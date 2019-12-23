@@ -35,27 +35,21 @@
 		margin-bottom: 1em; // Useful for when items wrap.
 	}
 
-	// 3. Remove margins on subsequent Edit container.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit {
-		margin-left: 0;
-		margin-right: 0;
-	}
-
-	// 4. Remove vertical margins on subsequent block container.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout .wp-block > .block-editor-block-list__block-edit > [data-block] {
+	// 3. Remove vertical margins on subsequent block container.
+	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout .wp-block > [data-block] {
 		margin-top: 0;
 		margin-bottom: 0;
 	}
 
-	.wp-block-navigation .block-editor-block-list__block-edit::before {
+	.wp-block-navigation::before {
 		left: 0;
 		right: 0;
 	}
 
 	// Remove the dashed outlines for child blocks.
-	&.is-hovered .wp-block-navigation .block-editor-block-list__block-edit::before,
-	&.is-selected .wp-block-navigation .block-editor-block-list__block-edit::before,
-	&.has-child-selected .wp-block-navigation .block-editor-block-list__block-edit::before {
+	&.is-hovered .wp-block-navigation::before,
+	&.is-selected .wp-block-navigation::before,
+	&.has-child-selected .wp-block-navigation::before {
 		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
 	}
 
