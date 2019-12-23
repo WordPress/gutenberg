@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, isArray } from 'lodash';
+import { filter, includes, isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,7 @@ function BlockManager( {
 	blockTypes = blockTypes.filter( ( blockType ) => (
 		hasBlockSupport( blockType, 'inserter', true ) &&
 		( ! search || isMatchingSearchTerm( blockType, search ) ) &&
-		! blockType.parent
+		( ! blockType.parent || includes( blockType.parent, 'core/post-content' ) )
 	) );
 
 	return (
