@@ -77,7 +77,7 @@ class InnerBlocks extends Component {
 
 		// Sync with controlled blocks value from parent, if possible.
 		if ( prevProps.block.innerBlocks !== innerBlocks ) {
-			const resetFunc = isLastBlockChangePersistent ? onInput : onChange;
+			const resetFunc = isLastBlockChangePersistent ? onChange : onInput;
 			if ( resetFunc ) {
 				resetFunc( innerBlocks );
 			}
