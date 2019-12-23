@@ -76,6 +76,17 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 /**
  * Renders focus capturing areas to redirect focus to the selected block if not
  * in Navigation mode.
+ *
+ * @param {string}  selectedClientId Client ID of the selected block.
+ * @param {boolean} isReverse        Set to true if the component is rendered
+ *                                   after the block list, false if rendered
+ *                                   before.
+ * @param {Object}  containerRef     Reference containing the element reference
+ *                                   of the block list container.
+ * @param {boolean} noCapture        Reference containing the flag for enabling
+ *                                   or disabling capturing.
+ *
+ * @return {WPElement} The focus capture element.
  */
 const FocusCapture = forwardRef( ( {
 	selectedClientId,
@@ -89,11 +100,15 @@ const FocusCapture = forwardRef( ( {
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	function onFocus() {
+		// Do not capture incoming focus if set by us in WritingFlow.
 		if ( noCapture.current ) {
 			delete noCapture.current;
 			return;
 		}
 
+		// When focus coming in from out of the block list, and no block is
+		// selected, enable Navigation mode and select the first or last block
+		// depending on the direction.
 		if ( ! selectedClientId ) {
 			setNavigationMode( true );
 
@@ -110,6 +125,8 @@ const FocusCapture = forwardRef( ( {
 			return;
 		}
 
+		// If there is a selected block, move focus to the first or last
+		// tabbable element depending on the direction.
 		const wrapper = getBlockFocusableWrapper( selectedClientId );
 
 		if ( isReverse ) {
@@ -123,6 +140,7 @@ const FocusCapture = forwardRef( ( {
 	return (
 		<div
 			ref={ ref }
+			// Don't allow tabbing to this element in Navigation mode.
 			tabIndex={ ! isNavigationMode ? '0' : undefined }
 			onFocus={ onFocus }
 			// Needs to be positioned within the viewport, so focus to this
@@ -152,6 +170,9 @@ class WritingFlow extends Component {
 		this.container = createRef();
 		this.focusCaptureBeforeRef = createRef();
 		this.focusCaptureAfterRef = createRef();
+
+		// Object reference that holds the a flag for enabling or disabling
+		// capturing on the focus capture elements.
 		this.noCapture = {};
 	}
 
@@ -349,6 +370,9 @@ class WritingFlow extends Component {
 
 			if ( isShift ) {
 				if ( target === wrapper ) {
+					// Disable focus capturing on the focus capture element, so
+					// it doesn't refocus this block and so it allows default
+					// behaviour (moving focus to the next tabbable element).
 					this.noCapture.current = true;
 					this.focusCaptureBeforeRef.current.focus();
 					return;
@@ -357,6 +381,7 @@ class WritingFlow extends Component {
 				const tabbables = focus.tabbable.find( wrapper );
 
 				if ( target === last( tabbables ) ) {
+					// See comment above.
 					this.noCapture.current = true;
 					this.focusCaptureAfterRef.current.focus();
 					return;
