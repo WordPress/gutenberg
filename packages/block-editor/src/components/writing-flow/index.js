@@ -6,7 +6,7 @@ import { overEvery, find, findLast, reverse, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createRef, useEffect } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -18,7 +18,7 @@ import {
 	isEntirelySelected,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT, TAB, isKeyboardEvent } from '@wordpress/keycodes';
-import { withSelect, withDispatch, useDispatch } from '@wordpress/data';
+import { withSelect, withDispatch, useSelect, useDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -77,9 +77,30 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
  * Renders focus capturing areas to redirect focus to the selected block if not
  * in Navigation mode.
  */
-function FocusCapture( { isReverse, clientId, isNavigationMode } ) {
+function FocusCapture( { selectedClientId, isReverse, containerRef } ) {
+	const isNavigationMode = useSelect( ( select ) =>
+		select( 'core/block-editor' ).isNavigationMode()
+	);
+	const { setNavigationMode } = useDispatch( 'core/block-editor' );
+
 	function onFocus() {
-		const wrapper = getBlockFocusableWrapper( clientId );
+		if ( ! selectedClientId ) {
+			setNavigationMode( true );
+
+			const tabbables = focus.tabbable.find( containerRef.current );
+
+			if ( tabbables.length ) {
+				if ( isReverse ) {
+					last( tabbables ).focus();
+				} else {
+					first( tabbables ).focus();
+				}
+			}
+
+			return;
+		}
+
+		const wrapper = getBlockFocusableWrapper( selectedClientId );
 
 		if ( isReverse ) {
 			const tabbables = focus.tabbable.find( wrapper );
@@ -91,7 +112,7 @@ function FocusCapture( { isReverse, clientId, isNavigationMode } ) {
 
 	return (
 		<div
-			tabIndex={ clientId && ! isNavigationMode ? '0' : undefined }
+			tabIndex={ ! isNavigationMode ? '0' : undefined }
 			onFocus={ onFocus }
 			// Needs to be positioned within the viewport, so focus to this
 			// element does not scroll the page.
@@ -100,33 +121,11 @@ function FocusCapture( { isReverse, clientId, isNavigationMode } ) {
 	);
 }
 
-/**
- * Enables navigation mode as soon as tab is pressed.
- * Meant to be rendered if there is no block selected.
- */
-function EnableNavigationModeOnTab() {
-	const { setNavigationMode } = useDispatch( 'core/block-editor' );
-	useEffect( () => {
-		function handleTab( event ) {
-			if ( event.keyCode === TAB ) {
-				setNavigationMode( true );
-			}
-		}
-
-		window.addEventListener( 'keydown', handleTab );
-		return () => {
-			window.removeEventListener( 'keydown', handleTab );
-		};
-	}, [ setNavigationMode ] );
-	return null;
-}
-
 class WritingFlow extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.bindContainer = this.bindContainer.bind( this );
 		this.onMouseDown = this.onMouseDown.bind( this );
 		this.focusLastTextField = this.focusLastTextField.bind( this );
 
@@ -139,16 +138,14 @@ class WritingFlow extends Component {
 		 */
 		this.verticalRect = null;
 
+		this.container = createRef();
+
 		/**
 		 * Reference of the writing flow appender element.
 		 * The reference is used to focus the first tabbable element after the block list
 		 * once we hit `tab` on the last block in navigation mode.
 		 */
 		this.appender = createRef();
-	}
-
-	bindContainer( ref ) {
-		this.container = ref;
 	}
 
 	onMouseDown() {
@@ -168,7 +165,7 @@ class WritingFlow extends Component {
 	getClosestTabbable( target, isReverse ) {
 		// Since the current focus target is not guaranteed to be a text field,
 		// find all focusables. Tabbability is considered later.
-		let focusableNodes = focus.focusable.find( this.container );
+		let focusableNodes = focus.focusable.find( this.container.current );
 
 		if ( isReverse ) {
 			focusableNodes = reverse( focusableNodes );
@@ -336,7 +333,7 @@ class WritingFlow extends Component {
 
 			if ( isShift ) {
 				if ( target === wrapper ) {
-					const focusableParent = this.container.closest( '[tabindex]' );
+					const focusableParent = this.container.current.closest( '[tabindex]' );
 					const beforeEditorElement = focus.tabbable.findPrevious( focusableParent );
 					beforeEditorElement.focus();
 					event.preventDefault();
@@ -346,7 +343,7 @@ class WritingFlow extends Component {
 				const tabbables = focus.tabbable.find( wrapper );
 
 				if ( target === last( tabbables ) ) {
-					const focusableParent = this.container.closest( '[tabindex]' );
+					const focusableParent = this.container.current.closest( '[tabindex]' );
 					const afterEditorElement = focus.tabbable.findNext( focusableParent );
 					afterEditorElement.focus();
 					event.preventDefault();
@@ -452,7 +449,7 @@ class WritingFlow extends Component {
 	 * Sets focus to the end of the last tabbable text field, if one exists.
 	 */
 	focusLastTextField() {
-		const focusableNodes = focus.focusable.find( this.container );
+		const focusableNodes = focus.focusable.find( this.container.current );
 		const target = findLast( focusableNodes, isTabbableTextField );
 		if ( target ) {
 			placeCaretAtHorizontalEdge( target, true );
@@ -462,33 +459,32 @@ class WritingFlow extends Component {
 	render() {
 		const {
 			children,
-			isNavigationMode,
 			selectedBlockClientId,
 			selectionStartClientId,
 		} = this.props;
-		const clientId = selectedBlockClientId || selectionStartClientId;
+		const selectedClientId = selectedBlockClientId || selectionStartClientId;
 
 		// Disable reason: Wrapper itself is non-interactive, but must capture
 		// bubbling events from children to determine focus transition intents.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div className="block-editor-writing-flow">
+				<FocusCapture
+					selectedClientId={ selectedClientId }
+					containerRef={ this.container }
+				/>
 				<div
-					ref={ this.bindContainer }
+					ref={ this.container }
 					onKeyDown={ this.onKeyDown }
 					onMouseDown={ this.onMouseDown }
 				>
-					<FocusCapture
-						clientId={ clientId }
-						isNavigationMode={ isNavigationMode }
-					/>
 					{ children }
-					<FocusCapture
-						clientId={ clientId }
-						isNavigationMode={ isNavigationMode }
-						isReverse
-					/>
 				</div>
+				<FocusCapture
+					selectedClientId={ selectedClientId }
+					containerRef={ this.container }
+					isReverse
+				/>
 				<div
 					ref={ this.appender }
 					aria-hidden
@@ -496,7 +492,6 @@ class WritingFlow extends Component {
 					onClick={ this.focusLastTextField }
 					className="block-editor-writing-flow__click-redirect"
 				/>
-				{ ! clientId && <EnableNavigationModeOnTab /> }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
