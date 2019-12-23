@@ -1,0 +1,39 @@
+.container {
+	margin: 10px 0;
+}
+
+.content {
+	padding: 0 12px;
+}
+
+.button {
+	background-color: rgba($black, 0.12);
+	border-radius: 20px;
+	flex-direction: row;
+	margin-right: 8px;
+	padding: 9px 16px 9px 12px;
+	align-items: center;
+}
+
+.buttonDark {
+	background-color: $light-opacity-light-200;
+}
+
+.buttonIconContent {
+	margin-right: 8px;
+}
+
+.buttonIcon {
+	width: 18px;
+}
+
+.buttonText {
+	color: $dark-opacity-800;
+	font-size: 14px;
+	font-weight: 600;
+	letter-spacing: 0.25px;
+}
+
+.buttonTextDark {
+	color: $light-opacity-700;
+}
