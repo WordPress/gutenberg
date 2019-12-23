@@ -570,6 +570,9 @@ function BlockListBlock( {
 						className="block-editor-block-list__block-popover"
 						__unstableSticky={ isPartOfMultiSelection ? '.wp-block.is-multi-selected' : true }
 						__unstableSlotName="block-toolbar"
+						// Allow subpixel positioning for the block movement animation.
+						__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' }
+						__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' }
 					>
 						{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && renderBlockContextualToolbar() }
 						{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (

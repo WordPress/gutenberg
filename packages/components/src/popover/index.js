@@ -226,6 +226,8 @@ const Popover = ( {
 	onFocusOutside,
 	__unstableSticky,
 	__unstableSlotName = SLOT_NAME,
+	__unstableAllowVerticalSubpixelPosition,
+	__unstableAllowHorizontalSubpixelPosition,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -254,7 +256,7 @@ const Popover = ( {
 			return;
 		}
 
-		const refresh = ( { noSubpixels } = {} ) => {
+		const refresh = ( { subpixels } = {} ) => {
 			const anchor = computeAnchorRect(
 				anchorRefFallback,
 				anchorRect,
@@ -281,15 +283,18 @@ const Popover = ( {
 			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef );
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
-				// Translate clashes with animated and arrow popovers.
-				if ( animate || ! noArrow || noSubpixels ) {
+				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
+					setStyle( containerEl, 'left', popoverLeft + 'px' );
+					setStyle( containerEl, 'top' );
+					setStyle( containerEl, 'transform', `translateY(${ popoverTop }px)` );
+				} else if ( subpixels && __unstableAllowHorizontalSubpixelPosition ) {
+					setStyle( containerEl, 'top', popoverTop + 'px' );
+					setStyle( containerEl, 'left' );
+					setStyle( containerEl, 'transform', `translate(${ popoverLeft }px)` );
+				} else {
 					setStyle( containerEl, 'top', popoverTop + 'px' );
 					setStyle( containerEl, 'left', popoverLeft + 'px' );
 					setStyle( containerEl, 'transform' );
-				} else {
-					setStyle( containerEl, 'top' );
-					setStyle( containerEl, 'left' );
-					setStyle( containerEl, 'transform', `translate(${ popoverLeft }px, ${ popoverTop }px)` );
 				}
 			}
 
@@ -320,11 +325,6 @@ const Popover = ( {
 			window.requestAnimationFrame( refresh );
 		};
 
-		// Scroll and attribute observation may render the popover on subpixels,
-		// which is good for a smooth transition, but at the end, it needs to
-		// rendered on pixels so the content is not blurry.
-		const intervalCallback = () => refresh( { noSubpixels: true } );
-
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
 		 * are not handled by the resize/scroll window events (i.e. CSS changes
@@ -332,7 +332,7 @@ const Popover = ( {
 		 *
 		 * For these situations, we refresh the popover every 0.5s
 		 */
-		const intervalHandle = window.setInterval( intervalCallback, 500 );
+		const intervalHandle = window.setInterval( refresh, 500 );
 
 		// Sometimes a click trigger a layout change that affects the popover
 		// position. This is an opportunity to immediately refresh rather than
@@ -343,8 +343,11 @@ const Popover = ( {
 
 		let observer;
 
-		if ( anchorRef && ! ( anchorRef instanceof window.Range ) ) {
-			observer = new window.MutationObserver( refresh );
+		if ( anchorRef && (
+			__unstableAllowVerticalSubpixelPosition ||
+			__unstableAllowHorizontalSubpixelPosition
+		) ) {
+			observer = new window.MutationObserver( () => refresh( { subpixels: true } ) );
 			observer.observe( anchorRef, { attributes: true } );
 		}
 
@@ -367,6 +370,8 @@ const Popover = ( {
 		shouldAnchorIncludePadding,
 		position,
 		__unstableSticky,
+		__unstableAllowVerticalSubpixelPosition,
+		__unstableAllowHorizontalSubpixelPosition,
 	] );
 
 	useFocusContentOnMount( focusOnMount, contentRef );
