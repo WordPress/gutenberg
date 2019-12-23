@@ -101,4 +101,69 @@ describe( 'Order of block keyboard navigation', () => {
 		await navigateToContentEditorTop();
 		await tabThroughParagraphBlock( 'Paragraph 1' );
 	} );
+
+	it( 'allows tabbing in navigation mode if no block is selected', async () => {
+		const paragraphBlocks = [ '0', '1' ];
+
+		// Create 2 paragraphs blocks with some content.
+		for ( const paragraphBlock of paragraphBlocks ) {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( paragraphBlock );
+		}
+
+		// Clear the selected block and put focus in front of the block list.
+		await page.evaluate( () => {
+			document.querySelector( '.edit-post-visual-editor' ).focus();
+		} );
+
+		await page.keyboard.press( 'Tab' );
+		await expect( await page.evaluate( () => {
+			return document.activeElement.placeholder;
+		} ) ).toBe( 'Add title' );
+
+		await page.keyboard.press( 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Paragraph' );
+
+		await page.keyboard.press( 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Paragraph' );
+
+		await page.keyboard.press( 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Open publish panel' );
+	} );
+
+	it( 'allows tabbing in navigation mode if no block is selected (reverse)', async () => {
+		const paragraphBlocks = [ '0', '1' ];
+
+		// Create 2 paragraphs blocks with some content.
+		for ( const paragraphBlock of paragraphBlocks ) {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( paragraphBlock );
+		}
+
+		// Clear the selected block and put focus behind the block list.
+		await page.evaluate( () => {
+			document.querySelector( '.edit-post-visual-editor' ).focus();
+			document.querySelector( '.edit-post-editor-regions__sidebar' ).focus();
+		} );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Open publish panel' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Paragraph' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Paragraph' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Add block' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Block: Paragraph' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await page.evaluate( () => {
+			return document.activeElement.placeholder;
+		} ) ).toBe( 'Add title' );
+	} );
 } );
