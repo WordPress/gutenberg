@@ -96,21 +96,23 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 				'Choose a template part by slug and theme, or create a new one.'
 			) }
 		>
-			<TextControl
-				label={ __( 'Slug' ) }
-				placeholder={ __( 'header' ) }
-				value={ slug }
-				onChange={ setSlug }
-				help={ help }
-				className="wp-block-template-part__placeholder-input"
-			/>
-			<TextControl
-				label={ __( 'Theme' ) }
-				placeholder={ __( 'twentytwenty' ) }
-				value={ theme }
-				onChange={ setTheme }
-				className="wp-block-template-part__placeholder-input"
-			/>
+			<div className="wp-block-template-part__placeholder-input-container">
+				<TextControl
+					label={ __( 'Slug' ) }
+					placeholder={ __( 'header' ) }
+					value={ slug }
+					onChange={ setSlug }
+					help={ help }
+					className="wp-block-template-part__placeholder-input"
+				/>
+				<TextControl
+					label={ __( 'Theme' ) }
+					placeholder={ __( 'twentytwenty' ) }
+					value={ theme }
+					onChange={ setTheme }
+					className="wp-block-template-part__placeholder-input"
+				/>
+			</div>
 			{ preview }
 			<Button isPrimary disabled={ ! slug || ! theme } onClick={ onChooseOrCreate }>
 				{ postId ? __( 'Choose' ) : __( 'Create' ) }
