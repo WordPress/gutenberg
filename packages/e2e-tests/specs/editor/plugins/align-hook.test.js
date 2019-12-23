@@ -177,7 +177,7 @@ describe( 'Align Hook Works As Expected', () => {
 
 	describe( 'Block with default align', () => {
 		const BLOCK_NAME = 'Test Default Align';
-		const SELECTED_ALIGNMENT_CONTROL_SELECTOR = '//div[contains(@class, "components-dropdown-menu__menu")]//button[contains(@class, "is-active")][text()="Align Right"]';
+		const SELECTED_ALIGNMENT_CONTROL_SELECTOR = '//div[contains(@class, "components-dropdown-menu__menu")]//button[contains(@class, "is-active")][text()="Align right"]';
 		createShowsTheExpectedButtonsTest( BLOCK_NAME, [
 			'Align left',
 			'Align center',
