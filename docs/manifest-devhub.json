@@ -840,6 +840,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ModalHeaderBar",
+		"slug": "modal-header-bar",
+		"markdown_source": "../packages/components/src/mobile/modal-header-bar/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Modal",
 		"slug": "modal",
 		"markdown_source": "../packages/components/src/modal/README.md",
