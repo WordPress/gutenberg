@@ -674,6 +674,14 @@ function gutenberg_extend_block_editor_preload_paths( $preload_paths, $post ) {
 		$preload_paths[] = $blocks_path;
 	}
 
+	/**
+	 * Attach the current post author data.
+	 */
+	$author_path = '/wp/v2/users/' . $post->post_author;
+	if ( ! in_array( $author_path, $preload_paths, true ) ) {
+		$preload_paths[] = $author_path;
+	}
+
 	return $preload_paths;
 }
 add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload_paths', 10, 2 );
