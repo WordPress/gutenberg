@@ -73,7 +73,7 @@ export class PostAuthor extends Component {
 			this.getCurrentAuthor( postAuthorId );
 		}
 
-		// Store a set of authors for display as initial results when uysing an autocomplete.
+		// Store a set of authors for display as initial results when using an autocomplete.
 		this.setState( { initialAuthors: authors.slice( 0, 9 ) } );
 	}
 
