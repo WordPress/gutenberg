@@ -156,12 +156,6 @@ describe( 'Order of block keyboard navigation', () => {
 		await expect( await getActiveLabel() ).toBe( 'Paragraph' );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Add block' );
-
-		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Block: Paragraph' );
-
-		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect( await page.evaluate( () => {
 			return document.activeElement.placeholder;
 		} ) ).toBe( 'Add title' );

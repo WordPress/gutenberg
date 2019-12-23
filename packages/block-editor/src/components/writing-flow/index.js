@@ -304,19 +304,28 @@ class WritingFlow extends Component {
 			const navigateDown = ( isTab && ! isShift ) || isDown;
 			const focusedBlockUid = navigateUp ? selectionBeforeEndClientId : selectionAfterEndClientId;
 
-			if (
-				( navigateDown || navigateUp ) &&
-				focusedBlockUid
-			) {
-				event.preventDefault();
-				this.props.onSelectBlock( focusedBlockUid );
+			if ( navigateDown || navigateUp ) {
+				if ( focusedBlockUid ) {
+					event.preventDefault();
+					this.props.onSelectBlock( focusedBlockUid );
+				} else if ( isTab && selectedBlockClientId ) {
+					const wrapper = getBlockFocusableWrapper( selectedBlockClientId );
+					let nextTabbable;
+
+					if ( navigateDown ) {
+						nextTabbable = focus.tabbable.findNext( wrapper );
+					} else {
+						nextTabbable = focus.tabbable.findPrevious( wrapper );
+					}
+
+					if ( nextTabbable ) {
+						event.preventDefault();
+						nextTabbable.focus();
+						this.props.clearSelectedBlock();
+					}
+				}
 			}
 
-			// Special case when reaching the end of the blocks (navigate to the next tabbable outside of the writing flow)
-			if ( navigateDown && selectedBlockClientId && ! selectionAfterEndClientId && [ UP, DOWN ].indexOf( keyCode ) === -1 ) {
-				this.props.clearSelectedBlock();
-				this.appender.current.focus();
-			}
 			return;
 		}
 
