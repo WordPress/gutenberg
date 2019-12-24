@@ -798,12 +798,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "IconButton",
-		"slug": "icon-button",
-		"markdown_source": "../packages/components/src/icon-button/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Icon",
 		"slug": "icon",
 		"markdown_source": "../packages/components/src/icon/README.md",
