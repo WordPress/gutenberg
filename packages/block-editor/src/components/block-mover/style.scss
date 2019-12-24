@@ -8,17 +8,27 @@
 }
 
 // Show the mover in a single button under the contextual toolbar.
-.block-editor-block-contextual-toolbar {
-	.block-editor-block-mover .components-toolbar {
+.block-editor-block-contextual-toolbar .block-editor-block-mover {
+	.components-toolbar {
 		flex-direction: column;
+	}
+
+	&.is-horizontal .components-toolbar {
+		flex-direction: row;
 	}
 
 	.block-editor-block-mover__control {
 		height: 50%;
 	}
 
+	&.is-horizontal .block-editor-block-mover__control {
+		height: $block-toolbar-height;
+		width: $block-toolbar-height/2 !important;
+		padding: 0;
+	}
+
 	// Drag and drop is only enabled in contextual toolbars
-	.block-editor-block-mover:not([draggable="false"]) {
+	&:not([draggable="false"]) {
 		cursor: grab;
 
 		.block-editor-block-mover__control {
