@@ -8,10 +8,10 @@
 * [iOS] Fix crash dismissing bottom-sheet after device rotation.
 * [Android] Add support for Preformatted block.
 * New block: Gallery. You can now create image galleries using WordPress Media library. Upload feature is coming soon.
+* Add support for Video block settings
 
 1.18.0
 ------
-* Add support for Video block settings
 * [iOS] Added native fullscreen preview when clicking image from Image Block
 * New block: Spacer
 
