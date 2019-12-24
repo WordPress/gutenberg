@@ -12,7 +12,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
     >
       Published
     </div>
-    <ForwardRef(IconButton)
+    <ForwardRef(Button)
       aria-expanded={true}
       icon="no-alt"
       label="Close panel"
@@ -47,7 +47,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
     >
       Scheduled
     </div>
-    <ForwardRef(IconButton)
+    <ForwardRef(Button)
       aria-expanded={true}
       icon="no-alt"
       label="Close panel"
@@ -85,7 +85,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
         onSubmit={[Function]}
       />
     </div>
-    <ForwardRef(IconButton)
+    <ForwardRef(Button)
       aria-expanded={true}
       icon="no-alt"
       label="Close panel"
@@ -121,7 +121,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
         onSubmit={[Function]}
       />
     </div>
-    <ForwardRef(IconButton)
+    <ForwardRef(Button)
       aria-expanded={true}
       icon="no-alt"
       label="Close panel"
@@ -157,7 +157,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
         onSubmit={[Function]}
       />
     </div>
-    <ForwardRef(IconButton)
+    <ForwardRef(Button)
       aria-expanded={true}
       icon="no-alt"
       label="Close panel"

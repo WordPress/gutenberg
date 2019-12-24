@@ -29,10 +29,7 @@ npm test
 
 Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some issues can be fixed automatically by running `npm run lint:fix`.
 
-To improve your developer workflow, you're encouraged to install an editor linting integration.
-
-- [ESLint Editor Integrations](https://eslint.org/docs/user-guide/integrations)
-- [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support)
+To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/getting-started.md) for additional information.
 
 To run unit tests only, without the linter, use `npm run test-unit` instead.
 

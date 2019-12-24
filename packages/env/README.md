@@ -40,7 +40,6 @@ First, ensure that Docker is running. You can do this by clocking on the Docker 
 Then, change to a directory that contains a WordPress plugin or theme:
 
 ```sh
-
 $ cd path/to/plugin-or-theme # WordPress install will be in path/to/plugin-or-theme-wordpress.
 ```
 
@@ -60,7 +59,8 @@ To stop the local environment:
 $ wp-env stop
 ```
 
-## Troubleshooting Common Problems
+## Troubleshooting common problems
+
 Many common problems can be fixed by running through the following troubleshooting steps in order:
 
 ### 1. Check that `wp-env` is running
