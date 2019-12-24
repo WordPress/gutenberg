@@ -195,6 +195,10 @@
 		line-height: 22px;
 		padding: 0 8px;
 		font-size: 11px;
+
+		&.has-icon:not(.has-text) {
+			width: 24px;
+		}
 	}
 
 	// Buttons that are text-based.
