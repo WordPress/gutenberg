@@ -155,16 +155,16 @@
 		height: $block-toolbar-height;
 	}
 
-	.components-icon-button.block-editor-block-switcher__toggle,
-	.components-icon-button.block-editor-block-switcher__no-switcher-icon {
+	.components-button.block-editor-block-switcher__toggle,
+	.components-button.block-editor-block-switcher__no-switcher-icon {
 		height: $block-toolbar-height;
 	}
 
-	.components-icon-button.block-editor-block-switcher__no-switcher-icon {
+	.components-button.block-editor-block-switcher__no-switcher-icon {
 		width: $block-toolbar-height;
 	}
 
-	.components-icon-button.block-editor-block-switcher__toggle {
+	.components-button.block-editor-block-switcher__toggle {
 		.block-editor-block-icon,
 		.block-editor-block-switcher__transform {
 			width: $block-toolbar-height;
