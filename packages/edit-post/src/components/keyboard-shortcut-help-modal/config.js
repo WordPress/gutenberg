@@ -27,18 +27,6 @@ export const mainShortcuts = [
 
 export const globalShortcuts = [
 	{
-		keyCombination: primary( 's' ),
-		description: __( 'Save your changes.' ),
-	},
-	{
-		keyCombination: primary( 'z' ),
-		description: __( 'Undo your last changes.' ),
-	},
-	{
-		keyCombination: primaryShift( 'z' ),
-		description: __( 'Redo your last undo.' ),
-	},
-	{
 		keyCombination: primaryShift( ',' ),
 		description: __( 'Show or hide the settings sidebar.' ),
 		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
