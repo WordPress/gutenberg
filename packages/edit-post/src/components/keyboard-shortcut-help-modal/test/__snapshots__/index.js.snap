@@ -36,32 +36,9 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
     <ShortcutSection
       shortcuts={
         Array [
-          Object {
-            "description": "Save your changes.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "S",
-            ],
-          },
-          Object {
-            "description": "Undo your last changes.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Z",
-            ],
-          },
-          Object {
-            "description": "Redo your last undo.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Shift",
-              "+",
-              "Z",
-            ],
-          },
+          "core/editor/save",
+          "core/editor/undo",
+          "core/editor/redo",
           Object {
             "ariaLabel": "Control + Shift + Comma",
             "description": "Show or hide the settings sidebar.",
