@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -15,6 +16,10 @@ function IconButton( {
 	label,
 	...props
 }, ref ) {
+	deprecated( 'wp.components.IconButton', {
+		alternative: 'wp.components.Button',
+	} );
+
 	return (
 		<Button
 			{ ...props }

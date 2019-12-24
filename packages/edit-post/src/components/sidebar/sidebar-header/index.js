@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
@@ -23,7 +23,7 @@ const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title }
 				<span className="edit-post-sidebar-header__title">
 					{ title || __( '(no title)' ) }
 				</span>
-				<IconButton
+				<Button
 					onClick={ closeSidebar }
 					icon="no-alt"
 					label={ closeLabel }
@@ -31,7 +31,7 @@ const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title }
 			</div>
 			<div className={ classnames( 'components-panel__header edit-post-sidebar-header', className ) }>
 				{ children }
-				<IconButton
+				<Button
 					onClick={ closeSidebar }
 					icon="no-alt"
 					label={ closeLabel }

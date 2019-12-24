@@ -3,7 +3,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { ENTER } from '@wordpress/keycodes';
 
 /**
@@ -53,7 +53,7 @@ const LinkControlSearchInput = ( {
 				__experimentalHandleURLSuggestions={ true }
 			/>
 
-			<IconButton
+			<Button
 				disabled={ ! value.length }
 				type="reset"
 				label={ __( 'Reset' ) }
