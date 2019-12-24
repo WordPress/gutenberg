@@ -11,7 +11,6 @@ import { BlockIcon } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-
 import DownloadableBlockHeader from '../index';
 import { pluginWithImg, pluginWithIcon } from './fixtures';
 
