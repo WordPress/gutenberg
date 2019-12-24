@@ -1,6 +1,6 @@
-# `@wordpress/env`
+# `wp-env`
 
-`wp-env` lets you easily set up a local WordPress environment for building and testing plugins and themes. It's simple to install and requires no configuration.
+`wp-env` (`@wordpress/env`) lets you easily set up a local WordPress environment for building and testing plugins and themes. It's simple to install and requires no configuration.
 
 ## Quick (tl;dr) Instructions
 
@@ -13,7 +13,9 @@ $ npx wp-env start
 
 The local environment will be available at http://localhost:8888.
 
-## Requirements
+## Instructions
+
+### Requirements
 
 One must have several software components installed on one's system before this environment can be successfully utilized.
 * [Docker](https://www.docker.com/) - Make sure this includes docker-compose. You can find instructions for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
@@ -21,16 +23,15 @@ One must have several software components installed on one's system before this 
 * [npm](https://www.npmjs.com/) - Is bundled with Node.js.
 * Virtualization Technology - On Linux you'll use the native container technology. For other OS'es you'll need virtualization software like [VirtualBox](https://virtualbox.org/), Hyper-V, or VMWare.
 
-## Installation
+### Installation
 
-Enter the following at your command prompt to install the environment:
+After confirming that the required software components have been installed, you can install `wp-env` globally like so:
+
 ```sh
 $ npm -g i @wordpress/env
 ```
 
 You're now ready to use `wp-env`!
-
-## Usage
 
 ### Starting the Environment
 
@@ -138,7 +139,7 @@ $ rm -rf "../$(basename $(pwd))-wordpress"
 $ wp-env start
 ```
 
-## Command reference
+## Command Reference
 
 ### `wp-env start [ref]`
 
