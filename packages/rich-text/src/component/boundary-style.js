@@ -7,10 +7,15 @@ import { useEffect } from '@wordpress/element';
  * Global stylesheet shared by all RichText instances.
  */
 const globalStyle = document.createElement( 'style' );
+
 const boundarySelector = '*[data-rich-text-format-boundary]';
 
 document.head.appendChild( globalStyle );
 
+/**
+ * Calculates and renders the format boundary style when the active formats
+ * change.
+ */
 export function BoundaryStyle( { activeFormats, forwardedRef } ) {
 	useEffect( () => {
 		// There's no need to recalculate the boundary styles if no formats are
