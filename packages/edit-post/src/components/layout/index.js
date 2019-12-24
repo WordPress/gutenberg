@@ -12,7 +12,7 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
-	VisualEditorGlobalKeyboardShortcuts,
+	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -90,7 +90,7 @@ function Layout() {
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
 			<EditorModeKeyboardShortcuts />
-			<VisualEditorGlobalKeyboardShortcuts.Register />
+			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
 				<EditorRegions
 					className={ className }
