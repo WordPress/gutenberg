@@ -64,6 +64,7 @@
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
+		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
@@ -102,6 +103,7 @@
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
 		"babel-loader": "8.0.6",
+		"babel-plugin-dev-expression": "0.2.2",
 		"babel-plugin-emotion": "10.0.23",
 		"babel-plugin-inline-json-import": "0.3.2",
 		"babel-plugin-react-native-classname-to-style": "1.2.2",
