@@ -228,6 +228,7 @@ const Popover = ( {
 	__unstableSlotName = SLOT_NAME,
 	__unstableAllowVerticalSubpixelPosition,
 	__unstableAllowHorizontalSubpixelPosition,
+	__unstableBoundaryParent,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -280,7 +281,15 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef );
+			} = computePopoverPosition(
+				anchor,
+				contentRect.current,
+				position,
+				__unstableSticky,
+				anchorRef,
+				// To do: get slot parent instead.
+				__unstableBoundaryParent ? document.querySelector( '.edit-post-editor-regions__content' ) : undefined
+			);
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
 				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
@@ -374,6 +383,7 @@ const Popover = ( {
 		__unstableSticky,
 		__unstableAllowVerticalSubpixelPosition,
 		__unstableAllowHorizontalSubpixelPosition,
+		__unstableBoundaryParent,
 	] );
 
 	useFocusContentOnMount( focusOnMount, contentRef );
