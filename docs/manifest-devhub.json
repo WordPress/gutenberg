@@ -1476,6 +1476,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/warning",
+		"slug": "packages-warning",
+		"markdown_source": "../packages/warning/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/wordcount",
 		"slug": "packages-wordcount",
 		"markdown_source": "../packages/wordcount/README.md",

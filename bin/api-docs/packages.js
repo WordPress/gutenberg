@@ -32,6 +32,7 @@ const packages = [
 	'shortcode',
 	'url',
 	'viewport',
+	'warning',
 	'wordcount',
 ];
 
