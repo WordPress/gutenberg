@@ -78,12 +78,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 					/>
 					<ShortcutSection
 						title={ __( 'Global shortcuts' ) }
-						shortcuts={ [ ,
-							'core/editor/save',
-							'core/editor/undo',
-							'core/editor/redo',
-							...globalShortcuts,
-						] }
+						shortcuts={ globalShortcuts }
 					/>
 					<ShortcutSection
 						title={ __( 'Selection shortcuts' ) }

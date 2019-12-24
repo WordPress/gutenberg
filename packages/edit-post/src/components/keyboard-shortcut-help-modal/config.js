@@ -26,6 +26,9 @@ export const mainShortcuts = [
 ];
 
 export const globalShortcuts = [
+	'core/editor/save',
+	'core/editor/undo',
+	'core/editor/redo',
 	{
 		keyCombination: primaryShift( ',' ),
 		description: __( 'Show or hide the settings sidebar.' ),
