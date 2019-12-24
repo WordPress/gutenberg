@@ -46,6 +46,7 @@
 		// Override default styles inherited from <Button /> to center
 		// icon horizontally.
 		justify-content: center;
+		width: auto;
 
 		&.is-secondary {
 			background-color: $white;
