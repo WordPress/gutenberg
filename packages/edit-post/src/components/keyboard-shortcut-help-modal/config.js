@@ -9,8 +9,6 @@ const {
 	primary,
 	// Shift+Cmd+<key> on a mac, Ctrl+Shift+<key> elsewhere.
 	primaryShift,
-	// Shift+Alt+Cmd+<key> on a mac, Ctrl+Shift+Akt+<key> elsewhere.
-	secondary,
 	// Ctrl+Alt+<key> on a mac, Shift+Alt+<key> elsewhere.
 	access,
 	ctrl,
@@ -29,11 +27,7 @@ export const globalShortcuts = [
 	'core/editor/save',
 	'core/editor/undo',
 	'core/editor/redo',
-	{
-		keyCombination: primaryShift( ',' ),
-		description: __( 'Show or hide the settings sidebar.' ),
-		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
-	},
+	'core/edit-post/toggle-sidebar',
 	{
 		keyCombination: access( 'o' ),
 		description: __( 'Open the block navigation menu.' ),
@@ -60,10 +54,7 @@ export const globalShortcuts = [
 		keyCombination: alt( 'F10' ),
 		description: __( 'Navigate to the nearest toolbar.' ),
 	},
-	{
-		keyCombination: secondary( 'm' ),
-		description: __( 'Switch between Visual editor and Code editor.' ),
-	},
+	'core/edit-post/toggle-mode',
 ];
 
 export const textFormattingShortcuts = [
