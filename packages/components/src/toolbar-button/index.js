@@ -35,6 +35,7 @@ function ToolbarButton( {
 
 	const button = (
 		<Button
+			aria-label={ title }
 			icon={ icon }
 			label={ title }
 			shortcut={ shortcut }
