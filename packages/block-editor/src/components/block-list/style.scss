@@ -411,7 +411,7 @@
 .block-editor-block-list__insertion-point-inserter,
 .block-editor-block-list__block-popover-inserter {
 	// Show a clickable plus.
-	.block-editor-inserter__toggle {
+	.block-editor-inserter__toggle.components-button {
 		border-radius: 50%;
 		color: $blue-medium-focus;
 		background: $white;
@@ -511,9 +511,8 @@
 		border: $border-width solid $blue-medium-focus;
 		border-left: none;
 		box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
-		height: $block-toolbar-height + $border-width;
+		height: $icon-button-size + 2 * $border-width;
 		font-size: $default-font-size;
-		line-height: $block-toolbar-height - $grid-size;
 		padding-left: $grid-size;
 		padding-right: $grid-size;
 
