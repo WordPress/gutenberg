@@ -30,7 +30,7 @@
 	left: 0;
 	right: 0;
 	background: $white;
-	min-height: $block-toolbar-height;
+	min-height: 36px;
 	border-bottom: $border-width solid $light-gray-500;
 
 	&:empty {
