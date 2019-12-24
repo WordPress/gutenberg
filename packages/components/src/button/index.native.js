@@ -76,7 +76,6 @@ export function Button( props ) {
 		getStylesFromColorScheme,
 		isPressed,
 		'aria-disabled': ariaDisabled,
-		'aria-label': ariaLabel,
 		'data-subscript': subscript,
 		testID,
 		icon,
@@ -133,7 +132,7 @@ export function Button( props ) {
 		<TouchableOpacity
 			activeOpacity={ 0.7 }
 			accessible={ true }
-			accessibilityLabel={ ariaLabel }
+			accessibilityLabel={ label }
 			accessibilityStates={ states }
 			accessibilityRole={ 'button' }
 			accessibilityHint={ hint }
