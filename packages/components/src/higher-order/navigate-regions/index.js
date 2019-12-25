@@ -44,8 +44,8 @@ export default createHigherOrderComponent(
 			const focusPrevious = useCallback( () => focusRegion( -1 ), [ container ] );
 			const focusNext = useCallback( () => focusRegion( 1 ), [ container ] );
 
-			useKeyboardShortcut( shortcuts.previous, focusPrevious );
-			useKeyboardShortcut( shortcuts.next, focusNext );
+			useKeyboardShortcut( shortcuts.previous, focusPrevious, { bindGlobal: true } );
+			useKeyboardShortcut( shortcuts.next, focusNext, { bindGlobal: true } );
 
 			// Disable reason: Clicking the editor should dismiss the regions focus style
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
