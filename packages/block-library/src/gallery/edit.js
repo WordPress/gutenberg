@@ -240,8 +240,14 @@ class GalleryEdit extends Component {
 	}
 
 	getImagesSizeOptions() {
-		const { imageSizes } = this.props;
-		return map( imageSizes, ( { name, slug } ) => ( { value: slug, label: name } ) );
+		const { imageSizes, resizedImages } = this.props;
+		return map(
+			filter(
+				imageSizes,
+				( { slug } ) => some( resizedImages, ( sizes ) => ( sizes[ slug ] ) )
+			),
+			( { name, slug } ) => ( { value: slug, label: name } )
+		);
 	}
 
 	updateImagesSize( sizeSlug ) {

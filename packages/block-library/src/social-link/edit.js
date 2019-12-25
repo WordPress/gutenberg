@@ -8,10 +8,7 @@ import classNames from 'classnames';
  */
 import { URLPopover, URLInput } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
-import {
-	Button,
-	IconButton,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -53,7 +50,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 							placeholder={ __( 'Enter Address' ) }
 							disableSuggestions={ true }
 						/>
-						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+						<Button icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
 				</URLPopover>
 			) }
