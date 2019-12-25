@@ -29,6 +29,7 @@ function KeyboardShortcuts( { children, shortcuts, bindGlobal, eventName } ) {
 			callback={ callback }
 			bindGlobal={ bindGlobal }
 			eventName={ eventName }
+			target={ target }
 		/>
 	) );
 
