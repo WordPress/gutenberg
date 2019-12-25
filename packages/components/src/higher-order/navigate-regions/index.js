@@ -6,35 +6,26 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { useCallback, useState, useRef } from '@wordpress/element';
+import { createHigherOrderComponent, useKeyboardShortcut } from '@wordpress/compose';
 import { rawShortcut } from '@wordpress/keycodes';
 
-/**
- * Internal dependencies
- */
-import KeyboardShortcuts from '../../keyboard-shortcuts';
+const defaultShortcuts = {
+	previous: [ 'ctrl+shift+`', rawShortcut.access( 'p' ) ],
+	next: [ 'ctrl+`', rawShortcut.access( 'n' ) ],
+};
 
 export default createHigherOrderComponent(
 	( WrappedComponent ) => {
-		return class extends Component {
-			constructor() {
-				super( ...arguments );
-				this.bindContainer = this.bindContainer.bind( this );
-				this.focusNextRegion = this.focusRegion.bind( this, 1 );
-				this.focusPreviousRegion = this.focusRegion.bind( this, -1 );
-				this.onClick = this.onClick.bind( this );
-				this.state = {
-					isFocusingRegions: false,
-				};
-			}
+		return ( { shortcuts = defaultShortcuts, ...props } ) => {
+			const container = useRef();
+			const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
+			const className = classnames( 'components-navigate-regions', {
+				'is-focusing-regions': isFocusingRegions,
+			} );
 
-			bindContainer( ref ) {
-				this.container = ref;
-			}
-
-			focusRegion( offset ) {
-				const regions = Array.from( this.container.querySelectorAll( '[role="region"]' ) );
+			function focusRegion( offset ) {
+				const regions = Array.from( container.current.querySelectorAll( '[role="region"]' ) );
 				if ( ! regions.length ) {
 					return;
 				}
@@ -48,41 +39,26 @@ export default createHigherOrderComponent(
 				}
 
 				nextRegion.focus();
-
-				if ( ! this.state.isFocusingRegions ) {
-					this.setState( { isFocusingRegions: true } );
-				}
+				setIsFocusingRegions( true );
 			}
+			const focusPrevious = useCallback( () => focusRegion( -1 ), [ container ] );
+			const focusNext = useCallback( () => focusRegion( 1 ), [ container ] );
 
-			onClick() {
-				if ( this.state.isFocusingRegions ) {
-					this.setState( { isFocusingRegions: false } );
-				}
-			}
+			useKeyboardShortcut( shortcuts.previous, focusPrevious );
+			useKeyboardShortcut( shortcuts.next, focusNext );
 
-			render() {
-				const className = classnames( 'components-navigate-regions', {
-					'is-focusing-regions': this.state.isFocusingRegions,
-				} );
-
-				// Disable reason: Clicking the editor should dismiss the regions focus style
-				/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
-				return (
-					<div ref={ this.bindContainer } className={ className } onClick={ this.onClick }>
-						<KeyboardShortcuts
-							bindGlobal
-							shortcuts={ {
-								'ctrl+`': this.focusNextRegion,
-								[ rawShortcut.access( 'n' ) ]: this.focusNextRegion,
-								'ctrl+shift+`': this.focusPreviousRegion,
-								[ rawShortcut.access( 'p' ) ]: this.focusPreviousRegion,
-							} }
-						/>
-						<WrappedComponent { ...this.props } />
-					</div>
-				);
-				/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
-			}
+			// Disable reason: Clicking the editor should dismiss the regions focus style
+			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+			return (
+				<div
+					ref={ container }
+					className={ className }
+					onClick={ () => setIsFocusingRegions( false ) }
+				>
+					<WrappedComponent { ...props } />
+				</div>
+			);
+			/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 		};
 	}, 'navigateRegions'
 );

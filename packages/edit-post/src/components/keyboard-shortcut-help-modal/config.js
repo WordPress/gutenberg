@@ -33,24 +33,6 @@ export const globalShortcuts = [
 		description: __( 'Open the block navigation menu.' ),
 	},
 	{
-		keyCombination: ctrl( '`' ),
-		description: __( 'Navigate to the next part of the editor.' ),
-		ariaLabel: shortcutAriaLabel.ctrl( '`' ),
-	},
-	{
-		keyCombination: ctrlShift( '`' ),
-		description: __( 'Navigate to the previous part of the editor.' ),
-		ariaLabel: shortcutAriaLabel.ctrlShift( '`' ),
-	},
-	{
-		keyCombination: access( 'n' ),
-		description: __( 'Navigate to the next part of the editor (alternative).' ),
-	},
-	{
-		keyCombination: access( 'p' ),
-		description: __( 'Navigate to the previous part of the editor (alternative).' ),
-	},
-	{
 		keyCombination: alt( 'F10' ),
 		description: __( 'Navigate to the nearest toolbar.' ),
 	},
