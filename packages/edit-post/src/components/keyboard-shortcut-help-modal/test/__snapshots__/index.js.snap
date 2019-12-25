@@ -39,17 +39,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           "core/editor/save",
           "core/editor/undo",
           "core/editor/redo",
-          Object {
-            "ariaLabel": "Control + Shift + Comma",
-            "description": "Show or hide the settings sidebar.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Shift",
-              "+",
-              ",",
-            ],
-          },
+          "core/edit-post/toggle-sidebar",
           Object {
             "description": "Open the block navigation menu.",
             "keyCombination": Array [
@@ -108,18 +98,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
               "F10",
             ],
           },
-          Object {
-            "description": "Switch between Visual editor and Code editor.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "M",
-            ],
-          },
+          "core/edit-post/toggle-mode",
         ]
       }
       title="Global shortcuts"

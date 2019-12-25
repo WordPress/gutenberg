@@ -6,17 +6,17 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import shortcuts from '../../../keyboard-shortcuts';
+const SidebarHeader = ( { children, className, closeLabel } ) => {
+	const { shortcut, title } = useSelect( ( select ) => ( {
+		shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+		title: select( 'core/editor' ).getEditedPostAttribute( 'title' ),
+	} ), [] );
+	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 
-const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title } ) => {
 	return (
 		<>
 			<div className="components-panel__header edit-post-sidebar-header__small">
@@ -24,7 +24,7 @@ const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title }
 					{ title || __( '(no title)' ) }
 				</span>
 				<Button
-					onClick={ closeSidebar }
+					onClick={ closeGeneralSidebar }
 					icon="no-alt"
 					label={ closeLabel }
 				/>
@@ -32,21 +32,14 @@ const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title }
 			<div className={ classnames( 'components-panel__header edit-post-sidebar-header', className ) }>
 				{ children }
 				<Button
-					onClick={ closeSidebar }
+					onClick={ closeGeneralSidebar }
 					icon="no-alt"
 					label={ closeLabel }
-					shortcut={ shortcuts.toggleSidebar }
+					shortcut={ shortcut }
 				/>
 			</div>
 		</>
 	);
 };
 
-export default compose(
-	withSelect( ( select ) => ( {
-		title: select( 'core/editor' ).getEditedPostAttribute( 'title' ),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		closeSidebar: dispatch( 'core/edit-post' ).closeGeneralSidebar,
-	} ) ),
-)( SidebarHeader );
+export default SidebarHeader;
