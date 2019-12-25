@@ -78,9 +78,7 @@ function useShortcut( name, callback, {
 		} );
 
 		return () => {
-			shortcutKeys.forEach( ( shortcut ) => {
-				mousetrap.unbind( shortcut, eventName );
-			} );
+			mousetrap.reset();
 		};
 	}, [ combination, aliases, bindGlobal, eventName, callback, target ] );
 }

@@ -12,11 +12,11 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
+	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
-	BlockEditorKeyboardShortcuts,
 	__experimentalPageTemplatePicker,
 	__experimentalUsePageTemplatePickerVisible,
 } from '@wordpress/block-editor';
@@ -90,7 +90,7 @@ function Layout() {
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
 			<EditorModeKeyboardShortcuts />
-			<BlockEditorKeyboardShortcuts.Register />
+			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
 				<EditorRegions
 					className={ className }
