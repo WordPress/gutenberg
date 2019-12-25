@@ -90,29 +90,30 @@ class PostTitle extends Component {
 			<PostTypeSupportCheck supportKeys="title">
 				<div className="editor-post-title">
 					<div className={ className }>
-
-						<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
-							{ decodedPlaceholder || __( 'Add title' ) }
-						</label>
-						<Textarea
-							id={ `post-title-${ instanceId }` }
-							className="editor-post-title__input"
-							value={ decodeEntities( title ) }
-							onChange={ this.onChange }
-							placeholder={ decodedPlaceholder || __( 'Add title' ) }
-							onFocus={ this.onSelect }
-							onKeyDown={ this.onKeyDown }
-							onKeyPress={ this.onUnselect }
-							/*
+						<div>
+							<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
+								{ decodedPlaceholder || __( 'Add title' ) }
+							</label>
+							<Textarea
+								id={ `post-title-${ instanceId }` }
+								className="editor-post-title__input"
+								value={ decodeEntities( title ) }
+								onChange={ this.onChange }
+								placeholder={ decodedPlaceholder || __( 'Add title' ) }
+								onFocus={ this.onSelect }
+								onKeyDown={ this.onKeyDown }
+								onKeyPress={ this.onUnselect }
+								/*
 									Only autofocus the title when the post is entirely empty.
 									This should only happen for a new post, which means we
 									focus the title on new post so the author can start typing
 									right away, without needing to click anything.
 								*/
-							/* eslint-disable jsx-a11y/no-autofocus */
-							autoFocus={ document.body === document.activeElement && isCleanNewPost }
+								/* eslint-disable jsx-a11y/no-autofocus */
+								autoFocus={ document.body === document.activeElement && isCleanNewPost }
 							/* eslint-enable jsx-a11y/no-autofocus */
-						/>
+							/>
+						</div>
 						{ isSelected && isPostTypeViewable && <PostPermalink /> }
 					</div>
 				</div>
