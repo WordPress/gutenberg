@@ -8,7 +8,7 @@ import { includes, castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Return true if platform is MacOS.
@@ -36,7 +36,7 @@ function useKeyboardShortcut( shortcuts, callback, {
 	eventName = 'keydown',
 	target,
 } = {} ) {
-	useLayoutEffect( () => {
+	useEffect( () => {
 		const mousetrap = new Mousetrap( target ? target.current : document );
 		castArray( shortcuts ).forEach( ( shortcut ) => {
 			const keys = shortcut.split( '+' );

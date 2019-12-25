@@ -85,7 +85,6 @@ function Layout() {
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 	} );
-	console.log( previousShortcut, nextShortcut );
 
 	return (
 		<>
