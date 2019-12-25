@@ -22,11 +22,11 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/keycodes": "file:../keycodes",
-		"lodash": "^4.17.15",
-		"mousetrap": "^1.6.2"
+		"lodash": "^4.17.15"
 	},
 	"publishConfig": {
 		"access": "public"
