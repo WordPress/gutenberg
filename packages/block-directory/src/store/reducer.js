@@ -16,7 +16,6 @@ export const downloadableBlocks = ( state = {
 	hasPermission: true,
 	filterValue: undefined,
 	isRequestingDownloadableBlocks: true,
-	installedBlockTypes: [],
 }, action ) => {
 	switch ( action.type ) {
 		case 'FETCH_DOWNLOADABLE_BLOCKS' :
@@ -33,6 +32,24 @@ export const downloadableBlocks = ( state = {
 				hasPermission: true,
 				isRequestingDownloadableBlocks: false,
 			};
+	}
+	return state;
+};
+
+/**
+ * Reducer managing the installation and deletion of blocks.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const blockManagement = ( state = {
+	hasPermission: true,
+	installedBlockTypes: [],
+	items: [],
+}, action ) => {
+	switch ( action.type ) {
 		case 'SET_INSTALL_BLOCKS_PERMISSION' :
 			return {
 				...state,
@@ -44,7 +61,6 @@ export const downloadableBlocks = ( state = {
 				...state,
 				installedBlockTypes: [ ...state.installedBlockTypes, action.item ],
 			};
-
 		case 'REMOVE_INSTALLED_BLOCK_TYPE' :
 			return {
 				...state,
@@ -56,4 +72,5 @@ export const downloadableBlocks = ( state = {
 
 export default combineReducers( {
 	downloadableBlocks,
+	blockManagement,
 } );
