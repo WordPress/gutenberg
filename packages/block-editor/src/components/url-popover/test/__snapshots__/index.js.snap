@@ -15,7 +15,7 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
       <div>
         Editor
       </div>
-      <ForwardRef(IconButton)
+      <ForwardRef(Button)
         aria-expanded={false}
         className="block-editor-url-popover__settings-toggle"
         icon="arrow-down-alt2"
@@ -42,7 +42,7 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
       <div>
         Editor
       </div>
-      <ForwardRef(IconButton)
+      <ForwardRef(Button)
         aria-expanded={true}
         className="block-editor-url-popover__settings-toggle"
         icon="arrow-down-alt2"

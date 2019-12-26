@@ -19,7 +19,7 @@ import { computePopoverPosition } from './utils';
 import withFocusReturn from '../higher-order/with-focus-return';
 import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import PopoverDetectOutside from './detect-outside';
-import IconButton from '../icon-button';
+import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
@@ -463,7 +463,7 @@ const Popover = ( {
 								<span className="components-popover__header-title">
 									{ headerTitle }
 								</span>
-								<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
+								<Button className="components-popover__close" icon="no-alt" onClick={ onClose } />
 							</div>
 						) }
 						<div

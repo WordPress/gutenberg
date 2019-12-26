@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { displayShortcut, shortcutAriaLabel, rawShortcut } from '@wordpress/keycodes';
+
 /** @typedef {import('./actions').WPShortcutKeyCombination} WPShortcutKeyCombination */
 
 /**
@@ -18,6 +23,32 @@ const EMPTY_ARRAY = [];
  */
 export function getShortcutKeyCombination( state, name ) {
 	return state[ name ] ? state[ name ].keyCombination : null;
+}
+
+/**
+ * Returns a string representing the main key combination for a given shortcut name.
+ *
+ * @param {Object} state          Global state.
+ * @param {string} name           Shortcut name.
+ * @param {string} representation Type of reprensentation. (display, raw, ariaLabel )
+ *
+ * @return {string} Shortcut representation.
+ */
+export function getShortcutRepresentation( state, name, representation = 'display' ) {
+	const shortcut = getShortcutKeyCombination( state, name );
+	if ( ! shortcut ) {
+		return null;
+	}
+
+	const formattingMethods = {
+		display: displayShortcut,
+		raw: rawShortcut,
+		ariaLabel: shortcutAriaLabel,
+	};
+
+	return shortcut.modifier ?
+		formattingMethods[ representation ][ shortcut.modifier ]( shortcut.character ) :
+		shortcut.character;
 }
 
 /**

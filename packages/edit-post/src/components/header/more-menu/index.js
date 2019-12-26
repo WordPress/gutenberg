@@ -18,7 +18,7 @@ const POPOVER_PROPS = {
 	position: 'bottom left',
 };
 const TOGGLE_PROPS = {
-	labelPosition: 'bottom',
+	tooltipPosition: 'bottom',
 };
 
 const MoreMenu = () => (

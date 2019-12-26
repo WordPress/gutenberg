@@ -75,7 +75,7 @@
 		margin-right: 0;
 
 		// Hide the box shadow that appears on hover.
-		// All the :not() rules are needed to override default iconButton styles.
+		// All the :not() rules are needed to override default Button styles.
 		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
 			box-shadow: none;
 		}

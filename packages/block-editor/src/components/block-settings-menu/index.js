@@ -14,7 +14,6 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -37,24 +36,15 @@ export function BlockSettingsMenu( { clientIds } ) {
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutKeyCombination } = select( 'core/keyboard-shortcuts' );
+		const { getShortcutRepresentation } = select( 'core/keyboard-shortcuts' );
 		return {
-			duplicate: getShortcutKeyCombination( 'core/block-editor/duplicate' ),
+      duplicate: getShortcutKeyCombination( 'core/block-editor/duplicate' ),
 			remove: getShortcutKeyCombination( 'core/block-editor/remove' ),
 			insertAfter: getShortcutKeyCombination( 'core/block-editor/insert-after' ),
 			insertBefore: getShortcutKeyCombination( 'core/block-editor/insert-before' ),
 			toggleBlockMode: getShortcutKeyCombination( 'core/block-editor/toggle-block-mode' ),
 		};
 	}, [] );
-
-	const getShortcutDisplay = ( shortcut ) => {
-		if ( ! shortcut ) {
-			return null;
-		}
-		return shortcut.modifier ?
-			displayShortcut[ shortcut.modifier ]( shortcut.character ) :
-			shortcut.character;
-	};
 
 	return (
 		<BlockActions clientIds={ clientIds }>
@@ -96,7 +86,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											className="block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onDuplicate ) }
 											icon="admin-page"
-											shortcut={ getShortcutDisplay( shortcuts.duplicate ) }
+											shortcut={ shortcuts.duplicate }
 										>
 											{ __( 'Duplicate' ) }
 										</MenuItem>
@@ -107,7 +97,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 												className="block-editor-block-settings-menu__control"
 												onClick={ flow( onClose, onInsertBefore ) }
 												icon="insert-before"
-												shortcut={ getShortcutDisplay( shortcuts.insertBefore ) }
+												shortcut={ shortcuts.insertBefore }
 											>
 												{ __( 'Insert Before' ) }
 											</MenuItem>
@@ -115,7 +105,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 												className="block-editor-block-settings-menu__control"
 												onClick={ flow( onClose, onInsertAfter ) }
 												icon="insert-after"
-												shortcut={ getShortcutDisplay( shortcuts.insertAfter ) }
+												shortcut={ shortcuts.insertAfter }
 											>
 												{ __( 'Insert After' ) }
 											</MenuItem>
@@ -138,7 +128,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											className="block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onRemove ) }
 											icon="trash"
-											shortcut={ getShortcutDisplay( shortcuts.remove ) }
+											shortcut={ shortcuts.remove }
 										>
 											{ _n( 'Remove Block', 'Remove Blocks', count ) }
 										</MenuItem>

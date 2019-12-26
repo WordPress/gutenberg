@@ -17,7 +17,6 @@ import {
 	BaseControl,
 	Button,
 	FocalPointPicker,
-	IconButton,
 	PanelBody,
 	PanelRow,
 	RangeControl,
@@ -317,7 +316,7 @@ function CoverEdit( {
 									allowedTypes={ ALLOWED_MEDIA_TYPES }
 									value={ id }
 									render={ ( { open } ) => (
-										<IconButton
+										<Button
 											className="components-toolbar__control"
 											label={ __( 'Edit media' ) }
 											icon="edit"
