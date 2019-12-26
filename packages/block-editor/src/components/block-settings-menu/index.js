@@ -38,11 +38,11 @@ export function BlockSettingsMenu( { clientIds } ) {
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( 'core/keyboard-shortcuts' );
 		return {
-      duplicate: getShortcutKeyCombination( 'core/block-editor/duplicate' ),
-			remove: getShortcutKeyCombination( 'core/block-editor/remove' ),
-			insertAfter: getShortcutKeyCombination( 'core/block-editor/insert-after' ),
-			insertBefore: getShortcutKeyCombination( 'core/block-editor/insert-before' ),
-			toggleBlockMode: getShortcutKeyCombination( 'core/block-editor/toggle-block-mode' ),
+			duplicate: getShortcutRepresentation( 'core/block-editor/duplicate' ),
+			remove: getShortcutRepresentation( 'core/block-editor/remove' ),
+			insertAfter: getShortcutRepresentation( 'core/block-editor/insert-after' ),
+			insertBefore: getShortcutRepresentation( 'core/block-editor/insert-before' ),
+			toggleBlockMode: getShortcutRepresentation( 'core/block-editor/toggle-block-mode' ),
 		};
 	}, [] );
 
@@ -115,7 +115,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 										<BlockModeToggle
 											clientId={ firstBlockClientId }
 											onToggle={ flow( onClose, onToggleBlockMode ) }
-											shortcut={ getShortcutDisplay( shortcuts.toggleBlockMode ) }
+											shortcut={ shortcuts.toggleBlockMode }
 										/>
 									) }
 									<__experimentalBlockSettingsMenuPluginsExtension.Slot
