@@ -65,13 +65,13 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 							} } >
 							<div className="editor-url-input block-editor-url-input">
 								<URLInput
-                  value={ url }
-							    onChange={ ( nextURL ) => setAttributes( { url: nextURL } ) }
-							    placeholder={ __( 'Enter Address' ) }
-							    disableSuggestions={ true }
+									value={ url }
+									onChange={ ( nextURL ) => setAttributes( { url: nextURL } ) }
+									placeholder={ __( 'Enter Address' ) }
+									disableSuggestions={ true }
 						    />
 							</div>
-						  <Button icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+							<Button icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 						</form>
 					</URLPopover>
 				) }
