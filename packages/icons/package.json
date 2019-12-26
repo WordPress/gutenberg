@@ -29,6 +29,6 @@
 	},
 	"scripts": {
 		"build": "svgr -d ./build ./src",
-		"postinstall": "npm run build"
+		"prepare": "npm run build"
 	}
 }
