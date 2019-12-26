@@ -130,6 +130,8 @@ function toFormat( { type, attributes } ) {
  *                                            multiline.
  * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
  *                                            nesting is possible.
+ * @param {?boolean} [$1.preserveWhiteSpace]  Whether or not to collapse white
+ *                                            space characters.
  *
  * @return {Object} A rich text value.
  */
@@ -141,6 +143,7 @@ export function create( {
 	multilineTag,
 	multilineWrapperTags,
 	__unstableIsEditableTree: isEditableTree,
+	preserveWhiteSpace,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -163,6 +166,7 @@ export function create( {
 			element,
 			range,
 			isEditableTree,
+			preserveWhiteSpace,
 		} );
 	}
 
@@ -172,6 +176,7 @@ export function create( {
 		multilineTag,
 		multilineWrapperTags,
 		isEditableTree,
+		preserveWhiteSpace,
 	} );
 }
 
@@ -268,14 +273,25 @@ function filterRange( node, range, filter ) {
 	return { startContainer, startOffset, endContainer, endOffset };
 }
 
+/**
+ * Collapse any whitespace used for HTML formatting to one space character,
+ * because it will also be displayed as such by the browser.
+ *
+ * @param {string} string
+ */
+function collapseWhiteSpace( string ) {
+	return string.replace( /[\n\r\t]+/g, ' ' );
+}
+
 const ZWNBSPRegExp = new RegExp( ZWNBSP, 'g' );
 
-function filterString( string ) {
-	// Reduce any whitespace used for HTML formatting to one space
-	// character, because it will also be displayed as such by the browser.
-	return string.replace( /[\n\r\t]+/g, ' ' )
-		// Remove padding added by `toTree`.
-		.replace( ZWNBSPRegExp, '' );
+/**
+ * Removes padding (zero width non breaking spaces) added by `toTree`.
+ *
+ * @param {string} string
+ */
+function removePadding( string ) {
+	return string.replace( ZWNBSPRegExp, '' );
 }
 
 /**
@@ -288,6 +304,8 @@ function filterString( string ) {
  *                                            multiline.
  * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
  *                                            nesting is possible.
+ * @param {?boolean} $1.preserveWhiteSpace    Whether or not to collapse white
+ *                                            space characters.
  *
  * @return {Object} A rich text value.
  */
@@ -298,6 +316,7 @@ function createFromElement( {
 	multilineWrapperTags,
 	currentWrapperTags = [],
 	isEditableTree,
+	preserveWhiteSpace,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -318,8 +337,15 @@ function createFromElement( {
 		const type = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === TEXT_NODE ) {
-			const text = filterString( node.nodeValue );
-			range = filterRange( node, range, filterString );
+			let filter = removePadding;
+
+			if ( ! preserveWhiteSpace ) {
+				filter = ( string ) =>
+					removePadding( collapseWhiteSpace( string ) );
+			}
+
+			const text = filter( node.nodeValue );
+			range = filterRange( node, range, filter );
 			accumulateSelection( accumulator, node, range, { text } );
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
@@ -365,6 +391,7 @@ function createFromElement( {
 				multilineWrapperTags,
 				currentWrapperTags: [ ...currentWrapperTags, format ],
 				isEditableTree,
+				preserveWhiteSpace,
 			} );
 
 			accumulateSelection( accumulator, node, range, value );
@@ -378,6 +405,7 @@ function createFromElement( {
 			multilineTag,
 			multilineWrapperTags,
 			isEditableTree,
+			preserveWhiteSpace,
 		} );
 
 		accumulateSelection( accumulator, node, range, value );
@@ -393,11 +421,28 @@ function createFromElement( {
 				} );
 			}
 		} else {
+			// Indices should share a reference to the same formats array.
+			// Only create a new reference if `formats` changes.
+			function mergeFormats( formats ) {
+				if ( mergeFormats.formats === formats ) {
+					return mergeFormats.newFormats;
+				}
+
+				const newFormats = formats ? [ format, ...formats ] : [ format ];
+
+				mergeFormats.formats = formats;
+				mergeFormats.newFormats = newFormats;
+
+				return newFormats;
+			}
+
+			// Since the formats parameter can be `undefined`, preset
+			// `mergeFormats` with a new reference.
+			mergeFormats.newFormats = [ format ];
+
 			mergePair( accumulator, {
 				...value,
-				formats: Array.from( value.formats, ( formats ) =>
-					formats ? [ format, ...formats ] : [ format ]
-				),
+				formats: Array.from( value.formats, mergeFormats ),
 			} );
 		}
 	}
@@ -409,15 +454,17 @@ function createFromElement( {
  * Creates a rich text value from a DOM element and range that should be
  * multiline.
  *
- * @param {Object}    $1                      Named argements.
- * @param {?Element}  $1.element              Element to create value from.
- * @param {?Range}    $1.range                Range to create value from.
- * @param {?string}   $1.multilineTag         Multiline tag if the structure is
- *                                            multiline.
- * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
- *                                            nesting is possible.
- * @param {boolean}   $1.currentWrapperTags   Whether to prepend a line
- *                                            separator.
+ * @param {Object}   $1                      Named argements.
+ * @param {?Element} $1.element              Element to create value from.
+ * @param {?Range}   $1.range                Range to create value from.
+ * @param {?string}  $1.multilineTag         Multiline tag if the structure is
+ *                                           multiline.
+ * @param {?Array}   $1.multilineWrapperTags Tags where lines can be found if
+ *                                           nesting is possible.
+ * @param {boolean}  $1.currentWrapperTags   Whether to prepend a line
+ *                                           separator.
+ * @param {?boolean} $1.preserveWhiteSpace   Whether or not to collapse white
+ *                                           space characters.
  *
  * @return {Object} A rich text value.
  */
@@ -428,6 +475,7 @@ function createFromMultilineElement( {
 	multilineWrapperTags,
 	currentWrapperTags = [],
 	isEditableTree,
+	preserveWhiteSpace,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -452,6 +500,7 @@ function createFromMultilineElement( {
 			multilineWrapperTags,
 			currentWrapperTags,
 			isEditableTree,
+			preserveWhiteSpace,
 		} );
 
 		// Multiline value text should be separated by a line separator.

@@ -28,18 +28,30 @@
 .components-color-picker {
 	width: 100%;
 	overflow: hidden;
+
+	* {
+		box-sizing: border-box;
+	}
+
+	.components-button {
+		padding: 6px;
+	}
 }
+
 .components-color-picker__saturation {
 	width: 100%;
 	padding-bottom: 55%;
 	position: relative;
 }
+
 .components-color-picker__body {
 	padding: $grid-size-large $grid-size-large #{ $grid-size-small * 3 };
 }
+
 .components-color-picker__controls {
 	display: flex;
 }
+
 .components-color-picker__saturation-pointer,
 .components-color-picker__hue-pointer,
 .components-color-picker__alpha-pointer {
@@ -72,6 +84,7 @@
 		margin-top: 0;
 	}
 }
+
 .components-color-picker__active {
 	position: absolute;
 	top: 0;
@@ -93,16 +106,20 @@
 	right: 0;
 	bottom: 0;
 }
+
 .components-color-picker__saturation-color {
 	overflow: hidden;
 }
+
 .components-color-picker__saturation-white {
 	/*rtl:ignore*/
 	background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
 }
+
 .components-color-picker__saturation-black {
 	background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
 }
+
 .components-color-picker__saturation-pointer {
 	width: 8px;
 	height: 8px;
@@ -119,6 +136,7 @@
 .components-color-picker__toggles {
 	flex: 1;
 }
+
 .components-color-picker__alpha {
 	background-image:
 		linear-gradient(45deg, #ddd 25%, transparent 25%),
@@ -128,6 +146,7 @@
 	background-size: 10px 10px;
 	background-position: 0 0, 0 5px, 5px -5px, -5px 0;
 }
+
 .components-color-picker__hue-gradient,
 .components-color-picker__alpha-gradient {
 	position: absolute;
@@ -136,14 +155,17 @@
 	right: 0;
 	bottom: 0;
 }
+
 .components-color-picker__hue,
 .components-color-picker__alpha {
 	height: 12px;
 	position: relative;
 }
+
 .is-alpha-enabled .components-color-picker__hue {
 	margin-bottom: 8px;
 }
+
 .components-color-picker__hue-bar,
 .components-color-picker__alpha-bar {
 	position: relative;
@@ -151,10 +173,12 @@
 	height: 100%;
 	padding: 0 2px;
 }
+
 .components-color-picker__hue-gradient {
 	/*rtl:ignore*/
 	background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
 }
+
 .components-color-picker__hue-pointer,
 .components-color-picker__alpha-pointer {
 	/*rtl:ignore*/
@@ -192,7 +216,6 @@
 	outline-offset: -2px;
 }
 
-
 /* INPUTS COMPONENT */
 .components-color-picker__inputs-wrapper {
 	margin: 0 -4px;
@@ -202,16 +225,29 @@
 
 	fieldset {
 		flex: 1;
+		border: none;
+		margin: 0;
+		padding: 0;
 	}
 
 	.components-color-picker__inputs-fields .components-text-control__input[type="number"] {
-		padding: 2px;
+		padding: 6px 8px;
 	}
 }
+
+.components-color-picker__inputs-field {
+	width: 100%;
+}
+
 .components-color-picker__inputs-fields {
 	display: flex;
 	/*rtl:ignore*/
 	direction: ltr;
+	flex-grow: 1;
+
+	.components-base-control + .components-base-control {
+		margin-bottom: 0;
+	}
 
 	.components-base-control__field {
 		margin: 0 4px;

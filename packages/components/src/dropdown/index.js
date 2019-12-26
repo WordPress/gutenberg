@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
@@ -62,6 +67,9 @@ class Dropdown extends Component {
 	}
 
 	close() {
+		if ( this.props.onClose ) {
+			this.props.onClose();
+		}
 		this.setState( { isOpen: false } );
 	}
 
@@ -82,7 +90,7 @@ class Dropdown extends Component {
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 
 		return (
-			<div className={ className } ref={ this.containerRef }>
+			<div className={ classnames( 'components-dropdown', className ) } ref={ this.containerRef }>
 				{ renderToggle( args ) }
 				{ isOpen && (
 					<Popover

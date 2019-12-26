@@ -14,17 +14,16 @@ import {
 	useState,
 } from '@wordpress/element';
 import {
+	BaseControl,
+	Button,
 	FocalPointPicker,
-	IconButton,
 	PanelBody,
 	PanelRow,
 	RangeControl,
-	ToggleControl,
-	Toolbar,
-	withNotices,
 	ResizableBox,
-	BaseControl,
-	Button,
+	ToggleControl,
+	ToolbarGroup,
+	withNotices,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import {
@@ -35,12 +34,11 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
-	PanelColorSettings,
 	withColors,
 	ColorPalette,
 	__experimentalUseGradient,
-	__experimentalGradientPickerControl,
 	__experimentalGradientPicker,
+	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -312,13 +310,13 @@ function CoverEdit( {
 				{ hasBackground && (
 					<>
 						<MediaUploadCheck>
-							<Toolbar>
+							<ToolbarGroup>
 								<MediaUpload
 									onSelect={ onSelectMedia }
 									allowedTypes={ ALLOWED_MEDIA_TYPES }
 									value={ id }
 									render={ ( { open } ) => (
-										<IconButton
+										<Button
 											className="components-toolbar__control"
 											label={ __( 'Edit media' ) }
 											icon="edit"
@@ -326,7 +324,7 @@ function CoverEdit( {
 										/>
 									) }
 								/>
-							</Toolbar>
+							</ToolbarGroup>
 						</MediaUploadCheck>
 					</>
 				) }
@@ -349,9 +347,17 @@ function CoverEdit( {
 								onChange={ ( newFocalPoint ) => setAttributes( { focalPoint: newFocalPoint } ) }
 							/>
 						) }
+						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+							<video
+								autoPlay
+								muted
+								loop
+								src={ url }
+							/>
+						) }
 						<PanelRow>
 							<Button
-								isDefault
+								isSecondary
 								isSmall
 								className="block-library-cover__reset-button"
 								onClick={ () => setAttributes( {
@@ -376,32 +382,17 @@ function CoverEdit( {
 								onChange={ ( newMinHeight ) => setAttributes( { minHeight: newMinHeight } ) }
 							/>
 						</PanelBody>
-						<PanelColorSettings
+						<PanelColorGradientSettings
 							title={ __( 'Overlay' ) }
 							initialOpen={ true }
-							colorSettings={ [ {
-								value: overlayColor.color,
-								onChange: ( ...args ) => {
-									setAttributes( {
-										customGradient: undefined,
-									} );
-									setOverlayColor( ...args );
-								},
-								label: __( 'Overlay Color' ),
+							settings={ [ {
+								colorValue: overlayColor.color,
+								gradientValue,
+								onColorChange: setOverlayColor,
+								onGradientChange: setGradient,
+								label: __( 'Overlay' ),
 							} ] }
 						>
-							<__experimentalGradientPickerControl
-								label={ __( 'Overlay Gradient' ) }
-								onChange={
-									( newGradient ) => {
-										setGradient( newGradient );
-										setAttributes( {
-											overlayColor: undefined,
-										} );
-									}
-								}
-								value={ gradientValue }
-							/>
 							{ !! url && (
 								<RangeControl
 									label={ __( 'Background Opacity' ) }
@@ -413,7 +404,7 @@ function CoverEdit( {
 									required
 								/>
 							) }
-						</PanelColorSettings>
+						</PanelColorGradientSettings>
 					</>
 				) }
 			</InspectorControls>
@@ -453,6 +444,7 @@ function CoverEdit( {
 							clearable={ false }
 						/>
 						<__experimentalGradientPicker
+							disableCustomGradients
 							onChange={
 								( newGradient ) => {
 									setGradient( newGradient );

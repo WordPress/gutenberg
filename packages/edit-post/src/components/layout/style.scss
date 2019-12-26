@@ -3,7 +3,6 @@
 }
 .edit-post-layout__metaboxes:not(:empty) {
 	border-top: $border-width solid $light-gray-500;
-	margin-top: 10px;
 	padding: 10px 0 10px;
 	clear: both;
 
@@ -13,14 +12,14 @@
 }
 
 // Adjust the position of the notices
-.edit-post-layout__content .components-editor-notices__snackbar {
+.edit-post-layout .components-editor-notices__snackbar {
 	position: fixed;
 	right: 0;
 	bottom: 20px;
 	padding-left: 16px;
 	padding-right: 16px;
 }
-@include editor-left(".edit-post-layout__content .components-editor-notices__snackbar");
+@include editor-left(".edit-post-layout .components-editor-notices__snackbar");
 
 .edit-post-layout .editor-post-publish-panel {
 	position: fixed;
@@ -60,12 +59,6 @@
 
 .edit-post-layout .editor-post-publish-panel__header-publish-button {
 	justify-content: center;
-
-	// Match the size of the Publish... button.
-	.components-button {
-		height: 33px;
-		line-height: 32px;
-	}
 }
 
 .edit-post-toggle-publish-panel {
@@ -108,32 +101,5 @@
 		padding: 0 $grid-size;
 		align-items: center;
 		font-size: $default-font-size;
-	}
-}
-
-.edit-post-layout__scrollable-container {
-	// On mobile the main content (html or body) area has to scroll.
-	// If, like we do on the desktop, scroll an element (.edit-post-layout__content) you can invoke
-	// the overscroll bounce on the non-scrolling container, causing for a frustrating scrolling experience.
-	// The following rule enables this scrolling beyond the mobile breakpoint, because on the desktop
-	// breakpoints scrolling an isolated element helps avoid scroll bleed.
-	@include break-small() {
-		overflow-y: auto;
-	}
-	-webkit-overflow-scrolling: touch;
-
-	// This rule ensures that if you've scrolled to the end of a container,
-	// then pause, then keep scrolling downwards, the browser doesn't try to scroll
-	// the parent element, usually invoking a "bounce" effect and then preventing you
-	// from scrolling upwards until you pause again.
-	// This is only necessary beyond the small breakpoint because that's when the scroll container changes.
-	@include break-small() {
-		overscroll-behavior-y: none;
-	}
-
-	// Pad the scroll box so content on the bottom can be scrolled up.
-	padding-bottom: 50vh;
-	@include break-small {
-		padding-bottom: 0;
 	}
 }

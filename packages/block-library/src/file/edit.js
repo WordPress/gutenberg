@@ -14,8 +14,8 @@ import {
 import {
 	Animate,
 	ClipboardButton,
-	IconButton,
-	Toolbar,
+	Button,
+	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -190,12 +190,12 @@ class FileEdit extends Component {
 				/>
 				<BlockControls>
 					<MediaUploadCheck>
-						<Toolbar>
+						<ToolbarGroup>
 							<MediaUpload
 								onSelect={ this.onSelectFile }
 								value={ id }
 								render={ ( { open } ) => (
-									<IconButton
+									<Button
 										className="components-toolbar__control"
 										label={ __( 'Edit file' ) }
 										onClick={ open }
@@ -203,7 +203,7 @@ class FileEdit extends Component {
 									/>
 								) }
 							/>
-						</Toolbar>
+						</ToolbarGroup>
 					</MediaUploadCheck>
 				</BlockControls>
 				<Animate type={ isBlobURL( href ) ? 'loading' : null }>
@@ -235,7 +235,7 @@ class FileEdit extends Component {
 							</div>
 							{ isSelected &&
 								<ClipboardButton
-									isDefault
+									isSecondary
 									text={ href }
 									className={ 'wp-block-file__copy-url-button' }
 									onCopy={ this.confirmCopyURL }

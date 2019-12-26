@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, ResizableBox, Toolbar, withNotices } from '@wordpress/components';
+import { Button, ResizableBox, ToolbarGroup, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -48,13 +48,13 @@ class MediaContainer extends Component {
 		const { mediaId, onSelectMedia } = this.props;
 		return (
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					<MediaUpload
 						onSelect={ onSelectMedia }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ mediaId }
 						render={ ( { open } ) => (
-							<IconButton
+							<Button
 								className="components-toolbar__control"
 								label={ __( 'Edit media' ) }
 								icon="edit"
@@ -62,7 +62,7 @@ class MediaContainer extends Component {
 							/>
 						) }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 			</BlockControls>
 		);
 	}

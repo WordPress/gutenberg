@@ -6,6 +6,8 @@ import { SlotFillProvider } from '@wordpress/components';
 import { withDispatch, RegistryConsumer } from '@wordpress/data';
 import { createHigherOrderComponent, compose } from '@wordpress/compose';
 
+/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
+
 /**
  * Higher-order component which renders the original component with the current
  * registry context passed as its `registry` prop.

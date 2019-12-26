@@ -9,15 +9,16 @@ import { __ } from '@wordpress/i18n';
 import NavigableToolbar from '../navigable-toolbar';
 import { BlockToolbar } from '../';
 
-function BlockContextualToolbar( { focusOnMount } ) {
+function BlockContextualToolbar( { focusOnMount, moverDirection, ...props } ) {
 	return (
 		<NavigableToolbar
 			focusOnMount={ focusOnMount }
-			className="editor-block-contextual-toolbar block-editor-block-contextual-toolbar"
+			className="block-editor-block-contextual-toolbar"
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
+			{ ...props }
 		>
-			<BlockToolbar />
+			<BlockToolbar moverDirection={ moverDirection } />
 		</NavigableToolbar>
 	);
 }

@@ -64,6 +64,7 @@ import * as socialLink from './social-link';
 
 // Full Site Editing Blocks
 import * as siteTitle from './site-title';
+import * as templatePart from './template-part';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
 
@@ -175,16 +176,16 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 			const {
 				__experimentalEnableLegacyWidgetBlock,
 				__experimentalEnableFullSiteEditing,
-			} = settings
+			} = settings;
 
-				;[
+			[
 				__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
 				socialLinks,
 				...socialLink.sites,
 
 				// Register Full Site Editing Blocks.
 				...( __experimentalEnableFullSiteEditing ?
-					[ siteTitle, postTitle, postContent ] :
+					[ siteTitle, templatePart, postTitle, postContent ] :
 					[] ),
 			].forEach( registerBlock );
 		} :

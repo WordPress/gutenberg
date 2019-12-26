@@ -9,9 +9,8 @@ import { get } from 'lodash';
 import { Component } from '@wordpress/element';
 import {
 	Button,
-	IconButton,
 	PanelBody,
-	Toolbar,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
@@ -88,9 +87,9 @@ class LegacyWidgetEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
+					<ToolbarGroup>
 						{ ( widgetObject && ! widgetObject.isHidden ) && (
-							<IconButton
+							<Button
 								onClick={ this.changeWidget }
 								label={ __( 'Change widget' ) }
 								icon="update"
@@ -99,20 +98,22 @@ class LegacyWidgetEdit extends Component {
 						{ hasEditForm && (
 							<>
 								<Button
-									className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
+									className="components-tab-button"
+									isPressed={ ! isPreview }
 									onClick={ this.switchToEdit }
 								>
 									<span>{ __( 'Edit' ) }</span>
 								</Button>
 								<Button
-									className={ `components-tab-button ${ isPreview ? 'is-active' : '' }` }
+									className="components-tab-button"
+									isPressed={ isPreview }
 									onClick={ this.switchToPreview }
 								>
 									<span>{ __( 'Preview' ) }</span>
 								</Button>
 							</>
 						) }
-					</Toolbar>
+					</ToolbarGroup>
 				</BlockControls>
 				{ inspectorControls }
 				{ hasEditForm && (

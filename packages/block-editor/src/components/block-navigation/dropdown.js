@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, Dropdown, SVG, Path, KeyboardShortcuts } from '@wordpress/components';
+import { Button, Dropdown, SVG, Path, KeyboardShortcuts } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
@@ -22,7 +22,7 @@ function BlockNavigationDropdown( { hasBlocks, isDisabled } ) {
 
 	return	(
 		<Dropdown
-			contentClassName="editor-block-navigation__popover block-editor-block-navigation__popover"
+			contentClassName="block-editor-block-navigation__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<>
 					{ isEnabled && <KeyboardShortcuts
@@ -32,12 +32,12 @@ function BlockNavigationDropdown( { hasBlocks, isDisabled } ) {
 						} }
 					/>
 					}
-					<IconButton
+					<Button
 						icon={ MenuIcon }
 						aria-expanded={ isOpen }
 						onClick={ isEnabled ? onToggle : undefined }
 						label={ __( 'Block navigation' ) }
-						className="editor-block-navigation block-editor-block-navigation"
+						className="block-editor-block-navigation"
 						shortcut={ displayShortcut.access( 'o' ) }
 						aria-disabled={ ! isEnabled }
 					/>

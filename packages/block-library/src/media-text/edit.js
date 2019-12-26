@@ -8,6 +8,8 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
@@ -15,13 +17,14 @@ import {
 	InspectorControls,
 	PanelColorSettings,
 	withColors,
+	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import {
 	PanelBody,
 	TextareaControl,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
@@ -40,6 +43,9 @@ const TEMPLATE = [
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
+export const LINK_DESTINATION_MEDIA = 'media';
+export const LINK_DESTINATION_ATTACHMENT = 'attachment';
+
 class MediaTextEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -50,10 +56,12 @@ class MediaTextEdit extends Component {
 		this.state = {
 			mediaWidth: null,
 		};
+		this.onSetHref = this.onSetHref.bind( this );
 	}
 
 	onSelectMedia( media ) {
 		const { setAttributes } = this.props;
+		const { linkDestination, href } = this.props.attributes;
 
 		let mediaType;
 		let src;
@@ -75,11 +83,25 @@ class MediaTextEdit extends Component {
 			src = get( media, [ 'sizes', 'large', 'url' ] ) || get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
 		}
 
+		let newHref = href;
+		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
+			// Update the media link.
+			newHref = media.url;
+		}
+
+		// Check if the image is linked to the attachment page.
+		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
+			// Update the media link.
+			newHref = media.link;
+		}
+
 		setAttributes( {
 			mediaAlt: media.alt,
 			mediaId: media.id,
 			mediaType,
 			mediaUrl: src || media.url,
+			mediaLink: media.link || undefined,
+			href: newHref,
 			imageFill: undefined,
 			focalPoint: undefined,
 		} );
@@ -89,6 +111,10 @@ class MediaTextEdit extends Component {
 		this.setState( {
 			mediaWidth: applyWidthConstraints( width ),
 		} );
+	}
+
+	onSetHref( props ) {
+		this.props.setAttributes( props );
 	}
 
 	commitWidthChange( width ) {
@@ -105,7 +131,6 @@ class MediaTextEdit extends Component {
 	renderMediaArea() {
 		const { attributes } = this.props;
 		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth, imageFill, focalPoint } = attributes;
-
 		return (
 			<MediaContainer
 				className="block-library-media-text__media-container"
@@ -125,6 +150,7 @@ class MediaTextEdit extends Component {
 			isSelected,
 			setAttributes,
 			setBackgroundColor,
+			image,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -136,7 +162,13 @@ class MediaTextEdit extends Component {
 			mediaUrl,
 			imageFill,
 			focalPoint,
+			rel,
+			href,
+			linkTarget,
+			linkClass,
+			linkDestination,
 		} = attributes;
+
 		const temporaryMediaWidth = this.state.mediaWidth;
 		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
@@ -213,6 +245,7 @@ class MediaTextEdit extends Component {
 				/> ) }
 			</PanelBody>
 		);
+
 		return (
 			<>
 				<InspectorControls>
@@ -224,13 +257,26 @@ class MediaTextEdit extends Component {
 					/>
 				</InspectorControls>
 				<BlockControls>
-					<Toolbar
+					<ToolbarGroup
 						controls={ toolbarControls }
 					/>
 					<BlockVerticalAlignmentToolbar
 						onChange={ onVerticalAlignmentChange }
 						value={ verticalAlignment }
 					/>
+					{ mediaType === 'image' && ( <ToolbarGroup>
+						<ImageURLInputUI
+							url={ href || '' }
+							onChangeUrl={ this.onSetHref }
+							linkDestination={ linkDestination }
+							mediaType={ mediaType }
+							mediaUrl={ image && image.source_url }
+							mediaLink={ image && image.link }
+							linkTarget={ linkTarget }
+							linkClass={ linkClass }
+							rel={ rel }
+						/>
+					</ToolbarGroup> ) }
 				</BlockControls>
 				<div className={ classNames } style={ style } >
 					{ this.renderMediaArea() }
@@ -244,4 +290,13 @@ class MediaTextEdit extends Component {
 	}
 }
 
-export default withColors( 'backgroundColor' )( MediaTextEdit );
+export default compose( [
+	withColors( 'backgroundColor' ),
+	withSelect( ( select, props ) => {
+		const { getMedia } = select( 'core' );
+		const { attributes: { mediaId }, isSelected } = props;
+		return {
+			image: mediaId && isSelected ? getMedia( mediaId ) : null,
+		};
+	} ),
+] )( MediaTextEdit );

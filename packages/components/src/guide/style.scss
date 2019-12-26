@@ -1,0 +1,118 @@
+.components-guide {
+	.components-modal__header {
+		background: none;
+		border-bottom: none;
+
+		.components-button {
+			align-self: flex-start;
+			margin-top: $grid-size-xlarge;
+			position: static;
+		}
+	}
+
+	&__container {
+		display: flex;
+		flex-direction: column;
+		margin-top: -$header-height;
+		min-height: 100%;
+	}
+
+	&__footer {
+		align-content: center;
+		display: flex;
+		height: 30px;
+		justify-content: center;
+		margin: auto 0 $grid-size-xlarge 0;
+		position: relative;
+		width: 100%;
+
+		@include break-small() {
+			margin: $grid-size-xlarge 0 0;
+		}
+	}
+
+	&__page-control {
+		margin: 0;
+
+		li {
+			display: inline-block;
+			margin: 0 2px;
+		}
+
+		.components-button {
+			height: 30px;
+		}
+	}
+}
+
+.components-modal__frame.components-guide {
+	@media (max-width: $break-small) {
+		bottom: 15%;
+		left: $grid-size-xlarge;
+		right: $grid-size-xlarge;
+		top: 15%;
+	}
+}
+
+.components-button {
+	&.components-guide__back-button,
+	&.components-guide__forward-button,
+	&.components-guide__finish-button {
+		height: 30px;
+		position: absolute;
+	}
+
+	&.components-guide__back-button,
+	&.components-guide__forward-button {
+		font-size: 0;
+		padding: 4px 2px;
+
+		&.has-text svg {
+			margin: 0;
+		}
+
+		@include break-small() {
+			font-size: $default-font-size;
+		}
+	}
+
+	&.components-guide__back-button {
+		left: 0;
+
+		@include break-small() {
+			padding: 4px 8px 4px 2px;
+
+			&.has-text svg {
+				margin-right: 4px;
+			}
+		}
+	}
+
+	&.components-guide__forward-button {
+		right: 0;
+
+		@include break-small() {
+			padding: 4px 2px 4px 8px;
+
+			&.has-text svg {
+				margin-left: 4px;
+				order: 1;
+			}
+		}
+	}
+
+	&.components-guide__finish-button {
+		display: none;
+		right: 0;
+
+		@include break-small() {
+			display: block;
+		}
+	}
+
+	&.components-guide__inline-finish-button {
+		@include break-small() {
+			display: none;
+		}
+	}
+}

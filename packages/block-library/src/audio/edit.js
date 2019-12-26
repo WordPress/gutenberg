@@ -5,11 +5,11 @@ import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
 import {
 	Disabled,
-	IconButton,
+	Button,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -154,14 +154,14 @@ class AudioEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
+					<ToolbarGroup>
+						<Button
+							className="components-toolbar__control"
 							label={ __( 'Edit audio' ) }
 							onClick={ switchToEditing }
 							icon="edit"
 						/>
-					</Toolbar>
+					</ToolbarGroup>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Audio Settings' ) }>

@@ -180,6 +180,12 @@
 		"parent": "themes"
 	},
 	{
+		"title": "Block-based Themes (Experimental)",
+		"slug": "block-based-themes",
+		"markdown_source": "../docs/designers-developers/developers/themes/block-based-themes.md",
+		"parent": "themes"
+	},
+	{
 		"title": "Backward Compatibility",
 		"slug": "backward-compatibility",
 		"markdown_source": "../docs/designers-developers/developers/backward-compatibility/README.md",
@@ -732,6 +738,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Guide",
+		"slug": "guide",
+		"markdown_source": "../packages/components/src/guide/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "NavigateRegions",
 		"slug": "navigate-regions",
 		"markdown_source": "../packages/components/src/higher-order/navigate-regions/README.md",
@@ -783,12 +795,6 @@
 		"title": "WithSpokenMessages",
 		"slug": "with-spoken-messages",
 		"markdown_source": "../packages/components/src/higher-order/with-spoken-messages/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "IconButton",
-		"slug": "icon-button",
-		"markdown_source": "../packages/components/src/icon-button/README.md",
 		"parent": "components"
 	},
 	{
@@ -957,6 +963,12 @@
 		"title": "TextControl",
 		"slug": "text-control",
 		"markdown_source": "../packages/components/src/text-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TextHighlight",
+		"slug": "text-highlight",
+		"markdown_source": "../packages/components/src/text-highlight/README.md",
 		"parent": "components"
 	},
 	{
@@ -1248,6 +1260,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/edit-site",
+		"slug": "packages-edit-site",
+		"markdown_source": "../packages/edit-site/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-widgets",
 		"slug": "packages-edit-widgets",
 		"markdown_source": "../packages/edit-widgets/README.md",
@@ -1329,6 +1347,12 @@
 		"title": "@wordpress/jest-puppeteer-axe",
 		"slug": "packages-jest-puppeteer-axe",
 		"markdown_source": "../packages/jest-puppeteer-axe/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/keyboard-shortcuts",
+		"slug": "packages-keyboard-shortcuts",
+		"markdown_source": "../packages/keyboard-shortcuts/README.md",
 		"parent": "packages"
 	},
 	{

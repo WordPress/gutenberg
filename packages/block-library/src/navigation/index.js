@@ -29,6 +29,11 @@ export const settings = {
 		inserter: true,
 	},
 
+	styles: [
+		{ name: 'light', label: __( 'Light' ), isDefault: true },
+		{ name: 'dark', label: __( 'Dark' ) },
+	],
+
 	edit,
 
 	save,

@@ -6,9 +6,8 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withViewportMatch } from '@wordpress/viewport';
 import { Modal } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import {
@@ -26,7 +25,6 @@ import Section from './section';
 import {
 	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
-	EnableTipsOption,
 	EnablePanelOption,
 	EnableFeature,
 } from './options';
@@ -34,7 +32,7 @@ import MetaBoxesSection from './meta-boxes-section';
 
 const MODAL_NAME = 'edit-post/options';
 
-export function OptionsModal( { isModalActive, isViewable, isSmallScreen, closeModal } ) {
+export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -46,28 +44,8 @@ export function OptionsModal( { isModalActive, isViewable, isSmallScreen, closeM
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ closeModal }
 		>
-			{ ! isSmallScreen && (
-				<Section title={ _x( 'View', 'noun' ) }>
-					<EnableFeature
-						feature="fixedToolbar"
-						label={ __( 'Top Toolbar' ) }
-						help={ __( 'Access all block and document tools in a single place' ) }
-					/>
-					<EnableFeature
-						feature="focusMode"
-						label={ __( 'Spotlight Mode' ) }
-						help={ __( 'Focus on one block at a time' ) }
-					/>
-					<EnableFeature
-						feature="fullscreenMode"
-						label={ __( 'Fullscreen Mode' ) }
-						help={ __( 'Work without distraction' ) }
-					/>
-				</Section>
-			) }
 			<Section title={ __( 'General' ) }>
 				<EnablePublishSidebarOption label={ __( 'Pre-publish Checks' ) } />
-				<EnableTipsOption label={ __( 'Tips' ) } />
 				<EnableFeature feature="showInserterHelpPanel" label={ __( 'Inserter Help Panel' ) } />
 			</Section>
 			<Section title={ __( 'Document Panels' ) }>
@@ -84,7 +62,7 @@ export function OptionsModal( { isModalActive, isViewable, isSmallScreen, closeM
 					) }
 				/>
 				<PostFeaturedImageCheck>
-					<EnablePanelOption label={ __( 'Featured Image' ) } panelName="featured-image" />
+					<EnablePanelOption label={ __( 'Featured image' ) } panelName="featured-image" />
 				</PostFeaturedImageCheck>
 				<PostExcerptCheck>
 					<EnablePanelOption label={ __( 'Excerpt' ) } panelName="post-excerpt" />
@@ -102,7 +80,6 @@ export function OptionsModal( { isModalActive, isViewable, isSmallScreen, closeM
 }
 
 export default compose(
-	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( 'core/editor' );
 		const { getPostType } = select( 'core' );

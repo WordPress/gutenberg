@@ -18,13 +18,13 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
-	PanelBody,
-	ToggleControl,
-	TextControl,
 	Button,
-	Toolbar,
 	DropdownMenu,
+	PanelBody,
 	Placeholder,
+	TextControl,
+	ToggleControl,
+	ToolbarGroup,
 } from '@wordpress/components';
 
 /**
@@ -483,9 +483,16 @@ export class TableEdit extends Component {
 			className,
 			backgroundColor,
 			setBackgroundColor,
+			setAttributes,
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
-		const { hasFixedLayout, head, body, foot } = attributes;
+		const {
+			hasFixedLayout,
+			caption,
+			head,
+			body,
+			foot,
+		} = attributes;
 		const isEmpty = isEmptyTableSection( head ) && isEmptyTableSection( body ) && isEmptyTableSection( foot );
 		const Section = this.renderSection;
 
@@ -495,7 +502,6 @@ export class TableEdit extends Component {
 					label={ __( 'Table' ) }
 					icon={ <BlockIcon icon={ icon } showColors /> }
 					instructions={ __( 'Insert a table for sharing data.' ) }
-					isColumnLayout
 				>
 					<form className="wp-block-table__placeholder-form" onSubmit={ this.onCreateTable }>
 						<TextControl
@@ -514,7 +520,7 @@ export class TableEdit extends Component {
 							min="1"
 							className="wp-block-table__placeholder-input"
 						/>
-						<Button className="wp-block-table__placeholder-button" isDefault type="submit">{ __( 'Create Table' ) }</Button>
+						<Button className="wp-block-table__placeholder-button" isSecondary type="submit">{ __( 'Create Table' ) }</Button>
 					</form>
 				</Placeholder>
 			);
@@ -528,14 +534,14 @@ export class TableEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
+					<ToolbarGroup>
 						<DropdownMenu
 							hasArrowIndicator
 							icon="editor-table"
 							label={ __( 'Edit table' ) }
 							controls={ this.getTableControls() }
 						/>
-					</Toolbar>
+					</ToolbarGroup>
 					<AlignmentToolbar
 						label={ __( 'Change column alignment' ) }
 						alignmentControls={ ALIGNMENT_CONTROLS }
@@ -582,6 +588,14 @@ export class TableEdit extends Component {
 						<Section name="body" rows={ body } />
 						<Section name="foot" rows={ foot } />
 					</table>
+					<RichText
+						tagName="figcaption"
+						placeholder={ __( 'Write caption…' ) }
+						value={ caption }
+						onChange={ ( value ) => setAttributes( { caption: value } ) }
+						// Deselect the selected table cell when the caption is focused.
+						unstableOnFocus={ () => this.setState( { selectedCell: null } ) }
+					/>
 				</figure>
 			</>
 		);

@@ -1,0 +1,12 @@
+.components-menu-items-choice,
+.components-menu-items-choice.components-button {
+	padding-left: 2rem;
+
+	&.has-icon {
+		padding-left: 0.5rem;
+	}
+
+	.dashicon {
+		margin-right: 4px;
+	}
+}

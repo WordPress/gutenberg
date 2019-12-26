@@ -46,17 +46,27 @@
 	fill: $gray-dark;
 }
 
-.isAppender {
+.appender {
 	height: auto;
 	background-color: $white;
 	border: $border-width solid $light-gray-500;
 	border-radius: 4px;
 }
 
-.addBlockButton {
+.appenderDark {
+	background-color: $background-dark-secondary;
+	border: $border-width solid $gray-70;
+}
+
+.addMediaButton {
 	color: $white;
 	background-color: $dark-gray-500;
 	border-radius: $icon-button-size-small / 2;
 	overflow: hidden;
 	size: $icon-button-size-small;
+}
+
+.addMediaButtonDark {
+	color: $background-dark-secondary;
+	background-color: $gray-40;
 }

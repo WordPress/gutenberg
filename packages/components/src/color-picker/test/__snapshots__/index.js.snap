@@ -29,7 +29,7 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
         <button
           aria-describedby="color-picker-saturation-2"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -37,6 +37,7 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
               "top": "20%",
             }
           }
+          type="button"
         />
         <div
           className="components-visually-hidden"
@@ -144,7 +145,7 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -203,7 +204,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
         <button
           aria-describedby="color-picker-saturation-4"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -211,6 +212,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
               "top": "20%",
             }
           }
+          type="button"
         />
         <div
           className="components-visually-hidden"
@@ -318,7 +320,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -377,7 +379,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
         <button
           aria-describedby="color-picker-saturation-5"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -385,6 +387,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
               "top": "20%",
             }
           }
+          type="button"
         />
         <div
           className="components-visually-hidden"
@@ -492,7 +495,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -551,7 +554,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
         <button
           aria-describedby="color-picker-saturation-3"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -559,6 +562,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
               "top": "20%",
             }
           }
+          type="button"
         />
         <div
           className="components-visually-hidden"
@@ -666,7 +670,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -725,7 +729,7 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
         <button
           aria-describedby="color-picker-saturation-1"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -733,6 +737,7 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
               "top": "0%",
             }
           }
+          type="button"
         />
         <div
           className="components-visually-hidden"
@@ -840,7 +845,7 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -899,7 +904,7 @@ exports[`ColorPicker should render color picker 1`] = `
         <button
           aria-describedby="color-picker-saturation-0"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -907,6 +912,7 @@ exports[`ColorPicker should render color picker 1`] = `
               "top": "0%",
             }
           }
+          type="button"
         />
         <div
           className="components-visually-hidden"
@@ -1014,7 +1020,7 @@ exports[`ColorPicker should render color picker 1`] = `
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}

@@ -1,77 +1,77 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { KeyboardShortcuts } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import shortcuts from '../../keyboard-shortcuts';
+function EditorModeKeyboardShortcuts() {
+	const {
+		getBlockSelectionStart,
+		getEditorSettings,
+		getEditorMode,
+		isEditorSidebarOpen,
+	} = useSelect( ( select ) => {
+		return {
+			getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
+			getEditorSettings: select( 'core/editor' ).getEditorSettings,
+			getEditorMode: select( 'core/edit-post' ).getEditorMode,
+			isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened,
+		};
+	} );
 
-class EditorModeKeyboardShortcuts extends Component {
-	constructor() {
-		super( ...arguments );
+	const {
+		switchEditorMode,
+		openGeneralSidebar,
+		closeGeneralSidebar,
+	} = useDispatch( 'core/edit-post' );
+	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
 
-		this.toggleMode = this.toggleMode.bind( this );
-		this.toggleSidebar = this.toggleSidebar.bind( this );
-	}
+	useEffect( () => {
+		registerShortcut( {
+			name: 'core/edit-post/toggle-mode',
+			category: 'global',
+			description: __( 'Switch between Visual editor and Code editor.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'm',
+			},
+		} );
 
-	toggleMode() {
-		const { mode, switchMode, isModeSwitchEnabled } = this.props;
-		if ( ! isModeSwitchEnabled ) {
+		registerShortcut( {
+			name: 'core/edit-post/toggle-sidebar',
+			category: 'global',
+			description: __( 'Show or hide the settings sidebar.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: ',',
+			},
+		} );
+	}, [] );
+
+	useShortcut( 'core/edit-post/toggle-mode', () => {
+		const { richEditingEnabled, codeEditingEnabled } = getEditorSettings();
+		if ( ! richEditingEnabled || ! codeEditingEnabled ) {
 			return;
 		}
-		switchMode( mode === 'visual' ? 'text' : 'visual' );
-	}
+		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
+	}, { bindGlobal: true } );
 
-	toggleSidebar( event ) {
+	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
 		// This shortcut has no known clashes, but use preventDefault to prevent any
 		// obscure shortcuts from triggering.
 		event.preventDefault();
-		const { isEditorSidebarOpen, closeSidebar, openSidebar } = this.props;
 
 		if ( isEditorSidebarOpen ) {
-			closeSidebar();
+			closeGeneralSidebar();
 		} else {
-			openSidebar();
+			const sidebarToOpen = getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document';
+			openGeneralSidebar( sidebarToOpen );
 		}
-	}
+	}, { bindGlobal: true } );
 
-	render() {
-		return (
-			<KeyboardShortcuts
-				bindGlobal
-				shortcuts={ {
-					[ shortcuts.toggleEditorMode.raw ]: this.toggleMode,
-					[ shortcuts.toggleSidebar.raw ]: this.toggleSidebar,
-				} }
-			/>
-		);
-	}
+	return null;
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { richEditingEnabled, codeEditingEnabled } = select( 'core/editor' ).getEditorSettings();
-
-		return {
-			isModeSwitchEnabled: richEditingEnabled && codeEditingEnabled,
-			mode: select( 'core/edit-post' ).getEditorMode(),
-			isEditorSidebarOpen: select( 'core/edit-post' ).isEditorSidebarOpened(),
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps, { select } ) => ( {
-		switchMode( mode ) {
-			dispatch( 'core/edit-post' ).switchEditorMode( mode );
-		},
-		openSidebar() {
-			const { getBlockSelectionStart } = select( 'core/block-editor' );
-			const sidebarToOpen = getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document';
-			dispatch( 'core/edit-post' ).openGeneralSidebar( sidebarToOpen );
-		},
-		closeSidebar: dispatch( 'core/edit-post' ).closeGeneralSidebar,
-	} ) ),
-] )( EditorModeKeyboardShortcuts );
+export default EditorModeKeyboardShortcuts;

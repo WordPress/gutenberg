@@ -8,11 +8,15 @@
 }
 
 // Needs specificity
-.components-icon-button:not(:disabled):not([aria-disabled="true"]).editor-post-last-revision__title {
+.components-button:not(:disabled):not([aria-disabled="true"]).editor-post-last-revision__title {
+	height: auto;
 
 	&:hover,
 	&:active {
-		@include menu-style__neutral;
+		// Override the default button hover style
+		background: $light-gray-200 !important;
+		border: none !important;
+		box-shadow: none !important;
 	}
 
 	&:focus {
