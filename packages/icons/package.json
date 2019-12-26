@@ -15,17 +15,20 @@
 		"url": "git+https://github.com/WordPress/gutenberg.git",
 		"directory": "packages/icons"
 	},
+	"sideEffects": false,
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@wordpress/components": "file:../components",
-		"lodash": "4.17.15",
-		"pascalcase": "1.0.0"
+		"@svgr/cli": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"build": "svgr -d ./build ./src",
+		"postinstall": "npm run build"
 	}
 }
