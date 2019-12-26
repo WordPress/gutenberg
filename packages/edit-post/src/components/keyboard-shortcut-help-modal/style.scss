@@ -15,7 +15,7 @@
 
 	&__shortcut {
 		display: flex;
-		align-items: center;
+		align-items: baseline;
 		padding: 0.6rem 0;
 		border-top: 1px solid $light-gray-500;
 		margin-bottom: 0;
@@ -32,6 +32,7 @@
 	&__shortcut-term {
 		font-weight: 600;
 		margin: 0 0 0 1rem;
+		text-align: right;
 	}
 
 	&__shortcut-description {
@@ -43,9 +44,14 @@
 	}
 
 	&__shortcut-key-combination {
+		display: block;
 		background: none;
 		margin: 0;
 		padding: 0;
+
+		& + .edit-post-keyboard-shortcut-help-modal__shortcut-key-combination {
+			margin-top: 10px;
+		}
 	}
 
 	&__shortcut-key {

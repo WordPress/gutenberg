@@ -62,6 +62,8 @@ function Layout() {
 		hasActiveMetaboxes,
 		isSaving,
 		hasFixedToolbar,
+		previousShortcut,
+		nextShortcut,
 	} = useSelect( ( select ) => {
 		return ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
@@ -72,6 +74,8 @@ function Layout() {
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			previousShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/previous-region' ),
+			nextShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
 		} );
 	}, [] );
 	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
@@ -139,6 +143,10 @@ function Layout() {
 							</Button>
 						</div>
 					) }
+					shortcuts={ {
+						previous: previousShortcut,
+						next: nextShortcut,
+					} }
 				/>
 				<ManageBlocksModal />
 				<OptionsModal />

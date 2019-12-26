@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import createSelector from 'rememo';
+import { compact } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { displayShortcut, shortcutAriaLabel, rawShortcut } from '@wordpress/keycodes';
@@ -12,6 +18,30 @@ import { displayShortcut, shortcutAriaLabel, rawShortcut } from '@wordpress/keyc
  * @type {Array}
  */
 const EMPTY_ARRAY = [];
+
+/**
+ * Returns a string representing the key combination.
+ *
+ * @param {WPShortcutKeyCombination} shortcut  Key combination.
+ * @param {string} representation              Type of reprensentation. (display, raw, ariaLabel )
+ *
+ * @return {string?} Shortcut representation.
+ */
+function getKeyCombinationRepresentation( shortcut, representation ) {
+	if ( ! shortcut ) {
+		return null;
+	}
+
+	const formattingMethods = {
+		display: displayShortcut,
+		raw: rawShortcut,
+		ariaLabel: shortcutAriaLabel,
+	};
+
+	return shortcut.modifier ?
+		formattingMethods[ representation ][ shortcut.modifier ]( shortcut.character ) :
+		shortcut.character;
+}
 
 /**
  * Returns the main key combination for a given shortcut name.
@@ -32,23 +62,11 @@ export function getShortcutKeyCombination( state, name ) {
  * @param {string} name           Shortcut name.
  * @param {string} representation Type of reprensentation. (display, raw, ariaLabel )
  *
- * @return {string} Shortcut representation.
+ * @return {string?} Shortcut representation.
  */
 export function getShortcutRepresentation( state, name, representation = 'display' ) {
 	const shortcut = getShortcutKeyCombination( state, name );
-	if ( ! shortcut ) {
-		return null;
-	}
-
-	const formattingMethods = {
-		display: displayShortcut,
-		raw: rawShortcut,
-		ariaLabel: shortcutAriaLabel,
-	};
-
-	return shortcut.modifier ?
-		formattingMethods[ representation ][ shortcut.modifier ]( shortcut.character ) :
-		shortcut.character;
+	return getKeyCombinationRepresentation( shortcut, representation );
 }
 
 /**
@@ -76,3 +94,25 @@ export function getShortcutAliases( state, name ) {
 		state[ name ].aliases :
 		EMPTY_ARRAY;
 }
+
+/**
+ * Returns the raw representation of all the keyboard combinations of a given shortcut name.
+ *
+ * @param {Object} state Global state.
+ * @param {string} name  Shortcut name.
+ *
+ * @return {string[]} Shortcuts.
+ */
+export const getAllShortcutRawKeyCombinations = createSelector(
+	( state, name ) => {
+		return compact( [
+			getKeyCombinationRepresentation(
+				getShortcutKeyCombination( state, name ), 'raw'
+			),
+			...getShortcutAliases( state, name ).map(
+				( combination ) => getKeyCombinationRepresentation( combination, 'raw' )
+			),
+		] );
+	},
+	( state, name ) => [ state[ name ] ]
+);
