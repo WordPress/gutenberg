@@ -637,7 +637,12 @@ export function replaceInnerBlocks( rootClientId, blocks, updateSelection = true
  *
  * @return {Object} Action object.
  */
-export function toggleBlockMode( clientId ) {
+export function * toggleBlockMode( clientId ) {
+	const canToggleBlockMode = yield select( 'core/block-editor', 'canToggleBlockMode', clientId );
+	if ( ! canToggleBlockMode ) {
+		return;
+	}
+
 	return {
 		type: 'TOGGLE_BLOCK_MODE',
 		clientId,

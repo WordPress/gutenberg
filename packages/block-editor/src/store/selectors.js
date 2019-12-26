@@ -27,6 +27,7 @@ import {
 	getBlockTypes,
 	hasBlockSupport,
 	parse,
+	isReusableBlock,
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
 
@@ -943,6 +944,21 @@ export function isSelectionEnabled( state ) {
  */
 export function getBlockMode( state, clientId ) {
 	return state.blocksMode[ clientId ] || 'visual';
+}
+
+/**
+ * Determines if block mode toggle is allowed for a given block.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Whether block mode toggle is allowed on given block.
+ */
+export function canToggleBlockMode( state, clientId ) {
+	const block = getBlock( state, clientId );
+	const isLocked = getTemplateLock( state, clientId );
+
+	return ! isLocked && hasBlockSupport( block.name, 'html', true ) && ! isReusableBlock( block );
 }
 
 /**

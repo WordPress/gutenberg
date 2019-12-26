@@ -83,6 +83,7 @@ export default compose( [
 			duplicateBlocks,
 			insertAfterBlock,
 			insertBeforeBlock,
+			toggleBlockMode,
 		} = dispatch( 'core/block-editor' );
 
 		return {
@@ -137,11 +138,10 @@ export default compose( [
 				);
 			},
 			onToggleBlockMode() {
-				const block = blocks[ 0 ];
 				const isCodeEditingEnabled = select( 'core/editor' ).getEditorSettings().codeEditingEnabled;
 
-				if ( hasBlockSupport( block.name, 'html', true ) && isCodeEditingEnabled && ! isLocked && ! isReusableBlock( block ) ) {
-					toggleBlockMode( clientIds );
+				if ( isCodeEditingEnabled ) {
+					toggleBlockMode( first( clientIds ) );
 				}
 			},
 		};
