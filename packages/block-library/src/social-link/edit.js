@@ -37,7 +37,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	return (
 		<Fragment>
 			<InspectorControls>
-				<PanelBody title={ sprintf( '%s', socialLinkName ) } initialOpen={ false }>
+				<PanelBody title={ sprintf( '%s Label', socialLinkName ) } initialOpen={ false }>
 					<PanelRow>
 						<TextControl
 							label={ __( 'Link Label' ) }
