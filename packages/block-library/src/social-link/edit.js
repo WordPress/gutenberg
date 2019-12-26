@@ -15,7 +15,7 @@ import {
 	PanelRow,
 	TextControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -33,12 +33,12 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 
 	// Import icon.
 	const IconComponent = getIconBySite( site );
-	const SocialLinkName = getNameBySite( site );
+	const socialLinkName = getNameBySite( site );
 
 	return (
 		<Fragment>
 			<InspectorControls>
-				<PanelBody title={ `${ SocialLinkName }` + __( ' Label' ) } initialOpen={ false }>
+				<PanelBody title={ sprintf( '%s', socialLinkName ) } initialOpen={ false }>
 					<PanelRow>
 						<TextControl
 							label={ __( 'Link Label' ) }

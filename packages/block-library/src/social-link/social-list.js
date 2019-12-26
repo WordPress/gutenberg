@@ -204,10 +204,24 @@ const socialList = {
 
 export default socialList;
 
+/**
+ * Retrieves the social service's icon component.
+ *
+ * @param {string} site key for a social service (lowercase slug)
+ *
+ * @return {WPComponent} Icon component for social service.
+ */
 export const getIconBySite = ( site ) => {
 	return socialList[ site ].icon;
 };
 
+/**
+ * Retrieves the display name for the social service.
+ *
+ * @param {string} site key for a social service (lowercase slug)
+ *
+ * @return {string} Display name for social service
+ */
 export const getNameBySite = ( site ) => {
 	return socialList[ site ].name;
 };
