@@ -26,6 +26,8 @@ function ToolbarButton( {
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ! accessibleToolbarState ) {
+		// This should be deprecated when <Toolbar __experimentalAccessibilityLabel="label">
+		// becomes stable.
 		return (
 			<ToolbarButtonContainer className={ containerClassName }>
 				<Button
@@ -49,6 +51,9 @@ function ToolbarButton( {
 		);
 	}
 
+	// ToobarItem will pass all props to the render prop child, which will pass
+	// all props to Button. This means that ToolbarButton has the same API as
+	// Button.
 	return (
 		<ToolbarItem
 			className={ classnames( 'components-toolbar-button', className ) }

@@ -10,13 +10,7 @@ import DropdownMenu from '../dropdown-menu';
 import ToolbarContext from '../toolbar-context';
 import ToolbarItem from '../toolbar-item';
 
-function ToolbarGroupCollapsed( {
-	controls = [],
-	className,
-	icon,
-	label,
-	...props
-} ) {
+function ToolbarGroupCollapsed( { controls = [], ...props } ) {
 	// It'll contain state if `ToolbarGroup` is being used within
 	// `<Toolbar __experimentalAccessibilityLabel="label" />`
 	const accessibleToolbarState = useContext( ToolbarContext );
@@ -24,22 +18,14 @@ function ToolbarGroupCollapsed( {
 	const renderDropdownMenu = ( toggleProps ) => (
 		<DropdownMenu
 			hasArrowIndicator
-			icon={ icon }
-			label={ label }
 			controls={ controls }
-			className={ className }
 			toggleProps={ toggleProps }
 			{ ...props }
 		/>
 	);
 
 	if ( accessibleToolbarState ) {
-		return (
-			// https://reakit.io/docs/composition/#render-props
-			<ToolbarItem>
-				{ ( toolbarItemHTMLProps ) => renderDropdownMenu( toolbarItemHTMLProps ) }
-			</ToolbarItem>
-		);
+		return <ToolbarItem>{ renderDropdownMenu }</ToolbarItem>;
 	}
 
 	return renderDropdownMenu();
