@@ -4,44 +4,44 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { useContext } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
-import ToolbarButtonContainer from './toolbar-button-container';
 import Button from '../button';
 import ToolbarItem from '../toolbar-item';
+import ToolbarButtonContainer from './toolbar-button-container';
+import ToolbarContext from '../toolbar-context';
 
 function ToolbarButton( {
 	containerClassName,
-	icon,
-	title,
-	shortcut,
-	subscript,
-	onClick,
 	className,
-	isActive,
-	isDisabled,
 	extraProps,
 	children,
 	...props
 } ) {
-	if ( icon ) {
+	const accessibleToolbarState = useContext( ToolbarContext );
+
+	if ( ! accessibleToolbarState ) {
 		return (
 			<ToolbarButtonContainer className={ containerClassName }>
-				<IconButton
-					icon={ icon }
-					label={ title }
-					shortcut={ shortcut }
-					data-subscript={ subscript }
+				<Button
+					icon={ props.icon }
+					label={ props.title }
+					shortcut={ props.shortcut }
+					data-subscript={ props.subscript }
 					onClick={ ( event ) => {
 						event.stopPropagation();
-						if ( onClick ) {
-							onClick( event );
+						if ( props.onClick ) {
+							props.onClick( event );
 						}
 					} }
 					className={ classnames( 'components-toolbar__control', className ) }
-					aria-pressed={ isActive }
-					disabled={ isDisabled }
+					isPressed={ props.isActive }
+					disabled={ props.isDisabled }
 					{ ...extraProps }
 				/>
 				{ children }
@@ -51,7 +51,6 @@ function ToolbarButton( {
 
 	return (
 		<ToolbarItem
-			onClick={ onClick }
 			className={ classnames( 'components-toolbar-button', className ) }
 			{ ...props }
 		>

@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { castArray, first, get, includes } from 'lodash';
+import { castArray, first, get, includes, last, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
+import { getDefaultBlockName, createBlock, hasBlockSupport, cloneBlock } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 
@@ -570,7 +570,16 @@ export function mergeBlocks( firstBlockClientId, secondBlockClientId ) {
  *                                         selected when a block is removed.
  */
 export function* removeBlocks( clientIds, selectPrevious = true ) {
+	if ( ! clientIds || ! clientIds.length ) {
+		return;
+	}
+
 	clientIds = castArray( clientIds );
+	const rootClientId = yield select( 'core/block-editor', 'getBlockRootClientId', clientIds[ 0 ] );
+	const isLocked = yield select( 'core/block-editor', 'getTemplateLock', rootClientId );
+	if ( isLocked ) {
+		return;
+	}
 
 	if ( selectPrevious ) {
 		yield selectPreviousBlock( clientIds[ 0 ] );
@@ -832,4 +841,83 @@ export function * setNavigationMode( isNavigationMode = true ) {
 	} else {
 		speak( __( 'You are currently in edit mode. To return to the navigation mode, press Escape.' ) );
 	}
+}
+
+/**
+ * Generator that triggers an action used to duplicate a list of blocks.
+ *
+ * @param {string[]} clientIds
+ */
+export function * duplicateBlocks( clientIds ) {
+	if ( ! clientIds && ! clientIds.length ) {
+		return;
+	}
+	const blocks = yield select( 'core/block-editor', 'getBlocksByClientId', clientIds );
+	const rootClientId = yield select( 'core/block-editor', 'getBlockRootClientId', clientIds[ 0 ] );
+	// Return early if blocks don't exist.
+	if ( some( blocks, ( block ) => ! block ) ) {
+		return;
+	}
+	const blockNames = blocks.map( ( block ) => block.name );
+	// Return early if blocks don't support multipe  usage.
+	if ( some( blockNames, ( blockName ) => ! hasBlockSupport( blockName, 'multiple', true ) ) ) {
+		return;
+	}
+
+	const lastSelectedIndex = yield select(
+		'core/block-editor',
+		'getBlockIndex',
+		last( castArray( clientIds ) ),
+		rootClientId
+	);
+	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+	yield insertBlocks(
+		clonedBlocks,
+		lastSelectedIndex + 1,
+		rootClientId
+	);
+	if ( clonedBlocks.length > 1 ) {
+		yield multiSelect(
+			first( clonedBlocks ).clientId,
+			last( clonedBlocks ).clientId
+		);
+	}
+}
+
+/**
+ * Generator used to insert an empty block after a given block.
+ *
+ * @param {string} clientId
+ */
+export function * insertBeforeBlock( clientId ) {
+	if ( ! clientId ) {
+		return;
+	}
+	const rootClientId = yield select( 'core/block-editor', 'getBlockRootClientId', clientId );
+	const isLocked = yield select( 'core/block-editor', 'getTemplateLock', rootClientId );
+	if ( isLocked ) {
+		return;
+	}
+
+	const firstSelectedIndex = yield select( 'core/block-editor', 'getBlockIndex', clientId, rootClientId );
+	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
+}
+
+/**
+ * Generator used to insert an empty block before a given block.
+ *
+ * @param {string} clientId
+ */
+export function * insertAfterBlock( clientId ) {
+	if ( ! clientId ) {
+		return;
+	}
+	const rootClientId = yield select( 'core/block-editor', 'getBlockRootClientId', clientId );
+	const isLocked = yield select( 'core/block-editor', 'getTemplateLock', rootClientId );
+	if ( isLocked ) {
+		return;
+	}
+
+	const firstSelectedIndex = yield select( 'core/block-editor', 'getBlockIndex', clientId, rootClientId );
+	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
 }

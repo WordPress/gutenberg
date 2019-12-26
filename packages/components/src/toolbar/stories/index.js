@@ -7,7 +7,6 @@ import {
 	Path,
 	ToolbarButton,
 	ToolbarGroup,
-	__experimentalToolbarIconButton as ToolbarIconButton,
 	__experimentalToolbarItem as ToolbarItem,
 	DropdownMenu,
 } from '../../';
@@ -28,7 +27,7 @@ export const _default = () => {
 		// id is required for server side rendering
 		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar">
 			<ToolbarGroup>
-				<ToolbarIconButton icon="editor-paragraph" label="Paragraph" />
+				<ToolbarButton icon="editor-paragraph" label="Paragraph" />
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
@@ -49,9 +48,9 @@ export const _default = () => {
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarButton>Text</ToolbarButton>
-				<ToolbarIconButton icon="editor-bold" label="Bold" />
-				<ToolbarIconButton icon="editor-italic" label="Italic" />
-				<ToolbarIconButton icon="admin-links" label="Link" />
+				<ToolbarButton icon="editor-bold" label="Bold" isPressed />
+				<ToolbarButton icon="editor-italic" label="Italic" />
+				<ToolbarButton icon="admin-links" label="Link" />
 				<ToolbarGroup
 					isCollapsed
 					icon={ false }
@@ -85,9 +84,9 @@ export const withoutGroup = () => {
 			__experimentalAccessibilityLabel="Options"
 			id="options-toolbar-without-group"
 		>
-			<ToolbarIconButton icon="editor-bold" label="Bold" />
-			<ToolbarIconButton icon="editor-italic" label="Italic" />
-			<ToolbarIconButton icon="admin-links" label="Link" />
+			<ToolbarButton icon="editor-bold" label="Bold" isPressed />
+			<ToolbarButton icon="editor-italic" label="Italic" />
+			<ToolbarButton icon="admin-links" label="Link" />
 		</Toolbar>
 	);
 };

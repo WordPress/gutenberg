@@ -38,7 +38,7 @@ export { default as __experimentalCustomGradientPicker } from './custom-gradient
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
 export { default as Icon } from './icon';
-export { default as IconButton } from './icon-button';
+export { default as IconButton } from './button/deprecated';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';
@@ -73,7 +73,6 @@ export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as ToolbarGroup } from './toolbar-group';
-export { default as __experimentalToolbarIconButton } from './toolbar-icon-button';
 export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';

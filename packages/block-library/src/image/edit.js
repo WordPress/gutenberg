@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import {
 	get,
 	isEmpty,
+	filter,
 	map,
 	last,
 	omit,
@@ -318,8 +319,11 @@ export class ImageEdit extends Component {
 	}
 
 	getImageSizeOptions() {
-		const { imageSizes } = this.props;
-		return map( imageSizes, ( { name, slug } ) => ( { value: slug, label: name } ) );
+		const { imageSizes, image } = this.props;
+		return map(
+			filter( imageSizes, ( { slug } ) => ( get( image, [ 'media_details', 'sizes', slug, 'source_url' ] ) ) ),
+			( { name, slug } ) => ( { value: slug, label: name } )
+		);
 	}
 
 	render() {

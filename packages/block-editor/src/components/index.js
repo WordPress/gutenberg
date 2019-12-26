@@ -63,7 +63,6 @@ export {
 	__experimentalWithPageTemplatePickerVisible,
 	__experimentalUsePageTemplatePickerVisible,
 } from './page-template-picker';
-export { default as BlockEditorKeyboardShortcuts } from './block-editor-keyboard-shortcuts';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
@@ -76,6 +75,7 @@ export { default as CopyHandler } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as Inserter } from './inserter';
 export { default as MultiBlocksSwitcher } from './block-switcher/multi-blocks-switcher';
+export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MultiSelectScrollIntoView } from './multi-select-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';
 export { default as ObserveTyping } from './observe-typing';
