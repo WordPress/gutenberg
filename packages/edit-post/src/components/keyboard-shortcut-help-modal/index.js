@@ -94,6 +94,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 							'core/block-editor/remove',
 							'core/block-editor/insert-before',
 							'core/block-editor/insert-after',
+							'core/block-editor/toggle-block-mode',
 							{
 								keyCombination: '/',
 								description: __( 'Change the block type after adding a new paragraph.' ),

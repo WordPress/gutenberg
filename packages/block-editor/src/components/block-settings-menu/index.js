@@ -43,6 +43,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 			remove: getShortcutKeyCombination( 'core/block-editor/remove' ),
 			insertAfter: getShortcutKeyCombination( 'core/block-editor/insert-after' ),
 			insertBefore: getShortcutKeyCombination( 'core/block-editor/insert-before' ),
+			toggleBlockMode: getShortcutKeyCombination( 'core/block-editor/toggle-block-mode' ),
 		};
 	}, [] );
 
@@ -65,6 +66,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 				onInsertAfter,
 				onInsertBefore,
 				onRemove,
+				onToggleBlockMode,
 			} ) => (
 				<Toolbar>
 					<DropdownMenu
@@ -122,7 +124,8 @@ export function BlockSettingsMenu( { clientIds } ) {
 									{ count === 1 && (
 										<BlockModeToggle
 											clientId={ firstBlockClientId }
-											onToggle={ onClose }
+											onToggle={ flow( onClose, onToggleBlockMode ) }
+											shortcut={ getShortcutDisplay( shortcuts.toggleBlockMode ) }
 										/>
 									) }
 									<__experimentalBlockSettingsMenuPluginsExtension.Slot

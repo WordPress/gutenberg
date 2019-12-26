@@ -1,19 +1,13 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
-import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, isCodeEditingEnabled = true } ) {
-	if ( ! hasBlockSupport( blockType, 'html', true ) || ! isCodeEditingEnabled ) {
+export function BlockModeToggle( { onToggle, small = false, shortcut, mode, canToggleBlockMode = true } ) {
+	if ( ! canToggleBlockMode ) {
 		return null;
 	}
 
@@ -24,8 +18,9 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false,
 	return (
 		<MenuItem
 			className="block-editor-block-settings-menu__control"
-			onClick={ onToggleMode }
+			onClick={ onToggle }
 			icon="html"
+			shortcut={ shortcut }
 		>
 			{ ! small && label }
 		</MenuItem>
@@ -34,20 +29,12 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false,
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlock, getBlockMode, getSettings } = select( 'core/block-editor' );
-		const block = getBlock( clientId );
-		const isCodeEditingEnabled = getSettings().codeEditingEnabled;
+		const { getBlockMode, canToggleBlockMode } = select( 'core/block-editor' );
+		const isCodeEditingEnabled = select( 'core/editor' ).getEditorSettings().codeEditingEnabled;
 
 		return {
 			mode: getBlockMode( clientId ),
-			blockType: block ? getBlockType( block.name ) : null,
-			isCodeEditingEnabled,
+			canToggleBlockMode: isCodeEditingEnabled && canToggleBlockMode( clientId ),
 		};
 	} ),
-	withDispatch( ( dispatch, { onToggle = noop, clientId } ) => ( {
-		onToggleMode() {
-			dispatch( 'core/block-editor' ).toggleBlockMode( clientId );
-			onToggle();
-		},
-	} ) ),
 ] )( BlockModeToggle );

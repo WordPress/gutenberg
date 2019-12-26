@@ -21,6 +21,7 @@ function BlockActions( {
 	onInsertBefore,
 	onRemove,
 	onUngroup,
+	onToggleBlockMode,
 } ) {
 	return children( {
 		canDuplicate,
@@ -32,6 +33,7 @@ function BlockActions( {
 		onInsertBefore,
 		onRemove,
 		onUngroup,
+		onToggleBlockMode,
 	} );
 }
 
@@ -81,6 +83,7 @@ export default compose( [
 			duplicateBlocks,
 			insertAfterBlock,
 			insertBeforeBlock,
+			toggleBlockMode,
 		} = dispatch( 'core/block-editor' );
 
 		return {
@@ -118,7 +121,6 @@ export default compose( [
 					newBlocks
 				);
 			},
-
 			onUngroup() {
 				if ( ! blocks.length ) {
 					return;
@@ -134,6 +136,13 @@ export default compose( [
 					clientIds,
 					innerBlocks
 				);
+			},
+			onToggleBlockMode() {
+				const isCodeEditingEnabled = select( 'core/editor' ).getEditorSettings().codeEditingEnabled;
+
+				if ( isCodeEditingEnabled ) {
+					toggleBlockMode( first( clientIds ) );
+				}
 			},
 		};
 	} ),

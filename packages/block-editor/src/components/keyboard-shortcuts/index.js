@@ -12,11 +12,14 @@ import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
 	// Shortcuts Logic
-	const { clientIds, rootBlocksClientIds } = useSelect( ( select ) => {
+	const { clientIds, rootBlocksClientIds, isCodeEditingEnabled } = useSelect( ( select ) => {
 		const { getSelectedBlockClientIds, getBlockOrder } = select( 'core/block-editor' );
+		const { codeEditingEnabled } = select( 'core/editor' ).getEditorSettings();
+
 		return {
 			clientIds: getSelectedBlockClientIds(),
 			rootBlocksClientIds: getBlockOrder(),
+			isCodeEditingEnabled: codeEditingEnabled,
 		};
 	}, [] );
 
@@ -27,6 +30,7 @@ function KeyboardShortcuts() {
 		insertBeforeBlock,
 		multiSelect,
 		clearSelectedBlock,
+		toggleBlockMode,
 	} = useDispatch( 'core/block-editor' );
 
 	// Prevents bookmark all Tabs shortcut in Chrome when devtools are closed.
@@ -75,6 +79,15 @@ function KeyboardShortcuts() {
 			window.getSelection().removeAllRanges();
 		}
 	}, [ clientIds, clearSelectedBlock ] ) );
+
+	// Does not clash with any known browser/native shortcuts, but preventDefault
+	// is used to prevent any obscure unknown shortcuts from triggering.
+	useShortcut( 'core/block-editor/toggle-block-mode', useCallback( ( event ) => {
+		event.preventDefault();
+		if ( isCodeEditingEnabled ) {
+			toggleBlockMode( first( clientIds ) );
+		}
+	}, [ clientIds, isCodeEditingEnabled ] ), { bindGlobal: true } );
 
 	return null;
 }
@@ -151,6 +164,16 @@ function KeyboardShortcutsRegister() {
 			description: __( 'Clear selection.' ),
 			keyCombination: {
 				character: 'escape',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/toggle-block-mode',
+			category: 'block',
+			description: __( 'Switch between editing a block visually and editing its HTML.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'm',
 			},
 		} );
 	}, [ registerShortcut ] );

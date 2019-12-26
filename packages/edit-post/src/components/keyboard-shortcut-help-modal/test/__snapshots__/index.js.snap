@@ -163,6 +163,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           "core/block-editor/remove",
           "core/block-editor/insert-before",
           "core/block-editor/insert-after",
+          "core/block-editor/toggle-block-mode",
           Object {
             "ariaLabel": "Forward-slash",
             "description": "Change the block type after adding a new paragraph.",
