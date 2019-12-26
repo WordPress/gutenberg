@@ -404,11 +404,11 @@ function BlockListBlock( {
 		! hasFixedToolbar &&
 		! isEmptyDefaultBlock
 	);
-	useShortcut( 'core/block-editor/focus-toolbar', useCallback( () => {
-		if ( canFocusHiddenToolbar ) {
-			forceFocusedContextualToolbar();
-		}
-	}, [ canFocusHiddenToolbar ] ), { bindGlobal: true, eventName: 'keydown' } );
+	useShortcut(
+		'core/block-editor/focus-toolbar',
+		useCallback( forceFocusedContextualToolbar, [] ),
+		{ bindGlobal: true, eventName: 'keydown', isDisabled: ! canFocusHiddenToolbar }
+	);
 
 	// Rendering the output
 	const isHovered = isBlockHovered && ! isPartOfMultiSelection;

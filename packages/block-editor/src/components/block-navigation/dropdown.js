@@ -19,11 +19,7 @@ const MenuIcon = (
 );
 
 function BlockNavigationDropdownToggle( { isEnabled, onToggle, isOpen } ) {
-	useShortcut( 'core/edit-post/toggle-block-navigation', useCallback( () => {
-		if ( isEnabled ) {
-			onToggle();
-		}
-	}, [ onToggle, isEnabled ] ), { bindGlobal: true } );
+	useShortcut( 'core/edit-post/toggle-block-navigation', useCallback( onToggle, [ onToggle ] ), { bindGlobal: true, isDisabled: ! isEnabled } );
 	const shortcut = useSelect( ( select ) =>
 		select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-block-navigation' ), []
 	);

@@ -9,15 +9,18 @@ import { __ } from '@wordpress/i18n';
 function KeyboardShortcuts() {
 	const {
 		getBlockSelectionStart,
-		getEditorSettings,
 		getEditorMode,
 		isEditorSidebarOpen,
+		richEditingEnabled,
+		codeEditingEnabled,
 	} = useSelect( ( select ) => {
+		const settings = select( 'core/editor' ).getEditorSettings();
 		return {
 			getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
-			getEditorSettings: select( 'core/editor' ).getEditorSettings,
 			getEditorMode: select( 'core/edit-post' ).getEditorMode,
 			isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened,
+			richEditingEnabled: settings.richEditingEnabled,
+			codeEditingEnabled: settings.codeEditingEnabled,
 		};
 	} );
 
@@ -99,12 +102,8 @@ function KeyboardShortcuts() {
 	}, [] );
 
 	useShortcut( 'core/edit-post/toggle-mode', () => {
-		const { richEditingEnabled, codeEditingEnabled } = getEditorSettings();
-		if ( ! richEditingEnabled || ! codeEditingEnabled ) {
-			return;
-		}
 		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
-	}, { bindGlobal: true } );
+	}, { bindGlobal: true, isDisabled: ! richEditingEnabled || ! codeEditingEnabled } );
 
 	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
 		// This shortcut has no known clashes, but use preventDefault to prevent any
