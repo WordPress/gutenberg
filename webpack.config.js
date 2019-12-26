@@ -90,6 +90,7 @@ module.exports = {
 			'token-list',
 			'server-side-render',
 			'shortcode',
+			'warning',
 		].map( camelCaseDash ) ),
 		new CopyWebpackPlugin(
 			gutenbergPackages.map( ( packageName ) => ( {
