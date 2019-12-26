@@ -10,9 +10,11 @@ Install the module
 npm install @wordpress/warning --save
 ```
 
-This is recommended to use in conjunction with [`babel-plugin-dev-expression`](https://github.com/4Catalyzer/babel-plugin-dev-expression) so your warning messages won't end up in your production bundle.
-
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
+## Reducing bundle size
+
+Literal strings aren't minified. Keeping them in your production bundle may increase the bundle size significantly. To prevent that, you can put `@wordpress/warning/babel-plugin` into your [babel config](https://babeljs.io/docs/en/plugins#plugin-options) or use [`@wordpress/babel-preset-default`](https://www.npmjs.com/package/@wordpress/babel-preset-default), which already includes the babel plugin.
 
 ## API
 
