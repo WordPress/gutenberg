@@ -1,24 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { displayShortcutList, shortcutAriaLabel } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
-
-const {
-	// Cmd+<key> on a mac, Ctrl+<key> elsewhere.
-	primary,
-	// Shift+Cmd+<key> on a mac, Ctrl+Shift+<key> elsewhere.
-	primaryShift,
-	// Ctrl+Alt+<key> on a mac, Shift+Alt+<key> elsewhere.
-	access,
-	ctrl,
-	alt,
-	ctrlShift,
-} = displayShortcutList;
 
 export const mainShortcuts = [
 	{
-		keyCombination: access( 'h' ),
+		keyCombination: { modifier: 'access', character: 'h' },
 		description: __( 'Display these keyboard shortcuts.' ),
 	},
 ];
@@ -29,29 +16,13 @@ export const globalShortcuts = [
 	'core/editor/redo',
 	'core/edit-post/toggle-sidebar',
 	{
-		keyCombination: access( 'o' ),
+		keyCombination: { modifier: 'access', character: 'o' },
 		description: __( 'Open the block navigation menu.' ),
 	},
+	'core/edit-post/next-region',
+	'core/edit-post/previous-region',
 	{
-		keyCombination: ctrl( '`' ),
-		description: __( 'Navigate to the next part of the editor.' ),
-		ariaLabel: shortcutAriaLabel.ctrl( '`' ),
-	},
-	{
-		keyCombination: ctrlShift( '`' ),
-		description: __( 'Navigate to the previous part of the editor.' ),
-		ariaLabel: shortcutAriaLabel.ctrlShift( '`' ),
-	},
-	{
-		keyCombination: access( 'n' ),
-		description: __( 'Navigate to the next part of the editor (alternative).' ),
-	},
-	{
-		keyCombination: access( 'p' ),
-		description: __( 'Navigate to the previous part of the editor (alternative).' ),
-	},
-	{
-		keyCombination: alt( 'F10' ),
+		keyCombination: { modifier: 'alt', character: 'F10' },
 		description: __( 'Navigate to the nearest toolbar.' ),
 	},
 	'core/edit-post/toggle-mode',
@@ -59,23 +30,23 @@ export const globalShortcuts = [
 
 export const textFormattingShortcuts = [
 	{
-		keyCombination: primary( 'b' ),
+		keyCombination: { modifier: 'primary', character: 'b' },
 		description: __( 'Make the selected text bold.' ),
 	},
 	{
-		keyCombination: primary( 'i' ),
+		keyCombination: { modifier: 'primary', character: 'i' },
 		description: __( 'Make the selected text italic.' ),
 	},
 	{
-		keyCombination: primary( 'k' ),
+		keyCombination: { modifier: 'primary', character: 'k' },
 		description: __( 'Convert the selected text into a link.' ),
 	},
 	{
-		keyCombination: primaryShift( 'k' ),
+		keyCombination: { modifier: 'primaryShift', character: 'k' },
 		description: __( 'Remove a link.' ),
 	},
 	{
-		keyCombination: primary( 'u' ),
+		keyCombination: { modifier: 'primary', character: 'u' },
 		description: __( 'Underline the selected text.' ),
 	},
 ];

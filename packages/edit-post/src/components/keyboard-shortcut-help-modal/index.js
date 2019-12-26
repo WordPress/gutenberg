@@ -95,7 +95,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 							'core/block-editor/insert-before',
 							'core/block-editor/insert-after',
 							{
-								keyCombination: '/',
+								keyCombination: { character: '/' },
 								description: __( 'Change the block type after adding a new paragraph.' ),
 								/* translators: The forward-slash character. e.g. '/'. */
 								ariaLabel: __( 'Forward-slash' ),

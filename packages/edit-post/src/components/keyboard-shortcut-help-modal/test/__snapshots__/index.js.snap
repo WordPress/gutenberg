@@ -22,13 +22,10 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         Array [
           Object {
             "description": "Display these keyboard shortcuts.",
-            "keyCombination": Array [
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "H",
-            ],
+            "keyCombination": Object {
+              "character": "h",
+              "modifier": "access",
+            },
           },
         ]
       }
@@ -42,61 +39,19 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           "core/edit-post/toggle-sidebar",
           Object {
             "description": "Open the block navigation menu.",
-            "keyCombination": Array [
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "O",
-            ],
+            "keyCombination": Object {
+              "character": "o",
+              "modifier": "access",
+            },
           },
-          Object {
-            "ariaLabel": "Control + Backtick",
-            "description": "Navigate to the next part of the editor.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "\`",
-            ],
-          },
-          Object {
-            "ariaLabel": "Control + Shift + Backtick",
-            "description": "Navigate to the previous part of the editor.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Shift",
-              "+",
-              "\`",
-            ],
-          },
-          Object {
-            "description": "Navigate to the next part of the editor (alternative).",
-            "keyCombination": Array [
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "N",
-            ],
-          },
-          Object {
-            "description": "Navigate to the previous part of the editor (alternative).",
-            "keyCombination": Array [
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "P",
-            ],
-          },
+          "core/edit-post/next-region",
+          "core/edit-post/previous-region",
           Object {
             "description": "Navigate to the nearest toolbar.",
-            "keyCombination": Array [
-              "Alt",
-              "+",
-              "F10",
-            ],
+            "keyCombination": Object {
+              "character": "F10",
+              "modifier": "alt",
+            },
           },
           "core/edit-post/toggle-mode",
         ]
@@ -122,7 +77,9 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           Object {
             "ariaLabel": "Forward-slash",
             "description": "Change the block type after adding a new paragraph.",
-            "keyCombination": "/",
+            "keyCombination": Object {
+              "character": "/",
+            },
           },
         ]
       }
@@ -133,45 +90,38 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         Array [
           Object {
             "description": "Make the selected text bold.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "B",
-            ],
+            "keyCombination": Object {
+              "character": "b",
+              "modifier": "primary",
+            },
           },
           Object {
             "description": "Make the selected text italic.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "I",
-            ],
+            "keyCombination": Object {
+              "character": "i",
+              "modifier": "primary",
+            },
           },
           Object {
             "description": "Convert the selected text into a link.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "K",
-            ],
+            "keyCombination": Object {
+              "character": "k",
+              "modifier": "primary",
+            },
           },
           Object {
             "description": "Remove a link.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "Shift",
-              "+",
-              "K",
-            ],
+            "keyCombination": Object {
+              "character": "k",
+              "modifier": "primaryShift",
+            },
           },
           Object {
             "description": "Underline the selected text.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "U",
-            ],
+            "keyCombination": Object {
+              "character": "u",
+              "modifier": "primary",
+            },
           },
         ]
       }
