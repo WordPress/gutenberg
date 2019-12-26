@@ -13,8 +13,8 @@ import { useContext } from '@wordpress/element';
  */
 import Button from '../button';
 import ToolbarItem from '../toolbar-item';
-import ToolbarButtonContainer from './toolbar-button-container';
 import ToolbarContext from '../toolbar-context';
+import ToolbarButtonContainer from './toolbar-button-container';
 
 function ToolbarButton( {
 	containerClassName,
