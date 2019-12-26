@@ -1,40 +1,156 @@
 /**
+ * External dependencies
+ */
+import { castArray, flow } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { MenuItem } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { __, _n } from '@wordpress/i18n';
+import {
+	Toolbar,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+} from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { displayShortcut } from '@wordpress/keycodes';
 
-export function BlockModeToggle( { onToggle, small = false, shortcut, mode, canToggleBlockMode = true } ) {
-	if ( ! canToggleBlockMode ) {
-		return null;
-	}
+/**
+ * Internal dependencies
+ */
+import BlockActions from '../block-actions';
+import BlockModeToggle from './block-mode-toggle';
+import BlockHTMLConvertButton from './block-html-convert-button';
+import BlockUnknownConvertButton from './block-unknown-convert-button';
+import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
+import __experimentalBlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
 
-	const label = mode === 'visual' ?
-		__( 'Edit as HTML' ) :
-		__( 'Edit visually' );
+const POPOVER_PROPS = {
+	className: 'block-editor-block-settings-menu__popover',
+	position: 'bottom right',
+};
+
+export function BlockSettingsMenu( { clientIds } ) {
+	const blockClientIds = castArray( clientIds );
+	const count = blockClientIds.length;
+	const firstBlockClientId = blockClientIds[ 0 ];
+
+	const shortcuts = useSelect( ( select ) => {
+		const { getShortcutKeyCombination } = select( 'core/keyboard-shortcuts' );
+		return {
+			duplicate: getShortcutKeyCombination( 'core/block-editor/duplicate' ),
+			remove: getShortcutKeyCombination( 'core/block-editor/remove' ),
+			insertAfter: getShortcutKeyCombination( 'core/block-editor/insert-after' ),
+			insertBefore: getShortcutKeyCombination( 'core/block-editor/insert-before' ),
+			toggleBlockMode: getShortcutKeyCombination( 'core/block-editor/toggle-block-mode' ),
+		};
+	}, [] );
+
+	const getShortcutDisplay = ( shortcut ) => {
+		if ( ! shortcut ) {
+			return null;
+		}
+		return shortcut.modifier ?
+			displayShortcut[ shortcut.modifier ]( shortcut.character ) :
+			shortcut.character;
+	};
 
 	return (
-		<MenuItem
-			className="block-editor-block-settings-menu__control"
-			onClick={ onToggle }
-			icon="html"
-			shortcut={ shortcut }
-		>
-			{ ! small && label }
-		</MenuItem>
+		<BlockActions clientIds={ clientIds }>
+			{ ( {
+				canDuplicate,
+				canInsertDefaultBlock,
+				isLocked,
+				onDuplicate,
+				onInsertAfter,
+				onInsertBefore,
+				onRemove,
+				onToggleBlockMode,
+			} ) => (
+				<Toolbar>
+					<DropdownMenu
+						icon="ellipsis"
+						label={ __( 'More options' ) }
+						className="block-editor-block-settings-menu"
+						popoverProps={ POPOVER_PROPS }
+					>
+						{ ( { onClose } ) => (
+							<>
+								<MenuGroup>
+									<__experimentalBlockSettingsMenuFirstItem.Slot
+										fillProps={ { onClose } }
+									/>
+									{ count === 1 && (
+										<BlockUnknownConvertButton
+											clientId={ firstBlockClientId }
+										/>
+									) }
+									{ count === 1 && (
+										<BlockHTMLConvertButton
+											clientId={ firstBlockClientId }
+										/>
+									) }
+									{ canDuplicate && (
+										<MenuItem
+											className="block-editor-block-settings-menu__control"
+											onClick={ flow( onClose, onDuplicate ) }
+											icon="admin-page"
+											shortcut={ getShortcutDisplay( shortcuts.duplicate ) }
+										>
+											{ __( 'Duplicate' ) }
+										</MenuItem>
+									) }
+									{ canInsertDefaultBlock && (
+										<>
+											<MenuItem
+												className="block-editor-block-settings-menu__control"
+												onClick={ flow( onClose, onInsertBefore ) }
+												icon="insert-before"
+												shortcut={ getShortcutDisplay( shortcuts.insertBefore ) }
+											>
+												{ __( 'Insert Before' ) }
+											</MenuItem>
+											<MenuItem
+												className="block-editor-block-settings-menu__control"
+												onClick={ flow( onClose, onInsertAfter ) }
+												icon="insert-after"
+												shortcut={ getShortcutDisplay( shortcuts.insertAfter ) }
+											>
+												{ __( 'Insert After' ) }
+											</MenuItem>
+										</>
+									) }
+									{ count === 1 && (
+										<BlockModeToggle
+											clientId={ firstBlockClientId }
+											onToggle={ flow( onClose, onToggleBlockMode ) }
+											shortcut={ getShortcutDisplay( shortcuts.toggleBlockMode ) }
+										/>
+									) }
+									<__experimentalBlockSettingsMenuPluginsExtension.Slot
+										fillProps={ { clientIds, onClose } }
+									/>
+								</MenuGroup>
+								<MenuGroup>
+									{ ! isLocked && (
+										<MenuItem
+											className="block-editor-block-settings-menu__control"
+											onClick={ flow( onClose, onRemove ) }
+											icon="trash"
+											shortcut={ getShortcutDisplay( shortcuts.remove ) }
+										>
+											{ _n( 'Remove Block', 'Remove Blocks', count ) }
+										</MenuItem>
+									) }
+								</MenuGroup>
+							</>
+						) }
+					</DropdownMenu>
+				</Toolbar>
+			) }
+		</BlockActions>
 	);
 }
 
-export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const { getBlockMode, canToggleBlockMode } = select( 'core/block-editor' );
-		const isCodeEditingEnabled = select( 'core/editor' ).getEditorSettings().codeEditingEnabled;
-
-		return {
-			mode: getBlockMode( clientId ),
-			canToggleBlockMode: isCodeEditingEnabled && canToggleBlockMode( clientId ),
-		};
-	} ),
-] )( BlockModeToggle );
+export default BlockSettingsMenu;
