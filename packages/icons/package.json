@@ -28,7 +28,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "svgr -d ./build ./src",
+		"build": "svgr -d ./build ./src --quite --silent",
 		"prepare": "npm run build"
 	}
 }
