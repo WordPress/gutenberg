@@ -56,6 +56,7 @@ module.exports = function( api ) {
 		presets: [ getPresetEnv() ],
 		plugins: [
 			require.resolve( '@babel/plugin-proposal-object-rest-spread' ),
+			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
 				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
 				{
