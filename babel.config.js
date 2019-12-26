@@ -6,7 +6,6 @@ module.exports = function( api ) {
 		plugins: [
 			'babel-plugin-emotion',
 			'babel-plugin-inline-json-import',
-			'babel-plugin-dev-expression',
 		],
 	};
 };
