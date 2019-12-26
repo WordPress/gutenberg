@@ -45,10 +45,12 @@ const ModalExample = ( { numberOfPages, ...props } ) => {
 
 export const _default = () => {
 	const finishButtonText = text( 'finishButtonText', 'Finish' );
+	const contentLabel = text( 'title', 'Guide title' );
 	const numberOfPages = number( 'numberOfPages', 3, { range: true, min: 1, max: 10, step: 1 } );
 
 	const modalProps = {
 		finishButtonText,
+		contentLabel,
 		numberOfPages,
 	};
 

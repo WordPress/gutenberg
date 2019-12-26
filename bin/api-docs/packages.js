@@ -23,6 +23,7 @@ const packages = [
 	'escape-html',
 	'html-entities',
 	'i18n',
+	'keyboard-shortcuts',
 	'keycodes',
 	'plugins',
 	'priority-queue',

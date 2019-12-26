@@ -4,7 +4,8 @@ $arrow-size: 8px;
 .components-popover {
 	position: fixed;
 	z-index: z-index(".components-popover");
-	left: 50%;
+	top: 0;
+	left: 0;
 
 	// Hide the popover element until the position has been calculated. The position
 	// cannot be calculated until the popover element is rendered because the
@@ -212,7 +213,7 @@ $arrow-size: 8px;
 	width: 100%;
 }
 
-.components-popover__close.components-icon-button {
+.components-popover__close.components-button {
 	z-index: z-index(".components-popover__close");
 }
 /*!rtl:end:ignore*/

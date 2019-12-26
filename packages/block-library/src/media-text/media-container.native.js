@@ -13,7 +13,7 @@ import {
  */
 import {
 	Icon,
-	IconButton,
+	Button,
 	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
@@ -112,7 +112,7 @@ class MediaContainer extends Component {
 		return (
 			<BlockControls>
 				<ToolbarGroup>
-					<IconButton
+					<Button
 						className="components-toolbar__control"
 						label={ __( 'Edit media' ) }
 						icon="edit"

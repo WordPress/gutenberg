@@ -19,7 +19,7 @@ import { computePopoverPosition } from './utils';
 import withFocusReturn from '../higher-order/with-focus-return';
 import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import PopoverDetectOutside from './detect-outside';
-import IconButton from '../icon-button';
+import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
@@ -83,19 +83,6 @@ function computeAnchorRect(
 	}
 
 	return withoutPadding( rect, parentNode );
-}
-
-function addBuffer( rect, verticalBuffer = 0, horizontalBuffer = 0 ) {
-	return {
-		x: rect.left - horizontalBuffer,
-		y: rect.top - verticalBuffer,
-		width: rect.width + ( 2 * horizontalBuffer ),
-		height: rect.height + ( 2 * verticalBuffer ),
-		left: rect.left - horizontalBuffer,
-		right: rect.right + horizontalBuffer,
-		top: rect.top - verticalBuffer,
-		bottom: rect.bottom + verticalBuffer,
-	};
 }
 
 function withoutPadding( rect, element ) {
@@ -231,14 +218,16 @@ const Popover = ( {
 	focusOnMount = 'firstElement',
 	anchorRef,
 	shouldAnchorIncludePadding,
-	anchorVerticalBuffer,
-	anchorHorizontalBuffer,
 	anchorRect,
 	getAnchorRect,
 	expandOnMobile,
 	animate = true,
 	onClickOutside,
 	onFocusOutside,
+	__unstableSticky,
+	__unstableSlotName = SLOT_NAME,
+	__unstableAllowVerticalSubpixelPosition,
+	__unstableAllowHorizontalSubpixelPosition,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -267,8 +256,8 @@ const Popover = ( {
 			return;
 		}
 
-		const refresh = () => {
-			let anchor = computeAnchorRect(
+		const refresh = ( { subpixels } = {} ) => {
+			const anchor = computeAnchorRect(
 				anchorRefFallback,
 				anchorRect,
 				getAnchorRect,
@@ -279,12 +268,6 @@ const Popover = ( {
 			if ( ! anchor ) {
 				return;
 			}
-
-			anchor = addBuffer(
-				anchor,
-				anchorVerticalBuffer,
-				anchorHorizontalBuffer
-			);
 
 			if ( ! contentRect.current ) {
 				contentRect.current = contentEl.getBoundingClientRect();
@@ -297,13 +280,27 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentRect.current, position );
+			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef );
+
+			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
+				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
+					setStyle( containerEl, 'left', popoverLeft + 'px' );
+					setStyle( containerEl, 'top' );
+					setStyle( containerEl, 'transform', `translateY(${ popoverTop }px)` );
+				} else if ( subpixels && __unstableAllowHorizontalSubpixelPosition ) {
+					setStyle( containerEl, 'top', popoverTop + 'px' );
+					setStyle( containerEl, 'left' );
+					setStyle( containerEl, 'transform', `translate(${ popoverLeft }px)` );
+				} else {
+					setStyle( containerEl, 'top', popoverTop + 'px' );
+					setStyle( containerEl, 'left', popoverLeft + 'px' );
+					setStyle( containerEl, 'transform' );
+				}
+			}
 
 			setClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
 			setAttribute( containerEl, 'data-x-axis', xAxis );
 			setAttribute( containerEl, 'data-y-axis', yAxis );
-			setStyle( containerEl, 'top', typeof popoverTop === 'number' ? popoverTop + 'px' : '' );
-			setStyle( containerEl, 'left', typeof popoverLeft === 'number' ? popoverLeft + 'px' : '' );
 			setStyle( contentEl, 'maxHeight', typeof contentHeight === 'number' ? contentHeight + 'px' : '' );
 			setStyle( contentEl, 'maxWidth', typeof contentWidth === 'number' ? contentWidth + 'px' : '' );
 
@@ -344,12 +341,28 @@ const Popover = ( {
 		window.addEventListener( 'resize', refresh );
 		window.addEventListener( 'scroll', refresh, true );
 
+		let observer;
+
+		const observeElement = (
+			__unstableAllowVerticalSubpixelPosition ||
+			__unstableAllowHorizontalSubpixelPosition
+		);
+
+		if ( observeElement ) {
+			observer = new window.MutationObserver( () => refresh( { subpixels: true } ) );
+			observer.observe( observeElement, { attributes: true } );
+		}
+
 		return () => {
 			window.clearTimeout( timeoutId );
 			window.clearInterval( intervalHandle );
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
 			window.addEventListener( 'click', refreshOnAnimationFrame );
+
+			if ( observer ) {
+				observer.disconnect();
+			}
 		};
 	}, [
 		isExpanded,
@@ -357,9 +370,10 @@ const Popover = ( {
 		getAnchorRect,
 		anchorRef,
 		shouldAnchorIncludePadding,
-		anchorVerticalBuffer,
-		anchorHorizontalBuffer,
 		position,
+		__unstableSticky,
+		__unstableAllowVerticalSubpixelPosition,
+		__unstableAllowHorizontalSubpixelPosition,
 	] );
 
 	useFocusContentOnMount( focusOnMount, contentRef );
@@ -443,12 +457,13 @@ const Popover = ( {
 						onKeyDown={ maybeClose }
 						ref={ containerRef }
 					>
+						{ isExpanded && <ScrollLock /> }
 						{ isExpanded && (
 							<div className="components-popover__header">
 								<span className="components-popover__header-title">
 									{ headerTitle }
 								</span>
-								<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
+								<Button className="components-popover__close" icon="no-alt" onClick={ onClose } />
 							</div>
 						) }
 						<div
@@ -475,14 +490,17 @@ const Popover = ( {
 			{ ( { getSlot } ) => {
 				// In case there is no slot context in which to render,
 				// default to an in-place rendering.
-				if ( getSlot && getSlot( SLOT_NAME ) ) {
-					content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
+				if ( getSlot && getSlot( __unstableSlotName ) ) {
+					content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
+				}
+
+				if ( anchorRef || anchorRect ) {
+					return content;
 				}
 
 				return (
 					<span ref={ anchorRefFallback }>
 						{ content }
-						{ isMobileViewport && expandOnMobile && <ScrollLock /> }
 					</span>
 				);
 			} }
@@ -492,6 +510,7 @@ const Popover = ( {
 
 const PopoverContainer = Popover;
 
-PopoverContainer.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
+PopoverContainer.Slot = ( { name = SLOT_NAME } ) =>
+	<Slot bubblesVirtually name={ name } />;
 
 export default PopoverContainer;
