@@ -35,7 +35,7 @@ import { __ } from '@wordpress/i18n';
  */
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
-import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
+import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
@@ -93,7 +93,7 @@ function Layout() {
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
-			<EditorModeKeyboardShortcuts />
+			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
 				<EditorRegions

@@ -6,7 +6,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 
-function EditorModeKeyboardShortcuts() {
+function KeyboardShortcuts() {
 	const {
 		getBlockSelectionStart,
 		getEditorSettings,
@@ -36,6 +36,16 @@ function EditorModeKeyboardShortcuts() {
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'm',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-post/toggle-block-navigation',
+			category: 'global',
+			description: __( 'Open the block navigation menu.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'o',
 			},
 		} );
 
@@ -76,6 +86,16 @@ function EditorModeKeyboardShortcuts() {
 				character: 'p',
 			} ],
 		} );
+
+		registerShortcut( {
+			name: 'core/edit-post/keyboard-shortcuts',
+			category: 'main',
+			description: __( 'Display these keyboard shortcuts.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'h',
+			},
+		} );
 	}, [] );
 
 	useShortcut( 'core/edit-post/toggle-mode', () => {
@@ -102,4 +122,4 @@ function EditorModeKeyboardShortcuts() {
 	return null;
 }
 
-export default EditorModeKeyboardShortcuts;
+export default KeyboardShortcuts;
