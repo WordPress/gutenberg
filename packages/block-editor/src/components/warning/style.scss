@@ -8,14 +8,6 @@
 	text-align: left;
 	padding: 10px $block-padding $block-padding;
 
-	.is-selected & {
-		border-color: $border-color;
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-800;
-		}
-	}
-
 	.block-editor-warning__message {
 		line-height: $default-line-height;
 		font-family: $default-font;

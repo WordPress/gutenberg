@@ -15,7 +15,7 @@
 	z-index: z-index(".block-editor-block-list__layout .reusable-block-edit-panel");
 
 	// Use opacity to work in various editor styles.
-	border: $border-width dashed $dark-opacity-light-500;
+	border: $border-width dashed $border-color;
 	border-bottom: none;
 
 	// Show a smaller padding when nested.
@@ -65,16 +65,10 @@
 	}
 }
 
-.block-editor-block-list__layout .is-selected .reusable-block-edit-panel {
-	border-color: $border-color;
-
-	.is-dark-theme & {
-		border-color: $light-opacity-light-800;
-	}
-}
-
 .is-navigate-mode .is-selected .reusable-block-edit-panel {
 	border-color: $blue-medium-focus;
+	border-style: solid;
+	border-bottom: 0;
 
 	.is-dark-theme & {
 		border-color: $blue-medium-focus;

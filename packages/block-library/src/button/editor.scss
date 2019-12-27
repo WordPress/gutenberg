@@ -65,8 +65,7 @@
 
 	}
 
-	.is-selected &,
-	.is-typing & {
+	.is-selected & {
 		height: auto;
 		overflow: visible;
 		margin-top: $grid-size-large;
