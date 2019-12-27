@@ -34,9 +34,13 @@ function isAppleOS( _window = window ) {
 function useKeyboardShortcut( shortcuts, callback, {
 	bindGlobal = false,
 	eventName = 'keydown',
+	isDisabled = false, // This is important for performance considerations.
 	target,
 } = {} ) {
 	useEffect( () => {
+		if ( isDisabled ) {
+			return;
+		}
 		const mousetrap = new Mousetrap( target ? target.current : document );
 		castArray( shortcuts ).forEach( ( shortcut ) => {
 			const keys = shortcut.split( '+' );
@@ -64,7 +68,7 @@ function useKeyboardShortcut( shortcuts, callback, {
 		return () => {
 			mousetrap.reset();
 		};
-	}, [ shortcuts, bindGlobal, eventName, callback, target ] );
+	}, [ shortcuts, bindGlobal, eventName, callback, target, isDisabled ] );
 }
 
 export default useKeyboardShortcut;

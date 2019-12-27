@@ -8,7 +8,7 @@ import { animated } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useLayoutEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useLayoutEffect, useState, useCallback } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { KeyboardShortcuts, withFilters, Popover } from '@wordpress/components';
+import { withFilters, Popover } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
@@ -31,6 +31,7 @@ import {
 } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -396,6 +397,19 @@ function BlockListBlock( {
 		}
 	};
 
+	const canFocusHiddenToolbar = (
+		! isNavigationMode &&
+		! shouldShowContextualToolbar &&
+		isSelected &&
+		! hasFixedToolbar &&
+		! isEmptyDefaultBlock
+	);
+	useShortcut(
+		'core/block-editor/focus-toolbar',
+		useCallback( forceFocusedContextualToolbar, [] ),
+		{ bindGlobal: true, eventName: 'keydown', isDisabled: ! canFocusHiddenToolbar }
+	);
+
 	// Rendering the output
 	const isHovered = isBlockHovered && ! isPartOfMultiSelection;
 	const blockType = getBlockType( name );
@@ -592,21 +606,6 @@ function BlockListBlock( {
 						) }
 					</Popover>
 				) }
-				{
-					! isNavigationMode &&
-					! shouldShowContextualToolbar &&
-					isSelected &&
-					! hasFixedToolbar &&
-					! isEmptyDefaultBlock && (
-						<KeyboardShortcuts
-							bindGlobal
-							eventName="keydown"
-							shortcuts={ {
-								'alt+f10': forceFocusedContextualToolbar,
-							} }
-						/>
-					)
-				}
 				<IgnoreNestedEvents
 					ref={ blockNodeRef }
 					onDragStart={ preventDrag }

@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { displayShortcutList } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -10,11 +9,16 @@ import { displayShortcutList } from '@wordpress/keycodes';
 import Shortcut from './shortcut';
 
 function DynamicShortcut( { name } ) {
-	const { keyCombination, description } = useSelect( ( select ) => {
-		const { getShortcutKeyCombination, getShortcutDescription } = select( 'core/keyboard-shortcuts' );
+	const { keyCombination, description, aliases } = useSelect( ( select ) => {
+		const {
+			getShortcutKeyCombination,
+			getShortcutDescription,
+			getShortcutAliases,
+		} = select( 'core/keyboard-shortcuts' );
 
 		return {
 			keyCombination: getShortcutKeyCombination( name ),
+			aliases: getShortcutAliases( name ),
 			description: getShortcutDescription( name ),
 		};
 	} );
@@ -23,14 +27,11 @@ function DynamicShortcut( { name } ) {
 		return null;
 	}
 
-	const combination = keyCombination.modifier ?
-		displayShortcutList[ keyCombination.modifier ]( keyCombination.character ) :
-		keyCombination.character;
-
 	return (
 		<Shortcut
-			keyCombination={ combination }
+			keyCombination={ keyCombination }
 			description={ description }
+			aliases={ aliases }
 		/>
 	);
 }
