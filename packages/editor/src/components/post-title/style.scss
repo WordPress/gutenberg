@@ -58,16 +58,6 @@
 		}
 	}
 
-	&:not(.is-focus-mode) {
-		&.is-selected .editor-post-title__input {
-			border-color: $border-color;
-
-			.is-dark-theme & {
-				border-color: $light-opacity-light-800;
-			}
-		}
-	}
-
 	&.is-focus-mode .editor-post-title__input {
 		opacity: 0.5;
 		transition: opacity 0.1s linear;

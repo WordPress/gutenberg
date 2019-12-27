@@ -11,14 +11,10 @@
 			margin-bottom: $block-spacing;
 			padding: $block-padding;
 
-			&:focus {
-				border: $border-width solid $light-gray-500;
+			&:focus,
+			&:hover {
+				border: $border-width solid $black;
 			}
-		}
-
-		textarea:hover,
-		&.is-selected textarea {
-			box-shadow: 0 0 0 $border-width $light-gray-500;
 		}
 	}
 
