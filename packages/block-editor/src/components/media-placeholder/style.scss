@@ -47,18 +47,10 @@
 
 .block-editor-media-placeholder.is-appender {
 	min-height: 100px;
-	outline: $border-width dashed $dark-gray-150;
 
 	&:hover {
-		outline: $border-width dashed $dark-gray-500;
 		cursor: pointer;
-	}
-
-	.is-dark-theme & {
-
-		&:hover {
-			outline: $border-width dashed $white;
-		}
+		border: 1px solid $theme-color;
 	}
 
 	.block-editor-media-placeholder__upload-button {

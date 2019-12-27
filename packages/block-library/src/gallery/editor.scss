@@ -6,9 +6,8 @@
 		list-style-type: none;
 	}
 
-	// Override the bottom margin every block gets.
-	.is-selected & {
-		margin-bottom: 0;
+	.block-editor-media-placeholder {
+		margin-bottom: $grid-size;
 	}
 }
 

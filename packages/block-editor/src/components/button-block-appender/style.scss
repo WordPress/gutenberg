@@ -4,31 +4,25 @@
 	align-items: center;
 	justify-content: center;
 	padding: $block-padding;
-	outline: $border-width dashed $dark-gray-150;
 	width: 100%;
 	height: auto;
 	color: $dark-gray-500;
-	background: $light-opacity-background-fill;
+
+	// Dotted backouground
+	background-image: radial-gradient($black 2%, transparent 2%), radial-gradient($white 2%, transparent 2%);
+	background-color: $white;
+	background-position: 0 0, 100px 100px;
+	background-size: 50px 50px;
+
+	border: $border-width solid $border-color;
 
 	&:hover,
 	&:focus {
-		outline: $border-width dashed $dark-gray-500;
-		color: $dark-gray-900;
+		border-color: $theme-color;
 	}
 
 	&:active {
-		outline: $border-width dashed $dark-gray-900;
+		border-color: $dark-gray-900;
 		color: $dark-gray-900;
-	}
-
-	// Use opacity to work in various editor styles
-	.is-dark-theme & {
-		background: $dark-opacity-background-fill;
-		color: $light-gray-100;
-
-		&:hover,
-		&:focus {
-			outline: $border-width dashed $white;
-		}
 	}
 }
