@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
-import { IconButton, ModalHeaderBar } from '@wordpress/components';
+import { Button, ModalHeaderBar } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * External dependencies
@@ -49,9 +50,10 @@ const Preview = ( props ) => {
 		<View
 			style={ { flex: 1, width: 44 } }
 		>
-			<IconButton
+			<Button
 				icon="no-alt"
 				size={ 24 }
+				label={ __( 'Close' ) }
 				onClick={ onDismiss }
 			/>
 		</View>
