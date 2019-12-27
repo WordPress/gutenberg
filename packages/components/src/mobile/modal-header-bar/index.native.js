@@ -31,7 +31,7 @@ const ModalHeaderBar = withPreferredColorScheme( ( props ) => {
 					{ leftButton }
 				</View>
 				<View style={ styles.titleContainer }>
-					<Text style={ styles.title }>
+					<Text style={ styles.title } accessibilityRole="header">
 						{ title }
 					</Text>
 				</View>
