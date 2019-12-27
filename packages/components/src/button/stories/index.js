@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { text, number } from '@storybook/addon-knobs';
+import { text, boolean, number } from '@storybook/addon-knobs';
 
 /**
  * Internal dependencies
@@ -11,77 +11,74 @@ import Button from '../';
 
 export default { title: 'Components|Button', component: Button };
 
-export const _default = () => {
-	const label = text( 'Label', 'Default Button' );
+function getOptions( defaultLabel = 'Button' ) {
+	const label = text( 'Label', defaultLabel );
+	const disabled = boolean( 'Disabled', false );
+	const isFocusable = disabled && boolean( 'isFocusable', false );
+	return { label, disabled, isFocusable };
+}
 
-	return (
-		<Button>{ label }</Button>
-	);
+export const _default = () => {
+	const { label, ...props } = getOptions( 'Default Button' );
+
+	return <Button { ...props }>{ label }</Button>;
 };
 
 export const primary = () => {
-	const label = text( 'Label', 'Primary Button' );
+	const { label, ...props } = getOptions( 'Primary Button' );
 
 	return (
-		<Button isPrimary>{ label }</Button>
-	);
-};
-
-export const secondary = () => {
-	const label = text( 'Label', 'Secondary Button' );
-
-	return (
-		<Button isSecondary>{ label }</Button>
-	);
-};
-
-export const tertiary = () => {
-	const label = text( 'Label', 'Tertiary Button' );
-
-	return (
-		<Button isTertiary>{ label }</Button>
-	);
-};
-
-export const small = () => {
-	const label = text( 'Label', 'Small Button' );
-
-	return (
-		<Button isSmall>{ label }</Button>
-	);
-};
-
-export const pressed = () => {
-	const label = text( 'Label', 'Pressed Button' );
-
-	return (
-		<Button isPressed>{ label }</Button>
-	);
-};
-
-export const disabled = () => {
-	const label = text( 'Label', 'Disabled Button' );
-
-	return (
-		<Button disabled>{ label }</Button>
-	);
-};
-
-export const link = () => {
-	const label = text( 'Label', 'Link Button' );
-
-	return (
-		<Button href="https://wordpress.org/" target="_blank">
+		<Button isPrimary { ...props }>
 			{ label }
 		</Button>
 	);
 };
 
-export const disabledLink = () => {
-	const label = text( 'Label', 'Disabled Link Button' );
+export const secondary = () => {
+	const { label, ...props } = getOptions( 'Secondary Button' );
 
 	return (
-		<Button href="https://wordpress.org/" target="_blank" disabled>
+		<Button isSecondary { ...props }>
+			{ label }
+		</Button>
+	);
+};
+
+export const tertiary = () => {
+	const { label, ...props } = getOptions( 'Tertiary Button' );
+
+	return (
+		<Button isTertiary { ...props }>
+			{ label }
+		</Button>
+	);
+};
+
+export const small = () => {
+	const { label, ...props } = getOptions( 'Small Button' );
+
+	return (
+		<Button isSmall { ...props }>
+			{ label }
+		</Button>
+	);
+};
+
+export const pressed = () => {
+	const { label, ...props } = getOptions( 'Pressed Button' );
+
+	return (
+		<Button isPressed { ...props }>
+			{ label }
+		</Button>
+	);
+};
+
+export const link = () => {
+	const { label, ...props } = getOptions( 'Link Button' );
+
+	return (
+		<Button href="https://wordpress.org/" target="_blank" { ...props }>
 			{ label }
 		</Button>
 	);
@@ -89,14 +86,15 @@ export const disabledLink = () => {
 
 export const icon = () => {
 	const usedIcon = text( 'Icon', 'ellipsis' );
-	const label = text( 'Label', 'More' );
 	const size = number( 'Size' );
+	const { label, ...props } = getOptions( 'More' );
 
 	return (
 		<Button
 			icon={ usedIcon }
 			label={ label }
 			iconSize={ size }
+			{ ...props }
 		/>
 	);
 };

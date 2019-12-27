@@ -16,6 +16,11 @@ import { forwardRef } from '@wordpress/element';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 
+const disabledEventsOnDisabledButton = [
+	'onMouseDown',
+	'onClick',
+];
+
 export function Button( props, ref ) {
 	const {
 		href,
@@ -30,6 +35,7 @@ export function Button( props, ref ) {
 		isSecondary,
 		isLink,
 		isDestructive,
+		isFocusable,
 		className,
 		disabled,
 		icon,
@@ -62,13 +68,28 @@ export function Button( props, ref ) {
 		'has-icon': !! icon,
 	} );
 
-	const Tag = href !== undefined && ! disabled ? 'a' : 'button';
+	const trulyDisabled = disabled && ! isFocusable;
+	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
 	const tagProps = Tag === 'a' ?
 		{ href, target } :
-		{ type: 'button', disabled, 'aria-pressed': isPressed };
+		{ type: 'button', disabled: trulyDisabled, 'aria-pressed': isPressed };
+
+	if ( disabled && isFocusable ) {
+		// In this case, the button will be disabled, but still focusable and
+		// perceivable by screen reader users.
+		tagProps[ 'aria-disabled' ] = true;
+
+		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
+			additionalProps[ disabledEvent ] = ( event ) => {
+				event.stopPropagation();
+				// event.stopImmediatePropagation();
+				event.preventDefault();
+			};
+		}
+	}
 
 	// Should show the tooltip if...
-	const shouldShowTooltip = ! disabled && (
+	const shouldShowTooltip = ! trulyDisabled && (
 		// an explicit tooltip is passed or...
 		( showTooltip && label ) ||
 		// there's a shortcut or...

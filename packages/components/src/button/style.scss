@@ -46,7 +46,7 @@
 
 		}
 
-		&:active:enabled {
+		&:not([aria-disabled="true"]):active:enabled {
 			background: #f3f5f6;
 			color: color(theme(button) shade(5%));
 			border-color: #7e8993;
@@ -87,7 +87,7 @@
 				0 0 0 3px color(theme(button));
 		}
 
-		&:active:enabled {
+		&:not([aria-disabled="true"]):active:enabled {
 			background: color(theme(button) shade(20%));
 			border-color: color(theme(button) shade(20%));
 			color: $white;
@@ -149,7 +149,7 @@
 		height: auto;
 
 		&:not(:disabled):not([aria-disabled="true"]):hover,
-		&:active {
+		&:not([aria-disabled="true"]):active {
 			color: #00a0d2;
 		}
 
@@ -166,7 +166,7 @@
 		color: $alert-red;
 	}
 
-	&:active {
+	&:not([aria-disabled="true"]):active {
 		color: inherit;
 	}
 
@@ -212,7 +212,7 @@
 			outline: none;
 		}
 
-		&:active:focus:enabled {
+		&:not([aria-disabled="true"]):active:focus {
 			box-shadow: none;
 		}
 

@@ -132,6 +132,7 @@ Name | Type | Default | Description
 `isPrimary` | `bool` | `false` | Renders a primary button style.
 `isTertiary` | `bool` | `false` | Renders a text-based button style.
 `isDestructive` | `bool` | `false` | Renders a red text-based button style to indicate destructive behavior.
+`isFocusable` | `bool` | `false` | Whether the button can be focusable even when `disabled`.
 `isLarge` | `bool` | `false` | Increases the size of the button.
 `isSmall` | `bool` | `false` | Decreases the size of the button.
 `isPressed` | `bool` | `false` | Renders a pressed button style.

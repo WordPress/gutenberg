@@ -58,6 +58,12 @@ describe( 'Button', () => {
 			expect( button.prop( 'disabled' ) ).toBe( true );
 		} );
 
+		it( 'should add only aria-disabled attribute when isFocusable prop is passed in', () => {
+			const button = shallow( <Button disabled isFocusable /> );
+			expect( button.prop( 'disabled' ) ).toBe( false );
+			expect( button.prop( 'aria-disabled' ) ).toBe( true );
+		} );
+
 		it( 'should not poss the prop target into the element', () => {
 			const button = shallow( <Button target="_blank" /> );
 			expect( button.prop( 'target' ) ).toBeUndefined();
