@@ -68,15 +68,14 @@ export class RootComponent extends React.Component {
 		let postType = this.props.postType;
 
 		if ( initialData === undefined && __DEV__ ) {
-			// initialData = initialHtml;
+			initialData = initialHtml;
 		}
 		if ( initialTitle === undefined ) {
-			// initialTitle = 'Welcome to Gutenberg!';
+			initialTitle = 'Welcome to Gutenberg!';
 		}
 		if ( postType === undefined ) {
 			postType = 'post';
 		}
-		postType = 'page';
 		const Editor = require( '@wordpress/edit-post' ).Editor;
 		return (
 			<Editor
