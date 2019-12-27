@@ -1,10 +1,10 @@
 .components-placeholder.components-placeholder { // This needs specificity to override individual block styles.
 	position: relative;
-	margin-bottom: $default-block-margin;
 	padding: 1em;
 	min-height: 200px;
 	width: 100%;
 	text-align: left;
+	margin: 0;
 
 	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 	@supports (position: sticky) {

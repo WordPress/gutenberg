@@ -1,4 +1,4 @@
-.block-editor-block-list__layout .block-editor-block-list__block.is-selected { // Needs specificity to override inherited styles.
+.block-editor-block-list__layout .block-editor-block-list__block { // Needs specificity to override inherited styles.
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {
 		&::before {
@@ -103,20 +103,13 @@
 		bottom: -$block-padding;
 	}
 
-	// Selected style.
-	&.is-selected {
-		&::before {
-			// Use opacity to work in various editor styles.
-			border-color: $border-color;
+	// Navigate mode & Focused wrapper.
+	&:focus:not(.is-reusable) > [data-block] {
+		@include button-style__focus-active;
+	}
 
-			.is-dark-theme & {
-				border-color: $light-opacity-light-800;
-			}
-		}
-
-		.is-navigate-mode &::before {
-			border-color: $blue-medium-focus;
-		}
+	.is-navigate-mode &.is-selected::before {
+		border-color: $theme-color;
 	}
 
 	// Spotlight mode.
@@ -202,14 +195,6 @@
 		}
 	}
 
-	&.has-warning.is-selected::before {
-		border-color: $border-color;
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-800;
-		}
-	}
-
 	&.has-warning::after {
 		content: "";
 		position: absolute;
@@ -226,15 +211,16 @@
 		background-color: transparent;
 	}
 
-	&.has-warning.is-selected::after {
-		bottom: ( $block-toolbar-height - $block-padding - $border-width );
+	// Reusable blocks.
+	&.is-reusable.is-selected::before {
+		// Use opacity to work in various editor styles.
+		border-color: $border-color;
 
-		@include break-small() {
-			bottom: -$block-padding;
+		.is-dark-theme & {
+			border-color: $light-opacity-light-800;
 		}
 	}
 
-	// Reusable blocks.
 	&.is-reusable.is-selected::before {
 		border-style: dashed;
 		border-width: $border-width;
