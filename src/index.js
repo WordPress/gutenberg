@@ -60,6 +60,9 @@ export class RootComponent extends React.Component {
 
 	render() {
 		const { initialHtmlModeEnabled } = this.props;
+		const settings = {
+			__experimentalEnablePageTemplates: !! __DEV__,
+		};
 		let initialData = this.props.initialData;
 		let initialTitle = this.props.initialTitle;
 		let postType = this.props.postType;
