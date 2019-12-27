@@ -77,9 +77,6 @@ export class RootComponent extends React.Component {
 			postType = 'post';
 		}
 		postType = 'page';
-		const settings = {
-			__experimentalEnablePageTemplates: !! __DEV__,
-		};
 		const Editor = require( '@wordpress/edit-post' ).Editor;
 		return (
 			<Editor
