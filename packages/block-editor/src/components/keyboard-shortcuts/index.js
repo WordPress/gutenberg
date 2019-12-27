@@ -153,6 +153,16 @@ function KeyboardShortcutsRegister() {
 				character: 'escape',
 			},
 		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/focus-toolbar',
+			category: 'global',
+			description: __( 'Navigate to the nearest toolbar.' ),
+			keyCombination: {
+				modifier: 'alt',
+				character: 'F10',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;
