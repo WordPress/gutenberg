@@ -330,6 +330,15 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 	},
 	{
+		name: 'core-embed/tiktok',
+		settings: {
+			title: 'TikTok',
+			icon: embedVideoIcon,
+			description: __( 'Embed a TikTok video.' ),
+		},
+		patterns: [ /^https?:\/\/(www\.)?tiktok\.com\/.+/i ],
+	},
+	{
 		name: 'core-embed/ted',
 		settings: {
 			title: 'TED',
