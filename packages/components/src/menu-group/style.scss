@@ -1,6 +1,11 @@
 .components-menu-group {
 	width: 100%;
-	padding: ($grid-size - $border-width) 0;
+}
+
+.components-menu-group + .components-menu-group {
+	margin-top: $grid-size;
+	padding-top: $grid-size;
+	border-top: $border-width solid $light-gray-500;
 }
 
 .components-menu-group__label {

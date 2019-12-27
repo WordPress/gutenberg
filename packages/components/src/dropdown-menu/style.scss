@@ -39,17 +39,6 @@
 			height: 1px;
 		}
 
-		// Plain menu styles.
-		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) {
-			@include menu-style__focus();
-		}
-
-		&:hover,
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-tertiary):not(.is-primary):hover {
-			@include menu-style__hover();
-			box-shadow: none;
-		}
-
 		// Formatting buttons
 		> svg {
 			border-radius: $radius-round-rectangle;
@@ -60,20 +49,14 @@
 			height: $icon-button-size-small;
 			margin: -1px $grid-size -1px 0;
 		}
-
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary).is-active > svg {
-			@include formatting-button-style__active();
-		}
-	}
-
-	.components-menu-group:not(:last-child) {
-		border-bottom: $border-width solid $light-gray-500;
 	}
 
 	.components-menu-item__button,
 	.components-menu-item__button.components-button {
+		min-height: $icon-button-size;
 		height: auto;
 		padding-left: 2rem;
+		text-align: left;
 
 		&.has-icon {
 			padding-left: 0.5rem;
