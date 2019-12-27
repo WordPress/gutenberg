@@ -250,8 +250,7 @@ div[data-type="core/freeform"] {
 	}
 
 	&.is-selected::before {
-		border-color: $light-gray-800;
-		border-left-color: transparent;
+		border-color: $border-color;
 	}
 
 	.block-editor-block-contextual-toolbar + div {
@@ -312,7 +311,7 @@ div[data-type="core/freeform"] {
 	div[data-type="core/freeform"].is-selected &,
 	div[data-type="core/freeform"].is-typing & {
 		display: block;
-		border-color: $light-gray-800;
+		border-color: $border-color;
 	}
 
 	// Remove the box shadow to mimic other Gutenberg UI.
@@ -337,6 +336,10 @@ div[data-type="core/freeform"] {
 			line-height: 37px;
 			padding: $block-padding;
 		}
+	}
+
+	div.mce-toolbar-grp {
+		border-bottom: 1px solid $border-color;
 	}
 
 	// Overwrite inline styles.

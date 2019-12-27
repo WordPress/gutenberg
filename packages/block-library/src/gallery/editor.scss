@@ -42,7 +42,7 @@ figure.wp-block-gallery {
 	.is-selected .block-library-gallery-item__move-menu,
 	.is-selected .block-library-gallery-item__inline-menu {
 		background: $white;
-		border: 1px solid $dark-opacity-light-800;
+		border: 1px solid $border-color;
 		border-radius: $radius-round-rectangle;
 		transition: box-shadow 0.2s ease-out;
 		@include reduce-motion("transition");

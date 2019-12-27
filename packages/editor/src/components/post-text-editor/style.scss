@@ -18,7 +18,7 @@
 
 	&:hover,
 	&:focus {
-		border: $border-width solid $light-gray-800 !important;
+		border: $border-width solid $border-color !important;
 		box-shadow: none !important;
 		// Emulate the effect used on the post title.
 		outline-offset: -2px !important;

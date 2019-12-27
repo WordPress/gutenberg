@@ -16,13 +16,6 @@
 			}
 		}
 
-		// Hide the thick left border in the code editor.
-		&:not(.is-focus-mode):not(.has-fixed-toolbar):not(.is-selected) .editor-post-title__input:hover,
-		&:not(.is-focus-mode):not(.has-fixed-toolbar).is-selected .editor-post-title__input {
-			box-shadow: none;
-			border-left-width: $border-width;
-		}
-
 		textarea:hover,
 		&.is-selected textarea {
 			box-shadow: 0 0 0 $border-width $light-gray-500;
@@ -35,7 +28,7 @@
 		// Hide the thick left border in the code editor.
 		box-shadow: none;
 		border: none;
-		outline: $border-width solid $light-gray-800;
+		outline: $border-width solid $border-color;
 	}
 
 	@include break-small() {
