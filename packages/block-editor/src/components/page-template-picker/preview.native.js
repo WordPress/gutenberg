@@ -61,8 +61,7 @@ const Preview = ( props ) => {
 		<Modal
 			visible={ !! template }
 			animationType="slide"
-			presentationStyle="fullScreen"
-			transparent={ false }
+			onRequestClose={ onDismiss }
 		>
 			<SafeAreaView style={ { flex: 1 } }>
 				<ModalHeaderBar
