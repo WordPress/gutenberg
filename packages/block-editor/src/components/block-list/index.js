@@ -12,7 +12,6 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import __experimentalBlockListFooter from '../block-list-footer';
@@ -88,11 +87,7 @@ function BlockList( {
 					selectedBlockClientId === clientId;
 
 				return (
-					<BlockAsyncModeProvider
-						key={ 'block-' + clientId }
-						clientId={ clientId }
-						isBlockInSelection={ isBlockInSelection }
-					>
+					<AsyncModeProvider key={ clientId } value={ ! isBlockInSelection }>
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
@@ -106,7 +101,7 @@ function BlockList( {
 							animateOnChange={ index }
 							enableAnimation={ enableAnimation }
 						/>
-					</BlockAsyncModeProvider>
+					</AsyncModeProvider>
 				);
 			} ) }
 			<BlockListAppender
