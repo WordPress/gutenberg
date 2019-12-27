@@ -7,6 +7,10 @@
 	display: none;
 }
 
+.block-editor-block-mover__control {
+	padding: 0;
+}
+
 // Show the mover in a single button under the contextual toolbar.
 .block-editor-block-contextual-toolbar .block-editor-block-mover {
 	.components-toolbar {
