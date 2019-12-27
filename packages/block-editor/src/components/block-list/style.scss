@@ -525,6 +525,7 @@
 	.components-popover__content {
 		margin: 0 !important;
 		min-width: auto;
+		width: max-content;
 		background: none;
 		border: none;
 		box-shadow: none;

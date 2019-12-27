@@ -89,7 +89,7 @@
 
 	@include break-mobile() {
 		position: absolute;
-		top: -$block-toolbar-height + $border-width + $border-width + 1px; // Shift this element upward the same height as the block toolbar, minus the border size
+		top: -$icon-button-size + $border-width + $border-width + 1px; // Shift this element upward the same height as the block toolbar, minus the border size
 		right: 0;
 		flex-wrap: nowrap;
 		width: auto;
