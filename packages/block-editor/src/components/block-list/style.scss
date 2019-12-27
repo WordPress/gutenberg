@@ -88,7 +88,6 @@
 		content: "";
 		position: absolute;
 		border: $border-width solid transparent;
-		border-left: none;
 		box-shadow: none;
 		pointer-events: none;
 		transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
@@ -108,31 +107,15 @@
 	&.is-selected {
 		&::before {
 			// Use opacity to work in various editor styles.
-			border-color: $dark-opacity-light-800;
-			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
+			border-color: $border-color;
 
 			.is-dark-theme & {
 				border-color: $light-opacity-light-800;
-				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
-			}
-
-			// Switch to outset borders on larger screens.
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-
-				.is-dark-theme & {
-					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-				}
 			}
 		}
 
 		.is-navigate-mode &::before {
 			border-color: $blue-medium-focus;
-			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
-
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
-			}
 		}
 	}
 
@@ -212,9 +195,7 @@
 	}
 
 	&.has-warning::before {
-		// Use opacity to work in various editor styles.
 		border-color: $dark-opacity-light-500;
-		border-left: $border-width solid $dark-opacity-light-500;
 
 		.is-dark-theme & {
 			border-color: $light-opacity-light-600;
@@ -222,9 +203,7 @@
 	}
 
 	&.has-warning.is-selected::before {
-		// Use opacity to work in various editor styles.
-		border-color: $dark-opacity-light-800;
-		border-left-color: transparent;
+		border-color: $border-color;
 
 		.is-dark-theme & {
 			border-color: $light-opacity-light-800;
@@ -257,7 +236,6 @@
 
 	// Reusable blocks.
 	&.is-reusable.is-selected::before {
-		border-left-color: transparent;
 		border-style: dashed;
 		border-width: $border-width;
 	}
@@ -482,8 +460,8 @@
 	// Adapt the height of the toolbar items.
 	.components-toolbar {
 		height: $block-toolbar-height + 1px;
-		border-top: $border-width solid $light-gray-800;
-		border-bottom: $border-width solid $light-gray-800;
+		border-top: $border-width solid $border-color;
+		border-bottom: $border-width solid $border-color;
 
 		// Ensure the icon buttons remain square.
 		.components-button.has-icon:not(.has-text) {
@@ -509,8 +487,6 @@
 		display: flex;
 		background: $white;
 		border: $border-width solid $blue-medium-focus;
-		border-left: none;
-		box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
 		height: $icon-button-size + 2 * $border-width;
 		font-size: $default-font-size;
 		padding-left: $grid-size;
@@ -522,10 +498,6 @@
 
 		.is-dark-theme & {
 			border-color: $light-opacity-light-800;
-		}
-
-		@include break-small() {
-			box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
 		}
 	}
 }

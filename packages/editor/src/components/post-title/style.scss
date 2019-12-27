@@ -32,7 +32,6 @@
 
 		@include break-small() {
 			border-width: $border-width;
-			border-left-width: 0;
 		}
 
 		// Match h1 heading.
@@ -54,7 +53,6 @@
 
 		&:focus {
 			border: $border-width solid transparent;
-			border-left-width: 0;
 			outline: $border-width solid transparent;
 			box-shadow: none;
 		}
@@ -62,22 +60,10 @@
 
 	&:not(.is-focus-mode) {
 		&.is-selected .editor-post-title__input {
-			// use opacity to work in various editor styles.
-			border-color: $dark-opacity-light-800;
-			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
+			border-color: $border-color;
 
 			.is-dark-theme & {
 				border-color: $light-opacity-light-800;
-				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
-			}
-
-			// Switch to outset borders on larger screens.
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-
-				.is-dark-theme & {
-					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-				}
 			}
 		}
 	}
@@ -98,9 +84,8 @@
 	color: $dark-gray-900;
 	height: auto;
 	position: relative;
-	left: $block-left-border-width;
 	top: -2px;
-	width: calc(100% - #{$block-left-border-width});
+	width: 100%;
 
 	@include break-mobile() {
 		position: absolute;
