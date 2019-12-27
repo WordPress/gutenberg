@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { identity } from 'lodash';
-import { FlatList, View, Platform, TouchableWithoutFeedback } from 'react-native';
+import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -47,11 +47,6 @@ export class BlockList extends Component {
 
 	scrollViewInnerRef( ref ) {
 		this.scrollViewRef = ref;
-		if ( typeof this.props.scrollViewRef === 'function' ) {
-			this.props.scrollViewRef( ref );
-		} else if ( typeof this.props.scrollViewRef === 'object' ) {
-			this.props.scrollViewRef.current = ref;
-		}
 	}
 
 	shouldFlatListPreventAutomaticScroll() {
@@ -83,26 +78,21 @@ export class BlockList extends Component {
 			renderAppender,
 			isReadOnly,
 			isRootList,
-			onScroll,
 		} = this.props;
-
-		const ListComponent = isReadOnly ? FlatList : KeyboardAwareFlatList;
 
 		return (
 			<View
 				style={ { flex: isRootList ? 1 : 0 } }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
-				<ListComponent
+				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
 					autoScroll={ this.props.autoScroll }
 					innerRef={ this.scrollViewInnerRef }
-					ref={ this.scrollViewInnerRef }
 					extraScrollHeight={ innerToolbarHeight + 10 }
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
-					onScroll={ onScroll }
 					data={ blockClientIds }
 					extraData={ [ isFullyBordered ] }
 					keyExtractor={ identity }
