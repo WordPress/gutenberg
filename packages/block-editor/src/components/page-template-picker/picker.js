@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { parse } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
 /**
@@ -13,7 +11,7 @@ import Container from './container';
 import getDefaultTemplates from './default-templates';
 import Preview from './preview';
 
-const __experimentalPageTemplatePicker = ( { templates = getDefaultTemplates(), resetContent } ) => {
+const __experimentalPageTemplatePicker = ( { templates = getDefaultTemplates() } ) => {
 	const [ templatePreview, setTemplatePreview ] = useState();
 
 	return (
