@@ -104,8 +104,18 @@
 	}
 
 	// Navigate mode & Focused wrapper.
-	&:focus:not(.is-reusable) > [data-block] {
-		@include button-style__focus-active;
+	// We're using a pseudo element to overflow placeholder borders
+	// and any border inside the block itself.
+	&:focus:not(.is-reusable) > [data-block]::after {
+		position: absolute;
+		pointer-events: none;
+		content: "";
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		border: 1px solid color($theme-color);
+		z-index: 1;
 	}
 
 	.is-navigate-mode &.is-selected::before {

@@ -14,12 +14,13 @@
 		align-items: flex-start;
 	}
 
-	// Use opacity to work in various editor styles.
-	background: $dark-opacity-light-200;
+	// Dotted background
+	background-image: radial-gradient($black 2%, transparent 2%), radial-gradient($white 2%, transparent 2%);
+	background-color: $white;
+	background-position: 0 0, 100px 100px;
+	background-size: 50px 50px;
 
-	.is-dark-theme & {
-		background: $light-opacity-light-200;
-	}
+	border: $border-width solid $border-color;
 
 	.components-base-control__label {
 		font-size: $default-font-size;
