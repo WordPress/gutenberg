@@ -14,13 +14,7 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import {
-	page,
-	trash,
-	moreHorizontal,
-	insertAfter,
-	insertBefore,
-} from '@wordpress/icons';
+import { moreHorizontal } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -35,6 +29,7 @@ import __experimentalBlockSettingsMenuPluginsExtension from './block-settings-me
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
+	noArrow: true,
 };
 
 export function BlockSettingsMenu( { clientIds } ) {
@@ -77,6 +72,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 						label={ __( 'More options' ) }
 						className="block-editor-block-settings-menu"
 						popoverProps={ POPOVER_PROPS }
+						noIcons
 					>
 						{ ( { onClose } ) => (
 							<>
@@ -100,7 +96,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 												onClose,
 												onDuplicate
 											) }
-											icon={ page }
 											shortcut={ shortcuts.duplicate }
 										>
 											{ __( 'Duplicate' ) }
@@ -113,7 +108,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 													onClose,
 													onInsertBefore
 												) }
-												icon={ insertBefore }
 												shortcut={
 													shortcuts.insertBefore
 												}
@@ -125,7 +119,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 													onClose,
 													onInsertAfter
 												) }
-												icon={ insertAfter }
 												shortcut={
 													shortcuts.insertAfter
 												}
@@ -151,7 +144,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 												onClose,
 												onRemove
 											) }
-											icon={ trash }
 											shortcut={ shortcuts.remove }
 										>
 											{ _n(

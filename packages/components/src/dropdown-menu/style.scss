@@ -70,4 +70,30 @@
 			margin-right: 4px;
 		}
 	}
+
+	.components-menu-group {
+		padding: $grid-size-large;
+		margin-top: 0;
+		margin-bottom: 0;
+		margin-left: -$grid-size-large;
+		margin-right: -$grid-size-large;
+
+		&:first-child {
+			margin-top: -$grid-size-large;
+		}
+
+		&:last-child {
+			margin-bottom: -$grid-size-large;
+		}
+	}
+
+	.components-menu-group + .components-menu-group {
+		margin-top: 0;
+		border-top: $border-width solid $border-color;
+		padding: $grid-size-large;
+	}
+}
+
+.components-dropdown-menu__menu.no-icons  .components-menu-item__button.components-button {
+	padding: 0 $grid-size;
 }

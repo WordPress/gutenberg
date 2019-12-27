@@ -29,7 +29,7 @@ $arrow-size: 8px;
 		margin-left: 2px;
 
 		&::before {
-			border: $arrow-size solid $light-gray-500;
+			border: $arrow-size solid $border-color;
 		}
 
 		&::after {
@@ -144,7 +144,7 @@ $arrow-size: 8px;
 
 .components-popover__content {
 	box-shadow: $shadow-popover;
-	border: $border-width solid $light-gray-500;
+	border: $border-width solid $border-color;
 	background: $white;
 	height: 100%;
 
@@ -161,7 +161,7 @@ $arrow-size: 8px;
 		overflow-y: visible;
 		min-width: auto;
 		border: none;
-		border-top: $border-width solid $light-gray-500;
+		border-top: $border-width solid $border-color;
 	}
 
 	.components-popover[data-y-axis="top"] & {

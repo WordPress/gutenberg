@@ -2,6 +2,10 @@
 	transform: rotate(90deg);
 }
 
+.block-editor-block-settings-menu__popover .components-popover__content {
+	margin-top: $grid-size;
+}
+
 .block-editor-block-settings-menu__popover .components-dropdown-menu__menu {
 	padding: 0;
 }

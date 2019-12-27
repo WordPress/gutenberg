@@ -1,11 +1,7 @@
-.components-menu-group {
-	width: 100%;
-}
-
 .components-menu-group + .components-menu-group {
 	margin-top: $grid-unit-10;
 	padding-top: $grid-unit-10;
-	border-top: $border-width solid $light-gray-500;
+	border-top: $border-width solid $border-color;
 }
 
 .components-menu-group__label {
