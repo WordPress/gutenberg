@@ -224,7 +224,7 @@
 
 @mixin block-style__hover {
 	background: $light-gray-200;
-	color: $dark-gray-900;
+	color: $dark-gray-900 !important;
 }
 
 @mixin block-style__focus() {

@@ -84,18 +84,10 @@ $tree-item-height: 36px;
 	padding: 6px;
 	text-align: left;
 	color: $dark-gray-600;
-	border-radius: 4px;
+	border-radius: 2px;
 
 	.block-editor-block-icon {
 		margin-right: 6px;
-	}
-
-	&:hover:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__hover;
-	}
-
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__focus;
 	}
 
 	&.is-selected,

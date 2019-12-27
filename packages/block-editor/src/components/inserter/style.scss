@@ -25,11 +25,6 @@ $block-inserter-search-height: 38px;
 	}
 }
 
-.block-editor-inserter__toggle {
-	transition: color 0.2s ease;
-	@include reduce-motion("transition");
-}
-
 .block-editor-inserter__menu {
 	height: 100%;
 	display: flex;
