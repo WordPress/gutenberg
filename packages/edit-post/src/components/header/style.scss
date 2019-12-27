@@ -62,15 +62,13 @@
 		background: $dark-gray-500 !important;
 	}
 
-	// Make editor header bar buttons bigger to match IconButtons.
+	// Make editor header bar buttons bigger to match Buttons.
 	&.editor-post-save-draft,
 	&.editor-post-switch-to-draft,
 	&.editor-post-preview,
 	&.editor-post-publish-button,
 	&.editor-post-publish-panel__toggle {
 		margin: 2px;
-		height: 34px;
-		line-height: 32px;
 		font-size: $default-font-size;
 	}
 

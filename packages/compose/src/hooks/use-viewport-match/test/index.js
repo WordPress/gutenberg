@@ -79,4 +79,43 @@ describe( 'useViewportMatch', () => {
 
 		root.unmount();
 	} );
+
+	it( 'should correctly simulate a value', async () => {
+		let root;
+		useMediaQueryMock.mockReturnValue( true );
+
+		const innerElement = <TestComponent breakpoint="wide" operator=">=" />;
+		const WidthProvider = useViewportMatch.__experimentalWidthProvider;
+
+		await act( async () => {
+			root = create( <WidthProvider value={ 300 }>{ innerElement }</WidthProvider> );
+		} );
+		expect( root.toJSON() ).toBe( 'useViewportMatch: false' );
+
+		await act( async () => {
+			root.update( <WidthProvider value={ 1200 }>{ innerElement }</WidthProvider> );
+		} );
+		expect( root.toJSON() ).toBe( 'useViewportMatch: false' );
+
+		await act( async () => {
+			root.update( <WidthProvider value={ 1300 }>{ innerElement }</WidthProvider> );
+		} );
+		expect( root.toJSON() ).toBe( 'useViewportMatch: true' );
+
+		await act( async () => {
+			root.update( <WidthProvider value={ 1300 }>
+				<TestComponent breakpoint="wide" operator="<" />
+			</WidthProvider> );
+		} );
+		expect( root.toJSON() ).toBe( 'useViewportMatch: false' );
+
+		expect( useMediaQueryMock.mock.calls ).toEqual( [
+			[ false ],
+			[ false ],
+			[ false ],
+			[ false ],
+		] );
+
+		root.unmount();
+	} );
 } );

@@ -798,12 +798,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "IconButton",
-		"slug": "icon-button",
-		"markdown_source": "../packages/components/src/icon-button/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Icon",
 		"slug": "icon",
 		"markdown_source": "../packages/components/src/icon/README.md",
@@ -837,12 +831,6 @@
 		"title": "MenuItemsChoice",
 		"slug": "menu-items-choice",
 		"markdown_source": "../packages/components/src/menu-items-choice/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "ModalHeaderBar",
-		"slug": "modal-header-bar",
-		"markdown_source": "../packages/components/src/mobile/modal-header-bar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1272,6 +1260,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/edit-site",
+		"slug": "packages-edit-site",
+		"markdown_source": "../packages/edit-site/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-widgets",
 		"slug": "packages-edit-widgets",
 		"markdown_source": "../packages/edit-widgets/README.md",
@@ -1353,6 +1347,12 @@
 		"title": "@wordpress/jest-puppeteer-axe",
 		"slug": "packages-jest-puppeteer-axe",
 		"markdown_source": "../packages/jest-puppeteer-axe/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/keyboard-shortcuts",
+		"slug": "packages-keyboard-shortcuts",
+		"markdown_source": "../packages/keyboard-shortcuts/README.md",
 		"parent": "packages"
 	},
 	{

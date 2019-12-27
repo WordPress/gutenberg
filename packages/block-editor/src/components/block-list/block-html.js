@@ -39,7 +39,7 @@ function BlockHTML( { clientId } ) {
 
 	return (
 		<TextareaAutosize
-			className="editor-block-list__block-html-textarea block-editor-block-list__block-html-textarea"
+			className="block-editor-block-list__block-html-textarea"
 			value={ html }
 			onBlur={ onChange }
 			onChange={ ( event ) => setHtml( event.target.value ) }

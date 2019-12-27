@@ -15,7 +15,7 @@ exports[`Storyshots Components|Animate Appear Bottom Left 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-icon-button components-notice__dismiss"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -52,7 +52,7 @@ exports[`Storyshots Components|Animate Appear Bottom Right 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-icon-button components-notice__dismiss"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -89,7 +89,7 @@ exports[`Storyshots Components|Animate Appear Top Left 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-icon-button components-notice__dismiss"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -126,7 +126,7 @@ exports[`Storyshots Components|Animate Appear Top Right 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-icon-button components-notice__dismiss"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -161,7 +161,7 @@ exports[`Storyshots Components|Animate Default 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-icon-button components-notice__dismiss"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -196,7 +196,7 @@ exports[`Storyshots Components|Animate Loading 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-icon-button components-notice__dismiss"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -231,7 +231,7 @@ exports[`Storyshots Components|Animate Slide In 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-icon-button components-notice__dismiss"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -279,6 +279,271 @@ exports[`Storyshots Components|BaseControl Default 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components|Button Buttons 1`] = `
+<div
+  style={
+    Object {
+      "padding": "20px",
+    }
+  }
+>
+  <h2>
+    Small Buttons
+  </h2>
+  <div
+    className="story-buttons-container"
+  >
+    <button
+      className="components-button is-small"
+      type="button"
+    >
+      Button
+    </button>
+    <button
+      className="components-button is-primary is-small"
+      type="button"
+    >
+      Primary Button
+    </button>
+    <button
+      className="components-button is-secondary is-small"
+      type="button"
+    >
+      Secondary Button
+    </button>
+    <button
+      className="components-button is-small is-tertiary"
+      type="button"
+    >
+      Tertiary Button
+    </button>
+    <button
+      className="components-button is-small has-icon"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-ellipsis"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        />
+      </svg>
+    </button>
+    <button
+      className="components-button is-primary is-small has-icon"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-ellipsis"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        />
+      </svg>
+    </button>
+    <button
+      className="components-button is-secondary is-small has-icon"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-ellipsis"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        />
+      </svg>
+    </button>
+    <button
+      className="components-button is-small is-tertiary has-icon"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-ellipsis"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        />
+      </svg>
+    </button>
+    <button
+      className="components-button is-primary is-small has-text has-icon"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-ellipsis"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        />
+      </svg>
+      Icon & Text
+    </button>
+  </div>
+  <h2>
+    Regular Buttons
+  </h2>
+  <div
+    className="story-buttons-container"
+  >
+    <button
+      className="components-button"
+      type="button"
+    >
+      Button
+    </button>
+    <button
+      className="components-button is-primary"
+      type="button"
+    >
+      Primary Button
+    </button>
+    <button
+      className="components-button is-secondary"
+      type="button"
+    >
+      Secondary Button
+    </button>
+    <button
+      className="components-button is-tertiary"
+      type="button"
+    >
+      Tertiary Button
+    </button>
+    <button
+      className="components-button has-icon"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-ellipsis"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        />
+      </svg>
+    </button>
+    <button
+      className="components-button is-primary has-icon"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-ellipsis"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        />
+      </svg>
+    </button>
+    <button
+      className="components-button is-secondary has-icon"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-ellipsis"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        />
+      </svg>
+    </button>
+    <button
+      className="components-button is-tertiary has-icon"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-ellipsis"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        />
+      </svg>
+    </button>
+    <button
+      className="components-button is-primary has-text has-icon"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-ellipsis"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        />
+      </svg>
+      Icon & Text
+    </button>
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components|Button Default 1`] = `
 <button
   className="components-button"
@@ -308,21 +573,121 @@ exports[`Storyshots Components|Button Disabled Link 1`] = `
 </button>
 `;
 
-exports[`Storyshots Components|Button Large 1`] = `
-<button
-  className="components-button is-button is-default is-large"
-  type="button"
+exports[`Storyshots Components|Button Grouped Icons 1`] = `
+<div
+  style={
+    Object {
+      "display": "inline-flex",
+    }
+  }
 >
-  Large Button
-</button>
+  <button
+    aria-label="Bold"
+    className="components-button has-icon"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onMouseDown={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-editor-bold"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6 4v13h4.54c1.37 0 2.46-.33 3.26-1 .8-.66 1.2-1.58 1.2-2.77 0-.84-.17-1.51-.51-2.01s-.9-.85-1.67-1.03v-.09c.57-.1 1.02-.4 1.36-.9s.51-1.13.51-1.91c0-1.14-.39-1.98-1.17-2.5C12.75 4.26 11.5 4 9.78 4H6zm2.57 5.15V6.26h1.36c.73 0 1.27.11 1.61.32.34.22.51.58.51 1.07 0 .54-.16.92-.47 1.15s-.82.35-1.51.35h-1.5zm0 2.19h1.6c1.44 0 2.16.53 2.16 1.61 0 .6-.17 1.05-.51 1.34s-.86.43-1.57.43H8.57v-3.38z"
+      />
+    </svg>
+  </button>
+  <button
+    aria-label="Italic"
+    className="components-button has-icon"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onMouseDown={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-editor-italic"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14.78 6h-2.13l-2.8 9h2.12l-.62 2H4.6l.62-2h2.14l2.8-9H8.03l.62-2h6.75z"
+      />
+    </svg>
+  </button>
+  <button
+    aria-label="Underline"
+    className="components-button has-icon"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onMouseDown={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-editor-underline"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14 5h-2v5.71c0 1.99-1.12 2.98-2.45 2.98-1.32 0-2.55-1-2.55-2.96V5H5v5.87c0 1.91 1 4.54 4.48 4.54 3.49 0 4.52-2.58 4.52-4.5V5zm0 13v-2H5v2h9z"
+      />
+    </svg>
+  </button>
+</div>
 `;
 
-exports[`Storyshots Components|Button Large Primary 1`] = `
+exports[`Storyshots Components|Button Icon 1`] = `
 <button
-  className="components-button is-button is-primary is-large"
+  aria-label="More"
+  className="components-button has-icon"
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onMouseDown={[Function]}
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
   type="button"
 >
-  Large Primary Button
+  <svg
+    aria-hidden="true"
+    className="dashicon dashicons-ellipsis"
+    focusable="false"
+    height={20}
+    role="img"
+    viewBox="0 0 20 20"
+    width={20}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+    />
+  </svg>
 </button>
 `;
 
@@ -348,19 +713,37 @@ exports[`Storyshots Components|Button Pressed 1`] = `
 
 exports[`Storyshots Components|Button Primary 1`] = `
 <button
-  className="components-button is-button is-primary"
+  className="components-button is-primary"
   type="button"
 >
   Primary Button
 </button>
 `;
 
+exports[`Storyshots Components|Button Secondary 1`] = `
+<button
+  className="components-button is-secondary"
+  type="button"
+>
+  Secondary Button
+</button>
+`;
+
 exports[`Storyshots Components|Button Small 1`] = `
 <button
-  className="components-button is-button is-default is-small"
+  className="components-button is-small"
   type="button"
 >
   Small Button
+</button>
+`;
+
+exports[`Storyshots Components|Button Tertiary 1`] = `
+<button
+  className="components-button is-tertiary"
+  type="button"
+>
+  Tertiary Button
 </button>
 `;
 
@@ -370,7 +753,7 @@ exports[`Storyshots Components|ButtonGroup Default 1`] = `
   role="group"
 >
   <button
-    className="components-button is-button is-primary"
+    className="components-button is-primary"
     style={
       Object {
         "margin": "0 4px",
@@ -381,7 +764,7 @@ exports[`Storyshots Components|ButtonGroup Default 1`] = `
     Button 1
   </button>
   <button
-    className="components-button is-button is-primary"
+    className="components-button is-primary"
     style={
       Object {
         "margin": "0 4px",
@@ -769,7 +1152,7 @@ exports[`Storyshots Components|ClipboardButton Default 1`] = `
   onCopy={[Function]}
 >
   <button
-    className="components-button components-clipboard-button is-button is-primary"
+    className="components-button components-clipboard-button is-primary"
     type="button"
   >
     Copy "Text"
@@ -872,7 +1255,7 @@ exports[`Storyshots Components|ColorPalette Default 1`] = `
       </button>
     </div>
     <button
-      className="components-button components-circular-option-picker__clear is-button is-default is-small"
+      className="components-button components-circular-option-picker__clear is-secondary is-small"
       onClick={[Function]}
       type="button"
     >
@@ -966,7 +1349,7 @@ exports[`Storyshots Components|ColorPalette With Knobs 1`] = `
       </button>
     </div>
     <button
-      className="components-button components-circular-option-picker__clear is-button is-default is-small"
+      className="components-button components-circular-option-picker__clear is-secondary is-small"
       onClick={[Function]}
       type="button"
     >
@@ -1158,7 +1541,7 @@ exports[`Storyshots Components|ColorPicker Alpha Enabled 1`] = `
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -1333,7 +1716,7 @@ exports[`Storyshots Components|ColorPicker Default 1`] = `
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -1442,7 +1825,7 @@ Array [
         aria-expanded={false}
         aria-haspopup="true"
         aria-label="Select a direction"
-        className="components-button components-icon-button components-dropdown-menu__toggle"
+        className="components-button components-dropdown-menu__toggle has-icon"
         onBlur={[Function]}
         onClick={[Function]}
         onFocus={[Function]}
@@ -1479,7 +1862,7 @@ Array [
       <button
         aria-expanded={false}
         aria-label="Select a direction"
-        className="components-button components-icon-button"
+        className="components-button has-icon"
         onBlur={[Function]}
         onClick={[Function]}
         onFocus={[Function]}
@@ -1615,7 +1998,7 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
       />
     </div>
     <button
-      className="components-button components-color-palette__clear is-button is-default is-small"
+      className="components-button components-color-palette__clear is-secondary is-small"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -1686,7 +2069,7 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
       />
     </div>
     <button
-      className="components-button components-color-palette__clear is-button is-default is-small"
+      className="components-button components-color-palette__clear is-secondary is-small"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -1818,7 +2201,7 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
       />
     </div>
     <button
-      className="components-button components-color-palette__clear is-button is-default is-small"
+      className="components-button components-color-palette__clear is-secondary is-small"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -1831,7 +2214,7 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
 
 exports[`Storyshots Components|Guide Default 1`] = `
 <button
-  className="components-button is-button is-default"
+  className="components-button is-secondary"
   onClick={[Function]}
   type="button"
 >
@@ -2315,127 +2698,9 @@ exports[`Storyshots Components|Icon With An SVG 1`] = `
 </svg>
 `;
 
-exports[`Storyshots Components|IconButton Default 1`] = `
-<button
-  aria-label="More"
-  className="components-button components-icon-button"
-  onBlur={[Function]}
-  onClick={[Function]}
-  onFocus={[Function]}
-  onMouseDown={[Function]}
-  onMouseEnter={[Function]}
-  onMouseLeave={[Function]}
-  type="button"
->
-  <svg
-    aria-hidden="true"
-    className="dashicon dashicons-ellipsis"
-    focusable="false"
-    height={20}
-    role="img"
-    viewBox="0 0 20 20"
-    width={20}
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-    />
-  </svg>
-</button>
-`;
-
-exports[`Storyshots Components|IconButton Grouped 1`] = `
-<div
-  style={
-    Object {
-      "display": "inline-flex",
-    }
-  }
->
-  <button
-    aria-label="Bold"
-    className="components-button components-icon-button"
-    onBlur={[Function]}
-    onClick={[Function]}
-    onFocus={[Function]}
-    onMouseDown={[Function]}
-    onMouseEnter={[Function]}
-    onMouseLeave={[Function]}
-    type="button"
-  >
-    <svg
-      aria-hidden="true"
-      className="dashicon dashicons-editor-bold"
-      focusable="false"
-      height={20}
-      role="img"
-      viewBox="0 0 20 20"
-      width={20}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M6 4v13h4.54c1.37 0 2.46-.33 3.26-1 .8-.66 1.2-1.58 1.2-2.77 0-.84-.17-1.51-.51-2.01s-.9-.85-1.67-1.03v-.09c.57-.1 1.02-.4 1.36-.9s.51-1.13.51-1.91c0-1.14-.39-1.98-1.17-2.5C12.75 4.26 11.5 4 9.78 4H6zm2.57 5.15V6.26h1.36c.73 0 1.27.11 1.61.32.34.22.51.58.51 1.07 0 .54-.16.92-.47 1.15s-.82.35-1.51.35h-1.5zm0 2.19h1.6c1.44 0 2.16.53 2.16 1.61 0 .6-.17 1.05-.51 1.34s-.86.43-1.57.43H8.57v-3.38z"
-      />
-    </svg>
-  </button>
-  <button
-    aria-label="Italic"
-    className="components-button components-icon-button"
-    onBlur={[Function]}
-    onClick={[Function]}
-    onFocus={[Function]}
-    onMouseDown={[Function]}
-    onMouseEnter={[Function]}
-    onMouseLeave={[Function]}
-    type="button"
-  >
-    <svg
-      aria-hidden="true"
-      className="dashicon dashicons-editor-italic"
-      focusable="false"
-      height={20}
-      role="img"
-      viewBox="0 0 20 20"
-      width={20}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M14.78 6h-2.13l-2.8 9h2.12l-.62 2H4.6l.62-2h2.14l2.8-9H8.03l.62-2h6.75z"
-      />
-    </svg>
-  </button>
-  <button
-    aria-label="Underline"
-    className="components-button components-icon-button"
-    onBlur={[Function]}
-    onClick={[Function]}
-    onFocus={[Function]}
-    onMouseDown={[Function]}
-    onMouseEnter={[Function]}
-    onMouseLeave={[Function]}
-    type="button"
-  >
-    <svg
-      aria-hidden="true"
-      className="dashicon dashicons-editor-underline"
-      focusable="false"
-      height={20}
-      role="img"
-      viewBox="0 0 20 20"
-      width={20}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M14 5h-2v5.71c0 1.99-1.12 2.98-2.45 2.98-1.32 0-2.55-1-2.55-2.96V5H5v5.87c0 1.91 1 4.54 4.48 4.54 3.49 0 4.52-2.58 4.52-4.5V5zm0 13v-2H5v2h9z"
-      />
-    </svg>
-  </button>
-</div>
-`;
-
 exports[`Storyshots Components|Modal Default 1`] = `
 <button
-  className="components-button is-button is-default"
+  className="components-button is-secondary"
   onClick={[Function]}
   type="button"
 >
@@ -2790,7 +3055,7 @@ exports[`Storyshots Components|RangeControl Default 1`] = `
 </div>
 `;
 
-exports[`Storyshots Components|RangeControl With Help 1`] = `
+exports[`Storyshots Components|RangeControl Initial Value Zero 1`] = `
 <div
   className="components-base-control components-range-control"
 >
@@ -2804,9 +3069,45 @@ exports[`Storyshots Components|RangeControl With Help 1`] = `
       How many columns should this use?
     </label>
     <input
-      aria-describedby="inspector-range-control-2__help"
       className="components-range-control__slider"
       id="inspector-range-control-2"
+      max={20}
+      min={0}
+      onChange={[Function]}
+      type="range"
+      value={0}
+    />
+    <input
+      aria-label="How many columns should this use?"
+      className="components-range-control__number"
+      max={20}
+      min={0}
+      onBlur={[Function]}
+      onChange={[Function]}
+      type="number"
+      value={null}
+    />
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components|RangeControl With Help 1`] = `
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-3"
+    >
+      How many columns should this use?
+    </label>
+    <input
+      aria-describedby="inspector-range-control-3__help"
+      className="components-range-control__slider"
+      id="inspector-range-control-3"
       onChange={[Function]}
       type="range"
       value={5}
@@ -2822,7 +3123,7 @@ exports[`Storyshots Components|RangeControl With Help 1`] = `
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-range-control-2__help"
+    id="inspector-range-control-3__help"
   >
     Please select the number of columns you would like this to contain.
   </p>
@@ -2838,13 +3139,13 @@ exports[`Storyshots Components|RangeControl With Icon After 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-range-control-5"
+      htmlFor="inspector-range-control-6"
     >
       How many columns should this use?
     </label>
     <input
       className="components-range-control__slider"
-      id="inspector-range-control-5"
+      id="inspector-range-control-6"
       onChange={[Function]}
       type="range"
       value={5}
@@ -2884,7 +3185,7 @@ exports[`Storyshots Components|RangeControl With Icon Before 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-range-control-4"
+      htmlFor="inspector-range-control-5"
     >
       How many columns should this use?
     </label>
@@ -2904,7 +3205,7 @@ exports[`Storyshots Components|RangeControl With Icon Before 1`] = `
     </svg>
     <input
       className="components-range-control__slider"
-      id="inspector-range-control-4"
+      id="inspector-range-control-5"
       onChange={[Function]}
       type="range"
       value={5}
@@ -2930,13 +3231,13 @@ exports[`Storyshots Components|RangeControl With Minimum And Maximum Limits 1`] 
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-range-control-3"
+      htmlFor="inspector-range-control-4"
     >
       How many columns should this use?
     </label>
     <input
       className="components-range-control__slider"
-      id="inspector-range-control-3"
+      id="inspector-range-control-4"
       max={10}
       min={2}
       onChange={[Function]}
@@ -2966,13 +3267,13 @@ exports[`Storyshots Components|RangeControl With Reset 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-range-control-6"
+      htmlFor="inspector-range-control-7"
     >
       How many columns should this use?
     </label>
     <input
       className="components-range-control__slider"
-      id="inspector-range-control-6"
+      id="inspector-range-control-7"
       onChange={[Function]}
       type="range"
       value={5}
@@ -2986,7 +3287,7 @@ exports[`Storyshots Components|RangeControl With Reset 1`] = `
       value={5}
     />
     <button
-      className="components-button components-range-control__reset is-button is-default is-small"
+      className="components-button components-range-control__reset is-secondary is-small"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -3126,7 +3427,7 @@ exports[`Storyshots Components|ScrollLock Default 1`] = `
   >
     <div>
       <button
-        className="components-button is-button is-default"
+        className="components-button is-secondary"
         onClick={[Function]}
         type="button"
       >
@@ -3390,7 +3691,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
     <div>
       <button
         aria-label="Paragraph"
-        className="components-button components-icon-button components-toolbar__control"
+        className="components-button components-toolbar__control has-icon"
         id="options-toolbar-1"
         onBlur={[Function]}
         onClick={[Function]}
@@ -3426,7 +3727,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
       aria-expanded={false}
       aria-haspopup="true"
       aria-label="Change text alignment"
-      className="components-button components-icon-button components-dropdown-menu__toggle has-text"
+      className="components-button components-dropdown-menu__toggle has-text has-icon"
       id="options-toolbar-2"
       onBlur={[Function]}
       onClick={[Function]}
@@ -3463,7 +3764,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
     <div>
       <button
         aria-label="Bold"
-        className="components-button components-icon-button components-toolbar__control"
+        className="components-button components-toolbar__control has-icon"
         id="options-toolbar-3"
         onBlur={[Function]}
         onClick={[Function]}
@@ -3494,7 +3795,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
     <div>
       <button
         aria-label="Italic"
-        className="components-button components-icon-button components-toolbar__control"
+        className="components-button components-toolbar__control has-icon"
         id="options-toolbar-4"
         onBlur={[Function]}
         onClick={[Function]}
@@ -3525,7 +3826,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
     <div>
       <button
         aria-label="Link"
-        className="components-button components-icon-button components-toolbar__control"
+        className="components-button components-toolbar__control has-icon"
         id="options-toolbar-5"
         onBlur={[Function]}
         onClick={[Function]}
@@ -3560,7 +3861,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
         aria-expanded={false}
         aria-haspopup="true"
         aria-label="More rich text controls"
-        className="components-button components-icon-button components-dropdown-menu__toggle has-text"
+        className="components-button components-dropdown-menu__toggle"
         id="options-toolbar-6"
         onBlur={[Function]}
         onClick={[Function]}
@@ -3585,7 +3886,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
       aria-expanded={false}
       aria-haspopup="true"
       aria-label="Change text alignment"
-      className="components-button components-icon-button components-dropdown-menu__toggle"
+      className="components-button components-dropdown-menu__toggle has-icon"
       id="options-toolbar-7"
       onBlur={[Function]}
       onClick={[Function]}
@@ -3627,7 +3928,7 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
   <div>
     <button
       aria-label="Bold"
-      className="components-button components-icon-button components-toolbar__control"
+      className="components-button components-toolbar__control has-icon"
       id="options-toolbar-without-group-1"
       onBlur={[Function]}
       onClick={[Function]}
@@ -3658,7 +3959,7 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
   <div>
     <button
       aria-label="Italic"
-      className="components-button components-icon-button components-toolbar__control"
+      className="components-button components-toolbar__control has-icon"
       id="options-toolbar-without-group-2"
       onBlur={[Function]}
       onClick={[Function]}
@@ -3689,7 +3990,7 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
   <div>
     <button
       aria-label="Link"
-      className="components-button components-icon-button components-toolbar__control"
+      className="components-button components-toolbar__control has-icon"
       id="options-toolbar-without-group-3"
       onBlur={[Function]}
       onClick={[Function]}
@@ -3728,7 +4029,7 @@ exports[`Storyshots Components|ToolbarGroup Default 1`] = `
     <button
       aria-label="Bold"
       aria-pressed={true}
-      className="components-button components-icon-button components-toolbar__control is-pressed"
+      className="components-button components-toolbar__control is-pressed has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -3756,7 +4057,7 @@ exports[`Storyshots Components|ToolbarGroup Default 1`] = `
   <div>
     <button
       aria-label="Italic"
-      className="components-button components-icon-button components-toolbar__control"
+      className="components-button components-toolbar__control has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -3784,7 +4085,7 @@ exports[`Storyshots Components|ToolbarGroup Default 1`] = `
   <div>
     <button
       aria-label="Link"
-      className="components-button components-icon-button components-toolbar__control"
+      className="components-button components-toolbar__control has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -3822,7 +4123,7 @@ exports[`Storyshots Components|ToolbarGroup With Controls Prop 1`] = `
     <button
       aria-label="Bold"
       aria-pressed={true}
-      className="components-button components-icon-button components-toolbar__control is-pressed"
+      className="components-button components-toolbar__control is-pressed has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -3852,7 +4153,7 @@ exports[`Storyshots Components|ToolbarGroup With Controls Prop 1`] = `
   >
     <button
       aria-label="Italic"
-      className="components-button components-icon-button components-toolbar__control"
+      className="components-button components-toolbar__control has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -3882,7 +4183,7 @@ exports[`Storyshots Components|ToolbarGroup With Controls Prop 1`] = `
   >
     <button
       aria-label="Link"
-      className="components-button components-icon-button components-toolbar__control"
+      className="components-button components-toolbar__control has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}

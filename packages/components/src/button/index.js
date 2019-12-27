@@ -2,11 +2,19 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { createElement, forwardRef } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
+import { forwardRef } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import Tooltip from '../tooltip';
+import Icon from '../icon';
 
 export function Button( props, ref ) {
 	const {
@@ -19,16 +27,29 @@ export function Button( props, ref ) {
 		isPressed,
 		isBusy,
 		isDefault,
+		isSecondary,
 		isLink,
 		isDestructive,
 		className,
 		disabled,
+		icon,
+		iconSize,
+		showTooltip,
+		tooltipPosition,
+		shortcut,
+		label,
+		children,
 		...additionalProps
 	} = props;
 
+	if ( isDefault ) {
+		deprecated( 'Button isDefault prop', {
+			alternative: 'isSecondary',
+		} );
+	}
+
 	const classes = classnames( 'components-button', className, {
-		'is-button': isDefault || isPrimary || isLarge || isSmall,
-		'is-default': isDefault || ( ! isPrimary && ( isLarge || isSmall ) ),
+		'is-secondary': isDefault || isSecondary,
 		'is-primary': isPrimary,
 		'is-large': isLarge,
 		'is-small': isSmall,
@@ -37,19 +58,53 @@ export function Button( props, ref ) {
 		'is-busy': isBusy,
 		'is-link': isLink,
 		'is-destructive': isDestructive,
+		'has-text': !! icon && !! children,
+		'has-icon': !! icon,
 	} );
 
-	const tag = href !== undefined && ! disabled ? 'a' : 'button';
-	const tagProps = tag === 'a' ?
+	const Tag = href !== undefined && ! disabled ? 'a' : 'button';
+	const tagProps = Tag === 'a' ?
 		{ href, target } :
 		{ type: 'button', disabled, 'aria-pressed': isPressed };
 
-	return createElement( tag, {
-		...tagProps,
-		...additionalProps,
-		className: classes,
-		ref,
-	} );
+	// Should show the tooltip if...
+	const shouldShowTooltip = ! disabled && (
+		// an explicit tooltip is passed or...
+		( showTooltip && label ) ||
+		// there's a shortcut or...
+		shortcut ||
+		(
+			// there's a label and...
+			!! label &&
+			// the children are empty and...
+			( ! children || ( isArray( children ) && ! children.length ) ) &&
+			// the tooltip is not explicitly disabled.
+			false !== showTooltip
+		)
+	);
+
+	const element = (
+		<Tag
+			{ ...tagProps }
+			{ ...additionalProps }
+			className={ classes }
+			aria-label={ additionalProps[ 'aria-label' ] || label }
+			ref={ ref }
+		>
+			{ icon && <Icon icon={ icon } size={ iconSize } /> }
+			{ children }
+		</Tag>
+	);
+
+	if ( ! shouldShowTooltip ) {
+		return element;
+	}
+
+	return (
+		<Tooltip text={ label } shortcut={ shortcut } position={ tooltipPosition }>
+			{ element }
+		</Tooltip>
+	);
 }
 
 export default forwardRef( Button );

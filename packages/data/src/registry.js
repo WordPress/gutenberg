@@ -131,16 +131,16 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	);
 
 	/**
-  * Given the name of a registered store, returns an object containing the store's
-  * selectors pre-bound to state so that you only need to supply additional arguments,
-  * and modified so that they return promises that resolve to their eventual values,
-  * after any resolvers have ran.
-  *
-  * @param {string} reducerKey Part of the state shape to register the
-  *                            selectors for.
-  *
-  * @return {Object} Each key of the object matches the name of a selector.
-  */
+	 * Given the name of a registered store, returns an object containing the store's
+	 * selectors pre-bound to state so that you only need to supply additional arguments,
+	 * and modified so that they return promises that resolve to their eventual values,
+	 * after any resolvers have ran.
+	 *
+	 * @param {string} reducerKey Part of the state shape to register the
+	 *                            selectors for.
+	 *
+	 * @return {Object} Each key of the object matches the name of a selector.
+	 */
 	function __experimentalResolveSelect( reducerKey ) {
 		return getResolveSelectors( select( reducerKey ) );
 	}

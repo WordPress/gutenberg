@@ -8,6 +8,7 @@ import path from 'path';
  * WordPress dependencies
  */
 import {
+	createBlock,
 	getBlockContent,
 	pasteHandler,
 	rawHandler,
@@ -52,6 +53,30 @@ describe( 'Blocks raw handling', () => {
 							},
 						},
 						priority: 9,
+					},
+				],
+			},
+			save: () => null,
+		} );
+
+		registerBlockType( 'test/non-inline-block', {
+			title: 'Test Non Inline Block',
+			category: 'common',
+			supports: {
+				pasteTextInline: false,
+			},
+			transforms: {
+				from: [
+					{
+						type: 'raw',
+						isMatch: ( node ) => {
+							return 'words to live by' === node.textContent.trim();
+						},
+						transform: () => {
+							return createBlock( 'core-embed/youtube', {
+								url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+							} );
+						},
 					},
 				],
 			},
@@ -150,6 +175,29 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		expect( filtered ).toBe( 'schön' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should not treat single non-inlineable block as inline text', () => {
+		const filtered = pasteHandler( {
+			HTML: '<p>words to live by</p>',
+			plainText: 'words to live by\n',
+			mode: 'AUTO',
+		} );
+
+		expect( filtered ).toHaveLength( 1 );
+		expect( filtered[ 0 ].name ).toBe( 'core-embed/youtube' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should treat single heading as inline text', () => {
+		const filtered = pasteHandler( {
+			HTML: '<h1>FOO</h1>',
+			plainText: 'FOO\n',
+			mode: 'AUTO',
+		} );
+
+		expect( filtered ).toBe( 'FOO' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -356,6 +404,11 @@ describe( 'rawHandler', () => {
 
 	it( 'should not strip any text-level elements', () => {
 		const HTML = '<p>This is <u>ncorect</u></p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should preserve alignment', () => {
+		const HTML = '<p style="text-align:center">center</p>';
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 } );

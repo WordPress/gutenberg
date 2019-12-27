@@ -77,7 +77,7 @@ function ButtonAction( {
 				className
 			) }
 			isSmall
-			isDefault
+			isSecondary
 			{ ...additionalProps }
 		>
 			{ children }
