@@ -27,7 +27,7 @@ export const settings = {
 			content: __( 'WHAT was he doing, the great god Pan,\n	Down in the reeds by the river?\nSpreading ruin and scattering ban,\nSplashing and paddling with hoofs of a goat,\nAnd breaking the golden lilies afloat\n    With the dragon-fly on the river.' ),
 		},
 	},
-	keywords: [ __( 'poetry' ) ],
+	keywords: [ __( 'poetry' ), __( 'poem' ) ],
 	transforms,
 	deprecated,
 	merge( attributes, attributesToMerge ) {
