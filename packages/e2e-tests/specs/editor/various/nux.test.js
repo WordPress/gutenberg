@@ -10,7 +10,7 @@ describe( 'New User Experience (NUX)', () => {
 		// Create a new post as a first-time user
 		await createNewPost( { showWelcomeGuide: true } );
 
-		// Guide should be on page 1 of 3
+		// Guide should be on page 1 of 4
 		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
 		expect( welcomeGuideText ).toContain( 'Welcome to the Block Editor' );
 
@@ -18,7 +18,7 @@ describe( 'New User Experience (NUX)', () => {
 		const [ nextButton ] = await page.$x( '//button[contains(text(), "Next")]' );
 		await nextButton.click();
 
-		// Guide should be on page 2 of 3
+		// Guide should be on page 2 of 4
 		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
 		expect( welcomeGuideText ).toContain( 'Make each block your own' );
 
@@ -26,18 +26,22 @@ describe( 'New User Experience (NUX)', () => {
 		const [ previousButton ] = await page.$x( '//button[contains(text(), "Previous")]' );
 		await previousButton.click();
 
-		// Guide should be on page 1 of 3
+		// Guide should be on page 1 of 4
 		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
 		expect( welcomeGuideText ).toContain( 'Welcome to the Block Editor' );
 
 		// Press the button for Page 2
-		await page.click( 'button[aria-label="Page 2 of 3"]' );
+		await page.click( 'button[aria-label="Page 2 of 4"]' );
 		await page.waitForXPath( '//h1[contains(text(), "Make each block your own")]' );
 		// This shouldn't be necessary
 		// eslint-disable-next-line no-restricted-syntax
 		await page.waitFor( 500 );
 
 		// Press the right arrow key for Page 3
+		await page.keyboard.press( 'ArrowRight' );
+		await page.waitForXPath( '//h1[contains(text(), "Detailed Documentation")]' );
+
+		// Press the right arrow key for Page 4
 		await page.keyboard.press( 'ArrowRight' );
 		await page.waitForXPath( '//h1[contains(text(), "Get to know the Block Library")]' );
 
