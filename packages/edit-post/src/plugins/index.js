@@ -32,6 +32,13 @@ registerPlugin( 'edit-post', {
 							<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
 							<WelcomeGuideMenuItem />
 							<CopyContentMenuItem />
+							<MenuItem
+								role="menuitem"
+								href="https://wordpress.org/support/article/wordpress-editor/"
+								target="_new"
+							>
+								{ __( 'Help' ) }
+							</MenuItem>
 						</>
 					) }
 				</ToolsMoreMenuGroup>
