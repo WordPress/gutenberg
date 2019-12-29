@@ -1,4 +1,4 @@
-# HEAD
+# 16.0.0
 
 -   Fixed: `selector-class-pattern` rule regex to account for numerals, case detection, and ensure kebab-case over snake_case.
 -   Fixed: `selector-id-pattern` rule regex to account for numerals, case detection, and ensure kebab-case over snake_case.
