@@ -67,6 +67,18 @@ export default function WelcomeGuide() {
 				</p>
 			</GuidePage>
 
+			<GuidePage className="edit-post-welcome-guide__page">
+				<h1 className="edit-post-welcome-guide__heading">
+					{ __( 'Detailed Documentation' ) }
+				</h1>
+				<p className="edit-post-welcome-guide__text">
+					{ __( 'For detailed information on using the block editor, see the ' ) }
+					<a target="_new" href="https://wordpress.org/support/article/wordpress-editor/">
+						{ __( 'Getting Started documentation' ) }
+					</a>
+				</p>
+			</GuidePage>
+
 		</Guide>
 	);
 }
