@@ -31,12 +31,12 @@ import {
 	BlockAlignmentToolbar,
 	BlockControls,
 	BlockIcon,
-	ImageSizeControl,
 	InspectorControls,
 	InspectorAdvancedControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	RichText,
+	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
 import {

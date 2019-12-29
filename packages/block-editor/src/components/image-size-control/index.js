@@ -87,7 +87,7 @@ class ImageSizeControl extends Component {
 											key={ scale }
 											isSmall
 											isPrimary={ isCurrent }
-											aria-pressed={ isCurrent }
+											isPressed={ isCurrent }
 											onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
 										>
 											{ scale }%
