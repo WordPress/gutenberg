@@ -51,12 +51,10 @@ describe( 'flags warnings with invalid scss', () => {
 		) );
 	} );
 
-	/**
-	 * ToDo: Fix snapshot, as results differ between Node.js v10 & v12
-	it( 'snapshot matches warnings', () => {
-		return result.then( ( data ) => (
-			expect( data.results[ 0 ].warnings ).toMatchSnapshot()
-		) );
-	} );
-	*/
+	// ToDo: Fix snapshot, as results differ between Node.js v10 & v12
+	// it( 'snapshot matches warnings', () => {
+	// 	return result.then( ( data ) => (
+	// 		expect( data.results[ 0 ].warnings ).toMatchSnapshot()
+	// 	) );
+	// } );
 } );
