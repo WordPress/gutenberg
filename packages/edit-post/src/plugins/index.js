@@ -34,7 +34,7 @@ registerPlugin( 'edit-post', {
 							<CopyContentMenuItem />
 							<MenuItem
 								role="menuitem"
-								href="https://wordpress.org/support/article/wordpress-editor/"
+								href={ __( 'https://wordpress.org/support/article/wordpress-editor/' ) }
 								target="_new"
 							>
 								{ __( 'Help' ) }
