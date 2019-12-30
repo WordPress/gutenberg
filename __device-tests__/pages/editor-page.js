@@ -200,7 +200,7 @@ export default class EditorPage {
 		}
 
 		const parentLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
-		let removeBlockLocator = `${ parentLocator }/following-sibling::*`;
+		let removeBlockLocator = `${ parentLocator }`;
 		removeBlockLocator += isAndroid() ? '//*' : '//XCUIElementTypeButton';
 		let removeButtonIdentifier = `Remove block at row ${ position }`;
 
