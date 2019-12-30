@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Guide, GuidePage } from '@wordpress/components';
+import { ExternalLink, Guide, GuidePage } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { __experimentalCreateInterpolateElement } from '@wordpress/element';
 
@@ -73,9 +73,11 @@ export default function WelcomeGuide() {
 				</h1>
 				<p className="edit-post-welcome-guide__text">
 					{ __( 'For detailed information on using the block editor, see the ' ) }
-					<a target="_new" href="https://wordpress.org/support/article/wordpress-editor/">
+					<ExternalLink
+						href={ __( 'https://wordpress.org/support/article/wordpress-editor/' ) }
+					>
 						{ __( 'Getting Started documentation' ) }
-					</a>
+					</ExternalLink>
 				</p>
 			</GuidePage>
 
