@@ -9,7 +9,7 @@ commands:
             - yarn-i18n-v4-cache-v{{ .Environment.CACHE_TRIGGER_VERSION }}-job-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
-          command: yarn install --frozen-lockfile --prefer-offline
+          command: yarn install --frozen-lockfile --prefer-offline --network-concurrency 1
       - save_cache:
           name: Save Yarn Cache
           key: yarn-i18n-v4-cache-v{{ .Environment.CACHE_TRIGGER_VERSION }}-job-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
