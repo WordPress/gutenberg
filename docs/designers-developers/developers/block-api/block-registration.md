@@ -653,4 +653,3 @@ By default all blocks can be converted to a reusable block. If supports reusable
 // Don't allow the block to be converted into a reusable block.
 reusable: false,
 ```
-

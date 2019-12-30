@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
 import classnames from 'classnames';
+import { isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,28 +17,11 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import shortcutConfig from './config';
+import { globalShortcuts, mainShortcuts, textFormattingShortcuts } from './config';
+import Shortcut from './shortcut';
+import DynamicShortcut from './dynamic-shortcut';
 
 const MODAL_NAME = 'edit-post/keyboard-shortcut-help';
-
-const mapKeyCombination = ( keyCombination ) => keyCombination.map( ( character, index ) => {
-	if ( character === '+' ) {
-		return (
-			<Fragment key={ index }>
-				{ character }
-			</Fragment>
-		);
-	}
-
-	return (
-		<kbd
-			key={ index }
-			className="edit-post-keyboard-shortcut-help__shortcut-key"
-		>
-			{ character }
-		</kbd>
-	);
-} );
 
 const ShortcutList = ( { shortcuts } ) => (
 	/*
@@ -46,20 +29,16 @@ const ShortcutList = ( { shortcuts } ) => (
 	 * Safari+VoiceOver won't announce the list otherwise.
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
-	<ul className="edit-post-keyboard-shortcut-help__shortcut-list" role="list">
-		{ shortcuts.map( ( { keyCombination, description, ariaLabel }, index ) => (
+	<ul className="edit-post-keyboard-shortcut-help-modal__shortcut-list" role="list">
+		{ shortcuts.map( ( shortcut, index ) => (
 			<li
-				className="edit-post-keyboard-shortcut-help__shortcut"
+				className="edit-post-keyboard-shortcut-help-modal__shortcut"
 				key={ index }
 			>
-				<div className="edit-post-keyboard-shortcut-help__shortcut-description">
-					{ description }
-				</div>
-				<div className="edit-post-keyboard-shortcut-help__shortcut-term">
-					<kbd className="edit-post-keyboard-shortcut-help__shortcut-key-combination" aria-label={ ariaLabel }>
-						{ mapKeyCombination( castArray( keyCombination ) ) }
-					</kbd>
-				</div>
+				{ isString( shortcut ) ?
+					<DynamicShortcut name={ shortcut } /> :
+					<Shortcut { ...shortcut } />
+				}
 			</li>
 		) ) }
 	</ul>
@@ -67,9 +46,9 @@ const ShortcutList = ( { shortcuts } ) => (
 );
 
 const ShortcutSection = ( { title, shortcuts, className } ) => (
-	<section className={ classnames( 'edit-post-keyboard-shortcut-help__section', className ) }>
+	<section className={ classnames( 'edit-post-keyboard-shortcut-help-modal__section', className ) }>
 		{ !! title && (
-			<h2 className="edit-post-keyboard-shortcut-help__section-title">
+			<h2 className="edit-post-keyboard-shortcut-help-modal__section-title">
 				{ title }
 			</h2>
 		) }
@@ -88,14 +67,45 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 			/>
 			{ isModalActive && (
 				<Modal
-					className="edit-post-keyboard-shortcut-help"
+					className="edit-post-keyboard-shortcut-help-modal"
 					title={ __( 'Keyboard shortcuts' ) }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ toggleModal }
 				>
-					{ shortcutConfig.map( ( config, index ) => (
-						<ShortcutSection key={ index } { ...config } />
-					) ) }
+					<ShortcutSection
+						className="edit-post-keyboard-shortcut-help-modal__main-shortcuts"
+						shortcuts={ mainShortcuts }
+					/>
+					<ShortcutSection
+						title={ __( 'Global shortcuts' ) }
+						shortcuts={ globalShortcuts }
+					/>
+					<ShortcutSection
+						title={ __( 'Selection shortcuts' ) }
+						shortcuts={ [
+							'core/block-editor/select-all',
+							'core/block-editor/unselect',
+						] }
+					/>
+					<ShortcutSection
+						title={ __( 'Block shortcuts' ) }
+						shortcuts={ [
+							'core/block-editor/duplicate',
+							'core/block-editor/remove',
+							'core/block-editor/insert-before',
+							'core/block-editor/insert-after',
+							{
+								keyCombination: { character: '/' },
+								description: __( 'Change the block type after adding a new paragraph.' ),
+								/* translators: The forward-slash character. e.g. '/'. */
+								ariaLabel: __( 'Forward-slash' ),
+							},
+						] }
+					/>
+					<ShortcutSection
+						title={ __( 'Text formatting' ) }
+						shortcuts={ textFormattingShortcuts }
+					/>
 				</Modal>
 			) }
 		</Fragment>

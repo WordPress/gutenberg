@@ -2,12 +2,19 @@
  * External dependencies
  */
 import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
+import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Children, cloneElement } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import Tooltip from '../tooltip';
+import Icon from '../icon';
 
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
@@ -69,9 +76,14 @@ export function Button( props ) {
 		getStylesFromColorScheme,
 		isPressed,
 		'aria-disabled': ariaDisabled,
-		'aria-label': ariaLabel,
 		'data-subscript': subscript,
 		testID,
+		icon,
+		iconSize,
+		showTooltip,
+		label,
+		shortcut,
+		tooltipPosition,
 	} = props;
 
 	const isDisabled = ariaDisabled || disabled;
@@ -97,11 +109,30 @@ export function Button( props ) {
 		return child ? cloneElement( child, { colorScheme: props.preferredColorScheme, isPressed } ) : child;
 	} );
 
-	return (
+	// Should show the tooltip if...
+	const shouldShowTooltip = ! isDisabled && (
+		// an explicit tooltip is passed or...
+		( showTooltip && label ) ||
+		// there's a shortcut or...
+		shortcut ||
+		(
+			// there's a label and...
+			!! label &&
+			// the children are empty and...
+			( ! children || ( isArray( children ) && ! children.length ) ) &&
+			// the tooltip is not explicitly disabled.
+			false !== showTooltip
+		)
+	);
+
+	const newIcon = cloneElement( ( icon && <Icon icon={ icon } size={ iconSize } /> ),
+		{ colorScheme: props.preferredColorScheme, isPressed } );
+
+	const element = (
 		<TouchableOpacity
 			activeOpacity={ 0.7 }
 			accessible={ true }
-			accessibilityLabel={ ariaLabel }
+			accessibilityLabel={ label }
 			accessibilityStates={ states }
 			accessibilityRole={ 'button' }
 			accessibilityHint={ hint }
@@ -112,11 +143,22 @@ export function Button( props ) {
 		>
 			<View style={ buttonViewStyle }>
 				<View style={ { flexDirection: 'row' } }>
+					{ newIcon }
 					{ newChildren }
 					{ subscript && ( <Text style={ isPressed ? styles.subscriptActive : subscriptInactive }>{ subscript }</Text> ) }
 				</View>
 			</View>
 		</TouchableOpacity>
+	);
+
+	if ( ! shouldShowTooltip ) {
+		return element;
+	}
+
+	return (
+		<Tooltip text={ label } shortcut={ shortcut } position={ tooltipPosition }>
+			{ element }
+		</Tooltip>
 	);
 }
 

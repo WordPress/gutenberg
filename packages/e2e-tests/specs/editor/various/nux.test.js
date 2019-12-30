@@ -8,7 +8,7 @@ describe( 'New User Experience (NUX)', () => {
 		let welcomeGuideText, welcomeGuide;
 
 		// Create a new post as a first-time user
-		await createNewPost( { enableTips: true } );
+		await createNewPost( { showWelcomeGuide: true } );
 
 		// Guide should be on page 1 of 3
 		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
@@ -32,13 +32,14 @@ describe( 'New User Experience (NUX)', () => {
 
 		// Press the button for Page 2
 		await page.click( 'button[aria-label="Page 2 of 3"]' );
+		await page.waitForXPath( '//h1[contains(text(), "Make each block your own")]' );
+		// This shouldn't be necessary
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 500 );
 
-		// Press the right arrow key
+		// Press the right arrow key for Page 3
 		await page.keyboard.press( 'ArrowRight' );
-
-		// Guide should be on page 3 of 3
-		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
-		expect( welcomeGuideText ).toContain( 'Get to know the Block Library' );
+		await page.waitForXPath( '//h1[contains(text(), "Get to know the Block Library")]' );
 
 		// Click on the *visible* 'Get started' button. There are two in the DOM
 		// but only one is shown depending on viewport size
@@ -68,7 +69,7 @@ describe( 'New User Experience (NUX)', () => {
 		let welcomeGuide;
 
 		// Create a new post as a first-time user
-		await createNewPost( { enableTips: true } );
+		await createNewPost( { showWelcomeGuide: true } );
 
 		// Guide should be open
 		welcomeGuide = await page.$( '.edit-post-welcome-guide' );

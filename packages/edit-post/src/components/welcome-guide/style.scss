@@ -28,10 +28,12 @@
 		margin: $grid-size 0;
 
 		@include break-small() {
-			height: $image-height;
-			left: 0;
 			position: absolute;
+			left: 0;
+			top: 50%;
+			height: $image-height;
 			width: $image-width;
+			margin-top: -0.5 * $image-height;
 		}
 	}
 

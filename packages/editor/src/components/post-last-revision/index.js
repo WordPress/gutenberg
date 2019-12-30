@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { sprintf, _n } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -14,7 +14,7 @@ import { getWPAdminURL } from '../../utils/url';
 function LastRevision( { lastRevisionId, revisionsCount } ) {
 	return (
 		<PostLastRevisionCheck>
-			<IconButton
+			<Button
 				href={ getWPAdminURL( 'revision.php', { revision: lastRevisionId, gutenberg: true } ) }
 				className="editor-post-last-revision__title"
 				icon="backup"
@@ -25,7 +25,7 @@ function LastRevision( { lastRevisionId, revisionsCount } ) {
 						revisionsCount
 					)
 				}
-			</IconButton>
+			</Button>
 		</PostLastRevisionCheck>
 	);
 }
