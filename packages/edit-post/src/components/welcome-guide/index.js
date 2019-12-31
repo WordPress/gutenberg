@@ -69,14 +69,14 @@ export default function WelcomeGuide() {
 
 			<GuidePage className="edit-post-welcome-guide__page">
 				<h1 className="edit-post-welcome-guide__heading">
-					{ __( 'Detailed Documentation' ) }
+					{ __( 'Learn how to use the block editor' ) }
 				</h1>
 				<p className="edit-post-welcome-guide__text">
-					{ __( 'For detailed information on using the block editor, see the ' ) }
+					{ __( 'New to the block editor? Want to learn more about using it?' ) }
 					<ExternalLink
 						href={ __( 'https://wordpress.org/support/article/wordpress-editor/' ) }
 					>
-						{ __( 'Getting Started documentation' ) }
+						{ __( 'Here\'s a detailed guide.' ) }
 					</ExternalLink>
 				</p>
 			</GuidePage>
