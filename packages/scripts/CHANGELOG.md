@@ -1,3 +1,16 @@
+## 6.2.0 (Unreleased)
+
+- The bundled `stylelint` dependency has been updated from requiring `^9.10.1` to requiring `^12.0.1`.
+See the [full list of changes](https://github.com/stylelint/stylelint/compare/9.10.1...12.0.1?short_path=4ac32a7#diff-4ac32a78649ca5bdd8e0ba38b7006a1e).
+- The bundled `stylelint-config-wordpress` dependency has been updated from requiring `^13.1.0` to requiring `^16.0.0`.
+See the [full list of changes](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress/compare/13.1.0...16.0.0?short_path=4ac32a7#diff-4ac32a78649ca5bdd8e0ba38b7006a1e).
+
+## 6.1.0 (2019-12-20)
+
+### New Features
+
+- Added support to collapse or omit successful test results from Travis CI builds ([#16744](https://github.com/WordPress/gutenberg/issues/16744))
+
 ## 6.0.0 (2019-11-14)
 
 ### Breaking Changes
