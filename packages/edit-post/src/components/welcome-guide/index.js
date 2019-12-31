@@ -9,7 +9,7 @@ import { __experimentalCreateInterpolateElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { CanvasImage, EditorImage, BlockLibraryImage, InserterIconImage } from './images';
+import { CanvasImage, EditorImage, BlockLibraryImage, DocumentationImage, InserterIconImage } from './images';
 
 export default function WelcomeGuide() {
 	const isActive = useSelect( ( select ) => select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ), [] );
@@ -69,10 +69,11 @@ export default function WelcomeGuide() {
 
 			<GuidePage className="edit-post-welcome-guide__page">
 				<h1 className="edit-post-welcome-guide__heading">
-					{ __( 'Learn how to use the block editor' ) }
+					{ __( 'Learn how to use the Block Editor' ) }
 				</h1>
+				<DocumentationImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
-					{ __( 'New to the block editor? Want to learn more about using it?' ) }
+					{ __( 'New to the Block Editor? Want to learn more about using it? ' ) }
 					<ExternalLink
 						href={ __( 'https://wordpress.org/support/article/wordpress-editor/' ) }
 					>
