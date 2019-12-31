@@ -43,7 +43,7 @@ describe( 'New User Experience (NUX)', () => {
 
 		// Press the right arrow key for Page 4
 		await page.keyboard.press( 'ArrowRight' );
-		await page.waitForXPath( '//h1[contains(text(), "Learn how to use the block editor")]' );
+		await page.waitForXPath( '//h1[contains(text(), "Learn how to use the Block Editor")]' );
 
 		// Click on the *visible* 'Get started' button. There are two in the DOM
 		// but only one is shown depending on viewport size
