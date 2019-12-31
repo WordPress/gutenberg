@@ -107,7 +107,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { autosave, editPost, resetEditorBlocks } = dispatch( 'core/editor' );
+		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
 		return {
 			editTitle( title ) {
 				editPost( { title } );
@@ -116,9 +116,9 @@ export default compose( [
 				editPost( { content } );
 			},
 			onPersist( content ) {
+				// Wrapping content in a function makes sure getEditedPostContent (in withSelect)
+				// always returns the last version instead of serializing blocks
 				editPost( { content: () => content } );
-				autosave();
-				// Now that content is safely persisted try to parse it and reset blocks
 				const blocks = parse( content );
 				resetEditorBlocks( blocks );
 			},
