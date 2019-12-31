@@ -6,7 +6,7 @@ import { TouchableOpacity, Text, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	Icon,
 } from '@wordpress/components';
@@ -25,15 +25,11 @@ const PickerButton = ( {
 } ) => {
 	const butonStyles = getStylesFromColorScheme( styles.button, styles.buttonDark );
 	const butonTextStyles = getStylesFromColorScheme( styles.buttonText, styles.buttonTextDark );
-	const accessibilityLabel = sprintf(
-		/* translators: accessibility text. Inform about list of predefined layout options. %1$s: Layout name, e.g About. */
-		__( 'Predefined layout picker. %1$s' ),
-		label
-	);
 
 	return (
 		<TouchableOpacity
-			accessibilityLabel={ accessibilityLabel }
+			accessibilityLabel={ label }
+			accessibilityHint={ __( 'Double tap to select layout' ) }
 			activeOpacity={ 0.7 }
 			onPress={ onPress }
 			style={ butonStyles }
