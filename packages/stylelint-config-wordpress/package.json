@@ -69,7 +69,7 @@
 		"release": "npmpub --verbose",
 		"stylelint-find-unused-rules": "stylelint-find-rules --config index.js",
 		"test:unit": "wp-scripts test-unit-js",
-		"test": "npm-run-all --parallel lint:*",
+		"test": "npm run test:unit",
 		"watch": "jest --watch"
 	},
 	"commitlint": {
