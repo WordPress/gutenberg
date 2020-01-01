@@ -35,7 +35,7 @@ You're now ready to use `wp-env`!
 
 ### Starting the Environment
 
-First, ensure that Docker is running. You can do this by clocking on the Docker icon in the system tray or menu bar.
+First, ensure that Docker is running. You can do this by clicking on the Docker icon in the system tray or menu bar.
 
 Then, change to a directory that contains a WordPress plugin or theme:
 
