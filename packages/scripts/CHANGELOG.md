@@ -1,3 +1,15 @@
+## 6.1.1 (2020-01-01)
+
+### Bug Fixes
+
+- Update `jest-preset-default` dependency to fix preset file extension for inclusion in NPM deployments. ([#19306](https://github.com/WordPress/gutenberg/pull/19306)).
+
+## 6.1.0 (2019-12-20)
+
+### New Features
+
+- Added support to collapse or omit successful test results from Travis CI builds ([#16744](https://github.com/WordPress/gutenberg/issues/16744))
+
 ## 6.0.0 (2019-11-14)
 
 ### Breaking Changes
