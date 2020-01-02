@@ -15,7 +15,7 @@
 				type: 'block',
 				blocks: [ '*' ],
 				isMultiBlock: true,
-				__experimentalConvert( blocks ) {
+				convert( blocks ) {
 					const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
 						return wp.blocks.createBlock( name, attributes, innerBlocks );
 					} );

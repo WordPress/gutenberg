@@ -405,16 +405,16 @@ export function switchToBlockType( blocks, name ) {
 	let transformationResults;
 
 	if ( transformation.isMultiBlock ) {
-		if ( has( transformation, '__experimentalConvert' ) ) {
-			transformationResults = transformation.__experimentalConvert( blocksArray );
+		if ( has( transformation, 'convert' ) ) {
+			transformationResults = transformation.convert( blocksArray );
 		} else {
 			transformationResults = transformation.transform(
 				blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
 				blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks ),
 			);
 		}
-	} else if ( has( transformation, '__experimentalConvert' ) ) {
-		transformationResults = transformation.__experimentalConvert( firstBlock );
+	} else if ( has( transformation, 'convert' ) ) {
+		transformationResults = transformation.convert( firstBlock );
 	} else {
 		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks );
 	}
