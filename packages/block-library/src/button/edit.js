@@ -10,18 +10,24 @@ import { escape } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import {
 	useCallback,
+	useEffect,
+	useState,
 } from '@wordpress/element';
 import {
 	compose,
 } from '@wordpress/compose';
 import {
+	KeyboardShortcuts,
 	PanelBody,
 	RangeControl,
 	TextControl,
 	ToggleControl,
 	withFallbackStyles,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
+	BlockControls,
 	__experimentalUseGradient,
 	ContrastChecker,
 	InspectorControls,
@@ -37,6 +43,8 @@ import {
 	DOWN,
 	BACKSPACE,
 	ENTER,
+	rawShortcut,
+	displayShortcut,
 } from '@wordpress/keycodes';
 
 const { getComputedStyle } = window;
@@ -94,7 +102,19 @@ const handleLinkControlOnKeyPress = ( event ) => {
 };
 
 function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onToggleOpenInNewTab } ) {
-	return isSelected ? (
+	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
+	useEffect(
+		() => {
+			if ( ! isSelected ) {
+				setIsURLPickerOpen( false );
+			}
+		},
+		[ isSelected ]
+	);
+	const openLinkControl = () => {
+		setIsURLPickerOpen( true );
+	};
+	const linkControl = isURLPickerOpen && (
 		<LinkControl
 			className="wp-block-navigation-link__inline-link-input"
 			onKeyDown={ handleLinkControlOnKeyDown }
@@ -118,8 +138,33 @@ function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onTo
 					onToggleOpenInNewTab( value );
 				}
 			} }
+			onClose={ () => {
+				setIsURLPickerOpen( false );
+			} }
 		/>
-	) : null;
+	);
+	return (
+		<>
+			<BlockControls>
+				<ToolbarGroup>
+					<KeyboardShortcuts
+						bindGlobal
+						shortcuts={ {
+							[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						} }
+					/>
+					<ToolbarButton
+						name="link"
+						icon="admin-links"
+						title={ __( 'Link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ openLinkControl }
+					/>
+				</ToolbarGroup>
+			</BlockControls>
+			{ linkControl }
+		</>
+	);
 }
 
 function ButtonEdit( {
