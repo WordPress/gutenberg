@@ -1302,7 +1302,46 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after1' );
 		} );
 
-		it( 'should pass entire block object(s) to the "convert" method if defined', () => {
+		it( 'should pass the entire block object to the "convert" method if defined', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						convert( block ) {
+							return createBlock( 'core/updated-text-block', {
+								value: 'chicken ' + block.attributes.value,
+							} );
+						},
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
+			expect( transformedBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
+			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
+			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+				value: 'chicken ribs',
+			} );
+		} );
+
+		it( 'should pass entire block objects to the "convert" method if defined (multi)', () => {
 			registerBlockType( 'core/test-group-block', {
 				attributes: {
 					value: {
