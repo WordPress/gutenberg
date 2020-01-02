@@ -53,7 +53,7 @@ describe( 'Meta boxes', () => {
 		await publishPost();
 
 		// View the post.
-		const viewPostLinks = await page.$x( "//a[contains(text(), 'View Post')]" );
+		const viewPostLinks = await page.$x( "//a[contains(text(), 'View post')]" );
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
@@ -68,7 +68,7 @@ describe( 'Meta boxes', () => {
 		await publishPost();
 
 		// View the post.
-		const viewPostLinks = await page.$x( "//a[contains(text(), 'View Post')]" );
+		const viewPostLinks = await page.$x( "//a[contains(text(), 'View post')]" );
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
@@ -103,7 +103,7 @@ describe( 'Meta boxes', () => {
 		await publishPost();
 
 		// View the post.
-		const viewPostLinks = await page.$x( "//a[contains(text(), 'View Post')]" );
+		const viewPostLinks = await page.$x( "//a[contains(text(), 'View post')]" );
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
