@@ -15,7 +15,7 @@ const MyColorControl = withState( {
 	<ColorControl
 		label={ 'Background Color' }
 		color={ backgroundColor }
-		onChange={ val => setState( { backgroundColor: val.hex } ) }
+		onChange={ value => setState( { backgroundColor: value.hex } ) }
 		disableAlpha
 	/>
 ) );
