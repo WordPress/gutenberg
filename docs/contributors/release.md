@@ -298,21 +298,14 @@ Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://gi
 
 1. `git checkout wp/trunk`
 2. Update each of the `CHANGELOG.md` files
-3. Make a note of each packages new version, you will require these when it comes time to publish the packages with Lerna to npm:
-> Example
-> ```
-> @packages/e2e-tests/CHANGELOG.md           - @1.9.1
-> @packages/jest-preset-default/CHANGELOG.md - @5.3.1
-> @packages/scripts/CHANGELOG.md             - @6.1.1
-> ```
-4. Stage the _changelog_ changes `git add packages/`
-5. `git commit -m "Update changelogs"`
-6. Make a note of the commit hash of this commit
+3. Stage the _changelog_ changes `git add packages/`
+4. `git commit -m "Update changelogs"`
+5. Make a note of the commit hash of this commit
 > Example
 > ```
 > [master 278f524f16] Update changelogs` 278f524
 > ```
-1. `git push`
+6. `git push`
 
 Now that the changes have been committed to the `wp/trunk` branch and the Travis CI builds for the `wp/trunk` [branch are passing](https://travis-ci.com/WordPress/gutenberg/branches) it's time to publish the packages to npm:
 1. Once again run `npm run publish:check` to confirm there are no unexpected packages ready to be published:
