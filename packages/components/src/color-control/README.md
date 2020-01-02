@@ -1,7 +1,6 @@
 # ColorControl
 
-ColorControl is used to generate a color picker user interface.
-
+ColorControl is used to generate a color picker user interface with the option to include a label and help text.
 
 ## Usage
 
@@ -14,11 +13,11 @@ const MyColorControl = withState( {
 	backgroundColor: '#fff',
 } )( ( { backgroundColor, setState } ) => (
 	<ColorControl
-			label={ 'Background Color' }
-			color={ backgroundColor }
-			onChange={ val => setState( { backgroundColor: val.hex } ) }
-			disableAlpha
-		/>
+		label={ 'Background Color' }
+		color={ backgroundColor }
+		onChange={ val => setState( { backgroundColor: val.hex } ) }
+		disableAlpha
+	/>
 ) );
 ```
 
@@ -41,6 +40,7 @@ If this property is added, a help text will be generated using help property as 
 - Required: No
 
 ### color
+
 The color that will be selected.
 
 - Type: `String`
@@ -58,4 +58,4 @@ A function that receives the selected color value
 The class that will be added with `components-base-control` and `component-color-control` to the classes of the wrapper div. If no className is passed only `components-base-control` and `component-color-control` are used.
 
 Type: String
-Required: No
+- Required: No
