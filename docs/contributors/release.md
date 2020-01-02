@@ -266,21 +266,21 @@ The `wp/trunk` branch now needs to be prepared to release and publish the packag
 
 Open a terminal and perform the following steps:
 1. `git checkout master`
-1. `git pull`
-1. `git checkout wp/trunk`
-1. `git pull`
+2. `git pull`
+3. `git checkout wp/trunk`
+4. `git pull`
 
 Before porting commits check that the `wp/trunk` branch does not have any outstanding packages waiting to be published:
 1. `git checkout wp/trunk`
-1. `npm run publish:check`
+2. `npm run publish:check`
 
 Now _cherry-pick_ the commits from `master` to `wp/trunk`, use `-m 1 commithash` if the commit was a pull request merge commit:
 1. `git cherry-pick -m 1 cb150a2`
-1. `git push` 
+2. `git push` 
 
 Whilst waiting for the Travis CI build for  `wp/trunk` [branch to pass](https://travis-ci.com/WordPress/gutenberg/branches) identify and begin updating the `CHANGELOG.md` files:
 1. `git checkout wp/trunk`
-1. `npm run publish:check`
+2. `npm run publish:check`
 > Example
 > ```shell
 > npm run publish:check
@@ -297,17 +297,17 @@ Note: You may discover the current version of each package is not up to date, if
 Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/master/packages/README.md#maintaining-changelogs) documentation and commit the changes:
 
 1. `git checkout wp/trunk`
-1. Update each of the `CHANGELOG.md` files
-1. Make a note of each packages new version, you will require these when it comes time to publish the packages with Lerna to npm:
+2. Update each of the `CHANGELOG.md` files
+3. Make a note of each packages new version, you will require these when it comes time to publish the packages with Lerna to npm:
 > Example
 > ```
 > @packages/e2e-tests/CHANGELOG.md           - @1.9.1
 > @packages/jest-preset-default/CHANGELOG.md - @5.3.1
 > @packages/scripts/CHANGELOG.md             - @6.1.1
 > ```
-5. Stage the _changelog_ changes `git add packages/`
-1. `git commit -m "Update changelogs"`
-1. Make a note of the commit hash of this commit
+4. Stage the _changelog_ changes `git add packages/`
+5. `git commit -m "Update changelogs"`
+6. Make a note of the commit hash of this commit
 > Example
 > ```
 > [master 278f524f16] Update changelogs` 278f524
@@ -360,13 +360,13 @@ Now that the changes have been committed to the `wp/trunk` branch and the Travis
 
 Now that the packages have been published the _"chore(release): publish"_ and _"Update changelogs"_ commits to `wp/trunk` need to be ported to the `master` branch:
 1. `git checkout master`
-1. `git pull`
-1. Cherry-pick the `278f524`hash you noted above from the _"Update changelogs"_ commit made to `wp/trunk`
-1. `git cherry-pick 278f524`
-1. Get the commit hash from the the lerna publish commit either from the terminal or [wp/trunk commits](https://github.com/WordPress/gutenberg/commits/wp/trunk)
-1. Cherry-pick the `fe6ae0d` "chore(release): publish"_ commit made to `wp/trunk`
-1. `git cherry-pick fe6ae0d`
-1. `git push` 
+2. `git pull`
+3. Cherry-pick the `278f524`hash you noted above from the _"Update changelogs"_ commit made to `wp/trunk`
+4. `git cherry-pick 278f524`
+5. Get the commit hash from the the lerna publish commit either from the terminal or [wp/trunk commits](https://github.com/WordPress/gutenberg/commits/wp/trunk)
+6. Cherry-pick the `fe6ae0d` "chore(release): publish"_ commit made to `wp/trunk`
+7. `git cherry-pick fe6ae0d`
+8. `git push` 
 
 Confirm the packages dependancies do not contain `file://` links in the `dependencies` or `devdependencies` section of the packages released, e.g:
 > https://unpkg.com/browse/@wordpress/jest-preset-default@5.3.1/package.json
