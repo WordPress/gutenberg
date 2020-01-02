@@ -52,6 +52,21 @@
 	display: flex;
 }
 
+.wp-block-social-links {
+
+	&.items-justified-left {
+		justify-content: flex-start;
+	}
+
+	&.items-justified-center {
+		justify-content: center;
+	}
+
+	&.items-justified-right {
+		justify-content: flex-end;
+	}
+
+}
 
 // Provide colors for a range of icons.
 .wp-block-social-links:not(.is-style-logos-only) {
