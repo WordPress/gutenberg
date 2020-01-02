@@ -11,13 +11,18 @@ import { withPluginContext } from '@wordpress/plugins';
 import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { EnablePluginDocumentSettingPanelOption } from '../../options-modal/options';
 
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
-const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, className, title, icon, children } ) => {
+const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, className, title, icon, children, currentPostType } ) => {
 	return (
 		<>
 			<EnablePluginDocumentSettingPanelOption
@@ -33,7 +38,7 @@ const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, cl
 						opened={ opened }
 						onToggle={ onToggle }
 					>
-						{ children }
+						{ ( isFunction( children ) ) ? ( children( { currentPostType } ) ) : ( children ) }
 					</PanelBody>
 				) }
 			</Fill>
@@ -103,6 +108,7 @@ const PluginDocumentSettingPanel = compose(
 			{
 				opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ),
 				isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled( panelName ),
+				currentPostType: select( 'core/editor' ).getCurrentPostType(),
 			}
 		);
 	} ),
