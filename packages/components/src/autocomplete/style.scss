@@ -1,3 +1,7 @@
+.components-popover.components-autocomplete__popover {
+	z-index: z-index(".components-popover.components-autocomplete__popover");
+}
+
 .components-autocomplete__popover .components-popover__content {
 	min-width: 200px;
 }
