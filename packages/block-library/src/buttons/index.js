@@ -17,7 +17,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Buttons' ),
-	description: __( 'Prompt visitors to take action with a  group of button-style links.' ),
+	description: __( 'Prompt visitors to take action with a group of button-style links.' ),
 	icon,
 	keywords: [ __( 'link' ) ],
 	supports: {

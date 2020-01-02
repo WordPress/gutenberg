@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { compact, partial } from 'lodash';
+import { escape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,39 +10,34 @@ import { compact, partial } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import {
 	useCallback,
-	useContext,
-	useMemo,
-	useState,
 } from '@wordpress/element';
 import {
 	compose,
-	withInstanceId,
 } from '@wordpress/compose';
 import {
 	PanelBody,
 	RangeControl,
 	TextControl,
 	ToggleControl,
-	Toolbar,
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
 	__experimentalUseGradient,
-	BlockControls,
 	ContrastChecker,
 	InspectorControls,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	RichText,
-	URLInput,
-	URLPopover,
 	withColors,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { ButtonEditSettings } from './edit-settings';
+import {
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN,
+	BACKSPACE,
+	ENTER,
+} from '@wordpress/keycodes';
 
 const { getComputedStyle } = window;
 
@@ -85,134 +80,51 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 	);
 }
 
-function ToolbarMovers( { clientId } ) {
-	const {
-		parentID,
-		isFirst,
-		isLast,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockIndex,
-				getBlockOrder,
-				getBlockRootClientId,
-			} = select( 'core/block-editor' );
-			const rootClientId = getBlockRootClientId( clientId );
-			const numberOfSiblings = getBlockOrder( rootClientId ).length;
-			const buttonIndex = getBlockIndex( clientId, rootClientId );
-			return {
-				parentID: rootClientId,
-				isFirst: buttonIndex === 0,
-				isLast: buttonIndex === ( numberOfSiblings - 1 ),
-			};
-		},
-		[ clientId ]
-	);
-	const { moveBlocksUp, moveBlocksDown } = useDispatch( 'core/block-editor' );
-	const moveUp = useCallback(
-		partial( moveBlocksUp, [ clientId ], parentID ),
-		[ moveBlocksUp, clientId, parentID ]
-	);
-	const moveDown = useCallback(
-		partial( moveBlocksDown, [ clientId ], parentID ),
-		[ moveBlocksDown, clientId, parentID ]
-	);
-	const toolbarControls = useMemo(
-		() => ( compact( [
-			isFirst ? null : {
-				icon: 'arrow-left-alt2',
-				title: __( 'Move left' ),
-				onClick: moveUp,
-			},
-			isLast ? null : {
-				icon: 'arrow-right-alt2',
-				title: __( 'Move right' ),
-				onClick: moveDown,
-			},
-		] ) ),
-		[ moveUp, moveDown, isFirst, isLast ]
-	);
+const handleLinkControlOnKeyDown = ( event ) => {
+	const { keyCode } = event;
 
-	return (
-		<BlockControls>
-			<Toolbar controls={ toolbarControls } />
-		</BlockControls>
-	);
-}
-
-const InlineURLPicker = withInstanceId(
-	function( { instanceId, isSelected, url, onChange } ) {
-		const linkId = `wp-block-button__inline-link-${ instanceId }`;
-		return (
-			<URLInput
-				className="wp-block-button__inline-link-input"
-				value={ url }
-				/* eslint-disable jsx-a11y/no-autofocus */
-				// Disable Reason: The rule is meant to prevent enabling auto-focus, not disabling it.
-				autoFocus={ false }
-				/* eslint-enable jsx-a11y/no-autofocus */
-				onChange={ onChange }
-				disableSuggestions={ ! isSelected }
-				id={ linkId }
-				isFullWidth
-				hasBorder
-			/>
-		);
+	if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
+		// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
+		event.stopPropagation();
 	}
-);
+};
 
-function PopoverURLPicker( { url, onChange } ) {
-	const [ urlInput, setUrlInput ] = useState( url || '' );
-	const [ isPopoverEnable, setIsPopoverEnable ] = useState( true );
-	const onSubmit = useCallback(
-		() => {
-			onChange( urlInput );
-			setIsPopoverEnable( false );
-		},
-		[ urlInput, onChange ]
-	);
-	if ( ! isPopoverEnable ) {
-		return null;
-	}
-	return (
-		<URLPopover focusOnMount={ false }>
-			<URLPopover.LinkEditor
-				className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
-				value={ urlInput }
-				onChangeInputValue={ setUrlInput }
-				onSubmit={ onSubmit }
-			/>
-		</URLPopover>
-	);
-}
+const handleLinkControlOnKeyPress = ( event ) => {
+	event.stopPropagation();
+};
 
-function URLPicker( { isSelected, url, setAttributes } ) {
-	const onChange = useCallback(
-		( value ) => setAttributes( { url: value } ),
-		[ setAttributes ]
-	);
-	const { urlInPopover } = useContext( ButtonEditSettings );
-	if ( urlInPopover ) {
-		return isSelected ? (
-			<PopoverURLPicker
-				url={ url }
-				onChange={ onChange }
-			/>
-		) : null;
-	}
-	return (
-		<InlineURLPicker
-			url={ url }
-			isSelected={ isSelected }
-			onChange={ onChange }
+function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onToggleOpenInNewTab } ) {
+	return isSelected ? (
+		<LinkControl
+			className="wp-block-navigation-link__inline-link-input"
+			onKeyDown={ handleLinkControlOnKeyDown }
+			onKeyPress={ handleLinkControlOnKeyPress }
+			currentLink={ ! url && ! title ? null : { url, title } }
+			onLinkChange={ ( { title: newTitle = '', url: newURL = '' } ) => {
+				setAttributes( {
+					title: escape( newTitle ),
+					url: newURL,
+				} );
+			} }
+			currentSettings={ [
+				{
+					id: 'opensInNewTab',
+					title: __( 'Open in new tab' ),
+					checked: opensInNewTab,
+				},
+			] }
+			onSettingsChange={ ( setting, value ) => {
+				if ( setting === 'opensInNewTab' ) {
+					onToggleOpenInNewTab( value );
+				}
+			} }
 		/>
-	);
+	) : null;
 }
 
 function ButtonEdit( {
 	attributes,
 	backgroundColor,
-	clientId,
 	textColor,
 	setBackgroundColor,
 	setTextColor,
@@ -289,9 +201,12 @@ function ButtonEdit( {
 				} }
 			/>
 			<URLPicker
+				title={ title }
 				url={ url }
 				setAttributes={ setAttributes }
 				isSelected={ isSelected }
+				opensInNewTab={ linkTarget === '_blank' }
+				onToggleOpenInNewTab={ onToggleOpenInNewTab }
 			/>
 			<InspectorControls>
 				<PanelColorGradientSettings
@@ -340,7 +255,6 @@ function ButtonEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<ToolbarMovers clientId={ clientId } />
 		</div>
 	);
 }
