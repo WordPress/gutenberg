@@ -7,6 +7,10 @@ import { isFunction, noop, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
+/* eslint-disable import/no-extraneous-dependencies */
+import apiFetch from '@wordpress/api-fetch';
+/* eslint-enable import/no-extraneous-dependencies */
+
 import {
 	Button,
 	ExternalLink,
@@ -27,6 +31,7 @@ import {
 	isURL,
 	prependHTTP,
 	getProtocol,
+	addQueryArgs,
 } from '@wordpress/url';
 
 import { withInstanceId, compose } from '@wordpress/compose';
@@ -40,7 +45,6 @@ import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
 const MODE_EDIT = 'edit';
-// const MODE_SHOW = 'show';
 
 function LinkControl( {
 	className,
@@ -112,6 +116,20 @@ function LinkControl( {
 		setInputValue( '' );
 	};
 
+	const fetchRemoteURLTitle = ( value ) => {
+		const endpoint = '/__experimental/url-details/title';
+
+		const args = {
+			url: prependHTTP( value ),
+		};
+
+		const queryArgs = addQueryArgs( endpoint, args );
+
+		return apiFetch( {
+			path: queryArgs,
+		} );
+	};
+
 	const handleDirectEntry = ( value ) => {
 		let type = 'URL';
 
@@ -129,13 +147,28 @@ function LinkControl( {
 			type = 'internal';
 		}
 
+		const defaultResponse = {
+			id: '-1',
+			title: value,
+			url: type === 'URL' ? prependHTTP( value ) : value,
+			type,
+		};
+
+		// If it's a URL then request the `<title>` tag
+		// Todo:
+		// * avoid invalid requests for incomplete URLS
+		// * avoid concurrent requests - cancel existing AJAX requests if already pending
+		if ( type === 'URL' && isURL( prependHTTP( value ) ) ) {
+			return fetchRemoteURLTitle( value ).then( ( title ) => {
+				return [ {
+					...defaultResponse,
+					title: title || value,
+				} ];
+			} ).catch( () => [ defaultResponse ] );
+		}
+
 		return Promise.resolve(
-			[ {
-				id: '-1',
-				title: value,
-				url: type === 'URL' ? prependHTTP( value ) : value,
-				type,
-			} ]
+			[ defaultResponse ]
 		);
 	};
 
