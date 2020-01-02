@@ -2,5 +2,9 @@
 	"name": "core/social-links",
 	"category": "widgets",
 	"icon": "share",
-	"attributes": {}
+	"attributes": {
+		"itemsJustification": {
+			"type": "string"
+		}
+	}
 }

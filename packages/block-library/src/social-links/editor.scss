@@ -26,6 +26,8 @@
 		width: auto;
 		padding-left: 0;
 		padding-right: 0;
+		margin-left: 0;
+		margin-right: 0;
 	}
 
 	// 3. Remove margins on subsequent Edit container.
@@ -140,4 +142,24 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
+}
+
+
+.wp-block-social-links {
+
+	> .block-editor-inner-blocks {
+		flex: 1; // expand to fill available space required for justification
+	}
+
+	&.items-justification-left .block-editor-inner-blocks > .block-editor-block-list__layout {
+		justify-content: flex-start;
+	}
+
+	&.items-justification-center .block-editor-inner-blocks > .block-editor-block-list__layout {
+		justify-content: center;
+	}
+
+	&.items-justification-right .block-editor-inner-blocks > .block-editor-block-list__layout {
+		justify-content: flex-end;
+	}
 }
