@@ -147,12 +147,6 @@ function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onTo
 		<>
 			<BlockControls>
 				<ToolbarGroup>
-					<KeyboardShortcuts
-						bindGlobal
-						shortcuts={ {
-							[ rawShortcut.primary( 'k' ) ]: openLinkControl,
-						} }
-					/>
 					<ToolbarButton
 						name="link"
 						icon="admin-links"
@@ -162,6 +156,12 @@ function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onTo
 					/>
 				</ToolbarGroup>
 			</BlockControls>
+			<KeyboardShortcuts
+				bindGlobal
+				shortcuts={ {
+					[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+				} }
+			/>
 			{ linkControl }
 		</>
 	);

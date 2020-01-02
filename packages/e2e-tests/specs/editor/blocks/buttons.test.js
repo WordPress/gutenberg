@@ -5,6 +5,7 @@ import {
 	insertBlock,
 	getEditedPostContent,
 	createNewPost,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Buttons', () => {
@@ -19,12 +20,12 @@ describe( 'Buttons', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'can jump focus back & forth', async () => {
+	it( 'can jump to the link editor using the keyboard shortcut', async () => {
 		await insertBlock( 'Buttons' );
 		await page.keyboard.type( 'WordPress' );
-		await page.keyboard.press( 'Tab' );
+		await pressKeyWithModifier( 'primary', 'k' );
+		await page.keyboard.type( 'https://wwww.wordpress.org/' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Button!' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
