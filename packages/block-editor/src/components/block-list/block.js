@@ -102,6 +102,8 @@ function BlockListBlock( {
 	setNavigationMode,
 	isMultiSelecting,
 	isLargeViewport,
+	hasSelectedUI = true,
+	hasMovers = true,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this component going forward
 	// to avoid leaking new props to the public API (editor.BlockListBlock filter)
@@ -460,8 +462,9 @@ function BlockListBlock( {
 	const wrapperClassName = classnames(
 		'wp-block block-editor-block-list__block',
 		{
+			'has-selected-ui': hasSelectedUI,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-			'is-selected': shouldAppearSelected,
+			'is-selected': shouldAppearSelected && hasSelectedUI,
 			'is-navigate-mode': isNavigationMode,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': shouldAppearHovered,
@@ -523,6 +526,7 @@ function BlockListBlock( {
 			data-type={ name }
 			data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
 			moverDirection={ moverDirection }
+			hasMovers={ hasMovers }
 		/>
 	);
 
