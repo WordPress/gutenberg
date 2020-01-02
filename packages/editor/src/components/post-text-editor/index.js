@@ -93,14 +93,14 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
+		const { editPost } = dispatch( 'core/editor' );
 		return {
 			onChange( content ) {
 				editPost( { content } );
 			},
 			onPersist( content ) {
 				const blocks = parse( content );
-				resetEditorBlocks( blocks );
+				editPost( { content: () => content, blocks } );
 			},
 		};
 	} ),
