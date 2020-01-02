@@ -3,6 +3,27 @@
 	height: $icon-button-size;
 }
 
+.block-editor-block-switcher__toggle {
+	position: relative;
+
+	&::before,
+	&::after {
+		content: "";
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		border-color: transparent;
+		border-style: solid;
+	}
+
+	&::before {
+		border-width: 5px;
+		border-right-color: $black;
+		border-bottom-color: $black;
+	}
+}
+
+
 .components-button.block-editor-block-switcher__toggle,
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	margin: 0;
@@ -61,11 +82,6 @@
 		align-items: center;
 		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
 		@include reduce-motion("transition");
-	}
-
-	// Add a dropdown arrow indicator.
-	.block-editor-block-icon::after {
-		@include dropdown-arrow();
 	}
 
 	.block-editor-block-switcher__transform {
