@@ -314,7 +314,7 @@ Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://gi
 > ```
 1. `git push`
 
-Now that the changes have been committed to the `wp/trunk` branch adnd the Travis CI builds for the `wp/trunk` [branch are passing](https://travis-ci.com/WordPress/gutenberg/branches) it's time to publish the packages to npm:
+Now that the changes have been committed to the `wp/trunk` branch and the Travis CI builds for the `wp/trunk` [branch are passing](https://travis-ci.com/WordPress/gutenberg/branches) it's time to publish the packages to npm:
 1. Once again run `npm run publish:check` to confirm there are no unexpected packages ready to be published:
 > Example
 > ```shell
