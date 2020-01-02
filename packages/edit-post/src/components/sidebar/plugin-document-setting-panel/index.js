@@ -3,17 +3,18 @@
  */
 
 /**
+ * External dependencies
+ */
+
+import { isFunction } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
 import { withDispatch, withSelect } from '@wordpress/data';
-
-/**
- * External dependencies
- */
-import { isFunction } from 'lodash';
 
 /**
  * Internal dependencies
@@ -38,7 +39,7 @@ const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, cl
 						opened={ opened }
 						onToggle={ onToggle }
 					>
-						{ ( isFunction( children ) ) ? ( children( { currentPostType } ) ) : ( children ) }
+						{ isFunction( children ) ? ( children( { currentPostType } ) ) : ( children ) }
 					</PanelBody>
 				) }
 			</Fill>
