@@ -21,7 +21,7 @@ Here is the basic InnerBlocks usage.
 			return el(
 				'div',
 				{ className: props.className },
-				InnerBlocks
+				el( InnerBlocks )
 			);
 		},
 
@@ -29,7 +29,7 @@ Here is the basic InnerBlocks usage.
 			return el(
 				'div',
 				{ className: props.className },
-				InnerBlocks.Content
+				el( InnerBlocks.Content )
 			);
 		},
 	} );
@@ -44,7 +44,7 @@ Here is the basic InnerBlocks usage.
 import { registerBlockType } from '@wordpress/blocks';
 import { InnerBlocks } from '@wordpress/block-editor';
 
-registerBlockType( 'a8c/workshop-ex7', {
+registerBlockType( 'gutenberg-examples/example-06', {
 	// ...
 
 	edit: ( { className } ) => {
