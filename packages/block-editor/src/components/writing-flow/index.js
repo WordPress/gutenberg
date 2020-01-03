@@ -378,7 +378,6 @@ export default function WritingFlow( { children } ) {
 				}
 			} else if ( isEscape ) {
 				setNavigationMode( true );
-				wrapper.focus();
 			}
 		}
 
