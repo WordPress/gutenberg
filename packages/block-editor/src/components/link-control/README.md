@@ -20,7 +20,7 @@
 ```
 [
 	{
-		id: 'newTab',
+		id: 'opensInNewTab',
 		title: 'Open in New Tab',
 	},
 ];

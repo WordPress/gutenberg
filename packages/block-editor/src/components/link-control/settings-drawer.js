@@ -13,7 +13,7 @@ import {
 
 const defaultSettings = [
 	{
-		id: 'newTab',
+		id: 'opensInNewTab',
 		title: __( 'Open in New Tab' ),
 	},
 ];

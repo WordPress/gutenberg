@@ -48,7 +48,7 @@ function NavigationLinkEdit( {
 	const link = {
 		title: title ? unescape( title ) : '',
 		url,
-		newTab: opensInNewTab,
+		opensInNewTab,
 	};
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const itemLabelPlaceholder = __( 'Add link…' );
@@ -165,12 +165,12 @@ function NavigationLinkEdit( {
 							onChange={ ( {
 								title: newTitle = '',
 								url: newURL = '',
-								newTab,
+								opensInNewTab: newOpensInNewTab,
 							} = {} ) => setAttributes( {
 								title: escape( newTitle ),
 								url: newURL,
 								label: label || escape( newTitle ),
-								opensInNewTab: newTab,
+								opensInNewTab: newOpensInNewTab,
 							} ) }
 							onClose={ () => setIsLinkOpen( false ) }
 						/>
