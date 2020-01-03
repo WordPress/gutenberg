@@ -5,6 +5,11 @@ import { useEffect, useRef, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import { getBlockClientId } from '../../utils/dom';
+
+/**
  * Returns for the deepest node at the start or end of a container node. Ignores
  * any text nodes that only contain HTML formatting whitespace.
  *
@@ -124,16 +129,7 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 			return;
 		}
 
-		let { focusNode } = selection;
-		let clientId;
-
-		// Find the client ID of the block where the selection ends.
-		do {
-			focusNode = focusNode.parentElement;
-		} while (
-			focusNode &&
-			! ( clientId = focusNode.getAttribute( 'data-block' ) )
-		);
+		const clientId = getBlockClientId( selection.focusNode );
 
 		if ( startClientId.current === clientId ) {
 			selectBlock( clientId );

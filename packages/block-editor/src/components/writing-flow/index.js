@@ -501,8 +501,6 @@ export default function WritingFlow( { children } ) {
 
 		const clientId = getBlockClientId( event.target );
 
-		// console.log( clientId, event.target, selectedBlockClientId );
-
 		if ( clientId && clientId !== selectedBlockClientId ) {
 			selectBlock( clientId );
 		}
