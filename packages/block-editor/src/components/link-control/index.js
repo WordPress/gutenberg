@@ -112,7 +112,7 @@ function LinkControl( {
 		setInputValue( '' );
 	};
 
-	const handleDirectEntry = async ( value ) => {
+	const handleDirectEntry = async ( value, { fetchUrlInfo = true } = {} ) => {
 		let type = 'URL';
 
 		const protocol = getProtocol( value ) || '';
@@ -140,7 +140,7 @@ function LinkControl( {
 		// Todo:
 		// * avoid invalid requests for incomplete URLS
 		// * avoid concurrent requests - cancel existing AJAX requests if already pending
-		if ( type === 'URL' && isURL( prependHTTP( value ) ) ) {
+		if ( fetchUrlInfo && type === 'URL' && isURL( prependHTTP( value ) ) && value.length > 3 ) {
 			try {
 				const urlTitle = await fetchRemoteURLTitle( value );
 				return [ {
@@ -156,12 +156,14 @@ function LinkControl( {
 	};
 
 	const handleEntitySearch = async ( value ) => {
+		const couldBeURL = ! value.includes( ' ' );
+
 		const results = await Promise.all( [
 			fetchSearchSuggestions( value ),
-			handleDirectEntry( value ),
+			handleDirectEntry( value, {
+				fetchUrlInfo: couldBeURL,
+			} ),
 		] );
-
-		const couldBeURL = ! value.includes( ' ' );
 
 		// If it's potentially a URL search then concat on a URL search suggestion
 		// just for good measure. That way once the actual results run out we always
