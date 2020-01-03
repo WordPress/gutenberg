@@ -135,7 +135,7 @@ _Parameters_
 
 -   _shortcuts_ `(Array<string>|string)`: Keyboard Shortcuts.
 -   _callback_ `Function`: Shortcut callback.
--   _options_ `WPKeyboarShortcutConfig`: Shortcut options.
+-   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
 

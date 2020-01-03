@@ -13,7 +13,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * A block selection object.
  *
- * @typedef {Object} WPKeyboarShortcutConfig
+ * @typedef {Object} WPKeyboardShortcutConfig
  *
  * @property {boolean} [bindGlobal]  Handle keyboard events anywhere including inside textarea/input fields.
  * @property {string}  [eventName]   Event name used to trigger the handler, defaults to keydown.
@@ -40,7 +40,7 @@ function isAppleOS( _window = window ) {
  *
  * @param {string[]|string}         shortcuts  Keyboard Shortcuts.
  * @param {Function}                callback   Shortcut callback.
- * @param {WPKeyboarShortcutConfig} options    Shortcut options.
+ * @param {WPKeyboardShortcutConfig} options    Shortcut options.
  */
 function useKeyboardShortcut( shortcuts, callback, {
 	bindGlobal = false,
