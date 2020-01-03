@@ -188,18 +188,6 @@ function selector( select ) {
 	};
 }
 
-/**
- * Prevents default dragging behavior within a block.
- * To do: we must handle this in the future and clean up the drag target.
- * Previously dragging was prevented for multi-selected, but this is no longer
- * needed.
- *
- * @param {WPSyntheticEvent} event Synthetic drag event.
- */
-function preventDrag( event ) {
-	event.preventDefault();
-}
-
 export default function WritingFlow( { children } ) {
 	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
@@ -503,6 +491,21 @@ export default function WritingFlow( { children } ) {
 
 		if ( clientId && clientId !== selectedBlockClientId ) {
 			selectBlock( clientId );
+		}
+	}
+
+	/**
+	 * Prevents default dragging behavior within a block.
+	 * To do: we must handle this in the future and clean up the drag target.
+	 * Previously dragging was prevented for multi-selected, but this is no longer
+	 * needed.
+	 *
+	 * @param {WPSyntheticEvent} event Synthetic drag event.
+	 */
+	function preventDrag( event ) {
+		// Ensure we target block content, not block controls.
+		if ( getBlockClientId( event.target ) ) {
+			event.preventDefault();
 		}
 	}
 

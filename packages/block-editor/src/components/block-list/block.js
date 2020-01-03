@@ -613,7 +613,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		mergeBlocks,
 		replaceBlocks,
 		toggleSelection,
-		setNavigationMode,
 		__unstableMarkLastChangeAsPersistent,
 	} = dispatch( 'core/block-editor' );
 
@@ -679,7 +678,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );
 		},
-		setNavigationMode,
 	};
 } );
 
