@@ -14,11 +14,11 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     />
     <WithSelect(WithDispatch(BaseOption))
       feature="showInserterHelpPanel"
-      label="Inserter Help Panel"
+      label="Inserter help panel"
     />
   </Section>
   <Section
-    title="Document Panels"
+    title="Document panels"
   >
     <EnablePluginDocumentSettingPanelOptionSlot />
     <WithSelect(PostTaxonomies)
@@ -51,13 +51,13 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     </WithSelect(PostTypeSupportCheck)>
     <WithSelect(PageAttributesCheck)>
       <WithSelect(IfCondition(WithDispatch(BaseOption)))
-        label="Page Attributes"
+        label="Page attributes"
         panelName="page-attributes"
       />
     </WithSelect(PageAttributesCheck)>
   </Section>
   <WithSelect(MetaBoxesSection)
-    title="Advanced Panels"
+    title="Advanced panels"
   />
 </WithInstanceId(Modal)>
 `;
