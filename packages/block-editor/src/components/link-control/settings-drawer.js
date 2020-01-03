@@ -25,7 +25,7 @@ const LinkControlSettingsDrawer = ( { value, onChange = noop, settings = default
 
 	const handleSettingChange = ( setting ) => ( newValue ) => {
 		onChange( {
-			...settings,
+			...value,
 			[ setting.id ]: newValue,
 		} );
 	};

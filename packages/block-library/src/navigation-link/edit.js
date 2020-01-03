@@ -54,39 +54,19 @@ function NavigationLinkEdit( {
 	const link = {
 		title: title ? unescape( title ) : '',
 		url,
-		opensInNewTab,
+		newTab: opensInNewTab,
 	};
-	const [ isLinkOpen, setIsLinkOpen ] = useState( ! label && isSelected );
-
-	let onCloseTimerId = null;
+	const [ isLinkOpen, setIsLinkOpen ] = useState( ! url && isSelected );
 
 	/**
-	 * It's a kind of hack to handle closing the LinkControl popover
-	 * clicking on the ToolbarButton link.
+	 * This hack shouldn't be necessary but due to a focus loss happening
+	 * when selecting a suggestion in the link popover, we force close on block unselection.
 	 */
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsLinkOpen( false );
 		}
-
-		return () => {
-			// Clear LinkControl.OnClose timeout.
-			if ( onCloseTimerId ) {
-				clearTimeout( onCloseTimerId );
-			}
-		};
 	}, [ isSelected ] );
-
-	/**
-	 * Opens the LinkControl popup
-	 */
-	const openLinkControl = () => {
-		if ( isLinkOpen ) {
-			return;
-		}
-
-		setIsLinkOpen( ! isLinkOpen );
-	};
 
 	/**
 	 * `onKeyDown` LinkControl handler.
@@ -115,7 +95,7 @@ function NavigationLinkEdit( {
 					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
-							[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+							[ rawShortcut.primary( 'k' ) ]: () => setIsLinkOpen( true ),
 						} }
 					/>
 					<ToolbarButton
@@ -123,7 +103,7 @@ function NavigationLinkEdit( {
 						icon="admin-links"
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
+						onClick={ () => setIsLinkOpen( true ) }
 					/>
 					<ToolbarButton
 						name="submenu"
@@ -200,16 +180,14 @@ function NavigationLinkEdit( {
 							onChange={ ( {
 								title: newTitle = '',
 								url: newURL = '',
-								opensInNewTab: newTab,
+								newTab,
 							} = {} ) => setAttributes( {
 								title: escape( newTitle ),
 								url: newURL,
 								label: label || escape( newTitle ),
 								opensInNewTab: newTab,
 							} ) }
-							onClose={ () => {
-								onCloseTimerId = setTimeout( () => setIsLinkOpen( false ), 100 );
-							} }
+							onClose={ () => setIsLinkOpen( false ) }
 						/>
 					) }
 				</div>
