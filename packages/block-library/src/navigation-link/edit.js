@@ -50,19 +50,24 @@ function NavigationLinkEdit( {
 		url,
 		newTab: opensInNewTab,
 	};
-	const [ isLinkOpen, setIsLinkOpen ] = useState( ! url && isSelected );
+	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	const itemLabelPlaceholder = __( 'Add link…' );
 
-	/**
-	 * This hack shouldn't be necessary but due to a focus loss happening
-	 * when selecting a suggestion in the link popover, we force close on block unselection.
-	 */
+	// Show the LinkControl on mount if the URL is empty
+	// ( When adding a new menu item)
+	// This can't be done in the useState call because it cconflicts
+	// with the autofocus behavior of the BlockListBlock component.
+	useEffect( () => {
+		if ( ! url ) {
+			setIsLinkOpen( true );
+		}
+	}, [] );
+
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsLinkOpen( false );
 		}
 	}, [ isSelected ] );
-
-	const itemLabelPlaceholder = __( 'Add link…' );
 
 	return (
 		<Fragment>
@@ -147,6 +152,12 @@ function NavigationLinkEdit( {
 						placeholder={ itemLabelPlaceholder }
 						withoutInteractiveFormatting
 					/>
+					{
+						/**
+						 * The  isSelected check shouldn't be necessary but due to a focus loss happening
+						 * when selecting a suggestion in the link popover, we force close on block unselection.
+						 */
+					}
 					{ isLinkOpen && (
 						<LinkControl
 							className="wp-block-navigation-link__inline-link-input"
