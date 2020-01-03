@@ -162,6 +162,8 @@ function NavigationLinkEdit( {
 								opensInNewTab: newTab,
 							} ) }
 							onClose={ () => setIsLinkOpen( false ) }
+							text={ label }
+							onTextChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
 						/>
 					) }
 				</div>

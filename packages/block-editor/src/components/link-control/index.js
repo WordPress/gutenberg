@@ -11,6 +11,7 @@ import {
 	Button,
 	ExternalLink,
 	Popover,
+	TextControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -30,7 +31,14 @@ import {
 
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-
+import {
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN,
+	BACKSPACE,
+	ENTER,
+} from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
@@ -49,6 +57,8 @@ function LinkControl( {
 	instanceId,
 	onClose = noop,
 	onChange = noop,
+	text = '',
+	onTextChange = noop,
 } ) {
 	// State
 	const [ inputValue, setInputValue ] = useState( '' );
@@ -133,6 +143,19 @@ function LinkControl( {
 		return couldBeURL ? results[ 0 ].concat( results[ 1 ] ) : results[ 0 ];
 	};
 
+	const handleTextControlOnKeyDown = ( event ) => {
+		const { keyCode } = event;
+
+		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
+			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
+			event.stopPropagation();
+		}
+	};
+
+	const handleTextControlOnKeyPress = ( event ) => {
+		event.stopPropagation();
+	};
+
 	// Effects
 	const getSearchHandler = useCallback( ( val ) => {
 		const protocol = getProtocol( val ) || '';
@@ -215,17 +238,33 @@ function LinkControl( {
 					) }
 
 					{ isEditingLink && (
-						<LinkControlSearchInput
-							value={ inputValue }
-							onChange={ onInputChange }
-							onSelect={ ( suggestion ) => {
-								setIsEditingLink( false );
-								onChange( { ...value, ...suggestion } );
-							} }
-							renderSuggestions={ renderSearchResults }
-							fetchSuggestions={ getSearchHandler }
-							onReset={ resetInput }
-						/>
+						<>
+							<LinkControlSearchInput
+								value={ inputValue }
+								onChange={ onInputChange }
+								onSelect={ ( suggestion ) => {
+									setIsEditingLink( false );
+									onChange( { ...value, ...suggestion } );
+								} }
+								renderSuggestions={ renderSearchResults }
+								fetchSuggestions={ getSearchHandler }
+								onReset={ resetInput }
+							/>
+
+							<TextControl
+								className="block-editor-link-control__text-content"
+								label="Text content"
+								value={ text }
+								onChange={ onTextChange }
+								onKeyDown={ ( event ) => {
+									if ( event.keyCode === ENTER ) {
+										return;
+									}
+									handleTextControlOnKeyDown( event );
+								} }
+								onKeyPress={ handleTextControlOnKeyPress }
+							/>
+						</>
 					) }
 
 					{ ! isEditingLink && (

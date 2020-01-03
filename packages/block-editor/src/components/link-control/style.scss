@@ -30,6 +30,10 @@
 	}
 }
 
+.block-editor-link-control__text-content {
+	margin: $grid-size-large;
+}
+
 .block-editor-link-control__search-reset {
 	position: absolute;
 	top: 19px; // has to be hard coded as form expands with search suggestions
