@@ -21,7 +21,7 @@ function ButtonsEdit( { className } ) {
 				allowedBlocks={ ALLOWED_BLOCKS }
 				template={ BUTTONS_TEMPLATE }
 				__experimentalUIParts={ UI_PARTS }
-				__experimentalMoverDirection={ 'horizontal' }
+				__experimentalMoverDirection="horizontal"
 			/>
 		</div>
 	);
