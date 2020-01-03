@@ -14,7 +14,7 @@ import {
 	isTextField,
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
-import { BACKSPACE, DELETE, ENTER, ESCAPE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
 	getBlockType,
 	getSaveElement,
@@ -99,7 +99,6 @@ function BlockListBlock( {
 	animateOnChange,
 	enableAnimation,
 	isNavigationMode,
-	setNavigationMode,
 	isMultiSelecting,
 	isLargeViewport,
 	hasSelectedUI = true,
@@ -279,15 +278,6 @@ function BlockListBlock( {
 					event.preventDefault();
 				}
 				break;
-			case ESCAPE:
-				if (
-					isSelected &&
-					isEditMode
-				) {
-					setNavigationMode( true );
-					wrapper.current.focus();
-				}
-				break;
 		}
 	};
 
@@ -301,14 +291,6 @@ function BlockListBlock( {
 		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 		if ( event.button !== 0 ) {
 			return;
-		}
-
-		if (
-			isNavigationMode &&
-			isSelected &&
-			isInsideRootBlock( blockNodeRef.current, event.target )
-		) {
-			setNavigationMode( false );
 		}
 
 		if ( event.shiftKey ) {

@@ -17,7 +17,7 @@ import {
 	placeCaretAtVerticalEdge,
 	isEntirelySelected,
 } from '@wordpress/dom';
-import { UP, DOWN, LEFT, RIGHT, TAB, isKeyboardEvent } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, TAB, isKeyboardEvent, ESCAPE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -28,6 +28,8 @@ import {
 	isInSameBlock,
 	hasInnerBlocksContext,
 	getBlockFocusableWrapper,
+	isInsideRootBlock,
+	getBlockDOMNode,
 } from '../../utils/dom';
 import FocusCapture from './focus-capture';
 
@@ -195,8 +197,16 @@ export default function WritingFlow( { children } ) {
 	// browser behaviour across blocks.
 	const verticalRect = useRef();
 
-	function onMouseDown() {
+	function onMouseDown( event ) {
 		verticalRect.current = null;
+
+		if (
+			isNavigationMode &&
+			selectedBlockClientId &&
+			isInsideRootBlock( getBlockDOMNode( selectedBlockClientId ), event.target )
+		) {
+			setNavigationMode( false );
+		}
 	}
 
 	const {
@@ -214,6 +224,7 @@ export default function WritingFlow( { children } ) {
 		multiSelect,
 		selectBlock,
 		clearSelectedBlock,
+		setNavigationMode,
 	} = useDispatch( 'core/block-editor' );
 
 	function expandSelection( isReverse ) {
@@ -260,6 +271,7 @@ export default function WritingFlow( { children } ) {
 		const isLeft = keyCode === LEFT;
 		const isRight = keyCode === RIGHT;
 		const isTab = keyCode === TAB;
+		const isEscape = keyCode === ESCAPE;
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
@@ -307,27 +319,32 @@ export default function WritingFlow( { children } ) {
 		// which is normally the block toolbar.
 		// Arrow keys can be used, and Tab and arrow keys can be used in
 		// Navigation mode (press Esc), to navigate through blocks.
-		if ( isTab && clientId ) {
+		if ( clientId ) {
 			const wrapper = getBlockFocusableWrapper( clientId );
 
-			if ( isShift ) {
-				if ( target === wrapper ) {
-					// Disable focus capturing on the focus capture element, so
-					// it doesn't refocus this block and so it allows default
-					// behaviour (moving focus to the next tabbable element).
-					noCapture.current = true;
-					focusCaptureBeforeRef.current.focus();
-					return;
-				}
-			} else {
-				const tabbables = focus.tabbable.find( wrapper );
+			if ( isTab ) {
+				if ( isShift ) {
+					if ( target === wrapper ) {
+						// Disable focus capturing on the focus capture element, so
+						// it doesn't refocus this block and so it allows default
+						// behaviour (moving focus to the next tabbable element).
+						noCapture.current = true;
+						focusCaptureBeforeRef.current.focus();
+						return;
+					}
+				} else {
+					const tabbables = focus.tabbable.find( wrapper );
 
-				if ( target === last( tabbables ) ) {
-					// See comment above.
-					noCapture.current = true;
-					focusCaptureAfterRef.current.focus();
-					return;
+					if ( target === last( tabbables ) ) {
+						// See comment above.
+						noCapture.current = true;
+						focusCaptureAfterRef.current.focus();
+						return;
+					}
 				}
+			} else if ( isEscape ) {
+				setNavigationMode( true );
+				wrapper.focus();
 			}
 		}
 
