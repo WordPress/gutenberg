@@ -82,7 +82,7 @@ function LinkControl( {
 
 		// Populate input searcher whether
 		// the current link has a title.
-		if ( value && value.title ) {
+		if ( value && value.title && mode === 'edit' ) {
 			setInputValue( value.title );
 		}
 
@@ -113,7 +113,7 @@ function LinkControl( {
 			type = 'tel';
 		}
 
-		if ( startsWith( value, '#' ) ) {
+		if ( startsWith( val, '#' ) ) {
 			type = 'internal';
 		}
 
@@ -121,7 +121,7 @@ function LinkControl( {
 			[ {
 				id: '-1',
 				title: val,
-				url: type === 'URL' ? prependHTTP( value ) : value,
+				url: type === 'URL' ? prependHTTP( val ) : val,
 				type,
 			} ]
 		);
