@@ -303,7 +303,7 @@ transforms: {
     to: [
         {
             type: 'block',
-            blocks: [ 'core/paragraph' ],
+            blocks: [ 'core/heading' ],
             convert: function( block ) {
                 return createBlock( 'core/paragraph', {
                     content: block.attributes.content,
@@ -319,7 +319,7 @@ transforms: {
     to: [
         {
             type: 'block',
-            blocks: [ 'core/paragraph' ],
+            blocks: [ 'core/heading' ],
             convert( block ) {
                 return createBlock( 'core/paragraph', {
                     content: block.attributes.content,
