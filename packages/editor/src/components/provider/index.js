@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 import { EntityProvider } from '@wordpress/core-data';
 import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
+import { addQueryArgs, prependHTTP } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -40,6 +40,18 @@ const fetchLinkSuggestions = async ( search ) => {
 		title: decodeEntities( post.title ) || __( '(no title)' ),
 		type: post.subtype || post.type,
 	} ) );
+};
+
+const fetchRemoteURLTitle = async ( url ) => {
+	const endpoint = '/__experimental/url-details/title';
+
+	const args = {
+		url: prependHTTP( url ),
+	};
+
+	return apiFetch( {
+		path: addQueryArgs( endpoint, args ),
+	} );
 };
 
 class EditorProvider extends Component {
@@ -118,6 +130,7 @@ class EditorProvider extends Component {
 			__experimentalFetchReusableBlocks,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
+			__experimentalFetchRemoteURLTitle: fetchRemoteURLTitle,
 		};
 	}
 

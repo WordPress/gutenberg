@@ -7,10 +7,6 @@ import { isFunction, noop, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-/* eslint-disable import/no-extraneous-dependencies */
-import apiFetch from '@wordpress/api-fetch';
-/* eslint-enable import/no-extraneous-dependencies */
-
 import {
 	Button,
 	ExternalLink,
@@ -31,7 +27,6 @@ import {
 	isURL,
 	prependHTTP,
 	getProtocol,
-	addQueryArgs,
 } from '@wordpress/url';
 
 import { withInstanceId, compose } from '@wordpress/compose';
@@ -51,6 +46,7 @@ function LinkControl( {
 	currentLink,
 	currentSettings,
 	fetchSearchSuggestions,
+	fetchRemoteURLTitle,
 	instanceId,
 	onClose = noop,
 	onChangeMode = noop,
@@ -116,21 +112,7 @@ function LinkControl( {
 		setInputValue( '' );
 	};
 
-	const fetchRemoteURLTitle = ( value ) => {
-		const endpoint = '/__experimental/url-details/title';
-
-		const args = {
-			url: prependHTTP( value ),
-		};
-
-		const queryArgs = addQueryArgs( endpoint, args );
-
-		return apiFetch( {
-			path: queryArgs,
-		} );
-	};
-
-	const handleDirectEntry = ( value ) => {
+	const handleDirectEntry = async ( value ) => {
 		let type = 'URL';
 
 		const protocol = getProtocol( value ) || '';
@@ -159,17 +141,18 @@ function LinkControl( {
 		// * avoid invalid requests for incomplete URLS
 		// * avoid concurrent requests - cancel existing AJAX requests if already pending
 		if ( type === 'URL' && isURL( prependHTTP( value ) ) ) {
-			return fetchRemoteURLTitle( value ).then( ( title ) => {
+			try {
+				const urlTitle = await fetchRemoteURLTitle( value );
 				return [ {
 					...defaultResponse,
-					title: title || value,
+					title: urlTitle || value,
 				} ];
-			} ).catch( () => [ defaultResponse ] );
+			} catch ( error ) {
+				return [ defaultResponse ];
+			}
 		}
 
-		return Promise.resolve(
-			[ defaultResponse ]
-		);
+		return [ defaultResponse ];
 	};
 
 	const handleEntitySearch = async ( value ) => {
@@ -297,6 +280,7 @@ export default compose(
 		const { getSettings } = select( 'core/block-editor' );
 		return {
 			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
+			fetchRemoteURLTitle: getSettings().__experimentalFetchRemoteURLTitle,
 		};
 	} )
 )( LinkControl );
