@@ -34,8 +34,6 @@ import {
 } from '../../utils/dom';
 import FocusCapture from './focus-capture';
 
-/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
-
 /**
  * Browser constants
  */
@@ -474,40 +472,6 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	/**
-	 * Marks the block as selected when focused and not already selected. This
-	 * specifically handles the case where block does not set focus on its own
-	 * (via `setFocus`), typically if there is no focusable input in the block.
-	 *
-	 * @param {WPSyntheticEvent} event
-	 */
-	function onFocus( event ) {
-		if ( hasMultiSelection ) {
-			return;
-		}
-
-		const clientId = getBlockClientId( event.target );
-
-		if ( clientId && clientId !== selectedBlockClientId ) {
-			selectBlock( clientId );
-		}
-	}
-
-	/**
-	 * Prevents default dragging behavior within a block.
-	 * To do: we must handle this in the future and clean up the drag target.
-	 * Previously dragging was prevented for multi-selected, but this is no longer
-	 * needed.
-	 *
-	 * @param {WPSyntheticEvent} event Synthetic drag event.
-	 */
-	function preventDrag( event ) {
-		// Ensure we target block content, not block controls.
-		if ( getBlockClientId( event.target ) ) {
-			event.preventDefault();
-		}
-	}
-
 	function focusLastTextField() {
 		const focusableNodes = focus.focusable.find( container.current );
 		const target = findLast( focusableNodes, isTabbableTextField );
@@ -531,10 +495,8 @@ export default function WritingFlow( { children } ) {
 			/>
 			<div
 				ref={ container }
-				onFocus={ onFocus }
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
-				onDragStart={ preventDrag }
 			>
 				{ children }
 			</div>
