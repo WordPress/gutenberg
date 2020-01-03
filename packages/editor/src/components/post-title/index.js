@@ -111,7 +111,7 @@ class PostTitle extends Component {
 								*/
 								/* eslint-disable jsx-a11y/no-autofocus */
 								autoFocus={ document.body === document.activeElement && isCleanNewPost }
-							/* eslint-enable jsx-a11y/no-autofocus */
+								/* eslint-enable jsx-a11y/no-autofocus */
 							/>
 						</div>
 						{ isSelected && isPostTypeViewable && <PostPermalink /> }
