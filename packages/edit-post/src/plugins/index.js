@@ -4,7 +4,6 @@
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -23,14 +22,6 @@ registerPlugin( 'edit-post', {
 					{ ( { onClose } ) => (
 						<>
 							<ManageBlocksMenuItem onSelect={ onClose } />
-							<MenuItem
-								role="menuitem"
-								href={ addQueryArgs( 'edit.php', {
-									post_type: 'wp_block',
-								} ) }
-							>
-								{ __( 'Manage all reusable blocks' ) }
-							</MenuItem>
 							<KeyboardShortcutsHelpMenuItem
 								onSelect={ onClose }
 							/>

@@ -79,6 +79,13 @@ function BlockManager( {
 						blockTypes={ filter( blockTypes, {
 							category: category.slug,
 						} ) }
+						callToAction={
+							category.slug === 'reusable' ? (
+								<a href="https://google.com">Test</a>
+							) : (
+								undefined
+							)
+						}
 					/>
 				) ) }
 			</div>

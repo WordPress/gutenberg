@@ -18,6 +18,7 @@ import BlockTypesChecklist from './checklist';
 import EditPostSettings from '../edit-post-settings';
 
 function BlockManagerCategory( {
+	callToAction,
 	instanceId,
 	category,
 	blockTypes,
@@ -65,13 +66,15 @@ function BlockManagerCategory( {
 			aria-labelledby={ titleId }
 			className="edit-post-manage-blocks-modal__category"
 		>
-			<CheckboxControl
-				checked={ isAllChecked }
-				onChange={ toggleAllVisible }
-				className="edit-post-manage-blocks-modal__category-title"
-				aria-checked={ ariaChecked }
-				label={ <span id={ titleId }>{ category.title }</span> }
-			/>
+			<div className="edit-post-manage-blocks-modal__category-title">
+				<CheckboxControl
+					checked={ isAllChecked }
+					onChange={ toggleAllVisible }
+					aria-checked={ ariaChecked }
+					label={ <span id={ titleId }>{ category.title }</span> }
+				/>
+				{ callToAction }
+			</div>
 			<BlockTypesChecklist
 				blockTypes={ filteredBlockTypes }
 				value={ checkedBlockNames }
