@@ -20,6 +20,15 @@ import { displayShortcut, shortcutAriaLabel, rawShortcut } from '@wordpress/keyc
 const EMPTY_ARRAY = [];
 
 /**
+ * {{[string]:Function}} Shortcut Formatting Methods.
+ */
+const FORMATTING_METHODS = {
+	display: displayShortcut,
+	raw: rawShortcut,
+	ariaLabel: shortcutAriaLabel,
+};
+
+/**
  * Returns a string representing the key combination.
  *
  * @param {WPShortcutKeyCombination} shortcut  Key combination.
@@ -32,14 +41,8 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
 		return null;
 	}
 
-	const formattingMethods = {
-		display: displayShortcut,
-		raw: rawShortcut,
-		ariaLabel: shortcutAriaLabel,
-	};
-
 	return shortcut.modifier ?
-		formattingMethods[ representation ][ shortcut.modifier ]( shortcut.character ) :
+		FORMATTING_METHODS[ representation ][ shortcut.modifier ]( shortcut.character ) :
 		shortcut.character;
 }
 
