@@ -331,6 +331,94 @@ transforms: {
 ```
 {% end %}
 
+It can also be transformed to multiple blocks by returning an array of blocks from the `convert` function.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			convert: function( block ) {
+				var words = block.attributes.content.split( ' ' );
+
+				return words.map( function( word ) {
+					return createBlock( 'core/paragraph', {
+						content: word,
+					} );
+				} );
+			},
+		},
+	],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			convert( block ) {
+				const words = block.attributes.content.split( ' ' );
+
+				return words.map( ( word ) => {
+					return createBlock( 'core/paragraph', {
+						content: word,
+					} );
+				} );
+			},
+		},
+	],
+},
+```
+{% end %}
+
+Similarly, multiple blocks can be transformed to one or more blocks. Including an `isMultiBlock` property value of `true` will indicate that the `convert` function should receive an array of blocks. Currently, multi-block transforms are only supported for blocks of the same type. For example, multiple Paragraph blocks can be converted to a List block.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+	to: [
+		{
+			type: 'block',
+			isMultiBlock: true,
+			blocks: [ 'core/paragraph' ],
+			convert: function( blocks ) {
+				return createBlock( 'core/list', {
+					values: blocks.reduce( function( result, block ) {
+						return result + '<li>' + block.attributes.content + '</li>';
+					}, '' ),
+				} );
+			},
+		},
+	],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+	to: [
+		{
+			type: 'block',
+			isMultiBlock: true,
+			blocks: [ 'core/paragraph' ],
+			convert( blocks ) {
+				return createBlock( 'core/list', {
+					values: blocks.reduce( ( result, block ) => {
+						return result + '<li>' + block.attributes.content + '</li>';
+					}, '' ),
+				} );
+			},
+		},
+	],
+},
+```
+{% end %}
+
 In addition to accepting an array of known block types, the `blocks` option also accepts a "wildcard" (`"*"`). This allows for transformations which apply to _all_ block types (eg: all blocks can transform into `core/group`):
 
 {% codetabs %}
