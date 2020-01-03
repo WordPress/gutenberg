@@ -11,7 +11,7 @@ const transforms = {
 				'wp-block': { attributes: [ 'data-block' ] },
 			},
 			isMatch: ( node ) => node.dataset && node.dataset.block === 'core/nextpage',
-			transform() {
+			convert() {
 				return createBlock( 'core/nextpage', {} );
 			},
 		},

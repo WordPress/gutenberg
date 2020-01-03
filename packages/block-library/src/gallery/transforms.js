@@ -30,14 +30,14 @@ const transforms = {
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ 'core/image' ],
-			transform: ( attributes ) => {
+			convert: ( blocks ) => {
 				// Init the align and size from the first item which may be either the placeholder or an image.
-				let { align, sizeSlug } = attributes[ 0 ];
+				let { align, sizeSlug } = blocks[ 0 ].attributes;
 				// Loop through all the images and check if they have the same align and size.
-				align = every( attributes, [ 'align', align ] ) ? align : undefined;
-				sizeSlug = every( attributes, [ 'sizeSlug', sizeSlug ] ) ? sizeSlug : undefined;
+				align = every( blocks, [ 'attributes', 'align', align ] ) ? align : undefined;
+				sizeSlug = every( blocks, [ 'attributes', 'sizeSlug', sizeSlug ] ) ? sizeSlug : undefined;
 
-				const validImages = filter( attributes, ( { url } ) => url );
+				const validImages = filter( blocks, ( { attributes } ) => attributes.url );
 
 				return createBlock( 'core/gallery', {
 					images: validImages.map( ( { id, url, alt, caption } ) => ( {
@@ -90,7 +90,7 @@ const transforms = {
 			isMatch( files ) {
 				return files.length !== 1 && every( files, ( file ) => file.type.indexOf( 'image/' ) === 0 );
 			},
-			transform( files ) {
+			convert( files ) {
 				const block = createBlock( 'core/gallery', {
 					images: files.map( ( file ) => pickRelevantMediaFiles( {
 						url: createBlobURL( file ),
@@ -104,7 +104,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { images, align, sizeSlug } ) => {
+			convert: ( { attributes: { images, align, sizeSlug } } ) => {
 				if ( images.length > 0 ) {
 					return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', {
 						id,

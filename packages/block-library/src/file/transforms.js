@@ -20,7 +20,7 @@ const transforms = {
 			// We define a lower priorty (higher number) than the default of 10. This
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
-			transform: ( files ) => {
+			convert: ( files ) => {
 				const blocks = [];
 
 				files.forEach( ( file ) => {
@@ -40,36 +40,36 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/audio' ],
-			transform: ( attributes ) => {
+			convert: ( block ) => {
 				return createBlock( 'core/file', {
-					href: attributes.src,
-					fileName: attributes.caption,
-					textLinkHref: attributes.src,
-					id: attributes.id,
+					href: block.attributes.src,
+					fileName: block.attributes.caption,
+					textLinkHref: block.attributes.src,
+					id: block.attributes.id,
 				} );
 			},
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
-			transform: ( attributes ) => {
+			convert: ( block ) => {
 				return createBlock( 'core/file', {
-					href: attributes.src,
-					fileName: attributes.caption,
-					textLinkHref: attributes.src,
-					id: attributes.id,
+					href: block.attributes.src,
+					fileName: block.attributes.caption,
+					textLinkHref: block.attributes.src,
+					id: block.attributes.id,
 				} );
 			},
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( attributes ) => {
+			convert: ( block ) => {
 				return createBlock( 'core/file', {
-					href: attributes.url,
-					fileName: attributes.caption,
-					textLinkHref: attributes.url,
-					id: attributes.id,
+					href: block.attributes.url,
+					fileName: block.attributes.caption,
+					textLinkHref: block.attributes.url,
+					id: block.attributes.id,
 				} );
 			},
 		},
@@ -86,11 +86,11 @@ const transforms = {
 				const media = getMedia( id );
 				return !! media && includes( media.mime_type, 'audio' );
 			},
-			transform: ( attributes ) => {
+			convert: ( block ) => {
 				return createBlock( 'core/audio', {
-					src: attributes.href,
-					caption: attributes.fileName,
-					id: attributes.id,
+					src: block.attributes.href,
+					caption: block.attributes.fileName,
+					id: block.attributes.id,
 				} );
 			},
 		},
@@ -105,11 +105,11 @@ const transforms = {
 				const media = getMedia( id );
 				return !! media && includes( media.mime_type, 'video' );
 			},
-			transform: ( attributes ) => {
+			convert: ( block ) => {
 				return createBlock( 'core/video', {
-					src: attributes.href,
-					caption: attributes.fileName,
-					id: attributes.id,
+					src: block.attributes.href,
+					caption: block.attributes.fileName,
+					id: block.attributes.id,
 				} );
 			},
 		},
@@ -124,11 +124,11 @@ const transforms = {
 				const media = getMedia( id );
 				return !! media && includes( media.mime_type, 'image' );
 			},
-			transform: ( attributes ) => {
+			convert: ( block ) => {
 				return createBlock( 'core/image', {
-					url: attributes.href,
-					caption: attributes.fileName,
-					id: attributes.id,
+					url: block.attributes.href,
+					caption: block.attributes.fileName,
+					id: block.attributes.id,
 				} );
 			},
 		},

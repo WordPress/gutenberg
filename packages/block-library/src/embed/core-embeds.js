@@ -155,10 +155,10 @@ export const others = [
 			title: 'Crowdsignal',
 			icon: embedContentIcon,
 			keywords: [ 'polldaddy' ],
-			transform: [ {
+			convert: [ {
 				type: 'block',
 				blocks: [ 'core-embed/polldaddy' ],
-				transform: ( content ) => {
+				convert: ( content ) => {
 					return createBlock( 'core-embed/crowdsignal', {
 						content,
 					} );
@@ -316,10 +316,10 @@ export const others = [
 		settings: {
 			title: 'Speaker Deck',
 			icon: embedContentIcon,
-			transform: [ {
+			convert: [ {
 				type: 'block',
 				blocks: [ 'core-embed/speaker' ],
-				transform: ( content ) => {
+				convert: ( content ) => {
 					return createBlock( 'core-embed/speaker-deck', {
 						content,
 					} );

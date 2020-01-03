@@ -8,16 +8,16 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( attributes ) =>
-				createBlock( 'core/verse', attributes ),
+			convert: ( block ) =>
+				createBlock( 'core/verse', block.attributes ),
 		},
 	],
 	to: [
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( attributes ) =>
-				createBlock( 'core/paragraph', attributes ),
+			convert: ( block ) =>
+				createBlock( 'core/paragraph', block.attributes ),
 		},
 	],
 };

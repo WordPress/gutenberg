@@ -8,7 +8,7 @@ const transforms = {
 		{
 			type: 'enter',
 			regExp: /^-{3,}$/,
-			transform: () => createBlock( 'core/separator' ),
+			convert: () => createBlock( 'core/separator' ),
 		},
 		{
 			type: 'raw',

@@ -11,7 +11,6 @@ import {
 	filter,
 	first,
 	flatMap,
-	has,
 	uniq,
 	isFunction,
 	isEmpty,
@@ -22,6 +21,7 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -355,10 +355,52 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 	}
 
 	// Map transforms to normal form.
-	return transforms[ direction ].map( ( transform ) => ( {
-		...transform,
-		blockName,
-	} ) );
+	return transforms[ direction ].map( ( transform ) => {
+		let { convert } = transform;
+		if ( convert === undefined && transform.transform ) {
+			deprecated( 'Block transformation `transform` method', {
+				alternative: '`convert` method',
+				hint: 'The `convert` method receives the full block object(s).',
+			} );
+
+			const originalTransform = transform.transform;
+			convert = transform.isMultiBlock ?
+				( blocks ) => originalTransform(
+					blocks.map( ( currentBlock ) => currentBlock.attributes ),
+					blocks.map( ( currentBlock ) => currentBlock.innerBlocks ),
+				) :
+				( block ) => originalTransform( block.attributes, block.innerBlocks );
+		}
+
+		transform = {
+			...transform,
+			blockName,
+			convert,
+		};
+
+		// Inject compatibility for deprecated transform if was assigned.
+		if ( transform.transform ) {
+			transform.transform = ( attributes, innerBlocks ) => {
+				const { type = 'block' } = transform;
+
+				deprecated( 'Block transformation `transform` method', {
+					alternative: '`convert` method',
+					hint: 'The `convert` method receives the full block object(s).',
+				} );
+
+				// Custom transformation types aren't expecting to receive
+				// blocks as argument.
+				if ( type !== 'block' ) {
+					return convert( ...arguments );
+				}
+
+				const block = createBlock( blockName, attributes, innerBlocks );
+				return convert( transform.isMultiBlock ? [ block ] : block );
+			};
+		}
+
+		return transform;
+	} );
 }
 
 /**
@@ -402,22 +444,7 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	let transformationResults;
-
-	if ( transformation.isMultiBlock ) {
-		if ( has( transformation, 'convert' ) ) {
-			transformationResults = transformation.convert( blocksArray );
-		} else {
-			transformationResults = transformation.transform(
-				blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
-				blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks ),
-			);
-		}
-	} else if ( has( transformation, 'convert' ) ) {
-		transformationResults = transformation.convert( firstBlock );
-	} else {
-		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks );
-	}
+	let transformationResults = transformation.convert( isMultiBlock ? blocksArray : firstBlock );
 
 	// Ensure that the transformation function returned an object or an array
 	// of objects.

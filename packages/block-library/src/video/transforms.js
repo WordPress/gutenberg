@@ -11,7 +11,7 @@ const transforms = {
 			isMatch( files ) {
 				return files.length === 1 && files[ 0 ].type.indexOf( 'video/' ) === 0;
 			},
-			transform( files ) {
+			convert( files ) {
 				const file = files[ 0 ];
 				// We don't need to upload the media directly here
 				// It's already done as part of the `componentDidMount`

@@ -206,7 +206,7 @@ describe( 'effects', () => {
 					to: [ {
 						type: 'block',
 						blocks: [ 'core/test-block' ],
-						transform: ( { content2 } ) => {
+						convert: ( { attributes: { content2 } } ) => {
 							return createBlock( 'core/test-block', {
 								content: content2,
 							} );

@@ -68,7 +68,7 @@ class BlockDropZone extends Component {
 
 		if ( transformation ) {
 			const insertIndex = this.getInsertIndex( position );
-			const blocks = transformation.transform( files, this.props.updateBlockAttributes );
+			const blocks = transformation.convert( files, this.props.updateBlockAttributes );
 			this.props.insertBlocks( blocks, insertIndex );
 		}
 	}

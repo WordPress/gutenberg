@@ -64,10 +64,10 @@ function htmlToBlocks( { html, rawTransforms } ) {
 			);
 		}
 
-		const { transform, blockName } = rawTransform;
+		const { convert, blockName } = rawTransform;
 
-		if ( transform ) {
-			return transform( node );
+		if ( convert ) {
+			return convert( node );
 		}
 
 		return createBlock(

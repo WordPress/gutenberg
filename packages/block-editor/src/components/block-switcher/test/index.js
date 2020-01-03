@@ -58,12 +58,12 @@ describe( 'BlockSwitcher', () => {
 					{
 						type: 'block',
 						blocks: [ 'core/paragraph' ],
-						transform: () => {},
+						convert: () => {},
 					},
 					{
 						type: 'block',
 						blocks: [ 'core/paragraph' ],
-						transform: () => {},
+						convert: () => {},
 						isMultiBlock: true,
 					},
 				],
@@ -79,7 +79,7 @@ describe( 'BlockSwitcher', () => {
 				to: [ {
 					type: 'block',
 					blocks: [ 'core/heading' ],
-					transform: () => {},
+					convert: () => {},
 				} ],
 			},
 		} );

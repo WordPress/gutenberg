@@ -204,9 +204,9 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            transform: function ( attributes ) {
+            convert: function ( block ) {
                 return createBlock( 'core/heading', {
-                    content: attributes.content,
+                    content: block.attributes.content,
                 } );
             },
         },
@@ -220,7 +220,7 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            transform: ( { content } ) => {
+            convert( { attributes: { content } } ) {
                 return createBlock( 'core/heading', {
                     content,
                 } );
@@ -304,9 +304,9 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            transform: function( attributes ) {
+            convert: function( block ) {
                 return createBlock( 'core/paragraph', {
-                    content: attributes.content,
+                    content: block.attributes.content,
                 } );
             },
         },
@@ -320,7 +320,7 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            transform: ( { content } ) => {
+            convert( { attributes: { content } } ) {
                 return createBlock( 'core/paragraph', {
                     content,
                 } );
@@ -341,7 +341,7 @@ transforms: {
         {
             type: 'block',
             blocks: [ '*' ], // wildcard - match any block
-            transform: function( attributes, innerBlocks ) {
+            convert: function( block ) {
                 // transform logic here
             },
         },
@@ -355,7 +355,7 @@ transforms: {
         {
             type: 'block',
             blocks: [ '*' ], // wildcard - match any block
-            transform: ( attributes, innerBlocks ) => {
+            convert( block ) {
                 // transform logic here
             },
         },
@@ -375,8 +375,8 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'some/block-with-innerblocks' ],
-            transform: function( attributes, innerBlocks ) {
-                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks );
+            convert: function( block ) {
+                return createBlock( 'some/other-block-with-innerblocks', block.attributes, block.innerBlocks );
             },
         },
     ],
@@ -389,8 +389,8 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'some/block-with-innerblocks' ],
-            transform: ( attributes, innerBlocks ) => {
-                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks);
+            convert: ( block ) => {
+                return createBlock( 'some/other-block-with-innerblocks', block.attributes, block.innerBlocks );
             },
         },
     ],
@@ -411,9 +411,9 @@ transforms: {
 			isMatch: function( attributes ) {
 				return attributes.isText;
 			},
-            transform: function( attributes ) {
+            convert: function( block ) {
                 return createBlock( 'core/paragraph', {
-                    content: attributes.content,
+                    content: block.attributes.content,
                 } );
             },
         },
@@ -428,7 +428,7 @@ transforms: {
             type: 'block',
 			blocks: [ 'core/paragraph' ],
 			isMatch: ( { isText } ) => isText,
-            transform: ( { content } ) => {
+            convert( { attributes: { content } } ) {
                 return createBlock( 'core/paragraph', {
                     content,
                 } );
@@ -474,7 +474,7 @@ transforms: {
 			// We define a lower priority (higher number) than the default of 10. This
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
-			transform: function( files ) {
+			convert: function( files ) {
 				var file = files[ 0 ];
 				var blobURL = createBlobURL( file );
 
@@ -499,7 +499,7 @@ transforms: {
 			// We define a lower priority (higher number) than the default of 10. This
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
-			transform: ( files ) => {
+			convert( files ) {
 				const file = files[ 0 ];
 				const blobURL = createBlobURL( file );
 
@@ -526,7 +526,7 @@ transforms: {
         {
             type: 'prefix',
             prefix: '?',
-            transform: function( content ) {
+            convert: function( content ) {
                 return createBlock( 'my-plugin/question', {
                     content,
                 } );
@@ -542,7 +542,7 @@ transforms: {
         {
             type: 'prefix',
             prefix: '?',
-            transform( content ) {
+            convert( content ) {
                 return createBlock( 'my-plugin/question', {
                     content,
                 } );
