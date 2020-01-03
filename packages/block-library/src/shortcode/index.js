@@ -26,6 +26,12 @@ export const settings = {
 		className: false,
 		html: false,
 	},
+	attributes: {
+		text: {
+			type: 'string',
+			source: 'html',
+		},
+	},
 	edit,
 	save,
 };
