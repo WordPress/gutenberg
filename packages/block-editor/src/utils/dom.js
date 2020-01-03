@@ -87,6 +87,13 @@ export function hasInnerBlocksContext( element ) {
 	return !! element.querySelector( '.block-editor-block-list__layout' );
 }
 
+/**
+ * Finds the block client ID given any DOM node inside the block.
+ *
+ * @param {Node} node DOM node.
+ *
+ * @return {?string} Client ID or undefined if the node is not part of a block.
+ */
 export function getBlockClientId( node ) {
 	if ( node.nodeType !== node.ELEMENT_NODE ) {
 		node = node.parentElement;
