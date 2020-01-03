@@ -45,20 +45,10 @@ import BlockHtml from './block-html';
 import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockInsertionPoint from './insertion-point';
-import IgnoreNestedEvents from '../ignore-nested-events';
 import Inserter from '../inserter';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { ChildToolbar, ChildToolbarSlot } from './block-child-toolbar';
-/**
- * Prevents default dragging behavior within a block to allow for multi-
- * selection to take effect unhampered.
- *
- * @param {DragEvent} event Drag event.
- */
-const preventDrag = ( event ) => {
-	event.preventDefault();
-};
 
 function BlockListBlock( {
 	mode,
@@ -94,7 +84,6 @@ function BlockListBlock( {
 	onRemove,
 	onInsertDefaultBlockAfter,
 	toggleSelection,
-	onShiftSelection,
 	onSelectionStart,
 	animateOnChange,
 	enableAnimation,
@@ -231,17 +220,6 @@ function BlockListBlock( {
 	// Other event handlers
 
 	/**
-	 * Marks the block as selected when focused and not already selected. This
-	 * specifically handles the case where block does not set focus on its own
-	 * (via `setFocus`), typically if there is no focusable input in the block.
-	 */
-	const onFocus = () => {
-		if ( ! isSelected && ! isPartOfMultiSelection ) {
-			onSelect();
-		}
-	};
-
-	/**
 	 * Interprets keydown event intent to remove or insert after block if key
 	 * event occurs on wrapper node. This can occur when the block has no text
 	 * fields of its own, particularly after initial insertion, to allow for
@@ -278,34 +256,6 @@ function BlockListBlock( {
 					event.preventDefault();
 				}
 				break;
-		}
-	};
-
-	/**
-	 * Begins tracking cursor multi-selection when clicking down within block.
-	 *
-	 * @param {MouseEvent} event A mousedown event.
-	 */
-	const onMouseDown = ( event ) => {
-		// Not the main button.
-		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-		if ( event.button !== 0 ) {
-			return;
-		}
-
-		if ( event.shiftKey ) {
-			if ( ! isSelected ) {
-				onShiftSelection();
-				event.preventDefault();
-			}
-
-		// Allow user to escape out of a multi-selection to a singular
-		// selection of a block via click. This is handled here since
-		// onFocus excludes blocks involved in a multiselection, as
-		// focus can be incurred by starting a multiselection (focus
-		// moved to first block's multi-controls).
-		} else if ( isPartOfMultiSelection ) {
-			onSelect();
 		}
 	};
 
@@ -451,18 +401,15 @@ function BlockListBlock( {
 	);
 
 	return (
-		<IgnoreNestedEvents
+		<animated.div
 			id={ blockElementId }
 			ref={ wrapper }
 			className={ wrapperClassName }
 			data-type={ name }
-			onFocus={ onFocus }
 			onKeyDown={ onKeyDown }
 			tabIndex="0"
 			aria-label={ blockLabel }
 			role="group"
-			childHandledEvents={ [ 'onDragStart', 'onMouseDown' ] }
-			tagName={ animated.div }
 			{ ...wrapperProps }
 			style={
 				wrapperProps && wrapperProps.style ?
@@ -524,10 +471,8 @@ function BlockListBlock( {
 					) }
 				</Popover>
 			) }
-			<IgnoreNestedEvents
+			<div
 				ref={ blockNodeRef }
-				onDragStart={ preventDrag }
-				onMouseDown={ onMouseDown }
 				onMouseLeave={ onMouseLeave }
 				data-block={ clientId }
 			>
@@ -547,7 +492,7 @@ function BlockListBlock( {
 					] }
 				</BlockCrashBoundary>
 				{ !! hasError && <BlockCrashWarning /> }
-			</IgnoreNestedEvents>
+			</div>
 			{ showEmptyBlockSideInserter && (
 				<div className="block-editor-block-list__empty-block-inserter">
 					<Inserter
@@ -558,7 +503,7 @@ function BlockListBlock( {
 					/>
 				</div>
 			) }
-		</IgnoreNestedEvents>
+		</animated.div>
 	);
 }
 
@@ -662,7 +607,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	const {
 		updateBlockAttributes,
 		selectBlock,
-		multiSelect,
 		insertBlocks,
 		insertDefaultBlock,
 		removeBlock,
@@ -731,21 +675,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 				__unstableMarkLastChangeAsPersistent();
 			}
 			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
-		},
-		onShiftSelection() {
-			if ( ! ownProps.isSelectionEnabled ) {
-				return;
-			}
-
-			const {
-				getBlockSelectionStart,
-			} = select( 'core/block-editor' );
-
-			if ( getBlockSelectionStart() ) {
-				multiSelect( getBlockSelectionStart(), ownProps.clientId );
-			} else {
-				selectBlock( ownProps.clientId );
-			}
 		},
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );

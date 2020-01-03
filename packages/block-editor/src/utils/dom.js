@@ -86,3 +86,17 @@ export function isInsideRootBlock( blockElement, element ) {
 export function hasInnerBlocksContext( element ) {
 	return !! element.querySelector( '.block-editor-block-list__layout' );
 }
+
+export function getBlockClientId( node ) {
+	if ( node.nodeType !== node.ELEMENT_NODE ) {
+		node = node.parentElement;
+	}
+
+	const blockNode = node.closest( '.wp-block' );
+
+	if ( ! blockNode ) {
+		return;
+	}
+
+	return blockNode.id.slice( 'block-'.length );
+}
