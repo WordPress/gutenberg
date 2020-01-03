@@ -46,7 +46,9 @@
 			"default": [ ]
 		},
 		"columns": {
-			"type": "number"
+			"type": "number",
+			"minimum": 1,
+			"maximum": 8
 		},
 		"caption": {
 			"type": "string",
