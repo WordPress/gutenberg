@@ -48,7 +48,6 @@ function LinkControl( {
 	fetchSearchSuggestions,
 	instanceId,
 	onClose = noop,
-	onChangeMode = noop,
 	onChange = noop,
 } ) {
 	// State
@@ -71,7 +70,6 @@ function LinkControl( {
 	/**
 	 * Handler function which switches the mode of the component,
 	 * between `edit` and `show` mode.
-	 * Also, it calls `onChangeMode` callback function.
 	 *
 	 * @param {string} mode Component mode: `show` or `edit`.
 	 */
@@ -82,10 +80,6 @@ function LinkControl( {
 		// the current link has a title.
 		if ( value && value.title && mode === 'edit' ) {
 			setInputValue( value.title );
-		}
-
-		if ( isFunction( onChangeMode ) ) {
-			onChangeMode( mode );
 		}
 	};
 
