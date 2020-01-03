@@ -220,9 +220,9 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            convert( { attributes: { content } } ) {
+            convert( block ) {
                 return createBlock( 'core/heading', {
-                    content,
+                    content: block.attributes.content,
                 } );
             },
         },
@@ -320,9 +320,9 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            convert( { attributes: { content } } ) {
+            convert( block ) {
                 return createBlock( 'core/paragraph', {
-                    content,
+                    content: block.attributes.content,
                 } );
             },
         },
@@ -394,9 +394,9 @@ transforms: {
             type: 'block',
 			blocks: [ 'core/paragraph' ],
 			isMatch: ( { isText } ) => isText,
-            convert( { attributes: { content } } ) {
+            convert( block ) {
                 return createBlock( 'core/paragraph', {
-                    content,
+                    content: block.attributes.content,
                 } );
             },
         },
