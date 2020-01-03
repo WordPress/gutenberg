@@ -54,16 +54,6 @@ through of its function parameter.
 - Type: `Function`
 - Required: No
 
-### onKeyDown
-
-- Type: `Function`
-- Required: No
-
-### onKeyPress
-
-- Type: `Function`
-- Required: No
-
 ### onChange
 
 - Type: `Function`
