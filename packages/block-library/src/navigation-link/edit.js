@@ -42,35 +42,6 @@ import {
 } from '@wordpress/block-editor';
 import { Fragment, useState, useEffect } from '@wordpress/element';
 
-/**
- * It updates the link attribute when the
- * link settings changes.
- *
- * @param {Function} setter Setter attribute function.
- */
-const updateLinkSetting = ( setter ) => ( setting, value ) => {
-	setter( { [ setting ]: value } );
-};
-
-/**
- * Updates the link attribute when it changes
- * through of the `onLinkChange` LinkControl callback.
- *
- * @param {Function} setter Setter attribute function.
- * @param {string} label Link label.
- */
-const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = '' } = {} ) => {
-	setter( {
-		title: escape( newTitle ),
-		url: newURL,
-	} );
-
-	// Set the item label as well if it isn't already defined.
-	if ( ! label ) {
-		setter( { label: escape( newTitle ) } );
-	}
-};
-
 function NavigationLinkEdit( {
 	attributes,
 	hasDescendants,
@@ -80,7 +51,11 @@ function NavigationLinkEdit( {
 	insertLinkBlock,
 } ) {
 	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
-	const link = title ? { title: unescape( title ), url } : null;
+	const link = {
+		title: title ? unescape( title ) : '',
+		url,
+		opensInNewTab,
+	};
 	const [ isLinkOpen, setIsLinkOpen ] = useState( ! label && isSelected );
 
 	let onCloseTimerId = null;
@@ -221,19 +196,20 @@ function NavigationLinkEdit( {
 							className="wp-block-navigation-link__inline-link-input"
 							onKeyDown={ handleLinkControlOnKeyDown }
 							onKeyPress={ ( event ) => event.stopPropagation() }
-							currentLink={ link }
-							onLinkChange={ updateLink( setAttributes, label ) }
+							value={ link }
+							onChange={ ( {
+								title: newTitle = '',
+								url: newURL = '',
+								opensInNewTab: newTab,
+							} = {} ) => setAttributes( {
+								title: escape( newTitle ),
+								url: newURL,
+								label: label || escape( newTitle ),
+								opensInNewTab: newTab,
+							} ) }
 							onClose={ () => {
 								onCloseTimerId = setTimeout( () => setIsLinkOpen( false ), 100 );
 							} }
-							currentSettings={ [
-								{
-									id: 'opensInNewTab',
-									title: __( 'Open in new tab' ),
-									checked: opensInNewTab,
-								},
-							] }
-							onSettingsChange={ updateLinkSetting( setAttributes ) }
 						/>
 					) }
 				</div>

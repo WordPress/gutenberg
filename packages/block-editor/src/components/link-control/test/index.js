@@ -318,7 +318,7 @@ describe( 'Selecting links', () => {
 
 			return (
 				<LinkControl
-					currentLink={ link }
+					value={ link }
 					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 				/>
 			);
@@ -350,8 +350,8 @@ describe( 'Selecting links', () => {
 
 			return (
 				<LinkControl
-					currentLink={ link }
-					onLinkChange={ ( suggestion ) => setLink( suggestion ) }
+					value={ link }
+					onChange={ ( suggestion ) => setLink( suggestion ) }
 					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 					onChangeMode={ spyOnEditMode( 'edit' ) }
 				/>
@@ -398,8 +398,8 @@ describe( 'Selecting links', () => {
 
 				return (
 					<LinkControl
-						currentLink={ link }
-						onLinkChange={ ( suggestion ) => setLink( suggestion ) }
+						value={ link }
+						onChange={ ( suggestion ) => setLink( suggestion ) }
 						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 					/>
 				);
@@ -458,8 +458,8 @@ describe( 'Selecting links', () => {
 
 				return (
 					<LinkControl
-						currentLink={ link }
-						onLinkChange={ ( suggestion ) => setLink( suggestion ) }
+						value={ link }
+						onChange={ ( suggestion ) => setLink( suggestion ) }
 						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 					/>
 				);
@@ -547,7 +547,7 @@ describe( 'Addition Settings UI', () => {
 
 			return (
 				<LinkControl
-					currentLink={ link }
+					value={ link }
 					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 				/>
 			);
@@ -577,12 +577,10 @@ describe( 'Addition Settings UI', () => {
 			{
 				id: 'newTab',
 				title: 'Open in New Tab',
-				checked: false,
 			},
 			{
 				id: 'noFollow',
 				title: 'No follow',
-				checked: true,
 			},
 		];
 
@@ -593,9 +591,9 @@ describe( 'Addition Settings UI', () => {
 
 			return (
 				<LinkControl
-					currentLink={ link }
+					value={ { ...link, newTab: false, noFollow: true } }
 					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-					currentSettings={ customSettings }
+					settings={ customSettings }
 				/>
 			);
 		};
