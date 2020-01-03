@@ -50,6 +50,14 @@ function BlockListAppender( {
 		);
 	}
 
+	// A `tabIndex` is used on the wrapping `div` element in order to force a
+	// focus event to occur when an appender `button` element is clicked. In
+	// some browsers (Firefox, Safari), button clicks do not emit a focus event,
+	// which could cause this event to propagate unexpectedly. The `tabIndex`
+	// ensures that the interaction is captured as a focus, without also adding
+	// an extra tab stop.
+	//
+	// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 	return (
 		<div tabIndex={ -1 } className="block-list-appender">
 			{ appender }
