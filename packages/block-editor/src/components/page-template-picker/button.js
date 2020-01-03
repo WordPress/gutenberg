@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, Icon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 
 const PickerButton = ( props ) => {
 	const {
@@ -12,8 +12,7 @@ const PickerButton = ( props ) => {
 
 	return (
 		<Button onClick={ onPress }>
-			<Icon icon={ icon } width={ 18 } height={ 18 } />
-			{ label }
+			{ icon } { label }
 		</Button>
 	);
 };
