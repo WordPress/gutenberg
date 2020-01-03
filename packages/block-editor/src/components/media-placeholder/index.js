@@ -116,29 +116,21 @@ export class MediaPlaceholder extends Component {
 			multiple,
 			onError,
 			onSelect,
-			value = [],
 		} = this.props;
 		let setMedia;
 		if ( multiple ) {
 			if ( addToGallery ) {
-				let mediaToReturn = value;
+				let lastMediaPassed = [];
 				setMedia = ( newMedia ) => {
 					const currentMedia = this.props.value || [];
-					// If mediaToReturn contains things not in currentMedia, remove them.
-					mediaToReturn = mediaToReturn.filter( ( item ) => {
-						return currentMedia.some( ( currentItem ) => currentItem.id === item.id && currentItem.url === item.url );
+					// Remove lastMediaPassed from currentMedia.
+					const mediaToReturn = currentMedia.filter( ( item ) => {
+						return ! lastMediaPassed.some( ( temporaryMediaURL ) => temporaryMediaURL === item.url );
 					} );
-					// If currentMedia has completed items not in mediaToReturn, add them.
-					currentMedia.forEach( ( currentItem ) => {
-						if ( currentItem.id &&
-								// Item is not already in mediaToReturn set.
-								! mediaToReturn.some( ( item ) => item.id === currentItem.id ) &&
-								// Item is not a member of our upload group.
-								! newMedia.some( ( item ) => item.id === currentItem.id )
-						) {
-							mediaToReturn.push( currentItem );
-						}
-					} );
+					// Reset lastMediaPassed and set it with urls from newMedia.
+					lastMediaPassed = [];
+					newMedia.forEach( ( media ) => lastMediaPassed.push( media.url ) );
+
 					onSelect( mediaToReturn.concat( newMedia ) );
 				};
 			} else {
