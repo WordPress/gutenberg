@@ -23,12 +23,6 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import {
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN,
-	BACKSPACE,
-	ENTER,
 	rawShortcut,
 	displayShortcut,
 } from '@wordpress/keycodes';
@@ -67,24 +61,6 @@ function NavigationLinkEdit( {
 			setIsLinkOpen( false );
 		}
 	}, [ isSelected ] );
-
-	/**
-	 * `onKeyDown` LinkControl handler.
-	 * It takes over to stop the event propagation to make the
-	 * navigation work, avoiding undesired behaviors.
-	 * For instance, it will block to move between link blocks
-	 * when the LinkControl is focused.
-	 *
-	 * @param {Event} event
-	 */
-	const handleLinkControlOnKeyDown = ( event ) => {
-		const { keyCode } = event;
-
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
-	};
 
 	const itemLabelPlaceholder = __( 'Add link…' );
 
@@ -174,8 +150,6 @@ function NavigationLinkEdit( {
 					{ isLinkOpen && (
 						<LinkControl
 							className="wp-block-navigation-link__inline-link-input"
-							onKeyDown={ handleLinkControlOnKeyDown }
-							onKeyPress={ ( event ) => event.stopPropagation() }
 							value={ link }
 							onChange={ ( {
 								title: newTitle = '',

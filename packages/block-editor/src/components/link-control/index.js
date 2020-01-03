@@ -49,8 +49,6 @@ function LinkControl( {
 	instanceId,
 	onClose = noop,
 	onChangeMode = noop,
-	onKeyDown = noop,
-	onKeyPress = noop,
 	onChange = noop,
 } ) {
 	// State
@@ -233,8 +231,6 @@ function LinkControl( {
 							renderSuggestions={ renderSearchResults }
 							fetchSuggestions={ getSearchHandler }
 							onReset={ resetInput }
-							onKeyDown={ onKeyDown }
-							onKeyPress={ onKeyPress }
 						/>
 					) }
 
