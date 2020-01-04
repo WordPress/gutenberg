@@ -186,6 +186,10 @@ function selector( select ) {
 	};
 }
 
+/**
+ * Handles selection and navigation across blocks. This component should be
+ * wrapped around BlockList.
+ */
 export default function WritingFlow( { children } ) {
 	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
@@ -225,6 +229,7 @@ export default function WritingFlow( { children } ) {
 	function onMouseDown( event ) {
 		verticalRect.current = null;
 
+		// Clicking inside a selected block should exit navigation mode.
 		if (
 			isNavigationMode &&
 			selectedBlockClientId &&
@@ -233,20 +238,21 @@ export default function WritingFlow( { children } ) {
 			setNavigationMode( false );
 		}
 
-		// The main button.
-		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-		if ( isSelectionEnabled && event.button === 0 ) {
+		// Multi-select blocks when Shift+clicking.
+		if (
+			isSelectionEnabled &&
+			// The main button.
+			// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+			event.button === 0
+		) {
 			const clientId = getBlockClientId( event.target );
 
 			if ( clientId ) {
 				if ( event.shiftKey ) {
-					if ( blockSelectionStart ) {
+					if ( blockSelectionStart !== clientId ) {
 						multiSelect( blockSelectionStart, clientId );
-					} else if ( clientId !== selectedBlockClientId ) {
-						multiSelect( selectedBlockClientId, clientId );
+						event.preventDefault();
 					}
-
-					event.preventDefault();
 				// Allow user to escape out of a multi-selection to a singular
 				// selection of a block via click. This is handled here since
 				// onFocus excludes blocks involved in a multiselection, as

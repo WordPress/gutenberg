@@ -35,25 +35,25 @@ function getDeepestNode( node, type ) {
 	return node;
 }
 
+function selector( select ) {
+	const {
+		isSelectionEnabled,
+		isMultiSelecting,
+		getMultiSelectedBlockClientIds,
+		hasMultiSelection,
+		getBlockParents,
+	} = select( 'core/block-editor' );
+
+	return {
+		isSelectionEnabled: isSelectionEnabled(),
+		isMultiSelecting: isMultiSelecting(),
+		multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+		hasMultiSelection: hasMultiSelection(),
+		getBlockParents,
+	};
+}
+
 export default function useMultiSelection( ref ) {
-	function selector( select ) {
-		const {
-			isSelectionEnabled,
-			isMultiSelecting,
-			getMultiSelectedBlockClientIds,
-			hasMultiSelection,
-			getBlockParents,
-		} = select( 'core/block-editor' );
-
-		return {
-			isSelectionEnabled: isSelectionEnabled(),
-			isMultiSelecting: isMultiSelecting(),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			hasMultiSelection: hasMultiSelection(),
-			getBlockParents,
-		};
-	}
-
 	const {
 		isSelectionEnabled,
 		isMultiSelecting,
