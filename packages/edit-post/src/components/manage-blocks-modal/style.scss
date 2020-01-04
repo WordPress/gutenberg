@@ -75,6 +75,10 @@
 		font-size: 0.9rem;
 		font-weight: 600;
 	}
+
+	> a {
+		float: right; //Aligning link to the right of category heading.
+	}
 }
 
 .edit-post-manage-blocks-modal__show-all {

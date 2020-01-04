@@ -81,7 +81,9 @@ function BlockManager( {
 						} ) }
 						callToAction={
 							category.slug === 'reusable' ? (
-								<a href="https://google.com">Test</a>
+								<a href="edit.php?post_type=wp_block">
+									Edit blocks
+								</a>
 							) : (
 								undefined
 							)
