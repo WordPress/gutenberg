@@ -12,7 +12,7 @@ describe( 'MetaBoxesSection', () => {
 	it( 'does not render if there are no options', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
-				areCustomFieldsRegistered={ false }
+				supportsCustomFields={ false }
 				metaBoxes={ [ { id: 'postcustom', title: 'This should not render' } ] }
 			/>
 		);
@@ -23,7 +23,7 @@ describe( 'MetaBoxesSection', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
 				title="Advanced Panels"
-				areCustomFieldsRegistered
+				supportsCustomFields
 				metaBoxes={ [ { id: 'postcustom', title: 'This should not render' } ] }
 			/>
 		);
@@ -34,7 +34,7 @@ describe( 'MetaBoxesSection', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
 				title="Advanced Panels"
-				areCustomFieldsRegistered={ false }
+				supportsCustomFields={ false }
 				metaBoxes={ [
 					{ id: 'postcustom', title: 'This should not render' },
 					{ id: 'test1', title: 'Meta Box 1' },
@@ -49,7 +49,7 @@ describe( 'MetaBoxesSection', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
 				title="Advanced Panels"
-				areCustomFieldsRegistered
+				supportsCustomFields
 				metaBoxes={ [
 					{ id: 'postcustom', title: 'This should not render' },
 					{ id: 'test1', title: 'Meta Box 1' },
