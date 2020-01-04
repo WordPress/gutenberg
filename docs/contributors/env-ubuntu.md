@@ -1,7 +1,7 @@
 
 # How to setup local WordPress environment on Ubuntu
 
-This article covers setting up the local WordPress development environment using Docker on Ubuntu. The docker binaries included in the Ubuntu repositories (19.10 and earlier) do not support the features needed for the WordPress enviornment.
+This article covers setting up the local WordPress development environment using Docker on Ubuntu. The docker binaries included in the Ubuntu repositories (19.10 and earlier) do not support the features needed for the WordPress environment.
 
 If you are using Ubuntu 19.04 or 18.04, you can follow these [directions from Docker to install](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
 
@@ -9,13 +9,13 @@ If you are using Ubuntu 19.10, Docker does not have a repository setup for this 
 
 Packages required:
 
-* containerd.io_1.2.10-3_amd64.deb
-* docker-ce-cli_19.03.3~3-0~ubuntu-disco_amd64.deb
-* docker-ce_19.03.3~3-0~ubuntu-disco_amd64.deb
+* `containerd.io_1.2.10-3_amd64.deb`
+* `docker-ce-cli_19.03.3~3-0~ubuntu-disco_amd64.deb`
+* `docker-ce_19.03.3~3-0~ubuntu-disco_amd64.deb`
 
 Install using: `sudo dpkg -i *.deb`
 
-Additionally, you need to install `docker-compose`, you can follow the [directions from Docker](https://docs.docker.com/compose/install/) or simply [download the latest binary](https://github.com/docker/compose/releases) from Github releases. 
+Additionally, you need to install `docker-compose`, you can follow the [directions from Docker](https://docs.docker.com/compose/install/) or simply [download the latest binary](https://github.com/docker/compose/releases) from GitHub releases. 
 
 After downloading the binary file `docker-compose-Linux-x86_64`, rename to just `docker-compose` and copy it to `/usr/local/bin` or another spot in your PATH.
 
@@ -57,7 +57,7 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker.service
 ```
 
-After restarting the services, set the enviornment variable DOCKER_HOST and try starting using:
+After restarting the services, set the environment variable DOCKER_HOST and try starting using:
 
 ```
 DOCKER_HOST=http://127.0.0.1:2376 npm run env start
