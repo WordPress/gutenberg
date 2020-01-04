@@ -231,13 +231,9 @@ function BlockListBlock( {
 	const onKeyDown = ( event ) => {
 		const { keyCode, target } = event;
 
-		// ENTER/BACKSPACE Shortcuts are only available if the wrapper is focused
-		// and the block is not locked.
-		const canUseShortcuts = (
-			isSelected &&
-				! isLocked &&
-				( target === wrapper.current || target === breadcrumb.current )
-		);
+		// ENTER/BACKSPACE Shortcuts are only available if the wrapper or
+		// breadcrumb is focused.
+		const canUseShortcuts = ( target === wrapper.current || target === breadcrumb.current );
 		const isEditMode = ! isNavigationMode;
 
 		switch ( keyCode ) {
@@ -266,7 +262,7 @@ function BlockListBlock( {
 		// cases where Firefox might always set `buttons` to `0`.
 		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
 		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/which
-		if ( isSelected && ( buttons || which ) === 1 ) {
+		if ( ( buttons || which ) === 1 ) {
 			onSelectionStart( clientId );
 		}
 	};
@@ -407,7 +403,8 @@ function BlockListBlock( {
 			ref={ wrapper }
 			className={ wrapperClassName }
 			data-type={ name }
-			onKeyDown={ onKeyDown }
+			// Only allow shortcuts when a blocks is selected and not locked.
+			onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
 			tabIndex="0"
 			aria-label={ blockLabel }
 			role="group"
@@ -474,7 +471,8 @@ function BlockListBlock( {
 			) }
 			<div
 				ref={ blockNodeRef }
-				onMouseLeave={ onMouseLeave }
+				// Only allow selection to be started from a selected block.
+				onMouseLeave={ isSelected ? onMouseLeave : undefined }
 				data-block={ clientId }
 			>
 				<BlockCrashBoundary onError={ onBlockError }>
