@@ -298,9 +298,9 @@ add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
  *
  * @since 6.7.0
 
- * @param WP_Styles $styles WP_Styles instance (passed by reference).
+ * @param WP_Styles $styles WP_Styles instance
  */
-function gutenberg_register_packages_styles( &$styles ) {
+function gutenberg_register_packages_styles( $styles ) {
 	// Editor Styles.
 	gutenberg_override_style(
 		$styles,
