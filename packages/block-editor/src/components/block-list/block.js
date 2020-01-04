@@ -8,7 +8,7 @@ import { animated } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useLayoutEffect, useState, useCallback } from '@wordpress/element';
+import { useRef, useEffect, useLayoutEffect, useState, useCallback, useContext } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
@@ -49,6 +49,7 @@ import Inserter from '../inserter';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { ChildToolbar, ChildToolbarSlot } from './block-child-toolbar';
+import { Context } from './root-container';
 
 function BlockListBlock( {
 	mode,
@@ -84,7 +85,6 @@ function BlockListBlock( {
 	onRemove,
 	onInsertDefaultBlockAfter,
 	toggleSelection,
-	onSelectionStart,
 	animateOnChange,
 	enableAnimation,
 	isNavigationMode,
@@ -93,6 +93,7 @@ function BlockListBlock( {
 	hasSelectedUI = true,
 	hasMovers = true,
 } ) {
+	const onSelectionStart = useContext( Context );
 	// In addition to withSelect, we should favor using useSelect in this component going forward
 	// to avoid leaking new props to the public API (editor.BlockListBlock filter)
 	const { isDraggingBlocks } = useSelect( ( select ) => {

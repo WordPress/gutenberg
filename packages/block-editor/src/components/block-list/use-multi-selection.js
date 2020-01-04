@@ -7,7 +7,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getBlockClientId } from '../../utils/dom';
+import { getBlockClientId, getBlockDOMNode } from '../../utils/dom';
 
 /**
  * Returns for the deepest node at the start or end of a container node. Ignores
@@ -35,10 +35,9 @@ function getDeepestNode( node, type ) {
 	return node;
 }
 
-export default function useMultiSelection( { ref, rootClientId } ) {
+export default function useMultiSelection( ref ) {
 	function selector( select ) {
 		const {
-			getBlockOrder,
 			isSelectionEnabled,
 			isMultiSelecting,
 			getMultiSelectedBlockClientIds,
@@ -47,7 +46,6 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 		} = select( 'core/block-editor' );
 
 		return {
-			blockClientIds: getBlockOrder( rootClientId ),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
@@ -57,13 +55,12 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 	}
 
 	const {
-		blockClientIds,
 		isSelectionEnabled,
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		getBlockParents,
-	} = useSelect( selector, [ rootClientId ] );
+	} = useSelect( selector, [] );
 	const {
 		startMultiSelect,
 		stopMultiSelect,
@@ -86,19 +83,9 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 		// These must be in the right DOM order.
 		const start = multiSelectedBlockClientIds[ 0 ];
 		const end = multiSelectedBlockClientIds[ length - 1 ];
-		const startIndex = blockClientIds.indexOf( start );
 
-		// The selected block is not in this block list.
-		if ( startIndex === -1 ) {
-			return;
-		}
-
-		let startNode = ref.current.querySelector(
-			`[data-block="${ start }"]`
-		);
-		let endNode = ref.current.querySelector(
-			`[data-block="${ end }"]`
-		);
+		let startNode = getBlockDOMNode( start );
+		let endNode = getBlockDOMNode( end );
 
 		const selection = window.getSelection();
 		const range = document.createRange();
@@ -117,7 +104,6 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 		hasMultiSelection,
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
-		blockClientIds,
 		selectBlock,
 	] );
 
