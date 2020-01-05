@@ -10,7 +10,7 @@ import { Clipboard } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withSpokenMessages } from '@wordpress/components';
-import { RichTextToolbarButton } from '@wordpress/block-editor';
+import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor';
 import {
 	applyFormat,
 	getActiveFormat,
@@ -132,6 +132,11 @@ export const link = {
 			}
 			return (
 				<>
+					<RichTextShortcut
+						type="primary"
+						character="k"
+						onUse={ this.addLink }
+					/>
 					<ModalLinkUI
 						isVisible={ this.state.addingLink }
 						isActive={ isActive }

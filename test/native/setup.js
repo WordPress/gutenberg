@@ -86,6 +86,7 @@ const mockNativeModules = {
 		...NativeModules.UIManager,
 		getViewManagerConfig: jest.fn( () => ( { Commands: {} } ) ),
 	},
+	NativeEventEmitter: jest.fn(),
 };
 
 Object.keys( mockNativeModules ).forEach( ( module ) => {
