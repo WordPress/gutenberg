@@ -142,8 +142,7 @@ export class MediaPlaceholder extends Component {
 					// Return the filtered media array along with newMedia.
 					onSelect( filteredMedia.concat( newMedia ) );
 					// Reset lastMediaPassed and set it with urls from newMedia.
-					lastMediaPassed = [];
-					newMedia.forEach( ( media ) => lastMediaPassed.push( media.url ) );
+					lastMediaPassed = newMedia.map( ( media ) => media.url );
 				};
 			} else {
 				setMedia = onSelect;
