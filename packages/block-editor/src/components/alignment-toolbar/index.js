@@ -12,17 +12,17 @@ import { Toolbar } from '@wordpress/components';
 const DEFAULT_ALIGNMENT_CONTROLS = [
 	{
 		icon: 'editor-alignleft',
-		title: __( 'Align Text Left' ),
+		title: __( 'Align text left' ),
 		align: 'left',
 	},
 	{
 		icon: 'editor-aligncenter',
-		title: __( 'Align Text Center' ),
+		title: __( 'Align text center' ),
 		align: 'center',
 	},
 	{
 		icon: 'editor-alignright',
-		title: __( 'Align Text Right' ),
+		title: __( 'Align text right' ),
 		align: 'right',
 	},
 ];
@@ -54,6 +54,7 @@ export function AlignmentToolbar( props ) {
 				return {
 					...control,
 					isActive,
+					role: isCollapsed ? 'menuitemradio' : undefined,
 					onClick: applyOrUnset( align ),
 				};
 			} ) }

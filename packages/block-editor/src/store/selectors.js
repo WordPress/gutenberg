@@ -149,7 +149,7 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, clientId ) => [
-		// Normally, we'd have both  `getBlockAttributes` dependancies and
+		// Normally, we'd have both `getBlockAttributes` dependencies and
 		// `getBlocks` (children) dependancies here but for performance reasons
 		// we use a denormalized cache key computed in the reducer that takes both
 		// the attributes and inner blocks into account. The value of the cache key
@@ -427,11 +427,12 @@ export function getBlockRootClientId( state, clientId ) {
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which to find root client ID.
+ * @param {boolean} ascending Order results from bottom to top (true) or top to bottom (false).
  *
  * @return {Array} ClientIDs of the parent blocks.
  */
 export const getBlockParents = createSelector(
-	( state, clientId ) => {
+	( state, clientId, ascending = false ) => {
 		const parents = [];
 		let current = clientId;
 		while ( !! state.blocks.parents[ current ] ) {
@@ -439,7 +440,7 @@ export const getBlockParents = createSelector(
 			parents.push( current );
 		}
 
-		return parents.reverse();
+		return ascending ? parents : parents.reverse();
 	},
 	( state ) => [
 		state.blocks.parents,
@@ -462,6 +463,33 @@ export function getBlockHierarchyRootClientId( state, clientId ) {
 		current = state.blocks.parents[ current ];
 	} while ( current );
 	return parent;
+}
+
+/**
+ * Given a block client ID, returns the lowest common ancestor with selected client ID.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find common ancestor client ID.
+ *
+ * @return {string} Common ancestor client ID or undefined
+ */
+export function getLowestCommonAncestorWithSelectedBlock( state, clientId ) {
+	const selectedId = getSelectedBlockClientId( state );
+	const clientParents = [ ...getBlockParents( state, clientId ), clientId ];
+	const selectedParents = [ ...getBlockParents( state, selectedId ), selectedId ];
+
+	let lowestCommonAncestor;
+
+	const maxDepth = Math.min( clientParents.length, selectedParents.length );
+	for ( let index = 0; index < maxDepth; index++ ) {
+		if ( clientParents[ index ] === selectedParents[ index ] ) {
+			lowestCommonAncestor = clientParents[ index ];
+		} else {
+			break;
+		}
+	}
+
+	return lowestCommonAncestor;
 }
 
 /**
@@ -929,6 +957,17 @@ export function isTyping( state ) {
 }
 
 /**
+ * Returns true if the user is dragging blocks, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether user is dragging blocks.
+ */
+export function isDraggingBlocks( state ) {
+	return state.isDraggingBlocks;
+}
+
+/**
  * Returns true if the caret is within formatted text, or false otherwise.
  *
  * @param {Object} state Global application state.
@@ -1037,6 +1076,12 @@ const canInsertBlockTypeUnmemoized = ( state, blockName, rootClientId = null ) =
 			return list;
 		}
 		if ( isArray( list ) ) {
+			// TODO: when there is a canonical way to detect that we are editing a post
+			// the following check should be changed to something like:
+			// if ( includes( list, 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
+			if ( includes( list, 'core/post-content' ) && item === null ) {
+				return true;
+			}
 			return includes( list, item );
 		}
 		return defaultResult;
@@ -1375,6 +1420,23 @@ export function getSettings( state ) {
 export function isLastBlockChangePersistent( state ) {
 	return state.blocks.isPersistentChange;
 }
+
+/**
+ * Returns the Block List settings for an array of blocks, if any exist.
+ *
+ * @param {Object}  state    Editor state.
+ * @param {Array} clientIds Block client IDs.
+ *
+ * @return {Array} Block List Settings for each of the found blocks
+ */
+export const __experimentalGetBlockListSettingsForBlocks = createSelector(
+	( state, clientIds ) => {
+		return filter( state.blockListSettings, ( value, key ) => clientIds.includes( key ) );
+	},
+	( state ) => [
+		state.blockListSettings,
+	],
+);
 
 /**
  * Returns the parsed block saved as shared block with the given ID.

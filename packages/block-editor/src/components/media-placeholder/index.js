@@ -18,7 +18,6 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
-	IconButton,
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -37,19 +36,19 @@ import URLPopover from '../url-popover';
 const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 	<URLPopover onClose={ onClose }>
 		<form
-			className="editor-media-placeholder__url-input-form block-editor-media-placeholder__url-input-form"
+			className="block-editor-media-placeholder__url-input-form"
 			onSubmit={ onSubmit }
 		>
 			<input
-				className="editor-media-placeholder__url-input-field block-editor-media-placeholder__url-input-field"
+				className="block-editor-media-placeholder__url-input-field"
 				type="url"
 				aria-label={ __( 'URL' ) }
 				placeholder={ __( 'Paste or type URL' ) }
 				onChange={ onChange }
 				value={ src }
 			/>
-			<IconButton
-				className="editor-media-placeholder__url-input-submit-button block-editor-media-placeholder__url-input-submit-button"
+			<Button
+				className="block-editor-media-placeholder__url-input-submit-button"
 				icon="editor-break"
 				label={ __( 'Apply' ) }
 				type="submit"
@@ -203,7 +202,6 @@ export class MediaPlaceholder extends Component {
 
 		const placeholderClassName = classnames(
 			'block-editor-media-placeholder',
-			'editor-media-placeholder',
 			className,
 			{ 'is-appender': isAppender }
 		);
@@ -268,12 +266,12 @@ export class MediaPlaceholder extends Component {
 			src,
 		} = this.state;
 		return (
-			<div className="editor-media-placeholder__url-input-container block-editor-media-placeholder__url-input-container">
+			<div className="block-editor-media-placeholder__url-input-container">
 				<Button
-					className="editor-media-placeholder__button block-editor-media-placeholder__button"
+					className="block-editor-media-placeholder__button"
 					onClick={ this.openURLInput }
-					isToggled={ isURLInputVisible }
-					isLarge
+					isPressed={ isURLInputVisible }
+					isSecondary
 				>
 					{ __( 'Insert from URL' ) }
 				</Button>
@@ -316,11 +314,7 @@ export class MediaPlaceholder extends Component {
 				render={ ( { open } ) => {
 					return (
 						<Button
-							isLarge
-							className={ classnames(
-								'editor-media-placeholder__button',
-								'editor-media-placeholder__media-library-button'
-							) }
+							isSecondary
 							onClick={ ( event ) => {
 								event.stopPropagation();
 								open();
@@ -344,17 +338,15 @@ export class MediaPlaceholder extends Component {
 						render={ ( { openFileDialog } ) => {
 							const content = (
 								<>
-									<IconButton
-										isLarge
+									<Button
+										isSecondary
 										className={ classnames(
 											'block-editor-media-placeholder__button',
-											'editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
 										) }
-										icon="upload"
 									>
 										{ __( 'Upload' ) }
-									</IconButton>
+									</Button>
 									{ mediaLibraryButton }
 									{ this.renderUrlSelectionUI() }
 									{ this.renderCancelLink() }
@@ -372,10 +364,9 @@ export class MediaPlaceholder extends Component {
 				<>
 					{ this.renderDropZone() }
 					<FormFileUpload
-						isLarge
+						isSecondary
 						className={ classnames(
 							'block-editor-media-placeholder__button',
-							'editor-media-placeholder__button',
 							'block-editor-media-placeholder__upload-button'
 						) }
 						onChange={ this.onUpload }

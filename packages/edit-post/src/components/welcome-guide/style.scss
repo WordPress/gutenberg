@@ -16,8 +16,8 @@
 
 	&__heading {
 		font-family: $editor-font;
-		font-size: 32px;
-		line-height: 44px;
+		font-size: 21px;
+		line-height: 1.4;
 		margin: $grid-size 0;
 	}
 
@@ -28,16 +28,18 @@
 		margin: $grid-size 0;
 
 		@include break-small() {
-			height: $image-height;
-			left: 0;
 			position: absolute;
+			left: 0;
+			top: 50%;
+			height: $image-height;
 			width: $image-width;
+			margin-top: -0.5 * $image-height;
 		}
 	}
 
 	&__text {
 		font-size: $editor-font-size;
-		line-height: 1.5;
+		line-height: 1.4;
 		margin: $grid-size 0;
 	}
 
@@ -45,5 +47,9 @@
 		margin: 0 4px;
 		position: relative;
 		top: 4px;
+	}
+
+	@include break-small() {
+		width: 600px;
 	}
 }

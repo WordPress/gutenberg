@@ -60,7 +60,7 @@ function ColumnsEditContainer( {
 		return {
 			count: select( 'core/block-editor' ).getBlockCount( clientId ),
 		};
-	} );
+	}, [ clientId ] );
 
 	const classes = classnames( className, {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,

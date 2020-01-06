@@ -8,19 +8,22 @@ exports[`BlockAlignmentToolbar should match snapshot 1`] = `
         "icon": "align-left",
         "isActive": true,
         "onClick": [Function],
-        "title": "Align Left",
+        "role": "menuitemradio",
+        "title": "Align left",
       },
       Object {
         "icon": "align-center",
         "isActive": false,
         "onClick": [Function],
-        "title": "Align Center",
+        "role": "menuitemradio",
+        "title": "Align center",
       },
       Object {
         "icon": "align-right",
         "isActive": false,
         "onClick": [Function],
-        "title": "Align Right",
+        "role": "menuitemradio",
+        "title": "Align right",
       },
     ]
   }

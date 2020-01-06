@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, ResizableBox, ToolbarGroup, withNotices } from '@wordpress/components';
+import { Button, ResizableBox, ToolbarGroup, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -54,7 +54,7 @@ class MediaContainer extends Component {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ mediaId }
 						render={ ( { open } ) => (
-							<IconButton
+							<Button
 								className="components-toolbar__control"
 								label={ __( 'Edit media' ) }
 								icon="edit"

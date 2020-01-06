@@ -4,6 +4,21 @@
 
 - Add `@wordpress/test-utils/extend-expect` to Jest setup ([18855](https://github.com/WordPress/gutenberg/pull/18855)).
 
+## 5.3.1 (2020-01-01)
+
+### Bug Fixes
+
+- Fix preset file extension for inclusion in NPM deployments. ([#19306](https://github.com/WordPress/gutenberg/pull/19306)).
+
+## 5.3.0 (2019-12-20)
+
+### New Features
+
+- Added support to collapse or omit successful test results from Travis CI builds ([#16744](https://github.com/WordPress/gutenberg/issues/16744))
+
+
+## 5.2.0 (2019-11-15)
+
 ## 5.1.0 (2019-09-03)
 
 ### Bug Fixes

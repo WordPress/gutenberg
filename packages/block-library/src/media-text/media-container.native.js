@@ -13,7 +13,7 @@ import {
  */
 import {
 	Icon,
-	IconButton,
+	Button,
 	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
@@ -43,6 +43,8 @@ import SvgIconRetry from './icon-retry';
  * Constants
  */
 const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
+
+export { imageFillStyles } from './media-container.js';
 
 class MediaContainer extends Component {
 	constructor() {
@@ -110,7 +112,7 @@ class MediaContainer extends Component {
 		return (
 			<BlockControls>
 				<ToolbarGroup>
-					<IconButton
+					<Button
 						className="components-toolbar__control"
 						label={ __( 'Edit media' ) }
 						icon="edit"

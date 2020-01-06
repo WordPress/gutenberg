@@ -15,7 +15,7 @@ import { pure } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
 import TextControl from '../text-control';
 import VisuallyHidden from '../visually-hidden';
 import { isValidHex } from './utils';
@@ -87,7 +87,7 @@ export class Input extends Component {
 	}
 }
 
-const PureIconButton = pure( IconButton );
+const PureButton = pure( Button );
 
 export class Inputs extends Component {
 	constructor( { hsl } ) {
@@ -142,7 +142,7 @@ export class Inputs extends Component {
 			return value;
 		}
 
-		if ( value > 0 ) {
+		if ( value < 0 ) {
 			return 0;
 		} else if ( value > 1 ) {
 			return 1;
@@ -287,7 +287,7 @@ export class Inputs extends Component {
 			<div className="components-color-picker__inputs-wrapper">
 				{ this.renderFields() }
 				<div className="components-color-picker__inputs-toggle">
-					<PureIconButton
+					<PureButton
 						icon="arrow-down-alt2"
 						label={ __( 'Change color format' ) }
 						onClick={ this.toggleViews }

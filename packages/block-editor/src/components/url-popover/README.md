@@ -8,7 +8,7 @@ URLPopover is a presentational React component used to render a popover used for
 The component will be rendered adjacent to its parent.
 
 ```jsx
-import { ToggleControl, IconButton, Button } from '@wordpress/components';
+import { ToggleControl, Button } from '@wordpress/components';
 import { URLPopover } from '@wordpress/block-editor';
 
 class MyURLPopover extends Component {
@@ -72,7 +72,7 @@ class MyURLPopover extends Component {
 					>
 						<form onSubmit={ this.submitURL }>
 							<input type="url" value={ url } onChange={ this.onChangeURL } />
-							<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+							<Button icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 						</form>
 					</URLPopover>
 				) }

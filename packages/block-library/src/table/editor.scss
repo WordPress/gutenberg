@@ -46,22 +46,25 @@
 		border-style: double;
 	}
 
-	// Extra specificity to override default Placeholder styles.
-	&__placeholder-form.wp-block-table__placeholder-form {
-		text-align: left;
-		align-items: center;
-	}
-
-	&__placeholder-input {
-		width: 100px;
-	}
-
-	&__placeholder-button {
-		min-width: 100px;
-		justify-content: center;
-	}
-
 	figcaption {
 		@include caption-style-theme();
+	}
+}
+
+// Extra specificity to override default Placeholder styles.
+.wp-block-table__placeholder-form.wp-block-table__placeholder-form {
+	.wp-block-table__placeholder-input {
+		width: $grid-size * 14;
+		margin-right: $grid-size;
+		margin-bottom: 0;
+
+		input {
+			height: $icon-button-size;
+		}
+	}
+
+	.wp-block-table__placeholder-button {
+		margin-top: auto;
+		margin-right: auto;
 	}
 }

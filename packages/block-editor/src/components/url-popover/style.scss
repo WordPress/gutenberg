@@ -2,11 +2,11 @@
 	border-top: $border-width solid $light-gray-500;
 }
 
-.block-editor-url-popover__additional-controls > div[role="menu"] .components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default) > svg {
+.block-editor-url-popover__additional-controls > div[role="menu"] .components-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) > svg {
 	box-shadow: none;
 }
 
-.block-editor-url-popover__additional-controls div[role="menu"] > .components-icon-button {
+.block-editor-url-popover__additional-controls div[role="menu"] > .components-button {
 	padding-left: 2px;
 }
 
@@ -21,7 +21,7 @@
 }
 
 // Mimic toolbar component styles for the icons in this popover.
-.block-editor-url-popover .components-icon-button {
+.block-editor-url-popover .components-button.has-icon {
 	padding: 3px;
 
 	> svg {
@@ -31,7 +31,7 @@
 		width: 30px;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
 		box-shadow: none;
 
 		> svg {

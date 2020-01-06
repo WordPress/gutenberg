@@ -24,7 +24,7 @@ export function PageAttributes( { isEnabled, isOpened, onTogglePanel, postType }
 	return (
 		<PageAttributesCheck>
 			<PanelBody
-				title={ get( postType, [ 'labels', 'attributes' ], __( 'Page Attributes' ) ) }
+				title={ get( postType, [ 'labels', 'attributes' ], __( 'Page attributes' ) ) }
 				opened={ isOpened }
 				onToggle={ onTogglePanel }
 			>

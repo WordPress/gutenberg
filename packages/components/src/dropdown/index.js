@@ -67,6 +67,9 @@ class Dropdown extends Component {
 	}
 
 	close() {
+		if ( this.props.onClose ) {
+			this.props.onClose();
+		}
 		this.setState( { isOpen: false } );
 	}
 

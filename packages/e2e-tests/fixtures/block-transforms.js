@@ -30,6 +30,12 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
+	core__buttons: {
+		originalBlock: 'Buttons',
+		availableTransforms: [
+			'Group',
+		],
+	},
 	core__calendar: {
 		originalBlock: 'Calendar',
 		availableTransforms: [

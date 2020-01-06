@@ -17,7 +17,7 @@
 	> .components-panel {
 		border-left: none;
 		border-right: none;
-		overflow: visible;
+		overflow: auto;
 		-webkit-overflow-scrolling: touch;
 		height: auto;
 		max-height: calc(100vh - #{ $admin-bar-height-big + $panel-header-height });
@@ -109,7 +109,7 @@
 	border-top: 0;
 	margin-top: 0;
 
-	.components-icon-button {
+	.components-button.has-icon {
 		display: none;
 		margin-left: auto;
 
@@ -122,6 +122,7 @@
 .edit-post-sidebar__panel-tab {
 	background: transparent;
 	border: none;
+	border-radius: 0;
 	box-shadow: none;
 	cursor: pointer;
 	height: 50px;

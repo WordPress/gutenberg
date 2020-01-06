@@ -12,6 +12,7 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
+	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -25,7 +26,7 @@ import {
 	Popover,
 	FocusReturnProvider,
 } from '@wordpress/components';
-import { withViewportMatch } from '@wordpress/viewport';
+import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
 
@@ -34,7 +35,7 @@ import { __ } from '@wordpress/i18n';
  */
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
-import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
+import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
@@ -49,7 +50,8 @@ import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
-function Layout( { isMobileViewport } ) {
+function Layout() {
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { closePublishSidebar, togglePublishSidebar } = useDispatch( 'core/edit-post' );
 	const {
 		mode,
@@ -60,6 +62,8 @@ function Layout( { isMobileViewport } ) {
 		hasActiveMetaboxes,
 		isSaving,
 		hasFixedToolbar,
+		previousShortcut,
+		nextShortcut,
 	} = useSelect( ( select ) => {
 		return ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
@@ -70,8 +74,10 @@ function Layout( { isMobileViewport } ) {
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			previousShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/previous-region' ),
+			nextShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
 		} );
-	} );
+	}, [] );
 	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -87,8 +93,9 @@ function Layout( { isMobileViewport } ) {
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
-			<EditorModeKeyboardShortcuts />
-			<FocusReturnProvider className={ className }>
+			<EditPostKeyboardShortcuts />
+			<EditorKeyboardShortcutsRegister />
+			<FocusReturnProvider>
 				<EditorRegions
 					className={ className }
 					header={ <Header /> }
@@ -101,6 +108,7 @@ function Layout( { isMobileViewport } ) {
 					content={
 						<>
 							<EditorNotices />
+							<Popover.Slot name="block-toolbar" />
 							{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
 							{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
 							<div className="edit-post-layout__metaboxes">
@@ -126,7 +134,7 @@ function Layout( { isMobileViewport } ) {
 					) : (
 						<div className="edit-post-toggle-publish-panel">
 							<Button
-								isDefault
+								isSecondary
 								className="edit-post-toggle-publish-panel__button"
 								onClick={ togglePublishSidebar }
 								aria-expanded={ false }
@@ -135,6 +143,10 @@ function Layout( { isMobileViewport } ) {
 							</Button>
 						</div>
 					) }
+					shortcuts={ {
+						previous: previousShortcut,
+						next: nextShortcut,
+					} }
 				/>
 				<ManageBlocksModal />
 				<OptionsModal />
@@ -149,4 +161,4 @@ function Layout( { isMobileViewport } ) {
 	);
 }
 
-export default withViewportMatch( { isMobileViewport: '< small' } )( Layout );
+export default Layout;

@@ -23,6 +23,7 @@ import * as quote from './quote';
 import * as gallery from './gallery';
 import * as archives from './archives';
 import * as audio from './audio';
+import * as buttons from './buttons';
 import * as button from './button';
 import * as calendar from './calendar';
 import * as categories from './categories';
@@ -64,6 +65,7 @@ import * as socialLink from './social-link';
 
 // Full Site Editing Blocks
 import * as siteTitle from './site-title';
+import * as templatePart from './template-part';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
 
@@ -110,6 +112,7 @@ export const registerCoreBlocks = () => {
 		archives,
 		audio,
 		button,
+		buttons,
 		calendar,
 		categories,
 		code,
@@ -175,16 +178,16 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 			const {
 				__experimentalEnableLegacyWidgetBlock,
 				__experimentalEnableFullSiteEditing,
-			} = settings
+			} = settings;
 
-				;[
+			[
 				__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
 				socialLinks,
 				...socialLink.sites,
 
 				// Register Full Site Editing Blocks.
 				...( __experimentalEnableFullSiteEditing ?
-					[ siteTitle, postTitle, postContent ] :
+					[ siteTitle, templatePart, postTitle, postContent ] :
 					[] ),
 			].forEach( registerBlock );
 		} :
