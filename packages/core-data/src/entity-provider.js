@@ -151,6 +151,9 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const save = useCallback( () => {
+		// We use the `select` from `useSelect` here instead of importing it from
+		// the data module so that we get the one bound to the provided registry,
+		// and not the default one.
 		let filteredEdits = _select( 'core' ).getEntityRecordNonTransientEdits(
 			kind,
 			type,
