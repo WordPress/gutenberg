@@ -82,7 +82,6 @@ export function Button( props, ref ) {
 		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
 			additionalProps[ disabledEvent ] = ( event ) => {
 				event.stopPropagation();
-				event.stopImmediatePropagation();
 				event.preventDefault();
 			};
 		}
