@@ -65,6 +65,7 @@ export default function Inspector( props ) {
 					label={ __( 'Margin' ) }
 					value={ attributes.marginSize }
 					onChange={ partialRight( updateSpacing, 'marginSize' ) }
+					help={ __( 'Controls horizontal margin only. Please use the Spacer block for vertical spacing.' ) }
 				/>
 
 			</PanelBody>
