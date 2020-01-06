@@ -80,6 +80,11 @@ export default function useMultiSelection( ref ) {
 		}
 
 		const { length } = multiSelectedBlockClientIds;
+
+		if ( length < 2 ) {
+			return;
+		}
+
 		// These must be in the right DOM order.
 		const start = multiSelectedBlockClientIds[ 0 ];
 		const end = multiSelectedBlockClientIds[ length - 1 ];
