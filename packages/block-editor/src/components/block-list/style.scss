@@ -329,17 +329,15 @@
 
 	// Full-wide.
 	&[data-align="full"] {
-		> [data-block] {
-			margin-left: -$block-padding;
-			margin-right: -$block-padding;
+		margin-left: -$block-padding;
+		margin-right: -$block-padding;
 
-			@include break-small() {
-				margin-left: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
-				margin-right: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
-			}
+		@include break-small() {
+			margin-left: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
+			margin-right: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
 		}
 
-		::before {
+		&::before {
 			left: 0;
 			right: 0;
 			border-left-width: 0;
