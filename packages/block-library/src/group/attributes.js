@@ -3,28 +3,12 @@
  *
  * @type {Object}
  */
-const DimensionsAttributes = {
-	responsivePadding: {
-		type: 'boolean',
-		default: false,
-	},
-	responsiveMargin: {
-		type: 'boolean',
-		default: false,
-	},
+const attributes = {
 	paddingUnit: {
 		type: 'string',
 		default: 'px',
 	},
 	paddingSize: {
-		type: 'string',
-		default: '',
-	},
-	paddingSizeSmall: {
-		type: 'string',
-		default: '',
-	},
-	paddingSizeMedium: {
 		type: 'string',
 		default: '',
 	},
@@ -36,14 +20,6 @@ const DimensionsAttributes = {
 		type: 'string',
 		default: '',
 	},
-	marginSizeMedium: {
-		type: 'string',
-		default: '',
-	},
-	marginSizeSmall: {
-		type: 'string',
-		default: '',
-	},
 };
 
-export default DimensionsAttributes;
+export default attributes;
