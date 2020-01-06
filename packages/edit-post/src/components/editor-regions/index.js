@@ -33,6 +33,16 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 				>
 					{ content }
 				</div>
+				{ !! sidebar && (
+					<div
+						className="edit-post-editor-regions__sidebar"
+						role="region"
+						aria-label={ 'Editor settings' }
+						tabIndex="-1"
+					>
+						{ sidebar }
+					</div>
+				) }
 				{ !! publish && (
 					<div
 						className="edit-post-editor-regions__publish"
@@ -42,16 +52,6 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 						tabIndex="-1"
 					>
 						{ publish }
-					</div>
-				) }
-				{ !! sidebar && (
-					<div
-						className="edit-post-editor-regions__sidebar"
-						role="region"
-						aria-label={ 'Editor settings' }
-						tabIndex="-1"
-					>
-						{ sidebar }
 					</div>
 				) }
 			</div>
