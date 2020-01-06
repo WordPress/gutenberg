@@ -29,7 +29,7 @@ import {
 	hasInnerBlocksContext,
 	getBlockFocusableWrapper,
 } from '../../utils/dom';
-import FocusCapture from './focus-capture';
+import ToolAccess from './tool-access';
 
 /**
  * Browser constants
@@ -181,14 +181,7 @@ function selector( select ) {
 
 export default function WritingFlow( { children } ) {
 	const container = useRef();
-	const focusCaptureBeforeRef = useRef();
-	const focusCaptureAfterRef = useRef();
-
 	const entirelySelected = useRef();
-
-	// Reference that holds the a flag for enabling or disabling
-	// capturing on the focus capture elements.
-	const noCapture = useRef();
 
 	// Here a DOMRect is stored while moving the caret vertically so vertical
 	// position of the start position can be restored. This is to recreate
@@ -299,38 +292,6 @@ export default function WritingFlow( { children } ) {
 			return;
 		}
 
-		const clientId = selectedBlockClientId || selectionStartClientId;
-
-		// In Edit mode, Tab should focus the first tabbable element after the
-		// content, which is normally the sidebar (with block controls) and
-		// Shift+Tab should focus the first tabbable element before the content,
-		// which is normally the block toolbar.
-		// Arrow keys can be used, and Tab and arrow keys can be used in
-		// Navigation mode (press Esc), to navigate through blocks.
-		if ( isTab && clientId ) {
-			const wrapper = getBlockFocusableWrapper( clientId );
-
-			if ( isShift ) {
-				if ( target === wrapper ) {
-					// Disable focus capturing on the focus capture element, so
-					// it doesn't refocus this block and so it allows default
-					// behaviour (moving focus to the next tabbable element).
-					noCapture.current = true;
-					focusCaptureBeforeRef.current.focus();
-					return;
-				}
-			} else {
-				const tabbables = focus.tabbable.find( wrapper );
-
-				if ( target === last( tabbables ) ) {
-					// See comment above.
-					noCapture.current = true;
-					focusCaptureAfterRef.current.focus();
-					return;
-				}
-			}
-		}
-
 		// When presing any key other than up or down, the initial vertical
 		// position must ALWAYS be reset. The vertical position is saved so it
 		// can be restored as well as possible on sebsequent vertical arrow key
@@ -432,40 +393,27 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	const selectedClientId = selectedBlockClientId || selectionStartClientId;
-
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div className="block-editor-writing-flow">
-			<FocusCapture
-				ref={ focusCaptureBeforeRef }
-				selectedClientId={ selectedClientId }
-				containerRef={ container }
-				noCapture={ noCapture }
-			/>
-			<div
-				ref={ container }
-				onKeyDown={ onKeyDown }
-				onMouseDown={ onMouseDown }
-			>
-				{ children }
+		<ToolAccess>
+			<div className="block-editor-writing-flow">
+				<div
+					ref={ container }
+					onKeyDown={ onKeyDown }
+					onMouseDown={ onMouseDown }
+				>
+					{ children }
+				</div>
+				<div
+					aria-hidden
+					tabIndex={ -1 }
+					onClick={ focusLastTextField }
+					className="block-editor-writing-flow__click-redirect"
+				/>
 			</div>
-			<FocusCapture
-				ref={ focusCaptureAfterRef }
-				selectedClientId={ selectedClientId }
-				containerRef={ container }
-				noCapture={ noCapture }
-				isReverse
-			/>
-			<div
-				aria-hidden
-				tabIndex={ -1 }
-				onClick={ focusLastTextField }
-				className="block-editor-writing-flow__click-redirect"
-			/>
-		</div>
+		</ToolAccess>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }

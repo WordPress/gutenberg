@@ -108,7 +108,6 @@ function Layout() {
 					content={
 						<>
 							<EditorNotices />
-							<Popover.Slot name="block-toolbar" />
 							{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
 							{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
 							<div className="edit-post-layout__metaboxes">
