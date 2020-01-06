@@ -397,8 +397,8 @@ export default function WritingFlow( { children } ) {
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<ToolAccess>
-			<div className="block-editor-writing-flow">
+		<div className="block-editor-writing-flow">
+			<ToolAccess>
 				<div
 					ref={ container }
 					onKeyDown={ onKeyDown }
@@ -406,14 +406,14 @@ export default function WritingFlow( { children } ) {
 				>
 					{ children }
 				</div>
-				<div
-					aria-hidden
-					tabIndex={ -1 }
-					onClick={ focusLastTextField }
-					className="block-editor-writing-flow__click-redirect"
-				/>
-			</div>
-		</ToolAccess>
+			</ToolAccess>
+			<div
+				aria-hidden
+				tabIndex={ -1 }
+				onClick={ focusLastTextField }
+				className="block-editor-writing-flow__click-redirect"
+			/>
+		</div>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
