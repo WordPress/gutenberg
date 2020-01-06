@@ -468,6 +468,12 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Nested Blocks: Using InnerBlocks",
+		"slug": "nested-blocks-inner-blocks",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/nested-blocks-inner-blocks.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Meta Boxes",
 		"slug": "metabox",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/metabox/readme.md",
@@ -645,6 +651,12 @@
 		"title": "ColorPicker",
 		"slug": "color-picker",
 		"markdown_source": "../packages/components/src/color-picker/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CustomSelectControl",
+		"slug": "custom-select-control",
+		"markdown_source": "../packages/components/src/custom-select-control/README.md",
 		"parent": "components"
 	},
 	{

@@ -11,6 +11,17 @@ import { includes, castArray } from 'lodash';
 import { useEffect } from '@wordpress/element';
 
 /**
+ * A block selection object.
+ *
+ * @typedef {Object} WPKeyboardShortcutConfig
+ *
+ * @property {boolean} [bindGlobal]  Handle keyboard events anywhere including inside textarea/input fields.
+ * @property {string}  [eventName]   Event name used to trigger the handler, defaults to keydown.
+ * @property {boolean} [isDisabled]  Disables the keyboard handler if the value is true.
+ * @property {Object}  [target]      React reference to the DOM element used to catch the keyboard event.
+ */
+
+/**
  * Return true if platform is MacOS.
  *
  * @param {Object} _window   window object by default; used for DI testing.
@@ -27,16 +38,20 @@ function isAppleOS( _window = window ) {
 /**
  * Attach a keyboard shortcut handler.
  *
- * @param {string[]|string} shortcuts  Keyboard Shortcuts.
- * @param {Function} callback          Shortcut callback.
- * @param {Object} options             Shortcut options.
+ * @param {string[]|string}         shortcuts  Keyboard Shortcuts.
+ * @param {Function}                callback   Shortcut callback.
+ * @param {WPKeyboardShortcutConfig} options    Shortcut options.
  */
 function useKeyboardShortcut( shortcuts, callback, {
 	bindGlobal = false,
 	eventName = 'keydown',
+	isDisabled = false, // This is important for performance considerations.
 	target,
 } = {} ) {
 	useEffect( () => {
+		if ( isDisabled ) {
+			return;
+		}
 		const mousetrap = new Mousetrap( target ? target.current : document );
 		castArray( shortcuts ).forEach( ( shortcut ) => {
 			const keys = shortcut.split( '+' );
@@ -64,7 +79,7 @@ function useKeyboardShortcut( shortcuts, callback, {
 		return () => {
 			mousetrap.reset();
 		};
-	}, [ shortcuts, bindGlobal, eventName, callback, target ] );
+	}, [ shortcuts, bindGlobal, eventName, callback, target, isDisabled ] );
 }
 
 export default useKeyboardShortcut;

@@ -26,7 +26,8 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/keycodes": "file:../keycodes",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.15",
+		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

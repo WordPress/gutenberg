@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { escape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,27 +10,42 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import {
 	useCallback,
+	useEffect,
+	useState,
 } from '@wordpress/element';
 import {
 	compose,
-	withInstanceId,
 } from '@wordpress/compose';
 import {
+	KeyboardShortcuts,
 	PanelBody,
 	RangeControl,
 	TextControl,
 	ToggleControl,
 	withFallbackStyles,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
+	BlockControls,
 	__experimentalUseGradient,
 	ContrastChecker,
 	InspectorControls,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	RichText,
-	URLInput,
 	withColors,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
+import {
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN,
+	BACKSPACE,
+	ENTER,
+	rawShortcut,
+	displayShortcut,
+} from '@wordpress/keycodes';
 
 const { getComputedStyle } = window;
 
@@ -69,6 +85,85 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 				onChange={ setBorderRadius }
 			/>
 		</PanelBody>
+	);
+}
+
+const handleLinkControlOnKeyDown = ( event ) => {
+	const { keyCode } = event;
+
+	if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
+		// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
+		event.stopPropagation();
+	}
+};
+
+const handleLinkControlOnKeyPress = ( event ) => {
+	event.stopPropagation();
+};
+
+function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onToggleOpenInNewTab } ) {
+	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
+	useEffect(
+		() => {
+			if ( ! isSelected ) {
+				setIsURLPickerOpen( false );
+			}
+		},
+		[ isSelected ]
+	);
+	const openLinkControl = () => {
+		setIsURLPickerOpen( true );
+	};
+	const linkControl = isURLPickerOpen && (
+		<LinkControl
+			className="wp-block-navigation-link__inline-link-input"
+			onKeyDown={ handleLinkControlOnKeyDown }
+			onKeyPress={ handleLinkControlOnKeyPress }
+			currentLink={ ! url && ! title ? null : { url, title } }
+			onLinkChange={ ( { title: newTitle = '', url: newURL = '' } ) => {
+				setAttributes( {
+					title: escape( newTitle ),
+					url: newURL,
+				} );
+			} }
+			currentSettings={ [
+				{
+					id: 'opensInNewTab',
+					title: __( 'Open in new tab' ),
+					checked: opensInNewTab,
+				},
+			] }
+			onSettingsChange={ ( setting, value ) => {
+				if ( setting === 'opensInNewTab' ) {
+					onToggleOpenInNewTab( value );
+				}
+			} }
+			onClose={ () => {
+				setIsURLPickerOpen( false );
+			} }
+		/>
+	);
+	return (
+		<>
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton
+						name="link"
+						icon="admin-links"
+						title={ __( 'Link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ openLinkControl }
+					/>
+				</ToolbarGroup>
+			</BlockControls>
+			<KeyboardShortcuts
+				bindGlobal
+				shortcuts={ {
+					[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+				} }
+			/>
+			{ linkControl }
+		</>
 	);
 }
 
@@ -150,18 +245,13 @@ function ButtonEdit( {
 					borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 				} }
 			/>
-			<URLInput
-				label={ __( 'Link' ) }
-				className="wp-block-button__inline-link"
-				value={ url }
-				/* eslint-disable jsx-a11y/no-autofocus */
-				// Disable Reason: The rule is meant to prevent enabling auto-focus, not disabling it.
-				autoFocus={ false }
-				/* eslint-enable jsx-a11y/no-autofocus */
-				onChange={ ( value ) => setAttributes( { url: value } ) }
-				disableSuggestions={ ! isSelected }
-				isFullWidth
-				hasBorder
+			<URLPicker
+				title={ title }
+				url={ url }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+				opensInNewTab={ linkTarget === '_blank' }
+				onToggleOpenInNewTab={ onToggleOpenInNewTab }
 			/>
 			<InspectorControls>
 				<PanelColorGradientSettings
@@ -215,7 +305,6 @@ function ButtonEdit( {
 }
 
 export default compose( [
-	withInstanceId,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	applyFallbackStyles,
 ] )( ButtonEdit );

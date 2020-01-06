@@ -8,7 +8,7 @@ import { animated } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useLayoutEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useLayoutEffect, useState, useCallback } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { KeyboardShortcuts, withFilters, Popover } from '@wordpress/components';
+import { withFilters, Popover } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
@@ -31,6 +31,7 @@ import {
 } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -101,6 +102,8 @@ function BlockListBlock( {
 	setNavigationMode,
 	isMultiSelecting,
 	isLargeViewport,
+	hasSelectedUI = true,
+	hasMovers = true,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this component going forward
 	// to avoid leaking new props to the public API (editor.BlockListBlock filter)
@@ -121,59 +124,6 @@ function BlockListBlock( {
 	const blockNodeRef = useRef();
 
 	const breadcrumb = useRef();
-
-	// Keep track of touchstart to disable hover on iOS
-	const hadTouchStart = useRef( false );
-	const onTouchStart = () => {
-		hadTouchStart.current = true;
-	};
-	const onTouchStop = () => {
-		// Clear touchstart detection
-		// Browser will try to emulate mouse events also see https://www.html5rocks.com/en/mobile/touchandmouse/
-		hadTouchStart.current = false;
-	};
-
-	// Handling isHovered
-	const [ isBlockHovered, setBlockHoveredState ] = useState( false );
-
-	/**
-	 * Sets the block state as unhovered if currently hovering. There are cases
-	 * where mouseleave may occur but the block is not hovered (multi-select),
-	 * so to avoid unnecesary renders, the state is only set if hovered.
-	 */
-	const hideHoverEffects = () => {
-		if ( isBlockHovered ) {
-			setBlockHoveredState( false );
-		}
-	};
-	/**
-	 * A mouseover event handler to apply hover effect when a pointer device is
-	 * placed within the bounds of the block. The mouseover event is preferred
-	 * over mouseenter because it may be the case that a previous mouseenter
-	 * event was blocked from being handled by a IgnoreNestedEvents component,
-	 * therefore transitioning out of a nested block to the bounds of the block
-	 * would otherwise not trigger a hover effect.
-	 *
-	 * @see https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
-	 */
-	const maybeHover = () => {
-		if (
-			isBlockHovered ||
-			isPartOfMultiSelection ||
-			isSelected ||
-			hadTouchStart.current
-		) {
-			return;
-		}
-		setBlockHoveredState( true );
-	};
-
-	// Set hover to false once we start typing or select the block.
-	useEffect( () => {
-		if ( isTypingWithinBlock || isSelected ) {
-			hideHoverEffects();
-		}
-	} );
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
@@ -386,8 +336,6 @@ function BlockListBlock( {
 		if ( isSelected && ( buttons || which ) === 1 ) {
 			onSelectionStart( clientId );
 		}
-
-		hideHoverEffects();
 	};
 
 	const selectOnOpen = ( open ) => {
@@ -396,8 +344,20 @@ function BlockListBlock( {
 		}
 	};
 
+	const canFocusHiddenToolbar = (
+		! isNavigationMode &&
+		! shouldShowContextualToolbar &&
+		isSelected &&
+		! hasFixedToolbar &&
+		! isEmptyDefaultBlock
+	);
+	useShortcut(
+		'core/block-editor/focus-toolbar',
+		useCallback( forceFocusedContextualToolbar, [] ),
+		{ bindGlobal: true, eventName: 'keydown', isDisabled: ! canFocusHiddenToolbar }
+	);
+
 	// Rendering the output
-	const isHovered = isBlockHovered && ! isPartOfMultiSelection;
 	const blockType = getBlockType( name );
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
@@ -408,17 +368,12 @@ function BlockListBlock( {
 
 	// If the block is selected and we're typing the block should not appear.
 	// Empty paragraph blocks should always show up as unselected.
-	const showEmptyBlockSideInserter = ! isNavigationMode && ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
+	const showEmptyBlockSideInserter = ! isNavigationMode && ( isSelected || isLast ) && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
 		! isFocusMode &&
 		! showEmptyBlockSideInserter &&
 		isSelected &&
 		! isTypingWithinBlock;
-	const shouldAppearHovered =
-		! isFocusMode &&
-		! hasFixedToolbar &&
-		isHovered &&
-		! isEmptyDefaultBlock;
 	const shouldShowBreadcrumb = isNavigationMode && isSelected;
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
@@ -446,11 +401,11 @@ function BlockListBlock( {
 	const wrapperClassName = classnames(
 		'wp-block block-editor-block-list__block',
 		{
+			'has-selected-ui': hasSelectedUI,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-			'is-selected': shouldAppearSelected,
+			'is-selected': shouldAppearSelected && hasSelectedUI,
 			'is-navigate-mode': isNavigationMode,
 			'is-multi-selected': isMultiSelected,
-			'is-hovered': shouldAppearHovered,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
 			'is-typing': isTypingWithinBlock,
@@ -509,6 +464,7 @@ function BlockListBlock( {
 			data-type={ name }
 			data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
 			moverDirection={ moverDirection }
+			hasMovers={ hasMovers }
 		/>
 	);
 
@@ -516,14 +472,9 @@ function BlockListBlock( {
 		<IgnoreNestedEvents
 			id={ blockElementId }
 			ref={ wrapper }
-			onMouseOver={ maybeHover }
-			onMouseOverHandled={ hideHoverEffects }
-			onMouseLeave={ hideHoverEffects }
 			className={ wrapperClassName }
 			data-type={ name }
-			onTouchStart={ onTouchStart }
 			onFocus={ onFocus }
-			onClick={ onTouchStop }
 			onKeyDown={ onKeyDown }
 			tabIndex="0"
 			aria-label={ blockLabel }
@@ -592,21 +543,6 @@ function BlockListBlock( {
 						) }
 					</Popover>
 				) }
-				{
-					! isNavigationMode &&
-					! shouldShowContextualToolbar &&
-					isSelected &&
-					! hasFixedToolbar &&
-					! isEmptyDefaultBlock && (
-						<KeyboardShortcuts
-							bindGlobal
-							eventName="keydown"
-							shortcuts={ {
-								'alt+f10': forceFocusedContextualToolbar,
-							} }
-						/>
-					)
-				}
 				<IgnoreNestedEvents
 					ref={ blockNodeRef }
 					onDragStart={ preventDrag }
