@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
+
 /**
  * Internal dependencies
  */
-import mockClientRects from './mock-client-rects';
+import './mock-client-rects';
 
 /**
  * @param {Element} element
@@ -15,8 +16,6 @@ export default function isFocusable( element ) {
 	if ( ! element.parentElement ) {
 		return false;
 	}
-	const restoreClientRects = mockClientRects();
 	const focusableElements = focus.focusable.find( element.parentElement );
-	restoreClientRects();
 	return focusableElements.indexOf( element ) !== -1;
 }

@@ -10,19 +10,16 @@ function isHidden( element ) {
 	);
 }
 
-export default function mockClientRects() {
-	const boundGetClientRects = () => window.Element.prototype.getClientRects();
+function getClientRects() {
+	if ( isHidden( this ) ) {
+		return [];
+	}
+	return [ { width: 1, height: 1 } ];
+}
 
-	window.Element.prototype.getClientRects = function getClientRects() {
-		if ( isHidden( this ) ) {
-			return [];
-		}
-		return [
-			{ width: 1, height: 1 },
-		];
-	};
-
-	return function restoreClientRects() {
-		window.Element.prototype.getClientRects = boundGetClientRects;
-	};
+if (
+	typeof window !== 'undefined' &&
+	window.Element.prototype.getClientRects !== getClientRects
+) {
+	window.Element.prototype.getClientRects = getClientRects;
 }
