@@ -11,10 +11,15 @@ const chalk = require( 'chalk' );
 const fs = require( 'fs' );
 const rimraf = require( 'rimraf' );
 const SimpleGit = require( 'simple-git/promise' );
-const childProcess = require( 'child_process' );
 const Octokit = require( '@octokit/rest' );
 const os = require( 'os' );
 const uuid = require( 'uuid/v4' );
+
+/**
+ * Internal dependencies
+ */
+const { readJSONFile, runShellScript, askForConfirmationToContinue } = require( './utils' );
+const { updateCorePackages } = require( './update-core-packages' );
 
 // Config
 const gitRepoOwner = 'WordPress';
@@ -35,37 +40,6 @@ const STABLE_TAG_REGEX = /Stable tag: [0-9]+\.[0-9]+\.[0-9]+\s*\n/;
 const STABLE_TAG_PLACEHOLDER = 'Stable tag: V.V.V\n';
 
 /**
- * Small utility used to read an uncached version of a JSON file
- *
- * @param {string} fileName
- */
-function readJSONFile( fileName ) {
-	const data = fs.readFileSync( fileName, 'utf8' );
-	return JSON.parse( data );
-}
-
-/**
- * Asks the user for a confirmation to continue or abort otherwise
- *
- * @param {string} message      Confirmation message.
- * @param {boolean} isDefault   Default reply.
- * @param {string} abortMessage Abort message.
- */
-async function askForConfirmationToContinue( message, isDefault = true, abortMessage = 'Aborting.' ) {
-	const { isReady } = await inquirer.prompt( [ {
-		type: 'confirm',
-		name: 'isReady',
-		default: isDefault,
-		message,
-	} ] );
-
-	if ( ! isReady ) {
-		console.log( error( '\n' + abortMessage ) );
-		process.exit( 1 );
-	}
-}
-
-/**
  * Common logic wrapping a step in the process.
  *
  * @param {string} name         Step name.
@@ -84,24 +58,6 @@ async function runStep( name, abortMessage, handler ) {
 
 		process.exit( 1 );
 	}
-}
-
-/**
- * Utility to run a child script
- *
- * @param {string} script Script to run.
- * @param {string} cwd    Working directory.
- */
-function runShellScript( script, cwd ) {
-	childProcess.execSync( script, {
-		cwd,
-		env: {
-			NO_CHECKS: true,
-			PATH: process.env.PATH,
-			HOME: process.env.HOME,
-		},
-		stdio: [ 'inherit', 'ignore', 'inherit' ],
-	} );
 }
 
 // Steps
@@ -772,6 +728,12 @@ program
 			'Let also people know on WordPress Slack when everything is finished.'
 		);
 	} );
+
+program
+	.command( 'update-core-packages' )
+	.alias( 'update-core' )
+	.description( 'Updates WordPress packages in core to their latest version' )
+	.action( updateCorePackages );
 
 program.parse( process.argv );
 
