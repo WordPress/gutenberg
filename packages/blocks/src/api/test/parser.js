@@ -17,8 +17,11 @@ import {
 	toBooleanAttributeMatcher,
 	isOfType,
 	isOfTypes,
+	isNumericType,
 	isValidByType,
 	isValidByEnum,
+	isInRange,
+	isValidSchemaValue,
 	serializeBlockNode,
 } from '../parser';
 import {
@@ -144,6 +147,18 @@ describe( 'block parser', () => {
 		} );
 	} );
 
+	describe( 'isNumericType', () => {
+		it( 'returns false for non-numeric type', () => {
+			expect( isNumericType( undefined ) ).toBe( false );
+			expect( isNumericType( 'string' ) ).toBe( false );
+		} );
+
+		it( 'returns true for numeric type', () => {
+			expect( isNumericType( 'integer' ) ).toBe( true );
+			expect( isNumericType( 'number' ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'isValidByType', () => {
 		it( 'returns true if type undefined', () => {
 			expect( isValidByType( null ) ).toBe( true );
@@ -177,6 +192,73 @@ describe( 'block parser', () => {
 
 		it( 'returns true if value is of enum set', () => {
 			expect( isValidByEnum( 2, [ 1, 2, 3 ] ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInRange', () => {
+		describe( 'minimum', () => {
+			it( 'is valid if undefined', () => {
+				expect( isInRange( 10, {} ) ).toBe( true );
+			} );
+
+			it( 'is valid by non-exclusive', () => {
+				expect( isInRange( 9, { minimum: 10 } ) ).toBe( false );
+				expect( isInRange( 10, { minimum: 10 } ) ).toBe( true );
+				expect( isInRange( 11, { minimum: 10 } ) ).toBe( true );
+			} );
+
+			it( 'is valid by exclusive', () => {
+				expect(
+					isInRange( 9, { minimum: 10, exclusiveMinimum: true } )
+				).toBe( false );
+				expect(
+					isInRange( 10, { minimum: 10, exclusiveMinimum: true } )
+				).toBe( false );
+				expect(
+					isInRange( 11, { minimum: 10, exclusiveMinimum: true } )
+				).toBe( true );
+			} );
+		} );
+
+		describe( 'maximum', () => {
+			it( 'is valid if undefined', () => {
+				expect( isInRange( 10, {} ) ).toBe( true );
+			} );
+
+			it( 'is valid by non-exclusive', () => {
+				expect( isInRange( 9, { maximum: 10 } ) ).toBe( true );
+				expect( isInRange( 10, { maximum: 10 } ) ).toBe( true );
+				expect( isInRange( 11, { maximum: 10 } ) ).toBe( false );
+			} );
+
+			it( 'is valid by exclusive', () => {
+				expect(
+					isInRange( 9, { maximum: 10, exclusiveMaximum: true } )
+				).toBe( true );
+				expect(
+					isInRange( 10, { maximum: 10, exclusiveMaximum: true } )
+				).toBe( false );
+				expect(
+					isInRange( 11, { maximum: 10, exclusiveMaximum: true } )
+				).toBe( false );
+			} );
+		} );
+	} );
+
+	describe( 'isValidSchemaValue', () => {
+		// These tests are intentionally sparse, since the bulk of the logic is
+		// deferred to separate schema-specific validation functions.
+
+		it( 'validates value by schema', () => {
+			expect( isValidSchemaValue( 2, { enum: [ 1, 2, 3 ] } ) ).toBe(
+				true
+			);
+			expect(
+				isValidSchemaValue( 2, { type: 'number', maximum: 2 } )
+			).toBe( true );
+			expect( isValidSchemaValue( 'foo', { type: 'string' } ) ).toBe(
+				true
+			);
 		} );
 	} );
 

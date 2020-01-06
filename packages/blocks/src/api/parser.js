@@ -114,6 +114,20 @@ export function isOfTypes( value, types ) {
 }
 
 /**
+ * Returns true if the given JSON schema type is numeric, either "integer" or
+ * "number".
+ *
+ * @see https://json-schema.org/understanding-json-schema/reference/numeric.html
+ *
+ * @param {string} type Type to test.
+ *
+ * @return {boolean} Whether type is numeric.
+ */
+export function isNumericType( type ) {
+	return type === 'integer' || type === 'number';
+}
+
+/**
  * Returns true if value is valid per the given block attribute schema type
  * definition, or false otherwise.
  *
@@ -141,6 +155,56 @@ export function isValidByType( value, type ) {
  */
 export function isValidByEnum( value, enumSet ) {
 	return ! Array.isArray( enumSet ) || enumSet.includes( value );
+}
+
+/**
+ * Returns true if the value is valid according to the given JSON schema, or
+ * false otherwise. Conforms to JSON Schema Draft 4 treatment of exclusivity as
+ * a boolean indicator.
+ *
+ * @see https://json-schema.org/understanding-json-schema/reference/numeric.html#range
+ *
+ * @param {number}  value                     Number to validate.
+ * @param {Object}  schema                    Schema.
+ * @param {number}  [schema.minimum]          Minimum valid value.
+ * @param {boolean} [schema.exclusiveMinimum] Whether minimum is exclusive.
+ * @param {number}  [schema.maximum]          Maximum valid value.
+ * @param {boolean} [schema.exclusiveMaximum] Whether maximum is exclusive.
+ *
+ * @return {boolean} Whether value is valid.
+ */
+export function isInRange( value, schema ) {
+	const { minimum, exclusiveMinimum, maximum, exclusiveMaximum } = schema;
+
+	return (
+		( minimum === undefined ||
+			( exclusiveMinimum ? value > minimum : value >= minimum ) ) &&
+		( maximum === undefined ||
+			( exclusiveMaximum ? value < maximum : value <= maximum ) )
+	);
+}
+
+/**
+ * Returns true if the given value is valid based on the given JSON schema, or
+ * false otherwise. This is not a complete JSON schema validator, and instead is
+ * intended to recreate an equivalent behavior to the WordPress REST JSON schema
+ * validation.
+ *
+ * @see https://developer.wordpress.org/reference/functions/rest_validate_value_from_schema/
+ *
+ * @param {*}      value  Value to validate.
+ * @param {Object} schema JSON schema object.
+ *
+ * @return {boolean} Whether value is valid.
+ */
+export function isValidSchemaValue( value, schema ) {
+	const { type, enum: enumSet } = schema;
+
+	return (
+		isValidByType( value, type ) &&
+		isValidByEnum( value, enumSet ) &&
+		( ! isNumericType( type ) || isInRange( value, schema ) )
+	);
 }
 
 /**
@@ -239,7 +303,6 @@ export function getBlockAttribute(
 	innerHTML,
 	commentAttributes
 ) {
-	const { type, enum: enumSet } = attributeSchema;
 	let value;
 
 	switch ( attributeSchema.source ) {
@@ -261,7 +324,7 @@ export function getBlockAttribute(
 			break;
 	}
 
-	if ( ! isValidByType( value, type ) || ! isValidByEnum( value, enumSet ) ) {
+	if ( ! isValidSchemaValue( value, attributeSchema ) ) {
 		// Reject the value if it is not valid. Reverting to the undefined
 		// value ensures the default is respected, if applicable.
 		value = undefined;
