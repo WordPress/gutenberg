@@ -1,0 +1,36 @@
+.wp-block-buttons .wp-block.block-editor-block-list__block[data-type="core/button"] {
+	display: inline-block;
+	width: auto;
+}
+
+.wp-block-buttons {
+	div[data-type="core/button"] div[data-block] {
+		display: block;
+	}
+
+	&[data-align="center"] .block-editor-block-list__layout {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	&[data-align="right"] .block-editor-block-list__layout {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.block-list-appender {
+		display: inline-block !important;
+		margin: 0;
+	}
+
+	.block-editor-block-list__layout > div:last-child {
+		display: inline-block;
+	}
+
+	.block-editor-button-block-appender {
+		background: none;
+		outline: none;
+	}
+}

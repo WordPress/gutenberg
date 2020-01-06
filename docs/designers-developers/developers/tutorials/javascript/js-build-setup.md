@@ -69,7 +69,7 @@ About to write to /home/mkaz/src/wp/scratch/package.json:
   "description": "Test block",
   "main": "block.js",
   "scripts": {
-	"test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "mkaz",
   "license": "GPL-2.0-only"
@@ -123,13 +123,13 @@ To configure npm to run a script, you use the scripts section in `package.json` 
 
 You can then run the build using: `npm run build`.
 
-After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [Step 2 Loading JavaScript](loading-javascript.md), and the block will load in the editor.
+After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [loading JavaScript step in this tutorial](/docs/designers-developers/developers/tutorials/javascript/loading-javascript.md), and the block will load in the editor.
 
 ## Finishing Touches
 
 ### Development Mode
 
-The **build** command in `@wordpress/scripts` runs in a "production" mode. This shrinks the code down so it downloads faster, but makes it difficult to read in the process. You can use the **start** command which runs a development mode that does not shrink the code, and additionally continues a running process to watch the source file for more changes and rebuild as you develop.
+The **build** command in `@wordpress/scripts` runs in "production" mode. This shrinks the code down so it downloads faster, but makes it difficult to read in the process. You can use the **start** command which runs in development mode that does not shrink the code, and additionally continues a running process to watch the source file for more changes and rebuilds as you develop.
 
 The start command can be added to the same scripts section of `package.json`:
 
@@ -152,7 +152,7 @@ Likewise, you do not need to include `node_modules` or any of the above configur
 
 ### Dependency Management
 
-Using wp-scripts ver 5.0.0+ the build step will also produce a `index.asset.php` file that contains an array of dependencies and version number for your block. For our simple example above is something like:
+Using `wp-scripts` ver 5.0.0+ build step will also produce an `index.asset.php` file that contains an array of dependencies and a version number for your block. For our simple example above, it is something like:
 `array('dependencies' => array('wp-element', 'wp-polyfill'), 'version' => 'fc93c4a9675c108725227db345898bcc');`
 
 Here is how to use this asset file to automatically set the dependency list for enqueuing the script. This prevents having to manually update the dependencies, it will be created based on the package imports used within your block.

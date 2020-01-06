@@ -56,7 +56,7 @@
 	height: $block-controls-height;
 
 	// the padding and margin of the more menu is intentionally non-standard
-	.components-icon-button {
+	.components-button.has-icon {
 		width: auto;
 		padding: 8px 2px;
 	}
@@ -64,7 +64,7 @@
 	@include break-small() {
 		margin-left: 4px;
 
-		.components-icon-button {
+		.components-button.has-icon {
 			padding: 8px 4px;
 		}
 	}

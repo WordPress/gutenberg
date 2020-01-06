@@ -61,7 +61,7 @@ Since a high-emphasis button commands the most attention, a layout should contai
 
 #### Text label
 
-All button types use text labels to describe the action that happens when a user taps a button. If there’s no text label, there should be an icon to signify what the button does (e.g. an IconButton component).
+All button types use text labels to describe the action that happens when a user taps a button. If there’s no text label, there should be an icon to signify what the button does.
 
 ![](https://make.wordpress.org/design/files/2019/03/do-link-button.png)
 
@@ -142,4 +142,4 @@ Name | Type | Default | Description
 ## Related components
 
 - To group buttons together, use the `ButtonGroup` component.
-- To display an icon inside the button, use the `IconButton` component.
+

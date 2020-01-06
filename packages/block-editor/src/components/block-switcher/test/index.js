@@ -171,7 +171,7 @@ describe( 'BlockSwitcher', () => {
 
 			test( 'should simulate a keydown event, which should call onToggle and open transform toggle.', () => {
 				const toggleClosed = shallow( getDropdown().props().renderToggle( { onToggle: onToggleStub, isOpen: false } ) );
-				const iconButtonClosed = toggleClosed.find( 'ForwardRef(IconButton)' );
+				const iconButtonClosed = toggleClosed.find( 'ForwardRef(Button)' );
 
 				iconButtonClosed.simulate( 'keydown', mockKeyDown );
 
@@ -180,7 +180,7 @@ describe( 'BlockSwitcher', () => {
 
 			test( 'should simulate a click event, which should call onToggle.', () => {
 				const toggleOpen = shallow( getDropdown().props().renderToggle( { onToggle: onToggleStub, isOpen: true } ) );
-				const iconButtonOpen = toggleOpen.find( 'ForwardRef(IconButton)' );
+				const iconButtonOpen = toggleOpen.find( 'ForwardRef(Button)' );
 
 				iconButtonOpen.simulate( 'keydown', mockKeyDown );
 

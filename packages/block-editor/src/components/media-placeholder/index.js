@@ -18,7 +18,6 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
-	IconButton,
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -48,7 +47,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 				onChange={ onChange }
 				value={ src }
 			/>
-			<IconButton
+			<Button
 				className="block-editor-media-placeholder__url-input-submit-button"
 				icon="editor-break"
 				label={ __( 'Apply' ) }
@@ -339,16 +338,15 @@ export class MediaPlaceholder extends Component {
 						render={ ( { openFileDialog } ) => {
 							const content = (
 								<>
-									<IconButton
+									<Button
 										isSecondary
 										className={ classnames(
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
 										) }
-										icon="upload"
 									>
 										{ __( 'Upload' ) }
-									</IconButton>
+									</Button>
 									{ mediaLibraryButton }
 									{ this.renderUrlSelectionUI() }
 									{ this.renderCancelLink() }

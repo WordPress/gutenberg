@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import Dropdown from '../';
-import IconButton from '../../icon-button';
+import Button from '../../button';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import DropdownMenu from '../../dropdown-menu';
@@ -44,7 +44,7 @@ const DropdownAndDropdownMenuExample = () => {
 					contentClassName="my-popover-content-classname"
 					position="bottom right"
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<IconButton
+						<Button
 							icon="move"
 							onClick={ onToggle }
 							aria-expanded={ isOpen }

@@ -502,7 +502,6 @@ export class TableEdit extends Component {
 					label={ __( 'Table' ) }
 					icon={ <BlockIcon icon={ icon } showColors /> }
 					instructions={ __( 'Insert a table for sharing data.' ) }
-					isColumnLayout
 				>
 					<form className="wp-block-table__placeholder-form" onSubmit={ this.onCreateTable }>
 						<TextControl
