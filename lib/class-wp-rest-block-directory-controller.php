@@ -84,7 +84,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check() {
+	public function get_items_permissions_check( $request ) {
 		if ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error(
 				'rest_user_cannot_view',
