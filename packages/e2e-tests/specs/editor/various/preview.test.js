@@ -93,7 +93,7 @@ describe( 'Preview', () => {
 
 		// Disabled until content present.
 		const isPreviewDisabled = await editorPage.$$eval(
-			'.editor-post-preview:not( :disabled )',
+			'.editor-post-preview:not( :disabled ):not( [aria-disabled="true"] )',
 			( enabledButtons ) => ! enabledButtons.length,
 		);
 		expect( isPreviewDisabled ).toBe( true );

@@ -110,7 +110,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( noBlocksElement ).not.toBeNull();
 
 		// The inserter is disabled
-		const disabledInserter = await page.$( '.block-editor-inserter > button:disabled' );
+		const disabledInserter = await page.$( '.block-editor-inserter > button:disabled, .block-editor-inserter > button[aria-disabled="true"]' );
 		expect( disabledInserter ).not.toBeNull();
 	} );
 } );
