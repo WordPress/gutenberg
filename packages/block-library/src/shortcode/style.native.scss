@@ -1,17 +1,21 @@
 .blockTitle {
 	font-family: $default-regular-font;
-    font-weight: bold;
-    color: $gray-40;
+	font-weight: 500;
+	font-size: 10px;
+	color: rgba($black, 0.6);
+	text-transform:uppercase;
+	letter-spacing: 0.4px;
 }
 
 .blockTitleDark {
-	color: $white;
+	color: rgba($white, 0.6);
 }
 
 .blockShortcode {
     font-family: $default-monospace-font;
-	font-size: 14;
-	padding: 12px 16px;
+	font-weight: 400;
+	font-size: 14px;
+	padding: 12px;
 	border-radius: 4px;
 	background-color: $gray-light;
 }
@@ -22,7 +26,10 @@
 }
 
 .placeholder {
-	color: $gray;
+	font-family: $default-monospace-font;
+	font-weight: 400;
+	font-size: 14px;
+	color: rgba($black, 0.25);
 }
 
 .placeholderDark {
