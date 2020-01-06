@@ -12,7 +12,6 @@ import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
-import attributes from './attributes';
 
 const { name } = metadata;
 
@@ -21,7 +20,7 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Group' ),
 	icon,
-	attributes,
+
 	description: __( 'A block that groups other blocks.' ),
 	keywords: [
 		__( 'container' ),
