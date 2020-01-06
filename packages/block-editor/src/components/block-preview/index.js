@@ -27,7 +27,7 @@ import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 const getInlineStyles = ( scale, x, y, isReady, width ) => ( {
 	transform: `scale(${ scale })`,
 	visibility: isReady ? 'visible' : 'hidden',
-	left: -x,
+	left: x,
 	top: y,
 	width,
 } );
@@ -56,8 +56,8 @@ function ScaledBlockPreview( {
 
 			// Auxiliary vars used for onReady() callback.
 			let scale,
-				_x = 0,
-				_y = 0;
+				offsetX = 0,
+				offsetY = 0;
 
 			// If we're previewing a single block, scale the preview to fit it.
 			if ( blocks.length === 1 ) {
@@ -80,11 +80,11 @@ function ScaledBlockPreview( {
 
 				scale =
 					containerElementRect.width / scaledElementRect.width || 1;
-				const offsetX =
+				offsetX =
 					-( scaledElementRect.left - containerElementRect.left ) *
 						scale +
 					padding;
-				const offsetY =
+				offsetY =
 					containerElementRect.height >
 					scaledElementRect.height * scale
 						? ( containerElementRect.height -
@@ -93,11 +93,8 @@ function ScaledBlockPreview( {
 						  padding
 						: 0;
 
-				_x = offsetX * scale;
-				_y = offsetY;
-
 				setPreviewScale( scale );
-				setPosition( { x: _x, y: _y } );
+				setPosition( { x: offsetX, y: offsetY } );
 
 				// Hack: we need  to reset the scaled elements margins
 				previewElement.style.marginTop = '0';
@@ -110,12 +107,13 @@ function ScaledBlockPreview( {
 			setIsReady( true );
 			onReady( {
 				scale,
-				position: { x: _x, y: _y },
+				position: { x: offsetX, y: offsetY },
 				previewContainerRef: previewRef,
+
 				inlineStyles: getInlineStyles(
 					scale,
-					_x,
-					_y,
+					offsetX,
+					offsetY,
 					true,
 					viewportWidth
 				),
