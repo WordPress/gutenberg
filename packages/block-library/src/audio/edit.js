@@ -118,7 +118,6 @@ class AudioEdit extends Component {
 			// sets the block's attribute and updates the edit component from the
 			// selected media, then switches off the editing UI
 			setAttributes( { src: media.url, id: media.id } );
-			this.setState( { src: media.url, editing: false } );
 		};
 		if ( ! src ) {
 			return (
