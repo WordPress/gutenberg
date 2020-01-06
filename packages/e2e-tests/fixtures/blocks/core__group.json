@@ -5,7 +5,11 @@
         "isValid": true,
         "attributes": {
             "backgroundColor": "secondary",
-            "align": "full"
+            "align": "full",
+            "marginSize": "",
+            "marginUnit": "px",
+            "paddingSize": "",
+            "paddingUnit": "px"
         },
         "innerBlocks": [
             {
