@@ -81,6 +81,10 @@ export default function ToolAccess( { children } ) {
 
 	return (
 		<>
+			{
+			// This slot in a temporary solution. In the future, the toolbar
+			// should be rendered here instead of inside the block.
+			}
 			<Popover.Slot name="block-toolbar" />
 			<FocusCapture
 				ref={ focusCaptureBeforeRef }
