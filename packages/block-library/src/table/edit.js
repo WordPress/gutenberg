@@ -452,9 +452,9 @@ export class TableEdit extends Component {
 
 							let placeholder = '';
 							if ( name === 'head' ) {
-								placeholder = 'Header label';
+								placeholder = __( 'Header label' );
 							} else if ( name === 'foot' ) {
-								placeholder = 'Footer label';
+								placeholder = __( 'Footer label' );
 							}
 
 							return (
