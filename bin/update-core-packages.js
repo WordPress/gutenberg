@@ -4,7 +4,6 @@
  * External dependencies
  */
 const chalk = require( 'chalk' );
-const fs = require( 'fs' );
 
 /**
  * Internal dependencies
@@ -15,7 +14,6 @@ const { readJSONFile, runShellScript, askForConfirmationToContinue } = require( 
  * Constants
  */
 const WORDPRESS_PACKAGES_PREFIX = '@wordpress/';
-const SCRIPT_LOADER_PATH = 'src/wp-includes/script-loader.php';
 const BUILD_COMMAND = 'npm run build';
 
 function getWordPressPackages( packageJSON ) {
@@ -68,27 +66,6 @@ function updatePackageJSON() {
 	outputPackageDiffReport( getPackageVersionDiff( initialPackageJSON, finalPackageJSON ) );
 }
 
-function updateScriptLoader() {
-	const scriptLoader = fs.readFileSync( SCRIPT_LOADER_PATH, 'utf8' );
-	const packageJSON = readJSONFile( 'package.json' );
-	const scriptLoaderUpdated = scriptLoader.replace( /\$packages_versions\s+=\s+array\(([^\)])*\)\s*;/g, ( packageVersionString ) => {
-		return packageVersionString.replace( /\'([^\']+)\'.*=>.*\'([^\']+)\',/g, ( match, packageName, version ) => {
-			const packageNameWordPressPrefix = `${ WORDPRESS_PACKAGES_PREFIX }${ packageName }`;
-			const versionInPackageJSON = packageJSON.dependencies[ packageNameWordPressPrefix ];
-			if ( versionInPackageJSON !== version ) {
-				return match.replace( version, versionInPackageJSON );
-			}
-			return match;
-		} );
-	} );
-	fs.writeFileSync(
-		SCRIPT_LOADER_PATH,
-		scriptLoaderUpdated
-	);
-
-	//console.log( scriptLoader );
-}
-
 async function updateCorePackages() {
 	const abortMessage = 'Aborting!';
 	console.log(
@@ -104,14 +81,7 @@ async function updateCorePackages() {
 	updatePackageJSON();
 
 	await askForConfirmationToContinue(
-		'Proceed with the update to script-loader.php?',
-		true,
-		abortMessage
-	);
-	updateScriptLoader();
-
-	await askForConfirmationToContinue(
-		'The script-loader.php file was updated with success. Run the build so remaining files (e.g: php block changes) are updated?',
+		'Run the build so remaining files (e.g: php block changes) are updated?',
 		true,
 		abortMessage
 	);
@@ -127,5 +97,4 @@ async function updateCorePackages() {
 module.exports = {
 	updateCorePackages,
 };
-
 /* eslint-enable no-console */
