@@ -56,9 +56,15 @@ export default function Inspector( props ) {
 			<PanelBody title={ __( 'Spacing' ) }>
 
 				<DimensionControl
-					label={ 'Padding' }
+					label={ __( 'Padding' ) }
 					value={ attributes.paddingSize }
 					onChange={ partialRight( updateSpacing, 'paddingSize' ) }
+				/>
+
+				<DimensionControl
+					label={ __( 'Margin' ) }
+					value={ attributes.marginSize }
+					onChange={ partialRight( updateSpacing, 'marginSize' ) }
 				/>
 
 			</PanelBody>
