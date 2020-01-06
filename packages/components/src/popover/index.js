@@ -254,6 +254,9 @@ const Popover = ( {
 		}
 
 		const refresh = ( { subpixels } = {} ) => {
+			if ( ! containerRef.current || ! contentRef.current ) {
+				return;
+			}
 			const anchor = computeAnchorRect(
 				anchorRefFallback,
 				anchorRect,
