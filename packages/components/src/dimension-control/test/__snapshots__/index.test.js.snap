@@ -3,6 +3,7 @@
 exports[`DimensionControl rendering renders with custom sizes 1`] = `
 <SelectControl
   className="block-editor-dimension-control"
+  help=""
   hideLabelFromVision={false}
   label={
     <React.Fragment>
@@ -36,6 +37,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
 exports[`DimensionControl rendering renders with defaults 1`] = `
 <SelectControl
   className="block-editor-dimension-control"
+  help=""
   hideLabelFromVision={false}
   label={
     <React.Fragment>
@@ -77,6 +79,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
 exports[`DimensionControl rendering renders with icon and custom icon label 1`] = `
 <SelectControl
   className="block-editor-dimension-control"
+  help=""
   hideLabelFromVision={false}
   label={
     <React.Fragment>
@@ -130,6 +133,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
 exports[`DimensionControl rendering renders with icon and default icon label 1`] = `
 <SelectControl
   className="block-editor-dimension-control"
+  help=""
   hideLabelFromVision={false}
   label={
     <React.Fragment>
