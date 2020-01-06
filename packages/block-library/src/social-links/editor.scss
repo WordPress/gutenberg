@@ -42,9 +42,9 @@
 	}
 
 	// 4. Remove the dashed outlines for child blocks.
-	&.is-hovered .wp-block-social-links::before,
-	&.is-selected .wp-block-social-links::before,
-	&.has-child-selected .wp-block-social-links::before {
+	&.is-hovered .wp-block-social-links .block-editor-block-list__block::before,
+	&.is-selected .wp-block-social-links .block-editor-block-list__block::before,
+	&.has-child-selected .wp-block-social-links .block-editor-block-list__block::before {
 		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
 	}
 

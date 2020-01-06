@@ -41,15 +41,15 @@
 		margin-bottom: 0;
 	}
 
-	.wp-block-navigation::before {
+	.wp-block-navigation .block-editor-block-list__block::before {
 		left: 0;
 		right: 0;
 	}
 
 	// Remove the dashed outlines for child blocks.
-	&.is-hovered .wp-block-navigation::before,
-	&.is-selected .wp-block-navigation::before,
-	&.has-child-selected .wp-block-navigation::before {
+	&.is-hovered .wp-block-navigation .block-editor-block-list__block::before,
+	&.is-selected .wp-block-navigation .block-editor-block-list__block::before,
+	&.has-child-selected .wp-block-navigation .block-editor-block-list__block::before {
 		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
 	}
 
