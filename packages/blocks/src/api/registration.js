@@ -253,8 +253,8 @@ export function registerBlockType( name, settings ) {
 /**
  * Registers a new block collection to group blocks in the same namespace in the inserter.
  *
- * @param {string} namespace      The namespace to group blocks by in the inserter; corresponds to the block namespace
- * @param {Object} title, icon    The title to show in the inserter, The icon to show in the inserter
+ * @param {string} namespace The namespace to group blocks by in the inserter; corresponds to the block namespace
+ * @param {Object} settings  An object composed of a title to show in the inserter, and an icon to show in the inserter
  *
  */
 export function registerBlockCollection( namespace, { title, icon } ) {

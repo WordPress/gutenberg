@@ -670,13 +670,15 @@ Blocks can be added to collections, grouping together all blocks from the same o
 
 This should match the namespace declared in the block name; the name of your plugin or theme.
 
-### Title
+### Settings
+
+#### Title
 
 * **Type:** `String`
 
 This will display in the block inserter section, which will list all blocks in this collection.
 
-### Icon
+#### Icon
 
 * **Type:** `Object`
 
@@ -684,5 +686,5 @@ This will display in the block inserter section, which will list all blocks in t
 
 ```js
 // Registering a block collection
-registerBlockCollection( 'my-plugin', 'My Plugin' );
+registerBlockCollection( 'my-plugin', { title: 'My Plugin' } );
 ```

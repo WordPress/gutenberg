@@ -112,7 +112,7 @@ export function getCategories( state ) {
  *
  * @param {Object} state Data state.
  *
- * @return {Array} Collections list.
+ * @return {Object} Collections list.
  */
 export function getCollections( state ) {
 	return state.collections;

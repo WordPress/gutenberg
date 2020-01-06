@@ -94,7 +94,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: Collections list.
+-   `Object`: Collections list.
 
 <a name="getDefaultBlockName" href="#getDefaultBlockName">#</a> **getDefaultBlockName**
 
