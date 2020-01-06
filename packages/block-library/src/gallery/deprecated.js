@@ -78,11 +78,7 @@ const deprecated = [
 			},
 		},
 		isEligible( { ids } ) {
-			return ids &&
-				ids.length > 0 &&
-				ids.reduce( ( state, id ) => {
-					return state || ( typeof id === 'string' );
-				}, false );
+			return ids && ids.some( ( id ) => typeof id === 'string' );
 		},
 		migrate( attributes ) {
 			return {
