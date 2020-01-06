@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
 import { useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { cleanForSlug } from '@wordpress/editor';
+import { cleanForSlug } from '@wordpress/url';
 import { Placeholder, TextControl, Button } from '@wordpress/components';
 
 /**
