@@ -242,17 +242,14 @@ const Popover = ( {
 	noArrow = isExpanded || noArrow;
 
 	useEffect( () => {
-		const containerEl = containerRef.current;
-		const contentEl = contentRef.current;
-
 		if ( isExpanded ) {
-			setClass( containerEl, 'is-without-arrow', noArrow );
-			setAttribute( containerEl, 'data-x-axis' );
-			setAttribute( containerEl, 'data-y-axis' );
-			setStyle( containerEl, 'top' );
-			setStyle( containerEl, 'left' );
-			setStyle( contentEl, 'maxHeight' );
-			setStyle( contentEl, 'maxWidth' );
+			setClass( containerRef.current, 'is-without-arrow', noArrow );
+			setAttribute( containerRef.current, 'data-x-axis' );
+			setAttribute( containerRef.current, 'data-y-axis' );
+			setStyle( containerRef.current, 'top' );
+			setStyle( containerRef.current, 'left' );
+			setStyle( contentRef.current, 'maxHeight' );
+			setStyle( contentRef.current, 'maxWidth' );
 			return;
 		}
 
@@ -270,7 +267,7 @@ const Popover = ( {
 			}
 
 			if ( ! contentRect.current ) {
-				contentRect.current = contentEl.getBoundingClientRect();
+				contentRect.current = contentRef.current.getBoundingClientRect();
 			}
 
 			const {
@@ -284,25 +281,25 @@ const Popover = ( {
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
 				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
-					setStyle( containerEl, 'left', popoverLeft + 'px' );
-					setStyle( containerEl, 'top' );
-					setStyle( containerEl, 'transform', `translateY(${ popoverTop }px)` );
+					setStyle( containerRef.current, 'left', popoverLeft + 'px' );
+					setStyle( containerRef.current, 'top' );
+					setStyle( containerRef.current, 'transform', `translateY(${ popoverTop }px)` );
 				} else if ( subpixels && __unstableAllowHorizontalSubpixelPosition ) {
-					setStyle( containerEl, 'top', popoverTop + 'px' );
-					setStyle( containerEl, 'left' );
-					setStyle( containerEl, 'transform', `translate(${ popoverLeft }px)` );
+					setStyle( containerRef.current, 'top', popoverTop + 'px' );
+					setStyle( containerRef.current, 'left' );
+					setStyle( containerRef.current, 'transform', `translate(${ popoverLeft }px)` );
 				} else {
-					setStyle( containerEl, 'top', popoverTop + 'px' );
-					setStyle( containerEl, 'left', popoverLeft + 'px' );
-					setStyle( containerEl, 'transform' );
+					setStyle( containerRef.current, 'top', popoverTop + 'px' );
+					setStyle( containerRef.current, 'left', popoverLeft + 'px' );
+					setStyle( containerRef.current, 'transform' );
 				}
 			}
 
-			setClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
-			setAttribute( containerEl, 'data-x-axis', xAxis );
-			setAttribute( containerEl, 'data-y-axis', yAxis );
-			setStyle( contentEl, 'maxHeight', typeof contentHeight === 'number' ? contentHeight + 'px' : '' );
-			setStyle( contentEl, 'maxWidth', typeof contentWidth === 'number' ? contentWidth + 'px' : '' );
+			setClass( containerRef.current, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
+			setAttribute( containerRef.current, 'data-x-axis', xAxis );
+			setAttribute( containerRef.current, 'data-y-axis', yAxis );
+			setStyle( contentRef.current, 'maxHeight', typeof contentHeight === 'number' ? contentHeight + 'px' : '' );
+			setStyle( contentRef.current, 'maxWidth', typeof contentWidth === 'number' ? contentWidth + 'px' : '' );
 
 			// Compute the animation position
 			const yAxisMapping = {
