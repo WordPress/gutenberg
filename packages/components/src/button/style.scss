@@ -212,7 +212,7 @@
 			outline: none;
 		}
 
-		&:not([aria-disabled="true"]):active:focus {
+		&:not([aria-disabled="true"]):active:focus:enabled {
 			box-shadow: none;
 		}
 
