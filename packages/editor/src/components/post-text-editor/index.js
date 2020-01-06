@@ -62,6 +62,11 @@ export class PostTextEditor extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		// sync content with blocks before switching to visual mode
+		this.props.resetEditorBlocks( parse( this.state.value ) );
+	}
+
 	render() {
 		const { value } = this.state;
 		const { instanceId } = this.props;
@@ -93,15 +98,16 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost } = dispatch( 'core/editor' );
+		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
 		return {
 			onChange( content ) {
-				editPost( { content } );
+				editPost( { content, blocks: null } );
 			},
 			onPersist( content ) {
-				const blocks = parse( content );
-				editPost( { content: () => content, blocks } );
+				// Reset blocks so content has priority in getEditedPostContent()
+				editPost( { content, blocks: null } );
 			},
+			resetEditorBlocks,
 		};
 	} ),
 	withInstanceId,
