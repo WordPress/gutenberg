@@ -93,7 +93,10 @@ export default function ToolAccess( { children } ) {
 				noCapture={ noCapture }
 			/>
 			{ /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */ }
-			<div onKeyDown={ isNavigationMode ? undefined : onKeydown }>
+			<div
+				ref={ container }
+				onKeyDown={ isNavigationMode ? undefined : onKeydown }
+			>
 				{ children }
 			</div>
 			<FocusCapture
