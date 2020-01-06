@@ -501,73 +501,71 @@ function BlockListBlock( {
 				clientId={ clientId }
 				rootClientId={ rootClientId }
 			/> }
-			<div className="block-editor-block-list__block-edit">
-				{ ( isCapturingDescendantToolbars ) && (
-					// A slot made available on all ancestors of the selected Block
-					// to allow child Blocks to render their toolbars into the DOM
-					// of the appropriate parent.
-					<ChildToolbarSlot />
-				) }
-				{ ( shouldShowBreadcrumb || shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
-					<Popover
-						noArrow
-						animate={ false }
-						// Position above the anchor, pop out towards the right,
-						// and position in the left corner.
-						// To do: refactor `Popover` to make this prop clearer.
-						position="top right left"
-						focusOnMount={ false }
-						anchorRef={ blockNodeRef.current }
-						className="block-editor-block-list__block-popover"
-						__unstableSticky={ isPartOfMultiSelection ? '.wp-block.is-multi-selected' : true }
-						__unstableSlotName="block-toolbar"
-						// Allow subpixel positioning for the block movement animation.
-						__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && wrapper.current }
-						__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && wrapper.current }
-					>
-						{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && renderBlockContextualToolbar() }
-						{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
-							// If the parent Block is set to consume toolbars of the child Blocks
-							// then render the child Block's toolbar into the Slot provided
-							// by the parent.
-							<ChildToolbar>
-								{ renderBlockContextualToolbar() }
-							</ChildToolbar>
-						) }
-						{ shouldShowBreadcrumb && (
-							<BlockBreadcrumb
-								clientId={ clientId }
-								ref={ breadcrumb }
-								data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
-							/>
-						) }
-					</Popover>
-				) }
-				<IgnoreNestedEvents
-					ref={ blockNodeRef }
-					onDragStart={ preventDrag }
-					onMouseDown={ onMouseDown }
-					onMouseLeave={ onMouseLeave }
-					data-block={ clientId }
+			{ ( isCapturingDescendantToolbars ) && (
+				// A slot made available on all ancestors of the selected Block
+				// to allow child Blocks to render their toolbars into the DOM
+				// of the appropriate parent.
+				<ChildToolbarSlot />
+			) }
+			{ ( shouldShowBreadcrumb || shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
+				<Popover
+					noArrow
+					animate={ false }
+					// Position above the anchor, pop out towards the right,
+					// and position in the left corner.
+					// To do: refactor `Popover` to make this prop clearer.
+					position="top right left"
+					focusOnMount={ false }
+					anchorRef={ blockNodeRef.current }
+					className="block-editor-block-list__block-popover"
+					__unstableSticky={ isPartOfMultiSelection ? '.wp-block.is-multi-selected' : true }
+					__unstableSlotName="block-toolbar"
+					// Allow subpixel positioning for the block movement animation.
+					__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && wrapper.current }
+					__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && wrapper.current }
 				>
-					<BlockCrashBoundary onError={ onBlockError }>
-						{ isValid && blockEdit }
-						{ isValid && mode === 'html' && (
-							<BlockHtml clientId={ clientId } />
-						) }
-						{ ! isValid && [
-							<BlockInvalidWarning
-								key="invalid-warning"
-								clientId={ clientId }
-							/>,
-							<div key="invalid-preview">
-								{ getSaveElement( blockType, attributes ) }
-							</div>,
-						] }
-					</BlockCrashBoundary>
-					{ !! hasError && <BlockCrashWarning /> }
-				</IgnoreNestedEvents>
-			</div>
+					{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && renderBlockContextualToolbar() }
+					{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
+						// If the parent Block is set to consume toolbars of the child Blocks
+						// then render the child Block's toolbar into the Slot provided
+						// by the parent.
+						<ChildToolbar>
+							{ renderBlockContextualToolbar() }
+						</ChildToolbar>
+					) }
+					{ shouldShowBreadcrumb && (
+						<BlockBreadcrumb
+							clientId={ clientId }
+							ref={ breadcrumb }
+							data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
+						/>
+					) }
+				</Popover>
+			) }
+			<IgnoreNestedEvents
+				ref={ blockNodeRef }
+				onDragStart={ preventDrag }
+				onMouseDown={ onMouseDown }
+				onMouseLeave={ onMouseLeave }
+				data-block={ clientId }
+			>
+				<BlockCrashBoundary onError={ onBlockError }>
+					{ isValid && blockEdit }
+					{ isValid && mode === 'html' && (
+						<BlockHtml clientId={ clientId } />
+					) }
+					{ ! isValid && [
+						<BlockInvalidWarning
+							key="invalid-warning"
+							clientId={ clientId }
+						/>,
+						<div key="invalid-preview">
+							{ getSaveElement( blockType, attributes ) }
+						</div>,
+					] }
+				</BlockCrashBoundary>
+				{ !! hasError && <BlockCrashWarning /> }
+			</IgnoreNestedEvents>
 			{ showEmptyBlockSideInserter && (
 				<div className="block-editor-block-list__empty-block-inserter">
 					<Inserter
