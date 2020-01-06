@@ -38,8 +38,8 @@ function hasModuleField( file ) {
 	} catch {
 		// If, for whatever reason, the package's `package.json` cannot be read,
 		// consider it as an invalid candidate. In most cases, this can happen
-		// wehn lingering (empty) directories are left in the working path when
-		// changing to an older branch where a package did not yet exist.
+		// when lingering directories are left in the working path when changing
+		// to an older branch where a package did not yet exist.
 		return false;
 	}
 
