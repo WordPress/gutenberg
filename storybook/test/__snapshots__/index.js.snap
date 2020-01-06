@@ -555,22 +555,59 @@ exports[`Storyshots Components|Button Default 1`] = `
 
 exports[`Storyshots Components|Button Disabled 1`] = `
 <button
+  aria-disabled={true}
   className="components-button"
-  disabled={true}
+  disabled={false}
+  onClick={[Function]}
+  onMouseDown={[Function]}
   type="button"
 >
   Disabled Button
 </button>
 `;
 
-exports[`Storyshots Components|Button Disabled Link 1`] = `
+exports[`Storyshots Components|Button Disabled Icon 1`] = `
 <button
-  className="components-button"
-  disabled={true}
+  aria-disabled={true}
+  aria-label="More"
+  className="components-button has-icon"
+  disabled={false}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onMouseDown={[Function]}
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
   type="button"
 >
-  Disabled Link Button
+  <svg
+    aria-hidden="true"
+    className="dashicon dashicons-ellipsis"
+    focusable="false"
+    height={20}
+    role="img"
+    viewBox="0 0 20 20"
+    width={20}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+    />
+  </svg>
 </button>
+`;
+
+exports[`Storyshots Components|Button Disabled Link 1`] = `
+<a
+  aria-disabled={true}
+  className="components-button"
+  href="https://wordpress.org/"
+  onClick={[Function]}
+  onMouseDown={[Function]}
+  target="_blank"
+>
+  Disabled Link Button
+</a>
 `;
 
 exports[`Storyshots Components|Button Grouped Icons 1`] = `

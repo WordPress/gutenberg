@@ -185,7 +185,7 @@ describe( 'InserterMenu', () => {
 		TestUtils.Simulate.click( layoutTab );
 
 		const disabledBlocks = element.querySelectorAll(
-			'.block-editor-block-types-list__item[disabled]'
+			'.block-editor-block-types-list__item[disabled], .block-editor-block-types-list__item[aria-disabled="true"]'
 		);
 
 		expect( disabledBlocks ).toHaveLength( 1 );
