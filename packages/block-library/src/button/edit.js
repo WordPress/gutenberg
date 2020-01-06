@@ -82,7 +82,7 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 	);
 }
 
-function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab } ) {
+function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onToggleOpenInNewTab } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	useEffect(
 		() => {
@@ -103,8 +103,11 @@ function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab } ) {
 				setAttributes( {
 					title: escape( newTitle ),
 					url: newURL,
-					opensInNewTab: newOpensInNewTab,
 				} );
+
+				if ( opensInNewTab !== newOpensInNewTab ) {
+					onToggleOpenInNewTab( newOpensInNewTab );
+				}
 			} }
 			onClose={ () => {
 				setIsURLPickerOpen( false );
@@ -219,6 +222,7 @@ function ButtonEdit( {
 				setAttributes={ setAttributes }
 				isSelected={ isSelected }
 				opensInNewTab={ linkTarget === '_blank' }
+				onToggleOpenInNewTab={ onToggleOpenInNewTab }
 			/>
 			<InspectorControls>
 				<PanelColorGradientSettings
