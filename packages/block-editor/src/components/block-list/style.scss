@@ -543,38 +543,6 @@
 	}
 }
 
-.block-editor-block-list__block {
-	@include break-small {
-		// Increase the hover and selection area around blocks.
-		// This makes the blue hover line and the settings button appear even if
-		// the mouse cursor is technically outside the block.
-		// This improves usability by making it possible to click somewhat outside
-		// the block and select it. (eg. A fuzzy click target.)
-		&::before {
-			bottom: 0;
-			content: "";
-			left: -$block-padding * 2;
-			position: absolute;
-			right: -$block-padding * 2;
-			top: 0;
-		}
-
-		// Remove the fuzzy click area effect set above on nested blocks.
-		// It should only applies to top-level blocks; applying this rule to
-		// nested blocks will result in difficult-to-use and possibly overlapping
-		// click targets.
-		& &::before {
-			left: 0;
-			right: 0;
-		}
-
-		// Don't use this for full-wide blocks, as there's no clearance to accommodate extra area on the side.
-		&[data-align="full"]::before {
-			content: none;
-		}
-	}
-}
-
 .block-editor-block-list__block .block-editor-warning {
 	z-index: z-index(".block-editor-warning");
 	position: relative;
