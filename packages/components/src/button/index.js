@@ -35,7 +35,7 @@ export function Button( props, ref ) {
 		isSecondary,
 		isLink,
 		isDestructive,
-		isFocusable,
+		isFocusable = true,
 		className,
 		disabled,
 		icon,
@@ -82,7 +82,7 @@ export function Button( props, ref ) {
 		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
 			additionalProps[ disabledEvent ] = ( event ) => {
 				event.stopPropagation();
-				// event.stopImmediatePropagation();
+				event.stopImmediatePropagation();
 				event.preventDefault();
 			};
 		}
