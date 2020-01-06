@@ -3,7 +3,7 @@
  */
 import {
 	Dropdown,
-	IconButton,
+	Button,
 	MenuItemsChoice,
 	SVG,
 	Path,
@@ -31,7 +31,7 @@ function ToolSelector() {
 	return (
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<IconButton
+				<Button
 					icon={ isNavigationTool ? selectIcon : editIcon }
 					aria-expanded={ isOpen }
 					onClick={ onToggle }

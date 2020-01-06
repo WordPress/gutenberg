@@ -14,7 +14,7 @@ import { useRef, useReducer, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
 import ColorPicker from '../color-picker';
 import Dropdown from '../dropdown';
 import ControlPoints from './control-points';
@@ -47,7 +47,7 @@ function InsertPoint( {
 				onCloseInserter();
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<IconButton
+				<Button
 					aria-expanded={ isOpen }
 					onClick={ () => {
 						setAlreadyInsertedPoint( false );

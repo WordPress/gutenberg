@@ -407,20 +407,27 @@ export function isEqualTagAttributePairs( actual, expected, logger = createLogge
 		return false;
 	}
 
-	// Convert tuples to object for ease of lookup
-	const [ actualAttributes, expectedAttributes ] = [ actual, expected ].map( fromPairs );
+	// Attributes are not guaranteed to occur in the same order. For validating
+	// actual attributes, first convert the set of expected attribute values to
+	// an object, for lookup by key.
+	const expectedAttributes = {};
+	for ( let i = 0; i < expected.length; i++ ) {
+		expectedAttributes[ expected[ i ][ 0 ].toLowerCase() ] = expected[ i ][ 1 ];
+	}
 
-	for ( const name in actualAttributes ) {
+	for ( let i = 0; i < actual.length; i++ ) {
+		const [ name, actualValue ] = actual[ i ];
+		const nameLower = name.toLowerCase();
+
 		// As noted above, if missing member in B, assume different
-		if ( ! expectedAttributes.hasOwnProperty( name ) ) {
+		if ( ! expectedAttributes.hasOwnProperty( nameLower ) ) {
 			logger.warning( 'Encountered unexpected attribute `%s`.', name );
 			return false;
 		}
 
-		const actualValue = actualAttributes[ name ];
-		const expectedValue = expectedAttributes[ name ];
+		const expectedValue = expectedAttributes[ nameLower ];
+		const isEqualAttributes = isEqualAttributesOfName[ nameLower ];
 
-		const isEqualAttributes = isEqualAttributesOfName[ name ];
 		if ( isEqualAttributes ) {
 			// Defer custom attribute equality handling
 			if ( ! isEqualAttributes( actualValue, expectedValue ) ) {
@@ -444,7 +451,13 @@ export function isEqualTagAttributePairs( actual, expected, logger = createLogge
  */
 export const isEqualTokensOfType = {
 	StartTag: ( actual, expected, logger = createLogger() ) => {
-		if ( actual.tagName !== expected.tagName ) {
+		if (
+			actual.tagName !== expected.tagName &&
+			// Optimization: Use short-circuit evaluation to defer case-
+			// insensitive check on the assumption that the majority case will
+			// have exactly equal tag names.
+			actual.tagName.toLowerCase() !== expected.tagName.toLowerCase()
+		) {
 			logger.warning( 'Expected tag name `%s`, instead saw `%s`.', expected.tagName, actual.tagName );
 			return false;
 		}

@@ -5,7 +5,7 @@
  */
 export async function clickOnCloseModalButton( modalClassName ) {
 	let closeButtonClassName =
-		'.components-modal__header .components-icon-button';
+		'.components-modal__header .components-button';
 
 	if ( modalClassName ) {
 		closeButtonClassName = `${ modalClassName } ${ closeButtonClassName }`;

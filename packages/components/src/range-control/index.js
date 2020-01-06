@@ -64,9 +64,12 @@ function RangeControl( {
 			parseFloat( newValue )
 		);
 	};
+
+	const initialFallbackValue = isFinite( initialPosition ) ?
+		initialPosition : '';
+
 	const initialSliderValue = isFinite( currentInputValue ) ?
-		currentInputValue :
-		initialPosition || '';
+		currentInputValue : initialFallbackValue;
 
 	return (
 		<BaseControl

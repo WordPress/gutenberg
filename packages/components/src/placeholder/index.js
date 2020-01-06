@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import useResizeAware from 'react-resize-aware';
 
 /**
  * Internal dependencies
@@ -15,10 +16,18 @@ import Icon from '../icon';
  * @return {Object}       The rendered placeholder.
  */
 function Placeholder( { icon, children, label, instructions, className, notices, preview, isColumnLayout, ...additionalProps } ) {
-	const classes = classnames( 'components-placeholder', className );
+	const [ resizeListener, { width } ] = useResizeAware();
+	const classes = classnames(
+		'components-placeholder',
+		( width >= 320 ? 'is-large' : '' ),
+		( width >= 160 && width < 320 ? 'is-medium' : '' ),
+		( width < 160 ? 'is-small' : '' ),
+		className
+	);
 	const fieldsetClasses = classnames( 'components-placeholder__fieldset', { 'is-column-layout': isColumnLayout } );
 	return (
 		<div { ...additionalProps } className={ classes }>
+			{ resizeListener }
 			{ notices }
 			{ preview &&
 				<div className="components-placeholder__preview">

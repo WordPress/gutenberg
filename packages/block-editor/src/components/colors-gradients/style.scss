@@ -1,0 +1,17 @@
+.block-editor-color-gradient-control__button-tabs {
+	display: block;
+}
+
+.block-editor-panel-color-gradient-settings {
+	.component-color-indicator {
+		vertical-align: text-bottom;
+	}
+
+	&__panel-title .component-color-indicator {
+		display: inline-block;
+	}
+
+	&.is-opened &__panel-title .component-color-indicator {
+		display: none;
+	}
+}

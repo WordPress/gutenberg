@@ -11,7 +11,7 @@ import { useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
 import ToolbarContext from '../toolbar-context';
 import AccessibleToolbarButtonContainer from './accessible-toolbar-button-container';
 import ToolbarButtonContainer from './toolbar-button-container';
@@ -34,7 +34,7 @@ function ToolbarButton( {
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	const button = (
-		<IconButton
+		<Button
 			icon={ icon }
 			label={ title }
 			shortcut={ shortcut }
