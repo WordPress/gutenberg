@@ -34,7 +34,7 @@ Width of the preview container in pixels. Controls at what size the blocks will 
 * **Type** `Int`
 * **Default** `100ms`
 
-It defines the delay before to start to calc the scale factor and position of the preview block.
+Defines a delay to be applied before calculating the scale factor and position of the preview block.
 
 ### `__experimentalOnReady`
 * **Type** `Function`
