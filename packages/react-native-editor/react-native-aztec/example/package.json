@@ -1,0 +1,35 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "Example for running ponies",
+  "main": "index.js",
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "android": "react-native run-android",
+    "preinstall": "yarn install-aztec",
+    "install-aztec": "pushd ../ && (yarn install; popd;)",
+    "preios": "pushd ../ && (yarn install-aztec-ios; popd;)",
+    "ios": "react-native run-ios",
+    "test": "jest",
+    "clean": "yarn clean-aztec; yarn clean-node; yarn clean-ios;",
+    "clean-aztec": "pushd ../ && (yarn clean; popd;)",
+    "clean-ios": "type xcodebuild &> /dev/null && (xcodebuild -project ./ios/example.xcodeproj -alltargets clean && rm -rf ./ios/build);",
+    "clean-node": "rm -rf node_modules/;",
+    "clean:install": "yarn clean && yarn install"
+  },
+  "dependencies": {
+    "react": "16.6.1",
+	"react-native": "0.57.5"
+  },
+  "devDependencies": {
+	"metro-react-native-babel-preset": "^0.45.5",
+	"@babel/core": "^7.1.0",
+	"babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "23.6.0",
+    "babel-plugin-module-resolver": "3.1.1",    
+    "eslint": "4.0.0",
+    "jest": "23.6.0",
+    "react-test-renderer": "16.5.0"
+  },
+  "license": "GPL-2.0"
+}
