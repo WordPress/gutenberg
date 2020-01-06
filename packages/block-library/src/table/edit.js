@@ -450,6 +450,13 @@ export class TableEdit extends Component {
 								[ `has-text-align-${ align }` ]: align,
 							}, 'wp-block-table__cell-content' );
 
+							let placeholder = '';
+							if ( name === 'head' ) {
+								placeholder = __( 'Header label' );
+							} else if ( name === 'foot' ) {
+								placeholder = __( 'Footer label' );
+							}
+
 							return (
 								<RichText
 									tagName={ CellTag }
@@ -459,6 +466,7 @@ export class TableEdit extends Component {
 									value={ content }
 									onChange={ this.onChange }
 									unstableOnFocus={ this.createOnFocus( cellLocation ) }
+									placeholder={ placeholder }
 								/>
 							);
 						} ) }
