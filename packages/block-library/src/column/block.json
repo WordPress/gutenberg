@@ -7,8 +7,8 @@
 		},
 		"width": {
 			"type": "number",
-			"min": 0,
-			"max": 100
+			"minimum": 0,
+			"maximum": 100
 		}
 	}
 }
