@@ -41,7 +41,7 @@ export class BlockInvalidWarning extends Component {
 		const { compare } = this.state;
 		const hiddenActions = [
 			{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
-			{ title: __( 'Attempt Block Recovery' ), onClick: attemptBlockRecovery },
+			{ title: __( 'Convert to HTML Block' ), onClick: convertToHTML },
 		];
 
 		return (
@@ -55,8 +55,8 @@ export class BlockInvalidWarning extends Component {
 							}
 						</Button>,
 						hasHTMLBlock && (
-							<Button key="edit" onClick={ convertToHTML } isPrimary>
-								{ __( 'Convert to HTML' ) }
+							<Button key="edit" onClick={ attemptBlockRecovery } isPrimary>
+								{ __( 'Attempt Block Recovery' ) }
 							</Button>
 						),
 					] }
