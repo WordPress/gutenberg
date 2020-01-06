@@ -3,6 +3,7 @@ package org.wordpress.mobile.ReactNativeGutenbergBridge;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -117,12 +118,9 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection, mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_CAMERA)) {
             mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(getNewUploadMediaCallback(false, onUploadMediaSelected), mediaType);
+        } else {
+            mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection);
         }
-    }
-
-    @ReactMethod
-    public void requestOtherMediaPickFrom(String mediaSource, Boolean allowMultipleSelection, final Callback onUploadMediaSelected) {
-        mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection);
     }
 
     private MediaType getMediaTypeFromFilter(ReadableArray filter) {
@@ -168,6 +166,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    public void requestImageFullscreenPreview(String mediaUrl) {
+        mGutenbergBridgeJS2Parent.requestImageFullscreenPreview(mediaUrl);
+    }
+
+    @ReactMethod
     public void editorDidEmitLog(String message, int logLevel) {
         mGutenbergBridgeJS2Parent.editorDidEmitLog(message, GutenbergBridgeJS2Parent.LogLevel.valueOf(logLevel));
     }
@@ -182,6 +185,13 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback = getNewOtherMediaReceivedCallback(jsCallback);
         MediaType mediaType = getMediaTypeFromFilter(filter);
         mGutenbergBridgeJS2Parent.getOtherMediaPickerOptions(otherMediaOptionsReceivedCallback, mediaType);
+    }
+
+    @ReactMethod
+    public void fetchRequest(String path, Promise promise) {
+        mGutenbergBridgeJS2Parent.performRequest(path,
+                promise::resolve,
+                errorMessage -> promise.reject(new Error(errorMessage)));
     }
 
     private OtherMediaOptionsReceivedCallback getNewOtherMediaReceivedCallback(final Callback jsCallback) {
@@ -200,7 +210,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         return new GutenbergBridgeJS2Parent.MediaUploadCallback() {
             @Override
             public void onUploadMediaFileSelected(List<RNMedia> mediaList) {
-                if(allowMultipleSelection) {
+                if (allowMultipleSelection) {
                     WritableArray writableArray = new WritableNativeArray();
                     for (RNMedia media : mediaList) {
                         writableArray.pushMap(media.toMap());

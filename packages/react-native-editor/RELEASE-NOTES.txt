@@ -1,9 +1,32 @@
+1.20.0
+------
+* Fix bug where image placeholders would sometimes not be shown
+
+1.19.0
+------
+* Add support for changing Settings in List Block.
+* [iOS] Fix crash dismissing bottom-sheet after device rotation.
+* [Android] Add support for Preformatted block.
+* New block: Gallery. You can now create image galleries using WordPress Media library. Upload feature is coming soon.
+* Add support for Video block settings
+
+1.18.0
+------
+* [iOS] Added native fullscreen preview when clicking image from Image Block
+* New block: Spacer
+
 1.17.0
 ------
 * Include block title in Unsupported block's UI
 * Show new-block-indicator when no blocks at all and when at the last block
 * Use existing links in the clipboard to prefill url field when inserting new link.
+* Media & Text block alignment options
+* Add alignment controls for paragraph blocks
 * [iOS] Fix issue where the keyboard would not capitalize sentences correctly on some cases.
+* [iOS] Support for Pexels image library
+* [Android] Added native fullscreen preview when clicking image from Image Block
+* [iOS] Add support for Preformatted block.
+* [Android] Fix issue when removing image/page break block crashes the app
 
 1.16.1
 ------

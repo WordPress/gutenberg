@@ -11,6 +11,7 @@ import {
 	isLocalEnvironment,
 	stopDriver,
 	isAndroid,
+	swipeDown,
 	clickMiddleOfElement,
 } from './helpers/utils';
 import testData from './helpers/test-data';
@@ -39,6 +40,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 	} );
 
 	it( 'should be able to see visual editor', async () => {
+		// wait for the block editor to load
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
@@ -100,6 +102,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			await editorPage.dismissKeyboard();
 		}
 
+		await swipeDown( driver );
 		const titleElement = await editorPage.getTitleElement( { autoscroll: true } );
 		await titleElement.click();
 		await titleElement.click();

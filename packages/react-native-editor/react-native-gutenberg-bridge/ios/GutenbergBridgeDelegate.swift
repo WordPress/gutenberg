@@ -123,6 +123,17 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that the editor has sent an autosave event.
     ///
     func editorDidAutosave()
+
+    /// Tells the delegate that the editor needs to perform a network request.
+    /// The paths given to perform the request are from the WP ORG REST API.
+    /// https://developer.wordpress.org/rest-api/reference/
+    /// - Parameter path: The path to perform the request.
+    /// - Parameter completion: Completion handler to be called with the result or an error.
+    func gutenbergDidRequestFetch(path: String, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
+
+    /// Tells the delegate to display a fullscreen image from a given URL
+    ///
+    func gutenbergDidRequestFullscreenImage(with mediaUrl: URL)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

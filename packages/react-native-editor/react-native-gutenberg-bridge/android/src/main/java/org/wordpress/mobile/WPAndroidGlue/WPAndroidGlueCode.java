@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout.LayoutParams;
 
+import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 
 import com.brentvatne.react.ReactVideoPackage;
@@ -22,6 +23,7 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.LifecycleState;
@@ -31,6 +33,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
 import com.horcrux.svg.SvgPackage;
+import com.reactnativecommunity.slider.ReactSliderPackage;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
@@ -61,10 +64,16 @@ public class WPAndroidGlueCode {
     private MediaUploadCallback mPendingMediaUploadCallback;
     private boolean mMediaPickedByUserOnBlock;
 
+    /**
+     * Flag to append as siblings when allowMultipleSelection = false is not respected
+     */
+    private boolean mAppendsMultipleSelectedToSiblingBlocks = false;
+
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachQueryListener mOnReattachQueryListener;
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
+    private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -76,10 +85,12 @@ public class WPAndroidGlueCode {
     private boolean mShouldUpdateContent;
     private CountDownLatch mGetContentCountDownLatch;
     private WeakReference<View> mLastFocusedView = null;
+    private RequestExecutor mRequestExecutor;
 
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
     private static final String PROP_NAME_INITIAL_TITLE = "initialTitle";
     private static final String PROP_NAME_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled";
+    private static final String PROP_NAME_POST_TYPE = "postType";
     private static final String PROP_NAME_LOCALE = "locale";
     private static final String PROP_NAME_TRANSLATIONS = "translations";
 
@@ -118,6 +129,10 @@ public class WPAndroidGlueCode {
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
     }
 
+    public interface OnImageFullscreenPreviewListener {
+        void onImageFullscreenPreviewClicked(String mediaUrl);
+    }
+
     public interface OnReattachQueryListener {
         void onQueryCurrentProgressForUploadingMedia();
     }
@@ -132,6 +147,10 @@ public class WPAndroidGlueCode {
 
     public interface OnEditorAutosaveListener {
         void onEditorAutosave();
+    }
+
+    public void mediaSelectionCancelled() {
+        mAppendsMultipleSelectedToSiblingBlocks = false;
     }
 
     protected List<ReactPackage> getPackages() {
@@ -155,6 +174,7 @@ public class WPAndroidGlueCode {
             @Override
             public void requestMediaPickFromMediaLibrary(MediaUploadCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
                 mMediaPickedByUserOnBlock = true;
+                mAppendsMultipleSelectedToSiblingBlocks = !allowMultipleSelection;
                 mPendingMediaUploadCallback = mediaSelectedCallback;
                 if (mediaType == MediaType.IMAGE) {
                     mOnMediaLibraryButtonListener.onMediaLibraryImageButtonClicked(allowMultipleSelection);
@@ -168,6 +188,7 @@ public class WPAndroidGlueCode {
             @Override
             public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection, MediaType mediaType) {
                 mMediaPickedByUserOnBlock = true;
+                mAppendsMultipleSelectedToSiblingBlocks = false;
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 if (mediaType == MediaType.IMAGE) {
                     mOnMediaLibraryButtonListener.onUploadPhotoButtonClicked(allowMultipleSelection);
@@ -181,6 +202,7 @@ public class WPAndroidGlueCode {
             @Override
             public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback, MediaType mediaType) {
                 mMediaPickedByUserOnBlock = true;
+                mAppendsMultipleSelectedToSiblingBlocks = false;
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 if (mediaType == MediaType.IMAGE) {
                     mOnMediaLibraryButtonListener.onCapturePhotoButtonClicked();
@@ -270,7 +292,18 @@ public class WPAndroidGlueCode {
                                                        Boolean allowMultipleSelection) {
                 mPendingMediaUploadCallback = mediaSelectedCallback;
                 mMediaPickedByUserOnBlock = true;
+                mAppendsMultipleSelectedToSiblingBlocks = false;
                 mOnMediaLibraryButtonListener.onOtherMediaButtonClicked(mediaSource, allowMultipleSelection);
+            }
+
+            @Override
+            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<String> onError) {
+                mRequestExecutor.performRequest(pathFromJS, onSuccess, onError);
+            }
+
+            @Override
+            public void requestImageFullscreenPreview(String mediaUrl) {
+                mOnImageFullscreenPreviewListener.onImageFullscreenPreviewClicked(mediaUrl);
             }
         });
 
@@ -280,6 +313,7 @@ public class WPAndroidGlueCode {
                 new ReactAztecPackage(),
                 new RNRecyclerviewListPackage(),
                 new ReactVideoPackage(),
+                new ReactSliderPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 
@@ -292,9 +326,17 @@ public class WPAndroidGlueCode {
                 .newBuilder(mReactRootView.getContext(), client).build();
     }
 
+    @Deprecated
     public void onCreateView(Context initContext, boolean htmlModeEnabled,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
                              boolean isNewPost, String localeString, Bundle translations) {
+        onCreateView(initContext, htmlModeEnabled, application, isDebug, buildGutenbergFromSource, "post", isNewPost
+        , localeString, translations);
+    }
+
+    public void onCreateView(Context initContext, boolean htmlModeEnabled,
+                             Application application, boolean isDebug, boolean buildGutenbergFromSource,
+                             String postType, boolean isNewPost, String localeString, Bundle translations) {
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
 
         ReactInstanceManagerBuilder builder =
@@ -321,6 +363,7 @@ public class WPAndroidGlueCode {
         initialProps.putString(PROP_NAME_INITIAL_DATA, "");
         initialProps.putString(PROP_NAME_INITIAL_TITLE, "");
         initialProps.putBoolean(PROP_NAME_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled);
+        initialProps.putString(PROP_NAME_POST_TYPE, postType);
         initialProps.putString(PROP_NAME_LOCALE, localeString);
         initialProps.putBundle(PROP_NAME_TRANSLATIONS, translations);
 
@@ -333,7 +376,9 @@ public class WPAndroidGlueCode {
                                   OnReattachQueryListener onReattachQueryListener,
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
-                                  OnAuthHeaderRequestedListener onAuthHeaderRequestedListener) {
+                                  OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
+                                  RequestExecutor fetchExecutor,
+                                  OnImageFullscreenPreviewListener onImageFullscreenPreviewListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
@@ -341,6 +386,8 @@ public class WPAndroidGlueCode {
         mOnReattachQueryListener = onReattachQueryListener;
         mOnEditorMountListener = onEditorMountListener;
         mOnEditorAutosaveListener = onEditorAutosaveListener;
+        mRequestExecutor = fetchExecutor;
+        mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -556,34 +603,39 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
     }
 
-    public void appendUploadMediaFile(final int mediaId, final String mediaUri, final boolean isVideo) {
-       if (isMediaUploadCallbackRegistered() && mMediaPickedByUserOnBlock) {
-           String mediaType = getMediaType(isVideo);
-           mMediaPickedByUserOnBlock = false;
-           List<RNMedia> mediaList = new ArrayList<>();
-           mediaList.add(new Media(mediaId, mediaUri, mediaType));
-           mPendingMediaUploadCallback.onUploadMediaFileSelected(mediaList);
-       } else {
-           // we can assume we're being passed a new image from share intent as there was no selectMedia callback
-           sendOrDeferAppendMediaSignal(mediaId, mediaUri, isVideo);
-       }
-    }
-
     public void appendUploadMediaFiles(ArrayList<Media> mediaList) {
         if (isMediaUploadCallbackRegistered() && mMediaPickedByUserOnBlock) {
             mMediaPickedByUserOnBlock = false;
             List<RNMedia> rnMediaList = new ArrayList<>();
-            for (Media media : mediaList) {
-                rnMediaList.add(new Media(media.getId(), media.getUrl(), media.getType()));
+
+            // We have special handling here for the image block when the user selects multiple items from the
+            // WordPress Media Library: We pass the first image to the callback, and the remaining images will be
+            // appended as blocks via sendOrDeferAppendMediaSignal
+            //
+            // All other media selection results should be passed to the callback at once (as a collection)
+            //
+            // Note: In the future, after image block <-> gallery block transforms have been implemented, this special
+            // handling will no longer be necessary
+
+            if (mAppendsMultipleSelectedToSiblingBlocks && 1 < mediaList.size()) {
+                rnMediaList.add(mediaList.get(0));
+                mPendingMediaUploadCallback.onUploadMediaFileSelected(rnMediaList);
+
+                for (Media mediaToAppend : mediaList.subList(1, mediaList.size())) {
+                    sendOrDeferAppendMediaSignal(mediaToAppend.getId(), mediaToAppend.getUrl(),
+                            mediaToAppend.getType());
+                }
+            } else {
+                rnMediaList.addAll(mediaList);
+                mPendingMediaUploadCallback.onUploadMediaFileSelected(rnMediaList);
             }
-            mPendingMediaUploadCallback.onUploadMediaFileSelected(rnMediaList);
-            mPendingMediaUploadCallback = null;
         }
+
+        mAppendsMultipleSelectedToSiblingBlocks = false;
     }
 
-    private void sendOrDeferAppendMediaSignal(final int mediaId, final String mediaUri, final boolean isVideo) {
+    private void sendOrDeferAppendMediaSignal(final int mediaId, final String mediaUri, final String mediaType) {
         // if editor is mounted, let's append the media file
-        String mediaType = getMediaType(isVideo);
         if (mIsEditorMounted) {
             if (!TextUtils.isEmpty(mediaUri) && mediaId > 0) {
                 // send signal to JS

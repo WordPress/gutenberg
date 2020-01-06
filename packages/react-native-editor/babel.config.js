@@ -26,7 +26,7 @@ module.exports = function( api ) {
 						},
 					],
 				],
-				exclude: /node_modules\/react-native/,
+				exclude: /node_modules\/(react-native|@react-native-community)/,
 			},
 			{
 				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found
@@ -41,7 +41,7 @@ module.exports = function( api ) {
 						},
 					],
 				],
-				exclude: /node_modules\/react-native/,
+				exclude: /node_modules\/(react-native|@react-native-community)/,
 			},
 		],
 		env: {

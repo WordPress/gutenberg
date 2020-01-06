@@ -3,7 +3,10 @@ package com.gutenberg;
 import android.app.Application;
 import android.util.Log;
 
+import androidx.core.util.Consumer;
+
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.devsupport.interfaces.DevOptionHandler;
@@ -88,6 +91,11 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
+            public void requestImageFullscreenPreview(String mediaUrl) {
+
+            }
+
+            @Override
             public void editorDidEmitLog(String message, LogLevel logLevel) {
                 switch (logLevel) {
                     case TRACE:
@@ -104,6 +112,9 @@ public class MainApplication extends Application implements ReactApplication {
                         break;
                 }
             }
+
+            @Override
+            public void performRequest(String path, Consumer<String> onSuccess, Consumer<String> onError) {}
         });
 
         return new ReactNativeHost(this) {
@@ -116,6 +127,7 @@ public class MainApplication extends Application implements ReactApplication {
             protected List<ReactPackage> getPackages() {
                 return Arrays.asList(
                         new MainReactPackage(),
+                        new ReactSliderPackage(),
                         new ReactVideoPackage(),
                         new SvgPackage(),
                         new ReactAztecPackage(),

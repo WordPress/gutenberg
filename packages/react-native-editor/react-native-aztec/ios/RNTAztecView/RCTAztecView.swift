@@ -88,6 +88,13 @@ class RCTAztecView: Aztec.TextView {
         )
     }()
 
+    private lazy var placeholderWidthConstraint: NSLayoutConstraint = {
+        // width needs to be shrunk on both the left and the right by the textInset in order for
+        // the placeholder to be appropriately positioned with right alignment.
+        let placeholderWidthInset = 2 * leftTextInset
+        return placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor, constant: -placeholderWidthInset)
+    }()
+
     /// If a dictation start with an empty UITextView,
     /// the dictation engine refreshes the TextView with an empty string when the dictation finishes.
     /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
@@ -136,6 +143,7 @@ class RCTAztecView: Aztec.TextView {
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
         shouldNotifyOfNonUserChanges = false
         disableLinkTapRecognizer()
+        preBackgroundColor = .clear
     }
 
     func addPlaceholder() {
@@ -143,8 +151,8 @@ class RCTAztecView: Aztec.TextView {
         let topConstant = contentInset.top + textContainerInset.top
         NSLayoutConstraint.activate([
             placeholderHorizontalConstraint,
-            placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
-            placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor),
+            placeholderWidthConstraint,
+            placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: topConstant)
         ])
     }
 
@@ -425,7 +433,7 @@ class RCTAztecView: Aztec.TextView {
 
         setHTML(html)
         updatePlaceholderVisibility()
-        refreshFont()
+        refreshTypingAttributesAndPlaceholderFont()
         if let selection = contents["selection"] as? NSDictionary,
             let start = selection["start"] as? NSNumber,
             let end = selection["end"]  as? NSNumber {
@@ -438,6 +446,7 @@ class RCTAztecView: Aztec.TextView {
     override var textColor: UIColor? {
         didSet {
             typingAttributes[NSAttributedString.Key.foregroundColor] = self.textColor
+            self.defaultTextColor = self.textColor
         }
     }
 
@@ -499,16 +508,25 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Font Setters
 
     @objc func setFontFamily(_ family: String) {
+        guard fontFamily != family else {
+            return
+        }
         fontFamily = family
         refreshFont()
     }
 
     @objc func setFontSize(_ size: CGFloat) {
+        guard fontSize != size else {
+            return
+        }
         fontSize = size
         refreshFont()
     }
 
     @objc func setFontWeight(_ weight: String) {
+        guard fontWeight != weight else {
+            return
+        }
         fontWeight = weight
         refreshFont()
     }
@@ -557,33 +575,16 @@ class RCTAztecView: Aztec.TextView {
     /// were ever set.
     ///
     private func refreshFont() {
-        guard fontFamily != nil || fontSize != nil || fontWeight != nil else {
-            return
-        }
-
-        let fullRange = NSRange(location: 0, length: textStorage.length)
-
-        textStorage.beginEditing()
-        textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
-            let oldFont = font(from: attributes)
-            let newFont = applyFontConstraints(to: oldFont)
-
-            textStorage.addAttribute(.font, value: newFont, range: subrange)
-        }
-        textStorage.endEditing()
-
-        refreshTypingAttributesAndPlaceholderFont()
+        let newFont = applyFontConstraints(to: defaultFont)
+        defaultFont = newFont
     }
 
     /// This method refreshes the font for the palceholder field and typing attributes.
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {
-        let oldFont = font(from: typingAttributes)
-        let newFont = applyFontConstraints(to: oldFont)
-
-        typingAttributes[.font] = newFont
-        placeholderLabel.font = newFont
+        let currentFont = font(from: typingAttributes)        
+        placeholderLabel.font = currentFont
     }
 
     // MARK: - Formatting interface
