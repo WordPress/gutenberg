@@ -16,7 +16,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	BlockEditorProvider,
 	BlockList,
-	WritingFlow,
 } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { parse, serialize } from '@wordpress/blocks';
@@ -122,9 +121,7 @@ class ReusableBlockEdit extends Component {
 				onChange={ this.setBlocks }
 				onInput={ this.setBlocks }
 			>
-				<WritingFlow>
-					<BlockList />
-				</WritingFlow>
+				<BlockList />
 			</BlockEditorProvider>
 		);
 
