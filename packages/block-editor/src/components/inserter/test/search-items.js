@@ -3,6 +3,7 @@
  */
 import items, {
 	categories,
+	collections,
 	textItem,
 	advancedTextItem,
 	moreItem,
@@ -48,37 +49,37 @@ describe( 'normalizeSearchTerm', () => {
 
 describe( 'searchItems', () => {
 	it( 'should return back all items when no terms detected', () => {
-		expect( searchItems( items, categories, ' - ? * ' ) ).toBe(
+		expect( searchItems( items, categories, collections, ' - ? * ' ) ).toBe(
 			items
 		);
 	} );
 
 	it( 'should search items using the title ignoring case', () => {
-		expect( searchItems( items, categories, 'TEXT' ) ).toEqual(
+		expect( searchItems( items, categories, collections, 'TEXT' ) ).toEqual(
 			[ textItem, advancedTextItem, textEmbedItem ]
 		);
 	} );
 
 	it( 'should search items using the keywords and partial terms', () => {
-		expect( searchItems( items, categories, 'GOOGL' ) ).toEqual(
+		expect( searchItems( items, categories, collections, 'GOOGL' ) ).toEqual(
 			[ youtubeItem ]
 		);
 	} );
 
 	it( 'should search items using the categories', () => {
-		expect( searchItems( items, categories, 'LAYOUT' ) ).toEqual(
+		expect( searchItems( items, categories, collections, 'LAYOUT' ) ).toEqual(
 			[ moreItem ]
 		);
 	} );
 
 	it( 'should ignore a leading slash on a search term', () => {
-		expect( searchItems( items, categories, '/GOOGL' ) ).toEqual(
+		expect( searchItems( items, categories, collections, '/GOOGL' ) ).toEqual(
 			[ youtubeItem ]
 		);
 	} );
 
 	it( 'should match words using the mix of the title, category and keywords', () => {
-		expect( searchItems( items, categories, 'youtube embed video' ) ).toEqual(
+		expect( searchItems( items, categories, collections, 'youtube embed video' ) ).toEqual(
 			[ youtubeItem ]
 		);
 	} );

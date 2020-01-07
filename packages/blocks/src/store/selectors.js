@@ -108,6 +108,17 @@ export function getCategories( state ) {
 }
 
 /**
+ * Returns all the available collections.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Object} Collections list.
+ */
+export function getCollections( state ) {
+	return state.collections;
+}
+
+/**
  * Returns the name of the default block name.
  *
  * @param {Object} state Data state.
