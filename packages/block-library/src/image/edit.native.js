@@ -420,9 +420,9 @@ export class ImageEdit extends React.Component {
 							const opacity = isUploadInProgress ? 0.3 : 1;
 							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed || this.state.isCaptionSelected ) ? styles.imageBorder : '';
 
-							const iconContainer = (
+							const iconRetryContainer = (
 								<View style={ styles.modalIcon }>
-									{ this.getIcon( isUploadFailed ? ICON_TYPE.RETRY : ICON_TYPE.PLACEHOLDER ) }
+									{ this.getIcon( ICON_TYPE.RETRY ) }
 								</View>
 							);
 
@@ -435,7 +435,6 @@ export class ImageEdit extends React.Component {
 									alignSelf: imageWidthWithinContainer && alignToFlex[ align ] }
 								} >
 									{ ! imageWidthWithinContainer &&
-
 										<View style={ [ this.props.getStylesFromColorScheme( styles.imageContainerUpload, styles.imageContainerUploadDark ),
 											{ height: imageContainerHeight } ] } >
 											<View style={ styles.imageUploadingIconContainer }>
@@ -455,7 +454,7 @@ export class ImageEdit extends React.Component {
 									>
 										{ isUploadFailed &&
 											<View style={ [ styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
-												{ iconContainer }
+												{ iconRetryContainer }
 												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 											</View>
 										}
