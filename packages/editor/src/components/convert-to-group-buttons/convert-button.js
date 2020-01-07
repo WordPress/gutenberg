@@ -28,7 +28,6 @@ export function ConvertToGroupButton( {
 		<Fragment>
 			{ isGroupable && (
 				<MenuItem
-					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 					icon={ Group }
 					onClick={ onConvertToGroup }
 				>
@@ -37,7 +36,6 @@ export function ConvertToGroupButton( {
 			) }
 			{ isUngroupable && (
 				<MenuItem
-					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 					icon={ Ungroup }
 					onClick={ onConvertFromGroup }
 				>

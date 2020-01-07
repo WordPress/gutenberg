@@ -63,7 +63,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 								event.preventDefault();
 								setPopover( false );
 							} } >
-							<div className="editor-url-input block-editor-url-input">
+							<div className="block-editor-url-input">
 								<URLInput
 									value={ url }
 									onChange={ ( nextURL ) => setAttributes( { url: nextURL } ) }

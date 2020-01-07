@@ -26,7 +26,6 @@ export function ReusableBlockConvertButton( {
 		<>
 			{ ! isReusable && (
 				<MenuItem
-					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 					icon="controls-repeat"
 					onClick={ onConvertToReusable }
 				>
@@ -35,7 +34,6 @@ export function ReusableBlockConvertButton( {
 			) }
 			{ isReusable && (
 				<MenuItem
-					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 					icon="controls-repeat"
 					onClick={ onConvertToStatic }
 				>

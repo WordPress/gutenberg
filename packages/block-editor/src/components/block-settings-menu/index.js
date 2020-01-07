@@ -81,7 +81,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 									) }
 									{ canDuplicate && (
 										<MenuItem
-											className="block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onDuplicate ) }
 											icon="admin-page"
 											shortcut={ shortcuts.duplicate }
@@ -92,7 +91,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 									{ canInsertDefaultBlock && (
 										<>
 											<MenuItem
-												className="block-editor-block-settings-menu__control"
 												onClick={ flow( onClose, onInsertBefore ) }
 												icon="insert-before"
 												shortcut={ shortcuts.insertBefore }
@@ -100,7 +98,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 												{ __( 'Insert Before' ) }
 											</MenuItem>
 											<MenuItem
-												className="block-editor-block-settings-menu__control"
 												onClick={ flow( onClose, onInsertAfter ) }
 												icon="insert-after"
 												shortcut={ shortcuts.insertAfter }
@@ -122,7 +119,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 								<MenuGroup>
 									{ ! isLocked && (
 										<MenuItem
-											className="block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onRemove ) }
 											icon="trash"
 											shortcut={ shortcuts.remove }

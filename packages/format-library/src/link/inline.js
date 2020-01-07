@@ -211,7 +211,7 @@ class InlineLinkUI extends Component {
 			>
 				{ showInput ? (
 					<URLPopover.LinkEditor
-						className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
+						className="block-editor-format-toolbar__link-container-content"
 						value={ inputValue }
 						onChangeInputValue={ this.onChangeInputValue }
 						onKeyDown={ this.onKeyDown }
@@ -221,7 +221,7 @@ class InlineLinkUI extends Component {
 					/>
 				) : (
 					<URLPopover.LinkViewer
-						className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
+						className="block-editor-format-toolbar__link-container-content"
 						onKeyPress={ stopKeyPropagation }
 						url={ url }
 						onEditLinkClick={ this.editLink }

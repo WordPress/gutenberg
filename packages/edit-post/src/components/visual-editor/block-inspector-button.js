@@ -33,7 +33,6 @@ export function BlockInspectorButton( {
 
 	return (
 		<MenuItem
-			className="block-editor-block-settings-menu__control"
 			onClick={ () => {
 				if ( areAdvancedSettingsOpened ) {
 					closeGeneralSidebar();
