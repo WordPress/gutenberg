@@ -38,3 +38,25 @@
 		margin-left: 5px;
 	}
 }
+
+.edit-site-header__actions-more-menu {
+	margin-left: -4px;
+
+	// The padding and margin of the more menu is intentionally non-standard.
+	.components-icon-button {
+		padding: 8px 2px;
+		width: auto;
+	}
+
+	@include break-small() {
+		margin-left: 4px;
+
+		.components-icon-button {
+			padding: 8px 4px;
+		}
+	}
+
+	.components-button svg {
+		transform: rotate(90deg);
+	}
+}

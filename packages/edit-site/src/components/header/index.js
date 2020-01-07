@@ -66,6 +66,7 @@ export default function Header() {
 					toggleProps={ {
 						labelPosition: 'bottom',
 					} }
+					className="edit-site-header__actions-more-menu"
 				>
 					{ () => (
 						<ThemeExporter
