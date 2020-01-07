@@ -24,7 +24,7 @@ function Layout( { blockEditorSettings } ) {
 	return (
 		<SlotFillProvider>
 			<DropZoneProvider>
-				<BlockEditorKeyboardShortcuts.Register />;
+				<BlockEditorKeyboardShortcuts.Register />
 				<Header />
 				<Sidebar />
 				<Notices />
