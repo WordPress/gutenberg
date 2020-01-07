@@ -55,6 +55,11 @@ import {
 	LINK_DESTINATION_NONE,
 } from './constants';
 
+const ICON_TYPE = {
+	PLACEHOLDER: 'placeholder',
+	RETRY: 'retry',
+	UPLOAD: 'upload',
+};
 const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
 const IMAGE_SIZE_MEDIUM = 'medium';
 const IMAGE_SIZE_LARGE = 'large';
@@ -286,12 +291,18 @@ export class ImageEdit extends React.Component {
 		}
 	}
 
-	getIcon( isRetryIcon ) {
-		if ( isRetryIcon ) {
-			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+	getIcon( iconType ) {
+		let iconStyle;
+		switch ( iconType ) {
+			case ICON_TYPE.RETRY:
+				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+			case ICON_TYPE.PLACEHOLDER:
+				iconStyle = this.props.getStylesFromColorScheme( styles.iconPlaceholder, styles.iconPlaceholderDark );
+				break;
+			case ICON_TYPE.UPLOAD:
+				iconStyle = this.props.getStylesFromColorScheme( styles.iconUpload, styles.iconUploadDark );
+				break;
 		}
-
-		const iconStyle = this.props.getStylesFromColorScheme( styles.icon, styles.iconDark );
 		return <Icon icon={ SvgIcon } { ...iconStyle } />;
 	}
 
@@ -366,7 +377,7 @@ export class ImageEdit extends React.Component {
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 						onSelect={ this.onSelectMediaUploadOption }
-						icon={ this.getIcon( false ) }
+						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
 					/>
 				</View>
@@ -407,12 +418,11 @@ export class ImageEdit extends React.Component {
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
-							const icon = this.getIcon( isUploadFailed );
 							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed || this.state.isCaptionSelected ) ? styles.imageBorder : '';
 
 							const iconContainer = (
 								<View style={ styles.modalIcon }>
-									{ icon }
+									{ this.getIcon( isUploadFailed ? ICON_TYPE.RETRY : ICON_TYPE.PLACEHOLDER ) }
 								</View>
 							);
 
@@ -425,8 +435,12 @@ export class ImageEdit extends React.Component {
 									alignSelf: imageWidthWithinContainer && alignToFlex[ align ] }
 								} >
 									{ ! imageWidthWithinContainer &&
-										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
-											{ this.getIcon( false ) }
+
+										<View style={ [ this.props.getStylesFromColorScheme( styles.imageContainerUpload, styles.imageContainerUploadDark ),
+											{ height: imageContainerHeight } ] } >
+											<View style={ styles.imageUploadingIconContainer }>
+												{ this.getIcon( ICON_TYPE.UPLOAD ) }
+											</View>
 										</View> }
 									<ImageBackground
 										accessible={ true }
