@@ -63,6 +63,10 @@ function NavigationLinkEdit( {
 		}
 	}, [] );
 
+	/**
+	 * The hook shouldn't be necessary but due to a focus loss happening
+	 * when selecting a suggestion in the link popover, we force close on block unselection.
+	 */
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsLinkOpen( false );
@@ -152,12 +156,6 @@ function NavigationLinkEdit( {
 						placeholder={ itemLabelPlaceholder }
 						withoutInteractiveFormatting
 					/>
-					{
-						/**
-						 * The  isSelected check shouldn't be necessary but due to a focus loss happening
-						 * when selecting a suggestion in the link popover, we force close on block unselection.
-						 */
-					}
 					{ isLinkOpen && (
 						<LinkControl
 							className="wp-block-navigation-link__inline-link-input"
