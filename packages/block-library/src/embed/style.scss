@@ -18,6 +18,14 @@
 	// The embed block is in a `figure` element, and many themes zero this out.
 	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
 	margin-bottom: 1em;
+
+	.components-placeholder__input {
+		margin-bottom: 0;
+	}
+
+	.components-placeholder__fieldset .components-button {
+		margin-bottom: 0;
+	}
 }
 
 .wp-embed-responsive {
