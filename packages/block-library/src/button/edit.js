@@ -156,12 +156,14 @@ function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onTo
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			<KeyboardShortcuts
-				bindGlobal
-				shortcuts={ {
-					[ rawShortcut.primary( 'k' ) ]: openLinkControl,
-				} }
-			/>
+			{ isSelected && (
+				<KeyboardShortcuts
+					bindGlobal
+					shortcuts={ {
+						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+					} }
+				/>
+			) }
 			{ linkControl }
 		</>
 	);
