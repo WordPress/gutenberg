@@ -60,6 +60,15 @@ class URLInput extends Component {
 		}
 	}
 
+	componentDidMount() {
+		const { manualSearch = '' } = this.props;
+		if ( manualSearch ) {
+			this.updateSuggestions( 'sdfsdfsdf', {
+				isManualSearch: true,
+			} );
+		}
+	}
+
 	componentWillUnmount() {
 		delete this.suggestionsRequest;
 	}
@@ -70,18 +79,22 @@ class URLInput extends Component {
 		};
 	}
 
-	updateSuggestions( value ) {
+	updateSuggestions( value, {
+		isManualSearch = false,
+	} = {} ) {
 		const {
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalHandleURLSuggestions: handleURLSuggestions,
+			manualSearch,
 		} = this.props;
-		if ( ! fetchLinkSuggestions ) {
+
+		if ( ! fetchLinkSuggestions || ! manualSearch ) {
 			return;
 		}
 
 		// Show the suggestions after typing at least 2 characters
 		// and also for URLs
-		if ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) {
+		if ( ! isManualSearch && ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) ) {
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
@@ -97,7 +110,7 @@ class URLInput extends Component {
 			loading: true,
 		} );
 
-		const request = fetchLinkSuggestions( value );
+		const request = isManualSearch ? manualSearch() : fetchLinkSuggestions( value );
 
 		request.then( ( suggestions ) => {
 			// A fetch Promise doesn't have an abort option. It's mimicked by
@@ -237,12 +250,12 @@ class URLInput extends Component {
 		this.inputRef.current.focus();
 	}
 
-	static getDerivedStateFromProps( { value, disableSuggestions }, { showSuggestions, selectedSuggestion } ) {
+	static getDerivedStateFromProps( { value, disableSuggestions, manualSearch }, { showSuggestions, selectedSuggestion } ) {
 		let shouldShowSuggestions = showSuggestions;
 
 		const hasValue = value && value.length;
 
-		if ( ! hasValue ) {
+		if ( ! manualSearch && ! hasValue ) {
 			shouldShowSuggestions = false;
 		}
 
@@ -275,6 +288,7 @@ class URLInput extends Component {
 			selectedSuggestion,
 			loading,
 		} = this.state;
+
 		const id = `url-input-control-${ instanceId }`;
 
 		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;

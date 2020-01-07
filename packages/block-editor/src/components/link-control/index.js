@@ -36,7 +36,7 @@ export function LinkControl( {
 	value,
 	settings,
 	onChange = noop,
-	fetchSearchSuggestions,
+	manualSearch,
 } ) {
 	const instanceId = useInstanceId( LinkControl );
 	const [ inputValue, setInputValue ] = useState( '' );
@@ -200,6 +200,7 @@ export function LinkControl( {
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
 					onReset={ resetInput }
+							manualSearch={ manualSearch }
 				/>
 			) }
 

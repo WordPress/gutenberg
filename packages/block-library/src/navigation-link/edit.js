@@ -169,6 +169,14 @@ function NavigationLinkEdit( {
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
+							manualSearch={ () => {
+								return Promise.resolve( [ {
+									id: '-1',
+									title: 'Manual result',
+									url: 'https://manual.result.com',
+									type: 'URL',
+								} ] );
+							} }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
