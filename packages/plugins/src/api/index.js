@@ -1,14 +1,19 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { applyFilters, doAction } from '@wordpress/hooks';
 
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { isFunction } from 'lodash';
+import PluginManager from '../api/plugin-manager';
 
 /**
  * Defined behavior of a plugin type.
@@ -27,11 +32,11 @@ import { isFunction } from 'lodash';
  */
 
 /**
- * Plugin definitions keyed by plugin name.
+ * Plugin manager class
  *
- * @type {Object.<string,WPPlugin>}
+ * @typedef {Object} PluginManager
  */
-const plugins = {};
+const pluginManager = applyFilters( 'plugins.pluginManager', new PluginManager() );
 
 /**
  * Registers a plugin to the editor.
@@ -125,7 +130,7 @@ export function registerPlugin( name, settings ) {
 		);
 		return null;
 	}
-	if ( plugins[ name ] ) {
+	if ( pluginManager.getPlugin( name ) ) {
 		console.error(
 			`Plugin "${ name }" is already registered.`
 		);
@@ -140,11 +145,13 @@ export function registerPlugin( name, settings ) {
 		return null;
 	}
 
-	plugins[ name ] = {
+	pluginManager.addPlugin(
 		name,
-		icon: 'admin-plugins',
-		...settings,
-	};
+		{
+			icon: 'admin-plugins',
+			...settings,
+		}
+	);
 
 	doAction( 'plugins.pluginRegistered', settings, name );
 
@@ -176,14 +183,14 @@ export function registerPlugin( name, settings ) {
  *                     successfully unregistered; otherwise `undefined`.
  */
 export function unregisterPlugin( name ) {
-	if ( ! plugins[ name ] ) {
+	if ( ! pluginManager.getPlugin( name ) ) {
 		console.error(
 			'Plugin "' + name + '" is not registered.'
 		);
 		return;
 	}
-	const oldPlugin = plugins[ name ];
-	delete plugins[ name ];
+	const oldPlugin = pluginManager.getPlugin( name );
+	pluginManager.removePlugin( name );
 
 	doAction( 'plugins.pluginUnregistered', oldPlugin, name );
 
@@ -198,7 +205,7 @@ export function unregisterPlugin( name ) {
  * @return {?WPPlugin} Plugin setting.
  */
 export function getPlugin( name ) {
-	return plugins[ name ];
+	return pluginManager.getPlugin( name );
 }
 
 /**
@@ -207,5 +214,5 @@ export function getPlugin( name ) {
  * @return {WPPlugin[]} Plugin settings.
  */
 export function getPlugins() {
-	return Object.values( plugins );
+	return Object.values( pluginManager.getPlugins() );
 }
