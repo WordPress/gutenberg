@@ -24,7 +24,7 @@ import {
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 
 /**
  * Browser dependencies
@@ -94,12 +94,12 @@ function ParagraphBlock( {
 		direction,
 	} = attributes;
 
+	const ref = useRef();
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [ fontSize.size ] );
 	const {
 		TextColor,
 		BackgroundColor,
 		InspectorControlsColorPanel,
-		ColorDetector,
 	} = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
@@ -108,7 +108,8 @@ function ParagraphBlock( {
 		{
 			contrastCheckers: [ { backgroundColor: true, textColor: true, fontSize: fontSize.size } ],
 		},
-		[ fontSize.size ]
+		[ fontSize.size ],
+		ref
 	);
 
 	return (
@@ -143,8 +144,8 @@ function ParagraphBlock( {
 			{ InspectorControlsColorPanel }
 			<BackgroundColor>
 				<TextColor>
-					<ColorDetector querySelector='[contenteditable="true"]' />
 					<RichText
+						ref={ ref }
 						identifier="content"
 						tagName="p"
 						className={ classnames( 'wp-block-paragraph', className, {

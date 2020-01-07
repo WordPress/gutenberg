@@ -13,6 +13,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useCallback,
 	useMemo,
+	useEffect,
 	Children,
 	cloneElement,
 	useRef,
@@ -122,7 +123,8 @@ export default function __experimentalUseColors(
 	} = {
 		panelTitle: __( 'Color Settings' ),
 	},
-	deps = []
+	deps = [],
+	targetRef
 ) {
 	const { clientId } = useBlockEditContext();
 	const { attributes, settingsColors } = useSelect(
@@ -199,7 +201,7 @@ export default function __experimentalUseColors(
 
 	const detectedBackgroundColorRef = useRef();
 	const detectedColorRef = useRef();
-	const ColorDetector = useMemo( () => {
+	useEffect( () => {
 		if ( ! contrastCheckers ) {
 			return undefined;
 		}
@@ -219,26 +221,10 @@ export default function __experimentalUseColors(
 		return (
 			( needsBackgroundColor || needsColor ) &&
 			withFallbackStyles(
-				(
-					node,
-					{
-						querySelector,
-						backgroundColorSelector = querySelector,
-						textColorSelector = querySelector,
-					}
-				) => {
-					let backgroundColorNode = node;
-					let textColorNode = node;
-					if ( backgroundColorSelector ) {
-						backgroundColorNode = node.parentNode.querySelector(
-							backgroundColorSelector
-						);
-					}
-					if ( textColorSelector ) {
-						textColorNode = node.parentNode.querySelector( textColorSelector );
-					}
+				() => {
+					let backgroundColorNode = targetRef.current;
 					let backgroundColor;
-					const color = getComputedStyle( textColorNode ).color;
+					const color = getComputedStyle( targetRef.current ).color;
 					if ( needsBackgroundColor ) {
 						backgroundColor = getComputedStyle( backgroundColorNode )
 							.backgroundColor;
@@ -344,7 +330,6 @@ export default function __experimentalUseColors(
 			InspectorControlsColorPanel: (
 				<InspectorControlsColorPanel { ...wrappedColorPanelProps } />
 			),
-			ColorDetector,
 		};
 	}, [ attributes, setAttributes, ...deps ] );
 }
