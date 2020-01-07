@@ -8,9 +8,9 @@ import {
 	FormFileUpload,
 	NavigableMenu,
 	MenuItem,
-	Toolbar,
+	ToolbarGroup,
 	Button,
-	Popover,
+	Dropdown,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -46,10 +46,9 @@ const MediaReplaceFlow = (
 	const [ showURLInput, setShowURLInput ] = useState( false );
 	const [ showEditURLInput, setShowEditURLInput ] = useState( false );
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
-	const [ showMediaReplaceOptions, setShowMediaReplaceOptions ] = useState( false );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSettings().mediaUpload;
-	} );
+	}, [] );
 	const editMediaButtonRef = createRef();
 
 	const stopPropagation = ( event ) => {
@@ -74,11 +73,11 @@ const MediaReplaceFlow = (
 		setShowEditURLInput( false );
 	};
 
-	const uploadFiles = ( event ) => {
+	const uploadFiles = ( event, closeDropdown ) => {
 		const files = event.target.files;
 		const setMedia = ( [ media ] ) => {
-			setShowMediaReplaceOptions( false );
 			selectMedia( media );
+			closeDropdown();
 		};
 		mediaUpload( {
 			allowedTypes,
@@ -87,12 +86,6 @@ const MediaReplaceFlow = (
 			onError,
 		} );
 	};
-
-	const onClose = () => {
-		editMediaButtonRef.current.focus();
-	};
-
-	const onClickOutside = () => ( setShowMediaReplaceOptions( false ) );
 
 	const openOnArrowDown = ( event ) => {
 		if ( event.keyCode === DOWN ) {
@@ -123,7 +116,7 @@ const MediaReplaceFlow = (
 		urlInputUIContent = (
 			<LinkViewer
 				isFullWidth={ true }
-				className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
+				className="block-editor-media-replace-flow__link-viewer"
 				url={ mediaURLValue }
 				onEditLinkClick={ () => ( setShowEditURLInput( ! showEditURLInput ) ) }
 			/>
@@ -131,68 +124,68 @@ const MediaReplaceFlow = (
 	}
 
 	return (
-		<MediaUpload
-			onSelect={ ( media ) => selectMedia( media ) }
-			onClose={ () => setShowMediaReplaceOptions( true ) }
-			allowedTypes={ allowedTypes }
-			render={ ( { open } ) => (
-				<Toolbar className={ 'media-replace-flow components-dropdown-menu' }>
+		<Dropdown
+			contentClassName="block-editor-media-replace-flow__options"
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<ToolbarGroup className="media-replace-flow">
 					<Button
 						ref={ editMediaButtonRef }
-						className={ 'components-icon-button components-dropdown-menu__toggle' }
-						onClick={ () => {
-							setShowMediaReplaceOptions( ! showMediaReplaceOptions );
-						} }
+						aria-expanded={ isOpen }
+						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }
 					>
-						<span className="components-dropdown-menu__label" > { name } </span>
-						<span className="components-dropdown-menu__indicator" />
+						{ name }
+						<span className="block-editor-media-replace-flow__indicator" />
 					</Button>
-					{ showMediaReplaceOptions &&
-						<Popover
-							onClickOutside={ onClickOutside }
-							onClose={ onClose }
-							className={ 'media-replace-flow__options' }
-						>
-							<NavigableMenu>
+				</ToolbarGroup>
+			) }
+			renderContent={ ( { onClose } ) => (
+				<>
+					<NavigableMenu>
+						<MediaUpload
+							onSelect={ ( media ) => selectMedia( media ) }
+							allowedTypes={ allowedTypes }
+							render={ ( { open } ) => (
 								<MenuItem
 									icon="admin-media"
 									onClick={ open }
 								>
 									{ __( 'Open Media Library' ) }
 								</MenuItem>
-								<MediaUploadCheck>
-									<FormFileUpload
-										onChange={ uploadFiles }
-										accept={ accept }
-										render={ ( { openFileDialog } ) => {
-											return (
-												<MenuItem
-													icon="upload"
-													onClick={ () => {
-														openFileDialog();
-													} }
-												>
-													{ __( 'Upload' ) }
-												</MenuItem>
-											);
-										} }
-									/>
-								</MediaUploadCheck>
-								<MenuItem
-									icon="admin-links"
-									onClick={ () => ( setShowURLInput( ! showURLInput ) ) }
-									aria-expanded={ showURLInput }
-								>
-									<div> { __( 'Insert from URL' ) } </div>
-								</MenuItem>
-							</NavigableMenu>
-							{ showURLInput && <div className="block-editor-media-flow__url-input">
-								{ urlInputUIContent }
-							</div> }
-						</Popover>
-					}
-				</Toolbar>
+							) }
+						/>
+						<MediaUploadCheck>
+							<FormFileUpload
+								onChange={ ( event ) => {
+									uploadFiles( event, onClose );
+								} }
+								accept={ accept }
+								render={ ( { openFileDialog } ) => {
+									return (
+										<MenuItem
+											icon="upload"
+											onClick={ () => {
+												openFileDialog();
+											} }
+										>
+											{ __( 'Upload' ) }
+										</MenuItem>
+									);
+								} }
+							/>
+						</MediaUploadCheck>
+						{ onSelectURL && <MenuItem
+							icon="admin-links"
+							onClick={ () => ( setShowURLInput( ! showURLInput ) ) }
+							aria-expanded={ showURLInput }
+						>
+							<div> { __( 'Insert from URL' ) } </div>
+						</MenuItem> }
+					</NavigableMenu>
+					{ showURLInput && <div className="block-editor-media-flow__url-input">
+						{ urlInputUIContent }
+					</div> }
+				</>
 			) }
 		/>
 	);

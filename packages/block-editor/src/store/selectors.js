@@ -149,7 +149,7 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, clientId ) => [
-		// Normally, we'd have both  `getBlockAttributes` dependancies and
+		// Normally, we'd have both `getBlockAttributes` dependencies and
 		// `getBlocks` (children) dependancies here but for performance reasons
 		// we use a denormalized cache key computed in the reducer that takes both
 		// the attributes and inner blocks into account. The value of the cache key
@@ -1076,6 +1076,12 @@ const canInsertBlockTypeUnmemoized = ( state, blockName, rootClientId = null ) =
 			return list;
 		}
 		if ( isArray( list ) ) {
+			// TODO: when there is a canonical way to detect that we are editing a post
+			// the following check should be changed to something like:
+			// if ( includes( list, 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
+			if ( includes( list, 'core/post-content' ) && item === null ) {
+				return true;
+			}
 			return includes( list, item );
 		}
 		return defaultResult;
@@ -1414,6 +1420,23 @@ export function getSettings( state ) {
 export function isLastBlockChangePersistent( state ) {
 	return state.blocks.isPersistentChange;
 }
+
+/**
+ * Returns the Block List settings for an array of blocks, if any exist.
+ *
+ * @param {Object}  state    Editor state.
+ * @param {Array} clientIds Block client IDs.
+ *
+ * @return {Array} Block List Settings for each of the found blocks
+ */
+export const __experimentalGetBlockListSettingsForBlocks = createSelector(
+	( state, clientIds ) => {
+		return filter( state.blockListSettings, ( value, key ) => clientIds.includes( key ) );
+	},
+	( state ) => [
+		state.blockListSettings,
+	],
+);
 
 /**
  * Returns the parsed block saved as shared block with the given ID.

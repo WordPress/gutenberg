@@ -1,8 +1,19 @@
-# 8.3.0 (Unreleased)
+## Master
 
 ### New Features
 
 - Added a new `Guide` component which allows developers to easily present a user guide.
+
+### Breaking Change
+
+- `is-button` classname has been removed from the Button component.
+- The `is-default` classname is not applied automatically anymore.
+- By default Button components come with a fixed height and hover styles.
+
+### Deprecations
+
+- `isDefault` prop in `Button` has been deprecated. Consider using `isSecondary` instead. 
+- `IconButton` has been deprecated. Use the `Button` component instead.
 
 ## 8.2.0 (2019-08-29)
 

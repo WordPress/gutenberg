@@ -14,7 +14,7 @@ import { Component } from '@wordpress/element';
 import { ToolbarButton, Toolbar } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -188,6 +188,17 @@ class BlockListBlock extends Component {
 		];
 	}
 
+	applyToolbarStyle() {
+		const {
+			hasChildren,
+			isUnregisteredBlock,
+		} = this.props;
+
+		if ( ! hasChildren || isUnregisteredBlock ) {
+			return styles.neutralToolbar;
+		}
+	}
+
 	render() {
 		const {
 			clientId,
@@ -228,7 +239,7 @@ class BlockListBlock extends Component {
 						style={ this.applyBlockStyle() }
 					>
 						{ isValid ? this.getBlockForType() : <BlockInvalidWarning blockTitle={ title } icon={ icon } /> }
-						{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
+						<View style={ this.applyToolbarStyle() } >{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }</View>
 					</View>
 				</TouchableWithoutFeedback>
 			</>
@@ -261,6 +272,8 @@ export default compose( [
 		const isLastBlock = order === getBlocks().length - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
+
+		const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 		const blockType = getBlockType( name || 'core/missing' );
 		const title = blockType.title;
 		const icon = blockType.icon;
@@ -281,7 +294,7 @@ export default compose( [
 		const commonAncestorIndex = parents.indexOf( commonAncestor ) - 1;
 		const firstToSelectId = commonAncestor ? parents[ commonAncestorIndex ] : parents[ parents.length - 1 ];
 
-		const hasChildren = !! getBlockCount( clientId );
+		const hasChildren = ! isUnregisteredBlock && !! getBlockCount( clientId );
 		const hasParent = !! parentId;
 		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parentId;
 		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
@@ -318,6 +331,7 @@ export default compose( [
 			isTouchable,
 			isDimmed,
 			isRootListInnerBlockHolder,
+			isUnregisteredBlock,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

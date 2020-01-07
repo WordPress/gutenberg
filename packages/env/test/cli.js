@@ -87,17 +87,45 @@ describe( 'env cli', () => {
 	} );
 
 	it( 'handles failed commands with messages.', async () => {
-		env.start.mockRejectedValueOnce( { message: 'failure message' } );
+		/* eslint-disable no-console */
+		env.start.mockRejectedValueOnce( {
+			message: 'failure message',
+			out: 'failure message',
+			exitCode: 2,
+		} );
+		const consoleError = console.error;
+		console.error = jest.fn();
+		const processExit = process.exit;
+		process.exit = jest.fn();
+
 		cli().parse( [ 'start' ] );
 		const { spinner } = env.start.mock.calls[ 0 ][ 0 ];
 		await env.start.mock.results[ 0 ].value.catch( () => {} );
+
 		expect( spinner.fail ).toHaveBeenCalledWith( 'failure message' );
+		expect( console.error ).toHaveBeenCalledWith( '\n\nfailure message\n\n' );
+		expect( process.exit ).toHaveBeenCalledWith( 2 );
+		console.error = consoleError;
+		process.exit = processExit;
+		/* eslint-enable no-console */
 	} );
 	it( 'handles failed commands with errors.', async () => {
+		/* eslint-disable no-console */
 		env.start.mockRejectedValueOnce( { err: 'failure error' } );
+		const consoleError = console.error;
+		console.error = jest.fn();
+		const processExit = process.exit;
+		process.exit = jest.fn();
+
 		cli().parse( [ 'start' ] );
 		const { spinner } = env.start.mock.calls[ 0 ][ 0 ];
 		await env.start.mock.results[ 0 ].value.catch( () => {} );
+
 		expect( spinner.fail ).toHaveBeenCalledWith( 'failure error' );
+		expect( console.error ).toHaveBeenCalledWith( '\n\nfailure error\n\n' );
+		expect( process.exit ).toHaveBeenCalledWith( 1 );
+		console.error = consoleError;
+		process.exit = processExit;
+		/* eslint-enable no-console */
 	} );
 } );

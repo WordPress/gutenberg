@@ -2,6 +2,7 @@
 @import "./audio/editor.scss";
 @import "./block/editor.scss";
 @import "./button/editor.scss";
+@import "./buttons/editor.scss";
 @import "./categories/editor.scss";
 @import "./code/editor.scss";
 @import "./columns/editor.scss";
@@ -36,7 +37,6 @@
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
-@import "./site-title/editor.scss";
 
 /**
  * Import styles from internal editor components used by the blocks.

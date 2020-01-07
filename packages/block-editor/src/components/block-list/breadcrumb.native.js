@@ -29,7 +29,11 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } )
 
 	return (
 		<View style={ styles.breadcrumbContainer }>
-			<TouchableOpacity style={ styles.button } onPress={ () => {/* Open BottomSheet with markup */} }>
+			<TouchableOpacity
+				style={ styles.button }
+				onPress={ () => {/* Open BottomSheet with markup */} }
+				disabled={ true } /* Disable temporarily since onPress function is empty */
+			>
 				{ rootClientId && rootBlockIcon && (
 					[
 						renderIcon( rootBlockIcon, 'parent-icon' ),

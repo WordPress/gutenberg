@@ -421,11 +421,28 @@ function createFromElement( {
 				} );
 			}
 		} else {
+			// Indices should share a reference to the same formats array.
+			// Only create a new reference if `formats` changes.
+			function mergeFormats( formats ) {
+				if ( mergeFormats.formats === formats ) {
+					return mergeFormats.newFormats;
+				}
+
+				const newFormats = formats ? [ format, ...formats ] : [ format ];
+
+				mergeFormats.formats = formats;
+				mergeFormats.newFormats = newFormats;
+
+				return newFormats;
+			}
+
+			// Since the formats parameter can be `undefined`, preset
+			// `mergeFormats` with a new reference.
+			mergeFormats.newFormats = [ format ];
+
 			mergePair( accumulator, {
 				...value,
-				formats: Array.from( value.formats, ( formats ) =>
-					formats ? [ format, ...formats ] : [ format ]
-				),
+				formats: Array.from( value.formats, mergeFormats ),
 			} );
 		}
 	}

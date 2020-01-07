@@ -240,7 +240,7 @@
 }
 
 div[data-type="core/freeform"] {
-	.block-editor-block-list__block-edit::before {
+	&::before {
 		transition: border-color 0.1s linear, box-shadow 0.1s linear;
 		@include reduce-motion("transition");
 		border: $border-width solid $light-gray-500;
@@ -249,12 +249,12 @@ div[data-type="core/freeform"] {
 		outline: $border-width solid transparent;
 	}
 
-	&.is-selected .block-editor-block-list__block-edit::before {
+	&.is-selected::before {
 		border-color: $light-gray-800;
 		border-left-color: transparent;
 	}
 
-	.editor-block-contextual-toolbar + div {
+	.block-editor-block-contextual-toolbar + div {
 		margin-top: 0;
 		padding-top: 0;
 	}
@@ -372,4 +372,3 @@ div[data-type="core/freeform"] {
 		display: block;
 	}
 }
-

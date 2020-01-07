@@ -18,7 +18,7 @@ export async function createNewPost( {
 	title,
 	content,
 	excerpt,
-	enableTips = false,
+	showWelcomeGuide = false,
 } = {} ) {
 	const query = addQueryArgs( '', {
 		post_type: postType,
@@ -29,13 +29,12 @@ export async function createNewPost( {
 
 	await visitAdminPage( 'post-new.php', query );
 
-	const areTipsEnabled = await page.evaluate( () => wp.data.select( 'core/nux' ).areTipsEnabled() );
+	const isWelcomeGuideActive = await page.evaluate( () =>
+		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ) );
 
-	if ( enableTips !== areTipsEnabled ) {
-		await page.evaluate( ( _enableTips ) => {
-			const action = _enableTips ? 'enableTips' : 'disableTips';
-			wp.data.dispatch( 'core/nux' )[ action ]();
-		}, enableTips );
+	if ( showWelcomeGuide !== isWelcomeGuideActive ) {
+		await page.evaluate( () =>
+			wp.data.dispatch( 'core/edit-post' ).toggleFeature( 'welcomeGuide' ) );
 
 		await page.reload();
 	}

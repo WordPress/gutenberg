@@ -18,6 +18,7 @@
 	padding-top: $grid-size-xlarge;
 }
 
-.edit-widgets-main-block-list > .block-list-appender {
+.edit-widgets-main-block-list > div > .block-list-appender {
 	padding-top: $panel-padding;
+	position: relative;
 }

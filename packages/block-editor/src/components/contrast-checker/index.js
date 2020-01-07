@@ -19,7 +19,7 @@ function ContrastCheckerMessage( { tinyBackgroundColor, tinyTextColor, backgroun
 		speak( __( 'This color combination may be hard for people to read.' ) );
 	}, [ backgroundColor, textColor ] );
 	return (
-		<div className="editor-contrast-checker block-editor-contrast-checker">
+		<div className="block-editor-contrast-checker">
 			<Notice status="warning" isDismissible={ false }>
 				{ msg }
 			</Notice>

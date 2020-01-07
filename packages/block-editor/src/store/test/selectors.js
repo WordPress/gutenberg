@@ -58,6 +58,7 @@ const {
 	getTemplate,
 	getTemplateLock,
 	getBlockListSettings,
+	__experimentalGetBlockListSettingsForBlocks,
 	__experimentalGetLastBlockAttributeChanges,
 	INSERTER_UTILITY_HIGH,
 	INSERTER_UTILITY_MEDIUM,
@@ -122,6 +123,15 @@ describe( 'selectors', () => {
 			},
 		} );
 
+		registerBlockType( 'core/post-content-child', {
+			save: () => null,
+			category: 'common',
+			title: 'Test Block Post Content Child',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			parent: [ 'core/post-content' ],
+		} );
+
 		setFreeformContentHandlerName( 'core/test-freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
@@ -133,6 +143,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
 		unregisterBlockType( 'core/test-freeform' );
+		unregisterBlockType( 'core/post-content-child' );
 
 		setFreeformContentHandlerName( undefined );
 	} );
@@ -1934,6 +1945,34 @@ describe( 'selectors', () => {
 			};
 			expect( canInsertBlockType( state, 'core/test-block-c', 'block1' ) ).toBe( true );
 		} );
+
+		it( 'should deny blocks that restrict parent to core/post-content when not in editor root', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						block1: {},
+					},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			expect( canInsertBlockType( state, 'core/post-content-child', 'block1' ) ).toBe( false );
+		} );
+
+		it( 'should allow blocks that restrict parent to core/post-content when in editor root', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			expect( canInsertBlockType( state, 'core/post-content-child' ) ).toBe( true );
+		} );
 	} );
 
 	describe( 'getInserterItems', () => {
@@ -2034,6 +2073,7 @@ describe( 'selectors', () => {
 			};
 			const itemIDs = getInserterItems( state ).map( ( item ) => item.id );
 			expect( itemIDs ).toEqual( [
+				'core/post-content-child',
 				'core/block/2',
 				'core/block/1',
 				'core/test-block-b',
@@ -2326,6 +2366,60 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockListSettings( state, 'chicken' ) ).toBe( undefined );
+		} );
+	} );
+
+	describe( '__experimentalGetBlockListSettingsForBlocks', () => {
+		it( 'should return the settings for a set of blocks', () => {
+			const state = {
+				blockListSettings: {
+					'test-1-dummy-clientId': {
+						setting1: false,
+					},
+					'test-2-dummy-clientId': {
+						setting1: true,
+						setting2: false,
+					},
+					'test-3-dummy-clientId': {
+						setting1: true,
+						setting2: false,
+					},
+					'test-4-dummy-clientId': {
+						setting1: true,
+					},
+				},
+			};
+
+			const targetBlocksClientIds = [ 'test-1-dummy-clientId', 'test-3-dummy-clientId' ];
+
+			expect( __experimentalGetBlockListSettingsForBlocks( state, targetBlocksClientIds ) ).toEqual( [
+				{
+					setting1: false,
+				},
+				{
+					setting1: true,
+					setting2: false,
+				},
+			] );
+		} );
+
+		it( 'should return empty array if settings for the blocks don’t exist', () => {
+			// Does not include target Block clientIds
+			const state = {
+				blockListSettings: {
+					'test-2-dummy-clientId': {
+						setting1: true,
+						setting2: false,
+					},
+					'test-4-dummy-clientId': {
+						setting1: true,
+					},
+				},
+			};
+
+			const targetBlocksClientIds = [ 'test-1-dummy-clientId', 'test-3-dummy-clientId' ];
+
+			expect( __experimentalGetBlockListSettingsForBlocks( state, targetBlocksClientIds ) ).toEqual( [] );
 		} );
 	} );
 

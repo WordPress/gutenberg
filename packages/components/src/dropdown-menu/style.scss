@@ -40,13 +40,14 @@
 		}
 
 		// Plain menu styles.
-		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
+		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) {
 			@include menu-style__focus();
 		}
 
 		&:hover,
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-tertiary):not(.is-primary):hover {
 			@include menu-style__hover();
+			box-shadow: none;
 		}
 
 		// Formatting buttons
@@ -60,7 +61,7 @@
 			margin: -1px $grid-size -1px 0;
 		}
 
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default).is-active > svg {
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary).is-active > svg {
 			@include formatting-button-style__active();
 		}
 	}
@@ -70,7 +71,8 @@
 	}
 
 	.components-menu-item__button,
-	.components-menu-item__button.components-icon-button {
+	.components-menu-item__button.components-button {
+		height: auto;
 		padding-left: 2rem;
 
 		&.has-icon {

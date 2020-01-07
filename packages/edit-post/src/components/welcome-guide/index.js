@@ -2,29 +2,30 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Guide, GuidePage } from '@wordpress/components';
+import { ExternalLink, Guide, GuidePage } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { __experimentalCreateInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { CanvasImage, EditorImage, BlockLibraryImage, InserterIconImage } from './images';
+import { CanvasImage, EditorImage, BlockLibraryImage, DocumentationImage, InserterIconImage } from './images';
 
 export default function WelcomeGuide() {
-	const areTipsEnabled = useSelect( ( select ) => select( 'core/nux' ).areTipsEnabled() );
+	const isActive = useSelect( ( select ) => select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ), [] );
 
-	const { disableTips } = useDispatch( 'core/nux' );
+	const { toggleFeature } = useDispatch( 'core/edit-post' );
 
-	if ( ! areTipsEnabled ) {
+	if ( ! isActive ) {
 		return null;
 	}
 
 	return (
 		<Guide
 			className="edit-post-welcome-guide"
+			contentLabel={ __( 'Welcome to the Block Editor' ) }
 			finishButtonText={ __( 'Get started' ) }
-			onFinish={ disableTips }
+			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
 		>
 
 			<GuidePage className="edit-post-welcome-guide__page">
@@ -63,6 +64,21 @@ export default function WelcomeGuide() {
 							),
 						}
 					) }
+				</p>
+			</GuidePage>
+
+			<GuidePage className="edit-post-welcome-guide__page">
+				<h1 className="edit-post-welcome-guide__heading">
+					{ __( 'Learn how to use the Block Editor' ) }
+				</h1>
+				<DocumentationImage className="edit-post-welcome-guide__image" />
+				<p className="edit-post-welcome-guide__text">
+					{ __( 'New to the Block Editor? Want to learn more about using it? ' ) }
+					<ExternalLink
+						href={ __( 'https://wordpress.org/support/article/wordpress-editor/' ) }
+					>
+						{ __( 'Here\'s a detailed guide.' ) }
+					</ExternalLink>
 				</p>
 			</GuidePage>
 

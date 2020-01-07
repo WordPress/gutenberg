@@ -58,16 +58,16 @@ export default function BlockNavigationList( {
 		 * Safari+VoiceOver won't announce the list otherwise.
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
-		<ul className="editor-block-navigation__list block-editor-block-navigation__list" role="list">
+		<ul className="block-editor-block-navigation__list" role="list">
 			{ map( omitBy( blocks, isNil ), ( block ) => {
 				const blockType = getBlockType( block.name );
 				const isSelected = block.clientId === selectedBlockClientId;
 
 				return (
 					<li key={ block.clientId }>
-						<div className="editor-block-navigation__item block-editor-block-navigation__item">
+						<div className="block-editor-block-navigation__item">
 							<Button
-								className={ classnames( 'editor-block-navigation__item-button block-editor-block-navigation__item-button', {
+								className={ classnames( 'block-editor-block-navigation__item-button', {
 									'is-selected': isSelected,
 								} ) }
 								onClick={ () => selectBlock( block.clientId ) }
@@ -92,7 +92,7 @@ export default function BlockNavigationList( {
 			} ) }
 			{ shouldShowAppender && (
 				<li>
-					<div className="editor-block-navigation__item block-editor-block-navigation__item">
+					<div className="block-editor-block-navigation__item">
 						<ButtonBlockAppender
 							rootClientId={ parentBlockClientId }
 							__experimentalSelectBlockOnInsert={ false }

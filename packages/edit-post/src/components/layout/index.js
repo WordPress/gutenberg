@@ -12,6 +12,7 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
+	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -34,7 +35,7 @@ import { __ } from '@wordpress/i18n';
  */
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
-import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
+import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
@@ -61,6 +62,8 @@ function Layout() {
 		hasActiveMetaboxes,
 		isSaving,
 		hasFixedToolbar,
+		previousShortcut,
+		nextShortcut,
 	} = useSelect( ( select ) => {
 		return ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
@@ -71,8 +74,10 @@ function Layout() {
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			previousShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/previous-region' ),
+			nextShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
 		} );
-	} );
+	}, [] );
 	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -88,7 +93,8 @@ function Layout() {
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
-			<EditorModeKeyboardShortcuts />
+			<EditPostKeyboardShortcuts />
+			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
 				<EditorRegions
 					className={ className }
@@ -102,6 +108,7 @@ function Layout() {
 					content={
 						<>
 							<EditorNotices />
+							<Popover.Slot name="block-toolbar" />
 							{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
 							{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
 							<div className="edit-post-layout__metaboxes">
@@ -127,7 +134,7 @@ function Layout() {
 					) : (
 						<div className="edit-post-toggle-publish-panel">
 							<Button
-								isDefault
+								isSecondary
 								className="edit-post-toggle-publish-panel__button"
 								onClick={ togglePublishSidebar }
 								aria-expanded={ false }
@@ -136,6 +143,10 @@ function Layout() {
 							</Button>
 						</div>
 					) }
+					shortcuts={ {
+						previous: previousShortcut,
+						next: nextShortcut,
+					} }
 				/>
 				<ManageBlocksModal />
 				<OptionsModal />

@@ -96,7 +96,7 @@ describe( 'Change detection', () => {
 		// Toggle post as needing review (not persisted for autosave).
 		await ensureSidebarOpened();
 
-		const postPendingReviewButton = ( await page.$x( "//label[contains(text(), 'Pending Review')]" ) )[ 0 ];
+		const postPendingReviewButton = ( await page.$x( "//label[contains(text(), 'Pending review')]" ) )[ 0 ];
 		await postPendingReviewButton.click( 'button' );
 
 		// Force autosave to occur immediately.

@@ -38,7 +38,7 @@ const PARAGRAPH_DROP_CAP_SELECTOR = 'p.has-drop-cap';
 function ParagraphRTLToolbar( { direction, setDirection } ) {
 	const isRTL = useSelect( ( select ) => {
 		return !! select( 'core/block-editor' ).getSettings().isRTL;
-	} );
+	}, [] );
 
 	return ( isRTL && (
 		<ToolbarGroup
@@ -124,7 +124,7 @@ function ParagraphBlock( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
+				<PanelBody title={ __( 'Text Settings' ) }>
 					<FontSizePicker
 						value={ fontSize.size }
 						onChange={ setFontSize }

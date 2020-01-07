@@ -31,6 +31,8 @@ const warning = chalk.bold.keyword( 'orange' );
 const success = chalk.bold.green;
 
 // Utils
+const STABLE_TAG_REGEX = /Stable tag: [0-9]+\.[0-9]+\.[0-9]+\s*\n/;
+const STABLE_TAG_PLACEHOLDER = 'Stable tag: V.V.V\n';
 
 /**
  * Small utility used to read an uncached version of a JSON file
@@ -145,33 +147,24 @@ async function runUpdateTrunkContentStep( version, changelog, abortMessage ) {
 	await runStep( 'Updating trunk content', abortMessage, async () => {
 		console.log( '>> Replacing trunk content using the new plugin ZIP' );
 
-		// Delete everything except readme.txt and changelog.txt
-		runShellScript( 'find . -maxdepth 1 -not -name "changelog.txt" -not -name "readme.txt" -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +', svnWorkingDirectoryPath );
+		const readmePath = svnWorkingDirectoryPath + '/readme.txt';
+
+		const previousReadmeFileContent = fs.readFileSync( readmePath, 'utf8' );
+		const stableTag = previousReadmeFileContent.match( STABLE_TAG_REGEX )[ 0 ];
+
+		// Delete everything
+		runShellScript( 'find . -maxdepth 1 -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +', svnWorkingDirectoryPath );
 
 		// Update the content using the plugin ZIP
 		const gutenbergZipPath = gitWorkingDirectoryPath + '/gutenberg.zip';
 		runShellScript( 'unzip ' + gutenbergZipPath + ' -d ' + svnWorkingDirectoryPath );
 
-		console.log( '>> Updating the changelog in readme.txt and changelog.txt' );
-
-		// Update the content of the readme.txt file
-		const readmePath = svnWorkingDirectoryPath + '/readme.txt';
-		const readmeFileContent = fs.readFileSync( readmePath, 'utf8' );
-		const newReadmeContent =
-			readmeFileContent.substr( 0, readmeFileContent.indexOf( '== Changelog ==' ) ) +
-			'== Changelog ==\n\n' +
-			changelog + '\n';
-		fs.writeFileSync( readmePath, newReadmeContent );
-
-		// Update the content of the changelog.txt file
-		const changelogPath = svnWorkingDirectoryPath + '/changelog.txt';
-		const changelogFileContent = fs.readFileSync( changelogPath, 'utf8' );
-		const newChangelogContent =
-			'== Changelog ==\n\n' +
-			'= ' + version + ' =\n\n' +
-			changelog +
-			changelogFileContent.substr( changelogFileContent.indexOf( '== Changelog ==' ) + 16 );
-		fs.writeFileSync( changelogPath, newChangelogContent );
+		// Replace the stable tag placeholder with the existing stable tag on the SVN repository.
+		const newReadmeFileContent = fs.readFileSync( readmePath, 'utf8' );
+		fs.writeFileSync(
+			readmePath,
+			newReadmeFileContent.replace( STABLE_TAG_PLACEHOLDER, stableTag )
+		);
 
 		// Commit the content changes
 		runShellScript( "svn st | grep '^\?' | awk '{print $2}' | xargs svn add", svnWorkingDirectoryPath );
@@ -219,7 +212,7 @@ async function updateThePluginStableVersion( version, abortMessage ) {
 		const readmePath = svnWorkingDirectoryPath + '/readme.txt';
 		const readmeFileContent = fs.readFileSync( readmePath, 'utf8' );
 		const newReadmeContent = readmeFileContent.replace(
-			/Stable tag: [0-9]+.[0-9]+.[0-9]+\s*\n/,
+			STABLE_TAG_REGEX,
 			'Stable tag: ' + version + '\n'
 		);
 		fs.writeFileSync( readmePath, newReadmeContent );
@@ -244,8 +237,18 @@ async function updateThePluginStableVersion( version, abortMessage ) {
  */
 async function runCleanLocalCloneStep( abortMessage ) {
 	await runStep( 'Cleaning the temporary folder', abortMessage, async () => {
-		await rimraf( gitWorkingDirectoryPath );
-		await rimraf( svnWorkingDirectoryPath );
+		await Promise.all( [
+			gitWorkingDirectoryPath,
+			svnWorkingDirectoryPath,
+		].map( async ( directoryPath ) => {
+			if ( fs.existsSync( directoryPath ) ) {
+				await rimraf( directoryPath, ( err ) => {
+					if ( err ) {
+						throw err;
+					}
+				} );
+			}
+		} ) );
 	} );
 }
 
@@ -295,6 +298,21 @@ async function runReleaseBranchCreationStep( abortMessage ) {
 }
 
 /**
+ * Finds the name of the current release branch based on the version in
+ * the package.json file.
+ *
+ * @param {string} packageJsonPath Path to the package.json file.
+ *
+ * @return {string} Name of the release branch.
+ */
+const findReleaseBranchName = ( packageJsonPath ) => {
+	const masterPackageJson = readJSONFile( packageJsonPath );
+	const masterParsedVersion = semver.parse( masterPackageJson.version );
+
+	return 'release/' + masterParsedVersion.major + '.' + masterParsedVersion.minor;
+};
+
+/**
  * Checkouts out the release branch and chooses a stable version number.
  *
  * @param {string} abortMessage Abort Message.
@@ -306,9 +324,7 @@ async function runReleaseBranchCheckoutStep( abortMessage ) {
 	await runStep( 'Getting into the release branch', abortMessage, async () => {
 		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
-		const masterPackageJson = readJSONFile( packageJsonPath );
-		const masterParsedVersion = semver.parse( masterPackageJson.version );
-		releaseBranch = 'release/' + masterParsedVersion.major + '.' + masterParsedVersion.minor;
+		releaseBranch = findReleaseBranchName( packageJsonPath );
 
 		// Creating the release branch
 		await simpleGit.checkout( releaseBranch );
@@ -342,11 +358,12 @@ async function runReleaseBranchCheckoutStep( abortMessage ) {
  * and commit the changes.
  *
  * @param {string} version      Version to use.
+ * @param {string} changelog    Changelog to use.
  * @param {string} abortMessage Abort message.
  *
  * @return {string} hash of the version bump commit.
  */
-async function runBumpPluginVersionAndCommitStep( version, abortMessage ) {
+async function runBumpPluginVersionAndCommitStep( version, changelog, abortMessage ) {
 	let commitHash;
 	await runStep( 'Updating the plugin version', abortMessage, async () => {
 		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
@@ -369,6 +386,32 @@ async function runBumpPluginVersionAndCommitStep( version, abortMessage ) {
 		fs.writeFileSync( pluginFilePath, content.replace( ' * Version: ' + packageJson.version, ' * Version: ' + version ) );
 		console.log( '>> The plugin version has been updated successfully.' );
 
+		// Update the content of the readme.txt file
+		const readmePath = gitWorkingDirectoryPath + '/readme.txt';
+		const readmeFileContent = fs.readFileSync( readmePath, 'utf8' );
+		const newReadmeContent =
+			readmeFileContent.substr( 0, readmeFileContent.indexOf( '== Changelog ==' ) ) +
+			'== Changelog ==\n\n' +
+			changelog + '\n';
+		fs.writeFileSync( readmePath, newReadmeContent );
+
+		// Update the content of the changelog.txt file
+		const stableVersion = version.match( /[0-9]+\.[0-9]+\.[0-9]+/ )[ 0 ];
+		const changelogPath = gitWorkingDirectoryPath + '/changelog.txt';
+		const changelogFileContent = fs.readFileSync( changelogPath, 'utf8' );
+		const versionHeader = '= ' + version + ' =\n\n';
+		const regexToSearch = /=\s([0-9]+\.[0-9]+\.[0-9]+)(-rc\.[0-9]+)?\s=\n\n/g;
+		let lastDifferentVersionMatch = regexToSearch.exec( changelogFileContent );
+		if ( lastDifferentVersionMatch[ 1 ] === stableVersion ) {
+			lastDifferentVersionMatch = regexToSearch.exec( changelogFileContent );
+		}
+		const newChangelogContent =
+			'== Changelog ==\n\n' +
+			versionHeader +
+			changelog + '\n\n' +
+			changelogFileContent.substr( lastDifferentVersionMatch.index );
+		fs.writeFileSync( changelogPath, newChangelogContent );
+
 		// Commit the version bump
 		await askForConfirmationToContinue(
 			'Please check the diff. Proceed with the version bump commit?',
@@ -379,6 +422,8 @@ async function runBumpPluginVersionAndCommitStep( version, abortMessage ) {
 			packageJsonPath,
 			packageLockPath,
 			pluginFilePath,
+			readmePath,
+			changelogPath,
 		] );
 		const commitData = await simpleGit.commit( 'Bump plugin version to ' + version );
 		commitHash = commitData.commit;
@@ -450,12 +495,13 @@ async function runPushGitChangesStep( releaseBranch, abortMessage ) {
  *
  * @param {string}  version      Released version.
  * @param {string}  versionLabel Label of the released Version.
+ * @param {string}  changelog    Release changelog.
  * @param {boolean} isPrerelease is a pre-release.
  * @param {string}  abortMessage Abort message.
  *
  * @return {Object} Github release object.
  */
-async function runGithubReleaseStep( version, versionLabel, isPrerelease, abortMessage ) {
+async function runGithubReleaseStep( version, versionLabel, changelog, isPrerelease, abortMessage ) {
 	let octokit;
 	let release;
 	await runStep( 'Creating the GitHub release', abortMessage, async () => {
@@ -464,11 +510,6 @@ async function runGithubReleaseStep( version, versionLabel, isPrerelease, abortM
 			true,
 			abortMessage
 		);
-		const { changelog } = await inquirer.prompt( [ {
-			type: 'editor',
-			name: 'changelog',
-			message: 'Please provide the CHANGELOG of the release (markdown)',
-		} ] );
 
 		const { token } = await inquirer.prompt( [ {
 			type: 'input',
@@ -550,6 +591,12 @@ async function releasePlugin( isRC = true ) {
 	let abortMessage = 'Aborting!';
 	await askForConfirmationToContinue( 'Ready to go? ' );
 
+	const { changelog } = await inquirer.prompt( [ {
+		type: 'editor',
+		name: 'changelog',
+		message: 'Please provide the CHANGELOG of the release (markdown)',
+	} ] );
+
 	// Cloning the Git repository
 	await runGitRepositoryCloneStep( abortMessage );
 
@@ -559,7 +606,7 @@ async function releasePlugin( isRC = true ) {
 		await runReleaseBranchCheckoutStep( abortMessage );
 
 	// Bumping the version and commit.
-	const commitHash = await runBumpPluginVersionAndCommitStep( version, abortMessage );
+	const commitHash = await runBumpPluginVersionAndCommitStep( version, changelog, abortMessage );
 
 	// Plugin ZIP creation
 	await runPluginZIPCreationStep();
@@ -572,7 +619,7 @@ async function releasePlugin( isRC = true ) {
 	abortMessage = 'Aborting! Make sure to ' + isRC ? 'remove' : 'reset' + ' the remote release branch and remove the git tag.';
 
 	// Creating the GitHub Release
-	const release = await runGithubReleaseStep( version, versionLabel, isRC, abortMessage );
+	const release = await runGithubReleaseStep( version, versionLabel, changelog, isRC, abortMessage );
 	abortMessage = 'Aborting! Make sure to manually cherry-pick the ' + success( commitHash ) + ' commit to the master branch.';
 	if ( ! isRC ) {
 		abortMessage += ' Make sure to perform the SVN release manually as well.';
@@ -645,6 +692,84 @@ program
 			'You can access the GitHub release here: ' + success( release.html_url ) + '\n',
 			'In a few minutes, you\'ll be able to update the plugin from the WordPress repository.\n',
 			'Thanks for performing the release! and don\'t forget to publish the release post.'
+		);
+	} );
+
+/**
+ * Checks out the WordPress release branch and syncs it with the changes from
+ * the last plugin release.
+ *
+ * @param {string} abortMessage Abort Message.
+ */
+async function runWordPressReleaseBranchSyncStep( abortMessage ) {
+	const wordpressReleaseBranch = 'wp/trunk';
+	await runStep( 'Getting into the WordPress release branch', abortMessage, async () => {
+		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
+		const pluginReleaseBranch = findReleaseBranchName( packageJsonPath );
+
+		// Creating the release branch
+		await simpleGit.checkout( wordpressReleaseBranch );
+		console.log( '>> The local release branch ' + success( wordpressReleaseBranch ) + ' has been successfully checked out.' );
+
+		await askForConfirmationToContinue(
+			`The branch is ready for sync with the latest plugin release changes applied to "${ pluginReleaseBranch }". Proceed?`,
+			true,
+			abortMessage
+		);
+
+		await simpleGit.raw( [ 'rm', '-r', '.' ] );
+		await simpleGit.raw( [ 'checkout', `origin/${ pluginReleaseBranch }`, '--', '.' ] );
+		await simpleGit.commit( `Merge changes published in the Gutenberg plugin "${ pluginReleaseBranch }" branch` );
+		console.log( '>> The local WordPress release branch ' + success( wordpressReleaseBranch ) + ' has been successfully synced.' );
+	} );
+
+	return {
+		releaseBranch: wordpressReleaseBranch,
+	};
+}
+
+/**
+ * Prepublish to npm steps for WordPress packages.
+ *
+ * @return {Object} Github release object.
+ */
+async function prepublishPackages() {
+	// This is a variable that contains the abort message shown when the script is aborted.
+	let abortMessage = 'Aborting!';
+	await askForConfirmationToContinue( 'Ready to go? ' );
+
+	// Cloning the Git repository.
+	await runGitRepositoryCloneStep( abortMessage );
+
+	// Checking out the WordPress release branch and doing sync with the last plugin release.
+	const { releaseBranch } = await runWordPressReleaseBranchSyncStep( abortMessage );
+
+	// Push the local changes
+	abortMessage = `Aborting! Make sure to push changes applied to WordPress release branch "${ releaseBranch }" manually.`;
+	await runPushGitChangesStep( releaseBranch, abortMessage );
+
+	abortMessage = 'Aborting! The release is finished though.';
+	await runCleanLocalCloneStep( abortMessage );
+}
+
+program
+	.command( 'prepublish-packages-stable' )
+	.alias( 'npm-stable' )
+	.description( 'Prepublish to npm steps for a stable version of WordPress packages' )
+	.action( async () => {
+		console.log(
+			chalk.bold( '💃 Time to publish WordPress packages to npm 🕺\n\n' ),
+			'Welcome! This tool is going to help you with prepublish to npm steps for a new stable version of WordPress packages.\n',
+			'To perform a release you\'ll have to be a member of the WordPress Team on npm.\n'
+		);
+
+		await prepublishPackages();
+
+		console.log(
+			'\n>> 🎉 WordPress packages are ready to publish.\n',
+			'Thanks for performing the prepublish process! You still need to run "npm run publish:prod" to perform the actual release.\n',
+			'Let also people know on WordPress Slack when everything is finished.'
 		);
 	} );
 

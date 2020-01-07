@@ -133,57 +133,6 @@ const MOCK_RESPONSES = [
 	},
 ];
 
-const addAllEmbeds = async () => {
-	// Valid embed.
-	await clickBlockAppender();
-	await page.keyboard.type( '/embed' );
-	await page.keyboard.press( 'Enter' );
-	await page.keyboard.type( 'https://twitter.com/notnownikki' );
-	await page.keyboard.press( 'Enter' );
-
-	// Valid provider; invalid content.
-	await clickBlockAppender();
-	await page.keyboard.type( '/embed' );
-	await page.keyboard.press( 'Enter' );
-	await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
-	await page.keyboard.press( 'Enter' );
-
-	// WordPress invalid content.
-	await clickBlockAppender();
-	await page.keyboard.type( '/embed' );
-	await page.keyboard.press( 'Enter' );
-	await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/' );
-	await page.keyboard.press( 'Enter' );
-
-	// Provider whose oembed API has gone wrong.
-	await clickBlockAppender();
-	await page.keyboard.type( '/embed' );
-	await page.keyboard.press( 'Enter' );
-	await page.keyboard.type( 'https://twitter.com/thatbunty' );
-	await page.keyboard.press( 'Enter' );
-
-	// WordPress content that can be embedded.
-	await clickBlockAppender();
-	await page.keyboard.type( '/embed' );
-	await page.keyboard.press( 'Enter' );
-	await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' );
-	await page.keyboard.press( 'Enter' );
-
-	// Video content.
-	await clickBlockAppender();
-	await page.keyboard.type( '/embed' );
-	await page.keyboard.press( 'Enter' );
-	await page.keyboard.type( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
-	await page.keyboard.press( 'Enter' );
-
-	// Photo content.
-	await clickBlockAppender();
-	await page.keyboard.type( '/embed' );
-	await page.keyboard.press( 'Enter' );
-	await page.keyboard.type( 'https://cloudup.com/cQFlxqtY4ob' );
-	await page.keyboard.press( 'Enter' );
-};
-
 describe( 'Embedding content', () => {
 	beforeEach( async () => {
 		await setUpResponseMocking( MOCK_RESPONSES );
@@ -191,19 +140,63 @@ describe( 'Embedding content', () => {
 	} );
 
 	it( 'should render embeds in the correct state', async () => {
-		await addAllEmbeds();
-		// The successful embeds should be in a correctly classed figure element.
-		// This tests that they have switched to the correct block.
+		// Valid embed. Should render valid figure element.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://twitter.com/notnownikki' );
+		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
-		await page.waitForSelector( 'figure.wp-block-embed-cloudup' );
+
+		// Valid provider; invalid content. Should render failed, edit state.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
+		await page.keyboard.press( 'Enter' );
+		await page.waitForSelector( 'input[value="https://twitter.com/wooyaygutenberg123454312"]' );
+
+		// WordPress invalid content. Should render failed, edit state.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/' );
+		await page.keyboard.press( 'Enter' );
+		await page.waitForSelector( 'input[value="https://wordpress.org/gutenberg/handbook/"]' );
+
+		// Provider whose oembed API has gone wrong. Should render failed, edit
+		// state.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://twitter.com/thatbunty' );
+		await page.keyboard.press( 'Enter' );
+		await page.waitForSelector( 'input[value="https://twitter.com/thatbunty"]' );
+
+		// WordPress content that can be embedded. Should render valid figure
+		// element.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' );
+		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( 'figure.wp-block-embed-wordpress' );
-		// Video embed should also have the aspect ratio class.
+
+		// Video content. Should render valid figure element, and include the
+		// aspect ratio class.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
+		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( 'figure.wp-block-embed-youtube.wp-embed-aspect-16-9' );
 
-		// Each failed embed should be in the edit state.
-		await page.waitForSelector( 'input[value="https://twitter.com/wooyaygutenberg123454312"]' );
-		await page.waitForSelector( 'input[value="https://twitter.com/thatbunty"]' );
-		await page.waitForSelector( 'input[value="https://wordpress.org/gutenberg/handbook/"]' );
+		// Photo content. Should render valid figure element.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://cloudup.com/cQFlxqtY4ob' );
+		await page.keyboard.press( 'Enter' );
 	} );
 
 	it( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async () => {

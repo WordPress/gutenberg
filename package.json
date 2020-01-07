@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "7.0.0",
+	"version": "7.2.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -39,6 +39,7 @@
 		"@wordpress/dom": "file:packages/dom",
 		"@wordpress/dom-ready": "file:packages/dom-ready",
 		"@wordpress/edit-post": "file:packages/edit-post",
+		"@wordpress/edit-site": "file:packages/edit-site",
 		"@wordpress/edit-widgets": "file:packages/edit-widgets",
 		"@wordpress/editor": "file:packages/editor",
 		"@wordpress/element": "file:packages/element",
@@ -48,6 +49,7 @@
 		"@wordpress/html-entities": "file:packages/html-entities",
 		"@wordpress/i18n": "file:packages/i18n",
 		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
+		"@wordpress/keyboard-shortcuts": "file:packages/keyboard-shortcuts",
 		"@wordpress/keycodes": "file:packages/keycodes",
 		"@wordpress/list-reusable-blocks": "file:packages/list-reusable-blocks",
 		"@wordpress/media-utils": "file:packages/media-utils",
@@ -79,6 +81,7 @@
 		"@storybook/addon-storysource": "5.2.4",
 		"@storybook/addon-viewport": "5.2.4",
 		"@storybook/react": "5.2.4",
+		"@types/requestidlecallback": "0.3.1",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
@@ -172,22 +175,22 @@
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
-		"docs:build": "node ./docs/tool/index.js && node ./bin/update-readmes.js",
+		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-readmes.js",
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
-		"fixtures:server-registered": "wp-scripts env docker-run php ./bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
+		"fixtures:server-registered": "npm run wp-env run tests-wordpress-phpunit './bin/get-server-blocks.php > test/integration/full-content/server-registered.json'",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\" \"npm run lint-types\"",
 		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
-		"lint-php": "wp-scripts env lint-php",
+		"lint-php": "npm run wp-env run composer run-script lint",
 		"lint-pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
 		"lint-types": "tsc",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"pot-to-php": "./bin/pot-to-php.js",
-		"publish:check": "npm run build:packages && lerna updated",
+		"publish:check": "lerna updated",
 		"publish:dev": "npm run build:packages && lerna publish --dist-tag next",
 		"publish:legacy": "npm run build:packages && lerna publish --dist-tag legacy",
 		"publish:prod": "npm run build:packages && lerna publish",
@@ -212,7 +215,8 @@
 		"playground:build": "npm run storybook:build",
 		"playground:dev": "echo \"Please use storybook:dev instead.\"",
 		"preenv": "npm run check-engines",
-		"env": "wp-scripts env"
+		"env": "wp-scripts env",
+		"wp-env": "packages/env/bin/wp-env"
 	},
 	"husky": {
 		"hooks": {
@@ -230,10 +234,12 @@
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
-			"node ./docs/tool/index.js"
+			"node ./docs/tool/index.js",
+			"node ./docs/tool/are-data-files-unstaged.js"
 		],
 		"packages/**/*.js": [
-			"node ./bin/update-readmes.js"
+			"node ./bin/api-docs/update-readmes.js",
+			"node ./bin/api-docs/are-readmes-unstaged.js"
 		]
 	},
 	"wp-env": {

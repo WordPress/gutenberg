@@ -7,16 +7,16 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
 import VisuallyHidden from '../visually-hidden';
 
-function Token( {
+export default function Token( {
 	value,
 	status,
 	title,
@@ -29,8 +29,8 @@ function Token( {
 	messages,
 	termPosition,
 	termsCount,
-	instanceId,
 } ) {
+	const instanceId = useInstanceId( Token );
 	const tokenClasses = classnames( 'components-form-token-field__token', {
 		'is-error': 'error' === status,
 		'is-success': 'success' === status,
@@ -65,7 +65,7 @@ function Token( {
 				<span aria-hidden="true">{ transformedValue }</span>
 			</span>
 
-			<IconButton
+			<Button
 				className="components-form-token-field__remove-token"
 				icon="dismiss"
 				onClick={ ! disabled && onClick }
@@ -75,5 +75,3 @@ function Token( {
 		</span>
 	);
 }
-
-export default withInstanceId( Token );

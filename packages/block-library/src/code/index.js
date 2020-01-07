@@ -22,7 +22,8 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			content: '// A "block" is the abstract term used\n// to describe units of markup that\n// when composed together, form the\n// content or layout of a page.\nregisterBlockType( name, settings );',
+			// translators: Preserve \n markers for line breaks
+			content: __( '// A "block" is the abstract term used\n// to describe units of markup that\n// when composed together, form the\n// content or layout of a page.\nregisterBlockType( name, settings );' ),
 		},
 	},
 	supports: {

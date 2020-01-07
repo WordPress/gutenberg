@@ -1,16 +1,17 @@
-.components-placeholder {
+.components-placeholder.components-placeholder { // This needs specificity to override individual block styles.
+	position: relative;
 	margin-bottom: $default-block-margin;
 	padding: 1em;
 	min-height: 200px;
 	width: 100%;
-	text-align: center;
+	text-align: left;
 
 	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 	@supports (position: sticky) {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
 		justify-content: center;
+		align-items: flex-start;
 	}
 
 	// Use opacity to work in various editor styles.
@@ -18,6 +19,10 @@
 
 	.is-dark-theme & {
 		background: $light-opacity-light-200;
+	}
+
+	.components-base-control__label {
+		font-size: $default-font-size;
 	}
 }
 
@@ -30,11 +35,10 @@
 
 .components-placeholder__label {
 	display: flex;
-	align-items: center;
-	justify-content: center;
 	font-weight: 600;
 	margin-bottom: 1em;
 
+	> svg,
 	.dashicon,
 	.block-editor-block-icon {
 		fill: currentColor;
@@ -46,9 +50,7 @@
 .components-placeholder__fieldset form {
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
 	width: 100%;
-	max-width: 400px;
 	flex-wrap: wrap;
 	z-index: z-index(".components-placeholder__fieldset");
 
@@ -64,8 +66,7 @@
 }
 
 .components-placeholder__input {
-	margin-top: 0;
-	margin-right: 8px;
+	margin: 0 8px 0 0;
 	flex: 1 1 auto;
 }
 
@@ -79,10 +80,11 @@
 }
 
 .components-placeholder__fieldset .components-button {
-	margin-right: 4px;
-	margin-bottom: 10px; // if buttons wrap we need vertical space between
+	margin-right: $grid-size;
+	margin-bottom: $grid-size; // If buttons wrap we need vertical space between.
 
 	&:last-child {
+		margin-bottom: 0;
 		margin-right: 0;
 	}
 }
@@ -97,5 +99,37 @@
 
 	&:last-child {
 		margin-right: 0;
+	}
+}
+
+// Element queries to show different layouts at various sizes.
+.components-placeholder {
+
+	// Medium and small sizes.
+	&.is-medium,
+	&.is-small {
+		.components-placeholder__instructions {
+			display: none;
+		}
+
+		.components-placeholder__fieldset,
+		.components-placeholder__fieldset form {
+			flex-direction: column;
+		}
+
+		.components-placeholder__fieldset .components-button {
+			margin-right: auto;
+		}
+	}
+
+	// Small sizes.
+	&.is-small {
+		.block-editor-block-icon {
+			display: none;
+		}
+
+		.components-button {
+			padding: 0 $grid-size 2px;
+		}
 	}
 }

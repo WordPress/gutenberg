@@ -1,43 +1,38 @@
-/**
- * WordPress dependencies
- */
-import { getPhrasingContentSchema } from '@wordpress/blocks';
-
-const tableContentPasteSchema = {
+const tableContentPasteSchema = ( { phrasingContentSchema } ) => ( {
 	tr: {
 		allowEmpty: true,
 		children: {
 			th: {
 				allowEmpty: true,
-				children: getPhrasingContentSchema(),
+				children: phrasingContentSchema,
 				attributes: [ 'scope' ],
 			},
 			td: {
 				allowEmpty: true,
-				children: getPhrasingContentSchema(),
+				children: phrasingContentSchema,
 			},
 		},
 	},
-};
+} );
 
-const tablePasteSchema = {
+const tablePasteSchema = ( args ) => ( {
 	table: {
 		children: {
 			thead: {
 				allowEmpty: true,
-				children: tableContentPasteSchema,
+				children: tableContentPasteSchema( args ),
 			},
 			tfoot: {
 				allowEmpty: true,
-				children: tableContentPasteSchema,
+				children: tableContentPasteSchema( args ),
 			},
 			tbody: {
 				allowEmpty: true,
-				children: tableContentPasteSchema,
+				children: tableContentPasteSchema( args ),
 			},
 		},
 	},
-};
+} );
 
 const transforms = {
 	from: [
