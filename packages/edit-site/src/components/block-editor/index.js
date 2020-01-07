@@ -21,7 +21,6 @@ import {
  */
 import { useEditorContext } from '../editor';
 import Sidebar from '../sidebar';
-import ThemeExporter from '../theme-exporter';
 
 export default function BlockEditor() {
 	const { settings: _settings } = useEditorContext();
@@ -78,12 +77,6 @@ export default function BlockEditor() {
 			onChange={ setContent }
 		>
 			<BlockEditorKeyboardShortcuts />
-			<Sidebar.TemplatesFill>
-				<ThemeExporter
-					ids={ settings.templateIds }
-					templatePartIds={ settings.templatePartIds }
-				/>
-			</Sidebar.TemplatesFill>
 			<Sidebar.InspectorFill>
 				<BlockInspector />
 			</Sidebar.InspectorFill>

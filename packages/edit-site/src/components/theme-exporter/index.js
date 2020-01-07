@@ -8,7 +8,7 @@ import { saveAs } from 'file-saver';
  */
 import { useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -62,15 +62,13 @@ export default function ThemeExporter( { ids, templatePartIds } ) {
 		saveAs( zip, 'theme.zip' );
 	}, [ files ] );
 	return (
-		<div className="edit-site-theme-exporter">
-			<Button
-				isPrimary
-				aria-disabled={ ! files }
-				disabled={ ! files }
-				onClick={ files ? exportTheme : undefined }
-			>
-				{ __( 'Export Theme' ) }
-			</Button>
-		</div>
+		<MenuItem
+			icon="download"
+			aria-disabled={ ! files }
+			disabled={ ! files }
+			onClick={ files ? exportTheme : undefined }
+		>
+			{ __( 'Export Theme' ) }
+		</MenuItem>
 	);
 }

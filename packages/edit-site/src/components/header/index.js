@@ -3,6 +3,7 @@
  */
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { DropdownMenu } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -10,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { useEditorContext } from '../editor';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
+import ThemeExporter from '../theme-exporter';
 
 export default function Header() {
 	const { settings, setSettings } = useEditorContext();
@@ -47,17 +49,31 @@ export default function Header() {
 			aria-label={ __( 'Site editor top bar.' ) }
 			tabIndex="-1"
 		>
+			<TemplateSwitcher
+				ids={ settings.templateIds }
+				templatePartIds={ settings.templatePartIds }
+				activeId={ settings.templateId }
+				isTemplatePart={ settings.templateType === 'wp_template_part' }
+				onActiveIdChange={ setActiveTemplateId }
+				onActiveTemplatePartIdChange={ setActiveTemplatePartId }
+				onAddTemplateId={ addTemplateId }
+			/>
 			<div className="edit-site-header__actions">
-				<TemplateSwitcher
-					ids={ settings.templateIds }
-					templatePartIds={ settings.templatePartIds }
-					activeId={ settings.templateId }
-					isTemplatePart={ settings.templateType === 'wp_template_part' }
-					onActiveIdChange={ setActiveTemplateId }
-					onActiveTemplatePartIdChange={ setActiveTemplatePartId }
-					onAddTemplateId={ addTemplateId }
-				/>
 				<SaveButton />
+				<DropdownMenu
+					icon="ellipsis"
+					label={ __( 'More tools & options' ) }
+					toggleProps={ {
+						labelPosition: 'bottom',
+					} }
+				>
+					{ () => (
+						<ThemeExporter
+							ids={ settings.templateIds }
+							templatePartIds={ settings.templatePartIds }
+						/>
+					) }
+				</DropdownMenu>
 			</div>
 		</div>
 	);
