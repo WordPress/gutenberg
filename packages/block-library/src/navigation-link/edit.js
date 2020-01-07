@@ -166,10 +166,10 @@ function NavigationLinkEdit( {
 					/>
 					{ isLinkOpen && (
 						<Popover position="bottom center">
-							<LinkControl
-								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-							manualSearch={ () => {
+						<LinkControl
+							className="wp-block-navigation-link__inline-link-input"
+							value={ link }
+							initialSuggestions={ () => {
 								return Promise.resolve( [ {
 									id: '-1',
 									title: 'Manual result',

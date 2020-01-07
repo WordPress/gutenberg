@@ -32,12 +32,12 @@ const handleLinkControlOnKeyPress = ( event ) => {
 
 const LinkControlSearchInput = ( {
 	value,
-	manualSearch,
 	onChange,
 	onSelect,
 	renderSuggestions,
 	fetchSuggestions,
 	onReset,
+	initialSuggestions,
 } ) => {
 	const selectItemHandler = ( selection, suggestion ) => {
 		onChange( selection );
@@ -69,7 +69,7 @@ const LinkControlSearchInput = ( {
 				__experimentalRenderSuggestions={ renderSuggestions }
 				__experimentalFetchLinkSuggestions={ fetchSuggestions }
 				__experimentalHandleURLSuggestions={ true }
-				manualSearch={ manualSearch }
+				__experimentalInitialSuggestions={ initialSuggestions }
 			/>
 
 			<Button

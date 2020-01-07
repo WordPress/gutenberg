@@ -61,9 +61,9 @@ class URLInput extends Component {
 	}
 
 	componentDidMount() {
-		const { manualSearch = '' } = this.props;
-		if ( manualSearch ) {
-			this.updateSuggestions( 'sdfsdfsdf', {
+		const { __experimentalInitialSuggestions = '' } = this.props;
+		if ( __experimentalInitialSuggestions ) {
+			this.updateSuggestions( '', {
 				isManualSearch: true,
 			} );
 		}
@@ -85,10 +85,10 @@ class URLInput extends Component {
 		const {
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalHandleURLSuggestions: handleURLSuggestions,
-			manualSearch,
+			__experimentalInitialSuggestions: initialSuggestions,
 		} = this.props;
 
-		if ( ! fetchLinkSuggestions || ! manualSearch ) {
+		if ( ! fetchLinkSuggestions || ! initialSuggestions ) {
 			return;
 		}
 
@@ -110,7 +110,7 @@ class URLInput extends Component {
 			loading: true,
 		} );
 
-		const request = isManualSearch ? manualSearch() : fetchLinkSuggestions( value );
+		const request = isManualSearch ? initialSuggestions() : fetchLinkSuggestions( value );
 
 		request.then( ( suggestions ) => {
 			// A fetch Promise doesn't have an abort option. It's mimicked by
@@ -250,7 +250,7 @@ class URLInput extends Component {
 		this.inputRef.current.focus();
 	}
 
-	static getDerivedStateFromProps( { value, disableSuggestions, manualSearch }, { showSuggestions, selectedSuggestion } ) {
+	static getDerivedStateFromProps( { value, disableSuggestions, __experimentalInitialSuggestions: manualSearch }, { showSuggestions, selectedSuggestion } ) {
 		let shouldShowSuggestions = showSuggestions;
 
 		const hasValue = value && value.length;
