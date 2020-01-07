@@ -18,7 +18,6 @@ import {
 	cloneElement,
 	useRef,
 } from '@wordpress/element';
-import { withFallbackStyles } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -218,32 +217,27 @@ export default function __experimentalUseColors(
 				break;
 			}
 		}
-		return (
-			( needsBackgroundColor || needsColor ) &&
-			withFallbackStyles(
-				() => {
-					let backgroundColorNode = targetRef.current;
-					let backgroundColor;
-					const color = getComputedStyle( targetRef.current ).color;
-					if ( needsBackgroundColor ) {
-						backgroundColor = getComputedStyle( backgroundColorNode )
-							.backgroundColor;
-						while (
-							backgroundColor === 'rgba(0, 0, 0, 0)' &&
-							backgroundColorNode.parentNode &&
-							backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
-						) {
-							backgroundColorNode = backgroundColorNode.parentNode;
-							backgroundColor = getComputedStyle( backgroundColorNode )
-								.backgroundColor;
-						}
-					}
-					detectedBackgroundColorRef.current = backgroundColor;
-					detectedColorRef.current = color;
-					return { backgroundColor, color };
-				}
-			)( () => <></> )
-		);
+
+		if ( needsColor ) {
+			detectedColorRef.current = getComputedStyle( targetRef.current ).color;
+		}
+
+		if ( needsBackgroundColor ) {
+			let backgroundColorNode = targetRef.current;
+			let backgroundColor = getComputedStyle( backgroundColorNode )
+				.backgroundColor;
+			while (
+				backgroundColor === 'rgba(0, 0, 0, 0)' &&
+				backgroundColorNode.parentNode &&
+				backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
+			) {
+				backgroundColorNode = backgroundColorNode.parentNode;
+				backgroundColor = getComputedStyle( backgroundColorNode )
+					.backgroundColor;
+			}
+
+			detectedBackgroundColorRef.current = backgroundColor;
+		}
 	}, [
 		colorConfigs.reduce(
 			( acc, colorConfig ) =>
