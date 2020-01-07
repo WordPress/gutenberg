@@ -6,8 +6,8 @@ import { useRef, useState, useMemo, useEffect } from '@wordpress/element';
 import {
 	ToggleControl,
 	withSpokenMessages,
+	KeyboardShortcuts,
 } from '@wordpress/components';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
 import {
 	create,
@@ -24,7 +24,12 @@ import { URLPopover } from '@wordpress/block-editor';
  */
 import { createLinkFormat, isValidHref } from './utils';
 
-const stopKeyPropagation = ( event ) => event.stopPropagation();
+/**
+ * Stops propagation of an event.
+ *
+ * @param {Event} event Event object.
+ */
+const stopPropagation = ( event ) => event.stopPropagation();
 
 const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
 	const anchorRef = useMemo( () => {
@@ -82,13 +87,6 @@ function InlineLinkUI( {
 			setOpensInNewWindow( target === '_blank' );
 		}
 	} );
-
-	function onKeyDown( event ) {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
-	}
 
 	function setLinkTarget( nextOpensInNewWindow ) {
 		setOpensInNewWindow( nextOpensInNewWindow );
@@ -157,6 +155,15 @@ function InlineLinkUI( {
 		setIsEditingLink( false );
 	}
 
+	// In the link editor input, most key events will have their propagation
+	// stopped. This is because the input is usually rendered in the context of
+	// an ancestor where some global key event handling occurs, for which the
+	// link input (being of a separate popover context) should be excluded. For
+	// example, in the block editor, undo/redo keyboard interactions should not
+	// trigger global editor history, but instead use native input history.
+	// Similarly, key presses are not propagated in order for `ObserveTyping`
+	// to not consider these interactions for dismissing the block toolbar.
+
 	return (
 		<URLPopoverAtLink
 			value={ value }
@@ -174,19 +181,31 @@ function InlineLinkUI( {
 			) }
 		>
 			{ isShowingInput ? (
-				<URLPopover.LinkEditor
-					className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
-					value={ inputValue }
-					onChangeInputValue={ setInputValue }
-					onKeyDown={ onKeyDown }
-					onKeyPress={ stopKeyPropagation }
-					onSubmit={ submitLink }
-					autocompleteRef={ autocompleteRef }
-				/>
+				<KeyboardShortcuts
+					shortcuts={ {
+						'meta+z': stopPropagation,
+						'meta+shift+z': stopPropagation,
+						left: stopPropagation,
+						down: stopPropagation,
+						right: stopPropagation,
+						up: stopPropagation,
+						backspace: stopPropagation,
+						enter: stopPropagation,
+					} }
+				>
+					<URLPopover.LinkEditor
+						className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
+						value={ inputValue }
+						onChangeInputValue={ setInputValue }
+						onKeyPress={ stopPropagation }
+						onSubmit={ submitLink }
+						autocompleteRef={ autocompleteRef }
+					/>
+				</KeyboardShortcuts>
 			) : (
 				<URLPopover.LinkViewer
 					className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
-					onKeyPress={ stopKeyPropagation }
+					onKeyPress={ stopPropagation }
 					url={ url }
 					onEditLinkClick={ editLink }
 					linkClassName={ isValidHref( prependHTTP( url ) ) ? undefined : 'has-invalid-link' }
