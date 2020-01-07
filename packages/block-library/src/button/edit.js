@@ -37,12 +37,6 @@ import {
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import {
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN,
-	BACKSPACE,
-	ENTER,
 	rawShortcut,
 	displayShortcut,
 } from '@wordpress/keycodes';
@@ -88,19 +82,6 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 	);
 }
 
-const handleLinkControlOnKeyDown = ( event ) => {
-	const { keyCode } = event;
-
-	if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
-		// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-		event.stopPropagation();
-	}
-};
-
-const handleLinkControlOnKeyPress = ( event ) => {
-	event.stopPropagation();
-};
-
 function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onToggleOpenInNewTab } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	useEffect(
@@ -117,25 +98,15 @@ function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onTo
 	const linkControl = isURLPickerOpen && (
 		<LinkControl
 			className="wp-block-navigation-link__inline-link-input"
-			onKeyDown={ handleLinkControlOnKeyDown }
-			onKeyPress={ handleLinkControlOnKeyPress }
-			currentLink={ ! url && ! title ? null : { url, title } }
-			onLinkChange={ ( { title: newTitle = '', url: newURL = '' } ) => {
+			value={ { url, title, opensInNewTab } }
+			onChange={ ( { title: newTitle = '', url: newURL = '', opensInNewTab: newOpensInNewTab } ) => {
 				setAttributes( {
 					title: escape( newTitle ),
 					url: newURL,
 				} );
-			} }
-			currentSettings={ [
-				{
-					id: 'opensInNewTab',
-					title: __( 'Open in new tab' ),
-					checked: opensInNewTab,
-				},
-			] }
-			onSettingsChange={ ( setting, value ) => {
-				if ( setting === 'opensInNewTab' ) {
-					onToggleOpenInNewTab( value );
+
+				if ( opensInNewTab !== newOpensInNewTab ) {
+					onToggleOpenInNewTab( newOpensInNewTab );
 				}
 			} }
 			onClose={ () => {
