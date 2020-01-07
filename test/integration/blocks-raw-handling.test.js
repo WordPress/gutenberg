@@ -72,7 +72,7 @@ describe( 'Blocks raw handling', () => {
 						isMatch: ( node ) => {
 							return 'words to live by' === node.textContent.trim();
 						},
-						transform: () => {
+						convert() {
 							return createBlock( 'core-embed/youtube', {
 								url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 							} );

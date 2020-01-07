@@ -13,7 +13,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { caption, url, align, id } ) => (
+			convert: ( { attributes: { caption, url, align, id } } ) => (
 				createBlock( 'core/cover', {
 					title: caption,
 					url,
@@ -25,7 +25,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
-			transform: ( { caption, src, align, id } ) => (
+			convert: ( { attributes: { caption, src, align, id } } ) => (
 				createBlock( 'core/cover', {
 					title: caption,
 					url: src,
@@ -48,7 +48,7 @@ const transforms = {
 				// If a url is not set the transform could happen if the cover has no background color or gradient;
 				return ! overlayColor && ! customOverlayColor && ! gradient && ! customGradient;
 			},
-			transform: ( { title, url, align, id } ) => (
+			convert: ( { attributes: { title, url, align, id } } ) => (
 				createBlock( 'core/image', {
 					caption: title,
 					url,
@@ -68,7 +68,7 @@ const transforms = {
 				// If a url is not set the transform could happen if the cover has no background color or gradient;
 				return ! overlayColor && ! customOverlayColor && ! gradient && ! customGradient;
 			},
-			transform: ( { title, url, align, id } ) => (
+			convert: ( { attributes: { title, url, align, id } } ) => (
 				createBlock( 'core/video', {
 					caption: title,
 					src: url,

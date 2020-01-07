@@ -8,7 +8,7 @@ const transforms = {
 		{
 			type: 'enter',
 			regExp: /^```$/,
-			transform: () => createBlock( 'core/code' ),
+			convert: () => createBlock( 'core/code' ),
 		},
 		{
 			type: 'raw',

@@ -8,7 +8,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/columns' ],
-			transform: ( { className, columns, content, width } ) => (
+			convert: ( { attributes: { className, columns, content, width } } ) => (
 				createBlock(
 					'core/columns',
 					{

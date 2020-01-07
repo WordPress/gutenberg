@@ -8,7 +8,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { alt, url, id } ) => (
+			convert: ( { attributes: { alt, url, id } } ) => (
 				createBlock( 'core/media-text', {
 					mediaAlt: alt,
 					mediaId: id,
@@ -20,7 +20,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
-			transform: ( { src, id } ) => (
+			convert: ( { attributes: { src, id } } ) => (
 				createBlock( 'core/media-text', {
 					mediaId: id,
 					mediaUrl: src,
@@ -36,7 +36,7 @@ const transforms = {
 			isMatch: ( { mediaType, mediaUrl } ) => {
 				return ! mediaUrl || mediaType === 'image';
 			},
-			transform: ( { mediaAlt, mediaId, mediaUrl } ) => {
+			convert: ( { attributes: { mediaAlt, mediaId, mediaUrl } } ) => {
 				return createBlock( 'core/image', {
 					alt: mediaAlt,
 					id: mediaId,
@@ -50,7 +50,7 @@ const transforms = {
 			isMatch: ( { mediaType, mediaUrl } ) => {
 				return ! mediaUrl || mediaType === 'video';
 			},
-			transform: ( { mediaId, mediaUrl } ) => {
+			convert: ( { attributes: { mediaId, mediaUrl } } ) => {
 				return createBlock( 'core/video', {
 					id: mediaId,
 					src: mediaUrl,

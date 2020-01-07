@@ -10,11 +10,11 @@ const transforms = {
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
-			transform: ( attributes ) => {
+			convert: ( blocks ) => {
 				return createBlock( 'core/quote', {
 					value: toHTMLString( {
-						value: join( attributes.map( ( { content } ) =>
-							create( { html: content } )
+						value: join( blocks.map( ( block ) =>
+							create( { html: block.attributes.content } )
 						), '\u2028' ),
 						multilineTag: 'p',
 					} ),
@@ -24,7 +24,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/heading' ],
-			transform: ( { content } ) => {
+			convert: ( { attributes: { content } } ) => {
 				return createBlock( 'core/quote', {
 					value: `<p>${ content }</p>`,
 				} );
@@ -33,7 +33,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation } ) => createBlock( 'core/quote', {
+			convert: ( { attributes: { value, citation } } ) => createBlock( 'core/quote', {
 				value,
 				citation,
 			} ),
@@ -41,7 +41,7 @@ const transforms = {
 		{
 			type: 'prefix',
 			prefix: '>',
-			transform: ( content ) => {
+			convert: ( content ) => {
 				return createBlock( 'core/quote', {
 					value: `<p>${ content }</p>`,
 				} );
@@ -92,7 +92,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { value, citation } ) => {
+			convert: ( { attributes: { value, citation } } ) => {
 				const paragraphs = [];
 				if ( value && value !== '<p></p>' ) {
 					paragraphs.push(
@@ -124,7 +124,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/heading' ],
-			transform: ( { value, citation, ...attrs } ) => {
+			convert: ( { attributes: { value, citation, ...attrs } } ) => {
 				// If there is no quote content, use the citation as the
 				// content of the resulting heading. A nonexistent citation
 				// will result in an empty heading.
@@ -162,7 +162,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation } ) => {
+			convert: ( { attributes: { value, citation } } ) => {
 				return createBlock( 'core/pullquote', {
 					value,
 					citation,

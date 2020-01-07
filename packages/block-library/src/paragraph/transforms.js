@@ -21,7 +21,7 @@ const transforms = {
 					attributes: isPaste ? [] : [ 'style' ],
 				},
 			} ),
-			transform( node ) {
+			convert( node ) {
 				const attributes = getBlockAttributes( name, node.outerHTML );
 				const { textAlign } = node.style || {};
 

@@ -41,13 +41,14 @@ const transforms = {
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
-			transform: ( blockAttributes ) => {
+			convert: ( blocks ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
-						value: join( blockAttributes.map( ( { content } ) => {
+						value: join( blocks.map( ( block ) => {
+							const { content } = block.attributes;
 							const value = create( { html: content } );
 
-							if ( blockAttributes.length > 1 ) {
+							if ( blocks.length > 1 ) {
 								return value;
 							}
 
@@ -63,7 +64,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/quote' ],
-			transform: ( { value } ) => {
+			convert: ( { attributes: { value } } ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
 						value: create( { html: value, multilineTag: 'p' } ),
@@ -79,7 +80,7 @@ const transforms = {
 				ol: getListContentSchema( args ).ol,
 				ul: getListContentSchema( args ).ul,
 			} ),
-			transform( node ) {
+			convert( node ) {
 				const attributes = {
 					ordered: node.nodeName === 'OL',
 				};
@@ -115,7 +116,7 @@ const transforms = {
 		...[ '*', '-' ].map( ( prefix ) => ( {
 			type: 'prefix',
 			prefix,
-			transform( content ) {
+			convert( content ) {
 				return createBlock( 'core/list', {
 					values: `<li>${ content }</li>`,
 				} );
@@ -124,7 +125,7 @@ const transforms = {
 		...[ '1.', '1)' ].map( ( prefix ) => ( {
 			type: 'prefix',
 			prefix,
-			transform( content ) {
+			convert( content ) {
 				return createBlock( 'core/list', {
 					ordered: true,
 					values: `<li>${ content }</li>`,
@@ -136,7 +137,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { values } ) =>
+			convert: ( { attributes: { values } } ) =>
 				split( create( {
 					html: values,
 					multilineTag: 'li',
@@ -151,7 +152,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/quote' ],
-			transform: ( { values } ) => {
+			convert: ( { attributes: { values } } ) => {
 				return createBlock( 'core/quote', {
 					value: toHTMLString( {
 						value: create( {

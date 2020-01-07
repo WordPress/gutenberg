@@ -27,6 +27,7 @@
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",

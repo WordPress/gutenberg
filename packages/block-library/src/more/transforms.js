@@ -11,7 +11,7 @@ const transforms = {
 				'wp-block': { attributes: [ 'data-block' ] },
 			},
 			isMatch: ( node ) => node.dataset && node.dataset.block === 'core/more',
-			transform( node ) {
+			convert( node ) {
 				const { customText, noTeaser } = node.dataset;
 				const attrs = {};
 				// Don't copy unless defined and not an empty string

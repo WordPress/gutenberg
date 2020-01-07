@@ -1,3 +1,9 @@
+## Master
+
+### New features
+
+- Added `convert()` method option to `transforms` definition. It receives complete block object(s) as it's argument (as an array of blocks only if `isMultiBlock` is also defined on the transformation). It is now preferred in place of the `transform` method.
+
 ## 6.4.0 (2019-08-05)
 
 ### Improvements

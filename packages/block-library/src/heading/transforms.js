@@ -17,7 +17,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content } ) => {
+			convert: ( { attributes: { content } } ) => {
 				return createBlock( name, {
 					content,
 				} );
@@ -40,7 +40,7 @@ const transforms = {
 					h6: schema,
 				};
 			},
-			transform( node ) {
+			convert( node ) {
 				const attributes = getBlockAttributes( name, node.outerHTML );
 				const { textAlign } = node.style || {};
 
@@ -60,7 +60,7 @@ const transforms = {
 		...[ 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'prefix',
 			prefix: Array( level + 1 ).join( '#' ),
-			transform( content ) {
+			convert( content ) {
 				return createBlock( name, {
 					level,
 					content,
@@ -72,7 +72,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content } ) => {
+			convert: ( { attributes: { content } } ) => {
 				return createBlock( 'core/paragraph', {
 					content,
 				} );

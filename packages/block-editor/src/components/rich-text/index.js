@@ -84,7 +84,7 @@ class RichTextWrapper extends Component {
 
 			if ( transformation ) {
 				onReplace( [
-					transformation.transform( { content: value.text } ),
+					transformation.convert( { content: value.text } ),
 				] );
 				markAutomaticChange();
 			}
@@ -290,7 +290,7 @@ class RichTextWrapper extends Component {
 		}
 
 		const content = valueToFormat( slice( value, start, text.length ) );
-		const block = transformation.transform( content );
+		const block = transformation.convert( content );
 
 		onReplace( [ block ] );
 		markAutomaticChange();

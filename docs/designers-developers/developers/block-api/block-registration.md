@@ -204,9 +204,9 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            transform: function ( attributes ) {
+            convert: function ( block ) {
                 return createBlock( 'core/heading', {
-                    content: attributes.content,
+                    content: block.attributes.content,
                 } );
             },
         },
@@ -220,9 +220,9 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            transform: ( { content } ) => {
+            convert( block ) {
                 return createBlock( 'core/heading', {
-                    content,
+                    content: block.attributes.content,
                 } );
             },
         },
@@ -303,10 +303,10 @@ transforms: {
     to: [
         {
             type: 'block',
-            blocks: [ 'core/paragraph' ],
-            transform: function( attributes ) {
+            blocks: [ 'core/heading' ],
+            convert: function( block ) {
                 return createBlock( 'core/paragraph', {
-                    content: attributes.content,
+                    content: block.attributes.content,
                 } );
             },
         },
@@ -319,14 +319,102 @@ transforms: {
     to: [
         {
             type: 'block',
-            blocks: [ 'core/paragraph' ],
-            transform: ( { content } ) => {
+            blocks: [ 'core/heading' ],
+            convert( block ) {
                 return createBlock( 'core/paragraph', {
-                    content,
+                    content: block.attributes.content,
                 } );
             },
         },
     ],
+},
+```
+{% end %}
+
+It can also be transformed to multiple blocks by returning an array of blocks from the `convert` function.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			convert: function( block ) {
+				var words = block.attributes.content.split( ' ' );
+
+				return words.map( function( word ) {
+					return createBlock( 'core/paragraph', {
+						content: word,
+					} );
+				} );
+			},
+		},
+	],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			convert( block ) {
+				const words = block.attributes.content.split( ' ' );
+
+				return words.map( ( word ) => {
+					return createBlock( 'core/paragraph', {
+						content: word,
+					} );
+				} );
+			},
+		},
+	],
+},
+```
+{% end %}
+
+Similarly, multiple blocks can be transformed to one or more blocks. Including an `isMultiBlock` property value of `true` will indicate that the `convert` function should receive an array of blocks. Currently, multi-block transforms are only supported for blocks of the same type. For example, multiple Paragraph blocks can be converted to a List block.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+	to: [
+		{
+			type: 'block',
+			isMultiBlock: true,
+			blocks: [ 'core/paragraph' ],
+			convert: function( blocks ) {
+				return createBlock( 'core/list', {
+					values: blocks.reduce( function( result, block ) {
+						return result + '<li>' + block.attributes.content + '</li>';
+					}, '' ),
+				} );
+			},
+		},
+	],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+	to: [
+		{
+			type: 'block',
+			isMultiBlock: true,
+			blocks: [ 'core/paragraph' ],
+			convert( blocks ) {
+				return createBlock( 'core/list', {
+					values: blocks.reduce( ( result, block ) => {
+						return result + '<li>' + block.attributes.content + '</li>';
+					}, '' ),
+				} );
+			},
+		},
+	],
 },
 ```
 {% end %}
@@ -341,7 +429,7 @@ transforms: {
         {
             type: 'block',
             blocks: [ '*' ], // wildcard - match any block
-            transform: function( attributes, innerBlocks ) {
+            convert: function( block ) {
                 // transform logic here
             },
         },
@@ -355,42 +443,8 @@ transforms: {
         {
             type: 'block',
             blocks: [ '*' ], // wildcard - match any block
-            transform: ( attributes, innerBlocks ) => {
+            convert( block ) {
                 // transform logic here
-            },
-        },
-    ],
-},
-```
-{% end %}
-
-
-A block with InnerBlocks can also be transformed from and to another block with InnerBlocks.
-
-{% codetabs %}
-{% ES5 %}
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-            blocks: [ 'some/block-with-innerblocks' ],
-            transform: function( attributes, innerBlocks ) {
-                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks );
-            },
-        },
-    ],
-},
-```
-{% ESNext %}
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-            blocks: [ 'some/block-with-innerblocks' ],
-            transform: ( attributes, innerBlocks ) => {
-                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks);
             },
         },
     ],
@@ -411,9 +465,9 @@ transforms: {
 			isMatch: function( attributes ) {
 				return attributes.isText;
 			},
-            transform: function( attributes ) {
+            convert: function( block ) {
                 return createBlock( 'core/paragraph', {
-                    content: attributes.content,
+                    content: block.attributes.content,
                 } );
             },
         },
@@ -428,9 +482,9 @@ transforms: {
             type: 'block',
 			blocks: [ 'core/paragraph' ],
 			isMatch: ( { isText } ) => isText,
-            transform: ( { content } ) => {
+            convert( block ) {
                 return createBlock( 'core/paragraph', {
-                    content,
+                    content: block.attributes.content,
                 } );
             },
         },
@@ -474,7 +528,7 @@ transforms: {
 			// We define a lower priority (higher number) than the default of 10. This
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
-			transform: function( files ) {
+			convert: function( files ) {
 				var file = files[ 0 ];
 				var blobURL = createBlobURL( file );
 
@@ -499,7 +553,7 @@ transforms: {
 			// We define a lower priority (higher number) than the default of 10. This
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
-			transform: ( files ) => {
+			convert( files ) {
 				const file = files[ 0 ];
 				const blobURL = createBlobURL( file );
 
@@ -526,7 +580,7 @@ transforms: {
         {
             type: 'prefix',
             prefix: '?',
-            transform: function( content ) {
+            convert: function( content ) {
                 return createBlock( 'my-plugin/question', {
                     content,
                 } );
@@ -542,7 +596,7 @@ transforms: {
         {
             type: 'prefix',
             prefix: '?',
-            transform( content ) {
+            convert( content ) {
                 return createBlock( 'my-plugin/question', {
                     content,
                 } );

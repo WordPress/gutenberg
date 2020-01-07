@@ -8,8 +8,8 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( attributes ) =>
-				createBlock( 'core/paragraph', attributes ),
+			convert: ( block ) =>
+				createBlock( 'core/paragraph', block.attributes ),
 		},
 	],
 };

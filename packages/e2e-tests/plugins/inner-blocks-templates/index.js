@@ -89,8 +89,8 @@
 						'test/test-inner-blocks-locking-all',
 						'test/test-inner-blocks-paragraph-placeholder'
 					],
-					transform: function( attributes, innerBlocks ) {
-						return createBlock( 'test/test-inner-blocks-transformer-target', attributes, innerBlocks );
+					convert: function( block ) {
+						return createBlock( 'test/test-inner-blocks-transformer-target', block.attributes, block.innerBlocks );
 					},
 				},
 			],
@@ -98,8 +98,8 @@
 				{
 					type: 'block',
 					blocks: [ 'test/i-dont-exist' ],
-					transform: function( attributes, innerBlocks ) {
-						return createBlock( 'test/test-inner-blocks-transformer-target', attributes, innerBlocks );
+					convert: function( block ) {
+						return createBlock( 'test/test-inner-blocks-transformer-target', block.attributes, block.innerBlocks );
 					},
 				}
 			]

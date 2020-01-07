@@ -70,7 +70,7 @@ const transforms = {
 			type: 'raw',
 			isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
 			schema,
-			transform: ( node ) => {
+			convert: ( node ) => {
 				// Search both figure and image classes. Alignment could be
 				// set on either. ID is set on the image.
 				const className = node.className + ' ' + node.querySelector( 'img' ).className;
@@ -92,7 +92,7 @@ const transforms = {
 			isMatch( files ) {
 				return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
 			},
-			transform( files ) {
+			convert( files ) {
 				const file = files[ 0 ];
 				// We don't need to upload the media directly here
 				// It's already done as part of the `componentDidMount`
