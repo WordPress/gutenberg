@@ -13,7 +13,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
 import VisuallyHidden from '../visually-hidden';
 
 export default function Token( {
@@ -65,7 +65,7 @@ export default function Token( {
 				<span aria-hidden="true">{ transformedValue }</span>
 			</span>
 
-			<IconButton
+			<Button
 				className="components-form-token-field__remove-token"
 				icon="dismiss"
 				onClick={ ! disabled && onClick }

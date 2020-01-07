@@ -12,11 +12,11 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
+	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
-	BlockEditorKeyboardShortcuts,
 	__experimentalPageTemplatePicker,
 	__experimentalUsePageTemplatePickerVisible,
 } from '@wordpress/block-editor';
@@ -35,7 +35,7 @@ import { __ } from '@wordpress/i18n';
  */
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
-import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
+import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
@@ -62,6 +62,8 @@ function Layout() {
 		hasActiveMetaboxes,
 		isSaving,
 		hasFixedToolbar,
+		previousShortcut,
+		nextShortcut,
 	} = useSelect( ( select ) => {
 		return ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
@@ -72,6 +74,8 @@ function Layout() {
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			previousShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/previous-region' ),
+			nextShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
 		} );
 	}, [] );
 	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
@@ -89,8 +93,8 @@ function Layout() {
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
-			<EditorModeKeyboardShortcuts />
-			<BlockEditorKeyboardShortcuts.Register />
+			<EditPostKeyboardShortcuts />
+			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
 				<EditorRegions
 					className={ className }
@@ -139,6 +143,10 @@ function Layout() {
 							</Button>
 						</div>
 					) }
+					shortcuts={ {
+						previous: previousShortcut,
+						next: nextShortcut,
+					} }
 				/>
 				<ManageBlocksModal />
 				<OptionsModal />

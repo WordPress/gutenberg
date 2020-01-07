@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { IconButton, ToolbarGroup } from '@wordpress/components';
+import { Button, ToolbarGroup } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -87,7 +87,7 @@ export class BlockMover extends Component {
 		// the rendering parent, leaving it unable to react to focus out.
 		return (
 			<ToolbarGroup className={ classnames( 'block-editor-block-mover', { 'is-visible': isFocused || ! isHidden, 'is-horizontal': orientation === 'horizontal' } ) }>
-				<IconButton
+				<Button
 					className="block-editor-block-mover__control"
 					onClick={ isFirst ? null : onMoveUp }
 					icon={ getArrowIcon( 'up' ) }
@@ -101,7 +101,7 @@ export class BlockMover extends Component {
 
 				<BlockDraggable clientIds={ clientIds }>
 					{ ( { onDraggableStart, onDraggableEnd } ) => (
-						<IconButton
+						<Button
 							icon={ dragHandle }
 							className="block-editor-block-mover__control-drag-handle block-editor-block-mover__control"
 							aria-hidden="true"
@@ -115,7 +115,7 @@ export class BlockMover extends Component {
 					) }
 				</BlockDraggable>
 
-				<IconButton
+				<Button
 					className="block-editor-block-mover__control"
 					onClick={ isLast ? null : onMoveDown }
 					icon={ getArrowIcon( 'down' ) }

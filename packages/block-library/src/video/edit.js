@@ -6,9 +6,7 @@ import {
 	BaseControl,
 	Button,
 	Disabled,
-	IconButton,
 	PanelBody,
-	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -18,6 +16,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
+	MediaReplaceFlow,
 	RichText,
 } from '@wordpress/block-editor';
 import { Component, createRef } from '@wordpress/element';
@@ -46,12 +45,6 @@ const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 class VideoEdit extends Component {
 	constructor() {
 		super( ...arguments );
-		// edit component has its own src in the state so it can be edited
-		// without setting the actual value outside of the edit UI
-		this.state = {
-			editing: ! this.props.attributes.src,
-		};
-
 		this.videoPlayer = createRef();
 		this.posterImageButton = createRef();
 		this.onSelectURL = this.onSelectURL.bind( this );
@@ -77,7 +70,6 @@ class VideoEdit extends Component {
 						setAttributes( { src: url } );
 					},
 					onError: ( message ) => {
-						this.setState( { editing: true } );
 						noticeOperations.createErrorNotice( message );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
@@ -96,8 +88,6 @@ class VideoEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { src } = attributes;
 
-		// Set the block's src from the edit component's state, and switch off
-		// the editing UI.
 		if ( newSrc !== src ) {
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock(
@@ -109,8 +99,6 @@ class VideoEdit extends Component {
 			}
 			setAttributes( { src: newSrc, id: undefined } );
 		}
-
-		this.setState( { editing: false } );
 	}
 
 	onSelectPoster( image ) {
@@ -147,25 +135,20 @@ class VideoEdit extends Component {
 			attributes,
 			setAttributes,
 		} = this.props;
-		const { editing } = this.state;
-		const switchToEditing = () => {
-			this.setState( { editing: true } );
-		};
 		const onSelectVideo = ( media ) => {
 			if ( ! media || ! media.url ) {
-				// in this case there was an error and we should continue in the editing state
-				// previous attributes should be removed because they may be temporary blob urls
+				// in this case there was an error
+				// previous attributes should be removed
+				// because they may be temporary blob urls
 				setAttributes( { src: undefined, id: undefined } );
-				switchToEditing();
 				return;
 			}
 			// sets the block's attribute and updates the edit component from the
-			// selected media, then switches off the editing UI
+			// selected media
 			setAttributes( { src: media.url, id: media.id } );
-			this.setState( { src: media.url, editing: false } );
 		};
 
-		if ( editing ) {
+		if ( ! src ) {
 			return (
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
@@ -185,14 +168,14 @@ class VideoEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<ToolbarGroup>
-						<IconButton
-							className="components-toolbar__control"
-							label={ __( 'Edit video' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
-					</ToolbarGroup>
+					<MediaReplaceFlow
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="video/*"
+						onSelect={ onSelectVideo }
+						onSelectURL={ this.onSelectURL }
+						onError={ this.onUploadError }
+					/>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Video Settings' ) }>

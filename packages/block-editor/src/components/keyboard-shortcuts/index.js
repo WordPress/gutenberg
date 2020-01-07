@@ -31,50 +31,70 @@ function KeyboardShortcuts() {
 
 	// Prevents bookmark all Tabs shortcut in Chrome when devtools are closed.
 	// Prevents reposition Chrome devtools pane shortcut when devtools are open.
-	useShortcut( 'core/block-editor/duplicate', useCallback( ( event ) => {
-		event.preventDefault();
-		duplicateBlocks( clientIds );
-	}, [ clientIds, duplicateBlocks ] ), { bindGlobal: true } );
+	useShortcut(
+		'core/block-editor/duplicate',
+		useCallback( ( event ) => {
+			event.preventDefault();
+			duplicateBlocks( clientIds );
+		}, [ clientIds, duplicateBlocks ] ),
+		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
+	);
 
 	// Does not clash with any known browser/native shortcuts, but preventDefault
 	// is used to prevent any obscure unknown shortcuts from triggering.
-	useShortcut( 'core/block-editor/remove', useCallback( ( event ) => {
-		event.preventDefault();
-		removeBlocks( clientIds );
-	}, [ clientIds, removeBlocks ] ), { bindGlobal: true } );
-
-	// Does not clash with any known browser/native shortcuts, but preventDefault
-	// is used to prevent any obscure unknown shortcuts from triggering.
-	useShortcut( 'core/block-editor/insert-after', useCallback( ( event ) => {
-		event.preventDefault();
-		insertAfterBlock( last( clientIds ) );
-	}, [ clientIds, insertAfterBlock ] ), { bindGlobal: true } );
-
-	// Prevent 'view recently closed tabs' in Opera using preventDefault.
-	useShortcut( 'core/block-editor/insert-before', useCallback( ( event ) => {
-		event.preventDefault();
-		insertBeforeBlock( first( clientIds ) );
-	}, [ clientIds, insertBeforeBlock ] ), { bindGlobal: true } );
-
-	useShortcut( 'core/block-editor/delete-multi-selection', useCallback( ( event ) => {
-		if ( clientIds.length > 0 ) {
+	useShortcut(
+		'core/block-editor/remove',
+		useCallback( ( event ) => {
 			event.preventDefault();
 			removeBlocks( clientIds );
-		}
-	}, [ clientIds, removeBlocks ] ) );
+		}, [ clientIds, removeBlocks ] ),
+		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
+	);
+
+	// Does not clash with any known browser/native shortcuts, but preventDefault
+	// is used to prevent any obscure unknown shortcuts from triggering.
+	useShortcut(
+		'core/block-editor/insert-after',
+		useCallback( ( event ) => {
+			event.preventDefault();
+			insertAfterBlock( last( clientIds ) );
+		}, [ clientIds, insertAfterBlock ] ),
+		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
+	);
+
+	// Prevent 'view recently closed tabs' in Opera using preventDefault.
+	useShortcut(
+		'core/block-editor/insert-before',
+		useCallback( ( event ) => {
+			event.preventDefault();
+			insertBeforeBlock( first( clientIds ) );
+		}, [ clientIds, insertBeforeBlock ] ),
+		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
+	);
+
+	useShortcut(
+		'core/block-editor/delete-multi-selection',
+		useCallback( ( event ) => {
+			event.preventDefault();
+			removeBlocks( clientIds );
+		}, [ clientIds, removeBlocks ] ),
+		{ isDisabled: clientIds.length < 1 }
+	);
 
 	useShortcut( 'core/block-editor/select-all', useCallback( ( event ) => {
 		event.preventDefault();
 		multiSelect( first( rootBlocksClientIds ), last( rootBlocksClientIds ) );
 	}, [ rootBlocksClientIds, multiSelect ] ) );
 
-	useShortcut( 'core/block-editor/unselect', useCallback( ( event ) => {
-		if ( clientIds.length > 1 ) {
+	useShortcut(
+		'core/block-editor/unselect',
+		useCallback( ( event ) => {
 			event.preventDefault();
 			clearSelectedBlock();
 			window.getSelection().removeAllRanges();
-		}
-	}, [ clientIds, clearSelectedBlock ] ) );
+		}, [ clientIds, clearSelectedBlock ] ),
+		{ isDisabled: clientIds.length < 2 }
+	);
 
 	return null;
 }
@@ -151,6 +171,16 @@ function KeyboardShortcutsRegister() {
 			description: __( 'Clear selection.' ),
 			keyCombination: {
 				character: 'escape',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/focus-toolbar',
+			category: 'global',
+			description: __( 'Navigate to the nearest toolbar.' ),
+			keyCombination: {
+				modifier: 'alt',
+				character: 'F10',
 			},
 		} );
 	}, [ registerShortcut ] );

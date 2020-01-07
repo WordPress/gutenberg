@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import Modal from '../modal';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import IconButton from '../icon-button';
+import Button from '../button';
 import PageControl from './page-control';
 import { BackButtonIcon, ForwardButtonIcon } from './icons';
 import FinishButton from './finish-button';
@@ -69,13 +69,13 @@ export default function Guide( { children, className, contentLabel, finishButton
 
 				<div className="components-guide__footer">
 					{ canGoBack && (
-						<IconButton
+						<Button
 							className="components-guide__back-button"
 							icon={ <BackButtonIcon /> }
 							onClick={ goBack }
 						>
 							{ __( 'Previous' ) }
-						</IconButton>
+						</Button>
 					) }
 					<PageControl
 						currentPage={ currentPage }
@@ -83,13 +83,13 @@ export default function Guide( { children, className, contentLabel, finishButton
 						setCurrentPage={ setCurrentPage }
 					/>
 					{ canGoForward && (
-						<IconButton
+						<Button
 							className="components-guide__forward-button"
 							icon={ <ForwardButtonIcon /> }
 							onClick={ goForward }
 						>
 							{ __( 'Next' ) }
-						</IconButton>
+						</Button>
 					) }
 					{ ! canGoForward && (
 						<FinishButton

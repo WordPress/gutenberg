@@ -9,12 +9,15 @@ import { noop, get, omit, pick } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter, removeAllFilters } from '@wordpress/hooks';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import {
 	registerBlockType,
+	registerBlockCollection,
+	unregisterBlockCollection,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
 	getFreeformContentHandlerName,
@@ -433,6 +436,24 @@ describe( 'blocks', () => {
 					expect( deprecation ).toEqual( pick( deprecation, DEPRECATED_ENTRY_KEYS ) );
 				} );
 			} );
+		} );
+	} );
+
+	describe( 'registerBlockCollection()', () => {
+		it( 'creates a new block collection', () => {
+			registerBlockCollection( 'core', { title: 'Core' } );
+
+			expect( select( 'core/blocks' ).getCollections() ).toEqual( { core: { title: 'Core', icon: undefined } } );
+		} );
+	} );
+
+	describe( 'unregisterBlockCollection()', () => {
+		it( 'removes a  block collection', () => {
+			registerBlockCollection( 'core', { title: 'Core' } );
+			registerBlockCollection( 'core2', { title: 'Core2' } );
+			unregisterBlockCollection( 'core' );
+
+			expect( select( 'core/blocks' ).getCollections() ).toEqual( { core2: { title: 'Core2', icon: undefined } } );
 		} );
 	} );
 

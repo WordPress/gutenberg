@@ -10,6 +10,7 @@ export {
 	EditorGlobalKeyboardShortcuts,
 } from './global-keyboard-shortcuts/visual-editor-shortcuts';
 export { default as TextEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/text-editor-shortcuts';
+export { default as EditorKeyboardShortcutsRegister } from './global-keyboard-shortcuts/register-shortcuts';
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';

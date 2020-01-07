@@ -4,7 +4,7 @@
 	"attributes": {
 		"images": {
 			"type": "array",
-			"default": [ ],
+			"default": [],
 			"source": "query",
 			"selector": ".blocks-gallery-item",
 			"query": {
@@ -43,10 +43,15 @@
 		},
 		"ids": {
 			"type": "array",
-			"default": [ ]
+			"items": {
+				"type": "number"
+  			},
+			"default": []
 		},
 		"columns": {
-			"type": "number"
+			"type": "number",
+			"minimum": 1,
+			"maximum": 8
 		},
 		"caption": {
 			"type": "string",
