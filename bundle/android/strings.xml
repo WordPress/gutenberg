@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. -->
+    <string name="gutenberg_native_1_s_current_value_is_2_s" tools:ignore="UnusedResources">"%1$s. Current value is %2$s"</string>
     <string name="gutenberg_native_add_a_description" tools:ignore="UnusedResources">"Add a description"</string>
     <string name="gutenberg_native_add_annotation" tools:ignore="UnusedResources">"Add annotation"</string>
     <string name="gutenberg_native_add_block_here" tools:ignore="UnusedResources">"ADD BLOCK HERE"</string>
