@@ -143,6 +143,10 @@ class URLInput extends Component {
 	onKeyDown( event ) {
 		const { showSuggestions, selectedSuggestion, suggestions, loading } = this.state;
 
+		const setCurrentInputAsLink = () => {
+			const { value } = this.props;
+			this.selectLink( { url: value, title: value } );
+		};
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
 		if (
@@ -178,6 +182,10 @@ class URLInput extends Component {
 						event.target.setSelectionRange( this.props.value.length, this.props.value.length );
 					}
 					break;
+				}
+				case ENTER: {
+					// If pressing enter before suggestions are loaded use the current input as the link.
+					setCurrentInputAsLink();
 				}
 			}
 
@@ -215,8 +223,10 @@ class URLInput extends Component {
 			}
 			case ENTER: {
 				if ( this.state.selectedSuggestion !== null ) {
-					event.stopPropagation();
 					this.selectLink( suggestion );
+				} else {
+					// If pressing enter and no suggestion is selected use the current input as the link.
+					setCurrentInputAsLink();
 				}
 				break;
 			}
