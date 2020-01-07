@@ -84,17 +84,8 @@ const deprecated = [
 			return {
 				...attributes,
 				ids: map( attributes.ids, ( id ) => {
-					if ( ! id ) {
-						return null;
-					}
-					if ( typeof id === 'string' ) {
-						return parseInt( id, 10 );
-					}
-					if ( typeof id === 'number' ) {
-						return id;
-					}
-
-					return null;
+					const parsedId = parseInt( id, 10 );
+					return Number.isInteger( parsedId ) ? parsedId : null;
 				} ),
 			};
 		},
