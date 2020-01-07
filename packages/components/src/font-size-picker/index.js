@@ -101,6 +101,7 @@ export default function FontSizePicker( {
 			<div className="components-font-size-picker__controls">
 				{ fontSizes.length > 0 && (
 					<CustomSelectControl
+						selectButtonProps={ { isSmall: true } }
 						className={ 'components-font-size-picker__select' }
 						label={ __( 'Preset Size' ) }
 						options={ options }
