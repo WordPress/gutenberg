@@ -35,9 +35,9 @@ function HeadingEdit( {
 		[ { name: 'textColor', property: 'color' } ],
 		{
 			contrastCheckers: { backgroundColor: true, textColor: true },
+			targetRef: ref,
 		},
-		[],
-		ref
+		[]
 	);
 
 	const { align, content, level, placeholder } = attributes;

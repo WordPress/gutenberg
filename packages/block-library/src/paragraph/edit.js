@@ -107,9 +107,9 @@ function ParagraphBlock( {
 		],
 		{
 			contrastCheckers: [ { backgroundColor: true, textColor: true, fontSize: fontSize.size } ],
+			targetRef: ref,
 		},
-		[ fontSize.size ],
-		ref
+		[ fontSize.size ]
 	);
 
 	return (

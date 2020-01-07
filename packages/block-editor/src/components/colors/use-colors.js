@@ -119,11 +119,11 @@ export default function __experimentalUseColors(
 		colorPanelProps,
 		contrastCheckers,
 		panelChildren,
+		targetRef,
 	} = {
 		panelTitle: __( 'Color Settings' ),
 	},
-	deps = [],
-	targetRef
+	deps = []
 ) {
 	const { clientId } = useBlockEditContext();
 	const { attributes, settingsColors } = useSelect(
