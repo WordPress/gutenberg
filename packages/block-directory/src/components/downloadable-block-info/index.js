@@ -16,7 +16,9 @@ function DownloadableBlockInfo( { description, activeInstalls, humanizedUpdated 
 					<Icon icon="chart-line"></Icon>{ sprintf( _n( '%d active installation', '%d active installations', activeInstalls ), activeInstalls ) }
 				</div>
 				<div className="block-directory-downloadable-block-info__column">
-					<Icon icon="update"></Icon><span aria-label={ sprintf( __( 'Updated %s' ), humanizedUpdated ) }>{ humanizedUpdated }</span>
+					<span aria-label={ sprintf( __( 'Updated %s' ), humanizedUpdated ) }>
+						<strong>{ __( 'Updated: ', 'gutenberg' ) }</strong> { humanizedUpdated }
+					</span>
 				</div>
 			</div>
 		</Fragment>
