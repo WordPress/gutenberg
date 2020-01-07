@@ -142,22 +142,25 @@ function build_navigation_html( $block, $colors, $font_sizes ) {
 		// Start anchor tag content.
 		$html .= '>';
 		if ( isset( $block['attrs']['label'] ) ) {
-			$html .= wp_kses( $block['attrs']['label'], array(
-				'code'   => array(),
-				'em'     => array(),
-				'img'    => array(
-					'scale' => array(),
-					'class' => array(),
-					'style' => array(),
-					'src'   => array(),
-					'alt'   => array(),
-				),
-				's'      => array(),
-				'span'   => array(
-					'style' => array(),
-				),
-				'strong' => array(),
-			) );
+			$html .= wp_kses(
+				$block['attrs']['label'],
+				array(
+					'code'   => array(),
+					'em'     => array(),
+					'img'    => array(
+						'scale' => array(),
+						'class' => array(),
+						'style' => array(),
+						'src'   => array(),
+						'alt'   => array(),
+					),
+					's'      => array(),
+					'span'   => array(
+						'style' => array(),
+					),
+					'strong' => array(),
+				)
+			);
 		}
 		$html .= '</a>';
 		// End anchor tag content.
