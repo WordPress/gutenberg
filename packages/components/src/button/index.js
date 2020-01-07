@@ -62,7 +62,7 @@ export function Button( {
 	} );
 
 	const Tag = href !== undefined && ! disabled ? A : PrimitiveButton;
-	const tagProps = Tag === 'a' ?
+	const tagProps = Tag === A ?
 		{ href, target } :
 		{ type: 'button', disabled, 'aria-pressed': isPressed };
 	const propsToPass = { ...tagProps, ...additionalProps, className: classes, ref };
