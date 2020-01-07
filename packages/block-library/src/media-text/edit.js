@@ -45,7 +45,6 @@ const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE
 
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
-const DEFAULT_SIZE_SLUG = 'large';
 
 class MediaTextEdit extends Component {
 	constructor() {
@@ -138,7 +137,6 @@ class MediaTextEdit extends Component {
 				mediaUrl: newURL,
 				href: newHref,
 				mediaId: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
 			} );
 		}
 	}
