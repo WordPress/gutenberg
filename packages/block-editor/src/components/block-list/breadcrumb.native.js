@@ -22,7 +22,7 @@ import styles from './breadcrumb.scss';
 const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } ) => {
 	const renderIcon = ( icon, key ) => {
 		if ( typeof icon.src === 'function' ) {
-			return <Icon icon={ icon.src( { key, size: 24, fill: styles.icon.color } ) } />;
+			return <Icon key={ key } icon={ icon.src( { size: 24, fill: styles.icon.color } ) } />;
 		}
 		return 	<Icon key={ key } size={ 24 } icon={ icon.src } fill={ styles.icon.color } />;
 	};
