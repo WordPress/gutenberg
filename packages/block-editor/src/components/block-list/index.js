@@ -12,7 +12,6 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import __experimentalBlockListFooter from '../block-list-footer';
@@ -38,6 +37,7 @@ function BlockList( {
 	__experimentalMoverDirection: moverDirection = 'vertical',
 	isDraggable,
 	renderAppender,
+	__experimentalUIParts = {},
 } ) {
 	function selector( select ) {
 		const {
@@ -74,6 +74,12 @@ function BlockList( {
 	const ref = useRef();
 	const onSelectionStart = useMultiSelection( { ref, rootClientId } );
 
+	const uiParts = {
+		hasMovers: true,
+		hasSelectedUI: true,
+		...__experimentalUIParts,
+	};
+
 	return (
 		<div
 			ref={ ref }
@@ -88,11 +94,7 @@ function BlockList( {
 					selectedBlockClientId === clientId;
 
 				return (
-					<BlockAsyncModeProvider
-						key={ 'block-' + clientId }
-						clientId={ clientId }
-						isBlockInSelection={ isBlockInSelection }
-					>
+					<AsyncModeProvider key={ clientId } value={ ! isBlockInSelection }>
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
@@ -105,8 +107,10 @@ function BlockList( {
 							// otherwise there might be a small delay to trigger the animation.
 							animateOnChange={ index }
 							enableAnimation={ enableAnimation }
+							hasSelectedUI={ uiParts.hasSelectedUI }
+							hasMovers={ uiParts.hasMovers }
 						/>
-					</BlockAsyncModeProvider>
+					</AsyncModeProvider>
 				);
 			} ) }
 			<BlockListAppender

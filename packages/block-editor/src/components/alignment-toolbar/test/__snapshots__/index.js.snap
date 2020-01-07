@@ -38,7 +38,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
         "isActive": true,
         "onClick": [Function],
         "role": "menuitemradio",
-        "title": "Align Text Left",
+        "title": "Align text left",
       },
       Object {
         "align": "center",
@@ -46,7 +46,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
         "isActive": false,
         "onClick": [Function],
         "role": "menuitemradio",
-        "title": "Align Text Center",
+        "title": "Align text center",
       },
       Object {
         "align": "right",
@@ -54,7 +54,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
         "isActive": false,
         "onClick": [Function],
         "role": "menuitemradio",
-        "title": "Align Text Right",
+        "title": "Align text right",
       },
     ]
   }

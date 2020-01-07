@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import {
-	IconButton,
+	Button,
 	Popover,
 } from '@wordpress/components';
 
@@ -58,7 +58,7 @@ class URLPopover extends Component {
 					<div className="block-editor-url-popover__row">
 						{ children }
 						{ !! renderSettings && (
-							<IconButton
+							<Button
 								className="block-editor-url-popover__settings-toggle"
 								icon="arrow-down-alt2"
 								label={ __( 'Link settings' ) }

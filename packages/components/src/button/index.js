@@ -58,8 +58,7 @@ export function Button( {
 		'is-link': isLink,
 		'is-destructive': isDestructive,
 		'has-text': !! icon && !! children,
-		// Ideally should be has-icon but this is named this way for BC
-		'components-icon-button': !! icon,
+		'has-icon': !! icon,
 	} );
 
 	const Tag = href !== undefined && ! disabled ? A : PrimitiveButton;

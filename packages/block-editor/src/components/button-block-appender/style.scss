@@ -3,9 +3,10 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: $block-padding*1.5;
+	padding: $block-padding;
 	outline: $border-width dashed $dark-gray-150;
 	width: 100%;
+	height: auto;
 	color: $dark-gray-500;
 	background: $light-opacity-background-fill;
 

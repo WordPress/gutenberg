@@ -9,7 +9,7 @@ import { get, omit } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import {
-	IconButton,
+	Button,
 	Spinner,
 	CheckboxControl,
 	withFocusReturn,
@@ -77,7 +77,7 @@ export class PostPublishPanel extends Component {
 							<PostPublishButton focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
 						</div>
 					) }
-					<IconButton
+					<Button
 						aria-expanded={ true }
 						onClick={ onClose }
 						icon="no-alt"

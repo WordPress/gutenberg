@@ -46,11 +46,6 @@
 	border-top: 1px solid $light-gray-500;
 
 	// Override external DatePicker styles.
-	.CalendarMonthGrid {
-		// The included component contains an arbitrary 13px padding that misaligns things.
-		margin-left: -13px;
-	}
-
 	.DayPickerNavigation_leftButton__horizontalDefault {
 		left: 0;
 	}

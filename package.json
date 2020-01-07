@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "7.1.0",
+	"version": "7.2.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -49,6 +49,7 @@
 		"@wordpress/html-entities": "file:packages/html-entities",
 		"@wordpress/i18n": "file:packages/i18n",
 		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
+		"@wordpress/keyboard-shortcuts": "file:packages/keyboard-shortcuts",
 		"@wordpress/keycodes": "file:packages/keycodes",
 		"@wordpress/list-reusable-blocks": "file:packages/list-reusable-blocks",
 		"@wordpress/media-utils": "file:packages/media-utils",
