@@ -9,10 +9,18 @@
 	background-color: #000;
 }
 
-.placeholder {
+.placeholderContainer {
 	flex: 1;
 	justify-content: center;
 	align-items: center;
+	background-color: $gray-light;
+}
+
+.placeholderContainerDark {
+	flex: 1;
+	justify-content: center;
+	align-items: center;
+	background-color: $gray-90;
 }
 
 .placeholderIcon {
@@ -65,6 +73,12 @@
 
 .iconUploading {
 	fill: $gray-lighten-20;
+	width: 100%;
+	height: 100%;
+}
+
+.iconUploadingDark {
+	fill: $gray-70;
 	width: 100%;
 	height: 100%;
 }
