@@ -22,7 +22,11 @@ import styles from './breadcrumb.scss';
 const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } ) => {
 	return (
 		<View style={ styles.breadcrumbContainer }>
-			<TouchableOpacity style={ styles.button } onPress={ () => {/* Open BottomSheet with markup */} }>
+			<TouchableOpacity
+				style={ styles.button }
+				onPress={ () => {/* Open BottomSheet with markup */} }
+				disabled={ true } /* Disable temporarily since onPress function is empty */
+			>
 				{ rootClientId && rootBlockIcon && (
 					[ <Icon key="parent-icon" size={ 20 } icon={ rootBlockIcon.src } fill={ styles.icon.color } />,
 						<View key="subdirectory-icon" style={ styles.arrow }><SubdirectorSVG fill={ styles.arrow.color } /></View>,
