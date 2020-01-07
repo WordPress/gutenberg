@@ -125,8 +125,8 @@ export function Button( props ) {
 		)
 	);
 
-	const newIcon = cloneElement( ( icon && <Icon icon={ icon } size={ iconSize } /> ),
-		{ colorScheme: props.preferredColorScheme, isPressed } );
+	const newIcon = icon ? cloneElement( ( <Icon icon={ icon } size={ iconSize } /> ),
+		{ colorScheme: props.preferredColorScheme, isPressed } ) : null;
 
 	const element = (
 		<TouchableOpacity
