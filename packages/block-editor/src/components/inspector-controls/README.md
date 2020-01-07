@@ -235,7 +235,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
+import { registerBlockType } from '@wordpress/blocks';
 const {
 	CheckboxControl,
 	RadioControl,
