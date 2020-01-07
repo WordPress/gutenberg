@@ -67,13 +67,13 @@ function BlockManagerCategory( {
 			className="edit-post-manage-blocks-modal__category"
 		>
 			<div className="edit-post-manage-blocks-modal__category-title">
-				{ callToAction }
 				<CheckboxControl
 					checked={ isAllChecked }
 					onChange={ toggleAllVisible }
 					aria-checked={ ariaChecked }
 					label={ <span id={ titleId }>{ category.title }</span> }
 				/>
+				{ callToAction }
 			</div>
 			<BlockTypesChecklist
 				blockTypes={ filteredBlockTypes }
