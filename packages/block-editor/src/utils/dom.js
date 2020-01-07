@@ -92,7 +92,7 @@ export function hasInnerBlocksContext( element ) {
  *
  * @param {Node} node DOM node.
  *
- * @return {?string} Client ID or undefined if the node is not part of a block.
+ * @return {string|undefined} Client ID or undefined if the node is not part of a block.
  */
 export function getBlockClientId( node ) {
 	if ( node.nodeType !== node.ELEMENT_NODE ) {
