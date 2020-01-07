@@ -47,6 +47,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 			<Section title={ __( 'General' ) }>
 				<EnablePublishSidebarOption label={ __( 'Pre-publish checks' ) } />
 				<EnableFeature feature="showInserterHelpPanel" label={ __( 'Inserter help panel' ) } />
+				<EnableFeature feature="welcomeGuide" label={ __( 'Welcome guide' ) } />
 			</Section>
 			<Section title={ __( 'Document panels' ) }>
 				<EnablePluginDocumentSettingPanelOption.Slot />
