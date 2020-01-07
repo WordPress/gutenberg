@@ -68,7 +68,7 @@ export default function ThemeExporter( { ids, templatePartIds } ) {
 			disabled={ ! files }
 			onClick={ files ? exportTheme : undefined }
 		>
-			{ __( 'Export Theme' ) }
+			{ __( 'Export as a Theme' ) }
 		</MenuItem>
 	);
 }
