@@ -55,6 +55,17 @@ add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10
 
 
 /**
+ * Registers the REST API routes for URL Details.
+ *
+ * @since 5.0.0
+ */
+function gutenberg_register_url_details_routes() {
+	$url_details_controller = new WP_REST_URL_Details_Controller();
+	$url_details_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_url_details_routes' );
+
+/**
  * Start: Include for phase 2
  */
 /**

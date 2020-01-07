@@ -36,7 +36,7 @@ export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = fal
 				<span aria-hidden={ ! isURL } className="block-editor-link-control__search-item-info">
 					{ ! isURL && ( safeDecodeURI( suggestion.url ) || '' ) }
 					{ isURL && (
-						__( 'Press ENTER to add this link' )
+						`${ safeDecodeURI( suggestion.url ) } - ${ __( 'press ENTER to add this link' ) }`
 					) }
 				</span>
 			</span>

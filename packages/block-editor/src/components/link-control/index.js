@@ -40,13 +40,13 @@ import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
 const MODE_EDIT = 'edit';
-// const MODE_SHOW = 'show';
 
 function LinkControl( {
 	className,
 	currentLink,
 	currentSettings,
 	fetchSearchSuggestions,
+	fetchRemoteURLTitle,
 	instanceId,
 	onClose = noop,
 	onChangeMode = noop,
@@ -112,7 +112,7 @@ function LinkControl( {
 		setInputValue( '' );
 	};
 
-	const handleDirectEntry = ( value ) => {
+	const handleDirectEntry = async ( value, { fetchUrlInfo = true } = {} ) => {
 		let type = 'URL';
 
 		const protocol = getProtocol( value ) || '';
@@ -129,23 +129,41 @@ function LinkControl( {
 			type = 'internal';
 		}
 
-		return Promise.resolve(
-			[ {
-				id: '-1',
-				title: value,
-				url: type === 'URL' ? prependHTTP( value ) : value,
-				type,
-			} ]
-		);
+		const defaultResponse = {
+			id: '-1',
+			title: value,
+			url: type === 'URL' ? prependHTTP( value ) : value,
+			type,
+		};
+
+		// If it's a URL then request the `<title>` tag
+		// Todo:
+		// * avoid invalid requests for incomplete URLS
+		// * avoid concurrent requests - cancel existing AJAX requests if already pending
+		if ( fetchUrlInfo && type === 'URL' && isURL( prependHTTP( value ) ) && value.length > 3 ) {
+			try {
+				const urlTitle = await fetchRemoteURLTitle( value );
+				return [ {
+					...defaultResponse,
+					title: urlTitle || value,
+				} ];
+			} catch ( error ) {
+				return [ defaultResponse ];
+			}
+		}
+
+		return [ defaultResponse ];
 	};
 
 	const handleEntitySearch = async ( value ) => {
+		const couldBeURL = ! value.includes( ' ' );
+
 		const results = await Promise.all( [
 			fetchSearchSuggestions( value ),
-			handleDirectEntry( value ),
+			handleDirectEntry( value, {
+				fetchUrlInfo: couldBeURL,
+			} ),
 		] );
-
-		const couldBeURL = ! value.includes( ' ' );
 
 		// If it's potentially a URL search then concat on a URL search suggestion
 		// just for good measure. That way once the actual results run out we always
@@ -264,6 +282,7 @@ export default compose(
 		const { getSettings } = select( 'core/block-editor' );
 		return {
 			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
+			fetchRemoteURLTitle: getSettings().__experimentalFetchRemoteURLTitle,
 		};
 	} )
 )( LinkControl );

@@ -43,6 +43,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	* End: Include for phase 2
 	*/
 
+	if ( ! class_exists( 'WP_REST_URL_Details_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-url-details-controller.php';
+	}
+
+
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
 
