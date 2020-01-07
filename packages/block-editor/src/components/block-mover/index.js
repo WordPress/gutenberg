@@ -105,6 +105,9 @@ export class BlockMover extends Component {
 							icon={ dragHandle }
 							className="block-editor-block-mover__control-drag-handle block-editor-block-mover__control"
 							aria-hidden="true"
+							// Should not be able to tab to drag handle as this
+							// button can only be used with a pointer device.
+							tabIndex="-1"
 							onDragStart={ onDraggableStart }
 							onDragEnd={ onDraggableEnd }
 							draggable

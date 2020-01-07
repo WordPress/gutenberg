@@ -124,7 +124,7 @@ function ParagraphBlock( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
+				<PanelBody title={ __( 'Text Settings' ) }>
 					<FontSizePicker
 						value={ fontSize.size }
 						onChange={ setFontSize }

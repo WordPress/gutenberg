@@ -345,6 +345,7 @@ export class RichText extends Component {
 			onPaste,
 			onChange,
 		} = this.props;
+		const { activeFormats = [] } = this.state;
 
 		const { pastedText, pastedHtml, files } = event.nativeEvent;
 		const currentRecord = this.createRecord();
@@ -381,6 +382,7 @@ export class RichText extends Component {
 				html: pastedHtml,
 				plainText: pastedText,
 				files,
+				activeFormats,
 			} );
 		}
 	}
@@ -641,6 +643,7 @@ export class RichText extends Component {
 			__unstableIsSelected: isSelected,
 			children,
 			getStylesFromColorScheme,
+			formatTypes,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -754,7 +757,11 @@ export class RichText extends Component {
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
 				/>
-				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
+				{ isSelected && <FormatEdit
+					formatTypes={ formatTypes }
+					value={ record }
+					onChange={ this.onFormatChange }
+				/> }
 			</View>
 		);
 	}

@@ -21,6 +21,7 @@ function BlockListAppender( {
 	canInsertDefaultBlock,
 	isLocked,
 	renderAppender: CustomAppender,
+	showSeparator,
 } ) {
 	if ( isLocked ) {
 		return null;
@@ -28,7 +29,7 @@ function BlockListAppender( {
 
 	if ( CustomAppender ) {
 		return (
-			<CustomAppender />
+			<CustomAppender showSeparator={ showSeparator } />
 		);
 	}
 
@@ -39,6 +40,7 @@ function BlockListAppender( {
 				lastBlockClientId={ last( blockClientIds ) }
 				containerStyle={ styles.blockListAppender }
 				placeholder={ blockClientIds.length > 0 ? '' : null }
+				showSeparator={ showSeparator }
 			/>
 		);
 	}

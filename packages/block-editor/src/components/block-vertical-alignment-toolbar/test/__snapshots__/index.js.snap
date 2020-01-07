@@ -21,6 +21,7 @@ exports[`BlockVerticalAlignmentToolbar should match snapshot 1`] = `
         </SVG>,
         "isActive": true,
         "onClick": [Function],
+        "role": "menuitemradio",
         "title": "Vertically Align Top",
       },
       Object {
@@ -40,6 +41,7 @@ exports[`BlockVerticalAlignmentToolbar should match snapshot 1`] = `
         </SVG>,
         "isActive": false,
         "onClick": [Function],
+        "role": "menuitemradio",
         "title": "Vertically Align Middle",
       },
       Object {
@@ -59,6 +61,7 @@ exports[`BlockVerticalAlignmentToolbar should match snapshot 1`] = `
         </SVG>,
         "isActive": false,
         "onClick": [Function],
+        "role": "menuitemradio",
         "title": "Vertically Align Bottom",
       },
     ]

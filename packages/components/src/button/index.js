@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,6 +13,8 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import Tooltip from '../tooltip';
+import Icon from '../icon';
 import { Button as PrimitiveButton, A } from '../styled-primitives/button';
 
 export function Button( {
@@ -29,6 +32,13 @@ export function Button( {
 	isDestructive,
 	className,
 	disabled,
+	icon,
+	iconSize,
+	showTooltip,
+	tooltipPosition,
+	shortcut,
+	label,
+	children,
 	...additionalProps
 }, ref ) {
 	if ( isDefault ) {
@@ -47,16 +57,52 @@ export function Button( {
 		'is-busy': isBusy,
 		'is-link': isLink,
 		'is-destructive': isDestructive,
+		'has-text': !! icon && !! children,
+		// Ideally should be has-icon but this is named this way for BC
+		'components-icon-button': !! icon,
 	} );
 
-	const tag = href !== undefined && ! disabled ? 'a' : 'button';
-	const tagProps = tag === 'a' ?
+	const Tag = href !== undefined && ! disabled ? A : PrimitiveButton;
+	const tagProps = Tag === 'a' ?
 		{ href, target } :
 		{ type: 'button', disabled, 'aria-pressed': isPressed };
 	const propsToPass = { ...tagProps, ...additionalProps, className: classes, ref };
-	if ( tag === 'a' ) {
-		return <A { ...propsToPass } />;
-	} return <PrimitiveButton { ...propsToPass } />;
+
+	// Should show the tooltip if...
+	const shouldShowTooltip = ! disabled && (
+		// an explicit tooltip is passed or...
+		( showTooltip && label ) ||
+		// there's a shortcut or...
+		shortcut ||
+		(
+			// there's a label and...
+			!! label &&
+			// the children are empty and...
+			( ! children || ( isArray( children ) && ! children.length ) ) &&
+			// the tooltip is not explicitly disabled.
+			false !== showTooltip
+		)
+	);
+
+	const element = (
+		<Tag
+			{ ...propsToPass }
+			aria-label={ additionalProps[ 'aria-label' ] || label }
+		>
+			{ icon && <Icon icon={ icon } size={ iconSize } /> }
+			{ children }
+		</Tag>
+	);
+
+	if ( ! shouldShowTooltip ) {
+		return element;
+	}
+
+	return (
+		<Tooltip text={ label } shortcut={ shortcut } position={ tooltipPosition }>
+			{ element }
+		</Tooltip>
+	);
 }
 
 export default forwardRef( Button );
