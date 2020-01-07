@@ -5,13 +5,14 @@ import { Button } from '@wordpress/components';
 
 const PickerButton = ( props ) => {
 	const {
+		icon,
 		label,
 		onPress,
 	} = props;
 
 	return (
 		<Button onClick={ onPress }>
-			{ label }
+			{ icon } { label }
 		</Button>
 	);
 };
