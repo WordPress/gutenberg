@@ -141,7 +141,7 @@ class AztecView extends React.Component {
 
   _onPress = (event) => {
 	if ( ! this.isFocused() ) {
-		this.focus(event); // Call to move the focus in RN way (TextInputState)
+		this.focus(); // Call to move the focus in RN way (TextInputState)
 		this._onFocus(event); // Check if there are listeners set on the focus event
 	}
   }
