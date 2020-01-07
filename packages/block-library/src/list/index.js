@@ -23,6 +23,7 @@ export const settings = {
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
 	supports: {
 		className: false,
+		__unstablePasteTextInline: true,
 	},
 	example: {
 		attributes: {

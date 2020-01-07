@@ -20,6 +20,8 @@ ${ dependencyMappings }
 	const testsVolumes = `
       - ${ cwd }/../${ cwdName }-tests-wordpress/:/var/www/html/${ commonVolumes }`;
 	return `version: '2.1'
+volumes:
+  tests-wordpress-phpunit:
 services:
   mysql:
     environment:
@@ -29,7 +31,7 @@ services:
     depends_on:
       - mysql
     environment:
-      WORDPRESS_DEBUG: 1cq
+      WORDPRESS_DEBUG: 1
       WORDPRESS_DB_NAME: wordpress
       WORDPRESS_DB_PASSWORD: password
     image: wordpress
@@ -45,7 +47,7 @@ services:
     depends_on:
       - mysql
     environment:
-      WORDPRESS_DEBUG: 1cq
+      WORDPRESS_DEBUG: 1
       WORDPRESS_DB_NAME: tests-wordpress
       WORDPRESS_DB_PASSWORD: password
     image: wordpress
@@ -57,5 +59,18 @@ services:
       - tests-wordpress
     image: wordpress:cli
     volumes:${ testsVolumes }
-  `;
+  tests-wordpress-phpunit:
+    depends_on:
+      - mysql
+    environment:
+      PHPUNIT_DB_HOST: mysql
+    image: chriszarate/wordpress-phpunit
+    volumes:
+      - ${ cwd }/:/app/
+      - tests-wordpress-phpunit/:/tmp/
+  composer:
+    image: composer
+    volumes:
+      - ${ cwd }/:/app/
+`;
 };

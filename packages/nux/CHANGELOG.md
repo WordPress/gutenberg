@@ -1,3 +1,7 @@
+# 3.1.0 (Unreleased)
+
+- The `@wordpress/nux` package has been deprecated. Please use the `Guide` component in `@wordpress/components` to show a user guide.
+
 ## 3.0.6 (2019-01-03)
 
 ## 3.0.5 (2018-12-12)

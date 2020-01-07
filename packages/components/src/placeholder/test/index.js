@@ -1,7 +1,9 @@
+jest.mock( 'react-resize-aware' );
 /**
  * External dependencies
  */
 import { shallow } from 'enzyme';
+import useResizeAware from 'react-resize-aware';
 
 /**
  * Internal dependencies
@@ -9,6 +11,8 @@ import { shallow } from 'enzyme';
 import Placeholder from '../';
 
 describe( 'Placeholder', () => {
+	useResizeAware.mockReturnValue( [ <div key="1" />, { width: 320 } ] );
+
 	describe( 'basic rendering', () => {
 		it( 'should by default render label section and fieldset.', () => {
 			const placeholder = shallow( <Placeholder /> );

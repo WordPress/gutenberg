@@ -26,7 +26,7 @@ export default function Notice( { children, onRemove } ) {
 			<div className="components-notice__content">
 				{ children }
 			</div>
-			<IconButton
+			<Button
 				className="components-notice__dismiss"
 				icon="no"
 				label={ __( 'Dismiss this notice' ) }

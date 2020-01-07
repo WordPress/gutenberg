@@ -1,6 +1,4 @@
 .block-editor-media-placeholder__url-input-container {
-	width: 100%;
-
 	// Reset the margin to ensure the url popover is adjacent to the button.
 	.block-editor-media-placeholder__button {
 		margin-bottom: 0;
@@ -45,10 +43,6 @@
 .block-editor-media-placeholder__cancel-button.is-link {
 	margin: 1em;
 	display: block;
-}
-
-.components-form-file-upload .block-editor-media-placeholder__button {
-	margin-right: $grid-size-small;
 }
 
 .block-editor-media-placeholder.is-appender {

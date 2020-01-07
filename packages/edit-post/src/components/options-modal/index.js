@@ -45,10 +45,10 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 			onRequestClose={ closeModal }
 		>
 			<Section title={ __( 'General' ) }>
-				<EnablePublishSidebarOption label={ __( 'Pre-publish Checks' ) } />
-				<EnableFeature feature="showInserterHelpPanel" label={ __( 'Inserter Help Panel' ) } />
+				<EnablePublishSidebarOption label={ __( 'Pre-publish checks' ) } />
+				<EnableFeature feature="showInserterHelpPanel" label={ __( 'Inserter help panel' ) } />
 			</Section>
-			<Section title={ __( 'Document Panels' ) }>
+			<Section title={ __( 'Document panels' ) }>
 				<EnablePluginDocumentSettingPanelOption.Slot />
 				{ isViewable && (
 					<EnablePanelOption label={ __( 'Permalink' ) } panelName="post-link" />
@@ -62,7 +62,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 					) }
 				/>
 				<PostFeaturedImageCheck>
-					<EnablePanelOption label={ __( 'Featured Image' ) } panelName="featured-image" />
+					<EnablePanelOption label={ __( 'Featured image' ) } panelName="featured-image" />
 				</PostFeaturedImageCheck>
 				<PostExcerptCheck>
 					<EnablePanelOption label={ __( 'Excerpt' ) } panelName="post-excerpt" />
@@ -71,10 +71,10 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 					<EnablePanelOption label={ __( 'Discussion' ) } panelName="discussion-panel" />
 				</PostTypeSupportCheck>
 				<PageAttributesCheck>
-					<EnablePanelOption label={ __( 'Page Attributes' ) } panelName="page-attributes" />
+					<EnablePanelOption label={ __( 'Page attributes' ) } panelName="page-attributes" />
 				</PageAttributesCheck>
 			</Section>
-			<MetaBoxesSection title={ __( 'Advanced Panels' ) } />
+			<MetaBoxesSection title={ __( 'Advanced panels' ) } />
 		</Modal>
 	);
 }

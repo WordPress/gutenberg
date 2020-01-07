@@ -106,10 +106,8 @@ class InnerBlocks extends Component {
 			enableClickThrough,
 			clientId,
 			hasOverlay,
-			renderAppender,
-			__experimentalMoverDirection: moverDirection,
 			__experimentalCaptureToolbars: captureToolbars,
-
+			...props
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -123,8 +121,7 @@ class InnerBlocks extends Component {
 				{ ! templateInProcess && (
 					<BlockList
 						rootClientId={ clientId }
-						renderAppender={ renderAppender }
-						__experimentalMoverDirection={ moverDirection }
+						{ ...props }
 					/>
 				) }
 			</div>

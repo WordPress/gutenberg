@@ -23,12 +23,12 @@ import { __ } from '@wordpress/i18n';
  * Module Constants
  */
 export const DEFAULT_CATEGORIES = [
-	{ slug: 'common', title: __( 'Common Blocks' ) },
+	{ slug: 'common', title: __( 'Common blocks' ) },
 	{ slug: 'formatting', title: __( 'Formatting' ) },
-	{ slug: 'layout', title: __( 'Layout Elements' ) },
+	{ slug: 'layout', title: __( 'Layout elements' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
 	{ slug: 'embed', title: __( 'Embeds' ) },
-	{ slug: 'reusable', title: __( 'Reusable Blocks' ) },
+	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
 
 /**
@@ -200,6 +200,22 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 	return state;
 }
 
+export function collections( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BLOCK_COLLECTION':
+			return {
+				...state,
+				[ action.namespace ]: {
+					title: action.title,
+					icon: action.icon,
+				},
+			};
+		case 'REMOVE_BLOCK_COLLECTION':
+			return omit( state, action.namespace );
+	}
+	return state;
+}
+
 export default combineReducers( {
 	blockTypes,
 	blockStyles,
@@ -209,4 +225,5 @@ export default combineReducers( {
 	unregisteredFallbackBlockName,
 	groupingBlockName,
 	categories,
+	collections,
 } );

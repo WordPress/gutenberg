@@ -1,0 +1,33 @@
+.edit-site-header {
+	align-items: center;
+	background: $white;
+	border-bottom: 1px solid $light-gray-500;
+	display: flex;
+	height: $header-height;
+	justify-content: space-between;
+	left: 0;
+	// Stick the toolbar to the top, because the admin bar is not fixed on mobile.
+	position: sticky;
+	right: 0;
+	top: 0;
+	z-index: z-index(".edit-site-header");
+
+	// On mobile, the main content area has to scroll,
+	// otherwise you can invoke the over-scroll bounce on the non-scrolling container.
+	@include break-small {
+		padding: $grid-size;
+		position: fixed;
+		top: $admin-bar-height-big;
+	}
+
+	@include break-medium() {
+		top: $admin-bar-height;
+	}
+}
+
+@include editor-left(".edit-site-header");
+
+.edit-site-header__title {
+	font-size: 16px;
+	padding: 0 20px;
+}

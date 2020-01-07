@@ -48,6 +48,10 @@ function GroupEdit( {
 				<div className="wp-block-group__inner-container">
 					<InnerBlocks
 						renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
+						__experimentalUIParts={ {
+							hasSelectedUI: false,
+							hasMovers: false,
+						} }
 					/>
 				</div>
 			</div>

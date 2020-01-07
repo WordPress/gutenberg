@@ -10,6 +10,15 @@
 		"resolveJsonModule": true,
 		"target": "esnext",
 
+		/* Project Imports */
+		"baseUrl": ".",
+		"paths": {
+			"@wordpress/*": [
+				"packages/*/index.js",
+				"packages/*/src/index.js"
+			]
+		},
+
 		/* Strict Type-Checking Options */
 		"strict": true,                        /* Enable all strict type-checking options. */
 		"strictNullChecks": true,
@@ -22,6 +31,7 @@
 		"noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
 	},
 	"include": [
+		"./packages/a11y/**/*.js",
 		"./packages/blob/**/*.js",
 		"./packages/dom-ready/**/*.js",
 		"./packages/i18n/**/*.js",

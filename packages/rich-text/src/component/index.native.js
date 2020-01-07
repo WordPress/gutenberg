@@ -344,6 +344,7 @@ export class RichText extends Component {
 			onPaste,
 			onChange,
 		} = this.props;
+		const { activeFormats = [] } = this.state;
 
 		const { pastedText, pastedHtml, files } = event.nativeEvent;
 		const currentRecord = this.createRecord();
@@ -380,6 +381,7 @@ export class RichText extends Component {
 				html: pastedHtml,
 				plainText: pastedText,
 				files,
+				activeFormats,
 			} );
 		}
 	}
@@ -642,6 +644,7 @@ export class RichText extends Component {
 			getStylesFromColorScheme,
 			minWidth,
 			maxWidth,
+			formatTypes,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -761,7 +764,11 @@ export class RichText extends Component {
 					minWidth={ minWidth }
 					id={ this.props.id }
 				/>
-				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
+				{ isSelected && <FormatEdit
+					formatTypes={ formatTypes }
+					value={ record }
+					onChange={ this.onFormatChange }
+				/> }
 			</View>
 		);
 	}

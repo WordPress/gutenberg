@@ -37,7 +37,7 @@ import {
 const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
 
 /**
- * Fetch Reusable Blocks Effect Handler.
+ * Fetch Reusable blocks Effect Handler.
  *
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
@@ -92,7 +92,7 @@ export const fetchReusableBlocks = async ( action, store ) => {
 };
 
 /**
- * Save Reusable Blocks Effect Handler.
+ * Save Reusable blocks Effect Handler.
  *
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
@@ -137,7 +137,7 @@ export const saveReusableBlocks = async ( action, store ) => {
 };
 
 /**
- * Delete Reusable Blocks Effect Handler.
+ * Delete Reusable blocks Effect Handler.
  *
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
