@@ -68,6 +68,7 @@ module.exports = {
 	],
 	snapshotSerializers: [
 		'enzyme-to-json/serializer',
+		'jest-emotion',
 	],
 	reporters: [ 'default', 'jest-junit' ],
 };
