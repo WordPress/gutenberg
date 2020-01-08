@@ -155,6 +155,12 @@ function NavigationLinkEdit( {
 						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
 						placeholder={ itemLabelPlaceholder }
 						withoutInteractiveFormatting
+						allowedFormats={ [
+							'core/bold',
+							'core/italic',
+							'core/image',
+							'core/strikethrough',
+						] }
 					/>
 					{ isLinkOpen && (
 						<LinkControl
