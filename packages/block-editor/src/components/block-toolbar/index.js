@@ -49,6 +49,34 @@ export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
 		return null;
 	}
 
+	function onFocus() {
+		setIsInserterShown( true );
+	}
+
+	function onBlur() {
+		setIsInserterShown( false );
+	}
+
+	const inserter = (
+		<Toolbar
+			onFocus={ onFocus }
+			onBlur={ onBlur }
+			// While ideally it would be enough to capture the
+			// bubbling focus event from the Inserter, due to the
+			// characteristics of click focusing of `button`s in
+			// Firefox and Safari, it is not reliable.
+			//
+			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+			tabIndex={ -1 }
+			className={ classnames(
+				'block-editor-block-toolbar__inserter',
+				{ 'is-visible': isInserterShown }
+			) }
+		>
+			<Inserter clientId={ blockClientIds[ 0 ] } rootClientId={ rootClientId } />
+		</Toolbar>
+	);
+
 	if ( blockClientIds.length > 1 ) {
 		return (
 			<div className="block-editor-block-toolbar">
@@ -58,16 +86,9 @@ export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
 				/> ) }
 				<MultiBlocksSwitcher />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
+				{ inserter }
 			</div>
 		);
-	}
-
-	function onFocus() {
-		setIsInserterShown( true );
-	}
-
-	function onBlur() {
-		setIsInserterShown( false );
 	}
 
 	return (
@@ -84,23 +105,7 @@ export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-			<Toolbar
-				onFocus={ onFocus }
-				onBlur={ onBlur }
-				// While ideally it would be enough to capture the
-				// bubbling focus event from the Inserter, due to the
-				// characteristics of click focusing of `button`s in
-				// Firefox and Safari, it is not reliable.
-				//
-				// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
-				tabIndex={ -1 }
-				className={ classnames(
-					'block-editor-block-toolbar__inserter',
-					{ 'is-visible': isInserterShown }
-				) }
-			>
-				<Inserter clientId={ blockClientIds[ 0 ] } rootClientId={ rootClientId } />
-			</Toolbar>
+			{ inserter }
 		</div>
 	);
 }
