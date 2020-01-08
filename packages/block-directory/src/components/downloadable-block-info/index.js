@@ -13,7 +13,7 @@ function DownloadableBlockInfo( { description, activeInstalls, humanizedUpdated 
 			</p>
 			<div className="block-directory-downloadable-block-info__row">
 				<div className="block-directory-downloadable-block-info__column">
-					<Icon icon="chart-line" className="label"></Icon>{ sprintf( _n( '%d active installation', '%d active installations', activeInstalls ), activeInstalls ) }
+					<Icon icon="chart-line"></Icon>{ sprintf( _n( '%d active installation', '%d active installations', activeInstalls ), activeInstalls ) }
 				</div>
 				<div className="block-directory-downloadable-block-info__column">
 					<Icon icon="update"></Icon>
