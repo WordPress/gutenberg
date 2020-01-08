@@ -1,14 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { useRef, createContext } from '@wordpress/element';
+import { useRef, createContext, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import useMultiSelection from './use-multi-selection';
 import { getBlockClientId } from '../../utils/dom';
+import BlockInsertionPoint from './insertion-point';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -18,11 +20,15 @@ function selector( select ) {
 	const {
 		getSelectedBlockClientId,
 		hasMultiSelection,
+		isMultiSelecting,
+		getBlockRootClientId,
 	} = select( 'core/block-editor' );
 
 	return {
 		selectedBlockClientId: getSelectedBlockClientId(),
 		hasMultiSelection: hasMultiSelection(),
+		isMultiSelecting: isMultiSelecting(),
+		getBlockRootClientId,
 	};
 }
 
@@ -46,6 +52,8 @@ export default function RootContainer( { children, className } ) {
 	const {
 		selectedBlockClientId,
 		hasMultiSelection,
+		isMultiSelecting,
+		getBlockRootClientId,
 	} = useSelect( selector, [] );
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const onSelectionStart = useMultiSelection( ref );
@@ -69,16 +77,69 @@ export default function RootContainer( { children, className } ) {
 		}
 	}
 
-	return (
+	const [ isInserterShown, setIsInserterShown ] = useState( false );
+	const [ isInserterForced, setIsInserterForced ] = useState( false );
+	const [ inserterPosition, setInserterPosition ] = useState( null );
+	const [ inserterClientId, setInserterClientId ] = useState( null );
+	const [ inserterRootClientId, setInserterRootClientId ] = useState( null );
+
+	function onMouseMove( event ) {
+		if ( event.target.className === className ) {
+			const rect = event.target.getBoundingClientRect();
+			const offset = event.clientY - rect.top;
+			const afterIndex = Array.from( event.target.children ).find( ( blockEl ) => {
+				return blockEl.offsetTop > offset;
+			} );
+
+			if ( ! afterIndex ) {
+				return;
+			}
+
+			const clientId = afterIndex.id.slice( 'block-'.length );
+
+			if ( ! clientId ) {
+				return;
+			}
+
+			setIsInserterShown( true );
+			setInserterPosition( afterIndex );
+			setInserterClientId( clientId );
+			setInserterRootClientId( getBlockRootClientId( clientId ) );
+		} else {
+			setIsInserterShown( false );
+		}
+	}
+
+	return <>
+		{ ( isInserterShown || isInserterForced ) && ! isMultiSelecting &&
+			<Popover
+				noArrow
+				animate={ false }
+				anchorRef={ inserterPosition }
+				position="top right left"
+				focusOnMount={ false }
+				className="block-editor-block-list__block-popover"
+				__unstableSlotName="block-toolbar"
+			>
+				<BlockInsertionPoint
+					rootClientId={ inserterRootClientId }
+					clientId={ inserterClientId }
+					onFocus={ () => setIsInserterForced( true ) }
+					onBlur={ () => setIsInserterForced( false ) }
+					width={ inserterPosition.offsetWidth }
+				/>
+			</Popover>
+		}
 		<div
 			ref={ ref }
 			className={ className }
 			onFocus={ onFocus }
 			onDragStart={ onDragStart }
+			onMouseMove={ ( isInserterForced || isMultiSelecting ) ? undefined : onMouseMove }
 		>
 			<Context.Provider value={ onSelectionStart }>
 				{ children }
 			</Context.Provider>
 		</div>
-	);
+	</>;
 }

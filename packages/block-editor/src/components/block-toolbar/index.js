@@ -1,7 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { Toolbar } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -13,18 +20,21 @@ import BlockSettingsMenu from '../block-settings-menu';
 import BlockSwitcher from '../block-switcher';
 import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockMover from '../block-mover';
+import Inserter from '../inserter';
 
 export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
-	const { blockClientIds, isValid, mode } = useSelect( ( select ) => {
+	const { blockClientIds, isValid, mode, rootClientId } = useSelect( ( select ) => {
 		const {
 			getBlockMode,
 			getSelectedBlockClientIds,
 			isBlockValid,
+			getBlockRootClientId,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 
 		return {
 			blockClientIds: selectedBlockClientIds,
+			rootClientId: getBlockRootClientId( selectedBlockClientIds[ 0 ] ),
 			isValid: selectedBlockClientIds.length === 1 ?
 				isBlockValid( selectedBlockClientIds[ 0 ] ) :
 				null,
@@ -33,6 +43,7 @@ export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
 				null,
 		};
 	}, [] );
+	const [ isInserterShown, setIsInserterShown ] = useState( false );
 
 	if ( blockClientIds.length === 0 ) {
 		return null;
@@ -51,6 +62,14 @@ export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
 		);
 	}
 
+	function onFocus() {
+		setIsInserterShown( true );
+	}
+
+	function onBlur() {
+		setIsInserterShown( false );
+	}
+
 	return (
 		<div className="block-editor-block-toolbar">
 			{ hasMovers && ( <BlockMover
@@ -65,6 +84,23 @@ export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
+			<Toolbar
+				onFocus={ onFocus }
+				onBlur={ onBlur }
+				// While ideally it would be enough to capture the
+				// bubbling focus event from the Inserter, due to the
+				// characteristics of click focusing of `button`s in
+				// Firefox and Safari, it is not reliable.
+				//
+				// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+				tabIndex={ -1 }
+				className={ classnames(
+					'block-editor-block-toolbar__inserter',
+					{ 'is-visible': isInserterShown }
+				) }
+			>
+				<Inserter clientId={ blockClientIds[ 0 ] } rootClientId={ rootClientId } />
+			</Toolbar>
 		</div>
 	);
 }

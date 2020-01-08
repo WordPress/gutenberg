@@ -1,12 +1,6 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -14,8 +8,7 @@ import { useSelect } from '@wordpress/data';
  */
 import Inserter from '../inserter';
 
-export default function BlockInsertionPoint( { rootClientId, clientId } ) {
-	const [ isInserterFocused, setInserterFocused ] = useState( false );
+export default function BlockInsertionPoint( { rootClientId, clientId, onBlur, onFocus, width } ) {
 	const showInsertionPoint = useSelect( ( select ) => {
 		const {
 			getBlockIndex,
@@ -31,20 +24,8 @@ export default function BlockInsertionPoint( { rootClientId, clientId } ) {
 		);
 	}, [ clientId, rootClientId ] );
 
-	function onFocus( event ) {
-		// Stop propagation of the focus event to avoid selecting the current
-		// block while inserting a new block, as it is not relevant to sibling
-		// insertion and conflicts with contextual toolbar placement.
-		event.stopPropagation();
-		setInserterFocused( true );
-	}
-
-	function onBlur() {
-		setInserterFocused( false );
-	}
-
 	return (
-		<div className="block-editor-block-list__insertion-point">
+		<div className="block-editor-block-list__insertion-point" style={ { width } }>
 			{ showInsertionPoint && (
 				<div className="block-editor-block-list__insertion-point-indicator" />
 			) }
@@ -58,11 +39,7 @@ export default function BlockInsertionPoint( { rootClientId, clientId } ) {
 				//
 				// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 				tabIndex={ -1 }
-				className={
-					classnames( 'block-editor-block-list__insertion-point-inserter', {
-						'is-visible': isInserterFocused,
-					} )
-				}
+				className="block-editor-block-list__insertion-point-inserter"
 			>
 				<Inserter
 					rootClientId={ rootClientId }
