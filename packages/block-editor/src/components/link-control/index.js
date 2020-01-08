@@ -17,7 +17,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	useCallback,
 	useState,
-	useEffect,
 	Fragment,
 } from '@wordpress/element';
 
@@ -44,40 +43,26 @@ const MODE_EDIT = 'edit';
 
 function LinkControl( {
 	className,
-	currentLink,
-	currentSettings,
+	value,
+	settings,
 	fetchSearchSuggestions,
 	instanceId,
 	onClose = noop,
-	onChangeMode = noop,
-	onKeyDown = noop,
-	onKeyPress = noop,
-	onLinkChange = noop,
-	onSettingsChange = noop,
+	onChange = noop,
 } ) {
 	// State
 	const [ inputValue, setInputValue ] = useState( '' );
-	const [ isEditingLink, setIsEditingLink ] = useState( false );
-
-	// Effects
-	useEffect( () => {
-		// If we have a link then stop editing mode
-		if ( currentLink ) {
-			setIsEditingLink( false );
-		} else {
-			setIsEditingLink( true );
-		}
-	}, [ currentLink ] );
+	const [ isEditingLink, setIsEditingLink ] = useState( ! value || ! value.url );
 
 	// Handlers
 
 	/**
 	 * onChange LinkControlSearchInput event handler
 	 *
-	 * @param {string} value Current value returned by the search.
+	 * @param {string} val Current value returned by the search.
 	 */
-	const onInputChange = ( value = '' ) => {
-		setInputValue( value );
+	const onInputChange = ( val = '' ) => {
+		setInputValue( val );
 	};
 
 	// Utils
@@ -85,7 +70,6 @@ function LinkControl( {
 	/**
 	 * Handler function which switches the mode of the component,
 	 * between `edit` and `show` mode.
-	 * Also, it calls `onChangeMode` callback function.
 	 *
 	 * @param {string} mode Component mode: `show` or `edit`.
 	 */
@@ -94,12 +78,8 @@ function LinkControl( {
 
 		// Populate input searcher whether
 		// the current link has a title.
-		if ( currentLink && currentLink.title ) {
-			setInputValue( currentLink.title );
-		}
-
-		if ( isFunction( onChangeMode ) ) {
-			onChangeMode( mode );
+		if ( value && value.title && mode === 'edit' ) {
+			setInputValue( value.title );
 		}
 	};
 
@@ -112,10 +92,10 @@ function LinkControl( {
 		setInputValue( '' );
 	};
 
-	const handleDirectEntry = ( value ) => {
+	const handleDirectEntry = ( val ) => {
 		let type = 'URL';
 
-		const protocol = getProtocol( value ) || '';
+		const protocol = getProtocol( val ) || '';
 
 		if ( protocol.includes( 'mailto' ) ) {
 			type = 'mailto';
@@ -125,27 +105,27 @@ function LinkControl( {
 			type = 'tel';
 		}
 
-		if ( startsWith( value, '#' ) ) {
+		if ( startsWith( val, '#' ) ) {
 			type = 'internal';
 		}
 
 		return Promise.resolve(
 			[ {
 				id: '-1',
-				title: value,
-				url: type === 'URL' ? prependHTTP( value ) : value,
+				title: val,
+				url: type === 'URL' ? prependHTTP( val ) : val,
 				type,
 			} ]
 		);
 	};
 
-	const handleEntitySearch = async ( value ) => {
+	const handleEntitySearch = async ( val ) => {
 		const results = await Promise.all( [
-			fetchSearchSuggestions( value ),
-			handleDirectEntry( value ),
+			fetchSearchSuggestions( val ),
+			handleDirectEntry( val ),
 		] );
 
-		const couldBeURL = ! value.includes( ' ' );
+		const couldBeURL = ! val.includes( ' ' );
 
 		// If it's potentially a URL search then concat on a URL search suggestion
 		// just for good measure. That way once the actual results run out we always
@@ -154,15 +134,15 @@ function LinkControl( {
 	};
 
 	// Effects
-	const getSearchHandler = useCallback( ( value ) => {
-		const protocol = getProtocol( value ) || '';
+	const getSearchHandler = useCallback( ( val ) => {
+		const protocol = getProtocol( val ) || '';
 		const isMailto = protocol.includes( 'mailto' );
-		const isInternal = startsWith( value, '#' );
+		const isInternal = startsWith( val, '#' );
 		const isTel = protocol.includes( 'tel' );
 
-		const handleManualEntry = isInternal || isMailto || isTel || isURL( value ) || ( value && value.includes( 'www.' ) );
+		const handleManualEntry = isInternal || isMailto || isTel || isURL( val ) || ( val && val.includes( 'www.' ) );
 
-		return ( handleManualEntry ) ? handleDirectEntry( value ) : handleEntitySearch( value );
+		return ( handleManualEntry ) ? handleDirectEntry( val ) : handleEntitySearch( val );
 	}, [ handleDirectEntry, fetchSearchSuggestions ] );
 
 	// Render Components
@@ -181,7 +161,10 @@ function LinkControl( {
 							key={ `${ suggestion.id }-${ suggestion.type }` }
 							itemProps={ buildSuggestionItemProps( suggestion, index ) }
 							suggestion={ suggestion }
-							onClick={ () => onLinkChange( suggestion ) }
+							onClick={ () => {
+								setIsEditingLink( false );
+								onChange( { ...value, ...suggestion } );
+							} }
 							isSelected={ index === selectedSuggestion }
 							isURL={ manualLinkEntryTypes.includes( suggestion.type.toLowerCase() ) }
 							searchTerm={ inputValue }
@@ -202,7 +185,7 @@ function LinkControl( {
 			<div className="block-editor-link-control__popover-inner">
 				<div className="block-editor-link-control__search">
 
-					{ ( ! isEditingLink && currentLink ) && (
+					{ ( ! isEditingLink ) && (
 						<Fragment>
 							<p className="screen-reader-text" id={ `current-link-label-${ instanceId }` }>
 								{ __( 'Currently selected' ) }:
@@ -215,18 +198,17 @@ function LinkControl( {
 								} ) }
 							>
 								<span className="block-editor-link-control__search-item-header">
-
 									<ExternalLink
 										className="block-editor-link-control__search-item-title"
-										href={ currentLink.url }
+										href={ value.url }
 									>
-										{ currentLink.title }
+										{ value.title }
 									</ExternalLink>
-									<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( currentLink.url ) ) || '' }</span>
+									<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( value.url ) ) || '' }</span>
 								</span>
 
 								<Button isSecondary onClick={ setMode( MODE_EDIT ) } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
-									{ __( 'Change' ) }
+									{ __( 'Edit' ) }
 								</Button>
 							</div>
 						</Fragment>
@@ -236,17 +218,18 @@ function LinkControl( {
 						<LinkControlSearchInput
 							value={ inputValue }
 							onChange={ onInputChange }
-							onSelect={ onLinkChange }
+							onSelect={ ( suggestion ) => {
+								setIsEditingLink( false );
+								onChange( { ...value, ...suggestion } );
+							} }
 							renderSuggestions={ renderSearchResults }
 							fetchSuggestions={ getSearchHandler }
 							onReset={ resetInput }
-							onKeyDown={ onKeyDown }
-							onKeyPress={ onKeyPress }
 						/>
 					) }
 
 					{ ! isEditingLink && (
-						<LinkControlSettingsDrawer settings={ currentSettings } onSettingChange={ onSettingsChange } />
+						<LinkControlSettingsDrawer value={ value } settings={ settings } onChange={ onChange } />
 					) }
 				</div>
 			</div>

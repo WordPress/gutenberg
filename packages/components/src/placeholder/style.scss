@@ -66,8 +66,7 @@
 }
 
 .components-placeholder__input {
-	margin-top: 0;
-	margin-right: 8px;
+	margin: 0 8px 0 0;
 	flex: 1 1 auto;
 }
 
@@ -85,6 +84,7 @@
 	margin-bottom: $grid-size; // If buttons wrap we need vertical space between.
 
 	&:last-child {
+		margin-bottom: 0;
 		margin-right: 0;
 	}
 }

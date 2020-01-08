@@ -1,6 +1,14 @@
 .wp-block-table {
 	border-collapse: collapse;
 
+	thead {
+		border-bottom: 3px solid;
+	}
+
+	tfoot {
+		border-top: 3px solid;
+	}
+
 	td,
 	th {
 		padding: 0.5em;

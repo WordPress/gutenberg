@@ -653,3 +653,38 @@ By default all blocks can be converted to a reusable block. If supports reusable
 // Don't allow the block to be converted into a reusable block.
 reusable: false,
 ```
+
+## Block Collections
+
+## `registerBlockCollection`
+
+* **Type:** `Function`
+
+Blocks can be added to collections, grouping together all blocks from the same origin
+
+`registerBlockCollection` takes two parameters, `namespace` and an object of settings including `title` and `icon`.
+
+### Namespace
+
+* **Type:** `String`
+
+This should match the namespace declared in the block name; the name of your plugin or theme.
+
+### Settings
+
+#### Title
+
+* **Type:** `String`
+
+This will display in the block inserter section, which will list all blocks in this collection.
+
+#### Icon
+
+* **Type:** `Object`
+
+(Optional) An icon to display alongside the title in the block inserter.
+
+```js
+// Registering a block collection
+registerBlockCollection( 'my-plugin', { title: 'My Plugin' } );
+```

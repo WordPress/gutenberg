@@ -55,19 +55,20 @@ Don’t use unclear visual markers to indicate a text field.
 ### Usage
 
 Render a user interface to input the name of an additional css class.
+```js 
+import { TextControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-    import { TextControl } from '@wordpress/components';
-    import { withState } from '@wordpress/compose';
-    
-    const MyTextControl = withState( {
-        className: '',
-    } )( ( { className, setState } ) => ( 
-        <TextControl
-            label="Additional CSS Class"
-            value={ className }
-            onChange={ ( className ) => setState( { className } ) }
-        />
-    ) );
+const MyTextControl = withState( {
+    className: '',
+} )( ( { className, setState } ) => ( 
+    <TextControl
+        label="Additional CSS Class"
+        value={ className }
+        onChange={ ( className ) => setState( { className } ) }
+    />
+) );
+``` 
 
 ### Props
 

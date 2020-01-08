@@ -29,6 +29,7 @@ export {
 } from './categories';
 export {
 	registerBlockType,
+	registerBlockCollection,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
 	getFreeformContentHandlerName,

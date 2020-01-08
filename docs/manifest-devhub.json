@@ -984,6 +984,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Text",
+		"slug": "text",
+		"markdown_source": "../packages/components/src/text/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TextareaControl",
 		"slug": "textarea-control",
 		"markdown_source": "../packages/components/src/textarea-control/README.md",
