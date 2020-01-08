@@ -208,7 +208,7 @@ function LinkControl( {
 								</span>
 
 								<Button isSecondary onClick={ setMode( MODE_EDIT ) } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
-									{ __( 'Change' ) }
+									{ __( 'Edit' ) }
 								</Button>
 							</div>
 						</Fragment>
