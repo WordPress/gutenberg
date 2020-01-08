@@ -45,6 +45,7 @@ function NavigationLinkEdit( {
 	setAttributes,
 	insertLinkBlock,
 	recentPages = [],
+	hasResolvedPages,
 } ) {
 	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
 	const link = {
@@ -170,18 +171,15 @@ function NavigationLinkEdit( {
 						<LinkControl
 							className="wp-block-navigation-link__inline-link-input"
 							value={ link }
-							initialSuggestions={ () => {
-								if ( ! recentPages ) {
-									return Promise.reject( recentPages );
+							initialSuggestions={ async () => {
+								if ( ! hasResolvedPages ) {
+									return [];
 								}
-
-								return Promise.resolve( recentPages.map( ( page ) => {
-									return {
-										id: page.id,
-										url: page.link,
-										title: escape( page.title.raw ) || __( '(no title)' ),
-										type: 'Page',
-									};
+								return recentPages.map( ( page ) => ( {
+									id: page.id,
+									url: page.link,
+									title: escape( page.title.raw ) || __( '(no title)' ),
+									type: 'Page',
 								} ) );
 							} }
 								onChange={ ( {
@@ -225,7 +223,6 @@ export default compose( [
 			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
 			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
 			recentPages: select( 'core' ).getEntityRecords( 'postType', 'page', queryForRecentPages ),
-			isRequestingPages: select( 'core/data' ).isResolving( ...pagesSelect ),
 			hasResolvedPages: select( 'core/data' ).hasFinishedResolution( ...pagesSelect ),
 		};
 	} ),
