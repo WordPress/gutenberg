@@ -10,13 +10,15 @@ import { Popover } from '@wordpress/components';
  */
 import Inserter from '../inserter';
 
-function Indicator( { rootClientId, clientId } ) {
+function Indicator( { clientId } ) {
 	const showInsertionPoint = useSelect( ( select ) => {
 		const {
 			getBlockIndex,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
+			getBlockRootClientId,
 		} = select( 'core/block-editor' );
+		const rootClientId = getBlockRootClientId( clientId );
 		const blockIndex = getBlockIndex( clientId, rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		return (
@@ -24,7 +26,7 @@ function Indicator( { rootClientId, clientId } ) {
 			insertionPoint.index === blockIndex &&
 			insertionPoint.rootClientId === rootClientId
 		);
-	}, [ clientId, rootClientId ] );
+	}, [ clientId ] );
 
 	if ( ! showInsertionPoint ) {
 		return null;
@@ -33,22 +35,16 @@ function Indicator( { rootClientId, clientId } ) {
 	return <div className="block-editor-block-list__insertion-point-indicator" />;
 }
 
-function selector( select ) {
-	return select( 'core/block-editor' ).getBlockRootClientId;
-}
-
 export default function InsertionPoint( {
 	className,
 	isMultiSelecting,
 	selectedBlockClientId,
 	children,
 } ) {
-	const getBlockRootClientId = useSelect( selector, [] );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
 	const [ inserterElement, setInserterElement ] = useState( null );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
-	const [ inserterRootClientId, setInserterRootClientId ] = useState( null );
 
 	function onMouseMove( event ) {
 		if ( event.target.className !== className ) {
@@ -86,7 +82,6 @@ export default function InsertionPoint( {
 		setIsInserterShown( true );
 		setInserterElement( element );
 		setInserterClientId( clientId );
-		setInserterRootClientId( getBlockRootClientId( clientId ) );
 	}
 
 	return <>
@@ -100,7 +95,7 @@ export default function InsertionPoint( {
 			__unstableSlotName="block-toolbar"
 		>
 			<div className="block-editor-block-list__insertion-point" style={ { width: inserterElement.offsetWidth } }>
-				<Indicator clientId={ inserterClientId } rootClientId={ inserterRootClientId } />
+				<Indicator clientId={ inserterClientId } />
 				<div
 					onFocus={ () => setIsInserterForced( true ) }
 					onBlur={ () => setIsInserterForced( false ) }
@@ -113,10 +108,7 @@ export default function InsertionPoint( {
 					tabIndex={ -1 }
 					className="block-editor-block-list__insertion-point-inserter"
 				>
-					<Inserter
-						rootClientId={ inserterRootClientId }
-						clientId={ inserterClientId }
-					/>
+					<Inserter clientId={ inserterClientId } />
 				</div>
 			</div>
 		</Popover> }
