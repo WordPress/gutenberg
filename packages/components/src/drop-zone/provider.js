@@ -9,10 +9,12 @@ import { isEqual, find, some, filter, throttle, includes } from 'lodash';
 import { Component, createContext } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
-const { Provider, Consumer } = createContext( {
+export const Context = createContext( {
 	addDropZone: () => {},
 	removeDropZone: () => {},
 } );
+
+const { Provider, Consumer } = Context;
 
 const getDragEventType = ( { dataTransfer } ) => {
 	if ( dataTransfer ) {
@@ -126,12 +128,12 @@ class DropZoneProvider extends Component {
 		// Index of hovered dropzone.
 		const hoveredDropZones = filter( this.dropZones, ( dropZone ) =>
 			isTypeSupportedByDropZone( dragEventType, dropZone ) &&
-			isWithinElementBounds( dropZone.element, detail.clientX, detail.clientY )
+			isWithinElementBounds( dropZone.element.current, detail.clientX, detail.clientY )
 		);
 
 		// Find the leaf dropzone not containing another dropzone
 		const hoveredDropZone = find( hoveredDropZones, ( zone ) => (
-			! some( hoveredDropZones, ( subZone ) => subZone !== zone && zone.element.parentElement.contains( subZone.element ) )
+			! some( hoveredDropZones, ( subZone ) => subZone !== zone && zone.element.current.parentElement.contains( subZone.element.current ) )
 		) );
 
 		const hoveredDropZoneIndex = this.dropZones.indexOf( hoveredDropZone );
@@ -139,7 +141,7 @@ class DropZoneProvider extends Component {
 		let position = null;
 
 		if ( hoveredDropZone ) {
-			const rect = hoveredDropZone.element.getBoundingClientRect();
+			const rect = hoveredDropZone.element.current.getBoundingClientRect();
 
 			position = {
 				x: detail.clientX - rect.left < rect.right - detail.clientX ? 'left' : 'right',

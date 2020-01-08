@@ -37,7 +37,7 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import BlockEdit from '../block-edit';
-import BlockDropZone from '../block-drop-zone';
+import useBlockDropZone from '../block-drop-zone';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
@@ -284,15 +284,13 @@ function BlockListBlock( {
 			isFirstMultiSelected
 		);
 
-	// Insertion point can only be made visible if the block is at the
-	// the extent of a multi-selection, or not in a multi-selection.
-	const shouldShowInsertionPoint = ! isMultiSelecting && (
-		( isPartOfMultiSelection && isFirstMultiSelected ) ||
-		! isPartOfMultiSelection
-	);
-
-	const shouldRenderDropzone = shouldShowInsertionPoint;
 	const isDragging = isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
+
+	const dropZoneClassName = useBlockDropZone( {
+		element: wrapper,
+		clientId,
+		rootClientId,
+	} );
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.
@@ -312,7 +310,8 @@ function BlockListBlock( {
 			'has-child-selected': isAncestorOfSelectedBlock,
 			'has-toolbar-captured': hasAncestorCapturingToolbars,
 		},
-		className
+		className,
+		dropZoneClassName
 	);
 
 	// Determine whether the block has props to apply to the wrapper.
@@ -394,10 +393,6 @@ function BlockListBlock( {
 					animationStyle
 			}
 		>
-			{ shouldRenderDropzone && <BlockDropZone
-				clientId={ clientId }
-				rootClientId={ rootClientId }
-			/> }
 			{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && (
 				// If the parent Block is set to consume toolbars of the child Blocks
 				// then render the child Block's toolbar into the Slot provided

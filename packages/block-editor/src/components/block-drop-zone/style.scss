@@ -1,18 +1,5 @@
 // Dropzones
-.block-editor-block-drop-zone {
-	border: none;
-	border-radius: 0;
-
-	.components-drop-zone__content,
-	&.is-dragging-over-element .components-drop-zone__content {
-		display: none;
-	}
-
-	&.is-close-to-bottom,
-	&.is-close-to-top {
-		background: none;
-	}
-
+.block-editor-block-list__block {
 	&.is-close-to-top {
 		border-top: 3px solid theme(primary);
 	}

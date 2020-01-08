@@ -12,13 +12,11 @@ import { _x, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import BlockDropZone from '../block-drop-zone';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender( { rootClientId, className, __experimentalSelectBlockOnInsert: selectBlockOnInsert } ) {
 	return (
 		<>
-			<BlockDropZone rootClientId={ rootClientId } />
 			<Inserter
 				rootClientId={ rootClientId }
 				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
