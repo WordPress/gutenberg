@@ -20,16 +20,12 @@ function selector( select ) {
 		getSelectedBlockClientId,
 		hasMultiSelection,
 		isMultiSelecting,
-		getBlockRootClientId,
-		isBlockSelected,
 	} = select( 'core/block-editor' );
 
 	return {
 		selectedBlockClientId: getSelectedBlockClientId(),
 		hasMultiSelection: hasMultiSelection(),
 		isMultiSelecting: isMultiSelecting(),
-		getBlockRootClientId,
-		isBlockSelected,
 	};
 }
 
