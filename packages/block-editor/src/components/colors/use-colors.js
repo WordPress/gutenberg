@@ -119,9 +119,11 @@ export default function __experimentalUseColors(
 		colorPanelProps,
 		contrastCheckers,
 		panelChildren,
-		targetRef,
-		backgroundColorTargetRef = targetRef,
-		textColorTargetRef = targetRef,
+		colorDetector: {
+			targetRef,
+			backgroundColorTargetRef = targetRef,
+			textColorTargetRef = targetRef,
+		} = {},
 	} = {
 		panelTitle: __( 'Color Settings' ),
 	},
