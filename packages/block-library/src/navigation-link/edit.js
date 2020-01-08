@@ -214,7 +214,7 @@ export default compose( [
 		const queryForRecentPages = {
 			order: 'desc',
 			orderby: 'modified',
-			per_page: 5,
+			per_page: 3,
 		};
 
 		const pagesSelect = [ 'core', 'getEntityRecords', [ 'postType', 'page', queryForRecentPages ] ];
