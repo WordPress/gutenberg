@@ -82,6 +82,5 @@ private func dummy() {
     _ = NSLocalizedString("Title:", comment: "")
     _ = NSLocalizedString("Translate", comment: "")
     _ = NSLocalizedString("Ungroup", comment: "")
-    _ = NSLocalizedString("Unsupported", comment: "")
     _ = NSLocalizedString("We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.", comment: "")
     _ = NSLocalizedString("WordPress Media Library", comment: "")

@@ -100,7 +100,6 @@
     <string name="gutenberg_native_title" tools:ignore="UnusedResources">"Title:"</string>
     <string name="gutenberg_native_translate" tools:ignore="UnusedResources">"Translate"</string>
     <string name="gutenberg_native_ungroup" tools:ignore="UnusedResources">"Ungroup"</string>
-    <string name="gutenberg_native_unsupported" tools:ignore="UnusedResources">"Unsupported"</string>
     <string name="gutenberg_native_we_are_working_hard_to_add_more_blocks_with_each_release_in_the_m" tools:ignore="UnusedResources">"We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web."</string>
     <string name="gutenberg_native_wordpress_media_library" tools:ignore="UnusedResources">"WordPress Media Library"</string>
 </resources>
