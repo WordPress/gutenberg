@@ -16,7 +16,7 @@ import {
 	useEffect,
 	Children,
 	cloneElement,
-	useRef,
+	useState,
 } from '@wordpress/element';
 
 /**
@@ -48,8 +48,8 @@ const ColorPanel = ( {
 	colorSettings,
 	colorPanelProps,
 	contrastCheckers,
-	detectedBackgroundColorRef,
-	detectedColorRef,
+	detectedBackgroundColor,
+	detectedColor,
 	panelChildren,
 } ) => (
 	<PanelColorSettings
@@ -64,12 +64,12 @@ const ColorPanel = ( {
 					backgroundColor = resolveContrastCheckerColor(
 						backgroundColor,
 						colorSettings,
-						detectedBackgroundColorRef.current
+						detectedBackgroundColor
 					);
 					textColor = resolveContrastCheckerColor(
 						textColor,
 						colorSettings,
-						detectedColorRef.current
+						detectedColor
 					);
 					return (
 						<ContrastChecker
@@ -85,12 +85,12 @@ const ColorPanel = ( {
 					backgroundColor = resolveContrastCheckerColor(
 						backgroundColor || value,
 						colorSettings,
-						detectedBackgroundColorRef.current
+						detectedBackgroundColor
 					);
 					textColor = resolveContrastCheckerColor(
 						textColor || value,
 						colorSettings,
-						detectedColorRef.current
+						detectedColor
 					);
 					return (
 						<ContrastChecker
@@ -198,8 +198,9 @@ export default function __experimentalUseColors(
 		[ setAttributes, colorConfigs.length ]
 	);
 
-	const detectedBackgroundColorRef = useRef();
-	const detectedColorRef = useRef();
+	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
+	const [ detectedColor, setDetectedColor ] = useState();
+
 	useEffect( () => {
 		if ( ! contrastCheckers ) {
 			return undefined;
@@ -219,7 +220,7 @@ export default function __experimentalUseColors(
 		}
 
 		if ( needsColor ) {
-			detectedColorRef.current = getComputedStyle( targetRef.current ).color;
+			setDetectedColor( getComputedStyle( targetRef.current ).color );
 		}
 
 		if ( needsBackgroundColor ) {
@@ -236,7 +237,7 @@ export default function __experimentalUseColors(
 					.backgroundColor;
 			}
 
-			detectedBackgroundColorRef.current = backgroundColor;
+			setDetectedBackgroundColor( backgroundColor );
 		}
 	}, [
 		colorConfigs.reduce(
@@ -314,8 +315,8 @@ export default function __experimentalUseColors(
 			colorSettings,
 			colorPanelProps,
 			contrastCheckers,
-			detectedBackgroundColorRef,
-			detectedColorRef,
+			detectedBackgroundColor,
+			detectedColor,
 			panelChildren,
 		};
 		return {
@@ -325,5 +326,5 @@ export default function __experimentalUseColors(
 				<InspectorControlsColorPanel { ...wrappedColorPanelProps } />
 			),
 		};
-	}, [ attributes, setAttributes, ...deps ] );
+	}, [ attributes, setAttributes, detectedColor, detectedBackgroundColor, ...deps ] );
 }
