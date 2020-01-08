@@ -337,7 +337,7 @@ describe( 'Selecting links', () => {
 
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.type ) );
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
 		expect( currentLinkAnchor ).not.toBeNull();
 	} );
 
@@ -435,7 +435,7 @@ describe( 'Selecting links', () => {
 
 			// Check that this suggestion is now shown as selected
 			expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
 			expect( currentLinkAnchor ).not.toBeNull();
 		} );
 	} );
@@ -528,7 +528,7 @@ describe( 'Selecting links', () => {
 			const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
 
 			expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
 			expect( currentLinkAnchor ).not.toBeNull();
 		} );
 	} );
