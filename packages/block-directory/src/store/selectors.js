@@ -50,3 +50,14 @@ export function hasInstallBlocksPermission( state ) {
 export function getInstalledBlockTypes( state ) {
 	return get( state, [ 'downloadableBlocks', 'installedBlockTypes' ], [] );
 }
+
+/**
+ * Returns the error notices
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Object with error notices.
+ */
+export function getErrorNotices( state ) {
+	return state.errorNotices.notices;
+}
