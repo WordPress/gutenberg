@@ -420,22 +420,6 @@
 	}
 }
 
-// Don't show the sibling inserter before the selected block.
-.edit-post-layout:not(.has-fixed-toolbar) {
-	// The child selector is necessary for this to work properly in nested contexts.
-	.is-selected > .block-editor-block-list__insertion-point > .block-editor-block-list__insertion-point-inserter,
-	.is-focused > .block-editor-block-list__insertion-point > .block-editor-block-list__insertion-point-inserter {
-		opacity: 0;
-		pointer-events: none;
-
-		&:hover,
-		&.is-visible {
-			opacity: 1;
-			pointer-events: auto;
-		}
-	}
-}
-
 // This is the edge-to-edge hover area that contains the plus.
 .block-editor-block-list__block {
 	> .block-editor-block-list__insertion-point {
