@@ -65,8 +65,8 @@ wp.blocks.registerBlockType( /* ... */, {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
-const { URLInputButton } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { URLInputButton } from @wordpress/editor';
 
 registerBlockType( /* ... */, {
 	// ...
@@ -183,8 +183,8 @@ wp.blocks.registerBlockType( /* ... */, {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
-const { URLInput } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { URLInput } from '@wordpress/editor';
 
 registerBlockType( /* ... */, {
 	// ...
