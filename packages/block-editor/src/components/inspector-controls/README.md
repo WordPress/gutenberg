@@ -1,4 +1,4 @@
-# Inspector Controls
+# InspectorControls
 
 <img src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/inspector.png" with="281" height="527" alt="inspector">
 
