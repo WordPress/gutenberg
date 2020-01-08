@@ -23,19 +23,19 @@
 	flex-direction: row;
 	flex-wrap: wrap;
 	width: 100%;
-	margin: $grid-size-large 0;
+	margin: $grid-unit-20 0;
 	padding: 0;
 	list-style: none;
 
 	> li {
 		list-style: none;
-		margin: $grid-size/2 $grid-size $grid-size/2 0;
+		margin: $grid-unit-05 $grid-unit-10 0;
 		flex-shrink: 1;
 		max-width: 100px;
 	}
 
 	.block-editor-block-variation-picker__variation {
-		padding: $grid-size;
+		padding: $grid-unit-10;
 	}
 }
 
@@ -62,7 +62,7 @@
 
 	&::before {
 		// Use `padding-bottom` trick to style element as perfect square.
-		content: "";
+		content: '';
 		padding-bottom: 100%;
 	}
 

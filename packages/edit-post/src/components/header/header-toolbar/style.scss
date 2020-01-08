@@ -55,7 +55,7 @@
 
 	// Move toolbar into top Editor Bar.
 	@include break-wide {
-		padding-left: $grid-size;
+		padding-left: $grid-unit-10;
 		position: static;
 		left: auto;
 		right: auto;
@@ -68,11 +68,11 @@
 		}
 
 		.block-editor-block-toolbar {
-			margin: -($grid-size + $border-width) 0;
+			margin: -($grid-unit-10 + $border-width) 0;
 		}
 
 		.block-editor-block-toolbar .components-toolbar {
-			padding: ($grid-size + $border-width + $border-width) $grid-size-small ($grid-size + $border-width);
+			padding: ($grid-unit-10 + $border-width + $border-width) $grid-unit-05 ($grid-unit-10 + $border-width);
 		}
 	}
 }

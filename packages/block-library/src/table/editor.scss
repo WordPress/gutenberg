@@ -54,8 +54,8 @@
 // Extra specificity to override default Placeholder styles.
 .wp-block-table__placeholder-form.wp-block-table__placeholder-form {
 	.wp-block-table__placeholder-input {
-		width: $grid-size * 14;
-		margin-right: $grid-size;
+		width: $grid-unit-10 * 14;
+		margin-right: $grid-unit-10;
 		margin-bottom: 0;
 
 		input {

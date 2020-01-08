@@ -7,13 +7,6 @@
 	width: 100%;
 	height: auto;
 	color: $dark-gray-500;
-
-	// Dotted backouground
-	background-image: radial-gradient($black 2%, transparent 2%), radial-gradient($white 2%, transparent 2%);
-	background-color: $white;
-	background-position: 0 0, 100px 100px;
-	background-size: 50px 50px;
-
 	border: $border-width solid $border-color;
 
 	&:hover,

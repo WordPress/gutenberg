@@ -1,10 +1,9 @@
 @import "./colors";
 
 /**
- * Often re-used variables
+ * Fonts & basic variables.
  */
 
-// Fonts & basics
 $default-font: -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif;
 $default-font-size: 13px;
 $default-line-height: 1.4;
@@ -17,13 +16,47 @@ $editor-line-height: 1.8;
 $big-font-size: 18px;
 $mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in"
 
-// Grid size
+
+/**
+ * Grid System.
+ * https://make.wordpress.org/design/2019/10/31/proposal-a-consistent-spacing-system-for-wordpress/
+ */
+
+$grid-unit: 8px;
+$grid-unit-05: 0.5 * $grid-unit;	// 4px
+$grid-unit-10: 1 * $grid-unit;		// 8px
+$grid-unit-15: 1.5 * $grid-unit;	// 12px
+$grid-unit-20: 2 * $grid-unit;		// 16px
+$grid-unit-30: 3 * $grid-unit;		// 24px
+$grid-unit-40: 4 * $grid-unit;		// 32px
+$grid-unit-50: 5 * $grid-unit;		// 40px
+$grid-unit-60: 6 * $grid-unit;		// 48px
+
+/* @Todo: Move towards custom properties:
+:root {
+	--grid-unit: 8px;
+	--grid-unit-05: calc(0.5 * var(--grid-unit)); // 4px
+	--grid-unit-10: calc(1 * var(--grid-unit));   // 8px
+	--grid-unit-15: calc(1.5 * var(--grid-unit)); // 12px
+	--grid-unit-20: calc(2 * var(--grid-unit));   // 16px
+	--grid-unit-30: calc(3 * var(--grid-unit));   // 24px
+	--grid-unit-40: calc(4 * var(--grid-unit));   // 32px
+	--grid-unit-50: calc(5 * var(--grid-unit));   // 40px
+	--grid-unit-60: calc(6 * var(--grid-unit));   // 48px
+}
+*/
+
+// Deprecated grid units.
 $grid-size-small: 4px;
 $grid-size: 8px;
 $grid-size-large: 16px;
 $grid-size-xlarge: 24px;
 
-// Widths, heights & dimensions
+
+/**
+ * Dimensions.
+ */
+
 $panel-padding: 16px;
 $header-height: 56px;
 $panel-header-height: 50px;
@@ -35,27 +68,42 @@ $admin-sidebar-width-collapsed: 36px;
 $empty-paragraph-height: $text-editor-font-size * 4;
 $modal-min-width: 360px;
 
-// Visuals
+
+/**
+ * Shadows.
+ */
+
 $shadow-popover: 0 3px 30px rgba($dark-gray-900, 0.1);
 $shadow-toolbar: 0 2px 10px rgba($dark-gray-900, 0.1), 0 0 2px rgba($dark-gray-900, 0.1);
 $shadow-below-only: 0 5px 10px rgba($dark-gray-900, 0.05), 0 2px 2px rgba($dark-gray-900, 0.05);
 $shadow-modal: 0 3px 30px rgba($dark-gray-900, 0.2);
-$border-color: $black;
-$theme-color: theme(button);
 
-// Editor Widths
+
+/**
+ * Editor widths.
+ */
+
 $sidebar-width: 280px;
 $content-width: 580px; // This is optimized for 70 characters.
+$widget-area-width: 700px;
 
-// Block UI
+
+/**
+ * Block UI.
+ */
+
 $border-width: 1px;
-$block-controls-height: 36px;
+$block-controls-height: 36px; // @todo: This should be deprecated in favor of 48px block control heights.
+$icon-button-size: 36px; // @todo: This should be deprecated in favor of 48px block control heights.
+$icon-button-size-small: 24px;
 $inserter-tabs-height: 36px;
-$block-toolbar-height: 48px;
+$block-toolbar-height: $grid-unit-60;
 $resize-handler-size: 15px;
-$resize-handler-container-size: $resize-handler-size + ($grid-size-small * 2); // Make the resize handle container larger so there's a larger grabbable area.
+$resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // Make the resize handle container larger so there's a larger grabbable area.
+$border-color: #1e1e1e;
+$theme-color: theme(button);
 
-// Blocks
+// Block specific dimensions.
 $block-padding: 14px; // Space between block footprint and focus boundaries. These are drawn outside the block footprint, and do not affect the size.
 $block-spacing: 4px; // Vertical space between blocks.
 $block-side-ui-width: 28px; // Width of the movers/drag handle UI.
@@ -78,14 +126,11 @@ $block-media-container-to-content: $block-selected-child-margin + $block-selecte
 $block-selected-vertical-margin-descendant: 2 * $block-selected-to-content;
 $block-selected-vertical-margin-child: $block-edge-to-content;
 
-// Buttons & UI Widgets
+
+/**
+ * Border radii.
+ */
+
 $radius-round-rectangle: 4px;
 $radius-round: 50%;
-$icon-button-size: 36px;
-$icon-button-size-small: 24px;
-$resize-handler-size: 15px;
-$resize-handler-container-size: $resize-handler-size + ($grid-size-small * 2); // Make the resize handle container larger so there's a larger grabbable area.
-$spinner-size: 18px;
-
-// Widgets screen
-$widget-area-width: 700px;
+$radius-block-ui: 2px;

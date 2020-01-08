@@ -15,11 +15,11 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control .block-editor-link-control__search-input {
 	// Specificity override.
 	&.block-editor-link-control__search-input input[type="text"] {
-		width: calc(100% - #{$grid-size-large*2});
+		width: calc(100% - #{$grid-unit-20*2});
 		display: block;
-		padding: 11px $grid-size-large;
-		margin: $grid-size-large;
 		padding-right: ( $icon-button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
+		padding: 11px $grid-unit-20;
+		margin: $grid-unit-20;
 		position: relative;
 		border: 1px solid $light-gray-500;
 		border-radius: $radius-round-rectangle;
@@ -61,28 +61,28 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control__search-results-wrapper {
 	position: relative;
-	margin-top: -$grid-size-large + 1px;
+	margin-top: -$grid-unit-20 + 1px;
 
 	&::before,
 	&::after {
 		content: "";
 		position: absolute;
 		left: -1px;
-		right: $grid-size-large; // avoid overlaying scrollbars
+		right: $grid-unit-20; // avoid overlaying scrollbars
 		display: block;
 		pointer-events: none;
 		z-index: 100;
 	}
 
 	&::before {
-		height: $grid-size-large/2;
+		height: $grid-unit-20/2;
 		top: 0;
 		bottom: auto;
 		background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
 	}
 
 	&::after {
-		height: $grid-size-large;
+		height: $grid-unit-20;
 		bottom: 0;
 		top: auto;
 		background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
@@ -97,7 +97,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control__search-results {
 	margin: 0;
-	padding: $grid-size-large/2 $grid-size-large $grid-size-large/2;
+	padding: $grid-unit-20/2 $grid-unit-20 $grid-unit-20;
 	max-height: 200px;
 	overflow-y: auto; // allow results list to scroll
 
@@ -138,14 +138,13 @@ $block-editor-link-control-number-of-actions: 1;
 		border: 0;
 		width: 100%;
 		cursor: default;
-		padding: $grid-size-large;
-		padding-left: $grid-size-xlarge;
+		padding: $grid-unit-20;
+		padding-left: $grid-unit-30;
 	}
 
 	.block-editor-link-control__search-item-header {
 		display: block;
-		margin-right: $grid-size-xlarge;
-		margin-top: 2px;
+		margin-right: $grid-unit-30;
 	}
 
 	.block-editor-link-control__search-item-icon {
@@ -235,7 +234,7 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control__settings {
 	border-top: 1px solid $light-gray-500;
 	margin: 0;
-	padding: $grid-size-large $grid-size-xlarge;
+	padding: $grid-unit-20 $grid-unit-30;
 
 	:last-child {
 		margin-bottom: 0;
@@ -243,7 +242,7 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__setting {
-	margin-bottom: $grid-size-large;
+	margin-bottom: $grid-unit-20;
 
 	:last-child {
 		margin-bottom: 0;

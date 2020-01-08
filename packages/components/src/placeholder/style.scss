@@ -14,13 +14,10 @@
 		align-items: flex-start;
 	}
 
-	// Dotted background
-	background-image: radial-gradient($black 2%, transparent 2%), radial-gradient($white 2%, transparent 2%);
-	background-color: $white;
-	background-position: 0 0, 100px 100px;
-	background-size: 50px 50px;
-
+	// Block UI appearance.
 	border: $border-width solid $border-color;
+	border-radius: $radius-block-ui;
+	background-color: $white;
 
 	.components-base-control__label {
 		font-size: $default-font-size;
@@ -87,8 +84,8 @@
 }
 
 .components-placeholder__fieldset .components-button {
-	margin-right: $grid-size;
-	margin-bottom: $grid-size; // If buttons wrap we need vertical space between.
+	margin-right: $grid-unit-10;
+	margin-bottom: $grid-unit-10; // If buttons wrap we need vertical space between.
 
 	&:last-child {
 		margin-bottom: 0;
@@ -136,7 +133,7 @@
 		}
 
 		.components-button {
-			padding: 0 $grid-size 2px;
+			padding: 0 $grid-unit-10 2px;
 		}
 	}
 }

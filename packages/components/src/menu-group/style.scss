@@ -3,13 +3,13 @@
 }
 
 .components-menu-group + .components-menu-group {
-	margin-top: $grid-size;
-	padding-top: $grid-size;
+	margin-top: $grid-unit-10;
+	padding-top: $grid-unit-10;
 	border-top: $border-width solid $light-gray-500;
 }
 
 .components-menu-group__label {
-	margin-bottom: $grid-size;
+	margin-bottom: $grid-unit-10;
 	color: $dark-gray-300;
-	padding: 0 ($grid-size - $border-width);
+	padding: 0 ($grid-unit-10 - $border-width);
 }

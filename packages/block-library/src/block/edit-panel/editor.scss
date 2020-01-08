@@ -9,7 +9,7 @@
 	position: relative;
 	top: -$block-padding;
 	margin: 0 (-$block-padding);
-	padding: $grid-size $block-padding;
+	padding: $grid-unit-10 $block-padding;
 
 	// Use opacity to work in various editor styles.
 	border: $border-width dashed $border-color;
@@ -18,7 +18,7 @@
 	// Show a smaller padding when nested.
 	.block-editor-block-list__layout & {
 		margin: 0 (-$block-padding);
-		padding: $grid-size $block-padding;
+		padding: $grid-unit-10 $block-padding;
 	}
 
 	.reusable-block-edit-panel__spinner {
@@ -30,7 +30,7 @@
 	}
 
 	.reusable-block-edit-panel__label {
-		margin-right: $grid-size;
+		margin-right: $grid-unit-10;
 		white-space: nowrap;
 		font-weight: 600;
 	}
@@ -39,7 +39,7 @@
 		flex: 1 1 100%;
 		font-size: 14px;
 		height: 30px;
-		margin: $grid-size-small 0 $grid-size;
+		margin: $grid-unit-05 0 $grid-unit-10;
 	}
 
 	.components-button.reusable-block-edit-panel__button {

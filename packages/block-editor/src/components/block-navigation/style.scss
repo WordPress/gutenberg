@@ -2,11 +2,11 @@ $tree-border-width: 2px;
 $tree-item-height: 36px;
 
 .block-editor-block-navigation__container {
-	padding: $grid-size - $border-width;
+	padding: $grid-unit-10 - $border-width;
 }
 
 .block-editor-block-navigation__label {
-	margin: 0 0 $grid-size;
+	margin: 0 0 $grid-unit-10;
 	color: $dark-gray-300;
 }
 
@@ -19,7 +19,7 @@ $tree-item-height: 36px;
 .block-editor-block-navigation__list .block-editor-button-block-appender {
 	outline: none;
 	background: none;
-	padding: $grid-size;
+	padding: $grid-unit-10;
 	margin-left: 0.8em;
 	width: $icon-button-size;
 	border-radius: 4px;

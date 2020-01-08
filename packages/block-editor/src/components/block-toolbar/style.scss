@@ -4,9 +4,16 @@
 	width: 100%;
 	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
-	border-left: $border-width solid $border-color;
+	height: $block-toolbar-height;
+
+	// Animation
 	transition: border-color 0.1s linear, box-shadow 0.1s linear;
 	@include reduce-motion("transition");
+
+	// Block UI appearance.
+	border: $border-width solid $border-color;
+	border-radius: $radius-block-ui;
+	background-color: $white;
 
 	@include break-small() {
 		// Allow overflow on desktop.
@@ -16,14 +23,18 @@
 	// The component is born with a border, but we only need some of them.
 	.components-toolbar {
 		border: 0;
-		border-top: $border-width solid $border-color;
-		border-bottom: $border-width solid $border-color;
 
 		// Add a right border to show as separator in the block toolbar.
 		border-right: $border-width solid $border-color;
 
 		// IE11 has thick paddings without this.
 		line-height: 0;
+
+	}
+
+	// Remove the right-border on the last item in the toolbar.
+	> :last-child {
+		border-right: none;
 	}
 
 	// Add a left border and adjust the color for Top Toolbar mode.

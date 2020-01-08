@@ -66,8 +66,8 @@ $block-inserter-search-height: 38px;
 
 .components-popover input[type="search"].block-editor-inserter__search {
 	display: block;
-	margin: $grid-size-large;
-	padding: 11px $grid-size-large;
+	margin: $grid-unit-20;
+	padding: 11px $grid-unit-20;
 	position: relative;
 	z-index: 1;
 	border-radius: $radius-round-rectangle;
@@ -88,7 +88,7 @@ $block-inserter-search-height: 38px;
 	overflow: auto;
 	position: relative;
 	z-index: 1; // Necessary for the stacked card below parent blocks to show up.
-	padding: 0 $grid-size-large $grid-size-large $grid-size-large;
+	padding: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
 
 	&:focus {
 		outline: $border-width dotted $dark-gray-500;
@@ -114,7 +114,7 @@ $block-inserter-search-height: 38px;
 }
 
 .block-editor-inserter__manage-reusable-blocks {
-	margin: $grid-size-large 0 0 $grid-size-large;
+	margin: $grid-unit-20 0 0 $grid-unit-20;
 }
 
 .block-editor-inserter__no-results {
@@ -124,7 +124,7 @@ $block-inserter-search-height: 38px;
 }
 
 .block-editor-inserter__child-blocks {
-	padding: 0 $grid-size-large;
+	padding: 0 $grid-unit-20;
 }
 
 .block-editor-inserter__parent-block-header {
@@ -136,7 +136,7 @@ $block-inserter-search-height: 38px;
 	}
 
 	.block-editor-block-icon {
-		margin-right: $grid-size;
+		margin-right: $grid-unit-10;
 	}
 }
 
