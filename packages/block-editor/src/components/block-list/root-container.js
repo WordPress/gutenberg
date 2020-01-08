@@ -9,7 +9,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import useMultiSelection from './use-multi-selection';
 import { getBlockClientId } from '../../utils/dom';
-import useInsertionPoint from './insertion-point';
+import InsertionPoint from './insertion-point';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -77,24 +77,22 @@ export default function RootContainer( { children, className } ) {
 		}
 	}
 
-	const { onMouseMove, InsertionPoint } = useInsertionPoint( {
-		className,
-		isMultiSelecting,
-		selectedBlockClientId,
-	} );
-
-	return <>
-		{ InsertionPoint && <InsertionPoint /> }
-		<div
-			ref={ ref }
+	return (
+		<InsertionPoint
 			className={ className }
-			onFocus={ onFocus }
-			onDragStart={ onDragStart }
-			onMouseMove={ onMouseMove }
+			isMultiSelecting={ isMultiSelecting }
+			selectedBlockClientId={ selectedBlockClientId }
 		>
-			<Context.Provider value={ onSelectionStart }>
-				{ children }
-			</Context.Provider>
-		</div>
-	</>;
+			<div
+				ref={ ref }
+				className={ className }
+				onFocus={ onFocus }
+				onDragStart={ onDragStart }
+			>
+				<Context.Provider value={ onSelectionStart }>
+					{ children }
+				</Context.Provider>
+			</div>
+		</InsertionPoint>
+	);
 }

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 
 /**
@@ -37,10 +37,11 @@ function selector( select ) {
 	return select( 'core/block-editor' ).getBlockRootClientId;
 }
 
-export default function useInsertionPoint( {
+export default function InsertionPoint( {
 	className,
 	isMultiSelecting,
 	selectedBlockClientId,
+	children,
 } ) {
 	const getBlockRootClientId = useSelect( selector, [] );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
@@ -88,50 +89,39 @@ export default function useInsertionPoint( {
 		setInserterRootClientId( getBlockRootClientId( clientId ) );
 	}
 
-	const InsertionPoint = useCallback( () => {
-		return (
-			<Popover
-				noArrow
-				animate={ false }
-				anchorRef={ inserterElement }
-				position="top right left"
-				focusOnMount={ false }
-				className="block-editor-block-list__block-popover"
-				__unstableSlotName="block-toolbar"
-			>
-				<div className="block-editor-block-list__insertion-point" style={ { width: inserterElement.offsetWidth } }>
-					<Indicator clientId={ inserterClientId } rootClientId={ inserterRootClientId } />
-					<div
-						onFocus={ () => setIsInserterForced( true ) }
-						onBlur={ () => setIsInserterForced( false ) }
-						// While ideally it would be enough to capture the
-						// bubbling focus event from the Inserter, due to the
-						// characteristics of click focusing of `button`s in
-						// Firefox and Safari, it is not reliable.
-						//
-						// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
-						tabIndex={ -1 }
-						className="block-editor-block-list__insertion-point-inserter"
-					>
-						<Inserter
-							rootClientId={ inserterRootClientId }
-							clientId={ inserterClientId }
-						/>
-					</div>
+	return <>
+		{ ! isMultiSelecting && ( isInserterShown || isInserterForced ) && <Popover
+			noArrow
+			animate={ false }
+			anchorRef={ inserterElement }
+			position="top right left"
+			focusOnMount={ false }
+			className="block-editor-block-list__block-popover"
+			__unstableSlotName="block-toolbar"
+		>
+			<div className="block-editor-block-list__insertion-point" style={ { width: inserterElement.offsetWidth } }>
+				<Indicator clientId={ inserterClientId } rootClientId={ inserterRootClientId } />
+				<div
+					onFocus={ () => setIsInserterForced( true ) }
+					onBlur={ () => setIsInserterForced( false ) }
+					// While ideally it would be enough to capture the
+					// bubbling focus event from the Inserter, due to the
+					// characteristics of click focusing of `button`s in
+					// Firefox and Safari, it is not reliable.
+					//
+					// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+					tabIndex={ -1 }
+					className="block-editor-block-list__insertion-point-inserter"
+				>
+					<Inserter
+						rootClientId={ inserterRootClientId }
+						clientId={ inserterClientId }
+					/>
 				</div>
-			</Popover>
-		);
-	}, [ inserterClientId ] );
-
-	const props = {};
-
-	if ( ! isInserterForced && ! isMultiSelecting ) {
-		props.onMouseMove = onMouseMove;
-	}
-
-	if ( ! isMultiSelecting && ( isInserterShown || isInserterForced ) ) {
-		props.InsertionPoint = InsertionPoint;
-	}
-
-	return props;
+			</div>
+		</Popover> }
+		<div onMouseMove={ ! isInserterForced && ! isMultiSelecting ? onMouseMove : undefined }>
+			{ children }
+		</div>
+	</>;
 }
