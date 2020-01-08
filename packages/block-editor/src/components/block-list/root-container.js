@@ -58,7 +58,7 @@ export default function RootContainer( { children, className } ) {
 	 * @param {WPSyntheticEvent} event
 	 */
 	function onFocus( event ) {
-		if ( hasMultiSelection ) {
+		if ( hasMultiSelection || event.defaultPrevented ) {
 			return;
 		}
 

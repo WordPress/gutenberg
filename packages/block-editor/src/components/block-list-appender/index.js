@@ -15,8 +15,8 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 
-function stopPropagation( event ) {
-	event.stopPropagation();
+function preventDefault( event ) {
+	event.preventDefault();
 }
 
 function BlockListAppender( {
@@ -65,9 +65,9 @@ function BlockListAppender( {
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
-			// Prevent the block from being selected when the appender is
-			// clicked.
-			onFocus={ stopPropagation }
+			// Prevent the default behaviour of selecting the block when the
+			// appender is clicked.
+			onFocus={ preventDefault }
 			className="block-list-appender"
 		>
 			{ appender }
