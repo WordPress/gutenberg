@@ -1,6 +1,11 @@
 1.20.0
 ------
 * Fix bug where image placeholders would sometimes not be shown
+* Introduce new Stepper component, used in the Spacer block to select the block's height
+* Hide image size selection options when image is a url
+* Fix crash on undo
+* Style fixes on the navigation UI
+* [iOS] Fix focus issue
 
 1.19.0
 ------
