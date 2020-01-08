@@ -35,18 +35,18 @@
 	}
 
 	// Make room for toolbar.
-	padding-top: $block-controls-height + $grid-size;
+	padding-top: $block-controls-height + $grid-unit-10;
 }
 
 // Exit Code Editor toolbar.
 .edit-post-text-editor__toolbar {
 	position: absolute;
-	top: $grid-size;
+	top: $grid-unit-10;
 	left: 0;
 	right: 0;
 	height: $block-controls-height;
 	line-height: $block-controls-height;
-	padding: 0 $grid-size 0 $grid-size-large;
+	padding: 0 $grid-unit-10 0 $grid-unit-20;
 	display: flex;
 
 	h2 {
@@ -61,10 +61,10 @@
 }
 
 .edit-post-text-editor__body {
-	max-width: calc(100% - #{$grid-size-large * 2});
-	margin-left: $grid-size-large;
-	margin-right: $grid-size-large;
-	padding-top: $grid-size * 5;
+	max-width: calc(100% - #{$grid-unit-20 * 2});
+	margin-left: $grid-unit-20;
+	margin-right: $grid-unit-20;
+	padding-top: $grid-unit-50;
 
 	@include break-small() {
 		max-width: $content-width;

@@ -29,7 +29,7 @@
 }
 
 .components-menu-item__info {
-	margin-top: $grid-size-small;
+	margin-top: $grid-unit-05;
 	font-size: $default-font-size - 1px;
 	color: $dark-gray-300;
 }
@@ -39,7 +39,7 @@
 	color: $dark-gray-300;
 	margin-right: 0;
 	margin-left: auto;
-	padding-left: $grid-size;
+	padding-left: $grid-unit-10;
 
 	// Hide the keyboard shortcuts on mobile, because they aren't super-useful
 	// for most mobile users and it frees up screen space for any item

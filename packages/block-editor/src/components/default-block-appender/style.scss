@@ -84,7 +84,7 @@
 // Left side.
 .block-editor-block-list__empty-block-inserter,
 .block-editor-default-block-appender .block-editor-inserter {
-	right: $grid-size; // Show to the right on mobile.
+	right: $grid-unit-10; // Show to the right on mobile.
 
 	@include break-small {
 		display: flex;

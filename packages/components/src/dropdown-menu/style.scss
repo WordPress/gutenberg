@@ -4,7 +4,7 @@
 
 .components-dropdown-menu__menu {
 	width: 100%;
-	padding: ($grid-size - $border-width) 0;
+	padding: ($grid-unit-10 - $border-width) 0;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
@@ -15,7 +15,7 @@
 		padding: 6px;
 		outline: none;
 		cursor: pointer;
-		margin-bottom: $grid-size-small;
+		margin-bottom: $grid-unit-05;
 
 		&.has-separator {
 			margin-top: 6px;
@@ -43,7 +43,7 @@
 			padding: 2px;
 			width: $icon-button-size-small;
 			height: $icon-button-size-small;
-			margin: -1px $grid-size -1px 0;
+			margin: -1px $grid-unit-10 -1px 0;
 		}
 	}
 

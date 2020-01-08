@@ -108,14 +108,15 @@
 	// and any border inside the block itself.
 	&:focus:not(.is-reusable) > [data-block]::after {
 		position: absolute;
+		z-index: 1;
 		pointer-events: none;
 		content: "";
 		top: 0;
 		bottom: 0;
 		left: 0;
 		right: 0;
-		border: 1px solid color($theme-color);
-		z-index: 1;
+		border: 2px solid color($theme-color);
+		border-radius: $radius-block-ui;
 	}
 
 	.is-navigate-mode &.is-selected::before {
@@ -321,7 +322,7 @@
 	.block-editor-block-list__layout {
 		.block-editor-default-block-appender .block-editor-inserter {
 			left: auto;
-			right: $grid-size;
+			right: $grid-unit-10;
 		}
 	}
 }
@@ -331,7 +332,7 @@
  */
 
 .block-editor-block-list .block-editor-inserter {
-	margin: $grid-size;
+	margin: $grid-unit-10;
 	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
 }
@@ -445,19 +446,14 @@
 /**
  * Block Toolbar when contextual.
  */
+
 .block-editor-block-contextual-toolbar {
-	.block-editor-block-toolbar {
-		width: 100%;
-
-		// Hide right border on desktop, where the .components-toolbar instead has a right border.
-		border-right: none;
-	}
-
 	// Adapt the height of the toolbar items.
 	.components-toolbar {
-		height: $block-toolbar-height + 1px;
-		border-top: $border-width solid $border-color;
-		border-bottom: $border-width solid $border-color;
+		height: $block-toolbar-height;
+		background: none;
+		margin-top: -$border-width;
+		margin-left: -$border-width;
 
 		// Ensure the icon buttons remain square.
 		.components-button.has-icon:not(.has-text) {
@@ -471,9 +467,11 @@
 	}
 }
 
+
 /**
  * Block Label for Navigation/Selection Mode
  */
+
 .block-editor-block-list__breadcrumb {
 	display: block;
 	line-height: 1;
@@ -485,8 +483,8 @@
 		border: $border-width solid $blue-medium-focus;
 		height: $icon-button-size + 2 * $border-width;
 		font-size: $default-font-size;
-		padding-left: $grid-size;
-		padding-right: $grid-size;
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
 
 		.components-button {
 			box-shadow: none;
@@ -548,10 +546,21 @@
 			pointer-events: all;
 		}
 
+		// Position the breacrumb. @todo: style for G2
 		.block-editor-block-contextual-toolbar,
 		.block-editor-block-list__breadcrumb {
 			margin-bottom: $block-padding - $border-width;
 			margin-left: - $block-padding;
+		}
+
+		// Position the block toolbar. @todo: should mirror the breadcrumb
+		.block-editor-block-contextual-toolbar {
+			margin-bottom: $grid-unit-20;
+
+			// @todo: This needs to be adjusted when the toolbar becomes detached and aware of left/right circumstances.
+			// Additionally, it should position the block transform dialog as the left margin of a block. It currently
+			// positions instead, the mover control.
+			margin-left: -$grid-unit-60;
 		}
 
 		.block-editor-block-contextual-toolbar[data-align="full"],

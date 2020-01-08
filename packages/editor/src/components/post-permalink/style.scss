@@ -3,7 +3,7 @@
 	align-items: center;
 	flex-wrap: wrap;
 	background: $white;
-	padding: $grid-size $grid-size 0;
+	padding: $grid-unit-10 $grid-unit-10 0;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	height: 40px;
@@ -18,7 +18,7 @@
 	margin-left: -$block-padding - $border-width; // This hides the border off the edge of the screen.
 	margin-right: -$block-padding - $border-width;
 	@include break-mobile() {
-		padding: $grid-size-small;
+		padding: $grid-unit-05;
 	}
 	@include break-small() {
 		margin-left: -$border-width;
@@ -26,7 +26,7 @@
 	}
 	// Increase specificity to override margins set on label element.
 	&.editor-post-permalink > * {
-		margin-bottom: $grid-size;
+		margin-bottom: $grid-unit-10;
 
 		@include break-mobile() {
 			margin-bottom: 0;

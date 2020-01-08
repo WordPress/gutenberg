@@ -99,14 +99,14 @@
 			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 			@include break-small() {
 				&:nth-child(even) {
-					margin-left: calc(#{$grid-size-large * 2});
+					margin-left: calc(#{$grid-unit-20 * 2});
 				}
 			}
 
 			// When columns are in a single row, add space before all except the first.
 			@include break-medium() {
 				&:not(:first-child) {
-					margin-left: calc(#{$grid-size-large * 2});
+					margin-left: calc(#{$grid-unit-20 * 2});
 				}
 			}
 

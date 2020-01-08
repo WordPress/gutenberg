@@ -38,7 +38,7 @@
 		// Add space between the multiple columns. Themes can customize this if they wish to work differently.
 		// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 		&:nth-child(even) {
-			margin-left: $grid-size-large * 2;
+			margin-left: $grid-unit-20 * 2;
 		}
 	}
 
@@ -62,7 +62,7 @@
 
 		// When columns are in a single row, add space before all except the first.
 		&:not(:first-child) {
-			margin-left: $grid-size-large * 2;
+			margin-left: $grid-unit-20 * 2;
 		}
 	}
 }

@@ -1,6 +1,6 @@
 .edit-post-header {
 	height: $header-height;
-	padding: $grid-size-small 2px;
+	padding: $grid-unit-05 2px;
 	background: $white;
 	display: flex;
 	flex-wrap: wrap;
@@ -16,7 +16,7 @@
 	}
 
 	@include break-small {
-		padding: $grid-size;
+		padding: $grid-unit-10;
 	}
 
 	// Some browsers, most notably IE11, honor an older version of the flexbox spec
