@@ -26,7 +26,7 @@ import { createLinkFormat, isValidHref } from './utils';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
-const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
+export const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
 	const anchorRef = useMemo( () => {
 		const selection = window.getSelection();
 
