@@ -212,6 +212,14 @@ function gutenberg_find_template( $template_file ) {
 		}
 	}
 
+	if ( isset( $_GET['_wp-find-template'] ) ) {
+		if ( $current_template_post ) {
+			wp_send_json_success( $current_template_post );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
+		}
+	}
+
 	if ( $current_template_post ) {
 		if ( is_admin() ) {
 			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
