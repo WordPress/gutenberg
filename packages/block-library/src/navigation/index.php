@@ -12,7 +12,7 @@
  * @param  array $attributes Navigation block attributes.
  * @return array Colors CSS classes and inline styles.
  */
-function build_css_colors( $attributes ) {
+function gutenberg_build_color_attributes( $attributes ) {
 	// CSS classes.
 	$colors = array(
 		'css_classes'   => array(),
@@ -76,8 +76,8 @@ function build_css_font_sizes( $attributes ) {
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_navigation( $attributes, $content, $block ) {
-	$colors          = build_css_colors( $attributes );
+function gutenberg_render_block_navigation( $attributes, $content, $block ) {
+	$colors          = gutenberg_build_color_attributes( $attributes );
 	$font_sizes      = build_css_font_sizes( $attributes );
 	$classes         = array_merge(
 		$colors['css_classes'],
@@ -96,7 +96,7 @@ function render_block_navigation( $attributes, $content, $block ) {
 		'<nav %1$s %2$s>%3$s</nav>',
 		$class_attribute,
 		$style_attribute,
-		build_navigation_html( $block, $colors, $font_sizes )
+		gutenberg_build_navigation_markup( $block, $colors, $font_sizes )
 	);
 }
 
@@ -109,7 +109,7 @@ function render_block_navigation( $attributes, $content, $block ) {
  *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function build_navigation_html( $block, $colors, $font_sizes ) {
+function gutenberg_build_navigation_markup( $block, $colors, $font_sizes ) {
 	$html            = '';
 	$classes         = array_merge(
 		$colors['css_classes'],
@@ -148,7 +148,7 @@ function build_navigation_html( $block, $colors, $font_sizes ) {
 		// End anchor tag content.
 
 		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
-			$html .= build_navigation_html( $block, $colors, $font_sizes );
+			$html .= gutenberg_build_navigation_markup( $block, $colors, $font_sizes );
 		}
 
 		$html .= '</li>';
@@ -159,7 +159,7 @@ function build_navigation_html( $block, $colors, $font_sizes ) {
 /**
  * Register the navigation block.
  *
- * @uses render_block_navigation()
+ * @uses gutenberg_render_block_navigation()
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation() {
@@ -188,7 +188,7 @@ function register_block_core_navigation() {
 				),
 			),
 
-			'render_callback' => 'render_block_navigation',
+			'render_callback' => 'gutenberg_render_block_navigation',
 		)
 	);
 }
