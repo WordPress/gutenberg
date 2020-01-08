@@ -14,8 +14,6 @@ import {
 import {
 	Animate,
 	ClipboardButton,
-	Button,
-	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -23,9 +21,8 @@ import { withSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	BlockIcon,
-	MediaUpload,
-	MediaUploadCheck,
 	MediaPlaceholder,
+	MediaReplaceFlow,
 	RichText,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
@@ -151,7 +148,6 @@ class FileEdit extends Component {
 			textLinkTarget,
 			showDownloadButton,
 			downloadButtonText,
-			id,
 		} = attributes;
 		const { hasError, showCopyConfirmation } = this.state;
 		const attachmentPage = media && media.link;
@@ -189,22 +185,12 @@ class FileEdit extends Component {
 					} }
 				/>
 				<BlockControls>
-					<MediaUploadCheck>
-						<ToolbarGroup>
-							<MediaUpload
-								onSelect={ this.onSelectFile }
-								value={ id }
-								render={ ( { open } ) => (
-									<Button
-										className="components-toolbar__control"
-										label={ __( 'Edit file' ) }
-										onClick={ open }
-										icon="edit"
-									/>
-								) }
-							/>
-						</ToolbarGroup>
-					</MediaUploadCheck>
+					<MediaReplaceFlow
+						mediaURL={ href }
+						accept="*"
+						onSelect={ this.onSelectFile }
+						onError={ this.onUploadError }
+					/>
 				</BlockControls>
 				<Animate type={ isBlobURL( href ) ? 'loading' : null }>
 					{ ( { className: animateClassName } ) => (

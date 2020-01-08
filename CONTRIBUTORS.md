@@ -142,3 +142,4 @@ This list is manually curated to include valuable contributions by volunteers th
 | @mkevins | |
 | @SergioEstevao | |
 | @mzorz | @mzorz |
+| @akkspros | @passoniate |

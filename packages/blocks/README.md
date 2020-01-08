@@ -627,6 +627,15 @@ _Returns_
 
 -   `Array`: A list of blocks.
 
+<a name="registerBlockCollection" href="#registerBlockCollection">#</a> **registerBlockCollection**
+
+Registers a new block collection to group blocks in the same namespace in the inserter.
+
+_Parameters_
+
+-   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace
+-   _settings_ `Object`: An object composed of a title to show in the inserter, and an icon to show in the inserter
+
 <a name="registerBlockStyle" href="#registerBlockStyle">#</a> **registerBlockStyle**
 
 Registers a new block style variation for the given block.

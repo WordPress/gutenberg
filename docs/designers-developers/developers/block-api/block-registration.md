@@ -27,7 +27,7 @@ registerBlockType( 'my-plugin/book', {} );
 
 A block requires a few properties to be specified before it can be registered successfully. These are defined through a configuration object, which includes the following:
 
-#### Title
+#### title
 
 * **Type:** `String`
 
@@ -38,7 +38,7 @@ This is the display title for your block, which can be translated with our trans
 title: __( 'Book' )
 ```
 
-#### Description (optional)
+#### description (optional)
 
 * **Type:** `String`
 
@@ -48,7 +48,7 @@ This is a short description for your block, which can be translated with our tra
 description: __( 'Block showing a Book card.' )
 ```
 
-#### Category
+#### category
 
 * **Type:** `String` [ common | formatting | layout | widgets | embed ]
 
@@ -69,7 +69,7 @@ category: 'widgets',
 
 Plugins and Themes can also register [custom block categories](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories).
 
-#### Icon (optional)
+#### icon (optional)
 
 * **Type:** `String` | `Object`
 
@@ -100,7 +100,7 @@ icon: {
 } ,
 ```
 
-#### Keywords (optional)
+#### keywords (optional)
 
 * **Type:** `Array`
 
@@ -112,7 +112,7 @@ Sometimes a block could have aliases that help users discover it while searching
 keywords: [ __( 'image' ), __( 'photo' ), __( 'pics' ) ],
 ```
 
-#### Styles (optional)
+#### styles (optional)
 
 * **Type:** `Array`
 
@@ -140,7 +140,7 @@ styles: [
 
 Plugins and Themes can also register [custom block style](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) for existing blocks.
 
-#### Attributes (optional)
+#### attributes (optional)
 
 * **Type:** `Object`
 
@@ -168,7 +168,7 @@ attributes: {
 
 * **See: [Attributes](/docs/designers-developers/developers/block-api/block-attributes.md).**
 
-#### Example (optional)
+#### example (optional)
 
 * **Type:** `Object`
 
@@ -188,7 +188,7 @@ example: {
 
 If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
 
-#### Transforms (optional)
+#### transforms (optional)
 
 * **Type:** `Array`
 
@@ -652,4 +652,39 @@ By default all blocks can be converted to a reusable block. If supports reusable
 ```js
 // Don't allow the block to be converted into a reusable block.
 reusable: false,
+```
+
+## Block Collections
+
+## `registerBlockCollection`
+
+* **Type:** `Function`
+
+Blocks can be added to collections, grouping together all blocks from the same origin
+
+`registerBlockCollection` takes two parameters, `namespace` and an object of settings including `title` and `icon`.
+
+### Namespace
+
+* **Type:** `String`
+
+This should match the namespace declared in the block name; the name of your plugin or theme.
+
+### Settings
+
+#### Title
+
+* **Type:** `String`
+
+This will display in the block inserter section, which will list all blocks in this collection.
+
+#### Icon
+
+* **Type:** `Object`
+
+(Optional) An icon to display alongside the title in the block inserter.
+
+```js
+// Registering a block collection
+registerBlockCollection( 'my-plugin', { title: 'My Plugin' } );
 ```

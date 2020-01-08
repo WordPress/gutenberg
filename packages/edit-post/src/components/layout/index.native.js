@@ -129,10 +129,10 @@ class Layout extends Component {
 						parentHeight={ this.state.rootViewHeight }
 						style={ toolbarKeyboardAvoidingViewStyle }
 					>
+						{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
 						<Header />
 						<BottomSheetSettings />
 					</KeyboardAvoidingView> ) }
-				{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
 			</SafeAreaView>
 		);
 	}
