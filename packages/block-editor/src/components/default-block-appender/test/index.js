@@ -14,12 +14,6 @@ describe( 'DefaultBlockAppender', () => {
 		expect( onAppend ).toHaveBeenCalledWith();
 	};
 
-	it( 'should render nothing if not visible', () => {
-		const wrapper = shallow( <DefaultBlockAppender /> );
-
-		expect( wrapper.type() ).toBe( null );
-	} );
-
 	it( 'should match snapshot', () => {
 		const onAppend = jest.fn();
 		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );

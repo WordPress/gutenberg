@@ -20,7 +20,7 @@ import { useRef } from '@wordpress/element';
 import Inserter from '../inserter';
 import useBlockDropZone from '../block-drop-zone';
 
-export function Appender( {
+export function DefaultBlockAppender( {
 	onAppend,
 	showPrompt,
 	placeholder,
@@ -74,7 +74,7 @@ export function Appender( {
 	);
 }
 
-export function DefaultBlockAppender( {
+function DefaultBlockAppenderWrapper( {
 	isLocked,
 	isVisible,
 	onAppend,
@@ -87,7 +87,7 @@ export function DefaultBlockAppender( {
 	}
 
 	return (
-		<Appender
+		<DefaultBlockAppender
 			onAppend={ onAppend }
 			showPrompt={ showPrompt }
 			placeholder={ placeholder }
@@ -127,4 +127,4 @@ export default compose(
 			},
 		};
 	} ),
-)( DefaultBlockAppender );
+)( DefaultBlockAppenderWrapper );
