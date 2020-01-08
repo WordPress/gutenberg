@@ -394,15 +394,6 @@ export default class EditorPage {
 		return this.getBlockAtPosition( position, this.galleryBlockName );
 	}
 
-	/*
-	async selectEmptyGalleryBlock( block: wd.PromiseChainWebdriver.Element ) {
-		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Gallery block. Empty"]`;
-		const galleryBlockInnerElement = await this.driver.elementByXPath( blockLocator );
-		await galleryBlockInnerElement.click();
-	}
-	*/
-
 	async removeGalleryBlockAtPosition( position: number ) {
 		return await this.removeBlockAtPosition( position, this.galleryBlockName );
 	}
