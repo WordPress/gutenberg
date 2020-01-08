@@ -2,18 +2,21 @@
  * External dependencies
  */
 import { last } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
+import useBlockDropZone from '../block-drop-zone';
 
 function stopPropagation( event ) {
 	event.stopPropagation();
@@ -26,6 +29,12 @@ function BlockListAppender( {
 	isLocked,
 	renderAppender: CustomAppender,
 } ) {
+	const ref = useRef();
+	const { position } = useBlockDropZone( {
+		element: ref,
+		rootClientId,
+	} );
+
 	if ( isLocked || CustomAppender === false ) {
 		return null;
 	}
@@ -68,7 +77,11 @@ function BlockListAppender( {
 			// Prevent the block from being selected when the appender is
 			// clicked.
 			onFocus={ stopPropagation }
-			className="block-list-appender"
+			ref={ ref }
+			className={ classnames( 'block-list-appender', {
+				'is-dragging-close-to-top': position && position.y === 'top',
+				'is-dragging-close-to-bottom': position && position.y === 'bottom',
+			} ) }
 		>
 			{ appender }
 		</div>

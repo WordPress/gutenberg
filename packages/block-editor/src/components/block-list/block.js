@@ -309,8 +309,8 @@ function BlockListBlock( {
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
 			'has-toolbar-captured': hasAncestorCapturingToolbars,
-			'is-close-to-top': position && position.y === 'top',
-			'is-close-to-bottom': position && position.y === 'bottom',
+			'is-dragging-close-to-top': position && position.y === 'top',
+			'is-dragging-close-to-bottom': position && position.y === 'bottom',
 		},
 		className
 	);

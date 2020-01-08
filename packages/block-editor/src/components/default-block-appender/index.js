@@ -2,7 +2,6 @@
  * External dependencies
  */
 import TextareaAutosize from 'react-autosize-textarea';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -12,25 +11,23 @@ import { compose } from '@wordpress/compose';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Inserter from '../inserter';
-import useBlockDropZone from '../block-drop-zone';
 
 export function DefaultBlockAppender( {
+	isLocked,
+	isVisible,
 	onAppend,
 	showPrompt,
 	placeholder,
 	rootClientId,
 } ) {
-	const ref = useRef();
-	const { position } = useBlockDropZone( {
-		element: ref,
-		rootClientId,
-	} );
+	if ( isLocked || ! isVisible ) {
+		return null;
+	}
 
 	const value = decodeEntities( placeholder ) || __( 'Start writing or type / to choose a block' );
 
@@ -51,15 +48,8 @@ export function DefaultBlockAppender( {
 
 	return (
 		<div
-			ref={ ref }
 			data-root-client-id={ rootClientId || '' }
-			className={ classnames(
-				'wp-block block-editor-default-block-appender',
-				{
-					'is-close-to-top': position && position.y === 'top',
-					'is-close-to-bottom': position && position.y === 'bottom',
-				}
-			) }
+			className="wp-block block-editor-default-block-appender"
 		>
 			<TextareaAutosize
 				role="button"
@@ -71,28 +61,6 @@ export function DefaultBlockAppender( {
 			/>
 			<Inserter rootClientId={ rootClientId } position="top right" isAppender />
 		</div>
-	);
-}
-
-function DefaultBlockAppenderWrapper( {
-	isLocked,
-	isVisible,
-	onAppend,
-	showPrompt,
-	placeholder,
-	rootClientId,
-} ) {
-	if ( isLocked || ! isVisible ) {
-		return null;
-	}
-
-	return (
-		<DefaultBlockAppender
-			onAppend={ onAppend }
-			showPrompt={ showPrompt }
-			placeholder={ placeholder }
-			rootClientId={ rootClientId }
-		/>
 	);
 }
 
@@ -127,4 +95,4 @@ export default compose(
 			},
 		};
 	} ),
-)( DefaultBlockAppenderWrapper );
+)( DefaultBlockAppender );

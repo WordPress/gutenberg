@@ -153,11 +153,11 @@
 		}
 	}
 
-	&.is-close-to-top::before {
+	&.is-dragging-close-to-top::before {
 		border-top: 3px solid theme(primary);
 	}
 
-	&.is-close-to-bottom::before {
+	&.is-dragging-close-to-bottom::before {
 		border-bottom: 3px solid theme(primary);
 	}
 }
