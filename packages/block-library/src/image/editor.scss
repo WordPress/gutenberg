@@ -40,6 +40,28 @@
 	z-index: z-index(".block-library-image__resize-handlers");
 }
 
+// Limit width of image to size of block
+.block-editor-block-list__block[data-type="core/image"] {
+	div {
+		max-width: inherit;
+
+		.wp-block-image {
+			max-width: inherit;
+
+			div {
+				max-width: inherit;
+
+				.components-resizable-box__container {
+					max-width: inherit !important;
+					max-height: inherit !important;
+					// transform: scale(1, 1/attr(data-ratio));
+				}
+			}
+		}
+	}
+}
+
+
 .block-editor-block-list__block[data-type="core/image"][data-align="center"] {
 	.wp-block-image {
 		margin-left: auto;

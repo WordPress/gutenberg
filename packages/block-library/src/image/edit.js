@@ -583,7 +583,7 @@ export class ImageEdit extends Component {
 							// The following variable adds a buffer to this vanilla style, so 3rd party themes have some wiggleroom.
 							// This does, in most cases, allow you to scale the image beyond the width of the main column, though not infinitely.
 							// @todo It would be good to revisit this once a content-width variable becomes available.
-							const maxWidthBuffer = maxWidth * 2.5;
+							const maxWidthBuffer = maxWidth;
 
 							let showRightHandle = false;
 							let showLeftHandle = false;
