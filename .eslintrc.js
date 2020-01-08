@@ -35,6 +35,7 @@ module.exports = {
 	],
 	plugins: [
 		'import',
+		'markdown',
 	],
 	globals: {
 		wp: 'off',

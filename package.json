@@ -189,6 +189,7 @@
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
 		"lint-types": "tsc",
+		"lint-md": "wp-scripts lint-md '**/*.md'",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"publish:check": "lerna updated",

@@ -46,6 +46,7 @@
 		"cross-spawn": "^5.1.0",
 		"decompress-zip": "^0.2.2",
 		"eslint": "^6.1.0",
+		"eslint-plugin-markdown": "1.0.1",
 		"jest": "^24.7.1",
 		"jest-puppeteer": "^4.3.0",
 		"js-yaml": "^3.13.1",
