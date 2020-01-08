@@ -84,30 +84,37 @@ export default function RootContainer( { children, className } ) {
 	const [ inserterRootClientId, setInserterRootClientId ] = useState( null );
 
 	function onMouseMove( event ) {
-		if ( event.target.className === className ) {
-			const rect = event.target.getBoundingClientRect();
-			const offset = event.clientY - rect.top;
-			const afterIndex = Array.from( event.target.children ).find( ( blockEl ) => {
-				return blockEl.offsetTop > offset;
-			} );
-
-			if ( ! afterIndex ) {
-				return;
+		if ( event.target.className !== className ) {
+			if ( isInserterShown ) {
+				setIsInserterShown( false );
 			}
-
-			const clientId = afterIndex.id.slice( 'block-'.length );
-
-			if ( ! clientId ) {
-				return;
-			}
-
-			setIsInserterShown( true );
-			setInserterPosition( afterIndex );
-			setInserterClientId( clientId );
-			setInserterRootClientId( getBlockRootClientId( clientId ) );
-		} else {
-			setIsInserterShown( false );
+			return;
 		}
+
+		if ( isInserterShown ) {
+			return;
+		}
+
+		const rect = event.target.getBoundingClientRect();
+		const offset = event.clientY - rect.top;
+		const afterIndex = Array.from( event.target.children ).find( ( blockEl ) => {
+			return blockEl.offsetTop > offset;
+		} );
+
+		if ( ! afterIndex ) {
+			return;
+		}
+
+		const clientId = afterIndex.id.slice( 'block-'.length );
+
+		if ( ! clientId ) {
+			return;
+		}
+
+		setIsInserterShown( true );
+		setInserterPosition( afterIndex );
+		setInserterClientId( clientId );
+		setInserterRootClientId( getBlockRootClientId( clientId ) );
 	}
 
 	return <>
