@@ -5,6 +5,11 @@ import { useEffect, useRef, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import { getBlockClientId, getBlockDOMNode } from '../../utils/dom';
+
+/**
  * Returns for the deepest node at the start or end of a container node. Ignores
  * any text nodes that only contain HTML formatting whitespace.
  *
@@ -30,35 +35,32 @@ function getDeepestNode( node, type ) {
 	return node;
 }
 
-export default function useMultiSelection( { ref, rootClientId } ) {
-	function selector( select ) {
-		const {
-			getBlockOrder,
-			isSelectionEnabled,
-			isMultiSelecting,
-			getMultiSelectedBlockClientIds,
-			hasMultiSelection,
-			getBlockParents,
-		} = select( 'core/block-editor' );
-
-		return {
-			blockClientIds: getBlockOrder( rootClientId ),
-			isSelectionEnabled: isSelectionEnabled(),
-			isMultiSelecting: isMultiSelecting(),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			hasMultiSelection: hasMultiSelection(),
-			getBlockParents,
-		};
-	}
-
+function selector( select ) {
 	const {
-		blockClientIds,
+		isSelectionEnabled,
+		isMultiSelecting,
+		getMultiSelectedBlockClientIds,
+		hasMultiSelection,
+		getBlockParents,
+	} = select( 'core/block-editor' );
+
+	return {
+		isSelectionEnabled: isSelectionEnabled(),
+		isMultiSelecting: isMultiSelecting(),
+		multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+		hasMultiSelection: hasMultiSelection(),
+		getBlockParents,
+	};
+}
+
+export default function useMultiSelection( ref ) {
+	const {
 		isSelectionEnabled,
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		getBlockParents,
-	} = useSelect( selector, [ rootClientId ] );
+	} = useSelect( selector, [] );
 	const {
 		startMultiSelect,
 		stopMultiSelect,
@@ -78,22 +80,17 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 		}
 
 		const { length } = multiSelectedBlockClientIds;
-		// These must be in the right DOM order.
-		const start = multiSelectedBlockClientIds[ 0 ];
-		const end = multiSelectedBlockClientIds[ length - 1 ];
-		const startIndex = blockClientIds.indexOf( start );
 
-		// The selected block is not in this block list.
-		if ( startIndex === -1 ) {
+		if ( length < 2 ) {
 			return;
 		}
 
-		let startNode = ref.current.querySelector(
-			`[data-block="${ start }"]`
-		);
-		let endNode = ref.current.querySelector(
-			`[data-block="${ end }"]`
-		);
+		// These must be in the right DOM order.
+		const start = multiSelectedBlockClientIds[ 0 ];
+		const end = multiSelectedBlockClientIds[ length - 1 ];
+
+		let startNode = getBlockDOMNode( start );
+		let endNode = getBlockDOMNode( end );
 
 		const selection = window.getSelection();
 		const range = document.createRange();
@@ -112,7 +109,6 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 		hasMultiSelection,
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
-		blockClientIds,
 		selectBlock,
 	] );
 
@@ -124,16 +120,7 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 			return;
 		}
 
-		let { focusNode } = selection;
-		let clientId;
-
-		// Find the client ID of the block where the selection ends.
-		do {
-			focusNode = focusNode.parentElement;
-		} while (
-			focusNode &&
-			! ( clientId = focusNode.getAttribute( 'data-block' ) )
-		);
+		const clientId = getBlockClientId( selection.focusNode );
 
 		if ( startClientId.current === clientId ) {
 			selectBlock( clientId );
