@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, createRef, useContext, useEffect, useState } from '@wordpress/element';
+import { useContext, useEffect, useState, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -40,21 +40,7 @@ export function useDropZone( { element, onFilesDrop, onHTMLDrop, onDrop, isDisab
 		}
 	}, [ isDisabled ] );
 
-	const { isDraggingOverDocument, isDraggingOverElement, position, type } = state;
-	return classnames( {
-		'is-active': ( isDraggingOverDocument || isDraggingOverElement ) && (
-			( type === 'file' && onFilesDrop ) ||
-			( type === 'html' && onHTMLDrop ) ||
-			( type === 'default' && onDrop )
-		),
-		'is-dragging-over-document': isDraggingOverDocument,
-		'is-dragging-over-element': isDraggingOverElement,
-		'is-close-to-top': position && position.y === 'top',
-		'is-close-to-bottom': position && position.y === 'bottom',
-		'is-close-to-left': position && position.x === 'left',
-		'is-close-to-right': position && position.x === 'right',
-		[ `is-dragging-${ type }` ]: !! type,
-	} );
+	return state;
 }
 
 const DropZone = ( props ) => (
@@ -69,73 +55,57 @@ const DropZone = ( props ) => (
 	</DropZoneConsumer>
 );
 
-class DropZoneComponent extends Component {
-	constructor() {
-		super( ...arguments );
+function DropZoneComponent( {
+	label,
+	onFilesDrop,
+	onHTMLDrop,
+	onDrop,
+} ) {
+	const element = useRef();
+	const {
+		isDraggingOverDocument,
+		isDraggingOverElement,
+		position,
+		type,
+	} = useDropZone( { element, onFilesDrop, onHTMLDrop, onDrop } );
 
-		this.dropZone = {
-			element: createRef(),
-			onDrop: this.props.onDrop,
-			onFilesDrop: this.props.onFilesDrop,
-			onHTMLDrop: this.props.onHTMLDrop,
-			setState: this.setState.bind( this ),
-		};
-		this.state = {
-			isDraggingOverDocument: false,
-			isDraggingOverElement: false,
-			position: null,
-			type: null,
-		};
-	}
+	let children;
 
-	componentDidMount() {
-		this.props.addDropZone( this.dropZone );
-	}
-
-	componentWillUnmount() {
-		this.props.removeDropZone( this.dropZone );
-	}
-
-	render() {
-		const { className, label, onFilesDrop, onHTMLDrop, onDrop } = this.props;
-		const { isDraggingOverDocument, isDraggingOverElement, position, type } = this.state;
-		const classes = classnames( 'components-drop-zone', className, {
-			'is-active': ( isDraggingOverDocument || isDraggingOverElement ) && (
-				( type === 'file' && onFilesDrop ) ||
-				( type === 'html' && onHTMLDrop ) ||
-				( type === 'default' && onDrop )
-			),
-			'is-dragging-over-document': isDraggingOverDocument,
-			'is-dragging-over-element': isDraggingOverElement,
-			'is-close-to-top': position && position.y === 'top',
-			'is-close-to-bottom': position && position.y === 'bottom',
-			'is-close-to-left': position && position.x === 'left',
-			'is-close-to-right': position && position.x === 'right',
-			[ `is-dragging-${ type }` ]: !! type,
-		} );
-
-		let children;
-		if ( isDraggingOverElement ) {
-			children = (
-				<div className="components-drop-zone__content">
-					<Dashicon
-						icon="upload"
-						size="40"
-						className="components-drop-zone__content-icon"
-					/>
-					<span className="components-drop-zone__content-text">
-						{ label ? label : __( 'Drop files to upload' ) }
-					</span>
-				</div>
-			);
-		}
-
-		return (
-			<div ref={ this.dropZone.element } className={ classes }>
-				{ children }
+	if ( isDraggingOverElement ) {
+		children = (
+			<div className="components-drop-zone__content">
+				<Dashicon
+					icon="upload"
+					size="40"
+					className="components-drop-zone__content-icon"
+				/>
+				<span className="components-drop-zone__content-text">
+					{ label ? label : __( 'Drop files to upload' ) }
+				</span>
 			</div>
 		);
 	}
+
+	const className = classnames( {
+		'is-active': ( isDraggingOverDocument || isDraggingOverElement ) && (
+			( type === 'file' && onFilesDrop ) ||
+			( type === 'html' && onHTMLDrop ) ||
+			( type === 'default' && onDrop )
+		),
+		'is-dragging-over-document': isDraggingOverDocument,
+		'is-dragging-over-element': isDraggingOverElement,
+		'is-close-to-top': position && position.y === 'top',
+		'is-close-to-bottom': position && position.y === 'bottom',
+		'is-close-to-left': position && position.x === 'left',
+		'is-close-to-right': position && position.x === 'right',
+		[ `is-dragging-${ type }` ]: !! type,
+	} );
+
+	return (
+		<div ref={ element } className={ className }>
+			{ children }
+		</div>
+	);
 }
 
 export default DropZone;

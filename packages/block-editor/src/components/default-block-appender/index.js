@@ -27,7 +27,7 @@ export function Appender( {
 	rootClientId,
 } ) {
 	const ref = useRef();
-	const dropZoneClassName = useBlockDropZone( {
+	const { position } = useBlockDropZone( {
 		element: ref,
 		rootClientId,
 	} );
@@ -55,7 +55,10 @@ export function Appender( {
 			data-root-client-id={ rootClientId || '' }
 			className={ classnames(
 				'wp-block block-editor-default-block-appender',
-				dropZoneClassName,
+				{
+					'is-close-to-top': position && position.y === 'top',
+					'is-close-to-bottom': position && position.y === 'bottom',
+				}
 			) }
 		>
 			<TextareaAutosize

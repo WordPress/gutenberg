@@ -18,13 +18,19 @@ import Inserter from '../inserter';
 
 function ButtonBlockAppender( { rootClientId, className, __experimentalSelectBlockOnInsert: selectBlockOnInsert } ) {
 	const ref = useRef();
-	const dropZoneClassName = useBlockDropZone( {
+	const { position } = useBlockDropZone( {
 		element: ref,
 		rootClientId,
 	} );
 
 	return (
-		<div ref={ ref } className={ dropZoneClassName }>
+		<div
+			ref={ ref }
+			className={ classnames( {
+				'is-close-to-top': position && position.y === 'top',
+				'is-close-to-bottom': position && position.y === 'bottom',
+			} ) }
+		>
 			<Inserter
 				rootClientId={ rootClientId }
 				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }

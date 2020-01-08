@@ -286,7 +286,7 @@ function BlockListBlock( {
 
 	const isDragging = isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
-	const dropZoneClassName = useBlockDropZone( {
+	const { position } = useBlockDropZone( {
 		element: wrapper,
 		clientId,
 		rootClientId,
@@ -309,9 +309,10 @@ function BlockListBlock( {
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
 			'has-toolbar-captured': hasAncestorCapturingToolbars,
+			'is-close-to-top': position && position.y === 'top',
+			'is-close-to-bottom': position && position.y === 'bottom',
 		},
-		className,
-		dropZoneClassName
+		className
 	);
 
 	// Determine whether the block has props to apply to the wrapper.
