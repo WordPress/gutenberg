@@ -169,8 +169,7 @@ class URLInput extends Component {
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
 		if (
-			( ! showSuggestions || ! suggestions.length || loading ) &&
-			this.props.value
+			( ! showSuggestions || ! suggestions.length || loading )
 		) {
 			// In the Windows version of Firefox the up and down arrows don't move the caret
 			// within an input field like they do for Mac Firefox/Chrome/Safari. This causes
@@ -260,7 +259,7 @@ class URLInput extends Component {
 		this.inputRef.current.focus();
 	}
 
-	static getDerivedStateFromProps( { value, disableSuggestions, __experimentalInitialSuggestions: manualSearch }, { showSuggestions, selectedSuggestion } ) {
+	static getDerivedStateFromProps( { value, disableSuggestions, __experimentalInitialSuggestions: manualSearch }, { showSuggestions } ) {
 		let shouldShowSuggestions = showSuggestions;
 
 		const hasValue = value && value.length;
@@ -274,7 +273,6 @@ class URLInput extends Component {
 		}
 
 		return {
-			selectedSuggestion: hasValue ? selectedSuggestion : null,
 			showSuggestions: shouldShowSuggestions,
 		};
 	}
