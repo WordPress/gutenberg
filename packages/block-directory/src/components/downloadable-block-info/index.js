@@ -16,7 +16,11 @@ function DownloadableBlockInfo( { description, activeInstalls, humanizedUpdated 
 					<Icon icon="chart-line" className="label"></Icon>{ sprintf( _n( '%d active installation', '%d active installations', activeInstalls ), activeInstalls ) }
 				</div>
 				<div className="block-directory-downloadable-block-info__column">
-					<strong className="label">{ __( 'Updated: ' ) }</strong> { humanizedUpdated }
+					<Icon icon="update"></Icon>
+					{
+						// translators: %s: Humanized date of last update e.g: "2 months ago".
+						sprintf( __( 'Updated %s' ), humanizedUpdated )
+					}
 				</div>
 			</div>
 		</Fragment>
