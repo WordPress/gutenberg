@@ -9,6 +9,7 @@ import { parse, serialize } from '@wordpress/blocks';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
+	URLPopover,
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
@@ -20,10 +21,11 @@ import {
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
+import NavigateToLink from '../navigate-to-link';
 import Sidebar from '../sidebar';
 
 export default function BlockEditor() {
-	const { settings: _settings } = useEditorContext();
+	const { settings: _settings, setSettings } = useEditorContext();
 	const canUserCreateMedia = useSelect( ( select ) => {
 		const _canUserCreateMedia = select( 'core' ).canUser(
 			'create',
@@ -69,6 +71,15 @@ export default function BlockEditor() {
 		},
 		[ setBlocks, _setContent ]
 	);
+	const setActiveTemplateId = useCallback(
+		( newTemplateId ) =>
+			setSettings( ( prevSettings ) => ( {
+				...prevSettings,
+				templateId: newTemplateId,
+				templateType: 'wp_template',
+			} ) ),
+		[]
+	);
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -77,6 +88,19 @@ export default function BlockEditor() {
 			onChange={ setContent }
 		>
 			<BlockEditorKeyboardShortcuts />
+			<URLPopover.LinkViewer.Fill>
+				{ useCallback(
+					( fillProps ) => (
+						<NavigateToLink
+							{ ...fillProps }
+							templateIds={ settings.templateIds }
+							activeId={ settings.templateId }
+							onActiveIdChange={ setActiveTemplateId }
+						/>
+					),
+					[ settings.templateIds, settings.templateId, setActiveTemplateId ]
+				) }
+			</URLPopover.LinkViewer.Fill>
 			<Sidebar.InspectorFill>
 				<BlockInspector />
 			</Sidebar.InspectorFill>
