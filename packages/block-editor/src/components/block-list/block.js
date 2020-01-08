@@ -353,7 +353,6 @@ function BlockListBlock( {
 			...blockType.getEditWrapperProps( attributes ),
 		};
 	}
-	const blockElementId = `block-${ clientId }`;
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -399,7 +398,7 @@ function BlockListBlock( {
 
 	return (
 		<animated.div
-			id={ blockElementId }
+			id={ clientId }
 			ref={ wrapper }
 			className={ wrapperClassName }
 			data-type={ name }

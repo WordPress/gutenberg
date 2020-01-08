@@ -105,5 +105,5 @@ export function getBlockClientId( node ) {
 		return;
 	}
 
-	return blockNode.id.slice( 'block-'.length );
+	return blockNode.id;
 }
