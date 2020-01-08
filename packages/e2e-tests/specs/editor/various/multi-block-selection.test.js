@@ -302,7 +302,6 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.click( '.components-circular-option-picker__option' );
 		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'ArrowUp' );
 
 		const [ coord1, coord2 ] = await page.evaluate( () => {
 			const elements = Array.from( document.querySelectorAll( '.wp-block-paragraph' ) );
