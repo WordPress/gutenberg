@@ -9,7 +9,9 @@
  * @return {Element} Block DOM node.
  */
 export function getBlockDOMNode( clientId, scope = document ) {
-	return scope.querySelector( '[data-block="' + clientId + '"]' );
+	return scope
+		.getElementById( clientId )
+		.querySelector( '[data-block]' );
 }
 
 export function getBlockPreviewContainerDOMNode( clientId, scope ) {

@@ -472,7 +472,7 @@ function BlockListBlock( {
 				ref={ blockNodeRef }
 				// Only allow selection to be started from a selected block.
 				onMouseLeave={ isSelected ? onMouseLeave : undefined }
-				data-block={ clientId }
+				data-block
 			>
 				<BlockCrashBoundary onError={ onBlockError }>
 					{ isValid && blockEdit }
