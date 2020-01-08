@@ -37,7 +37,7 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
 			// If we're previewing a single block, scale the preview to fit it.
 			if ( blocks.length === 1 ) {
 				const block = blocks[ 0 ];
-				const previewElement = getBlockPreviewContainerDOMNode( block.clientId, containerElement );
+				const previewElement = getBlockPreviewContainerDOMNode( block.clientId );
 				if ( ! previewElement ) {
 					return;
 				}

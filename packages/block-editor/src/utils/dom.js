@@ -4,18 +4,17 @@
  * in cases where isolated behaviors need remote access to a block node.
  *
  * @param {string} clientId Block client ID.
- * @param {Element} scope an optional DOM Element to which the selector should be scoped
  *
  * @return {Element} Block DOM node.
  */
-export function getBlockDOMNode( clientId, scope = document ) {
-	return scope
+export function getBlockDOMNode( clientId ) {
+	return document
 		.getElementById( clientId )
 		.querySelector( '[data-block]' );
 }
 
-export function getBlockPreviewContainerDOMNode( clientId, scope ) {
-	const domNode = getBlockDOMNode( clientId, scope );
+export function getBlockPreviewContainerDOMNode( clientId ) {
+	const domNode = getBlockDOMNode( clientId );
 
 	if ( ! domNode ) {
 		return;
