@@ -120,6 +120,8 @@ export default function __experimentalUseColors(
 		contrastCheckers,
 		panelChildren,
 		targetRef,
+		backgroundColorTargetRef = targetRef,
+		textColorTargetRef = targetRef,
 	} = {
 		panelTitle: __( 'Color Settings' ),
 	},
@@ -220,11 +222,11 @@ export default function __experimentalUseColors(
 		}
 
 		if ( needsColor ) {
-			setDetectedColor( getComputedStyle( targetRef.current ).color );
+			setDetectedColor( getComputedStyle( textColorTargetRef.current ).color );
 		}
 
 		if ( needsBackgroundColor ) {
-			let backgroundColorNode = targetRef.current;
+			let backgroundColorNode = backgroundColorTargetRef.current;
 			let backgroundColor = getComputedStyle( backgroundColorNode )
 				.backgroundColor;
 			while (
