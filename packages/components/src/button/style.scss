@@ -1,21 +1,9 @@
 .components-button {
-	display: inline-flex;
-	text-decoration: none;
-	font-size: $default-font-size;
-	margin: 0;
-	border: 0;
-	cursor: pointer;
-	-webkit-appearance: none;
-	background: none;
-	transition: box-shadow 0.1s linear;
 	@include reduce-motion("transition");
 	height: $icon-button-size;
-	align-items: center;
-	box-sizing: border-box;
-	padding: 0 8px;
-	overflow: hidden;
-	border-radius: 3px;
 	color: $dark-gray-500;
+	border-radius: 3;
+
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-primary):not(.is-tertiary):not(.is-link):hover {
 		@include button-style__hover;
@@ -24,55 +12,35 @@
 	// Default button style
 	&.is-secondary {
 		border-width: $border-width;
-		border-style: solid;
-		white-space: nowrap;
 		color: color(theme(button) shade(6%));
 		border-color: color(theme(button) shade(6%));
-		background: #f3f5f6;
 
 		&:not(:disabled):not([aria-disabled="true"]):hover {
-			background: #f1f1f1;
 			border-color: color(theme(button) shade(25%));
 			color: color(theme(button) shade(25%));
-			text-decoration: none;
 		}
 
 		&:focus:enabled {
-			background: #f3f5f6;
 			color: color(theme(button) shade(25%));
 			border-color: color(theme(button) shade(5%));
 			box-shadow: 0 0 0 $border-width color(theme(button) shade(5%));
-			text-decoration: none;
-
 		}
 
 		&:active:enabled {
-			background: #f3f5f6;
 			color: color(theme(button) shade(5%));
-			border-color: #7e8993;
-			box-shadow: none;
 		}
 
 		&:disabled,
 		&[aria-disabled="true"] {
-			color: #a0a5aa;
-			border-color: #ddd;
-			background: #f7f7f7;
 			text-shadow: 0 $border-width 0 #fff;
-			transform: none;
-			opacity: 1;
 		}
 	}
 
 	&.is-primary {
 		border-width: $border-width;
-		border-style: solid;
-		white-space: nowrap;
 		background: color(theme(button));
 		border-color: color(theme(button));
 		color: $white;
-		text-decoration: none;
-		text-shadow: none;
 
 		&:not(:disabled):not([aria-disabled="true"]):hover,
 		&:focus:enabled {
@@ -101,7 +69,6 @@
 			color: color(theme(button) tint(40%));
 			background: color(theme(button) tint(10%));
 			border-color: color(theme(button) tint(10%));
-			opacity: 1;
 
 			&:focus:enabled {
 				box-shadow:
@@ -131,49 +98,17 @@
 
 	/* Buttons that look like links, for a cross of good semantics with the visual */
 	&.is-link {
-		margin: 0;
-		padding: 0;
-		box-shadow: none;
-		border: 0;
-		border-radius: 0;
-		background: none;
-		outline: none;
-		text-align: left;
-		/* Mimics the default link style in common.css */
-		color: #0073aa;
-		text-decoration: underline;
-		transition-property: border, background, color;
-		transition-duration: 0.05s;
-		transition-timing-function: ease-in-out;
 		@include reduce-motion("transition");
-		height: auto;
-
-		&:not(:disabled):not([aria-disabled="true"]):hover,
-		&:active {
-			color: #00a0d2;
-		}
 
 		&:focus {
-			color: #124964;
 			box-shadow:
 				0 0 0 $border-width #5b9dd9,
 				0 0 2px $border-width rgba(30, 140, 190, 0.8);
 		}
 	}
 
-	/* Link buttons that are red to indicate destructive behavior. */
 	&.is-link.is-destructive {
 		color: $alert-red;
-	}
-
-	&:active {
-		color: inherit;
-	}
-
-	&:disabled,
-	&[aria-disabled="true"] {
-		cursor: default;
-		opacity: 0.3;
 	}
 
 	&:focus:not(:disabled) {
@@ -185,63 +120,16 @@
 	&.is-secondary.is-busy:disabled,
 	&.is-secondary.is-busy[aria-disabled="true"] {
 		animation: components-button__busy-animation 2500ms infinite linear;
-		background-size: 100px 100%;
 		background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px);
-		opacity: 1;
-	}
-
-	&.is-small {
-		height: 24px;
-		line-height: 22px;
-		padding: 0 8px;
-		font-size: 11px;
 	}
 
 	// Buttons that are text-based.
 	&.is-tertiary {
 		color: theme(outlines);
 
-		.dashicon {
-			display: inline-block;
-			flex: 0 0 auto;
-		}
-
-		// Ensure that even SVG icons that don't include the .dashicon class are colored.
-		svg {
-			fill: currentColor;
-			outline: none;
-		}
-
-		&:active:focus:enabled {
-			box-shadow: none;
-		}
-
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			color: color(theme(outlines) shade(25%));
 		}
-	}
-
-	&.has-icon {
-		.dashicon {
-			display: inline-block;
-			flex: 0 0 auto;
-		}
-
-		// Ensure that even SVG icons that don't include the .dashicon class are colored.
-		svg {
-			fill: currentColor;
-			outline: none;
-		}
-
-		&.has-text svg {
-			margin-right: 8px;
-		}
-	}
-
-	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
-	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
-	.screen-reader-text {
-		height: auto;
 	}
 }
 

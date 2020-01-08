@@ -7,7 +7,8 @@ export { useTheme as useTheme } from 'emotion-theming';
 
 const getTheme = ( theme ) => ( {
 	fontSizes: {
-		small: 12,
+		small: 11,
+		default: 13,
 		medium: 18,
 		big: 22,
 	},
