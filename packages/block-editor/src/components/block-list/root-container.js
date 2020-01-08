@@ -22,6 +22,7 @@ function selector( select ) {
 		hasMultiSelection,
 		isMultiSelecting,
 		getBlockRootClientId,
+		isBlockSelected,
 	} = select( 'core/block-editor' );
 
 	return {
@@ -29,6 +30,7 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		isMultiSelecting: isMultiSelecting(),
 		getBlockRootClientId,
+		isBlockSelected,
 	};
 }
 
@@ -54,6 +56,7 @@ export default function RootContainer( { children, className } ) {
 		hasMultiSelection,
 		isMultiSelecting,
 		getBlockRootClientId,
+		isBlockSelected,
 	} = useSelect( selector, [] );
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const onSelectionStart = useMultiSelection( ref );
@@ -103,7 +106,7 @@ export default function RootContainer( { children, className } ) {
 
 		const clientId = element.id.slice( 'block-'.length );
 
-		if ( ! clientId ) {
+		if ( ! clientId || isBlockSelected( clientId ) ) {
 			return;
 		}
 
