@@ -78,8 +78,8 @@ function gutenberg_edit_site_init( $hook ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
 
-	// Get all templates by trigerring `./template-loader.php`'s logic.
-	$template_getters = array(
+	// Get all templates by triggering `./template-loader.php`'s logic.
+	$template_getters  = array(
 		'get_embed_template',
 		'get_404_template',
 		'get_search_template',
