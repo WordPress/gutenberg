@@ -8,15 +8,23 @@ import classnames from 'classnames';
  */
 import { Button, Icon, Tooltip } from '@wordpress/components';
 import { _x, sprintf } from '@wordpress/i18n';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import useBlockDropZone from '../block-drop-zone';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender( { rootClientId, className, __experimentalSelectBlockOnInsert: selectBlockOnInsert } ) {
+	const ref = useRef();
+	const dropZoneClassName = useBlockDropZone( {
+		element: ref,
+		rootClientId,
+	} );
+
 	return (
-		<>
+		<div ref={ ref } className={ dropZoneClassName }>
 			<Inserter
 				rootClientId={ rootClientId }
 				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
@@ -47,7 +55,7 @@ function ButtonBlockAppender( { rootClientId, className, __experimentalSelectBlo
 				} }
 				isAppender
 			/>
-		</>
+		</div>
 	);
 }
 

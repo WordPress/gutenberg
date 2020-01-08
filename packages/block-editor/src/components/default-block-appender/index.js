@@ -2,6 +2,7 @@
  * External dependencies
  */
 import TextareaAutosize from 'react-autosize-textarea';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -11,23 +12,25 @@ import { compose } from '@wordpress/compose';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Inserter from '../inserter';
+import useBlockDropZone from '../block-drop-zone';
 
-export function DefaultBlockAppender( {
-	isLocked,
-	isVisible,
+export function Appender( {
 	onAppend,
 	showPrompt,
 	placeholder,
 	rootClientId,
 } ) {
-	if ( isLocked || ! isVisible ) {
-		return null;
-	}
+	const ref = useRef();
+	const dropZoneClassName = useBlockDropZone( {
+		element: ref,
+		rootClientId,
+	} );
 
 	const value = decodeEntities( placeholder ) || __( 'Start writing or type / to choose a block' );
 
@@ -48,8 +51,12 @@ export function DefaultBlockAppender( {
 
 	return (
 		<div
+			ref={ ref }
 			data-root-client-id={ rootClientId || '' }
-			className="wp-block block-editor-default-block-appender"
+			className={ classnames(
+				'wp-block block-editor-default-block-appender',
+				dropZoneClassName,
+			) }
 		>
 			<TextareaAutosize
 				role="button"
@@ -63,6 +70,29 @@ export function DefaultBlockAppender( {
 		</div>
 	);
 }
+
+export function DefaultBlockAppender( {
+	isLocked,
+	isVisible,
+	onAppend,
+	showPrompt,
+	placeholder,
+	rootClientId,
+} ) {
+	if ( isLocked || ! isVisible ) {
+		return null;
+	}
+
+	return (
+		<Appender
+			onAppend={ onAppend }
+			showPrompt={ showPrompt }
+			placeholder={ placeholder }
+			rootClientId={ rootClientId }
+		/>
+	);
+}
+
 export default compose(
 	withSelect( ( select, ownProps ) => {
 		const { getBlockCount, getBlockName, isBlockValid, getSettings, getTemplateLock } = select( 'core/block-editor' );
