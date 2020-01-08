@@ -152,6 +152,14 @@
 			opacity: 1;
 		}
 	}
+
+	&.is-close-to-top::before {
+		border-top: 3px solid theme(primary);
+	}
+
+	&.is-close-to-bottom::before {
+		border-bottom: 3px solid theme(primary);
+	}
 }
 
 
