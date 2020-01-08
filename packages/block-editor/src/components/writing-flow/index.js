@@ -255,8 +255,8 @@ export default function WritingFlow( { children } ) {
 					}
 				// Allow user to escape out of a multi-selection to a singular
 				// selection of a block via click. This is handled here since
-				// onFocus excludes blocks involved in a multiselection, as
-				// focus can be incurred by starting a multiselection (focus
+				// focus handling excludes blocks when there is multiselection,
+				// as focus can be incurred by starting a multiselection (focus
 				// moved to first block's multi-controls).
 				} else if ( hasMultiSelection ) {
 					selectBlock( clientId );
