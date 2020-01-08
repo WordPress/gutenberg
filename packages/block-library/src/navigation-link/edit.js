@@ -108,6 +108,7 @@ function NavigationLinkEdit( {
 							setAttributes( { description: descriptionValue } );
 						} }
 						label={ __( 'Description' ) }
+						help={ __( 'The description will be displayed in the menu if the current theme supports it.' ) }
 					/>
 				</PanelBody>
 				<PanelBody
