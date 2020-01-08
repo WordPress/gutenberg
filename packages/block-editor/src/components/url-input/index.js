@@ -44,7 +44,8 @@ class URLInput extends Component {
 	}
 
 	componentDidUpdate() {
-		const { showSuggestions, selectedSuggestion } = this.state;
+		const { showSuggestions, selectedSuggestion, suggestions } = this.state;
+		const { __experimentalInitialSuggestions = '', value } = this.props;
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
 		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
@@ -57,6 +58,15 @@ class URLInput extends Component {
 			this.props.setTimeout( () => {
 				this.scrollingIntoView = false;
 			}, 100 );
+		}
+
+		// If there is no search text and no current suggestions
+		// then display the initial suggesitons if provided
+		// (being careful to avoid infinite re-render loop).
+		if ( __experimentalInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length ) ) {
+			this.updateSuggestions( '', {
+				isManualSearch: true,
+			} );
 		}
 	}
 
