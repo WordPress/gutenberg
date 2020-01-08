@@ -79,7 +79,7 @@ export default function RootContainer( { children, className } ) {
 
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
-	const [ inserterPosition, setInserterPosition ] = useState( null );
+	const [ inserterElement, setInserterElement ] = useState( null );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
 	const [ inserterRootClientId, setInserterRootClientId ] = useState( null );
 
@@ -91,28 +91,33 @@ export default function RootContainer( { children, className } ) {
 			return;
 		}
 
-		if ( isInserterShown ) {
-			return;
-		}
-
 		const rect = event.target.getBoundingClientRect();
 		const offset = event.clientY - rect.top;
-		const afterIndex = Array.from( event.target.children ).find( ( blockEl ) => {
+		const element = Array.from( event.target.children ).find( ( blockEl ) => {
 			return blockEl.offsetTop > offset;
 		} );
 
-		if ( ! afterIndex ) {
+		if ( ! element ) {
 			return;
 		}
 
-		const clientId = afterIndex.id.slice( 'block-'.length );
+		const clientId = element.id.slice( 'block-'.length );
 
 		if ( ! clientId ) {
 			return;
 		}
 
+		const elementRect = element.getBoundingClientRect();
+
+		if ( event.clientX > elementRect.right || event.clientX < elementRect.left ) {
+			if ( isInserterShown ) {
+				setIsInserterShown( false );
+			}
+			return;
+		}
+
 		setIsInserterShown( true );
-		setInserterPosition( afterIndex );
+		setInserterElement( element );
 		setInserterClientId( clientId );
 		setInserterRootClientId( getBlockRootClientId( clientId ) );
 	}
@@ -122,7 +127,7 @@ export default function RootContainer( { children, className } ) {
 			<Popover
 				noArrow
 				animate={ false }
-				anchorRef={ inserterPosition }
+				anchorRef={ inserterElement }
 				position="top right left"
 				focusOnMount={ false }
 				className="block-editor-block-list__block-popover"
@@ -133,7 +138,7 @@ export default function RootContainer( { children, className } ) {
 					clientId={ inserterClientId }
 					onFocus={ () => setIsInserterForced( true ) }
 					onBlur={ () => setIsInserterForced( false ) }
-					width={ inserterPosition.offsetWidth }
+					width={ inserterElement.offsetWidth }
 				/>
 			</Popover>
 		}
