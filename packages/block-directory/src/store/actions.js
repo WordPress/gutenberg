@@ -78,6 +78,8 @@ export function* downloadBlock( item, onSuccess, onError ) {
  *
  */
 export function* installBlock( { id, name }, onSuccess, onError ) {
+	yield fetchInstallBlock();
+
 	try {
 		const response = yield apiFetch( {
 			path: '__experimental/block-directory/install',
@@ -94,6 +96,8 @@ export function* installBlock( { id, name }, onSuccess, onError ) {
 	} catch ( error ) {
 		onError( error );
 	}
+
+	yield receiveInstallBlock();
 }
 
 /**
@@ -148,6 +152,28 @@ export function removeInstalledBlockType( item ) {
 	return {
 		type: 'REMOVE_INSTALLED_BLOCK_TYPE',
 		item,
+	};
+}
+
+/**
+ * Returns an action object used to indicate install in progress
+ *
+ */
+export function fetchInstallBlock() {
+	return {
+		type: 'FETCH_INSTALL_BLOCK',
+		isInstalling: true,
+	};
+}
+
+/**
+ * Returns an action object used to indicate install has completed
+ *
+ */
+export function receiveInstallBlock() {
+	return {
+		type: 'RECEIVE_INSTALL_BLOCKS',
+		isInstalling: false,
 	};
 }
 

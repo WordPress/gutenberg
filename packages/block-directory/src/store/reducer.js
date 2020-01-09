@@ -48,6 +48,7 @@ export const downloadableBlocks = (
 export const blockManagement = (
 	state = {
 		installedBlockTypes: [],
+		isInstalling,
 	},
 	action
 ) => {
@@ -66,6 +67,12 @@ export const blockManagement = (
 				installedBlockTypes: state.installedBlockTypes.filter(
 					( blockType ) => blockType.name !== action.item.name
 				),
+			};
+		case 'FETCH_INSTALL_BLOCK' :
+		case 'RECEIVE_INSTALL_BLOCKS':
+			return {
+				...state,
+				isInstalling: action.isInstalling,
 			};
 	}
 	return state;
