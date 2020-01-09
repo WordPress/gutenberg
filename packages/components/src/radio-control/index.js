@@ -35,6 +35,7 @@ export default function RadioControl( { label, className, selected, help, onChan
 						onChange={ onChangeValue }
 						checked={ option.value === selected }
 						aria-describedby={ !! help ? `${ id }__help` : undefined }
+						disabled={ option.disabled }
 					/>
 					<label htmlFor={ `${ id }-${ index }` }>
 						{ option.label }

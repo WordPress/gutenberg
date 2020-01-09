@@ -106,6 +106,7 @@ The value property of the currently selected option.
 An array of objects containing the following properties:
 * `label`: (string) The label to be shown to the user.
 * `value`: (Object) The internal value compared against select and passed to onChange.
+* `disabled`: (boolean) Whether or not the input should have the disabled attribute.
 
 - Type: `Array`
 - Required: No
