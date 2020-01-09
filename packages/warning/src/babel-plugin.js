@@ -3,14 +3,28 @@ const pkg = require( '../package.json' );
 function babelPlugin( { types: t } ) {
 	const seen = Symbol();
 
-	const binaryExpression = t.binaryExpression(
+	const typeofProcessExpression = t.binaryExpression(
 		'!==',
-		t.memberExpression(
-			t.memberExpression( t.identifier( 'process' ), t.identifier( 'env' ), false ),
-			t.identifier( 'NODE_ENV' ),
-			false
-		),
+		t.unaryExpression( 'typeof', t.identifier( 'process' ), false ),
+		t.stringLiteral( 'undefined' )
+	);
+
+	const processEnvExpression = t.memberExpression(
+		t.identifier( 'process' ),
+		t.identifier( 'env' ),
+		false
+	);
+
+	const nodeEnvCheckExpression = t.binaryExpression(
+		'!==',
+		t.memberExpression( processEnvExpression, t.identifier( 'NODE_ENV' ), false ),
 		t.stringLiteral( 'production' )
+	);
+
+	const logicalExpression = t.logicalExpression(
+		'&&',
+		t.logicalExpression( '&&', typeofProcessExpression, processEnvExpression ),
+		nodeEnvCheckExpression
 	);
 
 	return {
@@ -45,11 +59,11 @@ function babelPlugin( { types: t } ) {
 					// Turns this code:
 					// warning(condition, argument, argument);
 					// into this:
-					// process.env.NODE_ENV !== "production" ? warning(condition, argument, argument) : void 0;
+					// typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(condition, argument, argument) : void 0;
 					node[ seen ] = true;
 					path.replaceWith(
 						t.ifStatement(
-							binaryExpression,
+							logicalExpression,
 							t.blockStatement( [ t.expressionStatement( node ) ] )
 						)
 					);

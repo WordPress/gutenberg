@@ -29,7 +29,7 @@ describe( 'babel-plugin', function() {
 			),
 			join(
 				'import warning from "@wordpress/warning";',
-				'process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;'
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;'
 			)
 		);
 	} );
@@ -44,7 +44,7 @@ describe( 'babel-plugin', function() {
 	it( 'should replace warning calls without import declaration with plugin options', () => {
 		compare(
 			'warning(true, "a", "b");',
-			'process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;',
+			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;',
 			{ callee: 'warning' }
 		);
 	} );
@@ -59,9 +59,9 @@ describe( 'babel-plugin', function() {
 			),
 			join(
 				'import warning from "@wordpress/warning";',
-				'process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;',
-				'process.env.NODE_ENV !== "production" ? warning(false, "b", "a") : void 0;',
-				'process.env.NODE_ENV !== "production" ? warning(cond, "c") : void 0;'
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(false, "b", "a") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(cond, "c") : void 0;'
 			)
 		);
 	} );
@@ -76,9 +76,9 @@ describe( 'babel-plugin', function() {
 			),
 			join(
 				'import warn from "@wordpress/warning";',
-				'process.env.NODE_ENV !== "production" ? warn(true, "a", "b") : void 0;',
-				'process.env.NODE_ENV !== "production" ? warn(false, "b", "a") : void 0;',
-				'process.env.NODE_ENV !== "production" ? warn(cond, "c") : void 0;'
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(true, "a", "b") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(false, "b", "a") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(cond, "c") : void 0;'
 			)
 		);
 	} );
@@ -93,9 +93,9 @@ describe( 'babel-plugin', function() {
 			),
 			join(
 				'import warn from "@wordpress/warning";',
-				'process.env.NODE_ENV !== "production" ? warn(true, "a", "b") : void 0;',
-				'process.env.NODE_ENV !== "production" ? warn(false, "b", "a") : void 0;',
-				'process.env.NODE_ENV !== "production" ? warn(cond, "c") : void 0;'
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(true, "a", "b") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(false, "b", "a") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(cond, "c") : void 0;'
 			)
 		);
 	} );
