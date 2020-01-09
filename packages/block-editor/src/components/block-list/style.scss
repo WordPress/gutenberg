@@ -410,7 +410,7 @@
 .block-editor-block-list__insertion-point-inserter,
 .block-editor-block-list__block-popover-inserter {
 	// Show a clickable plus.
-	.block-editor-inserter__toggle {
+	.block-editor-inserter__toggle.components-button {
 		border-radius: 50%;
 		color: $blue-medium-focus;
 		background: $white;
