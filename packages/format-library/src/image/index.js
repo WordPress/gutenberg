@@ -85,7 +85,7 @@ export const image = {
 		}
 
 		render() {
-			const { value, onChange, isObjectActive, activeObjectAttributes } = this.props;
+			const { value, onChange, onFocus, isObjectActive, activeObjectAttributes } = this.props;
 
 			return (
 				<MediaUploadCheck>
@@ -108,6 +108,7 @@ export const image = {
 									alt,
 								},
 							} ) );
+							onFocus();
 						} }
 						onClose={ this.closeModal }
 						render={ ( { open } ) => {

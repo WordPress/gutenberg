@@ -14,11 +14,14 @@ export const bold = {
 	tagName: 'strong',
 	className: null,
 	edit( { isActive, value, onChange, onFocus } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
-		const onClick = () => {
+		function onToggle() {
+			onChange( toggleFormat( value, { type: name } ) );
+		}
+
+		function onClick() {
 			onToggle();
 			onFocus();
-		};
+		}
 
 		return (
 			<>
