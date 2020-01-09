@@ -1,3 +1,11 @@
+function isDev() {
+	return (
+		typeof process !== 'undefined' &&
+		process.env &&
+		process.env.NODE_ENV !== 'production'
+	);
+}
+
 /**
  * Shows a warning with `messages` if `condition` passes and environment is not `production`.
  *
@@ -15,7 +23,7 @@
  * ```
  */
 export default function warning( condition, ...messages ) {
-	if ( process.env.NODE_ENV !== 'production' ) {
+	if ( isDev() ) {
 		if ( ! condition ) {
 			return;
 		}
