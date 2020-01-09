@@ -79,16 +79,15 @@ export default function useMultiSelection( ref ) {
 	 */
 	useEffect( () => {
 		if ( ! hasMultiSelection || isMultiSelecting ) {
+			if ( ! selectedBlockClientId ) {
+				return;
+			}
+
 			const selection = window.getSelection();
 
 			if ( selection.rangeCount && ! selection.isCollapsed ) {
-				const { startContainer, endContainer } = selection.getRangeAt( 0 );
-
-				if ( ! selectedBlockClientId ) {
-					return;
-				}
-
 				const blockNode = getBlockDOMNode( selectedBlockClientId );
+				const { startContainer, endContainer } = selection.getRangeAt( 0 );
 
 				if (
 					! blockNode.contains( startContainer ) ||
