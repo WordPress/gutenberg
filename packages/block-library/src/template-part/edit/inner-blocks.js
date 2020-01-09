@@ -12,5 +12,11 @@ export default function TemplatePartInnerBlocks() {
 			initialEdits: { status: 'publish' },
 		}
 	);
-	return <InnerBlocks blocks={ blocks } onInput={ onInput } onChange={ onChange } />;
+	return (
+		<InnerBlocks
+			__experimentalBlocks={ blocks }
+			onInput={ onInput }
+			onChange={ onChange }
+		/>
+	);
 }

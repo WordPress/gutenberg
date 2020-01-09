@@ -36,7 +36,12 @@ class InnerBlocks extends Component {
 	}
 
 	componentDidMount() {
-		const { block, templateLock, blocks, replaceInnerBlocks } = this.props;
+		const {
+			block,
+			templateLock,
+			__experimentalBlocks,
+			replaceInnerBlocks,
+		} = this.props;
 		const { innerBlocks } = block;
 		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
 		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
@@ -50,8 +55,8 @@ class InnerBlocks extends Component {
 		}
 
 		// Set controlled blocks value from parent, if any.
-		if ( blocks ) {
-			replaceInnerBlocks( blocks );
+		if ( __experimentalBlocks ) {
+			replaceInnerBlocks( __experimentalBlocks );
 		}
 	}
 
