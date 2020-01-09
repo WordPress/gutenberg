@@ -30,7 +30,7 @@ function BlockListAppender( {
 	renderAppender: CustomAppender,
 } ) {
 	const ref = useRef();
-	const { position } = useBlockDropZone( {
+	const { isDraggingOverElement } = useBlockDropZone( {
 		element: ref,
 		rootClientId,
 	} );
@@ -79,8 +79,7 @@ function BlockListAppender( {
 			onFocus={ stopPropagation }
 			ref={ ref }
 			className={ classnames( 'block-list-appender', {
-				'is-dragging-close-to-top': position && position.y === 'top',
-				'is-dragging-close-to-bottom': position && position.y === 'bottom',
+				'is-dragging-over': isDraggingOverElement,
 			} ) }
 		>
 			{ appender }
