@@ -86,6 +86,7 @@ export default function BlockEditor() {
 			value={ blocks }
 			onInput={ setBlocks }
 			onChange={ setContent }
+			useSubRegistry={ false }
 		>
 			<BlockEditorKeyboardShortcuts />
 			<URLPopover.LinkViewer.Fill>

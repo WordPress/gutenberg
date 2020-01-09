@@ -24,15 +24,11 @@
 		top: $admin-bar-height;
 	}
 }
-
 @include editor-left(".edit-site-header");
 
+.edit-site-header__toolbar,
 .edit-site-header__actions {
-	align-items: center;
 	display: flex;
-	flex: 0;
-	padding: 0 20px;
-	width: 100%;
 
 	& > * {
 		margin-left: 5px;

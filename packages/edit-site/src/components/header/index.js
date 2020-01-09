@@ -3,6 +3,7 @@
  */
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { BlockNavigationDropdown, ToolSelector } from '@wordpress/block-editor';
 import { DropdownMenu } from '@wordpress/components';
 
 /**
@@ -49,15 +50,19 @@ export default function Header() {
 			aria-label={ __( 'Site editor top bar.' ) }
 			tabIndex="-1"
 		>
-			<TemplateSwitcher
-				ids={ settings.templateIds }
-				templatePartIds={ settings.templatePartIds }
-				activeId={ settings.templateId }
-				isTemplatePart={ settings.templateType === 'wp_template_part' }
-				onActiveIdChange={ setActiveTemplateId }
-				onActiveTemplatePartIdChange={ setActiveTemplatePartId }
-				onAddTemplateId={ addTemplateId }
-			/>
+			<div className="edit-site-header__toolbar">
+				<TemplateSwitcher
+					ids={ settings.templateIds }
+					templatePartIds={ settings.templatePartIds }
+					activeId={ settings.templateId }
+					isTemplatePart={ settings.templateType === 'wp_template_part' }
+					onActiveIdChange={ setActiveTemplateId }
+					onActiveTemplatePartIdChange={ setActiveTemplatePartId }
+					onAddTemplateId={ addTemplateId }
+				/>
+				<BlockNavigationDropdown />
+				<ToolSelector />
+			</div>
 			<div className="edit-site-header__actions">
 				<SaveButton />
 				<DropdownMenu
