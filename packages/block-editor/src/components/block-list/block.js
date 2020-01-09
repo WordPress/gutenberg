@@ -411,17 +411,20 @@ function BlockListBlock( {
 				clientId={ clientId }
 				rootClientId={ rootClientId }
 			/> }
-			{ ( isCapturingDescendantToolbars ) && (
-				// A slot made available on all ancestors of the selected Block
-				// to allow child Blocks to render their toolbars into the DOM
-				// of the appropriate parent.
-				<ChildToolbarSlot />
+			{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && (
+				// If the parent Block is set to consume toolbars of the child Blocks
+				// then render the child Block's toolbar into the Slot provided
+				// by the parent.
+				<ChildToolbar>
+					{ renderBlockContextualToolbar() }
+				</ChildToolbar>
 			) }
 			{ (
 				shouldShowBreadcrumb ||
 				shouldShowContextualToolbar ||
 				isToolbarForced ||
-				showEmptyBlockSideInserter
+				showEmptyBlockSideInserter ||
+				isCapturingDescendantToolbars
 			) && (
 				<Popover
 					noArrow
@@ -438,13 +441,11 @@ function BlockListBlock( {
 					onBlur={ () => setIsToolbarForced( false ) }
 				>
 					{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && renderBlockContextualToolbar() }
-					{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && (
-						// If the parent Block is set to consume toolbars of the child Blocks
-						// then render the child Block's toolbar into the Slot provided
-						// by the parent.
-						<ChildToolbar>
-							{ renderBlockContextualToolbar() }
-						</ChildToolbar>
+					{ ( isCapturingDescendantToolbars ) && (
+						// A slot made available on all ancestors of the selected Block
+						// to allow child Blocks to render their toolbars into the DOM
+						// of the appropriate parent.
+						<ChildToolbarSlot />
 					) }
 					{ shouldShowBreadcrumb && (
 						<BlockBreadcrumb
