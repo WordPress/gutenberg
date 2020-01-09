@@ -101,10 +101,6 @@ function BlockListBlock( {
 		};
 	}, [] );
 
-	// Random state used to rerender the component if needed, ideally we don't need this
-	const [ , updateRerenderState ] = useState( {} );
-	const rerender = () => updateRerenderState( {} );
-
 	// Reference of the wrapper
 	const wrapper = useRef( null );
 
@@ -117,20 +113,7 @@ function BlockListBlock( {
 	const [ hasError, setErrorState ] = useState( false );
 	const onBlockError = () => setErrorState( true );
 
-	// Handling of forceContextualToolbarFocus
-	const isForcingContextualToolbar = useRef( false );
-	useEffect( () => {
-		if ( isForcingContextualToolbar.current ) {
-			// The forcing of contextual toolbar should only be true during one update,
-			// after the first update normal conditions should apply.
-			isForcingContextualToolbar.current = false;
-		}
-	} );
-	const forceFocusedContextualToolbar = () => {
-		isForcingContextualToolbar.current = true;
-		// trigger a re-render
-		rerender();
-	};
+	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 
 	// Handing the focus of the block on creation and update
 
@@ -281,7 +264,7 @@ function BlockListBlock( {
 	);
 	useShortcut(
 		'core/block-editor/focus-toolbar',
-		useCallback( forceFocusedContextualToolbar, [] ),
+		useCallback( () => setIsToolbarForced( true ), [] ),
 		{ bindGlobal: true, eventName: 'keydown', isDisabled: ! canFocusHiddenToolbar }
 	);
 
@@ -388,7 +371,7 @@ function BlockListBlock( {
 		<BlockContextualToolbar
 			// If the toolbar is being shown because of being forced
 			// it should focus the toolbar right after the mount.
-			focusOnMount={ isForcingContextualToolbar.current }
+			focusOnMount={ isToolbarForced }
 			data-type={ name }
 			data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
 			moverDirection={ moverDirection }
@@ -437,7 +420,7 @@ function BlockListBlock( {
 			{ (
 				shouldShowBreadcrumb ||
 				shouldShowContextualToolbar ||
-				isForcingContextualToolbar.current ||
+				isToolbarForced ||
 				showEmptyBlockSideInserter
 			) && (
 				<Popover
@@ -453,32 +436,44 @@ function BlockListBlock( {
 					__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && wrapper.current }
 					__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && wrapper.current }
 				>
-					{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && renderBlockContextualToolbar() }
-					{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
-						// If the parent Block is set to consume toolbars of the child Blocks
-						// then render the child Block's toolbar into the Slot provided
-						// by the parent.
-						<ChildToolbar>
-							{ renderBlockContextualToolbar() }
-						</ChildToolbar>
-					) }
-					{ shouldShowBreadcrumb && (
-						<BlockBreadcrumb
-							clientId={ clientId }
-							ref={ breadcrumb }
-							data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
-						/>
-					) }
-					{ showEmptyBlockSideInserter && (
-						<div className="block-editor-block-list__empty-block-inserter">
-							<Inserter
-								position="top right"
-								onToggle={ selectOnOpen }
-								rootClientId={ rootClientId }
+					<div
+						onFocus={ () => setIsToolbarForced( true ) }
+						onBlur={ () => setIsToolbarForced( false ) }
+						// While ideally it would be enough to capture the
+						// bubbling focus event from the Inserter, due to the
+						// characteristics of click focusing of `button`s in
+						// Firefox and Safari, it is not reliable.
+						//
+						// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+						tabIndex={ -1 }
+					>
+						{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && renderBlockContextualToolbar() }
+						{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && (
+							// If the parent Block is set to consume toolbars of the child Blocks
+							// then render the child Block's toolbar into the Slot provided
+							// by the parent.
+							<ChildToolbar>
+								{ renderBlockContextualToolbar() }
+							</ChildToolbar>
+						) }
+						{ shouldShowBreadcrumb && (
+							<BlockBreadcrumb
 								clientId={ clientId }
+								ref={ breadcrumb }
+								data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
 							/>
-						</div>
-					) }
+						) }
+						{ showEmptyBlockSideInserter && (
+							<div className="block-editor-block-list__empty-block-inserter">
+								<Inserter
+									position="top right"
+									onToggle={ selectOnOpen }
+									rootClientId={ rootClientId }
+									clientId={ clientId }
+								/>
+							</div>
+						) }
+					</div>
 				</Popover>
 			) }
 			<div
