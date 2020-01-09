@@ -13,8 +13,12 @@ export const bold = {
 	title,
 	tagName: 'strong',
 	className: null,
-	edit( { isActive, value, onChange } ) {
+	edit( { isActive, value, onChange, onFocus } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
+		const onClick = () => {
+			onToggle();
+			onFocus();
+		};
 
 		return (
 			<>
@@ -27,7 +31,7 @@ export const bold = {
 					name="bold"
 					icon="editor-bold"
 					title={ title }
-					onClick={ onToggle }
+					onClick={ onClick }
 					isActive={ isActive }
 					shortcutType="primary"
 					shortcutCharacter="b"

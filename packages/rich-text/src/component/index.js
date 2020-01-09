@@ -1100,6 +1100,7 @@ class RichText extends Component {
 					isSelected,
 					value: this.record,
 					onChange: this.onChange,
+					onFocus,
 					Editable: this.Editable,
 				} ) }
 				{ ! children && <this.Editable /> }
