@@ -78,60 +78,64 @@ function ColorGradientControlInner( {
 		<BaseControl
 			className={ classnames( 'block-editor-color-gradient-control', className ) }
 		>
-			<BaseControl.VisualLabel>
-				<VisualLabel
-					currentTab={ currentTab }
-					label={ label }
-					colorValue={ colorValue }
-					gradientValue={ gradientValue }
-				/>
-			</BaseControl.VisualLabel>
-			{ canChooseAColor && canChooseAGradient && (
-				<ButtonGroup className="block-editor-color-gradient-control__button-tabs">
-					<Button
-						isLarge
-						isPrimary={ currentTab === 'color' }
-						isSecondary={ currentTab !== 'color' }
-						onClick={ () => ( setCurrentTab( 'color' ) ) }
-					>
-						{ __( 'Solid Color' ) }
-					</Button>
-					<Button
-						isLarge
-						isPrimary={ currentTab === 'gradient' }
-						isSecondary={ currentTab !== 'gradient' }
-						onClick={ () => ( setCurrentTab( 'gradient' ) ) }
-					>
-						{ __( 'Gradient' ) }
-					</Button>
-				</ButtonGroup>
-			) }
-			{ currentTab === 'color' && (
-				<ColorPalette
-					value={ colorValue }
-					onChange={ canChooseAGradient ?
-						( newColor ) => {
-							onColorChange( newColor );
-							onGradientChange();
-						} :
-						onColorChange
-					}
-					{ ... { colors, disableCustomColors } }
-				/>
-			) }
-			{ currentTab === 'gradient' && (
-				<GradientPicker
-					value={ gradientValue }
-					onChange={ canChooseAColor ?
-						( newGradient ) => {
-							onGradientChange( newGradient );
-							onColorChange();
-						} :
-						onGradientChange
-					}
-					{ ... { gradients, disableCustomGradients } }
-				/>
-			) }
+			<fieldset>
+				<legend>
+					<BaseControl.VisualLabel>
+						<VisualLabel
+							currentTab={ currentTab }
+							label={ label }
+							colorValue={ colorValue }
+							gradientValue={ gradientValue }
+						/>
+					</BaseControl.VisualLabel>
+				</legend>
+				{ canChooseAColor && canChooseAGradient && (
+					<ButtonGroup className="block-editor-color-gradient-control__button-tabs">
+						<Button
+							isLarge
+							isPrimary={ currentTab === 'color' }
+							isSecondary={ currentTab !== 'color' }
+							onClick={ () => ( setCurrentTab( 'color' ) ) }
+						>
+							{ __( 'Solid Color' ) }
+						</Button>
+						<Button
+							isLarge
+							isPrimary={ currentTab === 'gradient' }
+							isSecondary={ currentTab !== 'gradient' }
+							onClick={ () => ( setCurrentTab( 'gradient' ) ) }
+						>
+							{ __( 'Gradient' ) }
+						</Button>
+					</ButtonGroup>
+				) }
+				{ currentTab === 'color' && (
+					<ColorPalette
+						value={ colorValue }
+						onChange={ canChooseAGradient ?
+							( newColor ) => {
+								onColorChange( newColor );
+								onGradientChange();
+							} :
+							onColorChange
+						}
+						{ ... { colors, disableCustomColors } }
+					/>
+				) }
+				{ currentTab === 'gradient' && (
+					<GradientPicker
+						value={ gradientValue }
+						onChange={ canChooseAColor ?
+							( newGradient ) => {
+								onGradientChange( newGradient );
+								onColorChange();
+							} :
+							onGradientChange
+						}
+						{ ... { gradients, disableCustomGradients } }
+					/>
+				) }
+			</fieldset>
 		</BaseControl>
 	);
 }
