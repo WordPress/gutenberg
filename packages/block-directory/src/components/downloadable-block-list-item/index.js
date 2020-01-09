@@ -38,8 +38,8 @@ function DownloadableBlockListItem( {
 						isLoading={ isLoading }
 					/>
 				</header>
-				{ notice }
 				<section className="block-directory-downloadable-block-list-item__body">
+					{ notice }
 					<DownloadableBlockInfo
 						activeInstalls={ activeInstalls }
 						description={ description }
