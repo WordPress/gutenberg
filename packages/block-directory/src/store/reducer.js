@@ -16,6 +16,7 @@ export const downloadableBlocks = ( state = {
 	hasPermission: true,
 	filterValue: undefined,
 	isRequestingDownloadableBlocks: true,
+	isInstalling: false,
 	installedBlockTypes: [],
 }, action ) => {
 	switch ( action.type ) {
@@ -38,6 +39,12 @@ export const downloadableBlocks = ( state = {
 				...state,
 				items: action.hasPermission ? state.items : [],
 				hasPermission: action.hasPermission,
+			};
+		case 'FETCH_INSTALL_BLOCK' :
+		case 'RECEIVE_INSTALL_BLOCKS':
+			return {
+				...state,
+				isInstalling: action.isInstalling,
 			};
 		case 'ADD_INSTALLED_BLOCK_TYPE' :
 			return {

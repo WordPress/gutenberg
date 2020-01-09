@@ -8,6 +8,8 @@ import DownloadableBlockInfo from '../downloadable-block-info';
 function DownloadableBlockListItem( {
 	item,
 	onClick,
+	isLoading,
+	notice,
 } ) {
 	const {
 		icon,
@@ -20,6 +22,7 @@ function DownloadableBlockListItem( {
 		humanizedUpdated,
 		authorBlockCount,
 		authorBlockRating,
+
 	} = item;
 
 	return (
@@ -32,8 +35,10 @@ function DownloadableBlockListItem( {
 						title={ title }
 						rating={ rating }
 						ratingCount={ ratingCount }
+						isLoading={ isLoading }
 					/>
 				</header>
+				{ notice }
 				<section className="block-directory-downloadable-block-list-item__body">
 					<DownloadableBlockInfo
 						activeInstalls={ activeInstalls }

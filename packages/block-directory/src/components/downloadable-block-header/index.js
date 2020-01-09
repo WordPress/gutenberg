@@ -10,7 +10,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { BlockIcon } from '@wordpress/block-editor';
 import BlockRatings from '../block-ratings';
 
-function DownloadableBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
+function DownloadableBlockHeader( { icon, title, rating, ratingCount, isLoading, onClick } ) {
 	return (
 		<div className="block-directory-downloadable-block-header__row">
 			{
@@ -30,12 +30,13 @@ function DownloadableBlockHeader( { icon, title, rating, ratingCount, onClick } 
 			</div>
 			<Button
 				isDefault
+				isBusy={ isLoading }
 				onClick={ ( event ) => {
 					event.preventDefault();
 					onClick();
 				} }
 			>
-				{ __( 'Add block' ) }
+				{ isLoading ? __( 'Adding…' ) : __( 'Add block' ) }
 			</Button>
 		</div>
 	);

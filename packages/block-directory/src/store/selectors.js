@@ -52,6 +52,17 @@ export function getInstalledBlockTypes( state ) {
 }
 
 /**
+ * Returns true if application is calling install endpoint.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether its currently installing
+ */
+export function isInstalling( state ) {
+	return state.downloadableBlocks.isInstalling;
+}
+
+/**
  * Returns the error notices
  *
  * @param {Object} state Global application state.
