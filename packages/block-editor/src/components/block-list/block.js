@@ -435,45 +435,34 @@ function BlockListBlock( {
 					// Allow subpixel positioning for the block movement animation.
 					__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && wrapper.current }
 					__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && wrapper.current }
+					onBlur={ () => setIsToolbarForced( false ) }
 				>
-					<div
-						onFocus={ () => setIsToolbarForced( true ) }
-						onBlur={ () => setIsToolbarForced( false ) }
-						// While ideally it would be enough to capture the
-						// bubbling focus event from the Inserter, due to the
-						// characteristics of click focusing of `button`s in
-						// Firefox and Safari, it is not reliable.
-						//
-						// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
-						tabIndex={ -1 }
-					>
-						{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && renderBlockContextualToolbar() }
-						{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && (
-							// If the parent Block is set to consume toolbars of the child Blocks
-							// then render the child Block's toolbar into the Slot provided
-							// by the parent.
-							<ChildToolbar>
-								{ renderBlockContextualToolbar() }
-							</ChildToolbar>
-						) }
-						{ shouldShowBreadcrumb && (
-							<BlockBreadcrumb
+					{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && renderBlockContextualToolbar() }
+					{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && (
+						// If the parent Block is set to consume toolbars of the child Blocks
+						// then render the child Block's toolbar into the Slot provided
+						// by the parent.
+						<ChildToolbar>
+							{ renderBlockContextualToolbar() }
+						</ChildToolbar>
+					) }
+					{ shouldShowBreadcrumb && (
+						<BlockBreadcrumb
+							clientId={ clientId }
+							ref={ breadcrumb }
+							data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
+						/>
+					) }
+					{ showEmptyBlockSideInserter && (
+						<div className="block-editor-block-list__empty-block-inserter">
+							<Inserter
+								position="top right"
+								onToggle={ selectOnOpen }
+								rootClientId={ rootClientId }
 								clientId={ clientId }
-								ref={ breadcrumb }
-								data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
 							/>
-						) }
-						{ showEmptyBlockSideInserter && (
-							<div className="block-editor-block-list__empty-block-inserter">
-								<Inserter
-									position="top right"
-									onToggle={ selectOnOpen }
-									rootClientId={ rootClientId }
-									clientId={ clientId }
-								/>
-							</div>
-						) }
-					</div>
+						</div>
+					) }
 				</Popover>
 			) }
 			<div
