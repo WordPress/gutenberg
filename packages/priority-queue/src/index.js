@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import requestIdleCallback from './request-idle-callback';
+
+/**
  * Enqueued callback to invoke once idle time permits.
  *
  * @typedef {()=>void} WPPriorityQueueCallback
@@ -30,9 +35,6 @@
  * @property {WPPriorityQueueAdd}   add   Add callback to queue for context.
  * @property {WPPriorityQueueFlush} flush Flush queue for context.
  */
-
-/** @type {typeof window.requestIdleCallback|typeof window.requestAnimationFrame} */
-const requestIdleCallback = window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
 
 /**
  * Creates a context-aware queue that only executes
