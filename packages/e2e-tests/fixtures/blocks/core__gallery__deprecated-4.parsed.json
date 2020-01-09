@@ -6,12 +6,22 @@
                 "1421",
                 "1440",
                 "1362"
-            ]
+            ],
+            "align": "wide"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-gallery columns-3 is-cropped\">\n\t<ul class=\"blocks-gallery-grid\">\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2016/09/cropped-img_9054-1.jpg?w=190\" alt=\"\" data-id=\"1421\" class=\"wp-image-1421\"/>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2017/09/cropped-l1001498-1.jpg?w=580\" alt=\"\" data-id=\"1440\" class=\"wp-image-1440\"/>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2017/05/cropped-l1005945-2-2.jpg?w=580\" alt=\"\" data-id=\"1362\" class=\"wp-image-1362\"/>\n\t\t\t</figure>\n\t\t</li>\n\t</ul>\n</figure>\n",
+        "innerHTML": "\n<figure class=\"wp-block-gallery columns-3 is-cropped alignwide\">\n\t<ul class=\"blocks-gallery-grid\">\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2016/09/cropped-img_9054-1.jpg?w=190\" alt=\"\" data-id=\"1421\" class=\"wp-image-1421\"/>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2017/09/cropped-l1001498-1.jpg?w=580\" alt=\"\" data-id=\"1440\" class=\"wp-image-1440\"/>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2017/05/cropped-l1005945-2-2.jpg?w=580\" alt=\"\" data-id=\"1362\" class=\"wp-image-1362\"/>\n\t\t\t</figure>\n\t\t</li>\n\t</ul>\n</figure>\n",
         "innerContent": [
-            "\n<figure class=\"wp-block-gallery columns-3 is-cropped\">\n\t<ul class=\"blocks-gallery-grid\">\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2016/09/cropped-img_9054-1.jpg?w=190\" alt=\"\" data-id=\"1421\" class=\"wp-image-1421\"/>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2017/09/cropped-l1001498-1.jpg?w=580\" alt=\"\" data-id=\"1440\" class=\"wp-image-1440\"/>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2017/05/cropped-l1005945-2-2.jpg?w=580\" alt=\"\" data-id=\"1362\" class=\"wp-image-1362\"/>\n\t\t\t</figure>\n\t\t</li>\n\t</ul>\n</figure>\n"
+            "\n<figure class=\"wp-block-gallery columns-3 is-cropped alignwide\">\n\t<ul class=\"blocks-gallery-grid\">\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2016/09/cropped-img_9054-1.jpg?w=190\" alt=\"\" data-id=\"1421\" class=\"wp-image-1421\"/>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2017/09/cropped-l1001498-1.jpg?w=580\" alt=\"\" data-id=\"1440\" class=\"wp-image-1440\"/>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"https://sergioestevaofolio.files.wordpress.com/2017/05/cropped-l1005945-2-2.jpg?w=580\" alt=\"\" data-id=\"1362\" class=\"wp-image-1362\"/>\n\t\t\t</figure>\n\t\t</li>\n\t</ul>\n</figure>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
         ]
     }
 ]
