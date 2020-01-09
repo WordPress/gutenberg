@@ -1,5 +1,7 @@
 .wp-block-template-part__placeholder-input-container {
 	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
 }
 
 .wp-block-template-part__placeholder-input {
