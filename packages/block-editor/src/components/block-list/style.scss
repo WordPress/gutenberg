@@ -452,8 +452,19 @@
 	.components-toolbar {
 		height: $block-toolbar-height;
 		background: none;
+
+		// These margins make the buttons themselves overlap the chrome of the toolbar.
+		// This helps make them square, and maximize the hit area.
 		margin-top: -$border-width;
+		margin-bottom: -$border-width;
 		margin-left: -$border-width;
+
+		// This is the last visible button.
+		// We add a negative left margin to make it the same square
+		// size as the other single buttons.
+		.block-editor-block-settings-menu {
+			margin-left: -$border-width;
+		}
 
 		// Ensure the icon buttons remain square.
 		.components-button.has-icon:not(.has-text) {

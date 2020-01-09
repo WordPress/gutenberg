@@ -4,7 +4,6 @@
 	width: 100%;
 	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
-	height: $block-toolbar-height;
 
 	// Animation
 	transition: border-color 0.1s linear, box-shadow 0.1s linear;
@@ -24,17 +23,19 @@
 	.components-toolbar {
 		border: 0;
 
-		// Add a right border to show as separator in the block toolbar.
-		border-right: $border-width solid $border-color;
+		// Add a border before item groups to show as separator in the block toolbar.
+		// Why not a border after item groups? Because the last item is an invisible inserter,
+		// so we can't use last-child to consistenly hide it, and we need round corners.
+		border-left: $border-width solid $border-color;
 
 		// IE11 has thick paddings without this.
 		line-height: 0;
-
 	}
 
-	// Remove the right-border on the last item in the toolbar.
-	> :last-child {
-		border-right: none;
+	// Remove the left-border on the last item in the toolbar.
+	> .components-toolbar:first-child,
+	> :first-child > .components-toolbar {
+		border-left: none;
 	}
 
 	// Add a left border and adjust the color for Top Toolbar mode.
@@ -45,6 +46,36 @@
 		.components-toolbar {
 			border-color: $light-gray-500;
 		}
+	}
+
+	// Size multiple sequential buttons to be optically balanced.
+	// Specifically, buttons in a toolbar group are not all 48px.
+	// Icons are 36px, as set by a 24px icon and 12px padding.
+	.components-toolbar > div > .components-button.has-icon:not(.has-text) {
+		width: auto;
+		padding-left: $grid-unit-15 / 2; // 6px.
+		padding-right: $grid-unit-15 / 2;
+
+		svg {
+			min-width: $icon-button-size-small; // This is the optimal icon size, and we size the whole button after this.
+		}
+	}
+
+	// First and last buttons in a group have 12px outer padding, like 48px buttons.
+	.components-toolbar > div:first-child .components-button.has-icon:not(.has-text) {
+		padding-left: $grid-unit-15;
+		padding-right: 0;
+	}
+
+	.components-toolbar > div:last-child .components-button {
+		padding-left: 0;
+		padding-right: $grid-unit-15;
+	}
+
+	// Single buttons should remain 48px.
+	.components-toolbar > div:first-child:last-child > .components-button.has-icon:not(.has-text) {
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
 	}
 }
 

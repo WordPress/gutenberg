@@ -1,24 +1,14 @@
 .block-editor-format-toolbar {
-	// Size the formatting buttons to be optically balanced.
-	// Specifically, buttons in a toolbar group are not all 48px.
-	// They are 36px, except for the first and the last, which have
-	// an additional 6px padding left or right.
-	.components-toolbar > div {
-		width: 48px - 6px - 6px;
-	}
-
-	.components-toolbar > div:first-child button {
-		padding-left: $grid-unit-10 + 6px;
-	}
-
-	.components-toolbar > div:last-child button {
-		padding-right: $grid-unit-10 + 6px;
-	}
-
 	.components-dropdown-menu__toggle {
 		justify-content: center;
+
+		// @todo: this should be the same icon as the DownArrow from the mover control.
 		&::after {
 			@include dropdown-arrow();
+
+			// The dropdown is 6px wide. To have the same footprint as a 24px icon, we add 9px margin left and right.
+			margin-left: 9px;
+			margin-right: 9px;
 		}
 	}
 }
