@@ -42,6 +42,7 @@ function NavigationLinkEdit( {
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
+	hideToolbar,
 	insertLinkBlock,
 } ) {
 	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
@@ -72,6 +73,16 @@ function NavigationLinkEdit( {
 			setIsLinkOpen( false );
 		}
 	}, [ isSelected ] );
+
+	if ( isLinkOpen ) {
+		/**
+		 * Hide the toolbar when the NavigationLink popup is opened. Note that this
+		 * doesn't force the toolbar to remain hidden until the popup is closed - it
+		 * will become visible on e.g. any mouse movement regardless of the popup
+		 * visibility.
+		 */
+		hideToolbar();
+	}
 
 	return (
 		<Fragment>
@@ -202,6 +213,9 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
 		return {
+			hideToolbar() {
+				dispatch( 'core/block-editor' ).startTyping();
+			},
 			insertLinkBlock() {
 				const { clientId } = ownProps;
 
