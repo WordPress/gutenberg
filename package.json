@@ -64,7 +64,7 @@
     "start:debug": "node --inspect-brk node_modules/.bin/react-native start",
     "start:inside-gb:debug": "node --inspect-brk node_modules/.bin/react-native start:inside-gb",
     "patch-metro-no-file-watch": "cp node_modules/metro/src/node-haste/DependencyGraph.js ./ && cp DependencyGraph.js.patched node_modules/metro/src/node-haste/DependencyGraph.js",
-    "un-patch-metro-no-file-watch": "cp ./DependencyGraph.js node_modules/metro/src/node-haste/DependencyGraph.js",
+    "un-patch-metro-no-file-watch": "mv ./DependencyGraph.js node_modules/metro/src/node-haste/DependencyGraph.js",
     "prebundle": "yarn i18n-cache:force",
     "prebundle:android": "yarn patch-metro-no-file-watch",
     "postbundle:android": "yarn un-patch-metro-no-file-watch",

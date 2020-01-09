@@ -20,6 +20,7 @@ export default class EditorPage {
 	listBlockName = 'List';
 	headingBlockName = 'Heading';
 	imageBlockName = 'Image';
+	galleryBlockName = 'Gallery';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
@@ -366,6 +367,22 @@ export default class EditorPage {
 
 	async removeImageBlockAtPosition( position: number ) {
 		return await this.removeBlockAtPosition( position, this.imageBlockName );
+	}
+
+	// =========================
+	// Gallery Block functions
+	// =========================
+
+	async addNewGalleryBlock() {
+		await this.addNewBlock( this.galleryBlockName );
+	}
+
+	async getGalleryBlockAtPosition( position: number ) {
+		return this.getBlockAtPosition( position, this.galleryBlockName );
+	}
+
+	async removeGalleryBlockAtPosition( position: number ) {
+		return await this.removeBlockAtPosition( position, this.galleryBlockName );
 	}
 
 	// =========================
