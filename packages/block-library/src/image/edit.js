@@ -32,7 +32,7 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -101,8 +101,19 @@ export class ImageEdit extends Component {
 		this.onUploadError = this.onUploadError.bind( this );
 		this.onImageError = this.onImageError.bind( this );
 
+		// With the current implementation of ResizableBox, an image needs an explicit pixel value for the max-width.
+		// In absence of being able to set the content-width, this max-width is currently dictated by the vanilla editor style.
+		// The following variable adds a buffer to this vanilla style, so 3rd party themes have some wiggleroom.
+		// This does, in most cases, allow you to scale the image beyond the width of the main column, though not infinitely.
+		// @todo It would be good to revisit this once a content-width variable becomes available.
+		this.maxWidthBuffer = this.props.maxWidth * 2.5;
+		// To limit scaling the image beyond the width of the main column, we will use resizeRef to find the parent block's width.
+		// This will then be used to reduce the maxWidth from the buffer value to a definitive value in componentDidUpdate.
+		this.resizeRef = createRef();
+
 		this.state = {
 			captionFocused: false,
+			maxWidth: this.maxWidthBuffer,
 		};
 	}
 
@@ -147,6 +158,20 @@ export class ImageEdit extends Component {
 			this.setState( {
 				captionFocused: false,
 			} );
+		}
+
+		// Check resizeRef's block parents to set an accurate width restriction.
+		// This is used to limit the resizer from resizing the image beyond the block parent's width.
+		if ( this.resizeRef.current && this.state.maxWidth === this.bufferWidth ) {
+			let parentBlock = this.resizeRef.current.parentNode;
+			// Traverse 'up' in parent nodes until we find the block parent.
+			while ( ! parentBlock.classList.contains( 'block-editor-block-list__block' ) ) {
+				parentBlock = parentBlock.parentNode;
+			}
+			// Only setState if maxWidth value has changed.
+			if ( this.state.maxWidth !== parentBlock.offsetWidth ) {
+				this.setState( { maxWidth: parentBlock.offsetWidth } );
+			}
 		}
 	}
 
@@ -328,12 +353,12 @@ export class ImageEdit extends Component {
 			isLargeViewport,
 			isSelected,
 			className,
-			maxWidth,
 			noticeUI,
 			isRTL,
 			onResizeStart,
 			onResizeStop,
 		} = this.props;
+		const { maxWidth } = this.state;
 		const {
 			url,
 			alt,
@@ -578,13 +603,6 @@ export class ImageEdit extends Component {
 									? MIN_SIZE
 									: MIN_SIZE / ratio;
 
-							// With the current implementation of ResizableBox, an image needs an explicit pixel value for the max-width.
-							// In absence of being able to set the content-width, this max-width is currently dictated by the vanilla editor style.
-							// The following variable adds a buffer to this vanilla style, so 3rd party themes have some wiggleroom.
-							// This does, in most cases, allow you to scale the image beyond the width of the main column, though not infinitely.
-							// @todo It would be good to revisit this once a content-width variable becomes available.
-							const maxWidthBuffer = maxWidth;
-
 							let showRightHandle = false;
 							let showLeftHandle = false;
 
@@ -615,20 +633,17 @@ export class ImageEdit extends Component {
 							/* eslint-enable no-lonely-if */
 
 							return (
-								<>
-									{ getInspectorControls(
-										imageWidth,
-										imageHeight
-									) }
+								<div ref={ this.resizeRef } >
+									{ getInspectorControls( imageWidth, imageHeight ) }
 									<ResizableBox
 										size={ {
 											width,
 											height,
 										} }
 										minWidth={ minWidth }
-										maxWidth={ maxWidthBuffer }
+										maxWidth={ maxWidth }
 										minHeight={ minHeight }
-										maxHeight={ maxWidthBuffer / ratio }
+										maxHeight={ maxWidth / ratio }
 										lockAspectRatio
 										enable={ {
 											top: false,
@@ -659,7 +674,7 @@ export class ImageEdit extends Component {
 									>
 										{ img }
 									</ResizableBox>
-								</>
+								</div>
 							);
 						} }
 					</ImageSize>
