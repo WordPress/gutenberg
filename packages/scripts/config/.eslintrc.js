@@ -1,8 +1,5 @@
 module.exports = {
 	root: true,
-	plugins: [
-		'markdown',
-	],
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 
