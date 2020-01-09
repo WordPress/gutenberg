@@ -91,7 +91,7 @@ export const link = {
 		}
 
 		render() {
-			const { isActive, activeAttributes, value, onChange } = this.props;
+			const { isActive, activeAttributes, value, onChange, onFocus } = this.props;
 
 			return (
 				<>
@@ -131,6 +131,7 @@ export const link = {
 						activeAttributes={ activeAttributes }
 						value={ value }
 						onChange={ onChange }
+						onFocus={ onFocus }
 					/>
 				</>
 			);

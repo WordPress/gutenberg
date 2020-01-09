@@ -1077,6 +1077,11 @@ class RichText extends Component {
 		} = this.props;
 		const { activeFormats } = this.state;
 
+		const onFocus = () => {
+			forwardedRef.current.focus();
+			this.applyRecord( this.record );
+		};
+
 		return (
 			<>
 				<BoundaryStyle
@@ -1088,6 +1093,7 @@ class RichText extends Component {
 					withoutInteractiveFormatting={ withoutInteractiveFormatting }
 					value={ this.record }
 					onChange={ this.onChange }
+					onFocus={ onFocus }
 					formatTypes={ formatTypes }
 				/> }
 				{ children && children( {

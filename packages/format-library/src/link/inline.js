@@ -135,7 +135,7 @@ class InlineLinkUI extends Component {
 	}
 
 	submitLink( event ) {
-		const { isActive, value, onChange, speak } = this.props;
+		const { isActive, value, onChange, onFocus, speak } = this.props;
 		const { inputValue, opensInNewWindow } = this.state;
 		const url = prependHTTP( inputValue );
 		const selectedText = getTextContent( slice( value ) );
@@ -153,6 +153,8 @@ class InlineLinkUI extends Component {
 		} else {
 			onChange( applyFormat( value, format ) );
 		}
+
+		onFocus();
 
 		this.resetState();
 

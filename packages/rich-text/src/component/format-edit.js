@@ -26,6 +26,7 @@ const interactiveContentTags = new Set( [
 export default function FormatEdit( {
 	formatTypes,
 	onChange,
+	onFocus,
 	value,
 	allowedFormats,
 	withoutInteractiveFormatting,
@@ -68,6 +69,7 @@ export default function FormatEdit( {
 				}
 				value={ value }
 				onChange={ onChange }
+				onFocus={ onFocus }
 			/>
 		);
 	} );
