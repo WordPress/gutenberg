@@ -36,7 +36,12 @@ class InnerBlocks extends Component {
 	}
 
 	componentDidMount() {
-		const { templateLock, block } = this.props;
+		const {
+			block,
+			templateLock,
+			__experimentalBlocks,
+			replaceInnerBlocks,
+		} = this.props;
 		const { innerBlocks } = block;
 		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
 		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
@@ -48,10 +53,22 @@ class InnerBlocks extends Component {
 				templateInProcess: false,
 			} );
 		}
+
+		// Set controlled blocks value from parent, if any.
+		if ( __experimentalBlocks ) {
+			replaceInnerBlocks( __experimentalBlocks );
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { template, block, templateLock } = this.props;
+		const {
+			block,
+			templateLock,
+			template,
+			isLastBlockChangePersistent,
+			onInput,
+			onChange,
+		} = this.props;
 		const { innerBlocks } = block;
 
 		this.updateNestedSettings();
@@ -60,6 +77,14 @@ class InnerBlocks extends Component {
 			const hasTemplateChanged = ! isEqual( template, prevProps.template );
 			if ( hasTemplateChanged ) {
 				this.synchronizeBlocksWithTemplate();
+			}
+		}
+
+		// Sync with controlled blocks value from parent, if possible.
+		if ( prevProps.block.innerBlocks !== innerBlocks ) {
+			const resetFunc = isLastBlockChangePersistent ? onChange : onInput;
+			if ( resetFunc ) {
+				resetFunc( innerBlocks );
 			}
 		}
 	}
@@ -141,6 +166,7 @@ InnerBlocks = compose( [
 			getBlockRootClientId,
 			getTemplateLock,
 			isNavigationMode,
+			isLastBlockChangePersistent,
 		} = select( 'core/block-editor' );
 		const { clientId, isSmallScreen } = ownProps;
 		const block = getBlock( clientId );
@@ -152,6 +178,7 @@ InnerBlocks = compose( [
 			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
 			enableClickThrough: isNavigationMode() || isSmallScreen,
+			isLastBlockChangePersistent: isLastBlockChangePersistent(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
@@ -163,7 +190,13 @@ InnerBlocks = compose( [
 
 		return {
 			replaceInnerBlocks( blocks ) {
-				replaceInnerBlocks( clientId, blocks, block.innerBlocks.length === 0 && templateInsertUpdatesSelection );
+				replaceInnerBlocks(
+					clientId,
+					blocks,
+					block.innerBlocks.length === 0 &&
+						templateInsertUpdatesSelection &&
+						blocks.length !== 0
+				);
 			},
 			updateNestedSettings( settings ) {
 				dispatch( updateBlockListSettings( clientId, settings ) );

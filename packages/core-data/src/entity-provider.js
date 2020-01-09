@@ -1,8 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useContext, useCallback } from '@wordpress/element';
+import {
+	createContext,
+	useContext,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { parse, serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -122,13 +128,14 @@ export function useEntityProp( kind, type, prop ) {
 export function __experimentalUseEntitySaving( kind, type, props ) {
 	const id = useEntityId( kind, type );
 
-	const [ isDirty, isSaving, edits ] = useSelect(
+	const [ isDirty, isSaving, _select ] = useSelect(
 		( select ) => {
 			const { getEntityRecordNonTransientEdits, isSavingEntityRecord } = select(
 				'core'
 			);
-			const _edits = getEntityRecordNonTransientEdits( kind, type, id );
-			const editKeys = Object.keys( _edits );
+			const editKeys = Object.keys(
+				getEntityRecordNonTransientEdits( kind, type, id )
+			);
 			return [
 				props ?
 					editKeys.some( ( key ) =>
@@ -136,7 +143,7 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 					) :
 					editKeys.length > 0,
 				isSavingEntityRecord( kind, type, id ),
-				_edits,
+				select,
 			];
 		},
 		[ kind, type, id, props ]
@@ -144,11 +151,18 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const save = useCallback( () => {
-		let filteredEdits = edits;
+		// We use the `select` from `useSelect` here instead of importing it from
+		// the data module so that we get the one bound to the provided registry,
+		// and not the default one.
+		let filteredEdits = _select( 'core' ).getEntityRecordNonTransientEdits(
+			kind,
+			type,
+			id
+		);
 		if ( typeof props === 'string' ) {
 			filteredEdits = { [ props ]: filteredEdits[ props ] };
 		} else if ( props ) {
-			filteredEdits = filteredEdits.reduce( ( acc, key ) => {
+			filteredEdits = Object.keys( filteredEdits ).reduce( ( acc, key ) => {
 				if ( props.includes( key ) ) {
 					acc[ key ] = filteredEdits[ key ];
 				}
@@ -156,7 +170,67 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 			}, {} );
 		}
 		saveEntityRecord( kind, type, { id, ...filteredEdits } );
-	}, [ kind, type, id, props, edits ] );
+	}, [ kind, type, id, props, _select ] );
 
 	return [ isDirty, isSaving, save ];
+}
+
+/**
+ * Hook that returns block content getters and setters for
+ * the nearest provided entity of the specified type.
+ *
+ * The return value has the shape `[ blocks, onInput, onChange ]`.
+ * `onInput` is for block changes that don't create undo levels
+ * or dirty the post, non-persistent changes, and `onChange` is for
+ * peristent changes. They map directly to the props of a
+ * `BlockEditorProvider` and are intended to be used with it,
+ * or similar components or hooks.
+ *
+ * @param {string} kind                            The entity kind.
+ * @param {string} type                            The entity type.
+ * @param {Object} options
+ * @param {Object} [options.initialEdits]          Initial edits object for the entity record.
+ * @param {string} [options.blocksProp='blocks']   The name of the entity prop that holds the blocks array.
+ * @param {string} [options.contentProp='content'] The name of the entity prop that holds the serialized blocks.
+ *
+ * @return {[WPBlock[], Function, Function]} The block array and setters.
+ */
+export function useEntityBlockEditor(
+	kind,
+	type,
+	{ initialEdits, blocksProp = 'blocks', contentProp = 'content' } = {}
+) {
+	const [ content, setContent ] = useEntityProp( kind, type, contentProp );
+
+	const { editEntityRecord } = useDispatch( 'core' );
+	const id = useEntityId( kind, type );
+	const initialBlocks = useMemo( () => {
+		if ( initialEdits ) {
+			editEntityRecord( kind, type, id, initialEdits, { undoIgnore: true } );
+		}
+
+		// Guard against other instances that might have
+		// set content to a function already.
+		if ( typeof content !== 'function' ) {
+			const parsedContent = parse( content );
+			return parsedContent.length ? parsedContent : [];
+		}
+	}, [ id ] ); // Reset when the provided entity record changes.
+	const [ blocks = initialBlocks, onInput ] = useEntityProp(
+		kind,
+		type,
+		blocksProp
+	);
+
+	const onChange = useCallback(
+		( nextBlocks ) => {
+			onInput( nextBlocks );
+			// Use a function edit to avoid serializing often.
+			setContent( ( { blocks: blocksToSerialize } ) =>
+				serialize( blocksToSerialize )
+			);
+		},
+		[ onInput, setContent ]
+	);
+	return [ blocks, onInput, onChange ];
 }

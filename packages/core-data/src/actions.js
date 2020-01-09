@@ -249,6 +249,26 @@ export function* saveEntityRecord(
 	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
 	const recordId = record[ entityIdKey ];
 
+	// Evaluate optimized edits.
+	// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
+	for ( const [ key, value ] of Object.entries( record ) ) {
+		if ( typeof value === 'function' ) {
+			const evaluatedValue = value(
+				yield select( 'getEditedEntityRecord', kind, name, recordId )
+			);
+			yield editEntityRecord(
+				kind,
+				name,
+				recordId,
+				{
+					[ key ]: evaluatedValue,
+				},
+				{ undoIgnore: true }
+			);
+			record[ key ] = evaluatedValue;
+		}
+	}
+
 	yield { type: 'SAVE_ENTITY_RECORD_START', kind, name, recordId, isAutosave };
 	let updatedRecord;
 	let error;

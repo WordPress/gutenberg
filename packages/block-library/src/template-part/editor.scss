@@ -1,0 +1,28 @@
+.wp-block-template-part__placeholder-input-container {
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+}
+
+.wp-block-template-part__placeholder-input {
+	margin: 5px;
+}
+
+.wp-block-template-part__placeholder-preview {
+	margin-bottom: 15px;
+	width: 100%;
+
+	.block-editor-block-preview__container {
+		padding: 1px;
+	}
+
+	.block-editor-block-preview__content {
+		position: initial;
+	}
+}
+
+.wp-block-template-part__placeholder-preview-title {
+	font-size: 15px;
+	font-weight: 600;
+	margin-bottom: 4px;
+}
