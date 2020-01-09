@@ -11,6 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { safeDecodeURIComponent } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -67,7 +68,7 @@ class PostPublishPanelPostpublish extends Component {
 		return (
 			<div className="post-publish-panel__postpublish">
 				<PanelBody className="post-publish-panel__postpublish-header">
-					<a ref={ this.postLink } href={ post.link }>{ post.title || __( '(no title)' ) }</a> { postPublishNonLinkHeader }
+					<a ref={ this.postLink } href={ post.link }>{ decodeEntities( post.title ) || __( '(no title)' ) }</a> { postPublishNonLinkHeader }
 				</PanelBody>
 				<PanelBody>
 					<p className="post-publish-panel__postpublish-subheader">
