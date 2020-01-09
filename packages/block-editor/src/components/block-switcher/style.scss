@@ -18,8 +18,8 @@
 
 	&::before {
 		border-width: 5px;
-		border-right-color: $black;
-		border-bottom-color: $black;
+		border-right-color: $border-color;
+		border-bottom-color: $border-color;
 	}
 }
 
@@ -168,10 +168,6 @@
 
 // The block switcher in the contextual toolbar should be bigger.
 .block-editor-block-contextual-toolbar {
-	.block-editor-block-switcher {
-		height: $block-toolbar-height;
-	}
-
 	.components-button.block-editor-block-switcher__toggle,
 	.components-button.block-editor-block-switcher__no-switcher-icon {
 		height: $block-toolbar-height;

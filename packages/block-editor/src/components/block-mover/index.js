@@ -115,7 +115,7 @@ export class BlockMover extends Component {
 					>
 						<ToolbarGroup>
 							<Button
-								className="block-editor-block-mover__control"
+								className="block-editor-block-mover__control block-editor-block-mover__control-up"
 								onClick={ isFirst ? null : onMoveUp }
 								icon={ getArrowIcon( 'up' ) }
 								// translators: %s: Horizontal direction of block movement ( left, right )
@@ -130,7 +130,7 @@ export class BlockMover extends Component {
 							/>
 
 							<Button
-								className="block-editor-block-mover__control"
+								className="block-editor-block-mover__control block-editor-block-mover__control-down"
 								onClick={ isLast ? null : onMoveDown }
 								icon={ getArrowIcon( 'down' ) }
 								// translators: %s: Horizontal direction of block movement ( left, right )
