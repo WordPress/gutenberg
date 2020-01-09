@@ -29,7 +29,7 @@
 
 	> li {
 		list-style: none;
-		margin: 0 $grid-size 0 0;
+		margin: $grid-size/2 $grid-size $grid-size/2 0;
 		flex-shrink: 1;
 		max-width: 100px;
 	}
