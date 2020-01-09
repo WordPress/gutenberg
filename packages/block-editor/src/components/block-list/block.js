@@ -555,11 +555,13 @@ const applyWithSelect = withSelect(
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
+
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 			isTypingWithinBlock:
 				( isSelected || isAncestorOfSelectedBlock ) && isTyping(),
-			isCaretWithinFormattedText: isCaretWithinFormattedText(),
+			isCaretWithinFormattedText: isSelected && isCaretWithinFormattedText(),
+
 			mode: getBlockMode( clientId ),
 			isSelectionEnabled: isSelectionEnabled(),
 			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
