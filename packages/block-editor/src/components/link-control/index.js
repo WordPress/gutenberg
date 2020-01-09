@@ -30,7 +30,6 @@ import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
 const MODE_EDIT = 'edit';
-// const MODE_SHOW = 'show';
 
 export function LinkControl( {
 	value,
