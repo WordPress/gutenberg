@@ -18,11 +18,11 @@ Literal strings aren't minified. Keeping them in your production bundle may incr
 
 To prevent that, you should:
 
-1. Put `@wordpress/warning/babel-plugin` into your [babel config](https://babeljs.io/docs/en/plugins#plugin-options) or use [`@wordpress/babel-preset-default`](https://www.npmjs.com/package/@wordpress/babel-preset-default), which already includes the babel plugin.
+1.  Put `@wordpress/warning/babel-plugin` into your [babel config](https://babeljs.io/docs/en/plugins#plugin-options) or use [`@wordpress/babel-preset-default`](https://www.npmjs.com/package/@wordpress/babel-preset-default), which already includes the babel plugin.
 
     This will make sure your `warning` calls are wrapped within a condition that checks if `process.env.NODE_ENV !== 'production'`.
 
-2. Use [UglifyJS](https://github.com/mishoo/UglifyJS2), [Terser](https://github.com/terser/terser) or any other JavaScript parser that performs [dead code elimination](https://en.wikipedia.org/wiki/Dead_code_elimination). This is usually used in conjunction with JavaScript bundlers, such as [webpack](https://github.com/webpack/webpack).
+2.  Use [UglifyJS](https://github.com/mishoo/UglifyJS2), [Terser](https://github.com/terser/terser) or any other JavaScript parser that performs [dead code elimination](https://en.wikipedia.org/wiki/Dead_code_elimination). This is usually used in conjunction with JavaScript bundlers, such as [webpack](https://github.com/webpack/webpack).
 
     When parsing the code in `production` mode, the `warning` call will be removed altogether.
 
