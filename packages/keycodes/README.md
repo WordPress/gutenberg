@@ -42,6 +42,10 @@ onKeyDown( event ) {
 
 Keycode for ALT key.
 
+_Type_
+
+-   `WPModifierPart` 
+
 <a name="BACKSPACE" href="#BACKSPACE">#</a> **BACKSPACE**
 
 Keycode for BACKSPACE key.
@@ -50,9 +54,17 @@ Keycode for BACKSPACE key.
 
 Keycode for COMMAND/META key.
 
+_Type_
+
+-   `WPModifierPart` 
+
 <a name="CTRL" href="#CTRL">#</a> **CTRL**
 
 Keycode for CTRL key.
+
+_Type_
+
+-   `WPModifierPart` 
 
 <a name="DELETE" href="#DELETE">#</a> **DELETE**
 
@@ -61,20 +73,30 @@ Keycode for DELETE key.
 <a name="displayShortcut" href="#displayShortcut">#</a> **displayShortcut**
 
 An object that contains functions to display shortcuts.
-E.g. displayShortcut.primary( 'm' ) will return '⌘M' on Mac.
+
+_Usage_
+
+    // Assuming macOS:
+    E.g. displayShortcut.primary( 'm' );
+    // "⌘M"
 
 _Type_
 
--   `WPKeycodeHandlerByModifier` Keyed map of functions to display shortcuts.
+-   `WPModifierHandler<WPKeyHandler<string>>` Keyed map of functions to display shortcuts.
 
 <a name="displayShortcutList" href="#displayShortcutList">#</a> **displayShortcutList**
 
-Return an array of the parts of a keyboard shortcut chord for display
-E.g displayShortcutList.primary( 'm' ) will return [ '⌘', 'M' ] on Mac.
+Return an array of the parts of a keyboard shortcut chord for display.
+
+_Usage_
+
+    // Assuming macOS:
+    displayShortcutList.primary( 'm' );
+    // [ "⌘", "M" ]
 
 _Type_
 
--   `WPKeycodeHandlerByModifier` Keyed map of functions to shortcut sequences.
+-   `WPModifierHandler<WPKeyHandler<Array<string>>>` Keyed map of functions to shortcut sequences.
 
 <a name="DOWN" href="#DOWN">#</a> **DOWN**
 
@@ -96,12 +118,16 @@ Keycode for F10 key.
 
 An object that contains functions to check if a keyboard event matches a
 predefined shortcut combination.
-E.g. isKeyboardEvent.primary( event, 'm' ) will return true if the event
-signals pressing ⌘M.
+
+_Usage_
+
+    // Assuming an event for ⌘M key press:
+    isKeyboardEvent.primary( event, 'm' );
+    // true
 
 _Type_
 
--   `WPKeycodeHandlerByModifier` Keyed map of functions to match events.
+-   `WPModifierHandler<WPEventKeyHandler<boolean>>` Keyed map of functions to match events.
 
 <a name="LEFT" href="#LEFT">#</a> **LEFT**
 
@@ -112,26 +138,25 @@ Keycode for LEFT key.
 Object that contains functions that return the available modifier
 depending on platform.
 
--   `primary`: takes a isApple function as a parameter.
--   `primaryShift`: takes a isApple function as a parameter.
--   `primaryAlt`: takes a isApple function as a parameter.
--   `secondary`: takes a isApple function as a parameter.
--   `access`: takes a isApple function as a parameter.
--   `ctrl`
--   `alt`
--   `ctrlShift`
--   `shift`
--   `shiftAlt`
+_Type_
+
+-   `null` 
 
 <a name="rawShortcut" href="#rawShortcut">#</a> **rawShortcut**
 
 An object that contains functions to get raw shortcuts.
-E.g. rawShortcut.primary( 'm' ) will return 'meta+m' on Mac.
-These are intended for user with the KeyboardShortcuts component or TinyMCE.
+
+These are intended for user with the KeyboardShortcuts.
+
+_Usage_
+
+    // Assuming macOS:
+    rawShortcut.primary( 'm' )
+    // "meta+m""
 
 _Type_
 
--   `WPKeycodeHandlerByModifier` Keyed map of functions to raw shortcuts.
+-   `WPModifierHandler<WPKeyHandler<string>>` Keyed map of functions to raw shortcuts.
 
 <a name="RIGHT" href="#RIGHT">#</a> **RIGHT**
 
@@ -141,14 +166,24 @@ Keycode for RIGHT key.
 
 Keycode for SHIFT key.
 
+_Type_
+
+-   `WPModifierPart` 
+
 <a name="shortcutAriaLabel" href="#shortcutAriaLabel">#</a> **shortcutAriaLabel**
 
-An object that contains functions to return an aria label for a keyboard shortcut.
-E.g. shortcutAriaLabel.primary( '.' ) will return 'Command + Period' on Mac.
+An object that contains functions to return an aria label for a keyboard
+shortcut.
+
+_Usage_
+
+    // Assuming macOS:
+    shortcutAriaLabel.primary( '.' );
+    // "Command + Period"
 
 _Type_
 
--   `WPKeycodeHandlerByModifier` Keyed map of functions to shortcut ARIA labels.
+-   `WPModifierHandler<WPKeyHandler<string>>` Keyed map of functions to shortcut ARIA labels.
 
 <a name="SPACE" href="#SPACE">#</a> **SPACE**
 
