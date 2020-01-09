@@ -77,6 +77,9 @@ const deprecated = [
 				default: 'none',
 			},
 		},
+		supports: {
+			align: true,
+		},
 		isEligible( { ids } ) {
 			return ids && ids.some( ( id ) => typeof id === 'string' );
 		},
@@ -191,6 +194,9 @@ const deprecated = [
 				type: 'string',
 				default: 'none',
 			},
+		},
+		supports: {
+			align: true,
 		},
 		save( { attributes } ) {
 			const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
@@ -307,6 +313,9 @@ const deprecated = [
 				} ),
 			};
 		},
+		supports: {
+			align: true,
+		},
 		save( { attributes } ) {
 			const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
 			return (
@@ -379,7 +388,9 @@ const deprecated = [
 				default: 'none',
 			},
 		},
-
+		supports: {
+			align: true,
+		},
 		save( { attributes } ) {
 			const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 			const className = classnames( `columns-${ columns }`, {
