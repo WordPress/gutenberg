@@ -812,6 +812,15 @@ export function __unstableMarkLastChangeAsPersistent() {
 }
 
 /**
+ * Returns an action object used in signalling that the next block change should be marked explicitly as not persistent.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableMarkNextChangeAsNotPersistent() {
+	return { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT' };
+}
+
+/**
  * Returns an action object used in signalling that the last block change is
  * an automatic change, meaning it was not performed by the user, and can be
  * undone using the `Escape` and `Backspace` keys. This action must be called
