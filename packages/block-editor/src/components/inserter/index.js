@@ -141,7 +141,7 @@ export default compose( [
 			__experimentalGetAllowedBlocks,
 		} = select( 'core/block-editor' );
 
-		rootClientId = rootClientId || getBlockRootClientId( clientId );
+		rootClientId = rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
@@ -157,6 +157,7 @@ export default compose( [
 			hasSingleBlockType,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
 			allowedBlockType,
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
