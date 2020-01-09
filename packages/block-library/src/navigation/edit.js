@@ -71,18 +71,18 @@ function Navigation( {
 				return null;
 			}
 
-			return pages.map( ( { title, type, link: url, id } ) => (
-				createBlock( 'core/navigation-link',
+			return pages.map( ( { title, type, link: url, id } ) => {
+				return createBlock( 'core/navigation-link',
 					{
 						type,
 						id,
 						url,
-						label: escape( title.rendered ),
-						title: escape( title.raw ),
+						label: title.rendered === '' ? __( '(no title)' ) : escape( title.rendered ),
+						title: title.raw === '' ? __( '(no title)' ) : escape( title.raw ),
 						opensInNewTab: false,
 					}
-				)
-			) );
+				);
+			} );
 		},
 		[ pages ]
 	);
