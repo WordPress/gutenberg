@@ -34,7 +34,26 @@ export const fauxEntitySuggestions = [
 	},
 ];
 
-// export const fetchFauxEntitySuggestions = async () => fauxEntitySuggestions;
+export const fauxInitialSuggestions = [
+	{
+		id: uniqueId(),
+		title: 'Suggested Page 1',
+		type: 'Page',
+		url: `?p=${ uniqueId() }`,
+	},
+	{
+		id: uniqueId(),
+		title: 'Suggested Page 2',
+		type: 'Page',
+		url: `?p=${ uniqueId() }`,
+	},
+	{
+		id: uniqueId(),
+		title: 'Suggested Page 3',
+		type: 'Page',
+		url: `?p=${ uniqueId() }`,
+	},
+];
 
 export const fetchFauxEntitySuggestions = () => {
 	return Promise.resolve( fauxEntitySuggestions );
