@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. -->
+    <string name="gutenberg_native_1_s_current_value_is_2_s" tools:ignore="UnusedResources">%1$s. Current value is %2$s</string>
     <string name="gutenberg_native_add_a_description" tools:ignore="UnusedResources">Add a description</string>
     <string name="gutenberg_native_add_annotation" tools:ignore="UnusedResources">Add annotation</string>
     <string name="gutenberg_native_add_block_here" tools:ignore="UnusedResources">ADD BLOCK HERE</string>
@@ -73,7 +75,7 @@
     <string name="gutenberg_native_remove_annotations" tools:ignore="UnusedResources">Remove annotations</string>
     <!-- translators: accessibility text. %s: current block position (number). -->
     <string name="gutenberg_native_remove_block_at_row_s" tools:ignore="UnusedResources">Remove block at row %s</string>
-    <string name="gutenberg_native_reset" tools:ignore="UnusedResources">RESET</string>
+    <string name="gutenberg_native_remove_image" tools:ignore="UnusedResources">Remove Image</string>
     <string name="gutenberg_native_reset_block" tools:ignore="UnusedResources">Reset Block</string>
     <string name="gutenberg_native_row_d" tools:ignore="UnusedResources">Row %d.</string>
     <!-- translators: accessibility text. %s: block name. -->
@@ -98,7 +100,6 @@
     <string name="gutenberg_native_title" tools:ignore="UnusedResources">Title:</string>
     <string name="gutenberg_native_translate" tools:ignore="UnusedResources">Translate</string>
     <string name="gutenberg_native_ungroup" tools:ignore="UnusedResources">Ungroup</string>
-    <string name="gutenberg_native_unsupported" tools:ignore="UnusedResources">Unsupported</string>
     <string name="gutenberg_native_we_are_working_hard_to_add_more_blocks_with_each_release_in_the_m" tools:ignore="UnusedResources">We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.</string>
     <string name="gutenberg_native_wordpress_media_library" tools:ignore="UnusedResources">WordPress Media Library</string>
 </resources>
