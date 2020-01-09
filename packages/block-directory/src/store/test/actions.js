@@ -9,7 +9,6 @@ import * as BlockFunctions from '@wordpress/blocks';
 import {
 	downloadBlock,
 	installBlock,
-	uninstallBlock,
 } from '../actions';
 import * as Controls from '../controls';
 
@@ -17,6 +16,8 @@ const ACTIONS = {
 	apiFetch: 'API_FETCH',
 	addInstalledBlockType: 'ADD_INSTALLED_BLOCK_TYPE',
 	removeInstalledBlockType: 'REMOVE_INSTALLED_BLOCK_TYPE',
+	fetchInstallBlock: 'FETCH_INSTALL_BLOCK',
+	receiveInstallBlock: 'RECEIVE_INSTALL_BLOCKS',
 };
 
 jest.mock( '@wordpress/blocks' );
@@ -44,6 +45,12 @@ describe( 'actions', () => {
 		).toEqual( ACTIONS.apiFetch );
 	};
 
+	const testInstallFetch = ( generator ) => {
+		expect(
+			generator.next().value.type,
+		).toEqual( ACTIONS.fetchInstallBlock );
+	};
+
 	const expectTest = ( hasCall, noCall ) => {
 		expect( hasCall.mock.calls.length ).toBe( 1 );
 		expect( noCall.mock.calls.length ).toBe( 0 );
@@ -55,41 +62,6 @@ describe( 'actions', () => {
 
 	const expectError = ( onSuccess, onError ) => {
 		expectTest( onError, onSuccess );
-	};
-
-	const runSuccessActionCall = ( generatorFunc, blockTypeAction ) => {
-		const onSuccess = jest.fn();
-		const onError = jest.fn();
-
-		const generator = generatorFunc( item, onSuccess, onError );
-
-		// It triggers API_FETCH that wraps @wordpress/api-fetch
-		testApiFetch( generator );
-
-		// It triggers ADD_INSTALLED_BLOCK_TYPE
-		expect(
-			generator.next( { success: true } ).value.type,
-		).toEqual( blockTypeAction );
-
-		// Call onSuccess
-		generator.next();
-
-		expectSuccess( onSuccess, onError );
-	};
-
-	const runErrorActionCall = ( generatorFunc ) => {
-		const onSuccess = jest.fn();
-		const onError = jest.fn();
-
-		const uninstallBlockGenerator = generatorFunc( item, onSuccess, onError );
-
-		// It triggers API_FETCH that wraps @wordpress/api-fetch
-		testApiFetch( uninstallBlockGenerator );
-
-		// Resolve fetch and make it fail
-		uninstallBlockGenerator.next( { success: false } );
-
-		expectError( onSuccess, onError );
 	};
 
 	describe( 'downloadBlock', () => {
@@ -146,21 +118,46 @@ describe( 'actions', () => {
 
 	describe( 'installBlock', () => {
 		it( 'should install a block successfully', () => {
-			runSuccessActionCall( installBlock, ACTIONS.addInstalledBlockType );
+			const onSuccess = jest.fn();
+			const onError = jest.fn();
+
+			const generator = installBlock( item, onSuccess, onError );
+
+			// It triggers FETCH_INSTALL_BLOCK
+			testInstallFetch( generator );
+
+			// It triggers API_FETCH that wraps @wordpress/api-fetch
+			testApiFetch( generator );
+
+			// It triggers ADD_INSTALLED_BLOCK_TYPE
+			expect(
+				generator.next( { success: true } ).value.type,
+			).toEqual( ACTIONS.addInstalledBlockType );
+
+			// It triggers RECEIVE_INSTALL_BLOCKS
+			expect(
+				generator.next().value.type,
+			).toEqual( ACTIONS.receiveInstallBlock );
+
+			expectSuccess( onSuccess, onError );
 		} );
 
 		it( 'should trigger error state when error is thrown', () => {
-			runErrorActionCall( installBlock );
-		} );
-	} );
+			const onSuccess = jest.fn();
+			const onError = jest.fn();
 
-	describe( 'uninstallBlock', () => {
-		it( 'should uninstall a block successfully', () => {
-			runSuccessActionCall( uninstallBlock, ACTIONS.removeInstalledBlockType );
-		} );
+			const generator = installBlock( item, onSuccess, onError );
 
-		it( 'should trigger error state when error is thrown', () => {
-			runErrorActionCall( uninstallBlock );
+			// It triggers FETCH_INSTALL_BLOCK
+			testInstallFetch( generator );
+
+			// It triggers API_FETCH that wraps @wordpress/api-fetch
+			testApiFetch( generator );
+
+			// Resolve fetch and make it fail
+			generator.next( { success: false } );
+
+			expectError( onSuccess, onError );
 		} );
 	} );
 } );
