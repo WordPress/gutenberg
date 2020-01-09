@@ -90,7 +90,6 @@ const PluginBlockSettingsMenuItem = ( { allowedBlocks, icon, label, onClick, sma
 				return null;
 			}
 			return ( <MenuItem
-				className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 				onClick={ compose( onClick, onClose ) }
 				icon={ icon || 'admin-plugins' }
 				label={ small ? label : undefined }
