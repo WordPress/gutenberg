@@ -15,11 +15,9 @@ import { compose } from '@wordpress/compose';
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
 import DownloadableBlockNotice from '../downloadable-block-notice';
+import { DOWNLOAD_ERROR_NOTICE_ID, INSTALL_ERROR_NOTICE_ID } from '../../store/constants';
 
-const DOWNLOAD_ERROR_NOTICE_ID = 'block-download-error';
-const INSTALL_ERROR_NOTICE_ID = 'block-install-error';
-
-function DownloadableBlocksList( { items, onHover = noop, children, isLoading, errorNotices, installAndDownloadBlock } ) {
+function DownloadableBlocksList( { items, onHover = noop, children, isLoading, errorNotices, install, download } ) {
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -33,7 +31,11 @@ function DownloadableBlocksList( { items, onHover = noop, children, isLoading, e
 					className={ getBlockMenuDefaultClassName( item.id ) }
 					icons={ item.icons }
 					onClick={ () => {
-						installAndDownloadBlock( item );
+						const onSuccess = () => {
+							download( item );
+						};
+
+						install( item, onSuccess );
 						onHover( null );
 					} }
 					onFocus={ () => onHover( item ) }
@@ -41,7 +43,7 @@ function DownloadableBlocksList( { items, onHover = noop, children, isLoading, e
 					onMouseLeave={ () => onHover( null ) }
 					onBlur={ () => onHover( null ) }
 					item={ item }
-					notice={ <DownloadableBlockNotice onRetry={ installAndDownloadBlock } errorNotices={ errorNotices } block={ item } /> }
+					notice={ <DownloadableBlockNotice install={ install } download={ download } errorNotices={ errorNotices } block={ item } /> }
 					isLoading={ isLoading }
 				/>
 			) }
@@ -70,28 +72,33 @@ export default compose(
 		const { downloadBlock, installBlock, setErrorNotice, clearErrorNotice } = dispatch( 'core/block-directory' );
 		const { onSelect } = props;
 
+		const download = ( item ) => {
+			clearErrorNotice( item.id );
+
+			const onDownloadError = () => {
+				setErrorNotice( item.id, DOWNLOAD_ERROR_NOTICE_ID );
+			};
+
+			const onDownloadSuccess = () => {
+				onSelect( item );
+			};
+
+			downloadBlock( item, onDownloadSuccess, onDownloadError );
+		};
+
+		const install = ( item, onSuccess ) => {
+			clearErrorNotice( item.id );
+
+			const onInstallBlockError = () => {
+				setErrorNotice( item.id, INSTALL_ERROR_NOTICE_ID );
+			};
+
+			installBlock( item, onSuccess, onInstallBlockError );
+		};
+
 		return {
-			installAndDownloadBlock: ( item ) => {
-				clearErrorNotice( item.id );
-
-				const onSuccess = () => {
-					const onDownloadError = () => {
-						setErrorNotice( item.id, DOWNLOAD_ERROR_NOTICE_ID );
-					};
-
-					const onDownloadSuccess = () => {
-						onSelect( item );
-					};
-
-					downloadBlock( item, onDownloadSuccess, onDownloadError );
-				};
-
-				const onInstallBlockError = () => {
-					setErrorNotice( item.id, INSTALL_ERROR_NOTICE_ID );
-				};
-
-				installBlock( item, onSuccess, onInstallBlockError );
-			},
+			install,
+			download,
 		};
 	} ),
 )( DownloadableBlocksList );
