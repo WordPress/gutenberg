@@ -98,7 +98,7 @@ class URLInput extends Component {
 			__experimentalInitialSuggestions: initialSuggestions,
 		} = this.props;
 
-		if ( ! fetchLinkSuggestions || ! initialSuggestions ) {
+		if ( ! fetchLinkSuggestions || ( isManualSearch && ! initialSuggestions ) ) {
 			return;
 		}
 
@@ -157,6 +157,7 @@ class URLInput extends Component {
 
 	onChange( event ) {
 		const inputValue = event.target.value;
+
 		this.props.onChange( inputValue );
 		if ( ! this.props.disableSuggestions ) {
 			this.updateSuggestions( inputValue );
