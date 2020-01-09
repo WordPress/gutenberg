@@ -162,7 +162,7 @@ export class ImageEdit extends Component {
 
 		// Check resizeRef's block parents to set an accurate width restriction.
 		// This is used to limit the resizer from resizing the image beyond the block parent's width.
-		if ( this.resizeRef.current && this.state.maxWidth === this.bufferWidth ) {
+		if ( this.resizeRef.current && this.state.maxWidth === this.maxWidthBuffer ) {
 			let parentBlock = this.resizeRef.current.parentNode;
 			// Traverse 'up' in parent nodes until we find the block parent.
 			while ( ! parentBlock.classList.contains( 'block-editor-block-list__block' ) ) {
