@@ -134,11 +134,14 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
+			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
 		} = select( 'core/block-editor' );
+
+		rootClientId = rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
@@ -154,6 +157,7 @@ export default compose( [
 			hasSingleBlockType,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
 			allowedBlockType,
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

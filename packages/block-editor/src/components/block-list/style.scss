@@ -31,6 +31,7 @@
 .block-editor-block-list__layout {
 	padding-left: $block-padding;
 	padding-right: $block-padding;
+	position: relative;
 
 	// Beyond the mobile breakpoint, compensate for side UI.
 	@include break-small() {
@@ -402,12 +403,7 @@
 		display: flex;
 	}
 
-	position: absolute;
-	bottom: auto;
-	left: 0;
-	right: 0;
 	justify-content: center;
-	height: $block-padding + 8px;
 
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
@@ -420,32 +416,6 @@
 
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			box-shadow: none;
-		}
-	}
-
-	// Hide both the button until hovered.
-	opacity: 0;
-	transition: opacity 0.1s linear;
-	@include reduce-motion("transition");
-
-	&:hover,
-	&.is-visible {
-		opacity: 1;
-	}
-}
-
-// Don't show the sibling inserter before the selected block.
-.edit-post-layout:not(.has-fixed-toolbar) {
-	// The child selector is necessary for this to work properly in nested contexts.
-	.is-selected > .block-editor-block-list__insertion-point > .block-editor-block-list__insertion-point-inserter,
-	.is-focused > .block-editor-block-list__insertion-point > .block-editor-block-list__insertion-point-inserter {
-		opacity: 0;
-		pointer-events: none;
-
-		&:hover,
-		&.is-visible {
-			opacity: 1;
-			pointer-events: auto;
 		}
 	}
 }

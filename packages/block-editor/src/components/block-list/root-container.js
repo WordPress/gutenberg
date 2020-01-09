@@ -9,6 +9,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import useMultiSelection from './use-multi-selection';
 import { getBlockClientId } from '../../utils/dom';
+import InsertionPoint from './insertion-point';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -18,11 +19,13 @@ function selector( select ) {
 	const {
 		getSelectedBlockClientId,
 		hasMultiSelection,
+		isMultiSelecting,
 	} = select( 'core/block-editor' );
 
 	return {
 		selectedBlockClientId: getSelectedBlockClientId(),
 		hasMultiSelection: hasMultiSelection(),
+		isMultiSelecting: isMultiSelecting(),
 	};
 }
 
@@ -46,6 +49,7 @@ export default function RootContainer( { children, className } ) {
 	const {
 		selectedBlockClientId,
 		hasMultiSelection,
+		isMultiSelecting,
 	} = useSelect( selector, [] );
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const onSelectionStart = useMultiSelection( ref );
@@ -70,15 +74,21 @@ export default function RootContainer( { children, className } ) {
 	}
 
 	return (
-		<div
-			ref={ ref }
+		<InsertionPoint
 			className={ className }
-			onFocus={ onFocus }
-			onDragStart={ onDragStart }
+			isMultiSelecting={ isMultiSelecting }
+			selectedBlockClientId={ selectedBlockClientId }
 		>
-			<Context.Provider value={ onSelectionStart }>
-				{ children }
-			</Context.Provider>
-		</div>
+			<div
+				ref={ ref }
+				className={ className }
+				onFocus={ onFocus }
+				onDragStart={ onDragStart }
+			>
+				<Context.Provider value={ onSelectionStart }>
+					{ children }
+				</Context.Provider>
+			</div>
+		</InsertionPoint>
 	);
 }

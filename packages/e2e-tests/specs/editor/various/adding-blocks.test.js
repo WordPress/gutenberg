@@ -92,11 +92,11 @@ describe( 'adding blocks', () => {
 		await page.click( '.editor-post-title__input' );
 
 		// Using the between inserter
-		const insertionPoint = await page.$( '[data-type="core/quote"] .block-editor-inserter__toggle' );
+		const insertionPoint = await page.$( '[data-type="core/quote"]' );
 		const rect = await insertionPoint.boundingBox();
-		await page.mouse.move( rect.x + ( rect.width / 2 ), rect.y + ( rect.height / 2 ), { steps: 10 } );
-		await page.waitForSelector( '[data-type="core/quote"] .block-editor-inserter__toggle' );
-		await page.click( '[data-type="core/quote"] .block-editor-inserter__toggle' );
+		await page.mouse.move( rect.x + ( rect.width / 2 ), rect.y - 10, { steps: 10 } );
+		await page.waitForSelector( '.block-editor-block-list__insertion-point .block-editor-inserter__toggle' );
+		await page.click( '.block-editor-block-list__insertion-point .block-editor-inserter__toggle' );
 		// [TODO]: Search input should be focused immediately. It shouldn't be
 		// necessary to have `waitForFunction`.
 		await page.waitForFunction( () => (
