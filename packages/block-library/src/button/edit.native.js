@@ -31,9 +31,9 @@ import { withDispatch, withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import richTextStyle from './richText.scss';
+import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
-import RichTextWrapper from './richTextWrapper';
+import BackgroundContainer from './background-container.native';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 const MIN_BORDER_RADIUS_VALUE = 0;
@@ -173,7 +173,7 @@ class ButtonEdit extends Component {
 						},
 					] }
 				>
-					<RichTextWrapper
+					<BackgroundContainer
 						borderRadiusValue={ borderRadiusValue }
 						backgroundColor={ this.onChangeBackgroundColor() }
 					>
@@ -196,7 +196,7 @@ class ButtonEdit extends Component {
 							maxWidth={ maxWidth }
 							id={ clientId }
 						/>
-					</RichTextWrapper>
+					</BackgroundContainer>
 
 					<InspectorControls>
 						<PanelBody title={ __( 'Border Settings' ) } >
