@@ -155,6 +155,14 @@ function observeConsoleLogging() {
 			return;
 		}
 
+		// As of WordPress 5.3.2 in Chrome 79, navigating to the block editor
+		// (Posts > Add New) will display a console warning about
+		// non - unique IDs.
+		// See: https://core.trac.wordpress.org/ticket/23165
+		if ( text.includes( '[DOM] Found 2 elements with non-unique id #_wpnonce' ) ) {
+			return;
+		}
+
 		const logFunction = OBSERVED_CONSOLE_MESSAGE_TYPES[ type ];
 
 		// As of Puppeteer 1.6.1, `message.text()` wrongly returns an object of
