@@ -35,7 +35,7 @@ const hasLintConfig = hasArgInCLI( '-c' ) ||
 // the `--no-eslintrc` flag, as otherwise it will still merge with inherited.
 const defaultConfigArgs = ! hasLintConfig ?
 	[ '--no-eslintrc', '--config', fromConfigRoot( '.eslintrc.js' ) ] :
-	[ '--ext', 'md' ];
+	[];
 
 // See: https://eslint.org/docs/user-guide/configuring#ignoring-files-and-directories.
 const hasIgnoredFiles = hasArgInCLI( '--ignore-path' ) ||
