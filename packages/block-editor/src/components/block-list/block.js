@@ -123,19 +123,6 @@ function BlockListBlock( {
 	 * @param {boolean} ignoreInnerBlocks Should not focus inner blocks.
 	 */
 	const focusTabbable = ( ignoreInnerBlocks ) => {
-		const selection = window.getSelection();
-
-		if ( selection.rangeCount && ! selection.isCollapsed ) {
-			const { startContainer, endContainer } = selection.getRangeAt( 0 );
-
-			if (
-				! blockNodeRef.current.contains( startContainer ) ||
-				! blockNodeRef.current.contains( endContainer )
-			) {
-				selection.removeAllRanges();
-			}
-		}
-
 		// Focus is captured by the wrapper node, so while focus transition
 		// should only consider tabbables within editable display, since it
 		// may be the wrapper itself or a side control which triggered the

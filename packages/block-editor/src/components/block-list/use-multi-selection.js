@@ -42,6 +42,7 @@ function selector( select ) {
 		getMultiSelectedBlockClientIds,
 		hasMultiSelection,
 		getBlockParents,
+		getSelectedBlockClientId,
 	} = select( 'core/block-editor' );
 
 	return {
@@ -50,6 +51,7 @@ function selector( select ) {
 		multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 		hasMultiSelection: hasMultiSelection(),
 		getBlockParents,
+		selectedBlockClientId: getSelectedBlockClientId(),
 	};
 }
 
@@ -60,6 +62,7 @@ export default function useMultiSelection( ref ) {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		getBlockParents,
+		selectedBlockClientId,
 	} = useSelect( selector, [] );
 	const {
 		startMultiSelect,
@@ -76,6 +79,24 @@ export default function useMultiSelection( ref ) {
 	 */
 	useEffect( () => {
 		if ( ! hasMultiSelection || isMultiSelecting ) {
+			if ( ! selectedBlockClientId ) {
+				return;
+			}
+
+			const selection = window.getSelection();
+
+			if ( selection.rangeCount && ! selection.isCollapsed ) {
+				const blockNode = getBlockDOMNode( selectedBlockClientId );
+				const { startContainer, endContainer } = selection.getRangeAt( 0 );
+
+				if (
+					! blockNode.contains( startContainer ) ||
+					! blockNode.contains( endContainer )
+				) {
+					selection.removeAllRanges();
+				}
+			}
+
 			return;
 		}
 
@@ -110,6 +131,7 @@ export default function useMultiSelection( ref ) {
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
 		selectBlock,
+		selectedBlockClientId,
 	] );
 
 	const onSelectionChange = useCallback( () => {
