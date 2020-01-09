@@ -396,6 +396,13 @@ function BlockListBlock( {
 		/>
 	);
 
+	// Position above the anchor, pop out towards the right, and position in the
+	// left corner. For the side inserter, pop out towards the left, and
+	// position in the right corner.
+	// To do: refactor `Popover` to make this prop clearer.
+	const popoverPosition = showEmptyBlockSideInserter ? 'top left right' : 'top right left';
+	const popoverIsSticky = isPartOfMultiSelection ? '.wp-block.is-multi-selected' : true;
+
 	return (
 		<animated.div
 			id={ blockElementId }
@@ -427,18 +434,20 @@ function BlockListBlock( {
 				// of the appropriate parent.
 				<ChildToolbarSlot />
 			) }
-			{ ( shouldShowBreadcrumb || shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
+			{ (
+				shouldShowBreadcrumb ||
+				shouldShowContextualToolbar ||
+				isForcingContextualToolbar.current ||
+				showEmptyBlockSideInserter
+			) && (
 				<Popover
 					noArrow
 					animate={ false }
-					// Position above the anchor, pop out towards the right,
-					// and position in the left corner.
-					// To do: refactor `Popover` to make this prop clearer.
-					position="top right left"
+					position={ popoverPosition }
 					focusOnMount={ false }
 					anchorRef={ blockNodeRef.current }
 					className="block-editor-block-list__block-popover"
-					__unstableSticky={ isPartOfMultiSelection ? '.wp-block.is-multi-selected' : true }
+					__unstableSticky={ showEmptyBlockSideInserter ? false : popoverIsSticky }
 					__unstableSlotName="block-toolbar"
 					// Allow subpixel positioning for the block movement animation.
 					__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && wrapper.current }
@@ -459,6 +468,16 @@ function BlockListBlock( {
 							ref={ breadcrumb }
 							data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
 						/>
+					) }
+					{ showEmptyBlockSideInserter && (
+						<div className="block-editor-block-list__empty-block-inserter">
+							<Inserter
+								position="top right"
+								onToggle={ selectOnOpen }
+								rootClientId={ rootClientId }
+								clientId={ clientId }
+							/>
+						</div>
 					) }
 				</Popover>
 			) }
@@ -485,16 +504,6 @@ function BlockListBlock( {
 				</BlockCrashBoundary>
 				{ !! hasError && <BlockCrashWarning /> }
 			</div>
-			{ showEmptyBlockSideInserter && (
-				<div className="block-editor-block-list__empty-block-inserter">
-					<Inserter
-						position="top right"
-						onToggle={ selectOnOpen }
-						rootClientId={ rootClientId }
-						clientId={ clientId }
-					/>
-				</div>
-			) }
 		</animated.div>
 	);
 }
