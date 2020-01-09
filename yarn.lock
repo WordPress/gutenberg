@@ -3064,7 +3064,7 @@ appium-remote-debugger@^5.7.0:
     lodash "^4.17.11"
     source-map-support "^0.5.5"
 
-appium-remote-debugger@^7.0.0, appium-remote-debugger@^7.3.0:
+appium-remote-debugger@^7.0.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/appium-remote-debugger/-/appium-remote-debugger-7.3.0.tgz#a512e7dc7fb5c187f00538f39e996580cea6c759"
   integrity sha512-3dMEvuOpql2B2SXJZ25o+rW4JkQe+1AFh+xIM4ArsLjn9FzHnTr9uRlhTUOgogrzNzJ8UJDVCAWIL+IbutwsfQ==
@@ -3400,10 +3400,10 @@ appium-youiengine-driver@^1.2.0:
     source-map-support "^0.5.9"
     teen_process "^1.14.1"
 
-appium@1.16.0-rc.1:
-  version "1.16.0-rc.1"
-  resolved "https://registry.yarnpkg.com/appium/-/appium-1.16.0-rc.1.tgz#78b5d25937f2c89acfbcdf940902395b721b47fb"
-  integrity sha512-VxwbfZi1WTAXqQPVj0a+u+f4kc0IMoQSTewiny6xUyLvr56MBd+xxoQws5ipIOiDQiQB6QkQ7/OWw+r/lUGp9g==
+appium@1.16.0:
+  version "1.16.0"
+  resolved "https://registry.yarnpkg.com/appium/-/appium-1.16.0.tgz#fb58a6cec93636892749c42d25d4396450223260"
+  integrity sha512-wOTmJTWPGvGV0I8rGZpJl+dPiJ6V05qkIrifn4SLWeR0WAp4Zlm0hyYeQO3Mqwbf0KDgwOc4SJd2sU7yytE2Tw==
   dependencies:
     "@babel/runtime" "^7.6.0"
     appium-android-driver "^4.21.0"
@@ -3413,7 +3413,6 @@ appium@1.16.0-rc.1:
     appium-flutter-driver "^0"
     appium-ios-driver "4.x"
     appium-mac-driver "1.x"
-    appium-remote-debugger "^7.3.0"
     appium-support "2.x"
     appium-tizen-driver "^1.1.1-beta.4"
     appium-uiautomator2-driver "^1.40.0"
