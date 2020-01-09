@@ -226,7 +226,9 @@ export function useEntityBlockEditor(
 		( nextBlocks ) => {
 			onInput( nextBlocks );
 			// Use a function edit to avoid serializing often.
-			setContent( () => serialize( nextBlocks ) );
+			setContent( ( { blocks: blocksToSerialize } ) =>
+				serialize( blocksToSerialize )
+			);
 		},
 		[ onInput, setContent ]
 	);

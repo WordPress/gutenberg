@@ -253,7 +253,9 @@ export function* saveEntityRecord(
 	// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
 	for ( const [ key, value ] of Object.entries( record ) ) {
 		if ( typeof value === 'function' ) {
-			const evaluatedValue = value();
+			const evaluatedValue = value(
+				yield select( 'getEditedEntityRecord', kind, name, recordId )
+			);
 			yield editEntityRecord(
 				kind,
 				name,
