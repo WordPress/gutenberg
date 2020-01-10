@@ -4,9 +4,8 @@ import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.facebook.react.views.textinput.ReactTextInputShadowNode;
 
-public class ReactAztecTextShadowNode extends ReactTextInputShadowNode {
+public class ReactAztecTextShadowNode extends ReactTextInputShadowNodeFork {
 
     @Override
     public void setDefaultPadding(int spacingType, float padding) {
