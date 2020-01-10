@@ -134,8 +134,6 @@ function BlockListBlock( {
 	// Reference to the block edit node
 	const blockNodeRef = useRef();
 
-	const breadcrumb = useRef();
-
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
 	const onBlockError = () => setErrorState( true );
@@ -158,11 +156,6 @@ function BlockListBlock( {
 		// may be the wrapper itself or a side control which triggered the
 		// focus event, don't unnecessary transition to an inner tabbable.
 		if ( wrapper.current.contains( document.activeElement ) ) {
-			return;
-		}
-
-		if ( isNavigationMode ) {
-			breadcrumb.current.focus();
 			return;
 		}
 
@@ -205,15 +198,10 @@ function BlockListBlock( {
 	// Block Reordering animation
 	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, isSelected || isFirstMultiSelected, enableAnimation, animateOnChange );
 
-	// Focus the breadcrumb if the wrapper is focused on navigation mode.
 	// Focus the first editable or the wrapper if edit mode.
 	useLayoutEffect( () => {
-		if ( isSelected ) {
-			if ( isNavigationMode ) {
-				breadcrumb.current.focus();
-			} else {
-				focusTabbable( true );
-			}
+		if ( isSelected && ! isNavigationMode ) {
+			focusTabbable( true );
 		}
 	}, [ isSelected, isNavigationMode ] );
 
@@ -230,14 +218,9 @@ function BlockListBlock( {
 	const onKeyDown = ( event ) => {
 		const { keyCode, target } = event;
 
-		// ENTER/BACKSPACE Shortcuts are only available if the wrapper or
-		// breadcrumb is focused.
-		const canUseShortcuts = ( target === wrapper.current || target === breadcrumb.current );
-		const isEditMode = ! isNavigationMode;
-
 		switch ( keyCode ) {
 			case ENTER:
-				if ( canUseShortcuts && isEditMode ) {
+				if ( target === wrapper.current ) {
 					// Insert default block after current block if enter and event
 					// not already handled by descendant.
 					onInsertDefaultBlockAfter();
@@ -246,7 +229,7 @@ function BlockListBlock( {
 				break;
 			case BACKSPACE:
 			case DELETE:
-				if ( canUseShortcuts ) {
+				if ( target === wrapper.current ) {
 					// Remove block on backspace.
 					onRemove( clientId );
 					event.preventDefault();
@@ -460,7 +443,6 @@ function BlockListBlock( {
 					{ shouldShowBreadcrumb && (
 						<BlockBreadcrumb
 							clientId={ clientId }
-							ref={ breadcrumb }
 							data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
 						/>
 					) }
