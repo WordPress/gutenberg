@@ -209,7 +209,7 @@ function gutenberg_user_settings_data_persistence_inline_script() {
 	global $wp_scripts, $wpdb;
 
 	$user_id         = get_current_user_id();
-	$persisted_value = get_user_meta( $user_id, $wpdb->prefix . 'data_persistence', true );
+	$persisted_value = get_user_meta( $user_id, $wpdb->get_blog_prefix() . 'data_persistence', true );
 	if ( empty( $persisted_value ) ) {
 		// If there's no explicit metadata assigned, fall back to a value which
 		// was persisted using browser storage, prior to user meta persistence.
