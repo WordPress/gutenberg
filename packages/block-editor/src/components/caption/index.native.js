@@ -1,20 +1,13 @@
 /**
  * External dependencies
  */
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-
-// this platform difference is needed to avoid a regression described here:
-// https://github.com/WordPress/gutenberg/pull/18818#issuecomment-559818548
-const CAPTION_TAG_NAME = Platform.select( {
-	ios: 'p',
-	android: '',
-} );
 
 const Caption = ( {
 	accessibilityLabelCreator,
@@ -47,7 +40,7 @@ const Caption = ( {
 			placeholderTextColor={ placeholderTextColor }
 			rootTagsToEliminate={ [ 'p' ] }
 			style={ style }
-			tagName={ CAPTION_TAG_NAME }
+			tagName="p"
 			textAlign="center"
 			underlineColorAndroid="transparent"
 			unstableOnFocus={ onFocus }
