@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* gutenbergTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* gutenbergTests.m */; };
+		05908C6EA5B80A39F74C4FEF /* Pods_gutenberg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E210A05B5C8829E0B3BE83 /* Pods_gutenberg.framework */; };
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
@@ -16,7 +17,6 @@
 		4858A387C929BA42C247FA16 /* Pods_gutenberg_tvOSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE48AF171A9B998D71F3078B /* Pods_gutenberg_tvOSTests.framework */; };
 		7EC7328F21907E3F00FED2E6 /* GutenbergViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC7328E21907E3F00FED2E6 /* GutenbergViewController.swift */; };
 		8C666FF0C9224FB88C2C0447 /* libRNSVG-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BFAFEB337654221B2F14D03 /* libRNSVG-tvOS.a */; };
-		9FECC5A298E0A9D64F0A912B /* Pods_gutenberg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E210A05B5C8829E0B3BE83 /* Pods_gutenberg.framework */; };
 		C05E07BC5927E0FBD17C828D /* Pods_gutenbergTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D57C380A7861BFFC2565FE6E /* Pods_gutenbergTests.framework */; };
 		F151983C2100DC3D000F6E97 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15198392100DC3D000F6E97 /* AppDelegate.swift */; };
 		F151983D2100DC3D000F6E97 /* MediaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F151983A2100DC3D000F6E97 /* MediaProvider.swift */; };
@@ -93,6 +93,7 @@
 		FF6836C722035EAB00A0C562 /* MediaUploadCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MediaUploadCoordinator.swift; path = gutenberg/MediaUploadCoordinator.swift; sourceTree = "<group>"; };
 		FF83DAA82226905A00A34C93 /* CustomImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomImageLoader.swift; sourceTree = "<group>"; };
 		FF9A6F1621FA8E2500D36D14 /* MediaPickCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MediaPickCoordinator.swift; path = gutenberg/MediaPickCoordinator.swift; sourceTree = "<group>"; };
+		FFFA53E823C794F500829A43 /* Gutenberg.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Gutenberg.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,7 +110,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF37F903223819FA00AFA3DB /* JavaScriptCore.framework in Frameworks */,
-				9FECC5A298E0A9D64F0A912B /* Pods_gutenberg.framework in Frameworks */,
+				05908C6EA5B80A39F74C4FEF /* Pods_gutenberg.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -172,6 +173,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FFFA53E823C794F500829A43 /* Gutenberg.framework */,
 				9193873C2260BA7800E4FBD6 /* CoreServices.framework */,
 				9193870E2260BA5500E4FBD6 /* MobileCoreServices.framework */,
 				FF37F8D0223819FA00AFA3DB /* JavaScriptCore.framework */,
@@ -381,6 +383,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);

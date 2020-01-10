@@ -79,6 +79,9 @@ group='com.github.wordpress-mobile.gutenberg-mobile'
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
 project.ext.buildGutenbergFromSource = false
 
+def hermesOriginalPath = "../../node_modules/hermes-engine/android/";
+def hermesPath = hermesOriginalPath;
+
 android {
     compileSdkVersion 28
 
@@ -108,7 +111,6 @@ repositories {
         // If building from source, use the local sources from node_modules
         def nodeModulesPath = "${project.buildDir}/../../../node_modules/"
         maven { url "${nodeModulesPath}/react-native/android" }
-        maven { url "${nodeModulesPath}/jsc-android/dist" }
     } else {
         // If not building from source (e.g. Jitpack), use the bintray repo so a local RN setup is not needed
         def reactNativeRepo = 'https://dl.bintray.com/wordpress-mobile/react-native-mirror/'
@@ -118,9 +120,8 @@ repositories {
 }
 
 dependencies {
-    // Make sure to put android-jsc at the the first
-    implementation "org.webkit:android-jsc:r241213"
     implementation project(':react-native-aztec')
+
     implementation "org.wordpress:utils:1.22"
 
     // For animated GIF support
@@ -134,6 +135,8 @@ dependencies {
 
         implementation 'com.facebook.react:react-native:+'
     } else {
+        hermesPath = "../../bundle/";
+
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../package.json', 'react-native-video', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-slider', readHashedVersion('../../package.json', '@react-native-community/slider', 'dependencies')))
@@ -141,17 +144,43 @@ dependencies {
         def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
         implementation "com.facebook.react:react-native:${rnVersion}"
     }
+
+    debugImplementation files(hermesPath + "hermes-debug.aar")
+    releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
 if (isJitPack) {
     def assetsFolder = 'src/main/assets'
+    def aarFolder = 'src/main/assets'
 
     task buildJSBundle(type: YarnTask) {
         args = ['bundle:android']
     }
 
-    task ensureAssetsDirectory << {
-        mkdir assetsFolder
+    task ensureAssetsDirectory { 
+        doLast {
+            mkdir assetsFolder
+        }
+    }
+
+    task backupHermesDebugAAR(type: Copy) {
+        def origFileName = 'hermes-debug.aar'
+        def origWithPath = hermesOriginalPath + origFileName
+        from origWithPath
+        into hermesPath
+        doLast {
+            println "Done backing up Hermes debug AARs"
+        }
+    }
+
+    task backupHermesReleaseAAR(type: Copy) {
+        def origFileName = 'hermes-release.aar'
+        def origWithPath = hermesOriginalPath + origFileName
+        from origWithPath
+        into hermesPath
+        doLast {
+            println "Done backing up Hermes release AARs"
+        }
     }
 
     task copyJSBundle(type: Copy) {
@@ -161,8 +190,9 @@ if (isJitPack) {
         from origWithPath
         into assetsFolder
         rename origFileName, target
-    } << {
-        println "Done copying the Android JS bundle to assets folder"
+        doLast {
+            println "Done copying the Android JS bundle to assets folder"
+        }
     }
 
     task cleanupNodeModulesFolder(type: Delete) {
@@ -171,7 +201,9 @@ if (isJitPack) {
 
     if (isJitPack) {
         preBuild.dependsOn(cleanupNodeModulesFolder)
-        cleanupNodeModulesFolder.dependsOn(copyJSBundle)
+        cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
+        backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
+        backupHermesReleaseAAR.dependsOn(copyJSBundle)
         copyJSBundle.dependsOn(buildJSBundle)
         buildJSBundle.dependsOn(yarn_install, ensureAssetsDirectory)
     }

@@ -1,6 +1,3 @@
-before_install:
-   - yes | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
-   - yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.3"
 install:
    - export TMPDIR=`dirname $(mktemp)`
    - echo "Changing into the android folder of the Bridge module"
