@@ -1,9 +1,3 @@
-
-/**
- * External dependencies
- */
-import { throttle } from 'lodash';
-
 /**
  * WordPress dependencies
  */
@@ -13,7 +7,6 @@ export default function useSuggestions( searchTerm, fetchSuggestions, disableSug
 	const requestInstance = useRef();
 	const [ suggestions, setSuggestions ] = useState( [] );
 	const [ isFetching, setIsFetching ] = useState( false );
-	const throttledFetchSuggestions = throttle( fetchSuggestions, 200 );
 
 	useEffect( () => async () => {
 		if ( searchTerm === undefined || ( searchTerm && searchTerm.length < 2 ) || disableSuggestions ) {
@@ -24,7 +17,7 @@ export default function useSuggestions( searchTerm, fetchSuggestions, disableSug
 		setIsFetching( true );
 
 		try {
-			const request = throttledFetchSuggestions( searchTerm );
+			const request = fetchSuggestions( searchTerm );
 			requestInstance.current = request;
 
 			const suggestionResults = await request;

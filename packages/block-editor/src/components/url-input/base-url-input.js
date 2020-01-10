@@ -28,7 +28,7 @@ export default function BaseURLInput( props ) {
 		loadingIndicator: LoadingIndicator = Spinner,
 		suggestionListContainer: SuggestionListContainer,
 		suggestionListItem: SuggestionListItem,
-		value: inputValue,
+		value: inputValue = '',
 		suggestions,
 		isFetchingSuggestions,
 		selectedSuggestionIndex,
@@ -41,7 +41,7 @@ export default function BaseURLInput( props ) {
 		label,
 		isFullWidth,
 		hasBorder,
-		placeholder,
+		placeholder = __( 'Paste URL or type to search' ),
 	} = props;
 
 	const inputRef = useRef();

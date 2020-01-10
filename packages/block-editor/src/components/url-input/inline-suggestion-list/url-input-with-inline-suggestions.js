@@ -8,7 +8,7 @@ import { startsWith } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import {
 	isURL,
@@ -80,13 +80,13 @@ function filterSuggestionResults( suggestionResults, searchTerm ) {
 }
 
 export default function URLInputWithInlineSuggestions( props ) {
-	const { value, onChange, disableSuggestions } = props;
+	const { value = '', onChange, disableSuggestions } = props;
 	const [ selectedSuggestionIndex, setSelectedSuggestionIndex ] = useState();
 	const fetchSuggestions = useSelect( ( select ) => {
 		const { __experimentalFetchLinkSuggestions } = select( 'core/block-editor' ).getSettings();
 		return __experimentalFetchLinkSuggestions;
 	} );
-	const enhancedFetchSuggestions = enhanceFetchSuggestions( fetchSuggestions );
+	const enhancedFetchSuggestions = useCallback( enhanceFetchSuggestions( fetchSuggestions ), [ fetchSuggestions ] );
 	const { suggestions, isFetchingSuggestions } = useSuggestions( value, enhancedFetchSuggestions, disableSuggestions );
 	const filteredSuggestions = filterSuggestionResults( suggestions, value );
 
