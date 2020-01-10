@@ -74,8 +74,8 @@ describe( 'Navigation', () => {
 		await createNewPost();
 	} );
 
-	afterEach( () => {
-		setUpResponseMocking( [] );
+	afterEach( async () => {
+		await setUpResponseMocking( [] );
 	} );
 
 	it( 'allows a navigation menu to be created using existing pages', async () => {
