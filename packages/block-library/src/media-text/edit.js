@@ -43,8 +43,8 @@ const TEMPLATE = [
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
-export const LINK_DESTINATION_MEDIA = 'media';
-export const LINK_DESTINATION_ATTACHMENT = 'attachment';
+const LINK_DESTINATION_MEDIA = 'media';
+const LINK_DESTINATION_ATTACHMENT = 'attachment';
 
 class MediaTextEdit extends Component {
 	constructor() {
@@ -57,6 +57,7 @@ class MediaTextEdit extends Component {
 			mediaWidth: null,
 		};
 		this.onSetHref = this.onSetHref.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
 	}
 
 	onSelectMedia( media ) {
@@ -117,6 +118,29 @@ class MediaTextEdit extends Component {
 		this.props.setAttributes( props );
 	}
 
+	onSelectURL( newURL ) {
+		const { mediaUrl, linkDestination, href } = this.props.attributes;
+
+		if ( newURL !== mediaUrl ) {
+			let newHref = href;
+			if ( linkDestination === LINK_DESTINATION_MEDIA ) {
+				// Update the media link.
+				newHref = newURL;
+			}
+
+			// Check if the image is linked to the attachment page.
+			if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
+				// Update the media link.
+				newHref = undefined;
+			}
+			this.props.setAttributes( {
+				mediaUrl: newURL,
+				href: newHref,
+				mediaId: undefined,
+			} );
+		}
+	}
+
 	commitWidthChange( width ) {
 		const { setAttributes } = this.props;
 
@@ -135,6 +159,7 @@ class MediaTextEdit extends Component {
 			<MediaContainer
 				className="block-library-media-text__media-container"
 				onSelectMedia={ this.onSelectMedia }
+				onSelectURL={ this.onSelectURL }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
 				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint } }

@@ -6,17 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import __experimentalBlockListFooter from '../block-list-footer';
-import useMultiSelection from './use-multi-selection';
+import RootContainer from './root-container';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -38,6 +36,7 @@ function BlockList( {
 	__experimentalMoverDirection: moverDirection = 'vertical',
 	isDraggable,
 	renderAppender,
+	__experimentalUIParts = {},
 } ) {
 	function selector( select ) {
 		const {
@@ -71,12 +70,17 @@ function BlockList( {
 		hasMultiSelection,
 		enableAnimation,
 	} = useSelect( selector, [ rootClientId ] );
-	const ref = useRef();
-	const onSelectionStart = useMultiSelection( { ref, rootClientId } );
+
+	const uiParts = {
+		hasMovers: true,
+		hasSelectedUI: true,
+		...__experimentalUIParts,
+	};
+
+	const Container = rootClientId ? 'div' : RootContainer;
 
 	return (
-		<div
-			ref={ ref }
+		<Container
 			className={ classnames(
 				'block-editor-block-list__layout',
 				className
@@ -88,15 +92,10 @@ function BlockList( {
 					selectedBlockClientId === clientId;
 
 				return (
-					<BlockAsyncModeProvider
-						key={ 'block-' + clientId }
-						clientId={ clientId }
-						isBlockInSelection={ isBlockInSelection }
-					>
+					<AsyncModeProvider key={ clientId } value={ ! isBlockInSelection }>
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
-							onSelectionStart={ onSelectionStart }
 							isDraggable={ isDraggable }
 							moverDirection={ moverDirection }
 							isMultiSelecting={ isMultiSelecting }
@@ -105,8 +104,10 @@ function BlockList( {
 							// otherwise there might be a small delay to trigger the animation.
 							animateOnChange={ index }
 							enableAnimation={ enableAnimation }
+							hasSelectedUI={ uiParts.hasSelectedUI }
+							hasMovers={ uiParts.hasMovers }
 						/>
-					</BlockAsyncModeProvider>
+					</AsyncModeProvider>
 				);
 			} ) }
 			<BlockListAppender
@@ -114,7 +115,7 @@ function BlockList( {
 				renderAppender={ renderAppender }
 			/>
 			<__experimentalBlockListFooter.Slot />
-		</div>
+		</Container>
 	);
 }
 

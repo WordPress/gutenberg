@@ -16,7 +16,7 @@ export { metadata, name };
 
 export const settings = {
 	name,
-	title: __( 'Unrecognized Block' ),
+	title: __( 'Unsupported' ),
 	description: __( 'Your site doesn’t include support for this block.' ),
 	supports: {
 		className: false,

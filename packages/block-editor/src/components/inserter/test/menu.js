@@ -8,12 +8,13 @@ import ReactDOM from 'react-dom';
 /**
  * Internal dependencies
  */
-import items, { categories } from './fixtures';
+import items, { categories, collections } from './fixtures';
 import { InserterMenu } from '../menu';
 
 const DEFAULT_PROPS = {
 	position: 'top center',
 	categories,
+	collections,
 	items,
 	debouncedSpeak: noop,
 	fetchReusableBlocks: noop,
@@ -196,13 +197,13 @@ describe( 'InserterMenu', () => {
 		const element = initializeMenuDefaultStateAndReturnElement();
 		performSearchWithText( element, 'text' );
 
-		assertOpenedPanels( element, 2 );
+		assertOpenedPanels( element, 3 );
 
 		const matchingCategories = element.querySelectorAll(
 			'.components-panel__body-toggle'
 		);
 
-		expect( matchingCategories ).toHaveLength( 2 );
+		expect( matchingCategories ).toHaveLength( 3 );
 		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
@@ -210,7 +211,7 @@ describe( 'InserterMenu', () => {
 			'.block-editor-block-types-list__item-title'
 		);
 
-		expect( visibleBlocks ).toHaveLength( 3 );
+		expect( visibleBlocks ).toHaveLength( 5 );
 		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
 		expect( visibleBlocks[ 1 ].textContent ).toBe( 'Advanced Text' );
 		expect( visibleBlocks[ 2 ].textContent ).toBe( 'A Text Embed' );
@@ -222,13 +223,13 @@ describe( 'InserterMenu', () => {
 		const element = initializeMenuDefaultStateAndReturnElement();
 		performSearchWithText( element, ' text' );
 
-		assertOpenedPanels( element, 2 );
+		assertOpenedPanels( element, 3 );
 
 		const matchingCategories = element.querySelectorAll(
 			'.components-panel__body-toggle'
 		);
 
-		expect( matchingCategories ).toHaveLength( 2 );
+		expect( matchingCategories ).toHaveLength( 3 );
 		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
@@ -236,7 +237,7 @@ describe( 'InserterMenu', () => {
 			'.block-editor-block-types-list__item-title'
 		);
 
-		expect( visibleBlocks ).toHaveLength( 3 );
+		expect( visibleBlocks ).toHaveLength( 5 );
 		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
 		expect( visibleBlocks[ 1 ].textContent ).toBe( 'Advanced Text' );
 		expect( visibleBlocks[ 2 ].textContent ).toBe( 'A Text Embed' );

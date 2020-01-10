@@ -245,7 +245,7 @@ export default function __experimentalUseColors(
 						while (
 							backgroundColor === 'rgba(0, 0, 0, 0)' &&
 							backgroundColorNode.parentNode &&
-							backgroundColorNode.parentNode === Node.ELEMENT_NODE
+							backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
 						) {
 							backgroundColorNode = backgroundColorNode.parentNode;
 							backgroundColor = getComputedStyle( backgroundColorNode )

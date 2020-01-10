@@ -18,12 +18,13 @@ const __experimentalPageTemplatePicker = ( { setLayout, templates = getDefaultTe
 
 	return (
 		<>
-			<Container style={ { flexDirection: 'row' } }>
+			<Container>
 				{ templates.map( ( template ) => (
 					<Button
 						key={ template.name }
-						onPress={ () => setTemplatePreview( template ) }
+						icon={ template.icon }
 						label={ template.name }
+						onPress={ () => setTemplatePreview( template ) }
 					/>
 				) ) }
 			</Container>

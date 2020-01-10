@@ -14,7 +14,7 @@ import BlockSwitcher from '../block-switcher';
 import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockMover from '../block-mover';
 
-export default function BlockToolbar( { moverDirection } ) {
+export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
 	const { blockClientIds, isValid, mode } = useSelect( ( select ) => {
 		const {
 			getBlockMode,
@@ -41,10 +41,10 @@ export default function BlockToolbar( { moverDirection } ) {
 	if ( blockClientIds.length > 1 ) {
 		return (
 			<div className="block-editor-block-toolbar">
-				<BlockMover
+				{ hasMovers && ( <BlockMover
 					clientIds={ blockClientIds }
 					__experimentalOrientation={ moverDirection }
-				/>
+				/> ) }
 				<MultiBlocksSwitcher />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
@@ -53,10 +53,10 @@ export default function BlockToolbar( { moverDirection } ) {
 
 	return (
 		<div className="block-editor-block-toolbar">
-			<BlockMover
+			{ hasMovers && ( <BlockMover
 				clientIds={ blockClientIds }
 				__experimentalOrientation={ moverDirection }
-			/>
+			/> ) }
 			{ mode === 'visual' && isValid && (
 				<>
 					<BlockSwitcher clientIds={ blockClientIds } />

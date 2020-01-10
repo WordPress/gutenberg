@@ -74,7 +74,7 @@ $block-selected-child-border-width: 1px;
 $block-selected-child-padding: 0;
 $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $block-selected-border-width;
 $block-selected-child-to-content: $block-selected-to-content - $block-selected-child-margin - $block-selected-child-border-width;
-$block-custom-appender-to-content: $block-edge-to-content - $block-selected-margin - $block-selected-child-margin + $block-selected-border-width;
+$block-custom-appender-to-content: $block-selected-margin - $block-selected-border-width;
 $block-media-container-to-content: $block-selected-child-margin + $block-selected-border-width;
 
 // Buttons & UI Widgets

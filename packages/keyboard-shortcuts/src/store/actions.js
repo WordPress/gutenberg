@@ -1,10 +1,12 @@
+/** @typedef {import('@wordpress/keycodes').WPKeycodeModifier} WPKeycodeModifier */
+
 /**
  * Keyboard key combination.
  *
  * @typedef {Object} WPShortcutKeyCombination
  *
- * @property {string}  character Character.
- * @property {string} [modifier]  Modifier.
+ * @property {string}                      character Character.
+ * @property {WPKeycodeModifier|undefined} modifier  Modifier.
  */
 
 /**
@@ -12,11 +14,11 @@
  *
  * @typedef {Object} WPShortcutConfig
  *
- * @property {string}                      name           Shortcut name.
- * @property {string}                      category       Shortcut category.
- * @property {string}                      description    Shortcut description.
- * @property {WPShortcutKeyCombination}    keyCombination Shortcut key combination.
- * @property {WPShortcutKeyCombination[]} [aliases]        Shortcut aliases.
+ * @property {string}                     name           Shortcut name.
+ * @property {string}                     category       Shortcut category.
+ * @property {string}                     description    Shortcut description.
+ * @property {WPShortcutKeyCombination}   keyCombination Shortcut key combination.
+ * @property {WPShortcutKeyCombination[]} [aliases]      Shortcut aliases.
  */
 
 /**

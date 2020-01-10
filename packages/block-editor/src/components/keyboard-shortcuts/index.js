@@ -93,7 +93,7 @@ function KeyboardShortcuts() {
 			clearSelectedBlock();
 			window.getSelection().removeAllRanges();
 		}, [ clientIds, clearSelectedBlock ] ),
-		{ isDisabled: clientIds.length < 1 }
+		{ isDisabled: clientIds.length < 2 }
 	);
 
 	return null;

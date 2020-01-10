@@ -11,19 +11,35 @@ import { displayShortcut, shortcutAriaLabel, rawShortcut } from '@wordpress/keyc
 
 /** @typedef {import('./actions').WPShortcutKeyCombination} WPShortcutKeyCombination */
 
+/** @typedef {import('@wordpress/keycodes').WPKeycodeHandlerByModifier} WPKeycodeHandlerByModifier */
+
 /**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation.
  *
- * @type {Array}
+ * @type {Array<any>}
  */
 const EMPTY_ARRAY = [];
 
 /**
+ * Shortcut formatting methods.
+ *
+ * @property {WPKeycodeHandlerByModifier} display     Display formatting.
+ * @property {WPKeycodeHandlerByModifier} rawShortcut Raw shortcut formatting.
+ * @property {WPKeycodeHandlerByModifier} ariaLabel   ARIA label formatting.
+ */
+const FORMATTING_METHODS = {
+	display: displayShortcut,
+	raw: rawShortcut,
+	ariaLabel: shortcutAriaLabel,
+};
+
+/**
  * Returns a string representing the key combination.
  *
- * @param {WPShortcutKeyCombination} shortcut  Key combination.
- * @param {string} representation              Type of reprensentation. (display, raw, ariaLabel )
+ * @param {?WPShortcutKeyCombination} shortcut       Key combination.
+ * @param {keyof FORMATTING_METHODS}  representation Type of representation
+ *                                                   (display, raw, ariaLabel).
  *
  * @return {string?} Shortcut representation.
  */
@@ -32,14 +48,8 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
 		return null;
 	}
 
-	const formattingMethods = {
-		display: displayShortcut,
-		raw: rawShortcut,
-		ariaLabel: shortcutAriaLabel,
-	};
-
 	return shortcut.modifier ?
-		formattingMethods[ representation ][ shortcut.modifier ]( shortcut.character ) :
+		FORMATTING_METHODS[ representation ][ shortcut.modifier ]( shortcut.character ) :
 		shortcut.character;
 }
 
@@ -58,9 +68,10 @@ export function getShortcutKeyCombination( state, name ) {
 /**
  * Returns a string representing the main key combination for a given shortcut name.
  *
- * @param {Object} state          Global state.
- * @param {string} name           Shortcut name.
- * @param {string} representation Type of reprensentation. (display, raw, ariaLabel )
+ * @param {Object}                   state          Global state.
+ * @param {string}                   name           Shortcut name.
+ * @param {keyof FORMATTING_METHODS} representation Type of representation
+ *                                                  (display, raw, ariaLabel).
  *
  * @return {string?} Shortcut representation.
  */
