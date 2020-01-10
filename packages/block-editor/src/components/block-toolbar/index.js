@@ -23,11 +23,12 @@ import BlockMover from '../block-mover';
 import Inserter from '../inserter';
 
 export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
-	const { blockClientIds, isValid, mode, rootClientId } = useSelect( ( select ) => {
+	const { blockClientIds, isHidden, isValid, mode, rootClientId } = useSelect( ( select ) => {
 		const {
 			getBlockMode,
 			getSelectedBlockClientIds,
 			isBlockValid,
+			isToolbarHidden,
 			getBlockRootClientId,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
@@ -35,6 +36,7 @@ export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
 		return {
 			blockClientIds: selectedBlockClientIds,
 			rootClientId: getBlockRootClientId( selectedBlockClientIds[ 0 ] ),
+			isHidden: isToolbarHidden(),
 			isValid: selectedBlockClientIds.length === 1 ?
 				isBlockValid( selectedBlockClientIds[ 0 ] ) :
 				null,
@@ -45,7 +47,7 @@ export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
 	}, [] );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 
-	if ( blockClientIds.length === 0 ) {
+	if ( blockClientIds.length === 0 || isHidden ) {
 		return null;
 	}
 
