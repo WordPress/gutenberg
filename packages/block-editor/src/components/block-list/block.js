@@ -51,7 +51,7 @@ import { ChildToolbar, ChildToolbarSlot } from './block-child-toolbar';
 import { Context } from './root-container';
 
 /**
- * A debounced version of getAccessibleBlockLabel, avoids unneccessary updates to the aria-label attribute
+ * A debounced version of getAccessibleBlockLabel, avoids unnecessary updates to the aria-label attribute
  * when typing in some blocks, like the paragraph.
  *
  * @param {Object} blockType      The block type object representing the block's definition.
