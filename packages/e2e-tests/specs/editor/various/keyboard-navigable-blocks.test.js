@@ -27,7 +27,7 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await tabThroughBlockToolbar();
 
 	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Block: Paragraph' );
+	await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 2. Paragraph 1' );
 
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
