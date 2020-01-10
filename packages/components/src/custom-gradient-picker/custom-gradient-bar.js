@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import gradientParser from 'gradient-parser';
+
 import { some } from 'lodash';
 import classnames from 'classnames';
 
@@ -19,7 +19,6 @@ import ColorPicker from '../color-picker';
 import Dropdown from '../dropdown';
 import ControlPoints from './control-points';
 import {
-	DEFAULT_GRADIENT,
 	INSERT_POINT_WIDTH,
 	COLOR_POPOVER_PROPS,
 	MINIMUM_DISTANCE_BETWEEN_POINTS,
@@ -30,6 +29,8 @@ import {
 	getGradientWithColorStopAdded,
 	getHorizontalRelativeGradientPosition,
 	getMarkerPoints,
+	getGradientParsed,
+	getLinearGradientRepresentationOfARadial,
 } from './utils';
 
 function InsertPoint( {
@@ -142,20 +143,10 @@ function customGradientBarReducer( state, action ) {
 }
 const customGradientBarReducerInitialState = { id: 'IDLE' };
 
-export default function CustomGradientPicker( { value, onChange } ) {
-	let hasGradient = !! value;
-	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
-	// More information of its structure available at.
-	let gradientAST;
-	let gradientValueUsed;
-	try {
-		gradientAST = gradientParser.parse( value || DEFAULT_GRADIENT )[ 0 ];
-		gradientValueUsed = value || DEFAULT_GRADIENT;
-	} catch ( error ) {
-		hasGradient = false;
-		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
-		gradientValueUsed = DEFAULT_GRADIENT;
-	}
+export default function CustomGradientBar( { value, onChange } ) {
+	const { gradientAST, gradientValue, hasGradient } = getGradientParsed(
+		value
+	);
 
 	const onGradientStructureChange = ( newGradientStructure ) => {
 		onChange( serializeGradient( newGradientStructure ) );
@@ -204,13 +195,21 @@ export default function CustomGradientPicker( { value, onChange } ) {
 	return (
 		<div
 			ref={ gradientPickerDomRef }
-			className={ classnames( 'components-custom-gradient-picker', {
-				'has-gradient': hasGradient,
-			} ) }
+			className={ classnames(
+				'components-custom-gradient-picker__gradient-bar',
+				{ 'has-gradient': hasGradient }
+			) }
 			onMouseEnter={ onMouseEnterAndMove }
 			onMouseMove={ onMouseEnterAndMove }
+			// On radial gradients the bar should display a linear gradient.
+			// On radial gradients the bar represents a slice of the gradient from the center until the outside.
 			style={ {
-				background: gradientValueUsed,
+				background:
+					gradientAST.type === 'radial-gradient'
+						? getLinearGradientRepresentationOfARadial(
+								gradientAST
+						  )
+						: gradientValue,
 			} }
 			onMouseLeave={ onMouseLeave }
 		>
