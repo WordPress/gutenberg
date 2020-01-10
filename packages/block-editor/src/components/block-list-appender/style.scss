@@ -10,7 +10,7 @@
 	}
 }
 
-.block-list-appender.is-dragging-over > div::before {
+.block-list-appender.is-drop-target > div::before {
 	content: "";
 	position: absolute;
 	right: -$block-padding;

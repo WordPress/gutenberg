@@ -124,6 +124,7 @@ function BlockList( {
 			<BlockListAppender
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
+				className={ targetClientId === null ? 'is-drop-target' : undefined }
 			/>
 			<__experimentalBlockListFooter.Slot />
 		</Container>
