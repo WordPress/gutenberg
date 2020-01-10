@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDropZone } from '@wordpress/components';
+import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import {
 	pasteHandler,
 	getBlockTransforms,
