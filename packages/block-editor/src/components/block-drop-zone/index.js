@@ -8,7 +8,7 @@ import {
 	findTransform,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 
 const parseDropEvent = ( event ) => {
 	let result = {
@@ -32,8 +32,7 @@ const parseDropEvent = ( event ) => {
 };
 
 export default function useBlockDropZone( { element, rootClientId } ) {
-	// const [ inserterElement, setInserterElement ] = useState( null );
-	const [ clientId, setInserterClientId ] = useState( null );
+	const [ clientId, setClientId ] = useState( null );
 
 	function selector( select ) {
 		const {
@@ -64,7 +63,7 @@ export default function useBlockDropZone( { element, rootClientId } ) {
 		moveBlockToPosition,
 	} = useDispatch( 'core/block-editor' );
 
-	function onFilesDrop( files ) {
+	const onFilesDrop = useCallback( ( files ) => {
 		if ( ! hasUploadPermissions ) {
 			return;
 		}
@@ -78,17 +77,17 @@ export default function useBlockDropZone( { element, rootClientId } ) {
 			const blocks = transformation.transform( files, updateBlockAttributes );
 			insertBlocks( blocks, blockIndex, rootClientId );
 		}
-	}
+	}, [ hasUploadPermissions, updateBlockAttributes, insertBlocks, blockIndex, rootClientId ] );
 
-	function onHTMLDrop( HTML ) {
+	const onHTMLDrop = useCallback( ( HTML ) => {
 		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
 			insertBlocks( blocks, blockIndex, rootClientId );
 		}
-	}
+	}, [ insertBlocks, blockIndex, rootClientId ] );
 
-	function onDrop( event ) {
+	const onDrop = useCallback( ( event ) => {
 		const { srcRootClientId, srcClientId, srcIndex, type } = parseDropEvent( event );
 
 		const isBlockDropType = ( dropType ) => dropType === 'block';
@@ -112,7 +111,7 @@ export default function useBlockDropZone( { element, rootClientId } ) {
 		// subtract to account for blocks shifting upward to occupy its old position.
 		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel( srcRootClientId, rootClientId ) ? positionIndex - 1 : positionIndex;
 		moveBlockToPosition( srcClientId, srcRootClientId, rootClientId, insertIndex );
-	}
+	}, [ getClientIdsOfDescendants, getBlockIndex, clientId, blockIndex, moveBlockToPosition, rootClientId ] );
 
 	const { position } = useDropZone( {
 		element,
@@ -143,10 +142,9 @@ export default function useBlockDropZone( { element, rootClientId } ) {
 				return;
 			}
 
-			// setInserterElement( target );
-			setInserterClientId( targetClientId );
+			setClientId( targetClientId );
 		}
-	} );
+	}, [ position ] );
 
 	if ( position ) {
 		return clientId;
