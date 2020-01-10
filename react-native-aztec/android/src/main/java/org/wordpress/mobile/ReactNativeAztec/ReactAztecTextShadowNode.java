@@ -1,17 +1,18 @@
 package org.wordpress.mobile.ReactNativeAztec;
 
+import android.widget.EditText;
+
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
 public class ReactAztecTextShadowNode extends ReactTextInputShadowNodeFork {
 
     @Override
-    public void setDefaultPadding(int spacingType, float padding) {
-        // Do nothing in order to avoid adding unwanted default padding to views
-        // (https://github.com/wordpress-mobile/gutenberg-mobile/issues/992) due to
-        // https://github.com/facebook/react-native/blob/6ebd3b046e5b71130281f1a7dbe7220eff95d74a/ReactAndroid/src/main/java/com/facebook/react/views/textinput/ReactTextInputShadowNode.java#L70
+    protected EditText createDummyEditText(ThemedReactContext themedContext) {
+        return new EditText(themedContext, null, 0);
     }
 
     @ReactProp(name = PROP_TEXT)

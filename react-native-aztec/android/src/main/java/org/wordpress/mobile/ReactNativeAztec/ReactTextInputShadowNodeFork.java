@@ -28,7 +28,8 @@ import com.facebook.yoga.YogaNode;
 
 /**
  * This is a fork from {@link com.facebook.react.views.textinput.ReactTextInputShadowNode} for the purpose
- * of customizing that class.
+ * of customizing that class so that the construction of the dummy {@link EditText} instance
+ * can be overridden (see {@link ReactTextInputShadowNodeFork#createDummyEditText(ThemedReactContext)}).
  */
 public class ReactTextInputShadowNodeFork extends ReactBaseTextShadowNode
     implements YogaMeasureFunction {
@@ -70,7 +71,7 @@ public class ReactTextInputShadowNodeFork extends ReactBaseTextShadowNode
         // of Android), and it cannot be changed.
         // So, we have to enforce it as a default padding.
         // TODO #7120264: Cache this stuff better.
-        EditText editText = new EditText(getThemedContext());
+        EditText editText = createDummyEditText(getThemedContext());
         setDefaultPadding(Spacing.START, ViewCompat.getPaddingStart(editText));
         setDefaultPadding(Spacing.TOP, editText.getPaddingTop());
         setDefaultPadding(Spacing.END, ViewCompat.getPaddingEnd(editText));
@@ -86,6 +87,10 @@ public class ReactTextInputShadowNodeFork extends ReactBaseTextShadowNode
         mDummyEditText.setLayoutParams(
                 new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    }
+
+    protected EditText createDummyEditText(ThemedReactContext themedContext) {
+        return new EditText(themedContext);
     }
 
     @Override
