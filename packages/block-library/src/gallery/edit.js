@@ -344,6 +344,11 @@ class GalleryEdit extends Component {
 		}
 
 		const imageSizeOptions = this.getImagesSizeOptions();
+		const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+		// This is needed to fix a separator fence-post issue on mobile.
+		const mobileLinkToProps = shouldShowSizeOptions ?
+			MOBILE_CONTROL_PROPS :
+			MOBILE_CONTROL_PROPS_SEPARATOR_NONE;
 
 		return (
 			<>
@@ -367,14 +372,15 @@ class GalleryEdit extends Component {
 						/>
 						<SelectControl
 							label={ __( 'Link To' ) }
-							{ ...MOBILE_CONTROL_PROPS_SEPARATOR_NONE }
+							{ ...mobileLinkToProps }
 							value={ linkTo }
 							onChange={ this.setLinkTo }
 							options={ linkOptions }
 						/>
-						{ hasImages && ! isEmpty( imageSizeOptions ) && (
+						{ shouldShowImageSizeOptions && (
 							<SelectControl
 								label={ __( 'Images Size' ) }
+								{ ...MOBILE_CONTROL_PROPS_SEPARATOR_NONE }
 								value={ sizeSlug }
 								options={ imageSizeOptions }
 								onChange={ this.updateImagesSize }
