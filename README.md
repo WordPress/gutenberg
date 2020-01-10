@@ -23,13 +23,13 @@ Note that the OS platform used by the maintainers is macOS but the tools and set
 
 * Clone the project and submodules:
 ```
-$ git clone --recurse-submodules https://github.com/wordpress-mobile/gutenberg-mobile.git
+git clone --recurse-submodules https://github.com/wordpress-mobile/gutenberg-mobile.git
 ```
 
 * Or if you already have the project cloned, initialize and update the submodules:
 ```
-$ git submodule init
-$ git submodule update
+git submodule init
+git submodule update
 ```
 
 ## Set up
@@ -95,7 +95,7 @@ When you first open the project in Visual Studio, you will be prompted to instal
 
 One of the extensions we are using is the [React Native Tools](https://marketplace.visualstudio.com/items?itemName=vsmobile.vscode-react-native). This allows you to run the packager from VSCode or launch the application on iOS or Android. It also adds some debug configurations so you can set breakpoints and debug the application directly from VSCode. Take a look at the [extension documentation](https://marketplace.visualstudio.com/items?itemName=vsmobile.vscode-react-native) for more details.
 
-## Test
+## Unit Tests
 
 Use the following command to run the test suite:
 
@@ -113,7 +113,7 @@ yarn test:debug
 
 Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to springle `debugger` statements anywhere in the code that you'd like the debugger to break.
 
-## Writing and Running Tests
+## Writing and Running Unit Tests
 
 This project is set up to use [jest](https://facebook.github.io/jest/) for tests. You can configure whatever testing strategy you like, but jest works out of the box. Create test files in directories called `__tests__` or with the `.test.js` extension to have the files loaded by jest. See an example test [here](https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/src/app/App.test.js). The [jest documentation](https://facebook.github.io/jest/docs/en/getting-started.html) is also a wonderful resource, as is the [React Native testing tutorial](https://facebook.github.io/jest/docs/en/tutorial-react-native.html).
 

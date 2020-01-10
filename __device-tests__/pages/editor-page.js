@@ -213,8 +213,8 @@ export default class EditorPage {
 
 		const parentId = `${ blockName } Block. Row ${ position }.`;
 		const parentLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ parentId }")]`;
-		let removeBlockLocator = `${ parentLocator }/following-sibling::*`;
-		removeBlockLocator += isAndroid() ? '' : '//*';
+		let removeBlockLocator = `${ parentLocator }`;
+		removeBlockLocator += isAndroid() ? '//*' : '//XCUIElementTypeButton';
 		let removeButtonIdentifier = `Remove block at row ${ position }`;
 
 		if ( isAndroid() ) {

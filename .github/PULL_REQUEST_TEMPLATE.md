@@ -2,6 +2,7 @@ Fixes #
 
 To test:
 
-Update release notes:
+PR submission checklist:
 
-- [ ] If there are user facing changes, I have added an item to `RELEASE-NOTES.txt`.
+- [ ] I have considered adding unit tests where possible.
+- [ ] I have considered if this change warrants user-facing release notes and have added them to `RELEASE-NOTES.txt` if necessary.
