@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, createContext } from '@wordpress/element';
+import { createContext, forwardRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -44,8 +44,7 @@ function onDragStart( event ) {
 	}
 }
 
-export default function RootContainer( { children, className } ) {
-	const ref = useRef();
+function RootContainer( { children, className }, ref ) {
 	const {
 		selectedBlockClientId,
 		hasMultiSelection,
@@ -92,3 +91,5 @@ export default function RootContainer( { children, className } ) {
 		</InsertionPoint>
 	);
 }
+
+export default forwardRef( RootContainer );

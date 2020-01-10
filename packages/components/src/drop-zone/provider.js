@@ -143,10 +143,15 @@ class DropZoneProvider extends Component {
 		if ( hoveredDropZone ) {
 			const rect = hoveredDropZone.element.current.getBoundingClientRect();
 
-			position = {
-				x: detail.clientX - rect.left < rect.right - detail.clientX ? 'left' : 'right',
-				y: detail.clientY - rect.top < rect.bottom - detail.clientY ? 'top' : 'bottom',
-			};
+			let x = detail.clientX;
+			let y = detail.clientY;
+
+			if ( ! hoveredDropZone.withExactPosition ) {
+				x = detail.clientX - rect.left < rect.right - detail.clientX ? 'left' : 'right';
+				y = detail.clientY - rect.top < rect.bottom - detail.clientY ? 'top' : 'bottom';
+			}
+
+			position = { x, y };
 		}
 
 		// Optimisation: Only update the changed dropzones

@@ -8,6 +8,7 @@ import {
 	findTransform,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 
 const parseDropEvent = ( event ) => {
 	let result = {
@@ -30,7 +31,10 @@ const parseDropEvent = ( event ) => {
 	return result;
 };
 
-export default function useBlockDropZone( { element, clientId, rootClientId } ) {
+export default function useBlockDropZone( { element, rootClientId } ) {
+	// const [ inserterElement, setInserterElement ] = useState( null );
+	const [ clientId, setInserterClientId ] = useState( null );
+
 	function selector( select ) {
 		const {
 			getBlockIndex,
@@ -40,6 +44,7 @@ export default function useBlockDropZone( { element, clientId, rootClientId } ) 
 		} = select( 'core/block-editor' );
 		return {
 			getBlockIndex,
+			blockIndex: getBlockIndex( clientId, rootClientId ),
 			getClientIdsOfDescendants,
 			hasUploadPermissions: !! getSettings().mediaUpload,
 			isLockedAll: getTemplateLock( rootClientId ) === 'all',
@@ -48,24 +53,18 @@ export default function useBlockDropZone( { element, clientId, rootClientId } ) 
 
 	const {
 		getBlockIndex,
+		blockIndex,
 		getClientIdsOfDescendants,
 		hasUploadPermissions,
 		isLockedAll,
-	} = useSelect( selector, [ rootClientId ] );
+	} = useSelect( selector, [ rootClientId, clientId ] );
 	const {
 		insertBlocks,
 		updateBlockAttributes,
 		moveBlockToPosition,
 	} = useDispatch( 'core/block-editor' );
 
-	function getInsertIndex( position ) {
-		if ( clientId !== undefined ) {
-			const index = getBlockIndex( clientId, rootClientId );
-			return ( position && position.y === 'top' ) ? index : index + 1;
-		}
-	}
-
-	function onFilesDrop( files, position ) {
+	function onFilesDrop( files ) {
 		if ( ! hasUploadPermissions ) {
 			return;
 		}
@@ -76,21 +75,20 @@ export default function useBlockDropZone( { element, clientId, rootClientId } ) 
 		);
 
 		if ( transformation ) {
-			const insertIndex = getInsertIndex( position );
 			const blocks = transformation.transform( files, updateBlockAttributes );
-			insertBlocks( blocks, insertIndex, rootClientId );
+			insertBlocks( blocks, blockIndex, rootClientId );
 		}
 	}
 
-	function onHTMLDrop( HTML, position ) {
+	function onHTMLDrop( HTML ) {
 		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
-			insertBlocks( blocks, getInsertIndex( position ), rootClientId );
+			insertBlocks( blocks, blockIndex, rootClientId );
 		}
 	}
 
-	function onDrop( event, position ) {
+	function onDrop( event ) {
 		const { srcRootClientId, srcClientId, srcIndex, type } = parseDropEvent( event );
 
 		const isBlockDropType = ( dropType ) => dropType === 'block';
@@ -109,18 +107,48 @@ export default function useBlockDropZone( { element, clientId, rootClientId } ) 
 		}
 
 		const dstIndex = clientId ? getBlockIndex( clientId, rootClientId ) : undefined;
-		const positionIndex = getInsertIndex( position );
+		const positionIndex = blockIndex;
 		// If the block is kept at the same level and moved downwards,
 		// subtract to account for blocks shifting upward to occupy its old position.
 		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel( srcRootClientId, rootClientId ) ? positionIndex - 1 : positionIndex;
 		moveBlockToPosition( srcClientId, srcRootClientId, rootClientId, insertIndex );
 	}
 
-	return useDropZone( {
+	const { position } = useDropZone( {
 		element,
 		onFilesDrop,
 		onHTMLDrop,
 		onDrop,
 		isDisabled: isLockedAll,
+		withExactPosition: true,
 	} );
+
+	useEffect( () => {
+		if ( position ) {
+			const { y } = position;
+			const rect = element.current.getBoundingClientRect();
+
+			const offset = y - rect.top;
+			const target = Array.from( element.current.children ).find( ( blockEl ) => {
+				return blockEl.offsetTop + ( blockEl.offsetHeight / 2 ) > offset;
+			} );
+
+			if ( ! target ) {
+				return;
+			}
+
+			const targetClientId = target.id.slice( 'block-'.length );
+
+			if ( ! targetClientId ) {
+				return;
+			}
+
+			// setInserterElement( target );
+			setInserterClientId( targetClientId );
+		}
+	} );
+
+	if ( position ) {
+		return clientId;
+	}
 }

@@ -15,7 +15,14 @@ import { useContext, useEffect, useState, useRef } from '@wordpress/element';
 import Dashicon from '../dashicon';
 import { DropZoneConsumer, Context } from './provider';
 
-export function useDropZone( { element, onFilesDrop, onHTMLDrop, onDrop, isDisabled } ) {
+export function useDropZone( {
+	element,
+	onFilesDrop,
+	onHTMLDrop,
+	onDrop,
+	isDisabled,
+	withExactPosition,
+} ) {
 	const { addDropZone, removeDropZone } = useContext( Context );
 	const [ state, setState ] = useState( {
 		isDraggingOverDocument: false,
@@ -32,13 +39,14 @@ export function useDropZone( { element, onFilesDrop, onHTMLDrop, onDrop, isDisab
 				onFilesDrop,
 				onHTMLDrop,
 				setState,
+				withExactPosition,
 			};
 			addDropZone( dropZone );
 			return () => {
 				removeDropZone( dropZone );
 			};
 		}
-	}, [ isDisabled ] );
+	}, [ isDisabled, onDrop, onFilesDrop, onHTMLDrop, withExactPosition ] );
 
 	return state;
 }

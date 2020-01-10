@@ -153,12 +153,8 @@
 		}
 	}
 
-	&.is-dragging-close-to-top::before {
+	&.is-drop-target::before {
 		border-top: 3px solid theme(primary);
-	}
-
-	&.is-dragging-close-to-bottom::before {
-		border-bottom: 3px solid theme(primary);
 	}
 }
 

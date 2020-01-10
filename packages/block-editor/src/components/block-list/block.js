@@ -37,7 +37,6 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import BlockEdit from '../block-edit';
-import useBlockDropZone from '../block-drop-zone';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
@@ -286,12 +285,6 @@ function BlockListBlock( {
 
 	const isDragging = isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
-	const { position } = useBlockDropZone( {
-		element: wrapper,
-		clientId,
-		rootClientId,
-	} );
-
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.
 	const wrapperClassName = classnames(
@@ -309,8 +302,6 @@ function BlockListBlock( {
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
 			'has-toolbar-captured': hasAncestorCapturingToolbars,
-			'is-dragging-close-to-top': position && position.y === 'top',
-			'is-dragging-close-to-bottom': position && position.y === 'bottom',
 		},
 		className
 	);
