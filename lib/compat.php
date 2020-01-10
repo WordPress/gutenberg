@@ -219,7 +219,7 @@ function gutenberg_user_settings_data_persistence_inline_script() {
 		// implementation script. The first `json_encode` will is responsible
 		// for producing a JSON encoding of the persisted meta object, and the
 		// second will apply quoting to that string result.
-		$persisted_value = json_encode( json_encode( $persisted_value ) );
+		$persisted_value = wp_json_encode( wp_json_encode( $persisted_value ) );
 	}
 
 	$persistence_script = <<<JS
