@@ -12,6 +12,10 @@ export function getBlockDOMNode( clientId, scope = document ) {
 	return scope.querySelector( '[data-block="' + clientId + '"]' );
 }
 
+export function getBlockWrapperNode( clientId ) {
+	return document.getElementById( 'block-' + clientId );
+}
+
 export function getBlockPreviewContainerDOMNode( clientId, scope ) {
 	const domNode = getBlockDOMNode( clientId, scope );
 
