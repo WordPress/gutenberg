@@ -152,6 +152,10 @@
 			opacity: 1;
 		}
 	}
+
+	&.is-drop-target::before {
+		border-top: 3px solid theme(primary);
+	}
 }
 
 
@@ -349,13 +353,6 @@
 	// Clear floats.
 	&[data-clear="true"] {
 		float: none;
-	}
-
-	// Dropzones.
-	.block-editor-block-drop-zone {
-		top: -4px;
-		bottom: -3px;
-		margin: 0 $block-padding;
 	}
 
 	// This essentially duplicates the mobile styles for the appender component.
