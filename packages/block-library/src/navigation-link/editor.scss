@@ -68,8 +68,7 @@
 	}
 
 	&.has-link .wp-block-navigation-link__content {
-		border-bottom-style: solid;
-		border-bottom-width: 1px;
+		text-decoration: underline;
 	}
 
 	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
