@@ -3,12 +3,13 @@
  */
 import { createContext, forwardRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import useMultiSelection from './use-multi-selection';
-import { getBlockClientId } from '../../utils/dom';
+import { getBlockClientId, getBlockWrapperNode } from '../../utils/dom';
 import InsertionPoint from './insertion-point';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
@@ -20,12 +21,22 @@ function selector( select ) {
 		getSelectedBlockClientId,
 		hasMultiSelection,
 		isMultiSelecting,
+		getBlockRootClientId,
+		getTemplateLock,
+		getBlockIndex,
 	} = select( 'core/block-editor' );
+	const clientId = getSelectedBlockClientId();
+	const rootClientId = getBlockRootClientId( clientId );
+	const templateLock = getTemplateLock( rootClientId );
+	const blockIndex = getBlockIndex( clientId );
 
 	return {
-		selectedBlockClientId: getSelectedBlockClientId(),
+		selectedBlockClientId: clientId,
 		hasMultiSelection: hasMultiSelection(),
 		isMultiSelecting: isMultiSelecting(),
+		isLocked: !! templateLock,
+		rootClientId,
+		blockIndex,
 	};
 }
 
@@ -49,8 +60,15 @@ function RootContainer( { children, className }, ref ) {
 		selectedBlockClientId,
 		hasMultiSelection,
 		isMultiSelecting,
+		isLocked,
+		rootClientId,
+		blockIndex,
 	} = useSelect( selector, [] );
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const {
+		selectBlock,
+		removeBlock,
+		insertDefaultBlock,
+	} = useDispatch( 'core/block-editor' );
 	const onSelectionStart = useMultiSelection( ref );
 
 	/**
@@ -72,17 +90,57 @@ function RootContainer( { children, className }, ref ) {
 		}
 	}
 
+	/**
+	 * Interprets keydown event intent to remove or insert after block if key
+	 * event occurs on wrapper node. This can occur when the block has no text
+	 * fields of its own, particularly after initial insertion, to allow for
+	 * easy deletion and continuous writing flow to add additional content.
+	 *
+	 * @param {KeyboardEvent} event Keydown event.
+	 */
+	function onKeyDown( event ) {
+		const { keyCode, target } = event;
+
+		if ( ! selectedBlockClientId || isLocked ) {
+			return;
+		}
+
+		if (
+			keyCode !== ENTER &&
+			keyCode !== BACKSPACE &&
+			keyCode !== DELETE
+		) {
+			return;
+		}
+
+		const wrapper = getBlockWrapperNode( selectedBlockClientId );
+
+		if ( wrapper !== target ) {
+			return;
+		}
+
+		event.preventDefault();
+
+		if ( keyCode === ENTER ) {
+			insertDefaultBlock( {}, rootClientId, blockIndex + 1 );
+		} else {
+			removeBlock( selectedBlockClientId );
+		}
+	}
+
 	return (
 		<InsertionPoint
 			className={ className }
 			isMultiSelecting={ isMultiSelecting }
 			selectedBlockClientId={ selectedBlockClientId }
 		>
+			{ /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */ }
 			<div
 				ref={ ref }
 				className={ className }
 				onFocus={ onFocus }
 				onDragStart={ onDragStart }
+				onKeyDown={ onKeyDown }
 			>
 				<Context.Provider value={ onSelectionStart }>
 					{ children }
