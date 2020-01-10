@@ -167,7 +167,7 @@ function observeConsoleLogging() {
 		// (Posts > Add New) will display a console warning about
 		// non - unique IDs.
 		// See: https://core.trac.wordpress.org/ticket/23165
-		if ( text.includes( '[DOM] Found 2 elements with non-unique id #_wpnonce' ) ) {
+		if ( text.includes( 'elements with non-unique id #_wpnonce' ) ) {
 			return;
 		}
 
