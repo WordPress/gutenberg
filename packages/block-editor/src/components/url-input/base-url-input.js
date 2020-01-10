@@ -18,6 +18,11 @@ import { sprintf, __, _n } from '@wordpress/i18n';
  */
 import useSuggestionListScrolling from './use-suggestion-list-scrolling';
 
+// Since URLInput is rendered in the context of other inputs, but should be
+// considered a separate modal node, prevent keyboard events from propagating
+// as being considered from the input.
+const stopEventPropagation = ( event ) => event.stopPropagation();
+
 export default function BaseURLInput( props ) {
 	const {
 		loadingIndicator: LoadingIndicator = Spinner,
@@ -36,7 +41,7 @@ export default function BaseURLInput( props ) {
 		label,
 		isFullWidth,
 		hasBorder,
-		...inputProps
+		placeholder,
 	} = props;
 
 	const inputRef = useRef();
@@ -161,6 +166,7 @@ export default function BaseURLInput( props ) {
 				ref={ inputRef }
 				id={ id }
 				role="combobox"
+				aria-label={ __( 'URL' ) }
 				aria-expanded={ showSuggestions }
 				aria-autocomplete="list"
 				aria-owns={ suggestionListContainerId }
@@ -171,9 +177,10 @@ export default function BaseURLInput( props ) {
 				required
 				onChange={ ( event ) => onChange( event.target.value ) }
 				onKeyDown={ handleKeyDown }
+				onInput={ stopEventPropagation }
+				placeholder={ placeholder }
 				value={ inputValue }
 				type="text"
-				{ ...inputProps }
 			/>
 
 			{ isFetchingSuggestions && <LoadingIndicator /> }
