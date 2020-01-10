@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { forwardRef } from '@wordpress/element';
 
-const URLInputInlineSuggestionList = forwardRef( ( { id, children, isFetchingSuggestions }, ref ) => {
+const InlineSuggestionListContainer = forwardRef( ( { id, children, isFetchingSuggestions }, ref ) => {
 	const resultsListClasses = classnames( 'block-editor-link-control__search-results', {
 		'is-loading': isFetchingSuggestions,
 	} );
@@ -27,5 +27,5 @@ const URLInputInlineSuggestionList = forwardRef( ( { id, children, isFetchingSug
 	);
 } );
 
-export default URLInputInlineSuggestionList;
+export default InlineSuggestionListContainer;
 

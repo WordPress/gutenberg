@@ -15,7 +15,7 @@ import {
 
 const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
 
-const URLInputInlineSuggestionList = forwardRef( ( { id, isSelected, onClick, suggestion, searchTerm }, ref ) => {
+const InlineSuggestionListItem = forwardRef( ( { id, isSelected, onClick, suggestion, searchTerm }, ref ) => {
 	const isURLSuggestion = manualLinkEntryTypes.includes( suggestion.type.toLowerCase() );
 
 	return (
@@ -56,5 +56,5 @@ const URLInputInlineSuggestionList = forwardRef( ( { id, isSelected, onClick, su
 	);
 } );
 
-export default URLInputInlineSuggestionList;
+export default InlineSuggestionListItem;
 

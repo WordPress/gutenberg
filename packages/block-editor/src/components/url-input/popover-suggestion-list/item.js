@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { Button } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 
-const URLInputPopoverSuggestionList = forwardRef( ( { id, isSelected, onClick, suggestion }, ref ) => {
+const PopoverSuggestionListItem = forwardRef( ( { id, isSelected, onClick, suggestion }, ref ) => {
 	return (
 		<Button
 			ref={ ref }
@@ -27,4 +27,4 @@ const URLInputPopoverSuggestionList = forwardRef( ( { id, isSelected, onClick, s
 	);
 } );
 
-export default URLInputPopoverSuggestionList;
+export default PopoverSuggestionListItem;
