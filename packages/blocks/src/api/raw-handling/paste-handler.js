@@ -35,6 +35,7 @@ import {
 	getBlockContentSchema,
 } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
+import { normalize } from './normalize';
 
 /**
  * Browser dependencies
@@ -137,6 +138,8 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 	HTML = HTML.replace( /^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i, '' );
 	HTML = HTML.replace( /(?:<!--\s*EndFragment\s*-->\s*)?<\/body>\s*<\/html>\s*$/i, '' );
 
+	HTML = normalize( HTML );
+
 	// If we detect block delimiters in HTML, parse entirely as blocks.
 	if ( mode !== 'INLINE' ) {
 		// Check plain text if there is no HTML.
@@ -145,17 +148,6 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
 			return parseWithGrammar( content );
 		}
-	}
-
-	// Normalize unicode to use composed characters.
-	// This is unsupported in IE 11 but it's a nice-to-have feature, not mandatory.
-	// Not normalizing the content will only affect older browsers and won't
-	// entirely break the app.
-	// See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
-	// See: https://core.trac.wordpress.org/ticket/30130
-	// See: https://github.com/WordPress/gutenberg/pull/6983#pullrequestreview-125151075
-	if ( String.prototype.normalize ) {
-		HTML = HTML.normalize();
 	}
 
 	// Parse Markdown (and encoded HTML) if:

@@ -18,7 +18,7 @@ import {
 	deepFilterHTML,
 	getBlockContentSchema,
 } from './utils';
-
+import { normalize } from './normalize';
 import { getPhrasingContentSchema } from './phrasing-content';
 
 export { pasteHandler } from './paste-handler';
@@ -89,6 +89,8 @@ function htmlToBlocks( { html, rawTransforms } ) {
  * @return {Array} A list of blocks.
  */
 export function rawHandler( { HTML = '' } ) {
+	HTML = normalize( HTML );
+
 	// If we detect block delimiters, parse entirely as blocks.
 	if ( HTML.indexOf( '<!-- wp:' ) !== -1 ) {
 		return parseWithGrammar( HTML );
