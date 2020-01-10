@@ -11,6 +11,7 @@ import {
 	Button,
 	ExternalLink,
 	Popover,
+	RadioControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -27,6 +28,10 @@ import {
 	prependHTTP,
 	getProtocol,
 } from '@wordpress/url';
+
+import apiFetch from '@wordpress/api-fetch';
+
+import { decodeEntities } from '@wordpress/html-entities';
 
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -53,6 +58,10 @@ function LinkControl( {
 	// State
 	const [ inputValue, setInputValue ] = useState( '' );
 	const [ isEditingLink, setIsEditingLink ] = useState( ! value || ! value.url );
+	const [ isAddingPost, setIsAddingPost ] = useState( false );
+	const [ showAddForm, setShowAddForm ] = useState( true );
+	const [ addedPostType, setAddedPostType ] = useState( 'page' );
+	const [ addedPostTitle, setAddedPostTitle ] = useState( '' );
 
 	// Handlers
 
@@ -175,6 +184,34 @@ function LinkControl( {
 		);
 	};
 
+	const onAddPostSubmit = async ( e ) => {
+		if ( e && typeof e.preventDefault === 'function' ) {
+			e.preventDefault();
+		}
+		setIsAddingPost( true );
+
+		const newPost = await apiFetch( {
+			path: `/wp/v2/posts`,
+			data: {
+				title: addedPostTitle,
+				content: '',
+				status: 'publish',
+			},
+			method: 'POST',
+		} );
+
+		setIsEditingLink( false );
+		onChange( {
+			id: newPost.id,
+			title: newPost.title.raw, // TODO: use raw or rendered?
+			url: newPost.link,
+			type: newPost.type,
+		} );
+
+		setIsAddingPost( false );
+		console.log( addedPostType, addedPostTitle, newPost );
+	};
+
 	return (
 		<Popover
 			className={ classnames( 'block-editor-link-control', className ) }
@@ -230,6 +267,29 @@ function LinkControl( {
 
 					{ ! isEditingLink && (
 						<LinkControlSettingsDrawer value={ value } settings={ settings } onChange={ onChange } />
+					) }
+					{ showAddForm && (
+						<div>
+							<form
+								className="block-editor-media-placeholder__url-input-form"
+								onSubmit={ onAddPostSubmit }
+							>
+								<RadioControl
+									label="Post Type"
+									selected={ addedPostType }
+									disabled={ isAddingPost }
+									options={ [
+										{ label: 'Page', value: 'page' },
+										{ label: 'Post', value: 'post' },
+									] }
+									onChange={ ( option ) => {
+										setAddedPostType( option );
+									} }
+								/>
+								<input disabled={ isAddingPost } type="text" value={ addedPostTitle } onChange={ ( e ) => setAddedPostTitle( e.target.value ) } />
+								<Button isPrimary disabled={ isAddingPost } isBusy={ isAddingPost } onClick={ () => onAddPostSubmit() }>Save</Button>
+							</form>
+						</div>
 					) }
 				</div>
 			</div>
