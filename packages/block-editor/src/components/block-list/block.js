@@ -375,7 +375,6 @@ function BlockListBlock( {
 			focusOnMount={ isToolbarForced }
 			data-type={ name }
 			data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
-			moverDirection={ moverDirection }
 			hasMovers={ hasMovers }
 		/>
 	);
