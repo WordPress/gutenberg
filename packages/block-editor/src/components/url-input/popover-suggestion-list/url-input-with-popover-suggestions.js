@@ -8,7 +8,7 @@ import { isURL } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import BaseURLInputWithSuggestions from '../base-url-input-with-suggestions';
+import BaseURLInput from '../base-url-input-with-suggestions';
 import useSuggestions from '../use-suggestions';
 import PopoverSuggestionListContainer from './container';
 import PopoverSuggestionListItem from './item';
@@ -28,7 +28,7 @@ export default function URLInputWithPopoverSuggestion( props ) {
 	const suggestionProps = useSuggestions( value, enhancedFetchSuggestions, disableSuggestions );
 
 	return (
-		<BaseURLInputWithSuggestions
+		<BaseURLInput
 			suggestionListContainer={ PopoverSuggestionListContainer }
 			suggestionListItem={ PopoverSuggestionListItem }
 			onChangeSelectedSuggestion={ ( index ) => setSelectedSuggestionIndex( index ) }

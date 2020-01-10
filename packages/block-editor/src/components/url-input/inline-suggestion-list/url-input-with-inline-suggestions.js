@@ -19,7 +19,7 @@ import {
 /**
  * Internal dependencies
  */
-import BaseURLInputWithSuggestions from '../base-url-input-with-suggestions';
+import BaseURLInput from '../base-url-input';
 import useSuggestions from '../use-suggestions';
 import InlineSuggestionListContainer from './container';
 import InlineSuggestionListItem from './item';
@@ -91,7 +91,7 @@ export default function URLInputWithInlineSuggestions( props ) {
 	const filteredSuggestions = filterSuggestionResults( suggestions, value );
 
 	return (
-		<BaseURLInputWithSuggestions
+		<BaseURLInput
 			suggestionListContainer={ InlineSuggestionListContainer }
 			suggestionListItem={ InlineSuggestionListItem }
 			onChangeSelectedSuggestion={ ( index ) => setSelectedSuggestionIndex( index ) }
