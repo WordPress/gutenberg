@@ -12,25 +12,6 @@ import DownloadableBlockInfo from '../../downloadable-block-info';
 import DownloadableBlockAuthorInfo from '../../downloadable-block-author-info';
 import { plugin } from './fixtures';
 
-{/* <DownloadableBlockListItem
-					key={ item.id }
-					className={ getBlockMenuDefaultClassName( item.id ) }
-					onClick={ () => {
-						const onSuccess = () => {
-							download( item );
-						};
-
-						install( item, onSuccess );
-						onHover( null );
-					} }
-					onFocus={ () => onHover( item ) }
-					onMouseEnter={ () => onHover( item ) }
-					onMouseLeave={ () => onHover( null ) }
-					onBlur={ () => onHover( null ) }
-					item={ item }
-					notice={ <DownloadableBlockNotice install={ install } download={ download } errorNotices={ errorNotices } block={ item } /> }
-					isLoading={ isLoading } */}
-
 const getContainer = ( item, onClick = jest.fn(), isLoading = false ) => {
 	return shallow(
 		<DownloadableBlockListItem
