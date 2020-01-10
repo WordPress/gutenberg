@@ -786,6 +786,28 @@ export function updateSettings( settings ) {
 }
 
 /**
+ * Returns an action object used in signalling that the Toolbar is hidden.
+ *
+ * @return {Object} Action object.
+ */
+export function hideToolbar() {
+	return {
+		type: 'HIDE_TOOLBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the Toolbar is visible.
+ *
+ * @return {Object} Action object.
+ */
+export function showToolbar() {
+	return {
+		type: 'SHOW_TOOLBAR',
+	};
+}
+
+/**
  * Returns an action object used in signalling that a temporary reusable blocks have been saved
  * in order to switch its temporary id with the real id.
  *

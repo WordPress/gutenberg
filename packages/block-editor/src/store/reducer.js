@@ -1351,8 +1351,29 @@ export function automaticChangeStatus( state, action ) {
 	// Reset the state by default (for any action not handled).
 }
 
+/**
+ * Reducer returning Toolbar visibility state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isToolbarHidden( state = false, action ) {
+	switch ( action.type ) {
+		case 'HIDE_TOOLBAR':
+			return true;
+
+		case 'SHOW_TOOLBAR':
+			return false;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
+	isToolbarHidden,
 	isTyping,
 	isDraggingBlocks,
 	isCaretWithinFormattedText,

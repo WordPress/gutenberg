@@ -1526,3 +1526,14 @@ export function isNavigationMode( state ) {
 export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
 }
+
+/**
+ * Returns true if the Toolbar is hidden, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the Toolbar is hidden.
+ */
+export function isToolbarHidden( state ) {
+	return state.isToolbarHidden;
+}
