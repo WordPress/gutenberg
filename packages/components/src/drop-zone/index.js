@@ -56,6 +56,7 @@ const DropZone = ( props ) => (
 );
 
 function DropZoneComponent( {
+	className,
 	label,
 	onFilesDrop,
 	onHTMLDrop,
@@ -86,7 +87,7 @@ function DropZoneComponent( {
 		);
 	}
 
-	const className = classnames( {
+	const classes = classnames( 'components-drop-zone', className, {
 		'is-active': ( isDraggingOverDocument || isDraggingOverElement ) && (
 			( type === 'file' && onFilesDrop ) ||
 			( type === 'html' && onHTMLDrop ) ||
@@ -102,7 +103,7 @@ function DropZoneComponent( {
 	} );
 
 	return (
-		<div ref={ element } className={ className }>
+		<div ref={ element } className={ classes }>
 			{ children }
 		</div>
 	);
