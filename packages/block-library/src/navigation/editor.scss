@@ -80,20 +80,6 @@
 	padding: $grid-size-large;
 }
 
-/*
- * Adjust Navigation Item.
- */
-.wp-block-navigation .wp-block-navigation-link {
-	margin-left: $grid-size;
-
-	// Provide a base navigation item margin.
-	// This should be the same inside the field,
-	// and the edit container should compensate.
-	// This is to make sure the edit and view are the same.
-	padding: 0 $grid-size;
-
-}
-
 /**
  * Colors Selector component
  */
