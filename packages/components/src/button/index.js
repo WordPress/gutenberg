@@ -35,7 +35,6 @@ export function Button( props, ref ) {
 		isSecondary,
 		isLink,
 		isDestructive,
-		isFocusable = true,
 		className,
 		disabled,
 		icon,
@@ -45,6 +44,7 @@ export function Button( props, ref ) {
 		shortcut,
 		label,
 		children,
+		__experimentalIsFocusable: isFocusable,
 		...additionalProps
 	} = props;
 

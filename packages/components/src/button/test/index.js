@@ -54,13 +54,13 @@ describe( 'Button', () => {
 			expect( button.hasClass( 'is-pressed' ) ).toBe( true );
 		} );
 
-		it( 'should add a disabled prop to the button when isFocusable is false', () => {
-			const button = shallow( <Button disabled isFocusable={ false } /> );
+		it( 'should add a disabled prop to the button', () => {
+			const button = shallow( <Button disabled /> );
 			expect( button.prop( 'disabled' ) ).toBe( true );
 		} );
 
-		it( 'should add only aria-disabled attribute when disabled is true', () => {
-			const button = shallow( <Button disabled /> );
+		it( 'should add only aria-disabled attribute when disabled and isFocusable are true', () => {
+			const button = shallow( <Button disabled __experimentalIsFocusable /> );
 			expect( button.prop( 'disabled' ) ).toBe( false );
 			expect( button.prop( 'aria-disabled' ) ).toBe( true );
 		} );
@@ -149,7 +149,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should become a button again when disabled is supplied', () => {
-			const button = shallow( <Button href="https://wordpress.org/" disabled isFocusable={ false } /> );
+			const button = shallow( <Button href="https://wordpress.org/" disabled /> );
 
 			expect( button.type() ).toBe( 'button' );
 		} );
