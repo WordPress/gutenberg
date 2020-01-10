@@ -6,6 +6,7 @@ import {
 	enterFormattedText,
 	exitFormattedText,
 	hideInsertionPoint,
+	hideToolbar,
 	insertBlock,
 	insertBlocks,
 	mergeBlocks,
@@ -20,6 +21,7 @@ import {
 	selectBlock,
 	selectPreviousBlock,
 	showInsertionPoint,
+	showToolbar,
 	startMultiSelect,
 	startTyping,
 	stopMultiSelect,
@@ -960,6 +962,22 @@ describe( 'actions', () => {
 				rootClientId: 'root',
 				time: expect.any( Number ),
 				updateSelection: false,
+			} );
+		} );
+	} );
+
+	describe( 'hideToolbar', () => {
+		it( 'should return the HIDE_TOOLBAR action', () => {
+			expect( hideToolbar() ).toEqual( {
+				type: 'HIDE_TOOLBAR',
+			} );
+		} );
+	} );
+
+	describe( 'showToolbar', () => {
+		it( 'should return the SHOW_TOOLBAR action', () => {
+			expect( showToolbar() ).toEqual( {
+				type: 'SHOW_TOOLBAR',
 			} );
 		} );
 	} );

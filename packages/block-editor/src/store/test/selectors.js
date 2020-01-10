@@ -58,6 +58,7 @@ const {
 	getTemplate,
 	getTemplateLock,
 	getBlockListSettings,
+	isToolbarHidden,
 	__experimentalGetBlockListSettingsForBlocks,
 	__experimentalGetLastBlockAttributeChanges,
 	INSERTER_UTILITY_HIGH,
@@ -2366,6 +2367,24 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockListSettings( state, 'chicken' ) ).toBe( undefined );
+		} );
+	} );
+
+	describe( 'isToolbarHidden', () => {
+		it( 'should return the hidden flag if the Toolbar is hidden', () => {
+			const state = {
+				isToolbarHidden: true,
+			};
+
+			expect( isToolbarHidden( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if the Toolbar is visible', () => {
+			const state = {
+				isToolbarHidden: false,
+			};
+
+			expect( isToolbarHidden( state ) ).toBe( false );
 		} );
 	} );
 

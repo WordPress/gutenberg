@@ -32,6 +32,7 @@ import {
 	template,
 	blockListSettings,
 	lastBlockAttributesChange,
+	isToolbarHidden,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -2401,6 +2402,24 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'isToolbarHidden()', () => {
+		it( 'should set the Toolbar hidden flag to true', () => {
+			const state = isToolbarHidden( false, {
+				type: 'HIDE_TOOLBAR',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should set the Toolbar hidden flag to false', () => {
+			const state = isToolbarHidden( false, {
+				type: 'SHOW_TOOLBAR',
+			} );
+
+			expect( state ).toBe( false );
 		} );
 	} );
 } );
