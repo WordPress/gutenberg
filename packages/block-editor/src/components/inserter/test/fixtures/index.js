@@ -7,6 +7,13 @@ export const categories = [
 	{ slug: 'reusable', title: 'Reusable blocks' },
 ];
 
+export const collections = {
+	core: {
+		icon: undefined,
+		title: 'Core',
+	},
+};
+
 export const textItem = {
 	id: 'core/text-block',
 	name: 'core/text-block',

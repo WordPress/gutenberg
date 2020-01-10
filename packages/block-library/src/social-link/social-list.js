@@ -7,7 +7,7 @@ import {
 	BehanceIcon,
 	ChainIcon,
 	CodepenIcon,
-	DeviantartIcon,
+	DeviantArtIcon,
 	DribbbleIcon,
 	DropboxIcon,
 	EtsyIcon,
@@ -18,10 +18,10 @@ import {
 	FoursquareIcon,
 	GoodreadsIcon,
 	GoogleIcon,
-	GithubIcon,
+	GitHubIcon,
 	InstagramIcon,
 	LastfmIcon,
-	LinkedinIcon,
+	LinkedInIcon,
 	MailIcon,
 	MastodonIcon,
 	MeetupIcon,
@@ -31,7 +31,7 @@ import {
 	RedditIcon,
 	SkypeIcon,
 	SnapchatIcon,
-	SoundcloudIcon,
+	SoundCloudIcon,
 	SpotifyIcon,
 	TumblrIcon,
 	TwitchIcon,
@@ -40,7 +40,7 @@ import {
 	VkIcon,
 	WordPressIcon,
 	YelpIcon,
-	YoutubeIcon,
+	YouTubeIcon,
 } from './icons';
 
 const socialList = {
@@ -70,7 +70,7 @@ const socialList = {
 	},
 	deviantart: {
 		name: 'DeviantArt',
-		icon: DeviantartIcon,
+		icon: DeviantArtIcon,
 	},
 	dribbble: {
 		name: 'Dribbble',
@@ -110,7 +110,7 @@ const socialList = {
 	},
 	github: {
 		name: 'GitHub',
-		icon: GithubIcon,
+		icon: GitHubIcon,
 	},
 	instagram: {
 		name: 'Instagram',
@@ -122,7 +122,7 @@ const socialList = {
 	},
 	linkedin: {
 		name: 'LinkedIn',
-		icon: LinkedinIcon,
+		icon: LinkedInIcon,
 	},
 	mail: {
 		name: 'Mail',
@@ -161,8 +161,8 @@ const socialList = {
 		icon: SnapchatIcon,
 	},
 	soundcloud: {
-		name: 'Soundcloud',
-		icon: SoundcloudIcon,
+		name: 'SoundCloud',
+		icon: SoundCloudIcon,
 	},
 	spotify: {
 		name: 'Spotify',
@@ -198,12 +198,30 @@ const socialList = {
 	},
 	youtube: {
 		name: 'YouTube',
-		icon: YoutubeIcon,
+		icon: YouTubeIcon,
 	},
 };
 
 export default socialList;
 
+/**
+ * Retrieves the social service's icon component.
+ *
+ * @param {string} site key for a social service (lowercase slug)
+ *
+ * @return {WPComponent} Icon component for social service.
+ */
 export const getIconBySite = ( site ) => {
 	return socialList[ site ].icon;
+};
+
+/**
+ * Retrieves the display name for the social service.
+ *
+ * @param {string} site key for a social service (lowercase slug)
+ *
+ * @return {string} Display name for social service
+ */
+export const getNameBySite = ( site ) => {
+	return socialList[ site ].name;
 };
