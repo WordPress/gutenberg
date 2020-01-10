@@ -17,7 +17,7 @@ import DownloadableBlockListItem from '../downloadable-block-list-item';
 import DownloadableBlockNotice from '../downloadable-block-notice';
 import { DOWNLOAD_ERROR_NOTICE_ID, INSTALL_ERROR_NOTICE_ID } from '../../store/constants';
 
-function DownloadableBlocksList( { items, onHover = noop, children, isLoading, errorNotices, install, download } ) {
+export function DownloadableBlocksList( { items, onHover = noop, children, isLoading, errorNotices, install, download } ) {
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but

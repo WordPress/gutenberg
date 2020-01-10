@@ -7,6 +7,7 @@ import { shallow } from 'enzyme';
  * WordPress dependencies
  */
 import { BlockIcon } from '@wordpress/block-editor';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -14,11 +15,11 @@ import { BlockIcon } from '@wordpress/block-editor';
 import DownloadableBlockHeader from '../index';
 import { pluginWithImg, pluginWithIcon } from './fixtures';
 
-const getContainer = ( { icon, title, rating, ratingCount } ) => {
+const getContainer = ( { icon, title, rating, ratingCount }, onClick = jest.fn() ) => {
 	return shallow(
 		<DownloadableBlockHeader
 			icon={ icon }
-			onClick={ () => {} }
+			onClick={ onClick }
 			title={ title }
 			rating={ rating }
 			ratingCount={ ratingCount }
@@ -43,6 +44,18 @@ describe( 'DownloadableBlockHeader', () => {
 		test( 'should render a <BlockIcon/> component', () => {
 			const wrapper = getContainer( pluginWithIcon );
 			expect( wrapper.find( BlockIcon ) ).toHaveLength( 1 );
+		} );
+	} );
+
+	describe( 'user interaction', () => {
+		test( 'should trigger the onClick function', () => {
+			const onClickMock = jest.fn();
+			const wrapper = getContainer( pluginWithIcon, onClickMock );
+			const event = {
+				preventDefault() {},
+			};
+			wrapper.find( Button ).simulate( 'click', event );
+			expect( onClickMock.mock.calls.length ).toBe( 1 );
 		} );
 	} );
 } );
