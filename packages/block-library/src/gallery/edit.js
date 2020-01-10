@@ -377,7 +377,7 @@ class GalleryEdit extends Component {
 							onChange={ this.setLinkTo }
 							options={ linkOptions }
 						/>
-						{ shouldShowImageSizeOptions && (
+						{ shouldShowSizeOptions && (
 							<SelectControl
 								label={ __( 'Images Size' ) }
 								{ ...MOBILE_CONTROL_PROPS_SEPARATOR_NONE }
