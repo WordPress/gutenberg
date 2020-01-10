@@ -181,7 +181,7 @@ function gutenberg_register_data_persistence_user_meta() {
 	global $wpdb;
 	register_meta(
 		'user',
-		$wpdb->prefix . 'data_persistence',
+		$wpdb->get_blog_prefix() . 'data_persistence',
 		array(
 			'type'         => 'object',
 			'single'       => true,
