@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -14,8 +14,9 @@ function DownloadableBlockHeader( { icon, title, rating, ratingCount, onClick } 
 	return (
 		<div className="block-directory-downloadable-block-header__row">
 			{
-				icon.match( /\.(jpeg|jpg|gif|png)$/ ) !== null ?
-					<img src={ icon } alt="block icon" /> :
+				icon.match( /\.(jpeg|jpg|gif|png)(?:\?.*)?$/ ) !== null ?
+					// translators: %s: Name of the plugin e.g: "Akismet".
+					<img src={ icon } alt={ sprintf( __( '%s block icon' ), title ) } /> :
 					<span >
 						<BlockIcon icon={ icon } showColors />
 					</span>
@@ -34,7 +35,7 @@ function DownloadableBlockHeader( { icon, title, rating, ratingCount, onClick } 
 					onClick();
 				} }
 			>
-				{ __( 'Add' ) }
+				{ __( 'Add block' ) }
 			</Button>
 		</div>
 	);

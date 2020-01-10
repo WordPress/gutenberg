@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -36,7 +36,7 @@ class URLInputButton extends Component {
 
 		return (
 			<div className="block-editor-url-input__button">
-				<IconButton
+				<Button
 					icon="admin-links"
 					label={ buttonLabel }
 					onClick={ this.toggle }
@@ -49,14 +49,14 @@ class URLInputButton extends Component {
 						onSubmit={ this.submitLink }
 					>
 						<div className="block-editor-url-input__button-modal-line">
-							<IconButton
+							<Button
 								className="block-editor-url-input__back"
 								icon="arrow-left-alt"
 								label={ __( 'Close' ) }
 								onClick={ this.toggle }
 							/>
 							<URLInput value={ url || '' } onChange={ onChange } />
-							<IconButton
+							<Button
 								icon="editor-break"
 								label={ __( 'Submit' ) }
 								type="submit"

@@ -3,7 +3,7 @@
 		background: none;
 		border-bottom: none;
 
-		.components-icon-button {
+		.components-button {
 			align-self: flex-start;
 			margin-top: $grid-size-xlarge;
 			position: static;
@@ -11,7 +11,6 @@
 	}
 
 	&__container {
-		align-items: center;
 		display: flex;
 		flex-direction: column;
 		margin-top: -$header-height;
@@ -40,7 +39,7 @@
 			margin: 0 2px;
 		}
 
-		.components-icon-button {
+		.components-button {
 			height: 30px;
 		}
 	}
@@ -107,7 +106,7 @@
 		right: 0;
 
 		@include break-small() {
-			display: unset;
+			display: block;
 		}
 	}
 

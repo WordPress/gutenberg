@@ -468,6 +468,12 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Nested Blocks: Using InnerBlocks",
+		"slug": "nested-blocks-inner-blocks",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/nested-blocks-inner-blocks.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Meta Boxes",
 		"slug": "metabox",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/metabox/readme.md",
@@ -648,6 +654,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "CustomSelectControl",
+		"slug": "custom-select-control",
+		"markdown_source": "../packages/components/src/custom-select-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Dashicon",
 		"slug": "dashicon",
 		"markdown_source": "../packages/components/src/dashicon/README.md",
@@ -798,12 +810,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "IconButton",
-		"slug": "icon-button",
-		"markdown_source": "../packages/components/src/icon-button/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Icon",
 		"slug": "icon",
 		"markdown_source": "../packages/components/src/icon/README.md",
@@ -837,12 +843,6 @@
 		"title": "MenuItemsChoice",
 		"slug": "menu-items-choice",
 		"markdown_source": "../packages/components/src/menu-items-choice/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "StepperControl",
-		"slug": "stepper-control",
-		"markdown_source": "../packages/components/src/mobile/stepper-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -981,6 +981,12 @@
 		"title": "TextHighlight",
 		"slug": "text-highlight",
 		"markdown_source": "../packages/components/src/text-highlight/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Text",
+		"slug": "text",
+		"markdown_source": "../packages/components/src/text/README.md",
 		"parent": "components"
 	},
 	{
@@ -1359,6 +1365,12 @@
 		"title": "@wordpress/jest-puppeteer-axe",
 		"slug": "packages-jest-puppeteer-axe",
 		"markdown_source": "../packages/jest-puppeteer-axe/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/keyboard-shortcuts",
+		"slug": "packages-keyboard-shortcuts",
+		"markdown_source": "../packages/keyboard-shortcuts/README.md",
 		"parent": "packages"
 	},
 	{

@@ -33,40 +33,43 @@ export default function ListEdit( {
 	mergeBlocks,
 	onReplace,
 	className,
+	isSelected,
 } ) {
 	const { ordered, values, type, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
 	const controls = ( { value, onChange } ) => (
 		<>
-			<RichTextShortcut
-				type="primary"
-				character="["
-				onUse={ () => {
-					onChange( outdentListItems( value ) );
-				} }
-			/>
-			<RichTextShortcut
-				type="primary"
-				character="]"
-				onUse={ () => {
-					onChange( indentListItems( value, { type: tagName } ) );
-				} }
-			/>
-			<RichTextShortcut
-				type="primary"
-				character="m"
-				onUse={ () => {
-					onChange( indentListItems( value, { type: tagName } ) );
-				} }
-			/>
-			<RichTextShortcut
-				type="primaryShift"
-				character="m"
-				onUse={ () => {
-					onChange( outdentListItems( value ) );
-				} }
-			/>
+			{ ( isSelected && <>
+				<RichTextShortcut
+					type="primary"
+					character="["
+					onUse={ () => {
+						onChange( outdentListItems( value ) );
+					} }
+				/>
+				<RichTextShortcut
+					type="primary"
+					character="]"
+					onUse={ () => {
+						onChange( indentListItems( value, { type: tagName } ) );
+					} }
+				/>
+				<RichTextShortcut
+					type="primary"
+					character="m"
+					onUse={ () => {
+						onChange( indentListItems( value, { type: tagName } ) );
+					} }
+				/>
+				<RichTextShortcut
+					type="primaryShift"
+					character="m"
+					onUse={ () => {
+						onChange( outdentListItems( value ) );
+					} }
+				/>
+			</> ) }
 			<BlockControls>
 				<ToolbarGroup
 					controls={ [

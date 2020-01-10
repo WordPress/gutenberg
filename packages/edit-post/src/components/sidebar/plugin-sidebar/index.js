@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, Panel } from '@wordpress/components';
+import { Button, Panel } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { withPluginContext } from '@wordpress/plugins';
@@ -32,7 +32,7 @@ function PluginSidebar( props ) {
 		<>
 			{ isPinnable && (
 				<PinnedPlugins>
-					{ isPinned && <IconButton
+					{ isPinned && <Button
 						icon={ icon }
 						label={ title }
 						onClick={ toggleSidebar }
@@ -47,7 +47,7 @@ function PluginSidebar( props ) {
 				>
 					<strong>{ title }</strong>
 					{ isPinnable && (
-						<IconButton
+						<Button
 							icon={ isPinned ? 'star-filled' : 'star-empty' }
 							label={ isPinned ? __( 'Unpin from toolbar' ) : __( 'Pin to toolbar' ) }
 							onClick={ togglePin }

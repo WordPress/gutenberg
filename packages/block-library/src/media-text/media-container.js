@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, ResizableBox, ToolbarGroup, withNotices } from '@wordpress/components';
+import { ResizableBox, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	MediaUpload,
+	MediaReplaceFlow,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -45,24 +45,16 @@ class MediaContainer extends Component {
 	}
 
 	renderToolbarEditButton() {
-		const { mediaId, onSelectMedia } = this.props;
+		const { onSelectMedia, onSelectURL, mediaUrl } = this.props;
 		return (
 			<BlockControls>
-				<ToolbarGroup>
-					<MediaUpload
-						onSelect={ onSelectMedia }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ mediaId }
-						render={ ( { open } ) => (
-							<IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit media' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
-					/>
-				</ToolbarGroup>
+				<MediaReplaceFlow
+					mediaURL={ mediaUrl }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*,video/*"
+					onSelect={ onSelectMedia }
+					onSelectURL={ onSelectURL }
+				/>
 			</BlockControls>
 		);
 	}

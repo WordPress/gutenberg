@@ -2,14 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
 
 function EditorHistoryUndo( { hasUndo, undo } ) {
 	return (
-		<IconButton
+		<Button
 			icon="undo"
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }

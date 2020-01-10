@@ -2,13 +2,12 @@
  * External dependencies
  */
 import { identity } from 'lodash';
-import { Text, View, Platform, TouchableWithoutFeedback } from 'react-native';
+import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
@@ -20,6 +19,7 @@ import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/component
 import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
+import BlockInsertionPoint from './insertion-point';
 import __experimentalBlockListFooter from '../block-list-footer';
 
 const innerToolbarHeight = 44;
@@ -29,7 +29,6 @@ export class BlockList extends Component {
 		super( ...arguments );
 
 		this.renderItem = this.renderItem.bind( this );
-		this.renderAddBlockSeparator = this.renderAddBlockSeparator.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
 		this.renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
 		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
@@ -59,13 +58,11 @@ export class BlockList extends Component {
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
 		return (
 			<ReadableContentView>
-				{ willShowInsertionPoint ?
-					this.renderAddBlockSeparator() :	// show the new-block indicator when we're inserting a block or
-					<BlockListAppender				// show the default appender, as normal, when not inserting a block
-						rootClientId={ this.props.rootClientId }
-						renderAppender={ this.props.renderAppender }
-					/>
-				}
+				<BlockListAppender				// show the default appender, anormal, when not inserting a block
+					rootClientId={ this.props.rootClientId }
+					renderAppender={ this.props.renderAppender }
+					showSeparator={ willShowInsertionPoint }
+				/>
 			</ReadableContentView>
 		);
 	}
@@ -131,7 +128,7 @@ export class BlockList extends Component {
 		const { shouldShowBlockAtIndex, shouldShowInsertionPointBefore, shouldShowInsertionPointAfter } = this.props;
 		return (
 			<ReadableContentView>
-				{ shouldShowInsertionPointBefore( clientId ) && this.renderAddBlockSeparator() }
+				{ shouldShowInsertionPointBefore( clientId ) && <BlockInsertionPoint /> }
 				{ shouldShowBlockAtIndex( index ) && (
 					<BlockListBlock
 						key={ clientId }
@@ -141,20 +138,8 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 						isSmallScreen={ ! this.props.isFullyBordered }
 					/> ) }
-				{ shouldShowInsertionPointAfter( clientId ) && this.renderAddBlockSeparator() }
+				{ shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
 			</ReadableContentView>
-		);
-	}
-
-	renderAddBlockSeparator() {
-		const lineStyle = this.props.getStylesFromColorScheme( styles.lineStyleAddHere, styles.lineStyleAddHereDark );
-		const labelStyle = this.props.getStylesFromColorScheme( styles.labelStyleAddHere, styles.labelStyleAddHereDark );
-		return (
-			<View style={ styles.containerStyleAddHere } >
-				<View style={ lineStyle }></View>
-				<Text style={ labelStyle } >{ __( 'ADD BLOCK HERE' ) }</Text>
-				<View style={ lineStyle }></View>
-			</View>
 		);
 	}
 

@@ -184,3 +184,35 @@ export function updateCategory( slug, category ) {
 		category,
 	};
 }
+
+/**
+ * Returns an action object used to add block collections
+ *
+ * @param {string} namespace       The namespace of the blocks to put in the collection
+ * @param {string} title           The title to display in the block inserter
+ * @param {Object} icon (optional) The icon to display in the block inserter
+ *
+ * @return {Object} Action object.
+ */
+export function addBlockCollection( namespace, title, icon ) {
+	return {
+		type: 'ADD_BLOCK_COLLECTION',
+		namespace,
+		title,
+		icon,
+	};
+}
+
+/**
+ * Returns an action object used to remove block collections
+ *
+ * @param {string} namespace       The namespace of the blocks to put in the collection
+ *
+ * @return {Object} Action object.
+ */
+export function removeBlockCollection( namespace ) {
+	return {
+		type: 'REMOVE_BLOCK_COLLECTION',
+		namespace,
+	};
+}

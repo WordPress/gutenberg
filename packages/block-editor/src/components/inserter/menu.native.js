@@ -171,7 +171,10 @@ export default compose(
 
 			// If there a selected block,
 			const end = getBlockSelectionEnd();
-			if ( ! isAppender && end ) {
+			// `end` argument (id) can refer to the component which is removed
+			// due to pressing `undo` button, that's why we need to check
+			// if `getBlock( end) is valid, otherwise `null` is passed
+			if ( ! isAppender && end && getBlock( end ) ) {
 				// and the last selected block is unmodified (empty), it will be replaced
 				if ( isUnmodifiedDefaultBlock( getBlock( end ) ) ) {
 					return getBlockIndex( end, destinationRootClientId );

@@ -75,12 +75,16 @@
 
 .selectedLeaf {
 	margin: $block-selected-margin;
-	padding: $block-selected-to-content;
+	padding-left: $block-selected-to-content;
+	padding-right: $block-selected-to-content;
+	padding-top: $block-selected-to-content;
 }
 
 .selectedRootLeaf {
 	margin: 0;
-	padding: $block-edge-to-content;
+	padding-left: $block-edge-to-content;
+	padding-right: $block-edge-to-content;
+	padding-top: $block-edge-to-content;
 }
 
 .selectedParent {
@@ -129,4 +133,9 @@
 	width: 1px;
 	background-color: #e9eff3;
 	opacity: 0.4;
+}
+
+.neutralToolbar {
+	margin-left: -$block-edge-to-content;
+	margin-right: -$block-edge-to-content;
 }

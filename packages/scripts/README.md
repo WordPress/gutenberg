@@ -380,7 +380,7 @@ Should there be any situation where you want to provide your own webpack config,
 
 To extend the provided webpack config, or replace subsections within the provided webpack config, you can provide your own `webpack.config.js` file, `require` the provided `webpack.config.js` file, and use the [`spread` operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) to import all of or part of the provided configuration.
 
-In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://github.com/webpack-contrib/url-loader):
+In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include [`css-loader`](https://github.com/webpack-contrib/css-loader) and [`style-loader`](https://github.com/webpack-contrib/style-loader):
 
 ```javascript
 const defaultConfig = require("@wordpress/scripts/config/webpack.config");
@@ -392,12 +392,13 @@ module.exports = {
     rules: [
       ...defaultConfig.module.rules,
       {
-        test: /\.svg$/,
-        use: ["@svgr/webpack", "url-loader"]
+        test: /\.css$/,
+        use: ["css-loader", "style-loader"],
       }
     ]
   }
 };
 ```
+
 If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
