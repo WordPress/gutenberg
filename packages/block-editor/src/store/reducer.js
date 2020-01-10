@@ -1359,13 +1359,13 @@ export function automaticChangeStatus( state, action ) {
  *
  * @return {boolean} Updated state.
  */
-export function isToolbarHidden( state = false, action ) {
+export function isToolbarVisible( state = true, action ) {
 	switch ( action.type ) {
 		case 'HIDE_TOOLBAR':
-			return true;
+			return false;
 
 		case 'SHOW_TOOLBAR':
-			return false;
+			return true;
 	}
 
 	return state;
@@ -1373,7 +1373,7 @@ export function isToolbarHidden( state = false, action ) {
 
 export default combineReducers( {
 	blocks,
-	isToolbarHidden,
+	isToolbarVisible,
 	isTyping,
 	isDraggingBlocks,
 	isCaretWithinFormattedText,

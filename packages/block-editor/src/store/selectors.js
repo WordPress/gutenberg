@@ -1534,6 +1534,6 @@ export function didAutomaticChange( state ) {
  *
  * @return {boolean} Whether the Toolbar is hidden.
  */
-export function isToolbarHidden( state ) {
-	return state.isToolbarHidden;
+export function isToolbarVisible( state ) {
+	return state.isToolbarVisible;
 }

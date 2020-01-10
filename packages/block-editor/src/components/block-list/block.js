@@ -79,7 +79,7 @@ const useDebouncedAccessibleBlockLabel = ( blockType, attributes, index, moverDi
 function BlockListBlock( {
 	mode,
 	isFocusMode,
-	isToolbarHidden,
+	isToolbarVisible,
 	hasFixedToolbar,
 	moverDirection,
 	isLocked,
@@ -292,13 +292,14 @@ function BlockListBlock( {
 	// Empty paragraph blocks should always show up as unselected.
 	const showEmptyBlockSideInserter = ! isNavigationMode && ( isSelected || isLast ) && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
-		! isToolbarHidden &&
+		isToolbarVisible &&
 		! isFocusMode &&
 		! showEmptyBlockSideInserter &&
 		isSelected &&
 		! isTypingWithinBlock;
 	const shouldShowBreadcrumb = isNavigationMode && isSelected;
 	const shouldShowContextualToolbar =
+		isToolbarVisible &&
 		! isNavigationMode &&
 		! hasFixedToolbar &&
 		isLargeViewport &&
@@ -515,7 +516,7 @@ const applyWithSelect = withSelect(
 			isTyping,
 			isCaretWithinFormattedText,
 			getBlockMode,
-			isToolbarHidden,
+			isToolbarVisible,
 			isSelectionEnabled,
 			getSelectedBlocksInitialCaretPosition,
 			getSettings,
@@ -577,7 +578,7 @@ const applyWithSelect = withSelect(
 			isCaretWithinFormattedText: isSelected && isCaretWithinFormattedText(),
 
 			mode: getBlockMode( clientId ),
-			isToolbarHidden: isToolbarHidden(),
+			isToolbarVisible: isToolbarVisible(),
 			isSelectionEnabled: isSelectionEnabled(),
 			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
 			isEmptyDefaultBlock:
