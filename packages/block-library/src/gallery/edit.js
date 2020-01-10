@@ -60,6 +60,10 @@ const MOBILE_CONTROL_PROPS = Platform.select( {
 	web: {},
 	native: { separatorType: 'fullWidth' },
 } );
+const MOBILE_CONTROL_PROPS_SEPARATOR_NONE = Platform.select( {
+	web: {},
+	native: { separatorType: 'none' },
+} );
 
 class GalleryEdit extends Component {
 	constructor() {
@@ -363,7 +367,7 @@ class GalleryEdit extends Component {
 						/>
 						<SelectControl
 							label={ __( 'Link To' ) }
-							{ ...MOBILE_CONTROL_PROPS }
+							{ ...MOBILE_CONTROL_PROPS_SEPARATOR_NONE }
 							value={ linkTo }
 							onChange={ this.setLinkTo }
 							options={ linkOptions }
