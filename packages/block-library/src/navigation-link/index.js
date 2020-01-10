@@ -24,6 +24,7 @@ export const settings = {
 
 	supports: {
 		reusable: false,
+		html: false,
 	},
 
 	__experimentalDisplayName: 'label',

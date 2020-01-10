@@ -23,6 +23,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
+		"lodash": "^4.17.15",
 		"qs": "^6.5.2"
 	},
 	"publishConfig": {

@@ -778,8 +778,117 @@ exports[`Storyshots Components|ButtonGroup Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card Default 1`] = `
+.emotion-6 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-6.is-borderless {
+  border: none;
+}
+
+.emotion-6.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  border-bottom: 1px solid #e2e4e7;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-0:last-child {
+  border-bottom: none;
+}
+
+.emotion-0.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-0.is-borderless {
+  border: none;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+}
+
+.emotion-2.is-size-large {
+  padding: 28px;
+}
+
+.emotion-2.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-2.is-size-small {
+  padding: 12px;
+}
+
+.emotion-2.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-2.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-4 {
+  border-top: 1px solid #e2e4e7;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-4:first-of-type {
+  border-top: none;
+}
+
+.emotion-4.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-4.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-4.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-4.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-shady {
+  background: #f3f4f5;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-6 emotion-7"
   style={
     Object {
       "width": "360px",
@@ -787,17 +896,17 @@ exports[`Storyshots Components|Card Default 1`] = `
   }
 >
   <div
-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
+    className="components-card__header is-size-medium emotion-0 emotion-1"
   >
     Header
   </div>
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-2 emotion-3"
   >
     Code is Poetry
   </div>
   <div
-    className="components-card__footer is-size-medium css-wy9sfy-FooterUI e1q7k77g4"
+    className="components-card__footer is-size-medium emotion-4 emotion-5"
   >
     Footer
   </div>
@@ -805,8 +914,47 @@ exports[`Storyshots Components|Card Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Body Default 1`] = `
+.emotion-2 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-2.is-borderless {
+  border: none;
+}
+
+.emotion-2.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+}
+
+.emotion-0.is-size-large {
+  padding: 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-2 emotion-3"
   style={
     Object {
       "width": "360px",
@@ -814,7 +962,7 @@ exports[`Storyshots Components|Card/Body Default 1`] = `
   }
 >
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-0 emotion-1"
   >
     Content
   </div>
@@ -822,8 +970,56 @@ exports[`Storyshots Components|Card/Body Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Divider Default 1`] = `
+.emotion-6 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-6.is-borderless {
+  border: none;
+}
+
+.emotion-6.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+}
+
+.emotion-0.is-size-large {
+  padding: 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-2 {
+  all: unset;
+  border-top: 1px solid #e2e4e7;
+  box-sizing: border-box;
+  display: block;
+  height: 0;
+  width: 100%;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-6 emotion-7"
   style={
     Object {
       "width": "360px",
@@ -831,16 +1027,16 @@ exports[`Storyshots Components|Card/Divider Default 1`] = `
   }
 >
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-0 emotion-1"
   >
     ...
   </div>
   <hr
-    className="components-card__divider css-lh2anh-DividerUI e1q7k77g5"
+    className="components-card__divider emotion-2 emotion-3"
     role="separator"
   />
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-0 emotion-1"
   >
     ...
   </div>
@@ -848,8 +1044,58 @@ exports[`Storyshots Components|Card/Divider Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Footer Default 1`] = `
+.emotion-2 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-2.is-borderless {
+  border: none;
+}
+
+.emotion-2.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  border-top: 1px solid #e2e4e7;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-0:first-of-type {
+  border-top: none;
+}
+
+.emotion-0.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-0.is-borderless {
+  border: none;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-2 emotion-3"
   style={
     Object {
       "width": "360px",
@@ -857,7 +1103,7 @@ exports[`Storyshots Components|Card/Footer Default 1`] = `
   }
 >
   <div
-    className="components-card__footer is-size-medium css-wy9sfy-FooterUI e1q7k77g4"
+    className="components-card__footer is-size-medium emotion-0 emotion-1"
   >
     Content
   </div>
@@ -865,8 +1111,58 @@ exports[`Storyshots Components|Card/Footer Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Header Default 1`] = `
+.emotion-2 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-2.is-borderless {
+  border: none;
+}
+
+.emotion-2.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  border-bottom: 1px solid #e2e4e7;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-0:last-child {
+  border-bottom: none;
+}
+
+.emotion-0.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-0.is-borderless {
+  border: none;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-2 emotion-3"
   style={
     Object {
       "width": "360px",
@@ -874,7 +1170,7 @@ exports[`Storyshots Components|Card/Header Default 1`] = `
   }
 >
   <div
-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
+    className="components-card__header is-size-medium emotion-0 emotion-1"
   >
     Content
   </div>
@@ -882,8 +1178,70 @@ exports[`Storyshots Components|Card/Header Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Media Default 1`] = `
+.emotion-4 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+}
+
+.emotion-2.is-size-large {
+  padding: 28px;
+}
+
+.emotion-2.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-2.is-size-small {
+  padding: 12px;
+}
+
+.emotion-2.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-2.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-0 > img,
+.emotion-0 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-0:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-0:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-4 emotion-5"
   style={
     Object {
       "width": "360px",
@@ -891,7 +1249,7 @@ exports[`Storyshots Components|Card/Media Default 1`] = `
   }
 >
   <div
-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+    className="components-card__media emotion-0 emotion-1"
   >
     <img
       alt="SMELLING MARSHMELLOW ICECREAM CONE"
@@ -899,7 +1257,7 @@ exports[`Storyshots Components|Card/Media Default 1`] = `
     />
   </div>
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-2 emotion-3"
   >
     Content
   </div>
@@ -907,8 +1265,116 @@ exports[`Storyshots Components|Card/Media Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Media Header And Footer 1`] = `
+.emotion-6 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-6.is-borderless {
+  border: none;
+}
+
+.emotion-6.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  border-bottom: 1px solid #e2e4e7;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-0:last-child {
+  border-bottom: none;
+}
+
+.emotion-0.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-0.is-borderless {
+  border: none;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-4 {
+  border-top: 1px solid #e2e4e7;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-4:first-of-type {
+  border-top: none;
+}
+
+.emotion-4.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-4.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-4.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-4.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-2 > img,
+.emotion-2 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-2:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-2:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-6 emotion-7"
   style={
     Object {
       "width": "360px",
@@ -916,12 +1382,12 @@ exports[`Storyshots Components|Card/Media Header And Footer 1`] = `
   }
 >
   <div
-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
+    className="components-card__header is-size-medium emotion-0 emotion-1"
   >
     Header Content
   </div>
   <div
-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+    className="components-card__media emotion-2 emotion-3"
   >
     <img
       alt="SMELLING MARSHMELLOW ICECREAM CONE"
@@ -929,7 +1395,7 @@ exports[`Storyshots Components|Card/Media Header And Footer 1`] = `
     />
   </div>
   <div
-    className="components-card__footer is-shady is-size-medium css-wy9sfy-FooterUI e1q7k77g4"
+    className="components-card__footer is-shady is-size-medium emotion-4 emotion-5"
   >
     Caption
   </div>
@@ -941,11 +1407,97 @@ Array [
   <p>
     Note: This story demonstrates how this UI may be created. It requires extra styling.
   </p>,
-  <div
-    className="components-card is-size-medium is-left e1gk3lep2 css-5mtgus-CardUI-HorizontallyAlignedCard e1q7k77g0"
+  .emotion-7 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.emotion-7.is-borderless {
+  border: none;
+}
+
+.emotion-7.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-7.is-right {
+  -webkit-flex-direction: row-reverse;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+}
+
+.emotion-7 .emotion-3 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-7 .emotion-0.is-left {
+  border-radius: 3px 0 0 3px;
+}
+
+.emotion-7 .emotion-0.is-right {
+  border-radius: 0 3px 3px 0;
+}
+
+.emotion-1 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-1 > img,
+.emotion-1 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-1:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-1:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.emotion-4 {
+  box-sizing: border-box;
+}
+
+.emotion-4.is-size-large {
+  padding: 28px;
+}
+
+.emotion-4.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-4.is-size-small {
+  padding: 12px;
+}
+
+.emotion-4.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-4.is-shady {
+  background: #f3f4f5;
+}
+
+<div
+    className="components-card is-size-medium is-left emotion-6 emotion-7 emotion-8"
   >
     <div
-      className="components-card__media is-left e1gk3lep0 css-7tds6a-MediaUI-StyledCardMedia e1q7k77g2"
+      className="components-card__media is-left emotion-0 emotion-1 emotion-2"
       style={
         Object {
           "maxWidth": 200,
@@ -958,7 +1510,7 @@ Array [
       />
     </div>
     <div
-      className="components-card__body is-size-medium e1gk3lep1 css-1drywz3-BodyUI-StyledCardBody e1q7k77g3"
+      className="components-card__body is-size-medium emotion-3 emotion-4 emotion-5"
     >
       Content
     </div>
@@ -967,8 +1519,81 @@ Array [
 `;
 
 exports[`Storyshots Components|Card/Media Iframe Embed 1`] = `
+.emotion-4 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  border-bottom: 1px solid #e2e4e7;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-0:last-child {
+  border-bottom: none;
+}
+
+.emotion-0.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-0.is-borderless {
+  border: none;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-2 > img,
+.emotion-2 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-2:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-2:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-4 emotion-5"
   style={
     Object {
       "width": "360px",
@@ -976,12 +1601,12 @@ exports[`Storyshots Components|Card/Media Iframe Embed 1`] = `
   }
 >
   <div
-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
+    className="components-card__header is-size-medium emotion-0 emotion-1"
   >
     Header Content
   </div>
   <div
-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+    className="components-card__media emotion-2 emotion-3"
   >
     <iframe
       allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -997,8 +1622,70 @@ exports[`Storyshots Components|Card/Media Iframe Embed 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Media On Bottom 1`] = `
+.emotion-4 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+}
+
+.emotion-0.is-size-large {
+  padding: 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-2 > img,
+.emotion-2 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-2:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-2:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-4 emotion-5"
   style={
     Object {
       "width": "360px",
@@ -1006,12 +1693,12 @@ exports[`Storyshots Components|Card/Media On Bottom 1`] = `
   }
 >
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-0 emotion-1"
   >
     Content
   </div>
   <div
-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+    className="components-card__media emotion-2 emotion-3"
   >
     <img
       alt="SMELLING MARSHMELLOW ICECREAM CONE"
@@ -1022,8 +1709,70 @@ exports[`Storyshots Components|Card/Media On Bottom 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Media On Top 1`] = `
+.emotion-4 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+}
+
+.emotion-2.is-size-large {
+  padding: 28px;
+}
+
+.emotion-2.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-2.is-size-small {
+  padding: 12px;
+}
+
+.emotion-2.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-2.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-0 > img,
+.emotion-0 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-0:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-0:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-4 emotion-5"
   style={
     Object {
       "width": "360px",
@@ -1031,7 +1780,7 @@ exports[`Storyshots Components|Card/Media On Top 1`] = `
   }
 >
   <div
-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+    className="components-card__media emotion-0 emotion-1"
   >
     <img
       alt="SMELLING MARSHMELLOW ICECREAM CONE"
@@ -1039,7 +1788,7 @@ exports[`Storyshots Components|Card/Media On Top 1`] = `
     />
   </div>
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-2 emotion-3"
   >
     <div>
       Content
@@ -1889,6 +2638,309 @@ Array [
     </div>
   </div>,
 ]
+`;
+
+exports[`Storyshots Components|Experimental/Text Body 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Body
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Body Small 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Body Small
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Button 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Button
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Caption 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Caption
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Default 1`] = `
+Array [
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 40px;
+}
+
+<h1
+    className="emotion-0 emotion-1"
+  >
+    Title Large
+  </h1>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+<h2
+    className="emotion-0 emotion-1"
+  >
+    Title Medium
+  </h2>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+<h3
+    className="emotion-0 emotion-1"
+  >
+    Title Small
+  </h3>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Subtitle
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Subtitle Small
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Body
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Body Small
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Button
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Caption
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Label
+  </p>,
+]
+`;
+
+exports[`Storyshots Components|Experimental/Text Label 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Label
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Subtitle 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Subtitle
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Subtitle Small 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Subtitle Small
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Title Large 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 40px;
+}
+
+<h1
+  className="emotion-0 emotion-1"
+>
+  Title Large
+</h1>
+`;
+
+exports[`Storyshots Components|Experimental/Text Title Medium 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+<h2
+  className="emotion-0 emotion-1"
+>
+  Title Medium
+</h2>
+`;
+
+exports[`Storyshots Components|Experimental/Text Title Small 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+<h3
+  className="emotion-0 emotion-1"
+>
+  Title Small
+</h3>
 `;
 
 exports[`Storyshots Components|ExternalLink Default 1`] = `
@@ -3688,47 +4740,10 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
   <div
     className="components-toolbar-group"
   >
-    <div>
-      <button
-        aria-label="Paragraph"
-        className="components-button components-toolbar__control has-icon"
-        id="options-toolbar-1"
-        onBlur={[Function]}
-        onClick={[Function]}
-        onFocus={[Function]}
-        onKeyDown={[Function]}
-        onMouseDown={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        tabIndex={-1}
-        type="button"
-      >
-        <svg
-          aria-hidden="true"
-          className="dashicon dashicons-editor-paragraph"
-          focusable="false"
-          height={20}
-          role="img"
-          viewBox="0 0 20 20"
-          width={20}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M15 2H7.54c-.83 0-1.59.2-2.28.6-.7.41-1.25.96-1.65 1.65C3.2 4.94 3 5.7 3 6.52s.2 1.58.61 2.27c.4.69.95 1.24 1.65 1.64.69.41 1.45.61 2.28.61h.43V17c0 .27.1.51.29.71.2.19.44.29.71.29.28 0 .51-.1.71-.29.2-.2.3-.44.3-.71V5c0-.27.09-.51.29-.71.2-.19.44-.29.71-.29s.51.1.71.29c.19.2.29.44.29.71v12c0 .27.1.51.3.71.2.19.43.29.71.29.27 0 .51-.1.71-.29.19-.2.29-.44.29-.71V4H15c.27 0 .5-.1.7-.3.2-.19.3-.43.3-.7s-.1-.51-.3-.71C15.5 2.1 15.27 2 15 2z"
-          />
-        </svg>
-      </button>
-    </div>
-  </div>
-  <div
-    className="components-dropdown components-dropdown-menu components-toolbar-group"
-  >
     <button
-      aria-expanded={false}
-      aria-haspopup="true"
-      aria-label="Change text alignment"
-      className="components-button components-dropdown-menu__toggle has-text has-icon"
-      id="options-toolbar-2"
+      aria-label="Paragraph"
+      className="components-button components-toolbar-button has-icon"
+      id="options-toolbar-1"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -3741,7 +4756,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-alignleft"
+        className="dashicon dashicons-editor-paragraph"
         focusable="false"
         height={20}
         role="img"
@@ -3750,22 +4765,23 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M12 5V3H3v2h9zm5 4V7H3v2h14zm-5 4v-2H3v2h9zm5 4v-2H3v2h14z"
+          d="M15 2H7.54c-.83 0-1.59.2-2.28.6-.7.41-1.25.96-1.65 1.65C3.2 4.94 3 5.7 3 6.52s.2 1.58.61 2.27c.4.69.95 1.24 1.65 1.64.69.41 1.45.61 2.28.61h.43V17c0 .27.1.51.29.71.2.19.44.29.71.29.28 0 .51-.1.71-.29.2-.2.3-.44.3-.71V5c0-.27.09-.51.29-.71.2-.19.44-.29.71-.29s.51.1.71.29c.19.2.29.44.29.71v12c0 .27.1.51.3.71.2.19.43.29.71.29.27 0 .51-.1.71-.29.19-.2.29-.44.29-.71V4H15c.27 0 .5-.1.7-.3.2-.19.3-.43.3-.7s-.1-.51-.3-.71C15.5 2.1 15.27 2 15 2z"
         />
       </svg>
-      <span
-        className="components-dropdown-menu__indicator"
-      />
     </button>
   </div>
   <div
     className="components-toolbar-group"
   >
-    <div>
+    <div
+      className="components-dropdown components-dropdown-menu"
+    >
       <button
-        aria-label="Bold"
-        className="components-button components-toolbar__control has-icon"
-        id="options-toolbar-3"
+        aria-expanded={false}
+        aria-haspopup="true"
+        aria-label="Change text alignment"
+        className="components-button components-dropdown-menu__toggle has-text has-icon"
+        id="options-toolbar-2"
         onBlur={[Function]}
         onClick={[Function]}
         onFocus={[Function]}
@@ -3778,7 +4794,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
       >
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-editor-bold"
+          className="dashicon dashicons-editor-alignleft"
           focusable="false"
           height={20}
           role="img"
@@ -3787,73 +4803,118 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M6 4v13h4.54c1.37 0 2.46-.33 3.26-1 .8-.66 1.2-1.58 1.2-2.77 0-.84-.17-1.51-.51-2.01s-.9-.85-1.67-1.03v-.09c.57-.1 1.02-.4 1.36-.9s.51-1.13.51-1.91c0-1.14-.39-1.98-1.17-2.5C12.75 4.26 11.5 4 9.78 4H6zm2.57 5.15V6.26h1.36c.73 0 1.27.11 1.61.32.34.22.51.58.51 1.07 0 .54-.16.92-.47 1.15s-.82.35-1.51.35h-1.5zm0 2.19h1.6c1.44 0 2.16.53 2.16 1.61 0 .6-.17 1.05-.51 1.34s-.86.43-1.57.43H8.57v-3.38z"
+            d="M12 5V3H3v2h9zm5 4V7H3v2h14zm-5 4v-2H3v2h9zm5 4v-2H3v2h14z"
           />
         </svg>
+        <span
+          className="components-dropdown-menu__indicator"
+        />
       </button>
     </div>
-    <div>
-      <button
-        aria-label="Italic"
-        className="components-button components-toolbar__control has-icon"
-        id="options-toolbar-4"
-        onBlur={[Function]}
-        onClick={[Function]}
-        onFocus={[Function]}
-        onKeyDown={[Function]}
-        onMouseDown={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        tabIndex={-1}
-        type="button"
+  </div>
+  <div
+    className="components-toolbar-group"
+  >
+    <button
+      className="components-button components-toolbar-button"
+      id="options-toolbar-3"
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onMouseDown={[Function]}
+      tabIndex={-1}
+      type="button"
+    >
+      Text
+    </button>
+    <button
+      aria-label="Bold"
+      aria-pressed={true}
+      className="components-button components-toolbar-button is-pressed has-icon"
+      id="options-toolbar-4"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      tabIndex={-1}
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-editor-bold"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <svg
-          aria-hidden="true"
-          className="dashicon dashicons-editor-italic"
-          focusable="false"
-          height={20}
-          role="img"
-          viewBox="0 0 20 20"
-          width={20}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M14.78 6h-2.13l-2.8 9h2.12l-.62 2H4.6l.62-2h2.14l2.8-9H8.03l.62-2h6.75z"
-          />
-        </svg>
-      </button>
-    </div>
-    <div>
-      <button
-        aria-label="Link"
-        className="components-button components-toolbar__control has-icon"
-        id="options-toolbar-5"
-        onBlur={[Function]}
-        onClick={[Function]}
-        onFocus={[Function]}
-        onKeyDown={[Function]}
-        onMouseDown={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        tabIndex={-1}
-        type="button"
+        <path
+          d="M6 4v13h4.54c1.37 0 2.46-.33 3.26-1 .8-.66 1.2-1.58 1.2-2.77 0-.84-.17-1.51-.51-2.01s-.9-.85-1.67-1.03v-.09c.57-.1 1.02-.4 1.36-.9s.51-1.13.51-1.91c0-1.14-.39-1.98-1.17-2.5C12.75 4.26 11.5 4 9.78 4H6zm2.57 5.15V6.26h1.36c.73 0 1.27.11 1.61.32.34.22.51.58.51 1.07 0 .54-.16.92-.47 1.15s-.82.35-1.51.35h-1.5zm0 2.19h1.6c1.44 0 2.16.53 2.16 1.61 0 .6-.17 1.05-.51 1.34s-.86.43-1.57.43H8.57v-3.38z"
+        />
+      </svg>
+    </button>
+    <button
+      aria-label="Italic"
+      className="components-button components-toolbar-button has-icon"
+      id="options-toolbar-5"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      tabIndex={-1}
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-editor-italic"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <svg
-          aria-hidden="true"
-          className="dashicon dashicons-admin-links"
-          focusable="false"
-          height={20}
-          role="img"
-          viewBox="0 0 20 20"
-          width={20}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M17.74 2.76c1.68 1.69 1.68 4.41 0 6.1l-1.53 1.52c-1.12 1.12-2.7 1.47-4.14 1.09l2.62-2.61.76-.77.76-.76c.84-.84.84-2.2 0-3.04-.84-.85-2.2-.85-3.04 0l-.77.76-3.38 3.38c-.37-1.44-.02-3.02 1.1-4.14l1.52-1.53c1.69-1.68 4.42-1.68 6.1 0zM8.59 13.43l5.34-5.34c.42-.42.42-1.1 0-1.52-.44-.43-1.13-.39-1.53 0l-5.33 5.34c-.42.42-.42 1.1 0 1.52.44.43 1.13.39 1.52 0zm-.76 2.29l4.14-4.15c.38 1.44.03 3.02-1.09 4.14l-1.52 1.53c-1.69 1.68-4.41 1.68-6.1 0-1.68-1.68-1.68-4.42 0-6.1l1.53-1.52c1.12-1.12 2.7-1.47 4.14-1.1l-4.14 4.15c-.85.84-.85 2.2 0 3.05.84.84 2.2.84 3.04 0z"
-          />
-        </svg>
-      </button>
-    </div>
+        <path
+          d="M14.78 6h-2.13l-2.8 9h2.12l-.62 2H4.6l.62-2h2.14l2.8-9H8.03l.62-2h6.75z"
+        />
+      </svg>
+    </button>
+    <button
+      aria-label="Link"
+      className="components-button components-toolbar-button has-icon"
+      id="options-toolbar-6"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      tabIndex={-1}
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-admin-links"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M17.74 2.76c1.68 1.69 1.68 4.41 0 6.1l-1.53 1.52c-1.12 1.12-2.7 1.47-4.14 1.09l2.62-2.61.76-.77.76-.76c.84-.84.84-2.2 0-3.04-.84-.85-2.2-.85-3.04 0l-.77.76-3.38 3.38c-.37-1.44-.02-3.02 1.1-4.14l1.52-1.53c1.69-1.68 4.42-1.68 6.1 0zM8.59 13.43l5.34-5.34c.42-.42.42-1.1 0-1.52-.44-.43-1.13-.39-1.53 0l-5.33 5.34c-.42.42-.42 1.1 0 1.52.44.43 1.13.39 1.52 0zm-.76 2.29l4.14-4.15c.38 1.44.03 3.02-1.09 4.14l-1.52 1.53c-1.69 1.68-4.41 1.68-6.1 0-1.68-1.68-1.68-4.42 0-6.1l1.53-1.52c1.12-1.12 2.7-1.47 4.14-1.1l-4.14 4.15c-.85.84-.85 2.2 0 3.05.84.84 2.2.84 3.04 0z"
+        />
+      </svg>
+    </button>
     <div
       className="components-dropdown components-dropdown-menu components-toolbar-group"
     >
@@ -3862,7 +4923,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
         aria-haspopup="true"
         aria-label="More rich text controls"
         className="components-button components-dropdown-menu__toggle"
-        id="options-toolbar-6"
+        id="options-toolbar-7"
         onBlur={[Function]}
         onClick={[Function]}
         onFocus={[Function]}
@@ -3887,7 +4948,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
       aria-haspopup="true"
       aria-label="Change text alignment"
       className="components-button components-dropdown-menu__toggle has-icon"
-      id="options-toolbar-7"
+      id="options-toolbar-8"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -3925,99 +4986,94 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
   id="options-toolbar-without-group"
   role="toolbar"
 >
-  <div>
-    <button
-      aria-label="Bold"
-      className="components-button components-toolbar__control has-icon"
-      id="options-toolbar-without-group-1"
-      onBlur={[Function]}
-      onClick={[Function]}
-      onFocus={[Function]}
-      onKeyDown={[Function]}
-      onMouseDown={[Function]}
-      onMouseEnter={[Function]}
-      onMouseLeave={[Function]}
-      tabIndex={-1}
-      type="button"
+  <button
+    aria-label="Bold"
+    aria-pressed={true}
+    className="components-button components-toolbar-button is-pressed has-icon"
+    id="options-toolbar-without-group-1"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onMouseDown={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    tabIndex={-1}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-editor-bold"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
     >
-      <svg
-        aria-hidden="true"
-        className="dashicon dashicons-editor-bold"
-        focusable="false"
-        height={20}
-        role="img"
-        viewBox="0 0 20 20"
-        width={20}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M6 4v13h4.54c1.37 0 2.46-.33 3.26-1 .8-.66 1.2-1.58 1.2-2.77 0-.84-.17-1.51-.51-2.01s-.9-.85-1.67-1.03v-.09c.57-.1 1.02-.4 1.36-.9s.51-1.13.51-1.91c0-1.14-.39-1.98-1.17-2.5C12.75 4.26 11.5 4 9.78 4H6zm2.57 5.15V6.26h1.36c.73 0 1.27.11 1.61.32.34.22.51.58.51 1.07 0 .54-.16.92-.47 1.15s-.82.35-1.51.35h-1.5zm0 2.19h1.6c1.44 0 2.16.53 2.16 1.61 0 .6-.17 1.05-.51 1.34s-.86.43-1.57.43H8.57v-3.38z"
-        />
-      </svg>
-    </button>
-  </div>
-  <div>
-    <button
-      aria-label="Italic"
-      className="components-button components-toolbar__control has-icon"
-      id="options-toolbar-without-group-2"
-      onBlur={[Function]}
-      onClick={[Function]}
-      onFocus={[Function]}
-      onKeyDown={[Function]}
-      onMouseDown={[Function]}
-      onMouseEnter={[Function]}
-      onMouseLeave={[Function]}
-      tabIndex={-1}
-      type="button"
+      <path
+        d="M6 4v13h4.54c1.37 0 2.46-.33 3.26-1 .8-.66 1.2-1.58 1.2-2.77 0-.84-.17-1.51-.51-2.01s-.9-.85-1.67-1.03v-.09c.57-.1 1.02-.4 1.36-.9s.51-1.13.51-1.91c0-1.14-.39-1.98-1.17-2.5C12.75 4.26 11.5 4 9.78 4H6zm2.57 5.15V6.26h1.36c.73 0 1.27.11 1.61.32.34.22.51.58.51 1.07 0 .54-.16.92-.47 1.15s-.82.35-1.51.35h-1.5zm0 2.19h1.6c1.44 0 2.16.53 2.16 1.61 0 .6-.17 1.05-.51 1.34s-.86.43-1.57.43H8.57v-3.38z"
+      />
+    </svg>
+  </button>
+  <button
+    aria-label="Italic"
+    className="components-button components-toolbar-button has-icon"
+    id="options-toolbar-without-group-2"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onMouseDown={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    tabIndex={-1}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-editor-italic"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
     >
-      <svg
-        aria-hidden="true"
-        className="dashicon dashicons-editor-italic"
-        focusable="false"
-        height={20}
-        role="img"
-        viewBox="0 0 20 20"
-        width={20}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M14.78 6h-2.13l-2.8 9h2.12l-.62 2H4.6l.62-2h2.14l2.8-9H8.03l.62-2h6.75z"
-        />
-      </svg>
-    </button>
-  </div>
-  <div>
-    <button
-      aria-label="Link"
-      className="components-button components-toolbar__control has-icon"
-      id="options-toolbar-without-group-3"
-      onBlur={[Function]}
-      onClick={[Function]}
-      onFocus={[Function]}
-      onKeyDown={[Function]}
-      onMouseDown={[Function]}
-      onMouseEnter={[Function]}
-      onMouseLeave={[Function]}
-      tabIndex={-1}
-      type="button"
+      <path
+        d="M14.78 6h-2.13l-2.8 9h2.12l-.62 2H4.6l.62-2h2.14l2.8-9H8.03l.62-2h6.75z"
+      />
+    </svg>
+  </button>
+  <button
+    aria-label="Link"
+    className="components-button components-toolbar-button has-icon"
+    id="options-toolbar-without-group-3"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onMouseDown={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    tabIndex={-1}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-admin-links"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
     >
-      <svg
-        aria-hidden="true"
-        className="dashicon dashicons-admin-links"
-        focusable="false"
-        height={20}
-        role="img"
-        viewBox="0 0 20 20"
-        width={20}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M17.74 2.76c1.68 1.69 1.68 4.41 0 6.1l-1.53 1.52c-1.12 1.12-2.7 1.47-4.14 1.09l2.62-2.61.76-.77.76-.76c.84-.84.84-2.2 0-3.04-.84-.85-2.2-.85-3.04 0l-.77.76-3.38 3.38c-.37-1.44-.02-3.02 1.1-4.14l1.52-1.53c1.69-1.68 4.42-1.68 6.1 0zM8.59 13.43l5.34-5.34c.42-.42.42-1.1 0-1.52-.44-.43-1.13-.39-1.53 0l-5.33 5.34c-.42.42-.42 1.1 0 1.52.44.43 1.13.39 1.52 0zm-.76 2.29l4.14-4.15c.38 1.44.03 3.02-1.09 4.14l-1.52 1.53c-1.69 1.68-4.41 1.68-6.1 0-1.68-1.68-1.68-4.42 0-6.1l1.53-1.52c1.12-1.12 2.7-1.47 4.14-1.1l-4.14 4.15c-.85.84-.85 2.2 0 3.05.84.84 2.2.84 3.04 0z"
-        />
-      </svg>
-    </button>
-  </div>
+      <path
+        d="M17.74 2.76c1.68 1.69 1.68 4.41 0 6.1l-1.53 1.52c-1.12 1.12-2.7 1.47-4.14 1.09l2.62-2.61.76-.77.76-.76c.84-.84.84-2.2 0-3.04-.84-.85-2.2-.85-3.04 0l-.77.76-3.38 3.38c-.37-1.44-.02-3.02 1.1-4.14l1.52-1.53c1.69-1.68 4.42-1.68 6.1 0zM8.59 13.43l5.34-5.34c.42-.42.42-1.1 0-1.52-.44-.43-1.13-.39-1.53 0l-5.33 5.34c-.42.42-.42 1.1 0 1.52.44.43 1.13.39 1.52 0zm-.76 2.29l4.14-4.15c.38 1.44.03 3.02-1.09 4.14l-1.52 1.53c-1.69 1.68-4.41 1.68-6.1 0-1.68-1.68-1.68-4.42 0-6.1l1.53-1.52c1.12-1.12 2.7-1.47 4.14-1.1l-4.14 4.15c-.85.84-.85 2.2 0 3.05.84.84 2.2.84 3.04 0z"
+      />
+    </svg>
+  </button>
 </div>
 `;
 

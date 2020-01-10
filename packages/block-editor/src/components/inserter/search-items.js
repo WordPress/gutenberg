@@ -46,18 +46,19 @@ const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
  *
  * @param {Array} items       Item list
  * @param {Array} categories  Available categories.
+ * @param {Array} collections Available collections.
  * @param {string} searchTerm Search term.
  *
  * @return {Array}             Filtered item list.
  */
-export const searchItems = ( items, categories, searchTerm ) => {
+export const searchItems = ( items, categories, collections, searchTerm ) => {
 	const normalizedTerms = normalizeSearchTerm( searchTerm );
 
 	if ( normalizedTerms.length === 0 ) {
 		return items;
 	}
 
-	return items.filter( ( { title, category, keywords = [] } ) => {
+	return items.filter( ( { name, title, category, keywords = [] } ) => {
 		let unmatchedTerms = removeMatchingTerms(
 			normalizedTerms,
 			title
@@ -80,6 +81,14 @@ export const searchItems = ( items, categories, searchTerm ) => {
 			unmatchedTerms,
 			get( find( categories, { slug: category } ), [ 'title' ] ),
 		);
+
+		const itemCollection = collections[ name.split( '/' )[ 0 ] ];
+		if ( itemCollection ) {
+			unmatchedTerms = removeMatchingTerms(
+				unmatchedTerms,
+				itemCollection.title
+			);
+		}
 
 		return unmatchedTerms.length === 0;
 	} );
