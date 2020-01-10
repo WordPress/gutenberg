@@ -21,13 +21,12 @@ export function useDropZone( {
 	onHTMLDrop,
 	onDrop,
 	isDisabled,
-	withExactPosition,
+	withPosition,
 } ) {
 	const { addDropZone, removeDropZone } = useContext( Context );
 	const [ state, setState ] = useState( {
 		isDraggingOverDocument: false,
 		isDraggingOverElement: false,
-		position: null,
 		type: null,
 	} );
 
@@ -39,14 +38,14 @@ export function useDropZone( {
 				onFilesDrop,
 				onHTMLDrop,
 				setState,
-				withExactPosition,
+				withPosition,
 			};
 			addDropZone( dropZone );
 			return () => {
 				removeDropZone( dropZone );
 			};
 		}
-	}, [ isDisabled, onDrop, onFilesDrop, onHTMLDrop, withExactPosition ] );
+	}, [ isDisabled, onDrop, onFilesDrop, onHTMLDrop, withPosition ] );
 
 	return state;
 }
@@ -74,7 +73,6 @@ function DropZoneComponent( {
 	const {
 		isDraggingOverDocument,
 		isDraggingOverElement,
-		position,
 		type,
 	} = useDropZone( { element, onFilesDrop, onHTMLDrop, onDrop } );
 
@@ -103,10 +101,6 @@ function DropZoneComponent( {
 		),
 		'is-dragging-over-document': isDraggingOverDocument,
 		'is-dragging-over-element': isDraggingOverElement,
-		'is-close-to-top': position && position.y === 'top',
-		'is-close-to-bottom': position && position.y === 'bottom',
-		'is-close-to-left': position && position.x === 'left',
-		'is-close-to-right': position && position.x === 'right',
 		[ `is-dragging-${ type }` ]: !! type,
 	} );
 

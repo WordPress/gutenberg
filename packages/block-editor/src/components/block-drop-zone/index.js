@@ -119,7 +119,7 @@ export default function useBlockDropZone( { element, rootClientId } ) {
 		onHTMLDrop,
 		onDrop,
 		isDisabled: isLockedAll,
-		withExactPosition: true,
+		withPosition: true,
 	} );
 
 	useEffect( () => {
