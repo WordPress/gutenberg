@@ -786,7 +786,7 @@ export function updateSettings( settings ) {
 }
 
 /**
- * Returns an action object used in signalling that the Toolbar is hidden.
+ * Returns an action object used in signalling the Toolbar visibility.
  *
  * @return {Object} Action object.
  */
@@ -797,7 +797,7 @@ export function hideToolbar() {
 }
 
 /**
- * Returns an action object used in signalling that the Toolbar is visible.
+ * Returns an action object used in signalling the Toolbar visibility.
  *
  * @return {Object} Action object.
  */
