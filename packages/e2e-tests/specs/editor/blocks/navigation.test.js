@@ -41,7 +41,7 @@ async function mockSearchResponse( items ) {
 
 	await setUpResponseMocking( [
 		{
-			match: ( request ) => request.url().includes( `rest_route=${ encodeURIComponent( '/wp/v2/search' ) }` ),
+			match: ( request ) => request.url().includes( `rest_route` ) && request.url().includes( `search` ),
 			onRequestMatch: createJSONResponse( mappedItems ),
 		},
 	] );
