@@ -36,6 +36,7 @@ import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
 import withFormatTypes from './with-format-types';
 import { BoundaryStyle } from './boundary-style';
+import { InlineWarning } from './inline-warning';
 
 /**
  * Browser dependencies
@@ -188,15 +189,6 @@ class RichText extends Component {
 	}
 
 	componentDidMount() {
-		if ( process.env.NODE_ENV === 'development' ) {
-			const computedStyle = getComputedStyle( this.props.forwardedRef.current );
-
-			if ( computedStyle.display === 'inline' ) {
-				// eslint-disable-next-line no-console
-				console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
-			}
-		}
-
 		this.applyRecord( this.record, { domOnly: true } );
 	}
 
@@ -1073,6 +1065,7 @@ class RichText extends Component {
 					activeFormats={ activeFormats }
 					forwardedRef={ forwardedRef }
 				/>
+				<InlineWarning forwardedRef={ forwardedRef } />
 				{ isSelected && <FormatEdit
 					allowedFormats={ allowedFormats }
 					withoutInteractiveFormatting={ withoutInteractiveFormatting }
