@@ -4,15 +4,13 @@
 import ColorGradientControl from '../colors-gradients/control';
 
 export default function ColorPaletteControl( {
-	colors,
-	disableCustomColors,
-	label,
 	onChange,
 	value,
+	...otherProps
 } ) {
 	return (
 		<ColorGradientControl
-			{ ...{ colors, disableCustomColors, label } }
+			{ ...otherProps }
 			onColorChange={ onChange }
 			colorValue={ value }
 			gradients={ [] }

@@ -86,3 +86,24 @@ export function isInsideRootBlock( blockElement, element ) {
 export function hasInnerBlocksContext( element ) {
 	return !! element.querySelector( '.block-editor-block-list__layout' );
 }
+
+/**
+ * Finds the block client ID given any DOM node inside the block.
+ *
+ * @param {Node} node DOM node.
+ *
+ * @return {string|undefined} Client ID or undefined if the node is not part of a block.
+ */
+export function getBlockClientId( node ) {
+	if ( node.nodeType !== node.ELEMENT_NODE ) {
+		node = node.parentElement;
+	}
+
+	const blockNode = node.closest( '.wp-block' );
+
+	if ( ! blockNode ) {
+		return;
+	}
+
+	return blockNode.id.slice( 'block-'.length );
+}

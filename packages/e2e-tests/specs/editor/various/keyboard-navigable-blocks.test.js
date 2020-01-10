@@ -30,9 +30,6 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await expect( await getActiveLabel() ).toBe( 'Block: Paragraph' );
 
 	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Add block' );
-
-	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
 	await expect( await page.evaluate( () =>
 		document.activeElement.innerHTML
@@ -71,6 +68,9 @@ const tabThroughBlockToolbar = async () => {
 
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'More options' );
+
+	await page.keyboard.press( 'Tab' );
+	await expect( await getActiveLabel() ).toBe( 'Add block' );
 };
 
 describe( 'Order of block keyboard navigation', () => {

@@ -52,33 +52,6 @@
 	}
 }
 
-.edit-post-sidebar .block-library-image__dimensions {
-	margin-bottom: 1em;
-
-	.block-library-image__dimensions__row {
-		display: flex;
-		justify-content: space-between;
-
-		.block-library-image__dimensions__width,
-		.block-library-image__dimensions__height {
-			margin-bottom: 0.5em;
-
-			// Fix the text and placeholder text being misaligned in Safari
-			input {
-				line-height: 1.25;
-			}
-		}
-
-		.block-library-image__dimensions__width {
-			margin-right: 5px;
-		}
-
-		.block-library-image__dimensions__height {
-			margin-left: 5px;
-		}
-	}
-}
-
 .block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
 	position: absolute;
 	left: 0;
