@@ -7,7 +7,7 @@ import { includes } from 'lodash';
  * Browser dependencies
  */
 
-const { getComputedStyle } = window;
+const { DOMParser, getComputedStyle } = window;
 const {
 	TEXT_NODE,
 	ELEMENT_NODE,
@@ -660,4 +660,16 @@ export function replaceTag( node, tagName ) {
 export function wrap( newNode, referenceNode ) {
 	referenceNode.parentNode.insertBefore( newNode, referenceNode );
 	newNode.appendChild( referenceNode );
+}
+
+/**
+ * Removes any HTML tags from the provided string.
+ *
+ * @param {string} html The string containing html.
+ *
+ * @return {string} The text content with any html removed.
+ */
+export function stripHTML( html ) {
+	const document = new DOMParser().parseFromString( html, 'text/html' );
+	return document.body.textContent || '';
 }

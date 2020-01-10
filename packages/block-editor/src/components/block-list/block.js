@@ -21,9 +21,9 @@ import {
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
+	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
 import { withFilters, Popover } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
 	withSelect,
@@ -50,6 +50,32 @@ import useMovingAnimation from './moving-animation';
 import { ChildToolbar, ChildToolbarSlot } from './block-child-toolbar';
 import { Context } from './root-container';
 
+/**
+ * A debounced version of getAccessibleBlockLabel, avoids unnecessary updates to the aria-label attribute
+ * when typing in some blocks, like the paragraph.
+ *
+ * @param {Object} blockType      The block type object representing the block's definition.
+ * @param {Object} attributes     The block's attribute values.
+ * @param {number} index          The index of the block in the block list.
+ * @param {string} moverDirection A string representing whether the movers are displayed vertically or horizontally.
+ * @param {number} delay          The debounce delay.
+ */
+const useDebouncedAccessibleBlockLabel = ( blockType, attributes, index, moverDirection, delay ) => {
+	const [ blockLabel, setBlockLabel ] = useState( '' );
+
+	useEffect( () => {
+		const timeoutId = setTimeout( () => {
+			setBlockLabel( getAccessibleBlockLabel( blockType, attributes, index + 1, moverDirection ) );
+		}, delay );
+
+		return () => {
+			clearTimeout( timeoutId );
+		};
+	}, [ blockType, attributes, index, moverDirection, delay ] );
+
+	return blockLabel;
+};
+
 function BlockListBlock( {
 	mode,
 	isFocusMode,
@@ -71,6 +97,7 @@ function BlockListBlock( {
 	isSelectionEnabled,
 	className,
 	name,
+	index,
 	isValid,
 	isLast,
 	attributes,
@@ -114,6 +141,9 @@ function BlockListBlock( {
 	const onBlockError = () => setErrorState( true );
 
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
+
+	const blockType = getBlockType( name );
+	const blockAriaLabel = useDebouncedAccessibleBlockLabel( blockType, attributes, index, moverDirection, 400 );
 
 	// Handing the focus of the block on creation and update
 
@@ -255,13 +285,6 @@ function BlockListBlock( {
 		{ bindGlobal: true, eventName: 'keydown', isDisabled: ! canFocusHiddenToolbar }
 	);
 
-	// Rendering the output
-	const blockType = getBlockType( name );
-	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
-	// The block as rendered in the editor is composed of general block UI
-	// (mover, toolbar, wrapper) and the display of the block content.
-
 	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 
 	// If the block is selected and we're typing the block should not appear.
@@ -382,7 +405,7 @@ function BlockListBlock( {
 			// Only allow shortcuts when a blocks is selected and not locked.
 			onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
 			tabIndex="0"
-			aria-label={ blockLabel }
+			aria-label={ blockAriaLabel }
 			role="group"
 			{ ...wrapperProps }
 			style={
@@ -560,6 +583,7 @@ const applyWithSelect = withSelect(
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 			isLast: index === blockOrder.length - 1,
 			isNavigationMode: isNavigationMode(),
+			index,
 			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to access the block prop

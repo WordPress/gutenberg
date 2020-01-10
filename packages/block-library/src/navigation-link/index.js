@@ -27,7 +27,7 @@ export const settings = {
 		html: false,
 	},
 
-	__experimentalDisplayName: 'label',
+	__experimentalLabel: ( { label } ) => label,
 
 	edit,
 	save,
