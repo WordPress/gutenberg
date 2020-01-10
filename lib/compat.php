@@ -31,6 +31,41 @@ function gutenberg_safe_style_css_column_flex_basis( $attr ) {
 add_filter( 'safe_style_css', 'gutenberg_safe_style_css_column_flex_basis' );
 
 /**
+ * Adds a polyfill for the WHATWG URL in environments which do not support it.
+ * The intention in how this action is handled is under the assumption that this
+ * code would eventually be placed at `wp_default_packages_vendor`, which is
+ * called as a result of `wp_default_packages` via the `wp_default_scripts`.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/URL/URL
+ * @see https://developer.wordpress.org/reference/functions/wp_default_packages_vendor/
+ * @see (TODO: Trac Ticket TBD)
+ *
+ * @since 7.3.0
+ *
+ * @param WP_Scripts $scripts WP_Scripts object.
+ */
+function gutenberg_add_url_polyfill( $scripts ) {
+	gutenberg_register_vendor_script(
+		$scripts,
+		'wp-polyfill-url',
+		'https://unpkg.com/polyfill-library@3.26.0-0/polyfills/URL/polyfill.js',
+		array(),
+		'3.26.0-0'
+	);
+
+	did_action( 'init' ) && $scripts->add_inline_script(
+		'wp-polyfill',
+		wp_get_script_polyfill(
+			$scripts,
+			array(
+				'\'URL\' in window' => 'wp-polyfill-url',
+			)
+		)
+	);
+}
+add_action( 'wp_default_scripts', 'gutenberg_add_url_polyfill' );
+
+/**
  * Sets the current post for usage in template blocks.
  *
  * @return WP_Post|null The post if any, or null otherwise.
