@@ -108,17 +108,17 @@ function BlockListBlock( {
 		};
 	}, [] );
 	const {
-		addBlockNode,
-		removeBlockNode,
+		__unstableAddBlockNode,
+		__unstableRemoveBlockNode,
 	} = useDispatch( 'core/block-editor' );
 
 	// Reference of the wrapper
 	const wrapper = useRef( null );
 
 	useEffect( () => {
-		addBlockNode( clientId, wrapper.current );
+		__unstableAddBlockNode( clientId, wrapper.current );
 		return () => {
-			removeBlockNode( clientId );
+			__unstableRemoveBlockNode( clientId );
 		};
 	}, [] );
 

@@ -45,7 +45,7 @@ function selector( select ) {
 		getBlockListSettings,
 		__experimentalGetBlockListSettingsForBlocks,
 		getSettings,
-		getBlockNode,
+		__unstableGetBlockNode,
 	} = select( 'core/block-editor' );
 
 	const clientId = getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
@@ -98,7 +98,7 @@ function selector( select ) {
 		hasAncestorCapturingToolbars,
 		hasFixedToolbar,
 		__experimentalMoverDirection,
-		blockNode: getBlockNode( clientId ),
+		blockNode: __unstableGetBlockNode( clientId ),
 	};
 }
 

@@ -922,7 +922,7 @@ export function * insertAfterBlock( clientId ) {
 	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
 }
 
-export function addBlockNode( clientId, node ) {
+export function __unstableAddBlockNode( clientId, node ) {
 	return {
 		type: 'ADD_BLOCK_NODE',
 		clientId,
@@ -930,7 +930,7 @@ export function addBlockNode( clientId, node ) {
 	};
 }
 
-export function removeBlockNode( clientId ) {
+export function __unstableRemoveBlockNode( clientId ) {
 	return {
 		type: 'REMOVE_BLOCK_NODE',
 		clientId,

@@ -1527,6 +1527,6 @@ export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
 }
 
-export function getBlockNode( state, clientId ) {
+export function __unstableGetBlockNode( state, clientId ) {
 	return state.blockNodes[ clientId ];
 }

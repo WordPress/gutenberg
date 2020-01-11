@@ -1344,6 +1344,8 @@ export function automaticChangeStatus( state, action ) {
 			return;
 		// Undoing an automatic change should still be possible after mouse
 		// move.
+		case 'ADD_BLOCK_NODE':
+		case 'REMOVE_BLOCK_NODE':
 		case 'STOP_TYPING':
 			return state;
 	}
