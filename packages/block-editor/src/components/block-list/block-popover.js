@@ -22,90 +22,45 @@ import Inserter from '../inserter';
 
 function selector( select ) {
 	const {
-		getSelectedBlockClientId,
-		getFirstMultiSelectedBlockClientId,
 		isNavigationMode,
 		isMultiSelecting,
 		hasMultiSelection,
-		__unstableGetBlockWithoutInnerBlocks,
 		isTyping,
 		isCaretWithinFormattedText,
-		getBlockRootClientId,
-		getBlockParents,
-		getBlockListSettings,
-		__experimentalGetBlockListSettingsForBlocks,
 		getSettings,
-		__unstableGetSelectedBlockNode,
 	} = select( 'core/block-editor' );
-
-	const clientId = getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
-
-	// The fallback to `{}` is a temporary fix.
-	// This function should never be called when a block is not present in the state.
-	// It happens now because the order in withSelect rendering is not correct.
-	const { name, attributes = {}, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
-
-	const blockParentsClientIds = getBlockParents( clientId );
-	const rootClientId = getBlockRootClientId( clientId );
-
-	const {
-		__experimentalMoverDirection,
-	} = getBlockListSettings( rootClientId ) || {};
-
-	// Get Block List Settings for all ancestors of the current Block clientId
-	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks( blockParentsClientIds );
-
-	// Find the index of the first Block with the `captureDescendantsToolbars` prop defined
-	// This will be the top most ancestor because getBlockParents() returns tree from top -> bottom
-	const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [ '__experimentalCaptureToolbars', true ] );
-
-	let blockNode;
-
-	if ( topmostAncestorWithCaptureDescendantsToolbarsIndex !== -1 ) {
-		const capturingClientId = blockParentsClientIds[ topmostAncestorWithCaptureDescendantsToolbarsIndex ];
-		// This node is guaranteed to be mounted if the child block node is
-		// mounted.
-		blockNode = document.getElementById( 'block-' + capturingClientId );
-	} else {
-		blockNode = __unstableGetSelectedBlockNode();
-	}
 
 	const { hasFixedToolbar } = getSettings();
 
 	return {
-		name,
-		clientId,
-		isValid,
 		isNavigationMode: isNavigationMode(),
 		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
 		isCaretWithinFormattedText: isCaretWithinFormattedText(),
-		isEmptyDefaultBlock: name && isUnmodifiedDefaultBlock( { name, attributes } ),
-		rootClientId,
 		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar,
-		__experimentalMoverDirection,
-		blockNode,
-		align: attributes.align,
 	};
 }
 
-function BlockPopover( { hasMovers = true } ) {
+function BlockPopover( {
+	clientId,
+	rootClientId,
+	node,
+	name,
+	align,
+	isValid,
+	moverDirection,
+	isEmptyDefaultBlock,
+	capturingClientId,
+	hasMovers = true,
+} ) {
 	const {
-		name,
-		clientId,
-		isValid,
 		isNavigationMode,
 		isMultiSelecting,
 		isTyping,
 		isCaretWithinFormattedText,
-		isEmptyDefaultBlock,
-		rootClientId,
 		hasMultiSelection,
 		hasFixedToolbar,
-		__experimentalMoverDirection,
-		blockNode,
-		align,
 	} = useSelect( selector, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -133,10 +88,6 @@ function BlockPopover( { hasMovers = true } ) {
 		{ bindGlobal: true, eventName: 'keydown', isDisabled: ! canFocusHiddenToolbar }
 	);
 
-	if ( ! blockNode ) {
-		return null;
-	}
-
 	if (
 		! shouldShowBreadcrumb &&
 		! shouldShowContextualToolbar &&
@@ -144,6 +95,10 @@ function BlockPopover( { hasMovers = true } ) {
 		! showEmptyBlockSideInserter
 	) {
 		return null;
+	}
+
+	if ( capturingClientId ) {
+		node = document.getElementById( 'block-' + capturingClientId );
 	}
 
 	// Position above the anchor, pop out towards the right, and position in the
@@ -159,13 +114,13 @@ function BlockPopover( { hasMovers = true } ) {
 			animate={ false }
 			position={ popoverPosition }
 			focusOnMount={ false }
-			anchorRef={ blockNode.lastChild }
+			anchorRef={ node.lastChild }
 			className="block-editor-block-list__block-popover"
 			__unstableSticky={ showEmptyBlockSideInserter ? false : popoverIsSticky }
 			__unstableSlotName="block-toolbar"
 			// Allow subpixel positioning for the block movement animation.
-			__unstableAllowVerticalSubpixelPosition={ __experimentalMoverDirection !== 'horizontal' && blockNode }
-			__unstableAllowHorizontalSubpixelPosition={ __experimentalMoverDirection === 'horizontal' && blockNode }
+			__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && node }
+			__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && node }
 			onBlur={ () => setIsToolbarForced( false ) }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
@@ -197,19 +152,80 @@ function BlockPopover( { hasMovers = true } ) {
 	);
 }
 
+function wrapperSelector( select ) {
+	const {
+		getSelectedBlockClientId,
+		getFirstMultiSelectedBlockClientId,
+		getBlockRootClientId,
+		__unstableGetSelectedBlockNode,
+		__unstableGetBlockWithoutInnerBlocks,
+		getBlockParents,
+		getBlockListSettings,
+		__experimentalGetBlockListSettingsForBlocks,
+	} = select( 'core/block-editor' );
+
+	const clientId = getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
+	const rootClientId = getBlockRootClientId( clientId );
+	const { name, attributes = {}, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
+	const blockParentsClientIds = getBlockParents( clientId );
+	const {
+		__experimentalMoverDirection,
+	} = getBlockListSettings( rootClientId ) || {};
+
+	// Get Block List Settings for all ancestors of the current Block clientId
+	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks( blockParentsClientIds );
+
+	// Find the index of the first Block with the `captureDescendantsToolbars` prop defined
+	// This will be the top most ancestor because getBlockParents() returns tree from top -> bottom
+	const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [ '__experimentalCaptureToolbars', true ] );
+
+	let capturingClientId;
+
+	if ( topmostAncestorWithCaptureDescendantsToolbarsIndex !== -1 ) {
+		capturingClientId = blockParentsClientIds[ topmostAncestorWithCaptureDescendantsToolbarsIndex ];
+	}
+
+	return {
+		clientId,
+		rootClientId: getBlockRootClientId( clientId ),
+		node: __unstableGetSelectedBlockNode(),
+		name,
+		align: attributes.align,
+		isValid,
+		moverDirection: __experimentalMoverDirection,
+		isEmptyDefaultBlock: name && isUnmodifiedDefaultBlock( { name, attributes } ),
+		capturingClientId,
+	};
+}
+
 export default function WrappedBlockPopover() {
-	const clientId = useSelect( ( select ) => {
-		const {
-			getSelectedBlockClientId,
-			getFirstMultiSelectedBlockClientId,
-		} = select( 'core/block-editor' );
+	const {
+		clientId,
+		rootClientId,
+		node,
+		name,
+		align,
+		isValid,
+		moverDirection,
+		isEmptyDefaultBlock,
+		capturingClientId,
+	} = useSelect( wrapperSelector, [] );
 
-		return getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
-	}, [] );
-
-	if ( ! clientId ) {
+	if ( ! name || ! node || node.id !== 'block-' + clientId ) {
 		return null;
 	}
 
-	return <BlockPopover />;
+	return (
+		<BlockPopover
+			clientId={ clientId }
+			rootClientId={ rootClientId }
+			node={ node }
+			name={ name }
+			align={ align }
+			isValid={ isValid }
+			moverDirection={ moverDirection }
+			isEmptyDefaultBlock={ isEmptyDefaultBlock }
+			capturingClientId={ capturingClientId }
+		/>
+	);
 }

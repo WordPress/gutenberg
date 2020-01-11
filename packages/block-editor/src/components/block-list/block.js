@@ -116,7 +116,6 @@ function BlockListBlock( {
 	}, [] );
 	const {
 		__unstableSetSelectedBlockNode,
-		__unstableUnsetSelectedBlockNode,
 	} = useDispatch( 'core/block-editor' );
 
 	// Reference of the wrapper
@@ -125,9 +124,6 @@ function BlockListBlock( {
 	useLayoutEffect( () => {
 		if ( isSelected || isFirstMultiSelected ) {
 			__unstableSetSelectedBlockNode( wrapper.current );
-			return () => {
-				__unstableUnsetSelectedBlockNode();
-			};
 		}
 	}, [ isSelected, isFirstMultiSelected ] );
 
