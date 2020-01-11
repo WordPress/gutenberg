@@ -39,7 +39,7 @@ function selector( select ) {
 	} = select( 'core/block-editor' );
 
 	const clientId = getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
-	const { name, attributes, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
+	const { name, attributes = {}, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 
 	const blockParentsClientIds = getBlockParents( clientId );
 	const rootClientId = getBlockRootClientId( clientId );
@@ -77,6 +77,7 @@ function selector( select ) {
 		hasFixedToolbar,
 		__experimentalMoverDirection,
 		blockNode: __unstableGetBlockNode( capturingBlockId ),
+		align: attributes.align,
 	};
 }
 
@@ -95,6 +96,7 @@ function BlockPopover( { hasMovers = true } ) {
 		hasFixedToolbar,
 		__experimentalMoverDirection,
 		blockNode,
+		align,
 	} = useSelect( selector, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -135,29 +137,6 @@ function BlockPopover( { hasMovers = true } ) {
 		return null;
 	}
 
-	// To do: remove align dependency by restricting toolbar position within
-	// the editor canvas.
-	const align = blockNode.getAttribute( 'data-align' );
-
-	/**
-	 * Renders an individual `BlockContextualToolbar` component.
-	 * This needs to be a function which generates the component
-	 * on demand as we can only have a single toolbar for each render.
-	 * This is because of the `isForcingContextualToolbar` logic which
-	 * relies on a single toolbar being rendered to update the boolean
-	 * value of the ref used to track the "force" state.
-	 */
-	const renderBlockContextualToolbar = () => (
-		<BlockContextualToolbar
-			// If the toolbar is being shown because of being forced
-			// it should focus the toolbar right after the mount.
-			focusOnMount={ isToolbarForced }
-			data-type={ name }
-			data-align={ align }
-			hasMovers={ hasMovers }
-		/>
-	);
-
 	// Position above the anchor, pop out towards the right, and position in the
 	// left corner. For the side inserter, pop out towards the left, and
 	// position in the right corner.
@@ -180,7 +159,16 @@ function BlockPopover( { hasMovers = true } ) {
 			__unstableAllowHorizontalSubpixelPosition={ __experimentalMoverDirection === 'horizontal' && blockNode }
 			onBlur={ () => setIsToolbarForced( false ) }
 		>
-			{ ( shouldShowContextualToolbar || isToolbarForced ) && renderBlockContextualToolbar() }
+			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
+				<BlockContextualToolbar
+					// If the toolbar is being shown because of being forced
+					// it should focus the toolbar right after the mount.
+					focusOnMount={ isToolbarForced }
+					data-type={ name }
+					data-align={ align }
+					hasMovers={ hasMovers }
+				/>
+			) }
 			{ shouldShowBreadcrumb && (
 				<BlockBreadcrumb
 					clientId={ clientId }
