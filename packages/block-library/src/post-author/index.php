@@ -15,7 +15,7 @@ function render_block_core_post_author() {
 	if ( ! $post ) {
 		return '';
 	}
-	return '<h6> By ' . get_the_author( $post ) . '</h6>';
+	return '<h6>' . __( 'By ' ) . get_the_author( $post ) . '</h6>';
 }
 
 /**
