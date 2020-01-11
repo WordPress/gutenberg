@@ -41,7 +41,7 @@ function selector( select ) {
 	} = select( 'core/block-editor' );
 
 	const clientId = getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
-	const { name, attributes, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId );
+	const { name, attributes, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 
 	const checkDeep = true;
 
