@@ -123,11 +123,13 @@ function BlockListBlock( {
 	const wrapper = useRef( null );
 
 	useEffect( () => {
-		__unstableAddBlockNode( clientId, wrapper.current );
-		return () => {
-			__unstableRemoveBlockNode( clientId );
-		};
-	}, [] );
+		if ( isSelected ) {
+			__unstableAddBlockNode( clientId, wrapper.current );
+			return () => {
+				__unstableRemoveBlockNode( clientId );
+			};
+		}
+	}, [ isSelected ] );
 
 	// Reference to the block edit node
 	const blockNodeRef = useRef();
