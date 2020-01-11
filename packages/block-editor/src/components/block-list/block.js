@@ -23,6 +23,7 @@ import {
 	withDispatch,
 	withSelect,
 	useSelect,
+	useDispatch,
 } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
@@ -106,9 +107,20 @@ function BlockListBlock( {
 			isDraggingBlocks: select( 'core/block-editor' ).isDraggingBlocks(),
 		};
 	}, [] );
+	const {
+		addBlockNode,
+		removeBlockNode,
+	} = useDispatch( 'core/block-editor' );
 
 	// Reference of the wrapper
 	const wrapper = useRef( null );
+
+	useEffect( () => {
+		addBlockNode( clientId, wrapper.current );
+		return () => {
+			removeBlockNode( clientId );
+		};
+	}, [] );
 
 	// Reference to the block edit node
 	const blockNodeRef = useRef();

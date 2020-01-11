@@ -1351,6 +1351,28 @@ export function automaticChangeStatus( state, action ) {
 	// Reset the state by default (for any action not handled).
 }
 
+/**
+ * Reducer returning typing state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function blockNodes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BLOCK_NODE':
+			return {
+				...state,
+				[ action.clientId ]: action.node,
+			};
+		case 'REMOVE_BLOCK_NODE':
+			return omit( state, [ action.clientId ] );
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1370,4 +1392,5 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	isNavigationMode,
 	automaticChangeStatus,
+	blockNodes,
 } );

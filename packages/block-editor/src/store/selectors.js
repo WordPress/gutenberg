@@ -1526,3 +1526,7 @@ export function isNavigationMode( state ) {
 export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
 }
+
+export function getBlockNode( state, clientId ) {
+	return state.blockNodes[ clientId ];
+}

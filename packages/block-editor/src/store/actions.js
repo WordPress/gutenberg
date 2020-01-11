@@ -921,3 +921,18 @@ export function * insertAfterBlock( clientId ) {
 	const firstSelectedIndex = yield select( 'core/block-editor', 'getBlockIndex', clientId, rootClientId );
 	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
 }
+
+export function addBlockNode( clientId, node ) {
+	return {
+		type: 'ADD_BLOCK_NODE',
+		clientId,
+		node,
+	};
+}
+
+export function removeBlockNode( clientId ) {
+	return {
+		type: 'REMOVE_BLOCK_NODE',
+		clientId,
+	};
+}

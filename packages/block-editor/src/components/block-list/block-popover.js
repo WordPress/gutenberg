@@ -45,6 +45,7 @@ function selector( select ) {
 		getBlockListSettings,
 		__experimentalGetBlockListSettingsForBlocks,
 		getSettings,
+		getBlockNode,
 	} = select( 'core/block-editor' );
 
 	const clientId = getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
@@ -97,6 +98,7 @@ function selector( select ) {
 		hasAncestorCapturingToolbars,
 		hasFixedToolbar,
 		__experimentalMoverDirection,
+		blockNode: getBlockNode( clientId ),
 	};
 }
 
@@ -119,6 +121,7 @@ function BlockPopover() {
 		hasAncestorCapturingToolbars,
 		hasFixedToolbar,
 		__experimentalMoverDirection,
+		blockNode,
 	} = useSelect( selector, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -207,6 +210,10 @@ function BlockPopover() {
 		}
 	}, [ isSelected, isNavigationMode ] );
 
+	if ( ! blockNode ) {
+		return null;
+	}
+
 	if (
 		! shouldShowBreadcrumb &&
 		! shouldShowContextualToolbar &&
@@ -217,13 +224,7 @@ function BlockPopover() {
 		return null;
 	}
 
-	const wrapper = getBlockWrapperNode( clientId );
-
-	if ( ! wrapper ) {
-		return null;
-	}
-
-	const align = wrapper.getAttribute( 'data-align' );
+	const align = blockNode.getAttribute( 'data-align' );
 	const hasMovers = true;
 
 	/**
@@ -258,13 +259,13 @@ function BlockPopover() {
 			animate={ false }
 			position={ popoverPosition }
 			focusOnMount={ false }
-			anchorRef={ wrapper.lastChild }
+			anchorRef={ blockNode.lastChild }
 			className="block-editor-block-list__block-popover"
 			__unstableSticky={ showEmptyBlockSideInserter ? false : popoverIsSticky }
 			__unstableSlotName="block-toolbar"
 			// Allow subpixel positioning for the block movement animation.
-			__unstableAllowVerticalSubpixelPosition={ __experimentalMoverDirection !== 'horizontal' && wrapper }
-			__unstableAllowHorizontalSubpixelPosition={ __experimentalMoverDirection === 'horizontal' && wrapper }
+			__unstableAllowVerticalSubpixelPosition={ __experimentalMoverDirection !== 'horizontal' && blockNode }
+			__unstableAllowHorizontalSubpixelPosition={ __experimentalMoverDirection === 'horizontal' && blockNode }
 			onBlur={ () => setIsToolbarForced( false ) }
 		>
 			{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && renderBlockContextualToolbar() }
