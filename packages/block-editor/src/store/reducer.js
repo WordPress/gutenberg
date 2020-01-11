@@ -1344,8 +1344,7 @@ export function automaticChangeStatus( state, action ) {
 			return;
 		// Undoing an automatic change should still be possible after mouse
 		// move.
-		case 'ADD_BLOCK_NODE':
-		case 'REMOVE_BLOCK_NODE':
+		case 'SET_SELECTED_BLOCK_NODE':
 		case 'STOP_TYPING':
 			return state;
 	}
@@ -1364,10 +1363,8 @@ export function automaticChangeStatus( state, action ) {
  */
 export function selectedBlockNode( state, action ) {
 	switch ( action.type ) {
-		case 'ADD_BLOCK_NODE':
+		case 'SET_SELECTED_BLOCK_NODE':
 			return action.node;
-		case 'REMOVE_BLOCK_NODE':
-			return;
 	}
 
 	return state;

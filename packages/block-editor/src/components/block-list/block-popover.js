@@ -29,16 +29,13 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 	} = select( 'core/block-editor' );
-
-	const { hasFixedToolbar } = getSettings();
-
 	return {
 		isNavigationMode: isNavigationMode(),
 		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
 		isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		hasMultiSelection: hasMultiSelection(),
-		hasFixedToolbar,
+		hasFixedToolbar: getSettings().hasFixedToolbar,
 	};
 }
 
@@ -63,8 +60,8 @@ function BlockPopover( {
 		hasFixedToolbar,
 	} = useSelect( selector, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
-
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
+
 	const showEmptyBlockSideInserter = ! isNavigationMode && isEmptyDefaultBlock && isValid;
 	const shouldShowBreadcrumb = isNavigationMode;
 	const shouldShowContextualToolbar =
@@ -74,13 +71,11 @@ function BlockPopover( {
 		! showEmptyBlockSideInserter &&
 		! isMultiSelecting &&
 		( ! isTyping || isCaretWithinFormattedText );
-
-	const canFocusHiddenToolbar = (
+	const canFocusHiddenToolbar =
 		! isNavigationMode &&
 		! shouldShowContextualToolbar &&
 		! hasFixedToolbar &&
-		! isEmptyDefaultBlock
-	);
+		! isEmptyDefaultBlock;
 
 	useShortcut(
 		'core/block-editor/focus-toolbar',
@@ -168,9 +163,7 @@ function wrapperSelector( select ) {
 	const rootClientId = getBlockRootClientId( clientId );
 	const { name, attributes = {}, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
-	const {
-		__experimentalMoverDirection,
-	} = getBlockListSettings( rootClientId ) || {};
+	const { __experimentalMoverDirection } = getBlockListSettings( rootClientId ) || {};
 
 	// Get Block List Settings for all ancestors of the current Block clientId
 	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks( blockParentsClientIds );

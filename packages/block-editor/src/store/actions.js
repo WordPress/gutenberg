@@ -929,14 +929,7 @@ export function * insertAfterBlock( clientId ) {
  */
 export function __unstableSetSelectedBlockNode( node ) {
 	return {
-		type: 'ADD_BLOCK_NODE',
+		type: 'SET_SELECTED_BLOCK_NODE',
 		node,
 	};
-}
-
-/**
- * Unsets the DOM node of the selected block.
- */
-export function __unstableUnsetSelectedBlockNode() {
-	return { type: 'REMOVE_BLOCK_NODE' };
 }
