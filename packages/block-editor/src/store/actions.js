@@ -922,6 +922,12 @@ export function * insertAfterBlock( clientId ) {
 	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
 }
 
+/**
+ * Adds a mounted block DOM node for a given client ID.
+ *
+ * @param {string}  clientId The block client ID.
+ * @param {Element} node     The block's DOM node.
+ */
 export function __unstableAddBlockNode( clientId, node ) {
 	return {
 		type: 'ADD_BLOCK_NODE',
@@ -930,6 +936,11 @@ export function __unstableAddBlockNode( clientId, node ) {
 	};
 }
 
+/**
+ * Removes an unmounted block DOM node for a given client ID.
+ *
+ * @param {string}  clientId The block client ID.
+ */
 export function __unstableRemoveBlockNode( clientId ) {
 	return {
 		type: 'REMOVE_BLOCK_NODE',

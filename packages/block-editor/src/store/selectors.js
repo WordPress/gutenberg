@@ -1527,6 +1527,14 @@ export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
 }
 
+/**
+ * Gets the block's DOM node.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {Element} The block's DOM node.
+ */
 export function __unstableGetBlockNode( state, clientId ) {
 	return state.blockNodes[ clientId ];
 }

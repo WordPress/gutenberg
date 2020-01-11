@@ -1354,7 +1354,8 @@ export function automaticChangeStatus( state, action ) {
 }
 
 /**
- * Reducer returning typing state.
+ * Reducer returning block DOM nodes state. This state is useful for components
+ * rendering and positioning controls around mounted block nodes.
  *
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.

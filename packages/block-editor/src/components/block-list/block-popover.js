@@ -25,6 +25,7 @@ function selector( select ) {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		isNavigationMode,
+		isMultiSelecting,
 		__unstableGetBlockWithoutInnerBlocks,
 		isTyping,
 		isCaretWithinFormattedText,
@@ -67,8 +68,8 @@ function selector( select ) {
 		name,
 		clientId,
 		isValid,
-		isSelected: !! getSelectedBlockClientId(),
 		isNavigationMode: isNavigationMode(),
+		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
 		isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		isEmptyDefaultBlock: name && isUnmodifiedDefaultBlock( { name, attributes } ),
@@ -80,7 +81,7 @@ function selector( select ) {
 	};
 }
 
-function BlockPopover() {
+function BlockPopover( { hasMovers = true } ) {
 	const {
 		name,
 		clientId,
@@ -138,8 +139,6 @@ function BlockPopover() {
 	// To do: remove align dependency by restricting toolbar position within
 	// the editor canvas.
 	const align = blockNode.getAttribute( 'data-align' );
-	// To do: add to block list settings.
-	const hasMovers = true;
 
 	/**
 	 * Renders an individual `BlockContextualToolbar` component.
