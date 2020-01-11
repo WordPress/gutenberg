@@ -1362,15 +1362,12 @@ export function automaticChangeStatus( state, action ) {
  *
  * @return {boolean} Updated state.
  */
-export function blockNodes( state = {}, action ) {
+export function selectedBlockNode( state, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_NODE':
-			return {
-				...state,
-				[ action.clientId ]: action.node,
-			};
+			return action.node;
 		case 'REMOVE_BLOCK_NODE':
-			return omit( state, [ action.clientId ] );
+			return;
 	}
 
 	return state;
@@ -1395,5 +1392,5 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	isNavigationMode,
 	automaticChangeStatus,
-	blockNodes,
+	selectedBlockNode,
 } );

@@ -35,7 +35,7 @@ function selector( select ) {
 		getBlockListSettings,
 		__experimentalGetBlockListSettingsForBlocks,
 		getSettings,
-		__unstableGetBlockNode,
+		__unstableGetSelectedBlockNode,
 	} = select( 'core/block-editor' );
 
 	const clientId = getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
@@ -59,10 +59,15 @@ function selector( select ) {
 	// This will be the top most ancestor because getBlockParents() returns tree from top -> bottom
 	const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [ '__experimentalCaptureToolbars', true ] );
 
-	let capturingBlockId = clientId;
+	let blockNode;
 
 	if ( topmostAncestorWithCaptureDescendantsToolbarsIndex !== -1 ) {
-		capturingBlockId = blockParentsClientIds[ topmostAncestorWithCaptureDescendantsToolbarsIndex ];
+		const capturingClientId = blockParentsClientIds[ topmostAncestorWithCaptureDescendantsToolbarsIndex ];
+		// This node is guaranteed to be mounted if the child block node is
+		// mounted.
+		blockNode = document.getElementById( 'block-' + capturingClientId );
+	} else {
+		blockNode = __unstableGetSelectedBlockNode();
 	}
 
 	const { hasFixedToolbar } = getSettings();
@@ -80,7 +85,7 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar,
 		__experimentalMoverDirection,
-		blockNode: __unstableGetBlockNode( capturingBlockId ),
+		blockNode,
 		align: attributes.align,
 	};
 }

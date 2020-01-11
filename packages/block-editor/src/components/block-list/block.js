@@ -115,21 +115,21 @@ function BlockListBlock( {
 		};
 	}, [] );
 	const {
-		__unstableAddBlockNode,
-		__unstableRemoveBlockNode,
+		__unstableSetSelectedBlockNode,
+		__unstableUnsetSelectedBlockNode,
 	} = useDispatch( 'core/block-editor' );
 
 	// Reference of the wrapper
 	const wrapper = useRef( null );
 
-	useEffect( () => {
-		if ( isSelected ) {
-			__unstableAddBlockNode( clientId, wrapper.current );
+	useLayoutEffect( () => {
+		if ( isSelected || isFirstMultiSelected ) {
+			__unstableSetSelectedBlockNode( wrapper.current );
 			return () => {
-				__unstableRemoveBlockNode( clientId );
+				__unstableUnsetSelectedBlockNode();
 			};
 		}
-	}, [ isSelected ] );
+	}, [ isSelected, isFirstMultiSelected ] );
 
 	// Reference to the block edit node
 	const blockNodeRef = useRef();

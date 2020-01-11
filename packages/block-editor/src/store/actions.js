@@ -923,27 +923,20 @@ export function * insertAfterBlock( clientId ) {
 }
 
 /**
- * Adds a mounted block DOM node for a given client ID.
+ * Sets the mounted DOM node of the selected block.
  *
- * @param {string}  clientId The block client ID.
  * @param {Element} node     The block's DOM node.
  */
-export function __unstableAddBlockNode( clientId, node ) {
+export function __unstableSetSelectedBlockNode( node ) {
 	return {
 		type: 'ADD_BLOCK_NODE',
-		clientId,
 		node,
 	};
 }
 
 /**
- * Removes an unmounted block DOM node for a given client ID.
- *
- * @param {string}  clientId The block client ID.
+ * Unsets the DOM node of the selected block.
  */
-export function __unstableRemoveBlockNode( clientId ) {
-	return {
-		type: 'REMOVE_BLOCK_NODE',
-		clientId,
-	};
+export function __unstableUnsetSelectedBlockNode() {
+	return { type: 'REMOVE_BLOCK_NODE' };
 }
