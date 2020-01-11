@@ -1,17 +1,12 @@
 /**
  * External dependencies
  */
-import { first, last, findIndex } from 'lodash';
+import { findIndex } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useLayoutEffect, useState, useCallback } from '@wordpress/element';
-import {
-	focus,
-	isTextField,
-	placeCaretAtHorizontalEdge,
-} from '@wordpress/dom';
+import { useState, useCallback } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -25,18 +20,15 @@ import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 import { ChildToolbar, ChildToolbarSlot } from './block-child-toolbar';
-import { getBlockWrapperNode, isInsideRootBlock } from '../../utils/dom';
 
 function selector( select ) {
 	const {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		isNavigationMode,
-		isMultiSelecting,
 		__unstableGetBlockWithoutInnerBlocks,
 		isTyping,
 		isCaretWithinFormattedText,
-		getSelectedBlocksInitialCaretPosition,
 		getBlockRootClientId,
 		isBlockMultiSelected,
 		isAncestorMultiSelected,
@@ -85,13 +77,10 @@ function selector( select ) {
 		clientId,
 		isValid,
 		isSelected: !! getSelectedBlockClientId(),
-		isFirstMultiSelected: !! getFirstMultiSelectedBlockClientId(),
 		isNavigationMode: isNavigationMode(),
-		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
 		isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		isEmptyDefaultBlock: name && isUnmodifiedDefaultBlock( { name, attributes } ),
-		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		rootClientId: getBlockRootClientId(),
 		isPartOfMultiSelection: isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
 		isCapturingDescendantToolbars,
@@ -107,14 +96,11 @@ function BlockPopover() {
 		name,
 		clientId,
 		isValid,
-		isSelected,
-		isFirstMultiSelected,
 		isNavigationMode,
 		isMultiSelecting,
 		isTyping,
 		isCaretWithinFormattedText,
 		isEmptyDefaultBlock,
-		initialPosition,
 		rootClientId,
 		isPartOfMultiSelection,
 		isCapturingDescendantToolbars,
@@ -149,67 +135,6 @@ function BlockPopover() {
 		{ bindGlobal: true, eventName: 'keydown', isDisabled: ! canFocusHiddenToolbar }
 	);
 
-	// Handing the focus of the block on creation and update
-
-	/**
-	 * When a block becomes selected, transition focus to an inner tabbable.
-	 *
-	 * @param {boolean} ignoreInnerBlocks Should not focus inner blocks.
-	 */
-	const focusTabbable = ( ignoreInnerBlocks ) => {
-		const wrapper = getBlockWrapperNode( clientId );
-
-		// Focus is captured by the wrapper node, so while focus transition
-		// should only consider tabbables within editable display, since it
-		// may be the wrapper itself or a side control which triggered the
-		// focus event, don't unnecessary transition to an inner tabbable.
-		if ( wrapper.lastChild.contains( document.activeElement ) ) {
-			return;
-		}
-
-		// Find all tabbables within node.
-		const textInputs = focus.tabbable
-			.find( wrapper )
-			.filter( isTextField )
-			// Exclude inner blocks
-			.filter( ( node ) => ! ignoreInnerBlocks || isInsideRootBlock( wrapper, node ) );
-
-		// If reversed (e.g. merge via backspace), use the last in the set of
-		// tabbables.
-		const isReverse = -1 === initialPosition;
-		const target = ( isReverse ? last : first )( textInputs );
-
-		if ( ! target ) {
-			wrapper.focus();
-			return;
-		}
-
-		placeCaretAtHorizontalEdge( target, isReverse );
-	};
-
-	// Focus the selected block's wrapper or inner input on mount and update
-	const isMounting = useRef( true );
-	useEffect( () => {
-		if ( isSelected && ! isMultiSelecting ) {
-			focusTabbable( ! isMounting.current );
-		}
-		isMounting.current = false;
-	}, [ clientId, isSelected, isMultiSelecting ] );
-
-	// Focus the first multi selected block
-	useEffect( () => {
-		if ( isFirstMultiSelected ) {
-			getBlockWrapperNode( clientId ).focus();
-		}
-	}, [ isFirstMultiSelected ] );
-
-	// Focus the first editable or the wrapper if edit mode.
-	useLayoutEffect( () => {
-		if ( isSelected && ! isNavigationMode ) {
-			focusTabbable( true );
-		}
-	}, [ isSelected, isNavigationMode ] );
-
 	if ( ! blockNode ) {
 		return null;
 	}
@@ -224,7 +149,10 @@ function BlockPopover() {
 		return null;
 	}
 
+	// To do: remove align dependency by restricting toolbar position within
+	// the editor canvas.
 	const align = blockNode.getAttribute( 'data-align' );
+	// To do: add to block list settings.
 	const hasMovers = true;
 
 	/**

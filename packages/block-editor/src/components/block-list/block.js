@@ -2,13 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { findIndex } from 'lodash';
+import { first, last, findIndex } from 'lodash';
 import { animated } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState, useContext } from '@wordpress/element';
+import { useRef, useEffect, useLayoutEffect, useState, useContext } from '@wordpress/element';
+import {
+	focus,
+	isTextField,
+	placeCaretAtHorizontalEdge,
+} from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
 	getBlockType,
@@ -36,6 +41,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
+import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context } from './root-container';
 
@@ -86,6 +92,7 @@ function BlockListBlock( {
 	isValid,
 	isLast,
 	attributes,
+	initialPosition,
 	wrapperProps,
 	setAttributes,
 	onReplace,
@@ -97,6 +104,7 @@ function BlockListBlock( {
 	animateOnChange,
 	enableAnimation,
 	isNavigationMode,
+	isMultiSelecting,
 	hasSelectedUI = true,
 } ) {
 	const onSelectionStart = useContext( Context );
@@ -132,8 +140,67 @@ function BlockListBlock( {
 	const blockType = getBlockType( name );
 	const blockAriaLabel = useDebouncedAccessibleBlockLabel( blockType, attributes, index, moverDirection, 400 );
 
+	// Handing the focus of the block on creation and update
+
+	/**
+	 * When a block becomes selected, transition focus to an inner tabbable.
+	 *
+	 * @param {boolean} ignoreInnerBlocks Should not focus inner blocks.
+	 */
+	const focusTabbable = ( ignoreInnerBlocks ) => {
+		// Focus is captured by the wrapper node, so while focus transition
+		// should only consider tabbables within editable display, since it
+		// may be the wrapper itself or a side control which triggered the
+		// focus event, don't unnecessary transition to an inner tabbable.
+		if ( blockNodeRef.current.contains( document.activeElement ) ) {
+			return;
+		}
+
+		// Find all tabbables within node.
+		const textInputs = focus.tabbable
+			.find( blockNodeRef.current )
+			.filter( isTextField )
+			// Exclude inner blocks
+			.filter( ( node ) => ! ignoreInnerBlocks || isInsideRootBlock( blockNodeRef.current, node ) );
+
+		// If reversed (e.g. merge via backspace), use the last in the set of
+		// tabbables.
+		const isReverse = -1 === initialPosition;
+		const target = ( isReverse ? last : first )( textInputs );
+
+		if ( ! target ) {
+			wrapper.current.focus();
+			return;
+		}
+
+		placeCaretAtHorizontalEdge( target, isReverse );
+	};
+
+	// Focus the selected block's wrapper or inner input on mount and update
+	const isMounting = useRef( true );
+	useEffect( () => {
+		if ( isSelected && ! isMultiSelecting ) {
+			focusTabbable( ! isMounting.current );
+		}
+		isMounting.current = false;
+	}, [ clientId, isSelected, isMultiSelecting ] );
+
+	// Focus the first multi selected block
+	useEffect( () => {
+		if ( isFirstMultiSelected ) {
+			wrapper.current.focus();
+		}
+	}, [ isFirstMultiSelected ] );
+
 	// Block Reordering animation
 	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, isSelected || isFirstMultiSelected, enableAnimation, animateOnChange );
+
+	// Focus the first editable or the wrapper if edit mode.
+	useLayoutEffect( () => {
+		if ( isSelected && ! isNavigationMode ) {
+			focusTabbable( true );
+		}
+	}, [ isSelected, isNavigationMode ] );
 
 	// Other event handlers
 
@@ -302,6 +369,7 @@ const applyWithSelect = withSelect(
 			isTyping,
 			getBlockMode,
 			isSelectionEnabled,
+			getSelectedBlocksInitialCaretPosition,
 			getSettings,
 			hasSelectedInnerBlock,
 			getTemplateLock,
@@ -358,6 +426,7 @@ const applyWithSelect = withSelect(
 
 			mode: getBlockMode( clientId ),
 			isSelectionEnabled: isSelectionEnabled(),
+			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
 			isLocked: !! templateLock,
