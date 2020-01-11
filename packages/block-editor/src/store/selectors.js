@@ -1528,11 +1528,11 @@ export function didAutomaticChange( state ) {
 }
 
 /**
- * Gets the block's DOM node.
+ * Gets the selected block's DOM node.
  *
- * @param {Object} state    Global application state.
+ * @param {Object} state Global application state.
  *
- * @return {Element} The block's DOM node.
+ * @return {Element} The selected block's DOM node.
  */
 export function __unstableGetSelectedBlockNode( state ) {
 	return state.selectedBlockNode;

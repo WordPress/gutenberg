@@ -89,7 +89,6 @@ function BlockListBlock( {
 	name,
 	index,
 	isValid,
-	isLast,
 	attributes,
 	initialPosition,
 	wrapperProps,
@@ -247,7 +246,7 @@ function BlockListBlock( {
 
 	// If the block is selected and we're typing the block should not appear.
 	// Empty paragraph blocks should always show up as unselected.
-	const showEmptyBlockSideInserter = ! isNavigationMode && ( isSelected || isLast ) && isEmptyDefaultBlock && isValid;
+	const showEmptyBlockSideInserter = ! isNavigationMode && isSelected && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
 		! isFocusMode &&
 		! showEmptyBlockSideInserter &&
@@ -370,7 +369,6 @@ const applyWithSelect = withSelect(
 			hasSelectedInnerBlock,
 			getTemplateLock,
 			getBlockIndex,
-			getBlockOrder,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
 		} = select( 'core/block-editor' );
@@ -384,7 +382,6 @@ const applyWithSelect = withSelect(
 		// "ancestor" is the more appropriate label due to "deep" check
 		const isAncestorOfSelectedBlock = hasSelectedInnerBlock( clientId, checkDeep );
 		const index = getBlockIndex( clientId, rootClientId );
-		const blockOrder = getBlockOrder( rootClientId );
 
 		// The fallback to `{}` is a temporary fix.
 		// This function should never be called when a block is not present in the state.
@@ -409,7 +406,6 @@ const applyWithSelect = withSelect(
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
-			isLast: index === blockOrder.length - 1,
 			isNavigationMode: isNavigationMode(),
 			index,
 			isRTL,
