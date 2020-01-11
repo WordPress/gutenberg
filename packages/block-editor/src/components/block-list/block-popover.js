@@ -19,7 +19,6 @@ import { useViewportMatch } from '@wordpress/compose';
 import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
-import { ChildToolbar, ChildToolbarSlot } from './block-child-toolbar';
 
 function selector( select ) {
 	const {
@@ -32,7 +31,6 @@ function selector( select ) {
 		getBlockRootClientId,
 		isBlockMultiSelected,
 		isAncestorMultiSelected,
-		hasSelectedInnerBlock,
 		getBlockParents,
 		getBlockListSettings,
 		__experimentalGetBlockListSettingsForBlocks,
@@ -43,12 +41,7 @@ function selector( select ) {
 	const clientId = getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 	const { name, attributes, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 
-	const checkDeep = true;
-
-	// "ancestor" is the more appropriate label due to "deep" check
-	const isAncestorOfSelectedBlock = hasSelectedInnerBlock( clientId, checkDeep );
 	const blockParentsClientIds = getBlockParents( clientId );
-	const currentBlockListSettings = getBlockListSettings( clientId );
 	const blockRootClientId = getBlockRootClientId( clientId );
 
 	const {
@@ -62,13 +55,11 @@ function selector( select ) {
 	// This will be the top most ancestor because getBlockParents() returns tree from top -> bottom
 	const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [ '__experimentalCaptureToolbars', true ] );
 
-	// Boolean to indicate whether current Block has a parent with `captureDescendantsToolbars` set
-	const hasAncestorCapturingToolbars = topmostAncestorWithCaptureDescendantsToolbarsIndex !== -1 ? true : false;
+	let capturingBlockId = clientId;
 
-	// Is the *current* Block the one capturing all its descendant toolbars?
-	// If there is no `topmostAncestorWithCaptureDescendantsToolbarsIndex` then
-	// we're at the top of the tree
-	const isCapturingDescendantToolbars = isAncestorOfSelectedBlock && ( currentBlockListSettings && currentBlockListSettings.__experimentalCaptureToolbars ) && ! hasAncestorCapturingToolbars;
+	if ( topmostAncestorWithCaptureDescendantsToolbarsIndex !== -1 ) {
+		capturingBlockId = blockParentsClientIds[ topmostAncestorWithCaptureDescendantsToolbarsIndex ];
+	}
 
 	const { hasFixedToolbar } = getSettings();
 
@@ -83,11 +74,9 @@ function selector( select ) {
 		isEmptyDefaultBlock: name && isUnmodifiedDefaultBlock( { name, attributes } ),
 		rootClientId: getBlockRootClientId(),
 		isPartOfMultiSelection: isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
-		isCapturingDescendantToolbars,
-		hasAncestorCapturingToolbars,
 		hasFixedToolbar,
 		__experimentalMoverDirection,
-		blockNode: __unstableGetBlockNode( clientId ),
+		blockNode: __unstableGetBlockNode( capturingBlockId ),
 	};
 }
 
@@ -103,8 +92,6 @@ function BlockPopover() {
 		isEmptyDefaultBlock,
 		rootClientId,
 		isPartOfMultiSelection,
-		isCapturingDescendantToolbars,
-		hasAncestorCapturingToolbars,
 		hasFixedToolbar,
 		__experimentalMoverDirection,
 		blockNode,
@@ -143,8 +130,7 @@ function BlockPopover() {
 		! shouldShowBreadcrumb &&
 		! shouldShowContextualToolbar &&
 		! isToolbarForced &&
-		! showEmptyBlockSideInserter &&
-		! isCapturingDescendantToolbars
+		! showEmptyBlockSideInserter
 	) {
 		return null;
 	}
@@ -196,21 +182,7 @@ function BlockPopover() {
 			__unstableAllowHorizontalSubpixelPosition={ __experimentalMoverDirection === 'horizontal' && blockNode }
 			onBlur={ () => setIsToolbarForced( false ) }
 		>
-			{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && renderBlockContextualToolbar() }
-			{ ( isCapturingDescendantToolbars ) && (
-				// A slot made available on all ancestors of the selected Block
-				// to allow child Blocks to render their toolbars into the DOM
-				// of the appropriate parent.
-				<ChildToolbarSlot />
-			) }
-			{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isToolbarForced ) && (
-				// If the parent Block is set to consume toolbars of the child Blocks
-				// then render the child Block's toolbar into the Slot provided
-				// by the parent.
-				<ChildToolbar>
-					{ renderBlockContextualToolbar() }
-				</ChildToolbar>
-			) }
+			{ ( shouldShowContextualToolbar || isToolbarForced ) && renderBlockContextualToolbar() }
 			{ shouldShowBreadcrumb && (
 				<BlockBreadcrumb
 					clientId={ clientId }
