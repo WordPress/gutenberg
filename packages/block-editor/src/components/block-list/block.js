@@ -152,7 +152,7 @@ function BlockListBlock( {
 		// should only consider tabbables within editable display, since it
 		// may be the wrapper itself or a side control which triggered the
 		// focus event, don't unnecessary transition to an inner tabbable.
-		if ( blockNodeRef.current.contains( document.activeElement ) ) {
+		if ( wrapper.current.contains( document.activeElement ) ) {
 			return;
 		}
 
@@ -179,11 +179,11 @@ function BlockListBlock( {
 	// Focus the selected block's wrapper or inner input on mount and update
 	const isMounting = useRef( true );
 	useEffect( () => {
-		if ( isSelected && ! isMultiSelecting ) {
+		if ( isSelected && ! isMultiSelecting && ! isNavigationMode ) {
 			focusTabbable( ! isMounting.current );
 		}
 		isMounting.current = false;
-	}, [ clientId, isSelected, isMultiSelecting ] );
+	}, [ isSelected, isMultiSelecting, isNavigationMode ] );
 
 	// Focus the first multi selected block
 	useEffect( () => {
