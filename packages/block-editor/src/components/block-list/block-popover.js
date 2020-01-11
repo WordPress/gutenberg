@@ -39,6 +39,10 @@ function selector( select ) {
 	} = select( 'core/block-editor' );
 
 	const clientId = getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
+
+	// The fallback to `{}` is a temporary fix.
+	// This function should never be called when a block is not present in the state.
+	// It happens now because the order in withSelect rendering is not correct.
 	const { name, attributes = {}, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 
 	const blockParentsClientIds = getBlockParents( clientId );

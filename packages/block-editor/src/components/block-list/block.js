@@ -378,7 +378,6 @@ const applyWithSelect = withSelect(
 		} = select( 'core/block-editor' );
 
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
-
 		const isSelected = isBlockSelected( clientId );
 		const { focusMode, isRTL } = getSettings();
 		const templateLock = getTemplateLock( rootClientId );
@@ -388,10 +387,6 @@ const applyWithSelect = withSelect(
 		const isAncestorOfSelectedBlock = hasSelectedInnerBlock( clientId, checkDeep );
 		const index = getBlockIndex( clientId, rootClientId );
 		const blockOrder = getBlockOrder( rootClientId );
-
-		// Is the *current* Block the one capturing all its descendant toolbars?
-		// If there is no `topmostAncestorWithCaptureDescendantsToolbarsIndex` then
-		// we're at the top of the tree
 
 		// The fallback to `{}` is a temporary fix.
 		// This function should never be called when a block is not present in the state.
