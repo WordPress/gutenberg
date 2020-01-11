@@ -26,12 +26,11 @@ function selector( select ) {
 		getFirstMultiSelectedBlockClientId,
 		isNavigationMode,
 		isMultiSelecting,
+		hasMultiSelection,
 		__unstableGetBlockWithoutInnerBlocks,
 		isTyping,
 		isCaretWithinFormattedText,
 		getBlockRootClientId,
-		isBlockMultiSelected,
-		isAncestorMultiSelected,
 		getBlockParents,
 		getBlockListSettings,
 		__experimentalGetBlockListSettingsForBlocks,
@@ -43,11 +42,11 @@ function selector( select ) {
 	const { name, attributes, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 
 	const blockParentsClientIds = getBlockParents( clientId );
-	const blockRootClientId = getBlockRootClientId( clientId );
+	const rootClientId = getBlockRootClientId( clientId );
 
 	const {
 		__experimentalMoverDirection,
-	} = getBlockListSettings( blockRootClientId ) || {};
+	} = getBlockListSettings( rootClientId ) || {};
 
 	// Get Block List Settings for all ancestors of the current Block clientId
 	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks( blockParentsClientIds );
@@ -73,8 +72,8 @@ function selector( select ) {
 		isTyping: isTyping(),
 		isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		isEmptyDefaultBlock: name && isUnmodifiedDefaultBlock( { name, attributes } ),
-		rootClientId: getBlockRootClientId(),
-		isPartOfMultiSelection: isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
+		rootClientId,
+		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar,
 		__experimentalMoverDirection,
 		blockNode: __unstableGetBlockNode( capturingBlockId ),
@@ -92,7 +91,7 @@ function BlockPopover( { hasMovers = true } ) {
 		isCaretWithinFormattedText,
 		isEmptyDefaultBlock,
 		rootClientId,
-		isPartOfMultiSelection,
+		hasMultiSelection,
 		hasFixedToolbar,
 		__experimentalMoverDirection,
 		blockNode,
@@ -164,7 +163,7 @@ function BlockPopover( { hasMovers = true } ) {
 	// position in the right corner.
 	// To do: refactor `Popover` to make this prop clearer.
 	const popoverPosition = showEmptyBlockSideInserter ? 'top left right' : 'top right left';
-	const popoverIsSticky = isPartOfMultiSelection ? '.wp-block.is-multi-selected' : true;
+	const popoverIsSticky = hasMultiSelection ? '.wp-block.is-multi-selected' : true;
 
 	return (
 		<Popover
