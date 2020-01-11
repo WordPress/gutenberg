@@ -189,11 +189,6 @@
 			}
 		}
 	}
-
-	// Toolbar is captured
-	&.has-toolbar-captured::before {
-		left: 0; // place "selected" indicator closer to block due to no toolbar
-	}
 }
 
 

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { first, last, findIndex } from 'lodash';
+import { first, last } from 'lodash';
 import { animated } from 'react-spring/web.cjs';
 
 /**
@@ -84,7 +84,6 @@ function BlockListBlock( {
 	isTypingWithinBlock,
 	isEmptyDefaultBlock,
 	isAncestorOfSelectedBlock,
-	hasAncestorCapturingToolbars,
 	isSelectionEnabled,
 	className,
 	name,
@@ -275,7 +274,6 @@ function BlockListBlock( {
 			'is-focused': isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
-			'has-toolbar-captured': hasAncestorCapturingToolbars,
 		},
 		className
 	);
@@ -377,8 +375,6 @@ const applyWithSelect = withSelect(
 			getBlockOrder,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
-			__experimentalGetBlockListSettingsForBlocks,
-			getBlockParents,
 		} = select( 'core/block-editor' );
 
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
@@ -392,17 +388,6 @@ const applyWithSelect = withSelect(
 		const isAncestorOfSelectedBlock = hasSelectedInnerBlock( clientId, checkDeep );
 		const index = getBlockIndex( clientId, rootClientId );
 		const blockOrder = getBlockOrder( rootClientId );
-		const blockParentsClientIds = getBlockParents( clientId );
-
-		// Get Block List Settings for all ancestors of the current Block clientId
-		const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks( blockParentsClientIds );
-
-		// Find the index of the first Block with the `captureDescendantsToolbars` prop defined
-		// This will be the top most ancestor because getBlockParents() returns tree from top -> bottom
-		const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [ '__experimentalCaptureToolbars', true ] );
-
-		// Boolean to indicate whether current Block has a parent with `captureDescendantsToolbars` set
-		const hasAncestorCapturingToolbars = topmostAncestorWithCaptureDescendantsToolbarsIndex !== -1 ? true : false;
 
 		// Is the *current* Block the one capturing all its descendant toolbars?
 		// If there is no `topmostAncestorWithCaptureDescendantsToolbarsIndex` then
@@ -446,7 +431,6 @@ const applyWithSelect = withSelect(
 			isValid,
 			isSelected,
 			isAncestorOfSelectedBlock,
-			hasAncestorCapturingToolbars,
 		};
 	}
 );
