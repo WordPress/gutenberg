@@ -3,6 +3,7 @@
  */
 import { useEntityProp, useEntityId } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 function PostTagsDisplay() {
 	const [ tags ] = useEntityProp( 'postType', 'post', 'tags' );
@@ -25,7 +26,12 @@ function PostTagsDisplay() {
 		},
 		[ tags ]
 	);
-	return tagLinks && tagLinks.reduce( ( prev, curr ) => [ prev, ' | ', curr ] );
+	return (
+		tagLinks &&
+		( tagLinks.length === 0 ?
+			__( 'No tags.' ) :
+			tagLinks.reduce( ( prev, curr ) => [ prev, ' | ', curr ] ) )
+	);
 }
 
 export default function PostTagsEdit() {
