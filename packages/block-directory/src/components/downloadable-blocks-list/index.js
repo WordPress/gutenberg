@@ -17,7 +17,7 @@ import DownloadableBlockListItem from '../downloadable-block-list-item';
 import DownloadableBlockNotice from '../downloadable-block-notice';
 import { DOWNLOAD_ERROR_NOTICE_ID, INSTALL_ERROR_NOTICE_ID } from '../../store/constants';
 
-export function DownloadableBlocksList( { items, onHover = noop, children, isLoading, errorNotices, install, download } ) {
+export function DownloadableBlocksList( { items, onHover = noop, children, isLoading, errorNotices, installAndDownload, download } ) {
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -31,11 +31,7 @@ export function DownloadableBlocksList( { items, onHover = noop, children, isLoa
 					className={ getBlockMenuDefaultClassName( item.id ) }
 					icons={ item.icons }
 					onClick={ () => {
-						const onSuccess = () => {
-							download( item );
-						};
-
-						install( item, onSuccess );
+						installAndDownload( item );
 						onHover( null );
 					} }
 					onFocus={ () => onHover( item ) }
@@ -43,7 +39,7 @@ export function DownloadableBlocksList( { items, onHover = noop, children, isLoa
 					onMouseLeave={ () => onHover( null ) }
 					onBlur={ () => onHover( null ) }
 					item={ item }
-					notice={ <DownloadableBlockNotice install={ install } download={ download } errorNotices={ errorNotices } block={ item } /> }
+					notice={ <DownloadableBlockNotice fullInstall={ installAndDownload } download={ download } errorNotices={ errorNotices } block={ item } /> }
 					isLoading={ isLoading }
 				/>
 			) }
@@ -97,7 +93,13 @@ export default compose(
 		};
 
 		return {
-			install,
+			installAndDownload: ( item ) => {
+				const onSuccess = () => {
+					download( item );
+				};
+
+				install( item, onSuccess );
+			},
 			download,
 		};
 	} ),

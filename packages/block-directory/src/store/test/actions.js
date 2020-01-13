@@ -39,16 +39,22 @@ describe( 'actions', () => {
 		jest.resetAllMocks();
 	} );
 
-	const testApiFetch = ( generator ) => {
+	const callsTheApi = ( generator ) => {
 		return expect(
 			generator.next( { success: true } ).value.type,
 		).toEqual( ACTIONS.apiFetch );
 	};
 
-	const testInstallFetch = ( generator ) => {
+	const setsStateToInstalling = ( generator ) => {
 		expect(
 			generator.next().value.type,
 		).toEqual( ACTIONS.fetchInstallBlock );
+	};
+
+	const removesInstallingState = ( generator ) => {
+		expect(
+			generator.next().value.type,
+		).toEqual( ACTIONS.receiveInstallBlock );
 	};
 
 	const expectTest = ( hasCall, noCall ) => {
@@ -73,7 +79,7 @@ describe( 'actions', () => {
 				assets: [],
 			}, onSuccess, onError );
 
-			// Trigger the check of whether the block plugin has assets
+			// Move onto the onError callback
 			generator.next();
 
 			expectError( onSuccess, onError );
@@ -109,7 +115,7 @@ describe( 'actions', () => {
 			// Trigger the loading of assets
 			generator.next();
 
-			// Trigger the block check via getBlockTypes
+			//Complete
 			generator.next();
 
 			expectError( onSuccess, onError );
@@ -124,10 +130,10 @@ describe( 'actions', () => {
 			const generator = installBlock( item, onSuccess, onError );
 
 			// It triggers FETCH_INSTALL_BLOCK
-			testInstallFetch( generator );
+			setsStateToInstalling( generator );
 
 			// It triggers API_FETCH that wraps @wordpress/api-fetch
-			testApiFetch( generator );
+			callsTheApi( generator );
 
 			// It triggers ADD_INSTALLED_BLOCK_TYPE
 			expect(
@@ -135,9 +141,7 @@ describe( 'actions', () => {
 			).toEqual( ACTIONS.addInstalledBlockType );
 
 			// It triggers RECEIVE_INSTALL_BLOCKS
-			expect(
-				generator.next().value.type,
-			).toEqual( ACTIONS.receiveInstallBlock );
+			removesInstallingState( generator );
 
 			expectSuccess( onSuccess, onError );
 		} );
@@ -149,13 +153,13 @@ describe( 'actions', () => {
 			const generator = installBlock( item, onSuccess, onError );
 
 			// It triggers FETCH_INSTALL_BLOCK
-			testInstallFetch( generator );
+			setsStateToInstalling( generator );
 
 			// It triggers API_FETCH that wraps @wordpress/api-fetch
-			testApiFetch( generator );
+			callsTheApi( generator );
 
-			// Resolve fetch and make it fail
-			generator.next( { success: false } );
+			// It triggers RECEIVE_INSTALL_BLOCKS
+			removesInstallingState( generator );
 
 			expectError( onSuccess, onError );
 		} );
