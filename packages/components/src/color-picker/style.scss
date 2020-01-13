@@ -32,10 +32,6 @@
 	* {
 		box-sizing: border-box;
 	}
-
-	.components-button {
-		padding: 6px;
-	}
 }
 
 .components-color-picker__saturation {
@@ -121,8 +117,9 @@
 }
 
 .components-color-picker__saturation-pointer {
-	width: 8px;
-	height: 8px;
+	width: 14px;
+	height: 14px;
+	padding: 0;
 	box-shadow:
 		0 0 0 1.5px #fff,
 		inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
