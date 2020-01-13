@@ -23,49 +23,54 @@ function BlockListAppender( {
 	isLocked,
 	renderAppender: CustomAppender,
 } ) {
-	if ( isLocked ) {
+	if ( isLocked || CustomAppender === false ) {
 		return null;
 	}
 
-	// If a render prop has been provided
-	// use it to render the appender.
+	let appender;
 	if ( CustomAppender ) {
-		return (
-			<div className="block-list-appender">
-				<CustomAppender />
-			</div>
+		// Prefer custom render prop if provided.
+		appender = <CustomAppender />;
+	} else if ( canInsertDefaultBlock ) {
+		// Render the default block appender when renderAppender has not been
+		// provided and the context supports use of the default appender.
+		appender = (
+			<DefaultBlockAppender
+				rootClientId={ rootClientId }
+				lastBlockClientId={ last( blockClientIds ) }
+			/>
 		);
-	}
-
-	// a false value means, don't render any appender.
-	if ( CustomAppender === false ) {
-		return null;
-	}
-
-	// Render the default block appender when renderAppender has not been
-	// provided and the context supports use of the default appender.
-	if ( canInsertDefaultBlock ) {
-		return (
-			<div className="block-list-appender">
-				<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
-					<DefaultBlockAppender
-						rootClientId={ rootClientId }
-						lastBlockClientId={ last( blockClientIds ) }
-					/>
-				</IgnoreNestedEvents>
-			</div>
-		);
-	}
-
-	// Fallback in the case no renderAppender has been provided and the
-	// default block can't be inserted.
-	return (
-		<div className="block-list-appender">
+	} else {
+		// Fallback in the case no renderAppender has been provided and the
+		// default block can't be inserted.
+		appender = (
 			<ButtonBlockAppender
 				rootClientId={ rootClientId }
 				className="block-list-appender__toggle"
 			/>
-		</div>
+		);
+	}
+
+	// IgnoreNestedEvents is used to treat interactions within the appender as
+	// subject to the same conditions as those which occur within nested blocks.
+	// Notably, this effectively prevents event bubbling to block ancestors
+	// which can otherwise interfere with the intended behavior of the appender
+	// (e.g. focus handler on the ancestor block).
+	//
+	// A `tabIndex` is used on the wrapping `div` element in order to force a
+	// focus event to occur when an appender `button` element is clicked. In
+	// some browsers (Firefox, Safari), button clicks do not emit a focus event,
+	// which could cause this event to propagate unexpectedly. The `tabIndex`
+	// ensures that the interaction is captured as a focus, without also adding
+	// an extra tab stop.
+	//
+	// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+	return (
+		<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
+			<div tabIndex={ -1 } className="block-list-appender">
+				{ appender }
+			</div>
+		</IgnoreNestedEvents>
 	);
 }
 

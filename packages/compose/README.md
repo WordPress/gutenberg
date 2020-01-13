@@ -119,13 +119,31 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
+
+Provides a unique instance ID.
+
+_Parameters_
+
+-   _object_ `Object`: Object reference to create an id for.
+
+<a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
+
+Attach a keyboard shortcut handler.
+
+_Parameters_
+
+-   _shortcuts_ `(Array<string>|string)`: Keyboard Shortcuts.
+-   _callback_ `Function`: Shortcut callback.
+-   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
+
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
 
 Runs a media query and returns its value when it changes.
 
 _Parameters_
 
--   _query_ `string`: Media Query.
+-   _query_ `[string]`: Media Query.
 
 _Returns_
 

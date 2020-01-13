@@ -18,11 +18,11 @@ import BlockTitle from '../block-title';
  * @param {string}   props.clientId        Client ID of block.
  * @return {WPComponent} The component to be rendered.
  */
-const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
+const BlockBreadcrumb = forwardRef( ( { clientId, ...props }, ref ) => {
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	return (
-		<div className="editor-block-list__breadcrumb block-editor-block-list__breadcrumb">
+		<div className="block-editor-block-list__breadcrumb" { ...props }>
 			<Toolbar>
 				<Button ref={ ref } onClick={ () => setNavigationMode( false ) }>
 					<BlockTitle clientId={ clientId } />

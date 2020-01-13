@@ -35,6 +35,8 @@ add_filter( 'safe_style_css', 'gutenberg_safe_style_css_column_flex_basis' );
  * with a function that passes `render_callback` the block object as the
  * argument.
  *
+ * @see https://core.trac.wordpress.org/ticket/48104
+ *
  * @param string $pre_render The pre-rendered content. Default null.
  * @param array  $block The block being rendered.
  *

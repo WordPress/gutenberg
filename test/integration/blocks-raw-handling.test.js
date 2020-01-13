@@ -8,6 +8,7 @@ import path from 'path';
  * WordPress dependencies
  */
 import {
+	createBlock,
 	getBlockContent,
 	pasteHandler,
 	rawHandler,
@@ -57,6 +58,30 @@ describe( 'Blocks raw handling', () => {
 			},
 			save: () => null,
 		} );
+
+		registerBlockType( 'test/non-inline-block', {
+			title: 'Test Non Inline Block',
+			category: 'common',
+			supports: {
+				pasteTextInline: false,
+			},
+			transforms: {
+				from: [
+					{
+						type: 'raw',
+						isMatch: ( node ) => {
+							return 'words to live by' === node.textContent.trim();
+						},
+						transform: () => {
+							return createBlock( 'core-embed/youtube', {
+								url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+							} );
+						},
+					},
+				],
+			},
+			save: () => null,
+		} );
 	} );
 
 	it( 'should filter inline content', () => {
@@ -73,9 +98,9 @@ describe( 'Blocks raw handling', () => {
 		const filtered = pasteHandler( {
 			HTML: '<b id="docs-internal-guid-0"><em>test</em></b>',
 			mode: 'AUTO',
-		} ).map( getBlockContent ).join( '' );
+		} );
 
-		expect( filtered ).toBe( '<p><em>test</em></p>' );
+		expect( filtered ).toBe( '<em>test</em>' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -150,6 +175,29 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		expect( filtered ).toBe( 'schön' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should not treat single non-inlineable block as inline text', () => {
+		const filtered = pasteHandler( {
+			HTML: '<p>words to live by</p>',
+			plainText: 'words to live by\n',
+			mode: 'AUTO',
+		} );
+
+		expect( filtered ).toHaveLength( 1 );
+		expect( filtered[ 0 ].name ).toBe( 'core-embed/youtube' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should treat single heading as inline text', () => {
+		const filtered = pasteHandler( {
+			HTML: '<h1>FOO</h1>',
+			plainText: 'FOO\n',
+			mode: 'AUTO',
+		} );
+
+		expect( filtered ).toBe( 'FOO' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -302,6 +350,29 @@ describe( 'Blocks raw handling', () => {
 				}
 			} );
 		} );
+
+		it( 'should strip some text-level elements', () => {
+			const HTML = '<p>This is <u>ncorect</u></p>';
+			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+			expect( console ).toHaveLogged();
+		} );
+
+		it( 'should remove extra blank lines', () => {
+			const HTML = readFile( path.join( __dirname, 'fixtures/google-docs-blank-lines.html' ) );
+			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+			expect( console ).toHaveLogged();
+		} );
+
+		it( 'should strip windows data', () => {
+			const HTML = readFile( path.join( __dirname, 'fixtures/windows.html' ) );
+			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+		} );
+
+		it( 'should strip HTML formatting space from inline text', () => {
+			const HTML = readFile( path.join( __dirname, 'fixtures/inline-with-html-formatting-space.html' ) );
+			expect( pasteHandler( { HTML } ) ).toMatchSnapshot();
+			expect( console ).toHaveLogged();
+		} );
 	} );
 } );
 
@@ -328,6 +399,16 @@ describe( 'rawHandler', () => {
 
 	it( 'should convert a list with attributes', () => {
 		const HTML = readFile( path.join( __dirname, 'fixtures/list-with-attributes.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should not strip any text-level elements', () => {
+		const HTML = '<p>This is <u>ncorect</u></p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should preserve alignment', () => {
+		const HTML = '<p style="text-align:center">center</p>';
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 } );

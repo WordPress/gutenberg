@@ -39,7 +39,7 @@ describe( 'Preformatted', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.type( '3' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Backspace' );

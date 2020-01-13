@@ -7,7 +7,7 @@ import TextareaAutosize from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose, withState } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -16,7 +16,6 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockDropZone from '../block-drop-zone';
-import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 
 export function DefaultBlockAppender( {
@@ -26,8 +25,6 @@ export function DefaultBlockAppender( {
 	showPrompt,
 	placeholder,
 	rootClientId,
-	hovered,
-	setState,
 } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
@@ -53,26 +50,22 @@ export function DefaultBlockAppender( {
 	return (
 		<div
 			data-root-client-id={ rootClientId || '' }
-			className="wp-block editor-default-block-appender block-editor-default-block-appender"
-			onMouseEnter={ () => setState( { hovered: true } ) }
-			onMouseLeave={ () => setState( { hovered: false } ) }
+			className="wp-block block-editor-default-block-appender"
 		>
 			<BlockDropZone rootClientId={ rootClientId } />
 			<TextareaAutosize
 				role="button"
 				aria-label={ __( 'Add block' ) }
-				className="editor-default-block-appender__content block-editor-default-block-appender__content"
+				className="block-editor-default-block-appender__content"
 				readOnly
 				onFocus={ onAppend }
 				value={ showPrompt ? value : '' }
 			/>
-			{ hovered && <InserterWithShortcuts rootClientId={ rootClientId } /> }
 			<Inserter rootClientId={ rootClientId } position="top right" isAppender />
 		</div>
 	);
 }
 export default compose(
-	withState( { hovered: false } ),
 	withSelect( ( select, ownProps ) => {
 		const { getBlockCount, getBlockName, isBlockValid, getSettings, getTemplateLock } = select( 'core/block-editor' );
 

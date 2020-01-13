@@ -24,7 +24,7 @@ export function ReusableBlockDeleteButton( { isVisible, isDisabled, onDelete } )
 			disabled={ isDisabled }
 			onClick={ () => onDelete() }
 		>
-			{ __( 'Remove from Reusable Blocks' ) }
+			{ __( 'Remove from Reusable blocks' ) }
 		</MenuItem>
 	);
 }

@@ -38,7 +38,7 @@ function PostSwitchToDraftButton( {
 			disabled={ isSaving }
 			isTertiary
 		>
-			{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to Draft' ) }
+			{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to draft' ) }
 		</Button>
 	);
 }

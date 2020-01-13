@@ -21,7 +21,7 @@ describe( 'Button', () => {
 			expect( button.hasClass( 'components-button' ) ).toBe( true );
 			expect( button.hasClass( 'is-large' ) ).toBe( false );
 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
-			expect( button.hasClass( 'is-toggled' ) ).toBe( false );
+			expect( button.hasClass( 'is-pressed' ) ).toBe( false );
 			expect( button.prop( 'disabled' ) ).toBeUndefined();
 			expect( button.prop( 'type' ) ).toBe( 'button' );
 			expect( button.type() ).toBe( 'button' );
@@ -31,35 +31,26 @@ describe( 'Button', () => {
 			const button = shallow( <Button isPrimary /> );
 			expect( button.hasClass( 'is-large' ) ).toBe( false );
 			expect( button.hasClass( 'is-primary' ) ).toBe( true );
-			expect( button.hasClass( 'is-button' ) ).toBe( true );
 		} );
 
 		it( 'should render a button element with is-large class', () => {
-			const button = shallow( <Button isLarge /> );
+			const button = shallow( <Button isSecondary isLarge /> );
 			expect( button.hasClass( 'is-large' ) ).toBe( true );
-			expect( button.hasClass( 'is-default' ) ).toBe( true );
-			expect( button.hasClass( 'is-button' ) ).toBe( true );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
 		} );
 
-		it( 'should render a button element without is-default if primary', () => {
-			const button = shallow( <Button isPrimary isLarge /> );
-			expect( button.hasClass( 'is-default' ) ).toBe( false );
-		} );
-
 		it( 'should render a button element with is-small class', () => {
-			const button = shallow( <Button isSmall /> );
-			expect( button.hasClass( 'is-default' ) ).toBe( true );
-			expect( button.hasClass( 'is-button' ) ).toBe( true );
+			const button = shallow( <Button isSecondary isSmall /> );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
 			expect( button.hasClass( 'is-large' ) ).toBe( false );
 			expect( button.hasClass( 'is-small' ) ).toBe( true );
 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
 		} );
 
-		it( 'should render a button element with is-toggled without button class', () => {
-			const button = shallow( <Button isToggled /> );
-			expect( button.hasClass( 'is-button' ) ).toBe( false );
-			expect( button.hasClass( 'is-toggled' ) ).toBe( true );
+		it( 'should render a button element with is-pressed without button class', () => {
+			const button = shallow( <Button isPressed /> );
+			expect( button.hasClass( 'is-pressed' ) ).toBe( true );
 		} );
 
 		it( 'should add a disabled prop to the button', () => {
@@ -82,6 +73,57 @@ describe( 'Button', () => {
 			const button = shallow( <Button WordPress="awesome" /> );
 
 			expect( button.prop( 'WordPress' ) ).toBe( 'awesome' );
+		} );
+
+		it( 'should render an icon button', () => {
+			const iconButton = shallow( <Button icon="plus" /> );
+			expect( iconButton.hasClass( 'has-icon' ) ).toBe( true );
+			expect( iconButton.prop( 'aria-label' ) ).toBeUndefined();
+		} );
+
+		it( 'should render a Dashicon component matching the wordpress icon', () => {
+			const iconButton = shallow( <Button icon="wordpress" /> );
+			expect( iconButton.find( 'Icon' ).dive().shallow().hasClass( 'dashicons-wordpress' ) ).toBe( true );
+		} );
+
+		it( 'should render child elements and icon', () => {
+			const iconButton = shallow( <Button icon="wordpress" children={ <p className="test">Test</p> } /> );
+			expect( iconButton.find( 'Icon' ).dive().shallow().hasClass( 'dashicons-wordpress' ) ).toBe( true );
+			expect( iconButton.find( '.test' ).shallow().text() ).toBe( 'Test' );
+		} );
+
+		it( 'should add an aria-label when the label property is used, with Tooltip wrapper', () => {
+			const iconButton = shallow( <Button icon="WordPress" label="WordPress" /> );
+			expect( iconButton.name() ).toBe( 'Tooltip' );
+			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
+			expect( iconButton.find( 'button' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
+		} );
+
+		it( 'should support explicit aria-label override', () => {
+			const iconButton = shallow( <Button aria-label="Custom" /> );
+			expect( iconButton.prop( 'aria-label' ) ).toBe( 'Custom' );
+		} );
+
+		it( 'should allow tooltip disable', () => {
+			const iconButton = shallow( <Button icon="WordPress" label="WordPress" showTooltip={ false } /> );
+			expect( iconButton.name() ).toBe( 'button' );
+			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
+		} );
+
+		it( 'should show the tooltip for empty children', () => {
+			const iconButton = shallow( <Button icon="WordPress" label="WordPress" children={ [] } /> );
+			expect( iconButton.name() ).toBe( 'Tooltip' );
+			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
+		} );
+
+		it( 'should not show the tooltip when icon and children defined', () => {
+			const iconButton = shallow( <Button icon="WordPress" label="WordPress">Children</Button> );
+			expect( iconButton.name() ).toBe( 'button' );
+		} );
+
+		it( 'should force showing the tooltip even if icon and children defined', () => {
+			const iconButton = shallow( <Button icon="WordPress" label="WordPress" showTooltip>Children</Button> );
+			expect( iconButton.name() ).toBe( 'Tooltip' );
 		} );
 	} );
 

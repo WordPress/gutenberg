@@ -655,6 +655,19 @@ _Related_
 
 -   hasMultiSelection in core/block-editor store.
 
+<a name="hasNonPostEntityChanges" href="#hasNonPostEntityChanges">#</a> **hasNonPostEntityChanges**
+
+Returns true if there are unsaved edits for entities other than
+the editor's post, and false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether there are edits or not.
+
 <a name="hasSelectedBlock" href="#hasSelectedBlock">#</a> **hasSelectedBlock**
 
 _Related_

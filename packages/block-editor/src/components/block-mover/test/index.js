@@ -38,11 +38,11 @@ describe( 'BlockMover', () => {
 			const moveDown = blockMover.childAt( 2 );
 			const moveUpDesc = blockMover.childAt( 3 );
 			const moveDownDesc = blockMover.childAt( 4 );
-			expect( moveUp.name() ).toBe( 'ForwardRef(IconButton)' );
+			expect( moveUp.name() ).toBe( 'ForwardRef(Button)' );
 			expect( drag.type().name ).toBe( 'BlockDraggable' );
-			expect( moveDown.name() ).toBe( 'ForwardRef(IconButton)' );
+			expect( moveDown.name() ).toBe( 'ForwardRef(Button)' );
 			expect( moveUp.props() ).toMatchObject( {
-				className: 'editor-block-mover__control block-editor-block-mover__control',
+				className: 'block-editor-block-mover__control',
 				onClick: undefined,
 				label: 'Move up',
 				icon: upArrow,
@@ -50,7 +50,7 @@ describe( 'BlockMover', () => {
 				'aria-describedby': 'block-editor-block-mover__up-description-1',
 			} );
 			expect( moveDown.props() ).toMatchObject( {
-				className: 'editor-block-mover__control block-editor-block-mover__control',
+				className: 'block-editor-block-mover__control',
 				onClick: undefined,
 				label: 'Move down',
 				icon: downArrow,

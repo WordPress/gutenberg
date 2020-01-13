@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { IconButton, Spinner } from '@wordpress/components';
+import { Button, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
@@ -134,7 +134,7 @@ class GalleryImage extends Component {
 			<figure className={ className }>
 				{ href ? <a href={ href }>{ img }</a> : img }
 				<div className="block-library-gallery-item__move-menu">
-					<IconButton
+					<Button
 						icon={ leftArrow }
 						onClick={ isFirstItem ? undefined : onMoveBackward }
 						className="blocks-gallery-item__move-backward"
@@ -142,7 +142,7 @@ class GalleryImage extends Component {
 						aria-disabled={ isFirstItem }
 						disabled={ ! isSelected }
 					/>
-					<IconButton
+					<Button
 						icon={ rightArrow }
 						onClick={ isLastItem ? undefined : onMoveForward }
 						className="blocks-gallery-item__move-forward"
@@ -152,7 +152,7 @@ class GalleryImage extends Component {
 					/>
 				</div>
 				<div className="block-library-gallery-item__inline-menu">
-					<IconButton
+					<Button
 						icon="no-alt"
 						onClick={ onRemove }
 						className="blocks-gallery-item__remove"

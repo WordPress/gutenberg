@@ -2,13 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import {
 	PostPreviewButton,
 	PostSavedState,
 } from '@wordpress/editor';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,17 +17,28 @@ import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PinnedPlugins from './pinned-plugins';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import shortcuts from '../../keyboard-shortcuts';
 
-function Header( {
-	closeGeneralSidebar,
-	hasActiveMetaboxes,
-	isEditorSidebarOpened,
-	isPublishSidebarOpened,
-	isSaving,
-	openGeneralSidebar,
-} ) {
-	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
+function Header() {
+	const {
+		shortcut,
+		hasActiveMetaboxes,
+		isEditorSidebarOpened,
+		isPublishSidebarOpened,
+		isSaving,
+		getBlockSelectionStart,
+	} = useSelect( ( select ) => ( {
+		shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
+		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
+	} ), [] );
+	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch( 'core/edit-post' );
+
+	const toggleGeneralSidebar = isEditorSidebarOpened ?
+		closeGeneralSidebar :
+		() => openGeneralSidebar( getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document' );
 
 	return (
 		<div className="edit-post-header">
@@ -56,13 +66,13 @@ function Header( {
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
 				/>
-				<IconButton
+				<Button
 					icon="admin-generic"
 					label={ __( 'Settings' ) }
 					onClick={ toggleGeneralSidebar }
-					isToggled={ isEditorSidebarOpened }
+					isPressed={ isEditorSidebarOpened }
 					aria-expanded={ isEditorSidebarOpened }
-					shortcut={ shortcuts.toggleSidebar }
+					shortcut={ shortcut }
 				/>
 				<PinnedPlugins.Slot />
 				<MoreMenu />
@@ -71,20 +81,4 @@ function Header( {
 	);
 }
 
-export default compose(
-	withSelect( ( select ) => ( {
-		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-	} ) ),
-	withDispatch( ( dispatch, ownProps, { select } ) => {
-		const { getBlockSelectionStart } = select( 'core/block-editor' );
-		const { openGeneralSidebar, closeGeneralSidebar } = dispatch( 'core/edit-post' );
-
-		return {
-			openGeneralSidebar: () => openGeneralSidebar( getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document' ),
-			closeGeneralSidebar,
-		};
-	} ),
-)( Header );
+export default Header;

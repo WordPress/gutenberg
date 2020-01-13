@@ -27,7 +27,6 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
-		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
 		"classnames": "^2.2.5",

@@ -219,6 +219,16 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		expect( transformed ).toHaveLength( 9 );
 	} );
 
+	it( 'should not convert inline shortcodes', () => {
+		const originalInASentence = `<p>Here is a nice [foo shortcode].</p>`;
+		expect( segmentHTMLToShortcodeBlock( originalInASentence, 0 ) )
+			.toEqual( [ originalInASentence ] );
+
+		const originalMultipleShortcodes = `<p>[foo bar] [baz quux]</p>`;
+		expect( segmentHTMLToShortcodeBlock( originalMultipleShortcodes, 0 ) )
+			.toEqual( [ originalMultipleShortcodes ] );
+	} );
+
 	it( 'should convert regardless of shortcode alias', () => {
 		const original = `<p>[my-gallery ids="1,2,3"]</p>
 <p>[my-bunch-of-images ids="4,5,6"]</p>`;

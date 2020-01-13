@@ -23,6 +23,7 @@ import * as quote from './quote';
 import * as gallery from './gallery';
 import * as archives from './archives';
 import * as audio from './audio';
+import * as buttons from './buttons';
 import * as button from './button';
 import * as calendar from './calendar';
 import * as categories from './categories';
@@ -111,6 +112,7 @@ export const registerCoreBlocks = () => {
 		archives,
 		audio,
 		button,
+		buttons,
 		calendar,
 		categories,
 		code,

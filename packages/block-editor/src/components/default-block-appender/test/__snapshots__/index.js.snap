@@ -2,15 +2,13 @@
 
 exports[`DefaultBlockAppender should append a default block when input focused 1`] = `
 <div
-  className="wp-block editor-default-block-appender block-editor-default-block-appender"
+  className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
-  onMouseEnter={[Function]}
-  onMouseLeave={[Function]}
 >
   <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
   <TextareaAutosize
     aria-label="Add block"
-    className="editor-default-block-appender__content block-editor-default-block-appender__content"
+    className="block-editor-default-block-appender__content"
     onFocus={
       [MockFunction] {
         "calls": Array [
@@ -38,15 +36,13 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
 
 exports[`DefaultBlockAppender should match snapshot 1`] = `
 <div
-  className="wp-block editor-default-block-appender block-editor-default-block-appender"
+  className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
-  onMouseEnter={[Function]}
-  onMouseLeave={[Function]}
 >
   <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
   <TextareaAutosize
     aria-label="Add block"
-    className="editor-default-block-appender__content block-editor-default-block-appender__content"
+    className="block-editor-default-block-appender__content"
     onFocus={[MockFunction]}
     readOnly={true}
     role="button"
@@ -62,15 +58,13 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
 
 exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
 <div
-  className="wp-block editor-default-block-appender block-editor-default-block-appender"
+  className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
-  onMouseEnter={[Function]}
-  onMouseLeave={[Function]}
 >
   <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
   <TextareaAutosize
     aria-label="Add block"
-    className="editor-default-block-appender__content block-editor-default-block-appender__content"
+    className="block-editor-default-block-appender__content"
     onFocus={[MockFunction]}
     readOnly={true}
     role="button"

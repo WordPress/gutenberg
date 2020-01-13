@@ -4,7 +4,6 @@
 import {
 	createBlock,
 	getBlockAttributes,
-	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 import {
 	__UNSTABLE_LINE_SEPARATOR,
@@ -15,22 +14,26 @@ import {
 	toHTMLString,
 } from '@wordpress/rich-text';
 
-const listContentSchema = {
-	...getPhrasingContentSchema(),
-	ul: {},
-	ol: { attributes: [ 'type', 'start', 'reversed' ] },
-};
-
-// Recursion is needed.
-// Possible: ul > li > ul.
-// Impossible: ul > ul.
-[ 'ul', 'ol' ].forEach( ( tag ) => {
-	listContentSchema[ tag ].children = {
-		li: {
-			children: listContentSchema,
-		},
+function getListContentSchema( { phrasingContentSchema } ) {
+	const listContentSchema = {
+		...phrasingContentSchema,
+		ul: {},
+		ol: { attributes: [ 'type', 'start', 'reversed' ] },
 	};
-} );
+
+	// Recursion is needed.
+	// Possible: ul > li > ul.
+	// Impossible: ul > ul.
+	[ 'ul', 'ol' ].forEach( ( tag ) => {
+		listContentSchema[ tag ].children = {
+			li: {
+				children: listContentSchema,
+			},
+		};
+	} );
+
+	return listContentSchema;
+}
 
 const transforms = {
 	from: [
@@ -72,10 +75,10 @@ const transforms = {
 		{
 			type: 'raw',
 			selector: 'ol,ul',
-			schema: {
-				ol: listContentSchema.ol,
-				ul: listContentSchema.ul,
-			},
+			schema: ( args ) => ( {
+				ol: getListContentSchema( args ).ol,
+				ul: getListContentSchema( args ).ul,
+			} ),
 			transform( node ) {
 				const attributes = {
 					ordered: node.nodeName === 'OL',

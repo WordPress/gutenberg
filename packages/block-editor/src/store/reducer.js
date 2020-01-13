@@ -1277,6 +1277,11 @@ export const blockListSettings = ( state = {}, action ) => {
  * @return {string} Updated state.
  */
 export function isNavigationMode( state = false, action ) {
+	// Let inserting block always trigger Edit mode.
+	if ( action.type === 'INSERT_BLOCKS' ) {
+		return false;
+	}
+
 	if ( action.type === 'SET_NAVIGATION_MODE' ) {
 		return action.isNavigationMode;
 	}

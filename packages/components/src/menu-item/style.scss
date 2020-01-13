@@ -1,5 +1,5 @@
 .components-menu-item__button,
-.components-menu-item__button.components-icon-button {
+.components-menu-item__button.components-button {
 	width: 100%;
 	padding: $grid-size ($grid-size-large - $border-width);
 	text-align: left;
@@ -18,7 +18,8 @@
 		flex: 0 0 auto;
 	}
 
-	&:hover:not(:disabled):not([aria-disabled="true"]) {
+	// This needs to be higher-specificity that the default button hover style.
+	&.components-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-tertiary):not(.is-primary):hover {
 		@include menu-style__hover;
 
 		.components-menu-item__shortcut {

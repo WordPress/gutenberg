@@ -33,6 +33,13 @@ selectorNames.forEach( ( name ) => {
 				return state.currentPost;
 			},
 
+			getEntityRecordChangesByRecord() {
+				return (
+					state.getEntityRecordChangesByRecord &&
+					state.getEntityRecordChangesByRecord()
+				);
+			},
+
 			getEntityRecordEdits() {
 				const present = state.editor && state.editor.present;
 				let edits = present && present.edits;
@@ -123,6 +130,7 @@ const {
 	isEditedPostNew,
 	hasChangedContent,
 	isEditedPostDirty,
+	hasNonPostEntityChanges,
 	isCleanNewPost,
 	getCurrentPost,
 	getCurrentPostId,
@@ -441,6 +449,69 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'hasNonPostEntityChanges', () => {
+		it( 'should return false if the full site editing experiment is disabled.', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				editorSettings: {
+					__experimentalEnableFullSiteEditing: false,
+				},
+				getEntityRecordChangesByRecord() {
+					return { someKind: { someName: { someKey: {} } } };
+				},
+			};
+			expect( hasNonPostEntityChanges( state ) ).toBe( false );
+		} );
+		it( 'should return true if there are changes to an arbitrary entity', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				editorSettings: {
+					__experimentalEnableFullSiteEditing: true,
+				},
+				getEntityRecordChangesByRecord() {
+					return { someKind: { someName: { someKey: {} } } };
+				},
+			};
+			expect( hasNonPostEntityChanges( state ) ).toBe( true );
+		} );
+		it( 'should return false if there are only changes for the current post', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				editorSettings: {
+					__experimentalEnableFullSiteEditing: true,
+				},
+				getEntityRecordChangesByRecord() {
+					return { postType: { post: { 1: {} } } };
+				},
+			};
+			expect( hasNonPostEntityChanges( state ) ).toBe( false );
+		} );
+		it( 'should return true if there are changes to multiple posts', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				editorSettings: {
+					__experimentalEnableFullSiteEditing: true,
+				},
+				getEntityRecordChangesByRecord() {
+					return { postType: { post: { 1: {}, 2: {} } } };
+				},
+			};
+			expect( hasNonPostEntityChanges( state ) ).toBe( true );
+		} );
+		it( 'should return true if there are changes to multiple posts of different post types', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				editorSettings: {
+					__experimentalEnableFullSiteEditing: true,
+				},
+				getEntityRecordChangesByRecord() {
+					return { postType: { post: { 1: {} }, wp_template: { 1: {} } } };
+				},
+			};
+			expect( hasNonPostEntityChanges( state ) ).toBe( true );
 		} );
 	} );
 

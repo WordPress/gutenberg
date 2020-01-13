@@ -274,6 +274,23 @@ describe( 'validation', () => {
 
 			expect( isEqual ).toBe( true );
 		} );
+
+		it( 'returns true if case-insensitive equal pairs', () => {
+			const isEqual = isEqualTagAttributePairs(
+				[
+					[ 'ID', 'foo' ],
+					[ 'class', 'a b' ],
+					[ 'Style', 'color: red;' ],
+				],
+				[
+					[ 'id', 'foo' ],
+					[ 'CLASS', 'a b' ],
+					[ 'style', 'color: red;' ],
+				]
+			);
+
+			expect( isEqual ).toBe( true );
+		} );
 	} );
 
 	describe( 'isEqualTokensOfType', () => {
@@ -323,6 +340,27 @@ describe( 'validation', () => {
 						attributes: [
 							[ 'class', 'c  a b' ],
 							[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+						],
+					}
+				);
+
+				expect( isEqual ).toBe( true );
+			} );
+
+			it( 'returns true if tag and attributes names are case insensitive the same', () => {
+				const isEqual = isEqualTokensOfType.StartTag(
+					{
+						tagName: 'P',
+						attributes: [
+							[ 'CLASS', 'a b' ],
+							[ 'style', 'color: red;' ],
+						],
+					},
+					{
+						tagName: 'p',
+						attributes: [
+							[ 'class', 'a b' ],
+							[ 'Style', 'color: red;' ],
 						],
 					}
 				);
@@ -417,7 +455,7 @@ describe( 'validation', () => {
 
 		it( 'should return true for effectively equivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
-				'<div>&quot; Hello<span   class="b a" id="foo" data-foo="here &mdash; there"> World! &#128517;</  span>  "</div>',
+				'<div>&quot; Hello<SPAN   class="b a" ID="foo" data-foo="here &mdash; there"> World! &#128517;</  SPAN>  "</div>',
 				'<div  >" Hello\n<span id="foo" class="a  b" data-foo="here — there">World! 😅</span>"</div>'
 			);
 

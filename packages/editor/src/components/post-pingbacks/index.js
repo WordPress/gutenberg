@@ -11,7 +11,7 @@ function PostPingbacks( { pingStatus = 'open', ...props } ) {
 
 	return (
 		<CheckboxControl
-			label={ __( 'Allow Pingbacks & Trackbacks' ) }
+			label={ __( 'Allow pingbacks & trackbacks' ) }
 			checked={ pingStatus === 'open' }
 			onChange={ onTogglePingback }
 		/>

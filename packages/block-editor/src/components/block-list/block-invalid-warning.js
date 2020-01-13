@@ -48,14 +48,14 @@ export class BlockInvalidWarning extends Component {
 			<>
 				<Warning
 					actions={ [
-						<Button key="convert" onClick={ this.onCompare } isLarge isPrimary={ ! hasHTMLBlock }>
+						<Button key="convert" onClick={ this.onCompare } isSecondary={ hasHTMLBlock } isPrimary={ ! hasHTMLBlock }>
 							{
 								// translators: Button to fix block content
 								_x( 'Resolve', 'imperative verb' )
 							}
 						</Button>,
 						hasHTMLBlock && (
-							<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
+							<Button key="edit" onClick={ convertToHTML } isPrimary>
 								{ __( 'Convert to HTML' ) }
 							</Button>
 						),
@@ -71,7 +71,7 @@ export class BlockInvalidWarning extends Component {
 							__( 'Resolve Block' )
 						}
 						onRequestClose={ this.onCompareClose }
-						className="editor-block-compare block-editor-block-compare"
+						className="block-editor-block-compare"
 					>
 						<BlockCompare
 							block={ block }

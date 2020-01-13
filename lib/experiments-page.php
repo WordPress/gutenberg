@@ -16,7 +16,7 @@ function the_gutenberg_experiments() {
 		id="experiments-editor"
 		class="wrap"
 	>
-	<h1><?php echo __( 'Experiment settings', 'gutenberg' ); ?></h1>
+	<h1><?php echo __( 'Experimental settings', 'gutenberg' ); ?></h1>
 	<?php settings_errors(); ?>
 	<form method="post" action="options.php">
 		<?php settings_fields( 'gutenberg-experiments' ); ?>
@@ -47,7 +47,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Widgets Screen and Legacy Widget Block', 'gutenberg' ),
+			'label' => __( 'Enable Widgets screen and Legacy Widgets block', 'gutenberg' ),
 			'id'    => 'gutenberg-widget-experiments',
 		)
 	);
@@ -58,7 +58,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Block Directory search', 'gutenberg' ),
+			'label' => __( 'Enable block directory search', 'gutenberg' ),
 			'id'    => 'gutenberg-block-directory',
 		)
 	);
@@ -69,7 +69,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Full Site Editing', 'gutenberg' ),
+			'label' => __( 'Enable Full Site Editing (Warning: this will replace your theme and cause potentially irreversible changes to your site. We recommend using this only in a development environment.)', 'gutenberg' ),
 			'id'    => 'gutenberg-full-site-editing',
 		)
 	);
@@ -80,7 +80,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Full Site Editing Demo Templates', 'gutenberg' ),
+			'label' => __( 'Enable Full Site Editing demo templates', 'gutenberg' ),
 			'id'    => 'gutenberg-full-site-editing-demo',
 		)
 	);
@@ -91,7 +91,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Page Templates', 'gutenberg' ),
+			'label' => __( 'Enable page templates', 'gutenberg' ),
 			'id'    => 'gutenberg-page-templates',
 		)
 	);
@@ -128,7 +128,7 @@ function gutenberg_display_experiment_field( $args ) {
  */
 function gutenberg_display_experiment_section() {
 	?>
-	<p><?php echo __( 'Gutenberg has some experimental features you can turn on. Simply select each you would like to use. These features are likely to change so it is inadvisable to use them in production.', 'gutenberg' ); ?></p>
+	<p><?php echo __( "The block editor includes experimental features that are useable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production.", 'gutenberg' ); ?></p>
 
 	<?php
 }

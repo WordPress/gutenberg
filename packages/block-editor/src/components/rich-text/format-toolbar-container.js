@@ -17,7 +17,6 @@ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
 				noArrow
 				position="top center"
 				focusOnMount={ false }
-				anchorVerticalBuffer={ 6 }
 				anchorRef={ anchorRef }
 				className="block-editor-rich-text__inline-format-toolbar"
 			>

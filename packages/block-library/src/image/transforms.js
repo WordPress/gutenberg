@@ -5,7 +5,6 @@ import { createBlobURL } from '@wordpress/blob';
 import {
 	createBlock,
 	getBlockAttributes,
-	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 
 export function stripFirstImage( attributes, { shortcode } ) {
@@ -49,7 +48,7 @@ const imageSchema = {
 	},
 };
 
-const schema = {
+const schema = ( { phrasingContentSchema } ) => ( {
 	figure: {
 		require: [ 'img' ],
 		children: {
@@ -59,11 +58,11 @@ const schema = {
 				children: imageSchema,
 			},
 			figcaption: {
-				children: getPhrasingContentSchema(),
+				children: phrasingContentSchema,
 			},
 		},
 	},
-};
+} );
 
 const transforms = {
 	from: [

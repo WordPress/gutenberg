@@ -197,6 +197,7 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: Block from which to find root client ID.
+-   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
 
 _Returns_
 
@@ -389,6 +390,19 @@ _Parameters_
 _Returns_
 
 -   `?string`: Last block client ID in the multi-selection set.
+
+<a name="getLowestCommonAncestorWithSelectedBlock" href="#getLowestCommonAncestorWithSelectedBlock">#</a> **getLowestCommonAncestorWithSelectedBlock**
+
+Given a block client ID, returns the lowest common ancestor with selected client ID.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which to find common ancestor client ID.
+
+_Returns_
+
+-   `string`: Common ancestor client ID or undefined
 
 <a name="getMultiSelectedBlockClientIds" href="#getMultiSelectedBlockClientIds">#</a> **getMultiSelectedBlockClientIds**
 
@@ -878,6 +892,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="duplicateBlocks" href="#duplicateBlocks">#</a> **duplicateBlocks**
+
+Generator that triggers an action used to duplicate a list of blocks.
+
+_Parameters_
+
+-   _clientIds_ `Array<string>`: 
+
 <a name="enterFormattedText" href="#enterFormattedText">#</a> **enterFormattedText**
 
 Returns an action object used in signalling that the caret has entered formatted text.
@@ -901,6 +923,22 @@ Returns an action object hiding the insertion point.
 _Returns_
 
 -   `Object`: Action object.
+
+<a name="insertAfterBlock" href="#insertAfterBlock">#</a> **insertAfterBlock**
+
+Generator used to insert an empty block before a given block.
+
+_Parameters_
+
+-   _clientId_ `string`: 
+
+<a name="insertBeforeBlock" href="#insertBeforeBlock">#</a> **insertBeforeBlock**
+
+Generator used to insert an empty block after a given block.
+
+_Parameters_
+
+-   _clientId_ `string`: 
 
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 

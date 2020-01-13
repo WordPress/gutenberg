@@ -36,9 +36,9 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 	const previousIndex = lastIndex;
 
 	if ( ( match = next( transformTag, HTML, lastIndex ) ) ) {
-		const beforeHTML = HTML.substr( 0, match.index );
-
 		lastIndex = match.index + match.content.length;
+		const beforeHTML = HTML.substr( 0, match.index );
+		const afterHTML = HTML.substr( lastIndex );
 
 		// If the shortcode content does not contain HTML and the shortcode is
 		// not on a new line (or in paragraph from Markdown converter),
@@ -46,7 +46,10 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 		// this segment.
 		if (
 			! includes( match.shortcode.content || '', '<' ) &&
-			! /(\n|<p>)\s*$/.test( beforeHTML )
+			! (
+				/(\n|<p>)\s*$/.test( beforeHTML ) &&
+				/^\s*(\n|<\/p>)/.test( afterHTML )
+			)
 		) {
 			return segmentHTMLToShortcodeBlock( HTML, lastIndex );
 		}

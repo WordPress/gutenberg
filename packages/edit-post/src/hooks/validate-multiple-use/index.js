@@ -75,16 +75,16 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 			<Warning
 				key="multiple-use-warning"
 				actions={ [
-					<Button key="find-original" isLarge onClick={ selectFirst }>
+					<Button key="find-original" isSecondary onClick={ selectFirst }>
 						{ __( 'Find original' ) }
 					</Button>,
-					<Button key="remove" isLarge onClick={ () => props.onReplace( [] ) }>
+					<Button key="remove" isSecondary onClick={ () => props.onReplace( [] ) }>
 						{ __( 'Remove' ) }
 					</Button>,
 					outboundType && (
 						<Button
 							key="transform"
-							isLarge
+							isSecondary
 							onClick={ () => props.onReplace(
 								createBlock( outboundType.name, props.attributes )
 							) }

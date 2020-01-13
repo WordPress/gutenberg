@@ -100,7 +100,7 @@ class ImportForm extends Component {
 					type="submit"
 					isBusy={ isLoading }
 					disabled={ ! file || isLoading }
-					isDefault
+					isSecondary
 					className="list-reusable-blocks-import-form__button"
 				>
 					{ _x( 'Import', 'button label' ) }

@@ -28,9 +28,9 @@ import PostFeaturedImageCheck from './check';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 // Used when labels from post type were not yet loaded or when they are not present.
-const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured Image' );
-const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set Featured Image' );
-const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove Image' );
+const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured image' );
+const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
+const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
 
 function PostFeaturedImage( {
 	currentPostId,
@@ -114,7 +114,7 @@ function PostFeaturedImage( {
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
-								<Button onClick={ open } isDefault isLarge>
+								<Button onClick={ open } isSecondary>
 									{ __( 'Replace Image' ) }
 								</Button>
 							) }

@@ -18,6 +18,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Page Break' ),
+	parent: [ 'core/post-content' ],
 	description: __( 'Separate your content into a multi-page experience.' ),
 	icon,
 	keywords: [ __( 'next page' ), __( 'pagination' ) ],

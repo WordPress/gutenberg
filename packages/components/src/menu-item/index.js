@@ -13,7 +13,7 @@ import { cloneElement } from '@wordpress/element';
  * Internal dependencies
  */
 import Shortcut from '../shortcut';
-import IconButton from '../icon-button';
+import Button from '../button';
 
 /**
  * Renders a generic menu item for use inside the more menu.
@@ -30,9 +30,7 @@ export function MenuItem( {
 	role = 'menuitem',
 	...props
 } ) {
-	className = classnames( 'components-menu-item__button', className, {
-		'has-icon': icon,
-	} );
+	className = classnames( 'components-menu-item__button', className );
 
 	if ( info ) {
 		children = (
@@ -55,7 +53,7 @@ export function MenuItem( {
 	}
 
 	return (
-		<IconButton
+		<Button
 			icon={ icon }
 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
 			aria-checked={ ( role === 'menuitemcheckbox' || role === 'menuitemradio' ) ? isSelected : undefined }
@@ -65,7 +63,7 @@ export function MenuItem( {
 		>
 			{ children }
 			<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
-		</IconButton>
+		</Button>
 	);
 }
 

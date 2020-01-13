@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject, get } from 'lodash';
+import { merge, isPlainObject, get, has } from 'lodash';
 
 /**
  * Internal dependencies
@@ -208,25 +208,39 @@ const persistencePlugin = function( registry, pluginOptions ) {
 };
 
 /**
- * Deprecated: Remove this function once WordPress 5.3 is released.
+ * Deprecated: Remove this function and the code in WordPress Core that calls
+ * it once WordPress 5.4 is released.
  */
 
 persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const persistence = createPersistenceInterface( pluginOptions );
 
-	// Preferences migration to introduce the block editor module
-	const insertUsage = get( persistence.get(), [
-		'core/editor',
-		'preferences',
-		'insertUsage',
-	] );
+	const state = persistence.get();
 
+	// Migrate 'insertUsage' from 'core/editor' to 'core/block-editor'
+	const insertUsage = get( state, [ 'core/editor', 'preferences', 'insertUsage' ] );
 	if ( insertUsage ) {
 		persistence.set( 'core/block-editor', {
 			preferences: {
 				insertUsage,
 			},
 		} );
+	}
+
+	// Migrate 'areTipsEnabled' from 'core/nux' to 'showWelcomeGuide' in 'core/edit-post'
+	const areTipsEnabled = get( state, [ 'core/nux', 'preferences', 'areTipsEnabled' ] );
+	const hasWelcomeGuide = has( state, [ 'core/edit-post', 'preferences', 'features', 'welcomeGuide' ] );
+	if ( areTipsEnabled !== undefined && ! hasWelcomeGuide ) {
+		persistence.set(
+			'core/edit-post',
+			merge( state[ 'core/edit-post' ], {
+				preferences: {
+					features: {
+						welcomeGuide: areTipsEnabled,
+					},
+				},
+			} )
+		);
 	}
 };
 

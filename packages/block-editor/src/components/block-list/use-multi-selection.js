@@ -58,7 +58,7 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		getBlockParents,
-	} = useSelect( selector );
+	} = useSelect( selector, [ rootClientId ] );
 	const {
 		startMultiSelect,
 		stopMultiSelect,

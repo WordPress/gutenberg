@@ -502,7 +502,6 @@ export class TableEdit extends Component {
 					label={ __( 'Table' ) }
 					icon={ <BlockIcon icon={ icon } showColors /> }
 					instructions={ __( 'Insert a table for sharing data.' ) }
-					isColumnLayout
 				>
 					<form className="wp-block-table__placeholder-form" onSubmit={ this.onCreateTable }>
 						<TextControl
@@ -521,7 +520,7 @@ export class TableEdit extends Component {
 							min="1"
 							className="wp-block-table__placeholder-input"
 						/>
-						<Button className="wp-block-table__placeholder-button" isDefault type="submit">{ __( 'Create Table' ) }</Button>
+						<Button className="wp-block-table__placeholder-button" isSecondary type="submit">{ __( 'Create Table' ) }</Button>
 					</form>
 				</Placeholder>
 			);

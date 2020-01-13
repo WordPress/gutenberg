@@ -21,7 +21,7 @@ export function CustomFieldsConfirmation( { willEnable } ) {
 			</p>
 			<Button
 				className="edit-post-options-modal__custom-fields-confirmation-button"
-				isDefault
+				isSecondary
 				isBusy={ isReloading }
 				disabled={ isReloading }
 				onClick={ () => {

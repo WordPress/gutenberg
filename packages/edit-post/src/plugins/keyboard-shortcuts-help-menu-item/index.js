@@ -14,7 +14,7 @@ export function KeyboardShortcutsHelpMenuItem( { openModal } ) {
 			} }
 			shortcut={ displayShortcut.access( 'h' ) }
 		>
-			{ __( 'Keyboard Shortcuts' ) }
+			{ __( 'Keyboard shortcuts' ) }
 		</MenuItem>
 	);
 }

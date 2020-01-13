@@ -26,7 +26,7 @@ const __experimentalUsePageTemplatePickerVisible = () => {
 		const isPage = getCurrentPostType() === 'page';
 
 		return isPageTemplatesEnabled && isEmptyContent && isPage;
-	} );
+	}, [] );
 };
 
 export default __experimentalUsePageTemplatePickerVisible;

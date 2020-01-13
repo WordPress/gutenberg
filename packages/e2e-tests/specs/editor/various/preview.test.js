@@ -61,7 +61,7 @@ async function waitForPreviewNavigation( previewPage ) {
  * @param {boolean} shouldBeChecked If true, turns the option on. If false, off.
  */
 async function toggleCustomFieldsOption( shouldBeChecked ) {
-	const checkboxXPath = '//*[contains(@class, "edit-post-options-modal")]//label[contains(text(), "Custom Fields")]';
+	const checkboxXPath = '//*[contains(@class, "edit-post-options-modal")]//label[contains(text(), "Custom fields")]';
 	await clickOnMoreMenuItem( 'Options' );
 	await page.waitForXPath( checkboxXPath );
 	const [ checkboxHandle ] = await page.$x( checkboxXPath );

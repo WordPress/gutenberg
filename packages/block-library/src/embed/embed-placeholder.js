@@ -23,14 +23,15 @@ const EmbedPlaceholder = ( props ) => {
 					placeholder={ __( 'Enter URL to embed here…' ) }
 					onChange={ onChange } />
 				<Button
-					isLarge
-					type="submit">
+					isSecondary
+					type="submit"
+				>
 					{ _x( 'Embed', 'button label' ) }
 				</Button>
 				{ cannotEmbed &&
 					<p className="components-placeholder__error">
 						{ __( 'Sorry, this content could not be embedded.' ) }<br />
-						<Button isLarge onClick={ tryAgain }>{ _x( 'Try again', 'button label' ) }</Button> <Button isLarge onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button>
+						<Button isSecondary onClick={ tryAgain }>{ _x( 'Try again', 'button label' ) }</Button> <Button isSecondary onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button>
 					</p>
 				}
 			</form>

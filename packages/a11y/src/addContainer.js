@@ -3,7 +3,7 @@
  *
  * @param {string} ariaLive Optional. Value for the 'aria-live' attribute, default 'polite'.
  *
- * @return {Object} $container The ARIA live region jQuery object.
+ * @return {HTMLDivElement} The ARIA live region HTML element.
  */
 const addContainer = function( ariaLive ) {
 	ariaLive = ariaLive || 'polite';
@@ -29,7 +29,11 @@ const addContainer = function( ariaLive ) {
 	container.setAttribute( 'aria-relevant', 'additions text' );
 	container.setAttribute( 'aria-atomic', 'true' );
 
-	document.querySelector( 'body' ).appendChild( container );
+	const body = document.querySelector( 'body' );
+	if ( body ) {
+		body.appendChild( container );
+	}
+
 	return container;
 };
 

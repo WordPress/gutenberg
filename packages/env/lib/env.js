@@ -28,6 +28,7 @@ const cwdTestsPath = fs.existsSync( './packages' ) ? '/packages' : '';
 const dockerComposeOptions = {
 	config: path.join( __dirname, 'docker-compose.yml' ),
 };
+const hasConfigFile = fs.existsSync( dockerComposeOptions.config );
 
 // WP CLI Utils
 const wpCliRun = ( command, isTests = false ) =>
@@ -209,5 +210,40 @@ module.exports = {
 		// Remove dangling containers and finish.
 		await dockerCompose.rm( dockerComposeOptions );
 		spinner.text = `Cleaned ${ description }.`;
+	},
+
+	async run( { container, command, spinner } ) {
+		command = command.join( ' ' );
+		spinner.text = `Running \`${ command }\` in "${ container }".`;
+
+		// Generate config file if we don't have one.
+		if ( ! hasConfigFile ) {
+			fs.writeFileSync(
+				dockerComposeOptions.config,
+				createDockerComposeConfig(
+					cwdTestsPath,
+					await detectContext(),
+					await resolveDependencies()
+				)
+			);
+		}
+
+		const result = await dockerCompose.run(
+			container,
+			command,
+			dockerComposeOptions
+		);
+		if ( result.out ) {
+			// eslint-disable-next-line no-console
+			console.log( `\n\n${ result.out }\n\n` );
+		} else if ( result.err ) {
+			// eslint-disable-next-line no-console
+			console.error( `\n\n${ result.err }\n\n` );
+			throw result.err;
+		}
+
+		// Remove dangling containers and finish.
+		await dockerCompose.rm( dockerComposeOptions );
+		spinner.text = `Ran \`${ command }\` in "${ container }".`;
 	},
 };

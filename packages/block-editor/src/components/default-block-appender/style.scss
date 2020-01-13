@@ -40,12 +40,6 @@
 		}
 	}
 
-	&:hover {
-		.block-editor-inserter-with-shortcuts {
-			@include edit-post__fade-in-animation;
-		}
-	}
-
 	// Dropzone.
 	.components-drop-zone__content-icon {
 		display: none;
@@ -58,26 +52,21 @@
 	line-height: $editor-line-height;
 }
 
-// Quick shortcuts, left and right.
+// Empty / default block side inserter.
 .block-editor-block-list__empty-block-inserter, // Empty paragraph
-.block-editor-default-block-appender .block-editor-inserter, // Empty appender
-.block-editor-inserter-with-shortcuts { // Right side quick shortcuts
+.block-editor-default-block-appender .block-editor-inserter { // Empty appender
 	position: absolute;
 	top: 0;
 
 	// Change the size of the buttons to match that of the default paragraph height.
-	.components-icon-button {
+	.components-button.has-icon {
 		width: $block-side-ui-width;
 		height: $block-side-ui-width;
 		margin-right: 12px;
 		padding: 0;
 	}
 
-	.block-editor-block-icon {
-		margin: auto;
-	}
-
-	.components-icon-button svg {
+	.components-button svg {
 		display: block;
 		margin: auto;
 	}
@@ -86,8 +75,8 @@
 		margin-right: 0;
 
 		// Hide the box shadow that appears on hover.
-		// All the :not() rules are needed to override default iconButton styles.
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+		// All the :not() rules are needed to override default Button styles.
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
 			box-shadow: none;
 		}
 	}
@@ -123,21 +112,5 @@
 				color: $light-opacity-500;
 			}
 		}
-	}
-}
-
-// Quick block insertion icons on the right side.
-// Needs specificity to styles from the component itself.
-.block-editor-block-list__side-inserter .block-editor-inserter-with-shortcuts,
-.block-editor-default-block-appender .block-editor-inserter-with-shortcuts {
-	right: $block-padding;
-	display: none; // Don't show on mobile.
-	z-index: z-index(".block-editor-inserter-with-shortcuts"); // Elevate above the sibling inserter.
-
-	@include break-small {
-		display: flex;
-		align-items: center;
-		height: 100%;
-		right: 0;
 	}
 }

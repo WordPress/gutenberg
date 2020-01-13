@@ -8,7 +8,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Animate, Dashicon, Button, IconButton } from '@wordpress/components';
+import { Animate, Dashicon, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
@@ -104,7 +104,7 @@ export class PostSavedState extends Component {
 		const label = isPending ? __( 'Save as Pending' ) : __( 'Save Draft' );
 		if ( ! isLargeViewport ) {
 			return (
-				<IconButton
+				<Button
 					className="editor-post-save-draft"
 					label={ label }
 					onClick={ () => onSave() }

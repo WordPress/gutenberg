@@ -40,7 +40,7 @@ const BlockInspector = ( {
 	if ( ! blockType || ! selectedBlockClientId || isSelectedBlockUnregistered ) {
 		if ( showNoBlockSelectedMessage ) {
 			return (
-				<span className="editor-block-inspector__no-blocks block-editor-block-inspector__no-blocks">
+				<span className="block-editor-block-inspector__no-blocks">
 					{ __( 'No block selected.' ) }
 				</span>
 			);
@@ -70,7 +70,7 @@ const BlockInspector = ( {
 					{ ( { hasFills } ) =>
 						hasFills( InspectorAdvancedControls.slotName ) && (
 							<PanelBody
-								className="editor-block-inspector__advanced block-editor-block-inspector__advanced"
+								className="block-editor-block-inspector__advanced"
 								title={ __( 'Advanced' ) }
 								initialOpen={ false }
 							>
