@@ -238,3 +238,11 @@ Object.defineProperties( Node.prototype, {
 		},
 	},
 } );
+
+class DOMParser {
+	parseFromString( string ) {
+		return jsdom.html( string );
+	}
+}
+
+global.DOMParser = DOMParser;
