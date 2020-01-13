@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, InteractionManager, AccessibilityInfo } from 'react-native';
+import { View, AccessibilityInfo } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -21,7 +21,6 @@ import {
 	PanelBody,
 	RangeControl,
 	MissingControl,
-	NotificationSheet,
 } from '@wordpress/components';
 import {
 	Component,
@@ -45,13 +44,10 @@ class ButtonEdit extends Component {
 		super( props );
 		this.onChangeBackgroundColor = this.onChangeBackgroundColor.bind( this );
 		this.setBorderRadius = this.setBorderRadius.bind( this );
-		this.openNotificationSheet = this.openNotificationSheet.bind( this );
-		this.toggleShowNoticationSheet = this.toggleShowNoticationSheet.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.onToggleOpenInNewTab = this.onToggleOpenInNewTab.bind( this );
 
 		this.state = {
-			showHelp: false,
 			maxWidth: INITIAL_MAX_WIDTH,
 		};
 	}
@@ -95,18 +91,6 @@ class ButtonEdit extends Component {
 		} );
 	}
 
-	toggleShowNoticationSheet() {
-		this.setState( { showHelp: ! this.state.showHelp } );
-	}
-
-	openNotificationSheet() {
-		const { closeGeneralSidebar } = this.props;
-		closeGeneralSidebar();
-		InteractionManager.runAfterInteractions( () => {
-			this.toggleShowNoticationSheet();
-		} );
-	}
-
 	onLayout( { nativeEvent } ) {
 		const { width } = nativeEvent.layout;
 		const { marginRight, paddingRight, borderWidth } = styles.button;
@@ -142,7 +126,7 @@ class ButtonEdit extends Component {
 			url,
 			linkTarget,
 		} = attributes;
-		const { maxWidth, showHelp } = this.state;
+		const { maxWidth } = this.state;
 
 		const isFocused = this.richTextRef && this.richTextRef.isFocused();
 
@@ -230,13 +214,11 @@ class ButtonEdit extends Component {
 						<PanelBody title={ __( 'Color Settings' ) } >
 							<MissingControl
 								label={ __( 'Coming Soon' ) }
-								onChange={ this.openNotificationSheet }
+								onChange={ () => {} }
 								separatorType="none"
 							/>
 						</PanelBody>
 					</InspectorControls>
-
-					<NotificationSheet title="Color Settings" isVisible={ showHelp } onClose={ this.toggleShowNoticationSheet } type="plural" withMessage={ false } withQuotes={ false } />
 				</View>
 			</View>
 		);
