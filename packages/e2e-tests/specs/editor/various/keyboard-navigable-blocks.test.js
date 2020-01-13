@@ -68,9 +68,6 @@ const tabThroughBlockToolbar = async () => {
 
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'More options' );
-
-	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Add block' );
 };
 
 describe( 'Order of block keyboard navigation', () => {
