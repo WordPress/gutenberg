@@ -20,6 +20,7 @@ export default class EditorPage {
 	listBlockName = 'List';
 	headingBlockName = 'Heading';
 	imageBlockName = 'Image';
+	galleryBlockName = 'Gallery';
 
 	// This is needed to adapt to changes in the way accessibility ids are being
 	// assigned after migrating to AndroidX and React Native 0.60. See:
@@ -379,6 +380,22 @@ export default class EditorPage {
 
 	async removeImageBlockAtPosition( position: number ) {
 		return await this.removeBlockAtPosition( position, this.imageBlockName );
+	}
+
+	// =========================
+	// Gallery Block functions
+	// =========================
+
+	async addNewGalleryBlock() {
+		await this.addNewBlock( this.galleryBlockName );
+	}
+
+	async getGalleryBlockAtPosition( position: number ) {
+		return this.getBlockAtPosition( position, this.galleryBlockName );
+	}
+
+	async removeGalleryBlockAtPosition( position: number ) {
+		return await this.removeBlockAtPosition( position, this.galleryBlockName );
 	}
 
 	// =========================
