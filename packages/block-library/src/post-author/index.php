@@ -15,7 +15,8 @@ function render_block_core_post_author() {
 	if ( ! $post ) {
 		return '';
 	}
-	return '<address>' . __( 'By ' ) . get_the_author() . '</address>';
+	// translators: %s: The author.
+	return sprintf( __( '<address>By %s</address>' ), get_the_author() );
 }
 
 /**
