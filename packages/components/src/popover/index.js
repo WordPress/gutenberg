@@ -274,6 +274,12 @@ const Popover = ( {
 				contentRect.current = contentRef.current.getBoundingClientRect();
 			}
 
+			let boundaryElement;
+
+			if ( __unstableBoundaryParent ) {
+				boundaryElement = containerRef.current.closest( '.popover-slot' ).parentNode;
+			}
+
 			const {
 				popoverTop,
 				popoverLeft,
@@ -287,8 +293,7 @@ const Popover = ( {
 				position,
 				__unstableSticky,
 				anchorRef,
-				// To do: get slot parent instead.
-				__unstableBoundaryParent ? document.querySelector( '.edit-post-editor-regions__content' ) : undefined
+				boundaryElement
 			);
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
@@ -521,6 +526,6 @@ const Popover = ( {
 const PopoverContainer = Popover;
 
 PopoverContainer.Slot = ( { name = SLOT_NAME } ) =>
-	<Slot bubblesVirtually name={ name } />;
+	<Slot bubblesVirtually name={ name } className="popover-slot" />;
 
 export default PopoverContainer;
