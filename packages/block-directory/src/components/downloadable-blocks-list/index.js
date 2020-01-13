@@ -17,13 +17,13 @@ import DownloadableBlockListItem from '../downloadable-block-list-item';
 import DownloadableBlockNotice from '../downloadable-block-notice';
 import { DOWNLOAD_ERROR_NOTICE_ID, INSTALL_ERROR_NOTICE_ID } from '../../store/constants';
 
-function DownloadableBlocksList( {
+export function DownloadableBlocksList( {
 	items,
 	onHover = noop,
 	children,
 	isLoading,
 	errorNotices,
-	install,
+	installAndDownload,
 	download
 } ) {
 	return (
@@ -39,11 +39,7 @@ function DownloadableBlocksList( {
 					className={ getBlockMenuDefaultClassName( item.id ) }
 					icons={ item.icons }
 					onClick={ () => {
-						const onSuccess = () => {
-							download( item );
-						};
-
-						install( item, onSuccess );
+						installAndDownload( item );
 						onHover( null );
 					} }
 					onFocus={ () => onHover( item ) }
@@ -51,7 +47,7 @@ function DownloadableBlocksList( {
 					onMouseLeave={ () => onHover( null ) }
 					onBlur={ () => onHover( null ) }
 					item={ item }
-					notice={ <DownloadableBlockNotice install={ install } download={ download } errorNotices={ errorNotices } block={ item } /> }
+					notice={ <DownloadableBlockNotice fullInstall={ installAndDownload } download={ download } errorNotices={ errorNotices } block={ item } /> }
 					isLoading={ isLoading }
 				/>
 			) }
@@ -110,7 +106,13 @@ export default compose(
 		};
 
 		return {
-			install,
+			installAndDownload: ( item ) => {
+				const onSuccess = () => {
+					download( item );
+				};
+
+				install( item, onSuccess );
+			},
 			download,
 		};
 	} )

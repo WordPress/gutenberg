@@ -9,28 +9,18 @@ import { __ } from '@wordpress/i18n';
  */
 import { DOWNLOAD_ERROR_NOTICE_ID } from '../../store/constants';
 
-const DownloadableBlockNotice = ( { block, isLoading, errorNotices, install, download } ) => {
+const DownloadableBlockNotice = ( { block, errorNotices, fullInstall, download } ) => {
 	if ( ! errorNotices[ block.id ] ) {
 		return null;
 	}
 
-	let copy, callback;
-
 	// A Failed install is the default error as its the first step
-	copy = __( 'Block previews can\'t install.' );
-	callback = () => {
-		const onSuccess = () => {
-			download( block );
-		};
-
-		install( block, onSuccess );
-	};
+	let copy = __( 'Block previews can\'t install.' );
+	let callback = fullInstall;
 
 	if ( errorNotices[ block.id ] === DOWNLOAD_ERROR_NOTICE_ID ) {
 		copy = __( 'Block previews can\'t load.' );
-		callback = () => {
-			download( block );
-		};
+		callback = download;
 	}
 
 	return (
@@ -38,7 +28,9 @@ const DownloadableBlockNotice = ( { block, isLoading, errorNotices, install, dow
 			<span className="block-directory-downloadable-blocks-notice-content">
 				{ copy }
 			</span>
-			<Button isSmall isPrimary isBusy={ isLoading } onClick={ callback }>
+			<Button isSmall isPrimary onClick={ () => {
+				callback( block );
+			} }>
 				{ __( 'Retry' ) }
 			</Button>
 		</Notice>
