@@ -146,25 +146,16 @@
 	outline-offset: 2px;
 }
 
-// Formatting Buttons.
-@mixin formatting-button-style__hover {
-	color: $dark-gray-500;
-	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
+
+/**
+ * Block Toolbar/Formatting Buttons
+ */
+
+@mixin block-toolbar-button-style__focus() {
+	box-shadow: inset 0 0 0 2px color($theme-color), inset 0 0 0 4px $white; // Inner halo makes this work on top of a toggled button.
+	outline: 2px solid transparent; // Shown to Windows 10 High Contrast Mode.
 }
 
-@mixin formatting-button-style__active() {
-	outline: none;
-	color: $white;
-	box-shadow: none;
-	background: $dark-gray-500;
-}
-
-@mixin formatting-button-style__focus() {
-	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-}
 
 // Tabs, Inputs, Square buttons.
 @mixin input-style__neutral() {

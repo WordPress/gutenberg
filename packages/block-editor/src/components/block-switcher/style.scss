@@ -3,10 +3,10 @@
 	height: $icon-button-size;
 }
 
+// Show an indicator triangle.
 .block-editor-block-switcher__toggle {
 	position: relative;
 
-	&::before,
 	&::after {
 		content: "";
 		position: absolute;
@@ -14,9 +14,6 @@
 		right: 0;
 		border-color: transparent;
 		border-style: solid;
-	}
-
-	&::before {
 		border-width: 5px;
 		border-right-color: $border-color;
 		border-bottom-color: $border-color;
@@ -61,16 +58,6 @@
 	width: auto;
 	padding: 0;
 
-	// Unset icon button styles.
-	&:active,
-	&:not(:disabled):not([aria-disabled="true"]):hover,
-	&:not([aria-disabled="true"]):focus {
-		outline: none;
-		box-shadow: none;
-		background: none;
-		border: none;
-	}
-
 	.block-editor-block-icon,
 	.block-editor-block-switcher__transform {
 		width: $icon-button-size;
@@ -84,10 +71,6 @@
 		@include reduce-motion("transition");
 	}
 
-	.block-editor-block-switcher__transform {
-		border-radius: $radius-round-rectangle;
-	}
-
 	// Block hover and focus style.
 	&[aria-expanded="true"] .block-editor-block-icon,
 	&[aria-expanded="true"] .block-editor-block-switcher__transform,
@@ -98,12 +81,14 @@
 		transform: translateY(-$icon-button-size);
 	}
 
-	// Block focus style.
-	&:not(:disabled):focus .block-editor-block-icon,
-	&:not(:disabled):focus .block-editor-block-switcher__transform {
-		@include formatting-button-style__focus();
+	// Position the focus style correctly.
+	&::before {
+		left: $grid-unit-10;
+		right: $grid-unit-10;
 	}
 }
+
+
 // We double the max-width for it to fit both the preview & content but we keep the min width the same for the border to work.
 .components-popover.block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;

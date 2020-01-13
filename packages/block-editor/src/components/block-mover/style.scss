@@ -26,14 +26,29 @@
 	}
 
 	// Position the icons correctly.
-	.block-editor-block-mover__control-up svg {
-		margin-bottom: -8px;
+	.block-editor-block-mover__control-up {
+		svg {
+			margin-bottom: -$grid-unit-10;
+		}
+
+		// Focus style.
+		&::before {
+			bottom: 0;
+		}
 	}
 
-	.block-editor-block-mover__control-down svg {
-		margin-top: -8px;
+	.block-editor-block-mover__control-down {
+		svg {
+			margin-top: -$grid-unit-10;
+		}
+
+		// Focus style.
+		&::before {
+			top: 0;
+		}
 	}
 
+	// Mover is horizontal.
 	&.is-horizontal {
 		.block-editor-block-mover__control {
 			height: $block-toolbar-height;
@@ -42,14 +57,36 @@
 		}
 
 		// Position the icons correctly.
-		.block-editor-block-mover__control-up svg {
-			margin-right: -8px;
-			margin-bottom: 0;
+		.block-editor-block-mover__control-up {
+			svg {
+				margin-right: -$grid-unit-10;
+				margin-bottom: 0;
+			}
+
+			// Focus style.
+			&::before {
+				top: $grid-unit-10;
+				bottom: $grid-unit-10;
+				left: $grid-unit-10;
+				right: 0;
+				min-width: 0;
+			}
 		}
 
-		.block-editor-block-mover__control-down svg {
-			margin-left: -8px;
-			margin-top: 0;
+		.block-editor-block-mover__control-down {
+			svg {
+				margin-left: -$grid-unit-10;
+				margin-top: 0;
+			}
+
+			// Focus style.
+			&::before {
+				top: $grid-unit-10;
+				bottom: $grid-unit-10;
+				left: 0;
+				right: $grid-unit-10;
+				min-width: 0;
+			}
 		}
 	}
 

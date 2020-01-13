@@ -63,19 +63,79 @@
 
 	// First and last buttons in a group have 12px outer padding, like 48px buttons.
 	.components-toolbar > div:first-child .components-button.has-icon:not(.has-text) {
-		padding-left: $grid-unit-15;
-		padding-right: 0;
+		padding-left: $grid-unit-15 - $border-width;
+		padding-right: $grid-unit-15 / 2;
 	}
 
 	.components-toolbar > div:last-child .components-button {
-		padding-left: 0;
-		padding-right: $grid-unit-15;
+		padding-left: $grid-unit-15 / 2;
+		padding-right: $grid-unit-15 - $border-width;
 	}
 
 	// Single buttons should remain 48px.
 	.components-toolbar > div:first-child:last-child > .components-button.has-icon:not(.has-text) {
 		padding-left: $grid-unit-15;
 		padding-right: $grid-unit-15;
+	}
+}
+
+// Special button styles.
+.block-editor-block-toolbar .components-button {
+	position: relative;
+
+	// Subscript for numbered icon buttons, like headings
+	&[data-subscript] svg {
+		padding: 5px 10px 5px 0;
+	}
+
+	&[data-subscript]::after {
+		content: attr(data-subscript);
+		font-family: $default-font;
+		font-size: $default-font-size;
+		font-weight: 600;
+		line-height: 12px;
+		position: absolute;
+		right: 8px;
+		bottom: 10px;
+	}
+
+	&:not(:disabled).is-pressed[data-subscript]::after {
+		color: $white;
+	}
+
+	// Don't show the focus inherited by the Button component.
+	&:focus:enabled {
+		box-shadow: none;
+		outline: none;
+	}
+
+	// Focus and toggle pseudo elements.
+	&::before {
+		content: "";
+		position: absolute;
+		top: $grid-unit-10;
+		bottom: $grid-unit-10;
+		min-width: $grid-unit-40;
+		display: block;
+		border-radius: $radius-block-ui;
+	}
+
+	svg {
+		position: relative;
+	}
+
+	// Toggled style.
+	&.is-pressed {
+		color: $white;
+
+		&::before {
+			background: $border-color;
+		}
+	}
+
+	// Focus style.
+	&:focus::before {
+		@include block-toolbar-button-style__focus();
 	}
 }
 
