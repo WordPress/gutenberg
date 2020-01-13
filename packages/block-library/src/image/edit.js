@@ -100,7 +100,7 @@ export class ImageEdit extends Component {
 		this.getFilename = this.getFilename.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 		this.onImageError = this.onImageError.bind( this );
-
+		this.updateMaxWidth = this.updateMaxWidth.bind( this );
 		// With the current implementation of ResizableBox, an image needs an explicit pixel value for the max-width.
 		// In absence of being able to set the content-width, this max-width is currently dictated by the vanilla editor style.
 		// The following variable adds a buffer to this vanilla style, so 3rd party themes have some wiggleroom.
@@ -137,6 +137,20 @@ export class ImageEdit extends Component {
 				} );
 			}
 		}
+
+		// Set updates for maxWidth once resizeRef is ready.
+		const someInterval = setInterval( () => {
+			if ( this.resizeRef.current ) {
+				this.updateMaxWidth();
+				window.addEventListener( 'resize', this.updateMaxWidth );
+				clearInterval( someInterval );
+			}
+		}, 100 );
+	}
+
+	componentWillUnmount() {
+		// Remove listener to update maxWidth on resize.
+		window.removeEventListener( 'resize', this.updateMaxWidth );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -159,7 +173,9 @@ export class ImageEdit extends Component {
 				captionFocused: false,
 			} );
 		}
+	}
 
+	updateMaxWidth() {
 		// Check resizeRef's block parents to set an accurate width restriction.
 		// This is used to limit the resizer from resizing the image beyond the block parent's width.
 		if ( this.resizeRef.current ) {

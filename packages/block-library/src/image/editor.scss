@@ -40,6 +40,14 @@
 	z-index: z-index(".block-library-image__resize-handlers");
 }
 
+// Ensures image ratio is respected on resizing viewport.
+.block-editor-block-list__block[data-type="core/image"]
+.wp-block-image
+.components-resizable-box__container
+img {
+	height: auto;
+}
+
 .block-editor-block-list__block[data-type="core/image"][data-align="center"] {
 	.wp-block-image {
 		margin-left: auto;
