@@ -139,11 +139,12 @@ export class ImageEdit extends Component {
 		}
 
 		// Set updates for maxWidth once resizeRef is ready.
-		const someInterval = setInterval( () => {
+		const waitForRef = setInterval( () => {
 			if ( this.resizeRef.current ) {
 				this.updateMaxWidth();
+				// Listener will update maxWidth on resize for fluid-width themes.
 				window.addEventListener( 'resize', this.updateMaxWidth );
-				clearInterval( someInterval );
+				clearInterval( waitForRef );
 			}
 		}, 100 );
 	}
@@ -175,6 +176,7 @@ export class ImageEdit extends Component {
 		}
 	}
 
+	// Required to set maxWidth based on block parent.
 	updateMaxWidth() {
 		// Check resizeRef's block parents to set an accurate width restriction.
 		// This is used to limit the resizer from resizing the image beyond the block parent's width.
