@@ -395,7 +395,20 @@
 	}
 
 	justify-content: center;
+}
 
+.block-editor-block-list__block-popover-inserter {
+	position: absolute;
+	top: -9999em;
+	margin-bottom: $block-padding;
+
+	&.is-visible {
+		position: static;
+	}
+}
+
+.block-editor-block-list__insertion-point-inserter,
+.block-editor-block-list__block-popover-inserter {
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
 		border-radius: 50%;
