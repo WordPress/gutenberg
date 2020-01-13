@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { uniqueId } from 'lodash';
+import { uniqueId, take } from 'lodash';
 
 export const fauxEntitySuggestions = [
 	{
@@ -34,27 +34,11 @@ export const fauxEntitySuggestions = [
 	},
 ];
 
-export const fauxInitialSuggestions = [
-	{
-		id: uniqueId(),
-		title: 'Suggested Page 1',
-		type: 'Page',
-		url: `?p=${ uniqueId() }`,
-	},
-	{
-		id: uniqueId(),
-		title: 'Suggested Page 2',
-		type: 'Page',
-		url: `?p=${ uniqueId() }`,
-	},
-	{
-		id: uniqueId(),
-		title: 'Suggested Page 3',
-		type: 'Page',
-		url: `?p=${ uniqueId() }`,
-	},
-];
-
-export const fetchFauxEntitySuggestions = () => {
-	return Promise.resolve( fauxEntitySuggestions );
+/* eslint-disable no-unused-vars */
+export const fetchFauxEntitySuggestions = ( val = '', {
+	perPage = null,
+} = {} ) => {
+	const suggestions = perPage ? take( fauxEntitySuggestions, perPage ) : fauxEntitySuggestions;
+	return Promise.resolve( suggestions );
 };
+/* eslint-enable no-unused-vars */

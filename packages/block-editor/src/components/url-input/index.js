@@ -45,7 +45,7 @@ class URLInput extends Component {
 
 	componentDidUpdate() {
 		const { showSuggestions, selectedSuggestion, suggestions } = this.state;
-		const { __experimentalInitialSuggestions = '', value } = this.props;
+		const { __experimentalShowInitialSuggestions = false, value } = this.props;
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
 		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
@@ -63,7 +63,7 @@ class URLInput extends Component {
 		// If there is no search text and no current suggestions
 		// then display the initial suggesitons if provided
 		// (being careful to avoid infinite re-render loop).
-		if ( __experimentalInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length ) ) {
+		if ( __experimentalShowInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length ) ) {
 			this.updateSuggestions( '', {
 				isManualSearch: true,
 			} );
@@ -71,8 +71,8 @@ class URLInput extends Component {
 	}
 
 	componentDidMount() {
-		const { __experimentalInitialSuggestions = '' } = this.props;
-		if ( __experimentalInitialSuggestions ) {
+		const { __experimentalShowInitialSuggestions = false } = this.props;
+		if ( __experimentalShowInitialSuggestions ) {
 			this.updateSuggestions( '', {
 				isManualSearch: true,
 			} );
@@ -95,15 +95,16 @@ class URLInput extends Component {
 		const {
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalHandleURLSuggestions: handleURLSuggestions,
-			__experimentalInitialSuggestions: initialSuggestions,
 		} = this.props;
 
-		if ( ! fetchLinkSuggestions || ( isManualSearch && ! initialSuggestions ) ) {
+		if ( ! fetchLinkSuggestions ) {
 			return;
 		}
 
-		// Show the suggestions after typing at least 2 characters
-		// and also for URLs
+		// Allow a suggestions request if:
+		// - there are at least 2 characters in the search input (except manual searches where
+		//   search input length is not required to trigger a fetch)
+		// - this is a direct entry (eg: a URL)
 		if ( ! isManualSearch && ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) ) {
 			this.setState( {
 				showSuggestions: false,
@@ -120,7 +121,9 @@ class URLInput extends Component {
 			loading: true,
 		} );
 
-		const request = isManualSearch ? initialSuggestions() : fetchLinkSuggestions( value );
+		const request = fetchLinkSuggestions( value, {
+			isInitialSuggestions: isManualSearch,
+		} );
 
 		request.then( ( suggestions ) => {
 			// A fetch Promise doesn't have an abort option. It's mimicked by
@@ -152,6 +155,8 @@ class URLInput extends Component {
 			}
 		} );
 
+		// Note that this assignment is handled *before* the async search request
+		// as a Promise always resolves on the next tick of the event loop.
 		this.suggestionsRequest = request;
 	}
 
@@ -260,12 +265,12 @@ class URLInput extends Component {
 		this.inputRef.current.focus();
 	}
 
-	static getDerivedStateFromProps( { value, disableSuggestions, __experimentalInitialSuggestions: manualSearch }, { showSuggestions } ) {
+	static getDerivedStateFromProps( { value, disableSuggestions, __experimentalShowInitialSuggestions = false }, { showSuggestions } ) {
 		let shouldShowSuggestions = showSuggestions;
 
 		const hasValue = value && value.length;
 
-		if ( ! manualSearch && ! hasValue ) {
+		if ( ! __experimentalShowInitialSuggestions && ! hasValue ) {
 			shouldShowSuggestions = false;
 		}
 

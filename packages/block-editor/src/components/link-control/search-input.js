@@ -69,7 +69,7 @@ const LinkControlSearchInput = ( {
 				__experimentalRenderSuggestions={ renderSuggestions }
 				__experimentalFetchLinkSuggestions={ fetchSuggestions }
 				__experimentalHandleURLSuggestions={ true }
-				__experimentalInitialSuggestions={ initialSuggestions }
+				__experimentalShowInitialSuggestions={ initialSuggestions }
 			/>
 
 			<Button

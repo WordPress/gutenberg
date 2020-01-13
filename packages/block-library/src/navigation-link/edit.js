@@ -44,8 +44,6 @@ function NavigationLinkEdit( {
 	isParentOfSelectedBlock,
 	setAttributes,
 	insertLinkBlock,
-	recentPages = [],
-	hasResolvedPages,
 } ) {
 	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
 	const link = {
@@ -171,17 +169,7 @@ function NavigationLinkEdit( {
 						<LinkControl
 							className="wp-block-navigation-link__inline-link-input"
 							value={ link }
-							initialSuggestions={ async () => {
-								if ( ! hasResolvedPages ) {
-									return [];
-								}
-								return recentPages.map( ( page ) => ( {
-									id: page.id,
-									url: page.link,
-									title: escape( page.title.raw ) || __( '(no title)' ),
-									type: 'Page',
-								} ) );
-							} }
+							initialSuggestions={ true }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -211,19 +199,10 @@ export default compose( [
 		const { getClientIdsOfDescendants, hasSelectedInnerBlock } = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 
-		const queryForRecentPages = {
-			order: 'desc',
-			orderby: 'modified',
-			per_page: 3,
-		};
-
-		const pagesSelect = [ 'core', 'getEntityRecords', [ 'postType', 'page', queryForRecentPages ] ];
-
 		return {
 			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
 			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
-			recentPages: select( 'core' ).getEntityRecords( 'postType', 'page', queryForRecentPages ),
-			hasResolvedPages: select( 'core/data' ).hasFinishedResolution( ...pagesSelect ),
+
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {

@@ -311,14 +311,14 @@ describe( 'Manual link entry', () => {
 
 describe( 'Default search suggestions', () => {
 	it( 'should display a list of initial search suggestions if provided', async () => {
-		const searchSuggestionsSpy = jest.fn();
-		const expectedResultsLength = fauxInitialSuggestions.length;
+		const searchSuggestionsSpy = jest.fn( fetchFauxEntitySuggestions );
+		const expectedResultsLength = 3; // set within `LinkControl`
 
 		act( () => {
 			render(
 				<LinkControl
 					fetchSearchSuggestions={ searchSuggestionsSpy }
-					initialSuggestions={ () => Promise.resolve( fauxInitialSuggestions ) }
+					initialSuggestions={ true }
 				/>, container
 			);
 		} );
@@ -331,8 +331,9 @@ describe( 'Default search suggestions', () => {
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		const initialSearchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
 
-		expect( searchSuggestionsSpy ).not.toHaveBeenCalled(); // verify no search has occured
-		expect( searchInput.value ).toBe( '' ); // verify no search has occured
+		// Verify input has no value has default suggestions should only show
+		// when this does not have a value
+		expect( searchInput.value ).toBe( '' );
 
 		// Verify the search results already display the initial suggestions
 		expect( initialSearchResultElements ).toHaveLength( expectedResultsLength );
