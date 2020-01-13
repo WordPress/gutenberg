@@ -90,6 +90,7 @@
 	transition: 0.1s background ease-in-out;
 	@include reduce-motion("transition");
 	height: auto;
+	line-height: 1;
 
 	&:focus:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__focus;

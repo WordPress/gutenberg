@@ -23,6 +23,7 @@
 	@include reduce-motion("transition");
 	position: relative;
 	height: auto;
+	line-height: 1;
 
 	&:disabled {
 		@include block-style__disabled();
