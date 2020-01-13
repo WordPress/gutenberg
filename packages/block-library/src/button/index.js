@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -33,9 +32,7 @@ export const settings = {
 		align: true,
 		alignWide: false,
 	},
-	// Currently, `Buttons` are not available on mobile, so `parent`
-	// needs to be temporarily dependent on platform.
-	parent: Platform.OS === 'web' ? [ 'core/buttons' ] : undefined,
+	parent: [ 'core/buttons' ],
 	styles: [
 		{ name: 'fill', label: __( 'Fill' ), isDefault: true },
 		{ name: 'outline', label: __( 'Outline' ) },
