@@ -4,11 +4,16 @@
 
 - Added a new `Guide` component which allows developers to easily present a user guide.
 
-### Breaking Change
+### Breaking Changes
 
 - `is-button` classname has been removed from the Button component.
 - The `is-default` classname is not applied automatically anymore.
 - By default Button components come with a fixed height and hover styles.
+
+### Bug Fixes
+
+- Fixes a regression published in version 8.5.0 that would prevent some build tools from including
+  styles provided in the packages build-styles directory.
 
 ### Deprecations
 
