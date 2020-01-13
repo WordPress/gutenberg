@@ -411,9 +411,9 @@ class RichTextWrapper extends Component {
 				start={ start }
 				reversed={ reversed }
 			>
-				{ ( { isSelected, value, onChange, Editable } ) =>
+				{ ( { isSelected, value, onChange, onFocus, Editable } ) =>
 					<>
-						{ children && children( { value, onChange } ) }
+						{ children && children( { value, onChange, onFocus } ) }
 						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorRef={ forwardedRef.current } /> ) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
