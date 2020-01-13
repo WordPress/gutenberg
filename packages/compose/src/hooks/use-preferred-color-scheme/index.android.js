@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { getPreferredColorScheme } from 'react-native-gutenberg-bridge';
-import { useState, useEffect } from 'react';
+import { subscribePreferredColorScheme, isInitialColorSchemeDark } from 'react-native-gutenberg-bridge';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Returns the color scheme value when it changes. Possible values: [ 'light', 'dark' ]
@@ -11,15 +11,16 @@ import { useState, useEffect } from 'react';
  */
 
 const usePreferredColorScheme = function() {
-	const [ currentMode, setCurrentMode ] = useState( 'light' );
+	const [ currentColorScheme, setCurrentColorScheme ] = useState( isInitialColorSchemeDark ? 'dark' : 'light' );
 	useEffect( () => {
-		getPreferredColorScheme( ( mode ) => {
-			if ( mode !== currentMode ) {
-				setCurrentMode( mode );
+		subscribePreferredColorScheme( ( { isPreferredColorSchemeDark } ) => {
+			const colorScheme = isPreferredColorSchemeDark ? 'dark' : 'light';
+			if ( colorScheme !== currentColorScheme ) {
+				setCurrentColorScheme( colorScheme );
 			}
 		} );
 	} );
-	return currentMode;
+	return currentColorScheme;
 };
 
 export default usePreferredColorScheme;
