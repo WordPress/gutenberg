@@ -43,14 +43,17 @@ export const code = {
 
 		return value;
 	},
-	edit( { value, onChange, isActive } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
+	edit( { value, onChange, onFocus, isActive } ) {
+		function onClick() {
+			onChange( toggleFormat( value, { type: name } ) );
+			onFocus();
+		}
 
 		return (
 			<RichTextToolbarButton
 				icon="editor-code"
 				title={ title }
-				onClick={ onToggle }
+				onClick={ onClick }
 				isActive={ isActive }
 			/>
 		);

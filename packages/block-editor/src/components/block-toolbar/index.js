@@ -14,23 +14,37 @@ import BlockSwitcher from '../block-switcher';
 import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockMover from '../block-mover';
 
-export default function BlockToolbar( { moverDirection, hasMovers = true } ) {
-	const { blockClientIds, isValid, mode } = useSelect( ( select ) => {
+export default function BlockToolbar( { hasMovers = true } ) {
+	const {
+		blockClientIds,
+		isValid,
+		mode,
+		moverDirection,
+	} = useSelect( ( select ) => {
 		const {
 			getBlockMode,
 			getSelectedBlockClientIds,
 			isBlockValid,
+			getBlockRootClientId,
+			getBlockListSettings,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const blockRootClientId = getBlockRootClientId( selectedBlockClientIds[ 0 ] );
+
+		const {
+			__experimentalMoverDirection,
+		} = getBlockListSettings( blockRootClientId ) || {};
 
 		return {
 			blockClientIds: selectedBlockClientIds,
+			rootClientId: blockRootClientId,
 			isValid: selectedBlockClientIds.length === 1 ?
 				isBlockValid( selectedBlockClientIds[ 0 ] ) :
 				null,
 			mode: selectedBlockClientIds.length === 1 ?
 				getBlockMode( selectedBlockClientIds[ 0 ] ) :
 				null,
+			moverDirection: __experimentalMoverDirection,
 		};
 	}, [] );
 

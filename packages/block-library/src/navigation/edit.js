@@ -77,8 +77,8 @@ function Navigation( {
 						type,
 						id,
 						url,
-						label: escape( title.rendered ),
-						title: escape( title.raw ),
+						label: ! title.rendered ? __( '(no title)' ) : escape( title.rendered ),
+						title: ! title.raw ? __( '(no title)' ) : escape( title.raw ),
 						opensInNewTab: false,
 					}
 				)
