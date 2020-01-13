@@ -14,9 +14,6 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 
-/**
- * Block code style
- */
 import styles from './style.scss';
 
 export function ShortcodeEdit( props ) {
