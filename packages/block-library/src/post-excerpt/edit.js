@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { useEntityProp, useEntityId } from '@wordpress/core-data';
-import { RichText } from '@wordpress/block-editor';
+import { PlainText } from '@wordpress/block-editor';
 
 function PostExcerptDisplay() {
-	const [ excerpt ] = useEntityProp( 'postType', 'post', 'excerpt' );
-	return <RichText.Content tagName="p" value={ excerpt } />;
+	const [ excerpt, setExcerpt ] = useEntityProp( 'postType', 'post', 'excerpt' );
+	return <PlainText value={ excerpt } onChange={ setExcerpt } />;
 }
 
 export default function PostExcerptEdit() {
