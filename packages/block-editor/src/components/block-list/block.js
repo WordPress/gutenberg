@@ -23,6 +23,7 @@ import {
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
 	withSelect,
@@ -103,8 +104,6 @@ function BlockListBlock( {
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
 	const onBlockError = () => setErrorState( true );
-
-	const blockType = getBlockType( name );
 
 	// Handing the focus of the block on creation and update
 
@@ -209,6 +208,13 @@ function BlockListBlock( {
 		}
 	};
 
+	// Rendering the output
+	const blockType = getBlockType( name );
+	// translators: %s: Type of block (i.e. Text, Image etc)
+	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
+	// The block as rendered in the editor is composed of general block UI
+	// (mover, toolbar, wrapper) and the display of the block content.
+
 	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 
 	// If the block is selected and we're typing the block should not appear.
@@ -284,6 +290,7 @@ function BlockListBlock( {
 			// Only allow selection to be started from a selected block.
 			onMouseLeave={ isSelected ? onMouseLeave : undefined }
 			tabIndex="0"
+			aria-label={ blockLabel }
 			role="group"
 			{ ...wrapperProps }
 			style={
@@ -331,7 +338,6 @@ const applyWithSelect = withSelect(
 			getSettings,
 			hasSelectedInnerBlock,
 			getTemplateLock,
-			getBlockIndex,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
 		} = select( 'core/block-editor' );
@@ -344,7 +350,6 @@ const applyWithSelect = withSelect(
 
 		// "ancestor" is the more appropriate label due to "deep" check
 		const isAncestorOfSelectedBlock = hasSelectedInnerBlock( clientId, checkDeep );
-		const index = getBlockIndex( clientId, rootClientId );
 
 		// The fallback to `{}` is a temporary fix.
 		// This function should never be called when a block is not present in the state.
@@ -370,7 +375,6 @@ const applyWithSelect = withSelect(
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			isNavigationMode: isNavigationMode(),
-			index,
 			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to access the block prop

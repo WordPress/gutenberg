@@ -22,7 +22,7 @@ const navigateToContentEditorTop = async () => {
 	await pressKeyWithModifier( 'ctrl', '`' );
 };
 
-const tabThroughParagraphBlock = async ( paragraphText, blockIndex ) => {
+const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Add block' );
 
@@ -30,7 +30,7 @@ const tabThroughParagraphBlock = async ( paragraphText, blockIndex ) => {
 	await tabThroughBlockToolbar();
 
 	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( `Paragraph Block. Row ${ blockIndex + 1 }. ${ paragraphText }` );
+	await expect( await getActiveLabel() ).toBe( 'Block: Paragraph' );
 
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
@@ -94,12 +94,12 @@ describe( 'Order of block keyboard navigation', () => {
 		await page.mouse.move( 10, 10 );
 
 		await navigateToContentEditorTop();
-		await tabThroughParagraphBlock( 'Paragraph 1', 1 );
+		await tabThroughParagraphBlock( 'Paragraph 1' );
 
 		// Repeat the same steps to ensure that there is no change introduced in how the focus is handled.
 		// This prevents the previous regression explained in: https://github.com/WordPress/gutenberg/issues/11773.
 		await navigateToContentEditorTop();
-		await tabThroughParagraphBlock( 'Paragraph 1', 1 );
+		await tabThroughParagraphBlock( 'Paragraph 1' );
 	} );
 
 	it( 'allows tabbing in navigation mode if no block is selected', async () => {
@@ -122,10 +122,10 @@ describe( 'Order of block keyboard navigation', () => {
 		} ) ).toBe( 'Add title' );
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph' );
+		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 1. 0' );
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph' );
+		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 2. 1' );
 
 		await page.keyboard.press( 'Tab' );
 		await expect( await getActiveLabel() ).toBe( 'Document (selected)' );
@@ -147,10 +147,10 @@ describe( 'Order of block keyboard navigation', () => {
 		} );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph' );
+		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 2. 1' );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph' );
+		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 1. 0' );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect( await page.evaluate( () => {
