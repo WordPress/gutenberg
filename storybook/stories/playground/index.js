@@ -61,7 +61,7 @@ function App() {
 }
 
 export default {
-	title: 'Playground|Block Editor',
+	title: 'Playground/Block Editor',
 };
 
 export const _default = () => {
