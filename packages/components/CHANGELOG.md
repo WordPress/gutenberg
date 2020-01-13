@@ -1,4 +1,4 @@
-## Master
+## 9.0.0 (2020-01-13)
 
 ### New Features
 
@@ -17,7 +17,7 @@
 
 ### Deprecations
 
-- `isDefault` prop in `Button` has been deprecated. Consider using `isSecondary` instead. 
+- `isDefault` prop in `Button` has been deprecated. Consider using `isSecondary` instead.
 - `IconButton` has been deprecated. Use the `Button` component instead.
 
 ## 8.2.0 (2019-08-29)
@@ -38,7 +38,7 @@
 
 ### Deprecations
 
-- `menuLabel` prop in `DropdownComponent` has been deprecated. Consider using `menuProps` object and its `aria-label` property instead. 
+- `menuLabel` prop in `DropdownComponent` has been deprecated. Consider using `menuProps` object and its `aria-label` property instead.
 - `position` prop in `DropdownComponent` has been deprecated. Consider using `popoverProps` object and its `position` property instead.
 
 ### Bug Fixes
@@ -101,7 +101,7 @@
 
 ### Improvements
 
-- Limit `Base Control Label` to the width of its content. 
+- Limit `Base Control Label` to the width of its content.
 
 ### Bug fixes
 
