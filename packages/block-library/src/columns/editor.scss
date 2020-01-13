@@ -9,6 +9,13 @@
 	}
 }
 
+// Ideally all block toolbars should be positioned the same.
+.components-popover.block-editor-block-list__block-popover
+.components-popover__content
+.block-editor-block-contextual-toolbar[data-type="core/column"] {
+	margin-left: 0;
+}
+
 .wp-block-columns {
 	display: block;
 
@@ -23,9 +30,8 @@
 		}
 		// Set full heights on Columns to enable vertical alignment preview
 		> [data-type="core/column"],
-		> [data-type="core/column"] > .block-editor-block-list__block-edit,
-		> [data-type="core/column"] > .block-editor-block-list__block-edit > div[data-block],
-		> [data-type="core/column"] > .block-editor-block-list__block-edit .block-core-columns {
+		> [data-type="core/column"] > div[data-block],
+		> [data-type="core/column"] .block-core-columns {
 			display: flex;
 			flex-direction: column;
 
@@ -81,33 +87,24 @@
 				}
 			}
 
-			> .block-editor-block-list__block-edit {
+			// Remove Block "padding" so individual Column is flush with parent Columns
+			&::before {
+				left: 0;
+				right: 0;
+			}
+
+			// Zero out margins.
+			> [data-block] {
 				margin-top: 0;
 				margin-bottom: 0;
+			}
 
-				// Remove Block "padding" so individual Column is flush with parent Columns
-				&::before {
-					left: 0;
-					right: 0;
-				}
-
-				> .block-editor-block-contextual-toolbar {
-					margin-left: -$border-width;
-				}
-
-				// Zero out margins.
-				> [data-block] {
-					margin-top: 0;
-					margin-bottom: 0;
-				}
-
-				// The Columns block is a flex-container, therefore it nullifies margin collapsing.
-				// Therefore, blocks inside this will appear to create a double margin.
-				// We compensate for this using negative margins.
-				> div > .block-core-columns > .block-editor-inner-blocks {
-					margin-top: -$default-block-margin;
-					margin-bottom: -$default-block-margin;
-				}
+			// The Columns block is a flex-container, therefore it nullifies margin collapsing.
+			// Therefore, blocks inside this will appear to create a double margin.
+			// We compensate for this using negative margins.
+			> div > .block-core-columns > .block-editor-inner-blocks {
+				margin-top: -$default-block-margin;
+				margin-bottom: -$default-block-margin;
 			}
 		}
 	}
@@ -152,7 +149,7 @@ div.block-core-columns.is-vertically-aligned-bottom {
 /**
  * Fixes single Column breadcrumb position.
  */
-[data-type="core/column"] > .block-editor-block-list__block-edit > .editor-block-list__breadcrumb {
+[data-type="core/column"] > .editor-block-list__breadcrumb {
 	left: -$block-left-border-width;
 }
 

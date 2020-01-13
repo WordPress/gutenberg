@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG, TextControl, Popover, IconButton } from '@wordpress/components';
+import { Path, SVG, TextControl, Popover, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { insertObject } from '@wordpress/rich-text';
@@ -154,7 +154,7 @@ export const image = {
 									min={ 1 }
 									onChange={ this.onChange }
 								/>
-								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+								<Button icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 							</form>
 							{ /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */ }
 						</Popover>

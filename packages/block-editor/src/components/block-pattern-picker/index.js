@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, IconButton, Placeholder } from '@wordpress/components';
+import { Button, Placeholder } from '@wordpress/components';
 
 function BlockPatternPicker( {
 	icon = 'layout',
@@ -38,10 +38,10 @@ function BlockPatternPicker( {
 			<ul className="block-editor-block-pattern-picker__patterns" role="list">
 				{ patterns.map( ( pattern ) => (
 					<li key={ pattern.name }>
-						<IconButton
+						<Button
 							isSecondary
 							icon={ pattern.icon }
-							size={ 48 }
+							iconSize={ 48 }
 							onClick={ () => onSelect( pattern ) }
 							className="block-editor-block-pattern-picker__pattern"
 							label={ pattern.label }

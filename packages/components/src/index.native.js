@@ -8,7 +8,7 @@ export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as Icon } from './icon';
-export { default as IconButton } from './icon-button';
+export { default as IconButton } from './button/deprecated';
 export { default as Spinner } from './spinner';
 export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 export { default as BaseControl } from './base-control';

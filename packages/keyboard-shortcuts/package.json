@@ -1,0 +1,35 @@
+{
+	"name": "@wordpress/keyboard-shortcuts",
+	"version": "0.1.0",
+	"description": "Handling keyboard shortcuts.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"keycodes"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/keyboard-shortcuts/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/keycodes"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.4.4",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/keycodes": "file:../keycodes",
+		"lodash": "^4.17.15",
+		"rememo": "^3.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

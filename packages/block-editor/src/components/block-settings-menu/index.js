@@ -13,11 +13,11 @@ import {
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { shortcuts } from '../block-editor-keyboard-shortcuts';
 import BlockActions from '../block-actions';
 import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
@@ -34,6 +34,16 @@ export function BlockSettingsMenu( { clientIds } ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
+
+	const shortcuts = useSelect( ( select ) => {
+		const { getShortcutRepresentation } = select( 'core/keyboard-shortcuts' );
+		return {
+			duplicate: getShortcutRepresentation( 'core/block-editor/duplicate' ),
+			remove: getShortcutRepresentation( 'core/block-editor/remove' ),
+			insertAfter: getShortcutRepresentation( 'core/block-editor/insert-after' ),
+			insertBefore: getShortcutRepresentation( 'core/block-editor/insert-before' ),
+		};
+	}, [] );
 
 	return (
 		<BlockActions clientIds={ clientIds }>
@@ -74,7 +84,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											className="block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onDuplicate ) }
 											icon="admin-page"
-											shortcut={ shortcuts.duplicate.display }
+											shortcut={ shortcuts.duplicate }
 										>
 											{ __( 'Duplicate' ) }
 										</MenuItem>
@@ -85,7 +95,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 												className="block-editor-block-settings-menu__control"
 												onClick={ flow( onClose, onInsertBefore ) }
 												icon="insert-before"
-												shortcut={ shortcuts.insertBefore.display }
+												shortcut={ shortcuts.insertBefore }
 											>
 												{ __( 'Insert Before' ) }
 											</MenuItem>
@@ -93,7 +103,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 												className="block-editor-block-settings-menu__control"
 												onClick={ flow( onClose, onInsertAfter ) }
 												icon="insert-after"
-												shortcut={ shortcuts.insertAfter.display }
+												shortcut={ shortcuts.insertAfter }
 											>
 												{ __( 'Insert After' ) }
 											</MenuItem>
@@ -115,7 +125,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											className="block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onRemove ) }
 											icon="trash"
-											shortcut={ shortcuts.removeBlock.display }
+											shortcut={ shortcuts.remove }
 										>
 											{ _n( 'Remove Block', 'Remove Blocks', count ) }
 										</MenuItem>

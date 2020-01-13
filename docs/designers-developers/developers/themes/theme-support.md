@@ -176,7 +176,7 @@ add_theme_support(
 
 ### Block Font Sizes:
 
-Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. The block  provides a default set of font sizes, but a theme can overwrite it and provide its own:
+Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. The block provides a default set of font sizes, but a theme can overwrite it and provide its own:
 
 ```php
 add_theme_support( 'editor-font-sizes', array(
@@ -186,9 +186,9 @@ add_theme_support( 'editor-font-sizes', array(
 		'slug' => 'small'
 	),
 	array(
-		'name' => __( 'Normal', 'themeLangDomain' ),
+		'name' => __( 'Regular', 'themeLangDomain' ),
 		'size' => 16,
-		'slug' => 'normal'
+		'slug' => 'regular'
 	),
 	array(
 		'name' => __( 'Large', 'themeLangDomain' ),
@@ -215,6 +215,8 @@ As an example for the regular font size, a theme may provide the following class
 	font-size: 16px;
 }
 ```
+
+**Note:** The slugs `default` and `custom` are reserved and cannot be used by themes.
 
 ### Disabling custom font sizes
 

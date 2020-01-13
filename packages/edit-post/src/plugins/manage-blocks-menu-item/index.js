@@ -12,7 +12,7 @@ export function ManageBlocksMenuItem( { openModal } ) {
 				openModal( 'edit-post/manage-blocks' );
 			} }
 		>
-			{ __( 'Block manager' ) }
+			{ __( 'Block Manager' ) }
 		</MenuItem>
 	);
 }

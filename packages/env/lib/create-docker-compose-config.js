@@ -31,7 +31,7 @@ services:
     depends_on:
       - mysql
     environment:
-      WORDPRESS_DEBUG: 1cq
+      WORDPRESS_DEBUG: 1
       WORDPRESS_DB_NAME: wordpress
       WORDPRESS_DB_PASSWORD: password
     image: wordpress
@@ -47,7 +47,7 @@ services:
     depends_on:
       - mysql
     environment:
-      WORDPRESS_DEBUG: 1cq
+      WORDPRESS_DEBUG: 1
       WORDPRESS_DB_NAME: tests-wordpress
       WORDPRESS_DB_PASSWORD: password
     image: wordpress

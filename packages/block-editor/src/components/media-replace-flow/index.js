@@ -174,13 +174,13 @@ const MediaReplaceFlow = (
 								} }
 							/>
 						</MediaUploadCheck>
-						<MenuItem
+						{ onSelectURL && <MenuItem
 							icon="admin-links"
 							onClick={ () => ( setShowURLInput( ! showURLInput ) ) }
 							aria-expanded={ showURLInput }
 						>
 							<div> { __( 'Insert from URL' ) } </div>
-						</MenuItem>
+						</MenuItem> }
 					</NavigableMenu>
 					{ showURLInput && <div className="block-editor-media-flow__url-input">
 						{ urlInputUIContent }

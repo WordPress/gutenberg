@@ -13,6 +13,7 @@
 ### Deprecations
 
 - `isDefault` prop in `Button` has been deprecated. Consider using `isSecondary` instead. 
+- `IconButton` has been deprecated. Use the `Button` component instead.
 
 ## 8.2.0 (2019-08-29)
 
