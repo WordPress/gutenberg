@@ -10,17 +10,18 @@ import { navigateRegions, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSimulatedMediaQuery } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 // const styleStorage = {};
 
 function EditorRegions( { footer, header, sidebar, content, publish, className } ) {
 	const [ simulatedWidth, updateSimulatedWidth ] = useState( window.innerWidth );
 
-	useSimulatedMediaQuery( [
-		'block-library',
-		'editor-style',
-		'block-editor',
-	], simulatedWidth );
+	const resizableStylesheets = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getSettings().resizableStylesheets;
+	}, [] );
+
+	useSimulatedMediaQuery( resizableStylesheets, simulatedWidth );
 
 	return (
 		<div className={ classnames( className, 'edit-post-editor-regions' ) }>
