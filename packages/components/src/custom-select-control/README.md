@@ -84,6 +84,12 @@ Used to visually hide the label. It will always be visible to screen readers.
 - Type: `Boolean`
 - Required: No
 
+#### isSmall
+
+Renders the Select in a smaller size.
+- Type: `Boolean`
+- Required: No
+
 #### label
 
 The label for the control.
@@ -100,12 +106,6 @@ The options that can be chosen from.
 
 Function called with the control's internal state changes. The `selectedItem` property contains the next selected item.
 - Type: `Function`
-- Required: No
-
-#### selectButtonProps
-
-Props to pass to the internally rendered `Button` component.
-- Type: `Object`
 - Required: No
 
 #### value

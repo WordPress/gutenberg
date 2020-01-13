@@ -55,7 +55,7 @@ export default function CustomSelectControl( {
 	label,
 	options: items,
 	onChange: onSelectedItemChange,
-	selectButtonProps = {},
+	isSmall = true,
 	value: _selectedItem,
 } ) {
 	const {
@@ -101,11 +101,11 @@ export default function CustomSelectControl( {
 			</label>
 			<Button
 				{ ...getToggleButtonProps( {
-					...selectButtonProps,
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
 					'aria-label': label,
 					'aria-labelledby': undefined,
-					className: classnames( 'components-custom-select-control__button', selectButtonProps.className ),
+					className: 'components-custom-select-control__button',
+					isSmall,
 				} ) }
 			>
 				{ itemToString( selectedItem ) }
