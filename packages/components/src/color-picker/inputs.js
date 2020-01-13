@@ -286,8 +286,9 @@ export class Inputs extends Component {
 		return (
 			<div className="components-color-picker__inputs-wrapper">
 				{ this.renderFields() }
-				<div className="components-color-picker__inputs-toggle">
+				<div className="components-color-picker__inputs-toggle-wrapper">
 					<PureButton
+						className="components-color-picker__inputs-toggle"
 						icon="arrow-down-alt2"
 						label={ __( 'Change color format' ) }
 						onClick={ this.toggleViews }
