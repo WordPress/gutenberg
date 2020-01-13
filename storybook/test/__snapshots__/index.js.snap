@@ -563,7 +563,7 @@ exports[`Storyshots Components/Button Disabled 1`] = `
 </button>
 `;
 
-exports[`Storyshots Components|Button Disabled Focusable 1`] = `
+exports[`Storyshots Components/Button Disabled Focusable 1`] = `
 <button
   aria-disabled={true}
   className="components-button"
@@ -576,7 +576,7 @@ exports[`Storyshots Components|Button Disabled Focusable 1`] = `
 </button>
 `;
 
-exports[`Storyshots Components|Button Disabled Focusable Icon 1`] = `
+exports[`Storyshots Components/Button Disabled Focusable Icon 1`] = `
 <button
   aria-disabled={true}
   aria-label="More"
