@@ -308,7 +308,7 @@ function CoverEdit( {
 					<MediaReplaceFlow
 						mediaURL={ url }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*"
+						accept="image/*,video/*"
 						onSelect={ onSelectMedia }
 					/>
 				) }
