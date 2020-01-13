@@ -20,7 +20,9 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"sideEffects": false,
+	"sideEffects": [
+		"build-style/**"
+	],
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"@emotion/core": "^10.0.22",
