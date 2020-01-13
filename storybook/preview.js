@@ -19,6 +19,7 @@ import './style.scss';
 
 addDecorator( withA11y );
 addDecorator( withKnobs );
+
 configure(
 	[
 		// StoryShots addon doesn't support MDX files at the moment.
