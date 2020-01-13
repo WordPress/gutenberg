@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 const pkg = require( './package.json' );
 
 function babelPlugin( { types: t } ) {
