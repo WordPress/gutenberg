@@ -11,7 +11,7 @@ import { dropRight, times } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
-	RangeControl,
+	StepperControl,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -86,13 +86,14 @@ function ColumnsEditContainer( {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Columns Settings' ) }>
-					<RangeControl
+					<StepperControl
 						label={ __( 'Number of columns' ) }
+						icon="columns"
 						value={ count }
 						defaultValue={ DEFAULT_COLUMNS }
-						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 2 }
-						max={ 6 }
+						onChangeValue={ ( value ) => updateColumns( count, value ) }
+						minValue={ 2 }
+						maxValue={ 6 }
 					/>
 				</PanelBody>
 			</InspectorControls>
