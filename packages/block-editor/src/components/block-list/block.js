@@ -21,7 +21,6 @@ import {
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
-	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import {
@@ -45,36 +44,9 @@ import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context } from './root-container';
 
-/**
- * A debounced version of getAccessibleBlockLabel, avoids unnecessary updates to the aria-label attribute
- * when typing in some blocks, like the paragraph.
- *
- * @param {Object} blockType      The block type object representing the block's definition.
- * @param {Object} attributes     The block's attribute values.
- * @param {number} index          The index of the block in the block list.
- * @param {string} moverDirection A string representing whether the movers are displayed vertically or horizontally.
- * @param {number} delay          The debounce delay.
- */
-const useDebouncedAccessibleBlockLabel = ( blockType, attributes, index, moverDirection, delay ) => {
-	const [ blockLabel, setBlockLabel ] = useState( '' );
-
-	useEffect( () => {
-		const timeoutId = setTimeout( () => {
-			setBlockLabel( getAccessibleBlockLabel( blockType, attributes, index + 1, moverDirection ) );
-		}, delay );
-
-		return () => {
-			clearTimeout( timeoutId );
-		};
-	}, [ blockType, attributes, index, moverDirection, delay ] );
-
-	return blockLabel;
-};
-
 function BlockListBlock( {
 	mode,
 	isFocusMode,
-	moverDirection,
 	isLocked,
 	clientId,
 	isSelected,
@@ -87,7 +59,6 @@ function BlockListBlock( {
 	isSelectionEnabled,
 	className,
 	name,
-	index,
 	isValid,
 	attributes,
 	initialPosition,
@@ -134,7 +105,6 @@ function BlockListBlock( {
 	const onBlockError = () => setErrorState( true );
 
 	const blockType = getBlockType( name );
-	const blockAriaLabel = useDebouncedAccessibleBlockLabel( blockType, attributes, index, moverDirection, 400 );
 
 	// Handing the focus of the block on creation and update
 
@@ -314,7 +284,6 @@ function BlockListBlock( {
 			// Only allow selection to be started from a selected block.
 			onMouseLeave={ isSelected ? onMouseLeave : undefined }
 			tabIndex="0"
-			aria-label={ blockAriaLabel }
 			role="group"
 			{ ...wrapperProps }
 			style={
