@@ -22,7 +22,6 @@ function DownloadableBlockListItem( {
 		humanizedUpdated,
 		authorBlockCount,
 		authorBlockRating,
-
 	} = item;
 
 	return (
