@@ -677,17 +677,17 @@ export class ImageEdit extends Component {
 											delta
 										) => {
 											onResizeStop();
-											setAttributes( {
-												width: parseInt(
-													currentWidth + delta.width,
-													10
-												),
-												height: parseInt(
-													currentHeight +
-														delta.height,
-													10
-												),
-											} );
+											if ( currentWidth > maxWidth ) {
+												setAttributes( {
+													width: parseInt( maxWidth + delta.width, 10 ),
+													height: parseInt( ( maxWidth / ratio ) + delta.height, 10 ),
+												} );
+											} else {
+												setAttributes( {
+													width: parseInt( currentWidth + delta.width, 10 ),
+													height: parseInt( currentHeight + delta.height, 10 ),
+												} );
+											}
 										} }
 									>
 										{ img }
