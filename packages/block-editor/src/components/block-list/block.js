@@ -105,6 +105,10 @@ function BlockListBlock( {
 	const [ hasError, setErrorState ] = useState( false );
 	const onBlockError = () => setErrorState( true );
 
+	const blockType = getBlockType( name );
+	// translators: %s: Type of block (i.e. Text, Image etc)
+	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
+
 	// Handing the focus of the block on creation and update
 
 	/**
@@ -207,13 +211,6 @@ function BlockListBlock( {
 			onSelectionStart( clientId );
 		}
 	};
-
-	// Rendering the output
-	const blockType = getBlockType( name );
-	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
-	// The block as rendered in the editor is composed of general block UI
-	// (mover, toolbar, wrapper) and the display of the block content.
 
 	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 
