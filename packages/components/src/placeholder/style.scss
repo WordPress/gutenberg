@@ -15,9 +15,10 @@
 	}
 
 	// Block UI appearance.
-	border: $border-width solid $border-color;
+	box-shadow: 0 0 0 $border-width $border-color;
 	border-radius: $radius-block-ui;
 	background-color: $white;
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 
 	.components-base-control__label {
 		font-size: $default-font-size;
