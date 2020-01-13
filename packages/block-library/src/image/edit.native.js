@@ -27,7 +27,7 @@ import {
 } from '@wordpress/components';
 
 import {
-	Caption,
+	BlockCaption,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
@@ -450,7 +450,7 @@ export class ImageEdit extends React.Component {
 							);
 						} }
 					/>
-					<Caption
+					<BlockCaption
 						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }
 						accessible={ true }
