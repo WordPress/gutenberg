@@ -31,19 +31,11 @@
 		width: 30px;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
-		box-shadow: none;
-
-		> svg {
-			@include formatting-button-style__hover;
-		}
-	}
-
 	&:not(:disabled):focus {
 		box-shadow: none;
 
 		> svg {
-			@include formatting-button-style__focus;
+			@include block-toolbar-button-style__focus();
 		}
 	}
 }

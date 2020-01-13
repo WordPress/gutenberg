@@ -22,7 +22,7 @@
 	}
 
 	&:focus:enabled {
-		box-shadow: 0 0 0 1px color($theme-color);
+		box-shadow: 0 0 0 2px color($theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 1px solid transparent;
