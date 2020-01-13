@@ -21,9 +21,8 @@ function render_block_core_shortcode( $attributes, $content ) {
  * Registers the `core/shortcode` block on server.
  */
 function register_block_core_shortcode() {
-	$path     = gutenberg_dir_path() . 'packages/block-library/src/shortcode/block.json';
+	$path     = __DIR__ . '/shortcode.json';
 	$metadata = json_decode( file_get_contents( $path ), true );
-
 	register_block_type(
 		'core/shortcode',
 		array(

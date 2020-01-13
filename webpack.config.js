@@ -149,6 +149,13 @@ module.exports = {
 				},
 			},
 		] ),
+		new CopyWebpackPlugin( [
+			{
+				from: './packages/block-library/src/+(shortcode)/block.json',
+				test: new RegExp( `([\\w-]+)${ escapeRegExp( sep ) }block\\.json$` ),
+				to: 'build/block-library/blocks/[1].json',
+			},
+		] ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	],
 	devtool,
