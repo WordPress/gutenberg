@@ -1344,7 +1344,7 @@ export function automaticChangeStatus( state, action ) {
 			return;
 		// Undoing an automatic change should still be possible after mouse
 		// move.
-		case 'SET_SELECTED_BLOCK_NODE':
+		case 'SET_SELECTED_MOUNTED_BLOCK':
 		case 'STOP_TYPING':
 			return state;
 	}
@@ -1353,7 +1353,7 @@ export function automaticChangeStatus( state, action ) {
 }
 
 /**
- * Reducer returning selected block's DOM node. This state is useful for
+ * Reducer returning selected and mounted block. This state is useful for
  * components rendering and positioning controls around the block's node.
  *
  * @param {boolean} state  Current state.
@@ -1361,10 +1361,10 @@ export function automaticChangeStatus( state, action ) {
  *
  * @return {boolean} Updated state.
  */
-export function selectedBlockNode( state, action ) {
+export function selectedMountedBlock( state, action ) {
 	switch ( action.type ) {
-		case 'SET_SELECTED_BLOCK_NODE':
-			return action.node;
+		case 'SET_SELECTED_MOUNTED_BLOCK':
+			return action.clientId;
 	}
 
 	return state;
@@ -1389,5 +1389,5 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	isNavigationMode,
 	automaticChangeStatus,
-	selectedBlockNode,
+	selectedMountedBlock,
 } );

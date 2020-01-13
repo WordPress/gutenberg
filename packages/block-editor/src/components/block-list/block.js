@@ -114,7 +114,7 @@ function BlockListBlock( {
 		};
 	}, [] );
 	const {
-		__unstableSetSelectedBlockNode,
+		__unstableSetSelectedMountedBlock,
 	} = useDispatch( 'core/block-editor' );
 
 	// Reference of the wrapper
@@ -122,7 +122,7 @@ function BlockListBlock( {
 
 	useLayoutEffect( () => {
 		if ( isSelected || isFirstMultiSelected ) {
-			__unstableSetSelectedBlockNode( wrapper.current );
+			__unstableSetSelectedMountedBlock( clientId );
 		}
 	}, [ isSelected, isFirstMultiSelected ] );
 

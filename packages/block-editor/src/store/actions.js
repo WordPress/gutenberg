@@ -923,13 +923,13 @@ export function * insertAfterBlock( clientId ) {
 }
 
 /**
- * Sets the mounted DOM node of the selected block.
+ * Sets the client ID for the mounted and selected block.
  *
- * @param {Element} node     The block's DOM node.
+ * @param {Element} clientId The block's client ID.
  */
-export function __unstableSetSelectedBlockNode( node ) {
+export function __unstableSetSelectedMountedBlock( clientId ) {
 	return {
-		type: 'SET_SELECTED_BLOCK_NODE',
-		node,
+		type: 'SET_SELECTED_MOUNTED_BLOCK',
+		clientId,
 	};
 }

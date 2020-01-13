@@ -1534,6 +1534,6 @@ export function didAutomaticChange( state ) {
  *
  * @return {Element} The selected block's DOM node.
  */
-export function __unstableGetSelectedBlockNode( state ) {
-	return state.selectedBlockNode;
+export function __unstableGetSelectedMountedBlock( state ) {
+	return state.selectedMountedBlock;
 }

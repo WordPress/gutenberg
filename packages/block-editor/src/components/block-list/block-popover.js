@@ -42,7 +42,6 @@ function selector( select ) {
 function BlockPopover( {
 	clientId,
 	rootClientId,
-	node,
 	name,
 	align,
 	isValid,
@@ -92,8 +91,10 @@ function BlockPopover( {
 		return null;
 	}
 
-	if ( capturingClientId ) {
-		node = document.getElementById( 'block-' + capturingClientId );
+	const node = document.getElementById( 'block-' + capturingClientId );
+
+	if ( ! node ) {
+		return null;
 	}
 
 	// Position above the anchor, pop out towards the right, and position in the
@@ -152,7 +153,7 @@ function wrapperSelector( select ) {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getBlockRootClientId,
-		__unstableGetSelectedBlockNode,
+		__unstableGetSelectedMountedBlock,
 		__unstableGetBlockWithoutInnerBlocks,
 		getBlockParents,
 		getBlockListSettings,
@@ -160,6 +161,11 @@ function wrapperSelector( select ) {
 	} = select( 'core/block-editor' );
 
 	const clientId = getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
+
+	if ( ! clientId ) {
+		return;
+	}
+
 	const rootClientId = getBlockRootClientId( clientId );
 	const { name, attributes = {}, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
@@ -172,7 +178,7 @@ function wrapperSelector( select ) {
 	// This will be the top most ancestor because getBlockParents() returns tree from top -> bottom
 	const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [ '__experimentalCaptureToolbars', true ] );
 
-	let capturingClientId;
+	let capturingClientId = clientId;
 
 	if ( topmostAncestorWithCaptureDescendantsToolbarsIndex !== -1 ) {
 		capturingClientId = blockParentsClientIds[ topmostAncestorWithCaptureDescendantsToolbarsIndex ];
@@ -181,7 +187,7 @@ function wrapperSelector( select ) {
 	return {
 		clientId,
 		rootClientId: getBlockRootClientId( clientId ),
-		node: __unstableGetSelectedBlockNode(),
+		isMounted: __unstableGetSelectedMountedBlock() === clientId,
 		name,
 		align: attributes.align,
 		isValid,
@@ -192,19 +198,25 @@ function wrapperSelector( select ) {
 }
 
 export default function WrappedBlockPopover() {
+	const selected = useSelect( wrapperSelector, [] );
+
+	if ( ! selected ) {
+		return null;
+	}
+
 	const {
 		clientId,
 		rootClientId,
-		node,
+		isMounted,
 		name,
 		align,
 		isValid,
 		moverDirection,
 		isEmptyDefaultBlock,
 		capturingClientId,
-	} = useSelect( wrapperSelector, [] );
+	} = selected;
 
-	if ( ! name || ! node || node.id !== 'block-' + clientId ) {
+	if ( ! name || ! isMounted ) {
 		return null;
 	}
 
@@ -212,7 +224,6 @@ export default function WrappedBlockPopover() {
 		<BlockPopover
 			clientId={ clientId }
 			rootClientId={ rootClientId }
-			node={ node }
 			name={ name }
 			align={ align }
 			isValid={ isValid }
