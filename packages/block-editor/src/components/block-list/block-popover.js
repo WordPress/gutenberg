@@ -129,6 +129,9 @@ function BlockPopover( {
 			__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && node }
 			__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && node }
 			onBlur={ () => setIsToolbarForced( false ) }
+			// Popover calculates the width once. Trigger a reset by remounting
+			// the component.
+			key={ shouldShowContextualToolbar }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
