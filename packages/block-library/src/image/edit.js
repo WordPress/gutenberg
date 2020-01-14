@@ -677,6 +677,8 @@ export class ImageEdit extends Component {
 											delta
 										) => {
 											onResizeStop();
+											// Images saved with width (currentWidth) larger than the width of their parent block (maxWidth),
+											// will resize with poor behavior if we do not resize based on maxWidth in that circumstance.
 											if ( currentWidth > maxWidth ) {
 												setAttributes( {
 													width: parseInt( maxWidth + delta.width, 10 ),
