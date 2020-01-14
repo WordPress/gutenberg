@@ -52,7 +52,7 @@ describe( 'Formatter', () => {
 			lineEnd: 9,
 		} ], 'API docs' );
 		expect( docs ).toBe(
-			'# API docs\n\n<a name="default" href="#default">#</a> **default**\n\nFunction invoking callback after delay with current timestamp in milliseconds\nsince epoch.\n\n*Parameters*\n\n- *callback*: Callback function.\n'
+			'# API docs\n\n<a name="default" href="#default">#</a> **default**\n\nFunction invoking callback after delay with current timestamp in milliseconds\nsince epoch.\n\n*Parameters*\n\n- *callback* (unknown type): Callback function.\n'
 		);
 	} );
 } );
