@@ -130,6 +130,6 @@ html {
 .edit-post-editor-regions__publish {
 	z-index: z-index(".edit-post-editor-regions__publish");
 	position: absolute !important; // Need to override the default relative positionning
-	top: 10px;
+	top: $grid-size;
 	right: $grid-size;
 }
