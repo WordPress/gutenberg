@@ -7,8 +7,8 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component, renderToString } from '@wordpress/element';
-import { Button, Path, SVG } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { Button, Dropdown, MenuGroup, MenuItem, Path, SVG } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
@@ -175,7 +175,7 @@ export class PostPreviewButton extends Component {
 	}
 
 	render() {
-		const { previewLink, currentPostLink, isSaveable } = this.props;
+		const { previewLink, currentPostLink, isSaveable, toggleCanvas } = this.props;
 
 		// Link to the `?preview=true` URL if we have it, since this lets us see
 		// changes that were autosaved since the post was last published. Otherwise,
@@ -183,20 +183,52 @@ export class PostPreviewButton extends Component {
 		const href = previewLink || currentPostLink;
 
 		return (
-			<Button
-				isSecondary
-				className="editor-post-preview"
-				href={ href }
-				target={ this.getWindowTarget() }
-				disabled={ ! isSaveable }
-				onClick={ this.openPreviewWindow }
-			>
-				{ _x( 'Preview', 'imperative verb' ) }
-				<span className="screen-reader-text">
-					{ /* translators: accessibility text */
-					__( '(opens in a new tab)' ) }
-				</span>
-			</Button>
+			<Dropdown
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
+						{ this.props.deviceType }
+					</Button>
+				) }
+				renderContent={ () => (
+					<>
+						<MenuGroup>
+							<MenuItem
+								onClick={ () => toggleCanvas( 'Desktop' ) }
+							>
+								{ __( 'Desktop' ) }
+							</MenuItem>
+							<MenuItem
+								onClick={ () => toggleCanvas( 'Tablet' ) }
+							>
+								{ __( 'Tablet' ) }
+							</MenuItem>
+							<MenuItem
+								onClick={ () => toggleCanvas( 'Mobile' ) }
+							>
+								{ __( 'Mobile' ) }
+							</MenuItem>
+						</MenuGroup>
+						<MenuGroup>
+							<Button
+								className="editor-post-preview"
+								href={ href }
+								target={ this.getWindowTarget() }
+								disabled={ ! isSaveable }
+								onClick={ this.openPreviewWindow }
+							>
+								{ __( 'Preview externally' ) }
+								<span className="screen-reader-text">
+									{
+										/* translators: accessibility text */
+										__( '(opens in a new tab)' )
+									}
+								</span>
+							</Button>
+						</MenuGroup>
+					</>
+				) }
+			/>
+
 		);
 	}
 }
@@ -211,7 +243,12 @@ export default compose( [
 			isEditedPostAutosaveable,
 			getEditedPostPreviewLink,
 		} = select( 'core/editor' );
-		const { getPostType } = select( 'core' );
+		const {
+			getPostType,
+		} = select( 'core' );
+		const {
+			deviceType,
+		} = select( 'core/block-editor' );
 
 		const previewLink = getEditedPostPreviewLink();
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
@@ -224,15 +261,20 @@ export default compose( [
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
-			isDraft:
-				[ 'draft', 'auto-draft' ].indexOf(
-					getEditedPostAttribute( 'status' )
-				) !== -1,
+			isDraft: [ 'draft', 'auto-draft' ].indexOf( getEditedPostAttribute( 'status' ) ) !== -1,
+			deviceType: deviceType(),
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		autosave: dispatch( 'core/editor' ).autosave,
-		savePost: dispatch( 'core/editor' ).savePost,
-	} ) ),
+	withDispatch( ( dispatch ) => {
+		const { toggleCanvasWidth } = dispatch( 'core/block-editor' );
+		return {
+			autosave: dispatch( 'core/editor' ).autosave,
+			savePost: dispatch( 'core/editor' ).savePost,
+			toggleCanvas( deviceType ) {
+				dispatch( toggleCanvasWidth( deviceType ) );
+			},
+		};
+	}
+	),
 	ifCondition( ( { isViewable } ) => isViewable ),
 ] )( PostPreviewButton );

@@ -800,6 +800,20 @@ export function updateSettings( settings ) {
 }
 
 /**
+ * Returns an action object used to toggle the width of the editing canvas
+ *
+ * @param {string} deviceType
+ *
+ * @return {Object} Action object.
+ */
+export function toggleCanvasWidth( deviceType ) {
+	return {
+		type: 'TOGGLE_CANVAS_WIDTH',
+		deviceType,
+	};
+}
+
+/**
  * Returns an action object used in signalling that a temporary reusable blocks have been saved
  * in order to switch its temporary id with the real id.
  *

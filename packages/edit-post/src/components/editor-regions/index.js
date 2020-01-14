@@ -6,22 +6,31 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { navigateRegions, Button } from '@wordpress/components';
+import { navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
 import { useSimulatedMediaQuery } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
 // const styleStorage = {};
 
 function EditorRegions( { footer, header, sidebar, content, publish, className } ) {
-	const [ simulatedWidth, updateSimulatedWidth ] = useState( window.innerWidth );
-
 	const resizableStylesheets = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSettings().resizableStylesheets;
 	}, [] );
 
-	useSimulatedMediaQuery( resizableStylesheets, simulatedWidth );
+	const canvasWidth = useSelect( ( select ) => {
+		const deviceType = select( 'core/block-editor' ).deviceType();
+		switch ( deviceType ) {
+			case 'Tablet':
+				return 780;
+			case 'Mobile':
+				return 340;
+			default:
+				return 2000;
+		}
+	} );
+
+	useSimulatedMediaQuery( resizableStylesheets, canvasWidth );
 
 	return (
 		<div className={ classnames( className, 'edit-post-editor-regions' ) }>
@@ -37,24 +46,13 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 				</div>
 			) }
 			<div className="edit-post-editor-regions__body">
-				<div className="edit-post-editor-regions__width-toggles">
-					<Button isTertiary isLarge onClick={ () => {
-						updateSimulatedWidth( 2000 );
-					} }>Desktop</Button>
-					<Button isTertiary isLarge onClick={ () => {
-						updateSimulatedWidth( 780 );
-					} }>Tablet</Button>
-					<Button isTertiary isLarge onClick={ () => {
-						updateSimulatedWidth( 340 );
-					} }>Mobile</Button>
-				</div>
 				<div
 					className="edit-post-editor-regions__content"
 					role="region"
 					/* translators: accessibility text for the content landmark region. */
 					aria-label={ __( 'Editor content' ) }
 					tabIndex="-1"
-					style={ { width: simulatedWidth, margin: '0 auto', flexGrow: 0 } }
+					style={ { width: canvasWidth, margin: '0 auto', flexGrow: 0 } }
 				>
 					{ content }
 				</div>
