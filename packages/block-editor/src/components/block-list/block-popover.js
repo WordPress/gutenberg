@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { findIndex } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -60,6 +61,7 @@ function BlockPopover( {
 	} = useSelect( selector, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
+	const [ isInserterShown, setIsInserterShown ] = useState( false );
 
 	const showEmptyBlockSideInserter = ! isNavigationMode && isEmptyDefaultBlock && isValid;
 	const shouldShowBreadcrumb = isNavigationMode;
@@ -97,6 +99,14 @@ function BlockPopover( {
 		return null;
 	}
 
+	function onFocus() {
+		setIsInserterShown( true );
+	}
+
+	function onBlur() {
+		setIsInserterShown( false );
+	}
+
 	// Position above the anchor, pop out towards the right, and position in the
 	// left corner. For the side inserter, pop out towards the left, and
 	// position in the right corner.
@@ -119,6 +129,25 @@ function BlockPopover( {
 			__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && node }
 			onBlur={ () => setIsToolbarForced( false ) }
 		>
+			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
+				<div
+					onFocus={ onFocus }
+					onBlur={ onBlur }
+					// While ideally it would be enough to capture the
+					// bubbling focus event from the Inserter, due to the
+					// characteristics of click focusing of `button`s in
+					// Firefox and Safari, it is not reliable.
+					//
+					// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+					tabIndex={ -1 }
+					className={ classnames(
+						'block-editor-block-list__block-popover-inserter',
+						{ 'is-visible': isInserterShown }
+					) }
+				>
+					<Inserter clientId={ clientId } rootClientId={ rootClientId } />
+				</div>
+			) }
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<BlockContextualToolbar
 					// If the toolbar is being shown because of being forced

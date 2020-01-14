@@ -44,16 +44,6 @@
 			border-color: $light-gray-500;
 		}
 	}
-
-	&__inserter {
-		opacity: 0;
-		pointer-events: none;
-
-		&.is-visible {
-			opacity: 1;
-			pointer-events: all;
-		}
-	}
 }
 
 .block-editor-block-toolbar__slot {
