@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigableToolbar from '../navigable-toolbar';
-import { BlockToolbar } from '../';
+import { BlockToolbar } from '../block-toolbar';
 
 function BlockContextualToolbar( { focusOnMount, ...props } ) {
 	return (

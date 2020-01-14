@@ -12,12 +12,10 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 
@@ -58,16 +56,14 @@ function BlockPopover( {
 		hasMultiSelection,
 		hasFixedToolbar,
 	} = useSelect( selector, [] );
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 
-	const showEmptyBlockSideInserter = ! isNavigationMode && isEmptyDefaultBlock && isValid;
-	const shouldShowBreadcrumb = isNavigationMode;
-	const shouldShowContextualToolbar =
+	const showEmptyBlockSideInserter =
 		! isNavigationMode &&
-		! hasFixedToolbar &&
-		isLargeViewport &&
+		isEmptyDefaultBlock &&
+		isValid;
+	const shouldShowContextualToolbar =
 		! showEmptyBlockSideInserter &&
 		! isMultiSelecting &&
 		( ! isTyping || isCaretWithinFormattedText );
@@ -84,7 +80,6 @@ function BlockPopover( {
 	);
 
 	if (
-		! shouldShowBreadcrumb &&
 		! shouldShowContextualToolbar &&
 		! isToolbarForced &&
 		! showEmptyBlockSideInserter
@@ -153,12 +148,6 @@ function BlockPopover( {
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
 					data-type={ name }
-					data-align={ align }
-				/>
-			) }
-			{ shouldShowBreadcrumb && (
-				<BlockBreadcrumb
-					clientId={ clientId }
 					data-align={ align }
 				/>
 			) }

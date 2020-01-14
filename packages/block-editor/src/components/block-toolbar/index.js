@@ -13,25 +13,29 @@ import BlockSettingsMenu from '../block-settings-menu';
 import BlockSwitcher from '../block-switcher';
 import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockMover from '../block-mover';
+import BlockPopover from '../block-list/block-popover';
+import BlockBreadcrumb from '../block-list/breadcrumb';
 
-export default function BlockToolbar() {
-	const {
-		blockClientIds,
-		isValid,
-		mode,
-		moverDirection,
-		hasMovers = true,
-	} = useSelect( ( select ) => {
+export default function BlockToolbarWrapper( { contextual } ) {
+	if ( contextual ) {
+		return <BlockPopover />;
+	}
+
+	return <BlockToolbar />;
+}
+
+export function BlockToolbar() {
+	function selector( select ) {
 		const {
 			getBlockMode,
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockRootClientId,
 			getBlockListSettings,
+			isNavigationMode,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientIds[ 0 ] );
-
 		const {
 			__experimentalMoverDirection,
 			__experimentalUIParts = {},
@@ -48,8 +52,18 @@ export default function BlockToolbar() {
 				null,
 			moverDirection: __experimentalMoverDirection,
 			hasMovers: __experimentalUIParts.hasMovers,
+			isNavigationMode: isNavigationMode(),
 		};
-	}, [] );
+	}
+
+	const {
+		blockClientIds,
+		isValid,
+		mode,
+		moverDirection,
+		hasMovers = true,
+		isNavigationMode,
+	} = useSelect( selector, [] );
 
 	if ( blockClientIds.length === 0 ) {
 		return null;
@@ -65,6 +79,15 @@ export default function BlockToolbar() {
 				<MultiBlocksSwitcher />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
+		);
+	}
+
+	if ( isNavigationMode ) {
+		return (
+			<BlockBreadcrumb
+				clientId={ blockClientIds[ 0 ] }
+				// data-align={ align }
+			/>
 		);
 	}
 

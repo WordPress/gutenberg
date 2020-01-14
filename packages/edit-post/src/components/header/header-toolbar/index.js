@@ -43,11 +43,9 @@ function HeaderToolbar() {
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
 			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
 			<ToolSelector />
-			{ ( hasFixedToolbar || ! isLargeViewport ) && (
-				<div className="edit-post-header-toolbar__block-toolbar">
-					<BlockToolbar />
-				</div>
-			) }
+			<div className="edit-post-header-toolbar__block-toolbar">
+				<BlockToolbar contextual={ ! hasFixedToolbar && isLargeViewport } />
+			</div>
 		</NavigableToolbar>
 	);
 }

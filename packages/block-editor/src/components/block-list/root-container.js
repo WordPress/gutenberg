@@ -10,7 +10,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import useMultiSelection from './use-multi-selection';
 import { getBlockClientId } from '../../utils/dom';
 import InsertionPoint from './insertion-point';
-import BlockPopover from './block-popover';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -79,7 +78,6 @@ function RootContainer( { children, className }, ref ) {
 			isMultiSelecting={ isMultiSelecting }
 			selectedBlockClientId={ selectedBlockClientId }
 		>
-			<BlockPopover />
 			<div
 				ref={ ref }
 				className={ className }
