@@ -44,7 +44,7 @@ const FocusCapture = forwardRef( ( {
 	function onFocus() {
 		// Do not capture incoming focus if set by us in WritingFlow.
 		if ( noCapture.current ) {
-			delete noCapture.current;
+			noCapture.current = null;
 			return;
 		}
 
