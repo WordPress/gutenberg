@@ -39,6 +39,10 @@
 			height: 1px;
 		}
 
+		&.is-active {
+			font-weight: bold;
+		}
+
 		// Plain menu styles.
 		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) {
 			@include menu-style__focus();
