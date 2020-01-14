@@ -22,7 +22,6 @@ import {
 	RangeControl,
 	ResizableBox,
 	ToggleControl,
-	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
@@ -32,8 +31,7 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUpload,
-	MediaUploadCheck,
+	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
 	__experimentalUseGradient,
@@ -259,7 +257,6 @@ function CoverEdit( {
 		dimRatio,
 		focalPoint,
 		hasParallax,
-		id,
 		minHeight,
 		url,
 	} = attributes;
@@ -308,25 +305,12 @@ function CoverEdit( {
 		<>
 			<BlockControls>
 				{ hasBackground && (
-					<>
-						<MediaUploadCheck>
-							<ToolbarGroup>
-								<MediaUpload
-									onSelect={ onSelectMedia }
-									allowedTypes={ ALLOWED_MEDIA_TYPES }
-									value={ id }
-									render={ ( { open } ) => (
-										<Button
-											className="components-toolbar__control"
-											label={ __( 'Edit media' ) }
-											icon="edit"
-											onClick={ open }
-										/>
-									) }
-								/>
-							</ToolbarGroup>
-						</MediaUploadCheck>
-					</>
+					<MediaReplaceFlow
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*,video/*"
+						onSelect={ onSelectMedia }
+					/>
 				) }
 			</BlockControls>
 			<InspectorControls>
