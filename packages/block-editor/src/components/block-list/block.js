@@ -191,13 +191,6 @@ function BlockListBlock( {
 	// Block Reordering animation
 	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, isSelected || isFirstMultiSelected, enableAnimation, animateOnChange );
 
-	// Focus the first editable or the wrapper if edit mode.
-	useLayoutEffect( () => {
-		if ( isSelected && ! isNavigationMode ) {
-			focusTabbable( true );
-		}
-	}, [ isSelected, isNavigationMode ] );
-
 	// Other event handlers
 
 	/**
