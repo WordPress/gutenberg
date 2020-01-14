@@ -52,6 +52,9 @@ async function updateActiveNavigationLink( { url, label } ) {
 		await page.type( 'input[placeholder="Search or type url"]', url );
 		// Wait for the autocomplete suggestion item to appear.
 		await page.waitForXPath( `//span[@class="block-editor-link-control__search-item-title"]/mark[text()="${ url }"]` );
+		// Navigate to the first suggestion.
+		await page.keyboard.press( 'ArrowDown' );
+		// Select the suggestion.
 		await page.keyboard.press( 'Enter' );
 	}
 
@@ -138,12 +141,5 @@ describe( 'Navigation', () => {
 
 		// Expect a Navigation Block with two Navigation Links in the snapshot.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		// TODO - this is needed currently because when adding a link using the suggestion list,
-		// a submit button is used. The form that the submit button is in is unmounted when submission
-		// occurs, resulting in a warning 'Form submission canceled because the form is not connected'
-		// in Chrome.
-		// Ideally, the suggestions wouldn't be implemented using submit buttons.
-		expect( console ).toHaveWarned();
 	} );
 } );

@@ -537,6 +537,7 @@ describe( 'Selecting links', () => {
 
 			// Search Input UI
 			const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+			const form = container.querySelector( 'form' );
 
 			// Simulate searching for a term
 			act( () => {
@@ -587,6 +588,9 @@ describe( 'Selecting links', () => {
 			// Commit the selected item as the current link
 			act( () => {
 				Simulate.keyDown( searchInput, { keyCode: ENTER } );
+			} );
+			act( () => {
+				Simulate.submit( form );
 			} );
 
 			// Check that the suggestion selected via is now shown as selected
