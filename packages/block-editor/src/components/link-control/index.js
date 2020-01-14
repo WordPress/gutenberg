@@ -32,20 +32,15 @@ import LinkControlSearchInput from './search-input';
 const MODE_EDIT = 'edit';
 // const MODE_SHOW = 'show';
 
-function LinkControl( {
+export function LinkControl( {
 	value,
 	settings,
 	onChange = noop,
+	fetchSearchSuggestions,
 } ) {
 	const instanceId = useInstanceId( LinkControl );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const [ isEditingLink, setIsEditingLink ] = useState( ! value || ! value.url );
-	const { fetchSearchSuggestions } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return {
-			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
-		};
-	}, [] );
 
 	// Handlers
 
@@ -215,4 +210,15 @@ function LinkControl( {
 	);
 }
 
-export default LinkControl;
+function ConnectedLinkControl( props ) {
+	const { fetchSearchSuggestions } = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return {
+			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
+		};
+	}, [] );
+
+	return <LinkControl fetchSearchSuggestions={ fetchSearchSuggestions } { ...props } />;
+}
+
+export default ConnectedLinkControl;
