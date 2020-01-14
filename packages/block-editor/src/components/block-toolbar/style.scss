@@ -38,6 +38,7 @@
 		// Ensure the icon buttons remain square.
 		.components-button.has-icon {
 			min-width: $block-toolbar-height;
+			justify-content: center;
 
 			// Center the icon inside.
 			svg {
@@ -78,11 +79,13 @@
 
 	// First and last buttons in a group have 12px outer padding, like 48px buttons.
 	.components-toolbar div:first-child .components-button.has-icon {
+		min-width: $block-toolbar-height - $grid-unit-15 / 2;
 		padding-left: $grid-unit-15 - $border-width;
 		padding-right: $grid-unit-15 / 2;
 	}
 
 	.components-toolbar div:last-child .components-button.has-icon {
+		min-width: $block-toolbar-height - $grid-unit-15 / 2;
 		padding-left: $grid-unit-15 / 2;
 		padding-right: $grid-unit-15 - $border-width;
 	}
@@ -95,7 +98,11 @@
 	}
 }
 
-// Special button styles.
+
+/**
+ * Button States
+ */
+
 .block-editor-block-toolbar .components-button {
 	position: relative;
 
@@ -129,11 +136,11 @@
 	&::before {
 		content: "";
 		position: absolute;
-		top: $grid-unit-10;
-		bottom: $grid-unit-10;
-		min-width: $grid-unit-40;
 		display: block;
 		border-radius: $radius-block-ui;
+		width: calc(100% - #{ $grid-unit-20 });
+		height: 32px;
+		min-width: 32px;
 	}
 
 	svg {

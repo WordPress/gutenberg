@@ -34,6 +34,7 @@
 		// Focus style.
 		&::before {
 			bottom: 0;
+			height: calc(100% - #{ $grid-unit-10 });
 		}
 	}
 
@@ -45,6 +46,7 @@
 		// Focus style.
 		&::before {
 			top: 0;
+			height: calc(100% - #{ $grid-unit-10 });
 		}
 	}
 

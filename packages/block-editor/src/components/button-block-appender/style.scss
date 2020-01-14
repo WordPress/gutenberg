@@ -6,7 +6,7 @@
 	padding: $block-padding;
 	width: 100%;
 	height: auto;
-	color: $dark-gray-500;
+	color: $border-color;
 	border: $border-width solid $border-color;
 
 	&:hover,
@@ -16,6 +16,6 @@
 
 	&:active {
 		border-color: $dark-gray-900;
-		color: $dark-gray-900;
+		color: $black;
 	}
 }

@@ -68,6 +68,12 @@
 		@include reduce-motion("transition");
 	}
 
+	// Position the focus rectangle.
+	&:focus::before {
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
 	// Block hover and focus style.
 	&[aria-expanded="true"] .block-editor-block-icon,
 	&[aria-expanded="true"] .block-editor-block-switcher__transform,
