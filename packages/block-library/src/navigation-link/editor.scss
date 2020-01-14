@@ -1,4 +1,14 @@
 
+[data-type="core/navigation-link"] {
+
+	// Hide the draggable mover until functionality for positioning it on drag correctly is added
+	.block-editor-block-toolbar .components-toolbar.block-editor-block-mover {
+		.components-button.block-editor-block-mover__control-drag-handle {
+			display: none;
+		}
+	}
+}
+
 // Normalize navigation link and edit containers, to look mostly the same.
 .wp-block-navigation-link__field .components-text-control__input.components-text-control__input,
 .wp-block-navigation-link__container {
