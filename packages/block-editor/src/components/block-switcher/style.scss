@@ -1,6 +1,5 @@
 .block-editor-block-switcher {
 	position: relative;
-	height: $icon-button-size;
 }
 
 // Show an indicator triangle.
@@ -25,11 +24,11 @@
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	margin: 0;
 	display: block;
-	height: $icon-button-size;
+	height: $grid-unit-60;
 }
 
 .components-button.block-editor-block-switcher__no-switcher-icon {
-	width: $icon-button-size;
+	width: $grid-unit-60;
 
 	.block-editor-blocks-icon {
 		margin-right: auto;
@@ -40,15 +39,13 @@
 // When the block switcher does not have any transformations, we show it but as disabled.
 // The background and opacity change helps make the icon legible, despite being disabled.
 .components-button.block-editor-block-switcher__no-switcher-icon:disabled {
-	border-radius: 0;
 	opacity: 0.84;
 
 	// Also make the icon monochrome to further imply disabled state.
 	// We use !important here because icon colors are set as inline styles,
 	// and should be overridden when disabled.
 	.block-editor-block-icon.has-colors {
-		color: $dark-gray-500 !important;
-		background: $light-gray-200 !important;
+		color: $border-color !important;
 	}
 }
 
@@ -60,8 +57,8 @@
 
 	.block-editor-block-icon,
 	.block-editor-block-switcher__transform {
-		width: $icon-button-size;
-		height: $icon-button-size;
+		width: $grid-unit-60;
+		height: $grid-unit-60;
 		position: relative;
 		margin: 0 auto;
 		padding: 3px;

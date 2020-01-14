@@ -9,19 +9,19 @@
 	transition: border-color 0.1s linear, box-shadow 0.1s linear;
 	@include reduce-motion("transition");
 
-	// Block UI appearance.
-	border: $border-width solid $border-color;
-	border-radius: $radius-block-ui;
-	background-color: $white;
-
+	// Allow overflow on desktop.
 	@include break-small() {
-		// Allow overflow on desktop.
 		overflow: inherit;
 	}
 
 	// The component is born with a border, but we only need some of them.
 	.components-toolbar {
 		border: 0;
+
+		// These margins make the buttons themselves overlap the chrome of the toolbar.
+		// This helps make them square, and maximize the hit area.
+		margin-top: -$border-width;
+		margin-bottom: -$border-width;
 
 		// Add a border before item groups to show as separator in the block toolbar.
 		// Why not a border after item groups? Because the last item is an invisible inserter,
@@ -30,6 +30,21 @@
 
 		// IE11 has thick paddings without this.
 		line-height: 0;
+
+		// Adapt the height of the toolbar items.
+		height: $block-toolbar-height;
+		background: none;
+
+		// Ensure the icon buttons remain square.
+		.components-button.has-icon {
+			min-width: $block-toolbar-height;
+
+			// Center the icon inside.
+			svg {
+				margin-left: auto;
+				margin-right: auto;
+			}
+		}
 	}
 
 	// Remove the left-border on the last item in the toolbar.
@@ -51,8 +66,8 @@
 	// Size multiple sequential buttons to be optically balanced.
 	// Specifically, buttons in a toolbar group are not all 48px.
 	// Icons are 36px, as set by a 24px icon and 12px padding.
-	.components-toolbar > div > .components-button.has-icon:not(.has-text) {
-		width: auto;
+	.components-toolbar div > .components-button.has-icon {
+		min-width: $block-toolbar-height - $grid-unit-15;
 		padding-left: $grid-unit-15 / 2; // 6px.
 		padding-right: $grid-unit-15 / 2;
 
@@ -62,18 +77,19 @@
 	}
 
 	// First and last buttons in a group have 12px outer padding, like 48px buttons.
-	.components-toolbar > div:first-child .components-button.has-icon:not(.has-text) {
+	.components-toolbar div:first-child .components-button.has-icon {
 		padding-left: $grid-unit-15 - $border-width;
 		padding-right: $grid-unit-15 / 2;
 	}
 
-	.components-toolbar > div:last-child .components-button {
+	.components-toolbar div:last-child .components-button.has-icon {
 		padding-left: $grid-unit-15 / 2;
 		padding-right: $grid-unit-15 - $border-width;
 	}
 
 	// Single buttons should remain 48px.
-	.components-toolbar > div:first-child:last-child > .components-button.has-icon:not(.has-text) {
+	.components-toolbar div:first-child:last-child > .components-button.has-icon {
+		min-width: $block-toolbar-height;
 		padding-left: $grid-unit-15;
 		padding-right: $grid-unit-15;
 	}
