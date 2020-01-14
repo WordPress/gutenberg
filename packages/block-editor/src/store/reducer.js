@@ -1000,7 +1000,11 @@ function selection( state = {}, action ) {
 				return state;
 			}
 
-			return { clientId: blockToSelect.clientId };
+			return {
+				clientId: blockToSelect.clientId,
+				attributeKey: action.attributeKey,
+				offset: action.offset,
+			};
 		}
 	}
 

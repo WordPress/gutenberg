@@ -189,7 +189,7 @@ class RichText extends Component {
 	}
 
 	componentDidMount() {
-		this.applyRecord( this.record, { domOnly: true } );
+		this.applyRecord( this.record );
 	}
 
 	createRecord() {
