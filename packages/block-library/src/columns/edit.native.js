@@ -29,6 +29,7 @@ import {
 } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -61,6 +62,8 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
  * @type {number}
  */
 const DEFAULT_COLUMNS = 2;
+const MIN_COLUMNS_NUMBER = 2;
+const MAX_COLUMNS_NUMBER = 6;
 
 function ColumnsEditContainer( {
 	attributes,
@@ -68,6 +71,7 @@ function ColumnsEditContainer( {
 	updateAlignment,
 	updateColumns,
 	clientId,
+	isSmallScreen,
 	// isSelected,
 } ) {
 	const { verticalAlignment } = attributes;
@@ -92,8 +96,8 @@ function ColumnsEditContainer( {
 						value={ count }
 						defaultValue={ DEFAULT_COLUMNS }
 						onChangeValue={ ( value ) => updateColumns( count, value ) }
-						minValue={ 2 }
-						maxValue={ 6 }
+						minValue={ MIN_COLUMNS_NUMBER }
+						maxValue={ MAX_COLUMNS_NUMBER }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -272,5 +276,6 @@ const ColumnsEdit = ( props ) => {
 };
 
 export default compose( [
+	withViewportMatch( { isSmallScreen: '< small' } ),
 	withPreferredColorScheme,
 ] )( ColumnsEdit );
