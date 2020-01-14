@@ -370,6 +370,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         }
 
         view.setHighlightColor(newColor);
+        view.setCursorColor(newColor);
     }
 
     @ReactProp(name = "blockType")

@@ -4,17 +4,22 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
@@ -31,6 +36,7 @@ import org.wordpress.aztec.ITextFormat;
 import org.wordpress.aztec.plugins.IAztecPlugin;
 import org.wordpress.aztec.plugins.IToolbarButton;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
@@ -570,5 +576,41 @@ public class ReactAztecText extends AztecText {
 
     private boolean isPreTag() {
         return PRE_TAG.equals(mTagName);
+    }
+
+    public void setCursorColor(@Nullable Integer color) {
+        // This is nearly a direct copy of the ReactNative implementation:
+        // https://github.com/facebook/react-native/blob/233fdfc014bb4b919c7624c90e5dac614479076f/ReactAndroid/src/main/java/com/facebook/react/views/textinput/ReactTextInputManager.java#L422-L457
+        // API 29 supports setTextCursorDrawable which would be a cleaner way to handle this when
+        // an upgrade to that API level occurs.
+        try {
+            // Get the original cursor drawable resource.
+            Field cursorDrawableResField = TextView.class.getDeclaredField("mCursorDrawableRes");
+            cursorDrawableResField.setAccessible(true);
+            int drawableResId = cursorDrawableResField.getInt(this);
+
+            // The view has no cursor drawable.
+            if (drawableResId == 0) {
+                return;
+            }
+
+            Drawable drawable = ContextCompat.getDrawable(getContext(), drawableResId);
+            if (color != null) {
+                drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            }
+            Drawable[] drawables = {drawable, drawable};
+
+            // Update the current cursor drawable with the new one.
+            Field editorField = TextView.class.getDeclaredField("mEditor");
+            editorField.setAccessible(true);
+            Object editor = editorField.get(this);
+            Field cursorDrawableField = editor.getClass().getDeclaredField("mCursorDrawable");
+            cursorDrawableField.setAccessible(true);
+            cursorDrawableField.set(editor, drawables);
+        } catch (NoSuchFieldException ex) {
+            // Ignore errors to avoid crashing if these private fields don't exist on modified
+            // or future android versions.
+        } catch (IllegalAccessException ex) {
+        }
     }
 }
