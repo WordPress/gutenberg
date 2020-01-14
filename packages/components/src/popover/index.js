@@ -228,6 +228,7 @@ const Popover = ( {
 	__unstableSlotName = SLOT_NAME,
 	__unstableAllowVerticalSubpixelPosition,
 	__unstableAllowHorizontalSubpixelPosition,
+	__unstableBoundaryParent,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -273,6 +274,12 @@ const Popover = ( {
 				contentRect.current = contentRef.current.getBoundingClientRect();
 			}
 
+			let boundaryElement;
+
+			if ( __unstableBoundaryParent ) {
+				boundaryElement = containerRef.current.closest( '.popover-slot' ).parentNode;
+			}
+
 			const {
 				popoverTop,
 				popoverLeft,
@@ -280,7 +287,14 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef );
+			} = computePopoverPosition(
+				anchor,
+				contentRect.current,
+				position,
+				__unstableSticky,
+				anchorRef,
+				boundaryElement
+			);
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
 				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
@@ -374,6 +388,7 @@ const Popover = ( {
 		__unstableSticky,
 		__unstableAllowVerticalSubpixelPosition,
 		__unstableAllowHorizontalSubpixelPosition,
+		__unstableBoundaryParent,
 	] );
 
 	useFocusContentOnMount( focusOnMount, contentRef );
@@ -511,6 +526,6 @@ const Popover = ( {
 const PopoverContainer = Popover;
 
 PopoverContainer.Slot = ( { name = SLOT_NAME } ) =>
-	<Slot bubblesVirtually name={ name } />;
+	<Slot bubblesVirtually name={ name } className="popover-slot" />;
 
 export default PopoverContainer;

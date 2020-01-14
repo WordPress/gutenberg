@@ -19,10 +19,11 @@ const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
  *                              scroll container edge when part of the anchor
  *                              leaves view.
  * @param {string}  chosenYAxis yAxis to be used.
+ * @param {Element} boundaryElement
  *
  * @return {Object} Popover xAxis position and constraints.
  */
-export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, corner, sticky, chosenYAxis ) {
+export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, corner, sticky, chosenYAxis, boundaryElement ) {
 	const { width } = contentSize;
 	const isRTL = document.documentElement.dir === 'rtl';
 
@@ -99,6 +100,11 @@ export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, cor
 		popoverLeft = leftAlignment.popoverLeft;
 	} else {
 		popoverLeft = rightAlignment.popoverLeft;
+	}
+
+	if ( boundaryElement ) {
+		const boundaryRect = boundaryElement.getBoundingClientRect();
+		popoverLeft = Math.min( popoverLeft, boundaryRect.right - width );
 	}
 
 	return {
@@ -222,14 +228,22 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis, cor
  *                              scroll container edge when part of the anchor
  *                              leaves view.
  * @param {Element} anchorRef   The anchor element.
+ * @param {Element} boundaryElement
  *
  * @return {Object} Popover position and constraints.
  */
-export function computePopoverPosition( anchorRect, contentSize, position = 'top', sticky, anchorRef ) {
+export function computePopoverPosition(
+	anchorRect,
+	contentSize,
+	position = 'top',
+	sticky,
+	anchorRef,
+	boundaryElement
+) {
 	const [ yAxis, xAxis = 'center', corner ] = position.split( ' ' );
 
 	const yAxisPosition = computePopoverYAxisPosition( anchorRect, contentSize, yAxis, corner, sticky, anchorRef );
-	const xAxisPosition = computePopoverXAxisPosition( anchorRect, contentSize, xAxis, corner, sticky, yAxisPosition.yAxis );
+	const xAxisPosition = computePopoverXAxisPosition( anchorRect, contentSize, xAxis, corner, sticky, yAxisPosition.yAxis, boundaryElement );
 
 	return {
 		...xAxisPosition,
