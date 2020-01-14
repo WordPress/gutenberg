@@ -13,6 +13,8 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
+	PostPreviewButton,
+	PostSavedState,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -49,10 +51,17 @@ import MetaBoxes from '../meta-boxes';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
+import MoreMenu from '../header/more-menu';
+import PinnedPlugins from '../header/pinned-plugins';
+import PostPublishButtonOrToggle from '../header/post-publish-button-or-toggle';
 
 function Layout() {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
-	const { closePublishSidebar, togglePublishSidebar } = useDispatch( 'core/edit-post' );
+	const {
+		closePublishSidebar,
+		openGeneralSidebar,
+		closeGeneralSidebar,
+	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
 		isRichEditingEnabled,
@@ -64,6 +73,9 @@ function Layout() {
 		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
+		shortcut,
+		isEditorSidebarOpened,
+		getBlockSelectionStart,
 	} = useSelect( ( select ) => {
 		return ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
@@ -76,8 +88,14 @@ function Layout() {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			previousShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/previous-region' ),
 			nextShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
+			shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
+			getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
 		} );
 	}, [] );
+	const toggleGeneralSidebar = isEditorSidebarOpened ?
+		closeGeneralSidebar :
+		() => openGeneralSidebar( getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document' );
 	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -132,15 +150,29 @@ function Layout() {
 							PostPublishExtension={ PluginPostPublishPanel.Slot }
 						/>
 					) : (
-						<div className="edit-post-toggle-publish-panel">
+						<div className="edit-post-header__settings">
+							<PostSavedState
+								forceIsDirty={ hasActiveMetaboxes }
+								forceIsSaving={ isSaving }
+							/>
+							<PostPreviewButton
+								forceIsAutosaveable={ hasActiveMetaboxes }
+								forcePreviewLink={ isSaving ? null : undefined }
+							/>
+							<PostPublishButtonOrToggle
+								forceIsDirty={ hasActiveMetaboxes }
+								forceIsSaving={ isSaving }
+							/>
 							<Button
-								isSecondary
-								className="edit-post-toggle-publish-panel__button"
-								onClick={ togglePublishSidebar }
-								aria-expanded={ false }
-							>
-								{ __( 'Open publish panel' ) }
-							</Button>
+								icon="admin-generic"
+								label={ __( 'Settings' ) }
+								onClick={ toggleGeneralSidebar }
+								isPressed={ isEditorSidebarOpened }
+								aria-expanded={ isEditorSidebarOpened }
+								shortcut={ shortcut }
+							/>
+							<PinnedPlugins.Slot />
+							<MoreMenu />
 						</div>
 					) }
 					shortcuts={ {

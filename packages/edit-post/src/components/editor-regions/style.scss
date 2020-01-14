@@ -129,15 +129,7 @@ html {
 
 .edit-post-editor-regions__publish {
 	z-index: z-index(".edit-post-editor-regions__publish");
-	position: fixed !important; // Need to override the default relative positionning
-	top: -9999em;
-	bottom: auto;
-	left: auto;
-	right: 0;
-	width: $sidebar-width;
-
-	&:focus {
-		top: auto;
-		bottom: 0;
-	}
+	position: absolute !important; // Need to override the default relative positionning
+	top: 10px;
+	right: $grid-size;
 }
