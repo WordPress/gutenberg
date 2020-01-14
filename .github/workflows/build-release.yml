@@ -24,16 +24,16 @@ jobs:
       - name: Create .zip archive
         run: |
           zip -r gutenberg.zip \
-	          gutenberg.php \
-	          lib/*.php \
-	          lib/demo-block-templates/*.html \
-	          packages/block-serialization-default-parser/*.php \
-	          post-content.php \
-	          # $vendor_scripts \ # TODO
-	          $build_files \
-	          readme.txt \
-	          changelog.txt \
-	          README.md
+            gutenberg.php \
+            lib/*.php \
+            lib/demo-block-templates/*.html \
+            packages/block-serialization-default-parser/*.php \
+            post-content.php \
+            # $vendor_scripts \ # TODO
+            $build_files \
+            readme.txt \
+            changelog.txt \
+            README.md
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1.0.0
