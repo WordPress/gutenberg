@@ -34,7 +34,7 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } )
 				) }
 				<Icon size={ 24 } icon={ blockIcon.src } fill={ styles.icon.color } />
 				<Text
-					maxFontSizeMultiplier={ 2 }
+					maxFontSizeMultiplier={ 1.25 }
 					ellipsizeMode="tail"
 					numberOfLines={ 1 }
 					style={ styles.breadcrumbTitle }>
