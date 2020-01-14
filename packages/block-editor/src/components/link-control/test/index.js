@@ -335,7 +335,10 @@ describe( 'Default search suggestions', () => {
 		// when this does not have a value
 		expect( searchInput.value ).toBe( '' );
 
-		expect( searchSuggestionsSpy ).toHaveBeenCalled();
+		// Ensure only called once as a guard against potential infinite
+		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
+		// which has calls to `setState` within it.
+		expect( searchSuggestionsSpy ).toHaveBeenCalledTimes( 1 );
 
 		// Verify the search results already display the initial suggestions
 		expect( initialSearchResultElements ).toHaveLength( expectedResultsLength );
@@ -396,7 +399,10 @@ describe( 'Default search suggestions', () => {
 
 		expect( searchResultElements ).toHaveLength( 3 );
 
-		expect( searchSuggestionsSpy ).toHaveBeenCalled();
+		// Ensure only called once as a guard against potential infinite
+		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
+		// which has calls to `setState` within it.
+		expect( searchSuggestionsSpy ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
 
