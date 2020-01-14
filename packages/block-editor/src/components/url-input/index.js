@@ -36,6 +36,8 @@ class URLInput extends Component {
 
 		this.suggestionNodes = [];
 
+		this.isUpdatingSuggestions = false;
+
 		this.state = {
 			suggestions: [],
 			showSuggestions: false,
@@ -44,8 +46,7 @@ class URLInput extends Component {
 	}
 
 	componentDidUpdate() {
-		const { showSuggestions, selectedSuggestion, suggestions } = this.state;
-		const { __experimentalShowInitialSuggestions = false, value } = this.props;
+		const { showSuggestions, selectedSuggestion } = this.state;
 
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
@@ -61,18 +62,13 @@ class URLInput extends Component {
 			}, 100 );
 		}
 
-		// If there is no search text and no current suggestions
-		// then display the initial suggestions if provided
-		// (being careful to avoid infinite re-render loop).
-		if ( __experimentalShowInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length ) ) {
+		if ( this.shouldShowInitialSuggestions() ) {
 			this.updateSuggestions();
 		}
 	}
 
 	componentDidMount() {
-		const { suggestions } = this.state;
-		const { __experimentalShowInitialSuggestions = false, value } = this.props;
-		if ( __experimentalShowInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length ) ) {
+		if ( this.shouldShowInitialSuggestions() ) {
 			this.updateSuggestions();
 		}
 	}
@@ -85,6 +81,12 @@ class URLInput extends Component {
 		return ( ref ) => {
 			this.suggestionNodes[ index ] = ref;
 		};
+	}
+
+	shouldShowInitialSuggestions() {
+		const { suggestions } = this.state;
+		const { __experimentalShowInitialSuggestions = false, value } = this.props;
+		return ! this.isUpdatingSuggestions && __experimentalShowInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length );
 	}
 
 	updateSuggestions( value = '' ) {
@@ -112,6 +114,8 @@ class URLInput extends Component {
 
 			return;
 		}
+
+		this.isUpdatingSuggestions = true;
 
 		this.setState( {
 			showSuggestions: true,
@@ -145,11 +149,13 @@ class URLInput extends Component {
 			} else {
 				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 			}
+			this.isUpdatingSuggestions = false;
 		} ).catch( () => {
 			if ( this.suggestionsRequest === request ) {
 				this.setState( {
 					loading: false,
 				} );
+				this.isUpdatingSuggestions = false;
 			}
 		} );
 
