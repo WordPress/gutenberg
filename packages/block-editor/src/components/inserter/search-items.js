@@ -6,6 +6,7 @@ import {
 	differenceWith,
 	find,
 	get,
+	intersection,
 	words,
 } from 'lodash';
 
@@ -100,5 +101,22 @@ export const searchItems = ( items, categories, collections, searchTerm ) => {
 		);
 
 		return unmatchedTerms.length === 0;
+	} ).map( ( item ) => {
+		if ( ! item.patterns ) {
+			return item;
+		}
+
+		return {
+			...item,
+			patterns: item.patterns.map( ( pattern ) => {
+				return {
+					...pattern,
+					matched: intersection(
+						normalizedTerms,
+						normalizeSearchTerm( pattern.label )
+					).length > 0,
+				};
+			} ),
+		};
 	} );
 };

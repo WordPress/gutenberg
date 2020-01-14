@@ -83,4 +83,13 @@ describe( 'searchItems', () => {
 			[ youtubeItem ]
 		);
 	} );
+
+	it( 'should match words using the patterns and mark those matched', () => {
+		const filteredItems = searchItems( items, categories, collections, 'patterns two three' );
+
+		expect( filteredItems ).toHaveLength( 1 );
+		expect( filteredItems[ 0 ].patterns[ 0 ].matched ).toBe( false );
+		expect( filteredItems[ 0 ].patterns[ 1 ].matched ).toBe( true );
+		expect( filteredItems[ 0 ].patterns[ 2 ].matched ).toBe( true );
+	} );
 } );
