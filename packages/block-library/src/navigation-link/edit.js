@@ -165,7 +165,7 @@ function NavigationLinkEdit( {
 						] }
 					/>
 					{ isLinkOpen && (
-						<Popover>
+						<Popover position="bottom center">
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
