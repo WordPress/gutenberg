@@ -252,6 +252,7 @@ const Popover = ( {
 	__unstableAllowVerticalSubpixelPosition,
 	__unstableAllowHorizontalSubpixelPosition,
 	__unstableFixedPosition = true,
+	__unstableBoundaryParent,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -471,6 +472,7 @@ const Popover = ( {
 		__unstableSticky,
 		__unstableAllowVerticalSubpixelPosition,
 		__unstableAllowHorizontalSubpixelPosition,
+		__unstableBoundaryParent,
 	] );
 
 	useFocusContentOnMount( focusOnMount, contentRef );
@@ -626,7 +628,7 @@ const Popover = ( {
 const PopoverContainer = Popover;
 
 PopoverContainer.Slot = ( { name = SLOT_NAME } ) => (
-	<Slot bubblesVirtually name={ name } />
+	<Slot bubblesVirtually name={ name } className="popover-slot" />
 );
 
 export default PopoverContainer;
