@@ -362,6 +362,16 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         view.setTextColor(newColor);
     }
 
+    @ReactProp(name = "selectionColor", customType = "Color")
+    public void setSelectionColor(ReactAztecText view, @Nullable Integer color) {
+        int newColor = Color.BLACK;
+        if (color != null) {
+            newColor = color;
+        }
+
+        view.setHighlightColor(newColor);
+    }
+
     @ReactProp(name = "blockType")
     public void setBlockType(ReactAztecText view, ReadableMap inputMap) {
         if (inputMap.hasKey(BLOCK_TYPE_TAG_KEY)) {
