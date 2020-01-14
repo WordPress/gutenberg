@@ -100,7 +100,7 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 			formatTag(
 				'Parameters',
 				getSymbolTagsByName( symbol, 'param' ),
-				( tag ) => `\n- *${ tag.name }*${ tag.type ? ` \`${ tag.type }\`` : '(unknown type)' }: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- *${ tag.name }* ${ tag.type ? `\`${ tag.type }\`` : '(unknown type)' }: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
