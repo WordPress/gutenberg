@@ -80,34 +80,6 @@
 	padding: $grid-size-large;
 }
 
-/*
- * Adjust Navigation Item.
- */
-.wp-block-navigation .wp-block-navigation-link {
-	margin-right: $grid-size;
-	margin-left: $grid-size;
-
-	.block-editor-block-list__layout {
-		display: block;
-		margin: $grid-size;
-	}
-
-	// Provide a base navigation item margin.
-	// This should be the same inside the field,
-	// and the edit container should compensate.
-	// This is to make sure the edit and view are the same.
-	padding: 0 $grid-size;
-
-	// Only display inner blocks when the block is being edited.
-	.block-editor-inner-blocks {
-		display: none;
-	}
-
-	&.is-editing .block-editor-inner-blocks {
-		display: block;
-	}
-}
-
 /**
  * Colors Selector component
  */
@@ -137,13 +109,6 @@ $colors-selector-size: 22px;
 		// Add the button arrow.
 		&::after {
 			@include dropdown-arrow();
-		}
-
-		// Styling button states.
-		&:focus,
-		&:hover {
-			color: $dark-gray-500;
-			box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px #fff;
 		}
 	}
 

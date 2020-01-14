@@ -318,7 +318,7 @@ describe( 'Selecting links', () => {
 
 			return (
 				<LinkControl
-					currentLink={ link }
+					value={ link }
 					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 				/>
 			);
@@ -337,23 +337,21 @@ describe( 'Selecting links', () => {
 
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.type ) );
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
 		expect( currentLinkAnchor ).not.toBeNull();
 	} );
 
 	it( 'should hide "selected" link UI and display search UI prepopulated with previously selected link title when "Change" button is clicked', () => {
 		const selectedLink = first( fauxEntitySuggestions );
-		const spyOnEditMode = jest.fn();
 
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( selectedLink );
 
 			return (
 				<LinkControl
-					currentLink={ link }
-					onLinkChange={ ( suggestion ) => setLink( suggestion ) }
+					value={ link }
+					onChange={ ( suggestion ) => setLink( suggestion ) }
 					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-					onChangeMode={ spyOnEditMode( 'edit' ) }
 				/>
 			);
 		};
@@ -380,7 +378,6 @@ describe( 'Selecting links', () => {
 		expect( searchInput ).not.toBeNull();
 		expect( searchInput.value ).toBe( selectedLink.title ); // prepopulated with previous link's title
 		expect( currentLinkUI ).toBeNull();
-		expect( spyOnEditMode ).toHaveBeenCalled();
 	} );
 
 	describe( 'Selection using mouse click', () => {
@@ -398,8 +395,8 @@ describe( 'Selecting links', () => {
 
 				return (
 					<LinkControl
-						currentLink={ link }
-						onLinkChange={ ( suggestion ) => setLink( suggestion ) }
+						value={ link }
+						onChange={ ( suggestion ) => setLink( suggestion ) }
 						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 					/>
 				);
@@ -438,7 +435,7 @@ describe( 'Selecting links', () => {
 
 			// Check that this suggestion is now shown as selected
 			expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
 			expect( currentLinkAnchor ).not.toBeNull();
 		} );
 	} );
@@ -458,8 +455,8 @@ describe( 'Selecting links', () => {
 
 				return (
 					<LinkControl
-						currentLink={ link }
-						onLinkChange={ ( suggestion ) => setLink( suggestion ) }
+						value={ link }
+						onChange={ ( suggestion ) => setLink( suggestion ) }
 						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 					/>
 				);
@@ -531,7 +528,7 @@ describe( 'Selecting links', () => {
 			const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
 
 			expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
 			expect( currentLinkAnchor ).not.toBeNull();
 		} );
 	} );
@@ -547,7 +544,7 @@ describe( 'Addition Settings UI', () => {
 
 			return (
 				<LinkControl
-					currentLink={ link }
+					value={ link }
 					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 				/>
 			);
@@ -577,12 +574,10 @@ describe( 'Addition Settings UI', () => {
 			{
 				id: 'newTab',
 				title: 'Open in New Tab',
-				checked: false,
 			},
 			{
 				id: 'noFollow',
 				title: 'No follow',
-				checked: true,
 			},
 		];
 
@@ -593,9 +588,9 @@ describe( 'Addition Settings UI', () => {
 
 			return (
 				<LinkControl
-					currentLink={ link }
+					value={ { ...link, newTab: false, noFollow: true } }
 					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-					currentSettings={ customSettings }
+					settings={ customSettings }
 				/>
 			);
 		};

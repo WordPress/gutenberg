@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,7 +15,8 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import __experimentalBlockListFooter from '../block-list-footer';
-import useMultiSelection from './use-multi-selection';
+import RootContainer from './root-container';
+import useBlockDropZone from '../block-drop-zone';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -71,8 +72,6 @@ function BlockList( {
 		hasMultiSelection,
 		enableAnimation,
 	} = useSelect( selector, [ rootClientId ] );
-	const ref = useRef();
-	const onSelectionStart = useMultiSelection( { ref, rootClientId } );
 
 	const uiParts = {
 		hasMovers: true,
@@ -80,8 +79,17 @@ function BlockList( {
 		...__experimentalUIParts,
 	};
 
+	const Container = rootClientId ? 'div' : RootContainer;
+
+	const ref = useRef();
+
+	const targetClientId = useBlockDropZone( {
+		element: ref,
+		rootClientId,
+	} );
+
 	return (
-		<div
+		<Container
 			ref={ ref }
 			className={ classnames(
 				'block-editor-block-list__layout',
@@ -98,7 +106,6 @@ function BlockList( {
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
-							onSelectionStart={ onSelectionStart }
 							isDraggable={ isDraggable }
 							moverDirection={ moverDirection }
 							isMultiSelecting={ isMultiSelecting }
@@ -109,6 +116,7 @@ function BlockList( {
 							enableAnimation={ enableAnimation }
 							hasSelectedUI={ uiParts.hasSelectedUI }
 							hasMovers={ uiParts.hasMovers }
+							className={ clientId === targetClientId ? 'is-drop-target' : undefined }
 						/>
 					</AsyncModeProvider>
 				);
@@ -116,9 +124,10 @@ function BlockList( {
 			<BlockListAppender
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
+				className={ targetClientId === null ? 'is-drop-target' : undefined }
 			/>
 			<__experimentalBlockListFooter.Slot />
-		</div>
+		</Container>
 	);
 }
 

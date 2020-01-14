@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "1.0.0-beta.0",
+	"version": "1.0.0",
 	"private": true,
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",

@@ -35,7 +35,7 @@ function DownloadableBlockHeader( { icon, title, rating, ratingCount, onClick } 
 					onClick();
 				} }
 			>
-				{ __( 'Add' ) }
+				{ __( 'Add block' ) }
 			</Button>
 		</div>
 	);

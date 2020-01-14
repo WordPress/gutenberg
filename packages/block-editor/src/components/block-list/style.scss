@@ -31,6 +31,7 @@
 .block-editor-block-list__layout {
 	padding-left: $block-padding;
 	padding-right: $block-padding;
+	position: relative;
 
 	// Beyond the mobile breakpoint, compensate for side UI.
 	@include break-small() {
@@ -151,6 +152,10 @@
 			opacity: 1;
 		}
 	}
+
+	&.is-drop-target::before {
+		border-top: 3px solid theme(primary);
+	}
 }
 
 
@@ -183,11 +188,6 @@
 				background: transparent;
 			}
 		}
-	}
-
-	// Toolbar is captured
-	&.has-toolbar-captured::before {
-		left: 0; // place "selected" indicator closer to block due to no toolbar
 	}
 }
 
@@ -350,17 +350,9 @@
 		float: none;
 	}
 
-	// Dropzones.
-	.block-editor-block-drop-zone {
-		top: -4px;
-		bottom: -3px;
-		margin: 0 $block-padding;
-	}
-
 	// This essentially duplicates the mobile styles for the appender component.
 	// It would be nice to be able to use element queries in that component instead https://github.com/tomhodgins/element-queries-spec
 	.block-editor-block-list__layout {
-		.block-editor-block-list__empty-block-inserter,
 		.block-editor-default-block-appender .block-editor-inserter {
 			left: auto;
 			right: $grid-size;
@@ -402,13 +394,21 @@
 		display: flex;
 	}
 
-	position: absolute;
-	bottom: auto;
-	left: 0;
-	right: 0;
 	justify-content: center;
-	height: $block-padding + 8px;
+}
 
+.block-editor-block-list__block-popover-inserter {
+	position: absolute;
+	top: -9999em;
+	margin-bottom: $block-padding;
+
+	&.is-visible {
+		position: static;
+	}
+}
+
+.block-editor-block-list__insertion-point-inserter,
+.block-editor-block-list__block-popover-inserter {
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
 		border-radius: 50%;
@@ -420,32 +420,6 @@
 
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			box-shadow: none;
-		}
-	}
-
-	// Hide both the button until hovered.
-	opacity: 0;
-	transition: opacity 0.1s linear;
-	@include reduce-motion("transition");
-
-	&:hover,
-	&.is-visible {
-		opacity: 1;
-	}
-}
-
-// Don't show the sibling inserter before the selected block.
-.edit-post-layout:not(.has-fixed-toolbar) {
-	// The child selector is necessary for this to work properly in nested contexts.
-	.is-selected > .block-editor-block-list__insertion-point > .block-editor-block-list__insertion-point-inserter,
-	.is-focused > .block-editor-block-list__insertion-point > .block-editor-block-list__insertion-point-inserter {
-		opacity: 0;
-		pointer-events: none;
-
-		&:hover,
-		&.is-visible {
-			opacity: 1;
-			pointer-events: auto;
 		}
 	}
 }
@@ -565,7 +539,7 @@
 	z-index: z-index(".block-editor-block-list__block-popover");
 
 	.components-popover__content {
-		margin-left: 0 !important;
+		margin: 0 !important;
 		min-width: auto;
 		background: none;
 		border: none;
@@ -578,7 +552,8 @@
 			margin-left: - $block-padding;
 		}
 
-		.block-editor-block-contextual-toolbar[data-align="full"] {
+		.block-editor-block-contextual-toolbar[data-align="full"],
+		.block-editor-block-list__breadcrumb[data-align="full"] {
 			margin-left: 0;
 		}
 	}

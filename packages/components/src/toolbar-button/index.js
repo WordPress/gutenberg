@@ -12,63 +12,55 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../button';
+import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
-import AccessibleToolbarButtonContainer from './accessible-toolbar-button-container';
 import ToolbarButtonContainer from './toolbar-button-container';
 
 function ToolbarButton( {
 	containerClassName,
-	icon,
-	title,
-	shortcut,
-	subscript,
-	onClick,
 	className,
-	isActive,
-	isDisabled,
 	extraProps,
 	children,
+	...props
 } ) {
-	// It'll contain state if `ToolbarButton` is being used within
-	// `<Toolbar __experimentalAccessibilityLabel="label" />`
 	const accessibleToolbarState = useContext( ToolbarContext );
 
-	const button = (
-		<Button
-			icon={ icon }
-			label={ title }
-			shortcut={ shortcut }
-			data-subscript={ subscript }
-			onClick={ ( event ) => {
-				event.stopPropagation();
-				if ( onClick ) {
-					onClick( event );
-				}
-			} }
-			className={ classnames(
-				'components-toolbar__control',
-				className,
-			) }
-			isPressed={ isActive }
-			disabled={ isDisabled }
-			{ ...extraProps }
-		/>
-	);
-
-	if ( accessibleToolbarState ) {
+	if ( ! accessibleToolbarState ) {
+		// This should be deprecated when <Toolbar __experimentalAccessibilityLabel="label">
+		// becomes stable.
 		return (
-			<AccessibleToolbarButtonContainer className={ containerClassName }>
-				{ button }
-			</AccessibleToolbarButtonContainer>
+			<ToolbarButtonContainer className={ containerClassName }>
+				<Button
+					icon={ props.icon }
+					label={ props.title }
+					shortcut={ props.shortcut }
+					data-subscript={ props.subscript }
+					onClick={ ( event ) => {
+						event.stopPropagation();
+						if ( props.onClick ) {
+							props.onClick( event );
+						}
+					} }
+					className={ classnames( 'components-toolbar__control', className ) }
+					isPressed={ props.isActive }
+					disabled={ props.isDisabled }
+					{ ...extraProps }
+				/>
+				{ children }
+			</ToolbarButtonContainer>
 		);
 	}
 
-	// ToolbarButton is being used outside of the accessible Toolbar
+	// ToobarItem will pass all props to the render prop child, which will pass
+	// all props to Button. This means that ToolbarButton has the same API as
+	// Button.
 	return (
-		<ToolbarButtonContainer className={ containerClassName }>
-			{ button }
-			{ children }
-		</ToolbarButtonContainer>
+		<ToolbarItem
+			className={ classnames( 'components-toolbar-button', className ) }
+			{ ...props }
+		>
+			{ ( toolbarItemProps ) => <Button { ...toolbarItemProps }>{ children }</Button> }
+		</ToolbarItem>
 	);
 }
 

@@ -85,7 +85,7 @@ export const image = {
 		}
 
 		render() {
-			const { value, onChange, isObjectActive, activeObjectAttributes } = this.props;
+			const { value, onChange, onFocus, isObjectActive, activeObjectAttributes } = this.props;
 
 			return (
 				<MediaUploadCheck>
@@ -108,6 +108,7 @@ export const image = {
 									alt,
 								},
 							} ) );
+							onFocus();
 						} }
 						onClose={ this.closeModal }
 						render={ ( { open } ) => {
@@ -124,7 +125,7 @@ export const image = {
 							{ // Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */ }
 							<form
-								className="editor-format-toolbar__image-container-content block-editor-format-toolbar__image-container-content"
+								className="block-editor-format-toolbar__image-container-content"
 								onKeyPress={ stopKeyPropagation }
 								onKeyDown={ this.onKeyDown }
 								onSubmit={ ( event ) => {
@@ -147,7 +148,7 @@ export const image = {
 								} }
 							>
 								<TextControl
-									className="editor-format-toolbar__image-container-value block-editor-format-toolbar__image-container-value"
+									className="block-editor-format-toolbar__image-container-value"
 									type="number"
 									label={ __( 'Width' ) }
 									value={ this.state.width }
