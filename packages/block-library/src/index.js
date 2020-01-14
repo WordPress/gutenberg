@@ -68,6 +68,7 @@ import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
+import * as postAuthor from './post-author';
 import * as postExcerpt from './post-excerpt';
 
 /**
@@ -188,7 +189,14 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 
 				// Register Full Site Editing Blocks.
 				...( __experimentalEnableFullSiteEditing ?
-					[ siteTitle, templatePart, postTitle, postContent, postExcerpt ] :
+					[
+						siteTitle,
+						templatePart,
+						postTitle,
+						postContent,
+						postAuthor,
+						postExcerpt,
+					] :
 					[] ),
 			].forEach( registerBlock );
 		} :
