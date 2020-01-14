@@ -13,12 +13,12 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
+		subscribePreferredColorScheme: () => 'light',
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
 		requestMediaPicker: jest.fn(),
-		getPreferredColorScheme: () => 'light',
 		mediaSources: {
 			deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 			deviceCamera: 'DEVICE_CAMERA',
