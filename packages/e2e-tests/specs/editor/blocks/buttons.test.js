@@ -30,5 +30,11 @@ describe( 'Buttons', () => {
 		await page.keyboard.press( 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+		// TODO - this is needed currently because when adding a link using the suggestion list,
+		// a submit button is used. The form that the submit button is in is unmounted when submission
+		// occurs, resulting in a warning 'Form submission canceled because the form is not connected'
+		// in Chrome.
+		// Ideally, the suggestions wouldn't be implemented using submit buttons.
+		expect( console ).toHaveWarned();
 	} );
 } );
