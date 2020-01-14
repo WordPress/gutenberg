@@ -61,7 +61,7 @@ class URLInput extends Component {
 		}
 
 		// If there is no search text and no current suggestions
-		// then display the initial suggesitons if provided
+		// then display the initial suggestions if provided
 		// (being careful to avoid infinite re-render loop).
 		if ( __experimentalShowInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length ) ) {
 			this.updateSuggestions( '' );
