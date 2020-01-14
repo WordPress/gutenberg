@@ -64,18 +64,14 @@ class URLInput extends Component {
 		// then display the initial suggesitons if provided
 		// (being careful to avoid infinite re-render loop).
 		if ( __experimentalShowInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length ) ) {
-			this.updateSuggestions( '', {
-				isManualSearch: true,
-			} );
+			this.updateSuggestions( '' );
 		}
 	}
 
 	componentDidMount() {
 		const { __experimentalShowInitialSuggestions = false } = this.props;
 		if ( __experimentalShowInitialSuggestions ) {
-			this.updateSuggestions( '', {
-				isManualSearch: true,
-			} );
+			this.updateSuggestions( '' );
 		}
 	}
 
@@ -89,9 +85,7 @@ class URLInput extends Component {
 		};
 	}
 
-	updateSuggestions( value, {
-		isManualSearch = false,
-	} = {} ) {
+	updateSuggestions( value = '' ) {
 		const {
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalHandleURLSuggestions: handleURLSuggestions,
@@ -101,11 +95,13 @@ class URLInput extends Component {
 			return;
 		}
 
+		const isInitialSuggestions = ! value || ! value.length;
+
 		// Allow a suggestions request if:
 		// - there are at least 2 characters in the search input (except manual searches where
 		//   search input length is not required to trigger a fetch)
 		// - this is a direct entry (eg: a URL)
-		if ( ! isManualSearch && ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) ) {
+		if ( ! isInitialSuggestions && ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) ) {
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
@@ -122,7 +118,7 @@ class URLInput extends Component {
 		} );
 
 		const request = fetchLinkSuggestions( value, {
-			isInitialSuggestions: isManualSearch,
+			isInitialSuggestions,
 		} );
 
 		request.then( ( suggestions ) => {
