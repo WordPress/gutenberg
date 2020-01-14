@@ -72,7 +72,7 @@
 		}
 
 		.block-editor-block-toolbar .components-toolbar {
-			padding: ($grid-unit-10 + $border-width + $border-width) $grid-unit-05 ($grid-unit-10 + $border-width);
+			padding: ($grid-unit-10 - $border-width - $border-width) 0;
 		}
 	}
 }
