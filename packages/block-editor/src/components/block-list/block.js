@@ -174,29 +174,26 @@ function BlockListBlock( {
 
 	// Focus the selected block's wrapper or inner input on mount and update
 	const isMounting = useRef( true );
-	useEffect( () => {
-		if ( isSelected && ! isMultiSelecting && ! isNavigationMode ) {
-			focusTabbable( ! isMounting.current );
-		}
-		isMounting.current = false;
-	}, [ isSelected, isMultiSelecting, isNavigationMode ] );
 
-	// Focus the first multi selected block
 	useEffect( () => {
-		if ( isFirstMultiSelected ) {
-			wrapper.current.focus();
+		if ( ! isMultiSelecting && ! isNavigationMode ) {
+			if ( isSelected ) {
+				focusTabbable( ! isMounting.current );
+			} else if ( isFirstMultiSelected ) {
+				wrapper.current.focus();
+			}
 		}
-	}, [ isFirstMultiSelected ] );
+
+		isMounting.current = false;
+	}, [
+		isSelected,
+		isFirstMultiSelected,
+		isMultiSelecting,
+		isNavigationMode,
+	] );
 
 	// Block Reordering animation
 	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, isSelected || isFirstMultiSelected, enableAnimation, animateOnChange );
-
-	// Focus the first editable or the wrapper if edit mode.
-	useLayoutEffect( () => {
-		if ( isSelected && ! isNavigationMode ) {
-			focusTabbable( true );
-		}
-	}, [ isSelected, isNavigationMode ] );
 
 	// Other event handlers
 
