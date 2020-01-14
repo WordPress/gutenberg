@@ -3,6 +3,14 @@
  */
 const pkg = require( './package.json' );
 
+/**
+ * Babel plugin which transforms `warning` function calls to wrap within a
+ * condition that checks if `process.env.NODE_ENV !== 'production'`.
+ *
+ * @param {import('@babel/core')} babel Current Babel object.
+ *
+ * @return {import('@babel/core').PluginObj} Babel plugin object.
+ */
 function babelPlugin( { types: t } ) {
 	const seen = Symbol();
 
