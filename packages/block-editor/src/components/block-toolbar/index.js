@@ -14,12 +14,13 @@ import BlockSwitcher from '../block-switcher';
 import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockMover from '../block-mover';
 
-export default function BlockToolbar( { hasMovers = true } ) {
+export default function BlockToolbar() {
 	const {
 		blockClientIds,
 		isValid,
 		mode,
 		moverDirection,
+		hasMovers = true,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockMode,
@@ -33,6 +34,7 @@ export default function BlockToolbar( { hasMovers = true } ) {
 
 		const {
 			__experimentalMoverDirection,
+			__experimentalUIParts = {},
 		} = getBlockListSettings( blockRootClientId ) || {};
 
 		return {
@@ -45,6 +47,7 @@ export default function BlockToolbar( { hasMovers = true } ) {
 				getBlockMode( selectedBlockClientIds[ 0 ] ) :
 				null,
 			moverDirection: __experimentalMoverDirection,
+			hasMovers: __experimentalUIParts.hasMovers,
 		};
 	}, [] );
 

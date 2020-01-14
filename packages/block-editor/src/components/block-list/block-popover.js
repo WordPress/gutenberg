@@ -49,7 +49,6 @@ function BlockPopover( {
 	moverDirection,
 	isEmptyDefaultBlock,
 	capturingClientId,
-	hasMovers = true,
 } ) {
 	const {
 		isNavigationMode,
@@ -155,7 +154,6 @@ function BlockPopover( {
 					focusOnMount={ isToolbarForced }
 					data-type={ name }
 					data-align={ align }
-					hasMovers={ hasMovers }
 				/>
 			) }
 			{ shouldShowBreadcrumb && (
