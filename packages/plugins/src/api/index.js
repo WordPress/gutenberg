@@ -36,7 +36,7 @@ import PluginManager from '../api/plugin-manager';
  *
  * @typedef {Object} PluginManager
  */
-const pluginManager = applyFilters( 'plugins.pluginManager', new PluginManager() );
+const pluginManager = PluginManager();
 
 /**
  * Registers a plugin to the editor.
