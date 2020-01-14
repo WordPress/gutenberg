@@ -19,6 +19,10 @@ jobs:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
       - name: Build Gutenberg
         run: npm run build
+      - name: Set production constants in gutenberg.php
+        run: |
+          php bin/generate-gutenberg-php.php > gutenberg.tmp.php
+          mv gutenberg.tmp.php gutenberg.php
       - name: Set build_files env var
         run: echo ::set-env name=build_files::$(ls build/*/*.{js,css,asset.php} build/block-library/blocks/*.php)
       - name: Create .zip archive
