@@ -19,6 +19,7 @@ const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
  *                              scroll container edge when part of the anchor
  *                              leaves view.
  * @param {string}  chosenYAxis yAxis to be used.
+ * @param {Element} boundaryElement
  *
  * @return {Object} Popover xAxis position and constraints.
  */
@@ -28,7 +29,8 @@ export function computePopoverXAxisPosition(
 	xAxis,
 	corner,
 	sticky,
-	chosenYAxis
+	chosenYAxis,
+	boundaryElement
 ) {
 	const { width } = contentSize;
 	const isRTL = document.documentElement.dir === 'rtl';
@@ -119,6 +121,11 @@ export function computePopoverXAxisPosition(
 		popoverLeft = leftAlignment.popoverLeft;
 	} else {
 		popoverLeft = rightAlignment.popoverLeft;
+	}
+
+	if ( boundaryElement ) {
+		const boundaryRect = boundaryElement.getBoundingClientRect();
+		popoverLeft = Math.min( popoverLeft, boundaryRect.right - width );
 	}
 
 	return {
