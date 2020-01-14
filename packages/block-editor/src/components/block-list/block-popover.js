@@ -120,7 +120,7 @@ function BlockPopover( {
 			animate={ false }
 			position={ popoverPosition }
 			focusOnMount={ false }
-			anchorRef={ node.lastChild }
+			anchorRef={ node }
 			className="block-editor-block-list__block-popover"
 			__unstableSticky={ showEmptyBlockSideInserter ? false : popoverIsSticky }
 			__unstableSlotName="block-toolbar"
@@ -128,6 +128,7 @@ function BlockPopover( {
 			__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && node }
 			__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && node }
 			onBlur={ () => setIsToolbarForced( false ) }
+			shouldAnchorIncludePadding
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div

@@ -30,7 +30,6 @@
 		}
 		// Set full heights on Columns to enable vertical alignment preview
 		> [data-type="core/column"],
-		> [data-type="core/column"] > div[data-block],
 		> [data-type="core/column"] .block-core-columns {
 			display: flex;
 			flex-direction: column;
@@ -52,6 +51,10 @@
 			padding-right: 0;
 			margin-left: -$block-padding;
 			margin-right: -$block-padding;
+
+			// Zero out margins.
+			margin-top: 0;
+			margin-bottom: 0;
 
 			// Prevent the columns from growing wider than their distributed sizes.
 			min-width: 0;
@@ -93,16 +96,10 @@
 				right: 0;
 			}
 
-			// Zero out margins.
-			> [data-block] {
-				margin-top: 0;
-				margin-bottom: 0;
-			}
-
 			// The Columns block is a flex-container, therefore it nullifies margin collapsing.
 			// Therefore, blocks inside this will appear to create a double margin.
 			// We compensate for this using negative margins.
-			> div > .block-core-columns > .block-editor-inner-blocks {
+			> .block-core-columns > .block-editor-inner-blocks {
 				margin-top: -$default-block-margin;
 				margin-bottom: -$default-block-margin;
 			}

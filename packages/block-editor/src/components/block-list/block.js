@@ -126,9 +126,6 @@ function BlockListBlock( {
 		}
 	}, [ isSelected, isFirstMultiSelected ] );
 
-	// Reference to the block edit node
-	const blockNodeRef = useRef();
-
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
 	const onBlockError = () => setErrorState( true );
@@ -308,6 +305,7 @@ function BlockListBlock( {
 			id={ blockElementId }
 			ref={ wrapper }
 			className={ wrapperClassName }
+			data-block={ clientId }
 			data-type={ name }
 			// Only allow shortcuts when a blocks is selected and not locked.
 			onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
@@ -326,24 +324,22 @@ function BlockListBlock( {
 					animationStyle
 			}
 		>
-			<div ref={ blockNodeRef } data-block={ clientId }>
-				<BlockCrashBoundary onError={ onBlockError }>
-					{ isValid && blockEdit }
-					{ isValid && mode === 'html' && (
-						<BlockHtml clientId={ clientId } />
-					) }
-					{ ! isValid && [
-						<BlockInvalidWarning
-							key="invalid-warning"
-							clientId={ clientId }
-						/>,
-						<div key="invalid-preview">
-							{ getSaveElement( blockType, attributes ) }
-						</div>,
-					] }
-				</BlockCrashBoundary>
-				{ !! hasError && <BlockCrashWarning /> }
-			</div>
+			<BlockCrashBoundary onError={ onBlockError }>
+				{ isValid && blockEdit }
+				{ isValid && mode === 'html' && (
+					<BlockHtml clientId={ clientId } />
+				) }
+				{ ! isValid && [
+					<BlockInvalidWarning
+						key="invalid-warning"
+						clientId={ clientId }
+					/>,
+					<div key="invalid-preview">
+						{ getSaveElement( blockType, attributes ) }
+					</div>,
+				] }
+			</BlockCrashBoundary>
+			{ !! hasError && <BlockCrashWarning /> }
 		</animated.div>
 	);
 }
