@@ -46,6 +46,7 @@ class URLInput extends Component {
 	componentDidUpdate() {
 		const { showSuggestions, selectedSuggestion, suggestions } = this.state;
 		const { __experimentalShowInitialSuggestions = false, value } = this.props;
+
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
 		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
@@ -64,14 +65,15 @@ class URLInput extends Component {
 		// then display the initial suggestions if provided
 		// (being careful to avoid infinite re-render loop).
 		if ( __experimentalShowInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length ) ) {
-			this.updateSuggestions( '' );
+			this.updateSuggestions();
 		}
 	}
 
 	componentDidMount() {
-		const { __experimentalShowInitialSuggestions = false } = this.props;
-		if ( __experimentalShowInitialSuggestions ) {
-			this.updateSuggestions( '' );
+		const { suggestions } = this.state;
+		const { __experimentalShowInitialSuggestions = false, value } = this.props;
+		if ( __experimentalShowInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length ) ) {
+			this.updateSuggestions();
 		}
 	}
 
@@ -95,7 +97,7 @@ class URLInput extends Component {
 			return;
 		}
 
-		const isInitialSuggestions = ! value || ! value.length;
+		const isInitialSuggestions = ! ( value && value.length );
 
 		// Allow a suggestions request if:
 		// - there are at least 2 characters in the search input (except manual searches where

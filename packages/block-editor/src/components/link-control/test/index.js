@@ -310,7 +310,7 @@ describe( 'Manual link entry', () => {
 } );
 
 describe( 'Default search suggestions', () => {
-	it( 'should display a list of initial search suggestions if provided', async () => {
+	it( 'should display a list of initial search suggestions when there is no search value or suggestions', async () => {
 		const searchSuggestionsSpy = jest.fn( fetchFauxEntitySuggestions );
 		const expectedResultsLength = 3; // set within `LinkControl`
 
@@ -335,8 +335,68 @@ describe( 'Default search suggestions', () => {
 		// when this does not have a value
 		expect( searchInput.value ).toBe( '' );
 
+		expect( searchSuggestionsSpy ).toHaveBeenCalled();
+
 		// Verify the search results already display the initial suggestions
 		expect( initialSearchResultElements ).toHaveLength( expectedResultsLength );
+	} );
+
+	it( 'should not display initial suggestions when input value is present', async () => {
+		const searchSuggestionsSpy = jest.fn( fetchFauxEntitySuggestions );
+		let searchResultElements;
+		//
+		// Render with an initial value an ensure that no initial suggestions
+		// are shown.
+		//
+		act( () => {
+			render(
+				<LinkControl
+					fetchSearchSuggestions={ searchSuggestionsSpy }
+					initialSuggestions={ true }
+					value={ fauxEntitySuggestions[ 0 ] }
+				/>, container
+			);
+		} );
+
+		await eventLoopTick();
+
+		expect( searchSuggestionsSpy ).not.toHaveBeenCalled();
+
+		//
+		// Click the "Edit/Change" button and check initial suggestions are not
+		// shown.
+		//
+		const currentLinkUI = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
+
+		act( () => {
+			Simulate.click( currentLinkBtn );
+		} );
+
+		await eventLoopTick();
+
+		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+
+		expect( searchResultElements ).toHaveLength( 0 );
+
+		expect( searchSuggestionsSpy ).not.toHaveBeenCalled();
+
+		//
+		// Reset the search to empty and check the initial suggestions are now shown.
+		//
+		const resetUI = container.querySelector( '[aria-label="Reset"]' );
+
+		act( () => {
+			Simulate.click( resetUI );
+		} );
+
+		await eventLoopTick();
+
+		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+
+		expect( searchResultElements ).toHaveLength( 3 );
+
+		expect( searchSuggestionsSpy ).toHaveBeenCalled();
 	} );
 } );
 
@@ -586,8 +646,6 @@ describe( 'Addition Settings UI', () => {
 				<LinkControlConsumer />, container
 			);
 		} );
-
-		// console.log( container.innerHTML );
 
 		const newTabSettingLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML && label.innerHTML.includes( expectedSettingText ) );
 		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found
