@@ -713,6 +713,7 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
+		// Logic below assures that `RichText` width will always have equal value when container is almost fully filled.
 		const width = maxWidth && this.state.width && ( maxWidth - this.state.width ) < 10 ? maxWidth : this.state.width;
 
 		return (

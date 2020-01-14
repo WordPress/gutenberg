@@ -14,7 +14,7 @@ import {
  */
 import styles from './editor.scss';
 
-function BackgroundContainer( { children, borderRadiusValue, backgroundColor } ) {
+function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
 	const wrapperStyles = [
 		styles.richTextWrapper,
 		{
@@ -63,4 +63,4 @@ function BackgroundContainer( { children, borderRadiusValue, backgroundColor } )
 	);
 }
 
-export default BackgroundContainer;
+export default ColorBackground;
