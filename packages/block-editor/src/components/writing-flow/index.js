@@ -27,7 +27,6 @@ import {
 	isBlockFocusStop,
 	isInSameBlock,
 	hasInnerBlocksContext,
-	getBlockFocusableWrapper,
 	isInsideRootBlock,
 	getBlockDOMNode,
 	getBlockClientId,
@@ -329,7 +328,7 @@ export default function WritingFlow( { children } ) {
 					event.preventDefault();
 					selectBlock( focusedBlockUid );
 				} else if ( isTab && selectedBlockClientId ) {
-					const wrapper = getBlockFocusableWrapper( selectedBlockClientId );
+					const wrapper = getBlockDOMNode( selectedBlockClientId );
 					let nextTabbable;
 
 					if ( navigateDown ) {
@@ -358,7 +357,7 @@ export default function WritingFlow( { children } ) {
 		// Arrow keys can be used, and Tab and arrow keys can be used in
 		// Navigation mode (press Esc), to navigate through blocks.
 		if ( clientId ) {
-			const wrapper = getBlockFocusableWrapper( clientId );
+			const wrapper = getBlockDOMNode( clientId );
 
 			if ( isTab ) {
 				if ( isShift ) {

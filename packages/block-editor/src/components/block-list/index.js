@@ -73,16 +73,8 @@ function BlockList( {
 		enableAnimation,
 	} = useSelect( selector, [ rootClientId ] );
 
-	const uiParts = {
-		hasMovers: true,
-		hasSelectedUI: true,
-		...__experimentalUIParts,
-	};
-
 	const Container = rootClientId ? 'div' : RootContainer;
-
 	const ref = useRef();
-
 	const targetClientId = useBlockDropZone( {
 		element: ref,
 		rootClientId,
@@ -114,8 +106,7 @@ function BlockList( {
 							// otherwise there might be a small delay to trigger the animation.
 							animateOnChange={ index }
 							enableAnimation={ enableAnimation }
-							hasSelectedUI={ uiParts.hasSelectedUI }
-							hasMovers={ uiParts.hasMovers }
+							hasSelectedUI={ __experimentalUIParts.hasSelectedUI }
 							className={ clientId === targetClientId ? 'is-drop-target' : undefined }
 						/>
 					</AsyncModeProvider>
