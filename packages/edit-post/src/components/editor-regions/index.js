@@ -37,7 +37,8 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 					<div
 						className="edit-post-editor-regions__sidebar"
 						role="region"
-						aria-label={ 'Editor settings' }
+						/* translators: accessibility text for the settings landmark region. */
+						aria-label={ __( 'Editor settings' ) }
 						tabIndex="-1"
 					>
 						{ sidebar }
@@ -59,7 +60,8 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 				<div
 					className="edit-post-editor-regions__footer"
 					role="region"
-					aria-label={ 'Editor footer' }
+					/* translators: accessibility text for the footer landmark region. */
+					aria-label={ __( 'Editor footer' ) }
 					tabIndex="-1"
 				>
 					{ footer }

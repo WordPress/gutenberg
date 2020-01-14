@@ -39,7 +39,7 @@ const tabThroughParagraphBlock = async ( paragraphText, blockIndex ) => {
 	) ).toBe( paragraphText );
 
 	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Open publish panel' );
+	await expect( await getActiveLabel() ).toBe( 'Document' );
 };
 
 const tabThroughBlockMoverControl = async () => {
@@ -128,7 +128,7 @@ describe( 'Order of block keyboard navigation', () => {
 		await expect( await getActiveLabel() ).toBe( 'Paragraph' );
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Open publish panel' );
+		await expect( await getActiveLabel() ).toBe( 'Document (selected)' );
 	} );
 
 	it( 'allows tabbing in navigation mode if no block is selected (reverse)', async () => {
@@ -145,9 +145,6 @@ describe( 'Order of block keyboard navigation', () => {
 			document.querySelector( '.edit-post-visual-editor' ).focus();
 			document.querySelector( '.edit-post-editor-regions__sidebar' ).focus();
 		} );
-
-		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Open publish panel' );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect( await getActiveLabel() ).toBe( 'Paragraph' );
