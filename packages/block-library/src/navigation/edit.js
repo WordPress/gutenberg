@@ -48,7 +48,6 @@ function Navigation( {
 	fontSize,
 	hasExistingNavItems,
 	hasResolvedPages,
-	isSelected,
 	isRequestingPages,
 	pages,
 	setAttributes,
@@ -199,7 +198,6 @@ function Navigation( {
 						allowedBlocks={ [ 'core/navigation-link' ] }
 						templateInsertUpdatesSelection={ false }
 						__experimentalMoverDirection={ 'horizontal' }
-						renderAppender={ isSelected ? InnerBlocks.ButtonBlockAppender : false }
 					/>
 
 				</div>

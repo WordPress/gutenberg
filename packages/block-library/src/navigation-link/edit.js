@@ -38,6 +38,7 @@ import { Fragment, useState, useEffect } from '@wordpress/element';
 
 function NavigationLinkEdit( {
 	attributes,
+	hasDescendants,
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
@@ -182,7 +183,7 @@ function NavigationLinkEdit( {
 				</div>
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
-					renderAppender={ isSelected ? InnerBlocks.ButtonBlockAppender : false }
+					renderAppender={ ( hasDescendants && isSelected ) ? InnerBlocks.DefaultAppender : false }
 				/>
 			</div>
 		</Fragment>
@@ -191,11 +192,12 @@ function NavigationLinkEdit( {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { hasSelectedInnerBlock } = select( 'core/block-editor' );
+		const { getClientIdsOfDescendants, hasSelectedInnerBlock } = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 
 		return {
 			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
+			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {

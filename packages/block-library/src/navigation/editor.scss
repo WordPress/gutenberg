@@ -61,11 +61,17 @@
 	// Polish the Appender.
 	.wp-block-navigation .block-list-appender {
 		margin: 0;
+		width: 28px;
+		height: 28px;
+		margin-top: $grid-size/2;
 
 		.block-editor-button-block-appender {
 			padding: $grid-size;
+			padding-bottom: $grid-size/2;
+			padding-top: $grid-size/2;
 			outline: none;
 			background: none;
+			border-radius: 50%;
 		}
 	}
 }
