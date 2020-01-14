@@ -65,7 +65,7 @@ export function LinkControl( {
 
 		// Populate input searcher whether
 		// the current link has a title.
-		if ( value && value.title && mode === 'edit' ) {
+		if ( value && value.title && MODE_EDIT === mode ) {
 			setInputValue( value.title );
 		}
 	};
