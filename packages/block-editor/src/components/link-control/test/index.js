@@ -12,7 +12,7 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import LinkControl from '../index';
+import { LinkControl } from '../index';
 import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
 
 /**
