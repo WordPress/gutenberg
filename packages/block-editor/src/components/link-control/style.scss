@@ -71,7 +71,7 @@
 	margin: 0;
 	padding: $grid-size-large/2 $grid-size-large $grid-size-large;
 	max-height: 200px;
-	overflow-y: scroll; // allow results list to scroll
+	overflow-y: auto; // allow results list to scroll
 
 	&.is-loading {
 		opacity: 0.2;
