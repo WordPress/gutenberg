@@ -25,6 +25,10 @@
 	margin: 0;
 	display: block;
 	height: $grid-unit-60;
+
+	.block-editor-block-icon {
+		margin: auto;
+	}
 }
 
 .components-button.block-editor-block-switcher__no-switcher-icon {
