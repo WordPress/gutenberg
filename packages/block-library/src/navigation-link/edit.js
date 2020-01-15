@@ -166,10 +166,10 @@ function NavigationLinkEdit( {
 					/>
 					{ isLinkOpen && (
 						<Popover position="bottom center">
-						<LinkControl
-							className="wp-block-navigation-link__inline-link-input"
-							value={ link }
-							initialSuggestions={ true }
+							<LinkControl
+								className="wp-block-navigation-link__inline-link-input"
+								value={ link }
+								initialSuggestions={ true }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
