@@ -40,6 +40,7 @@ import { toolbarSubmenuIcon, itemSubmenuIcon } from './icons';
 
 function NavigationLinkEdit( {
 	attributes,
+	hasChild,
 	hasDescendants,
 	isSelected,
 	isParentOfSelectedBlock,
@@ -196,6 +197,7 @@ function NavigationLinkEdit( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
 					'is-selected': isSelected,
 					'has-link': !! url,
+					'has-child': hasChild,
 				} ) }
 			>
 				<div className="wp-block-navigation-link__content">
@@ -291,8 +293,10 @@ export default compose( [
 			getBlockParents,
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
+			getBlocks,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
+		const innerBlocks = getBlocks( clientId );
 		const rootBlock = getBlockParents( clientId )[ 0 ];
 		const parentBlock = getBlockParents( clientId, true )[ 0 ];
 		const rootBlockAttributes = getBlockAttributes( rootBlock );
@@ -309,6 +313,7 @@ export default compose( [
 			isParentOfSelectedBlock,
 			hasDescendants,
 			showSubmenuIcon,
+			hasChild: !! innerBlocks.length,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
