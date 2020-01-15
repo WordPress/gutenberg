@@ -1,3 +1,11 @@
+## Master
+
+### New feature
+
+- Check for iterators rather than generators. This relaxes an excessive restriction where actions
+  were checked to be Generators, while the module is concerned with the iterator interface
+  ([#19666](https://github.com/WordPress/gutenberg/pull/19666)).
+
 ## 3.1.0 (2019-03-06)
 
 ### Bug Fixes
