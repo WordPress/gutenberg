@@ -52,9 +52,10 @@ function babelPlugin( { types: t } ) {
 					( specifier ) => specifier.type === 'ImportDefaultSpecifier'
 				);
 
-				const { name } = defaultSpecifier.local;
-
-				state.callee = name;
+				if ( defaultSpecifier && defaultSpecifier.local ) {
+					const { name } = defaultSpecifier.local;
+					state.callee = name;
+				}
 			},
 			CallExpression( path, state ) {
 				const { node } = path;
