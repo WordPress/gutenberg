@@ -25,11 +25,13 @@ import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 
-const fetchLinkSuggestions = async ( search ) => {
+const fetchLinkSuggestions = async ( search, {
+	perPage = 20,
+} = {} ) => {
 	const posts = await apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
-			per_page: 20,
+			per_page: perPage,
 			type: 'post',
 		} ),
 	} );

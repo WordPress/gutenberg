@@ -26,7 +26,7 @@ describe( 'Buttons', () => {
 		await insertBlock( 'Buttons' );
 		await page.keyboard.type( 'WordPress' );
 		await pressKeyWithModifier( 'primary', 'k' );
-		await page.keyboard.type( 'https://wwww.wordpress.org/' );
+		await page.keyboard.type( 'https://www.wordpress.org/' );
 		await page.keyboard.press( 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

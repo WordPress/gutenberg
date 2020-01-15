@@ -169,6 +169,7 @@ function NavigationLinkEdit( {
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
+								initialSuggestions={ true }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -201,6 +202,7 @@ export default compose( [
 		return {
 			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
 			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
+
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
