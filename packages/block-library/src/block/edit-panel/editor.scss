@@ -19,14 +19,12 @@
 	.reusable-block-edit-panel__label {
 		margin-right: $grid-unit-10;
 		white-space: nowrap;
-		font-weight: 600;
+		font-family: $default-font;
+		font-size: $default-font-size;
 	}
 
 	.reusable-block-edit-panel__title {
 		flex: 1 1 100%;
-		font-size: 14px;
-		height: 30px;
-		margin: $grid-unit-05 0 $grid-unit-10;
 	}
 
 	.components-button.reusable-block-edit-panel__button {
