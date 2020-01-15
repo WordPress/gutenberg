@@ -1,22 +1,16 @@
 /**
- * External dependencies
- */
-import { EventEmitter } from 'events';
-
-/**
  * Internal dependencies
  */
 import { createQueue } from '../';
 import requestIdleCallback from '../request-idle-callback';
 
-const emitter = new EventEmitter();
+jest.mock( '../request-idle-callback', () => {
+	const emitter = new ( require.requireActual( 'events' ).EventEmitter )();
 
-const tick = () => emitter.emit( 'tick' );
-
-jest.mock( '../request-idle-callback', () => jest.fn() );
-
-requestIdleCallback.mockImplementation( ( callback ) => {
-	emitter.once( 'tick', () => callback( Date.now() ) );
+	return Object.assign(
+		( callback ) => emitter.once( 'tick', () => callback( Date.now() ) ),
+		{ tick: () => emitter.emit( 'tick' ) },
+	);
 } );
 
 describe( 'createQueue', () => {
@@ -28,7 +22,7 @@ describe( 'createQueue', () => {
 	it( 'runs callback after processing waiting queue', () => {
 		const callback = jest.fn();
 		queue.add( {}, callback );
-		tick();
+		requestIdleCallback.tick();
 		expect( callback ).toHaveBeenCalled();
 	} );
 } );
