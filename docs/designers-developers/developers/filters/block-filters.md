@@ -110,7 +110,7 @@ register_block_style(
 
 The function's first argument is the registered name of the block, and the name of the style as the second argument.
 
-The following code sample unregisteres the style named 'fancy-quote'  from the quote block:
+The following code sample unregisters the style named 'fancy-quote'  from the quote block:
 
 ```php
 unregister_block_style( 'core/quote', 'fancy-quote' );
