@@ -176,7 +176,7 @@ function NavigationLinkEdit( {
 									opensInNewTab: newOpensInNewTab,
 								} = {} ) => setAttributes( {
 									title: escape( newTitle ),
-									url: newURL,
+									url: encodeURI( newURL ),
 									label: label || escape( newTitle ),
 									opensInNewTab: newOpensInNewTab,
 								} ) }
