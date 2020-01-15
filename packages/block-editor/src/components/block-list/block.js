@@ -2,18 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { first, last } from 'lodash';
 import { animated } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies
  */
 import { useRef, useEffect, useLayoutEffect, useState, useContext } from '@wordpress/element';
-import {
-	focus,
-	isTextField,
-	placeCaretAtHorizontalEdge,
-} from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
 	getBlockType,
@@ -41,7 +35,6 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context } from './root-container';
 
@@ -90,7 +83,6 @@ function BlockListBlock( {
 	index,
 	isValid,
 	attributes,
-	initialPosition,
 	wrapperProps,
 	setAttributes,
 	onReplace,
@@ -136,49 +128,19 @@ function BlockListBlock( {
 	const blockType = getBlockType( name );
 	const blockAriaLabel = useDebouncedAccessibleBlockLabel( blockType, attributes, index, moverDirection, 400 );
 
-	// Handing the focus of the block on creation and update
-
-	/**
-	 * When a block becomes selected, transition focus to an inner tabbable.
-	 *
-	 * @param {boolean} ignoreInnerBlocks Should not focus inner blocks.
-	 */
-	const focusTabbable = ( ignoreInnerBlocks ) => {
-		// Focus is captured by the wrapper node, so while focus transition
-		// should only consider tabbables within editable display, since it
-		// may be the wrapper itself or a side control which triggered the
-		// focus event, don't unnecessary transition to an inner tabbable.
-		if ( wrapper.current.contains( document.activeElement ) ) {
-			return;
-		}
-
-		// Find all tabbables within node.
-		const textInputs = focus.tabbable
-			.find( wrapper.current )
-			.filter( isTextField )
-			// Exclude inner blocks
-			.filter( ( node ) => ! ignoreInnerBlocks || isInsideRootBlock( wrapper.current, node ) );
-
-		// If reversed (e.g. merge via backspace), use the last in the set of
-		// tabbables.
-		const isReverse = -1 === initialPosition;
-		const target = ( isReverse ? last : first )( textInputs );
-
-		if ( ! target ) {
-			wrapper.current.focus();
-			return;
-		}
-
-		placeCaretAtHorizontalEdge( target, isReverse );
-	};
-
 	// Focus the selected block's wrapper or inner input on mount and update
 	const isMounting = useRef( true );
 
 	useEffect( () => {
 		if ( ! isMultiSelecting && ! isNavigationMode ) {
 			if ( isSelected ) {
-				focusTabbable( ! isMounting.current );
+				// Focus is captured by the wrapper node, so while focus transition
+				// should only consider tabbables within editable display, since it
+				// may be the wrapper itself or a side control which triggered the
+				// focus event, don't unnecessary transition to an inner tabbable.
+				if ( ! wrapper.current.contains( document.activeElement ) ) {
+					wrapper.current.focus();
+				}
 			} else if ( isFirstMultiSelected ) {
 				wrapper.current.focus();
 			}
@@ -477,14 +439,14 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 				}
 			}
 		},
-		onReplace( blocks, indexToSelect ) {
+		onReplace( blocks, ...props ) {
 			if (
 				blocks.length &&
 				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
 			) {
 				__unstableMarkLastChangeAsPersistent();
 			}
-			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
+			replaceBlocks( [ ownProps.clientId ], blocks, ...props );
 		},
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );

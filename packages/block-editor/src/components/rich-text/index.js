@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
+import { omit, findKey } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -244,22 +244,34 @@ class RichTextWrapper extends Component {
 			blocks.push( onSplitMiddle() );
 		}
 
+		let newAttributeKey;
+
 		// If there's pasted blocks, append a block with the content after the
 		// caret. Otherwise, do append and empty block if there is no
 		// `onSplitMiddle` prop, but if there is and the content is empty, the
 		// middle block is enough to set focus in.
 		if ( hasPastedBlocks || ! onSplitMiddle || ! isEmpty( after ) ) {
-			blocks.push( onSplit( toHTMLString( {
-				value: after,
+			const START_OF_SELECTED_AREA = '\u0086';
+			const afterBlock = onSplit( toHTMLString( {
+				value: insert( after, START_OF_SELECTED_AREA, 0, 0 ),
 				multilineTag,
-			} ) ) );
+			} ) );
+
+			newAttributeKey = findKey( afterBlock.attributes, ( v ) =>
+				typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
+			);
+
+			afterBlock.attributes[ newAttributeKey ] =
+			afterBlock.attributes[ newAttributeKey ].replace( START_OF_SELECTED_AREA, '' );
+
+			blocks.push( afterBlock );
 		}
 
 		// If there are pasted blocks, set the selection to the last one.
 		// Otherwise, set the selection to the second block.
 		const indexToSelect = hasPastedBlocks ? blocks.length - 1 : 1;
 
-		onReplace( blocks, indexToSelect );
+		onReplace( blocks, indexToSelect, newAttributeKey, 0 );
 	}
 
 	inputRule( value, valueToFormat ) {
