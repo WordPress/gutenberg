@@ -77,12 +77,45 @@ $navigation-item-height: 46px;
 	flex-wrap: wrap;
 }
 
-// Vertical aligment.
+// Vertical alignment.
 .wp-block-navigation {
 	min-height: $navigation-height;
 	padding-top: 7px;
 	padding-bottom: 7px;
 	align-items: center;
+}
+
+// Sub menus.
+
+
+// Only display inner blocks when the block is being edited.
+
+.wp-block-navigation {
+	.wp-block-navigation-link {
+		position: relative;
+
+		// Only display inner blocks when the block is being edited.
+		> .block-editor-inner-blocks {
+			display: none;
+		}
+
+		&.is-editing.has-child > .block-editor-inner-blocks {
+			display: block;
+			position: absolute;
+			width: 100%;
+			z-index: 1;
+			white-space: nowrap;
+
+			border: 1px solid $light-style-sub-menu-border-color;
+			background-color: $light-style-sub-menu-background-color;
+			color: $light-style-sub-menu-text-color;
+
+			.block-editor-inner-blocks {
+				left: 100%;
+				top: 0;
+			}
+		}
+	}
 }
 
 .wp-block-navigation__inserter-content {

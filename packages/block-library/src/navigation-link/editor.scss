@@ -56,18 +56,9 @@
 		margin: $grid-size;
 	}
 
-	// Only display inner blocks when the block is being edited.
-	.block-editor-inner-blocks {
-		display: none;
-	}
-
 	&.is-editing,
 	&.is-selected {
 		min-width: 20px;
-	}
-
-	&.is-editing .block-editor-inner-blocks {
-		display: block;
 	}
 
 	&.has-link .wp-block-navigation-link__content {
@@ -77,6 +68,9 @@
 	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
 		display: inline-block;
 	}
+
+	// sub-menus.
+
 }
 
 [data-type="core/navigation-link"] {
