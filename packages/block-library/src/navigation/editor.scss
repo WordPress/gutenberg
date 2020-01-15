@@ -32,13 +32,8 @@
 		padding-right: 0;
 		margin-left: 0;
 		margin-right: 0;
-		margin-bottom: 1em; // Useful for when items wrap.
-	}
-
-	// 3. Remove vertical margins on subsequent block container.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout .wp-block > [data-block] {
 		margin-top: 0;
-		margin-bottom: 0;
+		margin-bottom: 1em; // Useful for when items wrap.
 	}
 
 	.wp-block-navigation .block-editor-block-list__block::before {
