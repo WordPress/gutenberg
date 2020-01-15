@@ -46,7 +46,7 @@ const styles = StyleSheet.create( {
 		backgroundColor: '#2e4453',
 	},
 	subscriptInactive: {
-		color: '#7b9ab1',
+		color: '#7b9ab1', // $toolbar-button
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
@@ -125,8 +125,8 @@ export function Button( props ) {
 		)
 	);
 
-	const newIcon = cloneElement( ( icon && <Icon icon={ icon } size={ iconSize } /> ),
-		{ colorScheme: props.preferredColorScheme, isPressed } );
+	const newIcon = icon ? cloneElement( ( <Icon icon={ icon } size={ iconSize } /> ),
+		{ colorScheme: props.preferredColorScheme, isPressed } ) : null;
 
 	const element = (
 		<TouchableOpacity

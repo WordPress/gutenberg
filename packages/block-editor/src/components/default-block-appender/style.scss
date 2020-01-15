@@ -62,7 +62,6 @@
 	.components-button.has-icon {
 		width: $block-side-ui-width;
 		height: $block-side-ui-width;
-		margin-right: 12px;
 		padding: 0;
 	}
 
@@ -89,10 +88,7 @@
 
 	@include break-small {
 		display: flex;
-		align-items: center;
 		height: 100%;
-		left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
-		right: auto;
 	}
 
 	&:disabled {
@@ -112,5 +108,11 @@
 				color: $light-opacity-500;
 			}
 		}
+	}
+}
+
+.block-editor-default-block-appender .block-editor-inserter {
+	@include break-small {
+		align-items: center;
 	}
 }
