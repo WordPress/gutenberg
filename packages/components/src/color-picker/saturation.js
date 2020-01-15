@@ -62,6 +62,17 @@ export class Saturation extends Component {
 		this.handleMouseUp = this.handleMouseUp.bind( this );
 	}
 
+	componentDidMount() {
+		// Ensure container is scrolled to the left.
+		// When pointer starts at right edge, scroll position is offset by a few pixels (issue #19610).
+		const findContainer = setInterval( () => {
+			if ( this.container.current ) {
+				this.container.current.scroll( 0, 0 );
+				clearInterval( findContainer );
+			}
+		}, 10 );
+	}
+
 	componentWillUnmount() {
 		this.throttle.cancel();
 		this.unbindEventListeners();
