@@ -473,9 +473,7 @@
 	}
 
 	// Block UI appearance.
-	border: $border-width solid $border-color;
-	border-radius: $radius-block-ui;
-	background-color: $white;
+	@include block-ui-emphasized();
 }
 
 
