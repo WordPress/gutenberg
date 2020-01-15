@@ -17,9 +17,9 @@ function Warning( { className, actions, children, secondaryActions } ) {
 			<div className="block-editor-warning__contents">
 				<p className="block-editor-warning__message">{ children }</p>
 
-				{ Children.count( actions ) > 0 && (
-					<div className="block-editor-warning__actions">
-						{ Children.map( actions, ( action, i ) => (
+				<div className="block-editor-warning__actions">
+					{ Children.count( actions ) > 0 &&
+						Children.map( actions, ( action, i ) => (
 							<span
 								key={ i }
 								className="block-editor-warning__action"
@@ -27,33 +27,34 @@ function Warning( { className, actions, children, secondaryActions } ) {
 								{ action }
 							</span>
 						) ) }
-					</div>
-				) }
-			</div>
-
-			{ secondaryActions && (
-				<Dropdown
-					className="block-editor-warning__secondary"
-					position="bottom left"
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button
-							icon={ moreHorizontal }
-							label={ __( 'More options' ) }
-							onClick={ onToggle }
-							aria-expanded={ isOpen }
+					{ secondaryActions && (
+						<Dropdown
+							className="block-editor-warning__secondary"
+							position="bottom left"
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<Button
+									icon="ellipsis"
+									label={ __( 'More options' ) }
+									onClick={ onToggle }
+									aria-expanded={ isOpen }
+								/>
+							) }
+							renderContent={ () => (
+								<MenuGroup>
+									{ secondaryActions.map( ( item, pos ) => (
+										<MenuItem
+											onClick={ item.onClick }
+											key={ pos }
+										>
+											{ item.title }
+										</MenuItem>
+									) ) }
+								</MenuGroup>
+							) }
 						/>
 					) }
-					renderContent={ () => (
-						<MenuGroup>
-							{ secondaryActions.map( ( item, pos ) => (
-								<MenuItem onClick={ item.onClick } key={ pos }>
-									{ item.title }
-								</MenuItem>
-							) ) }
-						</MenuGroup>
-					) }
-				/>
-			) }
+				</div>
+			</div>
 		</div>
 	);
 }
