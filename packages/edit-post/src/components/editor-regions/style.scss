@@ -38,6 +38,7 @@ html {
 .edit-post-editor-regions__body {
 	flex-grow: 1;
 	display: flex;
+	background-color: $light-gray-700;
 
 	// Even on Mobile, we choose to scroll this element on its own.
 	// This helps enable a fixed-to-top toolbar that makes the editing experience
@@ -59,6 +60,9 @@ html {
 
 .edit-post-editor-regions__content {
 	flex-grow: 1;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
 
 	// Treat as flex container to allow children to grow to occupy full
 	// available height of the content area.

@@ -52,7 +52,12 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 					/* translators: accessibility text for the content landmark region. */
 					aria-label={ __( 'Editor content' ) }
 					tabIndex="-1"
-					style={ { width: canvasWidth, margin: '0 auto', flexGrow: 0 } }
+					style={ {
+						width: canvasWidth,
+						margin: '0 auto',
+						flexGrow: 0,
+						height: canvasWidth < 500 ? 780 : 'auto',
+					} }
 				>
 					{ content }
 				</div>

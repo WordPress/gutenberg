@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component, renderToString } from '@wordpress/element';
-import { Button, Dropdown, MenuGroup, MenuItem, Path, SVG } from '@wordpress/components';
+import { Button, Dropdown, MenuGroup, MenuItem, Path, Polygon, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
@@ -99,6 +99,19 @@ function writeInterstitialMessage( targetDocument ) {
 	targetDocument.close();
 }
 
+const downArrow = (
+	<SVG width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
+		<Polygon points="9,13.5 14.7,7.9 13.2,6.5 9,10.7 4.8,6.5 3.3,7.9 " />
+	</SVG>
+);
+
+const checkIcon = (
+	<SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+		<Path fill="none" d="M0 0h24v24H0z" />
+		<Path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
+	</SVG>
+);
+
 export class PostPreviewButton extends Component {
 	constructor() {
 		super( ...arguments );
@@ -184,33 +197,48 @@ export class PostPreviewButton extends Component {
 
 		return (
 			<Dropdown
+				className="editor-post-preview__dropdown"
+				contentClassName="editor-post-preview__dropdown-content"
 				renderToggle={ ( { isOpen, onToggle } ) => (
-					<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
+					<Button onClick={ onToggle }
+						className="editor-post-preview__button-toggle"
+						aria-expanded={ isOpen }
+					>
 						{ this.props.deviceType }
+						<div className="editor-post-preview__button-separator">{ downArrow }</div>
 					</Button>
 				) }
 				renderContent={ () => (
 					<>
 						<MenuGroup>
-							<MenuItem
-								onClick={ () => toggleCanvas( 'Desktop' ) }
-							>
-								{ __( 'Desktop' ) }
-							</MenuItem>
-							<MenuItem
-								onClick={ () => toggleCanvas( 'Tablet' ) }
-							>
-								{ __( 'Tablet' ) }
-							</MenuItem>
-							<MenuItem
-								onClick={ () => toggleCanvas( 'Mobile' ) }
-							>
-								{ __( 'Mobile' ) }
-							</MenuItem>
+							<fieldset>
+								<legend className="editor-post-preview__legend">View</legend>
+								<MenuItem
+									className="editor-post-preview__button-resize"
+									onClick={ () => toggleCanvas( 'Desktop' ) }
+								>
+									{ __( 'Desktop' ) }
+									{ this.props.deviceType === 'Desktop' && checkIcon }
+								</MenuItem>
+								<MenuItem
+									className="editor-post-preview__button-resize"
+									onClick={ () => toggleCanvas( 'Tablet' ) }
+								>
+									{ __( 'Tablet' ) }
+									{ this.props.deviceType === 'Tablet' && checkIcon }
+								</MenuItem>
+								<MenuItem
+									className="editor-post-preview__button-resize"
+									onClick={ () => toggleCanvas( 'Mobile' ) }
+								>
+									{ __( 'Mobile' ) }
+									{ this.props.deviceType === 'Mobile' && checkIcon }
+								</MenuItem>
+							</fieldset>
 						</MenuGroup>
 						<MenuGroup>
 							<Button
-								className="editor-post-preview"
+								className="editor-post-preview__button-external"
 								href={ href }
 								target={ this.getWindowTarget() }
 								disabled={ ! isSaveable }
