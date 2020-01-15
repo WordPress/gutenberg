@@ -36,6 +36,7 @@ export function LinkControl( {
 	settings,
 	onChange = noop,
 	initialSuggestions,
+	fetchSearchSuggestions,
 } ) {
 	const instanceId = useInstanceId( LinkControl );
 	const [ inputValue, setInputValue ] = useState( '' );
@@ -190,20 +191,20 @@ export function LinkControl( {
 				</Fragment>
 			) }
 
-					{ isEditingLink && (
-						<LinkControlSearchInput
-							value={ inputValue }
-							onChange={ onInputChange }
-							onSelect={ ( suggestion ) => {
-								setIsEditingLink( false );
-								onChange( { ...value, ...suggestion } );
-							} }
-							renderSuggestions={ renderSearchResults }
-							fetchSuggestions={ getSearchHandler }
-							onReset={ resetInput }
-							initialSuggestions={ initialSuggestions }
-						/>
-					) }
+			{ isEditingLink && (
+				<LinkControlSearchInput
+					value={ inputValue }
+					onChange={ onInputChange }
+					onSelect={ ( suggestion ) => {
+						setIsEditingLink( false );
+						onChange( { ...value, ...suggestion } );
+					} }
+					renderSuggestions={ renderSearchResults }
+					fetchSuggestions={ getSearchHandler }
+					onReset={ resetInput }
+					initialSuggestions={ initialSuggestions }
+				/>
+			) }
 
 			{ ! isEditingLink && (
 				<LinkControlSettingsDrawer value={ value } settings={ settings } onChange={ onChange } />
