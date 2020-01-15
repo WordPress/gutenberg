@@ -105,11 +105,6 @@ $navigation-item-height: 46px;
 			width: 100%;
 			border-width: 1px;
 			border-style: solid;
-			border-color: $light-style-sub-menu-border-color;
-
-			// Light / Dark styles.
-			background-color: $light-style-sub-menu-background-color;
-			color: $light-style-sub-menu-text-color;
 
 			// Position (level 1)
 			position: absolute;
@@ -121,6 +116,20 @@ $navigation-item-height: 46px;
 				top: 0;
 			}
 		}
+	}
+
+	// Light styles.
+	&.is-style-light .wp-block-navigation-link > .block-editor-inner-blocks {
+		color: $light-style-sub-menu-text-color;
+		border-color: $light-style-sub-menu-border-color;
+		background-color: $light-style-sub-menu-background-color;
+	}
+
+	// Light / Dark styles.
+	&.is-style-dark .wp-block-navigation-link > .block-editor-inner-blocks {
+		color: $dark-style-sub-menu-text-color;
+		border-color: $dark-style-sub-menu-border-color;
+		background-color: $dark-style-sub-menu-background-color;
 	}
 }
 
