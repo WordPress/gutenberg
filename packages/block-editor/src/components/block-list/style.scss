@@ -430,27 +430,39 @@
 
 .block-editor-block-list__breadcrumb {
 	display: block;
-	line-height: 1;
 	z-index: z-index(".block-editor-block-list__breadcrumb");
 
 	.components-toolbar {
 		display: flex;
-		background: $white;
-		border: $border-width solid $blue-medium-focus;
-		height: $icon-button-size + 2 * $border-width;
-		font-size: $default-font-size;
-		padding-left: $grid-unit-10;
-		padding-right: $grid-unit-10;
+		border: none;
+		background: none;
 
+		// The button here has a special style to appear as a toolbar.
 		.components-button {
-			box-shadow: none;
+			font-size: $default-font-size;
+			min-width: $grid-unit-60 * 2;
+			height: $grid-unit-60;
+			padding: $grid-unit-15;
+
+			// Block UI appearance.
+			border: $border-width solid $border-color;
+			border-radius: $radius-block-ui;
+			background-color: $white;
+
+			// When button is focused, it receives a box-shadow instead of the border.
+			&:focus {
+				border: none;
+			}
 		}
 
-		.is-dark-theme & {
-			border-color: $light-opacity-light-800;
-		}
+		// @todo, it should have the block type icon here.
 	}
 }
+
+
+/**
+ * Warnings.
+ */
 
 .block-editor-block-list__block .block-editor-warning {
 	z-index: z-index(".block-editor-warning");
@@ -465,6 +477,11 @@
 		margin-bottom: auto;
 	}
 }
+
+
+/**
+ * Popovers.
+ */
 
 .block-editor-block-list__insertion-point-popover {
 	z-index: z-index(".block-editor-block-list__insertion-point-popover");
@@ -496,19 +513,12 @@
 			pointer-events: all;
 		}
 
-		// Position the breacrumb. @todo: style for G2
-		.block-editor-block-contextual-toolbar,
-		.block-editor-block-list__breadcrumb {
-			margin-bottom: $block-padding - $border-width;
-			margin-left: - $block-padding;
-		}
-
-		// Position the block toolbar. @todo: should mirror the breadcrumb
+		// Position the block toolbar.
+		.block-editor-block-list__breadcrumb,
 		.block-editor-block-contextual-toolbar {
 			margin-bottom: $grid-unit-20;
 
-			// @todo: This needs to be adjusted when the toolbar becomes detached and aware of left/right circumstances.
-			// Additionally, it should position the block transform dialog as the left margin of a block. It currently
+			// @todo It should position the block transform dialog as the left margin of a block. It currently
 			// positions instead, the mover control.
 			margin-left: -$grid-unit-60;
 		}
