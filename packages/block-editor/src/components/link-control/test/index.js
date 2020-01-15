@@ -329,7 +329,10 @@ describe( 'Default search suggestions', () => {
 		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const initialSearchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		const searchResultsWrapper = container.querySelector( '[role="listbox"]' );
+		const initialSearchResultElements = searchResultsWrapper.querySelectorAll( '[role="option"]' );
+
+		const searchResultsLabel = container.querySelector( `#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }` );
 
 		// Verify input has no value has default suggestions should only show
 		// when this does not have a value
@@ -342,6 +345,8 @@ describe( 'Default search suggestions', () => {
 
 		// Verify the search results already display the initial suggestions
 		expect( initialSearchResultElements ).toHaveLength( expectedResultsLength );
+
+		expect( searchResultsLabel.innerHTML ).toEqual( 'Recently updated' );
 	} );
 
 	it( 'should not display initial suggestions when input value is present', async () => {

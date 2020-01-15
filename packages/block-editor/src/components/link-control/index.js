@@ -7,8 +7,8 @@ import { noop, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, ExternalLink } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState, Fragment } from '@wordpress/element';
 
 import {
@@ -131,16 +131,29 @@ export function LinkControl( {
 	}, [ handleDirectEntry, fetchSearchSuggestions ] );
 
 	// Render Components
-	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading } ) => {
+	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading, isInitialSuggestions } ) => {
 		const resultsListClasses = classnames( 'block-editor-link-control__search-results', {
 			'is-loading': isLoading,
 		} );
 
 		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
+		const searchResultsLabelId = isInitialSuggestions ? `block-editor-link-control-search-results-label-${ instanceId }` : undefined;
+		const labelText = isInitialSuggestions ? __( 'Recently updated' ) : sprintf( __( 'Search results for %s' ), inputValue );
+		// According to guidelines aria-label should be added if the label
+		// itself is not visible.
+		// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
+		const ariaLabel = isInitialSuggestions ? undefined : labelText;
+		const SearchResultsLabel = (
+			<span className="block-editor-link-control__search-results-label" id={ searchResultsLabelId } aria-label={ ariaLabel } >
+				{ labelText }
+			</span>
+		);
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				<div { ...suggestionsListProps } className={ resultsListClasses }>
+				{ isInitialSuggestions ? SearchResultsLabel : <VisuallyHidden>{ SearchResultsLabel }</VisuallyHidden> }
+
+				<div { ...suggestionsListProps } className={ resultsListClasses } aria-labelledby={ searchResultsLabelId }>
 					{ suggestions.map( ( suggestion, index ) => (
 						<LinkControlSearchItem
 							key={ `${ suggestion.id }-${ suggestion.type }` }
