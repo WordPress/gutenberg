@@ -21,7 +21,7 @@ const hasConfig = hasArgInCLI( '--package' ) ||
 const config = ! hasConfig ?
 	[
 		'--node', '>=10.0.0',
-		'--npm', '>=6.0.0',
+		'--npm', '>=6.9.0',
 	] :
 	[];
 
