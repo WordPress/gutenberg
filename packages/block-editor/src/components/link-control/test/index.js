@@ -318,7 +318,7 @@ describe( 'Default search suggestions', () => {
 			render(
 				<LinkControl
 					fetchSearchSuggestions={ searchSuggestionsSpy }
-					initialSuggestions={ true }
+					showInitialSuggestions={ true }
 				/>, container
 			);
 		} );
@@ -355,7 +355,7 @@ describe( 'Default search suggestions', () => {
 			render(
 				<LinkControl
 					fetchSearchSuggestions={ searchSuggestionsSpy }
-					initialSuggestions={ true }
+					showInitialSuggestions={ true }
 					value={ fauxEntitySuggestions[ 0 ] }
 				/>, container
 			);
