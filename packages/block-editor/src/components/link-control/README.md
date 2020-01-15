@@ -1,25 +1,69 @@
 # Link Control
 
-Renders a link control. A link control is a controlled input which maintains
-a value associated with a link (HTML anchor element) and relevant settings
-for how that link is expected to behave.
+`<LinkControl>` is a component designed to provide a standardized UI for the
+creation of hyperlinks within the Editor. Much of the context for this component
+can be found in [the original Issue](https://github.com/WordPress/gutenberg/issues/17557).
+
+Previously iterations of a hyperlink UI existed within the Gutenberg interface
+but these tended to be highly tailored to their individual use cases and were
+not standardised, each having their own implementation.
+
+These older UIs tended to make use of two existing components: `URLInput` and
+`URLPopover`. When a requirement was raised to implement a new UI for hyperlink
+creation, an assessment of these existing components was undertaken and it was
+determined that they were too opinionated as to be easily refactored to
+accommodate the new use cases required by the new UI. Attempting to do so would
+also have meant unavoidable breaking changes to the interface of `URLInput`
+which would have (most probably) caused breaking changes to ripple across not
+only the Core codebase, but also that of 3rd party Plugins.
+
+As a result, it was agreed that a new component `LinkControl` would be created
+to realise the new hyperlink creation interface. This new UI would begin life as
+an experimental component which would consume `URLInput` internally. The API of
+`URLInput` would be enhanced as required with "experimental" features to
+facilitate the implementation of the new UI with the goal of eventually phasing
+out the use of `URLInput` entirely.
+
+Indeed, over time, is is expected that `URLInput` will be depracted in favour of
+lower-level presentation components (eg: `<Combobox>`) which will not be tightly
+coupled to the concept of URL entry. This will allow `LinkControl` to become the
+canonical UI component for the creation of hyperlinks and will enable the
+simplification of the more complex internal mechanics of `LinkControl` which are
+currently necessary to enable it to mesh well with the older APIs exposed by
+`URLInput`.
+
+## Search Suggestions
+
+Currently LinkControl will handle two types of input to create hyperlinks:
+
+1. Entity searches - the user may input text-based search queries for entities retrieved from
+   remove data sources (in the context of WordPress these are `Pages`). For
+   example a user might search for a `Page` they have just created by name (eg:
+   About) and the UI will return a matching result if found.
+2. Direct entry - the user may also enter any arbitrary URL-like text. This
+   includes full URLs (https://), URL fragements (eg: `#myinternallink`), `tel`
+   protocol links (eg: `tel: 0800 1234`) and `mailto` protocol links (eg:
+   `mailto: hello@wordpress.org).
+
+### Data sources
+
+By default LinkControl utilizes the `__experimentalFetchLinkSuggestions` API
+from `core/block-editor` in order to retrieve search suggestions for matching
+`Page` post-type entities.
+
+It is however, possible to provide your own entity search handler via the `fetchSearchSuggestions` prop.
 
 ## Props
+
+### className
+
+- Type: `String`
+- Required: Yes
 
 ### value
 
 - Type: `Object`
-- Required: No
-
-Current link value.
-
-A link value contains is composed as a union of the default properties and any custom settings values.
-
-Default properties include:
-
-- `url` (`string`): Link URL.
-- `title` (`string`, optional): Link title.
-- `opensInNewTab` (`boolean`, optional): Whether link should open in a new browser tab.This value is only assigned if not providing a custom `settings` prop.
+- Required: Yes
 
 ### settings
 
@@ -30,12 +74,19 @@ Default properties include:
 [
 	{
 		id: 'opensInNewTab',
-		title: 'Open in new tab',
+		title: 'Open in New Tab',
 	},
 ];
 ```
 
 An array of settings objects. Each object will used to render a `ToggleControl` for that setting.
+
+### fetchSearchSuggestions
+
+- Type: `Function`
+- Required: No
+
+## Event handlers
 
 ### onClose
 
@@ -47,84 +98,16 @@ An array of settings objects. Each object will used to render a `ToggleControl` 
 - Type: `Function`
 - Required: No
 
-Value change handler, called with the updated value if the user selects a new link or updates settings.
+Use this callback to take an action after a user set or updated a link.
+The function callback will receive the selected item, or Null.
 
-```jsx
+```es6
 <LinkControl
-	onChange={ ( nextValue ) => {
-		console.log( `The selected item URL: ${ nextValue.url }.` );
+	onLinkChange={ ( item ) => {
+		item
+			? console.log( `The item selected has the ${ item.id } id.` )
+			: console.warn( 'No Item selected.' );
 	}
 />
 ```
 
-### showInitialSuggestions
-
-- Type: `boolean`
-- Required: No
-- Default: `false`
-
-Whether to present initial suggestions immediately.
-
-### forceIsEditingLink
-
-- Type: `boolean`
-- Required: No
-
-If passed as either `true` or `false`, controls the internal editing state of the component to respective show or not show the URL input field.
-
-
-### createSuggestion
-
-- Type: `function`
-- Required: No
-
-Used to handle the dynamic creation of new suggestions within the Link UI. When
-the prop is provided, an option is added to the end of all search
-results requests which when clicked will call `createSuggestion` callback
-(passing the current value of the search `<input>`) in
-order to afford the parent component the opportunity to dynamically create a new
-link `value` (see above).
-
-This is often used to allow on-the-fly creation of new entities (eg: `Posts`,
-`Pages`) based on the text the user has entered into the link search UI. For
-example, the Navigation Block uses this to create Pages on demand.
-
-When called, `createSuggestion` may return either a new suggestion directly or a `Promise` which resolves to a
-new suggestion. Suggestions have the following shape:
-
-```js
-{
-	id: // unique identifier
-	type: // "url", "page", "post"...etc
-	title: // "My new suggestion"
-	url: // any string representing the URL value
-}
-```
-
-#### Example
-```jsx
-// Promise example
-<LinkControl
-	createSuggestion={ async (inputText) => {
-        // Hard coded values. These could be dynamically created by calling out to an API which creates an entity (eg: https://developer.wordpress.org/rest-api/reference/pages/#create-a-page).
-		return {
-			id: 1234,
-			type: 'page',
-			title: inputText,
-			url: '/some-url-here'
-		}
-	}}
-/>
-
-// Non-Promise example
-<LinkControl
-	createSuggestion={ (inputText) => (
-		{
-			id: 1234,
-			type: 'page',
-			title: inputText,
-			url: '/some-url-here'
-		}
-	)}
-/>
-```
