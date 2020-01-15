@@ -20,3 +20,9 @@
 	margin-left: 0;
 	margin-right: 0;
 }
+
+.columnsContainer {
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}

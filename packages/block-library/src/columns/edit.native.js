@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import classnames from 'classnames';
 import { dropRight, times } from 'lodash';
 
 /**
@@ -67,12 +66,12 @@ const MAX_COLUMNS_NUMBER = 6;
 
 function ColumnsEditContainer( {
 	attributes,
-	className,
 	updateAlignment,
 	updateColumns,
 	clientId,
 	isSmallScreen,
-	// isSelected,
+	isLargeScreen,
+	isMediumScreen,
 } ) {
 	const { verticalAlignment } = attributes;
 
@@ -82,9 +81,18 @@ function ColumnsEditContainer( {
 		};
 	} );
 
-	const classes = classnames( className, {
-		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-	} );
+	const getColumnsInRow = ( columnsCount ) => {
+		if ( isSmallScreen ) {
+			return 1;
+		}
+		if ( isMediumScreen && ! isLargeScreen ) {
+			return 2;
+		}
+		return columnsCount;
+	};
+
+	const columnsInRow = getColumnsInRow( count );
+	const columnsWidth = `${ 100 / columnsInRow }%`;
 
 	return (
 		<>
@@ -114,13 +122,11 @@ function ColumnsEditContainer( {
 					value={ verticalAlignment }
 				/>
 			</BlockControls>
-			<View className={ classes }>
-				<InnerBlocks
-					// templateLock="all"
-					allowedBlocks={ ALLOWED_BLOCKS }
-					// renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
-				/>
-			</View>
+			<InnerBlocks
+				containerStyle={ ! isSmallScreen ? styles.columnsContainer : undefined }
+				itemStyle={ { width: columnsWidth } }
+				allowedBlocks={ ALLOWED_BLOCKS }
+			/>
 		</>
 	);
 }
@@ -208,16 +214,6 @@ const ColumnsEditContainerWrapper = withDispatch( ( dispatch, ownProps, registry
 	},
 } ) )( ColumnsEditContainer );
 
-// TODO: implement "templates" to allow select column layout
-
-// const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-// 	return map(
-// 		innerBlocksTemplate,
-// 		( [ name, attributes, innerBlocks = [] ] ) =>
-// 			createBlock( name, attributes, createBlocksFromInnerBlocksTemplate( innerBlocks ) )
-// 	);
-// };
-
 const ColumnsEdit = ( props ) => {
 	const { clientId, name, isSelected, getStylesFromColorScheme } = props;
 	// const { blockType, defaultPattern, hasInnerBlocks, patterns } = useSelect( ( select ) => {
@@ -236,8 +232,6 @@ const ColumnsEdit = ( props ) => {
 		};
 	}, [ clientId, name ] );
 
-	// const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
-
 	// TODO: make sure if columns should reder placeholder if block is not selected
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
@@ -251,31 +245,9 @@ const ColumnsEdit = ( props ) => {
 	return (
 		<ColumnsEditContainerWrapper { ...props } />
 	);
-
-	// TODO: implement "templates" to allow select column layout
-
-	// return (
-	// <__experimentalBlockPatternPicker
-	// 	icon={ get( blockType, [ 'icon', 'src' ] ) }
-	// 	label={ get( blockType, [ 'title' ] ) }
-	// 	patterns={ patterns }
-	// 	onSelect={ ( nextPattern = defaultPattern ) => {
-	// 		if ( nextPattern.attributes ) {
-	// 			props.setAttributes( nextPattern.attributes );
-	// 		}
-	// 		if ( nextPattern.innerBlocks ) {
-	// 			replaceInnerBlocks(
-	// 				props.clientId,
-	// 				createBlocksFromInnerBlocksTemplate( nextPattern.innerBlocks )
-	// 			);
-	// 		}
-	// 	} }
-	// 	allowSkip
-	// />
-	// );
 };
 
 export default compose( [
-	withViewportMatch( { isSmallScreen: '< small' } ),
+	withViewportMatch( { isSmallScreen: '< small', isLargeScreen: '>= large', isMediumScreen: '>= small' } ),
 	withPreferredColorScheme,
 ] )( ColumnsEdit );

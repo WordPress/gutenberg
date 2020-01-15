@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { FlatList } from 'react-native';
+import { FlatList, View } from 'react-native';
 
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,
@@ -10,6 +10,8 @@ export const KeyboardAwareFlatList = ( {
 	innerRef,
 	autoScroll,
 	scrollViewStyle,
+	containerStyle,
+	itemStyle,
 	...listProps
 } ) => (
 	<KeyboardAwareScrollView
@@ -45,7 +47,17 @@ export const KeyboardAwareFlatList = ( {
 		onScroll={ ( event ) => {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
 		} } >
-		<FlatList { ...listProps } />
+		<FlatList
+			{ ...listProps }
+			style={ containerStyle ? containerStyle : {} }
+			CellRendererComponent={ containerStyle && ( ( props ) => (
+				<View
+					{ ...props }
+					style={ itemStyle }
+				/>
+			) )
+			}
+		/>
 	</KeyboardAwareScrollView>
 );
 
