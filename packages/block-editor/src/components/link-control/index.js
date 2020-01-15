@@ -147,7 +147,7 @@ export function LinkControl( {
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				{ ! isInitialSuggestions ? <VisuallyHidden>{ SearchResultsLabel }</VisuallyHidden> : SearchResultsLabel }
+				{ isInitialSuggestions ? SearchResultsLabel : <VisuallyHidden>{ SearchResultsLabel }</VisuallyHidden> }
 
 				<div { ...suggestionsListProps } className={ resultsListClasses } aria-labelledby={ searchResultsLabelId }>
 					{ suggestions.map( ( suggestion, index ) => (
