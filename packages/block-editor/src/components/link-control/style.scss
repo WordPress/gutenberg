@@ -67,11 +67,17 @@
 	}
 }
 
+.block-editor-link-control__search-results-label {
+	padding: 15px 30px 0 30px;
+	display: block;
+	font-size: 1.1em;
+}
+
 .block-editor-link-control__search-results {
 	margin: 0;
 	padding: $grid-size-large/2 $grid-size-large $grid-size-large;
 	max-height: 200px;
-	overflow-y: scroll; // allow results list to scroll
+	overflow-y: auto; // allow results list to scroll
 
 	&.is-loading {
 		opacity: 0.2;

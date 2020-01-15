@@ -774,6 +774,7 @@ export class RichText extends Component {
 					formatTypes={ formatTypes }
 					value={ record }
 					onChange={ this.onFormatChange }
+					onFocus={ () => {} }
 				/> }
 			</View>
 		);

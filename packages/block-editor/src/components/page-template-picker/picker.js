@@ -1,40 +1,37 @@
 /**
  * WordPress dependencies
  */
-import { parse } from '@wordpress/blocks';
-import { withDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Button from './button';
 import Container from './container';
-import defaultTemplates from './default-templates';
+import getDefaultTemplates from './default-templates';
+import Preview from './preview';
 
-const __experimentalPageTemplatePicker = ( { templates = defaultTemplates, resetContent } ) => {
+const __experimentalPageTemplatePicker = ( { templates = getDefaultTemplates() } ) => {
+	const [ templatePreview, setTemplatePreview ] = useState();
+
 	return (
-		<Container>
-			{ templates.map( ( { name, content, icon } ) => (
-				<Button
-					icon={ icon }
-					key={ name }
-					label={ name }
-					onPress={ () => resetContent( content ) }
-				/>
-			) ) }
-		</Container>
+		<>
+			<Container>
+				{ templates.map( ( template ) => (
+					<Button
+						key={ template.name }
+						icon={ template.icon }
+						label={ template.name }
+						onPress={ () => setTemplatePreview( template ) }
+					/>
+				) ) }
+			</Container>
+			<Preview
+				template={ templatePreview }
+				onDismiss={ () => setTemplatePreview( undefined ) }
+			/>
+		</>
 	);
 };
 
-export default withDispatch( ( dispatch ) => {
-	const {
-		resetEditorBlocks,
-	} = dispatch( 'core/editor' );
-
-	return {
-		resetContent: ( html ) => {
-			const blocks = parse( html );
-			return resetEditorBlocks( blocks );
-		},
-	};
-} )( __experimentalPageTemplatePicker );
+export default __experimentalPageTemplatePicker;

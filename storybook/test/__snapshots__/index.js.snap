@@ -2330,11 +2330,11 @@ exports[`Storyshots Components|ColorPicker Alpha Enabled 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -2505,11 +2505,11 @@ exports[`Storyshots Components|ColorPicker Default 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}

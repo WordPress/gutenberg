@@ -7,8 +7,8 @@ import { noop, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, ExternalLink } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState, Fragment } from '@wordpress/element';
 
 import {
@@ -30,12 +30,12 @@ import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
 const MODE_EDIT = 'edit';
-// const MODE_SHOW = 'show';
 
 export function LinkControl( {
 	value,
 	settings,
 	onChange = noop,
+	showInitialSuggestions,
 	fetchSearchSuggestions,
 } ) {
 	const instanceId = useInstanceId( LinkControl );
@@ -66,7 +66,7 @@ export function LinkControl( {
 
 		// Populate input searcher whether
 		// the current link has a title.
-		if ( value && value.title && mode === 'edit' ) {
+		if ( value && value.title && MODE_EDIT === mode ) {
 			setInputValue( value.title );
 		}
 	};
@@ -102,9 +102,11 @@ export function LinkControl( {
 		);
 	};
 
-	const handleEntitySearch = async ( val ) => {
+	const handleEntitySearch = async ( val, args ) => {
 		const results = await Promise.all( [
-			fetchSearchSuggestions( val ),
+			fetchSearchSuggestions( val, {
+				...( args.isInitialSuggestions ? { perPage: 3 } : {} ),
+			} ),
 			handleDirectEntry( val ),
 		] );
 
@@ -113,11 +115,11 @@ export function LinkControl( {
 		// If it's potentially a URL search then concat on a URL search suggestion
 		// just for good measure. That way once the actual results run out we always
 		// have a URL option to fallback on.
-		return couldBeURL ? results[ 0 ].concat( results[ 1 ] ) : results[ 0 ];
+		return couldBeURL && ! args.isInitialSuggestions ? results[ 0 ].concat( results[ 1 ] ) : results[ 0 ];
 	};
 
 	// Effects
-	const getSearchHandler = useCallback( ( val ) => {
+	const getSearchHandler = useCallback( ( val, args ) => {
 		const protocol = getProtocol( val ) || '';
 		const isMailto = protocol.includes( 'mailto' );
 		const isInternal = startsWith( val, '#' );
@@ -125,20 +127,33 @@ export function LinkControl( {
 
 		const handleManualEntry = isInternal || isMailto || isTel || isURL( val ) || ( val && val.includes( 'www.' ) );
 
-		return ( handleManualEntry ) ? handleDirectEntry( val ) : handleEntitySearch( val );
+		return ( handleManualEntry ) ? handleDirectEntry( val, args ) : handleEntitySearch( val, args );
 	}, [ handleDirectEntry, fetchSearchSuggestions ] );
 
 	// Render Components
-	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading } ) => {
+	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading, isInitialSuggestions } ) => {
 		const resultsListClasses = classnames( 'block-editor-link-control__search-results', {
 			'is-loading': isLoading,
 		} );
 
 		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
+		const searchResultsLabelId = isInitialSuggestions ? `block-editor-link-control-search-results-label-${ instanceId }` : undefined;
+		const labelText = isInitialSuggestions ? __( 'Recently updated' ) : sprintf( __( 'Search results for %s' ), inputValue );
+		// According to guidelines aria-label should be added if the label
+		// itself is not visible.
+		// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
+		const ariaLabel = isInitialSuggestions ? undefined : labelText;
+		const SearchResultsLabel = (
+			<span className="block-editor-link-control__search-results-label" id={ searchResultsLabelId } aria-label={ ariaLabel } >
+				{ labelText }
+			</span>
+		);
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				<div { ...suggestionsListProps } className={ resultsListClasses }>
+				{ isInitialSuggestions ? SearchResultsLabel : <VisuallyHidden>{ SearchResultsLabel }</VisuallyHidden> }
+
+				<div { ...suggestionsListProps } className={ resultsListClasses } aria-labelledby={ searchResultsLabelId }>
 					{ suggestions.map( ( suggestion, index ) => (
 						<LinkControlSearchItem
 							key={ `${ suggestion.id }-${ suggestion.type }` }
@@ -200,6 +215,7 @@ export function LinkControl( {
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
 					onReset={ resetInput }
+					showInitialSuggestions={ showInitialSuggestions }
 				/>
 			) }
 

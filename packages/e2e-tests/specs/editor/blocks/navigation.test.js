@@ -41,7 +41,7 @@ async function mockSearchResponse( items ) {
 
 	await setUpResponseMocking( [
 		{
-			match: ( request ) => request.url().includes( `rest_route=${ encodeURIComponent( '/wp/v2/search' ) }` ),
+			match: ( request ) => request.url().includes( `rest_route` ) && request.url().includes( `search` ),
 			onRequestMatch: createJSONResponse( mappedItems ),
 		},
 	] );
@@ -72,6 +72,10 @@ async function updateActiveNavigationLink( { url, label } ) {
 describe( 'Navigation', () => {
 	beforeEach( async () => {
 		await createNewPost();
+	} );
+
+	afterEach( async () => {
+		await setUpResponseMocking( [] );
 	} );
 
 	it( 'allows a navigation menu to be created using existing pages', async () => {

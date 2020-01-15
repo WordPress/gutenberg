@@ -64,6 +64,7 @@
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
+		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
