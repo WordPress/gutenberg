@@ -21,10 +21,6 @@
 		flex-direction: row;
 	}
 
-	.block-editor-block-mover__control {
-		height: 50%;
-	}
-
 	// Position the icons correctly.
 	.block-editor-block-mover__control-up {
 		svg {
@@ -52,42 +48,48 @@
 
 	// Mover is horizontal.
 	&.is-horizontal {
-		.block-editor-block-mover__control {
+		.block-editor-block-mover__control.has-icon {
 			height: $block-toolbar-height;
 			width: $block-toolbar-height/2 !important;
+			min-width: $grid-unit-30;
 			padding: 0;
+
+			// Focus style.
+			&::before {
+				top: $grid-unit-10;
+				bottom: $grid-unit-10;
+				min-width: 0;
+				width: auto;
+				height: auto;
+			}
 		}
 
 		// Position the icons correctly.
-		.block-editor-block-mover__control-up {
+		.block-editor-block-mover__control-up.has-icon {
 			svg {
+				margin-left: 0;
 				margin-right: -$grid-unit-10;
 				margin-bottom: 0;
 			}
 
 			// Focus style.
 			&::before {
-				top: $grid-unit-10;
-				bottom: $grid-unit-10;
 				left: $grid-unit-10;
 				right: 0;
-				min-width: 0;
 			}
 		}
 
-		.block-editor-block-mover__control-down {
+		.block-editor-block-mover__control-down.has-icon {
 			svg {
 				margin-left: -$grid-unit-10;
+				margin-right: 0;
 				margin-top: 0;
 			}
 
 			// Focus style.
 			&::before {
-				top: $grid-unit-10;
-				bottom: $grid-unit-10;
 				left: 0;
 				right: $grid-unit-10;
-				min-width: 0;
 			}
 		}
 	}
