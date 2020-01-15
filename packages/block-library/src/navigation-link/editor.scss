@@ -24,11 +24,6 @@
 		margin: $grid-size;
 	}
 
-	// Only display inner blocks when the block is being edited.
-	.block-editor-inner-blocks {
-		display: none;
-	}
-
 	&.is-editing,
 	&.is-selected {
 		min-width: 20px;
