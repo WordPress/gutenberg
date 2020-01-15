@@ -22,6 +22,7 @@ describe( 'createQueue', () => {
 	it( 'runs callback after processing waiting queue', () => {
 		const callback = jest.fn();
 		queue.add( {}, callback );
+		expect( callback ).not.toHaveBeenCalled();
 		requestIdleCallback.tick();
 		expect( callback ).toHaveBeenCalled();
 	} );
