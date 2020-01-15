@@ -75,6 +75,7 @@ class BottomSheetCell extends Component {
 			accessibilityLabel,
 			accessibilityHint,
 			accessibilityRole,
+			disabled = false,
 			onPress,
 			label,
 			value,
@@ -218,6 +219,7 @@ class BottomSheetCell extends Component {
 					__( 'Double tap to edit this value' ) :
 					accessibilityHint
 				}
+				disabled={ disabled }
 				onPress={ onCellPress }
 				style={ [ styles.clipToBounds, style ] }
 			>

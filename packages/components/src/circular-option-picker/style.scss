@@ -32,10 +32,6 @@ $color-palette-circle-spacing: 12px;
 		height: 100%;
 		width: 100%;
 	}
-
-	&:nth-child(6n+6) {
-		margin-right: 0;
-	}
 }
 
 .components-circular-option-picker__option-wrapper::before {

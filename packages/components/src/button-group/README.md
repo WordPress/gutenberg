@@ -60,4 +60,3 @@ const MyButtonGroup = () => (
 ## Related components
 
 - For individual buttons, use a `Button` component.
-- To group `IconButtons` use a `Toolbar` component.

@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
 
 const ModalHeader = ( { icon, title, onClose, closeLabel, headingId, isDismissible } ) => {
 	const label = closeLabel ? closeLabel : __( 'Close dialog' );
@@ -29,7 +29,7 @@ const ModalHeader = ( { icon, title, onClose, closeLabel, headingId, isDismissib
 				}
 			</div>
 			{ isDismissible &&
-				<IconButton
+				<Button
 					onClick={ onClose }
 					icon="no-alt"
 					label={ label }

@@ -13,7 +13,7 @@ import { RawHTML } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Button, IconButton } from '../';
+import { Button } from '../';
 
 function Notice( {
 	className,
@@ -67,12 +67,12 @@ function Notice( {
 				) }
 			</div>
 			{ isDismissible && (
-				<IconButton
+				<Button
 					className="components-notice__dismiss"
 					icon="no-alt"
 					label={ __( 'Dismiss this notice' ) }
 					onClick={ onRemove }
-					tooltip={ false }
+					showTooltip={ false }
 				/>
 			) }
 		</div>

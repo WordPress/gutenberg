@@ -3,13 +3,38 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
-import { ENTER } from '@wordpress/keycodes';
+import { Button } from '@wordpress/components';
+import { LEFT,
+	RIGHT,
+	UP,
+	DOWN,
+	BACKSPACE,
+	ENTER,
+} from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { URLInput } from '../';
+
+const handleLinkControlOnKeyDown = ( event ) => {
+	const { keyCode } = event;
+
+	if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
+		// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
+		event.stopPropagation();
+	}
+};
+
+const handleLinkControlOnKeyPress = ( event ) => {
+	const { keyCode } = event;
+
+	event.stopPropagation();
+
+	if ( keyCode === ENTER ) {
+
+	}
+};
 
 const LinkControlSearchInput = ( {
 	value,
@@ -18,8 +43,7 @@ const LinkControlSearchInput = ( {
 	renderSuggestions,
 	fetchSuggestions,
 	onReset,
-	onKeyDown,
-	onKeyPress,
+	showInitialSuggestions,
 } ) => {
 	const selectItemHandler = ( selection, suggestion ) => {
 		onChange( selection );
@@ -44,16 +68,17 @@ const LinkControlSearchInput = ( {
 					if ( event.keyCode === ENTER ) {
 						return;
 					}
-					onKeyDown( event );
+					handleLinkControlOnKeyDown( event );
 				} }
-				onKeyPress={ onKeyPress }
+				onKeyPress={ handleLinkControlOnKeyPress }
 				placeholder={ __( 'Search or type url' ) }
 				__experimentalRenderSuggestions={ renderSuggestions }
 				__experimentalFetchLinkSuggestions={ fetchSuggestions }
 				__experimentalHandleURLSuggestions={ true }
+				__experimentalShowInitialSuggestions={ showInitialSuggestions }
 			/>
 
-			<IconButton
+			<Button
 				disabled={ ! value.length }
 				type="reset"
 				label={ __( 'Reset' ) }

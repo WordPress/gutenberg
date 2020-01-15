@@ -14,7 +14,7 @@ import {
 const INSERTER_RESULTS_SELECTOR = '.block-editor-inserter__results';
 const QUOTE_INSERT_BUTTON_SELECTOR = '//button[.="Quote"]';
 const APPENDER_SELECTOR = '.my-custom-awesome-appender';
-const DYNAMIC_APPENDER_SELECTOR = '.my-dynamic-blocks-appender';
+const DYNAMIC_APPENDER_SELECTOR = 'my-dynamic-blocks-appender';
 
 describe( 'RenderAppender prop of InnerBlocks ', () => {
 	beforeAll( async () => {
@@ -69,17 +69,15 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		await insertBlock( 'InnerBlocks renderAppender dynamic' );
 
 		// Wait for the custom dynamic block appender to appear.
-		await page.waitForSelector( DYNAMIC_APPENDER_SELECTOR );
+		await page.waitForSelector( '.' + DYNAMIC_APPENDER_SELECTOR );
 
 		// Verify if the custom block appender text is the expected one.
-		expect(
-			await page.evaluate(
-				( el ) => ( el.innerText ),
-				await page.$( `${ DYNAMIC_APPENDER_SELECTOR } > span.empty-blocks-appender` ) )
-		).toEqual( 'Empty Blocks Appender' );
+		await page.waitForXPath(
+			`//*[contains(@class, "${ DYNAMIC_APPENDER_SELECTOR }")]/span[contains(@class, "empty-blocks-appender")][contains(text(), "Empty Blocks Appender")]`
+		);
 
 		// Open the inserter of our custom block appender and expand all the categories.
-		const blockAppenderButtonSelector = `${ DYNAMIC_APPENDER_SELECTOR } .block-editor-button-block-appender`;
+		const blockAppenderButtonSelector = `.${ DYNAMIC_APPENDER_SELECTOR } .block-editor-button-block-appender`;
 		await page.click( blockAppenderButtonSelector );
 		await openAllBlockInserterCategories();
 
@@ -99,11 +97,9 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		await quoteButton.click();
 
 		// Verify if the custom block appender text changed as expected.
-		expect(
-			await page.evaluate(
-				( el ) => ( el.innerText ),
-				await page.$( `${ DYNAMIC_APPENDER_SELECTOR } > span.single-blocks-appender` ) )
-		).toEqual( 'Single Blocks Appender' );
+		await page.waitForXPath(
+			`//*[contains(@class, "${ DYNAMIC_APPENDER_SELECTOR }")]/span[contains(@class, "single-blocks-appender")][contains(text(), "Single Blocks Appender")]`
+		);
 
 		// Verify that the custom appender button is still being rendered.
 		expect(
@@ -114,11 +110,9 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		await insertBlock( 'Video' );
 
 		// Verify if the custom block appender text changed as expected.
-		expect(
-			await page.evaluate(
-				( el ) => ( el.innerText ),
-				await page.$( `${ DYNAMIC_APPENDER_SELECTOR } > span.multiple-blocks-appender` ) )
-		).toEqual( 'Multiple Blocks Appender' );
+		await page.waitForXPath(
+			`//*[contains(@class, "${ DYNAMIC_APPENDER_SELECTOR }")]/span[contains(@class, "multiple-blocks-appender")][contains(text(), "Multiple Blocks Appender")]`
+		);
 
 		// Verify that the custom appender button is now not being rendered.
 		expect(

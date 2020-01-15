@@ -26,8 +26,13 @@ function getGradientValueBySlug( gradients, slug ) {
 	return gradient && gradient.gradient;
 }
 
-function getGradientSlugByValue( gradients, value ) {
+export function __experimentalGetGradientObjectByGradientValue( gradients, value ) {
 	const gradient = find( gradients, [ 'gradient', value ] );
+	return gradient;
+}
+
+function getGradientSlugByValue( gradients, value ) {
+	const gradient = __experimentalGetGradientObjectByGradientValue( gradients, value );
 	return gradient && gradient.slug;
 }
 

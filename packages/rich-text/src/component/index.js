@@ -35,6 +35,8 @@ import { updateFormats } from '../update-formats';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
 import withFormatTypes from './with-format-types';
+import { BoundaryStyle } from './boundary-style';
+import { InlineWarning } from './inline-warning';
 
 /**
  * Browser dependencies
@@ -88,12 +90,7 @@ const whiteSpace = 'pre-wrap';
  */
 const defaultStyle = { whiteSpace };
 
-/**
- * Global stylesheet.
- */
-const globalStyle = document.createElement( 'style' );
-
-document.head.appendChild( globalStyle );
+const EMPTY_ACTIVE_FORMATS = [];
 
 function createPrepareEditableTree( props, prefix ) {
 	const fns = Object.keys( props ).reduce( ( accumulator, key ) => {
@@ -192,15 +189,6 @@ class RichText extends Component {
 	}
 
 	componentDidMount() {
-		if ( process.env.NODE_ENV === 'development' ) {
-			const computedStyle = getComputedStyle( this.props.forwardedRef.current );
-
-			if ( computedStyle.display === 'inline' ) {
-				// eslint-disable-next-line no-console
-				console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
-			}
-		}
-
 		this.applyRecord( this.record, { domOnly: true } );
 	}
 
@@ -362,21 +350,29 @@ class RichText extends Component {
 			unstableOnFocus();
 		}
 
-		this.recalculateBoundaryStyle();
+		if ( ! this.props.__unstableIsSelected ) {
+			// We know for certain that on focus, the old selection is invalid. It
+			// will be recalculated on the next mouseup, keyup, or touchend event.
+			const index = undefined;
+			const activeFormats = EMPTY_ACTIVE_FORMATS;
 
-		// We know for certain that on focus, the old selection is invalid. It
-		// will be recalculated on the next mouseup, keyup, or touchend event.
-		const index = undefined;
-		const activeFormats = undefined;
-
-		this.record = {
-			...this.record,
-			start: index,
-			end: index,
-			activeFormats,
-		};
-		this.props.onSelectionChange( index, index );
-		this.setState( { activeFormats } );
+			this.record = {
+				...this.record,
+				start: index,
+				end: index,
+				activeFormats,
+			};
+			this.props.onSelectionChange( index, index );
+			this.setState( { activeFormats } );
+		} else {
+			this.props.onSelectionChange( this.record.start, this.record.end );
+			this.setState( {
+				activeFormats: getActiveFormats( {
+					...this.record,
+					activeFormats: undefined,
+				}, EMPTY_ACTIVE_FORMATS ),
+			} );
+		}
 
 		// Update selection as soon as possible, which is at the next animation
 		// frame. The event listener for selection changes may be added too late
@@ -558,7 +554,7 @@ class RichText extends Component {
 			activeFormats: undefined,
 		};
 
-		const activeFormats = getActiveFormats( newValue );
+		const activeFormats = getActiveFormats( newValue, EMPTY_ACTIVE_FORMATS );
 
 		// Update the value with the new active formats.
 		newValue.activeFormats = activeFormats;
@@ -575,28 +571,6 @@ class RichText extends Component {
 		this.applyRecord( newValue, { domOnly: true } );
 		this.props.onSelectionChange( start, end );
 		this.setState( { activeFormats } );
-
-		if ( activeFormats.length > 0 ) {
-			this.recalculateBoundaryStyle();
-		}
-	}
-
-	recalculateBoundaryStyle() {
-		const boundarySelector = '*[data-rich-text-format-boundary]';
-		const element = this.props.forwardedRef.current.querySelector( boundarySelector );
-
-		if ( ! element ) {
-			return;
-		}
-
-		const computedStyle = getComputedStyle( element );
-		const newColor = computedStyle.color
-			.replace( ')', ', 0.2)' )
-			.replace( 'rgb', 'rgba' );
-		const selector = `.rich-text:focus ${ boundarySelector }`;
-		const rule = `background-color: ${ newColor }`;
-
-		globalStyle.innerHTML = `${ selector } {${ rule }}`;
 	}
 
 	/**
@@ -823,8 +797,8 @@ class RichText extends Component {
 		// In all other cases, prevent default behaviour.
 		event.preventDefault();
 
-		const formatsBefore = formats[ start - 1 ] || [];
-		const formatsAfter = formats[ start ] || [];
+		const formatsBefore = formats[ start - 1 ] || EMPTY_ACTIVE_FORMATS;
+		const formatsAfter = formats[ start ] || EMPTY_ACTIVE_FORMATS;
 
 		let newActiveFormatsLength = activeFormats.length;
 		let source = formatsAfter;
@@ -852,9 +826,6 @@ class RichText extends Component {
 				newActiveFormatsLength++;
 			}
 		}
-
-		// Wait for boundary class to be added.
-		this.props.setTimeout( () => this.recalculateBoundaryStyle() );
 
 		if ( newActiveFormatsLength !== activeFormats.length ) {
 			const newActiveFormats = source.slice( 0, newActiveFormatsLength );
@@ -1094,21 +1065,35 @@ class RichText extends Component {
 			allowedFormats,
 			withoutInteractiveFormatting,
 			formatTypes,
+			forwardedRef,
 		} = this.props;
+		const { activeFormats } = this.state;
+
+		const onFocus = () => {
+			forwardedRef.current.focus();
+			this.applyRecord( this.record );
+		};
 
 		return (
 			<>
+				<BoundaryStyle
+					activeFormats={ activeFormats }
+					forwardedRef={ forwardedRef }
+				/>
+				<InlineWarning forwardedRef={ forwardedRef } />
 				{ isSelected && <FormatEdit
 					allowedFormats={ allowedFormats }
 					withoutInteractiveFormatting={ withoutInteractiveFormatting }
 					value={ this.record }
 					onChange={ this.onChange }
+					onFocus={ onFocus }
 					formatTypes={ formatTypes }
 				/> }
 				{ children && children( {
 					isSelected,
 					value: this.record,
 					onChange: this.onChange,
+					onFocus,
 					Editable: this.Editable,
 				} ) }
 				{ ! children && <this.Editable /> }

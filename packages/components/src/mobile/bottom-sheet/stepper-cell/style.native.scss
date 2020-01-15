@@ -1,0 +1,66 @@
+.container {
+	flex-grow: 1;
+	flex-direction: row;
+	align-items: center;
+	min-height: 48px;
+	justify-content: flex-end;
+}
+
+.cellContainerStyles {
+	flex-direction: row;
+	align-items: flex-start;
+}
+
+.cellRowStyles {
+	min-height: 48px;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.cellLabel {
+	flex: 1;
+}
+
+.button {
+	width: 32px;
+	height: 32px;
+	background-color: $gray-light;
+	color: #0087be;
+	border-radius: 16px;
+	margin-left: 12px;
+	align-items: center;
+	justify-content: center;
+}
+
+.buttonNoBg {
+	width: 32px;
+	height: 32px;
+	color: #87a6bc;
+	margin-left: 12px;
+	align-items: center;
+	justify-content: center;
+}
+
+.buttonNoBgTextDark {
+	color: $light-opacity-700;
+}
+
+.buttonDark {
+	background-color: $light-opacity-light-100;
+	color: #5198d9;
+}
+
+.value {
+	color: #2e4453;
+	font-size: 16px;
+	margin-left: 12px;
+}
+
+.valueTextDark {
+	color: $light-opacity-200;
+}
+
+.plus {
+	margin-top: 4px;
+	margin-right: 1px;
+}

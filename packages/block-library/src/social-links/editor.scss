@@ -26,34 +26,30 @@
 		width: auto;
 		padding-left: 0;
 		padding-right: 0;
-	}
-
-	// 3. Remove margins on subsequent Edit container.
-	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit {
 		margin-left: 0;
 		margin-right: 0;
 	}
 
-	// 4. Minimize the block outlines.
-	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit::before {
+	// 3. Minimize the block outlines.
+	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block::before {
 		border-right: none;
 		border-top: none;
 		border-bottom: none;
 	}
 
-	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block.is-hovered:not(.is-navigate-mode) > .block-editor-block-list__block-edit::before {
+	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block.is-hovered:not(.is-navigate-mode)::before {
 		box-shadow: none;
 	}
 
-	// 5. Remove the dashed outlines for child blocks.
-	&.is-hovered .wp-block-social-links .block-editor-block-list__block-edit::before,
-	&.is-selected .wp-block-social-links .block-editor-block-list__block-edit::before,
-	&.has-child-selected .wp-block-social-links .block-editor-block-list__block-edit::before {
+	// 4. Remove the dashed outlines for child blocks.
+	&.is-hovered .wp-block-social-links .block-editor-block-list__block::before,
+	&.is-selected .wp-block-social-links .block-editor-block-list__block::before,
+	&.has-child-selected .wp-block-social-links .block-editor-block-list__block::before {
 		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
 	}
 
-	// 6. Remove vertical margins on subsequent block container.
-	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit > [data-block] {
+	// 5. Remove vertical margins on subsequent block container.
+	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > [data-block] {
 		margin-top: 0;
 		margin-bottom: 0;
 	}

@@ -8,7 +8,6 @@
 
 	.components-spinner {
 		display: block;
-		float: none;
 		margin: 100px auto 0;
 	}
 }
@@ -23,7 +22,7 @@
 	align-items: center;
 	align-content: space-between;
 
-	.components-icon-button {
+	.components-button.has-icon {
 		position: absolute;
 		right: 8px;
 	}
