@@ -4,6 +4,7 @@
 * Fix crash on undo
 * Style fixes on the navigation UI
 * [iOS] Fix focus issue
+* New block: Shortcode. You can now create and edit Shortcode blocks in the editor.
 
 1.19.0
 ------
