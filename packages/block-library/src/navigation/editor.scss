@@ -100,16 +100,22 @@ $navigation-item-height: 46px;
 		}
 
 		&.is-editing.has-child > .block-editor-inner-blocks {
+			// Box model.
 			display: block;
-			position: absolute;
 			width: 100%;
-			z-index: 1;
-			white-space: nowrap;
+			border-width: 1px;
+			border-style: solid;
+			border-color: $light-style-sub-menu-border-color;
 
-			border: 1px solid $light-style-sub-menu-border-color;
+			// Light / Dark styles.
 			background-color: $light-style-sub-menu-background-color;
 			color: $light-style-sub-menu-text-color;
 
+			// Position (level 1)
+			position: absolute;
+			z-index: 1;
+
+			// Position (deep levels).
 			.block-editor-inner-blocks {
 				left: 100%;
 				top: 0;
