@@ -2,17 +2,14 @@
 	display: inline-flex;
 	align-items: center;
 	flex-wrap: wrap;
-	background: $white;
 	padding: $grid-unit-10 $grid-unit-10 0;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	height: 40px;
 	white-space: nowrap;
-	border: $border-width solid $border-color;
 	background-clip: padding-box;
 
-	// Include transparent outline for Windows High Contrast mode.
-	outline: $border-width solid transparent;
+	// Block UI appearance.
+	@include block-ui-emphasized();
 
 	// Put toolbar snugly to edge on mobile.
 	margin-left: -$block-padding - $border-width; // This hides the border off the edge of the screen.
@@ -24,6 +21,7 @@
 		margin-left: -$border-width;
 		margin-right: -$border-width;
 	}
+
 	// Increase specificity to override margins set on label element.
 	&.editor-post-permalink > * {
 		margin-bottom: $grid-unit-10;
@@ -32,10 +30,11 @@
 			margin-bottom: 0;
 		}
 	}
+
+	// Prevent button shrinking in IE11 when other items have a 100% flex basis.
+	// This should be safe to apply in all browsers because we don't want these
+	// buttons to shrink anyway.
 	button {
-		// Prevent button shrinking in IE11 when other items have a 100% flex basis.
-		// This should be safe to apply in all browsers because we don't want these
-		// buttons to shrink anyway.
 		flex-shrink: 0;
 	}
 }

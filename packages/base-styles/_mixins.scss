@@ -327,6 +327,18 @@
 	margin-right: 2px;
 }
 
+
+/**
+ * Block UI
+ */
+
+@mixin block-ui-emphasized() {
+	border: $border-width solid $border-color;
+	border-radius: $radius-block-ui;
+	background-color: $white;
+}
+
+
 /**
  * Allows users to opt-out of animations via OS-level preferences.
  */
