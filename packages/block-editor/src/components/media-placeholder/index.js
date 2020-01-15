@@ -137,12 +137,17 @@ export class MediaPlaceholder extends Component {
 					// Remove any images this upload group is responsible for (lastMediaPassed).
 					// Their replacements are contained in newMedia.
 					const filteredMedia = currentMedia.filter( ( item ) => {
-						return ! lastMediaPassed.some( ( temporaryMediaURL ) => temporaryMediaURL === item.url );
+						// Compare via .includes since gallery adds a ratio to the url after returned from this function.
+						return ! lastMediaPassed.some( ( temporaryMediaSlug ) => item.url.includes( temporaryMediaSlug ) );
 					} );
 					// Return the filtered media array along with newMedia.
 					onSelect( filteredMedia.concat( newMedia ) );
 					// Reset lastMediaPassed and set it with urls from newMedia.
-					lastMediaPassed = newMedia.map( ( media ) => media.url );
+					lastMediaPassed = newMedia.map( ( media ) => {
+						// Add everything up to '.fileType' to compare via .includes.
+						const cutOffIndex = media.url.lastIndexOf( '.' );
+						return media.url.slice( 0, cutOffIndex );
+					} );
 				};
 			} else {
 				setMedia = onSelect;
