@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import isIterator from '../is-iterator';
+import isGenerator from '../is-generator';
 
-describe( 'isIterator', () => {
+describe( 'isGenerator', () => {
 	test.each( [
 		[ undefined ],
 		[ null ],
@@ -13,24 +13,24 @@ describe( 'isIterator', () => {
 		[ function() {} ],
 		[ function*() {} ],
 	] )( 'should return false if %o', ( value ) => {
-		expect( isIterator( value ) ).toBe( false );
+		expect( isGenerator( value ) ).toBe( false );
 	} );
 
 	it( 'should return false if an imposter!', () => {
 		const value = { next() {} };
 
-		expect( isIterator( value ) ).toBe( false );
+		expect( isGenerator( value ) ).toBe( false );
 	} );
 
 	it( 'should return false if an async generator', () => {
 		const value = ( async function*() {}() );
 
-		expect( isIterator( value ) ).toBe( false );
+		expect( isGenerator( value ) ).toBe( false );
 	} );
 
 	it( 'should return true if a generator', () => {
 		const value = ( function*() {}() );
 
-		expect( isIterator( value ) ).toBe( true );
+		expect( isGenerator( value ) ).toBe( true );
 	} );
 } );

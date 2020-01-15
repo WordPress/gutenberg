@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import isIterator from './is-iterator';
+import isGenerator from './is-generator';
 import createRuntime from './runtime';
 
 /**
@@ -20,7 +20,7 @@ export default function createMiddleware( controls = {} ) {
 	return ( store ) => {
 		const runtime = createRuntime( controls, store.dispatch );
 		return ( next ) => ( action ) => {
-			if ( ! isIterator( action ) ) {
+			if ( ! isGenerator( action ) ) {
 				return next( action );
 			}
 
