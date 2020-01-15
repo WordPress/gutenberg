@@ -160,12 +160,9 @@
 	color: #c3c4c7;
 }
 
-// Missing Cell
+// Unsupported Footer Cell
 
-.infoIcon {
-	color: $gray-darken-20;
-}
-
-.infoIconDark {
-	color: $gray-20;
+.unsupportedFooterCell {
+	font-size: $text-editor-font-size;
+	color: $gray;
 }

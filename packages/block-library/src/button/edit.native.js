@@ -20,7 +20,7 @@ import {
 	ToggleControl,
 	PanelBody,
 	RangeControl,
-	MissingControl,
+	UnsupportedFooterControl,
 } from '@wordpress/components';
 import {
 	Component,
@@ -212,9 +212,8 @@ class ButtonEdit extends Component {
 							/>
 						</PanelBody>
 						<PanelBody title={ __( 'Color Settings' ) } >
-							<MissingControl
-								label={ __( 'Coming Soon' ) }
-								onChange={ () => {} }
+							<UnsupportedFooterControl
+								label={ __( 'Note: Theme colors are not available at this time.' ) }
 								separatorType="none"
 							/>
 						</PanelBody>

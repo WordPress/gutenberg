@@ -1,19 +1,19 @@
 /**
  * Internal dependencies
  */
-import MissingCell from '../mobile/bottom-sheet/missing-cell';
+import UnsupportedFooterCell from '../mobile/bottom-sheet/unsupported-footer-cell';
 
-function MissingControl( {
+function UnsupportedFooterControl( {
 	label,
 	help,
 	instanceId,
 	className,
 	...props
 } ) {
-	const id = `inspector-missing-control-${ instanceId }`;
+	const id = `inspector-unsupported-footer-control-${ instanceId }`;
 
 	return (
-		<MissingCell
+		<UnsupportedFooterCell
 			label={ label }
 			id={ id }
 			help={ help }
@@ -24,4 +24,4 @@ function MissingControl( {
 	);
 }
 
-export default MissingControl;
+export default UnsupportedFooterControl;
