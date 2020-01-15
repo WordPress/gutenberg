@@ -63,7 +63,7 @@ jobs:
             lib/demo-block-templates/*.html \
             packages/block-serialization-default-parser/*.php \
             post-content.php \
-            # $vendor_scripts \ # TODO
+            $vendor_scripts \
             $build_files \
             readme.txt \
             changelog.txt \
