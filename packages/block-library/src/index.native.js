@@ -150,6 +150,7 @@ export const registerCoreBlocks = () => {
 		gallery,
 		devOnly( group ),
 		spacer,
+		shortcode,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
