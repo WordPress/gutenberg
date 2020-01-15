@@ -1,29 +1,16 @@
 .block-editor-block-list__layout .reusable-block-edit-panel {
 	align-items: center;
-	background: $light-gray-100;
-	color: $dark-gray-500;
 	display: flex;
 	flex-wrap: wrap;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	position: relative;
-	top: -$block-padding;
-	margin: 0 (-$block-padding);
-	padding: $grid-unit-10 $block-padding;
+	padding: ($grid-unit-10 - $border-width - $border-width) $grid-unit-15;
 
-	// Use opacity to work in various editor styles.
-	border: $border-width dashed $border-color;
-	border-bottom: none;
-
-	// Show a smaller padding when nested.
-	.block-editor-block-list__layout & {
-		margin: 0 (-$block-padding);
-		padding: $grid-unit-10 $block-padding;
-	}
-
-	.reusable-block-edit-panel__spinner {
-		margin: 0 5px;
-	}
+	// Block UI appearance.
+	border-radius: $radius-block-ui;
+	background-color: $white;
+	box-shadow: 0 0 0 $border-width $border-color;
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 
 	.reusable-block-edit-panel__info {
 		margin-right: auto;
@@ -57,7 +44,7 @@
 		}
 
 		.components-button.reusable-block-edit-panel__button {
-			margin: 0 0 0 5px;
+			margin: 0 0 0 $grid-unit-10;
 		}
 	}
 }

@@ -15,10 +15,8 @@
 	}
 
 	// Block UI appearance.
-	@include block-ui-emphasized();
-	// Override block UI to use box-shadow instead of border.
-	// This allows block focus styles to overlay it.
-	border: none;
+	border-radius: $radius-block-ui;
+	background-color: $white;
 	box-shadow: 0 0 0 $border-width $border-color;
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 

@@ -9,7 +9,9 @@
 	background-clip: padding-box;
 
 	// Block UI appearance.
-	@include block-ui-emphasized();
+	border: $border-width solid $border-color;
+	border-radius: $radius-block-ui;
+	background-color: $white;
 
 	// Put toolbar snugly to edge on mobile.
 	margin-left: -$block-padding - $border-width; // This hides the border off the edge of the screen.
