@@ -599,6 +599,7 @@ class FormTokenField extends Component {
 						/>
 					) }
 				</div>
+				{ this.props.children }
 				<p id={ `components-form-token-suggestions-howto-${ instanceId }` } className="components-form-token-field__help">
 					{ this.props.tokenizeOnSpace ?
 						__( 'Separate with commas, spaces, or the Enter key.' ) :
