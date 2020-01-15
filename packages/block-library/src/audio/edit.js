@@ -5,11 +5,9 @@ import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
 import {
 	Disabled,
-	IconButton,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
-	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -17,6 +15,7 @@ import {
 	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
+	MediaReplaceFlow,
 	RichText,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
@@ -38,12 +37,6 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 class AudioEdit extends Component {
 	constructor() {
 		super( ...arguments );
-		// edit component has its own src in the state so it can be edited
-		// without setting the actual value outside of the edit UI
-		this.state = {
-			editing: ! this.props.attributes.src,
-		};
-
 		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
@@ -69,7 +62,6 @@ class AudioEdit extends Component {
 					},
 					onError: ( e ) => {
 						setAttributes( { src: undefined, id: undefined } );
-						this.setState( { editing: true } );
 						noticeOperations.createErrorNotice( e );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
@@ -101,8 +93,6 @@ class AudioEdit extends Component {
 			}
 			setAttributes( { src: newSrc, id: undefined } );
 		}
-
-		this.setState( { editing: false } );
 	}
 
 	onUploadError( message ) {
@@ -118,24 +108,18 @@ class AudioEdit extends Component {
 	render() {
 		const { autoplay, caption, loop, preload, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeUI } = this.props;
-		const { editing } = this.state;
-		const switchToEditing = () => {
-			this.setState( { editing: true } );
-		};
 		const onSelectAudio = ( media ) => {
 			if ( ! media || ! media.url ) {
 				// in this case there was an error and we should continue in the editing state
 				// previous attributes should be removed because they may be temporary blob urls
 				setAttributes( { src: undefined, id: undefined } );
-				switchToEditing();
 				return;
 			}
 			// sets the block's attribute and updates the edit component from the
 			// selected media, then switches off the editing UI
 			setAttributes( { src: media.url, id: media.id } );
-			this.setState( { src: media.url, editing: false } );
 		};
-		if ( editing ) {
+		if ( ! src ) {
 			return (
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
@@ -154,14 +138,14 @@ class AudioEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<ToolbarGroup>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit audio' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
-					</ToolbarGroup>
+					<MediaReplaceFlow
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="audio/*"
+						onSelect={ onSelectAudio }
+						onSelectURL={ this.onSelectURL }
+						onError={ this.onUploadError }
+					/>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Audio Settings' ) }>

@@ -22,7 +22,7 @@ exports[`DotTip should render correctly 1`] = `
       Got it
     </ForwardRef(Button)>
   </p>
-  <ForwardRef(IconButton)
+  <ForwardRef(Button)
     className="nux-dot-tip__disable"
     icon="no-alt"
     label="Disable tips"

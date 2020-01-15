@@ -13,14 +13,17 @@ export const strikethrough = {
 	title,
 	tagName: 's',
 	className: null,
-	edit( { isActive, value, onChange } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
+	edit( { isActive, value, onChange, onFocus } ) {
+		function onClick() {
+			onChange( toggleFormat( value, { type: name } ) );
+			onFocus();
+		}
 
 		return (
 			<RichTextToolbarButton
 				icon="editor-strikethrough"
 				title={ title }
-				onClick={ onToggle }
+				onClick={ onClick }
 				isActive={ isActive }
 			/>
 		);

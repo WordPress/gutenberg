@@ -1,10 +1,10 @@
-.block-editor-link-control__search {
+.block-editor-link-control {
 	position: relative;
 	min-width: $modal-min-width;
 }
 
 // LinkControl popover.
-.block-editor-link-control__search .block-editor-link-control__search-input {
+.block-editor-link-control .block-editor-link-control__search-input {
 	// Specificity override.
 	&.block-editor-link-control__search-input input[type="text"] {
 		width: calc(100% - #{$grid-size-large*2});
@@ -191,7 +191,6 @@
 .block-editor-link-control .block-editor-link-control__search-input .components-spinner {
 	display: block;
 	z-index: 100;
-	float: none;
 
 	&.components-spinner { // Specificity override.
 		position: absolute;

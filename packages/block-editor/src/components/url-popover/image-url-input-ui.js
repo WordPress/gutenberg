@@ -9,7 +9,7 @@ import { find, isEmpty, each, map } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useCallback } from '@wordpress/element';
 import {
-	IconButton,
+	Button,
 	NavigableMenu,
 	MenuItem,
 	ToggleControl,
@@ -242,7 +242,7 @@ const ImageURLInputUI = ( {
 
 	return (
 		<>
-			<IconButton
+			<Button
 				icon="admin-links"
 				className="components-toolbar__control"
 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
@@ -276,7 +276,7 @@ const ImageURLInputUI = ( {
 				>
 					{ ( ! url || isEditingLink ) && (
 						<URLPopover.LinkEditor
-							className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
+							className="block-editor-format-toolbar__link-container-content"
 							value={ linkEditorValue }
 							onChangeInputValue={ setUrlInput }
 							onKeyDown={ stopPropagationRelevantKeys }
@@ -288,13 +288,13 @@ const ImageURLInputUI = ( {
 					{ ( url && ! isEditingLink ) && (
 						<>
 							<URLPopover.LinkViewer
-								className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
+								className="block-editor-format-toolbar__link-container-content"
 								onKeyPress={ stopPropagation }
 								url={ url }
 								onEditLinkClick={ startEditLink }
 								urlLabel={ urlLabel }
 							/>
-							<IconButton
+							<Button
 								icon="no"
 								label={ __( 'Remove link' ) }
 								onClick={ onLinkRemove }

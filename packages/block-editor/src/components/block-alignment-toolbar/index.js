@@ -14,23 +14,23 @@ import { withBlockEditContext } from '../block-edit/context';
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
 		icon: 'align-left',
-		title: __( 'Align Left' ),
+		title: __( 'Align left' ),
 	},
 	center: {
 		icon: 'align-center',
-		title: __( 'Align Center' ),
+		title: __( 'Align center' ),
 	},
 	right: {
 		icon: 'align-right',
-		title: __( 'Align Right' ),
+		title: __( 'Align right' ),
 	},
 	wide: {
 		icon: 'align-wide',
-		title: __( 'Wide Width' ),
+		title: __( 'Wide width' ),
 	},
 	full: {
 		icon: 'align-full-width',
-		title: __( 'Full Width' ),
+		title: __( 'Full width' ),
 	},
 };
 
@@ -60,6 +60,7 @@ export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CON
 					return {
 						...BLOCK_ALIGNMENTS_CONTROLS[ control ],
 						isActive: value === control,
+						role: isCollapsed ? 'menuitemradio' : undefined,
 						onClick: applyOrUnset( control ),
 					};
 				} )

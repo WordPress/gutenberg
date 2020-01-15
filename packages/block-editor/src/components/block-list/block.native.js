@@ -14,8 +14,12 @@ import { Component } from '@wordpress/element';
 import { ToolbarButton, Toolbar } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { getBlockType } from '@wordpress/blocks';
-import { __, sprintf } from '@wordpress/i18n';
+import {
+	getBlockType,
+	getUnregisteredTypeHandlerName,
+	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
+} from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -75,31 +79,6 @@ class BlockListBlock extends Component {
 				<Text>BlockType: { this.props.name }</Text>
 			</View>
 		);
-	}
-
-	getAccessibilityLabel() {
-		const { attributes, name, order, title, getAccessibilityLabelExtra } = this.props;
-
-		let blockName = '';
-
-		if ( name === 'core/missing' ) { // is the block unrecognized?
-			blockName = title;
-		} else {
-			blockName = sprintf(
-				/* translators: accessibility text. %s: block name. */
-				__( '%s Block' ),
-				title, //already localized
-			);
-		}
-
-		blockName += '. ' + sprintf( __( 'Row %d.' ), order + 1 );
-
-		if ( getAccessibilityLabelExtra ) {
-			const blockAccessibilityLabel = getAccessibilityLabelExtra( attributes );
-			blockName += blockAccessibilityLabel ? ' ' + blockAccessibilityLabel : '';
-		}
-
-		return blockName;
 	}
 
 	applySelectedBlockStyle() {
@@ -188,19 +167,33 @@ class BlockListBlock extends Component {
 		];
 	}
 
+	applyToolbarStyle() {
+		const {
+			hasChildren,
+			isUnregisteredBlock,
+		} = this.props;
+
+		if ( ! hasChildren || isUnregisteredBlock ) {
+			return styles.neutralToolbar;
+		}
+	}
+
 	render() {
 		const {
+			attributes,
+			blockType,
 			clientId,
 			icon,
 			isSelected,
 			isValid,
+			order,
 			title,
 			showFloatingToolbar,
 			parentId,
 			isTouchable,
 		} = this.props;
 
-		const accessibilityLabel = this.getAccessibilityLabel();
+		const accessibilityLabel = getAccessibleBlockLabel( blockType, attributes, order + 1 );
 
 		return (
 			<>
@@ -228,7 +221,7 @@ class BlockListBlock extends Component {
 						style={ this.applyBlockStyle() }
 					>
 						{ isValid ? this.getBlockForType() : <BlockInvalidWarning blockTitle={ title } icon={ icon } /> }
-						{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
+						<View style={ this.applyToolbarStyle() } >{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }</View>
 					</View>
 				</TouchableWithoutFeedback>
 			</>
@@ -261,10 +254,11 @@ export default compose( [
 		const isLastBlock = order === getBlocks().length - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
+
+		const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 		const blockType = getBlockType( name || 'core/missing' );
 		const title = blockType.title;
 		const icon = blockType.icon;
-		const getAccessibilityLabelExtra = blockType.__experimentalGetAccessibilityLabel;
 
 		const parents = getBlockParents( clientId, true );
 		const parentId = parents[ 0 ] || '';
@@ -281,7 +275,7 @@ export default compose( [
 		const commonAncestorIndex = parents.indexOf( commonAncestor ) - 1;
 		const firstToSelectId = commonAncestor ? parents[ commonAncestorIndex ] : parents[ parents.length - 1 ];
 
-		const hasChildren = !! getBlockCount( clientId );
+		const hasChildren = ! isUnregisteredBlock && !! getBlockCount( clientId );
 		const hasParent = !! parentId;
 		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parentId;
 		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
@@ -306,7 +300,6 @@ export default compose( [
 			isLastBlock,
 			isSelected,
 			isValid,
-			getAccessibilityLabelExtra,
 			showFloatingToolbar,
 			parentId,
 			isParentSelected,
@@ -317,6 +310,7 @@ export default compose( [
 			isTouchable,
 			isDimmed,
 			isRootListInnerBlockHolder,
+			isUnregisteredBlock,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

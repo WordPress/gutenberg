@@ -2,7 +2,7 @@
 	margin-left: -4px;
 
 	// the padding and margin of the more menu is intentionally non-standard
-	.components-icon-button {
+	.components-button {
 		width: auto;
 		padding: 8px 2px;
 	}
@@ -10,7 +10,7 @@
 	@include break-small() {
 		margin-left: 4px;
 
-		.components-icon-button {
+		.components-button {
 			padding: 8px 4px;
 		}
 	}

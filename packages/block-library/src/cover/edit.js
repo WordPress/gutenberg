@@ -17,13 +17,11 @@ import {
 	BaseControl,
 	Button,
 	FocalPointPicker,
-	IconButton,
 	PanelBody,
 	PanelRow,
 	RangeControl,
 	ResizableBox,
 	ToggleControl,
-	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
@@ -33,14 +31,12 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUpload,
-	MediaUploadCheck,
-	PanelColorSettings,
+	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
 	__experimentalUseGradient,
-	__experimentalGradientPickerControl,
 	__experimentalGradientPicker,
+	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -261,7 +257,6 @@ function CoverEdit( {
 		dimRatio,
 		focalPoint,
 		hasParallax,
-		id,
 		minHeight,
 		url,
 	} = attributes;
@@ -310,25 +305,12 @@ function CoverEdit( {
 		<>
 			<BlockControls>
 				{ hasBackground && (
-					<>
-						<MediaUploadCheck>
-							<ToolbarGroup>
-								<MediaUpload
-									onSelect={ onSelectMedia }
-									allowedTypes={ ALLOWED_MEDIA_TYPES }
-									value={ id }
-									render={ ( { open } ) => (
-										<IconButton
-											className="components-toolbar__control"
-											label={ __( 'Edit media' ) }
-											icon="edit"
-											onClick={ open }
-										/>
-									) }
-								/>
-							</ToolbarGroup>
-						</MediaUploadCheck>
-					</>
+					<MediaReplaceFlow
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*,video/*"
+						onSelect={ onSelectMedia }
+					/>
 				) }
 			</BlockControls>
 			<InspectorControls>
@@ -384,32 +366,17 @@ function CoverEdit( {
 								onChange={ ( newMinHeight ) => setAttributes( { minHeight: newMinHeight } ) }
 							/>
 						</PanelBody>
-						<PanelColorSettings
+						<PanelColorGradientSettings
 							title={ __( 'Overlay' ) }
 							initialOpen={ true }
-							colorSettings={ [ {
-								value: overlayColor.color,
-								onChange: ( ...args ) => {
-									setAttributes( {
-										customGradient: undefined,
-									} );
-									setOverlayColor( ...args );
-								},
-								label: __( 'Overlay Color' ),
+							settings={ [ {
+								colorValue: overlayColor.color,
+								gradientValue,
+								onColorChange: setOverlayColor,
+								onGradientChange: setGradient,
+								label: __( 'Overlay' ),
 							} ] }
 						>
-							<__experimentalGradientPickerControl
-								label={ __( 'Overlay Gradient' ) }
-								onChange={
-									( newGradient ) => {
-										setGradient( newGradient );
-										setAttributes( {
-											overlayColor: undefined,
-										} );
-									}
-								}
-								value={ gradientValue }
-							/>
 							{ !! url && (
 								<RangeControl
 									label={ __( 'Background Opacity' ) }
@@ -421,7 +388,7 @@ function CoverEdit( {
 									required
 								/>
 							) }
-						</PanelColorSettings>
+						</PanelColorGradientSettings>
 					</>
 				) }
 			</InspectorControls>

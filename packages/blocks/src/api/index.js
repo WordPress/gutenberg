@@ -29,6 +29,7 @@ export {
 } from './categories';
 export {
 	registerBlockType,
+	registerBlockCollection,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
 	getFreeformContentHandlerName,
@@ -56,6 +57,8 @@ export {
 	isUnmodifiedDefaultBlock,
 	normalizeIconObject,
 	isValidIcon,
+	getBlockLabel as __experimentalGetBlockLabel,
+	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
 } from './utils';
 export {
 	doBlocksMatchTemplate,

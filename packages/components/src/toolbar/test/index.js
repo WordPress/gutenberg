@@ -14,8 +14,8 @@ describe( 'Toolbar', () => {
 		it( 'should render a toolbar with toolbar buttons', () => {
 			const wrapper = mount(
 				<Toolbar __experimentalAccessibilityLabel="blocks">
-					<ToolbarButton title="control1" />
-					<ToolbarButton title="control2" />
+					<ToolbarButton label="control1" />
+					<ToolbarButton label="control2" />
 				</Toolbar>
 			);
 			const control1 = wrapper.find( 'button[aria-label="control1"]' );

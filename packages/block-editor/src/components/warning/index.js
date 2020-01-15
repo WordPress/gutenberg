@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
-import { Dropdown, IconButton, MenuGroup, MenuItem } from '@wordpress/components';
+import { Dropdown, Button, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 function Warning( { className, actions, children, secondaryActions } ) {
@@ -32,7 +32,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 					className="block-editor-warning__secondary"
 					position="bottom left"
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<IconButton
+						<Button
 							icon="ellipsis"
 							label={ __( 'More options' ) }
 							onClick={ onToggle }
