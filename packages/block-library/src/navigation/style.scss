@@ -150,7 +150,7 @@
 		}
 	}
 
-	// Top-level sub-menu indicators
+	// Top-level sub-menu indicators.
 	& .has-sub-menu > a {
 
 		&::after {
@@ -174,18 +174,7 @@
 		justify-content: flex-end;
 	}
 
-	// Colors.
-	$light-style-sub-menu-background-color: #fff;
-	$light-style-sub-menu-border-color: #e2e4e7;
-	$light-style-sub-menu-text-color: #111;
-	$light-style-sub-menu-text-color-hover: #333;
-
-	$dark-style-sub-menu-background-color: #333;
-	$dark-style-sub-menu-border-color: #111;
-	$dark-style-sub-menu-text-color: #fff;
-	$dark-style-sub-menu-text-color-hover: #eee;
-
-	// Default Style / Ligth style.
+	// Default Style / Light styles.
 	& > ul > li > ul,
 	&.is-light-style > ul > li > ul {
 		background-color: $light-style-sub-menu-background-color;
@@ -212,7 +201,7 @@
 		}
 	}
 
-	// Dark Style.
+	// Dark Styles.
 	&.is-style-dark > ul > li > ul {
 		background-color: $dark-style-sub-menu-background-color;
 		border-color: $dark-style-sub-menu-border-color;
