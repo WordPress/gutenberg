@@ -14,5 +14,8 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Post Excerpt' ),
+	supports: {
+		html: false,
+	},
 	edit,
 };
