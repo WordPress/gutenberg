@@ -86,34 +86,26 @@ function build_css_font_sizes( $attributes ) {
 }
 
 /**
- * Filters out links with no labels.
- *
- * @param array $block Block to check label attribute on.
- *
- * @return boolean
- */
-function gutenberg_has_navigation_label( $block ) {
-	return ! empty( $block['attrs']['label'] );
-}
-
-/**
  * Recursively filters out links with no labels to build a clean navigation block structure.
  *
  * @param array $blocks Navigation link inner blocks from the Navigation block.
  *
- * @return boolean
+ * @return array
  */
 function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
 
-	$blocks = array_filter( $blocks, 'gutenberg_has_navigation_label' );
+	$blocks = array_filter(
+		$blocks,
+		function( $block ) {
+			return ! empty( $block['attrs']['label'] );
+		}
+	);
 
-	if ( empty( $blocks ) ) {
-		return $blocks;
-	}
-
-	foreach ( $blocks as $key => $val ) {
-		if ( ! empty( $blocks[ $key ]['innerBlocks'] ) ) {
-			$blocks[ $key ]['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $blocks[ $key ]['innerBlocks'] );
+	if ( ! empty( $blocks ) ) {
+		foreach ( $blocks as $key => $block ) {
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$blocks[ $key ]['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+			}
 		}
 	}
 
@@ -134,7 +126,7 @@ function render_block_navigation( $attributes, $content, $block ) {
 	$block['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
 
 	if ( empty( $block['innerBlocks'] ) ) {
-		return;
+		return '';
 	}
 
 	$colors          = build_css_colors( $attributes );
