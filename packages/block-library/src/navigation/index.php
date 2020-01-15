@@ -87,9 +87,9 @@ function build_css_font_sizes( $attributes ) {
 
 /**
  * Filters out links with no labels
- * 
- * @param array $block
- * 
+ *
+ * @param array $block Block to check label attribute on.
+ *
  * @return boolean
  */
 function has_navigation_label( $block ) {
@@ -151,8 +151,8 @@ function build_navigation_html( $block, $colors, $font_sizes, $level_zero = true
 		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
 		: '';
 
-	// Only include link blocks that have a label set
-	foreach ( (array) array_filter( $block['innerBlocks'], "has_navigation_label" ) as $key => $block ) {
+	// Only include link blocks that have a label set.
+	foreach ( (array) array_filter( $block['innerBlocks'], 'has_navigation_label' ) as $key => $block ) {
 
 		$html .= '<li class="wp-block-navigation-link">' .
 			'<a';
@@ -205,7 +205,7 @@ function build_navigation_html( $block, $colors, $font_sizes, $level_zero = true
 			$html .= build_navigation_html( $block, $colors, $font_sizes, false );
 =======
 		// Only include innerBlocks that have a label set in the count. Otherwise a submenu with no links will be rendered.
-		if ( count( (array) array_filter( $block['innerBlocks'], "has_navigation_label" ) ) > 0 ) {
+		if ( count( (array) array_filter( $block['innerBlocks'], 'has_navigation_label' ) ) > 0 ) {
 			$html .= build_navigation_html( $block, $colors, $font_sizes );
 >>>>>>> Added filter for only getting blocks with a non-empty label for ouptputting in the navigation html.
 		}
