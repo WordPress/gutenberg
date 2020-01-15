@@ -86,14 +86,38 @@ function build_css_font_sizes( $attributes ) {
 }
 
 /**
- * Filters out links with no labels
+ * Filters out links with no labels.
  *
  * @param array $block Block to check label attribute on.
  *
  * @return boolean
  */
-function has_navigation_label( $block ) {
+function gutenberg_has_navigation_label( $block ) {
 	return ! empty( $block['attrs']['label'] );
+}
+
+/**
+ * Recursively filters out links with no labels to build a clean navigation block structure.
+ *
+ * @param array $blocks Navigation link inner blocks from the Navigation block.
+ *
+ * @return boolean
+ */
+function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
+
+	$blocks = array_filter( $blocks, 'gutenberg_has_navigation_label' );
+
+	if ( empty( $blocks ) ) {
+		return $blocks;
+	}
+
+	foreach ( $blocks as $key => $val ) {
+		if ( ! empty( $blocks[ $key ]['innerBlocks'] ) ) {
+			$blocks[ $key ]['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $blocks[ $key ]['innerBlocks'] );
+		}
+	}
+
+	return $blocks;
 }
 
 /**
@@ -106,6 +130,13 @@ function has_navigation_label( $block ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation( $attributes, $content, $block ) {
+
+	$block['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+
+	if ( empty( $block['innerBlocks'] ) ) {
+		return;
+	}
+
 	$colors          = build_css_colors( $attributes );
 	$font_sizes      = build_css_font_sizes( $attributes );
 	$classes         = array_merge(
@@ -151,8 +182,7 @@ function build_navigation_html( $block, $colors, $font_sizes, $level_zero = true
 		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
 		: '';
 
-	// Only include link blocks that have a label set.
-	foreach ( (array) array_filter( $block['innerBlocks'], 'has_navigation_label' ) as $key => $block ) {
+	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
 
 		$html .= '<li class="wp-block-navigation-link">' .
 			'<a';
@@ -201,11 +231,15 @@ function build_navigation_html( $block, $colors, $font_sizes, $level_zero = true
 		// End anchor tag content.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
 			$html .= build_navigation_html( $block, $colors, $font_sizes, false );
 =======
 		// Only include innerBlocks that have a label set in the count. Otherwise a submenu with no links will be rendered.
 		if ( count( (array) array_filter( $block['innerBlocks'], 'has_navigation_label' ) ) > 0 ) {
+=======
+		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
+>>>>>>> Adds recursive function for effectively sanitizing the navigation block from outputting empty links.
 			$html .= build_navigation_html( $block, $colors, $font_sizes );
 >>>>>>> Added filter for only getting blocks with a non-empty label for ouptputting in the navigation html.
 		}
