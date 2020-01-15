@@ -840,6 +840,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "CycleSelectControl",
+		"slug": "cycle-select-control",
+		"markdown_source": "../packages/components/src/mobile/cycle-select-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "StepperControl",
 		"slug": "stepper-control",
 		"markdown_source": "../packages/components/src/mobile/stepper-control/README.md",

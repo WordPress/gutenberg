@@ -16,10 +16,10 @@ import { isEmpty, map, get } from 'lodash';
  * WordPress dependencies
  */
 import {
+	CycleSelectControl,
 	Icon,
 	PanelBody,
 	PanelActions,
-	SelectControl,
 	TextControl,
 	ToggleControl,
 	ToolbarButton,
@@ -334,7 +334,7 @@ export class ImageEdit extends React.Component {
 					/>
 					{ // eslint-disable-next-line no-undef
 						image && __DEV__ &&
-						<SelectControl
+						<CycleSelectControl
 							icon={ 'editor-expand' }
 							label={ __( 'Size' ) }
 							value={ sizeSlug || DEFAULT_SIZE_SLUG }

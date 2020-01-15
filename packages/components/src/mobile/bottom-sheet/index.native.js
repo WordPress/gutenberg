@@ -18,6 +18,7 @@ import styles from './styles.scss';
 import Button from './button';
 import Cell from './cell';
 import CyclePickerCell from './cycle-picker-cell';
+import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
@@ -148,6 +149,7 @@ ThemedBottomSheet.getWidth = getWidth;
 ThemedBottomSheet.Button = Button;
 ThemedBottomSheet.Cell = Cell;
 ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
+ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
 
