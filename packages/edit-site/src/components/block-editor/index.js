@@ -4,8 +4,7 @@
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { uploadMedia } from '@wordpress/media-utils';
-import { useEntityProp } from '@wordpress/core-data';
-import { parse, serialize } from '@wordpress/blocks';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
@@ -48,28 +47,9 @@ export default function BlockEditor() {
 			},
 		};
 	}, [ canUserCreateMedia, _settings ] );
-	const [ content, _setContent ] = useEntityProp(
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		settings.templateType,
-		'content'
-	);
-	const initialBlocks = useMemo( () => {
-		if ( typeof content !== 'function' ) {
-			const parsedContent = parse( content );
-			return parsedContent.length ? parsedContent : [];
-		}
-	}, [ settings.templateId ] );
-	const [ blocks = initialBlocks, setBlocks ] = useEntityProp(
-		'postType',
-		settings.templateType,
-		'blocks'
-	);
-	const setContent = useCallback(
-		( nextBlocks ) => {
-			setBlocks( nextBlocks );
-			_setContent( serialize( nextBlocks ) );
-		},
-		[ setBlocks, _setContent ]
+		settings.templateType
 	);
 	const setActiveTemplateId = useCallback(
 		( newTemplateId ) =>
@@ -84,8 +64,8 @@ export default function BlockEditor() {
 		<BlockEditorProvider
 			settings={ settings }
 			value={ blocks }
-			onInput={ setBlocks }
-			onChange={ setContent }
+			onInput={ onInput }
+			onChange={ onChange }
 			useSubRegistry={ false }
 		>
 			<BlockEditorKeyboardShortcuts />
