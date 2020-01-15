@@ -3,7 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
-import { withDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -13,8 +13,17 @@ import Container from './container';
 import getDefaultTemplates from './default-templates';
 import Preview from './preview';
 
-const __experimentalPageTemplatePicker = ( { setLayout, templates = getDefaultTemplates() } ) => {
+const __experimentalPageTemplatePicker = ( { templates = getDefaultTemplates() } ) => {
+	const { setLayoutTemplate } = useDispatch( 'core/editor' );
 	const [ templatePreview, setTemplatePreview ] = useState();
+
+	const onApply = ( ) => {
+		setLayoutTemplate( {
+			name: templatePreview.name,
+			content: parse( templatePreview.content ),
+		} );
+		setTemplatePreview( undefined );
+	};
 
 	return (
 		<>
@@ -31,26 +40,10 @@ const __experimentalPageTemplatePicker = ( { setLayout, templates = getDefaultTe
 			<Preview
 				template={ templatePreview }
 				onDismiss={ () => setTemplatePreview( undefined ) }
-				onApply={ () => {
-					setLayout( templatePreview );
-					setTemplatePreview( undefined );
-				} }
+				onApply={ onApply }
 			/>
 		</>
 	);
 };
 
-export default withDispatch( ( dispatch ) => {
-	const {
-		editPost,
-		resetEditorBlocks,
-	} = dispatch( 'core/editor' );
-
-	return {
-		setLayout: ( layout ) => {
-			const blocks = parse( layout.content );
-			editPost( { title: layout.name } );
-			resetEditorBlocks( blocks );
-		},
-	};
-} )( __experimentalPageTemplatePicker );
+export default __experimentalPageTemplatePicker;

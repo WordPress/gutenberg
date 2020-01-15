@@ -717,6 +717,15 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	yield* editPost( edits );
 }
 
+/**
+ * Action generator to set the selected layout template.
+ *
+ * @param {Object} template Layout's template
+ */
+export function* setLayoutTemplate( template ) {
+	yield* editPost( { title: template.name, blocks: template.content } );
+}
+
 /*
  * Returns an action object used in signalling that the post editor settings have been updated.
  *
