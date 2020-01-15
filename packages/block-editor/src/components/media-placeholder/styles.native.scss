@@ -60,7 +60,7 @@
 
 .addMediaButton {
 	color: $white;
-	background-color: $dark-gray-500;
+	background-color: $toolbar-button;
 	border-radius: $icon-button-size-small / 2;
 	overflow: hidden;
 	size: $icon-button-size-small;
@@ -68,5 +68,5 @@
 
 .addMediaButtonDark {
 	color: $background-dark-secondary;
-	background-color: $gray-40;
+	background-color: $gray-20;
 }

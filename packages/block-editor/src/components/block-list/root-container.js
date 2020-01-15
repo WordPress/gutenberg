@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, createContext } from '@wordpress/element';
+import { createContext, forwardRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -9,6 +9,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import useMultiSelection from './use-multi-selection';
 import { getBlockClientId } from '../../utils/dom';
+import InsertionPoint from './insertion-point';
+import BlockPopover from './block-popover';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -18,11 +20,13 @@ function selector( select ) {
 	const {
 		getSelectedBlockClientId,
 		hasMultiSelection,
+		isMultiSelecting,
 	} = select( 'core/block-editor' );
 
 	return {
 		selectedBlockClientId: getSelectedBlockClientId(),
 		hasMultiSelection: hasMultiSelection(),
+		isMultiSelecting: isMultiSelecting(),
 	};
 }
 
@@ -41,11 +45,11 @@ function onDragStart( event ) {
 	}
 }
 
-export default function RootContainer( { children, className } ) {
-	const ref = useRef();
+function RootContainer( { children, className }, ref ) {
 	const {
 		selectedBlockClientId,
 		hasMultiSelection,
+		isMultiSelecting,
 	} = useSelect( selector, [] );
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const onSelectionStart = useMultiSelection( ref );
@@ -70,15 +74,24 @@ export default function RootContainer( { children, className } ) {
 	}
 
 	return (
-		<div
-			ref={ ref }
+		<InsertionPoint
 			className={ className }
-			onFocus={ onFocus }
-			onDragStart={ onDragStart }
+			isMultiSelecting={ isMultiSelecting }
+			selectedBlockClientId={ selectedBlockClientId }
 		>
-			<Context.Provider value={ onSelectionStart }>
-				{ children }
-			</Context.Provider>
-		</div>
+			<BlockPopover />
+			<div
+				ref={ ref }
+				className={ className }
+				onFocus={ onFocus }
+				onDragStart={ onDragStart }
+			>
+				<Context.Provider value={ onSelectionStart }>
+					{ children }
+				</Context.Provider>
+			</div>
+		</InsertionPoint>
 	);
 }
+
+export default forwardRef( RootContainer );

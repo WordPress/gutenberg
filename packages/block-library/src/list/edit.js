@@ -38,7 +38,7 @@ export default function ListEdit( {
 	const { ordered, values, type, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
-	const controls = ( { value, onChange } ) => (
+	const controls = ( { value, onChange, onFocus } ) => (
 		<>
 			{ ( isSelected && <>
 				<RichTextShortcut
@@ -79,6 +79,7 @@ export default function ListEdit( {
 							isActive: isActiveListType( value, 'ul', tagName ),
 							onClick() {
 								onChange( changeListType( value, { type: 'ul' } ) );
+								onFocus();
 
 								if ( isListRootSelected( value ) ) {
 									setAttributes( { ordered: false } );
@@ -91,6 +92,7 @@ export default function ListEdit( {
 							isActive: isActiveListType( value, 'ol', tagName ),
 							onClick() {
 								onChange( changeListType( value, { type: 'ol' } ) );
+								onFocus();
 
 								if ( isListRootSelected( value ) ) {
 									setAttributes( { ordered: true } );
@@ -104,6 +106,7 @@ export default function ListEdit( {
 							isDisabled: ! canOutdentListItems( value ),
 							onClick() {
 								onChange( outdentListItems( value ) );
+								onFocus();
 							},
 						},
 						{
@@ -113,6 +116,7 @@ export default function ListEdit( {
 							isDisabled: ! canIndentListItems( value ),
 							onClick() {
 								onChange( indentListItems( value, { type: tagName } ) );
+								onFocus();
 							},
 						},
 					] }

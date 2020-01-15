@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -32,6 +37,12 @@ export const settings = {
 	supports: {
 		className: false,
 		__unstablePasteTextInline: true,
+	},
+	__experimentalLabel( attributes, { context } ) {
+		if ( context === 'accessibility' ) {
+			const { content } = attributes;
+			return isEmpty( content ) ? __( 'Empty' ) : content;
+		}
 	},
 	transforms,
 	deprecated,

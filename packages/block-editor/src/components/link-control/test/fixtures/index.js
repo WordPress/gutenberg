@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { uniqueId } from 'lodash';
+import { uniqueId, take } from 'lodash';
 
 export const fauxEntitySuggestions = [
 	{
@@ -34,8 +34,11 @@ export const fauxEntitySuggestions = [
 	},
 ];
 
-// export const fetchFauxEntitySuggestions = async () => fauxEntitySuggestions;
-
-export const fetchFauxEntitySuggestions = () => {
-	return Promise.resolve( fauxEntitySuggestions );
+/* eslint-disable no-unused-vars */
+export const fetchFauxEntitySuggestions = ( val = '', {
+	perPage = null,
+} = {} ) => {
+	const suggestions = perPage ? take( fauxEntitySuggestions, perPage ) : fauxEntitySuggestions;
+	return Promise.resolve( suggestions );
 };
+/* eslint-enable no-unused-vars */

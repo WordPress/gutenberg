@@ -13,7 +13,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getBlockFocusableWrapper } from '../../utils/dom';
+import { getBlockDOMNode } from '../../utils/dom';
 
 /**
  * Renders focus capturing areas to redirect focus to the selected block if not
@@ -44,7 +44,7 @@ const FocusCapture = forwardRef( ( {
 	function onFocus() {
 		// Do not capture incoming focus if set by us in WritingFlow.
 		if ( noCapture.current ) {
-			delete noCapture.current;
+			noCapture.current = null;
 			return;
 		}
 
@@ -69,7 +69,7 @@ const FocusCapture = forwardRef( ( {
 
 		// If there is a selected block, move focus to the first or last
 		// tabbable element depending on the direction.
-		const wrapper = getBlockFocusableWrapper( selectedClientId );
+		const wrapper = getBlockDOMNode( selectedClientId );
 
 		if ( isReverse ) {
 			const tabbables = focus.tabbable.find( wrapper );

@@ -27,7 +27,7 @@ import {
 } from '@wordpress/components';
 
 import {
-	Caption,
+	BlockCaption,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
@@ -55,6 +55,11 @@ import {
 	LINK_DESTINATION_NONE,
 } from './constants';
 
+const ICON_TYPE = {
+	PLACEHOLDER: 'placeholder',
+	RETRY: 'retry',
+	UPLOAD: 'upload',
+};
 const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
 const IMAGE_SIZE_MEDIUM = 'medium';
 const IMAGE_SIZE_LARGE = 'large';
@@ -286,12 +291,18 @@ export class ImageEdit extends React.Component {
 		}
 	}
 
-	getIcon( isRetryIcon ) {
-		if ( isRetryIcon ) {
-			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+	getIcon( iconType ) {
+		let iconStyle;
+		switch ( iconType ) {
+			case ICON_TYPE.RETRY:
+				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+			case ICON_TYPE.PLACEHOLDER:
+				iconStyle = this.props.getStylesFromColorScheme( styles.iconPlaceholder, styles.iconPlaceholderDark );
+				break;
+			case ICON_TYPE.UPLOAD:
+				iconStyle = this.props.getStylesFromColorScheme( styles.iconUpload, styles.iconUploadDark );
+				break;
 		}
-
-		const iconStyle = this.props.getStylesFromColorScheme( styles.icon, styles.iconDark );
 		return <Icon icon={ SvgIcon } { ...iconStyle } />;
 	}
 
@@ -366,7 +377,7 @@ export class ImageEdit extends React.Component {
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 						onSelect={ this.onSelectMediaUploadOption }
-						icon={ this.getIcon( false ) }
+						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
 					/>
 				</View>
@@ -407,12 +418,11 @@ export class ImageEdit extends React.Component {
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
-							const icon = this.getIcon( isUploadFailed );
 							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed || this.state.isCaptionSelected ) ? styles.imageBorder : '';
 
-							const iconContainer = (
+							const iconRetryContainer = (
 								<View style={ styles.modalIcon }>
-									{ icon }
+									{ this.getIcon( ICON_TYPE.RETRY ) }
 								</View>
 							);
 
@@ -425,8 +435,11 @@ export class ImageEdit extends React.Component {
 									alignSelf: imageWidthWithinContainer && alignToFlex[ align ] }
 								} >
 									{ ! imageWidthWithinContainer &&
-										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
-											{ this.getIcon( false ) }
+										<View style={ [ this.props.getStylesFromColorScheme( styles.imageContainerUpload, styles.imageContainerUploadDark ),
+											{ height: imageContainerHeight } ] } >
+											<View style={ styles.imageUploadingIconContainer }>
+												{ this.getIcon( ICON_TYPE.UPLOAD ) }
+											</View>
 										</View> }
 									<ImageBackground
 										accessible={ true }
@@ -441,7 +454,7 @@ export class ImageEdit extends React.Component {
 									>
 										{ isUploadFailed &&
 											<View style={ [ styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
-												{ iconContainer }
+												{ iconRetryContainer }
 												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 											</View>
 										}
@@ -450,7 +463,7 @@ export class ImageEdit extends React.Component {
 							);
 						} }
 					/>
-					<Caption
+					<BlockCaption
 						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }
 						accessible={ true }

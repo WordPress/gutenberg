@@ -1330,6 +1330,14 @@ _Related_
 
 -   selectBlock in core/block-editor store.
 
+<a name="setLayoutTemplate" href="#setLayoutTemplate">#</a> **setLayoutTemplate**
+
+Action generator to set the selected layout template.
+
+_Parameters_
+
+-   _template_ `Object`: Layout's template
+
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
 _Related_

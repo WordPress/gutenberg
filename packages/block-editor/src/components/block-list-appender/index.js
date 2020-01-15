@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { last } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -25,6 +26,7 @@ function BlockListAppender( {
 	canInsertDefaultBlock,
 	isLocked,
 	renderAppender: CustomAppender,
+	className,
 } ) {
 	if ( isLocked || CustomAppender === false ) {
 		return null;
@@ -68,7 +70,7 @@ function BlockListAppender( {
 			// Prevent the block from being selected when the appender is
 			// clicked.
 			onFocus={ stopPropagation }
-			className="block-list-appender"
+			className={ classnames( 'block-list-appender', className ) }
 		>
 			{ appender }
 		</div>

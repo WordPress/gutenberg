@@ -22,7 +22,7 @@ export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { default as Draggable } from './draggable';
-export { default as DropZone } from './drop-zone';
+export { default as DropZone, useDropZone as __unstableUseDropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
