@@ -23,23 +23,25 @@ function isDev() {
  * ```
  */
 export default function warning( condition, ...messages ) {
-	if ( isDev() ) {
-		if ( ! condition ) {
-			return;
-		}
+	if ( ! isDev() ) {
+		return;
+	}
 
-		const text = messages.join( '\n' );
+	if ( ! condition ) {
+		return;
+	}
 
-		// eslint-disable-next-line no-console
-		console.warn( text );
+	const text = messages.join( '\n' );
 
-		// Throwing an error and catching it immediately to improve debugging
-		// A consumer can use 'pause on caught exceptions'
-		// https://github.com/facebook/react/issues/4216
-		try {
-			throw Error( text );
-		} catch ( x ) {
-			// do nothing
-		}
+	// eslint-disable-next-line no-console
+	console.warn( text );
+
+	// Throwing an error and catching it immediately to improve debugging
+	// A consumer can use 'pause on caught exceptions'
+	// https://github.com/facebook/react/issues/4216
+	try {
+		throw Error( text );
+	} catch ( x ) {
+		// do nothing
 	}
 }
