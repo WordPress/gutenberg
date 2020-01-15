@@ -40,7 +40,7 @@
 		}
 
 		&.is-active {
-			font-weight: bold;
+			@include formatting-button-style__active();
 		}
 
 		// Plain menu styles.
