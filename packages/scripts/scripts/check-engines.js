@@ -20,8 +20,8 @@ const hasConfig = hasArgInCLI( '--package' ) ||
 	hasArgInCLI( '--yarn' );
 const config = ! hasConfig ?
 	[
-		'--node', '>=10.0.0',
-		'--npm', '>=6.0.0',
+		'--node', '>=12',
+		'--npm', '>=6.9',
 	] :
 	[];
 
