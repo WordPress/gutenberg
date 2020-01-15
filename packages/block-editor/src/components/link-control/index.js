@@ -35,7 +35,7 @@ export function LinkControl( {
 	value,
 	settings,
 	onChange = noop,
-	initialSuggestions,
+	showInitialSuggestions,
 	fetchSearchSuggestions,
 } ) {
 	const instanceId = useInstanceId( LinkControl );
@@ -202,7 +202,7 @@ export function LinkControl( {
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
 					onReset={ resetInput }
-					initialSuggestions={ initialSuggestions }
+					showInitialSuggestions={ showInitialSuggestions }
 				/>
 			) }
 

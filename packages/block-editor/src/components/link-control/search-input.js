@@ -27,7 +27,13 @@ const handleLinkControlOnKeyDown = ( event ) => {
 };
 
 const handleLinkControlOnKeyPress = ( event ) => {
+	const { keyCode } = event;
+
 	event.stopPropagation();
+
+	if ( keyCode === ENTER ) {
+
+	}
 };
 
 const LinkControlSearchInput = ( {
@@ -37,7 +43,7 @@ const LinkControlSearchInput = ( {
 	renderSuggestions,
 	fetchSuggestions,
 	onReset,
-	initialSuggestions,
+	showInitialSuggestions,
 } ) => {
 	const selectItemHandler = ( selection, suggestion ) => {
 		onChange( selection );
@@ -69,7 +75,7 @@ const LinkControlSearchInput = ( {
 				__experimentalRenderSuggestions={ renderSuggestions }
 				__experimentalFetchLinkSuggestions={ fetchSuggestions }
 				__experimentalHandleURLSuggestions={ true }
-				__experimentalShowInitialSuggestions={ initialSuggestions }
+				__experimentalShowInitialSuggestions={ showInitialSuggestions }
 			/>
 
 			<Button
