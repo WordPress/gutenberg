@@ -65,17 +65,26 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  */
 
 /**
+ * Named block pattern scopes.
+ *
+ * @typedef {'block'|'inserter'} WPBlockPatternScope
+ */
+
+/**
  * An object describing a pattern defined for the block type.
  *
  * @typedef {Object} WPBlockPattern
  *
- * @property {string}  name          The unique and machine-readable name.
- * @property {string}  label         A human-readable label.
- * @property {WPIcon}  [icon]        An icon helping to visualize the pattern.
- * @property {boolean} [isDefault]   Indicates whether the current pattern is the default one.
- *                                   Defaults to `false`.
- * @property {Object}  [attributes]  Values which override block attributes.
- * @property {Array[]} [innerBlocks] Initial configuration of nested blocks.
+ * @property {string}   name                 The unique and machine-readable name.
+ * @property {string}   label                A human-readable label.
+ * @property {WPIcon}   [icon]               An icon helping to visualize the pattern.
+ * @property {boolean}  [isDefault]          Indicates whether the current pattern is
+ *                                           the default one. Defaults to `false`.
+ * @property {Object}   [attributes]         Values which override block attributes.
+ * @property {Array[]}  [innerBlocks]        Initial configuration of nested blocks.
+ * @property {WPBlockPatternScope[]} [scope] The list of scopes where the pattern
+ *                                           is applicable. When not provided, it
+ *                                           assumes all available scopes.
  */
 
 /**

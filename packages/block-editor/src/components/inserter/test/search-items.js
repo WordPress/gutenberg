@@ -84,7 +84,7 @@ describe( 'searchItems', () => {
 		);
 	} );
 
-	it( 'should match words using the patterns and mark those matched', () => {
+	it( 'should match words using the patterns and mark those matched which are scoped to inserter', () => {
 		const filteredItems = searchItems( items, categories, collections, 'patterns two three' );
 
 		expect( filteredItems ).toHaveLength( 1 );

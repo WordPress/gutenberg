@@ -19,6 +19,7 @@ const patterns = [
 			[ 'core/column' ],
 			[ 'core/column' ],
 		],
+		scope: [ 'block' ],
 	},
 	{
 		name: 'two-columns-one-third-two-thirds',
@@ -28,6 +29,7 @@ const patterns = [
 			[ 'core/column', { width: 33.33 } ],
 			[ 'core/column', { width: 66.66 } ],
 		],
+		scope: [ 'block' ],
 	},
 	{
 		name: 'two-columns-two-thirds-one-third',
@@ -37,6 +39,7 @@ const patterns = [
 			[ 'core/column', { width: 66.66 } ],
 			[ 'core/column', { width: 33.33 } ],
 		],
+		scope: [ 'block' ],
 	},
 	{
 		name: 'three-columns-equal',
@@ -47,6 +50,7 @@ const patterns = [
 			[ 'core/column' ],
 			[ 'core/column' ],
 		],
+		scope: [ 'block' ],
 	},
 	{
 		name: 'three-columns-wider-center',
@@ -57,6 +61,7 @@ const patterns = [
 			[ 'core/column', { width: 50 } ],
 			[ 'core/column', { width: 25 } ],
 		],
+		scope: [ 'block' ],
 	},
 ];
 

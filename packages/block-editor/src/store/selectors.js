@@ -1255,6 +1255,9 @@ export const getInserterItems = createSelector(
 
 			const isContextual = isArray( blockType.parent );
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
+			const inserterPatterns = blockType.patterns.filter(
+				( { scope } ) => ! scope || scope.includes( 'inserter' )
+			);
 
 			return {
 				id,
@@ -1264,7 +1267,7 @@ export const getInserterItems = createSelector(
 				icon: blockType.icon,
 				category: blockType.category,
 				keywords: blockType.keywords,
-				patterns: blockType.patterns,
+				patterns: inserterPatterns,
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),

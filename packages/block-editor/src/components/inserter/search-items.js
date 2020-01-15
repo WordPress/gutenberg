@@ -6,7 +6,7 @@ import {
 	differenceWith,
 	find,
 	get,
-	intersection,
+	intersectionWith,
 	words,
 } from 'lodash';
 
@@ -53,15 +53,15 @@ const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
  * @return {Array}             Filtered item list.
  */
 export const searchItems = ( items, categories, collections, searchTerm ) => {
-	const normalizedTerms = normalizeSearchTerm( searchTerm );
+	const normalizedSearchTerms = normalizeSearchTerm( searchTerm );
 
-	if ( normalizedTerms.length === 0 ) {
+	if ( normalizedSearchTerms.length === 0 ) {
 		return items;
 	}
 
 	return items.filter( ( { name, title, category, keywords = [], patterns = [] } ) => {
 		let unmatchedTerms = removeMatchingTerms(
-			normalizedTerms,
+			normalizedSearchTerms,
 			title
 		);
 
@@ -111,9 +111,10 @@ export const searchItems = ( items, categories, collections, searchTerm ) => {
 			patterns: item.patterns.map( ( pattern ) => {
 				return {
 					...pattern,
-					matched: intersection(
-						normalizedTerms,
-						normalizeSearchTerm( pattern.label )
+					matched: intersectionWith(
+						normalizedSearchTerms,
+						normalizeSearchTerm( pattern.label ),
+						( termToMatch, labelTerm ) => labelTerm.includes( termToMatch )
 					).length > 0,
 				};
 			} ),

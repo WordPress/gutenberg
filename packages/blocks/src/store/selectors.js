@@ -14,6 +14,8 @@ import {
 	some,
 } from 'lodash';
 
+/** @typedef {import('../api/registration').WPBlockPatternScope} WPBlockPatternScope */
+
 /**
  * Given a block name or block type object, returns the corresponding
  * normalized block type object.
@@ -78,13 +80,20 @@ export function getBlockStyles( state, name ) {
 /**
  * Returns block patterns by block name.
  *
- * @param {Object} state      Data state.
- * @param {string} blockName  Block type name.
+ * @param {Object}              state     Data state.
+ * @param {string}              blockName Block type name.
+ * @param {WPBlockPatternScope} [scope]   Block pattern scope name.
  *
  * @return {(WPBlockPattern[]|void)} Block patterns.
  */
-export function __experimentalGetBlockPatterns( state, blockName ) {
-	return state.blockPatterns[ blockName ];
+export function __experimentalGetBlockPatterns( state, blockName, scope ) {
+	const patterns = state.blockPatterns[ blockName ];
+	if ( ! patterns || ! scope ) {
+		return patterns;
+	}
+	return patterns.filter( ( pattern ) => {
+		return ! pattern.scope || pattern.scope.includes( scope );
+	} );
 }
 
 /**
@@ -93,13 +102,14 @@ export function __experimentalGetBlockPatterns( state, blockName ) {
  * the last added item is picked. This simplifies registering overrides.
  * When there is no default pattern set, it returns the first item.
  *
- * @param {Object} state      Data state.
- * @param {string} blockName  Block type name.
+ * @param {Object}              state     Data state.
+ * @param {string}              blockName Block type name.
+ * @param {WPBlockPatternScope} [scope]   Block pattern scope name.
  *
  * @return {?WPBlockPattern} The default block pattern.
  */
-export function __experimentalGetDefaultBlockPattern( state, blockName ) {
-	const patterns = __experimentalGetBlockPatterns( state, blockName );
+export function __experimentalGetDefaultBlockPattern( state, blockName, scope ) {
+	const patterns = __experimentalGetBlockPatterns( state, blockName, scope );
 
 	return findLast( patterns, 'isDefault' ) || first( patterns );
 }
