@@ -346,7 +346,7 @@ describe( 'Default search suggestions', () => {
 		// Verify the search results already display the initial suggestions
 		expect( initialSearchResultElements ).toHaveLength( expectedResultsLength );
 
-		expect( searchResultsLabel.innerHTML ).toEqual( 'Recently modified' );
+		expect( searchResultsLabel.innerHTML ).toEqual( 'Recently updated' );
 	} );
 
 	it( 'should not display initial suggestions when input value is present', async () => {

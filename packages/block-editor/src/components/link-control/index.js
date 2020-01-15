@@ -137,7 +137,7 @@ export function LinkControl( {
 		} );
 
 		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
-		const searchResultsLabelId = isInitialSuggestions && `block-editor-link-control-search-results-label-${ instanceId }`;
+		const searchResultsLabelId = isInitialSuggestions ? `block-editor-link-control-search-results-label-${ instanceId }` : undefined;
 		const labelText = isInitialSuggestions ? __( 'Recently updated' ) : sprintf( __( 'Search results for %s' ), inputValue );
 		// According to guidelines aria-label should be added if the label
 		// itself is not visible.
