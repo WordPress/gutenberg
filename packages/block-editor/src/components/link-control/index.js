@@ -7,7 +7,7 @@ import { noop, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, ExternalLink } from '@wordpress/components';
+import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState, Fragment } from '@wordpress/element';
 
@@ -139,14 +139,15 @@ export function LinkControl( {
 		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
 		const searchResultsLabelId = `block-editor-link-control-search-results-label-${ instanceId }`;
 		const labelText = isInitialSuggestions ? __( 'Recently modified' ) : sprintf( __( 'Search results for %s' ), inputValue );
+		const SearchResultsLabel = (
+			<span className="block-editor-link-control__search-results-label" id={ searchResultsLabelId }>
+				{ labelText }
+			</span>
+		);
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				{ isInitialSuggestions && (
-					<span className="block-editor-link-control__search-results-label" id={ searchResultsLabelId }>
-						{ labelText }
-					</span>
-				) }
+				{ ! isInitialSuggestions ? <VisuallyHidden>{ SearchResultsLabel }</VisuallyHidden> : SearchResultsLabel }
 
 				<div { ...suggestionsListProps } className={ resultsListClasses } aria-labelledby={ searchResultsLabelId }>
 					{ suggestions.map( ( suggestion, index ) => (
