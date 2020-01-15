@@ -169,7 +169,7 @@ function NavigationLinkEdit( {
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
-								initialSuggestions={ true }
+								showInitialSuggestions={ true }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',

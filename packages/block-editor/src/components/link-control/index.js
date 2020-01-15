@@ -8,7 +8,7 @@ import { noop, startsWith } from 'lodash';
  * WordPress dependencies
  */
 import { Button, ExternalLink } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState, Fragment } from '@wordpress/element';
 
 import {
@@ -131,16 +131,24 @@ export function LinkControl( {
 	}, [ handleDirectEntry, fetchSearchSuggestions ] );
 
 	// Render Components
-	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading } ) => {
+	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading, isInitialSuggestions } ) => {
 		const resultsListClasses = classnames( 'block-editor-link-control__search-results', {
 			'is-loading': isLoading,
 		} );
 
 		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
+		const searchResultsLabelId = `block-editor-link-control-search-results-label-${ instanceId }`;
+		const labelText = isInitialSuggestions ? __( 'Recently modified' ) : sprintf( __( 'Search results for %s' ), inputValue );
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				<div { ...suggestionsListProps } className={ resultsListClasses }>
+				{ isInitialSuggestions && (
+					<span className="block-editor-link-control__search-results-label" id={ searchResultsLabelId }>
+						{ labelText }
+					</span>
+				) }
+
+				<div { ...suggestionsListProps } className={ resultsListClasses } aria-labelledby={ searchResultsLabelId }>
 					{ suggestions.map( ( suggestion, index ) => (
 						<LinkControlSearchItem
 							key={ `${ suggestion.id }-${ suggestion.type }` }
