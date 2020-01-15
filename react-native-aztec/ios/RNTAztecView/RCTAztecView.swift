@@ -669,6 +669,7 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textViewDidEndEditing(_ textView: UITextView) {
-        onBlur?([:])
+        let text = packForRN(cleanHTML(), withName: "text")
+        onBlur?(text)
     }
 }
