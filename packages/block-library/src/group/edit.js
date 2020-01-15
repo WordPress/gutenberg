@@ -7,22 +7,24 @@ import {
 	InnerBlocks,
 	__experimentalUseColors,
 } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 
 function GroupEdit( {
 	hasInnerBlocks,
 } ) {
+	const ref = useRef();
 	const {
 		TextColor,
 		BackgroundColor,
 		InspectorControlsColorPanel,
-		ColorDetector,
 	} = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
 			{ name: 'backgroundColor', className: 'has-background' },
 		],
 		{
-			contrastCheckers: [ { backgroundColor: true, textColor: true } ],
+			contrastCheckers: { backgroundColor: true, textColor: true },
+			colorDetector: { targetRef: ref },
 		}
 	);
 
@@ -31,8 +33,7 @@ function GroupEdit( {
 			{ InspectorControlsColorPanel }
 			<BackgroundColor>
 				<TextColor>
-					<ColorDetector querySelector=".wp-block-group" />
-					<div className="wp-block-group" >
+					<div className="wp-block-group" ref={ ref } >
 						<div className="wp-block-group__inner-container" >
 							<InnerBlocks
 								renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
