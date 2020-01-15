@@ -29,6 +29,43 @@ describe( 'createQueue', () => {
 			requestIdleCallback.tick();
 			expect( callback ).toHaveBeenCalled();
 		} );
+
+		it( 'runs callbacks in order by distinct added element', () => {
+			const elementA = {};
+			const elementB = {};
+			const callbackElementA = jest.fn();
+			const callbackElementB = jest.fn();
+			queue.add( elementA, callbackElementA );
+			queue.add( elementB, callbackElementB );
+
+			expect( callbackElementA ).not.toHaveBeenCalled();
+			expect( callbackElementB ).not.toHaveBeenCalled();
+
+			// ElementA was added first, and should be called first after tick.
+			requestIdleCallback.tick();
+			expect( callbackElementA ).toHaveBeenCalledTimes( 1 );
+			expect( callbackElementB ).not.toHaveBeenCalled();
+
+			// ElementB will be be processed after second tick.
+			requestIdleCallback.tick();
+			expect( callbackElementA ).toHaveBeenCalledTimes( 1 );
+			expect( callbackElementB ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'calls most recently added callback if added for same element', () => {
+			const element = {};
+			const callbackOne = jest.fn();
+			const callbackTwo = jest.fn();
+			queue.add( element, callbackOne );
+			queue.add( element, callbackTwo );
+
+			expect( callbackOne ).not.toHaveBeenCalled();
+			expect( callbackTwo ).not.toHaveBeenCalled();
+
+			requestIdleCallback.tick();
+			expect( callbackOne ).not.toHaveBeenCalled();
+			expect( callbackTwo ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 
 	describe( 'flush', () => {
