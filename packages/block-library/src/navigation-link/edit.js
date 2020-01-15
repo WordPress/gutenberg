@@ -177,10 +177,17 @@ function NavigationLinkEdit( {
 								} = {} ) => setAttributes( {
 									title: escape( newTitle ),
 									url: encodeURI( newURL ),
-									label: (
-										( newTitle !== '' && newTitle !== newURL && label !== newTitle ) ?
-											escape( newTitle ) : label
-									),
+									label: ( () => {
+										const normalizedTitle = newTitle.replace( /http(s?):\/\//gi, '' );
+										const normalizedURL = newURL.replace( /http(s?):\/\//gi, '' );
+										if (
+											newTitle !== '' &&
+											normalizedTitle !== normalizedURL &&
+											label !== newTitle ) {
+											return escape( newTitle );
+										}
+										return label;
+									} )(),
 									opensInNewTab: newOpensInNewTab,
 								} ) }
 								onClose={ () => setIsLinkOpen( false ) }
