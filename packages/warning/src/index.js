@@ -7,10 +7,10 @@ function isDev() {
 }
 
 /**
- * Shows a warning with `messages` if `condition` passes and environment is not `production`.
+ * Shows a warning with `message` if `condition` passes and environment is not `production`.
  *
  * @param {boolean} condition Whether the warning will be triggered or not.
- * @param {string[]} messages Message(s) to show in the warning.
+ * @param {string} message Message to show in the warning.
  *
  * @example
  * ```js
@@ -22,7 +22,7 @@ function isDev() {
  * }
  * ```
  */
-export default function warning( condition, ...messages ) {
+export default function warning( condition, message ) {
 	if ( ! isDev() ) {
 		return;
 	}
@@ -31,16 +31,14 @@ export default function warning( condition, ...messages ) {
 		return;
 	}
 
-	const text = messages.join( '\n' );
-
 	// eslint-disable-next-line no-console
-	console.warn( text );
+	console.warn( message );
 
 	// Throwing an error and catching it immediately to improve debugging
 	// A consumer can use 'pause on caught exceptions'
 	// https://github.com/facebook/react/issues/4216
 	try {
-		throw Error( text );
+		throw Error( message );
 	} catch ( x ) {
 		// do nothing
 	}

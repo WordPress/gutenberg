@@ -12,19 +12,19 @@ describe( 'warning', () => {
 
 	it( 'logs to console.warn when NODE_ENV is not "production"', () => {
 		process.env.NODE_ENV = 'development';
-		warning( true, 'warn', 'ing' );
-		expect( console ).toHaveWarnedWith( 'warn\ning' );
+		warning( true, 'warning' );
+		expect( console ).toHaveWarnedWith( 'warning' );
 	} );
 
 	it( 'does not log to console.warn if NODE_ENV is "production"', () => {
 		process.env.NODE_ENV = 'production';
-		warning( true, 'warn', 'ing' );
+		warning( true, 'warning' );
 		expect( console ).not.toHaveWarned();
 	} );
 
 	it( 'does not log to console.warn if condition is falsy', () => {
 		process.env.NODE_ENV = 'development';
-		warning( false, 'warn', 'ing' );
+		warning( false, 'warning' );
 		expect( console ).not.toHaveWarned();
 	} );
 } );
