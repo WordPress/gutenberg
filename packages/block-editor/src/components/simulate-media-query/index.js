@@ -16,7 +16,7 @@ import { useEffect } from '@wordpress/element';
 const ENABLED_MEDIA_QUERY = '(min-width:0px)';
 const DISABLED_MEDIA_QUERY = '(min-width:999999px)';
 
-const VALID_MEDIA_QUERY_REGEX = /\((min|max)-width:([^\(]*?)px\)/g;
+const VALID_MEDIA_QUERY_REGEX = /\((min|max)-width:[^\(]*?\)/g;
 
 function getStyleSheetsThatMatchPaths( partialPaths ) {
 	return filter(
@@ -39,11 +39,12 @@ function isReplaceableMediaRule( rule ) {
 	if ( ! rule.media ) {
 		return false;
 	}
-	return !! rule.conditionText.match( VALID_MEDIA_QUERY_REGEX );
+	// Need to use "media.mediaText" instead of "conditionText" for IE support.
+	return !! rule.media.mediaText.match( VALID_MEDIA_QUERY_REGEX );
 }
 
 function replaceRule( styleSheet, newRuleText, index ) {
-	styleSheet.removeRule( index );
+	styleSheet.deleteRule( index );
 	styleSheet.insertRule( newRuleText, index );
 }
 
