@@ -51,6 +51,7 @@ function Navigation( {
 	setAttributes,
 	setFontSize,
 	updateNavItemBlocks,
+	className,
 } ) {
 	//
 	// HOOKS
@@ -135,10 +136,12 @@ function Navigation( {
 
 	const hasPages = hasResolvedPages && pages && pages.length;
 
-	const blockClassNames = classnames( 'wp-block-navigation', {
-		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-		[ fontSize.class ]: fontSize.class,
-	} );
+	const blockClassNames = classnames(
+		className, {
+			[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+			[ fontSize.class ]: fontSize.class,
+		}
+	);
 	const blockInlineStyles = {
 		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 	};
