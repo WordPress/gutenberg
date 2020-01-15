@@ -78,20 +78,20 @@
 	}
 
 	// First and last buttons in a group have 12px outer padding, like 48px buttons.
-	.components-toolbar div:first-child .components-button.has-icon {
+	.components-toolbar div:first-child .components-button {
 		min-width: $block-toolbar-height - $grid-unit-15 / 2;
 		padding-left: $grid-unit-15 - $border-width;
 		padding-right: $grid-unit-15 / 2;
 	}
 
-	.components-toolbar div:last-child .components-button.has-icon {
+	.components-toolbar div:last-child .components-button {
 		min-width: $block-toolbar-height - $grid-unit-15 / 2;
 		padding-left: $grid-unit-15 / 2;
 		padding-right: $grid-unit-15 - $border-width;
 	}
 
 	// Single buttons should remain 48px.
-	.components-toolbar div:first-child:last-child > .components-button.has-icon {
+	.components-toolbar div:first-child:last-child > .components-button {
 		min-width: $block-toolbar-height;
 		padding-left: $grid-unit-15;
 		padding-right: $grid-unit-15;
