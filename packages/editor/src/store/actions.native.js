@@ -3,6 +3,11 @@
  */
 import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
+/**
+ * Internal dependencies
+ */
+import { editPost } from './actions.js';
+
 export * from './actions.js';
 
 /**
@@ -24,4 +29,13 @@ export function togglePostTitleSelection( isSelected = true ) {
  */
 export function* autosave() {
 	RNReactNativeGutenbergBridge.editorDidAutosave();
+}
+
+/**
+ * Action generator to set the selected layout template.
+ *
+ * @param {Object} template Layout's template
+ */
+export function* setLayoutTemplate( template ) {
+	yield* editPost( { title: template.name, blocks: template.content } );
 }
