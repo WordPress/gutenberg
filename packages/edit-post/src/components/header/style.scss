@@ -48,7 +48,8 @@
 	flex-wrap: wrap;
 }
 
-.edit-post-header .components-button {
+// @todo: this state should be refactored away once the G2 UI goes beyond the canvas.
+.edit-post-header__settings .components-button {
 	// Header toggle buttons.
 	&.is-pressed {
 		color: $white;
