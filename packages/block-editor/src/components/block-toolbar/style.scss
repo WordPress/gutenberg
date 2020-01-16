@@ -33,6 +33,10 @@
 
 		// IE11 has thick paddings without this.
 		line-height: 0;
+
+		.components-button {
+			margin: 2px;
+		}
 	}
 
 	// Add a left border and adjust the color for Top Toolbar mode.
