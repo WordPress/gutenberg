@@ -17,11 +17,19 @@ const getTheme = ( theme ) => ( {
 		medium: 8,
 		large: 16,
 		xlarge: 24,
+		iconButtonSize: 36,
+		iconButtonSizeSmall: 24,
+		borderWidth: 1,
 	},
 	zIndices: {
 		'block-library-gallery-item__inline-menu': 20,
 	},
 	colors: themes[ theme || '' ] || themes.default,
+	helpers: {
+		shade: ( inputColor, amount ) => {
+			return '#' + inputColor.replace( /^#/, '' ).replace( /../g, ( color ) => ( '0' + Math.min( 255, Math.max( 0, parseInt( color, 16 ) + amount ) ).toString( 16 ) ).substr( -2 ) );
+		},
+	},
 } );
 
 const themes = {
@@ -31,7 +39,12 @@ const themes = {
 		toggle: '#11a0d2',
 		button: '#0085ba',
 		outlines: '#007cba',
+		'dark-gray-300': '6c7781',
 		'dark-gray-500': '#555d66',
+		'dark-gray-900': '191e23',
+		'light-gray-500': '#e2e4e7',
+		white: '#ffffff',
+		alertRed: '#d94f4f',
 	},
 	'admin-color-light': {
 		primary: '#0085ba',
