@@ -9,6 +9,7 @@ import deepFreeze from 'deep-freeze';
 import {
 	downloadableBlocks,
 	blockManagement,
+	hasPermission,
 } from '../reducer';
 import { installedItem, downloadableBlock } from './fixtures';
 
@@ -56,32 +57,6 @@ describe( 'state', () => {
 	} );
 
 	describe( 'blockManagement()', () => {
-		it( 'should set state to reflect user not having permissions', () => {
-			const initialState = deepFreeze( {
-				items: [ downloadableBlock ],
-			} );
-			const state = blockManagement( initialState, {
-				type: 'SET_INSTALL_BLOCKS_PERMISSION',
-				hasPermission: false,
-			} );
-
-			expect( state.hasPermission ).toBe( false );
-			expect( state.items ).toHaveLength( 0 );
-		} );
-
-		it( 'should set state to reflect user having permissions', () => {
-			const initialState = deepFreeze( {
-				items: [ downloadableBlock ],
-			} );
-			const state = blockManagement( initialState, {
-				type: 'SET_INSTALL_BLOCKS_PERMISSION',
-				hasPermission: true,
-			} );
-
-			expect( state.hasPermission ).toBe( true );
-			expect( state.items ).toHaveLength( 1 );
-		} );
-
 		it( 'should add item to the installedBlockTypesList', () => {
 			const initialState = deepFreeze( { installedBlockTypes: [] } );
 			const state = blockManagement( initialState, {
@@ -102,6 +77,17 @@ describe( 'state', () => {
 			} );
 
 			expect( state.installedBlockTypes ).toHaveLength( 0 );
+		} );
+	} );
+
+	describe( 'hasPermission()', () => {
+		it( 'should update permissions appropriately', () => {
+			const state = hasPermission( true, {
+				type: 'SET_INSTALL_BLOCKS_PERMISSION',
+				hasPermission: false,
+			} );
+
+			expect( state ).toBe( false );
 		} );
 	} );
 } );

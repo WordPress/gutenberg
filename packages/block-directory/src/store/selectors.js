@@ -37,7 +37,7 @@ export function getDownloadableBlocks( state, filterValue ) {
  * @return {boolean} User has permission to install blocks.
  */
 export function hasInstallBlocksPermission( state ) {
-	return state.downloadableBlocks.hasPermission;
+	return state.hasPermission;
 }
 
 /**
