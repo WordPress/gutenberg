@@ -83,7 +83,7 @@
 	// Navigate mode & Focused wrapper.
 	// We're using a pseudo element to overflow placeholder borders
 	// and any border inside the block itself.
-	&:focus > [data-block]::after {
+	&:focus::after {
 		position: absolute;
 		z-index: 1;
 		pointer-events: none;
