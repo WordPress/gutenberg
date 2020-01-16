@@ -89,8 +89,7 @@ function build_css_font_sizes( $attributes ) {
  * Recursively filters out links with no labels to build a clean navigation block structure.
  *
  * @param array $blocks Navigation link inner blocks from the Navigation block.
- *
- * @return array
+ * @return array Blocks that had valid labels
  */
 function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
 	$blocks = array_filter(
