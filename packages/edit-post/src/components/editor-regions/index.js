@@ -10,6 +10,7 @@ import { navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSimulatedMediaQuery } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
 function EditorRegions( { footer, header, sidebar, content, publish, className } ) {
 	const resizableStylesheets = useSelect( ( select ) => {
@@ -20,15 +21,25 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 		return select( 'core/block-editor' ).deviceType();
 	} );
 
+	const [ actualWidth, updateActualWidth ] = useState( window.innerWidth );
+
+	window.addEventListener( 'resize', () => updateActualWidth( window.innerWidth ) );
+
 	const canvasWidth = ( device ) => {
+		let deviceWidth = 0;
+
 		switch ( device ) {
 			case 'Tablet':
-				return 780;
+				deviceWidth = 780;
+				break;
 			case 'Mobile':
-				return 340;
+				deviceWidth = 340;
+				break;
 			default:
-				return 2000;
+				deviceWidth = 2000;
 		}
+
+		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
 	};
 
 	const marginValue = ( device ) => {
