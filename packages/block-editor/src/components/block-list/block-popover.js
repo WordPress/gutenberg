@@ -98,7 +98,7 @@ function BlockPopover( {
 		return null;
 	}
 
-	// A block may speciy a different target element for the toolbar.
+	// A block may specify a different target element for the toolbar.
 	if ( node.classList.contains( 'is-block-collapsed' ) ) {
 		node = node.querySelector( '.is-block-content' ) || node;
 	}
