@@ -12,6 +12,7 @@ import { Platform, Text, TouchableOpacity } from 'react-native';
  * Internal dependencies
  */
 import Icon from '../../icon';
+import styles from './button.scss';
 
 const ICON_SIZE = 24;
 
@@ -20,7 +21,7 @@ const Button = ( { icon, onPress, title } ) => {
 		<TouchableOpacity onPress={ onPress }>
 			{ icon ?
 				<Icon icon={ icon } size={ ICON_SIZE } /> :
-				<Text>{ title }</Text>
+				<Text style={ styles.title }>{ title }</Text>
 			}
 		</TouchableOpacity>
 	);
