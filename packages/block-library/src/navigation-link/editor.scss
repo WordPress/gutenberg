@@ -70,6 +70,8 @@
 	}
 
 	&.has-link .wp-block-navigation-link__content {
+		display: flex;
+		align-items: center;
 		text-decoration: underline;
 	}
 
