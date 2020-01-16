@@ -7627,7 +7627,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
         aria-expanded={false}
         aria-haspopup="true"
         aria-label="Change text alignment"
-        className="components-button components-dropdown-menu__toggle has-text has-icon"
+        className="components-button components-dropdown-menu__toggle has-icon"
         id="options-toolbar-2"
         onBlur={[Function]}
         onClick={[Function]}
@@ -7652,9 +7652,6 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
             d="M12 5V3H3v2h9zm5 4V7H3v2h14zm-5 4v-2H3v2h9zm5 4v-2H3v2h14z"
           />
         </svg>
-        <span
-          className="components-dropdown-menu__indicator"
-        />
       </button>
     </div>
   </div>
@@ -7776,11 +7773,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
         onMouseLeave={[Function]}
         tabIndex={-1}
         type="button"
-      >
-        <span
-          className="components-dropdown-menu__indicator"
-        />
-      </button>
+      />
     </div>
   </div>
   <div

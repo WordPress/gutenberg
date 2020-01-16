@@ -17,43 +17,47 @@ function Warning( { className, actions, children, secondaryActions } ) {
 			<div className="block-editor-warning__contents">
 				<p className="block-editor-warning__message">{ children }</p>
 
-				<div className="block-editor-warning__actions">
-					{ Children.count( actions ) > 0 &&
-						Children.map( actions, ( action, i ) => (
-							<span
-								key={ i }
-								className="block-editor-warning__action"
-							>
-								{ action }
-							</span>
-						) ) }
-					{ secondaryActions && (
-						<Dropdown
-							className="block-editor-warning__secondary"
-							position="bottom left"
-							renderToggle={ ( { isOpen, onToggle } ) => (
-								<Button
-									icon="ellipsis"
-									label={ __( 'More options' ) }
-									onClick={ onToggle }
-									aria-expanded={ isOpen }
-								/>
-							) }
-							renderContent={ () => (
-								<MenuGroup>
-									{ secondaryActions.map( ( item, pos ) => (
-										<MenuItem
-											onClick={ item.onClick }
-											key={ pos }
-										>
-											{ item.title }
-										</MenuItem>
-									) ) }
-								</MenuGroup>
-							) }
-						/>
-					) }
-				</div>
+				{ ( Children.count( actions ) > 0 || secondaryActions ) && (
+					<div className="block-editor-warning__actions">
+						{ Children.count( actions ) > 0 &&
+							Children.map( actions, ( action, i ) => (
+								<span
+									key={ i }
+									className="block-editor-warning__action"
+								>
+									{ action }
+								</span>
+							) ) }
+						{ secondaryActions && (
+							<Dropdown
+								className="block-editor-warning__secondary"
+								position="bottom left"
+								renderToggle={ ( { isOpen, onToggle } ) => (
+									<Button
+										icon="ellipsis"
+										label={ __( 'More options' ) }
+										onClick={ onToggle }
+										aria-expanded={ isOpen }
+									/>
+								) }
+								renderContent={ () => (
+									<MenuGroup>
+										{ secondaryActions.map(
+											( item, pos ) => (
+												<MenuItem
+													onClick={ item.onClick }
+													key={ pos }
+												>
+													{ item.title }
+												</MenuItem>
+											)
+										) }
+									</MenuGroup>
+								) }
+							/>
+						) }
+					</div>
+				) }
 			</div>
 		</div>
 	);
