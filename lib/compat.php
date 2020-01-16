@@ -208,7 +208,17 @@ add_action( 'init', 'gutenberg_register_data_persistence_user_meta' );
 function gutenberg_user_settings_data_persistence_inline_script() {
 	global $wp_scripts, $wpdb;
 
-	$user_id         = get_current_user_id();
+	$user_id = get_current_user_id();
+	if ( empty( $user_id ) ) {
+		/*
+		 * In most cases, it should be expected that this would only be reached
+		 * while logged in and viewing the block editor. However, there may be
+		 * edge cases where a plugin is calling to enqueue block assets outside
+		 * the editor and when a user may not be logged in.
+		 */
+		return;
+	}
+
 	$persisted_value = get_user_meta( $user_id, $wpdb->get_blog_prefix() . 'data_persistence', true );
 	if ( empty( $persisted_value ) ) {
 		// If there's no explicit metadata assigned, fall back to a value which
