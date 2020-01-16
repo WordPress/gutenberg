@@ -103,8 +103,10 @@ function BlockListBlock( {
 	const onBlockError = () => setErrorState( true );
 
 	const blockType = getBlockType( name );
-	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
+	const blockLabel = isFirstMultiSelected ?
+		__( 'Multiple selected blocks' ) :
+		// translators: %s: Type of block (i.e. Text, Image etc)
+		sprintf( __( 'Block: %s' ), blockType.title );
 
 	// Handing the focus of the block on creation and update
 
