@@ -348,7 +348,7 @@ export default function WritingFlow( { children } ) {
 			return;
 		}
 
-		const clientId = selectedBlockClientId || selectionStartClientId;
+		const clientId = selectedBlockClientId || selectedFirstClientId;
 
 		// In Edit mode, Tab should focus the first tabbable element after the
 		// content, which is normally the sidebar (with block controls) and
@@ -369,14 +369,16 @@ export default function WritingFlow( { children } ) {
 						focusCaptureBeforeRef.current.focus();
 						return;
 					}
-				} else if (
-					target === wrapper ||
-					target === last( focus.tabbable.find( wrapper ) )
-				) {
-					// See comment above.
-					noCapture.current = true;
-					focusCaptureAfterRef.current.focus();
-					return;
+				} else {
+					const tabbables = focus.tabbable.find( wrapper );
+					const lastTabbable = last( tabbables ) || wrapper;
+
+					if ( target === lastTabbable ) {
+						// See comment above.
+						noCapture.current = true;
+						focusCaptureAfterRef.current.focus();
+						return;
+					}
 				}
 			} else if ( isEscape ) {
 				setNavigationMode( true );
@@ -484,7 +486,7 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	const selectedClientId = selectedBlockClientId || selectionStartClientId;
+	const selectedClientId = selectedBlockClientId || selectedFirstClientId;
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.
