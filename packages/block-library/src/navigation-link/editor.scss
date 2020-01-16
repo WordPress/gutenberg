@@ -63,6 +63,7 @@
 
 	&.has-link .wp-block-navigation-link__content {
 		text-decoration: underline;
+		white-space: nowrap !important; // TODO: solve differently to prevent use of !important
 	}
 
 	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {

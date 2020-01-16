@@ -101,10 +101,10 @@ $navigation-item-height: 46px;
 
 		&.is-editing.has-child > .block-editor-inner-blocks {
 			// Box model.
-			display: block;
-			width: 100%;
+			display: flex;
 			border-width: 1px;
 			border-style: solid;
+			border-radius: 2px;
 
 			// Position (level 1)
 			position: absolute;
@@ -112,20 +112,20 @@ $navigation-item-height: 46px;
 
 			// Position (deep levels).
 			.block-editor-inner-blocks {
-				left: 100%;
+				left: calc(100% + 8px); // TODO: use correct variable
 				top: 0;
 			}
 		}
 	}
 
-	// Light styles.
-	&.is-style-light .wp-block-navigation-link > .block-editor-inner-blocks {
+	// Default / Light styles
+	.wp-block-navigation-link > .block-editor-inner-blocks {
 		color: $light-style-sub-menu-text-color;
 		border-color: $light-style-sub-menu-border-color;
 		background-color: $light-style-sub-menu-background-color;
 	}
 
-	// Light / Dark styles.
+	// Dark styles
 	&.is-style-dark .wp-block-navigation-link > .block-editor-inner-blocks {
 		color: $dark-style-sub-menu-text-color;
 		border-color: $dark-style-sub-menu-border-color;
