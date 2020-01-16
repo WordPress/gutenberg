@@ -89,9 +89,7 @@ describe( 'Searching for a link', () => {
 		mockFetchSearchSuggestions.mockImplementation( fauxRequest );
 
 		act( () => {
-			render(
-				<LinkControl />, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
@@ -130,9 +128,7 @@ describe( 'Searching for a link', () => {
 		const firstFauxSuggestion = first( fauxEntitySuggestions );
 
 		act( () => {
-			render(
-				<LinkControl />, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
@@ -166,9 +162,7 @@ describe( 'Searching for a link', () => {
 		[ 'ThisCouldAlsoBeAValidURL' ],
 	] )( 'should display a URL suggestion as a default fallback for the search term "%s" which could potentially be a valid url.', async ( searchTerm ) => {
 		act( () => {
-			render(
-				<LinkControl />, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
@@ -201,9 +195,7 @@ describe( 'Searching for a link', () => {
 		const searchTerm = 'Hello world';
 
 		act( () => {
-			render(
-				<LinkControl />, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		let searchResultElements;
@@ -251,9 +243,7 @@ describe( 'Manual link entry', () => {
 		[ 'www.wordpress.org' ], // usage of "www"
 	] )( 'should display a single suggestion result when the current input value is URL-like (eg: %s)', async ( searchTerm ) => {
 		act( () => {
-			render(
-				<LinkControl />, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
