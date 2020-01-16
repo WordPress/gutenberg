@@ -74,5 +74,28 @@ describe( 'JSDoc', () => {
 				],
 			}
 		);
+
+		expect(
+			getJSDocFromToken( {
+				leadingComments: [ {
+					value: '*\n * Function invoking callback after delay with current timestamp in milliseconds since epoch.\n * @param {(timestamp:number)=>void} callback Callback function.\n ',
+				} ],
+			} )
+		).toEqual(
+			{
+				description: 'Function invoking callback after delay with current timestamp in milliseconds since epoch.',
+				tags: [
+					{
+						title: 'param',
+						errors: [
+							'unexpected token',
+						],
+						description: 'Callback function.',
+						name: 'callback',
+						type: null,
+					},
+				],
+			}
+		);
 	} );
 } );
