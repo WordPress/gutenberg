@@ -10,46 +10,21 @@
 	flex-shrink: 0;
 }
 
-// We should extract this to a separate component.
-.components-tab-button {
-	padding: 3px;
-	color: $dark-gray-500;
+// @todo: We should extract this to a separate component, and refactor it.
+.block-editor-block-toolbar .components-tab-button {
+	padding: $grid-unit-10 $grid-unit-15;
+	color: $border-color;
 	height: $icon-button-size;
 	font-weight: 500;
 
-	&.is-pressed,
-	&.is-pressed:hover {
-		color: $white;
+	span {
+		position: relative;
+		display: block;
+		text-align: center;
+		padding: 0 $grid-unit-10;
 	}
 
-	&:disabled {
-		cursor: default;
-	}
-
-	& > span {
-		border: $border-width solid transparent;
-		padding: 0 6px;
-		box-sizing: content-box;
-		height: 28px;
-		line-height: 28px;
-	}
-
-	&:hover > span,
-	&:focus > span {
-		color: $dark-gray-500;
-	}
-
-	&:not(:disabled) {
-		&.is-pressed > span,
-		&:hover > span,
-		&:focus > span {
-			border: $border-width solid $dark-gray-500;
-		}
-	}
-
-	&.is-pressed > span,
-	&.is-pressed:hover > span {
-		background-color: $dark-gray-500;
-		color: $white;
+	&.components-button::before {
+		width: calc(100% - #{$grid-unit-30});
 	}
 }
