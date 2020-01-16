@@ -39,6 +39,12 @@
 		}
 	}
 
+	.block-editor-block-mover {
+		.components-button {
+			margin: 0;
+		}
+	}
+
 	// Add a left border and adjust the color for Top Toolbar mode.
 	.has-fixed-toolbar & {
 		box-shadow: none;
