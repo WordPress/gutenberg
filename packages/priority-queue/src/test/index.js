@@ -8,8 +8,8 @@ jest.mock( '../request-idle-callback', () => {
 	const emitter = new ( require.requireActual( 'events' ).EventEmitter )();
 
 	return Object.assign(
-		( callback ) => emitter.once( 'tick', () => callback( Date.now() ) ),
-		{ tick: () => emitter.emit( 'tick' ) },
+		( callback ) => emitter.once( 'tick', ( deadline = Date.now() ) => callback( deadline ) ),
+		{ tick: ( deadline ) => emitter.emit( 'tick', deadline ) },
 	);
 } );
 
@@ -65,6 +65,37 @@ describe( 'createQueue', () => {
 			requestIdleCallback.tick();
 			expect( callbackOne ).not.toHaveBeenCalled();
 			expect( callbackTwo ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'processes queue as long as time allows, with idle deadline implementation', () => {
+			const elementA = {};
+			const elementB = {};
+			const elementC = {};
+			const callbackElementA = jest.fn();
+			const callbackElementB = jest.fn();
+			const callbackElementC = jest.fn();
+			queue.add( elementA, callbackElementA );
+			queue.add( elementB, callbackElementB );
+			queue.add( elementC, callbackElementC );
+
+			expect( callbackElementA ).not.toHaveBeenCalled();
+			expect( callbackElementB ).not.toHaveBeenCalled();
+			expect( callbackElementC ).not.toHaveBeenCalled();
+
+			// Mock implementation such that with the first call, it reports as
+			// having some time remaining, but no time remaining on the second.
+			const timeRemaining = jest.fn()
+				.mockImplementationOnce( () => 100 )
+				.mockImplementationOnce( () => 0 );
+
+			requestIdleCallback.tick( { timeRemaining } );
+
+			// Given the above mock, expect that the initial callback would
+			// process A, then time remaining would allow for B to be processed,
+			// but C would not be processed because no time remains.
+			expect( callbackElementA ).toHaveBeenCalledTimes( 1 );
+			expect( callbackElementB ).toHaveBeenCalledTimes( 1 );
+			expect( callbackElementC ).not.toHaveBeenCalled();
 		} );
 	} );
 
