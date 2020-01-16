@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.ColorUtils;
+
 import android.text.Editable;
 import android.text.Layout;
 import android.text.TextUtils;
@@ -369,7 +371,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             newColor = color;
         }
 
-        view.setHighlightColor(newColor);
+        view.setHighlightColor(ColorUtils.setAlphaComponent(newColor, 127));
         view.setCursorColor(newColor);
     }
 
