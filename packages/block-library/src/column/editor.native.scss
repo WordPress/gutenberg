@@ -22,3 +22,11 @@
 	margin-left: 0;
 	margin-right: 0;
 }
+
+.columns-container {
+	max-width: $content-width;
+}
+
+.column-container-base {
+	max-width: $content-width - 2 * ( $block-selected-margin + $block-selected-border-width );
+}

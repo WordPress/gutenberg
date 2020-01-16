@@ -78,7 +78,7 @@ export class InserterMenu extends Component {
 				<FlatList
 					onLayout={ this.onLayout }
 					scrollEnabled={ false }
-					key={ `InserterUI-${ this.state.numberOfColumns }` } //re-render when numberOfColumns changes
+					// key={ `InserterUI-${ this.state.numberOfColumns }` } //re-render when numberOfColumns changes
 					keyboardShouldPersistTaps="always"
 					numColumns={ this.state.numberOfColumns }
 					data={ this.props.items }

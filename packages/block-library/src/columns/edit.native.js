@@ -70,8 +70,6 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 	isSmallScreen,
-	isLargeScreen,
-	isMediumScreen,
 } ) {
 	const { verticalAlignment } = attributes;
 
@@ -80,19 +78,6 @@ function ColumnsEditContainer( {
 			count: select( 'core/block-editor' ).getBlockCount( clientId ),
 		};
 	} );
-
-	const getColumnsInRow = ( columnsCount ) => {
-		if ( isSmallScreen ) {
-			return 1;
-		}
-		if ( isMediumScreen && ! isLargeScreen ) {
-			return 2;
-		}
-		return columnsCount;
-	};
-
-	const columnsInRow = getColumnsInRow( count );
-	const columnsWidth = `${ 100 / columnsInRow }%`;
 
 	return (
 		<>
@@ -124,7 +109,6 @@ function ColumnsEditContainer( {
 			</BlockControls>
 			<InnerBlocks
 				containerStyle={ ! isSmallScreen ? styles.columnsContainer : undefined }
-				itemStyle={ { width: columnsWidth } }
 				allowedBlocks={ ALLOWED_BLOCKS }
 			/>
 		</>
@@ -248,6 +232,6 @@ const ColumnsEdit = ( props ) => {
 };
 
 export default compose( [
-	withViewportMatch( { isSmallScreen: '< small', isLargeScreen: '>= large', isMediumScreen: '>= small' } ),
+	withViewportMatch( { isSmallScreen: '< small' } ),
 	withPreferredColorScheme,
 ] )( ColumnsEdit );

@@ -78,7 +78,6 @@ export class BlockList extends Component {
 			renderAppender,
 			isRootList,
 			containerStyle,
-			itemStyle,
 		} = this.props;
 
 		return (
@@ -95,7 +94,6 @@ export class BlockList extends Component {
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					containerStyle={ containerStyle }
-					itemStyle={ itemStyle }
 					data={ blockClientIds }
 					extraData={ [ isFullyBordered ] }
 					keyExtractor={ identity }
