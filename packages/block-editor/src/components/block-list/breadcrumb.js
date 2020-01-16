@@ -26,7 +26,7 @@ import BlockTitle from '../block-title';
  * @return {WPComponent} The component to be rendered.
  */
 function BlockBreadcrumb( { clientId, rootClientId, moverDirection, ...props } ) {
-	function selector( select ) {
+	const selected = useSelect( ( select ) => {
 		const {
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockIndex,
@@ -34,13 +34,8 @@ function BlockBreadcrumb( { clientId, rootClientId, moverDirection, ...props } )
 		const index = getBlockIndex( clientId, rootClientId );
 		const { name, attributes } = __unstableGetBlockWithoutInnerBlocks( clientId );
 		return { index, name, attributes };
-	}
-
-	const {
-		index,
-		name,
-		attributes,
-	} = useSelect( selector, [ clientId, rootClientId ] );
+	}, [ clientId, rootClientId ] );
+	const { index, name, attributes } = selected;
 	const {
 		setNavigationMode,
 		removeBlock,
