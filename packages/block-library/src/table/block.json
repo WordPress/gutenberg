@@ -2,10 +2,6 @@
 	"name": "core/table",
 	"category": "formatting",
 	"attributes": {
-		"hasFixedLayout": {
-			"type": "boolean",
-			"default": false
-		},
 		"backgroundColor": {
 			"type": "string"
 		},

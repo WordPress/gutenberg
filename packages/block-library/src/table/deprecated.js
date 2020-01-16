@@ -116,7 +116,6 @@ const deprecated = [
 		supports,
 		save( { attributes } ) {
 			const {
-				hasFixedLayout,
 				head,
 				body,
 				foot,
@@ -131,7 +130,6 @@ const deprecated = [
 			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 
 			const classes = classnames( backgroundClass, {
-				'has-fixed-layout': hasFixedLayout,
 				'has-background': !! backgroundClass,
 			} );
 

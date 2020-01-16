@@ -10,7 +10,6 @@ import { RichText, getColorClassName } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
-		hasFixedLayout,
 		head,
 		body,
 		foot,
@@ -26,7 +25,6 @@ export default function save( { attributes } ) {
 	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 
 	const classes = classnames( backgroundClass, {
-		'has-fixed-layout': hasFixedLayout,
 		'has-background': !! backgroundClass,
 	} );
 
