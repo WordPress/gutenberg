@@ -57,13 +57,12 @@ class ModalLinkUI extends Component {
 			return;
 		}
 
-		const { activeAttributes: { url, target }, value, selectedBlock } = this.props;
-		const opensInNewWindow = target === '_blank';
-
+		const { activeAttributes: { url, target }, value, selectedBlockAttributes } = this.props;
+		const opensInNewWindow = target === '_blank' || selectedBlockAttributes.linkTarget === '_blank';
 		this.setState( {
-			inputValue: url || selectedBlock.attributes.url || '',
+			inputValue: url || selectedBlockAttributes.url || '',
 			text: getTextContent( slice( value ) ),
-			linkRel: selectedBlock.attributes.rel || '',
+			linkRel: selectedBlockAttributes.rel || '',
 			opensInNewWindow,
 		} );
 	}
@@ -85,7 +84,7 @@ class ModalLinkUI extends Component {
 	}
 
 	submitLink() {
-		const { isActive, onChange, speak, value, isSelectedButtonBlock, onButtonAttributesChange, selectedBlockClientId } = this.props;
+		const { isActive, onChange, speak, value, isSelectedButtonBlock, onBlockAttributesChange, selectedBlockClientId } = this.props;
 		const { inputValue, opensInNewWindow, text, linkRel } = this.state;
 		const url = prependHTTP( inputValue );
 		const linkText = text || inputValue;
@@ -96,7 +95,8 @@ class ModalLinkUI extends Component {
 		} );
 
 		if ( isSelectedButtonBlock ) {
-			onButtonAttributesChange( selectedBlockClientId, { url, rel: linkRel } );
+			const attributes = { url, rel: linkRel, linkTarget: opensInNewWindow ? '_blank' : undefined };
+			onBlockAttributesChange( selectedBlockClientId, attributes );
 		} else if ( isCollapsed( value ) && ! isActive ) { // insert link
 			const toInsert = applyFormat( create( { text: linkText } ), format, 0, linkText.length );
 			const newAttributes = insert( value, toInsert );
@@ -122,9 +122,9 @@ class ModalLinkUI extends Component {
 	}
 
 	removeLink() {
-		const { onButtonAttributesChange, onRemove, onClose, selectedBlockClientId } = this.props;
+		const { onBlockAttributesChange, onRemove, onClose, selectedBlockClientId } = this.props;
 
-		onButtonAttributesChange( selectedBlockClientId, { url: '', rel: '' } );
+		onBlockAttributesChange( selectedBlockClientId, { url: '', rel: '', linkTarget: undefined } );
 		onRemove();
 		onClose();
 	}
@@ -195,23 +195,22 @@ class ModalLinkUI extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockName, getBlock } = select( 'core/block-editor' );
+		const { getSelectedBlockClientId, getBlock } = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const selectedBlockName = selectedBlockClientId && getBlockName( selectedBlockClientId );
 		const selectedBlock = selectedBlockClientId && getBlock( selectedBlockClientId );
 
 		return {
-			isSelectedButtonBlock: selectedBlockName === 'core/button',
 			selectedBlockClientId,
-			selectedBlock,
+			selectedBlockAttributes: selectedBlock.attributes,
+			isSelectedButtonBlock: selectedBlock.name === 'core/button',
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { updateBlockAttributes } = dispatch( 'core/block-editor' );
 
 		return {
-			onButtonAttributesChange: ( selectedBlockClientId, attributes ) => {
+			onBlockAttributesChange: ( selectedBlockClientId, attributes ) => {
 				updateBlockAttributes( selectedBlockClientId, attributes );
 			},
 		};
