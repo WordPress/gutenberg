@@ -44,6 +44,7 @@ class ButtonEdit extends Component {
 		super( props );
 		this.onChangeBackgroundColor = this.onChangeBackgroundColor.bind( this );
 		this.setBorderRadius = this.setBorderRadius.bind( this );
+		this.setLinkRel = this.setLinkRel.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.onToggleOpenInNewTab = this.onToggleOpenInNewTab.bind( this );
 
@@ -91,6 +92,11 @@ class ButtonEdit extends Component {
 		} );
 	}
 
+	setLinkRel( value ) {
+		const { setAttributes } = this.props;
+		setAttributes( { rel: value } );
+	}
+
 	onLayout( { nativeEvent } ) {
 		const { width } = nativeEvent.layout;
 		const { marginRight, paddingRight, borderWidth } = styles.button;
@@ -125,6 +131,7 @@ class ButtonEdit extends Component {
 			borderRadius,
 			url,
 			linkTarget,
+			rel,
 		} = attributes;
 		const { maxWidth } = this.state;
 
@@ -194,6 +201,16 @@ class ButtonEdit extends Component {
 							/>
 						</PanelBody>
 						<PanelBody title={ __( 'Link Settings' ) } >
+							<TextControl
+								label={ __( 'Button URL' ) }
+								value={ url || '' }
+								valuePlaceholder={ __( 'Add URL' ) }
+								onChange={ ( value ) => setAttributes( { url: value } ) }
+								autoCapitalize="none"
+								autoCorrect={ false }
+								separatorType="none"
+								keyboardType="url"
+							/>
 							<ToggleControl
 								label={ __( 'Open in new tab' ) }
 								checked={ linkTarget === '_blank' }
@@ -202,9 +219,9 @@ class ButtonEdit extends Component {
 							/>
 							<TextControl
 								label={ __( 'Link Rel' ) }
-								value={ url || '' }
+								value={ rel || '' }
 								valuePlaceholder={ __( 'None' ) }
-								onChange={ ( value ) => setAttributes( { url: value } ) }
+								onChange={ this.setLinkRel }
 								autoCapitalize="none"
 								autoCorrect={ false }
 								separatorType="none"
