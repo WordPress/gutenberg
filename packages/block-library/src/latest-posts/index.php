@@ -29,8 +29,6 @@ function render_block_core_latest_posts( $attributes ) {
 
 	$list_items_markup = '';
 
-	$excerpt_length = $attributes['excerptLength'];
-
 	foreach ( $recent_posts as $post ) {
 		$title = get_the_title( $post );
 		if ( ! $title ) {
