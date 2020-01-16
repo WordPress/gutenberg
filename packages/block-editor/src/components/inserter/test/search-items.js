@@ -84,12 +84,19 @@ describe( 'searchItems', () => {
 		);
 	} );
 
-	it( 'should match words using the patterns and mark those matched which are scoped to inserter', () => {
+	it( 'should match words using also patterns and return all matched patterns', () => {
+		const filteredItems = searchItems( items, categories, collections, 'pattern' );
+
+		expect( filteredItems ).toHaveLength( 1 );
+		expect( filteredItems[ 0 ].patterns ).toHaveLength( 3 );
+	} );
+
+	it( 'should match words using also patterns and filter out unmatched patterns', () => {
 		const filteredItems = searchItems( items, categories, collections, 'patterns two three' );
 
 		expect( filteredItems ).toHaveLength( 1 );
-		expect( filteredItems[ 0 ].patterns[ 0 ].matched ).toBe( false );
-		expect( filteredItems[ 0 ].patterns[ 1 ].matched ).toBe( true );
-		expect( filteredItems[ 0 ].patterns[ 2 ].matched ).toBe( true );
+		expect( filteredItems[ 0 ].patterns ).toHaveLength( 2 );
+		expect( filteredItems[ 0 ].patterns[ 0 ].label ).toBe( 'Pattern Two' );
+		expect( filteredItems[ 0 ].patterns[ 1 ].label ).toBe( 'Pattern Three' );
 	} );
 } );

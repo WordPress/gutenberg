@@ -7,6 +7,7 @@ import {
 	find,
 	get,
 	intersectionWith,
+	isEmpty,
 	words,
 } from 'lodash';
 
@@ -102,22 +103,25 @@ export const searchItems = ( items, categories, collections, searchTerm ) => {
 
 		return unmatchedTerms.length === 0;
 	} ).map( ( item ) => {
-		if ( ! item.patterns ) {
+		if ( isEmpty( item.patterns ) ) {
+			return item;
+		}
+
+		const matchedPatterns = item.patterns.filter( ( pattern ) => {
+			return intersectionWith(
+				normalizedSearchTerms,
+				normalizeSearchTerm( pattern.label ),
+				( termToMatch, labelTerm ) => labelTerm.includes( termToMatch )
+			).length > 0;
+		} );
+		// When no partterns matched, fallback to all patterns.
+		if ( isEmpty( matchedPatterns ) ) {
 			return item;
 		}
 
 		return {
 			...item,
-			patterns: item.patterns.map( ( pattern ) => {
-				return {
-					...pattern,
-					matched: intersectionWith(
-						normalizedSearchTerms,
-						normalizeSearchTerm( pattern.label ),
-						( termToMatch, labelTerm ) => labelTerm.includes( termToMatch )
-					).length > 0,
-				};
-			} ),
+			patterns: matchedPatterns,
 		};
 	} );
 };

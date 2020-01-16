@@ -58,6 +58,15 @@ const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
+// Copied over from the Columns block. It seems like it should become part of public API.
+const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
+	return map(
+		innerBlocksTemplate,
+		( [ name, attributes, innerBlocks = [] ] ) =>
+			createBlock( name, attributes, createBlocksFromInnerBlocksTemplate( innerBlocks ) )
+	);
+};
+
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
@@ -534,9 +543,13 @@ export default compose(
 					onSelect,
 					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 				} = ownProps;
-				const { name, title, initialAttributes } = item;
+				const { name, title, initialAttributes, innerBlocks } = item;
 				const selectedBlock = getSelectedBlock();
-				const insertedBlock = createBlock( name, initialAttributes );
+				const insertedBlock = createBlock(
+					name,
+					initialAttributes,
+					createBlocksFromInnerBlocksTemplate( innerBlocks )
+				);
 
 				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );

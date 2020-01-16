@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
@@ -17,8 +22,36 @@ function BlockTypesList( { items, onSelect, onHover = () => {}, children } ) {
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-editor-block-types-list">
 			{ items && items.map( ( item ) => {
-				const { patterns = [] } = item;
-				const matchedPatterns = patterns.filter( ( { matched } ) => matched );
+				if ( ! isEmpty( item.patterns ) ) {
+					return item.patterns.map( ( pattern ) => {
+						const customizedItem = {
+							...item,
+							initialAttributes: {
+								...item.initialAttributes,
+								...pattern.attributes,
+							},
+							innerBlocks: pattern.innerBlocks,
+						};
+						return (
+							<InserterListItem
+								key={ item.id + pattern.name }
+								className={ getBlockMenuDefaultClassName( item.id ) }
+								icon={ pattern.icon || item.icon }
+								onClick={ () => {
+									onSelect( customizedItem );
+									onHover( null );
+								} }
+								onFocus={ () => onHover( customizedItem ) }
+								onMouseEnter={ () => onHover( customizedItem ) }
+								onMouseLeave={ () => onHover( null ) }
+								onBlur={ () => onHover( null ) }
+								isDisabled={ item.isDisabled }
+								title={ item.title }
+								patternName={ pattern.label }
+							/>
+						);
+					} );
+				}
 				return (
 					<InserterListItem
 						key={ item.id }
@@ -34,7 +67,6 @@ function BlockTypesList( { items, onSelect, onHover = () => {}, children } ) {
 						onBlur={ () => onHover( null ) }
 						isDisabled={ item.isDisabled }
 						title={ item.title }
-						patterns={ matchedPatterns }
 					/>
 				);
 			} ) }

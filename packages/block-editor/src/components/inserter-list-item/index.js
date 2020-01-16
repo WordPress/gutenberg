@@ -19,7 +19,7 @@ function InserterListItem( {
 	isDisabled,
 	title,
 	className,
-	patterns = [],
+	patternName,
 	...props
 } ) {
 	const itemIconStyle = icon ? {
@@ -52,10 +52,8 @@ function InserterListItem( {
 				<span className="block-editor-block-types-list__item-title">
 					{ title }
 				</span>
-				{ patterns.map(
-					( { label, name } ) => (
-						<em style={ { padding: '5px' } } key={ name }>{ label }</em>
-					)
+				{ patternName && (
+					<em>{ patternName }</em>
 				) }
 			</Button>
 		</li>
