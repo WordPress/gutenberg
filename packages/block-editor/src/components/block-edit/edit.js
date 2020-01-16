@@ -27,13 +27,7 @@ export const Edit = ( props ) => {
 	// with which a block is displayed. If `blockType` is valid, assign
 	// them preferentially as the render value for the block.
 	const Component = blockType.edit || blockType.save;
-	const component = <Component { ...props } className={ className } />;
-
-	if ( attributes.align ) {
-		return <div className="is-block-content">{ component }</div>;
-	}
-
-	return component;
+	return <Component { ...props } className={ className } />;
 };
 
 export default withFilters( 'editor.BlockEdit' )( Edit );
