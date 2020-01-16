@@ -123,19 +123,31 @@ $navigation-item-height: 46px;
 		}
 	}
 
-	// Default / Light styles
-	.wp-block-navigation-link > .block-editor-inner-blocks {
-		color: $light-style-sub-menu-text-color;
-		border-color: $light-style-sub-menu-border-color;
-		background-color: $light-style-sub-menu-background-color;
+	// Inherit colors from menu.
+	// Some of these selectors shoule be replaced/removed
+	// once sub-menus support custom colors.
+	.block-editor-inner-blocks,
+	.block-editor-block-list__layout,
+	.wp-block,
+	.wp-block-navigation-link {
+		background-color: inherit;
+		color: inherit;
 	}
 
-	// Dark styles
-	&.is-style-dark .wp-block-navigation-link > .block-editor-inner-blocks {
-		color: $dark-style-sub-menu-text-color;
-		border-color: $dark-style-sub-menu-border-color;
-		background-color: $dark-style-sub-menu-background-color;
-	}
+	// Commenting styles for the moment.
+	//// Default / Light styles
+	//.wp-block-navigation-link > .block-editor-inner-blocks {
+	//	color: $light-style-sub-menu-text-color;
+	//	border-color: $light-style-sub-menu-border-color;
+	//	background-color: $light-style-sub-menu-background-color;
+	//}
+	//
+	//// Dark styles
+	//&.is-style-dark .wp-block-navigation-link > .block-editor-inner-blocks {
+	//	color: $dark-style-sub-menu-text-color;
+	//	border-color: $dark-style-sub-menu-border-color;
+	//	background-color: $dark-style-sub-menu-background-color;
+	//}
 }
 
 .wp-block-navigation__inserter-content {
