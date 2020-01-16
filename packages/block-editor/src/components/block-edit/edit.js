@@ -30,7 +30,7 @@ export const Edit = ( props ) => {
 	const component = <Component { ...props } className={ className } />;
 
 	if ( attributes.align ) {
-		return <div data-block-content>{ component }</div>;
+		return <div className="is-block-content">{ component }</div>;
 	}
 
 	return component;

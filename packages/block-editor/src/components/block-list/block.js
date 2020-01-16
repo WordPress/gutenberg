@@ -238,6 +238,7 @@ function BlockListBlock( {
 			'is-focused': isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
+			'is-block-collapsed': !! attributes.align,
 		},
 		className
 	);
