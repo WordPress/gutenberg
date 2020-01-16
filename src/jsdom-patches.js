@@ -238,3 +238,14 @@ Object.defineProperties( Node.prototype, {
 		},
 	},
 } );
+
+class DOMParser {
+	// This is required for the stripHTML function, but it doesn't necessarily
+	// conform to the DOM standard.
+	// See https://github.com/wordpress-mobile/gutenberg-mobile/pull/1771
+	parseFromString( string ) {
+		return jsdom.html( string );
+	}
+}
+
+global.DOMParser = DOMParser;
