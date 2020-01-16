@@ -35,7 +35,6 @@ const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
 function BlockList( {
 	className,
 	rootClientId,
-	__experimentalMoverDirection: moverDirection = 'vertical',
 	isDraggable,
 	renderAppender,
 	__experimentalUIParts = {},
@@ -99,7 +98,6 @@ function BlockList( {
 							rootClientId={ rootClientId }
 							clientId={ clientId }
 							isDraggable={ isDraggable }
-							moverDirection={ moverDirection }
 							isMultiSelecting={ isMultiSelecting }
 							// This prop is explicitely computed and passed down
 							// to avoid being impacted by the async mode

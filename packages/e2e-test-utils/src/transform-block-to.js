@@ -18,7 +18,7 @@ export async function transformBlockTo( name ) {
 	await insertButton.click();
 
 	// Wait for the transformed block to appear.
-	const BLOCK_SELECTOR = '[contains(@class, "block-editor-block-list__block")]';
-	const BLOCK_NAME_SELECTOR = `[contains(@aria-label, "${ name } Block")]`;
-	await page.waitForXPath( `//*${ BLOCK_SELECTOR }${ BLOCK_NAME_SELECTOR }` );
+	const BLOCK_SELECTOR = '.block-editor-block-list__block';
+	const BLOCK_NAME_SELECTOR = `[aria-label="Block: ${ name }"]`;
+	await page.waitForSelector( `${ BLOCK_SELECTOR }${ BLOCK_NAME_SELECTOR }` );
 }
