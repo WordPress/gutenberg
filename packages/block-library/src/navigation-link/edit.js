@@ -37,12 +37,18 @@ import {
 } from '@wordpress/block-editor';
 import { Fragment, useState, useEffect } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { submenuIcon } from './icons';
+
 function NavigationLinkEdit( {
 	attributes,
 	hasDescendants,
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
+	showSubmenuIcon,
 	insertLinkBlock,
 } ) {
 	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
@@ -152,6 +158,7 @@ function NavigationLinkEdit( {
 			>
 				<div>
 					<RichText
+						tagName="span"
 						className="wp-block-navigation-link__content"
 						value={ label }
 						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
@@ -164,6 +171,11 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
+					{ showSubmenuIcon &&
+						<span className="wp-block-navigation-link__submenu-icon">
+							{ submenuIcon }
+						</span>
+					}
 					{ isLinkOpen && (
 						<Popover position="bottom center">
 							<LinkControl
@@ -208,13 +220,26 @@ function NavigationLinkEdit( {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getClientIdsOfDescendants, hasSelectedInnerBlock } = select( 'core/block-editor' );
+		const {
+			getBlockName,
+			getBlockAttributes,
+			getBlockParents,
+			getClientIdsOfDescendants,
+			hasSelectedInnerBlock,
+		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
+		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] ).length;
+		const parentBlock = getBlockParents( clientId, true )[ 0 ];
+		let showSubmenuIcon = false;
+
+		if ( hasDescendants && getBlockName( parentBlock ) === 'core/navigation' ) {
+			showSubmenuIcon = getBlockAttributes( parentBlock ).showSubmenuIcon;
+		}
 
 		return {
 			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
-			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
-
+			hasDescendants,
+			showSubmenuIcon,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {

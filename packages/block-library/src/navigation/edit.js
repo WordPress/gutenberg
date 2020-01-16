@@ -222,9 +222,11 @@ function Navigation( {
 					title={ __( 'Display Settings' ) }
 				>
 					<ToggleControl
-						checked={ false } // ToDo: add 'showSubmenuChevron' attribute
-						onChange={ () => {} }
-						label={ __( 'Show submenu chevron' ) }
+						checked={ attributes.showSubmenuIcon }
+						onChange={ ( value ) => {
+							setAttributes( { showSubmenuIcon: value } );
+						} }
+						label={ __( 'Show submenu icon' ) }
 					/>
 				</PanelBody>
 			</InspectorControls>

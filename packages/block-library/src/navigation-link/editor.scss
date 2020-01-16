@@ -73,6 +73,10 @@
 		text-decoration: underline;
 	}
 
+	.wp-block-navigation-link__submenu-icon {
+		margin-left: 4px;
+	}
+
 	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
 		display: inline-block;
 	}
