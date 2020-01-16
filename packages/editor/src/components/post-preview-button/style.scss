@@ -1,4 +1,5 @@
 .editor-post-preview__dropdown {
+	display: none;
 	margin-right: $grid-size;
 	border: 1px solid $light-gray-600;
 }
@@ -54,5 +55,14 @@
 		border: none;
 		box-shadow: none;
 		background: $light-gray-200;
+	}
+}
+
+@include break-small() {
+	.editor-post-preview {
+		display: none;
+	}
+	.editor-post-preview__dropdown {
+		display: flex;
 	}
 }

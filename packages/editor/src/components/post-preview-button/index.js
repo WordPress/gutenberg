@@ -8,7 +8,7 @@ import { get } from 'lodash';
  */
 import { Component, renderToString } from '@wordpress/element';
 import { Button, Dropdown, MenuGroup, MenuItem, Path, Polygon, SVG } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
@@ -196,67 +196,84 @@ export class PostPreviewButton extends Component {
 		const href = previewLink || currentPostLink;
 
 		return (
-			<Dropdown
-				className="editor-post-preview__dropdown"
-				contentClassName="editor-post-preview__dropdown-content"
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<Button onClick={ onToggle }
-						className="editor-post-preview__button-toggle"
-						aria-expanded={ isOpen }
-					>
-						{ this.props.deviceType }
-						<div className="editor-post-preview__button-separator">{ downArrow }</div>
-					</Button>
-				) }
-				renderContent={ () => (
-					<>
-						<MenuGroup>
-							<fieldset>
-								<legend className="editor-post-preview__legend">View</legend>
-								<MenuItem
-									className="editor-post-preview__button-resize"
-									onClick={ () => toggleCanvas( 'Desktop' ) }
+			<>
+				<Dropdown
+					className="editor-post-preview__dropdown"
+					contentClassName="editor-post-preview__dropdown-content"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<Button onClick={ onToggle }
+							className="editor-post-preview__button-toggle"
+							aria-expanded={ isOpen }
+						>
+							{ this.props.deviceType }
+							<div className="editor-post-preview__button-separator">{ downArrow }</div>
+						</Button>
+					) }
+					renderContent={ () => (
+						<>
+							<MenuGroup>
+								<fieldset>
+									<legend className="editor-post-preview__legend">View</legend>
+									<MenuItem
+										className="editor-post-preview__button-resize"
+										onClick={ () => toggleCanvas( 'Desktop' ) }
+									>
+										{ __( 'Desktop' ) }
+										{ this.props.deviceType === 'Desktop' && checkIcon }
+									</MenuItem>
+									<MenuItem
+										className="editor-post-preview__button-resize"
+										onClick={ () => toggleCanvas( 'Tablet' ) }
+									>
+										{ __( 'Tablet' ) }
+										{ this.props.deviceType === 'Tablet' && checkIcon }
+									</MenuItem>
+									<MenuItem
+										className="editor-post-preview__button-resize"
+										onClick={ () => toggleCanvas( 'Mobile' ) }
+									>
+										{ __( 'Mobile' ) }
+										{ this.props.deviceType === 'Mobile' && checkIcon }
+									</MenuItem>
+								</fieldset>
+							</MenuGroup>
+							<MenuGroup>
+								<Button
+									className="editor-post-preview__button-external"
+									href={ href }
+									target={ this.getWindowTarget() }
+									disabled={ ! isSaveable }
+									onClick={ this.openPreviewWindow }
 								>
-									{ __( 'Desktop' ) }
-									{ this.props.deviceType === 'Desktop' && checkIcon }
-								</MenuItem>
-								<MenuItem
-									className="editor-post-preview__button-resize"
-									onClick={ () => toggleCanvas( 'Tablet' ) }
-								>
-									{ __( 'Tablet' ) }
-									{ this.props.deviceType === 'Tablet' && checkIcon }
-								</MenuItem>
-								<MenuItem
-									className="editor-post-preview__button-resize"
-									onClick={ () => toggleCanvas( 'Mobile' ) }
-								>
-									{ __( 'Mobile' ) }
-									{ this.props.deviceType === 'Mobile' && checkIcon }
-								</MenuItem>
-							</fieldset>
-						</MenuGroup>
-						<MenuGroup>
-							<Button
-								className="editor-post-preview__button-external"
-								href={ href }
-								target={ this.getWindowTarget() }
-								disabled={ ! isSaveable }
-								onClick={ this.openPreviewWindow }
-							>
-								{ __( 'Preview externally' ) }
-								<span className="screen-reader-text">
-									{
+									{ __( 'Preview externally' ) }
+									<span className="screen-reader-text">
+										{
 										/* translators: accessibility text */
-										__( '(opens in a new tab)' )
-									}
-								</span>
-							</Button>
-						</MenuGroup>
-					</>
-				) }
-			/>
-
+											__( '(opens in a new tab)' )
+										}
+									</span>
+								</Button>
+							</MenuGroup>
+						</>
+					) }
+				/>
+				<Button
+					isSecondary
+					className="editor-post-preview"
+					href={ href }
+					target={ this.getWindowTarget() }
+					disabled={ ! isSaveable }
+					onClick={ this.openPreviewWindow }
+				>
+					{ _x( 'Preview', 'imperative verb' ) }
+					<span className="screen-reader-text">
+						{
+						/* translators: accessibility text */
+							__( '(opens in a new tab)' )
+						}
+					</span>
+				</Button>
+			</>
 		);
 	}
 }
