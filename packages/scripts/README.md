@@ -31,6 +31,7 @@ _Example:_
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"packages-update": "wp-scripts packages-update",
 		"start": "wp-scripts start",
 		"test:e2e": "wp-scripts test-e2e",
 		"test:unit": "wp-scripts test-unit-js"
@@ -250,6 +251,25 @@ By default, files located in `build` and `node_modules` folders are ignored.
 #### Advanced information
 
 It uses [stylelint](https://github.com/stylelint/stylelint) with the [stylelint-config-wordpress](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress) configuration per the [WordPress CSS Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://github.com/stylelint/stylelint/docs/user-guide.md). Learn more in the [Advanced Usage](#advanced-usage) section.
+
+### `packages-update`
+
+Updates the WordPress packages used in the project to their latest version.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"packages-update": "wp-scripts packages-update",
+		"postpackages-update": "npm run build"
+	}
+}
+```
+
+#### Advanced information
+
+The command checks which packages whose name starts with `@wordpress/` are used in the project by reading the package.json file, and then executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one.
 
 ### `start`
 
