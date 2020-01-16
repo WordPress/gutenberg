@@ -40,6 +40,7 @@
 
 	&.has-link .wp-block-navigation-link__label {
 		text-decoration: underline;
+		white-space: nowrap !important; // TODO: solve differently to prevent use of !important
 	}
 
 	.wp-block-navigation-link__submenu-icon {
