@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import Cell from './cell';
@@ -9,6 +14,7 @@ export default function BottomSheetPickerCell( props ) {
 		options,
 		hideCancelButton,
 		onChangeValue,
+		value,
 		...cellProps
 	} = props;
 
@@ -22,8 +28,15 @@ export default function BottomSheetPickerCell( props ) {
 		onChangeValue( newValue );
 	};
 
+	const option = find( options, { value } );
+	const label = option ? option.label : value;
+
 	return (
-		<Cell onPress={ onCellPress } editable={ false } { ...cellProps } >
+		<Cell
+			onPress={ onCellPress }
+			editable={ false }
+			value={ label }
+			{ ...cellProps } >
 			<Picker
 				leftAlign
 				hideCancelButton={ hideCancelButton }
