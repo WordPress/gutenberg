@@ -2,8 +2,10 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { uploadMedia } from '@wordpress/media-utils';
+import { useEntityProp } from '@wordpress/core-data';
+import { parse, serialize } from '@wordpress/blocks';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
@@ -39,13 +41,32 @@ export default function BlockEditor( { settings: _settings } ) {
 			},
 		};
 	}, [ canUserCreateMedia, _settings ] );
-	const [ blocks, setBlocks ] = useState( [] );
+	const [ content, _setContent ] = useEntityProp(
+		'postType',
+		'wp_template',
+		'content'
+	);
+	const initialBlocks = useMemo( () => {
+		if ( typeof content !== 'function' ) {
+			const parsedContent = parse( content );
+			return parsedContent.length ? parsedContent : undefined;
+		}
+	}, [] );
+	const [ blocks = initialBlocks, setBlocks ] = useEntityProp(
+		'postType',
+		'wp_template',
+		'blocks'
+	);
+	const setContent = useCallback( ( nextBlocks ) => {
+		setBlocks( nextBlocks );
+		_setContent( serialize( nextBlocks ) );
+	}, [] );
 	return (
 		<BlockEditorProvider
 			settings={ settings }
 			value={ blocks }
 			onInput={ setBlocks }
-			onChange={ setBlocks }
+			onChange={ setContent }
 		>
 			<BlockEditorKeyboardShortcuts />
 			<Sidebar.InspectorFill>
