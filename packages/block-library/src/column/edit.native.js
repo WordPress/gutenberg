@@ -24,6 +24,7 @@ function ColumnEdit( {
 	isSelected,
 	getStylesFromColorScheme,
 	isParentSelected,
+	isDescendantOfParentSelected,
 	columnsCount,
 	isSmallScreen,
 	isLargeScreen,
@@ -53,14 +54,14 @@ function ColumnEdit( {
 		return (
 			<View style={ [
 				getStylesFromColorScheme( styles.columnPlaceholder, styles.columnPlaceholderDark ),
-				! isSmallScreen ? { width: columnBaseWidth - ( isParentSelected ? 24 : 32 ) } : {},
+				! isSmallScreen ? { width: columnBaseWidth - ( isParentSelected ? 24 : isDescendantOfParentSelected ? 28 : 32 ) } : {},
 				{ ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
 			] } />
 		);
 	}
 
 	return (
-		<View style={ ! isSmallScreen ? { width: columnBaseWidth - ( isParentSelected ? 12 : 0 ) } : {} } >
+		<View style={ ! isSmallScreen ? { maxWidth: columnBaseWidth, width: columnBaseWidth - ( isParentSelected ? 12 : isSelected ? ! hasInnerBlocks ? 28 : 4 : isDescendantOfParentSelected ? -4 : 0 ) } : {} } >
 			<InnerBlocks
 				renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
 			/>
@@ -92,11 +93,15 @@ export default compose( [
 
 		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parentId;
 
+		const selectedParents = selectedBlockClientId ? getBlockParents( selectedBlockClientId ) : [];
+		const isDescendantOfParentSelected = selectedParents.includes( parentId );
+
 		return {
 			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
 			isParentSelected,
 			isSelected,
 			columnsCount,
+			isDescendantOfParentSelected,
 		};
 	} ),
 	withViewportMatch( { isSmallScreen: '< small', isLargeScreen: '>= large', isMediumScreen: '>= small' } ),
