@@ -2,19 +2,14 @@
  * WordPress dependencies
  */
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
-import { Button, ModalHeaderBar } from '@wordpress/components';
+import { ModalHeaderBar } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
  * External dependencies
  */
-import { Modal, View, SafeAreaView, Text, TouchableOpacity } from 'react-native';
-
-/**
- * Internal dependencies
- */
-import styles from './styles.scss';
+import { Modal, View, SafeAreaView } from 'react-native';
 
 // We are replicating this here because the one in @wordpress/block-editor always
 // tries to scale the preview and we would need a lot of cross platform code to handle
@@ -52,26 +47,14 @@ const Preview = ( props ) => {
 	}
 
 	const leftButton = (
-		<View
-			style={ { flex: 1, width: 44 } }
-		>
-			<Button
-				icon="no-alt"
-				size={ 24 }
-				label={ __( 'Close' ) }
-				onClick={ onDismiss }
-			/>
-		</View>
+		<ModalHeaderBar.CloseButton onPress={ onDismiss } />
 	);
 
 	const rightButton = (
-		<View
-			style={ styles.headerRightButton }
-		>
-			<TouchableOpacity onPress={ onApply }>
-				<Text>{ __( 'Apply' ) }</Text>
-			</TouchableOpacity>
-		</View>
+		<ModalHeaderBar.Button
+			onPress={ onApply }
+			title={ __( 'Apply' ) }
+		/>
 	);
 
 	return (

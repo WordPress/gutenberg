@@ -12,6 +12,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import styles from './styles.scss';
+import { Button, CloseButton } from './button';
 
 const ModalHeaderBar = withPreferredColorScheme( ( props ) => {
 	const {
@@ -45,5 +46,8 @@ const ModalHeaderBar = withPreferredColorScheme( ( props ) => {
 } );
 
 ModalHeaderBar.displayName = 'ModalHeaderBar';
+
+ModalHeaderBar.Button = Button;
+ModalHeaderBar.CloseButton = CloseButton;
 
 export default ModalHeaderBar;
