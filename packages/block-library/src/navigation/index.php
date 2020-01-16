@@ -264,6 +264,10 @@ function register_block_core_navigation() {
 				'itemsJustification'    => array(
 					'type' => 'string',
 				),
+				'showSubmenuIcon'		 => array(
+					'type' => 'boolean',
+					'default' => false,
+				)
 			),
 
 			'render_callback' => 'render_block_navigation',
