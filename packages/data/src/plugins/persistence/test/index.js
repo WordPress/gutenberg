@@ -12,6 +12,16 @@ import plugin, {
 } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
+import withIdleCallback from '../with-idle-callback';
+
+jest.mock( '../with-idle-callback', () => {
+	const emitter = new ( require.requireActual( 'events' ).EventEmitter )();
+
+	return Object.assign(
+		( callback ) => emitter.once( 'tick', () => callback() ),
+		{ tick: () => emitter.emit( 'tick' ) },
+	);
+} );
 
 describe( 'persistence', () => {
 	let registry, originalRegisterStore;
@@ -248,6 +258,8 @@ describe( 'persistence', () => {
 
 		registry.dispatch( 'test' ).setState( { ok: true } );
 
+		withIdleCallback.tick();
+
 		expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"ok":true}}' );
 	} );
 
@@ -268,6 +280,8 @@ describe( 'persistence', () => {
 		} );
 
 		registry.dispatch( 'test' ).setState( { foo: 1, baz: 2 } );
+
+		withIdleCallback.tick();
 
 		expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"foo":1}}' );
 	} );

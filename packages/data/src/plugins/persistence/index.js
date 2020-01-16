@@ -7,6 +7,7 @@ import { merge, isPlainObject, get, has } from 'lodash';
  * Internal dependencies
  */
 import defaultStorage from './storage/default';
+import withIdleCallback from './with-idle-callback';
 import { combineReducers } from '../../';
 
 /** @typedef {import('../../registry').WPDataRegistry} WPDataRegistry */
@@ -53,23 +54,6 @@ export const withLazySameState = ( reducer ) => ( state, action ) => {
 
 	return reducer( state, action );
 };
-
-/**
- * Returns a function which accepts a callback and, when called, invokes the
- * callback at the earliest free moment, using `requestIdleCallback` if
- * available, falling back to `setTimeout`.
- *
- * @param {Function} callback Callback to invoke.
- *
- * @return {Function} Callback proxy, invoking the callback when available.
- */
-export const withIdleCallback = ( () => {
-	if ( typeof window !== 'undefined' && 'requestIdleCallback' in window ) {
-		return window.requestIdleCallback;
-	}
-
-	return ( callback ) => setTimeout( callback, 0 );
-} )();
 
 /**
  * Creates a persistence interface, exposing getter and setter methods (`get`
