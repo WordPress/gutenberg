@@ -284,9 +284,9 @@ function BlockListBlock( {
 			onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
 			// Only allow selection to be started from a selected block.
 			onMouseLeave={ isSelected ? onMouseLeave : undefined }
-			tabIndex="0"
-			aria-label={ blockLabel }
-			role="group"
+			tabIndex={ ( isSelected || isFirstMultiSelected ) ? '0' : undefined }
+			aria-label={ ( isSelected || isFirstMultiSelected ) ? blockLabel : undefined }
+			role={ ( isSelected || isFirstMultiSelected ) ? 'group' : undefined }
 			{ ...wrapperProps }
 			style={
 				wrapperProps && wrapperProps.style ?

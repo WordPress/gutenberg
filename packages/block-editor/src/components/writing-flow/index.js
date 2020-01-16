@@ -369,15 +369,14 @@ export default function WritingFlow( { children } ) {
 						focusCaptureBeforeRef.current.focus();
 						return;
 					}
-				} else {
-					const tabbables = focus.tabbable.find( wrapper );
-
-					if ( target === last( tabbables ) ) {
-						// See comment above.
-						noCapture.current = true;
-						focusCaptureAfterRef.current.focus();
-						return;
-					}
+				} else if (
+					target === wrapper ||
+					target === last( focus.tabbable.find( wrapper ) )
+				) {
+					// See comment above.
+					noCapture.current = true;
+					focusCaptureAfterRef.current.focus();
+					return;
 				}
 			} else if ( isEscape ) {
 				setNavigationMode( true );
