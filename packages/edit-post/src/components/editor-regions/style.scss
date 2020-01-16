@@ -60,9 +60,6 @@ html {
 
 .edit-post-editor-regions__content {
 	flex-grow: 1;
-	position: relative;
-	top: 50%;
-	transform: translateY(-50%);
 
 	// Treat as flex container to allow children to grow to occupy full
 	// available height of the content area.

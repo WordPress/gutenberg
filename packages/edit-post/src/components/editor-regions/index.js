@@ -11,16 +11,17 @@ import { __ } from '@wordpress/i18n';
 import { useSimulatedMediaQuery } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
-// const styleStorage = {};
-
 function EditorRegions( { footer, header, sidebar, content, publish, className } ) {
 	const resizableStylesheets = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSettings().resizableStylesheets;
 	}, [] );
 
-	const canvasWidth = useSelect( ( select ) => {
-		const deviceType = select( 'core/block-editor' ).deviceType();
-		switch ( deviceType ) {
+	const deviceType = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).deviceType();
+	} );
+
+	const canvasWidth = ( device ) => {
+		switch ( device ) {
 			case 'Tablet':
 				return 780;
 			case 'Mobile':
@@ -28,9 +29,33 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 			default:
 				return 2000;
 		}
-	} );
+	};
 
-	useSimulatedMediaQuery( resizableStylesheets, canvasWidth );
+	const marginValue = ( device ) => {
+		const viewportHeight = window.innerHeight;
+		if ( viewportHeight < 800 || device === 'Tablet' ) {
+			return '0';
+		} else if ( viewportHeight < 950 ) {
+			return '36px';
+		}
+		return '72px';
+	};
+
+	const inlineStyles = ( device ) => {
+		switch ( device ) {
+			case 'Tablet':
+			case 'Mobile':
+				return {
+					width: canvasWidth( deviceType ),
+					margin: marginValue( deviceType ) + ' auto',
+					flexGrow: 0,
+				};
+			default:
+				return null;
+		}
+	};
+
+	useSimulatedMediaQuery( resizableStylesheets, canvasWidth( deviceType ) );
 
 	return (
 		<div className={ classnames( className, 'edit-post-editor-regions' ) }>
@@ -52,12 +77,7 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 					/* translators: accessibility text for the content landmark region. */
 					aria-label={ __( 'Editor content' ) }
 					tabIndex="-1"
-					style={ {
-						width: canvasWidth,
-						margin: '0 auto',
-						flexGrow: 0,
-						height: canvasWidth < 500 ? 780 : 'auto',
-					} }
+					style={ inlineStyles( deviceType ) }
 				>
 					{ content }
 				</div>
