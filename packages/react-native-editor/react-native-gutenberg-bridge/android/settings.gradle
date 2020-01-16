@@ -1,0 +1,5 @@
+rootProject.name = 'react-native-gutenberg-bridge'
+
+include ':react-native-aztec'
+project(':react-native-aztec').projectDir = new File(rootProject.projectDir, '../../react-native-aztec/android')
+

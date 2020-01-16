@@ -1,0 +1,22 @@
+{
+  "name": "react-native-safe-area",
+  "version": "0.5.1",
+  "homepage": "https://github.com/miyabi/react-native-safe-area",
+  "summary": "React Native module to retrieve safe area insets for iOS 11 or later.",
+  "license": "MIT",
+  "authors": "Masayuki Iwai",
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source": {
+    "git": "https://github.com/miyabi/react-native-safe-area.git",
+    "tag": "v0.5.1"
+  },
+  "source_files": "ios/RNSafeArea/*.{h,m}",
+  "preserve_paths": "**/*.js",
+  "dependencies": {
+    "React": [
+
+    ]
+  }
+}

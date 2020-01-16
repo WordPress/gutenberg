@@ -1,0 +1,39 @@
+buildscript {
+    ext {
+        gradlePluginVersion = '3.3.1'
+        kotlinVersion = '1.3.11'
+        buildToolsVersion = "28.0.3"
+        minSdkVersion = 21
+        compileSdkVersion = 28
+        targetSdkVersion = 28
+        supportLibVersion = '28.0.0'
+        wordpressUtilsVersion = '1.22'
+    }
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:$gradlePluginVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
+// Load the "build from source" flag value but default to `true` since this is the demo gutenberg-mobile project so
+project.ext.buildGutenbergFromSource = project.properties.getOrDefault('wp.BUILD_GUTENBERG_FROM_SOURCE', true).toBoolean()
+
+allprojects {
+    repositories {
+        mavenLocal()
+        google()
+        jcenter()
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url "$rootDir/../node_modules/react-native/android"
+        }
+        maven {
+           // Local Maven repo containing AARs with JSC library built for Android
+           url "$rootDir/../node_modules/jsc-android/dist"
+        }
+    }
+}
