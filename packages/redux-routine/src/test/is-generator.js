@@ -10,9 +10,9 @@ describe( 'isGenerator', () => {
 		[ 10 ],
 		[ 'foo' ],
 		[ [ 0, 1, 2, 3 ] ],
-		[ function() {} ],
-		[ function*() {} ],
-	] )( 'should return false if %o', ( value ) => {
+		[ function func() {} ],
+		[ function* generatorFunc() {} ],
+	] )( 'should return false for %p', ( value ) => {
 		expect( isGenerator( value ) ).toBe( false );
 	} );
 
