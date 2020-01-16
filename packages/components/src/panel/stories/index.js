@@ -10,7 +10,7 @@ import Panel from '../';
 import PanelRow from '../row';
 import PanelBody from '../body';
 
-export default { title: 'Components|Panel', component: Panel };
+export default { title: 'Components/Panel', component: Panel };
 
 export const _default = () => {
 	const bodyTitle = text( 'Body Title', 'My Block Settings' );
