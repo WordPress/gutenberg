@@ -224,16 +224,16 @@ export default compose( [
 			hasSelectedInnerBlock,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
-		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] ).length;
+		const rootBlock = getBlockParents( clientId )[ 0 ];
 		const parentBlock = getBlockParents( clientId, true )[ 0 ];
-		let showSubmenuIcon = false;
-
-		if ( hasDescendants && getBlockName( parentBlock ) === 'core/navigation' ) {
-			showSubmenuIcon = getBlockAttributes( parentBlock ).showSubmenuIcon;
-		}
+		const rootBlockAttributes = getBlockAttributes( rootBlock );
+		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] ).length;
+		const isLevelZero = getBlockName( parentBlock ) === 'core/navigation';
+		const showSubmenuIcon = rootBlockAttributes.showSubmenuIcon && isLevelZero && hasDescendants;
+		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
 		return {
-			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
+			isParentOfSelectedBlock,
 			hasDescendants,
 			showSubmenuIcon,
 		};
