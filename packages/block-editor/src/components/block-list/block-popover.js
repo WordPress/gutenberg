@@ -92,10 +92,17 @@ function BlockPopover( {
 		return null;
 	}
 
-	const node = document.getElementById( 'block-' + capturingClientId );
+	let node = document.getElementById( 'block-' + capturingClientId );
 
 	if ( ! node ) {
 		return null;
+	}
+
+	const contentElement = node.querySelector( '[data-block-content]' );
+
+	// A block may speciy a different target element for the toolbar.
+	if ( contentElement ) {
+		node = contentElement;
 	}
 
 	function onFocus() {

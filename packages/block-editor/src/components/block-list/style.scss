@@ -57,6 +57,10 @@
 	// Break long strings of text without spaces so they don't overflow the block.
 	overflow-wrap: break-word;
 
+	[data-block-target] {
+		position: relative;
+	}
+
 	/**
 	 * Notices
 	 */
@@ -283,6 +287,10 @@
 	&[data-align="right"] {
 		// Without z-index, won't be clickable as "above" adjacent content.
 		z-index: z-index(".block-editor-block-list__block {core/image aligned left or right}");
+		width: 100%;
+
+		// When images are floated, the block itself should collapse to zero height.
+		height: 0;
 
 		&::before {
 			content: none;
@@ -290,7 +298,7 @@
 	}
 
 	// Left.
-	&[data-align="left"] {
+	&[data-align="left"] > [data-block-content] {
 		// This is in the editor only; the image should be floated on the frontend.
 		/*!rtl:begin:ignore*/
 		float: left;
@@ -299,7 +307,7 @@
 	}
 
 	// Right.
-	&[data-align="right"] {
+	&[data-align="right"] > [data-block-content] {
 		// Right: This is in the editor only; the image should be floated on the frontend.
 		/*!rtl:begin:ignore*/
 		float: right;
