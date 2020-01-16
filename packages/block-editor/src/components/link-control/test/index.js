@@ -17,16 +17,9 @@ import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
 
 const mockFetchSearchSuggestions = jest.fn();
 
-jest.mock( '@wordpress/data', () => {
-	return {
-		...require.requireActual( '../../../../../data' ),
-		useSelect() {
-			return {
-				fetchSearchSuggestions: mockFetchSearchSuggestions,
-			};
-		},
-	};
-} );
+jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
+	fetchSearchSuggestions: mockFetchSearchSuggestions,
+} ) );
 
 /**
  * Wait for next tick of event loop. This is required
