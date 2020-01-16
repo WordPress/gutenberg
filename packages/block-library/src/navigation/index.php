@@ -93,7 +93,6 @@ function build_css_font_sizes( $attributes ) {
  * @return array
  */
 function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
-
 	$blocks = array_filter(
 		$blocks,
 		function( $block ) {
@@ -122,7 +121,6 @@ function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation( $attributes, $content, $block ) {
-
 	$block['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
 
 	if ( empty( $block['innerBlocks'] ) ) {
@@ -222,18 +220,8 @@ function build_navigation_html( $block, $colors, $font_sizes, $level_zero = true
 		$html .= '</a>';
 		// End anchor tag content.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
 			$html .= build_navigation_html( $block, $colors, $font_sizes, false );
-=======
-		// Only include innerBlocks that have a label set in the count. Otherwise a submenu with no links will be rendered.
-		if ( count( (array) array_filter( $block['innerBlocks'], 'has_navigation_label' ) ) > 0 ) {
-=======
-		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
->>>>>>> Adds recursive function for effectively sanitizing the navigation block from outputting empty links.
-			$html .= build_navigation_html( $block, $colors, $font_sizes );
->>>>>>> Added filter for only getting blocks with a non-empty label for ouptputting in the navigation html.
 		}
 
 		$html .= '</li>';
