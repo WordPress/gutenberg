@@ -35,6 +35,14 @@
 			height: 1px;
 		}
 
+		&.is-active {
+			// Block UI appearance.
+			border: $border-width solid $border-color;
+			border-radius: $radius-block-ui;
+			color: $white;
+			background: $border-color;
+		}
+
 		// Formatting buttons
 		> svg {
 			border-radius: $radius-round-rectangle;
