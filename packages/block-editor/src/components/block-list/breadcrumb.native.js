@@ -37,7 +37,8 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } )
 					maxFontSizeMultiplier={ 1.25 }
 					ellipsizeMode="tail"
 					numberOfLines={ 1 }
-					style={ styles.breadcrumbTitle }>
+					style={ styles.breadcrumbTitle }
+				>
 					<BlockTitle clientId={ clientId } />
 				</Text>
 			</TouchableOpacity>
