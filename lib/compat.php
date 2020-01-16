@@ -221,14 +221,18 @@ function gutenberg_user_settings_data_persistence_inline_script() {
 
 	$persisted_value = get_user_meta( $user_id, $wpdb->get_blog_prefix() . 'data_persistence', true );
 	if ( empty( $persisted_value ) ) {
-		// If there's no explicit metadata assigned, fall back to a value which
-		// was persisted using browser storage, prior to user meta persistence.
+		/*
+		 * If there's no explicit metadata assigned, fall back to a value which
+		 * was persisted using browser storage, prior to user meta persistence.
+		 */
 		$persisted_value = sprintf( 'localStorage.getItem( "WP_DATA_USER_%s" );', $user_id );
 	} else {
-		// Otherwise, encode the string value for interpolation in the storage
-		// implementation script. The first `json_encode` will is responsible
-		// for producing a JSON encoding of the persisted meta object, and the
-		// second will apply quoting to that string result.
+		/*
+		 * Otherwise, encode the string value for interpolation in the storage
+		 * implementation script. The first `json_encode` will is responsible
+		 * for producing a JSON encoding of the persisted meta object, and the
+		 * second will apply quoting to that string result.
+		 */
 		$persisted_value = wp_json_encode( wp_json_encode( $persisted_value ) );
 	}
 
