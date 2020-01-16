@@ -26,13 +26,15 @@
 		// Add a border before item groups to show as separator in the block toolbar.
 		// Why not a border after item groups? Because the last item is an invisible inserter,
 		// so we can't use last-child to consistenly hide it, and we need round corners.
-		border-left: $border-width solid $border-color;
+		border-left: $border-width solid $light-gray-500;
+		@include break-medium() {
+			border-left: $border-width solid $border-color;
+		}
 
 		// IE11 has thick paddings without this.
 		line-height: 0;
 
 		// Adapt the height of the toolbar items.
-		height: $block-toolbar-height;
 		background: none;
 
 		// Ensure the icon buttons remain square.

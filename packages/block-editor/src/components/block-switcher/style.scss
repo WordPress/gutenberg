@@ -7,6 +7,7 @@
 	position: relative;
 
 	&::after {
+		display: none;
 		content: "";
 		position: absolute;
 		bottom: 0;
@@ -24,7 +25,7 @@
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	margin: 0;
 	display: block;
-	height: $grid-unit-60;
+	height: $icon-button-size;
 
 	.block-editor-block-icon {
 		margin: auto;
@@ -61,8 +62,7 @@
 
 	.block-editor-block-icon,
 	.block-editor-block-switcher__transform {
-		width: $grid-unit-60;
-		height: $grid-unit-60;
+		height: $icon-button-size;
 		position: relative;
 		margin: 0 auto;
 		padding: 3px;
@@ -170,6 +170,10 @@
 	}
 
 	.components-button.block-editor-block-switcher__toggle {
+		&::after {
+			display: block;
+		}
+
 		.block-editor-block-icon,
 		.block-editor-block-switcher__transform {
 			width: $block-toolbar-height;
