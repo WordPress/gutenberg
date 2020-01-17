@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { placeCaretAtVerticalEdge } from '@wordpress/dom';
 
@@ -49,6 +49,7 @@ export default function InsertionPoint( {
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
 	const [ inserterElement, setInserterElement ] = useState( null );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
+	const ref = useRef();
 
 	function onMouseMove( event ) {
 		if ( event.target.className !== className ) {
@@ -89,8 +90,13 @@ export default function InsertionPoint( {
 	}
 
 	function onClick( event ) {
-		const { clientX, clientY } = event;
-		const targetRect = event.target.getBoundingClientRect();
+		const { clientX, clientY, target } = event;
+
+		if ( target !== ref.current ) {
+			return;
+		}
+
+		const targetRect = target.getBoundingClientRect();
 		const isReverse = clientY < targetRect.top + ( targetRect.height / 2 );
 		const blockNode = getBlockDOMNode( inserterClientId );
 		const container = isReverse ? containerRef.current : blockNode;
@@ -116,6 +122,7 @@ export default function InsertionPoint( {
 				<Indicator clientId={ inserterClientId } />
 				{ /* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */ }
 				<div
+					ref={ ref }
 					onFocus={ () => setIsInserterForced( true ) }
 					onBlur={ () => setIsInserterForced( false ) }
 					onClick={ onClick }
