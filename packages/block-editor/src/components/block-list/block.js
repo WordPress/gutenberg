@@ -275,7 +275,8 @@ function BlockListBlock( {
 	);
 
 	// For aligned blocks, provide a wrapper element so the block can be
-	// positioned relative to the block column.
+	// positioned relative to the block column. This is enabled with the
+	// .is-block-content className.
 	if ( isAligned ) {
 		blockEdit = <div className="is-block-content">{ blockEdit }</div>;
 	}
