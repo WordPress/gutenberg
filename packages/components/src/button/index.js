@@ -40,6 +40,9 @@ export function Button( {
 	shortcut,
 	label,
 	children,
+	hoverStyle,
+	focusedStyle,
+	disabledStyle,
 	...additionalProps
 }, ref ) {
 	if ( isDefault ) {
@@ -86,7 +89,7 @@ export function Button( {
 
 	const element = (
 		<Tag
-			css={ styles }
+			css={ ( theme ) => styles( theme, hoverStyle, focusedStyle, disabledStyle ) }
 			font-size={ isSmall ? 'small' : 'default' }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
 			{ ...propsToPass }

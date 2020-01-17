@@ -3,7 +3,7 @@
  */
 import { css } from '@emotion/core';
 
-export default ( theme ) => css`
+export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 	border: 0;
 	cursor: pointer;
 	-webkit-appearance: none;
@@ -248,6 +248,17 @@ export default ( theme ) => css`
 		outline: 2px solid transparent;
 	}
 
+  &:hover {
+    ${ hoverStyle ? hoverStyle : '' }
+  }
+
+  &:focus {
+    ${ focusedStyle ? focusedStyle : '' }
+  }
+
+  &:disabled {
+    ${ disabledStyle ? disabledStyle : '' }
+  }
 	@keyframes components-button__busy-animation {
 		0% {
 			background-position: 200px 0;
