@@ -32,7 +32,7 @@ import { createLinkFormat, isValidHref } from './utils';
 
 import styles from './modal.scss';
 
-class ModalLinkUI extends Component {
+export class ModalLinkUI extends Component {
 	constructor() {
 		super( ...arguments );
 

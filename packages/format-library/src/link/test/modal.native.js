@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import ModalLinkUI from '../modal';
+import { ModalLinkUI } from '../modal';
 /**
  * External dependencies
  */
@@ -22,8 +22,9 @@ describe( 'LinksUI', () => {
 			<ModalLinkUI
 				onRemove={ onRemove }
 				onClose={ jest.fn() }
+				onBlockAttributesChange={ jest.fn() }
 			/>
-		).dive().dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
+		).dive();// -> dive() removes the HOC layer that was blocking access to ModalLinkUI
 
 		// When
 
@@ -44,7 +45,7 @@ describe( 'LinksUI', () => {
 				onRemove={ onRemove }
 				onClose={ jest.fn() }
 			/>
-		).dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
+		);
 
 		// Mock `submitLink` for simplicity (we don't want to test submitLink itself here)
 		wrapper.instance().submitLink = jest.fn();
