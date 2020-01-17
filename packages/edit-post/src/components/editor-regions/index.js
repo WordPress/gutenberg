@@ -33,7 +33,7 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 				deviceWidth = 780;
 				break;
 			case 'Mobile':
-				deviceWidth = 340;
+				deviceWidth = 360;
 				break;
 			default:
 				deviceWidth = 2000;
@@ -42,24 +42,31 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
 	};
 
-	const marginValue = ( device ) => {
-		const viewportHeight = window.innerHeight;
-		if ( viewportHeight < 800 || device === 'Tablet' ) {
-			return '0';
-		} else if ( viewportHeight < 950 ) {
-			return '36px';
-		}
-		return '72px';
-	};
+	const marginValue = () => window.innerHeight < 800 ? 36 : 72;
 
-	const inlineStyles = ( device ) => {
+	const minHeightValue = ( device ) => device === 'Mobile' ? 640 : 768;
+
+	const contentInlineStyles = ( device ) => {
 		switch ( device ) {
 			case 'Tablet':
 			case 'Mobile':
 				return {
-					width: canvasWidth( deviceType ),
-					margin: marginValue( deviceType ) + ' auto',
+					width: canvasWidth( device ),
+					margin: marginValue() + 'px auto',
 					flexGrow: 0,
+					minHeight: minHeightValue( device ) + 'px',
+				};
+			default:
+				return null;
+		}
+	};
+
+	const sidebarInlineStyles = ( device ) => {
+		switch ( device ) {
+			case 'Tablet':
+			case 'Mobile':
+				return {
+					minHeight: minHeightValue( device ) + ( marginValue() * 2 ) + 'px',
 				};
 			default:
 				return null;
@@ -88,7 +95,7 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 					/* translators: accessibility text for the content landmark region. */
 					aria-label={ __( 'Editor content' ) }
 					tabIndex="-1"
-					style={ inlineStyles( deviceType ) }
+					style={ contentInlineStyles( deviceType ) }
 				>
 					{ content }
 				</div>
@@ -99,6 +106,7 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 						/* translators: accessibility text for the settings landmark region. */
 						aria-label={ __( 'Editor settings' ) }
 						tabIndex="-1"
+						style={ sidebarInlineStyles( deviceType ) }
 					>
 						{ sidebar }
 					</div>
