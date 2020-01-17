@@ -9,6 +9,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
+	showMediaEditorButton
 } from 'react-native-gutenberg-bridge';
 import { isEmpty, map, get } from 'lodash';
 
@@ -35,6 +36,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	BlockAlignmentToolbar,
+	MediaEdit,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -48,6 +50,7 @@ import { withSelect } from '@wordpress/data';
 import styles from './styles.scss';
 import SvgIcon, { editImageIcon } from './icon';
 import SvgIconRetry from './icon-retry';
+import SvgIconCustomize from './icon-customize';
 import { getUpdatedLinkTargetSettings } from './utils';
 
 import {
@@ -394,6 +397,16 @@ export class ImageEdit extends React.Component {
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 
+		const editImageComponent = ( openMediaOptions, getMediaOptions ) => (
+			<TouchableWithoutFeedback
+				onPress={ openMediaOptions }>
+				<View style={ styles.edit }>
+					{ getMediaOptions() }
+					<Icon icon={ SvgIconCustomize } { ...styles.iconCustomise } />
+				</View>
+			</TouchableWithoutFeedback>
+		)
+
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
@@ -457,6 +470,14 @@ export class ImageEdit extends React.Component {
 												{ iconRetryContainer }
 												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 											</View>
+										}
+										{ !isUploadInProgress && !isUploadFailed && finalWidth && finalHeight && showMediaEditorButton &&
+											<MediaEdit allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+												onSelect={ this.onSelectMediaUploadOption }
+												render={ ( { open, getMediaOptions } ) => {
+													return editImageComponent( open, getMediaOptions );
+												} }
+											/>
 										}
 									</ImageBackground>
 								</View>

@@ -83,3 +83,20 @@
 	justify-content: center;
 	align-items: center;
 }
+
+.edit {
+	width: 44px;
+	height: 44px;
+	background-color: $dark-opacity-500;
+	border-radius: 22px;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+
+.iconCustomise {
+	fill: #fff;
+	position: absolute;
+	top: 10px;
+	left: 10px;
+}
