@@ -450,7 +450,7 @@ describe( 'Selecting links', () => {
 
 		// We should be back to showing the search input
 		expect( searchInput ).not.toBeNull();
-		expect( searchInput.value ).toBe( selectedLink.title ); // prepopulated with previous link's title
+		expect( searchInput.value ).toBe( selectedLink.url ); // prepopulated with previous link's URL
 		expect( currentLinkUI ).toBeNull();
 	} );
 
