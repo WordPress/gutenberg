@@ -156,6 +156,7 @@ function NavigationLinkEdit( {
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
+						tagName="span"
 						value={ label }
 						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
 						placeholder={ itemLabelPlaceholder }
@@ -168,9 +169,9 @@ function NavigationLinkEdit( {
 						] }
 					/>
 					{ showSubmenuIcon &&
-						<div className="wp-block-navigation-link__submenu-icon">
+						<span className="wp-block-navigation-link__submenu-icon">
 							{ itemSubmenuIcon }
-						</div>
+						</span>
 					}
 					{ isLinkOpen && (
 						<Popover position="bottom center">
