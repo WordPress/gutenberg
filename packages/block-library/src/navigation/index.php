@@ -86,6 +86,31 @@ function build_css_font_sizes( $attributes ) {
 }
 
 /**
+ * Recursively filters out links with no labels to build a clean navigation block structure.
+ *
+ * @param array $blocks Navigation link inner blocks from the Navigation block.
+ * @return array Blocks that had valid labels
+ */
+function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
+	$blocks = array_filter(
+		$blocks,
+		function( $block ) {
+			return ! empty( $block['attrs']['label'] );
+		}
+	);
+
+	if ( ! empty( $blocks ) ) {
+		foreach ( $blocks as $key => $block ) {
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$blocks[ $key ]['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+			}
+		}
+	}
+
+	return $blocks;
+}
+
+/**
  * Renders the `core/navigation` block on server.
  *
  * @param array $attributes The block attributes.
@@ -95,6 +120,12 @@ function build_css_font_sizes( $attributes ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation( $attributes, $content, $block ) {
+	$block['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+
+	if ( empty( $block['innerBlocks'] ) ) {
+		return '';
+	}
+
 	$colors          = build_css_colors( $attributes );
 	$font_sizes      = build_css_font_sizes( $attributes );
 	$classes         = array_merge(
