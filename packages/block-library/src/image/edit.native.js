@@ -9,7 +9,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
-	showMediaEditorButton
+	showMediaEditorButton,
 } from 'react-native-gutenberg-bridge';
 import { isEmpty, map, get } from 'lodash';
 
@@ -405,7 +405,7 @@ export class ImageEdit extends React.Component {
 					<Icon icon={ SvgIconCustomize } { ...styles.iconCustomise } />
 				</View>
 			</TouchableWithoutFeedback>
-		)
+		);
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
@@ -471,7 +471,7 @@ export class ImageEdit extends React.Component {
 												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 											</View>
 										}
-										{ !isUploadInProgress && !isUploadFailed && finalWidth && finalHeight && showMediaEditorButton &&
+										{ ! isUploadInProgress && ! isUploadFailed && finalWidth && finalHeight && showMediaEditorButton &&
 											<MediaEdit allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 												onSelect={ this.onSelectMediaUploadOption }
 												render={ ( { open, getMediaOptions } ) => {

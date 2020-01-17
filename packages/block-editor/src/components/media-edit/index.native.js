@@ -40,12 +40,8 @@ export class MediaEdit extends React.Component {
 		this.onPickerSelect = this.onPickerSelect.bind( this );
 	}
 
-	componentDidMount() {
-		const { allowedTypes = [] } = this.props;
-	}
-
 	getMediaOptionsItems() {
-		return options
+		return options;
 	}
 
 	onPickerPresent() {
@@ -60,7 +56,7 @@ export class MediaEdit extends React.Component {
 		const types = allowedTypes.filter( ( type ) => mediaSource.types.includes( type ) );
 		requestMediaPicker( mediaSource.id, types, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
-				onSelect(media)
+				onSelect( media );
 			}
 		} );
 	}
