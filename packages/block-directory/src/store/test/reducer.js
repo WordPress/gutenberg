@@ -57,6 +57,13 @@ describe( 'state', () => {
 	} );
 
 	describe( 'blockManagement()', () => {
+		it( 'should start with an empty installedBlockTypes List', () => {
+			const state = blockManagement( undefined, {
+				type: 'NOOP_TYPE',
+			} );
+			expect( state.installedBlockTypes ).toEqual( [] );
+		} );
+
 		it( 'should add item to the installedBlockTypesList', () => {
 			const initialState = deepFreeze( { installedBlockTypes: [] } );
 			const state = blockManagement( initialState, {
