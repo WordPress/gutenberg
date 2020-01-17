@@ -9,7 +9,7 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
-import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
+import { AlignmentToolbar, BlockControls, RichText, withColors } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -40,10 +40,12 @@ class ParagraphEdit extends Component {
 	render() {
 		const {
 			attributes,
-			setAttributes,
+			backgroundColor,
 			mergeBlocks,
 			onReplace,
+			setAttributes,
 			style,
+			textColor,
 		} = this.props;
 
 		const {
@@ -51,6 +53,12 @@ class ParagraphEdit extends Component {
 			content,
 			placeholder,
 		} = attributes;
+
+		const styles = {
+			...style,
+			...( backgroundColor && backgroundColor.color ? { backgroundColor: backgroundColor.color } : undefined ),
+			...( textColor ? { color: textColor.color } : undefined ),
+		};
 
 		return (
 			<View>
@@ -68,7 +76,7 @@ class ParagraphEdit extends Component {
 					tagName="p"
 					value={ content }
 					deleteEnter={ true }
-					style={ style }
+					style={ styles }
 					onChange={ ( nextContent ) => {
 						setAttributes( {
 							content: nextContent,
@@ -95,4 +103,7 @@ class ParagraphEdit extends Component {
 	}
 }
 
-export default ParagraphEdit;
+export default withColors(
+	{ textColor: 'color' },
+	{ backgroundColor: 'color' }
+)( ParagraphEdit );

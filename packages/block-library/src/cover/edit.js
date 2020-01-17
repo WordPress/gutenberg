@@ -159,7 +159,7 @@ function ResizableCover( {
 	);
 }
 
-function onCoverSelectMedia( setAttributes ) {
+export function onCoverSelectMedia( setAttributes ) {
 	return ( media ) => {
 		if ( ! media || ! media.url ) {
 			setAttributes( { url: undefined, id: undefined } );

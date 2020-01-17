@@ -146,6 +146,9 @@ export const registerCoreBlocks = () => {
 		gallery,
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
+		// eslint-disable-next-line no-undef
+		!! __DEV__ ? cover : null,
+
 		spacer,
 	].forEach( registerBlock );
 

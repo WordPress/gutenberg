@@ -1,4 +1,5 @@
 // Block Creation Components
+export * from './gradients';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
 export { default as BlockControls } from './block-controls';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';

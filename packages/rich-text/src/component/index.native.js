@@ -728,6 +728,7 @@ export class RichText extends Component {
 						}
 					} }
 					style={ {
+						backgroundColor: styles.richText.backgroundColor,
 						...style,
 						minHeight: Math.max( minHeight, this.state.height ),
 					} }

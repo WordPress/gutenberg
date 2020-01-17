@@ -50,6 +50,7 @@ const siteLibrarySource = {
 	label: __( 'WordPress Media Library' ),
 	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
 	icon: 'wordpress-alt',
+	mediaLibrary: true,
 };
 
 const internalSources = [ deviceLibrarySource, cameraImageSource, cameraVideoSource, siteLibrarySource ];
@@ -86,7 +87,7 @@ export class MediaUpload extends React.Component {
 	}
 
 	getMediaOptionsItems() {
-		const { allowedTypes = [], multiple = false } = this.props;
+		const { allowedTypes = [], multiple = false, onlyMediaLibrary } = this.props;
 
 		// disable upload sources for now when multiple flag is set
 		// eslint-disable-next-line no-undef
@@ -97,7 +98,7 @@ export class MediaUpload extends React.Component {
 		}
 
 		return this.getAllSources().filter( ( source ) => {
-			return allowedTypes.filter( ( allowedType ) => source.types.includes( allowedType ) ).length > 0;
+			return onlyMediaLibrary ? source.mediaLibrary : allowedTypes.filter( ( allowedType ) => source.types.includes( allowedType ) ).length > 0;
 		} ).map( ( source ) => {
 			return {
 				...source,
@@ -130,6 +131,7 @@ export class MediaUpload extends React.Component {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
 		const mediaSource = this.getAllSources().filter( ( source ) => source.value === value ).shift();
 		const types = allowedTypes.filter( ( type ) => mediaSource.types.includes( type ) );
+
 		requestMediaPicker( mediaSource.id, types, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
 				onSelect( media );
