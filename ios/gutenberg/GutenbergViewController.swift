@@ -99,9 +99,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         case .deviceCamera:
             print("Gutenberg did request a device media picker, opening the camera picker")
             pickAndUpload(from: .camera, filter: currentFilter, callback: callback)
-        case .mediaEditor:
-            print("Gutenberg did request a media editor, opening the media editor")
-            // Open Media Editor here
         default: break
         }
     }
@@ -187,6 +184,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     
     func gutenbergDidRequestFullscreenImage(with mediaUrl: URL) {
         print("Gutenberg requested fullscreen image preview for " + mediaUrl.absoluteString)
+    }
+
+    func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback) {
+        print("Gutenberg requested media editor for " + mediaUrl.absoluteString)
     }
 }
 

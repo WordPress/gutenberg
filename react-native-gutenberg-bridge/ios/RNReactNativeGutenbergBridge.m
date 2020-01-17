@@ -17,5 +17,6 @@ RCT_EXTERN_METHOD(editorDidEmitLog:(NSString *)message logLevel:(int)logLevel)
 RCT_EXTERN_METHOD(editorDidAutosave)
 RCT_EXTERN_METHOD(fetchRequest:(NSString *)path resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(requestImageFullscreenPreview:(NSString *)mediaUrl)
+RCT_EXTERN_METHOD(requestMediaEditor:(NSString *)mediaUrl callback:(RCTResponseSenderBlock)callback)
 
 @end

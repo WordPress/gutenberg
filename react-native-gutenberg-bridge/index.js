@@ -108,6 +108,10 @@ export function requestImageFullscreenPreview( mediaUrl ) {
 	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( mediaUrl );
 }
 
+export function requestMediaEditor( mediaUrl, callback ) {
+	return RNReactNativeGutenbergBridge.requestMediaEditor( mediaUrl, callback );
+}
+
 export function fetchRequest( path ) {
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
 }
