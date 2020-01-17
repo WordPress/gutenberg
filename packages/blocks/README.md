@@ -205,6 +205,14 @@ _Returns_
 
 -   `Object`: Block object.
 
+<a name="DEFAULT_BLOCK_TYPE_SETTINGS" href="#DEFAULT_BLOCK_TYPE_SETTINGS">#</a> **DEFAULT_BLOCK_TYPE_SETTINGS**
+
+Default values to assign for omitted optional block type settings.
+
+_Type_
+
+-   `Object` 
+
 <a name="doBlocksMatchTemplate" href="#doBlocksMatchTemplate">#</a> **doBlocksMatchTemplate**
 
 Checks whether a list of blocks matches a template by comparing the block names.

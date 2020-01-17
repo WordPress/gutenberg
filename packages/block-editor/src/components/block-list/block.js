@@ -23,6 +23,7 @@ import {
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
+	DEFAULT_BLOCK_TYPE_SETTINGS,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -427,7 +428,23 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	return {
 		setAttributes( newAttributes ) {
 			const { clientId } = ownProps;
-			updateBlockAttributes( clientId, newAttributes );
+			const { getBlockRootClientId, getBlockName } = select(
+				'core/block-editor'
+			);
+			let isLocalChange = false;
+			const rootClientId = getBlockRootClientId( clientId );
+			if ( rootClientId ) {
+				// The default save outputs null.
+				// We can have more nuanced heuristics in the future.
+				isLocalChange =
+					select( 'core/blocks' ).getBlockType( getBlockName( rootClientId ) )
+						.save === DEFAULT_BLOCK_TYPE_SETTINGS.save;
+			}
+			updateBlockAttributes(
+				clientId,
+				newAttributes,
+				isLocalChange ? rootClientId : undefined
+			);
 		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;

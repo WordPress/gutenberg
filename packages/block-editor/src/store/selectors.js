@@ -1502,16 +1502,21 @@ export function getSettings( state ) {
 }
 
 /**
- * Returns true if the most recent block change is be considered persistent, or
- * false otherwise. A persistent change is one committed by BlockEditorProvider
- * via its `onChange` callback, in addition to `onInput`.
+ * Returns true if the most recent block change is to be considered persistent with
+ * regards to the provided root client ID, or false otherwise. A persistent
+ * change is one committed by `BlockEditorProvider` via its `onChange` callback, in addition to `onInput`.
  *
- * @param {Object} state Block editor state.
+ * @param {Object} state          Block editor state.
+ * @param {string} [rootClientId] Block root client ID.
  *
  * @return {boolean} Whether the most recent block change was persistent.
  */
-export function isLastBlockChangePersistent( state ) {
-	return state.blocks.isPersistentChange;
+export function isLastBlockChangePersistent( state, rootClientId ) {
+	return (
+		state.blocks.isPersistentChange &&
+		( ! state.blocks.persistentChangeRootClientId ||
+			state.blocks.persistentChangeRootClientId === rootClientId )
+	);
 }
 
 /**

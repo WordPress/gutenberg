@@ -28,6 +28,7 @@ export {
 export { isValidBlockContent } from './validation';
 export { getCategories, setCategories, updateCategory } from './categories';
 export {
+	DEFAULT_BLOCK_TYPE_SETTINGS,
 	registerBlockType,
 	registerBlockCollection,
 	unregisterBlockType,
