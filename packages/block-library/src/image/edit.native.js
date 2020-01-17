@@ -397,11 +397,11 @@ export class ImageEdit extends React.Component {
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 
-		const editImageComponent = ( openMediaOptions, getMediaOptions ) => (
+		const editImageComponent = ( openMediaOptions, mediaOptions ) => (
 			<TouchableWithoutFeedback
 				onPress={ openMediaOptions }>
 				<View style={ styles.edit }>
-					{ getMediaOptions() }
+					{ mediaOptions() }
 					<Icon icon={ SvgIconCustomize } { ...styles.iconCustomise } />
 				</View>
 			</TouchableWithoutFeedback>

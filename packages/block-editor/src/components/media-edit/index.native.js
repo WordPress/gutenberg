@@ -62,7 +62,7 @@ export class MediaEdit extends React.Component {
 	}
 
 	render() {
-		const getMediaOptions = () => (
+		const mediaOptions = () => (
 			<Picker
 				hideCancelButton
 				ref={ ( instance ) => this.picker = instance }
@@ -71,7 +71,7 @@ export class MediaEdit extends React.Component {
 			/>
 		);
 
-		return this.props.render( { open: this.onPickerPresent, getMediaOptions } );
+		return this.props.render( { open: this.onPickerPresent, mediaOptions } );
 	}
 }
 
