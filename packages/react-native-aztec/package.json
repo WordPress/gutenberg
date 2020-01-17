@@ -1,6 +1,7 @@
 {
-  "name": "react-native-aztec",
+  "name": "@wordpress/react-native-aztec",
   "version": "0.1.11",
+  "private": true,
   "license": "GPL-2.0",
   "scripts": {
     "install-aztec-ios": "cd ./ios && carthage bootstrap --platform iOS --cache-builds",
