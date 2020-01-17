@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -71,7 +76,7 @@ export default function InsertionPoint( {
 
 		const clientId = element.id.slice( 'block-'.length );
 
-		if ( ! clientId || clientId === selectedBlockClientId ) {
+		if ( ! clientId ) {
 			return;
 		}
 
@@ -89,7 +94,7 @@ export default function InsertionPoint( {
 		setInserterClientId( clientId );
 	}
 
-	function onClick( event ) {
+	function focusClosestTabbable( event ) {
 		const { clientX, clientY, target } = event;
 
 		// Only handle click on the wrapper specifically, and not an event
@@ -127,7 +132,7 @@ export default function InsertionPoint( {
 					ref={ ref }
 					onFocus={ () => setIsInserterForced( true ) }
 					onBlur={ () => setIsInserterForced( false ) }
-					onClick={ onClick }
+					onClick={ focusClosestTabbable }
 					// While ideally it would be enough to capture the
 					// bubbling focus event from the Inserter, due to the
 					// characteristics of click focusing of `button`s in
@@ -135,7 +140,13 @@ export default function InsertionPoint( {
 					//
 					// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 					tabIndex={ -1 }
-					className="block-editor-block-list__insertion-point-inserter"
+					className={ classnames(
+						'block-editor-block-list__insertion-point-inserter',
+						{
+							// Hide the inserter above the selected block.
+							'is-inserter-hidden': inserterClientId === selectedBlockClientId,
+						}
+					) }
 				>
 					<Inserter clientId={ inserterClientId } />
 				</div>

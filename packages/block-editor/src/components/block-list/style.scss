@@ -381,6 +381,14 @@
 	}
 
 	justify-content: center;
+
+	// Clicks on the inserter are redirected to the nearest tabbable element.
+	cursor: text;
+
+	// Hide the inserter above the selected block.
+	&.is-inserter-hidden {
+		opacity: 0;
+	}
 }
 
 .block-editor-block-list__block-popover-inserter {
@@ -531,6 +539,13 @@
 		border: none;
 		box-shadow: none;
 		overflow-y: visible;
+
+		// Allow clicking through the toolbar holder.
+		pointer-events: none;
+
+		> * {
+			pointer-events: all;
+		}
 
 		.block-editor-block-contextual-toolbar,
 		.block-editor-block-list__breadcrumb {
