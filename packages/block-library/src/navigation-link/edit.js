@@ -296,20 +296,17 @@ export default compose( [
 		const { clientId } = ownProps;
 		const rootBlock = getBlockParents( clientId )[ 0 ];
 		const parentBlock = getBlockParents( clientId, true )[ 0 ];
-		const rootBlockAttributes = getBlockAttributes( rootBlock );
-		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
-			.length;
+		const navigationBlockAttributes = getBlockAttributes( rootBlock );
+		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] ).length;
 		const isLevelZero = getBlockName( parentBlock ) === 'core/navigation';
-		const showSubmenuIcon =
-			rootBlockAttributes.showSubmenuIcon &&
-			isLevelZero &&
-			hasDescendants;
+		const showSubmenuIcon = navigationBlockAttributes.showSubmenuIcon && isLevelZero && hasDescendants;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
 		return {
 			isParentOfSelectedBlock,
 			hasDescendants,
 			showSubmenuIcon,
+			navigationBlockAttributes,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
