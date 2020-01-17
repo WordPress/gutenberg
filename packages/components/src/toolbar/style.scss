@@ -9,22 +9,3 @@
 
 	flex-shrink: 0;
 }
-
-// @todo: We should extract this to a separate component, and refactor it.
-.block-editor-block-toolbar .components-tab-button {
-	padding: $grid-unit-10 $grid-unit-15;
-	color: $border-color;
-	height: $icon-button-size;
-	font-weight: 500;
-
-	span {
-		position: relative;
-		display: block;
-		text-align: center;
-		padding: 0 $grid-unit-10;
-	}
-
-	&.components-button::before {
-		width: calc(100% - #{$grid-unit-30});
-	}
-}

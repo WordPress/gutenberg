@@ -56,16 +56,15 @@
 
 // Style this the same as the block buttons in the library.
 // Needs specificiity to override the icon button.
-.components-button.block-editor-block-switcher__toggle {
-	width: auto;
+.block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__toggle.has-icon {
 	padding: 0;
 
 	.block-editor-block-icon,
 	.block-editor-block-switcher__transform {
-		height: $icon-button-size;
+		height: 100%;
 		position: relative;
 		margin: 0 auto;
-		padding: 3px;
+		padding: $grid-unit-10;
 		display: flex;
 		align-items: center;
 		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -85,7 +84,7 @@
 	&:not(:disabled):hover .block-editor-block-switcher__transform,
 	&:not(:disabled):focus .block-editor-block-icon,
 	&:not(:disabled):focus .block-editor-block-switcher__transform {
-		transform: translateY(-$icon-button-size);
+		transform: translateY(-100%);
 	}
 
 	// Position the focus style correctly.
