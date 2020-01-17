@@ -23,8 +23,6 @@
 
 An array of settings objects. Each object will used to render a `ToggleControl` for that setting.
 
-## Event handlers
-
 ### onClose
 
 - Type: `Function`
