@@ -440,4 +440,21 @@ describe( 'Writing Flow', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should allow selecting entire list with longer last item', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '* b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'cd' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+
+		// Ensure multi selection is not triggered and selection stays within
+		// the list.
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
