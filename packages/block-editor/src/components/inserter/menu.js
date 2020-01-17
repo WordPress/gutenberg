@@ -402,7 +402,13 @@ export class InserterMenu extends Component {
 												viewportWidth={ 500 }
 												blocks={
 													hoveredItemBlockType.example ?
-														getBlockFromExample( hoveredItem.name, hoveredItemBlockType.example ) :
+														getBlockFromExample( hoveredItem.name, {
+															attributes: {
+																...hoveredItemBlockType.example.attributes,
+																...hoveredItem.initialAttributes,
+															},
+															innerBlocks: hoveredItemBlockType.example.innerBlocks,
+														} ) :
 														createBlock( hoveredItem.name, hoveredItem.initialAttributes )
 												}
 											/>
