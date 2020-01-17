@@ -384,6 +384,7 @@ function withPersistentBlockChange( reducer ) {
 		// would have qualified as one which would have been ignored or not
 		// have resulted in a changed state.
 		lastAction = action;
+		markNextChangeAsNotPersistent = action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
 		return nextState;
 	};
