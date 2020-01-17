@@ -86,7 +86,7 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
  *
  * @return {?Element} Optimal tab target, if one exists.
  */
-function getClosestTabbable( target, isReverse, containerElement ) {
+export function getClosestTabbable( target, isReverse, containerElement ) {
 	// Since the current focus target is not guaranteed to be a text field,
 	// find all focusables. Tabbability is considered later.
 	let focusableNodes = focus.focusable.find( containerElement );

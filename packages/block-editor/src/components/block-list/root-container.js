@@ -78,6 +78,7 @@ function RootContainer( { children, className }, ref ) {
 			className={ className }
 			isMultiSelecting={ isMultiSelecting }
 			selectedBlockClientId={ selectedBlockClientId }
+			containerRef={ ref }
 		>
 			<BlockPopover />
 			<div
