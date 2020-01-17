@@ -30,6 +30,7 @@ _Example:_
 		"check-licenses": "wp-scripts check-licenses",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
+		"lint:md": "wp-scripts lint-md",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"packages-update": "wp-scripts packages-update",
 		"start": "wp-scripts start",
@@ -223,6 +224,30 @@ By default, files located in `build` and `node_modules` folders are ignored.
 #### Advanced information
 
 It uses [npm-package-json-lint](https://www.npmjs.com/package/npm-package-json-lint) with the set of recommended rules defined in [@wordpress/npm-package-json-lint-config](https://www.npmjs.com/package/@wordpress/npm-package-json-lint-config) npm package. You can override default rules with your own as described in [npm-package-json-lint wiki](https://github.com/tclindner/npm-package-json-lint/wiki). Learn more in the [Advanced Usage](#advanced-usage) section.
+
+### `lint-md`
+
+Helps enforce standards for JS source code in your markdown files.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"lint:md": "wp-scripts lint-md"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+
+* `npm run lint:md` - lints markdown files in the entire project’s directories.
+
+By default, files located in `build` and `node_modules` folders are ignored.
+
+#### Advanced information
+
+It uses [eslint-plugin-markdown](https://github.com/eslint/eslint-plugin-markdown) with the [.eslintrc-md.js](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/config/.eslintrc-md.js) configuration. This configuration tunes down the linting rules since documentation often includes just snippets of code. It is recommended to use the markdown linting as a check, but not necessarily a blocker since it might report more false errors.
 
 ### `lint-style`
 
