@@ -1,4 +1,9 @@
 <?php
+/**
+ * Stylesheet related functions.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Extends default editor settings with editing canvas stylesheets.
@@ -7,7 +12,6 @@
  *
  * @return array Filtered editor settings.
  */
-
 function gutenberg_stylesheets_editor_settings( $settings ) {
 	$stylesheets_settings = array(
 		'resizableStylesheets' => array(

@@ -20,6 +20,18 @@ _Returns_
 
 -   `boolean`: Whether the given block type is allowed to be inserted.
 
+<a name="deviceType" href="#deviceType">#</a> **deviceType**
+
+Returns the current editing canvas device type.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Device type.
+
 <a name="didAutomaticChange" href="#didAutomaticChange">#</a> **didAutomaticChange**
 
 Returns true if the last change was an automatic change, false otherwise.
@@ -1287,6 +1299,18 @@ visual and HTML modes.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
+<a name="toggleCanvasWidth" href="#toggleCanvasWidth">#</a> **toggleCanvasWidth**
+
+Returns an action object used to toggle the width of the editing canvas
+
+_Parameters_
+
+-   _deviceType_ `string`: 
 
 _Returns_
 

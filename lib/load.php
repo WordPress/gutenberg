@@ -66,4 +66,3 @@ require dirname( __FILE__ ) . '/customizer.php';
 require dirname( __FILE__ ) . '/edit-site-page.php';
 require dirname( __FILE__ ) . '/global-styles.php';
 require dirname( __FILE__ ) . '/editing-canvas-stylesheets.php';
-
