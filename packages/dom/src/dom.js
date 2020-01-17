@@ -59,6 +59,27 @@ function isSelectionForward( selection ) {
 	return true;
 }
 
+function normaliseRange( range ) {
+	range = range.cloneRange();
+
+	const { startContainer, startOffset } = range;
+
+	if (
+		startContainer.nodeType === startContainer.TEXT_NODE &&
+		startContainer.nodeValue.length === startOffset
+	) {
+		let element = startContainer;
+
+		while ( ! element.nextSibling ) {
+			element = element.parentNode;
+		}
+
+		range.setStart( element.nextSibling, 0 );
+	}
+
+	return range;
+}
+
 /**
  * Check whether the selection is at the edge of the container. Checks for
  * horizontal position by default. Set `onlyVertical` to true to check only
@@ -93,7 +114,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const range = selection.getRangeAt( 0 ).cloneRange();
+	const range = normaliseRange( selection.getRangeAt( 0 ) );
 	const isForward = isSelectionForward( selection );
 	const isCollapsed = selection.isCollapsed;
 
