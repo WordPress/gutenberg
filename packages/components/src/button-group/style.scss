@@ -1,11 +1,11 @@
 .components-button-group {
 	display: inline-block;
 
-	.components-button.is-button {
+	.components-button {
 		border-radius: 0;
 		display: inline-flex;
 
-		& + .components-button.is-button {
+		& + .components-button {
 			margin-left: -1px;
 		}
 
@@ -22,7 +22,7 @@
 		&:focus,
 		&.is-primary {
 			position: relative;
-			z-index: z-index(".components-button.is-button {:focus or .is-primary}");
+			z-index: z-index(".components-button {:focus or .is-primary}");
 		}
 
 		// The active button should look pressed.

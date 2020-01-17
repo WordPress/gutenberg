@@ -1,0 +1,19 @@
+.editor-styles-wrapper {
+	-webkit-overflow-scrolling: touch;
+	background: $white;
+	height: calc(100% - #{$header-height});
+	left: 0;
+	overflow: auto;
+	position: absolute;
+	top: $header-height;
+	width: 100%;
+
+	@include break-small {
+		width: calc(100% - #{$sidebar-width});
+	}
+}
+
+.edit-site-block-editor__block-list {
+	padding-bottom: $grid-size-xlarge;
+	padding-top: $grid-size-xlarge + 5;
+}

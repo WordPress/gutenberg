@@ -14,14 +14,14 @@ import filterMessage from './filterMessage';
  * Create the live regions.
  */
 export const setup = function() {
-	let containerPolite = document.getElementById( 'a11y-speak-polite' );
-	let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
+	const containerPolite = document.getElementById( 'a11y-speak-polite' );
+	const containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
 	if ( containerPolite === null ) {
-		containerPolite = addContainer( 'polite' );
+		addContainer( 'polite' );
 	}
 	if ( containerAssertive === null ) {
-		containerAssertive = addContainer( 'assertive' );
+		addContainer( 'assertive' );
 	}
 };
 

@@ -150,6 +150,25 @@ function gutenberg_override_translation_file( $file, $handle ) {
 add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
 
 /**
+ * Filters the default labels for common post types to change the case style
+ * from capitalized (e.g. "Featured Image") to sentence-style (e.g. "Featured
+ * image").
+ *
+ * See: https://github.com/WordPress/gutenberg/pull/18758
+ *
+ * @param object $labels Object with all the labels as member variables.
+ *
+ * @return object Object with all the labels, including overridden ones.
+ */
+function gutenberg_override_posttype_labels( $labels ) {
+	$labels->featured_image = __( 'Featured image', 'gutenberg' );
+	return $labels;
+}
+foreach ( array( 'post', 'page' ) as $post_type ) {
+	add_filter( "post_type_labels_{$post_type}", 'gutenberg_override_posttype_labels' );
+}
+
+/**
  * Registers a style according to `wp_register_style`. Honors this request by
  * deregistering any style by the same handler before registration.
  *
@@ -251,6 +270,10 @@ function gutenberg_register_packages_scripts( &$scripts ) {
 
 			case 'wp-edit-post':
 				array_push( $dependencies, 'media-models', 'media-views', 'postbox' );
+				break;
+
+			case 'wp-edit-site':
+				array_push( $dependencies, 'wp-dom-ready' );
 				break;
 		}
 
@@ -377,6 +400,15 @@ function gutenberg_register_packages_styles( &$styles ) {
 
 	gutenberg_override_style(
 		$styles,
+		'wp-edit-site',
+		gutenberg_url( 'build/edit-site/style.css' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
+		filemtime( gutenberg_dir_path() . 'build/edit-site/style.css' )
+	);
+	$styles->add_data( 'wp-edit-site', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
@@ -402,8 +434,6 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
  * @since 0.1.0
  */
 function gutenberg_enqueue_block_editor_assets() {
-	global $wp_scripts;
-
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(
@@ -415,26 +445,6 @@ function gutenberg_enqueue_block_editor_assets() {
 			admin_url( 'admin-ajax.php?action=gutenberg_rest_nonce' )
 		),
 		'after'
-	);
-
-	// TEMPORARY: Core does not (yet) provide persistence migration from the
-	// introduction of the block editor and still calls the data plugins.
-	// We unset the existing inline scripts first.
-	$wp_scripts->registered['wp-data']->extra['after'] = array();
-	wp_add_inline_script(
-		'wp-data',
-		implode(
-			"\n",
-			array(
-				'( function() {',
-				'	var userId = ' . get_current_user_ID() . ';',
-				'	var storageKey = "WP_DATA_USER_" + userId;',
-				'	wp.data',
-				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } );',
-				'	wp.data.plugins.persistence.__unstableMigrate( { storageKey: storageKey } );',
-				'} )();',
-			)
-		)
 	);
 
 	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {

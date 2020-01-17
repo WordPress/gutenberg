@@ -345,6 +345,7 @@ export class RichText extends Component {
 			onPaste,
 			onChange,
 		} = this.props;
+		const { activeFormats = [] } = this.state;
 
 		const { pastedText, pastedHtml, files } = event.nativeEvent;
 		const currentRecord = this.createRecord();
@@ -381,6 +382,7 @@ export class RichText extends Component {
 				html: pastedHtml,
 				plainText: pastedText,
 				files,
+				activeFormats,
 			} );
 		}
 	}
@@ -586,6 +588,15 @@ export class RichText extends Component {
 	}
 
 	willTrimSpaces( html ) {
+		const {
+			tagName,
+		} = this.props;
+
+		// aztec won't trim spaces in a case of <pre> block, so we are excluding it
+		if ( tagName === 'pre' ) {
+			return false;
+		}
+
 		// regex for detecting spaces around block element html tags
 		const blockHtmlElements = '(div|br|blockquote|ul|ol|li|p|pre|h1|h2|h3|h4|h5|h6|iframe|hr)';
 		const leadingOrTrailingSpaces = new RegExp( `(\\s+)<\/?${ blockHtmlElements }>|<\/?${ blockHtmlElements }>(\\s+)`, 'g' );
@@ -632,6 +643,7 @@ export class RichText extends Component {
 			__unstableIsSelected: isSelected,
 			children,
 			getStylesFromColorScheme,
+			formatTypes,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -745,7 +757,11 @@ export class RichText extends Component {
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
 				/>
-				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
+				{ isSelected && <FormatEdit
+					formatTypes={ formatTypes }
+					value={ record }
+					onChange={ this.onFormatChange }
+				/> }
 			</View>
 		);
 	}

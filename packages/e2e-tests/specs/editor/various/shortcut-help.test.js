@@ -14,7 +14,7 @@ describe( 'keyboard shortcut help modal', () => {
 	} );
 
 	it( 'displays the shortcut help modal when opened using the menu item in the more menu', async () => {
-		await clickOnMoreMenuItem( 'Keyboard Shortcuts' );
+		await clickOnMoreMenuItem( 'Keyboard shortcuts' );
 		const shortcutHelpModalElements = await page.$$( '.edit-post-keyboard-shortcut-help' );
 		expect( shortcutHelpModalElements ).toHaveLength( 1 );
 	} );

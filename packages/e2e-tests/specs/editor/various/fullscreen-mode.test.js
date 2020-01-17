@@ -13,7 +13,7 @@ describe( 'Fullscreen Mode', () => {
 	} );
 
 	it( 'should open the fullscreen mode from the more menu', async () => {
-		await clickOnMoreMenuItem( 'Fullscreen Mode' );
+		await clickOnMoreMenuItem( 'Fullscreen mode' );
 		await toggleMoreMenu();
 
 		const isFullscreenEnabled = await page.$eval( 'body', ( body ) => {

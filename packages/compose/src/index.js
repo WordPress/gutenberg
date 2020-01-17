@@ -16,3 +16,4 @@ export { default as withState } from './higher-order/with-state';
 export { default as useMediaQuery } from './hooks/use-media-query';
 export { default as useReducedMotion } from './hooks/use-reduced-motion';
 export { default as useViewportMatch } from './hooks/use-viewport-match';
+export { default as useInstanceId } from './hooks/use-instance-id';

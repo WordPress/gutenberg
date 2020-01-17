@@ -60,7 +60,7 @@ function Header( {
 					icon="admin-generic"
 					label={ __( 'Settings' ) }
 					onClick={ toggleGeneralSidebar }
-					isToggled={ isEditorSidebarOpened }
+					isPressed={ isEditorSidebarOpened }
 					aria-expanded={ isEditorSidebarOpened }
 					shortcut={ shortcuts.toggleSidebar }
 				/>

@@ -117,7 +117,7 @@ class BlockDropZone extends Component {
 		const isAppender = index === undefined;
 		return (
 			<DropZone
-				className={ classnames( 'editor-block-drop-zone block-editor-block-drop-zone', {
+				className={ classnames( 'block-editor-block-drop-zone', {
 					'is-appender': isAppender,
 				} ) }
 				onHTMLDrop={ this.onHTMLDrop }

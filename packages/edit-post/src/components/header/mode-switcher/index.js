@@ -18,11 +18,11 @@ import shortcuts from '../../../keyboard-shortcuts';
 const MODES = [
 	{
 		value: 'visual',
-		label: __( 'Visual Editor' ),
+		label: __( 'Visual editor' ),
 	},
 	{
 		value: 'text',
-		label: __( 'Code Editor' ),
+		label: __( 'Code editor' ),
 	},
 ];
 

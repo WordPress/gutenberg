@@ -1266,6 +1266,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/edit-site",
+		"slug": "packages-edit-site",
+		"markdown_source": "../packages/edit-site/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-widgets",
 		"slug": "packages-edit-widgets",
 		"markdown_source": "../packages/edit-widgets/README.md",

@@ -245,6 +245,7 @@ const Popover = ( {
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
+	const contentRect = useRef();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
 	const isExpanded = expandOnMobile && isMobileViewport;
@@ -285,10 +286,10 @@ const Popover = ( {
 				anchorHorizontalBuffer
 			);
 
-			const contentSize = {
-				height: contentEl.scrollHeight,
-				width: contentEl.scrollWidth,
-			};
+			if ( ! contentRect.current ) {
+				contentRect.current = contentEl.getBoundingClientRect();
+			}
+
 			const {
 				popoverTop,
 				popoverLeft,
@@ -296,7 +297,7 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentSize, position );
+			} = computePopoverPosition( anchor, contentRect.current, position );
 
 			setClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
 			setAttribute( containerEl, 'data-x-axis', xAxis );
@@ -321,7 +322,11 @@ const Popover = ( {
 			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
 		};
 
-		refresh();
+		// Height may still adjust between now and the next tick.
+		const timeoutId = window.setTimeout( refresh );
+		const refreshOnAnimationFrame = () => {
+			window.requestAnimationFrame( refresh );
+		};
 
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
@@ -331,13 +336,20 @@ const Popover = ( {
 		 * For these situations, we refresh the popover every 0.5s
 		 */
 		const intervalHandle = window.setInterval( refresh, 500 );
+
+		// Sometimes a click trigger a layout change that affects the popover
+		// position. This is an opportunity to immediately refresh rather than
+		// at the interval.
+		window.addEventListener( 'click', refreshOnAnimationFrame );
 		window.addEventListener( 'resize', refresh );
 		window.addEventListener( 'scroll', refresh, true );
 
 		return () => {
+			window.clearTimeout( timeoutId );
 			window.clearInterval( intervalHandle );
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
+			window.addEventListener( 'click', refreshOnAnimationFrame );
 		};
 	}, [
 		isExpanded,

@@ -18,6 +18,7 @@ import { Component } from '@wordpress/element';
 import {
 	ToolbarGroup,
 } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { withViewportMatch } from '@wordpress/viewport';
 
@@ -131,18 +132,26 @@ class MediaTextEdit extends Component {
 			attributes,
 			backgroundColor,
 			setAttributes,
-			// isMobile,
+			isMobile,
+			isSelected,
+			isParentSelected,
+			isAncestorSelected,
 		} = this.props;
 		const {
-			// isStackedOnMobile,
+			isStackedOnMobile,
 			mediaPosition,
 			mediaWidth,
 			verticalAlignment,
 		} = attributes;
-		const shouldStack = false; // We are temporarily not stacking until we fix alignment buttons
-		// const shouldStack = isStackedOnMobile && isMobile; // <<< Original line
+		const shouldStack = isStackedOnMobile && isMobile;
 		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
 		const widthString = `${ temporaryMediaWidth }%`;
+
+		const innerBlockContainerStyle = ! shouldStack && {
+			...styles.paddingHorizontalNone,
+			...( mediaPosition === 'right' && styles.innerPaddingMediaOnRight ),
+			...( mediaPosition === 'left' && styles.innerPaddingMediaOnLeft ),
+		};
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
 			...styles[ `is-vertically-aligned-${ verticalAlignment || 'center' }` ],
@@ -153,6 +162,10 @@ class MediaTextEdit extends Component {
 		};
 		const innerBlockWidth = shouldStack ? 100 : ( 100 - temporaryMediaWidth );
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
+		const mediaContainerStyle = {
+			...( isParentSelected || isAncestorSelected ? styles.denseMediaPadding : styles.regularMediaPadding ),
+			...( isSelected && styles.innerPadding ),
+		};
 
 		const toolbarControls = [ {
 			icon: 'align-pull-left',
@@ -183,10 +196,10 @@ class MediaTextEdit extends Component {
 					/>
 				</BlockControls>
 				<View style={ containerStyles }>
-					<View style={ { width: widthString } }>
+					<View style={ { width: widthString, ...mediaContainerStyle } } >
 						{ this.renderMediaArea() }
 					</View>
-					<View style={ { width: innerBlockWidthString } }>
+					<View style={ { width: innerBlockWidthString, ...innerBlockContainerStyle } }>
 						<InnerBlocks
 							allowedBlocks={ ALLOWED_BLOCKS }
 							template={ TEMPLATE }
@@ -201,5 +214,24 @@ class MediaTextEdit extends Component {
 
 export default compose(
 	withColors( 'backgroundColor' ),
-	withViewportMatch( { isMobile: '< small' } )
+	withViewportMatch( { isMobile: '< small' } ),
+	withSelect( ( select, { clientId } ) => {
+		const {
+			getSelectedBlockClientId,
+			getBlockRootClientId,
+			getBlockParents,
+		} = select( 'core/block-editor' );
+
+		const parents = getBlockParents( clientId, true );
+
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const isParentSelected = selectedBlockClientId && selectedBlockClientId === getBlockRootClientId( clientId );
+		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
+
+		return {
+			isSelected: selectedBlockClientId === clientId,
+			isParentSelected,
+			isAncestorSelected,
+		};
+	} ),
 )( MediaTextEdit );

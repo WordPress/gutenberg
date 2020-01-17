@@ -22,11 +22,10 @@ import {
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
-	__experimentalGradientPickerPanel,
 	__experimentalUseGradient,
 	ContrastChecker,
 	InspectorControls,
-	PanelColorSettings,
+	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	RichText,
 	URLInput,
 	withColors,
@@ -165,21 +164,20 @@ function ButtonEdit( {
 				hasBorder
 			/>
 			<InspectorControls>
-				<PanelColorSettings
-					title={ __( 'Color Settings' ) }
-					colorSettings={ [
+				<PanelColorGradientSettings
+					title={ __( 'Background & Text Color' ) }
+					settings={ [
 						{
-							value: backgroundColor.color,
-							onChange: ( newColor ) => {
-								setAttributes( { customGradient: undefined } );
-								setBackgroundColor( newColor );
-							},
-							label: __( 'Background Color' ),
+							colorValue: textColor.color,
+							onColorChange: setTextColor,
+							label: __( 'Text Color' ),
 						},
 						{
-							value: textColor.color,
-							onChange: setTextColor,
-							label: __( 'Text Color' ),
+							colorValue: backgroundColor.color,
+							onColorChange: setBackgroundColor,
+							gradientValue,
+							onGradientChange: setGradient,
+							label: __( 'Background' ),
 						},
 					] }
 				>
@@ -194,16 +192,7 @@ function ButtonEdit( {
 							fallbackTextColor,
 						} }
 					/>
-				</PanelColorSettings>
-				<__experimentalGradientPickerPanel
-					onChange={
-						( newGradient ) => {
-							setGradient( newGradient );
-							setBackgroundColor();
-						}
-					}
-					value={ gradientValue }
-				/>
+				</PanelColorGradientSettings>
 				<BorderPanel
 					borderRadius={ borderRadius }
 					setAttributes={ setAttributes }

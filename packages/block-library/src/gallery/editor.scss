@@ -57,7 +57,7 @@ figure.wp-block-gallery {
 			height: $icon-button-size-small;
 
 			// Remove hover box shadows, since they clash with the container.
-			&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+			&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
 				box-shadow: none;
 			}
 

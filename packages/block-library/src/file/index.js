@@ -20,7 +20,7 @@ export const settings = {
 	title: __( 'File' ),
 	description: __( 'Add a link to a downloadable file.' ),
 	icon,
-	keywords: [ __( 'document' ), __( 'pdf' ) ],
+	keywords: [ __( 'document' ), __( 'pdf' ), __( 'download' ) ],
 	supports: {
 		align: true,
 	},

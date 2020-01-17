@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { create, join, split, toHTMLString } from '@wordpress/rich-text';
 
 const transforms = {
@@ -74,18 +74,18 @@ const transforms = {
 						isParagraphOrSingleCite
 					);
 			},
-			schema: {
+			schema: ( { phrasingContentSchema } ) => ( {
 				blockquote: {
 					children: {
 						p: {
-							children: getPhrasingContentSchema(),
+							children: phrasingContentSchema,
 						},
 						cite: {
-							children: getPhrasingContentSchema(),
+							children: phrasingContentSchema,
 						},
 					},
 				},
-			},
+			} ),
 		},
 	],
 	to: [

@@ -25,6 +25,7 @@ import markdownConverter from './markdown-converter';
 import iframeRemover from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
 import htmlFormattingRemover from './html-formatting-remover';
+import brRemover from './br-remover';
 import { getPhrasingContentSchema } from './phrasing-content';
 import {
 	deepFilterHTML,
@@ -32,6 +33,7 @@ import {
 	removeInvalidHTML,
 	getBlockContentSchema,
 } from './utils';
+import emptyParagraphRemover from './empty-paragraph-remover';
 
 /**
  * Browser dependencies
@@ -47,7 +49,8 @@ const { console } = window;
  */
 function filterInlineHTML( HTML ) {
 	HTML = deepFilterHTML( HTML, [ googleDocsUIDRemover, phrasingContentReducer, commentRemover ] );
-	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema(), { inline: true } );
+	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), { inline: true } );
+	HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
 
 	// Allows us to ask for this information when we get a report.
 	console.log( 'Processed inline HTML:\n\n', HTML );
@@ -128,7 +131,10 @@ function htmlToBlocks( { html, rawTransforms } ) {
  */
 export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.
-	HTML = HTML.replace( /<meta[^>]+>/, '' );
+	HTML = HTML.replace( /<meta[^>]+>/g, '' );
+	// Strip Windows markers.
+	HTML = HTML.replace( /^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i, '' );
+	HTML = HTML.replace( /(?:<!--\s*EndFragment\s*-->\s*)?<\/body>\s*<\/html>\s*$/i, '' );
 
 	// If we detect block delimiters in HTML, parse entirely as blocks.
 	if ( mode !== 'INLINE' ) {
@@ -190,8 +196,8 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 	}
 
 	const rawTransforms = getRawTransformations();
-	const phrasingContentSchema = getPhrasingContentSchema();
-	const blockContentSchema = getBlockContentSchema( rawTransforms );
+	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
+	const blockContentSchema = getBlockContentSchema( rawTransforms, phrasingContentSchema, true );
 
 	const blocks = compact( flatMap( pieces, ( piece ) => {
 		// Already a block from shortcode.
@@ -225,8 +231,12 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 
 		piece = deepFilterHTML( piece, filters, blockContentSchema );
 		piece = removeInvalidHTML( piece, schema );
-		piece = deepFilterHTML( piece, [ htmlFormattingRemover ], blockContentSchema );
 		piece = normaliseBlocks( piece );
+		piece = deepFilterHTML( piece, [
+			htmlFormattingRemover,
+			brRemover,
+			emptyParagraphRemover,
+		], blockContentSchema );
 
 		// Allows us to ask for this information when we get a report.
 		console.log( 'Processed HTML piece:\n\n', piece );

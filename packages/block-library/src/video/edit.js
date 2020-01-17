@@ -213,7 +213,7 @@ class VideoEdit extends Component {
 									allowedTypes={ VIDEO_POSTER_ALLOWED_MEDIA_TYPES }
 									render={ ( { open } ) => (
 										<Button
-											isDefault
+											isSecondary
 											onClick={ open }
 											ref={ this.posterImageButton }
 											aria-describedby={ videoPosterDescription }

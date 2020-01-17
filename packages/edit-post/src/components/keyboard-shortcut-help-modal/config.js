@@ -78,7 +78,7 @@ const globalShortcuts = {
 		},
 		{
 			keyCombination: secondary( 'm' ),
-			description: __( 'Switch between Visual Editor and Code Editor.' ),
+			description: __( 'Switch between Visual editor and Code editor.' ),
 		},
 	],
 };

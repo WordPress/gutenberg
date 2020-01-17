@@ -13,7 +13,7 @@ import { Tooltip, Button } from '@wordpress/components';
 
 const MyTooltip = () => (
 	<Tooltip text="More information">
-		<Button isDefault>
+		<Button isSecondary>
 			Hover for more information
 		</Button>
 	</Tooltip>

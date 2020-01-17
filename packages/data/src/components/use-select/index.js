@@ -135,7 +135,7 @@ export default function useSelect( _mapSelect, deps ) {
 				} catch ( error ) {
 					latestMapOutputError.current = error;
 				}
-				forceRender( {} );
+				forceRender();
 			}
 		};
 

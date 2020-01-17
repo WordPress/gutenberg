@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import {
-	find,
 	get,
 	isEmpty,
 	map,
@@ -20,30 +19,16 @@ import {
 	Button,
 	ButtonGroup,
 	ExternalLink,
-	IconButton,
-	MenuItem,
-	NavigableMenu,
 	PanelBody,
-	Path,
 	ResizableBox,
 	SelectControl,
 	Spinner,
-	SVG,
 	TextareaControl,
 	TextControl,
-	ToggleControl,
 	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import {
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN,
-	BACKSPACE,
-	ENTER,
-} from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	BlockAlignmentToolbar,
@@ -52,37 +37,30 @@ import {
 	InspectorControls,
 	InspectorAdvancedControls,
 	MediaPlaceholder,
-	URLPopover,
+	MediaReplaceFlow,
 	RichText,
+	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
 import {
 	Component,
-	useCallback,
-	useState,
-	useRef,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
-import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
-import icon, { editImageIcon } from './icon';
+import icon from './icon';
 import ImageSize from './image-size';
-import { getUpdatedLinkTargetSettings, removeNewTabRel } from './utils';
-
 /**
  * Module constants
  */
 import {
 	MIN_SIZE,
-	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
-	LINK_DESTINATION_CUSTOM,
 	ALLOWED_MEDIA_TYPES,
 	DEFAULT_SIZE_SLUG,
 } from './constants';
@@ -115,157 +93,8 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
  */
 const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
-const stopPropagation = ( event ) => {
-	event.stopPropagation();
-};
-
-const stopPropagationRelevantKeys = ( event ) => {
-	if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
-		// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-		event.stopPropagation();
-	}
-};
-
-const ImageURLInputUI = ( {
-	advancedOptions,
-	linkDestination,
-	mediaLinks,
-	onChangeUrl,
-	url,
-} ) => {
-	const [ isOpen, setIsOpen ] = useState( false );
-	const openLinkUI = useCallback( () => {
-		setIsOpen( true );
-	} );
-
-	const [ isEditingLink, setIsEditingLink ] = useState( false );
-	const [ urlInput, setUrlInput ] = useState( null );
-
-	const startEditLink = useCallback( () => {
-		if ( linkDestination === LINK_DESTINATION_MEDIA ||
-			linkDestination === LINK_DESTINATION_ATTACHMENT
-		) {
-			setUrlInput( '' );
-		}
-		setIsEditingLink( true );
-	} );
-	const stopEditLink = useCallback( () => {
-		setIsEditingLink( false );
-	} );
-
-	const closeLinkUI = useCallback( () => {
-		setUrlInput( null );
-		stopEditLink();
-		setIsOpen( false );
-	} );
-
-	const autocompleteRef = useRef( null );
-
-	const onClickOutside = useCallback( () => {
-		return ( event ) => {
-			// The autocomplete suggestions list renders in a separate popover (in a portal),
-			// so onClickOutside fails to detect that a click on a suggestion occurred in the
-			// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
-			// return to avoid the popover being closed.
-			const autocompleteElement = autocompleteRef.current;
-			if ( autocompleteElement && autocompleteElement.contains( event.target ) ) {
-				return;
-			}
-			setIsOpen( false );
-			setUrlInput( null );
-			stopEditLink();
-		};
-	} );
-
-	const onSubmitLinkChange = useCallback( () => {
-		return ( event ) => {
-			if ( urlInput ) {
-				onChangeUrl( urlInput );
-			}
-			stopEditLink();
-			setUrlInput( null );
-			event.preventDefault();
-		};
-	} );
-
-	const onLinkRemove = useCallback( () => {
-		closeLinkUI();
-		onChangeUrl( '' );
-	} );
-	const linkEditorValue = urlInput !== null ? urlInput : url;
-
-	const urlLabel = (
-		find( mediaLinks, [ 'linkDestination', linkDestination ] ) || {}
-	).title;
-	return (
-		<>
-			<IconButton
-				icon="admin-links"
-				className="components-toolbar__control"
-				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
-				aria-expanded={ isOpen }
-				onClick={ openLinkUI }
-			/>
-			{ isOpen && (
-				<URLPopover
-					onClickOutside={ onClickOutside() }
-					onClose={ closeLinkUI }
-					renderSettings={ () => advancedOptions }
-					additionalControls={ ! linkEditorValue && (
-						<NavigableMenu>
-							{
-								map( mediaLinks, ( link ) => (
-									<MenuItem
-										key={ link.linkDestination }
-										icon={ link.icon }
-										onClick={ () => {
-											setUrlInput( null );
-											onChangeUrl( link.url );
-											stopEditLink();
-										} }
-									>
-										{ link.title }
-									</MenuItem>
-								) )
-							}
-						</NavigableMenu>
-					) }
-				>
-					{ ( ! url || isEditingLink ) && (
-						<URLPopover.LinkEditor
-							className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
-							value={ linkEditorValue }
-							onChangeInputValue={ setUrlInput }
-							onKeyDown={ stopPropagationRelevantKeys }
-							onKeyPress={ stopPropagation }
-							onSubmit={ onSubmitLinkChange() }
-							autocompleteRef={ autocompleteRef }
-						/>
-					) }
-					{ ( url && ! isEditingLink ) && (
-						<>
-							<URLPopover.LinkViewer
-								className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
-								onKeyPress={ stopPropagation }
-								url={ url }
-								onEditLinkClick={ startEditLink }
-								urlLabel={ urlLabel }
-							/>
-							<IconButton
-								icon="no"
-								label={ __( 'Remove link' ) }
-								onClick={ onLinkRemove }
-							/>
-						</>
-					) }
-				</URLPopover>
-			) }
-		</>
-	);
-};
-
 export class ImageEdit extends Component {
-	constructor( { attributes } ) {
+	constructor() {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
@@ -278,19 +107,13 @@ export class ImageEdit extends Component {
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
-		this.onSetLinkClass = this.onSetLinkClass.bind( this );
-		this.onSetLinkRel = this.onSetLinkRel.bind( this );
-		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetTitle = this.onSetTitle.bind( this );
 		this.getFilename = this.getFilename.bind( this );
-		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 		this.onImageError = this.onImageError.bind( this );
-		this.getLinkDestinations = this.getLinkDestinations.bind( this );
 
 		this.state = {
 			captionFocused: false,
-			isEditing: ! attributes.url,
 		};
 	}
 
@@ -314,7 +137,6 @@ export class ImageEdit extends Component {
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 					onError: ( message ) => {
 						noticeOperations.createErrorNotice( message );
-						this.setState( { isEditing: true } );
 					},
 				} );
 			}
@@ -340,9 +162,6 @@ export class ImageEdit extends Component {
 		const { noticeOperations } = this.props;
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
-		this.setState( {
-			isEditing: true,
-		} );
 	}
 
 	onSelectImage( media ) {
@@ -356,10 +175,6 @@ export class ImageEdit extends Component {
 			} );
 			return;
 		}
-
-		this.setState( {
-			isEditing: false,
-		} );
 
 		const { id, url, alt, caption, linkDestination } = this.props.attributes;
 
@@ -417,10 +232,6 @@ export class ImageEdit extends Component {
 				sizeSlug: DEFAULT_SIZE_SLUG,
 			} );
 		}
-
-		this.setState( {
-			isEditing: false,
-		} );
 	}
 
 	onImageError( url ) {
@@ -433,47 +244,13 @@ export class ImageEdit extends Component {
 		}
 	}
 
-	onSetHref( value ) {
-		const linkDestinations = this.getLinkDestinations();
-		const { attributes } = this.props;
-		const { linkDestination } = attributes;
-		let linkDestinationInput;
-		if ( ! value ) {
-			linkDestinationInput = LINK_DESTINATION_NONE;
-		} else {
-			linkDestinationInput = (
-				find( linkDestinations, ( destination ) => {
-					return destination.url === value;
-				} ) ||
-				{ linkDestination: LINK_DESTINATION_CUSTOM }
-			).linkDestination;
-		}
-		if ( linkDestination !== linkDestinationInput ) {
-			this.props.setAttributes( {
-				linkDestination: linkDestinationInput,
-				href: value,
-			} );
-			return;
-		}
-		this.props.setAttributes( { href: value } );
+	onSetHref( props ) {
+		this.props.setAttributes( props );
 	}
 
 	onSetTitle( value ) {
 		// This is the HTML title attribute, separate from the media object title
 		this.props.setAttributes( { title: value } );
-	}
-
-	onSetLinkClass( value ) {
-		this.props.setAttributes( { linkClass: value } );
-	}
-
-	onSetLinkRel( value ) {
-		this.props.setAttributes( { rel: value } );
-	}
-
-	onSetNewTab( value ) {
-		const updatedLinkTarget = getUpdatedLinkTargetSettings( value, this.props.attributes );
-		this.props.setAttributes( updatedLinkTarget );
 	}
 
 	onFocusCaption() {
@@ -540,42 +317,12 @@ export class ImageEdit extends Component {
 		}
 	}
 
-	getLinkDestinations() {
-		return [
-			{
-				linkDestination: LINK_DESTINATION_MEDIA,
-				title: __( 'Media File' ),
-				url: ( this.props.image && this.props.image.source_url ) ||
-					this.props.attributes.url,
-				icon,
-			},
-			{
-				linkDestination: LINK_DESTINATION_ATTACHMENT,
-				title: __( 'Attachment Page' ),
-				url: this.props.image && this.props.image.link,
-				icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M0 0h24v24H0V0z" fill="none" /><Path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z" /></SVG>,
-			},
-		];
-	}
-
-	toggleIsEditing() {
-		this.setState( {
-			isEditing: ! this.state.isEditing,
-		} );
-		if ( this.state.isEditing ) {
-			speak( __( 'You are now viewing the image in the image block.' ) );
-		} else {
-			speak( __( 'You are now editing the image in the image block.' ) );
-		}
-	}
-
 	getImageSizeOptions() {
 		const { imageSizes } = this.props;
 		return map( imageSizes, ( { name, slug } ) => ( { value: slug, label: name } ) );
 	}
 
 	render() {
-		const { isEditing } = this.state;
 		const {
 			attributes,
 			setAttributes,
@@ -605,7 +352,6 @@ export class ImageEdit extends Component {
 			sizeSlug,
 		} = attributes;
 
-		const cleanRel = removeNewTabRel( rel );
 		const isExternal = isExternalImage( id, url );
 		const controls = (
 			<BlockControls>
@@ -613,48 +359,27 @@ export class ImageEdit extends Component {
 					value={ align }
 					onChange={ this.updateAlignment }
 				/>
+				{ url && <MediaReplaceFlow
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*"
+					onSelect={ this.onSelectImage }
+					onSelectURL={ this.onSelectURL }
+					onError={ this.onUploadError }
+				/> }
 				{ url && (
-					<>
-						<ToolbarGroup>
-							<IconButton
-								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
-								label={ __( 'Edit image' ) }
-								aria-pressed={ this.state.isEditing }
-								onClick={ this.toggleIsEditing }
-								icon={ editImageIcon }
-							/>
-						</ToolbarGroup>
-						<ToolbarGroup>
-							<ImageURLInputUI
-								url={ href || '' }
-								onChangeUrl={ this.onSetHref }
-								mediaLinks={ this.getLinkDestinations() }
-								linkDestination={ linkDestination }
-								advancedOptions={
-									<>
-										<ToggleControl
-											label={ __( 'Open in New Tab' ) }
-											onChange={ this.onSetNewTab }
-											checked={ linkTarget === '_blank' } />
-										<TextControl
-											label={ __( 'Link Rel' ) }
-											value={ cleanRel || '' }
-											onChange={ this.onSetLinkRel }
-											onKeyPress={ stopPropagation }
-											onKeyDown={ stopPropagationRelevantKeys }
-										/>
-										<TextControl
-											label={ __( 'Link CSS Class' ) }
-											value={ linkClass || '' }
-											onKeyPress={ stopPropagation }
-											onKeyDown={ stopPropagationRelevantKeys }
-											onChange={ this.onSetLinkClass }
-										/>
-									</>
-								}
-							/>
-						</ToolbarGroup>
-					</>
+					<ToolbarGroup>
+						<ImageURLInputUI
+							url={ href || '' }
+							onChangeUrl={ this.onSetHref }
+							linkDestination={ linkDestination }
+							mediaUrl={ this.props.image && this.props.image.source_url }
+							mediaLink={ this.props.image && this.props.image.link }
+							linkTarget={ linkTarget }
+							linkClass={ linkClass }
+							rel={ rel }
+						/>
+					</ToolbarGroup>
 				) }
 			</BlockControls>
 		);
@@ -676,18 +401,16 @@ export class ImageEdit extends Component {
 				labels={ labels }
 				onSelect={ this.onSelectImage }
 				onSelectURL={ this.onSelectURL }
-				onDoubleClick={ this.toggleIsEditing }
-				onCancel={ !! url && this.toggleIsEditing }
 				notices={ noticeUI }
 				onError={ this.onUploadError }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
-				disableMediaButtons={ ! isEditing && url }
+				disableMediaButtons={ url }
 			/>
 		);
-		if ( isEditing || ! url ) {
+		if ( ! url ) {
 			return (
 				<>
 					{ controls }
@@ -768,7 +491,7 @@ export class ImageEdit extends Component {
 													key={ scale }
 													isSmall
 													isPrimary={ isCurrent }
-													aria-pressed={ isCurrent }
+													isPressed={ isCurrent }
 													onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
 												>
 													{ scale }%
@@ -838,7 +561,6 @@ export class ImageEdit extends Component {
 									<img
 										src={ url }
 										alt={ defaultedAlt }
-										onDoubleClick={ this.toggleIsEditing }
 										onClick={ this.onImageClick }
 										onError={ () => this.onImageError( url ) }
 									/>

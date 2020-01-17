@@ -78,7 +78,7 @@ class RSSEdit extends Component {
 							onChange={ ( value ) => setAttributes( { feedURL: value } ) }
 							className={ 'components-placeholder__input' }
 						/>
-						<Button isLarge type="submit">
+						<Button isSecondary type="submit">
 							{ __( 'Use URL' ) }
 						</Button>
 					</form>

@@ -92,6 +92,7 @@ class EditorProvider extends Component {
 				'colors',
 				'disableCustomColors',
 				'disableCustomFontSizes',
+				'disableCustomGradients',
 				'focusMode',
 				'fontSizes',
 				'hasFixedToolbar',

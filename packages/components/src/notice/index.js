@@ -51,7 +51,7 @@ function Notice( {
 							<Button
 								key={ index }
 								href={ url }
-								isDefault={ ! noDefaultClasses && ! url }
+								isSecondary={ ! noDefaultClasses && ! url }
 								isLink={ ! noDefaultClasses && !! url }
 								onClick={ url ? undefined : onClick }
 								className={ classnames(

@@ -6,7 +6,7 @@ import { difference } from 'lodash';
 /**
  * Internal dependencies
  */
-import { isPhrasingContent } from './phrasing-content';
+import { isTextContent } from './phrasing-content';
 
 /**
  * Checks if the given node should be considered inline content, optionally
@@ -18,7 +18,7 @@ import { isPhrasingContent } from './phrasing-content';
  * @return {boolean} True if the node is inline content, false if nohe.
  */
 function isInline( node, contextTag ) {
-	if ( isPhrasingContent( node ) ) {
+	if ( isTextContent( node ) ) {
 		return true;
 	}
 

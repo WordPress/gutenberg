@@ -67,7 +67,7 @@ describe( 'Heading', () => {
 		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( '#181717' );
 		await page.click( '[data-type="core/heading"] h3' );
-		await page.waitForSelector( '.component-color-indicator[aria-label="(text color: #181717)"]' );
+		await page.waitForSelector( '.component-color-indicator[aria-label="(Color: #181717)"]' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 

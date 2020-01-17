@@ -17,7 +17,7 @@ const editIcon = <SVG xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
 const selectIcon = <SVG xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><Path d="M6.5 1v21.5l6-6.5H21L6.5 1zm5.1 13l-3.1 3.4V5.9l7.8 8.1h-4.7z" /></SVG>;
 
 function ToolSelector() {
-	const isNavigationTool = useSelect( ( select ) => select( 'core/block-editor' ).isNavigationMode() );
+	const isNavigationTool = useSelect( ( select ) => select( 'core/block-editor' ).isNavigationMode(), [] );
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 	const isMediumViewport = useViewportMatch( 'medium' );
 	if ( ! isMediumViewport ) {

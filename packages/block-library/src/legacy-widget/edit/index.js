@@ -99,13 +99,15 @@ class LegacyWidgetEdit extends Component {
 						{ hasEditForm && (
 							<>
 								<Button
-									className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
+									className="components-tab-button"
+									isPressed={ ! isPreview }
 									onClick={ this.switchToEdit }
 								>
 									<span>{ __( 'Edit' ) }</span>
 								</Button>
 								<Button
-									className={ `components-tab-button ${ isPreview ? 'is-active' : '' }` }
+									className="components-tab-button"
+									isPressed={ isPreview }
 									onClick={ this.switchToPreview }
 								>
 									<span>{ __( 'Preview' ) }</span>

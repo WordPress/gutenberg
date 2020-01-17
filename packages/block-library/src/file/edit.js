@@ -235,7 +235,7 @@ class FileEdit extends Component {
 							</div>
 							{ isSelected &&
 								<ClipboardButton
-									isDefault
+									isSecondary
 									text={ href }
 									className={ 'wp-block-file__copy-url-button' }
 									onCopy={ this.confirmCopyURL }

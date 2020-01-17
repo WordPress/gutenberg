@@ -16,7 +16,7 @@
 				Button,
 				{
 					className: 'e2e-reset-block-button',
-					isDefault: true,
+					isSecondary: true,
 					isLarge: true,
 					onClick: function() {
 						var emptyBlock = createBlock( props.name );

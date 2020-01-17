@@ -60,6 +60,10 @@
 		"linkTo": {
 			"type": "string",
 			"default": "none"
+		},
+		"sizeSlug": {
+			"type": "string",
+			"default": "large"
 		}
 	}
 }

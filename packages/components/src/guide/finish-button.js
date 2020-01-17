@@ -24,7 +24,6 @@ export default function FinishButton( { className, onClick, children } ) {
 			ref={ button }
 			className={ className }
 			isPrimary
-			isLarge
 			onClick={ onClick }
 		>
 			{ children }

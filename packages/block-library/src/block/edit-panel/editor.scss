@@ -65,7 +65,7 @@
 	}
 }
 
-.editor-block-list__layout .is-selected .reusable-block-edit-panel {
+.block-editor-block-list__layout .is-selected .reusable-block-edit-panel {
 	border-color: $dark-opacity-light-800;
 	border-left-color: transparent;
 
@@ -78,4 +78,9 @@
 .is-selected.is-navigate-mode .reusable-block-edit-panel {
 	border-color: $blue-medium-focus;
 	border-left-color: transparent;
+
+	.is-dark-theme & {
+		border-color: $blue-medium-focus;
+		border-left-color: transparent;
+	}
 }

@@ -62,6 +62,14 @@
 }
 
 // Variations
+.is-style-rounded img {
+	// We use an absolute pixel to prevent the oval shape that a value of 50% would give
+	// to rectangular images. A pill-shape is better than otherwise.
+	border-radius: 9999px;
+}
+
+// The following variation is deprecated.
+// The CSS is kept here for the time being, to support blocks using the old variation.
 .is-style-circle-mask img {
 	// We use an absolute pixel to prevent the oval shape that a value of 50% would give
 	// to rectangular images. A pill-shape is better than otherwise.

@@ -119,13 +119,21 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
+
+Provides a unique instance ID.
+
+_Parameters_
+
+-   _object_ `Object`: Object reference to create an id for.
+
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
 
 Runs a media query and returns its value when it changes.
 
 _Parameters_
 
--   _query_ `string`: Media Query.
+-   _query_ `[string]`: Media Query.
 
 _Returns_
 

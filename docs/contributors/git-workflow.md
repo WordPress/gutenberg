@@ -54,7 +54,7 @@ upstream	https://github.com/WordPress/gutenberg.git (fetch)
 upstream	https://github.com/WordPress/gutenberg.git (push)
 ```
 
-To sync your fork you need to fetch the upstream changes and merge them into your fork. These are the corresponding commands:
+To sync your fork, you first need to fetch the upstream changes and merge them into your local copy:
 
 ``` sh
 git fetch upstream
@@ -62,7 +62,7 @@ git checkout master
 git merge upstream/master
 ```
 
-This will update you local copy to update your fork on github push your changes
+Once your local copy is updated, push your changes to update your fork on GitHub:
 
 ```
 git push

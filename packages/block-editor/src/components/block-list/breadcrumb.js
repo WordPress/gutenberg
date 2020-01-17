@@ -22,7 +22,7 @@ const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	return (
-		<div className="editor-block-list__breadcrumb block-editor-block-list__breadcrumb">
+		<div className="block-editor-block-list__breadcrumb">
 			<Toolbar>
 				<Button ref={ ref } onClick={ () => setNavigationMode( false ) }>
 					<BlockTitle clientId={ clientId } />

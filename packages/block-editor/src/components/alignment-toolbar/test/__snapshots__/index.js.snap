@@ -9,6 +9,7 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
         "icon": "editor-alignleft",
         "isActive": false,
         "onClick": [Function],
+        "role": "menuitemradio",
         "title": "My custom left",
       },
       Object {
@@ -16,6 +17,7 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
         "icon": "editor-aligncenter",
         "isActive": true,
         "onClick": [Function],
+        "role": "menuitemradio",
         "title": "My custom right",
       },
     ]
@@ -35,6 +37,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
         "icon": "editor-alignleft",
         "isActive": true,
         "onClick": [Function],
+        "role": "menuitemradio",
         "title": "Align Text Left",
       },
       Object {
@@ -42,6 +45,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
         "icon": "editor-aligncenter",
         "isActive": false,
         "onClick": [Function],
+        "role": "menuitemradio",
         "title": "Align Text Center",
       },
       Object {
@@ -49,6 +53,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
         "icon": "editor-alignright",
         "isActive": false,
         "onClick": [Function],
+        "role": "menuitemradio",
         "title": "Align Text Right",
       },
     ]

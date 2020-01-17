@@ -28,7 +28,7 @@ function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
 				title={ get(
 					postType,
 					[ 'labels', 'featured_image' ],
-					__( 'Featured Image' )
+					__( 'Featured image' )
 				) }
 				opened={ isOpened }
 				onToggle={ onTogglePanel }
