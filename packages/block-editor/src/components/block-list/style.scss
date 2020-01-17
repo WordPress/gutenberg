@@ -440,9 +440,8 @@
 		// The button here has a special style to appear as a toolbar.
 		.components-button {
 			font-size: $default-font-size;
-			min-width: $grid-unit-60 * 2;
 			height: $grid-unit-60;
-			padding: $grid-unit-15;
+			padding: $grid-unit-15 $grid-unit-20;
 
 			// Block UI appearance.
 			border: $border-width solid $border-color;
