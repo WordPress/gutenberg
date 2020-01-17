@@ -2,11 +2,6 @@
 
 ## Props
 
-### className
-
-- Type: `String`
-- Required: Yes
-
 ### value
 
 - Type: `Object`
