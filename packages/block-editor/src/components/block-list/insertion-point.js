@@ -92,6 +92,8 @@ export default function InsertionPoint( {
 	function onClick( event ) {
 		const { clientX, clientY, target } = event;
 
+		// Only handle click on the wrapper specifically, and not an event
+		// bubbled from the inserter itself.
 		if ( target !== ref.current ) {
 			return;
 		}
