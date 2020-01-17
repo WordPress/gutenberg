@@ -35,7 +35,6 @@ import {
 	withColors,
 	ColorPalette,
 	__experimentalUseGradient,
-	__experimentalGradientPicker,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -425,19 +424,6 @@ function CoverEdit( {
 							disableCustomColors={ true }
 							value={ overlayColor.color }
 							onChange={ setOverlayColor }
-							clearable={ false }
-						/>
-						<__experimentalGradientPicker
-							disableCustomGradients
-							onChange={
-								( newGradient ) => {
-									setGradient( newGradient );
-									setAttributes( {
-										overlayColor: undefined,
-									} );
-								}
-							}
-							value={ gradientValue }
 							clearable={ false }
 						/>
 					</div>
