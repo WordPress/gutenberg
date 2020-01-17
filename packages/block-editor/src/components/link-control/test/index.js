@@ -51,20 +51,15 @@ afterEach( () => {
 } );
 
 describe( 'Basic rendering', () => {
-	it( 'should display with required props', () => {
+	it( 'should render', () => {
 		act( () => {
-			render(
-				<LinkControl
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
 		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
-		// expect( searchInputLabel ).not.toBeNull();
 		expect( searchInput ).not.toBeNull();
-
 		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 } );
@@ -465,7 +460,7 @@ describe( 'Selecting links', () => {
 			} ], // url
 		] )( 'should display a current selected link UI when a %s suggestion for the search "%s" is clicked', async ( type, searchTerm, selectedLink ) => {
 			const LinkControlConsumer = () => {
-				const [ link, setLink ] = useState( null );
+				const [ link, setLink ] = useState();
 
 				return (
 					<LinkControl
@@ -524,7 +519,7 @@ describe( 'Selecting links', () => {
 			} ], // url
 		] )( 'should display a current selected link UI when an %s suggestion for the search "%s" is selected using the keyboard', async ( type, searchTerm, selectedLink ) => {
 			const LinkControlConsumer = () => {
-				const [ link, setLink ] = useState( null );
+				const [ link, setLink ] = useState();
 
 				return (
 					<LinkControl

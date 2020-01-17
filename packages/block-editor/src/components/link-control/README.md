@@ -5,7 +5,7 @@
 ### value
 
 - Type: `Object`
-- Required: Yes
+- Required: No
 
 ### settings
 
