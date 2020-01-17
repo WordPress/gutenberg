@@ -99,6 +99,9 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         case .deviceCamera:
             print("Gutenberg did request a device media picker, opening the camera picker")
             pickAndUpload(from: .camera, filter: currentFilter, callback: callback)
+        case .mediaEditor:
+            print("Gutenberg did request a media editor, opening the media editor")
+            // Open Media Editor here
         default: break
         }
     }

@@ -52,6 +52,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MEDIA_SOURCE_MEDIA_LIBRARY = "SITE_MEDIA_LIBRARY";
     private static final String MEDIA_SOURCE_DEVICE_LIBRARY = "DEVICE_MEDIA_LIBRARY";
     private static final String MEDIA_SOURCE_DEVICE_CAMERA = "DEVICE_CAMERA";
+    private static final String MEDIA_SOURCE_MEDIA_EDITOR = "MEDIA_EDITOR";
 
 
     public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,
@@ -118,6 +119,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection, mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_CAMERA)) {
             mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(getNewUploadMediaCallback(false, onUploadMediaSelected), mediaType);
+        } else if (mediaSource.equals(MEDIA_SOURCE_MEDIA_EDITOR)) {
+            // Open Media Editor
         } else {
             mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection);
         }
