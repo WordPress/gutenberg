@@ -147,7 +147,7 @@ class ButtonEdit extends Component {
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,
 		// because `AztecView` is calculating a `minWidth` based on placeholder text.
-		const placeholderText = isFocused ? '' : ( placeholder || __( 'Add text…' ) );
+		const placeholderText = isFocused || ( ! isFocused && text && text !== '' ) ? '' : ( placeholder || __( 'Add text…' ) );
 
 		return (
 			<View
