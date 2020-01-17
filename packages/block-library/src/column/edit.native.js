@@ -2,7 +2,7 @@
 /**
  * External dependencies
  */
-import { View, Dimensions } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -26,35 +26,36 @@ function ColumnEdit( {
 	isParentSelected,
 	isDescendantOfParentSelected,
 	columnsCount,
+	columnsContainerWidth,
 	isSmallScreen,
 	isLargeScreen,
 	isMediumScreen,
 } ) {
 	const columnContainerBaseWidth = styles[ 'column-container-base' ].maxWidth;
 
-	const screenWidth = Dimensions.get( 'window' ).width;
-	const containerWidth = styles[ 'columns-container' ].maxWidth;
-	const minWidth = Math.min( screenWidth, containerWidth );
+	const containerWidth = columnsContainerWidth || styles[ 'columns-container' ].maxWidth;
+
+	const containerMaxWidth = styles[ 'columns-container' ].maxWidth;
+	const minWidth = Math.min( containerWidth, columnContainerBaseWidth );
 
 	const getColumnsInRow = ( columnsNumber ) => {
-		if ( isSmallScreen ) {
+		if ( isSmallScreen || minWidth < 480 ) {
 			return 1;
 		}
-		if ( isMediumScreen && ( ! isLargeScreen || minWidth <= containerWidth ) ) {
+		if ( isMediumScreen && ( ! isLargeScreen || minWidth <= containerMaxWidth ) ) {
 			return 2;
 		}
 		return columnsNumber;
 	};
 
 	const columnsInRow = getColumnsInRow( columnsCount );
-	const columnBaseWidth = columnContainerBaseWidth / columnsInRow;
-	console.log( columnBaseWidth, columnsInRow );
+	const columnBaseWidth = minWidth / columnsInRow;
 
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
 			<View style={ [
 				getStylesFromColorScheme( styles.columnPlaceholder, styles.columnPlaceholderDark ),
-				! isSmallScreen ? { width: columnBaseWidth - ( isParentSelected ? 24 : isDescendantOfParentSelected ? 28 : 32 ) } : {},
+				! isSmallScreen ? { width: columnBaseWidth - ( isParentSelected ? 24 : isDescendantOfParentSelected ? 28 : columnsInRow === 1 ? 12 : 32 ) } : {},
 				{ ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
 			] } />
 		);
@@ -88,8 +89,7 @@ export default compose( [
 
 		const parentBlock = getBlock( parentId );
 		const columnsCount = parentBlock && parentBlock.innerBlocks.length;
-
-		console.log( parentBlock );
+		const columnsContainerWidth = parentBlock && parentBlock.attributes.width;
 
 		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parentId;
 
@@ -101,6 +101,7 @@ export default compose( [
 			isParentSelected,
 			isSelected,
 			columnsCount,
+			columnsContainerWidth,
 			isDescendantOfParentSelected,
 		};
 	} ),

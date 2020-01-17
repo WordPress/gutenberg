@@ -4,6 +4,9 @@
 	"attributes": {
 		"verticalAlignment": {
 			"type": "string"
+		},
+		"width": {
+			"type": "number"
 		}
 	}
 }

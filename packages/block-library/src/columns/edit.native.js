@@ -18,14 +18,13 @@ import {
 	InspectorControls,
 	InnerBlocks,
 	BlockControls,
-	// __experimentalBlockPatternPicker,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
 import {
 	withDispatch,
-	// useDispatch,
 	useSelect,
 } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -66,18 +65,23 @@ const MAX_COLUMNS_NUMBER = 6;
 
 function ColumnsEditContainer( {
 	attributes,
+	setAttributes,
 	updateAlignment,
 	updateColumns,
 	clientId,
 	isSmallScreen,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { verticalAlignment, width } = attributes;
 
 	const { count } = useSelect( ( select ) => {
 		return {
 			count: select( 'core/block-editor' ).getBlockCount( clientId ),
 		};
 	} );
+
+	useEffect( () => {
+		updateColumns( count, DEFAULT_COLUMNS );
+	}, [] );
 
 	return (
 		<>
@@ -99,7 +103,7 @@ function ColumnsEditContainer( {
 					<ToolbarButton
 						title={ __( 'ColumnsButton' ) }
 						icon={ <Icon width={ 20 } height={ 20 } /> }
-						onClick={ () => console.log( 'click' ) }
+						onClick={ () => {} }
 					/>
 				</Toolbar>
 				<BlockVerticalAlignmentToolbar
@@ -107,10 +111,17 @@ function ColumnsEditContainer( {
 					value={ verticalAlignment }
 				/>
 			</BlockControls>
-			<InnerBlocks
-				containerStyle={ ! isSmallScreen ? styles.columnsContainer : undefined }
-				allowedBlocks={ ALLOWED_BLOCKS }
-			/>
+			<View onLayout={ ( event ) => {
+				const { width: newWidth } = event.nativeEvent.layout;
+				if ( newWidth !== width ) {
+					setAttributes( { width: newWidth } );
+				}
+			} }>
+				<InnerBlocks
+					containerStyle={ ! isSmallScreen ? styles.columnsContainer : undefined }
+					allowedBlocks={ ALLOWED_BLOCKS }
+				/>
+			</View>
 		</>
 	);
 }
