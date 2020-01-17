@@ -37,7 +37,7 @@ module.exports = {
 		'<rootDir>/gutenberg/gutenberg-mobile',
 		'react-native-aztec-old-submodule',
 	],
-	moduleDirectories: [ 'node_modules', 'symlinked-packages' ],
+	moduleDirectories: [ 'node_modules' ],
 	moduleNameMapper: {
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
 		'\\.(scss)$': '<rootDir>/gutenberg/test/native/__mocks__/styleMock.js',
