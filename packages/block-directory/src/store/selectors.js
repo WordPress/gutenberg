@@ -48,5 +48,5 @@ export function hasInstallBlocksPermission( state ) {
  * @return {Array} Block type items.
  */
 export function getInstalledBlockTypes( state ) {
-	return get( state, [ 'downloadableBlocks', 'installedBlockTypes' ], [] );
+	return get( state, [ 'blockManagement', 'installedBlockTypes' ], [] );
 }
