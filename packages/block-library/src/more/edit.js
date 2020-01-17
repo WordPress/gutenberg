@@ -53,8 +53,8 @@ export default class MoreEdit extends Component {
 		const toggleHideExcerpt = () => setAttributes( { noTeaser: ! noTeaser } );
 		const { defaultText } = this.state;
 		const value = customText !== undefined ? customText : defaultText;
-		const inputLength = value.length + 1;
-		const currentWidth = { width: inputLength + 1 + 'em' };
+		const inputLength = value.length + 1.2;
+		const currentWidth = { width: inputLength + 'em' };
 
 		return (
 			<>
@@ -72,7 +72,6 @@ export default class MoreEdit extends Component {
 					<input
 						type="text"
 						value={ value }
-						size={ inputLength }
 						onChange={ this.onChangeInput }
 						onKeyDown={ this.onKeyDown }
 						style={ currentWidth }
