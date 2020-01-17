@@ -15,7 +15,7 @@ describe( 'selectors', () => {
 			expect( installedBlockTypes ).toEqual( [] );
 		} );
 
-		it( 'should retrieve the blocks types that are installed', () => {
+		it( 'should retrieve the block types that are installed', () => {
 			const blockTypes = [ 'fake-type' ];
 			const state = {
 				blockManagement: {
