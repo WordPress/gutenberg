@@ -386,8 +386,9 @@
 	cursor: text;
 
 	// Hide the inserter above the selected block.
-	&.is-inserter-hidden {
+	&.is-inserter-hidden .block-editor-inserter__toggle {
 		opacity: 0;
+		pointer-events: none;
 	}
 }
 

@@ -232,6 +232,26 @@ exports[`Writing Flow should not delete surrounding space when deleting a word w
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should not have a dead zone between blocks (lower) 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>23</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Writing Flow should not have a dead zone between blocks (upper) 1`] = `
+"<!-- wp:paragraph -->
+<p>13</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Writing Flow should not prematurely multi-select 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>
