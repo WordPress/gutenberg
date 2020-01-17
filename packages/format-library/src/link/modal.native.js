@@ -199,11 +199,13 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectedBlock = selectedBlockClientId && getBlock( selectedBlockClientId );
+		const selectedBlockAttributes = ( selectedBlock && selectedBlock.attributes ) || {};
+		const isSelectedButtonBlock = selectedBlock && selectedBlock.name === 'core/button';
 
 		return {
 			selectedBlockClientId,
-			selectedBlockAttributes: selectedBlock.attributes,
-			isSelectedButtonBlock: selectedBlock.name === 'core/button',
+			selectedBlockAttributes,
+			isSelectedButtonBlock,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
