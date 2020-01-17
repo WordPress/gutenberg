@@ -4,6 +4,7 @@
 import React from 'react';
 import {
 	requestMediaPicker,
+	requestMediaEditor,
 	mediaSources,
 } from 'react-native-gutenberg-bridge';
 
@@ -54,11 +55,19 @@ export class MediaEdit extends React.Component {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
 		const mediaSource = this.getMediaOptionsItems().filter( ( source ) => source.value === value ).shift();
 		const types = allowedTypes.filter( ( type ) => mediaSource.types.includes( type ) );
-		requestMediaPicker( mediaSource.id, types, multiple, ( media ) => {
+		const mediaCallback = ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
 				onSelect( media );
 			}
-		} );
+		}
+
+		switch ( value ) {
+			case mediaSources.mediaEditor:
+			requestMediaEditor( this.props.source.uri, mediaCallback );
+				break;
+			default:
+				requestMediaPicker( mediaSource.id, types, multiple, mediaCallback );
+		}
 	}
 
 	render() {

@@ -474,6 +474,7 @@ export class ImageEdit extends React.Component {
 										{ ! isUploadInProgress && ! isUploadFailed && finalWidth && finalHeight && showMediaEditorButton &&
 											<MediaEdit allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 												onSelect={ this.onSelectMediaUploadOption }
+												source={ { uri: url } }
 												render={ ( { open, mediaOptions } ) => {
 													return editImageComponent( open, mediaOptions );
 												} }
