@@ -78,3 +78,7 @@
 .block-editor-block-mover__description {
 	display: none;
 }
+
+.block-editor-block-mover.is-horizontal .block-editor-block-mover__control-drag-handle {
+	display: none;
+}

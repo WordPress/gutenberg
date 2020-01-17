@@ -49,7 +49,6 @@ function BlockPopover( {
 	moverDirection,
 	isEmptyDefaultBlock,
 	capturingClientId,
-	hasMovers = true,
 } ) {
 	const {
 		isNavigationMode,
@@ -120,7 +119,7 @@ function BlockPopover( {
 			animate={ false }
 			position={ popoverPosition }
 			focusOnMount={ false }
-			anchorRef={ node.lastChild }
+			anchorRef={ node }
 			className="block-editor-block-list__block-popover"
 			__unstableSticky={ showEmptyBlockSideInserter ? false : popoverIsSticky }
 			__unstableSlotName="block-toolbar"
@@ -128,6 +127,7 @@ function BlockPopover( {
 			__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && node }
 			__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && node }
 			onBlur={ () => setIsToolbarForced( false ) }
+			shouldAnchorIncludePadding
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
@@ -155,12 +155,13 @@ function BlockPopover( {
 					focusOnMount={ isToolbarForced }
 					data-type={ name }
 					data-align={ align }
-					hasMovers={ hasMovers }
 				/>
 			) }
 			{ shouldShowBreadcrumb && (
 				<BlockBreadcrumb
 					clientId={ clientId }
+					rootClientId={ rootClientId }
+					moverDirection={ moverDirection }
 					data-align={ align }
 				/>
 			) }

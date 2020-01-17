@@ -21,9 +21,9 @@ import {
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
-	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
 	withSelect,
@@ -45,36 +45,9 @@ import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context } from './root-container';
 
-/**
- * A debounced version of getAccessibleBlockLabel, avoids unnecessary updates to the aria-label attribute
- * when typing in some blocks, like the paragraph.
- *
- * @param {Object} blockType      The block type object representing the block's definition.
- * @param {Object} attributes     The block's attribute values.
- * @param {number} index          The index of the block in the block list.
- * @param {string} moverDirection A string representing whether the movers are displayed vertically or horizontally.
- * @param {number} delay          The debounce delay.
- */
-const useDebouncedAccessibleBlockLabel = ( blockType, attributes, index, moverDirection, delay ) => {
-	const [ blockLabel, setBlockLabel ] = useState( '' );
-
-	useEffect( () => {
-		const timeoutId = setTimeout( () => {
-			setBlockLabel( getAccessibleBlockLabel( blockType, attributes, index + 1, moverDirection ) );
-		}, delay );
-
-		return () => {
-			clearTimeout( timeoutId );
-		};
-	}, [ blockType, attributes, index, moverDirection, delay ] );
-
-	return blockLabel;
-};
-
 function BlockListBlock( {
 	mode,
 	isFocusMode,
-	moverDirection,
 	isLocked,
 	clientId,
 	isSelected,
@@ -87,7 +60,6 @@ function BlockListBlock( {
 	isSelectionEnabled,
 	className,
 	name,
-	index,
 	isValid,
 	attributes,
 	initialPosition,
@@ -126,15 +98,15 @@ function BlockListBlock( {
 		}
 	}, [ isSelected, isFirstMultiSelected ] );
 
-	// Reference to the block edit node
-	const blockNodeRef = useRef();
-
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
 	const onBlockError = () => setErrorState( true );
 
 	const blockType = getBlockType( name );
-	const blockAriaLabel = useDebouncedAccessibleBlockLabel( blockType, attributes, index, moverDirection, 400 );
+	const blockLabel = isFirstMultiSelected ?
+		__( 'Multiple selected blocks' ) :
+		// translators: %s: Type of block (i.e. Text, Image etc)
+		sprintf( __( 'Block: %s' ), blockType.title );
 
 	// Handing the focus of the block on creation and update
 
@@ -154,10 +126,10 @@ function BlockListBlock( {
 
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable
-			.find( blockNodeRef.current )
+			.find( wrapper.current )
 			.filter( isTextField )
 			// Exclude inner blocks
-			.filter( ( node ) => ! ignoreInnerBlocks || isInsideRootBlock( blockNodeRef.current, node ) );
+			.filter( ( node ) => ! ignoreInnerBlocks || isInsideRootBlock( wrapper.current, node ) );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
@@ -308,11 +280,14 @@ function BlockListBlock( {
 			id={ blockElementId }
 			ref={ wrapper }
 			className={ wrapperClassName }
+			data-block={ clientId }
 			data-type={ name }
 			// Only allow shortcuts when a blocks is selected and not locked.
 			onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
+			// Only allow selection to be started from a selected block.
+			onMouseLeave={ isSelected ? onMouseLeave : undefined }
 			tabIndex="0"
-			aria-label={ blockAriaLabel }
+			aria-label={ blockLabel }
 			role="group"
 			{ ...wrapperProps }
 			style={
@@ -324,29 +299,22 @@ function BlockListBlock( {
 					animationStyle
 			}
 		>
-			<div
-				ref={ blockNodeRef }
-				// Only allow selection to be started from a selected block.
-				onMouseLeave={ isSelected ? onMouseLeave : undefined }
-				data-block={ clientId }
-			>
-				<BlockCrashBoundary onError={ onBlockError }>
-					{ isValid && blockEdit }
-					{ isValid && mode === 'html' && (
-						<BlockHtml clientId={ clientId } />
-					) }
-					{ ! isValid && [
-						<BlockInvalidWarning
-							key="invalid-warning"
-							clientId={ clientId }
-						/>,
-						<div key="invalid-preview">
-							{ getSaveElement( blockType, attributes ) }
-						</div>,
-					] }
-				</BlockCrashBoundary>
-				{ !! hasError && <BlockCrashWarning /> }
-			</div>
+			<BlockCrashBoundary onError={ onBlockError }>
+				{ isValid && blockEdit }
+				{ isValid && mode === 'html' && (
+					<BlockHtml clientId={ clientId } />
+				) }
+				{ ! isValid && [
+					<BlockInvalidWarning
+						key="invalid-warning"
+						clientId={ clientId }
+					/>,
+					<div key="invalid-preview">
+						{ getSaveElement( blockType, attributes ) }
+					</div>,
+				] }
+			</BlockCrashBoundary>
+			{ !! hasError && <BlockCrashWarning /> }
 		</animated.div>
 	);
 }
@@ -365,7 +333,6 @@ const applyWithSelect = withSelect(
 			getSettings,
 			hasSelectedInnerBlock,
 			getTemplateLock,
-			getBlockIndex,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
 		} = select( 'core/block-editor' );
@@ -378,7 +345,6 @@ const applyWithSelect = withSelect(
 
 		// "ancestor" is the more appropriate label due to "deep" check
 		const isAncestorOfSelectedBlock = hasSelectedInnerBlock( clientId, checkDeep );
-		const index = getBlockIndex( clientId, rootClientId );
 
 		// The fallback to `{}` is a temporary fix.
 		// This function should never be called when a block is not present in the state.
@@ -404,7 +370,6 @@ const applyWithSelect = withSelect(
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			isNavigationMode: isNavigationMode(),
-			index,
 			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to access the block prop

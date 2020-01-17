@@ -2,23 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFunction, noop, startsWith } from 'lodash';
+import { noop, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	ExternalLink,
-	Popover,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-
-import {
-	useCallback,
-	useState,
-	Fragment,
-} from '@wordpress/element';
+import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { useCallback, useState, Fragment } from '@wordpress/element';
 
 import {
 	safeDecodeURI,
@@ -28,8 +19,8 @@ import {
 	getProtocol,
 } from '@wordpress/url';
 
-import { withInstanceId, compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -39,20 +30,22 @@ import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
 const MODE_EDIT = 'edit';
-// const MODE_SHOW = 'show';
 
 function LinkControl( {
-	className,
 	value,
 	settings,
-	fetchSearchSuggestions,
-	instanceId,
-	onClose = noop,
 	onChange = noop,
+	showInitialSuggestions,
 } ) {
-	// State
+	const instanceId = useInstanceId( LinkControl );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const [ isEditingLink, setIsEditingLink ] = useState( ! value || ! value.url );
+	const { fetchSearchSuggestions } = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return {
+			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
+		};
+	}, [] );
 
 	// Handlers
 
@@ -78,14 +71,9 @@ function LinkControl( {
 
 		// Populate input searcher whether
 		// the current link has a title.
-		if ( value && value.title && mode === 'edit' ) {
+		if ( value && value.title && MODE_EDIT === mode ) {
 			setInputValue( value.title );
 		}
-	};
-
-	const closeLinkUI = () => {
-		resetInput();
-		onClose();
 	};
 
 	const resetInput = () => {
@@ -119,9 +107,11 @@ function LinkControl( {
 		);
 	};
 
-	const handleEntitySearch = async ( val ) => {
+	const handleEntitySearch = async ( val, args ) => {
 		const results = await Promise.all( [
-			fetchSearchSuggestions( val ),
+			fetchSearchSuggestions( val, {
+				...( args.isInitialSuggestions ? { perPage: 3 } : {} ),
+			} ),
 			handleDirectEntry( val ),
 		] );
 
@@ -130,11 +120,11 @@ function LinkControl( {
 		// If it's potentially a URL search then concat on a URL search suggestion
 		// just for good measure. That way once the actual results run out we always
 		// have a URL option to fallback on.
-		return couldBeURL ? results[ 0 ].concat( results[ 1 ] ) : results[ 0 ];
+		return couldBeURL && ! args.isInitialSuggestions ? results[ 0 ].concat( results[ 1 ] ) : results[ 0 ];
 	};
 
 	// Effects
-	const getSearchHandler = useCallback( ( val ) => {
+	const getSearchHandler = useCallback( ( val, args ) => {
 		const protocol = getProtocol( val ) || '';
 		const isMailto = protocol.includes( 'mailto' );
 		const isInternal = startsWith( val, '#' );
@@ -142,20 +132,33 @@ function LinkControl( {
 
 		const handleManualEntry = isInternal || isMailto || isTel || isURL( val ) || ( val && val.includes( 'www.' ) );
 
-		return ( handleManualEntry ) ? handleDirectEntry( val ) : handleEntitySearch( val );
+		return ( handleManualEntry ) ? handleDirectEntry( val, args ) : handleEntitySearch( val, args );
 	}, [ handleDirectEntry, fetchSearchSuggestions ] );
 
 	// Render Components
-	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading } ) => {
+	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading, isInitialSuggestions } ) => {
 		const resultsListClasses = classnames( 'block-editor-link-control__search-results', {
 			'is-loading': isLoading,
 		} );
 
 		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
+		const searchResultsLabelId = isInitialSuggestions ? `block-editor-link-control-search-results-label-${ instanceId }` : undefined;
+		const labelText = isInitialSuggestions ? __( 'Recently updated' ) : sprintf( __( 'Search results for %s' ), inputValue );
+		// According to guidelines aria-label should be added if the label
+		// itself is not visible.
+		// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
+		const ariaLabel = isInitialSuggestions ? undefined : labelText;
+		const SearchResultsLabel = (
+			<span className="block-editor-link-control__search-results-label" id={ searchResultsLabelId } aria-label={ ariaLabel } >
+				{ labelText }
+			</span>
+		);
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				<div { ...suggestionsListProps } className={ resultsListClasses }>
+				{ isInitialSuggestions ? SearchResultsLabel : <VisuallyHidden>{ SearchResultsLabel }</VisuallyHidden> }
+
+				<div { ...suggestionsListProps } className={ resultsListClasses } aria-labelledby={ searchResultsLabelId }>
 					{ suggestions.map( ( suggestion, index ) => (
 						<LinkControlSearchItem
 							key={ `${ suggestion.id }-${ suggestion.type }` }
@@ -176,77 +179,56 @@ function LinkControl( {
 	};
 
 	return (
-		<Popover
-			className={ classnames( 'block-editor-link-control', className ) }
-			onClose={ closeLinkUI }
-			position="bottom center"
-			focusOnMount="firstElement"
-		>
-			<div className="block-editor-link-control__popover-inner">
-				<div className="block-editor-link-control__search">
-
-					{ ( ! isEditingLink ) && (
-						<Fragment>
-							<p className="screen-reader-text" id={ `current-link-label-${ instanceId }` }>
-								{ __( 'Currently selected' ) }:
-							</p>
-							<div
-								aria-labelledby={ `current-link-label-${ instanceId }` }
-								aria-selected="true"
-								className={ classnames( 'block-editor-link-control__search-item', {
-									'is-current': true,
-								} ) }
+		<div className="block-editor-link-control">
+			{ ( ! isEditingLink ) && (
+				<Fragment>
+					<p className="screen-reader-text" id={ `current-link-label-${ instanceId }` }>
+						{ __( 'Currently selected' ) }:
+					</p>
+					<div
+						aria-labelledby={ `current-link-label-${ instanceId }` }
+						aria-selected="true"
+						className={ classnames( 'block-editor-link-control__search-item', {
+							'is-current': true,
+						} ) }
+					>
+						<span className="block-editor-link-control__search-item-header">
+							<ExternalLink
+								className="block-editor-link-control__search-item-title"
+								href={ value.url }
 							>
-								<span className="block-editor-link-control__search-item-header">
-									<ExternalLink
-										className="block-editor-link-control__search-item-title"
-										href={ value.url }
-									>
-										{ value.title }
-									</ExternalLink>
-									<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( value.url ) ) || '' }</span>
-								</span>
+								{ value.title }
+							</ExternalLink>
+							<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( value.url ) ) || '' }</span>
+						</span>
 
-								<Button isSecondary onClick={ setMode( MODE_EDIT ) } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
-									{ __( 'Edit' ) }
-								</Button>
-							</div>
-						</Fragment>
-					) }
+						<Button isSecondary onClick={ setMode( MODE_EDIT ) } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
+							{ __( 'Edit' ) }
+						</Button>
+					</div>
+				</Fragment>
+			) }
 
-					{ isEditingLink && (
-						<LinkControlSearchInput
-							value={ inputValue }
-							onChange={ onInputChange }
-							onSelect={ ( suggestion ) => {
-								setIsEditingLink( false );
-								onChange( { ...value, ...suggestion } );
-							} }
-							renderSuggestions={ renderSearchResults }
-							fetchSuggestions={ getSearchHandler }
-							onReset={ resetInput }
-						/>
-					) }
+			{ isEditingLink && (
+				<LinkControlSearchInput
+					value={ inputValue }
+					onChange={ onInputChange }
+					onSelect={ ( suggestion ) => {
+						setIsEditingLink( false );
+						onChange( { ...value, ...suggestion } );
+					} }
+					renderSuggestions={ renderSearchResults }
+					fetchSuggestions={ getSearchHandler }
+					onReset={ resetInput }
+					showInitialSuggestions={ showInitialSuggestions }
+				/>
+			) }
 
-					{ ! isEditingLink && (
-						<LinkControlSettingsDrawer value={ value } settings={ settings } onChange={ onChange } />
-					) }
-				</div>
-			</div>
-		</Popover>
+			{ ! isEditingLink && (
+				<LinkControlSettingsDrawer value={ value } settings={ settings } onChange={ onChange } />
+			) }
+		</div>
 	);
 }
 
-export default compose(
-	withInstanceId,
-	withSelect( ( select, ownProps ) => {
-		if ( ownProps.fetchSearchSuggestions && isFunction( ownProps.fetchSearchSuggestions ) ) {
-			return;
-		}
-
-		const { getSettings } = select( 'core/block-editor' );
-		return {
-			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
-		};
-	} )
-)( LinkControl );
+export default LinkControl;

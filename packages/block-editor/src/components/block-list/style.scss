@@ -57,10 +57,6 @@
 	// Break long strings of text without spaces so they don't overflow the block.
 	overflow-wrap: break-word;
 
-	[data-block] {
-		position: relative;
-	}
-
 	/**
 	 * Notices
 	 */
@@ -169,17 +165,15 @@
 	// When selecting multiple blocks, we provide an additional selection indicator.
 	.block-editor-block-list__block.is-multi-selected {
 		// Show selection borders around every non-nested block's actual footprint.
-		> [data-block] {
-			box-shadow: 0 0 0 2px $blue-medium-focus;
-			border-radius: 1px;
+		box-shadow: 0 0 0 2px $blue-medium-focus;
+		border-radius: 1px;
 
-			// Windows High Contrast mode will show this outline.
-			outline: 2px solid transparent;
+		// Windows High Contrast mode will show this outline.
+		outline: 2px solid transparent;
 
-			// Show a lighter blue for dark themes.
-			.is-dark-theme & {
-				box-shadow: 0 0 0 2px $blue-medium-focus-dark;
-			}
+		// Show a lighter blue for dark themes.
+		.is-dark-theme & {
+			box-shadow: 0 0 0 2px $blue-medium-focus-dark;
 		}
 
 		// Provide exceptions for placeholders.
@@ -202,7 +196,7 @@
 	}
 
 	// Warnings
-	&.has-warning [data-block] {
+	&.has-warning {
 		// When a block has a warning, you shouldn't be able to manipulate the contents.
 		> * {
 			pointer-events: none;
@@ -289,10 +283,6 @@
 	&[data-align="right"] {
 		// Without z-index, won't be clickable as "above" adjacent content.
 		z-index: z-index(".block-editor-block-list__block {core/image aligned left or right}");
-		width: 100%;
-
-		// When images are floated, the block itself should collapse to zero height.
-		height: 0;
 
 		&::before {
 			content: none;
@@ -302,23 +292,19 @@
 	// Left.
 	&[data-align="left"] {
 		// This is in the editor only; the image should be floated on the frontend.
-		> [data-block] {
-			/*!rtl:begin:ignore*/
-			float: left;
-			margin-right: 2em;
-			/*!rtl:end:ignore*/
-		}
+		/*!rtl:begin:ignore*/
+		float: left;
+		margin-right: 2em;
+		/*!rtl:end:ignore*/
 	}
 
 	// Right.
 	&[data-align="right"] {
 		// Right: This is in the editor only; the image should be floated on the frontend.
-		> [data-block] {
-			/*!rtl:begin:ignore*/
-			float: right;
-			margin-left: 2em;
-			/*!rtl:end:ignore*/
-		}
+		/*!rtl:begin:ignore*/
+		float: right;
+		margin-left: 2em;
+		/*!rtl:end:ignore*/
 	}
 
 	// Wide and full-wide.

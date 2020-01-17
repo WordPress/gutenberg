@@ -15,6 +15,7 @@ import {
 	KeyboardShortcuts,
 	PanelBody,
 	Path,
+	Popover,
 	SVG,
 	TextareaControl,
 	TextControl,
@@ -164,21 +165,24 @@ function NavigationLinkEdit( {
 						] }
 					/>
 					{ isLinkOpen && (
-						<LinkControl
-							className="wp-block-navigation-link__inline-link-input"
-							value={ link }
-							onChange={ ( {
-								title: newTitle = '',
-								url: newURL = '',
-								opensInNewTab: newOpensInNewTab,
-							} = {} ) => setAttributes( {
-								title: escape( newTitle ),
-								url: newURL,
-								label: label || escape( newTitle ),
-								opensInNewTab: newOpensInNewTab,
-							} ) }
-							onClose={ () => setIsLinkOpen( false ) }
-						/>
+						<Popover position="bottom center">
+							<LinkControl
+								className="wp-block-navigation-link__inline-link-input"
+								value={ link }
+								showInitialSuggestions={ true }
+								onChange={ ( {
+									title: newTitle = '',
+									url: newURL = '',
+									opensInNewTab: newOpensInNewTab,
+								} = {} ) => setAttributes( {
+									title: escape( newTitle ),
+									url: encodeURI( newURL ),
+									label: label || escape( newTitle ),
+									opensInNewTab: newOpensInNewTab,
+								} ) }
+								onClose={ () => setIsLinkOpen( false ) }
+							/>
+						</Popover>
 					) }
 				</div>
 				<InnerBlocks
@@ -198,6 +202,7 @@ export default compose( [
 		return {
 			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
 			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
+
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {

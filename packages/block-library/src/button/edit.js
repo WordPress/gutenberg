@@ -25,6 +25,7 @@ import {
 	withFallbackStyles,
 	ToolbarButton,
 	ToolbarGroup,
+	Popover,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -96,23 +97,25 @@ function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onTo
 		setIsURLPickerOpen( true );
 	};
 	const linkControl = isURLPickerOpen && (
-		<LinkControl
-			className="wp-block-navigation-link__inline-link-input"
-			value={ { url, title, opensInNewTab } }
-			onChange={ ( { title: newTitle = '', url: newURL = '', opensInNewTab: newOpensInNewTab } ) => {
-				setAttributes( {
-					title: escape( newTitle ),
-					url: newURL,
-				} );
+		<Popover position="bottom center">
+			<LinkControl
+				className="wp-block-navigation-link__inline-link-input"
+				value={ { url, title, opensInNewTab } }
+				onChange={ ( { title: newTitle = '', url: newURL = '', opensInNewTab: newOpensInNewTab } ) => {
+					setAttributes( {
+						title: escape( newTitle ),
+						url: newURL,
+					} );
 
-				if ( opensInNewTab !== newOpensInNewTab ) {
-					onToggleOpenInNewTab( newOpensInNewTab );
-				}
-			} }
-			onClose={ () => {
-				setIsURLPickerOpen( false );
-			} }
-		/>
+					if ( opensInNewTab !== newOpensInNewTab ) {
+						onToggleOpenInNewTab( newOpensInNewTab );
+					}
+				} }
+				onClose={ () => {
+					setIsURLPickerOpen( false );
+				} }
+			/>
+		</Popover>
 	);
 	return (
 		<>

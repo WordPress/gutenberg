@@ -27,7 +27,6 @@ import {
 	isBlockFocusStop,
 	isInSameBlock,
 	hasInnerBlocksContext,
-	getBlockFocusableWrapper,
 	isInsideRootBlock,
 	getBlockDOMNode,
 	getBlockClientId,
@@ -329,7 +328,7 @@ export default function WritingFlow( { children } ) {
 					event.preventDefault();
 					selectBlock( focusedBlockUid );
 				} else if ( isTab && selectedBlockClientId ) {
-					const wrapper = getBlockFocusableWrapper( selectedBlockClientId );
+					const wrapper = getBlockDOMNode( selectedBlockClientId );
 					let nextTabbable;
 
 					if ( navigateDown ) {
@@ -349,7 +348,7 @@ export default function WritingFlow( { children } ) {
 			return;
 		}
 
-		const clientId = selectedBlockClientId || selectionStartClientId;
+		const clientId = selectedBlockClientId || selectedFirstClientId;
 
 		// In Edit mode, Tab should focus the first tabbable element after the
 		// content, which is normally the sidebar (with block controls) and
@@ -358,7 +357,7 @@ export default function WritingFlow( { children } ) {
 		// Arrow keys can be used, and Tab and arrow keys can be used in
 		// Navigation mode (press Esc), to navigate through blocks.
 		if ( clientId ) {
-			const wrapper = getBlockFocusableWrapper( clientId );
+			const wrapper = getBlockDOMNode( clientId );
 
 			if ( isTab ) {
 				if ( isShift ) {
@@ -372,8 +371,9 @@ export default function WritingFlow( { children } ) {
 					}
 				} else {
 					const tabbables = focus.tabbable.find( wrapper );
+					const lastTabbable = last( tabbables ) || wrapper;
 
-					if ( target === last( tabbables ) ) {
+					if ( target === lastTabbable ) {
 						// See comment above.
 						noCapture.current = true;
 						focusCaptureAfterRef.current.focus();
@@ -486,7 +486,7 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	const selectedClientId = selectedBlockClientId || selectionStartClientId;
+	const selectedClientId = selectedBlockClientId || selectedFirstClientId;
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.

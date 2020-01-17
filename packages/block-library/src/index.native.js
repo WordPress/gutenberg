@@ -151,6 +151,7 @@ export const registerCoreBlocks = () => {
 		devOnly( group ),
 		devOnly( button ),
 		spacer,
+		shortcode,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

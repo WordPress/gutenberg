@@ -42,10 +42,6 @@ function Header() {
 
 	return (
 		<div className="edit-post-header">
-			<div className="edit-post-header__toolbar">
-				<FullscreenModeClose />
-				<HeaderToolbar />
-			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
@@ -76,6 +72,10 @@ function Header() {
 				/>
 				<PinnedPlugins.Slot />
 				<MoreMenu />
+			</div>
+			<div className="edit-post-header__toolbar">
+				<FullscreenModeClose />
+				<HeaderToolbar />
 			</div>
 		</div>
 	);

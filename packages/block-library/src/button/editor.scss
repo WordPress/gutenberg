@@ -1,10 +1,8 @@
 .block-editor-block-list__block[data-type="core/button"] {
 	&[data-align="center"] {
 		text-align: center;
-		div[data-block] {
-			margin-left: auto;
-			margin-right: auto;
-		}
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	&[data-align="right"] {
@@ -76,6 +74,6 @@
 }
 
 // Display "table" is used because the button container should only wrap the content and not takes the full width.
-div[data-type="core/button"] div[data-block] {
+div[data-type="core/button"] {
 	display: table;
 }
