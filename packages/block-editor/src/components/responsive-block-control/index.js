@@ -95,14 +95,14 @@ function ResponsiveBlockControl( props ) {
 				/>
 
 				{ ! isResponsive && (
-					<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--default">
+					<div className="block-editor-responsive-block-control__group">
 						{ defaultControl }
 					</div>
 				) }
 
 				{ isResponsive && (
 					<div
-						className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--responsive"
+						className="block-editor-responsive-block-control__group is-responsive"
 						hidden={ ! isResponsive }
 					>
 						{ renderResponsiveControls
