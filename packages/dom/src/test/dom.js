@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isHorizontalEdge, placeCaretAtHorizontalEdge, isTextField, stripHTML } from '../dom';
+import { isHorizontalEdge, placeCaretAtHorizontalEdge, isTextField, __unstableStripHTML as stripHTML } from '../dom';
 
 describe( 'DOM', () => {
 	let parent;
