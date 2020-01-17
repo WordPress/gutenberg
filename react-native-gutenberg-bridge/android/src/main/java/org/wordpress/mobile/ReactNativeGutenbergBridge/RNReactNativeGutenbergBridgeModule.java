@@ -119,8 +119,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection, mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_CAMERA)) {
             mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(getNewUploadMediaCallback(false, onUploadMediaSelected), mediaType);
-        } else if (mediaSource.equals(MEDIA_SOURCE_MEDIA_EDITOR)) {
-            // Open Media Editor
         } else {
             mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection);
         }
@@ -171,6 +169,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void requestImageFullscreenPreview(String mediaUrl) {
         mGutenbergBridgeJS2Parent.requestImageFullscreenPreview(mediaUrl);
+    }
+
+    @ReactMethod
+    public void requestMediaEditor(String mediaUrl, final Callback onUploadMediaSelected) {
+        mGutenbergBridgeJS2Parent.requestMediaEditor(getNewUploadMediaCallback(false, onUploadMediaSelected), mediaUrl);
     }
 
     @ReactMethod
