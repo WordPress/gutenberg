@@ -59,11 +59,11 @@ export class MediaEdit extends React.Component {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
 				onSelect( media );
 			}
-		}
+		};
 
 		switch ( value ) {
 			case mediaSources.mediaEditor:
-			requestMediaEditor( this.props.source.uri, mediaCallback );
+				requestMediaEditor( this.props.source.uri, mediaCallback );
 				break;
 			default:
 				requestMediaPicker( mediaSource.id, types, multiple, mediaCallback );
