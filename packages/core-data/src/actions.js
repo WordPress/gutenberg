@@ -357,28 +357,34 @@ export function* saveEntityRecord(
 				}
 			}
 
-			// We perform an optimistic update here to clear all the edits that
-			// will be persisted so that if the server filters them, the new
-			// filtered values are always accepted.
-			persistedEntity = yield select(
-				'getEntityRecord',
-				kind,
-				name,
-				recordId
-			);
-			currentEdits = yield select(
-				'getEntityRecordEdits',
-				kind,
-				name,
-				recordId
-			);
-			yield receiveEntityRecords( kind, name, { ...persistedEntity, ...data }, undefined, true );
+			/*
+				// the code below issues an API fetch action against the server and gets the outdates pre-modification state of the record
+				// and since getEntityRecord calls receiveEntityRecords, this outdated state is rendered to the user, causing an unstable (flickering)
+				// intermediate UI state
+
+				//////// disabled //////////
+					// We perform an optimistic update here to clear all the edits that
+					// will be persisted so that if the server filters them, the new
+					// filtered values are always accepted.
+					persistedEntity = yield select(
+						'getEntityRecord',
+						kind,
+						name,
+						recordId
+					);
+				//////// disabled //////////
+			*/
+
+			// optimistic update subscribers (eg trigger re-renders) with the modifications applied to the record
+			// and on their way to be persisted on the server
+			yield receiveEntityRecords( kind, name, { ...data }, undefined, true );
 
 			updatedRecord = yield apiFetch( {
 				path,
 				method: recordId ? 'PUT' : 'POST',
 				data,
 			} );
+
 			yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
 		}
 	} catch ( _error ) {
