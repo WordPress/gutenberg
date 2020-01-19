@@ -57,6 +57,15 @@ export function* getEntityRecord( kind, name, key = '' ) {
 	yield receiveEntityRecords( kind, name, record );
 }
 
+getEntityRecord.shouldInvalidate = ( action, kind, name ) => {
+	return (
+		action.type === 'RECEIVE_ITEM' &&
+		action.invalidateCache &&
+		kind === action.kind &&
+		name === action.name
+	);
+};
+
 /**
  * Requests the entity's records from the REST API.
  *

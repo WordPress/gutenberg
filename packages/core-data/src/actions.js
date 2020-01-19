@@ -7,7 +7,9 @@ import { castArray, get, isEqual, find } from 'lodash';
  * Internal dependencies
  */
 import {
+	receiveItem,
 	receiveItems,
+	receiveQueriedItem,
 	receiveQueriedItems,
 } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
@@ -68,19 +70,34 @@ export function addEntities( entities ) {
  *
  * @return {Object} Action object.
  */
-export function receiveEntityRecords( kind, name, records, query, invalidateCache = false ) {
+export function receiveEntityRecords(
+	kind,
+	name,
+	records,
+	query,
+	invalidateCache = false
+) {
+	const recordsArray = castArray( records );
+
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
-		records = castArray( records ).map( ( record ) =>
+		records = recordsArray.map( ( record ) =>
 			record.status === 'auto-draft' ? { ...record, title: '' } : record
 		);
 	}
+
 	let action;
 	if ( query ) {
-		action = receiveQueriedItems( records, query );
+		action =
+			recordsArray.length === 1 ?
+				receiveQueriedItem( recordsArray[ 0 ], query ) :
+				receiveQueriedItems( recordsArray, query );
 	} else {
-		action = receiveItems( records );
+		action =
+			recordsArray.length === 1 ?
+				receiveItem( recordsArray[ 0 ], query ) :
+				receiveItems( recordsArray, query );
 	}
 
 	return {
@@ -138,7 +155,9 @@ export function receiveEmbedPreview( url, preview ) {
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 	const entity = yield select( 'getEntity', kind, name );
 	if ( ! entity ) {
-		throw new Error( `The entity being edited (${ kind }, ${ name }) does not have a loaded config.` );
+		throw new Error(
+			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
+		);
 	}
 	const { transientEdits = {}, mergedEdits = {} } = entity;
 	const record = yield select( 'getRawEntityRecord', kind, name, recordId );
@@ -348,7 +367,11 @@ export function* saveEntityRecord(
 			// Auto drafts should be converted to drafts on explicit saves and we should not respect their default title,
 			// but some plugins break with this behavior so we can't filter it on the server.
 			let data = record;
-			if ( kind === 'postType' && persistedRecord && persistedRecord.status === 'auto-draft' ) {
+			if (
+				kind === 'postType' &&
+				persistedRecord &&
+				persistedRecord.status === 'auto-draft'
+			) {
 				if ( ! data.status ) {
 					data = { ...data, status: 'draft' };
 				}
@@ -360,19 +383,15 @@ export function* saveEntityRecord(
 			// We perform an optimistic update here to clear all the edits that
 			// will be persisted so that if the server filters them, the new
 			// filtered values are always accepted.
-			persistedEntity = yield select(
-				'getEntityRecord',
+			persistedEntity = yield select( 'getEntityRecord', kind, name, recordId );
+			currentEdits = yield select( 'getEntityRecordEdits', kind, name, recordId );
+			yield receiveEntityRecords(
 				kind,
 				name,
-				recordId
+				{ ...persistedEntity, ...data },
+				undefined,
+				true
 			);
-			currentEdits = yield select(
-				'getEntityRecordEdits',
-				kind,
-				name,
-				recordId
-			);
-			yield receiveEntityRecords( kind, name, { ...persistedEntity, ...data }, undefined, true );
 
 			updatedRecord = yield apiFetch( {
 				path,

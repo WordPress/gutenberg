@@ -69,9 +69,9 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
  * @return {Object} Next state.
  */
 function items( state = {}, action ) {
+	const key = action.key || DEFAULT_ENTITY_KEY;
 	switch ( action.type ) {
 		case 'RECEIVE_ITEMS':
-			const key = action.key || DEFAULT_ENTITY_KEY;
 			return {
 				...state,
 				...action.items.reduce( ( accumulator, value ) => {
@@ -79,6 +79,13 @@ function items( state = {}, action ) {
 					accumulator[ itemId ] = conservativeMapItem( state[ itemId ], value );
 					return accumulator;
 				}, {} ),
+			};
+		case 'RECEIVE_ITEM':
+			const item = action.item;
+			const itemId = item[ key ];
+			return {
+				...state,
+				[ itemId ]: conservativeMapItem( state[ itemId ], item ),
 			};
 	}
 
