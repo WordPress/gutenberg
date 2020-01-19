@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { EntityProvider } from '@wordpress/core-data';
 import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
@@ -10,27 +9,26 @@ import { InnerBlocks } from '@wordpress/block-editor';
  */
 import PostPlaceholder from './placeholder';
 
-export default function PostEdit( { attributes: { postId }, setAttributes } ) {
+export default function PostEdit( {
+	attributes: { postType, postId },
+	setAttributes,
+} ) {
 	const loaded = useSelect(
 		( select ) => {
-			if ( ! postId ) {
+			if ( ! postType || ! postId ) {
 				return false;
 			}
 			return Boolean(
-				select( 'core' ).getEntityRecord( 'postType', 'post', postId )
+				select( 'core' ).getEntityRecord( 'postType', postType, postId )
 			);
 		},
-		[ postId ]
+		[ postType, postId ]
 	);
-	if ( postId ) {
+	if ( postType && postId ) {
 		if ( ! loaded ) {
 			return null;
 		}
-		return (
-			<EntityProvider kind="postType" type="post" id={ postId }>
-				<InnerBlocks />
-			</EntityProvider>
-		);
+		return <InnerBlocks />;
 	}
 	return <PostPlaceholder setAttributes={ setAttributes } />;
 }

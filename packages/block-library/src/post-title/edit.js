@@ -1,12 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { useEntityProp, useEntityId } from '@wordpress/core-data';
+import { useEntityProp } from '@wordpress/core-data';
 import { RichText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-function PostTitleInput() {
-	const [ title, setTitle ] = useEntityProp( 'postType', 'post', 'title' );
+function PostTitleInput( { postType, postId } ) {
+	const [ title, setTitle ] = useEntityProp(
+		'postType',
+		postType,
+		'title',
+		postId
+	);
 	return (
 		<RichText
 			tagName="h2"
@@ -18,10 +23,10 @@ function PostTitleInput() {
 	);
 }
 
-export default function PostTitleEdit() {
-	if ( ! useEntityId( 'postType', 'post' ) ) {
+export default function PostTitleEdit( { context: { postType, postId } } ) {
+	if ( ! postType || ! postId ) {
 		return 'Post Title Placeholder';
 	}
 
-	return <PostTitleInput />;
+	return <PostTitleInput postType={ postType } postId={ postId } />;
 }

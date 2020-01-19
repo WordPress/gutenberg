@@ -1,4 +1,14 @@
 {
 	"name": "core/post",
-	"category": "layout"
+	"category": "layout",
+	"attributes": {
+		"postType": {
+			"type": "string",
+			"context": true
+		},
+		"postId": {
+			"type": "string",
+			"context": true
+		}
+	}
 }

@@ -1,13 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { useEntityBlockEditor, useEntityId } from '@wordpress/core-data';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 import { InnerBlocks } from '@wordpress/block-editor';
 
-function PostContentInnerBlocks() {
+function PostContentInnerBlocks( { postType, postId } ) {
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		'post'
+		postType,
+		{
+			id: postId,
+		}
 	);
 	return (
 		<InnerBlocks
@@ -18,10 +21,10 @@ function PostContentInnerBlocks() {
 	);
 }
 
-export default function PostContentEdit() {
-	if ( ! useEntityId( 'postType', 'post' ) ) {
+export default function PostContentEdit( { context: { postType, postId } } ) {
+	if ( ! postType || ! postId ) {
 		return 'Post Content Placeholder';
 	}
 
-	return <PostContentInnerBlocks />;
+	return <PostContentInnerBlocks postType={ postType } postId={ postId } />;
 }

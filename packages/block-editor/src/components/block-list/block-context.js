@@ -27,9 +27,12 @@ function Providers( { blockType, blockAttributes, children } ) {
 			attributeConfig.context &&
 			blockAttributes[ attributeName ] !== undefined
 		) {
-			const Provider = getContext( blockType.name, attributeName ).Provider;
+			const Provider = getContext( blockType.name, attributeName )
+				.Provider;
 			children = (
-				<Provider value={ blockAttributes[ attributeName ] }>{ children }</Provider>
+				<Provider value={ blockAttributes[ attributeName ] }>
+					{ children }
+				</Provider>
 			);
 		}
 	}
@@ -49,7 +52,9 @@ function BlockContext( {
 			const blockNames = castArray( blockNameOrBlockNames );
 			for ( const blockName of blockNames ) {
 				// eslint-disable-next-line react-hooks/rules-of-hooks
-				const contextValue = useContext( getContext( blockName, attributeName ) );
+				const contextValue = useContext(
+					getContext( blockName, attributeName )
+				);
 				if ( contextValue !== undefined ) {
 					blockContext[ attributeName ] = contextValue;
 				}
@@ -60,7 +65,10 @@ function BlockContext( {
 		<Providers blockType={ blockType } blockAttributes={ blockAttributes }>
 			<Component
 				{ ...componentProps }
-				context={ useMemo( () => blockContext, Object.values( blockContext ) ) }
+				context={ useMemo(
+					() => blockContext,
+					Object.values( blockContext )
+				) }
 			/>
 		</Providers>
 	);

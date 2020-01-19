@@ -24,7 +24,7 @@ import { compose, pure, ifCondition } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import BlockContext from './block-context';
+import _BlockContext from './block-context';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
@@ -131,7 +131,7 @@ function BlockListBlock( {
 	// (InspectorControls, etc.) which are inside `BlockEdit` but not
 	// `BlockHTML`, even in HTML mode.
 	let blockEdit = (
-		<BlockContext
+		<_BlockContext
 			blockType={ blockType }
 			blockAttributes={ attributes }
 			Component={ BlockEdit }
