@@ -42,8 +42,6 @@ describe( 'saveEntityRecord', () => {
 			'SAVE_ENTITY_RECORD_START'
 		);
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
@@ -78,8 +76,6 @@ describe( 'saveEntityRecord', () => {
 			'SAVE_ENTITY_RECORD_START'
 		);
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
@@ -103,8 +99,6 @@ describe( 'saveEntityRecord', () => {
 		expect( fulfillment.next( entities ).value.type ).toBe(
 			'SAVE_ENTITY_RECORD_START'
 		);
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
