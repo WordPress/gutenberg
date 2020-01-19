@@ -16,6 +16,7 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import RootContainer from './root-container';
 import useBlockDropZone from '../block-drop-zone';
+import BlockContext from './block-context';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -129,7 +130,7 @@ const ForwardedBlockList = forwardRef( BlockList );
 // This component needs to always be synchronous
 // as it's the one changing the async mode
 // depending on the block selection.
-export default forwardRef( ( props, ref ) => {
+BlockList = forwardRef( ( props, ref ) => {
 	const fallbackRef = useRef();
 	return (
 		<AsyncModeProvider value={ false }>
@@ -137,3 +138,5 @@ export default forwardRef( ( props, ref ) => {
 		</AsyncModeProvider>
 	);
 } );
+BlockList.BlockContext = BlockContext;
+export default BlockList;
