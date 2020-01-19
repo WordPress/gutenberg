@@ -33,7 +33,9 @@
 
 .components-custom-select-control__menu {
 	background: $white;
+	max-height: 400px;
 	min-width: 100%;
+	overflow: auto;
 	padding: 0;
 	position: absolute;
 	z-index: z-index(".components-popover");
