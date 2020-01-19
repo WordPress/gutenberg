@@ -25,6 +25,10 @@ function render_block_core_latest_posts( $attributes ) {
 		$args['category'] = $attributes['categories'];
 	}
 
+	if ( isset( $attributes['tags'] ) ) {
+		$args['tag'] = $attributes['tags'];
+	}
+
 	$recent_posts = get_posts( $args );
 
 	$list_items_markup = '';
@@ -131,6 +135,9 @@ function register_block_core_latest_posts() {
 					'type' => 'string',
 				),
 				'categories'              => array(
+					'type' => 'string',
+				),
+				'tags'                    => array(
 					'type' => 'string',
 				),
 				'postsToShow'             => array(

@@ -34,6 +34,9 @@ import { withSelect } from '@wordpress/data';
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
 };
+const TAGS_LIST_QUERY = {
+	per_page: -1,
+};
 const MAX_POSTS_COLUMNS = 6;
 
 class LatestPostsEdit extends Component {
@@ -41,6 +44,7 @@ class LatestPostsEdit extends Component {
 		super( ...arguments );
 		this.state = {
 			categoriesList: [],
+			tagsList: [],
 		};
 	}
 
@@ -61,6 +65,21 @@ class LatestPostsEdit extends Component {
 				}
 			}
 		);
+		this.fetchRequest = apiFetch( {
+			path: addQueryArgs( `/wp/v2/tags`, TAGS_LIST_QUERY ),
+		} ).then(
+			( tagsList ) => {
+				if ( this.isStillMounted ) {
+					this.setState( { tagsList } );
+				}
+			}
+		).catch(
+			() => {
+				if ( this.isStillMounted ) {
+					this.setState( { tagsList: [] } );
+				}
+			}
+		);
 	}
 
 	componentWillUnmount() {
@@ -70,7 +89,8 @@ class LatestPostsEdit extends Component {
 	render() {
 		const { attributes, setAttributes, latestPosts } = this.props;
 		const { categoriesList } = this.state;
-		const { displayPostContentRadio, displayPostContent, displayPostDate, postLayout, columns, order, orderBy, categories, postsToShow, excerptLength } = attributes;
+		const { tagsList } = this.state;
+		const { displayPostContentRadio, displayPostContent, displayPostDate, postLayout, columns, order, orderBy, categories, tags, postsToShow, excerptLength } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -116,9 +136,12 @@ class LatestPostsEdit extends Component {
 						numberOfItems={ postsToShow }
 						categoriesList={ categoriesList }
 						selectedCategoryId={ categories }
+						tagsList={ tagsList }
+						selectedTagId={ tags }
 						onOrderChange={ ( value ) => setAttributes( { order: value } ) }
 						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
 						onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
+						onTagChange={ ( value ) => setAttributes( { tags: '' !== value ? value : undefined } ) }
 						onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
 					/>
 					{ postLayout === 'grid' &&
@@ -244,10 +267,11 @@ class LatestPostsEdit extends Component {
 }
 
 export default withSelect( ( select, props ) => {
-	const { postsToShow, order, orderBy, categories } = props.attributes;
+	const { postsToShow, order, orderBy, categories, tags } = props.attributes;
 	const { getEntityRecords } = select( 'core' );
 	const latestPostsQuery = pickBy( {
 		categories,
+		tags,
 		order,
 		orderby: orderBy,
 		per_page: postsToShow,

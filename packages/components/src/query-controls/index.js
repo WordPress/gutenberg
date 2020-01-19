@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { RangeControl, SelectControl } from '../';
 import CategorySelect from './category-select';
+import TagSelect from './tag-select';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
@@ -15,12 +16,15 @@ const DEFAULT_MAX_ITEMS = 100;
 export default function QueryControls( {
 	categoriesList,
 	selectedCategoryId,
+	tagsList,
+	selectedTagId,
 	numberOfItems,
 	order,
 	orderBy,
 	maxItems = DEFAULT_MAX_ITEMS,
 	minItems = DEFAULT_MIN_ITEMS,
 	onCategoryChange,
+	onTagChange,
 	onNumberOfItemsChange,
 	onOrderChange,
 	onOrderByChange,
@@ -70,6 +74,15 @@ export default function QueryControls( {
 				noOptionLabel={ __( 'All' ) }
 				selectedCategoryId={ selectedCategoryId }
 				onChange={ onCategoryChange }
+			/> ),
+		onTagChange && (
+			<TagSelect
+				key="query-controls-tag-select"
+				tagsList={ tagsList }
+				label={ __( 'Tag' ) }
+				noOptionLabel={ __( 'All' ) }
+				selectedTagId={ selectedTagId }
+				onChange={ onTagChange }
 			/> ),
 		onNumberOfItemsChange && (
 			<RangeControl
