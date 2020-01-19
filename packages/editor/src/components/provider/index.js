@@ -15,10 +15,12 @@ import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	__unstableEditorStyles as EditorStyles,
+	BlockList,
 } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -193,19 +195,27 @@ class EditorProvider extends Component {
 						type={ post.type }
 						id={ post.id }
 					>
-						<BlockEditorProvider
-							value={ blocks }
-							onInput={ resetEditorBlocksWithoutUndoLevel }
-							onChange={ resetEditorBlocks }
-							selectionStart={ selectionStart }
-							selectionEnd={ selectionEnd }
-							settings={ editorSettings }
-							useSubRegistry={ false }
+						<BlockList.BlockContext.Providers
+							blockType={ getBlockType( 'core/post' ) }
+							blockAttributes={ {
+								postType: post.type,
+								postId: post.id,
+							} }
 						>
-							{ children }
-							<ReusableBlocksButtons />
-							<ConvertToGroupButtons />
-						</BlockEditorProvider>
+							<BlockEditorProvider
+								value={ blocks }
+								onInput={ resetEditorBlocksWithoutUndoLevel }
+								onChange={ resetEditorBlocks }
+								selectionStart={ selectionStart }
+								selectionEnd={ selectionEnd }
+								settings={ editorSettings }
+								useSubRegistry={ false }
+							>
+								{ children }
+								<ReusableBlocksButtons />
+								<ConvertToGroupButtons />
+							</BlockEditorProvider>
+						</BlockList.BlockContext.Providers>
 					</EntityProvider>
 				</EntityProvider>
 			</>
