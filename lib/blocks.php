@@ -32,6 +32,7 @@ function gutenberg_reregister_core_block_types() {
 		'tag-cloud.php'           => 'core/tag-cloud',
 		'site-title.php'          => 'core/site-title',
 		'template-part.php'       => 'core/template-part',
+		'post.php'                => 'core/post',
 		'post-title.php'          => 'core/post-title',
 		'post-content.php'        => 'core/post-content',
 		'post-author.php'         => 'core/post-author',
