@@ -18,6 +18,7 @@ const ModalHeaderBar = withPreferredColorScheme( ( props ) => {
 	const {
 		leftButton,
 		title,
+		subtitle,
 		rightButton,
 		getStylesFromColorScheme,
 	} = props;
@@ -27,14 +28,19 @@ const ModalHeaderBar = withPreferredColorScheme( ( props ) => {
 
 	return (
 		<View>
-			<View style={ styles.bar }>
+			<View style={ [ styles.bar, subtitle && styles.subtitleBar ] }>
 				<View style={ styles.leftContainer }>
 					{ leftButton }
 				</View>
-				<View style={ styles.titleContainer }>
-					<Text style={ styles.title } accessibilityRole="header">
+				<View style={ styles.titleContainer } accessibilityRole="header">
+					<Text style={ styles.title }>
 						{ title }
 					</Text>
+					{ subtitle &&
+						<Text style={ styles.subtitle }>
+							{ subtitle }
+						</Text>
+					}
 				</View>
 				<View style={ styles.rightContainer }>
 					{ rightButton }

@@ -68,6 +68,7 @@ const Preview = ( props ) => {
 					leftButton={ leftButton }
 					rightButton={ rightButton }
 					title={ template.name }
+					subtitle={ __( 'Template Preview' ) }
 				/>
 				<BlockPreview
 					blocks={ template.blocks }

@@ -3,8 +3,12 @@
 	width: 100%;
 	justify-content: space-between;
 	align-items: center;
-	height: 48;
+	height: 48px;
 	padding: 0 16px;
+}
+
+.subtitleBar {
+	height: 64px;
 }
 
 .leftContainer {
@@ -20,6 +24,7 @@
 .titleContainer {
 	justify-content: center;
 	flex: 1;
+	flex-direction: column;
 }
 
 .title {
@@ -27,6 +32,13 @@
 	font-size: 18px;
 	font-weight: 600;
 	text-align: center;
+}
+
+.subtitle {
+	flex-shrink: 0;
+	text-align: center;
+	font-size: 16px;
+	color: $dark-gray-400;
 }
 
 .separator {
