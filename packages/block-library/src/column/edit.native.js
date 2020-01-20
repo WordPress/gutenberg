@@ -54,10 +54,12 @@ function ColumnEdit( {
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
 			<View style={ [
-				getStylesFromColorScheme( styles.columnPlaceholder, styles.columnPlaceholderDark ),
+				! isParentSelected && getStylesFromColorScheme( styles.columnPlaceholder, styles.columnPlaceholderDark ),
 				! isSmallScreen ? { width: columnBaseWidth - ( isParentSelected ? 24 : isDescendantOfParentSelected ? 28 : columnsInRow === 1 ? 12 : 32 ) } : {},
 				{ ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
-			] } />
+			] } >
+				{ isParentSelected && <InnerBlocks.ButtonBlockAppender /> }
+			</View>
 		);
 	}
 
