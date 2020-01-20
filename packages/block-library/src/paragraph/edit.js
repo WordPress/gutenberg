@@ -7,11 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import {
-	PanelBody,
-	ToggleControl,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import {
 	AlignmentToolbar,
 	BlockControls,
@@ -19,6 +15,8 @@ import {
 	InspectorControls,
 	RichText,
 	withFontSizes,
+	useStyledClassName,
+	useRegisterBlockCssProperties,
 	__experimentalUseColors,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
@@ -40,40 +38,36 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 		return !! select( 'core/block-editor' ).getSettings().isRTL;
 	}, [] );
 
-	return ( isRTL && (
-		<ToolbarGroup
-			controls={ [
-				{
-					icon: 'editor-ltr',
-					title: _x( 'Left to right', 'editor button' ),
-					isActive: direction === 'ltr',
-					onClick() {
-						setDirection( direction === 'ltr' ? undefined : 'ltr' );
+	return (
+		isRTL && (
+			<ToolbarGroup
+				controls={ [
+					{
+						icon: 'editor-ltr',
+						title: _x( 'Left to right', 'editor button' ),
+						isActive: direction === 'ltr',
+						onClick() {
+							setDirection(
+								direction === 'ltr' ? undefined : 'ltr'
+							);
+						},
 					},
-				},
-			] }
-		/>
-	) );
+				] }
+			/>
+		)
+	);
 }
 
 function useDropCapMinimumHeight( isDropCap, deps ) {
 	const [ minimumHeight, setMinimumHeight ] = useState();
-	useEffect(
-		() => {
-			const element = querySelector( PARAGRAPH_DROP_CAP_SELECTOR );
-			if ( isDropCap && element ) {
-				setMinimumHeight(
-					getComputedStyle(
-						element,
-						'first-letter'
-					).height
-				);
-			} else if ( minimumHeight ) {
-				setMinimumHeight( undefined );
-			}
-		},
-		[ isDropCap, minimumHeight, setMinimumHeight, ...deps ]
-	);
+	useEffect( () => {
+		const element = querySelector( PARAGRAPH_DROP_CAP_SELECTOR );
+		if ( isDropCap && element ) {
+			setMinimumHeight( getComputedStyle( element, 'first-letter' ).height );
+		} else if ( minimumHeight ) {
+			setMinimumHeight( undefined );
+		}
+	}, [ isDropCap, minimumHeight, setMinimumHeight, ...deps ] );
 	return minimumHeight;
 }
 
@@ -86,16 +80,12 @@ function ParagraphBlock( {
 	setAttributes,
 	setFontSize,
 } ) {
-	const {
-		align,
-		content,
-		dropCap,
-		placeholder,
-		direction,
-	} = attributes;
+	const { align, content, dropCap, placeholder, direction } = attributes;
 
 	const ref = useRef();
-	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [ fontSize.size ] );
+	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
+		fontSize.size,
+	] );
 	const {
 		TextColor,
 		BackgroundColor,
@@ -106,11 +96,38 @@ function ParagraphBlock( {
 			{ name: 'backgroundColor', className: 'has-background' },
 		],
 		{
-			contrastCheckers: [ { backgroundColor: true, textColor: true, fontSize: fontSize.size } ],
+			contrastCheckers: [
+				{
+					backgroundColor: true,
+					textColor: true,
+					fontSize: fontSize.size,
+				},
+			],
 			colorDetector: { targetRef: ref },
 		},
 		[ fontSize.size ]
 	);
+
+	useEffect( () => {
+		setAttributes( { styledClassName } );
+	}, [ styledClassName, setAttributes ] );
+
+	/**
+	 * GLOBAL STYLES IMPLEMENTATION START
+	 */
+	useRegisterBlockCssProperties( {
+		paragraph: {
+			color: 'blue',
+		},
+	} );
+	const styledClassName = useStyledClassName( {
+		sx: {
+			color: 'paragraph.color',
+		},
+	} );
+	/**
+	 * GLOBAL STYLES IMPLEMENTATION END
+	 */
 
 	return (
 		<>
@@ -121,7 +138,9 @@ function ParagraphBlock( {
 				/>
 				<ParagraphRTLToolbar
 					direction={ direction }
-					setDirection={ ( newDirection ) => setAttributes( { direction: newDirection } ) }
+					setDirection={ ( newDirection ) =>
+						setAttributes( { direction: newDirection } )
+					}
 				/>
 			</BlockControls>
 			<InspectorControls>
@@ -134,9 +153,10 @@ function ParagraphBlock( {
 						label={ __( 'Drop Cap' ) }
 						checked={ !! dropCap }
 						onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
-						help={ dropCap ?
-							__( 'Showing large initial letter.' ) :
-							__( 'Toggle to show a large initial letter.' )
+						help={
+							dropCap ?
+								__( 'Showing large initial letter.' ) :
+								__( 'Toggle to show a large initial letter.' )
 						}
 					/>
 				</PanelBody>
@@ -148,18 +168,25 @@ function ParagraphBlock( {
 						ref={ ref }
 						identifier="content"
 						tagName="p"
-						className={ classnames( 'wp-block-paragraph', className, {
-							'has-drop-cap': dropCap,
-							[ `has-text-align-${ align }` ]: align,
-							[ fontSize.class ]: fontSize.class,
-						} ) }
+						className={ classnames(
+							'wp-block-paragraph',
+							className,
+							{
+								'has-drop-cap': dropCap,
+								[ `has-text-align-${ align }` ]: align,
+								[ fontSize.class ]: fontSize.class,
+							},
+							styledClassName
+						) }
 						style={ {
 							fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 							direction,
 							minHeight: dropCapMinimumHeight,
 						} }
 						value={ content }
-						onChange={ ( newContent ) => setAttributes( { content: newContent } ) }
+						onChange={ ( newContent ) =>
+							setAttributes( { content: newContent } )
+						}
 						onSplit={ ( value ) => {
 							if ( ! value ) {
 								return createBlock( name );
@@ -173,8 +200,17 @@ function ParagraphBlock( {
 						onMerge={ mergeBlocks }
 						onReplace={ onReplace }
 						onRemove={ onReplace ? () => onReplace( [] ) : undefined }
-						aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
-						placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
+						aria-label={
+							content ?
+								__( 'Paragraph block' ) :
+								__(
+									'Empty block; start writing or type forward slash to choose a block'
+								)
+						}
+						placeholder={
+							placeholder ||
+							__( 'Start writing or type / to choose a block' )
+						}
 						__unstableEmbedURLOnPaste
 					/>
 				</TextColor>
@@ -183,8 +219,6 @@ function ParagraphBlock( {
 	);
 }
 
-const ParagraphEdit = compose( [
-	withFontSizes( 'fontSize' ),
-] )( ParagraphBlock );
+const ParagraphEdit = compose( [ withFontSizes( 'fontSize' ) ] )( ParagraphBlock );
 
 export default ParagraphEdit;

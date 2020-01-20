@@ -14,6 +14,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
+import { RootStyleSystemProvider } from '../global-styles/style-system';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
@@ -154,7 +155,7 @@ class BlockEditorProvider extends Component {
 	render() {
 		const { children } = this.props;
 
-		return children;
+		return <RootStyleSystemProvider>{ children }</RootStyleSystemProvider>;
 	}
 }
 

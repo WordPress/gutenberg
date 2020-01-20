@@ -24,21 +24,28 @@ export default function save( { attributes } ) {
 		fontSize,
 		customFontSize,
 		direction,
+		styledClassName,
 	} = attributes;
 
 	const textClass = getColorClassName( 'color', textColor );
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+	const backgroundClass = getColorClassName(
+		'background-color',
+		backgroundColor
+	);
 	const fontSizeClass = getFontSizeClass( fontSize );
 
-	const className = classnames( {
-		'has-text-color': textColor || customTextColor,
-		'has-background': backgroundColor || customBackgroundColor,
-		'has-drop-cap': dropCap,
-		[ `has-text-align-${ align }` ]: align,
-		[ fontSizeClass ]: fontSizeClass,
-		[ textClass ]: textClass,
-		[ backgroundClass ]: backgroundClass,
-	} );
+	const className = classnames(
+		{
+			'has-text-color': textColor || customTextColor,
+			'has-background': backgroundColor || customBackgroundColor,
+			'has-drop-cap': dropCap,
+			[ `has-text-align-${ align }` ]: align,
+			[ fontSizeClass ]: fontSizeClass,
+			[ textClass ]: textClass,
+			[ backgroundClass ]: backgroundClass,
+		},
+		styledClassName
+	);
 
 	const styles = {
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,

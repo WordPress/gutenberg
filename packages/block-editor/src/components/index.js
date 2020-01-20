@@ -91,3 +91,10 @@ export { default as WritingFlow } from './writing-flow';
  */
 
 export { default as BlockEditorProvider } from './provider';
+
+/**
+ * Internal dependencies
+ */
+import * as GlobalStylesBlock from './global-styles/block';
+export * from './global-styles';
+export { GlobalStylesBlock };

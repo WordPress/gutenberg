@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/block-editor';
 import '@wordpress/editor';
+import { GlobalStylesBlock } from '@wordpress/block-editor';
 import {
 	registerBlockType,
 	setDefaultBlockName,
@@ -126,6 +126,7 @@ export const registerCoreBlocks = () => {
 		...embed.common,
 		...embed.others,
 		file,
+		GlobalStylesBlock,
 		group,
 		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
 		html,

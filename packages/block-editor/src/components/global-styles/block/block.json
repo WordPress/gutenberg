@@ -1,0 +1,12 @@
+{
+	"name": "core/global-styles",
+	"category": "layout",
+	"attributes": {
+		"rootCssString": {
+			"type": "string"
+		},
+		"cssString": {
+			"type": "string"
+		}
+	}
+}

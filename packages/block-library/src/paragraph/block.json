@@ -38,7 +38,13 @@
 		},
 		"direction": {
 			"type": "string",
-			"enum": [ "ltr", "rtl" ]
+			"enum": [
+				"ltr",
+				"rtl"
+			]
+		},
+		"styledClassName": {
+			"type": "string"
 		}
 	}
 }
