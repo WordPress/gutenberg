@@ -71,9 +71,9 @@ html {
 	// On Mobile the header is fixed to keep HTML as scrollable.
 	// Beyond the medium breakpoint, we allow the sidebar.
 	// The sidebar should scroll independently, so enable scroll here also.
-	@include break-medium() {
-		overflow: auto;
-	}
+
+	overflow: auto;
+
 }
 
 .edit-post-editor-regions__sidebar {
