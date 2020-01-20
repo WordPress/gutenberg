@@ -26,6 +26,10 @@ export function DownloadableBlocksList( {
 	installAndDownload,
 	download
 } ) {
+	if ( ! items.length ) {
+		return null;
+	}
+
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -33,7 +37,7 @@ export function DownloadableBlocksList( {
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-directory-downloadable-blocks-list">
-			{ items && items.map( ( item ) =>
+			{ items.map( ( item ) =>
 				<DownloadableBlockListItem
 					key={ item.id }
 					className={ getBlockMenuDefaultClassName( item.id ) }
