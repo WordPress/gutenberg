@@ -465,12 +465,14 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
 
+		// Find a point outside the paragraph between the blocks where it's
+		// expected that the sibling inserter would be placed.
 		const paragraph = await page.$( '[data-type="core/paragraph"]' );
 		const paragraphRect = await paragraph.boundingBox();
 		const x = paragraphRect.x + ( 2 * paragraphRect.width / 3 );
-		const y = paragraphRect.y + paragraphRect.height + 10;
+		const y = paragraphRect.y + paragraphRect.height + 1;
 
-		await page.mouse.move( x, y, { steps: 10 } );
+		await page.mouse.move( x, y );
 		await page.waitForSelector( '.block-editor-block-list__insertion-point-inserter' );
 
 		const inserter = await page.$( '.block-editor-block-list__insertion-point-inserter' );
@@ -489,12 +491,14 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 
+		// Find a point outside the paragraph between the blocks where it's
+		// expected that the sibling inserter would be placed.
 		const paragraph = await page.$( '[data-type="core/paragraph"]' );
 		const paragraphRect = await paragraph.boundingBox();
 		const x = paragraphRect.x + ( 2 * paragraphRect.width / 3 );
-		const y = paragraphRect.y + paragraphRect.height + 10;
+		const y = paragraphRect.y + paragraphRect.height + 1;
 
-		await page.mouse.move( x, y, { steps: 10 } );
+		await page.mouse.move( x, y );
 		await page.waitForSelector( '.block-editor-block-list__insertion-point-inserter' );
 
 		const inserter = await page.$( '.block-editor-block-list__insertion-point-inserter' );
