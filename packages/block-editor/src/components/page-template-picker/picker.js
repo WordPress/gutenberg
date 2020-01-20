@@ -14,13 +14,13 @@ import getDefaultTemplates from './default-templates';
 import Preview from './preview';
 
 const __experimentalPageTemplatePicker = ( { templates = getDefaultTemplates() } ) => {
-	const { setLayoutTemplate } = useDispatch( 'core/editor' );
+	const { editPost } = useDispatch( 'core/editor' );
 	const [ templatePreview, setTemplatePreview ] = useState();
 
 	const onApply = ( ) => {
-		setLayoutTemplate( {
-			name: templatePreview.name,
-			content: parse( templatePreview.content ),
+		editPost( {
+			title: templatePreview.name,
+			blocks: parse( templatePreview.content ),
 		} );
 		setTemplatePreview( undefined );
 	};
