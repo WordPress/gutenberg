@@ -10,7 +10,6 @@ import { noop, startsWith } from 'lodash';
 import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState, Fragment } from '@wordpress/element';
-
 import {
 	safeDecodeURI,
 	filterURLForDisplay,
@@ -18,7 +17,6 @@ import {
 	prependHTTP,
 	getProtocol,
 } from '@wordpress/url';
-
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
@@ -44,6 +42,7 @@ function LinkControl( {
 			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
 		};
 	}, [] );
+	const displayURL = ( value && filterURLForDisplay( safeDecodeURI( value.url ) ) ) || '';
 
 	/**
 	 * onChange LinkControlSearchInput event handler
@@ -175,9 +174,13 @@ function LinkControl( {
 								className="block-editor-link-control__search-item-title"
 								href={ value.url }
 							>
-								{ value.title }
+								{ ( value && value.title ) || displayURL }
 							</ExternalLink>
-							<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( value.url ) ) || '' }</span>
+							{ value && value.title && (
+								<span className="block-editor-link-control__search-item-info">
+									{ displayURL }
+								</span>
+							) }
 						</span>
 
 						<Button
