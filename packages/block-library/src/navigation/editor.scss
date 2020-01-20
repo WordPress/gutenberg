@@ -91,10 +91,6 @@ $navigation-item-height: 46px;
 }
 
 // Sub menus.
-
-
-// Only display inner blocks when the block is being edited.
-
 .wp-block-navigation {
 	.wp-block-navigation-link {
 		position: relative;
@@ -124,19 +120,16 @@ $navigation-item-height: 46px;
 	}
 
 	// Inherit colors from menu.
-	// Some of these selectors should be replaced/removed
-	// once sub-menus support custom colors.
-	.block-editor-inner-blocks,
-	.block-editor-block-list__layout,
-	.wp-block,
-	.wp-block-navigation-link {
+	.wp-block-navigation-link .block-editor-inner-blocks {
 		background-color: inherit;
 		color: inherit;
+		border-color: inherit;
 	}
 
-	// Default / Light styles
-	.wp-block-navigation-link > .block-editor-inner-blocks {
-		border-color: $light-style-sub-menu-border-color;
+	// No text color - Default / Light styles
+	&:not(.has-text-color) .wp-block-navigation-link > .block-editor-inner-blocks {
+		color: $light-style-sub-menu-background-color;
+		border-color: $light-style-sub-menu-background-color;
 	}
 
 	// No background color - Default / Light styles
@@ -144,10 +137,14 @@ $navigation-item-height: 46px;
 		background-color: $light-style-sub-menu-background-color;
 	}
 
+	// No text color - Dark styles
+	&:not(.has-text-color).is-style-dark .wp-block-navigation-link > .block-editor-inner-blocks {
+		color: $dark-style-sub-menu-text-color;
+		border-color: $dark-style-sub-menu-border-color;
+	}
+
 	// No background color - Dark styles
 	&:not(.has-background-color).is-style-dark .wp-block-navigation-link > .block-editor-inner-blocks {
-		border-color: $dark-style-sub-menu-border-color;
-		color: $dark-style-sub-menu-text-color;
 		background-color: $dark-style-sub-menu-background-color;
 	}
 }
