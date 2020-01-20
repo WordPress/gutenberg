@@ -16,7 +16,7 @@ import {
 	identity,
 	difference,
 	omitBy,
-	filter,
+	pickBy,
 } from 'lodash';
 
 /**
@@ -409,6 +409,12 @@ function withPersistentBlockChange( reducer ) {
 				? ! markNextChangeAsNotPersistent
 				: ! isUpdatingSameBlockAttribute( action, lastAction ),
 		};
+		if (
+			action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+			action.rootClientId
+		) {
+			nextState.persistentChangeRootClientId = action.rootClientId;
+		}
 
 		// In comparing against the previous action, consider only those which
 		// would have qualified as one which would have been ignored or not
@@ -531,7 +537,7 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			cache: {
 				...state.cache,
 				...mapValues(
-					filter(
+					pickBy(
 						flattenBlocks( action.blocks ),
 						( block ) =>
 							! isShallowEqual( block, {
