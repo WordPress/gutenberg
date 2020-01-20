@@ -2,7 +2,9 @@
 
 ### New Features
 
-- Add SVGR support to compile SVG files to React components using the `@svgr/webpack` plugin.  [#18243](https://github.com/WordPress/gutenberg/pull/18243)
+- Add SVGR support to compile SVG files to React components using the `@svgr/webpack` plugin ([#18243](https://github.com/WordPress/gutenberg/pull/18243)).
+- Add `lint-md` script to lint JavaScript source code in markdown files, uses the `eslint-plugin-markdown` plugin ([#19518](https://github.com/WordPress/gutenberg/pull/19518)).
+- Add `packages-update` script to update WordPress packages to the latest version automatically ([#19448](https://github.com/WordPress/gutenberg/pull/19448)).
 
 ## 6.1.1 (2020-01-01)
 

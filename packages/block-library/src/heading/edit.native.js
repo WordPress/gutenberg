@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import HeadingToolbar from './heading-toolbar';
-import styles from './editor.scss';
 
 /**
  * External dependencies
@@ -38,10 +37,7 @@ const HeadingEdit = ( {
 			identifier="content"
 			tagName={ 'h' + attributes.level }
 			value={ attributes.content }
-			style={ {
-				...style,
-				minHeight: styles[ 'wp-block-heading' ].minHeight,
-			} }
+			style={ style }
 			onChange={ ( value ) => setAttributes( { content: value } ) }
 			onMerge={ mergeBlocks }
 			onSplit={ ( value ) => {

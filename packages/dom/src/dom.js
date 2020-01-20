@@ -93,7 +93,8 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const range = selection.getRangeAt( 0 ).cloneRange();
+	const originalRange = selection.getRangeAt( 0 );
+	const range = originalRange.cloneRange();
 	const isForward = isSelectionForward( selection );
 	const isCollapsed = selection.isCollapsed;
 
@@ -131,9 +132,10 @@ function isEdge( container, isReverse, onlyVertical ) {
 	// over its line boundary.
 	const buffer = 3 * parseInt( lineHeight, 10 ) / 4;
 	const containerRect = container.getBoundingClientRect();
+	const originalRangeRect = getRectangleFromRange( originalRange );
 	const verticalEdge = isReverse ?
-		containerRect.top + padding > rangeRect.top - buffer :
-		containerRect.bottom - padding < rangeRect.bottom + buffer;
+		containerRect.top + padding > originalRangeRect.top - buffer :
+		containerRect.bottom - padding < originalRangeRect.bottom + buffer;
 
 	if ( ! verticalEdge ) {
 		return false;
@@ -669,7 +671,7 @@ export function wrap( newNode, referenceNode ) {
  *
  * @return {string} The text content with any html removed.
  */
-export function stripHTML( html ) {
+export function __unstableStripHTML( html ) {
 	const document = new DOMParser().parseFromString( html, 'text/html' );
 	return document.body.textContent || '';
 }

@@ -13,12 +13,12 @@
  * @return array Colors CSS classes and inline styles.
  */
 function build_css_colors( $attributes ) {
-	// CSS classes.
 	$colors = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
 
+	// Text color.
 	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
 	$has_custom_text_color = array_key_exists( 'customTextColor', $attributes );
 
@@ -33,7 +33,25 @@ function build_css_colors( $attributes ) {
 		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
-		$colors['inline_styles'] = sprintf( 'color: %s;', $attributes['customTextColor'] );
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
+	}
+
+	// Background color.
+	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
+	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $attributes );
+
+	// If has background color.
+	if ( $has_custom_background_color || $has_named_background_color ) {
+		// Add has-background-color class.
+		$colors['css_classes'][] = 'has-background-color';
+	}
+
+	if ( $has_named_background_color ) {
+		// Add the background-color class.
+		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
+	} elseif ( $has_custom_background_color ) {
+		// Add the custom background-color inline style.
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
 	}
 
 	return $colors;
@@ -68,6 +86,31 @@ function build_css_font_sizes( $attributes ) {
 }
 
 /**
+ * Recursively filters out links with no labels to build a clean navigation block structure.
+ *
+ * @param array $blocks Navigation link inner blocks from the Navigation block.
+ * @return array Blocks that had valid labels
+ */
+function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
+	$blocks = array_filter(
+		$blocks,
+		function( $block ) {
+			return ! empty( $block['attrs']['label'] );
+		}
+	);
+
+	if ( ! empty( $blocks ) ) {
+		foreach ( $blocks as $key => $block ) {
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$blocks[ $key ]['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+			}
+		}
+	}
+
+	return $blocks;
+}
+
+/**
  * Renders the `core/navigation` block on server.
  *
  * @param array $attributes The block attributes.
@@ -77,6 +120,12 @@ function build_css_font_sizes( $attributes ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation( $attributes, $content, $block ) {
+	$block['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+
+	if ( empty( $block['innerBlocks'] ) ) {
+		return '';
+	}
+
 	$colors          = build_css_colors( $attributes );
 	$font_sizes      = build_css_font_sizes( $attributes );
 	$classes         = array_merge(
@@ -106,10 +155,11 @@ function render_block_navigation( $attributes, $content, $block ) {
  * @param array $block      The block.
  * @param array $colors     Contains inline styles and CSS classes to apply to navigation item.
  * @param array $font_sizes Contains inline styles and CSS classes to apply to navigation item.
+ * @param bool  $level_zero True whether is main menu (level zero). Otherwise, False.
  *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function build_navigation_html( $block, $colors, $font_sizes ) {
+function build_navigation_html( $block, $colors, $font_sizes, $level_zero = true ) {
 	$html            = '';
 	$classes         = array_merge(
 		$colors['css_classes'],
@@ -124,7 +174,11 @@ function build_navigation_html( $block, $colors, $font_sizes ) {
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
 
 		$html .= '<li class="wp-block-navigation-link">' .
-			'<a' . $class_attribute . $style_attribute;
+			'<a';
+
+		if ( $level_zero ) {
+			$html .= $class_attribute . $style_attribute;
+		}
 
 		// Start appending HTML attributes to anchor tag.
 		if ( isset( $block['attrs']['url'] ) ) {
@@ -166,7 +220,7 @@ function build_navigation_html( $block, $colors, $font_sizes ) {
 		// End anchor tag content.
 
 		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
-			$html .= build_navigation_html( $block, $colors, $font_sizes );
+			$html .= build_navigation_html( $block, $colors, $font_sizes, false );
 		}
 
 		$html .= '</li>';
@@ -186,22 +240,28 @@ function register_block_core_navigation() {
 		'core/navigation',
 		array(
 			'attributes'      => array(
-				'className'          => array(
+				'className'             => array(
 					'type' => 'string',
 				),
-				'textColor'          => array(
+				'textColor'             => array(
 					'type' => 'string',
 				),
-				'customTextColor'    => array(
+				'customTextColor'       => array(
 					'type' => 'string',
 				),
-				'fontSize'           => array(
+				'backgroundColor'       => array(
 					'type' => 'string',
 				),
-				'customFontSize'     => array(
+				'customBackgroundColor' => array(
+					'type' => 'string',
+				),
+				'fontSize'              => array(
+					'type' => 'string',
+				),
+				'customFontSize'        => array(
 					'type' => 'number',
 				),
-				'itemsJustification' => array(
+				'itemsJustification'    => array(
 					'type' => 'string',
 				),
 			),

@@ -10,6 +10,7 @@ import classnames from 'classnames';
 import {
 	useMemo,
 	Fragment,
+	useRef,
 } from '@wordpress/element';
 import {
 	InnerBlocks,
@@ -58,9 +59,28 @@ function Navigation( {
 	// HOOKS
 	//
 	/* eslint-disable @wordpress/no-unused-vars-before-return */
-	const { TextColor } = __experimentalUseColors(
-		[ { name: 'textColor', property: 'color' } ],
+	const ref = useRef();
+
+	const {
+		TextColor,
+		BackgroundColor,
+		InspectorControlsColorPanel,
+		ColorPanel,
+	} = __experimentalUseColors(
+		[
+			{ name: 'textColor', property: 'color' },
+			{ name: 'backgroundColor', className: 'background-color' },
+		],
+		{
+			contrastCheckers: [ { backgroundColor: true, textColor: true, fontSize: fontSize.size } ],
+			colorDetector: { targetRef: ref },
+			colorPanelProps: {
+				initialOpen: true,
+			},
+		},
+		[ fontSize.size ]
 	);
+
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 
@@ -130,7 +150,10 @@ function Navigation( {
 					label={ __( 'Navigation' ) }
 					instructions={ __( 'Create a Navigation from all existing pages, or create an empty one.' ) }
 				>
-					<div className="wp-block-navigation-placeholder__buttons">
+					<div
+						ref={ ref }
+						className="wp-block-navigation-placeholder__buttons"
+					>
 						<Button
 							isSecondary
 							className="wp-block-navigation-placeholder__button"
@@ -170,11 +193,13 @@ function Navigation( {
 				<ToolbarGroup>
 					{ navigatorToolbarButton }
 				</ToolbarGroup>
-				<BlockColorsStyleSelector
-					value={ TextColor.color }
-					onChange={ TextColor.setColor }
-				/>
 
+				<BlockColorsStyleSelector
+					TextColor={ TextColor }
+					BackgroundColor={ BackgroundColor }
+				>
+					{ ColorPanel }
+				</BlockColorsStyleSelector>
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
@@ -190,17 +215,24 @@ function Navigation( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			{ InspectorControlsColorPanel }
 			<TextColor>
-				<div className={ blockClassNames } style={ blockInlineStyles }>
-					{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
+				<BackgroundColor>
+					<div
+						ref={ ref }
+						className={ blockClassNames }
+						style={ blockInlineStyles }
+					>
+						{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 
-					<InnerBlocks
-						allowedBlocks={ [ 'core/navigation-link' ] }
-						templateInsertUpdatesSelection={ false }
-						__experimentalMoverDirection={ 'horizontal' }
-					/>
+						<InnerBlocks
+							allowedBlocks={ [ 'core/navigation-link' ] }
+							templateInsertUpdatesSelection={ false }
+							__experimentalMoverDirection={ 'horizontal' }
+						/>
 
-				</div>
+					</div>
+				</BackgroundColor>
 			</TextColor>
 		</Fragment>
 	);

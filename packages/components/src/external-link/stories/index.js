@@ -7,7 +7,7 @@ import { text } from '@storybook/addon-knobs';
  */
 import ExternalLink from '../';
 
-export default { title: 'Components|ExternalLink', component: ExternalLink };
+export default { title: 'Components/ExternalLink', component: ExternalLink };
 
 export const _default = () => {
 	const title = text( 'children', 'WordPress' );

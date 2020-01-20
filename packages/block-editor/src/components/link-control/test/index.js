@@ -12,8 +12,14 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { LinkControl } from '../index';
+import LinkControl from '../';
 import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
+
+const mockFetchSearchSuggestions = jest.fn();
+
+jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
+	fetchSearchSuggestions: mockFetchSearchSuggestions,
+} ) );
 
 /**
  * Wait for next tick of event loop. This is required
@@ -33,6 +39,7 @@ beforeEach( () => {
 	// setup a DOM element as a render target
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
+	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
 } );
 
 afterEach( () => {
@@ -40,6 +47,7 @@ afterEach( () => {
 	unmountComponentAtNode( container );
 	container.remove();
 	container = null;
+	mockFetchSearchSuggestions.mockReset();
 } );
 
 describe( 'Basic rendering', () => {
@@ -71,12 +79,10 @@ describe( 'Searching for a link', () => {
 			resolver = resolve;
 		} );
 
+		mockFetchSearchSuggestions.mockImplementation( fauxRequest );
+
 		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fauxRequest }
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
@@ -115,11 +121,7 @@ describe( 'Searching for a link', () => {
 		const firstFauxSuggestion = first( fauxEntitySuggestions );
 
 		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
@@ -153,11 +155,7 @@ describe( 'Searching for a link', () => {
 		[ 'ThisCouldAlsoBeAValidURL' ],
 	] )( 'should display a URL suggestion as a default fallback for the search term "%s" which could potentially be a valid url.', async ( searchTerm ) => {
 		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
@@ -190,11 +188,7 @@ describe( 'Searching for a link', () => {
 		const searchTerm = 'Hello world';
 
 		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		let searchResultElements;
@@ -242,11 +236,7 @@ describe( 'Manual link entry', () => {
 		[ 'www.wordpress.org' ], // usage of "www"
 	] )( 'should display a single suggestion result when the current input value is URL-like (eg: %s)', async ( searchTerm ) => {
 		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
@@ -279,9 +269,7 @@ describe( 'Manual link entry', () => {
 		] )( 'should recognise "%s" as a %s link and handle as manual entry by displaying a single suggestion', async ( searchTerm, searchType ) => {
 			act( () => {
 				render(
-					<LinkControl
-						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-					/>, container
+					<LinkControl />, container
 				);
 			} );
 
@@ -311,15 +299,11 @@ describe( 'Manual link entry', () => {
 
 describe( 'Default search suggestions', () => {
 	it( 'should display a list of initial search suggestions when there is no search value or suggestions', async () => {
-		const searchSuggestionsSpy = jest.fn( fetchFauxEntitySuggestions );
 		const expectedResultsLength = 3; // set within `LinkControl`
 
 		act( () => {
 			render(
-				<LinkControl
-					fetchSearchSuggestions={ searchSuggestionsSpy }
-					showInitialSuggestions={ true }
-				/>, container
+				<LinkControl showInitialSuggestions />, container
 			);
 		} );
 
@@ -329,7 +313,10 @@ describe( 'Default search suggestions', () => {
 		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const initialSearchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		const searchResultsWrapper = container.querySelector( '[role="listbox"]' );
+		const initialSearchResultElements = searchResultsWrapper.querySelectorAll( '[role="option"]' );
+
+		const searchResultsLabel = container.querySelector( `#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }` );
 
 		// Verify input has no value has default suggestions should only show
 		// when this does not have a value
@@ -338,14 +325,15 @@ describe( 'Default search suggestions', () => {
 		// Ensure only called once as a guard against potential infinite
 		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
 		// which has calls to `setState` within it.
-		expect( searchSuggestionsSpy ).toHaveBeenCalledTimes( 1 );
+		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 
 		// Verify the search results already display the initial suggestions
 		expect( initialSearchResultElements ).toHaveLength( expectedResultsLength );
+
+		expect( searchResultsLabel.innerHTML ).toEqual( 'Recently updated' );
 	} );
 
 	it( 'should not display initial suggestions when input value is present', async () => {
-		const searchSuggestionsSpy = jest.fn( fetchFauxEntitySuggestions );
 		let searchResultElements;
 		//
 		// Render with an initial value an ensure that no initial suggestions
@@ -354,8 +342,7 @@ describe( 'Default search suggestions', () => {
 		act( () => {
 			render(
 				<LinkControl
-					fetchSearchSuggestions={ searchSuggestionsSpy }
-					showInitialSuggestions={ true }
+					showInitialSuggestions
 					value={ fauxEntitySuggestions[ 0 ] }
 				/>, container
 			);
@@ -363,7 +350,7 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
-		expect( searchSuggestionsSpy ).not.toHaveBeenCalled();
+		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 
 		//
 		// Click the "Edit/Change" button and check initial suggestions are not
@@ -382,7 +369,7 @@ describe( 'Default search suggestions', () => {
 
 		expect( searchResultElements ).toHaveLength( 0 );
 
-		expect( searchSuggestionsSpy ).not.toHaveBeenCalled();
+		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 
 		//
 		// Reset the search to empty and check the initial suggestions are now shown.
@@ -402,7 +389,7 @@ describe( 'Default search suggestions', () => {
 		// Ensure only called once as a guard against potential infinite
 		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
 		// which has calls to `setState` within it.
-		expect( searchSuggestionsSpy ).toHaveBeenCalledTimes( 1 );
+		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
 
@@ -413,18 +400,11 @@ describe( 'Selecting links', () => {
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
 
-			return (
-				<LinkControl
-					value={ link }
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>
-			);
+			return <LinkControl value={ link } />;
 		};
 
 		act( () => {
-			render(
-				<LinkControlConsumer />, container
-			);
+			render( <LinkControlConsumer />, container );
 		} );
 
 		// TODO: select by aria role or visible text
@@ -448,15 +428,12 @@ describe( 'Selecting links', () => {
 				<LinkControl
 					value={ link }
 					onChange={ ( suggestion ) => setLink( suggestion ) }
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 				/>
 			);
 		};
 
 		act( () => {
-			render(
-				<LinkControlConsumer />, container
-			);
+			render( <LinkControlConsumer />, container );
 		} );
 
 		// Required in order to select the button below
@@ -494,7 +471,6 @@ describe( 'Selecting links', () => {
 					<LinkControl
 						value={ link }
 						onChange={ ( suggestion ) => setLink( suggestion ) }
-						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 					/>
 				);
 			};
@@ -554,7 +530,6 @@ describe( 'Selecting links', () => {
 					<LinkControl
 						value={ link }
 						onChange={ ( suggestion ) => setLink( suggestion ) }
-						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 					/>
 				);
 			};
@@ -639,18 +614,11 @@ describe( 'Addition Settings UI', () => {
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
 
-			return (
-				<LinkControl
-					value={ link }
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>
-			);
+			return <LinkControl value={ link } />;
 		};
 
 		act( () => {
-			render(
-				<LinkControlConsumer />, container
-			);
+			render( <LinkControlConsumer />, container );
 		} );
 
 		const newTabSettingLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML && label.innerHTML.includes( expectedSettingText ) );
@@ -684,16 +652,13 @@ describe( 'Addition Settings UI', () => {
 			return (
 				<LinkControl
 					value={ { ...link, newTab: false, noFollow: true } }
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 					settings={ customSettings }
 				/>
 			);
 		};
 
 		act( () => {
-			render(
-				<LinkControlConsumer />, container
-			);
+			render( <LinkControlConsumer />, container );
 		} );
 
 		// Grab the elements using user perceivable DOM queries

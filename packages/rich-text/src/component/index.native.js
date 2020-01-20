@@ -662,11 +662,6 @@ export class RichText extends Component {
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
 
-		let minHeight = styles.richText.minHeight;
-		if ( style && style.minHeight ) {
-			minHeight = style.minHeight;
-		}
-
 		const placeholderStyle = getStylesFromColorScheme( styles.richTextPlaceholder, styles.richTextPlaceholderDark );
 
 		const {
@@ -742,7 +737,7 @@ export class RichText extends Component {
 					} }
 					style={ {
 						...style,
-						minHeight: Math.max( minHeight, this.state.height ),
+						minHeight: this.state.height,
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }
 					placeholder={ this.props.placeholder }

@@ -9,7 +9,7 @@ import { text, number } from '@storybook/addon-knobs';
 import './style.css';
 import Button from '../';
 
-export default { title: 'Components|Button', component: Button };
+export default { title: 'Components/Button', component: Button };
 
 export const _default = () => {
 	const label = text( 'Label', 'Default Button' );

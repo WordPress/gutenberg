@@ -55,6 +55,18 @@ function selector( select ) {
 	};
 }
 
+function toggleRichText( container, toggle ) {
+	Array
+		.from( container.querySelectorAll( '.rich-text' ) )
+		.forEach( ( node ) => {
+			if ( toggle ) {
+				node.setAttribute( 'contenteditable', true );
+			} else {
+				node.removeAttribute( 'contenteditable' );
+			}
+		} );
+}
+
 export default function useMultiSelection( ref ) {
 	const {
 		isSelectionEnabled,
@@ -72,6 +84,7 @@ export default function useMultiSelection( ref ) {
 	} = useDispatch( 'core/block-editor' );
 	const rafId = useRef();
 	const startClientId = useRef();
+	const anchorElement = useRef();
 
 	/**
 	 * When the component updates, and there is multi selection, we need to
@@ -79,7 +92,7 @@ export default function useMultiSelection( ref ) {
 	 */
 	useEffect( () => {
 		if ( ! hasMultiSelection || isMultiSelecting ) {
-			if ( ! selectedBlockClientId ) {
+			if ( ! selectedBlockClientId || isMultiSelecting ) {
 				return;
 			}
 
@@ -167,6 +180,19 @@ export default function useMultiSelection( ref ) {
 		rafId.current = window.requestAnimationFrame( () => {
 			onSelectionChange();
 			stopMultiSelect();
+			toggleRichText( ref.current, true );
+
+			const selection = window.getSelection();
+
+			// If the anchor element contains the selection, set focus back to
+			// the anchor element.
+			if ( selection.rangeCount ) {
+				const { commonAncestorContainer } = selection.getRangeAt( 0 );
+
+				if ( anchorElement.current.contains( commonAncestorContainer ) ) {
+					anchorElement.current.focus();
+				}
+			}
 		} );
 	}, [ onSelectionChange, stopMultiSelect ] );
 
@@ -187,6 +213,7 @@ export default function useMultiSelection( ref ) {
 		}
 
 		startClientId.current = clientId;
+		anchorElement.current = document.activeElement;
 		startMultiSelect();
 
 		// `onSelectionStart` is called after `mousedown` and `mouseleave`
@@ -203,7 +230,6 @@ export default function useMultiSelection( ref ) {
 		// especially in Safari for the blocks that are asynchonously rendered.
 		// To ensure the browser instantly removes the selection boundaries, we
 		// remove the contenteditable attributes manually.
-		Array.from( ref.current.querySelectorAll( '.rich-text' ) )
-			.forEach( ( node ) => node.removeAttribute( 'contenteditable' ) );
+		toggleRichText( ref.current, false );
 	}, [ isSelectionEnabled, startMultiSelect, onSelectionEnd ] );
 }

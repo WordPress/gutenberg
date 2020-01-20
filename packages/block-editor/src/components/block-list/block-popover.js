@@ -92,10 +92,15 @@ function BlockPopover( {
 		return null;
 	}
 
-	const node = document.getElementById( 'block-' + capturingClientId );
+	let node = document.getElementById( 'block-' + capturingClientId );
 
 	if ( ! node ) {
 		return null;
+	}
+
+	// A block may specify a different target element for the toolbar.
+	if ( node.classList.contains( 'is-block-collapsed' ) ) {
+		node = node.querySelector( '.is-block-content' ) || node;
 	}
 
 	function onFocus() {
@@ -119,7 +124,7 @@ function BlockPopover( {
 			animate={ false }
 			position={ popoverPosition }
 			focusOnMount={ false }
-			anchorRef={ node.lastChild }
+			anchorRef={ node }
 			className="block-editor-block-list__block-popover"
 			__unstableSticky={ showEmptyBlockSideInserter ? false : popoverIsSticky }
 			__unstableSlotName="block-toolbar"
@@ -127,6 +132,7 @@ function BlockPopover( {
 			__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && node }
 			__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && node }
 			onBlur={ () => setIsToolbarForced( false ) }
+			shouldAnchorIncludePadding
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
@@ -159,6 +165,8 @@ function BlockPopover( {
 			{ shouldShowBreadcrumb && (
 				<BlockBreadcrumb
 					clientId={ clientId }
+					rootClientId={ rootClientId }
+					moverDirection={ moverDirection }
 					data-align={ align }
 				/>
 			) }
