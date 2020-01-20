@@ -112,7 +112,10 @@ dependencies {
     if (rootProject.ext.buildGutenbergFromSource) {
         implementation "com.facebook.react:react-native:+" // From node_modules.
     } else {
-        def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
+
+        // FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
+        //def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
+        def rnVersion = '0.60.0-patched'
         implementation "com.facebook.react:react-native:${rnVersion}" // From Maven repo
     }
 }
