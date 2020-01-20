@@ -31,7 +31,7 @@ describe( 'DownloadableBlockNotice', () => {
 	describe( 'Rendering', () => {
 		it( 'should return null when there are no error notices', () => {
 			const wrapper = getContainer( { block: plugin } );
-			expect( wrapper.type() ).toEqual( null );
+			expect( wrapper.isEmptyRender() ).toBe( true );
 		} );
 
 		it( 'should return something when there are error notices', () => {
@@ -56,8 +56,8 @@ describe( 'DownloadableBlockNotice', () => {
 
 			wrapper.find( Button ).simulate( 'click', { event: {} } );
 
-			expect( fullInstall.mock.calls.length ).toBe( 1 );
-			expect( download.mock.calls.length ).toBe( 0 );
+			expect( fullInstall ).toHaveBeenCalledTimes( 1 );
+			expect( download ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should try to download again if it installed but failed to download', () => {
@@ -72,8 +72,8 @@ describe( 'DownloadableBlockNotice', () => {
 
 			wrapper.find( Button ).simulate( 'click', { event: {} } );
 
-			expect( fullInstall.mock.calls.length ).toBe( 0 );
-			expect( download.mock.calls.length ).toBe( 1 );
+			expect( fullInstall ).not.toHaveBeenCalled();
+			expect( download ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );
