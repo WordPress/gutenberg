@@ -366,13 +366,10 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
 
     @ReactProp(name = "selectionColor", customType = "Color")
     public void setSelectionColor(ReactAztecText view, @Nullable Integer color) {
-        int newColor = Color.BLACK;
         if (color != null) {
-            newColor = color;
+            view.setHighlightColor(ColorUtils.setAlphaComponent(color, 85));
+            view.setCursorColor(color);
         }
-
-        view.setHighlightColor(ColorUtils.setAlphaComponent(newColor, 127));
-        view.setCursorColor(newColor);
     }
 
     @ReactProp(name = "blockType")
