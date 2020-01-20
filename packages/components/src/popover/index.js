@@ -257,7 +257,8 @@ const Popover = ( {
 			if ( ! containerRef.current || ! contentRef.current ) {
 				return;
 			}
-			const anchor = computeAnchorRect(
+
+			let anchor = computeAnchorRect(
 				anchorRefFallback,
 				anchorRect,
 				getAnchorRect,
@@ -273,6 +274,18 @@ const Popover = ( {
 				contentRect.current = contentRef.current.getBoundingClientRect();
 			}
 
+			const { offsetParent } = containerRef.current;
+
+			if ( offsetParent ) {
+				const offsetParentRect = offsetParent.getBoundingClientRect();
+				anchor = new window.DOMRect(
+					anchor.left - offsetParentRect.left,
+					anchor.top - offsetParentRect.top,
+					anchor.width,
+					anchor.height
+				);
+			}
+
 			const {
 				popoverTop,
 				popoverLeft,
@@ -280,7 +293,7 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef );
+			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef, containerRef.current );
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
 				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {

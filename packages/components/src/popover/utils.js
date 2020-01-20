@@ -119,10 +119,11 @@ export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, cor
  *                              scroll container edge when part of the anchor
  *                              leaves view.
  * @param {Element} anchorRef   The anchor element.
+ * @param {Element} containerRef
  *
  * @return {Object} Popover xAxis position and constraints.
  */
-export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis, corner, sticky, anchorRef ) {
+export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis, corner, sticky, anchorRef, containerRef ) {
 	const { height } = contentSize;
 
 	if ( sticky ) {
@@ -139,11 +140,31 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis, cor
 		}
 
 		const scrollContainerEl = getScrollContainer( topEl ) || document.body;
-		const scrollRect = scrollContainerEl.getBoundingClientRect();
+		let scrollRect = scrollContainerEl.getBoundingClientRect();
 		const topRect = topEl.getBoundingClientRect();
-		const bottomRect = bottomEl.getBoundingClientRect();
+		let bottomRect = bottomEl.getBoundingClientRect();
 
 		if ( topRect.top - height <= scrollRect.top ) {
+			const { offsetParent } = containerRef;
+
+			if ( offsetParent ) {
+				const offsetParentRect = offsetParent.getBoundingClientRect();
+
+				scrollRect = new window.DOMRect(
+					scrollRect.left - offsetParentRect.left,
+					scrollRect.top - offsetParentRect.top,
+					scrollRect.width,
+					scrollRect.height
+				);
+
+				bottomRect = new window.DOMRect(
+					bottomRect.left - offsetParentRect.left,
+					bottomRect.top - offsetParentRect.top,
+					bottomRect.width,
+					bottomRect.height
+				);
+			}
+
 			return {
 				yAxis,
 				popoverTop: Math.min( bottomRect.bottom, scrollRect.top + height ),
@@ -222,13 +243,14 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis, cor
  *                              scroll container edge when part of the anchor
  *                              leaves view.
  * @param {Element} anchorRef   The anchor element.
+ * @param {Element} containerRef
  *
  * @return {Object} Popover position and constraints.
  */
-export function computePopoverPosition( anchorRect, contentSize, position = 'top', sticky, anchorRef ) {
+export function computePopoverPosition( anchorRect, contentSize, position = 'top', sticky, anchorRef, containerRef ) {
 	const [ yAxis, xAxis = 'center', corner ] = position.split( ' ' );
 
-	const yAxisPosition = computePopoverYAxisPosition( anchorRect, contentSize, yAxis, corner, sticky, anchorRef );
+	const yAxisPosition = computePopoverYAxisPosition( anchorRect, contentSize, yAxis, corner, sticky, anchorRef, containerRef );
 	const xAxisPosition = computePopoverXAxisPosition( anchorRect, contentSize, xAxis, corner, sticky, yAxisPosition.yAxis );
 
 	return {
