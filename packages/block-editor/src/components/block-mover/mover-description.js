@@ -84,11 +84,11 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 
 	if ( dir > 0 && isLast ) {
 		// moving down, and is the last item
-		// translators: 1: Type of block (i.e. Text, Image etc)
 		const movementDirection = getMovementDirection( 'down' );
 
 		if ( movementDirection === 'down' ) {
 			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the end of the content and can’t be moved down' ),
 				type,
 			);
@@ -96,6 +96,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 
 		if ( movementDirection === 'left' ) {
 			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the end of the content and can’t be moved left' ),
 				type,
 			);
@@ -103,6 +104,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 
 		if ( movementDirection === 'right' ) {
 			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the end of the content and can’t be moved right' ),
 				type,
 			);
@@ -149,24 +151,24 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 		const movementDirection = getMovementDirection( 'up' );
 
 		if ( movementDirection === 'up' ) {
-			// translators: 1: Type of block (i.e. Text, Image etc)
 			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the beginning of the content and can’t be moved up' ),
 				type,
 			);
 		}
 
 		if ( movementDirection === 'left' ) {
-			// translators: 1: Type of block (i.e. Text, Image etc)
 			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the beginning of the content and can’t be moved left' ),
 				type,
 			);
 		}
 
 		if ( movementDirection === 'right' ) {
-			// translators: 1: Type of block (i.e. Text, Image etc)
 			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the beginning of the content and can’t be moved right' ),
 				type,
 			);
