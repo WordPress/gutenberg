@@ -62,6 +62,7 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 const DEFAULT_COLUMNS = 2;
 const MIN_COLUMNS_NUMBER = 2;
 const MAX_COLUMNS_NUMBER = 6;
+const DEFAULT_ALIGNMENT = 'top';
 
 function ColumnsEditContainer( {
 	attributes,
@@ -71,7 +72,7 @@ function ColumnsEditContainer( {
 	clientId,
 	isSmallScreen,
 } ) {
-	const { verticalAlignment, width } = attributes;
+	const { verticalAlignment = DEFAULT_ALIGNMENT, width } = attributes;
 
 	const { count } = useSelect( ( select ) => {
 		return {
@@ -80,7 +81,7 @@ function ColumnsEditContainer( {
 	} );
 
 	useEffect( () => {
-		updateColumns( count, DEFAULT_COLUMNS );
+		updateColumns( count, Math.min( MAX_COLUMNS_NUMBER, count || DEFAULT_COLUMNS ) );
 	}, [] );
 
 	return (
@@ -109,6 +110,7 @@ function ColumnsEditContainer( {
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }
+					isCollapsed={ false }
 				/>
 			</BlockControls>
 			<View onLayout={ ( event ) => {
@@ -118,7 +120,7 @@ function ColumnsEditContainer( {
 				}
 			} }>
 				<InnerBlocks
-					containerStyle={ ! isSmallScreen ? styles.columnsContainer : undefined }
+					containerStyle={ ! isSmallScreen ? { ...styles.columnsContainer, alignItems: verticalAlignment !== 'center' ? `flex-${ verticalAlignment === 'top' ? 'start' : 'end' }` : 'center' } : undefined }
 					allowedBlocks={ ALLOWED_BLOCKS }
 				/>
 			</View>
