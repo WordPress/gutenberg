@@ -5,6 +5,11 @@ import { useEffect, useRef, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import { getBlockClientId, getBlockDOMNode } from '../../utils/dom';
+
+/**
  * Returns for the deepest node at the start or end of a container node. Ignores
  * any text nodes that only contain HTML formatting whitespace.
  *
@@ -30,35 +35,47 @@ function getDeepestNode( node, type ) {
 	return node;
 }
 
-export default function useMultiSelection( { ref, rootClientId } ) {
-	function selector( select ) {
-		const {
-			getBlockOrder,
-			isSelectionEnabled,
-			isMultiSelecting,
-			getMultiSelectedBlockClientIds,
-			hasMultiSelection,
-			getBlockParents,
-		} = select( 'core/block-editor' );
-
-		return {
-			blockClientIds: getBlockOrder( rootClientId ),
-			isSelectionEnabled: isSelectionEnabled(),
-			isMultiSelecting: isMultiSelecting(),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			hasMultiSelection: hasMultiSelection(),
-			getBlockParents,
-		};
-	}
-
+function selector( select ) {
 	const {
-		blockClientIds,
+		isSelectionEnabled,
+		isMultiSelecting,
+		getMultiSelectedBlockClientIds,
+		hasMultiSelection,
+		getBlockParents,
+		getSelectedBlockClientId,
+	} = select( 'core/block-editor' );
+
+	return {
+		isSelectionEnabled: isSelectionEnabled(),
+		isMultiSelecting: isMultiSelecting(),
+		multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+		hasMultiSelection: hasMultiSelection(),
+		getBlockParents,
+		selectedBlockClientId: getSelectedBlockClientId(),
+	};
+}
+
+function toggleRichText( container, toggle ) {
+	Array
+		.from( container.querySelectorAll( '.rich-text' ) )
+		.forEach( ( node ) => {
+			if ( toggle ) {
+				node.setAttribute( 'contenteditable', true );
+			} else {
+				node.removeAttribute( 'contenteditable' );
+			}
+		} );
+}
+
+export default function useMultiSelection( ref ) {
+	const {
 		isSelectionEnabled,
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		getBlockParents,
-	} = useSelect( selector, [ rootClientId ] );
+		selectedBlockClientId,
+	} = useSelect( selector, [] );
 	const {
 		startMultiSelect,
 		stopMultiSelect,
@@ -67,6 +84,7 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 	} = useDispatch( 'core/block-editor' );
 	const rafId = useRef();
 	const startClientId = useRef();
+	const anchorElement = useRef();
 
 	/**
 	 * When the component updates, and there is multi selection, we need to
@@ -74,26 +92,39 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 	 */
 	useEffect( () => {
 		if ( ! hasMultiSelection || isMultiSelecting ) {
+			if ( ! selectedBlockClientId || isMultiSelecting ) {
+				return;
+			}
+
+			const selection = window.getSelection();
+
+			if ( selection.rangeCount && ! selection.isCollapsed ) {
+				const blockNode = getBlockDOMNode( selectedBlockClientId );
+				const { startContainer, endContainer } = selection.getRangeAt( 0 );
+
+				if (
+					! blockNode.contains( startContainer ) ||
+					! blockNode.contains( endContainer )
+				) {
+					selection.removeAllRanges();
+				}
+			}
+
 			return;
 		}
 
 		const { length } = multiSelectedBlockClientIds;
-		// These must be in the right DOM order.
-		const start = multiSelectedBlockClientIds[ 0 ];
-		const end = multiSelectedBlockClientIds[ length - 1 ];
-		const startIndex = blockClientIds.indexOf( start );
 
-		// The selected block is not in this block list.
-		if ( startIndex === -1 ) {
+		if ( length < 2 ) {
 			return;
 		}
 
-		let startNode = ref.current.querySelector(
-			`[data-block="${ start }"]`
-		);
-		let endNode = ref.current.querySelector(
-			`[data-block="${ end }"]`
-		);
+		// These must be in the right DOM order.
+		const start = multiSelectedBlockClientIds[ 0 ];
+		const end = multiSelectedBlockClientIds[ length - 1 ];
+
+		let startNode = getBlockDOMNode( start );
+		let endNode = getBlockDOMNode( end );
 
 		const selection = window.getSelection();
 		const range = document.createRange();
@@ -112,8 +143,8 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 		hasMultiSelection,
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
-		blockClientIds,
 		selectBlock,
+		selectedBlockClientId,
 	] );
 
 	const onSelectionChange = useCallback( () => {
@@ -124,16 +155,7 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 			return;
 		}
 
-		let { focusNode } = selection;
-		let clientId;
-
-		// Find the client ID of the block where the selection ends.
-		do {
-			focusNode = focusNode.parentElement;
-		} while (
-			focusNode &&
-			! ( clientId = focusNode.getAttribute( 'data-block' ) )
-		);
+		const clientId = getBlockClientId( selection.focusNode );
 
 		if ( startClientId.current === clientId ) {
 			selectBlock( clientId );
@@ -158,6 +180,19 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 		rafId.current = window.requestAnimationFrame( () => {
 			onSelectionChange();
 			stopMultiSelect();
+			toggleRichText( ref.current, true );
+
+			const selection = window.getSelection();
+
+			// If the anchor element contains the selection, set focus back to
+			// the anchor element.
+			if ( selection.rangeCount ) {
+				const { commonAncestorContainer } = selection.getRangeAt( 0 );
+
+				if ( anchorElement.current.contains( commonAncestorContainer ) ) {
+					anchorElement.current.focus();
+				}
+			}
 		} );
 	}, [ onSelectionChange, stopMultiSelect ] );
 
@@ -178,6 +213,7 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 		}
 
 		startClientId.current = clientId;
+		anchorElement.current = document.activeElement;
 		startMultiSelect();
 
 		// `onSelectionStart` is called after `mousedown` and `mouseleave`
@@ -194,7 +230,6 @@ export default function useMultiSelection( { ref, rootClientId } ) {
 		// especially in Safari for the blocks that are asynchonously rendered.
 		// To ensure the browser instantly removes the selection boundaries, we
 		// remove the contenteditable attributes manually.
-		Array.from( ref.current.querySelectorAll( '.rich-text' ) )
-			.forEach( ( node ) => node.removeAttribute( 'contenteditable' ) );
+		toggleRichText( ref.current, false );
 	}, [ isSelectionEnabled, startMultiSelect, onSelectionEnd ] );
 }

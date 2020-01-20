@@ -984,6 +984,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Text",
+		"slug": "text",
+		"markdown_source": "../packages/components/src/text/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TextareaControl",
 		"slug": "textarea-control",
 		"markdown_source": "../packages/components/src/textarea-control/README.md",
@@ -1479,6 +1485,12 @@
 		"title": "@wordpress/viewport",
 		"slug": "packages-viewport",
 		"markdown_source": "../packages/viewport/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/warning",
+		"slug": "packages-warning",
+		"markdown_source": "../packages/warning/README.md",
 		"parent": "packages"
 	},
 	{

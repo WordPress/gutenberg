@@ -129,9 +129,8 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 
 	it( 'should not convert a shortcode to a block type with a failing `isMatch`', () => {
 		const original = `<p>[my-broccoli id="1000"]</p>`;
-
 		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
-		const expectedBlock = createBlock( 'core/shortcode' );
+		const expectedBlock = createBlock( 'core/shortcode', { text: '[my-broccoli id="1000"]' } );
 		expectedBlock.clientId = transformed[ 1 ].clientId;
 		expect( transformed[ 1 ] ).toEqual( expectedBlock );
 	} );
@@ -146,7 +145,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		firstExpectedBlock.clientId = transformed[ 1 ].clientId;
 		const secondExpectedBlock = createBlock( 'test/broccoli', { id: 42 } );
 		secondExpectedBlock.clientId = transformed[ 3 ].clientId;
-		const thirdExpectedBlock = createBlock( 'core/shortcode' );
+		const thirdExpectedBlock = createBlock( 'core/shortcode', { text: '[my-broccoli id="1000"]' } );
 		thirdExpectedBlock.clientId = transformed[ 5 ].clientId;
 		expect( transformed[ 1 ] ).toEqual( firstExpectedBlock );
 		expect( transformed[ 3 ] ).toEqual( secondExpectedBlock );

@@ -12,8 +12,14 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import LinkControl from '../index';
+import LinkControl from '../';
 import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
+
+const mockFetchSearchSuggestions = jest.fn();
+
+jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
+	fetchSearchSuggestions: mockFetchSearchSuggestions,
+} ) );
 
 /**
  * Wait for next tick of event loop. This is required
@@ -33,6 +39,7 @@ beforeEach( () => {
 	// setup a DOM element as a render target
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
+	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
 } );
 
 afterEach( () => {
@@ -40,6 +47,7 @@ afterEach( () => {
 	unmountComponentAtNode( container );
 	container.remove();
 	container = null;
+	mockFetchSearchSuggestions.mockReset();
 } );
 
 describe( 'Basic rendering', () => {
@@ -71,12 +79,10 @@ describe( 'Searching for a link', () => {
 			resolver = resolve;
 		} );
 
+		mockFetchSearchSuggestions.mockImplementation( fauxRequest );
+
 		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fauxRequest }
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
@@ -115,11 +121,7 @@ describe( 'Searching for a link', () => {
 		const firstFauxSuggestion = first( fauxEntitySuggestions );
 
 		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
@@ -153,11 +155,7 @@ describe( 'Searching for a link', () => {
 		[ 'ThisCouldAlsoBeAValidURL' ],
 	] )( 'should display a URL suggestion as a default fallback for the search term "%s" which could potentially be a valid url.', async ( searchTerm ) => {
 		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
@@ -190,11 +188,7 @@ describe( 'Searching for a link', () => {
 		const searchTerm = 'Hello world';
 
 		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		let searchResultElements;
@@ -242,11 +236,7 @@ describe( 'Manual link entry', () => {
 		[ 'www.wordpress.org' ], // usage of "www"
 	] )( 'should display a single suggestion result when the current input value is URL-like (eg: %s)', async ( searchTerm ) => {
 		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
@@ -279,9 +269,7 @@ describe( 'Manual link entry', () => {
 		] )( 'should recognise "%s" as a %s link and handle as manual entry by displaying a single suggestion', async ( searchTerm, searchType ) => {
 			act( () => {
 				render(
-					<LinkControl
-						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-					/>, container
+					<LinkControl />, container
 				);
 			} );
 
@@ -309,6 +297,102 @@ describe( 'Manual link entry', () => {
 	} );
 } );
 
+describe( 'Default search suggestions', () => {
+	it( 'should display a list of initial search suggestions when there is no search value or suggestions', async () => {
+		const expectedResultsLength = 3; // set within `LinkControl`
+
+		act( () => {
+			render(
+				<LinkControl showInitialSuggestions />, container
+			);
+		} );
+
+		await eventLoopTick();
+
+		// Search Input UI
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		const searchResultsWrapper = container.querySelector( '[role="listbox"]' );
+		const initialSearchResultElements = searchResultsWrapper.querySelectorAll( '[role="option"]' );
+
+		const searchResultsLabel = container.querySelector( `#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }` );
+
+		// Verify input has no value has default suggestions should only show
+		// when this does not have a value
+		expect( searchInput.value ).toBe( '' );
+
+		// Ensure only called once as a guard against potential infinite
+		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
+		// which has calls to `setState` within it.
+		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+
+		// Verify the search results already display the initial suggestions
+		expect( initialSearchResultElements ).toHaveLength( expectedResultsLength );
+
+		expect( searchResultsLabel.innerHTML ).toEqual( 'Recently updated' );
+	} );
+
+	it( 'should not display initial suggestions when input value is present', async () => {
+		let searchResultElements;
+		//
+		// Render with an initial value an ensure that no initial suggestions
+		// are shown.
+		//
+		act( () => {
+			render(
+				<LinkControl
+					showInitialSuggestions
+					value={ fauxEntitySuggestions[ 0 ] }
+				/>, container
+			);
+		} );
+
+		await eventLoopTick();
+
+		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
+
+		//
+		// Click the "Edit/Change" button and check initial suggestions are not
+		// shown.
+		//
+		const currentLinkUI = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
+
+		act( () => {
+			Simulate.click( currentLinkBtn );
+		} );
+
+		await eventLoopTick();
+
+		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+
+		expect( searchResultElements ).toHaveLength( 0 );
+
+		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
+
+		//
+		// Reset the search to empty and check the initial suggestions are now shown.
+		//
+		const resetUI = container.querySelector( '[aria-label="Reset"]' );
+
+		act( () => {
+			Simulate.click( resetUI );
+		} );
+
+		await eventLoopTick();
+
+		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+
+		expect( searchResultElements ).toHaveLength( 3 );
+
+		// Ensure only called once as a guard against potential infinite
+		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
+		// which has calls to `setState` within it.
+		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+	} );
+} );
+
 describe( 'Selecting links', () => {
 	it( 'should display a selected link corresponding to the provided "currentLink" prop', () => {
 		const selectedLink = first( fauxEntitySuggestions );
@@ -316,18 +400,11 @@ describe( 'Selecting links', () => {
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
 
-			return (
-				<LinkControl
-					currentLink={ link }
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>
-			);
+			return <LinkControl value={ link } />;
 		};
 
 		act( () => {
-			render(
-				<LinkControlConsumer />, container
-			);
+			render( <LinkControlConsumer />, container );
 		} );
 
 		// TODO: select by aria role or visible text
@@ -337,31 +414,26 @@ describe( 'Selecting links', () => {
 
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.type ) );
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
 		expect( currentLinkAnchor ).not.toBeNull();
 	} );
 
 	it( 'should hide "selected" link UI and display search UI prepopulated with previously selected link title when "Change" button is clicked', () => {
 		const selectedLink = first( fauxEntitySuggestions );
-		const spyOnEditMode = jest.fn();
 
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( selectedLink );
 
 			return (
 				<LinkControl
-					currentLink={ link }
-					onLinkChange={ ( suggestion ) => setLink( suggestion ) }
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-					onChangeMode={ spyOnEditMode( 'edit' ) }
+					value={ link }
+					onChange={ ( suggestion ) => setLink( suggestion ) }
 				/>
 			);
 		};
 
 		act( () => {
-			render(
-				<LinkControlConsumer />, container
-			);
+			render( <LinkControlConsumer />, container );
 		} );
 
 		// Required in order to select the button below
@@ -380,7 +452,6 @@ describe( 'Selecting links', () => {
 		expect( searchInput ).not.toBeNull();
 		expect( searchInput.value ).toBe( selectedLink.title ); // prepopulated with previous link's title
 		expect( currentLinkUI ).toBeNull();
-		expect( spyOnEditMode ).toHaveBeenCalled();
 	} );
 
 	describe( 'Selection using mouse click', () => {
@@ -398,9 +469,8 @@ describe( 'Selecting links', () => {
 
 				return (
 					<LinkControl
-						currentLink={ link }
-						onLinkChange={ ( suggestion ) => setLink( suggestion ) }
-						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+						value={ link }
+						onChange={ ( suggestion ) => setLink( suggestion ) }
 					/>
 				);
 			};
@@ -438,7 +508,7 @@ describe( 'Selecting links', () => {
 
 			// Check that this suggestion is now shown as selected
 			expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
 			expect( currentLinkAnchor ).not.toBeNull();
 		} );
 	} );
@@ -458,9 +528,8 @@ describe( 'Selecting links', () => {
 
 				return (
 					<LinkControl
-						currentLink={ link }
-						onLinkChange={ ( suggestion ) => setLink( suggestion ) }
-						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+						value={ link }
+						onChange={ ( suggestion ) => setLink( suggestion ) }
 					/>
 				);
 			};
@@ -531,7 +600,7 @@ describe( 'Selecting links', () => {
 			const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
 
 			expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
 			expect( currentLinkAnchor ).not.toBeNull();
 		} );
 	} );
@@ -545,21 +614,12 @@ describe( 'Addition Settings UI', () => {
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
 
-			return (
-				<LinkControl
-					currentLink={ link }
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>
-			);
+			return <LinkControl value={ link } />;
 		};
 
 		act( () => {
-			render(
-				<LinkControlConsumer />, container
-			);
+			render( <LinkControlConsumer />, container );
 		} );
-
-		// console.log( container.innerHTML );
 
 		const newTabSettingLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML && label.innerHTML.includes( expectedSettingText ) );
 		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found
@@ -577,12 +637,10 @@ describe( 'Addition Settings UI', () => {
 			{
 				id: 'newTab',
 				title: 'Open in New Tab',
-				checked: false,
 			},
 			{
 				id: 'noFollow',
 				title: 'No follow',
-				checked: true,
 			},
 		];
 
@@ -593,17 +651,14 @@ describe( 'Addition Settings UI', () => {
 
 			return (
 				<LinkControl
-					currentLink={ link }
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-					currentSettings={ customSettings }
+					value={ { ...link, newTab: false, noFollow: true } }
+					settings={ customSettings }
 				/>
 			);
 		};
 
 		act( () => {
-			render(
-				<LinkControlConsumer />, container
-			);
+			render( <LinkControlConsumer />, container );
 		} );
 
 		// Grab the elements using user perceivable DOM queries

@@ -16,7 +16,7 @@ import Tiles from './tiles';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Caption } from '@wordpress/block-editor';
+import { BlockCaption } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 
 const TILE_SPACING = 15;
@@ -109,7 +109,7 @@ export const Gallery = ( props ) => {
 				} ) }
 			</Tiles>
 			{ mediaPlaceholder }
-			<Caption
+			<BlockCaption
 				clientId={ clientId }
 				isSelected={ isCaptionSelected }
 				accessible={ true }

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -24,6 +25,19 @@ export const settings = {
 		inserter: false,
 		html: false,
 		reusable: false,
+	},
+	__experimentalLabel( attributes, { context } ) {
+		if ( context === 'accessibility' ) {
+			const { originalName } = attributes;
+
+			const originalBlockType = originalName ? getBlockType( originalName ) : undefined;
+
+			if ( originalBlockType ) {
+				return originalBlockType.settings.title || originalName;
+			}
+
+			return '';
+		}
 	},
 	edit,
 	save,

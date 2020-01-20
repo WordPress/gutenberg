@@ -3,6 +3,8 @@
  */
 import React from 'react';
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
+import { isEmpty } from 'lodash';
+
 /**
  * Internal dependencies
  */
@@ -23,7 +25,7 @@ import {
 } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
-	Caption,
+	BlockCaption,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
@@ -33,7 +35,7 @@ import {
 	VideoPlayer,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 
@@ -44,6 +46,12 @@ import style from './style.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
 import VideoCommonSettings from './edit-common-settings';
+
+const ICON_TYPE = {
+	PLACEHOLDER: 'placeholder',
+	RETRY: 'retry',
+	UPLOAD: 'upload',
+};
 
 class VideoEdit extends React.Component {
 	constructor( props ) {
@@ -147,13 +155,20 @@ class VideoEdit extends React.Component {
 		}
 	}
 
-	getIcon( isRetryIcon, isMediaPlaceholder ) {
-		if ( isRetryIcon ) {
-			return <Icon icon={ SvgIconRetry } { ...style.icon } />;
+	getIcon( iconType ) {
+		let iconStyle;
+		switch ( iconType ) {
+			case ICON_TYPE.RETRY:
+				return <Icon icon={ SvgIconRetry } { ...style.icon } />;
+			case ICON_TYPE.PLACEHOLDER:
+				iconStyle = this.props.getStylesFromColorScheme( style.icon, style.iconDark );
+				break;
+			case ICON_TYPE.UPLOAD:
+				iconStyle = this.props.getStylesFromColorScheme( style.iconUploading, style.iconUploadingDark );
+				break;
 		}
 
-		const iconStyle = this.props.getStylesFromColorScheme( style.icon, style.iconDark );
-		return <Icon icon={ SvgIcon } { ...( ! isMediaPlaceholder ? style.iconUploading : iconStyle ) } />;
+		return <Icon icon={ SvgIcon } { ...iconStyle } />;
 	}
 
 	render() {
@@ -188,7 +203,7 @@ class VideoEdit extends React.Component {
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
 						onSelect={ this.onSelectMediaUploadOption }
-						icon={ this.getIcon( false, true ) }
+						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
 					/>
 				</View>
@@ -196,7 +211,11 @@ class VideoEdit extends React.Component {
 		}
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onVideoPressed } disabled={ ! isSelected }>
+			<TouchableWithoutFeedback
+				accessible={ ! isSelected }
+				onPress={ this.onVideoPressed }
+				disabled={ ! isSelected }
+			>
 				<View style={ { flex: 1 } }>
 					{ ! this.state.isCaptionSelected &&
 						<BlockControls>
@@ -218,7 +237,7 @@ class VideoEdit extends React.Component {
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( { isUploadInProgress, isUploadFailed, retryMessage } ) => {
 							const showVideo = isURL( src ) && ! isUploadInProgress && ! isUploadFailed;
-							const icon = this.getIcon( isUploadFailed, false );
+							const icon = this.getIcon( isUploadFailed ? ICON_TYPE.RETRY : ICON_TYPE.UPLOAD );
 							const styleIconContainer = isUploadFailed ? style.modalIconRetry : style.modalIcon;
 
 							const iconContainer = (
@@ -247,7 +266,8 @@ class VideoEdit extends React.Component {
 										</View>
 									}
 									{ ! showVideo &&
-										<View style={ { height: videoContainerHeight, width: '100%', ...style.placeholder } }>
+										<View style={ { height: videoContainerHeight, width: '100%', ...this.props.getStylesFromColorScheme(
+											style.placeholderContainer, style.placeholderContainerDark ) } }>
 											{ videoContainerHeight > 0 && iconContainer }
 											{ isUploadFailed && <Text style={ style.uploadFailedText }>{ retryMessage }</Text> }
 										</View>
@@ -256,7 +276,17 @@ class VideoEdit extends React.Component {
 							);
 						} }
 					/>
-					<Caption
+					<BlockCaption
+						accessible={ true }
+						accessibilityLabelCreator={ ( caption ) =>
+							isEmpty( caption ) ?
+							/* translators: accessibility text. Empty video caption. */
+								( 'Video caption. Empty' ) :
+								sprintf(
+								/* translators: accessibility text. %s: video caption. */
+									__( 'Video caption. %s' ),
+									caption )
+						}
 						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }
 						onFocus={ this.onFocusCaption }

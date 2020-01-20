@@ -13,7 +13,10 @@ import { useState } from '@wordpress/element';
  */
 import ClipboardButton from '../';
 
-export default { title: 'Components|ClipboardButton', component: ClipboardButton };
+export default {
+	title: 'Components/ClipboardButton',
+	component: ClipboardButton,
+};
 
 const ClipboardButtonWithState = ( { copied, ...props } ) => {
 	const [ isCopied, setCopied ] = useState( copied );
@@ -33,10 +36,5 @@ export const _default = () => {
 	const isPrimary = boolean( 'Is primary', true );
 	const copyText = text( 'Text', 'Text' );
 
-	return (
-		<ClipboardButtonWithState
-			isPrimary={ isPrimary }
-			text={ copyText }
-		/>
-	);
+	return <ClipboardButtonWithState isPrimary={ isPrimary } text={ copyText } />;
 };

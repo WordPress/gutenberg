@@ -132,6 +132,7 @@
 .components-form-token-field__remove-token.components-button {
 	display: inline-block;
 	line-height: 24px;
+	height: auto;
 	background: $light-gray-500;
 	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
 	@include reduce-motion;

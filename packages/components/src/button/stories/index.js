@@ -9,7 +9,7 @@ import { text, number } from '@storybook/addon-knobs';
 import './style.css';
 import Button from '../';
 
-export default { title: 'Components|Button', component: Button };
+export default { title: 'Components/Button', component: Button };
 
 export const _default = () => {
 	const label = text( 'Label', 'Default Button' );
@@ -67,6 +67,16 @@ export const disabled = () => {
 	);
 };
 
+export const disabledFocusable = () => {
+	const label = text( 'Label', 'Disabled Button' );
+
+	return (
+		<Button disabled __experimentalIsFocusable>
+			{ label }
+		</Button>
+	);
+};
+
 export const link = () => {
 	const label = text( 'Label', 'Link Button' );
 
@@ -97,6 +107,22 @@ export const icon = () => {
 			icon={ usedIcon }
 			label={ label }
 			iconSize={ size }
+		/>
+	);
+};
+
+export const disabledFocusableIcon = () => {
+	const usedIcon = text( 'Icon', 'ellipsis' );
+	const label = text( 'Label', 'More' );
+	const size = number( 'Size' );
+
+	return (
+		<Button
+			icon={ usedIcon }
+			label={ label }
+			iconSize={ size }
+			disabled
+			__experimentalIsFocusable
 		/>
 	);
 };

@@ -13,7 +13,7 @@
 }
 
 // On fullwide blocks, don't go beyond the canvas.
-[data-align="full"] > [data-block] .has-overlay::after {
+[data-align="full"] .has-overlay::after {
 	right: 0;
 	left: 0;
 }

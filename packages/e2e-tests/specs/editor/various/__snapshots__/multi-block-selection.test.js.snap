@@ -52,6 +52,12 @@ exports[`Multi-block selection should only trigger multi-selection when at the e
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Multi-block selection should return original focus after failed multi selection attempt 1`] = `
+"<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Multi-block selection should use selection direction to determine vertical edge 1`] = `
 "<!-- wp:paragraph -->
 <p>1<br>2.</p>

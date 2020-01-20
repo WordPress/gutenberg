@@ -76,6 +76,7 @@ export class BlockList extends Component {
 			header,
 			withFooter = true,
 			renderAppender,
+			isReadOnly,
 			isRootList,
 			containerStyle,
 		} = this.props;
@@ -100,9 +101,9 @@ export class BlockList extends Component {
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
 					title={ title }
-					ListHeaderComponent={ header }
-					ListEmptyComponent={ this.renderDefaultBlockAppender }
-					ListFooterComponent={ withFooter && this.renderBlockListFooter }
+					ListHeaderComponent={ ! isReadOnly && header }
+					ListEmptyComponent={ ! isReadOnly && this.renderDefaultBlockAppender }
+					ListFooterComponent={ ! isReadOnly && withFooter && this.renderBlockListFooter }
 				/>
 
 				{ renderAppender && blockClientIds.length > 0 && (
@@ -127,20 +128,28 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId, index } ) {
-		const { shouldShowBlockAtIndex, shouldShowInsertionPointBefore, shouldShowInsertionPointAfter } = this.props;
+		const {
+			isReadOnly,
+			shouldShowBlockAtIndex,
+			shouldShowInsertionPointBefore,
+			shouldShowInsertionPointAfter,
+		} = this.props;
+
 		return (
 			<ReadableContentView>
-				{ shouldShowInsertionPointBefore( clientId ) && <BlockInsertionPoint /> }
-				{ shouldShowBlockAtIndex( index ) && (
-					<BlockListBlock
-						key={ clientId }
-						showTitle={ false }
-						clientId={ clientId }
-						rootClientId={ this.props.rootClientId }
-						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-						isSmallScreen={ ! this.props.isFullyBordered }
-					/> ) }
-				{ shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
+				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
+					{ shouldShowInsertionPointBefore( clientId ) && <BlockInsertionPoint /> }
+					{ shouldShowBlockAtIndex( index ) && (
+						<BlockListBlock
+							key={ clientId }
+							showTitle={ false }
+							clientId={ clientId }
+							rootClientId={ this.props.rootClientId }
+							onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
+							isSmallScreen={ ! this.props.isFullyBordered }
+						/> ) }
+					{ shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
+				</View>
 			</ReadableContentView>
 		);
 	}
@@ -170,6 +179,7 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSelectedBlock,
+			getSettings,
 		} = select( 'core/block-editor' );
 
 		const {
@@ -220,6 +230,8 @@ export default compose( [
 			return ! shouldHideBlockAtIndex;
 		};
 
+		const isReadOnly = getSettings().readOnly;
+
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -228,6 +240,7 @@ export default compose( [
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			selectedBlockClientId,
+			isReadOnly,
 			isRootList: rootClientId === undefined,
 		};
 	} ),

@@ -90,6 +90,7 @@ module.exports = {
 			'token-list',
 			'server-side-render',
 			'shortcode',
+			'warning',
 		].map( camelCaseDash ) ),
 		new CopyWebpackPlugin(
 			gutenbergPackages.map( ( packageName ) => ( {
@@ -147,6 +148,13 @@ module.exports = {
 						// to occur at a later priority.
 						.replace( /(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/, '$1, 20' );
 				},
+			},
+		] ),
+		new CopyWebpackPlugin( [
+			{
+				from: './packages/block-library/src/+(shortcode)/block.json',
+				test: new RegExp( `([\\w-]+)${ escapeRegExp( sep ) }block\\.json$` ),
+				to: 'build/block-library/blocks/[1].json',
 			},
 		] ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),

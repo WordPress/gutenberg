@@ -7,7 +7,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, Component, createRef, Platform } from '@wordpress/element';
+import { RawHTML, Component, useRef, Platform, forwardRef } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
@@ -58,7 +58,6 @@ function getMultilineTag( multiline ) {
 class RichTextWrapper extends Component {
 	constructor() {
 		super( ...arguments );
-		this.ref = createRef();
 		this.onEnter = this.onEnter.bind( this );
 		this.onSplit = this.onSplit.bind( this );
 		this.onPaste = this.onPaste.bind( this );
@@ -358,6 +357,7 @@ class RichTextWrapper extends Component {
 			style,
 			preserveWhiteSpace,
 			disabled,
+			forwardedRef,
 			...props
 		} = this.props;
 		const multilineTag = getMultilineTag( multiline );
@@ -378,7 +378,7 @@ class RichTextWrapper extends Component {
 		const content = (
 			<RichText
 				{ ...props }
-				ref={ this.ref }
+				ref={ forwardedRef }
 				value={ adjustedValue }
 				onChange={ adjustedOnChange }
 				selectionStart={ selectionStart }
@@ -411,10 +411,10 @@ class RichTextWrapper extends Component {
 				start={ start }
 				reversed={ reversed }
 			>
-				{ ( { isSelected, value, onChange, Editable } ) =>
+				{ ( { isSelected, value, onChange, onFocus, Editable } ) =>
 					<>
-						{ children && children( { value, onChange } ) }
-						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorRef={ this.ref.current } /> ) }
+						{ children && children( { value, onChange, onFocus } ) }
+						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorRef={ forwardedRef.current } /> ) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
 							onReplace={ onReplace }
@@ -486,7 +486,10 @@ const RichTextContainer = compose( [
 
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		const { __experimentalCanUserUseUnfilteredHTML } = getSettings();
+		const {
+			__experimentalCanUserUseUnfilteredHTML,
+			__experimentalUndo: undo,
+		} = getSettings();
 		if ( isSelected === undefined ) {
 			isSelected = (
 				selectionStart.clientId === clientId &&
@@ -516,6 +519,7 @@ const RichTextContainer = compose( [
 			isSelected,
 			didAutomaticChange: didAutomaticChange(),
 			disabled: isMultiSelecting() || hasMultiSelection(),
+			undo,
 			...extraProps,
 		};
 	} ),
@@ -531,7 +535,6 @@ const RichTextContainer = compose( [
 			selectionChange,
 			__unstableMarkAutomaticChange,
 		} = dispatch( 'core/block-editor' );
-		const { undo } = dispatch( 'core/editor' );
 
 		return {
 			onCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
@@ -541,12 +544,16 @@ const RichTextContainer = compose( [
 				selectionChange( clientId, identifier, start, end );
 			},
 			markAutomaticChange: __unstableMarkAutomaticChange,
-			undo,
 		};
 	} ),
 ] )( RichTextWrapper );
 
-RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
+const ForwardedRichTextContainer = forwardRef( ( props, ref ) => {
+	const fallbackRef = useRef();
+	return <RichTextContainer { ...props } forwardedRef={ ref || fallbackRef } />;
+} );
+
+ForwardedRichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
 		value = childrenSource.toHTML( value );
@@ -567,11 +574,11 @@ RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => 
 	return content;
 };
 
-RichTextContainer.isEmpty = ( value ) => {
+ForwardedRichTextContainer.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
 };
 
-RichTextContainer.Content.defaultProps = {
+ForwardedRichTextContainer.Content.defaultProps = {
 	format: 'string',
 	value: '',
 };
@@ -579,7 +586,7 @@ RichTextContainer.Content.defaultProps = {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md
  */
-export default RichTextContainer;
+export default ForwardedRichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { __unstableRichTextInputEvent } from './input-event';

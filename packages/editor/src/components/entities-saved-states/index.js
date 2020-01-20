@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { startCase } from 'lodash';
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
@@ -20,8 +19,9 @@ const EntitiesSavedStatesCheckbox = ( {
 	setCheckedById,
 } ) => (
 	<CheckboxControl
-		label={ `${ startCase( name ) }: "${ rawRecord.title ||
-			rawRecord.name ||
+		label={ `${ name }: "${ rawRecord.name ||
+			rawRecord.slug ||
+			rawRecord.title ||
 			__( 'Untitled' ) }"` }
 		checked={ checked }
 		onChange={ ( nextChecked ) => setCheckedById( id, nextChecked ) }

@@ -41,7 +41,14 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } )
 					]
 				) }
 				{ renderIcon( blockIcon ) }
-				<Text style={ styles.breadcrumbTitle }><BlockTitle clientId={ clientId } /></Text>
+				<Text
+					maxFontSizeMultiplier={ 1.25 }
+					ellipsizeMode="tail"
+					numberOfLines={ 1 }
+					style={ styles.breadcrumbTitle }
+				>
+					<BlockTitle clientId={ clientId } />
+				</Text>
 			</TouchableOpacity>
 		</View>
 	);

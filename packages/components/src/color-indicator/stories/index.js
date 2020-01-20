@@ -9,7 +9,7 @@ import { text } from '@storybook/addon-knobs';
 import ColorIndicator from '../';
 
 export default {
-	title: 'Components|ColorIndicator',
+	title: 'Components/ColorIndicator',
 	component: ColorIndicator,
 };
 
