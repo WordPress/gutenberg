@@ -3,6 +3,7 @@
     <!-- translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. -->
     <string name="gutenberg_native_1_s_current_value_is_2_s" tools:ignore="UnusedResources">%1$s. Current value is %2$s</string>
     <string name="gutenberg_native_add_a_description" tools:ignore="UnusedResources">Add a description</string>
+    <string name="gutenberg_native_add_a_shortcode" tools:ignore="UnusedResources">Add a shortcode…</string>
     <string name="gutenberg_native_add_annotation" tools:ignore="UnusedResources">Add annotation</string>
     <string name="gutenberg_native_add_block_here" tools:ignore="UnusedResources">ADD BLOCK HERE</string>
     <string name="gutenberg_native_add_image" tools:ignore="UnusedResources">ADD IMAGE</string>
@@ -30,10 +31,12 @@
     <string name="gutenberg_native_double_tap_to_select" tools:ignore="UnusedResources">Double tap to select</string>
     <string name="gutenberg_native_double_tap_to_select_a_video" tools:ignore="UnusedResources">Double tap to select a video</string>
     <string name="gutenberg_native_double_tap_to_select_an_image" tools:ignore="UnusedResources">Double tap to select an image</string>
+    <string name="gutenberg_native_double_tap_to_select_layout" tools:ignore="UnusedResources">Double tap to select layout</string>
     <!-- translators: accessibility text (hint for switches) -->
     <string name="gutenberg_native_double_tap_to_toggle_setting" tools:ignore="UnusedResources">Double tap to toggle setting</string>
     <string name="gutenberg_native_double_tap_to_undo_last_change" tools:ignore="UnusedResources">Double tap to undo last change</string>
-    <string name="gutenberg_native_empty" tools:ignore="UnusedResources">Empty</string>
+    <string name="gutenberg_native_edit_media" tools:ignore="UnusedResources">Edit media</string>
+    <string name="gutenberg_native_edit_video" tools:ignore="UnusedResources">Edit video</string>
     <string name="gutenberg_native_failed_to_insert_media_please_tap_for_options" tools:ignore="UnusedResources">Failed to insert media.\nPlease tap for options.</string>
     <!-- translators: accessibility text. %s: gallery caption. -->
     <string name="gutenberg_native_gallery_caption_s" tools:ignore="UnusedResources">Gallery caption. %s</string>
@@ -42,10 +45,6 @@
     <string name="gutenberg_native_hide_keyboard" tools:ignore="UnusedResources">Hide keyboard</string>
     <!-- translators: accessibility text. %s: image caption. -->
     <string name="gutenberg_native_image_caption_s" tools:ignore="UnusedResources">Image caption. %s</string>
-    <!-- translators: accessibility text. 1: heading level. 2: heading content. -->
-    <string name="gutenberg_native_level_1_s_2_s" tools:ignore="UnusedResources">Level %1$s. %2$s</string>
-    <!-- translators: accessibility text. %s: heading level. -->
-    <string name="gutenberg_native_level_s_empty" tools:ignore="UnusedResources">Level %s. Empty.</string>
     <string name="gutenberg_native_link_inserted" tools:ignore="UnusedResources">Link inserted</string>
     <string name="gutenberg_native_link_text" tools:ignore="UnusedResources">Link text</string>
     <string name="gutenberg_native_move_block_down" tools:ignore="UnusedResources">Move block down</string>
@@ -77,9 +76,6 @@
     <string name="gutenberg_native_remove_block_at_row_s" tools:ignore="UnusedResources">Remove block at row %s</string>
     <string name="gutenberg_native_remove_image" tools:ignore="UnusedResources">Remove Image</string>
     <string name="gutenberg_native_reset_block" tools:ignore="UnusedResources">Reset Block</string>
-    <string name="gutenberg_native_row_d" tools:ignore="UnusedResources">Row %d.</string>
-    <!-- translators: accessibility text. %s: block name. -->
-    <string name="gutenberg_native_s_block" tools:ignore="UnusedResources">%s Block</string>
     <!-- translators: accessibility text for the media block empty state. %s: media type -->
     <string name="gutenberg_native_s_block_empty" tools:ignore="UnusedResources">%s block. Empty</string>
     <!-- translators: accessibility text for blocks with invalid content. %d: localized block title -->
@@ -100,6 +96,8 @@
     <string name="gutenberg_native_title" tools:ignore="UnusedResources">Title:</string>
     <string name="gutenberg_native_translate" tools:ignore="UnusedResources">Translate</string>
     <string name="gutenberg_native_ungroup" tools:ignore="UnusedResources">Ungroup</string>
+    <!-- translators: accessibility text. %s: video caption. -->
+    <string name="gutenberg_native_video_caption_s" tools:ignore="UnusedResources">Video caption. %s</string>
     <string name="gutenberg_native_we_are_working_hard_to_add_more_blocks_with_each_release_in_the_m" tools:ignore="UnusedResources">We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.</string>
     <string name="gutenberg_native_wordpress_media_library" tools:ignore="UnusedResources">WordPress Media Library</string>
 </resources>

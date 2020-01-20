@@ -101,8 +101,11 @@ export function getOtherMediaOptions( filter, callback ) {
 	return RNReactNativeGutenbergBridge.getOtherMediaOptions( filter, callback );
 }
 
-export function requestImageFullscreenPreview( mediaUrl ) {
-	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( mediaUrl );
+export function requestImageFullscreenPreview( currentImageUrl, originalImageUrl ) {
+	if ( isIOS ) {
+		return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( currentImageUrl, originalImageUrl );
+	}
+	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( originalImageUrl || currentImageUrl );
 }
 
 export function fetchRequest( path ) {
