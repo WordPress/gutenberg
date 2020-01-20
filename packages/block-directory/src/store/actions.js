@@ -157,7 +157,6 @@ export function removeInstalledBlockType( item ) {
 
 /**
  * Returns an action object used to indicate install in progress
- *
  */
 export function fetchInstallBlock() {
 	return {
@@ -168,7 +167,6 @@ export function fetchInstallBlock() {
 
 /**
  * Returns an action object used to indicate install has completed
- *
  */
 export function receiveInstallBlock() {
 	return {
