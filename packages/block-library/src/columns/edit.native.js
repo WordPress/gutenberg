@@ -84,6 +84,30 @@ function ColumnsEditContainer( {
 		updateColumns( count, Math.min( MAX_COLUMNS_NUMBER, count || DEFAULT_COLUMNS ) );
 	}, [] );
 
+	const getVerticalAlignmentRemap = () => {
+		let alingment;
+
+		switch ( verticalAlignment ) {
+			case 'center':
+				alingment = 'center';
+				break;
+
+			case 'bottom':
+				alingment = 'flex-end';
+				break;
+
+			case 'top':
+			default:
+				alingment = 'flex-start';
+		}
+		return { alignItems: alingment };
+	};
+
+	const containerStyle = {
+		...styles.columnsContainer,
+		...getVerticalAlignmentRemap(),
+	};
+
 	return (
 		<>
 			<InspectorControls>
@@ -120,7 +144,7 @@ function ColumnsEditContainer( {
 				}
 			} }>
 				<InnerBlocks
-					containerStyle={ ! isSmallScreen ? { ...styles.columnsContainer, alignItems: verticalAlignment !== 'center' ? `flex-${ verticalAlignment === 'top' ? 'start' : 'end' }` : 'center' } : undefined }
+					containerStyle={ ! isSmallScreen ? containerStyle : undefined }
 					allowedBlocks={ ALLOWED_BLOCKS }
 				/>
 			</View>
