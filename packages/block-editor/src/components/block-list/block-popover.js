@@ -92,10 +92,15 @@ function BlockPopover( {
 		return null;
 	}
 
-	const node = document.getElementById( 'block-' + capturingClientId );
+	let node = document.getElementById( 'block-' + capturingClientId );
 
 	if ( ! node ) {
 		return null;
+	}
+
+	// A block may specify a different target element for the toolbar.
+	if ( node.classList.contains( 'is-block-collapsed' ) ) {
+		node = node.querySelector( '.is-block-content' ) || node;
 	}
 
 	function onFocus() {

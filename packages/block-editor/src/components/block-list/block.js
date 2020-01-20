@@ -224,6 +224,16 @@ function BlockListBlock( {
 
 	const isDragging = isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
+	// Determine whether the block has props to apply to the wrapper.
+	if ( blockType.getEditWrapperProps ) {
+		wrapperProps = {
+			...wrapperProps,
+			...blockType.getEditWrapperProps( attributes ),
+		};
+	}
+
+	const isAligned = wrapperProps && wrapperProps[ 'data-align' ];
+
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.
 	const wrapperClassName = classnames(
@@ -240,17 +250,11 @@ function BlockListBlock( {
 			'is-focused': isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
+			'is-block-collapsed': isAligned,
 		},
 		className
 	);
 
-	// Determine whether the block has props to apply to the wrapper.
-	if ( blockType.getEditWrapperProps ) {
-		wrapperProps = {
-			...wrapperProps,
-			...blockType.getEditWrapperProps( attributes ),
-		};
-	}
 	const blockElementId = `block-${ clientId }`;
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
@@ -271,6 +275,14 @@ function BlockListBlock( {
 			toggleSelection={ toggleSelection }
 		/>
 	);
+
+	// For aligned blocks, provide a wrapper element so the block can be
+	// positioned relative to the block column. This is enabled with the
+	// .is-block-content className.
+	if ( isAligned ) {
+		blockEdit = <div className="is-block-content">{ blockEdit }</div>;
+	}
+
 	if ( mode !== 'visual' ) {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
 	}
