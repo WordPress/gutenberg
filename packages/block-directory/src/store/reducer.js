@@ -41,8 +41,7 @@ export const downloadableBlocks = ( state = {
 				items: action.hasPermission ? state.items : [],
 				hasPermission: action.hasPermission,
 			};
-		case 'FETCH_INSTALL_BLOCK' :
-		case 'RECEIVE_INSTALL_BLOCKS':
+		case 'SET_INSTALLING_BLOCK' :
 			return {
 				...state,
 				isInstalling: action.isInstalling,

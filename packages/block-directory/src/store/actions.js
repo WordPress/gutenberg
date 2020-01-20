@@ -74,7 +74,7 @@ export function* downloadBlock( item, onSuccess, onError ) {
  *
  */
 export function* installBlock( { id, name }, onSuccess, onError ) {
-	yield fetchInstallBlock();
+	yield setIsInstalling( true );
 
 	try {
 		const response = yield apiFetch( {
@@ -93,7 +93,7 @@ export function* installBlock( { id, name }, onSuccess, onError ) {
 		onError( error );
 	}
 
-	yield receiveInstallBlock();
+	yield setIsInstalling( false );
 }
 
 /**
@@ -153,21 +153,14 @@ export function removeInstalledBlockType( item ) {
 
 /**
  * Returns an action object used to indicate install in progress
+ *
+ * @param {boolean} isInstalling Boolean value that tells state whether installation is occurring
+ *
  */
-export function fetchInstallBlock() {
+export function setIsInstalling( isInstalling ) {
 	return {
-		type: 'FETCH_INSTALL_BLOCK',
-		isInstalling: true,
-	};
-}
-
-/**
- * Returns an action object used to indicate install has completed
- */
-export function receiveInstallBlock() {
-	return {
-		type: 'RECEIVE_INSTALL_BLOCKS',
-		isInstalling: false,
+		type: 'SET_INSTALLING_BLOCK',
+		isInstalling,
 	};
 }
 
