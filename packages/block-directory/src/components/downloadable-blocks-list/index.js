@@ -106,7 +106,7 @@ export default compose(
 		};
 
 		return {
-			installAndDownload: ( item ) => {
+			installAndDownload( item ) {
 				const onSuccess = () => {
 					download( item );
 				};
