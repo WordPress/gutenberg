@@ -501,7 +501,6 @@ export default function WritingFlow( { children } ) {
 
 	useEffect( () => {
 		if ( hasMultiSelection && ! isMultiSelecting ) {
-			noCapture.current = true;
 			container.current.focus();
 		}
 	}, [ hasMultiSelection, isMultiSelecting ] );
