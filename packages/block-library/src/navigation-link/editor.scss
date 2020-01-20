@@ -59,7 +59,10 @@
 			top: 50%;
 			border-left: 4px solid transparent;
 			border-right: 4px solid transparent;
-			border-top: 6px solid #111; //TODO: change to var
+
+			border-top-width: 6px;
+			border-top-style: solid;
+			border-top-color: inherit;
 		}
 	}
 
@@ -68,7 +71,10 @@
 		border-right: 0;
 		border-top: 4px solid transparent;
 		border-bottom: 4px solid transparent;
-		border-left: 6px solid #111; //TODO: change to var
+
+		border-left-width: 6px;
+		border-left-style: solid;
+		border-left-color: inherit;
 	}
 
 	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
