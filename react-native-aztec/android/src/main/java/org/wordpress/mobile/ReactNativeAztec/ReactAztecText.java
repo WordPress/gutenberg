@@ -3,6 +3,7 @@ package org.wordpress.mobile.ReactNativeAztec;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -11,7 +12,6 @@ import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import android.text.Editable;
 import android.text.InputType;
@@ -578,39 +578,48 @@ public class ReactAztecText extends AztecText {
         return PRE_TAG.equals(mTagName);
     }
 
-    public void setCursorColor(@Nullable Integer color) {
-        // This is nearly a direct copy of the ReactNative implementation:
-        // https://github.com/facebook/react-native/blob/233fdfc014bb4b919c7624c90e5dac614479076f/ReactAndroid/src/main/java/com/facebook/react/views/textinput/ReactTextInputManager.java#L422-L457
+    public void setCursorColor(@NonNull Integer color) {
+        // This is combination of the patterns taken in:
+        // - https://github.com/facebook/react-native/blob/233fdfc014bb4b919c7624c90e5dac614479076f/ReactAndroid/src/main/java/com/facebook/react/views/textinput/ReactTextInputManager.java#L422-L457
+        // - https://stackoverflow.com/a/44333069/1350218
+        // Note: This only works in API 27 and below as it uses reflection to look up the drawable fields.
         // API 29 supports setTextCursorDrawable which would be a cleaner way to handle this when
         // an upgrade to that API level occurs.
+
         try {
-            // Get the original cursor drawable resource.
-            Field cursorDrawableResField = TextView.class.getDeclaredField("mCursorDrawableRes");
-            cursorDrawableResField.setAccessible(true);
-            int drawableResId = cursorDrawableResField.getInt(this);
+            Resources res = getContext().getResources();
 
-            // The view has no cursor drawable.
-            if (drawableResId == 0) {
-                return;
+            Field field = TextView.class.getDeclaredField("mEditor");
+            field.setAccessible(true);
+            Object editor = field.get(this);
+
+            String[] resFieldNames = {"mCursorDrawableRes", "mTextSelectHandleLeftRes", "mTextSelectHandleRightRes", "mTextSelectHandleRes"};
+            String[] drawableFieldNames = {"mCursorDrawable", "mSelectHandleLeft", "mSelectHandleRight", "mSelectHandleCenter"};
+
+            for (int i = 0; i < resFieldNames.length; i++) {
+
+                String resFieldName = resFieldNames[i];
+                String drawableFieldName = drawableFieldNames[i];
+
+                Field resField = TextView.class.getDeclaredField(resFieldName);
+                resField.setAccessible(true);
+                int drawableResId = resField.getInt(this);
+
+                Drawable cursorDrawable = res.getDrawable(drawableResId).mutate();
+                cursorDrawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+
+                Field drawableField = editor.getClass().getDeclaredField(drawableFieldName);
+                drawableField.setAccessible(true);
+
+                if ( drawableFieldName.equals("mCursorDrawable")) {
+                    Drawable[] drawables = {cursorDrawable, cursorDrawable};
+                    drawableField.set(editor, drawables);
+                } else {
+                    drawableField.set(editor, cursorDrawable);
+                }
             }
-
-            Drawable drawable = ContextCompat.getDrawable(getContext(), drawableResId);
-            if (color != null) {
-                drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
-            }
-            Drawable[] drawables = {drawable, drawable};
-
-            // Update the current cursor drawable with the new one.
-            Field editorField = TextView.class.getDeclaredField("mEditor");
-            editorField.setAccessible(true);
-            Object editor = editorField.get(this);
-            Field cursorDrawableField = editor.getClass().getDeclaredField("mCursorDrawable");
-            cursorDrawableField.setAccessible(true);
-            cursorDrawableField.set(editor, drawables);
-        } catch (NoSuchFieldException ex) {
-            // Ignore errors to avoid crashing if these private fields don't exist on modified
-            // or future android versions.
-        } catch (IllegalAccessException ex) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // Ignore errors to avoid crashing if these private fields don't exist on modified or future android versions.
         }
     }
 }
