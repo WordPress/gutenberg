@@ -33,13 +33,14 @@
 		overflow-y: visible;
 	}
 	.components-menu-group + .components-menu-group {
-		border-top: 1px solid #000;
+		border-top: 1px solid $light-gray-500;
 		padding: 0;
 	}
 }
 
 .editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external {
-	display: block;
+	display: flex;
+	justify-content: space-between;
 	padding: $grid-size-large - 1;
 	height: auto;
 

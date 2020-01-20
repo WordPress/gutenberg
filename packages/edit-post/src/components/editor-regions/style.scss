@@ -60,6 +60,8 @@ html {
 
 .edit-post-editor-regions__content {
 	flex-grow: 1;
+	// Default background color so that grey .edit-post-editor-regions__body color doesn't show through.
+	background-color: #fff;
 
 	// Treat as flex container to allow children to grow to occupy full
 	// available height of the content area.

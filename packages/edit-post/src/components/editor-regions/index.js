@@ -44,7 +44,7 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 
 	const marginValue = () => window.innerHeight < 800 ? 36 : 72;
 
-	const minHeightValue = ( device ) => device === 'Mobile' ? 640 : 768;
+	const maxHeightValue = ( device ) => device === 'Mobile' ? 768 : 1024;
 
 	const contentInlineStyles = ( device ) => {
 		switch ( device ) {
@@ -54,19 +54,7 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 					width: canvasWidth( device ),
 					margin: marginValue() + 'px auto',
 					flexGrow: 0,
-					minHeight: minHeightValue( device ) + 'px',
-				};
-			default:
-				return null;
-		}
-	};
-
-	const sidebarInlineStyles = ( device ) => {
-		switch ( device ) {
-			case 'Tablet':
-			case 'Mobile':
-				return {
-					minHeight: minHeightValue( device ) + ( marginValue() * 2 ) + 'px',
+					maxHeight: maxHeightValue( device ) + 'px',
 				};
 			default:
 				return null;
@@ -106,7 +94,6 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 						/* translators: accessibility text for the settings landmark region. */
 						aria-label={ __( 'Editor settings' ) }
 						tabIndex="-1"
-						style={ sidebarInlineStyles( deviceType ) }
 					>
 						{ sidebar }
 					</div>

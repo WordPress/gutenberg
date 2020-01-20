@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component, renderToString } from '@wordpress/element';
-import { Button, Dropdown, MenuGroup, MenuItem, Path, Polygon, SVG } from '@wordpress/components';
+import { Button, Dropdown, Icon, MenuGroup, MenuItem, Path, Polygon, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
@@ -252,6 +252,7 @@ export class PostPreviewButton extends Component {
 											__( '(opens in a new tab)' )
 										}
 									</span>
+									<Icon icon="external" />
 								</Button>
 							</MenuGroup>
 						</>
