@@ -28,6 +28,7 @@ _Example:_
 		"build": "wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses",
+		"format-js": "wp-scripts format-js",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"lint:md": "wp-scripts lint-md",
@@ -168,6 +169,31 @@ In the `wp-env` config block, each entry can be configured like so:
 - `test-php`: Runs your plugin's PHPUnit tests. You will need to have an appropriately configured `phpunit.xml.dist` file.
 - `docker-run`: For more advanced debugging, contributors may sometimes need to run commands in the Docker containers. This is the equivalent of running `docker-compose run` within the WordPress directory.
 
+### `format-js`
+
+Formats JavaScript files to the expected coding guidelines.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"format:js": "wp-scripts format-js"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+
+* `npm run format:js src/` - formats JavaScript files in src/ directory.
+
+When you run commands similar to example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
+
+By default, files specified in `.eslintignore` are ignored.
+
+#### Advanced information
+
+It uses [wp-prettier](https://github.com/automattic/wp-prettier) a [Prettier](https://prettier.io/) fork that follows the WordPress code conventions.
 
 ### `lint-js`
 
