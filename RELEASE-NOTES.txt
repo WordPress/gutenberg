@@ -1,9 +1,15 @@
+1.21.0
+------
+* [Android] Reduced padding around text
+* Fixed intermittent crash that occurred with very long posts
+
 1.20.0
 ------
 * Fix bug where image placeholders would sometimes not be shown
 * Fix crash on undo
 * Style fixes on the navigation UI
 * [iOS] Fix focus issue
+* New block: Shortcode. You can now create and edit Shortcode blocks in the editor.
 
 1.19.0
 ------
