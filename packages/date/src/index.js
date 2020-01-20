@@ -110,19 +110,49 @@ function setupWPTimezone() {
  *
  * @type {number}
  */
-const MINUTE_IN_SECONDS = 60;
+export const MINUTE_IN_SECONDS = 60;
+
+/**
+ * Number of seconds in one hour.
+ *
+ * @type {number}
+ */
+export const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
+
+/**
+ * Number of seconds in one day.
+ *
+ * @type {number}
+ */
+export const DAY_IN_SECONDS = 24 * HOUR_IN_SECONDS;
+
+/**
+ * Number of seconds in one week.
+ *
+ * @type {number}
+ */
+export const WEEK_IN_SECONDS = 7 * DAY_IN_SECONDS;
+
+/**
+ * Number of seconds in one month.
+ *
+ * @type {number}
+ */
+export const MONTH_IN_SECONDS = 30 * DAY_IN_SECONDS;
+
+/**
+ * Number of seconds in one year.
+ *
+ * @type {number}
+ */
+export const YEAR_IN_SECONDS = 365 * DAY_IN_SECONDS;
+
 /**
  * Number of minutes in one hour.
  *
  * @type {number}
  */
 const HOUR_IN_MINUTES = 60;
-/**
- * Number of seconds in one hour.
- *
- * @type {number}
- */
-const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
 
 /**
  * Map of PHP formats to Moment.js formats.
