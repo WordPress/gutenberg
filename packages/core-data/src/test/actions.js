@@ -41,7 +41,14 @@ describe( 'saveEntityRecord', () => {
 		expect( fulfillment.next( entities ).value.type ).toBe(
 			'SAVE_ENTITY_RECORD_START'
 		);
+
+		// should select getEntityRecordNoResolver selector (as opposed to getEntityRecord)
+		// see https://github.com/WordPress/gutenberg/pull/19752#discussion_r368498318
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.selectorName ).toBe( 'getEntityRecordNoResolver' );
+
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+
 		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
@@ -76,6 +83,8 @@ describe( 'saveEntityRecord', () => {
 			'SAVE_ENTITY_RECORD_START'
 		);
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
@@ -99,6 +108,8 @@ describe( 'saveEntityRecord', () => {
 		expect( fulfillment.next( entities ).value.type ).toBe(
 			'SAVE_ENTITY_RECORD_START'
 		);
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
