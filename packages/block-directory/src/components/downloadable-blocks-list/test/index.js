@@ -28,8 +28,7 @@ describe( 'DownloadableBlocksList', () => {
 			const selectMock = jest.fn();
 			const hoverMock = jest.fn();
 			const wrapper = getContainer( [], selectMock, hoverMock );
-
-			expect( wrapper.find( DownloadableBlockListItem ).length ).toBe( 0 );
+			expect( wrapper.isEmptyRender() ).toBe( true );
 		} );
 
 		it( 'should render plugins items into the list', () => {

@@ -18,6 +18,10 @@ import DownloadableBlockNotice from '../downloadable-block-notice';
 import { DOWNLOAD_ERROR_NOTICE_ID, INSTALL_ERROR_NOTICE_ID } from '../../store/constants';
 
 export function DownloadableBlocksList( { items, onHover = noop, children, isLoading, errorNotices, installAndDownload, download } ) {
+	if ( ! items.length ) {
+		return null;
+	}
+
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -25,7 +29,7 @@ export function DownloadableBlocksList( { items, onHover = noop, children, isLoa
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-directory-downloadable-blocks-list">
-			{ items && items.map( ( item ) =>
+			{ items.map( ( item ) =>
 				<DownloadableBlockListItem
 					key={ item.id }
 					className={ getBlockMenuDefaultClassName( item.id ) }
