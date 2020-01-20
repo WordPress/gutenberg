@@ -17,8 +17,21 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
+// GET
 apiFetch( { path: '/wp/v2/posts' } ).then( posts => {
 	console.log( posts );
+} );
+
+// POST
+apiFetch( {
+	path: '/wp/v2/posts/1',
+	method: 'POST',
+	headers: {
+		'Content-Type': 'application/json',
+	},
+	body: JSON.stringify( { title: 'New Post Title' } ),
+} ).then( res => {
+	console.log( res );
 } );
 ```
 
