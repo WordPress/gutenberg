@@ -28,9 +28,10 @@ export const downloadableBlocks = ( state = {
 		case 'RECEIVE_DOWNLOADABLE_BLOCKS' :
 			return {
 				...state,
-				results: Object.assign( {}, state.results, {
+				results: {
+					...state.results,
 					[ action.filterValue ]: action.downloadableBlocks,
-				} ),
+				},
 				hasPermission: true,
 				isRequestingDownloadableBlocks: false,
 			};
@@ -76,9 +77,10 @@ export const errorNotices = ( state = {
 		case 'SET_ERROR_NOTICE_ID' :
 			return {
 				...state,
-				notices: Object.assign( {}, state.notices, {
+				notices: {
+					...state.notices,
 					[ action.blockId ]: action.noticeId,
-				} ),
+				},
 			};
 	}
 	return state;
