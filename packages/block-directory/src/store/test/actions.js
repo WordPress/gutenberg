@@ -16,8 +16,7 @@ const ACTIONS = {
 	apiFetch: 'API_FETCH',
 	addInstalledBlockType: 'ADD_INSTALLED_BLOCK_TYPE',
 	removeInstalledBlockType: 'REMOVE_INSTALLED_BLOCK_TYPE',
-	fetchInstallBlock: 'FETCH_INSTALL_BLOCK',
-	receiveInstallBlock: 'RECEIVE_INSTALL_BLOCKS',
+	setInstallBlock: 'SET_INSTALLING_BLOCK',
 };
 
 jest.mock( '@wordpress/blocks' );
@@ -48,18 +47,18 @@ describe( 'actions', () => {
 	const setsStateToInstalling = ( generator ) => {
 		expect(
 			generator.next().value.type,
-		).toEqual( ACTIONS.fetchInstallBlock );
+		).toEqual( ACTIONS.setInstallBlock );
 	};
 
 	const removesInstallingState = ( generator ) => {
 		expect(
 			generator.next().value.type,
-		).toEqual( ACTIONS.receiveInstallBlock );
+		).toEqual( ACTIONS.setInstallBlock );
 	};
 
 	const expectTest = ( hasCall, noCall ) => {
-		expect( hasCall.mock.calls.length ).toBe( 1 );
-		expect( noCall.mock.calls.length ).toBe( 0 );
+		expect( hasCall ).toHaveBeenCalledTimes( 1 );
+		expect( noCall ).toHaveBeenCalledTimes( 0 );
 	};
 
 	const expectSuccess = ( onSuccess, onError ) => {
@@ -140,7 +139,7 @@ describe( 'actions', () => {
 				generator.next( { success: true } ).value.type,
 			).toEqual( ACTIONS.addInstalledBlockType );
 
-			// It triggers RECEIVE_INSTALL_BLOCKS
+			// It triggers SET_INSTALLING_BLOCK
 			removesInstallingState( generator );
 
 			expectSuccess( onSuccess, onError );
@@ -158,7 +157,7 @@ describe( 'actions', () => {
 			// It triggers API_FETCH that wraps @wordpress/api-fetch
 			callsTheApi( generator );
 
-			// It triggers RECEIVE_INSTALL_BLOCKS
+			// It triggers SET_INSTALLING_BLOCK
 			removesInstallingState( generator );
 
 			expectError( onSuccess, onError );

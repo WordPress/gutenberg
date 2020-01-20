@@ -49,7 +49,7 @@ export const downloadableBlocks = (
 export const blockManagement = (
 	state = {
 		installedBlockTypes: [],
-		isInstalling,
+		isInstalling: false,
 	},
 	action
 ) => {
