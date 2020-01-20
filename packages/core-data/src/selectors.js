@@ -118,7 +118,7 @@ export function getEntityRecord( state, kind, name, key ) {
  * @return {Object?} Record.
  */
 export function getEntityRecordNoResolver( state, kind, name, key ) {
-	return get( state.entities.data, [ kind, name, 'queriedData', 'items', key ] );
+	return getEntityRecord( state, kind, name, key );
 }
 
 /**

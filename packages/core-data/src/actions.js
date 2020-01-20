@@ -357,7 +357,7 @@ export function* saveEntityRecord(
 				}
 			}
 
-			// get the full local version of the record before the update,
+			// Get the full local version of the record before the update,
 			// to merge it with the edits and then propagate it to subscribers
 			persistedEntity = yield select(
 				'getEntityRecordNoResolver',
@@ -378,7 +378,6 @@ export function* saveEntityRecord(
 				method: recordId ? 'PUT' : 'POST',
 				data,
 			} );
-
 			yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
 		}
 	} catch ( _error ) {

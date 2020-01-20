@@ -22,45 +22,47 @@ import {
 } from '../selectors';
 
 // getEntityRecord and getEntityRecordNoResolver selectors share the same tests
-Object.entries( { getEntityRecord, getEntityRecordNoResolver } ).forEach( ( [ name, func ] ) => {
-	// the interpolation is needed due to https://github.com/jest-community/eslint-plugin-jest/issues/203
-	describe( `${ name }`, () => {
-		it( 'should return undefined for unknown record’s key', () => {
-			const state = deepFreeze( {
-				entities: {
-					data: {
-						root: {
-							postType: {
-								queriedData: {
-									items: {},
-									queries: {},
-								},
+describe.each( [
+	[ getEntityRecord ],
+	[ getEntityRecordNoResolver ],
+] )( '%p', ( selector ) => {
+	it( 'should return undefined for unknown record’s key', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {},
+								queries: {},
 							},
 						},
 					},
 				},
-			} );
-			expect( func( state, 'root', 'postType', 'post' ) ).toBe( undefined );
+			},
 		} );
+		expect( selector( state, 'root', 'postType', 'post' ) ).toBe( undefined );
+	} );
 
-		it( 'should return a record by key', () => {
-			const state = deepFreeze( {
-				entities: {
-					data: {
-						root: {
-							postType: {
-								queriedData: {
-									items: {
-										post: { slug: 'post' },
-									},
-									queries: {},
+	it( 'should return a record by key', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {
+									post: { slug: 'post' },
 								},
+								queries: {},
 							},
 						},
 					},
 				},
-			} );
-			expect( func( state, 'root', 'postType', 'post' ) ).toEqual( { slug: 'post' } );
+			},
+		} );
+		expect( selector( state, 'root', 'postType', 'post' ) ).toEqual( {
+			slug: 'post',
 		} );
 	} );
 } );
