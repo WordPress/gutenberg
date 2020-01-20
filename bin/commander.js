@@ -20,6 +20,7 @@ const uuid = require( 'uuid/v4' );
 const gitRepoOwner = 'WordPress';
 const gitRepoURL = 'https://github.com/' + gitRepoOwner + '/gutenberg.git';
 const svnRepoURL = 'https://plugins.svn.wordpress.org/gutenberg';
+const releasePageURLPrefix = 'https://github.com/WordPress/gutenberg/releases/tag/';
 
 // Working Directories
 const gitWorkingDirectoryPath = path.join( os.tmpdir(), uuid() );
@@ -392,7 +393,7 @@ async function runBumpPluginVersionAndCommitStep( version, changelog, abortMessa
 		const newReadmeContent =
 			readmeFileContent.substr( 0, readmeFileContent.indexOf( '== Changelog ==' ) ) +
 			'== Changelog ==\n\n' +
-			changelog + '\n';
+			`To read the changelog for Gutenberg ${ version }, please navigate to the <a href="${ releasePageURLPrefix }v${ version }">release page</a>.` + '\n';
 		fs.writeFileSync( readmePath, newReadmeContent );
 
 		// Update the content of the changelog.txt file
