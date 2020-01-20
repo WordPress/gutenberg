@@ -52,10 +52,11 @@ describe( 'DownloadableBlockHeader', () => {
 			const onClickMock = jest.fn();
 			const wrapper = getContainer( pluginWithIcon, onClickMock );
 			const event = {
-				preventDefault() {},
+				preventDefault: jest.fn(),
 			};
 			wrapper.find( Button ).simulate( 'click', event );
-			expect( onClickMock.mock.calls.length ).toBe( 1 );
+			expect( onClickMock ).toHaveBeenCalledTimes( 1 );
+			expect( event.preventDefault ).toHaveBeenCalled();
 		} );
 	} );
 } );

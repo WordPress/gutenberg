@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import * as BlockFunctions from '@wordpress/blocks';
+import * as blockFunctions from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import {
 	downloadBlock,
 	installBlock,
 } from '../actions';
-import * as Controls from '../controls';
+import * as controls from '../controls';
 
 const ACTIONS = {
 	apiFetch: 'API_FETCH',
@@ -27,9 +27,9 @@ describe( 'actions', () => {
 	const blockPlugin = {
 		assets: [ 'http://www.wordpress.org/plugins/fakeasset.js' ],
 	};
-	const getBlockTypeMock = jest.spyOn( BlockFunctions, 'getBlockTypes' );
-	jest.spyOn( Controls, 'apiFetch' );
-	jest.spyOn( Controls, 'loadAssets' );
+	const getBlockTypeMock = jest.spyOn( blockFunctions, 'getBlockTypes' );
+	jest.spyOn( controls, 'apiFetch' );
+	jest.spyOn( controls, 'loadAssets' );
 
 	afterEach( () => {
 		jest.clearAllMocks();
