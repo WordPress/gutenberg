@@ -276,10 +276,16 @@ function register_block_core_navigation() {
 				'customTextColor'       => array(
 					'type' => 'string',
 				),
+				'valueTextColor'            => array(
+					'type' => 'string',
+				),
 				'backgroundColor'       => array(
 					'type' => 'string',
 				),
 				'customBackgroundColor' => array(
+					'type' => 'string',
+				),
+				'valueBackgroundColor'  => array(
 					'type' => 'string',
 				),
 				'fontSize'              => array(
