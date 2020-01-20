@@ -122,6 +122,7 @@ class NavigableContainer extends Component {
 					'stopNavigationEvents',
 					'eventToOffset',
 					'onNavigate',
+					'onKeyDown',
 					'cycle',
 					'onlyBrowserTabstops',
 					'forwardedRef',

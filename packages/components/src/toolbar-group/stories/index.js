@@ -3,7 +3,7 @@
  */
 import { ToolbarButton, ToolbarGroup } from '../../';
 
-export default { title: 'Components|ToolbarGroup', component: ToolbarGroup };
+export default { title: 'Components/ToolbarGroup', component: ToolbarGroup };
 
 export const _default = () => {
 	return (

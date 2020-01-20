@@ -1,23 +1,14 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import {
-	DropZone,
-	withFilters,
-} from '@wordpress/components';
+import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import {
 	pasteHandler,
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 
 const parseDropEvent = ( event ) => {
 	let result = {
@@ -40,49 +31,63 @@ const parseDropEvent = ( event ) => {
 	return result;
 };
 
-class BlockDropZone extends Component {
-	constructor() {
-		super( ...arguments );
+export default function useBlockDropZone( { element, rootClientId } ) {
+	const [ clientId, setClientId ] = useState( null );
 
-		this.onFilesDrop = this.onFilesDrop.bind( this );
-		this.onHTMLDrop = this.onHTMLDrop.bind( this );
-		this.onDrop = this.onDrop.bind( this );
+	function selector( select ) {
+		const {
+			getBlockIndex,
+			getClientIdsOfDescendants,
+			getSettings,
+			getTemplateLock,
+		} = select( 'core/block-editor' );
+		return {
+			getBlockIndex,
+			blockIndex: getBlockIndex( clientId, rootClientId ),
+			getClientIdsOfDescendants,
+			hasUploadPermissions: !! getSettings().mediaUpload,
+			isLockedAll: getTemplateLock( rootClientId ) === 'all',
+		};
 	}
 
-	getInsertIndex( position ) {
-		const { clientId, rootClientId, getBlockIndex } = this.props;
-		if ( clientId !== undefined ) {
-			const index = getBlockIndex( clientId, rootClientId );
-			return ( position && position.y === 'top' ) ? index : index + 1;
-		}
-	}
+	const {
+		getBlockIndex,
+		blockIndex,
+		getClientIdsOfDescendants,
+		hasUploadPermissions,
+		isLockedAll,
+	} = useSelect( selector, [ rootClientId, clientId ] );
+	const {
+		insertBlocks,
+		updateBlockAttributes,
+		moveBlockToPosition,
+	} = useDispatch( 'core/block-editor' );
 
-	onFilesDrop( files, position ) {
-		if ( ! this.props.hasUploadPermissions ) {
+	const onFilesDrop = useCallback( ( files ) => {
+		if ( ! hasUploadPermissions ) {
 			return;
 		}
+
 		const transformation = findTransform(
 			getBlockTransforms( 'from' ),
 			( transform ) => transform.type === 'files' && transform.isMatch( files )
 		);
 
 		if ( transformation ) {
-			const insertIndex = this.getInsertIndex( position );
-			const blocks = transformation.transform( files, this.props.updateBlockAttributes );
-			this.props.insertBlocks( blocks, insertIndex );
+			const blocks = transformation.transform( files, updateBlockAttributes );
+			insertBlocks( blocks, blockIndex, rootClientId );
 		}
-	}
+	}, [ hasUploadPermissions, updateBlockAttributes, insertBlocks, blockIndex, rootClientId ] );
 
-	onHTMLDrop( HTML, position ) {
+	const onHTMLDrop = useCallback( ( HTML ) => {
 		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
-			this.props.insertBlocks( blocks, this.getInsertIndex( position ) );
+			insertBlocks( blocks, blockIndex, rootClientId );
 		}
-	}
+	}, [ insertBlocks, blockIndex, rootClientId ] );
 
-	onDrop( event, position ) {
-		const { rootClientId: dstRootClientId, clientId: dstClientId, getClientIdsOfDescendants, getBlockIndex } = this.props;
+	const onDrop = useCallback( ( event ) => {
 		const { srcRootClientId, srcClientId, srcIndex, type } = parseDropEvent( event );
 
 		const isBlockDropType = ( dropType ) => dropType === 'block';
@@ -95,75 +100,53 @@ class BlockDropZone extends Component {
 		const isSrcBlockAnAncestorOfDstBlock = ( src, dst ) => getClientIdsOfDescendants( [ src ] ).some( ( id ) => id === dst );
 
 		if ( ! isBlockDropType( type ) ||
-			isSameBlock( srcClientId, dstClientId ) ||
-			isSrcBlockAnAncestorOfDstBlock( srcClientId, dstClientId || dstRootClientId ) ) {
+			isSameBlock( srcClientId, clientId ) ||
+			isSrcBlockAnAncestorOfDstBlock( srcClientId, clientId || rootClientId ) ) {
 			return;
 		}
 
-		const dstIndex = dstClientId ? getBlockIndex( dstClientId, dstRootClientId ) : undefined;
-		const positionIndex = this.getInsertIndex( position );
+		const dstIndex = clientId ? getBlockIndex( clientId, rootClientId ) : undefined;
+		const positionIndex = blockIndex;
 		// If the block is kept at the same level and moved downwards,
 		// subtract to account for blocks shifting upward to occupy its old position.
-		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel( srcRootClientId, dstRootClientId ) ? positionIndex - 1 : positionIndex;
-		this.props.moveBlockToPosition( srcClientId, srcRootClientId, insertIndex );
-	}
+		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel( srcRootClientId, rootClientId ) ? positionIndex - 1 : positionIndex;
+		moveBlockToPosition( srcClientId, srcRootClientId, rootClientId, insertIndex );
+	}, [ getClientIdsOfDescendants, getBlockIndex, clientId, blockIndex, moveBlockToPosition, rootClientId ] );
 
-	render() {
-		const { hasUploadPermissions, isLockedAll } = this.props;
-		if ( isLockedAll ) {
-			return null;
+	const { position } = useDropZone( {
+		element,
+		onFilesDrop,
+		onHTMLDrop,
+		onDrop,
+		isDisabled: isLockedAll,
+		withPosition: true,
+	} );
+
+	useEffect( () => {
+		if ( position ) {
+			const { y } = position;
+			const rect = element.current.getBoundingClientRect();
+
+			const offset = y - rect.top;
+			const target = Array.from( element.current.children ).find( ( blockEl ) => {
+				return blockEl.offsetTop + ( blockEl.offsetHeight / 2 ) > offset;
+			} );
+
+			if ( ! target ) {
+				return;
+			}
+
+			const targetClientId = target.id.slice( 'block-'.length );
+
+			if ( ! targetClientId ) {
+				return;
+			}
+
+			setClientId( targetClientId );
 		}
-		const index = this.getInsertIndex();
-		const isAppender = index === undefined;
-		return (
-			<DropZone
-				className={ classnames( 'block-editor-block-drop-zone', {
-					'is-appender': isAppender,
-				} ) }
-				onHTMLDrop={ this.onHTMLDrop }
-				onDrop={ this.onDrop }
-				onFilesDrop={ hasUploadPermissions ? this.onFilesDrop : undefined }
-			/>
-		);
+	}, [ position ] );
+
+	if ( position ) {
+		return clientId;
 	}
 }
-
-export default compose(
-	withDispatch( ( dispatch, ownProps ) => {
-		const {
-			insertBlocks,
-			updateBlockAttributes,
-			moveBlockToPosition,
-		} = dispatch( 'core/block-editor' );
-
-		return {
-			insertBlocks( blocks, index ) {
-				const { rootClientId } = ownProps;
-
-				insertBlocks( blocks, index, rootClientId );
-			},
-			updateBlockAttributes( ...args ) {
-				updateBlockAttributes( ...args );
-			},
-			moveBlockToPosition( srcClientId, srcRootClientId, dstIndex ) {
-				const { rootClientId: dstRootClientId } = ownProps;
-				moveBlockToPosition( srcClientId, srcRootClientId, dstRootClientId, dstIndex );
-			},
-		};
-	} ),
-	withSelect( ( select, { rootClientId } ) => {
-		const {
-			getBlockIndex,
-			getClientIdsOfDescendants,
-			getSettings,
-			getTemplateLock,
-		} = select( 'core/block-editor' );
-		return {
-			getBlockIndex,
-			getClientIdsOfDescendants,
-			hasUploadPermissions: !! getSettings().mediaUpload,
-			isLockedAll: getTemplateLock( rootClientId ) === 'all',
-		};
-	} ),
-	withFilters( 'editor.BlockDropZone' )
-)( BlockDropZone );

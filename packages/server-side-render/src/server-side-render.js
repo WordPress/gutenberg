@@ -115,7 +115,7 @@ ServerSideRender.defaultProps = {
 		<Placeholder
 			className={ className }
 		>
-			{ __( 'Block rendered as empty.' ) + className }
+			{ __( 'Block rendered as empty.' ) }
 		</Placeholder>
 	),
 	ErrorResponsePlaceholder: ( { response, className } ) => {

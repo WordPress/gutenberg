@@ -10,7 +10,7 @@ function KeyboardShortcuts() {
 	const {
 		getBlockSelectionStart,
 		getEditorMode,
-		isEditorSidebarOpen,
+		isEditorSidebarOpened,
 		richEditingEnabled,
 		codeEditingEnabled,
 	} = useSelect( ( select ) => {
@@ -110,7 +110,7 @@ function KeyboardShortcuts() {
 		// obscure shortcuts from triggering.
 		event.preventDefault();
 
-		if ( isEditorSidebarOpen ) {
+		if ( isEditorSidebarOpened() ) {
 			closeGeneralSidebar();
 		} else {
 			const sidebarToOpen = getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document';

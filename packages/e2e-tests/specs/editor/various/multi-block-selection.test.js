@@ -302,7 +302,6 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.click( '.components-circular-option-picker__option' );
 		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'ArrowUp' );
 
 		const [ coord1, coord2 ] = await page.evaluate( () => {
 			const elements = Array.from( document.querySelectorAll( '.wp-block-paragraph' ) );
@@ -361,6 +360,51 @@ describe( 'Multi-block selection', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await pressKeyWithModifier( 'primary', 'v' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should return original focus after failed multi selection attempt', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		const [ coord1, coord2 ] = await page.evaluate( () => {
+			const selection = window.getSelection();
+
+			if ( ! selection.rangeCount ) {
+				return;
+			}
+
+			const range = selection.getRangeAt( 0 );
+			const rect1 = range.getClientRects()[ 0 ];
+			const element = document.querySelector( '.wp-block-paragraph' );
+			const rect2 = element.getBoundingClientRect();
+
+			return [
+				{
+					x: rect1.x,
+					y: rect1.y + ( rect1.height / 2 ),
+				},
+				{
+					// Move a bit outside the paragraph.
+					x: rect2.x - 10,
+					y: rect2.y + ( rect2.height / 2 ),
+				},
+			];
+		} );
+
+		await page.mouse.move( coord1.x, coord1.y );
+		await page.mouse.down();
+		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
+		await page.mouse.up();
+
+		// Wait for the selection to update.
+		await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
+
+		// Only "1" should be deleted.
+		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

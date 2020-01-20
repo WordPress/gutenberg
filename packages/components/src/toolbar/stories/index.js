@@ -2,9 +2,16 @@
  * Internal dependencies
  */
 import Toolbar from '../';
-import { SVG, Path, ToolbarButton, ToolbarGroup } from '../../';
+import {
+	SVG,
+	Path,
+	ToolbarButton,
+	ToolbarGroup,
+	__experimentalToolbarItem as ToolbarItem,
+	DropdownMenu,
+} from '../../';
 
-export default { title: 'Components|Toolbar', component: Toolbar };
+export default { title: 'Components/Toolbar', component: Toolbar };
 
 function InlineImageIcon() {
 	return (
@@ -18,24 +25,45 @@ function InlineImageIcon() {
 export const _default = () => {
 	return (
 		// id is required for server side rendering
-		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar">
+		<Toolbar
+			__experimentalAccessibilityLabel="Options"
+			id="options-toolbar"
+		>
 			<ToolbarGroup>
-				<ToolbarButton icon="editor-paragraph" title="Paragraph" />
+				<ToolbarButton icon="editor-paragraph" label="Paragraph" />
 			</ToolbarGroup>
-			<ToolbarGroup
-				icon="editor-alignleft"
-				label="Change text alignment"
-				isCollapsed
-				controls={ [
-					{ icon: 'editor-alignleft', title: 'Align left', isActive: true },
-					{ icon: 'editor-aligncenter', title: 'Align center' },
-					{ icon: 'editor-alignright', title: 'Align right' },
-				] }
-			/>
 			<ToolbarGroup>
-				<ToolbarButton icon="editor-bold" title="Bold" />
-				<ToolbarButton icon="editor-italic" title="Italic" />
-				<ToolbarButton icon="admin-links" title="Link" />
+				<ToolbarItem>
+					{ ( toggleProps ) => (
+						<DropdownMenu
+							hasArrowIndicator
+							icon="editor-alignleft"
+							label="Change text alignment"
+							controls={ [
+								{
+									icon: 'editor-alignleft',
+									title: 'Align left',
+									isActive: true,
+								},
+								{
+									icon: 'editor-aligncenter',
+									title: 'Align center',
+								},
+								{
+									icon: 'editor-alignright',
+									title: 'Align right',
+								},
+							] }
+							toggleProps={ toggleProps }
+						/>
+					) }
+				</ToolbarItem>
+			</ToolbarGroup>
+			<ToolbarGroup>
+				<ToolbarButton>Text</ToolbarButton>
+				<ToolbarButton icon="editor-bold" label="Bold" isPressed />
+				<ToolbarButton icon="editor-italic" label="Italic" />
+				<ToolbarButton icon="admin-links" label="Link" />
 				<ToolbarGroup
 					isCollapsed
 					icon={ false }
@@ -43,7 +71,10 @@ export const _default = () => {
 					controls={ [
 						{ icon: 'editor-code', title: 'Inline code' },
 						{ icon: <InlineImageIcon />, title: 'Inline image' },
-						{ icon: 'editor-strikethrough', title: 'Strikethrough' },
+						{
+							icon: 'editor-strikethrough',
+							title: 'Strikethrough',
+						},
 					] }
 				/>
 			</ToolbarGroup>
@@ -53,7 +84,11 @@ export const _default = () => {
 				label="Change text alignment"
 				isCollapsed
 				controls={ [
-					{ icon: 'editor-alignleft', title: 'Align left', isActive: true },
+					{
+						icon: 'editor-alignleft',
+						title: 'Align left',
+						isActive: true,
+					},
 					{ icon: 'editor-aligncenter', title: 'Align center' },
 					{ icon: 'editor-alignright', title: 'Align right' },
 				] }
@@ -65,10 +100,13 @@ export const _default = () => {
 export const withoutGroup = () => {
 	return (
 		// id is required for server side rendering
-		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar-without-group">
-			<ToolbarButton icon="editor-bold" title="Bold" />
-			<ToolbarButton icon="editor-italic" title="Italic" />
-			<ToolbarButton icon="admin-links" title="Link" />
+		<Toolbar
+			__experimentalAccessibilityLabel="Options"
+			id="options-toolbar-without-group"
+		>
+			<ToolbarButton icon="editor-bold" label="Bold" isPressed />
+			<ToolbarButton icon="editor-italic" label="Italic" />
+			<ToolbarButton icon="admin-links" label="Link" />
 		</Toolbar>
 	);
 };
