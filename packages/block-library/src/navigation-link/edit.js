@@ -199,8 +199,11 @@ function NavigationLinkEdit( {
 						'is-selected': isSelected,
 						'has-link': !! url,
 						'has-child': hasDescendants,
+						'has-text-color': navigationAttributes.textColor,
+						[ `has-${ navigationAttributes.textColor }-color` ]: !! navigationAttributes.textColor,
+						'has-background-color': navigationAttributes.backgroundColor,
+						[ `has-${ navigationAttributes.backgroundColor }-background-color` ]: !! navigationAttributes.backgroundColor,
 					} ) }
-				style={ navigationAttributes.customTextColor ? { borderColor: navigationAttributes.customTextColor } : null }
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
