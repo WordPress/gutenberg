@@ -56,6 +56,12 @@
 		"height": {
 			"type": "number"
 		},
+		"imageWidth": {
+			"type": "number"
+		},
+		"imageHeight": {
+			"type": "number"
+		},
 		"sizeSlug": {
 			"type": "string"
 		},

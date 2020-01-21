@@ -20,6 +20,8 @@ export default function save( { attributes } ) {
 		linkClass,
 		width,
 		height,
+		imageWidth,
+		imageHeight,
 		id,
 		linkTarget,
 		sizeSlug,
@@ -39,8 +41,8 @@ export default function save( { attributes } ) {
 			src={ url }
 			alt={ alt }
 			className={ id ? `wp-image-${ id }` : null }
-			width={ width }
-			height={ height }
+			width={ width || imageWidth }
+			height={ height || imageHeight }
 			title={ title }
 		/>
 	);
