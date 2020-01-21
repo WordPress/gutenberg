@@ -147,7 +147,7 @@ export default function useMultiSelection( ref ) {
 		selectedBlockClientId,
 	] );
 
-	const onSelectionChange = useCallback( () => {
+	const onSelectionChange = useCallback( ( { isFinal } ) => {
 		const selection = window.getSelection();
 
 		// If no selection is found, end multi selection.
@@ -159,6 +159,20 @@ export default function useMultiSelection( ref ) {
 
 		if ( startClientId.current === clientId ) {
 			selectBlock( clientId );
+
+			if ( isFinal ) {
+				toggleRichText( ref.current, true );
+
+				// If the anchor element contains the selection, set focus back to
+				// the anchor element.
+				if ( selection.rangeCount ) {
+					const { commonAncestorContainer } = selection.getRangeAt( 0 );
+
+					if ( anchorElement.current.contains( commonAncestorContainer ) ) {
+						anchorElement.current.focus();
+					}
+				}
+			}
 		} else {
 			const startPath = [ ...getBlockParents( startClientId.current ), startClientId.current ];
 			const endPath = [ ...getBlockParents( clientId ), clientId ];
@@ -178,21 +192,8 @@ export default function useMultiSelection( ref ) {
 		// The browser selection won't have updated yet at this point, so wait
 		// until the next animation frame to get the browser selection.
 		rafId.current = window.requestAnimationFrame( () => {
-			onSelectionChange();
+			onSelectionChange( { isFinal: true } );
 			stopMultiSelect();
-			toggleRichText( ref.current, true );
-
-			const selection = window.getSelection();
-
-			// If the anchor element contains the selection, set focus back to
-			// the anchor element.
-			if ( selection.rangeCount ) {
-				const { commonAncestorContainer } = selection.getRangeAt( 0 );
-
-				if ( anchorElement.current.contains( commonAncestorContainer ) ) {
-					anchorElement.current.focus();
-				}
-			}
 		} );
 	}, [ onSelectionChange, stopMultiSelect ] );
 
