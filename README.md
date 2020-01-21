@@ -10,7 +10,7 @@ Gutenberg development precedes what is shipped in a WordPress releases, usually 
 
 ## Getting started
 
-Get hands on with the block editor, check out the [Block Editor live demo](https://wordpress.org/gutenberg/) that allows you to play with a test instance of the editor.
+Get hands on, check out the [Block Editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
 
 ### Using Gutenberg
 
