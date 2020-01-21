@@ -130,16 +130,28 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
         delegate?.gutenbergDidEmitLog(message: message, logLevel: logLevel)
     }
-    
+
     @objc
-    func requestImageFullscreenPreview(_ urlString: String) {
-        guard let url = URL(string: urlString) else {
+    func requestImageFullscreenPreview(_ currentImageUrlString: String, originalImageUrlString: String?) {
+        guard let currentImageUrl = URL(string: currentImageUrlString) else {
             assertionFailure("Given String is not a URL")
             return
         }
-        
+
+        let originalUrl: URL
+        let currentUrl: URL?
+
+        if let originalImageUrlString = originalImageUrlString, let original = URL(string: originalImageUrlString) {
+            originalUrl = original
+            currentUrl = currentImageUrl
+        } else {
+            // The current image url is the only one available.
+            originalUrl = currentImageUrl
+            currentUrl = nil
+        }
+
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestFullscreenImage(with: url)
+            self.delegate?.gutenbergDidRequestImagePreview(with: originalUrl, thumbUrl: currentUrl)
         }
     }
 
