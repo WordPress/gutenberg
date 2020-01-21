@@ -9,10 +9,7 @@ import { View } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import {
-	InnerBlocks,
-	withColors,
-} from '@wordpress/block-editor';
+import { InnerBlocks } from '@wordpress/block-editor';
 import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
@@ -27,22 +24,20 @@ function ColumnEdit( {
 	isDescendantOfParentSelected,
 	columnsCount,
 	columnsContainerWidth,
-	isSmallScreen,
-	isLargeScreen,
-	isMediumScreen,
+	isMobile,
 } ) {
 	const columnContainerBaseWidth = styles[ 'column-container-base' ].maxWidth;
-
-	const containerWidth = columnsContainerWidth || styles[ 'columns-container' ].maxWidth;
-
 	const containerMaxWidth = styles[ 'columns-container' ].maxWidth;
+
+	const containerWidth = columnsContainerWidth || containerMaxWidth;
+
 	const minWidth = Math.min( containerWidth, columnContainerBaseWidth );
 
 	const getColumnsInRow = ( columnsNumber ) => {
-		if ( isSmallScreen || minWidth < 480 ) {
+		if ( minWidth < 480 ) {
 			return 1;
 		}
-		if ( isMediumScreen && ( ! isLargeScreen || minWidth <= containerMaxWidth ) ) {
+		if ( minWidth >= 480 && minWidth < 768 ) {
 			return 2;
 		}
 		return columnsNumber;
@@ -55,7 +50,7 @@ function ColumnEdit( {
 		return (
 			<View style={ [
 				! isParentSelected && getStylesFromColorScheme( styles.columnPlaceholder, styles.columnPlaceholderDark ),
-				! isSmallScreen ? { width: columnBaseWidth - ( isParentSelected ? 24 : isDescendantOfParentSelected ? 28 : columnsInRow === 1 ? 12 : 32 ) } : {},
+				! isMobile ? { width: columnBaseWidth - ( isParentSelected ? 24 : isDescendantOfParentSelected ? 28 : columnsInRow === 1 ? 12 : 32 ) } : {},
 				{ ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
 			] } >
 				{ isParentSelected && <InnerBlocks.ButtonBlockAppender /> }
@@ -64,7 +59,7 @@ function ColumnEdit( {
 	}
 
 	return (
-		<View style={ ! isSmallScreen ? { maxWidth: columnBaseWidth, width: columnBaseWidth - ( isParentSelected ? 12 : isSelected ? ! hasInnerBlocks ? 28 : 4 : isDescendantOfParentSelected ? -4 : 0 ) } : {} } >
+		<View style={ ! isMobile ? { maxWidth: columnBaseWidth, width: columnBaseWidth - ( isParentSelected ? 12 : isSelected ? ! hasInnerBlocks ? 28 : 4 : isDescendantOfParentSelected ? -4 : 0 ) } : {} } >
 			<InnerBlocks
 				renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
 			/>
@@ -73,7 +68,6 @@ function ColumnEdit( {
 }
 
 export default compose( [
-	withColors( 'backgroundColor' ),
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getBlock,
@@ -107,6 +101,6 @@ export default compose( [
 			isDescendantOfParentSelected,
 		};
 	} ),
-	withViewportMatch( { isSmallScreen: '< small', isLargeScreen: '>= large', isMediumScreen: '>= small' } ),
+	withViewportMatch( { isMobile: '< mobile' } ),
 	withPreferredColorScheme,
 ] )( ColumnEdit );

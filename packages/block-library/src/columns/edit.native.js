@@ -32,13 +32,6 @@ import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
  */
-import {
-	hasExplicitColumnWidths,
-	getMappedColumnWidths,
-	getRedistributedColumnWidths,
-	toWidthPrecision,
-} from './utils';
-
 import styles from './editor.scss';
 import Icon from './icon';
 
@@ -70,7 +63,7 @@ function ColumnsEditContainer( {
 	updateAlignment,
 	updateColumns,
 	clientId,
-	isSmallScreen,
+	isMobile,
 } ) {
 	const { verticalAlignment = DEFAULT_ALIGNMENT, width } = attributes;
 
@@ -144,7 +137,7 @@ function ColumnsEditContainer( {
 				}
 			} }>
 				<InnerBlocks
-					containerStyle={ ! isSmallScreen ? containerStyle : undefined }
+					containerStyle={ ! isMobile ? containerStyle : undefined }
 					allowedBlocks={ ALLOWED_BLOCKS }
 				/>
 			</View>
@@ -190,29 +183,11 @@ const ColumnsEditContainerWrapper = withDispatch( ( dispatch, ownProps, registry
 		const { getBlocks } = registry.select( 'core/block-editor' );
 
 		let innerBlocks = getBlocks( clientId );
-		const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
 
 		// Redistribute available width for existing inner blocks.
 		const isAddingColumn = newColumns > previousColumns;
 
-		if ( isAddingColumn && hasExplicitWidths ) {
-			// If adding a new column, assign width to the new column equal to
-			// as if it were `1 / columns` of the total available space.
-			const newColumnWidth = toWidthPrecision( 100 / newColumns );
-
-			// Redistribute in consideration of pending block insertion as
-			// constraining the available working width.
-			const widths = getRedistributedColumnWidths( innerBlocks, 100 - newColumnWidth );
-
-			innerBlocks = [
-				...getMappedColumnWidths( innerBlocks, widths ),
-				...times( newColumns - previousColumns, () => {
-					return createBlock( 'core/column', {
-						width: newColumnWidth,
-					} );
-				} ),
-			];
-		} else if ( isAddingColumn ) {
+		if ( isAddingColumn ) {
 			innerBlocks = [
 				...innerBlocks,
 				...times( newColumns - previousColumns, () => {
@@ -222,13 +197,6 @@ const ColumnsEditContainerWrapper = withDispatch( ( dispatch, ownProps, registry
 		} else {
 			// The removed column will be the last of the inner blocks.
 			innerBlocks = dropRight( innerBlocks, previousColumns - newColumns );
-
-			if ( hasExplicitWidths ) {
-				// Redistribute as if block is already removed.
-				const widths = getRedistributedColumnWidths( innerBlocks, 100 );
-
-				innerBlocks = getMappedColumnWidths( innerBlocks, widths );
-			}
 		}
 
 		replaceInnerBlocks( clientId, innerBlocks, false );
@@ -237,7 +205,6 @@ const ColumnsEditContainerWrapper = withDispatch( ( dispatch, ownProps, registry
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, name, isSelected, getStylesFromColorScheme } = props;
-	// const { blockType, defaultPattern, hasInnerBlocks, patterns } = useSelect( ( select ) => {
 	const { hasInnerBlocks } = useSelect( ( select ) => {
 		const {
 			__experimentalGetBlockPatterns,
@@ -253,7 +220,6 @@ const ColumnsEdit = ( props ) => {
 		};
 	}, [ clientId, name ] );
 
-	// TODO: make sure if columns should reder placeholder if block is not selected
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
 			<View style={ [
@@ -269,6 +235,6 @@ const ColumnsEdit = ( props ) => {
 };
 
 export default compose( [
-	withViewportMatch( { isSmallScreen: '< small' } ),
+	withViewportMatch( { isMobile: '< mobile' } ),
 	withPreferredColorScheme,
 ] )( ColumnsEdit );
