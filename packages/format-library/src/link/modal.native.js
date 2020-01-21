@@ -29,6 +29,7 @@ import {
  * Internal dependencies
  */
 import { createLinkFormat, isValidHref } from './utils';
+import LinkRelIcon from './link-rel';
 
 import styles from './modal.scss';
 
@@ -161,7 +162,7 @@ export class ModalLinkUI extends Component {
 					/>
 				/* eslint-enable jsx-a11y/no-autofocus */ }
 				{ isSelectedButtonBlock && <BottomSheet.Cell
-					icon={ 'admin-page' }
+					icon={ LinkRelIcon }
 					label={ __( 'Add Rel' ) }
 					value={ linkRel }
 					placeholder={ __( 'None' ) }
