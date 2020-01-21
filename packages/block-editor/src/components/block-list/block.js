@@ -28,7 +28,6 @@ import {
 	withDispatch,
 	withSelect,
 	useSelect,
-	useDispatch,
 } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
@@ -43,7 +42,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
-import { Context } from './root-container';
+import { Context, SelectedBlockNode } from './root-container';
 
 function BlockListBlock( {
 	mode,
@@ -78,6 +77,7 @@ function BlockListBlock( {
 	hasSelectedUI = true,
 } ) {
 	const onSelectionStart = useContext( Context );
+	const [ , setSelectedBlockNode ] = useContext( SelectedBlockNode );
 	// In addition to withSelect, we should favor using useSelect in this component going forward
 	// to avoid leaking new props to the public API (editor.BlockListBlock filter)
 	const { isDraggingBlocks } = useSelect( ( select ) => {
@@ -85,16 +85,17 @@ function BlockListBlock( {
 			isDraggingBlocks: select( 'core/block-editor' ).isDraggingBlocks(),
 		};
 	}, [] );
-	const {
-		__unstableSetSelectedMountedBlock,
-	} = useDispatch( 'core/block-editor' );
 
 	// Reference of the wrapper
 	const wrapper = useRef( null );
 
 	useLayoutEffect( () => {
 		if ( isSelected || isFirstMultiSelected ) {
-			__unstableSetSelectedMountedBlock( clientId );
+			const node = wrapper.current;
+			setSelectedBlockNode( node );
+			return () => {
+				setSelectedBlockNode( ( n ) => n === node ? null : n );
+			};
 		}
 	}, [ isSelected, isFirstMultiSelected ] );
 

@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useContext } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -20,6 +20,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
+import { SelectedBlockNode } from './root-container';
 
 function selector( select ) {
 	const {
@@ -61,6 +62,7 @@ function BlockPopover( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
+	let [ node ] = useContext( SelectedBlockNode );
 
 	const showEmptyBlockSideInserter = ! isNavigationMode && isEmptyDefaultBlock && isValid;
 	const shouldShowBreadcrumb = isNavigationMode;
@@ -92,7 +94,9 @@ function BlockPopover( {
 		return null;
 	}
 
-	let node = document.getElementById( 'block-' + capturingClientId );
+	if ( capturingClientId ) {
+		node = document.getElementById( 'block-' + capturingClientId );
+	}
 
 	if ( ! node ) {
 		return null;
@@ -188,7 +192,6 @@ function wrapperSelector( select ) {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getBlockRootClientId,
-		__unstableGetSelectedMountedBlock,
 		__unstableGetBlockWithoutInnerBlocks,
 		getBlockParents,
 		getBlockListSettings,
@@ -213,7 +216,7 @@ function wrapperSelector( select ) {
 	// This will be the top most ancestor because getBlockParents() returns tree from top -> bottom
 	const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [ '__experimentalCaptureToolbars', true ] );
 
-	let capturingClientId = clientId;
+	let capturingClientId;
 
 	if ( topmostAncestorWithCaptureDescendantsToolbarsIndex !== -1 ) {
 		capturingClientId = blockParentsClientIds[ topmostAncestorWithCaptureDescendantsToolbarsIndex ];
@@ -222,7 +225,6 @@ function wrapperSelector( select ) {
 	return {
 		clientId,
 		rootClientId: getBlockRootClientId( clientId ),
-		isMounted: __unstableGetSelectedMountedBlock() === clientId,
 		name,
 		align: attributes.align,
 		isValid,
@@ -242,7 +244,6 @@ export default function WrappedBlockPopover() {
 	const {
 		clientId,
 		rootClientId,
-		isMounted,
 		name,
 		align,
 		isValid,
@@ -251,7 +252,7 @@ export default function WrappedBlockPopover() {
 		capturingClientId,
 	} = selected;
 
-	if ( ! name || ! isMounted ) {
+	if ( ! name ) {
 		return null;
 	}
 

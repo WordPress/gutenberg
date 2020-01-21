@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createContext, forwardRef } from '@wordpress/element';
+import { createContext, forwardRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -15,6 +15,7 @@ import BlockPopover from './block-popover';
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
 export const Context = createContext();
+export const SelectedBlockNode = createContext();
 
 function selector( select ) {
 	const {
@@ -80,17 +81,19 @@ function RootContainer( { children, className }, ref ) {
 			selectedBlockClientId={ selectedBlockClientId }
 			containerRef={ ref }
 		>
-			<BlockPopover />
-			<div
-				ref={ ref }
-				className={ className }
-				onFocus={ onFocus }
-				onDragStart={ onDragStart }
-			>
-				<Context.Provider value={ onSelectionStart }>
-					{ children }
-				</Context.Provider>
-			</div>
+			<SelectedBlockNode.Provider value={ useState( null ) }>
+				<BlockPopover />
+				<div
+					ref={ ref }
+					className={ className }
+					onFocus={ onFocus }
+					onDragStart={ onDragStart }
+				>
+					<Context.Provider value={ onSelectionStart }>
+						{ children }
+					</Context.Provider>
+				</div>
+			</SelectedBlockNode.Provider>
 		</InsertionPoint>
 	);
 }
