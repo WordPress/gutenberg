@@ -42,9 +42,37 @@
 		text-decoration: underline;
 		white-space: nowrap !important; // TODO: solve differently to prevent use of !important
 	}
-
+	
 	.wp-block-navigation-link__submenu-icon {
 		margin-left: 4px;
+	}
+
+	// Arrow indicator to show presence of children.
+	&.has-child {
+		position: relative;
+		padding-right: 15px;
+
+		&::after {
+			content: "";
+			position: absolute;
+			right: 0;
+			top: 50%;
+			border-left: 4px solid transparent;
+			border-right: 4px solid transparent;
+			border-top: 6px solid #111; //TODO: change to var
+		}
+	}
+
+	.wp-block-navigation-link.has-child::after {
+		top: calc(50% - 3px);
+		border-right: 0;
+		border-top: 4px solid transparent;
+		border-bottom: 4px solid transparent;
+		border-left: 6px solid #111; //TODO: change to var
+	}
+
+	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
+		display: inline-block;
 	}
 }
 
