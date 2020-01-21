@@ -110,7 +110,7 @@ function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
 	return $blocks;
 }
 
-/*
+/**
  * Returns the top-level submenu SVG chevron icon.
  *
  * @return string
@@ -161,9 +161,10 @@ function render_block_navigation( $attributes, $content, $block ) {
 /**
  * Walks the inner block structure and returns an HTML list for it.
  *
- * @param array $block      The block.
- * @param array $colors     Contains inline styles and CSS classes to apply to navigation item.
- * @param array $font_sizes Contains inline styles and CSS classes to apply to navigation item.
+ * @param array $attributes    The Navigation block attributes.
+ * @param array $block         The NavigationItem block.
+ * @param array $colors        Contains inline styles and CSS classes to apply to navigation item.
+ * @param array $font_sizes    Contains inline styles and CSS classes to apply to navigation item.
  * @param bool  $is_level_zero True whether is main menu (level zero). Otherwise, False.
  *
  * @return string Returns  an HTML list from innerBlocks.
@@ -229,7 +230,7 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_l
 
 		$html .= '</span>';
 
-		// Append submenu icon to top-level item
+		// Append submenu icon to top-level item.
 		if ( $attributes['showSubmenuIcon'] && $is_level_zero && $has_submenu ) {
 			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . render_submenu_icon() . '</span>';
 		}
@@ -282,10 +283,10 @@ function register_block_core_navigation() {
 				'itemsJustification'    => array(
 					'type' => 'string',
 				),
-				'showSubmenuIcon'		 => array(
-					'type' => 'boolean',
+				'showSubmenuIcon'       => array(
+					'type'    => 'boolean',
 					'default' => false,
-				)
+				),
 			),
 
 			'render_callback' => 'render_block_navigation',
