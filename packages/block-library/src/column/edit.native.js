@@ -46,11 +46,49 @@ function ColumnEdit( {
 	const columnsInRow = getColumnsInRow( columnsCount );
 	const columnBaseWidth = minWidth / columnsInRow;
 
+	const applyColumnPlaceholderStyle = () => {
+		if ( isMobile ) {
+			return;
+		}
+
+		let width = columnBaseWidth;
+
+		if ( isParentSelected ) {
+			width -= 24;
+		} else if ( isDescendantOfParentSelected ) {
+			width -= 28;
+		} else {
+			width -= ( columnsInRow === 1 ? 12 : 32 );
+		}
+
+		return { width };
+		// return { width: columnBaseWidth - ( isParentSelected ? 24 : isDescendantOfParentSelected ? 28 : columnsInRow === 1 ? 12 : 32 ) }
+	};
+
+	const applyColumnBlockStyle = () => {
+		if ( isMobile ) {
+			return;
+		}
+
+		let width = columnBaseWidth;
+
+		if ( isParentSelected ) {
+			width -= 12;
+		} else if ( isSelected ) {
+			width -= ( ! hasInnerBlocks ? 28 : 4 );
+		} else if ( isDescendantOfParentSelected ) {
+			width += 4;
+		}
+
+		return { width };
+		// return { width: columnBaseWidth - ( isParentSelected ? 12 : isSelected ? ! hasInnerBlocks ? 28 : 4 : isDescendantOfParentSelected ? -4 : 0 ) }
+	};
+
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
 			<View style={ [
 				! isParentSelected && getStylesFromColorScheme( styles.columnPlaceholder, styles.columnPlaceholderDark ),
-				! isMobile ? { width: columnBaseWidth - ( isParentSelected ? 24 : isDescendantOfParentSelected ? 28 : columnsInRow === 1 ? 12 : 32 ) } : {},
+				applyColumnPlaceholderStyle(),
 				{ ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
 			] } >
 				{ isParentSelected && <InnerBlocks.ButtonBlockAppender /> }
@@ -59,7 +97,7 @@ function ColumnEdit( {
 	}
 
 	return (
-		<View style={ ! isMobile ? { maxWidth: columnBaseWidth, width: columnBaseWidth - ( isParentSelected ? 12 : isSelected ? ! hasInnerBlocks ? 28 : 4 : isDescendantOfParentSelected ? -4 : 0 ) } : {} } >
+		<View style={ applyColumnBlockStyle() } >
 			<InnerBlocks
 				renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
 			/>

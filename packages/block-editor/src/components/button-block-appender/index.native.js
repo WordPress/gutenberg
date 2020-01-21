@@ -24,7 +24,7 @@ function ButtonBlockAppender( { rootClientId, getStylesFromColorScheme, showSepa
 			<Inserter
 				rootClientId={ rootClientId }
 				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
-					! isOpen && <Button
+					<Button
 						onClick={ onToggle }
 						aria-expanded={ isOpen }
 						disabled={ disabled }
