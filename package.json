@@ -56,6 +56,7 @@
 		"@wordpress/notices": "file:packages/notices",
 		"@wordpress/nux": "file:packages/nux",
 		"@wordpress/plugins": "file:packages/plugins",
+		"@wordpress/primitives": "file:packages/primitives",
 		"@wordpress/priority-queue": "file:packages/priority-queue",
 		"@wordpress/redux-routine": "file:packages/redux-routine",
 		"@wordpress/rich-text": "file:packages/rich-text",
