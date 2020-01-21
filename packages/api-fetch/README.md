@@ -26,10 +26,7 @@ apiFetch( { path: '/wp/v2/posts' } ).then( posts => {
 apiFetch( {
 	path: '/wp/v2/posts/1',
 	method: 'POST',
-	headers: {
-		'Content-Type': 'application/json',
-	},
-	body: JSON.stringify( { title: 'New Post Title' } ),
+	data: { title: 'New Post Title' },
 } ).then( res => {
 	console.log( res );
 } );
