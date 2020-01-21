@@ -59,7 +59,7 @@ async function updateActiveNavigationLink( { url, label } ) {
 	}
 
 	if ( label ) {
-		await page.click( '.wp-block-navigation-link__content.is-selected' );
+		await page.click( '.wp-block-navigation-link__label.is-selected' );
 
 		// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
 		// to select all text like other tests do.
