@@ -33,7 +33,9 @@ function DownloadableBlockHeader( { icon, title, rating, ratingCount, isLoading,
 				isBusy={ isLoading }
 				onClick={ ( event ) => {
 					event.preventDefault();
-					onClick();
+					if ( ! isLoading ) {
+						onClick();
+					}
 				} }
 			>
 				{ isLoading ? __( 'Adding…' ) : __( 'Add block' ) }

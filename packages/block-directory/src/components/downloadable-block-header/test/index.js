@@ -15,7 +15,7 @@ import { Button } from '@wordpress/components';
 import DownloadableBlockHeader from '../index';
 import { pluginWithImg, pluginWithIcon } from './fixtures';
 
-const getContainer = ( { icon, title, rating, ratingCount }, onClick = jest.fn() ) => {
+const getContainer = ( { icon, title, rating, ratingCount }, onClick = jest.fn(), isLoading = false ) => {
 	return shallow(
 		<DownloadableBlockHeader
 			icon={ icon }
@@ -23,6 +23,7 @@ const getContainer = ( { icon, title, rating, ratingCount }, onClick = jest.fn()
 			title={ title }
 			rating={ rating }
 			ratingCount={ ratingCount }
+			isLoading={ isLoading }
 		/>
 	);
 };
@@ -57,6 +58,17 @@ describe( 'DownloadableBlockHeader', () => {
 			wrapper.find( Button ).simulate( 'click', event );
 			expect( onClickMock ).toHaveBeenCalledTimes( 1 );
 			expect( event.preventDefault ).toHaveBeenCalled();
+		} );
+
+		test( 'should not trigger the onClick function if loading', () => {
+			const onClickMock = jest.fn();
+			const wrapper = getContainer( pluginWithIcon, onClickMock, true );
+			const event = {
+				preventDefault: jest.fn(),
+			};
+			wrapper.find( Button ).simulate( 'click', event );
+			expect( event.preventDefault ).toHaveBeenCalled();
+			expect( onClickMock ).toHaveBeenCalledTimes( 0 );
 		} );
 	} );
 } );

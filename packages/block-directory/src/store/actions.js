@@ -74,8 +74,6 @@ export function* downloadBlock( item, onSuccess, onError ) {
  *
  */
 export function* installBlock( { id, name }, onSuccess, onError ) {
-	yield setIsInstalling( true );
-
 	try {
 		const response = yield apiFetch( {
 			path: '__experimental/block-directory/install',
@@ -92,8 +90,6 @@ export function* installBlock( { id, name }, onSuccess, onError ) {
 	} catch ( error ) {
 		onError( error );
 	}
-
-	yield setIsInstalling( false );
 }
 
 /**
