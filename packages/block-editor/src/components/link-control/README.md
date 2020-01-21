@@ -24,7 +24,7 @@ an experimental component which would consume `URLInput` internally. The API of
 facilitate the implementation of the new UI with the goal of eventually phasing
 out the use of `URLInput` entirely.
 
-Indeed, over time, is is expected that `URLInput` will be depracted in favour of
+Indeed, over time, is is expected that `URLInput` will be deprecated in favour of
 lower-level presentation components (eg: `<Combobox>`) which will not be tightly
 coupled to the concept of URL entry. This will allow `LinkControl` to become the
 canonical UI component for the creation of hyperlinks and will enable the
@@ -110,4 +110,3 @@ The function callback will receive the selected item, or Null.
 	}
 />
 ```
-
