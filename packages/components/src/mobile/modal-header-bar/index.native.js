@@ -24,7 +24,8 @@ const ModalHeaderBar = withPreferredColorScheme( ( props ) => {
 	} = props;
 
 	const separatorStyle = getStylesFromColorScheme( styles.separator, styles.separatorDark );
-	// TODO: dark mode for background and title??
+	const titleStyle = getStylesFromColorScheme( styles.title, styles.titleDark );
+	const subtitleStyle = getStylesFromColorScheme( styles.subtitle, styles.subtitleDark );
 
 	return (
 		<View>
@@ -33,11 +34,11 @@ const ModalHeaderBar = withPreferredColorScheme( ( props ) => {
 					{ leftButton }
 				</View>
 				<View style={ styles.titleContainer } accessibilityRole="header">
-					<Text style={ styles.title }>
+					<Text style={ titleStyle }>
 						{ title }
 					</Text>
 					{ subtitle &&
-						<Text style={ styles.subtitle }>
+						<Text style={ subtitleStyle }>
 							{ subtitle }
 						</Text>
 					}

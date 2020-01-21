@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { withPreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -16,16 +17,17 @@ import styles from './button.scss';
 
 const ICON_SIZE = 24;
 
-const Button = ( { icon, onPress, title, isPrimary } ) => {
+const Button = withPreferredColorScheme( ( { icon, onPress, title, isPrimary, getStylesFromColorScheme } ) => {
+	const titleStyle = getStylesFromColorScheme( styles.title, styles.titleDark );
 	return (
 		<TouchableOpacity onPress={ onPress }>
 			{ icon ?
 				<Icon icon={ icon } size={ ICON_SIZE } style={ styles.icon } /> :
-				<Text style={ [ styles.title, isPrimary && styles.titlePrimary ] }>{ title }</Text>
+				<Text style={ [ titleStyle, isPrimary && styles.titlePrimary ] }>{ title }</Text>
 			}
 		</TouchableOpacity>
 	);
-};
+} );
 
 Button.displayName = 'ModalHeaderBar.Button';
 
