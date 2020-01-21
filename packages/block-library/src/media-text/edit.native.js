@@ -20,7 +20,6 @@ import {
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { BREAKPOINTS } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -37,6 +36,9 @@ const TEMPLATE = [
 ];
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
+const BREAKPOINTS = {
+	mobile: 480,
+};
 const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
 class MediaTextEdit extends Component {
