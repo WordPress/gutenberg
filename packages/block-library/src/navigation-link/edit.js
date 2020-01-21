@@ -298,7 +298,6 @@ function NavigationLinkEdit( {
 export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
-			getBlockName,
 			getBlockAttributes,
 			getBlockParents,
 			getClientIdsOfDescendants,
@@ -306,11 +305,9 @@ export default compose( [
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 		const rootBlock = getBlockParents( clientId )[ 0 ];
-		const parentBlock = getBlockParents( clientId, true )[ 0 ];
 		const navigationBlockAttributes = getBlockAttributes( rootBlock );
 		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] ).length;
-		const isLevelZero = getBlockName( parentBlock ) === 'core/navigation';
-		const showSubmenuIcon = navigationBlockAttributes.showSubmenuIcon && isLevelZero && hasDescendants;
+		const showSubmenuIcon = navigationBlockAttributes.showSubmenuIcon && hasDescendants;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
 		return {
