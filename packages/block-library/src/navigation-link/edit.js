@@ -174,6 +174,7 @@ function NavigationLinkEdit( {
 									title: newTitle = '',
 									url: newURL = '',
 									opensInNewTab: newOpensInNewTab,
+									id,
 								} = {} ) => setAttributes( {
 									title: escape( newTitle ),
 									url: encodeURI( newURL ),
@@ -189,6 +190,7 @@ function NavigationLinkEdit( {
 										return label;
 									} )(),
 									opensInNewTab: newOpensInNewTab,
+									id,
 								} ) }
 								onClose={ () => setIsLinkOpen( false ) }
 							/>
