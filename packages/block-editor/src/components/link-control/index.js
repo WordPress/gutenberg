@@ -23,7 +23,7 @@ import {
 	prependHTTP,
 	getProtocol,
 } from '@wordpress/url';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, withSafeTimeout } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 
@@ -309,6 +309,23 @@ function LinkControl( {
 					{ ! isInitialSuggestions && (
 						<LinkControlSearchCreate
 							searchTerm={ inputValue }
+							onClick={ async () => {
+								setIsEditingLink( false );
+								onChange( {
+									title: 'Loading link...',
+									url: 'loading...',
+								} );
+								const _result = await new Promise( ( resolve ) => {
+									setTimeout( () => {
+										resolve( {
+											title: 'Resolved Titlte',
+											url: '/some-revoled/slug',
+										} );
+									}, 5000 );
+								} );
+								setIsEditingLink( false );
+								onChange( _result );
+							} }
 						/>
 					) }
 				</div>
@@ -386,4 +403,4 @@ function LinkControl( {
 	);
 }
 
-export default LinkControl;
+export default withSafeTimeout( LinkControl );
