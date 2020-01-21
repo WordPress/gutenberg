@@ -35,6 +35,9 @@ function getRowFocusables( rowElement ) {
 	} );
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/navigable-tree-grid/README.md
+ */
 export default function NavigableTreeGrid( { children } ) {
 	const containerRef = useRef();
 
