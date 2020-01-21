@@ -164,11 +164,11 @@ function render_block_navigation( $attributes, $content, $block ) {
  * @param array $block      The block.
  * @param array $colors     Contains inline styles and CSS classes to apply to navigation item.
  * @param array $font_sizes Contains inline styles and CSS classes to apply to navigation item.
- * @param bool  $level_zero True whether is main menu (level zero). Otherwise, False.
+ * @param bool  $is_level_zero True whether is main menu (level zero). Otherwise, False.
  *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function build_navigation_html( $attributes, $block, $colors, $font_sizes, $level_zero = true ) {
+function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_level_zero = true ) {
 	$html            = '';
 	$classes         = array_merge(
 		$colors['css_classes'],
@@ -186,7 +186,7 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $leve
 		$html .= '<li class="wp-block-navigation-link' . ($has_submenu ? ' has-submenu' : '') . '">' .
 			'<a';
 
-		if ( $level_zero ) {
+		if ( $is_level_zero ) {
 			$html .= $class_attribute . $style_attribute;
 		}
 
@@ -230,7 +230,7 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $leve
 		$html .= '</span>';
 
 		// Append submenu icon to top-level item
-		if ( $attributes['showSubmenuIcon'] && $level_zero && $has_submenu ) {
+		if ( $attributes['showSubmenuIcon'] && $is_level_zero && $has_submenu ) {
 			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . render_submenu_icon() . '</span>';
 		}
 
