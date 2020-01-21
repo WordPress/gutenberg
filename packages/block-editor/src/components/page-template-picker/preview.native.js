@@ -63,6 +63,7 @@ const Preview = ( props ) => {
 			visible={ !! template }
 			animationType="slide"
 			onRequestClose={ onDismiss }
+			supportedOrientations={ [ 'portrait', 'landscape' ] }
 		>
 			<SafeAreaView style={ { flex: 1 } }>
 				<ModalHeaderBar
