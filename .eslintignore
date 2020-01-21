@@ -4,8 +4,7 @@ build-module
 node_modules
 packages/block-serialization-spec-parser/parser.js
 packages/e2e-tests/plugins
-packages/react-native-editor/bundle
-packages/react-native-*/(android|ios)
+packages/react-native-*
 playground/dist
 vendor
 wordpress
