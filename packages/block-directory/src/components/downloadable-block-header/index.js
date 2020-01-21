@@ -46,7 +46,9 @@ function DownloadableBlockHeader( {
 				isBusy={ isLoading }
 				onClick={ ( event ) => {
 					event.preventDefault();
-					onClick();
+					if ( ! isLoading ) {
+						onClick();
+					}
 				} }
 			>
 				{ isLoading ? __( 'Adding…' ) : __( 'Add block' ) }
