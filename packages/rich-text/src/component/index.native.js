@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import RCTAztecView from 'react-native-aztec';
+import RCTAztecView from '@wordpress/react-native-aztec';
 import { View, Platform } from 'react-native';
 import {
 	pickBy,

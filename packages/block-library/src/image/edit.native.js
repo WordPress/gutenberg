@@ -9,7 +9,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-bridge';
 import { isEmpty, map, get } from 'lodash';
 
 /**

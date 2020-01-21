@@ -6,7 +6,7 @@ import { TouchableWithoutFeedback } from 'react-native';
 import {
 	requestMediaPicker,
 	mediaSources,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
+import RNReactNativeGutenbergBridge from '@wordpress/react-native-bridge';
 import { mount } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 

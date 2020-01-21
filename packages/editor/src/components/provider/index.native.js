@@ -7,7 +7,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateHtml,
 	subscribeSetTitle,
 	subscribeMediaAppend,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-bridge';
 
 /**
  * WordPress dependencies

@@ -5,7 +5,7 @@ import React from 'react';
 import { View } from 'react-native';
 import {
 	subscribeMediaUpload,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-bridge';
 
 /**
  * WordPress dependencies

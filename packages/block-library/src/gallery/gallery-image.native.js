@@ -5,7 +5,7 @@ import { Image, StyleSheet, View, ScrollView, Text, TouchableWithoutFeedback } f
 import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-bridge';
 import { isEmpty } from 'lodash';
 
 /**

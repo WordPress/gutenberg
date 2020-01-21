@@ -12,7 +12,7 @@ import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-bridge';
 
 /**
  * WordPress dependencies

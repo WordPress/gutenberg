@@ -6,7 +6,7 @@ import {
 	getOtherMediaOptions,
 	requestMediaPicker,
 	mediaSources,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-bridge';
 
 /**
  * WordPress dependencies
