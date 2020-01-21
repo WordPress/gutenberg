@@ -22,13 +22,10 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@svgr/cli": "^5.0.0"
+		"@wordpress/element": "../element",
+		"@wordpress/primitives": "../primitives"
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"scripts": {
-		"build": "svgr -d ./build ./src --quite --silent",
-		"prepare": "npm run build"
 	}
 }

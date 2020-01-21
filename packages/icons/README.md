@@ -1,6 +1,6 @@
 # Icons
 
-Icons package library to be used in your project, based on Dashicon. It exposes icons components to be used.
+WordPress Icons Library.
 
 ## Installation
 
@@ -15,9 +15,9 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ## Usage
 
 ```js
-import { ArrowLeft } from '@wordpress/icons';
+import { __experimentalIcon as Icon, saved } from '@wordpress/icons';
 
-<ArrowLeft />
+<Icon icon={ saved } />
 ```
 
 ## Props
