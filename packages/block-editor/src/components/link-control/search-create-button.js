@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { safeDecodeURI } from '@wordpress/url';
+import { cleanForSlug } from '@wordpress/url';
 import {
 	Button,
 	Icon,
@@ -33,11 +33,11 @@ export const LinkControlSearchCreate = ( { searchTerm = '', onClick, itemProps }
 					{ sprintf( __( 'Create new Page: %s' ), searchTerm ) }
 				</span>
 				<span className="block-editor-link-control__search-item-info">
-					{ safeDecodeURI( '/some-url/' ) }
+					/{ cleanForSlug( searchTerm ) }/
 				</span>
 			</span>
 
-			<span className="block-editor-link-control__search-item-type">Page</span>
+			<span className="block-editor-link-control__search-item-type">page</span>
 
 		</Button>
 	);
