@@ -185,7 +185,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control__search-create {
 	margin-top: 20px;
-	overflow: auto;
+	overflow: visible;
 
 	// Create fake border. We cannot use border because the button has a border
 	// radius applied to it
