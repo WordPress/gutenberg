@@ -882,24 +882,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "BlockQuotation",
-		"slug": "block-quotation",
-		"markdown_source": "../packages/components/src/primitives/block-quotation/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "HorizontalRule",
-		"slug": "horizontal-rule",
-		"markdown_source": "../packages/components/src/primitives/horizontal-rule/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "Svg",
-		"slug": "svg",
-		"markdown_source": "../packages/components/src/primitives/svg/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "QueryControls",
 		"slug": "query-controls",
 		"markdown_source": "../packages/components/src/query-controls/README.md",
@@ -1425,6 +1407,12 @@
 		"title": "@wordpress/postcss-themes",
 		"slug": "packages-postcss-themes",
 		"markdown_source": "../packages/postcss-themes/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/primitives",
+		"slug": "packages-primitives",
+		"markdown_source": "../packages/primitives/README.md",
 		"parent": "packages"
 	},
 	{

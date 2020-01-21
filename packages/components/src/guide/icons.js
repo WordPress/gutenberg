@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { SVG, Path, Circle } from '../primitives/svg';
+import { SVG, Path, Circle } from '@wordpress/primitives';
 
 export const BackButtonIcon = () => (
 	<SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24">

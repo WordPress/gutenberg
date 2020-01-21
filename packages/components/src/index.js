@@ -1,5 +1,7 @@
+// Primitives
+export { SVG, Path, Circle, Polygon, Rect, G, HorizontalRule, BlockQuotation } from '@wordpress/primitives';
+
 // Components
-export * from './primitives';
 export { default as Animate } from './animate';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';

@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { cloneElement, createElement, Component, isValidElement } from '@wordpress/element';
+import { SVG } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
 import Dashicon from '../dashicon';
-import { SVG } from '../primitives';
 
 function Icon( { icon = null, size, ...additionalProps } ) {
 	// Dashicons should be 20x20 by default.
