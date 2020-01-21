@@ -21,11 +21,10 @@ import { __experimentalIcon as Icon, saved } from '@wordpress/icons';
 ```
 
 ## Props
+
 Name | Type | Default | Description
 --- | --- | --- | ---
-`size` | `integer` | `20` | Size of icon in pixels.
-`className` | `string` | `undefined` | Class name to be used.
-`ariaPressed` | `string` | `undefined` | Class name to be used when icon is pressed.
+`size` | `integer` | `24` | Size of icon in pixels.
 
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
