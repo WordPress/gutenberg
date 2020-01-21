@@ -3,6 +3,7 @@
  */
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
 import { ModalHeaderBar } from '@wordpress/components';
+import { usePreferredColorScheme } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -41,6 +42,8 @@ BlockPreview.displayName = 'BlockPreview';
 
 const Preview = ( props ) => {
 	const { template, onDismiss, onApply } = props;
+	const preferredColorScheme = usePreferredColorScheme();
+	const containerBackgroundColor = preferredColorScheme === 'dark' ? 'black' : 'white';
 
 	if ( template === undefined ) {
 		return null;
@@ -65,7 +68,7 @@ const Preview = ( props ) => {
 			onRequestClose={ onDismiss }
 			supportedOrientations={ [ 'portrait', 'landscape' ] }
 		>
-			<SafeAreaView style={ { flex: 1 } }>
+			<SafeAreaView style={ { flex: 1, backgroundColor: containerBackgroundColor } }>
 				<ModalHeaderBar
 					leftButton={ leftButton }
 					rightButton={ rightButton }
