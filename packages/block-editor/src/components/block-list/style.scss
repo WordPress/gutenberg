@@ -110,8 +110,18 @@
 		}
 	}
 
+	// Between-blocks dropzone line indicator.
 	&.is-drop-target::before {
-		border-top: 3px solid theme(primary);
+		content: "";
+		position: absolute;
+		z-index: 0;
+		pointer-events: none;
+		transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
+		right: 0;
+		left: 0;
+		bottom: -$default-block-margin / 2;
+		border-radius: $radius-block-ui;
+		border-top: 4px solid $blue-medium-focus;
 	}
 }
 
@@ -138,7 +148,10 @@
 			bottom: 0;
 			left: 0;
 			right: 0;
+		}
 
+		.is-block-content, // Floats.
+		&::after { // Everything else.
 			// 2px outside.
 			box-shadow: 0 0 0 2px $blue-medium-focus;
 			border-radius: $radius-block-ui;
@@ -159,6 +172,13 @@
 			}
 		}
 	}
+
+	// Hide the focus indicator for collapsed blocks.
+	// These serve as only as column containers for floated blocks.
+	.block-editor-block-list__block.is-block-collapsed::after {
+		content: none;
+	}
+
 }
 
 
@@ -531,4 +551,8 @@
 	.is-dragging-components-draggable & {
 		opacity: 0;
 	}
+}
+
+.is-dragging-components-draggable .components-tooltip {
+	display: none;
 }
