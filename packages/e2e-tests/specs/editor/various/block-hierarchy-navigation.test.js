@@ -23,7 +23,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate using the block hierarchy dropdown menu', async () => {
 		await insertBlock( 'Columns' );
-		await page.click( '[aria-label="Two columns; equal split"]' );
+		await page.click( 'button[text()="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
@@ -73,7 +73,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate block hierarchy using only the keyboard', async () => {
 		await insertBlock( 'Columns' );
-		await page.click( '[aria-label="Two columns; equal split"]' );
+		await page.click( 'button[text()="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.

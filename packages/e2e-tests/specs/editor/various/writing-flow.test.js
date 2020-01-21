@@ -37,7 +37,7 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/columns' );
 		await page.keyboard.press( 'Enter' );
-		await page.click( ':focus [aria-label="Two columns; equal split"]' );
+		await page.click( ':focus button[text()="Two columns; equal split"]' );
 		await page.click( ':focus .block-editor-button-block-appender' );
 		await page.waitForSelector( ':focus.block-editor-inserter__search' );
 		await page.keyboard.type( 'Paragraph' );
