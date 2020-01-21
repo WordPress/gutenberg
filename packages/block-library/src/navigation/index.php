@@ -183,7 +183,7 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_l
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
 		$has_submenu = count( (array) $block['innerBlocks'] ) > 0;
 
-		$html .= '<li class="wp-block-navigation-link' . ($has_submenu ? ' has-submenu' : '') . '">' .
+		$html .= '<li class="wp-block-navigation-link' . ( $has_submenu ? ' has-submenu' : '' ) . '">' .
 			'<a';
 
 		if ( $is_level_zero ) {
