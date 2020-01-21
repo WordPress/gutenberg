@@ -7,7 +7,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, Fragment, useRef } from '@wordpress/element';
+import {
+	useMemo,
+	Fragment,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -85,6 +90,29 @@ function Navigation( {
 		},
 		[ fontSize.size ]
 	);
+
+	/**
+	 * The following hook will get the current text color of the menu,
+	 * getting it from the valueTextColor if it's already defined.
+	 * If not, it will try to compute it from the DOM tree.
+	 * This value will be stored as a new detectedTextColor attribute.
+	 */
+	useEffect( () => {
+		if ( attributes.valueTextColor ) {
+			return setAttributes( { detectedTextColor: attributes.valueTextColor } )
+		}
+
+		if ( ! ref || ! ref.current ) {
+			return;
+		}
+
+		const navigationStyles  = getComputedStyle( ref.current );
+		if ( ! navigationStyles || ! navigationStyles.color ) {
+			return;
+		}
+
+		setAttributes( { detectedTextColor: navigationStyles.color } );
+	}, [ attributes.valueTextColor, attributes.valueBackgroundColor ] );
 
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
