@@ -334,6 +334,7 @@ const Popover = ( {
 		let rafId;
 
 		const refreshOnAnimationFrame = () => {
+			window.cancelAnimationFrame( rafId );
 			rafId = window.requestAnimationFrame( refresh );
 		};
 
