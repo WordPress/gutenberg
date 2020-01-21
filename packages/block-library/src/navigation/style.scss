@@ -37,6 +37,7 @@
 			}
 		}
 
+		// ToDo: move navigation-link styles to navigation-link/style.scss
 		& > li {
 
 			& > a {
@@ -57,14 +58,12 @@
 				padding-right: 0;
 			}
 
-			// Make submenu icon inherit current text color
-			& > a svg {
-				fill: currentColor;
-			}
-
-			// Add some space between link text & submenu icon
-			& > a > span + span {
+			.wp-block-navigation-link__submenu-icon {
 				margin-left: 4px;
+
+				svg {
+					fill: currentColor;
+				}
 			}
 		}
 
