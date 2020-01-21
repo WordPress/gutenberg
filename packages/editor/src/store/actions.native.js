@@ -1,5 +1,5 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
 import RNReactNativeGutenbergBridge from '@wordpress/react-native-bridge';
 

@@ -2,11 +2,6 @@
  * External dependencies
  */
 import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
-import {
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from '@wordpress/react-native-bridge';
 
 /**
  * WordPress dependencies
@@ -31,6 +26,11 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import {
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies

@@ -3,13 +3,6 @@
  */
 import React from 'react';
 import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
-import {
-	requestMediaImport,
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-	requestImageFullscreenPreview,
-} from '@wordpress/react-native-bridge';
 import { isEmpty, map, get } from 'lodash';
 
 /**
@@ -25,7 +18,6 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-
 import {
 	BlockCaption,
 	MediaPlaceholder,
@@ -41,6 +33,13 @@ import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
+import {
+	requestMediaImport,
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	requestImageFullscreenPreview,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies

@@ -2,6 +2,10 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
+
+/**
+ * WordPress dependencies
+ */
 import {
 	sendMediaUpload,
 } from '@wordpress/react-native-bridge';

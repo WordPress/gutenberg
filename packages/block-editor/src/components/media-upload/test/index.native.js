@@ -3,6 +3,10 @@
  */
 import { shallow } from 'enzyme';
 import { TouchableWithoutFeedback } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
 import {
 	requestMediaPicker,
 	mediaSources,

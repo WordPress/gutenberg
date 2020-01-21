@@ -2,10 +2,6 @@
  * External dependencies
  */
 import { Image, StyleSheet, View, ScrollView, Text, TouchableWithoutFeedback } from 'react-native';
-import {
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from '@wordpress/react-native-bridge';
 import { isEmpty } from 'lodash';
 
 /**
@@ -17,6 +13,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
 import { isURL } from '@wordpress/url';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies

@@ -3,7 +3,6 @@
  */
 import { Platform, SafeAreaView, View } from 'react-native';
 import SafeArea from 'react-native-safe-area';
-import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**
  * WordPress dependencies
@@ -14,6 +13,7 @@ import { BottomSheetSettings, __experimentalPageTemplatePicker, __experimentalWi
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
+import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
