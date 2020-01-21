@@ -276,7 +276,7 @@ function register_block_core_navigation() {
 				'customTextColor'       => array(
 					'type' => 'string',
 				),
-				'valueTextColor'            => array(
+				'valueTextColor'        => array(
 					'type' => 'string',
 				),
 				'backgroundColor'       => array(
