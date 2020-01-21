@@ -54,6 +54,7 @@ const Preview = ( props ) => {
 		<ModalHeaderBar.Button
 			onPress={ onApply }
 			title={ __( 'Apply' ) }
+			isPrimary={ true }
 		/>
 	);
 

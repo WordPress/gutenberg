@@ -16,12 +16,12 @@ import styles from './button.scss';
 
 const ICON_SIZE = 24;
 
-const Button = ( { icon, onPress, title } ) => {
+const Button = ( { icon, onPress, title, isPrimary } ) => {
 	return (
 		<TouchableOpacity onPress={ onPress }>
 			{ icon ?
 				<Icon icon={ icon } size={ ICON_SIZE } /> :
-				<Text style={ styles.title }>{ title }</Text>
+				<Text style={ [ styles.title, isPrimary && styles.titlePrimary ] }>{ title }</Text>
 			}
 		</TouchableOpacity>
 	);
