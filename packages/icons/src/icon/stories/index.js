@@ -10,8 +10,20 @@ export default { title: 'Icons/Icon', component: Icon };
 export const _default = () => {
 	return (
 		<>
-			<Icon icon={ saved } />
-			<Icon icon={ paragraph } />
+			<div>
+				<h2>Dashicons (corrected viewport)</h2>
+
+				<Icon icon={ saved } />
+				<Icon icon={ saved } size={ 36 } />
+				<Icon icon={ saved } size={ 48 } />
+			</div>
+			<div>
+				<h2>Material and Other</h2>
+
+				<Icon icon={ paragraph } />
+				<Icon icon={ paragraph } size={ 36 } />
+				<Icon icon={ paragraph } size={ 48 } />
+			</div>
 		</>
 	);
 };
