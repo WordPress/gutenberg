@@ -279,6 +279,56 @@ exports[`Storyshots Components/BaseControl Default 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/BaseControl Fieldset 1`] = `
+<fieldset
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <legend
+      className="components-base-control__label"
+      htmlFor="fieldset-1"
+    >
+      Post visibility
+    </legend>
+    <input
+      id="public"
+      name="post-visibility"
+      type="radio"
+    />
+    <label
+      htmlFor="public"
+    >
+      Public
+    </label>
+    <br />
+    <input
+      id="private"
+      name="post-visibility"
+      type="radio"
+    />
+    <label
+      htmlFor="private"
+    >
+      Private
+    </label>
+    <br />
+    <input
+      id="password"
+      name="post-visibility"
+      type="radio"
+    />
+    <label
+      htmlFor="password"
+    >
+      Password Protected
+    </label>
+    <br />
+  </div>
+</fieldset>
+`;
+
 exports[`Storyshots Components/Button Buttons 1`] = `
 <div
   style={
@@ -4336,18 +4386,18 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
 `;
 
 exports[`Storyshots Components/RadioControl Default 1`] = `
-<div
+<fieldset
   className="components-base-control components-radio-control"
 >
   <div
     className="components-base-control__field"
   >
-    <label
+    <legend
       className="components-base-control__label"
       htmlFor="inspector-radio-control-0"
     >
       Post visibility
-    </label>
+    </legend>
     <div
       className="components-radio-control__option"
     >
@@ -4403,22 +4453,22 @@ exports[`Storyshots Components/RadioControl Default 1`] = `
       </label>
     </div>
   </div>
-</div>
+</fieldset>
 `;
 
 exports[`Storyshots Components/RadioControl With Help 1`] = `
-<div
+<fieldset
   className="components-base-control components-radio-control"
 >
   <div
     className="components-base-control__field"
   >
-    <label
+    <legend
       className="components-base-control__label"
       htmlFor="inspector-radio-control-1"
     >
       Post visibility
-    </label>
+    </legend>
     <div
       className="components-radio-control__option"
     >
@@ -4483,7 +4533,7 @@ exports[`Storyshots Components/RadioControl With Help 1`] = `
   >
     The visibility level for the current post
   </p>
-</div>
+</fieldset>
 `;
 
 exports[`Storyshots Components/RangeControl Default 1`] = `
