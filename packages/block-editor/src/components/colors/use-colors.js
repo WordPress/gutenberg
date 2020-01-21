@@ -51,10 +51,11 @@ const ColorPanel = ( {
 	detectedBackgroundColor,
 	detectedColor,
 	panelChildren,
+	initialOpen,
 } ) => (
 	<PanelColorSettings
 		title={ title }
-		initialOpen={ false }
+		initialOpen={ initialOpen }
 		colorSettings={ Object.values( colorSettings ) }
 		{ ...colorPanelProps }
 	>
@@ -316,6 +317,7 @@ export default function __experimentalUseColors(
 
 		const wrappedColorPanelProps = {
 			title: panelTitle,
+			initialOpen: false,
 			colorSettings,
 			colorPanelProps,
 			contrastCheckers,

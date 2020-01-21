@@ -73,7 +73,8 @@ const FocusCapture = forwardRef( ( {
 
 		if ( isReverse ) {
 			const tabbables = focus.tabbable.find( wrapper );
-			last( tabbables ).focus();
+			const lastTabbable = last( tabbables ) || wrapper;
+			lastTabbable.focus();
 		} else {
 			wrapper.focus();
 		}

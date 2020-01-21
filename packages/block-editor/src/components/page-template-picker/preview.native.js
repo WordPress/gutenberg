@@ -9,7 +9,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * External dependencies
  */
-import { Modal, View, SafeAreaView } from 'react-native';
+import { Modal, View, SafeAreaView, Text, TouchableOpacity } from 'react-native';
+
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
 
 // We are replicating this here because the one in @wordpress/block-editor always
 // tries to scale the preview and we would need a lot of cross platform code to handle
@@ -40,7 +45,7 @@ const BlockPreview = ( { blocks } ) => {
 BlockPreview.displayName = 'BlockPreview';
 
 const Preview = ( props ) => {
-	const { template, onDismiss } = props;
+	const { template, onDismiss, onApply } = props;
 
 	if ( template === undefined ) {
 		return null;
@@ -59,6 +64,16 @@ const Preview = ( props ) => {
 		</View>
 	);
 
+	const rightButton = (
+		<View
+			style={ styles.headerRightButton }
+		>
+			<TouchableOpacity onPress={ onApply }>
+				<Text>{ __( 'Apply' ) }</Text>
+			</TouchableOpacity>
+		</View>
+	);
+
 	return (
 		<Modal
 			visible={ !! template }
@@ -68,6 +83,7 @@ const Preview = ( props ) => {
 			<SafeAreaView style={ { flex: 1 } }>
 				<ModalHeaderBar
 					leftButton={ leftButton }
+					rightButton={ rightButton }
 					title={ template.name }
 				/>
 				<BlockPreview

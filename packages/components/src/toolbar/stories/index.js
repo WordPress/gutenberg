@@ -11,7 +11,7 @@ import {
 	DropdownMenu,
 } from '../../';
 
-export default { title: 'Components|Toolbar', component: Toolbar };
+export default { title: 'Components/Toolbar', component: Toolbar };
 
 function InlineImageIcon() {
 	return (
@@ -25,7 +25,10 @@ function InlineImageIcon() {
 export const _default = () => {
 	return (
 		// id is required for server side rendering
-		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar">
+		<Toolbar
+			__experimentalAccessibilityLabel="Options"
+			id="options-toolbar"
+		>
 			<ToolbarGroup>
 				<ToolbarButton icon="editor-paragraph" label="Paragraph" />
 			</ToolbarGroup>
@@ -37,9 +40,19 @@ export const _default = () => {
 							icon="editor-alignleft"
 							label="Change text alignment"
 							controls={ [
-								{ icon: 'editor-alignleft', title: 'Align left', isActive: true },
-								{ icon: 'editor-aligncenter', title: 'Align center' },
-								{ icon: 'editor-alignright', title: 'Align right' },
+								{
+									icon: 'editor-alignleft',
+									title: 'Align left',
+									isActive: true,
+								},
+								{
+									icon: 'editor-aligncenter',
+									title: 'Align center',
+								},
+								{
+									icon: 'editor-alignright',
+									title: 'Align right',
+								},
 							] }
 							toggleProps={ toggleProps }
 						/>
@@ -58,7 +71,10 @@ export const _default = () => {
 					controls={ [
 						{ icon: 'editor-code', title: 'Inline code' },
 						{ icon: <InlineImageIcon />, title: 'Inline image' },
-						{ icon: 'editor-strikethrough', title: 'Strikethrough' },
+						{
+							icon: 'editor-strikethrough',
+							title: 'Strikethrough',
+						},
 					] }
 				/>
 			</ToolbarGroup>
@@ -68,7 +84,11 @@ export const _default = () => {
 				label="Change text alignment"
 				isCollapsed
 				controls={ [
-					{ icon: 'editor-alignleft', title: 'Align left', isActive: true },
+					{
+						icon: 'editor-alignleft',
+						title: 'Align left',
+						isActive: true,
+					},
 					{ icon: 'editor-aligncenter', title: 'Align center' },
 					{ icon: 'editor-alignright', title: 'Align right' },
 				] }

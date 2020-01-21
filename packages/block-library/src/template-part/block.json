@@ -11,8 +11,5 @@
 		"theme": {
 			"type": "string"
 		}
-	},
-	"supports": {
-		"html": false
 	}
 }

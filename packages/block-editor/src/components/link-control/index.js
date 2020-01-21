@@ -7,10 +7,9 @@ import { noop, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, ExternalLink } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState, Fragment } from '@wordpress/element';
-
 import {
 	safeDecodeURI,
 	filterURLForDisplay,
@@ -18,7 +17,6 @@ import {
 	prependHTTP,
 	getProtocol,
 } from '@wordpress/url';
-
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
@@ -29,20 +27,22 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
-const MODE_EDIT = 'edit';
-
-export function LinkControl( {
+function LinkControl( {
 	value,
 	settings,
 	onChange = noop,
 	showInitialSuggestions,
-	fetchSearchSuggestions,
 } ) {
 	const instanceId = useInstanceId( LinkControl );
-	const [ inputValue, setInputValue ] = useState( '' );
+	const [ inputValue, setInputValue ] = useState( ( value && value.url ) || '' );
 	const [ isEditingLink, setIsEditingLink ] = useState( ! value || ! value.url );
-
-	// Handlers
+	const { fetchSearchSuggestions } = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return {
+			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
+		};
+	}, [] );
+	const displayURL = ( value && filterURLForDisplay( safeDecodeURI( value.url ) ) ) || '';
 
 	/**
 	 * onChange LinkControlSearchInput event handler
@@ -51,24 +51,6 @@ export function LinkControl( {
 	 */
 	const onInputChange = ( val = '' ) => {
 		setInputValue( val );
-	};
-
-	// Utils
-
-	/**
-	 * Handler function which switches the mode of the component,
-	 * between `edit` and `show` mode.
-	 *
-	 * @param {string} mode Component mode: `show` or `edit`.
-	 */
-	const setMode = ( mode = 'show' ) => () => {
-		setIsEditingLink( MODE_EDIT === mode );
-
-		// Populate input searcher whether
-		// the current link has a title.
-		if ( value && value.title && MODE_EDIT === mode ) {
-			setInputValue( value.title );
-		}
 	};
 
 	const resetInput = () => {
@@ -131,16 +113,29 @@ export function LinkControl( {
 	}, [ handleDirectEntry, fetchSearchSuggestions ] );
 
 	// Render Components
-	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading } ) => {
+	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading, isInitialSuggestions } ) => {
 		const resultsListClasses = classnames( 'block-editor-link-control__search-results', {
 			'is-loading': isLoading,
 		} );
 
 		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
+		const searchResultsLabelId = isInitialSuggestions ? `block-editor-link-control-search-results-label-${ instanceId }` : undefined;
+		const labelText = isInitialSuggestions ? __( 'Recently updated' ) : sprintf( __( 'Search results for %s' ), inputValue );
+		// According to guidelines aria-label should be added if the label
+		// itself is not visible.
+		// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
+		const ariaLabel = isInitialSuggestions ? undefined : labelText;
+		const SearchResultsLabel = (
+			<span className="block-editor-link-control__search-results-label" id={ searchResultsLabelId } aria-label={ ariaLabel } >
+				{ labelText }
+			</span>
+		);
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				<div { ...suggestionsListProps } className={ resultsListClasses }>
+				{ isInitialSuggestions ? SearchResultsLabel : <VisuallyHidden>{ SearchResultsLabel }</VisuallyHidden> }
+
+				<div { ...suggestionsListProps } className={ resultsListClasses } aria-labelledby={ searchResultsLabelId }>
 					{ suggestions.map( ( suggestion, index ) => (
 						<LinkControlSearchItem
 							key={ `${ suggestion.id }-${ suggestion.type }` }
@@ -179,12 +174,20 @@ export function LinkControl( {
 								className="block-editor-link-control__search-item-title"
 								href={ value.url }
 							>
-								{ value.title }
+								{ ( value && value.title ) || displayURL }
 							</ExternalLink>
-							<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( value.url ) ) || '' }</span>
+							{ value && value.title && (
+								<span className="block-editor-link-control__search-item-info">
+									{ displayURL }
+								</span>
+							) }
 						</span>
 
-						<Button isSecondary onClick={ setMode( MODE_EDIT ) } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
+						<Button
+							isSecondary
+							onClick={ () => setIsEditingLink( true ) }
+							className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit"
+						>
 							{ __( 'Edit' ) }
 						</Button>
 					</div>
@@ -213,15 +216,4 @@ export function LinkControl( {
 	);
 }
 
-function ConnectedLinkControl( props ) {
-	const { fetchSearchSuggestions } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return {
-			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
-		};
-	}, [] );
-
-	return <LinkControl fetchSearchSuggestions={ fetchSearchSuggestions } { ...props } />;
-}
-
-export default ConnectedLinkControl;
+export default LinkControl;

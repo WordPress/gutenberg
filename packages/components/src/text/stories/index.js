@@ -4,7 +4,7 @@
 import { __experimentalText as Text } from '../text.styles';
 
 export default {
-	title: 'Components|Experimental/Text',
+	title: 'Components/Experimental/Text',
 	component: Text,
 };
 

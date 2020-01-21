@@ -9,7 +9,7 @@ import { default as tinycolor, mostReadable } from 'tinycolor2';
  */
 import { Component, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { stripHTML } from '@wordpress/dom';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies

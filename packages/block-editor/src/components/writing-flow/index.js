@@ -86,7 +86,7 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
  *
  * @return {?Element} Optimal tab target, if one exists.
  */
-function getClosestTabbable( target, isReverse, containerElement ) {
+export function getClosestTabbable( target, isReverse, containerElement ) {
 	// Since the current focus target is not guaranteed to be a text field,
 	// find all focusables. Tabbability is considered later.
 	let focusableNodes = focus.focusable.find( containerElement );
@@ -348,7 +348,7 @@ export default function WritingFlow( { children } ) {
 			return;
 		}
 
-		const clientId = selectedBlockClientId || selectionStartClientId;
+		const clientId = selectedBlockClientId || selectedFirstClientId;
 
 		// In Edit mode, Tab should focus the first tabbable element after the
 		// content, which is normally the sidebar (with block controls) and
@@ -371,8 +371,9 @@ export default function WritingFlow( { children } ) {
 					}
 				} else {
 					const tabbables = focus.tabbable.find( wrapper );
+					const lastTabbable = last( tabbables ) || wrapper;
 
-					if ( target === last( tabbables ) ) {
+					if ( target === lastTabbable ) {
 						// See comment above.
 						noCapture.current = true;
 						focusCaptureAfterRef.current.focus();
@@ -485,7 +486,7 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	const selectedClientId = selectedBlockClientId || selectionStartClientId;
+	const selectedClientId = selectedBlockClientId || selectedFirstClientId;
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.
