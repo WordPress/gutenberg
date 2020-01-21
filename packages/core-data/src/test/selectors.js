@@ -8,6 +8,7 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	getEntityRecord,
+	getEntityRecordNoResolver,
 	getEntityRecords,
 	getEntityRecordChangesByRecord,
 	getEntityRecordNonTransientEdits,
@@ -20,7 +21,11 @@ import {
 	getReferenceByDistinctEdits,
 } from '../selectors';
 
-describe( 'getEntityRecord', () => {
+// getEntityRecord and getEntityRecordNoResolver selectors share the same tests
+describe.each( [
+	[ getEntityRecord ],
+	[ getEntityRecordNoResolver ],
+] )( '%p', ( selector ) => {
 	it( 'should return undefined for unknown record’s key', () => {
 		const state = deepFreeze( {
 			entities: {
@@ -36,7 +41,7 @@ describe( 'getEntityRecord', () => {
 				},
 			},
 		} );
-		expect( getEntityRecord( state, 'root', 'postType', 'post' ) ).toBe( undefined );
+		expect( selector( state, 'root', 'postType', 'post' ) ).toBe( undefined );
 	} );
 
 	it( 'should return a record by key', () => {
@@ -56,7 +61,9 @@ describe( 'getEntityRecord', () => {
 				},
 			},
 		} );
-		expect( getEntityRecord( state, 'root', 'postType', 'post' ) ).toEqual( { slug: 'post' } );
+		expect( selector( state, 'root', 'postType', 'post' ) ).toEqual( {
+			slug: 'post',
+		} );
 	} );
 } );
 

@@ -357,11 +357,10 @@ export function* saveEntityRecord(
 				}
 			}
 
-			// We perform an optimistic update here to clear all the edits that
-			// will be persisted so that if the server filters them, the new
-			// filtered values are always accepted.
+			// Get the full local version of the record before the update,
+			// to merge it with the edits and then propagate it to subscribers
 			persistedEntity = yield select(
-				'getEntityRecord',
+				'getEntityRecordNoResolver',
 				kind,
 				name,
 				recordId

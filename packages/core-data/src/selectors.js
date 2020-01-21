@@ -108,6 +108,20 @@ export function getEntityRecord( state, kind, name, key ) {
 }
 
 /**
+ * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
+ *
+ * @param {Object} state  State tree
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {number} key    Record's key
+ *
+ * @return {Object?} Record.
+ */
+export function getEntityRecordNoResolver( state, kind, name, key ) {
+	return getEntityRecord( state, kind, name, key );
+}
+
+/**
  * Returns the entity's record object by key,
  * with its attributes mapped to their raw values.
  *
