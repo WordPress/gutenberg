@@ -16,16 +16,11 @@ module.exports = {
 		"react",
 		"react-native",
 		"jest",
-		"flowtype"
 	],
 	extends: [
 		"plugin:@wordpress/eslint-plugin/recommended",
-		"plugin:flowtype/recommended",
 	],
 	settings: {
-		flowtype: {
-			onlyFilesWithFlowAnnotation: true,
-		},
 		react: {
 			pragma: "React",
 			version: "16.8.3",

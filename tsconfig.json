@@ -9,6 +9,7 @@
 		"noEmit": true,
 		"resolveJsonModule": true,
 		"target": "esnext",
+		"typeRoots": ["node_modules/@types"],
 
 		/* Project Imports */
 		"baseUrl": ".",
