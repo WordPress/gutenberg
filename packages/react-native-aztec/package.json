@@ -1,7 +1,6 @@
 {
   "name": "@wordpress/react-native-aztec",
   "version": "0.1.11",
-  "private": true,
   "description": "Aztec view for react-native.",
   "private": true,
   "author": "The WordPress Contributors",
@@ -23,8 +22,8 @@
     "prop-types": "15.6.0"
   },
   "peerDependencies": {
-    "react": "16.6.1",
-    "react-native": "0.57.5"
+    "react": "*",
+    "react-native": "*"
   },
   "publishConfig": {
     "access": "public"

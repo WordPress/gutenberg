@@ -2,10 +2,9 @@
 {
   "name": "@wordpress/react-native-bridge",
   "version": "1.0.0",
-  "private": true,
   "description": "",
-  "main": "index.js",
   "private": true,
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,6 +14,6 @@
   "author": "",
   "license": "GPL-2.0-or-later",
   "peerDependencies": {
-    "react-native": "0.59.0"
+    "react-native": "*"
   }
 }

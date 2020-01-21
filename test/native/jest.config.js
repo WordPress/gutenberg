@@ -36,6 +36,7 @@ module.exports = {
 		'/node_modules/',
 		'/wordpress/',
 		'/__device-tests__/',
+		'/react-native-editor/',
 	],
 	testURL: 'http://localhost/',
 	// Add the `Libraries/Utilities` subfolder to the module directories, otherwise haste/jest doesn't find Platform.js on Travis,
@@ -46,6 +47,9 @@ module.exports = {
 		'\\.(scss)$': '<rootDir>/' + configPath + '/__mocks__/styleMock.js',
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]: '<rootDir>/packages/$1/src',
 	},
+	modulePathIgnorePatterns: [
+		'<rootDir>/packages/react-native',
+	],
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [
