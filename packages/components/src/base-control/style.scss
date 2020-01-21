@@ -1,6 +1,8 @@
 .components-base-control {
+	border: none;
 	font-family: $default-font;
 	font-size: $default-font-size;
+	padding: 0;
 
 	.components-base-control__field {
 		margin-bottom: $grid-size;

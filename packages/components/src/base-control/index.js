@@ -8,36 +8,47 @@ import classnames from 'classnames';
  */
 import VisuallyHidden from '../visually-hidden';
 
-function BaseControl( { id, label, hideLabelFromVision, help, className, children } ) {
+function BaseControl( { as = 'div', id, label, hideLabelFromVision, help, className, children } ) {
+	const isFieldSet = as === 'fieldset';
+
+	/**
+	 * BaseControl can only render as either a fieldset or a div
+	 */
+	const WrapperComponent = as;
+	const LabelComponent = isFieldSet ? 'legend' : 'label';
+	const VisualLabelComponent = isFieldSet ? 'legend' : 'span';
+
 	return (
-		<div className={ classnames( 'components-base-control', className ) }>
+		<WrapperComponent className={ classnames( 'components-base-control', className ) }>
 			<div className="components-base-control__field">
 				{ label && id && ( hideLabelFromVision ?
 					<VisuallyHidden
 						as="label"
 						htmlFor={ id }>{ label }</VisuallyHidden> :
-					<label
+					<LabelComponent
 						className="components-base-control__label"
-						htmlFor={ id }>{ label }</label>
+						htmlFor={ id }>{ label }</LabelComponent>
 				) }
 				{ label && ! id && ( hideLabelFromVision ?
 					<VisuallyHidden
 						as="label">{ label }</VisuallyHidden> :
-					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
+					<BaseControl.VisualLabel as={ VisualLabelComponent }>{ label }</BaseControl.VisualLabel>
 				) }
 				{ children }
 			</div>
 			{ !! help && <p id={ id + '__help' } className="components-base-control__help">{ help }</p> }
-		</div>
+		</WrapperComponent>
 	);
 }
 
-BaseControl.VisualLabel = ( { className, children } ) => {
-	className = classnames( 'components-base-control__label', className );
+BaseControl.VisualLabel = ( { as = 'span', className, children } ) => {
+	const Component = as;
+	const classes = classnames( 'components-base-control__label', className );
+
 	return (
-		<span className={ className }>
+		<Component className={ classes }>
 			{ children }
-		</span>
+		</Component>
 	);
 };
 

@@ -20,7 +20,7 @@ export default function RadioControl( { label, className, selected, help, onChan
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return ! isEmpty( options ) && (
-		<BaseControl label={ label } id={ id } help={ help } className={ classnames( className, 'components-radio-control' ) }>
+		<BaseControl as="fieldset" label={ label } id={ id } help={ help } className={ classnames( className, 'components-radio-control' ) }>
 			{ options.map( ( option, index ) =>
 				<div
 					key={ `${ id }-${ index }` }

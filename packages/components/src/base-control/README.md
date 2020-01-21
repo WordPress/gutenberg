@@ -48,6 +48,14 @@ If true, the label will only be visible to screen readers.
 - Type: `Boolean`
 - Required: No
 
+### as
+
+Can render the component as another DOM element tagName. Rendering `BaseControl` as a `fieldset` will change the inner `label` elements to `legend`. By default, `BaseControl` renders as a `div`.
+
+- Type: `String`
+- Required: No
+
+
 ### help
 
 If this property is added, a help text will be generated using help property as the content.
