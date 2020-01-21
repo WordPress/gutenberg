@@ -20,7 +20,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
-import { SelectedBlockNode } from './root-container';
+import { BlockNodes } from './root-container';
 
 function selector( select ) {
 	const {
@@ -30,6 +30,7 @@ function selector( select ) {
 		isTyping,
 		isCaretWithinFormattedText,
 		getSettings,
+		getLastMultiSelectedBlockClientId,
 	} = select( 'core/block-editor' );
 	return {
 		isNavigationMode: isNavigationMode(),
@@ -38,6 +39,7 @@ function selector( select ) {
 		isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
+		lastClientId: getLastMultiSelectedBlockClientId(),
 	};
 }
 
@@ -58,11 +60,12 @@ function BlockPopover( {
 		isCaretWithinFormattedText,
 		hasMultiSelection,
 		hasFixedToolbar,
+		lastClientId,
 	} = useSelect( selector, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
-	let [ node ] = useContext( SelectedBlockNode );
+	const [ blockNodes ] = useContext( BlockNodes );
 
 	const showEmptyBlockSideInserter = ! isNavigationMode && isEmptyDefaultBlock && isValid;
 	const shouldShowBreadcrumb = isNavigationMode;
@@ -94,6 +97,8 @@ function BlockPopover( {
 		return null;
 	}
 
+	let node = blockNodes[ clientId ];
+
 	if ( capturingClientId ) {
 		node = document.getElementById( 'block-' + capturingClientId );
 	}
@@ -105,6 +110,15 @@ function BlockPopover( {
 	// A block may specify a different target element for the toolbar.
 	if ( node.classList.contains( 'is-block-collapsed' ) ) {
 		node = node.querySelector( '.is-block-content' ) || node;
+	}
+
+	let anchorRef = node;
+
+	if ( hasMultiSelection ) {
+		anchorRef = {
+			top: blockNodes[ clientId ],
+			bottom: blockNodes[ lastClientId ],
+		};
 	}
 
 	function onFocus() {
@@ -120,7 +134,6 @@ function BlockPopover( {
 	// position in the right corner.
 	// To do: refactor `Popover` to make this prop clearer.
 	const popoverPosition = showEmptyBlockSideInserter ? 'top left right' : 'top right left';
-	const popoverIsSticky = hasMultiSelection ? '.wp-block.is-multi-selected' : true;
 
 	return (
 		<Popover
@@ -128,9 +141,9 @@ function BlockPopover( {
 			animate={ false }
 			position={ popoverPosition }
 			focusOnMount={ false }
-			anchorRef={ node }
+			anchorRef={ anchorRef }
 			className="block-editor-block-list__block-popover"
-			__unstableSticky={ showEmptyBlockSideInserter ? false : popoverIsSticky }
+			__unstableSticky={ ! showEmptyBlockSideInserter }
 			__unstableSlotName="block-toolbar"
 			// Allow subpixel positioning for the block movement animation.
 			__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && node }

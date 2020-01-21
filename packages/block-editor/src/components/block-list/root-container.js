@@ -15,7 +15,7 @@ import BlockPopover from './block-popover';
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
 export const Context = createContext();
-export const SelectedBlockNode = createContext();
+export const BlockNodes = createContext();
 
 function selector( select ) {
 	const {
@@ -81,7 +81,7 @@ function RootContainer( { children, className }, ref ) {
 			selectedBlockClientId={ selectedBlockClientId }
 			containerRef={ ref }
 		>
-			<SelectedBlockNode.Provider value={ useState( null ) }>
+			<BlockNodes.Provider value={ useState( {} ) }>
 				<BlockPopover />
 				<div
 					ref={ ref }
@@ -93,7 +93,7 @@ function RootContainer( { children, className }, ref ) {
 						{ children }
 					</Context.Provider>
 				</div>
-			</SelectedBlockNode.Provider>
+			</BlockNodes.Provider>
 		</InsertionPoint>
 	);
 }

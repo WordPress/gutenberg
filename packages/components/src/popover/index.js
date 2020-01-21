@@ -62,7 +62,25 @@ function computeAnchorRect(
 			return getRectangleFromRange( anchorRef );
 		}
 
-		const rect = anchorRef.getBoundingClientRect();
+		if ( anchorRef instanceof window.Element ) {
+			const rect = anchorRef.getBoundingClientRect();
+
+			if ( shouldAnchorIncludePadding ) {
+				return rect;
+			}
+
+			return withoutPadding( rect, anchorRef );
+		}
+
+		const { top, bottom } = anchorRef;
+		const topRect = top.getBoundingClientRect();
+		const bottomRect = bottom.getBoundingClientRect();
+		const rect = new window.DOMRect(
+			topRect.left,
+			topRect.top,
+			topRect.width,
+			bottomRect.bottom - topRect.top
+		);
 
 		if ( shouldAnchorIncludePadding ) {
 			return rect;
@@ -301,7 +319,7 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef, relativeOffsetTop );
+			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, containerRef.current, relativeOffsetTop );
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
 				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
