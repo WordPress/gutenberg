@@ -204,7 +204,7 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_l
 		// End appending HTML attributes to anchor tag.
 
 		// Start anchor tag content.
-		$html .= '><span>';
+		$html .= '><span>'; // Wrap title with span to isolate it from submenu icon.
 		if ( isset( $block['attrs']['label'] ) ) {
 			$html .= wp_kses(
 				$block['attrs']['label'],
