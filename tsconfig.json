@@ -9,7 +9,7 @@
 		"noEmit": true,
 		"resolveJsonModule": true,
 		"target": "esnext",
-		"typeRoots": ["node_modules/@types"],
+		"types": ["react", "node", "jest", "requestidlecallback"],
 
 		/* Project Imports */
 		"baseUrl": ".",
