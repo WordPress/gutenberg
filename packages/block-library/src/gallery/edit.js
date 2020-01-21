@@ -339,7 +339,11 @@ class GalleryEdit extends Component {
 			return mediaPlaceholder;
 		}
 
-		const imageSizeOptions = this.getImagesSizeOptions();
+		// disable image size options on mobile for now
+		const imageSizeOptions = Platform.select( {
+			web: this.getImagesSizeOptions(),
+			native: [],
+		} );
 
 		return (
 			<>
