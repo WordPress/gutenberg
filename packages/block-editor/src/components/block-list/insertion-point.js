@@ -122,7 +122,7 @@ export default function InsertionPoint( {
 			anchorRef={ inserterElement }
 			position="top right left"
 			focusOnMount={ false }
-			className="block-editor-block-list__block-popover"
+			className="block-editor-block-list__insertion-point-popover"
 			__unstableSlotName="block-toolbar"
 		>
 			<div className="block-editor-block-list__insertion-point" style={ { width: inserterElement.offsetWidth } }>
