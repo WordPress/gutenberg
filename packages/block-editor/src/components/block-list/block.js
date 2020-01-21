@@ -103,10 +103,8 @@ function BlockListBlock( {
 	const onBlockError = () => setErrorState( true );
 
 	const blockType = getBlockType( name );
-	const blockLabel = isFirstMultiSelected ?
-		__( 'Multiple selected blocks' ) :
-		// translators: %s: Type of block (i.e. Text, Image etc)
-		sprintf( __( 'Block: %s' ), blockType.title );
+	// translators: %s: Type of block (i.e. Text, Image etc)
+	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 
 	// Handing the focus of the block on creation and update
 
@@ -148,18 +146,13 @@ function BlockListBlock( {
 	const isMounting = useRef( true );
 
 	useEffect( () => {
-		if ( ! isMultiSelecting && ! isNavigationMode ) {
-			if ( isSelected ) {
-				focusTabbable( ! isMounting.current );
-			} else if ( isFirstMultiSelected ) {
-				wrapper.current.focus();
-			}
+		if ( ! isMultiSelecting && ! isNavigationMode && isSelected ) {
+			focusTabbable( ! isMounting.current );
 		}
 
 		isMounting.current = false;
 	}, [
 		isSelected,
-		isFirstMultiSelected,
 		isMultiSelecting,
 		isNavigationMode,
 	] );

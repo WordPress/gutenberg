@@ -6,7 +6,7 @@ import { overEvery, find, findLast, reverse, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -19,6 +19,7 @@ import {
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT, TAB, isKeyboardEvent, ESCAPE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -164,6 +165,7 @@ function selector( select ) {
 		isNavigationMode,
 		isSelectionEnabled,
 		getBlockSelectionStart,
+		isMultiSelecting,
 	} = select( 'core/block-editor' );
 
 	const selectedBlockClientId = getSelectedBlockClientId();
@@ -182,6 +184,7 @@ function selector( select ) {
 		isNavigationMode: isNavigationMode(),
 		isSelectionEnabled: isSelectionEnabled(),
 		blockSelectionStart: getBlockSelectionStart(),
+		isMultiSelecting: isMultiSelecting(),
 	};
 }
 
@@ -217,6 +220,7 @@ export default function WritingFlow( { children } ) {
 		isNavigationMode,
 		isSelectionEnabled,
 		blockSelectionStart,
+		isMultiSelecting,
 	} = useSelect( selector, [] );
 	const {
 		multiSelect,
@@ -348,18 +352,16 @@ export default function WritingFlow( { children } ) {
 			return;
 		}
 
-		const clientId = selectedBlockClientId || selectedFirstClientId;
-
 		// In Edit mode, Tab should focus the first tabbable element after the
 		// content, which is normally the sidebar (with block controls) and
 		// Shift+Tab should focus the first tabbable element before the content,
 		// which is normally the block toolbar.
 		// Arrow keys can be used, and Tab and arrow keys can be used in
 		// Navigation mode (press Esc), to navigate through blocks.
-		if ( clientId ) {
-			const wrapper = getBlockDOMNode( clientId );
-
+		if ( selectedBlockClientId ) {
 			if ( isTab ) {
+				const wrapper = getBlockDOMNode( selectedBlockClientId );
+
 				if ( isShift ) {
 					if ( target === wrapper ) {
 						// Disable focus capturing on the focus capture element, so
@@ -383,6 +385,17 @@ export default function WritingFlow( { children } ) {
 			} else if ( isEscape ) {
 				setNavigationMode( true );
 			}
+		} else if ( hasMultiSelection && isTab && target === container.current ) {
+			// See comment above.
+			noCapture.current = true;
+
+			if ( isShift ) {
+				focusCaptureBeforeRef.current.focus();
+			} else {
+				focusCaptureAfterRef.current.focus();
+			}
+
+			return;
 		}
 
 		// When presing any key other than up or down, the initial vertical
@@ -486,7 +499,11 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	const selectedClientId = selectedBlockClientId || selectedFirstClientId;
+	useEffect( () => {
+		if ( hasMultiSelection && ! isMultiSelecting ) {
+			container.current.focus();
+		}
+	}, [ hasMultiSelection, isMultiSelecting ] );
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.
@@ -495,22 +512,26 @@ export default function WritingFlow( { children } ) {
 		<div className="block-editor-writing-flow">
 			<FocusCapture
 				ref={ focusCaptureBeforeRef }
-				selectedClientId={ selectedClientId }
+				selectedClientId={ selectedBlockClientId }
 				containerRef={ container }
 				noCapture={ noCapture }
+				hasMultiSelection={ hasMultiSelection }
 			/>
 			<div
 				ref={ container }
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
+				tabIndex={ hasMultiSelection ? '0' : undefined }
+				aria-label={ hasMultiSelection ? __( 'Multiple selected blocks' ) : undefined }
 			>
 				{ children }
 			</div>
 			<FocusCapture
 				ref={ focusCaptureAfterRef }
-				selectedClientId={ selectedClientId }
+				selectedClientId={ selectedBlockClientId }
 				containerRef={ container }
 				noCapture={ noCapture }
+				hasMultiSelection={ hasMultiSelection }
 				isReverse
 			/>
 			<div
