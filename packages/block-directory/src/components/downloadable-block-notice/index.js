@@ -15,10 +15,10 @@ const DownloadableBlockNotice = ( { block, errorNotices, onClick } ) => {
 	}
 
 	// A Failed install is the default error as its the first step
-	let copy = __( 'Block previews can\'t install.' );
+	let copy = __( 'Block could not be added.' );
 
 	if ( errorNotices[ block.id ] === DOWNLOAD_ERROR_NOTICE_ID ) {
-		copy = __( 'Block previews can\'t load.' );
+		copy = __( 'Block could not be added. There is a problem with the block.' );
 	}
 
 	return (
