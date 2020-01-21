@@ -106,3 +106,19 @@ export const useRegisterBlockCssProperties = ( bx ) => {
 	setBlockProps( bx );
 	didRegisterRef.current = true;
 };
+
+export const useSetBlockCssProperties = ( ) => {
+	const setBlockProps = useSetBlockProps();
+	const bxRef = useRef();
+
+	const setBlockCssProperties = useCallback( ( bx ) => {
+		if ( ! equals( bxRef.current, bx ) ) {
+			bxRef.current = bx;
+			if ( bxRef.current ) {
+				setBlockProps( bx );
+			}
+		}
+	}, [] );
+
+	return setBlockCssProperties;
+};

@@ -43,7 +43,7 @@
 				"rtl"
 			]
 		},
-		"styledClassName": {
+		"globalColor": {
 			"type": "string"
 		}
 	}

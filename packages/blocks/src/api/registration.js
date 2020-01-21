@@ -168,6 +168,14 @@ export function registerBlockType( name, settings ) {
 	const preFilterSettings = { ...settings };
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
+	/** GLOBAL STYLES ENHANCEMENT START */
+	if ( ! settings.attributes.styledClassName ) {
+		settings.attributes.styledClassName = {
+			type: 'string',
+		};
+	}
+	/** GLOBAL STYLES ENHANCEMENT END */
+
 	if ( settings.deprecated ) {
 		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
 			pick( // Only keep valid deprecation keys.

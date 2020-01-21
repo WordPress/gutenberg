@@ -10,6 +10,7 @@ import {
 	getColorClassName,
 	getFontSizeClass,
 	RichText,
+	globalStylesManager,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -26,6 +27,8 @@ export default function save( { attributes } ) {
 		direction,
 		styledClassName,
 	} = attributes;
+
+	console.log( globalStylesManager.css( `background: purple;` ) );
 
 	const textClass = getColorClassName( 'color', textColor );
 	const backgroundClass = getColorClassName(

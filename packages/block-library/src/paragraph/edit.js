@@ -17,6 +17,7 @@ import {
 	withFontSizes,
 	useStyledClassName,
 	useRegisterBlockCssProperties,
+	useSetBlockCssProperties,
 	__experimentalUseColors,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
@@ -81,6 +82,7 @@ function ParagraphBlock( {
 	setFontSize,
 } ) {
 	const { align, content, dropCap, placeholder, direction } = attributes;
+	const setBlockCssProperties = useSetBlockCssProperties();
 
 	const ref = useRef();
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
@@ -117,7 +119,7 @@ function ParagraphBlock( {
 	 */
 	useRegisterBlockCssProperties( {
 		paragraph: {
-			color: 'blue',
+			color: attributes.globalColor || 'blue',
 		},
 	} );
 	const styledClassName = useStyledClassName( {
@@ -125,6 +127,12 @@ function ParagraphBlock( {
 			color: 'paragraph.color',
 		},
 	} );
+	const handleOnGlobalColorUpdate = ( event ) => {
+		const nextGlobalColor = event.target.value;
+		setBlockCssProperties( { paragraph: { color: nextGlobalColor } } );
+		setAttributes( { globalColor: nextGlobalColor } );
+	};
+
 	/**
 	 * GLOBAL STYLES IMPLEMENTATION END
 	 */
@@ -159,6 +167,9 @@ function ParagraphBlock( {
 								__( 'Toggle to show a large initial letter.' )
 						}
 					/>
+				</PanelBody>
+				<PanelBody title={ __( 'Global Color' ) }>
+					<input type="color" value={ attributes.globalColor } onChange={ handleOnGlobalColorUpdate } style={ { height: 40 } } />
 				</PanelBody>
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
