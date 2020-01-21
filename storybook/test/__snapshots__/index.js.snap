@@ -4092,6 +4092,85 @@ exports[`Storyshots Components/Panel With Icon 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/Placeholder Default 1`] = `
+<div
+  className="components-placeholder is-small"
+>
+  <iframe
+    aria-hidden={true}
+    aria-label="resize-listener"
+    frameBorder={0}
+    src="about:blank"
+    style={
+      Object {
+        "display": "block",
+        "height": "100%",
+        "left": 0,
+        "opacity": 0,
+        "overflow": "hidden",
+        "pointerEvents": "none",
+        "position": "absolute",
+        "top": 0,
+        "width": "100%",
+        "zIndex": -1,
+      }
+    }
+    tabIndex={-1}
+  />
+  <div
+    className="components-placeholder__label"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-smiley"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M7 5.2c1.1 0 2 .89 2 2 0 .37-.11.71-.28 1C8.72 8.2 8 8 7 8s-1.72.2-1.72.2c-.17-.29-.28-.63-.28-1 0-1.11.9-2 2-2zm6 0c1.11 0 2 .89 2 2 0 .37-.11.71-.28 1 0 0-.72-.2-1.72-.2s-1.72.2-1.72.2c-.17-.29-.28-.63-.28-1 0-1.11.89-2 2-2zm-3 13.7c3.72 0 7.03-2.36 8.23-5.88l-1.32-.46C15.9 15.52 13.12 17.5 10 17.5s-5.9-1.98-6.91-4.94l-1.32.46c1.2 3.52 4.51 5.88 8.23 5.88z"
+      />
+    </svg>
+    My Placeholder Label
+  </div>
+  <div
+    className="components-placeholder__instructions"
+  >
+    Here are instructions you should follow
+  </div>
+  <div
+    className="components-placeholder__fieldset"
+  >
+    <div>
+      <div
+        className="components-base-control"
+      >
+        <div
+          className="components-base-control__field"
+        >
+          <label
+            className="components-base-control__label"
+            htmlFor="inspector-text-control-2"
+          >
+            Sample Field
+          </label>
+          <input
+            className="components-text-control__input"
+            id="inspector-text-control-2"
+            onChange={[Function]}
+            placeholder="Enter something here"
+            type="text"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components/Popover Default 1`] = `
 <span>
   <div
