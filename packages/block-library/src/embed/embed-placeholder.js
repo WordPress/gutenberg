@@ -36,7 +36,9 @@ const EmbedPlaceholder = ( props ) => {
 			</div>
 			{ cannotEmbed &&
 				<div className="components-placeholder__error">
-					{ __( 'Sorry, this content could not be embedded.' ) }<br />
+					<div className="components-placeholder__instructions">
+						{ __( 'Sorry, this content could not be embedded.' ) }
+					</div>
 					<Button isSecondary onClick={ tryAgain }>{ _x( 'Try again', 'button label' ) }</Button> <Button isSecondary onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button>
 				</div>
 			}
