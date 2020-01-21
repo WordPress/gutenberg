@@ -157,6 +157,7 @@ function NavigationLinkEdit( {
 				<div className="wp-block-navigation-link__content">
 					<RichText
 						tagName="span"
+						className="wp-block-navigation-link__label"
 						value={ label }
 						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
 						placeholder={ itemLabelPlaceholder }
