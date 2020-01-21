@@ -28,7 +28,7 @@ _Example:_
 		"build": "wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses",
-		"format-js": "wp-scripts format-js",
+		"format:js": "wp-scripts format-js",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"lint:md": "wp-scripts lint-md",
