@@ -17,16 +17,6 @@
 	padding: $grid-size 0 $grid-size $grid-size;
 }
 
-.editor-post-preview__legend {
-	padding: $grid-size $grid-size-large - 1;
-	color: $dark-gray-200;
-}
-
-.editor-post-preview__button-resize {
-	display: flex;
-	justify-content: space-between;
-}
-
 .editor-post-preview__dropdown-content {
 	.components-popover__content {
 		overflow-y: visible;
