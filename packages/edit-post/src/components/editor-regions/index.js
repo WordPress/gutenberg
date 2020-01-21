@@ -10,22 +10,29 @@ import { navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSimulatedMediaQuery } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 function EditorRegions( { footer, header, sidebar, content, publish, className } ) {
-	const resizableStylesheets = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings().resizableStylesheets;
+	const resizableStyleSheets = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getSettings().resizableStyleSheets;
 	}, [] );
 
 	const deviceType = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).deviceType();
-	} );
+		return select( 'core/block-editor' ).getDeviceType();
+	}, [] );
 
 	const [ actualWidth, updateActualWidth ] = useState( window.innerWidth );
 
-	window.addEventListener( 'resize', () => updateActualWidth( window.innerWidth ) );
+	useEffect( () => {
+		const resizeListener = () => updateActualWidth( window.innerWidth );
+		window.addEventListener( 'resize', resizeListener );
 
-	const canvasWidth = ( device ) => {
+		return () => {
+			window.removeEventListener( 'resize', resizeListener );
+		};
+	} );
+
+	const getCanvasWidth = ( device ) => {
 		let deviceWidth = 0;
 
 		switch ( device ) {
@@ -44,24 +51,22 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 
 	const marginValue = () => window.innerHeight < 800 ? 36 : 72;
 
-	const maxHeightValue = ( device ) => device === 'Mobile' ? 768 : 1024;
-
 	const contentInlineStyles = ( device ) => {
 		switch ( device ) {
 			case 'Tablet':
 			case 'Mobile':
 				return {
-					width: canvasWidth( device ),
+					width: getCanvasWidth( device ),
 					margin: marginValue() + 'px auto',
 					flexGrow: 0,
-					maxHeight: maxHeightValue( device ) + 'px',
+					maxHeight: device === 'Mobile' ? '768px' : '1024px',
 				};
 			default:
 				return null;
 		}
 	};
 
-	useSimulatedMediaQuery( resizableStylesheets, canvasWidth( deviceType ) );
+	useSimulatedMediaQuery( resizableStyleSheets, getCanvasWidth( deviceType ) );
 
 	return (
 		<div className={ classnames( className, 'edit-post-editor-regions' ) }>

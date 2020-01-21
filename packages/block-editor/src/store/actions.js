@@ -806,9 +806,9 @@ export function updateSettings( settings ) {
  *
  * @return {Object} Action object.
  */
-export function toggleCanvasWidth( deviceType ) {
+export function setPreviewDeviceType( deviceType ) {
 	return {
-		type: 'TOGGLE_CANVAS_WIDTH',
+		type: 'SET_PREVIEW_DEVICE_TYPE',
 		deviceType,
 	};
 }

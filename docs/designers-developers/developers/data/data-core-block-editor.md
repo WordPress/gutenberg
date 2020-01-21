@@ -20,18 +20,6 @@ _Returns_
 
 -   `boolean`: Whether the given block type is allowed to be inserted.
 
-<a name="deviceType" href="#deviceType">#</a> **deviceType**
-
-Returns the current editing canvas device type.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `string`: Device type.
-
 <a name="didAutomaticChange" href="#didAutomaticChange">#</a> **didAutomaticChange**
 
 Returns true if the last change was an automatic change, false otherwise.
@@ -315,6 +303,18 @@ _Parameters_
 _Returns_
 
 -   `Array`: ids of top-level and descendant blocks.
+
+<a name="getDeviceType" href="#getDeviceType">#</a> **getDeviceType**
+
+Returns the current editing canvas device type.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Device type.
 
 <a name="getFirstMultiSelectedBlockClientId" href="#getFirstMultiSelectedBlockClientId">#</a> **getFirstMultiSelectedBlockClientId**
 
@@ -1209,6 +1209,18 @@ _Parameters_
 
 -   _isNavigationMode_ `string`: Enable/Disable navigation mode.
 
+<a name="setPreviewDeviceType" href="#setPreviewDeviceType">#</a> **setPreviewDeviceType**
+
+Returns an action object used to toggle the width of the editing canvas
+
+_Parameters_
+
+-   _deviceType_ `string`: 
+
+_Returns_
+
+-   `Object`: Action object.
+
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
 Returns an action object resetting the template validity.
@@ -1299,18 +1311,6 @@ visual and HTML modes.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
-
-_Returns_
-
--   `Object`: Action object.
-
-<a name="toggleCanvasWidth" href="#toggleCanvasWidth">#</a> **toggleCanvasWidth**
-
-Returns an action object used to toggle the width of the editing canvas
-
-_Parameters_
-
--   _deviceType_ `string`: 
 
 _Returns_
 

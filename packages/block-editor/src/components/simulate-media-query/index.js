@@ -65,6 +65,12 @@ function replaceMediaQueryWithWidthEvaluation( ruleText, widthValue ) {
 	} );
 }
 
+/**
+ * Function that manipulates media queries from stylesheets to simulate a given viewport width.
+ *
+ * @param {Array} partialPaths Paths of stylesheets to manipulate.
+ * @param {number} width Viewport width to simulate.
+ */
 export default function useSimulatedMediaQuery( partialPaths, width ) {
 	useEffect(
 		() => {
@@ -104,6 +110,5 @@ export default function useSimulatedMediaQuery( partialPaths, width ) {
 		},
 		[ partialPaths, width ]
 	);
-	return null;
 }
 

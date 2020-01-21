@@ -1600,6 +1600,6 @@ export function didAutomaticChange( state ) {
  *
  * @return {string} Device type.
  */
-export function deviceType( state ) {
+export function getDeviceType( state ) {
 	return state.deviceType;
 }

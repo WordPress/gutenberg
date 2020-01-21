@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component, renderToString } from '@wordpress/element';
-import { Button, Dropdown, Icon, MenuGroup, MenuItem, Path, Polygon, SVG } from '@wordpress/components';
+import { Button, Dropdown, Icon, MenuGroup, MenuItemsChoice, Path, Polygon, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
@@ -105,13 +105,6 @@ const downArrow = (
 	</SVG>
 );
 
-const checkIcon = (
-	<SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-		<Path fill="none" d="M0 0h24v24H0z" />
-		<Path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
-	</SVG>
-);
-
 export class PostPreviewButton extends Component {
 	constructor() {
 		super( ...arguments );
@@ -187,8 +180,19 @@ export class PostPreviewButton extends Component {
 		writeInterstitialMessage( this.previewWindow.document );
 	}
 
+	translateDropdownButtonText() {
+		switch ( this.props.deviceType ) {
+			case 'Tablet':
+				return __( 'Tablet' );
+			case 'Mobile':
+				return __( 'Mobile' );
+			default:
+				return __( 'Desktop' );
+		}
+	}
+
 	render() {
-		const { previewLink, currentPostLink, isSaveable, toggleCanvas } = this.props;
+		const { previewLink, currentPostLink, isSaveable, setDeviceType } = this.props;
 
 		// Link to the `?preview=true` URL if we have it, since this lets us see
 		// changes that were autosaved since the post was last published. Otherwise,
@@ -205,37 +209,33 @@ export class PostPreviewButton extends Component {
 							className="editor-post-preview__button-toggle"
 							aria-expanded={ isOpen }
 						>
-							{ this.props.deviceType }
+							{ this.translateDropdownButtonText() }
 							<div className="editor-post-preview__button-separator">{ downArrow }</div>
 						</Button>
 					) }
 					renderContent={ () => (
 						<>
-							<MenuGroup>
-								<fieldset>
-									<legend className="editor-post-preview__legend">View</legend>
-									<MenuItem
-										className="editor-post-preview__button-resize"
-										onClick={ () => toggleCanvas( 'Desktop' ) }
-									>
-										{ __( 'Desktop' ) }
-										{ this.props.deviceType === 'Desktop' && checkIcon }
-									</MenuItem>
-									<MenuItem
-										className="editor-post-preview__button-resize"
-										onClick={ () => toggleCanvas( 'Tablet' ) }
-									>
-										{ __( 'Tablet' ) }
-										{ this.props.deviceType === 'Tablet' && checkIcon }
-									</MenuItem>
-									<MenuItem
-										className="editor-post-preview__button-resize"
-										onClick={ () => toggleCanvas( 'Mobile' ) }
-									>
-										{ __( 'Mobile' ) }
-										{ this.props.deviceType === 'Mobile' && checkIcon }
-									</MenuItem>
-								</fieldset>
+							<MenuGroup
+								label={ _x( 'View', 'noun' ) }
+							>
+								<MenuItemsChoice
+									choices={ [
+										{
+											value: 'Desktop',
+											label: __( 'Desktop' ),
+										},
+										{
+											value: 'Tablet',
+											label: __( 'Tablet' ),
+										},
+										{
+											value: 'Mobile',
+											label: __( 'Mobile' ),
+										},
+									] }
+									value={ this.props.deviceType }
+									onSelect={ ( value ) => setDeviceType( value ) }
+								/>
 							</MenuGroup>
 							<MenuGroup>
 								<Button
@@ -293,7 +293,7 @@ export default compose( [
 			getPostType,
 		} = select( 'core' );
 		const {
-			deviceType,
+			getDeviceType,
 		} = select( 'core/block-editor' );
 
 		const previewLink = getEditedPostPreviewLink();
@@ -308,17 +308,15 @@ export default compose( [
 			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
 			isDraft: [ 'draft', 'auto-draft' ].indexOf( getEditedPostAttribute( 'status' ) ) !== -1,
-			deviceType: deviceType(),
+			deviceType: getDeviceType(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { toggleCanvasWidth } = dispatch( 'core/block-editor' );
+		// const { setPreviewDeviceType } = dispatch( 'core/block-editor' );
 		return {
 			autosave: dispatch( 'core/editor' ).autosave,
 			savePost: dispatch( 'core/editor' ).savePost,
-			toggleCanvas( deviceType ) {
-				dispatch( toggleCanvasWidth( deviceType ) );
-			},
+			setDeviceType: dispatch( 'core/block-editor' ).setPreviewDeviceType,
 		};
 	}
 	),
