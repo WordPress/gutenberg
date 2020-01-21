@@ -169,7 +169,7 @@ In the `wp-env` config block, each entry can be configured like so:
 - `test-php`: Runs your plugin's PHPUnit tests. You will need to have an appropriately configured `phpunit.xml.dist` file.
 - `docker-run`: For more advanced debugging, contributors may sometimes need to run commands in the Docker containers. This is the equivalent of running `docker-compose run` within the WordPress directory.
 
-### `format:js`
+### `format-js`
 
 Formats JavaScript files to the expected coding guidelines.
 
