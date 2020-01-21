@@ -14,7 +14,7 @@ export { default as withViewportMatch } from './with-viewport-match';
  *
  * @type {Object}
  */
-const BREAKPOINTS = {
+export const BREAKPOINTS = {
 	huge: 1440,
 	wide: 1280,
 	large: 960,
