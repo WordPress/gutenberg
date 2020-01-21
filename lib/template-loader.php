@@ -115,9 +115,9 @@ function create_auto_draft_for_template_part_block( $block ) {
 		}
 
 		if ( isset( $_wp_current_template_part_ids ) ) {
-			$_wp_current_template_part_ids[ $template_part_id ] = true;
+			$_wp_current_template_part_ids[ $block['attrs']['slug'] ] = $template_part_id;
 		} else {
-			$_wp_current_template_part_ids = array( $template_part_id => true );
+			$_wp_current_template_part_ids = array( $block['attrs']['slug'] => $template_part_id );
 		}
 	}
 
@@ -134,7 +134,7 @@ function create_auto_draft_for_template_part_block( $block ) {
  * @return string Path to the canvas file to include.
  */
 function gutenberg_find_template( $template_file ) {
-	global $_wp_current_template_id, $_wp_current_template_content, $_wp_current_template_hierarchy;
+	global $_wp_current_template_id, $_wp_current_template_name, $_wp_current_template_content, $_wp_current_template_hierarchy;
 
 	// Bail if no relevant template hierarchy was determined, or if the template file
 	// was overridden another way.
@@ -227,6 +227,7 @@ function gutenberg_find_template( $template_file ) {
 			}
 		}
 		$_wp_current_template_id      = $current_template_post->ID;
+		$_wp_current_template_name    = $current_template_post->post_name;
 		$_wp_current_template_content = empty( $current_template_post->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template_post->post_content;
 	}
 
