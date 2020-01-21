@@ -102,7 +102,6 @@ class MediaTextEdit extends Component {
 			mediaUrl: src || media.url,
 			mediaLink: media.link || undefined,
 			href: newHref,
-			imageFill: undefined,
 			focalPoint: undefined,
 		} );
 	}
