@@ -7,6 +7,7 @@ import {
 	pressKeyWithModifier,
 	pressKeyTimes,
 	getEditedPostContent,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
 async function getSelectedFlatIndices() {
@@ -405,6 +406,26 @@ describe( 'Multi-block selection', () => {
 
 		// Only "1" should be deleted.
 		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should preserve selection on move', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+
+		await testNativeSelection();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3 ] );
+
+		await clickBlockToolbarButton( 'Move up' );
+
+		await testNativeSelection();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
