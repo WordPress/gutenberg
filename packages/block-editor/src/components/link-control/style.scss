@@ -183,6 +183,23 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 }
 
+.block-editor-link-control__search-create {
+	margin-top: 20px;
+	overflow: auto;
+
+	// Create fake border. We cannot use border because the button has a border
+	// radius applied to it
+	&::before {
+		content: "";
+		position: absolute;
+		top: -10px;
+		left: 0;
+		display: block;
+		width: 100%;
+		border-top: 1px solid #ccc;
+	}
+}
+
 // Specificity overide
 .block-editor-link-control__search-results div[role="menu"] > .block-editor-link-control__search-item.block-editor-link-control__search-item {
 	padding: 10px;
