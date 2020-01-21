@@ -20,7 +20,7 @@ const Button = ( { icon, onPress, title, isPrimary } ) => {
 	return (
 		<TouchableOpacity onPress={ onPress }>
 			{ icon ?
-				<Icon icon={ icon } size={ ICON_SIZE } /> :
+				<Icon icon={ icon } size={ ICON_SIZE } style={ styles.icon } /> :
 				<Text style={ [ styles.title, isPrimary && styles.titlePrimary ] }>{ title }</Text>
 			}
 		</TouchableOpacity>
