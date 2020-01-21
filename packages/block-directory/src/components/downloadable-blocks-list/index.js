@@ -73,9 +73,10 @@ export function DownloadableBlocksList( {
 						onMouseLeave={ () => onHover( null ) }
 						onBlur={ () => onHover( null ) }
 						item={ item }
-						notice={ <DownloadableBlockNotice onClick={ callBack } errorNotices={ errorNotices } block={ item } /> }
 						isLoading={ isLoading }
-					/>
+					>
+						<DownloadableBlockNotice onClick={ callBack } errorNotices={ errorNotices } block={ item } />
+					</DownloadableBlockListItem>
 				);
 			}
 			) }

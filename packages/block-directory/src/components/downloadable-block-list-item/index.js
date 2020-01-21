@@ -9,7 +9,7 @@ function DownloadableBlockListItem( {
 	item,
 	onClick,
 	isLoading,
-	notice,
+	children,
 } ) {
 	const {
 		icon,
@@ -38,7 +38,7 @@ function DownloadableBlockListItem( {
 					/>
 				</header>
 				<section className="block-directory-downloadable-block-list-item__body">
-					{ notice }
+					{ children }
 					<DownloadableBlockInfo
 						activeInstalls={ activeInstalls }
 						description={ description }
