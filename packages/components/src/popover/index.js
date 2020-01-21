@@ -275,9 +275,12 @@ const Popover = ( {
 			}
 
 			const { offsetParent } = containerRef.current;
+			let relativeOffsetTop = 0;
 
 			if ( offsetParent ) {
 				const offsetParentRect = offsetParent.getBoundingClientRect();
+
+				relativeOffsetTop = offsetParentRect.top;
 				anchor = new window.DOMRect(
 					anchor.left - offsetParentRect.left,
 					anchor.top - offsetParentRect.top,
@@ -293,7 +296,7 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef, containerRef.current );
+			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef, relativeOffsetTop );
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
 				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
