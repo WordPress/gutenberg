@@ -1,3 +1,3 @@
-## 1.0.0 (2019-08-15)
+## Master
 
 - Initial release
