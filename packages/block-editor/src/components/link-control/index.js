@@ -257,9 +257,9 @@ function LinkControl( {
 			}
 		);
 
-		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
-		const searchResultsLabelId = isInitialSuggestions
-			? `block-editor-link-control-search-results-label-${ instanceId }`
+		const directLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
+		const isSingleDirectEntryResult = suggestions.length === 1 && directLinkEntryTypes.includes( suggestions[ 0 ].type.toLowerCase() );
+		const searchResultsLabelId = isInitialSuggestions ? `block-editor-link-control-search-results-label-${ instanceId }` : undefined;
 			: undefined;
 		const labelText = isInitialSuggestions
 			? __( 'Recently updated' )
@@ -311,7 +311,7 @@ function LinkControl( {
 						/>
 					) ) }
 
-					{ showCreatePages && createEmptyPage && ! isInitialSuggestions && (
+					{ showCreatePages && createEmptyPage && ! isInitialSuggestions && ! isSingleDirectEntryResult && (
 						<LinkControlSearchCreate
 							searchTerm={ inputValue }
 							onClick={ async () => {
