@@ -47,18 +47,13 @@ figure.wp-block-gallery {
 		@include reduce-motion("transition");
 
 		&:hover {
-			box-shadow: $shadow-toolbar;
+			box-shadow: $shadow-popover;
 		}
 
 		.components-button {
-			color: $dark-opacity-300;
-			padding: 2px;
-			height: $icon-button-size-small;
-
-			// Remove hover box shadows, since they clash with the container.
-			&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
-				box-shadow: none;
-			}
+			color: $dark-gray-primary;
+			min-width: $grid-unit-30;
+			height: $grid-unit-30;
 
 			@include break-small() {
 				// Use smaller buttons to fit when there are many columns.

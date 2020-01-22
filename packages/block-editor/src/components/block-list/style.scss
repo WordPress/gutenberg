@@ -361,20 +361,22 @@
 	}
 }
 
+// Sibling inserter / "inbetweenserter".
 .block-editor-block-list__insertion-point-inserter,
 .block-editor-block-list__block-popover-inserter {
-	// Show a clickable plus.
 	.block-editor-inserter__toggle.components-button {
-		border-radius: 50%;
-		color: $blue-medium-focus;
-		background: $white;
-		height: $block-padding * 2;
-		width: $block-padding * 2;
-		padding: 0;
-		justify-content: center;
+		// Special dimensions for this button.
+		min-width: 32px;
+		height: 32px;
 
-		&:not(:disabled):not([aria-disabled="true"]):hover {
-			box-shadow: none;
+		// Spot color button.
+		background-color: $blue-medium-focus;
+		color: $white;
+		border-radius: $radius-block-ui;
+
+		&:hover {
+			color: $white;
+			background-color: rgba($blue-medium-focus, 0.8);
 		}
 	}
 }
@@ -422,12 +424,13 @@
 
 
 /**
- * Block Toolbar when contextual.
+ * Block Toolbar, top and contextual.
  */
 .block-editor-block-contextual-toolbar-wrapper {
 	padding-left: $block-toolbar-height; // Provide space for the mover control on full-wide items.
 }
 
+.edit-post-header-toolbar__block-toolbar,
 .block-editor-block-contextual-toolbar {
 	// Adapt the height of the toolbar items.
 	.components-toolbar {
@@ -439,7 +442,14 @@
 	.components-button {
 		height: $block-toolbar-height;
 	}
+}
 
+
+/**
+ * Block Toolbar when contextual.
+ */
+
+.block-editor-block-contextual-toolbar {
 	// Block UI appearance.
 	border: $border-width solid $dark-gray-primary;
 	border-radius: $radius-block-ui;
@@ -474,6 +484,7 @@
 			// When button is focused, it receives a box-shadow instead of the border.
 			&:focus {
 				border: none;
+				box-shadow: inset 0 0 0 1px color($theme-color), 0 0 0 1px color($theme-color);
 			}
 		}
 

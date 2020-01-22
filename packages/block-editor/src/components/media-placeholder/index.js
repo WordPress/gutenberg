@@ -344,7 +344,7 @@ export class MediaPlaceholder extends Component {
 							const content = (
 								<>
 									<Button
-										isSecondary
+										isPrimary
 										className={ classnames(
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
@@ -372,7 +372,7 @@ export class MediaPlaceholder extends Component {
 				<>
 					{ this.renderDropZone() }
 					<FormFileUpload
-						isSecondary
+						isPrimary
 						className={ classnames(
 							'block-editor-media-placeholder__button',
 							'block-editor-media-placeholder__upload-button'

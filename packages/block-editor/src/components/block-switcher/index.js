@@ -157,10 +157,8 @@ export class BlockSwitcher extends Component {
 									</PanelBody>
 								) }
 								{ possibleBlockTransformations.length !== 0 && (
-									<PanelBody
-										title={ __( 'Transform To:' ) }
-										initialOpen
-									>
+									<>
+										<div>{ __( 'Transform to:' ) }</div>
 										<BlockTypesList
 											items={ possibleBlockTransformations.map(
 												( destinationBlockType ) => ( {
@@ -177,7 +175,7 @@ export class BlockSwitcher extends Component {
 												onClose();
 											} }
 										/>
-									</PanelBody>
+									</>
 								) }
 							</div>
 						) }

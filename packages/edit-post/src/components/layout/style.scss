@@ -67,27 +67,28 @@
 	padding: 10px 10px 10px 0;
 }
 
-.edit-post-layout__toogle-publish-panel-button,
-.edit-post-layout__toogle-sidebar-panel-button {
+.edit-post-layout__toogle-publish-panel-button.components-button,
+.edit-post-layout__toogle-sidebar-panel-button.components-button {
 	width: auto;
 	height: auto;
 	display: block;
 	font-size: 14px;
 	font-weight: 600;
 	margin: 0 0 0 auto;
-	padding: 15px 23px 14px;
+	padding: $grid-unit-20 $grid-unit-30;
 	line-height: normal;
 	text-decoration: none;
 	outline: none;
-	background: #f1f1f1;
-	color: theme(secondary);
+	background: $white;
+	color: $theme-color;
 
 	&:focus {
 		position: fixed;
 		top: auto;
-		right: 10px;
-		bottom: 10px;
+		right: $grid-unit-60;
+		bottom: $grid-unit-60;
 		left: auto;
+		box-shadow: 0 0 0 2px $blue-medium-focus, $shadow-modal;
 	}
 }
 
@@ -100,8 +101,25 @@
 		display: flex;
 		background: $white;
 		height: $footer-height;
-		padding: 0 $grid-unit-10;
 		align-items: center;
 		font-size: $default-font-size;
+		padding: 0 ($grid-unit-15 + 6px);
+	}
+
+	.table-of-contents {
+		margin: auto 0 0 auto;
+	}
+
+	.table-of-contents .components-button {
+		height: $icon-button-size-small;
+		padding: 0;
+
+		&:focus {
+			box-shadow: inset 0 0 0 2px color($theme-color);
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 1px solid transparent;
+
+		}
 	}
 }

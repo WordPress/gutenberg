@@ -44,6 +44,16 @@
 	> :last-child .components-toolbar {
 		border-right: none;
 	}
+
+	// Add a border and adjust the color for Top Toolbar mode.
+	.has-fixed-toolbar & {
+		.block-editor-block-mover .components-toolbar {
+			border-left: $border-width solid $light-gray-500;
+		}
+		.components-toolbar {
+			border-color: $light-gray-500;
+		}
+	}
 }
 
 .block-editor-block-toolbar,
@@ -171,16 +181,6 @@
 		&::before {
 			left: $grid-unit-10;
 			right: $grid-unit-10;
-		}
-	}
-
-	// Add a left border and adjust the color for Top Toolbar mode.
-	.has-fixed-toolbar & {
-		box-shadow: none;
-		border-left: $border-width solid $light-gray-500;
-
-		.components-toolbar {
-			border-color: $light-gray-500;
 		}
 	}
 }

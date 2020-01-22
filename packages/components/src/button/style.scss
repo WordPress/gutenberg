@@ -12,45 +12,41 @@
 	height: $icon-button-size;
 	align-items: center;
 	box-sizing: border-box;
-	padding: 6px; // Centers 24px icons.
+	padding: 6px 12px;
 	overflow: hidden;
-	border-radius: 2px;
+	border-radius: $radius-block-ui;
 	color: $black;
 
-	// Legacy 20px icons get 2px margin to have a 24px dimensions, making them centered.
-	> .dashicon,
-	> svg[width="20"] {
-		margin: 0 2px;
-	}
-
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-primary):not(.is-tertiary):not(.is-link):hover {
+	&[aria-expanded="true"],
+	&:hover {
 		color: $theme-color;
 	}
 
-	&:focus:enabled {
+	// Unset some hovers, instead of adding :not specificity.
+	&[aria-disabled="true"]:hover {
+		color: initial;
+	}
+
+	// Focus.
+	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
+	&:focus:not(:disabled) {
 		box-shadow: 0 0 0 2px color($theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 1px solid transparent;
 	}
 
-	// Default button style
+	// Secondary/default button style.
 	&.is-secondary {
-		border-width: $border-width;
-		border-style: solid;
 		white-space: nowrap;
-		color: color($theme-color shade(6%));
-		border-color: color($theme-color shade(6%));
-		background: #f3f5f6;
+		color: $theme-color;
+		background: transparent;
 
-		&:not(:disabled):not([aria-disabled="true"]):hover {
-			background: #f1f1f1;
-			border-color: color($theme-color shade(25%));
-			color: color($theme-color shade(25%));
-			text-decoration: none;
+		&:hover:not(:disabled) {
+			border-color: $theme-color;
 		}
 
-		&:not([aria-disabled="true"]):active:enabled {
+		&:active:not(:disabled) {
 			background: #f3f5f6;
 			color: color($theme-color shade(5%));
 			border-color: #7e8993;
@@ -68,32 +64,27 @@
 		}
 	}
 
+	// Primary button style.
 	&.is-primary {
-		border-width: $border-width;
-		border-style: solid;
 		white-space: nowrap;
 		background: color($theme-color);
-		border-color: color($theme-color);
 		color: $white;
 		text-decoration: none;
 		text-shadow: none;
 
-		&:not(:disabled):not([aria-disabled="true"]):hover {
+		&:hover:not(:disabled) {
 			background: color($theme-color shade(10%));
-			border-color: color($theme-color shade(10%));
 			color: $white;
 		}
 
-		&:active:enabled {
+		&:active:not(:disabled) {
 			background: color($theme-color shade(20%));
 			border-color: color($theme-color shade(20%));
 			color: $white;
 		}
 
-		&:focus:enabled {
-			box-shadow:
-				0 0 0 $border-width $white,
-				0 0 0 2px color($theme-color);
+		&:focus:not(:disabled) {
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 2px color($theme-color);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 1px solid transparent;
@@ -154,8 +145,8 @@
 		@include reduce-motion("transition");
 		height: auto;
 
-		&:not(:disabled):not([aria-disabled="true"]):hover,
-		&:not([aria-disabled="true"]):active {
+		&:hover:not(:disabled),
+		&:active:not(:disabled) {
 			color: #00a0d2;
 		}
 
@@ -218,9 +209,19 @@
 	}
 
 	&.has-icon {
+		padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
+
+		// Icon buttons are square.
+		min-width: $icon-button-size;
+		justify-content: center;
+
 		.dashicon {
 			display: inline-block;
 			flex: 0 0 auto;
+		}
+
+		&.has-text {
+			justify-content: left;
 		}
 
 		&.has-text svg {

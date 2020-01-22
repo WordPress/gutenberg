@@ -5,6 +5,11 @@
 	width: 100%;
 	text-align: left;
 	margin: 0;
+	color: $dark-gray-primary;
+
+	// Some editor styles unset this.
+	-moz-font-smoothing: subpixel-antialiased;
+	-webkit-font-smoothing: subpixel-antialiased;
 
 	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 	@supports (position: sticky) {
@@ -85,8 +90,8 @@
 }
 
 .components-placeholder__fieldset .components-button {
-	margin-right: $grid-unit-10;
-	margin-bottom: $grid-unit-10; // If buttons wrap we need vertical space between.
+	margin-right: $grid-unit-15;
+	margin-bottom: $grid-unit-15; // If buttons wrap we need vertical space between.
 
 	&:last-child {
 		margin-bottom: 0;

@@ -7,12 +7,12 @@
 	display: none;
 }
 
-.block-editor-block-mover__control {
+.block-editor-block-mover__control.has-icon {
 	padding: 0;
 }
 
 // Show the mover in a single button under the contextual toolbar.
-.block-editor-block-contextual-toolbar .block-editor-block-mover {
+.block-editor-block-mover {
 	.components-toolbar {
 		flex-direction: column;
 	}
@@ -22,7 +22,7 @@
 	}
 
 	// Position the icons correctly.
-	.block-editor-block-mover__control-up {
+	.components-toolbar .block-editor-block-mover__control-up {
 		svg {
 			margin-bottom: -$grid-unit-10;
 		}
@@ -34,7 +34,7 @@
 		}
 	}
 
-	.block-editor-block-mover__control-down {
+	.components-toolbar .block-editor-block-mover__control-down {
 		svg {
 			margin-top: -$grid-unit-10;
 		}
@@ -52,7 +52,6 @@
 			height: $block-toolbar-height;
 			width: $block-toolbar-height/2 !important;
 			min-width: $grid-unit-30;
-			padding: 0;
 
 			// Focus style.
 			&::before {

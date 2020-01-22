@@ -10,13 +10,19 @@
 		display: none;
 		content: "";
 		position: absolute;
-		bottom: 0;
+		bottom: 1px;
 		right: 0;
 		border-color: transparent;
 		border-style: solid;
+		border-width: 4px;
+		border-right-color: currentColor;
+		border-bottom-color: currentColor;
+		transition: border 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+	}
+
+	// Grow the indicator a little bit on hover.
+	&:hover::after {
 		border-width: 5px;
-		border-right-color: $dark-gray-primary;
-		border-bottom-color: $dark-gray-primary;
 	}
 }
 
@@ -25,7 +31,7 @@
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	margin: 0;
 	display: block;
-	height: $icon-button-size;
+	height: $grid-unit-60;
 
 	.block-editor-block-icon {
 		margin: auto;
@@ -84,7 +90,7 @@
 	display: flex;
 	background: $white;
 	box-shadow: $shadow-popover;
-	padding: 0;
+	padding: $grid-unit-30;
 }
 
 .block-editor-block-switcher__popover .components-popover__content {
@@ -131,7 +137,7 @@
 }
 
 .block-editor-block-switcher__popover .block-editor-block-types-list {
-	margin: 8px -8px -8px;
+	margin: $grid-unit-15 0 0 0;
 }
 
 .block-editor-block-switcher__preview-title {
@@ -143,11 +149,11 @@
 .block-editor-block-contextual-toolbar {
 	.components-button.block-editor-block-switcher__toggle,
 	.components-button.block-editor-block-switcher__no-switcher-icon {
-		height: $block-toolbar-height;
+		height: $grid-unit-60;
 	}
 
 	.components-button.block-editor-block-switcher__no-switcher-icon {
-		width: $block-toolbar-height;
+		width: $grid-unit-60;
 	}
 
 	.components-button.block-editor-block-switcher__toggle {

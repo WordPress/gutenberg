@@ -8,7 +8,7 @@
 	border-radius: 0;
 	display: flex;
 	justify-content: space-between;
-	height: $block-controls-height - 2; // Needs to be 2px smaller to account for the box-shadow.
+	height: $block-toolbar-height - 2; // Needs to be 2px smaller to account for the box-shadow.
 	padding-top: 0;
 	padding-bottom: 0;
 

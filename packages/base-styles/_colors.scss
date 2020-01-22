@@ -30,7 +30,7 @@ $dark-gray-primary: #1e1e1e;
 $medium-gray-text: #757575;
 $light-gray-secondary: #ccc;
 $theme-color: theme(button);
-$blue-medium-focus: #007cba;	// @todo: consider revisiting for theme colors.
+$blue-medium-focus: #007cba;	// @todo: Currently being used as "spot" color. Needs to be considered in context of themes.
 $blue-medium-focus-dark: #fff;
 
 // Dark opacities, for use with light themes.

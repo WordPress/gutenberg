@@ -1,6 +1,5 @@
 .edit-post-header {
 	height: $header-height;
-	padding: $grid-unit-05 2px;
 	background: $white;
 	display: flex;
 	flex-wrap: wrap;
@@ -10,13 +9,15 @@
 	// The header should never be wider than the viewport, or buttons might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
 	max-width: 100vw;
 
+	// Padding.
+	padding: $grid-unit-15;
+	@include break-small() {
+		padding: $grid-unit-15 ($grid-unit-15 + 6px);
+	}
+
 	// Make toolbar sticky on larger breakpoints
 	@include break-zoomed-in {
 		flex-wrap: nowrap;
-	}
-
-	@include break-small {
-		padding: $grid-unit-10;
 	}
 
 	// Some browsers, most notably IE11, honor an older version of the flexbox spec
@@ -48,63 +49,52 @@
 	flex-wrap: wrap;
 }
 
-// @todo: this state should be refactored away once the G2 UI goes beyond the canvas.
-.edit-post-header__settings .components-button {
-	// Header toggle buttons.
-	&.is-pressed {
+
+/**
+ * Buttons in the Toolbar
+ */
+
+.edit-post-header__toolbar {
+	.block-editor-inserter__toggle {
+		margin-right: $grid-unit-10;
+
+		// Special dimensions for this button.
+		min-width: 32px;
+		height: 32px;
+
+		// Spot color button.
+		background-color: $blue-medium-focus;
 		color: $white;
-		background: $dark-gray-500;
+		border-radius: $radius-block-ui;
+
+		&:hover {
+			color: $white;
+			background-color: rgba($blue-medium-focus, 0.8);
+		}
+	}
+}
+
+
+.edit-post-header__settings {
+	// Header toggle buttons.
+	.components-button.is-pressed {
+		color: $white;
+		background: $dark-gray-primary;
 	}
 
-	// The !important in this ruleset need to override the pile of :not() selectors used in the icon-button.
-	&.is-pressed:hover,
-	&.is-pressed:focus {
-		box-shadow: 0 0 0 $border-width $dark-gray-500, inset 0 0 0 $border-width $white !important;
-		color: $white !important;
-		background: $dark-gray-500 !important;
-	}
-
-	// Make editor header bar buttons bigger to match Buttons.
-	&.editor-post-save-draft,
-	&.editor-post-switch-to-draft,
-	&.editor-post-preview,
-	&.editor-post-publish-button,
-	&.editor-post-publish-panel__toggle {
-		margin: 2px;
-		font-size: $default-font-size;
-	}
-
-	&.editor-post-save-draft,
-	&.editor-post-switch-to-draft {
-		padding: 0 5px;
+	// Adjust button paddings to scale better to mobile.
+	.components-button.editor-post-save-draft,
+	.editor-post-saved-state,
+	.components-button.editor-post-switch-to-draft,
+	.components-button.editor-post-preview,
+	.components-button.editor-post-publish-button,
+	.components-button.editor-post-publish-panel__toggle {
+		padding: 0 6px;
+		margin-right: $grid-unit-05;
 
 		@include break-small() {
 			padding: 0 12px;
-		}
-	}
-
-	// These paddings actually duplicate existing rules from button component.
-	// But they are duplicated so as to provide smaller paddings to fit the buttons on mobile.
-	&.editor-post-preview,
-	&.editor-post-publish-button,
-	&.editor-post-publish-panel__toggle {
-		padding-left: 5px;
-		padding-right: 5px;
-
-		@include break-small() {
-			padding-left: 12px;
-			padding-right: 12px;
-		}
-	}
-
-	@include break-medium() {
-		&.editor-post-preview {
-			margin: 0 3px 0 12px;
-		}
-
-		&.editor-post-publish-button,
-		&.editor-post-publish-panel__toggle {
-			margin: 0 12px 0 3px;
+			margin-right: $grid-unit-10;
 		}
 	}
 }

@@ -40,7 +40,7 @@
 	}
 
 	&.is-active {
-		box-shadow: inset 0 -3px theme(outlines);
+		box-shadow: inset 0 -4px theme(outlines);
 		font-weight: 600;
 		position: relative;
 
@@ -52,7 +52,7 @@
 			bottom: 1px;
 			right: 0;
 			left: 0;
-			border-bottom: 3px solid transparent;
+			border-bottom: 4px solid transparent;
 		}
 	}
 

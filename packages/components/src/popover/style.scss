@@ -29,7 +29,7 @@ $arrow-size: 8px;
 		margin-left: 2px;
 
 		&::before {
-			border: $arrow-size solid $border-color;
+			border: $arrow-size solid $dark-gray-primary;
 		}
 
 		&::after {
@@ -143,10 +143,11 @@ $arrow-size: 8px;
 }
 
 .components-popover__content {
-	box-shadow: $shadow-popover;
-	border: $border-width solid $border-color;
-	background: $white;
 	height: 100%;
+	background: $white;
+	border: $border-width solid $light-gray-secondary;
+	box-shadow: $shadow-popover;
+	border-radius: $radius-block-ui;
 
 	.components-popover & {
 		position: absolute;
@@ -161,7 +162,7 @@ $arrow-size: 8px;
 		overflow-y: visible;
 		min-width: auto;
 		border: none;
-		border-top: $border-width solid $border-color;
+		border-top: $border-width solid $dark-gray-primary;
 	}
 
 	.components-popover[data-y-axis="top"] & {
