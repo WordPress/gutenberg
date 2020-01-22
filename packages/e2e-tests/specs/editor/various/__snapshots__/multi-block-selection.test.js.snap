@@ -52,7 +52,7 @@ exports[`Multi-block selection should only trigger multi-selection when at the e
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Multi-block selection should preserve selection on move 1`] = `
+exports[`Multi-block selection should preserve dragged selection on move 1`] = `
 "<!-- wp:paragraph -->
 <p>2</p>
 <!-- /wp:paragraph -->
