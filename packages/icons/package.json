@@ -21,6 +21,7 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"dependencies": {
 		"@wordpress/element": "../element",
 		"@wordpress/primitives": "../primitives"
