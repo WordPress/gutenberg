@@ -61,7 +61,7 @@ export class ModalLinkUI extends Component {
 		const { activeAttributes: { url, target }, value, selectedBlockAttributes } = this.props;
 		const opensInNewWindow = target === '_blank' || selectedBlockAttributes.linkTarget === '_blank';
 		this.setState( {
-			inputValue: url || selectedBlockAttributes.url || '',
+			inputValue: selectedBlockAttributes.url || url || '',
 			text: getTextContent( slice( value ) ),
 			linkRel: selectedBlockAttributes.rel || '',
 			opensInNewWindow,
