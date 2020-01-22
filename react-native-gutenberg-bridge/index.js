@@ -14,7 +14,6 @@ export const mediaSources = {
 	deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 	deviceCamera: 'DEVICE_CAMERA',
 	siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
-	mediaEditor: 'MEDIA_EDITOR',
 };
 
 export const showMediaEditorButton = isIOS && __DEV__;
