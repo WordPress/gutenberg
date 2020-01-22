@@ -149,7 +149,7 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	}
 
 	// We can skip the parsing below if there isn't an 'OR' in the license.
-	if ( ! formattedlicenseType.includes( 'or' ) ) {
+	if ( ! formattedlicenseType.includes( ' or ' ) ) {
 		return false;
 	}
 
