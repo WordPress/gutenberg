@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component, renderToString } from '@wordpress/element';
-import { Button, Dropdown, Icon, MenuGroup, MenuItemsChoice, Path, Polygon, SVG } from '@wordpress/components';
+import { Button, Dropdown, Icon, MenuGroup, MenuItem, Path, Polygon, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
@@ -204,10 +204,12 @@ export class PostPreviewButton extends Component {
 				<Dropdown
 					className="editor-post-preview__dropdown"
 					contentClassName="editor-post-preview__dropdown-content"
+					popoverProps={ { role: 'menu' } }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button onClick={ onToggle }
 							className="editor-post-preview__button-toggle"
 							aria-expanded={ isOpen }
+							disabled={ ! isSaveable }
 						>
 							{ this.translateDropdownButtonText() }
 							<div className="editor-post-preview__button-separator">{ downArrow }</div>
@@ -218,24 +220,27 @@ export class PostPreviewButton extends Component {
 							<MenuGroup
 								label={ _x( 'View', 'noun' ) }
 							>
-								<MenuItemsChoice
-									choices={ [
-										{
-											value: 'Desktop',
-											label: __( 'Desktop' ),
-										},
-										{
-											value: 'Tablet',
-											label: __( 'Tablet' ),
-										},
-										{
-											value: 'Mobile',
-											label: __( 'Mobile' ),
-										},
-									] }
-									value={ this.props.deviceType }
-									onSelect={ ( value ) => setDeviceType( value ) }
-								/>
+								<MenuItem
+									className="editor-post-preview__button-resize"
+									onClick={ () => setDeviceType( 'Desktop' ) }
+									icon={ this.props.deviceType === 'Desktop' && 'yes' }
+								>
+									{ __( 'Desktop' ) }
+								</MenuItem>
+								<MenuItem
+									className="editor-post-preview__button-resize"
+									onClick={ () => setDeviceType( 'Tablet' ) }
+									icon={ this.props.deviceType === 'Tablet' && 'yes' }
+								>
+									{ __( 'Tablet' ) }
+								</MenuItem>
+								<MenuItem
+									className="editor-post-preview__button-resize"
+									onClick={ () => setDeviceType( 'Mobile' ) }
+									icon={ this.props.deviceType === 'Mobile' && 'yes' }
+								>
+									{ __( 'Mobile' ) }
+								</MenuItem>
 							</MenuGroup>
 							<MenuGroup>
 								<Button

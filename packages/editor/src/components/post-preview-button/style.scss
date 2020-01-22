@@ -11,6 +11,14 @@
 	justify-content: space-between;
 }
 
+.editor-post-preview__button-resize.editor-post-preview__button-resize {
+	padding-left: 28px;
+
+	&.has-icon {
+		padding-left: 0;
+	}
+}
+
 .editor-post-preview__button-separator {
 	border-left: 1px solid $light-gray-600;
 	height: $icon-button-size;
