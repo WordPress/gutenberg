@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalIcon as Icon, saved } from '@wordpress/icons';
+import { __experimentalIcon as Icon, check } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -131,7 +131,7 @@ export default function CustomSelectControl( {
 						>
 							{ item === selectedItem && (
 								<Icon
-									icon={ saved }
+									icon={ check }
 									className="components-custom-select-control__item-icon"
 								/>
 							) }

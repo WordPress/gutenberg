@@ -14,7 +14,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { withSafeTimeout, compose } from '@wordpress/compose';
 import { withViewportMatch } from '@wordpress/viewport';
-import { __experimentalIcon as Icon, saved } from '@wordpress/icons';
+import { __experimentalIcon as Icon, check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -89,7 +89,7 @@ export class PostSavedState extends Component {
 		if ( forceSavedMessage || ( ! isNew && ! isDirty ) ) {
 			return (
 				<span className="editor-post-saved-state is-saved">
-					<Icon icon={ saved } />
+					<Icon icon={ check } />
 					{ __( 'Saved' ) }
 				</span>
 			);

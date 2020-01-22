@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalIcon as Icon, saved } from '@wordpress/icons';
+import { __experimentalIcon as Icon, check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,7 +37,7 @@ function Option( {
 				( <Tooltip text={ tooltipText }>{ optionButton }</Tooltip> ) :
 				optionButton
 			}
-			{ isSelected && <Icon icon={ saved } /> }
+			{ isSelected && <Icon icon={ check } /> }
 		</div>
 	);
 }
