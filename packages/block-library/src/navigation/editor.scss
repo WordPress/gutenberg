@@ -84,13 +84,6 @@ $navigation-item-height: 46px;
 		display: none;
 	}
 
-	// Inherit colors from menu.
-	.wp-block-navigation-link .block-editor-inner-blocks {
-		background-color: inherit;
-		color: inherit;
-		border-color: inherit;
-	}
-
 	// No text color - Default / Light styles
 	&:not(.has-text-color) .wp-block-navigation-link > .block-editor-inner-blocks {
 		color: $light-style-sub-menu-background-color;

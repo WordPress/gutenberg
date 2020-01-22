@@ -113,6 +113,14 @@ $navigation-height: 60px;
 			}
 		}
 
+		// Inherit colors from menu
+		.block-editor-inner-blocks,
+		.wp-block-navigation__container {
+			background-color: inherit;
+			color: inherit;
+			border-color: inherit;
+		}
+
 		.wp-block-navigation-link__content {
 			display: flex;
 			align-items: center;

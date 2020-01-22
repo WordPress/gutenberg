@@ -181,7 +181,7 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_l
 		$font_sizes['css_classes']
 	);
 	$css_classes     = implode( ' ', $classes );
-	$class_attribute = sprintf( ' class="wp-block-navigation-link__content %s"', esc_attr( trim( $css_classes ) ) );
+	$class_attribute = sprintf( ' class="wp-block-navigation-link %s', esc_attr( trim( $css_classes ) ) );
 	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
 		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
 		: '';
@@ -189,10 +189,8 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_l
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
 		$has_submenu = count( (array) $block['innerBlocks'] ) > 0;
 
-		$html .= '<li class="wp-block-navigation-link' . ( $has_submenu ? ' has-child' : '' ) . '">' .
-			'<a';
-
-		$html .= $class_attribute . $style_attribute;
+		$html .= '<li' . $class_attribute . ( $has_submenu ? ' has-child' : '' ) . '"' . $style_attribute . '>' .
+			'<a class="wp-block-navigation-link__content"';
 
 		// Start appending HTML attributes to anchor tag.
 		if ( isset( $block['attrs']['url'] ) ) {
