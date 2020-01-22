@@ -14,7 +14,9 @@ import {
 	TextHighlight,
 } from '@wordpress/components';
 
-export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = false, onClick, isURL = false, searchTerm = '' } ) => {
+export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = false, onClick, searchTerm = '' } ) => {
+	const isURL = suggestion.type === 'url';
+
 	return (
 		<Button
 			{ ...itemProps }
@@ -30,7 +32,7 @@ export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = fal
 			) }
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
-					<TextHighlight text={ suggestion.title } highlight={ searchTerm } />
+					<TextHighlight text={ suggestion.title || suggestion.url } highlight={ searchTerm } />
 				</span>
 				<span aria-hidden={ ! isURL } className="block-editor-link-control__search-item-info">
 					{ ! isURL && ( safeDecodeURI( suggestion.url ) || '' ) }

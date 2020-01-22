@@ -453,10 +453,11 @@ describe( 'Selecting links', () => {
 		it.each( [
 			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
 			[ 'url', 'https://www.wordpress.org', {
-				id: '1',
-				title: 'https://www.wordpress.org',
+				id: 'https://www.wordpress.org',
+				title: '',
 				url: 'https://www.wordpress.org',
-				type: 'URL',
+				type: 'url',
+				subtype: 'https',
 			} ], // url
 		] )( 'should display a current selected link UI when a %s suggestion for the search "%s" is clicked', async ( type, searchTerm, selectedLink ) => {
 			const LinkControlConsumer = () => {
@@ -512,10 +513,11 @@ describe( 'Selecting links', () => {
 		it.each( [
 			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
 			[ 'url', 'https://www.wordpress.org', {
-				id: '1',
-				title: 'https://www.wordpress.org',
+				id: 'https://www.wordpress.org',
+				title: '',
 				url: 'https://www.wordpress.org',
-				type: 'URL',
+				type: 'url',
+				subtype: 'https',
 			} ], // url
 		] )( 'should display a current selected link UI when an %s suggestion for the search "%s" is selected using the keyboard', async ( type, searchTerm, selectedLink ) => {
 			const LinkControlConsumer = () => {

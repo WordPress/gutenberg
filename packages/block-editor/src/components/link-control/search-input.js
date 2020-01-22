@@ -15,6 +15,7 @@ import { LEFT,
 /**
  * Internal dependencies
  */
+import getSuggestionByURL from './get-suggestion-by-url';
 import { URLInput } from '../';
 
 const handleLinkControlOnKeyDown = ( event ) => {
@@ -58,7 +59,7 @@ const LinkControlSearchInput = ( {
 
 		// Interpret the selected value as either the selected suggestion, if
 		// exists, or otherwise the current input value as entered.
-		onSelect( selectedSuggestion || { url: value } );
+		onSelect( selectedSuggestion || getSuggestionByURL( value ) );
 	}
 
 	return (

@@ -2,21 +2,15 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, startsWith } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useState, Fragment } from '@wordpress/element';
-import {
-	safeDecodeURI,
-	filterURLForDisplay,
-	isURL,
-	prependHTTP,
-	getProtocol,
-} from '@wordpress/url';
+import { useState, Fragment } from '@wordpress/element';
+import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
@@ -26,6 +20,7 @@ import { useSelect } from '@wordpress/data';
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
+import getSuggestionByURL from './get-suggestion-by-url';
 
 function LinkControl( {
 	value,
@@ -57,60 +52,12 @@ function LinkControl( {
 		setInputValue( '' );
 	};
 
-	const handleDirectEntry = ( val ) => {
-		let type = 'URL';
-
-		const protocol = getProtocol( val ) || '';
-
-		if ( protocol.includes( 'mailto' ) ) {
-			type = 'mailto';
-		}
-
-		if ( protocol.includes( 'tel' ) ) {
-			type = 'tel';
-		}
-
-		if ( startsWith( val, '#' ) ) {
-			type = 'internal';
-		}
-
-		return Promise.resolve(
-			[ {
-				id: '-1',
-				title: val,
-				url: type === 'URL' ? prependHTTP( val ) : val,
-				type,
-			} ]
-		);
-	};
-
-	const handleEntitySearch = async ( val, args ) => {
-		const results = await Promise.all( [
-			fetchSearchSuggestions( val, {
-				...( args.isInitialSuggestions ? { perPage: 3 } : {} ),
-			} ),
-			handleDirectEntry( val ),
-		] );
-
-		const couldBeURL = ! val.includes( ' ' );
-
-		// If it's potentially a URL search then concat on a URL search suggestion
-		// just for good measure. That way once the actual results run out we always
-		// have a URL option to fallback on.
-		return couldBeURL && ! args.isInitialSuggestions ? results[ 0 ].concat( results[ 1 ] ) : results[ 0 ];
-	};
-
-	// Effects
-	const getSearchHandler = useCallback( ( val, args ) => {
-		const protocol = getProtocol( val ) || '';
-		const isMailto = protocol.includes( 'mailto' );
-		const isInternal = startsWith( val, '#' );
-		const isTel = protocol.includes( 'tel' );
-
-		const handleManualEntry = isInternal || isMailto || isTel || isURL( val ) || ( val && val.includes( 'www.' ) );
-
-		return ( handleManualEntry ) ? handleDirectEntry( val, args ) : handleEntitySearch( val, args );
-	}, [ handleDirectEntry, fetchSearchSuggestions ] );
+	async function getSearchSuggestions( search, { isInitialSuggestions } ) {
+		return ( await Promise.all( [
+			fetchSearchSuggestions( search, isInitialSuggestions ? { perPage: 3 } : {} ),
+			Promise.resolve( [ getSuggestionByURL( search ) ] ),
+		] ) ).flat();
+	}
 
 	// Render Components
 	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading, isInitialSuggestions } ) => {
@@ -118,7 +65,6 @@ function LinkControl( {
 			'is-loading': isLoading,
 		} );
 
-		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
 		const searchResultsLabelId = isInitialSuggestions ? `block-editor-link-control-search-results-label-${ instanceId }` : undefined;
 		const labelText = isInitialSuggestions ? __( 'Recently updated' ) : sprintf( __( 'Search results for %s' ), inputValue );
 		// According to guidelines aria-label should be added if the label
@@ -146,7 +92,6 @@ function LinkControl( {
 								onChange( { ...value, ...suggestion } );
 							} }
 							isSelected={ index === selectedSuggestion }
-							isURL={ manualLinkEntryTypes.includes( suggestion.type.toLowerCase() ) }
 							searchTerm={ inputValue }
 						/>
 					) ) }
@@ -203,7 +148,7 @@ function LinkControl( {
 						onChange( { ...value, ...suggestion } );
 					} }
 					renderSuggestions={ renderSearchResults }
-					fetchSuggestions={ getSearchHandler }
+					fetchSuggestions={ getSearchSuggestions }
 					onReset={ resetInput }
 					showInitialSuggestions={ showInitialSuggestions }
 				/>
