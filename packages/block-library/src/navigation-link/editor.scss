@@ -22,12 +22,6 @@
 		min-width: 20px;
 	}
 
-	.wp-block-navigation-link__content {
-		display: flex;
-		align-items: center;
-		width: max-content;
-	}
-
 	&.has-link .wp-block-navigation-link__label {
 		text-decoration: underline;
 	}

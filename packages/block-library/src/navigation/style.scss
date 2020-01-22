@@ -112,6 +112,12 @@ $navigation-height: 60px;
 				top: 0;
 			}
 		}
+
+		.wp-block-navigation-link__content {
+			display: flex;
+			align-items: center;
+			width: max-content;
+		}
 	}
 }
 
@@ -125,10 +131,6 @@ $navigation-height: 60px;
 */
 
 .wp-block-navigation {
-
-	.wp-block-navigation__container {
-		width: max-content;
-	}
 
 	.wp-block-navigation-link.has-child > .wp-block-navigation__container {
 		display: block;
