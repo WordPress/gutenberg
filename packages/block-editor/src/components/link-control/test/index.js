@@ -518,10 +518,11 @@ describe( 'Default search suggestions', () => {
 } );
 
 describe( 'Creating pages', () => {
+	// These Pages must not match an page returned by `fauxEntitySuggestions`
 	it.each( [
-		'HelloWorld', // no spaces
-		'Hello World', // with spaces
-	] )( 'should display option to create a link within the search results for input "%s"', async ( pageNameText ) => {
+		'Pagetitlethatwillnotmatchexistingfixtureresults', // no spaces
+		'Page title that will not match existing fixture results', // with spaces
+	] )( 'should display option to create a link for a valid Page title "%s"', async ( pageNameText ) => {
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( null );
 
