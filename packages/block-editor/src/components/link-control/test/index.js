@@ -526,6 +526,15 @@ describe( 'Creating pages', () => {
 			render(
 				<LinkControl
 					showCreatePages={ true }
+					createEmptyPage={ async ( title ) => ( {
+						type: 'page',
+						id: 123,
+						title: {
+							raw: title,
+							rendered: title,
+						},
+						link: '/?p=123',
+					} ) }
 				/>, container
 			);
 		} );
