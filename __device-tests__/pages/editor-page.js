@@ -43,7 +43,7 @@ export default class EditorPage {
 	// and accessibilityId attributes on this object and selects the block
 	// position uses one based numbering
 	async getBlockAtPosition( position: number, blockName: string, options: { autoscroll: boolean } = { autoscroll: false } ) {
-		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
+		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
@@ -202,13 +202,11 @@ export default class EditorPage {
 			throw Error( `No Block at position ${ position }` );
 		}
 
-		const parentLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
-		let removeBlockLocator = `${ parentLocator }`;
-		removeBlockLocator += isAndroid() ? '//*' : '//XCUIElementTypeButton';
-		let removeButtonIdentifier = `Remove block at row ${ position }`;
+		const buttonElementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
+		const removeButtonIdentifier = `Remove block at row ${ position }`;
+		const removeBlockLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeButtonIdentifier }")]`;
 
 		if ( isAndroid() ) {
-			removeButtonIdentifier += ', Double tap to remove the block';
 			const block = await this.getBlockAtPosition( position, blockName );
 			let checkList = await this.driver.elementsByXPath( removeBlockLocator );
 			while ( checkList.length === 0 ) {
@@ -217,7 +215,6 @@ export default class EditorPage {
 			}
 		}
 
-		removeBlockLocator += `[@${ this.accessibilityIdXPathAttrib }="${ removeButtonIdentifier }"]`;
 		const removeButton = await this.driver.elementByXPath( removeBlockLocator );
 		await removeButton.click();
 	}
