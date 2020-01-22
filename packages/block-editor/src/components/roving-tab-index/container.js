@@ -1,23 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { RovingTabIndexProvider } from './context';
 
-const RovingTabIndexContainer = forwardRef( ( { children, ...props }, ref ) => {
+function RovingTabIndexContainer( { children, ...props } ) {
 	const [ lastFocusedElement, setLastFocusedElement ] = useState();
 
 	return (
 		<RovingTabIndexProvider value={ lastFocusedElement }>
-			<div onFocus={ ( event ) => setLastFocusedElement( event.target ) } ref={ ref } { ...props }>
+			<div onFocus={ ( event ) => setLastFocusedElement( event.target ) } { ...props }>
 				{ children }
 			</div>
 		</RovingTabIndexProvider>
 	);
-} );
+}
 
 export default RovingTabIndexContainer;
