@@ -165,8 +165,8 @@ const Cover = ( {
 			{ controls }
 			<View
 				onLayout={ onContainerLayout }
-				style={ [ styles.backgroundContainer, { height: CONTAINER_HEIGHT } ] }>
-				<View style={ styles.content } >
+				style={ [ styles.backgroundContainer, { minHeight: CONTAINER_HEIGHT } ] }>
+				<View style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] } >
 					<InnerBlocks
 						template={ INNER_BLOCKS_TEMPLATE }
 					/>
