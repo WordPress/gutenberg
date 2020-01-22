@@ -218,18 +218,6 @@ $navigation-height: 60px;
 				color: $light-style-sub-menu-text-color-hover;
 			}
 		}
-
-		// Sub menu arrow - background color.
-		&::after {
-			border-color: transparent;
-			border-bottom-color: $light-style-sub-menu-background-color;
-		}
-
-		// Sub menu arrow - border color.
-		&::before {
-			border-color: transparent;
-			border-bottom-color: $light-style-sub-menu-border-color;
-		}
 	}
 
 	// Dark Styles.
@@ -243,16 +231,6 @@ $navigation-height: 60px;
 			&:hover {
 				color: $dark-style-sub-menu-text-color-hover;
 			}
-		}
-
-		// Sub menu arrow - background color.
-		&::after {
-			border-bottom-color: $dark-style-sub-menu-background-color;
-		}
-
-		// Sub menu arrow - border color.
-		&::before {
-			border-bottom-color: $dark-style-sub-menu-border-color;
 		}
 	}
 }
