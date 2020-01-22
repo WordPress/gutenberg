@@ -16,9 +16,11 @@ import { Picker } from '@wordpress/components';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 
+export const MEDIA_EDITOR = 'MEDIA_EDITOR';
+
 const editOption = {
-	id: mediaSources.mediaEditor,
-	value: mediaSources.mediaEditor,
+	id: MEDIA_EDITOR,
+	value: MEDIA_EDITOR,
 	label: __( 'Edit' ),
 	types: [ MEDIA_TYPE_IMAGE ],
 	icon: 'admin-appearance',
@@ -62,7 +64,7 @@ export class MediaEdit extends React.Component {
 		};
 
 		switch ( value ) {
-			case mediaSources.mediaEditor:
+			case MEDIA_EDITOR:
 				requestMediaEditor( this.props.source.uri, mediaCallback );
 				break;
 			default:
