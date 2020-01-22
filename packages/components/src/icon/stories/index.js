@@ -4,10 +4,14 @@
 import { number, text } from '@storybook/addon-knobs';
 
 /**
+ * WordPress dependencies
+ */
+import { SVG, Path } from '@wordpress/primitives';
+
+/**
  * Internal dependencies
  */
 import Icon from '../';
-import { SVG, Path } from '../../primitives/svg';
 
 export default { title: 'Components/Icon', component: Icon };
 

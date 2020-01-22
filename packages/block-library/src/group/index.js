@@ -25,6 +25,7 @@ export const settings = {
 	example: {
 		attributes: {
 			customBackgroundColor: '#ffffff',
+			customTextColor: '#000000',
 		},
 		innerBlocks: [
 			{

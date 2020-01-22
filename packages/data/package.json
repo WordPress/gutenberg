@@ -34,7 +34,8 @@
 		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"redux": "^4.0.0",
-		"turbo-combine-reducers": "^1.0.2"
+		"turbo-combine-reducers": "^1.0.2",
+		"use-memo-one": "^1.1.1"
 	},
 	"publishConfig": {
 		"access": "public"

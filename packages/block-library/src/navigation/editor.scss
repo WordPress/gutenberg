@@ -62,9 +62,15 @@ $navigation-item-height: 46px;
 	// Polish the Appender.
 	.wp-block-navigation .block-list-appender {
 		margin: 0;
+		width: 28px;
+		height: 28px;
+		margin-top: $grid-size-small;
+		margin-left: $grid-size + $block-side-ui-clearance;
 
 		.block-editor-button-block-appender {
 			padding: $grid-size;
+			padding-bottom: $grid-size-small;
+			padding-top: $grid-size-small;
 			outline: none;
 			background: none;
 		}
