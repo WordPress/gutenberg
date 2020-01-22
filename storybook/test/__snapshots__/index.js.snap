@@ -288,7 +288,6 @@ exports[`Storyshots Components/BaseControl Fieldset 1`] = `
   >
     <legend
       className="components-base-control__label"
-      htmlFor="fieldset-1"
     >
       Post visibility
     </legend>
@@ -4394,7 +4393,6 @@ exports[`Storyshots Components/RadioControl Default 1`] = `
   >
     <legend
       className="components-base-control__label"
-      htmlFor="inspector-radio-control-0"
     >
       Post visibility
     </legend>
@@ -4465,7 +4463,6 @@ exports[`Storyshots Components/RadioControl With Help 1`] = `
   >
     <legend
       className="components-base-control__label"
-      htmlFor="inspector-radio-control-1"
     >
       Post visibility
     </legend>

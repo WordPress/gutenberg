@@ -11,9 +11,6 @@ import VisualLabel from './visual-label';
 function BaseControl( { as = 'div', id, label, hideLabelFromVision, help, className, children } ) {
 	const isFieldSet = as === 'fieldset';
 
-	/**
-	 * BaseControl can only render as either a fieldset or a div
-	 */
 	const WrapperComponent = as;
 	const LabelComponent = id ? 'label' : 'span';
 	const VisualLabelComponent = isFieldSet ? 'legend' : LabelComponent;
