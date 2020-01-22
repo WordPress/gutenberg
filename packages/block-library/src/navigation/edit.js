@@ -283,7 +283,7 @@ function Navigation( {
 						onChange={ ( value ) => {
 							setAttributes( { showSubmenuIcon: value } );
 						} }
-						label={ __( 'Show submenu icon for top-level items' ) }
+						label={ __( 'Show submenu indicator icons' ) }
 					/>
 				</PanelBody>
 			</InspectorControls>
