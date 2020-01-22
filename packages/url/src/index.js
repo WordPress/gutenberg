@@ -1,3 +1,5 @@
+
+export { isURI } from './is-uri';
 export { isURL } from './is-url';
 export { isEmail } from './is-email';
 export { getProtocol } from './get-protocol';

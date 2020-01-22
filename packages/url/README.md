@@ -227,6 +227,25 @@ _Returns_
 
 -   `boolean`: Whether or not it looks like an email.
 
+<a name="isURI" href="#isURI">#</a> **isURI**
+
+Determines whether the given string looks like a URI (of any type).
+
+_Usage_
+
+```js
+const isURI = isURI( 'https://wordpress.org' ); // true
+const anotherURI = isURI('mailto:hello@wordpress.org'); // true
+```
+
+_Parameters_
+
+-   _uri_ `string`: The string to scrutinise.
+
+_Returns_
+
+-   `boolean`: Whether or not it looks like a URI.
+
 <a name="isURL" href="#isURL">#</a> **isURL**
 
 Determines whether the given string looks like a URL.
