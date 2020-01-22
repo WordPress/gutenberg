@@ -25,7 +25,7 @@ import {
 import {
 	Component,
 } from '@wordpress/element';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -42,11 +42,11 @@ const INITIAL_MAX_WIDTH = 108;
 class ButtonEdit extends Component {
 	constructor( props ) {
 		super( props );
-		this.onChangeBackgroundColor = this.onChangeBackgroundColor.bind( this );
-		this.setBorderRadius = this.setBorderRadius.bind( this );
-		this.setLinkRel = this.setLinkRel.bind( this );
+		this.onChangeBorderRadius = this.onChangeBorderRadius.bind( this );
+		this.onChangeLinkRel = this.onChangeLinkRel.bind( this );
+		this.onChangeOpenInNewTab = this.onChangeOpenInNewTab.bind( this );
+		this.onChangeURL = this.onChangeURL.bind( this );
 		this.onLayout = this.onLayout.bind( this );
-		this.onToggleOpenInNewTab = this.onToggleOpenInNewTab.bind( this );
 
 		this.state = {
 			maxWidth: INITIAL_MAX_WIDTH,
@@ -72,7 +72,7 @@ class ButtonEdit extends Component {
 		}
 	}
 
-	onChangeBackgroundColor() {
+	getBackgroundColor() {
 		const { backgroundColor, attributes } = this.props;
 		if ( backgroundColor.color ) {
 			// `backgroundColor` which should be set when we are able to resolve it
@@ -85,16 +85,21 @@ class ButtonEdit extends Component {
 		} return styles.button.backgroundColor;
 	}
 
-	setBorderRadius( value ) {
+	onChangeBorderRadius( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( {
 			borderRadius: value,
 		} );
 	}
 
-	setLinkRel( value ) {
+	onChangeLinkRel( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { rel: value } );
+	}
+
+	onChangeURL( value ) {
+		const { setAttributes } = this.props;
+		setAttributes( { url: value } );
 	}
 
 	onLayout( { nativeEvent } ) {
@@ -104,7 +109,7 @@ class ButtonEdit extends Component {
 		this.setState( { maxWidth: width - buttonSpacing } );
 	}
 
-	onToggleOpenInNewTab( value ) {
+	onChangeOpenInNewTab( value ) {
 		const { setAttributes, attributes } = this.props;
 		const { rel } = attributes;
 
@@ -158,7 +163,7 @@ class ButtonEdit extends Component {
 					style={ [
 						styles.container,
 						isSelected && {
-							borderColor: this.onChangeBackgroundColor(),
+							borderColor: this.getBackgroundColor(),
 							borderRadius: outlineBorderRadius,
 							borderWidth: styles.button.borderWidth,
 						},
@@ -166,7 +171,7 @@ class ButtonEdit extends Component {
 				>
 					<ColorBackground
 						borderRadiusValue={ borderRadiusValue }
-						backgroundColor={ this.onChangeBackgroundColor() }
+						backgroundColor={ this.getBackgroundColor() }
 					>
 						<RichText
 							setRef={ ( richText ) => {
@@ -196,7 +201,7 @@ class ButtonEdit extends Component {
 								minimumValue={ MIN_BORDER_RADIUS_VALUE }
 								maximumValue={ MAX_BORDER_RADIUS_VALUE }
 								value={ borderRadiusValue }
-								onChange={ this.setBorderRadius }
+								onChange={ this.onChangeBorderRadius }
 								separatorType="none"
 							/>
 						</PanelBody>
@@ -205,7 +210,7 @@ class ButtonEdit extends Component {
 								label={ __( 'Button URL' ) }
 								value={ url || '' }
 								valuePlaceholder={ __( 'Add URL' ) }
-								onChange={ ( value ) => setAttributes( { url: value } ) }
+								onChange={ this.onChangeURL }
 								autoCapitalize="none"
 								autoCorrect={ false }
 								separatorType="none"
@@ -214,14 +219,14 @@ class ButtonEdit extends Component {
 							<ToggleControl
 								label={ __( 'Open in new tab' ) }
 								checked={ linkTarget === '_blank' }
-								onChange={ this.onToggleOpenInNewTab }
+								onChange={ this.onChangeOpenInNewTab }
 								separatorType="fullWidth"
 							/>
 							<TextControl
 								label={ __( 'Link Rel' ) }
 								value={ rel || '' }
 								valuePlaceholder={ __( 'None' ) }
-								onChange={ this.setLinkRel }
+								onChange={ this.onChangeLinkRel }
 								autoCapitalize="none"
 								autoCorrect={ false }
 								separatorType="none"
@@ -244,13 +249,6 @@ class ButtonEdit extends Component {
 export default compose( [
 	withInstanceId,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
-	withDispatch( ( dispatch ) => {
-		const { closeGeneralSidebar } = dispatch( 'core/edit-post' );
-
-		return {
-			closeGeneralSidebar,
-		};
-	} ),
 	withSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( 'core/block-editor' );
 
