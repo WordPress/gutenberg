@@ -517,6 +517,37 @@ describe( 'Default search suggestions', () => {
 	} );
 } );
 
+describe( 'Creating pages', () => {
+	it( 'should display option to create a link within the search results', async () => {
+		const pageNameText = 'HelloWorld';
+		act( () => {
+			render(
+				<LinkControl
+					showCreatePages={ true }
+				/>, container
+			);
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: pageNameText } } );
+		} );
+
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+
+		const createButton = first( Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new Page' ) ) );
+
+		expect( createButton ).not.toBeNull();
+		expect( createButton.innerHTML ).toEqual( expect.stringContaining( pageNameText ) );
+	} );
+} );
+
 describe( 'Selecting links', () => {
 	it( 'should display a selected link corresponding to the provided "currentLink" prop', () => {
 		const selectedLink = first( fauxEntitySuggestions );

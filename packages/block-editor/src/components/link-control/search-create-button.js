@@ -20,6 +20,7 @@ export const LinkControlSearchCreate = ( { searchTerm = '', onClick, itemProps }
 
 	return (
 		<Button
+			role="option"
 			{ ...itemProps }
 			onClick={ onClick }
 			className={ classnames( 'block-editor-link-control__search-create block-editor-link-control__search-item', {
