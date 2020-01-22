@@ -43,6 +43,7 @@ export function Button( {
 	hoverStyle,
 	focusedStyle,
 	disabledStyle,
+	activeStyle,
 	...additionalProps
 }, ref ) {
 	if ( isDefault ) {
@@ -89,7 +90,7 @@ export function Button( {
 
 	const element = (
 		<Tag
-			css={ ( theme ) => styles( theme, hoverStyle, focusedStyle, disabledStyle ) }
+			css={ ( theme ) => styles( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) }
 			font-size={ isSmall ? 'small' : 'default' }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
 			{ ...propsToPass }

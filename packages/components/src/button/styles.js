@@ -3,7 +3,8 @@
  */
 import { css } from '@emotion/core';
 
-export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
+// TODO Support theme in additional styles
+export default ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => css`
 	border: 0;
 	cursor: pointer;
 	-webkit-appearance: none;
@@ -27,6 +28,7 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 		background-color: ${ theme.colors.white };
 		color: ${ theme.colors[ 'dark-gray-900' ] };
 		box-shadow: inset 0 0 0 1px ${ theme.colors[ 'dark-gray-500' ] }, inset 0 0 0 2px ${ theme.colors.white };
+		${ hoverStyle ? hoverStyle : '' }
 	}
 
 	&.is-secondary {
@@ -42,6 +44,7 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 			text-decoration: none;
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
 			color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
+			${ hoverStyle ? hoverStyle : '' }
 		}
 
 		&:focus:enabled {
@@ -50,6 +53,7 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 			color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -5 ) };
 			box-shadow: 0 0 0 ${ theme.space.borderWidth } ${ theme.helpers.shade( theme.colors.primary, -5 ) };
+			${ focusedStyle ? focusedStyle : '' }
 		}
 
 		&:active:enabled {
@@ -57,6 +61,7 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 			border-color: #7e8993;
 			box-shadow: none;
 			color: ${ theme.helpers.shade( theme.colors.primary, -5 ) };
+			${ activeStyle ? activeStyle : '' }
 		}
 
 		&:disabled,
@@ -66,10 +71,7 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 			background: #f7f7f7;
 			transform: none;
 			opacity: 1;
-		}
-
-		&:disabled,
-		&[aria-disabled="true"] {
+			${ disabledStyle ? disabledStyle : '' }
 			text-shadow: 0 ${ theme.space.borderWidth } 0 ${ theme.colors.white };
 		}
 	}
@@ -88,18 +90,21 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 			color: ${ theme.colors.white };
 			background: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
+			${ hoverStyle ? hoverStyle : '' }
 		}
 
 		&:focus:enabled {
 			box-shadow:
 				0 0 0 ${ theme.space.borderWidth } ${ theme.colors.white },
 				0 0 0 3px ${ theme.colors.primary };
+			${ focusedStyle ? focusedStyle : '' }
 		}
 
 		&:active:enabled {
 			color: ${ theme.colors.white };
 			background: ${ theme.helpers.shade( theme.colors.primary, -20 ) };
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -20 ) };
+			${ activeStyle ? activeStyle : '' }
 		}
 
 		&:disabled,
@@ -118,6 +123,7 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 				${ theme.helpers.shade( theme.colors.primary, -20 ) } 72%,
 				${ theme.colors.button } 72%
 			);
+			${ disabledStyle ? disabledStyle : '' }
 
 			&:focus:enabled {
 				box-shadow:
@@ -132,6 +138,7 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 			color: ${ theme.colors.white };
 			background-size: 100px 100%;
 			border-color: ${ theme.colors.primary };
+			${ disabledStyle ? disabledStyle : '' }
 		}
 	}
 
@@ -155,6 +162,11 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 		&:not(:disabled):not([aria-disabled="true"]):hover,
 		&:active {
 			color: #00a0d2;
+			${ hoverStyle ? hoverStyle : '' }
+		}
+
+		&:active {
+			${ activeStyle ? activeStyle : '' }
 		}
 
 		&:focus {
@@ -162,6 +174,7 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 			box-shadow:
 				0 0 0 ${ theme.space.borderWidth } #5b9dd9,
 				0 0 2px ${ theme.space.borderWidth } rgba(30, 140, 190, 0.8);
+			${ focusedStyle ? focusedStyle : '' }
 		}
 	}
 
@@ -171,12 +184,14 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 
 	&:active {
 		color: inherit;
+		${ activeStyle ? activeStyle : '' }
 	}
 
 	&:disabled,
 	&[aria-disabled="true"] {
 		cursor: default;
 		opacity: 0.3;
+		${ disabledStyle ? disabledStyle : '' }
 	}
 
 	&.is-busy,
@@ -193,6 +208,7 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 			${ theme.colors.white } 10px,
 			${ theme.colors[ 'light-gray-500' ] } 20px
 		);
+		${ disabledStyle ? disabledStyle : '' }
 	}
 
 	&.is-small {
@@ -205,6 +221,7 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
+			${ hoverStyle ? hoverStyle : '' }
 		}
 
 		.dashicon {
@@ -246,19 +263,9 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 		color: ${ theme.colors[ 'dark-gray-900' ] };
 		box-shadow: inset 0 0 0 1px ${ theme.colors[ 'dark-gray-300' ] }, inset 0 0 0 2px ${ theme.colors.white };
 		outline: 2px solid transparent;
+		${ focusedStyle ? focusedStyle : '' }
 	}
 
-  &:hover {
-    ${ hoverStyle ? hoverStyle : '' }
-  }
-
-  &:focus {
-    ${ focusedStyle ? focusedStyle : '' }
-  }
-
-  &:disabled {
-    ${ disabledStyle ? disabledStyle : '' }
-  }
 	@keyframes components-button__busy-animation {
 		0% {
 			background-position: 200px 0;

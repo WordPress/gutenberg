@@ -177,6 +177,18 @@ export class PostPreviewButton extends Component {
 		return (
 			<Button
 				isSecondary
+				hoverStyle={ `
+					color: red;
+				` }
+				activeStyle={ `
+					color: yellow;
+				` }
+				disabledStyle={ `
+					color: green;
+				` }
+				focusedStyle={ `
+					color: blue;
+				` }
 				className="editor-post-preview"
 				href={ href }
 				target={ this.getWindowTarget() }
