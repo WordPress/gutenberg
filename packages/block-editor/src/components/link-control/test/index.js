@@ -518,11 +518,17 @@ describe( 'Default search suggestions', () => {
 } );
 
 describe( 'Creating pages', () => {
-	// These Pages must not match an page returned by `fauxEntitySuggestions`
 	it.each( [
-		'Pagetitlethatwillnotmatchexistingfixtureresults', // no spaces
-		'Page title that will not match existing fixture results', // with spaces
+		'HelloWorld', // no spaces
+		'Hello World', // with spaces
 	] )( 'should display option to create a link for a valid Page title "%s"', async ( pageNameText ) => {
+		const noResults = [];
+
+		// Force returning empty results for existing Pages, meaning only item
+		// shown should be "Create Page" because our input does not confirm to a
+		// direct entry schema (eg: a URL).
+		mockFetchSearchSuggestions.mockImplementation( Promise.resolve( noResults ) );
+
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( null );
 
