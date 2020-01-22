@@ -22,7 +22,7 @@ import {
 } from '@wordpress/block-editor';
 
 import { createBlock } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import {
 	Button,
 	PanelBody,
@@ -61,6 +61,7 @@ function Navigation( {
 	//
 	/* eslint-disable @wordpress/no-unused-vars-before-return */
 	const ref = useRef();
+	const { selectBlock } = useDispatch( 'core/block-editor' );
 
 	const {
 		TextColor,
@@ -127,6 +128,7 @@ function Navigation( {
 
 	function handleCreateFromExistingPages() {
 		updateNavItemBlocks( defaultPagesNavigationItems );
+		selectBlock( clientId );
 	}
 
 	const hasPages = hasResolvedPages && pages && pages.length;
