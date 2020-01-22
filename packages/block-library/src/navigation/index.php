@@ -190,11 +190,9 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_l
 		$has_submenu = count( (array) $block['innerBlocks'] ) > 0;
 
 		$html .= '<li class="wp-block-navigation-link' . ( $has_submenu ? ' has-child' : '' ) . '">' .
-			'<a class="wp-block-navigation-link__content"';
+			'<a';
 
-		if ( $is_level_zero ) {
-			$html .= $class_attribute . $style_attribute;
-		}
+		$html .= $class_attribute . $style_attribute;
 
 		// Start appending HTML attributes to anchor tag.
 		if ( isset( $block['attrs']['url'] ) ) {
