@@ -13,9 +13,10 @@ import { useCallback, useState, Fragment } from '@wordpress/element';
 import {
 	safeDecodeURI,
 	filterURLForDisplay,
-	isURL,
 	prependHTTP,
 	getProtocol,
+	isValidFragment,
+	isUri,
 } from '@wordpress/url';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -85,31 +86,22 @@ function LinkControl( {
 	};
 
 	const handleEntitySearch = async ( val, args ) => {
-		const results = await Promise.all( [
-			fetchSearchSuggestions( val, {
-				...( args.isInitialSuggestions ? { perPage: 3 } : {} ),
-			} ),
-			handleDirectEntry( val ),
-		] );
+		return await fetchSearchSuggestions( val, {
+			...( args.isInitialSuggestions ? { perPage: 3 } : {} ),
+		} );
+	};
 
-		const couldBeURL = ! val.includes( ' ' );
+	const couldBeURI = function( val ) {
+		const isInternal = startsWith( val, '#' ) && isValidFragment( val );
+		const includesWWW = !! ( val && val.includes( 'www.' ) );
 
-		// If it's potentially a URL search then concat on a URL search suggestion
-		// just for good measure. That way once the actual results run out we always
-		// have a URL option to fallback on.
-		return couldBeURL && ! args.isInitialSuggestions ? results[ 0 ].concat( results[ 1 ] ) : results[ 0 ];
+		return isUri( val ) || includesWWW || isInternal;
 	};
 
 	// Effects
 	const getSearchHandler = useCallback( ( val, args ) => {
-		const protocol = getProtocol( val ) || '';
-		const isMailto = protocol.includes( 'mailto' );
-		const isInternal = startsWith( val, '#' );
-		const isTel = protocol.includes( 'tel' );
-
-		const handleManualEntry = isInternal || isMailto || isTel || isURL( val ) || ( val && val.includes( 'www.' ) );
-
-		return ( handleManualEntry ) ? handleDirectEntry( val, args ) : handleEntitySearch( val, args );
+		// If it has a fragment and it is valid
+		return ( couldBeURI( val ) ) ? handleDirectEntry( val, args ) : handleEntitySearch( val, args );
 	}, [ handleDirectEntry, fetchSearchSuggestions ] );
 
 	// Render Components
