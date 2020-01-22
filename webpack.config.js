@@ -26,9 +26,13 @@ const {
 } = process.env;
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
+const BUNDLED_PACKAGES = [ '@wordpress/icons' ];
 
 const gutenbergPackages = Object.keys( dependencies )
-	.filter( ( packageName ) => packageName.startsWith( WORDPRESS_NAMESPACE ) )
+	.filter( ( packageName ) =>
+		! BUNDLED_PACKAGES.includes( packageName ) &&
+		packageName.startsWith( WORDPRESS_NAMESPACE )
+	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
 module.exports = {

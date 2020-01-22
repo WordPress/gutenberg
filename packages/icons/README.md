@@ -15,7 +15,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ## Usage
 
 ```js
-import { __experimentalIcon as Icon, check } from '@wordpress/icons';
+import { Icon, check } from '@wordpress/icons';
 
 <Icon icon={ check } />
 ```
