@@ -252,7 +252,7 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_l
 
 		$html .= '</li>';
 	}
-	return '<ul>' . $html . '</ul>';
+	return '<ul class="wp-block-navigation__container">' . $html . '</ul>';
 }
 
 /**
