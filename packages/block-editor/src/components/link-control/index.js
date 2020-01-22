@@ -16,7 +16,7 @@ import {
 	prependHTTP,
 	getProtocol,
 	isValidFragment,
-	isUri,
+	isURI,
 } from '@wordpress/url';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -95,7 +95,7 @@ function LinkControl( {
 		const isInternal = startsWith( val, '#' ) && isValidFragment( val );
 		const includesWWW = !! ( val && val.includes( 'www.' ) );
 
-		return isUri( val ) || includesWWW || isInternal;
+		return isURI( val ) || includesWWW || isInternal;
 	};
 
 	// Effects

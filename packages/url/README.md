@@ -230,6 +230,7 @@ _Returns_
 <a name="isURI" href="#isURI">#</a> **isURI**
 
 Determines whether the given string looks like a URI (of any type).
+See <https://url.spec.whatwg.org/#url-representation> for more info.
 
 _Usage_
 

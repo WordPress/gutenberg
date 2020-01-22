@@ -1,10 +1,11 @@
 /**
  * External dependencies
  */
-import { isUri } from 'valid-url';
+import { URL } from 'whatwg-url';
 
 /**
  * Determines whether the given string looks like a URI (of any type).
+ * See https://url.spec.whatwg.org/#url-representation for more info.
  *
  * @param {string} uri The string to scrutinise.
  *
@@ -17,5 +18,10 @@ import { isUri } from 'valid-url';
  * @return {boolean} Whether or not it looks like a URI.
  */
 export function isURI( uri ) {
-	return isUri( uri );
+	try {
+		new URL( uri );
+		return true;
+	} catch ( _ ) {
+		return false;
+	}
 }
