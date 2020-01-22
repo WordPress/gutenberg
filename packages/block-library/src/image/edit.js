@@ -175,12 +175,17 @@ export class ImageEdit extends Component {
 
 		let mediaAttributes = pickRelevantMediaFiles( media );
 
-		// If an alt or caption text was meanwhile written by the user,
-		// make sure the text is not overwritten by empty captions
-		if ( alt || ! get( mediaAttributes, [ 'alt' ] ) ) {
-			mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
+		// If the current image is temporary but an alt text was meanwhile written by the user,
+		// make sure the text is not overwritten.
+		if ( isTemporaryImage( id, url ) ) {
+			if ( alt ) {
+				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
+			}
 		}
-		if ( caption || ! get( mediaAttributes, [ 'caption' ] ) ) {
+
+		// If a caption text was meanwhile written by the user,
+		// make sure the text is not overwritten by empty captions
+		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
 			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
 		}
 
