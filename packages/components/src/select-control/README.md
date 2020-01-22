@@ -81,38 +81,42 @@ Use sentences in your menu.
 
 Render a user interface to select the size of an image.
 
-    import { SelectControl } from '@wordpress/components';
-    import { withState } from '@wordpress/compose';
+```jsx
+import { SelectControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-    const MySelectControl = withState( {
-        size: '50%',
-    } )( ( { size, setState } ) => (
-        <SelectControl
-            label="Size"
-            value={ size }
-            options={ [
-                { label: 'Big', value: '100%' },
-                { label: 'Medium', value: '50%' },
-                { label: 'Small', value: '25%' },
-            ] }
-            onChange={ ( size ) => { setState( { size } ) } }
-        />
-    ) );
+const MySelectControl = withState( {
+    size: '50%',
+} )( ( { size, setState } ) => (
+    <SelectControl
+        label="Size"
+        value={ size }
+        options={ [
+            { label: 'Big', value: '100%' },
+            { label: 'Medium', value: '50%' },
+            { label: 'Small', value: '25%' },
+        ] }
+        onChange={ ( size ) => { setState( { size } ) } }
+    />
+) );
+```
 
 Render a user interface to select multiple users from a list.
 
-        <SelectControl
-            multiple
-            label={ __( 'Select some users:' ) }
-            value={ this.state.users } // e.g: value = [ 'a', 'c' ]
-            onChange={ ( users ) => { this.setState( { users } ) } }
-            options={ [
-                { value: null, label: 'Select a User', disabled: true },
-                { value: 'a', label: 'User A' },
-                { value: 'b', label: 'User B' },
-                { value: 'c', label: 'User c' },
-            ] }
-        />
+```jsx
+<SelectControl
+    multiple
+    label={ __( 'Select some users:' ) }
+    value={ this.state.users } // e.g: value = [ 'a', 'c' ]
+    onChange={ ( users ) => { this.setState( { users } ) } }
+    options={ [
+        { value: null, label: 'Select a User', disabled: true },
+        { value: 'a', label: 'User A' },
+        { value: 'b', label: 'User B' },
+        { value: 'c', label: 'User c' },
+    ] }
+/>
+```
 
 ### Props
 
