@@ -316,10 +316,6 @@ function LinkControl( {
 							searchTerm={ inputValue }
 							onClick={ async () => {
 								setIsResolvingLink( true );
-								onChange( {
-									title: 'Loading link...',
-									url: 'loading...',
-								} );
 								const newPage = await createEmptyPage( inputValue );
 								// TODO: handle error from API
 								onChange( {
