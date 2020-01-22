@@ -1,65 +1,87 @@
+/*
+* Frontend: reset the default list styles
+*/
+
+.wp-block-navigation > ul {
+	display: block;
+	list-style: none;
+	margin: 0;
+	padding-left: 0;
+
+	@include break-small {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	// Submenu
+	ul {
+		list-style: none;
+		padding-left: 0;
+		margin-left: 0;
+
+		li {
+			margin: 0;
+		}
+	}
+}
+
+/*
+* Frontend: styles for submenu flyout
+*/
+
+.wp-block-navigation > ul {
+	li {
+		position: relative;
+		z-index: 1;
+
+		&:hover,
+		&:focus-within {
+			cursor: pointer;
+			z-index: 99999;
+		}
+
+		// Submenu Display
+		&:hover > ul,
+		&:focus-within > ul,
+		& ul:hover,
+		& ul:focus {
+			visibility: visible;
+			opacity: 1;
+			display: block;
+		}
+	}
+
+	& > li > ul {
+		position: absolute;
+		left: 0;
+		top: 80%;
+		min-width: max-content;
+		opacity: 0;
+		transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
+		transform: translateY(0.6rem);
+		visibility: hidden;
+	}
+}
+
+/*
+* Shared styles between editor and frontend
+*/
+
 .wp-block-navigation {
 
-	// Frontend: list style reset
-	& > ul {
-		display: block;
-		list-style: none;
-		margin: 0;
-		padding-left: 0;
-
-		@include break-small {
-			display: flex;
-			flex-wrap: wrap;
-		}
-
-		// Sub-menu
-		ul {
-			list-style: none;
-			padding-left: 0;
-			margin-left: 0;
-
-			li {
-				margin: 0;
-			}
-		}
+	// reset rotation of submenu indicator icons on nested levels
+	.wp-block-navigation-link .wp-block-navigation-link svg {
+		transform: rotate(0);
 	}
+}
 
-	// Frontend: submenu flyout
-	& > ul {
-		li {
-			position: relative;
-			z-index: 1;
 
-			&:hover,
-			&:focus-within {
-				cursor: pointer;
-				z-index: 99999;
-			}
+/*
+* TODO: organize/untangle styles below this line
+*/
 
-			// Submenu Display
-			&:hover > ul,
-			&:focus-within > ul,
-			& ul:hover,
-			& ul:focus {
-				visibility: visible;
-				opacity: 1;
-				display: block;
-			}
-		}
+.wp-block-navigation {
 
-		& > li > ul {
-			position: absolute;
-			left: 0;
-			top: 80%;
-			min-width: max-content;
-			opacity: 0;
-			transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
-			transform: translateY(0.6rem);
-			visibility: hidden;
-		}
-	}
-
-	// TODO: these styles should be shared between editor & Frontend
 	& > ul {
 		& > li {
 			& > a {
@@ -90,12 +112,6 @@
 		}
 	}
 
-	// Navigation Link
-	a {
-		display: block;
-		padding: 16px;
-	}
-
 	&.items-justified-left > ul {
 		justify-content: flex-start;
 	}
@@ -106,11 +122,6 @@
 
 	&.items-justified-right > ul {
 		justify-content: flex-end;
-	}
-
-	// reset rotation of submenu indicator icons on nested levels
-	.wp-block-navigation-link .wp-block-navigation-link svg {
-		transform: rotate(0);
 	}
 
 	// Default Style / Light styles.
