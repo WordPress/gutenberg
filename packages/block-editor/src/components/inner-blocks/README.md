@@ -71,7 +71,7 @@ The previous code block restricts all blocks, so only child blocks explicitly re
 * **Type:** `Array<Array<Object>>`
 
 The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc. Block templates allow specifying a default initial state for an InnerBlocks area.
-More information about templates can be found in [template docs](/docs/developers/block-api/block-templates.md).
+More information about templates can be found in [template docs](/docs/designers-developers/developers/block-api/block-templates.md).
 
 ```jsx
 const TEMPLATE = [ [ 'core/columns', {}, [
