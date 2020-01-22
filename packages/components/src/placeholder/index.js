@@ -27,13 +27,19 @@ function Placeholder( {
 	...additionalProps
 } ) {
 	const [ resizeListener, { width } ] = useResizeAware();
-	const classes = classnames(
-		'components-placeholder',
-		width >= 320 ? 'is-large' : '',
-		width >= 160 && width < 320 ? 'is-medium' : '',
-		width < 160 ? 'is-small' : '',
-		className
-	);
+
+	// Since `useResizeAware` will report a width of `null` until after the
+	// first render, avoid applying any modifier classes until width is known.
+	let modifierClassNames;
+	if ( typeof width === 'number' ) {
+		modifierClassNames = {
+			'is-large': width >= 320,
+			'is-medium': width >= 160 && width < 320,
+			'is-small': width < 160,
+		};
+	}
+
+	const classes = classnames( 'components-placeholder', className, modifierClassNames );
 	const fieldsetClasses = classnames( 'components-placeholder__fieldset', {
 		'is-column-layout': isColumnLayout,
 	} );
