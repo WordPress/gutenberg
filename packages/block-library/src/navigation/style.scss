@@ -19,6 +19,7 @@ $navigation-height: 60px;
 	ul {
 		list-style: none;
 		padding-left: 0;
+		margin-top: 0;
 		margin-left: 0;
 
 		li {
@@ -107,7 +108,7 @@ $navigation-height: 60px;
 			// Position (nested levels)
 			.block-editor-inner-blocks,
 			.wp-block-navigation__container {
-				left: calc(100% + 8px); // TODO: use correct variable
+				left: calc(100% + #{$grid-size});
 				top: 0;
 			}
 		}
@@ -132,6 +133,10 @@ $navigation-height: 60px;
 	.wp-block-navigation-link.has-child > .wp-block-navigation__container {
 		display: block;
 		padding: $grid-size;
+
+		.wp-block-navigation__container {
+			left: calc(100% + #{$grid-size} * 2);
+		}
 	}
 }
 
