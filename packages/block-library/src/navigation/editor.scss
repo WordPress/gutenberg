@@ -78,31 +78,10 @@ $navigation-item-height: 46px;
 
 // Sub menus.
 .wp-block-navigation {
-	.wp-block-navigation-link {
-		position: relative;
 
-		// Only display inner blocks when the block is being edited.
-		> .block-editor-inner-blocks {
-			display: none;
-		}
-
-		&.is-editing.has-child > .block-editor-inner-blocks {
-			// Box model.
-			display: flex;
-			border-width: 1px;
-			border-style: solid;
-			border-radius: 2px;
-
-			// Position (level 1)
-			position: absolute;
-			z-index: 1;
-
-			// Position (deep levels).
-			.block-editor-inner-blocks {
-				left: calc(100% + 8px); // TODO: use correct variable
-				top: 0;
-			}
-		}
+	// Only display inner blocks when the block is being edited.
+	.wp-block-navigation-link > .block-editor-inner-blocks {
+		display: none;
 	}
 
 	// Inherit colors from menu.

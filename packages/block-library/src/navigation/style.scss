@@ -33,7 +33,6 @@ $navigation-height: 60px;
 
 .wp-block-navigation > ul {
 	li {
-		position: relative;
 		z-index: 1;
 
 		&:hover,
@@ -66,7 +65,7 @@ $navigation-height: 60px;
 }
 
 /*
-* Shared styles between editor and frontend
+* Styles shared between editor and frontend
 */
 .wp-block-navigation,
 .wp-block-navigation .block-editor-block-list__layout {
@@ -81,11 +80,59 @@ $navigation-height: 60px;
 	padding-top: 7px;
 	padding-bottom: 7px;
 	align-items: center;
+
+	// Submenus
+	.wp-block-navigation-link {
+		position: relative;
+		// Provide a base menu item margin.
+		// This should be the same inside the field,
+		// and the edit container should compensate.
+		// This is to make sure the edit and view are the same.
+		margin-left: $grid-size;
+		margin-right: $grid-size;
+		padding: 0 $grid-size;
+
+		&.has-child > .wp-block-navigation__container,
+		&.is-editing.has-child > .block-editor-inner-blocks {
+			// Box model
+			display: flex;
+			border-width: 1px;
+			border-style: solid;
+			border-radius: 2px;
+
+			// Position (first level)
+			position: absolute;
+			z-index: 1;
+
+			// Position (nested levels)
+			.block-editor-inner-blocks,
+			.wp-block-navigation__container {
+				left: calc(100% + 8px); // TODO: use correct variable
+				top: 0;
+			}
+		}
+	}
 }
 
 // reset rotation of submenu indicator icons on nested levels
 .wp-block-navigation-link .wp-block-navigation-link svg {
 	transform: rotate(0);
+}
+
+/*
+* Frontend: non-shared styles & overrides
+*/
+
+.wp-block-navigation {
+
+	.wp-block-navigation__container {
+		width: max-content;
+	}
+
+	.wp-block-navigation-link.has-child > .wp-block-navigation__container {
+		display: block;
+		padding: $grid-size;
+	}
 }
 
 /*
