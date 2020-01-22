@@ -522,21 +522,27 @@ describe( 'Creating pages', () => {
 		'HelloWorld', // no spaces
 		'Hello World', // with spaces
 	] )( 'should display option to create a link within the search results for input "%s"', async ( pageNameText ) => {
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( null );
+
+			return ( <LinkControl
+				value={ link }
+				showCreatePages={ true }
+				onChange={ ( suggestion ) => setLink( suggestion ) }
+				createEmptyPage={ ( title ) => Promise.resolve( {
+					type: 'page',
+					id: 123,
+					title: {
+						raw: title,
+						rendered: title,
+					},
+					link: '/?p=123',
+				} ) }
+			/> );
+		};
+
 		act( () => {
-			render(
-				<LinkControl
-					showCreatePages={ true }
-					createEmptyPage={ async ( title ) => ( {
-						type: 'page',
-						id: 123,
-						title: {
-							raw: title,
-							rendered: title,
-						},
-						link: '/?p=123',
-					} ) }
-				/>, container
-			);
+			render( <LinkControlConsumer />, container );
 		} );
 
 		// Search Input UI
@@ -556,6 +562,22 @@ describe( 'Creating pages', () => {
 
 		expect( createButton ).not.toBeNull();
 		expect( createButton.innerHTML ).toEqual( expect.stringContaining( pageNameText ) );
+
+		await act( async () => {
+			Simulate.click( createButton );
+		} );
+
+		await eventLoopTick();
+
+		// Also acts as implicit test for "Selected Link" UI
+		const currentLinkLabel = container.querySelector( '[aria-label="Currently selected"]' );
+
+		const currentLink = container.querySelector( `[aria-labelledby="${ currentLinkLabel.id }"]` );
+
+		const currentLinkHTML = currentLink.innerHTML;
+
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( pageNameText ) ); //title
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( '/?p=123' ) ); // slug
 	} );
 } );
 
