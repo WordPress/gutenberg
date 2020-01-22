@@ -250,7 +250,7 @@ class GalleryEdit extends Component {
 				imageSizes,
 				( { slug } ) => some( resizedImages, ( sizes ) => ( sizes[ slug ] ) )
 			),
-			( { name, slug } ) => ( { value: slug, label: name } )
+			( { name, slug, label } ) => ( { value: slug, label: label || name } )
 		);
 	}
 
