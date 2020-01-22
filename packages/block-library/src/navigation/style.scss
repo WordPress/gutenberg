@@ -1,21 +1,31 @@
 .wp-block-navigation {
+
+	// Frontend: list style reset
 	& > ul {
 		display: block;
 		list-style: none;
 		margin: 0;
-		max-width: none;
 		padding-left: 0;
-		position: relative;
 
 		@include break-small {
 			display: flex;
 			flex-wrap: wrap;
 		}
 
+		// Sub-menu
 		ul {
+			list-style: none;
 			padding-left: 0;
-		}
+			margin-left: 0;
 
+			li {
+				margin: 0;
+			}
+		}
+	}
+
+	// Frontend: submenu flyout
+	& > ul {
 		li {
 			position: relative;
 			z-index: 1;
@@ -37,9 +47,21 @@
 			}
 		}
 
-		// ToDo: move navigation-link styles to navigation-link/style.scss
-		& > li {
+		& > li > ul {
+			position: absolute;
+			left: 0;
+			top: 80%;
+			min-width: max-content;
+			opacity: 0;
+			transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
+			transform: translateY(0.6rem);
+			visibility: hidden;
+		}
+	}
 
+	// TODO: these styles should be shared between editor & Frontend
+	& > ul {
+		& > li {
 			& > a {
 				display: flex;
 				align-items: center;
@@ -66,52 +88,12 @@
 				}
 			}
 		}
-
-		// Sub-menus Flyout
-		& > li > ul {
-			margin: 0;
-			padding: 0 30px 0 10px;
-			position: absolute;
-			left: 0;
-			top: 80%;
-			min-width: max-content;
-			opacity: 0;
-			transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
-			transform: translateY(0.6rem);
-			visibility: hidden;
-
-			li {
-				margin: 0;
-
-				& > ul {
-					padding-left: 10px;
-				}
-			}
-
-			a {
-				text-decoration: none;
-
-				&:hover {
-					text-decoration: underline;
-				}
-			}
-
-			ul {
-				width: 100%;
-			}
-		}
 	}
 
 	// Navigation Link
 	a {
 		display: block;
 		padding: 16px;
-	}
-
-	// Sub-menu
-	ul ul {
-		list-style: none;
-		margin-left: 0;
 	}
 
 	&.items-justified-left > ul {
