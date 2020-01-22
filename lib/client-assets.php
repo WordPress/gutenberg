@@ -216,17 +216,17 @@ function gutenberg_register_vendor_scripts( &$scripts ) {
 	gutenberg_register_vendor_script(
 		$scripts,
 		'react',
-		'https://unpkg.com/react@16.9.0/umd/react' . $react_suffix . '.js',
+		'https://unpkg.com/react@experimental/umd/react' . $react_suffix . '.js',
 		array( 'wp-polyfill' ),
-		'16.9.0',
+		'experimental',
 		true
 	);
 	gutenberg_register_vendor_script(
 		$scripts,
 		'react-dom',
-		'https://unpkg.com/react-dom@16.9.0/umd/react-dom' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@experimental/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' ),
-		'16.9.0',
+		'experimental',
 		true
 	);
 	gutenberg_register_vendor_script(
