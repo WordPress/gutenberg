@@ -59,7 +59,7 @@ async function updateActiveNavigationLink( { url, label } ) {
 	}
 
 	if ( label ) {
-		await page.click( '.wp-block-navigation-link__label.is-selected' );
+		await page.click( '.wp-block-navigation-link__label.is-rich-text-selected' );
 
 		// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
 		// to select all text like other tests do.
