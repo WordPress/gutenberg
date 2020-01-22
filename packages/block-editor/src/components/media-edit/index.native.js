@@ -3,7 +3,6 @@
  */
 import React from 'react';
 import {
-	requestMediaPicker,
 	requestMediaEditor,
 	mediaSources,
 } from 'react-native-gutenberg-bridge';
@@ -54,7 +53,7 @@ export class MediaEdit extends React.Component {
 	}
 
 	onPickerSelect( value ) {
-		const { allowedTypes = [], onSelect, multiple = false } = this.props;
+		const { onSelect, multiple = false } = this.props;
 
 		switch ( value ) {
 			case MEDIA_EDITOR:
@@ -65,7 +64,7 @@ export class MediaEdit extends React.Component {
 				} );
 				break;
 			default:
-				this.props.openReplaceMediaOptions()
+				this.props.openReplaceMediaOptions();
 		}
 	}
 
