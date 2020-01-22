@@ -306,6 +306,16 @@ export default function WritingFlow( { children } ) {
 	}
 
 	function onKeyDown( event ) {
+		// If the writing flow component is inside a parent that is hidden to
+		// assistive technologies, ignore the event. This typically happens
+		// when a modal is opened and `aria-hidden` is applied to an element
+		// wrapping this one. When that happens, keyboard input events (like
+		// those handled here) that change the focus can cause a modal to close
+		// unexpectedly. Returning early avoids that.
+		if ( container.current && container.current.closest( '[aria-hidden]' ) ) {
+			return;
+		}
+
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
