@@ -127,8 +127,16 @@ $navigation-height: 60px;
 			width: max-content;
 		}
 
+		&.has-child .wp-block-navigation-link__content {
+			min-width: 100%;
+			padding-right: 16px;
+			position: relative;
+		}
+
 		.wp-block-navigation-link__submenu-icon {
 			margin-left: 4px;
+			position: absolute;
+			right: 0;
 
 			svg {
 				fill: currentColor;
