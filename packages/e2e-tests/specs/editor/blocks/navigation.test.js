@@ -6,7 +6,6 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	insertBlock,
-	pressKeyWithModifier,
 	setUpResponseMocking,
 	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
@@ -66,15 +65,14 @@ async function updateActiveNavigationLink( { url, label } ) {
 	}
 
 	if ( label ) {
-		await page.click( '.is-selected .wp-block-navigation-link__label' );
-
+		// With https://github.com/WordPress/gutenberg/pull/19686, we're auto-selecting the label so we don't need to manually select this here. Leaving this code in place though as we may not always do this.
 		// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
 		// to select all text like other tests do.
 		// Unfortunately, these tests don't seem to pass on Travis CI when
 		// using that approach, while using `Home` and `End` they do pass.
-		await page.keyboard.press( 'Home' );
-		await pressKeyWithModifier( 'shift', 'End' );
-		await page.keyboard.press( 'Backspace' );
+		// await page.keyboard.press( 'Home' );
+		// await pressKeyWithModifier( 'shift', 'End' );
+		// await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( label );
 	}
 }
