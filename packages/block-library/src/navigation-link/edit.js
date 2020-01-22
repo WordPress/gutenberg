@@ -226,6 +226,7 @@ function NavigationLinkEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
+								showCreatePages={ true }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
