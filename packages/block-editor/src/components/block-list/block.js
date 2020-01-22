@@ -90,6 +90,10 @@ function BlockListBlock( {
 	// Reference of the wrapper
 	const wrapper = useRef( null );
 
+	// Provide the selected node, or the first and last nodes of a multi-
+	// selection, so it can be used to position the contextual block toolbar.
+	// We only provide what is necessary, and remove the nodes again when they
+	// are no longer selected.
 	useLayoutEffect( () => {
 		if ( isSelected || isFirstMultiSelected || isLastMultiSelected ) {
 			const node = wrapper.current;
