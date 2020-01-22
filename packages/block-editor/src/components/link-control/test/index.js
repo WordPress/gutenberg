@@ -527,7 +527,7 @@ describe( 'Creating pages', () => {
 		// Force returning empty results for existing Pages, meaning only item
 		// shown should be "Create Page" because our input does not confirm to a
 		// direct entry schema (eg: a URL).
-		mockFetchSearchSuggestions.mockImplementation( Promise.resolve( noResults ) );
+		mockFetchSearchSuggestions.mockImplementation( () => Promise.resolve( noResults ) );
 
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( null );
