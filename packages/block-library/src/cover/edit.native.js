@@ -36,12 +36,12 @@ import { COVER_MIN_HEIGHT, IMAGE_BACKGROUND_TYPE, VIDEO_BACKGROUND_TYPE } from '
  * Constants
  */
 const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE ];
-const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/list' ];
 const INNER_BLOCKS_TEMPLATE = [
 	[ 'core/paragraph', {
 		align: 'center',
 		fontSize: 'large',
 		placeholder: __( 'Write title…' ),
+		textColor: 'very-light-gray',
 	} ],
 ];
 const COVER_MAX_HEIGHT = 1000;
@@ -168,7 +168,6 @@ const Cover = ( {
 				style={ [ styles.backgroundContainer, { height: CONTAINER_HEIGHT } ] }>
 				<View style={ styles.content } >
 					<InnerBlocks
-						allowedBlocks={ ALLOWED_BLOCKS }
 						template={ INNER_BLOCKS_TEMPLATE }
 					/>
 				</View>
