@@ -118,6 +118,14 @@ $navigation-height: 60px;
 			align-items: center;
 			width: max-content;
 		}
+
+		.wp-block-navigation-link__submenu-icon {
+			margin-left: 4px;
+
+			svg {
+				fill: currentColor;
+			}
+		}
 	}
 }
 
@@ -166,14 +174,6 @@ $navigation-height: 60px;
 
 			&:last-of-type > a {
 				padding-right: 0;
-			}
-
-			.wp-block-navigation-link__submenu-icon {
-				margin-left: 4px;
-
-				svg {
-					fill: currentColor;
-				}
 			}
 		}
 	}
