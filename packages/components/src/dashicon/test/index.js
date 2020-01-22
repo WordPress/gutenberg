@@ -4,10 +4,14 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { SVG } from '@wordpress/primitives';
+
+/**
  * Internal dependencies
  */
 import Dashicon from '../';
-import { SVG } from '../../primitives';
 
 describe( 'Dashicon', () => {
 	describe( 'basic rendering', () => {

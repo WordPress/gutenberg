@@ -28,6 +28,7 @@ import {
 	PanelBody,
 	Placeholder,
 	Spinner,
+	ToggleControl,
 	Toolbar,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -216,6 +217,19 @@ function Navigation( {
 				</PanelBody>
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
+			<InspectorControls>
+				<PanelBody
+					title={ __( 'Display Settings' ) }
+				>
+					<ToggleControl
+						checked={ attributes.showSubmenuIcon }
+						onChange={ ( value ) => {
+							setAttributes( { showSubmenuIcon: value } );
+						} }
+						label={ __( 'Show submenu icon for top-level items' ) }
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<TextColor>
 				<BackgroundColor>
 					<div

@@ -51,20 +51,15 @@ afterEach( () => {
 } );
 
 describe( 'Basic rendering', () => {
-	it( 'should display with required props', () => {
+	it( 'should render', () => {
 		act( () => {
-			render(
-				<LinkControl
-				/>, container
-			);
+			render( <LinkControl />, container );
 		} );
 
 		// Search Input UI
 		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
-		// expect( searchInputLabel ).not.toBeNull();
 		expect( searchInput ).not.toBeNull();
-
 		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 } );
@@ -450,7 +445,7 @@ describe( 'Selecting links', () => {
 
 		// We should be back to showing the search input
 		expect( searchInput ).not.toBeNull();
-		expect( searchInput.value ).toBe( selectedLink.title ); // prepopulated with previous link's title
+		expect( searchInput.value ).toBe( selectedLink.url ); // prepopulated with previous link's URL
 		expect( currentLinkUI ).toBeNull();
 	} );
 
@@ -465,7 +460,7 @@ describe( 'Selecting links', () => {
 			} ], // url
 		] )( 'should display a current selected link UI when a %s suggestion for the search "%s" is clicked', async ( type, searchTerm, selectedLink ) => {
 			const LinkControlConsumer = () => {
-				const [ link, setLink ] = useState( null );
+				const [ link, setLink ] = useState();
 
 				return (
 					<LinkControl
@@ -524,7 +519,7 @@ describe( 'Selecting links', () => {
 			} ], // url
 		] )( 'should display a current selected link UI when an %s suggestion for the search "%s" is selected using the keyboard', async ( type, searchTerm, selectedLink ) => {
 			const LinkControlConsumer = () => {
-				const [ link, setLink ] = useState( null );
+				const [ link, setLink ] = useState();
 
 				return (
 					<LinkControl
@@ -542,6 +537,7 @@ describe( 'Selecting links', () => {
 
 			// Search Input UI
 			const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+			const form = container.querySelector( 'form' );
 
 			// Simulate searching for a term
 			act( () => {
@@ -592,6 +588,9 @@ describe( 'Selecting links', () => {
 			// Commit the selected item as the current link
 			act( () => {
 				Simulate.keyDown( searchInput, { keyCode: ENTER } );
+			} );
+			act( () => {
+				Simulate.submit( form );
 			} );
 
 			// Check that the suggestion selected via is now shown as selected

@@ -29,14 +29,16 @@ function VisualEditor() {
 			<VisualEditorGlobalKeyboardShortcuts />
 			<MultiSelectScrollIntoView />
 			<Typewriter>
-				<WritingFlow>
-					<ObserveTyping>
-						<CopyHandler>
-							<PostTitle />
-							<BlockList />
-						</CopyHandler>
-					</ObserveTyping>
-				</WritingFlow>
+				<CopyHandler>
+					<WritingFlow>
+						<ObserveTyping>
+							<CopyHandler>
+								<PostTitle />
+								<BlockList />
+							</CopyHandler>
+						</ObserveTyping>
+					</WritingFlow>
+				</CopyHandler>
 			</Typewriter>
 			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }
