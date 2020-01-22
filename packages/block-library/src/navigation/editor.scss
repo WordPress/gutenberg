@@ -76,37 +76,6 @@ $navigation-item-height: 46px;
 	}
 }
 
-// Sub menus.
-.wp-block-navigation {
-
-	// Only display inner blocks when the block is being edited.
-	.wp-block-navigation-link > .block-editor-inner-blocks {
-		display: none;
-	}
-
-	// No text color - Default / Light styles
-	&:not(.has-text-color) .wp-block-navigation-link > .block-editor-inner-blocks {
-		color: $light-style-sub-menu-background-color;
-		border-color: $light-style-sub-menu-background-color;
-	}
-
-	// No background color - Default / Light styles
-	&:not(.has-background-color) .wp-block-navigation-link > .block-editor-inner-blocks {
-		background-color: $light-style-sub-menu-background-color;
-	}
-
-	// No text color - Dark styles
-	&:not(.has-text-color).is-style-dark .wp-block-navigation-link > .block-editor-inner-blocks {
-		color: $dark-style-sub-menu-text-color;
-		border-color: $dark-style-sub-menu-border-color;
-	}
-
-	// No background color - Dark styles
-	&:not(.has-background-color).is-style-dark .wp-block-navigation-link > .block-editor-inner-blocks {
-		background-color: $dark-style-sub-menu-background-color;
-	}
-}
-
 .wp-block-navigation__inserter-content {
 	padding: $grid-size-large;
 }
