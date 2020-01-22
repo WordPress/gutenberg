@@ -278,7 +278,9 @@ const Popover = ( {
 			let relativeOffsetTop = 0;
 
 			// If there is a positioned ancestor element that is not the body,
-			// subtract the position from the anchor rect.
+			// subtract the position from the anchor rect. If the position of
+			// the popover is fixed, the offset parent is null or the body
+			// element, in which case the position is relative to the viewport.
 			// See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent
 			if ( offsetParent && offsetParent !== ownerDocument.body ) {
 				const offsetParentRect = offsetParent.getBoundingClientRect();
