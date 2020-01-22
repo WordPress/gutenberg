@@ -579,6 +579,40 @@ describe( 'Creating pages', () => {
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( pageNameText ) ); //title
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( '/?p=123' ) ); // slug
 	} );
+
+	it.each( [
+		'https://wordpress.org',
+		'www.wordpress.org',
+		'mailto:example123456@wordpress.org',
+		'tel:example123456@wordpress.org',
+		'#internal-anchor',
+	] )( 'should not show option to "Create Page" when text is a form of direct entry (eg: %s)', async ( inputText ) => {
+		act( () => {
+			render(
+				<LinkControl
+					showCreatePages={ true }
+					createEmptyPage={ jest.fn() }
+				/>, container
+			);
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: inputText } } );
+		} );
+
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+
+		const createButton = Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new Page' ) );
+
+		expect( createButton ).toBeNull();
+	} );
 } );
 
 describe( 'Selecting links', () => {
