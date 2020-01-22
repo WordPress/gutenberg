@@ -210,6 +210,9 @@ describe( 'Embedding content', () => {
 		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
 		await page.keyboard.press( 'Enter' );
 
+		// Wait for the request to fail and present an error.
+		await page.waitForSelector( '.components-placeholder__error' );
+
 		await clickButton( 'Convert to link' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -232,6 +235,10 @@ describe( 'Embedding content', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
 		await page.keyboard.press( 'Enter' );
+
+		// Wait for the request to fail and present an error.
+		await page.waitForSelector( '.components-placeholder__error' );
+
 		// Set up a different mock to make sure that try again actually does make the request again.
 		await setUpResponseMocking( [
 			{
