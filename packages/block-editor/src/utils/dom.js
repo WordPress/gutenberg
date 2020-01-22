@@ -8,32 +8,18 @@
  *
  * @return {Element} Block DOM node.
  */
-export function getBlockDOMNode( clientId, scope = document ) {
-	return scope.querySelector( '[data-block="' + clientId + '"]' );
+export function getBlockDOMNode( clientId ) {
+	return document.getElementById( 'block-' + clientId );
 }
 
-export function getBlockPreviewContainerDOMNode( clientId, scope ) {
-	const domNode = getBlockDOMNode( clientId, scope );
+export function getBlockPreviewContainerDOMNode( clientId ) {
+	const domNode = getBlockDOMNode( clientId );
 
 	if ( ! domNode ) {
 		return;
 	}
 
 	return domNode.firstChild || domNode;
-}
-
-/**
- * Given a block client ID, returns the corresponding DOM node for the block
- * focusable wrapper, if exists. As much as possible, this helper should be
- * avoided, and used only in cases where isolated behaviors need remote access
- * to a block node.
- *
- * @param {string} clientId Block client ID.
- *
- * @return {Element} Block DOM node.
- */
-export function getBlockFocusableWrapper( clientId ) {
-	return getBlockDOMNode( clientId ).closest( '.block-editor-block-list__block' );
 }
 
 /**
@@ -57,7 +43,7 @@ export function isBlockFocusStop( element ) {
  * @return {boolean} Whether elements are in the same block.
  */
 export function isInSameBlock( a, b ) {
-	return a.closest( '[data-block]' ) === b.closest( '[data-block]' );
+	return a.closest( '.block-editor-block-list__block' ) === b.closest( '.block-editor-block-list__block' );
 }
 
 /**
@@ -85,4 +71,25 @@ export function isInsideRootBlock( blockElement, element ) {
  */
 export function hasInnerBlocksContext( element ) {
 	return !! element.querySelector( '.block-editor-block-list__layout' );
+}
+
+/**
+ * Finds the block client ID given any DOM node inside the block.
+ *
+ * @param {Node} node DOM node.
+ *
+ * @return {string|undefined} Client ID or undefined if the node is not part of a block.
+ */
+export function getBlockClientId( node ) {
+	if ( node.nodeType !== node.ELEMENT_NODE ) {
+		node = node.parentElement;
+	}
+
+	const blockNode = node.closest( '.wp-block' );
+
+	if ( ! blockNode ) {
+		return;
+	}
+
+	return blockNode.id.slice( 'block-'.length );
 }

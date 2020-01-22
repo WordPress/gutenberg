@@ -27,6 +27,11 @@ export const settings = {
 		multiple: false,
 	},
 	example: {},
+	__experimentalLabel( attributes, { context } ) {
+		if ( context === 'accessibility' ) {
+			return attributes.customText;
+		}
+	},
 	transforms,
 	edit,
 	save,

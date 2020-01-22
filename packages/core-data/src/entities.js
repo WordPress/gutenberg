@@ -17,6 +17,7 @@ export const defaultEntities = [
 	{ name: 'media', kind: 'root', baseURL: '/wp/v2/media', plural: 'mediaItems' },
 	{ name: 'taxonomy', kind: 'root', key: 'slug', baseURL: '/wp/v2/taxonomies', plural: 'taxonomies' },
 	{ name: 'widgetArea', kind: 'root', baseURL: '/__experimental/widget-areas', plural: 'widgetAreas', transientEdits: { blocks: true } },
+	{ name: 'user', kind: 'root', baseURL: '/wp/v2/users', plural: 'users' },
 ];
 
 export const kinds = [

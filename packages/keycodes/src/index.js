@@ -25,6 +25,17 @@ import { __ } from '@wordpress/i18n';
 import { isAppleOS } from './platform';
 
 /**
+ * @typedef {'primary'|'primaryShift'|'primaryAlt'|'secondary'|'access'|'ctrl'|'alt'|'ctrlShift'|'shift'|'shiftAlt'} WPKeycodeModifier
+ */
+
+/**
+ * An object of handler functions for each of the possible modifier
+ * combinations. A handler will return a value for a given key.
+ *
+ * @typedef {{[M in WPKeycodeModifier]:(key:string)=>any}} WPKeycodeHandlerByModifier
+ */
+
+/**
  * Keycode for BACKSPACE key.
  */
 export const BACKSPACE = 8;
@@ -118,7 +129,7 @@ export const modifiers = {
  * E.g. rawShortcut.primary( 'm' ) will return 'meta+m' on Mac.
  * These are intended for user with the KeyboardShortcuts component or TinyMCE.
  *
- * @type {Object} Keyed map of functions to raw shortcuts.
+ * @type {WPKeycodeHandlerByModifier} Keyed map of functions to raw shortcuts.
  */
 export const rawShortcut = mapValues( modifiers, ( modifier ) => {
 	return ( character, _isApple = isAppleOS ) => {
@@ -130,7 +141,8 @@ export const rawShortcut = mapValues( modifiers, ( modifier ) => {
  * Return an array of the parts of a keyboard shortcut chord for display
  * E.g displayShortcutList.primary( 'm' ) will return [ '⌘', 'M' ] on Mac.
  *
- * @type {Object} keyed map of functions to shortcut sequences
+ * @type {WPKeycodeHandlerByModifier} Keyed map of functions to shortcut
+ *                                    sequences.
  */
 export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 	return ( character, _isApple = isAppleOS ) => {
@@ -161,7 +173,8 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
  * An object that contains functions to display shortcuts.
  * E.g. displayShortcut.primary( 'm' ) will return '⌘M' on Mac.
  *
- * @type {Object} Keyed map of functions to display shortcuts.
+ * @type {WPKeycodeHandlerByModifier} Keyed map of functions to display
+ *                                    shortcuts.
  */
 export const displayShortcut = mapValues( displayShortcutList, ( shortcutList ) => {
 	return ( character, _isApple = isAppleOS ) => shortcutList( character, _isApple ).join( '' );
@@ -170,6 +183,9 @@ export const displayShortcut = mapValues( displayShortcutList, ( shortcutList ) 
 /**
  * An object that contains functions to return an aria label for a keyboard shortcut.
  * E.g. shortcutAriaLabel.primary( '.' ) will return 'Command + Period' on Mac.
+ *
+ * @type {WPKeycodeHandlerByModifier} Keyed map of functions to shortcut ARIA
+ *                                    labels.
  */
 export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 	return ( character, _isApple = isAppleOS ) => {
@@ -199,7 +215,7 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
  * E.g. isKeyboardEvent.primary( event, 'm' ) will return true if the event
  * signals pressing ⌘M.
  *
- * @type {Object} Keyed map of functions to match events.
+ * @type {WPKeycodeHandlerByModifier} Keyed map of functions to match events.
  */
 export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 	return ( event, character, _isApple = isAppleOS ) => {

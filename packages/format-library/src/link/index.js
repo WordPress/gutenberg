@@ -91,7 +91,7 @@ export const link = {
 		}
 
 		render() {
-			const { isActive, activeAttributes, value, onChange } = this.props;
+			const { isActive, activeAttributes, value, onChange, onFocus } = this.props;
 
 			return (
 				<>
@@ -124,12 +124,14 @@ export const link = {
 						shortcutCharacter="k"
 					/> }
 					<InlineLinkUI
+						key={ isActive } // Make sure link UI state resets when switching between links.
 						addingLink={ this.state.addingLink }
 						stopAddingLink={ this.stopAddingLink }
 						isActive={ isActive }
 						activeAttributes={ activeAttributes }
 						value={ value }
 						onChange={ onChange }
+						onFocus={ onFocus }
 					/>
 				</>
 			);

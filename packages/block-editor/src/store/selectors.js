@@ -149,7 +149,7 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, clientId ) => [
-		// Normally, we'd have both  `getBlockAttributes` dependancies and
+		// Normally, we'd have both `getBlockAttributes` dependencies and
 		// `getBlocks` (children) dependancies here but for performance reasons
 		// we use a denormalized cache key computed in the reducer that takes both
 		// the attributes and inner blocks into account. The value of the cache key
@@ -1525,4 +1525,15 @@ export function isNavigationMode( state ) {
  */
 export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
+}
+
+/**
+ * Gets the selected block's DOM node.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Element} The selected block's DOM node.
+ */
+export function __unstableGetSelectedMountedBlock( state ) {
+	return state.selectedMountedBlock;
 }

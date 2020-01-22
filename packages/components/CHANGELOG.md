@@ -1,18 +1,23 @@
-## Master
+## 9.0.0 (2020-01-13)
 
 ### New Features
 
 - Added a new `Guide` component which allows developers to easily present a user guide.
 
-### Breaking Change
+### Breaking Changes
 
 - `is-button` classname has been removed from the Button component.
 - The `is-default` classname is not applied automatically anymore.
 - By default Button components come with a fixed height and hover styles.
 
+### Bug Fixes
+
+- Fixes a regression published in version 8.5.0 that would prevent some build tools from including
+  styles provided in the packages build-styles directory.
+
 ### Deprecations
 
-- `isDefault` prop in `Button` has been deprecated. Consider using `isSecondary` instead. 
+- `isDefault` prop in `Button` has been deprecated. Consider using `isSecondary` instead.
 - `IconButton` has been deprecated. Use the `Button` component instead.
 
 ## 8.2.0 (2019-08-29)
@@ -33,7 +38,7 @@
 
 ### Deprecations
 
-- `menuLabel` prop in `DropdownComponent` has been deprecated. Consider using `menuProps` object and its `aria-label` property instead. 
+- `menuLabel` prop in `DropdownComponent` has been deprecated. Consider using `menuProps` object and its `aria-label` property instead.
 - `position` prop in `DropdownComponent` has been deprecated. Consider using `popoverProps` object and its `position` property instead.
 
 ### Bug Fixes
@@ -96,7 +101,7 @@
 
 ### Improvements
 
-- Limit `Base Control Label` to the width of its content. 
+- Limit `Base Control Label` to the width of its content.
 
 ### Bug fixes
 
