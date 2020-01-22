@@ -126,13 +126,14 @@ $navigation-height: 60px;
 				fill: currentColor;
 			}
 		}
+
+		// reset rotation of submenu indicator icons on nested levels
+		.wp-block-navigation-link svg {
+			transform: rotate(0);
+		}
 	}
 }
 
-// reset rotation of submenu indicator icons on nested levels
-.wp-block-navigation-link .wp-block-navigation-link svg {
-	transform: rotate(0);
-}
 
 /*
 * Frontend: non-shared styles & overrides
