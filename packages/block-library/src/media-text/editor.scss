@@ -75,14 +75,14 @@ figure.block-library-media-text__media-container {
 	display: none;
 }
 
-.wp-block-media-text.is-selected:not(.is-stacked-on-mobile) {
+.wp-block-media-text.is-appearing-selected:not(.is-stacked-on-mobile) {
 	.editor-media-container__resizer .components-resizable-box__handle {
 		display: block;
 	}
 }
 
 @include break-small {
-	.wp-block-media-text.is-selected.is-stacked-on-mobile {
+	.wp-block-media-text.is-appearing-selected.is-stacked-on-mobile {
 		.editor-media-container__resizer .components-resizable-box__handle {
 			display: block;
 		}
@@ -111,4 +111,3 @@ figure.block-library-media-text__media-container {
 		}
 	}
 }
-

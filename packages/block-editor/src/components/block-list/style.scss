@@ -1,4 +1,4 @@
-.block-editor-block-list__layout .block-editor-block-list__block.is-selected { // Needs specificity to override inherited styles.
+.block-editor-block-list__layout .block-editor-block-list__block.is-appearing-selected { // Needs specificity to override inherited styles.
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {
 		&::before {
@@ -106,7 +106,7 @@
 	}
 
 	// Selected style.
-	&.is-selected {
+	&.is-appearing-selected {
 		&::before {
 			// Use opacity to work in various editor styles.
 			border-color: $dark-opacity-light-800;
@@ -222,7 +222,7 @@
 		}
 	}
 
-	&.has-warning.is-selected::before {
+	&.has-warning.is-appearing-selected::before {
 		// Use opacity to work in various editor styles.
 		border-color: $dark-opacity-light-800;
 		border-left-color: transparent;
@@ -248,7 +248,7 @@
 		background-color: transparent;
 	}
 
-	&.has-warning.is-selected::after {
+	&.has-warning.is-appearing-selected::after {
 		bottom: ( $block-toolbar-height - $block-padding - $border-width );
 
 		@include break-small() {
@@ -257,7 +257,7 @@
 	}
 
 	// Reusable blocks.
-	&.is-reusable.is-selected::before {
+	&.is-reusable.is-appearing-selected::before {
 		border-left-color: transparent;
 		border-style: dashed;
 		border-width: $border-width;

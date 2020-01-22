@@ -90,7 +90,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await openBlockNavigator();
 		await pressKeyTimes( 'Tab', 4 );
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
+		await page.waitForSelector( '.is-appearing-selected[data-type="core/column"]' );
 
 		// Insert text in the last column block
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.

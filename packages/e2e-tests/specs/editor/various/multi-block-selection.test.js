@@ -44,7 +44,7 @@ async function testNativeSelection() {
 		);
 
 		if ( ! elements.length ) {
-			const element = document.querySelector( '.is-selected' );
+			const element = document.querySelector( '.is-appearing-selected' );
 
 			if ( ! element || ! selection.rangeCount ) {
 				return;

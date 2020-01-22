@@ -32,7 +32,7 @@ describe( 'Spacer', () => {
 		await dragAndResize( resizableHandle, { x: 0, y: 50 } );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		const selectedSpacer = await page.$( '[data-type="core/spacer"].is-selected' );
+		const selectedSpacer = await page.$( '[data-type="core/spacer"].is-appearing-selected' );
 		expect( selectedSpacer ).not.toBe( null );
 	} );
 } );

@@ -7,7 +7,7 @@
 	}
 
 	// Override the bottom margin every block gets.
-	.is-selected & {
+	.is-appearing-selected & {
 		margin-bottom: 0;
 	}
 }

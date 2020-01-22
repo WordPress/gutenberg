@@ -249,7 +249,7 @@ div[data-type="core/freeform"] {
 		outline: $border-width solid transparent;
 	}
 
-	&.is-selected::before {
+	&.is-appearing-selected::before {
 		border-color: $light-gray-800;
 		border-left-color: transparent;
 	}
@@ -260,7 +260,7 @@ div[data-type="core/freeform"] {
 	}
 
 	// Ensure aligned blocks at end are within the selected block.
-	&.is-selected .block-library-rich-text__tinymce::after {
+	&.is-appearing-selected .block-library-rich-text__tinymce::after {
 		content: "";
 		display: table;
 		clear: both;
@@ -309,7 +309,7 @@ div[data-type="core/freeform"] {
 	// By using the `data-type` attribute in this selector it ensures these styles only appear
 	// when the block itself is selected, without it they would also show when a parent block
 	// is selected.
-	div[data-type="core/freeform"].is-selected &,
+	div[data-type="core/freeform"].is-appearing-selected &,
 	div[data-type="core/freeform"].is-typing & {
 		display: block;
 		border-color: $light-gray-800;
