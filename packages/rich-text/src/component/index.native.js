@@ -726,6 +726,7 @@ export class RichText extends Component {
 					isSelected,
 					value: record,
 					onChange: this.onFormatChange,
+					onFocus: () => {},
 				} ) }
 				<RCTAztecView
 					ref={ ( ref ) => {
