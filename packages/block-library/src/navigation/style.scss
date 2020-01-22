@@ -49,7 +49,8 @@ $navigation-height: 60px;
 		& ul:focus {
 			visibility: visible;
 			opacity: 1;
-			display: block;
+			display: flex;
+			flex-direction: column;
 		}
 	}
 
@@ -76,9 +77,12 @@ $navigation-height: 60px;
 
 .wp-block-navigation {
 
-	// Vertical alignment
-	min-height: $navigation-height;
-	align-items: center;
+	// Min height and vertical alignment.
+	&,
+	> .wp-block-navigation__container {
+		min-height: $navigation-height;
+		align-items: center;
+	}
 
 	// Submenus
 	.wp-block-navigation-link {
@@ -214,7 +218,8 @@ $navigation-height: 60px;
 .wp-block-navigation {
 
 	.wp-block-navigation-link.has-child > .wp-block-navigation__container {
-		display: block;
+		display: flex;
+		flex-direction: column;
 		padding: $grid-size;
 
 		.wp-block-navigation__container {
