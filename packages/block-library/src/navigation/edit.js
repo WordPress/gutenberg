@@ -45,6 +45,8 @@ import BlockNavigationList from './block-navigation-list';
 import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
 
+const { getComputedStyle } = window;
+
 function Navigation( {
 	attributes,
 	clientId,
@@ -99,14 +101,14 @@ function Navigation( {
 	 */
 	useEffect( () => {
 		if ( attributes.valueTextColor ) {
-			return setAttributes( { detectedTextColor: attributes.valueTextColor } )
+			return setAttributes( { detectedTextColor: attributes.valueTextColor } );
 		}
 
 		if ( ! ref || ! ref.current ) {
 			return;
 		}
 
-		const navigationStyles  = getComputedStyle( ref.current );
+		const navigationStyles = getComputedStyle( ref.current );
 		if ( ! navigationStyles || ! navigationStyles.color ) {
 			return;
 		}
