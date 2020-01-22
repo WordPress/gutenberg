@@ -382,12 +382,13 @@ function LinkControl( {
 
 			) : (
 				<Fragment>
-					<p
+					<VisuallyHidden>
 						className="screen-reader-text"
-						id={ `current-link-label-${ instanceId }` }
+						<p aria-label={ __( 'Currently selected' ) } id={ `current-link-label-${ instanceId }` }>
 					>
-						{ __( 'Currently selected' ) }:
-					</p>
+							{ __( 'Currently selected' ) }:
+						</p>
+					</VisuallyHidden>
 					<div
 						aria-labelledby={ `current-link-label-${ instanceId }` }
 						aria-selected="true"
