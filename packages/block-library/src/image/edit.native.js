@@ -475,6 +475,7 @@ export class ImageEdit extends React.Component {
 											<MediaEdit allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 												onSelect={ this.onSelectMediaUploadOption }
 												source={ { uri: url } }
+												openReplaceMediaOptions = { openMediaOptions }
 												render={ ( { open, mediaOptions } ) => {
 													return editImageComponent( open, mediaOptions );
 												} }

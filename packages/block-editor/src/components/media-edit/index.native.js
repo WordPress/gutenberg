@@ -55,20 +55,17 @@ export class MediaEdit extends React.Component {
 
 	onPickerSelect( value ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
-		const mediaSource = this.getMediaOptionsItems().filter( ( source ) => source.value === value ).shift();
-		const types = allowedTypes.filter( ( type ) => mediaSource.types.includes( type ) );
-		const mediaCallback = ( media ) => {
-			if ( ( multiple && media ) || ( media && media.id ) ) {
-				onSelect( media );
-			}
-		};
 
 		switch ( value ) {
 			case MEDIA_EDITOR:
-				requestMediaEditor( this.props.source.uri, mediaCallback );
+				requestMediaEditor( this.props.source.uri, ( media ) => {
+					if ( ( multiple && media ) || ( media && media.id ) ) {
+						onSelect( media );
+					}
+				} );
 				break;
 			default:
-				requestMediaPicker( mediaSource.id, types, multiple, mediaCallback );
+				this.props.openReplaceMediaOptions()
 		}
 	}
 
