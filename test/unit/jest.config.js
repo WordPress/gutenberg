@@ -23,6 +23,8 @@ module.exports = {
 		'/\.git/',
 		'/node_modules/',
 		'/packages/e2e-tests',
+		'/packages/react-native-*',
+		'/packages/e2e-tests',
 		'/wordpress/',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
