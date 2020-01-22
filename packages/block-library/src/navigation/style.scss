@@ -83,6 +83,10 @@ $navigation-height: 60px;
 	align-items: center;
 }
 
+// reset rotation of submenu indicator icons on nested levels
+.wp-block-navigation-link .wp-block-navigation-link svg {
+	transform: rotate(0);
+}
 
 /*
 * TODO: organize/untangle styles below this line
