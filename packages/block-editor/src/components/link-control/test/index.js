@@ -518,8 +518,10 @@ describe( 'Default search suggestions', () => {
 } );
 
 describe( 'Creating pages', () => {
-	it( 'should display option to create a link within the search results', async () => {
-		const pageNameText = 'HelloWorld';
+	it.each( [
+		'HelloWorld', // no spaces
+		'Hello World', // with spaces
+	] )( 'should display option to create a link within the search results for input "%s"', async ( pageNameText ) => {
 		act( () => {
 			render(
 				<LinkControl
