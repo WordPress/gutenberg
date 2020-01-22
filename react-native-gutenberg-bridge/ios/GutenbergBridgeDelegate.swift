@@ -20,14 +20,12 @@ extension Gutenberg.MediaSource {
     public static let mediaLibrary = Gutenberg.MediaSource(id: "SITE_MEDIA_LIBRARY", label: "", types: [.image, .video])
     public static let deviceLibrary = Gutenberg.MediaSource(id: "DEVICE_MEDIA_LIBRARY", label: "", types: [.image, .video])
     public static let deviceCamera = Gutenberg.MediaSource(id: "DEVICE_CAMERA", label: "", types: [.image, .video])
-    public static let mediaEditor = Gutenberg.MediaSource(id: "MEDIA_EDITOR", label: "", types: [.image])
 
     static var registeredInternalSources: [Gutenberg.MediaSource] {
         return [
             .deviceCamera,
             .deviceLibrary,
             .mediaLibrary,
-            .mediaEditor,
         ]
     }
 }
