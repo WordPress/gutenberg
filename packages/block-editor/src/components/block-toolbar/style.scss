@@ -36,7 +36,7 @@
 		// Also, on Mobile the toolbar is docked to the top of the screen.
 		border-right: $border-width solid $light-gray-500;
 		@include break-medium() {
-			border-right: $border-width solid $border-color;
+			border-right: $border-width solid $dark-gray-primary;
 		}
 	}
 
@@ -86,7 +86,7 @@
 			color: $white;
 
 			&::before {
-				background: $border-color;
+				background: $dark-gray-primary;
 			}
 		}
 

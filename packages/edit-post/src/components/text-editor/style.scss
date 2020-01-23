@@ -24,7 +24,7 @@
 		// Hide the thick left border in the code editor.
 		box-shadow: none;
 		border: none;
-		outline: $border-width solid $border-color;
+		outline: $border-width solid $dark-gray-primary;
 	}
 
 	@include break-small() {

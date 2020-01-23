@@ -438,7 +438,7 @@
 	}
 
 	// Block UI appearance.
-	border: $border-width solid $border-color;
+	border: $border-width solid $dark-gray-primary;
 	border-radius: $radius-block-ui;
 	background-color: $white;
 }
@@ -464,7 +464,7 @@
 			padding: $grid-unit-15 $grid-unit-20;
 
 			// Block UI appearance.
-			border: $border-width solid $border-color;
+			border: $border-width solid $dark-gray-primary;
 			border-radius: $radius-block-ui;
 			background-color: $white;
 

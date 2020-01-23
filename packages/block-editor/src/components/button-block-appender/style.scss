@@ -6,8 +6,8 @@
 	padding: $block-padding;
 	width: 100%;
 	height: auto;
-	color: $border-color;
-	border: $border-width solid $border-color;
+	color: $dark-gray-primary;
+	border: $border-width solid $dark-gray-primary;
 
 	&:hover,
 	&:focus {

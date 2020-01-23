@@ -37,10 +37,10 @@
 
 		&.is-active {
 			// Block UI appearance.
-			border: $border-width solid $border-color;
+			border: $border-width solid $dark-gray-primary;
 			border-radius: $radius-block-ui;
 			color: $white;
-			background: $border-color;
+			background: $dark-gray-primary;
 		}
 
 		// Formatting buttons
