@@ -12,12 +12,14 @@ const TOOLTIP_OFFSET_HEIGHT = 32;
 
 export default function RangeTooltip( {
 	inputRef,
+	position: positionProp,
 	show = false,
 	value = 0,
 	renderTooltipContent = ( v ) => v,
 	zIndex = 100,
 } ) {
-	const position = useTooltipPosition( { inputRef } );
+	const tooltipPosition = useTooltipPosition( { inputRef } );
+	const position = positionProp || tooltipPosition;
 
 	return (
 		<Tooltip position={ position } show={ show } style={ { zIndex } }>

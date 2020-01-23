@@ -22,19 +22,20 @@ export const RangeControlNext = forwardRef( ( {
 	alwaysShowTooltip = false,
 	className,
 	color: colorProp = color( 'blue.wordpress.700' ),
-	disableToolTip = false,
 	disabled,
+	disableToolTip = false,
 	help,
 	id,
 	label,
 	marks = false,
-	min = 0,
 	max = 100,
+	min = 0,
 	onChange = noop,
-	step = 1,
-	value: valueProp = 0,
 	renderTooltipContent = ( v ) => v,
+	step = 1,
+	tooltipPosition,
 	tooltipZIndex = 100,
+	value: valueProp = 0,
 }, ref ) => {
 	const [ value, setValue ] = useControlledRangeValue( valueProp );
 	const [ showTooltip, setShowTooltip ] = useState( false );
@@ -101,6 +102,7 @@ export const RangeControlNext = forwardRef( ( {
 						<RangeTooltip
 							inputRef={ inputRef }
 							renderTooltipContent={ renderTooltipContent }
+							position={ tooltipPosition }
 							show={ alwaysShowTooltip || showTooltip }
 							value={ value }
 							zIndex={ tooltipZIndex }
