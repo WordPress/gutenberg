@@ -496,7 +496,9 @@ export function hasUploadPermissions( state ) {
  *                             or `undefined` if the OPTIONS request is still being made.
  */
 export function canUser( state, action, resource, id ) {
-	const key = compact( [ action, resource, id ] ).join( '/' );
+	const endpoint = ( resource && resource.endpoint ) || resource;
+
+	const key = compact( [ action, endpoint, id ] ).join( '/' );
 	return get( state, [ 'userPermissions', key ] );
 }
 

@@ -129,7 +129,7 @@ export function* hasUploadPermissions() {
  *
  * @param {string}  action   Action to check. One of: 'create', 'read', 'update',
  *                           'delete'.
- * @param {string}  resource REST resource to check, e.g. 'media' or 'posts'.
+ * @param {string|Object}  resource REST resource to check, e.g. 'media' or 'posts' | { endpoint: 'media', isExperimental: true }
  * @param {?string} id       ID of the rest resource to check.
  */
 export function* canUser( action, resource, id ) {
@@ -145,7 +145,10 @@ export function* canUser( action, resource, id ) {
 		throw new Error( `'${ action }' is not a valid action.` );
 	}
 
-	const path = id ? `/wp/v2/${ resource }/${ id }` : `/wp/v2/${ resource }`;
+	const apiPrefix = resource && resource.isExperimental ? '/__experimental/' : '/wp/v2/';
+	const endpoint = ( resource && resource.endpoint ) || resource;
+	const resourcePart = apiPrefix + endpoint;
+	const path = id ? `${ resourcePart }/${ id }` : resourcePart;
 
 	let response;
 	try {
@@ -175,7 +178,7 @@ export function* canUser( action, resource, id ) {
 		allowHeader = get( response, [ 'headers', 'Allow' ], '' );
 	}
 
-	const key = compact( [ action, resource, id ] ).join( '/' );
+	const key = compact( [ action, endpoint, id ] ).join( '/' );
 	const isAllowed = includes( allowHeader, method );
 	yield receiveUserPermission( key, isAllowed );
 }

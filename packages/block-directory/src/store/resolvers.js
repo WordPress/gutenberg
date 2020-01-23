@@ -7,7 +7,7 @@ import { camelCase, mapKeys } from 'lodash';
  * Internal dependencies
  */
 import { apiFetch } from './controls';
-import { fetchDownloadableBlocks, receiveDownloadableBlocks, setInstallBlocksPermission } from './actions';
+import { fetchDownloadableBlocks, receiveDownloadableBlocks } from './actions';
 
 export default {
 	* getDownloadableBlocks( filterValue ) {
@@ -26,21 +26,7 @@ export default {
 
 			yield receiveDownloadableBlocks( blocks, filterValue );
 		} catch ( error ) {
-			if ( error.code === 'rest_user_cannot_view' ) {
-				yield setInstallBlocksPermission( false );
-			}
-		}
-	},
-	* hasInstallBlocksPermission() {
-		try {
-			yield apiFetch( {
-				path: `__experimental/block-directory/search?term=`,
-			} );
-			yield setInstallBlocksPermission( true );
-		} catch ( error ) {
-			if ( error.code === 'rest_user_cannot_view' ) {
-				yield setInstallBlocksPermission( false );
-			}
+			// TODO trigger error state
 		}
 	},
 };

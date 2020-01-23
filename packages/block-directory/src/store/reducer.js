@@ -13,7 +13,6 @@ import { combineReducers } from '@wordpress/data';
  */
 export const downloadableBlocks = ( state = {
 	results: {},
-	hasPermission: true,
 	filterValue: undefined,
 	isRequestingDownloadableBlocks: true,
 	installedBlockTypes: [],
@@ -30,14 +29,12 @@ export const downloadableBlocks = ( state = {
 				results: Object.assign( {}, state.results, {
 					[ action.filterValue ]: action.downloadableBlocks,
 				} ),
-				hasPermission: true,
 				isRequestingDownloadableBlocks: false,
 			};
 		case 'SET_INSTALL_BLOCKS_PERMISSION' :
 			return {
 				...state,
 				items: action.hasPermission ? state.items : [],
-				hasPermission: action.hasPermission,
 			};
 		case 'ADD_INSTALLED_BLOCK_TYPE' :
 			return {

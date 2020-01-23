@@ -61,11 +61,11 @@ export default compose( [
 	withSelect( ( select, { filterValue } ) => {
 		const {
 			getDownloadableBlocks,
-			hasInstallBlocksPermission,
 			isRequestingDownloadableBlocks,
 		} = select( 'core/block-directory' );
+		const { canUser } = select( 'core' );
 
-		const hasPermission = hasInstallBlocksPermission();
+		const hasPermission = !! canUser( 'create', { endpoint: 'block-directory/install', isExperimental: true } );
 		const downloadableItems = hasPermission ? getDownloadableBlocks( filterValue ) : [];
 		const isLoading = isRequestingDownloadableBlocks();
 
