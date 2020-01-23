@@ -150,6 +150,7 @@ class InnerBlocks extends Component {
 			hasOverlay,
 			__experimentalCaptureToolbars: captureToolbars,
 			forwardedRef,
+			className,
 			...props
 		} = this.props;
 		const { templateInProcess } = this.state;
@@ -158,10 +159,16 @@ class InnerBlocks extends Component {
 			return null;
 		}
 
+		const classes = classnames( className, {
+			'has-overlay': enableClickThrough && hasOverlay,
+			'is-capturing-toolbar': captureToolbars,
+		} );
+
 		const blockList = (
 			<BlockList
 				ref={ forwardedRef }
 				rootClientId={ clientId }
+				className={ classes }
 				{ ...omit( props, [
 					'templateLock',
 					'isSmallScreen',
@@ -178,17 +185,13 @@ class InnerBlocks extends Component {
 				] ) }
 			/>
 		);
+
 		if ( props.tagName ) {
 			return blockList;
 		}
 
-		const classes = classnames( 'block-editor-inner-blocks', {
-			'has-overlay': enableClickThrough && hasOverlay,
-			'is-capturing-toolbar': captureToolbars,
-		} );
-
 		return (
-			<div className={ classes } ref={ forwardedRef }>
+			<div className="block-editor-inner-blocks" ref={ forwardedRef }>
 				{ blockList }
 			</div>
 		);
