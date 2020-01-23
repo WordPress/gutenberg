@@ -18,11 +18,15 @@ Find the section below based on what you are looking to contribute:
 
 - Internationalization? See the [localizing and translating section](/docs/contributors/localizing.md)
 
-## Background
+### Repository Management
 
-- [Architectural and UX Principles of Gutenberg](/docs/contributors/principles.md)
+The Gutenberg project uses Github for managing code and tracking issues. Please see the following sections for the project methodologies using Github.
 
-- [History of the Project](/docs/contributors/history.md)
+- [Issue Management](/docs/contributors/repository-management.md#issues)
+
+- [Pull Requests](/docs/contributors/repository-management.md#pull-requests)
+
+- [Teams and Projects](/docs/contributors/repository-management.md#teams)
 
 ## Guidelines
 
