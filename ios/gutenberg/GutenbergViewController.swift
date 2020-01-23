@@ -188,6 +188,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 
     func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback) {
         print("Gutenberg requested media editor for " + mediaUrl.absoluteString)
+        callback([MediaInfo(id: 1, url: "https://cldup.com/Fz-ASbo2s3.jpg", type: "image")])
     }
 }
 
