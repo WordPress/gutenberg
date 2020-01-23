@@ -20,10 +20,10 @@ function BlockTypesList( { items = [], onSelect, onHover = () => {}, children } 
 		}
 
 		if ( patterns.length ) {
-			result.push( ...patterns.map( ( pattern ) => {
+			result = result.concat( patterns.map( ( pattern ) => {
 				return {
 					...item,
-					id: item.id + pattern.name,
+					id: `${ item.id }-${ pattern.name }`,
 					icon: pattern.icon || item.icon,
 					title: pattern.label || item.title,
 					description: pattern.description || item.description,
