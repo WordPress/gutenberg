@@ -9,6 +9,7 @@ import { noop, startsWith } from 'lodash';
  */
 import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { useRef, useCallback, useState, Fragment, useEffect } from '@wordpress/element';
 import {
 	useRef,
 	useCallback,
@@ -265,14 +266,16 @@ function LinkControl( {
 
 		const directLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
 		const isSingleDirectEntryResult = suggestions.length === 1 && directLinkEntryTypes.includes( suggestions[ 0 ].type.toLowerCase() );
-		const searchResultsLabelId = isInitialSuggestions ? `block-editor-link-control-search-results-label-${ instanceId }` : undefined;
+		const shouldShowCreateEntity = showCreatePages && createEmptyPage && ! isSingleDirectEntryResult;
 			: undefined;
 		const labelText = isInitialSuggestions
 			? __( 'Recently updated' )
-			: sprintf( __( 'Search results for %s' ), inputValue );
+
 		// According to guidelines aria-label should be added if the label
 		// itself is not visible.
 		// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
+		const searchResultsLabelId = isInitialSuggestions ? `block-editor-link-control-search-results-label-${ instanceId }` : undefined;
+		const labelText = isInitialSuggestions ? __( 'Recently updated' ) : sprintf( __( 'Search results for %s' ), inputValue );
 		const ariaLabel = isInitialSuggestions ? undefined : labelText;
 		const SearchResultsLabel = (
 			<span
@@ -283,7 +286,6 @@ function LinkControl( {
 				{ labelText }
 			</span>
 		);
-		const shouldShowCreatePages = showCreatePages && createEmptyPage && ! isSingleDirectEntryResult;
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
@@ -291,7 +293,7 @@ function LinkControl( {
 
 				<div { ...suggestionsListProps } className={ resultsListClasses } aria-labelledby={ searchResultsLabelId }>
 					{ suggestions.map( ( suggestion, index ) => {
-						if ( shouldShowCreatePages && CREATE_TYPE === suggestion.type ) {
+						if ( shouldShowCreateEntity && CREATE_TYPE === suggestion.type ) {
 							return (
 								<LinkControlSearchCreate
 									searchTerm={ inputValue }
