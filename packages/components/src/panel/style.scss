@@ -28,11 +28,6 @@
 	&.is-opened {
 		padding: $panel-padding;
 	}
-
-	// panel section header
-	&-title > .components-button {
-		color: $dark-gray-900;
-	}
 }
 
 .components-panel__header {
