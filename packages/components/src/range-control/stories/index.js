@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import styled from '@emotion/styled';
 import { number, text } from '@storybook/addon-knobs';
 
 /**
@@ -12,6 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import RangeControl from '../';
+import { RangeControlNext } from '../range-control';
 
 export default { title: 'Components/RangeControl', component: RangeControl };
 
@@ -112,3 +114,12 @@ export const withReset = () => {
 		/>
 	);
 };
+
+export const next = () => {
+	return <Wrapper><RangeControlNext min={ 0 } max={ 10 } /></Wrapper>;
+};
+
+const Wrapper = styled.div`
+	padding: 20px;
+`
+;
