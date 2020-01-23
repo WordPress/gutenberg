@@ -7,8 +7,6 @@ import { Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { prependHTTP } from '@wordpress/url';
@@ -29,11 +27,10 @@ import {
  * Internal dependencies
  */
 import { createLinkFormat, isValidHref } from './utils';
-import LinkRelIcon from './link-rel';
 
 import styles from './modal.scss';
 
-export class ModalLinkUI extends Component {
+class ModalLinkUI extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -43,13 +40,11 @@ export class ModalLinkUI extends Component {
 		this.onChangeOpensInNewWindow = this.onChangeOpensInNewWindow.bind( this );
 		this.removeLink = this.removeLink.bind( this );
 		this.onDismiss = this.onDismiss.bind( this );
-		this.onSetLinkRel = this.onSetLinkRel.bind( this );
 
 		this.state = {
 			inputValue: '',
 			text: '',
 			opensInNewWindow: false,
-			linkRel: '',
 		};
 	}
 
@@ -58,12 +53,12 @@ export class ModalLinkUI extends Component {
 			return;
 		}
 
-		const { activeAttributes: { url, target }, value, selectedBlockAttributes } = this.props;
-		const opensInNewWindow = target === '_blank' || selectedBlockAttributes.linkTarget === '_blank';
+		const { activeAttributes: { url, target } } = this.props;
+		const opensInNewWindow = target === '_blank';
+
 		this.setState( {
-			inputValue: selectedBlockAttributes.url || url || '',
-			text: getTextContent( slice( value ) ),
-			linkRel: selectedBlockAttributes.rel || '',
+			inputValue: url || '',
+			text: getTextContent( slice( this.props.value ) ),
 			opensInNewWindow,
 		} );
 	}
@@ -80,13 +75,9 @@ export class ModalLinkUI extends Component {
 		this.setState( { opensInNewWindow } );
 	}
 
-	onSetLinkRel( linkRel ) {
-		this.setState( { linkRel } );
-	}
-
 	submitLink() {
-		const { isActive, onChange, speak, value, isSelectedButtonBlock, onBlockAttributesChange, selectedBlockClientId } = this.props;
-		const { inputValue, opensInNewWindow, text, linkRel } = this.state;
+		const { isActive, onChange, speak, value } = this.props;
+		const { inputValue, opensInNewWindow, text } = this.state;
 		const url = prependHTTP( inputValue );
 		const linkText = text || inputValue;
 		const format = createLinkFormat( {
@@ -95,10 +86,7 @@ export class ModalLinkUI extends Component {
 			text: linkText,
 		} );
 
-		if ( isSelectedButtonBlock ) {
-			const attributes = { url, rel: linkRel, linkTarget: opensInNewWindow ? '_blank' : undefined };
-			onBlockAttributesChange( selectedBlockClientId, attributes );
-		} else if ( isCollapsed( value ) && ! isActive ) { // insert link
+		if ( isCollapsed( value ) && ! isActive ) { // insert link
 			const toInsert = applyFormat( create( { text: linkText } ), format, 0, linkText.length );
 			const newAttributes = insert( value, toInsert );
 			onChange( { ...newAttributes, needsSelectionUpdate: true } );
@@ -123,11 +111,8 @@ export class ModalLinkUI extends Component {
 	}
 
 	removeLink() {
-		const { onBlockAttributesChange, onRemove, onClose, selectedBlockClientId } = this.props;
-
-		onBlockAttributesChange( selectedBlockClientId, { url: '', rel: '', linkTarget: undefined } );
-		onRemove();
-		onClose();
+		this.props.onRemove();
+		this.props.onClose();
 	}
 
 	onDismiss() {
@@ -139,8 +124,8 @@ export class ModalLinkUI extends Component {
 	}
 
 	render() {
-		const { isVisible, isSelectedButtonBlock } = this.props;
-		const { text, inputValue, linkRel, opensInNewWindow } = this.state;
+		const { isVisible } = this.props;
+		const { text } = this.state;
 
 		return (
 			<BottomSheet
@@ -151,8 +136,8 @@ export class ModalLinkUI extends Component {
 				{ /* eslint-disable jsx-a11y/no-autofocus */
 					<BottomSheet.Cell
 						icon={ 'admin-links' }
-						label={ isSelectedButtonBlock ? __( 'Button URL' ) : __( 'URL' ) }
-						value={ inputValue }
+						label={ __( 'URL' ) }
+						value={ this.state.inputValue }
 						placeholder={ __( 'Add URL' ) }
 						autoCapitalize="none"
 						autoCorrect={ false }
@@ -161,25 +146,17 @@ export class ModalLinkUI extends Component {
 						autoFocus={ Platform.OS === 'ios' }
 					/>
 				/* eslint-enable jsx-a11y/no-autofocus */ }
-				{ isSelectedButtonBlock && <BottomSheet.Cell
-					icon={ LinkRelIcon }
-					label={ __( 'Add Rel' ) }
-					value={ linkRel }
-					placeholder={ __( 'None' ) }
-					autoCapitalize="none"
-					onChangeValue={ this.onSetLinkRel }
-				/> }
-				{ ! isSelectedButtonBlock && <BottomSheet.Cell
+				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
 					label={ __( 'Link text' ) }
 					value={ text }
 					placeholder={ __( 'Add link text' ) }
 					onChangeValue={ this.onChangeText }
-				/> }
+				/>
 				<BottomSheet.SwitchCell
 					icon={ 'external' }
 					label={ __( 'Open in new tab' ) }
-					value={ opensInNewWindow }
+					value={ this.state.opensInNewWindow }
 					onValueChange={ this.onChangeOpensInNewWindow }
 					separatorType={ 'fullWidth' }
 				/>
@@ -194,29 +171,4 @@ export class ModalLinkUI extends Component {
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlock } = select( 'core/block-editor' );
-
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const selectedBlock = selectedBlockClientId && getBlock( selectedBlockClientId );
-		const selectedBlockAttributes = ( selectedBlock && selectedBlock.attributes ) || {};
-		const isSelectedButtonBlock = selectedBlock && selectedBlock.name === 'core/button';
-
-		return {
-			selectedBlockClientId,
-			selectedBlockAttributes,
-			isSelectedButtonBlock,
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { updateBlockAttributes } = dispatch( 'core/block-editor' );
-
-		return {
-			onBlockAttributesChange: ( selectedBlockClientId, attributes ) => {
-				updateBlockAttributes( selectedBlockClientId, attributes );
-			},
-		};
-	} ),
-	withSpokenMessages,
-] )( ModalLinkUI );
+export default withSpokenMessages( ModalLinkUI );

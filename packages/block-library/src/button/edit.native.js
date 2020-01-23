@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, AccessibilityInfo } from 'react-native';
+import { View, AccessibilityInfo, Platform, Clipboard } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -14,6 +14,7 @@ import {
 	RichText,
 	withColors,
 	InspectorControls,
+	BlockControls,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -21,11 +22,15 @@ import {
 	PanelBody,
 	RangeControl,
 	UnsupportedFooterControl,
+	ToolbarGroup,
+	ToolbarButton,
+	BottomSheet,
 } from '@wordpress/components';
 import {
 	Component,
 } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import { isURL, prependHTTP } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -33,6 +38,7 @@ import { withSelect } from '@wordpress/data';
 import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
 import ColorBackground from './color-background.native';
+import LinkRelIcon from './link-rel';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 const MIN_BORDER_RADIUS_VALUE = 0;
@@ -42,19 +48,39 @@ const INITIAL_MAX_WIDTH = 108;
 class ButtonEdit extends Component {
 	constructor( props ) {
 		super( props );
+		this.onChangeText = this.onChangeText.bind( this );
 		this.onChangeBorderRadius = this.onChangeBorderRadius.bind( this );
 		this.onChangeLinkRel = this.onChangeLinkRel.bind( this );
 		this.onChangeOpenInNewTab = this.onChangeOpenInNewTab.bind( this );
 		this.onChangeURL = this.onChangeURL.bind( this );
+		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onLayout = this.onLayout.bind( this );
+		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
+		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
+
+		this.isEditingURL = false;
 
 		this.state = {
 			maxWidth: INITIAL_MAX_WIDTH,
+			isLinkSheetVisible: false,
 		};
 	}
 
-	componentDidUpdate( prevProps ) {
-		const { selectedId } = this.props;
+	componentDidUpdate( prevProps, prevState ) {
+		const { selectedId, setAttributes, editorSidebarOpened, attributes: { url } } = this.props;
+		const { isLinkSheetVisible } = this.state;
+
+		if ( ( prevProps.editorSidebarOpened && ! editorSidebarOpened ) || ( prevState.isLinkSheetVisible && ! isLinkSheetVisible ) ) {
+			this.isEditingURL = false;
+		}
+
+		if ( isLinkSheetVisible && url === '' && ! this.isEditingURL ) {
+			this.getURLFromClipboard();
+		}
+
+		if ( ! isLinkSheetVisible && ! editorSidebarOpened ) {
+			setAttributes( { url: prependHTTP( url ) } );
+		}
 
 		if ( this.richTextRef ) {
 			const selectedRichText = this.richTextRef.props.id === selectedId;
@@ -72,6 +98,21 @@ class ButtonEdit extends Component {
 		}
 	}
 
+	async getURLFromClipboard() {
+		const { setAttributes } = this.props;
+		const clipboardText = await Clipboard.getString();
+
+		if ( ! clipboardText ) {
+			return;
+		}
+		// Check if pasted text is URL
+		if ( ! isURL( clipboardText ) ) {
+			return;
+		}
+
+		setAttributes( { url: clipboardText } );
+	}
+
 	getBackgroundColor() {
 		const { backgroundColor, attributes } = this.props;
 		if ( backgroundColor.color ) {
@@ -83,6 +124,11 @@ class ButtonEdit extends Component {
 			return styles.fallbackButton.backgroundColor;
 		// `backgroundColor` which should be set when `Button` is created on mobile
 		} return styles.button.backgroundColor;
+	}
+
+	onChangeText( value ) {
+		const { setAttributes } = this.props;
+		setAttributes( { text: value } );
 	}
 
 	onChangeBorderRadius( value ) {
@@ -98,6 +144,7 @@ class ButtonEdit extends Component {
 	}
 
 	onChangeURL( value ) {
+		this.isEditingURL = true;
 		const { setAttributes } = this.props;
 		setAttributes( { url: value } );
 	}
@@ -128,8 +175,25 @@ class ButtonEdit extends Component {
 		} );
 	}
 
+	onToggleLinkSettings() {
+		const { isLinkSheetVisible } = this.state;
+		this.setState( { isLinkSheetVisible: ! isLinkSheetVisible } );
+	}
+
+	onClearSettings() {
+		const { setAttributes } = this.props;
+
+		setAttributes( {
+			url: '',
+			rel: '',
+			linkTarget: '',
+		} );
+
+		this.setState( { isLinkSheetVisible: false } );
+	}
+
 	render() {
-		const { attributes, setAttributes, textColor, isSelected, clientId } = this.props;
+		const { attributes, textColor, isSelected, clientId } = this.props;
 		const {
 			placeholder,
 			text,
@@ -138,7 +202,7 @@ class ButtonEdit extends Component {
 			linkTarget,
 			rel,
 		} = attributes;
-		const { maxWidth } = this.state;
+		const { maxWidth, isLinkSheetVisible } = this.state;
 
 		const isFocused = this.richTextRef && this.richTextRef.isFocused();
 
@@ -179,7 +243,7 @@ class ButtonEdit extends Component {
 							} }
 							placeholder={ placeholderText }
 							value={ text }
-							onChange={ ( value ) => setAttributes( { text: value } ) }
+							onChange={ this.onChangeText }
 							style={ {
 								...richTextStyle.richText,
 								color: textColor.color || '#fff',
@@ -191,8 +255,60 @@ class ButtonEdit extends Component {
 							minWidth={ minWidth }
 							maxWidth={ maxWidth }
 							id={ clientId }
+							withoutInteractiveFormatting={ true }
 						/>
 					</ColorBackground>
+
+					{ isFocused && <BlockControls>
+						<ToolbarGroup>
+							<ToolbarButton
+								title={ __( 'Edit image' ) }
+								icon={ 'admin-links' }
+								onClick={ this.onToggleLinkSettings }
+							/>
+						</ToolbarGroup>
+					</BlockControls> }
+
+					<BottomSheet
+						isVisible={ isLinkSheetVisible }
+						onClose={ this.onToggleLinkSettings }
+						hideHeader
+					>
+						{ /* eslint-disable jsx-a11y/no-autofocus */
+							<BottomSheet.Cell
+								icon={ 'admin-links' }
+								label={ __( 'Button URL' ) }
+								value={ url || '' }
+								placeholder={ __( 'Add URL' ) }
+								onChangeValue={ this.onChangeURL }
+								autoCapitalize="none"
+								autoCorrect={ false }
+								keyboardType="url"
+								autoFocus={ Platform.OS === 'ios' }
+							/>
+							/* eslint-enable jsx-a11y/no-autofocus */ }
+						<BottomSheet.Cell
+							icon={ LinkRelIcon }
+							label={ __( 'Add Rel' ) }
+							value={ rel || '' }
+							placeholder={ __( 'None' ) }
+							autoCapitalize="none"
+							onChangeValue={ this.onChangeLinkRel }
+						/>
+						<BottomSheet.SwitchCell
+							icon={ 'external' }
+							label={ __( 'Open in new tab' ) }
+							value={ linkTarget === '_blank' }
+							onValueChange={ this.onChangeOpenInNewTab }
+							separatorType={ 'fullWidth' }
+						/>
+						<BottomSheet.Cell
+							label={ __( 'Remove link' ) }
+							labelStyle={ styles.clearLinkButton }
+							separatorType={ 'none' }
+							onPress={ this.onClearSettings }
+						/>
+					</BottomSheet>
 
 					<InspectorControls>
 						<PanelBody title={ __( 'Border Settings' ) } >
@@ -213,7 +329,7 @@ class ButtonEdit extends Component {
 								onChange={ this.onChangeURL }
 								autoCapitalize="none"
 								autoCorrect={ false }
-								separatorType="none"
+								separatorType="fullWidth"
 								keyboardType="url"
 							/>
 							<ToggleControl
@@ -250,12 +366,16 @@ export default compose( [
 	withInstanceId,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select ) => {
+		const {
+			isEditorSidebarOpened,
+		} = select( 'core/edit-post' );
 		const { getSelectedBlockClientId } = select( 'core/block-editor' );
 
 		const selectedId = getSelectedBlockClientId();
 
 		return {
 			selectedId,
+			editorSidebarOpened: isEditorSidebarOpened(),
 		};
 	} ),
 ] )( ButtonEdit );

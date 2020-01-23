@@ -658,6 +658,7 @@ export class RichText extends Component {
 			minWidth,
 			maxWidth,
 			formatTypes,
+			withoutInteractiveFormatting,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -776,6 +777,7 @@ export class RichText extends Component {
 				{ isSelected && <FormatEdit
 					formatTypes={ formatTypes }
 					value={ record }
+					withoutInteractiveFormatting={ withoutInteractiveFormatting }
 					onChange={ this.onFormatChange }
 					onFocus={ () => {} }
 				/> }
