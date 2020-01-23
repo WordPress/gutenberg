@@ -1,4 +1,4 @@
-$navigation-height: 60px;
+$navigation-min-height: 60px;
 
 /*
 * Frontend: reset the default list styles
@@ -77,11 +77,18 @@ $navigation-height: 60px;
 
 .wp-block-navigation {
 
-	// Min height and vertical alignment.
+	// Min height and vertical alignment (main menu - level 0)
 	&,
 	> .wp-block-navigation__container {
-		min-height: $navigation-height;
+		min-height: $navigation-min-height;
 		align-items: center;
+
+		> .wp-block-navigation-link {
+			display: flex;
+			min-height: $navigation-min-height;
+			margin-top: 0;
+			margin-bottom: 0;
+		}
 	}
 
 	// Submenus
@@ -159,7 +166,7 @@ $navigation-height: 60px;
 // Styles
 .wp-block-navigation {
 
-	// Default / Light styles - No text color
+	// Default / Light styles
 	.wp-block-navigation-link,
 	&.is-style-light .wp-block-navigation-link {
 		//  No text color
