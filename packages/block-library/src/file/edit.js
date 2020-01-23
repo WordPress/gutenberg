@@ -27,11 +27,11 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
+import { file as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import icon from './icon';
 import FileBlockInspector from './inspector';
 
 class FileEdit extends Component {
