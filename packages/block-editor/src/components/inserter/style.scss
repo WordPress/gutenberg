@@ -1,7 +1,8 @@
-$block-inserter-content-height: 350px;
-$block-inserter-tabs-height: 44px;
-$block-inserter-search-height: 38px;
+/**
+ * Block Library
+ */
 
+// Plus button.
 .block-editor-inserter {
 	display: inline-block;
 	background: none;
@@ -14,42 +15,68 @@ $block-inserter-search-height: 38px;
 	@include break-medium {
 		position: relative;
 	}
+
+	.block-editor-inserter__toggle {
+		display: inline-flex;
+		align-items: center;
+		color: $dark-gray-500;
+		background: none;
+		cursor: pointer;
+		border: none;
+		outline: none;
+		transition: color 0.2s ease;
+		@include reduce-motion("transition");
+	}
 }
 
+// Popover container.
 .block-editor-inserter__popover > .components-popover__content {
 	@include break-medium {
 		overflow-y: visible;
-		height: $block-inserter-content-height + $block-inserter-tabs-height + $block-inserter-search-height;
+		height: 92vh; // This is further limited by a max-height from the popover component itself.
 	}
+
+	// Remove the popover styling and apply it instead to each sub panel.
+	box-shadow: none;
+	border: none;
+	background: none;
 }
 
-.block-editor-inserter__toggle {
-	transition: color 0.2s ease;
-	@include reduce-motion("transition");
-}
-
+// Container for all inserter content.
 .block-editor-inserter__menu {
 	height: 100%;
 	display: flex;
-	width: auto;
+	width: 100%;
 
 	@include break-medium {
-		width: 400px;
+		min-width: 480px;
 		position: relative;
+	}
 
-		&.has-help-panel {
-			width: 700px;
-		}
+	.components-tip {
+		padding: 0 $grid-size-large $grid-size-large $grid-size-large;
 	}
 }
 
+// Show popover background behind main menu and preview both.
+.block-editor-inserter__main-area,
+.block-editor-inserter__preview-panel {
+	box-shadow: $shadow-popover;
+	border: $border-width solid $light-gray-500;
+	background: $white;
+
+	width: 480px;
+}
+
+// Container for just the block library.
 .block-editor-inserter__main-area {
-	width: auto;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+
+	margin-right: $grid-size-large;
+
 	@include break-medium {
-		width: 400px;
 		position: relative;
 	}
 }
@@ -96,10 +123,6 @@ $block-inserter-search-height: 38px;
 		outline: $border-width dotted $dark-gray-500;
 	}
 
-	@include break-medium {
-		height: $block-inserter-content-height + $block-inserter-tabs-height;
-	}
-
 	// Don't show the top border on the first panel, let the Search border be the border.
 	[role="presentation"] + .components-panel__body {
 		border-top: none;
@@ -142,91 +165,15 @@ $block-inserter-search-height: 38px;
 	}
 }
 
-.block-editor-inserter__menu-help-panel {
-	display: none;
-	border-left: $border-width solid $light-gray-500;
-	width: 300px;
-	height: 100%;
-	padding: 20px;
-	overflow-y: auto;
-
-	@include break-medium {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.block-editor-block-card {
-		padding-bottom: 20px;
-		margin-bottom: 20px;
-		border-bottom: $border-width solid $light-gray-500;
-		@include edit-post__fade-in-animation();
-	}
-
-	.block-editor-inserter__preview {
-		display: flex;
-		flex-grow: 2;
-	}
-}
-
-.block-editor-inserter__menu-help-panel-no-block {
-	display: flex;
-	height: 100%;
-	flex-direction: column;
+// Container for the preview.
+.block-editor-inserter__preview-panel {
+	height: 480px;
+	padding: $grid-size-large;
 	@include edit-post__fade-in-animation();
 
-	.block-editor-inserter__menu-help-panel-no-block-text {
-		flex-grow: 1;
-
-		h4 {
-			font-size: $big-font-size;
-		}
+	.block-editor-block-card {
+		padding-bottom: $grid-size-large;
+		margin-bottom: $grid-size;
+		border-bottom: $border-width solid $light-gray-500;
 	}
-
-	.components-notice {
-		margin: 0;
-	}
-
-	h4 {
-		margin-top: 0;
-	}
-}
-
-.block-editor-inserter__menu-help-panel-hover-area {
-	flex-grow: 1;
-	margin-top: 20px;
-	padding: 20px;
-	border: 1px dotted $light-gray-500;
-	display: flex;
-	align-items: center;
-	text-align: center;
-}
-
-.block-editor-inserter__menu-help-panel-title {
-	font-size: $big-font-size;
-	font-weight: 600;
-	margin-bottom: 20px;
-}
-
-.block-editor-inserter__preview-content {
-	border: $border-width solid $light-gray-500;
-	border-radius: $radius-round-rectangle;
-	min-height: 150px;
-	display: grid;
-	flex-grow: 2;
-
-	.block-editor-block-preview__container {
-		margin-right: 0;
-		margin-left: 0;
-		padding: 10px;
-	}
-}
-
-.block-editor-inserter__preview-content-missing {
-	flex: 1;
-	display: flex;
-	justify-content: center;
-	color: $dark-gray-400;
-	border: $border-width solid $light-gray-500;
-	border-radius: $radius-round-rectangle;
-	align-items: center;
 }
