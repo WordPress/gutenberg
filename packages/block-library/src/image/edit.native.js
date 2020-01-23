@@ -25,7 +25,6 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-
 import {
 	BlockCaption,
 	MediaPlaceholder,
@@ -41,12 +40,13 @@ import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
+import { image as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
-import SvgIcon, { editImageIcon } from './icon';
+import { editImageIcon } from './icon';
 import SvgIconRetry from './icon-retry';
 import { getUpdatedLinkTargetSettings } from './utils';
 
@@ -303,7 +303,7 @@ export class ImageEdit extends React.Component {
 				iconStyle = this.props.getStylesFromColorScheme( styles.iconUpload, styles.iconUploadDark );
 				break;
 		}
-		return <Icon icon={ SvgIcon } { ...iconStyle } />;
+		return <Icon icon={ icon } { ...iconStyle } />;
 	}
 
 	render() {
