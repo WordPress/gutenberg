@@ -578,17 +578,14 @@ describe( 'Creating pages', () => {
 
 		await eventLoopTick();
 
-		// console.log( container.innerHTML );
+		const currentLinkLabel = container.querySelector( '[aria-label="Currently selected"]' );
 
-		// Also acts as implicit test for "Selected Link" UI
-		// const currentLinkLabel = container.querySelector( '[aria-label="Currently selected"]' );
+		const currentLink = container.querySelector( `[aria-labelledby="${ currentLinkLabel.id }"]` );
 
-		// const currentLink = container.querySelector( `[aria-labelledby="${ currentLinkLabel.id }"]` );
+		const currentLinkHTML = currentLink.innerHTML;
 
-		// const currentLinkHTML = currentLink.innerHTML;
-
-		// expect( currentLinkHTML ).toEqual( expect.stringContaining( pageNameText ) ); //title
-		// expect( currentLinkHTML ).toEqual( expect.stringContaining( '/?p=123' ) ); // slug
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( pageNameText ) ); //title
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( '/?p=123' ) ); // slug
 	} );
 
 	it.each( [
