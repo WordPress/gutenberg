@@ -8,6 +8,7 @@ import {
 	insertBlock,
 	setUpResponseMocking,
 	clickBlockToolbarButton,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 async function mockPagesResponse( pages ) {
@@ -65,14 +66,18 @@ async function updateActiveNavigationLink( { url, label } ) {
 	}
 
 	if ( label ) {
-		// With https://github.com/WordPress/gutenberg/pull/19686, we're auto-selecting the label so we don't need to manually select this here. Leaving this code in place though as we may not always do this.
-		// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
-		// to select all text like other tests do.
-		// Unfortunately, these tests don't seem to pass on Travis CI when
-		// using that approach, while using `Home` and `End` they do pass.
-		// await page.keyboard.press( 'Home' );
-		// await pressKeyWithModifier( 'shift', 'End' );
-		// await page.keyboard.press( 'Backspace' );
+		// With https://github.com/WordPress/gutenberg/pull/19686, we're auto-selecting the label if the label is URL-ish.
+		// In this case, it means we have to select and delete the label if it's _not_ the url.
+		if ( label !== url ) {
+			// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
+			// to select all text like other tests do.
+			// Unfortunately, these tests don't seem to pass on Travis CI when
+			// using that approach, while using `Home` and `End` they do pass.
+			await page.keyboard.press( 'Home' );
+			await pressKeyWithModifier( 'shift', 'End' );
+			await page.keyboard.press( 'Backspace' );
+		}
+
 		await page.keyboard.type( label );
 	}
 }
