@@ -56,6 +56,14 @@ function NavigationLinkEdit( {
 		nofollow,
 		description,
 	} = attributes;
+
+	const {
+		textColor,
+		valueTextColor,
+		backgroundColor,
+		valueBackgroundColor,
+	} = navigationBlockAttributes;
+
 	const link = {
 		title: title ? unescape( title ) : '',
 		url,
@@ -199,14 +207,14 @@ function NavigationLinkEdit( {
 						'is-selected': isSelected,
 						'has-link': !! url,
 						'has-child': hasDescendants,
-						'has-text-color': navigationBlockAttributes.valueTextColor,
-						[ `has-${ navigationBlockAttributes.textColor }-color` ]: !! navigationBlockAttributes.textColor,
-						'has-background-color': navigationBlockAttributes.valueBackgroundColor,
-						[ `has-${ navigationBlockAttributes.backgroundColor }-background-color` ]: !! navigationBlockAttributes.backgroundColor,
+						'has-text-color': valueTextColor,
+						[ `has-${ textColor }-color` ]: !! textColor,
+						'has-background-color': valueBackgroundColor,
+						[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 					} ) }
 				style={ {
-					color: navigationBlockAttributes.valueTextColor,
-					backgroundColor: navigationBlockAttributes.valueBackgroundColor,
+					color: valueTextColor,
+					backgroundColor: valueBackgroundColor,
 				} }
 			>
 				<div className="wp-block-navigation-link__content">
