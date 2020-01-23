@@ -15,8 +15,8 @@
 		border-color: transparent;
 		border-style: solid;
 		border-width: 5px;
-		border-right-color: $border-color;
-		border-bottom-color: $border-color;
+		border-right-color: $dark-gray-primary;
+		border-bottom-color: $dark-gray-primary;
 	}
 }
 
@@ -50,7 +50,7 @@
 	// We use !important here because icon colors are set as inline styles,
 	// and should be overridden when disabled.
 	.block-editor-block-icon.has-colors {
-		color: $border-color !important;
+		color: $dark-gray-primary !important;
 	}
 }
 
@@ -64,7 +64,6 @@
 		height: 100%;
 		position: relative;
 		margin: 0 auto;
-		padding: $grid-unit-10;
 		display: flex;
 		align-items: center;
 		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -180,7 +179,7 @@
 		}
 
 		.block-editor-block-switcher__transform {
-			padding: 10px;
+			padding: $grid-unit-15;
 		}
 
 		// Block hover and focus style.
