@@ -20,7 +20,7 @@ function build_css_colors( $attributes ) {
 
 	// Text color.
 	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-	$has_custom_text_color = array_key_exists( 'customTextColor', $attributes );
+	$has_custom_text_color = array_key_exists( 'rgbTextColor', $attributes );
 
 	// If has text color.
 	if ( $has_custom_text_color || $has_named_text_color ) {
@@ -33,12 +33,12 @@ function build_css_colors( $attributes ) {
 		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['rgbTextColor'] );
 	}
 
 	// Background color.
 	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $attributes );
+	$has_custom_background_color = array_key_exists( 'rgbBackgroundColor', $attributes );
 
 	// If has background color.
 	if ( $has_custom_background_color || $has_named_background_color ) {
@@ -51,7 +51,7 @@ function build_css_colors( $attributes ) {
 		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['rgbBackgroundColor'] );
 	}
 
 	return $colors;
@@ -269,19 +269,13 @@ function register_block_core_navigation() {
 				'textColor'             => array(
 					'type' => 'string',
 				),
-				'customTextColor'       => array(
-					'type' => 'string',
-				),
-				'valueTextColor'        => array(
+				'rgbTextColor'        => array(
 					'type' => 'string',
 				),
 				'backgroundColor'       => array(
 					'type' => 'string',
 				),
-				'customBackgroundColor' => array(
-					'type' => 'string',
-				),
-				'valueBackgroundColor'  => array(
+				'rgbBackgroundColor' => array(
 					'type' => 'string',
 				),
 				'fontSize'              => array(

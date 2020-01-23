@@ -11,6 +11,7 @@ import {
 	useMemo,
 	Fragment,
 	useRef,
+	useEffect,
 } from '@wordpress/element';
 import {
 	InnerBlocks,
@@ -89,6 +90,14 @@ function Navigation( {
 		},
 		[ fontSize.size ]
 	);
+
+	// Pickup and store text and background colors in grb format into attrs object.
+	useEffect( () => {
+		setAttributes( {
+			rgbTextColor: TextColor.color,
+			rgbBackgroundColor: BackgroundColor.color,
+		} );
+	}, [ TextColor.color, BackgroundColor.color ] );
 
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
