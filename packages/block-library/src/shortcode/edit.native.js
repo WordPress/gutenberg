@@ -38,7 +38,7 @@ export function ShortcodeEdit( props ) {
 				onBlur={ onBlur }
 				autoCorrect={ false }
 				autoComplete="off"
-				keyboardType={ Platform.OS === 'ios' ? "default" : "visible-password" }
+				keyboardType={ Platform.OS === 'ios' ? 'default' : 'visible-password' }
 				placeholderTextColor={ placeholderStyle.color }
 			/>
 		</View>
