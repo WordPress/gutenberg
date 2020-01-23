@@ -59,6 +59,10 @@ const getSymbolHeading = ( text ) => {
 	return `<a name="${ text }" href="#${ text }">#</a> **${ text }**`;
 };
 
+const getTypeOutput = ( type ) => {
+	return type ? `\`${ type }\`` : '(unknown type)';
+};
+
 module.exports = function( rootDir, docPath, symbols, headingTitle, headingStartIndex ) {
 	const docs = [];
 	let headingIndex = headingStartIndex || 1;
@@ -94,31 +98,31 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 			formatTag(
 				'Type',
 				getSymbolTagsByName( symbol, 'type' ),
-				( tag ) => `\n- \`${ tag.type }\` ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- ${ getTypeOutput( tag.type ) } ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Parameters',
 				getSymbolTagsByName( symbol, 'param' ),
-				( tag ) => `\n- *${ tag.name }* \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- *${ tag.name }* ${ getTypeOutput( tag.type ) }: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Returns',
 				getSymbolTagsByName( symbol, 'return' ),
-				( tag ) => `\n- \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- ${ getTypeOutput( tag.type ) }: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Type Definition',
 				getSymbolTagsByName( symbol, 'typedef' ),
-				( tag ) => `\n- *${ tag.name }* \`${ tag.type }\``,
+				( tag ) => `\n- *${ tag.name }* ${ getTypeOutput( tag.type ) }`,
 				docs
 			);
 			formatTag(
 				'Properties',
 				getSymbolTagsByName( symbol, 'property' ),
-				( tag ) => `\n- *${ tag.name }* \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- *${ tag.name }* ${ getTypeOutput( tag.type ) }: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			docs.push( '\n' );

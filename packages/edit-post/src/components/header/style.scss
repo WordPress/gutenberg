@@ -4,6 +4,7 @@
 	background: $white;
 	display: flex;
 	flex-wrap: wrap;
+	flex-direction: row-reverse;
 	justify-content: space-between;
 	align-items: center;
 	// The header should never be wider than the viewport, or buttons might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.

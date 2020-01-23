@@ -1,5 +1,4 @@
 .wp-block-navigation {
-
 	& > ul {
 		display: block;
 		list-style: none;
@@ -38,9 +37,12 @@
 			}
 		}
 
+		// ToDo: move navigation-link styles to navigation-link/style.scss
 		& > li {
 
 			& > a {
+				display: flex;
+				align-items: center;
 				padding-left: 0;
 
 				@include break-small {
@@ -55,17 +57,26 @@
 			&:last-of-type > a {
 				padding-right: 0;
 			}
+
+			.wp-block-navigation-link__submenu-icon {
+				margin-left: 4px;
+
+				svg {
+					fill: currentColor;
+				}
+			}
 		}
 
 		// Sub-menus Flyout
 		& > li > ul {
-			background: #fff;
 			-webkit-box-shadow: 0 3px 30px rgba(25, 30, 35, 0.1);
 			-moz-box-shadow: 0 3px 30px rgba(25, 30, 35, 0.1);
 			border-radius: 3px;
 			box-shadow: 0 3px 30px rgba(25, 30, 35, 0.1);
-			border: 1px solid #e2e4e7;
+			border-width: 1px;
+			border-style: solid;
 			margin: 0;
+			padding: 0 30px 0 10px;
 			position: absolute;
 			left: 0;
 			top: 80%;
@@ -74,11 +85,13 @@
 			transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
 			transform: translateY(0.6rem);
 			visibility: hidden;
-			padding: 5px 0;
-
 
 			li {
-				margin: 2px 8px;
+				margin: 0;
+
+				& > ul {
+					padding-left: 10px;
+				}
 			}
 
 			a {
@@ -89,10 +102,12 @@
 				}
 			}
 
+			// Sub menu arrow.
+			$light-style-sub-menu-arrow-width: 20px;
 			&::after,
 			&::before {
 				bottom: 100%;
-				left: 50%;
+				left: 22px;
 				border: solid transparent;
 				content: " ";
 				height: 0;
@@ -101,28 +116,23 @@
 				pointer-events: none;
 			}
 
+			// Sub menu arrow. Background.
 			&::after {
-				border-color: rgba(255, 255, 255, 0);
-				border-bottom-color: #fff;
-				border-width: 10px;
-				margin-left: -10px;
+				border-width: $light-style-sub-menu-arrow-width / 2;
+				margin-left: -($light-style-sub-menu-arrow-width / 2);
+				bottom: calc(100% - 1px);
 			}
 
+			// Sub menu arrow. Border.
 			&::before {
-				border-color: rgba(226, 228, 231, 0);
-				border-bottom-color: #e2e4e7;
-				border-width: 11px;
-				margin-left: -11px;
+				border-width: $light-style-sub-menu-arrow-width / 2 + 1px;
+				margin-left: -($light-style-sub-menu-arrow-width / 2 + 1px);
 			}
 
 			ul {
 				width: 100%;
 			}
 		}
-	}
-
-	.has-background-color + ul {
-		background: inherit;
 	}
 
 	// Navigation Link
@@ -139,18 +149,14 @@
 		li a {
 			padding-top: 8px;
 			padding-bottom: 8px;
-		}
-	}
 
-	// Top-level sub-menu indicators
-	& .has-sub-menu > a {
+			&:first-child {
+				padding-top: 13px;
+			}
 
-		&::after {
-			content: "\00a0\25BC";
-			display: inline-block;
-			font-size: 0.6rem;
-			height: inherit;
-			width: inherit;
+			&:last-child {
+				padding-bottom: 13px;
+			}
 		}
 	}
 
@@ -165,29 +171,66 @@
 	&.items-justified-right > ul {
 		justify-content: flex-end;
 	}
-}
 
-.is-style-dark > ul > li > ul {
-	background: #333;
-	border: 1px solid #111;
+	// Colors.
+	$light-style-sub-menu-background-color: #fff;
+	$light-style-sub-menu-border-color: #e2e4e7;
+	$light-style-sub-menu-text-color: #111;
+	$light-style-sub-menu-text-color-hover: #333;
 
-	a {
-		text-decoration: none;
-		color: #fff;
+	$dark-style-sub-menu-background-color: #333;
+	$dark-style-sub-menu-border-color: #111;
+	$dark-style-sub-menu-text-color: #fff;
+	$dark-style-sub-menu-text-color-hover: #eee;
 
-		&:hover {
-			text-decoration: underline;
-			color: #eee;
+	// Default Style / Ligth style.
+	& > ul > li > ul,
+	&.is-light-style > ul > li > ul {
+		background-color: $light-style-sub-menu-background-color;
+		border-color: $light-style-sub-menu-border-color;
+
+		a {
+			color: $light-style-sub-menu-text-color;
+
+			&:hover {
+				color: $light-style-sub-menu-text-color-hover;
+			}
+		}
+
+		// Sub menu arrow - background color.
+		&::after {
+			border-color: transparent;
+			border-bottom-color: $light-style-sub-menu-background-color;
+		}
+
+		// Sub menu arrow - border color.
+		&::before {
+			border-color: transparent;
+			border-bottom-color: $light-style-sub-menu-border-color;
 		}
 	}
 
-	&::after {
-		border-color: rgba(51, 51, 51, 0);
-		border-bottom-color: #333;
-	}
+	// Dark Style.
+	&.is-style-dark > ul > li > ul {
+		background-color: $dark-style-sub-menu-background-color;
+		border-color: $dark-style-sub-menu-border-color;
 
-	&::before {
-		border-color: rgba(17, 17, 17, 0);
-		border-bottom-color: #111;
+		a {
+			color: $dark-style-sub-menu-text-color;
+
+			&:hover {
+				color: $dark-style-sub-menu-text-color-hover;
+			}
+		}
+
+		// Sub menu arrow - background color.
+		&::after {
+			border-bottom-color: $dark-style-sub-menu-background-color;
+		}
+
+		// Sub menu arrow - border color.
+		&::before {
+			border-bottom-color: $dark-style-sub-menu-border-color;
+		}
 	}
 }

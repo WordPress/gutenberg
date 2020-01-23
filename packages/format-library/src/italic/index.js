@@ -13,8 +13,15 @@ export const italic = {
 	title,
 	tagName: 'em',
 	className: null,
-	edit( { isActive, value, onChange } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
+	edit( { isActive, value, onChange, onFocus } ) {
+		function onToggle() {
+			onChange( toggleFormat( value, { type: name } ) );
+		}
+
+		function onClick() {
+			onToggle();
+			onFocus();
+		}
 
 		return (
 			<>
@@ -27,7 +34,7 @@ export const italic = {
 					name="italic"
 					icon="editor-italic"
 					title={ title }
-					onClick={ onToggle }
+					onClick={ onClick }
 					isActive={ isActive }
 					shortcutType="primary"
 					shortcutCharacter="i"

@@ -36,6 +36,8 @@ class URLInput extends Component {
 
 		this.suggestionNodes = [];
 
+		this.isUpdatingSuggestions = false;
+
 		this.state = {
 			suggestions: [],
 			showSuggestions: false,
@@ -45,6 +47,7 @@ class URLInput extends Component {
 
 	componentDidUpdate() {
 		const { showSuggestions, selectedSuggestion } = this.state;
+
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
 		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
@@ -58,6 +61,16 @@ class URLInput extends Component {
 				this.scrollingIntoView = false;
 			}, 100 );
 		}
+
+		if ( this.shouldShowInitialSuggestions() ) {
+			this.updateSuggestions();
+		}
+	}
+
+	componentDidMount() {
+		if ( this.shouldShowInitialSuggestions() ) {
+			this.updateSuggestions();
+		}
 	}
 
 	componentWillUnmount() {
@@ -70,18 +83,29 @@ class URLInput extends Component {
 		};
 	}
 
-	updateSuggestions( value ) {
+	shouldShowInitialSuggestions() {
+		const { suggestions } = this.state;
+		const { __experimentalShowInitialSuggestions = false, value } = this.props;
+		return ! this.isUpdatingSuggestions && __experimentalShowInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length );
+	}
+
+	updateSuggestions( value = '' ) {
 		const {
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalHandleURLSuggestions: handleURLSuggestions,
 		} = this.props;
+
 		if ( ! fetchLinkSuggestions ) {
 			return;
 		}
 
-		// Show the suggestions after typing at least 2 characters
-		// and also for URLs
-		if ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) {
+		const isInitialSuggestions = ! ( value && value.length );
+
+		// Allow a suggestions request if:
+		// - there are at least 2 characters in the search input (except manual searches where
+		//   search input length is not required to trigger a fetch)
+		// - this is a direct entry (eg: a URL)
+		if ( ! isInitialSuggestions && ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) ) {
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
@@ -91,13 +115,17 @@ class URLInput extends Component {
 			return;
 		}
 
+		this.isUpdatingSuggestions = true;
+
 		this.setState( {
 			showSuggestions: true,
 			selectedSuggestion: null,
 			loading: true,
 		} );
 
-		const request = fetchLinkSuggestions( value );
+		const request = fetchLinkSuggestions( value, {
+			isInitialSuggestions,
+		} );
 
 		request.then( ( suggestions ) => {
 			// A fetch Promise doesn't have an abort option. It's mimicked by
@@ -121,19 +149,24 @@ class URLInput extends Component {
 			} else {
 				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 			}
+			this.isUpdatingSuggestions = false;
 		} ).catch( () => {
 			if ( this.suggestionsRequest === request ) {
 				this.setState( {
 					loading: false,
 				} );
+				this.isUpdatingSuggestions = false;
 			}
 		} );
 
+		// Note that this assignment is handled *before* the async search request
+		// as a Promise always resolves on the next tick of the event loop.
 		this.suggestionsRequest = request;
 	}
 
 	onChange( event ) {
 		const inputValue = event.target.value;
+
 		this.props.onChange( inputValue );
 		if ( ! this.props.disableSuggestions ) {
 			this.updateSuggestions( inputValue );
@@ -146,8 +179,7 @@ class URLInput extends Component {
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
 		if (
-			( ! showSuggestions || ! suggestions.length || loading ) &&
-			this.props.value
+			( ! showSuggestions || ! suggestions.length || loading )
 		) {
 			// In the Windows version of Firefox the up and down arrows don't move the caret
 			// within an input field like they do for Mac Firefox/Chrome/Safari. This causes
@@ -237,12 +269,12 @@ class URLInput extends Component {
 		this.inputRef.current.focus();
 	}
 
-	static getDerivedStateFromProps( { value, disableSuggestions }, { showSuggestions, selectedSuggestion } ) {
+	static getDerivedStateFromProps( { value, disableSuggestions, __experimentalShowInitialSuggestions = false }, { showSuggestions } ) {
 		let shouldShowSuggestions = showSuggestions;
 
 		const hasValue = value && value.length;
 
-		if ( ! hasValue ) {
+		if ( ! __experimentalShowInitialSuggestions && ! hasValue ) {
 			shouldShowSuggestions = false;
 		}
 
@@ -251,7 +283,6 @@ class URLInput extends Component {
 		}
 
 		return {
-			selectedSuggestion: hasValue ? selectedSuggestion : null,
 			showSuggestions: shouldShowSuggestions,
 		};
 	}
@@ -267,6 +298,7 @@ class URLInput extends Component {
 			placeholder = __( 'Paste URL or type to search' ),
 			value = '',
 			autoFocus = true,
+			__experimentalShowInitialSuggestions = false,
 		} = this.props;
 
 		const {
@@ -275,6 +307,7 @@ class URLInput extends Component {
 			selectedSuggestion,
 			loading,
 		} = this.state;
+
 		const id = `url-input-control-${ instanceId }`;
 
 		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
@@ -333,6 +366,7 @@ class URLInput extends Component {
 					buildSuggestionItemProps,
 					isLoading: loading,
 					handleSuggestionClick: this.handleOnClick,
+					isInitialSuggestions: __experimentalShowInitialSuggestions && ! ( value && value.length ),
 				} ) }
 
 				{ ! isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length &&

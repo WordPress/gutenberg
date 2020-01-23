@@ -66,7 +66,7 @@ _Parameters_
 
 -   _state_ `Object`: Global state.
 -   _name_ `string`: Shortcut name.
--   _representation_ `null`: Type of representation (display, raw, ariaLabel).
+-   _representation_ (unknown type): Type of representation (display, raw, ariaLabel).
 
 _Returns_
 

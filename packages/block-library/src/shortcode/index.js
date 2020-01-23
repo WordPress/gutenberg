@@ -10,14 +10,16 @@ import edit from './edit';
 import icon from './icon';
 import save from './save';
 import transforms from './transforms';
+import metadata from './block.json';
 
-export const name = 'core/shortcode';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Shortcode' ),
 	description: __( 'Insert additional custom elements with a WordPress shortcode.' ),
 	icon,
-	category: 'widgets',
 	transforms,
 	supports: {
 		customClassName: false,

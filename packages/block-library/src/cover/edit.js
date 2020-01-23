@@ -22,7 +22,6 @@ import {
 	RangeControl,
 	ResizableBox,
 	ToggleControl,
-	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
@@ -32,21 +31,19 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUpload,
-	MediaUploadCheck,
+	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
 	__experimentalUseGradient,
-	__experimentalGradientPicker,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
+import { cover as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import icon from './icon';
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
@@ -259,7 +256,6 @@ function CoverEdit( {
 		dimRatio,
 		focalPoint,
 		hasParallax,
-		id,
 		minHeight,
 		url,
 	} = attributes;
@@ -308,25 +304,12 @@ function CoverEdit( {
 		<>
 			<BlockControls>
 				{ hasBackground && (
-					<>
-						<MediaUploadCheck>
-							<ToolbarGroup>
-								<MediaUpload
-									onSelect={ onSelectMedia }
-									allowedTypes={ ALLOWED_MEDIA_TYPES }
-									value={ id }
-									render={ ( { open } ) => (
-										<Button
-											className="components-toolbar__control"
-											label={ __( 'Edit media' ) }
-											icon="edit"
-											onClick={ open }
-										/>
-									) }
-								/>
-							</ToolbarGroup>
-						</MediaUploadCheck>
-					</>
+					<MediaReplaceFlow
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*,video/*"
+						onSelect={ onSelectMedia }
+					/>
 				) }
 			</BlockControls>
 			<InspectorControls>
@@ -441,19 +424,6 @@ function CoverEdit( {
 							disableCustomColors={ true }
 							value={ overlayColor.color }
 							onChange={ setOverlayColor }
-							clearable={ false }
-						/>
-						<__experimentalGradientPicker
-							disableCustomGradients
-							onChange={
-								( newGradient ) => {
-									setGradient( newGradient );
-									setAttributes( {
-										overlayColor: undefined,
-									} );
-								}
-							}
-							value={ gradientValue }
 							clearable={ false }
 						/>
 					</div>

@@ -57,7 +57,6 @@ class MediaTextEdit extends Component {
 			mediaWidth: null,
 		};
 		this.onSetHref = this.onSetHref.bind( this );
-		this.onSelectURL = this.onSelectURL.bind( this );
 	}
 
 	onSelectMedia( media ) {
@@ -103,7 +102,6 @@ class MediaTextEdit extends Component {
 			mediaUrl: src || media.url,
 			mediaLink: media.link || undefined,
 			href: newHref,
-			imageFill: undefined,
 			focalPoint: undefined,
 		} );
 	}
@@ -116,29 +114,6 @@ class MediaTextEdit extends Component {
 
 	onSetHref( props ) {
 		this.props.setAttributes( props );
-	}
-
-	onSelectURL( newURL ) {
-		const { mediaUrl, linkDestination, href } = this.props.attributes;
-
-		if ( newURL !== mediaUrl ) {
-			let newHref = href;
-			if ( linkDestination === LINK_DESTINATION_MEDIA ) {
-				// Update the media link.
-				newHref = newURL;
-			}
-
-			// Check if the image is linked to the attachment page.
-			if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
-				// Update the media link.
-				newHref = undefined;
-			}
-			this.props.setAttributes( {
-				mediaUrl: newURL,
-				href: newHref,
-				mediaId: undefined,
-			} );
-		}
 	}
 
 	commitWidthChange( width ) {
@@ -159,7 +134,6 @@ class MediaTextEdit extends Component {
 			<MediaContainer
 				className="block-library-media-text__media-container"
 				onSelectMedia={ this.onSelectMedia }
-				onSelectURL={ this.onSelectURL }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
 				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint } }

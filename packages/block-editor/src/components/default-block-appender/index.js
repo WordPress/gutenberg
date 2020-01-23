@@ -15,7 +15,6 @@ import { withSelect, withDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import BlockDropZone from '../block-drop-zone';
 import Inserter from '../inserter';
 
 export function DefaultBlockAppender( {
@@ -52,7 +51,6 @@ export function DefaultBlockAppender( {
 			data-root-client-id={ rootClientId || '' }
 			className="wp-block block-editor-default-block-appender"
 		>
-			<BlockDropZone rootClientId={ rootClientId } />
 			<TextareaAutosize
 				role="button"
 				aria-label={ __( 'Add block' ) }
@@ -65,6 +63,7 @@ export function DefaultBlockAppender( {
 		</div>
 	);
 }
+
 export default compose(
 	withSelect( ( select, ownProps ) => {
 		const { getBlockCount, getBlockName, isBlockValid, getSettings, getTemplateLock } = select( 'core/block-editor' );
