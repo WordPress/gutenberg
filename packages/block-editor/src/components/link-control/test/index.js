@@ -525,8 +525,8 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const noResults = [];
 
 		// Force returning empty results for existing Pages. Doing this means that the only item
-		// shown should be "Create Page" suggestion because our input does not confirm to a
-		// direct entry schema (eg: a URL).
+		// shown should be "Create Page" suggestion because there will be no search suggestions
+		// and our input does not conform to a direct entry schema (eg: a URL).
 		mockFetchSearchSuggestions.mockImplementation( () => Promise.resolve( noResults ) );
 
 		const LinkControlConsumer = () => {
