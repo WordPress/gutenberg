@@ -1,4 +1,5 @@
-$navigation-min-height: 60px;
+$navigation-menu-height: $grid-size * 7;
+$navigation-sub-menu-height: $grid-size * 5;
 
 /*
 * Frontend: reset the default list styles
@@ -61,8 +62,11 @@ $navigation-min-height: 60px;
 		min-width: max-content;
 		opacity: 0;
 		transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
-		transform: translateY(0.6rem);
 		visibility: hidden;
+
+		> li ul {
+			transform: translateY(0.6rem);
+		}
 	}
 }
 
@@ -77,16 +81,18 @@ $navigation-min-height: 60px;
 
 .wp-block-navigation {
 
-	// Min height and vertical alignment (main menu - level 0)
+	// Remove paddings on subsequent immediate children.
+	.block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
+		margin: 0;
+	}
+
 	&,
 	> .wp-block-navigation__container {
-		min-height: $navigation-min-height;
 		align-items: center;
 		width: 100%;
 
 		> .wp-block-navigation-link {
 			display: flex;
-			min-height: $navigation-min-height;
 			margin-top: 0;
 			margin-bottom: 0;
 		}
@@ -96,25 +102,26 @@ $navigation-min-height: 60px;
 	.wp-block-navigation-link {
 		position: relative;
 		margin: 0;
-		padding-left: $grid-size * 2;
-		padding-right: $grid-size * 2;
+		padding: 0 $grid-size * 2;
+		min-height: $navigation-menu-height;
+		display: flex;
 
+		// Sub menus
+		.wp-block,
 		.wp-block-navigation-link {
-			padding-top: $grid-size / 4;
-			padding-bottom: $grid-size / 4;
+			min-height: $navigation-sub-menu-height;
 			&:first-child {
-				padding-top: $grid-size;
+				margin-top: $grid-size;
 			}
 
 			&:last-child {
-				padding-bottom: $grid-size;
+				margin-bottom: $grid-size;
 			}
 		}
 
 		// Sub menus (editor canvas)
-		[data-type="core/navigation-link"] .wp-block-navigation-link {
-			padding-top: 0;
-			padding-bottom: 0;
+		.wp-block .wp-block-navigation-link {
+			margin: 0;
 		}
 
 		> .block-editor-inner-blocks {
@@ -132,6 +139,7 @@ $navigation-min-height: 60px;
 			// Position (first level)
 			position: absolute;
 			z-index: 1;
+			top: $navigation-menu-height;
 			left: $grid-size * 2; // just under the main menu item.
 
 			// Position (nested levels)
@@ -240,9 +248,6 @@ $navigation-min-height: 60px;
 			& > a {
 				display: flex;
 				align-items: center;
-				@include break-small {
-					padding-left: 16px;
-				}
 			}
 
 			&:first-of-type > a {

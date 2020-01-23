@@ -28,20 +28,6 @@ $navigation-item-height: 46px;
 		justify-content: flex-end;
 	}
 
-	// 2. Remove paddings on subsequent immediate children.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
-		width: auto;
-		padding-left: 0;
-		padding-right: 0;
-		margin: 0;
-	}
-
-	// 3. Set a min height for nav items.
-	// It's needed in order to hide the sub-items when the navigation is not selected.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout .wp-block > [data-block] {
-		min-height: $navigation-item-height;
-	}
-
 	.wp-block-navigation .block-editor-block-list__block::before {
 		left: 0;
 		right: 0;
