@@ -82,6 +82,7 @@ $navigation-min-height: 60px;
 	> .wp-block-navigation__container {
 		min-height: $navigation-min-height;
 		align-items: center;
+		width: 100%;
 
 		> .wp-block-navigation-link {
 			display: flex;
