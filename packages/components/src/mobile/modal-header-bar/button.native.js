@@ -13,6 +13,7 @@ import { Platform, Text, TouchableOpacity } from 'react-native';
  * Internal dependencies
  */
 import Icon from '../../icon';
+import closeIcon from './close-icon';
 import styles from './button.scss';
 
 const ICON_SIZE = 24;
@@ -40,7 +41,7 @@ const CloseButton = ( { onPress } ) => {
 		},
 		android: {
 			accessibilityLabel: __( 'Close' ),
-			icon: 'no-alt',
+			icon: closeIcon,
 		},
 	} );
 	return (
