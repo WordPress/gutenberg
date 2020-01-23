@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { Platform, View, Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -36,6 +36,9 @@ export function ShortcodeEdit( props ) {
 				isSelected={ props.isSelected }
 				onFocus={ onFocus }
 				onBlur={ onBlur }
+				autoCorrect={ false }
+				autoComplete="off"
+				keyboardType={ Platform.OS === 'ios' ? "default" : "visible-password" }
 				placeholderTextColor={ placeholderStyle.color }
 			/>
 		</View>
