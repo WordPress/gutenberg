@@ -266,7 +266,7 @@ function LinkControl( {
 
 		const directLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
 		const isSingleDirectEntryResult = suggestions.length === 1 && directLinkEntryTypes.includes( suggestions[ 0 ].type.toLowerCase() );
-		const shouldShowCreateEntity = showCreatePages && createEmptyPage && ! isSingleDirectEntryResult;
+		const shouldShowCreateEntity = showCreateEntity && createEmptyPage && ! isSingleDirectEntryResult;
 			: undefined;
 		const labelText = isInitialSuggestions
 			? __( 'Recently updated' )
