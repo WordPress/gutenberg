@@ -32,7 +32,7 @@ program
 	.version( version )
 	.arguments( '[slug]' )
 	.option( '-t, --template <name>', 'template type name, allowed values: "es5", "esnext"', 'esnext' )
-	.action( ( slug, { template } ) => {
+	.action( async ( slug, { template } ) => {
 		try {
 			const defaultAnswers = getDefaultAnswers( template );
 			if ( slug ) {
@@ -44,19 +44,13 @@ program
 					slug,
 					title,
 				};
-				Promise.resolve()
-					.then( async () => {
-						await scaffold( template, answers );
-					} );
+				await scaffold( template, answers );
 			} else {
-				inquirer
-					.prompt( getPrompts( template ) )
-					.then( async ( answers ) => {
-						await scaffold( template, {
-							...defaultAnswers,
-							...answers,
-						} );
-					} );
+				const answers = await inquirer.prompt( getPrompts( template ) );
+				await scaffold( template, {
+					...defaultAnswers,
+					...answers,
+				} );
 			}
 		} catch ( e ) {
 			if ( e instanceof CLIError ) {
