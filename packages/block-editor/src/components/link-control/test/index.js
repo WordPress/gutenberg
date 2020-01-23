@@ -517,11 +517,11 @@ describe( 'Default search suggestions', () => {
 	} );
 } );
 
-describe( 'Creating pages', () => {
+describe( 'Creating Entities (eg: Posts, Pages)', () => {
 	it.each( [
 		[ 'HelloWorld', 'without spaces' ],
 		[ 'Hello World', 'with spaces' ],
-	] )( 'should display option to create a link for a valid Page title "%s" (%s)', async ( pageNameText ) => {
+	] )( 'should display option to create a link for a valid Entity title "%s" (%s)', async ( entityNameText ) => {
 		const noResults = [];
 
 		// Force returning empty results for existing Pages. Doing this means that the only item
@@ -539,7 +539,7 @@ describe( 'Creating pages', () => {
 					setLink( suggestion );
 				} }
 				createEmptyPage={ ( title ) => Promise.resolve( {
-					type: 'page',
+					type: 'page', // here we're returning a Page but any entity can be returned
 					id: 123,
 					title: {
 						raw: title,
@@ -559,7 +559,7 @@ describe( 'Creating pages', () => {
 
 		// Simulate searching for a term
 		act( () => {
-			Simulate.change( searchInput, { target: { value: pageNameText } } );
+			Simulate.change( searchInput, { target: { value: entityNameText } } );
 		} );
 
 		await eventLoopTick();
@@ -567,10 +567,10 @@ describe( 'Creating pages', () => {
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
 
-		const createButton = first( Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new Page' ) ) );
+		const createButton = first( Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new' ) ) );
 
 		expect( createButton ).not.toBeNull();
-		expect( createButton.innerHTML ).toEqual( expect.stringContaining( pageNameText ) );
+		expect( createButton.innerHTML ).toEqual( expect.stringContaining( entityNameText ) );
 
 		await act( async () => {
 			Simulate.click( createButton );
@@ -584,8 +584,42 @@ describe( 'Creating pages', () => {
 
 		const currentLinkHTML = currentLink.innerHTML;
 
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( pageNameText ) ); //title
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( entityNameText ) ); //title
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( '/?p=123' ) ); // slug
+	} );
+
+	it( 'should show option to create "blank" entity in initial suggestions (when input is empty)', async () => {
+		act( () => {
+			render(
+				<LinkControl
+					showInitialSuggestions={ true } // should show even if we're not showing initial suggestions
+					showCreatePages={ true }
+					createEmptyPage={ ( title = '(no title)' ) => Promise.resolve( {
+						type: 'page', // here we're returning a Page but any entity can be returned
+						id: 123,
+						title: {
+							raw: title,
+							rendered: title,
+						},
+						link: '/?p=123',
+					} ) }
+				/>, container
+			);
+		} );
+		// Await the initial suggestions to be fetched
+		await eventLoopTick();
+
+		// Search Input UI
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		const createButton = first( Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new' ) ) );
+
+		// Verify input has no value
+		expect( searchInput.value ).toBe( '' );
+		expect( createButton ).not.toBeNull();
+		expect( createButton.innerHTML ).toEqual( expect.stringContaining( 'Create new' ) );
 	} );
 
 	it.each( [
@@ -617,7 +651,7 @@ describe( 'Creating pages', () => {
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
 
-		const createButton = Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new Page' ) );
+		const createButton = Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new' ) );
 
 		expect( createButton ).toBeNull();
 	} );

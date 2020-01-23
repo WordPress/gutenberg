@@ -13,10 +13,6 @@ import {
 } from '@wordpress/components';
 
 export const LinkControlSearchCreate = ( { searchTerm = '', onClick, itemProps, isSelected } ) => {
-	if ( ! searchTerm.trim() ) {
-		return null;
-	}
-
 	return (
 		<Button
 			{ ...itemProps }
