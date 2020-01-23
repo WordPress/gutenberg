@@ -74,7 +74,7 @@ class ButtonEdit extends Component {
 			this.isEditingURL = false;
 		}
 
-		if ( isLinkSheetVisible && url === '' && ! this.isEditingURL ) {
+		if ( isLinkSheetVisible && ! url && ! this.isEditingURL ) {
 			this.getURLFromClipboard();
 		}
 
