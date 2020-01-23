@@ -199,9 +199,9 @@ function NavigationLinkEdit( {
 						'is-selected': isSelected,
 						'has-link': !! url,
 						'has-child': hasDescendants,
-						'has-text-color': navigationBlockAttributes.textColor,
+						'has-text-color': navigationBlockAttributes.valueTextColor,
 						[ `has-${ navigationBlockAttributes.textColor }-color` ]: !! navigationBlockAttributes.textColor,
-						'has-background-color': navigationBlockAttributes.backgroundColor,
+						'has-background-color': navigationBlockAttributes.valueBackgroundColor,
 						[ `has-${ navigationBlockAttributes.backgroundColor }-background-color` ]: !! navigationBlockAttributes.backgroundColor,
 					} ) }
 				style={ {
