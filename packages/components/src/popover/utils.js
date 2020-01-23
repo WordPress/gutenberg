@@ -128,27 +128,13 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis, cor
 	const { height } = contentSize;
 
 	if ( sticky ) {
-		let topEl = anchorRef;
-		let bottomEl = anchorRef;
-
-		if ( typeof sticky === 'string' ) {
-			const elements = document.querySelectorAll( sticky );
-
-			if ( elements.length ) {
-				topEl = elements[ 0 ];
-				bottomEl = elements[ elements.length - 1 ];
-			}
-		}
-
-		const scrollContainerEl = getScrollContainer( topEl ) || document.body;
+		const scrollContainerEl = getScrollContainer( anchorRef ) || document.body;
 		const scrollRect = scrollContainerEl.getBoundingClientRect();
-		const topRect = topEl.getBoundingClientRect();
-		const bottomRect = bottomEl.getBoundingClientRect();
 
-		if ( topRect.top - height <= scrollRect.top ) {
+		if ( anchorRect.top - height <= scrollRect.top ) {
 			return {
 				yAxis,
-				popoverTop: Math.min( bottomRect.bottom - relativeOffsetTop, scrollRect.top + height - relativeOffsetTop ),
+				popoverTop: Math.min( anchorRect.bottom - relativeOffsetTop, scrollRect.top + height - relativeOffsetTop ),
 			};
 		}
 	}

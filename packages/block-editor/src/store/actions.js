@@ -930,15 +930,3 @@ export function * insertAfterBlock( clientId ) {
 	const firstSelectedIndex = yield select( 'core/block-editor', 'getBlockIndex', clientId, rootClientId );
 	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
 }
-
-/**
- * Sets the client ID for the mounted and selected block.
- *
- * @param {Element} clientId The block's client ID.
- */
-export function __unstableSetSelectedMountedBlock( clientId ) {
-	return {
-		type: 'SET_SELECTED_MOUNTED_BLOCK',
-		clientId,
-	};
-}
