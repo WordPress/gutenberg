@@ -1,3 +1,9 @@
+## master
+
+### New Feature
+
+- Updated `@babel` packages to 7.8.3. 
+
 ## 4.5.0 (2019-08-29)
 
 ### Bug Fixes
