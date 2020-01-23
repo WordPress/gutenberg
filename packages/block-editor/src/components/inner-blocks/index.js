@@ -148,20 +148,25 @@ class InnerBlocks extends Component {
 			enableClickThrough,
 			clientId,
 			hasOverlay,
-			__experimentalCaptureToolbars: captureToolbars,
+			className,
 			...props
 		} = this.props;
 		const { templateInProcess } = this.state;
 
-		const classes = classnames( 'block-editor-inner-blocks', {
+		const classes = classnames( className, {
 			'has-overlay': enableClickThrough && hasOverlay,
-			'is-capturing-toolbar': captureToolbars,
 		} );
 
+		// Please do not add any new props to this wrapper div! Add them to the
+		// BlockList instead.
 		return (
-			<div className={ classes }>
+			<div className="block-editor-inner-blocks">
 				{ ! templateInProcess && (
-					<BlockList rootClientId={ clientId } { ...props } />
+					<BlockList
+						rootClientId={ clientId }
+						className={ classes }
+						{ ...props }
+					/>
 				) }
 			</div>
 		);
