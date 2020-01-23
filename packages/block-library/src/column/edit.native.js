@@ -9,7 +9,11 @@ import { View } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	BlockControls,
+	BlockVerticalAlignmentToolbar,
+} from '@wordpress/block-editor';
 import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
@@ -17,6 +21,8 @@ import { withViewportMatch } from '@wordpress/viewport';
 import styles from './editor.scss';
 
 function ColumnEdit( {
+	attributes,
+	setAttributes,
 	hasInnerBlocks,
 	isSelected,
 	getStylesFromColorScheme,
@@ -26,6 +32,8 @@ function ColumnEdit( {
 	columnsContainerWidth,
 	isMobile,
 } ) {
+	const { verticalAlignment } = attributes;
+
 	const columnContainerBaseWidth = styles[ 'column-container-base' ].maxWidth;
 	const containerMaxWidth = styles[ 'columns-container' ].maxWidth;
 
@@ -84,6 +92,10 @@ function ColumnEdit( {
 		// return { width: columnBaseWidth - ( isParentSelected ? 12 : isSelected ? ! hasInnerBlocks ? 28 : 4 : isDescendantOfParentSelected ? -4 : 0 ) }
 	};
 
+	const updateAlignment = ( alignment ) => {
+		setAttributes( { verticalAlignment: alignment } );
+	};
+
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
 			<View style={ [
@@ -97,11 +109,20 @@ function ColumnEdit( {
 	}
 
 	return (
-		<View style={ applyColumnBlockStyle() } >
-			<InnerBlocks
-				renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
-			/>
-		</View>
+		<>
+			<BlockControls>
+				<BlockVerticalAlignmentToolbar
+					onChange={ updateAlignment }
+					value={ verticalAlignment }
+					isCollapsed={ false }
+				/>
+			</BlockControls>
+			<View style={ applyColumnBlockStyle() } >
+				<InnerBlocks
+					renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
+				/>
+			</View>
+		</>
 	);
 }
 

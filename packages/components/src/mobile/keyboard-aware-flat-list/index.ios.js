@@ -43,12 +43,14 @@ export const KeyboardAwareFlatList = ( {
 		onKeyboardWillShow={ () => {
 			this.keyboardWillShowIndicator = true;
 		} }
+		scrollEnabled={ containerStyle ? false : true }
 		onScroll={ ( event ) => {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
 		} } >
 		<FlatList
 			{ ...listProps }
-			style={ containerStyle ? containerStyle : undefined }
+			horizontal={ containerStyle ? true : false }
+			contentContainerStyle={ containerStyle ? containerStyle : undefined }
 		/>
 	</KeyboardAwareScrollView>
 );

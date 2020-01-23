@@ -55,7 +55,6 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 const DEFAULT_COLUMNS = 2;
 const MIN_COLUMNS_NUMBER = 2;
 const MAX_COLUMNS_NUMBER = 6;
-const DEFAULT_ALIGNMENT = 'top';
 
 function ColumnsEditContainer( {
 	attributes,
@@ -65,7 +64,7 @@ function ColumnsEditContainer( {
 	clientId,
 	isMobile,
 } ) {
-	const { verticalAlignment = DEFAULT_ALIGNMENT, width } = attributes;
+	const { verticalAlignment, width } = attributes;
 
 	const { count } = useSelect( ( select ) => {
 		return {
@@ -76,30 +75,6 @@ function ColumnsEditContainer( {
 	useEffect( () => {
 		updateColumns( count, Math.min( MAX_COLUMNS_NUMBER, count || DEFAULT_COLUMNS ) );
 	}, [] );
-
-	const getVerticalAlignmentRemap = () => {
-		let alingment;
-
-		switch ( verticalAlignment ) {
-			case 'center':
-				alingment = 'center';
-				break;
-
-			case 'bottom':
-				alingment = 'flex-end';
-				break;
-
-			case 'top':
-			default:
-				alingment = 'flex-start';
-		}
-		return { alignItems: alingment };
-	};
-
-	const containerStyle = {
-		...styles.columnsContainer,
-		...getVerticalAlignmentRemap(),
-	};
 
 	return (
 		<>
@@ -137,7 +112,7 @@ function ColumnsEditContainer( {
 				}
 			} }>
 				<InnerBlocks
-					containerStyle={ ! isMobile ? containerStyle : undefined }
+					containerStyle={ ! isMobile ? styles.columnsContainer : undefined }
 					allowedBlocks={ ALLOWED_BLOCKS }
 				/>
 			</View>

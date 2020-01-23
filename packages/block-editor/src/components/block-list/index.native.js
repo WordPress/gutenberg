@@ -79,6 +79,7 @@ export class BlockList extends Component {
 			isReadOnly,
 			isRootList,
 			containerStyle,
+			columnStyle,
 		} = this.props;
 
 		return (
@@ -95,6 +96,7 @@ export class BlockList extends Component {
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					containerStyle={ containerStyle }
+					columnStyle={ columnStyle }
 					data={ blockClientIds }
 					extraData={ [ isFullyBordered ] }
 					keyExtractor={ identity }
@@ -133,11 +135,40 @@ export class BlockList extends Component {
 			shouldShowBlockAtIndex,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			containerStyle,
+			getBlockAttributes,
 		} = this.props;
 
+		const getVerticalAlignmentRemap = ( newAlignment ) => {
+			let alingment;
+			switch ( newAlignment ) {
+				case 'center':
+					alingment = 'center';
+					break;
+
+				case 'bottom':
+					alingment = 'flex-end';
+					break;
+
+				case 'top':
+					alingment = 'flex-start';
+					break;
+
+				default:
+					alingment = newAlignment;
+			}
+			return { justifyContent: alingment };
+		};
+
+		const attributes = getBlockAttributes( clientId );
+		let columnContainerStyle = {};
+		if ( attributes ) {
+			columnContainerStyle = getVerticalAlignmentRemap( attributes.verticalAlignment );
+		}
+
 		return (
-			<ReadableContentView>
-				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
+			<ReadableContentView style={ containerStyle ? columnContainerStyle : undefined } >
+				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' } >
 					{ shouldShowInsertionPointBefore( clientId ) && <BlockInsertionPoint /> }
 					{ shouldShowBlockAtIndex( index ) && (
 						<BlockListBlock
@@ -180,6 +211,7 @@ export default compose( [
 			isBlockInsertionPointVisible,
 			getSelectedBlock,
 			getSettings,
+			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
 
 		const {
@@ -232,6 +264,8 @@ export default compose( [
 
 		const isReadOnly = getSettings().readOnly;
 
+		const getBlockAttributes = ( clientId ) => ( __unstableGetBlockWithoutInnerBlocks( clientId ) || {} ).attributes;
+
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -242,6 +276,7 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
+			getBlockAttributes,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
