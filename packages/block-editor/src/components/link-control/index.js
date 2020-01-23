@@ -102,7 +102,8 @@ function LinkControl( {
 	onChange = noop,
 	showInitialSuggestions,
 	forceIsEditingLink,
-    createEmptyPage,
+    showCreateEntity,
+    createEntity,
 } ) {
 	const wrapperNode = useRef();
 	const instanceId = useInstanceId( LinkControl );
@@ -277,7 +278,7 @@ function LinkControl( {
 
 		const directLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
 		const isSingleDirectEntryResult = suggestions.length === 1 && directLinkEntryTypes.includes( suggestions[ 0 ].type.toLowerCase() );
-		const shouldShowCreateEntity = showCreateEntity && createEmptyPage && ! isSingleDirectEntryResult;
+		const shouldShowCreateEntity = showCreateEntity && createEntity && ! isSingleDirectEntryResult;
 			: undefined;
 		const labelText = isInitialSuggestions
 			? __( 'Recently updated' )
@@ -310,16 +311,22 @@ function LinkControl( {
 									searchTerm={ inputValue }
 									onClick={ async () => {
 										setIsResolvingLink( true );
-										const newPage = await createEmptyPage( inputValue );
-										// TODO: handle error from API
+										let newEntity;
+										try {
+											newEntity = await createEntity( 'page', inputValue );
+										} catch ( error ) {
+											// console.log( error );
+											// TODO: state for error
+										}
+
 										setIsResolvingLink( false );
-										onChange( {
-											id: newPage.id,
-											title: newPage.title.raw, // TODO: use raw or rendered?
-											url: newPage.link,
-											type: newPage.type,
-										} );
-										setIsEditingLink( false );
+
+										if ( newEntity ) {
+											onChange( newEntity );
+											setIsEditingLink( false );
+										} else {
+											setIsEditingLink( true );
+										}
 									} }
 									key={ `${ suggestion.id }-${ suggestion.type }` }
 									itemProps={ buildSuggestionItemProps( suggestion, index ) }
