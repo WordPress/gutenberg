@@ -1,6 +1,6 @@
 1.21.0
 ------
-* [Android] Reduced padding around text on Rich Text based blocks.
+* Reduced padding around text on Rich Text based blocks.
 * [Android] Improved stability on very long posts.
 
 1.20.0
