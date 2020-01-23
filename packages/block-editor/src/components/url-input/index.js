@@ -32,6 +32,7 @@ class URLInput extends Component {
 		super( props );
 
 		this.onChange = this.onChange.bind( this );
+		this.onFocus = this.onFocus.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.selectLink = this.selectLink.bind( this );
 		this.handleOnClick = this.handleOnClick.bind( this );
@@ -207,6 +208,15 @@ class URLInput extends Component {
 		const inputValue = event.target.value;
 
 		this.props.onChange( inputValue );
+		if ( ! this.props.disableSuggestions ) {
+			this.updateSuggestions( inputValue );
+		}
+	}
+
+	onFocus( event ) {
+		const inputValue = event.target.value;
+
+		this.props.onFocus( inputValue );
 		if ( ! this.props.disableSuggestions ) {
 			this.updateSuggestions( inputValue );
 		}
@@ -408,6 +418,7 @@ class URLInput extends Component {
 					required
 					value={ value }
 					onChange={ this.onChange }
+					onFocus={ this.onFocus }
 					onInput={ stopEventPropagation }
 					placeholder={ placeholder }
 					onKeyDown={ this.onKeyDown }
