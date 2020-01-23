@@ -21,11 +21,7 @@ import {
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import icon from './icon';
+import { audio as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies

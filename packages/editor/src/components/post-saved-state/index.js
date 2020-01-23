@@ -14,7 +14,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { withSafeTimeout, compose } from '@wordpress/compose';
 import { withViewportMatch } from '@wordpress/viewport';
-import { __experimentalIcon as Icon, check } from '@wordpress/icons';
+import { Icon, check } from '@wordpress/icons';
 
 /**
  * Internal dependencies

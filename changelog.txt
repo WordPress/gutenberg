@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 7.3.0-rc.1 =
+= 7.3.0 =
 
 
 ## Enhancements
@@ -158,6 +158,7 @@
 - Packages: Mark build-styles as side-effectful [19535](https://github.com/WordPress/gutenberg/pull/19535)
 - docgen: Omit unknown type tag from Markdown format output [19571](https://github.com/WordPress/gutenberg/pull/19571)
 - Build Tooling: Skip package for build if package.json unreadable [19439](https://github.com/WordPress/gutenberg/pull/19439)
+
 
 
 

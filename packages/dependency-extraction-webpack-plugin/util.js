@@ -1,4 +1,5 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
+const BUNDLED_PACKAGES = [ '@wordpress/icons' ];
 
 /**
  * Default request to global transformation
@@ -32,6 +33,10 @@ function defaultRequestToExternal( request ) {
 
 		case 'react-dom':
 			return 'ReactDOM';
+	}
+
+	if ( BUNDLED_PACKAGES.includes( request ) ) {
+		return undefined;
 	}
 
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
