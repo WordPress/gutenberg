@@ -91,16 +91,30 @@ $navigation-min-height: 60px;
 		}
 	}
 
-	// Submenus
+	// Main menu
 	.wp-block-navigation-link {
 		position: relative;
-		// Provide a base menu item margin.
-		// This should be the same inside the field,
-		// and the edit container should compensate.
-		// This is to make sure the edit and view are the same.
-		margin-left: $grid-size;
-		margin-right: $grid-size;
-		padding: 0 $grid-size;
+		margin: 0;
+		padding-left: $grid-size * 2;
+		padding-right: $grid-size * 2;
+
+		.wp-block-navigation-link {
+			padding-top: $grid-size / 4;
+			padding-bottom: $grid-size / 4;
+			&:first-child {
+				padding-top: $grid-size;
+			}
+
+			&:last-child {
+				padding-bottom: $grid-size;
+			}
+		}
+
+		// Sub menus (editor canvas)
+		[data-type="core/navigation-link"] .wp-block-navigation-link {
+			padding-top: 0;
+			padding-bottom: 0;
+		}
 
 		> .block-editor-inner-blocks {
 			display: none;
@@ -117,11 +131,12 @@ $navigation-min-height: 60px;
 			// Position (first level)
 			position: absolute;
 			z-index: 1;
+			left: $grid-size * 2; // just under the main menu item.
 
 			// Position (nested levels)
 			.block-editor-inner-blocks,
 			.wp-block-navigation__container {
-				left: calc(100% + #{$grid-size});
+				left: 100%;
 				top: 0;
 			}
 		}
@@ -227,11 +242,7 @@ $navigation-min-height: 60px;
 	.wp-block-navigation-link.has-child > .wp-block-navigation__container {
 		display: flex;
 		flex-direction: column;
-		padding: $grid-size;
-
-		.wp-block-navigation__container {
-			left: calc(100% + #{$grid-size} * 2);
-		}
+		padding: 0;
 	}
 }
 
@@ -246,8 +257,6 @@ $navigation-min-height: 60px;
 			& > a {
 				display: flex;
 				align-items: center;
-				padding-left: 0;
-
 				@include break-small {
 					padding-left: 16px;
 				}
