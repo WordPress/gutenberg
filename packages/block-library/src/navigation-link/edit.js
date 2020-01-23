@@ -209,7 +209,7 @@ function NavigationLinkEdit( {
 				</div>
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
-					renderAppender={ ( hasDescendants && isSelected ) ? InnerBlocks.DefaultAppender : false }
+					renderAppender={ ( ( hasDescendants && isSelected ) || isParentOfSelectedBlock ) ? InnerBlocks.DefaultAppender : false }
 				/>
 			</div>
 		</Fragment>
