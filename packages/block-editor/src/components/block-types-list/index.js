@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
@@ -13,7 +8,39 @@ import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
  */
 import InserterListItem from '../inserter-list-item';
 
-function BlockTypesList( { items, onSelect, onHover = () => {}, children } ) {
+function BlockTypesList( { items = [], onSelect, onHover = () => {}, children } ) {
+	const normalizedItems = items.reduce( ( result, item ) => {
+		const { patterns = [] } = item;
+		const hasDefaultPattern = patterns.filter( ( { isDefault } ) => isDefault ).length > 0;
+
+		// If there is no default inserter pattern provided,
+		// then default block type is displayed.
+		if ( ! hasDefaultPattern ) {
+			result.push( item );
+		}
+
+		if ( patterns.length ) {
+			result.push( ...patterns.map( ( pattern ) => {
+				return {
+					...item,
+					id: item.id + pattern.name,
+					icon: pattern.icon || item.icon,
+					title: pattern.label || item.title,
+					description: pattern.description || item.description,
+					// If `example` is explicitly undefined for the pattern, the preview will not be shown.
+					example: pattern.hasOwnProperty( 'example' ) ? pattern.example : item.example,
+					initialAttributes: {
+						...item.initialAttributes,
+						...pattern.attributes,
+					},
+					innerBlocks: pattern.innerBlocks,
+				};
+			} ) );
+		}
+
+		return result;
+	}, [] );
+
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -21,37 +48,7 @@ function BlockTypesList( { items, onSelect, onHover = () => {}, children } ) {
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-editor-block-types-list">
-			{ items && items.map( ( item ) => {
-				if ( ! isEmpty( item.patterns ) ) {
-					return item.patterns.map( ( pattern ) => {
-						const customizedItem = {
-							...item,
-							initialAttributes: {
-								...item.initialAttributes,
-								...pattern.attributes,
-							},
-							innerBlocks: pattern.innerBlocks,
-						};
-						return (
-							<InserterListItem
-								key={ item.id + pattern.name }
-								className={ getBlockMenuDefaultClassName( item.id ) }
-								icon={ pattern.icon || item.icon }
-								onClick={ () => {
-									onSelect( customizedItem );
-									onHover( null );
-								} }
-								onFocus={ () => onHover( customizedItem ) }
-								onMouseEnter={ () => onHover( customizedItem ) }
-								onMouseLeave={ () => onHover( null ) }
-								onBlur={ () => onHover( null ) }
-								isDisabled={ item.isDisabled }
-								title={ item.title }
-								patternName={ pattern.label }
-							/>
-						);
-					} );
-				}
+			{ normalizedItems.map( ( item ) => {
 				return (
 					<InserterListItem
 						key={ item.id }

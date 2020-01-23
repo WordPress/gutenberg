@@ -77,11 +77,16 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @property {string}   name                 The unique and machine-readable name.
  * @property {string}   label                A human-readable label.
+ * @property {string}   description          A detailed pattern description.
  * @property {WPIcon}   [icon]               An icon helping to visualize the pattern.
  * @property {boolean}  [isDefault]          Indicates whether the current pattern is
  *                                           the default one. Defaults to `false`.
  * @property {Object}   [attributes]         Values which override block attributes.
  * @property {Array[]}  [innerBlocks]        Initial configuration of nested blocks.
+ * @property {Object}   [example]            Example provides structured data for
+ *                                           the block preview. You can set to
+ *                                           `undefined` to disable the preview shown
+ *                                           for the block type.
  * @property {WPBlockPatternScope[]} [scope] The list of scopes where the pattern
  *                                           is applicable. When not provided, it
  *                                           assumes all available scopes.
@@ -94,6 +99,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @property {string}           name         Block type's namespaced name.
  * @property {string}           title        Human-readable block type label.
+ * @property {string}           description  A detailed block type description.
  * @property {string}           category     Block type category classification,
  *                                           used in search interfaces to arrange
  *                                           block types by category.
@@ -108,6 +114,9 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *                                           manipulate the attributes of a block
  *                                           in the context of an editor.
  * @property {WPBlockPattern[]} [patterns]   The list of block patterns.
+ * @property {Object}           [example]    Example provides structured data for
+ *                                           the block preview. When not defined
+ *                                           then no preview is shown.
  */
 
 /**

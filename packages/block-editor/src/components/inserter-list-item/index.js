@@ -19,7 +19,6 @@ function InserterListItem( {
 	isDisabled,
 	title,
 	className,
-	patternName,
 	...props
 } ) {
 	const itemIconStyle = icon ? {
@@ -52,9 +51,6 @@ function InserterListItem( {
 				<span className="block-editor-block-types-list__item-title">
 					{ title }
 				</span>
-				{ patternName && (
-					<em>{ patternName }</em>
-				) }
 			</Button>
 		</li>
 	);
