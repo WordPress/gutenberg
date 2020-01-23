@@ -188,7 +188,7 @@ $navigation-min-height: 60px;
 		//  No text color
 		&:not(.has-text-color) > .block-editor-inner-blocks,
 		&:not(.has-text-color) > .wp-block-navigation__container {
-			color: $light-style-sub-menu-background-color;
+			color: $light-style-sub-menu-text-color;
 			border-color: $light-style-sub-menu-border-color;
 		}
 
@@ -196,15 +196,6 @@ $navigation-min-height: 60px;
 		&:not(.has-background-color) > .block-editor-inner-blocks,
 		&:not(.has-background-color) > .wp-block-navigation__container {
 			background-color: $light-style-sub-menu-background-color;
-
-			.wp-block-navigation-link__submenu-icon,
-			.wp-block-navigation-link__content {
-				color: $light-style-sub-menu-text-color;
-			}
-
-			.wp-block-navigation-link__content:hover {
-				color: $light-style-sub-menu-text-color-hover;
-			}
 		}
 	}
 
@@ -213,7 +204,7 @@ $navigation-min-height: 60px;
 		// No text color
 		&:not(.has-text-color) > .block-editor-inner-blocks,
 		&:not(.has-text-color) > .wp-block-navigation__container {
-			color: $dark-style-sub-menu-background-color;
+			color: $dark-style-sub-menu-text-color;
 			border-color: $dark-style-sub-menu-border-color;
 		}
 
@@ -221,15 +212,6 @@ $navigation-min-height: 60px;
 		&:not(.has-background-color) > .block-editor-inner-blocks,
 		&:not(.has-background-color) > .wp-block-navigation__container {
 			background-color: $dark-style-sub-menu-background-color;
-
-			.wp-block-navigation-link__submenu-icon,
-			.wp-block-navigation-link__content {
-				color: $dark-style-sub-menu-text-color;
-			}
-
-			.wp-block-navigation-link__content:hover {
-				color: $dark-style-sub-menu-text-color-hover;
-			}
 		}
 	}
 }
