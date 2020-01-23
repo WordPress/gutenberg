@@ -20,6 +20,7 @@ export default class EditorPage {
 	listBlockName = 'List';
 	headingBlockName = 'Heading';
 	imageBlockName = 'Image';
+	galleryBlockName = 'Gallery';
 
 	// This is needed to adapt to changes in the way accessibility ids are being
 	// assigned after migrating to AndroidX and React Native 0.60. See:
@@ -47,7 +48,7 @@ export default class EditorPage {
 	// and accessibilityId attributes on this object and selects the block
 	// position uses one based numbering
 	async getBlockAtPosition( position: number, blockName: string, options: { autoscroll: boolean } = { autoscroll: false } ) {
-		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
+		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
@@ -211,14 +212,11 @@ export default class EditorPage {
 			throw Error( `No Block at position ${ position }` );
 		}
 
-		const parentId = `${ blockName } Block. Row ${ position }.`;
-		const parentLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ parentId }")]`;
-		let removeBlockLocator = `${ parentLocator }`;
-		removeBlockLocator += isAndroid() ? '//*' : '//XCUIElementTypeButton';
-		let removeButtonIdentifier = `Remove block at row ${ position }`;
+		const buttonElementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
+		const removeButtonIdentifier = `Remove block at row ${ position }`;
+		const removeBlockLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeButtonIdentifier }")]`;
 
 		if ( isAndroid() ) {
-			removeButtonIdentifier += `, Double tap to remove the block${ this.accessibilityIdSuffix }`;
 			const block = await this.getBlockAtPosition( position, blockName );
 			let checkList = await this.driver.elementsByXPath( removeBlockLocator );
 			while ( checkList.length === 0 ) {
@@ -227,7 +225,6 @@ export default class EditorPage {
 			}
 		}
 
-		removeBlockLocator += `[@${ this.accessibilityIdXPathAttrib }="${ removeButtonIdentifier }"]`;
 		const removeButton = await this.driver.elementByXPath( removeBlockLocator );
 		await removeButton.click();
 	}
@@ -379,6 +376,22 @@ export default class EditorPage {
 
 	async removeImageBlockAtPosition( position: number ) {
 		return await this.removeBlockAtPosition( position, this.imageBlockName );
+	}
+
+	// =========================
+	// Gallery Block functions
+	// =========================
+
+	async addNewGalleryBlock() {
+		await this.addNewBlock( this.galleryBlockName );
+	}
+
+	async getGalleryBlockAtPosition( position: number ) {
+		return this.getBlockAtPosition( position, this.galleryBlockName );
+	}
+
+	async removeGalleryBlockAtPosition( position: number ) {
+		return await this.removeBlockAtPosition( position, this.galleryBlockName );
 	}
 
 	// =========================

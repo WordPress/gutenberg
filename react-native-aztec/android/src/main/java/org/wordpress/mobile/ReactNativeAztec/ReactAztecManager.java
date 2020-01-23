@@ -97,6 +97,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         aztecText.setFocusableInTouchMode(false);
         aztecText.setFocusable(false);
         aztecText.setCalypsoMode(false);
+        aztecText.setPadding(0, 0, 0, 0);
         // This is a temporary hack that sets the correct GB link color and underline
         // see: https://github.com/wordpress-mobile/gutenberg-mobile/pull/1109
         aztecText.setLinkFormatter(new LinkFormatter(aztecText,

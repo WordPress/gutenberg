@@ -216,8 +216,12 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                         writableArray.pushMap(media.toMap());
                     }
                     jsCallback.invoke(writableArray);
-                } else {
+                } else if (!mediaList.isEmpty()) {
                     jsCallback.invoke(mediaList.get(0).toMap());
+                } else {
+                    // if we have no media (e.g. when a content provider throws an exception during file copy), invoke
+                    // the js callback with no arguments
+                    jsCallback.invoke();
                 }
             }
 

@@ -135,9 +135,12 @@ class RCTAztecView: Aztec.TextView {
     }
 
     func commonInit() {
+        Configuration.headersWithBoldTrait = true
         delegate = self
         textContainerInset = .zero
         contentInset = .zero
+        textContainer.lineFragmentPadding = 0
+        Aztec.Metrics.listTextIndentation = 24
         addPlaceholder()
         textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)

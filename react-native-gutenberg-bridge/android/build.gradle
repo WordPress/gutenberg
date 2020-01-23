@@ -139,7 +139,9 @@ dependencies {
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../package.json', 'react-native-video', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-slider', readHashedVersion('../../package.json', '@react-native-community/slider', 'dependencies')))
 
-        def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
+        // FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
+        //def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
+        def rnVersion = '0.60.0-patched'
         implementation "com.facebook.react:react-native:${rnVersion}"
     }
 }
