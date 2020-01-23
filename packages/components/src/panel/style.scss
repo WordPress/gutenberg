@@ -29,7 +29,8 @@
 		padding: $panel-padding;
 	}
 
-	> .components-button {
+	// panel section header 	
+	&-title > .components-button {
 		color: $dark-gray-900;
 	}
 }
