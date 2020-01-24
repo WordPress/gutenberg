@@ -7,10 +7,10 @@
 		align-items: center;
 	}
 
-	// .dashicon {
-	// 	flex-shrink: 0;
-	// 	margin-right: 10px;
-	// }
+	.dashicon {
+		flex-shrink: 0;
+		margin-right: 10px;
+	}
 
 	.components-base-control__label {
 		width: 100%;
@@ -22,9 +22,9 @@
 	}
 }
 
-// .components-range-control__reset {
-// 	margin-left: $grid-size;
-// }
+.components-range-control__reset {
+	margin-left: $grid-size;
+}
 
 // creating mixin because we can't do multiline variables, and we can't comma-group the selectors for styling the range slider
 @mixin range-thumb() {
@@ -121,9 +121,9 @@
 	}
 }
 
-// .components-range-control__number {
-// 	display: inline-block;
-// 	margin-left: $grid-size;
-// 	font-weight: 500;
-// 	width: 54px;
-// }
+.components-range-control__number {
+	display: inline-block;
+	margin-left: $grid-size;
+	font-weight: 500;
+	width: 54px;
+}

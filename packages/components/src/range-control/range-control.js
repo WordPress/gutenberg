@@ -1,296 +1,124 @@
 /**
  * External dependencies
  */
+import { isFinite } from 'lodash';
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useCallback,
-	useRef,
-	useEffect,
-	useState,
-	forwardRef,
-} from '@wordpress/element';
+import { compose, withInstanceId, withState } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import BaseControl from '../base-control';
-import Button from '../button';
-import Dashicon from '../dashicon';
+import { BaseControl, Button, Dashicon } from '../';
 
-import { color } from '../utils/colors';
-import RangeRail from './rail';
-import SimpleTooltip from './tooltip';
-import {
-	ActionRightWrapper,
-	AfterIconWrapper,
-	BeforeIconWrapper,
-	InputRange,
-	InputNumber,
-	Root,
-	Track,
-	ThumbWrapper,
-	Thumb,
-	Wrapper,
-} from './styles/range-control-styles';
-
-export const RangeControlNext = forwardRef(
-	(
-		{
-			afterIcon,
-			allowReset = false,
-			alwaysShowTooltip = false,
-			beforeIcon,
-			className,
-			color: colorProp = color( 'blue.wordpress.700' ),
-			disabled = false,
-			disableToolTip = false,
-			help,
-			id,
-			label,
-			marks = false,
-			max = 100,
-			min = 0,
-			onBlur = noop,
-			onChange = noop,
-			onFocus = noop,
-			onMouseEnter = noop,
-			onMouseLeave = noop,
-			renderTooltipContent = ( v ) => v,
-			step = 1,
-			width = '100%',
-			tooltipPosition = 'auto',
-			tooltipTimeout = 250,
-			tooltipZIndex = 100,
-			value: valueProp = 0,
-			withInputField = true,
-			...props
-		},
-		ref
-	) => {
-		const [ value, setValue ] = useControlledRangeValue( valueProp );
-		const [ showTooltip, setShowTooltip ] = useState( false );
-		const originalValueRef = useRef( value );
-
-		const inputRef = useRef();
-
-		const setRef = ( nodeRef ) => {
-			inputRef.current = nodeRef;
-
-			if ( ref ) {
-				ref( nodeRef );
-			}
-		};
-
-		const isFocused = ! disabled && showTooltip;
-		const fillValue = `${ ( value / max ) * 100 }%`;
-
-		const classes = classnames( 'components-range-control', className );
-		const wrapperClasses = classnames(
-			'components-range-control__wrapper',
-			!! marks && 'is-marked'
-		);
-
-		const describedBy = !! help ? `${ id }__help` : undefined;
-		const enableTooltip = ! disableToolTip;
-
-		const handleOnChange = ( event ) => {
-			const nextValue = event.target.value;
-
-			if ( ! event.target.checkValidity() ) {
-				return;
-			}
-
-			setValue( nextValue );
-			onChange( nextValue );
-		};
-
-		const handleOnReset = () => {
-			const nextValue = originalValueRef.current;
-
-			setValue( nextValue );
-			onChange( nextValue );
-		};
-
-		const handleShowTooltip = () => setShowTooltip( true );
-		const handleHideTooltip = () => setShowTooltip( false );
-
-		const handleOnBlur = ( event ) => {
-			onBlur( event );
-			handleHideTooltip();
-		};
-
-		const handleOnFocus = ( event ) => {
-			onFocus( event );
-			handleShowTooltip();
-		};
-
-		const hoverInteractions = useDebouncedHoverInteraction( {
-			onShow: handleShowTooltip,
-			onHide: handleHideTooltip,
-			onMouseEnter,
-			onMouseLeave,
-			timeout: tooltipTimeout,
-		} );
-
-		return (
-			<BaseControl className={ classes } label={ label } id={ id } help={ help }>
-				<Root className="components-range-control__root" width={ width }>
-					{ beforeIcon && (
-						<BeforeIconWrapper>
-							<Dashicon icon={ beforeIcon } />
-						</BeforeIconWrapper>
-					) }
-					<Wrapper
-						className={ wrapperClasses }
-						color={ colorProp }
-						marks={ !! marks }
-					>
-						<InputRange
-							{ ...props }
-							{ ...hoverInteractions }
-							aria-describedby={ describedBy }
-							aria-label={ label }
-							aria-hidden={ false }
-							className="components-range-control__input"
-							disabled={ disabled }
-							max={ max }
-							min={ min }
-							onBlur={ handleOnBlur }
-							onChange={ handleOnChange }
-							onFocus={ handleOnFocus }
-							ref={ setRef }
-							step={ step }
-							tabIndex={ 0 }
-							type="range"
-							value={ value }
-						/>
-						<RangeRail
-							aria-hidden={ true }
-							marks={ marks }
-							max={ max }
-							min={ min }
-							step={ step }
-							value={ value }
-						/>
-						<Track
-							aria-hidden={ true }
-							className="components-range-control__track"
-							style={ { width: fillValue } }
-						/>
-						<ThumbWrapper style={ { left: fillValue } }>
-							<Thumb aria-hidden={ true } isFocused={ isFocused } />
-						</ThumbWrapper>
-						{ enableTooltip && (
-							<SimpleTooltip
-								{ ...hoverInteractions }
-								className="components-range-control__tooltip"
-								inputRef={ inputRef }
-								renderTooltipContent={ renderTooltipContent }
-								position={ tooltipPosition }
-								show={ alwaysShowTooltip || showTooltip }
-								style={ { left: fillValue } }
-								value={ value }
-								zIndex={ tooltipZIndex }
-							/>
-						) }
-					</Wrapper>
-					{ afterIcon && (
-						<AfterIconWrapper>
-							<Dashicon icon={ afterIcon } />
-						</AfterIconWrapper>
-					) }
-					{ withInputField && (
-						<InputNumber
-							aria-label={ label }
-							className="components-range-control__number"
-							max={ max }
-							min={ min }
-							onChange={ handleOnChange }
-							step={ step }
-							type="number"
-							value={ value }
-						/>
-					) }
-					{ allowReset && (
-						<ActionRightWrapper>
-							<Button
-								className="components-range-control__reset"
-								disabled={ value === undefined }
-								isSecondary
-								isSmall
-								onClick={ handleOnReset }
-							>
-								{ __( 'Reset' ) }
-							</Button>
-						</ActionRightWrapper>
-					) }
-				</Root>
-			</BaseControl>
-		);
-	}
-);
-
-function useControlledRangeValue( { value: valueProp = 0 } ) {
-	const [ value, _setValue ] = useState( parseFloat( valueProp ) );
-	const valueRef = useRef( valueProp );
-
-	useEffect( () => {
-		if ( valueRef.current !== valueProp ) {
-			setValue( valueProp );
-			valueRef.current = valueProp;
-		}
-	}, [ valueRef, valueProp, setValue ] );
-
-	const setValue = useCallback(
-		( nextValue ) => {
-			_setValue( parseFloat( nextValue ) );
-		},
-		[ _setValue ]
-	);
-
-	return [ value, setValue ];
-}
-
-function useDebouncedHoverInteraction( {
-	onShow = noop,
-	onHide = noop,
-	onMouseEnter = noop,
-	onMouseLeave = noop,
-	timeout = 250,
+function RangeControl( {
+	className,
+	currentInput,
+	label,
+	value,
+	instanceId,
+	onChange,
+	beforeIcon,
+	afterIcon,
+	help,
+	allowReset,
+	initialPosition,
+	min,
+	max,
+	setState,
+	...props
 } ) {
-	const [ show, setShow ] = useState( false );
-	const timeoutRef = useRef();
-
-	const handleOnMouseEnter = useCallback( ( event ) => {
-		onMouseEnter( event );
-
-		if ( timeoutRef.current ) {
-			window.clearTimeout( timeoutRef.current );
-		}
-
-		if ( ! show ) {
-			setShow( true );
-			onShow();
-		}
-	}, [] );
-
-	const handleOnMouseLeave = useCallback( ( event ) => {
-		onMouseLeave( event );
-
-		timeoutRef.current = setTimeout( () => {
-			setShow( false );
-			onHide();
-		}, timeout );
-	}, [] );
-
-	return {
-		onMouseEnter: handleOnMouseEnter,
-		onMouseLeave: handleOnMouseLeave,
+	const id = `inspector-range-control-${ instanceId }`;
+	const currentInputValue = currentInput === null ? value : currentInput;
+	const resetValue = () => {
+		resetCurrentInput();
+		onChange();
 	};
+	const resetCurrentInput = () => {
+		if ( currentInput !== null ) {
+			setState( {
+				currentInput: null,
+			} );
+		}
+	};
+
+	const onChangeValue = ( event ) => {
+		const newValue = event.target.value;
+		// If the input value is invalid temporarily save it to the state,
+		// without calling on change.
+		if ( ! event.target.checkValidity() ) {
+			setState( {
+				currentInput: newValue,
+			} );
+			return;
+		}
+		// The input is valid, reset the local state property used to temporaly save the value,
+		// and call onChange with the new value as a number.
+		resetCurrentInput();
+		onChange( ( newValue === '' ) ?
+			undefined :
+			parseFloat( newValue )
+		);
+	};
+
+	const initialFallbackValue = isFinite( initialPosition ) ?
+		initialPosition : '';
+
+	const initialSliderValue = isFinite( currentInputValue ) ?
+		currentInputValue : initialFallbackValue;
+
+	return (
+		<BaseControl
+			label={ label }
+			id={ id }
+			help={ help }
+			className={ classnames( 'components-range-control', className ) }
+		>
+			{ beforeIcon && <Dashicon icon={ beforeIcon } /> }
+			<input
+				className="components-range-control__slider"
+				id={ id }
+				type="range"
+				value={ initialSliderValue }
+				onChange={ onChangeValue }
+				aria-describedby={ !! help ? id + '__help' : undefined }
+				min={ min }
+				max={ max }
+				{ ...props } />
+			{ afterIcon && <Dashicon icon={ afterIcon } /> }
+			<input
+				className="components-range-control__number"
+				type="number"
+				onChange={ onChangeValue }
+				aria-label={ label }
+				value={ currentInputValue }
+				min={ min }
+				max={ max }
+				onBlur={ resetCurrentInput }
+				{ ...props }
+			/>
+			{ allowReset && (
+				<Button
+					onClick={ resetValue }
+					disabled={ value === undefined }
+					isSmall
+					isSecondary
+					className="components-range-control__reset"
+				>
+					{ __( 'Reset' ) }
+				</Button>
+			) }
+		</BaseControl>
+	);
 }
+
+export default compose( [
+	withInstanceId,
+	withState( {
+		currentInput: null,
+	} ),
+] )( RangeControl );

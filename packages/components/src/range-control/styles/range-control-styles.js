@@ -76,6 +76,13 @@ export const Track = styled.span`
 	top: 0;
 `;
 
+export const MarksWrapper = styled.span`
+	box-sizing: border-box;
+	display: block;
+	position: relative;
+	width: 100%;
+`;
+
 const markFill = ( { isFilled } ) => {
 	return css( {
 		backgroundColor: isFilled ? 'currentColor' : color( 'lightGray.600' ),
@@ -262,7 +269,11 @@ export const InputNumber = styled.input`
 	margin-top: 2px;
 	min-width: 54px;
 	max-width: 120px;
-	height: 24px;
+
+	input[type="number"]& {
+		min-height: 24px;
+		height: 24px;
+	}
 `;
 
 export const ActionRightWrapper = styled.span`
@@ -270,4 +281,8 @@ export const ActionRightWrapper = styled.span`
 	display: block;
 	margin-left: 8px;
 	margin-top: 2px;
+
+	button& {
+		margin-left: 0;
+	}
 `;

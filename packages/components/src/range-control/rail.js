@@ -6,7 +6,7 @@ import { isUndefined } from 'lodash';
  * Internal dependencies
  */
 import RangeMark from './mark';
-import { Rail } from './styles/range-control-styles';
+import { MarksWrapper, Rail } from './styles/range-control-styles';
 
 export default function RangeRail( {
 	marks = false,
@@ -16,25 +16,45 @@ export default function RangeRail( {
 	value = 0,
 	...restProps
 } ) {
-	const marksData = useMarks( { marks, min, max, step, value } );
-
 	return (
 		<>
 			<Rail { ...restProps } />
-			<div style={ { position: 'relative' } }>
-				{ marks && (
-				<>
-					{ marksData.map( ( mark ) => (
-						<RangeMark { ...mark } key={ mark.key } aria-hidden="true" />
-					) ) }
-				</>
-				) }
-			</div>
+			{ marks && (
+				<Marks
+					marks={ marks }
+					min={ min }
+					max={ max }
+					step={ step }
+					value={ value }
+				/>
+			) }
 		</>
 	);
 }
 
+function Marks( {
+	marks = false,
+	min = 0,
+	max = 100,
+	step = 1,
+	value = 0,
+} ) {
+	const marksData = useMarks( { marks, min, max, step, value } );
+
+	return (
+		<MarksWrapper aria-hidden="true" className="components-range-control__marks">
+			{ marksData.map( ( mark ) => (
+				<RangeMark { ...mark } key={ mark.key } aria-hidden="true" />
+			) ) }
+		</MarksWrapper>
+	);
+}
+
 function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
+	if ( ! marks ) {
+		return [];
+	}
+
 	const isCustomMarks = Array.isArray( marks );
 
 	const markCount = ( max - min ) / step;
