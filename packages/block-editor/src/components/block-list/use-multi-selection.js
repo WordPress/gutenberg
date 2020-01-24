@@ -150,8 +150,10 @@ export default function useMultiSelection( ref ) {
 	const onSelectionChange = useCallback( ( { isSelectionEnd } ) => {
 		const selection = window.getSelection();
 
-		// If no selection is found, end multi selection.
+		// If no selection is found, end multi selection and enable all rich
+		// text areas.
 		if ( ! selection.rangeCount || selection.isCollapsed ) {
+			toggleRichText( ref.current, true );
 			return;
 		}
 

@@ -241,7 +241,6 @@ function BlockListBlock( {
 			'has-selected-ui': hasSelectedUI,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': shouldAppearSelected && hasSelectedUI,
-			'is-navigate-mode': isNavigationMode,
 			'is-multi-selected': isMultiSelected,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,

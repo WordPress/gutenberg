@@ -127,7 +127,7 @@
 			}
 		}
 
-		&.is-navigate-mode::before {
+		.is-navigate-mode &::before {
 			border-color: $blue-medium-focus;
 			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
 
@@ -277,7 +277,7 @@
 	}
 
 	// Select tool/navigation mode shows the default cursor until an additional click edits.
-	&.is-navigate-mode {
+	.is-navigate-mode & {
 		cursor: default;
 	}
 

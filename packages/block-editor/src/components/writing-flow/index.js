@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { overEvery, find, findLast, reverse, first, last } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -505,11 +506,15 @@ export default function WritingFlow( { children } ) {
 		}
 	}, [ hasMultiSelection, isMultiSelecting ] );
 
+	const className = classnames( 'block-editor-writing-flow', {
+		'is-navigate-mode': isNavigationMode,
+	} );
+
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div className="block-editor-writing-flow">
+		<div className={ className }>
 			<FocusCapture
 				ref={ focusCaptureBeforeRef }
 				selectedClientId={ selectedBlockClientId }

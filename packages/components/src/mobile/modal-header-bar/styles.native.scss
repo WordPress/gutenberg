@@ -1,34 +1,52 @@
 .bar {
 	flex-direction: row;
 	width: 100%;
-	margin-bottom: 5px;
 	justify-content: space-between;
 	align-items: center;
-	align-content: center;
-	min-height: 48;
+	height: 48px;
+	padding: 0 16px;
+}
+
+.subtitleBar {
+	height: 64px;
 }
 
 .leftContainer {
-	flex: 1;
-	justify-content: flex-start;
+	flex-grow: 0;
+	flex-shrink: 0;
 }
 
 .rightContainer {
-	flex: 1;
-	justify-content: flex-end;
+	flex-grow: 0;
+	flex-shrink: 0;
 }
 
 .titleContainer {
 	justify-content: center;
-	flex: 2;
-	align-content: center;
+	flex: 1;
+	flex-direction: column;
 }
 
 .title {
-	color: $dark-gray-600;
+	color: $dark-opacity-900;
 	font-size: 18px;
-	font-weight: 600;
+	font-weight: bold;
 	text-align: center;
+}
+
+.titleDark {
+	color: $white;
+}
+
+.subtitle {
+	flex-shrink: 0;
+	text-align: center;
+	font-size: 16px;
+	color: $dark-opacity-600;
+}
+
+.subtitleDark {
+	color: $light-opacity-200;
 }
 
 .separator {

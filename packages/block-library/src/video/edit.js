@@ -31,12 +31,12 @@ import {
 import {
 	withSelect,
 } from '@wordpress/data';
+import { video as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
-import icon from './icon';
 import VideoCommonSettings from './edit-common-settings';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
