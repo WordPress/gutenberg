@@ -105,7 +105,6 @@ $navigation-sub-menu-width: $grid-size * 25;
 	.wp-block-navigation-link {
 		position: relative;
 		margin: 0;
-		padding: 0 $grid-size * 2;
 		min-height: $navigation-menu-height;
 		display: flex;
 		line-height: 1.4;
@@ -158,14 +157,11 @@ $navigation-sub-menu-width: $grid-size * 25;
 			display: flex;
 			align-items: center;
 			width: max-content;
+			padding: $grid-size * 0.75 $grid-size * 2;
 		}
 
 		// Submenu links only
 		.wp-block-navigation-link {
-
-			.wp-block-navigation-link__content {
-				padding: $grid-size * 0.75 $grid-size * 2;
-			}
 
 			&:first-child .wp-block-navigation-link__content {
 				padding-top: $grid-size;
