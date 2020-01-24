@@ -140,7 +140,7 @@ $navigation-sub-menu-height: $grid-size * 5;
 			.block-editor-inner-blocks,
 			.wp-block-navigation__container {
 				left: 100%;
-				top: - $grid-size - 1px; // -1px to account for border width
+				top: - $grid-size - $border-width;
 			}
 		}
 
