@@ -20,6 +20,7 @@ export default function SimpleTooltip( {
 	inputRef,
 	position: positionProp,
 	show = false,
+	style = {},
 	value = 0,
 	renderTooltipContent = ( v ) => v,
 	zIndex = 100,
@@ -27,6 +28,10 @@ export default function SimpleTooltip( {
 } ) {
 	const position = useTooltipPosition( { inputRef, position: positionProp } );
 	const classes = classnames( 'components-simple-tooltip', className );
+	const styles = {
+		...style,
+		zIndex,
+	};
 
 	return (
 		<Tooltip
@@ -36,7 +41,7 @@ export default function SimpleTooltip( {
 			position={ position }
 			show={ show }
 			role="tooltip"
-			style={ { zIndex } }
+			style={ styles }
 		>
 			{ renderTooltipContent( value ) }
 		</Tooltip>

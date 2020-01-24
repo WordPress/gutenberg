@@ -20,17 +20,18 @@ import {
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import Button from '../button';
 import Dashicon from '../dashicon';
 
 import { color } from '../utils/colors';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
 import {
+	ActionRightWrapper,
 	AfterIconWrapper,
 	BeforeIconWrapper,
 	InputRange,
 	InputNumber,
-	ResetButton,
 	Root,
 	Track,
 	ThumbWrapper,
@@ -55,7 +56,11 @@ export const RangeControlNext = forwardRef(
 			marks = false,
 			max = 100,
 			min = 0,
+			onBlur = noop,
 			onChange = noop,
+			onFocus = noop,
+			onMouseEnter = noop,
+			onMouseLeave = noop,
 			renderTooltipContent = ( v ) => v,
 			step = 1,
 			width = '100%',
@@ -86,6 +91,11 @@ export const RangeControlNext = forwardRef(
 		const fillValue = `${ ( value / max ) * 100 }%`;
 
 		const classes = classnames( 'components-range-control', className );
+		const wrapperClasses = classnames(
+			'components-range-control__wrapper',
+			!! marks && 'is-marked'
+		);
+
 		const describedBy = !! help ? `${ id }__help` : undefined;
 		const enableTooltip = ! disableToolTip;
 
@@ -102,6 +112,7 @@ export const RangeControlNext = forwardRef(
 
 		const handleOnReset = () => {
 			const nextValue = originalValueRef.current;
+
 			setValue( nextValue );
 			onChange( nextValue );
 		};
@@ -109,9 +120,21 @@ export const RangeControlNext = forwardRef(
 		const handleShowTooltip = () => setShowTooltip( true );
 		const handleHideTooltip = () => setShowTooltip( false );
 
+		const handleOnBlur = ( event ) => {
+			onBlur( event );
+			handleHideTooltip();
+		};
+
+		const handleOnFocus = ( event ) => {
+			onFocus( event );
+			handleShowTooltip();
+		};
+
 		const hoverInteractions = useDebouncedHoverInteraction( {
 			onShow: handleShowTooltip,
 			onHide: handleHideTooltip,
+			onMouseEnter,
+			onMouseLeave,
 			timeout: tooltipTimeout,
 		} );
 
@@ -123,7 +146,11 @@ export const RangeControlNext = forwardRef(
 							<Dashicon icon={ beforeIcon } />
 						</BeforeIconWrapper>
 					) }
-					<Wrapper color={ colorProp }>
+					<Wrapper
+						className={ wrapperClasses }
+						color={ colorProp }
+						marks={ !! marks }
+					>
 						<InputRange
 							{ ...props }
 							{ ...hoverInteractions }
@@ -134,9 +161,9 @@ export const RangeControlNext = forwardRef(
 							disabled={ disabled }
 							max={ max }
 							min={ min }
-							onBlur={ handleHideTooltip }
+							onBlur={ handleOnBlur }
 							onChange={ handleOnChange }
-							onFocus={ handleShowTooltip }
+							onFocus={ handleOnFocus }
 							ref={ setRef }
 							step={ step }
 							tabIndex={ 0 }
@@ -158,18 +185,20 @@ export const RangeControlNext = forwardRef(
 						/>
 						<ThumbWrapper style={ { left: fillValue } }>
 							<Thumb aria-hidden={ true } isFocused={ isFocused } />
-							{ enableTooltip && (
-								<SimpleTooltip
-									className="components-range-control__tooltip"
-									inputRef={ inputRef }
-									renderTooltipContent={ renderTooltipContent }
-									position={ tooltipPosition }
-									show={ alwaysShowTooltip || showTooltip }
-									value={ value }
-									zIndex={ tooltipZIndex }
-								/>
-							) }
 						</ThumbWrapper>
+						{ enableTooltip && (
+							<SimpleTooltip
+								{ ...hoverInteractions }
+								className="components-range-control__tooltip"
+								inputRef={ inputRef }
+								renderTooltipContent={ renderTooltipContent }
+								position={ tooltipPosition }
+								show={ alwaysShowTooltip || showTooltip }
+								style={ { left: fillValue } }
+								value={ value }
+								zIndex={ tooltipZIndex }
+							/>
+						) }
 					</Wrapper>
 					{ afterIcon && (
 						<AfterIconWrapper>
@@ -189,15 +218,17 @@ export const RangeControlNext = forwardRef(
 						/>
 					) }
 					{ allowReset && (
-						<ResetButton
-							className="components-range-control__reset"
-							disabled={ value === undefined }
-							isSecondary
-							isSmall
-							onClick={ handleOnReset }
-						>
-							{ __( 'Reset' ) }
-						</ResetButton>
+						<ActionRightWrapper>
+							<Button
+								className="components-range-control__reset"
+								disabled={ value === undefined }
+								isSecondary
+								isSmall
+								onClick={ handleOnReset }
+							>
+								{ __( 'Reset' ) }
+							</Button>
+						</ActionRightWrapper>
 					) }
 				</Root>
 			</BaseControl>

@@ -19,15 +19,18 @@ export default function RangeRail( {
 	const marksData = useMarks( { marks, min, max, step, value } );
 
 	return (
-		<Rail { ...restProps }>
-			{ marks && (
+		<>
+			<Rail { ...restProps } />
+			<div style={ { position: 'relative' } }>
+				{ marks && (
 				<>
 					{ marksData.map( ( mark ) => (
 						<RangeMark { ...mark } key={ mark.key } aria-hidden="true" />
 					) ) }
 				</>
-			) }
-		</Rail>
+				) }
+			</div>
+		</>
 	);
 }
 
@@ -43,7 +46,7 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
 		const markValue = ! isUndefined( mark.value ) ? mark.value : value;
 
 		const key = `mark-${ index }`;
-		const isFilled = markValue <= value;
+		const isFilled = markValue * step <= value;
 		const left = `${ ( markValue / markCount ) * 100 }%`;
 
 		return {

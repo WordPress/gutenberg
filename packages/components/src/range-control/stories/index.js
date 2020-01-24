@@ -86,6 +86,8 @@ export const next = () => {
 	const props = {
 		allowReset: boolean( 'allowReset', false ),
 		alwaysShowTooltip: boolean( 'alwaysShowToolTip', false ),
+		label: text( 'label', 'Range Label' ),
+		help: text( 'help', '' ),
 		min: number( 'min', 0 ),
 		max: number( 'max', 10 ),
 		step: number( 'step', 1 ),
@@ -139,5 +141,5 @@ export const nextCustomMarks = () => {
 };
 
 const Wrapper = styled.div`
-	padding: 40px;
+	padding: 60px 40px;
 `;

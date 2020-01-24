@@ -7,7 +7,6 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import Button from '../../button';
 import { color } from '../../utils/colors';
 
 const rootWidth = ( { width } ) => css( { width } );
@@ -16,11 +15,10 @@ export const Root = styled.span`
 	-webkit-tap-highlight-color: transparent;
 	box-sizing: border-box;
 	cursor: pointer;
-	align-items: center;
+	align-items: flex-start;
 	display: inline-flex;
-	height: 2px;
 	justify-content: flex-start;
-	padding: 14px 0;
+	padding: 0;
 	position: relative;
 	touch-action: none;
 	width: 100%;
@@ -29,20 +27,28 @@ export const Root = styled.span`
 `;
 
 const wrapperColor = ( { color: colorProp } ) => css( { color: colorProp } );
+const wrapperMargin = ( { marks } ) => css( { marginBottom: marks ? 16 : null } );
 
 export const Wrapper = styled.span`
+	box-sizing: border-box;
+	display: block;
+	padding-top: 14px;
 	position: relative;
+	height: 28px;
 	width: 100%;
 
 	${ wrapperColor };
+	${ wrapperMargin };
 `;
 
 export const BeforeIconWrapper = styled.span`
 	margin-right: 16px;
+	margin-top: 2px;
 `;
 
 export const AfterIconWrapper = styled.span`
 	margin-left: 16px;
+	margin-top: 2px;
 `;
 
 export const Rail = styled.span`
@@ -51,11 +57,11 @@ export const Rail = styled.span`
 	left: 0;
 	pointer-events: none;
 	right: 0;
-	border-radius: 1px;
 	display: block;
 	height: 3px;
 	position: absolute;
-	margin-top: -1px;
+	margin-top: 13px;
+	top: 0;
 `;
 
 export const Track = styled.span`
@@ -66,7 +72,8 @@ export const Track = styled.span`
 	pointer-events: none;
 	display: block;
 	position: absolute;
-	margin-top: -1px;
+	margin-top: 13px;
+	top: 0;
 `;
 
 const markFill = ( { isFilled } ) => {
@@ -80,27 +87,35 @@ export const Mark = styled.span`
 	height: 9px;
 	left: 0;
 	position: absolute;
-	top: -3px;
+	top: -4px;
 	width: 1px;
 
 	${ markFill };
 `;
 
+const markLabelFill = ( { isFilled } ) => {
+	return css( {
+		color: isFilled ? color( 'darkGray.300' ) : color( 'lightGray.600' ),
+	} );
+};
+
 export const MarkLabel = styled.span`
 	box-sizing: border-box;
-	color: rgba(0, 0, 0, 0.54);
+	color: ${ color( 'lightGray.600' ) };
 	left: 0;
 	font-size: 11px;
 	position: absolute;
-	top: 20px;
+	top: 12px;
 	transform: translateX(-50%);
 	white-space: nowrap;
+
+	${ markLabelFill };
 `;
 
 export const ThumbWrapper = styled.span`
 	align-items: center;
 	margin-left: -10px;
-	margin-top: -10px;
+	margin-top: 4px;
 	width: 20px;
 	box-sizing: border-box;
 	display: flex;
@@ -109,6 +124,7 @@ export const ThumbWrapper = styled.span`
 	outline: 0;
 	position: absolute;
 	pointer-events: none;
+	top: 0;
 	user-select: none;
 `;
 
@@ -168,13 +184,10 @@ export const InputRange = styled.input`
 	width: 100%;
 `;
 
-const tooltipShow = ( { position, show } ) => {
-	const isTop = position === 'top';
-
+const tooltipShow = ( { show } ) => {
 	return css( {
 		opacity: show ? 1 : 0,
-		transform: show ? 'scale(1)' : 'scale(0.5)',
-		transformOrigin: isTop ? 'bottom' : 'top',
+		transform: show ? 'translateX(-50%)' : 'translateX(-50%)',
 	} );
 };
 
@@ -183,7 +196,7 @@ const tooltipPosition = ( { position } ) => {
 
 	if ( isTop ) {
 		return css`
-			margin-top: -32px;
+			margin-top: -8px;
 			top: -100%;
 
 			&::after {
@@ -195,7 +208,7 @@ const tooltipPosition = ( { position } ) => {
 	}
 
 	return css`
-		margin-bottom: -32px;
+		margin-bottom: -8px;
 		bottom: -100%;
 
 		&::after {
@@ -211,14 +224,15 @@ export const Tooltip = styled.div`
 	border-radius: 3px;
 	box-sizing: border-box;
 	color: white;
+	display: inline-block;
 	font-size: 11px;
 	min-width: 32px;
 	opacity: 0;
 	padding: 8px;
-	position: relative;
+	position: absolute;
 	text-align: center;
-	transform: scale(0.5);
-	transition: all 120ms ease;
+	transform: scale(0.5) translateX(-50%);
+	transition: opacity 120ms ease;
 	user-select: none;
 
 	&::after {
@@ -245,12 +259,15 @@ export const InputNumber = styled.input`
 	box-sizing: border-box;
 	display: inline-block;
 	margin-left: 16px;
+	margin-top: 2px;
 	min-width: 54px;
 	max-width: 120px;
 	height: 24px;
 `;
 
-export const ResetButton = styled( Button )( css`
+export const ActionRightWrapper = styled.span`
 	box-sizing: border-box;
+	display: block;
 	margin-left: 8px;
-` );
+	margin-top: 2px;
+`;
