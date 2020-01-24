@@ -20,6 +20,8 @@ import {
 } from '@wordpress/keycodes';
 import { withSafeTimeout } from '@wordpress/compose';
 
+/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+
 /**
  * Set of key codes upon which typing is to be initiated on a keydown event.
  *
@@ -45,6 +47,7 @@ function ObserveTyping( {
 	children,
 	setTimeout: setSafeTimeout,
 } ) {
+	const node = useRef();
 	const lastMouseMove = useRef();
 	const isTyping = useSelect( ( select ) => select( 'core/block-editor' ).isTyping() );
 	const { startTyping, stopTyping } = useDispatch( 'core/block-editor' );
@@ -52,6 +55,27 @@ function ObserveTyping( {
 		toggleEventBindings( isTyping );
 		return () => toggleEventBindings( false );
 	}, [ isTyping ] );
+
+	/**
+	 * Higher-order function which, given an event handler, calls the event
+	 * handler only if the event occurred within the same DOM hierarchy as the
+	 * rendered element. This is used to distinguish between events which bubble
+	 * through React's virtual event system from those which strictly occur in
+	 * the DOM created by the component.
+	 *
+	 * The implication here is: If it's not desirable for a bubbled event to be
+	 * considered by ObserveTyping, it's possible to avoid this by rendering to
+	 * a distinct place in the DOM (e.g. using Slot/Fill).
+	 *
+	 * @param {(event:WPSyntheticEvent)=>void} handler Original event handler.
+	 *
+	 * @return {(event:WPSyntheticEvent)=>void} Enhanced event handler.
+	 */
+	const ifDOMDescendentEventTarget = ( handler ) => ( event ) => {
+		if ( node.current.contains( event.target ) ) {
+			handler( event );
+		}
+	};
 
 	/**
 	 * Bind or unbind events to the document when typing has started or stopped
@@ -107,18 +131,18 @@ function ObserveTyping( {
 	 *
 	 * @param {KeyboardEvent} event Keypress or keydown event to interpret.
 	 */
-	function stopTypingOnEscapeKey( event ) {
+	const stopTypingOnEscapeKey = ifDOMDescendentEventTarget( ( event ) => {
 		if ( isTyping && event.keyCode === ESCAPE ) {
 			stopTyping();
 		}
-	}
+	} );
 
 	/**
 	 * Handles a keypress or keydown event to infer intention to start typing.
 	 *
 	 * @param {KeyboardEvent} event Keypress or keydown event to interpret.
 	 */
-	function startTypingInTextField( event ) {
+	const startTypingInTextField = ifDOMDescendentEventTarget( ( event ) => {
 		const { type, target } = event;
 
 		// Abort early if already typing, or key press is incurred outside a
@@ -136,14 +160,14 @@ function ObserveTyping( {
 		}
 
 		startTyping();
-	}
+	} );
 
 	/**
 	 * Stops typing when focus transitions to a non-text field element.
 	 *
 	 * @param {FocusEvent} event Focus event.
 	 */
-	function stopTypingOnNonTextField( event ) {
+	const stopTypingOnNonTextField = ifDOMDescendentEventTarget( ( event ) => {
 		const { target } = event;
 
 		// Since focus to a non-text field via arrow key will trigger before
@@ -154,7 +178,7 @@ function ObserveTyping( {
 				stopTyping();
 			}
 		} );
-	}
+	} );
 
 	// Disable reason: This component is responsible for capturing bubbled
 	// keyboard events which are interpreted as typing intent.
@@ -162,6 +186,7 @@ function ObserveTyping( {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div
+			ref={ node }
 			onFocus={ stopTypingOnNonTextField }
 			onKeyPress={ startTypingInTextField }
 			onKeyDown={ over( [ startTypingInTextField, stopTypingOnEscapeKey ] ) }
