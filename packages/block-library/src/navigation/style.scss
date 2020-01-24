@@ -105,14 +105,8 @@ $navigation-sub-menu-height: $grid-size * 5;
 		// Sub menus
 		.wp-block,
 		.wp-block-navigation-link {
-			min-height: $navigation-sub-menu-height;
-			&:first-child {
-				margin-top: $grid-size;
-			}
-
-			&:last-child {
-				margin-bottom: $grid-size;
-			}
+			min-height: auto; // reset the min-height and rely on padding
+			padding: 0;
 		}
 
 		// Sub menus (editor canvas)
@@ -140,7 +134,7 @@ $navigation-sub-menu-height: $grid-size * 5;
 			.block-editor-inner-blocks,
 			.wp-block-navigation__container {
 				left: 100%;
-				top: - $grid-size - $border-width;
+				top: - $border-width;
 			}
 		}
 
@@ -151,22 +145,38 @@ $navigation-sub-menu-height: $grid-size * 5;
 			color: inherit;
 		}
 
+		// All links
 		.wp-block-navigation-link__content {
 			display: flex;
 			align-items: center;
 			width: max-content;
 		}
 
+		// Submenu links only
+		.wp-block-navigation-link {
+
+			.wp-block-navigation-link__content {
+				padding: $grid-size / 2 $grid-size * 2;
+			}
+
+			&:first-child .wp-block-navigation-link__content {
+				padding-top: $grid-size;
+			}
+
+			&:last-child .wp-block-navigation-link__content {
+				padding-bottom: $grid-size;
+			}
+		}
+
 		&.has-child .wp-block-navigation-link__content {
 			min-width: 100%;
-			padding-right: 16px;
+			padding-right: $grid-size * 4;
 			position: relative;
 		}
 
 		.wp-block-navigation-link__submenu-icon {
-			margin-left: 4px;
 			position: absolute;
-			right: 0;
+			right: $grid-size;
 
 			svg {
 				fill: currentColor;
