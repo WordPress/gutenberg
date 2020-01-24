@@ -23,6 +23,7 @@ const {
 } = require( './env' );
 const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
+const { makeChangeLog } = require( './changelog/make-change-log' );
 
 module.exports = {
 	buildWordPress,
@@ -43,4 +44,5 @@ module.exports = {
 	downloadWordPressZip,
 	mergeYAMLConfigs,
 	spawnScript,
+	makeChangeLog,
 };
