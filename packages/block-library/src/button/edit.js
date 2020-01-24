@@ -97,7 +97,10 @@ function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onTo
 		setIsURLPickerOpen( true );
 	};
 	const linkControl = isURLPickerOpen && (
-		<Popover position="bottom center">
+		<Popover
+			position="bottom center"
+			onClose={ () => setIsURLPickerOpen( false ) }
+		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
 				value={ { url, title, opensInNewTab } }
@@ -110,9 +113,6 @@ function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onTo
 					if ( opensInNewTab !== newOpensInNewTab ) {
 						onToggleOpenInNewTab( newOpensInNewTab );
 					}
-				} }
-				onClose={ () => {
-					setIsURLPickerOpen( false );
 				} }
 			/>
 		</Popover>
