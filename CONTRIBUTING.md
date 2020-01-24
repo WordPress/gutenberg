@@ -4,7 +4,7 @@ Welcome to WordPress' Gutenberg project! We hope you join us in creating the fut
 
 ## How can I contribute?
 
-To learn all about contributing to the Gutenberg project, see the [Contributors Guide](/docs/contributors/readme.md). The handbook includes all the details you need to get setup and start shaping the future of web publishing.
+To learn all about contributing to the Gutenberg project, see the [Contributor Guide](/docs/contributors/readme.md). The handbook includes all the details you need to get setup and start shaping the future of web publishing.
 
 - Code? See the [developer section](/docs/contributors/develop.md).
 

@@ -1,6 +1,6 @@
-# Contributors Guide
+# Contributor Guide
 
-Welcome to the Gutenberg Project Contributors Guide. This guide is here to help you get setup and start contributing to the project. If you have any questions, you'll find us in the #core-editor channel in the WordPress Core Slack, [free to join](https://make.wordpress.org/chat/).
+Welcome to the Gutenberg Project Contributor Guide. This guide is here to help you get setup and start contributing to the project. If you have any questions, you'll find us in the #core-editor channel in the WordPress Core Slack, [free to join](https://make.wordpress.org/chat/).
 
 Gutenberg is a sub-project of Core WordPress. Please see the [Core Contributor Handbook](https://make.wordpress.org/core/handbook/) for additional information.
 
