@@ -192,9 +192,7 @@ class LatestPostsEdit extends Component {
 					{ displayPosts.map( ( post, i ) => {
 						const titleTrimmed = post.title.rendered.trim();
 						let excerpt = post.excerpt.rendered;
-						if ( excerpt === '' ) {
-							excerpt = post.content.raw;
-						}
+
 						const excerptElement = document.createElement( 'div' );
 						excerptElement.innerHTML = excerpt;
 						excerpt = excerptElement.textContent || excerptElement.innerText || '';
