@@ -643,6 +643,65 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		expect( createButton ).toBeNull();
 	} );
+
+	it( 'should display human readable error notice and re-show create button and search input if page creation request fails', async () => {
+		const searchText = 'This page to be created';
+		let searchInput;
+
+		const throwsError = () => {
+			throw new Error( 'API response returned invalid entity.' ); // this can be any error and msg
+		};
+
+		const createEntity = () => Promise.reject( throwsError() );
+
+		act( () => {
+			render(
+				<LinkControl
+					showCreateEntity={ true }
+					createEntity={ createEntity }
+				/>, container
+			);
+		} );
+
+		// Search Input UI
+		searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchText } } );
+		} );
+
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		const createButton = first( Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new' ) ) );
+
+		await act( async () => {
+			Simulate.click( createButton );
+		} );
+
+		await eventLoopTick();
+
+		searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// This is a Notice component wrapped in an aria-live div with role of "alert".
+		const errorNotice = container.querySelector( '[role="alert"]' );
+
+		// Catch the error in the test to avoid test failures
+		expect( throwsError ).toThrow( Error );
+
+		// Check human readable error notice is displayed
+		expect( errorNotice ).not.toBeFalsy();
+		expect( errorNotice.innerHTML ).toEqual( expect.stringContaining( 'An unknown error occurred during Page creation. Please try again.' ) );
+
+		// Verify input is repopulated with original search text
+		expect( searchInput ).not.toBeFalsy();
+		expect( searchInput.value ).toBe( searchText );
+
+		// TODO: check for Create button being visible again once
+		// https://github.com/WordPress/gutenberg/issues/19647 is resolved
+	} );
 } );
 
 describe( 'Selecting links', () => {
