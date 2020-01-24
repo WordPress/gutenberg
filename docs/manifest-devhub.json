@@ -264,7 +264,7 @@
 		"parent": "designers"
 	},
 	{
-		"title": "Contributors Guide",
+		"title": "Contributor Guide",
 		"slug": "contributors",
 		"markdown_source": "../docs/contributors/readme.md",
 		"parent": null
