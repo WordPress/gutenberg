@@ -163,7 +163,7 @@ $navigation-sub-menu-width: $grid-size * 25;
 		// Submenu links only
 		.wp-block-navigation-link {
 
-			&:first-child .wp-block-navigation-link__content {
+			&:first-child:not(:only-child) .wp-block-navigation-link__content {
 				padding-top: $grid-size;
 			}
 
