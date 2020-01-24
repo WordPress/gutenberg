@@ -45,12 +45,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
+import { image as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
-import icon from './icon';
 import ImageSize from './image-size';
 /**
  * Module constants

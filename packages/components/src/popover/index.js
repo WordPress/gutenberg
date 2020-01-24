@@ -62,7 +62,25 @@ function computeAnchorRect(
 			return getRectangleFromRange( anchorRef );
 		}
 
-		const rect = anchorRef.getBoundingClientRect();
+		if ( anchorRef instanceof window.Element ) {
+			const rect = anchorRef.getBoundingClientRect();
+
+			if ( shouldAnchorIncludePadding ) {
+				return rect;
+			}
+
+			return withoutPadding( rect, anchorRef );
+		}
+
+		const { top, bottom } = anchorRef;
+		const topRect = top.getBoundingClientRect();
+		const bottomRect = bottom.getBoundingClientRect();
+		const rect = new window.DOMRect(
+			topRect.left,
+			topRect.top,
+			topRect.width,
+			bottomRect.bottom - topRect.top
+		);
 
 		if ( shouldAnchorIncludePadding ) {
 			return rect;
@@ -301,7 +319,7 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef, relativeOffsetTop );
+			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, containerRef.current, relativeOffsetTop );
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
 				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
@@ -342,9 +360,6 @@ const Popover = ( {
 
 		// Height may still adjust between now and the next tick.
 		const timeoutId = window.setTimeout( refresh );
-		const refreshOnAnimationFrame = () => {
-			window.requestAnimationFrame( refresh );
-		};
 
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
@@ -354,6 +369,13 @@ const Popover = ( {
 		 * For these situations, we refresh the popover every 0.5s
 		 */
 		const intervalHandle = window.setInterval( refresh, 500 );
+
+		let rafId;
+
+		const refreshOnAnimationFrame = () => {
+			window.cancelAnimationFrame( rafId );
+			rafId = window.requestAnimationFrame( refresh );
+		};
 
 		// Sometimes a click trigger a layout change that affects the popover
 		// position. This is an opportunity to immediately refresh rather than
@@ -380,6 +402,7 @@ const Popover = ( {
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
 			window.addEventListener( 'click', refreshOnAnimationFrame );
+			window.cancelAnimationFrame( rafId );
 
 			if ( observer ) {
 				observer.disconnect();

@@ -39,11 +39,11 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
+import { cover as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import icon from './icon';
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,

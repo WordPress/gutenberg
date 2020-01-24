@@ -1526,14 +1526,3 @@ export function isNavigationMode( state ) {
 export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
 }
-
-/**
- * Gets the selected block's DOM node.
- *
- * @param {Object} state Global application state.
- *
- * @return {Element} The selected block's DOM node.
- */
-export function __unstableGetSelectedMountedBlock( state ) {
-	return state.selectedMountedBlock;
-}

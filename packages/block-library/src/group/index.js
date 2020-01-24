@@ -3,13 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { group as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 

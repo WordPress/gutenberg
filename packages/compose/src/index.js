@@ -13,6 +13,7 @@ export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
 export { default as withState } from './higher-order/with-state';
 
 // Hooks
+export { default as __experimentalUseDragging } from './hooks/use-dragging';
 export { default as useInstanceId } from './hooks/use-instance-id';
 export { default as useKeyboardShortcut } from './hooks/use-keyboard-shortcut';
 export { default as useMediaQuery } from './hooks/use-media-query';
