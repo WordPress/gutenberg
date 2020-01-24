@@ -1,5 +1,6 @@
 $navigation-menu-height: $grid-size * 7;
 $navigation-sub-menu-height: $grid-size * 5;
+$navigation-sub-menu-width: $grid-size * 25;
 
 /*
 * Frontend: reset the default list styles
@@ -59,7 +60,8 @@ $navigation-sub-menu-height: $grid-size * 5;
 		position: absolute;
 		left: 0;
 		top: 100%;
-		min-width: max-content;
+		min-width: $navigation-sub-menu-width;
+		max-width: $navigation-sub-menu-width;
 		opacity: 0;
 		transition: opacity 0.1s linear;
 		visibility: hidden;
@@ -76,6 +78,11 @@ $navigation-sub-menu-height: $grid-size * 5;
 }
 
 .wp-block-navigation {
+
+	// set a width on the editor submenus
+	.block-editor-block-list__layout .block-editor-block-list__layout {
+		width: $navigation-sub-menu-width;
+	}
 
 	// Remove paddings on subsequent immediate children.
 	.block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
@@ -101,6 +108,7 @@ $navigation-sub-menu-height: $grid-size * 5;
 		padding: 0 $grid-size * 2;
 		min-height: $navigation-menu-height;
 		display: flex;
+		line-height: 1.4;
 
 		// Sub menus
 		.wp-block,
@@ -156,7 +164,7 @@ $navigation-sub-menu-height: $grid-size * 5;
 		.wp-block-navigation-link {
 
 			.wp-block-navigation-link__content {
-				padding: $grid-size / 2 $grid-size * 2;
+				padding: $grid-size * 0.75 $grid-size * 2;
 			}
 
 			&:first-child .wp-block-navigation-link__content {
