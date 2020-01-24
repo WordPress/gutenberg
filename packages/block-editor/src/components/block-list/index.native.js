@@ -113,6 +113,7 @@ export class BlockList extends Component {
 						<BlockListAppender
 							rootClientId={ this.props.rootClientId }
 							renderAppender={ this.props.renderAppender }
+							showSeparator
 						/>
 					</View>
 				)
@@ -137,6 +138,8 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 			containerStyle,
 			getBlockAttributes,
+			renderAppender,
+			blockClientIds,
 		} = this.props;
 
 		const getVerticalAlignmentRemap = ( newAlignment ) => {
@@ -179,7 +182,7 @@ export class BlockList extends Component {
 							onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 							isSmallScreen={ ! this.props.isFullyBordered }
 						/> ) }
-					{ shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
+					{ ! ( renderAppender && blockClientIds.length > 0 ) && shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
 				</View>
 			</ReadableContentView>
 		);
@@ -223,7 +226,7 @@ export default compose( [
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const selectedBlock = getSelectedBlock();
-		const hasInnerBlocks = selectedBlock && ( selectedBlock.name === getGroupingBlockName() || selectedBlock.name === 'core/columns' );
+		const hasInnerBlocks = selectedBlock && ( selectedBlock.name === getGroupingBlockName() || selectedBlock.name === 'core/columns' || selectedBlock.name === 'core/column' );
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&
