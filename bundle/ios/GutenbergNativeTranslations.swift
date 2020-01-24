@@ -78,6 +78,7 @@ private func dummy() {
     _ = NSLocalizedString("Take a Video", comment: "")
     _ = NSLocalizedString("Tap here to show help", comment: "")
     _ = NSLocalizedString("Tap to hide the keyboard", comment: "")
+    _ = NSLocalizedString("Template Preview", comment: "")
     _ = NSLocalizedString("Title:", comment: "")
     _ = NSLocalizedString("Translate", comment: "")
     _ = NSLocalizedString("Ungroup", comment: "")
