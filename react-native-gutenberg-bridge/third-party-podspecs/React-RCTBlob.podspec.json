@@ -1,6 +1,6 @@
 {
   "name": "React-RCTBlob",
-  "version": "0.60.0-patched",
+  "version": "0.61.5",
   "summary": "An API for displaying iOS action sheets and share sheets.",
   "homepage": "http://facebook.github.io/react-native/",
   "license": "MIT",
@@ -10,10 +10,13 @@
     "tvos": "9.2"
   },
   "source": {
-    "git": "https://github.com/jtreanor/react-native.git",
-    "tag": "v0.60.0-patched"
+    "git": "https://github.com/facebook/react-native.git",
+    "tag": "v0.61.5"
   },
-  "source_files": "*.{h,m,mm}",
+  "source_files": [
+    "*.{m,mm}",
+    "RCTBlobCollector.h"
+  ],
   "preserve_paths": [
     "package.json",
     "LICENSE",
@@ -21,17 +24,17 @@
   ],
   "header_dir": "RCTBlob",
   "dependencies": {
-    "React-Core": [
-      "0.60.0-patched"
+    "React-Core/RCTBlobHeaders": [
+      "0.61.5"
     ],
-    "React-jsi": [
-      "0.60.0-patched"
+    "React-Core/RCTWebSocket": [
+      "0.61.5"
     ],
     "React-RCTNetwork": [
-      "0.60.0-patched"
+      "0.61.5"
     ],
-    "React-RCTWebSocket": [
-      "0.60.0-patched"
+    "React-jsi": [
+      "0.61.5"
     ]
   },
   "prepare_command": "TMP_DIR=$(mktemp -d); mv * $TMP_DIR; cp -R \"$TMP_DIR/Libraries/Blob\"/* . && true"

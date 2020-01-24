@@ -116,28 +116,9 @@ const setupDriver = async () => {
 
 	await driver.setImplicitWaitTimeout( 2000 );
 	await timer( 3000 );
-	await driver.setOrientation( 'PORTRAIT' );
 
-	// Proxy driver to patch functions on Android
-	// This is needed to adapt to changes in the way accessibility ids are being
-	// assigned after migrating to AndroidX and React Native 0.60. See:
-	// https://github.com/wordpress-mobile/gutenberg-mobile/pull/1112#issuecomment-501165250
-	// for more details.
-	return new Proxy( driver, {
-		get: ( original, property ) => {
-			const propertiesToPatch = [
-				'elementByAccessibilityId',
-				'hasElementByAccessibilityId',
-			];
-			if ( isAndroid() && ( propertiesToPatch.includes( property ) ) ) {
-				return async function( value, cb ) {
-					// Add a comma and a space to all ids
-					return await original[ property ]( `${ value }, `, cb );
-				};
-			}
-			return original[ property ];
-		},
-	} );
+	await driver.setOrientation( 'PORTRAIT' );
+	return driver;
 };
 
 const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {

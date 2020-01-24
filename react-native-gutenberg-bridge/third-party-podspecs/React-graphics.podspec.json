@@ -1,6 +1,6 @@
 {
   "name": "React-graphics",
-  "version": "0.60.0-patched",
+  "version": "0.61.5",
   "summary": "Fabric for React Native.",
   "homepage": "http://facebook.github.io/react-native/",
   "license": "MIT",
@@ -10,8 +10,8 @@
     "tvos": "9.2"
   },
   "source": {
-    "git": "https://github.com/jtreanor/react-native.git",
-    "tag": "v0.60.0-patched"
+    "git": "https://github.com/facebook/react-native.git",
+    "tag": "v0.61.5"
   },
   "libraries": "stdc++",
   "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32",

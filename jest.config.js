@@ -45,7 +45,6 @@ module.exports = {
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [ 'android', 'ios', 'native' ],
-		hasteImplModulePath: '<rootDir>/node_modules/react-native/jest/hasteImpl.js',
 		providesModuleNodeModules: [ 'react-native', 'react-native-svg' ],
 	},
 	transformIgnorePatterns: [
