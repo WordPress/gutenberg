@@ -15,12 +15,6 @@ import { BaseControl, Button, Spinner, withSpokenMessages, Popover } from '@word
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
-
-// Since URLInput is rendered in the context of other inputs, but should be
-// considered a separate modal node, prevent keyboard events from propagating
-// as being considered from the input.
-const stopEventPropagation = ( event ) => event.stopPropagation();
-
 class URLInput extends Component {
 	constructor( props ) {
 		super( props );
@@ -346,7 +340,6 @@ class URLInput extends Component {
 					required
 					value={ value }
 					onChange={ this.onChange }
-					onInput={ stopEventPropagation }
 					placeholder={ placeholder }
 					onKeyDown={ this.onKeyDown }
 					role="combobox"

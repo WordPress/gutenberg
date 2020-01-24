@@ -7,7 +7,6 @@ import {
 	ToggleControl,
 	withSpokenMessages,
 } from '@wordpress/components';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
 import {
 	create,
@@ -23,8 +22,6 @@ import { URLPopover } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { createLinkFormat, isValidHref } from './utils';
-
-const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
@@ -69,7 +66,6 @@ class InlineLinkUI extends Component {
 
 		this.editLink = this.editLink.bind( this );
 		this.submitLink = this.submitLink.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
 		this.onFocusOutside = this.onFocusOutside.bind( this );
@@ -99,13 +95,6 @@ class InlineLinkUI extends Component {
 		}
 
 		return null;
-	}
-
-	onKeyDown( event ) {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
 	}
 
 	onChangeInputValue( inputValue ) {
@@ -216,15 +205,12 @@ class InlineLinkUI extends Component {
 						className="block-editor-format-toolbar__link-container-content"
 						value={ inputValue }
 						onChangeInputValue={ this.onChangeInputValue }
-						onKeyDown={ this.onKeyDown }
-						onKeyPress={ stopKeyPropagation }
 						onSubmit={ this.submitLink }
 						autocompleteRef={ this.autocompleteRef }
 					/>
 				) : (
 					<URLPopover.LinkViewer
 						className="block-editor-format-toolbar__link-container-content"
-						onKeyPress={ stopKeyPropagation }
 						url={ url }
 						onEditLinkClick={ this.editLink }
 						linkClassName={ isValidHref( prependHTTP( url ) ) ? undefined : 'has-invalid-link' }

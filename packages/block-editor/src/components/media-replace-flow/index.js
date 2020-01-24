@@ -13,14 +13,7 @@ import {
 	Dropdown,
 	withNotices,
 } from '@wordpress/components';
-import {
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN,
-	BACKSPACE,
-	ENTER,
-} from '@wordpress/keycodes';
+import { DOWN } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -50,17 +43,6 @@ const MediaReplaceFlow = (
 		return select( 'core/block-editor' ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = createRef();
-
-	const stopPropagation = ( event ) => {
-		event.stopPropagation();
-	};
-
-	const stopPropagationRelevantKeys = ( event ) => {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
-	};
 
 	const selectMedia = ( media ) => {
 		onSelect( media );
@@ -99,8 +81,6 @@ const MediaReplaceFlow = (
 	if ( showEditURLInput ) {
 		urlInputUIContent = (
 			<LinkEditor
-				onKeyDown={ stopPropagationRelevantKeys }
-				onKeyPress={ stopPropagation }
 				value={ mediaURLValue }
 				isFullWidthInput={ true }
 				hasInputBorder={ true }

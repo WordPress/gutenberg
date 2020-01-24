@@ -39,7 +39,6 @@ import {
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -53,8 +52,6 @@ import __experimentalInserterMenuExtension from '../inserter-menu-extension';
 import { searchItems } from './search-items';
 
 const MAX_SUGGESTED_ITEMS = 9;
-
-const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -220,13 +217,6 @@ export class InserterMenu extends Component {
 		debouncedSpeak( resultsFoundMessage );
 	}
 
-	onKeyDown( event ) {
-		if ( includes( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ], event.keyCode ) ) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
-	}
-
 	render() {
 		const { categories, collections, instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
 		const {
@@ -247,16 +237,12 @@ export class InserterMenu extends Component {
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of autoFocus via
 		// Popover's focusOnMount.
-		// Disable reason (no-static-element-interactions): Navigational key-presses within
-		// the menu are prevented from triggering WritingFlow and ObserveTyping interactions.
-		/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div
 				className={ classnames( 'block-editor-inserter__menu', {
 					'has-help-panel': hasHelpPanel,
 				} ) }
-				onKeyPress={ stopKeyPropagation }
-				onKeyDown={ this.onKeyDown }
 			>
 				<div className="block-editor-inserter__main-area">
 					<label htmlFor={ `block-editor-inserter__search-${ instanceId }` } className="screen-reader-text">
@@ -438,7 +424,7 @@ export class InserterMenu extends Component {
 				) }
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 

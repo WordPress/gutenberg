@@ -6,14 +6,11 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { insertObject } from '@wordpress/rich-text';
 import { MediaUpload, RichTextToolbarButton, MediaUploadCheck } from '@wordpress/block-editor';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
 const title = __( 'Inline image' );
-
-const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 function getRange() {
 	const selection = window.getSelection();
@@ -37,7 +34,6 @@ export const image = {
 		constructor() {
 			super( ...arguments );
 			this.onChange = this.onChange.bind( this );
-			this.onKeyDown = this.onKeyDown.bind( this );
 			this.openModal = this.openModal.bind( this );
 			this.closeModal = this.closeModal.bind( this );
 			this.state = {
@@ -67,13 +63,6 @@ export const image = {
 
 		onChange( width ) {
 			this.setState( { width } );
-		}
-
-		onKeyDown( event ) {
-			if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
-				// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-				event.stopPropagation();
-			}
 		}
 
 		openModal() {
@@ -126,8 +115,6 @@ export const image = {
 							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */ }
 							<form
 								className="block-editor-format-toolbar__image-container-content"
-								onKeyPress={ stopKeyPropagation }
-								onKeyDown={ this.onKeyDown }
 								onSubmit={ ( event ) => {
 									const newReplacements = value.replacements.slice();
 
