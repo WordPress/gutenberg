@@ -76,7 +76,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  * @typedef {Object} WPBlockPattern
  *
  * @property {string}   name                 The unique and machine-readable name.
- * @property {string}   label                A human-readable label.
+ * @property {string}   title                A human-readable pattern title.
  * @property {string}   description          A detailed pattern description.
  * @property {WPIcon}   [icon]               An icon helping to visualize the pattern.
  * @property {boolean}  [isDefault]          Indicates whether the current pattern is

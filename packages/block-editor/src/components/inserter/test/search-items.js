@@ -96,7 +96,7 @@ describe( 'searchItems', () => {
 
 		expect( filteredItems ).toHaveLength( 1 );
 		expect( filteredItems[ 0 ].patterns ).toHaveLength( 2 );
-		expect( filteredItems[ 0 ].patterns[ 0 ].label ).toBe( 'Pattern Two' );
-		expect( filteredItems[ 0 ].patterns[ 1 ].label ).toBe( 'Pattern Three' );
+		expect( filteredItems[ 0 ].patterns[ 0 ].title ).toBe( 'Pattern Two' );
+		expect( filteredItems[ 0 ].patterns[ 1 ].title ).toBe( 'Pattern Three' );
 	} );
 } );

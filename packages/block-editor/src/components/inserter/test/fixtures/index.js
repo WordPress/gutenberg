@@ -35,15 +35,15 @@ export const withPatternsItem = {
 	patterns: [
 		{
 			name: 'pattern-one',
-			label: 'Pattern One',
+			title: 'Pattern One',
 		},
 		{
 			name: 'pattern-two',
-			label: 'Pattern Two',
+			title: 'Pattern Two',
 		},
 		{
 			name: 'pattern-three',
-			label: 'Pattern Three',
+			title: 'Pattern Three',
 		},
 	],
 };

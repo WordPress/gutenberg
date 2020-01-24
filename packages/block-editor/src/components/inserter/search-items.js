@@ -98,7 +98,7 @@ export const searchItems = ( items, categories, collections, searchTerm ) => {
 
 		unmatchedTerms = removeMatchingTerms(
 			unmatchedTerms,
-			patterns.map( ( { label } ) => label ).join( ' ' ),
+			patterns.map( ( pattern ) => pattern.title ).join( ' ' ),
 		);
 
 		return unmatchedTerms.length === 0;
@@ -110,7 +110,7 @@ export const searchItems = ( items, categories, collections, searchTerm ) => {
 		const matchedPatterns = item.patterns.filter( ( pattern ) => {
 			return intersectionWith(
 				normalizedSearchTerms,
-				normalizeSearchTerm( pattern.label ),
+				normalizeSearchTerm( pattern.title ),
 				( termToMatch, labelTerm ) => labelTerm.includes( termToMatch )
 			).length > 0;
 		} );
