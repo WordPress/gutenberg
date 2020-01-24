@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-Welcome to WordPress' Gutenberg project, we hope you join us in creating the future platform for publishing, all are welcome here.
+Welcome to WordPress' Gutenberg project! We hope you join us in creating the future platform for publishing; all are welcome here.
 
 ## How can I contribute?
 
