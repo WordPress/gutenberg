@@ -6,13 +6,13 @@ commands:
       - restore_cache:
           name: Restore Yarn Cache
           keys:
-            - yarn-i18n-v4-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
+            - yarn-i18n-v4-cache-v{{ .Environment.CACHE_TRIGGER_VERSION }}-job-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
-          command: yarn install --frozen-lockfile --prefer-offline
+          command: yarn install --frozen-lockfile --prefer-offline --network-concurrency 1
       - save_cache:
           name: Save Yarn Cache
-          key: yarn-i18n-v4-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
+          key: yarn-i18n-v4-cache-v{{ .Environment.CACHE_TRIGGER_VERSION }}-job-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - i18n-cache/data
@@ -112,20 +112,23 @@ jobs:
     - restore_cache:
         name: Restore Dependencies Cache
         keys:
-        - dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+        - dependencies-v3-{{ checksum "ios/Gemfile.lock" }}-{{ checksum "ios/Podfile.lock" }}-{{
           checksum "yarn.lock" }}
-        - dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}
-        - dependencies-v2-
+        - dependencies-v3-{{ checksum "ios/Gemfile.lock" }}-{{ checksum "ios/Podfile.lock" }}
+        - dependencies-v3-{{ checksum "ios/Gemfile.lock" }}
+        - dependencies-v3-
     - run:
         name: Yarn preios (if needed)
         command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app || yarn preios
     - save_cache:
         name: Save Dependencies Cache
-        key: dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+        key: dependencies-v3-{{ checksum "ios/Gemfile.lock" }}-{{ checksum "ios/Podfile.lock" }}-{{
           checksum "yarn.lock" }}
         paths:
-        - react-native-aztec/ios/Carthage
-        - ~/.rncache
+        - ios/Pods
+        - ~/Library/Caches/CocoaPods
+        - ~/.cocoapods/repos/trunk
+        - ios/vendor
     - run:
         name: Build (if needed)
         command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app || yarn react-native run-ios --configuration Release --no-packager
