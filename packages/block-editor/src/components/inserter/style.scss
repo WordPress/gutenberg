@@ -33,7 +33,12 @@
 .block-editor-inserter__popover > .components-popover__content {
 	@include break-medium {
 		overflow-y: visible;
-		height: 92vh; // This is further limited by a max-height from the popover component itself.
+		width: 86vw; // This is limited by a max-width.
+		height: 92vh; // This is limited by a max-height from the popover component itself.
+
+		// We take up the whole space horizontally, so as to afford a preview panel appearing.
+		// The layer is only for layout, and should not block clicks through it.
+		pointer-events: none;
 	}
 
 	// Remove the popover styling and apply it instead to each sub panel.
@@ -55,17 +60,23 @@
 
 	.components-tip {
 		padding: 0 $grid-size-large $grid-size-large $grid-size-large;
+		display: flex;
+		align-items: center;
 	}
 }
 
 // Show popover background behind main menu and preview both.
 .block-editor-inserter__main-area,
 .block-editor-inserter__preview-panel {
-	box-shadow: $shadow-popover;
-	border: $border-width solid $light-gray-500;
 	background: $white;
+	width: 49%;
+	width: calc(50% - #{$grid-size-large});
 
-	width: 480px;
+	@include break-medium() {
+		box-shadow: $shadow-popover;
+		border: $border-width solid $light-gray-500;
+		max-width: 480px;
+	}
 }
 
 // Container for just the block library.
@@ -73,11 +84,13 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
-
 	margin-right: $grid-size-large;
 
 	@include break-medium {
 		position: relative;
+
+		// Re-enable clicks on this layer.
+		pointer-events: all;
 	}
 }
 
@@ -95,6 +108,7 @@
 
 .components-popover input[type="search"].block-editor-inserter__search {
 	display: block;
+	flex-shrink: 0;
 	margin: $grid-size-large;
 	padding: 11px $grid-size-large;
 	position: relative;
@@ -167,13 +181,33 @@
 
 // Container for the preview.
 .block-editor-inserter__preview-panel {
-	height: 480px;
-	padding: $grid-size-large;
-	@include edit-post__fade-in-animation();
+	display: none;
 
-	.block-editor-block-card {
-		padding-bottom: $grid-size-large;
-		margin-bottom: $grid-size;
-		border-bottom: $border-width solid $light-gray-500;
+	// Show preview panel when inserter is not modal.
+	@include break-medium () {
+		display: block;
+		position: relative;
+		height: 480px;
+		padding: $grid-size-large;
+		@include edit-post__fade-in-animation();
+
+		.block-editor-block-card {
+			min-height: 6em;
+			padding-bottom: $grid-size-large;
+			margin-bottom: $grid-size-large;
+			border-bottom: $border-width solid $light-gray-500;
+		}
+
+		// Create a white overlay at the bottom of the preview to soft-crop the preview.
+		&::after {
+			content: "";
+			display: block;
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			height: $grid-size-large;
+			background: $white;
+		}
 	}
 }

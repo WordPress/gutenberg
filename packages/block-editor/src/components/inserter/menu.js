@@ -510,7 +510,7 @@ export class InserterMenu extends Component {
 								</div>
 							) : (
 								<div className="block-editor-inserter__preview-content-missing">
-									{ __( 'No Preview Available.' ) }
+									{ __( 'No preview available.' ) }
 								</div>
 							) }
 						</div>
