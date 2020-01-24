@@ -11,7 +11,6 @@
  * Adjust Navigation Item.
  */
 .wp-block-navigation-link {
-
 	.block-editor-block-list__layout {
 		display: block;
 	}
@@ -27,6 +26,12 @@
 
 	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
 		display: inline-block;
+	}
+
+	.block-list-appender {
+		margin: $grid-size * 2;
+		margin-left: $grid-size * 1.25;
+		margin-top: $grid-size * 1.25;
 	}
 }
 

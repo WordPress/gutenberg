@@ -58,10 +58,10 @@ $navigation-sub-menu-height: $grid-size * 5;
 	& > li ul {
 		position: absolute;
 		left: 0;
-		top: 80%;
+		top: 100%;
 		min-width: max-content;
 		opacity: 0;
-		transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
+		transition: opacity 0.1s linear;
 		visibility: hidden;
 
 		> li ul {
@@ -132,14 +132,11 @@ $navigation-sub-menu-height: $grid-size * 5;
 		&.is-editing.has-child > .block-editor-inner-blocks {
 			// Box model
 			display: flex;
-			border-width: 1px;
-			border-style: solid;
-			border-radius: 2px;
 
 			// Position (first level)
 			position: absolute;
 			z-index: 1;
-			top: $navigation-menu-height - $grid-size;
+			top: $navigation-menu-height;
 			left: $grid-size * 2; // just under the main menu item.
 
 			// Position (nested levels)
