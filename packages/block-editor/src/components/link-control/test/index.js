@@ -607,7 +607,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		// Verify input has no value
 		expect( searchInput.value ).toBe( '' );
-		expect( createButton ).toBeNull(); // shouldn't exist!
+		expect( createButton ).toBeFalsy(); // shouldn't exist!
 	} );
 
 	it.each( [
