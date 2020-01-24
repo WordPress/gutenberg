@@ -4774,7 +4774,6 @@ exports[`Storyshots Components/ResizableBox Default 1`] = `
     style={
       Object {
         "boxSizing": "border-box",
-        "flexShrink": 0,
         "height": "200px",
         "maxHeight": undefined,
         "maxWidth": undefined,
