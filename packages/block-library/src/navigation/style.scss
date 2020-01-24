@@ -132,11 +132,12 @@ $navigation-sub-menu-height: $grid-size * 5;
 		&.is-editing.has-child > .block-editor-inner-blocks {
 			// Box model
 			display: flex;
+			border: $border-width solid rgba(0, 0, 0, 0.15);
 
 			// Position (first level)
 			position: absolute;
 			z-index: 1;
-			top: $navigation-menu-height;
+			top: $navigation-menu-height - ( $block-padding / 2 );
 			left: $grid-size * 2; // just under the main menu item.
 
 			// Position (nested levels)
@@ -152,7 +153,6 @@ $navigation-sub-menu-height: $grid-size * 5;
 		.wp-block-navigation__container {
 			background-color: inherit;
 			color: inherit;
-			border-color: currentColor;
 		}
 
 		.wp-block-navigation-link__content {
@@ -194,7 +194,6 @@ $navigation-sub-menu-height: $grid-size * 5;
 		&:not(.has-text-color) > .block-editor-inner-blocks,
 		&:not(.has-text-color) > .wp-block-navigation__container {
 			color: $light-style-sub-menu-text-color;
-			border-color: $light-style-sub-menu-border-color;
 		}
 
 		// No background color
@@ -210,7 +209,6 @@ $navigation-sub-menu-height: $grid-size * 5;
 		&:not(.has-text-color) > .block-editor-inner-blocks,
 		&:not(.has-text-color) > .wp-block-navigation__container {
 			color: $dark-style-sub-menu-text-color;
-			border-color: $dark-style-sub-menu-border-color;
 		}
 
 		// No background color
