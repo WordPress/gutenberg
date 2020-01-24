@@ -70,7 +70,6 @@ class PostTitle extends Component {
 		const {
 			hasFixedToolbar,
 			isCleanNewPost,
-			isFocusMode,
 			isPostTypeViewable,
 			instanceId,
 			placeholder,
@@ -81,7 +80,6 @@ class PostTitle extends Component {
 		// The wp-block className is important for editor styles.
 		const className = classnames( 'wp-block editor-post-title__block', {
 			'is-selected': isSelected,
-			'is-focus-mode': isFocusMode,
 			'has-fixed-toolbar': hasFixedToolbar,
 		} );
 		const decodedPlaceholder = decodeEntities( placeholder );
@@ -127,14 +125,13 @@ const applyWithSelect = withSelect( ( select ) => {
 	const { getSettings } = select( 'core/block-editor' );
 	const { getPostType } = select( 'core' );
 	const postType = getPostType( getEditedPostAttribute( 'type' ) );
-	const { titlePlaceholder, focusMode, hasFixedToolbar } = getSettings();
+	const { titlePlaceholder, hasFixedToolbar } = getSettings();
 
 	return {
 		isCleanNewPost: isCleanNewPost(),
 		title: getEditedPostAttribute( 'title' ),
 		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 		placeholder: titlePlaceholder,
-		isFocusMode: focusMode,
 		hasFixedToolbar,
 	};
 } );

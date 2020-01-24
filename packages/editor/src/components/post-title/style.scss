@@ -60,29 +60,27 @@
 		}
 	}
 
-	&:not(.is-focus-mode) {
-		&.is-selected .editor-post-title__input {
-			// use opacity to work in various editor styles.
-			border-color: $dark-opacity-light-800;
-			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
+	:not(.is-focus-mode) &.is-selected .editor-post-title__input {
+		// use opacity to work in various editor styles.
+		border-color: $dark-opacity-light-800;
+		box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
+
+		.is-dark-theme & {
+			border-color: $light-opacity-light-800;
+			box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
+		}
+
+		// Switch to outset borders on larger screens.
+		@include break-small() {
+			box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
 
 			.is-dark-theme & {
-				border-color: $light-opacity-light-800;
-				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
-			}
-
-			// Switch to outset borders on larger screens.
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-
-				.is-dark-theme & {
-					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-				}
+				box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
 			}
 		}
 	}
 
-	&.is-focus-mode .editor-post-title__input {
+	.is-focus-mode & .editor-post-title__input {
 		opacity: 0.5;
 		transition: opacity 0.1s linear;
 		@include reduce-motion("transition");

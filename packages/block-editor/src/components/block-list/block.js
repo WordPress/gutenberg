@@ -29,7 +29,6 @@ import {
 	withSelect,
 	useSelect,
 } from '@wordpress/data';
-import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 
 /**
@@ -46,7 +45,6 @@ import { Context, BlockNodes } from './root-container';
 
 function BlockListBlock( {
 	mode,
-	isFocusMode,
 	isLocked,
 	clientId,
 	isSelected,
@@ -216,7 +214,6 @@ function BlockListBlock( {
 	// Empty paragraph blocks should always show up as unselected.
 	const showEmptyBlockSideInserter = ! isNavigationMode && isSelected && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
-		! isFocusMode &&
 		! showEmptyBlockSideInserter &&
 		isSelected &&
 		! isTypingWithinBlock;
@@ -245,8 +242,6 @@ function BlockListBlock( {
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
 			'is-typing': isTypingWithinBlock,
-			'is-focused': isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
-			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
 			'is-block-collapsed': isAligned,
 		},
@@ -330,7 +325,7 @@ function BlockListBlock( {
 }
 
 const applyWithSelect = withSelect(
-	( select, { clientId, rootClientId, isLargeViewport } ) => {
+	( select, { clientId, rootClientId } ) => {
 		const {
 			isBlockSelected,
 			isAncestorMultiSelected,
@@ -341,7 +336,6 @@ const applyWithSelect = withSelect(
 			getBlockMode,
 			isSelectionEnabled,
 			getSelectedBlocksInitialCaretPosition,
-			getSettings,
 			hasSelectedInnerBlock,
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
@@ -350,7 +344,6 @@ const applyWithSelect = withSelect(
 
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
-		const { focusMode, isRTL } = getSettings();
 		const templateLock = getTemplateLock( rootClientId );
 		const checkDeep = true;
 
@@ -380,9 +373,7 @@ const applyWithSelect = withSelect(
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
 			isLocked: !! templateLock,
-			isFocusMode: focusMode && isLargeViewport,
 			isNavigationMode: isNavigationMode(),
-			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to access the block prop
 			// Ideally these blocks would rely on the clientId prop only.
@@ -474,7 +465,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 
 export default compose(
 	pure,
-	withViewportMatch( { isLargeViewport: 'medium' } ),
 	applyWithSelect,
 	applyWithDispatch,
 	// block is sometimes not mounted at the right time, causing it be undefined

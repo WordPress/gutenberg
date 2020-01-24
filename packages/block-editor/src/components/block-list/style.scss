@@ -138,13 +138,14 @@
 	}
 
 	// Spotlight mode.
-	&.is-focus-mode:not(.is-multi-selected) {
+	.is-focus-mode &:not(.is-multi-selected) {
 		opacity: 0.5;
 		transition: opacity 0.1s linear;
 		@include reduce-motion("transition");
 
-		&:not(.is-focused) .block-editor-block-list__block,
-		&.is-focused {
+		&:not(.is-selected) .block-editor-block-list__block,
+		&.has-child-selected,
+		&.is-selected {
 			opacity: 1;
 		}
 	}
