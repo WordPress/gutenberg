@@ -9,20 +9,26 @@ import styled from '@emotion/styled';
  */
 import { color } from '../../utils/colors';
 
-const rootColor = ( { color: colorProp } ) => css( { color: colorProp } );
-
 export const Root = styled.span`
-    -webkit-tap-highlight-color: transparent;
+	-webkit-tap-highlight-color: transparent;
 	box-sizing: border-box;
-    cursor: pointer;
-    display: inline-block;
-    height: 2px;
-    padding: 14px 0;
-    position: relative;
-    touch-action: none;
+	cursor: pointer;
+	align-items: center;
+	display: inline-flex;
+	height: 2px;
+	padding: 14px 0;
+	position: relative;
+	touch-action: none;
+	width: 100%;
+`;
+
+const wrapperColor = ( { color: colorProp } ) => css( { color: colorProp } );
+
+export const Wrapper = styled.span`
+	position: relative;
 	width: 100%;
 
-	${ rootColor };
+	${ wrapperColor };
 `;
 
 export const Rail = styled.span`
@@ -31,9 +37,9 @@ export const Rail = styled.span`
 	left: 0;
 	pointer-events: none;
 	right: 0;
-    border-radius: 1px;
-    display: block;
-    height: 2px;
+	border-radius: 1px;
+	display: block;
+	height: 2px;
 	position: absolute;
 	margin-top: -1px;
 `;
@@ -44,7 +50,7 @@ export const Track = styled.span`
 	box-sizing: border-box;
 	height: 2px;
 	pointer-events: none;
-    display: block;
+	display: block;
 	position: absolute;
 	margin-top: -1px;
 `;
@@ -62,14 +68,15 @@ export const ThumbWrapper = styled.span`
 	align-items: center;
 	margin-left: -10px;
 	margin-top: -10px;
-	pointer-events: none;
 	width: 20px;
-    box-sizing: border-box;
-    display: flex;
-    height: 20px;
-    justify-content: center;
-    outline: 0;
-    position: absolute;
+	box-sizing: border-box;
+	display: flex;
+	height: 20px;
+	justify-content: center;
+	outline: 0;
+	position: absolute;
+	pointer-events: none;
+	user-select: none;
 `;
 
 const handleReducedMotion = () => {
@@ -82,39 +89,40 @@ const handleReducedMotion = () => {
 
 const thumbFocus = ( { isFocused } ) => {
 	return css( {
-		borderColor: isFocused ?
-			color( 'darkGray.300' ) :
-			color( 'lightGray.700' ),
-		boxShadow: isFocused ? `
+		borderColor: isFocused ? color( 'darkGray.300' ) : color( 'lightGray.700' ),
+		boxShadow: isFocused ?
+			`
 				0 1px 2px rgba(0, 0, 0, 0.1),
 				0 4px 8px rgba(0, 0, 0, 0.2)
-			` : `
+			` :
+			`
 				0 0 0 rgba(0, 0, 0, 0),
 				0 0 0 rgba(0, 0, 0, 0)
 			`,
-
 	} );
 };
 
 export const Thumb = styled.span`
+	align-items: center;
 	background-color: white;
+	border-radius: 50%;
 	border: 1px solid ${ color( 'lightGray.700' ) };
 	box-sizing: border-box;
+	box-sizing: border-box;
 	height: 100%;
+	outline: 0;
 	pointer-events: none;
 	position: absolute;
 	transition: box-shadow 60ms linear;
+	user-select: none;
 	width: 100%;
-    align-items: center;
-    border-radius: 50%;
-    box-sizing: border-box;
-    outline: 0;
 
 	${ thumbFocus };
 	${ handleReducedMotion };
 `;
 
 export const InputRange = styled.input`
+	cursor: pointer;
 	display: block;
 	height: 100%;
 	left: 0;
@@ -125,7 +133,6 @@ export const InputRange = styled.input`
 	right: 0;
 	top: 0;
 	width: 100%;
-    cursor: pointer;
 `;
 
 const tooltipShow = ( { position, show } ) => {
@@ -174,8 +181,6 @@ export const Tooltip = styled.div`
 	min-width: 32px;
 	opacity: 0;
 	padding: 8px;
-	pointer-events: none;
-	position: absolute;
 	position: relative;
 	text-align: center;
 	transform: scale(0.5);
@@ -187,7 +192,7 @@ export const Tooltip = styled.div`
 		border-left-color: transparent;
 		border-right-color: transparent;
 		bottom: -6px;
-		content: "";
+		content: '';
 		height: 0;
 		left: 50%;
 		line-height: 0;

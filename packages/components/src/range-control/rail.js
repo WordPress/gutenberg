@@ -9,12 +9,13 @@ export default function RangeRail( {
 	max = 100,
 	step = 1,
 	value = 0,
+	...restProps
 } ) {
 	const marksData = useMarks( { min, max, step, value } );
 	const LastMark = Mark;
 
 	return (
-		<Rail>
+		<Rail { ...restProps }>
 			{ marks && (
 				<>
 					{ marksData.map( ( mark ) => (
@@ -34,7 +35,7 @@ function useMarks( { min = 0, max = 100, step = 1, value = 0 } ) {
 		const key = `mark-${ index }`;
 		const isFilled = value >= index;
 		const style = {
-			left: `${ index / markCount * 100 }%`,
+			left: `${ ( index / markCount ) * 100 }%`,
 			background: isFilled ? 'currentColor' : undefined,
 		};
 

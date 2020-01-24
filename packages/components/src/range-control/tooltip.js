@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useCallback, useEffect, useState } from '@wordpress/element';
@@ -10,36 +15,51 @@ import { Tooltip } from './styles/range-control-styles';
 
 const TOOLTIP_OFFSET_HEIGHT = 32;
 
-export default function RangeTooltip( {
+export default function SimpleTooltip( {
+	className,
 	inputRef,
 	position: positionProp,
 	show = false,
 	value = 0,
 	renderTooltipContent = ( v ) => v,
 	zIndex = 100,
+	...restProps
 } ) {
-	const tooltipPosition = useTooltipPosition( { inputRef } );
-	const position = positionProp || tooltipPosition;
+	const position = useTooltipPosition( { inputRef, position: positionProp } );
+	const classes = classnames( 'components-simple-tooltip', className );
 
 	return (
-		<Tooltip position={ position } show={ show } style={ { zIndex } }>
+		<Tooltip
+			{ ...restProps }
+			aria-hidden={ show }
+			className={ classes }
+			position={ position }
+			show={ show }
+			role="tooltip"
+			style={ { zIndex } }
+		>
 			{ renderTooltipContent( value ) }
 		</Tooltip>
 	);
 }
 
-function useTooltipPosition( { inputRef } ) {
+function useTooltipPosition( { inputRef, position: positionProp } ) {
 	const [ position, setPosition ] = useState( 'top' );
 
 	const calculatePosition = useCallback( () => {
-		if ( inputRef.current ) {
-			const { top } = inputRef.current.getBoundingClientRect();
-			const isOverlay = top - TOOLTIP_OFFSET_HEIGHT < 0;
-			const nextPosition = isOverlay ? 'bottom' : 'top';
+		if ( inputRef && inputRef.current ) {
+			let nextPosition = positionProp;
+
+			if ( positionProp === 'auto' ) {
+				const { top } = inputRef.current.getBoundingClientRect();
+				const isOffscreenTop = top - TOOLTIP_OFFSET_HEIGHT < 0;
+
+				nextPosition = isOffscreenTop ? 'bottom' : 'top';
+			}
 
 			setPosition( nextPosition );
 		}
-	}, [] );
+	}, [ positionProp ] );
 
 	useEffect( () => {
 		calculatePosition();
