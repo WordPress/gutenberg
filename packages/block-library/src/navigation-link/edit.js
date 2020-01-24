@@ -233,12 +233,21 @@ function NavigationLinkEdit( {
 									saveEntityRecord( 'postType', type, {
 										title: entityTitle,
 										status: 'publish',
-									} ).then( ( entity ) => ( {
-										id: entity.id,
-										type,
-										title: entity.title.raw, // TODO: use raw or rendered?
-										url: entity.link,
-									} ) )
+									} ).then( ( entity ) => {
+										// `entity` may not reject the Promise
+										// but may still be invalid. Here we
+										// tests for unexpected values and throw accordingly.
+										if ( null === entity || undefined === entity ) {
+											throw new TypeError( 'API response returned invalid entity.', entity );
+										}
+
+										return {
+											id: entity.id,
+											type,
+											title: entity.title.raw, // TODO: use raw or rendered?
+											url: entity.link,
+										};
+									} )
 								}
 								onChange={ ( {
 									title: newTitle = '',
