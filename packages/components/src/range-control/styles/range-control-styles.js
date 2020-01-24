@@ -7,7 +7,10 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
+import Button from '../../button';
 import { color } from '../../utils/colors';
+
+const rootWidth = ( { width } ) => css( { width } );
 
 export const Root = styled.span`
 	-webkit-tap-highlight-color: transparent;
@@ -16,10 +19,13 @@ export const Root = styled.span`
 	align-items: center;
 	display: inline-flex;
 	height: 2px;
+	justify-content: flex-start;
 	padding: 14px 0;
 	position: relative;
 	touch-action: none;
 	width: 100%;
+
+	${ rootWidth };
 `;
 
 const wrapperColor = ( { color: colorProp } ) => css( { color: colorProp } );
@@ -31,6 +37,14 @@ export const Wrapper = styled.span`
 	${ wrapperColor };
 `;
 
+export const BeforeIconWrapper = styled.span`
+	margin-right: 16px;
+`;
+
+export const AfterIconWrapper = styled.span`
+	margin-left: 16px;
+`;
+
 export const Rail = styled.span`
 	background-color: ${ color( 'lightGray.600' ) };
 	box-sizing: border-box;
@@ -39,7 +53,7 @@ export const Rail = styled.span`
 	right: 0;
 	border-radius: 1px;
 	display: block;
-	height: 2px;
+	height: 3px;
 	position: absolute;
 	margin-top: -1px;
 `;
@@ -48,7 +62,7 @@ export const Track = styled.span`
 	background-color: currentColor;
 	border-radius: 1px;
 	box-sizing: border-box;
-	height: 2px;
+	height: 3px;
 	pointer-events: none;
 	display: block;
 	position: absolute;
@@ -62,7 +76,8 @@ const markFill = ( { isFilled } ) => {
 };
 
 export const Mark = styled.span`
-	height: 8px;
+	box-sizing: border-box;
+	height: 9px;
 	left: 0;
 	position: absolute;
 	top: -3px;
@@ -72,6 +87,7 @@ export const Mark = styled.span`
 `;
 
 export const MarkLabel = styled.span`
+	box-sizing: border-box;
 	color: rgba(0, 0, 0, 0.54);
 	left: 0;
 	font-size: 11px;
@@ -125,7 +141,6 @@ export const Thumb = styled.span`
 	border-radius: 50%;
 	border: 1px solid ${ color( 'lightGray.700' ) };
 	box-sizing: border-box;
-	box-sizing: border-box;
 	height: 100%;
 	outline: 0;
 	pointer-events: none;
@@ -139,6 +154,7 @@ export const Thumb = styled.span`
 `;
 
 export const InputRange = styled.input`
+	box-sizing: border-box;
 	cursor: pointer;
 	display: block;
 	height: 100%;
@@ -193,6 +209,7 @@ const tooltipPosition = ( { position } ) => {
 export const Tooltip = styled.div`
 	background: ${ color( 'darkGray.800' ) };
 	border-radius: 3px;
+	box-sizing: border-box;
 	color: white;
 	font-size: 11px;
 	min-width: 32px;
@@ -209,6 +226,7 @@ export const Tooltip = styled.div`
 		border-left-color: transparent;
 		border-right-color: transparent;
 		bottom: -6px;
+		box-sizing: border-box;
 		content: '';
 		height: 0;
 		left: 50%;
@@ -222,3 +240,17 @@ export const Tooltip = styled.div`
 	${ tooltipPosition };
 	${ handleReducedMotion };
 `;
+
+export const InputNumber = styled.input`
+	box-sizing: border-box;
+	display: inline-block;
+	margin-left: 16px;
+	min-width: 54px;
+	max-width: 120px;
+	height: 24px;
+`;
+
+export const ResetButton = styled( Button )( css`
+	box-sizing: border-box;
+	margin-left: 8px;
+` );

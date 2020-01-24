@@ -84,6 +84,7 @@ export const withReset = () => {
 
 export const next = () => {
 	const props = {
+		allowReset: boolean( 'allowReset', false ),
 		alwaysShowTooltip: boolean( 'alwaysShowToolTip', false ),
 		min: number( 'min', 0 ),
 		max: number( 'max', 10 ),
@@ -94,6 +95,9 @@ export const next = () => {
 			bottom: 'bottom',
 			auto: 'auto',
 		}, 'auto' ),
+		beforeIcon: text( 'beforeIcon', '' ),
+		afterIcon: text( 'afterIcon', '' ),
+		withInputField: boolean( 'withInputField', true ),
 	};
 
 	return (

@@ -7,6 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import {
 	useCallback,
 	useRef,
@@ -25,11 +26,15 @@ import { color } from '../utils/colors';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
 import {
+	AfterIconWrapper,
+	BeforeIconWrapper,
+	InputRange,
+	InputNumber,
+	ResetButton,
 	Root,
 	Track,
 	ThumbWrapper,
 	Thumb,
-	InputRange,
 	Wrapper,
 } from './styles/range-control-styles';
 
@@ -37,6 +42,7 @@ export const RangeControlNext = forwardRef(
 	(
 		{
 			afterIcon,
+			allowReset = false,
 			alwaysShowTooltip = false,
 			beforeIcon,
 			className,
@@ -52,16 +58,19 @@ export const RangeControlNext = forwardRef(
 			onChange = noop,
 			renderTooltipContent = ( v ) => v,
 			step = 1,
+			width = '100%',
 			tooltipPosition = 'auto',
 			tooltipTimeout = 250,
 			tooltipZIndex = 100,
 			value: valueProp = 0,
+			withInputField = true,
 			...props
 		},
 		ref
 	) => {
 		const [ value, setValue ] = useControlledRangeValue( valueProp );
 		const [ showTooltip, setShowTooltip ] = useState( false );
+		const originalValueRef = useRef( value );
 
 		const inputRef = useRef();
 
@@ -91,6 +100,12 @@ export const RangeControlNext = forwardRef(
 			onChange( nextValue );
 		};
 
+		const handleOnReset = () => {
+			const nextValue = originalValueRef.current;
+			setValue( nextValue );
+			onChange( nextValue );
+		};
+
 		const handleShowTooltip = () => setShowTooltip( true );
 		const handleHideTooltip = () => setShowTooltip( false );
 
@@ -102,8 +117,12 @@ export const RangeControlNext = forwardRef(
 
 		return (
 			<BaseControl className={ classes } label={ label } id={ id } help={ help }>
-				<Root className="components-range-control__root">
-					{ beforeIcon && <Dashicon icon={ beforeIcon } /> }
+				<Root className="components-range-control__root" width={ width }>
+					{ beforeIcon && (
+						<BeforeIconWrapper>
+							<Dashicon icon={ beforeIcon } />
+						</BeforeIconWrapper>
+					) }
 					<Wrapper color={ colorProp }>
 						<InputRange
 							{ ...props }
@@ -152,7 +171,34 @@ export const RangeControlNext = forwardRef(
 							) }
 						</ThumbWrapper>
 					</Wrapper>
-					{ afterIcon && <Dashicon icon={ afterIcon } /> }
+					{ afterIcon && (
+						<AfterIconWrapper>
+							<Dashicon icon={ afterIcon } />
+						</AfterIconWrapper>
+					) }
+					{ withInputField && (
+						<InputNumber
+							aria-label={ label }
+							className="components-range-control__number"
+							max={ max }
+							min={ min }
+							onChange={ handleOnChange }
+							step={ step }
+							type="number"
+							value={ value }
+						/>
+					) }
+					{ allowReset && (
+						<ResetButton
+							className="components-range-control__reset"
+							disabled={ value === undefined }
+							isSecondary
+							isSmall
+							onClick={ handleOnReset }
+						>
+							{ __( 'Reset' ) }
+						</ResetButton>
+					) }
 				</Root>
 			</BaseControl>
 		);
