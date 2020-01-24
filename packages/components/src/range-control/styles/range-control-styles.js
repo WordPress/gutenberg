@@ -282,7 +282,7 @@ export const ActionRightWrapper = styled.span`
 	margin-left: 8px;
 	margin-top: 2px;
 
-	button& {
+	button {
 		margin-left: 0;
 	}
 `;
