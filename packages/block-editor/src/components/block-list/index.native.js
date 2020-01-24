@@ -79,7 +79,6 @@ export class BlockList extends Component {
 			isReadOnly,
 			isRootList,
 			containerStyle,
-			columnStyle,
 		} = this.props;
 
 		return (
@@ -96,7 +95,6 @@ export class BlockList extends Component {
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					containerStyle={ containerStyle }
-					columnStyle={ columnStyle }
 					data={ blockClientIds }
 					extraData={ [ isFullyBordered ] }
 					keyExtractor={ identity }
