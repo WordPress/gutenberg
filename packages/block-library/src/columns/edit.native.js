@@ -179,21 +179,16 @@ const ColumnsEditContainerWrapper = withDispatch( ( dispatch, ownProps, registry
 } ) )( ColumnsEditContainer );
 
 const ColumnsEdit = ( props ) => {
-	const { clientId, name, isSelected, getStylesFromColorScheme } = props;
+	const { clientId, isSelected, getStylesFromColorScheme } = props;
 	const { hasInnerBlocks } = useSelect( ( select ) => {
 		const {
-			__experimentalGetBlockPatterns,
-			getBlockType,
-			__experimentalGetDefaultBlockPattern,
-		} = select( 'core/blocks' );
+			getBlocks,
+		} = select( 'core/block-editor' );
 
 		return {
-			blockType: getBlockType( name ),
-			defaultPattern: __experimentalGetDefaultBlockPattern( name ),
-			hasInnerBlocks: select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
-			patterns: __experimentalGetBlockPatterns( name ),
+			hasInnerBlocks: getBlocks( clientId ).length > 0,
 		};
-	}, [ clientId, name ] );
+	}, [ clientId ] );
 
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
