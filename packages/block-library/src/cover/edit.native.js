@@ -22,7 +22,7 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { cover as icon } from '@wordpress/icons';
 
 /**
@@ -65,6 +65,15 @@ const Cover = ( {
 	} = attributes;
 	const [ containerSize, setContainerSize ] = useState( null );
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	// Used to set a default color for its InnerBlocks
+	// since there's no system to inherit styles yet
+	// the RichText component will check if there are
+	// parent styles for the current block. If there are,
+	// it will use that color instead.
+	useEffect( () => {
+		setAttributes( { childrenStyles: styles.defaultColor } );
+	}, [ setAttributes ] );
 
 	const onSelectMedia = ( media ) => {
 		const onSelect = onCoverSelectMedia( setAttributes );
