@@ -55,13 +55,30 @@ export const Track = styled.span`
 	margin-top: -1px;
 `;
 
+const markFill = ( { isFilled } ) => {
+	return css( {
+		backgroundColor: isFilled ? 'currentColor' : color( 'lightGray.600' ),
+	} );
+};
+
 export const Mark = styled.span`
-	background-color: ${ color( 'lightGray.600' ) };
 	height: 8px;
 	left: 0;
 	position: absolute;
 	top: -3px;
 	width: 1px;
+
+	${ markFill };
+`;
+
+export const MarkLabel = styled.span`
+	color: rgba(0, 0, 0, 0.54);
+	left: 0;
+	font-size: 11px;
+	position: absolute;
+	top: 20px;
+	transform: translateX(-50%);
+	white-space: nowrap;
 `;
 
 export const ThumbWrapper = styled.span`

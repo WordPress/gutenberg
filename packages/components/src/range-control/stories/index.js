@@ -103,6 +103,37 @@ export const next = () => {
 	);
 };
 
+export const nextCustomMarks = () => {
+	const marks = [
+		{
+			value: 0,
+			label: '0',
+		},
+		{
+			value: 1,
+			label: '1',
+		},
+		{
+			value: 2,
+			label: '2',
+		},
+		{
+			value: 8,
+			label: '8',
+		},
+		{
+			value: 10,
+			label: '10',
+		},
+	];
+
+	return (
+		<Wrapper>
+			<RangeControlNext marks={ marks } min={ 0 } max={ 10 } step={ 1 } />
+		</Wrapper>
+	);
+};
+
 const Wrapper = styled.div`
 	padding: 40px;
 `;
