@@ -109,6 +109,7 @@ export class BlockList extends Component {
 						<BlockListAppender
 							rootClientId={ this.props.rootClientId }
 							renderAppender={ this.props.renderAppender }
+							showSeparator
 						/>
 					</View>
 				)
@@ -131,6 +132,8 @@ export class BlockList extends Component {
 			shouldShowBlockAtIndex,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			renderAppender,
+			blockClientIds,
 		} = this.props;
 
 		return (
@@ -146,7 +149,7 @@ export class BlockList extends Component {
 							onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 							isSmallScreen={ ! this.props.isFullyBordered }
 						/> ) }
-					{ shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
+					{ ! ( renderAppender && blockClientIds.length > 0 ) && shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
 				</View>
 			</ReadableContentView>
 		);
