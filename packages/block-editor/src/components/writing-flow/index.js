@@ -308,6 +308,19 @@ export default function WritingFlow( { children } ) {
 
 	function onKeyDown( event ) {
 		const { keyCode, target } = event;
+
+		// Handle only if the event occurred within the same DOM hierarchy as
+		// the rendered container. This is used to distinguish between events
+		// which bubble through React's virtual event system from those which
+		// strictly occur in the DOM created by the component.
+		//
+		// The implication here is: If it's not desirable for a bubbled event to
+		// be considered by WritingFlow, it can be avoided by rendering to a
+		// distinct place in the DOM (e.g. using Slot/Fill).
+		if ( ! container.current.contains( target ) ) {
+			return;
+		}
+
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
 		const isLeft = keyCode === LEFT;
