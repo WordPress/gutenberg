@@ -343,11 +343,7 @@ class GalleryEdit extends Component {
 			return mediaPlaceholder;
 		}
 
-		// disable image size options on mobile for now
-		const imageSizeOptions = Platform.select( {
-			web: this.getImagesSizeOptions(),
-			native: [],
-		} );
+		const imageSizeOptions = this.getImagesSizeOptions();
 		const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
 		// This is needed to fix a separator fence-post issue on mobile.
 		const mobileLinkToProps = shouldShowSizeOptions ?
