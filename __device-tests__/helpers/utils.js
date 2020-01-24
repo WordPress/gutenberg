@@ -142,14 +142,51 @@ const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
 	}
 };
 
-const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean = false ) => {
+/*
+ * The 'clear' parameter is defaulted to true because not clearing the text requires Android to use ADB, which
+ * has demonstrated itself to be very flaky, particularly on CI. In other words, clear the view unless you absolutely
+ * have to append the new text and, in that case, append fewest number of characters possible.
+ */
+const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean = true ) => {
+	if ( isAndroid() ) {
+		await typeStringAndroid( driver, element, str, clear );
+	} else {
+		await typeStringIos( driver, element, str, clear );
+	}
+};
+
+const typeStringIos = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean ) => {
 	if ( clear ) {
 		await element.clear();
 	}
+	await element.type( str );
+};
 
-	if ( isAndroid() ) {
+const typeStringAndroid = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean ) => {
+	if ( str in strToKeycode ) {
+		return await driver.pressKeycode( strToKeycode[ str ] );
+	} else if ( clear ) {
+		/*
+		 * On Android `element.type` deletes the contents of the EditText before typing and, unfortunately,
+		 * with our blocks it also deletes the block entirely. We used to avoid this by using adb to enter
+		 * long text along these lines:
+		 *         await driver.execute( 'mobile: shell', { command: 'input',
+		 *                                                  args: [ 'text', 'text I want to enter...' ] } )
+		 * but using adb in this way proved to be very flakey (frequently all of the text would not get entered,
+		 * particularly on CI). We are now using the `type` approach again, but adding a space to the block to
+		 * insure it is not empty, which avoids the deletion of the block when `type` executes.
+		 *
+		 * Note that this approach does not allow appending text to the text in a block on account
+		 * of `type` always clearing the block (on Android).
+		 */
+
+		await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', '%s' ] } );
+		await element.type( str );
+	} else {
+		// eslint-disable-next-line no-console
+		console.log( 'Warning: Using `adb shell input text` on Android which is rather flaky.' );
+
 		const paragraphs = str.split( '\n' );
-
 		for ( let i = 0; i < paragraphs.length; i++ ) {
 			const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
 			if ( paragraph in strToKeycode ) {
@@ -162,8 +199,6 @@ const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.Promise
 				await driver.pressKeycode( strToKeycode[ '\n' ] );
 			}
 		}
-	} else {
-		return await element.type( str );
 	}
 };
 
