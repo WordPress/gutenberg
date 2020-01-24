@@ -674,8 +674,8 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
-		const createButton = first( Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new' ) ) );
+		let searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		let createButton = first( Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new' ) ) );
 
 		await act( async () => {
 			Simulate.click( createButton );
@@ -699,8 +699,11 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		expect( searchInput ).not.toBeFalsy();
 		expect( searchInput.value ).toBe( searchText );
 
-		// TODO: check for Create button being visible again once
-		// https://github.com/WordPress/gutenberg/issues/19647 is resolved
+		// Verify search results are re-shown and create button is available.
+		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		createButton = first( Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new' ) ) );
+
+		expect( createButton ).not.toBeFalsy(); // shouldn't exist!
 	} );
 } );
 
