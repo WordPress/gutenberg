@@ -588,7 +588,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( '/?p=123' ) ); // slug
 	} );
 
-	it( 'should show option to create "blank" entity in initial suggestions (when input is empty)', async () => {
+	it( 'should show not show an option to create "blank" entity in initial suggestions (when input is empty)', async () => {
 		act( () => {
 			render(
 				<LinkControl
@@ -618,8 +618,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		// Verify input has no value
 		expect( searchInput.value ).toBe( '' );
-		expect( createButton ).not.toBeNull();
-		expect( createButton.innerHTML ).toEqual( expect.stringContaining( 'Create new' ) );
+		expect( createButton ).toBeNull(); // shouldn't exist!
 	} );
 
 	it.each( [
