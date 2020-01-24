@@ -58,8 +58,10 @@ class ButtonEdit extends Component {
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
-		this.isButtonFocused = this.isButtonFocused.bind( this );
 
+		// `isEditingURL` property is used to prevent from automatically pasting
+		// URL from clipboard while trying to clear `Button URL` field and then
+		// manually adding specific link
 		this.isEditingURL = false;
 
 		this.state = {
@@ -71,10 +73,20 @@ class ButtonEdit extends Component {
 
 	componentDidUpdate( prevProps, prevState ) {
 		const { selectedId, setAttributes, editorSidebarOpened, attributes: { url } } = this.props;
-		const { isLinkSheetVisible } = this.state;
+		const { isLinkSheetVisible, isButtonFocused } = this.state;
 
+		// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
 		if ( ( prevProps.editorSidebarOpened && ! editorSidebarOpened ) || ( prevState.isLinkSheetVisible && ! isLinkSheetVisible ) ) {
 			this.isEditingURL = false;
+		}
+
+		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
+		// to avoid flashing caret after closing one of them
+		if ( ( ! prevProps.editorSidebarOpened && editorSidebarOpened ) || ( ! prevState.isLinkSheetVisible && isLinkSheetVisible ) ) {
+			if ( Platform.OS === 'android' && this.richTextRef ) {
+				this.richTextRef.blur();
+				this.onToggleButtonFocus( false );
+			}
 		}
 
 		// Paste a URL from clipboard
@@ -82,20 +94,19 @@ class ButtonEdit extends Component {
 			this.getURLFromClipboard();
 		}
 
-		// Prepends "http://" to a url on closing link settings sheet and button settings sheet
+		// Prepends "http://" to a url when closing link settings sheet and button settings sheet
 		if ( ! isLinkSheetVisible && ! editorSidebarOpened ) {
 			setAttributes( { url: prependHTTP( url ) } );
 		}
 
 		if ( this.richTextRef ) {
 			const selectedRichText = this.richTextRef.props.id === selectedId;
-			const isFocused = this.isButtonFocused();
 
-			if ( ! selectedRichText && isFocused ) {
+			if ( ! selectedRichText && isButtonFocused ) {
 				this.onToggleButtonFocus( false );
 			}
 
-			if ( selectedRichText && selectedId !== prevProps.selectedId && ! isFocused ) {
+			if ( selectedRichText && selectedId !== prevProps.selectedId && ! isButtonFocused ) {
 				AccessibilityInfo.isScreenReaderEnabled().then(
 					( enabled ) => {
 						if ( enabled ) {
@@ -134,15 +145,6 @@ class ButtonEdit extends Component {
 			return styles.fallbackButton.backgroundColor;
 		// `backgroundColor` which should be set when `Button` is created on mobile
 		} return styles.button.backgroundColor;
-	}
-
-	isButtonFocused() {
-		const { isButtonFocused } = this.state;
-
-		return Platform.select( {
-			ios: isButtonFocused,
-			android: this.richTextRef && this.richTextRef.isFocused(),
-		} );
 	}
 
 	onChangeText( value ) {
@@ -225,9 +227,7 @@ class ButtonEdit extends Component {
 			linkTarget,
 			rel,
 		} = attributes;
-		const { maxWidth, isLinkSheetVisible } = this.state;
-
-		const isFocused = this.isButtonFocused();
+		const { maxWidth, isLinkSheetVisible, isButtonFocused } = this.state;
 
 		const borderRadiusValue = borderRadius !== undefined ? borderRadius : styles.button.borderRadius;
 		const outlineBorderRadius = borderRadiusValue > 0 ? borderRadiusValue + styles.button.paddingTop + styles.button.borderWidth : 0;
@@ -235,11 +235,11 @@ class ButtonEdit extends Component {
 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
 		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
 		// different than empty string.
-		const minWidth = isFocused || ( ! isFocused && text && text !== '' ) ? 1 : styles.button.minWidth;
+		const minWidth = isButtonFocused || ( ! isButtonFocused && text && text !== '' ) ? 1 : styles.button.minWidth;
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,
 		// because `AztecView` is calculating a `minWidth` based on placeholder text.
-		const placeholderText = isFocused || ( ! isFocused && text && text !== '' ) ? '' : ( placeholder || __( 'Add text…' ) );
+		const placeholderText = isButtonFocused || ( ! isButtonFocused && text && text !== '' ) ? '' : ( placeholder || __( 'Add text…' ) );
 
 		return (
 			<View
@@ -278,14 +278,14 @@ class ButtonEdit extends Component {
 							minWidth={ minWidth }
 							maxWidth={ maxWidth }
 							id={ clientId }
-							isSelected={ isFocused }
+							isSelected={ isButtonFocused }
 							withoutInteractiveFormatting
 							unstableOnFocus={ () => this.onToggleButtonFocus( true ) }
 							__unstableMobileNoFocusOnMount={ ! isSelected }
 						/>
 					</ColorBackground>
 
-					{ isFocused && <BlockControls>
+					{ isButtonFocused && <BlockControls>
 						<ToolbarGroup>
 							<ToolbarButton
 								title={ __( 'Edit image' ) }
