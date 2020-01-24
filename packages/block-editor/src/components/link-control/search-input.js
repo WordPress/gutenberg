@@ -59,36 +59,44 @@ const LinkControlSearchInput = ( {
 		<form onSubmit={ selectSuggestionOrCurrentInputValue }>
 			<div role="alert" aria-live="assertive">
 				{ errorMsg && (
-					<Notice className="block-editor-link-control__search-error" status="error" isDismissible={ false }>
+					<Notice
+						className="block-editor-link-control__search-error"
+						status="error"
+						isDismissible={ false }
+					>
 						{ errorMsg }
 					</Notice>
 				) }
 			</div>
-			<URLInput
-				className="block-editor-link-control__search-input"
-				value={ value }
-				onChange={ selectItemHandler }
-				onFocus={ selectItemHandler }
-				onKeyDown={ ( event ) => {
-					if ( event.keyCode === ENTER ) {
-						return;
+			<div className="block-editor-link-control__search-input-wrapper">
+				<URLInput
+					className="block-editor-link-control__search-input"
+					value={ value }
+					onChange={ selectItemHandler }
+					onFocus={ selectItemHandler }
+					onKeyDown={ ( event ) => {
+						if ( event.keyCode === ENTER ) {
+							return;
+						}
+						handleLinkControlOnKeyDown( event );
+					} }
+					onKeyPress={ handleLinkControlOnKeyPress }
+					placeholder={ __( 'Search or type url' ) }
+					__experimentalRenderSuggestions={ renderSuggestions }
+					__experimentalFetchLinkSuggestions={ fetchSuggestions }
+					__experimentalHandleURLSuggestions={ true }
+					__experimentalShowInitialSuggestions={
+						showInitialSuggestions
 					}
-					handleLinkControlOnKeyDown( event );
-				} }
-				onKeyPress={ handleLinkControlOnKeyPress }
-				placeholder={ __( 'Search or type url' ) }
-				__experimentalRenderSuggestions={ renderSuggestions }
-				__experimentalFetchLinkSuggestions={ fetchSuggestions }
-				__experimentalHandleURLSuggestions={ true }
-				__experimentalShowInitialSuggestions={ showInitialSuggestions }
-			/>
-			<div className="block-editor-link-control__search-actions">
-				<Button
-					type="submit"
-					label={ __( 'Submit' ) }
-					icon={ keyboardReturn }
-					className="block-editor-link-control__search-submit"
 				/>
+				<div className="block-editor-link-control__search-actions">
+					<Button
+						type="submit"
+						label={ __( 'Submit' ) }
+						icon={keyboardReturn}
+						className="block-editor-link-control__search-submit"
+					/>
+				</div>
 			</div>
 		</form>
 	);
