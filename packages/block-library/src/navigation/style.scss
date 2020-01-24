@@ -63,10 +63,6 @@ $navigation-sub-menu-height: $grid-size * 5;
 		opacity: 0;
 		transition: opacity 0.1s linear;
 		visibility: hidden;
-
-		> li ul {
-			transform: translateY(0.6rem);
-		}
 	}
 }
 
@@ -144,7 +140,7 @@ $navigation-sub-menu-height: $grid-size * 5;
 			.block-editor-inner-blocks,
 			.wp-block-navigation__container {
 				left: 100%;
-				top: 0;
+				top: - $grid-size - 1px; // -1px to account for border width
 			}
 		}
 
