@@ -57,12 +57,15 @@ class ButtonEdit extends Component {
 		this.onLayout = this.onLayout.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
+		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
+		this.isButtonFocused = this.isButtonFocused.bind( this );
 
 		this.isEditingURL = false;
 
 		this.state = {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
+			isButtonFocused: true,
 		};
 	}
 
@@ -74,22 +77,29 @@ class ButtonEdit extends Component {
 			this.isEditingURL = false;
 		}
 
+		// Paste a URL from clipboard
 		if ( isLinkSheetVisible && ! url && ! this.isEditingURL ) {
 			this.getURLFromClipboard();
 		}
 
+		// Prepends "http://" to a url on closing link settings sheet and button settings sheet
 		if ( ! isLinkSheetVisible && ! editorSidebarOpened ) {
 			setAttributes( { url: prependHTTP( url ) } );
 		}
 
 		if ( this.richTextRef ) {
 			const selectedRichText = this.richTextRef.props.id === selectedId;
-			const isFocused = this.richTextRef.isFocused();
+			const isFocused = this.isButtonFocused();
+
+			if ( ! selectedRichText && isFocused ) {
+				this.onToggleButtonFocus( false );
+			}
 
 			if ( selectedRichText && selectedId !== prevProps.selectedId && ! isFocused ) {
 				AccessibilityInfo.isScreenReaderEnabled().then(
 					( enabled ) => {
 						if ( enabled ) {
+							this.onToggleButtonFocus( true );
 							this.richTextRef.focus();
 						}
 					}
@@ -124,6 +134,15 @@ class ButtonEdit extends Component {
 			return styles.fallbackButton.backgroundColor;
 		// `backgroundColor` which should be set when `Button` is created on mobile
 		} return styles.button.backgroundColor;
+	}
+
+	isButtonFocused() {
+		const { isButtonFocused } = this.state;
+
+		return Platform.select( {
+			ios: isButtonFocused,
+			android: this.richTextRef && this.richTextRef.isFocused(),
+		} );
 	}
 
 	onChangeText( value ) {
@@ -180,6 +199,10 @@ class ButtonEdit extends Component {
 		this.setState( { isLinkSheetVisible: ! isLinkSheetVisible } );
 	}
 
+	onToggleButtonFocus( value ) {
+		this.setState( { isButtonFocused: value } );
+	}
+
 	onClearSettings() {
 		const { setAttributes } = this.props;
 
@@ -204,7 +227,7 @@ class ButtonEdit extends Component {
 		} = attributes;
 		const { maxWidth, isLinkSheetVisible } = this.state;
 
-		const isFocused = this.richTextRef && this.richTextRef.isFocused();
+		const isFocused = this.isButtonFocused();
 
 		const borderRadiusValue = borderRadius !== undefined ? borderRadius : styles.button.borderRadius;
 		const outlineBorderRadius = borderRadiusValue > 0 ? borderRadiusValue + styles.button.paddingTop + styles.button.borderWidth : 0;
@@ -255,7 +278,10 @@ class ButtonEdit extends Component {
 							minWidth={ minWidth }
 							maxWidth={ maxWidth }
 							id={ clientId }
-							withoutInteractiveFormatting={ true }
+							isSelected={ isFocused }
+							withoutInteractiveFormatting
+							unstableOnFocus={ () => this.onToggleButtonFocus( true ) }
+							__unstableMobileNoFocusOnMount={ ! isSelected }
 						/>
 					</ColorBackground>
 
