@@ -262,32 +262,32 @@ function register_block_core_navigation() {
 	register_block_type(
 		'core/navigation',
 		array(
-			'attributes' => array(
-				'className'             => array(
+			'attributes'      => array(
+				'className'          => array(
 					'type' => 'string',
 				),
-				'textColor'             => array(
+				'textColor'          => array(
 					'type' => 'string',
 				),
-				'rgbTextColor'        => array(
+				'rgbTextColor'       => array(
 					'type' => 'string',
 				),
-				'backgroundColor'       => array(
+				'backgroundColor'    => array(
 					'type' => 'string',
 				),
 				'rgbBackgroundColor' => array(
 					'type' => 'string',
 				),
-				'fontSize'              => array(
+				'fontSize'           => array(
 					'type' => 'string',
 				),
-				'customFontSize'        => array(
+				'customFontSize'     => array(
 					'type' => 'number',
 				),
-				'itemsJustification'    => array(
+				'itemsJustification' => array(
 					'type' => 'string',
 				),
-				'showSubmenuIcon'       => array(
+				'showSubmenuIcon'    => array(
 					'type'    => 'boolean',
 					'default' => true,
 				),
