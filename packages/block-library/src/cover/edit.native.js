@@ -23,12 +23,12 @@ import {
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { cover as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import icon from './icon';
 import { onCoverSelectMedia } from './edit.js';
 import { COVER_MIN_HEIGHT, IMAGE_BACKGROUND_TYPE, VIDEO_BACKGROUND_TYPE } from './shared';
 
@@ -41,7 +41,6 @@ const INNER_BLOCKS_TEMPLATE = [
 		align: 'center',
 		fontSize: 'large',
 		placeholder: __( 'Write title…' ),
-		textColor: 'very-light-gray',
 	} ],
 ];
 const COVER_MAX_HEIGHT = 1000;
