@@ -3,22 +3,19 @@
  */
 const program = require( 'commander' );
 const inquirer = require( 'inquirer' );
+const { startCase } = require( 'lodash' );
 
 /**
  * Internal dependencies
  */
 const CLIError = require( './cli-error' );
-const {
-	error,
-	info,
-} = require( './log' );
+const log = require( './log' );
 const { version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
 const {
-	getDefaultAnswers,
+	getDefaultValues,
 	getPrompts,
 } = require( './templates' );
-const { startCase } = require( './utils' );
 
 const commandName = `wp-create-block`;
 program
@@ -34,13 +31,13 @@ program
 	.option( '-t, --template <name>', 'template type name, allowed values: "es5", "esnext"', 'esnext' )
 	.action( async ( slug, { template } ) => {
 		try {
-			const defaultAnswers = getDefaultAnswers( template );
+			const defaultValues = getDefaultValues( template );
 			if ( slug ) {
-				const title = defaultAnswers.slug === slug ?
-					defaultAnswers.title :
+				const title = defaultValues.slug === slug ?
+					defaultValues.title :
 					startCase( slug.replace( /-/, ' ' ) );
 				const answers = {
-					...defaultAnswers,
+					...defaultValues,
 					slug,
 					title,
 				};
@@ -48,27 +45,27 @@ program
 			} else {
 				const answers = await inquirer.prompt( getPrompts( template ) );
 				await scaffold( template, {
-					...defaultAnswers,
+					...defaultValues,
 					...answers,
 				} );
 			}
-		} catch ( e ) {
-			if ( e instanceof CLIError ) {
-				info( '' );
-				error( e.message );
+		} catch ( error ) {
+			if ( error instanceof CLIError ) {
+				log.info( '' );
+				log.error( error.message );
 				process.exit( 1 );
 			} else {
-				throw e;
+				throw error;
 			}
 		}
 	} );
 
 program.on( '--help', function() {
-	info( '' );
-	info( 'Examples:' );
-	info( `  $ ${ commandName }` );
-	info( `  $ ${ commandName } todo-list` );
-	info( `  $ ${ commandName } --template es5 todo-list` );
+	log.info( '' );
+	log.info( 'Examples:' );
+	log.info( `  $ ${ commandName }` );
+	log.info( `  $ ${ commandName } todo-list` );
+	log.info( `  $ ${ commandName } --template es5 todo-list` );
 } );
 
 program.parse( process.argv );

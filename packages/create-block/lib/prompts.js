@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-const { upperFirst } = require( './utils' );
+const { upperFirst } = require( 'lodash' );
 
 const slug = {
 	type: 'input',

@@ -10,7 +10,7 @@ const { render } = require( 'mustache' );
  * Internal dependencies
  */
 const initWPScripts = require( './init-wp-scripts' );
-const { code, clear, info, success } = require( './log' );
+const { code, info, success } = require( './log' );
 const { hasWPScriptsEnabled, getOutputFiles } = require( './templates' );
 
 module.exports = async function( templateName, {
@@ -24,7 +24,7 @@ module.exports = async function( templateName, {
 	license,
 	version,
 } ) {
-	clear();
+	info( '' );
 	info( `Creating a new WordPress block in "${ slug }" folder.` );
 
 	const outputFiles = getOutputFiles( templateName );
@@ -61,8 +61,8 @@ module.exports = async function( templateName, {
 		await initWPScripts( view );
 	}
 
-	clear();
-	success( `Done: block '${ title }' bootstrapped in "${ slug }" folder.` );
+	info( '' );
+	success( `Done: block "${ title }" bootstrapped in the "${ slug }" folder.` );
 	if ( hasWPScriptsEnabled( templateName ) ) {
 		info( '' );
 		info( 'Inside that directory, you can run several commands:' );

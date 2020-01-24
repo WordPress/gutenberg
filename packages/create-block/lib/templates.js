@@ -13,7 +13,7 @@ const version = '0.1.0';
 
 const templates = {
 	es5: {
-		defaultAnswers: {
+		defaultValues: {
 			namespace,
 			slug: 'es5-example',
 			title: 'ES5 Example',
@@ -33,7 +33,7 @@ const templates = {
 		},
 	},
 	esnext: {
-		defaultAnswers: {
+		defaultValues: {
 			namespace,
 			slug: 'esnext-example',
 			title: 'ESNext Example',
@@ -66,8 +66,8 @@ const getTemplate = ( templateName ) => {
 	return templates[ templateName ];
 };
 
-const getDefaultAnswers = ( templateName ) => {
-	return getTemplate( templateName ).defaultAnswers;
+const getDefaultValues = ( templateName ) => {
+	return getTemplate( templateName ).defaultValues;
 };
 
 const getOutputFiles = ( templateName ) => {
@@ -75,11 +75,11 @@ const getOutputFiles = ( templateName ) => {
 };
 
 const getPrompts = ( templateName ) => {
-	const defaultAnswers = getDefaultAnswers( templateName );
+	const defaultValues = getDefaultValues( templateName );
 	return Object.keys( prompts ).map( ( promptName ) => {
 		return {
 			...prompts[ promptName ],
-			default: defaultAnswers[ promptName ],
+			default: defaultValues[ promptName ],
 		};
 	} );
 };
@@ -89,7 +89,7 @@ const hasWPScriptsEnabled = ( templateName ) => {
 };
 
 module.exports = {
-	getDefaultAnswers,
+	getDefaultValues,
 	getOutputFiles,
 	getPrompts,
 	hasWPScriptsEnabled,
