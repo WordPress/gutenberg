@@ -1,11 +1,9 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/navigation",
+        "name": "core/post-featured-image",
         "isValid": true,
-        "attributes": {
-            "showSubmenuIcon": true
-        },
+        "attributes": {},
         "innerBlocks": [],
         "originalContent": ""
     }
