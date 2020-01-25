@@ -44,7 +44,7 @@ A string to be shown within the drop zone area.
 
 ### onFilesDrop
 
-The function is called when dropping a file into the `DropZone`. It receives an array of dropped files as an argument.
+The function is called when dropping a file into the `DropZone`. It receives three arguments: an array of dropped files, a position object which the following shape: `{ x: 'left|right', y: 'top|bottom' }`, and the original drop `event` object. The position object indicates whether the drop event happened closer to the top or bottom edges and left or right ones.
 
 - Type: `Function`
 - Required: No
@@ -52,7 +52,7 @@ The function is called when dropping a file into the `DropZone`. It receives an 
 
 ### onHTMLDrop
 
-The function is called when dropping a file into the `DropZone`. It receives the HTML being dropped as an argument.
+The function is called when dropping a file into the `DropZone`. It receives three arguments: the HTML being dropped, a position object, and the original drop `event` object.
 
 - Type: `Function`
 - Required: No
