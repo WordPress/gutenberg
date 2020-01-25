@@ -115,9 +115,17 @@ function BlockPopover( {
 	let anchorRef = node;
 
 	if ( hasMultiSelection ) {
+		const bottomNode = blockNodes[ lastClientId ];
+
+		// Wait to render the popover until the bottom reference is available
+		// as well.
+		if ( ! bottomNode ) {
+			return null;
+		}
+
 		anchorRef = {
-			top: blockNodes[ clientId ],
-			bottom: blockNodes[ lastClientId ],
+			top: node,
+			bottom: bottomNode,
 		};
 	}
 
