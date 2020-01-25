@@ -246,6 +246,7 @@ const Popover = ( {
 	__unstableSlotName = SLOT_NAME,
 	__unstableAllowVerticalSubpixelPosition,
 	__unstableAllowHorizontalSubpixelPosition,
+	__unstableFixedPosition = true,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -268,6 +269,7 @@ const Popover = ( {
 			setStyle( containerRef.current, 'left' );
 			setStyle( contentRef.current, 'maxHeight' );
 			setStyle( contentRef.current, 'maxWidth' );
+			setStyle( containerRef.current, 'position' );
 			return;
 		}
 
@@ -292,7 +294,6 @@ const Popover = ( {
 				contentRect.current = contentRef.current.getBoundingClientRect();
 			}
 
-			const { offsetParent, ownerDocument } = containerRef.current;
 			let relativeOffsetTop = 0;
 
 			// If there is a positioned ancestor element that is not the body,
@@ -300,7 +301,10 @@ const Popover = ( {
 			// the popover is fixed, the offset parent is null or the body
 			// element, in which case the position is relative to the viewport.
 			// See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent
-			if ( offsetParent && offsetParent !== ownerDocument.body ) {
+			if ( ! __unstableFixedPosition ) {
+				setStyle( containerRef.current, 'position', 'absolute' );
+
+				const { offsetParent } = containerRef.current;
 				const offsetParentRect = offsetParent.getBoundingClientRect();
 
 				relativeOffsetTop = offsetParentRect.top;
@@ -310,6 +314,8 @@ const Popover = ( {
 					anchor.width,
 					anchor.height
 				);
+			} else {
+				setStyle( containerRef.current, 'position' );
 			}
 
 			const {
