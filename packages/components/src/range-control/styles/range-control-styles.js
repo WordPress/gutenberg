@@ -147,7 +147,7 @@ const handleReducedMotion = () => {
 
 const thumbFocus = ( { isFocused } ) => {
 	return css( {
-		borderColor: isFocused ? color( 'darkGray.300' ) : color( 'lightGray.700' ),
+		borderColor: isFocused ? color( 'darkGray.400' ) : color( 'darkGray.200' ),
 		boxShadow: isFocused ?
 			`
 				0 1px 2px rgba(0, 0, 0, 0.1),
@@ -164,7 +164,7 @@ export const Thumb = styled.span`
 	align-items: center;
 	background-color: white;
 	border-radius: 50%;
-	border: 1px solid ${ color( 'lightGray.700' ) };
+	border: 1px solid ${ color( 'darkGray.200' ) };
 	box-sizing: border-box;
 	height: 100%;
 	outline: 0;

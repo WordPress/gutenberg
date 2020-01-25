@@ -3269,7 +3269,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   align-items: center;
   background-color: white;
   border-radius: 50%;
-  border: 1px solid #ccd0d4;
+  border: 1px solid #7e8993;
   box-sizing: border-box;
   height: 100%;
   outline: 0;
@@ -3282,7 +3282,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   -ms-user-select: none;
   user-select: none;
   width: 100%;
-  border-color: #ccd0d4;
+  border-color: #7e8993;
   box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
 }
 
@@ -4944,7 +4944,7 @@ exports[`Storyshots Components/RangeControl Next 1`] = `
   align-items: center;
   background-color: white;
   border-radius: 50%;
-  border: 1px solid #ccd0d4;
+  border: 1px solid #7e8993;
   box-sizing: border-box;
   height: 100%;
   outline: 0;
@@ -4957,7 +4957,7 @@ exports[`Storyshots Components/RangeControl Next 1`] = `
   -ms-user-select: none;
   user-select: none;
   width: 100%;
-  border-color: #ccd0d4;
+  border-color: #7e8993;
   box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
 }
 
@@ -5241,7 +5241,7 @@ exports[`Storyshots Components/RangeControl Next Custom Marks 1`] = `
   align-items: center;
   background-color: white;
   border-radius: 50%;
-  border: 1px solid #ccd0d4;
+  border: 1px solid #7e8993;
   box-sizing: border-box;
   height: 100%;
   outline: 0;
@@ -5254,7 +5254,7 @@ exports[`Storyshots Components/RangeControl Next Custom Marks 1`] = `
   -ms-user-select: none;
   user-select: none;
   width: 100%;
-  border-color: #ccd0d4;
+  border-color: #7e8993;
   box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
 }
 
