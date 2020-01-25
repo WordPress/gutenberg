@@ -12,7 +12,8 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import RangeControl from '../';
+import RangeControl from '../range-control';
+import RangeControlNext from '../range-control-next';
 
 export default { title: 'Components/RangeControl', component: RangeControl };
 
@@ -103,7 +104,7 @@ export const next = () => {
 
 	return (
 		<Wrapper>
-			<RangeControl { ...props } next />
+			<RangeControlNext { ...props } />
 		</Wrapper>
 	);
 };
@@ -134,7 +135,7 @@ export const nextCustomMarks = () => {
 
 	return (
 		<Wrapper>
-			<RangeControl next marks={ marks } min={ 0 } max={ 10 } step={ 1 } />
+			<RangeControlNext marks={ marks } min={ 0 } max={ 10 } step={ 1 } />
 		</Wrapper>
 	);
 };

@@ -9,6 +9,7 @@ import styled from '@emotion/styled';
  */
 import { color } from '../../utils/colors';
 
+const rangeHeight = () => css( { height: 30, minHeight: 30 } );
 const rootWidth = ( { width } ) => css( { width } );
 
 export const Root = styled.span`
@@ -32,11 +33,11 @@ const wrapperMargin = ( { marks } ) => css( { marginBottom: marks ? 16 : null } 
 export const Wrapper = styled.span`
 	box-sizing: border-box;
 	display: block;
-	padding-top: 14px;
+	padding-top: 15px;
 	position: relative;
-	height: 28px;
 	width: 100%;
 
+	${ rangeHeight };
 	${ wrapperColor };
 	${ wrapperMargin };
 `;
@@ -60,7 +61,7 @@ export const Rail = styled.span`
 	display: block;
 	height: 3px;
 	position: absolute;
-	margin-top: 13px;
+	margin-top: 14px;
 	top: 0;
 `;
 
@@ -72,7 +73,7 @@ export const Track = styled.span`
 	pointer-events: none;
 	display: block;
 	position: absolute;
-	margin-top: 13px;
+	margin-top: 14px;
 	top: 0;
 `;
 
@@ -81,6 +82,7 @@ export const MarksWrapper = styled.span`
 	display: block;
 	position: relative;
 	width: 100%;
+	user-select: none;
 `;
 
 const markFill = ( { isFilled } ) => {
@@ -122,7 +124,7 @@ export const MarkLabel = styled.span`
 export const ThumbWrapper = styled.span`
 	align-items: center;
 	margin-left: -10px;
-	margin-top: 4px;
+	margin-top: 5px;
 	width: 20px;
 	box-sizing: border-box;
 	display: flex;
@@ -203,7 +205,7 @@ const tooltipPosition = ( { position } ) => {
 
 	if ( isTop ) {
 		return css`
-			margin-top: -8px;
+			margin-top: -4px;
 			top: -100%;
 
 			&::after {
@@ -215,7 +217,7 @@ const tooltipPosition = ( { position } ) => {
 	}
 
 	return css`
-		margin-bottom: -8px;
+		margin-bottom: -4px;
 		bottom: -100%;
 
 		&::after {
@@ -266,13 +268,12 @@ export const InputNumber = styled.input`
 	box-sizing: border-box;
 	display: inline-block;
 	margin-left: 16px;
-	margin-top: 2px;
+	margin-top: 0;
 	min-width: 54px;
 	max-width: 120px;
 
 	input[type="number"]& {
-		min-height: 24px;
-		height: 24px;
+		${ rangeHeight };
 	}
 `;
 
@@ -280,9 +281,11 @@ export const ActionRightWrapper = styled.span`
 	box-sizing: border-box;
 	display: block;
 	margin-left: 8px;
-	margin-top: 2px;
+	margin-top: 0;
 
-	button {
+	button,
+	button.is-small {
 		margin-left: 0;
+		${ rangeHeight };
 	}
 `;
