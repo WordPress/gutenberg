@@ -208,7 +208,7 @@ class MediaTextEdit extends Component {
 			setAttributes( { verticalAlignment: alignment } );
 		};
 		const mediaTextGeneralSettings = (
-			<PanelBody title={ __( 'Media & Text Settings' ) }>
+			<PanelBody title={ __( 'Media & Text settings' ) }>
 				<ToggleControl
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }

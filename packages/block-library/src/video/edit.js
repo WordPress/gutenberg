@@ -178,7 +178,7 @@ class VideoEdit extends Component {
 					/>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Video Settings' ) }>
+					<PanelBody title={ __( 'Video settings' ) }>
 						<VideoCommonSettings
 							setAttributes={ setAttributes }
 							attributes={ attributes }

@@ -50,7 +50,7 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId, onResi
 				} }
 			/>
 			<InspectorControls>
-				<PanelBody title={ __( 'Spacer Settings' ) }>
+				<PanelBody title={ __( 'Spacer settings' ) }>
 					<BaseControl label={ __( 'Height in pixels' ) } id={ id }>
 						<input
 							type="number"
