@@ -250,7 +250,7 @@ class MediaTextEdit extends Component {
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
 					<PanelColorSettings
-						title={ __( 'Color Settings' ) }
+						title={ __( 'Color settings' ) }
 						initialOpen={ false }
 						colorSettings={ colorSettings }
 					/>

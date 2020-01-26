@@ -577,7 +577,7 @@ export class TableEdit extends Component {
 						/>
 					</PanelBody>
 					<PanelColorSettings
-						title={ __( 'Color Settings' ) }
+						title={ __( 'Color settings' ) }
 						initialOpen={ false }
 						colorSettings={ [
 							{
