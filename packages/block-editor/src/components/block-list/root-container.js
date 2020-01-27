@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { createContext, forwardRef, useState } from '@wordpress/element';
@@ -73,6 +78,8 @@ function RootContainer( { children, className, hasPopover = true }, ref ) {
 			selectBlock( clientId );
 		}
 	}
+
+	className = classnames( className, 'block-editor-block-list__layout-root' );
 
 	return (
 		<InsertionPoint
