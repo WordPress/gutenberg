@@ -3,7 +3,9 @@
         "clientId": "_clientId_0",
         "name": "core/navigation",
         "isValid": true,
-        "attributes": {},
+        "attributes": {
+            "showSubmenuIcon": false
+        },
         "innerBlocks": [],
         "originalContent": ""
     }

@@ -183,7 +183,7 @@
 		"dev:packages": "node ./bin/packages/watch.js",
 		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-readmes.js",
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
-		"fixtures:server-registered": "npm run wp-env run tests-wordpress-phpunit './bin/get-server-blocks.php > test/integration/full-content/server-registered.json'",
+		"fixtures:server-registered": "packages/env/bin/wp-env run wordpress ./wp-content/plugins/gutenberg/bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\" \"npm run lint-types\"",
