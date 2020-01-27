@@ -38,6 +38,11 @@ export function ShortcodeEdit( props ) {
 				onBlur={ onBlur }
 				autoCorrect={ false }
 				autoComplete="off"
+				/*
+				 * For some devices autoCorrect and autoComplete are not enough to hide the suggestion toolbar.
+				 * Following the suggestion below we added the keyboard type as well.
+				 * https://stackoverflow.com/questions/37001070/how-to-avoid-the-suggestions-of-keyboard-for-android-in-react-native/51411575#51411575
+				*/
 				keyboardType={ Platform.OS === 'ios' ? 'default' : 'visible-password' }
 				placeholderTextColor={ placeholderStyle.color }
 			/>
