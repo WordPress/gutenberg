@@ -17,7 +17,6 @@ import {
 export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = false, onClick, isURL = false, searchTerm = '' } ) => {
 	return (
 		<Button
-			type="submit"
 			{ ...itemProps }
 			onClick={ onClick }
 			className={ classnames( 'block-editor-link-control__search-item', {

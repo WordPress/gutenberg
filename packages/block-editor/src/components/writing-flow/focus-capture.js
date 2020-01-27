@@ -35,6 +35,7 @@ const FocusCapture = forwardRef( ( {
 	isReverse,
 	containerRef,
 	noCapture,
+	hasMultiSelection,
 }, ref ) => {
 	const isNavigationMode = useSelect( ( select ) =>
 		select( 'core/block-editor' ).isNavigationMode()
@@ -52,6 +53,11 @@ const FocusCapture = forwardRef( ( {
 		// selected, enable Navigation mode and select the first or last block
 		// depending on the direction.
 		if ( ! selectedClientId ) {
+			if ( hasMultiSelection ) {
+				containerRef.current.focus();
+				return;
+			}
+
 			setNavigationMode( true );
 
 			const tabbables = focus.tabbable.find( containerRef.current );

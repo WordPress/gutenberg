@@ -4,9 +4,13 @@
 import styled from '@emotion/styled';
 
 /**
+ * WordPress dependencies
+ */
+import { HorizontalRule } from '@wordpress/primitives';
+
+/**
  * Internal dependencies
  */
-import { HorizontalRule } from '../../primitives';
 import { color } from '../../utils/colors';
 
 export const styleProps = {

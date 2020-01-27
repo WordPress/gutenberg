@@ -1,6 +1,7 @@
 const stories = [
 	process.env.NODE_ENV !== 'test' && './stories/**/*.(js|mdx)',
 	'../packages/components/src/**/stories/*.js',
+	'../packages/icons/src/**/stories/*.js',
 ].filter( Boolean );
 
 module.exports = {

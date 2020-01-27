@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
-import { Button, ModalHeaderBar } from '@wordpress/components';
+import { ModalHeaderBar } from '@wordpress/components';
+import { usePreferredColorScheme } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -40,23 +41,24 @@ const BlockPreview = ( { blocks } ) => {
 BlockPreview.displayName = 'BlockPreview';
 
 const Preview = ( props ) => {
-	const { template, onDismiss } = props;
+	const { template, onDismiss, onApply } = props;
+	const preferredColorScheme = usePreferredColorScheme();
+	const containerBackgroundColor = preferredColorScheme === 'dark' ? 'black' : 'white';
 
 	if ( template === undefined ) {
 		return null;
 	}
 
 	const leftButton = (
-		<View
-			style={ { flex: 1, width: 44 } }
-		>
-			<Button
-				icon="no-alt"
-				size={ 24 }
-				label={ __( 'Close' ) }
-				onClick={ onDismiss }
-			/>
-		</View>
+		<ModalHeaderBar.CloseButton onPress={ onDismiss } />
+	);
+
+	const rightButton = (
+		<ModalHeaderBar.Button
+			onPress={ onApply }
+			title={ __( 'Apply' ) }
+			isPrimary={ true }
+		/>
 	);
 
 	return (
@@ -64,11 +66,14 @@ const Preview = ( props ) => {
 			visible={ !! template }
 			animationType="slide"
 			onRequestClose={ onDismiss }
+			supportedOrientations={ [ 'portrait', 'landscape' ] }
 		>
-			<SafeAreaView style={ { flex: 1 } }>
+			<SafeAreaView style={ { flex: 1, backgroundColor: containerBackgroundColor } }>
 				<ModalHeaderBar
 					leftButton={ leftButton }
+					rightButton={ rightButton }
 					title={ template.name }
+					subtitle={ __( 'Template Preview' ) }
 				/>
 				<BlockPreview
 					blocks={ template.blocks }

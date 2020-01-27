@@ -26,6 +26,7 @@
 	}
 }
 
+.components-placeholder__error,
 .components-placeholder__instructions,
 .components-placeholder__label,
 .components-placeholder__fieldset {
@@ -72,6 +73,11 @@
 
 .components-placeholder__instructions {
 	margin-bottom: 1em;
+}
+
+.components-placeholder__error {
+	margin-top: 1em;
+	width: 100%;
 }
 
 .components-placeholder__preview img {

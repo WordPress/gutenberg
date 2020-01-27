@@ -2,9 +2,9 @@
 
 exports[`Navigation allows a navigation menu to be created from an empty menu using a mixture of internal and external links 1`] = `
 "<!-- wp:navigation -->
-<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"title\\":\\"https://wordpress.org\\",\\"url\\":\\"https://wordpress.org\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"title\\":\\"https://wordpress.org\\",\\"id\\":\\"-1\\",\\"url\\":\\"https://wordpress.org\\"} /-->
 
-<!-- wp:navigation-link {\\"label\\":\\"Get in touch\\",\\"title\\":\\"Contact Us\\",\\"url\\":\\"https://this/is/a/test/url/contact-us\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"Get in touch\\",\\"title\\":\\"Contact Us\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/url/contact-us\\"} /-->
 <!-- /wp:navigation -->"
 `;
 

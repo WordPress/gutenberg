@@ -17,8 +17,9 @@
 }
 
 .edit-post-visual-editor > .block-editor__typewriter,
-.edit-post-visual-editor > .block-editor__typewriter > .block-editor-writing-flow,
-.edit-post-visual-editor > .block-editor__typewriter > .block-editor-writing-flow > .block-editor-writing-flow__click-redirect {
+.edit-post-visual-editor > .block-editor__typewriter > div,
+.edit-post-visual-editor > .block-editor__typewriter > div > .block-editor-writing-flow,
+.edit-post-visual-editor > .block-editor__typewriter > div > .block-editor-writing-flow > .block-editor-writing-flow__click-redirect {
 	height: 100%;
 }
 

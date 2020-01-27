@@ -5,9 +5,9 @@ import classnames from 'classnames';
 import { noop } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { Path, SVG } from '../primitives';
+import { Path, SVG } from '@wordpress/primitives';
 
 function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
 	const wrapperClasses = classnames(
