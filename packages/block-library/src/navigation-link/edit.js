@@ -105,18 +105,6 @@ function NavigationLinkEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
-					title={ __( 'Link settings' ) }
-				>
-					<TextareaControl
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( { description: descriptionValue } );
-						} }
-						label={ __( 'Description' ) }
-						help={ __( 'The description will be displayed in the menu if the current theme supports it.' ) }
-					/>
-				</PanelBody>
-				<PanelBody
 					title={ __( 'SEO settings' ) }
 				>
 					<TextControl
@@ -144,6 +132,18 @@ function NavigationLinkEdit( {
 								</ExternalLink>
 							</Fragment>
 						) }
+					/>
+				</PanelBody>
+				<PanelBody
+					title={ __( 'Link settings' ) }
+				>
+					<TextareaControl
+						value={ description || '' }
+						onChange={ ( descriptionValue ) => {
+							setAttributes( { description: descriptionValue } );
+						} }
+						label={ __( 'Description' ) }
+						help={ __( 'The description will be displayed in the menu if the current theme supports it.' ) }
 					/>
 				</PanelBody>
 			</InspectorControls>
