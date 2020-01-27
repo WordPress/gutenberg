@@ -12,7 +12,7 @@ describe( 'Heading', () => {
 	const CUSTOM_COLOR_TEXT = 'Custom Color';
 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `//button[contains(text(),'${ CUSTOM_COLOR_TEXT }')]`;
 	const COLOR_INPUT_FIELD_SELECTOR = '.components-color-palette__picker .components-text-control__input';
-	const COLOR_PANEL_TOGGLE_X_SELECTOR = '//button[./span[contains(text(),\'Color Settings\')]]';
+	const COLOR_PANEL_TOGGLE_X_SELECTOR = '//button[./span[contains(text(),\'Color settings\')]]';
 
 	beforeEach( async () => {
 		await createNewPost();

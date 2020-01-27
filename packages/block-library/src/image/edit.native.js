@@ -331,7 +331,7 @@ export class ImageEdit extends React.Component {
 
 		const getInspectorControls = () => (
 			<InspectorControls>
-				<PanelBody title={ __( 'Image Settings' ) } >
+				<PanelBody title={ __( 'Image settings' ) } >
 					<TextControl
 						icon={ 'admin-links' }
 						label={ __( 'Link To' ) }

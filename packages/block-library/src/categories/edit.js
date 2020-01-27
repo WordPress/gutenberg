@@ -150,7 +150,7 @@ class CategoriesEdit extends Component {
 
 		const inspectorControls = (
 			<InspectorControls>
-				<PanelBody title={ __( 'Categories Settings' ) }>
+				<PanelBody title={ __( 'Categories settings' ) }>
 					<ToggleControl
 						label={ __( 'Display as Dropdown' ) }
 						checked={ displayAsDropdown }

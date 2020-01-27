@@ -11,7 +11,7 @@ import {
 
 const OrderedListSettings = ( { setAttributes, reversed, start } ) => (
 	<InspectorControls>
-		<PanelBody title={ __( 'Ordered List Settings' ) }>
+		<PanelBody title={ __( 'Ordered list settings' ) }>
 			<TextControl
 				label={ __( 'Start Value' ) }
 				type="number"

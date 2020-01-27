@@ -353,7 +353,7 @@ class GalleryEdit extends Component {
 		return (
 			<>
 				<InspectorControls>
-					<PanelBody title={ __( 'Gallery Settings' ) }>
+					<PanelBody title={ __( 'Gallery settings' ) }>
 						{ images.length > 1 && <RangeControl
 							label={ __( 'Columns' ) }
 							{ ...MOBILE_CONTROL_PROPS }

@@ -55,7 +55,7 @@ function ColumnEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Column Settings' ) }>
+				<PanelBody title={ __( 'Column settings' ) }>
 					<RangeControl
 						label={ __( 'Percentage width' ) }
 						value={ width || '' }

@@ -211,7 +211,7 @@ function Navigation( {
 				>
 					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
-				<PanelBody title={ __( 'Text Settings' ) }>
+				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
 						value={ fontSize.size }
 						onChange={ setFontSize }
@@ -221,7 +221,7 @@ function Navigation( {
 			{ InspectorControlsColorPanel }
 			<InspectorControls>
 				<PanelBody
-					title={ __( 'Display Settings' ) }
+					title={ __( 'Display settings' ) }
 				>
 					<ToggleControl
 						checked={ attributes.showSubmenuIcon }
