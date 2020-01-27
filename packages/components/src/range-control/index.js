@@ -51,6 +51,7 @@ const BaseRangeControlNext = forwardRef(
 			disabled = false,
 			help,
 			instanceId,
+			initialPosition,
 			label,
 			marks = false,
 			max = 100,
@@ -73,7 +74,8 @@ const BaseRangeControlNext = forwardRef(
 		},
 		ref
 	) => {
-		const [ value, setValue ] = useControlledRangeValue( { min, max, value: valueProp } );
+		const sliderValue = initialPosition || valueProp;
+		const [ value, setValue ] = useControlledRangeValue( { min, max, value: sliderValue } );
 		const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 		const originalValueRef = useRef( value );
 
