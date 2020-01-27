@@ -12,8 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import RangeControl from '../range-control';
-import RangeControlNext from '../range-control-next';
+import RangeControl from '../index';
 
 export default { title: 'Components/RangeControl', component: RangeControl };
 
@@ -25,9 +24,30 @@ const RangeControlWithState = ( props ) => {
 };
 
 export const _default = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
+	const props = {
+		allowReset: boolean( 'allowReset', false ),
+		alwaysShowTooltip: boolean( 'alwaysShowToolTip', false ),
+		label: text( 'label', 'Range Label' ),
+		help: text( 'help', '' ),
+		min: number( 'min', 0 ),
+		max: number( 'max', 10 ),
+		step: number( 'step', 1 ),
+		marks: boolean( 'marks', false ),
+		tooltipPosition: select( 'tooltipPosition', {
+			top: 'top',
+			bottom: 'bottom',
+			auto: 'auto',
+		}, 'auto' ),
+		beforeIcon: text( 'beforeIcon', '' ),
+		afterIcon: text( 'afterIcon', '' ),
+		withInputField: boolean( 'withInputField', true ),
+	};
 
-	return <RangeControlWithState label={ label } />;
+	return (
+		<Wrapper>
+			<RangeControl { ...props } />
+		</Wrapper>
+	);
 };
 
 export const InitialValueZero = () => {
@@ -82,34 +102,7 @@ export const withReset = () => {
 	return <RangeControlWithState label={ label } allowReset />;
 };
 
-export const next = () => {
-	const props = {
-		allowReset: boolean( 'allowReset', false ),
-		alwaysShowTooltip: boolean( 'alwaysShowToolTip', false ),
-		label: text( 'label', 'Range Label' ),
-		help: text( 'help', '' ),
-		min: number( 'min', 0 ),
-		max: number( 'max', 10 ),
-		step: number( 'step', 1 ),
-		marks: boolean( 'marks', false ),
-		tooltipPosition: select( 'tooltipPosition', {
-			top: 'top',
-			bottom: 'bottom',
-			auto: 'auto',
-		}, 'auto' ),
-		beforeIcon: text( 'beforeIcon', '' ),
-		afterIcon: text( 'afterIcon', '' ),
-		withInputField: boolean( 'withInputField', true ),
-	};
-
-	return (
-		<Wrapper>
-			<RangeControlNext { ...props } />
-		</Wrapper>
-	);
-};
-
-export const nextCustomMarks = () => {
+export const customMarks = () => {
 	const marks = [
 		{
 			value: 0,
@@ -135,7 +128,7 @@ export const nextCustomMarks = () => {
 
 	return (
 		<Wrapper>
-			<RangeControlNext marks={ marks } min={ 0 } max={ 10 } step={ 1 } />
+			<RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } />
 		</Wrapper>
 	);
 };

@@ -35,6 +35,7 @@ export const Wrapper = styled.span`
 	display: block;
 	padding-top: 15px;
 	position: relative;
+	margin-left: 10px;
 	width: 100%;
 
 	${ rangeHeight };
@@ -43,13 +44,21 @@ export const Wrapper = styled.span`
 `;
 
 export const BeforeIconWrapper = styled.span`
-	margin-right: 16px;
-	margin-top: 2px;
+	margin-right: 6px;
+	margin-top: 5px;
+
+	> .dashicon {
+		margin: 0;
+	}
 `;
 
 export const AfterIconWrapper = styled.span`
 	margin-left: 16px;
-	margin-top: 2px;
+	margin-top: 5px;
+
+	> .dashicon {
+		margin: 0;
+	}
 `;
 
 export const Rail = styled.span`
