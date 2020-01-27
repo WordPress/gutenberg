@@ -47,7 +47,6 @@ function ObserveTyping( {
 	children,
 	setTimeout: setSafeTimeout,
 } ) {
-	const node = useRef();
 	const lastMouseMove = useRef();
 	const isTyping = useSelect( ( select ) => select( 'core/block-editor' ).isTyping() );
 	const { startTyping, stopTyping } = useDispatch( 'core/block-editor' );
@@ -72,7 +71,7 @@ function ObserveTyping( {
 	 * @return {(event:WPSyntheticEvent)=>void} Enhanced event handler.
 	 */
 	const ifDOMDescendentEventTarget = ( handler ) => ( event ) => {
-		if ( node.current.contains( event.target ) ) {
+		if ( event.currentTarget.contains( event.target ) ) {
 			handler( event );
 		}
 	};
@@ -186,7 +185,6 @@ function ObserveTyping( {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div
-			ref={ node }
 			onFocus={ stopTypingOnNonTextField }
 			onKeyPress={ startTypingInTextField }
 			onKeyDown={ over( [ startTypingInTextField, stopTypingOnEscapeKey ] ) }
