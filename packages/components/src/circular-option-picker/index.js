@@ -4,12 +4,16 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { Icon, check } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
-import Dashicon from '../dashicon';
 
 function Option( {
 	className,
@@ -33,7 +37,7 @@ function Option( {
 				( <Tooltip text={ tooltipText }>{ optionButton }</Tooltip> ) :
 				optionButton
 			}
-			{ isSelected && <Dashicon icon="saved" /> }
+			{ isSelected && <Icon icon={ check } /> }
 		</div>
 	);
 }

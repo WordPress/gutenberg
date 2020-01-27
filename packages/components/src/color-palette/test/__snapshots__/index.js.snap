@@ -318,27 +318,31 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               />
             </ForwardRef(Button)>
           </Tooltip>
-          <Dashicon
-            icon="saved"
+          <Icon
+            icon={
+              <SVG
+                viewBox="-2 -2 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <Path
+                  d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+                />
+              </SVG>
+            }
           >
             <SVG
-              aria-hidden={true}
-              className="dashicon dashicons-saved"
-              focusable="false"
-              height={20}
-              role="img"
-              viewBox="0 0 20 20"
-              width={20}
+              height={24}
+              viewBox="-2 -2 24 24"
+              width={24}
               xmlns="http://www.w3.org/2000/svg"
             >
               <svg
                 aria-hidden="true"
-                className="dashicon dashicons-saved"
                 focusable="false"
-                height={20}
+                height={24}
                 role="img"
-                viewBox="0 0 20 20"
-                width={20}
+                viewBox="-2 -2 24 24"
+                width={24}
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <Path
@@ -350,7 +354,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 </Path>
               </svg>
             </SVG>
-          </Dashicon>
+          </Icon>
         </div>
       </Option>
       <Option

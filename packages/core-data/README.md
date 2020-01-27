@@ -379,7 +379,7 @@ _Parameters_
 
 _Returns_
 
--   `null`: The map of edited records with their edits.
+-   (unknown type): The map of edited records with their edits.
 
 <a name="getEntityRecordEdits" href="#getEntityRecordEdits">#</a> **getEntityRecordEdits**
 
@@ -414,6 +414,21 @@ _Parameters_
 _Returns_
 
 -   `?Object`: The entity record's non transient edits.
+
+<a name="getEntityRecordNoResolver" href="#getEntityRecordNoResolver">#</a> **getEntityRecordNoResolver**
+
+Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
+
+_Parameters_
+
+-   _state_ `Object`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `number`: Record's key
+
+_Returns_
+
+-   `?Object`: Record.
 
 <a name="getEntityRecords" href="#getEntityRecords">#</a> **getEntityRecords**
 

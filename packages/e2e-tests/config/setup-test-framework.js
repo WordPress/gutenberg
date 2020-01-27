@@ -83,8 +83,8 @@ async function trashExistingPosts() {
 	}
 
 	// Select all posts.
-	await page.waitForSelector( '#cb-select-all-1' );
-	await page.click( '#cb-select-all-1' );
+	await page.waitForSelector( '[id^=cb-select-all-]' );
+	await page.click( '[id^=cb-select-all-]' );
 	// Select the "bulk actions" > "trash" option.
 	await page.select( '#bulk-action-selector-top', 'trash' );
 	// Submit the form to send all draft/scheduled/published posts to the trash.

@@ -4,10 +4,6 @@
 }
 
 .wp-block-buttons {
-	div[data-type="core/button"] div[data-block] {
-		display: block;
-	}
-
 	&[data-align="center"] .block-editor-block-list__layout {
 		display: flex;
 		align-items: center;

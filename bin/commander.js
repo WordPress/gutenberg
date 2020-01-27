@@ -9,6 +9,8 @@ const inquirer = require( 'inquirer' );
 const semver = require( 'semver' );
 const chalk = require( 'chalk' );
 const fs = require( 'fs' );
+const glob = require( 'fast-glob' );
+const readline = require( 'readline' );
 const rimraf = require( 'rimraf' );
 const SimpleGit = require( 'simple-git/promise' );
 const childProcess = require( 'child_process' );
@@ -20,6 +22,7 @@ const uuid = require( 'uuid/v4' );
 const gitRepoOwner = 'WordPress';
 const gitRepoURL = 'https://github.com/' + gitRepoOwner + '/gutenberg.git';
 const svnRepoURL = 'https://plugins.svn.wordpress.org/gutenberg';
+const releasePageURLPrefix = 'https://github.com/WordPress/gutenberg/releases/tag/';
 
 // Working Directories
 const gitWorkingDirectoryPath = path.join( os.tmpdir(), uuid() );
@@ -392,7 +395,7 @@ async function runBumpPluginVersionAndCommitStep( version, changelog, abortMessa
 		const newReadmeContent =
 			readmeFileContent.substr( 0, readmeFileContent.indexOf( '== Changelog ==' ) ) +
 			'== Changelog ==\n\n' +
-			changelog + '\n';
+			`To read the changelog for Gutenberg ${ version }, please navigate to the <a href="${ releasePageURLPrefix }v${ version }">release page</a>.` + '\n';
 		fs.writeFileSync( readmePath, newReadmeContent );
 
 		// Update the content of the changelog.txt file
@@ -427,7 +430,7 @@ async function runBumpPluginVersionAndCommitStep( version, changelog, abortMessa
 		] );
 		const commitData = await simpleGit.commit( 'Bump plugin version to ' + version );
 		commitHash = commitData.commit;
-		console.log( '>> The plugin version bump has been commited successfully.' );
+		console.log( '>> The plugin version bump has been committed successfully.' );
 	} );
 
 	return commitHash;
@@ -730,11 +733,113 @@ async function runWordPressReleaseBranchSyncStep( abortMessage ) {
 }
 
 /**
+ * Update CHANGELOG files with the new version number for those packages that
+ * contain new entries.
+ *
+ * @param {string} minimumVersionBump Minimum version bump for the packages.
+ * @param {string} abortMessage       Abort Message.
+ */
+async function updatePackageChangelogs( minimumVersionBump, abortMessage ) {
+	const changelogFiles = await glob( path.resolve( gitWorkingDirectoryPath, 'packages/*/CHANGELOG.md' ) );
+	const processedPackages = await Promise.all( changelogFiles.map( async ( changelogFile ) => {
+		const fileStream = fs.createReadStream( changelogFile );
+
+		const lines = readline.createInterface( {
+			input: fileStream,
+		} );
+
+		let changesDetected = false;
+		let versionBump = null;
+		for await ( const line of lines ) {
+			// Detect unpublished changes first.
+			if ( line.startsWith( '## Master' ) ) {
+				changesDetected = true;
+				continue;
+			}
+
+			// Skip all lines until unpublished changes found.
+			if ( ! changesDetected ) {
+				continue;
+			}
+
+			// A previous published version detected. Stop processing.
+			if ( line.startsWith( '## ' ) ) {
+				break;
+			}
+
+			// A major version bump required. Stop processing.
+			if ( line.startsWith( '### Breaking Change' ) ) {
+				versionBump = 'major';
+				break;
+			}
+
+			// A minor version bump required. Proceed to the next line.
+			if ( line.startsWith( '### New Feature' ) || line.startsWith( '### Deprecation' ) ) {
+				versionBump = 'minor';
+				continue;
+			}
+
+			// A version bump required. Found new changelog section.
+			if ( versionBump !== 'minor' && line.startsWith( '### ' ) ) {
+				versionBump = minimumVersionBump;
+			}
+		}
+		const packageName = `@wordpress/${ changelogFile.split( '/' ).reverse()[ 1 ] }`;
+		const { version } = readJSONFile( changelogFile.replace( 'CHANGELOG.md', 'package.json' ) );
+		const nextVersion = ( versionBump !== null ) ?
+			semver.inc( version, versionBump ) :
+			null;
+
+		return {
+			changelogFile,
+			packageName,
+			version,
+			nextVersion,
+		};
+	} ) );
+
+	const changelogsToUpdate = processedPackages.
+		filter( ( { nextVersion } ) => nextVersion );
+
+	if ( changelogsToUpdate.length === 0 ) {
+		console.log( '>> No changes in CHANGELOG files detected.' );
+		return;
+	}
+
+	console.log( '>> Recommended version bumps based on the changes detected in CHANGELOG files:' );
+
+	const publishDate = new Date().toISOString().split( 'T' )[ 0 ];
+	await Promise.all(
+		changelogsToUpdate
+			.map( async ( { changelogFile, packageName, nextVersion, version } ) => {
+				const content = await fs.promises.readFile( changelogFile, 'utf8' );
+				await fs.promises.writeFile( changelogFile, content.replace(
+					'## Master',
+					`## Master\n\n## ${ nextVersion } (${ publishDate })`
+				) );
+				console.log( `   - ${ packageName }: ${ version } -> ${ nextVersion }` );
+			} )
+	);
+
+	await askForConfirmationToContinue(
+		`All corresponding files were updated. Commit the changes?`,
+		true,
+		abortMessage
+	);
+	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+	await simpleGit.add( './*' );
+	await simpleGit.commit( 'Update changelog files' );
+	console.log( '>> Changelog files changes have been committed successfully.' );
+}
+
+/**
  * Prepublish to npm steps for WordPress packages.
+ *
+ * @param {string} minimumVersionBump Minimum version bump for the packages.
  *
  * @return {Object} Github release object.
  */
-async function prepublishPackages() {
+async function prepublishPackages( minimumVersionBump ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
 	let abortMessage = 'Aborting!';
 	await askForConfirmationToContinue( 'Ready to go? ' );
@@ -744,6 +849,8 @@ async function prepublishPackages() {
 
 	// Checking out the WordPress release branch and doing sync with the last plugin release.
 	const { releaseBranch } = await runWordPressReleaseBranchSyncStep( abortMessage );
+
+	await updatePackageChangelogs( minimumVersionBump, abortMessage );
 
 	// Push the local changes
 	abortMessage = `Aborting! Make sure to push changes applied to WordPress release branch "${ releaseBranch }" manually.`;
@@ -756,15 +863,15 @@ async function prepublishPackages() {
 program
 	.command( 'prepublish-packages-stable' )
 	.alias( 'npm-stable' )
-	.description( 'Prepublish to npm steps for a stable version of WordPress packages' )
+	.description( 'Prepublish to npm steps for the next stable version of WordPress packages' )
 	.action( async () => {
 		console.log(
 			chalk.bold( '💃 Time to publish WordPress packages to npm 🕺\n\n' ),
-			'Welcome! This tool is going to help you with prepublish to npm steps for a new stable version of WordPress packages.\n',
+			'Welcome! This tool is going to help you with prepublish to npm steps for the next stable version of WordPress packages.\n',
 			'To perform a release you\'ll have to be a member of the WordPress Team on npm.\n'
 		);
 
-		await prepublishPackages();
+		await prepublishPackages( 'minor' );
 
 		console.log(
 			'\n>> 🎉 WordPress packages are ready to publish.\n',

@@ -298,6 +298,7 @@ class URLInput extends Component {
 			placeholder = __( 'Paste URL or type to search' ),
 			value = '',
 			autoFocus = true,
+			__experimentalShowInitialSuggestions = false,
 		} = this.props;
 
 		const {
@@ -365,6 +366,7 @@ class URLInput extends Component {
 					buildSuggestionItemProps,
 					isLoading: loading,
 					handleSuggestionClick: this.handleOnClick,
+					isInitialSuggestions: __experimentalShowInitialSuggestions && ! ( value && value.length ),
 				} ) }
 
 				{ ! isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length &&

@@ -35,16 +35,15 @@ import {
 	withColors,
 	ColorPalette,
 	__experimentalUseGradient,
-	__experimentalGradientPicker,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
+import { cover as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import icon from './icon';
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
@@ -425,19 +424,6 @@ function CoverEdit( {
 							disableCustomColors={ true }
 							value={ overlayColor.color }
 							onChange={ setOverlayColor }
-							clearable={ false }
-						/>
-						<__experimentalGradientPicker
-							disableCustomGradients
-							onChange={
-								( newGradient ) => {
-									setGradient( newGradient );
-									setAttributes( {
-										overlayColor: undefined,
-									} );
-								}
-							}
-							value={ gradientValue }
 							clearable={ false }
 						/>
 					</div>

@@ -16,7 +16,7 @@ function render_block_core_post_author() {
 		return '';
 	}
 	// translators: %s: The author.
-	return sprintf( __( '<address>By %s</address>' ), get_the_author() );
+	return '<address>' . sprintf( __( 'By %s' ), get_the_author() ) . '</address>';
 }
 
 /**

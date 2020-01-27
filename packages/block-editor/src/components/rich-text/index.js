@@ -386,7 +386,6 @@ class RichTextWrapper extends Component {
 				onSelectionChange={ onSelectionChange }
 				tagName={ tagName }
 				className={ classnames( classes, className, {
-					'is-selected': originalIsSelected,
 					'keep-placeholder-on-focus': keepPlaceholderOnFocus,
 				} ) }
 				placeholder={ placeholder }

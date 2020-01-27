@@ -26,9 +26,13 @@ const {
 } = process.env;
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
+const BUNDLED_PACKAGES = [ '@wordpress/icons' ];
 
 const gutenbergPackages = Object.keys( dependencies )
-	.filter( ( packageName ) => packageName.startsWith( WORDPRESS_NAMESPACE ) )
+	.filter( ( packageName ) =>
+		! BUNDLED_PACKAGES.includes( packageName ) &&
+		packageName.startsWith( WORDPRESS_NAMESPACE )
+	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
 module.exports = {
@@ -148,6 +152,13 @@ module.exports = {
 						// to occur at a later priority.
 						.replace( /(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/, '$1, 20' );
 				},
+			},
+		] ),
+		new CopyWebpackPlugin( [
+			{
+				from: './packages/block-library/src/+(shortcode)/block.json',
+				test: new RegExp( `([\\w-]+)${ escapeRegExp( sep ) }block\\.json$` ),
+				to: 'build/block-library/blocks/[1].json',
 			},
 		] ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),

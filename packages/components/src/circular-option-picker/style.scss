@@ -72,12 +72,12 @@ $color-palette-circle-spacing: 12px;
 		position: relative;
 		z-index: z-index(".components-circular-option-picker__option.is-pressed");
 
-		& + .dashicons-saved {
+		& + svg {
 			position: absolute;
-			left: 4px;
-			top: 4px;
+			left: 2px;
+			top: 2px;
 			border-radius: 50%;
-			z-index: z-index(".components-circular-option-picker__option.is-pressed + .dashicons-saved");
+			z-index: z-index(".components-circular-option-picker__option.is-pressed + svg");
 			background: $white;
 			pointer-events: none;
 		}

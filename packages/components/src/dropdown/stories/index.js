@@ -7,7 +7,7 @@ import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import DropdownMenu from '../../dropdown-menu';
 
-export default { title: 'Components|Dropdown', component: Dropdown };
+export default { title: 'Components/Dropdown', component: Dropdown };
 
 const DropdownAndDropdownMenuExample = () => {
 	return (
@@ -53,26 +53,10 @@ const DropdownAndDropdownMenuExample = () => {
 					) }
 					renderContent={ () => (
 						<MenuGroup>
-							<MenuItem
-								icon="arrow-up-alt"
-							>
-							Up
-							</MenuItem>
-							<MenuItem
-								icon="arrow-down-alt"
-							>
-							Down
-							</MenuItem>
-							<MenuItem
-								icon="arrow-left-alt"
-							>
-							Left
-							</MenuItem>
-							<MenuItem
-								icon="arrow-right-alt"
-							>
-							Right
-							</MenuItem>
+							<MenuItem icon="arrow-up-alt">Up</MenuItem>
+							<MenuItem icon="arrow-down-alt">Down</MenuItem>
+							<MenuItem icon="arrow-left-alt">Left</MenuItem>
+							<MenuItem icon="arrow-right-alt">Right</MenuItem>
 						</MenuGroup>
 					) }
 				/>
