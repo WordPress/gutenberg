@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { first, last } from 'lodash';
+import { first, last, omit } from 'lodash';
 import { animated } from 'react-spring/web.cjs';
 
 /**
@@ -28,7 +28,6 @@ import {
 	withDispatch,
 	withSelect,
 	useSelect,
-	useDispatch,
 } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
@@ -43,7 +42,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
-import { Context } from './root-container';
+import { Context, BlockNodes } from './root-container';
 
 function BlockListBlock( {
 	mode,
@@ -54,6 +53,7 @@ function BlockListBlock( {
 	isMultiSelected,
 	isPartOfMultiSelection,
 	isFirstMultiSelected,
+	isLastMultiSelected,
 	isTypingWithinBlock,
 	isEmptyDefaultBlock,
 	isAncestorOfSelectedBlock,
@@ -78,6 +78,7 @@ function BlockListBlock( {
 	hasSelectedUI = true,
 } ) {
 	const onSelectionStart = useContext( Context );
+	const [ , setBlockNodes ] = useContext( BlockNodes );
 	// In addition to withSelect, we should favor using useSelect in this component going forward
 	// to avoid leaking new props to the public API (editor.BlockListBlock filter)
 	const { isDraggingBlocks } = useSelect( ( select ) => {
@@ -85,28 +86,31 @@ function BlockListBlock( {
 			isDraggingBlocks: select( 'core/block-editor' ).isDraggingBlocks(),
 		};
 	}, [] );
-	const {
-		__unstableSetSelectedMountedBlock,
-	} = useDispatch( 'core/block-editor' );
 
 	// Reference of the wrapper
 	const wrapper = useRef( null );
 
+	// Provide the selected node, or the first and last nodes of a multi-
+	// selection, so it can be used to position the contextual block toolbar.
+	// We only provide what is necessary, and remove the nodes again when they
+	// are no longer selected.
 	useLayoutEffect( () => {
-		if ( isSelected || isFirstMultiSelected ) {
-			__unstableSetSelectedMountedBlock( clientId );
+		if ( isSelected || isFirstMultiSelected || isLastMultiSelected ) {
+			const node = wrapper.current;
+			setBlockNodes( ( nodes ) => ( { ...nodes, [ clientId ]: node } ) );
+			return () => {
+				setBlockNodes( ( nodes ) => omit( nodes, clientId ) );
+			};
 		}
-	}, [ isSelected, isFirstMultiSelected ] );
+	}, [ isSelected, isFirstMultiSelected, isLastMultiSelected ] );
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
 	const onBlockError = () => setErrorState( true );
 
 	const blockType = getBlockType( name );
-	const blockLabel = isFirstMultiSelected ?
-		__( 'Multiple selected blocks' ) :
-		// translators: %s: Type of block (i.e. Text, Image etc)
-		sprintf( __( 'Block: %s' ), blockType.title );
+	// translators: %s: Type of block (i.e. Text, Image etc)
+	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 
 	// Handing the focus of the block on creation and update
 
@@ -148,18 +152,13 @@ function BlockListBlock( {
 	const isMounting = useRef( true );
 
 	useEffect( () => {
-		if ( ! isMultiSelecting && ! isNavigationMode ) {
-			if ( isSelected ) {
-				focusTabbable( ! isMounting.current );
-			} else if ( isFirstMultiSelected ) {
-				wrapper.current.focus();
-			}
+		if ( ! isMultiSelecting && ! isNavigationMode && isSelected ) {
+			focusTabbable( ! isMounting.current );
 		}
 
 		isMounting.current = false;
 	}, [
 		isSelected,
-		isFirstMultiSelected,
 		isMultiSelecting,
 		isNavigationMode,
 	] );
@@ -242,7 +241,6 @@ function BlockListBlock( {
 			'has-selected-ui': hasSelectedUI,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': shouldAppearSelected && hasSelectedUI,
-			'is-navigate-mode': isNavigationMode,
 			'is-multi-selected': isMultiSelected,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
@@ -338,6 +336,7 @@ const applyWithSelect = withSelect(
 			isAncestorMultiSelected,
 			isBlockMultiSelected,
 			isFirstMultiSelectedBlock,
+			getLastMultiSelectedBlockClientId,
 			isTyping,
 			getBlockMode,
 			isSelectionEnabled,
@@ -368,6 +367,7 @@ const applyWithSelect = withSelect(
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
+			isLastMultiSelected: getLastMultiSelectedBlockClientId() === clientId,
 
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.

@@ -147,18 +147,38 @@ export default function useMultiSelection( ref ) {
 		selectedBlockClientId,
 	] );
 
-	const onSelectionChange = useCallback( () => {
+	const onSelectionChange = useCallback( ( { isSelectionEnd } ) => {
 		const selection = window.getSelection();
 
-		// If no selection is found, end multi selection.
+		// If no selection is found, end multi selection and enable all rich
+		// text areas.
 		if ( ! selection.rangeCount || selection.isCollapsed ) {
+			toggleRichText( ref.current, true );
 			return;
 		}
 
 		const clientId = getBlockClientId( selection.focusNode );
+		const isSingularSelection = startClientId.current === clientId;
 
-		if ( startClientId.current === clientId ) {
+		if ( isSingularSelection ) {
 			selectBlock( clientId );
+
+			// If the selection is complete (on mouse up), and no multiple
+			// blocks have been selected, set focus back to the anchor element
+			// if the anchor element contains the selection. Additionally, rich
+			// text elements that were previously disabled can now be enabled
+			// again.
+			if ( isSelectionEnd ) {
+				toggleRichText( ref.current, true );
+
+				if ( selection.rangeCount ) {
+					const { commonAncestorContainer } = selection.getRangeAt( 0 );
+
+					if ( anchorElement.current.contains( commonAncestorContainer ) ) {
+						anchorElement.current.focus();
+					}
+				}
+			}
 		} else {
 			const startPath = [ ...getBlockParents( startClientId.current ), startClientId.current ];
 			const endPath = [ ...getBlockParents( clientId ), clientId ];
@@ -178,21 +198,8 @@ export default function useMultiSelection( ref ) {
 		// The browser selection won't have updated yet at this point, so wait
 		// until the next animation frame to get the browser selection.
 		rafId.current = window.requestAnimationFrame( () => {
-			onSelectionChange();
+			onSelectionChange( { isSelectionEnd: true } );
 			stopMultiSelect();
-			toggleRichText( ref.current, true );
-
-			const selection = window.getSelection();
-
-			// If the anchor element contains the selection, set focus back to
-			// the anchor element.
-			if ( selection.rangeCount ) {
-				const { commonAncestorContainer } = selection.getRangeAt( 0 );
-
-				if ( anchorElement.current.contains( commonAncestorContainer ) ) {
-					anchorElement.current.focus();
-				}
-			}
 		} );
 	}, [ onSelectionChange, stopMultiSelect ] );
 

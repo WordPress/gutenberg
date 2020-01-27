@@ -48,7 +48,7 @@ describe( 'PostSavedState', () => {
 				isSaveable={ true } />
 		);
 
-		expect( wrapper.childAt( 0 ).name() ).toBe( 'Dashicon' );
+		expect( wrapper.childAt( 0 ).name() ).toBe( 'Icon' );
 		expect( wrapper.childAt( 1 ).text() ).toBe( 'Saved' );
 	} );
 

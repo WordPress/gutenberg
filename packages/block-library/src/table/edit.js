@@ -26,6 +26,7 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
+import { table as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -41,7 +42,6 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
-import icon from './icon';
 
 const BACKGROUND_COLORS = [
 	{

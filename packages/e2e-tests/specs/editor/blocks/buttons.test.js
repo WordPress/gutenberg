@@ -20,9 +20,7 @@ describe( 'Buttons', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	// Todo: Fix this intermittent test.
-	// eslint-disable-next-line jest/no-disabled-tests
-	it.skip( 'can jump to the link editor using the keyboard shortcut', async () => {
+	it( 'can jump to the link editor using the keyboard shortcut', async () => {
 		await insertBlock( 'Buttons' );
 		await page.keyboard.type( 'WordPress' );
 		await pressKeyWithModifier( 'primary', 'k' );

@@ -3,11 +3,11 @@
  */
 import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { gallery as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { icon } from './icons.js';
 import styles from './styles.scss';
 
 const IconWithColorScheme = withPreferredColorScheme( ( { getStylesFromColorScheme } ) => {

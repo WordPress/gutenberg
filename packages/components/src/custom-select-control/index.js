@@ -5,6 +5,10 @@ import { useSelect } from 'downshift';
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { Icon, check } from '@wordpress/icons';
+/**
  * Internal dependencies
  */
 import { Button, Dashicon } from '../';
@@ -126,8 +130,8 @@ export default function CustomSelectControl( {
 							} ) }
 						>
 							{ item === selectedItem && (
-								<Dashicon
-									icon="saved"
+								<Icon
+									icon={ check }
 									className="components-custom-select-control__item-icon"
 								/>
 							) }
