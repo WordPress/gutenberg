@@ -30,9 +30,9 @@ Please see the [Documentation section](/docs/contributors/document.md) of the Co
 
 Documentation is automatically synced from `master` to the [Block Editor Handbook](https://developer.wordpress.org/block-editor/) every 15 minutes.
 
-### `@wordpress/component`
+### `@wordpress/components`
 
-If you're contributing to the documentation of any component from the `@wordpress/component` package, take a look at its [guidelines for contributing](/packages/components/CONTRIBUTING.md).
+If you're contributing to the documentation of any component from the `@wordpress/components` package, take a look at its [guidelines for contributing](/packages/components/CONTRIBUTING.md).
 
 ## Reporting Security Issues
 
