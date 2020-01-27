@@ -51,6 +51,8 @@ function Marks( {
 }
 
 function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
+	const isRTL = document.documentElement.dir === 'rtl';
+
 	if ( ! marks ) {
 		return [];
 	}
@@ -67,13 +69,17 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
 
 		const key = `mark-${ index }`;
 		const isFilled = markValue * step <= value;
-		const left = `${ ( markValue / markCount ) * 100 }%`;
+		const offset = `${ ( markValue / markCount ) * 100 }%`;
+
+		const offsetStyle = {
+			[ isRTL ? 'right' : 'left' ]: offset,
+		};
 
 		return {
 			...mark,
-			left,
 			isFilled,
 			key,
+			style: offsetStyle,
 		};
 	} );
 

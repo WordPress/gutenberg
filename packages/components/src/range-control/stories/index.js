@@ -26,13 +26,13 @@ const RangeControlWithState = ( props ) => {
 export const _default = () => {
 	const props = {
 		allowReset: boolean( 'allowReset', false ),
-		alwaysShowTooltip: boolean( 'alwaysShowToolTip', false ),
 		label: text( 'label', 'Range Label' ),
 		help: text( 'help', '' ),
 		min: number( 'min', 0 ),
 		max: number( 'max', 10 ),
 		step: number( 'step', 1 ),
 		marks: boolean( 'marks', false ),
+		showTooltip: boolean( 'showTooltip', false ),
 		tooltipPosition: select( 'tooltipPosition', {
 			top: 'top',
 			bottom: 'bottom',

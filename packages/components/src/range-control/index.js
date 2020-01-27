@@ -64,16 +64,18 @@ const BaseRangeControlNext = forwardRef(
 			renderTooltipContent = ( v ) => v,
 			showTooltip: showTooltipProp,
 			step = 1,
-			width = '100%',
 			tooltipPosition = 'auto',
 			tooltipTimeout = 250,
 			tooltipZIndex = 100,
 			value: valueProp = 0,
+			width = '100%',
 			withInputField = true,
 			...props
 		},
 		ref
 	) => {
+		const isRTL = document.documentElement.dir === 'rtl';
+
 		const sliderValue = initialPosition || valueProp;
 		const [ value, setValue ] = useControlledRangeValue( { min, max, value: sliderValue } );
 		const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
@@ -144,9 +146,13 @@ const BaseRangeControlNext = forwardRef(
 			timeout: tooltipTimeout,
 		} );
 
+		const offsetStyle = {
+			[ isRTL ? 'right' : 'left' ]: fillValueOffset,
+		};
+
 		return (
 			<BaseControl className={ classes } label={ label } id={ id } help={ help }>
-				<Root className="components-range-control__root" width={ width }>
+				<Root className="components-range-control__root" isRTL={ isRTL } width={ width }>
 					{ beforeIcon && (
 						<BeforeIconWrapper>
 							<Dashicon icon={ beforeIcon } />
@@ -190,7 +196,7 @@ const BaseRangeControlNext = forwardRef(
 							className="components-range-control__track"
 							style={ { width: fillValueOffset } }
 						/>
-						<ThumbWrapper style={ { left: fillValueOffset } }>
+						<ThumbWrapper style={ offsetStyle }>
 							<Thumb aria-hidden={ true } isFocused={ isFocused } />
 						</ThumbWrapper>
 						{ enableTooltip && (
@@ -201,7 +207,7 @@ const BaseRangeControlNext = forwardRef(
 								renderTooltipContent={ renderTooltipContent }
 								position={ tooltipPosition }
 								show={ showTooltip || showTooltip }
-								style={ { left: fillValueOffset } }
+								style={ offsetStyle }
 								value={ value }
 								zIndex={ tooltipZIndex }
 							/>

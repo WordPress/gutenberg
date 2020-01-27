@@ -12,7 +12,6 @@ export default function RangeMark( {
 	className,
 	isFilled = false,
 	label,
-	left,
 	style = {},
 	...props
 } ) {
@@ -26,11 +25,6 @@ export default function RangeMark( {
 		isFilled && 'is-filled'
 	);
 
-	const styles = {
-		...style,
-		left,
-	};
-
 	return (
 		<>
 			<Mark
@@ -38,14 +32,14 @@ export default function RangeMark( {
 				aria-hidden="true"
 				className={ classes }
 				isFilled={ isFilled }
-				style={ styles }
+				style={ style }
 			/>
 			{ label && (
 				<MarkLabel
 					aria-hidden="true"
 					className={ labelClasses }
 					isFilled={ isFilled }
-					style={ styles }
+					style={ style }
 				>
 					{ label }
 				</MarkLabel>

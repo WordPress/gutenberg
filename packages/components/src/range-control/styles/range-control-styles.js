@@ -11,6 +11,7 @@ import { color } from '../../utils/colors';
 
 const rangeHeight = () => css( { height: 30, minHeight: 30 } );
 const rootWidth = ( { width } ) => css( { width } );
+const rootRtl = ( { isRTL } ) => css( { direction: isRTL ? 'rtl' : 'ltr' } );
 
 export const Root = styled.span`
 	-webkit-tap-highlight-color: transparent;
@@ -24,6 +25,7 @@ export const Root = styled.span`
 	touch-action: none;
 	width: 100%;
 
+	${ rootRtl }
 	${ rootWidth };
 `;
 
@@ -41,6 +43,10 @@ export const Wrapper = styled.span`
 	${ rangeHeight };
 	${ wrapperColor };
 	${ wrapperMargin };
+
+	[dir=rtl] & {
+		margin-right: 10px;
+	}
 `;
 
 export const BeforeIconWrapper = styled.span`
@@ -144,6 +150,11 @@ export const ThumbWrapper = styled.span`
 	pointer-events: none;
 	top: 0;
 	user-select: none;
+
+	[dir=rtl] & {
+		margin-left: 0;
+		margin-right: -10px;
+	}
 `;
 
 const handleReducedMotion = () => {
@@ -205,7 +216,6 @@ export const InputRange = styled.input`
 const tooltipShow = ( { show } ) => {
 	return css( {
 		opacity: show ? 1 : 0,
-		transform: show ? 'translateX(-50%)' : 'translateX(-50%)',
 	} );
 };
 
@@ -237,7 +247,7 @@ const tooltipPosition = ( { position } ) => {
 	`;
 };
 
-export const Tooltip = styled.div`
+export const Tooltip = styled.span`
 	background: ${ color( 'darkGray.800' ) };
 	border-radius: 3px;
 	box-sizing: border-box;
@@ -249,7 +259,7 @@ export const Tooltip = styled.div`
 	padding: 8px;
 	position: absolute;
 	text-align: center;
-	transform: scale(0.5) translateX(-50%);
+	transform: translateX(-50%);
 	transition: opacity 120ms ease;
 	user-select: none;
 
@@ -271,6 +281,11 @@ export const Tooltip = styled.div`
 	${ tooltipShow };
 	${ tooltipPosition };
 	${ handleReducedMotion };
+
+
+	[dir=rtl] & {
+		transform: translateX(50%);
+	}
 `;
 
 export const InputNumber = styled.input`
