@@ -3179,8 +3179,12 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
 }
 
 .emotion-0 {
-  margin-right: 16px;
-  margin-top: 2px;
+  margin-right: 6px;
+  margin-top: 5px;
+}
+
+.emotion-0 > .dashicon {
+  margin: 0;
 }
 
 .emotion-14 {
@@ -3188,6 +3192,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   display: block;
   padding-top: 15px;
   position: relative;
+  margin-left: 10px;
   width: 100%;
   height: 30px;
   min-height: 30px;
@@ -3352,7 +3357,11 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
 
 .emotion-16 {
   margin-left: 16px;
-  margin-top: 2px;
+  margin-top: 5px;
+}
+
+.emotion-16 > .dashicon {
+  margin: 0;
 }
 
 .emotion-18 {
@@ -3442,11 +3451,12 @@ input[type="number"].emotion-18 {
     <div
       className="components-base-control__field"
     >
-      <span
+      <label
         className="components-base-control__label"
+        htmlFor="inspector-range-control-0"
       >
         Custom Size
-      </span>
+      </label>
       <span
         className="components-range-control__root emotion-20 emotion-21"
         width="100%"
@@ -3478,6 +3488,7 @@ input[type="number"].emotion-18 {
             aria-label="Custom Size"
             className="components-range-control__slider emotion-2 emotion-3"
             disabled={false}
+            id="inspector-range-control-0"
             max={100}
             min={12}
             onBlur={[Function]}
@@ -3553,6 +3564,7 @@ input[type="number"].emotion-18 {
         <input
           aria-label="Custom Size"
           className="components-range-control__number emotion-18 emotion-153"
+          inputMode="decimal"
           max={100}
           min={12}
           onChange={[Function]}
@@ -4766,383 +4778,7 @@ exports[`Storyshots Components/RadioControl With Help 1`] = `
 </div>
 `;
 
-exports[`Storyshots Components/RangeControl Default 1`] = `
-<div
-  className="components-base-control components-range-control"
->
-  <div
-    className="components-base-control__field"
-  >
-    <label
-      className="components-base-control__label"
-      htmlFor="inspector-range-control-0"
-    >
-      How many columns should this use?
-    </label>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-0"
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
-  </div>
-</div>
-`;
-
-exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
-<div
-  className="components-base-control components-range-control"
->
-  <div
-    className="components-base-control__field"
-  >
-    <label
-      className="components-base-control__label"
-      htmlFor="inspector-range-control-1"
-    >
-      How many columns should this use?
-    </label>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-1"
-      max={20}
-      min={0}
-      onChange={[Function]}
-      type="range"
-      value={0}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      max={20}
-      min={0}
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={null}
-    />
-  </div>
-</div>
-`;
-
-exports[`Storyshots Components/RangeControl Next 1`] = `
-.emotion-16 {
-  -webkit-tap-highlight-color: transparent;
-  box-sizing: border-box;
-  cursor: pointer;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  -webkit-box-pack: start;
-  -webkit-justify-content: flex-start;
-  -ms-flex-pack: start;
-  justify-content: flex-start;
-  padding: 0;
-  position: relative;
-  touch-action: none;
-  width: 100%;
-  width: 100%;
-}
-
-.emotion-12 {
-  box-sizing: border-box;
-  display: block;
-  padding-top: 15px;
-  position: relative;
-  width: 100%;
-  height: 30px;
-  min-height: 30px;
-  color: #00669b;
-}
-
-.emotion-0 {
-  box-sizing: border-box;
-  cursor: pointer;
-  display: block;
-  height: 100%;
-  left: 0;
-  margin: 0;
-  opacity: 0;
-  outline: none;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 100%;
-}
-
-.emotion-2 {
-  background-color: #d7dade;
-  box-sizing: border-box;
-  left: 0;
-  pointer-events: none;
-  right: 0;
-  display: block;
-  height: 3px;
-  position: absolute;
-  margin-top: 14px;
-  top: 0;
-}
-
-.emotion-4 {
-  background-color: currentColor;
-  border-radius: 1px;
-  box-sizing: border-box;
-  height: 3px;
-  pointer-events: none;
-  display: block;
-  position: absolute;
-  margin-top: 14px;
-  top: 0;
-}
-
-.emotion-8 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  margin-left: -10px;
-  margin-top: 5px;
-  width: 20px;
-  box-sizing: border-box;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  height: 20px;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  outline: 0;
-  position: absolute;
-  pointer-events: none;
-  top: 0;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.emotion-6 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  background-color: white;
-  border-radius: 50%;
-  border: 1px solid #7e8993;
-  box-sizing: border-box;
-  height: 100%;
-  outline: 0;
-  pointer-events: none;
-  position: absolute;
-  -webkit-transition: box-shadow 60ms linear;
-  transition: box-shadow 60ms linear;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  width: 100%;
-  border-color: #7e8993;
-  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .emotion-6 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-.emotion-10 {
-  background: #23282d;
-  border-radius: 3px;
-  box-sizing: border-box;
-  color: white;
-  display: inline-block;
-  font-size: 11px;
-  min-width: 32px;
-  opacity: 0;
-  padding: 8px;
-  position: absolute;
-  text-align: center;
-  -webkit-transform: scale(0.5) translateX(-50%);
-  -ms-transform: scale(0.5) translateX(-50%);
-  transform: scale(0.5) translateX(-50%);
-  -webkit-transition: opacity 120ms ease;
-  transition: opacity 120ms ease;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  opacity: 0;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
-  margin-top: -4px;
-  top: -100%;
-}
-
-.emotion-10::after {
-  border: 6px solid #23282d;
-  border-left-color: transparent;
-  border-right-color: transparent;
-  bottom: -6px;
-  box-sizing: border-box;
-  content: '';
-  height: 0;
-  left: 50%;
-  line-height: 0;
-  margin-left: -6px;
-  position: absolute;
-  width: 0;
-}
-
-.emotion-10::after {
-  border-bottom: none;
-  border-top-style: solid;
-  bottom: -6px;
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .emotion-10 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-.emotion-14 {
-  box-sizing: border-box;
-  display: inline-block;
-  margin-left: 16px;
-  margin-top: 0;
-  min-width: 54px;
-  max-width: 120px;
-}
-
-input[type="number"].emotion-14 {
-  height: 30px;
-  min-height: 30px;
-}
-
-.emotion-18 {
-  padding: 60px 40px;
-}
-
-<div
-  className="emotion-18 emotion-19"
->
-  <div
-    className="components-base-control components-range-control"
-  >
-    <div
-      className="components-base-control__field"
-    >
-      <span
-        className="components-base-control__label"
-      >
-        Range Label
-      </span>
-      <span
-        className="components-range-control__root emotion-16 emotion-17"
-        width="100%"
-      >
-        
-        <span
-          className="components-range-control__wrapper emotion-12 emotion-13"
-          color="#00669b"
-        >
-          <input
-            aria-hidden={false}
-            aria-label="Range Label"
-            className="components-range-control__slider emotion-0 emotion-1"
-            disabled={false}
-            max={10}
-            min={0}
-            onBlur={[Function]}
-            onChange={[Function]}
-            onFocus={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            step={1}
-            tabIndex={0}
-            type="range"
-            value={0}
-          />
-          <span
-            aria-hidden={true}
-            className="emotion-2 emotion-3"
-          />
-          <span
-            aria-hidden={true}
-            className="components-range-control__track emotion-4 emotion-5"
-            style={
-              Object {
-                "width": "0%",
-              }
-            }
-          />
-          <span
-            className="emotion-8 emotion-9"
-            style={
-              Object {
-                "left": "0%",
-              }
-            }
-          >
-            <span
-              aria-hidden={true}
-              className="emotion-6 emotion-7"
-            />
-          </span>
-          <div
-            aria-hidden={false}
-            className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            role="tooltip"
-            style={
-              Object {
-                "left": "0%",
-                "zIndex": 100,
-              }
-            }
-          >
-            0
-          </div>
-        </span>
-        
-        <input
-          aria-label="Range Label"
-          className="components-range-control__number emotion-14 emotion-133"
-          max={10}
-          min={0}
-          onChange={[Function]}
-          step={1}
-          type="number"
-          value={0}
-        />
-      </span>
-    </div>
-  </div>
-</div>
-`;
-
-exports[`Storyshots Components/RangeControl Next Custom Marks 1`] = `
+exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
 .emotion-38 {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
@@ -5345,6 +4981,7 @@ input[type="number"].emotion-36 {
   display: block;
   padding-top: 15px;
   position: relative;
+  margin-left: 10px;
   width: 100%;
   height: 30px;
   min-height: 30px;
@@ -5432,6 +5069,7 @@ input[type="number"].emotion-36 {
             aria-hidden={false}
             className="components-range-control__slider emotion-0 emotion-1"
             disabled={false}
+            id="inspector-range-control-8"
             max={10}
             min={0}
             onBlur={[Function]}
@@ -5598,6 +5236,7 @@ input[type="number"].emotion-36 {
         </span>
         <input
           className="components-range-control__number emotion-36 emotion-353"
+          inputMode="decimal"
           max={10}
           min={0}
           onChange={[Function]}
@@ -5611,7 +5250,524 @@ input[type="number"].emotion-36 {
 </div>
 `;
 
-exports[`Storyshots Components/RangeControl With Help 1`] = `
+exports[`Storyshots Components/RangeControl Default 1`] = `
+.emotion-16 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+  width: 100%;
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  margin-left: 10px;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  color: #00669b;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-left: -10px;
+  margin-top: 5px;
+  width: 20px;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  outline: 0;
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-transition: box-shadow 60ms linear;
+  transition: box-shadow 60ms linear;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-6 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transform: scale(0.5) translateX(-50%);
+  -ms-transform: scale(0.5) translateX(-50%);
+  transform: scale(0.5) translateX(-50%);
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: -4px;
+  top: -100%;
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-10 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-left: 16px;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+}
+
+input[type="number"].emotion-14 {
+  height: 30px;
+  min-height: 30px;
+}
+
+.emotion-18 {
+  padding: 60px 40px;
+}
+
+<div
+  className="emotion-18 emotion-19"
+>
+  <div
+    className="components-base-control components-range-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-range-control-1"
+      >
+        Range Label
+      </label>
+      <span
+        className="components-range-control__root emotion-16 emotion-17"
+        width="100%"
+      >
+        
+        <span
+          className="components-range-control__wrapper emotion-12 emotion-13"
+          color="#00669b"
+        >
+          <input
+            aria-hidden={false}
+            aria-label="Range Label"
+            className="components-range-control__slider emotion-0 emotion-1"
+            disabled={false}
+            id="inspector-range-control-1"
+            max={10}
+            min={0}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            step={1}
+            tabIndex={0}
+            type="range"
+            value={0}
+          />
+          <span
+            aria-hidden={true}
+            className="emotion-2 emotion-3"
+          />
+          <span
+            aria-hidden={true}
+            className="components-range-control__track emotion-4 emotion-5"
+            style={
+              Object {
+                "width": "0%",
+              }
+            }
+          />
+          <span
+            className="emotion-8 emotion-9"
+            style={
+              Object {
+                "left": "0%",
+              }
+            }
+          >
+            <span
+              aria-hidden={true}
+              className="emotion-6 emotion-7"
+            />
+          </span>
+          <div
+            aria-hidden={false}
+            className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            role="tooltip"
+            style={
+              Object {
+                "left": "0%",
+                "zIndex": 100,
+              }
+            }
+          >
+            0
+          </div>
+        </span>
+        
+        <input
+          aria-label="Range Label"
+          className="components-range-control__number emotion-14 emotion-133"
+          inputMode="decimal"
+          max={10}
+          min={0}
+          onChange={[Function]}
+          step={1}
+          type="number"
+          value={0}
+        />
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
+.emotion-16 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+  width: 100%;
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  margin-left: 10px;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  color: #00669b;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-left: -10px;
+  margin-top: 5px;
+  width: 20px;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  outline: 0;
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-transition: box-shadow 60ms linear;
+  transition: box-shadow 60ms linear;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-6 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transform: scale(0.5) translateX(-50%);
+  -ms-transform: scale(0.5) translateX(-50%);
+  transform: scale(0.5) translateX(-50%);
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: -4px;
+  top: -100%;
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-10 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-left: 16px;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+}
+
+input[type="number"].emotion-14 {
+  height: 30px;
+  min-height: 30px;
+}
+
 <div
   className="components-base-control components-range-control"
 >
@@ -5624,125 +5780,296 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
     >
       How many columns should this use?
     </label>
-    <input
-      aria-describedby="inspector-range-control-2__help"
-      className="components-range-control__slider"
-      id="inspector-range-control-2"
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
-  </div>
-  <p
-    className="components-base-control__help"
-    id="inspector-range-control-2__help"
-  >
-    Please select the number of columns you would like this to contain.
-  </p>
-</div>
-`;
-
-exports[`Storyshots Components/RangeControl With Icon After 1`] = `
-<div
-  className="components-base-control components-range-control"
->
-  <div
-    className="components-base-control__field"
-  >
-    <label
-      className="components-base-control__label"
-      htmlFor="inspector-range-control-5"
+    <span
+      className="components-range-control__root emotion-16 emotion-17"
+      width="100%"
     >
-      How many columns should this use?
-    </label>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-5"
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <svg
-      aria-hidden="true"
-      className="dashicon dashicons-wordpress"
-      focusable="false"
-      height={20}
-      role="img"
-      viewBox="0 0 20 20"
-      width={20}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
+      <span
+        className="components-range-control__wrapper emotion-12 emotion-13"
+        color="#00669b"
+      >
+        <input
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-0 emotion-1"
+          disabled={false}
+          id="inspector-range-control-2"
+          max={20}
+          min={0}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={0}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-2 emotion-3"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-4 emotion-5"
+          style={
+            Object {
+              "width": "0%",
+            }
+          }
+        />
+        <span
+          className="emotion-8 emotion-9"
+          style={
+            Object {
+              "left": "0%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-6 emotion-7"
+          />
+        </span>
+        <div
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "0%",
+              "zIndex": 100,
+            }
+          }
+        >
+          0
+        </div>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-14 emotion-133"
+        inputMode="decimal"
+        max={20}
+        min={0}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={0}
       />
-    </svg>
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
+    </span>
   </div>
 </div>
 `;
 
-exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
-<div
-  className="components-base-control components-range-control"
->
-  <div
-    className="components-base-control__field"
-  >
-    <label
-      className="components-base-control__label"
-      htmlFor="inspector-range-control-4"
-    >
-      How many columns should this use?
-    </label>
-    <svg
-      aria-hidden="true"
-      className="dashicon dashicons-wordpress"
-      focusable="false"
-      height={20}
-      role="img"
-      viewBox="0 0 20 20"
-      width={20}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
-      />
-    </svg>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-4"
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
-  </div>
-</div>
-`;
+exports[`Storyshots Components/RangeControl With Help 1`] = `
+.emotion-16 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+  width: 100%;
+}
 
-exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] = `
+.emotion-12 {
+  box-sizing: border-box;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  margin-left: 10px;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  color: #00669b;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-left: -10px;
+  margin-top: 5px;
+  width: 20px;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  outline: 0;
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-transition: box-shadow 60ms linear;
+  transition: box-shadow 60ms linear;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-6 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transform: scale(0.5) translateX(-50%);
+  -ms-transform: scale(0.5) translateX(-50%);
+  transform: scale(0.5) translateX(-50%);
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: -4px;
+  top: -100%;
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-10 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-left: 16px;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+}
+
+input[type="number"].emotion-14 {
+  height: 30px;
+  min-height: 30px;
+}
+
 <div
   className="components-base-control components-range-control"
 >
@@ -5755,30 +6082,312 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
     >
       How many columns should this use?
     </label>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-3"
-      max={10}
-      min={2}
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      max={10}
-      min={2}
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
+    <span
+      className="components-range-control__root emotion-16 emotion-17"
+      width="100%"
+    >
+      <span
+        className="components-range-control__wrapper emotion-12 emotion-13"
+        color="#00669b"
+      >
+        <input
+          aria-describedby="inspector-range-control-3__help"
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-0 emotion-1"
+          disabled={false}
+          id="inspector-range-control-3"
+          max={100}
+          min={0}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={5}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-2 emotion-3"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-4 emotion-5"
+          style={
+            Object {
+              "width": "5%",
+            }
+          }
+        />
+        <span
+          className="emotion-8 emotion-9"
+          style={
+            Object {
+              "left": "5%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-6 emotion-7"
+          />
+        </span>
+        <div
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "5%",
+              "zIndex": 100,
+            }
+          }
+        >
+          5
+        </div>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-14 emotion-133"
+        inputMode="decimal"
+        max={100}
+        min={0}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={5}
+      />
+    </span>
   </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-range-control-3__help"
+  >
+    Please select the number of columns you would like this to contain.
+  </p>
 </div>
 `;
 
-exports[`Storyshots Components/RangeControl With Reset 1`] = `
+exports[`Storyshots Components/RangeControl With Icon After 1`] = `
+.emotion-18 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+  width: 100%;
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  margin-left: 10px;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  color: #00669b;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-left: -10px;
+  margin-top: 5px;
+  width: 20px;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  outline: 0;
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-transition: box-shadow 60ms linear;
+  transition: box-shadow 60ms linear;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-6 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transform: scale(0.5) translateX(-50%);
+  -ms-transform: scale(0.5) translateX(-50%);
+  transform: scale(0.5) translateX(-50%);
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: -4px;
+  top: -100%;
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-10 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-14 {
+  margin-left: 16px;
+  margin-top: 5px;
+}
+
+.emotion-14 > .dashicon {
+  margin: 0;
+}
+
+.emotion-16 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-left: 16px;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+}
+
+input[type="number"].emotion-16 {
+  height: 30px;
+  min-height: 30px;
+}
+
 <div
   className="components-base-control components-range-control"
 >
@@ -5791,29 +6400,1063 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
     >
       How many columns should this use?
     </label>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-6"
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
-    <button
-      className="components-button components-range-control__reset is-secondary is-small"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
+    <span
+      className="components-range-control__root emotion-18 emotion-19"
+      width="100%"
     >
-      Reset
-    </button>
+      <span
+        className="components-range-control__wrapper emotion-12 emotion-13"
+        color="#00669b"
+      >
+        <input
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-0 emotion-1"
+          disabled={false}
+          id="inspector-range-control-6"
+          max={100}
+          min={0}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={5}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-2 emotion-3"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-4 emotion-5"
+          style={
+            Object {
+              "width": "5%",
+            }
+          }
+        />
+        <span
+          className="emotion-8 emotion-9"
+          style={
+            Object {
+              "left": "5%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-6 emotion-7"
+          />
+        </span>
+        <div
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "5%",
+              "zIndex": 100,
+            }
+          }
+        >
+          5
+        </div>
+      </span>
+      <span
+        className="emotion-14 emotion-15"
+      >
+        <svg
+          aria-hidden="true"
+          className="dashicon dashicons-wordpress"
+          focusable="false"
+          height={20}
+          role="img"
+          viewBox="0 0 20 20"
+          width={20}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
+          />
+        </svg>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-16 emotion-133"
+        inputMode="decimal"
+        max={100}
+        min={0}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={5}
+      />
+    </span>
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
+.emotion-18 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+  width: 100%;
+}
+
+.emotion-0 {
+  margin-right: 6px;
+  margin-top: 5px;
+}
+
+.emotion-0 > .dashicon {
+  margin: 0;
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  margin-left: 10px;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  color: #00669b;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-4 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-6 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-10 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-left: -10px;
+  margin-top: 5px;
+  width: 20px;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  outline: 0;
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-transition: box-shadow 60ms linear;
+  transition: box-shadow 60ms linear;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-8 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-12 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transform: scale(0.5) translateX(-50%);
+  -ms-transform: scale(0.5) translateX(-50%);
+  transform: scale(0.5) translateX(-50%);
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: -4px;
+  top: -100%;
+}
+
+.emotion-12::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-12::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-12 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-16 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-left: 16px;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+}
+
+input[type="number"].emotion-16 {
+  height: 30px;
+  min-height: 30px;
+}
+
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-5"
+    >
+      How many columns should this use?
+    </label>
+    <span
+      className="components-range-control__root emotion-18 emotion-19"
+      width="100%"
+    >
+      <span
+        className="emotion-0 emotion-1"
+      >
+        <svg
+          aria-hidden="true"
+          className="dashicon dashicons-wordpress"
+          focusable="false"
+          height={20}
+          role="img"
+          viewBox="0 0 20 20"
+          width={20}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
+          />
+        </svg>
+      </span>
+      <span
+        className="components-range-control__wrapper emotion-14 emotion-15"
+        color="#00669b"
+      >
+        <input
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-2 emotion-3"
+          disabled={false}
+          id="inspector-range-control-5"
+          max={100}
+          min={0}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={5}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-4 emotion-5"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-6 emotion-7"
+          style={
+            Object {
+              "width": "5%",
+            }
+          }
+        />
+        <span
+          className="emotion-10 emotion-11"
+          style={
+            Object {
+              "left": "5%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-8 emotion-9"
+          />
+        </span>
+        <div
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-12 emotion-13"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "5%",
+              "zIndex": 100,
+            }
+          }
+        >
+          5
+        </div>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-16 emotion-153"
+        inputMode="decimal"
+        max={100}
+        min={0}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={5}
+      />
+    </span>
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] = `
+.emotion-16 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+  width: 100%;
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  margin-left: 10px;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  color: #00669b;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-left: -10px;
+  margin-top: 5px;
+  width: 20px;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  outline: 0;
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-transition: box-shadow 60ms linear;
+  transition: box-shadow 60ms linear;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-6 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transform: scale(0.5) translateX(-50%);
+  -ms-transform: scale(0.5) translateX(-50%);
+  transform: scale(0.5) translateX(-50%);
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: -4px;
+  top: -100%;
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-10 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-left: 16px;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+}
+
+input[type="number"].emotion-14 {
+  height: 30px;
+  min-height: 30px;
+}
+
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-4"
+    >
+      How many columns should this use?
+    </label>
+    <span
+      className="components-range-control__root emotion-16 emotion-17"
+      width="100%"
+    >
+      <span
+        className="components-range-control__wrapper emotion-12 emotion-13"
+        color="#00669b"
+      >
+        <input
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-0 emotion-1"
+          disabled={false}
+          id="inspector-range-control-4"
+          max={10}
+          min={2}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={5}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-2 emotion-3"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-4 emotion-5"
+          style={
+            Object {
+              "width": "37.5%",
+            }
+          }
+        />
+        <span
+          className="emotion-8 emotion-9"
+          style={
+            Object {
+              "left": "37.5%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-6 emotion-7"
+          />
+        </span>
+        <div
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "37.5%",
+              "zIndex": 100,
+            }
+          }
+        >
+          5
+        </div>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-14 emotion-133"
+        inputMode="decimal"
+        max={10}
+        min={2}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={5}
+      />
+    </span>
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components/RangeControl With Reset 1`] = `
+.emotion-18 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+  width: 100%;
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  margin-left: 10px;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  color: #00669b;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-left: -10px;
+  margin-top: 5px;
+  width: 20px;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  outline: 0;
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-transition: box-shadow 60ms linear;
+  transition: box-shadow 60ms linear;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-6 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transform: scale(0.5) translateX(-50%);
+  -ms-transform: scale(0.5) translateX(-50%);
+  transform: scale(0.5) translateX(-50%);
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: -4px;
+  top: -100%;
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .emotion-10 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-left: 16px;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+}
+
+input[type="number"].emotion-14 {
+  height: 30px;
+  min-height: 30px;
+}
+
+.emotion-16 {
+  box-sizing: border-box;
+  display: block;
+  margin-left: 8px;
+  margin-top: 0;
+}
+
+.emotion-16 button,
+.emotion-16 button.is-small {
+  margin-left: 0;
+  height: 30px;
+  min-height: 30px;
+}
+
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-7"
+    >
+      How many columns should this use?
+    </label>
+    <span
+      className="components-range-control__root emotion-18 emotion-19"
+      width="100%"
+    >
+      <span
+        className="components-range-control__wrapper emotion-12 emotion-13"
+        color="#00669b"
+      >
+        <input
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-0 emotion-1"
+          disabled={false}
+          id="inspector-range-control-7"
+          max={100}
+          min={0}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={5}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-2 emotion-3"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-4 emotion-5"
+          style={
+            Object {
+              "width": "5%",
+            }
+          }
+        />
+        <span
+          className="emotion-8 emotion-9"
+          style={
+            Object {
+              "left": "5%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-6 emotion-7"
+          />
+        </span>
+        <div
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "5%",
+              "zIndex": 100,
+            }
+          }
+        >
+          5
+        </div>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-14 emotion-133"
+        inputMode="decimal"
+        max={100}
+        min={0}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={5}
+      />
+      <span
+        className="emotion-16 emotion-134"
+      >
+        <button
+          className="components-button components-range-control__reset is-secondary is-small"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          Reset
+        </button>
+      </span>
+    </span>
   </div>
 </div>
 `;
