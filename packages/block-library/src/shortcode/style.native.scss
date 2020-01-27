@@ -1,14 +1,14 @@
 .blockTitle {
-	font-family: $default-regular-font;
 	font-weight: 500;
 	font-size: 10px;
-	color: rgba($black, 0.6);
+	color: $gray;
 	text-transform: uppercase;
 	letter-spacing: 0.4px;
+	padding-bottom: 4px;
 }
 
 .blockTitleDark {
-	color: rgba($white, 0.6);
+	color: $gray-50;
 }
 
 .blockShortcode {
@@ -29,7 +29,7 @@
 	font-family: $default-monospace-font;
 	font-weight: 400;
 	font-size: 14px;
-	color: rgba($black, 0.25);
+	color: $gray;
 }
 
 .placeholderDark {
