@@ -66,7 +66,7 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 					getComputedStyle(
 						element,
 						'first-letter'
-					).height
+					).lineHeight
 				);
 			} else if ( minimumHeight ) {
 				setMinimumHeight( undefined );
