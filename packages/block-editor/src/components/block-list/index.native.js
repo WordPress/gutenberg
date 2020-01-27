@@ -35,6 +35,7 @@ export class BlockList extends Component {
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
+		this.showGroupAppender = this.showGroupAppender.bind( this );
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -65,6 +66,14 @@ export class BlockList extends Component {
 				/>
 			</ReadableContentView>
 		);
+	}
+
+	showGroupAppender() {
+		const {
+			blockClientIds,
+			renderAppender,
+		} = this.props;
+		return ( renderAppender && blockClientIds.length > 0 )
 	}
 
 	render() {
@@ -104,7 +113,7 @@ export class BlockList extends Component {
 					ListFooterComponent={ ! isReadOnly && withFooter && this.renderBlockListFooter }
 				/>
 
-				{ renderAppender && blockClientIds.length > 0 && (
+				{ this.showGroupAppender() && (
 					<View style={ styles.paddingToContent }>
 						<BlockListAppender
 							rootClientId={ this.props.rootClientId }
@@ -132,8 +141,6 @@ export class BlockList extends Component {
 			shouldShowBlockAtIndex,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
-			renderAppender,
-			blockClientIds,
 		} = this.props;
 
 		return (
@@ -149,7 +156,7 @@ export class BlockList extends Component {
 							onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 							isSmallScreen={ ! this.props.isFullyBordered }
 						/> ) }
-					{ ! ( renderAppender && blockClientIds.length > 0 ) && shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
+					{ ! this.showGroupAppender() && shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
 				</View>
 			</ReadableContentView>
 		);
