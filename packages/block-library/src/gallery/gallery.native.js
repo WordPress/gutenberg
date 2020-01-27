@@ -92,7 +92,7 @@ export const Gallery = ( props ) => {
 							key={ img.id || img.url }
 							url={ img.url }
 							alt={ img.alt }
-							id={ img.id }
+							id={ parseInt( img.id ) } // make id an integer explicitly
 							isCropped={ imageCrop }
 							isFirstItem={ index === 0 }
 							isLastItem={ ( index + 1 ) === images.length }
