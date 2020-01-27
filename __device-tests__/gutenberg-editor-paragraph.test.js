@@ -13,6 +13,7 @@ import {
 	clickBeginningOfElement,
 	stopDriver,
 	isAndroid,
+	swipeUp,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
@@ -115,6 +116,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 
 		for ( let i = 3; i > 0; i-- ) {
+			await swipeUp( driver );
 			await editorPage.removeParagraphBlockAtPosition( i );
 		}
 	} );

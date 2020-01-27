@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactNative, {requireNativeComponent, TextViewPropTypes, UIManager, ColorPropType, TouchableWithoutFeedback, Platform} from 'react-native';
-import TextInputState from 'react-native/lib/TextInputState';
+import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 
 const AztecManager = UIManager.getViewManagerConfig('RCTAztecView');
 
