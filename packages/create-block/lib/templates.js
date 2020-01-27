@@ -24,13 +24,13 @@ const templates = {
 			license,
 			version,
 		},
-		outputFiles: {
-			'.editorconfig': 'editorconfig',
-			'editor.css': 'editor-css',
-			'index.js': 'es5/index-js',
-			'$slug.php': 'es5/plugin-php',
-			'style.css': 'style-css',
-		},
+		outputFiles: [
+			'.editorconfig',
+			'editor.css',
+			'index.js',
+			'$slug.php',
+			'style.css',
+		],
 	},
 	esnext: {
 		defaultValues: {
@@ -44,14 +44,14 @@ const templates = {
 			license,
 			version,
 		},
-		outputFiles: {
-			'.editorconfig': 'editorconfig',
-			'.gitignore': 'gitignore',
-			'editor.css': 'editor-css',
-			'src/index.js': 'esnext/index-js',
-			'$slug.php': 'esnext/plugin-php',
-			'style.css': 'style-css',
-		},
+		outputFiles: [
+			'.editorconfig',
+			'.gitignore',
+			'editor.css',
+			'src/index.js',
+			'$slug.php',
+			'style.css',
+		],
 		wpScriptsEnabled: true,
 	},
 };

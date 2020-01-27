@@ -27,7 +27,6 @@ module.exports = async function( templateName, {
 	info( '' );
 	info( `Creating a new WordPress block in "${ slug }" folder.` );
 
-	const outputFiles = getOutputFiles( templateName );
 	const view = {
 		namespace,
 		slug,
@@ -41,17 +40,17 @@ module.exports = async function( templateName, {
 		license,
 		textdomain: namespace,
 	};
-
 	await Promise.all(
-		Object.keys( outputFiles ).map( async ( fileName ) => {
+		getOutputFiles( templateName ).map( async ( file ) => {
 			const template = await readFile(
-				join( __dirname, `templates/${ outputFiles[ fileName ] }.mustache` ),
+				join( __dirname, `templates/${ templateName }/${ file }.mustache` ),
 				'utf8'
 			);
-			const filePath = `${ slug }/${ fileName.replace( /\$slug/g, slug ) }`;
-			await makeDir( dirname( filePath ) );
+			// Output files can have names that depend on the slug provided.
+			const outputFilePath = `${ slug }/${ file.replace( /\$slug/g, slug ) }`;
+			await makeDir( dirname( outputFilePath ) );
 			writeFile(
-				filePath,
+				outputFilePath,
 				render( template, view )
 			);
 		} )
