@@ -15,24 +15,16 @@
 // @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
 // When that happens, leverage that instead of the following overrides.
 [data-type="core/social-links"] {
-	// 1. Reset margins on immediate innerblocks container.
-	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout {
-		margin-left: 0;
-		margin-right: 0;
-	}
-
-	// 2. Remove paddings on subsequent immediate children.
+	// 1. Remove paddings on subsequent immediate children.
 	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
 		width: auto;
 		padding-left: 0;
 		padding-right: 0;
-		margin-left: 0;
-		margin-right: 0;
 		margin-top: 0;
 		margin-bottom: 0;
 	}
 
-	// 3. Minimize the block outlines.
+	// 2. Minimize the block outlines.
 	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block::before {
 		border-right: none;
 		border-top: none;
