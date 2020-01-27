@@ -144,13 +144,12 @@ function ObserveTyping( {
 	 * @param {FocusEvent} event Focus event.
 	 */
 	function stopTypingOnNonTextField( event ) {
-		event.persist();
+		const { target } = event;
 
 		// Since focus to a non-text field via arrow key will trigger before
 		// the keydown event, wait until after current stack before evaluating
 		// whether typing is to be stopped. Otherwise, typing will re-start.
 		setSafeTimeout( () => {
-			const { target } = event;
 			if ( isTyping && ! isTextField( target ) ) {
 				stopTyping();
 			}
