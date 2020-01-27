@@ -397,7 +397,7 @@ export class ImageEdit extends React.Component {
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 
-		const editImageComponent = ( openMediaOptions, mediaOptions ) => (
+		const editImageComponent = ( { openMediaOptions, mediaOptions } ) => (
 			<TouchableWithoutFeedback
 				onPress={ openMediaOptions }>
 				<View style={ styles.edit }>
@@ -476,9 +476,7 @@ export class ImageEdit extends React.Component {
 												onSelect={ this.onSelectMediaUploadOption }
 												source={ { uri: url } }
 												openReplaceMediaOptions={ openMediaOptions }
-												render={ ( { open, mediaOptions } ) => {
-													return editImageComponent( open, mediaOptions );
-												} }
+												render={ editImageComponent }
 											/>
 										}
 									</ImageBackground>
