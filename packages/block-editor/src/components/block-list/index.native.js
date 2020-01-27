@@ -73,7 +73,7 @@ export class BlockList extends Component {
 			blockClientIds,
 			renderAppender,
 		} = this.props;
-		return ( renderAppender && blockClientIds.length > 0 )
+		return ( renderAppender && blockClientIds.length > 0 );
 	}
 
 	render() {
@@ -84,7 +84,6 @@ export class BlockList extends Component {
 			title,
 			header,
 			withFooter = true,
-			renderAppender,
 			isReadOnly,
 			isRootList,
 		} = this.props;
