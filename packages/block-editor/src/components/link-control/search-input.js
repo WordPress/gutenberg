@@ -57,17 +57,6 @@ const LinkControlSearchInput = ( {
 
 	return (
 		<form onSubmit={ selectSuggestionOrCurrentInputValue }>
-			<div role="alert" aria-live="assertive">
-				{ errorMsg && (
-					<Notice
-						className="block-editor-link-control__search-error"
-						status="error"
-						isDismissible={ false }
-					>
-						{ errorMsg }
-					</Notice>
-				) }
-			</div>
 			<div className="block-editor-link-control__search-input-wrapper">
 				<URLInput
 					className="block-editor-link-control__search-input"
@@ -96,6 +85,17 @@ const LinkControlSearchInput = ( {
 						icon={keyboardReturn}
 						className="block-editor-link-control__search-submit"
 					/>
+				</div>
+				<div role="alert" aria-live="assertive">
+					{ errorMsg && (
+						<Notice
+							className="block-editor-link-control__search-error"
+							status="error"
+							isDismissible={ false }
+						>
+							{ errorMsg }
+						</Notice>
+					) }
 				</div>
 			</div>
 		</form>
