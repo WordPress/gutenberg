@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.ColorUtils;
+
 import android.text.Editable;
 import android.text.Layout;
 import android.text.TextUtils;
@@ -361,6 +363,14 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             newColor = color;
         }
         view.setTextColor(newColor);
+    }
+
+    @ReactProp(name = "selectionColor", customType = "Color")
+    public void setSelectionColor(ReactAztecText view, @Nullable Integer color) {
+        if (color != null) {
+            view.setHighlightColor(ColorUtils.setAlphaComponent(color, 51));
+            view.setCursorColor(color);
+        }
     }
 
     @ReactProp(name = "blockType")
