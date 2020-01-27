@@ -33,8 +33,12 @@
 .block-editor-inserter__popover > .components-popover__content {
 	@include break-medium {
 		overflow-y: visible;
-		width: 86vw; // This is limited by a max-width.
 		height: 92vh; // This is limited by a max-height from the popover component itself.
+		width: 82vw; // This is limited by a max-width.
+
+		.is-fullscreen-mode & {
+			width: 86vw;
+		}
 
 		// We take up the whole space horizontally, so as to afford a preview panel appearing.
 		// The layer is only for layout, and should not block clicks through it.
@@ -59,7 +63,7 @@
 	}
 
 	.components-tip {
-		padding: 0 $grid-size-large $grid-size-large $grid-size-large;
+		padding: $grid-size-large;
 		display: flex;
 		align-items: center;
 	}
@@ -69,10 +73,10 @@
 .block-editor-inserter__main-area,
 .block-editor-inserter__preview-panel {
 	background: $white;
-	width: 49%;
-	width: calc(50% - #{$grid-size-large});
 
 	@include break-medium() {
+		width: 49%;
+		width: calc(50% - #{$grid-size-large});
 		box-shadow: $shadow-popover;
 		border: $border-width solid $light-gray-500;
 		max-width: 480px;
@@ -84,10 +88,10 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
-	margin-right: $grid-size-large;
 
 	@include break-medium {
 		position: relative;
+		margin-right: $grid-size-large;
 
 		// Re-enable clicks on this layer.
 		pointer-events: all;
@@ -187,7 +191,10 @@
 	@include break-medium () {
 		display: block;
 		position: relative;
-		height: 480px;
+		min-height: 480px;
+		height: 50%;
+		max-height: 640px;
+		overflow: hidden;
 		padding: $grid-size-large;
 		@include edit-post__fade-in-animation();
 
