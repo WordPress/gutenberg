@@ -8,11 +8,7 @@ import { escape } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useCallback,
-	useEffect,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import {
 	compose,
 } from '@wordpress/compose';
@@ -85,14 +81,6 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 
 function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onToggleOpenInNewTab } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
-	useEffect(
-		() => {
-			if ( ! isSelected ) {
-				setIsURLPickerOpen( false );
-			}
-		},
-		[ isSelected ]
-	);
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
 	};
