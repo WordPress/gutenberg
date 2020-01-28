@@ -252,7 +252,7 @@ By default, files located in `build` and `node_modules` folders are ignored.
 
 It uses [npm-package-json-lint](https://www.npmjs.com/package/npm-package-json-lint) with the set of recommended rules defined in [@wordpress/npm-package-json-lint-config](https://www.npmjs.com/package/@wordpress/npm-package-json-lint-config) npm package. You can override default rules with your own as described in [npm-package-json-lint wiki](https://github.com/tclindner/npm-package-json-lint/wiki). Learn more in the [Advanced Usage](#advanced-usage) section.
 
-### `lint-md:docs`
+### `lint-md-docs`
 
 Uses markdownlint to lint the markup of markdown files to enforce standards.
 
@@ -276,9 +276,9 @@ By default, files located in `build` and `node_modules` folders are ignored.
 
 It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
 
-### `lint-md:js`
+### `lint-md-js`
 
-Uses eslint to lint the source included in markdown files to enforce standards for JS code.
+Uses ESLint to lint the source included in markdown files to enforce standards for JS code.
 
 _Example:_
 
