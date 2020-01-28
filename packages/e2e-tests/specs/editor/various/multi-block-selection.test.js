@@ -449,4 +449,31 @@ describe( 'Multi-block selection', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should clear selection when clicking next to blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+
+		await testNativeSelection();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
+
+		const coord = await page.evaluate( () => {
+			const element = document.querySelector( '.wp-block-paragraph' );
+			const rect = element.getBoundingClientRect();
+			return {
+				x: rect.x - 1,
+				y: rect.y + ( rect.height / 2 ),
+			};
+		} );
+
+		await page.mouse.click( coord.x, coord.y );
+
+		await testNativeSelection();
+		expect( await getSelectedFlatIndices() ).toEqual( [] );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
