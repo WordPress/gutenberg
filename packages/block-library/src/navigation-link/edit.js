@@ -105,7 +105,7 @@ function NavigationLinkEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
-					title={ __( 'Link Settings' ) }
+					title={ __( 'Link settings' ) }
 				>
 					<TextareaControl
 						value={ description || '' }
@@ -117,7 +117,7 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 				<PanelBody
-					title={ __( 'SEO Settings' ) }
+					title={ __( 'SEO settings' ) }
 				>
 					<TextControl
 						value={ title || '' }

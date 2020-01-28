@@ -20,7 +20,6 @@ import {
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -37,6 +36,9 @@ const TEMPLATE = [
 ];
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
+const BREAKPOINTS = {
+	mobile: 480,
+};
 const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
 class MediaTextEdit extends Component {
@@ -47,8 +49,11 @@ class MediaTextEdit extends Component {
 		this.onMediaUpdate = this.onMediaUpdate.bind( this );
 		this.onWidthChange = this.onWidthChange.bind( this );
 		this.commitWidthChange = this.commitWidthChange.bind( this );
+		this.onLayoutChange = this.onLayoutChange.bind( this );
+
 		this.state = {
 			mediaWidth: null,
+			containerWidth: 0,
 		};
 	}
 
@@ -111,6 +116,19 @@ class MediaTextEdit extends Component {
 		} );
 	}
 
+	onLayoutChange( { nativeEvent } ) {
+		const { width } = nativeEvent.layout;
+		const { containerWidth } = this.state;
+
+		if ( containerWidth === width ) {
+			return null;
+		}
+
+		this.setState( {
+			containerWidth: width,
+		} );
+	}
+
 	renderMediaArea() {
 		const { attributes, isSelected } = this.props;
 		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth, imageFill, focalPoint } = attributes;
@@ -132,7 +150,6 @@ class MediaTextEdit extends Component {
 			attributes,
 			backgroundColor,
 			setAttributes,
-			isMobile,
 			isSelected,
 			isParentSelected,
 			isAncestorSelected,
@@ -143,6 +160,11 @@ class MediaTextEdit extends Component {
 			mediaWidth,
 			verticalAlignment,
 		} = attributes;
+		const {
+			containerWidth,
+		} = this.state;
+
+		const isMobile = containerWidth < BREAKPOINTS.mobile;
 		const shouldStack = isStackedOnMobile && isMobile;
 		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
 		const widthString = `${ temporaryMediaWidth }%`;
@@ -195,7 +217,7 @@ class MediaTextEdit extends Component {
 						isCollapsed={ false }
 					/>
 				</BlockControls>
-				<View style={ containerStyles }>
+				<View style={ containerStyles } onLayout={ this.onLayoutChange }>
 					<View style={ { width: widthString, ...mediaContainerStyle } } >
 						{ this.renderMediaArea() }
 					</View>
@@ -214,7 +236,6 @@ class MediaTextEdit extends Component {
 
 export default compose(
 	withColors( 'backgroundColor' ),
-	withViewportMatch( { isMobile: '< small' } ),
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getSelectedBlockClientId,

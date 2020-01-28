@@ -222,7 +222,7 @@ class VideoEdit extends React.Component {
 							{ toolbarEditButton }
 						</BlockControls> }
 					<InspectorControls>
-						<PanelBody title={ __( 'Video Settings' ) }>
+						<PanelBody title={ __( 'Video settings' ) }>
 							<VideoCommonSettings
 								setAttributes={ setAttributes }
 								attributes={ attributes }

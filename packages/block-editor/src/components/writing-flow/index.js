@@ -197,6 +197,7 @@ export default function WritingFlow( { children } ) {
 	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
+	const multiSelectionContainer = useRef();
 
 	const entirelySelected = useRef();
 
@@ -386,7 +387,7 @@ export default function WritingFlow( { children } ) {
 			} else if ( isEscape ) {
 				setNavigationMode( true );
 			}
-		} else if ( hasMultiSelection && isTab && target === container.current ) {
+		} else if ( hasMultiSelection && isTab && target === multiSelectionContainer.current ) {
 			// See comment above.
 			noCapture.current = true;
 
@@ -502,7 +503,7 @@ export default function WritingFlow( { children } ) {
 
 	useEffect( () => {
 		if ( hasMultiSelection && ! isMultiSelecting ) {
-			container.current.focus();
+			multiSelectionContainer.current.focus();
 		}
 	}, [ hasMultiSelection, isMultiSelecting ] );
 
@@ -521,14 +522,21 @@ export default function WritingFlow( { children } ) {
 				containerRef={ container }
 				noCapture={ noCapture }
 				hasMultiSelection={ hasMultiSelection }
+				multiSelectionContainer={ multiSelectionContainer }
 			/>
 			<div
 				ref={ container }
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
-				tabIndex={ hasMultiSelection ? '0' : undefined }
-				aria-label={ hasMultiSelection ? __( 'Multiple selected blocks' ) : undefined }
 			>
+				<div
+					ref={ multiSelectionContainer }
+					tabIndex={ hasMultiSelection ? '0' : undefined }
+					aria-label={ hasMultiSelection ? __( 'Multiple selected blocks' ) : undefined }
+					// Needs to be positioned within the viewport, so focus to this
+					// element does not scroll the page.
+					style={ { position: 'fixed' } }
+				/>
 				{ children }
 			</div>
 			<FocusCapture
@@ -537,6 +545,7 @@ export default function WritingFlow( { children } ) {
 				containerRef={ container }
 				noCapture={ noCapture }
 				hasMultiSelection={ hasMultiSelection }
+				multiSelectionContainer={ multiSelectionContainer }
 				isReverse
 			/>
 			<div

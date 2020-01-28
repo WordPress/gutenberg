@@ -63,7 +63,7 @@ class LatestComments extends Component {
 		return (
 			<>
 				<InspectorControls>
-					<PanelBody title={ __( 'Latest Comments Settings' ) }>
+					<PanelBody title={ __( 'Latest comments settings' ) }>
 						<ToggleControl
 							label={ __( 'Display Avatar' ) }
 							checked={ displayAvatar }
