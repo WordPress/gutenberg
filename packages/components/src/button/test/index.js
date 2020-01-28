@@ -23,6 +23,7 @@ describe( 'Button', () => {
 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
 			expect( button.hasClass( 'is-pressed' ) ).toBe( false );
 			expect( button.prop( 'disabled' ) ).toBeUndefined();
+			expect( button.prop( 'aria-disabled' ) ).toBeUndefined();
 			expect( button.prop( 'type' ) ).toBe( 'button' );
 			expect( button.type() ).toBe( 'button' );
 		} );
@@ -56,6 +57,12 @@ describe( 'Button', () => {
 		it( 'should add a disabled prop to the button', () => {
 			const button = shallow( <Button disabled /> );
 			expect( button.prop( 'disabled' ) ).toBe( true );
+		} );
+
+		it( 'should add only aria-disabled attribute when disabled and isFocusable are true', () => {
+			const button = shallow( <Button disabled __experimentalIsFocusable /> );
+			expect( button.prop( 'disabled' ) ).toBe( false );
+			expect( button.prop( 'aria-disabled' ) ).toBe( true );
 		} );
 
 		it( 'should not poss the prop target into the element', () => {

@@ -115,6 +115,7 @@ export default compose(
 			getBlockName,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
+			getSettings,
 		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
@@ -129,10 +130,13 @@ export default compose(
 		}
 		const destinationRootBlockName = getBlockName( destinationRootClientId );
 
+		const { __experimentalShouldInsertAtTheTop: shouldInsertAtTheTop } = getSettings();
+
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items: getInserterItems( destinationRootClientId ),
 			destinationRootClientId,
+			shouldInsertAtTheTop,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

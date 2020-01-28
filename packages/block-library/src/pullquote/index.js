@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
+import { pullquote as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -9,7 +10,6 @@ import { __, _x } from '@wordpress/i18n';
 import { SOLID_COLOR_STYLE_NAME } from './shared';
 import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 

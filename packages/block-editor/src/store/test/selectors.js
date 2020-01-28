@@ -2015,6 +2015,7 @@ describe( 'selectors', () => {
 				},
 				category: 'formatting',
 				keywords: [ 'testing' ],
+				patterns: [],
 				isDisabled: false,
 				utility: 0,
 				frecency: 0,

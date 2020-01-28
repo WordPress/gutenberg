@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { size } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -134,15 +134,24 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
+			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
 		} = select( 'core/block-editor' );
+		const {
+			__experimentalGetBlockPatterns: getBlockPatterns,
+		} = select( 'core/blocks' );
+
+		rootClientId = rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
-		const hasSingleBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
+		const hasSingleBlockType = (
+			size( allowedBlocks ) === 1 &&
+			size( getBlockPatterns( allowedBlocks[ 0 ].name, 'inserter' ) ) === 0
+		);
 
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
@@ -154,6 +163,7 @@ export default compose( [
 			hasSingleBlockType,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
 			allowedBlockType,
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

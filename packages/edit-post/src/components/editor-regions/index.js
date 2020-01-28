@@ -33,6 +33,17 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 				>
 					{ content }
 				</div>
+				{ !! sidebar && (
+					<div
+						className="edit-post-editor-regions__sidebar"
+						role="region"
+						/* translators: accessibility text for the settings landmark region. */
+						aria-label={ __( 'Editor settings' ) }
+						tabIndex="-1"
+					>
+						{ sidebar }
+					</div>
+				) }
 				{ !! publish && (
 					<div
 						className="edit-post-editor-regions__publish"
@@ -44,22 +55,13 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 						{ publish }
 					</div>
 				) }
-				{ !! sidebar && (
-					<div
-						className="edit-post-editor-regions__sidebar"
-						role="region"
-						aria-label={ 'Editor settings' }
-						tabIndex="-1"
-					>
-						{ sidebar }
-					</div>
-				) }
 			</div>
 			{ !! footer && (
 				<div
 					className="edit-post-editor-regions__footer"
 					role="region"
-					aria-label={ 'Editor footer' }
+					/* translators: accessibility text for the footer landmark region. */
+					aria-label={ __( 'Editor footer' ) }
 					tabIndex="-1"
 				>
 					{ footer }

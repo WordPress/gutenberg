@@ -40,6 +40,30 @@ describe.each( [ [ 'unified', true ], [ 'contextual', false ] ] )(
 			await pressKeyWithModifier( 'alt', 'F10' );
 			expect( await isInBlockToolbar() ).toBe( true );
 		} );
+
+		if ( ! isUnifiedToolbar ) {
+			it( 'should not scroll page', async () => {
+				while ( await page.evaluate( () =>
+					wp.dom.getScrollContainer( document.activeElement ).scrollTop === 0
+				) ) {
+					await page.keyboard.press( 'Enter' );
+				}
+
+				await page.keyboard.type( 'a' );
+
+				const scrollTopBefore = await page.evaluate( () =>
+					wp.dom.getScrollContainer( document.activeElement ).scrollTop
+				);
+
+				await pressKeyWithModifier( 'alt', 'F10' );
+				expect( await isInBlockToolbar() ).toBe( true );
+
+				const scrollTopAfter = await page.evaluate( () =>
+					wp.dom.getScrollContainer( document.activeElement ).scrollTop
+				);
+
+				expect( scrollTopBefore ).toBe( scrollTopAfter );
+			} );
+		}
 	}
 );
-

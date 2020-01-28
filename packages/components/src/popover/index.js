@@ -62,7 +62,25 @@ function computeAnchorRect(
 			return getRectangleFromRange( anchorRef );
 		}
 
-		const rect = anchorRef.getBoundingClientRect();
+		if ( anchorRef instanceof window.Element ) {
+			const rect = anchorRef.getBoundingClientRect();
+
+			if ( shouldAnchorIncludePadding ) {
+				return rect;
+			}
+
+			return withoutPadding( rect, anchorRef );
+		}
+
+		const { top, bottom } = anchorRef;
+		const topRect = top.getBoundingClientRect();
+		const bottomRect = bottom.getBoundingClientRect();
+		const rect = new window.DOMRect(
+			topRect.left,
+			topRect.top,
+			topRect.width,
+			bottomRect.bottom - topRect.top
+		);
 
 		if ( shouldAnchorIncludePadding ) {
 			return rect;
@@ -228,6 +246,7 @@ const Popover = ( {
 	__unstableSlotName = SLOT_NAME,
 	__unstableAllowVerticalSubpixelPosition,
 	__unstableAllowHorizontalSubpixelPosition,
+	__unstableFixedPosition = true,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -250,6 +269,7 @@ const Popover = ( {
 			setStyle( containerRef.current, 'left' );
 			setStyle( contentRef.current, 'maxHeight' );
 			setStyle( contentRef.current, 'maxWidth' );
+			setStyle( containerRef.current, 'position' );
 			return;
 		}
 
@@ -257,7 +277,8 @@ const Popover = ( {
 			if ( ! containerRef.current || ! contentRef.current ) {
 				return;
 			}
-			const anchor = computeAnchorRect(
+
+			let anchor = computeAnchorRect(
 				anchorRefFallback,
 				anchorRect,
 				getAnchorRect,
@@ -273,6 +294,30 @@ const Popover = ( {
 				contentRect.current = contentRef.current.getBoundingClientRect();
 			}
 
+			let relativeOffsetTop = 0;
+
+			// If there is a positioned ancestor element that is not the body,
+			// subtract the position from the anchor rect. If the position of
+			// the popover is fixed, the offset parent is null or the body
+			// element, in which case the position is relative to the viewport.
+			// See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent
+			if ( ! __unstableFixedPosition ) {
+				setStyle( containerRef.current, 'position', 'absolute' );
+
+				const { offsetParent } = containerRef.current;
+				const offsetParentRect = offsetParent.getBoundingClientRect();
+
+				relativeOffsetTop = offsetParentRect.top;
+				anchor = new window.DOMRect(
+					anchor.left - offsetParentRect.left,
+					anchor.top - offsetParentRect.top,
+					anchor.width,
+					anchor.height
+				);
+			} else {
+				setStyle( containerRef.current, 'position' );
+			}
+
 			const {
 				popoverTop,
 				popoverLeft,
@@ -280,7 +325,7 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef );
+			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, containerRef.current, relativeOffsetTop );
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
 				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
@@ -321,9 +366,6 @@ const Popover = ( {
 
 		// Height may still adjust between now and the next tick.
 		const timeoutId = window.setTimeout( refresh );
-		const refreshOnAnimationFrame = () => {
-			window.requestAnimationFrame( refresh );
-		};
 
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
@@ -333,6 +375,13 @@ const Popover = ( {
 		 * For these situations, we refresh the popover every 0.5s
 		 */
 		const intervalHandle = window.setInterval( refresh, 500 );
+
+		let rafId;
+
+		const refreshOnAnimationFrame = () => {
+			window.cancelAnimationFrame( rafId );
+			rafId = window.requestAnimationFrame( refresh );
+		};
 
 		// Sometimes a click trigger a layout change that affects the popover
 		// position. This is an opportunity to immediately refresh rather than
@@ -359,6 +408,7 @@ const Popover = ( {
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
 			window.addEventListener( 'click', refreshOnAnimationFrame );
+			window.cancelAnimationFrame( rafId );
 
 			if ( observer ) {
 				observer.disconnect();

@@ -252,11 +252,13 @@ export default compose( [
 
 		function getDefaultInsertionIndex() {
 			const {
-				isPostTitleSelected,
-			} = select( 'core/editor' );
+				getSettings,
+			} = select( 'core/block-editor' );
+
+			const { __experimentalShouldInsertAtTheTop: shouldInsertAtTheTop } = getSettings();
 
 			// if post title is selected insert as first block
-			if ( isPostTitleSelected() ) {
+			if ( shouldInsertAtTheTop ) {
 				return 0;
 			}
 

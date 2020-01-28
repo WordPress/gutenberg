@@ -114,7 +114,7 @@ function create_auto_draft_for_template_part_block( $block ) {
  * @return string Path to the canvas file to include.
  */
 function gutenberg_find_template( $template_file ) {
-	global $_wp_current_template_content, $_wp_current_template_hierarchy;
+	global $_wp_current_template_id, $_wp_current_template_content, $_wp_current_template_hierarchy;
 
 	// Bail if no relevant template hierarchy was determined, or if the template file
 	// was overridden another way.
@@ -149,15 +149,17 @@ function gutenberg_find_template( $template_file ) {
 	$higher_priority_block_template_priority = PHP_INT_MAX;
 	$block_template_files                    = glob( get_stylesheet_directory() . '/block-templates/*.html' ) ?: array();
 	if ( is_child_theme() ) {
-			$block_template_files = array_merge( $block_template_files, glob( get_template_directory() . '/block-templates/*.html' ) ?: array() );
+		$block_template_files = array_merge( $block_template_files, glob( get_template_directory() . '/block-templates/*.html' ) ?: array() );
 	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
 		$block_template_files = array_merge( $block_template_files, glob( dirname( __FILE__ ) . '/demo-block-templates/*.html' ) ?: array() );
 	}
 	foreach ( $block_template_files as $path ) {
+		if ( ! isset( $slug_priorities[ basename( $path, '.html' ) ] ) ) {
+			continue;
+		}
 		$theme_block_template_priority = $slug_priorities[ basename( $path, '.html' ) ];
 		if (
-			isset( $theme_block_template_priority ) &&
 			$theme_block_template_priority < $higher_priority_block_template_priority &&
 			( empty( $current_template_post ) || $theme_block_template_priority < $slug_priorities[ $current_template_post->post_name ] )
 		) {
@@ -183,10 +185,6 @@ function gutenberg_find_template( $template_file ) {
 			$current_template_post = get_post(
 				wp_insert_post( $current_template_post )
 			);
-
-			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
-				create_auto_draft_for_template_part_block( $block );
-			}
 		} else {
 			$current_template_post = new WP_Post(
 				(object) $current_template_post
@@ -195,6 +193,12 @@ function gutenberg_find_template( $template_file ) {
 	}
 
 	if ( $current_template_post ) {
+		if ( is_admin() ) {
+			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
+				create_auto_draft_for_template_part_block( $block );
+			}
+		}
+		$_wp_current_template_id      = $current_template_post->ID;
 		$_wp_current_template_content = $current_template_post->post_content;
 	}
 
@@ -262,3 +266,25 @@ function gutenberg_viewport_meta_tag() {
 function gutenberg_strip_php_suffix( $template_file ) {
 	return preg_replace( '/\.php$/', '', $template_file );
 }
+
+/**
+ * Extends default editor settings to enable template and template part editing.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
+	if ( ! post_type_exists( 'wp_template' ) || ! post_type_exists( 'wp_template_part' ) ) {
+		return $settings;
+	}
+
+	// Create template part auto-drafts for the edited post.
+	foreach ( parse_blocks( get_post()->post_content ) as $block ) {
+		create_auto_draft_for_template_part_block( $block );
+	}
+
+	// TODO: Set editing mode and current template ID for editing modes support.
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_template_loader_filter_block_editor_settings' );

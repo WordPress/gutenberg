@@ -141,11 +141,11 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -316,11 +316,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -491,11 +491,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -666,11 +666,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -841,11 +841,11 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -1016,11 +1016,11 @@ exports[`ColorPicker should render color picker 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}

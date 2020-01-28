@@ -83,4 +83,20 @@ describe( 'searchItems', () => {
 			[ youtubeItem ]
 		);
 	} );
+
+	it( 'should match words using also patterns and return all matched patterns', () => {
+		const filteredItems = searchItems( items, categories, collections, 'pattern' );
+
+		expect( filteredItems ).toHaveLength( 1 );
+		expect( filteredItems[ 0 ].patterns ).toHaveLength( 3 );
+	} );
+
+	it( 'should match words using also patterns and filter out unmatched patterns', () => {
+		const filteredItems = searchItems( items, categories, collections, 'patterns two three' );
+
+		expect( filteredItems ).toHaveLength( 1 );
+		expect( filteredItems[ 0 ].patterns ).toHaveLength( 2 );
+		expect( filteredItems[ 0 ].patterns[ 0 ].title ).toBe( 'Pattern Two' );
+		expect( filteredItems[ 0 ].patterns[ 1 ].title ).toBe( 'Pattern Three' );
+	} );
 } );

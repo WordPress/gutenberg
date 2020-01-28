@@ -235,10 +235,10 @@ module.exports = {
 		);
 		if ( result.out ) {
 			// eslint-disable-next-line no-console
-			console.log( `\n\n${ result.out }\n\n` );
+			console.log( process.stdout.isTTY ? `\n\n${ result.out }\n\n` : result.out );
 		} else if ( result.err ) {
 			// eslint-disable-next-line no-console
-			console.error( `\n\n${ result.err }\n\n` );
+			console.error( process.stdout.isTTY ? `\n\n${ result.err }\n\n` : result.err );
 			throw result.err;
 		}
 

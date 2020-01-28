@@ -386,7 +386,6 @@ class RichTextWrapper extends Component {
 				onSelectionChange={ onSelectionChange }
 				tagName={ tagName }
 				className={ classnames( classes, className, {
-					'is-selected': originalIsSelected,
 					'keep-placeholder-on-focus': keepPlaceholderOnFocus,
 				} ) }
 				placeholder={ placeholder }
@@ -411,9 +410,9 @@ class RichTextWrapper extends Component {
 				start={ start }
 				reversed={ reversed }
 			>
-				{ ( { isSelected, value, onChange, Editable } ) =>
+				{ ( { isSelected, value, onChange, onFocus, Editable } ) =>
 					<>
-						{ children && children( { value, onChange } ) }
+						{ children && children( { value, onChange, onFocus } ) }
 						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorRef={ forwardedRef.current } /> ) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
@@ -486,7 +485,10 @@ const RichTextContainer = compose( [
 
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		const { __experimentalCanUserUseUnfilteredHTML } = getSettings();
+		const {
+			__experimentalCanUserUseUnfilteredHTML,
+			__experimentalUndo: undo,
+		} = getSettings();
 		if ( isSelected === undefined ) {
 			isSelected = (
 				selectionStart.clientId === clientId &&
@@ -516,6 +518,7 @@ const RichTextContainer = compose( [
 			isSelected,
 			didAutomaticChange: didAutomaticChange(),
 			disabled: isMultiSelecting() || hasMultiSelection(),
+			undo,
 			...extraProps,
 		};
 	} ),
@@ -531,7 +534,6 @@ const RichTextContainer = compose( [
 			selectionChange,
 			__unstableMarkAutomaticChange,
 		} = dispatch( 'core/block-editor' );
-		const { undo } = dispatch( 'core/editor' );
 
 		return {
 			onCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
@@ -541,7 +543,6 @@ const RichTextContainer = compose( [
 				selectionChange( clientId, identifier, start, end );
 			},
 			markAutomaticChange: __unstableMarkAutomaticChange,
-			undo,
 		};
 	} ),
 ] )( RichTextWrapper );

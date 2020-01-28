@@ -1,14 +1,19 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { paragraph as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -32,6 +37,12 @@ export const settings = {
 	supports: {
 		className: false,
 		__unstablePasteTextInline: true,
+	},
+	__experimentalLabel( attributes, { context } ) {
+		if ( context === 'accessibility' ) {
+			const { content } = attributes;
+			return isEmpty( content ) ? __( 'Empty' ) : content;
+		}
 	},
 	transforms,
 	deprecated,

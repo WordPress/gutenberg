@@ -14,8 +14,7 @@ import {
 	ExternalLink,
 	KeyboardShortcuts,
 	PanelBody,
-	Path,
-	SVG,
+	Popover,
 	TextareaControl,
 	TextControl,
 	ToggleControl,
@@ -36,12 +35,18 @@ import {
 } from '@wordpress/block-editor';
 import { Fragment, useState, useEffect } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { toolbarSubmenuIcon, itemSubmenuIcon } from './icons';
+
 function NavigationLinkEdit( {
 	attributes,
 	hasDescendants,
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
+	showSubmenuIcon,
 	insertLinkBlock,
 } ) {
 	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
@@ -92,7 +97,7 @@ function NavigationLinkEdit( {
 					/>
 					<ToolbarButton
 						name="submenu"
-						icon={ <SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24"><Path d="M14 5h8v2h-8zm0 5.5h8v2h-8zm0 5.5h8v2h-8zM2 11.5C2 15.08 4.92 18 8.5 18H9v2l3-3-3-3v2h-.5C6.02 16 4 13.98 4 11.5S6.02 7 8.5 7H12V5H8.5C4.92 5 2 7.92 2 11.5z" /><Path fill="none" d="M0 0h24v24H0z" /></SVG> }
+						icon={ toolbarSubmenuIcon }
 						title={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
@@ -100,7 +105,7 @@ function NavigationLinkEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
-					title={ __( 'Link Settings' ) }
+					title={ __( 'Link settings' ) }
 				>
 					<TextareaControl
 						value={ description || '' }
@@ -108,10 +113,11 @@ function NavigationLinkEdit( {
 							setAttributes( { description: descriptionValue } );
 						} }
 						label={ __( 'Description' ) }
+						help={ __( 'The description will be displayed in the menu if the current theme supports it.' ) }
 					/>
 				</PanelBody>
 				<PanelBody
-					title={ __( 'SEO Settings' ) }
+					title={ __( 'SEO settings' ) }
 				>
 					<TextControl
 						value={ title || '' }
@@ -148,9 +154,10 @@ function NavigationLinkEdit( {
 					'has-link': !! url,
 				} ) }
 			>
-				<div>
+				<div className="wp-block-navigation-link__content">
 					<RichText
-						className="wp-block-navigation-link__content"
+						tagName="span"
+						className="wp-block-navigation-link__label"
 						value={ label }
 						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
 						placeholder={ itemLabelPlaceholder }
@@ -162,27 +169,49 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
+					{ showSubmenuIcon &&
+						<span className="wp-block-navigation-link__submenu-icon">
+							{ itemSubmenuIcon }
+						</span>
+					}
 					{ isLinkOpen && (
-						<LinkControl
-							className="wp-block-navigation-link__inline-link-input"
-							value={ link }
-							onChange={ ( {
-								title: newTitle = '',
-								url: newURL = '',
-								opensInNewTab: newOpensInNewTab,
-							} = {} ) => setAttributes( {
-								title: escape( newTitle ),
-								url: newURL,
-								label: label || escape( newTitle ),
-								opensInNewTab: newOpensInNewTab,
-							} ) }
+						<Popover
+							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
-						/>
+						>
+							<LinkControl
+								className="wp-block-navigation-link__inline-link-input"
+								value={ link }
+								showInitialSuggestions={ true }
+								onChange={ ( {
+									title: newTitle = '',
+									url: newURL = '',
+									opensInNewTab: newOpensInNewTab,
+									id,
+								} = {} ) => setAttributes( {
+									title: escape( newTitle ),
+									url: encodeURI( newURL ),
+									label: ( () => {
+										const normalizedTitle = newTitle.replace( /http(s?):\/\//gi, '' );
+										const normalizedURL = newURL.replace( /http(s?):\/\//gi, '' );
+										if (
+											newTitle !== '' &&
+											normalizedTitle !== normalizedURL &&
+											label !== newTitle ) {
+											return escape( newTitle );
+										}
+										return label;
+									} )(),
+									opensInNewTab: newOpensInNewTab,
+									id,
+								} ) }
+							/>
+						</Popover>
 					) }
 				</div>
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
-					renderAppender={ hasDescendants ? InnerBlocks.ButtonBlockAppender : false }
+					renderAppender={ ( ( hasDescendants && isSelected ) || isParentOfSelectedBlock ) ? InnerBlocks.DefaultAppender : false }
 				/>
 			</div>
 		</Fragment>
@@ -191,12 +220,26 @@ function NavigationLinkEdit( {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getClientIdsOfDescendants, hasSelectedInnerBlock } = select( 'core/block-editor' );
+		const {
+			getBlockName,
+			getBlockAttributes,
+			getBlockParents,
+			getClientIdsOfDescendants,
+			hasSelectedInnerBlock,
+		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
+		const rootBlock = getBlockParents( clientId )[ 0 ];
+		const parentBlock = getBlockParents( clientId, true )[ 0 ];
+		const rootBlockAttributes = getBlockAttributes( rootBlock );
+		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] ).length;
+		const isLevelZero = getBlockName( parentBlock ) === 'core/navigation';
+		const showSubmenuIcon = rootBlockAttributes.showSubmenuIcon && isLevelZero && hasDescendants;
+		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
 		return {
-			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
-			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
+			isParentOfSelectedBlock,
+			hasDescendants,
+			showSubmenuIcon,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {

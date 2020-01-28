@@ -51,10 +51,11 @@ const ColorPanel = ( {
 	detectedBackgroundColor,
 	detectedColor,
 	panelChildren,
+	initialOpen,
 } ) => (
 	<PanelColorSettings
 		title={ title }
-		initialOpen={ false }
+		initialOpen={ initialOpen }
 		colorSettings={ Object.values( colorSettings ) }
 		{ ...colorPanelProps }
 	>
@@ -115,7 +116,7 @@ const InspectorControlsColorPanel = ( props ) => (
 export default function __experimentalUseColors(
 	colorConfigs,
 	{
-		panelTitle = __( 'Color Settings' ),
+		panelTitle = __( 'Color settings' ),
 		colorPanelProps,
 		contrastCheckers,
 		panelChildren,
@@ -125,7 +126,7 @@ export default function __experimentalUseColors(
 			textColorTargetRef = targetRef,
 		} = {},
 	} = {
-		panelTitle: __( 'Color Settings' ),
+		panelTitle: __( 'Color settings' ),
 	},
 	deps = []
 ) {
@@ -316,6 +317,7 @@ export default function __experimentalUseColors(
 
 		const wrappedColorPanelProps = {
 			title: panelTitle,
+			initialOpen: false,
 			colorSettings,
 			colorPanelProps,
 			contrastCheckers,

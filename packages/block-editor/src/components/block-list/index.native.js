@@ -35,6 +35,7 @@ export class BlockList extends Component {
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
+		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind( this );
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -67,6 +68,14 @@ export class BlockList extends Component {
 		);
 	}
 
+	shouldShowInnerBlockAppender() {
+		const {
+			blockClientIds,
+			renderAppender,
+		} = this.props;
+		return ( renderAppender && blockClientIds.length > 0 );
+	}
+
 	render() {
 		const {
 			clearSelectedBlock,
@@ -75,7 +84,7 @@ export class BlockList extends Component {
 			title,
 			header,
 			withFooter = true,
-			renderAppender,
+			isReadOnly,
 			isRootList,
 		} = this.props;
 
@@ -98,16 +107,17 @@ export class BlockList extends Component {
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
 					title={ title }
-					ListHeaderComponent={ header }
-					ListEmptyComponent={ this.renderDefaultBlockAppender }
-					ListFooterComponent={ withFooter && this.renderBlockListFooter }
+					ListHeaderComponent={ ! isReadOnly && header }
+					ListEmptyComponent={ ! isReadOnly && this.renderDefaultBlockAppender }
+					ListFooterComponent={ ! isReadOnly && withFooter && this.renderBlockListFooter }
 				/>
 
-				{ renderAppender && blockClientIds.length > 0 && (
+				{ this.shouldShowInnerBlockAppender() && (
 					<View style={ styles.paddingToContent }>
 						<BlockListAppender
 							rootClientId={ this.props.rootClientId }
 							renderAppender={ this.props.renderAppender }
+							showSeparator
 						/>
 					</View>
 				)
@@ -118,19 +128,26 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId } ) {
-		const { shouldShowInsertionPointBefore, shouldShowInsertionPointAfter } = this.props;
+		const {
+			isReadOnly,
+			shouldShowInsertionPointBefore,
+			shouldShowInsertionPointAfter,
+		} = this.props;
+
 		return (
 			<ReadableContentView>
-				{ shouldShowInsertionPointBefore( clientId ) && <BlockInsertionPoint /> }
-				<BlockListBlock
-					key={ clientId }
-					showTitle={ false }
-					clientId={ clientId }
-					rootClientId={ this.props.rootClientId }
-					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-					isSmallScreen={ ! this.props.isFullyBordered }
-				/>
-				{ shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
+				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
+					{ shouldShowInsertionPointBefore( clientId ) && <BlockInsertionPoint /> }
+					<BlockListBlock
+						key={ clientId }
+						showTitle={ false }
+						clientId={ clientId }
+						rootClientId={ this.props.rootClientId }
+						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
+						isSmallScreen={ ! this.props.isFullyBordered }
+					/>
+					{ ! this.shouldShowInnerBlockAppender() && shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
+				</View>
 			</ReadableContentView>
 		);
 	}
@@ -158,6 +175,7 @@ export default compose( [
 			getSelectedBlockClientId,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
+			getSettings,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -189,6 +207,8 @@ export default compose( [
 			);
 		};
 
+		const isReadOnly = getSettings().readOnly;
+
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -196,6 +216,7 @@ export default compose( [
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			selectedBlockClientId,
+			isReadOnly,
 			isRootList: rootClientId === undefined,
 		};
 	} ),

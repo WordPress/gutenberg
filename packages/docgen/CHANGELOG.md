@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fixes
+
+- The built-in Markdown formatter will output text indicating that the type is unknown if a type cannot be parsed. Previously, these would be output wrongly as the `null` type.
+
 ## 1.3.0 (2019-08-05)
 
 ### Bug Fixes

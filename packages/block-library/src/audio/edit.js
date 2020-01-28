@@ -21,11 +21,7 @@ import {
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import icon from './icon';
+import { audio as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -148,7 +144,7 @@ class AudioEdit extends Component {
 					/>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Audio Settings' ) }>
+					<PanelBody title={ __( 'Audio settings' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }

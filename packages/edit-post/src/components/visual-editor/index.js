@@ -16,6 +16,7 @@ import {
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalBlockSettingsMenuPluginsExtension,
 } from '@wordpress/block-editor';
+import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -28,15 +29,18 @@ function VisualEditor() {
 		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
 			<VisualEditorGlobalKeyboardShortcuts />
 			<MultiSelectScrollIntoView />
+			<Popover.Slot name="block-toolbar" />
 			<Typewriter>
-				<WritingFlow>
-					<ObserveTyping>
-						<CopyHandler>
-							<PostTitle />
-							<BlockList />
-						</CopyHandler>
-					</ObserveTyping>
-				</WritingFlow>
+				<CopyHandler>
+					<WritingFlow>
+						<ObserveTyping>
+							<CopyHandler>
+								<PostTitle />
+								<BlockList />
+							</CopyHandler>
+						</ObserveTyping>
+					</WritingFlow>
+				</CopyHandler>
 			</Typewriter>
 			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }

@@ -37,7 +37,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	return (
 		<Fragment>
 			<InspectorControls>
-				<PanelBody title={ sprintf( __( '%s Label' ), socialLinkName ) } initialOpen={ false }>
+				<PanelBody title={ sprintf( __( '%s label' ), socialLinkName ) } initialOpen={ false }>
 					<PanelRow>
 						<TextControl
 							label={ __( 'Link Label' ) }
@@ -63,7 +63,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 								event.preventDefault();
 								setPopover( false );
 							} } >
-							<div className="editor-url-input block-editor-url-input">
+							<div className="block-editor-url-input">
 								<URLInput
 									value={ url }
 									onChange={ ( nextURL ) => setAttributes( { url: nextURL } ) }

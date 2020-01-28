@@ -15,7 +15,9 @@ module.exports = function( api ) {
 	} );
 
 	const getPresetEnv = () => {
-		const opts = {};
+		const opts = {
+			shippedProposals: true,
+		};
 
 		if ( isTestEnv ) {
 			opts.targets = {
@@ -56,6 +58,7 @@ module.exports = function( api ) {
 		presets: [ getPresetEnv() ],
 		plugins: [
 			require.resolve( '@babel/plugin-proposal-object-rest-spread' ),
+			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
 				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
 				{
