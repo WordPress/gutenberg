@@ -52,7 +52,7 @@ Value change handler, called with the updated value if the user selects a new li
 ```jsx
 <LinkControl
 	onChange={ ( nextValue ) => {
-		console.log( `The item selected has the ${ nextValue.id } id.` );
+		console.log( `The selected item URL: ${ nextValue.url }.` );
 	}
 /> 
 ```
