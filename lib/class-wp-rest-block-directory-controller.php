@@ -140,7 +140,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			! current_user_can( 'deactivate_plugin', $plugin )
 		) {
 			return new WP_Error(
-				'rest_user_cannot_edit',
+				'rest_user_cannot_delete',
 				__( 'Sorry, you are not allowed to uninstall blocks.', 'gutenberg' )
 			);
 		}
