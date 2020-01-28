@@ -66,7 +66,7 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 					getComputedStyle(
 						element,
 						'first-letter'
-					).height
+					).lineHeight
 				);
 			} else if ( minimumHeight ) {
 				setMinimumHeight( undefined );
@@ -125,7 +125,7 @@ function ParagraphBlock( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Text Settings' ) }>
+				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
 						value={ fontSize.size }
 						onChange={ setFontSize }

@@ -69,7 +69,7 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 		[ setAttributes ]
 	);
 	return (
-		<PanelBody title={ __( 'Border Settings' ) }>
+		<PanelBody title={ __( 'Border settings' ) }>
 			<RangeControl
 				value={ borderRadius }
 				label={ __( 'Border Radius' ) }

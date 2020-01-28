@@ -350,15 +350,18 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
  */
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
+	let markNextChangeAsNotPersistent = false;
 
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
 
-		const isExplicitPersistentChange = action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT';
+		const isExplicitPersistentChange = action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' || markNextChangeAsNotPersistent;
 
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
 		if ( state === nextState && ! isExplicitPersistentChange ) {
+			markNextChangeAsNotPersistent = action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
+
 			const nextIsPersistentChange = get( state, [ 'isPersistentChange' ], true );
 			if ( state.isPersistentChange === nextIsPersistentChange ) {
 				return state;
@@ -372,16 +375,16 @@ function withPersistentBlockChange( reducer ) {
 
 		nextState = {
 			...nextState,
-			isPersistentChange: (
-				isExplicitPersistentChange ||
-				! isUpdatingSameBlockAttribute( action, lastAction )
-			),
+			isPersistentChange: isExplicitPersistentChange ?
+				! markNextChangeAsNotPersistent :
+				! isUpdatingSameBlockAttribute( action, lastAction ),
 		};
 
 		// In comparing against the previous action, consider only those which
 		// would have qualified as one which would have been ignored or not
 		// have resulted in a changed state.
 		lastAction = action;
+		markNextChangeAsNotPersistent = action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
 		return nextState;
 	};
@@ -1344,30 +1347,11 @@ export function automaticChangeStatus( state, action ) {
 			return;
 		// Undoing an automatic change should still be possible after mouse
 		// move.
-		case 'SET_SELECTED_MOUNTED_BLOCK':
 		case 'STOP_TYPING':
 			return state;
 	}
 
 	// Reset the state by default (for any action not handled).
-}
-
-/**
- * Reducer returning selected and mounted block. This state is useful for
- * components rendering and positioning controls around the block's node.
- *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {boolean} Updated state.
- */
-export function selectedMountedBlock( state, action ) {
-	switch ( action.type ) {
-		case 'SET_SELECTED_MOUNTED_BLOCK':
-			return action.clientId;
-	}
-
-	return state;
 }
 
 export default combineReducers( {
@@ -1389,5 +1373,4 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	isNavigationMode,
 	automaticChangeStatus,
-	selectedMountedBlock,
 } );

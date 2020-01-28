@@ -26,6 +26,7 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
+import { table as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -41,7 +42,6 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
-import icon from './icon';
 
 const BACKGROUND_COLORS = [
 	{
@@ -559,7 +559,7 @@ export class TableEdit extends Component {
 					/>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Table Settings' ) } className="blocks-table-settings">
+					<PanelBody title={ __( 'Table settings' ) } className="blocks-table-settings">
 						<ToggleControl
 							label={ __( 'Fixed width table cells' ) }
 							checked={ !! hasFixedLayout }
@@ -577,7 +577,7 @@ export class TableEdit extends Component {
 						/>
 					</PanelBody>
 					<PanelColorSettings
-						title={ __( 'Color Settings' ) }
+						title={ __( 'Color settings' ) }
 						initialOpen={ false }
 						colorSettings={ [
 							{

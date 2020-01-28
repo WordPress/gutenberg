@@ -37,7 +37,7 @@ The following example in JavaScript creates a new block using [InnerBlocks](/pac
 ```js
 const el = wp.element.createElement;
 const { registerBlockType } = wp.blocks;
-const { InnerBlocks } = wp.editor;
+const { InnerBlocks } = wp.blockEditor;
 
 const BLOCKS_TEMPLATE = [
 	[ 'core/image', {} ],

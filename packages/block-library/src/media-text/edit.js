@@ -102,7 +102,6 @@ class MediaTextEdit extends Component {
 			mediaUrl: src || media.url,
 			mediaLink: media.link || undefined,
 			href: newHref,
-			imageFill: undefined,
 			focalPoint: undefined,
 		} );
 	}
@@ -209,7 +208,7 @@ class MediaTextEdit extends Component {
 			setAttributes( { verticalAlignment: alignment } );
 		};
 		const mediaTextGeneralSettings = (
-			<PanelBody title={ __( 'Media & Text Settings' ) }>
+			<PanelBody title={ __( 'Media & Text settings' ) }>
 				<ToggleControl
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }
@@ -251,7 +250,7 @@ class MediaTextEdit extends Component {
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
 					<PanelColorSettings
-						title={ __( 'Color Settings' ) }
+						title={ __( 'Color settings' ) }
 						initialOpen={ false }
 						colorSettings={ colorSettings }
 					/>

@@ -196,9 +196,9 @@ const ColumnsEdit = ( props ) => {
 
 		return {
 			blockType: getBlockType( name ),
-			defaultPattern: __experimentalGetDefaultBlockPattern( name ),
+			defaultPattern: __experimentalGetDefaultBlockPattern( name, 'block' ),
 			hasInnerBlocks: select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
-			patterns: __experimentalGetBlockPatterns( name ),
+			patterns: __experimentalGetBlockPatterns( name, 'block' ),
 		};
 	}, [ clientId, name ] );
 

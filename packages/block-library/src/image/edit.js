@@ -45,12 +45,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
+import { image as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
-import icon from './icon';
 import ImageSize from './image-size';
 /**
  * Module constants
@@ -417,7 +417,7 @@ export class ImageEdit extends Component {
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<>
 				<InspectorControls>
-					<PanelBody title={ __( 'Image Settings' ) }>
+					<PanelBody title={ __( 'Image settings' ) }>
 						<TextareaControl
 							label={ __( 'Alt Text (Alternative Text)' ) }
 							value={ alt }

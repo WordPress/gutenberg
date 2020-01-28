@@ -22,12 +22,13 @@ import {
 } from '@wordpress/block-editor';
 
 import { createBlock } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import {
 	Button,
 	PanelBody,
 	Placeholder,
 	Spinner,
+	ToggleControl,
 	Toolbar,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -60,6 +61,7 @@ function Navigation( {
 	//
 	/* eslint-disable @wordpress/no-unused-vars-before-return */
 	const ref = useRef();
+	const { selectBlock } = useDispatch( 'core/block-editor' );
 
 	const {
 		TextColor,
@@ -126,6 +128,7 @@ function Navigation( {
 
 	function handleCreateFromExistingPages() {
 		updateNavItemBlocks( defaultPagesNavigationItems );
+		selectBlock( clientId );
 	}
 
 	const hasPages = hasResolvedPages && pages && pages.length;
@@ -208,7 +211,7 @@ function Navigation( {
 				>
 					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
-				<PanelBody title={ __( 'Text Settings' ) }>
+				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
 						value={ fontSize.size }
 						onChange={ setFontSize }
@@ -216,6 +219,19 @@ function Navigation( {
 				</PanelBody>
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
+			<InspectorControls>
+				<PanelBody
+					title={ __( 'Display settings' ) }
+				>
+					<ToggleControl
+						checked={ attributes.showSubmenuIcon }
+						onChange={ ( value ) => {
+							setAttributes( { showSubmenuIcon: value } );
+						} }
+						label={ __( 'Show submenu icon for top-level items' ) }
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<TextColor>
 				<BackgroundColor>
 					<div

@@ -49,47 +49,130 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 
 	if ( dir > 0 && ! isLast ) {
 		// moving down
-		return sprintf(
-			// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: Direction of movement ( up, down, left, right ), 4: New position
-			__( 'Move %1$s block from position %2$d %3$s to position %4$d' ),
-			type,
-			position,
-			getMovementDirection( 'down' ),
-			( position + 1 ),
-		);
+		const movementDirection = getMovementDirection( 'down' );
+
+		if ( movementDirection === 'down' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
+				__( 'Move %1$s block from position %2$d down to position %3$d' ),
+				type,
+				position,
+				( position + 1 ),
+			);
+		}
+
+		if ( movementDirection === 'left' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
+				__( 'Move %1$s block from position %2$d left to position %3$d' ),
+				type,
+				position,
+				( position + 1 ),
+			);
+		}
+
+		if ( movementDirection === 'right' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
+				__( 'Move %1$s block from position %2$d right to position %3$d' ),
+				type,
+				position,
+				( position + 1 ),
+			);
+		}
 	}
 
 	if ( dir > 0 && isLast ) {
 		// moving down, and is the last item
-		// translators: 1: Type of block (i.e. Text, Image etc), 2: Direction of movement ( up, down, left, right )
-		return sprintf(
-			__( 'Block %1$s is at the end of the content and can’t be moved %2$s' ),
-			type,
-			getMovementDirection( 'down' ),
+		const movementDirection = getMovementDirection( 'down' );
 
-		);
+		if ( movementDirection === 'down' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
+				__( 'Block %1$s is at the end of the content and can’t be moved down' ),
+				type,
+			);
+		}
+
+		if ( movementDirection === 'left' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
+				__( 'Block %1$s is at the end of the content and can’t be moved left' ),
+				type,
+			);
+		}
+
+		if ( movementDirection === 'right' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
+				__( 'Block %1$s is at the end of the content and can’t be moved right' ),
+				type,
+			);
+		}
 	}
 
 	if ( dir < 0 && ! isFirst ) {
 		// moving up
-		return sprintf(
-			// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: Direction of movement ( up, down, left, right ), 4: New position
-			__( 'Move %1$s block from position %2$d %3$s to position %4$d' ),
-			type,
-			position,
-			getMovementDirection( 'up' ),
-			( position - 1 ),
-		);
+		const movementDirection = getMovementDirection( 'up' );
+
+		if ( movementDirection === 'up' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
+				__( 'Move %1$s block from position %2$d up to position %3$d' ),
+				type,
+				position,
+				( position - 1 ),
+			);
+		}
+
+		if ( movementDirection === 'left' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
+				__( 'Move %1$s block from position %2$d left to position %3$d' ),
+				type,
+				position,
+				( position - 1 ),
+			);
+		}
+
+		if ( movementDirection === 'right' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
+				__( 'Move %1$s block from position %2$d right to position %3$d' ),
+				type,
+				position,
+				( position - 1 ),
+			);
+		}
 	}
 
 	if ( dir < 0 && isFirst ) {
 		// moving up, and is the first item
-		// translators: 1: Type of block (i.e. Text, Image etc), 2: Direction of movement ( up, down, left, right )
-		return sprintf(
-			__( 'Block %1$s is at the beginning of the content and can’t be moved %2$s' ),
-			type,
-			getMovementDirection( 'up' ),
-		);
+		const movementDirection = getMovementDirection( 'up' );
+
+		if ( movementDirection === 'up' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
+				__( 'Block %1$s is at the beginning of the content and can’t be moved up' ),
+				type,
+			);
+		}
+
+		if ( movementDirection === 'left' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
+				__( 'Block %1$s is at the beginning of the content and can’t be moved left' ),
+				type,
+			);
+		}
+
+		if ( movementDirection === 'right' ) {
+			return sprintf(
+				// translators: 1: Type of block (i.e. Text, Image etc)
+				__( 'Block %1$s is at the beginning of the content and can’t be moved right' ),
+				type,
+			);
+		}
 	}
 }
 

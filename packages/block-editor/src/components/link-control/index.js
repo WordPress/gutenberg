@@ -10,7 +10,6 @@ import { noop, startsWith } from 'lodash';
 import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState, Fragment } from '@wordpress/element';
-
 import {
 	safeDecodeURI,
 	filterURLForDisplay,
@@ -18,7 +17,6 @@ import {
 	prependHTTP,
 	getProtocol,
 } from '@wordpress/url';
-
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
@@ -29,8 +27,6 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
-const MODE_EDIT = 'edit';
-
 function LinkControl( {
 	value,
 	settings,
@@ -38,7 +34,7 @@ function LinkControl( {
 	showInitialSuggestions,
 } ) {
 	const instanceId = useInstanceId( LinkControl );
-	const [ inputValue, setInputValue ] = useState( '' );
+	const [ inputValue, setInputValue ] = useState( ( value && value.url ) || '' );
 	const [ isEditingLink, setIsEditingLink ] = useState( ! value || ! value.url );
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -46,8 +42,7 @@ function LinkControl( {
 			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
 		};
 	}, [] );
-
-	// Handlers
+	const displayURL = ( value && filterURLForDisplay( safeDecodeURI( value.url ) ) ) || '';
 
 	/**
 	 * onChange LinkControlSearchInput event handler
@@ -56,24 +51,6 @@ function LinkControl( {
 	 */
 	const onInputChange = ( val = '' ) => {
 		setInputValue( val );
-	};
-
-	// Utils
-
-	/**
-	 * Handler function which switches the mode of the component,
-	 * between `edit` and `show` mode.
-	 *
-	 * @param {string} mode Component mode: `show` or `edit`.
-	 */
-	const setMode = ( mode = 'show' ) => () => {
-		setIsEditingLink( MODE_EDIT === mode );
-
-		// Populate input searcher whether
-		// the current link has a title.
-		if ( value && value.title && MODE_EDIT === mode ) {
-			setInputValue( value.title );
-		}
 	};
 
 	const resetInput = () => {
@@ -197,12 +174,20 @@ function LinkControl( {
 								className="block-editor-link-control__search-item-title"
 								href={ value.url }
 							>
-								{ value.title }
+								{ ( value && value.title ) || displayURL }
 							</ExternalLink>
-							<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( value.url ) ) || '' }</span>
+							{ value && value.title && (
+								<span className="block-editor-link-control__search-item-info">
+									{ displayURL }
+								</span>
+							) }
 						</span>
 
-						<Button isSecondary onClick={ setMode( MODE_EDIT ) } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
+						<Button
+							isSecondary
+							onClick={ () => setIsEditingLink( true ) }
+							className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit"
+						>
 							{ __( 'Edit' ) }
 						</Button>
 					</div>

@@ -55,6 +55,18 @@ function selector( select ) {
 	};
 }
 
+function toggleRichText( container, toggle ) {
+	Array
+		.from( container.querySelectorAll( '.rich-text' ) )
+		.forEach( ( node ) => {
+			if ( toggle ) {
+				node.setAttribute( 'contenteditable', true );
+			} else {
+				node.removeAttribute( 'contenteditable' );
+			}
+		} );
+}
+
 export default function useMultiSelection( ref ) {
 	const {
 		isSelectionEnabled,
@@ -72,6 +84,7 @@ export default function useMultiSelection( ref ) {
 	} = useDispatch( 'core/block-editor' );
 	const rafId = useRef();
 	const startClientId = useRef();
+	const anchorElement = useRef();
 
 	/**
 	 * When the component updates, and there is multi selection, we need to
@@ -79,7 +92,7 @@ export default function useMultiSelection( ref ) {
 	 */
 	useEffect( () => {
 		if ( ! hasMultiSelection || isMultiSelecting ) {
-			if ( ! selectedBlockClientId ) {
+			if ( ! selectedBlockClientId || isMultiSelecting ) {
 				return;
 			}
 
@@ -134,18 +147,38 @@ export default function useMultiSelection( ref ) {
 		selectedBlockClientId,
 	] );
 
-	const onSelectionChange = useCallback( () => {
+	const onSelectionChange = useCallback( ( { isSelectionEnd } ) => {
 		const selection = window.getSelection();
 
-		// If no selection is found, end multi selection.
+		// If no selection is found, end multi selection and enable all rich
+		// text areas.
 		if ( ! selection.rangeCount || selection.isCollapsed ) {
+			toggleRichText( ref.current, true );
 			return;
 		}
 
 		const clientId = getBlockClientId( selection.focusNode );
+		const isSingularSelection = startClientId.current === clientId;
 
-		if ( startClientId.current === clientId ) {
+		if ( isSingularSelection ) {
 			selectBlock( clientId );
+
+			// If the selection is complete (on mouse up), and no multiple
+			// blocks have been selected, set focus back to the anchor element
+			// if the anchor element contains the selection. Additionally, rich
+			// text elements that were previously disabled can now be enabled
+			// again.
+			if ( isSelectionEnd ) {
+				toggleRichText( ref.current, true );
+
+				if ( selection.rangeCount ) {
+					const { commonAncestorContainer } = selection.getRangeAt( 0 );
+
+					if ( anchorElement.current.contains( commonAncestorContainer ) ) {
+						anchorElement.current.focus();
+					}
+				}
+			}
 		} else {
 			const startPath = [ ...getBlockParents( startClientId.current ), startClientId.current ];
 			const endPath = [ ...getBlockParents( clientId ), clientId ];
@@ -165,7 +198,7 @@ export default function useMultiSelection( ref ) {
 		// The browser selection won't have updated yet at this point, so wait
 		// until the next animation frame to get the browser selection.
 		rafId.current = window.requestAnimationFrame( () => {
-			onSelectionChange();
+			onSelectionChange( { isSelectionEnd: true } );
 			stopMultiSelect();
 		} );
 	}, [ onSelectionChange, stopMultiSelect ] );
@@ -187,6 +220,7 @@ export default function useMultiSelection( ref ) {
 		}
 
 		startClientId.current = clientId;
+		anchorElement.current = document.activeElement;
 		startMultiSelect();
 
 		// `onSelectionStart` is called after `mousedown` and `mouseleave`
@@ -203,7 +237,6 @@ export default function useMultiSelection( ref ) {
 		// especially in Safari for the blocks that are asynchonously rendered.
 		// To ensure the browser instantly removes the selection boundaries, we
 		// remove the contenteditable attributes manually.
-		Array.from( ref.current.querySelectorAll( '.rich-text' ) )
-			.forEach( ( node ) => node.removeAttribute( 'contenteditable' ) );
+		toggleRichText( ref.current, false );
 	}, [ isSelectionEnabled, startMultiSelect, onSelectionEnd ] );
 }

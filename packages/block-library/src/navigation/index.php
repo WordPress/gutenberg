@@ -111,6 +111,15 @@ function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
 }
 
 /**
+ * Returns the top-level submenu SVG chevron icon.
+ *
+ * @return string
+ */
+function render_submenu_icon() {
+	return '<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" role="img" aria-hidden="true" focusable="false"><polygon points="9,13.5 14.7,7.9 13.2,6.5 9,10.7 4.8,6.5 3.3,7.9 "></polygon></svg>';
+}
+
+/**
  * Renders the `core/navigation` block on server.
  *
  * @param array $attributes The block attributes.
@@ -145,21 +154,22 @@ function render_block_navigation( $attributes, $content, $block ) {
 		'<nav %1$s %2$s>%3$s</nav>',
 		$class_attribute,
 		$style_attribute,
-		build_navigation_html( $block, $colors, $font_sizes )
+		build_navigation_html( $attributes, $block, $colors, $font_sizes, true )
 	);
 }
 
 /**
  * Walks the inner block structure and returns an HTML list for it.
  *
- * @param array $block      The block.
- * @param array $colors     Contains inline styles and CSS classes to apply to navigation item.
- * @param array $font_sizes Contains inline styles and CSS classes to apply to navigation item.
- * @param bool  $level_zero True whether is main menu (level zero). Otherwise, False.
+ * @param array $attributes    The Navigation block attributes.
+ * @param array $block         The NavigationItem block.
+ * @param array $colors        Contains inline styles and CSS classes to apply to navigation item.
+ * @param array $font_sizes    Contains inline styles and CSS classes to apply to navigation item.
+ * @param bool  $is_level_zero True whether is main menu (level zero). Otherwise, False.
  *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function build_navigation_html( $block, $colors, $font_sizes, $level_zero = true ) {
+function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_level_zero = true ) {
 	$html            = '';
 	$classes         = array_merge(
 		$colors['css_classes'],
@@ -172,11 +182,12 @@ function build_navigation_html( $block, $colors, $font_sizes, $level_zero = true
 		: '';
 
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
+		$has_submenu = count( (array) $block['innerBlocks'] ) > 0;
 
-		$html .= '<li class="wp-block-navigation-link">' .
+		$html .= '<li class="wp-block-navigation-link' . ( $has_submenu ? ' has-submenu' : '' ) . '">' .
 			'<a';
 
-		if ( $level_zero ) {
+		if ( $is_level_zero ) {
 			$html .= $class_attribute . $style_attribute;
 		}
 
@@ -194,7 +205,10 @@ function build_navigation_html( $block, $colors, $font_sizes, $level_zero = true
 		// End appending HTML attributes to anchor tag.
 
 		// Start anchor tag content.
-		$html .= '>';
+		$html .= '>' .
+			// Wrap title with span to isolate it from submenu icon.
+			'<span class="wp-block-navigation-link__label">';
+
 		if ( isset( $block['attrs']['label'] ) ) {
 			$html .= wp_kses(
 				$block['attrs']['label'],
@@ -216,11 +230,19 @@ function build_navigation_html( $block, $colors, $font_sizes, $level_zero = true
 				)
 			);
 		}
+
+		$html .= '</span>';
+
+		// Append submenu icon to top-level item.
+		if ( $attributes['showSubmenuIcon'] && $is_level_zero && $has_submenu ) {
+			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . render_submenu_icon() . '</span>';
+		}
+
 		$html .= '</a>';
 		// End anchor tag content.
 
-		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
-			$html .= build_navigation_html( $block, $colors, $font_sizes, false );
+		if ( $has_submenu ) {
+			$html .= build_navigation_html( $attributes, $block, $colors, $font_sizes, false );
 		}
 
 		$html .= '</li>';
@@ -263,6 +285,10 @@ function register_block_core_navigation() {
 				),
 				'itemsJustification'    => array(
 					'type' => 'string',
+				),
+				'showSubmenuIcon'       => array(
+					'type'    => 'boolean',
+					'default' => false,
 				),
 			),
 

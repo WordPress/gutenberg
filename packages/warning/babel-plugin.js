@@ -69,9 +69,9 @@ function babelPlugin( { types: t } ) {
 
 				if ( path.get( 'callee' ).isIdentifier( { name } ) ) {
 					// Turns this code:
-					// warning(condition, argument, argument);
+					// warning(argument);
 					// into this:
-					// typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(condition, argument, argument) : void 0;
+					// typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(argument) : void 0;
 					node[ seen ] = true;
 					path.replaceWith(
 						t.ifStatement(

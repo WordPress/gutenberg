@@ -7,13 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component, forwardRef } from '@wordpress/element';
+import { G, Path, SVG } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import Icon from '../icon';
-import { G, Path, SVG } from '../primitives';
 
 export class PanelBody extends Component {
 	constructor( props ) {

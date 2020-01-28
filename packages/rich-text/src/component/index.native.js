@@ -731,6 +731,7 @@ export class RichText extends Component {
 					isSelected,
 					value: record,
 					onChange: this.onFormatChange,
+					onFocus: () => {},
 				} ) }
 				<RCTAztecView
 					ref={ ( ref ) => {
@@ -773,6 +774,7 @@ export class RichText extends Component {
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
 					minWidth={ minWidth }
 					id={ this.props.id }
+					selectionColor={ this.props.selectionColor }
 				/>
 				{ isSelected && <FormatEdit
 					formatTypes={ formatTypes }
