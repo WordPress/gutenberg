@@ -56,6 +56,10 @@ export class RootComponent extends React.Component {
 		setupLocale( props.locale, props.translations );
 		setupApiFetch();
 		require( '@wordpress/edit-post' ).initializeEditor();
+
+		const isHermes = () => global.HermesInternal !== null;
+		// eslint-disable-next-line no-console
+		console.log( 'Hermes is: ' + isHermes() );
 	}
 
 	render() {
