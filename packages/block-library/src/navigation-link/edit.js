@@ -175,7 +175,10 @@ function NavigationLinkEdit( {
 						</span>
 					}
 					{ isLinkOpen && (
-						<Popover position="bottom center">
+						<Popover
+							position="bottom center"
+							onClose={ () => setIsLinkOpen( false ) }
+						>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
@@ -202,7 +205,6 @@ function NavigationLinkEdit( {
 									opensInNewTab: newOpensInNewTab,
 									id,
 								} ) }
-								onClose={ () => setIsLinkOpen( false ) }
 							/>
 						</Popover>
 					) }
