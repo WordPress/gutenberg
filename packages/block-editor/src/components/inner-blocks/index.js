@@ -150,6 +150,8 @@ class InnerBlocks extends Component {
 			hasOverlay,
 			__experimentalCaptureToolbars: captureToolbars,
 			forwardedRef,
+			onInput,
+			isSelected,
 			...props
 		} = this.props;
 		const { templateInProcess } = this.state;
@@ -161,6 +163,8 @@ class InnerBlocks extends Component {
 		const classes = classnames( {
 			'has-overlay': enableClickThrough && hasOverlay,
 			'is-capturing-toolbar': captureToolbars,
+			'is-controlled': onInput,
+			'is-selected': isSelected,
 		} );
 
 		const blockList = (
@@ -201,14 +205,15 @@ const ComposedInnerBlocks = compose( [
 		const { clientId, isSmallScreen } = ownProps;
 		const block = getBlock( clientId );
 		const rootClientId = getBlockRootClientId( clientId );
+		const isSelected =
+			isBlockSelected( clientId ) ||
+			hasSelectedInnerBlock( clientId, true );
 
 		return {
 			block,
 			blockListSettings: getBlockListSettings( clientId ),
-			hasOverlay:
-				block.name !== 'core/template' &&
-				! isBlockSelected( clientId ) &&
-				! hasSelectedInnerBlock( clientId, true ),
+			hasOverlay: block.name !== 'core/template' && ! isSelected,
+			isSelected,
 			parentLock: getTemplateLock( rootClientId ),
 			enableClickThrough: isNavigationMode() || isSmallScreen,
 			isLastBlockChangePersistent: isLastBlockChangePersistent(),
