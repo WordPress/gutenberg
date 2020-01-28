@@ -1,24 +1,24 @@
 import React, { Component } from 'react';
 import {StyleSheet, Button, View} from 'react-native';
-import AztecView from '@wordpress/react-native-aztec'
+import AztecView from 'react-native-aztec'
 
 const _minHeight = 100;
 
 export default class Editor extends Component {
     constructor(props) {
         super(props);
-        this.onFormatPress = this.onFormatPress.bind(this)
+        this.onFormatPress = this.onFormatPress.bind(this) 
         this.onActiveFormatsChange = this.onActiveFormatsChange.bind(this)
         this.isFormatActive = this.isFormatActive.bind(this)
-        this.state = { activeFormats: [] };
+        this.state = { activeFormats: [] };       
     }
-
+    
     onFormatPress( format ) {
       const { _aztec } = this.refs;
       _aztec.applyFormat(format);
     }
 
-    onActiveFormatsChange( formats ) {
+    onActiveFormatsChange( formats ) {      
       this.setState({activeFormats: formats });
     }
 
@@ -27,10 +27,10 @@ export default class Editor extends Component {
       console.log(activeFormats);
       return activeFormats.indexOf(format) != -1;
     }
-
+    
     render() {
       const { item, onContentSizeChange } = this.props;
-      let myMinHeight = Math.max(_minHeight, item.height);
+      let myMinHeight = Math.max(_minHeight, item.height);      
       return (
               <View>
               <View style={{flex: 1, flexDirection: 'row'}}>
@@ -41,10 +41,10 @@ export default class Editor extends Component {
               <AztecView
                 ref="_aztec"
                 style={[styles.aztec_editor, {minHeight: myMinHeight}]}
-                text = { { text: item.text } }
+                text = { { text: item.text } } 
                 disableGutenbergMode = { true }
                 placeholder = {'This is the placeholder text'}
-                placeholderTextColor = {'lightgray'} // See http://facebook.github.io/react-native/docs/colors
+                placeholderTextColor = {'lightgray'} // See http://facebook.github.io/react-native/docs/colors                
                 onContentSizeChange= { onContentSizeChange }
                 onChange= {(event) => console.log(event.nativeEvent) }
                 onEnter= {(event) => console.log("asta") }
@@ -55,11 +55,11 @@ export default class Editor extends Component {
                 onEndEditing= {(event) => console.log(event.nativeEvent) }
                 onActiveFormatsChange = { this.onActiveFormatsChange }
                 color = {'black'}
-                maxImagesWidth = {200}
+                maxImagesWidth = {200} 
               />
               </View>
             )
-    }
+    }    
 }
 
 var styles = StyleSheet.create({
