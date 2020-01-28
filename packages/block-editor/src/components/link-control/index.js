@@ -27,6 +27,62 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
+/**
+ * Default properties associated with a link control value.
+ *
+ * @typedef WPLinkControlDefaultValue
+ *
+ * @property {string}   url           Link URL.
+ * @property {string=}  title         Link title.
+ * @property {boolean=} opensInNewTab Whether link should open in a new browser
+ *                                    tab. This value is only assigned if not
+ *                                    providing a custom `settings` prop.
+ */
+
+/**
+ * Custom settings values associated with a link.
+ *
+ * @typedef {{[setting:string]:any}} WPLinkControlSettingsValue
+ */
+
+/**
+ * Custom settings values associated with a link.
+ *
+ * @typedef WPLinkControlSetting
+ *
+ * @property {string} id    Identifier to use as property for setting value.
+ * @property {string} title Human-readable label to show in user interface.
+ */
+
+/**
+ * Properties associated with a link control value, composed as a union of the
+ * default properties and any custom settings values.
+ *
+ * @typedef {WPLinkControlDefaultValue&WPLinkControlSettingsValue} WPLinkControlValue
+ */
+
+/** @typedef {(nextValue:WPLinkControlValue)=>void} WPLinkControlOnChangeProp */
+
+/**
+ * @typedef WPLinkControlProps
+ *
+ * @property {(WPLinkControlSetting[])=}  settings               An array of settings objects. Each object will used to
+ *                                                               render a `ToggleControl` for that setting.
+ * @property {(search:string)=>Promise=}  fetchSearchSuggestions Fetches suggestions for a given search term,
+ *                                                               returning a promise resolving once fetch is complete.
+ * @property {WPLinkControlValue=}        value                  Current link value.
+ * @property {WPLinkControlOnChangeProp=} onChange               Value change handler, called with the updated value if
+ *                                                               the user selects a new link or updates settings.
+ * @property {boolean=}                   showInitialSuggestions Whether to present initial suggestions immediately.
+ */
+
+/**
+ * Renders a link control. A link control is a controlled input which maintains
+ * a value associated with a link (HTML anchor element) and relevant settings
+ * for how that link is expected to behave.
+ *
+ * @param {WPLinkControlProps} props Component props.
+ */
 function LinkControl( {
 	value,
 	settings,
@@ -157,7 +213,19 @@ function LinkControl( {
 
 	return (
 		<div className="block-editor-link-control">
-			{ ( ! isEditingLink ) && (
+			{ isEditingLink || ! value ?
+				<LinkControlSearchInput
+					value={ inputValue }
+					onChange={ onInputChange }
+					onSelect={ ( suggestion ) => {
+						setIsEditingLink( false );
+						onChange( { ...value, ...suggestion } );
+					} }
+					renderSuggestions={ renderSearchResults }
+					fetchSuggestions={ getSearchHandler }
+					onReset={ resetInput }
+					showInitialSuggestions={ showInitialSuggestions }
+				/> :
 				<Fragment>
 					<p className="screen-reader-text" id={ `current-link-label-${ instanceId }` }>
 						{ __( 'Currently selected' ) }:
@@ -191,27 +259,13 @@ function LinkControl( {
 							{ __( 'Edit' ) }
 						</Button>
 					</div>
+					<LinkControlSettingsDrawer
+						value={ value }
+						settings={ settings }
+						onChange={ onChange }
+					/>
 				</Fragment>
-			) }
-
-			{ isEditingLink && (
-				<LinkControlSearchInput
-					value={ inputValue }
-					onChange={ onInputChange }
-					onSelect={ ( suggestion ) => {
-						setIsEditingLink( false );
-						onChange( { ...value, ...suggestion } );
-					} }
-					renderSuggestions={ renderSearchResults }
-					fetchSuggestions={ getSearchHandler }
-					onReset={ resetInput }
-					showInitialSuggestions={ showInitialSuggestions }
-				/>
-			) }
-
-			{ ! isEditingLink && (
-				<LinkControlSettingsDrawer value={ value } settings={ settings } onChange={ onChange } />
-			) }
+			}
 		</div>
 	);
 }
