@@ -445,6 +445,7 @@ class RichText extends Component {
 		const {
 			__unstableInputRule: inputRule,
 			__unstableMarkAutomaticChange: markAutomaticChange,
+			__unstableAllowPrefixTransformations: allowPrefixTransformations,
 			formatTypes,
 			setTimeout,
 			clearTimeout,
@@ -453,6 +454,10 @@ class RichText extends Component {
 		// Create an undo level when input stops for over a second.
 		clearTimeout( this.onInput.timeout );
 		this.onInput.timeout = setTimeout( this.onCreateUndoLevel, 1000 );
+
+		if ( ! allowPrefixTransformations ) {
+			return;
+		}
 
 		// Only run input rules when inserting text.
 		if ( inputType !== 'insertText' ) {

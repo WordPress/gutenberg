@@ -176,6 +176,7 @@ function ParagraphBlock( {
 						aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
 						placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
 						__unstableEmbedURLOnPaste
+						__unstableAllowPrefixTransformations
 					/>
 				</TextColor>
 			</BackgroundColor>
