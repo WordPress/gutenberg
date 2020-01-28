@@ -4,6 +4,7 @@
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withPluginContext } from '@wordpress/plugins';
+import { check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -12,7 +13,7 @@ import PluginMoreMenuItem from '../plugin-more-menu-item';
 
 const PluginSidebarMoreMenuItem = ( { children, icon, isSelected, onClick } ) => (
 	<PluginMoreMenuItem
-		icon={ isSelected ? 'yes' : icon }
+		icon={ isSelected ? check : icon }
 		isSelected={ isSelected }
 		role="menuitemcheckbox"
 		onClick={ onClick }
