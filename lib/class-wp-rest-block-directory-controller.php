@@ -323,11 +323,15 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	private static function is_filesystem_available() {
 		$filesystem_method = get_filesystem_method();
 
+		if ( 'direct' === $filesystem_method ) {
+			return true;
+		}
+
 		ob_start();
 		$filesystem_credentials_are_stored = request_filesystem_credentials( self_admin_url() );
 		ob_end_clean();
 
-		if ( 'direct' === $filesystem_method || $filesystem_credentials_are_stored ) {
+		if ( $filesystem_credentials_are_stored ) {
 			return true;
 		}
 
