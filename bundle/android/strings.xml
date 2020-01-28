@@ -93,6 +93,7 @@
     <string name="gutenberg_native_take_a_video" tools:ignore="UnusedResources">Take a Video</string>
     <string name="gutenberg_native_tap_here_to_show_help" tools:ignore="UnusedResources">Tap here to show help</string>
     <string name="gutenberg_native_tap_to_hide_the_keyboard" tools:ignore="UnusedResources">Tap to hide the keyboard</string>
+    <string name="gutenberg_native_template_preview" tools:ignore="UnusedResources">Template Preview</string>
     <string name="gutenberg_native_title" tools:ignore="UnusedResources">Title:</string>
     <string name="gutenberg_native_translate" tools:ignore="UnusedResources">Translate</string>
     <string name="gutenberg_native_ungroup" tools:ignore="UnusedResources">Ungroup</string>
