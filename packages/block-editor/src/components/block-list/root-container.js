@@ -22,12 +22,14 @@ function selector( select ) {
 		getSelectedBlockClientId,
 		hasMultiSelection,
 		isMultiSelecting,
+		isNavigationMode,
 	} = select( 'core/block-editor' );
 
 	return {
 		selectedBlockClientId: getSelectedBlockClientId(),
 		hasMultiSelection: hasMultiSelection(),
 		isMultiSelecting: isMultiSelecting(),
+		isNavigationMode: isNavigationMode(),
 	};
 }
 
@@ -51,6 +53,7 @@ function RootContainer( { children, className }, ref ) {
 		selectedBlockClientId,
 		hasMultiSelection,
 		isMultiSelecting,
+		isNavigationMode,
 	} = useSelect( selector, [] );
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const onSelectionStart = useMultiSelection( ref );
@@ -63,7 +66,7 @@ function RootContainer( { children, className }, ref ) {
 	 * @param {WPSyntheticEvent} event
 	 */
 	function onFocus( event ) {
-		if ( hasMultiSelection ) {
+		if ( hasMultiSelection || isNavigationMode ) {
 			return;
 		}
 

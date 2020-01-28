@@ -21,6 +21,7 @@ import {
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
+	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -71,11 +72,12 @@ function BlockListBlock( {
 	onRemove,
 	onInsertDefaultBlockAfter,
 	toggleSelection,
-	animateOnChange,
+	index,
 	enableAnimation,
 	isNavigationMode,
 	isMultiSelecting,
 	hasSelectedUI = true,
+	moverDirection,
 } ) {
 	const onSelectionStart = useContext( Context );
 	const [ , setBlockNodes ] = useContext( BlockNodes );
@@ -109,8 +111,15 @@ function BlockListBlock( {
 	const onBlockError = () => setErrorState( true );
 
 	const blockType = getBlockType( name );
-	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
+
+	let blockLabel;
+
+	if ( isSelected && isNavigationMode ) {
+		blockLabel = getAccessibleBlockLabel( blockType, attributes, index + 1, moverDirection );
+	} else {
+		// translators: %s: Type of block (i.e. Text, Image etc)
+		blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
+	}
 
 	// Handing the focus of the block on creation and update
 
@@ -152,8 +161,12 @@ function BlockListBlock( {
 	const isMounting = useRef( true );
 
 	useEffect( () => {
-		if ( ! isMultiSelecting && ! isNavigationMode && isSelected ) {
-			focusTabbable( ! isMounting.current );
+		if ( isSelected ) {
+			if ( isNavigationMode ) {
+				wrapper.current.focus();
+			} else if ( ! isMultiSelecting ) {
+				focusTabbable( ! isMounting.current );
+			}
 		}
 
 		isMounting.current = false;
@@ -164,7 +177,7 @@ function BlockListBlock( {
 	] );
 
 	// Block Reordering animation
-	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, isSelected || isFirstMultiSelected, enableAnimation, animateOnChange );
+	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, isSelected || isFirstMultiSelected, enableAnimation, index );
 
 	// Other event handlers
 
@@ -181,7 +194,7 @@ function BlockListBlock( {
 
 		switch ( keyCode ) {
 			case ENTER:
-				if ( target === wrapper.current ) {
+				if ( ! isNavigationMode && target === wrapper.current ) {
 					// Insert default block after current block if enter and event
 					// not already handled by descendant.
 					onInsertDefaultBlockAfter();

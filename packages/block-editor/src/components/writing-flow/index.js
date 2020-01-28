@@ -18,7 +18,7 @@ import {
 	placeCaretAtVerticalEdge,
 	isEntirelySelected,
 } from '@wordpress/dom';
-import { UP, DOWN, LEFT, RIGHT, TAB, isKeyboardEvent, ESCAPE } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, TAB, isKeyboardEvent, ESCAPE, ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -315,6 +315,7 @@ export default function WritingFlow( { children } ) {
 		const isRight = keyCode === RIGHT;
 		const isTab = keyCode === TAB;
 		const isEscape = keyCode === ESCAPE;
+		const isEnter = keyCode === ENTER;
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
@@ -349,6 +350,9 @@ export default function WritingFlow( { children } ) {
 						clearSelectedBlock();
 					}
 				}
+			} else if ( isEnter ) {
+				event.preventDefault();
+				setNavigationMode( false );
 			}
 
 			return;
