@@ -185,6 +185,11 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestImagePreview(with fullSizeUrl: URL, thumbUrl: URL?) {
         print("Gutenberg requested fullscreen image preview for " + fullSizeUrl.absoluteString)
     }
+
+    func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback) {
+        print("Gutenberg requested media editor for " + mediaUrl.absoluteString)
+        callback([MediaInfo(id: 1, url: "https://cldup.com/Fz-ASbo2s3.jpg", type: "image")])
+    }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {

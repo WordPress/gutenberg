@@ -74,6 +74,7 @@ public class WPAndroidGlueCode {
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
+    private OnMediaEditorListener mOnMediaEditorListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -147,6 +148,10 @@ public class WPAndroidGlueCode {
 
     public interface OnEditorAutosaveListener {
         void onEditorAutosave();
+    }
+
+    public interface OnMediaEditorListener {
+        void onMediaEditorClicked(String mediaUrl);
     }
 
     public void mediaSelectionCancelled() {
@@ -305,6 +310,13 @@ public class WPAndroidGlueCode {
             public void requestImageFullscreenPreview(String mediaUrl) {
                 mOnImageFullscreenPreviewListener.onImageFullscreenPreviewClicked(mediaUrl);
             }
+
+            @Override
+            public void requestMediaEditor(MediaUploadCallback mediaUploadCallback, String mediaUrl) {
+                mMediaPickedByUserOnBlock = true;
+                mPendingMediaUploadCallback = mediaUploadCallback;
+                mOnMediaEditorListener.onMediaEditorClicked(mediaUrl);
+            }
         });
 
         return Arrays.asList(
@@ -378,7 +390,8 @@ public class WPAndroidGlueCode {
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
                                   RequestExecutor fetchExecutor,
-                                  OnImageFullscreenPreviewListener onImageFullscreenPreviewListener) {
+                                  OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
+                                  OnMediaEditorListener onMediaEditorListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
@@ -388,6 +401,7 @@ public class WPAndroidGlueCode {
         mOnEditorAutosaveListener = onEditorAutosaveListener;
         mRequestExecutor = fetchExecutor;
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
+        mOnMediaEditorListener = onMediaEditorListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
