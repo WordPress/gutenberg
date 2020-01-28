@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { size } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -140,12 +140,18 @@ export default compose( [
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
 		} = select( 'core/block-editor' );
+		const {
+			__experimentalGetBlockPatterns: getBlockPatterns,
+		} = select( 'core/blocks' );
 
 		rootClientId = rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
-		const hasSingleBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
+		const hasSingleBlockType = (
+			size( allowedBlocks ) === 1 &&
+			size( getBlockPatterns( allowedBlocks[ 0 ].name, 'inserter' ) ) === 0
+		);
 
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {

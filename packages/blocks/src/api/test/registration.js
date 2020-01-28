@@ -477,6 +477,7 @@ describe( 'blocks', () => {
 					},
 					attributes: {},
 					keywords: [],
+					patterns: [],
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
@@ -606,6 +607,7 @@ describe( 'blocks', () => {
 					},
 					attributes: {},
 					keywords: [],
+					patterns: [],
 				},
 				{
 					name: 'core/test-block-with-settings',
@@ -618,6 +620,7 @@ describe( 'blocks', () => {
 					},
 					attributes: {},
 					keywords: [],
+					patterns: [],
 				},
 			] );
 		} );
