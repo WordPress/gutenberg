@@ -19,17 +19,16 @@ const args = getArgsFromCLI();
 
 const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '**/*.md' ];
 
-// See: https://eslint.org/docs/user-guide/configuring#using-configuration-files-1.
+// See: https://github.com/igorshubovych/markdownlint-cli#usage
 const hasLintConfig = hasArgInCLI( '-c' ) || hasArgInCLI( '--config' );
 
 // When a configuration is not provided by the project, use from the default
-// provided with the scripts module. Instruct ESLint to avoid discovering via
-// the `--no-eslintrc` flag, as otherwise it will still merge with inherited.
+// provided with the scripts module.
 const defaultConfigArgs = ! hasLintConfig ?
 	[ '--config', fromConfigRoot( '.markdownlint.json' ) ] :
 	[];
 
-// See: https://eslint.org/docs/user-guide/configuring#ignoring-files-and-directories.
+// See: https://github.com/igorshubovych/markdownlint-cli#ignoring-files
 const hasIgnoredFiles = hasArgInCLI( '--ignore' ) ||
 	hasProjectFile( '.markdownlintignore' );
 
