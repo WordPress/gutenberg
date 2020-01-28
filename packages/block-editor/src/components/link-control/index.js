@@ -32,15 +32,11 @@ import LinkControlSearchInput from './search-input';
  *
  * @typedef WPLinkControlDefaultValue
  *
- * @property {string|number} id              Unique identifier of link.
- * @property {string}        url             Link URL.
- * @property {string}        title           Link title.
- * @property {string}        type            Type of link entity.
- * @property {string}        subtype         Subtype of link entity.
- * @property {boolean}       [opensInNewTab] Whether link should open in a new
- *                                           browser tab. This value is only
- *                                           assigned if not providing a custom
- *                                           settings array.
+ * @property {string}   url           Link URL.
+ * @property {string=}  title         Link title.
+ * @property {boolean=} opensInNewTab Whether link should open in a new browser
+ *                                    tab. This value is only assigned if not
+ *                                    providing a custom `settings` prop.
  */
 
 /**

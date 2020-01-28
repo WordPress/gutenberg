@@ -17,11 +17,9 @@ A link value contains is composed as a union of the default properties and any c
 
 Default properties include:
 
-- id (`string|number`): Unique identifier of link.
-- url (`string`): Link URL.
-- title (`string`): Link title.
-- type (`string`): Type of link entity.
-- subtype (`string`): Subtype of link entity.
+- `url` (`string`): Link URL.
+- `title` (`string`, optional): Link title.
+- `opensInNewTab` (`boolean`, optional): Whether link should open in a new browser tab.This value is only assigned if not providing a custom `settings` prop.
 
 ### settings
 
