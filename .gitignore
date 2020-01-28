@@ -107,3 +107,8 @@ bin/wp-cli.phar
 
 # Report generated from jest-junit
 /junit.xml
+
+# Cocoapods
+
+ios/Pods
+ios/vendor

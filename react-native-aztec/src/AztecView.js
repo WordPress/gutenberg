@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactNative, {requireNativeComponent, TextViewPropTypes, UIManager, ColorPropType, TouchableWithoutFeedback, Platform} from 'react-native';
-import TextInputState from 'react-native/lib/TextInputState';
+import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 
 const AztecManager = UIManager.getViewManagerConfig('RCTAztecView');
 
@@ -141,7 +141,7 @@ class AztecView extends React.Component {
 
   _onPress = (event) => {
 	if ( ! this.isFocused() ) {
-		this.focus(event); // Call to move the focus in RN way (TextInputState)
+		this.focus(); // Call to move the focus in RN way (TextInputState)
 		this._onFocus(event); // Check if there are listeners set on the focus event
 	}
   }

@@ -53,6 +53,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MEDIA_SOURCE_MEDIA_LIBRARY = "SITE_MEDIA_LIBRARY";
     private static final String MEDIA_SOURCE_DEVICE_LIBRARY = "DEVICE_MEDIA_LIBRARY";
     private static final String MEDIA_SOURCE_DEVICE_CAMERA = "DEVICE_CAMERA";
+    private static final String MEDIA_SOURCE_MEDIA_EDITOR = "MEDIA_EDITOR";
 
 
     public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,
@@ -172,6 +173,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    public void requestMediaEditor(String mediaUrl, final Callback onUploadMediaSelected) {
+        mGutenbergBridgeJS2Parent.requestMediaEditor(getNewUploadMediaCallback(false, onUploadMediaSelected), mediaUrl);
+    }
+
+    @ReactMethod
     public void editorDidEmitLog(String message, int logLevel) {
         mGutenbergBridgeJS2Parent.editorDidEmitLog(message, GutenbergBridgeJS2Parent.LogLevel.valueOf(logLevel));
     }
@@ -225,8 +231,12 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                         writableArray.pushMap(media.toMap());
                     }
                     jsCallback.invoke(writableArray);
-                } else {
+                } else if (!mediaList.isEmpty()) {
                     jsCallback.invoke(mediaList.get(0).toMap());
+                } else {
+                    // if we have no media (e.g. when a content provider throws an exception during file copy), invoke
+                    // the js callback with no arguments
+                    jsCallback.invoke();
                 }
             }
 
