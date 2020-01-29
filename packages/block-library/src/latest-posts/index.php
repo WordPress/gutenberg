@@ -169,8 +169,8 @@ function register_block_core_latest_posts() {
 					'default' => false,
 				),
 				'imageAlign'              => array(
-					'type'    => 'string',
-					'default' => false,
+					'type' => 'string',
+					'enum' => array( 'left', 'center', 'right' ),
 				),
 				'imageSizeSlug'           => array(
 					'type'    => 'string',
