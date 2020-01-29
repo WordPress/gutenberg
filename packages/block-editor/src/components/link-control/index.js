@@ -193,7 +193,7 @@ function LinkControl( {
 	 */
 	function stopEditing() {
 		isEndingEditWithFocus.current = (
-			wrapperNode.current &&
+			!! wrapperNode.current &&
 			wrapperNode.current.contains( document.activeElement )
 		);
 
