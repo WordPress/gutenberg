@@ -46,10 +46,10 @@ function MediaPlaceholder( props ) {
 	mediaRef.current = value;
 
 	// append and deduplicate media array for gallery use case
-	const setMedia = multiple && addToGallery ? ( selected ) => { 
-		return onSelect( dedupMedia ( [ ...mediaRef.current, ...selected ] ) );
+	const setMedia = multiple && addToGallery ? ( selected ) => {
+		return onSelect( dedupMedia( [ ...mediaRef.current, ...selected ] ) );
 	} :
-	onSelect;
+		onSelect;
 
 	const isOneType = allowedTypes.length === 1;
 	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
