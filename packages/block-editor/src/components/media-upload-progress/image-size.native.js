@@ -21,16 +21,13 @@ function calculatePreferedImageSize( image, container ) {
 	return { width, height };
 }
 
-const Image = ( () => {
-	let cancelled = false;
-
-	return {
-		cancelAllGetSize: () => cancelled = true,
-		getSize: ( src, callback ) => RNImage.getSize( src, ( ...args ) => (
-			cancelled ? undefined : callback( ...args )
-		) ),
-	};
-} )();
+const Image = {
+	getSize: ( src, callback ) => {
+		let cancelled = false;
+		RNImage.getSize( src, ( ...args ) => ! cancelled && callback( ...args ) );
+		return { cancel: () => cancelled = true };
+	},
+};
 
 class ImageSize extends Component {
 	constructor() {
@@ -40,6 +37,7 @@ class ImageSize extends Component {
 			height: undefined,
 		};
 		this.onLayout = this.onLayout.bind( this );
+		this.pendingGetSizeRequest = null;
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -63,7 +61,11 @@ class ImageSize extends Component {
 	}
 
 	fetchImageSize() {
-		Image.getSize( this.props.src, ( width, height ) => {
+		if ( this.getSizeRequest ) {
+			this.getSizeRequest.cancel();
+		}
+
+		this.getSizeRequest = Image.getSize( this.props.src, ( width, height ) => {
 			this.image = { width, height };
 			this.calculateSize();
 		} );
@@ -87,7 +89,9 @@ class ImageSize extends Component {
 	}
 
 	componentWillUnmount() {
-		Image.cancelAllGetSize();
+		if ( this.getSizeRequest ) {
+			this.getSizeRequest.cancel();
+		}
 	}
 
 	render() {
