@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useRef, Children, cloneElement } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { useRovingTabIndexContext } from './context';
 
-export default function RovingTabIndexItem( { children } ) {
+export default function RovingTabIndexItem( { children, as: Component, ...props } ) {
 	const ref = useRef();
 	const lastFocusedElement = useRovingTabIndexContext();
 	let tabIndex;
@@ -17,12 +17,11 @@ export default function RovingTabIndexItem( { children } ) {
 		tabIndex = lastFocusedElement === ref.current ? 0 : -1;
 	}
 
-	// Ensure a single child.
-	Children.only( children );
+	const allProps = { ref, tabIndex, ...props };
 
-	// Override the tabIndex and ref props to the child element.
-	return cloneElement( children, {
-		tabIndex,
-		ref,
-	} );
+	if ( typeof children === 'function' ) {
+		return children( allProps );
+	}
+
+	return <Component { ...allProps }>{ children }</Component>;
 }
