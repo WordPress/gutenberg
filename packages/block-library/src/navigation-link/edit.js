@@ -105,7 +105,7 @@ function NavigationLinkEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
-					title={ __( 'Link Settings' ) }
+					title={ __( 'Link settings' ) }
 				>
 					<TextareaControl
 						value={ description || '' }
@@ -117,7 +117,7 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 				<PanelBody
-					title={ __( 'SEO Settings' ) }
+					title={ __( 'SEO settings' ) }
 				>
 					<TextControl
 						value={ title || '' }
@@ -175,7 +175,10 @@ function NavigationLinkEdit( {
 						</span>
 					}
 					{ isLinkOpen && (
-						<Popover position="bottom center">
+						<Popover
+							position="bottom center"
+							onClose={ () => setIsLinkOpen( false ) }
+						>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
@@ -202,14 +205,13 @@ function NavigationLinkEdit( {
 									opensInNewTab: newOpensInNewTab,
 									id,
 								} ) }
-								onClose={ () => setIsLinkOpen( false ) }
 							/>
 						</Popover>
 					) }
 				</div>
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
-					renderAppender={ ( hasDescendants && isSelected ) ? InnerBlocks.DefaultAppender : false }
+					renderAppender={ ( ( hasDescendants && isSelected ) || isParentOfSelectedBlock ) ? InnerBlocks.DefaultAppender : false }
 				/>
 			</div>
 		</Fragment>

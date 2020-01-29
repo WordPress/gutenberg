@@ -112,7 +112,7 @@ class RSSEdit extends Component {
 					<ToolbarGroup controls={ toolbarControls } />
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'RSS Settings' ) }>
+					<PanelBody title={ __( 'RSS settings' ) }>
 						<RangeControl
 							label={ __( 'Number of items' ) }
 							value={ itemsToShow }

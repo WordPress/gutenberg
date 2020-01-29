@@ -728,6 +728,7 @@ export class RichText extends Component {
 					isSelected,
 					value: record,
 					onChange: this.onFormatChange,
+					onFocus: () => {},
 				} ) }
 				<RCTAztecView
 					ref={ ( ref ) => {
@@ -767,6 +768,7 @@ export class RichText extends Component {
 					disableEditingMenu={ this.props.disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
+					selectionColor={ this.props.selectionColor }
 				/>
 				{ isSelected && <FormatEdit
 					formatTypes={ formatTypes }

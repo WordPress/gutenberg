@@ -52,7 +52,7 @@ function HeadingEdit( {
 				} } />
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Heading Settings' ) }>
+				<PanelBody title={ __( 'Heading settings' ) }>
 					<p>{ __( 'Level' ) }</p>
 					<HeadingToolbar isCollapsed={ false } minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				</PanelBody>
