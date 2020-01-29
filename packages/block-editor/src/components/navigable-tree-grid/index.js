@@ -11,6 +11,11 @@ import { useRef } from '@wordpress/element';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
+ * Internal dependencies
+ */
+import RovingTabIndexContainer from '../roving-tab-index';
+
+/**
  * Return focusables in a row element, excluding those from other branches
  * nested within the row.
  *
@@ -33,7 +38,7 @@ function getRowFocusables( rowElement ) {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/navigable-tree-grid/README.md
  */
-export default function NavigableTreeGrid( { children } ) {
+export default function NavigableTreeGrid( { children, ...props } ) {
 	const containerRef = useRef();
 
 	const onKeyDown = ( event ) => {
@@ -96,11 +101,9 @@ export default function NavigableTreeGrid( { children } ) {
 		}
 	};
 
-	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div onKeyDown={ onKeyDown } ref={ containerRef }>
+		<RovingTabIndexContainer tagName={ 'table' } role="treegrid" onKeyDown={ onKeyDown } ref={ containerRef } { ...props }>
 			{ children }
-		</div>
+		</RovingTabIndexContainer>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
