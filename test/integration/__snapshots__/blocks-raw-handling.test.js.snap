@@ -111,6 +111,14 @@ exports[`rawHandler should convert a list with attributes 1`] = `
 <!-- /wp:list -->"
 `;
 
+exports[`rawHandler should handle embed element 1`] = `
+"<!-- wp:embed {\\"url\\":\\"http://v.wordpress.com/KllQxFVq\\"} -->
+<figure class=\\"wp-block-embed\\"><div class=\\"wp-block-embed__wrapper\\">
+http://v.wordpress.com/KllQxFVq
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
 exports[`rawHandler should not strip any text-level elements 1`] = `
 "<!-- wp:paragraph -->
 <p>This is <u>ncorect</u></p>
