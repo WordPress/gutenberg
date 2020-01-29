@@ -134,9 +134,9 @@ function ParagraphBlock( {
 						label={ __( 'Drop Cap' ) }
 						checked={ !! dropCap }
 						onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
-						help={ dropCap
-							? __( 'Showing large initial letter.' )
-							: __( 'Toggle to show a large initial letter.' )
+						help={ dropCap ?
+							__( 'Showing large initial letter.' ) :
+							__( 'Toggle to show a large initial letter.' )
 						}
 					/>
 				</PanelBody>
