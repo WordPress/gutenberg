@@ -59,6 +59,7 @@ function gutenberg_reregister_core_block_types() {
 		'post-author.php'     => 'core/post-author',
 		'post-date.php'       => 'core/post-date',
 		'post-excerpt.php'    => 'core/post-excerpt',
+		'post-navigation.php' => 'core/post-navigation',
 	);
 
 	$registry = WP_Block_Type_Registry::get_instance();
