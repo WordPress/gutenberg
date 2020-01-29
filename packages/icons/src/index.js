@@ -27,6 +27,7 @@ export { default as more } from './library/more';
 export { default as navigation } from './library/navigation';
 export { default as pageBreak } from './library/page-break';
 export { default as paragraph } from './library/paragraph';
+export { default as plusCircle } from './library/plus-circle';
 export { default as postList } from './library/post-list';
 export { default as preformatted } from './library/preformatted';
 export { default as pullquote } from './library/pullquote';
