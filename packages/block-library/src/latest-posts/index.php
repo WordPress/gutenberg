@@ -30,12 +30,41 @@ function render_block_core_latest_posts( $attributes ) {
 	$list_items_markup = '';
 
 	foreach ( $recent_posts as $post ) {
+		$list_items_markup .= '<li>';
+
+		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post )  ) {
+			$image_style = '';
+			if ( isset( $attributes['imageSizeWidth'] ) ) {
+				$image_style .= sprintf( 'max-width:%spx;', $attributes['imageSizeWidth'] );
+			}
+			if ( isset( $attributes['imageSizeHeight'] ) ) {
+				$image_style .= sprintf( 'max-height:%spx;', $attributes['imageSizeHeight'] );
+			}
+
+			$image_classes = 'wp-block-latest-posts__featured-image';
+			if ( isset( $attributes['imageAlign'] ) ) {
+				$image_classes .= ' align' . $attributes['imageAlign'];
+			}
+
+			$list_items_markup .= sprintf(
+				'<div class="%1$s">%2$s</div>',
+				$image_classes,
+				get_the_post_thumbnail(
+					$post,
+					$attributes['imageSizeSlug'],
+					array(
+						'style' => $image_style,
+					)
+				)
+			);
+		}
+
 		$title = get_the_title( $post );
 		if ( ! $title ) {
 			$title = __( '(no title)' );
 		}
 		$list_items_markup .= sprintf(
-			'<li><a href="%1$s">%2$s</a>',
+			'<a href="%1$s">%2$s</a>',
 			esc_url( get_permalink( $post ) ),
 			$title
 		);

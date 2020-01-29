@@ -46,6 +46,10 @@
 }
 
 .wp-block-latest-posts__featured-image {
+	img {
+		height: auto;
+		width: auto;
+	}
 	&.alignleft {
 		/*rtl:ignore*/
 		margin-right: 1em;
