@@ -288,6 +288,11 @@ function LinkControl( {
 		}
 	};
 
+	const handleSelectSuggestion = ( suggestion, _value = {} ) => () => {
+		setIsEditingLink( false );
+		onChange( { ..._value, ...suggestion } );
+	};
+
 	// Render Components
 	const renderSearchResults = ( {
 		suggestionsListProps,
@@ -492,8 +497,7 @@ function LinkControl( {
 					value={ inputValue }
 					onChange={ onInputChange }
 					onSelect={ ( suggestion ) => {
-						setIsEditingLink( false );
-						onChange( { ...value, ...suggestion } );
+						handleSelectSuggestion( suggestion, value )();
 					} }
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
