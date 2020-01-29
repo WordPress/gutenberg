@@ -33,7 +33,7 @@ _Example:_
 		"format:js": "wp-scripts format-js",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
-		"lint-md:docs": "wp-scripts lint-md-docs",
+		"lint:md:docs": "wp-scripts lint-md-docs",
 		"lint-md:js": "wp-scripts lint-md-js",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"packages-update": "wp-scripts packages-update",
