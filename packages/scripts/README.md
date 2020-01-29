@@ -180,8 +180,8 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"format:js": "wp-scripts lint-js",
-		"format:js:src": "wp-scripts lint-js ./src"
+		"format:js": "wp-scripts format-js",
+		"format:js:src": "wp-scripts format-js ./src"
 	}
 }
 ```
