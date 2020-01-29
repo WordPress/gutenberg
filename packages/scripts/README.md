@@ -16,6 +16,8 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
+**Note**: This package requires `npm` 6.9.0 or later, and is not compatible with older versions.
+
 ## Setup
 
 This package offers a command-line interface and exposes a binary called `wp-scripts` so you can call it directly with `npx` – an npm package runner. However, this module is designed to be configured using the `scripts` section in the `package.json` file of your project. This comprehensive example demonstrates the most of the capabilities included.
