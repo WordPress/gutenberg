@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { useRef } from 'react';
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import { uniqWith } from 'lodash';
 
@@ -35,9 +36,13 @@ function MediaPlaceholder( props ) {
 		value = [],
 	} = props;
 
+	const mediaRef = useRef( value );
+	mediaRef.current = value;
+
 	const setMedia = multiple && addToGallery ?
-		( selected ) => onSelect( uniqWith( [ ...value, ...selected ], ( media1, media2 ) => {
-			return media1.id === media2.id || media1.url === media2.url;
+		( selected ) => onSelect( uniqWith( [ ...mediaRef.current, ...selected ],
+			( media1, media2 ) => {
+				return media1.id === media2.id || media1.url === media2.url;
 		} ) ) :
 		onSelect;
 
