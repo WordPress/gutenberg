@@ -52,6 +52,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MEDIA_SOURCE_MEDIA_LIBRARY = "SITE_MEDIA_LIBRARY";
     private static final String MEDIA_SOURCE_DEVICE_LIBRARY = "DEVICE_MEDIA_LIBRARY";
     private static final String MEDIA_SOURCE_DEVICE_CAMERA = "DEVICE_CAMERA";
+    private static final String MEDIA_SOURCE_MEDIA_EDITOR = "MEDIA_EDITOR";
 
 
     public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,
@@ -168,6 +169,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void requestImageFullscreenPreview(String mediaUrl) {
         mGutenbergBridgeJS2Parent.requestImageFullscreenPreview(mediaUrl);
+    }
+
+    @ReactMethod
+    public void requestMediaEditor(String mediaUrl, final Callback onUploadMediaSelected) {
+        mGutenbergBridgeJS2Parent.requestMediaEditor(getNewUploadMediaCallback(false, onUploadMediaSelected), mediaUrl);
     }
 
     @ReactMethod

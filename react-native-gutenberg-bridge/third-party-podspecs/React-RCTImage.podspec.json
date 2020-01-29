@@ -1,6 +1,6 @@
 {
   "name": "React-RCTImage",
-  "version": "0.60.0-patched",
+  "version": "0.61.5",
   "summary": "A React component for displaying different types of images.",
   "homepage": "http://facebook.github.io/react-native/",
   "documentation_url": "https://facebook.github.io/react-native/docs/image",
@@ -11,10 +11,10 @@
     "tvos": "9.2"
   },
   "source": {
-    "git": "https://github.com/jtreanor/react-native.git",
-    "tag": "v0.60.0-patched"
+    "git": "https://github.com/facebook/react-native.git",
+    "tag": "v0.61.5"
   },
-  "source_files": "*.{h,m}",
+  "source_files": "*.{m}",
   "preserve_paths": [
     "package.json",
     "LICENSE",
@@ -22,11 +22,11 @@
   ],
   "header_dir": "RCTImage",
   "dependencies": {
-    "React-Core": [
-      "0.60.0-patched"
+    "React-Core/RCTImageHeaders": [
+      "0.61.5"
     ],
     "React-RCTNetwork": [
-      "0.60.0-patched"
+      "0.61.5"
     ]
   },
   "prepare_command": "TMP_DIR=$(mktemp -d); mv * $TMP_DIR; cp -R \"$TMP_DIR/Libraries/Image\"/* . && true"
