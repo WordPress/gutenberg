@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { Image } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -82,4 +81,4 @@ const ImageWithFocalPoint = ( {
 	/>;
 };
 
-export default React.memo( ImageWithFocalPoint );
+export default memo( ImageWithFocalPoint );

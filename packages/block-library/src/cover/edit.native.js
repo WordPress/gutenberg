@@ -173,7 +173,7 @@ const Cover = ( {
 			{ controls }
 			<View
 				onLayout={ onContainerLayout }
-				style={ [ styles.backgroundContainer, { minHeight: CONTAINER_HEIGHT } ] }>
+				style={ [ styles.backgroundContainer ] }>
 				<View style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] } >
 					<InnerBlocks
 						template={ INNER_BLOCKS_TEMPLATE }
@@ -185,7 +185,7 @@ const Cover = ( {
 				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 					<ImageWithFocalPoint
 						containerSize={ containerSize }
-						contentHeight={ CONTAINER_HEIGHT }
+						contentHeight={ containerSize ? containerSize.height : CONTAINER_HEIGHT }
 						focalPoint={ focalPoint }
 						url={ url }
 					/>
