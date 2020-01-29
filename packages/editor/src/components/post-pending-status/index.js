@@ -20,7 +20,7 @@ export function PostPendingStatus( { status, onUpdateStatus } ) {
 	return (
 		<PostPendingStatusCheck>
 			<CheckboxControl
-				label={ __( 'Pending Review' ) }
+				label={ __( 'Pending review' ) }
 				checked={ status === 'pending' }
 				onChange={ togglePendingStatus }
 			/>

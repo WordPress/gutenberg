@@ -43,8 +43,8 @@ const TEMPLATE = [
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
-export const LINK_DESTINATION_MEDIA = 'media';
-export const LINK_DESTINATION_ATTACHMENT = 'attachment';
+const LINK_DESTINATION_MEDIA = 'media';
+const LINK_DESTINATION_ATTACHMENT = 'attachment';
 
 class MediaTextEdit extends Component {
 	constructor() {
@@ -102,7 +102,6 @@ class MediaTextEdit extends Component {
 			mediaUrl: src || media.url,
 			mediaLink: media.link || undefined,
 			href: newHref,
-			imageFill: undefined,
 			focalPoint: undefined,
 		} );
 	}
@@ -209,7 +208,7 @@ class MediaTextEdit extends Component {
 			setAttributes( { verticalAlignment: alignment } );
 		};
 		const mediaTextGeneralSettings = (
-			<PanelBody title={ __( 'Media & Text Settings' ) }>
+			<PanelBody title={ __( 'Media & Text settings' ) }>
 				<ToggleControl
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }
@@ -251,7 +250,7 @@ class MediaTextEdit extends Component {
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
 					<PanelColorSettings
-						title={ __( 'Color Settings' ) }
+						title={ __( 'Color settings' ) }
 						initialOpen={ false }
 						colorSettings={ colorSettings }
 					/>

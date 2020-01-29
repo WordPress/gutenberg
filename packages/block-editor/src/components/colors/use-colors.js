@@ -13,11 +13,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useCallback,
 	useMemo,
+	useEffect,
 	Children,
 	cloneElement,
-	useRef,
+	useState,
 } from '@wordpress/element';
-import { withFallbackStyles } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -48,13 +48,14 @@ const ColorPanel = ( {
 	colorSettings,
 	colorPanelProps,
 	contrastCheckers,
-	detectedBackgroundColorRef,
-	detectedColorRef,
+	detectedBackgroundColor,
+	detectedColor,
 	panelChildren,
+	initialOpen,
 } ) => (
 	<PanelColorSettings
 		title={ title }
-		initialOpen={ false }
+		initialOpen={ initialOpen }
 		colorSettings={ Object.values( colorSettings ) }
 		{ ...colorPanelProps }
 	>
@@ -64,12 +65,12 @@ const ColorPanel = ( {
 					backgroundColor = resolveContrastCheckerColor(
 						backgroundColor,
 						colorSettings,
-						detectedBackgroundColorRef.current
+						detectedBackgroundColor
 					);
 					textColor = resolveContrastCheckerColor(
 						textColor,
 						colorSettings,
-						detectedColorRef.current
+						detectedColor
 					);
 					return (
 						<ContrastChecker
@@ -85,12 +86,12 @@ const ColorPanel = ( {
 					backgroundColor = resolveContrastCheckerColor(
 						backgroundColor || value,
 						colorSettings,
-						detectedBackgroundColorRef.current
+						detectedBackgroundColor
 					);
 					textColor = resolveContrastCheckerColor(
 						textColor || value,
 						colorSettings,
-						detectedColorRef.current
+						detectedColor
 					);
 					return (
 						<ContrastChecker
@@ -115,12 +116,17 @@ const InspectorControlsColorPanel = ( props ) => (
 export default function __experimentalUseColors(
 	colorConfigs,
 	{
-		panelTitle = __( 'Color Settings' ),
+		panelTitle = __( 'Color settings' ),
 		colorPanelProps,
 		contrastCheckers,
 		panelChildren,
+		colorDetector: {
+			targetRef,
+			backgroundColorTargetRef = targetRef,
+			textColorTargetRef = targetRef,
+		} = {},
 	} = {
-		panelTitle: __( 'Color Settings' ),
+		panelTitle: __( 'Color settings' ),
 	},
 	deps = []
 ) {
@@ -197,9 +203,10 @@ export default function __experimentalUseColors(
 		[ setAttributes, colorConfigs.length ]
 	);
 
-	const detectedBackgroundColorRef = useRef();
-	const detectedColorRef = useRef();
-	const ColorDetector = useMemo( () => {
+	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
+	const [ detectedColor, setDetectedColor ] = useState();
+
+	useEffect( () => {
 		if ( ! contrastCheckers ) {
 			return undefined;
 		}
@@ -216,48 +223,27 @@ export default function __experimentalUseColors(
 				break;
 			}
 		}
-		return (
-			( needsBackgroundColor || needsColor ) &&
-			withFallbackStyles(
-				(
-					node,
-					{
-						querySelector,
-						backgroundColorSelector = querySelector,
-						textColorSelector = querySelector,
-					}
-				) => {
-					let backgroundColorNode = node;
-					let textColorNode = node;
-					if ( backgroundColorSelector ) {
-						backgroundColorNode = node.parentNode.querySelector(
-							backgroundColorSelector
-						);
-					}
-					if ( textColorSelector ) {
-						textColorNode = node.parentNode.querySelector( textColorSelector );
-					}
-					let backgroundColor;
-					const color = getComputedStyle( textColorNode ).color;
-					if ( needsBackgroundColor ) {
-						backgroundColor = getComputedStyle( backgroundColorNode )
-							.backgroundColor;
-						while (
-							backgroundColor === 'rgba(0, 0, 0, 0)' &&
-							backgroundColorNode.parentNode &&
-							backgroundColorNode.parentNode === Node.ELEMENT_NODE
-						) {
-							backgroundColorNode = backgroundColorNode.parentNode;
-							backgroundColor = getComputedStyle( backgroundColorNode )
-								.backgroundColor;
-						}
-					}
-					detectedBackgroundColorRef.current = backgroundColor;
-					detectedColorRef.current = color;
-					return { backgroundColor, color };
-				}
-			)( () => <></> )
-		);
+
+		if ( needsColor ) {
+			setDetectedColor( getComputedStyle( textColorTargetRef.current ).color );
+		}
+
+		if ( needsBackgroundColor ) {
+			let backgroundColorNode = backgroundColorTargetRef.current;
+			let backgroundColor = getComputedStyle( backgroundColorNode )
+				.backgroundColor;
+			while (
+				backgroundColor === 'rgba(0, 0, 0, 0)' &&
+				backgroundColorNode.parentNode &&
+				backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
+			) {
+				backgroundColorNode = backgroundColorNode.parentNode;
+				backgroundColor = getComputedStyle( backgroundColorNode )
+					.backgroundColor;
+			}
+
+			setDetectedBackgroundColor( backgroundColor );
+		}
 	}, [
 		colorConfigs.reduce(
 			( acc, colorConfig ) =>
@@ -331,11 +317,12 @@ export default function __experimentalUseColors(
 
 		const wrappedColorPanelProps = {
 			title: panelTitle,
+			initialOpen: false,
 			colorSettings,
 			colorPanelProps,
 			contrastCheckers,
-			detectedBackgroundColorRef,
-			detectedColorRef,
+			detectedBackgroundColor,
+			detectedColor,
 			panelChildren,
 		};
 		return {
@@ -344,7 +331,6 @@ export default function __experimentalUseColors(
 			InspectorControlsColorPanel: (
 				<InspectorControlsColorPanel { ...wrappedColorPanelProps } />
 			),
-			ColorDetector,
 		};
-	}, [ attributes, setAttributes, ...deps ] );
+	}, [ attributes, setAttributes, detectedColor, detectedBackgroundColor, ...deps ] );
 }

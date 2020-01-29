@@ -13,7 +13,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 
@@ -91,11 +91,10 @@ function DropdownMenu( {
 					className: classnames( 'components-dropdown-menu__toggle', {
 						'is-opened': isOpen,
 					} ),
-					tooltip: label,
 				}, toggleProps );
 
 				return (
-					<IconButton
+					<Button
 						{ ...mergedToggleProps }
 						icon={ icon }
 						onClick={ ( event ) => {
@@ -113,9 +112,10 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
+						showTooltip
 					>
 						{ ( ! icon || hasArrowIndicator ) && <span className="components-dropdown-menu__indicator" /> }
-					</IconButton>
+					</Button>
 				);
 			} }
 			renderContent={ ( props ) => {
@@ -136,7 +136,7 @@ function DropdownMenu( {
 						}
 						{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 							controlSet.map( ( control, indexOfControl ) => (
-								<IconButton
+								<Button
 									key={ [ indexOfSet, indexOfControl ].join() }
 									onClick={ ( event ) => {
 										event.stopPropagation();
@@ -153,11 +153,12 @@ function DropdownMenu( {
 										},
 									) }
 									icon={ control.icon }
-									role="menuitem"
+									aria-checked={ ( control.role === 'menuitemcheckbox' || control.role === 'menuitemradio' ) ? control.isActive : undefined }
+									role={ ( control.role === 'menuitemcheckbox' || control.role === 'menuitemradio' ) ? control.role : 'menuitem' }
 									disabled={ control.isDisabled }
 								>
 									{ control.title }
-								</IconButton>
+								</Button>
 							) )
 						) ) }
 					</NavigableMenu>

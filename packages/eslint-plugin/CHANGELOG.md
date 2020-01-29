@@ -1,5 +1,12 @@
 ## Master
 
+### New Features
+
+- The `recommended` ruleset no longer enables rules that check code formatting (whitespace, indenting, etc.) and that could conflict with Prettier.
+- There is a new `recommended-with-formatting` ruleset that has the code formatting rules still enabled, for projects that want to opt out from Prettier and continue checking code formatting with ESLint.
+
+## 3.3.0 (2019-12-19)
+
 ### Bug Fixes
 
 - The React ruleset now correctly references the WordPress ESLint plugin, resolving an error about an unfound rule.

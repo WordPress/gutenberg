@@ -56,6 +56,17 @@ const MAX_SUGGESTED_ITEMS = 9;
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
+const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
+
+// Copied over from the Columns block. It seems like it should become part of public API.
+const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
+	return map(
+		innerBlocksTemplate,
+		( [ name, attributes, innerBlocks = [] ] ) =>
+			createBlock( name, attributes, createBlocksFromInnerBlocksTemplate( innerBlocks ) )
+	);
+};
+
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
@@ -66,6 +77,7 @@ export class InserterMenu extends Component {
 			suggestedItems: [],
 			reusableItems: [],
 			itemsPerCategory: {},
+			itemsPerCollection: {},
 			openPanels: [ 'suggested' ],
 		};
 		this.onChangeSearchInput = this.onChangeSearchInput.bind( this );
@@ -135,7 +147,7 @@ export class InserterMenu extends Component {
 		};
 	}
 
-	filterOpenPanels( filterValue, itemsPerCategory, filteredItems, reusableItems ) {
+	filterOpenPanels( filterValue, itemsPerCategory, itemsPerCollection, filteredItems, reusableItems ) {
 		if ( filterValue === this.state.filterValue ) {
 			return this.state.openPanels;
 		}
@@ -148,16 +160,18 @@ export class InserterMenu extends Component {
 		}
 		if ( filteredItems.length > 0 ) {
 			openPanels = openPanels.concat(
-				Object.keys( itemsPerCategory )
+				Object.keys( itemsPerCategory ),
+				Object.keys( itemsPerCollection )
 			);
 		}
+
 		return openPanels;
 	}
 
 	filter( filterValue = '' ) {
-		const { categories, debouncedSpeak, items, rootChildBlocks } = this.props;
+		const { categories, collections, debouncedSpeak, items, rootChildBlocks } = this.props;
 
-		const filteredItems = searchItems( items, categories, filterValue );
+		const filteredItems = searchItems( items, categories, collections, filterValue );
 
 		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
 
@@ -178,6 +192,15 @@ export class InserterMenu extends Component {
 			( itemList ) => groupBy( itemList, 'category' )
 		)( filteredItems );
 
+		// Create a new Object to avoid mutating this.props.collection
+		const itemsPerCollection = { ...collections };
+		Object.keys( collections ).forEach( ( namespace ) => {
+			itemsPerCollection[ namespace ] = filteredItems.filter( ( item ) => getBlockNamespace( item ) === namespace );
+			if ( itemsPerCollection[ namespace ].length === 0 ) {
+				delete itemsPerCollection[ namespace ];
+			}
+		} );
+
 		this.setState( {
 			hoveredItem: null,
 			childItems,
@@ -185,9 +208,11 @@ export class InserterMenu extends Component {
 			suggestedItems,
 			reusableItems,
 			itemsPerCategory,
+			itemsPerCollection,
 			openPanels: this.filterOpenPanels(
 				filterValue,
 				itemsPerCategory,
+				itemsPerCollection,
 				filteredItems,
 				reusableItems
 			),
@@ -212,19 +237,19 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { categories, instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
+		const { categories, collections, instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
 		const {
 			childItems,
 			hoveredItem,
 			itemsPerCategory,
+			itemsPerCollection,
 			openPanels,
 			reusableItems,
 			suggestedItems,
 			filterValue,
 		} = this.state;
-
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
-		const hasItems = ! isEmpty( suggestedItems ) || ! isEmpty( reusableItems ) || ! isEmpty( itemsPerCategory );
+		const hasItems = ! isEmpty( suggestedItems ) || ! isEmpty( reusableItems ) || ! isEmpty( itemsPerCategory ) || ! isEmpty( itemsPerCollection );
 		const hoveredItemBlockType = hoveredItem ? getBlockType( hoveredItem.name ) : null;
 		const hasHelpPanel = hasItems && showInserterHelpPanel;
 
@@ -300,6 +325,26 @@ export class InserterMenu extends Component {
 							);
 						} ) }
 
+						{ map( collections, ( collection, namespace ) => {
+							const collectionItems = itemsPerCollection[ namespace ];
+							if ( ! collectionItems || ! collectionItems.length ) {
+								return null;
+							}
+
+							return (
+								<PanelBody
+									key={ namespace }
+									title={ collection.title }
+									icon={ collection.icon }
+									opened={ isPanelOpen( namespace ) }
+									onToggle={ this.onTogglePanel( namespace ) }
+									ref={ this.bindPanel( namespace ) }
+								>
+									<BlockTypesList items={ collectionItems } onSelect={ onSelect } onHover={ this.onHover } />
+								</PanelBody>
+							);
+						} ) }
+
 						{ !! reusableItems.length && (
 							<PanelBody
 								className="block-editor-inserter__reusable-blocks-panel"
@@ -347,7 +392,7 @@ export class InserterMenu extends Component {
 						{ hoveredItem && (
 							<>
 								{ ! isReusableBlock( hoveredItem ) && (
-									<BlockCard blockType={ hoveredItemBlockType } />
+									<BlockCard blockType={ hoveredItem } />
 								) }
 								<div className="block-editor-inserter__preview">
 									{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) ? (
@@ -357,7 +402,13 @@ export class InserterMenu extends Component {
 												viewportWidth={ 500 }
 												blocks={
 													hoveredItemBlockType.example ?
-														getBlockFromExample( hoveredItem.name, hoveredItemBlockType.example ) :
+														getBlockFromExample( hoveredItem.name, {
+															attributes: {
+																...hoveredItemBlockType.example.attributes,
+																...hoveredItem.initialAttributes,
+															},
+															innerBlocks: hoveredItemBlockType.example.innerBlocks,
+														} ) :
 														createBlock( hoveredItem.name, hoveredItem.initialAttributes )
 												}
 											/>
@@ -417,6 +468,7 @@ export default compose(
 		} = select( 'core/block-editor' );
 		const {
 			getCategories,
+			getCollections,
 			getChildBlockNames,
 		} = select( 'core/blocks' );
 
@@ -436,6 +488,7 @@ export default compose(
 
 		return {
 			categories: getCategories(),
+			collections: getCollections(),
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items: getInserterItems( destinationRootClientId ),
 			showInserterHelpPanel: showInserterHelpPanel && showInserterHelpPanelSetting,
@@ -496,9 +549,13 @@ export default compose(
 					onSelect,
 					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 				} = ownProps;
-				const { name, title, initialAttributes } = item;
+				const { name, title, initialAttributes, innerBlocks } = item;
 				const selectedBlock = getSelectedBlock();
-				const insertedBlock = createBlock( name, initialAttributes );
+				const insertedBlock = createBlock(
+					name,
+					initialAttributes,
+					createBlocksFromInnerBlocksTemplate( innerBlocks )
+				);
 
 				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );

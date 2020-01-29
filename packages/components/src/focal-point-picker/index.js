@@ -9,13 +9,13 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
+import { Path, SVG } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
 import withFocusOutside from '../higher-order/with-focus-outside';
-import { Path, SVG } from '../primitives';
 
 const TEXTCONTROL_MIN = 0;
 const TEXTCONTROL_MAX = 100;

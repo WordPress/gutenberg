@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
-import { Popover, Button, IconButton } from '@wordpress/components';
+import { Popover, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
@@ -56,7 +56,7 @@ export function DotTip( {
 					{ hasNextTip ? __( 'See next tip' ) : __( 'Got it' ) }
 				</Button>
 			</p>
-			<IconButton
+			<Button
 				className="nux-dot-tip__disable"
 				icon="no-alt"
 				label={ __( 'Disable tips' ) }

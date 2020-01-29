@@ -28,18 +28,20 @@ const EmbedPlaceholder = ( props ) => {
 				>
 					{ _x( 'Embed', 'button label' ) }
 				</Button>
-				{ cannotEmbed &&
-					<p className="components-placeholder__error">
-						{ __( 'Sorry, this content could not be embedded.' ) }<br />
-						<Button isSecondary onClick={ tryAgain }>{ _x( 'Try again', 'button label' ) }</Button> <Button isSecondary onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button>
-					</p>
-				}
 			</form>
 			<div className="components-placeholder__learn-more">
 				<ExternalLink href={ __( 'https://wordpress.org/support/article/embeds/' ) }>
 					{ __( 'Learn more about embeds' ) }
 				</ExternalLink>
 			</div>
+			{ cannotEmbed &&
+				<div className="components-placeholder__error">
+					<div className="components-placeholder__instructions">
+						{ __( 'Sorry, this content could not be embedded.' ) }
+					</div>
+					<Button isSecondary onClick={ tryAgain }>{ _x( 'Try again', 'button label' ) }</Button> <Button isSecondary onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button>
+				</div>
+			}
 		</Placeholder>
 	);
 };

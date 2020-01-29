@@ -14,8 +14,7 @@ import {
 	ExternalLink,
 	KeyboardShortcuts,
 	PanelBody,
-	Path,
-	SVG,
+	Popover,
 	TextareaControl,
 	TextControl,
 	ToggleControl,
@@ -23,12 +22,6 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import {
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN,
-	BACKSPACE,
-	ENTER,
 	rawShortcut,
 	displayShortcut,
 } from '@wordpress/keycodes';
@@ -43,33 +36,9 @@ import {
 import { Fragment, useState, useEffect } from '@wordpress/element';
 
 /**
- * It updates the link attribute when the
- * link settings changes.
- *
- * @param {Function} setter Setter attribute function.
+ * Internal dependencies
  */
-const updateLinkSetting = ( setter ) => ( setting, value ) => {
-	setter( { [ setting ]: value } );
-};
-
-/**
- * Updates the link attribute when it changes
- * through of the `onLinkChange` LinkControl callback.
- *
- * @param {Function} setter Setter attribute function.
- * @param {string} label Link label.
- */
-const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = '' } = {} ) => {
-	setter( {
-		title: escape( newTitle ),
-		url: newURL,
-	} );
-
-	// Set the item label as well if it isn't already defined.
-	if ( ! label ) {
-		setter( { label: escape( newTitle ) } );
-	}
-};
+import { toolbarSubmenuIcon, itemSubmenuIcon } from './icons';
 
 function NavigationLinkEdit( {
 	attributes,
@@ -77,61 +46,37 @@ function NavigationLinkEdit( {
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
+	showSubmenuIcon,
 	insertLinkBlock,
 } ) {
 	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
-	const link = title ? { title: unescape( title ), url } : null;
-	const [ isLinkOpen, setIsLinkOpen ] = useState( ! label && isSelected );
+	const link = {
+		title: title ? unescape( title ) : '',
+		url,
+		opensInNewTab,
+	};
+	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	const itemLabelPlaceholder = __( 'Add link…' );
 
-	let onCloseTimerId = null;
+	// Show the LinkControl on mount if the URL is empty
+	// ( When adding a new menu item)
+	// This can't be done in the useState call because it cconflicts
+	// with the autofocus behavior of the BlockListBlock component.
+	useEffect( () => {
+		if ( ! url ) {
+			setIsLinkOpen( true );
+		}
+	}, [] );
 
 	/**
-	 * It's a kind of hack to handle closing the LinkControl popover
-	 * clicking on the ToolbarButton link.
+	 * The hook shouldn't be necessary but due to a focus loss happening
+	 * when selecting a suggestion in the link popover, we force close on block unselection.
 	 */
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsLinkOpen( false );
 		}
-
-		return () => {
-			// Clear LinkControl.OnClose timeout.
-			if ( onCloseTimerId ) {
-				clearTimeout( onCloseTimerId );
-			}
-		};
 	}, [ isSelected ] );
-
-	/**
-	 * Opens the LinkControl popup
-	 */
-	const openLinkControl = () => {
-		if ( isLinkOpen ) {
-			return;
-		}
-
-		setIsLinkOpen( ! isLinkOpen );
-	};
-
-	/**
-	 * `onKeyDown` LinkControl handler.
-	 * It takes over to stop the event propagation to make the
-	 * navigation work, avoiding undesired behaviors.
-	 * For instance, it will block to move between link blocks
-	 * when the LinkControl is focused.
-	 *
-	 * @param {Event} event
-	 */
-	const handleLinkControlOnKeyDown = ( event ) => {
-		const { keyCode } = event;
-
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
-	};
-
-	const itemLabelPlaceholder = __( 'Add link…' );
 
 	return (
 		<Fragment>
@@ -140,7 +85,7 @@ function NavigationLinkEdit( {
 					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
-							[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+							[ rawShortcut.primary( 'k' ) ]: () => setIsLinkOpen( true ),
 						} }
 					/>
 					<ToolbarButton
@@ -148,11 +93,11 @@ function NavigationLinkEdit( {
 						icon="admin-links"
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
+						onClick={ () => setIsLinkOpen( true ) }
 					/>
 					<ToolbarButton
 						name="submenu"
-						icon={ <SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24"><Path d="M14 5h8v2h-8zm0 5.5h8v2h-8zm0 5.5h8v2h-8zM2 11.5C2 15.08 4.92 18 8.5 18H9v2l3-3-3-3v2h-.5C6.02 16 4 13.98 4 11.5S6.02 7 8.5 7H12V5H8.5C4.92 5 2 7.92 2 11.5z" /><Path fill="none" d="M0 0h24v24H0z" /></SVG> }
+						icon={ toolbarSubmenuIcon }
 						title={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
@@ -160,7 +105,7 @@ function NavigationLinkEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
-					title={ __( 'Link Settings' ) }
+					title={ __( 'Link settings' ) }
 				>
 					<TextareaControl
 						value={ description || '' }
@@ -168,10 +113,11 @@ function NavigationLinkEdit( {
 							setAttributes( { description: descriptionValue } );
 						} }
 						label={ __( 'Description' ) }
+						help={ __( 'The description will be displayed in the menu if the current theme supports it.' ) }
 					/>
 				</PanelBody>
 				<PanelBody
-					title={ __( 'SEO Settings' ) }
+					title={ __( 'SEO settings' ) }
 				>
 					<TextControl
 						value={ title || '' }
@@ -208,38 +154,64 @@ function NavigationLinkEdit( {
 					'has-link': !! url,
 				} ) }
 			>
-				<div>
+				<div className="wp-block-navigation-link__content">
 					<RichText
-						className="wp-block-navigation-link__content"
+						tagName="span"
+						className="wp-block-navigation-link__label"
 						value={ label }
 						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
 						placeholder={ itemLabelPlaceholder }
 						withoutInteractiveFormatting
+						allowedFormats={ [
+							'core/bold',
+							'core/italic',
+							'core/image',
+							'core/strikethrough',
+						] }
 					/>
+					{ showSubmenuIcon &&
+						<span className="wp-block-navigation-link__submenu-icon">
+							{ itemSubmenuIcon }
+						</span>
+					}
 					{ isLinkOpen && (
-						<LinkControl
-							className="wp-block-navigation-link__inline-link-input"
-							onKeyDown={ handleLinkControlOnKeyDown }
-							onKeyPress={ ( event ) => event.stopPropagation() }
-							currentLink={ link }
-							onLinkChange={ updateLink( setAttributes, label ) }
-							onClose={ () => {
-								onCloseTimerId = setTimeout( () => setIsLinkOpen( false ), 100 );
-							} }
-							currentSettings={ [
-								{
-									id: 'opensInNewTab',
-									title: __( 'Open in new tab' ),
-									checked: opensInNewTab,
-								},
-							] }
-							onSettingsChange={ updateLinkSetting( setAttributes ) }
-						/>
+						<Popover
+							position="bottom center"
+							onClose={ () => setIsLinkOpen( false ) }
+						>
+							<LinkControl
+								className="wp-block-navigation-link__inline-link-input"
+								value={ link }
+								showInitialSuggestions={ true }
+								onChange={ ( {
+									title: newTitle = '',
+									url: newURL = '',
+									opensInNewTab: newOpensInNewTab,
+									id,
+								} = {} ) => setAttributes( {
+									title: escape( newTitle ),
+									url: encodeURI( newURL ),
+									label: ( () => {
+										const normalizedTitle = newTitle.replace( /http(s?):\/\//gi, '' );
+										const normalizedURL = newURL.replace( /http(s?):\/\//gi, '' );
+										if (
+											newTitle !== '' &&
+											normalizedTitle !== normalizedURL &&
+											label !== newTitle ) {
+											return escape( newTitle );
+										}
+										return label;
+									} )(),
+									opensInNewTab: newOpensInNewTab,
+									id,
+								} ) }
+							/>
+						</Popover>
 					) }
 				</div>
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
-					renderAppender={ hasDescendants ? InnerBlocks.ButtonBlockAppender : false }
+					renderAppender={ ( ( hasDescendants && isSelected ) || isParentOfSelectedBlock ) ? InnerBlocks.DefaultAppender : false }
 				/>
 			</div>
 		</Fragment>
@@ -248,12 +220,26 @@ function NavigationLinkEdit( {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getClientIdsOfDescendants, hasSelectedInnerBlock } = select( 'core/block-editor' );
+		const {
+			getBlockName,
+			getBlockAttributes,
+			getBlockParents,
+			getClientIdsOfDescendants,
+			hasSelectedInnerBlock,
+		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
+		const rootBlock = getBlockParents( clientId )[ 0 ];
+		const parentBlock = getBlockParents( clientId, true )[ 0 ];
+		const rootBlockAttributes = getBlockAttributes( rootBlock );
+		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] ).length;
+		const isLevelZero = getBlockName( parentBlock ) === 'core/navigation';
+		const showSubmenuIcon = rootBlockAttributes.showSubmenuIcon && isLevelZero && hasDescendants;
+		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
 		return {
-			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
-			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
+			isParentOfSelectedBlock,
+			hasDescendants,
+			showSubmenuIcon,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {

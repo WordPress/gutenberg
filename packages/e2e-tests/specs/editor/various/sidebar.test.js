@@ -96,7 +96,6 @@ describe( 'Sidebar', () => {
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
 
 		// Tab lands at first (presumed selected) option "Document".
 		await page.keyboard.press( 'Tab' );

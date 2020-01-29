@@ -63,9 +63,9 @@ class Editor extends Component {
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
 			const defaultAllowedBlockTypes = (
-				true === settings.allowedBlockTypes ?
-					map( blockTypes, 'name' ) :
-					( settings.allowedBlockTypes || [] )
+				true === settings.allowedBlockTypes
+					? map( blockTypes, 'name' )
+					: ( settings.allowedBlockTypes || [] )
 			);
 
 			settings.allowedBlockTypes = without(

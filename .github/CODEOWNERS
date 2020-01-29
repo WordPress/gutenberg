@@ -11,6 +11,7 @@
 
 # Blocks
 /packages/block-library                         @Soean @ajitbohra @jorgefilipecosta @talldan
+/packages/block-library/src/gallery             @mkevins @pinarol
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
 
@@ -31,7 +32,7 @@
 
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
-/bin/update-readmes.js                          @ntwb @nerrad @ajitbohra @nosolosw
+/bin/api-docs                                   @ntwb @nerrad @ajitbohra @nosolosw
 /docs/tool                                      @youknowriad @chrisvanpatten @ajitbohra @nosolosw
 /packages/babel-plugin-import-jsx-pragma        @gziolo @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra

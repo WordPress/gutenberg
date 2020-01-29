@@ -83,8 +83,8 @@ async function trashExistingPosts() {
 	}
 
 	// Select all posts.
-	await page.waitForSelector( '#cb-select-all-1' );
-	await page.click( '#cb-select-all-1' );
+	await page.waitForSelector( '[id^=cb-select-all-]' );
+	await page.click( '[id^=cb-select-all-]' );
 	// Select the "bulk actions" > "trash" option.
 	await page.select( '#bulk-action-selector-top', 'trash' );
 	// Submit the form to send all draft/scheduled/published posts to the trash.
@@ -152,6 +152,22 @@ function observeConsoleLogging() {
 		// Network errors are ignored only if we are intentionally testing
 		// offline mode.
 		if ( text.includes( 'net::ERR_INTERNET_DISCONNECTED' ) && isOfflineMode() ) {
+			return;
+		}
+
+		// As of WordPress 5.3.2 in Chrome 79, navigating to the block editor
+		// (Posts > Add New) will display a console warning about
+		// non - unique IDs.
+		// See: https://core.trac.wordpress.org/ticket/23165
+		if ( text.includes( 'elements with non-unique id #_wpnonce' ) ) {
+			return;
+		}
+
+		// As of WordPress 5.3.2 in Chrome 79, navigating to the block editor
+		// (Posts > Add New) will display a console warning about
+		// non - unique IDs.
+		// See: https://core.trac.wordpress.org/ticket/23165
+		if ( text.includes( 'elements with non-unique id #_wpnonce' ) ) {
 			return;
 		}
 

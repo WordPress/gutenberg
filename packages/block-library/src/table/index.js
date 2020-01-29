@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
+import { table as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';

@@ -12,7 +12,6 @@ import { Component, createRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
 import Button from '../button';
 
 class ClipboardButton extends Component {
@@ -75,9 +74,7 @@ class ClipboardButton extends Component {
 		// Disable reason: Exclude from spread props passed to Button
 		// eslint-disable-next-line no-unused-vars
 		const { className, children, onCopy, onFinishCopy, text, ...buttonProps } = this.props;
-		const { icon } = buttonProps;
 		const classes = classnames( 'components-clipboard-button', className );
-		const ComponentToUse = icon ? IconButton : Button;
 
 		// Workaround for inconsistent behavior in Safari, where <textarea> is not
 		// the document.activeElement at the moment when the copy event fires.
@@ -90,9 +87,9 @@ class ClipboardButton extends Component {
 
 		return (
 			<span ref={ this.containerRef } onCopy={ focusOnCopyEventTarget }>
-				<ComponentToUse { ...buttonProps } className={ classes }>
+				<Button { ...buttonProps } className={ classes }>
 					{ children }
-				</ComponentToUse>
+				</Button>
 			</span>
 		);
 	}

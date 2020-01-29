@@ -24,7 +24,7 @@ import {
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 
 /**
  * Browser dependencies
@@ -66,7 +66,7 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 					getComputedStyle(
 						element,
 						'first-letter'
-					).height
+					).lineHeight
 				);
 			} else if ( minimumHeight ) {
 				setMinimumHeight( undefined );
@@ -94,12 +94,12 @@ function ParagraphBlock( {
 		direction,
 	} = attributes;
 
+	const ref = useRef();
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [ fontSize.size ] );
 	const {
 		TextColor,
 		BackgroundColor,
 		InspectorControlsColorPanel,
-		ColorDetector,
 	} = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
@@ -107,6 +107,7 @@ function ParagraphBlock( {
 		],
 		{
 			contrastCheckers: [ { backgroundColor: true, textColor: true, fontSize: fontSize.size } ],
+			colorDetector: { targetRef: ref },
 		},
 		[ fontSize.size ]
 	);
@@ -124,7 +125,7 @@ function ParagraphBlock( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
+				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
 						value={ fontSize.size }
 						onChange={ setFontSize }
@@ -133,9 +134,9 @@ function ParagraphBlock( {
 						label={ __( 'Drop Cap' ) }
 						checked={ !! dropCap }
 						onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
-						help={ dropCap ?
-							__( 'Showing large initial letter.' ) :
-							__( 'Toggle to show a large initial letter.' )
+						help={ dropCap
+							? __( 'Showing large initial letter.' )
+							: __( 'Toggle to show a large initial letter.' )
 						}
 					/>
 				</PanelBody>
@@ -143,8 +144,8 @@ function ParagraphBlock( {
 			{ InspectorControlsColorPanel }
 			<BackgroundColor>
 				<TextColor>
-					<ColorDetector querySelector='[contenteditable="true"]' />
 					<RichText
+						ref={ ref }
 						identifier="content"
 						tagName="p"
 						className={ classnames( 'wp-block-paragraph', className, {
@@ -175,6 +176,7 @@ function ParagraphBlock( {
 						aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
 						placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
 						__unstableEmbedURLOnPaste
+						__unstableAllowPrefixTransformations
 					/>
 				</TextColor>
 			</BackgroundColor>

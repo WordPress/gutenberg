@@ -1,4 +1,6 @@
-## Master
+## 2.10.0 (2019-12-19)
+
+### New Features
 
 - Added `__experimentalCreateInterpolateElement` function (see [17376](https://github.com/WordPress/gutenberg/pull/17376))
 

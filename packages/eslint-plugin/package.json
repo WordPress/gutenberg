@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "3.2.0",
+	"version": "3.3.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,7 +24,8 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"babel-eslint": "^10.0.2",
+		"babel-eslint": "^10.0.3",
+		"eslint-config-prettier": "^6.10.0",
 		"eslint-plugin-jest": "^22.15.1",
 		"eslint-plugin-jsdoc": "^15.8.0",
 		"eslint-plugin-jsx-a11y": "^6.2.3",

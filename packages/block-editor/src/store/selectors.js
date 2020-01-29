@@ -149,7 +149,7 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, clientId ) => [
-		// Normally, we'd have both  `getBlockAttributes` dependancies and
+		// Normally, we'd have both `getBlockAttributes` dependencies and
 		// `getBlocks` (children) dependancies here but for performance reasons
 		// we use a denormalized cache key computed in the reducer that takes both
 		// the attributes and inner blocks into account. The value of the cache key
@@ -1255,15 +1255,21 @@ export const getInserterItems = createSelector(
 
 			const isContextual = isArray( blockType.parent );
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
+			const inserterPatterns = blockType.patterns.filter(
+				( { scope } ) => ! scope || scope.includes( 'inserter' )
+			);
 
 			return {
 				id,
 				name: blockType.name,
 				initialAttributes: {},
 				title: blockType.title,
+				description: blockType.description,
 				icon: blockType.icon,
 				category: blockType.category,
 				keywords: blockType.keywords,
+				patterns: inserterPatterns,
+				example: blockType.example,
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),
