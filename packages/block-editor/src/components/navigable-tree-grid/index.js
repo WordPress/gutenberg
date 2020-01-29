@@ -102,8 +102,12 @@ export default function NavigableTreeGrid( { children, ...props } ) {
 	};
 
 	return (
-		<RovingTabIndexContainer tagName={ 'table' } role="treegrid" onKeyDown={ onKeyDown } ref={ containerRef } { ...props }>
-			{ children }
+		<RovingTabIndexContainer>
+			{ /* Disable reason: A treegrid is implemented using a table element. */ }
+			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role */ }
+			<table role="treegrid" onKeyDown={ onKeyDown } ref={ containerRef } { ...props }>
+				{ children }
+			</table>
 		</RovingTabIndexContainer>
 	);
 }

@@ -11,14 +11,15 @@ import { RovingTabIndexProvider } from './context';
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/roving-tab-index/README.md
  */
-export default function RovingTabIndexContainer( { children, tagName: TagName, ...props } ) {
-	const [ lastFocusedElement, setLastFocusedElement ] = useState();
+export default function RovingTabIndexContainer( { children } ) {
+	const [ providerValue, setProviderValue ] = useState( {
+		lastFocusedElement: undefined,
+		setLastFocusedElement: ( element ) => setProviderValue( { ...providerValue, lastFocusedElement: element } ),
+	} );
 
 	return (
-		<RovingTabIndexProvider value={ lastFocusedElement }>
-			<TagName onFocus={ ( event ) => setLastFocusedElement( event.target ) } { ...props }>
-				{ children }
-			</TagName>
+		<RovingTabIndexProvider value={ providerValue }>
+			{ children }
 		</RovingTabIndexProvider>
 	);
 }
