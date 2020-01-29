@@ -122,7 +122,7 @@
     "build:gutenberg": "cd gutenberg && npm install && npm run build",
     "clean": "yarn clean:build-artifacts; yarn clean:aztec; yarn cache clean; yarn clean:haste; yarn clean:jest; yarn clean:metro; yarn clean:react; yarn clean:watchman; yarn clean:node; yarn clean:pot",
     "clean:runtime": "yarn clean:haste; yarn clean:react; yarn clean:metro; yarn clean:jest; yarn clean:watchman; yarn clean:babel-cache",
-    "clean:build-artifacts": "rm -rf ./ios/build",
+    "clean:build-artifacts": "rm -rf ./ios/build && rm -rf ./ios/Pods",
     "clean:aztec": "cd react-native-aztec && yarn clean",
     "clean:gutenberg": "cd gutenberg && npm run clean:packages && rm -rf build && rm -rf node_modules",
     "clean:pot": "rm -f gutenberg*.pot",
