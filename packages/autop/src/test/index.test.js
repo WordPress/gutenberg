@@ -86,21 +86,44 @@ done = 0;
 	expect( autop( str ).trim() ).toBe( expected );
 } );
 
-test( 'skip script/style elements', () => {
-	// Not wrapped in <p> tags
-	const str = `<script>
+describe( 'exempt tags', () => {
+	it.each( [
+		[
+			'script',
+			`<script>
 (function(){
 
 done = 0;
-});</script>
-<style>
+});</script>`,
+		],
+		[
+			'style',
+			`<style>
 .example {
 
 	color: red;
 }
-</style>`;
-
-	expect( autop( str ).trim() ).toBe( str );
+</style>`,
+		],
+		[
+			'pre',
+			`<pre>
+body {
+	background-color: blue;
+}
+</pre>`,
+		],
+		[
+			'svg',
+			`<svg xmlns="http://www.w3.org/2000/svg">
+<circle cx="50" cy="50" r="30" fill="blue">
+<animateTransform attributeName="transform" type="scale" to="1.5" dur="2s" fill="freeze"/>
+</circle>
+</svg>`,
+		],
+	] )( '%s', ( _tagName, str ) => {
+		expect( autop( str ).trim() ).toBe( str );
+	} );
 } );
 
 test( 'avoid pulling out inline script', () => {
