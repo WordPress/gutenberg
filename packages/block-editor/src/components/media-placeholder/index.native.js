@@ -22,6 +22,11 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 
+// remove duplicates after gallery append
+const dedupMedia = ( media ) => uniqWith( media, ( media1, media2 ) => {
+	return media1.id === media2.id || media1.url === media2.url;
+} );
+
 function MediaPlaceholder( props ) {
 	const {
 		addToGallery,
@@ -36,15 +41,15 @@ function MediaPlaceholder( props ) {
 		value = [],
 	} = props;
 
+	// use ref to keep media array current for callbacks during rerenders
 	const mediaRef = useRef( value );
 	mediaRef.current = value;
 
-	const setMedia = multiple && addToGallery ?
-		( selected ) => onSelect( uniqWith( [ ...mediaRef.current, ...selected ],
-			( media1, media2 ) => {
-				return media1.id === media2.id || media1.url === media2.url;
-		} ) ) :
-		onSelect;
+	// append and deduplicate media array for gallery use case
+	const setMedia = multiple && addToGallery ? ( selected ) => { 
+		return onSelect( dedupMedia ( [ ...mediaRef.current, ...selected ] ) );
+	} :
+	onSelect;
 
 	const isOneType = allowedTypes.length === 1;
 	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
