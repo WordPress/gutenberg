@@ -29,11 +29,11 @@ export const Root = styled.span`
 	${ rootWidth };
 `;
 
-const wrapperColor = ( { color: colorProp } ) => css( { color: colorProp } );
 const wrapperMargin = ( { marks } ) => css( { marginBottom: marks ? 16 : null } );
 
 export const Wrapper = styled.span`
 	box-sizing: border-box;
+	color: ${ color( 'blue.medium.focus' ) };
 	display: block;
 	padding-top: 15px;
 	position: relative;
@@ -41,7 +41,6 @@ export const Wrapper = styled.span`
 	width: 100%;
 
 	${ rangeHeight };
-	${ wrapperColor };
 	${ wrapperMargin };
 
 	[dir=rtl] & {
@@ -167,14 +166,12 @@ const handleReducedMotion = () => {
 
 const thumbFocus = ( { isFocused } ) => {
 	return css( {
-		borderColor: isFocused ? color( 'darkGray.400' ) : color( 'darkGray.200' ),
+		borderColor: isFocused ? color( 'blue.medium.focus' ) : color( 'darkGray.200' ),
 		boxShadow: isFocused ?
 			`
-				0 1px 2px rgba(0, 0, 0, 0.1),
-				0 4px 8px rgba(0, 0, 0, 0.2)
+				0 0 0 1px ${ color( 'blue.medium.focus' ) }
 			` :
 			`
-				0 0 0 rgba(0, 0, 0, 0),
 				0 0 0 rgba(0, 0, 0, 0)
 			`,
 	} );
@@ -190,12 +187,10 @@ export const Thumb = styled.span`
 	outline: 0;
 	pointer-events: none;
 	position: absolute;
-	transition: box-shadow 60ms linear;
 	user-select: none;
 	width: 100%;
 
 	${ thumbFocus };
-	${ handleReducedMotion };
 `;
 
 export const InputRange = styled.input`

@@ -79,6 +79,7 @@ const BaseRangeControlNext = forwardRef(
 		const sliderValue = initialPosition || valueProp;
 		const [ value, setValue ] = useControlledRangeValue( { min, max, value: sliderValue } );
 		const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
+		const [ isFocused, setIsFocused ] = useState( false );
 		const originalValueRef = useRef( value );
 
 		const inputRef = useRef();
@@ -91,7 +92,7 @@ const BaseRangeControlNext = forwardRef(
 			}
 		};
 
-		const isFocused = ! disabled && showTooltip;
+		const isThumbFocused = ! disabled && isFocused;
 		const fillValue = ( ( value - min ) / ( max - min ) ) * 100;
 		const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
 
@@ -130,11 +131,13 @@ const BaseRangeControlNext = forwardRef(
 
 		const handleOnBlur = ( event ) => {
 			onBlur( event );
+			setIsFocused( false );
 			handleHideTooltip();
 		};
 
 		const handleOnFocus = ( event ) => {
 			onFocus( event );
+			setIsFocused( true );
 			handleShowTooltip();
 		};
 
@@ -197,7 +200,7 @@ const BaseRangeControlNext = forwardRef(
 							style={ { width: fillValueOffset } }
 						/>
 						<ThumbWrapper style={ offsetStyle }>
-							<Thumb aria-hidden={ true } isFocused={ isFocused } />
+							<Thumb aria-hidden={ true } isFocused={ isThumbFocused } />
 						</ThumbWrapper>
 						{ enableTooltip && (
 							<SimpleTooltip
@@ -250,12 +253,18 @@ const BaseRangeControlNext = forwardRef(
 	}
 );
 
+/**
+ * A Higher-Order function that creates a clamp function for a specific value.
+ */
 function createClampValue( { min = 0, max = 10 } ) {
 	return ( value ) => {
 		return parseFloat( clamp( value, min, max ) );
 	};
 }
 
+/**
+ * Hook to store a clamped value, derived from props.
+ */
 function useControlledRangeValue( { min, max, value: valueProp = 0 } ) {
 	const clampValue = createClampValue( { min, max } );
 
@@ -279,6 +288,10 @@ function useControlledRangeValue( { min, max, value: valueProp = 0 } ) {
 	return [ value, setValue ];
 }
 
+/**
+ * Hook to encapsulate the debouncing "hover" to better handle the showing
+ * and hiding of the Tooltip.
+ */
 function useDebouncedHoverInteraction( {
 	onShow = noop,
 	onHide = noop,

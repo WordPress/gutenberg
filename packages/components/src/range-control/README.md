@@ -152,14 +152,6 @@ If this property is true, a button to reset the the slider is rendered.
 - Required: No
 - Platform: Web | Mobile
 
-#### color
-
-Color to render the filled range UI.
-
-- Type: `String`
-- Required: No
-- Platform: Web
-
 #### disabled
 
 Disables the `input`, preventing new values from being applied.

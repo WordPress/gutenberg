@@ -3190,6 +3190,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
 
 .emotion-14 {
   box-sizing: border-box;
+  color: #007cba;
   display: block;
   padding-top: 15px;
   position: relative;
@@ -3197,7 +3198,6 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   width: 100%;
   height: 30px;
   min-height: 30px;
-  color: #00669b;
 }
 
 [dir=rtl] .emotion-14 {
@@ -3290,22 +3290,13 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   outline: 0;
   pointer-events: none;
   position: absolute;
-  -webkit-transition: box-shadow 60ms linear;
-  transition: box-shadow 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   width: 100%;
   border-color: #7e8993;
-  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .emotion-8 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
+  box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
 .emotion-12 {
@@ -4902,22 +4893,13 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   outline: 0;
   pointer-events: none;
   position: absolute;
-  -webkit-transition: box-shadow 60ms linear;
-  transition: box-shadow 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   width: 100%;
   border-color: #7e8993;
-  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .emotion-28 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
+  box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
 .emotion-32 {
@@ -5000,6 +4982,7 @@ input[type="number"].emotion-36 {
 
 .emotion-34 {
   box-sizing: border-box;
+  color: #007cba;
   display: block;
   padding-top: 15px;
   position: relative;
@@ -5007,7 +4990,6 @@ input[type="number"].emotion-36 {
   width: 100%;
   height: 30px;
   min-height: 30px;
-  color: #00669b;
   margin-bottom: 16px;
 }
 
@@ -5303,6 +5285,7 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
 
 .emotion-10 {
   box-sizing: border-box;
+  color: #007cba;
   display: block;
   padding-top: 15px;
   position: relative;
@@ -5310,7 +5293,6 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
   width: 100%;
   height: 30px;
   min-height: 30px;
-  color: #00669b;
 }
 
 [dir=rtl] .emotion-10 {
@@ -5403,22 +5385,13 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
   outline: 0;
   pointer-events: none;
   position: absolute;
-  -webkit-transition: box-shadow 60ms linear;
-  transition: box-shadow 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   width: 100%;
   border-color: #7e8993;
-  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .emotion-6 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
+  box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
 .emotion-12 {
@@ -5553,6 +5526,7 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
 
 .emotion-12 {
   box-sizing: border-box;
+  color: #007cba;
   display: block;
   padding-top: 15px;
   position: relative;
@@ -5560,7 +5534,6 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   width: 100%;
   height: 30px;
   min-height: 30px;
-  color: #00669b;
 }
 
 [dir=rtl] .emotion-12 {
@@ -5653,22 +5626,13 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   outline: 0;
   pointer-events: none;
   position: absolute;
-  -webkit-transition: box-shadow 60ms linear;
-  transition: box-shadow 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   width: 100%;
   border-color: #7e8993;
-  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .emotion-6 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
+  box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
 .emotion-10 {
@@ -5868,6 +5832,7 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
 
 .emotion-12 {
   box-sizing: border-box;
+  color: #007cba;
   display: block;
   padding-top: 15px;
   position: relative;
@@ -5875,7 +5840,6 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   width: 100%;
   height: 30px;
   min-height: 30px;
-  color: #00669b;
 }
 
 [dir=rtl] .emotion-12 {
@@ -5968,22 +5932,13 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   outline: 0;
   pointer-events: none;
   position: absolute;
-  -webkit-transition: box-shadow 60ms linear;
-  transition: box-shadow 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   width: 100%;
   border-color: #7e8993;
-  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .emotion-6 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
+  box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
 .emotion-10 {
@@ -6190,6 +6145,7 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
 
 .emotion-12 {
   box-sizing: border-box;
+  color: #007cba;
   display: block;
   padding-top: 15px;
   position: relative;
@@ -6197,7 +6153,6 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   width: 100%;
   height: 30px;
   min-height: 30px;
-  color: #00669b;
 }
 
 [dir=rtl] .emotion-12 {
@@ -6290,22 +6245,13 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   outline: 0;
   pointer-events: none;
   position: absolute;
-  -webkit-transition: box-shadow 60ms linear;
-  transition: box-shadow 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   width: 100%;
   border-color: #7e8993;
-  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .emotion-6 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
+  box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
 .emotion-10 {
@@ -6541,6 +6487,7 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
 
 .emotion-14 {
   box-sizing: border-box;
+  color: #007cba;
   display: block;
   padding-top: 15px;
   position: relative;
@@ -6548,7 +6495,6 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   width: 100%;
   height: 30px;
   min-height: 30px;
-  color: #00669b;
 }
 
 [dir=rtl] .emotion-14 {
@@ -6641,22 +6587,13 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   outline: 0;
   pointer-events: none;
   position: absolute;
-  -webkit-transition: box-shadow 60ms linear;
-  transition: box-shadow 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   width: 100%;
   border-color: #7e8993;
-  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .emotion-8 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
+  box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
 .emotion-12 {
@@ -6874,6 +6811,7 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
 
 .emotion-12 {
   box-sizing: border-box;
+  color: #007cba;
   display: block;
   padding-top: 15px;
   position: relative;
@@ -6881,7 +6819,6 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   width: 100%;
   height: 30px;
   min-height: 30px;
-  color: #00669b;
 }
 
 [dir=rtl] .emotion-12 {
@@ -6974,22 +6911,13 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   outline: 0;
   pointer-events: none;
   position: absolute;
-  -webkit-transition: box-shadow 60ms linear;
-  transition: box-shadow 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   width: 100%;
   border-color: #7e8993;
-  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .emotion-6 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
+  box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
 .emotion-10 {
@@ -7189,6 +7117,7 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
 
 .emotion-12 {
   box-sizing: border-box;
+  color: #007cba;
   display: block;
   padding-top: 15px;
   position: relative;
@@ -7196,7 +7125,6 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   width: 100%;
   height: 30px;
   min-height: 30px;
-  color: #00669b;
 }
 
 [dir=rtl] .emotion-12 {
@@ -7289,22 +7217,13 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   outline: 0;
   pointer-events: none;
   position: absolute;
-  -webkit-transition: box-shadow 60ms linear;
-  transition: box-shadow 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   width: 100%;
   border-color: #7e8993;
-  box-shadow: 0 0 0 rgba(0,0,0,0), 0 0 0 rgba(0,0,0,0);
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .emotion-6 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
+  box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
 .emotion-10 {
