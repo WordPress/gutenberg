@@ -5,6 +5,13 @@ import { __ } from '@wordpress/i18n';
 import { Toolbar } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import {
+	alignBlockCenter,
+	alignBlockFullWidth,
+	alignBlockLeft,
+	alignBlockRight,
+	alignBlockWide,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -13,23 +20,23 @@ import { withBlockEditContext } from '../block-edit/context';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
-		icon: 'align-left',
+		icon: alignBlockLeft,
 		title: __( 'Align left' ),
 	},
 	center: {
-		icon: 'align-center',
+		icon: alignBlockCenter,
 		title: __( 'Align center' ),
 	},
 	right: {
-		icon: 'align-right',
+		icon: alignBlockRight,
 		title: __( 'Align right' ),
 	},
 	wide: {
-		icon: 'align-wide',
+		icon: alignBlockWide,
 		title: __( 'Wide width' ),
 	},
 	full: {
-		icon: 'align-full-width',
+		icon: alignBlockFullWidth,
 		title: __( 'Full width' ),
 	},
 };

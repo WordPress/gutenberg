@@ -3883,23 +3883,15 @@ exports[`Storyshots Components/Panel Default 1`] = `
             aria-hidden="true"
             className="components-panel__arrow"
             focusable="false"
-            height="24px"
+            height={24}
             role="img"
             viewBox="0 0 24 24"
-            width="24px"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <g>
-              <path
-                d="M0,0h24v24H0V0z"
-                fill="none"
-              />
-            </g>
-            <g>
-              <path
-                d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
-              />
-            </g>
+            <path
+              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            />
           </svg>
         </span>
         My Block Settings
@@ -3944,23 +3936,15 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
             aria-hidden="true"
             className="components-panel__arrow"
             focusable="false"
-            height="24px"
+            height={24}
             role="img"
             viewBox="0 0 24 24"
-            width="24px"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <g>
-              <path
-                d="M0,0h24v24H0V0z"
-                fill="none"
-              />
-            </g>
-            <g>
-              <path
-                d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
-              />
-            </g>
+            <path
+              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            />
           </svg>
         </span>
         First Settings
@@ -3991,23 +3975,15 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
             aria-hidden="true"
             className="components-panel__arrow"
             focusable="false"
-            height="24px"
+            height={24}
             role="img"
             viewBox="0 0 24 24"
-            width="24px"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <g>
-              <path
-                d="M0,0h24v24H0V0z"
-                fill="none"
-              />
-            </g>
-            <g>
-              <path
-                d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
-              />
-            </g>
+            <path
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+            />
           </svg>
         </span>
         Second Settings
@@ -4047,23 +4023,15 @@ exports[`Storyshots Components/Panel With Icon 1`] = `
             aria-hidden="true"
             className="components-panel__arrow"
             focusable="false"
-            height="24px"
+            height={24}
             role="img"
             viewBox="0 0 24 24"
-            width="24px"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <g>
-              <path
-                d="M0,0h24v24H0V0z"
-                fill="none"
-              />
-            </g>
-            <g>
-              <path
-                d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
-              />
-            </g>
+            <path
+              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            />
           </svg>
         </span>
         My Block Settings
