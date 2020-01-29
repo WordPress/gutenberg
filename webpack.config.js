@@ -153,12 +153,10 @@ module.exports = {
 						.replace( /(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/, '$1, 20' );
 				},
 			},
-		] ),
-		new CopyWebpackPlugin( [
 			{
-				from: './packages/block-library/src/+(shortcode)/block.json',
+				from: './packages/block-library/src/*/block.json',
 				test: new RegExp( `([\\w-]+)${ escapeRegExp( sep ) }block\\.json$` ),
-				to: 'build/block-library/blocks/[1].json',
+				to: 'build/block-library/blocks/[1]/block.json',
 			},
 		] ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
