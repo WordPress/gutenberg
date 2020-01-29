@@ -16,7 +16,7 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
-**Note**: This package requires `npm` 6.9.0 or later, and is not compatible with older versions.
+**Note**: This package requires `node` 10.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
 
 ## Setup
 
@@ -30,6 +30,7 @@ _Example:_
 		"build": "wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses",
+		"format:js": "wp-scripts format-js",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"lint:md": "wp-scripts lint-md",
@@ -48,7 +49,7 @@ It might also be a good idea to get familiar with the [JavaScript Build Setup tu
 
 To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
 
-In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md) for potential breaking changes.
+In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `update-packages` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
 
 We commit to keeping the breaking changes minimal so you can upgrade `@wordpress/scripts` as seamless as possible.
 
@@ -98,7 +99,7 @@ This is how you execute the script with presented setup:
 
 #### Advanced information
 
-It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. Similarly to this package, the default requirements are `node` 10.0.0 or later, and `npm` 6.9.0 or later. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-licenses`
 
@@ -170,6 +171,29 @@ In the `wp-env` config block, each entry can be configured like so:
 - `test-php`: Runs your plugin's PHPUnit tests. You will need to have an appropriately configured `phpunit.xml.dist` file.
 - `docker-run`: For more advanced debugging, contributors may sometimes need to run commands in the Docker containers. This is the equivalent of running `docker-compose run` within the WordPress directory.
 
+### `format-js`
+
+It helps to enforce coding style guidelines for your JavaScript files by formatting source code in a consistent way.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"format:js": "wp-scripts format-js",
+		"format:js:src": "wp-scripts format-js ./src"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+
+* `npm run format:js` - formats JavaScript files in the entire project’s directories.
+* `npm run format:js:src` - formats JavaScript files in the project’s `src` subfolder’s directories.
+
+When you run commands similar to the `npm run format:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
+
+By default, files located in `build` and `node_modules` folders are ignored.
 
 ### `lint-js`
 
