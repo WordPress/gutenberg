@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isUndefined, map, pickBy } from 'lodash';
+import { get, isUndefined, map, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -329,7 +329,8 @@ class LatestPostsEdit extends Component {
 							'';
 
 						const imageSourceUrl = getFeaturedMediaSourceUrl(
-							post.featured_media
+							post.featured_media,
+							imageSizeSlug
 						);
 						const imageClasses = classnames( [
 							'wp-block-latest-posts__featured-image',
@@ -443,12 +444,18 @@ export default withSelect( ( select, props ) => {
 			label: name,
 		} ) ),
 		// @todo get size dynamically based on size selected.
-		getFeaturedMediaSourceUrl( featuredImageId ) {
+		getFeaturedMediaSourceUrl( featuredImageId, sizeSlug ) {
 			if ( featuredImageId ) {
-				const media = getMedia( featuredImageId );
-				if ( media ) {
-					return media.source_url;
+				const image = getMedia( featuredImageId );
+				const url = get(
+					image,
+					[ 'media_details', 'sizes', sizeSlug, 'source_url' ],
+					null
+				);
+				if ( ! url ) {
+					return get( image, 'source_url', null );
 				}
+				return url;
 			}
 			return null;
 		},
