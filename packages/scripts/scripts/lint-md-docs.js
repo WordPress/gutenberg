@@ -43,7 +43,7 @@ const hasIgnoredFiles = hasArgInCLI( '--ignore' ) || hasArgInCLI( '-i' ) ||
 // markdownlint looks for .markdownlintignore in project direcotry, but how our
 // scripts work we store the configs in the scripts/config directory
 const defaultIgnoreArgs = ! hasIgnoredFiles ?
-	[ '--ignore', 'build', '--ignore', 'node_modules' ] :
+	[ '--ignore', '**/build/**', '--ignore', '**/node_modules/**' ] :
 	[];
 
 const result = spawn(

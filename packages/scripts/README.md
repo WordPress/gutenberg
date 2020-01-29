@@ -34,7 +34,7 @@ _Example:_
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"lint:md:docs": "wp-scripts lint-md-docs",
-		"lint-md:js": "wp-scripts lint-md-js",
+		"lint:md:js": "wp-scripts lint-md-js",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"packages-update": "wp-scripts packages-update",
 		"start": "wp-scripts start",
@@ -261,14 +261,14 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"lint-md:docs": "wp-scripts lint-md-docs"
+		"lint:md:docs": "wp-scripts lint-md-docs"
 	}
 }
 ```
 
 This is how you execute the script with presented setup:
 
-* `npm run lint-md:docs` - lints markdown files in the entire project’s directories.
+* `npm run lint:md:docs` - lints markdown files in the entire project’s directories.
 
 By default, files located in `build` and `node_modules` folders are ignored.
 
@@ -285,14 +285,14 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"lint-md:js": "wp-scripts lint-md-js"
+		"lint:md:js": "wp-scripts lint-md-js"
 	}
 }
 ```
 
 This is how you execute the script with presented setup:
 
-* `npm run lint-md:js` - lints markdown files in the entire project’s directories.
+* `npm run lint:md:js` - lints markdown files in the entire project’s directories.
 
 By default, files located in `build` and `node_modules` folders are ignored.
 
