@@ -43,3 +43,5 @@ You can join us in the `#core-editor` channel in Slack, see [WordPress Slack pag
 ## License
 
 WordPress is free software, and is released under the terms of the GNU General Public License version 2 or (at your option) any later version. See [LICENSE.md](LICENSE.md) for complete license.
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
