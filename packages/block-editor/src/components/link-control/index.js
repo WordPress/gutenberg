@@ -107,6 +107,10 @@ function LinkControl( {
 		// When `isEditingLink` is set to `false`, a focus loss could occur
 		// since the link input may be removed from the DOM. To avoid this,
 		// reinstate focus to a suitable target if focus has in-fact been lost.
+		// Note that the check is necessary because while typically unsetting
+		// edit mode would render the read-only mode's link element, it isn't
+		// guaranteed. The link input may continue to be shown if the next value
+		// is still unassigned after calling `onChange`.
 		const hadFocusLoss = (
 			isEndingEditWithFocus.current &&
 			wrapperNode.current &&
@@ -115,10 +119,7 @@ function LinkControl( {
 
 		if ( hadFocusLoss ) {
 			// Prefer to focus a natural focusable descendent of the wrapper,
-			// but settle for the wrapper if there are no other options. Note
-			// that typically this would be the read-only mode's link element,
-			// but isn't guaranteed to be, since the input may continue to be
-			// forced to be shown if the next value is still unassigned.
+			// but settle for the wrapper if there are no other options.
 			const nextFocusTarget = (
 				focus.focusable.find( wrapperNode.current )[ 0 ] ||
 				wrapperNode.current
