@@ -49,7 +49,7 @@ class Editor extends Component {
 			...settings,
 			__experimentalPreferredStyleVariations: {
 				value: {
-					...( settings.themeAutoApplyStyles || {} ),
+					...( settings.__experimentalPreferredBlockStyles || {} ),
 					...preferredStyleVariations,
 				},
 				onChange: updatePreferredStyleVariations,

@@ -680,19 +680,19 @@ add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload
 
 
 /**
- * Extends block editor settings to include themeAutoApplyStyles.
+ * Extends block editor settings to include __experimentalPreferredBlockStyles.
  * This option allows themes to set the default style applied in a block.
  *
  * @param array $settings Default editor settings.
  *
  * @return array Filtered editor settings.
  */
-function gutenberg_add_auto_apply_block_styles_setting( $settings ) {
-	$auto_apply_styles = current( (array) get_theme_support( 'editor-default-block-styles' ) );
-	if ( false !== $auto_apply_styles ) {
-		$settings['themeAutoApplyStyles'] = $auto_apply_styles;
+function gutenberg_add_preferred_block_styles_setting( $settings ) {
+	$preferred_block_styles = current( (array) get_theme_support( 'editor-preferred-block-styles' ) );
+	if ( false !== $preferred_block_styles ) {
+		$settings['__experimentalPreferredBlockStyles'] = $preferred_block_styles;
 	}
 	return $settings;
 }
 
-add_filter( 'block_editor_settings', 'gutenberg_add_auto_apply_block_styles_setting' );
+add_filter( 'block_editor_settings', 'gutenberg_add_preferred_block_styles_setting' );
