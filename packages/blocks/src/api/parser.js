@@ -40,10 +40,11 @@ const STRING_SOURCES = new Set( [
 
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
- * or false depending on whether the original matcher returns undefined. This
- * is useful for boolean attributes (e.g. disabled) whose attribute values may
- * be technically falsey (empty string), though their mere presence should be
- * enough to infer as true.
+ * or false depending on whether the original matcher returns undefined or the
+ * "false" string. This is useful for boolean attributes (e.g. disabled) whose
+ * attribute values may be technically falsey (empty string), though their
+ * mere presence should be enough to infer as true. It's also useful for those
+ * boolean attributes whose value is either "true" or "false".
  *
  * @param {Function} matcher Original hpq matcher.
  *
@@ -64,7 +65,39 @@ export const toBooleanAttributeMatcher = ( matcher ) => flow( [
 	// <input disabled="disabled">
 	// - Value:       `'disabled'`
 	// - Transformed: `true`
-	( value ) => value !== undefined,
+	( value ) => value !== undefined && value !== 'false',
+] );
+
+/**
+ * Higher-order hpq matcher which enhances an attribute matcher to return a
+ * number.
+ *
+ * @param {Function} matcher Original hpq matcher.
+ *
+ * @return {Function} Enhanced hpq matcher.
+ */
+export const toNumberAttributeMatcher = ( matcher ) => flow( [
+	matcher,
+	// <input>
+	// - Value: `undefined`
+	// - Transformed: `undefined`
+	//
+	// <input data-number>
+	// - Value: `''`
+	// - Transformed: `undefined`
+	//
+	// <input data-number="10">
+	// - Value: `'10'`
+	// - Transformed: `10`
+	//
+	// <input data-number="2.5">
+	// - Value: `'2.5'`
+	// - Transformed: `2.5`
+	//
+	// <input data-number="not-a-number">
+	// - Value: `'not-a-number'`
+	// - Transformed: `undefined`
+	( value ) => isNaN( Number( value ) ) ? undefined : Number( value ),
 ] );
 
 /**
@@ -181,8 +214,15 @@ export function matcherFromSource( sourceConfig ) {
 	switch ( sourceConfig.source ) {
 		case 'attribute':
 			let matcher = attr( sourceConfig.selector, sourceConfig.attribute );
-			if ( sourceConfig.type === 'boolean' ) {
-				matcher = toBooleanAttributeMatcher( matcher );
+
+			switch ( sourceConfig.type ) {
+				case 'boolean':
+					matcher = toBooleanAttributeMatcher( matcher );
+					break;
+				case 'integer':
+				case 'number':
+					matcher = toNumberAttributeMatcher( matcher );
+					break;
 			}
 
 			return matcher;
