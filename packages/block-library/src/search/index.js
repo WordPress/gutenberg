@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { search as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -13,7 +14,7 @@ export const name = 'core/search';
 export const settings = {
 	title: __( 'Search' ),
 	description: __( 'Help visitors find your content.' ),
-	icon: 'search',
+	icon,
 	category: 'widgets',
 	keywords: [ __( 'find' ) ],
 	supports: {

@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
+import { classic as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 

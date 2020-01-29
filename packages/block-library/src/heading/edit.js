@@ -21,6 +21,7 @@ import {
 	RichText,
 	__experimentalUseColors,
 } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 
 function HeadingEdit( {
 	attributes,
@@ -29,10 +30,12 @@ function HeadingEdit( {
 	onReplace,
 	className,
 } ) {
-	const { TextColor, InspectorControlsColorPanel, ColorDetector } = __experimentalUseColors(
+	const ref = useRef();
+	const { TextColor, InspectorControlsColorPanel } = __experimentalUseColors(
 		[ { name: 'textColor', property: 'color' } ],
 		{
 			contrastCheckers: { backgroundColor: true, textColor: true },
+			colorDetector: { targetRef: ref },
 		},
 		[]
 	);
@@ -49,15 +52,15 @@ function HeadingEdit( {
 				} } />
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Heading Settings' ) }>
+				<PanelBody title={ __( 'Heading settings' ) }>
 					<p>{ __( 'Level' ) }</p>
 					<HeadingToolbar isCollapsed={ false } minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				</PanelBody>
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
 			<TextColor>
-				<ColorDetector querySelector='[contenteditable="true"]' />
 				<RichText
+					ref={ ref }
 					identifier="content"
 					tagName={ tagName }
 					value={ content }

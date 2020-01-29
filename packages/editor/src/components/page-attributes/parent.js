@@ -27,7 +27,7 @@ export function PageAttributesParent( { parent, postType, items, onUpdateParent 
 	const pagesTree = buildTermsTree( pageItems.map( ( item ) => ( {
 		id: item.id,
 		parent: item.parent,
-		name: item.title.raw ? item.title.raw : `#${ item.id } (${ __( 'no title' ) })`,
+		name: ( item.title && item.title.raw ) ? item.title.raw : `#${ item.id } (${ __( 'no title' ) })`,
 	} ) ) );
 	return (
 		<TreeSelect

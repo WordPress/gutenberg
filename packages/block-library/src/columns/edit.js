@@ -16,8 +16,9 @@ import {
 	InspectorControls,
 	InnerBlocks,
 	BlockControls,
-	__experimentalBlockPatternPicker,
 	BlockVerticalAlignmentToolbar,
+	__experimentalBlockPatternPicker,
+	__experimentalUseColors,
 } from '@wordpress/block-editor';
 import {
 	withDispatch,
@@ -62,12 +63,27 @@ function ColumnsEditContainer( {
 		};
 	}, [ clientId ] );
 
+	const {
+		BackgroundColor,
+		InspectorControlsColorPanel,
+	} = __experimentalUseColors(
+		[
+			{ name: 'backgroundColor', className: 'has-background' },
+		]
+	);
+
 	const classes = classnames( className, {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
 	return (
 		<>
+			<BlockControls>
+				<BlockVerticalAlignmentToolbar
+					onChange={ updateAlignment }
+					value={ verticalAlignment }
+				/>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
@@ -79,17 +95,14 @@ function ColumnsEditContainer( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls>
-				<BlockVerticalAlignmentToolbar
-					onChange={ updateAlignment }
-					value={ verticalAlignment }
-				/>
-			</BlockControls>
-			<div className={ classes }>
-				<InnerBlocks
-					templateLock="all"
-					allowedBlocks={ ALLOWED_BLOCKS } />
-			</div>
+			{ InspectorControlsColorPanel }
+			<BackgroundColor>
+				<div className={ classes }>
+					<InnerBlocks
+						templateLock="all"
+						allowedBlocks={ ALLOWED_BLOCKS } />
+				</div>
+			</BackgroundColor>
 		</>
 	);
 }
@@ -196,9 +209,9 @@ const ColumnsEdit = ( props ) => {
 
 		return {
 			blockType: getBlockType( name ),
-			defaultPattern: __experimentalGetDefaultBlockPattern( name ),
+			defaultPattern: __experimentalGetDefaultBlockPattern( name, 'block' ),
 			hasInnerBlocks: select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
-			patterns: __experimentalGetBlockPatterns( name ),
+			patterns: __experimentalGetBlockPatterns( name, 'block' ),
 		};
 	}, [ clientId, name ] );
 

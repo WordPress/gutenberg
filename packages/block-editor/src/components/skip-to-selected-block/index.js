@@ -8,11 +8,11 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getBlockFocusableWrapper } from '../../utils/dom';
+import { getBlockDOMNode } from '../../utils/dom';
 
 const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 	const onClick = () => {
-		const selectedBlockElement = getBlockFocusableWrapper( selectedBlockClientId );
+		const selectedBlockElement = getBlockDOMNode( selectedBlockClientId );
 		selectedBlockElement.focus();
 	};
 

@@ -4,6 +4,7 @@
 import '@wordpress/block-editor';
 import '@wordpress/blocks';
 import '@wordpress/core-data';
+import '@wordpress/keyboard-shortcuts';
 import '@wordpress/notices';
 import '@wordpress/rich-text';
 import '@wordpress/viewport';

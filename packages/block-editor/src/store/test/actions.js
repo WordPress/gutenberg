@@ -621,6 +621,8 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlocks( clientIds ) );
 
 			expect( actions ).toEqual( [
+				select( 'core/block-editor', 'getBlockRootClientId', clientId ),
+				select( 'core/block-editor', 'getTemplateLock', undefined ),
 				selectPreviousBlock( clientId ),
 				{
 					type: 'REMOVE_BLOCKS',
@@ -819,6 +821,8 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlock( clientId ) );
 
 			expect( actions ).toEqual( [
+				select( 'core/block-editor', 'getBlockRootClientId', clientId ),
+				select( 'core/block-editor', 'getTemplateLock', undefined ),
 				selectPreviousBlock( clientId ),
 				{
 					type: 'REMOVE_BLOCKS',
@@ -837,6 +841,8 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlock( clientId, false ) );
 
 			expect( actions ).toEqual( [
+				select( 'core/block-editor', 'getBlockRootClientId', clientId ),
+				select( 'core/block-editor', 'getTemplateLock', undefined ),
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],

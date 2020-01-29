@@ -38,6 +38,9 @@ export const sites = Object.keys( socialList ).map(
 						type: 'string',
 						default: site,
 					},
+					label: {
+						type: 'string',
+					},
 				},
 			},
 		};

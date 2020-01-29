@@ -2,12 +2,12 @@
  * Internal dependencies
  */
 import Dropdown from '../';
-import IconButton from '../../icon-button';
+import Button from '../../button';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import DropdownMenu from '../../dropdown-menu';
 
-export default { title: 'Components|Dropdown', component: Dropdown };
+export default { title: 'Components/Dropdown', component: Dropdown };
 
 const DropdownAndDropdownMenuExample = () => {
 	return (
@@ -44,7 +44,7 @@ const DropdownAndDropdownMenuExample = () => {
 					contentClassName="my-popover-content-classname"
 					position="bottom right"
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<IconButton
+						<Button
 							icon="move"
 							onClick={ onToggle }
 							aria-expanded={ isOpen }
@@ -53,26 +53,10 @@ const DropdownAndDropdownMenuExample = () => {
 					) }
 					renderContent={ () => (
 						<MenuGroup>
-							<MenuItem
-								icon="arrow-up-alt"
-							>
-							Up
-							</MenuItem>
-							<MenuItem
-								icon="arrow-down-alt"
-							>
-							Down
-							</MenuItem>
-							<MenuItem
-								icon="arrow-left-alt"
-							>
-							Left
-							</MenuItem>
-							<MenuItem
-								icon="arrow-right-alt"
-							>
-							Right
-							</MenuItem>
+							<MenuItem icon="arrow-up-alt">Up</MenuItem>
+							<MenuItem icon="arrow-down-alt">Down</MenuItem>
+							<MenuItem icon="arrow-left-alt">Left</MenuItem>
+							<MenuItem icon="arrow-right-alt">Right</MenuItem>
 						</MenuGroup>
 					) }
 				/>

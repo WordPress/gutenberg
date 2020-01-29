@@ -23,6 +23,7 @@ describe( 'Button', () => {
 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
 			expect( button.hasClass( 'is-pressed' ) ).toBe( false );
 			expect( button.prop( 'disabled' ) ).toBeUndefined();
+			expect( button.prop( 'aria-disabled' ) ).toBeUndefined();
 			expect( button.prop( 'type' ) ).toBe( 'button' );
 			expect( button.type() ).toBe( 'button' );
 		} );
@@ -58,6 +59,12 @@ describe( 'Button', () => {
 			expect( button.prop( 'disabled' ) ).toBe( true );
 		} );
 
+		it( 'should add only aria-disabled attribute when disabled and isFocusable are true', () => {
+			const button = shallow( <Button disabled __experimentalIsFocusable /> );
+			expect( button.prop( 'disabled' ) ).toBe( false );
+			expect( button.prop( 'aria-disabled' ) ).toBe( true );
+		} );
+
 		it( 'should not poss the prop target into the element', () => {
 			const button = shallow( <Button target="_blank" /> );
 			expect( button.prop( 'target' ) ).toBeUndefined();
@@ -77,7 +84,7 @@ describe( 'Button', () => {
 
 		it( 'should render an icon button', () => {
 			const iconButton = shallow( <Button icon="plus" /> );
-			expect( iconButton.hasClass( 'components-icon-button' ) ).toBe( true );
+			expect( iconButton.hasClass( 'has-icon' ) ).toBe( true );
 			expect( iconButton.prop( 'aria-label' ) ).toBeUndefined();
 		} );
 

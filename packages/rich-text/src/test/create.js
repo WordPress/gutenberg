@@ -85,18 +85,33 @@ describe( 'create', () => {
 			text: 'test',
 		} );
 
+		// Format objects.
 		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 1 ][ 0 ] );
 		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 2 ][ 0 ] );
 		expect( value.formats[ 2 ][ 1 ] ).toBe( value.formats[ 3 ][ 1 ] );
+
+		// Format arrays per index.
+		expect( value.formats[ 0 ] ).toBe( value.formats[ 1 ] );
+		expect( value.formats[ 2 ] ).toBe( value.formats[ 3 ] );
 	} );
 
 	it( 'should use same reference for equal format', () => {
 		const value = create( { html: '<a href="#">a</a><a href="#">a</a>' } );
+
+		// Format objects.
 		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 1 ][ 0 ] );
+
+		// Format arrays per index.
+		expect( value.formats[ 0 ] ).not.toBe( value.formats[ 1 ] );
 	} );
 
 	it( 'should use different reference for different format', () => {
 		const value = create( { html: '<a href="#">a</a><a href="#a">a</a>' } );
+
+		// Format objects.
 		expect( value.formats[ 0 ][ 0 ] ).not.toBe( value.formats[ 1 ][ 0 ] );
+
+		// Format arrays per index.
+		expect( value.formats[ 0 ] ).not.toBe( value.formats[ 1 ] );
 	} );
 } );

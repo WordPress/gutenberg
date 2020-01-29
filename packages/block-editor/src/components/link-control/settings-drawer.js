@@ -13,19 +13,21 @@ import {
 
 const defaultSettings = [
 	{
-		id: 'newTab',
+		id: 'opensInNewTab',
 		title: __( 'Open in New Tab' ),
-		checked: false,
 	},
 ];
 
-const LinkControlSettingsDrawer = ( { settings = defaultSettings, onSettingChange = noop } ) => {
+const LinkControlSettingsDrawer = ( { value, onChange = noop, settings = defaultSettings } ) => {
 	if ( ! settings || ! settings.length ) {
 		return null;
 	}
 
-	const handleSettingChange = ( setting ) => ( value ) => {
-		onSettingChange( setting.id, value, settings );
+	const handleSettingChange = ( setting ) => ( newValue ) => {
+		onChange( {
+			...value,
+			[ setting.id ]: newValue,
+		} );
 	};
 
 	const theSettings = settings.map( ( setting ) => (
@@ -34,7 +36,7 @@ const LinkControlSettingsDrawer = ( { settings = defaultSettings, onSettingChang
 			key={ setting.id }
 			label={ setting.title }
 			onChange={ handleSettingChange( setting ) }
-			checked={ setting.checked } />
+			checked={ value ? value[ setting.id ] : false } />
 	) );
 
 	return (

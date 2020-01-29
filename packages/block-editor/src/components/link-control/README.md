@@ -1,18 +1,27 @@
 # Link Control
 
+Renders a link control. A link control is a controlled input which maintains
+a value associated with a link (HTML anchor element) and relevant settings
+for how that link is expected to behave.
+
 ## Props
 
-### className
-
-- Type: `String`
-- Required: Yes
-
-### currentLink
+### value
 
 - Type: `Object`
-- Required: Yes
+- Required: No
 
-### currentSettings
+Current link value.
+
+A link value contains is composed as a union of the default properties and any custom settings values.
+
+Default properties include:
+
+- `url` (`string`): Link URL.
+- `title` (`string`, optional): Link title.
+- `opensInNewTab` (`boolean`, optional): Whether link should open in a new browser tab.This value is only assigned if not providing a custom `settings` prop.
+
+### settings
 
 - Type: `Array`
 - Required: No
@@ -20,90 +29,38 @@
 ```
 [
 	{
-		id: 'newTab',
+		id: 'opensInNewTab',
 		title: 'Open in New Tab',
-		checked: false,
 	},
 ];
 ```
 
-An array of settings objects. Each object will used to render a `ToggleControl` for that setting. See also `onSettingsChange`.
-
-### fetchSearchSuggestions
-
-- Type: `Function`
-- Required: No
-
-## Event handlers
-
-### onChangeMode
-
-- Type: `Function`
-- Required: No
-
-Use this callback to know when the LinkControl component changes its mode to `edit` or `show`
-through of its function parameter.
-
-```es6
-<LinkControl
-	onChangeMode={ ( mode ) => { console.log( `Mode change to ${ mode } mode.` ) }
-/> 
-```  
+An array of settings objects. Each object will used to render a `ToggleControl` for that setting.
 
 ### onClose
 
 - Type: `Function`
 - Required: No
 
-### onKeyDown
+### onChange
 
 - Type: `Function`
 - Required: No
 
-### onKeyPress
+Value change handler, called with the updated value if the user selects a new link or updates settings.
 
-- Type: `Function`
-- Required: No
-
-### onLinkChange
-
-- Type: `Function`
-- Required: No
-
-Use this callback to take an action after a user set or updated a link.
-The function callback will receive the selected item, or Null.
-
-```es6
+```jsx
 <LinkControl
-	onLinkChange={ ( item ) => {
-		item
-			? console.log( `The item selected has the ${ item.id } id.` )
-			: console.warn( 'No Item selected.' );
+	onChange={ ( nextValue ) => {
+		console.log( `The selected item URL: ${ nextValue.url }.` );
 	}
 /> 
-```  
+```
 
-### onSettingsChange
+### showInitialSuggestions
 
-- Type: `Function`
+- Type: `boolean`
 - Required: No
-- Args:
-  - `id` - the `id` property of the setting that changed (eg: `newTab`).
-  - `value` - the `checked` value of the control.
-  - `settings` - the current settings object.
+- Default: `false`
 
-Called when any of the settings supplied as `currentSettings` are changed/toggled. May be used to attribute a Block's `attributes` with the current state of the control.
-
-```
-<LinkControl
-	currentSettings={ [
-		{
-			id: 'opensInNewTab',
-			title: __( 'Open in New Tab' ),
-			checked: attributes.opensInNewTab, // Block attributes persist control state
-		},
-	] }
-	onSettingsChange={ ( setting, value ) => setAttributes( { [ setting ]: value } ) }
-/>
-```
-
+Whether to present initial suggestions immediately.

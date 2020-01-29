@@ -5,7 +5,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import {
-	IconButton,
+	Button,
 	SVG,
 	Path,
 	Modal,
@@ -27,7 +27,7 @@ export default function useBlockNavigator( clientId ) {
 	const [ isNavigationListOpen, setIsNavigationListOpen ] = useState( false );
 
 	const navigatorToolbarButton = (
-		<IconButton
+		<Button
 			className="components-toolbar__control"
 			label={ __( 'Open block navigator' ) }
 			onClick={ () => setIsNavigationListOpen( true ) }

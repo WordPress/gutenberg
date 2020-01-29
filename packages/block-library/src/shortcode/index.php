@@ -21,15 +21,12 @@ function render_block_core_shortcode( $attributes, $content ) {
  * Registers the `core/shortcode` block on server.
  */
 function register_block_core_shortcode() {
+	$path     = __DIR__ . '/shortcode.json';
+	$metadata = json_decode( file_get_contents( $path ), true );
 	register_block_type(
 		'core/shortcode',
 		array(
-			'attributes'      => array(
-				'text' => array(
-					'type'   => 'string',
-					'source' => 'html',
-				),
-			),
+			'attributes'      => $metadata['attributes'],
 			'render_callback' => 'render_block_core_shortcode',
 		)
 	);

@@ -56,6 +56,9 @@ function gutenberg_reregister_core_block_types() {
 		'template-part.php'   => 'core/template-part',
 		'post-title.php'      => 'core/post-title',
 		'post-content.php'    => 'core/post-content',
+		'post-author.php'     => 'core/post-author',
+		'post-date.php'       => 'core/post-date',
+		'post-excerpt.php'    => 'core/post-excerpt',
 	);
 
 	$registry = WP_Block_Type_Registry::get_instance();

@@ -24,6 +24,16 @@ exports[`Writing Flow Should navigate inner blocks with arrow keys 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should allow selecting entire list with longer last item 1`] = `
+"<!-- wp:paragraph -->
+<p>a</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li></li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`Writing Flow should create valid paragraph blocks when rapidly pressing Enter 1`] = `
 "<!-- wp:paragraph -->
 <p></p>
@@ -219,6 +229,26 @@ exports[`Writing Flow should not delete surrounding space when deleting a word w
 exports[`Writing Flow should not delete surrounding space when deleting a word with Backspace 2`] = `
 "<!-- wp:paragraph -->
 <p>1 2 3</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Writing Flow should not have a dead zone between blocks (lower) 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>23</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Writing Flow should not have a dead zone between blocks (upper) 1`] = `
+"<!-- wp:paragraph -->
+<p>13</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
 <!-- /wp:paragraph -->"
 `;
 

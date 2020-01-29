@@ -9,6 +9,7 @@ import {
 	insertBlock,
 	pressKeyWithModifier,
 	setUpResponseMocking,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
 async function mockPagesResponse( pages ) {
@@ -41,7 +42,7 @@ async function mockSearchResponse( items ) {
 
 	await setUpResponseMocking( [
 		{
-			match: ( request ) => request.url().includes( `rest_route=${ encodeURIComponent( '/wp/v2/search' ) }` ),
+			match: ( request ) => request.url().includes( `rest_route` ) && request.url().includes( `search` ),
 			onRequestMatch: createJSONResponse( mappedItems ),
 		},
 	] );
@@ -52,11 +53,14 @@ async function updateActiveNavigationLink( { url, label } ) {
 		await page.type( 'input[placeholder="Search or type url"]', url );
 		// Wait for the autocomplete suggestion item to appear.
 		await page.waitForXPath( `//span[@class="block-editor-link-control__search-item-title"]/mark[text()="${ url }"]` );
+		// Navigate to the first suggestion.
+		await page.keyboard.press( 'ArrowDown' );
+		// Select the suggestion.
 		await page.keyboard.press( 'Enter' );
 	}
 
 	if ( label ) {
-		await page.click( '.wp-block-navigation-link__content.is-selected' );
+		await page.click( '.is-selected .wp-block-navigation-link__label' );
 
 		// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
 		// to select all text like other tests do.
@@ -72,6 +76,10 @@ async function updateActiveNavigationLink( { url, label } ) {
 describe( 'Navigation', () => {
 	beforeEach( async () => {
 		await createNewPost();
+	} );
+
+	afterEach( async () => {
+		await setUpResponseMocking( [] );
 	} );
 
 	it( 'allows a navigation menu to be created using existing pages', async () => {
@@ -125,6 +133,23 @@ describe( 'Navigation', () => {
 		// an issue where the block appender requires two clicks.
 		await page.click( '.wp-block-navigation .block-list-appender' );
 
+		// After adding a new block, search input should be shown immediately.
+		// Verify that Escape would close the popover.
+		// Regression: https://github.com/WordPress/gutenberg/pull/19885
+		const isInURLInput = await page.evaluate( () => (
+			!! document.activeElement.closest( '.block-editor-url-input' )
+		) );
+		expect( isInURLInput ).toBe( true );
+		await page.keyboard.press( 'Escape' );
+		const isInLinkRichText = await page.evaluate( () => (
+			document.activeElement.classList.contains( 'rich-text' ) &&
+			!! document.activeElement.closest( '.block-editor-block-list__block' )
+		) );
+		expect( isInLinkRichText ).toBe( true );
+
+		// Now, trigger the link dialog once more.
+		await clickBlockToolbarButton( 'Link' );
+
 		// For the second nav link block use an existing internal page.
 		// Mock the api response so that it's consistent.
 		await mockSearchResponse( [ { title: 'Contact Us', slug: 'contact-us' } ] );
@@ -134,12 +159,5 @@ describe( 'Navigation', () => {
 
 		// Expect a Navigation Block with two Navigation Links in the snapshot.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		// TODO - this is needed currently because when adding a link using the suggestion list,
-		// a submit button is used. The form that the submit button is in is unmounted when submission
-		// occurs, resulting in a warning 'Form submission canceled because the form is not connected'
-		// in Chrome.
-		// Ideally, the suggestions wouldn't be implemented using submit buttons.
-		expect( console ).toHaveWarned();
 	} );
 } );

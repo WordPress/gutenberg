@@ -18,7 +18,6 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
-	IconButton,
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -48,7 +47,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 				onChange={ onChange }
 				value={ src }
 			/>
-			<IconButton
+			<Button
 				className="block-editor-media-placeholder__url-input-submit-button"
 				icon="editor-break"
 				label={ __( 'Apply' ) }

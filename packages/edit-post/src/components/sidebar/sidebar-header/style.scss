@@ -20,11 +20,11 @@
 
 	background: $light-gray-200;
 
-	.components-icon-button {
+	.components-button.has-icon {
 		display: none;
 		margin-left: auto;
 
-		~ .components-icon-button {
+		~ .components-button {
 			margin-left: 0;
 		}
 

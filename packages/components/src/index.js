@@ -1,6 +1,9 @@
+// Primitives
+export { SVG, Path, Circle, Polygon, Rect, G, HorizontalRule, BlockQuotation } from '@wordpress/primitives';
+
 // Components
-export * from './primitives';
 export { default as Animate } from './animate';
+export { default as __experimentalAnglePicker } from './angle-picker';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
@@ -22,7 +25,7 @@ export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { default as Draggable } from './draggable';
-export { default as DropZone } from './drop-zone';
+export { default as DropZone, useDropZone as __unstableUseDropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
@@ -38,7 +41,7 @@ export { default as __experimentalCustomGradientPicker } from './custom-gradient
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
 export { default as Icon } from './icon';
-export { default as IconButton } from './icon-button';
+export { default as IconButton } from './button/deprecated';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';
@@ -73,6 +76,7 @@ export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as ToolbarGroup } from './toolbar-group';
+export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
 export { default as VisuallyHidden } from './visually-hidden';
@@ -103,3 +107,4 @@ export { default as withNotices } from './higher-order/with-notices';
 export {
 	default as withSpokenMessages,
 } from './higher-order/with-spoken-messages';
+export * from './text';

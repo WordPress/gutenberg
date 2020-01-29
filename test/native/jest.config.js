@@ -53,7 +53,6 @@ module.exports = {
 			'ios',
 			'native',
 		],
-		hasteImplModulePath: '<rootDir>/node_modules/react-native/jest/hasteImpl.js',
 		providesModuleNodeModules: [
 			'react-native',
 			'react-native-svg',
@@ -68,6 +67,7 @@ module.exports = {
 	],
 	snapshotSerializers: [
 		'enzyme-to-json/serializer',
+		'jest-emotion',
 	],
 	reporters: [ 'default', 'jest-junit' ],
 };

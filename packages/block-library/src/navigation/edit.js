@@ -10,6 +10,7 @@ import classnames from 'classnames';
 import {
 	useMemo,
 	Fragment,
+	useRef,
 } from '@wordpress/element';
 import {
 	InnerBlocks,
@@ -21,12 +22,13 @@ import {
 } from '@wordpress/block-editor';
 
 import { createBlock } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import {
 	Button,
 	PanelBody,
 	Placeholder,
 	Spinner,
+	ToggleControl,
 	Toolbar,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -58,9 +60,29 @@ function Navigation( {
 	// HOOKS
 	//
 	/* eslint-disable @wordpress/no-unused-vars-before-return */
-	const { TextColor } = __experimentalUseColors(
-		[ { name: 'textColor', property: 'color' } ],
+	const ref = useRef();
+	const { selectBlock } = useDispatch( 'core/block-editor' );
+
+	const {
+		TextColor,
+		BackgroundColor,
+		InspectorControlsColorPanel,
+		ColorPanel,
+	} = __experimentalUseColors(
+		[
+			{ name: 'textColor', property: 'color' },
+			{ name: 'backgroundColor', className: 'background-color' },
+		],
+		{
+			contrastCheckers: [ { backgroundColor: true, textColor: true, fontSize: fontSize.size } ],
+			colorDetector: { targetRef: ref },
+			colorPanelProps: {
+				initialOpen: true,
+			},
+		},
+		[ fontSize.size ]
 	);
+
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 
@@ -77,8 +99,8 @@ function Navigation( {
 						type,
 						id,
 						url,
-						label: escape( title.rendered ),
-						title: escape( title.raw ),
+						label: ! title.rendered ? __( '(no title)' ) : escape( title.rendered ),
+						title: ! title.raw ? __( '(no title)' ) : escape( title.raw ),
 						opensInNewTab: false,
 					}
 				)
@@ -106,6 +128,7 @@ function Navigation( {
 
 	function handleCreateFromExistingPages() {
 		updateNavItemBlocks( defaultPagesNavigationItems );
+		selectBlock( clientId );
 	}
 
 	const hasPages = hasResolvedPages && pages && pages.length;
@@ -130,7 +153,10 @@ function Navigation( {
 					label={ __( 'Navigation' ) }
 					instructions={ __( 'Create a Navigation from all existing pages, or create an empty one.' ) }
 				>
-					<div className="wp-block-navigation-placeholder__buttons">
+					<div
+						ref={ ref }
+						className="wp-block-navigation-placeholder__buttons"
+					>
 						<Button
 							isSecondary
 							className="wp-block-navigation-placeholder__button"
@@ -170,11 +196,13 @@ function Navigation( {
 				<ToolbarGroup>
 					{ navigatorToolbarButton }
 				</ToolbarGroup>
-				<BlockColorsStyleSelector
-					value={ TextColor.color }
-					onChange={ TextColor.setColor }
-				/>
 
+				<BlockColorsStyleSelector
+					TextColor={ TextColor }
+					BackgroundColor={ BackgroundColor }
+				>
+					{ ColorPanel }
+				</BlockColorsStyleSelector>
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
@@ -183,24 +211,44 @@ function Navigation( {
 				>
 					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
-				<PanelBody title={ __( 'Text Settings' ) }>
+				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
 						value={ fontSize.size }
 						onChange={ setFontSize }
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<TextColor>
-				<div className={ blockClassNames } style={ blockInlineStyles }>
-					{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
-
-					<InnerBlocks
-						allowedBlocks={ [ 'core/navigation-link' ] }
-						templateInsertUpdatesSelection={ false }
-						__experimentalMoverDirection={ 'horizontal' }
+			{ InspectorControlsColorPanel }
+			<InspectorControls>
+				<PanelBody
+					title={ __( 'Display settings' ) }
+				>
+					<ToggleControl
+						checked={ attributes.showSubmenuIcon }
+						onChange={ ( value ) => {
+							setAttributes( { showSubmenuIcon: value } );
+						} }
+						label={ __( 'Show submenu icon for top-level items' ) }
 					/>
+				</PanelBody>
+			</InspectorControls>
+			<TextColor>
+				<BackgroundColor>
+					<div
+						ref={ ref }
+						className={ blockClassNames }
+						style={ blockInlineStyles }
+					>
+						{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 
-				</div>
+						<InnerBlocks
+							allowedBlocks={ [ 'core/navigation-link' ] }
+							templateInsertUpdatesSelection={ false }
+							__experimentalMoverDirection={ 'horizontal' }
+						/>
+
+					</div>
+				</BackgroundColor>
 			</TextColor>
 		</Fragment>
 	);

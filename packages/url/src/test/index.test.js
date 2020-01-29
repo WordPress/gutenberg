@@ -26,6 +26,7 @@ import {
 	prependHTTP,
 	safeDecodeURI,
 	filterURLForDisplay,
+	cleanForSlug,
 } from '../';
 
 describe( 'isURL', () => {
@@ -550,3 +551,16 @@ describe( 'filterURLForDisplay', () => {
 	} );
 } );
 
+describe( 'cleanForSlug', () => {
+	it( 'should return string prepared for use as url slug', () => {
+		expect( cleanForSlug( ' /Déjà_vu. ' ) ).toBe( 'deja-vu' );
+	} );
+
+	it( 'should return an empty string for missing argument', () => {
+		expect( cleanForSlug() ).toBe( '' );
+	} );
+
+	it( 'should return an empty string for falsy argument', () => {
+		expect( cleanForSlug( null ) ).toBe( '' );
+	} );
+} );

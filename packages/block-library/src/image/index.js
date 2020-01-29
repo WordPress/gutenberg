@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
+import { image as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -37,6 +37,23 @@ export const settings = {
 		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: 'rounded', label: _x( 'Rounded', 'block style' ) },
 	],
+	__experimentalLabel( attributes, { context } ) {
+		if ( context === 'accessibility' ) {
+			const { caption, alt, url } = attributes;
+
+			if ( ! url ) {
+				return __( 'Empty' );
+			}
+
+			if ( ! alt ) {
+				return caption || '';
+			}
+
+			// This is intended to be read by a screen reader.
+			// A period simply means a pause, no need to translate it.
+			return alt + ( caption ? '. ' + caption : '' );
+		}
+	},
 	transforms,
 	getEditWrapperProps( attributes ) {
 		const { align, width } = attributes;

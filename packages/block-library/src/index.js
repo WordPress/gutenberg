@@ -3,7 +3,6 @@
  */
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
-import '@wordpress/editor';
 import {
 	registerBlockType,
 	setDefaultBlockName,
@@ -23,6 +22,7 @@ import * as quote from './quote';
 import * as gallery from './gallery';
 import * as archives from './archives';
 import * as audio from './audio';
+import * as buttons from './buttons';
 import * as button from './button';
 import * as calendar from './calendar';
 import * as categories from './categories';
@@ -67,6 +67,9 @@ import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
+import * as postAuthor from './post-author';
+import * as postDate from './post-date';
+import * as postExcerpt from './post-excerpt';
 
 /**
  * Function to register an individual block.
@@ -111,6 +114,7 @@ export const registerCoreBlocks = () => {
 		archives,
 		audio,
 		button,
+		buttons,
 		calendar,
 		categories,
 		code,
@@ -185,7 +189,15 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 
 				// Register Full Site Editing Blocks.
 				...( __experimentalEnableFullSiteEditing ?
-					[ siteTitle, templatePart, postTitle, postContent ] :
+					[
+						siteTitle,
+						templatePart,
+						postTitle,
+						postContent,
+						postAuthor,
+						postDate,
+						postExcerpt,
+					] :
 					[] ),
 			].forEach( registerBlock );
 		} :

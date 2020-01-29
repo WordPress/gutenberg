@@ -14,7 +14,7 @@ describe( 'actions', () => {
 		it( 'should return the ADD_BLOCK_PATTERNS action', () => {
 			const pattern = {
 				name: patternName,
-				label: 'My Pattern',
+				title: 'My Pattern',
 				attributes: {
 					example: 'foo',
 				},
