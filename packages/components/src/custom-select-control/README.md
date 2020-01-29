@@ -84,12 +84,6 @@ Used to visually hide the label. It will always be visible to screen readers.
 - Type: `Boolean`
 - Required: No
 
-#### isSmall
-
-Renders the Select in a smaller size.
-- Type: `Boolean`
-- Required: No
-
 #### label
 
 The label for the control.

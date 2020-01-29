@@ -29,9 +29,9 @@ const stateReducer = (
 			return {
 				selectedItem:
 					items[
-						selectedItem ?
-							Math.min( items.indexOf( selectedItem ) + 1, items.length - 1 ) :
-							0
+						selectedItem
+							? Math.min( items.indexOf( selectedItem ) + 1, items.length - 1 )
+							: 0
 					],
 			};
 		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowUp:
@@ -40,9 +40,9 @@ const stateReducer = (
 			return {
 				selectedItem:
 					items[
-						selectedItem ?
-							Math.max( items.indexOf( selectedItem ) - 1, 0 ) :
-							items.length - 1
+						selectedItem
+							? Math.max( items.indexOf( selectedItem ) - 1, 0 )
+							: items.length - 1
 					],
 			};
 		default:
@@ -55,7 +55,6 @@ export default function CustomSelectControl( {
 	label,
 	options: items,
 	onChange: onSelectedItemChange,
-	isSmall = true,
 	value: _selectedItem,
 } ) {
 	const {
@@ -105,7 +104,7 @@ export default function CustomSelectControl( {
 					'aria-label': label,
 					'aria-labelledby': undefined,
 					className: 'components-custom-select-control__button',
-					isSmall,
+					isSmall: true,
 				} ) }
 			>
 				{ itemToString( selectedItem ) }
