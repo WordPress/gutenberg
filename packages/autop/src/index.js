@@ -192,7 +192,8 @@ export function autop( text, br = true ) {
 	// Change multiple <br>s into two line breaks, which will turn into paragraphs.
 	text = text.replace( /<br\s*\/?>\s*<br\s*\/?>/g, '\n\n' );
 
-	const allBlocks = '(?:table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|form|map|area|blockquote|address|math|style|script|p|h[1-6]|hr|fieldset|legend|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+	const allBlocks = '(?:table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|form|map|area|blockquote|address|math|p|h[1-6]|hr|fieldset|legend|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+	const unwrapTags = '(?:' + allBlocks + '|script|style)';
 
 	// Add a double line break above block-level opening tags.
 	text = text.replace( new RegExp( '(<' + allBlocks + '[\\s\/>])', 'g' ), '\n\n$1' );
@@ -259,7 +260,7 @@ export function autop( text, br = true ) {
 	text = text.replace( /<p>([^<]+)<\/(div|address|form)>/g, '<p>$1</p></$2>' );
 
 	// If an opening or closing block element tag is wrapped in a <p>, unwrap it.
-	text = text.replace( new RegExp( '<p>\\s*(<\/?' + allBlocks + '[^>]*>)\\s*<\/p>', 'g' ), '$1' );
+	text = text.replace( new RegExp( '<p>\\s*(<\/?' + unwrapTags + '[^>]*>)\\s*<\/p>', 'g' ), '$1' );
 
 	// In some cases <li> may get wrapped in <p>, fix them.
 	text = text.replace( /<p>(<li.+?)<\/p>/g, '$1' );
@@ -269,10 +270,10 @@ export function autop( text, br = true ) {
 	text = text.replace( /<\/blockquote><\/p>/g, '</p></blockquote>' );
 
 	// If an opening or closing block element tag is preceded by an opening <p> tag, remove it.
-	text = text.replace( new RegExp( '<p>\\s*(<\/?' + allBlocks + '[^>]*>)', 'g' ), '$1' );
+	text = text.replace( new RegExp( '<p>\\s*(<\/?' + unwrapTags + '[^>]*>)', 'g' ), '$1' );
 
 	// If an opening or closing block element tag is followed by a closing <p> tag, remove it.
-	text = text.replace( new RegExp( '(<\/?' + allBlocks + '[^>]*>)\\s*<\/p>', 'g' ), '$1' );
+	text = text.replace( new RegExp( '(<\/?' + unwrapTags + '[^>]*>)\\s*<\/p>', 'g' ), '$1' );
 
 	// Optionally insert line breaks.
 	if ( br ) {
@@ -284,7 +285,7 @@ export function autop( text, br = true ) {
 	}
 
 	// If a <br /> tag is after an opening or closing block tag, remove it.
-	text = text.replace( new RegExp( '(<\/?' + allBlocks + '[^>]*>)\\s*<br \/>', 'g' ), '$1' );
+	text = text.replace( new RegExp( '(<\/?' + unwrapTags + '[^>]*>)\\s*<br \/>', 'g' ), '$1' );
 
 	// If a <br /> tag is before a subset of opening or closing block tags, remove it.
 	text = text.replace( /<br \/>(\s*<\/?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)[^>]*>)/g, '$1' );
