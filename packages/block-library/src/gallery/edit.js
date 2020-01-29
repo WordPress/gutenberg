@@ -21,6 +21,7 @@ import {
 	PanelBody,
 	RangeControl,
 	SelectControl,
+	StepperControl,
 	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
@@ -299,6 +300,33 @@ class GalleryEdit extends Component {
 		}
 	}
 
+	renderColumnsSettings( columns ) {
+		const { attributes } = this.props;
+		const { images } = attributes;
+		const label = __( 'Columns' );
+		const minValue = 1;
+		const maxValue = Math.min( MAX_COLUMNS, images.length );
+
+		return images.length > 1 && (
+			Platform.OS === 'web' ?
+				<RangeControl
+					label={ label }
+					value={ columns }
+					onChange={ this.setColumnsNumber }
+					min={ minValue }
+					max={ maxValue }
+					required
+				/> :
+				<StepperControl
+					label={ label }
+					maxValue={ maxValue }
+					minValue={ minValue }
+					onChangeValue={ this.setColumnsNumber }
+					value={ columns }
+				/>
+		);
+	}
+
 	render() {
 		const {
 			attributes,
@@ -354,15 +382,8 @@ class GalleryEdit extends Component {
 			<>
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
-						{ images.length > 1 && <RangeControl
-							label={ __( 'Columns' ) }
-							{ ...MOBILE_CONTROL_PROPS }
-							value={ columns }
-							onChange={ this.setColumnsNumber }
-							min={ 1 }
-							max={ Math.min( MAX_COLUMNS, images.length ) }
-							required
-						/> }
+						{ this.renderColumnsSettings( columns ) }
+
 						<ToggleControl
 							label={ __( 'Crop Images' ) }
 							{ ...MOBILE_CONTROL_PROPS }
