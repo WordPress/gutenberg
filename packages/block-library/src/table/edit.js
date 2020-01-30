@@ -26,7 +26,7 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { table as icon, alignLeft, alignRight, alignCenter } from '@wordpress/icons';
+import { table as icon, textAlignLeft, textAlignRight, textAlignCenter } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -68,17 +68,17 @@ const BACKGROUND_COLORS = [
 
 const ALIGNMENT_CONTROLS = [
 	{
-		icon: alignLeft,
+		icon: textAlignLeft,
 		title: __( 'Align Column Left' ),
 		align: 'left',
 	},
 	{
-		icon: alignCenter,
+		icon: textAlignCenter,
 		title: __( 'Align Column Center' ),
 		align: 'center',
 	},
 	{
-		icon: alignRight,
+		icon: textAlignRight,
 		title: __( 'Align Column Right' ),
 		align: 'right',
 	},
