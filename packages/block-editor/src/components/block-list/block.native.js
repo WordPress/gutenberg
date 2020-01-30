@@ -122,6 +122,7 @@ class BlockListBlock extends Component {
 			isAncestorSelected,
 			hasParent,
 			getStylesFromColorScheme,
+			shouldApplyVerticalMarginStyle,
 		} = this.props;
 
 		// if block does not have parent apply neutral or full
@@ -138,15 +139,18 @@ class BlockListBlock extends Component {
 
 			// return apply childOfSelected or childOfSelectedLeaf
 			// margins depending if block has children or not
-			return hasChildren ?
-				{ ...styles.childOfSelected, ...dashedBorderStyle } :
-				{ ...styles.childOfSelectedLeaf, ...dashedBorderStyle };
+			return {
+				...( hasChildren ? styles.childOfSelected : styles.childOfSelectedLeaf ),
+				...dashedBorderStyle,
+				...( shouldApplyVerticalMarginStyle && styles.marginVerticalChild ),
+			};
 		}
 
 		if ( isAncestorSelected ) { // ancestor of a block is selected
 			return {
 				...styles.descendantOfSelectedLeaf,
-				...( hasChildren && styles.marginHorizontalNone ),
+				...( hasChildren && { ...styles.marginHorizontalNone, ...styles.marginVerticalNone } ),
+				...( shouldApplyVerticalMarginStyle && styles.marginVerticalDescendant ),
 			};
 		}
 
@@ -251,6 +255,7 @@ export default compose( [
 
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
+		const isFirstBlock = order === 0;
 		const isLastBlock = order === getBlocks().length - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
@@ -275,6 +280,7 @@ export default compose( [
 		const commonAncestorIndex = parents.indexOf( commonAncestor ) - 1;
 		const firstToSelectId = commonAncestor ? parents[ commonAncestorIndex ] : parents[ parents.length - 1 ];
 
+		const parentCount = getBlockCount( parentId );
 		const hasChildren = ! isUnregisteredBlock && !! getBlockCount( clientId );
 		const hasParent = !! parentId;
 		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parentId;
@@ -289,6 +295,8 @@ export default compose( [
 
 		const isInnerBlockHolder = name === getGroupingBlockName();
 		const isRootListInnerBlockHolder = ! isSelectedBlockNested && isInnerBlockHolder;
+
+		const shouldApplyVerticalMarginStyle = ! isLastBlock && ( ( isFirstBlock && parentCount === 2 ) || parentCount > 2 );
 
 		return {
 			icon,
@@ -311,6 +319,7 @@ export default compose( [
 			isDimmed,
 			isRootListInnerBlockHolder,
 			isUnregisteredBlock,
+			shouldApplyVerticalMarginStyle,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
