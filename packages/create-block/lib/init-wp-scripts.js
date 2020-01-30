@@ -10,7 +10,7 @@ const writePkg = require( 'write-pkg' );
  */
 const { info } = require( './log' );
 
-module.exports = async function( { author, license, slug, title, version } ) {
+module.exports = async function( { author, description, license, slug, version } ) {
 	const cwd = join( process.cwd(), slug );
 
 	info( '' );
@@ -18,7 +18,7 @@ module.exports = async function( { author, license, slug, title, version } ) {
 	await writePkg( cwd, {
 		name: slug,
 		version,
-		description: title,
+		description,
 		author,
 		license,
 		main: 'build/index.js',
