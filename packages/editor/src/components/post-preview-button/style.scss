@@ -10,7 +10,8 @@
 	display: flex;
 	justify-content: space-between;
 
-	&:hover {
+	&:hover,
+	&:focus {
 		box-shadow: 0 0 0 1px $dark-gray-500, 0 0 0 2px $white;
 	}
 
