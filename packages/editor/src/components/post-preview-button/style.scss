@@ -4,18 +4,23 @@
 	border: 1px solid $light-gray-600;
 }
 
-.editor-post-preview__button-toggle {
+.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle {
 	border-radius: 0;
 	min-width: 120px;
 	display: flex;
 	justify-content: space-between;
+
+	&:hover {
+		box-shadow: 0 0 0 1px $dark-gray-500, 0 0 0 2px $white;
+	}
+
 }
 
 .editor-post-preview__button-resize.editor-post-preview__button-resize {
-	padding-left: 28px;
+	padding-left: 36px;
 
 	&.has-icon {
-		padding-left: 0;
+		padding-left: $grid-size;
 	}
 }
 
