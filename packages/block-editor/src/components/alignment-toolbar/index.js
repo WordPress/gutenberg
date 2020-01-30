@@ -8,21 +8,21 @@ import { find } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Toolbar } from '@wordpress/components';
-import { textAlignLeft, textAlignRight, textAlignCenter } from '@wordpress/icons';
+import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
 const DEFAULT_ALIGNMENT_CONTROLS = [
 	{
-		icon: textAlignLeft,
+		icon: alignLeft,
 		title: __( 'Align text left' ),
 		align: 'left',
 	},
 	{
-		icon: textAlignCenter,
+		icon: alignCenter,
 		title: __( 'Align text center' ),
 		align: 'center',
 	},
 	{
-		icon: textAlignRight,
+		icon: alignRight,
 		title: __( 'Align text right' ),
 		align: 'right',
 	},

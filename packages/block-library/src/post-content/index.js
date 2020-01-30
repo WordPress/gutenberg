@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { textAlignJustify as icon } from '@wordpress/icons';
+import { alignJustify as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies

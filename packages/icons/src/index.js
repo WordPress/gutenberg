@@ -1,5 +1,9 @@
 export { default as Icon } from './icon';
 
+export { default as alignCenter } from './library/align-center';
+export { default as alignJustify } from './library/align-justify';
+export { default as alignLeft } from './library/align-left';
+export { default as alignRight } from './library/align-right';
 export { default as archive } from './library/archive';
 export { default as audio } from './library/audio';
 export { default as button } from './library/button';
@@ -45,10 +49,6 @@ export { default as stretchFullWidth } from './library/stretch-full-width';
 export { default as stretchWide } from './library/stretch-wide';
 export { default as table } from './library/table';
 export { default as tag } from './library/tag';
-export { default as textAlignCenter } from './library/text-align-center';
-export { default as textAlignJustify } from './library/text-align-justify';
-export { default as textAlignLeft } from './library/text-align-left';
-export { default as textAlignRight } from './library/text-align-right';
 export { default as title } from './library/title';
 export { default as trash } from './library/trash';
 export { default as verse } from './library/verse';
