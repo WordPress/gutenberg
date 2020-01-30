@@ -136,8 +136,6 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 			containerStyle,
 			getBlockAttributes,
-			renderAppender,
-			blockClientIds,
 		} = this.props;
 
 		const getVerticalAlignmentRemap = ( newAlignment ) => {
@@ -216,8 +214,6 @@ export default compose( [
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
-		const selectedBlock = getSelectedBlock();
-		const hasInnerBlocks = selectedBlock && ( selectedBlock.name === getGroupingBlockName() || selectedBlock.name === 'core/columns' || selectedBlock.name === 'core/column' );
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&
