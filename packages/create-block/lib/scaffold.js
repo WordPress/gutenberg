@@ -5,6 +5,7 @@ const { dirname, join } = require( 'path' );
 const makeDir = require( 'make-dir' );
 const { readFile, writeFile } = require( 'fs' ).promises;
 const { render } = require( 'mustache' );
+const { snakeCase } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -17,13 +18,17 @@ module.exports = async function(
 	templateName,
 	{ namespace, slug, title, description, dashicon, category, author, license, version }
 ) {
+	slug = slug.toLowerCase();
+	namespace = namespace.toLowerCase();
+
 	info( '' );
 	info( `Creating a new WordPress block in "${ slug }" folder.` );
 
 	const view = {
 		namespace,
+		namespaceSnakeCase: snakeCase( namespace ),
 		slug,
-		machineName: `${ namespace }_${ slug }`.replace( /\-/g, '_' ),
+		slugSnakeCase: snakeCase( slug ),
 		title,
 		description,
 		dashicon,

@@ -16,7 +16,7 @@
  *
  * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/applying-styles-with-stylesheets/
  */
-function {{machineName}}_block_init() {
+function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	$dir = dirname( __FILE__ );
 
 	$index_js = 'index.js';
@@ -53,4 +53,4 @@ function {{machineName}}_block_init() {
 		'style'         => '{{namespace}}-{{slug}}-block',
 	) );
 }
-add_action( 'init', '{{machineName}}_block_init' );
+add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
