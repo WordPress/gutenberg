@@ -39,6 +39,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Block_Directory_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-block-directory-controller.php';
 	}
+	require dirname( __FILE__ ) . '/class-wp-rest-settings-controller.php';
 	/**
 	* End: Include for phase 2
 	*/
