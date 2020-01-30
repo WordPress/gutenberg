@@ -34,12 +34,11 @@ program
 		try {
 			const defaultValues = getDefaultValues( template );
 			if ( slug ) {
-				const title =
-					defaultValues.slug === slug ? defaultValues.title : startCase( slug.replace( /-/, ' ' ) );
 				const answers = {
 					...defaultValues,
 					slug,
-					title,
+					// Transforms slug to title.
+					title: startCase( slug ),
 				};
 				await scaffold( template, answers );
 			} else {
