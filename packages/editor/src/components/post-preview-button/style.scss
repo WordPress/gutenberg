@@ -6,7 +6,6 @@
 
 .editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle {
 	border-radius: 0;
-	min-width: 120px;
 	display: flex;
 	justify-content: space-between;
 
@@ -29,11 +28,15 @@
 	border-left: 1px solid $light-gray-600;
 	height: $icon-button-size;
 	padding: $grid-size 0 $grid-size $grid-size;
+	margin-left: $grid-size;
 }
 
 .editor-post-preview__dropdown-content {
 	.components-popover__content {
 		overflow-y: visible;
+	}
+	.components-menu-group__label {
+		padding-left: 15px;
 	}
 	.components-menu-group + .components-menu-group {
 		border-top: 1px solid $light-gray-500;
