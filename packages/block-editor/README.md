@@ -435,7 +435,11 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
+
+<a name="Text" href="#Text">#</a> **Text**
+
+Renders an editable text input in which text formatting is not allowed.
 
 <a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
 

@@ -67,7 +67,15 @@ function getMultilineTag( multiline ) {
 	return multiline === true ? 'p' : multiline;
 }
 
-function getAllowedFormats( { allowedFormats, formattingControls } ) {
+function getAllowedFormats( {
+	allowedFormats,
+	formattingControls,
+	disableFormats,
+} ) {
+	if ( disableFormats ) {
+		return getAllowedFormats.EMPTY_ARRAY;
+	}
+
 	if ( ! allowedFormats && ! formattingControls ) {
 		return;
 	}
@@ -82,6 +90,8 @@ function getAllowedFormats( { allowedFormats, formattingControls } ) {
 
 	return formattingControls.map( ( name ) => `core/${ name }` );
 }
+
+getAllowedFormats.EMPTY_ARRAY = [];
 
 function RichTextWrapper(
 	{
@@ -112,6 +122,8 @@ function RichTextWrapper(
 		style,
 		preserveWhiteSpace,
 		__unstableEmbedURLOnPaste,
+		__unstableDisableFormats: disableFormats,
+		disableLineBreaks,
 		...props
 	},
 	forwardedRef
@@ -207,6 +219,7 @@ function RichTextWrapper(
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		formattingControls,
+		disableFormats,
 	} );
 	const hasFormats =
 		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
@@ -334,14 +347,18 @@ function RichTextWrapper(
 
 			if ( multiline ) {
 				if ( shiftKey ) {
-					onChange( insert( value, '\n' ) );
+					if ( ! disableLineBreaks ) {
+						onChange( insert( value, '\n' ) );
+					}
 				} else if ( canSplit && isEmptyLine( value ) ) {
 					splitValue( value );
 				} else {
 					onChange( insertLineSeparator( value ) );
 				}
 			} else if ( shiftKey || ! canSplit ) {
-				onChange( insert( value, '\n' ) );
+				if ( ! disableLineBreaks ) {
+					onChange( insert( value, '\n' ) );
+				}
 			} else {
 				splitValue( value );
 			}
@@ -511,6 +528,7 @@ function RichTextWrapper(
 			__unstableMarkAutomaticChange={ __unstableMarkAutomaticChange }
 			__unstableDidAutomaticChange={ didAutomaticChange }
 			__unstableUndo={ undo }
+			__unstableDisableFormats={ disableFormats }
 			style={ style }
 			preserveWhiteSpace={ preserveWhiteSpace }
 			disabled={ disabled }
