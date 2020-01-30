@@ -148,7 +148,7 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		preformatted,
 		gallery,
-		devOnly( group ),
+		group,
 		spacer,
 		shortcode,
 	].forEach( registerBlock );
