@@ -25,7 +25,7 @@ describe( 'BlockAlignmentToolbar', () => {
 	} );
 
 	test( 'should call onChange with undefined, when the control is already active', () => {
-		const activeControl = controls.find( ( { icon } ) => icon === `align-${ alignment }` );
+		const activeControl = controls.find( ( { title } ) => title === 'Align left' );
 		activeControl.onClick();
 
 		expect( activeControl.isActive ).toBe( true );
@@ -34,7 +34,7 @@ describe( 'BlockAlignmentToolbar', () => {
 	} );
 
 	test( 'should call onChange with alignment value when the control is inactive', () => {
-		const inactiveCenterControl = controls.find( ( { icon } ) => icon === 'align-center' );
+		const inactiveCenterControl = controls.find( ( { title } ) => title === 'Align center' );
 		inactiveCenterControl.onClick();
 
 		expect( inactiveCenterControl.isActive ).toBe( false );

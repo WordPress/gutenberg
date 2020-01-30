@@ -10,6 +10,7 @@ import { ToolbarButton } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -39,7 +40,7 @@ const BlockMobileToolbar = ( {
 				)
 			}
 			onClick={ onDelete }
-			icon="trash"
+			icon={ trash }
 			extraProps={ { hint: __( 'Double tap to remove the block' ) } }
 		/>
 	</View>
