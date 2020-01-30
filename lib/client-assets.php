@@ -690,6 +690,7 @@ function gutenberg_stylesheets_editor_settings( $settings ) {
 		'resizableStyleSheets' => array(
 			'block-library',
 			'block-editor',
+			'load-styles',
 		),
 	);
 

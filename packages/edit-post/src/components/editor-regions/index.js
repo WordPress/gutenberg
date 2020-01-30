@@ -13,9 +13,15 @@ import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
 function EditorRegions( { footer, header, sidebar, content, publish, className } ) {
-	const resizableStyleSheets = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings().resizableStyleSheets;
-	}, [] );
+	// const resizableStyleSheets = useSelect( ( select ) => {
+	// 	return select( 'core/block-editor' ).getSettings().resizableStyleSheets;
+	// }, [] );
+
+	const resizableStyleSheets = [
+		'block-library',
+		'block-editor',
+		'load-styles',
+	];
 
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getDeviceType();

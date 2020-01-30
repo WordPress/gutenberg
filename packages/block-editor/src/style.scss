@@ -1,3 +1,7 @@
+#start-resizable-editor-section {
+	display: none;
+}
+
 @import "./components/block-icon/style.scss";
 @import "./components/block-inspector/style.scss";
 @import "./components/block-list/style.scss";
@@ -38,3 +42,7 @@
 @import "./components/warning/style.scss";
 @import "./components/writing-flow/style.scss";
 @import "./hooks/anchor.scss";
+
+#end-resizable-editor-section {
+	display: none;
+}

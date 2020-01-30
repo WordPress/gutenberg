@@ -77,9 +77,19 @@ export default function useSimulatedMediaQuery( partialPaths, width ) {
 			const styleSheets = getStyleSheetsThatMatchPaths( partialPaths );
 			const originalStyles = [];
 			styleSheets.forEach( ( styleSheet, styleSheetIndex ) => {
+				let relevantSection = false;
 				for ( let ruleIndex = 0; ruleIndex < styleSheet.cssRules.length; ++ruleIndex ) {
 					const rule = styleSheet.cssRules[ ruleIndex ];
-					if ( ! isReplaceableMediaRule( rule ) ) {
+
+					if ( ! relevantSection && !! rule.cssText.match( /#start-resizable-editor-section/ ) ) {
+						relevantSection = true;
+					}
+
+					if ( relevantSection && !! rule.cssText.match( /#end-resizable-editor-section/ ) ) {
+						relevantSection = false;
+					}
+
+					if ( ! relevantSection || ! isReplaceableMediaRule( rule ) ) {
 						continue;
 					}
 					const ruleText = rule.cssText;

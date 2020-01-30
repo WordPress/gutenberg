@@ -1,3 +1,7 @@
+#start-resizable-editor-section {
+	display: none;
+}
+
 @import "./audio/theme.scss";
 @import "./code/theme.scss";
 @import "./embed/theme.scss";
@@ -11,3 +15,7 @@
 @import "./separator/theme.scss";
 @import "./table/theme.scss";
 @import "./video/theme.scss";
+
+#end-resizable-editor-section {
+	display: none;
+}
