@@ -8,7 +8,7 @@ Welcome to the development hub for the WordPress Gutenberg Project!
 
 Gutenberg development precedes what is shipped in a WordPress releases, usually by numerous weeks. The latest development version of Gutenberg is available as a plugin for testing and trying out the latest features.
 
-## Getting started
+## Getting Started
 
 Get hands on, check out the [Block Editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
 
@@ -34,7 +34,7 @@ See the [Contributors Handbook](https://developer.wordpress.org/block-editor/con
 
 As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](https://github.com/WordPress/gutenberg/blob/master/CODE_OF_CONDUCT.md).
 
-## Get involved
+## Get Involved
 
 You can join us in the `#core-editor` channel in Slack, see [WordPress Slack page](https://make.wordpress.org/chat/) for signup information, it is free to join.
 

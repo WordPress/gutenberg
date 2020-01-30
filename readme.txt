@@ -30,12 +30,12 @@ Discussion for the project is on <a href="https://make.wordpress.com/core/">Make
 
 We'd love to hear your bug reports, feature suggestions and any other feedback! Please head over to <a href="https://github.com/WordPress/gutenberg/issues">the GitHub issues page</a> to search for existing issues or open a new one. While we'll try to triage issues reported here on the plugin forum, you'll get a faster response (and reduce duplication of effort) by keeping everything centralized in the GitHub repository.
 
-= What are the next phases for the project? =
+= What's Next for the Project? =
 
 The four phases of the project are Editing, Customization, Collaboration, and Multilingual. You can hear more about the project and phases from Matt in his State of the Word talks for <a href="https://ma.tt/2019/11/state-of-the-word-2019/">2019</a> and <a href="https://ma.tt/2018/12/state-of-the-word-2018/">2018</a>. Additionally you can follow updates in the <a href="https://make.wordpress.org/core/?s=gutenberg">Make WordPress Core blog</a>.
 
 
-= Where can I read more about Gutenberg? =
+= Where Can I Read More About Gutenberg? =
 
 - <a href="http://matiasventura.com/post/gutenberg-or-the-ship-of-theseus/">Gutenberg, or the Ship of Theseus</a>, with examples of what Gutenberg might do in the future
 - <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">Editor Technical Overview</a>
