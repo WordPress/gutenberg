@@ -2,7 +2,7 @@
 [![Build Status](https://img.shields.io/travis/com/WordPress/gutenberg/master.svg)](https://travis-ci.com/WordPress/gutenberg)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org)
 
-![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://cldup.com/R84R5fNgrI.png)
+![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://user-images.githubusercontent.com/1204802/73433964-2540d900-4346-11ea-94f3-5df2e9d876bc.png)
 
 Welcome to the development hub for the WordPress Gutenberg project!
 
