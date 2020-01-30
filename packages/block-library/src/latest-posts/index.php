@@ -32,7 +32,7 @@ function render_block_core_latest_posts( $attributes ) {
 	foreach ( $recent_posts as $post ) {
 		$list_items_markup .= '<li>';
 
-		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post )  ) {
+		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post ) ) {
 			$image_style = '';
 			if ( isset( $attributes['imageSizeWidth'] ) ) {
 				$image_style .= sprintf( 'max-width:%spx;', $attributes['imageSizeWidth'] );
