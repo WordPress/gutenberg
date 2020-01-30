@@ -57,6 +57,9 @@ async function updateActiveNavigationLink( { url, label } ) {
 		await page.keyboard.press( 'ArrowDown' );
 		// Select the suggestion.
 		await page.keyboard.press( 'Enter' );
+		// Make sure that the dialog is still opened, and that focus is retained
+		// within (focusing on the link preview).
+		await page.waitForSelector( ':focus.block-editor-link-control__search-item-title' );
 	}
 
 	if ( label ) {
