@@ -400,9 +400,11 @@ export class ImageEdit extends React.Component {
 		const editImageComponent = ( { open, mediaOptions } ) => (
 			<TouchableWithoutFeedback
 				onPress={ open }>
-				<View style={ styles.edit }>
-					{ mediaOptions() }
-					<Icon icon={ SvgIconCustomize } { ...styles.iconCustomise } />
+				<View style={ styles.editContainer }>
+					<View style={ styles.edit }>
+						{ mediaOptions() }
+						<Icon size={ 16 } icon={ SvgIconCustomize } { ...styles.iconCustomise } />
+					</View>
 				</View>
 			</TouchableWithoutFeedback>
 		);
@@ -471,7 +473,7 @@ export class ImageEdit extends React.Component {
 												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 											</View>
 										}
-										{ ! isUploadInProgress && ! isUploadFailed && finalWidth && finalHeight && showMediaEditorButton &&
+										{ isSelected && ! isUploadInProgress && ! isUploadFailed && finalWidth && finalHeight && showMediaEditorButton &&
 											<MediaEdit allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 												onSelect={ this.onSelectMediaUploadOption }
 												source={ { uri: url } }
