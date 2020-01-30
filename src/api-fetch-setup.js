@@ -12,7 +12,7 @@ import apiFetch from '@wordpress/api-fetch';
 
 const setTimeoutPromise = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 
-const fetchHandler = ( { path }, retries = 20 ) => {
+const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
 	if ( ! isPathSupported( path ) ) {
 		return Promise.reject( `Unsupported path: ${ path }` );
 	}
@@ -34,7 +34,9 @@ const fetchHandler = ( { path }, retries = 20 ) => {
 		} else if ( retries === 0 ) {
 			return Promise.reject( error );
 		}
-		return setTimeoutPromise( 2000 ).then( () => fetchHandler( { path }, retries - 1 ) );
+		return setTimeoutPromise( 1000 * retryCount ).then( () =>
+			fetchHandler( { path }, retries - 1, retryCount + 1 )
+		);
 	} );
 };
 
