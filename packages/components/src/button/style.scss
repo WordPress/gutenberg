@@ -206,12 +206,6 @@
 			flex: 0 0 auto;
 		}
 
-		// Ensure that even SVG icons that don't include the .dashicon class are colored.
-		svg {
-			fill: currentColor;
-			outline: none;
-		}
-
 		&:not([aria-disabled="true"]):active:focus:enabled {
 			box-shadow: none;
 		}
@@ -227,15 +221,14 @@
 			flex: 0 0 auto;
 		}
 
-		// Ensure that even SVG icons that don't include the .dashicon class are colored.
-		svg {
-			fill: currentColor;
-			outline: none;
-		}
-
 		&.has-text svg {
 			margin-right: 8px;
 		}
+	}
+
+	svg {
+		fill: currentColor;
+		outline: none;
 	}
 
 	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.

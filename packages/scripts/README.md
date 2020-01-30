@@ -33,7 +33,8 @@ _Example:_
 		"format:js": "wp-scripts format-js",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
-		"lint:md": "wp-scripts lint-md",
+		"lint:md:docs": "wp-scripts lint-md-docs",
+		"lint:md:js": "wp-scripts lint-md-js",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"packages-update": "wp-scripts packages-update",
 		"start": "wp-scripts start",
@@ -251,23 +252,47 @@ By default, files located in `build` and `node_modules` folders are ignored.
 
 It uses [npm-package-json-lint](https://www.npmjs.com/package/npm-package-json-lint) with the set of recommended rules defined in [@wordpress/npm-package-json-lint-config](https://www.npmjs.com/package/@wordpress/npm-package-json-lint-config) npm package. You can override default rules with your own as described in [npm-package-json-lint wiki](https://github.com/tclindner/npm-package-json-lint/wiki). Learn more in the [Advanced Usage](#advanced-usage) section.
 
-### `lint-md`
+### `lint-md-docs`
 
-Helps enforce standards for JS source code in your markdown files.
+Uses markdownlint to lint the markup of markdown files to enforce standards.
 
 _Example:_
 
 ```json
 {
 	"scripts": {
-		"lint:md": "wp-scripts lint-md"
+		"lint:md:docs": "wp-scripts lint-md-docs"
 	}
 }
 ```
 
 This is how you execute the script with presented setup:
 
-* `npm run lint:md` - lints markdown files in the entire project’s directories.
+* `npm run lint:md:docs` - lints markdown files in the entire project’s directories.
+
+By default, files located in `build` and `node_modules` folders are ignored.
+
+#### Advanced information
+
+It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
+
+### `lint-md-js`
+
+Uses ESLint to lint the source included in markdown files to enforce standards for JS code.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"lint:md:js": "wp-scripts lint-md-js"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+
+* `npm run lint:md:js` - lints markdown files in the entire project’s directories.
 
 By default, files located in `build` and `node_modules` folders are ignored.
 

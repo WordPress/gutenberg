@@ -77,7 +77,7 @@ export class InserterMenu extends Component {
 				<TouchableHighlight>
 					<FlatList
 						onLayout={ this.onLayout }
-						scrollEnabled={ true }
+						scrollEnabled={ false }
 						key={ `InserterUI-${ this.state.numberOfColumns }` } //re-render when numberOfColumns changes
 						keyboardShouldPersistTaps="always"
 						numColumns={ this.state.numberOfColumns }

@@ -11,9 +11,8 @@ import { Dropdown, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import {
-	createBlock,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
+import { plusCircle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -30,7 +29,7 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingl
 	}
 	return (
 		<Button
-			icon="insert"
+			icon={ plusCircle }
 			label={ label }
 			tooltipPosition="bottom"
 			onClick={ onToggle }
