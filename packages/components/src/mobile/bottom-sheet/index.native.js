@@ -91,12 +91,15 @@ class BottomSheet extends Component {
 
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
-				// Activates swipe down over child Touchables if the swipe is long enough.
-				// With this we can adjust sensibility on the swipe vs tap gestures.
-				if ( gestureState.dy > 3 && ! this.state.bounces ) {
-					gestureState.dy = 0;
-					return true;
-				}
+				// Temporarily disable 'swiping-to-close' option on Android
+				if ( Platform.OS === 'ios' ) {
+					// Activates swipe down over child Touchables if the swipe is long enough.
+					// With this we can adjust sensibility on the swipe vs tap gestures.
+					if ( gestureState.dy > 3 && ! this.state.bounces ) {
+						gestureState.dy = 0;
+						return true;
+					}
+				} return false;
 			},
 		} );
 
@@ -155,7 +158,8 @@ class BottomSheet extends Component {
 						onScroll={ this.onScroll }
 						scrollEventThrottle={ 16 }
 						style={ { maxHeight } }
-						contentContainerStyle={ [ styles.content, contentStyle ] }>
+						contentContainerStyle={ [ styles.content, contentStyle ] }
+					>
 						{ this.props.children }
 					</ScrollView>
 					<View style={ { height: this.state.safeAreaBottomInset } } />
