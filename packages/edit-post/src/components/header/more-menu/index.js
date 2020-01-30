@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup } from '@wordpress/components';
+import { ellipsis } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,7 +25,7 @@ const TOGGLE_PROPS = {
 const MoreMenu = () => (
 	<DropdownMenu
 		className="edit-post-more-menu"
-		icon="ellipsis"
+		icon={ ellipsis }
 		label={ __( 'More tools & options' ) }
 		popoverProps={ POPOVER_PROPS }
 		toggleProps={ TOGGLE_PROPS }
