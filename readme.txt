@@ -10,7 +10,11 @@ The Gutenberg plugin provides editing, customization, and site building features
 
 == Description ==
 
-Gutenberg is more than an editor. It is the foundation that will revolutionize customization, site building and the entire publishing experience of the platform. The four phases of the project are Editing, Customization, Collaboration, and Multilingual.
+"Gutenberg" is a codename for a whole new paradigm in WordPress site building and publishing, one that will revolutionize the entire publishing experience as much as Gutenberg did the printed word. Right now, the project is in the first phase of a four-phase process that will touch every piece of WordPress -- Editing, Customization, Collaboration, and Multilingual -- and is focused on a new editing experience, the block editor.
+
+The block editor introduces a modular approach to pages and posts: each piece of content in the editor, from a paragraph to an image gallery to a headline, is its own block. And just like physical blocks, WordPress blocks can added, arranged, and rearranged, allowing WordPress users to create media-rich pages in a visually intuitive way -- and without work-arounds like shortcodes or custom HTML.
+
+The block editor first became available in December 2018, and we're still hard at work refining the experience, creating more and better blocks, and laying the groundwork for the next three phases of work. The Gutenberg plugin gives you the latest version of the block editor so you can join us in testing bleeding-edge features, start playing with blocks, and maybe get inspired to build your own.
 
 ### Discover More
 
