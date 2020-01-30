@@ -9,7 +9,6 @@ import { noop, startsWith, uniqueId } from 'lodash';
  */
 import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef, useCallback, useState, Fragment, useEffect } from '@wordpress/element';
 import {
 	useRef,
 	useCallback,
@@ -102,8 +101,8 @@ function LinkControl( {
 	onChange = noop,
 	showInitialSuggestions,
 	forceIsEditingLink,
-    showCreateEntity,
-    createEntity,
+	showCreateEntity,
+	createEntity,
 } ) {
 	const wrapperNode = useRef();
 	const instanceId = useInstanceId( LinkControl );
@@ -115,8 +114,9 @@ function LinkControl( {
 			? forceIsEditingLink
 			: ! value || ! value.url
 	);
-    const [ isResolvingLink, setIsResolvingLink ] = useState( false );
+	const [ isResolvingLink, setIsResolvingLink ] = useState( false );
 	const [ errorMsg, setErrorMsg ] = useState( null );
+	const isEndingEditWithFocus = useRef( false );
 
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -173,10 +173,6 @@ function LinkControl( {
 		setInputValue( val );
 	};
 
-		setErrorMsg( null ); // remove lingering error messages
-		setInputValue( '' );
-	};
-
 	const handleDirectEntry = ( val ) => {
 		let type = 'URL';
 
@@ -194,8 +190,8 @@ function LinkControl( {
 			type = 'internal';
 		}
 
-		return Promise.resolve(
-			[ {
+		return Promise.resolve( [
+			{
 				id: uniqueId(),
 				title: val,
 				url: type === 'URL' ? prependHTTP( val ) : val,
@@ -217,7 +213,10 @@ function LinkControl( {
 		// If it's potentially a URL search then concat on a URL search suggestion
 		// just for good measure. That way once the actual results run out we always
 		// have a URL option to fallback on.
-		results = couldBeURL && ! args.isInitialSuggestions ? results[ 0 ].concat( results[ 1 ] ) : results[ 0 ];
+		results =
+			couldBeURL && ! args.isInitialSuggestions
+				? results[ 0 ].concat( results[ 1 ] )
+				: results[ 0 ];
 
 		// Here we append a faux suggestion to represent a "CREATE" option. This
 		// is detected in the rendering of the search results and handeled as a
@@ -230,7 +229,6 @@ function LinkControl( {
 		// keyboard handling, ARIA roles...etc).
 		return results.concat( {
 			id: uniqueId(),
-			? results[ 0 ].concat( results[ 1 ] )
 			title: '',
 			url: '',
 			type: CREATE_TYPE,
@@ -261,7 +259,7 @@ function LinkControl( {
 
 			return handleManualEntry
 				? handleDirectEntry( val, args )
-		return ( maybeURL ) ? handleDirectEntry( val, args ) : handleEntitySearch( val, args );
+				: handleEntitySearch( val, args );
 		},
 		[ handleDirectEntry, fetchSearchSuggestions ]
 	);
@@ -275,12 +273,18 @@ function LinkControl( {
 		try {
 			newEntity = await createEntity( 'page', inputValue );
 		} catch ( error ) {
-			setErrorMsg( error.msg || __( 'An unknown error occurred during Page creation. Please try again.' ) );
+			setErrorMsg(
+				error.msg ||
+					__(
+						'An unknown error occurred during Page creation. Please try again.'
+					)
+			);
 		}
 
 		setIsResolvingLink( false );
 
-		if ( newEntity ) { // only set if request is resolved
+		if ( newEntity ) {
+			// only set if request is resolved
 			onChange( newEntity );
 			setIsEditingLink( false );
 		} else {
@@ -310,17 +314,26 @@ function LinkControl( {
 		);
 
 		const directLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
-		const isSingleDirectEntryResult = suggestions.length === 1 && directLinkEntryTypes.includes( suggestions[ 0 ].type.toLowerCase() );
-		const shouldShowCreateEntity = showCreateEntity && createEntity && ! isSingleDirectEntryResult && ! isInitialSuggestions;
-			: undefined;
-		const labelText = isInitialSuggestions
-			? __( 'Recently updated' )
+		const isSingleDirectEntryResult =
+			suggestions.length === 1 &&
+			directLinkEntryTypes.includes(
+				suggestions[ 0 ].type.toLowerCase()
+			);
+		const shouldShowCreateEntity =
+			showCreateEntity &&
+			createEntity &&
+			! isSingleDirectEntryResult &&
+			! isInitialSuggestions;
 
 		// According to guidelines aria-label should be added if the label
 		// itself is not visible.
 		// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
-		const searchResultsLabelId = isInitialSuggestions ? `block-editor-link-control-search-results-label-${ instanceId }` : undefined;
-		const labelText = isInitialSuggestions ? __( 'Recently updated' ) : sprintf( __( 'Search results for %s' ), inputValue );
+		const searchResultsLabelId = isInitialSuggestions
+			? `block-editor-link-control-search-results-label-${ instanceId }`
+			: undefined;
+		const labelText = isInitialSuggestions
+			? __( 'Recently updated' )
+			: sprintf( __( 'Search results for %s' ), inputValue );
 		const ariaLabel = isInitialSuggestions ? undefined : labelText;
 		const SearchResultsLabel = (
 			<span
@@ -334,17 +347,25 @@ function LinkControl( {
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				{ isInitialSuggestions ? (
-
-				<div { ...suggestionsListProps } className={ resultsListClasses } aria-labelledby={ searchResultsLabelId }>
+				<div
+					{ ...suggestionsListProps }
+					className={ resultsListClasses }
+					aria-labelledby={ searchResultsLabelId }
+				>
 					{ suggestions.map( ( suggestion, index ) => {
-						if ( shouldShowCreateEntity && CREATE_TYPE === suggestion.type ) {
+						if (
+							shouldShowCreateEntity &&
+							CREATE_TYPE === suggestion.type
+						) {
 							return (
 								<LinkControlSearchCreate
 									searchTerm={ inputValue }
 									onClick={ handleOnCreate }
 									key={ `${ suggestion.id }-${ suggestion.type }` }
-									itemProps={ buildSuggestionItemProps( suggestion, index ) }
+									itemProps={ buildSuggestionItemProps(
+										suggestion,
+										index
+									) }
 									isSelected={ index === selectedSuggestion }
 								/>
 							);
@@ -357,103 +378,78 @@ function LinkControl( {
 						}
 
 						return (
-					{ ...suggestionsListProps }
-					className={ resultsListClasses }
-					aria-labelledby={ searchResultsLabelId }
-				>
-					{ suggestions.map( ( suggestion, index ) => (
-						<LinkControlSearchItem
-							key={ `${ suggestion.id }-${ suggestion.type }` }
-							itemProps={ buildSuggestionItemProps(
-								suggestion,
+							<LinkControlSearchItem
+								key={ `${ suggestion.id }-${ suggestion.type }` }
+								itemProps={ buildSuggestionItemProps(
+									suggestion,
+									index
+								) }
+								suggestion
 								index
-							) }
-							suggestion={ suggestion }
-							onClick={ () => {
-								onChange( { ...value, ...suggestion } );
-								stopEditing();
-							} }
-							isSelected={ index === selectedSuggestion }
-							isURL={ manualLinkEntryTypes.includes(
-								suggestion.type.toLowerCase()
-							) }
-							searchTerm={ inputValue }
-						/>
-					) ) }
-						;
+								onClick={ () => {
+									stopEditing();
+									onChange( { ...value, ...suggestion } );
+								} }
+								isSelected={ index === selectedSuggestion }
+								isURL={ directLinkEntryTypes.includes(
+									suggestion.type.toLowerCase()
+								) }
+								searchTerm={ inputValue }
+							/>
+						);
 					} ) }
-
-					{ showCreatePages && createEmptyPage && ! isInitialSuggestions && ! isSingleDirectEntryResult && (
-						<LinkControlSearchCreate
-							searchTerm={ inputValue }
-							onClick={ async () => {
-								setIsResolvingLink( true );
-								const newPage = await createEmptyPage( inputValue );
-								// TODO: handle error from API
-								onChange( {
-									id: newPage.id,
-									title: newPage.title.raw, // TODO: use raw or rendered?
-									url: newPage.link,
-									type: newPage.type,
-								} );
-								setIsResolvingLink( false );
-								setIsEditingLink( false );
-								onChange( _result );
-							} }
-						/>
-					) }
 				</div>
-
 			</div>
 		);
 	};
 
 	return (
 		<div
-
 			tabIndex={ -1 }
 			ref={ wrapperNode }
 			className="block-editor-link-control"
 		>
-            { isResolvingLink && (
-            <div
-                className={ classnames( 'block-editor-link-control__search-item', {
-                    'is-current': true,
-                } ) }
-            >
-                <span className="block-editor-link-control__search-item-header">
-                    <span
-                        className="block-editor-link-control__search-item-title"
-                    >
-                        { __( 'Creating Page' ) }
-                    </span>
-                    <span className="block-editor-link-control__search-item-info">
-                        { __( 'Your new Page is being created' ) }.
-                    </span>
-                </span>
-            </div>
-
+			{ isResolvingLink && (
+				<div
+					className={ classnames(
+						'block-editor-link-control__search-item',
+						{
+							'is-current': true,
+						}
+					) }
+				>
+					<span className="block-editor-link-control__search-item-header">
+						<span className="block-editor-link-control__search-item-title">
+							{ __( 'Creating Page' ) }
+						</span>
+						<span className="block-editor-link-control__search-item-info">
+							{ __( 'Your new Page is being created' ) }.
+						</span>
+					</span>
+				</div>
+			) }
 
 			{ isEditingLink || ! value ? (
 				<LinkControlSearchInput
 					value={ inputValue }
 					onChange={ onInputChange }
 					onSelect={ ( suggestion ) => {
-						onChange( { ...value, ...suggestion } );
 						stopEditing();
+
+						handleSelectSuggestion( suggestion, value )();
 					} }
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
 					showInitialSuggestions={ showInitialSuggestions }
+					errorMsg={ errorMsg }
 				/>
-			) }
-
 			) : (
 				<Fragment>
 					<VisuallyHidden>
-						className="screen-reader-text"
-						<p aria-label={ __( 'Currently selected' ) } id={ `current-link-label-${ instanceId }` }>
-					>
+						<p
+							aria-label={ __( 'Currently selected' ) }
+							id={ `current-link-label-${ instanceId }` }
+						>
 							{ __( 'Currently selected' ) }:
 						</p>
 					</VisuallyHidden>
@@ -490,7 +486,7 @@ function LinkControl( {
 						</Button>
 					</div>
 				</Fragment>
-			}
+			) }
 
 			{ isEditingLink && ! isResolvingLink && (
 				<LinkControlSearchInput
@@ -501,20 +497,18 @@ function LinkControl( {
 					} }
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
-					onReset={ resetInput }
 					showInitialSuggestions={ showInitialSuggestions }
 					errorMsg={ errorMsg }
 				/>
 			) }
 
 			{ ! isEditingLink && ! isResolvingLink && (
-				<LinkControlSettingsDrawer value={ value } settings={ settings } onChange={ onChange } />
+				<LinkControlSettingsDrawer
+					value={ value }
+					settings={ settings }
+					onChange={ onChange }
+				/>
 			) }
-			<LinkControlSettingsDrawer
-				value={ value }
-				settings={ settings }
-				onChange={ onChange }
-			/>
 		</div>
 	);
 }
