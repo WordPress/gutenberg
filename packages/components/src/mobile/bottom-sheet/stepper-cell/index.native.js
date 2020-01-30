@@ -39,21 +39,21 @@ class BottomSheetStepperCell extends Component {
 	}
 
 	onIncrementValue() {
-		const { step, maxValue, onChangeValue, value } = this.props;
+		const { step, max, onChange, value } = this.props;
 		const newValue = value + step;
 
-		if ( newValue <= maxValue ) {
-			onChangeValue( newValue );
+		if ( newValue <= max ) {
+			onChange( newValue );
 			this.announceValue( newValue );
 		}
 	}
 
 	onDecrementValue() {
-		const { step, minValue, onChangeValue, value } = this.props;
+		const { step, min, onChange, value } = this.props;
 		const newValue = value - step;
 
-		if ( newValue >= minValue ) {
-			onChangeValue( newValue );
+		if ( newValue >= min ) {
+			onChange( newValue );
 			this.announceValue( newValue );
 		}
 	}
@@ -102,9 +102,9 @@ class BottomSheetStepperCell extends Component {
 	}
 
 	render() {
-		const { label, icon, minValue, maxValue, value, separatorType } = this.props;
-		const isMinValue = value === minValue;
-		const isMaxValue = value === maxValue;
+		const { label, icon, min, max, value, separatorType } = this.props;
+		const isMinValue = value === min;
+		const isMaxValue = value === max;
 		const labelStyle = [ styles.cellLabel, ! icon ? styles.cellLabelNoIcon : {} ];
 
 		const accessibilityLabel = sprintf(
