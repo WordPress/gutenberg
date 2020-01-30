@@ -1,3 +1,7 @@
+1.24.0
+------
+* [Android] Can now scroll post when in landscape orientation with the soft keyboard displayed
+
 1.23.0
 ------
 * New block: Group
