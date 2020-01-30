@@ -108,6 +108,58 @@ function replaceInHtmlTags( haystack, replacePairs ) {
 }
 
 /**
+ * Searches the provided text for the specified tag names and adds placeholders
+ * in their place.
+ *
+ * Example: If 'pre' is provided as tag name, anything between <pre> and
+ * </pre>, including the tags themselves would be replaced with a placeholder.
+ * The placeholder and the original value will then be added to the tags array.
+ *
+ * The function returns an object with two keys, 'text' and 'tags'. 'text'
+ * contains the original text text, except with placeholders in place of the
+ * tags. `tags` is an array of tuples of the placeholder and its original
+ * value.
+ *
+ * @param {string}   text     The text which has to be formatted.
+ * @param {string[]} tagNames The tag names to replace with placeholders.
+ *
+ * @return {Object} Returns an object containing `text` and `tags` properties.
+ */
+function addTagPlaceholders( text, tagNames ) {
+	const tags = [];
+
+	tagNames.forEach( ( tagName ) => {
+		if ( -1 === text.indexOf( '<' + tagName ) ) {
+			return;
+		}
+
+		const textParts = text.split( '</' + tagName + '>' );
+		const lastText = textParts.pop();
+		text = '';
+
+		for ( let i = 0; i < textParts.length; i++ ) {
+			const textPart = textParts[ i ];
+			const start = textPart.indexOf( '<' + tagName );
+
+			// Malformed html?
+			if ( start === -1 ) {
+				text += textPart;
+				continue;
+			}
+
+			const name = '<' + tagName + ' wp-' + tagName + '-tag-' + i + '></' + tagName + '>';
+			tags.push( [ name, textPart.substr( start ) + '</' + tagName + '>' ] );
+
+			text += textPart.substr( 0, start ) + name;
+		}
+
+		text += lastText;
+	} );
+
+	return { text, tags };
+}
+
+/**
  * Replaces double line-breaks with paragraph elements.
  *
  * A group of regex replaces used to identify text formatted with newlines and
@@ -127,8 +179,6 @@ function replaceInHtmlTags( haystack, replacePairs ) {
  * @return {string}         Text which has been converted into paragraph tags.
  */
 export function autop( text, br = true ) {
-	const preTags = [];
-
 	if ( text.trim() === '' ) {
 		return '';
 	}
@@ -136,37 +186,14 @@ export function autop( text, br = true ) {
 	// Just to make things a little easier, pad the end.
 	text = text + '\n';
 
-	/*
-	 * Pre tags shouldn't be touched by autop.
-	 * Replace pre tags with placeholders and bring them back after autop.
-	 */
-	if ( text.indexOf( '<pre' ) !== -1 ) {
-		const textParts = text.split( '</pre>' );
-		const lastText = textParts.pop();
-		text = '';
+	let tags;
+	( { text, tags } = addTagPlaceholders( text, [ 'pre', 'script', 'style', 'svg' ] ) );
 
-		for ( let i = 0; i < textParts.length; i++ ) {
-			const textPart = textParts[ i ];
-			const start = textPart.indexOf( '<pre' );
-
-			// Malformed html?
-			if ( start === -1 ) {
-				text += textPart;
-				continue;
-			}
-
-			const name = '<pre wp-pre-tag-' + i + '></pre>';
-			preTags.push( [ name, textPart.substr( start ) + '</pre>' ] );
-
-			text += textPart.substr( 0, start ) + name;
-		}
-
-		text += lastText;
-	}
 	// Change multiple <br>s into two line breaks, which will turn into paragraphs.
 	text = text.replace( /<br\s*\/?>\s*<br\s*\/?>/g, '\n\n' );
 
-	const allBlocks = '(?:table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|form|map|area|blockquote|address|math|style|p|h[1-6]|hr|fieldset|legend|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+	const allBlocks = '(?:table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|form|map|area|blockquote|address|math|p|h[1-6]|hr|fieldset|legend|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+	const unwrapTags = '(?:' + allBlocks + '|script|style|svg)';
 
 	// Add a double line break above block-level opening tags.
 	text = text.replace( new RegExp( '(<' + allBlocks + '[\\s\/>])', 'g' ), '\n\n$1' );
@@ -233,7 +260,7 @@ export function autop( text, br = true ) {
 	text = text.replace( /<p>([^<]+)<\/(div|address|form)>/g, '<p>$1</p></$2>' );
 
 	// If an opening or closing block element tag is wrapped in a <p>, unwrap it.
-	text = text.replace( new RegExp( '<p>\\s*(<\/?' + allBlocks + '[^>]*>)\\s*<\/p>', 'g' ), '$1' );
+	text = text.replace( new RegExp( '<p>\\s*(<\/?' + unwrapTags + '[^>]*>)\\s*<\/p>', 'g' ), '$1' );
 
 	// In some cases <li> may get wrapped in <p>, fix them.
 	text = text.replace( /<p>(<li.+?)<\/p>/g, '$1' );
@@ -243,35 +270,29 @@ export function autop( text, br = true ) {
 	text = text.replace( /<\/blockquote><\/p>/g, '</p></blockquote>' );
 
 	// If an opening or closing block element tag is preceded by an opening <p> tag, remove it.
-	text = text.replace( new RegExp( '<p>\\s*(<\/?' + allBlocks + '[^>]*>)', 'g' ), '$1' );
+	text = text.replace( new RegExp( '<p>\\s*(<\/?' + unwrapTags + '[^>]*>)', 'g' ), '$1' );
 
 	// If an opening or closing block element tag is followed by a closing <p> tag, remove it.
-	text = text.replace( new RegExp( '(<\/?' + allBlocks + '[^>]*>)\\s*<\/p>', 'g' ), '$1' );
+	text = text.replace( new RegExp( '(<\/?' + unwrapTags + '[^>]*>)\\s*<\/p>', 'g' ), '$1' );
 
 	// Optionally insert line breaks.
 	if ( br ) {
-		// Replace newlines that shouldn't be touched with a placeholder.
-		text = text.replace( /<(script|style).*?<\/\\1>/g, ( match ) => match[ 0 ].replace( /\n/g, '<WPPreserveNewline />' ) );
-
 		// Normalize <br>
 		text = text.replace( /<br>|<br\/>/g, '<br />' );
 
 		// Replace any new line characters that aren't preceded by a <br /> with a <br />.
 		text = text.replace( /(<br \/>)?\s*\n/g, ( a, b ) => b ? a : '<br />\n' );
-
-		// Replace newline placeholders with newlines.
-		text = text.replace( /<WPPreserveNewline \/>/g, '\n' );
 	}
 
 	// If a <br /> tag is after an opening or closing block tag, remove it.
-	text = text.replace( new RegExp( '(<\/?' + allBlocks + '[^>]*>)\\s*<br \/>', 'g' ), '$1' );
+	text = text.replace( new RegExp( '(<\/?' + unwrapTags + '[^>]*>)\\s*<br \/>', 'g' ), '$1' );
 
 	// If a <br /> tag is before a subset of opening or closing block tags, remove it.
 	text = text.replace( /<br \/>(\s*<\/?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)[^>]*>)/g, '$1' );
 	text = text.replace( /\n<\/p>$/g, '</p>' );
 
 	// Replace placeholder <pre> tags with their original content.
-	preTags.forEach( ( preTag ) => {
+	tags.forEach( ( preTag ) => {
 		const [ name, original ] = preTag;
 		text = text.replace( name, original );
 	} );

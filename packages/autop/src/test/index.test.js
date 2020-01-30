@@ -86,6 +86,52 @@ done = 0;
 	expect( autop( str ).trim() ).toBe( expected );
 } );
 
+describe( 'exempt tags', () => {
+	it.each( [
+		[
+			'script',
+			`<script>
+(function(){
+
+done = 0;
+});</script>`,
+		],
+		[
+			'style',
+			`<style>
+.example {
+
+	color: red;
+}
+</style>`,
+		],
+		[
+			'pre',
+			`<pre>
+body {
+	background-color: blue;
+}
+</pre>`,
+		],
+		[
+			'svg',
+			`<svg xmlns="http://www.w3.org/2000/svg">
+<circle cx="50" cy="50" r="30" fill="blue">
+<animateTransform attributeName="transform" type="scale" to="1.5" dur="2s" fill="freeze"/>
+</circle>
+</svg>`,
+		],
+	] )( '%s', ( _tagName, str ) => {
+		expect( autop( str ).trim() ).toBe( str );
+	} );
+} );
+
+test( 'avoid pulling out inline script', () => {
+	const str = '<p>This is <script>console.log();</script> some text.</p>';
+
+	expect( autop( str ).trim() ).toBe( str );
+} );
+
 test( 'skip input elements', () => {
 	const str = 'Username: <input type="text" id="username" name="username" /><br />Password: <input type="password" id="password1" name="password1" />';
 	expect( autop( str ).trim() ).toBe( '<p>' + str + '</p>' );
@@ -281,7 +327,6 @@ test( 'that_autop_treats_block_level_elements_as_blocks', () => {
 		'area',
 		'address',
 		'math',
-		'style',
 		'p',
 		'h1',
 		'h2',
