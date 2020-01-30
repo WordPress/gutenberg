@@ -90,7 +90,19 @@ export function Button( {
 
 	const element = (
 		<Tag
-			css={ ( theme ) => styles( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) }
+			css={ ( theme ) => {
+				const allStyles = styles( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle );
+				return [
+					allStyles.base,
+					( isDefault || isSecondary ) && allStyles.secondary,
+					isPrimary && allStyles.primary,
+					isTertiary && allStyles.tertiary,
+					isLink && allStyles.link,
+					isSmall && allStyles.small,
+					!! icon && allStyles.hasIcon,
+					isBusy && allStyles.busy,
+				];
+			} }
 			font-size={ isSmall ? 'small' : 'default' }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
 			{ ...propsToPass }

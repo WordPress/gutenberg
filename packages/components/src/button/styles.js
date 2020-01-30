@@ -3,8 +3,7 @@
  */
 import { css } from '@emotion/core';
 
-// TODO Support theme in additional styles
-export default ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => css`
+const base = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => css`
 	border: 0;
 	cursor: pointer;
 	-webkit-appearance: none;
@@ -24,14 +23,44 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) =
 			transition-duration: 0s;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-primary):not(.is-tertiary):not(.is-link):hover {
+	.screen-reader-text {
+		height: auto;
+	}
+
+	@keyframes components-button__busy-animation {
+		0% {
+			background-position: 200px 0;
+		}
+	}
+
+	&:hover:not(:disabled):not([aria-disabled="true"]) {
 		background-color: ${ theme.colors.white };
 		color: ${ theme.colors[ 'dark-gray-900' ] };
 		box-shadow: inset 0 0 0 1px ${ theme.colors[ 'dark-gray-500' ] }, inset 0 0 0 2px ${ theme.colors.white };
 		${ hoverStyle ? hoverStyle : '' }
 	}
 
-	&.is-secondary {
+	&:focus:not(:disabled):not([aria-disabled="true"]) {
+		color: ${ theme.colors[ 'dark-gray-900' ] };
+		box-shadow: inset 0 0 0 1px ${ theme.colors[ 'dark-gray-300' ] }, inset 0 0 0 2px ${ theme.colors.white };
+		outline: 2px solid transparent;
+		${ focusedStyle ? focusedStyle : '' }
+	}
+
+	&:active:not(:disabled):not([aria-disabled="true"]) {
+		color: inherit;
+		${ activeStyle ? activeStyle : '' }
+	}
+
+	&:disabled,
+	&[aria-disabled="true"] {
+		cursor: default;
+		opacity: 0.3;
+		${ disabledStyle ? disabledStyle : '' }
+	}
+`;
+
+const secondary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => css`
 		border-style: solid;
 		white-space: nowrap;
 		background: #f3f5f6;
@@ -42,12 +71,14 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) =
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			background: #f1f1f1;
 			text-decoration: none;
+			box-shadow: none;
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
 			color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
 			${ hoverStyle ? hoverStyle : '' }
 		}
 
 		&:focus:enabled {
+			outline: none;
 			background: #f3f5f6;
 			text-decoration: none;
 			color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
@@ -71,12 +102,27 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) =
 			background: #f7f7f7;
 			transform: none;
 			opacity: 1;
-			${ disabledStyle ? disabledStyle : '' }
 			text-shadow: 0 ${ theme.space.borderWidth } 0 ${ theme.colors.white };
+			${ disabledStyle ? disabledStyle : '' }
 		}
-	}
 
-	&.is-primary {
+		&.is-busy,
+		&.is-busy:disabled,
+		&.is-busy[aria-disabled="true"] {
+			background-size: 100px 100%;
+			opacity: 1;
+			animation: components-button__busy-animation 2500ms infinite linear;
+			background-image: repeating-linear-gradient(
+				-45deg,
+				${ theme.colors.outlines },
+				${ theme.colors.white } 11px,
+				${ theme.colors.white } 10px,
+				${ theme.colors[ 'light-gray-500' ] } 20px
+			);
+		}
+`;
+
+const primary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => css`
 		border-style: solid;
 		white-space: nowrap;
 		text-shadow: none;
@@ -85,15 +131,18 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) =
 		background: ${ theme.colors.primary };
 		border-color: ${ theme.colors.primary };
 
-		&:not(:disabled):not([aria-disabled="true"]):hover,
-		&:focus:enabled {
+		&:not(:disabled):not([aria-disabled="true"]):hover {
 			color: ${ theme.colors.white };
 			background: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
+			box-shadow: none;
 			${ hoverStyle ? hoverStyle : '' }
 		}
 
 		&:focus:enabled {
+			color: ${ theme.colors.white };
+			background: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
+			border-color: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
 			box-shadow:
 				0 0 0 ${ theme.space.borderWidth } ${ theme.colors.white },
 				0 0 0 3px ${ theme.colors.primary };
@@ -129,9 +178,8 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) =
 				box-shadow:
 					0 0 0 ${ theme.space.borderWidth } ${ theme.colors.white },
 					0 0 0 3px ${ theme.colors.primary };
-			}
+			}  
 		}
-
 		&.is-busy,
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
@@ -140,64 +188,49 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) =
 			border-color: ${ theme.colors.primary };
 			${ disabledStyle ? disabledStyle : '' }
 		}
+`;
+
+const link = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => css`
+	box-shadow: none;
+	border: 0;
+	background: none;
+	outline: none;
+	text-align: left;
+	color: #0073aa;
+	transition-property: border, background, color;
+	transition-duration: 0.05s;
+	transition-timing-function: ease-in-out;
+	height: auto;
+	text-decoration: underline;
+	padding: 0;
+	border-radius: 0;
+	@media (prefers-reduced-motion: reduce) {
+		transition-duration: 0s;
 	}
 
-	&.is-link {
-		box-shadow: none;
-		border: 0;
-		background: none;
-		outline: none;
-		text-align: left;
-		color: #0073aa;
-		transition-property: border, background, color;
-		transition-duration: 0.05s;
-		transition-timing-function: ease-in-out;
-		height: auto;
-		text-decoration: underline;
-		padding: 0;
-		border-radius: 0;
-		@media (prefers-reduced-motion: reduce) {
-			transition-duration: 0s;
-	  }
-		&:not(:disabled):not([aria-disabled="true"]):hover,
-		&:active {
-			color: #00a0d2;
-			${ hoverStyle ? hoverStyle : '' }
-		}
-
-		&:active {
-			${ activeStyle ? activeStyle : '' }
-		}
-
-		&:focus {
-			color: #124964;
-			box-shadow:
-				0 0 0 ${ theme.space.borderWidth } #5b9dd9,
-				0 0 2px ${ theme.space.borderWidth } rgba(30, 140, 190, 0.8);
-			${ focusedStyle ? focusedStyle : '' }
-		}
-	}
-
-	&.is-link.is-destructive {
-		color: ${ theme.colors.alertRed };
+	&:not(:disabled):not([aria-disabled="true"]):hover {
+		color: #00a0d2;
+		${ hoverStyle ? hoverStyle : '' }
 	}
 
 	&:active {
-		color: inherit;
+		color: #00a0d2;
 		${ activeStyle ? activeStyle : '' }
 	}
 
-	&:disabled,
-	&[aria-disabled="true"] {
-		cursor: default;
-		opacity: 0.3;
-		${ disabledStyle ? disabledStyle : '' }
+	&:focus {
+		color: #124964;
+		box-shadow:
+			0 0 0 ${ theme.space.borderWidth } #5b9dd9,
+			0 0 2px ${ theme.space.borderWidth } rgba(30, 140, 190, 0.8);
+		${ focusedStyle ? focusedStyle : '' }
 	}
+	&.is-destructive {
+		color: ${ theme.colors.alertRed };
+	}
+`;
 
-	&.is-busy,
-	&.is-secondary.is-busy,
-	&.is-secondary.is-busy:disabled,
-	&.is-secondary.is-busy[aria-disabled="true"] {
+const busy = ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 		background-size: 100px 100%;
 		opacity: 1;
 		animation: components-button__busy-animation 2500ms infinite linear;
@@ -209,66 +242,54 @@ export default ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) =
 			${ theme.colors[ 'light-gray-500' ] } 20px
 		);
 		${ disabledStyle ? disabledStyle : '' }
+`;
+const small = ( theme ) => css`
+	height: ${ theme.space.xlarge }px;
+	line-height: 22px;
+`;
+
+const tertiary = ( theme ) => css`
+	color: ${ theme.colors.outlines };
+
+	.dashicon {
+		display: inline-block;
+		flex: 0 0 auto;
 	}
 
-	&.is-small {
-		height: ${ theme.space.xlarge }px;
-		line-height: 22px;
+	svg {
+		fill: currentColor;
+		outline: none;
 	}
 
-	&.is-tertiary {
-		color: ${ theme.colors.outlines };
-
-		&:not(:disabled):not([aria-disabled="true"]):hover {
-			color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
-			${ hoverStyle ? hoverStyle : '' }
-		}
-
-		.dashicon {
-			display: inline-block;
-			flex: 0 0 auto;
-		}
-
-		svg {
-			fill: currentColor;
-			outline: none;
-		}
-
-		&:active:focus:enabled {
-			box-shadow: none;
-		}
-	}
-
-	&.has-icon {
-		.dashicon {
-			display: inline-block;
-			flex: 0 0 auto;
-		}
-
-		svg {
-			fill: currentColor;
-			outline: none;
-		}
-
-		&.has-text svg {
-			margin-right: ${ theme.space.medium }px;
-		}
-	}
-
-	.screen-reader-text {
-		height: auto;
-	}
-
-	&:focus:not(:disabled) {
-		color: ${ theme.colors[ 'dark-gray-900' ] };
-		box-shadow: inset 0 0 0 1px ${ theme.colors[ 'dark-gray-300' ] }, inset 0 0 0 2px ${ theme.colors.white };
-		outline: 2px solid transparent;
-		${ focusedStyle ? focusedStyle : '' }
-	}
-
-	@keyframes components-button__busy-animation {
-		0% {
-			background-position: 200px 0;
-		}
+	&:active:focus:enabled {
+		box-shadow: none;
 	}
 `;
+
+const hasIcon = ( theme ) => css`
+	.dashicon {
+		display: inline-block;
+		flex: 0 0 auto;
+	}
+
+	svg {
+		fill: currentColor;
+		outline: none;
+	}
+
+	&.has-text svg {
+		margin-right: ${ theme.space.medium }px;
+	}
+`;
+
+// TODO Support theme in additional styles
+export default ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => ( {
+	base: base( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
+	secondary: secondary( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
+	primary: primary( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
+	link: link( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
+	small: small( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
+	tertiary: tertiary( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
+	hasIcon: hasIcon( theme ),
+	busy: busy( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
+} );
