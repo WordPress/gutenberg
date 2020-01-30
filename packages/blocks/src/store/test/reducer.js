@@ -7,12 +7,12 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	__experimentalAddBlockPatterns,
+	__experimentalAddBlockVariations,
 	addBlockTypes,
-	__experimentalRemoveBlockPatterns,
+	__experimentalRemoveBlockVariations,
 } from '../actions';
 import {
-	blockPatterns,
+	blockVariations,
 	blockStyles,
 	blockTypes,
 	categories,
@@ -127,85 +127,85 @@ describe( 'blockStyles', () => {
 	} );
 } );
 
-describe( 'blockPatterns', () => {
+describe( 'blockVariations', () => {
 	const blockName = 'block/name';
 
-	const blockPatternName = 'pattern-name';
-	const blockPattern = {
-		name: blockPatternName,
-		label: 'My pattern',
+	const blockVariationName = 'variation-name';
+	const blockVariation = {
+		name: blockVariationName,
+		label: 'My variation',
 	};
 
-	const secondBlockPatternName = 'second-pattern-name';
-	const secondBlockPattern = {
-		name: secondBlockPatternName,
-		label: 'My Second Pattern',
+	const secondBlockVariationName = 'second-variation-name';
+	const secondBlockVariation = {
+		name: secondBlockVariationName,
+		label: 'My Second Variation',
 	};
 
 	it( 'should return an empty object as default state', () => {
-		const state = blockPatterns( undefined, {} );
+		const state = blockVariations( undefined, {} );
 
 		expect( state ).toEqual( {} );
 	} );
 
-	it( 'should add a new block pattern when no pattern register', () => {
+	it( 'should add a new block variation when no variation register', () => {
 		const initialState = deepFreeze( {} );
 
-		const state = blockPatterns(
+		const state = blockVariations(
 			initialState,
-			__experimentalAddBlockPatterns( blockName, blockPattern )
+			__experimentalAddBlockVariations( blockName, blockVariation )
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [ blockPattern ],
+			[ blockName ]: [ blockVariation ],
 		} );
 	} );
 
-	it( 'should add another pattern when a block pattern already present for the block', () => {
+	it( 'should add another variation when a block variation already present for the block', () => {
 		const initialState = deepFreeze( {
-			[ blockName ]: [ blockPattern ],
+			[ blockName ]: [ blockVariation ],
 		} );
 
-		const state = blockPatterns(
+		const state = blockVariations(
 			initialState,
-			__experimentalAddBlockPatterns( blockName, secondBlockPattern )
+			__experimentalAddBlockVariations( blockName, secondBlockVariation )
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [ blockPattern, secondBlockPattern ],
+			[ blockName ]: [ blockVariation, secondBlockVariation ],
 		} );
 	} );
 
-	it( 'should prepend block patterns added when adding a block', () => {
+	it( 'should prepend block variations added when adding a block', () => {
 		const initialState = deepFreeze( {
-			[ blockName ]: [ secondBlockPattern ],
+			[ blockName ]: [ secondBlockVariation ],
 		} );
 
-		const state = blockPatterns(
+		const state = blockVariations(
 			initialState,
 			addBlockTypes( {
 				name: blockName,
-				patterns: [ blockPattern ],
+				variations: [ blockVariation ],
 			} )
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [ blockPattern, secondBlockPattern ],
+			[ blockName ]: [ blockVariation, secondBlockVariation ],
 		} );
 	} );
 
-	it( 'should remove a block pattern', () => {
+	it( 'should remove a block variation', () => {
 		const initialState = deepFreeze( {
-			[ blockName ]: [ blockPattern, secondBlockPattern ],
+			[ blockName ]: [ blockVariation, secondBlockVariation ],
 		} );
 
-		const state = blockPatterns(
+		const state = blockVariations(
 			initialState,
-			__experimentalRemoveBlockPatterns( blockName, blockPatternName )
+			__experimentalRemoveBlockVariations( blockName, blockVariationName )
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [ secondBlockPattern ],
+			[ blockName ]: [ secondBlockVariation ],
 		} );
 	} );
 } );

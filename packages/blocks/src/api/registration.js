@@ -58,31 +58,31 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  */
 
 /**
- * Named block pattern scopes.
+ * Named block variation scopes.
  *
- * @typedef {'block'|'inserter'} WPBlockPatternScope
+ * @typedef {'block'|'inserter'} WPBlockVariationScope
  */
 
 /**
- * An object describing a pattern defined for the block type.
+ * An object describing a variation defined for the block type.
  *
- * @typedef {Object} WPBlockPattern
+ * @typedef {Object} WPBlockVariation
  *
- * @property {string}   name                 The unique and machine-readable name.
- * @property {string}   title                A human-readable pattern title.
- * @property {string}   description          A detailed pattern description.
- * @property {WPIcon}   [icon]               An icon helping to visualize the pattern.
- * @property {boolean}  [isDefault]          Indicates whether the current pattern is
- *                                           the default one. Defaults to `false`.
- * @property {Object}   [attributes]         Values which override block attributes.
- * @property {Array[]}  [innerBlocks]        Initial configuration of nested blocks.
- * @property {Object}   [example]            Example provides structured data for
- *                                           the block preview. You can set to
- *                                           `undefined` to disable the preview shown
- *                                           for the block type.
- * @property {WPBlockPatternScope[]} [scope] The list of scopes where the pattern
- *                                           is applicable. When not provided, it
- *                                           assumes all available scopes.
+ * @property {string}   name                   The unique and machine-readable name.
+ * @property {string}   title                  A human-readable variation title.
+ * @property {string}   description            A detailed variation description.
+ * @property {WPIcon}   [icon]                 An icon helping to visualize the variation.
+ * @property {boolean}  [isDefault]            Indicates whether the current variation is
+ *                                             the default one. Defaults to `false`.
+ * @property {Object}   [attributes]           Values which override block attributes.
+ * @property {Array[]}  [innerBlocks]          Initial configuration of nested blocks.
+ * @property {Object}   [example]              Example provides structured data for
+ *                                             the block preview. You can set to
+ *                                             `undefined` to disable the preview shown
+ *                                             for the block type.
+ * @property {WPBlockVariationScope[]} [scope] The list of scopes where the variation
+ *                                             is applicable. When not provided, it
+ *                                             assumes all available scopes.
  */
 
 /**
@@ -90,26 +90,26 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @typedef {Object} WPBlock
  *
- * @property {string}           name         Block type's namespaced name.
- * @property {string}           title        Human-readable block type label.
- * @property {string}           description  A detailed block type description.
- * @property {string}           category     Block type category classification,
- *                                           used in search interfaces to arrange
- *                                           block types by category.
- * @property {WPBlockTypeIcon}  [icon]       Block type icon.
- * @property {string[]}         [keywords]   Additional keywords to produce block
- *                                           type as result in search interfaces.
- * @property {Object}           [attributes] Block type attributes.
- * @property {WPComponent}      [save]       Optional component describing
- *                                           serialized markup structure of a
- *                                           block type.
- * @property {WPComponent}      edit         Component rendering an element to
- *                                           manipulate the attributes of a block
- *                                           in the context of an editor.
- * @property {WPBlockPattern[]} [patterns]   The list of block patterns.
- * @property {Object}           [example]    Example provides structured data for
- *                                           the block preview. When not defined
- *                                           then no preview is shown.
+ * @property {string}             name         Block type's namespaced name.
+ * @property {string}             title        Human-readable block type label.
+ * @property {string}             description  A detailed block type description.
+ * @property {string}             category     Block type category classification,
+ *                                             used in search interfaces to arrange
+ *                                             block types by category.
+ * @property {WPBlockTypeIcon}    [icon]       Block type icon.
+ * @property {string[]}           [keywords]   Additional keywords to produce block
+ *                                             type as result in search interfaces.
+ * @property {Object}             [attributes] Block type attributes.
+ * @property {WPComponent}        [save]       Optional component describing
+ *                                             serialized markup structure of a
+ *                                             block type.
+ * @property {WPComponent}        edit         Component rendering an element to
+ *                                             manipulate the attributes of a block
+ *                                             in the context of an editor.
+ * @property {WPBlockVariation[]} [variations] The list of block variations.
+ * @property {Object}             [example]    Example provides structured data for
+ *                                             the block preview. When not defined
+ *                                             then no preview is shown.
  */
 
 /**
@@ -491,30 +491,33 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
 };
 
 /**
- * Registers a new block pattern for the given block.
+ * Registers a new block variation for the given block.
  *
- * @param {string}         blockName Name of the block (example: “core/columns”).
- * @param {WPBlockPattern} pattern   Object describing a block pattern.
+ * @param {string}           blockName Name of the block (example: “core/columns”).
+ * @param {WPBlockVariation} variation Object describing a block variation.
  */
-export const __experimentalRegisterBlockPattern = ( blockName, pattern ) => {
-	dispatch( 'core/blocks' ).__experimentalAddBlockPatterns(
+export const __experimentalRegisterBlockVariation = (
+	blockName,
+	variation
+) => {
+	dispatch( 'core/blocks' ).__experimentalAddBlockVariations(
 		blockName,
-		pattern
+		variation
 	);
 };
 
 /**
- * Unregisters a block pattern defined for the given block.
+ * Unregisters a block variation defined for the given block.
  *
- * @param {string} blockName   Name of the block (example: “core/columns”).
- * @param {string} patternName Name of the pattern defined for the block.
+ * @param {string} blockName     Name of the block (example: “core/columns”).
+ * @param {string} variationName Name of the variation defined for the block.
  */
-export const __experimentalUnregisterBlockPattern = (
+export const __experimentalUnregisterBlockVariation = (
 	blockName,
-	patternName
+	variationName
 ) => {
-	dispatch( 'core/blocks' ).__experimentalRemoveBlockPatterns(
+	dispatch( 'core/blocks' ).__experimentalRemoveBlockVariations(
 		blockName,
-		patternName
+		variationName
 	);
 };

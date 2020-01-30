@@ -8,7 +8,7 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	getChildBlockNames,
-	__experimentalGetDefaultBlockPattern,
+	__experimentalGetDefaultBlockVariation,
 	getGroupingBlockName,
 	isMatchingSearchTerm,
 } from '../selectors';
@@ -156,82 +156,82 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( '__experimentalGetDefaultBlockPattern', () => {
+	describe( '__experimentalGetDefaultBlockVariation', () => {
 		const blockName = 'block/name';
-		const createBlockPatternsState = ( patterns ) => {
+		const createBlockVariationsState = ( variations ) => {
 			return deepFreeze( {
-				blockPatterns: {
-					[ blockName ]: patterns,
+				blockVariations: {
+					[ blockName ]: variations,
 				},
 			} );
 		};
-		const firstBlockPattern = {
-			name: 'first-block-pattern',
+		const firstBlockVariation = {
+			name: 'first-block-variation',
 		};
-		const secondBlockPattern = {
-			name: 'second-block-pattern',
+		const secondBlockVariation = {
+			name: 'second-block-variation',
 		};
-		const thirdBlockPattern = {
-			name: 'third-block-pattern',
+		const thirdBlockVariation = {
+			name: 'third-block-variation',
 		};
 
-		it( 'should return the default pattern when set', () => {
-			const defaultBlockPattern = {
-				...secondBlockPattern,
+		it( 'should return the default variation when set', () => {
+			const defaultBlockVariation = {
+				...secondBlockVariation,
 				isDefault: true,
 			};
-			const state = createBlockPatternsState( [
-				firstBlockPattern,
-				defaultBlockPattern,
-				thirdBlockPattern,
+			const state = createBlockVariationsState( [
+				firstBlockVariation,
+				defaultBlockVariation,
+				thirdBlockVariation,
 			] );
 
-			const result = __experimentalGetDefaultBlockPattern(
+			const result = __experimentalGetDefaultBlockVariation(
 				state,
 				blockName
 			);
 
-			expect( result ).toEqual( defaultBlockPattern );
+			expect( result ).toEqual( defaultBlockVariation );
 		} );
 
-		it( 'should return the last pattern when multiple default patterns added', () => {
-			const defaultBlockPattern = {
-				...thirdBlockPattern,
+		it( 'should return the last variation when multiple default variations added', () => {
+			const defaultBlockVariation = {
+				...thirdBlockVariation,
 				isDefault: true,
 			};
-			const state = createBlockPatternsState( [
+			const state = createBlockVariationsState( [
 				{
-					...firstBlockPattern,
+					...firstBlockVariation,
 					isDefault: true,
 				},
 				{
-					...secondBlockPattern,
+					...secondBlockVariation,
 					isDefault: true,
 				},
-				defaultBlockPattern,
+				defaultBlockVariation,
 			] );
 
-			const result = __experimentalGetDefaultBlockPattern(
+			const result = __experimentalGetDefaultBlockVariation(
 				state,
 				blockName
 			);
 
-			expect( result ).toEqual( defaultBlockPattern );
+			expect( result ).toEqual( defaultBlockVariation );
 		} );
 
-		it( 'should return the first pattern when no default pattern set', () => {
-			const state = createBlockPatternsState( [
-				firstBlockPattern,
-				secondBlockPattern,
-				thirdBlockPattern,
+		it( 'should return the first variation when no default variation set', () => {
+			const state = createBlockVariationsState( [
+				firstBlockVariation,
+				secondBlockVariation,
+				thirdBlockVariation,
 			] );
 
-			const result = __experimentalGetDefaultBlockPattern(
+			const result = __experimentalGetDefaultBlockVariation(
 				state,
 				blockName
 			);
 
-			expect( result ).toEqual( firstBlockPattern );
+			expect( result ).toEqual( firstBlockVariation );
 		} );
 	} );
 
