@@ -24,20 +24,15 @@ const templates = {
 			license,
 			version,
 		},
-		outputFiles: [
-			'.editorconfig',
-			'editor.css',
-			'index.js',
-			'$slug.php',
-			'style.css',
-		],
+		outputFiles: [ '.editorconfig', 'editor.css', 'index.js', '$slug.php', 'style.css' ],
 	},
 	esnext: {
 		defaultValues: {
 			namespace,
 			slug: 'esnext-example',
 			title: 'ESNext Example',
-			description: 'Example block written with ESNext standard and JSX support – build step required.',
+			description:
+				'Example block written with ESNext standard and JSX support – build step required.',
 			dashicon,
 			category,
 			author,
@@ -59,8 +54,7 @@ const templates = {
 const getTemplate = ( templateName ) => {
 	if ( ! templates[ templateName ] ) {
 		throw new CliError(
-			'Invalid template type name.' +
-			` Allowed values: ${ Object.keys( templates ).join( ', ' ) }.`
+			'Invalid template type name.' + ` Allowed values: ${ Object.keys( templates ).join( ', ' ) }.`
 		);
 	}
 	return templates[ templateName ];

@@ -12,30 +12,30 @@ const CLIError = require( './cli-error' );
 const log = require( './log' );
 const { version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
-const {
-	getDefaultValues,
-	getPrompts,
-} = require( './templates' );
+const { getDefaultValues, getPrompts } = require( './templates' );
 
 const commandName = `wp-create-block`;
 program
 	.name( commandName )
 	.description(
 		'Generates PHP, JS and CSS code for registering a block for a WordPress plugin.\n\n' +
-		'[slug] is optional. When provided it triggers the quick mode where it is used ' +
-		'as the block slug used for its identification, the output location for scaffolded files, ' +
-		'and the name of the WordPress plugin. The rest of the configuration is set to all default values.'
+			'[slug] is optional. When provided it triggers the quick mode where it is used ' +
+			'as the block slug used for its identification, the output location for scaffolded files, ' +
+			'and the name of the WordPress plugin. The rest of the configuration is set to all default values.'
 	)
 	.version( version )
 	.arguments( '[slug]' )
-	.option( '-t, --template <name>', 'template type name, allowed values: "es5", "esnext"', 'esnext' )
+	.option(
+		'-t, --template <name>',
+		'template type name, allowed values: "es5", "esnext"',
+		'esnext'
+	)
 	.action( async ( slug, { template } ) => {
 		try {
 			const defaultValues = getDefaultValues( template );
 			if ( slug ) {
-				const title = defaultValues.slug === slug ?
-					defaultValues.title :
-					startCase( slug.replace( /-/, ' ' ) );
+				const title =
+					defaultValues.slug === slug ? defaultValues.title : startCase( slug.replace( /-/, ' ' ) );
 				const answers = {
 					...defaultValues,
 					slug,
