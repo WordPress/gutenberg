@@ -58,6 +58,15 @@ const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
+// Copied over from the Columns block. It seems like it should become part of public API.
+const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
+	return map(
+		innerBlocksTemplate,
+		( [ name, attributes, innerBlocks = [] ] ) =>
+			createBlock( name, attributes, createBlocksFromInnerBlocksTemplate( innerBlocks ) )
+	);
+};
+
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
@@ -383,7 +392,7 @@ export class InserterMenu extends Component {
 						{ hoveredItem && (
 							<>
 								{ ! isReusableBlock( hoveredItem ) && (
-									<BlockCard blockType={ hoveredItemBlockType } />
+									<BlockCard blockType={ hoveredItem } />
 								) }
 								<div className="block-editor-inserter__preview">
 									{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) ? (
@@ -393,7 +402,13 @@ export class InserterMenu extends Component {
 												viewportWidth={ 500 }
 												blocks={
 													hoveredItemBlockType.example ?
-														getBlockFromExample( hoveredItem.name, hoveredItemBlockType.example ) :
+														getBlockFromExample( hoveredItem.name, {
+															attributes: {
+																...hoveredItemBlockType.example.attributes,
+																...hoveredItem.initialAttributes,
+															},
+															innerBlocks: hoveredItemBlockType.example.innerBlocks,
+														} ) :
 														createBlock( hoveredItem.name, hoveredItem.initialAttributes )
 												}
 											/>
@@ -534,9 +549,13 @@ export default compose(
 					onSelect,
 					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 				} = ownProps;
-				const { name, title, initialAttributes } = item;
+				const { name, title, initialAttributes, innerBlocks } = item;
 				const selectedBlock = getSelectedBlock();
-				const insertedBlock = createBlock( name, initialAttributes );
+				const insertedBlock = createBlock(
+					name,
+					initialAttributes,
+					createBlocksFromInnerBlocksTemplate( innerBlocks )
+				);
 
 				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );

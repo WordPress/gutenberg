@@ -7,6 +7,12 @@
 		},
 		"width": {
 			"type": "number"
+		},
+		"backgroundColor": {
+			"type": "string"
+		},
+		"customBackgroundColor": {
+			"type": "string"
 		}
 	}
 }

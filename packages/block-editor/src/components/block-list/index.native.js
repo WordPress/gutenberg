@@ -10,7 +10,7 @@ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
 
 /**
@@ -35,6 +35,7 @@ export class BlockList extends Component {
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
+		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind( this );
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -67,6 +68,14 @@ export class BlockList extends Component {
 		);
 	}
 
+	shouldShowInnerBlockAppender() {
+		const {
+			blockClientIds,
+			renderAppender,
+		} = this.props;
+		return ( renderAppender && blockClientIds.length > 0 );
+	}
+
 	render() {
 		const {
 			clearSelectedBlock,
@@ -75,7 +84,6 @@ export class BlockList extends Component {
 			title,
 			header,
 			withFooter = true,
-			renderAppender,
 			isReadOnly,
 			isRootList,
 			containerStyle,
@@ -106,7 +114,7 @@ export class BlockList extends Component {
 					ListFooterComponent={ ! isReadOnly && withFooter && this.renderBlockListFooter }
 				/>
 
-				{ renderAppender && blockClientIds.length > 0 && (
+				{ this.shouldShowInnerBlockAppender() && (
 					<View style={ styles.paddingToContent }>
 						<BlockListAppender
 							rootClientId={ this.props.rootClientId }
@@ -121,17 +129,9 @@ export class BlockList extends Component {
 		);
 	}
 
-	isReplaceable( block ) {
-		if ( ! block ) {
-			return false;
-		}
-		return isUnmodifiedDefaultBlock( block );
-	}
-
-	renderItem( { item: clientId, index } ) {
+	renderItem( { item: clientId } ) {
 		const {
 			isReadOnly,
-			shouldShowBlockAtIndex,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			containerStyle,
@@ -171,16 +171,15 @@ export class BlockList extends Component {
 			<ReadableContentView style={ containerStyle ? columnContainerStyle : undefined } >
 				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' } >
 					{ shouldShowInsertionPointBefore( clientId ) && <BlockInsertionPoint /> }
-					{ shouldShowBlockAtIndex( index ) && (
-						<BlockListBlock
-							key={ clientId }
-							showTitle={ false }
-							clientId={ clientId }
-							rootClientId={ this.props.rootClientId }
-							onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-							isSmallScreen={ ! this.props.isFullyBordered }
-						/> ) }
-					{ ! ( renderAppender && blockClientIds.length > 0 ) && shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
+					<BlockListBlock
+						key={ clientId }
+						showTitle={ false }
+						clientId={ clientId }
+						rootClientId={ this.props.rootClientId }
+						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
+						isSmallScreen={ ! this.props.isFullyBordered }
+					/>
+					{ ! this.shouldShowInnerBlockAppender() && shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
 				</View>
 			</ReadableContentView>
 		);
@@ -205,19 +204,13 @@ export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getBlockCount,
-			getBlockIndex,
 			getBlockOrder,
 			getSelectedBlockClientId,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
-			getSelectedBlock,
 			getSettings,
 			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
-
-		const {
-			getGroupingBlockName,
-		} = select( 'core/blocks' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
@@ -250,19 +243,6 @@ export default compose( [
 			);
 		};
 
-		const selectedBlockIndex = getBlockIndex( selectedBlockClientId, rootClientId );
-
-		const shouldShowBlockAtIndex = ( index ) => {
-			const shouldHideBlockAtIndex = (
-				! hasInnerBlocks && blockInsertionPointIsVisible &&
-				// if `index` === `insertionPoint.index`, then block is replaceable
-				index === insertionPoint.index &&
-				// only hide selected block
-				index === selectedBlockIndex
-			);
-			return ! shouldHideBlockAtIndex;
-		};
-
 		const isReadOnly = getSettings().readOnly;
 
 		const getBlockAttributes = ( clientId ) => ( __unstableGetBlockWithoutInnerBlocks( clientId ) || {} ).attributes;
@@ -271,7 +251,6 @@ export default compose( [
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
 			isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
-			shouldShowBlockAtIndex,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			selectedBlockClientId,

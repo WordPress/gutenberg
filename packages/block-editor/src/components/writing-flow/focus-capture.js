@@ -36,6 +36,7 @@ const FocusCapture = forwardRef( ( {
 	containerRef,
 	noCapture,
 	hasMultiSelection,
+	multiSelectionContainer,
 }, ref ) => {
 	const isNavigationMode = useSelect( ( select ) =>
 		select( 'core/block-editor' ).isNavigationMode()
@@ -54,7 +55,7 @@ const FocusCapture = forwardRef( ( {
 		// depending on the direction.
 		if ( ! selectedClientId ) {
 			if ( hasMultiSelection ) {
-				containerRef.current.focus();
+				multiSelectionContainer.current.focus();
 				return;
 			}
 

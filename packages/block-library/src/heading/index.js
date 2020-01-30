@@ -6,6 +6,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -24,7 +25,7 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Heading' ),
 	description: __( 'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.' ),
-	icon: 'heading',
+	icon,
 	keywords: [ __( 'title' ), __( 'subtitle' ) ],
 	supports: {
 		className: false,

@@ -144,7 +144,7 @@ class AudioEdit extends Component {
 					/>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Audio Settings' ) }>
+					<PanelBody title={ __( 'Audio settings' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }

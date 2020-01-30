@@ -314,7 +314,7 @@ function CoverEdit( {
 			</BlockControls>
 			<InspectorControls>
 				{ !! url && (
-					<PanelBody title={ __( 'Media Settings' ) }>
+					<PanelBody title={ __( 'Media settings' ) }>
 						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 							<ToggleControl
 								label={ __( 'Fixed Background' ) }

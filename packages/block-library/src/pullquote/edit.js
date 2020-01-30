@@ -142,7 +142,7 @@ class PullQuoteEdit extends Component {
 				</figure>
 				<InspectorControls>
 					<PanelColorSettings
-						title={ __( 'Color Settings' ) }
+						title={ __( 'Color settings' ) }
 						colorSettings={ [
 							{
 								value: mainColor.color,

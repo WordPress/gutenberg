@@ -20,6 +20,7 @@ const {
 	mergeYAMLConfigs,
 } = require( './env' );
 const {
+	fromProjectRoot,
 	fromConfigRoot,
 	hasProjectFile,
 } = require( './file' );
@@ -33,6 +34,7 @@ const {
 module.exports = {
 	buildWordPress,
 	camelCaseDash,
+	fromProjectRoot,
 	fromConfigRoot,
 	getArgFromCLI,
 	getArgsFromCLI,

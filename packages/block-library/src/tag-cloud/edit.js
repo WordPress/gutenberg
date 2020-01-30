@@ -66,7 +66,7 @@ class TagCloudEdit extends Component {
 
 		const inspectorControls = (
 			<InspectorControls>
-				<PanelBody title={ __( 'Tag Cloud Settings' ) }>
+				<PanelBody title={ __( 'Tag Cloud settings' ) }>
 					<SelectControl
 						label={ __( 'Taxonomy' ) }
 						options={ taxonomyOptions }

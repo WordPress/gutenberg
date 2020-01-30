@@ -8,6 +8,10 @@
 	@include break-medium() {
 		flex-wrap: nowrap;
 	}
+
+	&.has-background {
+		padding: $block-bg-padding--v $block-bg-padding--h;
+	}
 }
 
 .wp-block-column {
