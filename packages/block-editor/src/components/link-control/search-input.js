@@ -5,7 +5,6 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -74,15 +73,23 @@ const LinkControlSearchInput = ( {
 				__experimentalHandleURLSuggestions={ true }
 				__experimentalShowInitialSuggestions={ showInitialSuggestions }
 			/>
-
-			<Button
-				disabled={ ! value.length }
-				type="reset"
-				label={ __( 'Reset' ) }
-				icon={ close }
-				className="block-editor-link-control__search-reset"
-				onClick={ onReset }
-			/>
+			<div className="block-editor-link-control__search-actions">
+				<Button
+					disabled={ ! value.length }
+					type="submit"
+					label={ __( 'Submit' ) }
+					icon="editor-break"
+					className="block-editor-link-control__search-submit"
+				/>
+				<Button
+					disabled={ ! value.length }
+					type="reset"
+					label={ __( 'Reset' ) }
+					icon="no-alt"
+					className="block-editor-link-control__search-reset"
+					onClick={ onReset }
+				/>
+			</div>
 		</form>
 	);
 };

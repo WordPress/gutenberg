@@ -11,9 +11,8 @@
 		display: block;
 		padding: 11px $grid-size-large;
 		margin: $grid-size-large;
-		padding-right: 38px; // width of reset button
+		padding-right: ( $icon-button-size * 2 ); // width of reset and submit buttons
 		position: relative;
-		z-index: 1;
 		border: 1px solid #e1e1e1;
 		border-radius: $radius-round-rectangle;
 
@@ -30,11 +29,20 @@
 	}
 }
 
-.block-editor-link-control__search-reset {
+.block-editor-link-control__search-actions {
 	position: absolute;
-	top: 19px; // has to be hard coded as form expands with search suggestions
-	right: 19px; // push away to avoid focus style obscuring input border
-	z-index: 10;
+	/*
+	 * Actions must be positioned on top of URLInput, since the input will grow
+	 * when suggestions are rendered.
+	 *
+	 * Compensate for:
+	 *  - Input margin ($grid-size-large)
+	 *  - Border (1px)
+	 *  - Vertically, for the difference in height between the input (40px) and
+	 *    the icon buttons.
+	 */
+	top: $grid-size-large + 1px + ( ( 40px - $icon-button-size ) / 2 );
+	right: $grid-size-large + 1px;
 }
 
 .block-editor-link-control__search-results-wrapper {
@@ -196,14 +204,25 @@
 
 .block-editor-link-control .block-editor-link-control__search-input .components-spinner {
 	display: block;
-	z-index: 100;
 
 	&.components-spinner { // Specificity override.
 		position: absolute;
-		top: 27px;
 		left: auto;
-		right: 60px;
-		bottom: 0;
+		bottom: auto;
+		/*
+		 * Position spinner to the left of the actions.
+		 *
+		 * Compensate for:
+		 *  - Input margin ($grid-size-large)
+		 *  - Border (1px)
+		 *  - Vertically, for the difference in height between the input (40px)
+		 *    and the spinner.
+		 *  - Horizontally, adjust for the width occupied by the icon buttons,
+		 *    then artificially create spacing that mimics as if the spinner
+		 *    were center-padded to the same width as an icon button.
+		 */
+		top: $grid-size-large + 1px + ( ( 40px - $spinner-size ) / 2 );
+		right: $grid-size-large + 1px + ( $icon-button-size * 2 ) + ( ( $icon-button-size - $spinner-size ) / 2 );
 	}
 }
 
