@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { Children } from '@wordpress/element';
 import { Dropdown, Button, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { ellipsis } from '@wordpress/icons';
+import { moreHorizontal } from '@wordpress/icons';
 
 function Warning( { className, actions, children, secondaryActions } ) {
 	return (
@@ -37,7 +37,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 					position="bottom left"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
-							icon={ ellipsis }
+							icon={ moreHorizontal }
 							label={ __( 'More options' ) }
 							onClick={ onToggle }
 							aria-expanded={ isOpen }
