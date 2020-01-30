@@ -27,6 +27,8 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
+import { compose, withState } from '@wordpress/compose';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Module Constants
@@ -68,9 +70,21 @@ class LatestPostsEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, latestPosts } = this.props;
+		const { attributes, setAttributes, latestPosts, page, setState, hasMorePages } = this.props;
 		const { categoriesList } = this.state;
-		const { displayPostContentRadio, displayPostContent, displayPostDate, postLayout, columns, order, orderBy, categories, postsToShow, excerptLength } = attributes;
+		const {
+			displayPostContentRadio,
+			displayPostContent,
+			displayPostDate,
+			postLayout,
+			columns,
+			order,
+			orderBy,
+			paginate,
+			categories,
+			postsToShow,
+			excerptLength,
+		} = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -131,6 +145,16 @@ class LatestPostsEdit extends Component {
 							required
 						/>
 					}
+					<ToggleControl
+						label={ __( 'Enable Pagination' ) }
+						checked={ paginate }
+						onChange={ ( value ) => {
+							if ( ! value ) {
+								setState( { page: 1 } );
+							}
+							setAttributes( { paginate: value } )
+						} }
+					/>
 				</PanelBody>
 			</InspectorControls>
 		);
@@ -237,22 +261,74 @@ class LatestPostsEdit extends Component {
 							</li>
 						);
 					} ) }
+					{ paginate && (
+						<>
+							{ page > 1 && (
+								<span
+									className="wp-block-latest-posts__navigation-link"
+									role="button"
+									tabIndex="0"
+									onKeyDown={ ( event ) => {
+										if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
+											event.preventDefault();
+											setState( { page: page - 1 } );
+										}
+									} }
+									onClick={ () => setState( { page: page - 1 } ) }
+								>
+									{ __( 'Previous' ) }
+								</span>
+							) }
+							{ hasMorePages && (
+								<span
+									className="wp-block-latest-posts__navigation-link"
+									role="button"
+									tabIndex="0"
+									onKeyDown={ ( event ) => {
+										if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
+											event.preventDefault();
+											setState( { page: page + 1 } );
+										}
+									} }
+									onClick={ () => setState( { page: page + 1 } ) }
+								>
+									{ __( 'Next' ) }
+								</span>
+							) }
+						</>
+					) }
 				</ul>
 			</>
 		);
 	}
 }
 
-export default withSelect( ( select, props ) => {
-	const { postsToShow, order, orderBy, categories } = props.attributes;
-	const { getEntityRecords } = select( 'core' );
-	const latestPostsQuery = pickBy( {
-		categories,
-		order,
-		orderby: orderBy,
-		per_page: postsToShow,
-	}, ( value ) => ! isUndefined( value ) );
-	return {
-		latestPosts: getEntityRecords( 'postType', 'post', latestPostsQuery ),
-	};
-} )( LatestPostsEdit );
+export default compose( [
+	withState( {
+		page: 1,
+	} ),
+	withSelect( ( select, props ) => {
+		const { postsToShow, order, orderBy, categories } = props.attributes;
+		const { getEntityRecords } = select( 'core' );
+		const latestPostsQuery = pickBy(
+			{
+				categories,
+				order,
+				orderby: orderBy,
+				per_page: postsToShow + 1,
+				offset: ( props.page - 1 ) * postsToShow,
+			},
+			( value ) => ! isUndefined( value )
+		);
+		let hasMorePages = false;
+		let latestPosts = getEntityRecords( 'postType', 'post', latestPostsQuery );
+		if ( latestPosts && latestPosts.length === postsToShow + 1 ) {
+			hasMorePages = true;
+			latestPosts = latestPosts.slice( 0, latestPosts.length - 1 );
+		}
+		return {
+			latestPosts,
+			hasMorePages,
+		};
+	} ),
+] )( LatestPostsEdit );

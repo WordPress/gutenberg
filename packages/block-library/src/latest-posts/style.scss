@@ -40,3 +40,11 @@
 	margin-top: $grid-size;
 	margin-bottom: $grid-size-large;
 }
+
+.wp-block-latest-posts__navigation-link {
+	color: $dark-gray-300;
+	cursor: pointer;
+	font-size: $default-font-size;
+	font-weight: 700;
+	margin: $grid-size;
+}

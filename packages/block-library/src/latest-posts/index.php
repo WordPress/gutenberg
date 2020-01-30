@@ -6,6 +6,19 @@
  */
 
 /**
+ * Filter the WPQuery vars to add a custom pagination key for the latest posts block.
+ *
+ * @param array $query_vars The query vars.
+ *
+ * @return array Returns the filtered query vars.
+ */
+function block_core_latest_posts_filter_query_vars( $query_vars ) {
+	$query_vars[] = 'latest_posts_page';
+	return $query_vars;
+}
+add_filter( 'query_vars', 'block_core_latest_posts_filter_query_vars' );
+
+/**
  * Renders the `core/latest-posts` block on server.
  *
  * @param array $attributes The block attributes.
@@ -14,7 +27,7 @@
  */
 function render_block_core_latest_posts( $attributes ) {
 	$args = array(
-		'posts_per_page'   => $attributes['postsToShow'],
+		'posts_per_page'   => $attributes['postsToShow'] + 1,
 		'post_status'      => 'publish',
 		'order'            => $attributes['order'],
 		'orderby'          => $attributes['orderBy'],
@@ -25,8 +38,32 @@ function render_block_core_latest_posts( $attributes ) {
 		$args['category'] = $attributes['categories'];
 	}
 
-	$recent_posts = get_posts( $args );
+	$pagination_markup = '';
+	$latest_posts_page = get_query_var( 'latest_posts_page' );
+	if ( ! empty( $attributes['paginate'] ) && ! empty( $latest_posts_page ) ) {
+		$args['offset'] = ( $latest_posts_page - 1 ) * $attributes['postsToShow'];
 
+		if ( $latest_posts_page > 1 ) {
+			$pagination_markup .= sprintf(
+				'<a class="wp-block-latest-posts__navigation-link" href="%1$s" alt="%2$s">%2$s</a>',
+				esc_attr( add_query_arg( 'latest_posts_page', $latest_posts_page - 1 ) ),
+				__( 'Previous', 'gutenberg' )
+			);
+		}
+	}
+
+	$recent_posts = get_posts( $args );
+	if ( count( $recent_posts ) === $attributes['postsToShow'] + 1 ) {
+		array_pop( $recent_posts );
+
+		if ( ! empty( $attributes['paginate'] ) ) {
+			$pagination_markup .= sprintf(
+				'<a class="wp-block-latest-posts__navigation-link" href="%1$s" alt="%2$s">%2$s</a>',
+				esc_attr( add_query_arg( 'latest_posts_page', max( 2, $latest_posts_page + 1 ) ) ),
+				__( 'Next', 'gutenberg' )
+			);
+		}
+	}
 	$list_items_markup = '';
 
 	$excerpt_length = $attributes['excerptLength'];
@@ -109,9 +146,10 @@ function render_block_core_latest_posts( $attributes ) {
 	}
 
 	return sprintf(
-		'<ul class="%1$s">%2$s</ul>',
+		'<ul class="%1$s">%2$s%3$s</ul>',
 		esc_attr( $class ),
-		$list_items_markup
+		$list_items_markup,
+		$pagination_markup
 	);
 }
 
@@ -168,6 +206,10 @@ function register_block_core_latest_posts() {
 				'orderBy'                 => array(
 					'type'    => 'string',
 					'default' => 'date',
+				),
+				'paginate'                => array(
+					'type'    => 'boolean',
+					'default' => false,
 				),
 			),
 			'render_callback' => 'render_block_core_latest_posts',
