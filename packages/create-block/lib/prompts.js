@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-const { upperFirst } = require( './utils' );
+const { upperFirst } = require( 'lodash' );
 
 const slug = {
 	type: 'input',
@@ -59,8 +59,7 @@ const dashicon = {
 		return true;
 	},
 	filter( input ) {
-		return input &&
-			input.replace( /dashicon(s)?-/, '' );
+		return input && input.replace( /dashicon(s)?-/, '' );
 	},
 };
 

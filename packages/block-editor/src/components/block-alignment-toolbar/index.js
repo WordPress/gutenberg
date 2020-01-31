@@ -5,6 +5,13 @@ import { __ } from '@wordpress/i18n';
 import { Toolbar } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import {
+	positionCenter,
+	positionLeft,
+	positionRight,
+	stretchFullWidth,
+	stretchWide,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -13,23 +20,23 @@ import { withBlockEditContext } from '../block-edit/context';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
-		icon: 'align-left',
+		icon: positionLeft,
 		title: __( 'Align left' ),
 	},
 	center: {
-		icon: 'align-center',
+		icon: positionCenter,
 		title: __( 'Align center' ),
 	},
 	right: {
-		icon: 'align-right',
+		icon: positionRight,
 		title: __( 'Align right' ),
 	},
 	wide: {
-		icon: 'align-wide',
+		icon: stretchWide,
 		title: __( 'Wide width' ),
 	},
 	full: {
-		icon: 'align-full-width',
+		icon: stretchFullWidth,
 		title: __( 'Full width' ),
 	},
 };
@@ -43,9 +50,9 @@ export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CON
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const enabledControls = wideControlsEnabled ?
-		controls :
-		controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
+	const enabledControls = wideControlsEnabled
+		? controls
+		: controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
 
 	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value ];
 	const defaultAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];

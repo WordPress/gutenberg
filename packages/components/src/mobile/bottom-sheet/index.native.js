@@ -27,6 +27,7 @@ class BottomSheet extends Component {
 		super( ...arguments );
 		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
 		this.onScroll = this.onScroll.bind( this );
+		this.onSetMaxHeight = this.onSetMaxHeight.bind( this );
 
 		this.state = {
 			safeAreaBottomInset: 0,
@@ -35,10 +36,12 @@ class BottomSheet extends Component {
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
+		Dimensions.addEventListener('change', this.onSetMaxHeight)
 	}
 
 	componentDidMount() {
 		this.safeAreaEventSubscription = SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		this.onSetMaxHeight();
 	}
 
 	componentWillUnmount() {
@@ -79,8 +82,9 @@ class BottomSheet extends Component {
 
 	onSetMaxHeight() {
 		const { height } = Dimensions.get('window');
+		const { safeAreaBottomInset } = this.state;
 
-		this.setState({maxHeight: height})
+		this.setState({ maxHeight: height / 2 - safeAreaBottomInset })
 	}
 
 
@@ -96,8 +100,6 @@ class BottomSheet extends Component {
 			getStylesFromColorScheme,
 			...rest
 		} = this.props;
-
-		Dimensions.addEventListener('change', this.onSetMaxHeight)
 
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
@@ -177,7 +179,6 @@ class BottomSheet extends Component {
 					</ScrollView>
 				</KeyboardAvoidingView>
 			</Modal>
-
 		);
 	}
 }
