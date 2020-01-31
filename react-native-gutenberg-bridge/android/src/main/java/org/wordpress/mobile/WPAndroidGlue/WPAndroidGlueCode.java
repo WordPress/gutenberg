@@ -24,7 +24,6 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.LifecycleState;
@@ -302,7 +301,7 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<String> onError) {
+            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<Bundle> onError) {
                 mRequestExecutor.performRequest(pathFromJS, onSuccess, onError);
             }
 
