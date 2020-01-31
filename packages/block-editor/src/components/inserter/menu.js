@@ -251,6 +251,7 @@ export class InserterMenu extends Component {
 			! isEmpty( itemsPerCollection );
 		const hoveredItemBlockType = hoveredItem ? getBlockType( hoveredItem.name ) : null;
 		const hasHelpPanel = hasItems && showInserterHelpPanel;
+		const viewportWidth = ( hoveredItemBlockType && hoveredItemBlockType.example && hoveredItemBlockType.example.viewportWidth ) ? hoveredItemBlockType.example.viewportWidth : 500;
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of autoFocus via
@@ -416,7 +417,7 @@ export class InserterMenu extends Component {
 										<div className="block-editor-inserter__preview-content">
 											<BlockPreview
 												padding={ 10 }
-												viewportWidth={ 500 }
+												viewportWidth={ viewportWidth }
 												blocks={
 													hoveredItemBlockType.example
 														? getBlockFromExample( hoveredItem.name, {
