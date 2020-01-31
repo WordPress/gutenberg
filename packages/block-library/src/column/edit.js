@@ -43,6 +43,7 @@ function ColumnEdit( {
 					<RangeControl
 						label={ __( 'Percentage width' ) }
 						value={ width || '' }
+						initialPosition={ 0 }
 						onChange={ updateWidth }
 						min={ 0 }
 						max={ 100 }

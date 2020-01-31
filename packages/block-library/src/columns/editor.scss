@@ -20,11 +20,33 @@
 	display: block;
 
 	> .block-editor-inner-blocks > .block-editor-block-list__layout {
-		--columns-template: 1fr;
-		display: grid;
-		grid-gap: $grid-size-large * 2;
+		display: flex;
+		flex-wrap: wrap;
+		margin-bottom: $default-block-margin;
+
 		@include break-medium() {
-			grid-template-columns: var(--columns-template);
+			flex-wrap: nowrap;
+		}
+
+		@supports (display: grid) {
+			--columns-template: 1fr;
+			display: grid;
+			grid-gap: $grid-size-large * 2;
+			@include break-medium() {
+				grid-template-columns: var(--columns-template);
+			}
+		}
+
+		> [data-type="core/column"] {
+			@include break-medium() {
+				+ [data-type="core/column"] {
+					margin-left: $grid-size-large * 2;
+
+					@supports (display: grid) {
+						margin-left: 0;
+					}
+				}
+			}
 		}
 
 		// Set full heights on Columns to enable vertical alignment preview

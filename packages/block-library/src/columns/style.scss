@@ -1,12 +1,11 @@
-.wp-block-columns {
-	--columns-template: 1fr;
 
-	display: grid;
-	grid-gap: $grid-size-large * 2;
+.wp-block-columns {
+	display: flex;
+	flex-wrap: wrap;
 	margin-bottom: $default-block-margin;
 
 	@include break-medium() {
-		grid-template-columns: var(--columns-template);
+		flex-wrap: nowrap;
 	}
 
 	&.has-background {
@@ -18,7 +17,35 @@
 	// Prevent long unbroken words from overflowing.
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
+
+	@include break-medium() {
+		+ .wp-block-column {
+			margin-left: $grid-size-large * 2;
+		}
+	}
 }
+
+@supports (display: grid) {
+	.wp-block-columns {
+		--columns-template: 1fr;
+
+		display: grid;
+		grid-gap: $grid-size-large * 2;
+
+		@include break-medium() {
+			grid-template-columns: var(--columns-template);
+		}
+	}
+
+	.wp-block-column {
+		@include break-medium() {
+			+ .wp-block-column {
+				margin-left: 0;
+			}
+		}
+	}
+}
+
 
 /**
  * All Columns Alignment

@@ -87,10 +87,10 @@ function ColumnsEditContainer( {
 	let columnsTemplateString = ``;
 
 	childColumnsAttributes.forEach( ( column ) => {
-		if ( column.width ) {
-			columnsTemplateString += `${ column.width }% `;
-		} else {
+		if ( ! column.width || column.width < 0 ) {
 			columnsTemplateString += `1fr `;
+		} else {
+			columnsTemplateString += `${ column.width }% `;
 		}
 	} );
 
