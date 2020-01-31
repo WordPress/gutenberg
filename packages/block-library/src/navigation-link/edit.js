@@ -91,7 +91,10 @@ function NavigationLinkEdit( {
 			setIsLinkOpen( false );
 
 			// Does this look like a URL and have something TLD-ish?
-			if ( isURL( prependHTTP( label ) ) && /^.+\.[a-z]+/.test( label ) ) {
+			if (
+				isURL( prependHTTP( label ) ) &&
+				/^.+\.[a-z]+/.test( label )
+			) {
 				// Focus and select the label text.
 				selectLabelText();
 			} else {
