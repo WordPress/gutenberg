@@ -1,4 +1,9 @@
-export default function TreeGridRow( { children, level, positionInSet, setSize, isExpanded } ) {
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+function TreeGridRow( { children, level, positionInSet, setSize, isExpanded }, ref ) {
 	return (
 		// Disable reason: Due to an error in the ARIA 1.1 specification, the
 		// aria-posinset and aria-setsize properties are not supported on row
@@ -7,6 +12,7 @@ export default function TreeGridRow( { children, level, positionInSet, setSize, 
 		//
 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<tr
+			ref={ ref }
 			role="row"
 			aria-level={ level }
 			aria-posinset={ positionInSet }
@@ -17,3 +23,5 @@ export default function TreeGridRow( { children, level, positionInSet, setSize, 
 		</tr>
 	);
 }
+
+export default forwardRef( TreeGridRow );
