@@ -3,13 +3,13 @@
  */
 import RichText from '../rich-text';
 
-function Text( props ) {
+function Editable( props ) {
 	return (
 		<RichText { ...props } __unstableDisableFormats />
 	);
 }
 
-Text.Content = ( {
+Editable.Content = ( {
 	value = '',
 	tagName: Tag = 'div',
 	...props
@@ -20,4 +20,4 @@ Text.Content = ( {
 /**
  * Renders an editable text input in which text formatting is not allowed.
  */
-export default Text;
+export default Editable;

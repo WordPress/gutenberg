@@ -231,6 +231,10 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="Editable" href="#Editable">#</a> **Editable**
+
+Renders an editable text input in which text formatting is not allowed.
+
 <a name="FontSizePicker" href="#FontSizePicker">#</a> **FontSizePicker**
 
 Undocumented declaration.
@@ -435,11 +439,7 @@ _Related_
 
 _Type_
 
--   `Object`
-
-<a name="Text" href="#Text">#</a> **Text**
-
-Renders an editable text input in which text formatting is not allowed.
+-   `Object` 
 
 <a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
 
