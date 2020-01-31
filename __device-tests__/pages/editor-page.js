@@ -21,6 +21,8 @@ export default class EditorPage {
 	headingBlockName = 'Heading';
 	imageBlockName = 'Image';
 	galleryBlockName = 'Gallery';
+	unorderedListButtonName = 'Convert to unordered list';
+	orderedListButtonName = 'Convert to ordered list';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
@@ -161,6 +163,11 @@ export default class EditorPage {
 		// Click on block of choice
 		const blockButton = await this.driver.elementByAccessibilityId( blockName );
 		await blockButton.click();
+	}
+
+	async clickToolBarButton( buttonName: string ) {
+		const toolBarButton = await this.driver.elementByAccessibilityId( buttonName );
+		await toolBarButton.click();
 	}
 
 	// =========================
@@ -336,6 +343,10 @@ export default class EditorPage {
 		const block = await this.getListBlockAtPosition( position );
 		const text = await this.getTextForListBlock( block );
 		return text.toString();
+	}
+
+	async clickOrderedListToolBarButton() {
+		await this.clickToolBarButton( this.orderedListButtonName );
 	}
 
 	// =========================
