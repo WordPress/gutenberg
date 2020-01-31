@@ -28,10 +28,7 @@ const BlockPreview = ( { blocks } ) => {
 	};
 
 	return (
-		<BlockEditorProvider
-			value={ blocks }
-			settings={ settings }
-		>
+		<BlockEditorProvider value={ blocks } settings={ settings }>
 			<View style={ { flex: 1 } }>
 				<BlockList />
 			</View>
@@ -49,16 +46,10 @@ const Preview = ( props ) => {
 		return null;
 	}
 
-	const leftButton = (
-		<ModalHeaderBar.CloseButton onPress={ onDismiss } />
-	);
+	const leftButton = <ModalHeaderBar.CloseButton onPress={ onDismiss } />;
 
 	const rightButton = (
-		<ModalHeaderBar.Button
-			onPress={ onApply }
-			title={ __( 'Apply' ) }
-			isPrimary={ true }
-		/>
+		<ModalHeaderBar.Button onPress={ onApply } title={ __( 'Apply' ) } isPrimary={ true } />
 	);
 
 	return (
@@ -75,9 +66,7 @@ const Preview = ( props ) => {
 					title={ template.name }
 					subtitle={ __( 'Template Preview' ) }
 				/>
-				<BlockPreview
-					blocks={ template.blocks }
-				/>
+				<BlockPreview blocks={ template.blocks } />
 			</SafeAreaView>
 		</Modal>
 	);

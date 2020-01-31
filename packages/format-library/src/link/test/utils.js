@@ -1,10 +1,7 @@
-
 /**
  * Internal dependencies
  */
-import {
-	isValidHref,
-} from '../utils';
+import { isValidHref } from '../utils';
 
 describe( 'isValidHref', () => {
 	it( 'returns true if the href cannot be recognised as a url or an anchor link', () => {
@@ -76,4 +73,3 @@ describe( 'isValidHref', () => {
 		} );
 	} );
 } );
-

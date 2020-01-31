@@ -24,7 +24,11 @@ import styles from './style.scss';
 class PostTitle extends Component {
 	componentDidUpdate( prevProps ) {
 		// Unselect if any other block is selected
-		if ( this.props.isSelected && ! prevProps.isAnyBlockSelected && this.props.isAnyBlockSelected ) {
+		if (
+			this.props.isSelected &&
+			! prevProps.isAnyBlockSelected &&
+			this.props.isAnyBlockSelected
+		) {
 			this.props.onUnselect();
 		}
 	}
@@ -57,14 +61,7 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const {
-			placeholder,
-			style,
-			title,
-			focusedBorderColor,
-			borderStyle,
-			isDimmed,
-		} = this.props;
+		const { placeholder, style, title, focusedBorderColor, borderStyle, isDimmed } = this.props;
 
 		const decodedPlaceholder = decodeEntities( placeholder );
 		const borderColor = this.props.isSelected ? focusedBorderColor : 'transparent';
@@ -74,14 +71,14 @@ class PostTitle extends Component {
 				style={ [ styles.titleContainer, borderStyle, { borderColor }, isDimmed && styles.dimmed ] }
 				accessible={ ! this.props.isSelected }
 				accessibilityLabel={
-					isEmpty( title ) ?
-						/* translators: accessibility text. empty post title. */
-						__( 'Post title. Empty' ) :
-						sprintf(
-							/* translators: accessibility text. %s: text content of the post title. */
-							__( 'Post title. %s' ),
-							title
-						)
+					isEmpty( title )
+						? /* translators: accessibility text. empty post title. */
+						  __( 'Post title. Empty' )
+						: sprintf(
+								/* translators: accessibility text. %s: text content of the post title. */
+								__( 'Post title. %s' ),
+								title
+						  )
 				}
 			>
 				<RichText
@@ -101,13 +98,12 @@ class PostTitle extends Component {
 					onPaste={ this.onPaste }
 					placeholder={ decodedPlaceholder }
 					value={ title }
-					onSelectionChange={ () => { } }
+					onSelectionChange={ () => {} }
 					onEnter={ this.props.onEnterPress }
 					disableEditingMenu={ true }
 					__unstableIsSelected={ this.props.isSelected }
-					__unstableOnCreateUndoLevel={ () => { } }
-				>
-				</RichText>
+					__unstableOnCreateUndoLevel={ () => {} }
+				></RichText>
 			</View>
 		);
 	}
@@ -115,9 +111,7 @@ class PostTitle extends Component {
 
 export default compose(
 	withSelect( ( select ) => {
-		const {
-			isPostTitleSelected,
-		} = select( 'core/editor' );
+		const { isPostTitleSelected } = select( 'core/editor' );
 
 		const { getSelectedBlockClientId, getBlockRootClientId } = select( 'core/block-editor' );
 
@@ -131,16 +125,9 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const {
-			undo,
-			redo,
-			togglePostTitleSelection,
-		} = dispatch( 'core/editor' );
+		const { undo, redo, togglePostTitleSelection } = dispatch( 'core/editor' );
 
-		const {
-			clearSelectedBlock,
-			insertDefaultBlock,
-		} = dispatch( 'core/block-editor' );
+		const { clearSelectedBlock, insertDefaultBlock } = dispatch( 'core/block-editor' );
 
 		return {
 			onEnterPress() {

@@ -45,17 +45,13 @@ export const Gallery = ( props ) => {
 		onFocus,
 	} = props;
 
-	const {
-		columns = defaultColumnsNumber( attributes ),
-		imageCrop,
-		images,
-	} = attributes;
+	const { columns = defaultColumnsNumber( attributes ), imageCrop, images } = attributes;
 
 	// limit displayed columns when isNarrow is true (i.e. when viewport width is
 	// less than "small", where small = 600)
-	const displayedColumns = isNarrow ?
-		Math.min( columns, MAX_DISPLAYED_COLUMNS_NARROW ) :
-		Math.min( columns, MAX_DISPLAYED_COLUMNS );
+	const displayedColumns = isNarrow
+		? Math.min( columns, MAX_DISPLAYED_COLUMNS_NARROW )
+		: Math.min( columns, MAX_DISPLAYED_COLUMNS );
 
 	const selectImage = ( index ) => {
 		return () => {
@@ -83,7 +79,11 @@ export const Gallery = ( props ) => {
 			>
 				{ images.map( ( img, index ) => {
 					/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
-					const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
+					const ariaLabel = sprintf(
+						__( 'image %1$d of %2$d in gallery' ),
+						index + 1,
+						images.length
+					);
 
 					return (
 						<GalleryImage
@@ -93,7 +93,7 @@ export const Gallery = ( props ) => {
 							id={ img.id }
 							isCropped={ imageCrop }
 							isFirstItem={ index === 0 }
-							isLastItem={ ( index + 1 ) === images.length }
+							isLastItem={ index + 1 === images.length }
 							isSelected={ isSelected && selectedImage === index }
 							isBlockSelected={ isSelected }
 							onMoveBackward={ onMoveBackward( index ) }
@@ -114,13 +114,14 @@ export const Gallery = ( props ) => {
 				isSelected={ isCaptionSelected }
 				accessible={ true }
 				accessibilityLabelCreator={ ( caption ) =>
-					isEmpty( caption ) ?
-					/* translators: accessibility text. Empty gallery caption. */
-						( 'Gallery caption. Empty' ) :
-						sprintf(
-						/* translators: accessibility text. %s: gallery caption. */
-							__( 'Gallery caption. %s' ),
-							caption )
+					isEmpty( caption )
+						? /* translators: accessibility text. Empty gallery caption. */
+						  'Gallery caption. Empty'
+						: sprintf(
+								/* translators: accessibility text. %s: gallery caption. */
+								__( 'Gallery caption. %s' ),
+								caption
+						  )
 				}
 				onFocus={ focusGalleryCaption }
 				onBlur={ onBlur } // always assign onBlur as props

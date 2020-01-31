@@ -13,9 +13,10 @@ const transforms = {
 			transform: ( attributes ) => {
 				return createBlock( 'core/quote', {
 					value: toHTMLString( {
-						value: join( attributes.map( ( { content } ) =>
-							create( { html: content } )
-						), '\u2028' ),
+						value: join(
+							attributes.map( ( { content } ) => create( { html: content } ) ),
+							'\u2028'
+						),
 						multilineTag: 'p',
 					} ),
 				} );
@@ -33,10 +34,11 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation } ) => createBlock( 'core/quote', {
-				value,
-				citation,
-			} ),
+			transform: ( { value, citation } ) =>
+				createBlock( 'core/quote', {
+					value,
+					citation,
+				} ),
 		},
 		{
 			type: 'prefix',
@@ -58,21 +60,18 @@ const transforms = {
 							return true;
 						}
 						// Child is a cite and no other cite child exists before it.
-						if (
-							! hasCitation &&
-							child.nodeName === 'CITE'
-						) {
+						if ( ! hasCitation && child.nodeName === 'CITE' ) {
 							hasCitation = true;
 							return true;
 						}
 					};
 				} )();
-				return node.nodeName === 'BLOCKQUOTE' &&
+				return (
+					node.nodeName === 'BLOCKQUOTE' &&
 					// The quote block can only handle multiline paragraph
 					// content with an optional cite child.
-					Array.from( node.childNodes ).every(
-						isParagraphOrSingleCite
-					);
+					Array.from( node.childNodes ).every( isParagraphOrSingleCite )
+				);
 			},
 			schema: ( { phrasingContentSchema } ) => ( {
 				blockquote: {
@@ -96,12 +95,11 @@ const transforms = {
 				const paragraphs = [];
 				if ( value && value !== '<p></p>' ) {
 					paragraphs.push(
-						...split( create( { html: value, multilineTag: 'p' } ), '\u2028' )
-							.map( ( piece ) =>
-								createBlock( 'core/paragraph', {
-									content: toHTMLString( { value: piece } ),
-								} )
-							)
+						...split( create( { html: value, multilineTag: 'p' } ), '\u2028' ).map( ( piece ) =>
+							createBlock( 'core/paragraph', {
+								content: toHTMLString( { value: piece } ),
+							} )
+						)
 					);
 				}
 				if ( citation && citation !== '<p></p>' ) {

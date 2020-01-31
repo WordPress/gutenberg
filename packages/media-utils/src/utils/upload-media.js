@@ -85,17 +85,14 @@ export async function uploadMedia( {
 		if ( ! allowedTypes ) {
 			return true;
 		}
-		return some(
-			allowedTypes,
-			( allowedType ) => {
-				// If a complete mimetype is specified verify if it matches exactly the mime type of the file.
-				if ( includes( allowedType, '/' ) ) {
-					return allowedType === fileType;
-				}
-				// Otherwise a general mime type is used and we should verify if the file mimetype starts with it.
-				return startsWith( fileType, `${ allowedType }/` );
+		return some( allowedTypes, ( allowedType ) => {
+			// If a complete mimetype is specified verify if it matches exactly the mime type of the file.
+			if ( includes( allowedType, '/' ) ) {
+				return allowedType === fileType;
 			}
-		);
+			// Otherwise a general mime type is used and we should verify if the file mimetype starts with it.
+			return startsWith( fileType, `${ allowedType }/` );
+		} );
 	};
 
 	// Allowed types for the current WP_User
@@ -106,11 +103,7 @@ export async function uploadMedia( {
 
 	// Build the error message including the filename
 	const triggerError = ( error ) => {
-		error.message = [
-			<strong key="filename">{ error.file.name }</strong>,
-			': ',
-			error.message,
-		];
+		error.message = [ <strong key="filename">{ error.file.name }</strong>, ': ', error.message ];
 
 		onError( error );
 	};
@@ -210,7 +203,7 @@ function createMediaFromFile( file, additionalData ) {
 	// Create upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
-	forEach( additionalData, ( ( value, key ) => data.append( key, value ) ) );
+	forEach( additionalData, ( value, key ) => data.append( key, value ) );
 	return apiFetch( {
 		path: '/wp/v2/media',
 		body: data,

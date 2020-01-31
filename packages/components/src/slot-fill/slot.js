@@ -1,22 +1,12 @@
 /**
  * External dependencies
  */
-import {
-	isFunction,
-	isString,
-	map,
-	negate,
-} from 'lodash';
+import { isFunction, isString, map, negate } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import {
-	Children,
-	Component,
-	cloneElement,
-	isEmptyElement,
-} from '@wordpress/element';
+import { Children, Component, cloneElement, isEmptyElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -56,7 +46,14 @@ class SlotComponent extends Component {
 	}
 
 	render() {
-		const { children, name, bubblesVirtually = false, fillProps = {}, getFills, className } = this.props;
+		const {
+			children,
+			name,
+			bubblesVirtually = false,
+			fillProps = {},
+			getFills,
+			className,
+		} = this.props;
 
 		if ( bubblesVirtually ) {
 			return <div ref={ this.bindNode } className={ className } />;
@@ -81,11 +78,7 @@ class SlotComponent extends Component {
 			negate( isEmptyElement )
 		);
 
-		return (
-			<>
-				{ isFunction( children ) ? children( fills ) : fills }
-			</>
-		);
+		return <>{ isFunction( children ) ? children( fills ) : fills }</>;
 	}
 }
 

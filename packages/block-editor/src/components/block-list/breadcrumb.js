@@ -26,20 +26,17 @@ import BlockTitle from '../block-title';
  * @return {WPComponent} The component to be rendered.
  */
 function BlockBreadcrumb( { clientId, rootClientId, moverDirection, ...props } ) {
-	const selected = useSelect( ( select ) => {
-		const {
-			__unstableGetBlockWithoutInnerBlocks,
-			getBlockIndex,
-		} = select( 'core/block-editor' );
-		const index = getBlockIndex( clientId, rootClientId );
-		const { name, attributes } = __unstableGetBlockWithoutInnerBlocks( clientId );
-		return { index, name, attributes };
-	}, [ clientId, rootClientId ] );
+	const selected = useSelect(
+		( select ) => {
+			const { __unstableGetBlockWithoutInnerBlocks, getBlockIndex } = select( 'core/block-editor' );
+			const index = getBlockIndex( clientId, rootClientId );
+			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks( clientId );
+			return { index, name, attributes };
+		},
+		[ clientId, rootClientId ]
+	);
 	const { index, name, attributes } = selected;
-	const {
-		setNavigationMode,
-		removeBlock,
-	} = useDispatch( 'core/block-editor' );
+	const { setNavigationMode, removeBlock } = useDispatch( 'core/block-editor' );
 	const ref = useRef();
 
 	// Focus the breadcrumb in navigation mode.

@@ -142,17 +142,15 @@ export class Alpha extends Component {
 		return (
 			<KeyboardShortcuts shortcuts={ shortcuts }>
 				<div className="components-color-picker__alpha">
-					<div
-						className="components-color-picker__alpha-gradient"
-						style={ gradient }
-					/>
+					<div className="components-color-picker__alpha-gradient" style={ gradient } />
 					{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
 					<div
 						className="components-color-picker__alpha-bar"
 						ref={ this.container }
 						onMouseDown={ this.handleMouseDown }
 						onTouchMove={ this.handleChange }
-						onTouchStart={ this.handleChange }>
+						onTouchStart={ this.handleChange }
+					>
 						<div
 							tabIndex="0"
 							role="slider"
@@ -160,9 +158,7 @@ export class Alpha extends Component {
 							aria-valuemin="0"
 							aria-valuenow={ rgb.a }
 							aria-orientation="horizontal"
-							aria-label={ __(
-								'Alpha value, from 0 (transparent) to 1 (fully opaque).'
-							) }
+							aria-label={ __( 'Alpha value, from 0 (transparent) to 1 (fully opaque).' ) }
 							className="components-color-picker__alpha-pointer"
 							style={ pointerLocation }
 							onKeyDown={ this.preventKeyEvents }

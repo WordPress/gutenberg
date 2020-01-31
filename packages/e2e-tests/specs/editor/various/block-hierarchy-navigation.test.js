@@ -33,11 +33,17 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the columns blocks.
 		await page.click( '[aria-label="Block navigation"]' );
-		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]" ) )[ 0 ];
+		const columnsBlockMenuItem = (
+			await page.$x(
+				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]"
+			)
+		 )[ 0 ];
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
-		await page.focus( '.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]' );
+		await page.focus(
+			'.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]'
+		);
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );
@@ -45,9 +51,11 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the last column block.
 		await page.click( '[aria-label="Block navigation"]' );
-		const lastColumnsBlockMenuItem = ( await page.$x(
-			"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
-		) )[ 3 ];
+		const lastColumnsBlockMenuItem = (
+			await page.$x(
+				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
+			)
+		 )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
 
 		// Insert text in the last column block.

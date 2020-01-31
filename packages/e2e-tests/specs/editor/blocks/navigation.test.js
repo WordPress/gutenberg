@@ -1,4 +1,3 @@
-
 /**
  * WordPress dependencies
  */
@@ -25,7 +24,8 @@ async function mockPagesResponse( pages ) {
 
 	await setUpResponseMocking( [
 		{
-			match: ( request ) => request.url().includes( `rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }` ),
+			match: ( request ) =>
+				request.url().includes( `rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }` ),
 			onRequestMatch: createJSONResponse( mappedPages ),
 		},
 	] );
@@ -42,7 +42,8 @@ async function mockSearchResponse( items ) {
 
 	await setUpResponseMocking( [
 		{
-			match: ( request ) => request.url().includes( `rest_route` ) && request.url().includes( `search` ),
+			match: ( request ) =>
+				request.url().includes( `rest_route` ) && request.url().includes( `search` ),
 			onRequestMatch: createJSONResponse( mappedItems ),
 		},
 	] );
@@ -52,7 +53,9 @@ async function updateActiveNavigationLink( { url, label } ) {
 	if ( url ) {
 		await page.type( 'input[placeholder="Search or type url"]', url );
 		// Wait for the autocomplete suggestion item to appear.
-		await page.waitForXPath( `//span[@class="block-editor-link-control__search-item-title"]/mark[text()="${ url }"]` );
+		await page.waitForXPath(
+			`//span[@class="block-editor-link-control__search-item-title"]/mark[text()="${ url }"]`
+		);
 		// Navigate to the first suggestion.
 		await page.keyboard.press( 'ArrowDown' );
 		// Select the suggestion.
@@ -109,7 +112,9 @@ describe( 'Navigation', () => {
 		// Create an empty nav block. The 'create' button is disabled until pages are loaded,
 		// so we must wait for it to become not-disabled.
 		await page.waitForXPath( '//button[text()="Create from all top-level pages"][not(@disabled)]' );
-		const [ createFromExistingButton ] = await page.$x( '//button[text()="Create from all top-level pages"][not(@disabled)]' );
+		const [ createFromExistingButton ] = await page.$x(
+			'//button[text()="Create from all top-level pages"][not(@disabled)]'
+		);
 		await createFromExistingButton.click();
 
 		// Snapshot should contain the mocked pages.
@@ -139,15 +144,16 @@ describe( 'Navigation', () => {
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
-		const isInURLInput = await page.evaluate( () => (
-			!! document.activeElement.closest( '.block-editor-url-input' )
-		) );
+		const isInURLInput = await page.evaluate(
+			() => !! document.activeElement.closest( '.block-editor-url-input' )
+		);
 		expect( isInURLInput ).toBe( true );
 		await page.keyboard.press( 'Escape' );
-		const isInLinkRichText = await page.evaluate( () => (
-			document.activeElement.classList.contains( 'rich-text' ) &&
-			!! document.activeElement.closest( '.block-editor-block-list__block' )
-		) );
+		const isInLinkRichText = await page.evaluate(
+			() =>
+				document.activeElement.classList.contains( 'rich-text' ) &&
+				!! document.activeElement.closest( '.block-editor-block-list__block' )
+		);
 		expect( isInLinkRichText ).toBe( true );
 
 		// Now, trigger the link dialog once more.

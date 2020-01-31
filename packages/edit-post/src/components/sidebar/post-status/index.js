@@ -26,7 +26,12 @@ const PANEL_NAME = 'post-status';
 
 function PostStatus( { isOpened, onTogglePanel } ) {
 	return (
-		<PanelBody className="edit-post-post-status" title={ __( 'Status & visibility' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+		<PanelBody
+			className="edit-post-post-status"
+			title={ __( 'Status & visibility' ) }
+			opened={ isOpened }
+			onToggle={ onTogglePanel }
+		>
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
@@ -63,4 +68,3 @@ export default compose( [
 		},
 	} ) ),
 ] )( PostStatus );
-

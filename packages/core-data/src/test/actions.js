@@ -14,15 +14,8 @@ import { select } from '../controls';
 describe( 'editEntityRecord', () => {
 	it( 'throws when the edited entity does not have a loaded config.', () => {
 		const entity = { kind: 'someKind', name: 'someName', id: 'someId' };
-		const fulfillment = editEntityRecord(
-			entity.kind,
-			entity.name,
-			entity.id,
-			{}
-		);
-		expect( fulfillment.next().value ).toEqual(
-			select( 'getEntity', entity.kind, entity.name )
-		);
+		const fulfillment = editEntityRecord( entity.kind, entity.name, entity.id, {} );
+		expect( fulfillment.next().value ).toEqual( select( 'getEntity', entity.kind, entity.name ) );
 		// Don't pass back an entity config.
 		expect( fulfillment.next.bind( fulfillment ) ).toThrow(
 			`The entity being edited (${ entity.kind }, ${ entity.name }) does not have a loaded config.`
@@ -38,9 +31,7 @@ describe( 'saveEntityRecord', () => {
 		// Trigger generator
 		fulfillment.next();
 		// Provide entities and trigger apiFetch
-		expect( fulfillment.next( entities ).value.type ).toBe(
-			'SAVE_ENTITY_RECORD_START'
-		);
+		expect( fulfillment.next( entities ).value.type ).toBe( 'SAVE_ENTITY_RECORD_START' );
 
 		// Should select getEntityRecordNoResolver selector (as opposed to getEntityRecord)
 		// see https://github.com/WordPress/gutenberg/pull/19752#discussion_r368498318.
@@ -58,13 +49,7 @@ describe( 'saveEntityRecord', () => {
 		const updatedRecord = { ...post, id: 10 };
 		const { value: received } = fulfillment.next( updatedRecord );
 		expect( received ).toEqual(
-			receiveEntityRecords(
-				'postType',
-				'post',
-				updatedRecord,
-				undefined,
-				true
-			)
+			receiveEntityRecords( 'postType', 'post', updatedRecord, undefined, true )
 		);
 		expect( fulfillment.next().value.type ).toBe( 'SAVE_ENTITY_RECORD_FINISH' );
 		expect( fulfillment.next().value ).toBe( updatedRecord );
@@ -77,9 +62,7 @@ describe( 'saveEntityRecord', () => {
 		// Trigger generator
 		fulfillment.next();
 		// Provide entities and trigger apiFetch
-		expect( fulfillment.next( entities ).value.type ).toBe(
-			'SAVE_ENTITY_RECORD_START'
-		);
+		expect( fulfillment.next( entities ).value.type ).toBe( 'SAVE_ENTITY_RECORD_START' );
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
@@ -103,9 +86,7 @@ describe( 'saveEntityRecord', () => {
 		// Trigger generator
 		fulfillment.next();
 		// Provide entities and trigger apiFetch
-		expect( fulfillment.next( entities ).value.type ).toBe(
-			'SAVE_ENTITY_RECORD_START'
-		);
+		expect( fulfillment.next( entities ).value.type ).toBe( 'SAVE_ENTITY_RECORD_START' );
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
@@ -118,7 +99,9 @@ describe( 'saveEntityRecord', () => {
 		} );
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( postType );
-		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', postType, undefined, true ) );
+		expect( received ).toEqual(
+			receiveEntityRecords( 'root', 'postType', postType, undefined, true )
+		);
 		expect( fulfillment.next().value.type ).toBe( 'SAVE_ENTITY_RECORD_FINISH' );
 	} );
 } );

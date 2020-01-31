@@ -43,11 +43,8 @@ class URLInputButton extends Component {
 					className="components-toolbar__control"
 					isPressed={ !! url }
 				/>
-				{ expanded &&
-					<form
-						className="block-editor-url-input__button-modal"
-						onSubmit={ this.submitLink }
-					>
+				{ expanded && (
+					<form className="block-editor-url-input__button-modal" onSubmit={ this.submitLink }>
 						<div className="block-editor-url-input__button-modal-line">
 							<Button
 								className="block-editor-url-input__back"
@@ -56,14 +53,10 @@ class URLInputButton extends Component {
 								onClick={ this.toggle }
 							/>
 							<URLInput value={ url || '' } onChange={ onChange } />
-							<Button
-								icon="editor-break"
-								label={ __( 'Submit' ) }
-								type="submit"
-							/>
+							<Button icon="editor-break" label={ __( 'Submit' ) } type="submit" />
 						</div>
 					</form>
-				}
+				) }
 			</div>
 		);
 	}

@@ -124,18 +124,14 @@ export const controls = {
 	API_FETCH( { request } ) {
 		return triggerFetch( request );
 	},
-	SELECT: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) => {
-			return registry[
-				registry.select( storeKey )[ selectorName ].hasResolver ?
-					'__experimentalResolveSelect' :
-					'select'
-			]( storeKey )[ selectorName ]( ...args );
-		}
-	),
-	DISPATCH: createRegistryControl(
-		( registry ) => ( { storeKey, actionName, args } ) => {
-			return registry.dispatch( storeKey )[ actionName ]( ...args );
-		}
-	),
+	SELECT: createRegistryControl( ( registry ) => ( { storeKey, selectorName, args } ) => {
+		return registry[
+			registry.select( storeKey )[ selectorName ].hasResolver
+				? '__experimentalResolveSelect'
+				: 'select'
+		]( storeKey )[ selectorName ]( ...args );
+	} ),
+	DISPATCH: createRegistryControl( ( registry ) => ( { storeKey, actionName, args } ) => {
+		return registry.dispatch( storeKey )[ actionName ]( ...args );
+	} ),
 };

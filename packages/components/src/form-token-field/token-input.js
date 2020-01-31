@@ -46,7 +46,11 @@ class TokenInput extends Component {
 				aria-expanded={ isExpanded }
 				aria-autocomplete="list"
 				aria-owns={ isExpanded ? `components-form-token-suggestions-${ instanceId }` : undefined }
-				aria-activedescendant={ selectedSuggestionIndex !== -1 ? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }` : undefined }
+				aria-activedescendant={
+					selectedSuggestionIndex !== -1
+						? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
+						: undefined
+				}
 				aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
 			/>
 		);

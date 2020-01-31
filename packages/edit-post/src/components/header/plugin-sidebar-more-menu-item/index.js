@@ -75,23 +75,16 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { sidebarName } ) => {
-		const {
-			getActiveGeneralSidebarName,
-		} = select( 'core/edit-post' );
+		const { getActiveGeneralSidebarName } = select( 'core/edit-post' );
 
 		return {
 			isSelected: getActiveGeneralSidebarName() === sidebarName,
 		};
 	} ),
 	withDispatch( ( dispatch, { isSelected, sidebarName } ) => {
-		const {
-			closeGeneralSidebar,
-			openGeneralSidebar,
-		} = dispatch( 'core/edit-post' );
-		const onClick = isSelected ?
-			closeGeneralSidebar :
-			() => openGeneralSidebar( sidebarName );
+		const { closeGeneralSidebar, openGeneralSidebar } = dispatch( 'core/edit-post' );
+		const onClick = isSelected ? closeGeneralSidebar : () => openGeneralSidebar( sidebarName );
 
 		return { onClick };
-	} ),
+	} )
 )( PluginSidebarMoreMenuItem );

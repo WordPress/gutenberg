@@ -68,7 +68,8 @@ const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
 
 const MOCK_CANT_EMBED_RESPONSE = {
 	provider_name: 'Embed Handler',
-	html: '<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
+	html:
+		'<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
 };
 
 const MOCK_BAD_WORDPRESS_RESPONSE = {
@@ -90,7 +91,9 @@ const MOCK_RESPONSES = [
 		onRequestMatch: createJSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
+		match: createEmbeddingMatcher(
+			'https://wordpress.org/gutenberg/handbook/block-api/attributes/'
+		),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
 	},
 	{
@@ -230,14 +233,12 @@ describe( 'Embedding content', () => {
 		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
 		await page.keyboard.press( 'Enter' );
 		// Set up a different mock to make sure that try again actually does make the request again.
-		await setUpResponseMocking(
-			[
-				{
-					match: createEmbeddingMatcher( 'https://twitter.com/wooyaygutenberg123454312' ),
-					onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
-				},
-			]
-		);
+		await setUpResponseMocking( [
+			{
+				match: createEmbeddingMatcher( 'https://twitter.com/wooyaygutenberg123454312' ),
+				onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+			},
+		] );
 		await clickButton( 'Try again' );
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
 	} );

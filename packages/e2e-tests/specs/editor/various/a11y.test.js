@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createNewPost,
-	pressKeyWithModifier,
-} from '@wordpress/e2e-test-utils';
+import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
 
 function isCloseButtonFocused() {
 	return page.$eval( ':focus', ( focusedElement ) => {

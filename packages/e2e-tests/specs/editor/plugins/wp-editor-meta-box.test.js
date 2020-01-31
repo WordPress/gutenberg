@@ -33,10 +33,7 @@ describe( 'WP Editor Meta Boxes', () => {
 
 		await expect( page ).toClick( '#test_tinymce_id-html' );
 		await page.waitForSelector( '#test_tinymce_id' );
-		const content = await page.$eval(
-			'#test_tinymce_id',
-			( textarea ) => textarea.value
-		);
+		const content = await page.$eval( '#test_tinymce_id', ( textarea ) => textarea.value );
 
 		expect( content ).toMatchSnapshot();
 	} );

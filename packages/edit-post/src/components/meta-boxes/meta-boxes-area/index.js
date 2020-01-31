@@ -53,13 +53,9 @@ class MetaBoxesArea extends Component {
 	render() {
 		const { location, isSaving } = this.props;
 
-		const classes = classnames(
-			'edit-post-meta-boxes-area',
-			`is-${ location }`,
-			{
-				'is-loading': isSaving,
-			}
-		);
+		const classes = classnames( 'edit-post-meta-boxes-area', `is-${ location }`, {
+			'is-loading': isSaving,
+		} );
 
 		return (
 			<div className={ classes }>

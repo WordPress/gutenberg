@@ -29,30 +29,17 @@ import {
 	getRedistributedColumnWidths,
 } from '../columns/utils';
 
-function ColumnEdit( {
-	attributes,
-	className,
-	updateAlignment,
-	updateWidth,
-	hasChildBlocks,
-} ) {
+function ColumnEdit( { attributes, className, updateAlignment, updateWidth, hasChildBlocks } ) {
 	const { verticalAlignment, width } = attributes;
 
-	const classes = classnames(
-		className,
-		'block-core-columns',
-		{
-			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		}
-	);
+	const classes = classnames( className, 'block-core-columns', {
+		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+	} );
 
 	return (
 		<div className={ classes }>
 			<BlockControls>
-				<BlockVerticalAlignmentToolbar
-					onChange={ updateAlignment }
-					value={ verticalAlignment }
-				/>
+				<BlockVerticalAlignmentToolbar onChange={ updateAlignment } value={ verticalAlignment } />
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Column settings' ) }>
@@ -69,11 +56,7 @@ function ColumnEdit( {
 			</InspectorControls>
 			<InnerBlocks
 				templateLock={ false }
-				renderAppender={ (
-					hasChildBlocks ?
-						undefined :
-						() => <InnerBlocks.ButtonBlockAppender />
-				) }
+				renderAppender={ hasChildBlocks ? undefined : () => <InnerBlocks.ButtonBlockAppender /> }
 			/>
 		</div>
 	);
@@ -114,12 +97,11 @@ export default compose(
 
 				// The occupied width is calculated as the sum of the new width
 				// and the total width of blocks _not_ in the adjacent set.
-				const occupiedWidth = width + getTotalColumnsWidth(
-					difference( columns, [
-						find( columns, { clientId } ),
-						...adjacentColumns,
-					] )
-				);
+				const occupiedWidth =
+					width +
+					getTotalColumnsWidth(
+						difference( columns, [ find( columns, { clientId } ), ...adjacentColumns ] )
+					);
 
 				// Compute _all_ next column widths, in case the updated column
 				// is in the middle of a set of columns which don't yet have

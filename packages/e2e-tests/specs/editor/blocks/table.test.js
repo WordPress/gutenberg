@@ -35,7 +35,9 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Check for existence of the column count field.
-		const columnCountLabel = await page.$x( "//div[@data-type='core/table']//label[text()='Column Count']" );
+		const columnCountLabel = await page.$x(
+			"//div[@data-type='core/table']//label[text()='Column Count']"
+		);
 		expect( columnCountLabel ).toHaveLength( 1 );
 
 		// Modify the column count.
@@ -46,7 +48,9 @@ describe( 'Table', () => {
 		await page.keyboard.type( '5' );
 
 		// Check for existence of the row count field.
-		const rowCountLabel = await page.$x( "//div[@data-type='core/table']//label[text()='Row Count']" );
+		const rowCountLabel = await page.$x(
+			"//div[@data-type='core/table']//label[text()='Row Count']"
+		);
 		expect( rowCountLabel ).toHaveLength( 1 );
 
 		// Modify the row count.
@@ -168,7 +172,9 @@ describe( 'Table', () => {
 	it( 'allows columns to be aligned', async () => {
 		await insertBlock( 'Table' );
 
-		const [ columnCountLabel ] = await page.$x( "//div[@data-type='core/table']//label[text()='Column Count']" );
+		const [ columnCountLabel ] = await page.$x(
+			"//div[@data-type='core/table']//label[text()='Column Count']"
+		);
 		await columnCountLabel.click();
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '4' );

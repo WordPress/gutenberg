@@ -9,7 +9,12 @@ import { get, partial } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { PageAttributesCheck, PageAttributesOrder, PageAttributesParent, PageTemplate } from '@wordpress/editor';
+import {
+	PageAttributesCheck,
+	PageAttributesOrder,
+	PageAttributesParent,
+	PageTemplate,
+} from '@wordpress/editor';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -57,7 +62,4 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	};
 } );
 
-export default compose(
-	applyWithSelect,
-	applyWithDispatch,
-)( PageAttributes );
+export default compose( applyWithSelect, applyWithDispatch )( PageAttributes );

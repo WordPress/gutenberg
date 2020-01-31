@@ -42,7 +42,7 @@ describe( 'isURL', () => {
 		expect( every( urls, isURL ) ).toBe( true );
 	} );
 
-	it( 'returns false when given things that don\'t look like a URL', () => {
+	it( "returns false when given things that don't look like a URL", () => {
 		const urls = [
 			'HTTP: HyperText Transfer Protocol',
 			'URLs begin with a http:// prefix',
@@ -72,14 +72,14 @@ describe( 'isEmail', () => {
 		expect( every( emails, isEmail ) ).toBe( true );
 	} );
 
-	it( 'returns false when given things that don\'t look like an email', () => {
+	it( "returns false when given things that don't look like an email", () => {
 		const emails = [
 			'Abc.wordpress.org',
 			'A@b@c@wordpress.org',
-			'a"b(c)d,e:f;g<h>i[j\k]l@wordpress.org',
+			'a"b(c)d,e:f;g<h>i[jk]l@wordpress.org',
 			'just"not"right@wordpress.org',
-			'this is"not\allowed@wordpress.org',
-			'this\ still\"not\\allowed@wordpress.org',
+			'this is"notallowed@wordpress.org',
+			'this still"not\\allowed@wordpress.org',
 			'1234567890123456789012345678901234567890123456789012345678901234+x@wordpress.org',
 		];
 
@@ -89,8 +89,16 @@ describe( 'isEmail', () => {
 
 describe( 'getProtocol', () => {
 	it( 'returns the protocol part of a URL', () => {
-		expect( getProtocol( 'http://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more' ) ).toBe( 'http:' );
-		expect( getProtocol( 'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more' ) ).toBe( 'https:' );
+		expect(
+			getProtocol(
+				'http://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+			)
+		).toBe( 'http:' );
+		expect(
+			getProtocol(
+				'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+			)
+		).toBe( 'https:' );
 		expect( getProtocol( 'https://wordpress.org#test' ) ).toBe( 'https:' );
 		expect( getProtocol( 'https://wordpress.org/' ) ).toBe( 'https:' );
 		expect( getProtocol( 'https://wordpress.org?test' ) ).toBe( 'https:' );
@@ -134,8 +142,16 @@ describe( 'isValidProtocol', () => {
 
 describe( 'getAuthority', () => {
 	it( 'returns the authority part of a URL', () => {
-		expect( getAuthority( 'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more' ) ).toBe( 'user:password@www.test-this.com:1020' );
-		expect( getAuthority( 'http://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more' ) ).toBe( 'user:password@www.test-this.com:1020' );
+		expect(
+			getAuthority(
+				'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+			)
+		).toBe( 'user:password@www.test-this.com:1020' );
+		expect(
+			getAuthority(
+				'http://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+			)
+		).toBe( 'user:password@www.test-this.com:1020' );
 		expect( getAuthority( 'https://wordpress.org#test' ) ).toBe( 'wordpress.org' );
 		expect( getAuthority( 'https://wordpress.org/' ) ).toBe( 'wordpress.org' );
 		expect( getAuthority( 'https://wordpress.org?test' ) ).toBe( 'wordpress.org' );
@@ -174,13 +190,29 @@ describe( 'isValidAuthority', () => {
 
 describe( 'getPath', () => {
 	it( 'returns the path part of a URL', () => {
-		expect( getPath( 'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more' ) ).toBe( 'test-path/file.extension' );
-		expect( getPath( 'http://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more' ) ).toBe( 'test-path/file.extension' );
+		expect(
+			getPath(
+				'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+			)
+		).toBe( 'test-path/file.extension' );
+		expect(
+			getPath(
+				'http://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+			)
+		).toBe( 'test-path/file.extension' );
 		expect( getPath( 'https://wordpress.org/test-path#anchor' ) ).toBe( 'test-path' );
 		expect( getPath( 'https://wordpress.org/test-path?query' ) ).toBe( 'test-path' );
-		expect( getPath( 'https://www.google.com/search?source=hp&ei=tP7kW8-_FoK89QORoa2QBQ&q=test+url&oq=test+url&gs_l=psy-ab.3..0l10' ) ).toBe( 'search' );
-		expect( getPath( 'https://wordpress.org/this%20is%20a%20test' ) ).toBe( 'this%20is%20a%20test' );
-		expect( getPath( 'https://wordpress.org/this%20is%20a%20test?query' ) ).toBe( 'this%20is%20a%20test' );
+		expect(
+			getPath(
+				'https://www.google.com/search?source=hp&ei=tP7kW8-_FoK89QORoa2QBQ&q=test+url&oq=test+url&gs_l=psy-ab.3..0l10'
+			)
+		).toBe( 'search' );
+		expect( getPath( 'https://wordpress.org/this%20is%20a%20test' ) ).toBe(
+			'this%20is%20a%20test'
+		);
+		expect( getPath( 'https://wordpress.org/this%20is%20a%20test?query' ) ).toBe(
+			'this%20is%20a%20test'
+		);
 	} );
 
 	it( 'returns undefined when the provided value does not contain a URL path', () => {
@@ -221,14 +253,29 @@ describe( 'isValidPath', () => {
 
 describe( 'getQueryString', () => {
 	it( 'returns the query string of a URL', () => {
-		expect( getQueryString( 'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more' ) ).toBe( 'query=params&more' );
-		expect( getQueryString( 'http://user:password@www.test-this.com:1020/test-path/file.extension?query=params&more#anchor' ) ).toBe( 'query=params&more' );
+		expect(
+			getQueryString(
+				'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+			)
+		).toBe( 'query=params&more' );
+		expect(
+			getQueryString(
+				'http://user:password@www.test-this.com:1020/test-path/file.extension?query=params&more#anchor'
+			)
+		).toBe( 'query=params&more' );
 		expect( getQueryString( 'https://wordpress.org/test-path?query' ) ).toBe( 'query' );
-		expect( getQueryString( 'https://www.google.com/search?source=hp&ei=tP7kW8-_FoK89QORoa2QBQ&q=test+url&oq=test+url&gs_l=psy-ab.3..0l10' ) )
-			.toBe( 'source=hp&ei=tP7kW8-_FoK89QORoa2QBQ&q=test+url&oq=test+url&gs_l=psy-ab.3..0l10' );
+		expect(
+			getQueryString(
+				'https://www.google.com/search?source=hp&ei=tP7kW8-_FoK89QORoa2QBQ&q=test+url&oq=test+url&gs_l=psy-ab.3..0l10'
+			)
+		).toBe( 'source=hp&ei=tP7kW8-_FoK89QORoa2QBQ&q=test+url&oq=test+url&gs_l=psy-ab.3..0l10' );
 		expect( getQueryString( 'https://wordpress.org/this%20is%20a%20test?query' ) ).toBe( 'query' );
-		expect( getQueryString( 'https://wordpress.org/test?query=something%20with%20spaces' ) ).toBe( 'query=something%20with%20spaces' );
-		expect( getQueryString( 'https://andalouses.example/beach?foo[]=bar&foo[]=baz' ) ).toBe( 'foo[]=bar&foo[]=baz' );
+		expect( getQueryString( 'https://wordpress.org/test?query=something%20with%20spaces' ) ).toBe(
+			'query=something%20with%20spaces'
+		);
+		expect( getQueryString( 'https://andalouses.example/beach?foo[]=bar&foo[]=baz' ) ).toBe(
+			'foo[]=bar&foo[]=baz'
+		);
 		expect( getQueryString( 'test.com?foo[]=bar&foo[]=baz' ) ).toBe( 'foo[]=bar&foo[]=baz' );
 		expect( getQueryString( 'test.com?foo=bar&foo=baz?test' ) ).toBe( 'foo=bar&foo=baz?test' );
 	} );
@@ -256,7 +303,11 @@ describe( 'isValidQueryString', () => {
 		expect( isValidQueryString( 'test=true&another=false' ) ).toBe( true );
 		expect( isValidQueryString( 'test[]=true&another[]=false' ) ).toBe( true );
 		expect( isValidQueryString( 'query=something%20with%20spaces' ) ).toBe( true );
-		expect( isValidQueryString( 'source=hp&ei=tP7kW8-_FoK89QORoa2QBQ&q=test+url&oq=test+url&gs_l=psy-ab.3..0l10' ) ).toBe( true );
+		expect(
+			isValidQueryString(
+				'source=hp&ei=tP7kW8-_FoK89QORoa2QBQ&q=test+url&oq=test+url&gs_l=psy-ab.3..0l10'
+			)
+		).toBe( true );
 	} );
 
 	it( 'returns false if the query string is invalid', () => {
@@ -276,8 +327,16 @@ describe( 'isValidQueryString', () => {
 
 describe( 'getFragment', () => {
 	it( 'returns the fragment of a URL', () => {
-		expect( getFragment( 'https://user:password@www.test-this.com:1020/test-path/file.extension#fragment?query=params&more' ) ).toBe( '#fragment' );
-		expect( getFragment( 'http://user:password@www.test-this.com:1020/test-path/file.extension?query=params&more#fragment' ) ).toBe( '#fragment' );
+		expect(
+			getFragment(
+				'https://user:password@www.test-this.com:1020/test-path/file.extension#fragment?query=params&more'
+			)
+		).toBe( '#fragment' );
+		expect(
+			getFragment(
+				'http://user:password@www.test-this.com:1020/test-path/file.extension?query=params&more#fragment'
+			)
+		).toBe( '#fragment' );
 		expect( getFragment( 'relative/url/#fragment' ) ).toBe( '#fragment' );
 		expect( getFragment( '/absolute/url/#fragment' ) ).toBe( '#fragment' );
 	} );
@@ -287,7 +346,11 @@ describe( 'getFragment', () => {
 		expect( getFragment( 'https://wordpress.org/test-path?query' ) ).toBeUndefined();
 		expect( getFragment( 'https://wordpress.org/test-path' ) ).toBeUndefined();
 		expect( getFragment( 'https://wordpress.org/this%20is%20a%20test' ) ).toBeUndefined();
-		expect( getFragment( 'https://www.google.com/search?source=hp&ei=tP7kW8-_FoK89QORoa2QBQ&q=test+url&oq=test+url&gs_l=psy-ab.3..0l10' ) ).toBeUndefined();
+		expect(
+			getFragment(
+				'https://www.google.com/search?source=hp&ei=tP7kW8-_FoK89QORoa2QBQ&q=test+url&oq=test+url&gs_l=psy-ab.3..0l10'
+			)
+		).toBeUndefined();
 		expect( getFragment( 'https://wordpress.org' ) ).toBeUndefined();
 		expect( getFragment( 'https://localhost:8080' ) ).toBeUndefined();
 		expect( getFragment( 'https://' ) ).toBeUndefined();
@@ -323,28 +386,36 @@ describe( 'addQueryArgs', () => {
 		const url = 'https://andalouses.example/beach';
 		const args = { sun: 'true', sand: 'false' };
 
-		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?sun=true&sand=false' );
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach?sun=true&sand=false'
+		);
 	} );
 
 	it( 'should append args to a URL with query string', () => {
 		const url = 'https://andalouses.example/beach?night=false';
 		const args = { sun: 'true', sand: 'false' };
 
-		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?night=false&sun=true&sand=false' );
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach?night=false&sun=true&sand=false'
+		);
 	} );
 
 	it( 'should update args to an URL with conflicting query string', () => {
 		const url = 'https://andalouses.example/beach?night=false&sun=false&sand=true';
 		const args = { sun: 'true', sand: 'false' };
 
-		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?night=false&sun=true&sand=false' );
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach?night=false&sun=true&sand=false'
+		);
 	} );
 
 	it( 'should update args to an URL with array parameters', () => {
 		const url = 'https://andalouses.example/beach?time[]=10&time[]=11';
 		const args = { beach: [ 'sand', 'rock' ] };
 
-		expect( safeDecodeURI( addQueryArgs( url, args ) ) ).toBe( 'https://andalouses.example/beach?time[0]=10&time[1]=11&beach[0]=sand&beach[1]=rock' );
+		expect( safeDecodeURI( addQueryArgs( url, args ) ) ).toBe(
+			'https://andalouses.example/beach?time[0]=10&time[1]=11&beach[0]=sand&beach[1]=rock'
+		);
 	} );
 
 	it( 'should disregard keys with undefined values', () => {
@@ -358,7 +429,9 @@ describe( 'addQueryArgs', () => {
 		const url = 'https://andalouses.example/beach';
 		const args = { activity: 'fun in the sun' };
 
-		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?activity=fun%20in%20the%20sun' );
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach?activity=fun%20in%20the%20sun'
+		);
 	} );
 
 	it( 'should return only querystring when passed undefined url', () => {
@@ -433,13 +506,17 @@ describe( 'removeQueryArgs', () => {
 	it( 'should remove existing query args', () => {
 		const url = 'https://andalouses.example/beach?foo=bar&baz=foo&bar=baz';
 
-		expect( removeQueryArgs( url, 'foo', 'bar' ) ).toEqual( 'https://andalouses.example/beach?baz=foo' );
+		expect( removeQueryArgs( url, 'foo', 'bar' ) ).toEqual(
+			'https://andalouses.example/beach?baz=foo'
+		);
 	} );
 
 	it( 'should remove array query arg', () => {
 		const url = 'https://andalouses.example/beach?foo[]=bar&foo[]=baz&bar=foobar';
 
-		expect( removeQueryArgs( url, 'foo' ) ).toEqual( 'https://andalouses.example/beach?bar=foobar' );
+		expect( removeQueryArgs( url, 'foo' ) ).toEqual(
+			'https://andalouses.example/beach?bar=foobar'
+		);
 	} );
 } );
 

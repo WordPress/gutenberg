@@ -35,7 +35,9 @@ describe( 'Warning', () => {
 	} );
 
 	it( 'should show hidden actions', () => {
-		const wrapper = shallow( <Warning secondaryActions={ [ { title: 'test', onClick: null } ] }>Message</Warning> );
+		const wrapper = shallow(
+			<Warning secondaryActions={ [ { title: 'test', onClick: null } ] }>Message</Warning>
+		);
 
 		const actions = wrapper.find( '.block-editor-warning__secondary' );
 

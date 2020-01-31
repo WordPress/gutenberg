@@ -22,7 +22,9 @@ describe( 'Links', () => {
 	} );
 
 	const waitForAutoFocus = async () => {
-		await page.waitForFunction( () => !! document.activeElement.closest( '.block-editor-url-input' ) );
+		await page.waitForFunction(
+			() => !! document.activeElement.closest( '.block-editor-url-input' )
+		);
 	};
 
 	it( 'can be created by selecting text and clicking Link', async () => {
@@ -263,7 +265,9 @@ describe( 'Links', () => {
 
 		// Return the URL of the new post
 		await page.waitForSelector( '.post-publish-panel__postpublish-post-address input' );
-		return page.evaluate( () => document.querySelector( '.post-publish-panel__postpublish-post-address input' ).value );
+		return page.evaluate(
+			() => document.querySelector( '.post-publish-panel__postpublish-post-address input' ).value
+		);
 	};
 
 	it( 'allows use of escape key to dismiss the url popover', async () => {
@@ -346,7 +350,9 @@ describe( 'Links', () => {
 		// focused with the value previously inserted.
 		await pressKeyWithModifier( 'primary', 'K' );
 		await waitForAutoFocus();
-		const activeElementParentClasses = await page.evaluate( () => Object.values( document.activeElement.parentElement.parentElement.classList ) );
+		const activeElementParentClasses = await page.evaluate( () =>
+			Object.values( document.activeElement.parentElement.parentElement.classList )
+		);
 		expect( activeElementParentClasses ).toContain( 'block-editor-url-input' );
 		const activeElementValue = await page.evaluate( () => document.activeElement.value );
 		expect( activeElementValue ).toBe( URL );
@@ -360,8 +366,12 @@ describe( 'Links', () => {
 		await waitForAutoFocus();
 		await page.keyboard.type( 'http://#test.com' );
 		await page.keyboard.press( 'Enter' );
-		const assertiveContent = await page.evaluate( () => document.querySelector( '#a11y-speak-assertive' ).textContent );
-		expect( assertiveContent.trim() ).toBe( 'Warning: the link has been inserted but may have errors. Please test it.' );
+		const assertiveContent = await page.evaluate(
+			() => document.querySelector( '#a11y-speak-assertive' ).textContent
+		);
+		expect( assertiveContent.trim() ).toBe(
+			'Warning: the link has been inserted but may have errors. Please test it.'
+		);
 	} );
 
 	it( 'link popover remains visible after a mouse drag event', async () => {
@@ -392,7 +402,7 @@ describe( 'Links', () => {
 
 		await page.mouse.move( bounds.x, bounds.y );
 		await page.mouse.down();
-		await page.mouse.move( bounds.x + ( bounds.width / 2 ), bounds.y, { steps: 10 } );
+		await page.mouse.move( bounds.x + bounds.width / 2, bounds.y, { steps: 10 } );
 		await page.mouse.up();
 
 		// The link popover should still be visible

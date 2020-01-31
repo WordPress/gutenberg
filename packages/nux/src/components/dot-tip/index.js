@@ -85,5 +85,5 @@ export default compose(
 				disableTips();
 			},
 		};
-	} ),
+	} )
 )( DotTip );

@@ -18,9 +18,7 @@ describe( 'deprecated', () => {
 	it( 'should show a deprecation warning', () => {
 		deprecated( 'Eating meat' );
 
-		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated.'
-		);
+		expect( console ).toHaveWarnedWith( 'Eating meat is deprecated.' );
 	} );
 
 	it( 'should show a deprecation warning with a version', () => {

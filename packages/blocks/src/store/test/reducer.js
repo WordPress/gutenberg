@@ -76,9 +76,7 @@ describe( 'blockStyles', () => {
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [
-				{ name: 'fancy' },
-			],
+			'core/image': [ { name: 'fancy' } ],
 		} );
 
 		state = blockStyles( state, {
@@ -88,44 +86,33 @@ describe( 'blockStyles', () => {
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [
-				{ name: 'fancy' },
-				{ name: 'lightbox' },
-			],
+			'core/image': [ { name: 'fancy' }, { name: 'lightbox' } ],
 		} );
 	} );
 
 	it( 'should add block styles when adding a block', () => {
 		const original = deepFreeze( {
-			'core/image': [
-				{ name: 'fancy' },
-			],
+			'core/image': [ { name: 'fancy' } ],
 		} );
 
 		const state = blockStyles( original, {
 			type: 'ADD_BLOCK_TYPES',
-			blockTypes: [ {
-				name: 'core/image',
-				styles: [
-					{ name: 'original' },
-				],
-			} ],
+			blockTypes: [
+				{
+					name: 'core/image',
+					styles: [ { name: 'original' } ],
+				},
+			],
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [
-				{ name: 'original' },
-				{ name: 'fancy' },
-			],
+			'core/image': [ { name: 'original' }, { name: 'fancy' } ],
 		} );
 	} );
 
 	it( 'should remove block styles', () => {
 		const original = deepFreeze( {
-			'core/image': [
-				{ name: 'fancy' },
-				{ name: 'lightbox' },
-			],
+			'core/image': [ { name: 'fancy' }, { name: 'lightbox' } ],
 		} );
 
 		const state = blockStyles( original, {
@@ -135,9 +122,7 @@ describe( 'blockStyles', () => {
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [
-				{ name: 'lightbox' },
-			],
+			'core/image': [ { name: 'lightbox' } ],
 		} );
 	} );
 } );
@@ -172,63 +157,46 @@ describe( 'blockPatterns', () => {
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [
-				blockPattern,
-			],
+			[ blockName ]: [ blockPattern ],
 		} );
 	} );
 
 	it( 'should add another pattern when a block pattern already present for the block', () => {
 		const initialState = deepFreeze( {
-			[ blockName ]: [
-				blockPattern,
-			],
+			[ blockName ]: [ blockPattern ],
 		} );
 
 		const state = blockPatterns(
 			initialState,
-			__experimentalAddBlockPatterns( blockName, secondBlockPattern ),
+			__experimentalAddBlockPatterns( blockName, secondBlockPattern )
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [
-				blockPattern,
-				secondBlockPattern,
-			],
+			[ blockName ]: [ blockPattern, secondBlockPattern ],
 		} );
 	} );
 
 	it( 'should prepend block patterns added when adding a block', () => {
 		const initialState = deepFreeze( {
-			[ blockName ]: [
-				secondBlockPattern,
-			],
+			[ blockName ]: [ secondBlockPattern ],
 		} );
 
 		const state = blockPatterns(
 			initialState,
 			addBlockTypes( {
 				name: blockName,
-				patterns: [
-					blockPattern,
-				],
+				patterns: [ blockPattern ],
 			} )
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [
-				blockPattern,
-				secondBlockPattern,
-			],
+			[ blockName ]: [ blockPattern, secondBlockPattern ],
 		} );
 	} );
 
 	it( 'should remove a block pattern', () => {
 		const initialState = deepFreeze( {
-			[ blockName ]: [
-				blockPattern,
-				secondBlockPattern,
-			],
+			[ blockName ]: [ blockPattern, secondBlockPattern ],
 		} );
 
 		const state = blockPatterns(
@@ -237,9 +205,7 @@ describe( 'blockPatterns', () => {
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [
-				secondBlockPattern,
-			],
+			[ blockName ]: [ secondBlockPattern ],
 		} );
 	} );
 } );
@@ -346,25 +312,23 @@ describe( 'categories', () => {
 	} );
 
 	it( 'should override categories', () => {
-		const original = deepFreeze( [
-			{ slug: 'chicken', title: 'Chicken' },
-		] );
+		const original = deepFreeze( [ { slug: 'chicken', title: 'Chicken' } ] );
 
 		const state = categories( original, {
 			type: 'SET_CATEGORIES',
 			categories: [ { slug: 'wings', title: 'Wings' } ],
 		} );
 
-		expect( state ).toEqual( [
-			{ slug: 'wings', title: 'Wings' },
-		] );
+		expect( state ).toEqual( [ { slug: 'wings', title: 'Wings' } ] );
 	} );
 
 	it( 'should add the category icon', () => {
-		const original = deepFreeze( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-		} ] );
+		const original = deepFreeze( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+			},
+		] );
 
 		const state = categories( original, {
 			type: 'UPDATE_CATEGORY',
@@ -374,23 +338,28 @@ describe( 'categories', () => {
 			},
 		} );
 
-		expect( state ).toEqual( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-			icon: 'new-icon',
-		} ] );
+		expect( state ).toEqual( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+				icon: 'new-icon',
+			},
+		] );
 	} );
 
 	it( 'should update the category icon', () => {
-		const original = deepFreeze( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-			icon: 'old-icon',
-		}, {
-			slug: 'wings',
-			title: 'Wings',
-			icon: 'old-icon',
-		} ] );
+		const original = deepFreeze( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+				icon: 'old-icon',
+			},
+			{
+				slug: 'wings',
+				title: 'Wings',
+				icon: 'old-icon',
+			},
+		] );
 
 		const state = categories( original, {
 			type: 'UPDATE_CATEGORY',
@@ -400,27 +369,33 @@ describe( 'categories', () => {
 			},
 		} );
 
-		expect( state ).toEqual( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-			icon: 'new-icon',
-		}, {
-			slug: 'wings',
-			title: 'Wings',
-			icon: 'old-icon',
-		} ] );
+		expect( state ).toEqual( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+				icon: 'new-icon',
+			},
+			{
+				slug: 'wings',
+				title: 'Wings',
+				icon: 'old-icon',
+			},
+		] );
 	} );
 
 	it( 'should update multiple category properties', () => {
-		const original = deepFreeze( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-			icon: 'old-icon',
-		}, {
-			slug: 'wings',
-			title: 'Wings',
-			icon: 'old-icon',
-		} ] );
+		const original = deepFreeze( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+				icon: 'old-icon',
+			},
+			{
+				slug: 'wings',
+				title: 'Wings',
+				icon: 'old-icon',
+			},
+		] );
 
 		const state = categories( original, {
 			type: 'UPDATE_CATEGORY',
@@ -431,15 +406,18 @@ describe( 'categories', () => {
 			},
 		} );
 
-		expect( state ).toEqual( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-			icon: 'old-icon',
-		}, {
-			slug: 'wings',
-			title: 'New Wings',
-			chicken: 'ribs',
-			icon: 'old-icon',
-		} ] );
+		expect( state ).toEqual( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+				icon: 'old-icon',
+			},
+			{
+				slug: 'wings',
+				title: 'New Wings',
+				chicken: 'ribs',
+				icon: 'old-icon',
+			},
+		] );
 	} );
 } );

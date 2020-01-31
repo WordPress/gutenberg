@@ -3,16 +3,12 @@
  */
 import React from 'react';
 import { View } from 'react-native';
-import {
-	subscribeMediaUpload,
-} from 'react-native-gutenberg-bridge';
+import { subscribeMediaUpload } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
-import {
-	Spinner,
-} from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -71,7 +67,11 @@ export class MediaUploadProgress extends React.Component {
 	}
 
 	updateMediaProgress( payload ) {
-		this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
+		this.setState( {
+			progress: payload.progress,
+			isUploadInProgress: true,
+			isUploadFailed: false,
+		} );
 		if ( this.props.onUpdateMediaProgress ) {
 			this.props.onUpdateMediaProgress( payload );
 		}
@@ -123,18 +123,15 @@ export class MediaUploadProgress extends React.Component {
 
 		return (
 			<View style={ styles.mediaUploadProgress }>
-				{ showSpinner &&
+				{ showSpinner && (
 					<View style={ styles.progressBar }>
 						<Spinner progress={ progress } />
 					</View>
-				}
-				{ coverUrl &&
-					<ImageSize src={ coverUrl } >
+				) }
+				{ coverUrl && (
+					<ImageSize src={ coverUrl }>
 						{ ( sizes ) => {
-							const {
-								imageWidthWithinContainer,
-								imageHeightWithinContainer,
-							} = sizes;
+							const { imageWidthWithinContainer, imageHeightWithinContainer } = sizes;
 
 							let finalHeight = imageHeightWithinContainer;
 							if ( height > 0 && height < imageHeightWithinContainer ) {
@@ -145,22 +142,23 @@ export class MediaUploadProgress extends React.Component {
 							if ( width > 0 && width < imageWidthWithinContainer ) {
 								finalWidth = width;
 							}
-							return ( this.props.renderContent( {
+							return this.props.renderContent( {
 								isUploadInProgress,
 								isUploadFailed,
 								finalWidth,
 								finalHeight,
 								imageWidthWithinContainer,
 								retryMessage,
-							} ) );
+							} );
 						} }
 					</ImageSize>
-				}
-				{ ! coverUrl && this.props.renderContent( {
-					isUploadInProgress,
-					isUploadFailed,
-					retryMessage,
-				} ) }
+				) }
+				{ ! coverUrl &&
+					this.props.renderContent( {
+						isUploadInProgress,
+						isUploadFailed,
+						retryMessage,
+					} ) }
 			</View>
 		);
 	}

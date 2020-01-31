@@ -18,10 +18,7 @@ export function RichTextToolbarButton( { name, shortcutType, shortcutCharacter, 
 
 	return (
 		<Fill name={ fillName }>
-			<ToolbarButton
-				{ ...props }
-				shortcut={ shortcut }
-			/>
+			<ToolbarButton { ...props } shortcut={ shortcut } />
 		</Fill>
 	);
 }

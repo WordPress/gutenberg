@@ -23,7 +23,10 @@ export const settings = {
 	example: {
 		innerBlocks: [
 			{ name: 'core/social-link-wordpress', attributes: { url: 'https://wordpress.org' } },
-			{ name: 'core/social-link-facebook', attributes: { url: 'https://www.facebook.com/WordPress/' } },
+			{
+				name: 'core/social-link-facebook',
+				attributes: { url: 'https://www.facebook.com/WordPress/' },
+			},
 			{ name: 'core/social-link-twitter', attributes: { url: 'https://twitter.com/WordPress' } },
 		],
 	},

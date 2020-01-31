@@ -31,8 +31,7 @@ import { useEffect } from '@wordpress/element';
 function isAppleOS( _window = window ) {
 	const { platform } = _window.navigator;
 
-	return platform.indexOf( 'Mac' ) !== -1 ||
-		includes( [ 'iPad', 'iPhone' ], platform );
+	return platform.indexOf( 'Mac' ) !== -1 || includes( [ 'iPad', 'iPhone' ], platform );
 }
 
 /**
@@ -42,12 +41,16 @@ function isAppleOS( _window = window ) {
  * @param {Function}                callback   Shortcut callback.
  * @param {WPKeyboardShortcutConfig} options    Shortcut options.
  */
-function useKeyboardShortcut( shortcuts, callback, {
-	bindGlobal = false,
-	eventName = 'keydown',
-	isDisabled = false, // This is important for performance considerations.
-	target,
-} = {} ) {
+function useKeyboardShortcut(
+	shortcuts,
+	callback,
+	{
+		bindGlobal = false,
+		eventName = 'keydown',
+		isDisabled = false, // This is important for performance considerations.
+		target,
+	} = {}
+) {
 	useEffect( () => {
 		if ( isDisabled ) {
 			return;
@@ -64,12 +67,12 @@ function useKeyboardShortcut( shortcuts, callback, {
 
 			// This should be better moved to the shortcut registration instead.
 			if (
-				isAppleOS() && (
-					( modifiers.size === 1 && hasAlt ) ||
-					( modifiers.size === 2 && hasAlt && hasShift )
-				)
+				isAppleOS() &&
+				( ( modifiers.size === 1 && hasAlt ) || ( modifiers.size === 2 && hasAlt && hasShift ) )
 			) {
-				throw new Error( `Cannot bind ${ shortcut }. Alt and Shift+Alt modifiers are reserved for character input.` );
+				throw new Error(
+					`Cannot bind ${ shortcut }. Alt and Shift+Alt modifiers are reserved for character input.`
+				);
 			}
 
 			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';

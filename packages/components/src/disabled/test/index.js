@@ -56,10 +56,19 @@ describe( 'Disabled', () => {
 		window.MutationObserver = MutationObserver;
 	} );
 
-	const Form = () => <form><input /><div contentEditable tabIndex="0" /></form>;
+	const Form = () => (
+		<form>
+			<input />
+			<div contentEditable tabIndex="0" />
+		</form>
+	);
 
 	it( 'will disable all fields', () => {
-		const wrapper = TestUtils.renderIntoDocument( <Disabled><Form /></Disabled> );
+		const wrapper = TestUtils.renderIntoDocument(
+			<Disabled>
+				<Form />
+			</Disabled>
+		);
 
 		const input = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'input' );
 		const div = TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'div' )[ 1 ];
@@ -83,9 +92,13 @@ describe( 'Disabled', () => {
 			}
 
 			render() {
-				return this.state.isDisabled ?
-					<Disabled><Form /></Disabled> :
-					<Form />;
+				return this.state.isDisabled ? (
+					<Disabled>
+						<Form />
+					</Disabled>
+				) : (
+					<Form />
+				);
 			}
 		}
 
@@ -115,7 +128,7 @@ describe( 'Disabled', () => {
 				return (
 					<p>
 						<Disabled.Consumer>
-							{ ( isDisabled ) => isDisabled ? 'Disabled' : 'Not disabled' }
+							{ ( isDisabled ) => ( isDisabled ? 'Disabled' : 'Not disabled' ) }
 						</Disabled.Consumer>
 					</p>
 				);
@@ -123,7 +136,11 @@ describe( 'Disabled', () => {
 		}
 
 		test( "lets components know that they're disabled via context", () => {
-			const wrapper = TestUtils.renderIntoDocument( <Disabled><DisabledStatus /></Disabled> );
+			const wrapper = TestUtils.renderIntoDocument(
+				<Disabled>
+					<DisabledStatus />
+				</Disabled>
+			);
 			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'p' );
 			expect( wrapperElement.textContent ).toBe( 'Disabled' );
 		} );

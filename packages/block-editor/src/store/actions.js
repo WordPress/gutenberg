@@ -22,10 +22,7 @@ import { select } from './controls';
  * replacement, etc).
  */
 function* ensureDefaultBlock() {
-	const count = yield select(
-		'core/block-editor',
-		'getBlockCount',
-	);
+	const count = yield select( 'core/block-editor', 'getBlockCount' );
 
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
@@ -173,11 +170,7 @@ export function* selectPreviousBlock( clientId ) {
  * @param {string} clientId Block client ID.
  */
 export function* selectNextBlock( clientId ) {
-	const nextBlockClientId = yield select(
-		'core/block-editor',
-		'getNextBlockClientId',
-		clientId
-	);
+	const nextBlockClientId = yield select( 'core/block-editor', 'getNextBlockClientId', clientId );
 
 	if ( nextBlockClientId ) {
 		yield selectBlock( nextBlockClientId );
@@ -269,7 +262,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 			...block,
 			attributes: {
 				...attributes,
-				className: `${ ( className || '' ) } is-style-${ blockStyle }`.trim(),
+				className: `${ className || '' } is-style-${ blockStyle }`.trim(),
 			},
 		};
 	} );
@@ -290,10 +283,7 @@ export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield select(
-			'core/block-editor',
-			'getSettings',
-		)
+		yield select( 'core/block-editor', 'getSettings' )
 	);
 	const rootClientId = yield select(
 		'core/block-editor',
@@ -368,12 +358,13 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  *
  * @yield {Object} Action object.
  */
-export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootClientId = '', index ) {
-	const templateLock = yield select(
-		'core/block-editor',
-		'getTemplateLock',
-		fromRootClientId
-	);
+export function* moveBlockToPosition(
+	clientId,
+	fromRootClientId = '',
+	toRootClientId = '',
+	index
+) {
+	const templateLock = yield select( 'core/block-editor', 'getTemplateLock', fromRootClientId );
 
 	// If locking is equal to all on the original clientId (fromRootClientId),
 	// it is not possible to move the block to any other position.
@@ -400,11 +391,7 @@ export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootCli
 		return;
 	}
 
-	const blockName = yield select(
-		'core/block-editor',
-		'getBlockName',
-		clientId
-	);
+	const blockName = yield select( 'core/block-editor', 'getBlockName', clientId );
 
 	const canInsertBlock = yield select(
 		'core/block-editor',
@@ -430,18 +417,8 @@ export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootCli
  *
  * @return {Object} Action object.
  */
-export function insertBlock(
-	block,
-	index,
-	rootClientId,
-	updateSelection = true,
-) {
-	return insertBlocks(
-		[ block ],
-		index,
-		rootClientId,
-		updateSelection
-	);
+export function insertBlock( block, index, rootClientId, updateSelection = true ) {
+	return insertBlocks( [ block ], index, rootClientId, updateSelection );
 }
 
 /**
@@ -455,18 +432,10 @@ export function insertBlock(
  *
  *  @return {Object} Action object.
  */
-export function* insertBlocks(
-	blocks,
-	index,
-	rootClientId,
-	updateSelection = true
-) {
+export function* insertBlocks( blocks, index, rootClientId, updateSelection = true ) {
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield select(
-			'core/block-editor',
-			'getSettings',
-		)
+		yield select( 'core/block-editor', 'getSettings' )
 	);
 	const allowedBlocks = [];
 	for ( const block of blocks ) {
@@ -839,16 +808,22 @@ export function __unstableMarkAutomaticChange() {
  *
  * @param {string} isNavigationMode Enable/Disable navigation mode.
  */
-export function * setNavigationMode( isNavigationMode = true ) {
+export function* setNavigationMode( isNavigationMode = true ) {
 	yield {
 		type: 'SET_NAVIGATION_MODE',
 		isNavigationMode,
 	};
 
 	if ( isNavigationMode ) {
-		speak( __( 'You are currently in navigation mode. Navigate blocks using the Tab key. To exit navigation mode and edit the selected block, press Enter.' ) );
+		speak(
+			__(
+				'You are currently in navigation mode. Navigate blocks using the Tab key. To exit navigation mode and edit the selected block, press Enter.'
+			)
+		);
 	} else {
-		speak( __( 'You are currently in edit mode. To return to the navigation mode, press Escape.' ) );
+		speak(
+			__( 'You are currently in edit mode. To return to the navigation mode, press Escape.' )
+		);
 	}
 }
 
@@ -857,7 +832,7 @@ export function * setNavigationMode( isNavigationMode = true ) {
  *
  * @param {string[]} clientIds
  */
-export function * duplicateBlocks( clientIds ) {
+export function* duplicateBlocks( clientIds ) {
 	if ( ! clientIds && ! clientIds.length ) {
 		return;
 	}
@@ -880,16 +855,9 @@ export function * duplicateBlocks( clientIds ) {
 		rootClientId
 	);
 	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
-	yield insertBlocks(
-		clonedBlocks,
-		lastSelectedIndex + 1,
-		rootClientId
-	);
+	yield insertBlocks( clonedBlocks, lastSelectedIndex + 1, rootClientId );
 	if ( clonedBlocks.length > 1 ) {
-		yield multiSelect(
-			first( clonedBlocks ).clientId,
-			last( clonedBlocks ).clientId
-		);
+		yield multiSelect( first( clonedBlocks ).clientId, last( clonedBlocks ).clientId );
 	}
 }
 
@@ -898,7 +866,7 @@ export function * duplicateBlocks( clientIds ) {
  *
  * @param {string} clientId
  */
-export function * insertBeforeBlock( clientId ) {
+export function* insertBeforeBlock( clientId ) {
 	if ( ! clientId ) {
 		return;
 	}
@@ -908,7 +876,12 @@ export function * insertBeforeBlock( clientId ) {
 		return;
 	}
 
-	const firstSelectedIndex = yield select( 'core/block-editor', 'getBlockIndex', clientId, rootClientId );
+	const firstSelectedIndex = yield select(
+		'core/block-editor',
+		'getBlockIndex',
+		clientId,
+		rootClientId
+	);
 	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
 }
 
@@ -917,7 +890,7 @@ export function * insertBeforeBlock( clientId ) {
  *
  * @param {string} clientId
  */
-export function * insertAfterBlock( clientId ) {
+export function* insertAfterBlock( clientId ) {
 	if ( ! clientId ) {
 		return;
 	}
@@ -927,6 +900,11 @@ export function * insertAfterBlock( clientId ) {
 		return;
 	}
 
-	const firstSelectedIndex = yield select( 'core/block-editor', 'getBlockIndex', clientId, rootClientId );
+	const firstSelectedIndex = yield select(
+		'core/block-editor',
+		'getBlockIndex',
+		clientId,
+		rootClientId
+	);
 	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
 }

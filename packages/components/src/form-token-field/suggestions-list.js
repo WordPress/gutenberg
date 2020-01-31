@@ -84,42 +84,39 @@ class SuggestionsList extends Component {
 				id={ `components-form-token-suggestions-${ this.props.instanceId }` }
 				role="listbox"
 			>
-				{
-					map( this.props.suggestions, ( suggestion, index ) => {
-						const match = this.computeSuggestionMatch( suggestion );
-						const classeName = classnames( 'components-form-token-field__suggestion', {
-							'is-selected': index === this.props.selectedIndex,
-						} );
+				{ map( this.props.suggestions, ( suggestion, index ) => {
+					const match = this.computeSuggestionMatch( suggestion );
+					const classeName = classnames( 'components-form-token-field__suggestion', {
+						'is-selected': index === this.props.selectedIndex,
+					} );
 
-						/* eslint-disable jsx-a11y/click-events-have-key-events */
-						return (
-							<li
-								id={ `components-form-token-suggestions-${ this.props.instanceId }-${ index }` }
-								role="option"
-								className={ classeName }
-								key={ suggestion }
-								onMouseDown={ this.handleMouseDown }
-								onClick={ this.handleClick( suggestion ) }
-								onMouseEnter={ this.handleHover( suggestion ) }
-								aria-selected={ index === this.props.selectedIndex }
-							>
-								{ match ?
-									(
-										<span aria-label={ this.props.displayTransform( suggestion ) }>
-											{ match.suggestionBeforeMatch }
-											<strong className="components-form-token-field__suggestion-match">
-												{ match.suggestionMatch }
-											</strong>
-											{ match.suggestionAfterMatch }
-										</span>
-									) :
-									this.props.displayTransform( suggestion )
-								}
-							</li>
-						);
-						/* eslint-enable jsx-a11y/click-events-have-key-events */
-					} )
-				}
+					/* eslint-disable jsx-a11y/click-events-have-key-events */
+					return (
+						<li
+							id={ `components-form-token-suggestions-${ this.props.instanceId }-${ index }` }
+							role="option"
+							className={ classeName }
+							key={ suggestion }
+							onMouseDown={ this.handleMouseDown }
+							onClick={ this.handleClick( suggestion ) }
+							onMouseEnter={ this.handleHover( suggestion ) }
+							aria-selected={ index === this.props.selectedIndex }
+						>
+							{ match ? (
+								<span aria-label={ this.props.displayTransform( suggestion ) }>
+									{ match.suggestionBeforeMatch }
+									<strong className="components-form-token-field__suggestion-match">
+										{ match.suggestionMatch }
+									</strong>
+									{ match.suggestionAfterMatch }
+								</span>
+							) : (
+								this.props.displayTransform( suggestion )
+							) }
+						</li>
+					);
+					/* eslint-enable jsx-a11y/click-events-have-key-events */
+				} ) }
 			</ul>
 		);
 	}

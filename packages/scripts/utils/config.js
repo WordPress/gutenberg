@@ -23,7 +23,8 @@ const hasJestConfig = () =>
 	hasProjectFile( 'jest.config.json' ) ||
 	hasPackageProp( 'jest' );
 
-const hasWebpackConfig = () => hasArgInCLI( '--config' ) ||
+const hasWebpackConfig = () =>
+	hasArgInCLI( '--config' ) ||
 	hasProjectFile( 'webpack.config.js' ) ||
 	hasProjectFile( 'webpack.config.babel.js' );
 

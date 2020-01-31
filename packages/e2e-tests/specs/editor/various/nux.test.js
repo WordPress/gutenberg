@@ -11,7 +11,10 @@ describe( 'New User Experience (NUX)', () => {
 		await createNewPost( { showWelcomeGuide: true } );
 
 		// Guide should be on page 1 of 4
-		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
+		welcomeGuideText = await page.$eval(
+			'.edit-post-welcome-guide',
+			( element ) => element.innerText
+		);
 		expect( welcomeGuideText ).toContain( 'Welcome to the Block Editor' );
 
 		// Click on the 'Next' button
@@ -19,7 +22,10 @@ describe( 'New User Experience (NUX)', () => {
 		await nextButton.click();
 
 		// Guide should be on page 2 of 4
-		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
+		welcomeGuideText = await page.$eval(
+			'.edit-post-welcome-guide',
+			( element ) => element.innerText
+		);
 		expect( welcomeGuideText ).toContain( 'Make each block your own' );
 
 		// Click on the 'Previous' button
@@ -27,7 +33,10 @@ describe( 'New User Experience (NUX)', () => {
 		await previousButton.click();
 
 		// Guide should be on page 1 of 4
-		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
+		welcomeGuideText = await page.$eval(
+			'.edit-post-welcome-guide',
+			( element ) => element.innerText
+		);
 		expect( welcomeGuideText ).toContain( 'Welcome to the Block Editor' );
 
 		// Press the button for Page 2
@@ -49,9 +58,7 @@ describe( 'New User Experience (NUX)', () => {
 		// but only one is shown depending on viewport size
 		let getStartedButton;
 		for ( const buttonHandle of await page.$x( '//button[contains(text(), "Get started")]' ) ) {
-			if (
-				await page.evaluate( ( button ) => button.style.display !== 'none', buttonHandle )
-			) {
+			if ( await page.evaluate( ( button ) => button.style.display !== 'none', buttonHandle ) ) {
 				getStartedButton = buttonHandle;
 			}
 		}

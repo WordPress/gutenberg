@@ -1,11 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	getNamedNodeMapAsObject,
-	toHTML,
-	fromDOM,
-} from '../node';
+import { getNamedNodeMapAsObject, toHTML, fromDOM } from '../node';
 
 describe( 'getNamedNodeMapAsObject', () => {
 	it( 'should return an object of node attributes', () => {

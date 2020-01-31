@@ -62,30 +62,21 @@ const DropZone = ( props ) => (
 	</DropZoneConsumer>
 );
 
-function DropZoneComponent( {
-	className,
-	label,
-	onFilesDrop,
-	onHTMLDrop,
-	onDrop,
-} ) {
+function DropZoneComponent( { className, label, onFilesDrop, onHTMLDrop, onDrop } ) {
 	const element = useRef();
-	const {
-		isDraggingOverDocument,
-		isDraggingOverElement,
-		type,
-	} = useDropZone( { element, onFilesDrop, onHTMLDrop, onDrop } );
+	const { isDraggingOverDocument, isDraggingOverElement, type } = useDropZone( {
+		element,
+		onFilesDrop,
+		onHTMLDrop,
+		onDrop,
+	} );
 
 	let children;
 
 	if ( isDraggingOverElement ) {
 		children = (
 			<div className="components-drop-zone__content">
-				<Dashicon
-					icon="upload"
-					size="40"
-					className="components-drop-zone__content-icon"
-				/>
+				<Dashicon icon="upload" size="40" className="components-drop-zone__content-icon" />
 				<span className="components-drop-zone__content-text">
 					{ label ? label : __( 'Drop files to upload' ) }
 				</span>
@@ -94,11 +85,11 @@ function DropZoneComponent( {
 	}
 
 	const classes = classnames( 'components-drop-zone', className, {
-		'is-active': ( isDraggingOverDocument || isDraggingOverElement ) && (
-			( type === 'file' && onFilesDrop ) ||
-			( type === 'html' && onHTMLDrop ) ||
-			( type === 'default' && onDrop )
-		),
+		'is-active':
+			( isDraggingOverDocument || isDraggingOverElement ) &&
+			( ( type === 'file' && onFilesDrop ) ||
+				( type === 'html' && onHTMLDrop ) ||
+				( type === 'default' && onDrop ) ),
 		'is-dragging-over-document': isDraggingOverDocument,
 		'is-dragging-over-element': isDraggingOverElement,
 		[ `is-dragging-${ type }` ]: !! type,

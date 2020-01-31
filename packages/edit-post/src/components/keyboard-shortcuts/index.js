@@ -24,11 +24,9 @@ function KeyboardShortcuts() {
 		};
 	} );
 
-	const {
-		switchEditorMode,
-		openGeneralSidebar,
-		closeGeneralSidebar,
-	} = useDispatch( 'core/edit-post' );
+	const { switchEditorMode, openGeneralSidebar, closeGeneralSidebar } = useDispatch(
+		'core/edit-post'
+	);
 	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
 
 	useEffect( () => {
@@ -70,10 +68,12 @@ function KeyboardShortcuts() {
 				modifier: 'ctrl',
 				character: '`',
 			},
-			aliases: [ {
-				modifier: 'access',
-				character: 'n',
-			} ],
+			aliases: [
+				{
+					modifier: 'access',
+					character: 'n',
+				},
+			],
 		} );
 
 		registerShortcut( {
@@ -84,10 +84,12 @@ function KeyboardShortcuts() {
 				modifier: 'ctrlShift',
 				character: '`',
 			},
-			aliases: [ {
-				modifier: 'access',
-				character: 'p',
-			} ],
+			aliases: [
+				{
+					modifier: 'access',
+					character: 'p',
+				},
+			],
 		} );
 
 		registerShortcut( {
@@ -101,22 +103,30 @@ function KeyboardShortcuts() {
 		} );
 	}, [] );
 
-	useShortcut( 'core/edit-post/toggle-mode', () => {
-		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
-	}, { bindGlobal: true, isDisabled: ! richEditingEnabled || ! codeEditingEnabled } );
+	useShortcut(
+		'core/edit-post/toggle-mode',
+		() => {
+			switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
+		},
+		{ bindGlobal: true, isDisabled: ! richEditingEnabled || ! codeEditingEnabled }
+	);
 
-	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
-		// This shortcut has no known clashes, but use preventDefault to prevent any
-		// obscure shortcuts from triggering.
-		event.preventDefault();
+	useShortcut(
+		'core/edit-post/toggle-sidebar',
+		( event ) => {
+			// This shortcut has no known clashes, but use preventDefault to prevent any
+			// obscure shortcuts from triggering.
+			event.preventDefault();
 
-		if ( isEditorSidebarOpened() ) {
-			closeGeneralSidebar();
-		} else {
-			const sidebarToOpen = getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document';
-			openGeneralSidebar( sidebarToOpen );
-		}
-	}, { bindGlobal: true } );
+			if ( isEditorSidebarOpened() ) {
+				closeGeneralSidebar();
+			} else {
+				const sidebarToOpen = getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document';
+				openGeneralSidebar( sidebarToOpen );
+			}
+		},
+		{ bindGlobal: true }
+	);
 
 	return null;
 }

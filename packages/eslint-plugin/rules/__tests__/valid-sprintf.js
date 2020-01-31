@@ -65,11 +65,15 @@ ruleTester.run( 'valid-sprintf', rule, {
 		},
 		{
 			code: `sprintf( _n( '%s', '' ), 'substitute' )`,
-			errors: [ { message: 'sprintf format string options must have the same number of placeholders' } ],
+			errors: [
+				{ message: 'sprintf format string options must have the same number of placeholders' },
+			],
 		},
 		{
 			code: `sprintf( _n( '%s', '%s %s' ), 'substitute' )`,
-			errors: [ { message: 'sprintf format string options must have the same number of placeholders' } ],
+			errors: [
+				{ message: 'sprintf format string options must have the same number of placeholders' },
+			],
 		},
 	],
 } );

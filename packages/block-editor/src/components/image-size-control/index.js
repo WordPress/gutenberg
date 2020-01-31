@@ -53,9 +53,7 @@ class ImageSizeControl extends Component {
 				) }
 				{ isResizable && (
 					<div className="block-editor-image-size-control">
-						<p className="block-editor-image-size-control__row">
-							{ __( 'Image Dimensions' ) }
-						</p>
+						<p className="block-editor-image-size-control__row">{ __( 'Image Dimensions' ) }</p>
 						<div className="block-editor-image-size-control__row">
 							<TextControl
 								type="number"
@@ -95,10 +93,7 @@ class ImageSizeControl extends Component {
 									);
 								} ) }
 							</ButtonGroup>
-							<Button
-								isSmall
-								onClick={ this.updateDimensions() }
-							>
+							<Button isSmall onClick={ this.updateDimensions() }>
 								{ __( 'Reset' ) }
 							</Button>
 						</div>

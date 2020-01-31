@@ -7,9 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	ToggleControl,
-} from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 
 const defaultSettings = [
 	{
@@ -36,14 +34,13 @@ const LinkControlSettingsDrawer = ( { value, onChange = noop, settings = default
 			key={ setting.id }
 			label={ setting.title }
 			onChange={ handleSettingChange( setting ) }
-			checked={ value ? value[ setting.id ] : false } />
+			checked={ value ? value[ setting.id ] : false }
+		/>
 	) );
 
 	return (
 		<fieldset className="block-editor-link-control__settings">
-			<legend className="screen-reader-text">
-				{ __( 'Currently selected link settings' ) }
-			</legend>
+			<legend className="screen-reader-text">{ __( 'Currently selected link settings' ) }</legend>
 			{ theSettings }
 		</fieldset>
 	);

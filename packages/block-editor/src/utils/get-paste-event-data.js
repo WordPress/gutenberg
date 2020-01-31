@@ -61,9 +61,7 @@ export function getPasteEventData( { clipboardData } ) {
 	// Only process files if no HTML is present.
 	// A pasted file may have the URL as plain text.
 	if ( files.length && ! html ) {
-		html = files
-			.map( ( file ) => `<img src="${ createBlobURL( file ) }">` )
-			.join( '' );
+		html = files.map( ( file ) => `<img src="${ createBlobURL( file ) }">` ).join( '' );
 		plainText = '';
 	}
 

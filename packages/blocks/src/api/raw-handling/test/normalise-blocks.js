@@ -31,7 +31,13 @@ describe( 'normaliseBlocks', () => {
 	} );
 
 	it( 'should not break between inline siblings', () => {
-		expect( normaliseBlocks( '<strong>test</strong>&nbsp;is a test of&nbsp;<a href="#">test</a>&nbsp;using a&nbsp;<a href="#">test</a>.' ) ).toEqual( '<p><strong>test</strong>&nbsp;is a test of&nbsp;<a href="#">test</a>&nbsp;using a&nbsp;<a href="#">test</a>.</p>' );
+		expect(
+			normaliseBlocks(
+				'<strong>test</strong>&nbsp;is a test of&nbsp;<a href="#">test</a>&nbsp;using a&nbsp;<a href="#">test</a>.'
+			)
+		).toEqual(
+			'<p><strong>test</strong>&nbsp;is a test of&nbsp;<a href="#">test</a>&nbsp;using a&nbsp;<a href="#">test</a>.</p>'
+		);
 	} );
 
 	it( 'should not append empty text nodes', () => {

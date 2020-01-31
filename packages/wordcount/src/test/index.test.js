@@ -6,9 +6,7 @@ import { count } from '../';
 
 const mockData = {
 	l10n: {
-		shortcodes: [
-			'shortcode',
-		],
+		shortcodes: [ 'shortcode' ],
 	},
 };
 
@@ -111,4 +109,3 @@ describe( 'WordCounter', () => {
 		} );
 	} );
 } );
-

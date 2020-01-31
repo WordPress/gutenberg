@@ -40,11 +40,7 @@ const SELECTOR = [
  * @return {boolean} Whether element is visible.
  */
 function isVisible( element ) {
-	return (
-		element.offsetWidth > 0 ||
-		element.offsetHeight > 0 ||
-		element.getClientRects().length > 0
-	);
+	return element.offsetWidth > 0 || element.offsetHeight > 0 || element.getClientRects().length > 0;
 }
 
 /**

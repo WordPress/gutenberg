@@ -37,11 +37,7 @@ const BlockContentProvider = ( { children, innerBlocks } ) => {
 		return <RawHTML>{ html }</RawHTML>;
 	};
 
-	return (
-		<Provider value={ BlockContent }>
-			{ children }
-		</Provider>
-	);
+	return <Provider value={ BlockContent }>{ children }</Provider>;
 };
 
 /**
@@ -53,12 +49,7 @@ const BlockContentProvider = ( { children, innerBlocks } ) => {
 export const withBlockContentContext = createHigherOrderComponent( ( OriginalComponent ) => {
 	return ( props ) => (
 		<Consumer>
-			{ ( context ) => (
-				<OriginalComponent
-					{ ...props }
-					BlockContent={ context }
-				/>
-			) }
+			{ ( context ) => <OriginalComponent { ...props } BlockContent={ context } /> }
 		</Consumer>
 	);
 }, 'withBlockContentContext' );

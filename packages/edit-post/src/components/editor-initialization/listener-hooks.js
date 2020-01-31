@@ -20,14 +20,9 @@ import {
  * @param {number} postId  The current post id.
  */
 export const useBlockSelectionListener = ( postId ) => {
-	const {
-		hasBlockSelection,
-		isEditorSidebarOpened,
-	} = useSelect(
+	const { hasBlockSelection, isEditorSidebarOpened } = useSelect(
 		( select ) => ( {
-			hasBlockSelection: !! select(
-				'core/block-editor'
-			).getBlockSelectionStart(),
+			hasBlockSelection: !! select( 'core/block-editor' ).getBlockSelectionStart(),
 			isEditorSidebarOpened: select( STORE_KEY ).isEditorSidebarOpened(),
 		} ),
 		[ postId ]
@@ -101,7 +96,8 @@ export const useUpdatePostLinkListener = ( postId ) => {
 	const nodeToUpdate = useRef();
 
 	useEffect( () => {
-		nodeToUpdate.current = document.querySelector( VIEW_AS_PREVIEW_LINK_SELECTOR ) ||
+		nodeToUpdate.current =
+			document.querySelector( VIEW_AS_PREVIEW_LINK_SELECTOR ) ||
 			document.querySelector( VIEW_AS_LINK_SELECTOR );
 	}, [ postId ] );
 

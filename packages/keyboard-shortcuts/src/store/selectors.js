@@ -48,9 +48,9 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
 		return null;
 	}
 
-	return shortcut.modifier ?
-		FORMATTING_METHODS[ representation ][ shortcut.modifier ]( shortcut.character ) :
-		shortcut.character;
+	return shortcut.modifier
+		? FORMATTING_METHODS[ representation ][ shortcut.modifier ]( shortcut.character )
+		: shortcut.character;
 }
 
 /**
@@ -101,9 +101,7 @@ export function getShortcutDescription( state, name ) {
  * @return {WPShortcutKeyCombination[]} Key combinations.
  */
 export function getShortcutAliases( state, name ) {
-	return state[ name ] && state[ name ].aliases ?
-		state[ name ].aliases :
-		EMPTY_ARRAY;
+	return state[ name ] && state[ name ].aliases ? state[ name ].aliases : EMPTY_ARRAY;
 }
 
 /**
@@ -117,11 +115,9 @@ export function getShortcutAliases( state, name ) {
 export const getAllShortcutRawKeyCombinations = createSelector(
 	( state, name ) => {
 		return compact( [
-			getKeyCombinationRepresentation(
-				getShortcutKeyCombination( state, name ), 'raw'
-			),
-			...getShortcutAliases( state, name ).map(
-				( combination ) => getKeyCombinationRepresentation( combination, 'raw' )
+			getKeyCombinationRepresentation( getShortcutKeyCombination( state, name ), 'raw' ),
+			...getShortcutAliases( state, name ).map( ( combination ) =>
+				getKeyCombinationRepresentation( combination, 'raw' )
 			),
 		] );
 	},

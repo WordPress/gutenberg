@@ -6,10 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import plugin, {
-	createPersistenceInterface,
-	withLazySameState,
-} from '../';
+import plugin, { createPersistenceInterface, withLazySameState } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
 
@@ -86,13 +83,14 @@ describe( 'persistence', () => {
 
 		registry = createRegistry().use( plugin, {
 			storage: {
-				getItem: () => JSON.stringify( {
-					test: {
-						preferences: {
-							useFoo: false,
+				getItem: () =>
+					JSON.stringify( {
+						test: {
+							preferences: {
+								useFoo: false,
+							},
 						},
-					},
-				} ),
+					} ),
 				setItem() {},
 			},
 		} );
@@ -154,9 +152,10 @@ describe( 'persistence', () => {
 	it( 'should be reasonably tolerant to a non-object persisted state', () => {
 		registry = createRegistry().use( plugin, {
 			storage: {
-				getItem: () => JSON.stringify( {
-					test: 1,
-				} ),
+				getItem: () =>
+					JSON.stringify( {
+						test: 1,
+					} ),
 				setItem() {},
 			},
 		} );
@@ -336,7 +335,10 @@ describe( 'persistence', () => {
 				set( 'test2', {} );
 
 				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{}}' );
-				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{},"test2":{}}' );
+				expect( objectStorage.setItem ).toHaveBeenCalledWith(
+					storageKey,
+					'{"test1":{},"test2":{}}'
+				);
 			} );
 		} );
 	} );

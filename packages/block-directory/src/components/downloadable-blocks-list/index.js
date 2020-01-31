@@ -27,22 +27,23 @@ function DownloadableBlocksList( { items, onHover = noop, children, downloadAndI
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-directory-downloadable-blocks-list">
-			{ items && items.map( ( item ) =>
-				<DownloadableBlockListItem
-					key={ item.id }
-					className={ getBlockMenuDefaultClassName( item.id ) }
-					icons={ item.icons }
-					onClick={ () => {
-						downloadAndInstallBlock( item );
-						onHover( null );
-					} }
-					onFocus={ () => onHover( item ) }
-					onMouseEnter={ () => onHover( item ) }
-					onMouseLeave={ () => onHover( null ) }
-					onBlur={ () => onHover( null ) }
-					item={ item }
-				/>
-			) }
+			{ items &&
+				items.map( ( item ) => (
+					<DownloadableBlockListItem
+						key={ item.id }
+						className={ getBlockMenuDefaultClassName( item.id ) }
+						icons={ item.icons }
+						onClick={ () => {
+							downloadAndInstallBlock( item );
+							onHover( null );
+						} }
+						onFocus={ () => onHover( item ) }
+						onMouseEnter={ () => onHover( item ) }
+						onMouseLeave={ () => onHover( null ) }
+						onBlur={ () => onHover( null ) }
+						item={ item }
+					/>
+				) ) }
 			{ children }
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
@@ -59,49 +60,44 @@ export default compose(
 		return {
 			downloadAndInstallBlock: ( item ) => {
 				const onDownloadError = () => {
-					createErrorNotice(
-						__( 'Block previews can’t load.' ),
-						{
-							id: DOWNLOAD_ERROR_NOTICE_ID,
-							actions: [
-								{
-									label: __( 'Retry' ),
-									onClick: () => {
-										removeNotice( DOWNLOAD_ERROR_NOTICE_ID );
-										downloadBlock( item, onSuccess, onDownloadError );
-									},
+					createErrorNotice( __( 'Block previews can’t load.' ), {
+						id: DOWNLOAD_ERROR_NOTICE_ID,
+						actions: [
+							{
+								label: __( 'Retry' ),
+								onClick: () => {
+									removeNotice( DOWNLOAD_ERROR_NOTICE_ID );
+									downloadBlock( item, onSuccess, onDownloadError );
 								},
-							],
-						} );
+							},
+						],
+					} );
 				};
 
 				const onSuccess = () => {
 					const createdBlock = onSelect( item );
 
 					const onInstallBlockError = () => {
-						createErrorNotice(
-							__( 'Block previews can\'t install.' ),
-							{
-								id: INSTALL_ERROR_NOTICE_ID,
-								actions: [
-									{
-										label: __( 'Retry' ),
-										onClick: () => {
-											removeNotice( INSTALL_ERROR_NOTICE_ID );
-											installBlock( item, noop, onInstallBlockError );
-										},
+						createErrorNotice( __( "Block previews can't install." ), {
+							id: INSTALL_ERROR_NOTICE_ID,
+							actions: [
+								{
+									label: __( 'Retry' ),
+									onClick: () => {
+										removeNotice( INSTALL_ERROR_NOTICE_ID );
+										installBlock( item, noop, onInstallBlockError );
 									},
-									{
-										label: __( 'Remove' ),
-										onClick: () => {
-											removeNotice( INSTALL_ERROR_NOTICE_ID );
-											removeBlocks( createdBlock.clientId );
-											unregisterBlockType( item.name );
-										},
+								},
+								{
+									label: __( 'Remove' ),
+									onClick: () => {
+										removeNotice( INSTALL_ERROR_NOTICE_ID );
+										removeBlocks( createdBlock.clientId );
+										unregisterBlockType( item.name );
 									},
-								],
-							}
-						);
+								},
+							],
+						} );
 					};
 
 					installBlock( item, noop, onInstallBlockError );
@@ -110,5 +106,5 @@ export default compose(
 				downloadBlock( item, onSuccess, onDownloadError );
 			},
 		};
-	} ),
+	} )
 )( DownloadableBlocksList );

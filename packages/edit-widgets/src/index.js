@@ -3,7 +3,10 @@
  */
 import '@wordpress/notices';
 import { render } from '@wordpress/element';
-import { registerCoreBlocks, __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
+import {
+	registerCoreBlocks,
+	__experimentalRegisterExperimentalCoreBlocks,
+} from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -23,12 +26,7 @@ export function initialize( id, settings ) {
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
-	render(
-		<EditWidgetsInitializer
-			settings={ settings }
-		/>,
-		document.getElementById( id )
-	);
+	render( <EditWidgetsInitializer settings={ settings } />, document.getElementById( id ) );
 }
 
 /**
@@ -43,9 +41,7 @@ export function customizerInitialize( id, settings ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
 	render(
-		<CustomizerEditWidgetsInitializer
-			settings={ settings }
-		/>,
+		<CustomizerEditWidgetsInitializer settings={ settings } />,
 		document.getElementById( id )
 	);
 }

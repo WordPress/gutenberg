@@ -28,12 +28,7 @@ import googleDocsUIDRemover from './google-docs-uid-remover';
 import htmlFormattingRemover from './html-formatting-remover';
 import brRemover from './br-remover';
 import { getPhrasingContentSchema } from './phrasing-content';
-import {
-	deepFilterHTML,
-	isPlain,
-	removeInvalidHTML,
-	getBlockContentSchema,
-} from './utils';
+import { deepFilterHTML, isPlain, removeInvalidHTML, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 
 /**
@@ -60,13 +55,14 @@ function filterInlineHTML( HTML ) {
 }
 
 function getRawTransformations() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } )
-		.map( ( transform ) => {
-			return transform.isMatch ? transform : {
-				...transform,
-				isMatch: ( node ) => transform.selector && node.matches( transform.selector ),
-			};
-		} );
+	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map( ( transform ) => {
+		return transform.isMatch
+			? transform
+			: {
+					...transform,
+					isMatch: ( node ) => transform.selector && node.matches( transform.selector ),
+			  };
+	} );
 }
 
 /**
@@ -92,10 +88,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
 			return createBlock(
 				// Should not be hardcoded.
 				'core/html',
-				getBlockAttributes(
-					'core/html',
-					node.outerHTML
-				)
+				getBlockAttributes( 'core/html', node.outerHTML )
 			);
 		}
 
@@ -105,13 +98,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
 			return transform( node );
 		}
 
-		return createBlock(
-			blockName,
-			getBlockAttributes(
-				blockName,
-				node.outerHTML
-			)
-		);
+		return createBlock( blockName, getBlockAttributes( blockName, node.outerHTML ) );
 	} );
 }
 
@@ -130,7 +117,13 @@ function htmlToBlocks( { html, rawTransforms } ) {
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
+export function pasteHandler( {
+	HTML = '',
+	plainText = '',
+	mode = 'AUTO',
+	tagName,
+	canUserUseUnfilteredHTML = false,
+} ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/g, '' );
 	// Strip Windows markers.
@@ -200,50 +193,52 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
 	const blockContentSchema = getBlockContentSchema( rawTransforms, phrasingContentSchema, true );
 
-	const blocks = compact( flatMap( pieces, ( piece ) => {
-		// Already a block from shortcode.
-		if ( typeof piece !== 'string' ) {
-			return piece;
-		}
+	const blocks = compact(
+		flatMap( pieces, ( piece ) => {
+			// Already a block from shortcode.
+			if ( typeof piece !== 'string' ) {
+				return piece;
+			}
 
-		const filters = [
-			googleDocsUIDRemover,
-			msListConverter,
-			headRemover,
-			listReducer,
-			imageCorrector,
-			phrasingContentReducer,
-			specialCommentConverter,
-			commentRemover,
-			figureContentReducer,
-			blockquoteNormaliser,
-		];
+			const filters = [
+				googleDocsUIDRemover,
+				msListConverter,
+				headRemover,
+				listReducer,
+				imageCorrector,
+				phrasingContentReducer,
+				specialCommentConverter,
+				commentRemover,
+				figureContentReducer,
+				blockquoteNormaliser,
+			];
 
-		if ( ! canUserUseUnfilteredHTML ) {
-			// Should run before `figureContentReducer`.
-			filters.unshift( iframeRemover );
-		}
+			if ( ! canUserUseUnfilteredHTML ) {
+				// Should run before `figureContentReducer`.
+				filters.unshift( iframeRemover );
+			}
 
-		const schema = {
-			...blockContentSchema,
-			// Keep top-level phrasing content, normalised by `normaliseBlocks`.
-			...phrasingContentSchema,
-		};
+			const schema = {
+				...blockContentSchema,
+				// Keep top-level phrasing content, normalised by `normaliseBlocks`.
+				...phrasingContentSchema,
+			};
 
-		piece = deepFilterHTML( piece, filters, blockContentSchema );
-		piece = removeInvalidHTML( piece, schema );
-		piece = normaliseBlocks( piece );
-		piece = deepFilterHTML( piece, [
-			htmlFormattingRemover,
-			brRemover,
-			emptyParagraphRemover,
-		], blockContentSchema );
+			piece = deepFilterHTML( piece, filters, blockContentSchema );
+			piece = removeInvalidHTML( piece, schema );
+			piece = normaliseBlocks( piece );
+			piece = deepFilterHTML(
+				piece,
+				[ htmlFormattingRemover, brRemover, emptyParagraphRemover ],
+				blockContentSchema
+			);
 
-		// Allows us to ask for this information when we get a report.
-		console.log( 'Processed HTML piece:\n\n', piece );
+			// Allows us to ask for this information when we get a report.
+			console.log( 'Processed HTML piece:\n\n', piece );
 
-		return htmlToBlocks( { html: piece, rawTransforms } );
-	} ) );
+			return htmlToBlocks( { html: piece, rawTransforms } );
+		} )
+	);
 
 	// If we're allowed to return inline content, and there is only one inlineable block,
 	// and the original plain text content does not have any line breaks, then
@@ -256,10 +251,7 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		const trimmedPlainText = plainText.trim();
 
 		if ( trimmedPlainText !== '' && trimmedPlainText.indexOf( '\n' ) === -1 ) {
-			return removeInvalidHTML(
-				getBlockContent( blocks[ 0 ] ),
-				phrasingContentSchema
-			);
+			return removeInvalidHTML( getBlockContent( blocks[ 0 ] ), phrasingContentSchema );
 		}
 	}
 
