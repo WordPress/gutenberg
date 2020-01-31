@@ -54,7 +54,7 @@ const templates = {
 const getTemplate = ( templateName ) => {
 	if ( ! templates[ templateName ] ) {
 		throw new CliError(
-			'Invalid template type name.' + ` Allowed values: ${ Object.keys( templates ).join( ', ' ) }.`
+			`Invalid template type name. Allowed values: ${ Object.keys( templates ).join( ', ' ) }.`
 		);
 	}
 	return templates[ templateName ];
