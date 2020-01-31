@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { FlatList, View, Text, TouchableHighlight } from 'react-native';
+import { FlatList, View, Text, TouchableHighlight, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -26,6 +26,8 @@ export class InserterMenu extends Component {
 		this.state = {
 			numberOfColumns: this.calculateNumberOfColumns(),
 		};
+
+		Dimensions.addEventListener( 'change', this.onLayout );
 	}
 
 	componentDidMount() {
