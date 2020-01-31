@@ -1,6 +1,6 @@
 # TreeGrid components
 
-`TreeGrid`, `TreeGridRow`, and `TreeGridCell` are components used to add keyboard navigation and a roving tab index to a tree grid. 
+`TreeGrid`, `TreeGridRow`, and `TreeGridCell` are components used to create a tree hierarchy. They're not visually styled components, but instead help with adding keyboard navigation and roving tab index behaviours to tree grid structures. 
 
 A tree grid is a hierarchical 2 dimensional UI component, for example it could be used to implement a file system browser.
 
@@ -90,7 +90,7 @@ An optional value that designates whether a row is expanded or collapsed. Curren
 
 ## Properties
 
-`TreeGridCell` accepts no specific props. Any props specified will be passed to the `table` element rendered by `TreeGridCell`.
+`TreeGridCell` accepts no specific props. Any props specified will be passed to the `td` element rendered by `TreeGridCell`.
 
 ## Render prop
 

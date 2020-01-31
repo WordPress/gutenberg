@@ -1,4 +1,4 @@
-# RovingTabIndex
+# RovingTabIndex components
 
 `RovingTabIndexContainer` and `RovingTabIndexItem` are components that help to manage focus in the style of a roving tab index.
 
@@ -57,7 +57,7 @@ This component takes no props, but should always have `children`.
 
 ### `as: <Component>`
 
-Specify the component that the item should render as. For example the following renders a button with the text 'Submit':
+Specify the component that the item should render as. For example the following renders a button with the text 'Close':
 
 ```jsx
 <RovingTabIndexItem as={ Button }>Close</RovingTabIndexItem>

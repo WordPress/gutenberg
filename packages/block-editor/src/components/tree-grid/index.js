@@ -35,7 +35,7 @@ function getRowFocusables( rowElement ) {
 }
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/navigable-tree-grid/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/tree-grid/README.md
  */
 export default function TreeGrid( { children, ...props } ) {
 	const onKeyDown = ( event ) => {
