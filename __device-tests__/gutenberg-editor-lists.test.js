@@ -66,10 +66,8 @@ describe( 'Gutenberg Editor tests for List block', () => {
 	it( 'should update format to ordered list, using toolbar button', async () => {
 		const listBlockElement = await editorPage.getListBlockAtPosition( 1 );
 
-		// Click List block on Android to force EditText focus
-		if ( isAndroid() ) {
-			await listBlockElement.click();
-		}
+		// Click List block to force EditText focus
+		await listBlockElement.click();
 
 		// Send a click on the order list format button
 		await editorPage.clickOrderedListToolBarButton();
