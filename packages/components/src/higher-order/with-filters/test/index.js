@@ -41,8 +41,8 @@ describe( 'withFilters', () => {
 
 	afterEach( () => {
 		if ( wrapper ) {
-			// eslint-disable-next-line react/no-find-dom-node
 			ReactDOM.unmountComponentAtNode(
+				// eslint-disable-next-line react/no-find-dom-node
 				ReactDOM.findDOMNode( wrapper ).parentNode
 			);
 		}

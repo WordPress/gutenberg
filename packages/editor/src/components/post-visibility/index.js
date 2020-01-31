@@ -33,8 +33,8 @@ export class PostVisibility extends Component {
 	}
 
 	setPrivate() {
-		// eslint-disable-next-line no-alert
 		if (
+			// eslint-disable-next-line no-alert
 			! window.confirm(
 				__( 'Would you like to privately publish this post now?' )
 			)

@@ -122,8 +122,8 @@ describe( 'withFocusOutside', () => {
 		simulateEvent( 'focus' );
 		simulateEvent( 'input' );
 
-		// eslint-disable-next-line react/no-find-dom-node
 		ReactDOM.unmountComponentAtNode(
+			// eslint-disable-next-line react/no-find-dom-node
 			ReactDOM.findDOMNode( wrapper ).parentNode
 		);
 

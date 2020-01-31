@@ -83,8 +83,8 @@ describe( 'URLInputButton', () => {
 		expect( wrapper.state.expanded ).toBe( true );
 		TestUtils.Simulate.submit( formElement().shift() );
 		expect( wrapper.state.expanded ).toBe( false );
-		// eslint-disable-next-line react/no-find-dom-node
 		ReactDOM.unmountComponentAtNode(
+			// eslint-disable-next-line react/no-find-dom-node
 			ReactDOM.findDOMNode( wrapper ).parentNode
 		);
 	} );

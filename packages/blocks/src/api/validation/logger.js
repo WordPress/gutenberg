@@ -15,8 +15,8 @@ export function createLogger() {
 		// dependency in runtime environments, and it can be dropped by a combo
 		// of Webpack env substitution + UglifyJS dead code elimination.
 		if ( process.env.NODE_ENV === 'test' ) {
-			// eslint-disable-next-line import/no-extraneous-dependencies
 			log = ( ...args ) =>
+				// eslint-disable-next-line import/no-extraneous-dependencies
 				logger( require( 'sprintf-js' ).sprintf( ...args ) );
 		}
 

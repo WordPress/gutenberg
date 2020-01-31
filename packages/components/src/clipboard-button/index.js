@@ -71,13 +71,15 @@ class ClipboardButton extends Component {
 	}
 
 	render() {
-		// Disable reason: Exclude from spread props passed to Button
-		// eslint-disable-next-line no-unused-vars
 		const {
 			className,
 			children,
+			// Disable reason: Exclude from spread props passed to Button
+			// eslint-disable-next-line no-unused-vars
 			onCopy,
+			// eslint-disable-next-line no-unused-vars
 			onFinishCopy,
+			// eslint-disable-next-line no-unused-vars
 			text,
 			...buttonProps
 		} = this.props;
