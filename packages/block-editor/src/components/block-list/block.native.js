@@ -120,7 +120,7 @@ class BlockListBlock extends Component {
 			isAncestorSelected,
 			hasParent,
 			getStylesFromColorScheme,
-			shouldApplyVerticalMarginStyle,
+			isLastBlock,
 		} = this.props;
 
 		// if block does not have parent apply neutral or full
@@ -142,7 +142,7 @@ class BlockListBlock extends Component {
 			return {
 				...( hasChildren ? styles.childOfSelected : styles.childOfSelectedLeaf ),
 				...dashedBorderStyle,
-				...( shouldApplyVerticalMarginStyle && styles.marginVerticalChild ),
+				...( ! isLastBlock && styles.marginVerticalChild ),
 			};
 		}
 
@@ -151,7 +151,7 @@ class BlockListBlock extends Component {
 			return {
 				...styles.descendantOfSelectedLeaf,
 				...( hasChildren && { ...styles.marginHorizontalNone, ...styles.marginVerticalNone } ),
-				...( shouldApplyVerticalMarginStyle && styles.marginVerticalDescendant ),
+				...( ! isLastBlock && styles.marginVerticalDescendant ),
 			};
 		}
 
@@ -300,8 +300,6 @@ export default compose( [
 		const isInnerBlockHolder = name === getGroupingBlockName();
 		const isRootListInnerBlockHolder = ! isSelectedBlockNested && isInnerBlockHolder;
 
-		const shouldApplyVerticalMarginStyle = ! isLastBlock;
-
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -309,6 +307,7 @@ export default compose( [
 			title,
 			attributes,
 			blockType,
+			isLastBlock,
 			isSelected,
 			isValid,
 			showFloatingToolbar,
@@ -322,7 +321,6 @@ export default compose( [
 			isDimmed,
 			isRootListInnerBlockHolder,
 			isUnregisteredBlock,
-			shouldApplyVerticalMarginStyle,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
