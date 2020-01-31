@@ -57,6 +57,10 @@ export default function save( { attributes } ) {
 		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 	};
 
+	// The use of a `title` attribute here is soft-deprecated, but still applied
+	// if it had already been assigned, for the sake of backward-compatibility.
+	// A title will no longer be assigned for new or updated button block links.
+
 	return (
 		<div>
 			<RichText.Content
