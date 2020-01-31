@@ -7,7 +7,6 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import { useRef } from '@wordpress/element';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
@@ -39,8 +38,6 @@ function getRowFocusables( rowElement ) {
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/navigable-tree-grid/README.md
  */
 export default function TreeGrid( { children, ...props } ) {
-	const containerRef = useRef();
-
 	const onKeyDown = ( event ) => {
 		const { keyCode } = event;
 
@@ -51,7 +48,8 @@ export default function TreeGrid( { children, ...props } ) {
 		event.stopPropagation();
 
 		const { activeElement } = document;
-		if ( ! containerRef.current.contains( activeElement ) ) {
+		const { currentTarget: treeGridElement } = event;
+		if ( ! treeGridElement.contains( activeElement ) ) {
 			return;
 		}
 
@@ -78,7 +76,7 @@ export default function TreeGrid( { children, ...props } ) {
 			focusablesInRow[ nextIndex ].focus();
 		} else if ( includes( [ UP, DOWN ], keyCode ) ) {
 			// Calculate the rowIndex of the next row.
-			const rows = Array.from( containerRef.current.querySelectorAll( '[role="row"]' ) );
+			const rows = Array.from( treeGridElement.querySelectorAll( '[role="row"]' ) );
 			const currentRowIndex = rows.indexOf( activeRow );
 			let nextRowIndex;
 
@@ -111,7 +109,7 @@ export default function TreeGrid( { children, ...props } ) {
 		<RovingTabIndexContainer>
 			{ /* Disable reason: A treegrid is implemented using a table element. */ }
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role */ }
-			<table role="treegrid" onKeyDown={ onKeyDown } ref={ containerRef } { ...props }>
+			<table role="treegrid" onKeyDown={ onKeyDown } { ...props }>
 				<tbody>
 					{ children }
 				</tbody>
