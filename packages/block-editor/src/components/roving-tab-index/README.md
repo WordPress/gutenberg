@@ -1,9 +1,8 @@
-RovingTabIndex
-==============
+# RovingTabIndex
 
-`RovingTabIndex` exports two separate components `<RovingTabIndex.Container />` and `<RovingTabIndex.Item />` that help to implement a roving tab index.
+`RovingTabIndexContainer` and `RovingTabIndexItem` are components that help to manage focus in the style of a roving tab index.
 
-A roving tab index is helpful for a UI component that contains multiple focusable elements, it reduces the number of tab stops in such an element to a single tab stop. Some more information is available here:
+A roving tab index is helpful for a UI component that contains multiple focusable elements, it reduces the number of tab stops in such a component to a single tab stop. Some more information is available here:
 
 - [WAI Aria Authoring Practices - Roving Tab Index](https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_roving_tabindex)
 
@@ -17,31 +16,67 @@ Some patterns that implement a roving tab index are:
 - [Tree Grid](https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html)
 - [Tree View](https://www.w3.org/TR/wai-aria-practices/examples/treeview/treeview-2/treeview-2a.html)
 
+This component doesn't implement any keyboard navigation, instead it handles setting the correct `tabIndex` value on focusable elements. It should be composed with another component that implements keyboard navigation (e.g. arrow key navigation).
+
 ## Usage
 
-Wrap the component with `<RovingTabIndex.Container />` and individual focusables within the component with `<RovingTabIndex.Item />`:
+Wrap the component with `<RovingTabIndexContainer />` and individual focusables within the component with `<RovingTabIndexItem />`.
 
 ```jsx
 function TreeMenu() {
 	return (
-		<RovingTabIndex.Container>
+		<RovingTabIndexContainer>
 			<ul role="tree">
 				<li role="treeitem">
 					<span>First item</span>
-					<RovingTabIndex.Item>
-						<button>Select</button>
-					</RovingTabIndex.Item>
+					<RovingTabIndexItem as={ Button }>
+						Select
+					</RovingTabIndexItem>
 				</li>
 				<li role="treeitem">
 					<span>Second item</span>
-					<RovingTabIndex.Item>
-						<button>Select</button>
-					</RovingTabIndex.Item>
+					<RovingTabIndexItem as={ Button }>
+						Select
+					</RovingTabIndexItem>
 				</li>
 			</ul>
-		</RovingTabIndex.Container>
+		</RovingTabIndexContainer>
 	);
 }
 ```
 
-`</RovingTabIndex.Item>` is a component that can only take a single child element or component. That child must forward both the `ref` and `tabIndex` props to its underlying focusable element.
+# `RovingTabIndexContainer`
+
+## Properties
+
+This component takes no props, but should always have `children`.
+
+# `RovingTabIndexItem`
+
+## Properties
+
+### `as: <Component>`
+
+Specify the component that the item should render as. For example the following renders a button with the text 'Submit':
+
+```jsx
+<RovingTabIndexItem as={ Button }>Close</RovingTabIndexItem>
+```
+
+All props other than `as` are forwarded to the component, for example, the following code passes the `onClick` handler to the rendered `Button` component:
+
+```jsx
+<RovingTabIndexItem as={ Button } onClick={ onClose }>Close</RovingTabIndexItem>
+```
+
+Components used with the `as` prop must be able to receive the `onFocus`, `tabIndex`, and `ref` props and pass those props to the element it renders.
+
+As an alternative to `as`, `RovingTabIndexItem` also supports a render prop function:
+
+```jsx
+<RovingTabIndexItem>
+	( props ) => <Button onClick={ onClose } { ...props }>Close</Button>
+</RovingTabIndexItem>
+```
+
+The `props` passed to `Button` in this example contain the aforementioned `onFocus`, `tabIndex`, and `ref` props. For the roving tab index functionality to work, they should always be passed onto the `RovingTabIndexItem`'s child and handled correctly by that child.
