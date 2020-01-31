@@ -30,8 +30,9 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
-import { Fragment, useState, useEffect } from '@wordpress/element';
-
+import { isURL, prependHTTP } from '@wordpress/url';
+import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
@@ -61,6 +62,7 @@ function NavigationLinkEdit( {
 	};
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const itemLabelPlaceholder = __( 'Add link…' );
+	const ref = useRef();
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -71,6 +73,49 @@ function NavigationLinkEdit( {
 			setIsLinkOpen( true );
 		}
 	}, [] );
+
+	/**
+	 * The hook shouldn't be necessary but due to a focus loss happening
+	 * when selecting a suggestion in the link popover, we force close on block unselection.
+	 */
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsLinkOpen( false );
+		}
+	}, [ isSelected ] );
+
+	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
+	useEffect( () => {
+		if ( isLinkOpen && url ) {
+			// Close the link.
+			setIsLinkOpen( false );
+
+			// Does this look like a URL and have something TLD-ish?
+			if (
+				isURL( prependHTTP( label ) ) &&
+				/^.+\.[a-z]+/.test( label )
+			) {
+				// Focus and select the label text.
+				selectLabelText();
+			} else {
+				// Focus it (but do not select).
+				placeCaretAtHorizontalEdge( ref.current, true );
+			}
+		}
+	}, [ url ] );
+
+	/**
+	 * Focus the navigation link label text and select it.
+	 */
+	function selectLabelText() {
+		ref.current.focus();
+		const selection = window.getSelection();
+		const range = document.createRange();
+		// Get the range of the current ref contents so we can add this range to the selection.
+		range.selectNodeContents( ref.current );
+		selection.removeAllRanges();
+		selection.addRange( range );
+	}
 
 	return (
 		<Fragment>
@@ -155,6 +200,7 @@ function NavigationLinkEdit( {
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
+						ref={ ref }
 						tagName="span"
 						className="wp-block-navigation-link__label"
 						value={ label }
@@ -209,8 +255,11 @@ function NavigationLinkEdit( {
 												label !== newTitle
 											) {
 												return escape( newTitle );
+											} else if ( label ) {
+												return label;
 											}
-											return label;
+											// If there's no label, add the URL.
+											return escape( normalizedURL );
 										} )(),
 										opensInNewTab: newOpensInNewTab,
 										id,

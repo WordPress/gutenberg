@@ -6,9 +6,9 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	insertBlock,
-	pressKeyWithModifier,
 	setUpResponseMocking,
 	clickBlockToolbarButton,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 async function mockPagesResponse( pages ) {
@@ -65,23 +65,21 @@ async function updateActiveNavigationLink( { url, label } ) {
 		await page.keyboard.press( 'ArrowDown' );
 		// Select the suggestion.
 		await page.keyboard.press( 'Enter' );
-		// Make sure that the dialog is still opened, and that focus is retained
-		// within (focusing on the link preview).
-		await page.waitForSelector(
-			':focus.block-editor-link-control__search-item-title'
-		);
 	}
 
 	if ( label ) {
-		await page.click( '.is-selected .wp-block-navigation-link__label' );
+		// With https://github.com/WordPress/gutenberg/pull/19686, we're auto-selecting the label if the label is URL-ish.
+		// In this case, it means we have to select and delete the label if it's _not_ the url.
+		if ( label !== url ) {
+			// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
+			// to select all text like other tests do.
+			// Unfortunately, these tests don't seem to pass on Travis CI when
+			// using that approach, while using `Home` and `End` they do pass.
+			await page.keyboard.press( 'Home' );
+			await pressKeyWithModifier( 'shift', 'End' );
+			await page.keyboard.press( 'Backspace' );
+		}
 
-		// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
-		// to select all text like other tests do.
-		// Unfortunately, these tests don't seem to pass on Travis CI when
-		// using that approach, while using `Home` and `End` they do pass.
-		await page.keyboard.press( 'Home' );
-		await pressKeyWithModifier( 'shift', 'End' );
-		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( label );
 	}
 }
