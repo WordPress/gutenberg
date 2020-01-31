@@ -79,21 +79,31 @@ export function getEmbedBlockSettings( {
 					getThemeSupports,
 				} = core;
 				const preview = undefined !== url && getEmbedPreview( url );
-				const previewIsFallback = undefined !== url && isPreviewEmbedFallback( url );
-				const fetching = undefined !== url && isRequestingEmbedPreview( url );
+				const previewIsFallback =
+					undefined !== url && isPreviewEmbedFallback( url );
+				const fetching =
+					undefined !== url && isRequestingEmbedPreview( url );
 				const themeSupports = getThemeSupports();
 				// The external oEmbed provider does not exist. We got no type info and no html.
-				const badEmbedProvider = !! preview && undefined === preview.type && false === preview.html;
+				const badEmbedProvider =
+					!! preview &&
+					undefined === preview.type &&
+					false === preview.html;
 				// Some WordPress URLs that can't be embedded will cause the API to return
 				// a valid JSON response with no HTML and `data.status` set to 404, rather
 				// than generating a fallback response as other embeds do.
-				const wordpressCantEmbed = !! preview && preview.data && preview.data.status === 404;
-				const validPreview = !! preview && ! badEmbedProvider && ! wordpressCantEmbed;
-				const cannotEmbed = undefined !== url && ( ! validPreview || previewIsFallback );
+				const wordpressCantEmbed =
+					!! preview && preview.data && preview.data.status === 404;
+				const validPreview =
+					!! preview && ! badEmbedProvider && ! wordpressCantEmbed;
+				const cannotEmbed =
+					undefined !== url &&
+					( ! validPreview || previewIsFallback );
 				return {
 					preview: validPreview ? preview : undefined,
 					fetching,
-					themeSupportsResponsive: themeSupports[ 'responsive-embeds' ],
+					themeSupportsResponsive:
+						themeSupports[ 'responsive-embeds' ],
 					cannotEmbed,
 				};
 			} ),
@@ -101,7 +111,9 @@ export function getEmbedBlockSettings( {
 				const { url } = ownProps.attributes;
 				const coreData = dispatch( 'core/data' );
 				const tryAgain = () => {
-					coreData.invalidateResolution( 'core', 'getEmbedPreview', [ url ] );
+					coreData.invalidateResolution( 'core', 'getEmbedPreview', [
+						url,
+					] );
 				};
 				return {
 					tryAgain,
@@ -127,7 +139,10 @@ export function getEmbedBlockSettings( {
 						{ `\n${ url }\n` /* URL needs to be on its own line. */ }
 					</div>
 					{ ! RichText.isEmpty( caption ) && (
-						<RichText.Content tagName="figcaption" value={ caption } />
+						<RichText.Content
+							tagName="figcaption"
+							value={ caption }
+						/>
 					) }
 				</figure>
 			);
@@ -152,7 +167,10 @@ export function getEmbedBlockSettings( {
 						<figure className={ embedClassName }>
 							{ `\n${ url }\n` /* URL needs to be on its own line. */ }
 							{ ! RichText.isEmpty( caption ) && (
-								<RichText.Content tagName="figcaption" value={ caption } />
+								<RichText.Content
+									tagName="figcaption"
+									value={ caption }
+								/>
 							) }
 						</figure>
 					);

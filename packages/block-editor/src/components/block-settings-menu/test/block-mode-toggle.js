@@ -25,7 +25,10 @@ describe( 'BlockModeToggle', () => {
 
 	it( 'should render the HTML mode button', () => {
 		const wrapper = getShallowRenderOutput(
-			<BlockModeToggle blockType={ { supports: { html: true } } } mode="visual" />
+			<BlockModeToggle
+				blockType={ { supports: { html: true } } }
+				mode="visual"
+			/>
 		);
 		const text = wrapper.props.children;
 
@@ -34,7 +37,10 @@ describe( 'BlockModeToggle', () => {
 
 	it( 'should render the Visual mode button', () => {
 		const wrapper = getShallowRenderOutput(
-			<BlockModeToggle blockType={ { supports: { html: true } } } mode="html" />
+			<BlockModeToggle
+				blockType={ { supports: { html: true } } }
+				mode="html"
+			/>
 		);
 		const text = wrapper.props.children;
 

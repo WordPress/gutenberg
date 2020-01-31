@@ -25,7 +25,10 @@ export function ReusableBlockConvertButton( {
 	return (
 		<>
 			{ ! isReusable && (
-				<MenuItem icon="controls-repeat" onClick={ onConvertToReusable }>
+				<MenuItem
+					icon="controls-repeat"
+					onClick={ onConvertToReusable }
+				>
 					{ __( 'Add to Reusable blocks' ) }
 				</MenuItem>
 			) }
@@ -40,8 +43,12 @@ export function ReusableBlockConvertButton( {
 
 export default compose( [
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlocksByClientId, canInsertBlockType } = select( 'core/block-editor' );
-		const { __experimentalGetReusableBlock: getReusableBlock } = select( 'core/editor' );
+		const { getBlocksByClientId, canInsertBlockType } = select(
+			'core/block-editor'
+		);
+		const { __experimentalGetReusableBlock: getReusableBlock } = select(
+			'core/editor'
+		);
 		const { canUser } = select( 'core' );
 
 		const blocks = getBlocksByClientId( clientIds );

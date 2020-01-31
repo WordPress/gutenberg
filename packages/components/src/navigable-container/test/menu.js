@@ -17,7 +17,9 @@ import { NavigableMenu } from '../menu';
 function simulateVisible( wrapper, selector ) {
 	const elements = wrapper.getDOMNode().querySelectorAll( selector );
 	each( elements, ( elem ) => {
-		elem.getClientRects = () => [ 'trick-jsdom-into-having-size-for-element-rect' ];
+		elem.getClientRects = () => [
+			'trick-jsdom-into-having-size-for-element-rect',
+		];
 	} );
 }
 
@@ -47,7 +49,10 @@ describe( 'NavigableMenu', () => {
 				`withInstanceId`. In this case, it's fine to use literal IDs.
 			*/
 			/* eslint-disable no-restricted-syntax */
-			<NavigableMenu orientation="vertical" onNavigate={ ( index ) => ( currentIndex = index ) }>
+			<NavigableMenu
+				orientation="vertical"
+				onNavigate={ ( index ) => ( currentIndex = index ) }
+			>
 				<span tabIndex="-1" id="btn1">
 					One
 				</span>
@@ -154,7 +159,10 @@ describe( 'NavigableMenu', () => {
 				`withInstanceId`. In this case, it's fine to use literal IDs.
 			*/
 			/* eslint-disable no-restricted-syntax */
-			<NavigableMenu orientation="horizontal" onNavigate={ ( index ) => ( currentIndex = index ) }>
+			<NavigableMenu
+				orientation="horizontal"
+				onNavigate={ ( index ) => ( currentIndex = index ) }
+			>
 				<span tabIndex="-1" id="btn1">
 					One
 				</span>
@@ -261,7 +269,10 @@ describe( 'NavigableMenu', () => {
 				`withInstanceId`. In this case, it's fine to use literal IDs.
 			*/
 			/* eslint-disable no-restricted-syntax */
-			<NavigableMenu orientation="both" onNavigate={ ( index ) => ( currentIndex = index ) }>
+			<NavigableMenu
+				orientation="both"
+				onNavigate={ ( index ) => ( currentIndex = index ) }
+			>
 				<button id="btn1">One</button>
 				<button id="btn2">Two</button>
 				<button id="btn3">Three</button>

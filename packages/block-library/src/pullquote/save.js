@@ -31,7 +31,10 @@ export default function save( { attributes } ) {
 
 	// Is solid color style
 	if ( isSolidColorStyle ) {
-		const backgroundClass = getColorClassName( 'background-color', mainColor );
+		const backgroundClass = getColorClassName(
+			'background-color',
+			mainColor
+		);
 
 		figureClasses = classnames( {
 			'has-background': backgroundClass || customMainColor,
@@ -55,13 +58,20 @@ export default function save( { attributes } ) {
 			[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 		} );
 
-	const blockquoteStyles = blockquoteTextColorClass ? undefined : { color: customTextColor };
+	const blockquoteStyles = blockquoteTextColorClass
+		? undefined
+		: { color: customTextColor };
 
 	return (
 		<figure className={ figureClasses } style={ figureStyles }>
-			<blockquote className={ blockquoteClasses } style={ blockquoteStyles }>
+			<blockquote
+				className={ blockquoteClasses }
+				style={ blockquoteStyles }
+			>
 				<RichText.Content value={ value } multiline />
-				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+				{ ! RichText.isEmpty( citation ) && (
+					<RichText.Content tagName="cite" value={ citation } />
+				) }
 			</blockquote>
 		</figure>
 	);

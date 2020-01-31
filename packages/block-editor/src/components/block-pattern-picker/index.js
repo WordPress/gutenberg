@@ -22,13 +22,21 @@ function BlockPatternPicker( {
 	} );
 
 	return (
-		<Placeholder icon={ icon } label={ label } instructions={ instructions } className={ classes }>
+		<Placeholder
+			icon={ icon }
+			label={ label }
+			instructions={ instructions }
+			className={ classes }
+		>
 			{ /*
 			 * Disable reason: The `list` ARIA role is redundant but
 			 * Safari+VoiceOver won't announce the list otherwise.
 			 */
 			/* eslint-disable jsx-a11y/no-redundant-roles */ }
-			<ul className="block-editor-block-pattern-picker__patterns" role="list">
+			<ul
+				className="block-editor-block-pattern-picker__patterns"
+				role="list"
+			>
 				{ patterns.map( ( pattern ) => (
 					<li key={ pattern.name }>
 						<Button

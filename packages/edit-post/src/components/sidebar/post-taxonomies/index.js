@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { PostTaxonomies as PostTaxonomiesForm, PostTaxonomiesCheck } from '@wordpress/editor';
+import {
+	PostTaxonomies as PostTaxonomiesForm,
+	PostTaxonomiesCheck,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -13,7 +16,11 @@ function PostTaxonomies() {
 		<PostTaxonomiesCheck>
 			<PostTaxonomiesForm
 				taxonomyWrapper={ ( content, taxonomy ) => {
-					return <TaxonomyPanel taxonomy={ taxonomy }>{ content }</TaxonomyPanel>;
+					return (
+						<TaxonomyPanel taxonomy={ taxonomy }>
+							{ content }
+						</TaxonomyPanel>
+					);
 				} }
 			/>
 		</PostTaxonomiesCheck>

@@ -55,8 +55,13 @@ export function getEffectiveColumnWidth( block, totalBlockCount ) {
  *
  * @return {number} Total width occupied by blocks.
  */
-export function getTotalColumnsWidth( blocks, totalBlockCount = blocks.length ) {
-	return sumBy( blocks, ( block ) => getEffectiveColumnWidth( block, totalBlockCount ) );
+export function getTotalColumnsWidth(
+	blocks,
+	totalBlockCount = blocks.length
+) {
+	return sumBy( blocks, ( block ) =>
+		getEffectiveColumnWidth( block, totalBlockCount )
+	);
 }
 
 /**
@@ -110,7 +115,9 @@ export function getRedistributedColumnWidths(
  * @return {boolean} Whether columns have explicit widths.
  */
 export function hasExplicitColumnWidths( blocks ) {
-	return blocks.some( ( block ) => Number.isFinite( block.attributes.width ) );
+	return blocks.some( ( block ) =>
+		Number.isFinite( block.attributes.width )
+	);
 }
 
 /**

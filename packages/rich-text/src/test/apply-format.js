@@ -152,7 +152,21 @@ describe( 'applyFormat', () => {
 		};
 		const expected = {
 			activeFormats: [ strong ],
-			formats: [ , , , [ strong ], [ strong, em ], [ strong, em ], [ em ], , , , , , , ],
+			formats: [
+				,
+				,
+				,
+				[ strong ],
+				[ strong, em ],
+				[ strong, em ],
+				[ em ],
+				,
+				,
+				,
+				,
+				,
+				,
+			],
 			text: 'one two three',
 		};
 		const result = applyFormat( deepFreeze( record ), strong, 3, 6 );
@@ -171,7 +185,21 @@ describe( 'applyFormat', () => {
 		};
 		const expected = {
 			activeFormats: [ strong ],
-			formats: [ , , , [ strong ], [ strong, em ], [ strong, em ], [ em ], , , , , , , ],
+			formats: [
+				,
+				,
+				,
+				[ strong ],
+				[ strong, em ],
+				[ strong, em ],
+				[ em ],
+				,
+				,
+				,
+				,
+				,
+				,
+			],
 			text: 'one two three',
 			start: 3,
 			end: 6,

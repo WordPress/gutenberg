@@ -16,7 +16,9 @@ describe( 'state native', () => {
 					isSelected: false,
 				};
 
-				expect( postTitle( { isSelected: true }, action ).isSelected ).toBe( false );
+				expect(
+					postTitle( { isSelected: true }, action ).isSelected
+				).toBe( false );
 			} );
 
 			it( 'should return true if selecting the post title', () => {
@@ -25,7 +27,9 @@ describe( 'state native', () => {
 					isSelected: true,
 				};
 
-				expect( postTitle( { isSelected: false }, action ).isSelected ).toBe( true );
+				expect(
+					postTitle( { isSelected: false }, action ).isSelected
+				).toBe( true );
 			} );
 		} );
 	} );

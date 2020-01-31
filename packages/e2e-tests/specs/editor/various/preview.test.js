@@ -67,12 +67,17 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 	await page.waitForXPath( checkboxXPath );
 	const [ checkboxHandle ] = await page.$x( checkboxXPath );
 
-	const isChecked = await page.evaluate( ( element ) => element.control.checked, checkboxHandle );
+	const isChecked = await page.evaluate(
+		( element ) => element.control.checked,
+		checkboxHandle
+	);
 
 	if ( isChecked !== shouldBeChecked ) {
 		await checkboxHandle.click();
 		const [ saveButton ] = await page.$x(
-			shouldBeChecked ? '//button[text()="Enable & Reload"]' : '//button[text()="Disable & Reload"]'
+			shouldBeChecked
+				? '//button[text()="Enable & Reload"]'
+				: '//button[text()="Disable & Reload"]'
 		);
 		const navigationCompleted = page.waitForNavigation();
 		saveButton.click();
@@ -110,11 +115,17 @@ describe( 'Preview', () => {
 			} )
 		 ).jsonValue();
 
-		const expectedPreviewURL = createURL( '', `?p=${ postId }&preview=true` );
+		const expectedPreviewURL = createURL(
+			'',
+			`?p=${ postId }&preview=true`
+		);
 		expect( previewPage.url() ).toBe( expectedPreviewURL );
 
 		// Title in preview should match input.
-		let previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		let previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
 		expect( previewTitle ).toBe( 'Hello World' );
 
 		// Return to editor to change title.
@@ -123,14 +134,20 @@ describe( 'Preview', () => {
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
-		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
 		expect( previewTitle ).toBe( 'Hello World!' );
 
 		// Pressing preview without changes should bring same preview window to
 		// front and reload, but should not show interstitial.
 		await editorPage.bringToFront();
 		await waitForPreviewNavigation( previewPage );
-		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
 		expect( previewTitle ).toBe( 'Hello World!' );
 
 		// Preview for published post (no unsaved changes) directs to canonical URL for post.
@@ -143,7 +160,10 @@ describe( 'Preview', () => {
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
-		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
 		expect( previewTitle ).toBe( 'Hello World! And more.' );
 
 		// Published preview URL should include ID and nonce parameters.
@@ -161,7 +181,10 @@ describe( 'Preview', () => {
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
-		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
 		expect( previewTitle ).toBe( 'Hello World! And more.' );
 
 		await previewPage.close();
@@ -182,7 +205,10 @@ describe( 'Preview', () => {
 		const previewPage = await openPreviewPage( editorPage );
 
 		// Title in preview should match input.
-		let previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		let previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
 		expect( previewTitle ).toBe( 'aaaaa' );
 
 		// Return to editor.
@@ -198,7 +224,10 @@ describe( 'Preview', () => {
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
-		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
 		expect( previewTitle ).toBe( 'aaaaabbbbb' );
 
 		await previewPage.close();
@@ -233,7 +262,10 @@ describe( 'Preview with Custom Fields enabled', () => {
 		const previewPage = await openPreviewPage( editorPage );
 
 		// Check the title and preview match.
-		let previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		let previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
 		expect( previewTitle ).toBe( 'title 1' );
 		let previewContent = await previewPage.$eval(
 			'.entry-content p',
@@ -256,9 +288,15 @@ describe( 'Preview with Custom Fields enabled', () => {
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match input.
-		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
 		expect( previewTitle ).toBe( 'title 2' );
-		previewContent = await previewPage.$eval( '.entry-content p', ( node ) => node.textContent );
+		previewContent = await previewPage.$eval(
+			'.entry-content p',
+			( node ) => node.textContent
+		);
 		expect( previewContent ).toBe( 'content 2' );
 
 		// Make sure the editor is active for the afterEach function.

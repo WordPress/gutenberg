@@ -6,7 +6,12 @@ import { mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo, useRef, useEffect, useLayoutEffect } from '@wordpress/element';
+import {
+	useMemo,
+	useRef,
+	useEffect,
+	useLayoutEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,7 +27,8 @@ import useRegistry from '../registry-provider/use-registry';
  * Fallback to useEffect for server rendered components because currently React
  * throws a warning when using useLayoutEffect in that environment.
  */
-const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+const useIsomorphicLayoutEffect =
+	typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 /**
  * Custom react hook for returning aggregate dispatch actions using the provided
@@ -47,7 +53,10 @@ const useDispatchWithMap = ( dispatchMap, deps ) => {
 	} );
 
 	return useMemo( () => {
-		const currentDispatchProps = currentDispatchMap.current( registry.dispatch, registry );
+		const currentDispatchProps = currentDispatchMap.current(
+			registry.dispatch,
+			registry
+		);
 		return mapValues( currentDispatchProps, ( dispatcher, propName ) => {
 			if ( typeof dispatcher !== 'function' ) {
 				// eslint-disable-next-line no-console
@@ -56,7 +65,9 @@ const useDispatchWithMap = ( dispatchMap, deps ) => {
 				);
 			}
 			return ( ...args ) =>
-				currentDispatchMap.current( registry.dispatch, registry )[ propName ]( ...args );
+				currentDispatchMap
+					.current( registry.dispatch, registry )
+					[ propName ]( ...args );
 		} );
 	}, [ registry, ...deps ] );
 };

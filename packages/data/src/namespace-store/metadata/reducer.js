@@ -55,7 +55,9 @@ const isResolved = ( state = {}, action ) => {
 		case 'INVALIDATE_RESOLUTION_FOR_STORE':
 			return {};
 		case 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR':
-			return has( state, [ action.selectorName ] ) ? omit( state, [ action.selectorName ] ) : state;
+			return has( state, [ action.selectorName ] )
+				? omit( state, [ action.selectorName ] )
+				: state;
 		case 'START_RESOLUTION':
 		case 'FINISH_RESOLUTION':
 		case 'INVALIDATE_RESOLUTION':

@@ -23,7 +23,13 @@ import {
 } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
-function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace, className } ) {
+function HeadingEdit( {
+	attributes,
+	setAttributes,
+	mergeBlocks,
+	onReplace,
+	className,
+} ) {
 	const ref = useRef();
 	const { TextColor, InspectorControlsColorPanel } = __experimentalUseColors(
 		[ { name: 'textColor', property: 'color' } ],
@@ -44,7 +50,9 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace, class
 					minLevel={ 2 }
 					maxLevel={ 5 }
 					selectedLevel={ level }
-					onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
 				/>
 				<AlignmentToolbar
 					value={ align }
@@ -61,7 +69,9 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace, class
 						minLevel={ 1 }
 						maxLevel={ 7 }
 						selectedLevel={ level }
-						onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -72,7 +82,9 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace, class
 					identifier="content"
 					tagName={ tagName }
 					value={ content }
-					onChange={ ( value ) => setAttributes( { content: value } ) }
+					onChange={ ( value ) =>
+						setAttributes( { content: value } )
+					}
 					onMerge={ mergeBlocks }
 					onSplit={ ( value ) => {
 						if ( ! value ) {

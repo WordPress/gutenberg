@@ -21,7 +21,13 @@ import { isActionOfType, isAction } from './is-action';
 export default function createRuntime( controls = {}, dispatch ) {
 	const rungenControls = map(
 		controls,
-		( control, actionType ) => ( value, next, iterate, yieldNext, yieldError ) => {
+		( control, actionType ) => (
+			value,
+			next,
+			iterate,
+			yieldNext,
+			yieldError
+		) => {
 			if ( ! isActionOfType( value, actionType ) ) {
 				return false;
 			}

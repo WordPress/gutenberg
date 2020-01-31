@@ -25,7 +25,11 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 		link: 'some_link',
 	};
 	const post = { ...previousPost };
-	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID, actions: [], type: 'snackbar' };
+	const defaultExpectedAction = {
+		id: SAVE_POST_NOTICE_ID,
+		actions: [],
+		type: 'snackbar',
+	};
 	[
 		[
 			'when previous post is not published and post will not be published',
@@ -43,12 +47,14 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			[ 'publish', defaultExpectedAction ],
 		],
 		[
-			'when previous post is not published and post will be privately ' + 'published',
+			'when previous post is not published and post will be privately ' +
+				'published',
 			[ 'draft', 'private', false ],
 			[ 'private', defaultExpectedAction ],
 		],
 		[
-			'when previous post is not published and post will be scheduled for ' + 'publishing',
+			'when previous post is not published and post will be scheduled for ' +
+				'publishing',
 			[ 'draft', 'future', false ],
 			[ 'scheduled', defaultExpectedAction ],
 		],
@@ -68,20 +74,26 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 				},
 			],
 		],
-	].forEach( ( [ description, [ previousPostStatus, postStatus, isViewable ], expectedValue ] ) => {
-		it( description, () => {
-			previousPost.status = previousPostStatus;
-			post.status = postStatus;
-			postType.viewable = isViewable;
-			expect(
-				getNotificationArgumentsForSaveSuccess( {
-					previousPost,
-					post,
-					postType,
-				} )
-			).toEqual( expectedValue );
-		} );
-	} );
+	].forEach(
+		( [
+			description,
+			[ previousPostStatus, postStatus, isViewable ],
+			expectedValue,
+		] ) => {
+			it( description, () => {
+				previousPost.status = previousPostStatus;
+				post.status = postStatus;
+				postType.viewable = isViewable;
+				expect(
+					getNotificationArgumentsForSaveSuccess( {
+						previousPost,
+						post,
+						postType,
+					} )
+				).toEqual( expectedValue );
+			} );
+		}
+	);
 } );
 describe( 'getNotificationArgumentsForSaveFail()', () => {
 	const error = { code: '42', message: 'Something went wrong.' };
@@ -99,19 +111,28 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'when post is not published and edits is published',
 			'',
 			[ 'draft', 'publish' ],
-			[ 'Publishing failed. Something went wrong.', defaultExpectedAction ],
+			[
+				'Publishing failed. Something went wrong.',
+				defaultExpectedAction,
+			],
 		],
 		[
 			'when post is published and edits is privately published',
 			'',
 			[ 'draft', 'private' ],
-			[ 'Publishing failed. Something went wrong.', defaultExpectedAction ],
+			[
+				'Publishing failed. Something went wrong.',
+				defaultExpectedAction,
+			],
 		],
 		[
 			'when post is published and edits is scheduled to be published',
 			'',
 			[ 'draft', 'future' ],
-			[ 'Scheduling failed. Something went wrong.', defaultExpectedAction ],
+			[
+				'Scheduling failed. Something went wrong.',
+				defaultExpectedAction,
+			],
 		],
 		[
 			'when post is published and edits is published',
@@ -119,20 +140,27 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			[ 'publish', 'publish' ],
 			[ 'Updating failed. Something went wrong.', defaultExpectedAction ],
 		],
-	].forEach( ( [ description, errorCode, [ postStatus, editsStatus ], expectedValue ] ) => {
-		it( description, () => {
-			post.status = postStatus;
-			error.code = errorCode;
-			edits.status = editsStatus;
-			expect(
-				getNotificationArgumentsForSaveFail( {
-					post,
-					edits,
-					error,
-				} )
-			).toEqual( expectedValue );
-		} );
-	} );
+	].forEach(
+		( [
+			description,
+			errorCode,
+			[ postStatus, editsStatus ],
+			expectedValue,
+		] ) => {
+			it( description, () => {
+				post.status = postStatus;
+				error.code = errorCode;
+				edits.status = editsStatus;
+				expect(
+					getNotificationArgumentsForSaveFail( {
+						post,
+						edits,
+						error,
+					} )
+				).toEqual( expectedValue );
+			} );
+		}
+	);
 } );
 describe( 'getNotificationArgumentsForTrashFail()', () => {
 	[
@@ -146,11 +174,17 @@ describe( 'getNotificationArgumentsForTrashFail()', () => {
 			{ message: 'foo', code: 'unknown_error' },
 			'Trashing failed',
 		],
-		[ 'when there is not an error message', { code: 42 }, 'Trashing failed' ],
+		[
+			'when there is not an error message',
+			{ code: 42 },
+			'Trashing failed',
+		],
 	].forEach( ( [ description, error, message ] ) => {
 		it( description, () => {
 			const expectedValue = [ message, { id: TRASH_POST_NOTICE_ID } ];
-			expect( getNotificationArgumentsForTrashFail( { error } ) ).toEqual( expectedValue );
+			expect( getNotificationArgumentsForTrashFail( { error } ) ).toEqual(
+				expectedValue
+			);
 		} );
 	} );
 } );

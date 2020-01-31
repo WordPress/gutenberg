@@ -6,7 +6,11 @@ import { mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, pure, useViewportMatch } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	pure,
+	useViewportMatch,
+} from '@wordpress/compose';
 
 /**
  * Higher-order component creator, creating a new component which renders with

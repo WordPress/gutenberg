@@ -254,7 +254,10 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 
 	switch ( action.type ) {
 		case 'RESET_BLOCKS':
-			newState.cache = mapValues( flattenBlocks( action.blocks ), () => ( {} ) );
+			newState.cache = mapValues(
+				flattenBlocks( action.blocks ),
+				() => ( {} )
+			);
 			break;
 		case 'RECEIVE_BLOCKS':
 		case 'INSERT_BLOCKS': {
@@ -264,7 +267,9 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			}
 			newState.cache = {
 				...newState.cache,
-				...fillKeysWithEmptyObject( getBlocksWithParentsClientIds( updatedBlockUids ) ),
+				...fillKeysWithEmptyObject(
+					getBlocksWithParentsClientIds( updatedBlockUids )
+				),
 			};
 			break;
 		}
@@ -272,7 +277,9 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 		case 'UPDATE_BLOCK_ATTRIBUTES':
 			newState.cache = {
 				...newState.cache,
-				...fillKeysWithEmptyObject( getBlocksWithParentsClientIds( [ action.clientId ] ) ),
+				...fillKeysWithEmptyObject(
+					getBlocksWithParentsClientIds( [ action.clientId ] )
+				),
 			};
 			break;
 		case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
@@ -283,14 +290,19 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			newState.cache = {
 				...omit( newState.cache, action.replacedClientIds ),
 				...omit( parentClientIds, action.replacedClientIds ),
-				...fillKeysWithEmptyObject( keys( flattenBlocks( action.blocks ) ) ),
+				...fillKeysWithEmptyObject(
+					keys( flattenBlocks( action.blocks ) )
+				),
 			};
 			break;
 		case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 			newState.cache = {
 				...omit( newState.cache, action.removedClientIds ),
 				...fillKeysWithEmptyObject(
-					difference( getBlocksWithParentsClientIds( action.clientIds ), action.clientIds )
+					difference(
+						getBlocksWithParentsClientIds( action.clientIds ),
+						action.clientIds
+					)
 				),
 			};
 			break;
@@ -304,7 +316,9 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			}
 			newState.cache = {
 				...newState.cache,
-				...fillKeysWithEmptyObject( getBlocksWithParentsClientIds( updatedBlockUids ) ),
+				...fillKeysWithEmptyObject(
+					getBlocksWithParentsClientIds( updatedBlockUids )
+				),
 			};
 			break;
 		}
@@ -316,7 +330,9 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			}
 			newState.cache = {
 				...newState.cache,
-				...fillKeysWithEmptyObject( getBlocksWithParentsClientIds( updatedBlockUids ) ),
+				...fillKeysWithEmptyObject(
+					getBlocksWithParentsClientIds( updatedBlockUids )
+				),
 			};
 			break;
 		}
@@ -332,7 +348,9 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 
 			newState.cache = {
 				...newState.cache,
-				...fillKeysWithEmptyObject( getBlocksWithParentsClientIds( updatedBlockUids ) ),
+				...fillKeysWithEmptyObject(
+					getBlocksWithParentsClientIds( updatedBlockUids )
+				),
 			};
 		}
 	}
@@ -358,14 +376,20 @@ function withPersistentBlockChange( reducer ) {
 		let nextState = reducer( state, action );
 
 		const isExplicitPersistentChange =
-			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' || markNextChangeAsNotPersistent;
+			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
+			markNextChangeAsNotPersistent;
 
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
 		if ( state === nextState && ! isExplicitPersistentChange ) {
-			markNextChangeAsNotPersistent = action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
+			markNextChangeAsNotPersistent =
+				action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
-			const nextIsPersistentChange = get( state, [ 'isPersistentChange' ], true );
+			const nextIsPersistentChange = get(
+				state,
+				[ 'isPersistentChange' ],
+				true
+			);
 			if ( state.isPersistentChange === nextIsPersistentChange ) {
 				return state;
 			}
@@ -387,7 +411,8 @@ function withPersistentBlockChange( reducer ) {
 		// would have qualified as one which would have been ignored or not
 		// have resulted in a changed state.
 		lastAction = action;
-		markNextChangeAsNotPersistent = action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
+		markNextChangeAsNotPersistent =
+			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
 		return nextState;
 	};
@@ -563,17 +588,20 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 
 		state = { ...state };
 
-		state.attributes = mapValues( state.attributes, ( attributes, clientId ) => {
-			const { name } = state.byClientId[ clientId ];
-			if ( name === 'core/block' && attributes.ref === id ) {
-				return {
-					...attributes,
-					ref: updatedId,
-				};
-			}
+		state.attributes = mapValues(
+			state.attributes,
+			( attributes, clientId ) => {
+				const { name } = state.byClientId[ clientId ];
+				if ( name === 'core/block' && attributes.ref === id ) {
+					return {
+						...attributes,
+						ref: updatedId,
+					};
+				}
 
-			return attributes;
-		} );
+				return attributes;
+			}
+		);
 	}
 
 	return reducer( state, action );
@@ -660,7 +688,10 @@ export const blocks = flow(
 
 			case 'UPDATE_BLOCK':
 				// Ignore updates if block isn't known or there are no attribute changes.
-				if ( ! state[ action.clientId ] || ! action.updates.attributes ) {
+				if (
+					! state[ action.clientId ] ||
+					! action.updates.attributes
+				) {
 					return state;
 				}
 
@@ -683,7 +714,10 @@ export const blocks = flow(
 					action.attributes,
 					( result, value, key ) => {
 						if ( value !== result[ key ] ) {
-							result = getMutateSafeObject( state[ action.clientId ], result );
+							result = getMutateSafeObject(
+								state[ action.clientId ],
+								result
+							);
 							result[ key ] = value;
 						}
 
@@ -735,18 +769,29 @@ export const blocks = flow(
 			case 'INSERT_BLOCKS': {
 				const { rootClientId = '' } = action;
 				const subState = state[ rootClientId ] || [];
-				const mappedBlocks = mapBlockOrder( action.blocks, rootClientId );
+				const mappedBlocks = mapBlockOrder(
+					action.blocks,
+					rootClientId
+				);
 				const { index = subState.length } = action;
 
 				return {
 					...state,
 					...mappedBlocks,
-					[ rootClientId ]: insertAt( subState, mappedBlocks[ rootClientId ], index ),
+					[ rootClientId ]: insertAt(
+						subState,
+						mappedBlocks[ rootClientId ],
+						index
+					),
 				};
 			}
 
 			case 'MOVE_BLOCK_TO_POSITION': {
-				const { fromRootClientId = '', toRootClientId = '', clientId } = action;
+				const {
+					fromRootClientId = '',
+					toRootClientId = '',
+					clientId,
+				} = action;
 				const { index = state[ toRootClientId ].length } = action;
 
 				// Moving inside the same parent block
@@ -755,15 +800,26 @@ export const blocks = flow(
 					const fromIndex = subState.indexOf( clientId );
 					return {
 						...state,
-						[ toRootClientId ]: moveTo( state[ toRootClientId ], fromIndex, index ),
+						[ toRootClientId ]: moveTo(
+							state[ toRootClientId ],
+							fromIndex,
+							index
+						),
 					};
 				}
 
 				// Moving from a parent block to another
 				return {
 					...state,
-					[ fromRootClientId ]: without( state[ fromRootClientId ], clientId ),
-					[ toRootClientId ]: insertAt( state[ toRootClientId ], clientId, index ),
+					[ fromRootClientId ]: without(
+						state[ fromRootClientId ],
+						clientId
+					),
+					[ toRootClientId ]: insertAt(
+						state[ toRootClientId ],
+						clientId,
+						index
+					),
 				};
 			}
 
@@ -772,7 +828,10 @@ export const blocks = flow(
 				const firstClientId = first( clientIds );
 				const subState = state[ rootClientId ];
 
-				if ( ! subState.length || firstClientId === first( subState ) ) {
+				if (
+					! subState.length ||
+					firstClientId === first( subState )
+				) {
 					return state;
 				}
 
@@ -780,7 +839,12 @@ export const blocks = flow(
 
 				return {
 					...state,
-					[ rootClientId ]: moveTo( subState, firstIndex, firstIndex - 1, clientIds.length ),
+					[ rootClientId ]: moveTo(
+						subState,
+						firstIndex,
+						firstIndex - 1,
+						clientIds.length
+					),
 				};
 			}
 
@@ -798,7 +862,12 @@ export const blocks = flow(
 
 				return {
 					...state,
-					[ rootClientId ]: moveTo( subState, firstIndex, firstIndex + 1, clientIds.length ),
+					[ rootClientId ]: moveTo(
+						subState,
+						firstIndex,
+						firstIndex + 1,
+						clientIds.length
+					),
 				};
 			}
 
@@ -811,7 +880,8 @@ export const blocks = flow(
 				const mappedBlocks = mapBlockOrder( action.blocks );
 
 				return flow( [
-					( nextState ) => omit( nextState, action.replacedClientIds ),
+					( nextState ) =>
+						omit( nextState, action.replacedClientIds ),
 					( nextState ) => ( {
 						...nextState,
 						...omit( mappedBlocks, '' ),
@@ -822,10 +892,15 @@ export const blocks = flow(
 								subState,
 								( result, clientId ) => {
 									if ( clientId === clientIds[ 0 ] ) {
-										return [ ...result, ...mappedBlocks[ '' ] ];
+										return [
+											...result,
+											...mappedBlocks[ '' ],
+										];
 									}
 
-									if ( clientIds.indexOf( clientId ) === -1 ) {
+									if (
+										clientIds.indexOf( clientId ) === -1
+									) {
 										result.push( clientId );
 									}
 
@@ -844,7 +919,9 @@ export const blocks = flow(
 
 					// Remove deleted blocks from other blocks' orderings
 					( nextState ) =>
-						mapValues( nextState, ( subState ) => without( subState, ...action.removedClientIds ) ),
+						mapValues( nextState, ( subState ) =>
+							without( subState, ...action.removedClientIds )
+						),
 				] )( state );
 		}
 
@@ -867,7 +944,10 @@ export const blocks = flow(
 			case 'INSERT_BLOCKS':
 				return {
 					...state,
-					...mapBlockParents( action.blocks, action.rootClientId || '' ),
+					...mapBlockParents(
+						action.blocks,
+						action.rootClientId || ''
+					),
 				};
 
 			case 'MOVE_BLOCK_TO_POSITION': {
@@ -880,7 +960,10 @@ export const blocks = flow(
 			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				return {
 					...omit( state, action.replacedClientIds ),
-					...mapBlockParents( action.blocks, state[ action.clientIds[ 0 ] ] ),
+					...mapBlockParents(
+						action.blocks,
+						state[ action.clientIds[ 0 ] ]
+					),
 				};
 
 			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
@@ -998,7 +1081,8 @@ function selection( state = {}, action ) {
 				return state;
 			}
 
-			const indexToSelect = action.indexToSelect || action.blocks.length - 1;
+			const indexToSelect =
+				action.indexToSelect || action.blocks.length - 1;
 			const blockToSelect = action.blocks[ indexToSelect ];
 
 			if ( ! blockToSelect ) {
@@ -1130,7 +1214,10 @@ export function blocksMode( state = {}, action ) {
 		const { clientId } = action;
 		return {
 			...state,
-			[ clientId ]: state[ clientId ] && state[ clientId ] === 'html' ? 'visual' : 'html',
+			[ clientId ]:
+				state[ clientId ] && state[ clientId ] === 'html'
+					? 'visual'
+					: 'html',
 		};
 	}
 
@@ -1226,7 +1313,9 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 						...prevState.insertUsage,
 						[ id ]: {
 							time: action.time,
-							count: prevState.insertUsage[ id ] ? prevState.insertUsage[ id ].count + 1 : 1,
+							count: prevState.insertUsage[ id ]
+								? prevState.insertUsage[ id ].count + 1
+								: 1,
 							insert,
 						},
 					},

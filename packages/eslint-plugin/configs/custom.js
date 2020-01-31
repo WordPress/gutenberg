@@ -10,17 +10,20 @@ module.exports = {
 			{
 				selector:
 					'CallExpression[callee.name=/^(__|_n|_nx|_x)$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])',
-				message: 'Translate function arguments must be string literals.',
+				message:
+					'Translate function arguments must be string literals.',
 			},
 			{
 				selector:
 					'CallExpression[callee.name=/^(_n|_nx|_x)$/]:not([arguments.1.type=/^Literal|BinaryExpression$/])',
-				message: 'Translate function arguments must be string literals.',
+				message:
+					'Translate function arguments must be string literals.',
 			},
 			{
 				selector:
 					'CallExpression[callee.name=_nx]:not([arguments.3.type=/^Literal|BinaryExpression$/])',
-				message: 'Translate function arguments must be string literals.',
+				message:
+					'Translate function arguments must be string literals.',
 			},
 		],
 	},

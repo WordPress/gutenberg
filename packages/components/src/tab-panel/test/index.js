@@ -15,11 +15,17 @@ import { Component } from '@wordpress/element';
 
 describe( 'TabPanel', () => {
 	const getElementByClass = ( wrapper, className ) => {
-		return TestUtils.findRenderedDOMComponentWithClass( wrapper, className );
+		return TestUtils.findRenderedDOMComponentWithClass(
+			wrapper,
+			className
+		);
 	};
 
 	const getElementsByClass = ( wrapper, className ) => {
-		return TestUtils.scryRenderedDOMComponentsWithClass( wrapper, className );
+		return TestUtils.scryRenderedDOMComponentsWithClass(
+			wrapper,
+			className
+		);
 	};
 
 	const elementClick = ( element ) => {
@@ -68,19 +74,28 @@ describe( 'TabPanel', () => {
 				},
 			};
 
-			const wrapper = TestUtils.renderIntoDocument( getTestComponent( TabPanel, props ) );
+			const wrapper = TestUtils.renderIntoDocument(
+				getTestComponent( TabPanel, props )
+			);
 
 			const alphaTab = getElementByClass( wrapper, 'alpha' );
 			const betaTab = getElementByClass( wrapper, 'beta' );
 			const gammaTab = getElementByClass( wrapper, 'gamma' );
 
-			const getAlphaViews = () => getElementsByClass( wrapper, 'alpha-view' );
-			const getBetaViews = () => getElementsByClass( wrapper, 'beta-view' );
-			const getGammaViews = () => getElementsByClass( wrapper, 'gamma-view' );
+			const getAlphaViews = () =>
+				getElementsByClass( wrapper, 'alpha-view' );
+			const getBetaViews = () =>
+				getElementsByClass( wrapper, 'beta-view' );
+			const getGammaViews = () =>
+				getElementsByClass( wrapper, 'gamma-view' );
 
-			const getActiveTab = () => getElementByClass( wrapper, 'active-tab' );
+			const getActiveTab = () =>
+				getElementByClass( wrapper, 'active-tab' );
 			const getActiveView = () =>
-				getElementByClass( wrapper, 'components-tab-panel__tab-content' ).firstChild.textContent;
+				getElementByClass(
+					wrapper,
+					'components-tab-panel__tab-content'
+				).firstChild.textContent;
 
 			expect( getActiveTab().innerHTML ).toBe( 'Alpha' );
 			expect( getAlphaViews() ).toHaveLength( 1 );
@@ -147,7 +162,9 @@ describe( 'TabPanel', () => {
 				);
 			},
 		};
-		const wrapper = TestUtils.renderIntoDocument( getTestComponent( TabPanel, props ) );
+		const wrapper = TestUtils.renderIntoDocument(
+			getTestComponent( TabPanel, props )
+		);
 
 		const getActiveTab = () => getElementByClass( wrapper, 'active-tab' );
 		expect( getActiveTab().innerHTML ).toBe( 'Beta' );

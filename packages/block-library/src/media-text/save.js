@@ -41,13 +41,22 @@ export default function save( { attributes } ) {
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
-			className={ mediaId && mediaType === 'image' ? `wp-image-${ mediaId }` : null }
+			className={
+				mediaId && mediaType === 'image'
+					? `wp-image-${ mediaId }`
+					: null
+			}
 		/>
 	);
 
 	if ( href ) {
 		image = (
-			<a className={ linkClass } href={ href } target={ linkTarget } rel={ newRel }>
+			<a
+				className={ linkClass }
+				href={ href }
+				target={ linkTarget }
+				rel={ newRel }
+			>
 				{ image }
 			</a>
 		);
@@ -57,7 +66,10 @@ export default function save( { attributes } ) {
 		image: () => image,
 		video: () => <video controls src={ mediaUrl } />,
 	};
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+	const backgroundClass = getColorClassName(
+		'background-color',
+		backgroundColor
+	);
 	const className = classnames( {
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'has-background': backgroundClass || customBackgroundColor,
@@ -66,12 +78,16 @@ export default function save( { attributes } ) {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		'is-image-fill': imageFill,
 	} );
-	const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
+	const backgroundStyles = imageFill
+		? imageFillStyles( mediaUrl, focalPoint )
+		: {};
 
 	let gridTemplateColumns;
 	if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
 		gridTemplateColumns =
-			'right' === mediaPosition ? `auto ${ mediaWidth }%` : `${ mediaWidth }% auto`;
+			'right' === mediaPosition
+				? `auto ${ mediaWidth }%`
+				: `${ mediaWidth }% auto`;
 	}
 	const style = {
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
@@ -79,7 +95,10 @@ export default function save( { attributes } ) {
 	};
 	return (
 		<div className={ className } style={ style }>
-			<figure className="wp-block-media-text__media" style={ backgroundStyles }>
+			<figure
+				className="wp-block-media-text__media"
+				style={ backgroundStyles }
+			>
 				{ ( mediaTypeRenders[ mediaType ] || noop )() }
 			</figure>
 			<div className="wp-block-media-text__content">

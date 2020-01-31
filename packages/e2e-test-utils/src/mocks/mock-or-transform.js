@@ -17,7 +17,11 @@ import { getJSONResponse } from '../shared/get-json-response';
  * @param {Function|undefined} responseObjectTransform An optional function that transforms the response's object before the response is used.
  * @return {Promise} Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
  */
-export function mockOrTransform( mockCheck, mock, responseObjectTransform = ( obj ) => obj ) {
+export function mockOrTransform(
+	mockCheck,
+	mock,
+	responseObjectTransform = ( obj ) => obj
+) {
 	return async ( request ) => {
 		// Because we can't get the responses to requests and modify them on the fly,
 		// we have to make our own request and get the response, then apply the
@@ -31,7 +35,9 @@ export function mockOrTransform( mockCheck, mock, responseObjectTransform = ( ob
 		if ( mockCheck( responseObject ) ) {
 			request.respond( getJSONResponse( mock ) );
 		} else {
-			request.respond( getJSONResponse( responseObjectTransform( responseObject ) ) );
+			request.respond(
+				getJSONResponse( responseObjectTransform( responseObject ) )
+			);
 		}
 	};
 }

@@ -19,11 +19,20 @@ import { plusCircle } from '@wordpress/icons';
  */
 import InserterMenu from './menu';
 
-const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingleBlockType } ) => {
+const defaultRenderToggle = ( {
+	onToggle,
+	disabled,
+	isOpen,
+	blockTitle,
+	hasSingleBlockType,
+} ) => {
 	let label;
 	if ( hasSingleBlockType ) {
 		// translators: %s: the name of the block when there is only one
-		label = sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
+		label = sprintf(
+			_x( 'Add %s', 'directly add the only allowed block' ),
+			blockTitle
+		);
 	} else {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
@@ -77,7 +86,13 @@ class Inserter extends Component {
 			renderToggle = defaultRenderToggle,
 		} = this.props;
 
-		return renderToggle( { onToggle, isOpen, disabled, blockTitle, hasSingleBlockType } );
+		return renderToggle( {
+			onToggle,
+			isOpen,
+			disabled,
+			blockTitle,
+			hasSingleBlockType,
+		} );
 	}
 
 	/**
@@ -111,7 +126,11 @@ class Inserter extends Component {
 	}
 
 	render() {
-		const { position, hasSingleBlockType, insertOnlyAllowedBlock } = this.props;
+		const {
+			position,
+			hasSingleBlockType,
+			insertOnlyAllowedBlock,
+		} = this.props;
 
 		if ( hasSingleBlockType ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
@@ -134,18 +153,24 @@ class Inserter extends Component {
 
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
-		const { getBlockRootClientId, hasInserterItems, __experimentalGetAllowedBlocks } = select(
-			'core/block-editor'
+		const {
+			getBlockRootClientId,
+			hasInserterItems,
+			__experimentalGetAllowedBlocks,
+		} = select( 'core/block-editor' );
+		const { __experimentalGetBlockPatterns: getBlockPatterns } = select(
+			'core/blocks'
 		);
-		const { __experimentalGetBlockPatterns: getBlockPatterns } = select( 'core/blocks' );
 
-		rootClientId = rootClientId || getBlockRootClientId( clientId ) || undefined;
+		rootClientId =
+			rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
 		const hasSingleBlockType =
 			size( allowedBlocks ) === 1 &&
-			size( getBlockPatterns( allowedBlocks[ 0 ].name, 'inserter' ) ) === 0;
+			size( getBlockPatterns( allowedBlocks[ 0 ].name, 'inserter' ) ) ===
+				0;
 
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
@@ -175,9 +200,11 @@ export default compose( [
 				}
 
 				function getInsertionIndex() {
-					const { getBlockIndex, getBlockSelectionEnd, getBlockOrder } = select(
-						'core/block-editor'
-					);
+					const {
+						getBlockIndex,
+						getBlockSelectionEnd,
+						getBlockOrder,
+					} = select( 'core/block-editor' );
 
 					// If the clientId is defined, we insert at the position of the block.
 					if ( clientId ) {
@@ -198,11 +225,19 @@ export default compose( [
 
 				const blockToInsert = createBlock( allowedBlockType.name );
 
-				insertBlock( blockToInsert, getInsertionIndex(), rootClientId, selectBlockOnInsert );
+				insertBlock(
+					blockToInsert,
+					getInsertionIndex(),
+					rootClientId,
+					selectBlockOnInsert
+				);
 
 				if ( ! selectBlockOnInsert ) {
 					// translators: %s: the name of the block that has been added
-					const message = sprintf( __( '%s block added' ), allowedBlockType.title );
+					const message = sprintf(
+						__( '%s block added' ),
+						allowedBlockType.title
+					);
 					speak( message );
 				}
 			},

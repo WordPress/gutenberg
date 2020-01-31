@@ -130,7 +130,10 @@ const ENUMERATED_ATTRIBUTES = [
  *
  * @type {Array}
  */
-const MEANINGFUL_ATTRIBUTES = [ ...BOOLEAN_ATTRIBUTES, ...ENUMERATED_ATTRIBUTES ];
+const MEANINGFUL_ATTRIBUTES = [
+	...BOOLEAN_ATTRIBUTES,
+	...ENUMERATED_ATTRIBUTES,
+];
 
 /**
  * Array of functions which receive a text string on which to apply normalizing
@@ -272,7 +275,11 @@ export function getTextWithCollapsedWhitespace( text ) {
 export function getMeaningfulAttributePairs( token ) {
 	return token.attributes.filter( ( pair ) => {
 		const [ key, value ] = pair;
-		return value || key.indexOf( 'data-' ) === 0 || includes( MEANINGFUL_ATTRIBUTES, key );
+		return (
+			value ||
+			key.indexOf( 'data-' ) === 0 ||
+			includes( MEANINGFUL_ATTRIBUTES, key )
+		);
 	} );
 }
 
@@ -286,7 +293,11 @@ export function getMeaningfulAttributePairs( token ) {
  *
  * @return {boolean} Whether two text tokens are equivalent.
  */
-export function isEquivalentTextTokens( actual, expected, logger = createLogger() ) {
+export function isEquivalentTextTokens(
+	actual,
+	expected,
+	logger = createLogger()
+) {
 	// This function is intentionally written as syntactically "ugly" as a hot
 	// path optimization. Text is progressively normalized in order from least-
 	// to-most operationally expensive, until the earliest point at which text
@@ -305,7 +316,11 @@ export function isEquivalentTextTokens( actual, expected, logger = createLogger(
 		}
 	}
 
-	logger.warning( 'Expected text `%s`, saw `%s`.', expected.chars, actual.chars );
+	logger.warning(
+		'Expected text `%s`, saw `%s`.',
+		expected.chars,
+		actual.chars
+	);
 
 	return false;
 }
@@ -360,14 +375,18 @@ export const isEqualAttributesOfName = {
 	class: ( actual, expected ) => {
 		// Class matches if members are the same, even if out of order or
 		// superfluous whitespace between.
-		return ! xor( ...[ actual, expected ].map( getTextPiecesSplitOnWhitespace ) ).length;
+		return ! xor(
+			...[ actual, expected ].map( getTextPiecesSplitOnWhitespace )
+		).length;
 	},
 	style: ( actual, expected ) => {
 		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
 	},
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.
-	...fromPairs( BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, stubTrue ] ) ),
+	...fromPairs(
+		BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, stubTrue ] )
+	),
 };
 
 /**
@@ -380,12 +399,20 @@ export const isEqualAttributesOfName = {
  *
  * @return {boolean} Whether attributes are equivalent.
  */
-export function isEqualTagAttributePairs( actual, expected, logger = createLogger() ) {
+export function isEqualTagAttributePairs(
+	actual,
+	expected,
+	logger = createLogger()
+) {
 	// Attributes is tokenized as tuples. Their lengths should match. This also
 	// avoids us needing to check both attributes sets, since if A has any keys
 	// which do not exist in B, we know the sets to be different.
 	if ( actual.length !== expected.length ) {
-		logger.warning( 'Expected attributes %o, instead saw %o.', expected, actual );
+		logger.warning(
+			'Expected attributes %o, instead saw %o.',
+			expected,
+			actual
+		);
 		return false;
 	}
 
@@ -394,7 +421,8 @@ export function isEqualTagAttributePairs( actual, expected, logger = createLogge
 	// an object, for lookup by key.
 	const expectedAttributes = {};
 	for ( let i = 0; i < expected.length; i++ ) {
-		expectedAttributes[ expected[ i ][ 0 ].toLowerCase() ] = expected[ i ][ 1 ];
+		expectedAttributes[ expected[ i ][ 0 ].toLowerCase() ] =
+			expected[ i ][ 1 ];
 	}
 
 	for ( let i = 0; i < actual.length; i++ ) {
@@ -524,7 +552,11 @@ export function isClosedByToken( currentToken, nextToken ) {
 	}
 
 	// Check token names and determine if nextToken is the closing tag for currentToken
-	if ( nextToken && nextToken.tagName === currentToken.tagName && nextToken.type === 'EndTag' ) {
+	if (
+		nextToken &&
+		nextToken.tagName === currentToken.tagName &&
+		nextToken.type === 'EndTag'
+	) {
 		return true;
 	}
 
@@ -544,9 +576,10 @@ export function isClosedByToken( currentToken, nextToken ) {
  */
 export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 	// Tokenize input content and reserialized save content
-	const [ actualTokens, expectedTokens ] = [ actual, expected ].map( ( html ) =>
-		getHTMLTokens( html, logger )
-	);
+	const [ actualTokens, expectedTokens ] = [
+		actual,
+		expected,
+	].map( ( html ) => getHTMLTokens( html, logger ) );
 
 	// If either is malformed then stop comparing - the strings are not equivalent
 	if ( ! actualTokens || ! expectedTokens ) {
@@ -559,7 +592,10 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 
 		// Inequal if exhausted all expected tokens
 		if ( ! expectedToken ) {
-			logger.warning( 'Expected end of content, instead saw %o.', actualToken );
+			logger.warning(
+				'Expected end of content, instead saw %o.',
+				actualToken
+			);
 			return false;
 		}
 
@@ -578,7 +614,10 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 		// Defer custom token type equality handling, otherwise continue and
 		// assume as equal
 		const isEqualTokens = isEqualTokensOfType[ actualToken.type ];
-		if ( isEqualTokens && ! isEqualTokens( actualToken, expectedToken, logger ) ) {
+		if (
+			isEqualTokens &&
+			! isEqualTokens( actualToken, expectedToken, logger )
+		) {
 			return false;
 		}
 
@@ -598,7 +637,10 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 	if ( ( expectedToken = getNextNonWhitespaceToken( expectedTokens ) ) ) {
 		// If any non-whitespace tokens remain in expected token set, this
 		// indicates inequality
-		logger.warning( 'Expected %o, instead saw end of content.', expectedToken );
+		logger.warning(
+			'Expected %o, instead saw end of content.',
+			expectedToken
+		);
 		return false;
 	}
 
@@ -640,7 +682,11 @@ export function getBlockContentValidationResult(
 		};
 	}
 
-	const isValid = isEquivalentHTML( originalBlockContent, generatedBlockContent, logger );
+	const isValid = isEquivalentHTML(
+		originalBlockContent,
+		generatedBlockContent,
+		logger
+	);
 	if ( ! isValid ) {
 		logger.error(
 			'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
@@ -670,7 +716,11 @@ export function getBlockContentValidationResult(
  *
  * @return {boolean} Whether block is valid.
  */
-export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent ) {
+export function isValidBlockContent(
+	blockTypeOrName,
+	attributes,
+	originalBlockContent
+) {
 	const { isValid } = getBlockContentValidationResult(
 		blockTypeOrName,
 		attributes,

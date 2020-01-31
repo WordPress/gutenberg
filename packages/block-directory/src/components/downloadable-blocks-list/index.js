@@ -6,7 +6,10 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getBlockMenuDefaultClassName, unregisterBlockType } from '@wordpress/blocks';
+import {
+	getBlockMenuDefaultClassName,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -19,7 +22,12 @@ import DownloadableBlockListItem from '../downloadable-block-list-item';
 const DOWNLOAD_ERROR_NOTICE_ID = 'block-download-error';
 const INSTALL_ERROR_NOTICE_ID = 'block-install-error';
 
-function DownloadableBlocksList( { items, onHover = noop, children, downloadAndInstallBlock } ) {
+function DownloadableBlocksList( {
+	items,
+	onHover = noop,
+	children,
+	downloadAndInstallBlock,
+} ) {
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -52,7 +60,9 @@ function DownloadableBlocksList( { items, onHover = noop, children, downloadAndI
 
 export default compose(
 	withDispatch( ( dispatch, props ) => {
-		const { installBlock, downloadBlock } = dispatch( 'core/block-directory' );
+		const { installBlock, downloadBlock } = dispatch(
+			'core/block-directory'
+		);
 		const { createErrorNotice, removeNotice } = dispatch( 'core/notices' );
 		const { removeBlocks } = dispatch( 'core/block-editor' );
 		const { onSelect } = props;
@@ -67,7 +77,11 @@ export default compose(
 								label: __( 'Retry' ),
 								onClick: () => {
 									removeNotice( DOWNLOAD_ERROR_NOTICE_ID );
-									downloadBlock( item, onSuccess, onDownloadError );
+									downloadBlock(
+										item,
+										onSuccess,
+										onDownloadError
+									);
 								},
 							},
 						],
@@ -78,26 +92,39 @@ export default compose(
 					const createdBlock = onSelect( item );
 
 					const onInstallBlockError = () => {
-						createErrorNotice( __( "Block previews can't install." ), {
-							id: INSTALL_ERROR_NOTICE_ID,
-							actions: [
-								{
-									label: __( 'Retry' ),
-									onClick: () => {
-										removeNotice( INSTALL_ERROR_NOTICE_ID );
-										installBlock( item, noop, onInstallBlockError );
+						createErrorNotice(
+							__( "Block previews can't install." ),
+							{
+								id: INSTALL_ERROR_NOTICE_ID,
+								actions: [
+									{
+										label: __( 'Retry' ),
+										onClick: () => {
+											removeNotice(
+												INSTALL_ERROR_NOTICE_ID
+											);
+											installBlock(
+												item,
+												noop,
+												onInstallBlockError
+											);
+										},
 									},
-								},
-								{
-									label: __( 'Remove' ),
-									onClick: () => {
-										removeNotice( INSTALL_ERROR_NOTICE_ID );
-										removeBlocks( createdBlock.clientId );
-										unregisterBlockType( item.name );
+									{
+										label: __( 'Remove' ),
+										onClick: () => {
+											removeNotice(
+												INSTALL_ERROR_NOTICE_ID
+											);
+											removeBlocks(
+												createdBlock.clientId
+											);
+											unregisterBlockType( item.name );
+										},
 									},
-								},
-							],
-						} );
+								],
+							}
+						);
 					};
 
 					installBlock( item, noop, onInstallBlockError );

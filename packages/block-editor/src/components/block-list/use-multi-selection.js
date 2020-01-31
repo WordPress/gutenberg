@@ -56,13 +56,15 @@ function selector( select ) {
 }
 
 function toggleRichText( container, toggle ) {
-	Array.from( container.querySelectorAll( '.rich-text' ) ).forEach( ( node ) => {
-		if ( toggle ) {
-			node.setAttribute( 'contenteditable', true );
-		} else {
-			node.removeAttribute( 'contenteditable' );
+	Array.from( container.querySelectorAll( '.rich-text' ) ).forEach(
+		( node ) => {
+			if ( toggle ) {
+				node.setAttribute( 'contenteditable', true );
+			} else {
+				node.removeAttribute( 'contenteditable' );
+			}
 		}
-	} );
+	);
 }
 
 export default function useMultiSelection( ref ) {
@@ -74,9 +76,12 @@ export default function useMultiSelection( ref ) {
 		getBlockParents,
 		selectedBlockClientId,
 	} = useSelect( selector, [] );
-	const { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } = useDispatch(
-		'core/block-editor'
-	);
+	const {
+		startMultiSelect,
+		stopMultiSelect,
+		multiSelect,
+		selectBlock,
+	} = useDispatch( 'core/block-editor' );
 	const rafId = useRef();
 	const startClientId = useRef();
 	const anchorElement = useRef();
@@ -95,9 +100,14 @@ export default function useMultiSelection( ref ) {
 
 			if ( selection.rangeCount && ! selection.isCollapsed ) {
 				const blockNode = getBlockDOMNode( selectedBlockClientId );
-				const { startContainer, endContainer } = selection.getRangeAt( 0 );
+				const { startContainer, endContainer } = selection.getRangeAt(
+					0
+				);
 
-				if ( ! blockNode.contains( startContainer ) || ! blockNode.contains( endContainer ) ) {
+				if (
+					! blockNode.contains( startContainer ) ||
+					! blockNode.contains( endContainer )
+				) {
 					selection.removeAllRanges();
 				}
 			}
@@ -165,15 +175,24 @@ export default function useMultiSelection( ref ) {
 					toggleRichText( ref.current, true );
 
 					if ( selection.rangeCount ) {
-						const { commonAncestorContainer } = selection.getRangeAt( 0 );
+						const {
+							commonAncestorContainer,
+						} = selection.getRangeAt( 0 );
 
-						if ( anchorElement.current.contains( commonAncestorContainer ) ) {
+						if (
+							anchorElement.current.contains(
+								commonAncestorContainer
+							)
+						) {
 							anchorElement.current.focus();
 						}
 					}
 				}
 			} else {
-				const startPath = [ ...getBlockParents( startClientId.current ), startClientId.current ];
+				const startPath = [
+					...getBlockParents( startClientId.current ),
+					startClientId.current,
+				];
 				const endPath = [ ...getBlockParents( clientId ), clientId ];
 				const depth = Math.min( startPath.length, endPath.length ) - 1;
 
@@ -201,7 +220,10 @@ export default function useMultiSelection( ref ) {
 	// Only clean up when unmounting, these are added and cleaned up elsewhere.
 	useEffect(
 		() => () => {
-			document.removeEventListener( 'selectionchange', onSelectionChange );
+			document.removeEventListener(
+				'selectionchange',
+				onSelectionChange
+			);
 			window.removeEventListener( 'mouseup', onSelectionEnd );
 			window.cancelAnimationFrame( rafId.current );
 		},

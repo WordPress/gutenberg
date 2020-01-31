@@ -30,11 +30,18 @@ const entitySelectors = defaultEntities.reduce( ( result, entity ) => {
 
 const entityResolvers = defaultEntities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name ) ] = ( key ) => resolvers.getEntityRecord( kind, name, key );
+	result[ getMethodName( kind, name ) ] = ( key ) =>
+		resolvers.getEntityRecord( kind, name, key );
 	const pluralMethodName = getMethodName( kind, name, 'get', true );
-	result[ pluralMethodName ] = ( ...args ) => resolvers.getEntityRecords( kind, name, ...args );
+	result[ pluralMethodName ] = ( ...args ) =>
+		resolvers.getEntityRecords( kind, name, ...args );
 	result[ pluralMethodName ].shouldInvalidate = ( action, ...args ) =>
-		resolvers.getEntityRecords.shouldInvalidate( action, kind, name, ...args );
+		resolvers.getEntityRecords.shouldInvalidate(
+			action,
+			kind,
+			name,
+			...args
+		);
 	return result;
 }, {} );
 

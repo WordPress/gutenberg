@@ -7,7 +7,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, FormFileUpload, Placeholder, DropZone, withFilters } from '@wordpress/components';
+import {
+	Button,
+	FormFileUpload,
+	Placeholder,
+	DropZone,
+	withFilters,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
@@ -23,7 +29,10 @@ import URLPopover from '../url-popover';
 
 const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 	<URLPopover onClose={ onClose }>
-		<form className="block-editor-media-placeholder__url-input-form" onSubmit={ onSubmit }>
+		<form
+			className="block-editor-media-placeholder__url-input-form"
+			onSubmit={ onSubmit }
+		>
 			<input
 				className="block-editor-media-placeholder__url-input-field"
 				type="url"
@@ -63,7 +72,9 @@ export class MediaPlaceholder extends Component {
 			return false;
 		}
 		return every( allowedTypes, ( allowedType ) => {
-			return allowedType === 'image' || startsWith( allowedType, 'image/' );
+			return (
+				allowedType === 'image' || startsWith( allowedType, 'image/' )
+			);
 		} );
 	}
 
@@ -72,7 +83,10 @@ export class MediaPlaceholder extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( get( prevProps.value, [ 'src' ], '' ) !== get( this.props.value, [ 'src' ], '' ) ) {
+		if (
+			get( prevProps.value, [ 'src' ], '' ) !==
+			get( this.props.value, [ 'src' ], '' )
+		) {
 			this.setState( { src: get( this.props.value, [ 'src' ], '' ) } );
 		}
 	}
@@ -151,7 +165,9 @@ export class MediaPlaceholder extends Component {
 		let title = labels.title;
 
 		if ( ! mediaUpload && ! onSelectURL ) {
-			instructions = __( 'To edit this block, you need permission to upload media.' );
+			instructions = __(
+				'To edit this block, you need permission to upload media.'
+			);
 		}
 
 		if ( instructions === undefined || title === undefined ) {
@@ -161,7 +177,9 @@ export class MediaPlaceholder extends Component {
 			const isVideo = isOneType && 'video' === allowedTypes[ 0 ];
 
 			if ( instructions === undefined && mediaUpload ) {
-				instructions = __( 'Upload a media file or pick one from your media library.' );
+				instructions = __(
+					'Upload a media file or pick one from your media library.'
+				);
 
 				if ( isAudio ) {
 					instructions = __(
@@ -191,9 +209,13 @@ export class MediaPlaceholder extends Component {
 			}
 		}
 
-		const placeholderClassName = classnames( 'block-editor-media-placeholder', className, {
-			'is-appender': isAppender,
-		} );
+		const placeholderClassName = classnames(
+			'block-editor-media-placeholder',
+			className,
+			{
+				'is-appender': isAppender,
+			}
+		);
 
 		return (
 			<Placeholder
@@ -219,7 +241,12 @@ export class MediaPlaceholder extends Component {
 			return null;
 		}
 
-		return <DropZone onFilesDrop={ this.onFilesUpload } onHTMLDrop={ onHTMLDrop } />;
+		return (
+			<DropZone
+				onFilesDrop={ this.onFilesUpload }
+				onHTMLDrop={ onHTMLDrop }
+			/>
+		);
 	}
 
 	renderCancelLink() {
@@ -285,7 +312,9 @@ export class MediaPlaceholder extends Component {
 				multiple={ multiple }
 				onSelect={ onSelect }
 				allowedTypes={ allowedTypes }
-				value={ isArray( value ) ? value.map( ( { id } ) => id ) : value.id }
+				value={
+					isArray( value ) ? value.map( ( { id } ) => id ) : value.id
+				}
 				render={ ( { open } ) => {
 					return (
 						<Button
@@ -327,7 +356,10 @@ export class MediaPlaceholder extends Component {
 									{ this.renderCancelLink() }
 								</>
 							);
-							return this.renderPlaceholder( content, openFileDialog );
+							return this.renderPlaceholder(
+								content,
+								openFileDialog
+							);
 						} }
 					/>
 				</>
@@ -366,16 +398,25 @@ export class MediaPlaceholder extends Component {
 
 		if ( dropZoneUIOnly || disableMediaButtons ) {
 			if ( dropZoneUIOnly ) {
-				deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
-					alternative: 'disableMediaButtons',
-				} );
+				deprecated(
+					'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop',
+					{
+						alternative: 'disableMediaButtons',
+					}
+				);
 			}
 
-			return <MediaUploadCheck>{ this.renderDropZone() }</MediaUploadCheck>;
+			return (
+				<MediaUploadCheck>{ this.renderDropZone() }</MediaUploadCheck>
+			);
 		}
 
 		return (
-			<MediaUploadCheck fallback={ this.renderPlaceholder( this.renderUrlSelectionUI() ) }>
+			<MediaUploadCheck
+				fallback={ this.renderPlaceholder(
+					this.renderUrlSelectionUI()
+				) }
+			>
 				{ this.renderMediaUploadChecked() }
 			</MediaUploadCheck>
 		);

@@ -25,7 +25,9 @@ describe( 'Using Hooks API', () => {
 	it( 'Should contain a reset block button on the sidebar', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
-		expect( await page.$( '.edit-post-sidebar .e2e-reset-block-button' ) ).not.toBeNull();
+		expect(
+			await page.$( '.edit-post-sidebar .e2e-reset-block-button' )
+		).not.toBeNull();
 	} );
 
 	it( 'Pressing reset block button resets the block', async () => {

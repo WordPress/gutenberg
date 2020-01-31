@@ -30,11 +30,16 @@ export function DefaultBlockAppender( {
 	}
 
 	const value =
-		typeof placeholder === 'string' ? decodeEntities( placeholder ) : __( 'Start writing…' );
+		typeof placeholder === 'string'
+			? decodeEntities( placeholder )
+			: __( 'Start writing…' );
 
 	return (
 		<TouchableWithoutFeedback onPress={ onAppend }>
-			<View style={ [ styles.blockHolder, containerStyle ] } pointerEvents="box-only">
+			<View
+				style={ [ styles.blockHolder, containerStyle ] }
+				pointerEvents="box-only"
+			>
 				<RichText placeholder={ value } onChange={ () => {} } />
 			</View>
 		</TouchableWithoutFeedback>
@@ -43,12 +48,17 @@ export function DefaultBlockAppender( {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getBlockName, isBlockValid, getTemplateLock } = select(
-			'core/block-editor'
-		);
+		const {
+			getBlockCount,
+			getBlockName,
+			isBlockValid,
+			getTemplateLock,
+		} = select( 'core/block-editor' );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const isLastBlockDefault = getBlockName( ownProps.lastBlockClientId ) === getDefaultBlockName();
+		const isLastBlockDefault =
+			getBlockName( ownProps.lastBlockClientId ) ===
+			getDefaultBlockName();
 		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
 
 		return {
@@ -57,7 +67,9 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { insertDefaultBlock, startTyping } = dispatch( 'core/block-editor' );
+		const { insertDefaultBlock, startTyping } = dispatch(
+			'core/block-editor'
+		);
 
 		return {
 			onAppend() {

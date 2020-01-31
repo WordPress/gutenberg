@@ -36,7 +36,8 @@ const defaultConfigArgs = ! hasLintConfig
 
 // See: https://github.com/tclindner/npm-package-json-lint/#cli-commands-and-configuration.
 const hasIgnoredFiles =
-	hasArgInCLI( '--ignorePath' ) || hasProjectFile( '.npmpackagejsonlintignore' );
+	hasArgInCLI( '--ignorePath' ) ||
+	hasProjectFile( '.npmpackagejsonlintignore' );
 
 const defaultIgnoreArgs = ! hasIgnoredFiles
 	? [ '--ignorePath', fromConfigRoot( '.npmpackagejsonlintignore' ) ]
@@ -44,7 +45,12 @@ const defaultIgnoreArgs = ! hasIgnoredFiles
 
 const result = spawn(
 	resolveBin( 'npm-package-json-lint', { executable: 'npmPkgJsonLint' } ),
-	[ ...defaultConfigArgs, ...defaultIgnoreArgs, ...args, ...defaultFilesArgs ],
+	[
+		...defaultConfigArgs,
+		...defaultIgnoreArgs,
+		...args,
+		...defaultFilesArgs,
+	],
 	{ stdio: 'inherit' }
 );
 

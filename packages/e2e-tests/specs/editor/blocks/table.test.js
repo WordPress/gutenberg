@@ -42,7 +42,9 @@ describe( 'Table', () => {
 
 		// Modify the column count.
 		await columnCountLabel[ 0 ].click();
-		const currentColumnCount = await page.evaluate( () => document.activeElement.value );
+		const currentColumnCount = await page.evaluate(
+			() => document.activeElement.value
+		);
 		expect( currentColumnCount ).toBe( '2' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '5' );
@@ -55,7 +57,9 @@ describe( 'Table', () => {
 
 		// Modify the row count.
 		await rowCountLabel[ 0 ].click();
-		const currentRowCount = await page.evaluate( () => document.activeElement.value );
+		const currentRowCount = await page.evaluate(
+			() => document.activeElement.value
+		);
 		expect( currentRowCount ).toBe( '2' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '10' );
@@ -145,8 +149,12 @@ describe( 'Table', () => {
 		await clickButton( createButtonLabel );
 
 		// Toggle on the switches and add some content.
-		const headerSwitch = await page.$x( "//label[text()='Header section']" );
-		const footerSwitch = await page.$x( "//label[text()='Footer section']" );
+		const headerSwitch = await page.$x(
+			"//label[text()='Header section']"
+		);
+		const footerSwitch = await page.$x(
+			"//label[text()='Footer section']"
+		);
 		await headerSwitch[ 0 ].click();
 		await footerSwitch[ 0 ].click();
 
@@ -214,7 +222,9 @@ describe( 'Table', () => {
 		await clickButton( createButtonLabel );
 
 		// Enable fixed width as it exascerbates the amount of empty space around the RichText.
-		const [ fixedWidthSwitch ] = await page.$x( "//label[text()='Fixed width table cells']" );
+		const [ fixedWidthSwitch ] = await page.$x(
+			"//label[text()='Fixed width table cells']"
+		);
 		await fixedWidthSwitch.click();
 
 		// Add multiple new lines to the first cell to make it taller.
@@ -223,7 +233,9 @@ describe( 'Table', () => {
 
 		// Get the bounding client rect for the second cell.
 		const { x: secondCellX, y: secondCellY } = await page.evaluate( () => {
-			const secondCell = document.querySelectorAll( '.wp-block-table td' )[ 1 ];
+			const secondCell = document.querySelectorAll(
+				'.wp-block-table td'
+			)[ 1 ];
 			// Page.evaluate can only return a serializable value to the
 			// parent process, so destructure and restructure the result
 			// into an object.

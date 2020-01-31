@@ -4189,7 +4189,8 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
       Move the gray box around.
     </p>
     <p>
-      The 
+      The
+       
       <strong
         style={
           Object {
@@ -4199,10 +4200,12 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
       >
         pink bordered
       </strong>
-       element is a parent.
+       
+      element is a parent.
     </p>
     <p>
-      The 
+      The
+       
       <strong
         style={
           Object {
@@ -4212,7 +4215,8 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
       >
         cyan bordered
       </strong>
-       element is a sibling to 
+       
+      element is a sibling to 
       <strong>
         Popover
       </strong>
@@ -4861,7 +4865,8 @@ exports[`Storyshots Components/ScrollLock Default 1`] = `
         Toggle Scroll Lock
       </button>
       <p>
-        Scroll locked: 
+        Scroll locked:
+         
         <strong>
           No
         </strong>
@@ -5650,7 +5655,8 @@ Array [
     This should not show.
   </div>,
   <div>
-    This text will 
+    This text will
+     
     <span
       className="components-visually-hidden"
     >

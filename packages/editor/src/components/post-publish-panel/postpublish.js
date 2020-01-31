@@ -6,7 +6,12 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { PanelBody, Button, ClipboardButton, TextControl } from '@wordpress/components';
+import {
+	PanelBody,
+	Button,
+	ClipboardButton,
+	TextControl,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
@@ -63,7 +68,8 @@ class PostPublishPanelPostpublish extends Component {
 
 		const postPublishNonLinkHeader = isScheduled ? (
 			<>
-				{ __( 'is now scheduled. It will go live on' ) } <PostScheduleLabel />.
+				{ __( 'is now scheduled. It will go live on' ) }{ ' ' }
+				<PostScheduleLabel />.
 			</>
 		) : (
 			__( 'is now live.' )
@@ -99,8 +105,14 @@ class PostPublishPanelPostpublish extends Component {
 							</Button>
 						) }
 
-						<ClipboardButton isSecondary text={ post.link } onCopy={ this.onCopy }>
-							{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy Link' ) }
+						<ClipboardButton
+							isSecondary
+							text={ post.link }
+							onCopy={ this.onCopy }
+						>
+							{ this.state.showCopyConfirmation
+								? __( 'Copied!' )
+								: __( 'Copy Link' ) }
 						</ClipboardButton>
 					</div>
 				</PanelBody>
@@ -111,9 +123,11 @@ class PostPublishPanelPostpublish extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const { getEditedPostAttribute, getCurrentPost, isCurrentPostScheduled } = select(
-		'core/editor'
-	);
+	const {
+		getEditedPostAttribute,
+		getCurrentPost,
+		isCurrentPostScheduled,
+	} = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
 
 	return {

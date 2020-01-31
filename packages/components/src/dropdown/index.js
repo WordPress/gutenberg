@@ -90,7 +90,10 @@ class Dropdown extends Component {
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 
 		return (
-			<div className={ classnames( 'components-dropdown', className ) } ref={ this.containerRef }>
+			<div
+				className={ classnames( 'components-dropdown', className ) }
+				ref={ this.containerRef }
+			>
 				{ renderToggle( args ) }
 				{ isOpen && (
 					<Popover

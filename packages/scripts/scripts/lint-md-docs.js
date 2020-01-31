@@ -37,7 +37,9 @@ const defaultConfigArgs = ! hasLintConfig
 // See: https://github.com/igorshubovych/markdownlint-cli#ignoring-files
 // Check if ignore specified on command-line or project file
 const hasIgnoredFiles =
-	hasArgInCLI( '--ignore' ) || hasArgInCLI( '-i' ) || hasProjectFile( '.markdownlintignore' );
+	hasArgInCLI( '--ignore' ) ||
+	hasArgInCLI( '-i' ) ||
+	hasProjectFile( '.markdownlintignore' );
 
 // Default ignore [ build, node_modules ] directories
 // TODO: Once https://github.com/igorshubovych/markdownlint-cli/issues/46 is in
@@ -50,7 +52,12 @@ const defaultIgnoreArgs = ! hasIgnoredFiles
 
 const result = spawn(
 	resolveBin( 'markdownlint-cli', { executable: 'markdownlint' } ),
-	[ ...defaultConfigArgs, ...defaultIgnoreArgs, ...args, ...defaultFilesArgs ],
+	[
+		...defaultConfigArgs,
+		...defaultIgnoreArgs,
+		...args,
+		...defaultFilesArgs,
+	],
 	{ stdio: 'inherit' }
 );
 

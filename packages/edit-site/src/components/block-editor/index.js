@@ -23,7 +23,10 @@ import Sidebar from '../sidebar';
 
 export default function BlockEditor( { settings: _settings } ) {
 	const canUserCreateMedia = useSelect( ( select ) => {
-		const _canUserCreateMedia = select( 'core' ).canUser( 'create', 'media' );
+		const _canUserCreateMedia = select( 'core' ).canUser(
+			'create',
+			'media'
+		);
 		return _canUserCreateMedia || _canUserCreateMedia !== false;
 	}, [] );
 	const settings = useMemo( () => {
@@ -41,7 +44,11 @@ export default function BlockEditor( { settings: _settings } ) {
 			},
 		};
 	}, [ canUserCreateMedia, _settings ] );
-	const [ content, _setContent ] = useEntityProp( 'postType', 'wp_template', 'content' );
+	const [ content, _setContent ] = useEntityProp(
+		'postType',
+		'wp_template',
+		'content'
+	);
 	const initialBlocks = useMemo( () => {
 		if ( typeof content !== 'function' ) {
 			const parsedContent = parse( content );

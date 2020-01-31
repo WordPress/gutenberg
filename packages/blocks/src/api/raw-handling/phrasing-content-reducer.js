@@ -12,7 +12,13 @@ export default function( node, doc ) {
 	// In jsdom-jscore, 'node.style' can be null.
 	// TODO: Explore fixing this by patching jsdom-jscore.
 	if ( node.nodeName === 'SPAN' && node.style ) {
-		const { fontWeight, fontStyle, textDecorationLine, textDecoration, verticalAlign } = node.style;
+		const {
+			fontWeight,
+			fontStyle,
+			textDecorationLine,
+			textDecoration,
+			verticalAlign,
+		} = node.style;
 
 		if ( fontWeight === 'bold' || fontWeight === '700' ) {
 			wrap( doc.createElement( 'strong' ), node );
@@ -25,7 +31,10 @@ export default function( node, doc ) {
 		// Some DOM implementations (Safari, JSDom) don't support
 		// style.textDecorationLine, so we check style.textDecoration as a
 		// fallback.
-		if ( textDecorationLine === 'line-through' || includes( textDecoration, 'line-through' ) ) {
+		if (
+			textDecorationLine === 'line-through' ||
+			includes( textDecoration, 'line-through' )
+		) {
 			wrap( doc.createElement( 's' ), node );
 		}
 

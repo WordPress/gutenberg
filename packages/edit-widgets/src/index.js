@@ -26,7 +26,10 @@ export function initialize( id, settings ) {
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
-	render( <EditWidgetsInitializer settings={ settings } />, document.getElementById( id ) );
+	render(
+		<EditWidgetsInitializer settings={ settings } />,
+		document.getElementById( id )
+	);
 }
 
 /**

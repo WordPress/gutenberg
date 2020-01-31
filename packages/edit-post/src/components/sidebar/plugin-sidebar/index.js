@@ -49,7 +49,11 @@ function PluginSidebar( props ) {
 					{ isPinnable && (
 						<Button
 							icon={ isPinned ? 'star-filled' : 'star-empty' }
-							label={ isPinned ? __( 'Unpin from toolbar' ) : __( 'Pin to toolbar' ) }
+							label={
+								isPinned
+									? __( 'Unpin from toolbar' )
+									: __( 'Pin to toolbar' )
+							}
 							onClick={ togglePin }
 							isPressed={ isPinned }
 							aria-expanded={ isPinned }
@@ -134,7 +138,9 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { sidebarName } ) => {
-		const { getActiveGeneralSidebarName, isPluginItemPinned } = select( 'core/edit-post' );
+		const { getActiveGeneralSidebarName, isPluginItemPinned } = select(
+			'core/edit-post'
+		);
 
 		return {
 			isActive: getActiveGeneralSidebarName() === sidebarName,
@@ -142,9 +148,11 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { isActive, sidebarName } ) => {
-		const { closeGeneralSidebar, openGeneralSidebar, togglePinnedPluginItem } = dispatch(
-			'core/edit-post'
-		);
+		const {
+			closeGeneralSidebar,
+			openGeneralSidebar,
+			togglePinnedPluginItem,
+		} = dispatch( 'core/edit-post' );
 
 		return {
 			togglePin() {

@@ -72,7 +72,11 @@ export function __experimentalRemoveAnnotation( annotationId ) {
  *
  * @return {Object} Action object.
  */
-export function __experimentalUpdateAnnotationRange( annotationId, start, end ) {
+export function __experimentalUpdateAnnotationRange(
+	annotationId,
+	start,
+	end
+) {
 	return {
 		type: 'ANNOTATION_UPDATE_RANGE',
 		annotationId,

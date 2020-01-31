@@ -9,7 +9,11 @@ import { FlatList, View, Text, TouchableHighlight } from 'react-native';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { withInstanceId, compose, withPreferredColorScheme } from '@wordpress/compose';
+import {
+	withInstanceId,
+	compose,
+	withPreferredColorScheme,
+} from '@wordpress/compose';
 import { BottomSheet, Icon } from '@wordpress/components';
 
 /**
@@ -38,14 +42,18 @@ export class InserterMenu extends Component {
 
 	calculateNumberOfColumns() {
 		const bottomSheetWidth = BottomSheet.getWidth();
-		const { paddingLeft: itemPaddingLeft, paddingRight: itemPaddingRight } = styles.modalItem;
+		const {
+			paddingLeft: itemPaddingLeft,
+			paddingRight: itemPaddingRight,
+		} = styles.modalItem;
 		const {
 			paddingLeft: containerPaddingLeft,
 			paddingRight: containerPaddingRight,
 		} = styles.content;
 		const { width: itemWidth } = styles.modalIconWrapper;
 		const itemTotalWidth = itemWidth + itemPaddingLeft + itemPaddingRight;
-		const containerTotalWidth = bottomSheetWidth - ( containerPaddingLeft + containerPaddingRight );
+		const containerTotalWidth =
+			bottomSheetWidth - ( containerPaddingLeft + containerPaddingRight );
 		return Math.floor( containerTotalWidth / itemTotalWidth );
 	}
 
@@ -70,7 +78,10 @@ export class InserterMenu extends Component {
 			styles.modalIconWrapper,
 			styles.modalIconWrapperDark
 		);
-		const modalIconStyle = getStylesFromColorScheme( styles.modalIcon, styles.modalIconDark );
+		const modalIconStyle = getStylesFromColorScheme(
+			styles.modalIcon,
+			styles.modalIconDark
+		);
 		const modalItemLabelStyle = getStylesFromColorScheme(
 			styles.modalItemLabel,
 			styles.modalItemLabelDark
@@ -90,7 +101,9 @@ export class InserterMenu extends Component {
 					keyboardShouldPersistTaps="always"
 					numColumns={ this.state.numberOfColumns }
 					data={ this.props.items }
-					ItemSeparatorComponent={ () => <View style={ styles.rowSeparator } /> }
+					ItemSeparatorComponent={ () => (
+						<View style={ styles.rowSeparator } />
+					) }
 					keyExtractor={ ( item ) => item.name }
 					renderItem={ ( { item } ) => (
 						<TouchableHighlight
@@ -110,7 +123,9 @@ export class InserterMenu extends Component {
 										/>
 									</View>
 								</View>
-								<Text style={ modalItemLabelStyle }>{ item.title }</Text>
+								<Text style={ modalItemLabelStyle }>
+									{ item.title }
+								</Text>
 							</View>
 						</TouchableHighlight>
 					) }
@@ -135,12 +150,17 @@ export default compose(
 		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
 			const end = getBlockSelectionEnd();
 			if ( end ) {
-				destinationRootClientId = getBlockRootClientId( end ) || undefined;
+				destinationRootClientId =
+					getBlockRootClientId( end ) || undefined;
 			}
 		}
-		const destinationRootBlockName = getBlockName( destinationRootClientId );
+		const destinationRootBlockName = getBlockName(
+			destinationRootClientId
+		);
 
-		const { __experimentalShouldInsertAtTheTop: shouldInsertAtTheTop } = getSettings();
+		const {
+			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
+		} = getSettings();
 
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
@@ -163,7 +183,9 @@ export default compose(
 		return {
 			showInsertionPoint() {
 				if ( ownProps.shouldReplaceBlock ) {
-					const { getBlockOrder, getBlockCount } = select( 'core/block-editor' );
+					const { getBlockOrder, getBlockCount } = select(
+						'core/block-editor'
+					);
 
 					const count = getBlockCount();
 					if ( count === 1 ) {
@@ -172,14 +194,17 @@ export default compose(
 						clearSelectedBlock();
 						resetBlocks( [] );
 					} else {
-						const blockToReplace = getBlockOrder( ownProps.destinationRootClientId )[
-							ownProps.insertionIndex
-						];
+						const blockToReplace = getBlockOrder(
+							ownProps.destinationRootClientId
+						)[ ownProps.insertionIndex ];
 
 						removeBlock( blockToReplace, false );
 					}
 				}
-				showInsertionPoint( ownProps.destinationRootClientId, ownProps.insertionIndex );
+				showInsertionPoint(
+					ownProps.destinationRootClientId,
+					ownProps.insertionIndex
+				);
 			},
 			hideInsertionPoint,
 			onSelect( item ) {
@@ -187,12 +212,20 @@ export default compose(
 
 				const insertedBlock = createBlock( name, initialAttributes );
 
-				insertBlock( insertedBlock, ownProps.insertionIndex, ownProps.destinationRootClientId );
+				insertBlock(
+					insertedBlock,
+					ownProps.insertionIndex,
+					ownProps.destinationRootClientId
+				);
 
 				ownProps.onSelect();
 			},
 			insertDefaultBlock() {
-				insertDefaultBlock( {}, ownProps.destinationRootClientId, ownProps.insertionIndex );
+				insertDefaultBlock(
+					{},
+					ownProps.destinationRootClientId,
+					ownProps.insertionIndex
+				);
 			},
 		};
 	} ),

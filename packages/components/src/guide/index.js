@@ -19,7 +19,13 @@ import PageControl from './page-control';
 import { BackButtonIcon, ForwardButtonIcon } from './icons';
 import FinishButton from './finish-button';
 
-export default function Guide( { children, className, contentLabel, finishButtonText, onFinish } ) {
+export default function Guide( {
+	children,
+	className,
+	contentLabel,
+	finishButtonText,
+	onFinish,
+} ) {
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
 	const numberOfPages = Children.count( children );
@@ -60,7 +66,10 @@ export default function Guide( { children, className, contentLabel, finishButton
 				{ children[ currentPage ] }
 
 				{ ! canGoForward && (
-					<FinishButton className="components-guide__inline-finish-button" onClick={ onFinish }>
+					<FinishButton
+						className="components-guide__inline-finish-button"
+						onClick={ onFinish }
+					>
 						{ finishButtonText || __( 'Finish' ) }
 					</FinishButton>
 				) }
@@ -90,7 +99,10 @@ export default function Guide( { children, className, contentLabel, finishButton
 						</Button>
 					) }
 					{ ! canGoForward && (
-						<FinishButton className="components-guide__finish-button" onClick={ onFinish }>
+						<FinishButton
+							className="components-guide__finish-button"
+							onClick={ onFinish }
+						>
 							{ finishButtonText || __( 'Finish' ) }
 						</FinishButton>
 					) }

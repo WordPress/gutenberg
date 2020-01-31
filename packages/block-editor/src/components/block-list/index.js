@@ -56,7 +56,9 @@ function BlockList( {
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
-			enableAnimation: ! isTyping() && getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+			enableAnimation:
+				! isTyping() &&
+				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 		};
 	}
 
@@ -77,14 +79,23 @@ function BlockList( {
 	} );
 
 	return (
-		<Container ref={ ref } className={ classnames( 'block-editor-block-list__layout', className ) }>
+		<Container
+			ref={ ref }
+			className={ classnames(
+				'block-editor-block-list__layout',
+				className
+			) }
+		>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
 				return (
-					<AsyncModeProvider key={ clientId } value={ ! isBlockInSelection }>
+					<AsyncModeProvider
+						key={ clientId }
+						value={ ! isBlockInSelection }
+					>
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
@@ -95,8 +106,14 @@ function BlockList( {
 							// otherwise there might be a small delay to trigger the animation.
 							animateOnChange={ index }
 							enableAnimation={ enableAnimation }
-							hasSelectedUI={ __experimentalUIParts.hasSelectedUI }
-							className={ clientId === targetClientId ? 'is-drop-target' : undefined }
+							hasSelectedUI={
+								__experimentalUIParts.hasSelectedUI
+							}
+							className={
+								clientId === targetClientId
+									? 'is-drop-target'
+									: undefined
+							}
 						/>
 					</AsyncModeProvider>
 				);
@@ -104,7 +121,9 @@ function BlockList( {
 			<BlockListAppender
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
-				className={ targetClientId === null ? 'is-drop-target' : undefined }
+				className={
+					targetClientId === null ? 'is-drop-target' : undefined
+				}
 			/>
 			<__experimentalBlockListFooter.Slot />
 		</Container>

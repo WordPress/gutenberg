@@ -8,7 +8,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { __experimentalGetBlockLabel as getBlockLabel, getBlockType } from '@wordpress/blocks';
+import {
+	__experimentalGetBlockLabel as getBlockLabel,
+	getBlockType,
+} from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -44,28 +47,37 @@ export default function BlockNavigationList( {
 					<li key={ block.clientId }>
 						<div className="block-editor-block-navigation__item">
 							<Button
-								className={ classnames( 'block-editor-block-navigation__item-button', {
-									'is-selected': isSelected,
-								} ) }
+								className={ classnames(
+									'block-editor-block-navigation__item-button',
+									{
+										'is-selected': isSelected,
+									}
+								) }
 								onClick={ () => selectBlock( block.clientId ) }
 							>
 								<BlockIcon icon={ blockType.icon } showColors />
 								{ getBlockLabel( blockType, block.attributes ) }
 								{ isSelected && (
-									<span className="screen-reader-text">{ __( '(selected block)' ) }</span>
+									<span className="screen-reader-text">
+										{ __( '(selected block)' ) }
+									</span>
 								) }
 							</Button>
 						</div>
-						{ showNestedBlocks && !! block.innerBlocks && !! block.innerBlocks.length && (
-							<BlockNavigationList
-								blocks={ block.innerBlocks }
-								selectedBlockClientId={ selectedBlockClientId }
-								selectBlock={ selectBlock }
-								parentBlockClientId={ block.clientId }
-								showAppender={ showAppender }
-								showNestedBlocks
-							/>
-						) }
+						{ showNestedBlocks &&
+							!! block.innerBlocks &&
+							!! block.innerBlocks.length && (
+								<BlockNavigationList
+									blocks={ block.innerBlocks }
+									selectedBlockClientId={
+										selectedBlockClientId
+									}
+									selectBlock={ selectBlock }
+									parentBlockClientId={ block.clientId }
+									showAppender={ showAppender }
+									showNestedBlocks
+								/>
+							) }
 					</li>
 				);
 			} ) }

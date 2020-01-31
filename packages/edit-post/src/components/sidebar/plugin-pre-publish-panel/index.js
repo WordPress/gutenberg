@@ -6,7 +6,13 @@ import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
 const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
 
-const PluginPrePublishPanelFill = ( { children, className, title, initialOpen = false, icon } ) => (
+const PluginPrePublishPanelFill = ( {
+	children,
+	className,
+	title,
+	initialOpen = false,
+	icon,
+} ) => (
 	<Fill>
 		<PanelBody
 			className={ className }

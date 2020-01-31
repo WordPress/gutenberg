@@ -6,7 +6,12 @@ const { basename } = require( 'path' );
 /**
  * Internal dependencies
  */
-const { getArgsFromCLI, getFileArgsFromCLI, hasArgInCLI, hasFileArgInCLI } = require( './cli' );
+const {
+	getArgsFromCLI,
+	getFileArgsFromCLI,
+	hasArgInCLI,
+	hasFileArgInCLI,
+} = require( './cli' );
 const { fromConfigRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
 
@@ -41,7 +46,8 @@ const hasWebpackConfig = () =>
 const getWebpackArgs = ( additionalArgs = [] ) => {
 	let webpackArgs = getArgsFromCLI();
 
-	const hasWebpackOutputOption = hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
+	const hasWebpackOutputOption =
+		hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
 	if ( hasFileArgInCLI() && ! hasWebpackOutputOption ) {
 		/**
 		 * Converts a path to the entry format supported by webpack, e.g.:
@@ -65,7 +71,10 @@ const getWebpackArgs = ( additionalArgs = [] ) => {
 		// The following handles the support for multiple entry points in webpack, e.g.:
 		// `wp-scripts build one.js custom=./two.js` -> `webpack one=./one.js custom=./two.js`
 		webpackArgs = webpackArgs.map( ( cliArg ) => {
-			if ( getFileArgsFromCLI().includes( cliArg ) && ! cliArg.includes( '=' ) ) {
+			if (
+				getFileArgsFromCLI().includes( cliArg ) &&
+				! cliArg.includes( '=' )
+			) {
 				return pathToEntry( cliArg );
 			}
 

@@ -23,7 +23,9 @@ describe( 'PluginMoreMenuItem', () => {
 	test( 'renders menu item as button properly', () => {
 		const component = ReactTestRenderer.create(
 			<SlotFillProvider>
-				<PluginMoreMenuItem icon="smiley">My plugin button menu item</PluginMoreMenuItem>
+				<PluginMoreMenuItem icon="smiley">
+					My plugin button menu item
+				</PluginMoreMenuItem>
 				<PluginsMoreMenuGroup.Slot fillProps={ fillProps } />
 			</SlotFillProvider>
 		);

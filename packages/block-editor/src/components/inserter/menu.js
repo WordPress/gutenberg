@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { filter, findIndex, flow, groupBy, isEmpty, map, sortBy, without, includes } from 'lodash';
+import {
+	filter,
+	findIndex,
+	flow,
+	groupBy,
+	isEmpty,
+	map,
+	sortBy,
+	without,
+	includes,
+} from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 import classnames from 'classnames';
 
@@ -10,7 +20,11 @@ import classnames from 'classnames';
  */
 import { speak } from '@wordpress/a11y';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { Component, __experimentalCreateInterpolateElement, createRef } from '@wordpress/element';
+import {
+	Component,
+	__experimentalCreateInterpolateElement,
+	createRef,
+} from '@wordpress/element';
 import { PanelBody, withSpokenMessages, Tip } from '@wordpress/components';
 import {
 	isReusableBlock,
@@ -42,8 +56,14 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 // Copied over from the Columns block. It seems like it should become part of public API.
 const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map( innerBlocksTemplate, ( [ name, attributes, innerBlocks = [] ] ) =>
-		createBlock( name, attributes, createBlocksFromInnerBlocksTemplate( innerBlocks ) )
+	return map(
+		innerBlocksTemplate,
+		( [ name, attributes, innerBlocks = [] ] ) =>
+			createBlock(
+				name,
+				attributes,
+				createBlocksFromInnerBlocksTemplate( innerBlocks )
+			)
 	);
 };
 
@@ -116,9 +136,13 @@ export class InserterMenu extends Component {
 
 				this.props.setTimeout( () => {
 					// We need a generic way to access the panel's container
-					scrollIntoView( this.panels[ panel ], this.inserterResults.current, {
-						alignWithTop: true,
-					} );
+					scrollIntoView(
+						this.panels[ panel ],
+						this.inserterResults.current,
+						{
+							alignWithTop: true,
+						}
+					);
 				} );
 			}
 		};
@@ -152,25 +176,46 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { categories, collections, debouncedSpeak, items, rootChildBlocks } = this.props;
+		const {
+			categories,
+			collections,
+			debouncedSpeak,
+			items,
+			rootChildBlocks,
+		} = this.props;
 
-		const filteredItems = searchItems( items, categories, collections, filterValue );
+		const filteredItems = searchItems(
+			items,
+			categories,
+			collections,
+			filterValue
+		);
 
-		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
+		const childItems = filter( filteredItems, ( { name } ) =>
+			includes( rootChildBlocks, name )
+		);
 
 		let suggestedItems = [];
 		if ( ! filterValue ) {
-			const maxSuggestedItems = this.props.maxSuggestedItems || MAX_SUGGESTED_ITEMS;
-			suggestedItems = filter( items, ( item ) => item.utility > 0 ).slice( 0, maxSuggestedItems );
+			const maxSuggestedItems =
+				this.props.maxSuggestedItems || MAX_SUGGESTED_ITEMS;
+			suggestedItems = filter(
+				items,
+				( item ) => item.utility > 0
+			).slice( 0, maxSuggestedItems );
 		}
 
 		const reusableItems = filter( filteredItems, { category: 'reusable' } );
 
 		const getCategoryIndex = ( item ) => {
-			return findIndex( categories, ( category ) => category.slug === item.category );
+			return findIndex(
+				categories,
+				( category ) => category.slug === item.category
+			);
 		};
 		const itemsPerCategory = flow(
-			( itemList ) => filter( itemList, ( item ) => item.category !== 'reusable' ),
+			( itemList ) =>
+				filter( itemList, ( item ) => item.category !== 'reusable' ),
 			( itemList ) => sortBy( itemList, getCategoryIndex ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( filteredItems );
@@ -205,7 +250,9 @@ export class InserterMenu extends Component {
 
 		const resultCount = Object.keys( itemsPerCategory ).reduce(
 			( accumulator, currentCategorySlug ) => {
-				return accumulator + itemsPerCategory[ currentCategorySlug ].length;
+				return (
+					accumulator + itemsPerCategory[ currentCategorySlug ].length
+				);
 			},
 			0
 		);
@@ -218,7 +265,12 @@ export class InserterMenu extends Component {
 	}
 
 	onKeyDown( event ) {
-		if ( includes( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ], event.keyCode ) ) {
+		if (
+			includes(
+				[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ],
+				event.keyCode
+			)
+		) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
 			event.stopPropagation();
 		}
@@ -249,7 +301,9 @@ export class InserterMenu extends Component {
 			! isEmpty( reusableItems ) ||
 			! isEmpty( itemsPerCategory ) ||
 			! isEmpty( itemsPerCollection );
-		const hoveredItemBlockType = hoveredItem ? getBlockType( hoveredItem.name ) : null;
+		const hoveredItemBlockType = hoveredItem
+			? getBlockType( hoveredItem.name )
+			: null;
 		const hasHelpPanel = hasItems && showInserterHelpPanel;
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
@@ -312,7 +366,8 @@ export class InserterMenu extends Component {
 						) }
 
 						{ map( categories, ( category ) => {
-							const categoryItems = itemsPerCategory[ category.slug ];
+							const categoryItems =
+								itemsPerCategory[ category.slug ];
 							if ( ! categoryItems || ! categoryItems.length ) {
 								return null;
 							}
@@ -322,7 +377,9 @@ export class InserterMenu extends Component {
 									title={ category.title }
 									icon={ category.icon }
 									opened={ isPanelOpen( category.slug ) }
-									onToggle={ this.onTogglePanel( category.slug ) }
+									onToggle={ this.onTogglePanel(
+										category.slug
+									) }
 									ref={ this.bindPanel( category.slug ) }
 								>
 									<BlockTypesList
@@ -335,8 +392,12 @@ export class InserterMenu extends Component {
 						} ) }
 
 						{ map( collections, ( collection, namespace ) => {
-							const collectionItems = itemsPerCollection[ namespace ];
-							if ( ! collectionItems || ! collectionItems.length ) {
+							const collectionItems =
+								itemsPerCollection[ namespace ];
+							if (
+								! collectionItems ||
+								! collectionItems.length
+							) {
 								return null;
 							}
 
@@ -374,7 +435,9 @@ export class InserterMenu extends Component {
 								/>
 								<a
 									className="block-editor-inserter__manage-reusable-blocks"
-									href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
+									href={ addQueryArgs( 'edit.php', {
+										post_type: 'wp_block',
+									} ) }
 								>
 									{ __( 'Manage all reusable blocks' ) }
 								</a>
@@ -410,23 +473,37 @@ export class InserterMenu extends Component {
 					<div className="block-editor-inserter__menu-help-panel">
 						{ hoveredItem && (
 							<>
-								{ ! isReusableBlock( hoveredItem ) && <BlockCard blockType={ hoveredItem } /> }
+								{ ! isReusableBlock( hoveredItem ) && (
+									<BlockCard blockType={ hoveredItem } />
+								) }
 								<div className="block-editor-inserter__preview">
-									{ isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ? (
+									{ isReusableBlock( hoveredItem ) ||
+									hoveredItemBlockType.example ? (
 										<div className="block-editor-inserter__preview-content">
 											<BlockPreview
 												padding={ 10 }
 												viewportWidth={ 500 }
 												blocks={
 													hoveredItemBlockType.example
-														? getBlockFromExample( hoveredItem.name, {
-																attributes: {
-																	...hoveredItemBlockType.example.attributes,
-																	...hoveredItem.initialAttributes,
-																},
-																innerBlocks: hoveredItemBlockType.example.innerBlocks,
-														  } )
-														: createBlock( hoveredItem.name, hoveredItem.initialAttributes )
+														? getBlockFromExample(
+																hoveredItem.name,
+																{
+																	attributes: {
+																		...hoveredItemBlockType
+																			.example
+																			.attributes,
+																		...hoveredItem.initialAttributes,
+																	},
+																	innerBlocks:
+																		hoveredItemBlockType
+																			.example
+																			.innerBlocks,
+																}
+														  )
+														: createBlock(
+																hoveredItem.name,
+																hoveredItem.initialAttributes
+														  )
 												}
 											/>
 										</div>
@@ -455,12 +532,16 @@ export class InserterMenu extends Component {
 										) }
 									</p>
 									<p>
-										{ __( 'Browse through the library to learn more about what each block does.' ) }
+										{ __(
+											'Browse through the library to learn more about what each block does.'
+										) }
 									</p>
 								</div>
 								<Tip>
 									{ __experimentalCreateInterpolateElement(
-										__( 'While writing, you can press <kbd>/</kbd> to quickly insert new blocks.' ),
+										__(
+											'While writing, you can press <kbd>/</kbd> to quickly insert new blocks.'
+										),
 										{ kbd: <kbd /> }
 									) }
 								</Tip>
@@ -475,42 +556,57 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withSelect( ( select, { clientId, isAppender, rootClientId, showInserterHelpPanel } ) => {
-		const {
-			getInserterItems,
-			getBlockName,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-			getSettings,
-		} = select( 'core/block-editor' );
-		const { getCategories, getCollections, getChildBlockNames } = select( 'core/blocks' );
+	withSelect(
+		(
+			select,
+			{ clientId, isAppender, rootClientId, showInserterHelpPanel }
+		) => {
+			const {
+				getInserterItems,
+				getBlockName,
+				getBlockRootClientId,
+				getBlockSelectionEnd,
+				getSettings,
+			} = select( 'core/block-editor' );
+			const {
+				getCategories,
+				getCollections,
+				getChildBlockNames,
+			} = select( 'core/blocks' );
 
-		let destinationRootClientId = rootClientId;
-		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
-			const end = getBlockSelectionEnd();
-			if ( end ) {
-				destinationRootClientId = getBlockRootClientId( end ) || undefined;
+			let destinationRootClientId = rootClientId;
+			if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
+				const end = getBlockSelectionEnd();
+				if ( end ) {
+					destinationRootClientId =
+						getBlockRootClientId( end ) || undefined;
+				}
 			}
+			const destinationRootBlockName = getBlockName(
+				destinationRootClientId
+			);
+
+			const {
+				showInserterHelpPanel: showInserterHelpPanelSetting,
+				__experimentalFetchReusableBlocks: fetchReusableBlocks,
+			} = getSettings();
+
+			return {
+				categories: getCategories(),
+				collections: getCollections(),
+				rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
+				items: getInserterItems( destinationRootClientId ),
+				showInserterHelpPanel:
+					showInserterHelpPanel && showInserterHelpPanelSetting,
+				destinationRootClientId,
+				fetchReusableBlocks,
+			};
 		}
-		const destinationRootBlockName = getBlockName( destinationRootClientId );
-
-		const {
-			showInserterHelpPanel: showInserterHelpPanelSetting,
-			__experimentalFetchReusableBlocks: fetchReusableBlocks,
-		} = getSettings();
-
-		return {
-			categories: getCategories(),
-			collections: getCollections(),
-			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-			items: getInserterItems( destinationRootClientId ),
-			showInserterHelpPanel: showInserterHelpPanel && showInserterHelpPanelSetting,
-			destinationRootClientId,
-			fetchReusableBlocks,
-		};
-	} ),
+	),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
-		const { showInsertionPoint, hideInsertionPoint } = dispatch( 'core/block-editor' );
+		const { showInsertionPoint, hideInsertionPoint } = dispatch(
+			'core/block-editor'
+		);
 
 		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
 		// This breaks the withDispatch not containing any logic rule.
@@ -518,7 +614,11 @@ export default compose(
 		// it's fine to extract it.
 		// eslint-disable-next-line no-restricted-syntax
 		function getInsertionIndex() {
-			const { getBlockIndex, getBlockSelectionEnd, getBlockOrder } = select( 'core/block-editor' );
+			const {
+				getBlockIndex,
+				getBlockSelectionEnd,
+				getBlockOrder,
+			} = select( 'core/block-editor' );
 			const { clientId, destinationRootClientId, isAppender } = ownProps;
 
 			// If the clientId is defined, we insert at the position of the block.
@@ -543,7 +643,9 @@ export default compose(
 			},
 			hideInsertionPoint,
 			onSelect( item ) {
-				const { replaceBlocks, insertBlock } = dispatch( 'core/block-editor' );
+				const { replaceBlocks, insertBlock } = dispatch(
+					'core/block-editor'
+				);
 				const { getSelectedBlock } = select( 'core/block-editor' );
 				const {
 					isAppender,
@@ -558,7 +660,11 @@ export default compose(
 					createBlocksFromInnerBlocksTemplate( innerBlocks )
 				);
 
-				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+				if (
+					! isAppender &&
+					selectedBlock &&
+					isUnmodifiedDefaultBlock( selectedBlock )
+				) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
 					insertBlock(
@@ -570,7 +676,10 @@ export default compose(
 
 					if ( ! selectBlockOnInsert ) {
 						// translators: %s: the name of the block that has been added
-						const message = sprintf( __( '%s block added' ), title );
+						const message = sprintf(
+							__( '%s block added' ),
+							title
+						);
 						speak( message );
 					}
 				}

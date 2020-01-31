@@ -13,14 +13,20 @@ import { useDispatch, useSelect } from '@wordpress/data';
 
 function SaveButton() {
 	const { editedWidgetAreaIds, isSaving } = useSelect( ( select ) => {
-		const { hasEditsForEntityRecord, isSavingEntityRecord, getEntityRecords } = select( 'core' );
+		const {
+			hasEditsForEntityRecord,
+			isSavingEntityRecord,
+			getEntityRecords,
+		} = select( 'core' );
 		const widgetAreas = getEntityRecords( 'root', 'widgetArea' );
 		const widgetAreaIds = map( widgetAreas, ( { id } ) => id );
 		return {
 			editedWidgetAreaIds: filter( widgetAreaIds, ( id ) =>
 				hasEditsForEntityRecord( 'root', 'widgetArea', id )
 			),
-			isSaving: some( widgetAreaIds, ( id ) => isSavingEntityRecord( 'root', 'widgetArea', id ) ),
+			isSaving: some( widgetAreaIds, ( id ) =>
+				isSavingEntityRecord( 'root', 'widgetArea', id )
+			),
 		};
 	}, [] );
 	const { saveEditedEntityRecord } = useDispatch( 'core' );

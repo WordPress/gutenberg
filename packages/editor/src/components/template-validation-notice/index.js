@@ -15,7 +15,9 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 		if (
 			// eslint-disable-next-line no-alert
 			window.confirm(
-				__( 'Resetting the template may result in loss of content, do you want to continue?' )
+				__(
+					'Resetting the template may result in loss of content, do you want to continue?'
+				)
 			)
 		) {
 			props.synchronizeTemplate();
@@ -23,9 +25,15 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 	};
 
 	return (
-		<Notice className="editor-template-validation-notice" isDismissible={ false } status="warning">
+		<Notice
+			className="editor-template-validation-notice"
+			isDismissible={ false }
+			status="warning"
+		>
 			<p>
-				{ __( 'The content of your post doesn’t match the template assigned to your post type.' ) }
+				{ __(
+					'The content of your post doesn’t match the template assigned to your post type.'
+				) }
 			</p>
 			<div>
 				<Button isSecondary onClick={ props.resetTemplateValidity }>
@@ -44,7 +52,9 @@ export default compose( [
 		isValid: select( 'core/block-editor' ).isValidTemplate(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { setTemplateValidity, synchronizeTemplate } = dispatch( 'core/block-editor' );
+		const { setTemplateValidity, synchronizeTemplate } = dispatch(
+			'core/block-editor'
+		);
 		return {
 			resetTemplateValidity: () => setTemplateValidity( true ),
 			synchronizeTemplate,

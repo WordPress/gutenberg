@@ -15,7 +15,9 @@ class BlockSelectionClearer extends Component {
 		super( ...arguments );
 
 		this.bindContainer = this.bindContainer.bind( this );
-		this.clearSelectionIfFocusTarget = this.clearSelectionIfFocusTarget.bind( this );
+		this.clearSelectionIfFocusTarget = this.clearSelectionIfFocusTarget.bind(
+			this
+		);
 	}
 
 	bindContainer( ref ) {
@@ -30,7 +32,11 @@ class BlockSelectionClearer extends Component {
 	 * @param {FocusEvent} event Focus event.
 	 */
 	clearSelectionIfFocusTarget( event ) {
-		const { hasSelectedBlock, hasMultiSelection, clearSelectedBlock } = this.props;
+		const {
+			hasSelectedBlock,
+			hasMultiSelection,
+			clearSelectedBlock,
+		} = this.props;
 
 		const hasSelection = hasSelectedBlock || hasMultiSelection;
 		if ( event.target === this.container && hasSelection ) {
@@ -44,7 +50,11 @@ class BlockSelectionClearer extends Component {
 				tabIndex={ -1 }
 				onFocus={ this.clearSelectionIfFocusTarget }
 				ref={ this.bindContainer }
-				{ ...omit( this.props, [ 'clearSelectedBlock', 'hasSelectedBlock', 'hasMultiSelection' ] ) }
+				{ ...omit( this.props, [
+					'clearSelectedBlock',
+					'hasSelectedBlock',
+					'hasMultiSelection',
+				] ) }
 			/>
 		);
 	}
@@ -52,7 +62,9 @@ class BlockSelectionClearer extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { hasSelectedBlock, hasMultiSelection } = select( 'core/block-editor' );
+		const { hasSelectedBlock, hasMultiSelection } = select(
+			'core/block-editor'
+		);
 
 		return {
 			hasSelectedBlock: hasSelectedBlock(),

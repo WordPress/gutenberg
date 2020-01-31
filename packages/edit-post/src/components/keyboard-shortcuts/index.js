@@ -16,17 +16,21 @@ function KeyboardShortcuts() {
 	} = useSelect( ( select ) => {
 		const settings = select( 'core/editor' ).getEditorSettings();
 		return {
-			getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
+			getBlockSelectionStart: select( 'core/block-editor' )
+				.getBlockSelectionStart,
 			getEditorMode: select( 'core/edit-post' ).getEditorMode,
-			isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened,
+			isEditorSidebarOpened: select( 'core/edit-post' )
+				.isEditorSidebarOpened,
 			richEditingEnabled: settings.richEditingEnabled,
 			codeEditingEnabled: settings.codeEditingEnabled,
 		};
 	} );
 
-	const { switchEditorMode, openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		'core/edit-post'
-	);
+	const {
+		switchEditorMode,
+		openGeneralSidebar,
+		closeGeneralSidebar,
+	} = useDispatch( 'core/edit-post' );
 	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
 
 	useEffect( () => {
@@ -106,9 +110,14 @@ function KeyboardShortcuts() {
 	useShortcut(
 		'core/edit-post/toggle-mode',
 		() => {
-			switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
+			switchEditorMode(
+				getEditorMode() === 'visual' ? 'text' : 'visual'
+			);
 		},
-		{ bindGlobal: true, isDisabled: ! richEditingEnabled || ! codeEditingEnabled }
+		{
+			bindGlobal: true,
+			isDisabled: ! richEditingEnabled || ! codeEditingEnabled,
+		}
 	);
 
 	useShortcut(
@@ -121,7 +130,9 @@ function KeyboardShortcuts() {
 			if ( isEditorSidebarOpened() ) {
 				closeGeneralSidebar();
 			} else {
-				const sidebarToOpen = getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document';
+				const sidebarToOpen = getBlockSelectionStart()
+					? 'edit-post/block'
+					: 'edit-post/document';
 				openGeneralSidebar( sidebarToOpen );
 			}
 		},

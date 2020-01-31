@@ -145,31 +145,73 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	core__image: {
 		originalBlock: 'Image',
-		availableTransforms: [ 'Gallery', 'Cover', 'File', 'Group', 'Media & Text' ],
+		availableTransforms: [
+			'Gallery',
+			'Cover',
+			'File',
+			'Group',
+			'Media & Text',
+		],
 	},
 	'core__image__attachment-link': {
 		originalBlock: 'Image',
-		availableTransforms: [ 'Gallery', 'Cover', 'File', 'Group', 'Media & Text' ],
+		availableTransforms: [
+			'Gallery',
+			'Cover',
+			'File',
+			'Group',
+			'Media & Text',
+		],
 	},
 	'core__image__center-caption': {
 		originalBlock: 'Image',
-		availableTransforms: [ 'Gallery', 'Cover', 'File', 'Group', 'Media & Text' ],
+		availableTransforms: [
+			'Gallery',
+			'Cover',
+			'File',
+			'Group',
+			'Media & Text',
+		],
 	},
 	'core__image__custom-link': {
 		originalBlock: 'Image',
-		availableTransforms: [ 'Gallery', 'Cover', 'File', 'Group', 'Media & Text' ],
+		availableTransforms: [
+			'Gallery',
+			'Cover',
+			'File',
+			'Group',
+			'Media & Text',
+		],
 	},
 	'core__image__custom-link-class': {
 		originalBlock: 'Image',
-		availableTransforms: [ 'Gallery', 'Cover', 'File', 'Group', 'Media & Text' ],
+		availableTransforms: [
+			'Gallery',
+			'Cover',
+			'File',
+			'Group',
+			'Media & Text',
+		],
 	},
 	'core__image__custom-link-rel': {
 		originalBlock: 'Image',
-		availableTransforms: [ 'Gallery', 'Cover', 'File', 'Group', 'Media & Text' ],
+		availableTransforms: [
+			'Gallery',
+			'Cover',
+			'File',
+			'Group',
+			'Media & Text',
+		],
 	},
 	'core__image__media-link': {
 		originalBlock: 'Image',
-		availableTransforms: [ 'Gallery', 'Cover', 'File', 'Group', 'Media & Text' ],
+		availableTransforms: [
+			'Gallery',
+			'Cover',
+			'File',
+			'Group',
+			'Media & Text',
+		],
 	},
 	'core__latest-comments': {
 		originalBlock: 'Latest Comments',
@@ -213,7 +255,14 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	'core__paragraph__align-right': {
 		originalBlock: 'Paragraph',
-		availableTransforms: [ 'Heading', 'List', 'Quote', 'Group', 'Preformatted', 'Verse' ],
+		availableTransforms: [
+			'Heading',
+			'List',
+			'Quote',
+			'Group',
+			'Preformatted',
+			'Verse',
+		],
 	},
 	'core__post-content': {
 		availableTransforms: [ 'Group' ],
@@ -241,11 +290,23 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	'core__quote__style-1': {
 		originalBlock: 'Quote',
-		availableTransforms: [ 'List', 'Group', 'Paragraph', 'Heading', 'Pullquote' ],
+		availableTransforms: [
+			'List',
+			'Group',
+			'Paragraph',
+			'Heading',
+			'Pullquote',
+		],
 	},
 	'core__quote__style-2': {
 		originalBlock: 'Quote',
-		availableTransforms: [ 'List', 'Group', 'Paragraph', 'Heading', 'Pullquote' ],
+		availableTransforms: [
+			'List',
+			'Group',
+			'Paragraph',
+			'Heading',
+			'Pullquote',
+		],
 	},
 	core__rss: {
 		originalBlock: 'RSS',

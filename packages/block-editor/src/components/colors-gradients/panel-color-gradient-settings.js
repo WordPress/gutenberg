@@ -34,7 +34,13 @@ const colorsAndGradientKeys = [
 const Indicators = ( { colors, gradients, settings } ) => {
 	return settings.map(
 		(
-			{ colorValue, gradientValue, label, colors: availableColors, gradients: availableGradients },
+			{
+				colorValue,
+				gradientValue,
+				label,
+				colors: availableColors,
+				gradients: availableGradients,
+			},
 			index
 		) => {
 			if ( ! colorValue && ! gradientValue ) {
@@ -42,7 +48,10 @@ const Indicators = ( { colors, gradients, settings } ) => {
 			}
 			let ariaLabel;
 			if ( colorValue ) {
-				const colorObject = getColorObjectByColorValue( availableColors || colors, colorValue );
+				const colorObject = getColorObjectByColorValue(
+					availableColors || colors,
+					colorValue
+				);
 				ariaLabel = sprintf(
 					colorIndicatorAriaLabel,
 					label.toLowerCase(),
@@ -92,8 +101,10 @@ export const PanelColorGradientSettingsInner = ( {
 			( setting ) =>
 				isEmpty( setting.colors ) &&
 				isEmpty( setting.gradients ) &&
-				( setting.disableCustomColors === undefined || setting.disableCustomColors ) &&
-				( setting.disableCustomGradients === undefined || setting.disableCustomGradients )
+				( setting.disableCustomColors === undefined ||
+					setting.disableCustomColors ) &&
+				( setting.disableCustomGradients === undefined ||
+					setting.disableCustomGradients )
 		)
 	) {
 		return null;
@@ -102,12 +113,19 @@ export const PanelColorGradientSettingsInner = ( {
 	const titleElement = (
 		<span className="block-editor-panel-color-gradient-settings__panel-title">
 			{ title }
-			<Indicators colors={ colors } gradients={ gradients } settings={ settings } />
+			<Indicators
+				colors={ colors }
+				gradients={ gradients }
+				settings={ settings }
+			/>
 		</span>
 	);
 	return (
 		<PanelBody
-			className={ classnames( 'block-editor-panel-color-gradient-settings', className ) }
+			className={ classnames(
+				'block-editor-panel-color-gradient-settings',
+				className
+			) }
 			title={ titleElement }
 			{ ...props }
 		>
@@ -133,11 +151,17 @@ const PanelColorGradientSettingsSelect = ( props ) => {
 		const settings = select( 'core/block-editor' ).getSettings();
 		return pick( settings, colorsAndGradientKeys );
 	} );
-	return <PanelColorGradientSettingsInner { ...{ ...colorGradientSettings, ...props } } />;
+	return (
+		<PanelColorGradientSettingsInner
+			{ ...{ ...colorGradientSettings, ...props } }
+		/>
+	);
 };
 
 const PanelColorGradientSettings = ( props ) => {
-	if ( every( colorsAndGradientKeys, ( key ) => props.hasOwnProperty( key ) ) ) {
+	if (
+		every( colorsAndGradientKeys, ( key ) => props.hasOwnProperty( key ) )
+	) {
 		return <PanelColorGradientSettingsInner { ...props } />;
 	}
 	return <PanelColorGradientSettingsSelect { ...props } />;
