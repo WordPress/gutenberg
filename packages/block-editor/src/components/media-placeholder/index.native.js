@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { useRef } from 'react';
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import { uniqWith } from 'lodash';
 
@@ -16,6 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { Dashicon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
