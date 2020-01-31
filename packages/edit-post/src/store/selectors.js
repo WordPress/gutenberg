@@ -25,7 +25,10 @@ export function getEditorMode( state ) {
 export function isEditorSidebarOpened( state ) {
 	const activeGeneralSidebar = getActiveGeneralSidebarName( state );
 
-	return includes( [ 'edit-post/document', 'edit-post/block' ], activeGeneralSidebar );
+	return includes(
+		[ 'edit-post/document', 'edit-post/block' ],
+		activeGeneralSidebar
+	);
 }
 
 /**
@@ -55,7 +58,11 @@ export function isPluginSidebarOpened( state ) {
  */
 export function getActiveGeneralSidebarName( state ) {
 	// Dismissal takes precedent.
-	const isDismissed = getPreference( state, 'isGeneralSidebarDismissed', false );
+	const isDismissed = getPreference(
+		state,
+		'isGeneralSidebarDismissed',
+		false
+	);
 	if ( isDismissed ) {
 		return null;
 	}
@@ -125,7 +132,8 @@ export function isEditorPanelEnabled( state, panelName ) {
 	const panels = getPreference( state, 'panels' );
 
 	return (
-		! isEditorPanelRemoved( state, panelName ) && get( panels, [ panelName, 'enabled' ], true )
+		! isEditorPanelRemoved( state, panelName ) &&
+		get( panels, [ panelName, 'enabled' ], true )
 	);
 }
 
@@ -140,7 +148,10 @@ export function isEditorPanelEnabled( state, panelName ) {
  */
 export function isEditorPanelOpened( state, panelName ) {
 	const panels = getPreference( state, 'panels' );
-	return get( panels, [ panelName ] ) === true || get( panels, [ panelName, 'opened' ] ) === true;
+	return (
+		get( panels, [ panelName ] ) === true ||
+		get( panels, [ panelName, 'opened' ] ) === true
+	);
 }
 
 /**

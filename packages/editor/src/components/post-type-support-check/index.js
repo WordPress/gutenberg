@@ -24,7 +24,10 @@ import { withSelect } from '@wordpress/data';
 export function PostTypeSupportCheck( { postType, children, supportKeys } ) {
 	let isSupported = true;
 	if ( postType ) {
-		isSupported = some( castArray( supportKeys ), ( key ) => !! postType.supports[ key ] );
+		isSupported = some(
+			castArray( supportKeys ),
+			( key ) => !! postType.supports[ key ]
+		);
 	}
 
 	if ( ! isSupported ) {

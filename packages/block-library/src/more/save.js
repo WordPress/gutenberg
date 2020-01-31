@@ -15,5 +15,7 @@ export default function save( { attributes } ) {
 
 	const noTeaserTag = noTeaser ? '<!--noteaser-->' : '';
 
-	return <RawHTML>{ compact( [ moreTag, noTeaserTag ] ).join( '\n' ) }</RawHTML>;
+	return (
+		<RawHTML>{ compact( [ moreTag, noTeaserTag ] ).join( '\n' ) }</RawHTML>
+	);
 }

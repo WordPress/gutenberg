@@ -14,6 +14,10 @@ export default function Notices() {
 	);
 	const { removeNotice } = useDispatch( 'core/notices' );
 	return (
-		<SnackbarList className="edit-site-notices" notices={ notices } onRemove={ removeNotice } />
+		<SnackbarList
+			className="edit-site-notices"
+			notices={ notices }
+			onRemove={ removeNotice }
+		/>
 	);
 }

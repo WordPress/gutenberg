@@ -45,7 +45,11 @@ export const Gallery = ( props ) => {
 		onFocus,
 	} = props;
 
-	const { columns = defaultColumnsNumber( attributes ), imageCrop, images } = attributes;
+	const {
+		columns = defaultColumnsNumber( attributes ),
+		imageCrop,
+		images,
+	} = attributes;
 
 	// limit displayed columns when isNarrow is true (i.e. when viewport width is
 	// less than "small", where small = 600)
@@ -75,7 +79,11 @@ export const Gallery = ( props ) => {
 			<Tiles
 				columns={ displayedColumns }
 				spacing={ TILE_SPACING }
-				style={ isSelected ? styles.galleryTilesContainerSelected : undefined }
+				style={
+					isSelected
+						? styles.galleryTilesContainerSelected
+						: undefined
+				}
 			>
 				{ images.map( ( img, index ) => {
 					/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
@@ -101,7 +109,9 @@ export const Gallery = ( props ) => {
 							onRemove={ onRemoveImage( index ) }
 							onSelect={ selectImage( index ) }
 							onSelectBlock={ onFocus }
-							setAttributes={ ( attrs ) => onSetImageAttributes( index, attrs ) }
+							setAttributes={ ( attrs ) =>
+								onSetImageAttributes( index, attrs )
+							}
 							caption={ img.caption }
 							aria-label={ ariaLabel }
 						/>

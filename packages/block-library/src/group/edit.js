@@ -8,7 +8,11 @@ import { useRef } from '@wordpress/element';
 
 function GroupEdit( { hasInnerBlocks } ) {
 	const ref = useRef();
-	const { TextColor, BackgroundColor, InspectorControlsColorPanel } = __experimentalUseColors(
+	const {
+		TextColor,
+		BackgroundColor,
+		InspectorControlsColorPanel,
+	} = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
 			{ name: 'backgroundColor', className: 'has-background' },
@@ -26,7 +30,12 @@ function GroupEdit( { hasInnerBlocks } ) {
 				<TextColor>
 					<div className="wp-block-group" ref={ ref }>
 						<div className="wp-block-group__inner-container">
-							<InnerBlocks renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender } />
+							<InnerBlocks
+								renderAppender={
+									! hasInnerBlocks &&
+									InnerBlocks.ButtonBlockAppender
+								}
+							/>
 						</div>
 					</div>
 				</TextColor>

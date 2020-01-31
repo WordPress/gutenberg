@@ -35,7 +35,12 @@ export default function( {
 		return null;
 	}
 	return (
-		<BaseControl className={ classnames( 'block-editor-gradient-picker-control', className ) }>
+		<BaseControl
+			className={ classnames(
+				'block-editor-gradient-picker-control',
+				className
+			) }
+		>
 			<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 			<GradientPicker
 				value={ value }

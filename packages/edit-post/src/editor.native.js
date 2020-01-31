@@ -36,7 +36,13 @@ class Editor extends Component {
 		this.setTitleRef = this.setTitleRef.bind( this );
 	}
 
-	getEditorSettings( settings, hasFixedToolbar, focusMode, hiddenBlockTypes, blockTypes ) {
+	getEditorSettings(
+		settings,
+		hasFixedToolbar,
+		focusMode,
+		hiddenBlockTypes,
+		blockTypes
+	) {
 		settings = {
 			...settings,
 			hasFixedToolbar,
@@ -53,18 +59,23 @@ class Editor extends Component {
 					? map( blockTypes, 'name' )
 					: settings.allowedBlockTypes || [];
 
-			settings.allowedBlockTypes = without( defaultAllowedBlockTypes, ...hiddenBlockTypes );
+			settings.allowedBlockTypes = without(
+				defaultAllowedBlockTypes,
+				...hiddenBlockTypes
+			);
 		}
 
 		return settings;
 	}
 
 	componentDidMount() {
-		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle( () => {
-			if ( this.postTitleRef ) {
-				this.postTitleRef.focus();
+		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle(
+			() => {
+				if ( this.postTitleRef ) {
+					this.postTitleRef.focus();
+				}
 			}
-		} );
+		);
 	}
 
 	componentWillUnmount() {
@@ -132,7 +143,9 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isFeatureActive, getEditorMode, getPreference } = select( 'core/edit-post' );
+		const { isFeatureActive, getEditorMode, getPreference } = select(
+			'core/edit-post'
+		);
 		const { getBlockTypes } = select( 'core/blocks' );
 
 		return {

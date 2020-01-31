@@ -39,7 +39,11 @@ function Placeholder( {
 		};
 	}
 
-	const classes = classnames( 'components-placeholder', className, modifierClassNames );
+	const classes = classnames(
+		'components-placeholder',
+		className,
+		modifierClassNames
+	);
 	const fieldsetClasses = classnames( 'components-placeholder__fieldset', {
 		'is-column-layout': isColumnLayout,
 	} );
@@ -47,13 +51,19 @@ function Placeholder( {
 		<div { ...additionalProps } className={ classes }>
 			{ resizeListener }
 			{ notices }
-			{ preview && <div className="components-placeholder__preview">{ preview }</div> }
+			{ preview && (
+				<div className="components-placeholder__preview">
+					{ preview }
+				</div>
+			) }
 			<div className="components-placeholder__label">
 				<Icon icon={ icon } />
 				{ label }
 			</div>
 			{ !! instructions && (
-				<div className="components-placeholder__instructions">{ instructions }</div>
+				<div className="components-placeholder__instructions">
+					{ instructions }
+				</div>
 			) }
 			<div className={ fieldsetClasses }>{ children }</div>
 		</div>

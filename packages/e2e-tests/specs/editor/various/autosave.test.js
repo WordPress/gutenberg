@@ -49,12 +49,16 @@ async function readSessionStorageAutosave( postId ) {
 }
 
 async function getCurrentPostId() {
-	return page.evaluate( () => window.wp.data.select( 'core/editor' ).getCurrentPostId() );
+	return page.evaluate( () =>
+		window.wp.data.select( 'core/editor' ).getCurrentPostId()
+	);
 }
 
 async function setLocalAutosaveInterval( value ) {
 	return page.evaluate( ( _value ) => {
-		window.wp.data.dispatch( 'core/edit-post' ).__experimentalUpdateLocalAutosaveInterval( _value );
+		window.wp.data
+			.dispatch( 'core/edit-post' )
+			.__experimentalUpdateLocalAutosaveInterval( _value );
 	}, value );
 }
 
@@ -107,7 +111,9 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave()
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.__experimentalLocalAutosave()
 		);
 		// Reload without saving on the server
 		await page.reload();
@@ -118,9 +124,13 @@ describe( 'autosave', () => {
 		);
 		expect( notice ).toContain( AUTOSAVE_NOTICE_LOCAL );
 
-		expect( await getEditedPostContent() ).toEqual( wrapParagraph( 'before save' ) );
+		expect( await getEditedPostContent() ).toEqual(
+			wrapParagraph( 'before save' )
+		);
 		await page.click( '.components-notice__action' );
-		expect( await getEditedPostContent() ).toEqual( wrapParagraph( 'before save after save' ) );
+		expect( await getEditedPostContent() ).toEqual(
+			wrapParagraph( 'before save after save' )
+		);
 	} );
 
 	it( 'should clear sessionStorage upon user logout', async () => {
@@ -133,19 +143,30 @@ describe( 'autosave', () => {
 			( postId ) =>
 				window.sessionStorage.setItem(
 					`wp-autosave-block-editor-post-${ postId }`,
-					JSON.stringify( { post_title: 'A', content: 'B', excerpt: 'C' } )
+					JSON.stringify( {
+						post_title: 'A',
+						content: 'B',
+						excerpt: 'C',
+					} )
 				),
 			await getCurrentPostId()
 		);
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
 
 		await Promise.all( [
 			page.waitForSelector( '#wp-admin-bar-logout', { visible: true } ),
 			page.hover( '#wp-admin-bar-my-account' ),
 		] );
-		await Promise.all( [ page.waitForNavigation(), page.click( '#wp-admin-bar-logout' ) ] );
+		await Promise.all( [
+			page.waitForNavigation(),
+			page.click( '#wp-admin-bar-logout' ),
+		] );
 
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 0 );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 0 );
 	} );
 
 	it( "shouldn't contaminate other posts", async () => {
@@ -158,11 +179,17 @@ describe( 'autosave', () => {
 			( postId ) =>
 				window.sessionStorage.setItem(
 					`wp-autosave-block-editor-post-${ postId }`,
-					JSON.stringify( { post_title: 'A', content: 'B', excerpt: 'C' } )
+					JSON.stringify( {
+						post_title: 'A',
+						content: 'B',
+						excerpt: 'C',
+					} )
 				),
 			await getCurrentPostId()
 		);
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
 
 		await page.reload();
 		const notice = await page.$eval(
@@ -186,13 +213,21 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave()
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.__experimentalLocalAutosave()
 		);
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
 
 		// Trigger remote autosave
-		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 0 );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 0 );
 	} );
 
 	it( "shouldn't clear local autosave if remote autosave fails", async () => {
@@ -204,14 +239,22 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave()
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.__experimentalLocalAutosave()
 		);
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
 
 		// Bring network down and attempt to autosave remotely
 		toggleOfflineMode( true );
-		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
 	} );
 
 	it( 'should clear local autosave after successful save', async () => {
@@ -223,12 +266,18 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave()
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.__experimentalLocalAutosave()
 		);
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
 
 		await saveDraftWithKeyboard();
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 0 );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 0 );
 	} );
 
 	it( "shouldn't clear local autosave if save fails", async () => {
@@ -240,14 +289,20 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave()
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.__experimentalLocalAutosave()
 		);
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
 
 		// Bring network down and attempt to save
 		toggleOfflineMode( true );
 		saveDraftWithKeyboard();
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
 	} );
 
 	it( "shouldn't conflict with server-side autosave", async () => {
@@ -259,13 +314,19 @@ describe( 'autosave', () => {
 		await page.keyboard.type( ' after publish' );
 
 		// Trigger remote autosave
-		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
 
 		// Force conflicting local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave()
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.__experimentalLocalAutosave()
 		);
-		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
 
 		await page.reload();
 
@@ -276,7 +337,9 @@ describe( 'autosave', () => {
 		// drop this test's expectations if we don't have an autosave object
 		// available.
 		const stillHasRemoteAutosave = await page.evaluate(
-			() => window.wp.data.select( 'core/editor' ).getEditorSettings().autosave
+			() =>
+				window.wp.data.select( 'core/editor' ).getEditorSettings()
+					.autosave
 		);
 		if ( ! stillHasRemoteAutosave ) {
 			return;

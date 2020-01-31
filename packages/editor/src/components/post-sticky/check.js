@@ -21,7 +21,11 @@ export default compose( [
 	withSelect( ( select ) => {
 		const post = select( 'core/editor' ).getCurrentPost();
 		return {
-			hasStickyAction: get( post, [ '_links', 'wp:action-sticky' ], false ),
+			hasStickyAction: get(
+				post,
+				[ '_links', 'wp:action-sticky' ],
+				false
+			),
 			postType: select( 'core/editor' ).getCurrentPostType(),
 		};
 	} ),

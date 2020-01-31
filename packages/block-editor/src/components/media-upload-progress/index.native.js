@@ -103,9 +103,11 @@ export class MediaUploadProgress extends React.Component {
 		if ( this.subscriptionParentMediaUpload ) {
 			return;
 		}
-		this.subscriptionParentMediaUpload = subscribeMediaUpload( ( payload ) => {
-			this.mediaUpload( payload );
-		} );
+		this.subscriptionParentMediaUpload = subscribeMediaUpload(
+			( payload ) => {
+				this.mediaUpload( payload );
+			}
+		);
 	}
 
 	removeMediaUploadListener() {
@@ -119,7 +121,9 @@ export class MediaUploadProgress extends React.Component {
 		const { isUploadInProgress, isUploadFailed } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
-		const retryMessage = __( 'Failed to insert media.\nPlease tap for options.' );
+		const retryMessage = __(
+			'Failed to insert media.\nPlease tap for options.'
+		);
 
 		return (
 			<View style={ styles.mediaUploadProgress }>
@@ -131,15 +135,24 @@ export class MediaUploadProgress extends React.Component {
 				{ coverUrl && (
 					<ImageSize src={ coverUrl }>
 						{ ( sizes ) => {
-							const { imageWidthWithinContainer, imageHeightWithinContainer } = sizes;
+							const {
+								imageWidthWithinContainer,
+								imageHeightWithinContainer,
+							} = sizes;
 
 							let finalHeight = imageHeightWithinContainer;
-							if ( height > 0 && height < imageHeightWithinContainer ) {
+							if (
+								height > 0 &&
+								height < imageHeightWithinContainer
+							) {
 								finalHeight = height;
 							}
 
 							let finalWidth = imageWidthWithinContainer;
-							if ( width > 0 && width < imageWidthWithinContainer ) {
+							if (
+								width > 0 &&
+								width < imageWidthWithinContainer
+							) {
 								finalWidth = width;
 							}
 							return this.props.renderContent( {

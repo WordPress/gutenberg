@@ -19,19 +19,31 @@ function Option( { className, isSelected, tooltipText, ...additionalProps } ) {
 	const optionButton = (
 		<Button
 			isPressed={ isSelected }
-			className={ classnames( className, 'components-circular-option-picker__option' ) }
+			className={ classnames(
+				className,
+				'components-circular-option-picker__option'
+			) }
 			{ ...additionalProps }
 		/>
 	);
 	return (
 		<div className="components-circular-option-picker__option-wrapper">
-			{ tooltipText ? <Tooltip text={ tooltipText }>{ optionButton }</Tooltip> : optionButton }
+			{ tooltipText ? (
+				<Tooltip text={ tooltipText }>{ optionButton }</Tooltip>
+			) : (
+				optionButton
+			) }
 			{ isSelected && <Icon icon={ check } /> }
 		</div>
 	);
 }
 
-function DropdownLinkAction( { buttonProps, className, dropdownProps, linkText } ) {
+function DropdownLinkAction( {
+	buttonProps,
+	className,
+	dropdownProps,
+	linkText,
+} ) {
 	return (
 		<Dropdown
 			className={ classnames(
@@ -39,7 +51,12 @@ function DropdownLinkAction( { buttonProps, className, dropdownProps, linkText }
 				className
 			) }
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button aria-expanded={ isOpen } onClick={ onToggle } isLink { ...buttonProps }>
+				<Button
+					aria-expanded={ isOpen }
+					onClick={ onToggle }
+					isLink
+					{ ...buttonProps }
+				>
 					{ linkText }
 				</Button>
 			) }
@@ -51,7 +68,10 @@ function DropdownLinkAction( { buttonProps, className, dropdownProps, linkText }
 function ButtonAction( { className, children, ...additionalProps } ) {
 	return (
 		<Button
-			className={ classnames( 'components-circular-option-picker__clear', className ) }
+			className={ classnames(
+				'components-circular-option-picker__clear',
+				className
+			) }
 			isSmall
 			isSecondary
 			{ ...additionalProps }
@@ -61,13 +81,25 @@ function ButtonAction( { className, children, ...additionalProps } ) {
 	);
 }
 
-export default function CircularOptionPicker( { actions, className, options, children } ) {
+export default function CircularOptionPicker( {
+	actions,
+	className,
+	options,
+	children,
+} ) {
 	return (
-		<div className={ classnames( 'components-circular-option-picker', className ) }>
+		<div
+			className={ classnames(
+				'components-circular-option-picker',
+				className
+			) }
+		>
 			{ options }
 			{ children }
 			{ actions && (
-				<div className="components-circular-option-picker__custom-clear-wrapper">{ actions }</div>
+				<div className="components-circular-option-picker__custom-clear-wrapper">
+					{ actions }
+				</div>
 			) }
 		</div>
 	);

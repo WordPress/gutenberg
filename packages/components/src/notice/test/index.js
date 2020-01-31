@@ -18,7 +18,10 @@ describe( 'Notice', () => {
 		const renderer = new ShallowRenderer();
 
 		renderer.render(
-			<Notice status="success" actions={ [ { label: 'View', url: 'https://example.com' } ] }>
+			<Notice
+				status="success"
+				actions={ [ { label: 'View', url: 'https://example.com' } ] }
+			>
 				Example
 			</Notice>
 		);
@@ -31,7 +34,9 @@ describe( 'Notice', () => {
 
 		renderer.render( <Notice isDismissible={ false } /> );
 
-		const classes = new TokenList( renderer.getRenderOutput().props.className );
+		const classes = new TokenList(
+			renderer.getRenderOutput().props.className
+		);
 		expect( classes.contains( 'components-notice' ) ).toBe( true );
 		expect( classes.contains( 'is-dismissible' ) ).toBe( false );
 	} );

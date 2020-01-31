@@ -109,11 +109,19 @@ function isEdge( container, isReverse, onlyVertical ) {
 
 	// Only consider the multiline selection at the edge if the direction is
 	// towards the edge.
-	if ( ! isCollapsed && rangeRect.height > lineHeight && isForward === isReverse ) {
+	if (
+		! isCollapsed &&
+		rangeRect.height > lineHeight &&
+		isForward === isReverse
+	) {
 		return false;
 	}
 
-	const padding = parseInt( computedStyle[ `padding${ isReverse ? 'Top' : 'Bottom' }` ], 10 ) || 0;
+	const padding =
+		parseInt(
+			computedStyle[ `padding${ isReverse ? 'Top' : 'Bottom' }` ],
+			10
+		) || 0;
 
 	// Calculate a buffer that is half the line height. In some browsers, the
 	// selection rectangle may not fill the entire height of the line, so we add
@@ -144,7 +152,9 @@ function isEdge( container, isReverse, onlyVertical ) {
 	// nodes and a trailing line break element. In other words, we need to check
 	// visual positioning, not DOM positioning.
 	const x = isReverseDir ? containerRect.left + 1 : containerRect.right - 1;
-	const y = isReverse ? containerRect.top + buffer : containerRect.bottom - buffer;
+	const y = isReverse
+		? containerRect.top + buffer
+		: containerRect.bottom - buffer;
 	const testRange = hiddenCaretRangeFromPoint( document, x, y, container );
 
 	if ( ! testRange ) {
@@ -202,7 +212,9 @@ export function getRectangleFromRange( range ) {
 	// Correct invalid "BR" ranges. The cannot contain any children.
 	if ( startContainer.nodeName === 'BR' ) {
 		const { parentNode } = startContainer;
-		const index = Array.from( parentNode.childNodes ).indexOf( startContainer );
+		const index = Array.from( parentNode.childNodes ).indexOf(
+			startContainer
+		);
 
 		range = document.createRange();
 		range.setStart( parentNode, index );
@@ -367,7 +379,12 @@ function hiddenCaretRangeFromPoint( doc, x, y, container ) {
  * @param {DOMRect} [rect]              The rectangle to position the caret with.
  * @param {boolean} [mayUseScroll=true] True to allow scrolling, false to disallow.
  */
-export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScroll = true ) {
+export function placeCaretAtVerticalEdge(
+	container,
+	isReverse,
+	rect,
+	mayUseScroll = true
+) {
 	if ( ! container ) {
 		return;
 	}
@@ -386,14 +403,18 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	const buffer = rect.height / 2;
 	const editableRect = container.getBoundingClientRect();
 	const x = rect.left;
-	const y = isReverse ? editableRect.bottom - buffer : editableRect.top + buffer;
+	const y = isReverse
+		? editableRect.bottom - buffer
+		: editableRect.top + buffer;
 
 	const range = hiddenCaretRangeFromPoint( document, x, y, container );
 
 	if ( ! range || ! container.contains( range.startContainer ) ) {
 		if (
 			mayUseScroll &&
-			( ! range || ! range.startContainer || ! range.startContainer.contains( container ) )
+			( ! range ||
+				! range.startContainer ||
+				! range.startContainer.contains( container ) )
 		) {
 			// Might be out of view.
 			// Easier than attempting to calculate manually.
@@ -475,7 +496,10 @@ export function documentHasSelection() {
  */
 export function isEntirelySelected( element ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], element.nodeName ) ) {
-		return element.selectionStart === 0 && element.value.length === element.selectionEnd;
+		return (
+			element.selectionStart === 0 &&
+			element.value.length === element.selectionEnd
+		);
 	}
 
 	if ( ! element.isContentEditable ) {
@@ -502,7 +526,9 @@ export function isEntirelySelected( element ) {
 
 	const lastChild = element.lastChild;
 	const lastChildContentLength =
-		lastChild.nodeType === TEXT_NODE ? lastChild.data.length : lastChild.childNodes.length;
+		lastChild.nodeType === TEXT_NODE
+			? lastChild.data.length
+			: lastChild.childNodes.length;
 
 	return (
 		startContainer === element.firstChild &&

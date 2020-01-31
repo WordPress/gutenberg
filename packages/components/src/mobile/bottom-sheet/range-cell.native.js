@@ -96,7 +96,10 @@ class BottomSheetRangeCell extends Component {
 			return Math.min( Math.max( text, minimumValue ), maximumValue );
 		}
 		return Math.min(
-			Math.max( text.replace( /[^0-9]/g, '' ).replace( /^0+(?=\d)/, '' ), minimumValue ),
+			Math.max(
+				text.replace( /[^0-9]/g, '' ).replace( /^0+(?=\d)/, '' ),
+				minimumValue
+			),
 			maximumValue
 		);
 	}
@@ -143,8 +146,12 @@ class BottomSheetRangeCell extends Component {
 			disabled,
 			step = 1,
 			preferredColorScheme,
-			minimumTrackTintColor = preferredColorScheme === 'light' ? '#00669b' : '#5198d9',
-			maximumTrackTintColor = Platform.OS === 'ios' ? '#e9eff3' : '#909090',
+			minimumTrackTintColor = preferredColorScheme === 'light'
+				? '#00669b'
+				: '#5198d9',
+			maximumTrackTintColor = Platform.OS === 'ios'
+				? '#e9eff3'
+				: '#909090',
 			thumbTintColor = Platform.OS === 'android' && '#00669b',
 			getStylesFromColorScheme,
 			...cellProps
@@ -154,7 +161,10 @@ class BottomSheetRangeCell extends Component {
 
 		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
-			_x( '%1$s. Current value is %2$s', 'Slider for picking a number inside a range' ),
+			_x(
+				'%1$s. Current value is %2$s',
+				'Slider for picking a number inside a range'
+			),
 			cellProps.label,
 			value
 		);

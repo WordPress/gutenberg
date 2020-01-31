@@ -34,7 +34,11 @@ describe( 'buildTermsTree()', () => {
 			{ id: 2245, parent: 2232 },
 		] );
 		const output = [
-			{ id: 2232, parent: 0, children: [ { id: 2245, parent: 2232, children: [] } ] },
+			{
+				id: 2232,
+				parent: 0,
+				children: [ { id: 2245, parent: 2232, children: [] } ],
+			},
 		];
 		const termsTreem = buildTermsTree( input );
 		expect( termsTreem ).toEqual( output );

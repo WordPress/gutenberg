@@ -9,7 +9,15 @@ import { over, includes } from 'lodash';
 import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
-import { UP, RIGHT, DOWN, LEFT, ENTER, BACKSPACE, ESCAPE } from '@wordpress/keycodes';
+import {
+	UP,
+	RIGHT,
+	DOWN,
+	LEFT,
+	ENTER,
+	BACKSPACE,
+	ESCAPE,
+} from '@wordpress/keycodes';
 import { withSafeTimeout } from '@wordpress/compose';
 
 /**
@@ -35,7 +43,9 @@ function isKeyDownEligibleForStartTyping( event ) {
 
 function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	const lastMouseMove = useRef();
-	const isTyping = useSelect( ( select ) => select( 'core/block-editor' ).isTyping() );
+	const isTyping = useSelect( ( select ) =>
+		select( 'core/block-editor' ).isTyping()
+	);
 	const { startTyping, stopTyping } = useDispatch( 'core/block-editor' );
 	useEffect( () => {
 		toggleEventBindings( isTyping );
@@ -50,7 +60,10 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	 */
 	function toggleEventBindings( isBound ) {
 		const bindFn = isBound ? 'addEventListener' : 'removeEventListener';
-		document[ bindFn ]( 'selectionchange', stopTypingOnSelectionUncollapse );
+		document[ bindFn ](
+			'selectionchange',
+			stopTypingOnSelectionUncollapse
+		);
 		document[ bindFn ]( 'mousemove', stopTypingOnMouseMove );
 	}
 
@@ -65,7 +78,10 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 		// We need to check that the mouse really moved because Safari triggers
 		// mousemove events when shift or ctrl are pressed.
 		if ( lastMouseMove.current ) {
-			const { clientX: lastClientX, clientY: lastClientY } = lastMouseMove.current;
+			const {
+				clientX: lastClientX,
+				clientY: lastClientY,
+			} = lastMouseMove.current;
 
 			if ( lastClientX !== clientX || lastClientY !== clientY ) {
 				stopTyping();
@@ -81,7 +97,8 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	 */
 	function stopTypingOnSelectionUncollapse() {
 		const selection = window.getSelection();
-		const isCollapsed = selection.rangeCount > 0 && selection.getRangeAt( 0 ).collapsed;
+		const isCollapsed =
+			selection.rangeCount > 0 && selection.getRangeAt( 0 ).collapsed;
 
 		if ( ! isCollapsed ) {
 			stopTyping();
@@ -110,14 +127,21 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 		// Abort early if already typing, or key press is incurred outside a
 		// text field (e.g. arrow-ing through toolbar buttons).
 		// Ignore typing in a block toolbar
-		if ( isTyping || ! isTextField( target ) || target.closest( '.block-editor-block-toolbar' ) ) {
+		if (
+			isTyping ||
+			! isTextField( target ) ||
+			target.closest( '.block-editor-block-toolbar' )
+		) {
 			return;
 		}
 
 		// Special-case keydown because certain keys do not emit a keypress
 		// event. Conversely avoid keydown as the canonical event since there
 		// are many keydown which are explicitly not targeted for typing.
-		if ( type === 'keydown' && ! isKeyDownEligibleForStartTyping( event ) ) {
+		if (
+			type === 'keydown' &&
+			! isKeyDownEligibleForStartTyping( event )
+		) {
 			return;
 		}
 
@@ -150,7 +174,10 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 		<div
 			onFocus={ stopTypingOnNonTextField }
 			onKeyPress={ startTypingInTextField }
-			onKeyDown={ over( [ startTypingInTextField, stopTypingOnEscapeKey ] ) }
+			onKeyDown={ over( [
+				startTypingInTextField,
+				stopTypingOnEscapeKey,
+			] ) }
 		>
 			{ children }
 		</div>

@@ -51,7 +51,9 @@ describe( 'Panel', () => {
 		} );
 
 		it( 'should render both children and header when provided as props', () => {
-			const panel = shallow( <Panel children="The Panel" header="The Header" /> );
+			const panel = shallow(
+				<Panel children="The Panel" header="The Header" />
+			);
 			expect(
 				panel
 					.find( 'div' )

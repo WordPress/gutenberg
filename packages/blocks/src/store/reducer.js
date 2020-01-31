@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { filter, find, get, isEmpty, keyBy, map, mapValues, omit, uniqBy } from 'lodash';
+import {
+	filter,
+	find,
+	get,
+	isEmpty,
+	keyBy,
+	map,
+	mapValues,
+	omit,
+	uniqBy,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,7 +45,9 @@ export function blockTypes( state = {}, action ) {
 			return {
 				...state,
 				...keyBy(
-					map( action.blockTypes, ( blockType ) => omit( blockType, 'styles ' ) ),
+					map( action.blockTypes, ( blockType ) =>
+						omit( blockType, 'styles ' )
+					),
 					'name'
 				),
 			};
@@ -59,18 +71,27 @@ export function blockStyles( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...mapValues( keyBy( action.blockTypes, 'name' ), ( blockType ) => {
-					return uniqBy(
-						[ ...get( blockType, [ 'styles' ], [] ), ...get( state, [ blockType.name ], [] ) ],
-						( style ) => style.name
-					);
-				} ),
+				...mapValues(
+					keyBy( action.blockTypes, 'name' ),
+					( blockType ) => {
+						return uniqBy(
+							[
+								...get( blockType, [ 'styles' ], [] ),
+								...get( state, [ blockType.name ], [] ),
+							],
+							( style ) => style.name
+						);
+					}
+				),
 			};
 		case 'ADD_BLOCK_STYLES':
 			return {
 				...state,
 				[ action.blockName ]: uniqBy(
-					[ ...get( state, [ action.blockName ], [] ), ...action.styles ],
+					[
+						...get( state, [ action.blockName ], [] ),
+						...action.styles,
+					],
 					( style ) => style.name
 				),
 			};
@@ -100,18 +121,27 @@ export function blockPatterns( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...mapValues( keyBy( action.blockTypes, 'name' ), ( blockType ) => {
-					return uniqBy(
-						[ ...get( blockType, [ 'patterns' ], [] ), ...get( state, [ blockType.name ], [] ) ],
-						( pattern ) => pattern.name
-					);
-				} ),
+				...mapValues(
+					keyBy( action.blockTypes, 'name' ),
+					( blockType ) => {
+						return uniqBy(
+							[
+								...get( blockType, [ 'patterns' ], [] ),
+								...get( state, [ blockType.name ], [] ),
+							],
+							( pattern ) => pattern.name
+						);
+					}
+				),
 			};
 		case 'ADD_BLOCK_PATTERNS':
 			return {
 				...state,
 				[ action.blockName ]: uniqBy(
-					[ ...get( state, [ action.blockName ], [] ), ...action.patterns ],
+					[
+						...get( state, [ action.blockName ], [] ),
+						...action.patterns,
+					],
 					( pattern ) => pattern.name
 				),
 			};
@@ -120,7 +150,8 @@ export function blockPatterns( state = {}, action ) {
 				...state,
 				[ action.blockName ]: filter(
 					get( state, [ action.blockName ], [] ),
-					( pattern ) => action.patternNames.indexOf( pattern.name ) === -1
+					( pattern ) =>
+						action.patternNames.indexOf( pattern.name ) === -1
 				),
 			};
 	}
@@ -152,14 +183,18 @@ export function createBlockNameSetterReducer( setActionType ) {
 	};
 }
 
-export const defaultBlockName = createBlockNameSetterReducer( 'SET_DEFAULT_BLOCK_NAME' );
+export const defaultBlockName = createBlockNameSetterReducer(
+	'SET_DEFAULT_BLOCK_NAME'
+);
 export const freeformFallbackBlockName = createBlockNameSetterReducer(
 	'SET_FREEFORM_FALLBACK_BLOCK_NAME'
 );
 export const unregisteredFallbackBlockName = createBlockNameSetterReducer(
 	'SET_UNREGISTERED_FALLBACK_BLOCK_NAME'
 );
-export const groupingBlockName = createBlockNameSetterReducer( 'SET_GROUPING_BLOCK_NAME' );
+export const groupingBlockName = createBlockNameSetterReducer(
+	'SET_GROUPING_BLOCK_NAME'
+);
 
 /**
  * Reducer managing the categories

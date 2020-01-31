@@ -67,7 +67,10 @@ export class PostTextEditor extends Component {
 		const { instanceId } = this.props;
 		return (
 			<>
-				<label htmlFor={ `post-content-${ instanceId }` } className="screen-reader-text">
+				<label
+					htmlFor={ `post-content-${ instanceId }` }
+					className="screen-reader-text"
+				>
 					{ __( 'Type text or HTML' ) }
 				</label>
 				<Textarea

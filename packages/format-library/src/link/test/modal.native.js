@@ -16,7 +16,9 @@ describe( 'LinksUI', () => {
 	it( 'Links are removed when no text is in the URL field', () => {
 		// Given
 		const onRemove = jest.fn();
-		const wrapper = shallow( <ModalLinkUI onRemove={ onRemove } onClose={ jest.fn() } /> )
+		const wrapper = shallow(
+			<ModalLinkUI onRemove={ onRemove } onClose={ jest.fn() } />
+		)
 			.dive()
 			.dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
 
@@ -34,7 +36,9 @@ describe( 'LinksUI', () => {
 	it( 'Links are saved when URL field has content', () => {
 		// Given
 		const onRemove = jest.fn();
-		const wrapper = shallow( <ModalLinkUI onRemove={ onRemove } onClose={ jest.fn() } /> ).dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
+		const wrapper = shallow(
+			<ModalLinkUI onRemove={ onRemove } onClose={ jest.fn() } />
+		).dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
 
 		// Mock `submitLink` for simplicity (we don't want to test submitLink itself here)
 		wrapper.instance().submitLink = jest.fn();

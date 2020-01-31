@@ -73,7 +73,14 @@ class ClipboardButton extends Component {
 	render() {
 		// Disable reason: Exclude from spread props passed to Button
 		// eslint-disable-next-line no-unused-vars
-		const { className, children, onCopy, onFinishCopy, text, ...buttonProps } = this.props;
+		const {
+			className,
+			children,
+			onCopy,
+			onFinishCopy,
+			text,
+			...buttonProps
+		} = this.props;
 		const classes = classnames( 'components-clipboard-button', className );
 
 		// Workaround for inconsistent behavior in Safari, where <textarea> is not

@@ -20,7 +20,10 @@ function Animate( { type, options = {}, children } ) {
 		const { origin = 'left' } = options;
 
 		return children( {
-			className: classnames( 'components-animate__slide-in', 'is-from-' + origin ),
+			className: classnames(
+				'components-animate__slide-in',
+				'is-from-' + origin
+			),
 		} );
 	}
 

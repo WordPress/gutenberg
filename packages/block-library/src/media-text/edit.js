@@ -37,12 +37,21 @@ import MediaContainer from './media-container';
  * Constants
  */
 const TEMPLATE = [
-	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
+	[
+		'core/paragraph',
+		{
+			fontSize: 'large',
+			placeholder: _x( 'Content…', 'content placeholder' ),
+		},
+	],
 ];
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) =>
-	Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
+	Math.max(
+		WIDTH_CONSTRAINT_PERCENTAGE,
+		Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE )
+	);
 
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
@@ -84,7 +93,12 @@ class MediaTextEdit extends Component {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src =
 				get( media, [ 'sizes', 'large', 'url' ] ) ||
-				get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
+				get( media, [
+					'media_details',
+					'sizes',
+					'large',
+					'source_url',
+				] );
 		}
 
 		let newHref = href;
@@ -202,7 +216,9 @@ class MediaTextEdit extends Component {
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 		const gridTemplateColumns =
-			'right' === mediaPosition ? `1fr ${ widthString }` : `${ widthString } 1fr`;
+			'right' === mediaPosition
+				? `1fr ${ widthString }`
+				: `${ widthString } 1fr`;
 		const style = {
 			gridTemplateColumns,
 			msGridColumns: gridTemplateColumns,
@@ -262,7 +278,9 @@ class MediaTextEdit extends Component {
 						label={ __( 'Focal Point Picker' ) }
 						url={ mediaUrl }
 						value={ focalPoint }
-						onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { focalPoint: value } )
+						}
 					/>
 				) }
 				{ mediaType === 'image' && (
@@ -273,9 +291,13 @@ class MediaTextEdit extends Component {
 						help={
 							<>
 								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-									{ __( 'Describe the purpose of the image' ) }
+									{ __(
+										'Describe the purpose of the image'
+									) }
 								</ExternalLink>
-								{ __( 'Leave empty if the image is purely decorative.' ) }
+								{ __(
+									'Leave empty if the image is purely decorative.'
+								) }
 							</>
 						}
 					/>
@@ -317,7 +339,10 @@ class MediaTextEdit extends Component {
 				</BlockControls>
 				<div className={ classNames } style={ style }>
 					{ this.renderMediaArea() }
-					<InnerBlocks template={ TEMPLATE } templateInsertUpdatesSelection={ false } />
+					<InnerBlocks
+						template={ TEMPLATE }
+						templateInsertUpdatesSelection={ false }
+					/>
 				</div>
 			</>
 		);

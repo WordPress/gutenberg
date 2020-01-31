@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { deburr, differenceWith, find, get, intersectionWith, isEmpty, words } from 'lodash';
+import {
+	deburr,
+	differenceWith,
+	find,
+	get,
+	intersectionWith,
+	isEmpty,
+	words,
+} from 'lodash';
 
 /**
  * Converts the search term into a list of normalized terms.
@@ -31,7 +39,8 @@ const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
 	return differenceWith(
 		unmatchedTerms,
 		normalizeSearchTerm( unprocessedTerms ),
-		( unmatchedTerm, unprocessedTerm ) => unprocessedTerm.includes( unmatchedTerm )
+		( unmatchedTerm, unprocessedTerm ) =>
+			unprocessedTerm.includes( unmatchedTerm )
 	);
 };
 
@@ -53,40 +62,51 @@ export const searchItems = ( items, categories, collections, searchTerm ) => {
 	}
 
 	return items
-		.filter( ( { name, title, category, keywords = [], patterns = [] } ) => {
-			let unmatchedTerms = removeMatchingTerms( normalizedSearchTerms, title );
+		.filter(
+			( { name, title, category, keywords = [], patterns = [] } ) => {
+				let unmatchedTerms = removeMatchingTerms(
+					normalizedSearchTerms,
+					title
+				);
 
-			if ( unmatchedTerms.length === 0 ) {
-				return true;
+				if ( unmatchedTerms.length === 0 ) {
+					return true;
+				}
+
+				unmatchedTerms = removeMatchingTerms(
+					unmatchedTerms,
+					keywords.join( ' ' )
+				);
+
+				if ( unmatchedTerms.length === 0 ) {
+					return true;
+				}
+
+				unmatchedTerms = removeMatchingTerms(
+					unmatchedTerms,
+					get( find( categories, { slug: category } ), [ 'title' ] )
+				);
+
+				const itemCollection = collections[ name.split( '/' )[ 0 ] ];
+				if ( itemCollection ) {
+					unmatchedTerms = removeMatchingTerms(
+						unmatchedTerms,
+						itemCollection.title
+					);
+				}
+
+				if ( unmatchedTerms.length === 0 ) {
+					return true;
+				}
+
+				unmatchedTerms = removeMatchingTerms(
+					unmatchedTerms,
+					patterns.map( ( pattern ) => pattern.title ).join( ' ' )
+				);
+
+				return unmatchedTerms.length === 0;
 			}
-
-			unmatchedTerms = removeMatchingTerms( unmatchedTerms, keywords.join( ' ' ) );
-
-			if ( unmatchedTerms.length === 0 ) {
-				return true;
-			}
-
-			unmatchedTerms = removeMatchingTerms(
-				unmatchedTerms,
-				get( find( categories, { slug: category } ), [ 'title' ] )
-			);
-
-			const itemCollection = collections[ name.split( '/' )[ 0 ] ];
-			if ( itemCollection ) {
-				unmatchedTerms = removeMatchingTerms( unmatchedTerms, itemCollection.title );
-			}
-
-			if ( unmatchedTerms.length === 0 ) {
-				return true;
-			}
-
-			unmatchedTerms = removeMatchingTerms(
-				unmatchedTerms,
-				patterns.map( ( pattern ) => pattern.title ).join( ' ' )
-			);
-
-			return unmatchedTerms.length === 0;
-		} )
+		)
 		.map( ( item ) => {
 			if ( isEmpty( item.patterns ) ) {
 				return item;
@@ -97,7 +117,8 @@ export const searchItems = ( items, categories, collections, searchTerm ) => {
 					intersectionWith(
 						normalizedSearchTerms,
 						normalizeSearchTerm( pattern.title ),
-						( termToMatch, labelTerm ) => labelTerm.includes( termToMatch )
+						( termToMatch, labelTerm ) =>
+							labelTerm.includes( termToMatch )
 					).length > 0
 				);
 			} );

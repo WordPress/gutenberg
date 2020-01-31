@@ -46,7 +46,9 @@ export const TitleSmall = () => (
 );
 
 export const Subtitle = () => <Text variant="subtitle">Subtitle</Text>;
-export const SubtitleSmall = () => <Text variant="subtitle.small">Subtitle Small</Text>;
+export const SubtitleSmall = () => (
+	<Text variant="subtitle.small">Subtitle Small</Text>
+);
 
 export const Body = () => <Text variant="body">Body</Text>;
 export const BodySmall = () => <Text variant="body.small">Body Small</Text>;

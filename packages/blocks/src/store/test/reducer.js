@@ -312,7 +312,9 @@ describe( 'categories', () => {
 	} );
 
 	it( 'should override categories', () => {
-		const original = deepFreeze( [ { slug: 'chicken', title: 'Chicken' } ] );
+		const original = deepFreeze( [
+			{ slug: 'chicken', title: 'Chicken' },
+		] );
 
 		const state = categories( original, {
 			type: 'SET_CATEGORIES',

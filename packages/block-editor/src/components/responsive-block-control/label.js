@@ -5,7 +5,11 @@ import { useInstanceId } from '@wordpress/compose';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 
-export default function ResponsiveBlockControlLabel( { property, viewport, desc } ) {
+export default function ResponsiveBlockControlLabel( {
+	property,
+	viewport,
+	desc,
+} ) {
 	const instanceId = useInstanceId( ResponsiveBlockControlLabel );
 	const accessibleLabel =
 		desc ||
@@ -19,8 +23,13 @@ export default function ResponsiveBlockControlLabel( { property, viewport, desc 
 		);
 	return (
 		<Fragment>
-			<span aria-describedby={ `rbc-desc-${ instanceId }` }>{ viewport.label }</span>
-			<span className="screen-reader-text" id={ `rbc-desc-${ instanceId }` }>
+			<span aria-describedby={ `rbc-desc-${ instanceId }` }>
+				{ viewport.label }
+			</span>
+			<span
+				className="screen-reader-text"
+				id={ `rbc-desc-${ instanceId }` }
+			>
 				{ accessibleLabel }
 			</span>
 		</Fragment>

@@ -17,7 +17,8 @@ export const Rect = ( props ) => createElement( 'rect', props );
 export const SVG = ( { className, isPressed, ...props } ) => {
 	const appliedProps = {
 		...props,
-		className: classnames( className, { 'is-pressed': isPressed } ) || undefined,
+		className:
+			classnames( className, { 'is-pressed': isPressed } ) || undefined,
 		role: 'img',
 		'aria-hidden': 'true',
 		focusable: 'false',

@@ -19,7 +19,10 @@ function Warning( { className, actions, children, secondaryActions } ) {
 				{ Children.count( actions ) > 0 && (
 					<div className="block-editor-warning__actions">
 						{ Children.map( actions, ( action, i ) => (
-							<span key={ i } className="block-editor-warning__action">
+							<span
+								key={ i }
+								className="block-editor-warning__action"
+							>
 								{ action }
 							</span>
 						) ) }

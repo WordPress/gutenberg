@@ -12,13 +12,18 @@ const transforms = {
 				createBlock(
 					'core/columns',
 					{
-						align: 'wide' === width || 'full' === width ? width : undefined,
+						align:
+							'wide' === width || 'full' === width
+								? width
+								: undefined,
 						className,
 						columns,
 					},
 					content.map( ( { children } ) =>
 						createBlock( 'core/column', {}, [
-							createBlock( 'core/paragraph', { content: children } ),
+							createBlock( 'core/paragraph', {
+								content: children,
+							} ),
 						] )
 					)
 				),

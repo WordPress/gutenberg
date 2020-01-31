@@ -56,7 +56,9 @@ export class PostAuthor extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			postAuthor: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
+			postAuthor: select( 'core/editor' ).getEditedPostAttribute(
+				'author'
+			),
 			authors: select( 'core' ).getAuthors(),
 		};
 	} ),

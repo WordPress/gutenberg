@@ -7,7 +7,8 @@ export function createLogger() {
 	 * @return {Function} Augmented logger function.
 	 */
 	function createLogHandler( logger ) {
-		let log = ( message, ...args ) => logger( 'Block validation: ' + message, ...args );
+		let log = ( message, ...args ) =>
+			logger( 'Block validation: ' + message, ...args );
 
 		// In test environments, pre-process the sprintf message to improve
 		// readability of error messages. We'd prefer to avoid pulling in this
@@ -15,7 +16,8 @@ export function createLogger() {
 		// of Webpack env substitution + UglifyJS dead code elimination.
 		if ( process.env.NODE_ENV === 'test' ) {
 			// eslint-disable-next-line import/no-extraneous-dependencies
-			log = ( ...args ) => logger( require( 'sprintf-js' ).sprintf( ...args ) );
+			log = ( ...args ) =>
+				logger( require( 'sprintf-js' ).sprintf( ...args ) );
 		}
 
 		return log;

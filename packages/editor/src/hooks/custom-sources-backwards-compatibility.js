@@ -37,13 +37,23 @@ import { addFilter } from '@wordpress/hooks';
 const createWithMetaAttributeSource = ( metaAttributes ) =>
 	createHigherOrderComponent(
 		( BlockEdit ) => ( { attributes, setAttributes, ...props } ) => {
-			const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
-			const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
+			const postType = useSelect(
+				( select ) => select( 'core/editor' ).getCurrentPostType(),
+				[]
+			);
+			const [ meta, setMeta ] = useEntityProp(
+				'postType',
+				postType,
+				'meta'
+			);
 
 			const mergedAttributes = useMemo(
 				() => ( {
 					...attributes,
-					...mapValues( metaAttributes, ( metaKey ) => meta[ metaKey ] ),
+					...mapValues(
+						metaAttributes,
+						( metaKey ) => meta[ metaKey ]
+					),
 				} ),
 				[ attributes, meta ]
 			);
@@ -55,10 +65,14 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
 						const nextMeta = mapKeys(
 							// Filter to intersection of keys between the updated
 							// attributes and those with an associated meta key.
-							pickBy( nextAttributes, ( value, key ) => metaAttributes[ key ] ),
+							pickBy(
+								nextAttributes,
+								( value, key ) => metaAttributes[ key ]
+							),
 
 							// Rename the keys to the expected meta key name.
-							( value, attributeKey ) => metaAttributes[ attributeKey ]
+							( value, attributeKey ) =>
+								metaAttributes[ attributeKey ]
 						);
 
 						if ( ! isEmpty( nextMeta ) ) {
@@ -84,9 +98,14 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
  */
 function shimAttributeSource( settings ) {
 	/** @type {WPMetaAttributeMapping} */
-	const metaAttributes = mapValues( pickBy( settings.attributes, { source: 'meta' } ), 'meta' );
+	const metaAttributes = mapValues(
+		pickBy( settings.attributes, { source: 'meta' } ),
+		'meta'
+	);
 	if ( ! isEmpty( metaAttributes ) ) {
-		settings.edit = createWithMetaAttributeSource( metaAttributes )( settings.edit );
+		settings.edit = createWithMetaAttributeSource( metaAttributes )(
+			settings.edit
+		);
 	}
 
 	return settings;

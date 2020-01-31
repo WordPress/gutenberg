@@ -177,7 +177,10 @@ describe( 'actions', () => {
 				},
 			];
 
-			const replaceBlockGenerator = replaceBlocks( [ 'chicken' ], blocks );
+			const replaceBlockGenerator = replaceBlocks(
+				[ 'chicken' ],
+				blocks
+			);
 
 			expect( replaceBlockGenerator.next().value ).toEqual( {
 				args: [],
@@ -225,7 +228,10 @@ describe( 'actions', () => {
 				},
 			];
 
-			const replaceBlockGenerator = replaceBlocks( [ 'chicken' ], blocks );
+			const replaceBlockGenerator = replaceBlocks(
+				[ 'chicken' ],
+				blocks
+			);
 
 			// Skip getSettings select.
 			replaceBlockGenerator.next();
@@ -280,7 +286,12 @@ describe( 'actions', () => {
 			};
 			const index = 5;
 
-			const insertBlockGenerator = insertBlock( block, index, 'testclientid', true );
+			const insertBlockGenerator = insertBlock(
+				block,
+				index,
+				'testclientid',
+				true
+			);
 
 			// Skip getSettings select.
 			insertBlockGenerator.next();
@@ -322,7 +333,12 @@ describe( 'actions', () => {
 			};
 			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
 
-			const insertBlocksGenerator = insertBlocks( blocks, 5, 'testrootid', false );
+			const insertBlocksGenerator = insertBlocks(
+				blocks,
+				5,
+				'testrootid',
+				false
+			);
 
 			expect( insertBlocksGenerator.next().value ).toEqual( {
 				args: [],
@@ -366,9 +382,15 @@ describe( 'actions', () => {
 				value: {
 					type: 'INSERT_BLOCKS',
 					blocks: [
-						{ ...ribsBlock, attributes: { className: 'is-style-squared' } },
+						{
+							...ribsBlock,
+							attributes: { className: 'is-style-squared' },
+						},
 						chickenBlock,
-						{ ...chickenRibsBlock, attributes: { className: 'is-style-colorful' } },
+						{
+							...chickenRibsBlock,
+							attributes: { className: 'is-style-colorful' },
+						},
 					],
 					index: 5,
 					rootClientId: 'testrootid',
@@ -388,7 +410,12 @@ describe( 'actions', () => {
 			};
 			const blocks = [ ribsWithStyleBlock ];
 
-			const insertBlocksGenerator = insertBlocks( blocks, 5, 'testrootid', false );
+			const insertBlocksGenerator = insertBlocks(
+				blocks,
+				5,
+				'testrootid',
+				false
+			);
 
 			expect( insertBlocksGenerator.next().value ).toEqual( {
 				args: [],
@@ -416,7 +443,12 @@ describe( 'actions', () => {
 				done: true,
 				value: {
 					type: 'INSERT_BLOCKS',
-					blocks: [ { ...ribsWithStyleBlock, attributes: { className: 'is-style-colorful' } } ],
+					blocks: [
+						{
+							...ribsWithStyleBlock,
+							attributes: { className: 'is-style-colorful' },
+						},
+					],
 					index: 5,
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
@@ -439,7 +471,12 @@ describe( 'actions', () => {
 			};
 			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
 
-			const insertBlocksGenerator = insertBlocks( blocks, 5, 'testrootid', false );
+			const insertBlocksGenerator = insertBlocks(
+				blocks,
+				5,
+				'testrootid',
+				false
+			);
 
 			// Skip getSettings select.
 			insertBlocksGenerator.next();
@@ -489,7 +526,12 @@ describe( 'actions', () => {
 			};
 			const blocks = [ ribsBlock, chickenBlock ];
 
-			const insertBlocksGenerator = insertBlocks( blocks, 5, 'testrootid', false );
+			const insertBlocksGenerator = insertBlocks(
+				blocks,
+				5,
+				'testrootid',
+				false
+			);
 
 			// Skip getSettings select.
 			insertBlocksGenerator.next();
@@ -535,7 +577,9 @@ describe( 'actions', () => {
 		it( 'should return MERGE_BLOCKS action', () => {
 			const firstBlockClientId = 'blockA';
 			const secondBlockClientId = 'blockB';
-			expect( mergeBlocks( firstBlockClientId, secondBlockClientId ) ).toEqual( {
+			expect(
+				mergeBlocks( firstBlockClientId, secondBlockClientId )
+			).toEqual( {
 				type: 'MERGE_BLOCKS',
 				blocks: [ firstBlockClientId, secondBlockClientId ],
 			} );
@@ -564,7 +608,12 @@ describe( 'actions', () => {
 
 	describe( 'moveBlockToPosition', () => {
 		it( 'should yield MOVE_BLOCK_TO_POSITION action if locking is insert and move is not changing the root block', () => {
-			const moveBlockToPositionGenerator = moveBlockToPosition( 'chicken', 'ribs', 'ribs', 5 );
+			const moveBlockToPositionGenerator = moveBlockToPosition(
+				'chicken',
+				'ribs',
+				'ribs',
+				5
+			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
 				args: [ 'ribs' ],
@@ -573,7 +622,9 @@ describe( 'actions', () => {
 				type: 'SELECT',
 			} );
 
-			expect( moveBlockToPositionGenerator.next( 'insert' ).value ).toEqual( {
+			expect(
+				moveBlockToPositionGenerator.next( 'insert' ).value
+			).toEqual( {
 				type: 'MOVE_BLOCK_TO_POSITION',
 				fromRootClientId: 'ribs',
 				toRootClientId: 'ribs',
@@ -585,7 +636,12 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should not yield MOVE_BLOCK_TO_POSITION action if locking is all', () => {
-			const moveBlockToPositionGenerator = moveBlockToPosition( 'chicken', 'ribs', 'ribs', 5 );
+			const moveBlockToPositionGenerator = moveBlockToPosition(
+				'chicken',
+				'ribs',
+				'ribs',
+				5
+			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
 				args: [ 'ribs' ],
@@ -643,7 +699,10 @@ describe( 'actions', () => {
 				type: 'SELECT',
 			} );
 
-			expect( moveBlockToPositionGenerator.next( 'myblock/chicken-block' ).value ).toEqual( {
+			expect(
+				moveBlockToPositionGenerator.next( 'myblock/chicken-block' )
+					.value
+			).toEqual( {
 				args: [ 'myblock/chicken-block', 'chicken-ribs' ],
 				selectorName: 'canInsertBlockType',
 				storeName: 'core/block-editor',
@@ -686,7 +745,10 @@ describe( 'actions', () => {
 				type: 'SELECT',
 			} );
 
-			expect( moveBlockToPositionGenerator.next( 'myblock/chicken-block' ).value ).toEqual( {
+			expect(
+				moveBlockToPositionGenerator.next( 'myblock/chicken-block' )
+					.value
+			).toEqual( {
 				args: [ 'myblock/chicken-block', 'chicken-ribs' ],
 				selectorName: 'canInsertBlockType',
 				storeName: 'core/block-editor',
@@ -810,7 +872,9 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should return the UPDATE_BLOCK_LIST_SETTINGS action with the passed settings', () => {
-			expect( updateBlockListSettings( 'chicken', { chicken: 'ribs' } ) ).toEqual( {
+			expect(
+				updateBlockListSettings( 'chicken', { chicken: 'ribs' } )
+			).toEqual( {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
 				clientId: 'chicken',
 				settings: { chicken: 'ribs' },

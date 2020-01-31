@@ -45,14 +45,17 @@ export const settings = {
 					{
 						name: 'core/image',
 						attributes: {
-							url: 'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
+							url:
+								'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
 						},
 					},
 					{
 						name: 'core/paragraph',
 						attributes: {
 							/* translators: example text. */
-							content: __( 'Suspendisse commodo neque lacus, a dictum orci interdum et.' ),
+							content: __(
+								'Suspendisse commodo neque lacus, a dictum orci interdum et.'
+							),
 						},
 					},
 				],

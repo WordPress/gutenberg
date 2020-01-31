@@ -34,7 +34,8 @@ const DEFAULT_QUERY = {
 	_fields: 'id,name',
 };
 const MAX_TERMS_SUGGESTIONS = 20;
-const isSameTermName = ( termA, termB ) => termA.toLowerCase() === termB.toLowerCase();
+const isSameTermName = ( termA, termB ) =>
+	termA.toLowerCase() === termB.toLowerCase();
 
 /**
  * Returns a term object with name unescaped.
@@ -120,7 +121,11 @@ class FlatTermSelector extends Component {
 				availableTerms: state.availableTerms.concat(
 					terms.filter(
 						( term ) =>
-							! find( state.availableTerms, ( availableTerm ) => availableTerm.id === term.id )
+							! find(
+								state.availableTerms,
+								( availableTerm ) =>
+									availableTerm.id === term.id
+							)
 					)
 				),
 			} ) );
@@ -132,7 +137,10 @@ class FlatTermSelector extends Component {
 
 	updateSelectedTerms( terms = [] ) {
 		const selectedTerms = terms.reduce( ( accumulator, termId ) => {
-			const termObject = find( this.state.availableTerms, ( term ) => term.id === termId );
+			const termObject = find(
+				this.state.availableTerms,
+				( term ) => term.id === termId
+			);
 			if ( termObject ) {
 				accumulator.push( termObject.name );
 			}
@@ -164,7 +172,9 @@ class FlatTermSelector extends Component {
 						} ),
 					} ).then( unescapeTerms );
 					return this.addRequest.then( ( searchResult ) => {
-						return find( searchResult, ( result ) => isSameTermName( result.name, termName ) );
+						return find( searchResult, ( result ) =>
+							isSameTermName( result.name, termName )
+						);
 					} );
 				}
 				return Promise.reject( error );
@@ -177,11 +187,16 @@ class FlatTermSelector extends Component {
 		this.setState( { selectedTerms: uniqueTerms } );
 		const newTermNames = uniqueTerms.filter(
 			( termName ) =>
-				! find( this.state.availableTerms, ( term ) => isSameTermName( term.name, termName ) )
+				! find( this.state.availableTerms, ( term ) =>
+					isSameTermName( term.name, termName )
+				)
 		);
 		const termNamesToIds = ( names, availableTerms ) => {
 			return names.map(
-				( termName ) => find( availableTerms, ( term ) => isSameTermName( term.name, termName ) ).id
+				( termName ) =>
+					find( availableTerms, ( term ) =>
+						isSameTermName( term.name, termName )
+					).id
 			);
 		};
 
@@ -191,14 +206,18 @@ class FlatTermSelector extends Component {
 				this.props.taxonomy.rest_base
 			);
 		}
-		Promise.all( newTermNames.map( this.findOrCreateTerm ) ).then( ( newTerms ) => {
-			const newAvailableTerms = this.state.availableTerms.concat( newTerms );
-			this.setState( { availableTerms: newAvailableTerms } );
-			return this.props.onUpdateTerms(
-				termNamesToIds( uniqueTerms, newAvailableTerms ),
-				this.props.taxonomy.rest_base
-			);
-		} );
+		Promise.all( newTermNames.map( this.findOrCreateTerm ) ).then(
+			( newTerms ) => {
+				const newAvailableTerms = this.state.availableTerms.concat(
+					newTerms
+				);
+				this.setState( { availableTerms: newAvailableTerms } );
+				return this.props.onUpdateTerms(
+					termNamesToIds( uniqueTerms, newAvailableTerms ),
+					this.props.taxonomy.rest_base
+				);
+			}
+		);
 	}
 
 	searchTerms( search = '' ) {
@@ -225,9 +244,18 @@ class FlatTermSelector extends Component {
 			[ 'labels', 'singular_name' ],
 			slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
 		);
-		const termAddedLabel = sprintf( _x( '%s added', 'term' ), singularName );
-		const termRemovedLabel = sprintf( _x( '%s removed', 'term' ), singularName );
-		const removeTermLabel = sprintf( _x( 'Remove %s', 'term' ), singularName );
+		const termAddedLabel = sprintf(
+			_x( '%s added', 'term' ),
+			singularName
+		);
+		const termRemovedLabel = sprintf(
+			_x( '%s removed', 'term' ),
+			singularName
+		);
+		const removeTermLabel = sprintf(
+			_x( 'Remove %s', 'term' ),
+			singularName
+		);
 
 		return (
 			<FormTokenField
@@ -255,12 +283,24 @@ export default compose(
 		const taxonomy = getTaxonomy( slug );
 		return {
 			hasCreateAction: taxonomy
-				? get( getCurrentPost(), [ '_links', 'wp:action-create-' + taxonomy.rest_base ], false )
+				? get(
+						getCurrentPost(),
+						[ '_links', 'wp:action-create-' + taxonomy.rest_base ],
+						false
+				  )
 				: false,
 			hasAssignAction: taxonomy
-				? get( getCurrentPost(), [ '_links', 'wp:action-assign-' + taxonomy.rest_base ], false )
+				? get(
+						getCurrentPost(),
+						[ '_links', 'wp:action-assign-' + taxonomy.rest_base ],
+						false
+				  )
 				: false,
-			terms: taxonomy ? select( 'core/editor' ).getEditedPostAttribute( taxonomy.rest_base ) : [],
+			terms: taxonomy
+				? select( 'core/editor' ).getEditedPostAttribute(
+						taxonomy.rest_base
+				  )
+				: [],
 			taxonomy,
 		};
 	} ),

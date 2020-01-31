@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-const { defaultRequestToExternal, defaultRequestToHandle } = require( '../util' );
+const {
+	defaultRequestToExternal,
+	defaultRequestToHandle,
+} = require( '../util' );
 
 describe( 'defaultRequestToExternal', () => {
 	test( 'Returns undefined on unrecognized request', () => {
@@ -13,14 +16,16 @@ describe( 'defaultRequestToExternal', () => {
 	} );
 
 	test( 'Handles known @wordpress request', () => {
-		expect( defaultRequestToExternal( '@wordpress/i18n' ) ).toEqual( [ 'wp', 'i18n' ] );
+		expect( defaultRequestToExternal( '@wordpress/i18n' ) ).toEqual( [
+			'wp',
+			'i18n',
+		] );
 	} );
 
 	test( 'Handles future @wordpress namespace packages', () => {
-		expect( defaultRequestToExternal( '@wordpress/some-future-package' ) ).toEqual( [
-			'wp',
-			'someFuturePackage',
-		] );
+		expect(
+			defaultRequestToExternal( '@wordpress/some-future-package' )
+		).toEqual( [ 'wp', 'someFuturePackage' ] );
 	} );
 } );
 
@@ -34,8 +39,8 @@ describe( 'defaultRequestToHandle', () => {
 	} );
 
 	test( 'Handles  @wordpress request', () => {
-		expect( defaultRequestToHandle( '@wordpress/some-future-package' ) ).toBe(
-			'wp-some-future-package'
-		);
+		expect(
+			defaultRequestToHandle( '@wordpress/some-future-package' )
+		).toBe( 'wp-some-future-package' );
 	} );
 } );

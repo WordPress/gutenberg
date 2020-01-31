@@ -22,7 +22,12 @@ import { normaliseFormats } from './normalise-formats';
  *
  * @return {Object} A new value with the format applied.
  */
-export function removeFormat( value, formatType, startIndex = value.start, endIndex = value.end ) {
+export function removeFormat(
+	value,
+	formatType,
+	startIndex = value.start,
+	endIndex = value.end
+) {
 	const { formats, activeFormats } = value;
 	const newFormats = formats.slice();
 
@@ -60,7 +65,9 @@ export function removeFormat( value, formatType, startIndex = value.start, endIn
 }
 
 function filterFormats( formats, index, formatType ) {
-	const newFormats = formats[ index ].filter( ( { type } ) => type !== formatType );
+	const newFormats = formats[ index ].filter(
+		( { type } ) => type !== formatType
+	);
 
 	if ( newFormats.length ) {
 		formats[ index ] = newFormats;

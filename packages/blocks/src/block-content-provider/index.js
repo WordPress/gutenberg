@@ -46,12 +46,17 @@ const BlockContentProvider = ( { children, innerBlocks } ) => {
  *
  * @return {WPComponent} Enhanced component with injected BlockContent as prop.
  */
-export const withBlockContentContext = createHigherOrderComponent( ( OriginalComponent ) => {
-	return ( props ) => (
-		<Consumer>
-			{ ( context ) => <OriginalComponent { ...props } BlockContent={ context } /> }
-		</Consumer>
-	);
-}, 'withBlockContentContext' );
+export const withBlockContentContext = createHigherOrderComponent(
+	( OriginalComponent ) => {
+		return ( props ) => (
+			<Consumer>
+				{ ( context ) => (
+					<OriginalComponent { ...props } BlockContent={ context } />
+				) }
+			</Consumer>
+		);
+	},
+	'withBlockContentContext'
+);
 
 export default BlockContentProvider;

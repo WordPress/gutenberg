@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useContext, useCallback, useMemo } from '@wordpress/element';
+import {
+	createContext,
+	useContext,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, serialize } from '@wordpress/blocks';
 
@@ -125,12 +130,19 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 
 	const [ isDirty, isSaving, _select ] = useSelect(
 		( select ) => {
-			const { getEntityRecordNonTransientEdits, isSavingEntityRecord } = select( 'core' );
-			const editKeys = Object.keys( getEntityRecordNonTransientEdits( kind, type, id ) );
+			const {
+				getEntityRecordNonTransientEdits,
+				isSavingEntityRecord,
+			} = select( 'core' );
+			const editKeys = Object.keys(
+				getEntityRecordNonTransientEdits( kind, type, id )
+			);
 			return [
 				props
 					? editKeys.some( ( key ) =>
-							typeof props === 'string' ? key === props : props.includes( key )
+							typeof props === 'string'
+								? key === props
+								: props.includes( key )
 					  )
 					: editKeys.length > 0,
 				isSavingEntityRecord( kind, type, id ),
@@ -145,16 +157,23 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 		// We use the `select` from `useSelect` here instead of importing it from
 		// the data module so that we get the one bound to the provided registry,
 		// and not the default one.
-		let filteredEdits = _select( 'core' ).getEntityRecordNonTransientEdits( kind, type, id );
+		let filteredEdits = _select( 'core' ).getEntityRecordNonTransientEdits(
+			kind,
+			type,
+			id
+		);
 		if ( typeof props === 'string' ) {
 			filteredEdits = { [ props ]: filteredEdits[ props ] };
 		} else if ( props ) {
-			filteredEdits = Object.keys( filteredEdits ).reduce( ( acc, key ) => {
-				if ( props.includes( key ) ) {
-					acc[ key ] = filteredEdits[ key ];
-				}
-				return acc;
-			}, {} );
+			filteredEdits = Object.keys( filteredEdits ).reduce(
+				( acc, key ) => {
+					if ( props.includes( key ) ) {
+						acc[ key ] = filteredEdits[ key ];
+					}
+					return acc;
+				},
+				{}
+			);
 		}
 		saveEntityRecord( kind, type, { id, ...filteredEdits } );
 	}, [ kind, type, id, props, _select ] );
@@ -193,7 +212,9 @@ export function useEntityBlockEditor(
 	const id = useEntityId( kind, type );
 	const initialBlocks = useMemo( () => {
 		if ( initialEdits ) {
-			editEntityRecord( kind, type, id, initialEdits, { undoIgnore: true } );
+			editEntityRecord( kind, type, id, initialEdits, {
+				undoIgnore: true,
+			} );
 		}
 
 		// Guard against other instances that might have
@@ -203,13 +224,19 @@ export function useEntityBlockEditor(
 			return parsedContent.length ? parsedContent : [];
 		}
 	}, [ id ] ); // Reset when the provided entity record changes.
-	const [ blocks = initialBlocks, onInput ] = useEntityProp( kind, type, blocksProp );
+	const [ blocks = initialBlocks, onInput ] = useEntityProp(
+		kind,
+		type,
+		blocksProp
+	);
 
 	const onChange = useCallback(
 		( nextBlocks ) => {
 			onInput( nextBlocks );
 			// Use a function edit to avoid serializing often.
-			setContent( ( { blocks: blocksToSerialize } ) => serialize( blocksToSerialize ) );
+			setContent( ( { blocks: blocksToSerialize } ) =>
+				serialize( blocksToSerialize )
+			);
 		},
 		[ onInput, setContent ]
 	);

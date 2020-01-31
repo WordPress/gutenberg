@@ -33,7 +33,16 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const { pick, reduce, uniq, forEach, sortBy, isEqual, merge, isEmpty } = require( 'lodash' );
+const {
+	pick,
+	reduce,
+	uniq,
+	forEach,
+	sortBy,
+	isEqual,
+	merge,
+	isEmpty,
+} = require( 'lodash' );
 const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -178,7 +187,10 @@ function isValidTranslationKey( key ) {
  * @return {boolean} Whether valid translation keys match.
  */
 function isSameTranslation( a, b ) {
-	return isEqual( pick( a, VALID_TRANSLATION_KEYS ), pick( b, VALID_TRANSLATION_KEYS ) );
+	return isEqual(
+		pick( a, VALID_TRANSLATION_KEYS ),
+		pick( b, VALID_TRANSLATION_KEYS )
+	);
 }
 
 module.exports = function() {
@@ -200,20 +212,24 @@ module.exports = function() {
 				}
 
 				// Skip unhandled functions
-				const functionKeys = ( state.opts.functions || DEFAULT_FUNCTIONS )[ name ];
+				const functionKeys = ( state.opts.functions ||
+					DEFAULT_FUNCTIONS )[ name ];
 				if ( ! functionKeys ) {
 					return;
 				}
 
 				// Assign translation keys by argument position
-				const translation = path.node.arguments.reduce( ( memo, arg, i ) => {
-					const key = functionKeys[ i ];
-					if ( isValidTranslationKey( key ) ) {
-						memo[ key ] = getNodeAsString( arg );
-					}
+				const translation = path.node.arguments.reduce(
+					( memo, arg, i ) => {
+						const key = functionKeys[ i ];
+						if ( isValidTranslationKey( key ) ) {
+							memo[ key ] = getNodeAsString( arg );
+						}
 
-					return memo;
-				}, {} );
+						return memo;
+					},
+					{}
+				);
 
 				// Can only assign translation with usable msgid
 				if ( ! translation.msgid ) {
@@ -243,9 +259,9 @@ module.exports = function() {
 					}
 
 					// Attempt to exract nplurals from header
-					const pluralsMatch = ( baseData.headers[ 'plural-forms' ] || '' ).match(
-						/nplurals\s*=\s*(\d+);/
-					);
+					const pluralsMatch = (
+						baseData.headers[ 'plural-forms' ] || ''
+					).match( /nplurals\s*=\s*(\d+);/ );
 					if ( pluralsMatch ) {
 						nplurals = parseInt( pluralsMatch[ 1 ], 10 );
 					}
@@ -253,7 +269,9 @@ module.exports = function() {
 
 				// Create empty msgstr or array of empty msgstr by nplurals
 				if ( translation.msgid_plural ) {
-					translation.msgstr = Array.from( Array( nplurals ) ).map( () => '' );
+					translation.msgstr = Array.from( Array( nplurals ) ).map(
+						() => ''
+					);
 				} else {
 					translation.msgstr = '';
 				}
@@ -307,26 +325,41 @@ module.exports = function() {
 									'comments.reference'
 								);
 
-								forEach( sortedTranslations, ( translation ) => {
-									const { msgctxt = '', msgid } = translation;
-									if ( ! memo.hasOwnProperty( msgctxt ) ) {
-										memo[ msgctxt ] = {};
-									}
+								forEach(
+									sortedTranslations,
+									( translation ) => {
+										const {
+											msgctxt = '',
+											msgid,
+										} = translation;
+										if (
+											! memo.hasOwnProperty( msgctxt )
+										) {
+											memo[ msgctxt ] = {};
+										}
 
-									// Merge references if translation already exists
-									if ( isSameTranslation( translation, memo[ msgctxt ][ msgid ] ) ) {
-										translation.comments.reference = uniq(
-											[
-												memo[ msgctxt ][ msgid ].comments.reference,
-												translation.comments.reference,
-											]
-												.join( '\n' )
-												.split( '\n' )
-										).join( '\n' );
-									}
+										// Merge references if translation already exists
+										if (
+											isSameTranslation(
+												translation,
+												memo[ msgctxt ][ msgid ]
+											)
+										) {
+											translation.comments.reference = uniq(
+												[
+													memo[ msgctxt ][ msgid ]
+														.comments.reference,
+													translation.comments
+														.reference,
+												]
+													.join( '\n' )
+													.split( '\n' )
+											).join( '\n' );
+										}
 
-									memo[ msgctxt ][ msgid ] = translation;
-								} );
+										memo[ msgctxt ][ msgid ] = translation;
+									}
+								);
 							}
 
 							return memo;
@@ -342,7 +375,10 @@ module.exports = function() {
 					// Babel loader doesn't expose these entry points and async
 					// write may hit file lock (need queue).
 					const compiled = po.compile( data );
-					writeFileSync( state.opts.output || DEFAULT_OUTPUT, compiled );
+					writeFileSync(
+						state.opts.output || DEFAULT_OUTPUT,
+						compiled
+					);
 					this.hasPendingWrite = false;
 				},
 			},

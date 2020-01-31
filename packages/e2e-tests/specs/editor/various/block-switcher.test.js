@@ -24,7 +24,11 @@ describe( 'adding blocks', () => {
 		expect( await hasBlockSwitcher() ).toBeTruthy();
 
 		// Verify the correct block transforms appear.
-		expect( await getAvailableBlockTransforms() ).toEqual( [ 'Group', 'Paragraph', 'Quote' ] );
+		expect( await getAvailableBlockTransforms() ).toEqual( [
+			'Group',
+			'Paragraph',
+			'Quote',
+		] );
 	} );
 
 	it( 'Should show the expected block transforms on the list block when the quote block is removed', async () => {
@@ -42,7 +46,10 @@ describe( 'adding blocks', () => {
 		expect( await hasBlockSwitcher() ).toBeTruthy();
 
 		// Verify the correct block transforms appear.
-		expect( await getAvailableBlockTransforms() ).toEqual( [ 'Group', 'Paragraph' ] );
+		expect( await getAvailableBlockTransforms() ).toEqual( [
+			'Group',
+			'Paragraph',
+		] );
 	} );
 
 	it( 'Should not show the block switcher if all the blocks the list block transforms into are removed', async () => {

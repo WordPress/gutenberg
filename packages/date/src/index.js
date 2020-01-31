@@ -42,7 +42,15 @@ let settings = {
 			'Nov',
 			'Dec',
 		],
-		weekdays: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
+		weekdays: [
+			'Sunday',
+			'Monday',
+			'Tuesday',
+			'Wednesday',
+			'Thursday',
+			'Friday',
+			'Saturday',
+		],
 		weekdaysShort: [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ],
 		meridiem: { am: 'am', pm: 'pm', AM: 'AM', PM: 'PM' },
 		relative: {
@@ -90,9 +98,13 @@ export function setSettings( dateSettings ) {
 		weekdaysShort: dateSettings.l10n.weekdaysShort,
 		meridiem( hour, minute, isLowercase ) {
 			if ( hour < 12 ) {
-				return isLowercase ? dateSettings.l10n.meridiem.am : dateSettings.l10n.meridiem.AM;
+				return isLowercase
+					? dateSettings.l10n.meridiem.am
+					: dateSettings.l10n.meridiem.AM;
 			}
-			return isLowercase ? dateSettings.l10n.meridiem.pm : dateSettings.l10n.meridiem.PM;
+			return isLowercase
+				? dateSettings.l10n.meridiem.pm
+				: dateSettings.l10n.meridiem.PM;
 		},
 		longDateFormat: {
 			LT: dateSettings.formats.time,
@@ -249,7 +261,10 @@ const formatMap = {
 			minutes = parseInt( timezoned.format( 'm' ), 10 ),
 			hours = parseInt( timezoned.format( 'H' ), 10 );
 		return parseInt(
-			( seconds + minutes * MINUTE_IN_SECONDS + hours * HOUR_IN_SECONDS ) / 86.4,
+			( seconds +
+				minutes * MINUTE_IN_SECONDS +
+				hours * HOUR_IN_SECONDS ) /
+				86.4,
 			10
 		);
 	},
@@ -288,7 +303,11 @@ const formatMap = {
 		const offset = momentDate.format( 'Z' );
 		const sign = offset[ 0 ] === '-' ? -1 : 1;
 		const parts = offset.substring( 1 ).split( ':' );
-		return sign * ( parts[ 0 ] * HOUR_IN_MINUTES + parts[ 1 ] ) * MINUTE_IN_SECONDS;
+		return (
+			sign *
+			( parts[ 0 ] * HOUR_IN_MINUTES + parts[ 1 ] ) *
+			MINUTE_IN_SECONDS
+		);
 	},
 	// Full date/time
 	c: 'YYYY-MM-DDTHH:mm:ssZ', // .toISOString

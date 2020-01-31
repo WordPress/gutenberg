@@ -27,7 +27,9 @@ export default function SelectControl( {
 	const id = `inspector-select-control-${ instanceId }`;
 	const onChangeValue = ( event ) => {
 		if ( multiple ) {
-			const selectedOptions = [ ...event.target.options ].filter( ( { selected } ) => selected );
+			const selectedOptions = [ ...event.target.options ].filter(
+				( { selected } ) => selected
+			);
 			const newValues = selectedOptions.map( ( { value } ) => value );
 			onChange( newValues );
 			return;

@@ -21,7 +21,9 @@ const withConstrainedTabbing = createHigherOrderComponent(
 					return;
 				}
 
-				const tabbables = focus.tabbable.find( this.focusContainRef.current );
+				const tabbables = focus.tabbable.find(
+					this.focusContainRef.current
+				);
 				if ( ! tabbables.length ) {
 					return;
 				}
@@ -31,7 +33,10 @@ const withConstrainedTabbing = createHigherOrderComponent(
 				if ( event.shiftKey && event.target === firstTabbable ) {
 					event.preventDefault();
 					lastTabbable.focus();
-				} else if ( ! event.shiftKey && event.target === lastTabbable ) {
+				} else if (
+					! event.shiftKey &&
+					event.target === lastTabbable
+				) {
 					event.preventDefault();
 					firstTabbable.focus();
 					/*
@@ -49,7 +54,11 @@ const withConstrainedTabbing = createHigherOrderComponent(
 				// events from the wrapped component to determine when the Tab key is used.
 				/* eslint-disable jsx-a11y/no-static-element-interactions */
 				return (
-					<div onKeyDown={ this.handleTabBehaviour } ref={ this.focusContainRef } tabIndex="-1">
+					<div
+						onKeyDown={ this.handleTabBehaviour }
+						ref={ this.focusContainRef }
+						tabIndex="-1"
+					>
 						<WrappedComponent { ...this.props } />
 					</div>
 				);

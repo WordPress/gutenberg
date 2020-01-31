@@ -60,7 +60,9 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should add only aria-disabled attribute when disabled and isFocusable are true', () => {
-			const button = shallow( <Button disabled __experimentalIsFocusable /> );
+			const button = shallow(
+				<Button disabled __experimentalIsFocusable />
+			);
 			expect( button.prop( 'disabled' ) ).toBe( false );
 			expect( button.prop( 'aria-disabled' ) ).toBe( true );
 		} );
@@ -101,7 +103,10 @@ describe( 'Button', () => {
 
 		it( 'should render child elements and icon', () => {
 			const iconButton = shallow(
-				<Button icon="wordpress" children={ <p className="test">Test</p> } />
+				<Button
+					icon="wordpress"
+					children={ <p className="test">Test</p> }
+				/>
 			);
 			expect(
 				iconButton
@@ -119,10 +124,14 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should add an aria-label when the label property is used, with Tooltip wrapper', () => {
-			const iconButton = shallow( <Button icon="WordPress" label="WordPress" /> );
+			const iconButton = shallow(
+				<Button icon="WordPress" label="WordPress" />
+			);
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
-			expect( iconButton.find( 'button' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
+			expect( iconButton.find( 'button' ).prop( 'aria-label' ) ).toBe(
+				'WordPress'
+			);
 		} );
 
 		it( 'should support explicit aria-label override', () => {
@@ -132,14 +141,20 @@ describe( 'Button', () => {
 
 		it( 'should allow tooltip disable', () => {
 			const iconButton = shallow(
-				<Button icon="WordPress" label="WordPress" showTooltip={ false } />
+				<Button
+					icon="WordPress"
+					label="WordPress"
+					showTooltip={ false }
+				/>
 			);
 			expect( iconButton.name() ).toBe( 'button' );
 			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 
 		it( 'should show the tooltip for empty children', () => {
-			const iconButton = shallow( <Button icon="WordPress" label="WordPress" children={ [] } /> );
+			const iconButton = shallow(
+				<Button icon="WordPress" label="WordPress" children={ [] } />
+			);
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
 		} );
@@ -172,13 +187,17 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should allow for the passing of the target prop when a link is created', () => {
-			const button = shallow( <Button href="https://wordpress.org/" target="_blank" /> );
+			const button = shallow(
+				<Button href="https://wordpress.org/" target="_blank" />
+			);
 
 			expect( button.prop( 'target' ) ).toBe( '_blank' );
 		} );
 
 		it( 'should become a button again when disabled is supplied', () => {
-			const button = shallow( <Button href="https://wordpress.org/" disabled /> );
+			const button = shallow(
+				<Button href="https://wordpress.org/" disabled />
+			);
 
 			expect( button.type() ).toBe( 'button' );
 		} );
@@ -188,7 +207,9 @@ describe( 'Button', () => {
 		it( 'should enable access to DOM element', () => {
 			const ref = createRef();
 
-			TestUtils.renderIntoDocument( <ButtonWithForwardedRef ref={ ref } /> );
+			TestUtils.renderIntoDocument(
+				<ButtonWithForwardedRef ref={ ref } />
+			);
 			expect( ref.current.type ).toBe( 'button' );
 		} );
 	} );

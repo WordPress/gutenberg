@@ -18,7 +18,9 @@ function TemplatePartPreview() {
 	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_template_part' );
 	return (
 		<div className="wp-block-template-part__placeholder-preview">
-			<div className="wp-block-template-part__placeholder-preview-title">{ __( 'Preview' ) }</div>
+			<div className="wp-block-template-part__placeholder-preview-title">
+				{ __( 'Preview' ) }
+			</div>
 			<BlockPreview blocks={ blocks } />
 		</div>
 	);
@@ -45,7 +47,11 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 			);
 			if ( templatePart ) {
 				return (
-					<EntityProvider kind="postType" type="wp_template_part" id={ postId }>
+					<EntityProvider
+						kind="postType"
+						type="wp_template_part"
+						id={ postId }
+					>
 						<TemplatePartPreview />
 					</EntityProvider>
 				);
@@ -69,12 +75,16 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 			// Create a new template part.
 			try {
 				const cleanSlug = cleanForSlug( slug );
-				const templatePart = await saveEntityRecord( 'postType', 'wp_template_part', {
-					title: cleanSlug,
-					status: 'publish',
-					slug: cleanSlug,
-					meta: { theme },
-				} );
+				const templatePart = await saveEntityRecord(
+					'postType',
+					'wp_template_part',
+					{
+						title: cleanSlug,
+						status: 'publish',
+						slug: cleanSlug,
+						meta: { theme },
+					}
+				);
 				nextAttributes.postId = templatePart.id;
 			} catch ( err ) {
 				setHelp( __( 'Error adding template.' ) );
@@ -86,7 +96,9 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 		<Placeholder
 			icon="layout"
 			label={ __( 'Template Part' ) }
-			instructions={ __( 'Choose a template part by slug and theme, or create a new one.' ) }
+			instructions={ __(
+				'Choose a template part by slug and theme, or create a new one.'
+			) }
 		>
 			<div className="wp-block-template-part__placeholder-input-container">
 				<TextControl
@@ -106,7 +118,11 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 				/>
 			</div>
 			{ preview }
-			<Button isPrimary disabled={ ! slug || ! theme } onClick={ onChooseOrCreate }>
+			<Button
+				isPrimary
+				disabled={ ! slug || ! theme }
+				onClick={ onChooseOrCreate }
+			>
 				{ postId ? __( 'Choose' ) : __( 'Create' ) }
 			</Button>
 		</Placeholder>

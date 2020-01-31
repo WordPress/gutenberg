@@ -7,7 +7,11 @@ import deepFreeze from 'deep-freeze';
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType, createBlock } from '@wordpress/blocks';
+import {
+	registerBlockType,
+	unregisterBlockType,
+	createBlock,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -58,7 +62,9 @@ describe( 'state', () => {
 				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			};
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( false );
 		} );
 
 		it( 'should return false if last action was not updating block attributes', () => {
@@ -74,7 +80,9 @@ describe( 'state', () => {
 				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			};
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( false );
 		} );
 
 		it( 'should return false if not updating the same block', () => {
@@ -93,7 +101,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( false );
 		} );
 
 		it( 'should return false if not updating the same block attributes', () => {
@@ -112,7 +122,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( false );
 		} );
 
 		it( 'should return false if no previous action', () => {
@@ -125,7 +137,9 @@ describe( 'state', () => {
 			};
 			const previousAction = undefined;
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( false );
 		} );
 
 		it( 'should return true if updating the same block attributes', () => {
@@ -144,7 +158,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( true );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( true );
 		} );
 	} );
 
@@ -276,7 +292,9 @@ describe( 'state', () => {
 						[ newChildBlockId ]: {},
 					},
 				} );
-				expect( state.cache.chicken ).not.toBe( existingState.cache.chicken );
+				expect( state.cache.chicken ).not.toBe(
+					existingState.cache.chicken
+				);
 			} );
 
 			it( 'can insert a child block', () => {
@@ -354,7 +372,9 @@ describe( 'state', () => {
 						[ newChildBlockId ]: {},
 					},
 				} );
-				expect( state.cache.chicken ).not.toBe( existingState.cache.chicken );
+				expect( state.cache.chicken ).not.toBe(
+					existingState.cache.chicken
+				);
 			} );
 
 			it( 'can replace multiple child blocks', () => {
@@ -470,7 +490,11 @@ describe( 'state', () => {
 					},
 					order: {
 						'': [ 'chicken' ],
-						chicken: [ newChildBlockId1, newChildBlockId2, newChildBlockId3 ],
+						chicken: [
+							newChildBlockId1,
+							newChildBlockId2,
+							newChildBlockId3,
+						],
 						[ newChildBlockId1 ]: [],
 						[ newChildBlockId2 ]: [],
 						[ newChildBlockId3 ]: [],
@@ -579,7 +603,9 @@ describe( 'state', () => {
 				} );
 
 				// the cache key of the parent should be updated
-				expect( existingState.cache.chicken ).not.toBe( state.cache.chicken );
+				expect( existingState.cache.chicken ).not.toBe(
+					state.cache.chicken
+				);
 			} );
 		} );
 
@@ -605,7 +631,9 @@ describe( 'state', () => {
 				} );
 
 				expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-				expect( values( state.byClientId )[ 0 ].clientId ).toBe( 'bananas' );
+				expect( values( state.byClientId )[ 0 ].clientId ).toBe(
+					'bananas'
+				);
 				expect( state.order ).toEqual( {
 					'': [ 'bananas' ],
 					bananas: [],
@@ -623,7 +651,9 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'bananas',
-						innerBlocks: [ { clientId: 'apples', innerBlocks: [] } ],
+						innerBlocks: [
+							{ clientId: 'apples', innerBlocks: [] },
+						],
 					},
 				],
 			} );
@@ -703,7 +733,9 @@ describe( 'state', () => {
 			} );
 
 			expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-			expect( values( state.byClientId )[ 0 ].name ).toBe( 'core/freeform' );
+			expect( values( state.byClientId )[ 0 ].name ).toBe(
+				'core/freeform'
+			);
 			expect( values( state.byClientId )[ 0 ].clientId ).toBe( 'wings' );
 			expect( state.order ).toEqual( {
 				'': [ 'wings' ],
@@ -762,14 +794,17 @@ describe( 'state', () => {
 
 		it( 'should replace the nested block', () => {
 			const nestedBlock = createBlock( 'core/test-block' );
-			const wrapperBlock = createBlock( 'core/test-block', {}, [ nestedBlock ] );
+			const wrapperBlock = createBlock( 'core/test-block', {}, [
+				nestedBlock,
+			] );
 			const replacementBlock = createBlock( 'core/test-block' );
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ wrapperBlock ],
 			} );
 
-			const originalWrapperBlockCacheKey = original.cache[ wrapperBlock.clientId ];
+			const originalWrapperBlockCacheKey =
+				original.cache[ wrapperBlock.clientId ];
 
 			const state = blocks( original, {
 				type: 'REPLACE_BLOCKS',
@@ -777,9 +812,12 @@ describe( 'state', () => {
 				blocks: [ replacementBlock ],
 			} );
 
-			const newWrapperBlockCacheKey = state.cache[ wrapperBlock.clientId ];
+			const newWrapperBlockCacheKey =
+				state.cache[ wrapperBlock.clientId ];
 
-			expect( newWrapperBlockCacheKey ).not.toBe( originalWrapperBlockCacheKey );
+			expect( newWrapperBlockCacheKey ).not.toBe(
+				originalWrapperBlockCacheKey
+			);
 
 			expect( state.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
@@ -823,9 +861,15 @@ describe( 'state', () => {
 			} );
 
 			expect( Object.keys( replacedState.byClientId ) ).toHaveLength( 1 );
-			expect( values( originalState.byClientId )[ 0 ].name ).toBe( 'core/test-block' );
-			expect( values( replacedState.byClientId )[ 0 ].name ).toBe( 'core/freeform' );
-			expect( values( replacedState.byClientId )[ 0 ].clientId ).toBe( 'chicken' );
+			expect( values( originalState.byClientId )[ 0 ].name ).toBe(
+				'core/test-block'
+			);
+			expect( values( replacedState.byClientId )[ 0 ].name ).toBe(
+				'core/freeform'
+			);
+			expect( values( replacedState.byClientId )[ 0 ].clientId ).toBe(
+				'chicken'
+			);
 			expect( replacedState.order ).toEqual( {
 				'': [ 'chicken' ],
 				chicken: [],
@@ -833,7 +877,9 @@ describe( 'state', () => {
 			expect( replacedState.cache ).toEqual( {
 				chicken: {},
 			} );
-			expect( originalState.cache.chicken ).not.toBe( replacedState.cache.chicken );
+			expect( originalState.cache.chicken ).not.toBe(
+				replacedState.cache.chicken
+			);
 
 			const nestedBlock = {
 				clientId: 'chicken',
@@ -841,7 +887,9 @@ describe( 'state', () => {
 				attributes: {},
 				innerBlocks: [],
 			};
-			const wrapperBlock = createBlock( 'core/test-block', {}, [ nestedBlock ] );
+			const wrapperBlock = createBlock( 'core/test-block', {}, [
+				nestedBlock,
+			] );
 			const replacementNestedBlock = {
 				clientId: 'chicken',
 				name: 'core/freeform',
@@ -866,8 +914,12 @@ describe( 'state', () => {
 				[ replacementNestedBlock.clientId ]: [],
 			} );
 
-			expect( originalNestedState.byClientId.chicken.name ).toBe( 'core/test-block' );
-			expect( replacedNestedState.byClientId.chicken.name ).toBe( 'core/freeform' );
+			expect( originalNestedState.byClientId.chicken.name ).toBe(
+				'core/test-block'
+			);
+			expect( replacedNestedState.byClientId.chicken.name ).toBe(
+				'core/freeform'
+			);
 		} );
 
 		it( 'should update the block', () => {
@@ -976,7 +1028,10 @@ describe( 'state', () => {
 		it( 'should move the nested block up', () => {
 			const movedBlock = createBlock( 'core/test-block' );
 			const siblingBlock = createBlock( 'core/test-block' );
-			const wrapperBlock = createBlock( 'core/test-block', {}, [ siblingBlock, movedBlock ] );
+			const wrapperBlock = createBlock( 'core/test-block', {}, [
+				siblingBlock,
+				movedBlock,
+			] );
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ wrapperBlock ],
@@ -989,14 +1044,19 @@ describe( 'state', () => {
 
 			expect( state.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
-				[ wrapperBlock.clientId ]: [ movedBlock.clientId, siblingBlock.clientId ],
+				[ wrapperBlock.clientId ]: [
+					movedBlock.clientId,
+					siblingBlock.clientId,
+				],
 				[ movedBlock.clientId ]: [],
 				[ siblingBlock.clientId ]: [],
 			} );
 			expect( state.cache[ wrapperBlock.clientId ] ).not.toBe(
 				original.cache[ wrapperBlock.clientId ]
 			);
-			expect( state.cache[ movedBlock.clientId ] ).toBe( original.cache[ movedBlock.clientId ] );
+			expect( state.cache[ movedBlock.clientId ] ).toBe(
+				original.cache[ movedBlock.clientId ]
+			);
 			expect( state.cache[ siblingBlock.clientId ] ).toBe(
 				original.cache[ siblingBlock.clientId ]
 			);
@@ -1031,7 +1091,11 @@ describe( 'state', () => {
 				clientIds: [ 'ribs', 'veggies' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs', 'veggies', 'chicken' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'ribs',
+				'veggies',
+				'chicken',
+			] );
 		} );
 
 		it( 'should move multiple nested blocks up', () => {
@@ -1121,7 +1185,10 @@ describe( 'state', () => {
 		it( 'should move the nested block down', () => {
 			const movedBlock = createBlock( 'core/test-block' );
 			const siblingBlock = createBlock( 'core/test-block' );
-			const wrapperBlock = createBlock( 'core/test-block', {}, [ movedBlock, siblingBlock ] );
+			const wrapperBlock = createBlock( 'core/test-block', {}, [
+				movedBlock,
+				siblingBlock,
+			] );
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ wrapperBlock ],
@@ -1134,7 +1201,10 @@ describe( 'state', () => {
 
 			expect( state.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
-				[ wrapperBlock.clientId ]: [ siblingBlock.clientId, movedBlock.clientId ],
+				[ wrapperBlock.clientId ]: [
+					siblingBlock.clientId,
+					movedBlock.clientId,
+				],
 				[ movedBlock.clientId ]: [],
 				[ siblingBlock.clientId ]: [],
 			} );
@@ -1169,7 +1239,11 @@ describe( 'state', () => {
 				clientIds: [ 'chicken', 'ribs' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'veggies', 'chicken', 'ribs' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'veggies',
+				'chicken',
+				'ribs',
+			] );
 		} );
 
 		it( 'should move multiple nested blocks down', () => {
@@ -1320,7 +1394,9 @@ describe( 'state', () => {
 
 		it( 'should cascade remove to include inner blocks', () => {
 			const block = createBlock( 'core/test-block', {}, [
-				createBlock( 'core/test-block', {}, [ createBlock( 'core/test-block' ) ] ),
+				createBlock( 'core/test-block', {}, [
+					createBlock( 'core/test-block' ),
+				] ),
 			] );
 
 			const original = blocks( undefined, {
@@ -1372,7 +1448,11 @@ describe( 'state', () => {
 			} );
 
 			expect( Object.keys( state.byClientId ) ).toHaveLength( 3 );
-			expect( state.order[ '' ] ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'kumquat',
+				'persimmon',
+				'loquat',
+			] );
 		} );
 
 		it( 'should move block to lower index', () => {
@@ -1405,7 +1485,11 @@ describe( 'state', () => {
 				index: 0,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs', 'chicken', 'veggies' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'ribs',
+				'chicken',
+				'veggies',
+			] );
 		} );
 
 		it( 'should move block to higher index', () => {
@@ -1438,7 +1522,11 @@ describe( 'state', () => {
 				index: 2,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'chicken', 'veggies', 'ribs' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'chicken',
+				'veggies',
+				'ribs',
+			] );
 		} );
 
 		it( 'should not move block if passed same index', () => {
@@ -1471,7 +1559,11 @@ describe( 'state', () => {
 				index: 1,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'chicken', 'ribs', 'veggies' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'chicken',
+				'ribs',
+				'veggies',
+			] );
 		} );
 
 		describe( 'blocks', () => {
@@ -1502,7 +1594,9 @@ describe( 'state', () => {
 						],
 					},
 				];
-				const original = deepFreeze( actions.reduce( blocks, undefined ) );
+				const original = deepFreeze(
+					actions.reduce( blocks, undefined )
+				);
 
 				const state = blocks( original, {
 					type: 'RESET_BLOCKS',
@@ -1817,7 +1911,9 @@ describe( 'state', () => {
 
 			describe( 'isIgnoredChange', () => {
 				it( 'should consider received blocks as ignored change', () => {
-					const resetState = blocks( undefined, { type: 'random action' } );
+					const resetState = blocks( undefined, {
+						type: 'random action',
+					} );
 					const state = blocks( resetState, {
 						type: 'RECEIVE_BLOCKS',
 						blocks: [
@@ -2302,7 +2398,10 @@ describe( 'state', () => {
 				type: 'TOGGLE_BLOCK_MODE',
 				clientId: 'chicken',
 			};
-			const value = blocksMode( deepFreeze( { chicken: 'html' } ), action );
+			const value = blocksMode(
+				deepFreeze( { chicken: 'html' } ),
+				action
+			);
 
 			expect( value ).toEqual( { chicken: 'visual' } );
 		} );

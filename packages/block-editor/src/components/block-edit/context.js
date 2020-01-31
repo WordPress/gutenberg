@@ -44,7 +44,10 @@ export const withBlockEditContext = ( mapContextToProps ) =>
 		return ( props ) => (
 			<Consumer>
 				{ ( context ) => (
-					<OriginalComponent { ...props } { ...mapContextToProps( context, props ) } />
+					<OriginalComponent
+						{ ...props }
+						{ ...mapContextToProps( context, props ) }
+					/>
 				) }
 			</Consumer>
 		);
@@ -58,8 +61,15 @@ export const withBlockEditContext = ( mapContextToProps ) =>
  *
  * @return {WPComponent} Component which renders only when the BlockEdit is selected.
  */
-export const ifBlockEditSelected = createHigherOrderComponent( ( OriginalComponent ) => {
-	return ( props ) => (
-		<Consumer>{ ( { isSelected } ) => isSelected && <OriginalComponent { ...props } /> }</Consumer>
-	);
-}, 'ifBlockEditSelected' );
+export const ifBlockEditSelected = createHigherOrderComponent(
+	( OriginalComponent ) => {
+		return ( props ) => (
+			<Consumer>
+				{ ( { isSelected } ) =>
+					isSelected && <OriginalComponent { ...props } />
+				}
+			</Consumer>
+		);
+	},
+	'ifBlockEditSelected'
+);

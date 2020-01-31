@@ -31,7 +31,9 @@ describe( 'ToolbarGroup', () => {
 				},
 			];
 			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
-			const button = wrapper.find( '[aria-label="WordPress"]' ).hostNodes();
+			const button = wrapper
+				.find( '[aria-label="WordPress"]' )
+				.hostNodes();
 			expect( button.props() ).toMatchObject( {
 				'aria-label': 'WordPress',
 				'aria-pressed': false,
@@ -50,7 +52,9 @@ describe( 'ToolbarGroup', () => {
 				},
 			];
 			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
-			const button = wrapper.find( '[aria-label="WordPress"]' ).hostNodes();
+			const button = wrapper
+				.find( '[aria-label="WordPress"]' )
+				.hostNodes();
 			expect( button.props() ).toMatchObject( {
 				'aria-label': 'WordPress',
 				'aria-pressed': true,
@@ -78,7 +82,9 @@ describe( 'ToolbarGroup', () => {
 
 			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
 			const buttons = wrapper.find( 'button' ).hostNodes();
-			const hasLeftDivider = wrapper.find( '.has-left-divider' ).hostNodes();
+			const hasLeftDivider = wrapper
+				.find( '.has-left-divider' )
+				.hostNodes();
 			expect( buttons ).toHaveLength( 2 );
 			expect( hasLeftDivider ).toHaveLength( 1 );
 			expect( hasLeftDivider.html() ).toContain( buttons.at( 1 ).html() );
@@ -95,7 +101,9 @@ describe( 'ToolbarGroup', () => {
 				},
 			];
 			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
-			const button = wrapper.find( '[aria-label="WordPress"]' ).hostNodes();
+			const button = wrapper
+				.find( '[aria-label="WordPress"]' )
+				.hostNodes();
 			button.simulate( 'click' );
 			expect( clickHandler ).toHaveBeenCalledTimes( 1 );
 		} );

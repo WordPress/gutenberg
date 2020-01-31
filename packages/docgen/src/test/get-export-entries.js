@@ -12,7 +12,10 @@ const getExportEntries = require( '../get-export-entries' );
 describe( 'Export entries', function() {
 	it( 'default class (anonymous)', () => {
 		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/default-class-anonymous/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/default-class-anonymous/exports.json'
+			),
 			'utf-8'
 		);
 		const name = getExportEntries( JSON.parse( token ) );
@@ -28,7 +31,10 @@ describe( 'Export entries', function() {
 
 	it( 'default class (named)', function() {
 		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/default-class-named/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/default-class-named/exports.json'
+			),
 			'utf-8'
 		);
 		const name = getExportEntries( JSON.parse( token ) );
@@ -44,7 +50,10 @@ describe( 'Export entries', function() {
 
 	it( 'default function (anonymous)', function() {
 		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/default-function-anonymous/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/default-function-anonymous/exports.json'
+			),
 			'utf-8'
 		);
 		const name = getExportEntries( JSON.parse( token ) );
@@ -60,7 +69,10 @@ describe( 'Export entries', function() {
 
 	it( 'default function (named)', function() {
 		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/default-function-named/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/default-function-named/exports.json'
+			),
 			'utf-8'
 		);
 		const name = getExportEntries( JSON.parse( token ) );
@@ -76,7 +88,10 @@ describe( 'Export entries', function() {
 
 	it( 'default identifier', function() {
 		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/default-identifier/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/default-identifier/exports.json'
+			),
 			'utf-8'
 		);
 		const name = getExportEntries( JSON.parse( token ) );
@@ -92,7 +107,10 @@ describe( 'Export entries', function() {
 
 	it( 'default import (named)', function() {
 		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/default-import-named/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/default-import-named/exports.json'
+			),
 			'utf-8'
 		);
 		const name = getExportEntries( JSON.parse( token ) );
@@ -108,7 +126,10 @@ describe( 'Export entries', function() {
 
 	it( 'default import (default)', function() {
 		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/default-import-default/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/default-import-default/exports.json'
+			),
 			'utf-8'
 		);
 		const name = getExportEntries( JSON.parse( token ) );
@@ -124,7 +145,10 @@ describe( 'Export entries', function() {
 
 	it( 'default named export', function() {
 		const tokens = fs.readFileSync(
-			path.join( __dirname, './fixtures/default-named-export/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/default-named-export/exports.json'
+			),
 			'utf-8'
 		);
 		const namedExport = getExportEntries( JSON.parse( tokens )[ 0 ] );
@@ -197,7 +221,10 @@ describe( 'Export entries', function() {
 
 	it( 'named default (exported)', function() {
 		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/named-default-exported/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/named-default-exported/exports.json'
+			),
 			'utf-8'
 		);
 		const name = getExportEntries( JSON.parse( token ) );
@@ -242,7 +269,10 @@ describe( 'Export entries', function() {
 			lineEnd: 6,
 		} );
 		const tokenObject = fs.readFileSync(
-			path.join( __dirname, './fixtures/named-identifier-destructuring/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/named-identifier-destructuring/exports.json'
+			),
 			'utf-8'
 		);
 		const nameObject = getExportEntries( JSON.parse( tokenObject ) );
@@ -285,10 +315,15 @@ describe( 'Export entries', function() {
 			lineEnd: 16,
 		} );
 		const tokenIdentifiersAndInline = fs.readFileSync(
-			path.join( __dirname, './fixtures/named-identifiers-and-inline/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/named-identifiers-and-inline/exports.json'
+			),
 			'utf-8'
 		);
-		const nameInline0 = getExportEntries( JSON.parse( tokenIdentifiersAndInline )[ 0 ] );
+		const nameInline0 = getExportEntries(
+			JSON.parse( tokenIdentifiersAndInline )[ 0 ]
+		);
 		expect( nameInline0 ).toHaveLength( 2 );
 		expect( nameInline0[ 0 ] ).toEqual( {
 			localName: 'functionDeclaration',
@@ -304,7 +339,9 @@ describe( 'Export entries', function() {
 			lineStart: 11,
 			lineEnd: 11,
 		} );
-		const nameInline1 = getExportEntries( JSON.parse( tokenIdentifiersAndInline )[ 1 ] );
+		const nameInline1 = getExportEntries(
+			JSON.parse( tokenIdentifiersAndInline )[ 1 ]
+		);
 		expect( nameInline1 ).toHaveLength( 1 );
 		expect( nameInline1[ 0 ] ).toEqual( {
 			localName: 'variableDeclaration',
@@ -317,7 +354,10 @@ describe( 'Export entries', function() {
 
 	it( 'named import namespace', function() {
 		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/named-import-namespace/exports.json' ),
+			path.join(
+				__dirname,
+				'./fixtures/named-import-namespace/exports.json'
+			),
 			'utf-8'
 		);
 		const name = getExportEntries( JSON.parse( token ) );

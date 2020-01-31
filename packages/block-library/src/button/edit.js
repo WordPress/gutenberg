@@ -41,12 +41,18 @@ const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	const textColorValue = textColor && textColor.color;
 	//avoid the use of querySelector if textColor color is known and verify if node is available.
 	const textNode =
-		! textColorValue && node ? node.querySelector( '[contenteditable="true"]' ) : null;
+		! textColorValue && node
+			? node.querySelector( '[contenteditable="true"]' )
+			: null;
 	return {
 		fallbackBackgroundColor:
-			backgroundColorValue || ! node ? undefined : getComputedStyle( node ).backgroundColor,
+			backgroundColorValue || ! node
+				? undefined
+				: getComputedStyle( node ).backgroundColor,
 		fallbackTextColor:
-			textColorValue || ! textNode ? undefined : getComputedStyle( textNode ).color,
+			textColorValue || ! textNode
+				? undefined
+				: getComputedStyle( textNode ).color,
 	};
 } );
 
@@ -90,7 +96,10 @@ function URLPicker( {
 		setIsURLPickerOpen( true );
 	};
 	const linkControl = isURLPickerOpen && (
-		<Popover position="bottom center" onClose={ () => setIsURLPickerOpen( false ) }>
+		<Popover
+			position="bottom center"
+			onClose={ () => setIsURLPickerOpen( false ) }
+		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
 				value={ { url, title, opensInNewTab } }
@@ -149,7 +158,15 @@ function ButtonEdit( {
 	className,
 	isSelected,
 } ) {
-	const { borderRadius, linkTarget, placeholder, rel, text, title, url } = attributes;
+	const {
+		borderRadius,
+		linkTarget,
+		placeholder,
+		rel,
+		text,
+		title,
+		url,
+	} = attributes;
 	const onSetLinkRel = useCallback(
 		( value ) => {
 			setAttributes( { rel: value } );
@@ -175,7 +192,11 @@ function ButtonEdit( {
 		},
 		[ rel, setAttributes ]
 	);
-	const { gradientClass, gradientValue, setGradient } = __experimentalUseGradient();
+	const {
+		gradientClass,
+		gradientValue,
+		setGradient,
+	} = __experimentalUseGradient();
 
 	return (
 		<div className={ className } title={ title }>
@@ -186,7 +207,8 @@ function ButtonEdit( {
 				withoutInteractiveFormatting
 				className={ classnames( 'wp-block-button__link', {
 					'has-background': backgroundColor.color || gradientValue,
-					[ backgroundColor.class ]: ! gradientValue && backgroundColor.class,
+					[ backgroundColor.class ]:
+						! gradientValue && backgroundColor.class,
 					'has-text-color': textColor.color,
 					[ textColor.class ]: textColor.class,
 					[ gradientClass ]: gradientClass,
@@ -197,7 +219,9 @@ function ButtonEdit( {
 						? { background: gradientValue }
 						: { backgroundColor: backgroundColor.color } ),
 					color: textColor.color,
-					borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+					borderRadius: borderRadius
+						? borderRadius + 'px'
+						: undefined,
 				} }
 			/>
 			<URLPicker
@@ -238,14 +262,21 @@ function ButtonEdit( {
 						} }
 					/>
 				</PanelColorGradientSettings>
-				<BorderPanel borderRadius={ borderRadius } setAttributes={ setAttributes } />
+				<BorderPanel
+					borderRadius={ borderRadius }
+					setAttributes={ setAttributes }
+				/>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
 						label={ __( 'Open in new tab' ) }
 						onChange={ onToggleOpenInNewTab }
 						checked={ linkTarget === '_blank' }
 					/>
-					<TextControl label={ __( 'Link rel' ) } value={ rel || '' } onChange={ onSetLinkRel } />
+					<TextControl
+						label={ __( 'Link rel' ) }
+						value={ rel || '' }
+						onChange={ onSetLinkRel }
+					/>
 				</PanelBody>
 			</InspectorControls>
 		</div>

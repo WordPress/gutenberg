@@ -189,7 +189,15 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 
 					// Register Full Site Editing Blocks.
 					...( __experimentalEnableFullSiteEditing
-						? [ siteTitle, templatePart, postTitle, postContent, postAuthor, postDate, postExcerpt ]
+						? [
+								siteTitle,
+								templatePart,
+								postTitle,
+								postContent,
+								postAuthor,
+								postDate,
+								postExcerpt,
+						  ]
 						: [] ),
 				].forEach( registerBlock );
 		  }

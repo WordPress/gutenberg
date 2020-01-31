@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, ToolbarButton, Dashicon, Picker } from '@wordpress/components';
+import {
+	Dropdown,
+	ToolbarButton,
+	Dashicon,
+	Picker,
+} from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -18,7 +23,9 @@ import BlockInsertionPoint from '../block-list/insertion-point';
 const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 	<ToolbarButton
 		title={ __( 'Add block' ) }
-		icon={ <Dashicon icon="plus-alt" style={ style } color={ style.color } /> }
+		icon={
+			<Dashicon icon="plus-alt" style={ style } color={ style.color } />
+		}
 		onClick={ onToggle }
 		extraProps={ {
 			hint: __( 'Double tap to add a block' ),
@@ -74,7 +81,11 @@ export class Inserter extends Component {
 		const { isAnyBlockSelected, isSelectedBlockReplaceable } = this.props;
 		if ( isAnyBlockSelected ) {
 			if ( isSelectedBlockReplaceable ) {
-				return [ addBeforeOption, replaceCurrentOption, addAfterOption ];
+				return [
+					addBeforeOption,
+					replaceCurrentOption,
+					addAfterOption,
+				];
 			}
 			return [ addBeforeOption, addAfterOption ];
 		}
@@ -82,7 +93,11 @@ export class Inserter extends Component {
 	}
 
 	getInsertionIndex( insertionType ) {
-		const { insertionIndexDefault, insertionIndexBefore, insertionIndexAfter } = this.props;
+		const {
+			insertionIndexDefault,
+			insertionIndexBefore,
+			insertionIndexAfter,
+		} = this.props;
 		if ( insertionType === 'before' || insertionType === 'replace' ) {
 			return insertionIndexBefore;
 		}
@@ -132,7 +147,10 @@ export class Inserter extends Component {
 		if ( showSeparator && isOpen ) {
 			return <BlockInsertionPoint />;
 		}
-		const style = getStylesFromColorScheme( styles.addBlockButton, styles.addBlockButtonDark );
+		const style = getStylesFromColorScheme(
+			styles.addBlockButton,
+			styles.addBlockButtonDark
+		);
 
 		const onPress = () => {
 			this.setState(
@@ -155,7 +173,9 @@ export class Inserter extends Component {
 			this.setState(
 				{
 					destinationRootClientId: this.props.destinationRootClientId,
-					shouldReplaceBlock: this.shouldReplaceBlock( insertionType ),
+					shouldReplaceBlock: this.shouldReplaceBlock(
+						insertionType
+					),
 					insertionIndex: this.getInsertionIndex( insertionType ),
 				},
 				onToggle
@@ -192,7 +212,11 @@ export class Inserter extends Component {
 	 */
 	renderContent( { onClose, isOpen } ) {
 		const { clientId, isAppender } = this.props;
-		const { destinationRootClientId, shouldReplaceBlock, insertionIndex } = this.state;
+		const {
+			destinationRootClientId,
+			shouldReplaceBlock,
+			insertionIndex,
+		} = this.state;
 		return (
 			<InserterMenu
 				isOpen={ isOpen }
@@ -234,8 +258,13 @@ export default compose( [
 		// due to pressing `undo` button, that's why we need to check
 		// if `getBlock( end) is valid, otherwise `null` is passed
 		const isAnyBlockSelected = ! isAppender && end && getBlock( end );
-		const destinationRootClientId = isAnyBlockSelected ? getBlockRootClientId( end ) : rootClientId;
-		const selectedBlockIndex = getBlockIndex( end, destinationRootClientId );
+		const destinationRootClientId = isAnyBlockSelected
+			? getBlockRootClientId( end )
+			: rootClientId;
+		const selectedBlockIndex = getBlockIndex(
+			end,
+			destinationRootClientId
+		);
 		const endOfRootIndex = getBlockOrder( rootClientId ).length;
 		const isSelectedUnmodifiedDefaultBlock = isAnyBlockSelected
 			? isUnmodifiedDefaultBlock( getBlock( end ) )
@@ -244,7 +273,9 @@ export default compose( [
 		function getDefaultInsertionIndex() {
 			const { getSettings } = select( 'core/block-editor' );
 
-			const { __experimentalShouldInsertAtTheTop: shouldInsertAtTheTop } = getSettings();
+			const {
+				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
+			} = getSettings();
 
 			// if post title is selected insert as first block
 			if ( shouldInsertAtTheTop ) {
@@ -271,9 +302,13 @@ export default compose( [
 			return endOfRootIndex;
 		}
 
-		const insertionIndexBefore = isAnyBlockSelected ? selectedBlockIndex : 0;
+		const insertionIndexBefore = isAnyBlockSelected
+			? selectedBlockIndex
+			: 0;
 
-		const insertionIndexAfter = isAnyBlockSelected ? selectedBlockIndex + 1 : endOfRootIndex;
+		const insertionIndexAfter = isAnyBlockSelected
+			? selectedBlockIndex + 1
+			: endOfRootIndex;
 
 		return {
 			destinationRootClientId,

@@ -71,16 +71,22 @@ function testIsAccessedViaProcessEnv( node, context ) {
  * @param {Object} context The eslint context object.
  */
 function testIsUsedInStrictBinaryExpression( node, context ) {
-	const parent = findParent( node, ( candidate ) => candidate.type === 'BinaryExpression' );
+	const parent = findParent(
+		node,
+		( candidate ) => candidate.type === 'BinaryExpression'
+	);
 
 	if ( parent ) {
-		const comparisonNode = node.parent.type === 'MemberExpression' ? node.parent : node;
+		const comparisonNode =
+			node.parent.type === 'MemberExpression' ? node.parent : node;
 
 		// Test for process.env.GUTENBERG_PHASE === <number> or <number> === process.env.GUTENBERG_PHASE
 		const hasCorrectOperator = [ '===', '!==' ].includes( parent.operator );
 		const hasCorrectOperands =
-			( parent.left === comparisonNode && typeof parent.right.value === 'number' ) ||
-			( parent.right === comparisonNode && typeof parent.left.value === 'number' );
+			( parent.left === comparisonNode &&
+				typeof parent.right.value === 'number' ) ||
+			( parent.right === comparisonNode &&
+				typeof parent.left.value === 'number' );
 
 		if ( hasCorrectOperator && hasCorrectOperands ) {
 			return;
@@ -113,7 +119,10 @@ function testIsUsedInIfOrTernary( node, context ) {
 	const conditionalParent = findParent( node, ( candidate ) =>
 		[ 'IfStatement', 'ConditionalExpression' ].includes( candidate.type )
 	);
-	const binaryParent = findParent( node, ( candidate ) => candidate.type === 'BinaryExpression' );
+	const binaryParent = findParent(
+		node,
+		( candidate ) => candidate.type === 'BinaryExpression'
+	);
 
 	if (
 		conditionalParent &&

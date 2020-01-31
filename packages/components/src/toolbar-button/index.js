@@ -16,7 +16,13 @@ import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import ToolbarButtonContainer from './toolbar-button-container';
 
-function ToolbarButton( { containerClassName, className, extraProps, children, ...props } ) {
+function ToolbarButton( {
+	containerClassName,
+	className,
+	extraProps,
+	children,
+	...props
+} ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ! accessibleToolbarState ) {
@@ -35,7 +41,10 @@ function ToolbarButton( { containerClassName, className, extraProps, children, .
 							props.onClick( event );
 						}
 					} }
-					className={ classnames( 'components-toolbar__control', className ) }
+					className={ classnames(
+						'components-toolbar__control',
+						className
+					) }
 					isPressed={ props.isActive }
 					disabled={ props.isDisabled }
 					{ ...extraProps }
@@ -49,8 +58,13 @@ function ToolbarButton( { containerClassName, className, extraProps, children, .
 	// all props to Button. This means that ToolbarButton has the same API as
 	// Button.
 	return (
-		<ToolbarItem className={ classnames( 'components-toolbar-button', className ) } { ...props }>
-			{ ( toolbarItemProps ) => <Button { ...toolbarItemProps }>{ children }</Button> }
+		<ToolbarItem
+			className={ classnames( 'components-toolbar-button', className ) }
+			{ ...props }
+		>
+			{ ( toolbarItemProps ) => (
+				<Button { ...toolbarItemProps }>{ children }</Button>
+			) }
 		</ToolbarItem>
 	);
 }

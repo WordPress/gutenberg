@@ -69,15 +69,20 @@ export default compose(
 		const postType = select( 'core/editor' ).getCurrentPostType();
 		const tagsTaxonomy = select( 'core' ).getTaxonomy( 'post_tag' );
 		const tags =
-			tagsTaxonomy && select( 'core/editor' ).getEditedPostAttribute( tagsTaxonomy.rest_base );
+			tagsTaxonomy &&
+			select( 'core/editor' ).getEditedPostAttribute(
+				tagsTaxonomy.rest_base
+			);
 		return {
 			areTagsFetched: tagsTaxonomy !== undefined,
 			isPostTypeSupported:
-				tagsTaxonomy && some( tagsTaxonomy.types, ( type ) => type === postType ),
+				tagsTaxonomy &&
+				some( tagsTaxonomy.types, ( type ) => type === postType ),
 			hasTags: tags && tags.length,
 		};
 	} ),
 	ifCondition(
-		( { areTagsFetched, isPostTypeSupported } ) => isPostTypeSupported && areTagsFetched
+		( { areTagsFetched, isPostTypeSupported } ) =>
+			isPostTypeSupported && areTagsFetched
 	)
 )( MaybeTagsPanel );

@@ -8,10 +8,17 @@ import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
  */
 import InserterListItem from '../inserter-list-item';
 
-function BlockTypesList( { items = [], onSelect, onHover = () => {}, children } ) {
+function BlockTypesList( {
+	items = [],
+	onSelect,
+	onHover = () => {},
+	children,
+} ) {
 	const normalizedItems = items.reduce( ( result, item ) => {
 		const { patterns = [] } = item;
-		const hasDefaultPattern = patterns.some( ( { isDefault } ) => isDefault );
+		const hasDefaultPattern = patterns.some(
+			( { isDefault } ) => isDefault
+		);
 
 		// If there is no default inserter pattern provided,
 		// then default block type is displayed.
@@ -29,7 +36,9 @@ function BlockTypesList( { items = [], onSelect, onHover = () => {}, children } 
 						title: pattern.title || item.title,
 						description: pattern.description || item.description,
 						// If `example` is explicitly undefined for the pattern, the preview will not be shown.
-						example: pattern.hasOwnProperty( 'example' ) ? pattern.example : item.example,
+						example: pattern.hasOwnProperty( 'example' )
+							? pattern.example
+							: item.example,
 						initialAttributes: {
 							...item.initialAttributes,
 							...pattern.attributes,

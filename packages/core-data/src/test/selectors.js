@@ -22,47 +22,52 @@ import {
 } from '../selectors';
 
 // getEntityRecord and getEntityRecordNoResolver selectors share the same tests
-describe.each( [ [ getEntityRecord ], [ getEntityRecordNoResolver ] ] )( '%p', ( selector ) => {
-	it( 'should return undefined for unknown record’s key', () => {
-		const state = deepFreeze( {
-			entities: {
-				data: {
-					root: {
-						postType: {
-							queriedData: {
-								items: {},
-								queries: {},
-							},
-						},
-					},
-				},
-			},
-		} );
-		expect( selector( state, 'root', 'postType', 'post' ) ).toBe( undefined );
-	} );
-
-	it( 'should return a record by key', () => {
-		const state = deepFreeze( {
-			entities: {
-				data: {
-					root: {
-						postType: {
-							queriedData: {
-								items: {
-									post: { slug: 'post' },
+describe.each( [ [ getEntityRecord ], [ getEntityRecordNoResolver ] ] )(
+	'%p',
+	( selector ) => {
+		it( 'should return undefined for unknown record’s key', () => {
+			const state = deepFreeze( {
+				entities: {
+					data: {
+						root: {
+							postType: {
+								queriedData: {
+									items: {},
+									queries: {},
 								},
-								queries: {},
 							},
 						},
 					},
 				},
-			},
+			} );
+			expect( selector( state, 'root', 'postType', 'post' ) ).toBe(
+				undefined
+			);
 		} );
-		expect( selector( state, 'root', 'postType', 'post' ) ).toEqual( {
-			slug: 'post',
+
+		it( 'should return a record by key', () => {
+			const state = deepFreeze( {
+				entities: {
+					data: {
+						root: {
+							postType: {
+								queriedData: {
+									items: {
+										post: { slug: 'post' },
+									},
+									queries: {},
+								},
+							},
+						},
+					},
+				},
+			} );
+			expect( selector( state, 'root', 'postType', 'post' ) ).toEqual( {
+				slug: 'post',
+			} );
 		} );
-	} );
-} );
+	}
+);
 
 describe( 'getEntityRecords', () => {
 	it( 'should return an null by default', () => {
@@ -128,7 +133,9 @@ describe( 'getEntityRecordChangesByRecord', () => {
 								items: {
 									someKey: {
 										someProperty: 'somePersistedValue',
-										someRawProperty: { raw: 'somePersistedRawValue' },
+										someRawProperty: {
+											raw: 'somePersistedRawValue',
+										},
 									},
 								},
 							},
@@ -136,7 +143,8 @@ describe( 'getEntityRecordChangesByRecord', () => {
 								someKey: {
 									someProperty: 'someEditedValue',
 									someRawProperty: 'someEditedRawValue',
-									someTransientEditProperty: 'someEditedTransientEditValue',
+									someTransientEditProperty:
+										'someEditedTransientEditValue',
 								},
 							},
 						},
@@ -168,9 +176,14 @@ describe( 'getEntityRecordNonTransientEdits', () => {
 		const state = deepFreeze( {
 			entities: { config: [], data: {} },
 		} );
-		expect( getEntityRecordNonTransientEdits( state, 'someKind', 'someName', 'someId' ) ).toEqual(
-			{}
-		);
+		expect(
+			getEntityRecordNonTransientEdits(
+				state,
+				'someKind',
+				'someName',
+				'someId'
+			)
+		).toEqual( {} );
 	} );
 } );
 
@@ -179,14 +192,18 @@ describe( 'getEmbedPreview()', () => {
 		let state = deepFreeze( {
 			embedPreviews: {},
 		} );
-		expect( getEmbedPreview( state, 'http://example.com/' ) ).toBe( undefined );
+		expect( getEmbedPreview( state, 'http://example.com/' ) ).toBe(
+			undefined
+		);
 
 		state = deepFreeze( {
 			embedPreviews: {
 				'http://example.com/': { data: 42 },
 			},
 		} );
-		expect( getEmbedPreview( state, 'http://example.com/' ) ).toEqual( { data: 42 } );
+		expect( getEmbedPreview( state, 'http://example.com/' ) ).toEqual( {
+			data: 42,
+		} );
 	} );
 } );
 
@@ -194,10 +211,15 @@ describe( 'isPreviewEmbedFallback()', () => {
 	it( 'returns true if the preview html is just a single link', () => {
 		const state = deepFreeze( {
 			embedPreviews: {
-				'http://example.com/': { html: '<a href="http://example.com/">http://example.com/</a>' },
+				'http://example.com/': {
+					html:
+						'<a href="http://example.com/">http://example.com/</a>',
+				},
 			},
 		} );
-		expect( isPreviewEmbedFallback( state, 'http://example.com/' ) ).toEqual( true );
+		expect(
+			isPreviewEmbedFallback( state, 'http://example.com/' )
+		).toEqual( true );
 	} );
 } );
 
@@ -309,7 +331,9 @@ describe( 'getAutosaves', () => {
 	it( 'returns undefined for the provided post id if no autosaves exist for it in state', () => {
 		const postType = 'post';
 		const postId = 2;
-		const autosaves = [ { title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } } ];
+		const autosaves = [
+			{ title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } },
+		];
 		const state = {
 			autosaves: {
 				1: autosaves,
@@ -324,7 +348,9 @@ describe( 'getAutosaves', () => {
 	it( 'returns the autosaves for the provided post id when they exist in state', () => {
 		const postType = 'post';
 		const postId = 1;
-		const autosaves = [ { title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } } ];
+		const autosaves = [
+			{ title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } },
+		];
 		const state = {
 			autosaves: {
 				1: autosaves,
@@ -360,7 +386,9 @@ describe( 'getCurrentUser', () => {
 describe( 'getReferenceByDistinctEdits', () => {
 	it( 'should return referentially equal values across empty states', () => {
 		const state = { undo: [] };
-		expect( getReferenceByDistinctEdits( state ) ).toBe( getReferenceByDistinctEdits( state ) );
+		expect( getReferenceByDistinctEdits( state ) ).toBe(
+			getReferenceByDistinctEdits( state )
+		);
 
 		const beforeState = { undo: [] };
 		const afterState = { undo: [] };
@@ -372,7 +400,9 @@ describe( 'getReferenceByDistinctEdits', () => {
 	it( 'should return referentially equal values across unchanging non-empty state', () => {
 		const undoStates = [ {} ];
 		const state = { undo: undoStates };
-		expect( getReferenceByDistinctEdits( state ) ).toBe( getReferenceByDistinctEdits( state ) );
+		expect( getReferenceByDistinctEdits( state ) ).toBe(
+			getReferenceByDistinctEdits( state )
+		);
 
 		const beforeState = { undo: undoStates };
 		const afterState = { undo: undoStates };

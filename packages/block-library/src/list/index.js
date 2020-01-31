@@ -20,7 +20,11 @@ export const settings = {
 	title: __( 'List' ),
 	description: __( 'Create a bulleted or numbered list.' ),
 	icon,
-	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
+	keywords: [
+		__( 'bullet list' ),
+		__( 'ordered list' ),
+		__( 'numbered list' ),
+	],
 	supports: {
 		className: false,
 		__unstablePasteTextInline: true,

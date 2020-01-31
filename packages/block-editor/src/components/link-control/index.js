@@ -9,7 +9,13 @@ import { noop, startsWith } from 'lodash';
  */
 import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef, useCallback, useState, Fragment, useEffect } from '@wordpress/element';
+import {
+	useRef,
+	useCallback,
+	useState,
+	Fragment,
+	useEffect,
+} from '@wordpress/element';
 import {
 	safeDecodeURI,
 	filterURLForDisplay,
@@ -84,19 +90,30 @@ import LinkControlSearchInput from './search-input';
  *
  * @param {WPLinkControlProps} props Component props.
  */
-function LinkControl( { value, settings, onChange = noop, showInitialSuggestions } ) {
+function LinkControl( {
+	value,
+	settings,
+	onChange = noop,
+	showInitialSuggestions,
+} ) {
 	const wrapperNode = useRef();
 	const instanceId = useInstanceId( LinkControl );
-	const [ inputValue, setInputValue ] = useState( ( value && value.url ) || '' );
-	const [ isEditingLink, setIsEditingLink ] = useState( ! value || ! value.url );
+	const [ inputValue, setInputValue ] = useState(
+		( value && value.url ) || ''
+	);
+	const [ isEditingLink, setIsEditingLink ] = useState(
+		! value || ! value.url
+	);
 	const isEndingEditWithFocus = useRef( false );
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return {
-			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
+			fetchSearchSuggestions: getSettings()
+				.__experimentalFetchLinkSuggestions,
 		};
 	}, [] );
-	const displayURL = ( value && filterURLForDisplay( safeDecodeURI( value.url ) ) ) || '';
+	const displayURL =
+		( value && filterURLForDisplay( safeDecodeURI( value.url ) ) ) || '';
 
 	useEffect( () => {
 		// When `isEditingLink` is set to `false`, a focus loss could occur
@@ -115,7 +132,8 @@ function LinkControl( { value, settings, onChange = noop, showInitialSuggestions
 			// Prefer to focus a natural focusable descendent of the wrapper,
 			// but settle for the wrapper if there are no other options.
 			const nextFocusTarget =
-				focus.focusable.find( wrapperNode.current )[ 0 ] || wrapperNode.current;
+				focus.focusable.find( wrapperNode.current )[ 0 ] ||
+				wrapperNode.current;
 
 			nextFocusTarget.focus();
 		}
@@ -187,7 +205,8 @@ function LinkControl( { value, settings, onChange = noop, showInitialSuggestions
 	 */
 	function stopEditing() {
 		isEndingEditWithFocus.current =
-			!! wrapperNode.current && wrapperNode.current.contains( document.activeElement );
+			!! wrapperNode.current &&
+			wrapperNode.current.contains( document.activeElement );
 
 		setIsEditingLink( false );
 	}
@@ -201,9 +220,15 @@ function LinkControl( { value, settings, onChange = noop, showInitialSuggestions
 			const isTel = protocol.includes( 'tel' );
 
 			const handleManualEntry =
-				isInternal || isMailto || isTel || isURL( val ) || ( val && val.includes( 'www.' ) );
+				isInternal ||
+				isMailto ||
+				isTel ||
+				isURL( val ) ||
+				( val && val.includes( 'www.' ) );
 
-			return handleManualEntry ? handleDirectEntry( val, args ) : handleEntitySearch( val, args );
+			return handleManualEntry
+				? handleDirectEntry( val, args )
+				: handleEntitySearch( val, args );
 		},
 		[ handleDirectEntry, fetchSearchSuggestions ]
 	);
@@ -217,9 +242,12 @@ function LinkControl( { value, settings, onChange = noop, showInitialSuggestions
 		isLoading,
 		isInitialSuggestions,
 	} ) => {
-		const resultsListClasses = classnames( 'block-editor-link-control__search-results', {
-			'is-loading': isLoading,
-		} );
+		const resultsListClasses = classnames(
+			'block-editor-link-control__search-results',
+			{
+				'is-loading': isLoading,
+			}
+		);
 
 		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
 		const searchResultsLabelId = isInitialSuggestions
@@ -258,14 +286,19 @@ function LinkControl( { value, settings, onChange = noop, showInitialSuggestions
 					{ suggestions.map( ( suggestion, index ) => (
 						<LinkControlSearchItem
 							key={ `${ suggestion.id }-${ suggestion.type }` }
-							itemProps={ buildSuggestionItemProps( suggestion, index ) }
+							itemProps={ buildSuggestionItemProps(
+								suggestion,
+								index
+							) }
 							suggestion={ suggestion }
 							onClick={ () => {
 								stopEditing();
 								onChange( { ...value, ...suggestion } );
 							} }
 							isSelected={ index === selectedSuggestion }
-							isURL={ manualLinkEntryTypes.includes( suggestion.type.toLowerCase() ) }
+							isURL={ manualLinkEntryTypes.includes(
+								suggestion.type.toLowerCase()
+							) }
 							searchTerm={ inputValue }
 						/>
 					) ) }
@@ -275,7 +308,11 @@ function LinkControl( { value, settings, onChange = noop, showInitialSuggestions
 	};
 
 	return (
-		<div tabIndex={ -1 } ref={ wrapperNode } className="block-editor-link-control">
+		<div
+			tabIndex={ -1 }
+			ref={ wrapperNode }
+			className="block-editor-link-control"
+		>
 			{ isEditingLink || ! value ? (
 				<LinkControlSearchInput
 					value={ inputValue }
@@ -291,15 +328,21 @@ function LinkControl( { value, settings, onChange = noop, showInitialSuggestions
 				/>
 			) : (
 				<Fragment>
-					<p className="screen-reader-text" id={ `current-link-label-${ instanceId }` }>
+					<p
+						className="screen-reader-text"
+						id={ `current-link-label-${ instanceId }` }
+					>
 						{ __( 'Currently selected' ) }:
 					</p>
 					<div
 						aria-labelledby={ `current-link-label-${ instanceId }` }
 						aria-selected="true"
-						className={ classnames( 'block-editor-link-control__search-item', {
-							'is-current': true,
-						} ) }
+						className={ classnames(
+							'block-editor-link-control__search-item',
+							{
+								'is-current': true,
+							}
+						) }
 					>
 						<span className="block-editor-link-control__search-item-header">
 							<ExternalLink
@@ -309,7 +352,9 @@ function LinkControl( { value, settings, onChange = noop, showInitialSuggestions
 								{ ( value && value.title ) || displayURL }
 							</ExternalLink>
 							{ value && value.title && (
-								<span className="block-editor-link-control__search-item-info">{ displayURL }</span>
+								<span className="block-editor-link-control__search-item-info">
+									{ displayURL }
+								</span>
 							) }
 						</span>
 
@@ -321,7 +366,11 @@ function LinkControl( { value, settings, onChange = noop, showInitialSuggestions
 							{ __( 'Edit' ) }
 						</Button>
 					</div>
-					<LinkControlSettingsDrawer value={ value } settings={ settings } onChange={ onChange } />
+					<LinkControlSettingsDrawer
+						value={ value }
+						settings={ settings }
+						onChange={ onChange }
+					/>
 				</Fragment>
 			) }
 		</div>

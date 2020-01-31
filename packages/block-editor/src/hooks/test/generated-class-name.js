@@ -22,7 +22,10 @@ describe( 'generated className', () => {
 	};
 
 	describe( 'addSaveProps', () => {
-		const addSaveProps = applyFilters.bind( null, 'blocks.getSaveContent.extraProps' );
+		const addSaveProps = applyFilters.bind(
+			null,
+			'blocks.getSaveContent.extraProps'
+		);
 
 		it( 'should do nothing if the block settings do not define generated className support', () => {
 			const attributes = { className: 'foo' };
@@ -42,7 +45,11 @@ describe( 'generated className', () => {
 
 		it( 'should inject the generated className', () => {
 			const attributes = { className: 'bar' };
-			const extraProps = addSaveProps( { className: 'foo' }, blockSettings, attributes );
+			const extraProps = addSaveProps(
+				{ className: 'foo' },
+				blockSettings,
+				attributes
+			);
 
 			expect( extraProps.className ).toBe( 'wp-block-chicken-ribs foo' );
 		} );

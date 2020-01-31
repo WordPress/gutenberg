@@ -191,12 +191,16 @@ export function matcherFromSource( sourceConfig ) {
 		case 'node':
 			return node( sourceConfig.selector );
 		case 'query':
-			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
+			const subMatchers = mapValues(
+				sourceConfig.query,
+				matcherFromSource
+			);
 			return query( sourceConfig.selector, subMatchers );
 		case 'tag':
 			return flow( [
 				prop( sourceConfig.selector, 'nodeName' ),
-				( nodeName ) => ( nodeName ? nodeName.toLowerCase() : undefined ),
+				( nodeName ) =>
+					nodeName ? nodeName.toLowerCase() : undefined,
 			] );
 		default:
 			// eslint-disable-next-line no-console
@@ -229,14 +233,21 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
  *
  * @return {*} Attribute value.
  */
-export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
+export function getBlockAttribute(
+	attributeKey,
+	attributeSchema,
+	innerHTML,
+	commentAttributes
+) {
 	const { type, enum: enumSet } = attributeSchema;
 	let value;
 
 	switch ( attributeSchema.source ) {
 		// undefined source means that it's an attribute serialized to the block's "comment"
 		case undefined:
-			value = commentAttributes ? commentAttributes[ attributeKey ] : undefined;
+			value = commentAttributes
+				? commentAttributes[ attributeKey ]
+				: undefined;
 			break;
 		case 'attribute':
 		case 'property':
@@ -272,11 +283,23 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
  *
  * @return {Object} All block attributes.
  */
-export function getBlockAttributes( blockTypeOrName, innerHTML, attributes = {} ) {
+export function getBlockAttributes(
+	blockTypeOrName,
+	innerHTML,
+	attributes = {}
+) {
 	const blockType = normalizeBlockType( blockTypeOrName );
-	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
-		return getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
-	} );
+	const blockAttributes = mapValues(
+		blockType.attributes,
+		( attributeSchema, attributeKey ) => {
+			return getBlockAttribute(
+				attributeKey,
+				attributeSchema,
+				innerHTML,
+				attributes
+			);
+		}
+	);
 
 	return applyFilters(
 		'blocks.getBlockAttributes',
@@ -341,7 +364,10 @@ export function getMigratedBlock( block, parsedAttributes ) {
 		if ( ! isValid ) {
 			block = {
 				...block,
-				validationIssues: [ ...get( block, 'validationIssues', [] ), ...validationIssues ],
+				validationIssues: [
+					...get( block, 'validationIssues', [] ),
+					...validationIssues,
+				],
 			};
 			continue;
 		}
@@ -352,9 +378,10 @@ export function getMigratedBlock( block, parsedAttributes ) {
 		// inner blocks.
 		const { migrate } = deprecatedBlockType;
 		if ( migrate ) {
-			[ migratedAttributes = parsedAttributes, migratedInnerBlocks = innerBlocks ] = castArray(
-				migrate( migratedAttributes, innerBlocks )
-			);
+			[
+				migratedAttributes = parsedAttributes,
+				migratedInnerBlocks = innerBlocks,
+			] = castArray( migrate( migratedAttributes, innerBlocks ) );
 		}
 
 		block = {
@@ -426,9 +453,12 @@ export function createBlockWithFallback( blockNode ) {
 		// Preserve undelimited content for use by the unregistered type
 		// handler. A block node's `innerHTML` isn't enough, as that field only
 		// carries the block's own HTML and not its nested blocks'.
-		const originalUndelimitedContent = serializeBlockNode( reconstitutedBlockNode, {
-			isCommentDelimited: false,
-		} );
+		const originalUndelimitedContent = serializeBlockNode(
+			reconstitutedBlockNode,
+			{
+				isCommentDelimited: false,
+			}
+		);
 
 		// Preserve full block content for use by the unregistered type
 		// handler, block boundaries included.
@@ -443,7 +473,11 @@ export function createBlockWithFallback( blockNode ) {
 		}
 
 		name = unregisteredFallbackBlock;
-		attributes = { originalName, originalContent, originalUndelimitedContent };
+		attributes = {
+			originalName,
+			originalContent,
+			originalUndelimitedContent,
+		};
 		blockType = getBlockType( name );
 	}
 
@@ -457,7 +491,8 @@ export function createBlockWithFallback( blockNode ) {
 	innerBlocks = innerBlocks.filter( ( innerBlock ) => innerBlock );
 
 	const isFallbackBlock =
-		name === freeformContentFallbackBlock || name === unregisteredFallbackBlock;
+		name === freeformContentFallbackBlock ||
+		name === unregisteredFallbackBlock;
 
 	// Include in set only if type was determined.
 	if ( ! blockType || ( ! innerHTML && isFallbackBlock ) ) {
@@ -501,7 +536,9 @@ export function createBlockWithFallback( blockNode ) {
 				block.originalContent
 			);
 		} else {
-			block.validationIssues.forEach( ( { log, args } ) => log( ...args ) );
+			block.validationIssues.forEach( ( { log, args } ) =>
+				log( ...args )
+			);
 		}
 	}
 
@@ -531,19 +568,28 @@ export function createBlockWithFallback( blockNode ) {
  */
 export function serializeBlockNode( blockNode, options = {} ) {
 	const { isCommentDelimited = true } = options;
-	const { blockName, attrs = {}, innerBlocks = [], innerContent = [] } = blockNode;
+	const {
+		blockName,
+		attrs = {},
+		innerBlocks = [],
+		innerContent = [],
+	} = blockNode;
 
 	let childIndex = 0;
 	const content = innerContent
 		.map( ( item ) =>
 			// `null` denotes a nested block, otherwise we have an HTML fragment
-			item !== null ? item : serializeBlockNode( innerBlocks[ childIndex++ ], options )
+			item !== null
+				? item
+				: serializeBlockNode( innerBlocks[ childIndex++ ], options )
 		)
 		.join( '\n' )
 		.replace( /\n+/g, '\n' )
 		.trim();
 
-	return isCommentDelimited ? getCommentDelimitedContent( blockName, attrs, content ) : content;
+	return isCommentDelimited
+		? getCommentDelimitedContent( blockName, attrs, content )
+		: content;
 }
 
 /**

@@ -14,7 +14,12 @@ const patterns = [
 		name: 'two-columns-equal',
 		title: __( 'Two columns; equal split' ),
 		icon: (
-			<SVG width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+			<SVG
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
+				xmlns="http://www.w3.org/2000/svg"
+			>
 				<Path
 					fillRule="evenodd"
 					clipRule="evenodd"
@@ -30,7 +35,12 @@ const patterns = [
 		name: 'two-columns-one-third-two-thirds',
 		title: __( 'Two columns; one-third, two-thirds split' ),
 		icon: (
-			<SVG width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+			<SVG
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
+				xmlns="http://www.w3.org/2000/svg"
+			>
 				<Path
 					fillRule="evenodd"
 					clipRule="evenodd"
@@ -48,7 +58,12 @@ const patterns = [
 		name: 'two-columns-two-thirds-one-third',
 		title: __( 'Two columns; two-thirds, one-third split' ),
 		icon: (
-			<SVG width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+			<SVG
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
+				xmlns="http://www.w3.org/2000/svg"
+			>
 				<Path
 					fillRule="evenodd"
 					clipRule="evenodd"
@@ -66,21 +81,35 @@ const patterns = [
 		name: 'three-columns-equal',
 		title: __( 'Three columns; equal split' ),
 		icon: (
-			<SVG width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+			<SVG
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
+				xmlns="http://www.w3.org/2000/svg"
+			>
 				<Path
 					fillRule="evenodd"
 					d="M41 14a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h30a2 2 0 0 0 2-2V14zM28.5 34h-9V14h9v20zm2 0V14H39v20h-8.5zm-13 0H9V14h8.5v20z"
 				/>
 			</SVG>
 		),
-		innerBlocks: [ [ 'core/column' ], [ 'core/column' ], [ 'core/column' ] ],
+		innerBlocks: [
+			[ 'core/column' ],
+			[ 'core/column' ],
+			[ 'core/column' ],
+		],
 		scope: [ 'block' ],
 	},
 	{
 		name: 'three-columns-wider-center',
 		title: __( 'Three columns; wide center column' ),
 		icon: (
-			<SVG width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+			<SVG
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
+				xmlns="http://www.w3.org/2000/svg"
+			>
 				<Path
 					fillRule="evenodd"
 					d="M41 14a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h30a2 2 0 0 0 2-2V14zM31 34H17V14h14v20zm2 0V14h6v20h-6zm-18 0H9V14h6v20z"

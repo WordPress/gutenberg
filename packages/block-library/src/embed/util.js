@@ -2,7 +2,11 @@
  * Internal dependencies
  */
 import { common, others } from './core-embeds';
-import { DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK, ASPECT_RATIOS } from './constants';
+import {
+	DEFAULT_EMBED_BLOCK,
+	WORDPRESS_EMBED_BLOCK,
+	ASPECT_RATIOS,
+} from './constants';
 
 /**
  * External dependencies
@@ -92,7 +96,10 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
-	if ( WORDPRESS_EMBED_BLOCK !== name && DEFAULT_EMBED_BLOCK !== matchingBlock ) {
+	if (
+		WORDPRESS_EMBED_BLOCK !== name &&
+		DEFAULT_EMBED_BLOCK !== matchingBlock
+	) {
 		// At this point, we have discovered a more suitable block for this url, so transform it.
 		if ( name !== matchingBlock ) {
 			return createBlock( matchingBlock, { url } );
@@ -130,13 +137,21 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
  * @param {boolean} allowResponsive    If the responsive class names should be added, or removed.
  * @return {string} Deduped class names.
  */
-export function getClassNames( html, existingClassNames = '', allowResponsive = true ) {
+export function getClassNames(
+	html,
+	existingClassNames = '',
+	allowResponsive = true
+) {
 	if ( ! allowResponsive ) {
 		// Remove all of the aspect ratio related class names.
 		const aspectRatioClassNames = {
 			'wp-has-aspect-ratio': false,
 		};
-		for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
+		for (
+			let ratioIndex = 0;
+			ratioIndex < ASPECT_RATIOS.length;
+			ratioIndex++
+		) {
 			const aspectRatioToRemove = ASPECT_RATIOS[ ratioIndex ];
 			aspectRatioClassNames[ aspectRatioToRemove.className ] = false;
 		}
@@ -151,7 +166,11 @@ export function getClassNames( html, existingClassNames = '', allowResponsive = 
 	if ( iframe && iframe.height && iframe.width ) {
 		const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
 		// Given the actual aspect ratio, find the widest ratio to support it.
-		for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
+		for (
+			let ratioIndex = 0;
+			ratioIndex < ASPECT_RATIOS.length;
+			ratioIndex++
+		) {
 			const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
 			if ( aspectRatio >= potentialRatio.ratio ) {
 				return classnames( existingClassNames, {
@@ -174,7 +193,9 @@ export function getClassNames( html, existingClassNames = '', allowResponsive = 
  */
 export function fallback( url, onReplace ) {
 	const link = <a href={ url }>{ url }</a>;
-	onReplace( createBlock( 'core/paragraph', { content: renderToString( link ) } ) );
+	onReplace(
+		createBlock( 'core/paragraph', { content: renderToString( link ) } )
+	);
 }
 
 /***
@@ -188,7 +209,13 @@ export function fallback( url, onReplace ) {
  * @return {Object} Attributes and values.
  */
 export const getAttributesFromPreview = memoize(
-	( preview, title, currentClassNames, isResponsive, allowResponsive = true ) => {
+	(
+		preview,
+		title,
+		currentClassNames,
+		isResponsive,
+		allowResponsive = true
+	) => {
 		if ( ! preview ) {
 			return {};
 		}
@@ -199,7 +226,9 @@ export const getAttributesFromPreview = memoize(
 		// If we got a provider name from the API, use it for the slug, otherwise we use the title,
 		// because not all embed code gives us a provider name.
 		const { html, provider_name: providerName } = preview;
-		const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
+		const providerNameSlug = kebabCase(
+			toLower( '' !== providerName ? providerName : title )
+		);
 
 		if ( isFromWordPress( html ) ) {
 			type = 'wp-embed';

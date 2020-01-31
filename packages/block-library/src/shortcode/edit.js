@@ -12,7 +12,10 @@ export default function ShortcodeEdit( { attributes, setAttributes } ) {
 
 	return (
 		<div className="wp-block-shortcode  components-placeholder">
-			<label htmlFor={ inputId } className="components-placeholder__label">
+			<label
+				htmlFor={ inputId }
+				className="components-placeholder__label"
+			>
 				<Dashicon icon="shortcode" />
 				{ __( 'Shortcode' ) }
 			</label>

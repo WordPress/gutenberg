@@ -57,7 +57,9 @@ describe( 'Basic rendering', () => {
 		} );
 
 		// Search Input UI
-		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
 
 		expect( searchInput ).not.toBeNull();
 		expect( container.innerHTML ).toMatchSnapshot();
@@ -82,7 +84,9 @@ describe( 'Searching for a link', () => {
 		} );
 
 		// Search Input UI
-		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
 
 		// Simulate searching for a term
 		act( () => {
@@ -123,7 +127,9 @@ describe( 'Searching for a link', () => {
 		} );
 
 		// Search Input UI
-		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
 
 		// Simulate searching for a term
 		act( () => {
@@ -134,11 +140,16 @@ describe( 'Searching for a link', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
-		const firstSearchResultItemHTML = first( searchResultElements ).innerHTML;
+		const searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
+		const firstSearchResultItemHTML = first( searchResultElements )
+			.innerHTML;
 		const lastSearchResultItemHTML = last( searchResultElements ).innerHTML;
 
-		expect( searchResultElements ).toHaveLength( fauxEntitySuggestions.length );
+		expect( searchResultElements ).toHaveLength(
+			fauxEntitySuggestions.length
+		);
 
 		// Sanity check that a search suggestion shows up corresponding to the data
 		expect( firstSearchResultItemHTML ).toEqual(
@@ -149,10 +160,15 @@ describe( 'Searching for a link', () => {
 		);
 
 		// The fallback URL suggestion should not be shown when input is not URL-like
-		expect( lastSearchResultItemHTML ).not.toEqual( expect.stringContaining( 'URL' ) );
+		expect( lastSearchResultItemHTML ).not.toEqual(
+			expect.stringContaining( 'URL' )
+		);
 	} );
 
-	it.each( [ [ 'couldbeurlorentitysearchterm' ], [ 'ThisCouldAlsoBeAValidURL' ] ] )(
+	it.each( [
+		[ 'couldbeurlorentitysearchterm' ],
+		[ 'ThisCouldAlsoBeAValidURL' ],
+	] )(
 		'should display a URL suggestion as a default fallback for the search term "%s" which could potentially be a valid url.',
 		async ( searchTerm ) => {
 			act( () => {
@@ -160,30 +176,42 @@ describe( 'Searching for a link', () => {
 			} );
 
 			// Search Input UI
-			const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+			const searchInput = container.querySelector(
+				'input[aria-label="URL"]'
+			);
 
 			// Simulate searching for a term
 			act( () => {
-				Simulate.change( searchInput, { target: { value: searchTerm } } );
+				Simulate.change( searchInput, {
+					target: { value: searchTerm },
+				} );
 			} );
 
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 			await eventLoopTick();
 
 			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-			const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
-			const lastSearchResultItemHTML = last( searchResultElements ).innerHTML;
+			const searchResultElements = container.querySelectorAll(
+				'[role="listbox"] [role="option"]'
+			);
+			const lastSearchResultItemHTML = last( searchResultElements )
+				.innerHTML;
 			const additionalDefaultFallbackURLSuggestionLength = 1;
 
 			// We should see a search result for each of the expect search suggestions
 			// plus 1 additional one for the fallback URL suggestion
 			expect( searchResultElements ).toHaveLength(
-				fauxEntitySuggestions.length + additionalDefaultFallbackURLSuggestionLength
+				fauxEntitySuggestions.length +
+					additionalDefaultFallbackURLSuggestionLength
 			);
 
 			// The last item should be a URL search suggestion
-			expect( lastSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
-			expect( lastSearchResultItemHTML ).toEqual( expect.stringContaining( 'URL' ) );
+			expect( lastSearchResultItemHTML ).toEqual(
+				expect.stringContaining( searchTerm )
+			);
+			expect( lastSearchResultItemHTML ).toEqual(
+				expect.stringContaining( 'URL' )
+			);
 			expect( lastSearchResultItemHTML ).toEqual(
 				expect.stringContaining( 'Press ENTER to add this link' )
 			);
@@ -212,10 +240,14 @@ describe( 'Searching for a link', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
 
 		// Check we have definitely rendered some suggestions
-		expect( searchResultElements ).toHaveLength( fauxEntitySuggestions.length );
+		expect( searchResultElements ).toHaveLength(
+			fauxEntitySuggestions.length
+		);
 
 		// Grab the reset button now it's available
 		const resetUI = container.querySelector( '[aria-label="Reset"]' );
@@ -227,7 +259,9 @@ describe( 'Searching for a link', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
 		searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
 		expect( searchInput.value ).toBe( '' );
@@ -248,24 +282,37 @@ describe( 'Manual link entry', () => {
 			} );
 
 			// Search Input UI
-			const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+			const searchInput = container.querySelector(
+				'input[aria-label="URL"]'
+			);
 
 			// Simulate searching for a term
 			act( () => {
-				Simulate.change( searchInput, { target: { value: searchTerm } } );
+				Simulate.change( searchInput, {
+					target: { value: searchTerm },
+				} );
 			} );
 
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 			await eventLoopTick();
 
 			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-			const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
-			const firstSearchResultItemHTML = searchResultElements[ 0 ].innerHTML;
+			const searchResultElements = container.querySelectorAll(
+				'[role="listbox"] [role="option"]'
+			);
+			const firstSearchResultItemHTML =
+				searchResultElements[ 0 ].innerHTML;
 			const expectedResultsLength = 1;
 
-			expect( searchResultElements ).toHaveLength( expectedResultsLength );
-			expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
-			expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'URL' ) );
+			expect( searchResultElements ).toHaveLength(
+				expectedResultsLength
+			);
+			expect( firstSearchResultItemHTML ).toEqual(
+				expect.stringContaining( searchTerm )
+			);
+			expect( firstSearchResultItemHTML ).toEqual(
+				expect.stringContaining( 'URL' )
+			);
 			expect( firstSearchResultItemHTML ).toEqual(
 				expect.stringContaining( 'Press ENTER to add this link' )
 			);
@@ -285,11 +332,15 @@ describe( 'Manual link entry', () => {
 				} );
 
 				// Search Input UI
-				const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+				const searchInput = container.querySelector(
+					'input[aria-label="URL"]'
+				);
 
 				// Simulate searching for a term
 				act( () => {
-					Simulate.change( searchInput, { target: { value: searchTerm } } );
+					Simulate.change( searchInput, {
+						target: { value: searchTerm },
+					} );
 				} );
 
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
@@ -299,12 +350,19 @@ describe( 'Manual link entry', () => {
 				const searchResultElements = container.querySelectorAll(
 					'[role="listbox"] [role="option"]'
 				);
-				const firstSearchResultItemHTML = searchResultElements[ 0 ].innerHTML;
+				const firstSearchResultItemHTML =
+					searchResultElements[ 0 ].innerHTML;
 				const expectedResultsLength = 1;
 
-				expect( searchResultElements ).toHaveLength( expectedResultsLength );
-				expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
-				expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchType ) );
+				expect( searchResultElements ).toHaveLength(
+					expectedResultsLength
+				);
+				expect( firstSearchResultItemHTML ).toEqual(
+					expect.stringContaining( searchTerm )
+				);
+				expect( firstSearchResultItemHTML ).toEqual(
+					expect.stringContaining( searchType )
+				);
 				expect( firstSearchResultItemHTML ).toEqual(
 					expect.stringContaining( 'Press ENTER to add this link' )
 				);
@@ -324,11 +382,17 @@ describe( 'Default search suggestions', () => {
 		await eventLoopTick();
 
 		// Search Input UI
-		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultsWrapper = container.querySelector( '[role="listbox"]' );
-		const initialSearchResultElements = searchResultsWrapper.querySelectorAll( '[role="option"]' );
+		const searchResultsWrapper = container.querySelector(
+			'[role="listbox"]'
+		);
+		const initialSearchResultElements = searchResultsWrapper.querySelectorAll(
+			'[role="option"]'
+		);
 
 		const searchResultsLabel = container.querySelector(
 			`#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }`
@@ -344,7 +408,9 @@ describe( 'Default search suggestions', () => {
 		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 
 		// Verify the search results already display the initial suggestions
-		expect( initialSearchResultElements ).toHaveLength( expectedResultsLength );
+		expect( initialSearchResultElements ).toHaveLength(
+			expectedResultsLength
+		);
 
 		expect( searchResultsLabel.innerHTML ).toEqual( 'Recently updated' );
 	} );
@@ -357,7 +423,10 @@ describe( 'Default search suggestions', () => {
 		//
 		act( () => {
 			render(
-				<LinkControl showInitialSuggestions value={ fauxEntitySuggestions[ 0 ] } />,
+				<LinkControl
+					showInitialSuggestions
+					value={ fauxEntitySuggestions[ 0 ] }
+				/>,
 				container
 			);
 		} );
@@ -381,7 +450,9 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
-		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
 
 		expect( searchResultElements ).toHaveLength( 0 );
 
@@ -398,7 +469,9 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
-		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
 
 		expect( searchResultElements ).toHaveLength( 3 );
 
@@ -428,10 +501,16 @@ describe( 'Selecting links', () => {
 			'.block-editor-link-control__search-item.is-current'
 		);
 		const currentLinkHTML = currentLink.innerHTML;
-		const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
+		const currentLinkAnchor = currentLink.querySelector(
+			`[href="${ selectedLink.url }"]`
+		);
 
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.type ) );
+		expect( currentLinkHTML ).toEqual(
+			expect.stringContaining( selectedLink.title )
+		);
+		expect( currentLinkHTML ).toEqual(
+			expect.stringContaining( selectedLink.type )
+		);
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
 		expect( currentLinkAnchor ).not.toBeNull();
 	} );
@@ -442,7 +521,12 @@ describe( 'Selecting links', () => {
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( selectedLink );
 
-			return <LinkControl value={ link } onChange={ ( suggestion ) => setLink( suggestion ) } />;
+			return (
+				<LinkControl
+					value={ link }
+					onChange={ ( suggestion ) => setLink( suggestion ) }
+				/>
+			);
 		};
 
 		act( () => {
@@ -460,8 +544,12 @@ describe( 'Selecting links', () => {
 			Simulate.click( currentLinkBtn );
 		} );
 
-		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
-		currentLinkUI = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
+		currentLinkUI = container.querySelector(
+			'.block-editor-link-control__search-item.is-current'
+		);
 
 		// We should be back to showing the search input
 		expect( searchInput ).not.toBeNull();
@@ -489,7 +577,10 @@ describe( 'Selecting links', () => {
 					const [ link, setLink ] = useState();
 
 					return (
-						<LinkControl value={ link } onChange={ ( suggestion ) => setLink( suggestion ) } />
+						<LinkControl
+							value={ link }
+							onChange={ ( suggestion ) => setLink( suggestion ) }
+						/>
 					);
 				};
 
@@ -498,11 +589,15 @@ describe( 'Selecting links', () => {
 				} );
 
 				// Search Input UI
-				const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+				const searchInput = container.querySelector(
+					'input[aria-label="URL"]'
+				);
 
 				// Simulate searching for a term
 				act( () => {
-					Simulate.change( searchInput, { target: { value: searchTerm } } );
+					Simulate.change( searchInput, {
+						target: { value: searchTerm },
+					} );
 				} );
 
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
@@ -524,11 +619,17 @@ describe( 'Selecting links', () => {
 					'.block-editor-link-control__search-item.is-current'
 				);
 				const currentLinkHTML = currentLink.innerHTML;
-				const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
+				const currentLinkAnchor = currentLink.querySelector(
+					`[href="${ selectedLink.url }"]`
+				);
 
 				// Check that this suggestion is now shown as selected
-				expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-				expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
+				expect( currentLinkHTML ).toEqual(
+					expect.stringContaining( selectedLink.title )
+				);
+				expect( currentLinkHTML ).toEqual(
+					expect.stringContaining( 'Edit' )
+				);
 				expect( currentLinkAnchor ).not.toBeNull();
 			}
 		);
@@ -554,7 +655,10 @@ describe( 'Selecting links', () => {
 					const [ link, setLink ] = useState();
 
 					return (
-						<LinkControl value={ link } onChange={ ( suggestion ) => setLink( suggestion ) } />
+						<LinkControl
+							value={ link }
+							onChange={ ( suggestion ) => setLink( suggestion ) }
+						/>
 					);
 				};
 
@@ -563,12 +667,16 @@ describe( 'Selecting links', () => {
 				} );
 
 				// Search Input UI
-				const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+				const searchInput = container.querySelector(
+					'input[aria-label="URL"]'
+				);
 				const form = container.querySelector( 'form' );
 
 				// Simulate searching for a term
 				act( () => {
-					Simulate.change( searchInput, { target: { value: searchTerm } } );
+					Simulate.change( searchInput, {
+						target: { value: searchTerm },
+					} );
 				} );
 
 				//fetchFauxEntitySuggestions resolves on next "tick" of event loop
@@ -591,7 +699,9 @@ describe( 'Selecting links', () => {
 				);
 
 				// We should have highlighted the first item using the keyboard
-				expect( selectedSearchResultElement ).toEqual( firstSearchSuggestion );
+				expect( selectedSearchResultElement ).toEqual(
+					firstSearchSuggestion
+				);
 
 				// Only entity searches contain more than 1 suggestion
 				if ( type === 'entity' ) {
@@ -605,7 +715,9 @@ describe( 'Selecting links', () => {
 					);
 
 					// We should have highlighted the first item using the keyboard
-					expect( selectedSearchResultElement ).toEqual( secondSearchSuggestion );
+					expect( selectedSearchResultElement ).toEqual(
+						secondSearchSuggestion
+					);
 
 					// Check we can go back up via up arrow
 					act( () => {
@@ -617,7 +729,9 @@ describe( 'Selecting links', () => {
 					);
 
 					// We should be back to highlighting the first search result again
-					expect( selectedSearchResultElement ).toEqual( firstSearchSuggestion );
+					expect( selectedSearchResultElement ).toEqual(
+						firstSearchSuggestion
+					);
 				}
 
 				// Commit the selected item as the current link
@@ -633,13 +747,21 @@ describe( 'Selecting links', () => {
 					'.block-editor-link-control__search-item.is-current'
 				);
 				const currentLinkHTML = currentLink.innerHTML;
-				const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
+				const currentLinkAnchor = currentLink.querySelector(
+					`[href="${ selectedLink.url }"]`
+				);
 
 				// Make sure focus is retained after submission.
-				expect( container.contains( document.activeElement ) ).toBe( true );
+				expect( container.contains( document.activeElement ) ).toBe(
+					true
+				);
 
-				expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-				expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
+				expect( currentLinkHTML ).toEqual(
+					expect.stringContaining( selectedLink.title )
+				);
+				expect( currentLinkHTML ).toEqual(
+					expect.stringContaining( 'Edit' )
+				);
 				expect( currentLinkAnchor ).not.toBeNull();
 			}
 		);
@@ -661,13 +783,21 @@ describe( 'Addition Settings UI', () => {
 			render( <LinkControlConsumer />, container );
 		} );
 
-		const newTabSettingLabel = Array.from( container.querySelectorAll( 'label' ) ).find(
-			( label ) => label.innerHTML && label.innerHTML.includes( expectedSettingText )
+		const newTabSettingLabel = Array.from(
+			container.querySelectorAll( 'label' )
+		).find(
+			( label ) =>
+				label.innerHTML &&
+				label.innerHTML.includes( expectedSettingText )
 		);
 		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found
 
-		const newTabSettingLabelForAttr = newTabSettingLabel.getAttribute( 'for' );
-		const newTabSettingInput = container.querySelector( `#${ newTabSettingLabelForAttr }` );
+		const newTabSettingLabelForAttr = newTabSettingLabel.getAttribute(
+			'for'
+		);
+		const newTabSettingInput = container.querySelector(
+			`#${ newTabSettingLabelForAttr }`
+		);
 		expect( newTabSettingInput ).not.toBeNull();
 		expect( newTabSettingInput.checked ).toBe( false );
 	} );
@@ -686,7 +816,9 @@ describe( 'Addition Settings UI', () => {
 			},
 		];
 
-		const customSettingsLabelsText = customSettings.map( ( setting ) => setting.title );
+		const customSettingsLabelsText = customSettings.map(
+			( setting ) => setting.title
+		);
 
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
@@ -704,19 +836,26 @@ describe( 'Addition Settings UI', () => {
 		} );
 
 		// Grab the elements using user perceivable DOM queries
-		const settingsLegend = Array.from( container.querySelectorAll( 'legend' ) ).find(
+		const settingsLegend = Array.from(
+			container.querySelectorAll( 'legend' )
+		).find(
 			( legend ) =>
-				legend.innerHTML && legend.innerHTML.includes( 'Currently selected link settings' )
+				legend.innerHTML &&
+				legend.innerHTML.includes( 'Currently selected link settings' )
 		);
 		const settingsFieldset = settingsLegend.closest( 'fieldset' );
-		const settingControlsLabels = Array.from( settingsFieldset.querySelectorAll( 'label' ) );
+		const settingControlsLabels = Array.from(
+			settingsFieldset.querySelectorAll( 'label' )
+		);
 		const settingControlsInputs = settingControlsLabels.map( ( label ) => {
-			return settingsFieldset.querySelector( `#${ label.getAttribute( 'for' ) }` );
+			return settingsFieldset.querySelector(
+				`#${ label.getAttribute( 'for' ) }`
+			);
 		} );
 
-		const settingControlLabelsText = Array.from( settingControlsLabels ).map(
-			( label ) => label.innerHTML
-		);
+		const settingControlLabelsText = Array.from(
+			settingControlsLabels
+		).map( ( label ) => label.innerHTML );
 
 		// Check we have the correct number of controls
 		expect( settingControlsLabels ).toHaveLength( 2 );

@@ -29,7 +29,8 @@ const isEverySelectedBlockAllowed = ( selected, allowed ) =>
  * @return {boolean} Whether the item will be rendered or not.
  */
 const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
-	! Array.isArray( allowedBlocks ) || isEverySelectedBlockAllowed( selectedBlocks, allowedBlocks );
+	! Array.isArray( allowedBlocks ) ||
+	isEverySelectedBlockAllowed( selectedBlocks, allowedBlocks );
 
 /**
  * Renders a new item in the block settings menu.
@@ -84,7 +85,14 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  *
  * @return {WPComponent} The component to be rendered.
  */
-const PluginBlockSettingsMenuItem = ( { allowedBlocks, icon, label, onClick, small, role } ) => (
+const PluginBlockSettingsMenuItem = ( {
+	allowedBlocks,
+	icon,
+	label,
+	onClick,
+	small,
+	role,
+} ) => (
 	<PluginBlockSettingsMenuGroup>
 		{ ( { selectedBlocks, onClose } ) => {
 			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {

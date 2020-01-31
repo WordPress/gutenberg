@@ -9,7 +9,11 @@ import { withSelect } from '@wordpress/data';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 function PostFormatCheck( { disablePostFormats, ...props } ) {
-	return ! disablePostFormats && <PostTypeSupportCheck { ...props } supportKeys="post-formats" />;
+	return (
+		! disablePostFormats && (
+			<PostTypeSupportCheck { ...props } supportKeys="post-formats" />
+		)
+	);
 }
 
 export default withSelect( ( select ) => {

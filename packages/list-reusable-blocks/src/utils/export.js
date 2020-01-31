@@ -20,7 +20,9 @@ import { download } from './file';
  */
 async function exportReusableBlock( id ) {
 	const postType = await apiFetch( { path: `/wp/v2/types/wp_block` } );
-	const post = await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit` } );
+	const post = await apiFetch( {
+		path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit`,
+	} );
 	const title = post.title.raw;
 	const content = post.content.raw;
 	const fileContent = JSON.stringify(

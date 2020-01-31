@@ -29,31 +29,37 @@ const afterArrayUnequal = [ 1, 2, 3, 4, 5, 'Unequal', 7 ];
 	[ 'is-equal-shallow', require( 'is-equal-shallow' ) ],
 	[ 'shallow-equals', require( 'shallow-equals' ) ],
 	[ 'fbjs/lib/shallowEqual', require( 'fbjs/lib/shallowEqual' ) ],
-].forEach( ( [ name, isShallowEqualObjects, isShallowEqualArrays = isShallowEqualObjects ] ) => {
-	suite.add( name + ' (object, equal)', () => {
-		isShallowEqualObjects( beforeObject, afterObjectEqual );
-	} );
+].forEach(
+	( [
+		name,
+		isShallowEqualObjects,
+		isShallowEqualArrays = isShallowEqualObjects,
+	] ) => {
+		suite.add( name + ' (object, equal)', () => {
+			isShallowEqualObjects( beforeObject, afterObjectEqual );
+		} );
 
-	suite.add( name + ' (object, same)', () => {
-		isShallowEqualObjects( beforeObject, afterObjectSame );
-	} );
+		suite.add( name + ' (object, same)', () => {
+			isShallowEqualObjects( beforeObject, afterObjectSame );
+		} );
 
-	suite.add( name + ' (object, unequal)', () => {
-		isShallowEqualObjects( beforeObject, afterObjectUnequal );
-	} );
+		suite.add( name + ' (object, unequal)', () => {
+			isShallowEqualObjects( beforeObject, afterObjectUnequal );
+		} );
 
-	suite.add( name + ' (array, equal)', () => {
-		isShallowEqualArrays( beforeArray, afterArrayEqual );
-	} );
+		suite.add( name + ' (array, equal)', () => {
+			isShallowEqualArrays( beforeArray, afterArrayEqual );
+		} );
 
-	suite.add( name + ' (array, same)', () => {
-		isShallowEqualArrays( beforeArray, afterArraySame );
-	} );
+		suite.add( name + ' (array, same)', () => {
+			isShallowEqualArrays( beforeArray, afterArraySame );
+		} );
 
-	suite.add( name + ' (array, unequal)', () => {
-		isShallowEqualArrays( beforeArray, afterArrayUnequal );
-	} );
-} );
+		suite.add( name + ' (array, unequal)', () => {
+			isShallowEqualArrays( beforeArray, afterArrayUnequal );
+		} );
+	}
+);
 
 suite
 	// eslint-disable-next-line no-console

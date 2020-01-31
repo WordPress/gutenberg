@@ -84,7 +84,10 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [ 'child1', 'child3' ] );
+			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
+				'child1',
+				'child3',
+			] );
 		} );
 
 		it( 'should return an array with the child block names even if only one child exists', () => {
@@ -110,7 +113,9 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [ 'child1' ] );
+			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
+				'child1',
+			] );
 		} );
 
 		it( 'should return an array with the child block names even if children have multiple parents', () => {
@@ -140,8 +145,14 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [ 'child1', 'child2', 'child3' ] );
-			expect( getChildBlockNames( state, 'parent2' ) ).toEqual( [ 'child2' ] );
+			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
+				'child1',
+				'child2',
+				'child3',
+			] );
+			expect( getChildBlockNames( state, 'parent2' ) ).toEqual( [
+				'child2',
+			] );
 		} );
 	} );
 
@@ -175,7 +186,10 @@ describe( 'selectors', () => {
 				thirdBlockPattern,
 			] );
 
-			const result = __experimentalGetDefaultBlockPattern( state, blockName );
+			const result = __experimentalGetDefaultBlockPattern(
+				state,
+				blockName
+			);
 
 			expect( result ).toEqual( defaultBlockPattern );
 		} );
@@ -197,7 +211,10 @@ describe( 'selectors', () => {
 				defaultBlockPattern,
 			] );
 
-			const result = __experimentalGetDefaultBlockPattern( state, blockName );
+			const result = __experimentalGetDefaultBlockPattern(
+				state,
+				blockName
+			);
 
 			expect( result ).toEqual( defaultBlockPattern );
 		} );
@@ -209,7 +226,10 @@ describe( 'selectors', () => {
 				thirdBlockPattern,
 			] );
 
-			const result = __experimentalGetDefaultBlockPattern( state, blockName );
+			const result = __experimentalGetDefaultBlockPattern(
+				state,
+				blockName
+			);
 
 			expect( result ).toEqual( firstBlockPattern );
 		} );
@@ -234,43 +254,71 @@ describe( 'selectors', () => {
 			[ 'block type', blockType ],
 		] )( 'by %s', ( label, nameOrType ) => {
 			it( 'should return false if not match', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'Quote' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'Quote'
+				);
 
 				expect( result ).toBe( false );
 			} );
 
 			it( 'should return true if match by title', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'Paragraph' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'Paragraph'
+				);
 
 				expect( result ).toBe( true );
 			} );
 
 			it( 'should return true if match ignoring case', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'PARAGRAPH' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'PARAGRAPH'
+				);
 
 				expect( result ).toBe( true );
 			} );
 
 			it( 'should return true if match ignoring diacritics', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'PÁRAGRAPH' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'PÁRAGRAPH'
+				);
 
 				expect( result ).toBe( true );
 			} );
 
 			it( 'should return true if match ignoring whitespace', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, '  PARAGRAPH  ' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'  PARAGRAPH  '
+				);
 
 				expect( result ).toBe( true );
 			} );
 
 			it( 'should return true if match using the keywords', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'TEXT' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'TEXT'
+				);
 
 				expect( result ).toBe( true );
 			} );
 
 			it( 'should return true if match using the categories', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'COMMON' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'COMMON'
+				);
 
 				expect( result ).toBe( true );
 			} );

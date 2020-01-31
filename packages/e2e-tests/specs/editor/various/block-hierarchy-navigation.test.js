@@ -11,7 +11,9 @@ import {
 
 async function openBlockNavigator() {
 	await pressKeyWithModifier( 'access', 'o' );
-	await page.waitForSelector( '.block-editor-block-navigation__item-button.is-selected' );
+	await page.waitForSelector(
+		'.block-editor-block-navigation__item-button.is-selected'
+	);
 }
 
 describe( 'Navigating the block hierarchy', () => {

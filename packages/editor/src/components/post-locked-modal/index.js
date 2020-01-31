@@ -131,7 +131,14 @@ class PostLockedModal extends Component {
 	}
 
 	render() {
-		const { user, postId, isLocked, isTakeover, postLockUtils, postType } = this.props;
+		const {
+			user,
+			postId,
+			isLocked,
+			isTakeover,
+			postLockUtils,
+			postType,
+		} = this.props;
 		if ( ! isLocked ) {
 			return null;
 		}

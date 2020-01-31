@@ -44,7 +44,10 @@ export const common = [
 			keywords: [ __( 'music' ), __( 'video' ) ],
 			description: __( 'Embed a YouTube video.' ),
 		},
-		patterns: [ /^https?:\/\/((m|www)\.)?youtube\.com\/.+/i, /^https?:\/\/youtu\.be\/.+/i ],
+		patterns: [
+			/^https?:\/\/((m|www)\.)?youtube\.com\/.+/i,
+			/^https?:\/\/youtu\.be\/.+/i,
+		],
 	},
 	{
 		name: 'core-embed/facebook',
@@ -103,7 +106,10 @@ export const common = [
 			keywords: [ __( 'image' ) ],
 			description: __( 'Embed Flickr content.' ),
 		},
-		patterns: [ /^https?:\/\/(www\.)?flickr\.com\/.+/i, /^https?:\/\/flic\.kr\/.+/i ],
+		patterns: [
+			/^https?:\/\/(www\.)?flickr\.com\/.+/i,
+			/^https?:\/\/flic\.kr\/.+/i,
+		],
 	},
 	{
 		name: 'core-embed/vimeo',
@@ -166,9 +172,13 @@ export const others = [
 					},
 				},
 			],
-			description: __( 'Embed Crowdsignal (formerly Polldaddy) content.' ),
+			description: __(
+				'Embed Crowdsignal (formerly Polldaddy) content.'
+			),
 		},
-		patterns: [ /^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i ],
+		patterns: [
+			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i,
+		],
 	},
 	{
 		name: 'core-embed/dailymotion',
@@ -213,7 +223,10 @@ export const others = [
 			icon: embedContentIcon,
 			description: __( 'Embed Kickstarter content.' ),
 		},
-		patterns: [ /^https?:\/\/(www\.)?kickstarter\.com\/.+/i, /^https?:\/\/kck\.st\/.+/i ],
+		patterns: [
+			/^https?:\/\/(www\.)?kickstarter\.com\/.+/i,
+			/^https?:\/\/kck\.st\/.+/i,
+		],
 	},
 	{
 		name: 'core-embed/meetup-com',

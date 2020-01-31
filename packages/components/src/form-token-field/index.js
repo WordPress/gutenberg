@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { last, take, clone, uniq, map, difference, each, identity, some } from 'lodash';
+import {
+	last,
+	take,
+	clone,
+	uniq,
+	map,
+	difference,
+	each,
+	identity,
+	some,
+} from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -69,7 +79,10 @@ class FormTokenField extends Component {
 		}
 
 		const { suggestions, value } = this.props;
-		const suggestionsDidUpdate = ! isShallowEqual( suggestions, prevProps.suggestions );
+		const suggestionsDidUpdate = ! isShallowEqual(
+			suggestions,
+			prevProps.suggestions
+		);
 		if ( suggestionsDidUpdate || value !== prevProps.value ) {
 			this.updateSuggestions( suggestionsDidUpdate );
 		}
@@ -125,7 +138,9 @@ class FormTokenField extends Component {
 
 		switch ( event.keyCode ) {
 			case BACKSPACE:
-				preventDefault = this.handleDeleteKey( this.deleteTokenBeforeInput );
+				preventDefault = this.handleDeleteKey(
+					this.deleteTokenBeforeInput
+				);
 				break;
 			case ENTER:
 				preventDefault = this.addCurrentToken();
@@ -143,7 +158,9 @@ class FormTokenField extends Component {
 				preventDefault = this.handleDownArrowKey();
 				break;
 			case DELETE:
-				preventDefault = this.handleDeleteKey( this.deleteTokenAfterInput );
+				preventDefault = this.handleDeleteKey(
+					this.deleteTokenAfterInput
+				);
 				break;
 			case SPACE:
 				if ( this.props.tokenizeOnSpace ) {
@@ -216,7 +233,10 @@ class FormTokenField extends Component {
 			this.addNewTokens( items.slice( 0, -1 ) );
 		}
 
-		this.setState( { incompleteTokenValue: tokenValue }, this.updateSuggestions );
+		this.setState(
+			{ incompleteTokenValue: tokenValue },
+			this.updateSuggestions
+		);
 
 		this.props.onInputChange( tokenValue );
 	}
@@ -312,7 +332,10 @@ class FormTokenField extends Component {
 
 	moveInputBeforePreviousToken() {
 		this.setState( ( state, props ) => ( {
-			inputOffsetFromEnd: Math.min( state.inputOffsetFromEnd + 1, props.value.length ),
+			inputOffsetFromEnd: Math.min(
+				state.inputOffsetFromEnd + 1,
+				props.value.length
+			),
 		} ) );
 	}
 
@@ -365,7 +388,10 @@ class FormTokenField extends Component {
 
 		if ( tokensToAdd.length > 0 ) {
 			const newValue = clone( this.props.value );
-			newValue.splice.apply( newValue, [ this.getIndexOfInput(), 0 ].concat( tokensToAdd ) );
+			newValue.splice.apply(
+				newValue,
+				[ this.getIndexOfInput(), 0 ].concat( tokensToAdd )
+			);
 			this.props.onChange( newValue );
 		}
 	}
@@ -437,7 +463,9 @@ class FormTokenField extends Component {
 
 	getSelectedSuggestion() {
 		if ( this.state.selectedSuggestionIndex !== -1 ) {
-			return this.getMatchingSuggestions()[ this.state.selectedSuggestionIndex ];
+			return this.getMatchingSuggestions()[
+				this.state.selectedSuggestionIndex
+			];
 		}
 	}
 
@@ -456,14 +484,19 @@ class FormTokenField extends Component {
 	}
 
 	inputHasValidValue() {
-		return this.props.saveTransform( this.state.incompleteTokenValue ).length > 0;
+		return (
+			this.props.saveTransform( this.state.incompleteTokenValue ).length >
+			0
+		);
 	}
 
 	updateSuggestions( resetSelectedSuggestion = true ) {
 		const { incompleteTokenValue } = this.state;
 
 		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
-		const matchingSuggestions = this.getMatchingSuggestions( incompleteTokenValue );
+		const matchingSuggestions = this.getMatchingSuggestions(
+			incompleteTokenValue
+		);
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 
 		const newState = {
@@ -527,7 +560,13 @@ class FormTokenField extends Component {
 	}
 
 	renderInput() {
-		const { autoCapitalize, autoComplete, maxLength, value, instanceId } = this.props;
+		const {
+			autoCapitalize,
+			autoComplete,
+			maxLength,
+			value,
+			instanceId,
+		} = this.props;
 
 		let props = {
 			instanceId,
@@ -550,12 +589,21 @@ class FormTokenField extends Component {
 	}
 
 	render() {
-		const { disabled, label = __( 'Add item' ), instanceId, className } = this.props;
+		const {
+			disabled,
+			label = __( 'Add item' ),
+			instanceId,
+			className,
+		} = this.props;
 		const { isExpanded } = this.state;
-		const classes = classnames( className, 'components-form-token-field__input-container', {
-			'is-active': this.state.isActive,
-			'is-disabled': disabled,
-		} );
+		const classes = classnames(
+			className,
+			'components-form-token-field__input-container',
+			{
+				'is-active': this.state.isActive,
+				'is-disabled': disabled,
+			}
+		);
 
 		let tokenFieldProps = {
 			className: 'components-form-token-field',
@@ -594,11 +642,15 @@ class FormTokenField extends Component {
 					{ isExpanded && (
 						<SuggestionsList
 							instanceId={ instanceId }
-							match={ this.props.saveTransform( this.state.incompleteTokenValue ) }
+							match={ this.props.saveTransform(
+								this.state.incompleteTokenValue
+							) }
 							displayTransform={ this.props.displayTransform }
 							suggestions={ matchingSuggestions }
 							selectedIndex={ this.state.selectedSuggestionIndex }
-							scrollIntoView={ this.state.selectedSuggestionScroll }
+							scrollIntoView={
+								this.state.selectedSuggestionScroll
+							}
 							onHover={ this.onSuggestionHovered }
 							onSelect={ this.onSuggestionSelected }
 						/>
@@ -609,7 +661,9 @@ class FormTokenField extends Component {
 					className="components-form-token-field__help"
 				>
 					{ this.props.tokenizeOnSpace
-						? __( 'Separate with commas, spaces, or the Enter key.' )
+						? __(
+								'Separate with commas, spaces, or the Enter key.'
+						  )
 						: __( 'Separate with commas or the Enter key.' ) }
 				</p>
 			</div>

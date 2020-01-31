@@ -8,7 +8,12 @@ import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { parse, serialize, createBlock, isReusableBlock } from '@wordpress/blocks';
+import {
+	parse,
+	serialize,
+	createBlock,
+	isReusableBlock,
+} from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 // TODO: Ideally this would be the only dispatch in scope. This requires either
 // refactoring editor actions to yielded controls, or replacing direct dispatch
@@ -50,9 +55,15 @@ export const fetchReusableBlocks = async ( action, store ) => {
 		let posts;
 
 		if ( id ) {
-			posts = [ await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }` } ) ];
+			posts = [
+				await apiFetch( {
+					path: `/wp/v2/${ postType.rest_base }/${ id }`,
+				} ),
+			];
 		} else {
-			posts = await apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
+			posts = await apiFetch( {
+				path: `/wp/v2/${ postType.rest_base }?per_page=-1`,
+			} );
 		}
 
 		const results = compact(
@@ -120,13 +131,18 @@ export const saveReusableBlocks = async ( action, store ) => {
 			updatedId: updatedReusableBlock.id,
 			id,
 		} );
-		const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
+		const message = isTemporary
+			? __( 'Block created.' )
+			: __( 'Block updated.' );
 		dataDispatch( 'core/notices' ).createSuccessNotice( message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
 			type: 'snackbar',
 		} );
 
-		dataDispatch( 'core/block-editor' ).__unstableSaveReusableBlock( id, updatedReusableBlock.id );
+		dataDispatch( 'core/block-editor' ).__unstableSaveReusableBlock(
+			id,
+			updatedReusableBlock.id
+		);
 	} catch ( error ) {
 		dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
 		dataDispatch( 'core/notices' ).createErrorNotice( error.message, {
@@ -162,7 +178,9 @@ export const deleteReusableBlocks = async ( action, store ) => {
 	const associatedBlocks = allBlocks.filter(
 		( block ) => isReusableBlock( block ) && block.attributes.ref === id
 	);
-	const associatedBlockClientIds = associatedBlocks.map( ( block ) => block.clientId );
+	const associatedBlockClientIds = associatedBlocks.map(
+		( block ) => block.clientId
+	);
 
 	const transactionId = uniqueId();
 
@@ -174,7 +192,9 @@ export const deleteReusableBlocks = async ( action, store ) => {
 
 	// Remove the parsed block.
 	if ( associatedBlockClientIds.length ) {
-		dataDispatch( 'core/block-editor' ).removeBlocks( associatedBlockClientIds );
+		dataDispatch( 'core/block-editor' ).removeBlocks(
+			associatedBlockClientIds
+		);
 	}
 
 	try {
@@ -215,7 +235,10 @@ export const convertBlockToStatic = ( action, store ) => {
 	const oldBlock = select( 'core/block-editor' ).getBlock( action.clientId );
 	const reusableBlock = getReusableBlock( state, oldBlock.attributes.ref );
 	const newBlocks = parse( reusableBlock.content );
-	dataDispatch( 'core/block-editor' ).replaceBlocks( oldBlock.clientId, newBlocks );
+	dataDispatch( 'core/block-editor' ).replaceBlocks(
+		oldBlock.clientId,
+		newBlocks
+	);
 };
 
 /**
@@ -229,7 +252,11 @@ export const convertBlockToReusable = ( action, store ) => {
 	const reusableBlock = {
 		id: uniqueId( 'reusable' ),
 		title: __( 'Untitled Reusable Block' ),
-		content: serialize( select( 'core/block-editor' ).getBlocksByClientId( action.clientIds ) ),
+		content: serialize(
+			select( 'core/block-editor' ).getBlocksByClientId(
+				action.clientIds
+			)
+		),
 	};
 
 	dispatch( receiveReusableBlocksAction( [ reusableBlock ] ) );

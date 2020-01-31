@@ -35,9 +35,14 @@ class DatePicker extends Component {
 			return;
 		}
 		// If focus was lost.
-		if ( ! document.activeElement || ! this.nodeRef.current.contains( document.activeElement ) ) {
+		if (
+			! document.activeElement ||
+			! this.nodeRef.current.contains( document.activeElement )
+		) {
 			// Retrieve the focus region div.
-			const focusRegion = this.nodeRef.current.querySelector( '.DayPicker_focusRegion' );
+			const focusRegion = this.nodeRef.current.querySelector(
+				'.DayPicker_focusRegion'
+			);
 			if ( ! focusRegion ) {
 				return;
 			}
@@ -88,7 +93,9 @@ class DatePicker extends Component {
 					hideKeyboardShortcutsPanel
 					// This is a hack to force the calendar to update on month or year change
 					// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
-					key={ `datepicker-controller-${ momentDate ? momentDate.format( 'MM-YYYY' ) : 'null' }` }
+					key={ `datepicker-controller-${
+						momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
+					}` }
 					noBorder
 					numberOfMonths={ 1 }
 					onDateChange={ this.onChangeMoment }

@@ -48,13 +48,19 @@ class LegacyWidgetEdit extends Component {
 			return (
 				<LegacyWidgetPlaceholder
 					availableLegacyWidgets={ availableLegacyWidgets }
-					hasPermissionsToManageWidgets={ hasPermissionsToManageWidgets }
+					hasPermissionsToManageWidgets={
+						hasPermissionsToManageWidgets
+					}
 					onChangeWidget={ ( newWidget ) => {
-						const { isReferenceWidget } = availableLegacyWidgets[ newWidget ];
+						const { isReferenceWidget } = availableLegacyWidgets[
+							newWidget
+						];
 						setAttributes( {
 							instance: {},
 							id: isReferenceWidget ? newWidget : undefined,
-							widgetClass: isReferenceWidget ? undefined : newWidget,
+							widgetClass: isReferenceWidget
+								? undefined
+								: newWidget,
 						} );
 					} }
 				/>
@@ -63,7 +69,9 @@ class LegacyWidgetEdit extends Component {
 
 		const inspectorControls = widgetObject ? (
 			<InspectorControls>
-				<PanelBody title={ widgetObject.name }>{ widgetObject.description }</PanelBody>
+				<PanelBody title={ widgetObject.name }>
+					{ widgetObject.description }
+				</PanelBody>
 			</InspectorControls>
 		) : null;
 		if ( ! hasPermissionsToManageWidgets ) {
@@ -80,7 +88,11 @@ class LegacyWidgetEdit extends Component {
 				<BlockControls>
 					<ToolbarGroup>
 						{ widgetObject && ! widgetObject.isHidden && (
-							<Button onClick={ this.changeWidget } label={ __( 'Change widget' ) } icon="update" />
+							<Button
+								onClick={ this.changeWidget }
+								label={ __( 'Change widget' ) }
+								icon="update"
+							/>
 						) }
 						{ hasEditForm && (
 							<>
@@ -166,7 +178,10 @@ class LegacyWidgetEdit extends Component {
 
 export default withSelect( ( select ) => {
 	const editorSettings = select( 'core/block-editor' ).getSettings();
-	const { availableLegacyWidgets, hasPermissionsToManageWidgets } = editorSettings;
+	const {
+		availableLegacyWidgets,
+		hasPermissionsToManageWidgets,
+	} = editorSettings;
 	return {
 		hasPermissionsToManageWidgets,
 		availableLegacyWidgets,

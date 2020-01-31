@@ -91,12 +91,16 @@ describe( 'actions', () => {
 		} );
 
 		it( 'yields action when speak disabled', () => {
-			const result = createNotice( undefined, 'my <strong>message</strong>', {
-				id,
-				__unstableHTML: true,
-				isDismissible: false,
-				speak: false,
-			} );
+			const result = createNotice(
+				undefined,
+				'my <strong>message</strong>',
+				{
+					id,
+					__unstableHTML: true,
+					isDismissible: false,
+					speak: false,
+				}
+			);
 
 			expect( result.next().value ).toEqual( {
 				type: 'CREATE_NOTICE',

@@ -16,11 +16,17 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 	},
 	center: {
 		icon: alignCenter,
-		title: _x( 'Vertically Align Middle', 'Block vertical alignment setting' ),
+		title: _x(
+			'Vertically Align Middle',
+			'Block vertical alignment setting'
+		),
 	},
 	bottom: {
 		icon: alignBottom,
-		title: _x( 'Vertically Align Bottom', 'Block vertical alignment setting' ),
+		title: _x(
+			'Vertically Align Bottom',
+			'Block vertical alignment setting'
+		),
 	},
 };
 
@@ -38,13 +44,21 @@ export function BlockVerticalAlignmentToolbar( {
 	}
 
 	const activeAlignment = BLOCK_ALIGNMENTS_CONTROLS[ value ];
-	const defaultAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
+	const defaultAlignmentControl =
+		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	return (
 		<Toolbar
 			isCollapsed={ isCollapsed }
-			icon={ activeAlignment ? activeAlignment.icon : defaultAlignmentControl.icon }
-			label={ _x( 'Change vertical alignment', 'Block vertical alignment setting label' ) }
+			icon={
+				activeAlignment
+					? activeAlignment.icon
+					: defaultAlignmentControl.icon
+			}
+			label={ _x(
+				'Change vertical alignment',
+				'Block vertical alignment setting label'
+			) }
 			controls={ controls.map( ( control ) => {
 				return {
 					...BLOCK_ALIGNMENTS_CONTROLS[ control ],

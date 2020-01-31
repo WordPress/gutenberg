@@ -103,7 +103,9 @@ describe( 'env cli', () => {
 		await env.start.mock.results[ 0 ].value.catch( () => {} );
 
 		expect( spinner.fail ).toHaveBeenCalledWith( 'failure message' );
-		expect( console.error ).toHaveBeenCalledWith( '\n\nfailure message\n\n' );
+		expect( console.error ).toHaveBeenCalledWith(
+			'\n\nfailure message\n\n'
+		);
 		expect( process.exit ).toHaveBeenCalledWith( 2 );
 		console.error = consoleError;
 		process.exit = processExit;

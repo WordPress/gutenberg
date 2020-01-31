@@ -37,7 +37,9 @@ class TokenFieldWrapper extends Component {
 	render() {
 		return (
 			<TokenField
-				suggestions={ this.state.isExpanded ? this.state.tokenSuggestions : null }
+				suggestions={
+					this.state.isExpanded ? this.state.tokenSuggestions : null
+				}
 				value={ this.state.tokens }
 				displayTransform={ unescapeAndFormatSpaces }
 				onChange={ this.onTokensChange }

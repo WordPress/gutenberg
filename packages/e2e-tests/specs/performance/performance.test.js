@@ -7,15 +7,23 @@ import { existsSync, readFileSync, writeFileSync } from 'fs';
 /**
  * WordPress dependencies
  */
-import { createNewPost, saveDraft, insertBlock } from '@wordpress/e2e-test-utils';
+import {
+	createNewPost,
+	saveDraft,
+	insertBlock,
+} from '@wordpress/e2e-test-utils';
 
 function readFile( filePath ) {
-	return existsSync( filePath ) ? readFileSync( filePath, 'utf8' ).trim() : '';
+	return existsSync( filePath )
+		? readFileSync( filePath, 'utf8' ).trim()
+		: '';
 }
 
 describe( 'Performance', () => {
 	it( '1000 paragraphs', async () => {
-		const html = readFile( join( __dirname, '../../assets/large-post.html' ) );
+		const html = readFile(
+			join( __dirname, '../../assets/large-post.html' )
+		);
 
 		await createNewPost();
 		await page.evaluate( ( _html ) => {
@@ -43,7 +51,9 @@ describe( 'Performance', () => {
 		let i = 1;
 		let startTime;
 
-		await page.on( 'load', () => results.load.push( new Date() - startTime ) );
+		await page.on( 'load', () =>
+			results.load.push( new Date() - startTime )
+		);
 		await page.on( 'domcontentloaded', () =>
 			results.domcontentloaded.push( new Date() - startTime )
 		);
@@ -63,7 +73,10 @@ describe( 'Performance', () => {
 			results.type.push( new Date() - startTime );
 		}
 
-		writeFileSync( __dirname + '/results.json', JSON.stringify( results, null, 2 ) );
+		writeFileSync(
+			__dirname + '/results.json',
+			JSON.stringify( results, null, 2 )
+		);
 
 		expect( true ).toBe( true );
 	} );

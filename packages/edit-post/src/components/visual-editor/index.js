@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { PostTitle, VisualEditorGlobalKeyboardShortcuts } from '@wordpress/editor';
+import {
+	PostTitle,
+	VisualEditorGlobalKeyboardShortcuts,
+} from '@wordpress/editor';
 import {
 	WritingFlow,
 	Typewriter,
@@ -40,11 +43,15 @@ function VisualEditor() {
 				</CopyHandler>
 			</Typewriter>
 			<__experimentalBlockSettingsMenuFirstItem>
-				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }
+				{ ( { onClose } ) => (
+					<BlockInspectorButton onClick={ onClose } />
+				) }
 			</__experimentalBlockSettingsMenuFirstItem>
 			<__experimentalBlockSettingsMenuPluginsExtension>
 				{ ( { clientIds, onClose } ) => (
-					<PluginBlockSettingsMenuGroup.Slot fillProps={ { clientIds, onClose } } />
+					<PluginBlockSettingsMenuGroup.Slot
+						fillProps={ { clientIds, onClose } }
+					/>
 				) }
 			</__experimentalBlockSettingsMenuPluginsExtension>
 		</BlockSelectionClearer>
