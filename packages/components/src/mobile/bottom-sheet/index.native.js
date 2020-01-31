@@ -36,7 +36,7 @@ class BottomSheet extends Component {
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
-		Dimensions.addEventListener('change', this.onSetMaxHeight)
+		Dimensions.addEventListener( 'change', this.onSetMaxHeight );
 	}
 
 	componentDidMount() {
@@ -87,12 +87,11 @@ class BottomSheet extends Component {
 	}
 
 	onSetMaxHeight() {
-		const { height } = Dimensions.get('window');
+		const { height } = Dimensions.get( 'window' );
 		const { safeAreaBottomInset } = this.state;
 
-		this.setState({ maxHeight: height / 2 - safeAreaBottomInset })
+		this.setState( { maxHeight: height / 2 - safeAreaBottomInset } );
 	}
-
 
 	render() {
 		const {
@@ -109,7 +108,8 @@ class BottomSheet extends Component {
 
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
-				// Temporarily disable 'swiping-to-close' option on Android
+				// 'swiping-to-close' option is temporarily and partially disabled
+				//	on Android ( swipe / drag is still available in the top most area - near drag indicator)
 				if ( Platform.OS === 'ios' ) {
 					// Activates swipe down over child Touchables if the swipe is long enough.
 					// With this we can adjust sensibility on the swipe vs tap gestures.
@@ -117,7 +117,8 @@ class BottomSheet extends Component {
 						gestureState.dy = 0;
 						return true;
 					}
-				} return false;
+				}
+				return false;
 			},
 		} );
 
@@ -172,7 +173,7 @@ class BottomSheet extends Component {
 							styles.content,
 							hideHeader && styles.emptyHeader,
 							{ paddingBottom: this.state.safeAreaBottomInset },
-							contentStyle
+							contentStyle,
 						] }
 					>
 						{ this.props.children }

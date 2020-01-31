@@ -92,27 +92,30 @@ export class InserterMenu extends Component {
 						keyboardShouldPersistTaps="always"
 						numColumns={ this.state.numberOfColumns }
 						data={ this.props.items }
-						ItemSeparatorComponent={ () =>
-							<View style={ styles.rowSeparator } />
-						}
+						ItemSeparatorComponent={ () => <View style={ styles.rowSeparator } /> }
 						keyExtractor={ ( item ) => item.name }
-						renderItem={ ( { item } ) =>
+						renderItem={ ( { item } ) => (
 							<TouchableHighlight
 								style={ styles.touchableArea }
 								underlayColor="transparent"
-								activeOpacity={ .5 }
+								activeOpacity={ 0.5 }
 								accessibilityLabel={ item.title }
-								onPress={ () => this.props.onSelect( item ) }>
-								<View style={ [ styles.modalItem, { flex: 1, justifyContent: 'flex-start', maxWidth: modalItemMaxWidth } ] }>
+								onPress={ () => this.props.onSelect( item ) }
+							>
+								<View style={ [ styles.modalItem, { flex: 1, maxWidth: modalItemMaxWidth } ] }>
 									<View style={ modalIconWrapperStyle }>
 										<View style={ modalIconStyle }>
-											<Icon icon={ item.icon.src } fill={ modalIconStyle.fill } size={ modalIconStyle.width } />
+											<Icon
+												icon={ item.icon.src }
+												fill={ modalIconStyle.fill }
+												size={ modalIconStyle.width }
+											/>
 										</View>
 									</View>
 									<Text style={ modalItemLabelStyle }>{ item.title }</Text>
 								</View>
 							</TouchableHighlight>
-						}
+						) }
 					/>
 				</TouchableHighlight>
 			</BottomSheet>
