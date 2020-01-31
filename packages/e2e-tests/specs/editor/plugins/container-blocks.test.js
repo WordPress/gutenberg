@@ -8,6 +8,7 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	switchEditorModeTo,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'InnerBlocks Template Sync', () => {
@@ -45,6 +46,8 @@ describe( 'InnerBlocks Template Sync', () => {
 		);
 		// Press "Enter" inside the Code Editor to fire the `onChange` event for the new value.
 		await page.click( '.editor-post-text-editor' );
+		await pressKeyWithModifier( 'primary', 'A' );
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 		await switchEditorModeTo( 'Visual' );
 	};
