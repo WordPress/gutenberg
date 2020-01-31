@@ -237,7 +237,6 @@ export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
-			getBlocks,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
@@ -255,8 +254,7 @@ export default compose( [
 
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
-		const isFirstBlock = order === 0;
-		const isLastBlock = order === getBlocks().length - 1;
+		const isLastBlock = order === getBlockCount( rootClientId ) - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
 
@@ -280,7 +278,6 @@ export default compose( [
 		const commonAncestorIndex = parents.indexOf( commonAncestor ) - 1;
 		const firstToSelectId = commonAncestor ? parents[ commonAncestorIndex ] : parents[ parents.length - 1 ];
 
-		const parentCount = getBlockCount( parentId );
 		const hasChildren = ! isUnregisteredBlock && !! getBlockCount( clientId );
 		const hasParent = !! parentId;
 		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parentId;
@@ -296,7 +293,7 @@ export default compose( [
 		const isInnerBlockHolder = name === getGroupingBlockName();
 		const isRootListInnerBlockHolder = ! isSelectedBlockNested && isInnerBlockHolder;
 
-		const shouldApplyVerticalMarginStyle = ! isLastBlock && ( ( isFirstBlock && parentCount === 2 ) || parentCount > 2 );
+		const shouldApplyVerticalMarginStyle = ! isLastBlock;
 
 		return {
 			icon,
@@ -305,7 +302,6 @@ export default compose( [
 			title,
 			attributes,
 			blockType,
-			isLastBlock,
 			isSelected,
 			isValid,
 			showFloatingToolbar,
