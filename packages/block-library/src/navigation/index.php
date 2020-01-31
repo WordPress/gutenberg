@@ -128,7 +128,13 @@ function render_submenu_icon() {
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_navigation( $attributes, $content, $block ) {
+function render_block_navigation( $content, $block ) {
+
+	if ( 'core/navigation' !== $block['blockName'] ) {
+		return $content;
+	}
+
+	$attributes           = $block['attrs'];
 	$block['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
 
 	if ( empty( $block['innerBlocks'] ) ) {
@@ -234,7 +240,7 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_l
 		$html .= '</span>';
 
 		// Append submenu icon to top-level item.
-		if ( $attributes['showSubmenuIcon'] && $is_level_zero && $has_submenu ) {
+		if ( ! empty( $attributes['showSubmenuIcon'] ) && $is_level_zero && $has_submenu ) {
 			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . render_submenu_icon() . '</span>';
 		}
 
@@ -291,9 +297,8 @@ function register_block_core_navigation() {
 					'default' => false,
 				),
 			),
-
-			'render_callback' => 'render_block_navigation',
 		)
 	);
 }
 add_action( 'init', 'register_block_core_navigation' );
+add_filter( 'render_block', 'render_block_navigation', 10, 2 );
