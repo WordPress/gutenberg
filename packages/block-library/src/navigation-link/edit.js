@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, unescape, head } from 'lodash';
+import { escape, head } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,6 @@ import {
 	PanelBody,
 	Popover,
 	TextareaControl,
-	TextControl,
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -48,14 +47,7 @@ function NavigationLinkEdit( {
 	insertLinkBlock,
 	navigationBlockAttributes,
 } ) {
-	const {
-		label,
-		opensInNewTab,
-		title,
-		url,
-		nofollow,
-		description,
-	} = attributes;
+	const { label, opensInNewTab, url, nofollow, description } = attributes;
 
 	/*
 	 * Navigation Block attributes.
@@ -68,7 +60,6 @@ function NavigationLinkEdit( {
 	} = navigationBlockAttributes;
 
 	const link = {
-		title: title ? unescape( title ) : '',
 		url,
 		opensInNewTab,
 	};
@@ -157,16 +148,6 @@ function NavigationLinkEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'SEO settings' ) }>
-					<TextControl
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Title Attribute' ) }
-						help={ __(
-							'Provide more context about where the link goes.'
-						) }
-					/>
 					<ToggleControl
 						checked={ nofollow }
 						onChange={ ( nofollowValue ) => {
@@ -258,7 +239,6 @@ function NavigationLinkEdit( {
 									id,
 								} = {} ) =>
 									setAttributes( {
-										title: escape( newTitle ),
 										url: encodeURI( newURL ),
 										label: ( () => {
 											const normalizedTitle = newTitle.replace(

@@ -195,9 +195,6 @@ function core_block_navigation_build_html( $attributes, $block, $colors, $font_s
 		if ( isset( $block['attrs']['url'] ) ) {
 			$html .= ' href="' . esc_url( $block['attrs']['url'] ) . '"';
 		}
-		if ( isset( $block['attrs']['title'] ) ) {
-			$html .= ' title="' . esc_attr( $block['attrs']['title'] ) . '"';
-		}
 
 		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
