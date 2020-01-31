@@ -16,13 +16,7 @@ import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import ToolbarButtonContainer from './toolbar-button-container';
 
-function ToolbarButton( {
-	containerClassName,
-	className,
-	extraProps,
-	children,
-	...props
-} ) {
+function ToolbarButton( { containerClassName, className, extraProps, children, ...props } ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ! accessibleToolbarState ) {
@@ -55,10 +49,7 @@ function ToolbarButton( {
 	// all props to Button. This means that ToolbarButton has the same API as
 	// Button.
 	return (
-		<ToolbarItem
-			className={ classnames( 'components-toolbar-button', className ) }
-			{ ...props }
-		>
+		<ToolbarItem className={ classnames( 'components-toolbar-button', className ) } { ...props }>
 			{ ( toolbarItemProps ) => <Button { ...toolbarItemProps }>{ children }</Button> }
 		</ToolbarItem>
 	);

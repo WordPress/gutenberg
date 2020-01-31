@@ -27,10 +27,7 @@ import { isReusableBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import {
-	PREFERENCES_DEFAULTS,
-	SETTINGS_DEFAULTS,
-} from './defaults';
+import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 
 /**
@@ -67,11 +64,15 @@ function mapBlockOrder( blocks, rootClientId = '' ) {
  * @return {Object} Block order map object.
  */
 function mapBlockParents( blocks, rootClientId = '' ) {
-	return blocks.reduce( ( result, block ) => Object.assign(
-		result,
-		{ [ block.clientId ]: rootClientId },
-		mapBlockParents( block.innerBlocks, block.clientId )
-	), {} );
+	return blocks.reduce(
+		( result, block ) =>
+			Object.assign(
+				result,
+				{ [ block.clientId ]: rootClientId },
+				mapBlockParents( block.innerBlocks, block.clientId )
+			),
+		{}
+	);
 }
 
 /**
@@ -138,11 +139,15 @@ function getFlattenedBlockAttributes( blocks ) {
  * @return {Array} List of descendant client IDs.
  */
 function getNestedBlockClientIds( blocksOrder, rootClientId = '' ) {
-	return reduce( blocksOrder[ rootClientId ], ( result, clientId ) => [
-		...result,
-		clientId,
-		...getNestedBlockClientIds( blocksOrder, clientId ),
-	], [] );
+	return reduce(
+		blocksOrder[ rootClientId ],
+		( result, clientId ) => [
+			...result,
+			clientId,
+			...getNestedBlockClientIds( blocksOrder, clientId ),
+		],
+		[]
+	);
 }
 
 /**
@@ -259,9 +264,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			}
 			newState.cache = {
 				...newState.cache,
-				...fillKeysWithEmptyObject(
-					getBlocksWithParentsClientIds( updatedBlockUids ),
-				),
+				...fillKeysWithEmptyObject( getBlocksWithParentsClientIds( updatedBlockUids ) ),
 			};
 			break;
 		}
@@ -269,13 +272,13 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 		case 'UPDATE_BLOCK_ATTRIBUTES':
 			newState.cache = {
 				...newState.cache,
-				...fillKeysWithEmptyObject(
-					getBlocksWithParentsClientIds( [ action.clientId ] ),
-				),
+				...fillKeysWithEmptyObject( getBlocksWithParentsClientIds( [ action.clientId ] ) ),
 			};
 			break;
 		case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-			const parentClientIds = fillKeysWithEmptyObject( getBlocksWithParentsClientIds( action.replacedClientIds ) );
+			const parentClientIds = fillKeysWithEmptyObject(
+				getBlocksWithParentsClientIds( action.replacedClientIds )
+			);
 
 			newState.cache = {
 				...omit( newState.cache, action.replacedClientIds ),
@@ -287,7 +290,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			newState.cache = {
 				...omit( newState.cache, action.removedClientIds ),
 				...fillKeysWithEmptyObject(
-					difference( getBlocksWithParentsClientIds( action.clientIds ), action.clientIds ),
+					difference( getBlocksWithParentsClientIds( action.clientIds ), action.clientIds )
 				),
 			};
 			break;
@@ -301,9 +304,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			}
 			newState.cache = {
 				...newState.cache,
-				...fillKeysWithEmptyObject(
-					getBlocksWithParentsClientIds( updatedBlockUids )
-				),
+				...fillKeysWithEmptyObject( getBlocksWithParentsClientIds( updatedBlockUids ) ),
 			};
 			break;
 		}
@@ -315,22 +316,23 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			}
 			newState.cache = {
 				...newState.cache,
-				...fillKeysWithEmptyObject(
-					getBlocksWithParentsClientIds( updatedBlockUids )
-				),
+				...fillKeysWithEmptyObject( getBlocksWithParentsClientIds( updatedBlockUids ) ),
 			};
 			break;
 		}
 		case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-			const updatedBlockUids = keys( omitBy( newState.attributes, ( attributes, clientId ) => {
-				return newState.byClientId[ clientId ].name !== 'core/block' || attributes.ref !== action.updatedId;
-			} ) );
+			const updatedBlockUids = keys(
+				omitBy( newState.attributes, ( attributes, clientId ) => {
+					return (
+						newState.byClientId[ clientId ].name !== 'core/block' ||
+						attributes.ref !== action.updatedId
+					);
+				} )
+			);
 
 			newState.cache = {
 				...newState.cache,
-				...fillKeysWithEmptyObject(
-					getBlocksWithParentsClientIds( updatedBlockUids )
-				),
+				...fillKeysWithEmptyObject( getBlocksWithParentsClientIds( updatedBlockUids ) ),
 			};
 		}
 	}
@@ -355,7 +357,8 @@ function withPersistentBlockChange( reducer ) {
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
 
-		const isExplicitPersistentChange = action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' || markNextChangeAsNotPersistent;
+		const isExplicitPersistentChange =
+			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' || markNextChangeAsNotPersistent;
 
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
@@ -375,9 +378,9 @@ function withPersistentBlockChange( reducer ) {
 
 		nextState = {
 			...nextState,
-			isPersistentChange: isExplicitPersistentChange ?
-				! markNextChangeAsNotPersistent :
-				! isUpdatingSameBlockAttribute( action, lastAction ),
+			isPersistentChange: isExplicitPersistentChange
+				? ! markNextChangeAsNotPersistent
+				: ! isUpdatingSameBlockAttribute( action, lastAction ),
 		};
 
 		// In comparing against the previous action, consider only those which
@@ -406,9 +409,7 @@ function withIgnoredBlockChange( reducer ) {
 	 *
 	 * @type {Set}
 	 */
-	const IGNORED_ACTION_TYPES = new Set( [
-		'RECEIVE_BLOCKS',
-	] );
+	const IGNORED_ACTION_TYPES = new Set( [ 'RECEIVE_BLOCKS' ] );
 
 	return ( state, action ) => {
 		const nextState = reducer( state, action );
@@ -594,7 +595,7 @@ export const blocks = flow(
 	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
 	withBlockReset,
 	withPersistentBlockChange,
-	withIgnoredBlockChange,
+	withIgnoredBlockChange
 )( {
 	byClientId( state = {}, action ) {
 		switch ( action.type ) {
@@ -678,14 +679,18 @@ export const blocks = flow(
 				}
 
 				// Consider as updates only changed values
-				const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
-					if ( value !== result[ key ] ) {
-						result = getMutateSafeObject( state[ action.clientId ], result );
-						result[ key ] = value;
-					}
+				const nextAttributes = reduce(
+					action.attributes,
+					( result, value, key ) => {
+						if ( value !== result[ key ] ) {
+							result = getMutateSafeObject( state[ action.clientId ], result );
+							result[ key ] = value;
+						}
 
-					return result;
-				}, state[ action.clientId ] );
+						return result;
+					},
+					state[ action.clientId ]
+				);
 
 				// Skip update if nothing has been changed. The reference will
 				// match the original block if `reduce` had no changed values.
@@ -811,22 +816,24 @@ export const blocks = flow(
 						...nextState,
 						...omit( mappedBlocks, '' ),
 					} ),
-					( nextState ) => mapValues( nextState, ( subState ) => (
-						reduce( subState, ( result, clientId ) => {
-							if ( clientId === clientIds[ 0 ] ) {
-								return [
-									...result,
-									...mappedBlocks[ '' ],
-								];
-							}
+					( nextState ) =>
+						mapValues( nextState, ( subState ) =>
+							reduce(
+								subState,
+								( result, clientId ) => {
+									if ( clientId === clientIds[ 0 ] ) {
+										return [ ...result, ...mappedBlocks[ '' ] ];
+									}
 
-							if ( clientIds.indexOf( clientId ) === -1 ) {
-								result.push( clientId );
-							}
+									if ( clientIds.indexOf( clientId ) === -1 ) {
+										result.push( clientId );
+									}
 
-							return result;
-						}, [] )
-					) ),
+									return result;
+								},
+								[]
+							)
+						),
 				] )( state );
 			}
 
@@ -836,9 +843,8 @@ export const blocks = flow(
 					( nextState ) => omit( nextState, action.removedClientIds ),
 
 					// Remove deleted blocks from other blocks' orderings
-					( nextState ) => mapValues( nextState, ( subState ) => (
-						without( subState, ...action.removedClientIds )
-					) ),
+					( nextState ) =>
+						mapValues( nextState, ( subState ) => without( subState, ...action.removedClientIds ) ),
 				] )( state );
 		}
 
@@ -1244,7 +1250,7 @@ export const blockListSettings = ( state = {}, action ) => {
 	switch ( action.type ) {
 		// Even if the replaced blocks have the same client ID, our logic
 		// should correct the state.
-		case 'REPLACE_BLOCKS' :
+		case 'REPLACE_BLOCKS':
 		case 'REMOVE_BLOCKS': {
 			return omit( state, action.clientIds );
 		}

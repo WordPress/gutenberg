@@ -13,11 +13,7 @@ function PostTaxonomies() {
 		<PostTaxonomiesCheck>
 			<PostTaxonomiesForm
 				taxonomyWrapper={ ( content, taxonomy ) => {
-					return (
-						<TaxonomyPanel taxonomy={ taxonomy }>
-							{ content }
-						</TaxonomyPanel>
-					);
+					return <TaxonomyPanel taxonomy={ taxonomy }>{ content }</TaxonomyPanel>;
 				} }
 			/>
 		</PostTaxonomiesCheck>

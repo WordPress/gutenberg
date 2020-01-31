@@ -37,8 +37,21 @@ const embedAttributes = {
 	},
 };
 
-export function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [], supports = {}, responsive = true } ) {
-	const blockDescription = description || __( 'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.' );
+export function getEmbedBlockSettings( {
+	title,
+	description,
+	icon,
+	category = 'embed',
+	transforms,
+	keywords = [],
+	supports = {},
+	responsive = true,
+} ) {
+	const blockDescription =
+		description ||
+		__(
+			'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.'
+		);
 	const edit = getEmbedEditComponent( title, icon, responsive );
 	return {
 		title,
@@ -59,7 +72,12 @@ export function getEmbedBlockSettings( { title, description, icon, category = 'e
 			withSelect( ( select, ownProps ) => {
 				const { url } = ownProps.attributes;
 				const core = select( 'core' );
-				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview, getThemeSupports } = core;
+				const {
+					getEmbedPreview,
+					isPreviewEmbedFallback,
+					isRequestingEmbedPreview,
+					getThemeSupports,
+				} = core;
 				const preview = undefined !== url && getEmbedPreview( url );
 				const previewIsFallback = undefined !== url && isPreviewEmbedFallback( url );
 				const fetching = undefined !== url && isRequestingEmbedPreview( url );
@@ -108,7 +126,9 @@ export function getEmbedBlockSettings( { title, description, icon, category = 'e
 					<div className="wp-block-embed__wrapper">
 						{ `\n${ url }\n` /* URL needs to be on its own line. */ }
 					</div>
-					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+					{ ! RichText.isEmpty( caption ) && (
+						<RichText.Content tagName="figcaption" value={ caption } />
+					) }
 				</figure>
 			);
 		},
@@ -131,7 +151,9 @@ export function getEmbedBlockSettings( { title, description, icon, category = 'e
 					return (
 						<figure className={ embedClassName }>
 							{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-							{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+							{ ! RichText.isEmpty( caption ) && (
+								<RichText.Content tagName="figcaption" value={ caption } />
+							) }
 						</figure>
 					);
 				},

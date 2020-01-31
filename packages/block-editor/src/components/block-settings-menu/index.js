@@ -7,13 +7,9 @@ import { castArray, flow } from 'lodash';
  * WordPress dependencies
  */
 import { __, _n } from '@wordpress/i18n';
-import {
-	Toolbar,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-} from '@wordpress/components';
+import { Toolbar, DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -66,19 +62,9 @@ export function BlockSettingsMenu( { clientIds } ) {
 						{ ( { onClose } ) => (
 							<>
 								<MenuGroup>
-									<__experimentalBlockSettingsMenuFirstItem.Slot
-										fillProps={ { onClose } }
-									/>
-									{ count === 1 && (
-										<BlockUnknownConvertButton
-											clientId={ firstBlockClientId }
-										/>
-									) }
-									{ count === 1 && (
-										<BlockHTMLConvertButton
-											clientId={ firstBlockClientId }
-										/>
-									) }
+									<__experimentalBlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
+									{ count === 1 && <BlockUnknownConvertButton clientId={ firstBlockClientId } /> }
+									{ count === 1 && <BlockHTMLConvertButton clientId={ firstBlockClientId } /> }
 									{ canDuplicate && (
 										<MenuItem
 											onClick={ flow( onClose, onDuplicate ) }
@@ -107,10 +93,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 										</>
 									) }
 									{ count === 1 && (
-										<BlockModeToggle
-											clientId={ firstBlockClientId }
-											onToggle={ onClose }
-										/>
+										<BlockModeToggle clientId={ firstBlockClientId } onToggle={ onClose } />
 									) }
 									<__experimentalBlockSettingsMenuPluginsExtension.Slot
 										fillProps={ { clientIds, onClose } }
@@ -120,7 +103,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 									{ ! isLocked && (
 										<MenuItem
 											onClick={ flow( onClose, onRemove ) }
-											icon="trash"
+											icon={ trash }
 											shortcut={ shortcuts.remove }
 										>
 											{ _n( 'Remove Block', 'Remove Blocks', count ) }

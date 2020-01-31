@@ -32,24 +32,17 @@ const hasConfigFile = fs.existsSync( dockerComposeOptions.config );
 
 // WP CLI Utils
 const wpCliRun = ( command, isTests = false ) =>
-	dockerCompose.run(
-		`${ isTests ? 'tests-' : '' }wordpress-cli`,
-		command,
-		dockerComposeOptions
-	);
+	dockerCompose.run( `${ isTests ? 'tests-' : '' }wordpress-cli`, command, dockerComposeOptions );
 const setupSite = ( isTests = false ) =>
 	wpCliRun(
 		`wp core install --url=localhost:${
-			isTests ?
-				process.env.WP_ENV_TESTS_PORT || 8889 :
-				process.env.WP_ENV_PORT || 8888
+			isTests ? process.env.WP_ENV_TESTS_PORT || 8889 : process.env.WP_ENV_PORT || 8888
 		} --title=${ cwdName } --admin_user=admin --admin_password=password --admin_email=admin@wordpress.org`,
 		isTests
 	);
 const activateContext = ( { type, pathBasename }, isTests = false ) =>
 	wpCliRun( `wp ${ type } activate ${ pathBasename }`, isTests );
-const resetDatabase = ( isTests = false ) =>
-	wpCliRun( 'wp db reset --yes', isTests );
+const resetDatabase = ( isTests = false ) => wpCliRun( 'wp db reset --yes', isTests );
 
 module.exports = {
 	async start( { ref, spinner = {} } ) {
@@ -121,8 +114,7 @@ module.exports = {
 			filter: ( stat, filepath ) =>
 				stat !== 'symbolicLink' &&
 				( stat !== 'directory' ||
-					( filepath !== `${ repoPath }.git` &&
-						! filepath.endsWith( 'node_modules' ) ) ),
+					( filepath !== `${ repoPath }.git` && ! filepath.endsWith( 'node_modules' ) ) ),
 		} );
 		if ( stashed ) {
 			try {
@@ -139,10 +131,7 @@ module.exports = {
 
 		// These will bring up the database container,
 		// because it's a dependency.
-		await dockerCompose.upMany(
-			[ 'wordpress', 'tests-wordpress' ],
-			dockerComposeOptions
-		);
+		await dockerCompose.upMany( [ 'wordpress', 'tests-wordpress' ], dockerComposeOptions );
 
 		const retryableSiteSetup = async () => {
 			try {
@@ -178,12 +167,9 @@ module.exports = {
 	async clean( { environment, spinner } ) {
 		const context = await detectContext();
 		const dependencies = await resolveDependencies();
-		const activateDependencies = () =>
-			Promise.all( dependencies.map( activateContext ) );
+		const activateDependencies = () => Promise.all( dependencies.map( activateContext ) );
 
-		const description = `${ environment } environment${
-			environment === 'all' ? 's' : ''
-		}`;
+		const description = `${ environment } environment${ environment === 'all' ? 's' : '' }`;
 		spinner.text = `Cleaning ${ description }.`;
 
 		// Parallelize task sequences for each environment.
@@ -228,11 +214,7 @@ module.exports = {
 			);
 		}
 
-		const result = await dockerCompose.run(
-			container,
-			command,
-			dockerComposeOptions
-		);
+		const result = await dockerCompose.run( container, command, dockerComposeOptions );
 		if ( result.out ) {
 			// eslint-disable-next-line no-console
 			console.log( process.stdout.isTTY ? `\n\n${ result.out }\n\n` : result.out );

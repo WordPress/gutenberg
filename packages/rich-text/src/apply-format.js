@@ -28,12 +28,7 @@ function replace( array, index, value ) {
  *
  * @return {Object} A new value with the format applied.
  */
-export function applyFormat(
-	value,
-	format,
-	startIndex = value.start,
-	endIndex = value.end
-) {
+export function applyFormat( value, format, startIndex = value.start, endIndex = value.end ) {
 	const { formats, activeFormats } = value;
 	const newFormats = formats.slice();
 
@@ -47,16 +42,14 @@ export function applyFormat(
 			const index = newFormats[ startIndex ].indexOf( startFormat );
 
 			while ( newFormats[ startIndex ] && newFormats[ startIndex ][ index ] === startFormat ) {
-				newFormats[ startIndex ] =
-					replace( newFormats[ startIndex ], index, format );
+				newFormats[ startIndex ] = replace( newFormats[ startIndex ], index, format );
 				startIndex--;
 			}
 
 			endIndex++;
 
 			while ( newFormats[ endIndex ] && newFormats[ endIndex ][ index ] === startFormat ) {
-				newFormats[ endIndex ] =
-					replace( newFormats[ endIndex ], index, format );
+				newFormats[ endIndex ] = replace( newFormats[ endIndex ], index, format );
 				endIndex++;
 			}
 		}
@@ -66,8 +59,7 @@ export function applyFormat(
 
 		for ( let index = startIndex; index < endIndex; index++ ) {
 			if ( newFormats[ index ] ) {
-				newFormats[ index ] = newFormats[ index ]
-					.filter( ( { type } ) => type !== format.type );
+				newFormats[ index ] = newFormats[ index ].filter( ( { type } ) => type !== format.type );
 
 				const length = newFormats[ index ].length;
 
@@ -91,9 +83,6 @@ export function applyFormat(
 		// Always revise active formats. This serves as a placeholder for new
 		// inputs with the format so new input appears with the format applied,
 		// and ensures a format of the same type uses the latest values.
-		activeFormats: [
-			...reject( activeFormats, { type: format.type } ),
-			format,
-		],
+		activeFormats: [ ...reject( activeFormats, { type: format.type } ), format ],
 	} );
 }

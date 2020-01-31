@@ -3,9 +3,7 @@
  */
 import { useCallback, useEffect, useState } from '@wordpress/element';
 
-export const DraggableWrapper = (
-	props = { role: 'presentation', style: {} }
-) => {
+export const DraggableWrapper = ( props = { role: 'presentation', style: {} } ) => {
 	const { role, style, ...restProps } = props;
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
 	const [ isDragging, setDragging ] = useState( false );

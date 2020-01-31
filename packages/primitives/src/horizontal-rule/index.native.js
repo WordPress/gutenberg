@@ -10,7 +10,5 @@ export const HorizontalRule = ( props ) => {
 		...props.lineStyle,
 	};
 
-	return (
-		<Hr { ...props } lineStyle={ lineStyle } />
-	);
+	return <Hr { ...props } lineStyle={ lineStyle } />;
 };

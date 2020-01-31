@@ -74,7 +74,9 @@ describe( 'babel-plugin', () => {
 		} );
 
 		it( 'should traverse up parents until it encounters comment', () => {
-			const comment = getCommentFromString( "// translators: Greeting\nconst string = __( 'Hello world' );" );
+			const comment = getCommentFromString(
+				"// translators: Greeting\nconst string = __( 'Hello world' );"
+			);
 
 			expect( comment ).toBe( 'Greeting' );
 		} );
@@ -86,7 +88,9 @@ describe( 'babel-plugin', () => {
 		} );
 
 		it( 'should use multi-line comment starting many lines previous', () => {
-			const comment = getCommentFromString( "/* translators: Long comment\nspanning multiple \nlines */\nconst string = __( 'Hello world' );" );
+			const comment = getCommentFromString(
+				"/* translators: Long comment\nspanning multiple \nlines */\nconst string = __( 'Hello world' );"
+			);
 
 			expect( comment ).toBe( 'Long comment spanning multiple lines' );
 		} );

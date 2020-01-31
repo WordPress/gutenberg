@@ -15,9 +15,12 @@ import { HTMLTextInput } from '..';
 
 // Utility to find a TextInput in a ShallowWrapper
 const findTextInputInWrapper = ( wrapper, matchingProps ) => {
-	return wrapper.dive().findWhere( ( node ) => {
-		return node.name() === 'TextInput' && node.is( matchingProps );
-	} ).first();
+	return wrapper
+		.dive()
+		.findWhere( ( node ) => {
+			return node.name() === 'TextInput' && node.is( matchingProps );
+		} )
+		.first();
 };
 
 // Finds the Content TextInput in our HTMLInputView
@@ -49,10 +52,7 @@ describe( 'HTMLTextInput', () => {
 		const onChange = jest.fn();
 
 		const wrapper = shallow(
-			<HTMLTextInput
-				onChange={ onChange }
-				getStylesFromColorScheme={ getStylesFromColorScheme }
-			/>
+			<HTMLTextInput onChange={ onChange } getStylesFromColorScheme={ getStylesFromColorScheme } />
 		);
 
 		expect( wrapper.instance().state.isDirty ).toBeFalsy();
@@ -120,4 +120,3 @@ describe( 'HTMLTextInput', () => {
 		expect( editTitle ).toHaveBeenCalledWith( 'text' );
 	} );
 } );
-

@@ -99,10 +99,7 @@ export function createBlockCompleter( {
 		},
 		getOptionLabel( inserterItem ) {
 			const { icon, title } = inserterItem;
-			return [
-				<BlockIcon key="icon" icon={ icon } showColors />,
-				title,
-			];
+			return [ <BlockIcon key="icon" icon={ icon } showColors />, title ];
 		},
 		allowContext( before, after ) {
 			return ! ( /\S/.test( before ) || /\S/.test( after ) );

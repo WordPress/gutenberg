@@ -42,9 +42,11 @@ describe( 'uploadMedia', () => {
 			onFileChange,
 		} );
 
-		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
-			code: 'MIME_TYPE_NOT_SUPPORTED',
-		} ) );
+		expect( onError ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				code: 'MIME_TYPE_NOT_SUPPORTED',
+			} )
+		);
 		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 
@@ -58,9 +60,11 @@ describe( 'uploadMedia', () => {
 			onFileChange,
 		} );
 
-		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
-			code: 'MIME_TYPE_NOT_SUPPORTED',
-		} ) );
+		expect( onError ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				code: 'MIME_TYPE_NOT_SUPPORTED',
+			} )
+		);
 		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 
@@ -91,9 +95,11 @@ describe( 'uploadMedia', () => {
 			onFileChange,
 		} );
 
-		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
-			code: 'MIME_TYPE_NOT_SUPPORTED',
-		} ) );
+		expect( onError ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				code: 'MIME_TYPE_NOT_SUPPORTED',
+			} )
+		);
 		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 
@@ -127,10 +133,12 @@ describe( 'uploadMedia', () => {
 			onFileChange,
 		} );
 
-		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
-			code: 'MIME_TYPE_NOT_SUPPORTED',
-			file: xmlFile,
-		} ) );
+		expect( onError ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				code: 'MIME_TYPE_NOT_SUPPORTED',
+				file: xmlFile,
+			} )
+		);
 		expect( onFileChange ).toHaveBeenCalledTimes( 2 );
 	} );
 
@@ -145,9 +153,11 @@ describe( 'uploadMedia', () => {
 			onFileChange,
 		} );
 
-		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
-			code: 'SIZE_ABOVE_LIMIT',
-		} ) );
+		expect( onError ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				code: 'SIZE_ABOVE_LIMIT',
+			} )
+		);
 		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 
@@ -161,9 +171,11 @@ describe( 'uploadMedia', () => {
 			wpAllowedMimeTypes: { aac: 'audio/aac' },
 		} );
 
-		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
-			code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
-		} ) );
+		expect( onError ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
+			} )
+		);
 		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 } );
@@ -179,33 +191,27 @@ describe( 'getMimeTypesArray', () => {
 	} );
 
 	it( 'should return the type plus a new mime type with type and subtype with the extension if a type is passed', () => {
-		expect(
-			getMimeTypesArray( { ext: 'chicken' } )
-		).toEqual(
-			[ 'chicken', 'chicken/ext' ]
-		);
+		expect( getMimeTypesArray( { ext: 'chicken' } ) ).toEqual( [ 'chicken', 'chicken/ext' ] );
 	} );
 
 	it( 'should return the mime type passed and a new mime type with type and the extension as subtype', () => {
-		expect(
-			getMimeTypesArray( { ext: 'chicken/ribs' } )
-		).toEqual(
-			[ 'chicken/ribs', 'chicken/ext' ]
-		);
+		expect( getMimeTypesArray( { ext: 'chicken/ribs' } ) ).toEqual( [
+			'chicken/ribs',
+			'chicken/ext',
+		] );
 	} );
 
 	it( 'should return the mime type passed and an additional mime type per extension supported', () => {
-		expect(
-			getMimeTypesArray( { 'jpg|jpeg|jpe': 'image/jpeg' } )
-		).toEqual(
-			[ 'image/jpeg', 'image/jpg', 'image/jpeg', 'image/jpe' ]
-		);
+		expect( getMimeTypesArray( { 'jpg|jpeg|jpe': 'image/jpeg' } ) ).toEqual( [
+			'image/jpeg',
+			'image/jpg',
+			'image/jpeg',
+			'image/jpe',
+		] );
 	} );
 
 	it( 'should handle multiple mime types', () => {
-		expect(
-			getMimeTypesArray( { 'ext|aaa': 'chicken/ribs', aaa: 'bbb' } )
-		).toEqual( [
+		expect( getMimeTypesArray( { 'ext|aaa': 'chicken/ribs', aaa: 'bbb' } ) ).toEqual( [
 			'chicken/ribs',
 			'chicken/ext',
 			'chicken/aaa',

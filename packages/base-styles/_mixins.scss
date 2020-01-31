@@ -279,7 +279,7 @@
 			left: $admin-sidebar-width-collapsed;
 		}
 
-		@include break-large() {
+		@media (min-width: #{ ($break-large + 1) }) {
 			left: $admin-sidebar-width;
 		}
 	}

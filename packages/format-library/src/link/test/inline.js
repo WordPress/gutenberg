@@ -9,16 +9,12 @@ import { shallow } from 'enzyme';
 
 describe( 'InlineLinkUI', () => {
 	it( 'InlineLinkUI renders', () => {
-		const wrapper = shallow(
-			<InlineLinkUI />
-		);
+		const wrapper = shallow( <InlineLinkUI /> );
 		expect( wrapper ).toBeTruthy();
 	} );
 
 	it( 'should set state.opensInNewWindow to false by default', () => {
-		const wrapper = shallow(
-			<InlineLinkUI activeAttributes={ {} } />
-		).dive();
+		const wrapper = shallow( <InlineLinkUI activeAttributes={ {} } /> ).dive();
 
 		expect( wrapper.state( 'opensInNewWindow' ) ).toEqual( false );
 	} );
@@ -29,9 +25,7 @@ describe( 'InlineLinkUI', () => {
 			activeAttributes: { url: 'http://www.google.com', target: '_blank' },
 		};
 
-		const wrapper = shallow(
-			<InlineLinkUI activeAttributes={ {} } />
-		).dive();
+		const wrapper = shallow( <InlineLinkUI activeAttributes={ {} } /> ).dive();
 		wrapper.setProps( givenProps );
 		expect( wrapper.state( 'opensInNewWindow' ) ).toEqual( true );
 	} );

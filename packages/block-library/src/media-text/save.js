@@ -7,10 +7,7 @@ import { noop, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	InnerBlocks,
-	getColorClassName,
-} from '@wordpress/block-editor';
+import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -40,20 +37,17 @@ export default function save( { attributes } ) {
 	} = attributes;
 	const newRel = isEmpty( rel ) ? undefined : rel;
 
-	let image = <img
-		src={ mediaUrl }
-		alt={ mediaAlt }
-		className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null }
-	/>;
+	let image = (
+		<img
+			src={ mediaUrl }
+			alt={ mediaAlt }
+			className={ mediaId && mediaType === 'image' ? `wp-image-${ mediaId }` : null }
+		/>
+	);
 
 	if ( href ) {
 		image = (
-			<a
-				className={ linkClass }
-				href={ href }
-				target={ linkTarget }
-				rel={ newRel }
-			>
+			<a className={ linkClass } href={ href } target={ linkTarget } rel={ newRel }>
 				{ image }
 			</a>
 		);
@@ -66,7 +60,7 @@ export default function save( { attributes } ) {
 	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 	const className = classnames( {
 		'has-media-on-the-right': 'right' === mediaPosition,
-		'has-background': ( backgroundClass || customBackgroundColor ),
+		'has-background': backgroundClass || customBackgroundColor,
 		[ backgroundClass ]: backgroundClass,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
@@ -76,7 +70,8 @@ export default function save( { attributes } ) {
 
 	let gridTemplateColumns;
 	if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
-		gridTemplateColumns = 'right' === mediaPosition ? `auto ${ mediaWidth }%` : `${ mediaWidth }% auto`;
+		gridTemplateColumns =
+			'right' === mediaPosition ? `auto ${ mediaWidth }%` : `${ mediaWidth }% auto`;
 	}
 	const style = {
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,

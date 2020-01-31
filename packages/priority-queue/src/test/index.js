@@ -9,7 +9,7 @@ jest.mock( '../request-idle-callback', () => {
 
 	return Object.assign(
 		( callback ) => emitter.once( 'tick', ( deadline = Date.now() ) => callback( deadline ) ),
-		{ tick: ( deadline ) => emitter.emit( 'tick', deadline ) },
+		{ tick: ( deadline ) => emitter.emit( 'tick', deadline ) }
 	);
 } );
 
@@ -84,7 +84,8 @@ describe( 'createQueue', () => {
 
 			// Mock implementation such that with the first call, it reports as
 			// having some time remaining, but no time remaining on the second.
-			const timeRemaining = jest.fn()
+			const timeRemaining = jest
+				.fn()
 				.mockImplementationOnce( () => 100 )
 				.mockImplementationOnce( () => 0 );
 

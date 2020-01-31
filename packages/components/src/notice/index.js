@@ -38,13 +38,7 @@ function Notice( {
 				{ children }
 				{ actions.map(
 					(
-						{
-							className: buttonCustomClasses,
-							label,
-							noDefaultClasses = false,
-							onClick,
-							url,
-						},
+						{ className: buttonCustomClasses, label, noDefaultClasses = false, onClick, url },
 						index
 					) => {
 						return (
@@ -54,16 +48,12 @@ function Notice( {
 								isSecondary={ ! noDefaultClasses && ! url }
 								isLink={ ! noDefaultClasses && !! url }
 								onClick={ url ? undefined : onClick }
-								className={ classnames(
-									'components-notice__action',
-									buttonCustomClasses
-								) }
+								className={ classnames( 'components-notice__action', buttonCustomClasses ) }
 							>
 								{ label }
 							</Button>
 						);
 					}
-
 				) }
 			</div>
 			{ isDismissible && (

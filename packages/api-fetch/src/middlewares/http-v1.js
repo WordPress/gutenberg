@@ -3,11 +3,7 @@
  *
  * @type {Set}
  */
-const OVERRIDE_METHODS = new Set( [
-	'PATCH',
-	'PUT',
-	'DELETE',
-] );
+const OVERRIDE_METHODS = new Set( [ 'PATCH', 'PUT', 'DELETE' ] );
 
 /**
  * Default request method.

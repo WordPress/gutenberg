@@ -7,14 +7,8 @@ import { isFinite, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	RawHTML,
-} from '@wordpress/element';
-import {
-	getColorClassName,
-	getFontSizeClass,
-	RichText,
-} from '@wordpress/block-editor';
+import { RawHTML } from '@wordpress/element';
+import { getColorClassName, getFontSizeClass, RichText } from '@wordpress/block-editor';
 
 const supports = {
 	className: false,
@@ -164,12 +158,17 @@ const deprecated = [
 	},
 	{
 		supports,
-		attributes: omit( {
-			...blockAttributes,
-			fontSize: {
-				type: 'number',
+		attributes: omit(
+			{
+				...blockAttributes,
+				fontSize: {
+					type: 'number',
+				},
 			},
-		}, 'customFontSize', 'customTextColor', 'customBackgroundColor' ),
+			'customFontSize',
+			'customTextColor',
+			'customBackgroundColor'
+		),
 		save( { attributes } ) {
 			const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
 			const className = classnames( {
@@ -184,15 +183,28 @@ const deprecated = [
 				textAlign: align,
 			};
 
-			return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+			return (
+				<p style={ styles } className={ className ? className : undefined }>
+					{ content }
+				</p>
+			);
 		},
 		migrate( attributes ) {
-			return omit( {
-				...attributes,
-				customFontSize: isFinite( attributes.fontSize ) ? attributes.fontSize : undefined,
-				customTextColor: attributes.textColor && '#' === attributes.textColor[ 0 ] ? attributes.textColor : undefined,
-				customBackgroundColor: attributes.backgroundColor && '#' === attributes.backgroundColor[ 0 ] ? attributes.backgroundColor : undefined,
-			}, [ 'fontSize', 'textColor', 'backgroundColor' ] );
+			return omit(
+				{
+					...attributes,
+					customFontSize: isFinite( attributes.fontSize ) ? attributes.fontSize : undefined,
+					customTextColor:
+						attributes.textColor && '#' === attributes.textColor[ 0 ]
+							? attributes.textColor
+							: undefined,
+					customBackgroundColor:
+						attributes.backgroundColor && '#' === attributes.backgroundColor[ 0 ]
+							? attributes.backgroundColor
+							: undefined,
+				},
+				[ 'fontSize', 'textColor', 'backgroundColor' ]
+			);
 		},
 	},
 	{

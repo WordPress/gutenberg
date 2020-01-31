@@ -28,7 +28,9 @@ describe( 'Spacer', () => {
 		await page.keyboard.type( '/spacer' );
 		await page.keyboard.press( 'Enter' );
 
-		const resizableHandle = await page.$( '.block-library-spacer__resize-container .components-resizable-box__handle' );
+		const resizableHandle = await page.$(
+			'.block-library-spacer__resize-container .components-resizable-box__handle'
+		);
 		await dragAndResize( resizableHandle, { x: 0, y: 50 } );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 

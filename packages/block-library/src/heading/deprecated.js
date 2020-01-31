@@ -6,10 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	getColorClassName,
-	RichText,
-} from '@wordpress/block-editor';
+import { getColorClassName, RichText } from '@wordpress/block-editor';
 
 const blockSupports = {
 	className: false,
@@ -45,13 +42,7 @@ const deprecated = [
 	{
 		attributes: blockAttributes,
 		save( { attributes } ) {
-			const {
-				align,
-				content,
-				customTextColor,
-				level,
-				textColor,
-			} = attributes;
+			const { align, content, customTextColor, level, textColor } = attributes;
 			const tagName = 'h' + level;
 
 			const textClass = getColorClassName( 'color', textColor );
@@ -78,13 +69,7 @@ const deprecated = [
 		supports: blockSupports,
 		attributes: blockAttributes,
 		save( { attributes } ) {
-			const {
-				align,
-				level,
-				content,
-				textColor,
-				customTextColor,
-			} = attributes;
+			const { align, level, content, textColor, customTextColor } = attributes;
 			const tagName = 'h' + level;
 
 			const textClass = getColorClassName( 'color', textColor );

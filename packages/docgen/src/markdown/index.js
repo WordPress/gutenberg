@@ -27,7 +27,9 @@ const appendOrEmbedContents = ( { options, newContents } ) => {
 module.exports = function( options, processDir, doc, filteredIR, headingTitle ) {
 	if ( options.toSection || options.toToken ) {
 		const currentReadmeFile = fs.readFileSync( options.output, 'utf8' );
-		const newContents = unified().use( remarkParser ).parse( formatter( processDir, doc, filteredIR, null ) );
+		const newContents = unified()
+			.use( remarkParser )
+			.parse( formatter( processDir, doc, filteredIR, null ) );
 		remark()
 			.use( { settings: { commonmark: true } } )
 			.use( appendOrEmbedContents, { options, newContents } )

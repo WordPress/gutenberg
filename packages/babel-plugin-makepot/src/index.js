@@ -93,10 +93,7 @@ const REGEXP_TRANSLATOR_COMMENT = /^\s*translators:\s*([\s\S]+)/im;
 function getNodeAsString( node ) {
 	switch ( node.type ) {
 		case 'BinaryExpression':
-			return (
-				getNodeAsString( node.left ) +
-				getNodeAsString( node.right )
-			);
+			return getNodeAsString( node.left ) + getNodeAsString( node.right );
 
 		case 'StringLiteral':
 			return node.value;
@@ -134,7 +131,10 @@ function getExtractedComment( path, _originalNodeLine ) {
 		const match = commentNode.value.match( REGEXP_TRANSLATOR_COMMENT );
 		if ( match ) {
 			// Extract text from matched translator prefix
-			comment = match[ 1 ].split( '\n' ).map( ( text ) => text.trim() ).join( ' ' );
+			comment = match[ 1 ]
+				.split( '\n' )
+				.map( ( text ) => text.trim() )
+				.join( ' ' );
 
 			// False return indicates to Lodash to break iteration
 			return false;
@@ -178,10 +178,7 @@ function isValidTranslationKey( key ) {
  * @return {boolean} Whether valid translation keys match.
  */
 function isSameTranslation( a, b ) {
-	return isEqual(
-		pick( a, VALID_TRANSLATION_KEYS ),
-		pick( b, VALID_TRANSLATION_KEYS )
-	);
+	return isEqual( pick( a, VALID_TRANSLATION_KEYS ), pick( b, VALID_TRANSLATION_KEYS ) );
 }
 
 module.exports = function() {
@@ -240,11 +237,15 @@ module.exports = function() {
 					};
 
 					for ( const key in baseData.headers ) {
-						baseData.translations[ '' ][ '' ].msgstr.push( `${ key }: ${ baseData.headers[ key ] };\n` );
+						baseData.translations[ '' ][ '' ].msgstr.push(
+							`${ key }: ${ baseData.headers[ key ] };\n`
+						);
 					}
 
 					// Attempt to exract nplurals from header
-					const pluralsMatch = ( baseData.headers[ 'plural-forms' ] || '' ).match( /nplurals\s*=\s*(\d+);/ );
+					const pluralsMatch = ( baseData.headers[ 'plural-forms' ] || '' ).match(
+						/nplurals\s*=\s*(\d+);/
+					);
 					if ( pluralsMatch ) {
 						nplurals = parseInt( pluralsMatch[ 1 ], 10 );
 					}
@@ -260,7 +261,9 @@ module.exports = function() {
 				// Assign file reference comment, ensuring consistent pathname
 				// reference between Win32 and POSIX
 				const { filename } = this.file.opts;
-				const pathname = relative( '.', filename ).split( sep ).join( '/' );
+				const pathname = relative( '.', filename )
+					.split( sep )
+					.join( '/' );
 				translation.comments = {
 					reference: pathname + ':' + path.node.loc.start.line,
 				};
@@ -294,34 +297,42 @@ module.exports = function() {
 					const files = Object.keys( strings ).sort();
 
 					// Combine translations from each file grouped by context
-					const translations = reduce( files, ( memo, file ) => {
-						for ( const context in strings[ file ] ) {
-							// Within the same file, sort translations by line
-							const sortedTranslations = sortBy(
-								strings[ file ][ context ],
-								'comments.reference'
-							);
+					const translations = reduce(
+						files,
+						( memo, file ) => {
+							for ( const context in strings[ file ] ) {
+								// Within the same file, sort translations by line
+								const sortedTranslations = sortBy(
+									strings[ file ][ context ],
+									'comments.reference'
+								);
 
-							forEach( sortedTranslations, ( translation ) => {
-								const { msgctxt = '', msgid } = translation;
-								if ( ! memo.hasOwnProperty( msgctxt ) ) {
-									memo[ msgctxt ] = {};
-								}
+								forEach( sortedTranslations, ( translation ) => {
+									const { msgctxt = '', msgid } = translation;
+									if ( ! memo.hasOwnProperty( msgctxt ) ) {
+										memo[ msgctxt ] = {};
+									}
 
-								// Merge references if translation already exists
-								if ( isSameTranslation( translation, memo[ msgctxt ][ msgid ] ) ) {
-									translation.comments.reference = uniq( [
-										memo[ msgctxt ][ msgid ].comments.reference,
-										translation.comments.reference,
-									].join( '\n' ).split( '\n' ) ).join( '\n' );
-								}
+									// Merge references if translation already exists
+									if ( isSameTranslation( translation, memo[ msgctxt ][ msgid ] ) ) {
+										translation.comments.reference = uniq(
+											[
+												memo[ msgctxt ][ msgid ].comments.reference,
+												translation.comments.reference,
+											]
+												.join( '\n' )
+												.split( '\n' )
+										).join( '\n' );
+									}
 
-								memo[ msgctxt ][ msgid ] = translation;
-							} );
-						}
+									memo[ msgctxt ][ msgid ] = translation;
+								} );
+							}
 
-						return memo;
-					}, {} );
+							return memo;
+						},
+						{}
+					);
 
 					// Merge translations from individual files into headers
 					const data = merge( {}, baseData, { translations } );

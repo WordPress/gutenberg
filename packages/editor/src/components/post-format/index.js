@@ -29,7 +29,13 @@ export const POST_FORMATS = [
 	{ id: 'chat', caption: __( 'Chat' ) },
 ];
 
-function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFormats, suggestedFormat, instanceId } ) {
+function PostFormat( {
+	onUpdatePostFormat,
+	postFormat = 'standard',
+	supportedFormats,
+	suggestedFormat,
+	instanceId,
+} ) {
 	const postFormatSelectorId = 'post-format-selector-' + instanceId;
 	const formats = POST_FORMATS.filter( ( format ) => includes( supportedFormats, format.id ) );
 	const suggestion = find( formats, ( format ) => format.id === suggestedFormat );

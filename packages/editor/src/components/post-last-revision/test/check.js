@@ -11,9 +11,7 @@ import { PostLastRevisionCheck } from '../check';
 describe( 'PostLastRevisionCheck', () => {
 	it( 'should not render anything if the last revision ID is unknown', () => {
 		const wrapper = shallow(
-			<PostLastRevisionCheck revisionsCount={ 2 }>
-				Children
-			</PostLastRevisionCheck>
+			<PostLastRevisionCheck revisionsCount={ 2 }>Children</PostLastRevisionCheck>
 		);
 
 		expect( wrapper.type() ).toBe( null );

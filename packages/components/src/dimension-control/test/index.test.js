@@ -18,22 +18,13 @@ describe( 'DimensionControl', () => {
 
 	describe( 'rendering', () => {
 		it( 'renders with defaults', () => {
-			const wrapper = shallow(
-				<DimensionControl
-					instanceId={ uniqueId() }
-					label={ 'Padding' }
-				/>
-			);
+			const wrapper = shallow( <DimensionControl instanceId={ uniqueId() } label={ 'Padding' } /> );
 			expect( wrapper ).toMatchSnapshot();
 		} );
 
 		it( 'renders with icon and default icon label', () => {
 			const wrapper = shallow(
-				<DimensionControl
-					instanceId={ uniqueId() }
-					label={ 'Margin' }
-					icon={ 'tablet' }
-				/>
+				<DimensionControl instanceId={ uniqueId() } label={ 'Margin' } icon={ 'tablet' } />
 			);
 			expect( wrapper ).toMatchSnapshot();
 		} );
@@ -90,17 +81,23 @@ describe( 'DimensionControl', () => {
 				/>
 			);
 
-			wrapper.find( 'select' ).at( 0 ).simulate( 'change', {
-				target: {
-					value: 'small',
-				},
-			} );
+			wrapper
+				.find( 'select' )
+				.at( 0 )
+				.simulate( 'change', {
+					target: {
+						value: 'small',
+					},
+				} );
 
-			wrapper.find( 'select' ).at( 0 ).simulate( 'change', {
-				target: {
-					value: 'medium',
-				},
-			} );
+			wrapper
+				.find( 'select' )
+				.at( 0 )
+				.simulate( 'change', {
+					target: {
+						value: 'medium',
+					},
+				} );
 
 			expect( onChangeHandler ).toHaveBeenCalledTimes( 2 );
 			expect( onChangeHandler.mock.calls[ 0 ][ 0 ] ).toEqual( 'small' );
@@ -116,11 +113,14 @@ describe( 'DimensionControl', () => {
 				/>
 			);
 
-			wrapper.find( 'select' ).at( 0 ).simulate( 'change', {
-				target: {
-					value: '', // this happens when you select the "default" <option />
-				},
-			} );
+			wrapper
+				.find( 'select' )
+				.at( 0 )
+				.simulate( 'change', {
+					target: {
+						value: '', // this happens when you select the "default" <option />
+					},
+				} );
 
 			expect( onChangeHandler ).toHaveBeenNthCalledWith( 1, undefined );
 		} );

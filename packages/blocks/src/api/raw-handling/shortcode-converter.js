@@ -19,11 +19,13 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 	// Get all matches.
 	const transformsFrom = getBlockTransforms( 'from' );
 
-	const transformation = findTransform( transformsFrom, ( transform ) => (
-		excludedBlockNames.indexOf( transform.blockName ) === -1 &&
-		transform.type === 'shortcode' &&
-		some( castArray( transform.tag ), ( tag ) => regexp( tag ).test( HTML ) )
-	) );
+	const transformation = findTransform(
+		transformsFrom,
+		( transform ) =>
+			excludedBlockNames.indexOf( transform.blockName ) === -1 &&
+			transform.type === 'shortcode' &&
+			some( castArray( transform.tag ), ( tag ) => regexp( tag ).test( HTML ) )
+	);
 
 	if ( ! transformation ) {
 		return [ HTML ];
@@ -46,10 +48,7 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 		// this segment.
 		if (
 			! includes( match.shortcode.content || '', '<' ) &&
-			! (
-				/(\n|<p>)\s*$/.test( beforeHTML ) &&
-				/^\s*(\n|<\/p>)/.test( afterHTML )
-			)
+			! ( /(\n|<p>)\s*$/.test( beforeHTML ) && /^\s*(\n|<\/p>)/.test( afterHTML ) )
 		) {
 			return segmentHTMLToShortcodeBlock( HTML, lastIndex );
 		}
@@ -63,11 +62,10 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 		// that one `isMatch` fail in an HTML fragment doesn't prevent any
 		// valid matches in subsequent fragments.
 		if ( transformation.isMatch && ! transformation.isMatch( match.shortcode.attrs ) ) {
-			return segmentHTMLToShortcodeBlock(
-				HTML,
-				previousIndex,
-				[ ...excludedBlockNames, transformation.blockName ],
-			);
+			return segmentHTMLToShortcodeBlock( HTML, previousIndex, [
+				...excludedBlockNames,
+				transformation.blockName,
+			] );
 		}
 
 		const attributes = mapValues(
@@ -76,7 +74,7 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 			// but shouldn't be too relied upon.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
-			( schema ) => schema.shortcode( match.shortcode.attrs, match ),
+			( schema ) => schema.shortcode( match.shortcode.attrs, match )
 		);
 
 		const block = createBlock(
@@ -87,15 +85,11 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 					attributes: transformation.attributes,
 				},
 				match.shortcode.content,
-				attributes,
+				attributes
 			)
 		);
 
-		return [
-			beforeHTML,
-			block,
-			...segmentHTMLToShortcodeBlock( HTML.substr( lastIndex ) ),
-		];
+		return [ beforeHTML, block, ...segmentHTMLToShortcodeBlock( HTML.substr( lastIndex ) ) ];
 	}
 
 	return [ HTML ];

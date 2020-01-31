@@ -93,7 +93,9 @@ const deprecated = [
 			return (
 				<figure className={ classes }>
 					{ href ? <a href={ href }>{ image }</a> : image }
-					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+					{ ! RichText.isEmpty( caption ) && (
+						<RichText.Content tagName="figcaption" value={ caption } />
+					) }
 				</figure>
 			);
 		},
@@ -114,9 +116,11 @@ const deprecated = [
 			);
 
 			return (
-				<figure className={ align ? `align${ align }` : null } >
+				<figure className={ align ? `align${ align }` : null }>
 					{ href ? <a href={ href }>{ image }</a> : image }
-					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+					{ ! RichText.isEmpty( caption ) && (
+						<RichText.Content tagName="figcaption" value={ caption } />
+					) }
 				</figure>
 			);
 		},
@@ -139,7 +143,9 @@ const deprecated = [
 			return (
 				<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
 					{ href ? <a href={ href }>{ image }</a> : image }
-					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+					{ ! RichText.isEmpty( caption ) && (
+						<RichText.Content tagName="figcaption" value={ caption } />
+					) }
 				</figure>
 			);
 		},

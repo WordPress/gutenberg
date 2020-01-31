@@ -60,7 +60,11 @@ describe( 'Font Size Picker', () => {
 		await page.click( '.components-font-size-picker__select' );
 		await page.click( '.components-custom-select-control__item:nth-child(2)' );
 
-		const resetButton = ( await page.$x( '//*[contains(concat(" ", @class, " "), " components-font-size-picker__controls ")]//*[text()=\'Reset\']' ) )[ 0 ];
+		const resetButton = (
+			await page.$x(
+				'//*[contains(concat(" ", @class, " "), " components-font-size-picker__controls ")]//*[text()=\'Reset\']'
+			)
+		 )[ 0 ];
 		await resetButton.click();
 
 		// Ensure content matches snapshot.

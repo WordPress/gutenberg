@@ -30,9 +30,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 							ids: {
 								type: 'array',
 								shortcode: ( { named: { ids } } ) =>
-									ids.split( ',' ).map( ( id ) => (
-										parseInt( id, 10 )
-									) ),
+									ids.split( ',' ).map( ( id ) => parseInt( id, 10 ) ),
 							},
 						},
 					},
@@ -220,12 +218,14 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 
 	it( 'should not convert inline shortcodes', () => {
 		const originalInASentence = `<p>Here is a nice [foo shortcode].</p>`;
-		expect( segmentHTMLToShortcodeBlock( originalInASentence, 0 ) )
-			.toEqual( [ originalInASentence ] );
+		expect( segmentHTMLToShortcodeBlock( originalInASentence, 0 ) ).toEqual( [
+			originalInASentence,
+		] );
 
 		const originalMultipleShortcodes = `<p>[foo bar] [baz quux]</p>`;
-		expect( segmentHTMLToShortcodeBlock( originalMultipleShortcodes, 0 ) )
-			.toEqual( [ originalMultipleShortcodes ] );
+		expect( segmentHTMLToShortcodeBlock( originalMultipleShortcodes, 0 ) ).toEqual( [
+			originalMultipleShortcodes,
+		] );
 	} );
 
 	it( 'should convert regardless of shortcode alias', () => {

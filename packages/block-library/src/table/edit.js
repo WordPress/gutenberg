@@ -26,7 +26,7 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { table as icon } from '@wordpress/icons';
+import { table as icon, alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -68,17 +68,17 @@ const BACKGROUND_COLORS = [
 
 const ALIGNMENT_CONTROLS = [
 	{
-		icon: 'editor-alignleft',
+		icon: alignLeft,
 		title: __( 'Align Column Left' ),
 		align: 'left',
 	},
 	{
-		icon: 'editor-aligncenter',
+		icon: alignCenter,
 		title: __( 'Align Column Center' ),
 		align: 'center',
 	},
 	{
-		icon: 'editor-alignright',
+		icon: alignRight,
 		title: __( 'Align Column Right' ),
 		align: 'right',
 	},
@@ -149,10 +149,12 @@ export class TableEdit extends Component {
 		initialRowCount = parseInt( initialRowCount, 10 ) || 2;
 		initialColumnCount = parseInt( initialColumnCount, 10 ) || 2;
 
-		setAttributes( createTable( {
-			rowCount: initialRowCount,
-			columnCount: initialColumnCount,
-		} ) );
+		setAttributes(
+			createTable( {
+				rowCount: initialRowCount,
+				columnCount: initialColumnCount,
+			} )
+		);
 	}
 
 	/**
@@ -179,11 +181,12 @@ export class TableEdit extends Component {
 
 		const { attributes, setAttributes } = this.props;
 
-		setAttributes( updateSelectedCell(
-			attributes,
-			selectedCell,
-			( cellAttributes ) => ( { ...cellAttributes, content } ),
-		) );
+		setAttributes(
+			updateSelectedCell( attributes, selectedCell, ( cellAttributes ) => ( {
+				...cellAttributes,
+				content,
+			} ) )
+		);
 	}
 
 	/**
@@ -206,11 +209,10 @@ export class TableEdit extends Component {
 		};
 
 		const { attributes, setAttributes } = this.props;
-		const newAttributes = updateSelectedCell(
-			attributes,
-			columnSelection,
-			( cellAttributes ) => ( { ...cellAttributes, align } ),
-		);
+		const newAttributes = updateSelectedCell( attributes, columnSelection, ( cellAttributes ) => ( {
+			...cellAttributes,
+			align,
+		} ) );
 		setAttributes( newAttributes );
 	}
 
@@ -263,10 +265,12 @@ export class TableEdit extends Component {
 		const { sectionName, rowIndex } = selectedCell;
 
 		this.setState( { selectedCell: null } );
-		setAttributes( insertRow( attributes, {
-			sectionName,
-			rowIndex: rowIndex + delta,
-		} ) );
+		setAttributes(
+			insertRow( attributes, {
+				sectionName,
+				rowIndex: rowIndex + delta,
+			} )
+		);
 	}
 
 	/**
@@ -316,9 +320,11 @@ export class TableEdit extends Component {
 		const { columnIndex } = selectedCell;
 
 		this.setState( { selectedCell: null } );
-		setAttributes( insertColumn( attributes, {
-			columnIndex: columnIndex + delta,
-		} ) );
+		setAttributes(
+			insertColumn( attributes, {
+				columnIndex: columnIndex + delta,
+			} )
+		);
 	}
 
 	/**
@@ -446,9 +452,12 @@ export class TableEdit extends Component {
 								columnIndex,
 							};
 
-							const cellClasses = classnames(	{
-								[ `has-text-align-${ align }` ]: align,
-							}, 'wp-block-table__cell-content' );
+							const cellClasses = classnames(
+								{
+									[ `has-text-align-${ align }` ]: align,
+								},
+								'wp-block-table__cell-content'
+							);
 
 							let placeholder = '';
 							if ( name === 'head' ) {
@@ -494,14 +503,9 @@ export class TableEdit extends Component {
 			setAttributes,
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
-		const {
-			hasFixedLayout,
-			caption,
-			head,
-			body,
-			foot,
-		} = attributes;
-		const isEmpty = isEmptyTableSection( head ) && isEmptyTableSection( body ) && isEmptyTableSection( foot );
+		const { hasFixedLayout, caption, head, body, foot } = attributes;
+		const isEmpty =
+			isEmptyTableSection( head ) && isEmptyTableSection( body ) && isEmptyTableSection( foot );
 		const Section = this.renderSection;
 
 		if ( isEmpty ) {
@@ -528,7 +532,9 @@ export class TableEdit extends Component {
 							min="1"
 							className="wp-block-table__placeholder-input"
 						/>
-						<Button className="wp-block-table__placeholder-button" isSecondary type="submit">{ __( 'Create Table' ) }</Button>
+						<Button className="wp-block-table__placeholder-button" isSecondary type="submit">
+							{ __( 'Create Table' ) }
+						</Button>
 					</form>
 				</Placeholder>
 			);

@@ -29,42 +29,39 @@ describe( 'toHTMLString', () => {
 		require( '../store' );
 	} );
 
-	specWithRegistration.forEach( ( {
-		description,
-		formatName,
-		formatType,
-		html,
-		value,
-		noToHTMLString,
-	} ) => {
-		if ( noToHTMLString ) {
-			return;
+	specWithRegistration.forEach(
+		( { description, formatName, formatType, html, value, noToHTMLString } ) => {
+			if ( noToHTMLString ) {
+				return;
+			}
+
+			it( description, () => {
+				if ( formatName ) {
+					registerFormatType( formatName, formatType );
+				}
+
+				const result = toHTMLString( { value } );
+
+				if ( formatName ) {
+					unregisterFormatType( formatName );
+				}
+
+				expect( result ).toEqual( html );
+			} );
 		}
-
-		it( description, () => {
-			if ( formatName ) {
-				registerFormatType( formatName, formatType );
-			}
-
-			const result = toHTMLString( { value } );
-
-			if ( formatName ) {
-				unregisterFormatType( formatName );
-			}
-
-			expect( result ).toEqual( html );
-		} );
-	} );
+	);
 
 	it( 'should extract recreate HTML 1', () => {
-		const HTML = 'one <em>two 🍒</em> <a href="#"><img src=""><strong>three</strong></a><img src="">';
+		const HTML =
+			'one <em>two 🍒</em> <a href="#"><img src=""><strong>three</strong></a><img src="">';
 		const element = createNode( `<p>${ HTML }</p>` );
 
 		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual( HTML );
 	} );
 
 	it( 'should extract recreate HTML 2', () => {
-		const HTML = 'one <em>two 🍒</em> <a href="#">test <img src=""><strong>three</strong></a><img src="">';
+		const HTML =
+			'one <em>two 🍒</em> <a href="#">test <img src=""><strong>three</strong></a><img src="">';
 		const element = createNode( `<p>${ HTML }</p>` );
 
 		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual( HTML );
@@ -85,7 +82,8 @@ describe( 'toHTMLString', () => {
 	} );
 
 	it( 'should extract recreate HTML 5', () => {
-		const HTML = '<em>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</em>';
+		const HTML =
+			'<em>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</em>';
 		const element = createNode( `<p>${ HTML }</p>` );
 
 		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual( HTML );

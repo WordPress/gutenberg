@@ -10,7 +10,7 @@ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
 
 /**
@@ -34,7 +34,9 @@ export class BlockList extends Component {
 		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
-		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
+		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind(
+			this
+		);
 		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind( this );
 	}
 
@@ -43,7 +45,12 @@ export class BlockList extends Component {
 	}
 
 	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
-		KeyboardAwareFlatList.handleCaretVerticalPositionChange( this.scrollViewRef, targetId, caretY, previousCaretY );
+		KeyboardAwareFlatList.handleCaretVerticalPositionChange(
+			this.scrollViewRef,
+			targetId,
+			caretY,
+			previousCaretY
+		);
 	}
 
 	scrollViewInnerRef( ref ) {
@@ -59,7 +66,7 @@ export class BlockList extends Component {
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
 		return (
 			<ReadableContentView>
-				<BlockListAppender				// show the default appender, anormal, when not inserting a block
+				<BlockListAppender // show the default appender, anormal, when not inserting a block
 					rootClientId={ this.props.rootClientId }
 					renderAppender={ this.props.renderAppender }
 					showSeparator={ willShowInsertionPoint }
@@ -69,11 +76,8 @@ export class BlockList extends Component {
 	}
 
 	shouldShowInnerBlockAppender() {
-		const {
-			blockClientIds,
-			renderAppender,
-		} = this.props;
-		return ( renderAppender && blockClientIds.length > 0 );
+		const { blockClientIds, renderAppender } = this.props;
+		return renderAppender && blockClientIds.length > 0;
 	}
 
 	render() {
@@ -89,10 +93,7 @@ export class BlockList extends Component {
 		} = this.props;
 
 		return (
-			<View
-				style={ { flex: isRootList ? 1 : 0 } }
-				onAccessibilityEscape={ clearSelectedBlock }
-			>
+			<View style={ { flex: isRootList ? 1 : 0 } } onAccessibilityEscape={ clearSelectedBlock }>
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
@@ -120,24 +121,14 @@ export class BlockList extends Component {
 							showSeparator
 						/>
 					</View>
-				)
-				}
-
+				) }
 			</View>
 		);
 	}
 
-	isReplaceable( block ) {
-		if ( ! block ) {
-			return false;
-		}
-		return isUnmodifiedDefaultBlock( block );
-	}
-
-	renderItem( { item: clientId, index } ) {
+	renderItem( { item: clientId } ) {
 		const {
 			isReadOnly,
-			shouldShowBlockAtIndex,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 		} = this.props;
@@ -146,16 +137,17 @@ export class BlockList extends Component {
 			<ReadableContentView>
 				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
 					{ shouldShowInsertionPointBefore( clientId ) && <BlockInsertionPoint /> }
-					{ shouldShowBlockAtIndex( index ) && (
-						<BlockListBlock
-							key={ clientId }
-							showTitle={ false }
-							clientId={ clientId }
-							rootClientId={ this.props.rootClientId }
-							onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-							isSmallScreen={ ! this.props.isFullyBordered }
-						/> ) }
-					{ ! this.shouldShowInnerBlockAppender() && shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
+					<BlockListBlock
+						key={ clientId }
+						showTitle={ false }
+						clientId={ clientId }
+						rootClientId={ this.props.rootClientId }
+						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
+						isSmallScreen={ ! this.props.isFullyBordered }
+					/>
+					{ ! this.shouldShowInnerBlockAppender() && shouldShowInsertionPointAfter( clientId ) && (
+						<BlockInsertionPoint />
+					) }
 				</View>
 			</ReadableContentView>
 		);
@@ -165,9 +157,11 @@ export class BlockList extends Component {
 		const paragraphBlock = createBlock( 'core/paragraph' );
 		return (
 			<>
-				<TouchableWithoutFeedback onPress={ () => {
-					this.addBlockToEndOfPost( paragraphBlock );
-				} } >
+				<TouchableWithoutFeedback
+					onPress={ () => {
+						this.addBlockToEndOfPost( paragraphBlock );
+					} }
+				>
 					<View style={ styles.blockListFooter } />
 				</TouchableWithoutFeedback>
 				<__experimentalBlockListFooter.Slot />
@@ -180,61 +174,36 @@ export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getBlockCount,
-			getBlockIndex,
 			getBlockOrder,
 			getSelectedBlockClientId,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
-			getSelectedBlock,
 			getSettings,
 		} = select( 'core/block-editor' );
-
-		const {
-			getGroupingBlockName,
-		} = select( 'core/blocks' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
-		const selectedBlock = getSelectedBlock();
-		const hasInnerBlocks = selectedBlock && selectedBlock.name === getGroupingBlockName();
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
-				(
-					// if list is empty, show the insertion point (via the default appender)
-					blockClientIds.length === 0 ||
+				// if list is empty, show the insertion point (via the default appender)
+				( blockClientIds.length === 0 ||
 					// or if the insertion point is right before the denoted block
-					blockClientIds[ insertionPoint.index ] === clientId
-				)
+					blockClientIds[ insertionPoint.index ] === clientId )
 			);
 		};
 		const shouldShowInsertionPointAfter = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
-
 				// if the insertion point is at the end of the list
 				blockClientIds.length === insertionPoint.index &&
-
 				// and the denoted block is the last one on the list, show the indicator at the end of the block
 				blockClientIds[ insertionPoint.index - 1 ] === clientId
 			);
-		};
-
-		const selectedBlockIndex = getBlockIndex( selectedBlockClientId, rootClientId );
-
-		const shouldShowBlockAtIndex = ( index ) => {
-			const shouldHideBlockAtIndex = (
-				! hasInnerBlocks && blockInsertionPointIsVisible &&
-				// if `index` === `insertionPoint.index`, then block is replaceable
-				index === insertionPoint.index &&
-				// only hide selected block
-				index === selectedBlockIndex
-			);
-			return ! shouldHideBlockAtIndex;
 		};
 
 		const isReadOnly = getSettings().readOnly;
@@ -243,7 +212,6 @@ export default compose( [
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
 			isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
-			shouldShowBlockAtIndex,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			selectedBlockClientId,
@@ -252,11 +220,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const {
-			insertBlock,
-			replaceBlock,
-			clearSelectedBlock,
-		} = dispatch( 'core/block-editor' );
+		const { insertBlock, replaceBlock, clearSelectedBlock } = dispatch( 'core/block-editor' );
 
 		return {
 			clearSelectedBlock,

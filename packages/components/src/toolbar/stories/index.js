@@ -25,10 +25,7 @@ function InlineImageIcon() {
 export const _default = () => {
 	return (
 		// id is required for server side rendering
-		<Toolbar
-			__experimentalAccessibilityLabel="Options"
-			id="options-toolbar"
-		>
+		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar">
 			<ToolbarGroup>
 				<ToolbarButton icon="editor-paragraph" label="Paragraph" />
 			</ToolbarGroup>
@@ -100,10 +97,7 @@ export const _default = () => {
 export const withoutGroup = () => {
 	return (
 		// id is required for server side rendering
-		<Toolbar
-			__experimentalAccessibilityLabel="Options"
-			id="options-toolbar-without-group"
-		>
+		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar-without-group">
 			<ToolbarButton icon="editor-bold" label="Bold" isPressed />
 			<ToolbarButton icon="editor-italic" label="Italic" />
 			<ToolbarButton icon="admin-links" label="Link" />

@@ -39,7 +39,9 @@ describe( 'BlockIcon', () => {
 	} );
 
 	it( 'adds background and foreground styles when colors are enabled', () => {
-		const wrapper = shallow( <BlockIcon icon={ { background: 'white', foreground: 'black' } } showColors /> );
+		const wrapper = shallow(
+			<BlockIcon icon={ { background: 'white', foreground: 'black' } } showColors />
+		);
 
 		expect( wrapper.find( 'span' ).prop( 'style' ) ).toEqual( {
 			backgroundColor: 'white',

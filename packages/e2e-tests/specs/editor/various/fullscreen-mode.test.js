@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createNewPost,
-	clickOnMoreMenuItem,
-	toggleMoreMenu,
-} from '@wordpress/e2e-test-utils';
+import { createNewPost, clickOnMoreMenuItem, toggleMoreMenu } from '@wordpress/e2e-test-utils';
 
 describe( 'Fullscreen Mode', () => {
 	beforeAll( async () => {

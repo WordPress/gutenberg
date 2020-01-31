@@ -3,10 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import {
-	PostPreviewButton,
-	PostSavedState,
-} from '@wordpress/editor';
+import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -26,19 +23,25 @@ function Header() {
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
-	} = useSelect( ( select ) => ( {
-		shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
-	} ), [] );
+	} = useSelect(
+		( select ) => ( {
+			shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(
+				'core/edit-post/toggle-sidebar'
+			),
+			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+			isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
+			isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
+		} ),
+		[]
+	);
 	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 
-	const toggleGeneralSidebar = isEditorSidebarOpened ?
-		closeGeneralSidebar :
-		() => openGeneralSidebar( getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document' );
+	const toggleGeneralSidebar = isEditorSidebarOpened
+		? closeGeneralSidebar
+		: () =>
+				openGeneralSidebar( getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document' );
 
 	return (
 		<div className="edit-post-header">
@@ -49,19 +52,13 @@ function Header() {
 					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
 					// We track that DOM node to return focus to the PostPublishButtonOrToggle
 					// when the publish sidebar has been closed.
-					<PostSavedState
-						forceIsDirty={ hasActiveMetaboxes }
-						forceIsSaving={ isSaving }
-					/>
+					<PostSavedState forceIsDirty={ hasActiveMetaboxes } forceIsSaving={ isSaving } />
 				) }
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }
 				/>
-				<PostPublishButtonOrToggle
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-				/>
+				<PostPublishButtonOrToggle forceIsDirty={ hasActiveMetaboxes } forceIsSaving={ isSaving } />
 				<Button
 					icon="admin-generic"
 					label={ __( 'Settings' ) }

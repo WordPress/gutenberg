@@ -17,11 +17,7 @@ import { LINE_SEPARATOR } from './special-characters';
  *
  * @return {Object} A new value with the value inserted.
  */
-export function insertLineSeparator(
-	value,
-	startIndex = value.start,
-	endIndex = value.end,
-) {
+export function insertLineSeparator( value, startIndex = value.start, endIndex = value.end ) {
 	const beforeText = getTextContent( value ).slice( 0, startIndex );
 	const previousLineSeparatorIndex = beforeText.lastIndexOf( LINE_SEPARATOR );
 	const previousLineSeparatorFormats = value.replacements[ previousLineSeparatorIndex ];

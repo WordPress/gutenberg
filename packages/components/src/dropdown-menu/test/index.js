@@ -67,7 +67,9 @@ describe( 'DropdownMenu', () => {
 			} );
 
 			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
-			expect( wrapper.find( Button ).filter( '.components-dropdown-menu__menu-item' ) ).toHaveLength( controls.length );
+			expect(
+				wrapper.find( Button ).filter( '.components-dropdown-menu__menu-item' )
+			).toHaveLength( controls.length );
 		} );
 
 		it( 'should open menu on arrow down (children)', () => {
@@ -82,7 +84,10 @@ describe( 'DropdownMenu', () => {
 
 			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
 
-			wrapper.find( MenuItem ).props().onClick();
+			wrapper
+				.find( MenuItem )
+				.props()
+				.onClick();
 			wrapper.update();
 
 			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 0 );

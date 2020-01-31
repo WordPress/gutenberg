@@ -11,9 +11,7 @@ import styles from './style.android.scss';
 
 const HTMLInputContainer = ( { children, parentHeight } ) => (
 	<KeyboardAvoidingView style={ styles.keyboardAvoidingView } parentHeight={ parentHeight }>
-		<ScrollView style={ styles.scrollView } >
-			{ children }
-		</ScrollView>
+		<ScrollView style={ styles.scrollView }>{ children }</ScrollView>
 	</KeyboardAvoidingView>
 );
 

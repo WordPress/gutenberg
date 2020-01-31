@@ -15,30 +15,25 @@ const NAMESPACE_EXPORT = '*';
 const DEFAULT_EXPORT = 'default';
 
 const hasClassWithName = ( node, name ) =>
-	node.type === 'ClassDeclaration' &&
-	node.id.name === name;
+	node.type === 'ClassDeclaration' && node.id.name === name;
 
 const hasFunctionWithName = ( node, name ) =>
-	node.type === 'FunctionDeclaration' &&
-	node.id.name === name;
+	node.type === 'FunctionDeclaration' && node.id.name === name;
 
 const hasVariableWithName = ( node, name ) =>
 	node.type === 'VariableDeclaration' &&
 	node.declarations.some( ( declaration ) => {
 		if ( declaration.id.type === 'ObjectPattern' ) {
-			return declaration.id.properties.some(
-				( property ) => property.key.name === name
-			);
+			return declaration.id.properties.some( ( property ) => property.key.name === name );
 		}
 		return declaration.id.name === name;
 	} );
 
 const hasNamedExportWithName = ( node, name ) =>
-	node.type === 'ExportNamedDeclaration' && (
-		( node.declaration && hasClassWithName( node.declaration, name ) ) ||
+	node.type === 'ExportNamedDeclaration' &&
+	( ( node.declaration && hasClassWithName( node.declaration, name ) ) ||
 		( node.declaration && hasFunctionWithName( node.declaration, name ) ) ||
-		( node.declaration && hasVariableWithName( node.declaration, name ) )
-	);
+		( node.declaration && hasVariableWithName( node.declaration, name ) ) );
 
 const hasImportWithName = ( node, name ) =>
 	node.type === 'ImportDeclaration' &&
@@ -49,10 +44,10 @@ const isImportDeclaration = ( node ) => node.type === 'ImportDeclaration';
 const someImportMatchesName = ( name, token ) => {
 	let matches = false;
 	token.specifiers.forEach( ( specifier ) => {
-		if ( ( specifier.type === 'ImportDefaultSpecifier' ) && ( name === 'default' ) ) {
+		if ( specifier.type === 'ImportDefaultSpecifier' && name === 'default' ) {
 			matches = true;
 		}
-		if ( ( specifier.type === 'ImportSpecifier' ) && ( name === specifier.imported.name ) ) {
+		if ( specifier.type === 'ImportSpecifier' && name === specifier.imported.name ) {
 			matches = true;
 		}
 	} );
@@ -78,18 +73,20 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 	let doc;
 	if ( entry.localName !== NAMESPACE_EXPORT ) {
 		doc = getJSDocFromToken( token );
-		if ( ( doc !== undefined ) ) {
+		if ( doc !== undefined ) {
 			return doc;
 		}
 	}
 
 	if ( entry && entry.module === null ) {
 		const candidates = ast.body.filter( ( node ) => {
-			return hasClassWithName( node, entry.localName ) ||
+			return (
+				hasClassWithName( node, entry.localName ) ||
 				hasFunctionWithName( node, entry.localName ) ||
 				hasVariableWithName( node, entry.localName ) ||
 				hasNamedExportWithName( node, entry.localName ) ||
-				hasImportWithName( node, entry.localName );
+				hasImportWithName( node, entry.localName )
+			);
 		} );
 		if ( candidates.length !== 1 ) {
 			return doc;

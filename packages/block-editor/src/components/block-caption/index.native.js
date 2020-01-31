@@ -20,9 +20,7 @@ const BlockCaption = ( {
 	shouldDisplay,
 	text,
 } ) => (
-	<View
-		style={ { flex: 1, padding: 12 } }
-	>
+	<View style={ { flex: 1, padding: 12 } }>
 		<Caption
 			accessibilityLabelCreator={ accessibilityLabelCreator }
 			accessible={ accessible }
@@ -38,10 +36,7 @@ const BlockCaption = ( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlockAttributes,
-			getSelectedBlockClientId,
-		} = select( 'core/block-editor' );
+		const { getBlockAttributes, getSelectedBlockClientId } = select( 'core/block-editor' );
 		const { caption } = getBlockAttributes( clientId );
 		const isBlockSelected = getSelectedBlockClientId() === clientId;
 

@@ -11,18 +11,21 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Object} Updated state.
  */
-export const downloadableBlocks = ( state = {
-	results: {},
-	filterValue: undefined,
-	isRequestingDownloadableBlocks: true,
-}, action ) => {
+export const downloadableBlocks = (
+	state = {
+		results: {},
+		filterValue: undefined,
+		isRequestingDownloadableBlocks: true,
+	},
+	action
+) => {
 	switch ( action.type ) {
-		case 'FETCH_DOWNLOADABLE_BLOCKS' :
+		case 'FETCH_DOWNLOADABLE_BLOCKS':
 			return {
 				...state,
 				isRequestingDownloadableBlocks: true,
 			};
-		case 'RECEIVE_DOWNLOADABLE_BLOCKS' :
+		case 'RECEIVE_DOWNLOADABLE_BLOCKS':
 			return {
 				...state,
 				results: Object.assign( {}, state.results, {
@@ -42,19 +45,24 @@ export const downloadableBlocks = ( state = {
  *
  * @return {Object} Updated state.
  */
-export const blockManagement = ( state = {
-	installedBlockTypes: [],
-}, action ) => {
+export const blockManagement = (
+	state = {
+		installedBlockTypes: [],
+	},
+	action
+) => {
 	switch ( action.type ) {
-		case 'ADD_INSTALLED_BLOCK_TYPE' :
+		case 'ADD_INSTALLED_BLOCK_TYPE':
 			return {
 				...state,
 				installedBlockTypes: [ ...state.installedBlockTypes, action.item ],
 			};
-		case 'REMOVE_INSTALLED_BLOCK_TYPE' :
+		case 'REMOVE_INSTALLED_BLOCK_TYPE':
 			return {
 				...state,
-				installedBlockTypes: state.installedBlockTypes.filter( ( blockType ) => blockType.name !== action.item.name ),
+				installedBlockTypes: state.installedBlockTypes.filter(
+					( blockType ) => blockType.name !== action.item.name
+				),
 			};
 	}
 	return state;

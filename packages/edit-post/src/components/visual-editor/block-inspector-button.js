@@ -10,15 +10,17 @@ import { __ } from '@wordpress/i18n';
 import { MenuItem, withSpokenMessages } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
-export function BlockInspectorButton( {
-	onClick = noop,
-	small = false,
-	speak,
-} ) {
-	const { shortcut, areAdvancedSettingsOpened } = useSelect( ( select ) => ( {
-		shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-		areAdvancedSettingsOpened: select( 'core/edit-post' ).getActiveGeneralSidebarName() === 'edit-post/block',
-	} ), [] );
+export function BlockInspectorButton( { onClick = noop, small = false, speak } ) {
+	const { shortcut, areAdvancedSettingsOpened } = useSelect(
+		( select ) => ( {
+			shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(
+				'core/edit-post/toggle-sidebar'
+			),
+			areAdvancedSettingsOpened:
+				select( 'core/edit-post' ).getActiveGeneralSidebarName() === 'edit-post/block',
+		} ),
+		[]
+	);
 	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 
 	const speakMessage = () => {
@@ -29,7 +31,9 @@ export function BlockInspectorButton( {
 		}
 	};
 
-	const label = areAdvancedSettingsOpened ? __( 'Hide Block Settings' ) : __( 'Show Block Settings' );
+	const label = areAdvancedSettingsOpened
+		? __( 'Hide Block Settings' )
+		: __( 'Show Block Settings' );
 
 	return (
 		<MenuItem

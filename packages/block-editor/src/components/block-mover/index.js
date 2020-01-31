@@ -18,7 +18,8 @@ import { withInstanceId, compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { getBlockMoverDescription } from './mover-description';
-import { leftArrow, rightArrow, upArrow, downArrow, dragHandle } from './icons';
+import { leftArrow, rightArrow, dragHandle } from './icons';
+import { chevronUp, chevronDown } from '@wordpress/icons';
 import BlockDraggable from '../block-draggable';
 
 export class BlockMover extends Component {
@@ -44,7 +45,21 @@ export class BlockMover extends Component {
 	}
 
 	render() {
-		const { onMoveUp, onMoveDown, __experimentalOrientation: orientation, isRTL, isFirst, isLast, clientIds, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
+		const {
+			onMoveUp,
+			onMoveDown,
+			__experimentalOrientation: orientation,
+			isRTL,
+			isFirst,
+			isLast,
+			clientIds,
+			blockType,
+			firstIndex,
+			isLocked,
+			instanceId,
+			isHidden,
+			rootClientId,
+		} = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
 		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
@@ -56,12 +71,12 @@ export class BlockMover extends Component {
 				if ( orientation === 'horizontal' ) {
 					return isRTL ? rightArrow : leftArrow;
 				}
-				return upArrow;
+				return chevronUp;
 			} else if ( moveDirection === 'down' ) {
 				if ( orientation === 'horizontal' ) {
 					return isRTL ? leftArrow : rightArrow;
 				}
-				return downArrow;
+				return chevronDown;
 			}
 			return null;
 		};
@@ -86,7 +101,12 @@ export class BlockMover extends Component {
 		// to an unfocused state (body as active element) without firing blur on,
 		// the rendering parent, leaving it unable to react to focus out.
 		return (
-			<ToolbarGroup className={ classnames( 'block-editor-block-mover', { 'is-visible': isFocused || ! isHidden, 'is-horizontal': orientation === 'horizontal' } ) }>
+			<ToolbarGroup
+				className={ classnames( 'block-editor-block-mover', {
+					'is-visible': isFocused || ! isHidden,
+					'is-horizontal': orientation === 'horizontal',
+				} ) }
+			>
 				<Button
 					className="block-editor-block-mover__control"
 					onClick={ isFirst ? null : onMoveUp }
@@ -126,33 +146,35 @@ export class BlockMover extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 				/>
-				<span id={ `block-editor-block-mover__up-description-${ instanceId }` } className="block-editor-block-mover__description">
-					{
-						getBlockMoverDescription(
-							blocksCount,
-							blockType && blockType.title,
-							firstIndex,
-							isFirst,
-							isLast,
-							-1,
-							orientation,
-							isRTL,
-						)
-					}
+				<span
+					id={ `block-editor-block-mover__up-description-${ instanceId }` }
+					className="block-editor-block-mover__description"
+				>
+					{ getBlockMoverDescription(
+						blocksCount,
+						blockType && blockType.title,
+						firstIndex,
+						isFirst,
+						isLast,
+						-1,
+						orientation,
+						isRTL
+					) }
 				</span>
-				<span id={ `block-editor-block-mover__down-description-${ instanceId }` } className="block-editor-block-mover__description">
-					{
-						getBlockMoverDescription(
-							blocksCount,
-							blockType && blockType.title,
-							firstIndex,
-							isFirst,
-							isLast,
-							1,
-							orientation,
-							isRTL,
-						)
-					}
+				<span
+					id={ `block-editor-block-mover__down-description-${ instanceId }` }
+					className="block-editor-block-mover__description"
+				>
+					{ getBlockMoverDescription(
+						blocksCount,
+						blockType && blockType.title,
+						firstIndex,
+						isFirst,
+						isLast,
+						1,
+						orientation,
+						isRTL
+					) }
 				</span>
 			</ToolbarGroup>
 		);
@@ -161,7 +183,13 @@ export class BlockMover extends Component {
 
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlock, getBlockIndex, getTemplateLock, getBlockRootClientId, getBlockOrder } = select( 'core/block-editor' );
+		const {
+			getBlock,
+			getBlockIndex,
+			getTemplateLock,
+			getBlockRootClientId,
+			getBlockOrder,
+		} = select( 'core/block-editor' );
 		const normalizedClientIds = castArray( clientIds );
 		const firstClientId = first( normalizedClientIds );
 		const block = getBlock( firstClientId );
@@ -170,9 +198,7 @@ export default compose(
 		const firstIndex = getBlockIndex( firstClientId, rootClientId );
 		const lastIndex = getBlockIndex( last( normalizedClientIds ), rootClientId );
 		const { getSettings } = select( 'core/block-editor' );
-		const {
-			isRTL,
-		} = getSettings();
+		const { isRTL } = getSettings();
 
 		return {
 			blockType: block ? getBlockType( block.name ) : null,
@@ -191,5 +217,5 @@ export default compose(
 			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
 		};
 	} ),
-	withInstanceId,
+	withInstanceId
 )( BlockMover );

@@ -15,14 +15,7 @@ import { __ } from '@wordpress/i18n';
 import { RichText, BlockControls } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
-const HeadingEdit = ( {
-	attributes,
-	mergeBlocks,
-	onFocus,
-	onReplace,
-	setAttributes,
-	style,
-} ) => (
+const HeadingEdit = ( { attributes, mergeBlocks, onFocus, onReplace, setAttributes, style } ) => (
 	<View onAccessibilityTap={ onFocus }>
 		<BlockControls>
 			<HeadingToolbar

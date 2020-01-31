@@ -10,17 +10,29 @@ describe( 'PublishButtonLabel', () => {
 	} );
 
 	it( 'should show updating if published and saving in progress', () => {
-		const label = PublishButtonLabel( { hasPublishAction: true, isPublished: true, isSaving: true } );
+		const label = PublishButtonLabel( {
+			hasPublishAction: true,
+			isPublished: true,
+			isSaving: true,
+		} );
 		expect( label ).toBe( 'Updating…' );
 	} );
 
 	it( 'should show scheduling if scheduled and saving in progress', () => {
-		const label = PublishButtonLabel( { hasPublishAction: true, isBeingScheduled: true, isSaving: true } );
+		const label = PublishButtonLabel( {
+			hasPublishAction: true,
+			isBeingScheduled: true,
+			isSaving: true,
+		} );
 		expect( label ).toBe( 'Scheduling…' );
 	} );
 
 	it( 'should show publish if not published and saving in progress', () => {
-		const label = PublishButtonLabel( { hasPublishAction: true, isPublished: false, isSaving: true } );
+		const label = PublishButtonLabel( {
+			hasPublishAction: true,
+			isPublished: false,
+			isSaving: true,
+		} );
 		expect( label ).toBe( 'Publish' );
 	} );
 

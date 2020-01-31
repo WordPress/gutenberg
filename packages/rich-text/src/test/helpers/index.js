@@ -181,7 +181,12 @@ export const spec = [
 		record: {
 			start: 0,
 			end: 4,
-			formats: [ [ em, strong ], [ em, strong ], [ em, strong ], [ em, strong ] ],
+			formats: [
+				[ em, strong ],
+				[ em, strong ],
+				[ em, strong ],
+				[ em, strong ],
+			],
 			replacements: [ , , , , ],
 			text: 'test',
 		},
@@ -623,7 +628,10 @@ export const spec = [
 		record: {
 			start: 1,
 			end: 1,
-			formats: [ [ a, em ], [ a, strong ] ],
+			formats: [
+				[ a, em ],
+				[ a, strong ],
+			],
 			replacements: [ , , ],
 			text: '12',
 		},
@@ -642,7 +650,10 @@ export const spec = [
 		record: {
 			start: 1,
 			end: 1,
-			formats: [ [ em, a ], [ strong, a ] ],
+			formats: [
+				[ em, a ],
+				[ strong, a ],
+			],
 			replacements: [ , , ],
 			text: '12',
 		},
@@ -661,11 +672,15 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'my-plugin/link',
-				attributes: {},
-				unregisteredAttributes: {},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'my-plugin/link',
+						attributes: {},
+						unregisteredAttributes: {},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -681,13 +696,17 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format test">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'my-plugin/link',
-				attributes: {},
-				unregisteredAttributes: {
-					class: 'test',
-				},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'my-plugin/link',
+						attributes: {},
+						unregisteredAttributes: {
+							class: 'test',
+						},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -703,13 +722,17 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'core/link',
-				attributes: {},
-				unregisteredAttributes: {
-					class: 'custom-format',
-				},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'core/link',
+						attributes: {},
+						unregisteredAttributes: {
+							class: 'custom-format',
+						},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -718,12 +741,16 @@ export const specWithRegistration = [
 		description: 'should create fallback format',
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'a',
-				attributes: {
-					class: 'custom-format',
-				},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'a',
+						attributes: {
+							class: 'custom-format',
+						},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -759,11 +786,15 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'my-plugin/link',
-				attributes: {},
-				unregisteredAttributes: {},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'my-plugin/link',
+						attributes: {},
+						unregisteredAttributes: {},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},

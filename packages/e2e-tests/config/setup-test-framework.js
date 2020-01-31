@@ -202,7 +202,7 @@ function observeConsoleLogging() {
  * @return {?Promise} Promise resolving once Axe texts are finished.
  */
 async function runAxeTestsForBlockEditor() {
-	if ( ! await page.$( '.block-editor' ) ) {
+	if ( ! ( await page.$( '.block-editor' ) ) ) {
 		return;
 	}
 

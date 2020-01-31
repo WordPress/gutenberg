@@ -7,11 +7,7 @@
  */
 function isComponent( node ) {
 	// Assume function component by naming convention of UpperCamelCase.
-	if (
-		node.type === 'FunctionDeclaration' &&
-		node.id &&
-		/^[A-Z]/.test( node.id.name )
-	) {
+	if ( node.type === 'FunctionDeclaration' && node.id && /^[A-Z]/.test( node.id.name ) ) {
 		return true;
 	}
 
@@ -46,10 +42,8 @@ module.exports = {
 			'CallExpression[callee.name="setTimeout"]'( node ) {
 				// If the result of a `setTimeout` call is assigned to a
 				// variable, assume the timer ID is handled by a cancellation.
-				const hasAssignment = (
-					node.parent.type === 'AssignmentExpression' ||
-					node.parent.type === 'VariableDeclarator'
-				);
+				const hasAssignment =
+					node.parent.type === 'AssignmentExpression' || node.parent.type === 'VariableDeclarator';
 				if ( hasAssignment ) {
 					return;
 				}
@@ -73,20 +67,18 @@ module.exports = {
 				// by checking references to see if `setTimeout` resolves to a
 				// variable in scope.
 				const { references } = context.getScope();
-				const hasResolvedReference = references.some( ( reference ) => (
-					reference.identifier.name === 'setTimeout' &&
-					!! reference.resolved &&
-					reference.resolved.scope.type !== 'global'
-				) );
+				const hasResolvedReference = references.some(
+					( reference ) =>
+						reference.identifier.name === 'setTimeout' &&
+						!! reference.resolved &&
+						reference.resolved.scope.type !== 'global'
+				);
 
 				if ( hasResolvedReference ) {
 					return;
 				}
 
-				context.report(
-					node,
-					'setTimeout in a component must be cancelled on unmount'
-				);
+				context.report( node, 'setTimeout in a component must be cancelled on unmount' );
 			},
 		};
 	},

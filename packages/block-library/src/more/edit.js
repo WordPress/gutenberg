@@ -6,10 +6,7 @@ import { PanelBody, ToggleControl } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/block-editor';
 import { ENTER } from '@wordpress/keycodes';
-import {
-	getDefaultBlockName,
-	createBlock,
-} from '@wordpress/blocks';
+import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
 export default class MoreEdit extends Component {
 	constructor() {
@@ -41,9 +38,7 @@ export default class MoreEdit extends Component {
 	}
 
 	getHideExcerptHelp( checked ) {
-		return checked ?
-			__( 'The excerpt is hidden.' ) :
-			__( 'The excerpt is visible.' );
+		return checked ? __( 'The excerpt is hidden.' ) : __( 'The excerpt is visible.' );
 	}
 
 	render() {

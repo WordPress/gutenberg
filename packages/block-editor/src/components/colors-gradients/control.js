@@ -8,7 +8,14 @@ import { every, isEmpty, pick } from 'lodash';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { BaseControl, Button, ButtonGroup, ColorIndicator, ColorPalette, __experimentalGradientPicker as GradientPicker } from '@wordpress/components';
+import {
+	BaseControl,
+	Button,
+	ButtonGroup,
+	ColorIndicator,
+	ColorPalette,
+	__experimentalGradientPicker as GradientPicker,
+} from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
@@ -24,7 +31,12 @@ const colorIndicatorAriaLabel = __( '(Color: %s)' );
 // translators: first %s: the gradient name or value (e.g. red to green or linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)
 const gradientIndicatorAriaLabel = __( '(Gradient: %s)' );
 
-const colorsAndGradientKeys = [ 'colors', 'disableCustomColors', 'gradients', 'disableCustomGradients' ];
+const colorsAndGradientKeys = [
+	'colors',
+	'disableCustomColors',
+	'gradients',
+	'disableCustomGradients',
+];
 
 function VisualLabel( { colors, gradients, label, currentTab, colorValue, gradientValue } ) {
 	let value, ariaLabel;
@@ -45,12 +57,7 @@ function VisualLabel( { colors, gradients, label, currentTab, colorValue, gradie
 	return (
 		<>
 			{ label }
-			{ !! value && (
-				<ColorIndicator
-					colorValue={ value }
-					aria-label={ ariaLabel }
-				/>
-			) }
+			{ !! value && <ColorIndicator colorValue={ value } aria-label={ ariaLabel } /> }
 		</>
 	);
 }
@@ -68,16 +75,17 @@ function ColorGradientControlInner( {
 	gradientValue,
 } ) {
 	const canChooseAColor = onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
-	const canChooseAGradient = onGradientChange && ( ! isEmpty( gradients ) || ! disableCustomGradients );
-	const [ currentTab, setCurrentTab ] = useState( gradientValue ? 'gradient' : !! canChooseAColor && 'color' );
+	const canChooseAGradient =
+		onGradientChange && ( ! isEmpty( gradients ) || ! disableCustomGradients );
+	const [ currentTab, setCurrentTab ] = useState(
+		gradientValue ? 'gradient' : !! canChooseAColor && 'color'
+	);
 
 	if ( ! canChooseAColor && ! canChooseAGradient ) {
 		return null;
 	}
 	return (
-		<BaseControl
-			className={ classnames( 'block-editor-color-gradient-control', className ) }
-		>
+		<BaseControl className={ classnames( 'block-editor-color-gradient-control', className ) }>
 			<fieldset>
 				<legend>
 					<BaseControl.VisualLabel>
@@ -95,7 +103,7 @@ function ColorGradientControlInner( {
 							isLarge
 							isPrimary={ currentTab === 'color' }
 							isSecondary={ currentTab !== 'color' }
-							onClick={ () => ( setCurrentTab( 'color' ) ) }
+							onClick={ () => setCurrentTab( 'color' ) }
 						>
 							{ __( 'Solid Color' ) }
 						</Button>
@@ -103,36 +111,38 @@ function ColorGradientControlInner( {
 							isLarge
 							isPrimary={ currentTab === 'gradient' }
 							isSecondary={ currentTab !== 'gradient' }
-							onClick={ () => ( setCurrentTab( 'gradient' ) ) }
+							onClick={ () => setCurrentTab( 'gradient' ) }
 						>
 							{ __( 'Gradient' ) }
 						</Button>
 					</ButtonGroup>
 				) }
-				{ currentTab === 'color' && (
+				{ ( currentTab === 'color' || ! canChooseAGradient ) && (
 					<ColorPalette
 						value={ colorValue }
-						onChange={ canChooseAGradient ?
-							( newColor ) => {
-								onColorChange( newColor );
-								onGradientChange();
-							} :
-							onColorChange
+						onChange={
+							canChooseAGradient
+								? ( newColor ) => {
+										onColorChange( newColor );
+										onGradientChange();
+								  }
+								: onColorChange
 						}
-						{ ... { colors, disableCustomColors } }
+						{ ...{ colors, disableCustomColors } }
 					/>
 				) }
-				{ currentTab === 'gradient' && (
+				{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
 					<GradientPicker
 						value={ gradientValue }
-						onChange={ canChooseAColor ?
-							( newGradient ) => {
-								onGradientChange( newGradient );
-								onColorChange();
-							} :
-							onGradientChange
+						onChange={
+							canChooseAColor
+								? ( newGradient ) => {
+										onGradientChange( newGradient );
+										onColorChange();
+								  }
+								: onGradientChange
 						}
-						{ ... { gradients, disableCustomGradients } }
+						{ ...{ gradients, disableCustomGradients } }
 					/>
 				) }
 			</fieldset>
@@ -141,17 +151,15 @@ function ColorGradientControlInner( {
 }
 
 function ColorGradientControlSelect( props ) {
-	const colorGradientSettings = useSelect(
-		( select ) => {
-			const settings = select( 'core/block-editor' ).getSettings();
-			return pick( settings, colorsAndGradientKeys );
-		}
-	);
+	const colorGradientSettings = useSelect( ( select ) => {
+		const settings = select( 'core/block-editor' ).getSettings();
+		return pick( settings, colorsAndGradientKeys );
+	} );
 	return <ColorGradientControlInner { ...{ ...colorGradientSettings, ...props } } />;
 }
 
 function ColorGradientControl( props ) {
-	if ( every( colorsAndGradientKeys, ( key ) => ( props.hasOwnProperty( key ) ) ) ) {
+	if ( every( colorsAndGradientKeys, ( key ) => props.hasOwnProperty( key ) ) ) {
 		return <ColorGradientControlInner { ...props } />;
 	}
 	return <ColorGradientControlSelect { ...props } />;

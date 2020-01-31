@@ -7,10 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	InnerBlocks,
-	getColorClassName,
-} from '@wordpress/block-editor';
+import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -93,7 +90,13 @@ export default [
 				focalPoint,
 			} = attributes;
 			const mediaTypeRenders = {
-				image: () => <img src={ mediaUrl } alt={ mediaAlt } className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null } />,
+				image: () => (
+					<img
+						src={ mediaUrl }
+						alt={ mediaAlt }
+						className={ mediaId && mediaType === 'image' ? `wp-image-${ mediaId }` : null }
+					/>
+				),
 				video: () => <video controls src={ mediaUrl } />,
 			};
 			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
@@ -108,7 +111,8 @@ export default [
 
 			let gridTemplateColumns;
 			if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
-				gridTemplateColumns = 'right' === mediaPosition ? `auto ${ mediaWidth }%` : `${ mediaWidth }% auto`;
+				gridTemplateColumns =
+					'right' === mediaPosition ? `auto ${ mediaWidth }%` : `${ mediaWidth }% auto`;
 			}
 			const style = {
 				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
@@ -152,7 +156,8 @@ export default [
 
 			let gridTemplateColumns;
 			if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
-				gridTemplateColumns = 'right' === mediaPosition ? `auto ${ mediaWidth }%` : `${ mediaWidth }% auto`;
+				gridTemplateColumns =
+					'right' === mediaPosition ? `auto ${ mediaWidth }%` : `${ mediaWidth }% auto`;
 			}
 			const style = {
 				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
@@ -160,7 +165,7 @@ export default [
 			};
 			return (
 				<div className={ className } style={ style }>
-					<figure className="wp-block-media-text__media" >
+					<figure className="wp-block-media-text__media">
 						{ ( mediaTypeRenders[ mediaType ] || noop )() }
 					</figure>
 					<div className="wp-block-media-text__content">

@@ -25,11 +25,11 @@ class DatePicker extends Component {
 	}
 
 	/*
-	* Todo: We should remove this function ASAP.
-	* It is kept because focus is lost when we click on the previous and next month buttons.
-	* This focus loss closes the date picker popover.
-	* Ideally we should add an upstream commit on react-dates to fix this issue.
-	*/
+	 * Todo: We should remove this function ASAP.
+	 * It is kept because focus is lost when we click on the previous and next month buttons.
+	 * This focus loss closes the date picker popover.
+	 * Ideally we should add an upstream commit on react-dates to fix this issue.
+	 */
 	keepFocusInside() {
 		if ( ! this.nodeRef.current ) {
 			return;
@@ -80,10 +80,7 @@ class DatePicker extends Component {
 		const momentDate = this.getMomentDate( currentDate );
 
 		return (
-			<div
-				className="components-datetime__date"
-				ref={ this.nodeRef }
-			>
+			<div className="components-datetime__date" ref={ this.nodeRef }>
 				<DayPickerSingleDateController
 					date={ momentDate }
 					daySize={ 30 }

@@ -163,7 +163,7 @@ export default function( css, options ) {
 		let c;
 		accumulator = accumulator || [];
 		// eslint-disable-next-line no-cond-assign
-		while ( c = comment() ) {
+		while ( ( c = comment() ) ) {
 			if ( c !== false ) {
 				accumulator.push( c );
 			}
@@ -273,7 +273,7 @@ export default function( css, options ) {
 		// declarations
 		let decl;
 		// eslint-disable-next-line no-cond-assign
-		while ( decl = declaration() ) {
+		while ( ( decl = declaration() ) ) {
 			if ( decl !== false ) {
 				decls.push( decl );
 				comments( decls );
@@ -296,7 +296,7 @@ export default function( css, options ) {
 		const pos = position();
 
 		// eslint-disable-next-line no-cond-assign
-		while ( m = match( /^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/ ) ) {
+		while ( ( m = match( /^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/ ) ) ) {
 			vals.push( m[ 1 ] );
 			match( /^,\s*/ );
 		}
@@ -339,7 +339,7 @@ export default function( css, options ) {
 		let frame;
 		let frames = comments();
 		// eslint-disable-next-line no-cond-assign
-		while ( frame = keyframe() ) {
+		while ( ( frame = keyframe() ) ) {
 			frames.push( frame );
 			frames = frames.concat( comments() );
 		}
@@ -483,7 +483,7 @@ export default function( css, options ) {
 		// declarations
 		let decl;
 		// eslint-disable-next-line no-cond-assign
-		while ( decl = declaration() ) {
+		while ( ( decl = declaration() ) ) {
 			decls.push( decl );
 			decls = decls.concat( comments() );
 		}
@@ -550,7 +550,7 @@ export default function( css, options ) {
 		// declarations
 		let decl;
 		// eslint-disable-next-line no-cond-assign
-		while ( decl = declaration() ) {
+		while ( ( decl = declaration() ) ) {
 			decls.push( decl );
 			decls = decls.concat( comments() );
 		}
@@ -610,17 +610,19 @@ export default function( css, options ) {
 			return;
 		}
 
-		return atkeyframes() ||
-      atmedia() ||
-      atcustommedia() ||
-      atsupports() ||
-      atimport() ||
-      atcharset() ||
-      atnamespace() ||
-      atdocument() ||
-      atpage() ||
-      athost() ||
-      atfontface();
+		return (
+			atkeyframes() ||
+			atmedia() ||
+			atcustommedia() ||
+			atsupports() ||
+			atimport() ||
+			atcharset() ||
+			atnamespace() ||
+			atdocument() ||
+			atpage() ||
+			athost() ||
+			atfontface()
+		);
 	}
 
 	/**

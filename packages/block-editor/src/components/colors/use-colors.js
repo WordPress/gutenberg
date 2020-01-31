@@ -60,51 +60,45 @@ const ColorPanel = ( {
 		{ ...colorPanelProps }
 	>
 		{ contrastCheckers &&
-			( Array.isArray( contrastCheckers ) ?
-				contrastCheckers.map( ( { backgroundColor, textColor, ...rest } ) => {
-					backgroundColor = resolveContrastCheckerColor(
-						backgroundColor,
-						colorSettings,
-						detectedBackgroundColor
-					);
-					textColor = resolveContrastCheckerColor(
-						textColor,
-						colorSettings,
-						detectedColor
-					);
-					return (
-						<ContrastChecker
-							key={ `${ backgroundColor }-${ textColor }` }
-							backgroundColor={ backgroundColor }
-							textColor={ textColor }
-							{ ...rest }
-						/>
-					);
-				} ) :
-				map( colorSettings, ( { value } ) => {
-					let { backgroundColor, textColor } = contrastCheckers;
-					backgroundColor = resolveContrastCheckerColor(
-						backgroundColor || value,
-						colorSettings,
-						detectedBackgroundColor
-					);
-					textColor = resolveContrastCheckerColor(
-						textColor || value,
-						colorSettings,
-						detectedColor
-					);
-					return (
-						<ContrastChecker
-							{ ...contrastCheckers }
-							key={ `${ backgroundColor }-${ textColor }` }
-							backgroundColor={ backgroundColor }
-							textColor={ textColor }
-						/>
-					);
-				} ) ) }
-		{ typeof panelChildren === 'function' ?
-			panelChildren( colorSettings ) :
-			panelChildren }
+			( Array.isArray( contrastCheckers )
+				? contrastCheckers.map( ( { backgroundColor, textColor, ...rest } ) => {
+						backgroundColor = resolveContrastCheckerColor(
+							backgroundColor,
+							colorSettings,
+							detectedBackgroundColor
+						);
+						textColor = resolveContrastCheckerColor( textColor, colorSettings, detectedColor );
+						return (
+							<ContrastChecker
+								key={ `${ backgroundColor }-${ textColor }` }
+								backgroundColor={ backgroundColor }
+								textColor={ textColor }
+								{ ...rest }
+							/>
+						);
+				  } )
+				: map( colorSettings, ( { value } ) => {
+						let { backgroundColor, textColor } = contrastCheckers;
+						backgroundColor = resolveContrastCheckerColor(
+							backgroundColor || value,
+							colorSettings,
+							detectedBackgroundColor
+						);
+						textColor = resolveContrastCheckerColor(
+							textColor || value,
+							colorSettings,
+							detectedColor
+						);
+						return (
+							<ContrastChecker
+								{ ...contrastCheckers }
+								key={ `${ backgroundColor }-${ textColor }` }
+								backgroundColor={ backgroundColor }
+								textColor={ textColor }
+							/>
+						);
+				  } ) ) }
+		{ typeof panelChildren === 'function' ? panelChildren( colorSettings ) : panelChildren }
 	</PanelColorSettings>
 );
 const InspectorControlsColorPanel = ( props ) => (
@@ -191,9 +185,7 @@ export default function __experimentalUseColors(
 						[ color ? camelCase( `custom ${ name }` ) : name ]: undefined,
 					} );
 					setAttributes( {
-						[ color ? name : camelCase( `custom ${ name }` ) ]: color ?
-							color.slug :
-							newColor,
+						[ color ? name : camelCase( `custom ${ name }` ) ]: color ? color.slug : newColor,
 					} );
 				},
 				{
@@ -230,16 +222,14 @@ export default function __experimentalUseColors(
 
 		if ( needsBackgroundColor ) {
 			let backgroundColorNode = backgroundColorTargetRef.current;
-			let backgroundColor = getComputedStyle( backgroundColorNode )
-				.backgroundColor;
+			let backgroundColor = getComputedStyle( backgroundColorNode ).backgroundColor;
 			while (
 				backgroundColor === 'rgba(0, 0, 0, 0)' &&
 				backgroundColorNode.parentNode &&
 				backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
 			) {
 				backgroundColorNode = backgroundColorNode.parentNode;
-				backgroundColor = getComputedStyle( backgroundColorNode )
-					.backgroundColor;
+				backgroundColor = getComputedStyle( backgroundColorNode ).backgroundColor;
 			}
 
 			setDetectedBackgroundColor( backgroundColor );
@@ -280,9 +270,7 @@ export default function __experimentalUseColors(
 			const customColor = attributes[ camelCase( `custom ${ name }` ) ];
 			// We memoize the non-primitives to avoid unnecessary updates
 			// when they are used as props for other components.
-			const _color = customColor ?
-				undefined :
-				colors.find( ( __color ) => __color.slug === color );
+			const _color = customColor ? undefined : colors.find( ( __color ) => __color.slug === color );
 			acc[ componentName ] = createComponent(
 				name,
 				property,
@@ -292,9 +280,7 @@ export default function __experimentalUseColors(
 				customColor
 			);
 			acc[ componentName ].displayName = componentName;
-			acc[ componentName ].color = customColor ?
-				customColor :
-				_color && _color.color;
+			acc[ componentName ].color = customColor ? customColor : _color && _color.color;
 			acc[ componentName ].slug = color;
 			acc[ componentName ].setColor = createSetColor( name, colors );
 
@@ -328,9 +314,7 @@ export default function __experimentalUseColors(
 		return {
 			...components,
 			ColorPanel: <ColorPanel { ...wrappedColorPanelProps } />,
-			InspectorControlsColorPanel: (
-				<InspectorControlsColorPanel { ...wrappedColorPanelProps } />
-			),
+			InspectorControlsColorPanel: <InspectorControlsColorPanel { ...wrappedColorPanelProps } />,
 		};
 	}, [ attributes, setAttributes, detectedColor, detectedBackgroundColor, ...deps ] );
 }

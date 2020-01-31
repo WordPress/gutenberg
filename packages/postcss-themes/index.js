@@ -47,9 +47,10 @@ module.exports = postcss.plugin( 'postcss-themes', function( options ) {
 			if ( hasThemeDecls ) {
 				Object.keys( options.themes ).forEach( ( key ) => {
 					const newRule = postcss.rule( {
-						selector: rule.selector.split( ',' ).map(
-							( subselector ) => 'body.' + key + ' ' + subselector.trim()
-						).join( ', ' ),
+						selector: rule.selector
+							.split( ',' )
+							.map( ( subselector ) => 'body.' + key + ' ' + subselector.trim() )
+							.join( ', ' ),
 					} );
 					themeDecls[ key ].forEach( ( decl ) => newRule.append( decl ) );
 					rule.parent.insertAfter( rule, newRule );

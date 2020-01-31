@@ -34,7 +34,10 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
-		this.safeAreaEventSubscription = SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		this.safeAreaEventSubscription = SafeArea.addEventListener(
+			'safeAreaInsetsForRootViewDidChange',
+			this.onSafeAreaInsetsUpdate
+		);
 	}
 
 	componentWillUnmount() {
@@ -43,7 +46,10 @@ class BottomSheet extends Component {
 		}
 		this.safeAreaEventSubscription.remove();
 		this.safeAreaEventSubscription = null;
-		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		SafeArea.removeEventListener(
+			'safeAreaInsetsForRootViewDidChange',
+			this.onSafeAreaInsetsUpdate
+		);
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
@@ -82,17 +88,11 @@ class BottomSheet extends Component {
 		const getHeader = () => (
 			<View>
 				<View style={ styles.head }>
-					<View style={ { flex: 1 } }>
-						{ leftButton }
-					</View>
+					<View style={ { flex: 1 } }>{ leftButton }</View>
 					<View style={ styles.titleContainer }>
-						<Text style={ styles.title }>
-							{ title }
-						</Text>
+						<Text style={ styles.title }>{ title }</Text>
 					</View>
-					<View style={ { flex: 1 } }>
-						{ rightButton }
-					</View>
+					<View style={ { flex: 1 } }>{ rightButton }</View>
 				</View>
 				<View style={ styles.separator } />
 			</View>
@@ -125,15 +125,12 @@ class BottomSheet extends Component {
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
-					{ hideHeader && ( <View style={ styles.emptyHeaderSpace } /> ) }
+					{ hideHeader && <View style={ styles.emptyHeaderSpace } /> }
 					{ ! hideHeader && getHeader() }
-					<View style={ [ styles.content, contentStyle ] }>
-						{ this.props.children }
-					</View>
+					<View style={ [ styles.content, contentStyle ] }>{ this.props.children }</View>
 					<View style={ { height: this.state.safeAreaBottomInset } } />
 				</KeyboardAvoidingView>
 			</Modal>
-
 		);
 	}
 }

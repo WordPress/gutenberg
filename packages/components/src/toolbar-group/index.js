@@ -48,14 +48,7 @@ import ToolbarContext from '../toolbar-context';
  * @param {WPBlockTypeIconRender} [props.icon]        The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
  * @param {string}                [props.label]       The menu item text.
  */
-function ToolbarGroup( {
-	controls = [],
-	children,
-	className,
-	isCollapsed,
-	title,
-	...props
-} ) {
+function ToolbarGroup( { controls = [], children, className, isCollapsed, title, ...props } ) {
 	// It'll contain state if `ToolbarGroup` is being used within
 	// `<Toolbar accessibilityLabel="label" />`
 	const accessibleToolbarState = useContext( ToolbarContext );

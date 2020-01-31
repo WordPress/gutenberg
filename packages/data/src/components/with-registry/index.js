@@ -19,12 +19,7 @@ import { RegistryConsumer } from '../registry-provider';
 const withRegistry = createHigherOrderComponent(
 	( OriginalComponent ) => ( props ) => (
 		<RegistryConsumer>
-			{ ( registry ) => (
-				<OriginalComponent
-					{ ...props }
-					registry={ registry }
-				/>
-			) }
+			{ ( registry ) => <OriginalComponent { ...props } registry={ registry } /> }
 		</RegistryConsumer>
 	),
 	'withRegistry'

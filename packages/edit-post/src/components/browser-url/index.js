@@ -77,11 +77,7 @@ export class BrowserURL extends Component {
 	 * @param {number} postId Post ID for which to generate post editor URL.
 	 */
 	setBrowserURL( postId ) {
-		window.history.replaceState(
-			{ id: postId },
-			'Post ' + postId,
-			getPostEditURL( postId )
-		);
+		window.history.replaceState( { id: postId }, 'Post ' + postId, getPostEditURL( postId ) );
 
 		this.setState( () => ( {
 			historyId: postId,

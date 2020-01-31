@@ -144,7 +144,8 @@ export class Hue extends Component {
 						ref={ this.container }
 						onMouseDown={ this.handleMouseDown }
 						onTouchMove={ this.handleChange }
-						onTouchStart={ this.handleChange }>
+						onTouchStart={ this.handleChange }
+					>
 						<div
 							tabIndex="0"
 							role="slider"
@@ -158,7 +159,8 @@ export class Hue extends Component {
 							style={ pointerLocation }
 							onKeyDown={ this.preventKeyEvents }
 						/>
-						<VisuallyHidden as="p"
+						<VisuallyHidden
+							as="p"
 							id={ `components-color-picker__hue-description-${ instanceId }` }
 						>
 							{ __( 'Move the arrow left or right to change hue.' ) }
@@ -171,7 +173,4 @@ export class Hue extends Component {
 	}
 }
 
-export default compose(
-	pure,
-	withInstanceId
-)( Hue );
+export default compose( pure, withInstanceId )( Hue );

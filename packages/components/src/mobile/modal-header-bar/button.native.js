@@ -18,17 +18,20 @@ import styles from './button.scss';
 
 const ICON_SIZE = 24;
 
-const Button = withPreferredColorScheme( ( { icon, onPress, title, isPrimary, getStylesFromColorScheme } ) => {
-	const titleStyle = getStylesFromColorScheme( styles.title, styles.titleDark );
-	return (
-		<TouchableOpacity onPress={ onPress }>
-			{ icon ?
-				<Icon icon={ icon } size={ ICON_SIZE } style={ styles.icon } /> :
-				<Text style={ [ titleStyle, isPrimary && styles.titlePrimary ] }>{ title }</Text>
-			}
-		</TouchableOpacity>
-	);
-} );
+const Button = withPreferredColorScheme(
+	( { icon, onPress, title, isPrimary, getStylesFromColorScheme } ) => {
+		const titleStyle = getStylesFromColorScheme( styles.title, styles.titleDark );
+		return (
+			<TouchableOpacity onPress={ onPress }>
+				{ icon ? (
+					<Icon icon={ icon } size={ ICON_SIZE } style={ styles.icon } />
+				) : (
+					<Text style={ [ titleStyle, isPrimary && styles.titlePrimary ] }>{ title }</Text>
+				) }
+			</TouchableOpacity>
+		);
+	}
+);
 
 Button.displayName = 'ModalHeaderBar.Button';
 
@@ -44,9 +47,7 @@ const CloseButton = ( { onPress } ) => {
 			icon: closeIcon,
 		},
 	} );
-	return (
-		<Button onPress={ onPress } { ...props } />
-	);
+	return <Button onPress={ onPress } { ...props } />;
 };
 CloseButton.displayName = 'ModalHeaderBar.CloseButton';
 

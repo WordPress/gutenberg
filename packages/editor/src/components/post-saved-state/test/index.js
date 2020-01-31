@@ -11,11 +11,7 @@ import { PostSavedState } from '../';
 describe( 'PostSavedState', () => {
 	it( 'should display saving while save in progress, even if not saveable', () => {
 		const wrapper = mount(
-			<PostSavedState
-				isNew
-				isDirty={ false }
-				isSaving={ true }
-				isSaveable={ false } />
+			<PostSavedState isNew isDirty={ false } isSaving={ true } isSaveable={ false } />
 		);
 
 		expect( wrapper.text() ).toContain( 'Saving' );
@@ -23,11 +19,7 @@ describe( 'PostSavedState', () => {
 
 	it( 'returns null if the post is not saveable', () => {
 		const wrapper = shallow(
-			<PostSavedState
-				isNew
-				isDirty={ false }
-				isSaving={ false }
-				isSaveable={ false } />
+			<PostSavedState isNew isDirty={ false } isSaving={ false } isSaveable={ false } />
 		);
 
 		expect( wrapper.type() ).toBeNull();
@@ -41,11 +33,7 @@ describe( 'PostSavedState', () => {
 
 	it( 'should return Saved text if not new and not dirty', () => {
 		const wrapper = shallow(
-			<PostSavedState
-				isNew={ false }
-				isDirty={ false }
-				isSaving={ false }
-				isSaveable={ true } />
+			<PostSavedState isNew={ false } isDirty={ false } isSaving={ false } isSaveable={ true } />
 		);
 
 		expect( wrapper.childAt( 0 ).name() ).toBe( 'Icon' );

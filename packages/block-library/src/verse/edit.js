@@ -7,11 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	RichText,
-	BlockControls,
-	AlignmentToolbar,
-} from '@wordpress/block-editor';
+import { RichText, BlockControls, AlignmentToolbar } from '@wordpress/block-editor';
 
 export default function VerseEdit( { attributes, setAttributes, className, mergeBlocks } ) {
 	const { textAlign, content } = attributes;

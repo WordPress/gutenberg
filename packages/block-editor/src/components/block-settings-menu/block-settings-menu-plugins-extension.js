@@ -3,7 +3,9 @@
  */
 import { createSlotFill } from '@wordpress/components';
 
-const { Fill: __experimentalBlockSettingsMenuPluginsExtension, Slot } = createSlotFill( '__experimentalBlockSettingsMenuPluginsExtension' );
+const { Fill: __experimentalBlockSettingsMenuPluginsExtension, Slot } = createSlotFill(
+	'__experimentalBlockSettingsMenuPluginsExtension'
+);
 
 __experimentalBlockSettingsMenuPluginsExtension.Slot = Slot;
 

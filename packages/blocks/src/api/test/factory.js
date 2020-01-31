@@ -69,11 +69,9 @@ describe( 'block factory', () => {
 				category: 'common',
 				title: 'test block',
 			} );
-			const block = createBlock(
-				'core/test-block',
-				{ align: 'left' },
-				[ createBlock( 'core/test-block' ) ],
-			);
+			const block = createBlock( 'core/test-block', { align: 'left' }, [
+				createBlock( 'core/test-block' ),
+			] );
 
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( {
@@ -180,11 +178,7 @@ describe( 'block factory', () => {
 				title: 'test block',
 			} );
 			const block = deepFreeze(
-				createBlock(
-					'core/test-block',
-					{ align: 'left' },
-					[ createBlock( 'core/test-block' ) ],
-				)
+				createBlock( 'core/test-block', { align: 'left' }, [ createBlock( 'core/test-block' ) ] )
 			);
 
 			const clonedBlock = cloneBlock( block, {
@@ -217,19 +211,13 @@ describe( 'block factory', () => {
 				title: 'test block',
 			} );
 			const block = deepFreeze(
-				createBlock(
-					'core/test-block',
-					{ align: 'left' },
-					[
-						createBlock( 'core/test-block', { align: 'right' } ),
-						createBlock( 'core/test-block', { align: 'left' } ),
-					],
-				)
+				createBlock( 'core/test-block', { align: 'left' }, [
+					createBlock( 'core/test-block', { align: 'right' } ),
+					createBlock( 'core/test-block', { align: 'left' } ),
+				] )
 			);
 
-			const clonedBlock = cloneBlock( block, undefined, [
-				createBlock( 'core/test-block' ),
-			] );
+			const clonedBlock = cloneBlock( block, undefined, [ createBlock( 'core/test-block' ) ] );
 
 			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
 			expect( clonedBlock.innerBlocks[ 0 ].attributes ).not.toHaveProperty( 'align' );
@@ -251,25 +239,29 @@ describe( 'block factory', () => {
 				title: 'test block',
 			} );
 			const block = deepFreeze(
-				createBlock(
-					'core/test-block',
-					{ align: 'left' },
-					[
-						createBlock( 'core/test-block', { align: 'right' } ),
-						createBlock( 'core/test-block', { align: 'left' } ),
-					],
-				)
+				createBlock( 'core/test-block', { align: 'left' }, [
+					createBlock( 'core/test-block', { align: 'right' } ),
+					createBlock( 'core/test-block', { align: 'left' } ),
+				] )
 			);
 
 			const clonedBlock = cloneBlock( block );
 
 			expect( clonedBlock.innerBlocks ).toHaveLength( 2 );
 			expect( clonedBlock.innerBlocks[ 0 ].clientId ).not.toBe( block.innerBlocks[ 0 ].clientId );
-			expect( clonedBlock.innerBlocks[ 0 ].attributes ).not.toBe( block.innerBlocks[ 0 ].attributes );
-			expect( clonedBlock.innerBlocks[ 0 ].attributes ).toEqual( block.innerBlocks[ 0 ].attributes );
+			expect( clonedBlock.innerBlocks[ 0 ].attributes ).not.toBe(
+				block.innerBlocks[ 0 ].attributes
+			);
+			expect( clonedBlock.innerBlocks[ 0 ].attributes ).toEqual(
+				block.innerBlocks[ 0 ].attributes
+			);
 			expect( clonedBlock.innerBlocks[ 1 ].clientId ).not.toBe( block.innerBlocks[ 1 ].clientId );
-			expect( clonedBlock.innerBlocks[ 1 ].attributes ).not.toBe( block.innerBlocks[ 1 ].attributes );
-			expect( clonedBlock.innerBlocks[ 1 ].attributes ).toEqual( block.innerBlocks[ 1 ].attributes );
+			expect( clonedBlock.innerBlocks[ 1 ].attributes ).not.toBe(
+				block.innerBlocks[ 1 ].attributes
+			);
+			expect( clonedBlock.innerBlocks[ 1 ].attributes ).toEqual(
+				block.innerBlocks[ 1 ].attributes
+			);
 		} );
 	} );
 
@@ -282,11 +274,13 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-					} ],
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -312,11 +306,13 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-					} ],
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -342,11 +338,13 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-					} ],
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -375,11 +373,13 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/updated-text-block' ],
-						transform: noop,
-					} ],
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/updated-text-block' ],
+							transform: noop,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -408,12 +408,14 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-						isMultiBlock: true,
-					} ],
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+							isMultiBlock: true,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -443,12 +445,14 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/updated-text-block' ],
-						transform: noop,
-						isMultiBlock: true,
-					} ],
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/updated-text-block' ],
+							transform: noop,
+							isMultiBlock: true,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -478,17 +482,20 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-						isMultiBlock: true,
-					}, {
-						type: 'block',
-						blocks: [ 'core/another-text-block' ],
-						transform: noop,
-						isMultiBlock: true,
-					} ],
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+							isMultiBlock: true,
+						},
+						{
+							type: 'block',
+							blocks: [ 'core/another-text-block' ],
+							transform: noop,
+							isMultiBlock: true,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -516,12 +523,14 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-						isMultiBlock: false,
-					} ],
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+							isMultiBlock: false,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -534,12 +543,14 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-						isMultiBlock: true,
-					} ],
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+							isMultiBlock: true,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -566,11 +577,13 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/text-block', 'core/another-text-block' ],
-						transform: noop,
-					} ],
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block', 'core/another-text-block' ],
+							transform: noop,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -598,12 +611,14 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-						isMatch: () => true,
-					} ],
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+							isMatch: () => true,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -629,12 +644,14 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-						isMatch: () => false,
-					} ],
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+							isMatch: () => false,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -659,12 +676,14 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-						isMatch: () => true,
-					} ],
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+							isMatch: () => true,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -690,12 +709,14 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-						isMatch: () => false,
-					} ],
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+							isMatch: () => false,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -722,12 +743,14 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-						isMatch,
-					} ],
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+							isMatch,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -754,13 +777,15 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: noop,
-						isMultiBlock: true,
-						isMatch,
-					} ],
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+							isMultiBlock: true,
+							isMatch,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -790,11 +815,13 @@ describe( 'block factory', () => {
 						},
 					},
 					transforms: {
-						from: [ {
-							type: 'block',
-							blocks: [ '*' ],
-							transform: noop,
-						} ],
+						from: [
+							{
+								type: 'block',
+								blocks: [ '*' ],
+								transform: noop,
+							},
+						],
 					},
 					save: noop,
 					category: 'common',
@@ -834,7 +861,10 @@ describe( 'block factory', () => {
 					} );
 				} );
 
-				const availableBlocks = getPossibleBlockTransformations( [ ...textBlocks, ...imageBlocks ] );
+				const availableBlocks = getPossibleBlockTransformations( [
+					...textBlocks,
+					...imageBlocks,
+				] );
 
 				expect( availableBlocks ).toHaveLength( 1 );
 				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
@@ -866,15 +896,17 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ 'core/text-block' ],
-						transform: ( { value } ) => {
-							return createBlock( 'core/updated-text-block', {
-								value: 'chicken ' + value,
-							} );
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: ( { value } ) => {
+								return createBlock( 'core/updated-text-block', {
+									value: 'chicken ' + value,
+								} );
+							},
 						},
-					} ],
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -906,15 +938,17 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/updated-text-block' ],
-						transform: ( { value } ) => {
-							return createBlock( 'core/updated-text-block', {
-								value: 'chicken ' + value,
-							} );
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/updated-text-block' ],
+							transform: ( { value } ) => {
+								return createBlock( 'core/updated-text-block', {
+									value: 'chicken ' + value,
+								} );
+							},
 						},
-					} ],
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -957,10 +991,12 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						blocks: [ 'core/text-block' ],
-						transform: () => null,
-					} ],
+					from: [
+						{
+							blocks: [ 'core/text-block' ],
+							transform: () => null,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -985,10 +1021,12 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						blocks: [ 'core/text-block' ],
-						transform: () => [],
-					} ],
+					from: [
+						{
+							blocks: [ 'core/text-block' ],
+							transform: () => [],
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1013,16 +1051,18 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						blocks: [ 'core/text-block' ],
-						transform: ( { value } ) => {
-							return {
-								attributes: {
-									value: 'chicken ' + value,
-								},
-							};
+					from: [
+						{
+							blocks: [ 'core/text-block' ],
+							transform: ( { value } ) => {
+								return {
+									attributes: {
+										value: 'chicken ' + value,
+									},
+								};
+							},
 						},
-					} ],
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1047,21 +1087,23 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						blocks: [ 'core/text-block' ],
-						transform: ( { value } ) => {
-							return [
-								createBlock( 'core/updated-text-block', {
-									value: 'chicken ' + value,
-								} ),
-								{
-									attributes: {
-										value: 'smoked ' + value,
+					from: [
+						{
+							blocks: [ 'core/text-block' ],
+							transform: ( { value } ) => {
+								return [
+									createBlock( 'core/updated-text-block', {
+										value: 'chicken ' + value,
+									} ),
+									{
+										attributes: {
+											value: 'smoked ' + value,
+										},
 									},
-								},
-							];
+								];
+							},
 						},
-					} ],
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1087,14 +1129,16 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						blocks: [ 'core/updated-text-block' ],
-						transform: ( { value } ) => {
-							return createBlock( 'core/text-block', {
-								value: 'chicken ' + value,
-							} );
+					to: [
+						{
+							blocks: [ 'core/updated-text-block' ],
+							transform: ( { value } ) => {
+								return createBlock( 'core/text-block', {
+									value: 'chicken ' + value,
+								} );
+							},
 						},
-					} ],
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1119,19 +1163,21 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						blocks: [ 'core/updated-text-block' ],
-						transform: ( { value } ) => {
-							return [
-								createBlock( 'core/text-block', {
-									value: 'chicken ' + value,
-								} ),
-								createBlock( 'core/text-block', {
-									value: 'smoked ' + value,
-								} ),
-							];
+					to: [
+						{
+							blocks: [ 'core/updated-text-block' ],
+							transform: ( { value } ) => {
+								return [
+									createBlock( 'core/text-block', {
+										value: 'chicken ' + value,
+									} ),
+									createBlock( 'core/text-block', {
+										value: 'smoked ' + value,
+									} ),
+								];
+							},
 						},
-					} ],
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1156,20 +1202,22 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					to: [ {
-						type: 'block',
-						blocks: [ 'core/updated-text-block' ],
-						transform: ( { value } ) => {
-							return [
-								createBlock( 'core/text-block', {
-									value: 'chicken ' + value,
-								} ),
-								createBlock( 'core/updated-text-block', {
-									value: 'smoked ' + value,
-								} ),
-							];
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/updated-text-block' ],
+							transform: ( { value } ) => {
+								return [
+									createBlock( 'core/text-block', {
+										value: 'chicken ' + value,
+									} ),
+									createBlock( 'core/updated-text-block', {
+										value: 'smoked ' + value,
+									} ),
+								];
+							},
 						},
-					} ],
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1210,21 +1258,23 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ 'core/columns-block' ],
-						transform( attributes, innerBlocks ) {
-							return createBlock(
-								'core/updated-columns-block',
-								attributes,
-								innerBlocks.map( ( innerBlock ) => {
-									return cloneBlock( innerBlock, {
-										value: 'after',
-									} );
-								} ),
-							);
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/columns-block' ],
+							transform( attributes, innerBlocks ) {
+								return createBlock(
+									'core/updated-columns-block',
+									attributes,
+									innerBlocks.map( ( innerBlock ) => {
+										return cloneBlock( innerBlock, {
+											value: 'after',
+										} );
+									} )
+								);
+							},
 						},
-					} ],
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1233,11 +1283,9 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/columns-block', defaultBlockSettings );
 			registerBlockType( 'core/column-block', defaultBlockSettings );
 
-			const block = createBlock(
-				'core/columns-block',
-				{},
-				[ createBlock( 'core/column-block', { value: 'before' } ) ]
-			);
+			const block = createBlock( 'core/columns-block', {}, [
+				createBlock( 'core/column-block', { value: 'before' } ),
+			] );
 
 			const transformedBlocks = switchToBlockType( block, 'core/updated-columns-block' );
 
@@ -1254,24 +1302,26 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ 'core/columns-block' ],
-						isMultiBlock: true,
-						transform( blocksAttributes, blocksInnerBlocks ) {
-							return blocksAttributes.map( ( attributes, i ) => {
-								return createBlock(
-									'core/updated-columns-block',
-									attributes,
-									blocksInnerBlocks[ i ].map( ( innerBlock ) => {
-										return cloneBlock( innerBlock, {
-											value: 'after' + i,
-										} );
-									} ),
-								);
-							} );
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/columns-block' ],
+							isMultiBlock: true,
+							transform( blocksAttributes, blocksInnerBlocks ) {
+								return blocksAttributes.map( ( attributes, i ) => {
+									return createBlock(
+										'core/updated-columns-block',
+										attributes,
+										blocksInnerBlocks[ i ].map( ( innerBlock ) => {
+											return cloneBlock( innerBlock, {
+												value: 'after' + i,
+											} );
+										} )
+									);
+								} );
+							},
 						},
-					} ],
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1281,16 +1331,12 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/column-block', defaultBlockSettings );
 
 			const blocks = [
-				createBlock(
-					'core/columns-block',
-					{},
-					[ createBlock( 'core/column-block', { value: 'before' } ) ]
-				),
-				createBlock(
-					'core/columns-block',
-					{},
-					[ createBlock( 'core/column-block', { value: 'before' } ) ]
-				),
+				createBlock( 'core/columns-block', {}, [
+					createBlock( 'core/column-block', { value: 'before' } ),
+				] ),
+				createBlock( 'core/columns-block', {}, [
+					createBlock( 'core/column-block', { value: 'before' } ),
+				] ),
 			];
 
 			const transformedBlocks = switchToBlockType( blocks, 'core/updated-columns-block' );
@@ -1310,18 +1356,20 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ '*' ],
-						isMultiBlock: true,
-						__experimentalConvert( blocks ) {
-							const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
-								return createBlock( name, attributes, innerBlocks );
-							} );
+					from: [
+						{
+							type: 'block',
+							blocks: [ '*' ],
+							isMultiBlock: true,
+							__experimentalConvert( blocks ) {
+								const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
+									return createBlock( name, attributes, innerBlocks );
+								} );
 
-							return createBlock( 'core/test-group-block', {}, groupInnerBlocks );
+								return createBlock( 'core/test-group-block', {}, groupInnerBlocks );
+							},
 						},
-					} ],
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1361,13 +1409,15 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ '*' ],
-						isMultiBlock: true,
-						__experimentalConvert: convertSpy,
-						transform: transformSpy,
-					} ],
+					from: [
+						{
+							type: 'block',
+							blocks: [ '*' ],
+							isMultiBlock: true,
+							__experimentalConvert: convertSpy,
+							transform: transformSpy,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1396,9 +1446,11 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 			registerBlockType( 'core/transform-from-text-block-1', {
 				transforms: {
-					from: [ {
-						blocks: [ 'core/text-block' ],
-					} ],
+					from: [
+						{
+							blocks: [ 'core/text-block' ],
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1406,9 +1458,11 @@ describe( 'block factory', () => {
 			} );
 			registerBlockType( 'core/transform-from-text-block-2', {
 				transforms: {
-					from: [ {
-						blocks: [ 'core/text-block' ],
-					} ],
+					from: [
+						{
+							blocks: [ 'core/text-block' ],
+						},
+					],
 				},
 				save: noop,
 				category: 'common',
@@ -1521,9 +1575,7 @@ describe( 'block factory', () => {
 		it( 'should return false for transforms with a type which is not "block"', () => {
 			const invalidWildcardBlockTransform = {
 				type: 'file',
-				blocks: [
-					'*',
-				],
+				blocks: [ '*' ],
 				blockName: 'core/test-block',
 			};
 
@@ -1533,10 +1585,7 @@ describe( 'block factory', () => {
 		it( 'should return false for transforms which do not include "*" alias in "block" array', () => {
 			const invalidWildcardBlockTransform = {
 				type: 'block',
-				blocks: [
-					'core/some-block',
-					'core/another-block',
-				],
+				blocks: [ 'core/some-block', 'core/another-block' ],
 				blockName: 'core/test-block',
 			};
 
@@ -1563,11 +1612,13 @@ describe( 'block factory', () => {
 					},
 				},
 				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ '*' ],
-						transform: noop,
-					} ],
+					from: [
+						{
+							type: 'block',
+							blocks: [ '*' ],
+							transform: noop,
+						},
+					],
 				},
 				save: noop,
 				category: 'common',

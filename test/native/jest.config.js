@@ -15,8 +15,9 @@ if ( process.env.TEST_RN_PLATFORM ) {
 
 const configPath = 'test/native';
 
-const transpiledPackageNames = glob( '../../packages/*/src/index.js' )
-	.map( ( fileName ) => fileName.split( '/' )[ 3 ] );
+const transpiledPackageNames = glob( '../../packages/*/src/index.js' ).map(
+	( fileName ) => fileName.split( '/' )[ 3 ]
+);
 
 module.exports = {
 	verbose: true,
@@ -29,14 +30,8 @@ module.exports = {
 		'<rootDir>/' + configPath + '/enzyme.config.js',
 	],
 	testEnvironment: 'jsdom',
-	testMatch: [
-		'**/test/*.native.[jt]s?(x)',
-	],
-	testPathIgnorePatterns: [
-		'/node_modules/',
-		'/wordpress/',
-		'/__device-tests__/',
-	],
+	testMatch: [ '**/test/*.native.[jt]s?(x)' ],
+	testPathIgnorePatterns: [ '/node_modules/', '/wordpress/', '/__device-tests__/' ],
 	testURL: 'http://localhost/',
 	// Add the `Libraries/Utilities` subfolder to the module directories, otherwise haste/jest doesn't find Platform.js on Travis,
 	// and add it first so https://github.com/facebook/react-native/blob/v0.60.0/Libraries/react-native/react-native-implementation.js#L324-L326 doesn't pick up the Platform npm module.
@@ -48,15 +43,8 @@ module.exports = {
 	},
 	haste: {
 		defaultPlatform: rnPlatform,
-		platforms: [
-			'android',
-			'ios',
-			'native',
-		],
-		providesModuleNodeModules: [
-			'react-native',
-			'react-native-svg',
-		],
+		platforms: [ 'android', 'ios', 'native' ],
+		providesModuleNodeModules: [ 'react-native', 'react-native-svg' ],
 	},
 	transformIgnorePatterns: [
 		// This is required for now to have jest transform some of our modules
@@ -65,9 +53,6 @@ module.exports = {
 		// https://github.com/facebook/react-native/blob/master/jest-preset.json#L20
 		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|react-clone-referenced-element))',
 	],
-	snapshotSerializers: [
-		'enzyme-to-json/serializer',
-		'jest-emotion',
-	],
+	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],
 	reporters: [ 'default', 'jest-junit' ],
 };

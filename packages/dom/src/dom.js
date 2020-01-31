@@ -26,12 +26,7 @@ const {
  * @return {boolean} Whether the selection is forward.
  */
 function isSelectionForward( selection ) {
-	const {
-		anchorNode,
-		focusNode,
-		anchorOffset,
-		focusOffset,
-	} = selection;
+	const { anchorNode, focusNode, anchorOffset, focusOffset } = selection;
 
 	const position = anchorNode.compareDocumentPosition( focusNode );
 
@@ -114,28 +109,22 @@ function isEdge( container, isReverse, onlyVertical ) {
 
 	// Only consider the multiline selection at the edge if the direction is
 	// towards the edge.
-	if (
-		! isCollapsed &&
-		rangeRect.height > lineHeight &&
-		isForward === isReverse
-	) {
+	if ( ! isCollapsed && rangeRect.height > lineHeight && isForward === isReverse ) {
 		return false;
 	}
 
-	const padding = parseInt( computedStyle[
-		`padding${ isReverse ? 'Top' : 'Bottom' }`
-	], 10 ) || 0;
+	const padding = parseInt( computedStyle[ `padding${ isReverse ? 'Top' : 'Bottom' }` ], 10 ) || 0;
 
 	// Calculate a buffer that is half the line height. In some browsers, the
 	// selection rectangle may not fill the entire height of the line, so we add
 	// 3/4 the line height to the selection rectangle to ensure that it is well
 	// over its line boundary.
-	const buffer = 3 * parseInt( lineHeight, 10 ) / 4;
+	const buffer = ( 3 * parseInt( lineHeight, 10 ) ) / 4;
 	const containerRect = container.getBoundingClientRect();
 	const originalRangeRect = getRectangleFromRange( originalRange );
-	const verticalEdge = isReverse ?
-		containerRect.top + padding > originalRangeRect.top - buffer :
-		containerRect.bottom - padding < originalRangeRect.bottom + buffer;
+	const verticalEdge = isReverse
+		? containerRect.top + padding > originalRangeRect.top - buffer
+		: containerRect.bottom - padding < originalRangeRect.bottom + buffer;
 
 	if ( ! verticalEdge ) {
 		return false;
@@ -147,7 +136,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
 	const { direction } = computedStyle;
-	const isReverseDir = direction === 'rtl' ? ( ! isReverse ) : isReverse;
+	const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
 
 	// To calculate the horizontal position, we insert a test range and see if
 	// this test range has the same horizontal position. This method proves to
@@ -397,14 +386,15 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	const buffer = rect.height / 2;
 	const editableRect = container.getBoundingClientRect();
 	const x = rect.left;
-	const y = isReverse ? ( editableRect.bottom - buffer ) : ( editableRect.top + buffer );
+	const y = isReverse ? editableRect.bottom - buffer : editableRect.top + buffer;
 
 	const range = hiddenCaretRangeFromPoint( document, x, y, container );
 
 	if ( ! range || ! container.contains( range.startContainer ) ) {
-		if ( mayUseScroll && (
-			( ! range || ! range.startContainer ) ||
-				! range.startContainer.contains( container ) ) ) {
+		if (
+			mayUseScroll &&
+			( ! range || ! range.startContainer || ! range.startContainer.contains( container ) )
+		) {
 			// Might be out of view.
 			// Easier than attempting to calculate manually.
 			container.scrollIntoView( isReverse );
@@ -442,7 +432,7 @@ export function isTextField( element ) {
 
 		return (
 			( nodeName === 'INPUT' && selectionStart !== null ) ||
-			( nodeName === 'TEXTAREA' ) ||
+			nodeName === 'TEXTAREA' ||
 			contentEditable === 'true'
 		);
 	} catch ( error ) {
@@ -511,9 +501,8 @@ export function isEntirelySelected( element ) {
 	}
 
 	const lastChild = element.lastChild;
-	const lastChildContentLength = lastChild.nodeType === TEXT_NODE ?
-		lastChild.data.length :
-		lastChild.childNodes.length;
+	const lastChildContentLength =
+		lastChild.nodeType === TEXT_NODE ? lastChild.data.length : lastChild.childNodes.length;
 
 	return (
 		startContainer === element.firstChild &&

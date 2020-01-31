@@ -1,15 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-} from '@wordpress/element';
-import {
-	Button,
-	SVG,
-	Path,
-	Modal,
-} from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { Button, SVG, Path, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**

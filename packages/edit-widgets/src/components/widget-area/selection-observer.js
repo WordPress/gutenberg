@@ -15,12 +15,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 
 class SelectionObserver extends Component {
 	componentDidUpdate( prevProps ) {
-		const {
-			hasSelectedBlock,
-			onBlockSelected,
-			isSelectedArea,
-			clearSelectedBlock,
-		} = this.props;
+		const { hasSelectedBlock, onBlockSelected, isSelectedArea, clearSelectedBlock } = this.props;
 
 		if ( hasSelectedBlock && ! prevProps.hasSelectedBlock ) {
 			onBlockSelected();

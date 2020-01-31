@@ -25,26 +25,23 @@ const PostFormatSuggestion = ( { suggestedPostFormat, suggestionText, onUpdatePo
 const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
 	const panelBodyTitle = [
 		__( 'Suggestion:' ),
-		(
-			<span className="editor-post-publish-panel__link" key="label">
-				{ __( 'Use a post format' ) }
-			</span>
-		),
+		<span className="editor-post-publish-panel__link" key="label">
+			{ __( 'Use a post format' ) }
+		</span>,
 	];
 
 	return (
-		<PanelBody initialOpen={ false } title={ panelBodyTitle } >
+		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
 			<p>
-				{ __( 'Your theme uses post formats to highlight different kinds of content, like images or videos. Apply a post format to see this special styling.' ) }
+				{ __(
+					'Your theme uses post formats to highlight different kinds of content, like images or videos. Apply a post format to see this special styling.'
+				) }
 			</p>
 			<p>
 				<PostFormatSuggestion
 					onUpdatePostFormat={ onUpdatePostFormat }
 					suggestedPostFormat={ suggestion.id }
-					suggestionText={ sprintf(
-						__( 'Apply the "%1$s" format.' ),
-						suggestion.caption
-					) }
+					suggestionText={ sprintf( __( 'Apply the "%1$s" format.' ), suggestion.caption ) }
 				/>
 			</p>
 		</PanelBody>
@@ -70,5 +67,7 @@ export default compose(
 			dispatch( 'core/editor' ).editPost( { format: postFormat } );
 		},
 	} ) ),
-	ifCondition( ( { suggestion, currentPostFormat } ) => suggestion && suggestion.id !== currentPostFormat ),
+	ifCondition(
+		( { suggestion, currentPostFormat } ) => suggestion && suggestion.id !== currentPostFormat
+	)
 )( PostFormatPanel );

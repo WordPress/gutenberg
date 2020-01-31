@@ -26,9 +26,14 @@ describe( 'isValidBlockContent', () => {
 	it( 'should include additional classes in block attributes', () => {
 		const valid = isValidBlockContent(
 			{
-				save: ( { attributes } ) => createElement( 'div', {
-					className: 'fruit',
-				}, attributes.fruit ),
+				save: ( { attributes } ) =>
+					createElement(
+						'div',
+						{
+							className: 'fruit',
+						},
+						attributes.fruit
+					),
 				name: 'myplugin/fruit',
 			},
 			{
