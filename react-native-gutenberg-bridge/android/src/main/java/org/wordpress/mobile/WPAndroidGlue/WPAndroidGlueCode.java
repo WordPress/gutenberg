@@ -643,6 +643,12 @@ public class WPAndroidGlueCode {
                 rnMediaList.addAll(mediaList);
                 mPendingMediaUploadCallback.onUploadMediaFileSelected(rnMediaList);
             }
+        } else {
+            // This case is for media that is shared from the device
+            for (Media mediaToAppend : mediaList) {
+                sendOrDeferAppendMediaSignal(mediaToAppend.getId(), mediaToAppend.getUrl(),
+                        mediaToAppend.getType());
+            }
         }
 
         mAppendsMultipleSelectedToSiblingBlocks = false;
