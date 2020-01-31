@@ -24,4 +24,4 @@ export default function RovingTabIndexContainer( { children } ) {
 	);
 }
 
-export { RovingTabIndexItem } from './item';
+export { default as RovingTabIndexItem } from './item';

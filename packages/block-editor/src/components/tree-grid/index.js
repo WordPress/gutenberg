@@ -38,7 +38,7 @@ function getRowFocusables( rowElement ) {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/navigable-tree-grid/README.md
  */
-export default function NavigableTreeGrid( { children, ...props } ) {
+export default function TreeGrid( { children, ...props } ) {
 	const containerRef = useRef();
 
 	const onKeyDown = ( event ) => {
@@ -117,3 +117,6 @@ export default function NavigableTreeGrid( { children, ...props } ) {
 		</RovingTabIndexContainer>
 	);
 }
+
+export { default as TreeGridRow } from './row';
+export { default as TreeGridCell } from './cell';
