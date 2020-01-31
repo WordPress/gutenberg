@@ -3,8 +3,6 @@
   "version": "0.1.11",
   "license": "GPL-2.0",
   "scripts": {
-    "install-aztec-ios": "cd ./ios && carthage bootstrap --platform iOS --cache-builds",
-    "update-aztec-ios": "cd ./ios && carthage update --platform iOS --cache-builds",
     "clean": "yarn clean-watchman; yarn clean-node; yarn clean-react; yarn clean-metro; yarn clean-jest;",
     "clean-jest": "rm -rf $TMPDIR/jest_*;",
     "clean-metro": "rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/metro-bundler-cache-*;",

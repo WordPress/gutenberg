@@ -37,7 +37,12 @@ describe( 'RootComponent', () => {
 	it( 'renders without crashing with a block focused', () => {
 		const app = renderer.create( <RootComponent /> );
 		renderer.act( () => {
+			// jest.runAllTicks needs to be in it's own "act"
+			// we need to wait for all tasks to be done before dispatching an action
+			// otherwise the store may not be ready
 			jest.runAllTicks();
+		} );
+		renderer.act( () => {
 			const blocks = select( 'core/block-editor' ).getBlocks();
 			// Methods that modify state are required to be called inside `act`
 			dispatch( 'core/block-editor' ).selectBlock( blocks[ 0 ].clientId );

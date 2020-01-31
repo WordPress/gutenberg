@@ -17,7 +17,6 @@ import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
-import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -96,6 +95,11 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
+            public void requestMediaEditor(MediaUploadCallback mediaUploadCallback, String mediaUrl) {
+
+            }
+
+            @Override
             public void editorDidEmitLog(String message, LogLevel logLevel) {
                 switch (logLevel) {
                     case TRACE:
@@ -131,7 +135,6 @@ public class MainApplication extends Application implements ReactApplication {
                         new ReactVideoPackage(),
                         new SvgPackage(),
                         new ReactAztecPackage(),
-                        new RNRecyclerviewListPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 
