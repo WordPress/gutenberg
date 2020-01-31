@@ -135,6 +135,7 @@ class RCTAztecView: Aztec.TextView {
     }
 
     func commonInit() {
+        Configuration.headersWithBoldTrait = true
         delegate = self
         textContainerInset = .zero
         contentInset = .zero

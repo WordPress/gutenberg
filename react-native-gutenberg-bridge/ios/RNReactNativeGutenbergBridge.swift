@@ -155,6 +155,31 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
+    @objc
+    func requestMediaEditor(_ urlString: String, callback: @escaping RCTResponseSenderBlock) {
+        guard let url = URL(string: urlString) else {
+            assertionFailure("Given String is not a URL")
+            return
+        }
+
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaEditor(with: url) { media in
+                guard let media = media else {
+                    callback(nil)
+                    return
+                }
+
+                let mediaToReturn = media
+
+                let jsFormattedMedia = mediaToReturn.map { mediaInfo in
+                    return mediaInfo.encodeForJS()
+                }
+
+                callback(jsFormattedMedia)
+            }
+        }
+    }
+
     private func shouldLog(with level: Int) -> Bool {
         return level >= RCTGetLogThreshold().rawValue
     }
