@@ -10,7 +10,7 @@ import {
 const SeparatorSettings = ( { color, setColor } ) => (
 	<InspectorControls>
 		<PanelColorSettings
-			title={ __( 'Color Settings' ) }
+			title={ __( 'Color settings' ) }
 			colorSettings={ [
 				{
 					value: color.color,

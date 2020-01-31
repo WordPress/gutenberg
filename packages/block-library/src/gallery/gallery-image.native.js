@@ -196,57 +196,57 @@ class GalleryImage extends Component {
 				) }
 				<View style={ overlayStyle }>
 					{ ! isUploadInProgress && (
-					<>
-						{ isSelected && (
-							<View style={ style.toolbar }>
-								<View style={ style.moverButtonContainer } >
+						<>
+							{ isSelected && (
+								<View style={ style.toolbar }>
+									<View style={ style.moverButtonContainer } >
+										<Button
+											style={ buttonStyle }
+											icon="arrow-left-alt"
+											iconSize={ ICON_SIZE_ARROW }
+											onClick={ isFirstItem ? undefined : onMoveBackward }
+											accessibilityLabel={ __( 'Move Image Backward' ) }
+											aria-disabled={ isFirstItem }
+											disabled={ ! isSelected }
+										/>
+										<View style={ separatorStyle }></View>
+										<Button
+											style={ buttonStyle }
+											icon="arrow-right-alt"
+											iconSize={ ICON_SIZE_ARROW }
+											onClick={ isLastItem ? undefined : onMoveForward }
+											accessibilityLabel={ __( 'Move Image Forward' ) }
+											aria-disabled={ isLastItem }
+											disabled={ ! isSelected }
+										/>
+									</View>
 									<Button
-										style={ buttonStyle }
-										icon="arrow-left-alt"
-										iconSize={ ICON_SIZE_ARROW }
-										onClick={ isFirstItem ? undefined : onMoveBackward }
-										accessibilityLabel={ __( 'Move Image Backward' ) }
-										aria-disabled={ isFirstItem }
-										disabled={ ! isSelected }
-									/>
-									<View style={ separatorStyle }></View>
-									<Button
-										style={ buttonStyle }
-										icon="arrow-right-alt"
-										iconSize={ ICON_SIZE_ARROW }
-										onClick={ isLastItem ? undefined : onMoveForward }
-										accessibilityLabel={ __( 'Move Image Forward' ) }
-										aria-disabled={ isLastItem }
+										style={ removeButtonStyle }
+										icon="no-alt"
+										iconSize={ ICON_SIZE_REMOVE }
+										onClick={ onRemove }
+										accessibilityLabel={ __( 'Remove Image' ) }
 										disabled={ ! isSelected }
 									/>
 								</View>
-								<Button
-									style={ removeButtonStyle }
-									icon="no-alt"
-									iconSize={ ICON_SIZE_REMOVE }
-									onClick={ onRemove }
-									accessibilityLabel={ __( 'Remove Image' ) }
-									disabled={ ! isSelected }
-								/>
-							</View>
-						) }
-						{ ( shouldShowCaptionEditable || shouldShowCaptionExpanded ) && (
-							<View style={ captionContainerStyle }>
-								<ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
-									<Caption
-										inlineToolbar
-										isSelected={ captionSelected }
-										onChange={ this.onCaptionChange }
-										onFocus={ this.onSelectCaption }
-										placeholder={ isSelected ? __( 'Write caption…' ) : null }
-										placeholderTextColor={ captionPlaceholderStyle.color }
-										style={ captionStyle }
-										value={ caption }
-									/>
-								</ScrollView>
-							</View>
-						) }
-					</>
+							) }
+							{ ( shouldShowCaptionEditable || shouldShowCaptionExpanded ) && (
+								<View style={ captionContainerStyle }>
+									<ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
+										<Caption
+											inlineToolbar
+											isSelected={ captionSelected }
+											onChange={ this.onCaptionChange }
+											onFocus={ this.onSelectCaption }
+											placeholder={ isSelected ? __( 'Write caption…' ) : null }
+											placeholderTextColor={ captionPlaceholderStyle.color }
+											style={ captionStyle }
+											value={ caption }
+										/>
+									</ScrollView>
+								</View>
+							) }
+						</>
 					) }
 				</View>
 			</>

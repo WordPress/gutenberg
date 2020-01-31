@@ -47,7 +47,7 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes, getStylesFromColor
 	return (
 		<View style={ [ defaultStyle, isSelected && styles.selectedSpacer, { height } ] }>
 			<InspectorControls>
-				<PanelBody title={ __( 'Spacer Settings' ) } >
+				<PanelBody title={ __( 'Spacer settings' ) } >
 					<RangeControl
 						label={ __( 'Height in pixels' ) }
 						minimumValue={ minSpacerHeight }

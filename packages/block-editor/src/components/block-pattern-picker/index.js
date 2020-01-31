@@ -44,7 +44,7 @@ function BlockPatternPicker( {
 							iconSize={ 48 }
 							onClick={ () => onSelect( pattern ) }
 							className="block-editor-block-pattern-picker__pattern"
-							label={ pattern.label }
+							label={ pattern.title }
 						/>
 					</li>
 				) ) }

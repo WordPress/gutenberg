@@ -10,6 +10,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRef, useReducer, useState } from '@wordpress/element';
+import { plusCircle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -55,7 +56,7 @@ function InsertPoint( {
 						onToggle();
 					} }
 					className="components-custom-gradient-picker__insert-point"
-					icon="insert"
+					icon={ plusCircle }
 					style={ {
 						left: insertPosition !== null ? `${ insertPosition }%` : undefined,
 					} }

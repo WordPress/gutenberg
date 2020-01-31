@@ -9,6 +9,7 @@ import {
 	insertBlock,
 	pressKeyWithModifier,
 	setUpResponseMocking,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
 async function mockPagesResponse( pages ) {
@@ -56,10 +57,13 @@ async function updateActiveNavigationLink( { url, label } ) {
 		await page.keyboard.press( 'ArrowDown' );
 		// Select the suggestion.
 		await page.keyboard.press( 'Enter' );
+		// Make sure that the dialog is still opened, and that focus is retained
+		// within (focusing on the link preview).
+		await page.waitForSelector( ':focus.block-editor-link-control__search-item-title' );
 	}
 
 	if ( label ) {
-		await page.click( '.wp-block-navigation-link__label.is-selected' );
+		await page.click( '.is-selected .wp-block-navigation-link__label' );
 
 		// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
 		// to select all text like other tests do.
@@ -131,6 +135,23 @@ describe( 'Navigation', () => {
 		// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,
 		// an issue where the block appender requires two clicks.
 		await page.click( '.wp-block-navigation .block-list-appender' );
+
+		// After adding a new block, search input should be shown immediately.
+		// Verify that Escape would close the popover.
+		// Regression: https://github.com/WordPress/gutenberg/pull/19885
+		const isInURLInput = await page.evaluate( () => (
+			!! document.activeElement.closest( '.block-editor-url-input' )
+		) );
+		expect( isInURLInput ).toBe( true );
+		await page.keyboard.press( 'Escape' );
+		const isInLinkRichText = await page.evaluate( () => (
+			document.activeElement.classList.contains( 'rich-text' ) &&
+			!! document.activeElement.closest( '.block-editor-block-list__block' )
+		) );
+		expect( isInLinkRichText ).toBe( true );
+
+		// Now, trigger the link dialog once more.
+		await clickBlockToolbarButton( 'Link' );
 
 		// For the second nav link block use an existing internal page.
 		// Mock the api response so that it's consistent.

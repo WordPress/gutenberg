@@ -1255,15 +1255,21 @@ export const getInserterItems = createSelector(
 
 			const isContextual = isArray( blockType.parent );
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
+			const inserterPatterns = blockType.patterns.filter(
+				( { scope } ) => ! scope || scope.includes( 'inserter' )
+			);
 
 			return {
 				id,
 				name: blockType.name,
 				initialAttributes: {},
 				title: blockType.title,
+				description: blockType.description,
 				icon: blockType.icon,
 				category: blockType.category,
 				keywords: blockType.keywords,
+				patterns: inserterPatterns,
+				example: blockType.example,
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),
@@ -1525,15 +1531,4 @@ export function isNavigationMode( state ) {
  */
 export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
-}
-
-/**
- * Gets the selected block's DOM node.
- *
- * @param {Object} state Global application state.
- *
- * @return {Element} The selected block's DOM node.
- */
-export function __unstableGetSelectedMountedBlock( state ) {
-	return state.selectedMountedBlock;
 }

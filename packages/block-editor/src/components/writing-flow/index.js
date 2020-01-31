@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { overEvery, find, findLast, reverse, first, last } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -196,6 +197,7 @@ export default function WritingFlow( { children } ) {
 	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
+	const multiSelectionContainer = useRef();
 
 	const entirelySelected = useRef();
 
@@ -385,7 +387,7 @@ export default function WritingFlow( { children } ) {
 			} else if ( isEscape ) {
 				setNavigationMode( true );
 			}
-		} else if ( hasMultiSelection && isTab && target === container.current ) {
+		} else if ( hasMultiSelection && isTab && target === multiSelectionContainer.current ) {
 			// See comment above.
 			noCapture.current = true;
 
@@ -501,29 +503,40 @@ export default function WritingFlow( { children } ) {
 
 	useEffect( () => {
 		if ( hasMultiSelection && ! isMultiSelecting ) {
-			container.current.focus();
+			multiSelectionContainer.current.focus();
 		}
 	}, [ hasMultiSelection, isMultiSelecting ] );
+
+	const className = classnames( 'block-editor-writing-flow', {
+		'is-navigate-mode': isNavigationMode,
+	} );
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div className="block-editor-writing-flow">
+		<div className={ className }>
 			<FocusCapture
 				ref={ focusCaptureBeforeRef }
 				selectedClientId={ selectedBlockClientId }
 				containerRef={ container }
 				noCapture={ noCapture }
 				hasMultiSelection={ hasMultiSelection }
+				multiSelectionContainer={ multiSelectionContainer }
 			/>
 			<div
 				ref={ container }
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
-				tabIndex={ hasMultiSelection ? '0' : undefined }
-				aria-label={ hasMultiSelection ? __( 'Multiple selected blocks' ) : undefined }
 			>
+				<div
+					ref={ multiSelectionContainer }
+					tabIndex={ hasMultiSelection ? '0' : undefined }
+					aria-label={ hasMultiSelection ? __( 'Multiple selected blocks' ) : undefined }
+					// Needs to be positioned within the viewport, so focus to this
+					// element does not scroll the page.
+					style={ { position: 'fixed' } }
+				/>
 				{ children }
 			</div>
 			<FocusCapture
@@ -532,6 +545,7 @@ export default function WritingFlow( { children } ) {
 				containerRef={ container }
 				noCapture={ noCapture }
 				hasMultiSelection={ hasMultiSelection }
+				multiSelectionContainer={ multiSelectionContainer }
 				isReverse
 			/>
 			<div

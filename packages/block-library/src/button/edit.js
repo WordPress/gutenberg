@@ -8,11 +8,7 @@ import { escape } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useCallback,
-	useEffect,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import {
 	compose,
 } from '@wordpress/compose';
@@ -69,7 +65,7 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 		[ setAttributes ]
 	);
 	return (
-		<PanelBody title={ __( 'Border Settings' ) }>
+		<PanelBody title={ __( 'Border settings' ) }>
 			<RangeControl
 				value={ borderRadius }
 				label={ __( 'Border Radius' ) }
@@ -85,19 +81,14 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 
 function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onToggleOpenInNewTab } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
-	useEffect(
-		() => {
-			if ( ! isSelected ) {
-				setIsURLPickerOpen( false );
-			}
-		},
-		[ isSelected ]
-	);
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
 	};
 	const linkControl = isURLPickerOpen && (
-		<Popover position="bottom center">
+		<Popover
+			position="bottom center"
+			onClose={ () => setIsURLPickerOpen( false ) }
+		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
 				value={ { url, title, opensInNewTab } }
@@ -110,9 +101,6 @@ function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onTo
 					if ( opensInNewTab !== newOpensInNewTab ) {
 						onToggleOpenInNewTab( newOpensInNewTab );
 					}
-				} }
-				onClose={ () => {
-					setIsURLPickerOpen( false );
 				} }
 			/>
 		</Popover>

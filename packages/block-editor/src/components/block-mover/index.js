@@ -18,7 +18,8 @@ import { withInstanceId, compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { getBlockMoverDescription } from './mover-description';
-import { leftArrow, rightArrow, upArrow, downArrow, dragHandle } from './icons';
+import { leftArrow, rightArrow, dragHandle } from './icons';
+import { chevronUp, chevronDown } from '@wordpress/icons';
 import BlockDraggable from '../block-draggable';
 
 export class BlockMover extends Component {
@@ -56,12 +57,12 @@ export class BlockMover extends Component {
 				if ( orientation === 'horizontal' ) {
 					return isRTL ? rightArrow : leftArrow;
 				}
-				return upArrow;
+				return chevronUp;
 			} else if ( moveDirection === 'down' ) {
 				if ( orientation === 'horizontal' ) {
 					return isRTL ? leftArrow : rightArrow;
 				}
-				return downArrow;
+				return chevronDown;
 			}
 			return null;
 		};

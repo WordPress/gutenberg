@@ -24,6 +24,30 @@ export const textItem = {
 	utility: 1,
 };
 
+export const withPatternsItem = {
+	id: 'core/block-with-patterns',
+	name: 'core/block-with-patterns',
+	initialAttributes: {},
+	title: 'With Patterns',
+	category: 'widgets',
+	isDisabled: false,
+	utility: 0,
+	patterns: [
+		{
+			name: 'pattern-one',
+			title: 'Pattern One',
+		},
+		{
+			name: 'pattern-two',
+			title: 'Pattern Two',
+		},
+		{
+			name: 'pattern-three',
+			title: 'Pattern Three',
+		},
+	],
+};
+
 export const advancedTextItem = {
 	id: 'core/advanced-text-block',
 	name: 'core/advanced-text-block',
@@ -87,6 +111,7 @@ export const reusableItem = {
 
 export default [
 	textItem,
+	withPatternsItem,
 	advancedTextItem,
 	someOtherItem,
 	moreItem,

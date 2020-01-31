@@ -7,10 +7,7 @@ import { FlatList, View, Text, TouchableHighlight } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import {
-	createBlock,
-	isUnmodifiedDefaultBlock,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withPreferredColorScheme } from '@wordpress/compose';
 import { BottomSheet, Icon } from '@wordpress/components';
@@ -24,6 +21,7 @@ export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.onClose = this.onClose.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.state = {
 			numberOfColumns: this.calculateNumberOfColumns(),
@@ -31,11 +29,11 @@ export class InserterMenu extends Component {
 	}
 
 	componentDidMount() {
-		this.onOpen();
+		this.props.showInsertionPoint();
 	}
 
 	componentWillUnmount() {
-		this.onClose();
+		this.props.hideInsertionPoint();
 	}
 
 	calculateNumberOfColumns() {
@@ -48,12 +46,13 @@ export class InserterMenu extends Component {
 		return Math.floor( containerTotalWidth / itemTotalWidth );
 	}
 
-	onOpen() {
-		this.props.showInsertionPoint();
-	}
-
 	onClose() {
-		this.props.hideInsertionPoint();
+		// if should replace but didn't insert any block
+		// re-insert default block
+		if ( this.props.shouldReplaceBlock ) {
+			this.props.insertDefaultBlock();
+		}
+		this.props.onDismiss();
 	}
 
 	onLayout() {
@@ -71,7 +70,7 @@ export class InserterMenu extends Component {
 		return (
 			<BottomSheet
 				isVisible={ true }
-				onClose={ this.props.onDismiss }
+				onClose={ this.onClose }
 				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
 			>
@@ -116,6 +115,7 @@ export default compose(
 			getBlockName,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
+			getSettings,
 		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
@@ -130,93 +130,73 @@ export default compose(
 		}
 		const destinationRootBlockName = getBlockName( destinationRootClientId );
 
+		const { __experimentalShouldInsertAtTheTop: shouldInsertAtTheTop } = getSettings();
+
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items: getInserterItems( destinationRootClientId ),
 			destinationRootClientId,
+			shouldInsertAtTheTop,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
 			showInsertionPoint,
 			hideInsertionPoint,
+			removeBlock,
+			resetBlocks,
+			clearSelectedBlock,
+			insertBlock,
+			insertDefaultBlock,
 		} = dispatch( 'core/block-editor' );
-
-		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
-		// This breaks the withDispatch not containing any logic rule.
-		// Since it's a function only called when the event handlers are called,
-		// it's fine to extract it.
-		// eslint-disable-next-line no-restricted-syntax
-		function getInsertionIndex() {
-			const {
-				getBlock,
-				getBlockIndex,
-				getBlockSelectionEnd,
-				getBlockOrder,
-			} = select( 'core/block-editor' );
-			const {
-				isPostTitleSelected,
-			} = select( 'core/editor' );
-			const { clientId, destinationRootClientId, isAppender } = ownProps;
-
-			// if post title is selected insert as first block
-			if ( isPostTitleSelected() ) {
-				return 0;
-			}
-
-			// If the clientId is defined, we insert at the position of the block.
-			if ( clientId ) {
-				return getBlockIndex( clientId, destinationRootClientId );
-			}
-
-			// If there a selected block,
-			const end = getBlockSelectionEnd();
-			// `end` argument (id) can refer to the component which is removed
-			// due to pressing `undo` button, that's why we need to check
-			// if `getBlock( end) is valid, otherwise `null` is passed
-			if ( ! isAppender && end && getBlock( end ) ) {
-				// and the last selected block is unmodified (empty), it will be replaced
-				if ( isUnmodifiedDefaultBlock( getBlock( end ) ) ) {
-					return getBlockIndex( end, destinationRootClientId );
-				}
-
-				// we insert after the selected block.
-				return getBlockIndex( end, destinationRootClientId ) + 1;
-			}
-
-			// Otherwise, we insert at the end of the current rootClientId
-			return getBlockOrder( destinationRootClientId ).length;
-		}
 
 		return {
 			showInsertionPoint() {
-				const index = getInsertionIndex();
-				showInsertionPoint( ownProps.destinationRootClientId, index );
+				if ( ownProps.shouldReplaceBlock ) {
+					const {
+						getBlockOrder,
+						getBlockCount,
+					} = select( 'core/block-editor' );
+
+					const count = getBlockCount();
+					if ( count === 1 ) {
+						// removing the last block is not possible with `removeBlock` action
+						// it always inserts a default block if the last of the blocks have been removed
+						clearSelectedBlock();
+						resetBlocks( [] );
+					} else {
+						const blockToReplace = getBlockOrder(
+							ownProps.destinationRootClientId
+						)[ ownProps.insertionIndex ];
+
+						removeBlock( blockToReplace, false );
+					}
+				}
+				showInsertionPoint(
+					ownProps.destinationRootClientId,
+					ownProps.insertionIndex,
+				);
 			},
 			hideInsertionPoint,
 			onSelect( item ) {
-				const {
-					replaceBlocks,
-					insertBlock,
-				} = dispatch( 'core/block-editor' );
-				const {
-					getSelectedBlock,
-				} = select( 'core/block-editor' );
-				const { isAppender } = ownProps;
 				const { name, initialAttributes } = item;
-				const selectedBlock = getSelectedBlock();
+
 				const insertedBlock = createBlock( name, initialAttributes );
-				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
-					replaceBlocks( selectedBlock.clientId, insertedBlock );
-				} else {
-					insertBlock(
-						insertedBlock,
-						getInsertionIndex(),
-						ownProps.destinationRootClientId
-					);
-				}
+
+				insertBlock(
+					insertedBlock,
+					ownProps.insertionIndex,
+					ownProps.destinationRootClientId
+				);
 
 				ownProps.onSelect();
+			},
+			insertDefaultBlock() {
+				insertDefaultBlock(
+					{},
+					ownProps.destinationRootClientId,
+					ownProps.insertionIndex,
+				);
 			},
 		};
 	} ),

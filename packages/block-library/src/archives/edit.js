@@ -16,7 +16,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Archives Settings' ) }>
+				<PanelBody title={ __( 'Archives settings' ) }>
 					<ToggleControl
 						label={ __( 'Display as Dropdown' ) }
 						checked={ displayAsDropdown }

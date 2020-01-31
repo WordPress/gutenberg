@@ -38,12 +38,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
+import { video as SvgIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import style from './style.scss';
-import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
 import VideoCommonSettings from './edit-common-settings';
 
@@ -222,7 +222,7 @@ class VideoEdit extends React.Component {
 							{ toolbarEditButton }
 						</BlockControls> }
 					<InspectorControls>
-						<PanelBody title={ __( 'Video Settings' ) }>
+						<PanelBody title={ __( 'Video settings' ) }>
 							<VideoCommonSettings
 								setAttributes={ setAttributes }
 								attributes={ attributes }

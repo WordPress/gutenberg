@@ -9,6 +9,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
+	showMediaEditorButton,
 } from 'react-native-gutenberg-bridge';
 import { isEmpty, map, get } from 'lodash';
 
@@ -25,7 +26,6 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-
 import {
 	BlockCaption,
 	MediaPlaceholder,
@@ -35,19 +35,22 @@ import {
 	BlockControls,
 	InspectorControls,
 	BlockAlignmentToolbar,
+	MediaEdit,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
+import { image as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
-import SvgIcon, { editImageIcon } from './icon';
+import { editImageIcon } from './icon';
 import SvgIconRetry from './icon-retry';
+import SvgIconCustomize from './icon-customize';
 import { getUpdatedLinkTargetSettings } from './utils';
 
 import {
@@ -303,7 +306,7 @@ export class ImageEdit extends React.Component {
 				iconStyle = this.props.getStylesFromColorScheme( styles.iconUpload, styles.iconUploadDark );
 				break;
 		}
-		return <Icon icon={ SvgIcon } { ...iconStyle } />;
+		return <Icon icon={ icon } { ...iconStyle } />;
 	}
 
 	render() {
@@ -331,7 +334,7 @@ export class ImageEdit extends React.Component {
 
 		const getInspectorControls = () => (
 			<InspectorControls>
-				<PanelBody title={ __( 'Image Settings' ) } >
+				<PanelBody title={ __( 'Image settings' ) } >
 					<TextControl
 						icon={ 'admin-links' }
 						label={ __( 'Link To' ) }
@@ -393,6 +396,16 @@ export class ImageEdit extends React.Component {
 		};
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
+
+		const editImageComponent = ( { open, mediaOptions } ) => (
+			<TouchableWithoutFeedback
+				onPress={ open }>
+				<View style={ styles.edit }>
+					{ mediaOptions() }
+					<Icon icon={ SvgIconCustomize } { ...styles.iconCustomise } />
+				</View>
+			</TouchableWithoutFeedback>
+		);
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
@@ -457,6 +470,14 @@ export class ImageEdit extends React.Component {
 												{ iconRetryContainer }
 												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 											</View>
+										}
+										{ ! isUploadInProgress && ! isUploadFailed && finalWidth && finalHeight && showMediaEditorButton &&
+											<MediaEdit allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+												onSelect={ this.onSelectMediaUploadOption }
+												source={ { uri: url } }
+												openReplaceMediaOptions={ openMediaOptions }
+												render={ editImageComponent }
+											/>
 										}
 									</ImageBackground>
 								</View>

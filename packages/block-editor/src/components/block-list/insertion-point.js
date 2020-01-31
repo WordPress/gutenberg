@@ -124,6 +124,7 @@ export default function InsertionPoint( {
 			focusOnMount={ false }
 			className="block-editor-block-list__insertion-point-popover"
 			__unstableSlotName="block-toolbar"
+			__unstableFixedPosition={ false }
 		>
 			<div className="block-editor-block-list__insertion-point" style={ { width: inserterElement.offsetWidth } }>
 				<Indicator clientId={ inserterClientId } />

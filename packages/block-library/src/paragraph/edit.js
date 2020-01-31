@@ -66,7 +66,7 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 					getComputedStyle(
 						element,
 						'first-letter'
-					).height
+					).lineHeight
 				);
 			} else if ( minimumHeight ) {
 				setMinimumHeight( undefined );
@@ -125,7 +125,7 @@ function ParagraphBlock( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Text Settings' ) }>
+				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
 						value={ fontSize.size }
 						onChange={ setFontSize }
@@ -176,6 +176,7 @@ function ParagraphBlock( {
 						aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
 						placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
 						__unstableEmbedURLOnPaste
+						__unstableAllowPrefixTransformations
 					/>
 				</TextColor>
 			</BackgroundColor>
