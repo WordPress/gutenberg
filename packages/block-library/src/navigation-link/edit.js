@@ -68,16 +68,6 @@ function NavigationLinkEdit( {
 		}
 	}, [] );
 
-	/**
-	 * The hook shouldn't be necessary but due to a focus loss happening
-	 * when selecting a suggestion in the link popover, we force close on block unselection.
-	 */
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsLinkOpen( false );
-		}
-	}, [ isSelected ] );
-
 	return (
 		<Fragment>
 			<BlockControls>
@@ -104,18 +94,6 @@ function NavigationLinkEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody
-					title={ __( 'Link settings' ) }
-				>
-					<TextareaControl
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( { description: descriptionValue } );
-						} }
-						label={ __( 'Description' ) }
-						help={ __( 'The description will be displayed in the menu if the current theme supports it.' ) }
-					/>
-				</PanelBody>
 				<PanelBody
 					title={ __( 'SEO settings' ) }
 				>
@@ -144,6 +122,18 @@ function NavigationLinkEdit( {
 								</ExternalLink>
 							</Fragment>
 						) }
+					/>
+				</PanelBody>
+				<PanelBody
+					title={ __( 'Link settings' ) }
+				>
+					<TextareaControl
+						value={ description || '' }
+						onChange={ ( descriptionValue ) => {
+							setAttributes( { description: descriptionValue } );
+						} }
+						label={ __( 'Description' ) }
+						help={ __( 'The description will be displayed in the menu if the current theme supports it.' ) }
 					/>
 				</PanelBody>
 			</InspectorControls>

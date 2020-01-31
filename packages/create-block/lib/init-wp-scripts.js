@@ -2,7 +2,6 @@
  * External dependencies
  */
 const { command } = require( 'execa' );
-const { install } = require( 'pkg-install' );
 const { join } = require( 'path' );
 const writePkg = require( 'write-pkg' );
 
@@ -11,7 +10,7 @@ const writePkg = require( 'write-pkg' );
  */
 const { info } = require( './log' );
 
-module.exports = async function( { author, license, slug, title, version } ) {
+module.exports = async function( { author, description, license, slug, version } ) {
 	const cwd = join( process.cwd(), slug );
 
 	info( '' );
@@ -19,7 +18,7 @@ module.exports = async function( { author, license, slug, title, version } ) {
 	await writePkg( cwd, {
 		name: slug,
 		version,
-		description: title,
+		description,
 		author,
 		license,
 		main: 'build/index.js',
@@ -34,12 +33,8 @@ module.exports = async function( { author, license, slug, title, version } ) {
 
 	info( '' );
 	info( 'Installing packages. It might take a couple of minutes.' );
-	await install( [
-		'@wordpress/scripts',
-	], {
+	await command( 'npm install @wordpress/scripts --save-dev', {
 		cwd,
-		dev: true,
-		prefer: 'npm',
 	} );
 
 	info( '' );

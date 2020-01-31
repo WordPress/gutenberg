@@ -12,6 +12,14 @@ import {
 	setPostContent,
 } from '@wordpress/e2e-test-utils';
 
+const alignLabels = {
+	left: 'Align left',
+	center: 'Align center',
+	right: 'Align right',
+	wide: 'Wide width',
+	full: 'Full width',
+};
+
 describe( 'Align Hook Works As Expected', () => {
 	const CHANGE_ALIGNMENT_BUTTON_SELECTOR = '.block-editor-block-toolbar .components-dropdown-menu__toggle[aria-label="Change alignment"]';
 
@@ -76,12 +84,12 @@ describe( 'Align Hook Works As Expected', () => {
 	const createCorrectlyAppliesAndRemovesAlignmentTest = ( blockName, alignment ) => {
 		it( 'Correctly applies the selected alignment and correctly removes the alignment',
 			async () => {
-				const BUTTON_SELECTOR = `.components-dropdown-menu__menu button svg.dashicons-align-${ alignment }`;
+				const BUTTON_XPATH = `//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), '${ alignLabels[ alignment ] }')]`;
 				const BUTTON_PRESSED_SELECTOR = '.components-dropdown-menu__menu button.is-active';
 				// set the specified alignment.
 				await insertBlock( blockName );
 				await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
-				await page.click( BUTTON_SELECTOR );
+				await ( await page.$x( BUTTON_XPATH ) )[ 0 ].click();
 
 				// verify the button of the specified alignment is pressed.
 				await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
@@ -102,7 +110,7 @@ describe( 'Align Hook Works As Expected', () => {
 
 				// remove the alignment.
 				await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
-				await page.click( BUTTON_SELECTOR );
+				await ( await page.$x( BUTTON_XPATH ) )[ 0 ].click();
 
 				// verify no alignment button is in pressed state.
 				await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
@@ -150,11 +158,11 @@ describe( 'Align Hook Works As Expected', () => {
 		const BLOCK_NAME = 'Test Align True';
 
 		createShowsTheExpectedButtonsTest( BLOCK_NAME, [
-			'Align left',
-			'Align center',
-			'Align right',
-			'Wide width',
-			'Full width',
+			alignLabels.left,
+			alignLabels.center,
+			alignLabels.right,
+			alignLabels.wide,
+			alignLabels.full,
 		] );
 
 		createDoesNotApplyAlignmentByDefaultTest( BLOCK_NAME );
@@ -166,8 +174,8 @@ describe( 'Align Hook Works As Expected', () => {
 		const BLOCK_NAME = 'Test Align Array';
 
 		createShowsTheExpectedButtonsTest( BLOCK_NAME, [
-			'Align left',
-			'Align center',
+			alignLabels.left,
+			alignLabels.center,
 		] );
 
 		createDoesNotApplyAlignmentByDefaultTest( BLOCK_NAME );
@@ -179,11 +187,11 @@ describe( 'Align Hook Works As Expected', () => {
 		const BLOCK_NAME = 'Test Default Align';
 		const SELECTED_ALIGNMENT_CONTROL_SELECTOR = '//div[contains(@class, "components-dropdown-menu__menu")]//button[contains(@class, "is-active")][text()="Align right"]';
 		createShowsTheExpectedButtonsTest( BLOCK_NAME, [
-			'Align left',
-			'Align center',
-			'Align right',
-			'Wide width',
-			'Full width',
+			alignLabels.left,
+			alignLabels.center,
+			alignLabels.right,
+			alignLabels.wide,
+			alignLabels.full,
 		] );
 
 		it( 'Applies the selected alignment by default', async () => {
