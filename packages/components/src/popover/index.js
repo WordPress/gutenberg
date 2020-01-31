@@ -407,7 +407,7 @@ const Popover = ( {
 			window.clearInterval( intervalHandle );
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
-			window.addEventListener( 'click', refreshOnAnimationFrame );
+			window.removeEventListener( 'click', refreshOnAnimationFrame );
 			window.cancelAnimationFrame( rafId );
 
 			if ( observer ) {
