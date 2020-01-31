@@ -97,7 +97,7 @@ function NavigationLinkEdit( {
 	/**
 	 * Focus the navigation link label text and select it.
 	 */
-	function selectLabelText( ) {
+	function selectLabelText() {
 		ref.current.focus();
 		const selection = window.getSelection();
 		const range = document.createRange();
@@ -206,26 +206,29 @@ function NavigationLinkEdit( {
 									url: newURL = '',
 									opensInNewTab: newOpensInNewTab,
 									id,
-								} = {} ) => setAttributes( {
-									title: escape( newTitle ),
-									url: encodeURI( newURL ),
-									label: ( () => {
-										const normalizedTitle = newTitle.replace( /http(s?):\/\//gi, '' );
-										const normalizedURL = newURL.replace( /http(s?):\/\//gi, '' );
-										if (
-											newTitle !== '' &&
-											normalizedTitle !== normalizedURL &&
-											label !== newTitle ) {
-											return escape( newTitle );
-										} else if ( label ) {
-											return label;
-										}
-										// If there's no label, add the URL.
-										return escape( normalizedURL );
-									} )(),
-									opensInNewTab: newOpensInNewTab,
-									id,
-								} ) }
+								} = {} ) =>
+									setAttributes( {
+										title: escape( newTitle ),
+										url: encodeURI( newURL ),
+										label: ( () => {
+											const normalizedTitle = newTitle.replace( /http(s?):\/\//gi, '' );
+											const normalizedURL = newURL.replace( /http(s?):\/\//gi, '' );
+											if (
+												newTitle !== '' &&
+												normalizedTitle !== normalizedURL &&
+												label !== newTitle
+											) {
+												return escape( newTitle );
+											} else if ( label ) {
+												return label;
+											}
+											// If there's no label, add the URL.
+											return escape( normalizedURL );
+										} )(),
+										opensInNewTab: newOpensInNewTab,
+										id,
+									} )
+								}
 							/>
 						</Popover>
 					) }
