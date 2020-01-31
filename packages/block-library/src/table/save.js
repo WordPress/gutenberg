@@ -9,14 +9,7 @@ import classnames from 'classnames';
 import { RichText, getColorClassName } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const {
-		hasFixedLayout,
-		head,
-		body,
-		foot,
-		backgroundColor,
-		caption,
-	} = attributes;
+	const { hasFixedLayout, head, body, foot, backgroundColor, caption } = attributes;
 	const isEmpty = ! head.length && ! body.length && ! foot.length;
 
 	if ( isEmpty ) {
@@ -72,12 +65,7 @@ export default function save( { attributes } ) {
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />
 			</table>
-			{ hasCaption && (
-				<RichText.Content
-					tagName="figcaption"
-					value={ caption }
-				/>
-			) }
+			{ hasCaption && <RichText.Content tagName="figcaption" value={ caption } /> }
 		</figure>
 	);
 }

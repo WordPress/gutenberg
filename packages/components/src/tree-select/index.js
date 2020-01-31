@@ -30,11 +30,5 @@ export default function TreeSelect( {
 		noOptionLabel && { value: '', label: noOptionLabel },
 		...getSelectOptions( tree ),
 	] );
-	return (
-		<SelectControl
-			{ ...{ label, options, onChange } }
-			value={ selectedId }
-			{ ...props }
-		/>
-	);
+	return <SelectControl { ...{ label, options, onChange } } value={ selectedId } { ...props } />;
 }

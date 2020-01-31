@@ -54,11 +54,8 @@ const effects = {
 			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
 
 			// Save metaboxes on save completion, except for autosaves that are not a post preview.
-			const shouldTriggerMetaboxesSave = (
-				hasActiveMetaBoxes && (
-					( wasSavingPost && ! isSavingPost && ! wasAutosavingPost )
-				)
-			);
+			const shouldTriggerMetaboxesSave =
+				hasActiveMetaBoxes && wasSavingPost && ! isSavingPost && ! wasAutosavingPost;
 
 			// Save current state for next inspection.
 			wasSavingPost = isSavingPost;
@@ -91,18 +88,22 @@ const effects = {
 		const baseFormData = new window.FormData( document.querySelector( '.metabox-base-form' ) );
 		const formDataToMerge = [
 			baseFormData,
-			...getActiveMetaBoxLocations( state ).map( ( location ) => (
-				new window.FormData( getMetaBoxContainer( location ) )
-			) ),
+			...getActiveMetaBoxLocations( state ).map(
+				( location ) => new window.FormData( getMetaBoxContainer( location ) )
+			),
 		];
 
 		// Merge all form data objects into a single one.
-		const formData = reduce( formDataToMerge, ( memo, currentFormData ) => {
-			for ( const [ key, value ] of currentFormData ) {
-				memo.append( key, value );
-			}
-			return memo;
-		}, new window.FormData() );
+		const formData = reduce(
+			formDataToMerge,
+			( memo, currentFormData ) => {
+				for ( const [ key, value ] of currentFormData ) {
+					memo.append( key, value );
+				}
+				return memo;
+			},
+			new window.FormData()
+		);
 		additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
 
 		// Save the metaboxes
@@ -111,8 +112,7 @@ const effects = {
 			method: 'POST',
 			body: formData,
 			parse: false,
-		} )
-			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
+		} ).then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
 	SWITCH_MODE( action ) {
 		// Unselect blocks when we switch to the code editor.
@@ -120,7 +120,8 @@ const effects = {
 			dispatch( 'core/block-editor' ).clearSelectedBlock();
 		}
 
-		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
+		const message =
+			action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
 		speak( message, 'assertive' );
 	},
 };

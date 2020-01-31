@@ -50,9 +50,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 			</Section>
 			<Section title={ __( 'Document panels' ) }>
 				<EnablePluginDocumentSettingPanelOption.Slot />
-				{ isViewable && (
-					<EnablePanelOption label={ __( 'Permalink' ) } panelName="post-link" />
-				) }
+				{ isViewable && <EnablePanelOption label={ __( 'Permalink' ) } panelName="post-link" /> }
 				<PostTaxonomies
 					taxonomyWrapper={ ( content, taxonomy ) => (
 						<EnablePanelOption

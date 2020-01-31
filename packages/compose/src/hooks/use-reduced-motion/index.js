@@ -8,9 +8,7 @@ import useMediaQuery from '../use-media-query';
  *
  * @type {boolean}
  */
-const IS_IE =
-	typeof window !== 'undefined' &&
-	window.navigator.userAgent.indexOf( 'Trident' ) >= 0;
+const IS_IE = typeof window !== 'undefined' && window.navigator.userAgent.indexOf( 'Trident' ) >= 0;
 
 /**
  * Hook returning whether the user has a preference for reduced motion.
@@ -18,8 +16,8 @@ const IS_IE =
  * @return {boolean} Reduced motion preference value.
  */
 const useReducedMotion =
-	process.env.FORCE_REDUCED_MOTION || IS_IE ?
-		() => true :
-		() => useMediaQuery( '(prefers-reduced-motion: reduce)' );
+	process.env.FORCE_REDUCED_MOTION || IS_IE
+		? () => true
+		: () => useMediaQuery( '(prefers-reduced-motion: reduce)' );
 
 export default useReducedMotion;

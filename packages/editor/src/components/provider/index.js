@@ -25,9 +25,7 @@ import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 
-const fetchLinkSuggestions = async ( search, {
-	perPage = 20,
-} = {} ) => {
+const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
 	const posts = await apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
@@ -83,7 +81,7 @@ class EditorProvider extends Component {
 		hasUploadPermissions,
 		canUserUseUnfilteredHTML,
 		undo,
-		shouldInsertAtTheTop,
+		shouldInsertAtTheTop
 	) {
 		return {
 			...pick( settings, [
@@ -185,7 +183,7 @@ class EditorProvider extends Component {
 			hasUploadPermissions,
 			canUserUseUnfilteredHTML,
 			undo,
-			isPostTitleSelected,
+			isPostTitleSelected
 		);
 
 		return (

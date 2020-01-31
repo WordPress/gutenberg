@@ -1,4 +1,3 @@
-
 /**
  * External dependencies
  */
@@ -6,15 +5,10 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import {
-	RangeControl,
-	PanelBody,
-} from '@wordpress/components';
+import { RangeControl, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { useState, useEffect } from '@wordpress/element';
-import {
-	InspectorControls,
-} from '@wordpress/block-editor';
+import { InspectorControls } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -47,7 +41,7 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes, getStylesFromColor
 	return (
 		<View style={ [ defaultStyle, isSelected && styles.selectedSpacer, { height } ] }>
 			<InspectorControls>
-				<PanelBody title={ __( 'Spacer settings' ) } >
+				<PanelBody title={ __( 'Spacer settings' ) }>
 					<RangeControl
 						label={ __( 'Height in pixels' ) }
 						minimumValue={ minSpacerHeight }

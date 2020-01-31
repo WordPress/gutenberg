@@ -18,13 +18,8 @@ export const _default = () => {
 	const rowText = text( 'Row Text', 'My Panel Inputs and Labels' );
 	return (
 		<Panel header="My Panel">
-			<PanelBody
-				title={ bodyTitle }
-				opened={ opened }
-			>
-				<PanelRow>
-					{ rowText }
-				</PanelRow>
+			<PanelBody title={ bodyTitle } opened={ opened }>
+				<PanelRow>{ rowText }</PanelRow>
 			</PanelBody>
 		</Panel>
 	);
@@ -39,21 +34,11 @@ export const multipleBodies = () => {
 	const row2Text = text( '2: Row Text', 'My Panel Inputs and Labels' );
 	return (
 		<Panel header="My Panel">
-			<PanelBody
-				title={ body1Title }
-				opened={ body1Open }
-			>
-				<PanelRow>
-					{ row1Text }
-				</PanelRow>
+			<PanelBody title={ body1Title } opened={ body1Open }>
+				<PanelRow>{ row1Text }</PanelRow>
 			</PanelBody>
-			<PanelBody
-				title={ body2Title }
-				opened={ body2Open }
-			>
-				<PanelRow>
-					{ row2Text }
-				</PanelRow>
+			<PanelBody title={ body2Title } opened={ body2Open }>
+				<PanelRow>{ row2Text }</PanelRow>
 			</PanelBody>
 		</Panel>
 	);
@@ -66,14 +51,8 @@ export const withIcon = () => {
 	const opened = boolean( 'Opened', true );
 	return (
 		<Panel header="My Panel">
-			<PanelBody
-				title={ bodyTitle }
-				opened={ opened }
-				icon={ icon }
-			>
-				<PanelRow>
-					{ rowText }
-				</PanelRow>
+			<PanelBody title={ bodyTitle } opened={ opened } icon={ icon }>
+				<PanelRow>{ rowText }</PanelRow>
 			</PanelBody>
 		</Panel>
 	);

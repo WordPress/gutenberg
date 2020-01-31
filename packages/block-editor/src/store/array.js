@@ -13,11 +13,7 @@ import { castArray } from 'lodash';
  * @return {Array}          Result.
  */
 export function insertAt( array, elements, index ) {
-	return [
-		...array.slice( 0, index ),
-		...castArray( elements ),
-		...array.slice( index ),
-	];
+	return [ ...array.slice( 0, index ), ...castArray( elements ), ...array.slice( index ) ];
 }
 
 /**
@@ -33,9 +29,5 @@ export function insertAt( array, elements, index ) {
 export function moveTo( array, from, to, count = 1 ) {
 	const withoutMovedElements = [ ...array ];
 	withoutMovedElements.splice( from, count );
-	return insertAt(
-		withoutMovedElements,
-		array.slice( from, from + count ),
-		to,
-	);
+	return insertAt( withoutMovedElements, array.slice( from, from + count ), to );
 }

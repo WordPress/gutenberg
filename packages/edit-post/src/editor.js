@@ -10,11 +10,7 @@ import { size, map, without } from 'lodash';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
 import { StrictMode, Component } from '@wordpress/element';
-import {
-	KeyboardShortcuts,
-	SlotFillProvider,
-	DropZoneProvider,
-} from '@wordpress/components';
+import { KeyboardShortcuts, SlotFillProvider, DropZoneProvider } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -43,7 +39,7 @@ class Editor extends Component {
 		blockTypes,
 		preferredStyleVariations,
 		__experimentalLocalAutosaveInterval,
-		updatePreferredStyleVariations,
+		updatePreferredStyleVariations
 	) {
 		settings = {
 			...settings,
@@ -62,16 +58,12 @@ class Editor extends Component {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
-			const defaultAllowedBlockTypes = (
-				true === settings.allowedBlockTypes ?
-					map( blockTypes, 'name' ) :
-					( settings.allowedBlockTypes || [] )
-			);
+			const defaultAllowedBlockTypes =
+				true === settings.allowedBlockTypes
+					? map( blockTypes, 'name' )
+					: settings.allowedBlockTypes || [];
 
-			settings.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes,
-			);
+			settings.allowedBlockTypes = without( defaultAllowedBlockTypes, ...hiddenBlockTypes );
 		}
 
 		return settings;
@@ -108,7 +100,7 @@ class Editor extends Component {
 			blockTypes,
 			preferredStyleVariations,
 			__experimentalLocalAutosaveInterval,
-			updatePreferredStyleVariations,
+			updatePreferredStyleVariations
 		);
 
 		return (

@@ -11,7 +11,14 @@ import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-edit
 import { BlockQuotation } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 
-export default function QuoteEdit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
+export default function QuoteEdit( {
+	attributes,
+	setAttributes,
+	isSelected,
+	mergeBlocks,
+	onReplace,
+	className,
+} ) {
 	const { align, value, citation } = attributes;
 
 	return (
@@ -33,8 +40,8 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 					identifier="value"
 					multiline
 					value={ value }
-					onChange={
-						( nextValue ) => setAttributes( {
+					onChange={ ( nextValue ) =>
+						setAttributes( {
 							value: nextValue,
 						} )
 					}
@@ -56,16 +63,14 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 							value: piece,
 						} )
 					}
-					__unstableOnSplitMiddle={ () =>
-						createBlock( 'core/paragraph' )
-					}
+					__unstableOnSplitMiddle={ () => createBlock( 'core/paragraph' ) }
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
 						identifier="citation"
 						value={ citation }
-						onChange={
-							( nextCitation ) => setAttributes( {
+						onChange={ ( nextCitation ) =>
+							setAttributes( {
 								citation: nextCitation,
 							} )
 						}

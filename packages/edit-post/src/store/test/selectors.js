@@ -212,9 +212,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true when panel was removed', () => {
 			const state = deepFreeze( {
-				removedPanels: [
-					'post-status',
-				],
+				removedPanels: [ 'post-status' ],
 			} );
 
 			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
@@ -378,8 +376,7 @@ describe( 'selectors', () => {
 		it( 'should return false if feature is not referred', () => {
 			const state = {
 				preferences: {
-					features: {
-					},
+					features: {},
 				},
 			};
 

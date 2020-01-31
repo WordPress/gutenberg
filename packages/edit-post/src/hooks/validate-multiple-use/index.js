@@ -52,15 +52,11 @@ const enhance = compose(
 	} ),
 	withDispatch( ( dispatch, { originalBlockClientId } ) => ( {
 		selectFirst: () => dispatch( 'core/block-editor' ).selectBlock( originalBlockClientId ),
-	} ) ),
+	} ) )
 );
 
 const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
-	return enhance( ( {
-		originalBlockClientId,
-		selectFirst,
-		...props
-	} ) => {
+	return enhance( ( { originalBlockClientId, selectFirst, ...props } ) => {
 		if ( ! originalBlockClientId ) {
 			return <BlockEdit { ...props } />;
 		}
@@ -85,12 +81,11 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 						<Button
 							key="transform"
 							isSecondary
-							onClick={ () => props.onReplace(
-								createBlock( outboundType.name, props.attributes )
-							) }
+							onClick={ () =>
+								props.onReplace( createBlock( outboundType.name, props.attributes ) )
+							}
 						>
-							{ __( 'Transform into:' ) }{ ' ' }
-							{ outboundType.title }
+							{ __( 'Transform into:' ) } { outboundType.title }
 						</Button>
 					),
 				] }

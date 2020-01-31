@@ -4,6 +4,7 @@
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withPluginContext } from '@wordpress/plugins';
+import { check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -12,7 +13,7 @@ import PluginMoreMenuItem from '../plugin-more-menu-item';
 
 const PluginSidebarMoreMenuItem = ( { children, icon, isSelected, onClick } ) => (
 	<PluginMoreMenuItem
-		icon={ isSelected ? 'yes' : icon }
+		icon={ isSelected ? check : icon }
 		isSelected={ isSelected }
 		role="menuitemcheckbox"
 		onClick={ onClick }
@@ -74,23 +75,16 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { sidebarName } ) => {
-		const {
-			getActiveGeneralSidebarName,
-		} = select( 'core/edit-post' );
+		const { getActiveGeneralSidebarName } = select( 'core/edit-post' );
 
 		return {
 			isSelected: getActiveGeneralSidebarName() === sidebarName,
 		};
 	} ),
 	withDispatch( ( dispatch, { isSelected, sidebarName } ) => {
-		const {
-			closeGeneralSidebar,
-			openGeneralSidebar,
-		} = dispatch( 'core/edit-post' );
-		const onClick = isSelected ?
-			closeGeneralSidebar :
-			() => openGeneralSidebar( sidebarName );
+		const { closeGeneralSidebar, openGeneralSidebar } = dispatch( 'core/edit-post' );
+		const onClick = isSelected ? closeGeneralSidebar : () => openGeneralSidebar( sidebarName );
 
 		return { onClick };
-	} ),
+	} )
 )( PluginSidebarMoreMenuItem );

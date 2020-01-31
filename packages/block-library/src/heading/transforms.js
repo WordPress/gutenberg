@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createBlock,
-	getBlockAttributes,
-} from '@wordpress/blocks';
+import { createBlock, getBlockAttributes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -46,11 +43,7 @@ const transforms = {
 
 				attributes.level = getLevelFromHeadingNodeName( node.nodeName );
 
-				if (
-					textAlign === 'left' ||
-					textAlign === 'center' ||
-					textAlign === 'right'
-				) {
+				if ( textAlign === 'left' || textAlign === 'center' || textAlign === 'right' ) {
 					attributes.align = textAlign;
 				}
 

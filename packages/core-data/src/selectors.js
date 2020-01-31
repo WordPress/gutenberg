@@ -137,13 +137,13 @@ export const getRawEntityRecord = createSelector(
 		const record = getEntityRecord( state, kind, name, key );
 		return (
 			record &&
-							Object.keys( record ).reduce( ( accumulator, _key ) => {
-								// Because edits are the "raw" attribute values,
-								// we return those from record selectors to make rendering,
-								// comparisons, and joins with edits easier.
-								accumulator[ _key ] = get( record[ _key ], 'raw', record[ _key ] );
-								return accumulator;
-							}, {} )
+			Object.keys( record ).reduce( ( accumulator, _key ) => {
+				// Because edits are the "raw" attribute values,
+				// we return those from record selectors to make rendering,
+				// comparisons, and joins with edits easier.
+				accumulator[ _key ] = get( record[ _key ], 'raw', record[ _key ] );
+				return accumulator;
+			}, {} )
 		);
 	},
 	( state ) => [ state.entities.data ]
@@ -198,12 +198,7 @@ export const getEntityRecordChangesByRecord = createSelector(
 						( editsKey ) =>
 							( acc[ kind ][ name ][ editsKey ] = {
 								rawRecord: getRawEntityRecord( state, kind, name, editsKey ),
-								edits: getEntityRecordNonTransientEdits(
-									state,
-									kind,
-									name,
-									editsKey
-								),
+								edits: getEntityRecordNonTransientEdits( state, kind, name, editsKey ),
 							} )
 					);
 				}
@@ -274,8 +269,7 @@ export const getEntityRecordNonTransientEdits = createSelector(
 export function hasEditsForEntityRecord( state, kind, name, recordId ) {
 	return (
 		isSavingEntityRecord( state, kind, name, recordId ) ||
-		Object.keys( getEntityRecordNonTransientEdits( state, kind, name, recordId ) )
-			.length > 0
+		Object.keys( getEntityRecordNonTransientEdits( state, kind, name, recordId ) ).length > 0
 	);
 }
 
@@ -327,11 +321,7 @@ export function isAutosavingEntityRecord( state, kind, name, recordId ) {
  * @return {boolean} Whether the entity record is saving or not.
  */
 export function isSavingEntityRecord( state, kind, name, recordId ) {
-	return get(
-		state.entities.data,
-		[ kind, name, 'saving', recordId, 'pending' ],
-		false
-	);
+	return get( state.entities.data, [ kind, name, 'saving', recordId, 'pending' ], false );
 }
 
 /**
@@ -544,9 +534,11 @@ export function getAutosave( state, postType, postId, authorId ) {
  *
  * @return {boolean} True if the REST request was completed. False otherwise.
  */
-export const hasFetchedAutosaves = createRegistrySelector( ( select ) => ( state, postType, postId ) => {
-	return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [ postType, postId ] );
-} );
+export const hasFetchedAutosaves = createRegistrySelector(
+	( select ) => ( state, postType, postId ) => {
+		return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [ postType, postId ] );
+	}
+);
 
 /**
  * Returns a new reference when edited values have changed. This is useful in
@@ -568,5 +560,5 @@ export const hasFetchedAutosaves = createRegistrySelector( ( select ) => ( state
  */
 export const getReferenceByDistinctEdits = createSelector(
 	() => [],
-	( state ) => [ state.undo.length, state.undo.offset ],
+	( state ) => [ state.undo.length, state.undo.offset ]
 );

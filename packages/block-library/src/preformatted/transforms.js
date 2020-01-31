@@ -15,13 +15,9 @@ const transforms = {
 		},
 		{
 			type: 'raw',
-			isMatch: ( node ) => (
+			isMatch: ( node ) =>
 				node.nodeName === 'PRE' &&
-				! (
-					node.children.length === 1 &&
-					node.firstChild.nodeName === 'CODE'
-				)
-			),
+				! ( node.children.length === 1 && node.firstChild.nodeName === 'CODE' ),
 			schema: ( { phrasingContentSchema } ) => ( {
 				pre: {
 					children: phrasingContentSchema,
@@ -33,8 +29,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( attributes ) =>
-				createBlock( 'core/paragraph', attributes ),
+			transform: ( attributes ) => createBlock( 'core/paragraph', attributes ),
 		},
 	],
 };

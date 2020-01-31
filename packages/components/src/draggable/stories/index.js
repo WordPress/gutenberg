@@ -48,11 +48,7 @@ const DraggalbeExample = () => {
 						};
 
 						return (
-							<Box
-								onDragStart={ handleOnDragStart }
-								onDragEnd={ handleOnDragEnd }
-								draggable
-							>
+							<Box onDragStart={ handleOnDragStart } onDragEnd={ handleOnDragEnd } draggable>
 								<Dashicon icon="move" />
 							</Box>
 						);

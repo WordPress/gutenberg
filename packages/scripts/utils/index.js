@@ -9,30 +9,16 @@ const {
 	hasFileArgInCLI,
 	spawnScript,
 } = require( './cli' );
-const {
-	getWebpackArgs,
-	hasBabelConfig,
-	hasJestConfig,
-} = require( './config' );
-const {
-	buildWordPress,
-	downloadWordPressZip,
-	mergeYAMLConfigs,
-} = require( './env' );
-const {
-	fromConfigRoot,
-	hasProjectFile,
-} = require( './file' );
-const {
-	hasPackageProp,
-} = require( './package' );
-const {
-	camelCaseDash,
-} = require( './string' );
+const { getWebpackArgs, hasBabelConfig, hasJestConfig } = require( './config' );
+const { buildWordPress, downloadWordPressZip, mergeYAMLConfigs } = require( './env' );
+const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
+const { hasPackageProp } = require( './package' );
+const { camelCaseDash } = require( './string' );
 
 module.exports = {
 	buildWordPress,
 	camelCaseDash,
+	fromProjectRoot,
 	fromConfigRoot,
 	getArgFromCLI,
 	getArgsFromCLI,

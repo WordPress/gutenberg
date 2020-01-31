@@ -1,4 +1,4 @@
 /**
  * Module declaration.
  */
-export default function( ) {}
+export default function() {}

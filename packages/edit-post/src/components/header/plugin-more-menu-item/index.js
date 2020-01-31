@@ -17,12 +17,7 @@ import PluginsMoreMenuGroup from '../plugins-more-menu-group';
 
 const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
 	<PluginsMoreMenuGroup>
-		{ ( fillProps ) => (
-			<MenuItem
-				{ ...props }
-				onClick={ compose( onClick, fillProps.onClose ) }
-			/>
-		) }
+		{ ( fillProps ) => <MenuItem { ...props } onClick={ compose( onClick, fillProps.onClose ) } /> }
 	</PluginsMoreMenuGroup>
 );
 
@@ -85,5 +80,5 @@ export default compose(
 		return {
 			icon: ownProps.icon || context.icon,
 		};
-	} ),
+	} )
 )( PluginMoreMenuItem );

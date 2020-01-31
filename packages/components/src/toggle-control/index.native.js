@@ -3,15 +3,7 @@
  */
 import SwitchCell from '../mobile/bottom-sheet/switch-cell';
 
-function ToggleControl( {
-	label,
-	checked,
-	help,
-	instanceId,
-	className,
-	onChange,
-	...props
-} ) {
+function ToggleControl( { label, checked, help, instanceId, className, onChange, ...props } ) {
 	const id = `inspector-toggle-control-${ instanceId }`;
 
 	return (

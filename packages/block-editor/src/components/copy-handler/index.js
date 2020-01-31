@@ -28,9 +28,7 @@ export default compose( [
 			getSettings,
 		} = select( 'core/block-editor' );
 		const { removeBlocks, replaceBlocks } = dispatch( 'core/block-editor' );
-		const {
-			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
-		} = getSettings();
+		const { __experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML } = getSettings();
 
 		return {
 			handler( event ) {

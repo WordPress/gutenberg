@@ -11,7 +11,7 @@ import {
 describe( 'PostPublishButton', () => {
 	let werePrePublishChecksEnabled;
 	beforeEach( async () => {
-		await createNewPost( );
+		await createNewPost();
 		werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
 		if ( werePrePublishChecksEnabled ) {
 			await disablePrePublishChecks();
@@ -41,7 +41,9 @@ describe( 'PostPublishButton', () => {
 		await page.type( '.editor-post-title__input', 'E2E Test Post' ); // Make it saveable
 		expect( await page.$( '.editor-post-publish-button[aria-disabled="true"]' ) ).toBeNull();
 
-		await page.evaluate( () => window.wp.data.dispatch( 'core/edit-post' ).requestMetaBoxUpdates() );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/edit-post' ).requestMetaBoxUpdates()
+		);
 		expect( await page.$( '.editor-post-publish-button[aria-disabled="true"]' ) ).not.toBeNull();
 	} );
 } );

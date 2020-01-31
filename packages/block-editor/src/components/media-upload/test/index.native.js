@@ -3,10 +3,7 @@
  */
 import { shallow } from 'enzyme';
 import { TouchableWithoutFeedback } from 'react-native';
-import {
-	requestMediaPicker,
-	mediaSources,
-} from 'react-native-gutenberg-bridge';
+import { requestMediaPicker, mediaSources } from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
@@ -24,21 +21,22 @@ const MEDIA_ID = 123;
 
 describe( 'MediaUpload component', () => {
 	it( 'renders without crashing', () => {
-		const wrapper = shallow(
-			<MediaUpload allowedTypes={ [] } render={ () => {} } />
-		);
+		const wrapper = shallow( <MediaUpload allowedTypes={ [] } render={ () => {} } /> );
 		expect( wrapper ).toBeTruthy();
 	} );
 
 	it( 'opens media options picker', () => {
 		const wrapper = shallow(
-			<MediaUpload allowedTypes={ [] } render={ ( { open, getMediaOptions } ) => {
-				return (
-					<TouchableWithoutFeedback onPress={ open }>
-						{ getMediaOptions() }
-					</TouchableWithoutFeedback>
-				);
-			} } />
+			<MediaUpload
+				allowedTypes={ [] }
+				render={ ( { open, getMediaOptions } ) => {
+					return (
+						<TouchableWithoutFeedback onPress={ open }>
+							{ getMediaOptions() }
+						</TouchableWithoutFeedback>
+					);
+				} }
+			/>
 		);
 		expect( wrapper.find( 'Picker' ) ).toHaveLength( 1 );
 	} );
@@ -54,9 +52,15 @@ describe( 'MediaUpload component', () => {
 								{ getMediaOptions() }
 							</TouchableWithoutFeedback>
 						);
-					} } />
+					} }
+				/>
 			);
-			expect( wrapper.find( 'Picker' ).props().options.filter( ( item ) => item.label === expectedOption ) ).toHaveLength( 1 );
+			expect(
+				wrapper
+					.find( 'Picker' )
+					.props()
+					.options.filter( ( item ) => item.label === expectedOption )
+			).toHaveLength( 1 );
 		};
 		expectOptionForMediaType( MEDIA_TYPE_IMAGE, OPTION_TAKE_PHOTO );
 		expectOptionForMediaType( MEDIA_TYPE_VIDEO, OPTION_TAKE_VIDEO );
@@ -85,7 +89,8 @@ describe( 'MediaUpload component', () => {
 							{ getMediaOptions() }
 						</TouchableWithoutFeedback>
 					);
-				} } />
+				} }
+			/>
 		);
 		wrapper.find( 'Picker' ).simulate( 'change', option );
 		const media = { id: MEDIA_ID, url: MEDIA_URL };

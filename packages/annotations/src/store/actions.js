@@ -25,7 +25,14 @@ import uuid from 'uuid/v4';
  *
  * @return {Object} Action object.
  */
-export function __experimentalAddAnnotation( { blockClientId, richTextIdentifier = null, range = null, selector = 'range', source = 'default', id = uuid() } ) {
+export function __experimentalAddAnnotation( {
+	blockClientId,
+	richTextIdentifier = null,
+	range = null,
+	selector = 'range',
+	source = 'default',
+	id = uuid(),
+} ) {
 	const action = {
 		type: 'ANNOTATION_ADD',
 		id,

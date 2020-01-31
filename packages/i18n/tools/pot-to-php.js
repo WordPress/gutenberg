@@ -7,16 +7,15 @@ const fs = require( 'fs' );
 const TAB = '\t';
 const NEWLINE = '\n';
 
-const fileHeader = [
-	'<?php',
-	'/* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */',
-	'$generated_i18n_strings = array(',
-].join( NEWLINE ) + NEWLINE;
+const fileHeader =
+	[
+		'<?php',
+		'/* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */',
+		'$generated_i18n_strings = array(',
+	].join( NEWLINE ) + NEWLINE;
 
-const fileFooter = NEWLINE + [
-	');',
-	'/* THIS IS THE END OF THE GENERATED FILE */',
-].join( NEWLINE ) + NEWLINE;
+const fileFooter =
+	NEWLINE + [ ');', '/* THIS IS THE END OF THE GENERATED FILE */' ].join( NEWLINE ) + NEWLINE;
 
 /**
  * Escapes single quotes.
@@ -25,7 +24,7 @@ const fileFooter = NEWLINE + [
  * @return {string} The escaped string.
  */
 function escapeSingleQuotes( input ) {
-	return input.replace( /'/g, '\\\'' );
+	return input.replace( /'/g, "\\'" );
 }
 
 /**
@@ -46,18 +45,16 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 	if ( ! isEmpty( comments ) ) {
 		if ( ! isEmpty( comments.reference ) ) {
 			// All references are split by newlines, add a // Reference prefix to make them tidy.
-			php += TAB + '// Reference: ' +
-				comments.reference
-					.split( NEWLINE )
-					.join( NEWLINE + TAB + '// Reference: ' ) +
+			php +=
+				TAB +
+				'// Reference: ' +
+				comments.reference.split( NEWLINE ).join( NEWLINE + TAB + '// Reference: ' ) +
 				NEWLINE;
 		}
 
 		if ( ! isEmpty( comments.translator ) ) {
 			// All extracted comments are split by newlines, add a tab to line them up nicely.
-			const translator = comments.translator
-				.split( NEWLINE )
-				.join( NEWLINE + TAB + '   ' );
+			const translator = comments.translator.split( NEWLINE ).join( NEWLINE + TAB + '   ' );
 
 			php += TAB + `/* ${ translator } */${ NEWLINE }`;
 		}
@@ -82,7 +79,9 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 			if ( isEmpty( context ) ) {
 				php += TAB + `_n_noop( '${ original }', '${ plural }', '${ textdomain }' )`;
 			} else {
-				php += TAB + `_nx_noop( '${ original }',  '${ plural }', '${ translation.msgctxt }', '${ textdomain }' )`;
+				php +=
+					TAB +
+					`_nx_noop( '${ original }',  '${ plural }', '${ translation.msgctxt }', '${ textdomain }' )`;
 			}
 		}
 	}
@@ -113,10 +112,6 @@ function convertPOTToPHP( potFile, phpFile, options ) {
 
 const args = process.argv.slice( 2 );
 
-convertPOTToPHP(
-	args[ 0 ],
-	args[ 1 ],
-	{
-		textdomain: args[ 2 ],
-	}
-);
+convertPOTToPHP( args[ 0 ], args[ 1 ], {
+	textdomain: args[ 2 ],
+} );

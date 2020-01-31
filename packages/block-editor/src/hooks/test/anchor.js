@@ -70,24 +70,32 @@ describe( 'anchor', () => {
 
 		it( 'should inject anchor attribute ID', () => {
 			const attributes = { anchor: 'foo' };
-			const extraProps = getSaveContentExtraProps( {}, {
-				...blockSettings,
-				supports: {
-					anchor: true,
+			const extraProps = getSaveContentExtraProps(
+				{},
+				{
+					...blockSettings,
+					supports: {
+						anchor: true,
+					},
 				},
-			}, attributes );
+				attributes
+			);
 
 			expect( extraProps.id ).toBe( 'foo' );
 		} );
 
 		it( 'should remove an anchor attribute ID when feild is cleared', () => {
 			const attributes = { anchor: '' };
-			const extraProps = getSaveContentExtraProps( {}, {
-				...blockSettings,
-				supports: {
-					anchor: true,
+			const extraProps = getSaveContentExtraProps(
+				{},
+				{
+					...blockSettings,
+					supports: {
+						anchor: true,
+					},
 				},
-			}, attributes );
+				attributes
+			);
 
 			expect( extraProps.id ).toBe( null );
 		} );

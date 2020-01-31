@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	clickBlockAppender,
-	getEditedPostContent,
-	createNewPost,
-} from '@wordpress/e2e-test-utils';
+import { clickBlockAppender, getEditedPostContent, createNewPost } from '@wordpress/e2e-test-utils';
 
 describe( 'HTML block', () => {
 	beforeEach( async () => {
@@ -19,7 +15,9 @@ describe( 'HTML block', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '<p>Pythagorean theorem: ' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '<var>a</var><sup>2</sup> + <var>b</var><sup>2</sup> = <var>c</var><sup>2</sup> </p>' );
+		await page.keyboard.type(
+			'<var>a</var><sup>2</sup> + <var>b</var><sup>2</sup> = <var>c</var><sup>2</sup> </p>'
+		);
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

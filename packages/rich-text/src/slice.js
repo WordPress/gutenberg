@@ -9,11 +9,7 @@
  *
  * @return {Object} A new extracted value.
  */
-export function slice(
-	value,
-	startIndex = value.start,
-	endIndex = value.end
-) {
+export function slice( value, startIndex = value.start, endIndex = value.end ) {
 	const { formats, replacements, text } = value;
 
 	if ( startIndex === undefined || endIndex === undefined ) {

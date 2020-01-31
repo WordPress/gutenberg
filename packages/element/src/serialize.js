@@ -28,14 +28,7 @@
 /**
  * External dependencies
  */
-import {
-	isEmpty,
-	castArray,
-	omit,
-	startsWith,
-	kebabCase,
-	isPlainObject,
-} from 'lodash';
+import { isEmpty, castArray, omit, startsWith, kebabCase, isPlainObject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -45,12 +38,7 @@ import { escapeHTML, escapeAttribute, isValidAttributeName } from '@wordpress/es
 /**
  * Internal dependencies
  */
-import {
-	createContext,
-	Fragment,
-	StrictMode,
-	forwardRef,
-} from './react';
+import { createContext, Fragment, StrictMode, forwardRef } from './react';
 import RawHTML from './raw-html';
 
 const { Provider, Consumer } = createContext();
@@ -63,11 +51,7 @@ const ForwardRef = forwardRef( () => {
  *
  * @type {Set}
  */
-const ATTRIBUTES_TYPES = new Set( [
-	'string',
-	'boolean',
-	'number',
-] );
+const ATTRIBUTES_TYPES = new Set( [ 'string', 'boolean', 'number' ] );
 
 /**
  * Element tags which can be self-closing.
@@ -337,8 +321,11 @@ function getNormalStylePropertyName( property ) {
  * @return {*} Normalized property value.
  */
 function getNormalStylePropertyValue( property, value ) {
-	if ( typeof value === 'number' && 0 !== value &&
-			! CSS_PROPERTIES_SUPPORTS_UNITLESS.has( property ) ) {
+	if (
+		typeof value === 'number' &&
+		0 !== value &&
+		! CSS_PROPERTIES_SUPPORTS_UNITLESS.has( property )
+	) {
 		return value + 'px';
 	}
 
@@ -409,7 +396,11 @@ export function renderElement( element, context, legacyContext = {} ) {
 			return renderChildren( props.children, props.value, legacyContext );
 
 		case Consumer.$$typeof:
-			return renderElement( props.children( context || type._currentValue ), context, legacyContext );
+			return renderElement(
+				props.children( context || type._currentValue ),
+				context,
+				legacyContext
+			);
 
 		case ForwardRef.$$typeof:
 			return renderElement( type.render( props ), context, legacyContext );
@@ -437,8 +428,10 @@ export function renderNativeComponent( type, props, context, legacyContext = {} 
 		// as well.
 		content = renderChildren( props.value, context, legacyContext );
 		props = omit( props, 'value' );
-	} else if ( props.dangerouslySetInnerHTML &&
-			typeof props.dangerouslySetInnerHTML.__html === 'string' ) {
+	} else if (
+		props.dangerouslySetInnerHTML &&
+		typeof props.dangerouslySetInnerHTML.__html === 'string'
+	) {
 		// Dangerous content is left unescaped.
 		content = props.dangerouslySetInnerHTML.__html;
 	} else if ( typeof props.children !== 'undefined' ) {
@@ -538,11 +531,10 @@ export function renderAttributes( props ) {
 			continue;
 		}
 
-		const isMeaningfulAttribute = (
+		const isMeaningfulAttribute =
 			isBooleanAttribute ||
 			hasPrefix( key, [ 'data-', 'aria-' ] ) ||
-			ENUMERATED_ATTRIBUTES.has( attribute )
-		);
+			ENUMERATED_ATTRIBUTES.has( attribute );
 
 		// Only write boolean value as attribute if meaningful.
 		if ( typeof value === 'boolean' && ! isMeaningfulAttribute ) {

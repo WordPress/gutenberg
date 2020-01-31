@@ -15,9 +15,7 @@ async function getSelectedFlatIndices() {
 		const indices = [];
 		let single;
 
-		Array.from(
-			document.querySelectorAll( '.wp-block' )
-		).forEach( ( node, index ) => {
+		Array.from( document.querySelectorAll( '.wp-block' ) ).forEach( ( node, index ) => {
 			if ( node.classList.contains( 'is-selected' ) ) {
 				single = index;
 			}
@@ -39,9 +37,7 @@ async function testNativeSelection() {
 	await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
 	await page.evaluate( () => {
 		const selection = window.getSelection();
-		const elements = Array.from(
-			document.querySelectorAll( '.is-multi-selected' )
-		);
+		const elements = Array.from( document.querySelectorAll( '.is-multi-selected' ) );
 
 		if ( ! elements.length ) {
 			const element = document.querySelector( '.is-selected' );
@@ -110,7 +106,10 @@ describe( 'Multi-block selection', () => {
 		// DOM-dependant side-effect setup code and doesn't seem straightforward
 		// to mock. Instead, we check for the DOM node that `wp.a11y.speak()`
 		// inserts text into.
-		const speakTextContent = await page.$eval( '#a11y-speak-assertive', ( element ) => element.textContent );
+		const speakTextContent = await page.$eval(
+			'#a11y-speak-assertive',
+			( element ) => element.textContent
+		);
 		expect( speakTextContent.trim() ).toEqual( '3 blocks selected.' );
 	} );
 
@@ -276,12 +275,12 @@ describe( 'Multi-block selection', () => {
 			const rect2 = elements[ 1 ].getBoundingClientRect();
 			return [
 				{
-					x: rect1.x + ( rect1.width / 2 ),
-					y: rect1.y + ( rect1.height / 2 ),
+					x: rect1.x + rect1.width / 2,
+					y: rect1.y + rect1.height / 2,
 				},
 				{
-					x: rect2.x + ( rect2.width / 2 ),
-					y: rect2.y + ( rect2.height / 2 ),
+					x: rect2.x + rect2.width / 2,
+					y: rect2.y + rect2.height / 2,
 				},
 			];
 		} );
@@ -310,12 +309,12 @@ describe( 'Multi-block selection', () => {
 			const rect2 = elements[ 1 ].getBoundingClientRect();
 			return [
 				{
-					x: rect1.x + ( rect1.width / 2 ),
-					y: rect1.y + ( rect1.height / 2 ),
+					x: rect1.x + rect1.width / 2,
+					y: rect1.y + rect1.height / 2,
 				},
 				{
-					x: rect2.x + ( rect2.width / 2 ),
-					y: rect2.y + ( rect2.height / 2 ),
+					x: rect2.x + rect2.width / 2,
+					y: rect2.y + rect2.height / 2,
 				},
 			];
 		} );
@@ -386,12 +385,12 @@ describe( 'Multi-block selection', () => {
 			return [
 				{
 					x: rect1.x,
-					y: rect1.y + ( rect1.height / 2 ),
+					y: rect1.y + rect1.height / 2,
 				},
 				{
 					// Move a bit outside the paragraph.
 					x: rect2.x - 10,
-					y: rect2.y + ( rect2.height / 2 ),
+					y: rect2.y + rect2.height / 2,
 				},
 			];
 		} );
@@ -424,12 +423,12 @@ describe( 'Multi-block selection', () => {
 			const rect2 = elements[ 1 ].getBoundingClientRect();
 			return [
 				{
-					x: rect1.x + ( rect1.width / 2 ),
-					y: rect1.y + ( rect1.height / 2 ),
+					x: rect1.x + rect1.width / 2,
+					y: rect1.y + rect1.height / 2,
 				},
 				{
-					x: rect2.x + ( rect2.width / 2 ),
-					y: rect2.y + ( rect2.height / 2 ),
+					x: rect2.x + rect2.width / 2,
+					y: rect2.y + rect2.height / 2,
 				},
 			];
 		} );
@@ -446,6 +445,33 @@ describe( 'Multi-block selection', () => {
 
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should clear selection when clicking next to blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+
+		await testNativeSelection();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
+
+		const coord = await page.evaluate( () => {
+			const element = document.querySelector( '.wp-block-paragraph' );
+			const rect = element.getBoundingClientRect();
+			return {
+				x: rect.x - 1,
+				y: rect.y + rect.height / 2,
+			};
+		} );
+
+		await page.mouse.click( coord.x, coord.y );
+
+		await testNativeSelection();
+		expect( await getSelectedFlatIndices() ).toEqual( [] );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

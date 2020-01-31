@@ -64,7 +64,8 @@ class GalleryImage extends Component {
 	onRemoveImage( event ) {
 		if (
 			this.container === document.activeElement &&
-			this.props.isSelected && [ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
+			this.props.isSelected &&
+			[ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
 		) {
 			event.stopPropagation();
 			event.preventDefault();
@@ -91,7 +92,22 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption, onRemove, onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel } = this.props;
+		const {
+			url,
+			alt,
+			id,
+			linkTo,
+			link,
+			isFirstItem,
+			isLastItem,
+			isSelected,
+			caption,
+			onRemove,
+			onMoveForward,
+			onMoveBackward,
+			setAttributes,
+			'aria-label': ariaLabel,
+		} = this.props;
 
 		let href;
 

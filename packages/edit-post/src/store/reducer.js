@@ -1,14 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	flow,
-	get,
-	includes,
-	omit,
-	union,
-	without,
-} from 'lodash';
+import { flow, get, includes, omit, union, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -175,10 +168,7 @@ export function removedPanels( state = [], action ) {
 	switch ( action.type ) {
 		case 'REMOVE_PANEL':
 			if ( ! includes( state, action.panelName ) ) {
-				return [
-					...state,
-					action.panelName,
-				];
+				return [ ...state, action.panelName ];
 			}
 	}
 

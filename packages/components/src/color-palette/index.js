@@ -23,33 +23,29 @@ export default function ColorPalette( {
 	onChange,
 	value,
 } ) {
-	const clearColor = useCallback(
-		() => onChange( undefined ),
-		[ onChange ]
-	);
-	const colorOptions = useMemo(
-		() => {
-			return map( colors, ( { color, name } ) => (
-				<CircularOptionPicker.Option
-					key={ color }
-					isSelected={ value === color }
-					tooltipText={ name ||
-						// translators: %s: color hex code e.g: "#f00".
-						sprintf( __( 'Color code: %s' ), color )
-					}
-					style={ { color } }
-					onClick={ value === color ? clearColor : () => onChange( color ) }
-					aria-label={ name ?
-						// translators: %s: The name of the color e.g: "vivid red".
-						sprintf( __( 'Color: %s' ), name ) :
-						// translators: %s: color hex code e.g: "#f00".
-						sprintf( __( 'Color code: %s' ), color )
-					}
-				/>
-			) );
-		},
-		[ colors, value, onChange, clearColor ]
-	);
+	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+	const colorOptions = useMemo( () => {
+		return map( colors, ( { color, name } ) => (
+			<CircularOptionPicker.Option
+				key={ color }
+				isSelected={ value === color }
+				tooltipText={
+					name ||
+					// translators: %s: color hex code e.g: "#f00".
+					sprintf( __( 'Color code: %s' ), color )
+				}
+				style={ { color } }
+				onClick={ value === color ? clearColor : () => onChange( color ) }
+				aria-label={
+					name
+						? // translators: %s: The name of the color e.g: "vivid red".
+						  sprintf( __( 'Color: %s' ), name )
+						: // translators: %s: color hex code e.g: "#f00".
+						  sprintf( __( 'Color code: %s' ), color )
+				}
+			/>
+		) );
+	}, [ colors, value, onChange, clearColor ] );
 	const renderCustomColorPicker = useCallback(
 		() => (
 			<ColorPicker
@@ -65,7 +61,7 @@ export default function ColorPalette( {
 		<CircularOptionPicker
 			className={ className }
 			options={ colorOptions }
-			actions={ (
+			actions={
 				<>
 					{ ! disableCustomColors && (
 						<CircularOptionPicker.DropdownLinkAction
@@ -85,7 +81,7 @@ export default function ColorPalette( {
 						</CircularOptionPicker.ButtonAction>
 					) }
 				</>
-			) }
+			}
 		/>
 	);
 }

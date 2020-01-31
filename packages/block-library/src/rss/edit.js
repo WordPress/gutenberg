@@ -13,10 +13,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	BlockControls,
-	InspectorControls,
-} from '@wordpress/block-editor';
+import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
 const DEFAULT_MIN_ITEMS = 1;
@@ -67,10 +64,7 @@ class RSSEdit extends Component {
 
 		if ( this.state.editing ) {
 			return (
-				<Placeholder
-					icon="rss"
-					label="RSS"
-				>
+				<Placeholder icon="rss" label="RSS">
 					<form onSubmit={ this.onSubmitURL }>
 						<TextControl
 							placeholder={ __( 'Enter URL here…' ) }
@@ -136,7 +130,7 @@ class RSSEdit extends Component {
 							checked={ displayExcerpt }
 							onChange={ this.toggleAttribute( 'displayExcerpt' ) }
 						/>
-						{ displayExcerpt &&
+						{ displayExcerpt && (
 							<RangeControl
 								label={ __( 'Max number of words in excerpt' ) }
 								value={ excerptLength }
@@ -145,8 +139,8 @@ class RSSEdit extends Component {
 								max={ 100 }
 								required
 							/>
-						}
-						{ blockLayout === 'grid' &&
+						) }
+						{ blockLayout === 'grid' && (
 							<RangeControl
 								label={ __( 'Columns' ) }
 								value={ columns }
@@ -155,14 +149,11 @@ class RSSEdit extends Component {
 								max={ 6 }
 								required
 							/>
-						}
+						) }
 					</PanelBody>
 				</InspectorControls>
 				<Disabled>
-					<ServerSideRender
-						block="core/rss"
-						attributes={ this.props.attributes }
-					/>
+					<ServerSideRender block="core/rss" attributes={ this.props.attributes } />
 				</Disabled>
 			</>
 		);

@@ -18,24 +18,13 @@ export default { title: 'Components/CheckboxControl', component: CheckboxControl
 const CheckboxControlWithState = ( { checked, ...props } ) => {
 	const [ isChecked, setChecked ] = useState( checked );
 
-	return (
-		<CheckboxControl
-			{ ...props }
-			checked={ isChecked }
-			onChange={ setChecked }
-		/>
-	);
+	return <CheckboxControl { ...props } checked={ isChecked } onChange={ setChecked } />;
 };
 
 export const _default = () => {
 	const label = text( 'Label', 'Is author' );
 
-	return (
-		<CheckboxControlWithState
-			label={ label }
-			checked
-		/>
-	);
+	return <CheckboxControlWithState label={ label } checked />;
 };
 
 export const all = () => {
@@ -43,12 +32,5 @@ export const all = () => {
 	const label = text( 'Label', 'Is author' );
 	const help = text( 'Help', 'Is the user an author or not?' );
 
-	return (
-		<CheckboxControlWithState
-			heading={ heading }
-			label={ label }
-			help={ help }
-			checked
-		/>
-	);
+	return <CheckboxControlWithState heading={ heading } label={ label } help={ help } checked />;
 };

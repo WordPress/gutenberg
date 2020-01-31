@@ -20,12 +20,15 @@ getPackages().forEach( ( entry ) => {
 			join( __dirname, '..', '..', 'node_modules', '.bin', 'docgen' ).replace( / /g, '\\ ' ),
 			[
 				target,
-				`--output docs/designers-developers/developers/data/data-${ packageName.replace( '/', '-' ) }.md`,
+				`--output docs/designers-developers/developers/data/data-${ packageName.replace(
+					'/',
+					'-'
+				) }.md`,
 				'--to-token',
 				`--use-token "${ token }"`,
 				'--ignore "/unstable|experimental/i"',
 			],
-			{ shell: true },
+			{ shell: true }
 		);
 
 		if ( status !== 0 ) {

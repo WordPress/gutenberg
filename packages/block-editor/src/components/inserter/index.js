@@ -11,9 +11,8 @@ import { Dropdown, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import {
-	createBlock,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
+import { plusCircle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -30,7 +29,7 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingl
 	}
 	return (
 		<Button
-			icon="insert"
+			icon={ plusCircle }
 			label={ label }
 			tooltipPosition="bottom"
 			onClick={ onToggle }
@@ -135,23 +134,18 @@ class Inserter extends Component {
 
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
-		const {
-			getBlockRootClientId,
-			hasInserterItems,
-			__experimentalGetAllowedBlocks,
-		} = select( 'core/block-editor' );
-		const {
-			__experimentalGetBlockPatterns: getBlockPatterns,
-		} = select( 'core/blocks' );
+		const { getBlockRootClientId, hasInserterItems, __experimentalGetAllowedBlocks } = select(
+			'core/block-editor'
+		);
+		const { __experimentalGetBlockPatterns: getBlockPatterns } = select( 'core/blocks' );
 
 		rootClientId = rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
-		const hasSingleBlockType = (
+		const hasSingleBlockType =
 			size( allowedBlocks ) === 1 &&
-			size( getBlockPatterns( allowedBlocks[ 0 ].name, 'inserter' ) ) === 0
-		);
+			size( getBlockPatterns( allowedBlocks[ 0 ].name, 'inserter' ) ) === 0;
 
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
@@ -181,11 +175,9 @@ export default compose( [
 				}
 
 				function getInsertionIndex() {
-					const {
-						getBlockIndex,
-						getBlockSelectionEnd,
-						getBlockOrder,
-					} = select( 'core/block-editor' );
+					const { getBlockIndex, getBlockSelectionEnd, getBlockOrder } = select(
+						'core/block-editor'
+					);
 
 					// If the clientId is defined, we insert at the position of the block.
 					if ( clientId ) {
@@ -202,18 +194,11 @@ export default compose( [
 					return getBlockOrder( rootClientId ).length;
 				}
 
-				const {
-					insertBlock,
-				} = dispatch( 'core/block-editor' );
+				const { insertBlock } = dispatch( 'core/block-editor' );
 
 				const blockToInsert = createBlock( allowedBlockType.name );
 
-				insertBlock(
-					blockToInsert,
-					getInsertionIndex(),
-					rootClientId,
-					selectBlockOnInsert
-				);
+				insertBlock( blockToInsert, getInsertionIndex(), rootClientId, selectBlockOnInsert );
 
 				if ( ! selectBlockOnInsert ) {
 					// translators: %s: the name of the block that has been added

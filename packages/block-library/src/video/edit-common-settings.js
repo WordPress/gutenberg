@@ -2,23 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	ToggleControl,
-	SelectControl,
-} from '@wordpress/components';
+import { ToggleControl, SelectControl } from '@wordpress/components';
 
 const VideoSettings = ( { setAttributes, attributes } ) => {
-	const {
-		autoplay,
-		controls,
-		loop,
-		muted,
-		playsInline,
-		preload,
-	} = attributes;
+	const { autoplay, controls, loop, muted, playsInline, preload } = attributes;
 
 	const getAutoplayHelp = ( checked ) => {
-		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
+		return checked
+			? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' )
+			: null;
 	};
 
 	const toggleAttribute = ( attribute ) => {

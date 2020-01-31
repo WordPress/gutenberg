@@ -2,12 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import {
-	find,
-	isNil,
-	pickBy,
-	startsWith,
-} from 'lodash';
+import { find, isNil, pickBy, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -101,9 +96,10 @@ function createPrepareEditableTree( props, prefix ) {
 		return accumulator;
 	}, [] );
 
-	return ( value ) => fns.reduce( ( accumulator, fn ) => {
-		return fn( accumulator, value.text );
-	}, value.formats );
+	return ( value ) =>
+		fns.reduce( ( accumulator, fn ) => {
+			return fn( accumulator, value.text );
+		}, value.formats );
 }
 
 /**
@@ -135,11 +131,7 @@ function fixPlaceholderSelection() {
  * See export statement below.
  */
 class RichText extends Component {
-	constructor( {
-		value,
-		selectionStart,
-		selectionEnd,
-	} ) {
+	constructor( { value, selectionStart, selectionEnd } ) {
 		super( ...arguments );
 
 		this.onFocus = this.onFocus.bind( this );
@@ -193,11 +185,7 @@ class RichText extends Component {
 	}
 
 	createRecord() {
-		const {
-			__unstableMultilineTag: multilineTag,
-			forwardedRef,
-			preserveWhiteSpace,
-		} = this.props;
+		const { __unstableMultilineTag: multilineTag, forwardedRef, preserveWhiteSpace } = this.props;
 		const selection = getSelection();
 		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
@@ -233,11 +221,7 @@ class RichText extends Component {
 	 * @param {ClipboardEvent} event The paste event.
 	 */
 	onPaste( event ) {
-		const {
-			formatTypes,
-			onPaste,
-			__unstableIsSelected: isSelected,
-		} = this.props;
+		const { formatTypes, onPaste, __unstableIsSelected: isSelected } = this.props;
 		const { activeFormats = [] } = this.state;
 
 		if ( ! isSelected ) {
@@ -367,10 +351,13 @@ class RichText extends Component {
 		} else {
 			this.props.onSelectionChange( this.record.start, this.record.end );
 			this.setState( {
-				activeFormats: getActiveFormats( {
-					...this.record,
-					activeFormats: undefined,
-				}, EMPTY_ACTIVE_FORMATS ),
+				activeFormats: getActiveFormats(
+					{
+						...this.record,
+						activeFormats: undefined,
+					},
+					EMPTY_ACTIVE_FORMATS
+				),
 			} );
 		}
 
@@ -421,10 +408,10 @@ class RichText extends Component {
 		// The browser formatted something or tried to insert HTML.
 		// Overwrite it. It will be handled later by the format library if
 		// needed.
-		if ( inputType && (
-			inputType.indexOf( 'format' ) === 0 ||
-			INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType )
-		) ) {
+		if (
+			inputType &&
+			( inputType.indexOf( 'format' ) === 0 || INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType ) )
+		) {
 			this.applyRecord( this.record );
 			return;
 		}
@@ -445,6 +432,7 @@ class RichText extends Component {
 		const {
 			__unstableInputRule: inputRule,
 			__unstableMarkAutomaticChange: markAutomaticChange,
+			__unstableAllowPrefixTransformations: allowPrefixTransformations,
 			formatTypes,
 			setTimeout,
 			clearTimeout,
@@ -453,6 +441,10 @@ class RichText extends Component {
 		// Create an undo level when input stops for over a second.
 		clearTimeout( this.onInput.timeout );
 		this.onInput.timeout = setTimeout( this.onCreateUndoLevel, 1000 );
+
+		if ( ! allowPrefixTransformations ) {
+			return;
+		}
 
 		// Only run input rules when inserting text.
 		if ( inputType !== 'insertText' ) {
@@ -503,10 +495,7 @@ class RichText extends Component {
 	 * @param {Event|WPSyntheticEvent|DOMHighResTimeStamp} event
 	 */
 	onSelectionChange( event ) {
-		if (
-			event.type !== 'selectionchange' &&
-			! this.props.__unstableIsSelected
-		) {
+		if ( event.type !== 'selectionchange' && ! this.props.__unstableIsSelected ) {
 			return;
 		}
 
@@ -723,8 +712,12 @@ class RichText extends Component {
 
 		if (
 			// Only override when no modifiers are pressed.
-			shiftKey || altKey || metaKey || ctrlKey ||
-			keyCode !== SPACE || multilineTag !== 'li'
+			shiftKey ||
+			altKey ||
+			metaKey ||
+			ctrlKey ||
+			keyCode !== SPACE ||
+			multilineTag !== 'li'
 		) {
 			return;
 		}
@@ -759,7 +752,10 @@ class RichText extends Component {
 
 		if (
 			// Only override left and right keys without modifiers pressed.
-			shiftKey || altKey || metaKey || ctrlKey ||
+			shiftKey ||
+			altKey ||
+			metaKey ||
+			ctrlKey ||
 			( keyCode !== LEFT && keyCode !== RIGHT )
 		) {
 			return;
@@ -891,23 +887,14 @@ class RichText extends Component {
 		let shouldReapply = tagName !== prevProps.tagName;
 
 		// Check if the content changed.
-		shouldReapply = shouldReapply || (
-			value !== prevProps.value &&
-			value !== this.value
-		);
+		shouldReapply = shouldReapply || ( value !== prevProps.value && value !== this.value );
 
-		const selectionChanged = (
-			selectionStart !== prevProps.selectionStart &&
-			selectionStart !== this.record.start
-		) || (
-			selectionEnd !== prevProps.selectionEnd &&
-			selectionEnd !== this.record.end
-		);
+		const selectionChanged =
+			( selectionStart !== prevProps.selectionStart && selectionStart !== this.record.start ) ||
+			( selectionEnd !== prevProps.selectionEnd && selectionEnd !== this.record.end );
 
 		// Check if the selection changed.
-		shouldReapply = shouldReapply || (
-			isSelected && ! prevProps.isSelected && selectionChanged
-		);
+		shouldReapply = shouldReapply || ( isSelected && ! prevProps.isSelected && selectionChanged );
 
 		const prefix = 'format_prepare_props_';
 		const predicate = ( v, key ) => key.startsWith( prefix );
@@ -915,12 +902,10 @@ class RichText extends Component {
 		const prevPrepareProps = pickBy( prevProps, predicate );
 
 		// Check if any format props changed.
-		shouldReapply = shouldReapply ||
-			! isShallowEqual( prepareProps, prevPrepareProps );
+		shouldReapply = shouldReapply || ! isShallowEqual( prepareProps, prevPrepareProps );
 
 		// Rerender if the placeholder changed.
-		shouldReapply = shouldReapply ||
-			placeholder !== prevProps.placeholder;
+		shouldReapply = shouldReapply || placeholder !== prevProps.placeholder;
 
 		if ( shouldReapply ) {
 			this.value = value;
@@ -944,11 +929,7 @@ class RichText extends Component {
 	 * @return {Object} An internal rich-text value.
 	 */
 	formatToValue( value ) {
-		const {
-			format,
-			__unstableMultilineTag: multilineTag,
-			preserveWhiteSpace,
-		} = this.props;
+		const { format, __unstableMultilineTag: multilineTag, preserveWhiteSpace } = this.props;
 
 		if ( format !== 'string' ) {
 			return value;
@@ -994,11 +975,7 @@ class RichText extends Component {
 	 * @return {*} The external data format, data type depends on props.
 	 */
 	valueToFormat( value ) {
-		const {
-			format,
-			__unstableMultilineTag: multilineTag,
-			preserveWhiteSpace,
-		} = this.props;
+		const { format, __unstableMultilineTag: multilineTag, preserveWhiteSpace } = this.props;
 
 		value = this.removeEditorOnlyFormats( value );
 
@@ -1018,8 +995,7 @@ class RichText extends Component {
 			forwardedRef,
 			disabled,
 		} = this.props;
-		const ariaProps = pickBy( this.props, ( value, key ) =>
-			startsWith( key, 'aria-' ) );
+		const ariaProps = pickBy( this.props, ( value, key ) => startsWith( key, 'aria-' ) );
 
 		return (
 			<TagName
@@ -1036,10 +1012,14 @@ class RichText extends Component {
 				onInput={ this.onInput }
 				onCompositionStart={ this.onCompositionStart }
 				onCompositionEnd={ this.onCompositionEnd }
-				onKeyDown={ props.onKeyDown ? ( event ) => {
-					props.onKeyDown( event );
-					this.onKeyDown( event );
-				} : this.onKeyDown }
+				onKeyDown={
+					props.onKeyDown
+						? ( event ) => {
+								props.onKeyDown( event );
+								this.onKeyDown( event );
+						  }
+						: this.onKeyDown
+				}
 				onFocus={ this.onFocus }
 				onBlur={ this.onBlur }
 				onMouseDown={ this.onPointerDown }
@@ -1076,26 +1056,26 @@ class RichText extends Component {
 
 		return (
 			<>
-				<BoundaryStyle
-					activeFormats={ activeFormats }
-					forwardedRef={ forwardedRef }
-				/>
+				<BoundaryStyle activeFormats={ activeFormats } forwardedRef={ forwardedRef } />
 				<InlineWarning forwardedRef={ forwardedRef } />
-				{ isSelected && <FormatEdit
-					allowedFormats={ allowedFormats }
-					withoutInteractiveFormatting={ withoutInteractiveFormatting }
-					value={ this.record }
-					onChange={ this.onChange }
-					onFocus={ onFocus }
-					formatTypes={ formatTypes }
-				/> }
-				{ children && children( {
-					isSelected,
-					value: this.record,
-					onChange: this.onChange,
-					onFocus,
-					Editable: this.Editable,
-				} ) }
+				{ isSelected && (
+					<FormatEdit
+						allowedFormats={ allowedFormats }
+						withoutInteractiveFormatting={ withoutInteractiveFormatting }
+						value={ this.record }
+						onChange={ this.onChange }
+						onFocus={ onFocus }
+						formatTypes={ formatTypes }
+					/>
+				) }
+				{ children &&
+					children( {
+						isSelected,
+						value: this.record,
+						onChange: this.onChange,
+						onFocus,
+						Editable: this.Editable,
+					} ) }
 				{ ! children && <this.Editable /> }
 			</>
 		);
@@ -1107,10 +1087,7 @@ RichText.defaultProps = {
 	value: '',
 };
 
-const RichTextWrapper = compose( [
-	withSafeTimeout,
-	withFormatTypes,
-] )( RichText );
+const RichTextWrapper = compose( [ withSafeTimeout, withFormatTypes ] )( RichText );
 
 /**
  * Renders a rich content input, providing users with the option to format the

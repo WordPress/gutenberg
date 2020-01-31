@@ -834,7 +834,7 @@ exports[`Storyshots Components/Card Default 1`] = `
 }
 
 .emotion-6.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -970,7 +970,7 @@ exports[`Storyshots Components/Card/Body Default 1`] = `
 }
 
 .emotion-2.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1026,7 +1026,7 @@ exports[`Storyshots Components/Card/Divider Default 1`] = `
 }
 
 .emotion-6.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1100,7 +1100,7 @@ exports[`Storyshots Components/Card/Footer Default 1`] = `
 }
 
 .emotion-2.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1167,7 +1167,7 @@ exports[`Storyshots Components/Card/Header Default 1`] = `
 }
 
 .emotion-2.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1234,7 +1234,7 @@ exports[`Storyshots Components/Card/Media Default 1`] = `
 }
 
 .emotion-4.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-2 {
@@ -1321,7 +1321,7 @@ exports[`Storyshots Components/Card/Media Header And Footer 1`] = `
 }
 
 .emotion-6.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1467,7 +1467,7 @@ Array [
 }
 
 .emotion-7.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-7.is-right {
@@ -1575,7 +1575,7 @@ exports[`Storyshots Components/Card/Media Iframe Embed 1`] = `
 }
 
 .emotion-4.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1678,7 +1678,7 @@ exports[`Storyshots Components/Card/Media On Bottom 1`] = `
 }
 
 .emotion-4.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1765,7 +1765,7 @@ exports[`Storyshots Components/Card/Media On Top 1`] = `
 }
 
 .emotion-4.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-2 {
@@ -1868,16 +1868,16 @@ exports[`Storyshots Components/CheckboxControl All 1`] = `
       />
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-yes components-checkbox-control__checked"
+        className="components-checkbox-control__checked"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M14.83 4.89l1.34.94-5.81 8.38H9.02L5.78 9.67l1.34-1.25 2.57 2.4z"
+          d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
         />
       </svg>
     </span>
@@ -1917,16 +1917,16 @@ exports[`Storyshots Components/CheckboxControl Default 1`] = `
       />
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-yes components-checkbox-control__checked"
+        className="components-checkbox-control__checked"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M14.83 4.89l1.34.94-5.81 8.38H9.02L5.78 9.67l1.34-1.25 2.57 2.4z"
+          d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
         />
       </svg>
     </span>
@@ -2554,7 +2554,7 @@ exports[`Storyshots Components/CustomSelectControl Default 1`] = `
     aria-expanded={false}
     aria-haspopup="listbox"
     aria-label="Font Size"
-    className="components-button components-custom-select-control__button"
+    className="components-button components-custom-select-control__button is-small"
     id="downshift-null-toggle-button"
     onClick={[Function]}
     onKeyDown={[Function]}
@@ -3092,7 +3092,7 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
         aria-expanded={false}
         aria-haspopup="listbox"
         aria-label="Preset Size"
-        className="components-button components-custom-select-control__button"
+        className="components-button components-custom-select-control__button is-small"
         id="downshift-null-toggle-button"
         onClick={[Function]}
         onKeyDown={[Function]}
@@ -3180,7 +3180,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
         aria-expanded={false}
         aria-haspopup="listbox"
         aria-label="Preset Size"
-        className="components-button components-custom-select-control__button"
+        className="components-button components-custom-select-control__button is-small"
         id="downshift-null-toggle-button"
         onClick={[Function]}
         onKeyDown={[Function]}
@@ -3312,7 +3312,7 @@ exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
         aria-expanded={false}
         aria-haspopup="listbox"
         aria-label="Preset Size"
-        className="components-button components-custom-select-control__button"
+        className="components-button components-custom-select-control__button is-small"
         id="downshift-null-toggle-button"
         onClick={[Function]}
         onKeyDown={[Function]}
@@ -3883,23 +3883,15 @@ exports[`Storyshots Components/Panel Default 1`] = `
             aria-hidden="true"
             className="components-panel__arrow"
             focusable="false"
-            height="24px"
+            height={24}
             role="img"
             viewBox="0 0 24 24"
-            width="24px"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <g>
-              <path
-                d="M0,0h24v24H0V0z"
-                fill="none"
-              />
-            </g>
-            <g>
-              <path
-                d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
-              />
-            </g>
+            <path
+              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            />
           </svg>
         </span>
         My Block Settings
@@ -3944,23 +3936,15 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
             aria-hidden="true"
             className="components-panel__arrow"
             focusable="false"
-            height="24px"
+            height={24}
             role="img"
             viewBox="0 0 24 24"
-            width="24px"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <g>
-              <path
-                d="M0,0h24v24H0V0z"
-                fill="none"
-              />
-            </g>
-            <g>
-              <path
-                d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
-              />
-            </g>
+            <path
+              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            />
           </svg>
         </span>
         First Settings
@@ -3991,23 +3975,15 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
             aria-hidden="true"
             className="components-panel__arrow"
             focusable="false"
-            height="24px"
+            height={24}
             role="img"
             viewBox="0 0 24 24"
-            width="24px"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <g>
-              <path
-                d="M0,0h24v24H0V0z"
-                fill="none"
-              />
-            </g>
-            <g>
-              <path
-                d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
-              />
-            </g>
+            <path
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+            />
           </svg>
         </span>
         Second Settings
@@ -4047,23 +4023,15 @@ exports[`Storyshots Components/Panel With Icon 1`] = `
             aria-hidden="true"
             className="components-panel__arrow"
             focusable="false"
-            height="24px"
+            height={24}
             role="img"
             viewBox="0 0 24 24"
-            width="24px"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <g>
-              <path
-                d="M0,0h24v24H0V0z"
-                fill="none"
-              />
-            </g>
-            <g>
-              <path
-                d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
-              />
-            </g>
+            <path
+              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            />
           </svg>
         </span>
         My Block Settings
@@ -4221,8 +4189,7 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
       Move the gray box around.
     </p>
     <p>
-      The
-       
+      The 
       <strong
         style={
           Object {
@@ -4232,12 +4199,10 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
       >
         pink bordered
       </strong>
-       
-      element is a parent.
+       element is a parent.
     </p>
     <p>
-      The
-       
+      The 
       <strong
         style={
           Object {
@@ -4247,8 +4212,7 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
       >
         cyan bordered
       </strong>
-       
-      element is a sibling to 
+       element is a sibling to 
       <strong>
         Popover
       </strong>
@@ -5686,8 +5650,7 @@ Array [
     This should not show.
   </div>,
   <div>
-    This text will
-     
+    This text will 
     <span
       className="components-visually-hidden"
     >

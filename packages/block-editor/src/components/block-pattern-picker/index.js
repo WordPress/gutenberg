@@ -22,19 +22,12 @@ function BlockPatternPicker( {
 	} );
 
 	return (
-		<Placeholder
-			icon={ icon }
-			label={ label }
-			instructions={ instructions }
-			className={ classes }
-		>
-			{
-				/*
-				* Disable reason: The `list` ARIA role is redundant but
-				* Safari+VoiceOver won't announce the list otherwise.
-				*/
-				/* eslint-disable jsx-a11y/no-redundant-roles */
-			}
+		<Placeholder icon={ icon } label={ label } instructions={ instructions } className={ classes }>
+			{ /*
+			 * Disable reason: The `list` ARIA role is redundant but
+			 * Safari+VoiceOver won't announce the list otherwise.
+			 */
+			/* eslint-disable jsx-a11y/no-redundant-roles */ }
 			<ul className="block-editor-block-pattern-picker__patterns" role="list">
 				{ patterns.map( ( pattern ) => (
 					<li key={ pattern.name }>
@@ -52,10 +45,7 @@ function BlockPatternPicker( {
 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			{ allowSkip && (
 				<div className="block-editor-block-pattern-picker__skip">
-					<Button
-						isLink
-						onClick={ () => onSelect() }
-					>
+					<Button isLink onClick={ () => onSelect() }>
 						{ __( 'Skip' ) }
 					</Button>
 				</div>

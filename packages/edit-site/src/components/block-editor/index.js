@@ -41,11 +41,7 @@ export default function BlockEditor( { settings: _settings } ) {
 			},
 		};
 	}, [ canUserCreateMedia, _settings ] );
-	const [ content, _setContent ] = useEntityProp(
-		'postType',
-		'wp_template',
-		'content'
-	);
+	const [ content, _setContent ] = useEntityProp( 'postType', 'wp_template', 'content' );
 	const initialBlocks = useMemo( () => {
 		if ( typeof content !== 'function' ) {
 			const parsedContent = parse( content );

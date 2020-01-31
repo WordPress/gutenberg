@@ -19,9 +19,11 @@ describe( 'ThemeSupportCheck', () => {
 			'post-thumbnails': true,
 		};
 		const supportKeys = 'post-thumbnails';
-		const wrapper = shallow( <ThemeSupportCheck
-			supportKeys={ supportKeys }
-			themeSupports={ themeSupports }>foobar</ThemeSupportCheck> );
+		const wrapper = shallow(
+			<ThemeSupportCheck supportKeys={ supportKeys } themeSupports={ themeSupports }>
+				foobar
+			</ThemeSupportCheck>
+		);
 		expect( wrapper.type() ).not.toBe( null );
 	} );
 
@@ -30,10 +32,15 @@ describe( 'ThemeSupportCheck', () => {
 			'post-thumbnails': [ 'post' ],
 		};
 		const supportKeys = 'post-thumbnails';
-		const wrapper = shallow( <ThemeSupportCheck
-			supportKeys={ supportKeys }
-			postType={ 'post' }
-			themeSupports={ themeSupports }>foobar</ThemeSupportCheck> );
+		const wrapper = shallow(
+			<ThemeSupportCheck
+				supportKeys={ supportKeys }
+				postType={ 'post' }
+				themeSupports={ themeSupports }
+			>
+				foobar
+			</ThemeSupportCheck>
+		);
 		expect( wrapper.type() ).not.toBe( null );
 	} );
 
@@ -42,10 +49,15 @@ describe( 'ThemeSupportCheck', () => {
 			'post-thumbnails': [ 'post' ],
 		};
 		const supportKeys = 'post-thumbnails';
-		const wrapper = shallow( <ThemeSupportCheck
-			supportKeys={ supportKeys }
-			postType={ 'page' }
-			themeSupports={ themeSupports }>foobar</ThemeSupportCheck> );
+		const wrapper = shallow(
+			<ThemeSupportCheck
+				supportKeys={ supportKeys }
+				postType={ 'page' }
+				themeSupports={ themeSupports }
+			>
+				foobar
+			</ThemeSupportCheck>
+		);
 		expect( wrapper.type() ).toBe( null );
 	} );
 
@@ -54,10 +66,15 @@ describe( 'ThemeSupportCheck', () => {
 			'post-thumbnails': [ 'post' ],
 		};
 		const supportKeys = 'post-thumbnails';
-		const wrapper = shallow( <ThemeSupportCheck
-			supportKeys={ supportKeys }
-			postType={ false }
-			themeSupports={ themeSupports }>foobar</ThemeSupportCheck> );
+		const wrapper = shallow(
+			<ThemeSupportCheck
+				supportKeys={ supportKeys }
+				postType={ false }
+				themeSupports={ themeSupports }
+			>
+				foobar
+			</ThemeSupportCheck>
+		);
 		expect( wrapper.type() ).toBe( null );
 	} );
 
@@ -66,9 +83,11 @@ describe( 'ThemeSupportCheck', () => {
 			'post-thumbnails': false,
 		};
 		const supportKeys = 'post-thumbnails';
-		const wrapper = shallow( <ThemeSupportCheck
-			supportKeys={ supportKeys }
-			themeSupports={ themeSupports }>foobar</ThemeSupportCheck> );
+		const wrapper = shallow(
+			<ThemeSupportCheck supportKeys={ supportKeys } themeSupports={ themeSupports }>
+				foobar
+			</ThemeSupportCheck>
+		);
 		expect( wrapper.type() ).toBe( null );
 	} );
 } );

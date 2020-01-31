@@ -11,10 +11,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { __ } from '@wordpress/i18n';
-import {
-	Inserter,
-	BlockToolbar,
-} from '@wordpress/block-editor';
+import { Inserter, BlockToolbar } from '@wordpress/block-editor';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 
 /**
@@ -67,11 +64,9 @@ function HeaderToolbar( {
 						extraProps={ { hint: __( 'Double tap to redo last change' ) } }
 					/>
 				</Toolbar>
-				{ hasFixedToolbar &&
-					<BlockToolbar />
-				}
+				{ hasFixedToolbar && <BlockToolbar /> }
 			</ScrollView>
-			{ showKeyboardHideButton &&
+			{ showKeyboardHideButton && (
 				<Toolbar passedStyle={ styles.keyboardHideContainer }>
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
@@ -80,7 +75,7 @@ function HeaderToolbar( {
 						extraProps={ { hint: __( 'Tap to hide the keyboard' ) } }
 					/>
 				</Toolbar>
-			}
+			) }
 		</View>
 	);
 }
@@ -91,7 +86,9 @@ export default compose( [
 		hasUndo: select( 'core/editor' ).hasEditorUndo(),
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		// This setting (richEditingEnabled) should not live in the block editor's setting.
-		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+		showInserter:
+			select( 'core/edit-post' ).getEditorMode() === 'visual' &&
+			select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
 	} ) ),
 	withDispatch( ( dispatch ) => {

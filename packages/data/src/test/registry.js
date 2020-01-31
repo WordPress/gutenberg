@@ -54,8 +54,12 @@ describe( 'createRegistry', () => {
 
 		it( 'should throw if not all required config elements are present', () => {
 			expect( () => registry.registerGenericStore( 'grocer', {} ) ).toThrow();
-			expect( () => registry.registerGenericStore( 'grocer', { getSelectors, getActions } ) ).toThrow();
-			expect( () => registry.registerGenericStore( 'grocer', { getActions, subscribe } ) ).toThrow();
+			expect( () =>
+				registry.registerGenericStore( 'grocer', { getSelectors, getActions } )
+			).toThrow();
+			expect( () =>
+				registry.registerGenericStore( 'grocer', { getActions, subscribe } )
+			).toThrow();
 		} );
 
 		describe( 'getSelectors', () => {
@@ -109,15 +113,19 @@ describe( 'createRegistry', () => {
 
 				registry.dispatch( 'grocer' ).setPrice( 'broccoli', 3 );
 				expect( dispatch ).toHaveBeenCalledTimes( 1 );
-				expect( dispatch ).toHaveBeenCalledWith(
-					{ type: 'SET_PRICE', itemName: 'broccoli', price: 3 }
-				);
+				expect( dispatch ).toHaveBeenCalledWith( {
+					type: 'SET_PRICE',
+					itemName: 'broccoli',
+					price: 3,
+				} );
 
 				registry.dispatch( 'grocer' ).setQuantity( 'lettuce', 8 );
 				expect( dispatch ).toHaveBeenCalledTimes( 2 );
-				expect( dispatch ).toHaveBeenCalledWith(
-					{ type: 'SET_QUANTITY', itemName: 'lettuce', quantity: 8 }
-				);
+				expect( dispatch ).toHaveBeenCalledWith( {
+					type: 'SET_QUANTITY',
+					itemName: 'lettuce',
+					quantity: 8,
+				} );
 			} );
 		} );
 
@@ -393,7 +401,7 @@ describe( 'createRegistry', () => {
 			return promise;
 		} );
 
-		it( 'should invalidate the resolver\'s resolution cache', async () => {
+		it( "should invalidate the resolver's resolution cache", async () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
 					return action.type === 'SET_OK' && state === 'NOTOK' ? 'OK' : 'NOTOK';
@@ -588,12 +596,10 @@ describe( 'createRegistry', () => {
 			} );
 			// state = 1
 			const dispatchResult = await registry.dispatch( 'counter' ).increment();
-			await expect( dispatchResult ).toEqual(
-				{
-					type: 'increment',
-					count: 1,
-				}
-			);
+			await expect( dispatchResult ).toEqual( {
+				type: 'increment',
+				count: 1,
+			} );
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
 		} );

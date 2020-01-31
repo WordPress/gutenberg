@@ -9,6 +9,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
+	showMediaEditorButton,
 } from 'react-native-gutenberg-bridge';
 import { isEmpty, map, get } from 'lodash';
 
@@ -34,6 +35,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	BlockAlignmentToolbar,
+	MediaEdit,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -48,12 +50,10 @@ import { image as icon } from '@wordpress/icons';
 import styles from './styles.scss';
 import { editImageIcon } from './icon';
 import SvgIconRetry from './icon-retry';
+import SvgIconCustomize from './icon-customize';
 import { getUpdatedLinkTargetSettings } from './utils';
 
-import {
-	LINK_DESTINATION_CUSTOM,
-	LINK_DESTINATION_NONE,
-} from './constants';
+import { LINK_DESTINATION_CUSTOM, LINK_DESTINATION_NONE } from './constants';
 
 const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
@@ -297,7 +297,10 @@ export class ImageEdit extends React.Component {
 			case ICON_TYPE.RETRY:
 				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 			case ICON_TYPE.PLACEHOLDER:
-				iconStyle = this.props.getStylesFromColorScheme( styles.iconPlaceholder, styles.iconPlaceholderDark );
+				iconStyle = this.props.getStylesFromColorScheme(
+					styles.iconPlaceholder,
+					styles.iconPlaceholderDark
+				);
 				break;
 			case ICON_TYPE.UPLOAD:
 				iconStyle = this.props.getStylesFromColorScheme( styles.iconUpload, styles.iconUploadDark );
@@ -315,11 +318,7 @@ export class ImageEdit extends React.Component {
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton
-						title={ __( 'Edit image' ) }
-						icon={ editImageIcon }
-						onClick={ open }
-					/>
+					<ToolbarButton title={ __( 'Edit image' ) } icon={ editImageIcon } onClick={ open } />
 				</ToolbarGroup>
 				<BlockAlignmentToolbar
 					value={ align }
@@ -331,7 +330,7 @@ export class ImageEdit extends React.Component {
 
 		const getInspectorControls = () => (
 			<InspectorControls>
-				<PanelBody title={ __( 'Image settings' ) } >
+				<PanelBody title={ __( 'Image settings' ) }>
 					<TextControl
 						icon={ 'admin-links' }
 						label={ __( 'Link To' ) }
@@ -349,7 +348,7 @@ export class ImageEdit extends React.Component {
 						onChange={ this.onSetNewTab }
 					/>
 					{ // eslint-disable-next-line no-undef
-						image && __DEV__ &&
+					image && __DEV__ && (
 						<SelectControl
 							hideCancelButton
 							icon={ 'editor-expand' }
@@ -357,7 +356,8 @@ export class ImageEdit extends React.Component {
 							value={ sizeOptionLabels[ sizeSlug || DEFAULT_SIZE_SLUG ] }
 							onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
 							options={ sizeOptions }
-						/> }
+						/>
+					) }
 					<TextControl
 						icon={ 'editor-textcolor' }
 						label={ __( 'Alt Text' ) }
@@ -373,7 +373,7 @@ export class ImageEdit extends React.Component {
 
 		if ( ! url ) {
 			return (
-				<View style={ { flex: 1 } } >
+				<View style={ { flex: 1 } }>
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 						onSelect={ this.onSelectMediaUploadOption }
@@ -394,6 +394,15 @@ export class ImageEdit extends React.Component {
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 
+		const editImageComponent = ( { open, mediaOptions } ) => (
+			<TouchableWithoutFeedback onPress={ open }>
+				<View style={ styles.edit }>
+					{ mediaOptions() }
+					<Icon icon={ SvgIconCustomize } { ...styles.iconCustomise } />
+				</View>
+			</TouchableWithoutFeedback>
+		);
+
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
@@ -404,9 +413,7 @@ export class ImageEdit extends React.Component {
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
 					{ getMediaOptions() }
-					{ ( ! this.state.isCaptionSelected ) &&
-						getToolbarEditButton( openMediaOptions )
-					}
+					{ ! this.state.isCaptionSelected && getToolbarEditButton( openMediaOptions ) }
 					<MediaUploadProgress
 						height={ height }
 						width={ width }
@@ -416,48 +423,88 @@ export class ImageEdit extends React.Component {
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
+						renderContent={ ( {
+							isUploadInProgress,
+							isUploadFailed,
+							finalWidth,
+							finalHeight,
+							imageWidthWithinContainer,
+							retryMessage,
+						} ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
-							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed || this.state.isCaptionSelected ) ? styles.imageBorder : '';
+							const imageBorderOnSelectedStyle =
+								isSelected &&
+								! ( isUploadInProgress || isUploadFailed || this.state.isCaptionSelected )
+									? styles.imageBorder
+									: '';
 
 							const iconRetryContainer = (
-								<View style={ styles.modalIcon }>
-									{ this.getIcon( ICON_TYPE.RETRY ) }
-								</View>
+								<View style={ styles.modalIcon }>{ this.getIcon( ICON_TYPE.RETRY ) }</View>
 							);
 
 							return (
-								<View style={ {
-									flex: 1,
-									// only set alignSelf if an image exists because alignSelf causes the placeholder
-									// to disappear when an aligned image can't be downloaded
-									// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
-									alignSelf: imageWidthWithinContainer && alignToFlex[ align ] }
-								} >
-									{ ! imageWidthWithinContainer &&
-										<View style={ [ this.props.getStylesFromColorScheme( styles.imageContainerUpload, styles.imageContainerUploadDark ),
-											{ height: imageContainerHeight } ] } >
+								<View
+									style={ {
+										flex: 1,
+										// only set alignSelf if an image exists because alignSelf causes the placeholder
+										// to disappear when an aligned image can't be downloaded
+										// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
+										alignSelf: imageWidthWithinContainer && alignToFlex[ align ],
+									} }
+								>
+									{ ! imageWidthWithinContainer && (
+										<View
+											style={ [
+												this.props.getStylesFromColorScheme(
+													styles.imageContainerUpload,
+													styles.imageContainerUploadDark
+												),
+												{ height: imageContainerHeight },
+											] }
+										>
 											<View style={ styles.imageUploadingIconContainer }>
 												{ this.getIcon( ICON_TYPE.UPLOAD ) }
 											</View>
-										</View> }
+										</View>
+									) }
 									<ImageBackground
 										accessible={ true }
 										disabled={ ! isSelected }
 										accessibilityLabel={ alt }
 										accessibilityHint={ __( 'Double tap and hold to edit' ) }
 										accessibilityRole={ 'imagebutton' }
-										style={ [ imageBorderOnSelectedStyle, { width: finalWidth, height: finalHeight, opacity } ] }
+										style={ [
+											imageBorderOnSelectedStyle,
+											{ width: finalWidth, height: finalHeight, opacity },
+										] }
 										resizeMethod="scale"
 										source={ { uri: url } }
 										key={ url }
 									>
-										{ isUploadFailed &&
-											<View style={ [ styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
+										{ isUploadFailed && (
+											<View
+												style={ [
+													styles.imageContainer,
+													{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+												] }
+											>
 												{ iconRetryContainer }
 												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 											</View>
-										}
+										) }
+										{ ! isUploadInProgress &&
+											! isUploadFailed &&
+											finalWidth &&
+											finalHeight &&
+											showMediaEditorButton && (
+												<MediaEdit
+													allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+													onSelect={ this.onSelectMediaUploadOption }
+													source={ { uri: url } }
+													openReplaceMediaOptions={ openMediaOptions }
+													render={ editImageComponent }
+												/>
+											) }
 									</ImageBackground>
 								</View>
 							);
@@ -468,13 +515,14 @@ export class ImageEdit extends React.Component {
 						isSelected={ this.state.isCaptionSelected }
 						accessible={ true }
 						accessibilityLabelCreator={ ( caption ) =>
-							isEmpty( caption ) ?
-							/* translators: accessibility text. Empty image caption. */
-								( 'Image caption. Empty' ) :
-								sprintf(
-								/* translators: accessibility text. %s: image caption. */
-									__( 'Image caption. %s' ),
-									caption )
+							isEmpty( caption )
+								? /* translators: accessibility text. Empty image caption. */
+								  'Image caption. Empty'
+								: sprintf(
+										/* translators: accessibility text. %s: image caption. */
+										__( 'Image caption. %s' ),
+										caption
+								  )
 						}
 						onFocus={ this.onFocusCaption }
 						onBlur={ this.props.onBlur } // always assign onBlur as props
@@ -484,7 +532,8 @@ export class ImageEdit extends React.Component {
 		);
 
 		return (
-			<MediaUpload allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+			<MediaUpload
+				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return getImageComponent( open, getMediaOptions );
@@ -497,7 +546,10 @@ export class ImageEdit extends React.Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
-		const { attributes: { id }, isSelected } = props;
+		const {
+			attributes: { id },
+			isSelected,
+		} = props;
 
 		return {
 			image: id && isSelected ? getMedia( id ) : null,

@@ -17,4 +17,7 @@ const pluginBase = {
 };
 
 export const pluginWithIcon = { ...pluginBase, icon: 'block-default' };
-export const pluginWithImg = { ...pluginBase, icon: 'https://ps.w.org/listicles/assets/icon-128x128.png' };
+export const pluginWithImg = {
+	...pluginBase,
+	icon: 'https://ps.w.org/listicles/assets/icon-128x128.png',
+};

@@ -39,18 +39,16 @@ export function useBlockEditContext() {
  *
  * @return {WPComponent} Enhanced component with injected context as props.
  */
-export const withBlockEditContext = ( mapContextToProps ) => createHigherOrderComponent( ( OriginalComponent ) => {
-	return ( props ) => (
-		<Consumer>
-			{ ( context ) => (
-				<OriginalComponent
-					{ ...props }
-					{ ...mapContextToProps( context, props ) }
-				/>
-			) }
-		</Consumer>
-	);
-}, 'withBlockEditContext' );
+export const withBlockEditContext = ( mapContextToProps ) =>
+	createHigherOrderComponent( ( OriginalComponent ) => {
+		return ( props ) => (
+			<Consumer>
+				{ ( context ) => (
+					<OriginalComponent { ...props } { ...mapContextToProps( context, props ) } />
+				) }
+			</Consumer>
+		);
+	}, 'withBlockEditContext' );
 
 /**
  * A Higher Order Component used to render conditionally the wrapped
@@ -62,10 +60,6 @@ export const withBlockEditContext = ( mapContextToProps ) => createHigherOrderCo
  */
 export const ifBlockEditSelected = createHigherOrderComponent( ( OriginalComponent ) => {
 	return ( props ) => (
-		<Consumer>
-			{ ( { isSelected } ) => isSelected && (
-				<OriginalComponent { ...props } />
-			) }
-		</Consumer>
+		<Consumer>{ ( { isSelected } ) => isSelected && <OriginalComponent { ...props } /> }</Consumer>
 	);
 }, 'ifBlockEditSelected' );

@@ -14,4 +14,3 @@ export { functionDeclaration, ClassDeclaration };
  * Variable declaration example.
  */
 export const variableDeclaration = true;
-

@@ -6,12 +6,7 @@ import { debounce, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	Component,
-	Children,
-	cloneElement,
-	concatChildren,
-} from '@wordpress/element';
+import { Component, Children, cloneElement, concatChildren } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,10 +25,7 @@ class Tooltip extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.delayedSetIsOver = debounce(
-			( isOver ) => this.setState( { isOver } ),
-			TOOLTIP_DELAY
-		);
+		this.delayedSetIsOver = debounce( ( isOver ) => this.setState( { isOver } ), TOOLTIP_DELAY );
 
 		/**
 		 * Prebound `isInMouseDown` handler, created as a constant reference to
@@ -131,11 +123,10 @@ class Tooltip extends Component {
 			// instance property and remove its own event handler. The bind is
 			// made on the document since the `mouseup` might not occur within
 			// the bounds of the element.
-			document[
-				isMouseDown ?
-					'addEventListener' :
-					'removeEventListener'
-			]( 'mouseup', this.cancelIsMouseDown );
+			document[ isMouseDown ? 'addEventListener' : 'removeEventListener' ](
+				'mouseup',
+				this.cancelIsMouseDown
+			);
 
 			this.isInMouseDown = isMouseDown;
 		};
@@ -174,7 +165,7 @@ class Tooltip extends Component {
 						{ text }
 						<Shortcut className="components-tooltip__shortcut" shortcut={ shortcut } />
 					</Popover>
-				),
+				)
 			),
 		} );
 	}

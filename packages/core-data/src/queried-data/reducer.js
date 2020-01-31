@@ -11,12 +11,7 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import {
-	conservativeMapItem,
-	ifMatchingAction,
-	replaceAction,
-	onSubKey,
-} from '../utils';
+import { conservativeMapItem, ifMatchingAction, replaceAction, onSubKey } from '../utils';
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import getQueryParts from './get-query-parts';
 
@@ -36,24 +31,19 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
-	const size = Math.max(
-		itemIds.length,
-		nextItemIdsStartIndex + nextItemIds.length
-	);
+	const size = Math.max( itemIds.length, nextItemIdsStartIndex + nextItemIds.length );
 
 	// Preallocate array since size is known.
 	const mergedItemIds = new Array( size );
 
 	for ( let i = 0; i < size; i++ ) {
 		// Preserve existing item ID except for subset of range of next items.
-		const isInNextItemsRange = (
-			i >= nextItemIdsStartIndex &&
-			i < nextItemIdsStartIndex + nextItemIds.length
-		);
+		const isInNextItemsRange =
+			i >= nextItemIdsStartIndex && i < nextItemIdsStartIndex + nextItemIds.length;
 
-		mergedItemIds[ i ] = isInNextItemsRange ?
-			nextItemIds[ i - nextItemIdsStartIndex ] :
-			itemIds[ i ];
+		mergedItemIds[ i ] = isInNextItemsRange
+			? nextItemIds[ i - nextItemIdsStartIndex ]
+			: itemIds[ i ];
 	}
 
 	return mergedItemIds;
@@ -124,12 +114,7 @@ const queries = flowRight( [
 		return state;
 	}
 
-	return getMergedItemIds(
-		state || [],
-		map( action.items, key ),
-		page,
-		perPage
-	);
+	return getMergedItemIds( state || [], map( action.items, key ), page, perPage );
 } );
 
 export default combineReducers( {

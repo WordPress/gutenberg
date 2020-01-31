@@ -19,9 +19,16 @@ const MenuIcon = (
 );
 
 function BlockNavigationDropdownToggle( { isEnabled, onToggle, isOpen } ) {
-	useShortcut( 'core/edit-post/toggle-block-navigation', useCallback( onToggle, [ onToggle ] ), { bindGlobal: true, isDisabled: ! isEnabled } );
-	const shortcut = useSelect( ( select ) =>
-		select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-block-navigation' ), []
+	useShortcut( 'core/edit-post/toggle-block-navigation', useCallback( onToggle, [ onToggle ] ), {
+		bindGlobal: true,
+		isDisabled: ! isEnabled,
+	} );
+	const shortcut = useSelect(
+		( select ) =>
+			select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(
+				'core/edit-post/toggle-block-navigation'
+			),
+		[]
 	);
 
 	return (
@@ -41,15 +48,13 @@ function BlockNavigationDropdown( { isDisabled } ) {
 	const hasBlocks = useSelect( ( select ) => !! select( 'core/block-editor' ).getBlockCount(), [] );
 	const isEnabled = hasBlocks && ! isDisabled;
 
-	return	(
+	return (
 		<Dropdown
 			contentClassName="block-editor-block-navigation__popover"
 			renderToggle={ ( toggleProps ) => (
 				<BlockNavigationDropdownToggle { ...toggleProps } isEnabled={ isEnabled } />
 			) }
-			renderContent={ ( { onClose } ) => (
-				<BlockNavigation onSelect={ onClose } />
-			) }
+			renderContent={ ( { onClose } ) => <BlockNavigation onSelect={ onClose } /> }
 		/>
 	);
 }

@@ -1,4 +1,13 @@
-export { SVG, Path, Circle, Polygon, Rect, G, HorizontalRule, BlockQuotation } from '@wordpress/primitives';
+export {
+	SVG,
+	Path,
+	Circle,
+	Polygon,
+	Rect,
+	G,
+	HorizontalRule,
+	BlockQuotation,
+} from '@wordpress/primitives';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as Dashicon } from './dashicon';

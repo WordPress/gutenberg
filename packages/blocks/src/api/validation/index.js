@@ -2,14 +2,7 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import {
-	identity,
-	xor,
-	fromPairs,
-	isEqual,
-	includes,
-	stubTrue,
-} from 'lodash';
+import { identity, xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -137,10 +130,7 @@ const ENUMERATED_ATTRIBUTES = [
  *
  * @type {Array}
  */
-const MEANINGFUL_ATTRIBUTES = [
-	...BOOLEAN_ATTRIBUTES,
-	...ENUMERATED_ATTRIBUTES,
-];
+const MEANINGFUL_ATTRIBUTES = [ ...BOOLEAN_ATTRIBUTES, ...ENUMERATED_ATTRIBUTES ];
 
 /**
  * Array of functions which receive a text string on which to apply normalizing
@@ -149,10 +139,7 @@ const MEANINGFUL_ATTRIBUTES = [
  *
  * @type {Array}
  */
-const TEXT_NORMALIZATIONS = [
-	identity,
-	getTextWithCollapsedWhitespace,
-];
+const TEXT_NORMALIZATIONS = [ identity, getTextWithCollapsedWhitespace ];
 
 /**
  * Regular expression matching a named character reference. In lieu of bundling
@@ -285,11 +272,7 @@ export function getTextWithCollapsedWhitespace( text ) {
 export function getMeaningfulAttributePairs( token ) {
 	return token.attributes.filter( ( pair ) => {
 		const [ key, value ] = pair;
-		return (
-			value ||
-			key.indexOf( 'data-' ) === 0 ||
-			includes( MEANINGFUL_ATTRIBUTES, key )
-		);
+		return value || key.indexOf( 'data-' ) === 0 || includes( MEANINGFUL_ATTRIBUTES, key );
 	} );
 }
 
@@ -336,9 +319,11 @@ export function isEquivalentTextTokens( actual, expected, logger = createLogger(
  * @return {string} Normalized style value.
  */
 export function getNormalizedStyleValue( value ) {
-	return value
-		// Normalize URL type to omit whitespace or quotes
-		.replace( REGEXP_STYLE_URL_TYPE, 'url($1)' );
+	return (
+		value
+			// Normalize URL type to omit whitespace or quotes
+			.replace( REGEXP_STYLE_URL_TYPE, 'url($1)' )
+	);
 }
 
 /**
@@ -360,10 +345,7 @@ export function getStyleProperties( text ) {
 			const [ key, ...valueParts ] = style.split( ':' );
 			const value = valueParts.join( ':' );
 
-			return [
-				key.trim(),
-				getNormalizedStyleValue( value.trim() ),
-			];
+			return [ key.trim(), getNormalizedStyleValue( value.trim() ) ];
 		} );
 
 	return fromPairs( pairs );
@@ -431,12 +413,22 @@ export function isEqualTagAttributePairs( actual, expected, logger = createLogge
 		if ( isEqualAttributes ) {
 			// Defer custom attribute equality handling
 			if ( ! isEqualAttributes( actualValue, expectedValue ) ) {
-				logger.warning( 'Expected attribute `%s` of value `%s`, saw `%s`.', name, expectedValue, actualValue );
+				logger.warning(
+					'Expected attribute `%s` of value `%s`, saw `%s`.',
+					name,
+					expectedValue,
+					actualValue
+				);
 				return false;
 			}
 		} else if ( actualValue !== expectedValue ) {
 			// Otherwise strict inequality should bail
-			logger.warning( 'Expected attribute `%s` of value `%s`, saw `%s`.', name, expectedValue, actualValue );
+			logger.warning(
+				'Expected attribute `%s` of value `%s`, saw `%s`.',
+				name,
+				expectedValue,
+				actualValue
+			);
 			return false;
 		}
 	}
@@ -458,7 +450,11 @@ export const isEqualTokensOfType = {
 			// have exactly equal tag names.
 			actual.tagName.toLowerCase() !== expected.tagName.toLowerCase()
 		) {
-			logger.warning( 'Expected tag name `%s`, instead saw `%s`.', expected.tagName, actual.tagName );
+			logger.warning(
+				'Expected tag name `%s`, instead saw `%s`.',
+				expected.tagName,
+				actual.tagName
+			);
 			return false;
 		}
 
@@ -548,8 +544,8 @@ export function isClosedByToken( currentToken, nextToken ) {
  */
 export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 	// Tokenize input content and reserialized save content
-	const [ actualTokens, expectedTokens ] = [ actual, expected ].map(
-		( html ) => getHTMLTokens( html, logger )
+	const [ actualTokens, expectedTokens ] = [ actual, expected ].map( ( html ) =>
+		getHTMLTokens( html, logger )
 	);
 
 	// If either is malformed then stop comparing - the strings are not equivalent
@@ -569,7 +565,13 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 
 		// Inequal if next non-whitespace token of each set are not same type
 		if ( actualToken.type !== expectedToken.type ) {
-			logger.warning( 'Expected token of type `%s` (%o), instead saw `%s` (%o).', expectedToken.type, expectedToken, actualToken.type, actualToken );
+			logger.warning(
+				'Expected token of type `%s` (%o), instead saw `%s` (%o).',
+				expectedToken.type,
+				expectedToken,
+				actualToken.type,
+				actualToken
+			);
 			return false;
 		}
 
@@ -616,13 +618,21 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  *
  * @return {Object} Whether block is valid and contains validation messages.
  */
-export function getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, logger = createQueuedLogger() ) {
+export function getBlockContentValidationResult(
+	blockTypeOrName,
+	attributes,
+	originalBlockContent,
+	logger = createQueuedLogger()
+) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let generatedBlockContent;
 	try {
 		generatedBlockContent = getSaveContent( blockType, attributes );
 	} catch ( error ) {
-		logger.error( 'Block validation failed because an error occurred while generating block content:\n\n%s', error.toString() );
+		logger.error(
+			'Block validation failed because an error occurred while generating block content:\n\n%s',
+			error.toString()
+		);
 
 		return {
 			isValid: false,
@@ -661,7 +671,12 @@ export function getBlockContentValidationResult( blockTypeOrName, attributes, or
  * @return {boolean} Whether block is valid.
  */
 export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent ) {
-	const { isValid } = getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, createLogger() );
+	const { isValid } = getBlockContentValidationResult(
+		blockTypeOrName,
+		attributes,
+		originalBlockContent,
+		createLogger()
+	);
 
 	return isValid;
 }

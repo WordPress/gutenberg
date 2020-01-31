@@ -1,5 +1,1 @@
-export {
-	functionDeclaration,
-	variableDeclaration,
-	ClassDeclaration,
-} from './named-identifiers';
+export { functionDeclaration, variableDeclaration, ClassDeclaration } from './named-identifiers';

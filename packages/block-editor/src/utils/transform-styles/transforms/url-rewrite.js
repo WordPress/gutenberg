@@ -76,14 +76,7 @@ function processURL( baseURL ) {
 		const URL = getResourcePath( meta.value, baseURL );
 		return {
 			...meta,
-			newUrl:
-				'url(' +
-				meta.before +
-				meta.quote +
-				URL +
-				meta.quote +
-				meta.after +
-				')',
+			newUrl: 'url(' + meta.before + meta.quote + URL + meta.quote + meta.after + ')',
 		};
 	};
 }

@@ -102,7 +102,9 @@ export function* getThemeSupports() {
  */
 export function* getEmbedPreview( url ) {
 	try {
-		const embedProxyResponse = yield apiFetch( { path: addQueryArgs( '/oembed/1.0/proxy', { url } ) } );
+		const embedProxyResponse = yield apiFetch( {
+			path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
+		} );
 		yield receiveEmbedPreview( url, embedProxyResponse );
 	} catch ( error ) {
 		// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
@@ -188,7 +190,9 @@ export function* canUser( action, resource, id ) {
  */
 export function* getAutosaves( postType, postId ) {
 	const { rest_base: restBase } = yield resolveSelect( 'getPostType', postType );
-	const autosaves = yield apiFetch( { path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit` } );
+	const autosaves = yield apiFetch( {
+		path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
+	} );
 
 	if ( autosaves && autosaves.length ) {
 		yield receiveAutosaves( postId, autosaves );

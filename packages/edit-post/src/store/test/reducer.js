@@ -36,10 +36,12 @@ describe( 'state', () => {
 		} );
 
 		it( 'should set the general sidebar undismissed', () => {
-			const original = deepFreeze( preferences( undefined, {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name: 'edit-post/document',
-			} ) );
+			const original = deepFreeze(
+				preferences( undefined, {
+					type: 'OPEN_GENERAL_SIDEBAR',
+					name: 'edit-post/document',
+				} )
+			);
 			const state = preferences( original, {
 				type: 'CLOSE_GENERAL_SIDEBAR',
 			} );
@@ -228,11 +230,7 @@ describe( 'state', () => {
 					blockNames: [ 'b', 'c' ],
 				} );
 
-				expect( state.hiddenBlockTypes ).toEqual( [
-					'a',
-					'b',
-					'c',
-				] );
+				expect( state.hiddenBlockTypes ).toEqual( [ 'a', 'b', 'c' ] );
 			} );
 
 			it( 'omits present names by enable', () => {
@@ -245,9 +243,7 @@ describe( 'state', () => {
 					blockNames: [ 'b', 'c' ],
 				} );
 
-				expect( state.hiddenBlockTypes ).toEqual( [
-					'a',
-				] );
+				expect( state.hiddenBlockTypes ).toEqual( [ 'a' ] );
 			} );
 		} );
 	} );

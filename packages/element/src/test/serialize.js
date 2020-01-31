@@ -26,15 +26,12 @@ import serialize, {
 
 describe( 'serialize()', () => {
 	it( 'should allow only valid attribute names', () => {
-		const element = createElement(
-			'div',
-			{
-				'notok\u007F': 'bad',
-				'notok"': 'bad',
-				ok: 'good',
-				'notok\uFDD0': 'bad',
-			},
-		);
+		const element = createElement( 'div', {
+			'notok\u007F': 'bad',
+			'notok"': 'bad',
+			ok: 'good',
+			'notok\uFDD0': 'bad',
+		} );
 
 		const result = serialize( element );
 
@@ -79,10 +76,7 @@ describe( 'serialize()', () => {
 			</Provider>
 		);
 
-		expect( result ).toBe(
-			'FunctionComponent: Hello!' +
-			'ClassComponent: Hello!'
-		);
+		expect( result ).toBe( 'FunctionComponent: Hello!' + 'ClassComponent: Hello!' );
 	} );
 
 	it( 'should render with forwardRef', () => {
@@ -90,13 +84,9 @@ describe( 'serialize()', () => {
 			return <div>test</div>;
 		} );
 
-		const result = serialize(
-			<ForwardedComponent />
-		);
+		const result = serialize( <ForwardedComponent /> );
 
-		expect( result ).toBe(
-			'<div>test</div>'
-		);
+		expect( result ).toBe( '<div>test</div>' );
 	} );
 
 	describe( 'empty attributes', () => {
@@ -260,11 +250,7 @@ describe( 'renderElement()', () => {
 			value: 'default',
 		} );
 
-		const result = renderElement(
-			<Consumer>
-				{ ( context ) => context.value }
-			</Consumer>
-		);
+		const result = renderElement( <Consumer>{ ( context ) => context.value }</Consumer> );
 
 		expect( result ).toBe( 'default' );
 	} );
@@ -276,9 +262,7 @@ describe( 'renderElement()', () => {
 
 		const result = renderElement(
 			<Provider value={ { value: 'provided' } }>
-				<Consumer>
-					{ ( context ) => context.value }
-				</Consumer>
+				<Consumer>{ ( context ) => context.value }</Consumer>
 			</Provider>
 		);
 
@@ -293,20 +277,14 @@ describe( 'renderElement()', () => {
 		const result = renderElement(
 			<Fragment>
 				<Provider value={ { value: '1st provided' } }>
-					<Consumer>
-						{ ( context ) => context.value }
-					</Consumer>
+					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
 				{ '|' }
 				<Provider value={ { value: '2nd provided' } }>
-					<Consumer>
-						{ ( context ) => context.value }
-					</Consumer>
+					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
 				{ '|' }
-				<Consumer>
-					{ ( context ) => context.value }
-				</Consumer>
+				<Consumer>{ ( context ) => context.value }</Consumer>
 			</Fragment>
 		);
 
@@ -321,14 +299,10 @@ describe( 'renderElement()', () => {
 		const result = renderElement(
 			<Provider value={ { value: 'outer provided' } }>
 				<Provider value={ { value: 'inner provided' } }>
-					<Consumer>
-						{ ( context ) => context.value }
-					</Consumer>
+					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
 				{ '|' }
-				<Consumer>
-					{ ( context ) => context.value }
-				</Consumer>
+				<Consumer>{ ( context ) => context.value }</Consumer>
 			</Provider>
 		);
 
@@ -383,13 +357,17 @@ describe( 'renderNativeComponent()', () => {
 		} );
 
 		it( 'should not render invalid dangerouslySetInnerHTML', () => {
-			const result = renderNativeComponent( 'div', { dangerouslySetInnerHTML: { __html: undefined } } );
+			const result = renderNativeComponent( 'div', {
+				dangerouslySetInnerHTML: { __html: undefined },
+			} );
 
 			expect( result ).toBe( '<div></div>' );
 		} );
 
 		it( 'should not escape children with dangerouslySetInnerHTML', () => {
-			const result = renderNativeComponent( 'div', { dangerouslySetInnerHTML: { __html: '<img/>' } } );
+			const result = renderNativeComponent( 'div', {
+				dangerouslySetInnerHTML: { __html: '<img/>' },
+			} );
 
 			expect( result ).toBe( '<div><img/></div>' );
 		} );
@@ -417,10 +395,9 @@ describe( 'renderNativeComponent()', () => {
 		} );
 
 		it( 'should render array of children', () => {
-			const result = renderNativeComponent( 'div', { children: [
-				'Hello ',
-				<Fragment key="toWhom">World</Fragment>,
-			] } );
+			const result = renderNativeComponent( 'div', {
+				children: [ 'Hello ', <Fragment key="toWhom">World</Fragment> ],
+			} );
 
 			expect( result ).toBe( '<div>Hello World</div>' );
 		} );
@@ -543,7 +520,9 @@ describe( 'renderAttributes()', () => {
 				href: '/index.php?foo=bar&qux=<"scary">',
 			} );
 
-			expect( result ).toBe( ' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;"' );
+			expect( result ).toBe(
+				' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;"'
+			);
 		} );
 
 		it( 'should render numeric attributes', () => {
@@ -650,7 +629,9 @@ describe( 'renderStyle()', () => {
 			WebkitTransform: 'none',
 		} );
 
-		expect( result ).toBe( '-ms-transform:none;-o-transform:none;-moz-transform:none;-webkit-transform:none' );
+		expect( result ).toBe(
+			'-ms-transform:none;-o-transform:none;-moz-transform:none;-webkit-transform:none'
+		);
 	} );
 
 	describe( 'value unit', () => {

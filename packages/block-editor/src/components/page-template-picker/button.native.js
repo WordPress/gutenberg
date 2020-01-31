@@ -14,12 +14,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 
-const PickerButton = ( {
-	icon,
-	label,
-	onPress,
-	getStylesFromColorScheme,
-} ) => {
+const PickerButton = ( { icon, label, onPress, getStylesFromColorScheme } ) => {
 	const butonStyles = getStylesFromColorScheme( styles.button, styles.buttonDark );
 	const butonTextStyles = getStylesFromColorScheme( styles.buttonText, styles.buttonTextDark );
 

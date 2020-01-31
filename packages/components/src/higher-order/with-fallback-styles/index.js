@@ -9,8 +9,8 @@ import { every, isEqual } from 'lodash';
 import { Component } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
-export default ( mapNodeToProps ) => createHigherOrderComponent(
-	( WrappedComponent ) => {
+export default ( mapNodeToProps ) =>
+	createHigherOrderComponent( ( WrappedComponent ) => {
 		return class extends Component {
 			constructor() {
 				super( ...arguments );
@@ -52,10 +52,14 @@ export default ( mapNodeToProps ) => createHigherOrderComponent(
 			}
 
 			render() {
-				const wrappedComponent = <WrappedComponent { ...this.props } { ...this.state.fallbackStyles } />;
-				return this.props.node ? wrappedComponent : <div ref={ this.bindRef }> { wrappedComponent } </div>;
+				const wrappedComponent = (
+					<WrappedComponent { ...this.props } { ...this.state.fallbackStyles } />
+				);
+				return this.props.node ? (
+					wrappedComponent
+				) : (
+					<div ref={ this.bindRef }> { wrappedComponent } </div>
+				);
 			}
 		};
-	},
-	'withFallbackStyles'
-);
+	}, 'withFallbackStyles' );

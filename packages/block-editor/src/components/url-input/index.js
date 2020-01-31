@@ -86,7 +86,12 @@ class URLInput extends Component {
 	shouldShowInitialSuggestions() {
 		const { suggestions } = this.state;
 		const { __experimentalShowInitialSuggestions = false, value } = this.props;
-		return ! this.isUpdatingSuggestions && __experimentalShowInitialSuggestions && ! ( value && value.length ) && ! ( suggestions && suggestions.length );
+		return (
+			! this.isUpdatingSuggestions &&
+			__experimentalShowInitialSuggestions &&
+			! ( value && value.length ) &&
+			! ( suggestions && suggestions.length )
+		);
 	}
 
 	updateSuggestions( value = '' ) {
@@ -105,7 +110,10 @@ class URLInput extends Component {
 		// - there are at least 2 characters in the search input (except manual searches where
 		//   search input length is not required to trigger a fetch)
 		// - this is a direct entry (eg: a URL)
-		if ( ! isInitialSuggestions && ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) ) {
+		if (
+			! isInitialSuggestions &&
+			( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) )
+		) {
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
@@ -127,37 +135,45 @@ class URLInput extends Component {
 			isInitialSuggestions,
 		} );
 
-		request.then( ( suggestions ) => {
-			// A fetch Promise doesn't have an abort option. It's mimicked by
-			// comparing the request reference in on the instance, which is
-			// reset or deleted on subsequent requests or unmounting.
-			if ( this.suggestionsRequest !== request ) {
-				return;
-			}
+		request
+			.then( ( suggestions ) => {
+				// A fetch Promise doesn't have an abort option. It's mimicked by
+				// comparing the request reference in on the instance, which is
+				// reset or deleted on subsequent requests or unmounting.
+				if ( this.suggestionsRequest !== request ) {
+					return;
+				}
 
-			this.setState( {
-				suggestions,
-				loading: false,
-			} );
-
-			if ( !! suggestions.length ) {
-				this.props.debouncedSpeak( sprintf( _n(
-					'%d result found, use up and down arrow keys to navigate.',
-					'%d results found, use up and down arrow keys to navigate.',
-					suggestions.length
-				), suggestions.length ), 'assertive' );
-			} else {
-				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
-			}
-			this.isUpdatingSuggestions = false;
-		} ).catch( () => {
-			if ( this.suggestionsRequest === request ) {
 				this.setState( {
+					suggestions,
 					loading: false,
 				} );
+
+				if ( !! suggestions.length ) {
+					this.props.debouncedSpeak(
+						sprintf(
+							_n(
+								'%d result found, use up and down arrow keys to navigate.',
+								'%d results found, use up and down arrow keys to navigate.',
+								suggestions.length
+							),
+							suggestions.length
+						),
+						'assertive'
+					);
+				} else {
+					this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
+				}
 				this.isUpdatingSuggestions = false;
-			}
-		} );
+			} )
+			.catch( () => {
+				if ( this.suggestionsRequest === request ) {
+					this.setState( {
+						loading: false,
+					} );
+					this.isUpdatingSuggestions = false;
+				}
+			} );
 
 		// Note that this assignment is handled *before* the async search request
 		// as a Promise always resolves on the next tick of the event loop.
@@ -178,9 +194,7 @@ class URLInput extends Component {
 
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
-		if (
-			( ! showSuggestions || ! suggestions.length || loading )
-		) {
+		if ( ! showSuggestions || ! suggestions.length || loading ) {
 			// In the Windows version of Firefox the up and down arrows don't move the caret
 			// within an input field like they do for Mac Firefox/Chrome/Safari. This causes
 			// a form of focus trapping that is disruptive to the user experience. This disruption
@@ -222,7 +236,9 @@ class URLInput extends Component {
 			case UP: {
 				event.stopPropagation();
 				event.preventDefault();
-				const previousIndex = ! selectedSuggestion ? suggestions.length - 1 : selectedSuggestion - 1;
+				const previousIndex = ! selectedSuggestion
+					? suggestions.length - 1
+					: selectedSuggestion - 1;
 				this.setState( {
 					selectedSuggestion: previousIndex,
 				} );
@@ -231,7 +247,10 @@ class URLInput extends Component {
 			case DOWN: {
 				event.stopPropagation();
 				event.preventDefault();
-				const nextIndex = selectedSuggestion === null || ( selectedSuggestion === suggestions.length - 1 ) ? 0 : selectedSuggestion + 1;
+				const nextIndex =
+					selectedSuggestion === null || selectedSuggestion === suggestions.length - 1
+						? 0
+						: selectedSuggestion + 1;
 				this.setState( {
 					selectedSuggestion: nextIndex,
 				} );
@@ -269,7 +288,10 @@ class URLInput extends Component {
 		this.inputRef.current.focus();
 	}
 
-	static getDerivedStateFromProps( { value, disableSuggestions, __experimentalShowInitialSuggestions = false }, { showSuggestions } ) {
+	static getDerivedStateFromProps(
+		{ value, disableSuggestions, __experimentalShowInitialSuggestions = false },
+		{ showSuggestions }
+	) {
 		let shouldShowSuggestions = showSuggestions;
 
 		const hasValue = value && value.length;
@@ -301,12 +323,7 @@ class URLInput extends Component {
 			__experimentalShowInitialSuggestions = false,
 		} = this.props;
 
-		const {
-			showSuggestions,
-			suggestions,
-			selectedSuggestion,
-			loading,
-		} = this.state;
+		const { showSuggestions, suggestions, selectedSuggestion, loading } = this.state;
 
 		const id = `url-input-control-${ instanceId }`;
 
@@ -353,28 +370,32 @@ class URLInput extends Component {
 					aria-expanded={ showSuggestions }
 					aria-autocomplete="list"
 					aria-owns={ suggestionsListboxId }
-					aria-activedescendant={ selectedSuggestion !== null ? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }` : undefined }
+					aria-activedescendant={
+						selectedSuggestion !== null
+							? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
+							: undefined
+					}
 					ref={ this.inputRef }
 				/>
 
-				{ ( loading ) && <Spinner /> }
+				{ loading && <Spinner /> }
 
-				{ isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length && renderSuggestions( {
-					suggestions,
-					selectedSuggestion,
-					suggestionsListProps,
-					buildSuggestionItemProps,
-					isLoading: loading,
-					handleSuggestionClick: this.handleOnClick,
-					isInitialSuggestions: __experimentalShowInitialSuggestions && ! ( value && value.length ),
-				} ) }
+				{ isFunction( renderSuggestions ) &&
+					showSuggestions &&
+					!! suggestions.length &&
+					renderSuggestions( {
+						suggestions,
+						selectedSuggestion,
+						suggestionsListProps,
+						buildSuggestionItemProps,
+						isLoading: loading,
+						handleSuggestionClick: this.handleOnClick,
+						isInitialSuggestions:
+							__experimentalShowInitialSuggestions && ! ( value && value.length ),
+					} ) }
 
-				{ ! isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length &&
-					<Popover
-						position="bottom"
-						noArrow
-						focusOnMount={ false }
-					>
+				{ ! isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length && (
+					<Popover position="bottom" noArrow focusOnMount={ false }>
 						<div
 							{ ...suggestionsListProps }
 							className={ classnames(
@@ -396,7 +417,7 @@ class URLInput extends Component {
 							) ) }
 						</div>
 					</Popover>
-				}
+				) }
 			</BaseControl>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */

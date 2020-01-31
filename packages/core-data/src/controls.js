@@ -59,11 +59,9 @@ const controls = {
 		return registry.select( 'core' )[ selectorName ]( ...args );
 	} ),
 
-	RESOLVE_SELECT: createRegistryControl(
-		( registry ) => ( { selectorName, args } ) => {
-			return registry.__experimentalResolveSelect( 'core' )[ selectorName ]( ...args );
-		}
-	),
+	RESOLVE_SELECT: createRegistryControl( ( registry ) => ( { selectorName, args } ) => {
+		return registry.__experimentalResolveSelect( 'core' )[ selectorName ]( ...args );
+	} ),
 };
 
 export default controls;

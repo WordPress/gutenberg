@@ -8,22 +8,16 @@ import { dropRight, get, map, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	PanelBody,
-	RangeControl,
-} from '@wordpress/components';
+import { PanelBody, RangeControl } from '@wordpress/components';
 import {
 	InspectorControls,
 	InnerBlocks,
 	BlockControls,
-	__experimentalBlockPatternPicker,
 	BlockVerticalAlignmentToolbar,
+	__experimentalBlockPatternPicker,
+	__experimentalUseColors,
 } from '@wordpress/block-editor';
-import {
-	withDispatch,
-	useDispatch,
-	useSelect,
-} from '@wordpress/data';
+import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -56,11 +50,18 @@ function ColumnsEditContainer( {
 } ) {
 	const { verticalAlignment } = attributes;
 
-	const { count } = useSelect( ( select ) => {
-		return {
-			count: select( 'core/block-editor' ).getBlockCount( clientId ),
-		};
-	}, [ clientId ] );
+	const { count } = useSelect(
+		( select ) => {
+			return {
+				count: select( 'core/block-editor' ).getBlockCount( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	const { BackgroundColor, InspectorControlsColorPanel } = __experimentalUseColors( [
+		{ name: 'backgroundColor', className: 'has-background' },
+	] );
 
 	const classes = classnames( className, {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
@@ -68,6 +69,9 @@ function ColumnsEditContainer( {
 
 	return (
 		<>
+			<BlockControls>
+				<BlockVerticalAlignmentToolbar onChange={ updateAlignment } value={ verticalAlignment } />
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
@@ -79,17 +83,12 @@ function ColumnsEditContainer( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls>
-				<BlockVerticalAlignmentToolbar
-					onChange={ updateAlignment }
-					value={ verticalAlignment }
-				/>
-			</BlockControls>
-			<div className={ classes }>
-				<InnerBlocks
-					templateLock="all"
-					allowedBlocks={ ALLOWED_BLOCKS } />
-			</div>
+			{ InspectorControlsColorPanel }
+			<BackgroundColor>
+				<div className={ classes }>
+					<InnerBlocks templateLock="all" allowedBlocks={ ALLOWED_BLOCKS } />
+				</div>
+			</BackgroundColor>
 		</>
 	);
 }
@@ -178,36 +177,35 @@ const ColumnsEditContainerWrapper = withDispatch( ( dispatch, ownProps, registry
 } ) )( ColumnsEditContainer );
 
 const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock( name, attributes, createBlocksFromInnerBlocksTemplate( innerBlocks ) )
+	return map( innerBlocksTemplate, ( [ name, attributes, innerBlocks = [] ] ) =>
+		createBlock( name, attributes, createBlocksFromInnerBlocksTemplate( innerBlocks ) )
 	);
 };
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, name } = props;
-	const { blockType, defaultPattern, hasInnerBlocks, patterns } = useSelect( ( select ) => {
-		const {
-			__experimentalGetBlockPatterns,
-			getBlockType,
-			__experimentalGetDefaultBlockPattern,
-		} = select( 'core/blocks' );
+	const { blockType, defaultPattern, hasInnerBlocks, patterns } = useSelect(
+		( select ) => {
+			const {
+				__experimentalGetBlockPatterns,
+				getBlockType,
+				__experimentalGetDefaultBlockPattern,
+			} = select( 'core/blocks' );
 
-		return {
-			blockType: getBlockType( name ),
-			defaultPattern: __experimentalGetDefaultBlockPattern( name, 'block' ),
-			hasInnerBlocks: select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
-			patterns: __experimentalGetBlockPatterns( name, 'block' ),
-		};
-	}, [ clientId, name ] );
+			return {
+				blockType: getBlockType( name ),
+				defaultPattern: __experimentalGetDefaultBlockPattern( name, 'block' ),
+				hasInnerBlocks: select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
+				patterns: __experimentalGetBlockPatterns( name, 'block' ),
+			};
+		},
+		[ clientId, name ]
+	);
 
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 
 	if ( hasInnerBlocks ) {
-		return (
-			<ColumnsEditContainerWrapper { ...props } />
-		);
+		return <ColumnsEditContainerWrapper { ...props } />;
 	}
 
 	return (
@@ -227,7 +225,8 @@ const ColumnsEdit = ( props ) => {
 				}
 			} }
 			allowSkip
-		/> );
+		/>
+	);
 };
 
 export default ColumnsEdit;

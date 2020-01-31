@@ -8,12 +8,7 @@ import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import {
-	parse,
-	serialize,
-	createBlock,
-	isReusableBlock,
-} from '@wordpress/blocks';
+import { parse, serialize, createBlock, isReusableBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 // TODO: Ideally this would be the only dispatch in scope. This requires either
 // refactoring editor actions to yielded controls, or replacing direct dispatch
@@ -27,9 +22,7 @@ import {
 	__experimentalReceiveReusableBlocks as receiveReusableBlocksAction,
 	__experimentalSaveReusableBlock as saveReusableBlock,
 } from '../actions';
-import {
-	__experimentalGetReusableBlock as getReusableBlock,
-} from '../selectors';
+import { __experimentalGetReusableBlock as getReusableBlock } from '../selectors';
 
 /**
  * Module Constants
@@ -62,17 +55,19 @@ export const fetchReusableBlocks = async ( action, store ) => {
 			posts = await apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
 		}
 
-		const results = compact( map( posts, ( post ) => {
-			if ( post.status !== 'publish' || post.content.protected ) {
-				return null;
-			}
+		const results = compact(
+			map( posts, ( post ) => {
+				if ( post.status !== 'publish' || post.content.protected ) {
+					return null;
+				}
 
-			return {
-				...post,
-				content: post.content.raw,
-				title: post.title.raw,
-			};
-		} ) );
+				return {
+					...post,
+					content: post.content.raw,
+					title: post.title.raw,
+				};
+			} )
+		);
 
 		if ( results.length ) {
 			dispatch( receiveReusableBlocksAction( results ) );
@@ -110,8 +105,12 @@ export const saveReusableBlocks = async ( action, store ) => {
 	const state = store.getState();
 	const { title, content, isTemporary } = getReusableBlock( state, id );
 
-	const data = isTemporary ? { title, content, status: 'publish' } : { id, title, content, status: 'publish' };
-	const path = isTemporary ? `/wp/v2/${ postType.rest_base }` : `/wp/v2/${ postType.rest_base }/${ id }`;
+	const data = isTemporary
+		? { title, content, status: 'publish' }
+		: { id, title, content, status: 'publish' };
+	const path = isTemporary
+		? `/wp/v2/${ postType.rest_base }`
+		: `/wp/v2/${ postType.rest_base }/${ id }`;
 	const method = isTemporary ? 'POST' : 'PUT';
 
 	try {
@@ -160,7 +159,9 @@ export const deleteReusableBlocks = async ( action, store ) => {
 	}
 	// Remove any other blocks that reference this reusable block
 	const allBlocks = select( 'core/block-editor' ).getBlocks();
-	const associatedBlocks = allBlocks.filter( ( block ) => isReusableBlock( block ) && block.attributes.ref === id );
+	const associatedBlocks = allBlocks.filter(
+		( block ) => isReusableBlock( block ) && block.attributes.ref === id
+	);
 	const associatedBlockClientIds = associatedBlocks.map( ( block ) => block.clientId );
 
 	const transactionId = uniqueId();
@@ -231,9 +232,7 @@ export const convertBlockToReusable = ( action, store ) => {
 		content: serialize( select( 'core/block-editor' ).getBlocksByClientId( action.clientIds ) ),
 	};
 
-	dispatch( receiveReusableBlocksAction( [
-		reusableBlock,
-	] ) );
+	dispatch( receiveReusableBlocksAction( [ reusableBlock ] ) );
 	dispatch( saveReusableBlock( reusableBlock.id ) );
 
 	dataDispatch( 'core/block-editor' ).replaceBlocks(

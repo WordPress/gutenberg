@@ -13,15 +13,13 @@ export function PostLastRevisionCheck( { lastRevisionId, revisionsCount, childre
 		return null;
 	}
 
-	return <PostTypeSupportCheck supportKeys="revisions" >{ children }</PostTypeSupportCheck>;
+	return <PostTypeSupportCheck supportKeys="revisions">{ children }</PostTypeSupportCheck>;
 }
 
-export default withSelect(
-	( select ) => {
-		const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } = select( 'core/editor' );
-		return {
-			lastRevisionId: getCurrentPostLastRevisionId(),
-			revisionsCount: getCurrentPostRevisionsCount(),
-		};
-	}
-)( PostLastRevisionCheck );
+export default withSelect( ( select ) => {
+	const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } = select( 'core/editor' );
+	return {
+		lastRevisionId: getCurrentPostLastRevisionId(),
+		revisionsCount: getCurrentPostRevisionsCount(),
+	};
+} )( PostLastRevisionCheck );

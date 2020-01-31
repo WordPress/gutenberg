@@ -1,17 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	filter,
-	findIndex,
-	flow,
-	groupBy,
-	isEmpty,
-	map,
-	sortBy,
-	without,
-	includes,
-} from 'lodash';
+import { filter, findIndex, flow, groupBy, isEmpty, map, sortBy, without, includes } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 import classnames from 'classnames';
 
@@ -20,16 +10,8 @@ import classnames from 'classnames';
  */
 import { speak } from '@wordpress/a11y';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import {
-	Component,
-	__experimentalCreateInterpolateElement,
-	createRef,
-} from '@wordpress/element';
-import {
-	PanelBody,
-	withSpokenMessages,
-	Tip,
-} from '@wordpress/components';
+import { Component, __experimentalCreateInterpolateElement, createRef } from '@wordpress/element';
+import { PanelBody, withSpokenMessages, Tip } from '@wordpress/components';
 import {
 	isReusableBlock,
 	createBlock,
@@ -60,10 +42,8 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 // Copied over from the Columns block. It seems like it should become part of public API.
 const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock( name, attributes, createBlocksFromInnerBlocksTemplate( innerBlocks ) )
+	return map( innerBlocksTemplate, ( [ name, attributes, innerBlocks = [] ] ) =>
+		createBlock( name, attributes, createBlocksFromInnerBlocksTemplate( innerBlocks ) )
 	);
 };
 
@@ -131,10 +111,7 @@ export class InserterMenu extends Component {
 				} );
 			} else {
 				this.setState( {
-					openPanels: [
-						...this.state.openPanels,
-						panel,
-					],
+					openPanels: [ ...this.state.openPanels, panel ],
 				} );
 
 				this.props.setTimeout( () => {
@@ -147,7 +124,13 @@ export class InserterMenu extends Component {
 		};
 	}
 
-	filterOpenPanels( filterValue, itemsPerCategory, itemsPerCollection, filteredItems, reusableItems ) {
+	filterOpenPanels(
+		filterValue,
+		itemsPerCategory,
+		itemsPerCollection,
+		filteredItems,
+		reusableItems
+	) {
 		if ( filterValue === this.state.filterValue ) {
 			return this.state.openPanels;
 		}
@@ -195,7 +178,9 @@ export class InserterMenu extends Component {
 		// Create a new Object to avoid mutating this.props.collection
 		const itemsPerCollection = { ...collections };
 		Object.keys( collections ).forEach( ( namespace ) => {
-			itemsPerCollection[ namespace ] = filteredItems.filter( ( item ) => getBlockNamespace( item ) === namespace );
+			itemsPerCollection[ namespace ] = filteredItems.filter(
+				( item ) => getBlockNamespace( item ) === namespace
+			);
 			if ( itemsPerCollection[ namespace ].length === 0 ) {
 				delete itemsPerCollection[ namespace ];
 			}
@@ -218,9 +203,12 @@ export class InserterMenu extends Component {
 			),
 		} );
 
-		const resultCount = Object.keys( itemsPerCategory ).reduce( ( accumulator, currentCategorySlug ) => {
-			return accumulator + itemsPerCategory[ currentCategorySlug ].length;
-		}, 0 );
+		const resultCount = Object.keys( itemsPerCategory ).reduce(
+			( accumulator, currentCategorySlug ) => {
+				return accumulator + itemsPerCategory[ currentCategorySlug ].length;
+			},
+			0
+		);
 
 		const resultsFoundMessage = sprintf(
 			_n( '%d result found.', '%d results found.', resultCount ),
@@ -237,7 +225,14 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { categories, collections, instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
+		const {
+			categories,
+			collections,
+			instanceId,
+			onSelect,
+			rootClientId,
+			showInserterHelpPanel,
+		} = this.props;
 		const {
 			childItems,
 			hoveredItem,
@@ -249,7 +244,11 @@ export class InserterMenu extends Component {
 			filterValue,
 		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
-		const hasItems = ! isEmpty( suggestedItems ) || ! isEmpty( reusableItems ) || ! isEmpty( itemsPerCategory ) || ! isEmpty( itemsPerCollection );
+		const hasItems =
+			! isEmpty( suggestedItems ) ||
+			! isEmpty( reusableItems ) ||
+			! isEmpty( itemsPerCategory ) ||
+			! isEmpty( itemsPerCollection );
 		const hoveredItemBlockType = hoveredItem ? getBlockType( hoveredItem.name ) : null;
 		const hasHelpPanel = hasItems && showInserterHelpPanel;
 
@@ -268,7 +267,10 @@ export class InserterMenu extends Component {
 				onKeyDown={ this.onKeyDown }
 			>
 				<div className="block-editor-inserter__main-area">
-					<label htmlFor={ `block-editor-inserter__search-${ instanceId }` } className="screen-reader-text">
+					<label
+						htmlFor={ `block-editor-inserter__search-${ instanceId }` }
+						className="screen-reader-text"
+					>
 						{ __( 'Search for a block' ) }
 					</label>
 					<input
@@ -287,7 +289,6 @@ export class InserterMenu extends Component {
 						role="region"
 						aria-label={ __( 'Available block types' ) }
 					>
-
 						<ChildBlocks
 							rootClientId={ rootClientId }
 							items={ childItems }
@@ -295,16 +296,20 @@ export class InserterMenu extends Component {
 							onHover={ this.onHover }
 						/>
 
-						{ !! suggestedItems.length &&
+						{ !! suggestedItems.length && (
 							<PanelBody
 								title={ _x( 'Most used', 'blocks' ) }
 								opened={ isPanelOpen( 'suggested' ) }
 								onToggle={ this.onTogglePanel( 'suggested' ) }
 								ref={ this.bindPanel( 'suggested' ) }
 							>
-								<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
+								<BlockTypesList
+									items={ suggestedItems }
+									onSelect={ onSelect }
+									onHover={ this.onHover }
+								/>
 							</PanelBody>
-						}
+						) }
 
 						{ map( categories, ( category ) => {
 							const categoryItems = itemsPerCategory[ category.slug ];
@@ -320,7 +325,11 @@ export class InserterMenu extends Component {
 									onToggle={ this.onTogglePanel( category.slug ) }
 									ref={ this.bindPanel( category.slug ) }
 								>
-									<BlockTypesList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
+									<BlockTypesList
+										items={ categoryItems }
+										onSelect={ onSelect }
+										onHover={ this.onHover }
+									/>
 								</PanelBody>
 							);
 						} ) }
@@ -340,7 +349,11 @@ export class InserterMenu extends Component {
 									onToggle={ this.onTogglePanel( namespace ) }
 									ref={ this.bindPanel( namespace ) }
 								>
-									<BlockTypesList items={ collectionItems } onSelect={ onSelect } onHover={ this.onHover } />
+									<BlockTypesList
+										items={ collectionItems }
+										onSelect={ onSelect }
+										onHover={ this.onHover }
+									/>
 								</PanelBody>
 							);
 						} ) }
@@ -354,7 +367,11 @@ export class InserterMenu extends Component {
 								icon="controls-repeat"
 								ref={ this.bindPanel( 'reusable' ) }
 							>
-								<BlockTypesList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
+								<BlockTypesList
+									items={ reusableItems }
+									onSelect={ onSelect }
+									onHover={ this.onHover }
+								/>
 								<a
 									className="block-editor-inserter__manage-reusable-blocks"
 									href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
@@ -378,7 +395,9 @@ export class InserterMenu extends Component {
 								}
 								if ( ! hasItems ) {
 									return (
-										<p className="block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+										<p className="block-editor-inserter__no-results">
+											{ __( 'No blocks found.' ) }
+										</p>
 									);
 								}
 								return null;
@@ -391,25 +410,23 @@ export class InserterMenu extends Component {
 					<div className="block-editor-inserter__menu-help-panel">
 						{ hoveredItem && (
 							<>
-								{ ! isReusableBlock( hoveredItem ) && (
-									<BlockCard blockType={ hoveredItem } />
-								) }
+								{ ! isReusableBlock( hoveredItem ) && <BlockCard blockType={ hoveredItem } /> }
 								<div className="block-editor-inserter__preview">
-									{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) ? (
+									{ isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ? (
 										<div className="block-editor-inserter__preview-content">
 											<BlockPreview
 												padding={ 10 }
 												viewportWidth={ 500 }
 												blocks={
-													hoveredItemBlockType.example ?
-														getBlockFromExample( hoveredItem.name, {
-															attributes: {
-																...hoveredItemBlockType.example.attributes,
-																...hoveredItem.initialAttributes,
-															},
-															innerBlocks: hoveredItemBlockType.example.innerBlocks,
-														} ) :
-														createBlock( hoveredItem.name, hoveredItem.initialAttributes )
+													hoveredItemBlockType.example
+														? getBlockFromExample( hoveredItem.name, {
+																attributes: {
+																	...hoveredItemBlockType.example.attributes,
+																	...hoveredItem.initialAttributes,
+																},
+																innerBlocks: hoveredItemBlockType.example.innerBlocks,
+														  } )
+														: createBlock( hoveredItem.name, hoveredItem.initialAttributes )
 												}
 											/>
 										</div>
@@ -424,7 +441,9 @@ export class InserterMenu extends Component {
 						{ ! hoveredItem && (
 							<div className="block-editor-inserter__menu-help-panel-no-block">
 								<div className="block-editor-inserter__menu-help-panel-no-block-text">
-									<div className="block-editor-inserter__menu-help-panel-title">{ __( 'Content blocks' ) }</div>
+									<div className="block-editor-inserter__menu-help-panel-title">
+										{ __( 'Content blocks' ) }
+									</div>
 									<p>
 										{ __(
 											'Welcome to the wonderful world of blocks! Blocks are the basis of all content within the editor.'
@@ -436,9 +455,7 @@ export class InserterMenu extends Component {
 										) }
 									</p>
 									<p>
-										{ __(
-											'Browse through the library to learn more about what each block does.'
-										) }
+										{ __( 'Browse through the library to learn more about what each block does.' ) }
 									</p>
 								</div>
 								<Tip>
@@ -466,11 +483,7 @@ export default compose(
 			getBlockSelectionEnd,
 			getSettings,
 		} = select( 'core/block-editor' );
-		const {
-			getCategories,
-			getCollections,
-			getChildBlockNames,
-		} = select( 'core/blocks' );
+		const { getCategories, getCollections, getChildBlockNames } = select( 'core/blocks' );
 
 		let destinationRootClientId = rootClientId;
 		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
@@ -497,10 +510,7 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
-		const {
-			showInsertionPoint,
-			hideInsertionPoint,
-		} = dispatch( 'core/block-editor' );
+		const { showInsertionPoint, hideInsertionPoint } = dispatch( 'core/block-editor' );
 
 		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
 		// This breaks the withDispatch not containing any logic rule.
@@ -508,11 +518,7 @@ export default compose(
 		// it's fine to extract it.
 		// eslint-disable-next-line no-restricted-syntax
 		function getInsertionIndex() {
-			const {
-				getBlockIndex,
-				getBlockSelectionEnd,
-				getBlockOrder,
-			} = select( 'core/block-editor' );
+			const { getBlockIndex, getBlockSelectionEnd, getBlockOrder } = select( 'core/block-editor' );
 			const { clientId, destinationRootClientId, isAppender } = ownProps;
 
 			// If the clientId is defined, we insert at the position of the block.
@@ -537,13 +543,8 @@ export default compose(
 			},
 			hideInsertionPoint,
 			onSelect( item ) {
-				const {
-					replaceBlocks,
-					insertBlock,
-				} = dispatch( 'core/block-editor' );
-				const {
-					getSelectedBlock,
-				} = select( 'core/block-editor' );
+				const { replaceBlocks, insertBlock } = dispatch( 'core/block-editor' );
+				const { getSelectedBlock } = select( 'core/block-editor' );
 				const {
 					isAppender,
 					onSelect,

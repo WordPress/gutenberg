@@ -10,9 +10,7 @@ import { uniqueId } from 'lodash';
  */
 import { Fragment, useState } from '@wordpress/element';
 
-import {
-	SelectControl,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -57,13 +55,10 @@ const sizeOptions = [
 const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 	return (
 		<Fragment>
-			<SelectControl
-				label={ labelComponent }
-				options={ sizeOptions }
-			/>
+			<SelectControl label={ labelComponent } options={ sizeOptions } />
 			<p id={ device.id }>
-				{ device.label } is used here for testing purposes to ensure we have access
-				to details about the device.
+				{ device.label } is used here for testing purposes to ensure we have access to details about
+				the device.
 			</p>
 		</Fragment>
 	);
@@ -77,23 +72,36 @@ describe( 'Basic rendering', () => {
 					title="Padding"
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>, container
+				/>,
+				container
 			);
 		} );
 
-		const activePropertyLabel = Array.from( container.querySelectorAll( 'legend' ) ).find( ( legend ) => legend.innerHTML === 'Padding' );
+		const activePropertyLabel = Array.from( container.querySelectorAll( 'legend' ) ).find(
+			( legend ) => legend.innerHTML === 'Padding'
+		);
 
-		const activeViewportLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML.includes( 'All' ) );
+		const activeViewportLabel = Array.from(
+			container.querySelectorAll( 'label' )
+		).find( ( label ) => label.innerHTML.includes( 'All' ) );
 
-		const defaultControl = container.querySelector( `#${ activeViewportLabel.getAttribute( 'for' ) }` );
+		const defaultControl = container.querySelector(
+			`#${ activeViewportLabel.getAttribute( 'for' ) }`
+		);
 
-		const toggleLabel = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => label.innerHTML.includes( 'Use the same padding on all screensizes' ) );
+		const toggleLabel = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) =>
+			label.innerHTML.includes( 'Use the same padding on all screensizes' )
+		);
 
 		const toggleState = container.querySelector( 'input[type="checkbox"]' ).checked;
 
-		const defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
+		const defaultControlGroup = container.querySelector(
+			'.block-editor-responsive-block-control__group--default'
+		);
 
-		const responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
+		const responsiveControlGroup = container.querySelector(
+			'.block-editor-responsive-block-control__group--responsive'
+		);
 
 		expect( container.innerHTML ).not.toBe( '' );
 
@@ -114,7 +122,8 @@ describe( 'Basic rendering', () => {
 				<ResponsiveBlockControl
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>, container
+				/>,
+				container
 			);
 		} );
 
@@ -127,7 +136,8 @@ describe( 'Basic rendering', () => {
 				<ResponsiveBlockControl
 					title="Padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>, container
+				/>,
+				container
 			);
 		} );
 
@@ -136,12 +146,7 @@ describe( 'Basic rendering', () => {
 
 	it( 'should not render without valid default control render prop', () => {
 		act( () => {
-			render(
-				<ResponsiveBlockControl
-					title="Padding"
-					property="padding"
-				/>, container
-			);
+			render( <ResponsiveBlockControl title="Padding" property="padding" />, container );
 		} );
 
 		expect( container.innerHTML ).toBe( '' );
@@ -156,11 +161,13 @@ describe( 'Basic rendering', () => {
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
 					toggleLabel={ customToggleLabel }
-				/>, container
+				/>,
+				container
 			);
 		} );
 
-		const actualToggleLabel = container.querySelector( 'label.components-toggle-control__label' ).innerHTML;
+		const actualToggleLabel = container.querySelector( 'label.components-toggle-control__label' )
+			.innerHTML;
 
 		expect( actualToggleLabel ).toEqual( customToggleLabel );
 	} );
@@ -175,11 +182,14 @@ describe( 'Basic rendering', () => {
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
 					defaultLabel={ customDefaultControlGroupLabel }
-				/>, container
+				/>,
+				container
 			);
 		} );
 
-		const defaultControlLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML.includes( 'Everything' ) );
+		const defaultControlLabel = Array.from(
+			container.querySelectorAll( 'label' )
+		).find( ( label ) => label.innerHTML.includes( 'Everything' ) );
 
 		expect( defaultControlLabel ).not.toBeNull();
 	} );
@@ -194,12 +204,17 @@ describe( 'Default and Responsive modes', () => {
 					property="padding"
 					isResponsive={ true }
 					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>, container
+				/>,
+				container
 			);
 		} );
 
-		const defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
-		const responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
+		const defaultControlGroup = container.querySelector(
+			'.block-editor-responsive-block-control__group--default'
+		);
+		const responsiveControlGroup = container.querySelector(
+			'.block-editor-responsive-block-control__group--responsive'
+		);
 
 		expect( defaultControlGroup ).toBeNull();
 		expect( responsiveControlGroup ).not.toBeNull();
@@ -235,21 +250,28 @@ describe( 'Default and Responsive modes', () => {
 					isResponsive={ true }
 					renderDefaultControl={ mockRenderDefaultControl }
 					viewports={ customViewportSet }
-				/>, container
+				/>,
+				container
 			);
 		} );
 
 		const defaultRenderControlCall = 1;
 
 		// Get array of labels which match those in the custom viewports provided
-		const responsiveViewportsLabels = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => {
-			const labelText = label.innerHTML;
-			// Is the label one of those in the custom device set?
-			return !! customViewportSet.find( ( deviceName ) => labelText.includes( deviceName.label ) );
-		} );
+		const responsiveViewportsLabels = Array.from( container.querySelectorAll( 'label' ) ).filter(
+			( label ) => {
+				const labelText = label.innerHTML;
+				// Is the label one of those in the custom device set?
+				return !! customViewportSet.find( ( deviceName ) =>
+					labelText.includes( deviceName.label )
+				);
+			}
+		);
 
 		expect( responsiveViewportsLabels ).toHaveLength( customViewportSet.length );
-		expect( mockRenderDefaultControl ).toHaveBeenCalledTimes( customViewportSet.length + defaultRenderControlCall );
+		expect( mockRenderDefaultControl ).toHaveBeenCalledTimes(
+			customViewportSet.length + defaultRenderControlCall
+		);
 	} );
 
 	it( 'should switch between default and responsive modes when interacting with toggle control', () => {
@@ -270,16 +292,20 @@ describe( 'Default and Responsive modes', () => {
 		};
 
 		act( () => {
-			render(
-				<ResponsiveBlockControlConsumer />, container
-			);
+			render( <ResponsiveBlockControlConsumer />, container );
 		} );
 
-		let defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
-		let responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
+		let defaultControlGroup = container.querySelector(
+			'.block-editor-responsive-block-control__group--default'
+		);
+		let responsiveControlGroup = container.querySelector(
+			'.block-editor-responsive-block-control__group--responsive'
+		);
 
 		// Select elements based on what the user can see
-		const toggleLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML.includes( 'Use the same padding on all screensizes' ) );
+		const toggleLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) =>
+			label.innerHTML.includes( 'Use the same padding on all screensizes' )
+		);
 		const toggleInput = container.querySelector( `#${ toggleLabel.getAttribute( 'for' ) }` );
 
 		// Initial mode (default)
@@ -291,8 +317,12 @@ describe( 'Default and Responsive modes', () => {
 			Simulate.change( toggleInput, { target: { checked: false } } );
 		} );
 
-		defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
-		responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
+		defaultControlGroup = container.querySelector(
+			'.block-editor-responsive-block-control__group--default'
+		);
+		responsiveControlGroup = container.querySelector(
+			'.block-editor-responsive-block-control__group--responsive'
+		);
 
 		expect( defaultControlGroup ).toBeNull();
 		expect( responsiveControlGroup ).not.toBeNull();
@@ -302,8 +332,12 @@ describe( 'Default and Responsive modes', () => {
 			Simulate.change( toggleInput, { target: { checked: true } } );
 		} );
 
-		defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
-		responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
+		defaultControlGroup = container.querySelector(
+			'.block-editor-responsive-block-control__group--default'
+		);
+		responsiveControlGroup = container.querySelector(
+			'.block-editor-responsive-block-control__group--responsive'
+		);
 
 		expect( defaultControlGroup ).not.toBeNull();
 		expect( responsiveControlGroup ).toBeNull();
@@ -317,11 +351,7 @@ describe( 'Default and Responsive modes', () => {
 				return (
 					<Fragment key={ `${ inputId }-${ id }` }>
 						<label htmlFor={ `${ inputId }-${ id }` }>Custom Viewport { label }</label>
-						<input
-							id={ `${ inputId }-${ id }` }
-							defaultValue={ label }
-							type="range"
-						/>
+						<input id={ `${ inputId }-${ id }` } defaultValue={ label } type="range" />
 					</Fragment>
 				);
 			} );
@@ -335,7 +365,8 @@ describe( 'Default and Responsive modes', () => {
 					isResponsive={ true }
 					renderDefaultControl={ spyRenderDefaultControl }
 					renderResponsiveControls={ mockRenderResponsiveControls }
-				/>, container
+				/>,
+				container
 			);
 		} );
 
@@ -351,4 +382,3 @@ describe( 'Default and Responsive modes', () => {
 		expect( customControls ).toHaveLength( 3 );
 	} );
 } );
-

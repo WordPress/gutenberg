@@ -114,30 +114,22 @@ test( 'remove a non-existent filter', () => {
 
 test( 'remove an invalid namespace from a filter', () => {
 	expect( removeFilter( 'test.filter', 42 ) ).toBe( undefined );
-	expect( console ).toHaveErroredWith(
-		'The namespace must be a non-empty string.'
-	);
+	expect( console ).toHaveErroredWith( 'The namespace must be a non-empty string.' );
 } );
 
 test( 'cannot add filters with non-string hook names', () => {
 	addFilter( 42, 'my_callback', () => null );
-	expect( console ).toHaveErroredWith(
-		'The hook name must be a non-empty string.'
-	);
+	expect( console ).toHaveErroredWith( 'The hook name must be a non-empty string.' );
 } );
 
 test( 'cannot add filters with empty-string hook names', () => {
 	addFilter( '', 'my_callback', () => null );
-	expect( console ).toHaveErroredWith(
-		'The hook name must be a non-empty string.'
-	);
+	expect( console ).toHaveErroredWith( 'The hook name must be a non-empty string.' );
 } );
 
 test( 'cannot add filters with empty-string namespaces', () => {
 	addFilter( 'hook_name', '', () => null );
-	expect( console ).toHaveErroredWith(
-		'The namespace must be a non-empty string.'
-	);
+	expect( console ).toHaveErroredWith( 'The namespace must be a non-empty string.' );
 } );
 
 test( 'cannot add filters with invalid namespaces', () => {
@@ -185,7 +177,7 @@ test( 'Can add filters with periods in hookName', () => {
 } );
 
 test( 'cannot add filters with namespace containing backslash', () => {
-	addFilter( 'hook_name', 'i\n\v\a\l\i\d\n\a\m\e', () => null );
+	addFilter( 'hook_name', 'i\n\valid\name', () => null );
 	expect( console ).toHaveErroredWith(
 		'The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.'
 	);
@@ -193,23 +185,17 @@ test( 'cannot add filters with namespace containing backslash', () => {
 
 test( 'cannot add filters named with __ prefix', () => {
 	addFilter( '__test', 'my_callback', () => null );
-	expect( console ).toHaveErroredWith(
-		'The hook name cannot begin with `__`.'
-	);
+	expect( console ).toHaveErroredWith( 'The hook name cannot begin with `__`.' );
 } );
 
 test( 'cannot add filters with non-function callbacks', () => {
 	addFilter( 'test', 'my_callback', '42' );
-	expect( console ).toHaveErroredWith(
-		'The hook callback must be a function.'
-	);
+	expect( console ).toHaveErroredWith( 'The hook callback must be a function.' );
 } );
 
 test( 'cannot add filters with non-numeric priorities', () => {
 	addFilter( 'test', 'my_callback', () => null, '42' );
-	expect( console ).toHaveErroredWith(
-		'If specified, the hook priority must be a number.'
-	);
+	expect( console ).toHaveErroredWith( 'If specified, the hook priority must be a number.' );
 } );
 
 test( 'add 3 filters with different priorities and run them', () => {
@@ -237,16 +223,12 @@ test( 'filters with the same and different priorities', () => {
 	addFilter( 'test_order', 'my_callback_fn_2b', callbacks.fn_2b, 2 );
 	addFilter( 'test_order', 'my_callback_fn_2c', callbacks.fn_2c, 2 );
 
-	expect( applyFilters( 'test_order', [] ) ).toEqual(
-		[ '2a', '2b', '2c', '3a', '3b', '3c' ]
-	);
+	expect( applyFilters( 'test_order', [] ) ).toEqual( [ '2a', '2b', '2c', '3a', '3b', '3c' ] );
 
 	removeFilter( 'test_order', 'my_callback_fn_2b', callbacks.fn_2b );
 	removeFilter( 'test_order', 'my_callback_fn_3a', callbacks.fn_3a );
 
-	expect( applyFilters( 'test_order', [] ) ).toEqual(
-		[ '2a', '2c', '3b', '3c' ]
-	);
+	expect( applyFilters( 'test_order', [] ) ).toEqual( [ '2a', '2c', '3b', '3c' ] );
 
 	addFilter( 'test_order', 'my_callback_fn_4a', callbacks.fn_4a, 4 );
 	addFilter( 'test_order', 'my_callback_fn_4b', callbacks.fn_4b, 4 );
@@ -261,10 +243,20 @@ test( 'filters with the same and different priorities', () => {
 
 	expect( applyFilters( 'test_order', [] ) ).toEqual( [
 		// all except 2b and 3a, which we removed earlier
-		'1a', '1b', '1c', '1d',
-		'2a', '2c', '2d',
-		'3b', '3c', '3d',
-		'4a', '4b', '4c', '4d',
+		'1a',
+		'1b',
+		'1c',
+		'1d',
+		'2a',
+		'2c',
+		'2d',
+		'3b',
+		'3c',
+		'3d',
+		'4a',
+		'4b',
+		'4c',
+		'4d',
 	] );
 } );
 
@@ -320,28 +312,43 @@ test( 'fire action multiple times', () => {
 } );
 
 test( 'add a filter before the one currently executing', () => {
-	addFilter( 'test.filter', 'my_callback', ( outerValue ) => {
-		addFilter( 'test.filter', 'my_callback', ( innerValue ) => innerValue + 'a', 1 );
-		return outerValue + 'b';
-	}, 2 );
+	addFilter(
+		'test.filter',
+		'my_callback',
+		( outerValue ) => {
+			addFilter( 'test.filter', 'my_callback', ( innerValue ) => innerValue + 'a', 1 );
+			return outerValue + 'b';
+		},
+		2
+	);
 
 	expect( applyFilters( 'test.filter', 'test_' ) ).toBe( 'test_b' );
 } );
 
 test( 'add a filter after the one currently executing', () => {
-	addFilter( 'test.filter', 'my_callback', ( outerValue ) => {
-		addFilter( 'test.filter', 'my_callback', ( innerValue ) => innerValue + 'b', 2 );
-		return outerValue + 'a';
-	}, 1 );
+	addFilter(
+		'test.filter',
+		'my_callback',
+		( outerValue ) => {
+			addFilter( 'test.filter', 'my_callback', ( innerValue ) => innerValue + 'b', 2 );
+			return outerValue + 'a';
+		},
+		1
+	);
 
 	expect( applyFilters( 'test.filter', 'test_' ) ).toBe( 'test_ab' );
 } );
 
 test( 'add a filter immediately after the one currently executing', () => {
-	addFilter( 'test.filter', 'my_callback', ( outerValue ) => {
-		addFilter( 'test.filter', 'my_callback', ( innerValue ) => innerValue + 'b', 1 );
-		return outerValue + 'a';
-	}, 1 );
+	addFilter(
+		'test.filter',
+		'my_callback',
+		( outerValue ) => {
+			addFilter( 'test.filter', 'my_callback', ( innerValue ) => innerValue + 'b', 1 );
+			return outerValue + 'a';
+		},
+		1
+	);
 
 	expect( applyFilters( 'test.filter', 'test_' ) ).toBe( 'test_ab' );
 } );
@@ -553,9 +560,11 @@ test( 'current filter when multiple filters are running', () => {
 
 	expect( currentFilter() ).toBe( null );
 
-	expect( applyFilters( 'test.filter1', [ 'test' ] ) ).toEqual(
-		[ 'test', 'test.filter1', 'test.filter2' ]
-	);
+	expect( applyFilters( 'test.filter1', [ 'test' ] ) ).toEqual( [
+		'test',
+		'test.filter1',
+		'test.filter2',
+	] );
 
 	expect( currentFilter() ).toBe( null );
 } );
@@ -644,12 +653,7 @@ test( 'adding an action triggers a hookAdded action passing all callback details
 
 	addAction( 'testAction', 'my_callback2', actionA, 9 );
 	expect( hookAddedSpy ).toHaveBeenCalledTimes( 1 );
-	expect( hookAddedSpy ).toHaveBeenCalledWith(
-		'testAction',
-		'my_callback2',
-		actionA,
-		9
-	);
+	expect( hookAddedSpy ).toHaveBeenCalledWith( 'testAction', 'my_callback2', actionA, 9 );
 } );
 
 test( 'adding a filter triggers a hookAdded action passing all callback details', () => {
@@ -659,12 +663,7 @@ test( 'adding a filter triggers a hookAdded action passing all callback details'
 
 	addFilter( 'testFilter', 'my_callback3', filterA, 8 );
 	expect( hookAddedSpy ).toHaveBeenCalledTimes( 1 );
-	expect( hookAddedSpy ).toHaveBeenCalledWith(
-		'testFilter',
-		'my_callback3',
-		filterA,
-		8
-	);
+	expect( hookAddedSpy ).toHaveBeenCalledWith( 'testFilter', 'my_callback3', filterA, 8 );
 } );
 
 test( 'removing an action triggers a hookRemoved action passing all callback details', () => {
@@ -676,10 +675,7 @@ test( 'removing an action triggers a hookRemoved action passing all callback det
 	removeAction( 'testAction', 'my_callback2' );
 
 	expect( hookRemovedSpy ).toHaveBeenCalledTimes( 1 );
-	expect( hookRemovedSpy ).toHaveBeenCalledWith(
-		'testAction',
-		'my_callback2'
-	);
+	expect( hookRemovedSpy ).toHaveBeenCalledWith( 'testAction', 'my_callback2' );
 } );
 
 test( 'removing a filter triggers a hookRemoved action passing all callback details', () => {
@@ -691,10 +687,7 @@ test( 'removing a filter triggers a hookRemoved action passing all callback deta
 	removeFilter( 'testFilter', 'my_callback3' );
 
 	expect( hookRemovedSpy ).toHaveBeenCalledTimes( 1 );
-	expect( hookRemovedSpy ).toHaveBeenCalledWith(
-		'testFilter',
-		'my_callback3'
-	);
+	expect( hookRemovedSpy ).toHaveBeenCalledWith( 'testFilter', 'my_callback3' );
 } );
 
 test( 'add an all filter and run it any hook to trigger it', () => {
@@ -705,7 +698,7 @@ test( 'add an all filter and run it any hook to trigger it', () => {
 
 test( 'add an all action and run it any hook to trigger it', () => {
 	addAction( 'all', 'my_callback', actionA );
-	addAction( 'test.action', 'my_callback', actionA );// Doesn't get triggered.
+	addAction( 'test.action', 'my_callback', actionA ); // Doesn't get triggered.
 	doAction( 'test.action-anything' );
 	expect( window.actionValue ).toBe( 'a' );
 } );

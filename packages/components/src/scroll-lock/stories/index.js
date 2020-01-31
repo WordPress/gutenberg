@@ -36,8 +36,7 @@ function StripedBackground( props ) {
 		<div
 			style={ {
 				backgroundColor: '#fff',
-				backgroundImage:
-					'linear-gradient(transparent 50%, rgba(0, 0, 0, 0.05) 50%)',
+				backgroundImage: 'linear-gradient(transparent 50%, rgba(0, 0, 0, 0.05) 50%)',
 				backgroundSize: '50px 50px',
 				height: 3000,
 				position: 'relative',

@@ -77,7 +77,7 @@ class GalleryImage extends Component {
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( id );
-		} else if ( ( this.state.didUploadFail ) || ( id && ! isURL( url ) ) ) {
+		} else if ( this.state.didUploadFail || ( id && ! isURL( url ) ) ) {
 			requestImageFailedRetryDialog( id );
 		}
 	}
@@ -148,34 +148,46 @@ class GalleryImage extends Component {
 
 	renderContent( params ) {
 		const {
-			url, isFirstItem, isLastItem, isSelected, caption, onRemove,
-			onMoveForward, onMoveBackward, 'aria-label': ariaLabel,
-			isCropped, getStylesFromColorScheme } = this.props;
+			url,
+			isFirstItem,
+			isLastItem,
+			isSelected,
+			caption,
+			onRemove,
+			onMoveForward,
+			onMoveBackward,
+			'aria-label': ariaLabel,
+			isCropped,
+			getStylesFromColorScheme,
+		} = this.props;
 
 		const { isUploadInProgress, captionSelected } = this.state;
 		const { isUploadFailed, retryMessage } = params;
 		const resizeMode = isCropped ? 'cover' : 'contain';
 
-		const imageStyle = [ style.image, { resizeMode },
+		const imageStyle = [
+			style.image,
+			{ resizeMode },
 			isUploadInProgress ? style.imageUploading : undefined,
 		];
 
-		const overlayStyle = compose( style.overlay,
-			isSelected ? style.overlaySelected : undefined,
+		const overlayStyle = compose( style.overlay, isSelected ? style.overlaySelected : undefined );
+
+		const captionPlaceholderStyle = getStylesFromColorScheme(
+			style.captionPlaceholder,
+			style.captionPlaceholderDark
 		);
 
-		const captionPlaceholderStyle = getStylesFromColorScheme( style.captionPlaceholder, style.captionPlaceholderDark );
-
 		const shouldShowCaptionEditable = ! isUploadFailed && isSelected;
-		const shouldShowCaptionExpanded = ! isUploadFailed && ( ! isSelected && !! caption );
+		const shouldShowCaptionExpanded = ! isUploadFailed && ! isSelected && !! caption;
 
-		const captionContainerStyle = shouldShowCaptionExpanded ?
-			style.captionExpandedContainer :
-			style.captionContainer;
+		const captionContainerStyle = shouldShowCaptionExpanded
+			? style.captionExpandedContainer
+			: style.captionContainer;
 
-		const captionStyle = shouldShowCaptionExpanded ?
-			style.captionExpanded :
-			getStylesFromColorScheme( style.caption, style.captionDark );
+		const captionStyle = shouldShowCaptionExpanded
+			? style.captionExpanded
+			: getStylesFromColorScheme( style.caption, style.captionDark );
 
 		return (
 			<>
@@ -199,7 +211,7 @@ class GalleryImage extends Component {
 						<>
 							{ isSelected && (
 								<View style={ style.toolbar }>
-									<View style={ style.moverButtonContainer } >
+									<View style={ style.moverButtonContainer }>
 										<Button
 											style={ buttonStyle }
 											icon="arrow-left-alt"
@@ -256,8 +268,10 @@ class GalleryImage extends Component {
 	render() {
 		const { id, onRemove, getStylesFromColorScheme, isSelected } = this.props;
 
-		const containerStyle = getStylesFromColorScheme( style.galleryImageContainer,
-			style.galleryImageContainerDark );
+		const containerStyle = getStylesFromColorScheme(
+			style.galleryImageContainer,
+			style.galleryImageContainerDark
+		);
 
 		return (
 			<TouchableWithoutFeedback
@@ -283,10 +297,15 @@ class GalleryImage extends Component {
 	accessibilityLabelImageContainer() {
 		const { caption, 'aria-label': ariaLabel } = this.props;
 
-		return isEmpty( caption ) ? ariaLabel : ( ariaLabel + '. ' + sprintf(
-			/* translators: accessibility text. %s: image caption. */
-			__( 'Image caption. %s' ), caption
-		) );
+		return isEmpty( caption )
+			? ariaLabel
+			: ariaLabel +
+					'. ' +
+					sprintf(
+						/* translators: accessibility text. %s: image caption. */
+						__( 'Image caption. %s' ),
+						caption
+					);
 	}
 }
 

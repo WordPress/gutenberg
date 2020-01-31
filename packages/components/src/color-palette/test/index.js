@@ -9,11 +9,17 @@ import { mount, shallow } from 'enzyme';
 import ColorPalette from '../';
 
 describe( 'ColorPalette', () => {
-	const colors = [ { name: 'red', color: '#f00' }, { name: 'white', color: '#fff' }, { name: 'blue', color: '#00f' } ];
+	const colors = [
+		{ name: 'red', color: '#f00' },
+		{ name: 'white', color: '#fff' },
+		{ name: 'blue', color: '#00f' },
+	];
 	const currentColor = '#f00';
 	const onChange = jest.fn();
 
-	const wrapper = mount( <ColorPalette colors={ colors } value={ currentColor } onChange={ onChange } /> );
+	const wrapper = mount(
+		<ColorPalette colors={ colors } value={ currentColor } onChange={ onChange } />
+	);
 	const buttons = wrapper.find( 'Option button' );
 
 	beforeEach( () => {
@@ -37,7 +43,9 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should call onClick on an inactive button', () => {
-		const inactiveButton = buttons.findWhere( ( button ) => ! button.hasClass( 'is-pressed' ) ).first();
+		const inactiveButton = buttons
+			.findWhere( ( button ) => ! button.hasClass( 'is-pressed' ) )
+			.first();
 		inactiveButton.simulate( 'click' );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
@@ -55,7 +63,16 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should allow disabling custom color picker', () => {
-		expect( shallow( <ColorPalette colors={ colors } disableCustomColors={ true } value={ currentColor } onChange={ onChange } /> ) ).toMatchSnapshot();
+		expect(
+			shallow(
+				<ColorPalette
+					colors={ colors }
+					disableCustomColors={ true }
+					value={ currentColor }
+					onChange={ onChange }
+				/>
+			)
+		).toMatchSnapshot();
 	} );
 
 	describe( 'Dropdown', () => {

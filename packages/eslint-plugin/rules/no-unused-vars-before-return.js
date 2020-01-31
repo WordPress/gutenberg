@@ -82,7 +82,7 @@ module.exports = {
 					context.report(
 						declaratorCandidate.node,
 						'Variables should not be assigned until just prior its first reference. ' +
-						'An early return statement may leave this variable unused.'
+							'An early return statement may leave this variable unused.'
 					);
 				}
 			},

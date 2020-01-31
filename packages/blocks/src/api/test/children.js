@@ -6,12 +6,7 @@ import { renderToString } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	getSerializeCapableElement,
-	concat,
-	toHTML,
-	fromDOM,
-} from '../children';
+import { getSerializeCapableElement, concat, toHTML, fromDOM } from '../children';
 
 describe( 'getSerializeCapableElement', () => {
 	it( 'returns a serialize capable element', () => {
@@ -52,7 +47,7 @@ describe( 'concat', () => {
 				props: {
 					children: [ 'world' ],
 				},
-			},
+			}
 		);
 
 		expect( result ).toEqual( [
@@ -73,16 +68,12 @@ describe( 'concat', () => {
 	} );
 
 	it( 'should merge adjacent strings', () => {
-		const result = concat(
-			'Hello',
-			' ',
-			{
-				type: 'strong',
-				props: {
-					children: [ 'World' ],
-				},
+		const result = concat( 'Hello', ' ', {
+			type: 'strong',
+			props: {
+				children: [ 'World' ],
 			},
-		);
+		} );
 
 		expect( result ).toEqual( [
 			'Hello ',

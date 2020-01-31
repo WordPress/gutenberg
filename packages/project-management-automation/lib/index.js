@@ -39,7 +39,9 @@ const automations = [
 
 	const octokit = new GitHub( token );
 
-	debug( `main: Received event = '${ context.eventName }', action = '${ context.payload.action }'` );
+	debug(
+		`main: Received event = '${ context.eventName }', action = '${ context.payload.action }'`
+	);
 
 	for ( const { event, action, task } of automations ) {
 		if ( event === context.eventName && action === context.payload.action ) {
@@ -53,4 +55,4 @@ const automations = [
 	}
 
 	debug( 'main: All done!' );
-}() );
+} )();
