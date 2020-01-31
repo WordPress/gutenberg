@@ -21,12 +21,19 @@ const LinkControlSearchInput = ( {
 } ) => {
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState();
 
+	/**
+	 * Handles the user moving between different suggestions. Does not handle
+	 * choosing an individual item.
+	 *
+	 * @param {string} selection the url of the selected suggestion
+	 * @param {Object} suggestion the suggestion object
+	 */
 	const selectItemHandler = ( selection, suggestion ) => {
 		onChange( selection );
 		setSelectedSuggestion( suggestion );
 	};
 
-	function selectSuggestionOrCurrentInputValue( event ) {
+	function handleSubmit( event ) {
 		// Avoid default forms behavior, since it's being handled custom here.
 		event.preventDefault();
 
@@ -36,7 +43,7 @@ const LinkControlSearchInput = ( {
 	}
 
 	return (
-		<form onSubmit={ selectSuggestionOrCurrentInputValue }>
+		<form onSubmit={ handleSubmit }>
 			<div className="block-editor-link-control__search-input-wrapper">
 				<URLInput
 					className="block-editor-link-control__search-input"
