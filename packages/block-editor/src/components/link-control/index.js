@@ -10,13 +10,6 @@ import { noop, startsWith, uniqueId } from 'lodash';
 import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	useRef,
-	useCallback,
-	useState,
-	Fragment,
-	useEffect,
-} from '@wordpress/element';
-import {
 	safeDecodeURI,
 	filterURLForDisplay,
 	isURL,
@@ -227,10 +220,14 @@ function LinkControl( {
 		// API. In addition promoting CREATE to a first class suggestion affords
 		// the a11y benefits afforded by `URLInput` to all suggestions (eg:
 		// keyboard handling, ARIA roles...etc).
+		// Note also that due to the flow of data and the nature of the
+		// controlled components the value of the `url` property must correspond
+		// to the text value of the `<input>` otherwise it will result in an
+		// incorrectly named entity being created.
 		return results.concat( {
 			id: uniqueId(),
-			title: '',
-			url: '',
+			title: val, // placeholder
+			url: val, // must match the existing `<input>`s text value
 			type: CREATE_TYPE,
 		} );
 	};
@@ -264,14 +261,13 @@ function LinkControl( {
 		[ handleDirectEntry, fetchSearchSuggestions ]
 	);
 
-	const handleOnCreate = async () => {
+	const handleOnCreate = async (entityTitle) => {
 		let newEntity;
 
 		setIsResolvingLink( true );
 		setErrorMsg( null );
-
 		try {
-			newEntity = await createEntity( 'page', inputValue );
+			newEntity = await createEntity('page', entityTitle );
 		} catch ( error ) {
 			setErrorMsg(
 				error.msg ||
@@ -360,7 +356,9 @@ function LinkControl( {
 							return (
 								<LinkControlSearchCreate
 									searchTerm={ inputValue }
-									onClick={ handleOnCreate }
+									onClick={ () => {
+										handleOnCreate(suggestion.title);
+									 } }
 									key={ `${ suggestion.id }-${ suggestion.type }` }
 									itemProps={ buildSuggestionItemProps(
 										suggestion,
@@ -434,9 +432,14 @@ function LinkControl( {
 					value={ inputValue }
 					onChange={ onInputChange }
 					onSelect={ ( suggestion ) => {
-						stopEditing();
+                        stopEditing();
 
-						handleSelectSuggestion( suggestion, value )();
+						if (suggestion.type && CREATE_TYPE === suggestion.type) {
+							handleOnCreate(inputValue);
+						} else {
+
+							handleSelectSuggestion( suggestion, value )();
+						}
 					} }
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }

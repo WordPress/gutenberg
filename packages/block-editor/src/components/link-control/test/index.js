@@ -622,7 +622,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
-
+		const form = container.querySelector('form');
 		const createButton = first( Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new' ) ) );
 
 		// Step down into the search results, highlighting the first result item
@@ -630,9 +630,13 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			Simulate.keyDown( searchInput, { keyCode: DOWN } );
 		} );
 
-		await act( async () => {
+		act( () => {
 			Simulate.keyDown( createButton, { keyCode: ENTER } );
 		} );
+
+		await act(async () => {
+			Simulate.submit(form);
+		});
 
 		await eventLoopTick();
 
@@ -643,7 +647,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const currentLinkHTML = currentLink.innerHTML;
 
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( entityNameText ) ); //title
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( '/?p=123' ) ); // slug
 	} );
 
 	it( 'should not show not show an option to create an entity when input is empty', async () => {
