@@ -19,8 +19,7 @@ describe( 'TabPanel', () => {
 	};
 
 	const getElementsByClass = ( wrapper, className ) => {
-		return TestUtils
-			.scryRenderedDOMComponentsWithClass( wrapper, className );
+		return TestUtils.scryRenderedDOMComponentsWithClass( wrapper, className );
 	};
 
 	const elementClick = ( element ) => {
@@ -61,13 +60,15 @@ describe( 'TabPanel', () => {
 					},
 				],
 				children: ( tab ) => {
-					return <p tabIndex="0" className={ tab.name + '-view' }>{ tab.name }</p>;
+					return (
+						<p tabIndex="0" className={ tab.name + '-view' }>
+							{ tab.name }
+						</p>
+					);
 				},
 			};
 
-			const wrapper = TestUtils.renderIntoDocument(
-				getTestComponent( TabPanel, props )
-			);
+			const wrapper = TestUtils.renderIntoDocument( getTestComponent( TabPanel, props ) );
 
 			const alphaTab = getElementByClass( wrapper, 'alpha' );
 			const betaTab = getElementByClass( wrapper, 'beta' );
@@ -78,7 +79,8 @@ describe( 'TabPanel', () => {
 			const getGammaViews = () => getElementsByClass( wrapper, 'gamma-view' );
 
 			const getActiveTab = () => getElementByClass( wrapper, 'active-tab' );
-			const getActiveView = () => getElementByClass( wrapper, 'components-tab-panel__tab-content' ).firstChild.textContent;
+			const getActiveView = () =>
+				getElementByClass( wrapper, 'components-tab-panel__tab-content' ).firstChild.textContent;
 
 			expect( getActiveTab().innerHTML ).toBe( 'Alpha' );
 			expect( getAlphaViews() ).toHaveLength( 1 );
@@ -138,12 +140,14 @@ describe( 'TabPanel', () => {
 				},
 			],
 			children: ( tab ) => {
-				return <p tabIndex="0" className={ tab.name + '-view' }>{ tab.name }</p>;
+				return (
+					<p tabIndex="0" className={ tab.name + '-view' }>
+						{ tab.name }
+					</p>
+				);
 			},
 		};
-		const wrapper = TestUtils.renderIntoDocument(
-			getTestComponent( TabPanel, props )
-		);
+		const wrapper = TestUtils.renderIntoDocument( getTestComponent( TabPanel, props ) );
 
 		const getActiveTab = () => getElementByClass( wrapper, 'active-tab' );
 		expect( getActiveTab().innerHTML ).toBe( 'Beta' );

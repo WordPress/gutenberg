@@ -73,11 +73,7 @@ class ImageSize extends Component {
 			imageWidthWithinContainer: this.state.width,
 			imageHeightWithinContainer: this.state.height,
 		};
-		return (
-			<div ref={ this.bindContainer }>
-				{ this.props.children( sizes ) }
-			</div>
-		);
+		return <div ref={ this.bindContainer }>{ this.props.children( sizes ) }</div>;
 	}
 }
 

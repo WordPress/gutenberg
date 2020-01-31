@@ -34,13 +34,13 @@ describe( 'withDispatch', () => {
 
 			return {
 				increment: () => {
-					const actionReturnedFromDispatch = Promise.resolve( _dispatch( 'counter' ).increment( count ) );
-					return expect( actionReturnedFromDispatch ).resolves.toEqual(
-						{
-							type: 'increment',
-							count,
-						}
+					const actionReturnedFromDispatch = Promise.resolve(
+						_dispatch( 'counter' ).increment( count )
 					);
+					return expect( actionReturnedFromDispatch ).resolves.toEqual( {
+						type: 'increment',
+						count,
+					} );
 				},
 			};
 		} )( ( props ) => <button onClick={ props.increment } /> );
@@ -140,66 +140,68 @@ describe( 'withDispatch', () => {
 		expect( secondRegistryAction ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'always calls select with the latest state in the handler passed to ' +
-		'the component', () => {
-		const store = registry.registerStore( 'counter', {
-			reducer: ( state = 0, action ) => {
-				if ( action.type === 'update' ) {
-					return action.count;
-				}
-				return state;
-			},
-			actions: {
-				update: ( count ) => ( { type: 'update', count } ),
-			},
-			selectors: {
-				getCount: ( state ) => state,
-			},
-		} );
-
-		const Component = withDispatch( ( _dispatch, ownProps, { select: _select } ) => {
-			const outerCount = _select( 'counter' ).getCount();
-			return {
-				update: () => {
-					const innerCount = _select( 'counter' ).getCount();
-					expect( innerCount ).toBe( outerCount );
-					const actionReturnedFromDispatch = Promise.resolve(
-						_dispatch( 'counter' ).update( innerCount + 1 )
-					);
-					return expect( actionReturnedFromDispatch ).resolves.toEqual( {
-						type: 'update',
-						count: innerCount + 1,
-					} );
+	it(
+		'always calls select with the latest state in the handler passed to ' + 'the component',
+		() => {
+			const store = registry.registerStore( 'counter', {
+				reducer: ( state = 0, action ) => {
+					if ( action.type === 'update' ) {
+						return action.count;
+					}
+					return state;
 				},
-			};
-		} )( ( props ) => <button onClick={ props.update } /> );
+				actions: {
+					update: ( count ) => ( { type: 'update', count } ),
+				},
+				selectors: {
+					getCount: ( state ) => state,
+				},
+			} );
 
-		let testRenderer;
-		act( () => {
-			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ registry }>
-					<Component />
-				</RegistryProvider>
-			);
-		} );
+			const Component = withDispatch( ( _dispatch, ownProps, { select: _select } ) => {
+				const outerCount = _select( 'counter' ).getCount();
+				return {
+					update: () => {
+						const innerCount = _select( 'counter' ).getCount();
+						expect( innerCount ).toBe( outerCount );
+						const actionReturnedFromDispatch = Promise.resolve(
+							_dispatch( 'counter' ).update( innerCount + 1 )
+						);
+						return expect( actionReturnedFromDispatch ).resolves.toEqual( {
+							type: 'update',
+							count: innerCount + 1,
+						} );
+					},
+				};
+			} )( ( props ) => <button onClick={ props.update } /> );
 
-		const counterUpdateHandler = testRenderer.root.findByType( 'button' ).props.onClick;
+			let testRenderer;
+			act( () => {
+				testRenderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<Component />
+					</RegistryProvider>
+				);
+			} );
 
-		act( () => {
-			counterUpdateHandler();
-		} );
-		expect( store.getState() ).toBe( 1 );
+			const counterUpdateHandler = testRenderer.root.findByType( 'button' ).props.onClick;
 
-		act( () => {
-			counterUpdateHandler();
-		} );
-		expect( store.getState() ).toBe( 2 );
+			act( () => {
+				counterUpdateHandler();
+			} );
+			expect( store.getState() ).toBe( 1 );
 
-		act( () => {
-			counterUpdateHandler();
-		} );
-		expect( store.getState() ).toBe( 3 );
-	} );
+			act( () => {
+				counterUpdateHandler();
+			} );
+			expect( store.getState() ).toBe( 2 );
+
+			act( () => {
+				counterUpdateHandler();
+			} );
+			expect( store.getState() ).toBe( 3 );
+		}
+	);
 
 	it( 'warns when mapDispatchToProps returns non-function property', () => {
 		const Component = withDispatch( () => {

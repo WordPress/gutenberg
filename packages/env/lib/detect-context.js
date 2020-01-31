@@ -37,9 +37,9 @@ module.exports = async function detectContext( directoryPath = process.cwd() ) {
 
 	// Race multiple file read streams against each other until
 	// a plugin or theme header is found.
-	const files = ( await readDir( absPath ) ).filter(
-		( file ) => path.extname( file ) === '.php' || path.basename( file ) === 'style.css'
-	).map( ( fileName ) => path.join( absPath, fileName ) );
+	const files = ( await readDir( absPath ) )
+		.filter( ( file ) => path.extname( file ) === '.php' || path.basename( file ) === 'style.css' )
+		.map( ( fileName ) => path.join( absPath, fileName ) );
 
 	const streams = [];
 	for ( const file of files ) {
@@ -59,9 +59,7 @@ module.exports = async function detectContext( directoryPath = process.cwd() ) {
 		} );
 		streams.push( fileStream );
 	}
-	await Promise.all(
-		streams.map( ( fileStream ) => finished( fileStream ).catch( () => {} ) )
-	);
+	await Promise.all( streams.map( ( fileStream ) => finished( fileStream ).catch( () => {} ) ) );
 
 	return context;
 };

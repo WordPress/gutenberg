@@ -12,18 +12,28 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 	}
 
 	const confirmSynchronization = () => {
-		// eslint-disable-next-line no-alert
-		if ( window.confirm( __( 'Resetting the template may result in loss of content, do you want to continue?' ) ) ) {
+		if (
+			// eslint-disable-next-line no-alert
+			window.confirm(
+				__( 'Resetting the template may result in loss of content, do you want to continue?' )
+			)
+		) {
 			props.synchronizeTemplate();
 		}
 	};
 
 	return (
 		<Notice className="editor-template-validation-notice" isDismissible={ false } status="warning">
-			<p>{ __( 'The content of your post doesn’t match the template assigned to your post type.' ) }</p>
+			<p>
+				{ __( 'The content of your post doesn’t match the template assigned to your post type.' ) }
+			</p>
 			<div>
-				<Button isSecondary onClick={ props.resetTemplateValidity }>{ __( 'Keep it as is' ) }</Button>
-				<Button onClick={ confirmSynchronization } isPrimary>{ __( 'Reset the template' ) }</Button>
+				<Button isSecondary onClick={ props.resetTemplateValidity }>
+					{ __( 'Keep it as is' ) }
+				</Button>
+				<Button onClick={ confirmSynchronization } isPrimary>
+					{ __( 'Reset the template' ) }
+				</Button>
 			</div>
 		</Notice>
 	);

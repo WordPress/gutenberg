@@ -27,10 +27,7 @@ export function doBlocksMatchTemplate( blocks = [], template = [] ) {
 		blocks.length === template.length &&
 		every( template, ( [ name, , innerBlocksTemplate ], index ) => {
 			const block = blocks[ index ];
-			return (
-				name === block.name &&
-				doBlocksMatchTemplate( block.innerBlocks, innerBlocksTemplate )
-			);
+			return name === block.name && doBlocksMatchTemplate( block.innerBlocks, innerBlocksTemplate );
 		} )
 	);
 }
@@ -67,8 +64,10 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 		// before creating the blocks.
 
 		const blockType = getBlockType( name );
-		const isHTMLAttribute = ( attributeDefinition ) => get( attributeDefinition, [ 'source' ] ) === 'html';
-		const isQueryAttribute = ( attributeDefinition ) => get( attributeDefinition, [ 'source' ] ) === 'query';
+		const isHTMLAttribute = ( attributeDefinition ) =>
+			get( attributeDefinition, [ 'source' ] ) === 'html';
+		const isQueryAttribute = ( attributeDefinition ) =>
+			get( attributeDefinition, [ 'source' ] ) === 'query';
 
 		const normalizeAttributes = ( schema, values ) => {
 			return mapValues( values, ( value, key ) => {

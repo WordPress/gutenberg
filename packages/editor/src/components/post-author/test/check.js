@@ -36,7 +36,11 @@ describe( 'PostAuthorCheck', () => {
 	};
 
 	it( 'should not render anything if users unknown', () => {
-		const wrapper = shallow( <PostAuthorCheck authors={ [] } hasAssignAuthorAction={ true }>authors</PostAuthorCheck> );
+		const wrapper = shallow(
+			<PostAuthorCheck authors={ [] } hasAssignAuthorAction={ true }>
+				authors
+			</PostAuthorCheck>
+		);
 		expect( wrapper.type() ).toBe( null );
 	} );
 

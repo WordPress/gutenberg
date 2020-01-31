@@ -31,9 +31,7 @@ export function BoundaryStyle( { activeFormats, forwardedRef } ) {
 		}
 
 		const computedStyle = window.getComputedStyle( element );
-		const newColor = computedStyle.color
-			.replace( ')', ', 0.2)' )
-			.replace( 'rgb', 'rgba' );
+		const newColor = computedStyle.color.replace( ')', ', 0.2)' ).replace( 'rgb', 'rgba' );
 		const selector = `.rich-text:focus ${ boundarySelector }`;
 		const rule = `background-color: ${ newColor }`;
 		const style = `${ selector } {${ rule }}`;

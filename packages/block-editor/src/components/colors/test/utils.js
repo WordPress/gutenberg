@@ -10,38 +10,32 @@ import {
 describe( 'color utils', () => {
 	describe( 'getColorObjectByAttributeValues', () => {
 		it( 'should return the custom color object when there is no definedColor', () => {
-			const colors = [
-				{ slug: 'red' },
-				{ slug: 'green' },
-				{ slug: 'blue' },
-			];
+			const colors = [ { slug: 'red' }, { slug: 'green' }, { slug: 'blue' } ];
 			const customColor = '#ffffff';
 
-			expect( getColorObjectByAttributeValues( colors, undefined, customColor ) ).toEqual( { color: customColor } );
+			expect( getColorObjectByAttributeValues( colors, undefined, customColor ) ).toEqual( {
+				color: customColor,
+			} );
 		} );
 
 		it( 'should return the custom color object when definedColor was not found', () => {
-			const colors = [
-				{ slug: 'red' },
-				{ slug: 'green' },
-				{ slug: 'blue' },
-			];
+			const colors = [ { slug: 'red' }, { slug: 'green' }, { slug: 'blue' } ];
 			const definedColor = 'purple';
 			const customColor = '#ffffff';
 
-			expect( getColorObjectByAttributeValues( colors, definedColor, customColor ) ).toEqual( { color: customColor } );
+			expect( getColorObjectByAttributeValues( colors, definedColor, customColor ) ).toEqual( {
+				color: customColor,
+			} );
 		} );
 
 		it( 'should return the found color object', () => {
-			const colors = [
-				{ slug: 'red' },
-				{ slug: 'green' },
-				{ slug: 'blue' },
-			];
+			const colors = [ { slug: 'red' }, { slug: 'green' }, { slug: 'blue' } ];
 			const definedColor = 'blue';
 			const customColor = '#ffffff';
 
-			expect( getColorObjectByAttributeValues( colors, definedColor, customColor ) ).toEqual( { slug: 'blue' } );
+			expect( getColorObjectByAttributeValues( colors, definedColor, customColor ) ).toEqual( {
+				slug: 'blue',
+			} );
 		} );
 	} );
 
@@ -63,7 +57,10 @@ describe( 'color utils', () => {
 				{ slug: 'blue', color: '#0000ff' },
 			];
 
-			expect( getColorObjectByColorValue( colors, '#00ff00' ) ).toEqual( { slug: 'green', color: '#00ff00' } );
+			expect( getColorObjectByColorValue( colors, '#00ff00' ) ).toEqual( {
+				slug: 'green',
+				color: '#00ff00',
+			} );
 		} );
 	} );
 
@@ -77,7 +74,9 @@ describe( 'color utils', () => {
 		} );
 
 		it( 'should return a class name with the color slug in kebab case', () => {
-			expect( getColorClassName( 'background', 'Light Purple' ) ).toBe( 'has-light-purple-background' );
+			expect( getColorClassName( 'background', 'Light Purple' ) ).toBe(
+				'has-light-purple-background'
+			);
 		} );
 	} );
 } );

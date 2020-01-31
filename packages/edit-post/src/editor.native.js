@@ -36,13 +36,7 @@ class Editor extends Component {
 		this.setTitleRef = this.setTitleRef.bind( this );
 	}
 
-	getEditorSettings(
-		settings,
-		hasFixedToolbar,
-		focusMode,
-		hiddenBlockTypes,
-		blockTypes,
-	) {
+	getEditorSettings( settings, hasFixedToolbar, focusMode, hiddenBlockTypes, blockTypes ) {
 		settings = {
 			...settings,
 			hasFixedToolbar,
@@ -54,16 +48,12 @@ class Editor extends Component {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
-			const defaultAllowedBlockTypes = (
-				true === settings.allowedBlockTypes ?
-					map( blockTypes, 'name' ) :
-					( settings.allowedBlockTypes || [] )
-			);
+			const defaultAllowedBlockTypes =
+				true === settings.allowedBlockTypes
+					? map( blockTypes, 'name' )
+					: settings.allowedBlockTypes || [];
 
-			settings.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes,
-			);
+			settings.allowedBlockTypes = without( defaultAllowedBlockTypes, ...hiddenBlockTypes );
 		}
 
 		return settings;
@@ -105,7 +95,7 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			hiddenBlockTypes,
-			blockTypes,
+			blockTypes
 		);
 
 		const normalizedPost = post || {
@@ -154,9 +144,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const {
-			switchEditorMode,
-		} = dispatch( 'core/edit-post' );
+		const { switchEditorMode } = dispatch( 'core/edit-post' );
 
 		return {
 			switchEditorMode,

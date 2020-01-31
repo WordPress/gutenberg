@@ -6,12 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, useViewportMatch } from '@wordpress/compose';
 
-function PostSwitchToDraftButton( {
-	isSaving,
-	isPublished,
-	isScheduled,
-	onClick,
-} ) {
+function PostSwitchToDraftButton( { isSaving, isPublished, isScheduled, onClick } ) {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 
 	if ( ! isPublished && ! isScheduled ) {
@@ -45,7 +40,9 @@ function PostSwitchToDraftButton( {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isSavingPost, isCurrentPostPublished, isCurrentPostScheduled } = select( 'core/editor' );
+		const { isSavingPost, isCurrentPostPublished, isCurrentPostScheduled } = select(
+			'core/editor'
+		);
 		return {
 			isSaving: isSavingPost(),
 			isPublished: isCurrentPostPublished(),
@@ -62,4 +59,3 @@ export default compose( [
 		};
 	} ),
 ] )( PostSwitchToDraftButton );
-

@@ -1,9 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createNewPost,
-} from '@wordpress/e2e-test-utils';
+import { createNewPost } from '@wordpress/e2e-test-utils';
 
 describe( 'Scheduling', () => {
 	beforeEach( createNewPost );

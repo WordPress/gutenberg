@@ -50,12 +50,7 @@ class FocusableIframe extends Component {
 		// responsibility of the parent to assign a title.
 
 		/* eslint-disable jsx-a11y/iframe-has-title */
-		return (
-			<iframe
-				ref={ this.node }
-				{ ...omit( this.props, [ 'iframeRef', 'onFocus' ] ) }
-			/>
-		);
+		return <iframe ref={ this.node } { ...omit( this.props, [ 'iframeRef', 'onFocus' ] ) } />;
 		/* eslint-enable jsx-a11y/iframe-has-title */
 	}
 }

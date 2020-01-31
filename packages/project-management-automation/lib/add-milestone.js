@@ -31,7 +31,9 @@ async function addMilestone( payload, octokit ) {
 
 	debug( 'add-milestone: Fetching current milestone' );
 
-	const { data: { milestone } } = await octokit.issues.get( {
+	const {
+		data: { milestone },
+	} = await octokit.issues.get( {
 		owner: payload.repository.owner.login,
 		repo: payload.repository.name,
 		issue_number: payload.pull_request.number,
@@ -44,7 +46,9 @@ async function addMilestone( payload, octokit ) {
 
 	debug( 'add-milestone: Fetching `package.json` contents' );
 
-	const { data: { content, encoding } } = await octokit.repos.getContents( {
+	const {
+		data: { content, encoding },
+	} = await octokit.repos.getContents( {
 		owner: payload.repository.owner.login,
 		repo: payload.repository.name,
 		path: 'package.json',
@@ -63,14 +67,16 @@ async function addMilestone( payload, octokit ) {
 		minor += 1;
 	}
 
-	const numVersionsElapsed = ( ( major - REFERENCE_MAJOR ) * 10 ) + ( minor - REFERENCE_MINOR );
+	const numVersionsElapsed = ( major - REFERENCE_MAJOR ) * 10 + ( minor - REFERENCE_MINOR );
 	const numDaysElapsed = numVersionsElapsed * DAYS_PER_RELEASE;
 
 	// Using UTC for the calculation ensures it's not affected by daylight savings.
 	const dueDate = new Date( REFERENCE_DATE );
 	dueDate.setUTCDate( dueDate.getUTCDate() + numDaysElapsed );
 
-	debug( `add-milestone: Creating 'Gutenberg ${ major }.${ minor }' milestone, due on ${ dueDate.toISOString() }` );
+	debug(
+		`add-milestone: Creating 'Gutenberg ${ major }.${ minor }' milestone, due on ${ dueDate.toISOString() }`
+	);
 
 	await octokit.issues.createMilestone( {
 		owner: payload.repository.owner.login,
@@ -90,7 +96,9 @@ async function addMilestone( payload, octokit ) {
 		( { title } ) => title === `Gutenberg ${ major }.${ minor }`
 	);
 
-	debug( `add-milestone: Adding issue #${ payload.pull_request.number } to milestone #${ number }` );
+	debug(
+		`add-milestone: Adding issue #${ payload.pull_request.number } to milestone #${ number }`
+	);
 
 	await octokit.issues.update( {
 		owner: payload.repository.owner.login,

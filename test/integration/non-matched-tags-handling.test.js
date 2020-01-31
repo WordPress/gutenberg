@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	pasteHandler,
-	unregisterBlockType,
-} from '@wordpress/blocks';
+import { pasteHandler, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 describe( 'Handling of non matched tags in block transforms', () => {

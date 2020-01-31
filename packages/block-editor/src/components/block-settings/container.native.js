@@ -20,16 +20,14 @@ function BottomSheetSettings( { editorSidebarOpened, closeGeneralSidebar, ...pro
 			contentStyle={ styles.content }
 			{ ...props }
 		>
-			<InspectorControls.Slot	/>
+			<InspectorControls.Slot />
 		</BottomSheet>
 	);
 }
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			isEditorSidebarOpened,
-		} = select( 'core/edit-post' );
+		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 
 		return {
 			editorSidebarOpened: isEditorSidebarOpened(),
@@ -42,5 +40,4 @@ export default compose( [
 			closeGeneralSidebar,
 		};
 	} ),
-]
-)( BottomSheetSettings );
+] )( BottomSheetSettings );

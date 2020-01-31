@@ -1,8 +1,4 @@
-module.exports = function createDockerComposeConfig(
-	cwdTestsPath,
-	context,
-	dependencies
-) {
+module.exports = function createDockerComposeConfig( cwdTestsPath, context, dependencies ) {
 	const { path: cwd, pathBasename: cwdName } = context;
 
 	const dependencyMappings = [ ...dependencies, context ]

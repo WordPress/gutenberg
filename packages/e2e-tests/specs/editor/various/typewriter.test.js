@@ -8,14 +8,13 @@ describe( 'TypeWriter', () => {
 		await createNewPost();
 	} );
 
-	const getCaretPosition = async () =>
-		await page.evaluate( () => wp.dom.computeCaretRect().y );
+	const getCaretPosition = async () => await page.evaluate( () => wp.dom.computeCaretRect().y );
 
 	// Allow the scroll position to be 1px off.
 	const BUFFER = 1;
 
 	const getDiff = async ( caretPosition ) =>
-		Math.abs( await getCaretPosition() - caretPosition );
+		Math.abs( ( await getCaretPosition() ) - caretPosition );
 
 	it( 'should maintain caret position', async () => {
 		// Create first block.
@@ -29,9 +28,11 @@ describe( 'TypeWriter', () => {
 		expect( await getCaretPosition() ).toBeGreaterThan( initialPosition );
 
 		// Create blocks until the the typewriter effect kicks in.
-		while ( await page.evaluate( () =>
-			wp.dom.getScrollContainer( document.activeElement ).scrollTop === 0
-		) ) {
+		while (
+			await page.evaluate(
+				() => wp.dom.getScrollContainer( document.activeElement ).scrollTop === 0
+			)
+		) {
 			await page.keyboard.press( 'Enter' );
 		}
 
@@ -43,10 +44,13 @@ describe( 'TypeWriter', () => {
 		expect( await getDiff( newPosition ) ).toBeLessThanOrEqual( BUFFER );
 
 		// Type until the text wraps.
-		while ( await page.evaluate( () =>
-			document.activeElement.clientHeight <=
-			parseInt( getComputedStyle( document.activeElement ).lineHeight, 10 )
-		) ) {
+		while (
+			await page.evaluate(
+				() =>
+					document.activeElement.clientHeight <=
+					parseInt( getComputedStyle( document.activeElement ).lineHeight, 10 )
+			)
+		) {
 			await page.keyboard.type( 'a' );
 		}
 
@@ -76,14 +80,12 @@ describe( 'TypeWriter', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Create blocks until there is a scrollable container.
-		while ( await page.evaluate( () =>
-			! wp.dom.getScrollContainer( document.activeElement )
-		) ) {
+		while ( await page.evaluate( () => ! wp.dom.getScrollContainer( document.activeElement ) ) ) {
 			await page.keyboard.press( 'Enter' );
 		}
 
-		await page.evaluate( () =>
-			wp.dom.getScrollContainer( document.activeElement ).scrollTop = 1
+		await page.evaluate(
+			() => ( wp.dom.getScrollContainer( document.activeElement ).scrollTop = 1 )
 		);
 
 		const initialPosition = await getCaretPosition();
@@ -115,18 +117,18 @@ describe( 'TypeWriter', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Create blocks until there is a scrollable container.
-		while ( await page.evaluate( () =>
-			! wp.dom.getScrollContainer( document.activeElement )
-		) ) {
+		while ( await page.evaluate( () => ! wp.dom.getScrollContainer( document.activeElement ) ) ) {
 			await page.keyboard.press( 'Enter' );
 		}
 
 		let count = 0;
 
 		// Create blocks until the the typewriter effect kicks in.
-		while ( await page.evaluate( () =>
-			wp.dom.getScrollContainer( document.activeElement ).scrollTop === 0
-		) ) {
+		while (
+			await page.evaluate(
+				() => wp.dom.getScrollContainer( document.activeElement ).scrollTop === 0
+			)
+		) {
 			await page.keyboard.press( 'Enter' );
 			count++;
 		}

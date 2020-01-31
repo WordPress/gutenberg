@@ -30,13 +30,9 @@ class BlockSelectionClearer extends Component {
 	 * @param {FocusEvent} event Focus event.
 	 */
 	clearSelectionIfFocusTarget( event ) {
-		const {
-			hasSelectedBlock,
-			hasMultiSelection,
-			clearSelectedBlock,
-		} = this.props;
+		const { hasSelectedBlock, hasMultiSelection, clearSelectedBlock } = this.props;
 
-		const hasSelection = ( hasSelectedBlock || hasMultiSelection );
+		const hasSelection = hasSelectedBlock || hasMultiSelection;
 		if ( event.target === this.container && hasSelection ) {
 			clearSelectedBlock();
 		}
@@ -48,11 +44,7 @@ class BlockSelectionClearer extends Component {
 				tabIndex={ -1 }
 				onFocus={ this.clearSelectionIfFocusTarget }
 				ref={ this.bindContainer }
-				{ ...omit( this.props, [
-					'clearSelectedBlock',
-					'hasSelectedBlock',
-					'hasMultiSelection',
-				] ) }
+				{ ...omit( this.props, [ 'clearSelectedBlock', 'hasSelectedBlock', 'hasMultiSelection' ] ) }
 			/>
 		);
 	}

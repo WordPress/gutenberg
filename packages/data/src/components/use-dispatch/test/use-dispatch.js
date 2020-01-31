@@ -42,8 +42,7 @@ describe( 'useDispatch', () => {
 
 		const testInstance = testRenderer.root;
 
-		expect( testInstance.findByType( TestComponent ).props.dispatch )
-			.toBe( registry.dispatch );
+		expect( testInstance.findByType( TestComponent ).props.dispatch ).toBe( registry.dispatch );
 	} );
 	it( 'returns expected action creators from store for given storeName', () => {
 		const noop = () => ( { type: '__INERT__' } );
@@ -63,7 +62,7 @@ describe( 'useDispatch', () => {
 
 		act( () => {
 			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ registry } >
+				<RegistryProvider value={ registry }>
 					<TestComponent />
 				</RegistryProvider>
 			);

@@ -76,9 +76,8 @@ export const createQueue = () => {
 	 *                                       animation frame timestamp.
 	 */
 	const runWaitingList = ( deadline ) => {
-		const hasTimeRemaining = typeof deadline === 'number' ?
-			() => false :
-			() => deadline.timeRemaining() > 0;
+		const hasTimeRemaining =
+			typeof deadline === 'number' ? () => false : () => deadline.timeRemaining() > 0;
 
 		do {
 			if ( waitingList.length === 0 ) {

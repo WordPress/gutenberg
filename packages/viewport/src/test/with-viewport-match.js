@@ -39,8 +39,7 @@ describe( 'withViewportMatch()', () => {
 			isSmall: '>= small',
 			isLarge: 'large',
 			isLessThanSmall: '< small',
-		}
-		)( ChildComponent );
+		} )( ChildComponent );
 
 		useViewportMatchMock.mockReturnValueOnce( false );
 		useViewportMatchMock.mockReturnValueOnce( true );

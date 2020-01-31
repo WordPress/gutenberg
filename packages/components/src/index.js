@@ -1,5 +1,14 @@
 // Primitives
-export { SVG, Path, Circle, Polygon, Rect, G, HorizontalRule, BlockQuotation } from '@wordpress/primitives';
+export {
+	SVG,
+	Path,
+	Circle,
+	Polygon,
+	Rect,
+	G,
+	HorizontalRule,
+	BlockQuotation,
+} from '@wordpress/primitives';
 
 // Components
 export { default as Animate } from './animate';
@@ -91,12 +100,8 @@ export {
 
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
-export {
-	default as withConstrainedTabbing,
-} from './higher-order/with-constrained-tabbing';
-export {
-	default as withFallbackStyles,
-} from './higher-order/with-fallback-styles';
+export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
+export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
 export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export {
@@ -104,7 +109,5 @@ export {
 	Provider as FocusReturnProvider,
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
-export {
-	default as withSpokenMessages,
-} from './higher-order/with-spoken-messages';
+export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 export * from './text';

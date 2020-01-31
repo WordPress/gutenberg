@@ -3,7 +3,8 @@ module.exports = {
 		type: 'layout',
 		docs: {
 			description: 'Enforce dependencies docblocks formatting',
-			url: 'https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md',
+			url:
+				'https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md',
 		},
 		schema: [],
 		fixable: true,

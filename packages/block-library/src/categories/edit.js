@@ -86,21 +86,20 @@ class CategoriesEdit extends Component {
 
 		return (
 			<li key={ category.id }>
-				<a href={ category.link } target="_blank" rel="noreferrer noopener">{ this.renderCategoryName( category ) }</a>
-				{ showPostCounts &&
-					<span className="wp-block-categories__post-count">
-						{ ' ' }({ category.count })
-					</span>
-				}
+				<a href={ category.link } target="_blank" rel="noreferrer noopener">
+					{ this.renderCategoryName( category ) }
+				</a>
+				{ showPostCounts && (
+					<span className="wp-block-categories__post-count"> ({ category.count })</span>
+				) }
 
-				{
-					showHierarchy &&
-					!! childCategories.length && (
-						<ul className={ this.getCategoryListClassName( level + 1 ) }>
-							{ childCategories.map( ( childCategory ) => this.renderCategoryListItem( childCategory, level + 1 ) ) }
-						</ul>
-					)
-				}
+				{ showHierarchy && !! childCategories.length && (
+					<ul className={ this.getCategoryListClassName( level + 1 ) }>
+						{ childCategories.map( ( childCategory ) =>
+							this.renderCategoryListItem( childCategory, level + 1 )
+						) }
+					</ul>
+				) }
 			</li>
 		);
 	}
@@ -131,16 +130,13 @@ class CategoriesEdit extends Component {
 			<option key={ category.id }>
 				{ times( level * 3, () => '\xa0' ) }
 				{ this.renderCategoryName( category ) }
-				{
-					!! showPostCounts ?
-						` (${ category.count })` :
-						''
-				}
+				{ !! showPostCounts ? ` (${ category.count })` : '' }
 			</option>,
 			showHierarchy &&
-			!! childCategories.length && (
-				childCategories.map( ( childCategory ) => this.renderCategoryDropdownItem( childCategory, level + 1 ) )
-			),
+				!! childCategories.length &&
+				childCategories.map( ( childCategory ) =>
+					this.renderCategoryDropdownItem( childCategory, level + 1 )
+				),
 		];
 	}
 
@@ -174,10 +170,7 @@ class CategoriesEdit extends Component {
 			return (
 				<>
 					{ inspectorControls }
-					<Placeholder
-						icon="admin-post"
-						label={ __( 'Categories' ) }
-					>
+					<Placeholder icon="admin-post" label={ __( 'Categories' ) }>
 						<Spinner />
 					</Placeholder>
 				</>
@@ -188,11 +181,7 @@ class CategoriesEdit extends Component {
 			<>
 				{ inspectorControls }
 				<div className={ this.props.className }>
-					{
-						displayAsDropdown ?
-							this.renderCategoryDropdown() :
-							this.renderCategoryList()
-					}
+					{ displayAsDropdown ? this.renderCategoryDropdown() : this.renderCategoryList() }
 				</div>
 			</>
 		);

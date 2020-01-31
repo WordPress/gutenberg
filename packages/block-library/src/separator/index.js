@@ -25,7 +25,6 @@ export const settings = {
 		attributes: {
 			customColor: '#065174',
 			className: 'is-style-wide',
-
 		},
 	},
 	styles: [

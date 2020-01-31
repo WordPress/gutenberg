@@ -2,13 +2,7 @@
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
-import {
-	BaseControl,
-	Button,
-	Disabled,
-	PanelBody,
-	withNotices,
-} from '@wordpress/components';
+import { BaseControl, Button, Disabled, PanelBody, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -20,17 +14,9 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { Component, createRef } from '@wordpress/element';
-import {
-	__,
-	sprintf,
-} from '@wordpress/i18n';
-import {
-	compose,
-	withInstanceId,
-} from '@wordpress/compose';
-import {
-	withSelect,
-} from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { compose, withInstanceId } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 
 /**
@@ -54,12 +40,7 @@ class VideoEdit extends Component {
 	}
 
 	componentDidMount() {
-		const {
-			attributes,
-			mediaUpload,
-			noticeOperations,
-			setAttributes,
-		} = this.props;
+		const { attributes, mediaUpload, noticeOperations, setAttributes } = this.props;
 		const { id, src = '' } = attributes;
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
@@ -90,9 +71,7 @@ class VideoEdit extends Component {
 
 		if ( newSrc !== src ) {
 			// Check if there's an embed block that handles this URL.
-			const embedBlock = createUpgradedEmbedBlock(
-				{ attributes: { url: newSrc } }
-			);
+			const embedBlock = createUpgradedEmbedBlock( { attributes: { url: newSrc } } );
 			if ( undefined !== embedBlock ) {
 				this.props.onReplace( embedBlock );
 				return;
@@ -121,20 +100,8 @@ class VideoEdit extends Component {
 	}
 
 	render() {
-		const {
-			caption,
-			controls,
-			poster,
-			src,
-		} = this.props.attributes;
-		const {
-			className,
-			instanceId,
-			isSelected,
-			noticeUI,
-			attributes,
-			setAttributes,
-		} = this.props;
+		const { caption, controls, poster, src } = this.props.attributes;
+		const { className, instanceId, isSelected, noticeUI, attributes, setAttributes } = this.props;
 		const onSelectVideo = ( media ) => {
 			if ( ! media || ! media.url ) {
 				// in this case there was an error
@@ -179,17 +146,10 @@ class VideoEdit extends Component {
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Video settings' ) }>
-						<VideoCommonSettings
-							setAttributes={ setAttributes }
-							attributes={ attributes }
-						/>
+						<VideoCommonSettings setAttributes={ setAttributes } attributes={ attributes } />
 						<MediaUploadCheck>
-							<BaseControl
-								className="editor-video-poster-control"
-							>
-								<BaseControl.VisualLabel>
-									{ __( 'Poster Image' ) }
-								</BaseControl.VisualLabel>
+							<BaseControl className="editor-video-poster-control">
+								<BaseControl.VisualLabel>{ __( 'Poster Image' ) }</BaseControl.VisualLabel>
 								<MediaUpload
 									title={ __( 'Select Poster Image' ) }
 									onSelect={ this.onSelectPoster }
@@ -201,24 +161,25 @@ class VideoEdit extends Component {
 											ref={ this.posterImageButton }
 											aria-describedby={ videoPosterDescription }
 										>
-											{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
+											{ ! this.props.attributes.poster
+												? __( 'Select Poster Image' )
+												: __( 'Replace image' ) }
 										</Button>
 									) }
 								/>
-								<p
-									id={ videoPosterDescription }
-									hidden
-								>
-									{ this.props.attributes.poster ?
-										sprintf( __( 'The current poster image url is %s' ), this.props.attributes.poster ) :
-										__( 'There is no poster image currently selected' )
-									}
+								<p id={ videoPosterDescription } hidden>
+									{ this.props.attributes.poster
+										? sprintf(
+												__( 'The current poster image url is %s' ),
+												this.props.attributes.poster
+										  )
+										: __( 'There is no poster image currently selected' ) }
 								</p>
-								{ !! this.props.attributes.poster &&
+								{ !! this.props.attributes.poster && (
 									<Button onClick={ this.onRemovePoster } isLink isDestructive>
 										{ __( 'Remove Poster Image' ) }
 									</Button>
-								}
+								) }
 							</BaseControl>
 						</MediaUploadCheck>
 					</PanelBody>
@@ -229,12 +190,7 @@ class VideoEdit extends Component {
 						video when the controls are enabled.
 					*/ }
 					<Disabled>
-						<video
-							controls={ controls }
-							poster={ poster }
-							src={ src }
-							ref={ this.videoPlayer }
-						/>
+						<video controls={ controls } poster={ poster } src={ src } ref={ this.videoPlayer } />
 					</Disabled>
 					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText

@@ -54,10 +54,7 @@ export const colors = () => {
 	return (
 		<>
 			{ iconColors.map( ( color ) => (
-				<div
-					key={ color }
-					style={ { padding: 20, display: 'inline-block', color } }
-				>
+				<div key={ color } style={ { padding: 20, display: 'inline-block', color } }>
 					<Icon icon="screenoptions" />
 					<IconSizeLabel size={ 24 } />
 				</div>

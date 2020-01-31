@@ -834,7 +834,7 @@ exports[`Storyshots Components/Card Default 1`] = `
 }
 
 .emotion-6.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -970,7 +970,7 @@ exports[`Storyshots Components/Card/Body Default 1`] = `
 }
 
 .emotion-2.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1026,7 +1026,7 @@ exports[`Storyshots Components/Card/Divider Default 1`] = `
 }
 
 .emotion-6.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1100,7 +1100,7 @@ exports[`Storyshots Components/Card/Footer Default 1`] = `
 }
 
 .emotion-2.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1167,7 +1167,7 @@ exports[`Storyshots Components/Card/Header Default 1`] = `
 }
 
 .emotion-2.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1234,7 +1234,7 @@ exports[`Storyshots Components/Card/Media Default 1`] = `
 }
 
 .emotion-4.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-2 {
@@ -1321,7 +1321,7 @@ exports[`Storyshots Components/Card/Media Header And Footer 1`] = `
 }
 
 .emotion-6.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1467,7 +1467,7 @@ Array [
 }
 
 .emotion-7.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-7.is-right {
@@ -1575,7 +1575,7 @@ exports[`Storyshots Components/Card/Media Iframe Embed 1`] = `
 }
 
 .emotion-4.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1678,7 +1678,7 @@ exports[`Storyshots Components/Card/Media On Bottom 1`] = `
 }
 
 .emotion-4.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-0 {
@@ -1765,7 +1765,7 @@ exports[`Storyshots Components/Card/Media On Top 1`] = `
 }
 
 .emotion-4.is-elevated {
-  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 3px 0px rgba( 0,0,0,0.2 ),0px 1px 1px 0px rgba( 0,0,0,0.14 ),0px 2px 1px -1px rgba( 0,0,0,0.12 );
 }
 
 .emotion-2 {
@@ -4189,8 +4189,7 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
       Move the gray box around.
     </p>
     <p>
-      The
-       
+      The 
       <strong
         style={
           Object {
@@ -4200,12 +4199,10 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
       >
         pink bordered
       </strong>
-       
-      element is a parent.
+       element is a parent.
     </p>
     <p>
-      The
-       
+      The 
       <strong
         style={
           Object {
@@ -4215,8 +4212,7 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
       >
         cyan bordered
       </strong>
-       
-      element is a sibling to 
+       element is a sibling to 
       <strong>
         Popover
       </strong>
@@ -5654,8 +5650,7 @@ Array [
     This should not show.
   </div>,
   <div>
-    This text will
-     
+    This text will 
     <span
       className="components-visually-hidden"
     >

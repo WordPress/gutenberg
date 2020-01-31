@@ -21,21 +21,13 @@ import BlockEditor from '../block-editor';
 function Editor( { settings } ) {
 	const template = useSelect(
 		( select ) =>
-			select( 'core' ).getEntityRecord(
-				'postType',
-				'wp_template',
-				settings.templateId
-			),
+			select( 'core' ).getEntityRecord( 'postType', 'wp_template', settings.templateId ),
 		[]
 	);
 	return template ? (
 		<SlotFillProvider>
 			<DropZoneProvider>
-				<EntityProvider
-					kind="postType"
-					type="wp_template"
-					id={ settings.templateId }
-				>
+				<EntityProvider kind="postType" type="wp_template" id={ settings.templateId }>
 					<Notices />
 					<Header />
 					<Sidebar />

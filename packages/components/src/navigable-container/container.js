@@ -117,7 +117,8 @@ class NavigableContainer extends Component {
 	render() {
 		const { children, ...props } = this.props;
 		return (
-			<div ref={ this.bindContainer }
+			<div
+				ref={ this.bindContainer }
 				{ ...omit( props, [
 					'stopNavigationEvents',
 					'eventToOffset',

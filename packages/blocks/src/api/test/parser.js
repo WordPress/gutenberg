@@ -182,90 +182,69 @@ describe( 'block parser', () => {
 
 	describe( 'parseWithAttributeSchema', () => {
 		it( 'should return the matcher’s attribute value', () => {
-			const value = parseWithAttributeSchema(
-				'<div>chicken</div>',
-				{
-					type: 'string',
-					source: 'text',
-					selector: 'div',
-				},
-			);
+			const value = parseWithAttributeSchema( '<div>chicken</div>', {
+				type: 'string',
+				source: 'text',
+				selector: 'div',
+			} );
 			expect( value ).toBe( 'chicken' );
 		} );
 
 		it( 'should return the matcher’s string attribute value', () => {
-			const value = parseWithAttributeSchema(
-				'<audio src="#" loop>',
-				{
-					type: 'string',
-					source: 'attribute',
-					selector: 'audio',
-					attribute: 'src',
-				},
-			);
+			const value = parseWithAttributeSchema( '<audio src="#" loop>', {
+				type: 'string',
+				source: 'attribute',
+				selector: 'audio',
+				attribute: 'src',
+			} );
 			expect( value ).toBe( '#' );
 		} );
 
 		it( 'should return the matcher’s true boolean attribute value', () => {
-			const value = parseWithAttributeSchema(
-				'<audio src="#" loop>',
-				{
-					type: 'boolean',
-					source: 'attribute',
-					selector: 'audio',
-					attribute: 'loop',
-				},
-			);
+			const value = parseWithAttributeSchema( '<audio src="#" loop>', {
+				type: 'boolean',
+				source: 'attribute',
+				selector: 'audio',
+				attribute: 'loop',
+			} );
 			expect( value ).toBe( true );
 		} );
 
 		it( 'should return the matcher’s true boolean attribute value on explicit attribute value', () => {
-			const value = parseWithAttributeSchema(
-				'<audio src="#" loop="loop">',
-				{
-					type: 'boolean',
-					source: 'attribute',
-					selector: 'audio',
-					attribute: 'loop',
-				},
-			);
+			const value = parseWithAttributeSchema( '<audio src="#" loop="loop">', {
+				type: 'boolean',
+				source: 'attribute',
+				selector: 'audio',
+				attribute: 'loop',
+			} );
 			expect( value ).toBe( true );
 		} );
 
 		it( 'should return the matcher’s false boolean attribute value', () => {
-			const value = parseWithAttributeSchema(
-				'<audio src="#" autoplay>',
-				{
-					type: 'boolean',
-					source: 'attribute',
-					selector: 'audio',
-					attribute: 'loop',
-				},
-			);
+			const value = parseWithAttributeSchema( '<audio src="#" autoplay>', {
+				type: 'boolean',
+				source: 'attribute',
+				selector: 'audio',
+				attribute: 'loop',
+			} );
 			expect( value ).toBe( false );
 		} );
 
 		describe( 'source: tag', () => {
 			it( 'returns tag name of matching selector', () => {
-				const value = parseWithAttributeSchema(
-					'<div></div>',
-					{
-						source: 'tag',
-						selector: ':nth-child(1)',
-					}
-				);
+				const value = parseWithAttributeSchema( '<div></div>', {
+					source: 'tag',
+					selector: ':nth-child(1)',
+				} );
 
 				expect( value ).toBe( 'div' );
 			} );
 
 			it( 'returns undefined when no element matches selector', () => {
-				const value = parseWithAttributeSchema(
-					'<div></div>',
-					{
-						source: 'tag',
-						selector: ':nth-child(2)',
-					}
-				);
+				const value = parseWithAttributeSchema( '<div></div>', {
+					source: 'tag',
+					selector: ':nth-child(2)',
+				} );
 
 				expect( value ).toBe( undefined );
 			} );
@@ -542,10 +521,12 @@ describe( 'block parser', () => {
 						migrate: ( attributes ) => {
 							return [
 								{ newFruit: attributes.fruit },
-								[ {
-									name: 'core/test-block',
-									attributes: { aaa: 'bbb' },
-								} ],
+								[
+									{
+										name: 'core/test-block',
+										attributes: { aaa: 'bbb' },
+									},
+								],
 							];
 						},
 					},
@@ -799,11 +780,7 @@ describe( 'block parser', () => {
 							},
 						],
 						innerHTML: '<div class="wp-block-column"></div>',
-						innerContent: [
-							'<div class="wp-block-column">',
-							null,
-							'</div>',
-						],
+						innerContent: [ '<div class="wp-block-column">', null, '</div>' ],
 					},
 					{
 						blockName: 'core/column',
@@ -828,31 +805,23 @@ describe( 'block parser', () => {
 										innerContent: [ '<p>D</p>' ],
 									},
 								],
-								innerHTML: '<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+								innerHTML:
+									'<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
 								innerContent: [
 									'<div class="wp-block-group"><div class="wp-block-group__inner-container">',
 									null,
 									'',
 									null,
-									'</div></div>' ],
+									'</div></div>',
+								],
 							},
 						],
 						innerHTML: '<div class="wp-block-column"></div>',
-						innerContent: [
-							'<div class="wp-block-column">',
-							null,
-							'</div>',
-						],
+						innerContent: [ '<div class="wp-block-column">', null, '</div>' ],
 					},
 				],
 				innerHTML: '<div class="wp-block-columns has-2-columns"></div>',
-				innerContent: [
-					'<div class="wp-block-columns has-2-columns">',
-					null,
-					'',
-					null,
-					'</div>',
-				],
+				innerContent: [ '<div class="wp-block-columns has-2-columns">', null, '', null, '</div>' ],
 			};
 			const actual = serializeBlockNode( input );
 
@@ -885,8 +854,8 @@ describe( 'block parser', () => {
 
 			const parsed = parse(
 				`<!-- wp:core/test-block {"smoked":"yes","url":"http://google.com","chicken":"ribs & 'wings'"} -->` +
-				'Brisket' +
-				'<!-- /wp:core/test-block -->'
+					'Brisket' +
+					'<!-- /wp:core/test-block -->'
 			);
 
 			expect( parsed ).toHaveLength( 1 );
@@ -921,8 +890,8 @@ describe( 'block parser', () => {
 
 			const parsed = parse(
 				'<!-- wp:core/test-block -->\nRibs\n<!-- /wp:core/test-block -->' +
-				'<p>Broccoli</p>' +
-				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
+					'<p>Broccoli</p>' +
+					'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 			);
 
 			expect( parsed ).toHaveLength( 1 );
@@ -952,8 +921,8 @@ describe( 'block parser', () => {
 
 			const parsed = parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
-				'<p>Broccoli</p>' +
-				'<!-- wp:core/unknown/block -->Ribs<!-- /wp:core/unknown/block -->'
+					'<p>Broccoli</p>' +
+					'<!-- wp:core/unknown/block -->Ribs<!-- /wp:core/unknown/block -->'
 			);
 			expect( parsed ).toHaveLength( 1 );
 			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
@@ -967,8 +936,8 @@ describe( 'block parser', () => {
 
 			const parsed = parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
-				'<p>Broccoli</p>' +
-				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
+					'<p>Broccoli</p>' +
+					'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 			);
 
 			expect( parsed ).toHaveLength( 3 );
@@ -987,10 +956,10 @@ describe( 'block parser', () => {
 
 			const parsed = parse(
 				'<p>Cauliflower</p>' +
-				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
-				'\n<p>Broccoli</p>\n' +
-				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
-				'<p>Romanesco</p>'
+					'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
+					'\n<p>Broccoli</p>\n' +
+					'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
+					'<p>Romanesco</p>'
 			);
 
 			expect( parsed ).toHaveLength( 5 );
@@ -1008,27 +977,23 @@ describe( 'block parser', () => {
 
 		it( 'should parse blocks with empty content', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			const parsed = parse(
-				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->'
-			);
+			const parsed = parse( '<!-- wp:core/test-block --><!-- /wp:core/test-block -->' );
 
 			expect( parsed ).toHaveLength( 1 );
-			expect( parsed.map( ( { name } ) => name ) ).toEqual( [
-				'core/test-block',
-			] );
+			expect( parsed.map( ( { name } ) => name ) ).toEqual( [ 'core/test-block' ] );
 		} );
 
 		it( 'should parse void blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/void-block', defaultBlockSettings );
 			const parsed = parse(
-				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->' +
-				'<!-- wp:core/void-block /-->'
+				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->' + '<!-- wp:core/void-block /-->'
 			);
 
 			expect( parsed ).toHaveLength( 2 );
 			expect( parsed.map( ( { name } ) => name ) ).toEqual( [
-				'core/test-block', 'core/void-block',
+				'core/test-block',
+				'core/void-block',
 			] );
 		} );
 
@@ -1044,7 +1009,7 @@ describe( 'block parser', () => {
 				save: ( { attributes } ) => attributes.content,
 			} );
 
-			const content = '$foo = "My \"escaped\" text.";';
+			const content = '$foo = "My "escaped" text.";';
 			const block = createBlock( 'core/code', { content } );
 			const serialized = serialize( block );
 			const parsed = parse( serialized );

@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	getColorClassName,
-	getFontSizeClass,
-	RichText,
-} from '@wordpress/block-editor';
+import { getColorClassName, getFontSizeClass, RichText } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {

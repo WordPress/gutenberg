@@ -51,7 +51,11 @@ const processFile = ( rootDir, inputFile ) => {
 		const data = fs.readFileSync( inputFile, 'utf8' );
 		currentFileStack.push( inputFile );
 		const relativePath = path.relative( rootDir, inputFile );
-		const result = engine( relativePath, data, getIRFromRelativePath( rootDir, last( currentFileStack ) ) );
+		const result = engine(
+			relativePath,
+			data,
+			getIRFromRelativePath( rootDir, last( currentFileStack ) )
+		);
 		currentFileStack.pop();
 		return result;
 	} catch ( e ) {
@@ -97,9 +101,7 @@ module.exports = function( sourceFile, options ) {
 	const ast = inputBase + '-ast.json';
 	const tokens = inputBase + '-exports.json';
 	const ir = inputBase + '-ir.json';
-	const doc = options.output ?
-		path.join( processDir, options.output ) :
-		inputBase + '-api.md';
+	const doc = options.output ? path.join( processDir, options.output ) : inputBase + '-api.md';
 
 	// Process
 	const result = processFile( processDir, sourceFile );
@@ -124,7 +126,13 @@ module.exports = function( sourceFile, options ) {
 	}
 
 	if ( options.formatter ) {
-		runCustomFormatter( path.join( processDir, options.formatter ), processDir, doc, filteredIR, 'API' );
+		runCustomFormatter(
+			path.join( processDir, options.formatter ),
+			processDir,
+			doc,
+			filteredIR,
+			'API'
+		);
 	} else {
 		defaultMarkdownFormatter( options, processDir, doc, filteredIR, 'API' );
 	}

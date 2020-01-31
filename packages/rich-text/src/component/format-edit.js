@@ -31,11 +31,7 @@ export default function FormatEdit( {
 	allowedFormats,
 	withoutInteractiveFormatting,
 } ) {
-	return formatTypes.map( ( {
-		name,
-		edit: Edit,
-		tagName,
-	} ) => {
+	return formatTypes.map( ( { name, edit: Edit, tagName } ) => {
 		if ( ! Edit ) {
 			return null;
 		}
@@ -44,10 +40,7 @@ export default function FormatEdit( {
 			return null;
 		}
 
-		if (
-			withoutInteractiveFormatting &&
-			interactiveContentTags.has( tagName )
-		) {
+		if ( withoutInteractiveFormatting && interactiveContentTags.has( tagName ) ) {
 			return null;
 		}
 
@@ -60,13 +53,9 @@ export default function FormatEdit( {
 			<Edit
 				key={ name }
 				isActive={ isActive }
-				activeAttributes={
-					isActive ? activeFormat.attributes || {} : {}
-				}
+				activeAttributes={ isActive ? activeFormat.attributes || {} : {} }
 				isObjectActive={ isObjectActive }
-				activeObjectAttributes={
-					isObjectActive ? activeObject.attributes || {} : {}
-				}
+				activeObjectAttributes={ isObjectActive ? activeObject.attributes || {} : {} }
 				value={ value }
 				onChange={ onChange }
 				onFocus={ onFocus }

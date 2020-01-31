@@ -22,24 +22,18 @@ describe( 'cpt locking', () => {
 	} );
 
 	const shouldRemoveTheInserter = async () => {
-		expect(
-			await page.$( '.edit-post-header [aria-label="Add block"]' )
-		).toBeNull();
+		expect( await page.$( '.edit-post-header [aria-label="Add block"]' ) ).toBeNull();
 	};
 
 	const shouldNotAllowBlocksToBeRemoved = async () => {
 		await page.type( '.block-editor-rich-text__editable.wp-block-paragraph', 'p1' );
 		await clickBlockToolbarButton( 'More options' );
-		expect(
-			await page.$x( '//button[contains(text(), "Remove Block")]' )
-		).toHaveLength( 0 );
+		expect( await page.$x( '//button[contains(text(), "Remove Block")]' ) ).toHaveLength( 0 );
 	};
 
 	const shouldAllowBlocksToBeMoved = async () => {
 		await page.click( '.block-editor-rich-text__editable.wp-block-paragraph' );
-		expect(
-			await page.$( 'button[aria-label="Move up"]' )
-		).not.toBeNull();
+		expect( await page.$( 'button[aria-label="Move up"]' ) ).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
 		await page.type( '.block-editor-rich-text__editable.wp-block-paragraph', 'p1' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -56,9 +50,7 @@ describe( 'cpt locking', () => {
 
 		it( 'should not allow blocks to be moved', async () => {
 			await page.click( '.block-editor-rich-text__editable.wp-block-paragraph' );
-			expect(
-				await page.$( 'button[aria-label="Move up"]' )
-			).toBeNull();
+			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();
 		} );
 
 		it( 'should not error when deleting the cotents of a paragraph', async () => {
@@ -73,14 +65,17 @@ describe( 'cpt locking', () => {
 			const content = await getEditedPostContent();
 			const [ , contentWithoutImage ] = content.split( '<!-- /wp:image -->' );
 			await setPostContent( contentWithoutImage );
-			const VALIDATION_PARAGRAPH_SELECTOR = '.editor-template-validation-notice .components-notice__content p';
+			const VALIDATION_PARAGRAPH_SELECTOR =
+				'.editor-template-validation-notice .components-notice__content p';
 			await page.waitForSelector( VALIDATION_PARAGRAPH_SELECTOR );
 			expect(
 				await page.evaluate(
 					( element ) => element.textContent,
 					await page.$( VALIDATION_PARAGRAPH_SELECTOR )
 				)
-			).toEqual( 'The content of your post doesn’t match the template assigned to your post type.' );
+			).toEqual(
+				'The content of your post doesn’t match the template assigned to your post type.'
+			);
 		} );
 	} );
 
@@ -102,9 +97,7 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'should allow blocks to be inserted', async () => {
-			expect(
-				await page.$( '.edit-post-header [aria-label="Add block"]' )
-			).not.toBeNull();
+			expect( await page.$( '.edit-post-header [aria-label="Add block"]' ) ).not.toBeNull();
 			await insertBlock( 'List' );
 			await page.keyboard.type( 'List content' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();

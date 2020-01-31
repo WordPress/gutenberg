@@ -10,13 +10,7 @@ import Cell from './cell';
 import Picker from '../picker';
 
 export default function BottomSheetPickerCell( props ) {
-	const {
-		options,
-		hideCancelButton,
-		onChangeValue,
-		value,
-		...cellProps
-	} = props;
+	const { options, hideCancelButton, onChangeValue, value, ...cellProps } = props;
 
 	let picker;
 
@@ -32,15 +26,11 @@ export default function BottomSheetPickerCell( props ) {
 	const label = option ? option.label : value;
 
 	return (
-		<Cell
-			onPress={ onCellPress }
-			editable={ false }
-			value={ label }
-			{ ...cellProps } >
+		<Cell onPress={ onCellPress } editable={ false } value={ label } { ...cellProps }>
 			<Picker
 				leftAlign
 				hideCancelButton={ hideCancelButton }
-				ref={ ( instance ) => picker = instance }
+				ref={ ( instance ) => ( picker = instance ) }
 				options={ options }
 				onChange={ onChange }
 			/>

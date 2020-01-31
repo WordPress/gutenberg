@@ -4,12 +4,7 @@
 import { getSibling } from './utils';
 
 function isFormattingSpace( character ) {
-	return (
-		character === ' ' ||
-		character === '\r' ||
-		character === '\n' ||
-		character === '\t'
-	);
+	return character === ' ' || character === '\r' || character === '\n' || character === '\t';
 }
 
 /**
@@ -57,10 +52,8 @@ export default function( node ) {
 		if (
 			! nextSibling ||
 			nextSibling.nodeName === 'BR' ||
-			(
-				nextSibling.nodeType === nextSibling.TEXT_NODE &&
-				isFormattingSpace( nextSibling.textContent[ 0 ] )
-			)
+			( nextSibling.nodeType === nextSibling.TEXT_NODE &&
+				isFormattingSpace( nextSibling.textContent[ 0 ] ) )
 		) {
 			newData = newData.slice( 0, -1 );
 		}

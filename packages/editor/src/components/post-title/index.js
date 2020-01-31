@@ -140,10 +140,7 @@ const applyWithSelect = withSelect( ( select ) => {
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const {
-		insertDefaultBlock,
-		clearSelectedBlock,
-	} = dispatch( 'core/block-editor' );
+	const { insertDefaultBlock, clearSelectedBlock } = dispatch( 'core/block-editor' );
 	const { editPost } = dispatch( 'core/editor' );
 
 	return {

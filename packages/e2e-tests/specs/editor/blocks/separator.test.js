@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	clickBlockAppender,
-	getEditedPostContent,
-	createNewPost,
-} from '@wordpress/e2e-test-utils';
+import { clickBlockAppender, getEditedPostContent, createNewPost } from '@wordpress/e2e-test-utils';
 
 describe( 'Separator', () => {
 	beforeEach( async () => {

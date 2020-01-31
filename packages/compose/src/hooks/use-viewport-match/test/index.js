@@ -103,9 +103,11 @@ describe( 'useViewportMatch', () => {
 		expect( root.toJSON() ).toBe( 'useViewportMatch: true' );
 
 		await act( async () => {
-			root.update( <WidthProvider value={ 1300 }>
-				<TestComponent breakpoint="wide" operator="<" />
-			</WidthProvider> );
+			root.update(
+				<WidthProvider value={ 1300 }>
+					<TestComponent breakpoint="wide" operator="<" />
+				</WidthProvider>
+			);
 		} );
 		expect( root.toJSON() ).toBe( 'useViewportMatch: false' );
 

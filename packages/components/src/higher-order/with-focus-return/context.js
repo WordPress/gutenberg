@@ -46,9 +46,7 @@ class FocusReturnProvider extends Component {
 		// stack may otherwise only consist of members pending destruction, at
 		// which point focus might have been lost.
 		const nextFocusHistory = uniq(
-			[ ...focusHistory, event.target ]
-				.slice( -1 * MAX_STACK_LENGTH )
-				.reverse()
+			[ ...focusHistory, event.target ].slice( -1 * MAX_STACK_LENGTH ).reverse()
 		).reverse();
 
 		this.setState( { focusHistory: nextFocusHistory } );

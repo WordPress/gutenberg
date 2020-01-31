@@ -20,12 +20,7 @@ import {
 	__experimentalPageTemplatePicker,
 	__experimentalUsePageTemplatePickerVisible,
 } from '@wordpress/block-editor';
-import {
-	Button,
-	ScrollLock,
-	Popover,
-	FocusReturnProvider,
-} from '@wordpress/components';
+import { Button, ScrollLock, Popover, FocusReturnProvider } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
@@ -65,7 +60,7 @@ function Layout() {
 		previousShortcut,
 		nextShortcut,
 	} = useSelect( ( select ) => {
-		return ( {
+		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 			editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 			pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
@@ -74,9 +69,13 @@ function Layout() {
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			previousShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/previous-region' ),
-			nextShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-		} );
+			previousShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations(
+				'core/edit-post/previous-region'
+			),
+			nextShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations(
+				'core/edit-post/next-region'
+			),
+		};
 	}, [] );
 	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
@@ -99,12 +98,14 @@ function Layout() {
 				<EditorRegions
 					className={ className }
 					header={ <Header /> }
-					sidebar={ ! publishSidebarOpened && (
-						<>
-							<SettingsSidebar />
-							<Sidebar.Slot />
-						</>
-					) }
+					sidebar={
+						! publishSidebarOpened && (
+							<>
+								<SettingsSidebar />
+								<Sidebar.Slot />
+							</>
+						)
+					}
 					content={
 						<>
 							<EditorNotices />
@@ -117,31 +118,36 @@ function Layout() {
 							{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
 						</>
 					}
-					footer={ isRichEditingEnabled && mode === 'visual' && (
-						<div className="edit-post-layout__footer">
-							<BlockBreadcrumb />
-						</div>
-					) }
-					publish={ publishSidebarOpened ? (
-						<PostPublishPanel
-							onClose={ closePublishSidebar }
-							forceIsDirty={ hasActiveMetaboxes }
-							forceIsSaving={ isSaving }
-							PrePublishExtension={ PluginPrePublishPanel.Slot }
-							PostPublishExtension={ PluginPostPublishPanel.Slot }
-						/>
-					) : (
-						<div className="edit-post-toggle-publish-panel">
-							<Button
-								isSecondary
-								className="edit-post-toggle-publish-panel__button"
-								onClick={ togglePublishSidebar }
-								aria-expanded={ false }
-							>
-								{ __( 'Open publish panel' ) }
-							</Button>
-						</div>
-					) }
+					footer={
+						isRichEditingEnabled &&
+						mode === 'visual' && (
+							<div className="edit-post-layout__footer">
+								<BlockBreadcrumb />
+							</div>
+						)
+					}
+					publish={
+						publishSidebarOpened ? (
+							<PostPublishPanel
+								onClose={ closePublishSidebar }
+								forceIsDirty={ hasActiveMetaboxes }
+								forceIsSaving={ isSaving }
+								PrePublishExtension={ PluginPrePublishPanel.Slot }
+								PostPublishExtension={ PluginPostPublishPanel.Slot }
+							/>
+						) : (
+							<div className="edit-post-toggle-publish-panel">
+								<Button
+									isSecondary
+									className="edit-post-toggle-publish-panel__button"
+									onClick={ togglePublishSidebar }
+									aria-expanded={ false }
+								>
+									{ __( 'Open publish panel' ) }
+								</Button>
+							</div>
+						)
+					}
 					shortcuts={ {
 						previous: previousShortcut,
 						next: nextShortcut,
@@ -155,7 +161,6 @@ function Layout() {
 				<PluginArea />
 				{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
 			</FocusReturnProvider>
-
 		</>
 	);
 }

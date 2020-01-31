@@ -47,12 +47,16 @@ describe( 'custom className', () => {
 
 		it( 'should do nothing if the block settings do not define custom className support', () => {
 			const attributes = { className: 'foo' };
-			const extraProps = addSaveProps( {}, {
-				...blockSettings,
-				supports: {
-					customClassName: false,
+			const extraProps = addSaveProps(
+				{},
+				{
+					...blockSettings,
+					supports: {
+						customClassName: false,
+					},
 				},
-			}, attributes );
+				attributes
+			);
 
 			expect( extraProps ).not.toHaveProperty( 'className' );
 		} );
@@ -108,11 +112,7 @@ describe( 'custom className', () => {
 		} );
 
 		it( 'should assign as undefined if there are no classes', () => {
-			const attributes = addParsedDifference(
-				{},
-				blockSettings,
-				'<div class=""></div>'
-			);
+			const attributes = addParsedDifference( {}, blockSettings, '<div class=""></div>' );
 
 			expect( attributes.className ).toBeUndefined();
 		} );
@@ -138,11 +138,7 @@ describe( 'custom className', () => {
 		} );
 
 		it( 'should remove the custom class from an element originally without a class', () => {
-			const attributes = addParsedDifference(
-				{ className: 'foo' },
-				blockSettings,
-				'<div></div>'
-			);
+			const attributes = addParsedDifference( { className: 'foo' }, blockSettings, '<div></div>' );
 
 			expect( attributes.className ).toBeUndefined();
 		} );
@@ -161,7 +157,7 @@ describe( 'custom className', () => {
 			const attributes = addParsedDifference(
 				{ className: 'custom1' },
 				dynamicBlockSettings,
-				null,
+				null
 			);
 
 			expect( attributes.className ).toBe( 'custom1' );

@@ -7,11 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	registerBlockType,
-	unregisterBlockType,
-	getBlockTypes,
-} from '@wordpress/blocks';
+import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -70,9 +66,7 @@ describe( 'Edit', () => {
 			title: 'block title',
 		} );
 
-		const wrapper = shallow(
-			<Edit name="core/test-block" attributes={ attributes } />
-		);
+		const wrapper = shallow( <Edit name="core/test-block" attributes={ attributes } /> );
 
 		expect( wrapper.find( edit ).hasClass( 'wp-block-test-block' ) ).toBe( true );
 		expect( wrapper.find( edit ).hasClass( 'my-class' ) ).toBe( true );

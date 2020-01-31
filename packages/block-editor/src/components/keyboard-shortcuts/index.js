@@ -33,10 +33,13 @@ function KeyboardShortcuts() {
 	// Prevents reposition Chrome devtools pane shortcut when devtools are open.
 	useShortcut(
 		'core/block-editor/duplicate',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			duplicateBlocks( clientIds );
-		}, [ clientIds, duplicateBlocks ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				duplicateBlocks( clientIds );
+			},
+			[ clientIds, duplicateBlocks ]
+		),
 		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
 	);
 
@@ -44,10 +47,13 @@ function KeyboardShortcuts() {
 	// is used to prevent any obscure unknown shortcuts from triggering.
 	useShortcut(
 		'core/block-editor/remove',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			removeBlocks( clientIds );
-		}, [ clientIds, removeBlocks ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				removeBlocks( clientIds );
+			},
+			[ clientIds, removeBlocks ]
+		),
 		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
 	);
 
@@ -55,44 +61,62 @@ function KeyboardShortcuts() {
 	// is used to prevent any obscure unknown shortcuts from triggering.
 	useShortcut(
 		'core/block-editor/insert-after',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			insertAfterBlock( last( clientIds ) );
-		}, [ clientIds, insertAfterBlock ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				insertAfterBlock( last( clientIds ) );
+			},
+			[ clientIds, insertAfterBlock ]
+		),
 		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
 	);
 
 	// Prevent 'view recently closed tabs' in Opera using preventDefault.
 	useShortcut(
 		'core/block-editor/insert-before',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			insertBeforeBlock( first( clientIds ) );
-		}, [ clientIds, insertBeforeBlock ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				insertBeforeBlock( first( clientIds ) );
+			},
+			[ clientIds, insertBeforeBlock ]
+		),
 		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
 	);
 
 	useShortcut(
 		'core/block-editor/delete-multi-selection',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			removeBlocks( clientIds );
-		}, [ clientIds, removeBlocks ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				removeBlocks( clientIds );
+			},
+			[ clientIds, removeBlocks ]
+		),
 		{ isDisabled: clientIds.length < 1 }
 	);
 
-	useShortcut( 'core/block-editor/select-all', useCallback( ( event ) => {
-		event.preventDefault();
-		multiSelect( first( rootBlocksClientIds ), last( rootBlocksClientIds ) );
-	}, [ rootBlocksClientIds, multiSelect ] ) );
+	useShortcut(
+		'core/block-editor/select-all',
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				multiSelect( first( rootBlocksClientIds ), last( rootBlocksClientIds ) );
+			},
+			[ rootBlocksClientIds, multiSelect ]
+		)
+	);
 
 	useShortcut(
 		'core/block-editor/unselect',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			clearSelectedBlock();
-			window.getSelection().removeAllRanges();
-		}, [ clientIds, clearSelectedBlock ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				clearSelectedBlock();
+				window.getSelection().removeAllRanges();
+			},
+			[ clientIds, clearSelectedBlock ]
+		),
 		{ isDisabled: clientIds.length < 2 }
 	);
 
@@ -150,9 +174,11 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				character: 'del',
 			},
-			aliases: [ {
-				character: 'backspace',
-			} ],
+			aliases: [
+				{
+					character: 'backspace',
+				},
+			],
 		} );
 
 		registerShortcut( {

@@ -52,8 +52,9 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const newDefaultBlock = isUnmodifiedDefaultBlock.block;
 	const blockType = getBlockType( defaultBlockName );
 
-	return every( blockType.attributes, ( value, key ) =>
-		newDefaultBlock.attributes[ key ] === block.attributes[ key ]
+	return every(
+		blockType.attributes,
+		( value, key ) => newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);
 }
 
@@ -66,11 +67,12 @@ export function isUnmodifiedDefaultBlock( block ) {
  */
 
 export function isValidIcon( icon ) {
-	return !! icon && (
-		isString( icon ) ||
-		isValidElement( icon ) ||
-		isFunction( icon ) ||
-		icon instanceof Component
+	return (
+		!! icon &&
+		( isString( icon ) ||
+			isValidElement( icon ) ||
+			isFunction( icon ) ||
+			icon instanceof Component )
 	);
 }
 
@@ -95,11 +97,13 @@ export function normalizeIconObject( icon ) {
 
 		return {
 			...icon,
-			foreground: icon.foreground ? icon.foreground : mostReadable(
-				tinyBgColor,
-				ICON_COLORS,
-				{ includeFallbackColors: true, level: 'AA', size: 'large' }
-			).toHexString(),
+			foreground: icon.foreground
+				? icon.foreground
+				: mostReadable( tinyBgColor, ICON_COLORS, {
+						includeFallbackColors: true,
+						level: 'AA',
+						size: 'large',
+				  } ).toHexString(),
 			shadowColor: tinyBgColor.setAlpha( 0.3 ).toRgbString(),
 		};
 	}
@@ -135,10 +139,7 @@ export function normalizeBlockType( blockTypeOrName ) {
  * @return {string} The block label.
  */
 export function getBlockLabel( blockType, attributes, context = 'visual' ) {
-	const {
-		__experimentalLabel: getLabel,
-		title,
-	} = blockType;
+	const { __experimentalLabel: getLabel, title } = blockType;
 
 	const label = getLabel && getLabel( attributes, { context } );
 
@@ -189,7 +190,7 @@ export function getAccessibleBlockLabel( blockType, attributes, position, direct
 			/* translators: accessibility text. %s: The block title, %d The block row number. */
 			__( '%s Block. Row %d' ),
 			title,
-			position,
+			position
 		);
 	} else if ( hasPosition && direction === 'horizontal' ) {
 		if ( hasLabel ) {
@@ -206,7 +207,7 @@ export function getAccessibleBlockLabel( blockType, attributes, position, direct
 			/* translators: accessibility text. %s: The block title, %d The block column number. */
 			__( '%s Block. Column %d' ),
 			title,
-			position,
+			position
 		);
 	}
 

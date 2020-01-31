@@ -15,7 +15,11 @@ import { Icon, plusCircle } from '@wordpress/icons';
  */
 import Inserter from '../inserter';
 
-function ButtonBlockAppender( { rootClientId, className, __experimentalSelectBlockOnInsert: selectBlockOnInsert } ) {
+function ButtonBlockAppender( {
+	rootClientId,
+	className,
+	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+} ) {
 	return (
 		<Inserter
 			rootClientId={ rootClientId }

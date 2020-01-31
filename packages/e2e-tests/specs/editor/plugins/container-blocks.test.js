@@ -31,10 +31,18 @@ describe( 'InnerBlocks Template Sync', () => {
 		`;
 		await insertBlock( blockName );
 		await switchEditorModeTo( 'Code' );
-		await page.$eval( '.editor-post-text-editor', ( element, _paragraph, _blockSlug ) => {
-			const blockDelimiter = `<!-- /wp:${ _blockSlug } -->`;
-			element.value = element.value.replace( blockDelimiter, `${ _paragraph }${ blockDelimiter }` );
-		}, paragraphToAdd, blockSlug );
+		await page.$eval(
+			'.editor-post-text-editor',
+			( element, _paragraph, _blockSlug ) => {
+				const blockDelimiter = `<!-- /wp:${ _blockSlug } -->`;
+				element.value = element.value.replace(
+					blockDelimiter,
+					`${ _paragraph }${ blockDelimiter }`
+				);
+			},
+			paragraphToAdd,
+			blockSlug
+		);
 		// Press "Enter" inside the Code Editor to fire the `onChange` event for the new value.
 		await page.click( '.editor-post-text-editor' );
 		await page.keyboard.press( 'Enter' );
@@ -42,12 +50,18 @@ describe( 'InnerBlocks Template Sync', () => {
 	};
 
 	it( 'Ensures blocks without locking are kept intact even if they do not match the template ', async () => {
-		await insertBlockAndAddParagraphInside( 'Test Inner Blocks no locking', 'test/test-inner-blocks-no-locking' );
+		await insertBlockAndAddParagraphInside(
+			'Test Inner Blocks no locking',
+			'test/test-inner-blocks-no-locking'
+		);
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'Removes blocks that are not expected by the template if a lock all exists ', async () => {
-		await insertBlockAndAddParagraphInside( 'Test InnerBlocks locking all', 'test/test-inner-blocks-locking-all' );
+		await insertBlockAndAddParagraphInside(
+			'Test InnerBlocks locking all',
+			'test/test-inner-blocks-locking-all'
+		);
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -78,12 +92,12 @@ describe( 'Container block without paragraph support', () => {
 		await insertBlock( 'Container without paragraph' );
 
 		// Open the specific appender used when there's no paragraph support.
-		await page.click( '.block-editor-inner-blocks .block-list-appender .block-list-appender__toggle' );
+		await page.click(
+			'.block-editor-inner-blocks .block-list-appender .block-list-appender__toggle'
+		);
 
 		// Insert an image block.
-		const insertButton = ( await page.$x(
-			`//button//span[contains(text(), 'Image')]`
-		) )[ 0 ];
+		const insertButton = ( await page.$x( `//button//span[contains(text(), 'Image')]` ) )[ 0 ];
 		await insertButton.click();
 
 		// Check the inserted content.

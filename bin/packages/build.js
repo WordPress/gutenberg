@@ -37,7 +37,7 @@ function getPackageName( file ) {
  * @return {Transform} Stream transform instance.
  */
 function createStyleEntryTransform() {
-	const packages = new Set;
+	const packages = new Set();
 
 	return new Transform( {
 		objectMode: true,
@@ -73,7 +73,7 @@ function createStyleEntryTransform() {
  * @return {Transform} Stream transform instance.
  */
 function createBlockJsonEntryTransform() {
-	const blocks = new Set;
+	const blocks = new Set();
 
 	return new Transform( {
 		objectMode: true,
@@ -109,9 +109,7 @@ if ( files.length ) {
 	stream = new Readable( { encoding: 'utf8' } );
 	files.forEach( ( file ) => stream.push( file ) );
 	stream.push( null );
-	stream = stream
-		.pipe( createStyleEntryTransform() )
-		.pipe( createBlockJsonEntryTransform() );
+	stream = stream.pipe( createStyleEntryTransform() ).pipe( createBlockJsonEntryTransform() );
 } else {
 	const bar = new ProgressBar( 'Build Progress: [:bar] :percent', {
 		width: 30,
@@ -121,15 +119,8 @@ if ( files.length ) {
 
 	bar.tick( 0 );
 
-	stream = glob.stream( [
-		`${ PACKAGES_DIR }/*/src/**/*.js`,
-		`${ PACKAGES_DIR }/*/src/*.scss`,
-	], {
-		ignore: [
-			`**/benchmark/**`,
-			`**/{__mocks__,__tests__,test}/**`,
-			`**/{storybook,stories}/**`,
-		],
+	stream = glob.stream( [ `${ PACKAGES_DIR }/*/src/**/*.js`, `${ PACKAGES_DIR }/*/src/*.scss` ], {
+		ignore: [ `**/benchmark/**`, `**/{__mocks__,__tests__,test}/**`, `**/{storybook,stories}/**` ],
 		onlyFiles: true,
 	} );
 
@@ -137,11 +128,9 @@ if ( files.length ) {
 	// but should wait until worker processing below.
 	//
 	// See: https://nodejs.org/api/stream.html#stream_two_reading_modes
-	stream
-		.pause()
-		.on( 'data', ( file ) => {
-			bar.total = files.push( file );
-		} );
+	stream.pause().on( 'data', ( file ) => {
+		bar.total = files.push( file );
+	} );
 
 	onFileComplete = () => {
 		bar.tick();
@@ -154,27 +143,29 @@ let ended = false,
 	complete = 0;
 
 stream
-	.on( 'data', ( file ) => worker( file, ( error ) => {
-		onFileComplete();
+	.on( 'data', ( file ) =>
+		worker( file, ( error ) => {
+			onFileComplete();
 
-		if ( error ) {
-			// If an error occurs, the process can't be ended immediately since
-			// other workers are likely pending. Optimally, it would end at the
-			// earliest opportunity (after the current round of workers has had
-			// the chance to complete), but this is not made directly possible
-			// through `worker-farm`. Instead, ensure at least that when the
-			// process does exit, it exits with a non-zero code to reflect the
-			// fact that an error had occurred.
-			process.exitCode = 1;
+			if ( error ) {
+				// If an error occurs, the process can't be ended immediately since
+				// other workers are likely pending. Optimally, it would end at the
+				// earliest opportunity (after the current round of workers has had
+				// the chance to complete), but this is not made directly possible
+				// through `worker-farm`. Instead, ensure at least that when the
+				// process does exit, it exits with a non-zero code to reflect the
+				// fact that an error had occurred.
+				process.exitCode = 1;
 
-			console.error( error );
-		}
+				console.error( error );
+			}
 
-		if ( ended && ++complete === files.length ) {
-			workerFarm.end( worker );
-		}
-	} ) )
-	.on( 'end', () => ended = true )
+			if ( ended && ++complete === files.length ) {
+				workerFarm.end( worker );
+			}
+		} )
+	)
+	.on( 'end', () => ( ended = true ) )
 	.resume();
 
 /* eslint-enable no-console */

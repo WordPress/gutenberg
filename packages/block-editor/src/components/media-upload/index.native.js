@@ -52,7 +52,12 @@ const siteLibrarySource = {
 	icon: 'wordpress-alt',
 };
 
-const internalSources = [ deviceLibrarySource, cameraImageSource, cameraVideoSource, siteLibrarySource ];
+const internalSources = [
+	deviceLibrarySource,
+	cameraImageSource,
+	cameraVideoSource,
+	siteLibrarySource,
+];
 
 export class MediaUpload extends React.Component {
 	constructor( props ) {
@@ -96,14 +101,18 @@ export class MediaUpload extends React.Component {
 			}
 		}
 
-		return this.getAllSources().filter( ( source ) => {
-			return allowedTypes.filter( ( allowedType ) => source.types.includes( allowedType ) ).length > 0;
-		} ).map( ( source ) => {
-			return {
-				...source,
-				icon: source.icon || this.getChooseFromDeviceIcon(),
-			};
-		} );
+		return this.getAllSources()
+			.filter( ( source ) => {
+				return (
+					allowedTypes.filter( ( allowedType ) => source.types.includes( allowedType ) ).length > 0
+				);
+			} )
+			.map( ( source ) => {
+				return {
+					...source,
+					icon: source.icon || this.getChooseFromDeviceIcon(),
+				};
+			} );
 	}
 
 	getChooseFromDeviceIcon() {
@@ -128,7 +137,9 @@ export class MediaUpload extends React.Component {
 
 	onPickerSelect( value ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
-		const mediaSource = this.getAllSources().filter( ( source ) => source.value === value ).shift();
+		const mediaSource = this.getAllSources()
+			.filter( ( source ) => source.value === value )
+			.shift();
 		const types = allowedTypes.filter( ( type ) => mediaSource.types.includes( type ) );
 		requestMediaPicker( mediaSource.id, types, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
@@ -141,7 +152,7 @@ export class MediaUpload extends React.Component {
 		const getMediaOptions = () => (
 			<Picker
 				hideCancelButton
-				ref={ ( instance ) => this.picker = instance }
+				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }
 				onChange={ this.onPickerSelect }
 			/>

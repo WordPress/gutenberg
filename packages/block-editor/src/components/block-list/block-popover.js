@@ -170,10 +170,9 @@ function BlockPopover( {
 					//
 					// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 					tabIndex={ -1 }
-					className={ classnames(
-						'block-editor-block-list__block-popover-inserter',
-						{ 'is-visible': isInserterShown }
-					) }
+					className={ classnames( 'block-editor-block-list__block-popover-inserter', {
+						'is-visible': isInserterShown,
+					} ) }
 				>
 					<Inserter clientId={ clientId } rootClientId={ rootClientId } />
 				</div>
@@ -197,11 +196,7 @@ function BlockPopover( {
 			) }
 			{ showEmptyBlockSideInserter && (
 				<div className="block-editor-block-list__empty-block-inserter">
-					<Inserter
-						position="top right"
-						rootClientId={ rootClientId }
-						clientId={ clientId }
-					/>
+					<Inserter position="top right" rootClientId={ rootClientId } clientId={ clientId } />
 				</div>
 			) }
 		</Popover>
@@ -231,11 +226,16 @@ function wrapperSelector( select ) {
 	const { __experimentalMoverDirection } = getBlockListSettings( rootClientId ) || {};
 
 	// Get Block List Settings for all ancestors of the current Block clientId
-	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks( blockParentsClientIds );
+	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks(
+		blockParentsClientIds
+	);
 
 	// Find the index of the first Block with the `captureDescendantsToolbars` prop defined
 	// This will be the top most ancestor because getBlockParents() returns tree from top -> bottom
-	const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [ '__experimentalCaptureToolbars', true ] );
+	const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [
+		'__experimentalCaptureToolbars',
+		true,
+	] );
 
 	let capturingClientId;
 

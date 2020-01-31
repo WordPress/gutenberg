@@ -40,7 +40,10 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
-		this.safeAreaEventSubscription = SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		this.safeAreaEventSubscription = SafeArea.addEventListener(
+			'safeAreaInsetsForRootViewDidChange',
+			this.onSafeAreaInsetsUpdate
+		);
 		this.onSetMaxHeight();
 	}
 
@@ -50,7 +53,10 @@ class BottomSheet extends Component {
 		}
 		this.safeAreaEventSubscription.remove();
 		this.safeAreaEventSubscription = null;
-		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		SafeArea.removeEventListener(
+			'safeAreaInsetsForRootViewDidChange',
+			this.onSafeAreaInsetsUpdate
+		);
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
@@ -118,17 +124,11 @@ class BottomSheet extends Component {
 		const getHeader = () => (
 			<View>
 				<View style={ styles.head }>
-					<View style={ { flex: 1 } }>
-						{ leftButton }
-					</View>
+					<View style={ { flex: 1 } }>{ leftButton }</View>
 					<View style={ styles.titleContainer }>
-						<Text style={ styles.title }>
-							{ title }
-						</Text>
+						<Text style={ styles.title }>{ title }</Text>
 					</View>
-					<View style={ { flex: 1 } }>
-						{ rightButton }
-					</View>
+					<View style={ { flex: 1 } }>{ rightButton }</View>
 				</View>
 				<View style={ styles.separator } />
 			</View>

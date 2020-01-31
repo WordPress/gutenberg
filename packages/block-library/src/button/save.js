@@ -29,7 +29,8 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const textClass = getColorClassName( 'color', textColor );
-	const backgroundClass = ! customGradient && getColorClassName( 'background-color', backgroundColor );
+	const backgroundClass =
+		! customGradient && getColorClassName( 'background-color', backgroundColor );
 	const gradientClass = __experimentalGetGradientClass( gradient );
 
 	const buttonClasses = classnames( 'wp-block-button__link', {
@@ -43,7 +44,8 @@ export default function save( { attributes } ) {
 
 	const buttonStyle = {
 		background: customGradient ? customGradient : undefined,
-		backgroundColor: backgroundClass || customGradient || gradient ? undefined : customBackgroundColor,
+		backgroundColor:
+			backgroundClass || customGradient || gradient ? undefined : customBackgroundColor,
 		color: textClass ? undefined : customTextColor,
 		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 	};

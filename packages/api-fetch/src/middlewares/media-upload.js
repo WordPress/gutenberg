@@ -6,10 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	parseAndThrowError,
-	parseResponseAndNormalizeError,
-} from '../utils/response';
+import { parseAndThrowError, parseResponseAndNormalizeError } from '../utils/response';
 
 /**
  * Middleware handling media upload failures and retries.
@@ -37,18 +34,17 @@ function mediaUploadMiddleware( options, next ) {
 			method: 'POST',
 			data: { action: 'create-image-subsizes' },
 			parse: false,
-		} )
-			.catch( () => {
-				if ( retries < maxRetries ) {
-					return postProcess( attachmentId );
-				}
-				next( {
-					path: `/wp/v2/media/${ attachmentId }?force=true`,
-					method: 'DELETE',
-				} );
-
-				return Promise.reject();
+		} ).catch( () => {
+			if ( retries < maxRetries ) {
+				return postProcess( attachmentId );
+			}
+			next( {
+				path: `/wp/v2/media/${ attachmentId }?force=true`,
+				method: 'DELETE',
 			} );
+
+			return Promise.reject();
+		} );
 	};
 
 	return next( { ...options, parse: false } )
@@ -59,7 +55,9 @@ function mediaUploadMiddleware( options, next ) {
 					if ( options.parse !== false ) {
 						return Promise.reject( {
 							code: 'post_process',
-							message: __( 'Media upload failed. If this is a photo or a large image, please scale it down and try again.' ),
+							message: __(
+								'Media upload failed. If this is a photo or a large image, please scale it down and try again.'
+							),
 						} );
 					}
 

@@ -14,7 +14,8 @@ import URLInputButton from '../button';
 import '../../../store';
 
 describe( 'URLInputButton', () => {
-	const clickEditLink = ( wrapper ) => wrapper.find( 'ForwardRef(Button).components-toolbar__control' ).simulate( 'click' );
+	const clickEditLink = ( wrapper ) =>
+		wrapper.find( 'ForwardRef(Button).components-toolbar__control' ).simulate( 'click' );
 
 	it( 'should have a valid class name in the wrapper tag', () => {
 		const wrapper = shallow( <URLInputButton /> );
@@ -63,14 +64,9 @@ describe( 'URLInputButton', () => {
 	} );
 	it( 'should close the form when user submits it', () => {
 		const wrapper = TestUtils.renderIntoDocument( <URLInputButton /> );
-		const buttonElement = () => TestUtils.scryRenderedDOMComponentsWithClass(
-			wrapper,
-			'components-toolbar__control'
-		);
-		const formElement = () => TestUtils.scryRenderedDOMComponentsWithTag(
-			wrapper,
-			'form'
-		);
+		const buttonElement = () =>
+			TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-toolbar__control' );
+		const formElement = () => TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'form' );
 		TestUtils.Simulate.click( buttonElement().shift() );
 		expect( wrapper.state.expanded ).toBe( true );
 		TestUtils.Simulate.submit( formElement().shift() );

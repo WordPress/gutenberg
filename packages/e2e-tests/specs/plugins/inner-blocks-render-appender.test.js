@@ -36,10 +36,7 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		await page.waitForSelector( APPENDER_SELECTOR );
 		// Verify if the custom block appender text is the expected one.
 		expect(
-			await page.evaluate(
-				( el ) => ( el.innerText ),
-				await page.$( `${ APPENDER_SELECTOR } > span` )
-			)
+			await page.evaluate( ( el ) => el.innerText, await page.$( `${ APPENDER_SELECTOR } > span` ) )
 		).toEqual( 'My custom awesome appender' );
 
 		// Open the inserter of our custom block appender and expand all the categories.
@@ -47,12 +44,7 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		await openAllBlockInserterCategories();
 
 		// Verify if the blocks the custom inserter is rendering are the expected ones.
-		expect(
-			await getAllBlockInserterItemTitles()
-		).toEqual( [
-			'Quote',
-			'Video',
-		] );
+		expect( await getAllBlockInserterItemTitles() ).toEqual( [ 'Quote', 'Video' ] );
 
 		// Find the quote block insert button option within the inserter popover.
 		const inserterPopover = await page.$( INSERTER_RESULTS_SELECTOR );
@@ -82,12 +74,7 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		await openAllBlockInserterCategories();
 
 		// Verify if the blocks the custom inserter is rendering are the expected ones.
-		expect(
-			await getAllBlockInserterItemTitles()
-		).toEqual( [
-			'Quote',
-			'Video',
-		] );
+		expect( await getAllBlockInserterItemTitles() ).toEqual( [ 'Quote', 'Video' ] );
 
 		// Find the quote block insert button option within the inserter popover.
 		const inserterPopover = await page.$( INSERTER_RESULTS_SELECTOR );
@@ -102,9 +89,7 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		);
 
 		// Verify that the custom appender button is still being rendered.
-		expect(
-			await page.$( blockAppenderButtonSelector )
-		).toBeTruthy();
+		expect( await page.$( blockAppenderButtonSelector ) ).toBeTruthy();
 
 		// Insert a video block.
 		await insertBlock( 'Video' );
@@ -115,9 +100,7 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		);
 
 		// Verify that the custom appender button is now not being rendered.
-		expect(
-			await page.$( blockAppenderButtonSelector )
-		).toBeFalsy();
+		expect( await page.$( blockAppenderButtonSelector ) ).toBeFalsy();
 
 		// Verify that final block markup is the expected one.
 		expect( await getEditedPostContent() ).toMatchSnapshot();

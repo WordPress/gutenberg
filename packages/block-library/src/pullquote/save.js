@@ -7,10 +7,7 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	getColorClassName,
-	RichText,
-} from '@wordpress/block-editor';
+import { getColorClassName, RichText } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -37,14 +34,14 @@ export default function save( { attributes } ) {
 		const backgroundClass = getColorClassName( 'background-color', mainColor );
 
 		figureClasses = classnames( {
-			'has-background': ( backgroundClass || customMainColor ),
+			'has-background': backgroundClass || customMainColor,
 			[ backgroundClass ]: backgroundClass,
 		} );
 
 		figureStyles = {
 			backgroundColor: backgroundClass ? undefined : customMainColor,
 		};
-	// Is normal style and a custom color is being used ( we can set a style directly with its value)
+		// Is normal style and a custom color is being used ( we can set a style directly with its value)
 	} else if ( customMainColor ) {
 		figureStyles = {
 			borderColor: customMainColor,
@@ -52,15 +49,17 @@ export default function save( { attributes } ) {
 	}
 
 	const blockquoteTextColorClass = getColorClassName( 'color', textColor );
-	const blockquoteClasses = ( textColor || customTextColor ) && classnames( 'has-text-color', {
-		[ blockquoteTextColorClass ]: blockquoteTextColorClass,
-	} );
+	const blockquoteClasses =
+		( textColor || customTextColor ) &&
+		classnames( 'has-text-color', {
+			[ blockquoteTextColorClass ]: blockquoteTextColorClass,
+		} );
 
 	const blockquoteStyles = blockquoteTextColorClass ? undefined : { color: customTextColor };
 
 	return (
 		<figure className={ figureClasses } style={ figureStyles }>
-			<blockquote className={ blockquoteClasses } style={ blockquoteStyles } >
+			<blockquote className={ blockquoteClasses } style={ blockquoteStyles }>
 				<RichText.Content value={ value } multiline />
 				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>

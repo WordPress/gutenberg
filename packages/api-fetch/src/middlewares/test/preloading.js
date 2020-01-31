@@ -73,10 +73,7 @@ describe( 'Preloading Middleware', () => {
 		expect( value ).toEqual( body );
 	} );
 
-	describe.each( [
-		[ 'GET' ],
-		[ 'OPTIONS' ],
-	] )( '%s', ( method ) => {
+	describe.each( [ [ 'GET' ], [ 'OPTIONS' ] ] )( '%s', ( method ) => {
 		describe.each( [
 			[ 'all empty', {} ],
 			[ 'method empty', { [ method ]: {} } ],

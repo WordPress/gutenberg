@@ -22,8 +22,7 @@ import useRegistry from '../registry-provider/use-registry';
  * Fallback to useEffect for server rendered components because currently React
  * throws a warning when using useLayoutEffect in that environment.
  */
-const useIsomorphicLayoutEffect =
-	typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 /**
  * Custom react hook for returning aggregate dispatch actions using the provided
@@ -48,23 +47,17 @@ const useDispatchWithMap = ( dispatchMap, deps ) => {
 	} );
 
 	return useMemo( () => {
-		const currentDispatchProps = currentDispatchMap.current(
-			registry.dispatch,
-			registry
-		);
-		return mapValues(
-			currentDispatchProps,
-			( dispatcher, propName ) => {
-				if ( typeof dispatcher !== 'function' ) {
-					// eslint-disable-next-line no-console
-					console.warn(
-						`Property ${ propName } returned from dispatchMap in useDispatchWithMap must be a function.`
-					);
-				}
-				return ( ...args ) => currentDispatchMap
-					.current( registry.dispatch, registry )[ propName ]( ...args );
+		const currentDispatchProps = currentDispatchMap.current( registry.dispatch, registry );
+		return mapValues( currentDispatchProps, ( dispatcher, propName ) => {
+			if ( typeof dispatcher !== 'function' ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					`Property ${ propName } returned from dispatchMap in useDispatchWithMap must be a function.`
+				);
 			}
-		);
+			return ( ...args ) =>
+				currentDispatchMap.current( registry.dispatch, registry )[ propName ]( ...args );
+		} );
 	}, [ registry, ...deps ] );
 };
 
