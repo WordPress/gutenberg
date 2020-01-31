@@ -4,16 +4,10 @@
 import RichText from '../rich-text';
 
 function Editable( props ) {
-	return (
-		<RichText { ...props } __unstableDisableFormats />
-	);
+	return <RichText { ...props } __unstableDisableFormats />;
 }
 
-Editable.Content = ( {
-	value = '',
-	tagName: Tag = 'div',
-	...props
-} ) => {
+Editable.Content = ( { value = '', tagName: Tag = 'div', ...props } ) => {
 	return <Tag { ...props }>{ value }</Tag>;
 };
 
