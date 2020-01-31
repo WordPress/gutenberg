@@ -520,6 +520,8 @@ describe( 'Default search suggestions', () => {
 describe( 'Creating Entities (eg: Posts, Pages)', () => {
 	const noResults = [];
 	beforeEach( () => {
+
+
 		// Force returning empty results for existing Pages. Doing this means that the only item
 		// shown should be "Create Page" suggestion because there will be no search suggestions
 		// and our input does not conform to a direct entry schema (eg: a URL).
@@ -528,7 +530,23 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 	it.each( [
 		[ 'HelloWorld', 'without spaces' ],
 		[ 'Hello World', 'with spaces' ],
-	] )( 'should display option to create a link for a valid Entity title "%s" (%s)', async ( entityNameText ) => {
+	] )( 'should allow creating a link for a valid Entity title "%s" (%s)', async ( entityNameText ) => {
+
+
+		let resolver;
+		let resolvedEntity;
+		let currentLinkLabel;
+
+		const createEntity = (type, title) => new Promise((resolve) => {
+			resolver = resolve;
+			resolvedEntity = {
+				type,
+				title,
+				id: 123,
+				url: '/?p=123',
+			};
+		});
+
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( null );
 
@@ -538,12 +556,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				onChange={ ( suggestion ) => {
 					setLink( suggestion );
 				} }
-				createEntity={ ( type, title ) => Promise.resolve( {
-					type,
-					title,
-					id: 123,
-					url: '/?p=123',
-				} ) }
+				createEntity={ createEntity }
 			/> );
 		};
 
@@ -569,14 +582,30 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		expect( createButton ).not.toBeNull();
 		expect( createButton.innerHTML ).toEqual( expect.stringContaining( entityNameText ) );
 
-		await act( async () => {
+		// No need to wait in this test because we control the Promise
+		// resolution manually via the `resolver` reference
+		act( () => {
 			Simulate.click( createButton );
 		} );
 
 		await eventLoopTick();
 
-		const currentLinkLabel = container.querySelector( '[aria-label="Currently selected"]' );
+		// Check for loading indicator
+		const loadingIndicator = container.querySelector('.block-editor-link-control__loading');
+		currentLinkLabel = container.querySelector('[aria-label="Currently selected"]');
 
+		expect(currentLinkLabel).toBeNull();
+		expect(loadingIndicator.innerHTML).toEqual(expect.stringContaining('Loading'));
+
+		// Resolve the `createEntity` promise
+		await act( async () => {
+			resolver(resolvedEntity);
+		});
+
+		await eventLoopTick();
+
+		// Test the new entity was displayed.
+		currentLinkLabel = container.querySelector( '[aria-label="Currently selected"]' );
 		const currentLink = container.querySelector( `[aria-labelledby="${ currentLinkLabel.id }"]` );
 
 		const currentLinkHTML = currentLink.innerHTML;

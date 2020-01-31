@@ -408,22 +408,8 @@ function LinkControl( {
 			className="block-editor-link-control"
 		>
 			{ isResolvingLink && (
-				<div
-					className={ classnames(
-						'block-editor-link-control__search-item',
-						{
-							'is-current': true,
-						}
-					) }
-				>
-					<span className="block-editor-link-control__search-item-header">
-						<span className="block-editor-link-control__search-item-title">
-							{ __( 'Creating Page' ) }
-						</span>
-						<span className="block-editor-link-control__search-item-info">
-							{ __( 'Your new Page is being created' ) }.
-						</span>
-					</span>
+				<div className="block-editor-link-control__loading">
+					Loading...
 				</div>
 			) }
 
