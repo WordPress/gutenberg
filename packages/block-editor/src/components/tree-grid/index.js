@@ -31,7 +31,7 @@ function getRowFocusables( rowElement ) {
 	}
 
 	return focusablesInRow.filter( ( focusable ) => {
-		return focusable.closest( '[role="treeitem"]' ) === rowElement;
+		return focusable.closest( '[role="row"]' ) === rowElement;
 	} );
 }
 
@@ -56,7 +56,7 @@ export default function TreeGrid( { children, ...props } ) {
 		}
 
 		// Calculate the columnIndex of the active element.
-		const activeRow = activeElement.closest( '[role="treeitem"]' );
+		const activeRow = activeElement.closest( '[role="row"]' );
 		const focusablesInRow = getRowFocusables( activeRow );
 		const currentColumnIndex = focusablesInRow.indexOf( activeElement );
 
@@ -78,7 +78,7 @@ export default function TreeGrid( { children, ...props } ) {
 			focusablesInRow[ nextIndex ].focus();
 		} else if ( includes( [ UP, DOWN ], keyCode ) ) {
 			// Calculate the rowIndex of the next row.
-			const rows = Array.from( containerRef.current.querySelectorAll( '[role="treeitem"]' ) );
+			const rows = Array.from( containerRef.current.querySelectorAll( '[role="row"]' ) );
 			const currentRowIndex = rows.indexOf( activeRow );
 			let nextRowIndex;
 
