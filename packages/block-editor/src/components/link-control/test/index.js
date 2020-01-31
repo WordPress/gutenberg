@@ -598,6 +598,9 @@ describe( 'Selecting links', () => {
 			const currentLinkHTML = currentLink.innerHTML;
 			const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
 
+			// Make sure focus is retained after submission.
+			expect( container.contains( document.activeElement ) ).toBe( true );
+
 			expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
 			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
 			expect( currentLinkAnchor ).not.toBeNull();

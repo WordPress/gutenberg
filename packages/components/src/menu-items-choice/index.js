@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { check } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import MenuItem from '../menu-item';
@@ -14,7 +19,7 @@ export default function MenuItemsChoice( {
 			<MenuItem
 				key={ item.value }
 				role="menuitemradio"
-				icon={ isSelected && 'yes' }
+				icon={ isSelected && check }
 				isSelected={ isSelected }
 				shortcut={ item.shortcut }
 				className="components-menu-items-choice"

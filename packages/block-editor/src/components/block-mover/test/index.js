@@ -4,10 +4,14 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { chevronUp, chevronDown } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import { BlockMover } from '../';
-import { upArrow, downArrow } from '../icons';
 
 describe( 'BlockMover', () => {
 	describe( 'basic rendering', () => {
@@ -45,7 +49,7 @@ describe( 'BlockMover', () => {
 				className: 'block-editor-block-mover__control',
 				onClick: undefined,
 				label: 'Move up',
-				icon: upArrow,
+				icon: chevronUp,
 				'aria-disabled': undefined,
 				'aria-describedby': 'block-editor-block-mover__up-description-1',
 			} );
@@ -53,7 +57,7 @@ describe( 'BlockMover', () => {
 				className: 'block-editor-block-mover__control',
 				onClick: undefined,
 				label: 'Move down',
-				icon: downArrow,
+				icon: chevronDown,
 				'aria-disabled': undefined,
 				'aria-describedby': 'block-editor-block-mover__down-description-1',
 			} );

@@ -14,6 +14,7 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -120,7 +121,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 									{ ! isLocked && (
 										<MenuItem
 											onClick={ flow( onClose, onRemove ) }
-											icon="trash"
+											icon={ trash }
 											shortcut={ shortcuts.remove }
 										>
 											{ _n( 'Remove Block', 'Remove Blocks', count ) }

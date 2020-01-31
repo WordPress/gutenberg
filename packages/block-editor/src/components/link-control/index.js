@@ -9,7 +9,7 @@ import { noop, startsWith } from 'lodash';
  */
 import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useState, Fragment } from '@wordpress/element';
+import { useRef, useCallback, useState, Fragment, useEffect } from '@wordpress/element';
 import {
 	safeDecodeURI,
 	filterURLForDisplay,
@@ -19,6 +19,7 @@ import {
 } from '@wordpress/url';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -89,9 +90,11 @@ function LinkControl( {
 	onChange = noop,
 	showInitialSuggestions,
 } ) {
+	const wrapperNode = useRef();
 	const instanceId = useInstanceId( LinkControl );
 	const [ inputValue, setInputValue ] = useState( ( value && value.url ) || '' );
 	const [ isEditingLink, setIsEditingLink ] = useState( ! value || ! value.url );
+	const isEndingEditWithFocus = useRef( false );
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return {
@@ -99,6 +102,34 @@ function LinkControl( {
 		};
 	}, [] );
 	const displayURL = ( value && filterURLForDisplay( safeDecodeURI( value.url ) ) ) || '';
+
+	useEffect( () => {
+		// When `isEditingLink` is set to `false`, a focus loss could occur
+		// since the link input may be removed from the DOM. To avoid this,
+		// reinstate focus to a suitable target if focus has in-fact been lost.
+		// Note that the check is necessary because while typically unsetting
+		// edit mode would render the read-only mode's link element, it isn't
+		// guaranteed. The link input may continue to be shown if the next value
+		// is still unassigned after calling `onChange`.
+		const hadFocusLoss = (
+			isEndingEditWithFocus.current &&
+			wrapperNode.current &&
+			! wrapperNode.current.contains( document.activeElement )
+		);
+
+		if ( hadFocusLoss ) {
+			// Prefer to focus a natural focusable descendent of the wrapper,
+			// but settle for the wrapper if there are no other options.
+			const nextFocusTarget = (
+				focus.focusable.find( wrapperNode.current )[ 0 ] ||
+				wrapperNode.current
+			);
+
+			nextFocusTarget.focus();
+		}
+
+		isEndingEditWithFocus.current = false;
+	}, [ isEditingLink ] );
 
 	/**
 	 * onChange LinkControlSearchInput event handler
@@ -156,6 +187,19 @@ function LinkControl( {
 		return couldBeURL && ! args.isInitialSuggestions ? results[ 0 ].concat( results[ 1 ] ) : results[ 0 ];
 	};
 
+	/**
+	 * Cancels editing state and marks that focus may need to be restored after
+	 * the next render, if focus was within the wrapper when editing finished.
+	 */
+	function stopEditing() {
+		isEndingEditWithFocus.current = (
+			!! wrapperNode.current &&
+			wrapperNode.current.contains( document.activeElement )
+		);
+
+		setIsEditingLink( false );
+	}
+
 	// Effects
 	const getSearchHandler = useCallback( ( val, args ) => {
 		const protocol = getProtocol( val ) || '';
@@ -198,7 +242,7 @@ function LinkControl( {
 							itemProps={ buildSuggestionItemProps( suggestion, index ) }
 							suggestion={ suggestion }
 							onClick={ () => {
-								setIsEditingLink( false );
+								stopEditing();
 								onChange( { ...value, ...suggestion } );
 							} }
 							isSelected={ index === selectedSuggestion }
@@ -212,13 +256,17 @@ function LinkControl( {
 	};
 
 	return (
-		<div className="block-editor-link-control">
+		<div
+			tabIndex={ -1 }
+			ref={ wrapperNode }
+			className="block-editor-link-control"
+		>
 			{ isEditingLink || ! value ?
 				<LinkControlSearchInput
 					value={ inputValue }
 					onChange={ onInputChange }
 					onSelect={ ( suggestion ) => {
-						setIsEditingLink( false );
+						stopEditing();
 						onChange( { ...value, ...suggestion } );
 					} }
 					renderSuggestions={ renderSearchResults }

@@ -109,7 +109,7 @@ function ColorGradientControlInner( {
 						</Button>
 					</ButtonGroup>
 				) }
-				{ currentTab === 'color' && (
+				{ ( currentTab === 'color' || ! canChooseAGradient ) && (
 					<ColorPalette
 						value={ colorValue }
 						onChange={ canChooseAGradient ?
@@ -122,7 +122,7 @@ function ColorGradientControlInner( {
 						{ ... { colors, disableCustomColors } }
 					/>
 				) }
-				{ currentTab === 'gradient' && (
+				{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
 					<GradientPicker
 						value={ gradientValue }
 						onChange={ canChooseAColor ?
