@@ -31,6 +31,7 @@ class BottomSheet extends Component {
 		this.state = {
 			safeAreaBottomInset: 0,
 			bounces: false,
+			maxHeight: 0,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
@@ -76,6 +77,13 @@ class BottomSheet extends Component {
 		}
 	}
 
+	onSetMaxHeight() {
+		const { height } = Dimensions.get('window');
+
+		this.setState({maxHeight: height})
+	}
+
+
 	render() {
 		const {
 			title = '',
@@ -88,6 +96,8 @@ class BottomSheet extends Component {
 			getStylesFromColorScheme,
 			...rest
 		} = this.props;
+
+		Dimensions.addEventListener('change', this.onSetMaxHeight)
 
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
@@ -123,7 +133,6 @@ class BottomSheet extends Component {
 		);
 
 		const backgroundStyle = getStylesFromColorScheme( styles.background, styles.backgroundDark );
-		const maxHeight = ( Dimensions.get( 'window' ).height / 2 ) - this.state.safeAreaBottomInset;
 
 		return (
 			<Modal
@@ -151,18 +160,21 @@ class BottomSheet extends Component {
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
-					{ hideHeader && ( <View style={ styles.emptyHeaderSpace } /> ) }
 					{ ! hideHeader && getHeader() }
 					<ScrollView
 						bounces={ this.state.bounces }
 						onScroll={ this.onScroll }
 						scrollEventThrottle={ 16 }
-						style={ { maxHeight } }
-						contentContainerStyle={ [ styles.content, contentStyle ] }
+						style={ { maxHeight: this.state.maxHeight } }
+						contentContainerStyle={ [
+							styles.content,
+							hideHeader && styles.emptyHeader,
+							{ paddingBottom: this.state.safeAreaBottomInset },
+							contentStyle
+						] }
 					>
 						{ this.props.children }
 					</ScrollView>
-					<View style={ { height: this.state.safeAreaBottomInset } } />
 				</KeyboardAvoidingView>
 			</Modal>
 
