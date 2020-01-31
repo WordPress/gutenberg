@@ -122,11 +122,11 @@ const HorizontallyAlignedCard = styled( Card )`
 		flex-direction: row-reverse;
 	}
 
-	${ StyledCardBody } {
+	${StyledCardBody} {
 		flex: 1;
 	}
 
-	${ StyledCardMedia } {
+	${StyledCardMedia} {
 		&.is-left {
 			border-radius: 3px 0 0 3px;
 		}
@@ -151,10 +151,7 @@ export const horizontallyAligned = () => {
 
 	return (
 		<>
-			<p>
-				Note: This story demonstrates how this UI may be created. It
-				requires extra styling.
-			</p>
+			<p>Note: This story demonstrates how this UI may be created. It requires extra styling.</p>
 			<HorizontallyAlignedCard className={ classes }>
 				<StyledCardMedia className={ classes } style={ { maxWidth } }>
 					<DummyImage />

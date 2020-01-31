@@ -33,9 +33,7 @@ export function registerFormatType( name, settings ) {
 	};
 
 	if ( typeof settings.name !== 'string' ) {
-		window.console.error(
-			'Format names must be strings.'
-		);
+		window.console.error( 'Format names must be strings.' );
 		return;
 	}
 
@@ -47,19 +45,12 @@ export function registerFormatType( name, settings ) {
 	}
 
 	if ( select( 'core/rich-text' ).getFormatType( settings.name ) ) {
-		window.console.error(
-			'Format "' + settings.name + '" is already registered.'
-		);
+		window.console.error( 'Format "' + settings.name + '" is already registered.' );
 		return;
 	}
 
-	if (
-		typeof settings.tagName !== 'string' ||
-		settings.tagName === ''
-	) {
-		window.console.error(
-			'Format tag names must be a string.'
-		);
+	if ( typeof settings.tagName !== 'string' || settings.tagName === '' ) {
+		window.console.error( 'Format tag names must be a string.' );
 		return;
 	}
 
@@ -67,9 +58,7 @@ export function registerFormatType( name, settings ) {
 		( typeof settings.className !== 'string' || settings.className === '' ) &&
 		settings.className !== null
 	) {
-		window.console.error(
-			'Format class names must be a string, or null to handle bare elements.'
-		);
+		window.console.error( 'Format class names must be a string, or null to handle bare elements.' );
 		return;
 	}
 
@@ -81,8 +70,9 @@ export function registerFormatType( name, settings ) {
 	}
 
 	if ( settings.className === null ) {
-		const formatTypeForBareElement = select( 'core/rich-text' )
-			.getFormatTypeForBareElement( settings.tagName );
+		const formatTypeForBareElement = select( 'core/rich-text' ).getFormatTypeForBareElement(
+			settings.tagName
+		);
 
 		if ( formatTypeForBareElement ) {
 			window.console.error(
@@ -91,8 +81,9 @@ export function registerFormatType( name, settings ) {
 			return;
 		}
 	} else {
-		const formatTypeForClassName = select( 'core/rich-text' )
-			.getFormatTypeForClassName( settings.className );
+		const formatTypeForClassName = select( 'core/rich-text' ).getFormatTypeForClassName(
+			settings.className
+		);
 
 		if ( formatTypeForClassName ) {
 			window.console.error(
@@ -103,23 +94,17 @@ export function registerFormatType( name, settings ) {
 	}
 
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
-		window.console.error(
-			'The format "' + settings.name + '" must have a title.'
-		);
+		window.console.error( 'The format "' + settings.name + '" must have a title.' );
 		return;
 	}
 
 	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
-		window.console.error(
-			'The format "' + settings.name + '" can have a maximum of 3 keywords.'
-		);
+		window.console.error( 'The format "' + settings.name + '" can have a maximum of 3 keywords.' );
 		return;
 	}
 
 	if ( typeof settings.title !== 'string' ) {
-		window.console.error(
-			'Format titles must be strings.'
-		);
+		window.console.error( 'Format titles must be strings.' );
 		return;
 	}
 

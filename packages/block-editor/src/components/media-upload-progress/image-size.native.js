@@ -84,11 +84,7 @@ class ImageSize extends Component {
 			imageWidthWithinContainer: this.state.width,
 			imageHeightWithinContainer: this.state.height,
 		};
-		return (
-			<View onLayout={ this.onLayout }>
-				{ this.props.children( sizes ) }
-			</View>
-		);
+		return <View onLayout={ this.onLayout }>{ this.props.children( sizes ) }</View>;
 	}
 }
 

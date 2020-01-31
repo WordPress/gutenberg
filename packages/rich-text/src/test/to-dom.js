@@ -21,13 +21,7 @@ describe( 'recordToDom', () => {
 		require( '../store' );
 	} );
 
-	spec.forEach( ( {
-		description,
-		multilineTag,
-		record,
-		startPath,
-		endPath,
-	} ) => {
+	spec.forEach( ( { description, multilineTag, record, startPath, endPath } ) => {
 		it( description, () => {
 			const { body, selection } = toDom( {
 				value: record,

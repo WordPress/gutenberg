@@ -31,12 +31,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @type {Set}
  */
-const STRING_SOURCES = new Set( [
-	'attribute',
-	'html',
-	'text',
-	'tag',
-] );
+const STRING_SOURCES = new Set( [ 'attribute', 'html', 'text', 'tag' ] );
 
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
@@ -49,23 +44,24 @@ const STRING_SOURCES = new Set( [
  *
  * @return {Function} Enhanced hpq matcher.
  */
-export const toBooleanAttributeMatcher = ( matcher ) => flow( [
-	matcher,
-	// Expected values from `attr( 'disabled' )`:
-	//
-	// <input>
-	// - Value:       `undefined`
-	// - Transformed: `false`
-	//
-	// <input disabled>
-	// - Value:       `''`
-	// - Transformed: `true`
-	//
-	// <input disabled="disabled">
-	// - Value:       `'disabled'`
-	// - Transformed: `true`
-	( value ) => value !== undefined,
-] );
+export const toBooleanAttributeMatcher = ( matcher ) =>
+	flow( [
+		matcher,
+		// Expected values from `attr( 'disabled' )`:
+		//
+		// <input>
+		// - Value:       `undefined`
+		// - Transformed: `false`
+		//
+		// <input disabled>
+		// - Value:       `''`
+		// - Transformed: `true`
+		//
+		// <input disabled="disabled">
+		// - Value:       `'disabled'`
+		// - Transformed: `true`
+		( value ) => value !== undefined,
+	] );
 
 /**
  * Returns true if value is of the given JSON schema type, or false otherwise.
@@ -200,7 +196,7 @@ export function matcherFromSource( sourceConfig ) {
 		case 'tag':
 			return flow( [
 				prop( sourceConfig.selector, 'nodeName' ),
-				( nodeName ) => nodeName ? nodeName.toLowerCase() : undefined,
+				( nodeName ) => ( nodeName ? nodeName.toLowerCase() : undefined ),
 			] );
 		default:
 			// eslint-disable-next-line no-console
@@ -345,10 +341,7 @@ export function getMigratedBlock( block, parsedAttributes ) {
 		if ( ! isValid ) {
 			block = {
 				...block,
-				validationIssues: [
-					...get( block, 'validationIssues', [] ),
-					...validationIssues,
-				],
+				validationIssues: [ ...get( block, 'validationIssues', [] ), ...validationIssues ],
 			};
 			continue;
 		}
@@ -359,10 +352,9 @@ export function getMigratedBlock( block, parsedAttributes ) {
 		// inner blocks.
 		const { migrate } = deprecatedBlockType;
 		if ( migrate ) {
-			( [
-				migratedAttributes = parsedAttributes,
-				migratedInnerBlocks = innerBlocks,
-			] = castArray( migrate( migratedAttributes, innerBlocks ) ) );
+			[ migratedAttributes = parsedAttributes, migratedInnerBlocks = innerBlocks ] = castArray(
+				migrate( migratedAttributes, innerBlocks )
+			);
 		}
 
 		block = {
@@ -385,14 +377,11 @@ export function getMigratedBlock( block, parsedAttributes ) {
  */
 export function createBlockWithFallback( blockNode ) {
 	const { blockName: originalName } = blockNode;
-	let {
-		attrs: attributes,
-		innerBlocks = [],
-		innerHTML,
-	} = blockNode;
+	let { attrs: attributes, innerBlocks = [], innerHTML } = blockNode;
 	const { innerContent } = blockNode;
 	const freeformContentFallbackBlock = getFreeformContentHandlerName();
-	const unregisteredFallbackBlock = getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
+	const unregisteredFallbackBlock =
+		getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
 
 	attributes = attributes || {};
 
@@ -437,17 +426,15 @@ export function createBlockWithFallback( blockNode ) {
 		// Preserve undelimited content for use by the unregistered type
 		// handler. A block node's `innerHTML` isn't enough, as that field only
 		// carries the block's own HTML and not its nested blocks'.
-		const originalUndelimitedContent = serializeBlockNode(
-			reconstitutedBlockNode,
-			{ isCommentDelimited: false }
-		);
+		const originalUndelimitedContent = serializeBlockNode( reconstitutedBlockNode, {
+			isCommentDelimited: false,
+		} );
 
 		// Preserve full block content for use by the unregistered type
 		// handler, block boundaries included.
-		const originalContent = serializeBlockNode(
-			reconstitutedBlockNode,
-			{ isCommentDelimited: true }
-		);
+		const originalContent = serializeBlockNode( reconstitutedBlockNode, {
+			isCommentDelimited: true,
+		} );
 
 		// If detected as a block which is not registered, preserve comment
 		// delimiters in content of unregistered type handler.
@@ -469,10 +456,8 @@ export function createBlockWithFallback( blockNode ) {
 	// empty freeform block nodes. See https://github.com/WordPress/gutenberg/pull/17164.
 	innerBlocks = innerBlocks.filter( ( innerBlock ) => innerBlock );
 
-	const isFallbackBlock = (
-		name === freeformContentFallbackBlock ||
-		name === unregisteredFallbackBlock
-	);
+	const isFallbackBlock =
+		name === freeformContentFallbackBlock || name === unregisteredFallbackBlock;
 
 	// Include in set only if type was determined.
 	if ( ! blockType || ( ! innerHTML && isFallbackBlock ) ) {
@@ -490,7 +475,11 @@ export function createBlockWithFallback( blockNode ) {
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
 	if ( ! isFallbackBlock ) {
-		const { isValid, validationIssues } = getBlockContentValidationResult( blockType, block.attributes, innerHTML );
+		const { isValid, validationIssues } = getBlockContentValidationResult(
+			blockType,
+			block.attributes,
+			innerHTML
+		);
 		block.isValid = isValid;
 		block.validationIssues = validationIssues;
 	}
@@ -545,16 +534,16 @@ export function serializeBlockNode( blockNode, options = {} ) {
 	const { blockName, attrs = {}, innerBlocks = [], innerContent = [] } = blockNode;
 
 	let childIndex = 0;
-	const content = innerContent.map( ( item ) =>
-		// `null` denotes a nested block, otherwise we have an HTML fragment
-		item !== null ?
-			item :
-			serializeBlockNode( innerBlocks[ childIndex++ ], options )
-	).join( '\n' ).replace( /\n+/g, '\n' ).trim();
+	const content = innerContent
+		.map( ( item ) =>
+			// `null` denotes a nested block, otherwise we have an HTML fragment
+			item !== null ? item : serializeBlockNode( innerBlocks[ childIndex++ ], options )
+		)
+		.join( '\n' )
+		.replace( /\n+/g, '\n' )
+		.trim();
 
-	return isCommentDelimited ?
-		getCommentDelimitedContent( blockName, attrs, content ) :
-		content;
+	return isCommentDelimited ? getCommentDelimitedContent( blockName, attrs, content ) : content;
 }
 
 /**
@@ -564,8 +553,8 @@ export function serializeBlockNode( blockNode, options = {} ) {
  *
  * @return {Function} An implementation which parses the post content.
  */
-const createParse = ( parseImplementation ) =>
-	( content ) => parseImplementation( content ).reduce( ( accumulator, blockNode ) => {
+const createParse = ( parseImplementation ) => ( content ) =>
+	parseImplementation( content ).reduce( ( accumulator, blockNode ) => {
 		const block = createBlockWithFallback( blockNode );
 		if ( block ) {
 			accumulator.push( block );

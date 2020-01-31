@@ -167,7 +167,7 @@ function proceed() {
 	const stackDepth = stack.length;
 
 	// we may have some HTML soup before the next block
-	const leadingHtmlStart = ( startOffset > offset ) ? offset : null;
+	const leadingHtmlStart = startOffset > offset ? offset : null;
 
 	switch ( tokenType ) {
 		case 'no-more-tokens':
@@ -202,7 +202,9 @@ function proceed() {
 			// in the top-level of the document
 			if ( 0 === stackDepth ) {
 				if ( null !== leadingHtmlStart ) {
-					output.push( Freeform( document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ) ) );
+					output.push(
+						Freeform( document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ) )
+					);
 				}
 				output.push( Block( blockName, attrs, [], '', [] ) );
 				offset = startOffset + tokenLength;
@@ -210,11 +212,7 @@ function proceed() {
 			}
 
 			// otherwise we found an inner block
-			addInnerBlock(
-				Block( blockName, attrs, [], '', [] ),
-				startOffset,
-				tokenLength,
-			);
+			addInnerBlock( Block( blockName, attrs, [], '', [] ), startOffset, tokenLength );
 			offset = startOffset + tokenLength;
 			return true;
 
@@ -226,8 +224,8 @@ function proceed() {
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
-					leadingHtmlStart,
-				),
+					leadingHtmlStart
+				)
 			);
 			offset = startOffset + tokenLength;
 			return true;
@@ -263,7 +261,7 @@ function proceed() {
 				stackTop.block,
 				stackTop.tokenStart,
 				stackTop.tokenLength,
-				startOffset + tokenLength,
+				startOffset + tokenLength
 			);
 			offset = startOffset + tokenLength;
 			return true;
@@ -308,7 +306,15 @@ function nextToken() {
 	}
 
 	const startedAt = matches.index;
-	const [ match, closerMatch, namespaceMatch, nameMatch, attrsMatch, /* internal/unused */, voidMatch ] = matches;
+	const [
+		match,
+		closerMatch,
+		namespaceMatch,
+		nameMatch,
+		attrsMatch /* internal/unused */,
+		,
+		voidMatch,
+	] = matches;
 
 	const length = match.length;
 	const isCloser = !! closerMatch;
@@ -363,7 +369,9 @@ function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 function addBlockFromStack( endOffset ) {
 	const { block, leadingHtmlStart, prevOffset, tokenStart } = stack.pop();
 
-	const html = endOffset ? document.substr( prevOffset, endOffset - prevOffset ) : document.substr( prevOffset );
+	const html = endOffset
+		? document.substr( prevOffset, endOffset - prevOffset )
+		: document.substr( prevOffset );
 
 	if ( html ) {
 		block.innerHTML += html;

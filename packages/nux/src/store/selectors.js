@@ -34,10 +34,7 @@ export const getAssociatedGuide = createSelector(
 
 		return null;
 	},
-	( state ) => [
-		state.guides,
-		state.preferences.dismissedTips,
-	],
+	( state ) => [ state.guides, state.preferences.dismissedTips ]
 );
 
 /**

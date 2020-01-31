@@ -10,4 +10,3 @@ const trash = (
 );
 
 export default trash;
-

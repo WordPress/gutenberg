@@ -44,17 +44,19 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
 
 				let containerElementRect = containerElement.getBoundingClientRect();
 				containerElementRect = {
-					width: containerElementRect.width - ( padding * 2 ),
-					height: containerElementRect.height - ( padding * 2 ),
+					width: containerElementRect.width - padding * 2,
+					height: containerElementRect.height - padding * 2,
 					left: containerElementRect.left,
 					top: containerElementRect.top,
 				};
 				const scaledElementRect = previewElement.getBoundingClientRect();
 
 				const scale = containerElementRect.width / scaledElementRect.width || 1;
-				const offsetX = ( -( scaledElementRect.left - containerElementRect.left ) * scale ) + padding;
-				const offsetY = ( containerElementRect.height > scaledElementRect.height * scale ) ?
-					( ( containerElementRect.height - ( scaledElementRect.height * scale ) ) / 2 ) + padding : 0;
+				const offsetX = -( scaledElementRect.left - containerElementRect.left ) * scale + padding;
+				const offsetY =
+					containerElementRect.height > scaledElementRect.height * scale
+						? ( containerElementRect.height - scaledElementRect.height * scale ) / 2 + padding
+						: 0;
 
 				setPreviewScale( scale );
 				setPosition( { x: offsetX, y: offsetY } );
@@ -109,17 +111,12 @@ export function BlockPreview( { blocks, viewportWidth = 700, padding, settings }
 	const [ recompute, triggerRecompute ] = useReducer( ( state ) => state + 1, 0 );
 	useLayoutEffect( triggerRecompute, [ blocks ] );
 	return (
-		<BlockEditorProvider
-			value={ renderedBlocks }
-			settings={ settings }
-		>
-			{
-				/*
-				 * The key prop is used to force recomputing the preview
-				 * by remounting the component, ScaledBlockPreview is not meant to
-				 * be rerendered.
-				 */
-			}
+		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+			{ /*
+			 * The key prop is used to force recomputing the preview
+			 * by remounting the component, ScaledBlockPreview is not meant to
+			 * be rerendered.
+			 */ }
 			<ScaledBlockPreview
 				key={ recompute }
 				blocks={ renderedBlocks }

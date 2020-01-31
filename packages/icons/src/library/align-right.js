@@ -10,4 +10,3 @@ const alignRight = (
 );
 
 export default alignRight;
-

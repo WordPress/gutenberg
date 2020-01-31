@@ -9,7 +9,13 @@ import { RichText } from '@wordpress/block-editor';
 import { defaultColumnsNumber } from './shared';
 
 export default function save( { attributes } ) {
-	const { images, columns = defaultColumnsNumber( attributes ), imageCrop, caption, linkTo } = attributes;
+	const {
+		images,
+		columns = defaultColumnsNumber( attributes ),
+		imageCrop,
+		caption,
+		linkTo,
+	} = attributes;
 
 	return (
 		<figure className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
@@ -42,14 +48,24 @@ export default function save( { attributes } ) {
 							<figure>
 								{ href ? <a href={ href }>{ img }</a> : img }
 								{ ! RichText.isEmpty( image.caption ) && (
-									<RichText.Content tagName="figcaption" className="blocks-gallery-item__caption" value={ image.caption } />
+									<RichText.Content
+										tagName="figcaption"
+										className="blocks-gallery-item__caption"
+										value={ image.caption }
+									/>
 								) }
 							</figure>
 						</li>
 					);
 				} ) }
 			</ul>
-			{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" className="blocks-gallery-caption" value={ caption } /> }
+			{ ! RichText.isEmpty( caption ) && (
+				<RichText.Content
+					tagName="figcaption"
+					className="blocks-gallery-caption"
+					value={ caption }
+				/>
+			) }
 		</figure>
 	);
 }

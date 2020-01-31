@@ -19,26 +19,16 @@ function LastRevision( { lastRevisionId, revisionsCount } ) {
 				className="editor-post-last-revision__title"
 				icon="backup"
 			>
-				{
-					sprintf(
-						_n( '%d Revision', '%d Revisions', revisionsCount ),
-						revisionsCount
-					)
-				}
+				{ sprintf( _n( '%d Revision', '%d Revisions', revisionsCount ), revisionsCount ) }
 			</Button>
 		</PostLastRevisionCheck>
 	);
 }
 
-export default withSelect(
-	( select ) => {
-		const {
-			getCurrentPostLastRevisionId,
-			getCurrentPostRevisionsCount,
-		} = select( 'core/editor' );
-		return {
-			lastRevisionId: getCurrentPostLastRevisionId(),
-			revisionsCount: getCurrentPostRevisionsCount(),
-		};
-	}
-)( LastRevision );
+export default withSelect( ( select ) => {
+	const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } = select( 'core/editor' );
+	return {
+		lastRevisionId: getCurrentPostLastRevisionId(),
+		revisionsCount: getCurrentPostRevisionsCount(),
+	};
+} )( LastRevision );

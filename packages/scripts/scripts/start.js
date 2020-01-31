@@ -9,9 +9,7 @@ const { sync: resolveBin } = require( 'resolve-bin' );
  */
 const { getWebpackArgs } = require( '../utils' );
 
-const { status } = spawn(
-	resolveBin( 'webpack' ),
-	getWebpackArgs( [ '--watch' ] ),
-	{ stdio: 'inherit' }
-);
+const { status } = spawn( resolveBin( 'webpack' ), getWebpackArgs( [ '--watch' ] ), {
+	stdio: 'inherit',
+} );
 process.exit( status );

@@ -7,7 +7,10 @@ import '@wordpress/editor';
 import '@wordpress/keyboard-shortcuts';
 import '@wordpress/viewport';
 import '@wordpress/notices';
-import { registerCoreBlocks, __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
+import {
+	registerCoreBlocks,
+	__experimentalRegisterExperimentalCoreBlocks,
+} from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 
 /**
@@ -74,7 +77,9 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 	const documentMode = document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks';
 	if ( documentMode !== 'Standards' ) {
 		// eslint-disable-next-line no-console
-		console.warn( "Your browser is using Quirks Mode. \nThis can cause rendering issues such as blocks overlaying meta boxes in the editor. Quirks Mode can be triggered by PHP errors or HTML code appearing before the opening <!DOCTYPE html>. Try checking the raw page source or your site's PHP error log and resolving errors there, removing any HTML before the doctype, or disabling plugins." );
+		console.warn(
+			"Your browser is using Quirks Mode. \nThis can cause rendering issues such as blocks overlaying meta boxes in the editor. Quirks Mode can be triggered by PHP errors or HTML code appearing before the opening <!DOCTYPE html>. Try checking the raw page source or your site's PHP error log and resolving errors there, removing any HTML before the doctype, or disabling plugins."
+		);
 	}
 
 	// This is a temporary fix for a couple of issues specific to Webkit on iOS.
@@ -87,7 +92,9 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
 	if ( isIphone ) {
 		window.addEventListener( 'scroll', function( event ) {
-			const editorScrollContainer = document.getElementsByClassName( 'edit-post-editor-regions__body' )[ 0 ];
+			const editorScrollContainer = document.getElementsByClassName(
+				'edit-post-editor-regions__body'
+			)[ 0 ];
 			if ( event.target === document ) {
 				// Scroll element into view by scrolling the editor container by the same amount
 				// that Mobile Safari tried to scroll the html element upwards.

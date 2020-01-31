@@ -6,15 +6,9 @@ import { useSelect } from '@wordpress/data';
 
 const __experimentalUsePageTemplatePickerVisible = () => {
 	return useSelect( ( select ) => {
-		const {
-			getCurrentPostType,
-		} = select( 'core/editor' );
+		const { getCurrentPostType } = select( 'core/editor' );
 
-		const {
-			getBlockOrder,
-			getBlock,
-			getSettings,
-		} = select( 'core/block-editor' );
+		const { getBlockOrder, getBlock, getSettings } = select( 'core/block-editor' );
 
 		const isPageTemplatesEnabled = getSettings().__experimentalEnablePageTemplates;
 

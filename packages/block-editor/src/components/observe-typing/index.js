@@ -9,15 +9,7 @@ import { over, includes } from 'lodash';
 import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
-import {
-	UP,
-	RIGHT,
-	DOWN,
-	LEFT,
-	ENTER,
-	BACKSPACE,
-	ESCAPE,
-} from '@wordpress/keycodes';
+import { UP, RIGHT, DOWN, LEFT, ENTER, BACKSPACE, ESCAPE } from '@wordpress/keycodes';
 import { withSafeTimeout } from '@wordpress/compose';
 
 /**
@@ -41,10 +33,7 @@ function isKeyDownEligibleForStartTyping( event ) {
 	return ! shiftKey && includes( KEY_DOWN_ELIGIBLE_KEY_CODES, keyCode );
 }
 
-function ObserveTyping( {
-	children,
-	setTimeout: setSafeTimeout,
-} ) {
+function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	const lastMouseMove = useRef();
 	const isTyping = useSelect( ( select ) => select( 'core/block-editor' ).isTyping() );
 	const { startTyping, stopTyping } = useDispatch( 'core/block-editor' );
@@ -76,10 +65,7 @@ function ObserveTyping( {
 		// We need to check that the mouse really moved because Safari triggers
 		// mousemove events when shift or ctrl are pressed.
 		if ( lastMouseMove.current ) {
-			const {
-				clientX: lastClientX,
-				clientY: lastClientY,
-			} = lastMouseMove.current;
+			const { clientX: lastClientX, clientY: lastClientY } = lastMouseMove.current;
 
 			if ( lastClientX !== clientX || lastClientY !== clientY ) {
 				stopTyping();

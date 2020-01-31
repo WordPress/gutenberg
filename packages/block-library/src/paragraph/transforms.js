@@ -25,11 +25,7 @@ const transforms = {
 				const attributes = getBlockAttributes( name, node.outerHTML );
 				const { textAlign } = node.style || {};
 
-				if (
-					textAlign === 'left' ||
-					textAlign === 'center' ||
-					textAlign === 'right'
-				) {
+				if ( textAlign === 'left' || textAlign === 'center' || textAlign === 'right' ) {
 					attributes.align = textAlign;
 				}
 

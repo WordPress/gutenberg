@@ -22,7 +22,9 @@ if ( env.MANAGED_WP ) {
 
 	const lastUpdated = new Date( stat.mtimeMs );
 	if ( Date.now() - lastUpdated.getTime() > 7 * 24 * 60 * 60 * 1000 ) {
-		stdout.write( "\nIt's been a while since you updated WordPress. Run `npm run env update` to update it.\n\n" );
+		stdout.write(
+			"\nIt's been a while since you updated WordPress. Run `npm run env update` to update it.\n\n"
+		);
 	}
 }
 

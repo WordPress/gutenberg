@@ -127,9 +127,13 @@ function buildWordPress( newInstall, fastInstall ) {
 	execSync( 'npm run env connect', { stdio: 'inherit' } );
 
 	if ( newInstall ) {
-		execSync( `npm run env cli plugin activate ${ env.npm_package_wp_env_plugin_dir }`, { stdio: 'inherit' } );
+		execSync( `npm run env cli plugin activate ${ env.npm_package_wp_env_plugin_dir }`, {
+			stdio: 'inherit',
+		} );
 
-		const currentUrl = execSync( 'npm run --silent env cli option get siteurl' ).toString().trim();
+		const currentUrl = execSync( 'npm run --silent env cli option get siteurl' )
+			.toString()
+			.trim();
 
 		stdout.write( chalk.white( '\nWelcome to...\n' ) );
 		for ( let ii = 0; env[ `npm_package_wp_env_welcome_logo_${ ii }` ]; ii++ ) {

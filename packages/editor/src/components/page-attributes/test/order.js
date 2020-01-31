@@ -11,9 +11,7 @@ import { PageAttributesOrder } from '../order';
 describe( 'PageAttributesOrder', () => {
 	it( 'should reject invalid input', () => {
 		const onUpdateOrder = jest.fn();
-		const wrapper = mount(
-			<PageAttributesOrder onUpdateOrder={ onUpdateOrder } />
-		);
+		const wrapper = mount( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
 
 		wrapper.find( 'input' ).simulate( 'change', {
 			target: {
@@ -56,9 +54,7 @@ describe( 'PageAttributesOrder', () => {
 
 	it( 'should update with zero input', () => {
 		const onUpdateOrder = jest.fn();
-		const wrapper = mount(
-			<PageAttributesOrder onUpdateOrder={ onUpdateOrder } />
-		);
+		const wrapper = mount( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
 
 		wrapper.find( 'input' ).simulate( 'change', {
 			target: {
@@ -71,9 +67,7 @@ describe( 'PageAttributesOrder', () => {
 
 	it( 'should update with valid positive input', () => {
 		const onUpdateOrder = jest.fn();
-		const wrapper = mount(
-			<PageAttributesOrder onUpdateOrder={ onUpdateOrder } />
-		);
+		const wrapper = mount( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
 
 		wrapper.find( 'input' ).simulate( 'change', {
 			target: {
@@ -86,9 +80,7 @@ describe( 'PageAttributesOrder', () => {
 
 	it( 'should update with valid negative input', () => {
 		const onUpdateOrder = jest.fn();
-		const wrapper = mount(
-			<PageAttributesOrder onUpdateOrder={ onUpdateOrder } />
-		);
+		const wrapper = mount( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
 
 		wrapper.find( 'input' ).simulate( 'change', {
 			target: {

@@ -42,15 +42,18 @@ export function __experimentalUseGradient( {
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const { gradients, gradient, customGradient } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSettings } = select( 'core/block-editor' );
-		const attributes = getBlockAttributes( clientId );
-		return {
-			gradient: attributes[ gradientAttribute ],
-			customGradient: attributes[ customGradientAttribute ],
-			gradients: getSettings().gradients,
-		};
-	}, [ clientId, gradientAttribute, customGradientAttribute ] );
+	const { gradients, gradient, customGradient } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } = select( 'core/block-editor' );
+			const attributes = getBlockAttributes( clientId );
+			return {
+				gradient: attributes[ gradientAttribute ],
+				customGradient: attributes[ customGradientAttribute ],
+				gradients: getSettings().gradients,
+			};
+		},
+		[ clientId, gradientAttribute, customGradientAttribute ]
+	);
 
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 	const setGradient = useCallback(

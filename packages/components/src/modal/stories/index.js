@@ -44,10 +44,7 @@ export const _default = () => {
 	const isDismissible = boolean( 'isDismissible', true );
 	const focusOnMount = boolean( 'focusOnMount', true );
 	const shouldCloseOnEsc = boolean( 'shouldCloseOnEsc', true );
-	const shouldCloseOnClickOutside = boolean(
-		'shouldCloseOnClickOutside',
-		true
-	);
+	const shouldCloseOnClickOutside = boolean( 'shouldCloseOnClickOutside', true );
 
 	const iconComponent = icon ? <Dashicon icon={ icon } /> : null;
 

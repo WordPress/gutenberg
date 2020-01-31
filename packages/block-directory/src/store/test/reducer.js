@@ -6,11 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import {
-	downloadableBlocks,
-	blockManagement,
-	hasPermission,
-} from '../reducer';
+import { downloadableBlocks, blockManagement, hasPermission } from '../reducer';
 import { installedItem, downloadableBlock } from './fixtures';
 
 describe( 'state', () => {
@@ -36,7 +32,7 @@ describe( 'state', () => {
 			expect( state.isRequestingDownloadableBlocks ).toBe( false );
 		} );
 
-		it( 'should set user\'s search term and save results', () => {
+		it( "should set user's search term and save results", () => {
 			const state = downloadableBlocks( undefined, {
 				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
 				filterValue: downloadableBlock.title,

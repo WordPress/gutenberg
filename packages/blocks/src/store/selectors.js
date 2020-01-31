@@ -2,17 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import {
-	deburr,
-	filter,
-	findLast,
-	first,
-	flow,
-	get,
-	includes,
-	map,
-	some,
-} from 'lodash';
+import { deburr, filter, findLast, first, flow, get, includes, map, some } from 'lodash';
 
 /** @typedef {import('../api/registration').WPBlockPatternScope} WPBlockPatternScope */
 
@@ -25,11 +15,8 @@ import {
  *
  * @return {Object} Block type object.
  */
-const getNormalizedBlockType = ( state, nameOrType ) => (
-	'string' === typeof nameOrType ?
-		getBlockType( state, nameOrType ) :
-		nameOrType
-);
+const getNormalizedBlockType = ( state, nameOrType ) =>
+	'string' === typeof nameOrType ? getBlockType( state, nameOrType ) : nameOrType;
 
 /**
  * Returns all the available block types.
@@ -47,10 +34,7 @@ export const getBlockTypes = createSelector(
 			};
 		} );
 	},
-	( state ) => [
-		state.blockTypes,
-		state.blockPatterns,
-	]
+	( state ) => [ state.blockTypes, state.blockPatterns ]
 );
 
 /**
@@ -197,9 +181,7 @@ export const getChildBlockNames = createSelector(
 			( { name } ) => name
 		);
 	},
-	( state ) => [
-		state.blockTypes,
-	]
+	( state ) => [ state.blockTypes ]
 );
 
 /**
@@ -216,10 +198,7 @@ export const getChildBlockNames = createSelector(
 export const getBlockSupport = ( state, nameOrType, feature, defaultSupports ) => {
 	const blockType = getNormalizedBlockType( state, nameOrType );
 
-	return get( blockType, [
-		'supports',
-		feature,
-	], defaultSupports );
+	return get( blockType, [ 'supports', feature ], defaultSupports );
 };
 
 /**
@@ -268,10 +247,7 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 
 	const isSearchMatch = flow( [
 		getNormalizedSearchTerm,
-		( normalizedCandidate ) => includes(
-			normalizedCandidate,
-			normalizedSearchTerm
-		),
+		( normalizedCandidate ) => includes( normalizedCandidate, normalizedSearchTerm ),
 	] );
 
 	return (

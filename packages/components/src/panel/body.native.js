@@ -13,7 +13,7 @@ import { Component } from '@wordpress/element';
 import styles from './body.scss';
 
 export class PanelBody extends Component {
-	constructor( ) {
+	constructor() {
 		super( ...arguments );
 		this.state = {};
 	}

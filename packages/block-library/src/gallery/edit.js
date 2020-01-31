@@ -1,17 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	every,
-	filter,
-	find,
-	forEach,
-	get,
-	isEmpty,
-	map,
-	reduce,
-	some,
-} from 'lodash';
+import { every, filter, find, forEach, get, isEmpty, map, reduce, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,10 +14,7 @@ import {
 	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
-import {
-	MediaPlaceholder,
-	InspectorControls,
-} from '@wordpress/block-editor';
+import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
 import { Component, Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
@@ -93,7 +80,9 @@ class GalleryEdit extends Component {
 
 	setAttributes( attributes ) {
 		if ( attributes.ids ) {
-			throw new Error( 'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes' );
+			throw new Error(
+				'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes'
+			);
 		}
 
 		if ( attributes.images ) {
@@ -155,9 +144,7 @@ class GalleryEdit extends Component {
 	}
 
 	selectCaption( newImage, images, attachmentCaptions ) {
-		const currentImage = find(
-			images, { id: newImage.id }
-		);
+		const currentImage = find( images, { id: newImage.id } );
 
 		const currentImageCaption = currentImage ? currentImage.caption : newImage.caption;
 
@@ -165,12 +152,10 @@ class GalleryEdit extends Component {
 			return currentImageCaption;
 		}
 
-		const attachment = find(
-			attachmentCaptions, { id: newImage.id }
-		);
+		const attachment = find( attachmentCaptions, { id: newImage.id } );
 
 		// if the attachment caption is updated
-		if ( attachment && ( attachment.caption !== newImage.caption ) ) {
+		if ( attachment && attachment.caption !== newImage.caption ) {
 			return newImage.caption;
 		}
 
@@ -180,14 +165,12 @@ class GalleryEdit extends Component {
 	onSelectImages( newImages ) {
 		const { columns, images, sizeSlug } = this.props.attributes;
 		const { attachmentCaptions } = this.state;
-		this.setState(
-			{
-				attachmentCaptions: newImages.map( ( newImage ) => ( {
-					id: newImage.id,
-					caption: newImage.caption,
-				} ) ),
-			}
-		);
+		this.setState( {
+			attachmentCaptions: newImages.map( ( newImage ) => ( {
+				id: newImage.id,
+				caption: newImage.caption,
+			} ) ),
+		} );
 		this.setAttributes( {
 			images: newImages.map( ( newImage ) => ( {
 				...pickRelevantMediaFiles( newImage, sizeSlug ),
@@ -226,7 +209,9 @@ class GalleryEdit extends Component {
 	}
 
 	setImageAttributes( index, attributes ) {
-		const { attributes: { images } } = this.props;
+		const {
+			attributes: { images },
+		} = this.props;
 		const { setAttributes } = this;
 		if ( ! images[ index ] ) {
 			return;
@@ -246,16 +231,16 @@ class GalleryEdit extends Component {
 	getImagesSizeOptions() {
 		const { imageSizes, resizedImages } = this.props;
 		return map(
-			filter(
-				imageSizes,
-				( { slug } ) => some( resizedImages, ( sizes ) => ( sizes[ slug ] ) )
-			),
+			filter( imageSizes, ( { slug } ) => some( resizedImages, ( sizes ) => sizes[ slug ] ) ),
 			( { name, slug } ) => ( { value: slug, label: name } )
 		);
 	}
 
 	updateImagesSize( sizeSlug ) {
-		const { attributes: { images }, resizedImages } = this.props;
+		const {
+			attributes: { images },
+			resizedImages,
+		} = this.props;
 
 		const updatedImages = map( images, ( image ) => {
 			if ( ! image.id ) {
@@ -276,7 +261,8 @@ class GalleryEdit extends Component {
 		const { images } = attributes;
 		if (
 			Platform.OS === 'web' &&
-			images && images.length > 0 &&
+			images &&
+			images.length > 0 &&
 			every( images, ( { url } ) => isBlobURL( url ) )
 		) {
 			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
@@ -300,12 +286,7 @@ class GalleryEdit extends Component {
 	}
 
 	render() {
-		const {
-			attributes,
-			className,
-			isSelected,
-			noticeUI,
-		} = this.props;
+		const { attributes, className, isSelected, noticeUI } = this.props;
 		const {
 			columns = defaultColumnsNumber( attributes ),
 			imageCrop,
@@ -346,23 +327,25 @@ class GalleryEdit extends Component {
 		const imageSizeOptions = this.getImagesSizeOptions();
 		const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
 		// This is needed to fix a separator fence-post issue on mobile.
-		const mobileLinkToProps = shouldShowSizeOptions ?
-			MOBILE_CONTROL_PROPS :
-			MOBILE_CONTROL_PROPS_SEPARATOR_NONE;
+		const mobileLinkToProps = shouldShowSizeOptions
+			? MOBILE_CONTROL_PROPS
+			: MOBILE_CONTROL_PROPS_SEPARATOR_NONE;
 
 		return (
 			<>
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
-						{ images.length > 1 && <RangeControl
-							label={ __( 'Columns' ) }
-							{ ...MOBILE_CONTROL_PROPS }
-							value={ columns }
-							onChange={ this.setColumnsNumber }
-							min={ 1 }
-							max={ Math.min( MAX_COLUMNS, images.length ) }
-							required
-						/> }
+						{ images.length > 1 && (
+							<RangeControl
+								label={ __( 'Columns' ) }
+								{ ...MOBILE_CONTROL_PROPS }
+								value={ columns }
+								onChange={ this.setColumnsNumber }
+								min={ 1 }
+								max={ Math.min( MAX_COLUMNS, images.length ) }
+								required
+							/>
+						) }
 						<ToggleControl
 							label={ __( 'Crop Images' ) }
 							{ ...MOBILE_CONTROL_PROPS }
@@ -408,32 +391,42 @@ export default compose( [
 	withSelect( ( select, { attributes: { ids }, isSelected } ) => {
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
-		const {
-			imageSizes,
-			mediaUpload,
-		} = getSettings();
+		const { imageSizes, mediaUpload } = getSettings();
 
 		let resizedImages = {};
 
 		if ( isSelected ) {
-			resizedImages = reduce( ids, ( currentResizedImages, id ) => {
-				if ( ! id ) {
-					return currentResizedImages;
-				}
-				const image = getMedia( id );
-				const sizes = reduce( imageSizes, ( currentSizes, size ) => {
-					const defaultUrl = get( image, [ 'sizes', size.slug, 'url' ] );
-					const mediaDetailsUrl = get( image, [ 'media_details', 'sizes', size.slug, 'source_url' ] );
+			resizedImages = reduce(
+				ids,
+				( currentResizedImages, id ) => {
+					if ( ! id ) {
+						return currentResizedImages;
+					}
+					const image = getMedia( id );
+					const sizes = reduce(
+						imageSizes,
+						( currentSizes, size ) => {
+							const defaultUrl = get( image, [ 'sizes', size.slug, 'url' ] );
+							const mediaDetailsUrl = get( image, [
+								'media_details',
+								'sizes',
+								size.slug,
+								'source_url',
+							] );
+							return {
+								...currentSizes,
+								[ size.slug ]: defaultUrl || mediaDetailsUrl,
+							};
+						},
+						{}
+					);
 					return {
-						...currentSizes,
-						[ size.slug ]: defaultUrl || mediaDetailsUrl,
+						...currentResizedImages,
+						[ parseInt( id, 10 ) ]: sizes,
 					};
-				}, {} );
-				return {
-					...currentResizedImages,
-					[ parseInt( id, 10 ) ]: sizes,
-				};
-			}, {} );
+				},
+				{}
+			);
 		}
 
 		return {

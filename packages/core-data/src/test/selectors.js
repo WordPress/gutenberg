@@ -22,10 +22,7 @@ import {
 } from '../selectors';
 
 // getEntityRecord and getEntityRecordNoResolver selectors share the same tests
-describe.each( [
-	[ getEntityRecord ],
-	[ getEntityRecordNoResolver ],
-] )( '%p', ( selector ) => {
+describe.each( [ [ getEntityRecord ], [ getEntityRecordNoResolver ] ] )( '%p', ( selector ) => {
 	it( 'should return undefined for unknown record’s key', () => {
 		const state = deepFreeze( {
 			entities: {
@@ -171,9 +168,9 @@ describe( 'getEntityRecordNonTransientEdits', () => {
 		const state = deepFreeze( {
 			entities: { config: [], data: {} },
 		} );
-		expect(
-			getEntityRecordNonTransientEdits( state, 'someKind', 'someName', 'someId' )
-		).toEqual( {} );
+		expect( getEntityRecordNonTransientEdits( state, 'someKind', 'someName', 'someId' ) ).toEqual(
+			{}
+		);
 	} );
 } );
 
@@ -232,7 +229,12 @@ describe( 'canUser', () => {
 } );
 
 describe( 'getAutosave', () => {
-	const testAutosave = { author: 1, title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } };
+	const testAutosave = {
+		author: 1,
+		title: { raw: '' },
+		excerpt: { raw: '' },
+		content: { raw: '' },
+	};
 
 	it( 'returns undefined if no autosaves exist for the post id in state', () => {
 		const postType = 'post';
@@ -284,7 +286,12 @@ describe( 'getAutosave', () => {
 		const postType = 'post';
 		const postId = 1;
 		const author = 2;
-		const expectedAutosave = { author, title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } };
+		const expectedAutosave = {
+			author,
+			title: { raw: '' },
+			excerpt: { raw: '' },
+			content: { raw: '' },
+		};
 		const state = {
 			autosaves: {
 				[ postId ]: [ testAutosave, expectedAutosave ],
@@ -357,7 +364,9 @@ describe( 'getReferenceByDistinctEdits', () => {
 
 		const beforeState = { undo: [] };
 		const afterState = { undo: [] };
-		expect( getReferenceByDistinctEdits( beforeState ) ).toBe( getReferenceByDistinctEdits( afterState ) );
+		expect( getReferenceByDistinctEdits( beforeState ) ).toBe(
+			getReferenceByDistinctEdits( afterState )
+		);
 	} );
 
 	it( 'should return referentially equal values across unchanging non-empty state', () => {
@@ -367,7 +376,9 @@ describe( 'getReferenceByDistinctEdits', () => {
 
 		const beforeState = { undo: undoStates };
 		const afterState = { undo: undoStates };
-		expect( getReferenceByDistinctEdits( beforeState ) ).toBe( getReferenceByDistinctEdits( afterState ) );
+		expect( getReferenceByDistinctEdits( beforeState ) ).toBe(
+			getReferenceByDistinctEdits( afterState )
+		);
 	} );
 
 	describe( 'when adding edits', () => {
@@ -376,7 +387,9 @@ describe( 'getReferenceByDistinctEdits', () => {
 			beforeState.undo.offset = 0;
 			const afterState = { undo: [ {}, {} ] };
 			afterState.undo.offset = 1;
-			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe( getReferenceByDistinctEdits( afterState ) );
+			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe(
+				getReferenceByDistinctEdits( afterState )
+			);
 		} );
 	} );
 
@@ -386,8 +399,9 @@ describe( 'getReferenceByDistinctEdits', () => {
 			beforeState.undo.offset = 1;
 			const afterState = { undo: [ {}, {} ] };
 			afterState.undo.offset = 0;
-			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe( getReferenceByDistinctEdits( afterState ) );
+			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe(
+				getReferenceByDistinctEdits( afterState )
+			);
 		} );
 	} );
 } );
-

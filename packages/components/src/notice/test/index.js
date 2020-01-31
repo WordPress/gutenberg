@@ -18,12 +18,7 @@ describe( 'Notice', () => {
 		const renderer = new ShallowRenderer();
 
 		renderer.render(
-			<Notice
-				status="success"
-				actions={ [
-					{ label: 'View', url: 'https://example.com' },
-				] }
-			>
+			<Notice status="success" actions={ [ { label: 'View', url: 'https://example.com' } ] }>
 				Example
 			</Notice>
 		);

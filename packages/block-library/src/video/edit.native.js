@@ -17,12 +17,7 @@ import {
 /**
  * WordPress dependencies
  */
-import {
-	Icon,
-	ToolbarButton,
-	ToolbarGroup,
-	PanelBody,
-} from '@wordpress/components';
+import { Icon, ToolbarButton, ToolbarGroup, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
 	BlockCaption,
@@ -164,7 +159,10 @@ class VideoEdit extends React.Component {
 				iconStyle = this.props.getStylesFromColorScheme( style.icon, style.iconDark );
 				break;
 			case ICON_TYPE.UPLOAD:
-				iconStyle = this.props.getStylesFromColorScheme( style.iconUploading, style.iconUploadingDark );
+				iconStyle = this.props.getStylesFromColorScheme(
+					style.iconUploading,
+					style.iconUploadingDark
+				);
 				break;
 		}
 
@@ -173,33 +171,27 @@ class VideoEdit extends React.Component {
 
 	render() {
 		const { setAttributes, attributes, isSelected } = this.props;
-		const {
-			id,
-			src,
-		} = attributes;
+		const { id, src } = attributes;
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
-			<MediaUpload allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+			<MediaUpload
+				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
 				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<ToolbarGroup>
 							{ getMediaOptions() }
-							<ToolbarButton
-								label={ __( 'Edit video' ) }
-								icon="edit"
-								onClick={ open }
-							/>
+							<ToolbarButton label={ __( 'Edit video' ) } icon="edit" onClick={ open } />
 						</ToolbarGroup>
 					);
-				} } >
-			</MediaUpload>
+				} }
+			></MediaUpload>
 		);
 
 		if ( ! id ) {
 			return (
-				<View style={ { flex: 1 } } >
+				<View style={ { flex: 1 } }>
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
 						onSelect={ this.onSelectMediaUploadOption }
@@ -217,16 +209,10 @@ class VideoEdit extends React.Component {
 				disabled={ ! isSelected }
 			>
 				<View style={ { flex: 1 } }>
-					{ ! this.state.isCaptionSelected &&
-						<BlockControls>
-							{ toolbarEditButton }
-						</BlockControls> }
+					{ ! this.state.isCaptionSelected && <BlockControls>{ toolbarEditButton }</BlockControls> }
 					<InspectorControls>
 						<PanelBody title={ __( 'Video settings' ) }>
-							<VideoCommonSettings
-								setAttributes={ setAttributes }
-								attributes={ attributes }
-							/>
+							<VideoCommonSettings setAttributes={ setAttributes } attributes={ attributes } />
 						</PanelBody>
 					</InspectorControls>
 					<MediaUploadProgress
@@ -240,22 +226,19 @@ class VideoEdit extends React.Component {
 							const icon = this.getIcon( isUploadFailed ? ICON_TYPE.RETRY : ICON_TYPE.UPLOAD );
 							const styleIconContainer = isUploadFailed ? style.modalIconRetry : style.modalIcon;
 
-							const iconContainer = (
-								<View style={ styleIconContainer }>
-									{ icon }
-								</View>
-							);
+							const iconContainer = <View style={ styleIconContainer }>{ icon }</View>;
 
 							const videoStyle = {
 								height: videoContainerHeight,
 								...style.video,
 							};
 
-							const containerStyle = showVideo && isSelected ? style.containerFocused : style.container;
+							const containerStyle =
+								showVideo && isSelected ? style.containerFocused : style.container;
 
 							return (
 								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
-									{ showVideo &&
+									{ showVideo && (
 										<View style={ style.videoContainer }>
 											<VideoPlayer
 												isSelected={ isSelected && ! this.state.isCaptionSelected }
@@ -264,14 +247,24 @@ class VideoEdit extends React.Component {
 												paused={ true }
 											/>
 										</View>
-									}
-									{ ! showVideo &&
-										<View style={ { height: videoContainerHeight, width: '100%', ...this.props.getStylesFromColorScheme(
-											style.placeholderContainer, style.placeholderContainerDark ) } }>
+									) }
+									{ ! showVideo && (
+										<View
+											style={ {
+												height: videoContainerHeight,
+												width: '100%',
+												...this.props.getStylesFromColorScheme(
+													style.placeholderContainer,
+													style.placeholderContainerDark
+												),
+											} }
+										>
 											{ videoContainerHeight > 0 && iconContainer }
-											{ isUploadFailed && <Text style={ style.uploadFailedText }>{ retryMessage }</Text> }
+											{ isUploadFailed && (
+												<Text style={ style.uploadFailedText }>{ retryMessage }</Text>
+											) }
 										</View>
-									}
+									) }
 								</View>
 							);
 						} }
@@ -279,13 +272,14 @@ class VideoEdit extends React.Component {
 					<BlockCaption
 						accessible={ true }
 						accessibilityLabelCreator={ ( caption ) =>
-							isEmpty( caption ) ?
-							/* translators: accessibility text. Empty video caption. */
-								( 'Video caption. Empty' ) :
-								sprintf(
-								/* translators: accessibility text. %s: video caption. */
-									__( 'Video caption. %s' ),
-									caption )
+							isEmpty( caption )
+								? /* translators: accessibility text. Empty video caption. */
+								  'Video caption. Empty'
+								: sprintf(
+										/* translators: accessibility text. %s: video caption. */
+										__( 'Video caption. %s' ),
+										caption
+								  )
 						}
 						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }

@@ -24,24 +24,15 @@ class FormFileUpload extends Component {
 	}
 
 	render() {
-		const {
-			accept,
-			children,
-			multiple = false,
-			onChange,
-			render,
-			...props
-		} = this.props;
+		const { accept, children, multiple = false, onChange, render, ...props } = this.props;
 
-		const ui = render ?
-			render( { openFileDialog: this.openFileDialog } ) : (
-				<Button
-					onClick={ this.openFileDialog }
-					{ ...props }
-				>
-					{ children }
-				</Button>
-			);
+		const ui = render ? (
+			render( { openFileDialog: this.openFileDialog } )
+		) : (
+			<Button onClick={ this.openFileDialog } { ...props }>
+				{ children }
+			</Button>
+		);
 		return (
 			<div className="components-form-file-upload">
 				{ ui }

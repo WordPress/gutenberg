@@ -8,12 +8,7 @@ import classNames from 'classnames';
  */
 import { InspectorControls, URLPopover, URLInput } from '@wordpress/block-editor';
 import { Fragment, useState } from '@wordpress/element';
-import {
-	Button,
-	PanelBody,
-	PanelRow,
-	TextControl,
-} from '@wordpress/components';
+import { Button, PanelBody, PanelRow, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -24,11 +19,9 @@ import { getIconBySite, getNameBySite } from './social-list';
 const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	const { url, site, label } = attributes;
 	const [ showURLPopover, setPopover ] = useState( false );
-	const classes = classNames(
-		'wp-social-link',
-		'wp-social-link-' + site,
-		{ 'wp-social-link__is-incomplete': ! url },
-	);
+	const classes = classNames( 'wp-social-link', 'wp-social-link-' + site, {
+		'wp-social-link__is-incomplete': ! url,
+	} );
 
 	// Import icon.
 	const IconComponent = getIconBySite( site );
@@ -48,21 +41,17 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<Button
-				className={ classes }
-				onClick={ () => setPopover( true ) }
-			>
+			<Button className={ classes } onClick={ () => setPopover( true ) }>
 				<IconComponent />
 				{ isSelected && showURLPopover && (
-					<URLPopover
-						onClose={ () => setPopover( false ) }
-					>
+					<URLPopover onClose={ () => setPopover( false ) }>
 						<form
 							className="block-editor-url-popover__link-editor"
 							onSubmit={ ( event ) => {
 								event.preventDefault();
 								setPopover( false );
-							} } >
+							} }
+						>
 							<div className="block-editor-url-input">
 								<URLInput
 									value={ url }

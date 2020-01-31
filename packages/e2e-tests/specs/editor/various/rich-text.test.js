@@ -70,9 +70,9 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'primary', 'b' );
 
-		const count = await page.evaluate( () => document.querySelectorAll(
-			'*[data-rich-text-format-boundary]'
-		).length );
+		const count = await page.evaluate(
+			() => document.querySelectorAll( '*[data-rich-text-format-boundary]' ).length
+		);
 
 		expect( count ).toBe( 1 );
 	} );
@@ -169,9 +169,7 @@ describe( 'RichText', () => {
 
 				records.forEach( ( record ) => {
 					if ( record.type !== 'characterData' ) {
-						throw new Error(
-							`Typing mutated more than character data: ${ record.type }`
-						);
+						throw new Error( `Typing mutated more than character data: ${ record.type }` );
 					}
 				} );
 
@@ -182,21 +180,23 @@ describe( 'RichText', () => {
 
 			window.unsubscribes = [ () => mutationObserver.disconnect() ];
 
-			document.addEventListener( 'selectionchange', () => {
-				function throwMultipleSelectionChange() {
-					throw new Error( 'Typing should only emit one selection change event.' );
-				}
+			document.addEventListener(
+				'selectionchange',
+				() => {
+					function throwMultipleSelectionChange() {
+						throw new Error( 'Typing should only emit one selection change event.' );
+					}
 
-				document.addEventListener(
-					'selectionchange',
-					throwMultipleSelectionChange,
-					{ once: true }
-				);
+					document.addEventListener( 'selectionchange', throwMultipleSelectionChange, {
+						once: true,
+					} );
 
-				window.unsubscribes.push( () => {
-					document.removeEventListener( 'selectionchange', throwMultipleSelectionChange );
-				} );
-			}, { once: true } );
+					window.unsubscribes.push( () => {
+						document.removeEventListener( 'selectionchange', throwMultipleSelectionChange );
+					} );
+				},
+				{ once: true }
+			);
 		} );
 
 		await page.keyboard.type( '4' );

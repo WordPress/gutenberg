@@ -91,9 +91,13 @@ describe( 'shortcode', () => {
 		} );
 
 		it( 'should replace the shortcode with data from an attribute', () => {
-			const result1 = replace( 'foo', 'this [foo param="replacement text"] came from a shortcode attribute', ( match ) => {
-				return match.attrs.named.param || '';
-			} );
+			const result1 = replace(
+				'foo',
+				'this [foo param="replacement text"] came from a shortcode attribute',
+				( match ) => {
+					return match.attrs.named.param || '';
+				}
+			);
 			expect( result1 ).toBe( 'this replacement text came from a shortcode attribute' );
 		} );
 
@@ -109,7 +113,11 @@ describe( 'shortcode', () => {
 			const result1 = replace( 'foo', 'this has the [foo] shortcode [foo] twice', () => 'bar' );
 			expect( result1 ).toBe( 'this has the bar shortcode bar twice' );
 
-			const result2 = replace( 'foo', 'this has the [foo param="foo"] shortcode [foo] twice', () => 'bar' );
+			const result2 = replace(
+				'foo',
+				'this has the [foo param="foo"] shortcode [foo] twice',
+				() => 'bar'
+			);
 			expect( result2 ).toBe( 'this has the bar shortcode bar twice' );
 		} );
 
@@ -120,15 +128,27 @@ describe( 'shortcode', () => {
 			const result2 = replace( 'foo', 'this has the [[foo param="bar"]] shortcode', () => 'bar' );
 			expect( result2 ).toBe( 'this has the [[foo param="bar"]] shortcode' );
 
-			const result3 = replace( 'foo', 'this [foo] has the [[foo param="bar"]] shortcode escaped', () => 'bar' );
+			const result3 = replace(
+				'foo',
+				'this [foo] has the [[foo param="bar"]] shortcode escaped',
+				() => 'bar'
+			);
 			expect( result3 ).toBe( 'this bar has the [[foo param="bar"]] shortcode escaped' );
 		} );
 
 		it( 'should replace improperly escaped shortcodes that include newlines', () => {
-			const result1 = replace( 'foo', 'this [foo] has the [[foo param="bar"]\n] shortcode ', () => 'bar' );
+			const result1 = replace(
+				'foo',
+				'this [foo] has the [[foo param="bar"]\n] shortcode ',
+				() => 'bar'
+			);
 			expect( result1 ).toBe( 'this bar has the [bar\n] shortcode ' );
 
-			const result2 = replace( 'foo', 'this [foo] has the [\n[foo param="bar"]] shortcode ', () => 'bar' );
+			const result2 = replace(
+				'foo',
+				'this [foo] has the [\n[foo param="bar"]] shortcode ',
+				() => 'bar'
+			);
 			expect( result2 ).toBe( 'this bar has the [\nbar] shortcode ' );
 		} );
 

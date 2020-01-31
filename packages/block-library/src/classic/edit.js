@@ -52,7 +52,10 @@ export default class ClassicEdit extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { clientId, attributes: { content } } = this.props;
+		const {
+			clientId,
+			attributes: { content },
+		} = this.props;
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
 
@@ -76,7 +79,10 @@ export default class ClassicEdit extends Component {
 	}
 
 	onSetup( editor ) {
-		const { attributes: { content }, setAttributes } = this.props;
+		const {
+			attributes: { content },
+			setAttributes,
+		} = this.props;
 		const { ref } = this;
 		let bookmark;
 
@@ -189,7 +195,7 @@ export default class ClassicEdit extends Component {
 			<div
 				key="toolbar"
 				id={ `toolbar-${ clientId }` }
-				ref={ ( ref ) => this.ref = ref }
+				ref={ ( ref ) => ( this.ref = ref ) }
 				className="block-library-classic__toolbar"
 				onClick={ this.focus }
 				data-placeholder={ __( 'Classic' ) }

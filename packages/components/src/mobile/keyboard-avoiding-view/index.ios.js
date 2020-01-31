@@ -8,7 +8,11 @@ export const KeyboardAvoidingView = ( { parentHeight, ...otherProps } ) => {
 	const keyboardVerticalOffset = fullHeight - parentHeight;
 
 	return (
-		<IOSKeyboardAvoidingView { ...otherProps } behavior="padding" keyboardVerticalOffset={ keyboardVerticalOffset } />
+		<IOSKeyboardAvoidingView
+			{ ...otherProps }
+			behavior="padding"
+			keyboardVerticalOffset={ keyboardVerticalOffset }
+		/>
 	);
 };
 

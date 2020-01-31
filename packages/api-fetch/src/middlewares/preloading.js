@@ -16,23 +16,27 @@ export function getStablePath( path ) {
 	}
 
 	// 'b=1&c=2&a=5'
-	return base + '?' + query
-		// [ 'b=1', 'c=2', 'a=5' ]
-		.split( '&' )
-		// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
-		.map( function( entry ) {
-			return entry.split( '=' );
-		} )
-		// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
-		.sort( function( a, b ) {
-			return a[ 0 ].localeCompare( b[ 0 ] );
-		} )
-		// [ 'a=5', 'b=1', 'c=2' ]
-		.map( function( pair ) {
-			return pair.join( '=' );
-		} )
-		// 'a=5&b=1&c=2'
-		.join( '&' );
+	return (
+		base +
+		'?' +
+		query
+			// [ 'b=1', 'c=2', 'a=5' ]
+			.split( '&' )
+			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
+			.map( function( entry ) {
+				return entry.split( '=' );
+			} )
+			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
+			.sort( function( a, b ) {
+				return a[ 0 ].localeCompare( b[ 0 ] );
+			} )
+			// [ 'a=5', 'b=1', 'c=2' ]
+			.map( function( pair ) {
+				return pair.join( '=' );
+			} )
+			// 'a=5&b=1&c=2'
+			.join( '&' )
+	);
 }
 
 function createPreloadingMiddleware( preloadedData ) {
@@ -49,11 +53,7 @@ function createPreloadingMiddleware( preloadedData ) {
 
 			if ( parse && 'GET' === method && cache[ path ] ) {
 				return Promise.resolve( cache[ path ].body );
-			} else if (
-				'OPTIONS' === method &&
-				cache[ method ] &&
-				cache[ method ][ path ]
-			) {
+			} else if ( 'OPTIONS' === method && cache[ method ] && cache[ method ][ path ] ) {
 				return Promise.resolve( cache[ method ][ path ] );
 			}
 		}

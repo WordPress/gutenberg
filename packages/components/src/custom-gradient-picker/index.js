@@ -1,4 +1,3 @@
-
 /**
  * External dependencies
  */
@@ -33,13 +32,7 @@ import {
 	getMarkerPoints,
 } from './utils';
 
-function InsertPoint( {
-	onChange,
-	gradientAST,
-	onOpenInserter,
-	onCloseInserter,
-	insertPosition,
-} ) {
+function InsertPoint( { onChange, gradientAST, onOpenInserter, onCloseInserter, insertPosition } ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
 	return (
 		<Dropdown
@@ -67,7 +60,11 @@ function InsertPoint( {
 					onChangeComplete={ ( { rgb } ) => {
 						let newGradient;
 						if ( alreadyInsertedPoint ) {
-							newGradient = getGradientWithColorAtPositionChanged( gradientAST, insertPosition, rgb );
+							newGradient = getGradientWithColorAtPositionChanged(
+								gradientAST,
+								insertPosition,
+								rgb
+							);
 						} else {
 							newGradient = getGradientWithColorStopAdded( gradientAST, insertPosition, rgb );
 							setAlreadyInsertedPoint( true );
@@ -162,16 +159,15 @@ export default function CustomGradientPicker( { value, onChange } ) {
 		const insertPosition = getHorizontalRelativeGradientPosition(
 			event.clientX,
 			gradientPickerDomRef.current,
-			INSERT_POINT_WIDTH,
+			INSERT_POINT_WIDTH
 		);
 
 		// If the insert point is close to an existing control point don't show it.
-		if ( some(
-			markerPoints,
-			( { positionValue } ) => {
+		if (
+			some( markerPoints, ( { positionValue } ) => {
 				return Math.abs( insertPosition - positionValue ) < MINIMUM_DISTANCE_BETWEEN_POINTS;
-			}
-		) ) {
+			} )
+		) {
 			if ( gradientBarState.id === 'MOVING_INSERTER' ) {
 				gradientBarStateDispatch( { type: 'STOP_INSERTER_MOVE' } );
 			}
@@ -191,10 +187,9 @@ export default function CustomGradientPicker( { value, onChange } ) {
 	return (
 		<div
 			ref={ gradientPickerDomRef }
-			className={ classnames(
-				'components-custom-gradient-picker',
-				{ 'has-gradient': hasGradient }
-			) }
+			className={ classnames( 'components-custom-gradient-picker', {
+				'has-gradient': hasGradient,
+			} ) }
 			onMouseEnter={ onMouseEnterAndMove }
 			onMouseMove={ onMouseEnterAndMove }
 			style={ {
@@ -218,7 +213,9 @@ export default function CustomGradientPicker( { value, onChange } ) {
 				) }
 				<ControlPoints
 					gradientPickerDomRef={ gradientPickerDomRef }
-					ignoreMarkerPosition={ isInsertingControlPoint ? gradientBarState.insertPosition : undefined }
+					ignoreMarkerPosition={
+						isInsertingControlPoint ? gradientBarState.insertPosition : undefined
+					}
 					markerPoints={ markerPoints }
 					onChange={ onGradientStructureChange }
 					gradientAST={ gradientAST }

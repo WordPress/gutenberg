@@ -21,13 +21,7 @@ const deprecated = [
 		save( { attributes } ) {
 			const { textAlign, content } = attributes;
 
-			return (
-				<RichText.Content
-					tagName="pre"
-					style={ { textAlign } }
-					value={ content }
-				/>
-			);
+			return <RichText.Content tagName="pre" style={ { textAlign } } value={ content } />;
 		},
 	},
 ];

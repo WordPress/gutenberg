@@ -15,39 +15,23 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 
-function Option( {
-	className,
-	isSelected,
-	tooltipText,
-	...additionalProps
-} ) {
+function Option( { className, isSelected, tooltipText, ...additionalProps } ) {
 	const optionButton = (
 		<Button
 			isPressed={ isSelected }
-			className={ classnames(
-				className,
-				'components-circular-option-picker__option',
-			) }
+			className={ classnames( className, 'components-circular-option-picker__option' ) }
 			{ ...additionalProps }
 		/>
 	);
 	return (
 		<div className="components-circular-option-picker__option-wrapper">
-			{ tooltipText ?
-				( <Tooltip text={ tooltipText }>{ optionButton }</Tooltip> ) :
-				optionButton
-			}
+			{ tooltipText ? <Tooltip text={ tooltipText }>{ optionButton }</Tooltip> : optionButton }
 			{ isSelected && <Icon icon={ check } /> }
 		</div>
 	);
 }
 
-function DropdownLinkAction( {
-	buttonProps,
-	className,
-	dropdownProps,
-	linkText,
-} ) {
+function DropdownLinkAction( { buttonProps, className, dropdownProps, linkText } ) {
 	return (
 		<Dropdown
 			className={ classnames(
@@ -55,12 +39,7 @@ function DropdownLinkAction( {
 				className
 			) }
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					aria-expanded={ isOpen }
-					onClick={ onToggle }
-					isLink
-					{ ...buttonProps }
-				>
+				<Button aria-expanded={ isOpen } onClick={ onToggle } isLink { ...buttonProps }>
 					{ linkText }
 				</Button>
 			) }
@@ -69,17 +48,10 @@ function DropdownLinkAction( {
 	);
 }
 
-function ButtonAction( {
-	className,
-	children,
-	...additionalProps
-} ) {
+function ButtonAction( { className, children, ...additionalProps } ) {
 	return (
 		<Button
-			className={ classnames(
-				'components-circular-option-picker__clear',
-				className
-			) }
+			className={ classnames( 'components-circular-option-picker__clear', className ) }
 			isSmall
 			isSecondary
 			{ ...additionalProps }
@@ -89,20 +61,13 @@ function ButtonAction( {
 	);
 }
 
-export default function CircularOptionPicker( {
-	actions,
-	className,
-	options,
-	children,
-} ) {
+export default function CircularOptionPicker( { actions, className, options, children } ) {
 	return (
 		<div className={ classnames( 'components-circular-option-picker', className ) }>
 			{ options }
 			{ children }
 			{ actions && (
-				<div className="components-circular-option-picker__custom-clear-wrapper">
-					{ actions }
-				</div>
+				<div className="components-circular-option-picker__custom-clear-wrapper">{ actions }</div>
 			) }
 		</div>
 	);

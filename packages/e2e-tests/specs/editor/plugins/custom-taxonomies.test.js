@@ -4,7 +4,9 @@
 import {
 	activatePlugin,
 	createNewPost,
-	deactivatePlugin, findSidebarPanelWithTitle, openDocumentSettingsSidebar,
+	deactivatePlugin,
+	findSidebarPanelWithTitle,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Custom Taxonomies labels are used', () => {
@@ -36,7 +38,9 @@ describe( 'Custom Taxonomies labels are used', () => {
 		}
 
 		// Check the add new button
-		const labelNew = await page.$x( "//label[@class='components-form-token-field__label' and contains(text(), 'Add New Model')]" );
+		const labelNew = await page.$x(
+			"//label[@class='components-form-token-field__label' and contains(text(), 'Add New Model')]"
+		);
 		expect( labelNew ).not.toBeFalsy();
 
 		// Fill with one entry
@@ -44,7 +48,9 @@ describe( 'Custom Taxonomies labels are used', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Check the "Remove Model"
-		const value = await page.$x( "//div[@class='components-form-token-field__input-container']//span//button[@aria-label='Remove Model']" );
+		const value = await page.$x(
+			"//div[@class='components-form-token-field__input-container']//span//button[@aria-label='Remove Model']"
+		);
 		expect( value ).not.toBeFalsy();
 	} );
 } );

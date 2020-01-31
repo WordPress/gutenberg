@@ -30,11 +30,7 @@ const ToggleControlWithState = ( { helpTextChecked, helpTextUnchecked, ...props 
 export const _default = () => {
 	const label = text( 'Label', 'Does this have a fixed background?' );
 
-	return (
-		<ToggleControlWithState
-			label={ label }
-		/>
-	);
+	return <ToggleControlWithState label={ label } />;
 };
 
 export const withHelpText = () => {

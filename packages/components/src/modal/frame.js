@@ -107,10 +107,7 @@ class ModalFrame extends Component {
 		const {
 			overlayClassName,
 			contentLabel,
-			aria: {
-				describedby,
-				labelledby,
-			},
+			aria: { describedby, labelledby },
 			children,
 			className,
 			role,
@@ -123,10 +120,7 @@ class ModalFrame extends Component {
 				onKeyDown={ this.handleKeyDown }
 			>
 				<div
-					className={ classnames(
-						'components-modal__frame',
-						className
-					) }
+					className={ classnames( 'components-modal__frame', className ) }
 					style={ style }
 					ref={ this.containerRef }
 					role={ role }
@@ -142,8 +136,6 @@ class ModalFrame extends Component {
 	}
 }
 
-export default compose( [
-	withFocusReturn,
-	withConstrainedTabbing,
-	withFocusOutside,
-] )( ModalFrame );
+export default compose( [ withFocusReturn, withConstrainedTabbing, withFocusOutside ] )(
+	ModalFrame
+);

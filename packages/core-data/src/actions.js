@@ -6,10 +6,7 @@ import { castArray, get, isEqual, find } from 'lodash';
 /**
  * Internal dependencies
  */
-import {
-	receiveItems,
-	receiveQueriedItems,
-} from './queried-data';
+import { receiveItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { select, apiFetch } from './controls';
 
@@ -138,16 +135,13 @@ export function receiveEmbedPreview( url, preview ) {
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 	const entity = yield select( 'getEntity', kind, name );
 	if ( ! entity ) {
-		throw new Error( `The entity being edited (${ kind }, ${ name }) does not have a loaded config.` );
+		throw new Error(
+			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
+		);
 	}
 	const { transientEdits = {}, mergedEdits = {} } = entity;
 	const record = yield select( 'getRawEntityRecord', kind, name, recordId );
-	const editedRecord = yield select(
-		'getEditedEntityRecord',
-		kind,
-		name,
-		recordId
-	);
+	const editedRecord = yield select( 'getEditedEntityRecord', kind, name, recordId );
 
 	const edit = {
 		kind,
@@ -158,9 +152,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 		edits: Object.keys( edits ).reduce( ( acc, key ) => {
 			const recordValue = record[ key ];
 			const editedRecordValue = editedRecord[ key ];
-			const value = mergedEdits[ key ] ?
-				{ ...editedRecordValue, ...edits[ key ] } :
-				edits[ key ];
+			const value = mergedEdits[ key ] ? { ...editedRecordValue, ...edits[ key ] } : edits[ key ];
 			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
 			return acc;
 		}, {} ),
@@ -253,9 +245,7 @@ export function* saveEntityRecord(
 	// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
 	for ( const [ key, value ] of Object.entries( record ) ) {
 		if ( typeof value === 'function' ) {
-			const evaluatedValue = value(
-				yield select( 'getEditedEntityRecord', kind, name, recordId )
-			);
+			const evaluatedValue = value( yield select( 'getEditedEntityRecord', kind, name, recordId ) );
 			yield editEntityRecord(
 				kind,
 				name,
@@ -276,12 +266,7 @@ export function* saveEntityRecord(
 	let currentEdits;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
-		const persistedRecord = yield select(
-			'getRawEntityRecord',
-			kind,
-			name,
-			recordId
-		);
+		const persistedRecord = yield select( 'getRawEntityRecord', kind, name, recordId );
 
 		if ( isAutosave ) {
 			// Most of this autosave logic is very specific to posts.
@@ -330,10 +315,9 @@ export function* saveEntityRecord(
 						// Status is only persisted in autosaves when going from
 						// "auto-draft" to "draft".
 						acc[ key ] =
-							persistedRecord.status === 'auto-draft' &&
-							newRecord.status === 'draft' ?
-								newRecord.status :
-								persistedRecord.status;
+							persistedRecord.status === 'auto-draft' && newRecord.status === 'draft'
+								? newRecord.status
+								: persistedRecord.status;
 					} else {
 						// These properties are not persisted in autosaves.
 						acc[ key ] = get( persistedRecord[ key ], 'raw', persistedRecord[ key ] );
@@ -359,18 +343,8 @@ export function* saveEntityRecord(
 
 			// Get the full local version of the record before the update,
 			// to merge it with the edits and then propagate it to subscribers
-			persistedEntity = yield select(
-				'getEntityRecordNoResolver',
-				kind,
-				name,
-				recordId
-			);
-			currentEdits = yield select(
-				'getEntityRecordEdits',
-				kind,
-				name,
-				recordId
-			);
+			persistedEntity = yield select( 'getEntityRecordNoResolver', kind, name, recordId );
+			currentEdits = yield select( 'getEntityRecordEdits', kind, name, recordId );
 			yield receiveEntityRecords( kind, name, { ...persistedEntity, ...data }, undefined, true );
 
 			updatedRecord = yield apiFetch( {
@@ -423,12 +397,7 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 	if ( ! ( yield select( 'hasEditsForEntityRecord', kind, name, recordId ) ) ) {
 		return;
 	}
-	const edits = yield select(
-		'getEntityRecordNonTransientEdits',
-		kind,
-		name,
-		recordId
-	);
+	const edits = yield select( 'getEntityRecordNonTransientEdits', kind, name, recordId );
 	const record = { id: recordId, ...edits };
 	yield* saveEntityRecord( kind, name, record, options );
 }

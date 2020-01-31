@@ -18,7 +18,9 @@ function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierNa
 	return ( OriginalComponent ) => {
 		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
 		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
-		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
+		EnhancedComponent.displayName = `${ upperFirst(
+			camelCase( modifierName )
+		) }(${ displayName })`;
 
 		return EnhancedComponent;
 	};

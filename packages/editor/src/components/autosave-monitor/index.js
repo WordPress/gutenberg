@@ -29,11 +29,7 @@ export class AutosaveMonitor extends Component {
 			prevProps.isAutosaveable !== isAutosaveable ||
 			prevProps.editsReference !== editsReference
 		) {
-			this.toggleTimer(
-				isDirty &&
-				isAutosaveable &&
-				! this.didAutosaveForEditsReference
-			);
+			this.toggleTimer( isDirty && isAutosaveable && ! this.didAutosaveForEditsReference );
 		}
 	}
 
@@ -55,13 +51,10 @@ export class AutosaveMonitor extends Component {
 		}
 
 		if ( isPendingSave && ! ( shouldThrottle && this.pendingSave ) ) {
-			this.pendingSave = setTimeout(
-				() => {
-					this.props.autosave();
-					delete this.pendingSave;
-				},
-				interval * 1000
-			);
+			this.pendingSave = setTimeout( () => {
+				this.props.autosave();
+				delete this.pendingSave;
+			}, interval * 1000 );
 		}
 	}
 
@@ -72,9 +65,7 @@ export class AutosaveMonitor extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const {
-			getReferenceByDistinctEdits,
-		} = select( 'core' );
+		const { getReferenceByDistinctEdits } = select( 'core' );
 
 		const {
 			isEditedPostDirty,

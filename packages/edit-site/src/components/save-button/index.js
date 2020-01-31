@@ -14,22 +14,16 @@ export default function SaveButton() {
 	useEffect( () => setStatus( 'publish' ), [] );
 
 	const { isDirty, isSaving } = useSelect( ( select ) => {
-		const { getEntityRecordChangesByRecord, isSavingEntityRecord } = select(
-			'core'
-		);
+		const { getEntityRecordChangesByRecord, isSavingEntityRecord } = select( 'core' );
 		const entityRecordChangesByRecord = getEntityRecordChangesByRecord();
 		const changedKinds = Object.keys( entityRecordChangesByRecord );
 		return {
 			isDirty: changedKinds.length > 0,
 			isSaving: changedKinds.some( ( changedKind ) =>
-				Object.keys(
-					entityRecordChangesByRecord[ changedKind ]
-				).some( ( changedName ) =>
+				Object.keys( entityRecordChangesByRecord[ changedKind ] ).some( ( changedName ) =>
 					Object.keys(
 						entityRecordChangesByRecord[ changedKind ][ changedName ]
-					).some( ( changedKey ) =>
-						isSavingEntityRecord( changedKind, changedName, changedKey )
-					)
+					).some( ( changedKey ) => isSavingEntityRecord( changedKind, changedName, changedKey ) )
 				)
 			),
 		};

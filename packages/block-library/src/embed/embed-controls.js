@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	PanelBody,
-	ToggleControl,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { Button, PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 
 const EmbedControls = ( props ) => {

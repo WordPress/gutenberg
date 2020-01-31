@@ -27,7 +27,11 @@ function Stepper( {
 	const buttonIconStyle = getStylesFromColorScheme( styles.buttonNoBg, styles.buttonNoBgTextDark );
 
 	return (
-		<View style={ styles.container } accesibility={ false } importantForAccessibility="no-hide-descendants">
+		<View
+			style={ styles.container }
+			accesibility={ false }
+			importantForAccessibility="no-hide-descendants"
+		>
 			<TouchableOpacity
 				disabled={ isMinValue }
 				onPressIn={ onPressInDecrement }

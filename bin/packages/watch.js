@@ -27,7 +27,12 @@ const exists = ( filename ) => {
 // and files with a suffix of .test or .spec (e.g. blocks.test.js),
 // and deceitful source-like files, such as editor swap files.
 const isSourceFile = ( filename ) => {
-	return ! [ /\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+.js$/, /.\.(spec|test)\.js$/ ].some( ( regex ) => regex.test( filename ) ) && /.\.(js|json|scss)$/.test( filename );
+	return (
+		! [
+			/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+.js$/,
+			/.\.(spec|test)\.js$/,
+		].some( ( regex ) => regex.test( filename ) ) && /.\.(js|json|scss)$/.test( filename )
+	);
 };
 
 const rebuild = ( filename ) => filesToBuild.set( filename, true );
@@ -42,7 +47,7 @@ getPackages().forEach( ( p ) => {
 			}
 
 			const filePath = path.resolve( srcDir, filename );
-			if ( ( event === 'update' ) && exists( filePath ) ) {
+			if ( event === 'update' && exists( filePath ) ) {
 				// eslint-disable-next-line no-console
 				console.log( chalk.green( '->' ), `${ event }: ${ filename }` );
 				rebuild( filePath );
@@ -52,9 +57,9 @@ getPackages().forEach( ( p ) => {
 					fs.unlinkSync( buildFile );
 					process.stdout.write(
 						chalk.red( '  \u2022 ' ) +
-              path.relative( path.resolve( srcDir, '..', '..' ), buildFile ) +
-              ' (deleted)' +
-              '\n'
+							path.relative( path.resolve( srcDir, '..', '..' ), buildFile ) +
+							' (deleted)' +
+							'\n'
 					);
 				} catch ( e ) {}
 			}

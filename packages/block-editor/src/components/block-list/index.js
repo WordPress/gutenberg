@@ -56,10 +56,7 @@ function BlockList( {
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
-			enableAnimation: (
-				! isTyping() &&
-				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD
-			),
+			enableAnimation: ! isTyping() && getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 		};
 	}
 
@@ -80,17 +77,11 @@ function BlockList( {
 	} );
 
 	return (
-		<Container
-			ref={ ref }
-			className={ classnames(
-				'block-editor-block-list__layout',
-				className
-			) }
-		>
+		<Container ref={ ref } className={ classnames( 'block-editor-block-list__layout', className ) }>
 			{ blockClientIds.map( ( clientId, index ) => {
-				const isBlockInSelection = hasMultiSelection ?
-					multiSelectedBlockClientIds.includes( clientId ) :
-					selectedBlockClientId === clientId;
+				const isBlockInSelection = hasMultiSelection
+					? multiSelectedBlockClientIds.includes( clientId )
+					: selectedBlockClientId === clientId;
 
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isBlockInSelection }>

@@ -18,11 +18,7 @@ const { Fill, Slot } = createSlotFill( 'Sidebar' );
  * @return {Object} The rendered sidebar.
  */
 function Sidebar( { children, className } ) {
-	return (
-		<div className={ classnames( 'edit-post-sidebar', className ) }>
-			{ children }
-		</div>
-	);
+	return <div className={ classnames( 'edit-post-sidebar', className ) }>{ children }</div>;
 }
 
 Sidebar = withFocusReturn( {
@@ -49,7 +45,7 @@ const WrappedSidebar = compose(
 	withSelect( ( select, { name } ) => ( {
 		isActive: select( 'core/edit-post' ).getActiveGeneralSidebarName() === name,
 	} ) ),
-	ifCondition( ( { isActive } ) => isActive ),
+	ifCondition( ( { isActive } ) => isActive )
 )( AnimatedSidebarFill );
 
 WrappedSidebar.Slot = Slot;

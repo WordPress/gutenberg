@@ -1,9 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	postTitle,
-} from '../reducer';
+import { postTitle } from '../reducer';
 
 describe( 'state native', () => {
 	describe( 'postTitle', () => {

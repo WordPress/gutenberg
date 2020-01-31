@@ -8,11 +8,7 @@ import { uniqWith } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	MediaUpload,
-	MEDIA_TYPE_IMAGE,
-	MEDIA_TYPE_VIDEO,
-} from '@wordpress/block-editor';
+import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
 import { Dashicon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
@@ -46,10 +42,9 @@ function MediaPlaceholder( props ) {
 	mediaRef.current = value;
 
 	// append and deduplicate media array for gallery use case
-	const setMedia = multiple && addToGallery ? ( selected ) => {
-		return onSelect( dedupMedia( [ ...mediaRef.current, ...selected ] ) );
-	} :
-		onSelect;
+	const setMedia = multiple && addToGallery 
+		? ( selected ) => onSelect( dedupMedia( [ ...mediaRef.current, ...selected ] ) )
+		: onSelect;
 
 	const isOneType = allowedTypes.length === 1;
 	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
@@ -83,22 +78,22 @@ function MediaPlaceholder( props ) {
 		accessibilityHint = __( 'Double tap to select a video' );
 	}
 
-	const emptyStateTitleStyle = getStylesFromColorScheme( styles.emptyStateTitle, styles.emptyStateTitleDark );
-	const addMediaButtonStyle = getStylesFromColorScheme( styles.addMediaButton, styles.addMediaButtonDark );
+	const emptyStateTitleStyle = getStylesFromColorScheme(
+		styles.emptyStateTitle,
+		styles.emptyStateTitleDark
+	);
+	const addMediaButtonStyle = getStylesFromColorScheme(
+		styles.addMediaButton,
+		styles.addMediaButtonDark
+	);
 
 	const renderContent = () => {
 		if ( isAppender === undefined || ! isAppender ) {
 			return (
 				<>
-					<View style={ styles.modalIcon }>
-						{ icon }
-					</View>
-					<Text style={ emptyStateTitleStyle }>
-						{ placeholderTitle }
-					</Text>
-					<Text style={ styles.emptyStateDescription }>
-						{ instructions }
-					</Text>
+					<View style={ styles.modalIcon }>{ icon }</View>
+					<Text style={ emptyStateTitleStyle }>{ placeholderTitle }</Text>
+					<Text style={ styles.emptyStateDescription }>{ instructions }</Text>
 				</>
 			);
 		} else if ( isAppender && ! disableMediaButtons ) {
@@ -118,7 +113,10 @@ function MediaPlaceholder( props ) {
 	}
 
 	const appenderStyle = getStylesFromColorScheme( styles.appender, styles.appenderDark );
-	const emptyStateContainerStyle = getStylesFromColorScheme( styles.emptyStateContainer, styles.emptyStateContainerDark );
+	const emptyStateContainerStyle = getStylesFromColorScheme(
+		styles.emptyStateContainer,
+		styles.emptyStateContainerDark
+	);
 
 	return (
 		<View style={ { flex: 1 } }>
@@ -139,12 +137,9 @@ function MediaPlaceholder( props ) {
 							onPress={ ( event ) => {
 								props.onFocus( event );
 								open();
-							} }>
-							<View
-								style={ [
-									emptyStateContainerStyle,
-									isAppender && appenderStyle,
-								] }>
+							} }
+						>
+							<View style={ [ emptyStateContainerStyle, isAppender && appenderStyle ] }>
 								{ getMediaOptions() }
 								{ renderContent() }
 							</View>

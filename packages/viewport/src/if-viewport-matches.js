@@ -28,14 +28,15 @@ import withViewportMatch from './with-viewport-match';
  *
  * @return {Function} Higher-order component.
  */
-const ifViewportMatches = ( query ) => createHigherOrderComponent(
-	compose( [
-		withViewportMatch( {
-			isViewportMatch: query,
-		} ),
-		ifCondition( ( props ) => props.isViewportMatch ),
-	] ),
-	'ifViewportMatches'
-);
+const ifViewportMatches = ( query ) =>
+	createHigherOrderComponent(
+		compose( [
+			withViewportMatch( {
+				isViewportMatch: query,
+			} ),
+			ifCondition( ( props ) => props.isViewportMatch ),
+		] ),
+		'ifViewportMatches'
+	);
 
 export default ifViewportMatches;

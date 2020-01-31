@@ -66,9 +66,7 @@ describe( 'AlignmentToolbar', () => {
 		expect( customControls ).toHaveLength( 2 );
 
 		// should correctly call on change when right alignment is pressed (active alignment)
-		const rightControl = customControls.find(
-			( { align } ) => align === 'custom-right'
-		);
+		const rightControl = customControls.find( ( { align } ) => align === 'custom-right' );
 		expect( rightControl.title ).toBe( 'My custom right' );
 		rightControl.onClick();
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
@@ -76,9 +74,7 @@ describe( 'AlignmentToolbar', () => {
 		onChangeSpy.mockClear();
 
 		// should correctly call on change when right alignment is pressed (inactive alignment)
-		const leftControl = customControls.find(
-			( { align } ) => align === 'custom-left'
-		);
+		const leftControl = customControls.find( ( { align } ) => align === 'custom-left' );
 		expect( leftControl.title ).toBe( 'My custom left' );
 		leftControl.onClick();
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );

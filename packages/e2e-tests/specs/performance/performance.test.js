@@ -7,11 +7,7 @@ import { existsSync, readFileSync, writeFileSync } from 'fs';
 /**
  * WordPress dependencies
  */
-import {
-	createNewPost,
-	saveDraft,
-	insertBlock,
-} from '@wordpress/e2e-test-utils';
+import { createNewPost, saveDraft, insertBlock } from '@wordpress/e2e-test-utils';
 
 function readFile( filePath ) {
 	return existsSync( filePath ) ? readFileSync( filePath, 'utf8' ).trim() : '';
@@ -48,7 +44,9 @@ describe( 'Performance', () => {
 		let startTime;
 
 		await page.on( 'load', () => results.load.push( new Date() - startTime ) );
-		await page.on( 'domcontentloaded', () => results.domcontentloaded.push( new Date() - startTime ) );
+		await page.on( 'domcontentloaded', () =>
+			results.domcontentloaded.push( new Date() - startTime )
+		);
 
 		while ( i-- ) {
 			startTime = new Date();

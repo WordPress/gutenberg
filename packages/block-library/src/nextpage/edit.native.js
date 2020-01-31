@@ -25,21 +25,21 @@ export function NextPageEdit( { attributes, isSelected, onFocus, getStylesFromCo
 	return (
 		<View
 			accessible
-			accessibilityLabel={
-				sprintf(
-					/* translators: accessibility text. %s: Page break text. */
-					__( 'Page break block. %s' ),
-					accessibilityTitle
-				)
-			}
+			accessibilityLabel={ sprintf(
+				/* translators: accessibility text. %s: Page break text. */
+				__( 'Page break block. %s' ),
+				accessibilityTitle
+			) }
 			accessibilityStates={ accessibilityState }
 			onAccessibilityTap={ onFocus }
 		>
-			<Hr text={ customText }
+			<Hr
+				text={ customText }
 				marginLeft={ 0 }
 				marginRight={ 0 }
 				textStyle={ textStyle }
-				lineStyle={ lineStyle } />
+				lineStyle={ lineStyle }
+			/>
 		</View>
 	);
 }

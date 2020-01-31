@@ -74,11 +74,7 @@ describe( 'Meta boxes', () => {
 
 		// Retrieve the excerpt used as meta
 		const metaExcerpt = await page.evaluate( () => {
-			return document.querySelector(
-				'meta[property="gutenberg:hello"]'
-			).getAttribute(
-				'content'
-			);
+			return document.querySelector( 'meta[property="gutenberg:hello"]' ).getAttribute( 'content' );
 		} );
 
 		expect( metaExcerpt ).toEqual( 'Excerpt from content.' );
@@ -109,11 +105,7 @@ describe( 'Meta boxes', () => {
 
 		// Retrieve the excerpt used as meta
 		const metaExcerpt = await page.evaluate( () => {
-			return document.querySelector(
-				'meta[property="gutenberg:hello"]'
-			).getAttribute(
-				'content'
-			);
+			return document.querySelector( 'meta[property="gutenberg:hello"]' ).getAttribute( 'content' );
 		} );
 
 		expect( metaExcerpt ).toEqual( 'Explicitly set excerpt.' );

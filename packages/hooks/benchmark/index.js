@@ -1,7 +1,7 @@
 const Benchmark = require( 'benchmark' );
 const hooks = require( '../' );
 
-const suite = new Benchmark.Suite;
+const suite = new Benchmark.Suite();
 
 const filter = process.argv[ 2 ];
 const isInFilter = ( key ) => ! filter || filter === key;

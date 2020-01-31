@@ -22,9 +22,7 @@ const DEFAULT_PROPS = {
 };
 
 const getWrapperForProps = ( propOverrides ) => {
-	return TestUtils.renderIntoDocument(
-		<InserterMenu { ...DEFAULT_PROPS } { ...propOverrides } />
-	);
+	return TestUtils.renderIntoDocument( <InserterMenu { ...DEFAULT_PROPS } { ...propOverrides } /> );
 };
 
 const initializeMenuDefaultStateAndReturnElement = ( propOverrides ) => {
@@ -45,22 +43,19 @@ const initializeAllClosedMenuStateAndReturnElement = ( propOverrides ) => {
 };
 
 const assertNoResultsMessageToBePresent = ( element ) => {
-	const noResultsMessage = element.querySelector(
-		'.block-editor-inserter__no-results'
-	);
+	const noResultsMessage = element.querySelector( '.block-editor-inserter__no-results' );
 	expect( noResultsMessage.textContent ).toEqual( 'No blocks found.' );
 };
 
 const assertNoResultsMessageNotToBePresent = ( element ) => {
-	const noResultsMessage = element.querySelector(
-		'.block-editor-inserter__no-results'
-	);
+	const noResultsMessage = element.querySelector( '.block-editor-inserter__no-results' );
 	expect( noResultsMessage ).toBe( null );
 };
 
 const assertOpenedPanels = ( element, expectedOpen = 0 ) => {
-	expect( element.querySelectorAll( '.components-panel__body.is-opened ' ) )
-		.toHaveLength( expectedOpen );
+	expect( element.querySelectorAll( '.components-panel__body.is-opened ' ) ).toHaveLength(
+		expectedOpen
+	);
 };
 
 const getTabButtonWithContent = ( element, content ) => {
@@ -89,12 +84,8 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should show nothing if there are no items', () => {
-		const element = initializeMenuDefaultStateAndReturnElement(
-			{ items: [] }
-		);
-		const visibleBlocks = element.querySelector(
-			'.block-editor-block-types-list__item'
-		);
+		const element = initializeMenuDefaultStateAndReturnElement( { items: [] } );
+		const visibleBlocks = element.querySelector( '.block-editor-block-types-list__item' );
 
 		expect( visibleBlocks ).toBe( null );
 
@@ -103,9 +94,7 @@ describe( 'InserterMenu', () => {
 
 	it( 'should show only high utility items in the suggested tab', () => {
 		const element = initializeMenuDefaultStateAndReturnElement();
-		const visibleBlocks = element.querySelectorAll(
-			'.block-editor-block-types-list__item-title'
-		);
+		const visibleBlocks = element.querySelectorAll( '.block-editor-block-types-list__item-title' );
 		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks[ 0 ].textContent ).toEqual( 'Text' );
 		expect( visibleBlocks[ 1 ].textContent ).toEqual( 'Advanced Text' );
@@ -113,12 +102,8 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should limit the number of items shown in the suggested tab', () => {
-		const element = initializeMenuDefaultStateAndReturnElement(
-			{ maxSuggestedItems: 2 }
-		);
-		const visibleBlocks = element.querySelectorAll(
-			'.block-editor-block-types-list__list-item'
-		);
+		const element = initializeMenuDefaultStateAndReturnElement( { maxSuggestedItems: 2 } );
+		const visibleBlocks = element.querySelectorAll( '.block-editor-block-types-list__list-item' );
 		expect( visibleBlocks ).toHaveLength( 2 );
 	} );
 
@@ -130,9 +115,7 @@ describe( 'InserterMenu', () => {
 
 		assertOpenedPanels( element, 1 );
 
-		const visibleBlocks = element.querySelectorAll(
-			'.block-editor-block-types-list__item-title'
-		);
+		const visibleBlocks = element.querySelectorAll( '.block-editor-block-types-list__item-title' );
 
 		expect( visibleBlocks ).toHaveLength( 2 );
 		expect( visibleBlocks[ 0 ].textContent ).toBe( 'YouTube' );
@@ -149,9 +132,7 @@ describe( 'InserterMenu', () => {
 
 		assertOpenedPanels( element, 1 );
 
-		const visibleBlocks = element.querySelectorAll(
-			'.block-editor-block-types-list__item-title'
-		);
+		const visibleBlocks = element.querySelectorAll( '.block-editor-block-types-list__item-title' );
 
 		expect( visibleBlocks ).toHaveLength( 1 );
 		expect( visibleBlocks[ 0 ].textContent ).toBe( 'My reusable block' );
@@ -167,9 +148,7 @@ describe( 'InserterMenu', () => {
 
 		assertOpenedPanels( element, 1 );
 
-		const visibleBlocks = element.querySelectorAll(
-			'.block-editor-block-types-list__item-title'
-		);
+		const visibleBlocks = element.querySelectorAll( '.block-editor-block-types-list__item-title' );
 
 		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
@@ -199,17 +178,13 @@ describe( 'InserterMenu', () => {
 
 		assertOpenedPanels( element, 3 );
 
-		const matchingCategories = element.querySelectorAll(
-			'.components-panel__body-toggle'
-		);
+		const matchingCategories = element.querySelectorAll( '.components-panel__body-toggle' );
 
 		expect( matchingCategories ).toHaveLength( 3 );
 		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
-		const visibleBlocks = element.querySelectorAll(
-			'.block-editor-block-types-list__item-title'
-		);
+		const visibleBlocks = element.querySelectorAll( '.block-editor-block-types-list__item-title' );
 
 		expect( visibleBlocks ).toHaveLength( 5 );
 		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
@@ -225,17 +200,13 @@ describe( 'InserterMenu', () => {
 
 		assertOpenedPanels( element, 3 );
 
-		const matchingCategories = element.querySelectorAll(
-			'.components-panel__body-toggle'
-		);
+		const matchingCategories = element.querySelectorAll( '.components-panel__body-toggle' );
 
 		expect( matchingCategories ).toHaveLength( 3 );
 		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
-		const visibleBlocks = element.querySelectorAll(
-			'.block-editor-block-types-list__item-title'
-		);
+		const visibleBlocks = element.querySelectorAll( '.block-editor-block-types-list__item-title' );
 
 		expect( visibleBlocks ).toHaveLength( 5 );
 		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );

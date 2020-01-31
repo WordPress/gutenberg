@@ -22,11 +22,7 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			isEditedPostNew,
-			getCurrentPostId,
-			getCurrentPostType,
-		} = select( 'core/editor' );
+		const { isEditedPostNew, getCurrentPostId, getCurrentPostType } = select( 'core/editor' );
 		return {
 			isNew: isEditedPostNew(),
 			postId: getCurrentPostId(),

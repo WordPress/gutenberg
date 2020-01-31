@@ -28,13 +28,7 @@ export default function withState( initialState = {} ) {
 			}
 
 			render() {
-				return (
-					<OriginalComponent
-						{ ...this.props }
-						{ ...this.state }
-						setState={ this.setState }
-					/>
-				);
+				return <OriginalComponent { ...this.props } { ...this.state } setState={ this.setState } />;
 			}
 		};
 	}, 'withState' );

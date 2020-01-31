@@ -2,12 +2,7 @@
  * External dependencies
  */
 import optimist from 'redux-optimist';
-import {
-	omit,
-	keys,
-	isEqual,
-	keyBy,
-} from 'lodash';
+import { omit, keys, isEqual, keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -59,10 +54,7 @@ export function hasSameKeys( a, b ) {
  * @return {boolean} Whether actions are updating the same post property.
  */
 export function isUpdatingSamePostProperty( action, previousAction ) {
-	return (
-		action.type === 'EDIT_POST' &&
-		hasSameKeys( action.edits, previousAction.edits )
-	);
+	return action.type === 'EDIT_POST' && hasSameKeys( action.edits, previousAction.edits );
 }
 
 /**
@@ -380,16 +372,18 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
-export default optimist( combineReducers( {
-	postId,
-	postType,
-	preferences,
-	saving,
-	postLock,
-	reusableBlocks,
-	template,
-	postSavingLock,
-	isReady,
-	editorSettings,
-	postAutosavingLock,
-} ) );
+export default optimist(
+	combineReducers( {
+		postId,
+		postType,
+		preferences,
+		saving,
+		postLock,
+		reusableBlocks,
+		template,
+		postSavingLock,
+		isReady,
+		editorSettings,
+		postAutosavingLock,
+	} )
+);

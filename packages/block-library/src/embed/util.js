@@ -53,8 +53,12 @@ export const isFromWordPress = ( html ) => {
 export const getPhotoHtml = ( photo ) => {
 	// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
 	// actually the full size photo. If thumbnails not found, use full image.
-	const imageUrl = ( photo.thumbnail_url ) ? photo.thumbnail_url : photo.url;
-	const photoPreview = <p><img src={ imageUrl } alt={ photo.title } width="100%" /></p>;
+	const imageUrl = photo.thumbnail_url ? photo.thumbnail_url : photo.url;
+	const photoPreview = (
+		<p>
+			<img src={ imageUrl } alt={ photo.title } width="100%" />
+		</p>
+	);
 	return renderToString( photoPreview );
 };
 
@@ -102,20 +106,17 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 		if ( isFromWordPress( html ) ) {
 			// If this is not the WordPress embed block, transform it into one.
 			if ( WORDPRESS_EMBED_BLOCK !== name ) {
-				return createBlock(
-					WORDPRESS_EMBED_BLOCK,
-					{
-						url,
-						// By now we have the preview, but when the new block first renders, it
-						// won't have had all the attributes set, and so won't get the correct
-						// type and it won't render correctly. So, we pass through the current attributes
-						// here so that the initial render works when we switch to the WordPress
-						// block. This only affects the WordPress block because it can't be
-						// rendered in the usual Sandbox (it has a sandbox of its own) and it
-						// relies on the preview to set the correct render type.
-						...attributesFromPreview,
-					}
-				);
+				return createBlock( WORDPRESS_EMBED_BLOCK, {
+					url,
+					// By now we have the preview, but when the new block first renders, it
+					// won't have had all the attributes set, and so won't get the correct
+					// type and it won't render correctly. So, we pass through the current attributes
+					// here so that the initial render works when we switch to the WordPress
+					// block. This only affects the WordPress block because it can't be
+					// rendered in the usual Sandbox (it has a sandbox of its own) and it
+					// relies on the preview to set the correct render type.
+					...attributesFromPreview,
+				} );
 			}
 		}
 	}
@@ -139,10 +140,7 @@ export function getClassNames( html, existingClassNames = '', allowResponsive = 
 			const aspectRatioToRemove = ASPECT_RATIOS[ ratioIndex ];
 			aspectRatioClassNames[ aspectRatioToRemove.className ] = false;
 		}
-		return classnames(
-			existingClassNames,
-			aspectRatioClassNames
-		);
+		return classnames( existingClassNames, aspectRatioClassNames );
 	}
 
 	const previewDocument = document.implementation.createHTMLDocument( '' );
@@ -156,13 +154,10 @@ export function getClassNames( html, existingClassNames = '', allowResponsive = 
 		for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
 			const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
 			if ( aspectRatio >= potentialRatio.ratio ) {
-				return classnames(
-					existingClassNames,
-					{
-						[ potentialRatio.className ]: allowResponsive,
-						'wp-has-aspect-ratio': allowResponsive,
-					}
-				);
+				return classnames( existingClassNames, {
+					[ potentialRatio.className ]: allowResponsive,
+					'wp-has-aspect-ratio': allowResponsive,
+				} );
 			}
 		}
 	}
@@ -179,9 +174,7 @@ export function getClassNames( html, existingClassNames = '', allowResponsive = 
  */
 export function fallback( url, onReplace ) {
 	const link = <a href={ url }>{ url }</a>;
-	onReplace(
-		createBlock( 'core/paragraph', { content: renderToString( link ) } )
-	);
+	onReplace( createBlock( 'core/paragraph', { content: renderToString( link ) } ) );
 }
 
 /***
@@ -194,29 +187,35 @@ export function fallback( url, onReplace ) {
  * @param {boolean} allowResponsive Apply responsive classes to fixed size content.
  * @return {Object} Attributes and values.
  */
-export const getAttributesFromPreview = memoize( ( preview, title, currentClassNames, isResponsive, allowResponsive = true ) => {
-	if ( ! preview ) {
-		return {};
+export const getAttributesFromPreview = memoize(
+	( preview, title, currentClassNames, isResponsive, allowResponsive = true ) => {
+		if ( ! preview ) {
+			return {};
+		}
+
+		const attributes = {};
+		// Some plugins only return HTML with no type info, so default this to 'rich'.
+		let { type = 'rich' } = preview;
+		// If we got a provider name from the API, use it for the slug, otherwise we use the title,
+		// because not all embed code gives us a provider name.
+		const { html, provider_name: providerName } = preview;
+		const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
+
+		if ( isFromWordPress( html ) ) {
+			type = 'wp-embed';
+		}
+
+		if ( html || 'photo' === type ) {
+			attributes.type = type;
+			attributes.providerNameSlug = providerNameSlug;
+		}
+
+		attributes.className = getClassNames(
+			html,
+			currentClassNames,
+			isResponsive && allowResponsive
+		);
+
+		return attributes;
 	}
-
-	const attributes = {};
-	// Some plugins only return HTML with no type info, so default this to 'rich'.
-	let { type = 'rich' } = preview;
-	// If we got a provider name from the API, use it for the slug, otherwise we use the title,
-	// because not all embed code gives us a provider name.
-	const { html, provider_name: providerName } = preview;
-	const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
-
-	if ( isFromWordPress( html ) ) {
-		type = 'wp-embed';
-	}
-
-	if ( html || 'photo' === type ) {
-		attributes.type = type;
-		attributes.providerNameSlug = providerNameSlug;
-	}
-
-	attributes.className = getClassNames( html, currentClassNames, isResponsive && allowResponsive );
-
-	return attributes;
-} );
+);

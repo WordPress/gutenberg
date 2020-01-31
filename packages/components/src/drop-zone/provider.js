@@ -34,9 +34,11 @@ const getDragEventType = ( { dataTransfer } ) => {
 };
 
 const isTypeSupportedByDropZone = ( type, dropZone ) => {
-	return ( type === 'file' && dropZone.onFilesDrop ) ||
+	return (
+		( type === 'file' && dropZone.onFilesDrop ) ||
 		( type === 'html' && dropZone.onHTMLDrop ) ||
-		( type === 'default' && dropZone.onDrop );
+		( type === 'default' && dropZone.onDrop )
+	);
 };
 
 const isWithinElementBounds = ( element, x, y ) => {
@@ -108,12 +110,14 @@ class DropZoneProvider extends Component {
 			position: null,
 		} );
 
-		this.dropZones.forEach( ( dropZone ) => dropZone.setState( {
-			isDraggingOverDocument: false,
-			isDraggingOverElement: false,
-			position: null,
-			type: null,
-		} ) );
+		this.dropZones.forEach( ( dropZone ) =>
+			dropZone.setState( {
+				isDraggingOverDocument: false,
+				isDraggingOverElement: false,
+				position: null,
+				type: null,
+			} )
+		);
 	}
 
 	toggleDraggingOverDocument( event, dragEventType ) {
@@ -126,15 +130,24 @@ class DropZoneProvider extends Component {
 		const detail = window.CustomEvent && event instanceof window.CustomEvent ? event.detail : event;
 
 		// Index of hovered dropzone.
-		const hoveredDropZones = filter( this.dropZones, ( dropZone ) =>
-			isTypeSupportedByDropZone( dragEventType, dropZone ) &&
-			isWithinElementBounds( dropZone.element.current, detail.clientX, detail.clientY )
+		const hoveredDropZones = filter(
+			this.dropZones,
+			( dropZone ) =>
+				isTypeSupportedByDropZone( dragEventType, dropZone ) &&
+				isWithinElementBounds( dropZone.element.current, detail.clientX, detail.clientY )
 		);
 
 		// Find the leaf dropzone not containing another dropzone
-		const hoveredDropZone = find( hoveredDropZones, ( zone ) => (
-			! some( hoveredDropZones, ( subZone ) => subZone !== zone && zone.element.current.parentElement.contains( subZone.element.current ) )
-		) );
+		const hoveredDropZone = find(
+			hoveredDropZones,
+			( zone ) =>
+				! some(
+					hoveredDropZones,
+					( subZone ) =>
+						subZone !== zone &&
+						zone.element.current.parentElement.contains( subZone.element.current )
+				)
+		);
 
 		const hoveredDropZoneIndex = this.dropZones.indexOf( hoveredDropZone );
 
@@ -221,9 +234,7 @@ class DropZoneProvider extends Component {
 	render() {
 		return (
 			<div onDrop={ this.onDrop } className="components-drop-zone__provider">
-				<Provider value={ this.dropZoneCallbacks }>
-					{ this.props.children }
-				</Provider>
+				<Provider value={ this.dropZoneCallbacks }>{ this.props.children }</Provider>
 			</div>
 		);
 	}

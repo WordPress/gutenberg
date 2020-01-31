@@ -20,22 +20,24 @@ function BlockTypesList( { items = [], onSelect, onHover = () => {}, children } 
 		}
 
 		if ( patterns.length ) {
-			result = result.concat( patterns.map( ( pattern ) => {
-				return {
-					...item,
-					id: `${ item.id }-${ pattern.name }`,
-					icon: pattern.icon || item.icon,
-					title: pattern.title || item.title,
-					description: pattern.description || item.description,
-					// If `example` is explicitly undefined for the pattern, the preview will not be shown.
-					example: pattern.hasOwnProperty( 'example' ) ? pattern.example : item.example,
-					initialAttributes: {
-						...item.initialAttributes,
-						...pattern.attributes,
-					},
-					innerBlocks: pattern.innerBlocks,
-				};
-			} ) );
+			result = result.concat(
+				patterns.map( ( pattern ) => {
+					return {
+						...item,
+						id: `${ item.id }-${ pattern.name }`,
+						icon: pattern.icon || item.icon,
+						title: pattern.title || item.title,
+						description: pattern.description || item.description,
+						// If `example` is explicitly undefined for the pattern, the preview will not be shown.
+						example: pattern.hasOwnProperty( 'example' ) ? pattern.example : item.example,
+						initialAttributes: {
+							...item.initialAttributes,
+							...pattern.attributes,
+						},
+						innerBlocks: pattern.innerBlocks,
+					};
+				} )
+			);
 		}
 
 		return result;

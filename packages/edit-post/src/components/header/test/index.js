@@ -15,18 +15,16 @@ describe( 'PostPublishButtonOrToggle should render a', () => {
 	} );
 
 	it( 'button when the post is scheduled (2)', () => {
-		const wrapper = shallow( <PostPublishButtonOrToggle
-			isScheduled={ true }
-			isBeingScheduled={ true }
-		/> );
+		const wrapper = shallow(
+			<PostPublishButtonOrToggle isScheduled={ true } isBeingScheduled={ true } />
+		);
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	it( 'button when the post is pending and cannot be published but the viewport is >= medium (3)', () => {
-		const wrapper = shallow( <PostPublishButtonOrToggle
-			isPending={ true }
-			hasPublishAction={ false }
-		/> );
+		const wrapper = shallow(
+			<PostPublishButtonOrToggle isPending={ true } hasPublishAction={ false } />
+		);
 
 		expect( wrapper ).toMatchSnapshot();
 	} );

@@ -40,8 +40,9 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item.formats ) ).toBe(
+				getSparseArrayLength( expected[ index ].formats )
+			);
 		} );
 	} );
 
@@ -72,8 +73,9 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item.formats ) ).toBe(
+				getSparseArrayLength( expected[ index ].formats )
+			);
 		} );
 	} );
 
@@ -104,8 +106,9 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item.formats ) ).toBe(
+				getSparseArrayLength( expected[ index ].formats )
+			);
 		} );
 	} );
 
@@ -136,8 +139,9 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item.formats ) ).toBe(
+				getSparseArrayLength( expected[ index ].formats )
+			);
 		} );
 	} );
 
@@ -187,8 +191,9 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item.formats ) ).toBe(
+				getSparseArrayLength( expected[ index ].formats )
+			);
 		} );
 	} );
 
@@ -224,8 +229,9 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item.formats ) ).toBe(
+				getSparseArrayLength( expected[ index ].formats )
+			);
 		} );
 	} );
 } );

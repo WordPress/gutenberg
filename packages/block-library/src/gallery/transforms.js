@@ -19,9 +19,7 @@ const parseShortcodeIds = ( ids ) => {
 		return [];
 	}
 
-	return ids.split( ',' ).map( ( id ) => (
-		parseInt( id, 10 )
-	) );
+	return ids.split( ',' ).map( ( id ) => parseInt( id, 10 ) );
 };
 
 const transforms = {
@@ -88,13 +86,17 @@ const transforms = {
 			// When created by drag and dropping multiple files on an insertion point
 			type: 'files',
 			isMatch( files ) {
-				return files.length !== 1 && every( files, ( file ) => file.type.indexOf( 'image/' ) === 0 );
+				return (
+					files.length !== 1 && every( files, ( file ) => file.type.indexOf( 'image/' ) === 0 )
+				);
 			},
 			transform( files ) {
 				const block = createBlock( 'core/gallery', {
-					images: files.map( ( file ) => pickRelevantMediaFiles( {
-						url: createBlobURL( file ),
-					} ) ),
+					images: files.map( ( file ) =>
+						pickRelevantMediaFiles( {
+							url: createBlobURL( file ),
+						} )
+					),
 				} );
 				return block;
 			},
@@ -106,14 +108,16 @@ const transforms = {
 			blocks: [ 'core/image' ],
 			transform: ( { images, align, sizeSlug } ) => {
 				if ( images.length > 0 ) {
-					return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', {
-						id,
-						url,
-						alt,
-						caption,
-						align,
-						sizeSlug,
-					} ) );
+					return images.map( ( { id, url, alt, caption } ) =>
+						createBlock( 'core/image', {
+							id,
+							url,
+							alt,
+							caption,
+							align,
+							sizeSlug,
+						} )
+					);
 				}
 				return createBlock( 'core/image', { align } );
 			},

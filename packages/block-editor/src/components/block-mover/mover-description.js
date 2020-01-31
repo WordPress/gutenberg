@@ -20,8 +20,17 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  *
  * @return {string} Label for the block movement controls.
  */
-export function getBlockMoverDescription( selectedCount, type, firstIndex, isFirst, isLast, dir, orientation, isRTL ) {
-	const position = ( firstIndex + 1 );
+export function getBlockMoverDescription(
+	selectedCount,
+	type,
+	firstIndex,
+	isFirst,
+	isLast,
+	dir,
+	orientation,
+	isRTL
+) {
+	const position = firstIndex + 1;
 
 	const getMovementDirection = ( moveDirection ) => {
 		if ( moveDirection === 'up' ) {
@@ -57,7 +66,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 				__( 'Move %1$s block from position %2$d down to position %3$d' ),
 				type,
 				position,
-				( position + 1 ),
+				position + 1
 			);
 		}
 
@@ -67,7 +76,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 				__( 'Move %1$s block from position %2$d left to position %3$d' ),
 				type,
 				position,
-				( position + 1 ),
+				position + 1
 			);
 		}
 
@@ -77,7 +86,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 				__( 'Move %1$s block from position %2$d right to position %3$d' ),
 				type,
 				position,
-				( position + 1 ),
+				position + 1
 			);
 		}
 	}
@@ -90,7 +99,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the end of the content and can’t be moved down' ),
-				type,
+				type
 			);
 		}
 
@@ -98,7 +107,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the end of the content and can’t be moved left' ),
-				type,
+				type
 			);
 		}
 
@@ -106,7 +115,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the end of the content and can’t be moved right' ),
-				type,
+				type
 			);
 		}
 	}
@@ -121,7 +130,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 				__( 'Move %1$s block from position %2$d up to position %3$d' ),
 				type,
 				position,
-				( position - 1 ),
+				position - 1
 			);
 		}
 
@@ -131,7 +140,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 				__( 'Move %1$s block from position %2$d left to position %3$d' ),
 				type,
 				position,
-				( position - 1 ),
+				position - 1
 			);
 		}
 
@@ -141,7 +150,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 				__( 'Move %1$s block from position %2$d right to position %3$d' ),
 				type,
 				position,
-				( position - 1 ),
+				position - 1
 			);
 		}
 	}
@@ -154,7 +163,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the beginning of the content and can’t be moved up' ),
-				type,
+				type
 			);
 		}
 
@@ -162,7 +171,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the beginning of the content and can’t be moved left' ),
-				type,
+				type
 			);
 		}
 
@@ -170,7 +179,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__( 'Block %1$s is at the beginning of the content and can’t be moved right' ),
-				type,
+				type
 			);
 		}
 	}
@@ -189,7 +198,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
  * @return {string} Label for the block movement controls.
  */
 export function getMultiBlockMoverDescription( selectedCount, firstIndex, isFirst, isLast, dir ) {
-	const position = ( firstIndex + 1 );
+	const position = firstIndex + 1;
 
 	if ( dir < 0 && isFirst ) {
 		return __( 'Blocks cannot be moved up as they are already at the top' );

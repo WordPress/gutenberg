@@ -18,7 +18,7 @@ import BlockInsertionPoint from '../block-list/insertion-point';
 const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 	<ToolbarButton
 		title={ __( 'Add block' ) }
-		icon={ ( <Dashicon icon="plus-alt" style={ style } color={ style.color } /> ) }
+		icon={ <Dashicon icon="plus-alt" style={ style } color={ style.color } /> }
 		onClick={ onToggle }
 		extraProps={ {
 			hint: __( 'Double tap to add a block' ),
@@ -82,11 +82,7 @@ export class Inserter extends Component {
 	}
 
 	getInsertionIndex( insertionType ) {
-		const {
-			insertionIndexDefault,
-			insertionIndexBefore,
-			insertionIndexAfter,
-		} = this.props;
+		const { insertionIndexDefault, insertionIndexBefore, insertionIndexAfter } = this.props;
 		if ( insertionType === 'before' || insertionType === 'replace' ) {
 			return insertionIndexBefore;
 		}
@@ -97,9 +93,7 @@ export class Inserter extends Component {
 	}
 
 	shouldReplaceBlock( insertionType ) {
-		const {
-			isSelectedBlockReplaceable,
-		} = this.props;
+		const { isSelectedBlockReplaceable } = this.props;
 		if ( insertionType === 'replace' ) {
 			return true;
 		}
@@ -141,11 +135,14 @@ export class Inserter extends Component {
 		const style = getStylesFromColorScheme( styles.addBlockButton, styles.addBlockButtonDark );
 
 		const onPress = () => {
-			this.setState( {
-				destinationRootClientId: this.props.destinationRootClientId,
-				shouldReplaceBlock: this.shouldReplaceBlock( 'default' ),
-				insertionIndex: this.getInsertionIndex( 'default' ),
-			}, onToggle );
+			this.setState(
+				{
+					destinationRootClientId: this.props.destinationRootClientId,
+					shouldReplaceBlock: this.shouldReplaceBlock( 'default' ),
+					insertionIndex: this.getInsertionIndex( 'default' ),
+				},
+				onToggle
+			);
 		};
 
 		const onLongPress = () => {
@@ -155,11 +152,14 @@ export class Inserter extends Component {
 		};
 
 		const onPickerSelect = ( insertionType ) => {
-			this.setState( {
-				destinationRootClientId: this.props.destinationRootClientId,
-				shouldReplaceBlock: this.shouldReplaceBlock( insertionType ),
-				insertionIndex: this.getInsertionIndex( insertionType ),
-			}, onToggle );
+			this.setState(
+				{
+					destinationRootClientId: this.props.destinationRootClientId,
+					shouldReplaceBlock: this.shouldReplaceBlock( insertionType ),
+					insertionIndex: this.getInsertionIndex( insertionType ),
+				},
+				onToggle
+			);
 		};
 
 		return (
@@ -191,15 +191,8 @@ export class Inserter extends Component {
 	 * @return {WPElement} Dropdown content element.
 	 */
 	renderContent( { onClose, isOpen } ) {
-		const {
-			clientId,
-			isAppender,
-		} = this.props;
-		const {
-			destinationRootClientId,
-			shouldReplaceBlock,
-			insertionIndex,
-		} = this.state;
+		const { clientId, isAppender } = this.props;
+		const { destinationRootClientId, shouldReplaceBlock, insertionIndex } = this.state;
 		return (
 			<InserterMenu
 				isOpen={ isOpen }
@@ -240,20 +233,16 @@ export default compose( [
 		// `end` argument (id) can refer to the component which is removed
 		// due to pressing `undo` button, that's why we need to check
 		// if `getBlock( end) is valid, otherwise `null` is passed
-		const isAnyBlockSelected = ( ! isAppender && end && getBlock( end ) );
-		const destinationRootClientId = isAnyBlockSelected ?
-			getBlockRootClientId( end ) :
-			rootClientId;
+		const isAnyBlockSelected = ! isAppender && end && getBlock( end );
+		const destinationRootClientId = isAnyBlockSelected ? getBlockRootClientId( end ) : rootClientId;
 		const selectedBlockIndex = getBlockIndex( end, destinationRootClientId );
 		const endOfRootIndex = getBlockOrder( rootClientId ).length;
-		const isSelectedUnmodifiedDefaultBlock = isAnyBlockSelected ?
-			isUnmodifiedDefaultBlock( getBlock( end ) ) :
-			undefined;
+		const isSelectedUnmodifiedDefaultBlock = isAnyBlockSelected
+			? isUnmodifiedDefaultBlock( getBlock( end ) )
+			: undefined;
 
 		function getDefaultInsertionIndex() {
-			const {
-				getSettings,
-			} = select( 'core/block-editor' );
+			const { getSettings } = select( 'core/block-editor' );
 
 			const { __experimentalShouldInsertAtTheTop: shouldInsertAtTheTop } = getSettings();
 
@@ -282,13 +271,9 @@ export default compose( [
 			return endOfRootIndex;
 		}
 
-		const insertionIndexBefore = isAnyBlockSelected ?
-			selectedBlockIndex :
-			0;
+		const insertionIndexBefore = isAnyBlockSelected ? selectedBlockIndex : 0;
 
-		const insertionIndexAfter = isAnyBlockSelected ?
-			selectedBlockIndex + 1 :
-			endOfRootIndex;
+		const insertionIndexAfter = isAnyBlockSelected ? selectedBlockIndex + 1 : endOfRootIndex;
 
 		return {
 			destinationRootClientId,
