@@ -30,48 +30,66 @@
 }
 
 // Popover container.
-.block-editor-inserter__popover > .components-popover__content {
-	@include break-medium {
-		overflow-y: visible;
-		height: 92vh; // This is limited by a max-height from the popover component itself.
-		width: 82vw; // This is limited by a max-width.
+.block-editor-inserter__popover {
 
-		.is-fullscreen-mode & {
-			width: 86vw;
-		}
-
-		// We take up the whole space horizontally, so as to afford a preview panel appearing.
-		// The layer is only for layout, and should not block clicks through it.
-		pointer-events: none;
+	// The in-canvas appender library.
+	> .components-popover__content {
+		height: 440px;
 	}
 
-	// Remove the popover styling and apply it instead to each sub panel.
-	box-shadow: none;
-	border: none;
-	background: none;
+	// The toolbar library.
+	&.is-from-toolbar > .components-popover__content {
+		@include break-medium {
+			overflow-y: visible;
+			height: 92vh; // This is limited by a max-height from the popover component itself.
+			width: 82vw; // This is limited by a max-width.
+
+			.is-fullscreen-mode & {
+				width: 86vw;
+			}
+
+			// We take up the whole space horizontally, so as to afford a preview panel appearing.
+			// The layer is only for layout, and should not block clicks through it.
+			pointer-events: none;
+		}
+
+		// Remove the popover styling and apply it instead to each sub panel.
+		box-shadow: none;
+		border: none;
+		background: none;
+	}
 }
 
 // Container for all inserter content.
 .block-editor-inserter__menu {
 	height: 100%;
 	display: flex;
-	width: 100%;
+	width: auto;
 
 	@include break-medium {
-		min-width: 480px;
-		position: relative;
+		width: 400px;
+
+		.is-from-toolbar & {
+			width: 100%;
+			min-width: 480px;
+			position: relative;
+		}
 	}
 
 	.components-tip {
-		padding: $grid-size-large;
-		display: flex;
-		align-items: center;
+		display: none;
+
+		.is-from-toolbar & {
+			padding: $grid-size-large;
+			display: flex;
+			align-items: center;
+		}
 	}
 }
 
-// Show popover background behind main menu and preview both.
-.block-editor-inserter__main-area,
-.block-editor-inserter__preview-panel {
+// When opened from toolbar, show popover background behind main menu and preview.
+.is-from-toolbar .block-editor-inserter__main-area,
+.is-from-toolbar .block-editor-inserter__preview-panel {
 	background: $white;
 
 	@include break-medium() {
@@ -88,13 +106,16 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	width: 100%;
 
 	@include break-medium {
-		position: relative;
-		margin-right: $grid-size-large;
+		.is-from-toolbar & {
+			position: relative;
+			margin-right: $grid-size-large;
 
-		// Re-enable clicks on this layer.
-		pointer-events: all;
+			// Re-enable clicks on this layer.
+			pointer-events: all;
+		}
 	}
 }
 
@@ -187,34 +208,36 @@
 .block-editor-inserter__preview-panel {
 	display: none;
 
-	// Show preview panel when inserter is not modal.
+	// Show preview panel when inserter is not modal, and opened from inserter.
 	@include break-medium () {
-		display: block;
-		position: relative;
-		min-height: 480px;
-		height: 50%;
-		max-height: 640px;
-		overflow: hidden;
-		padding: $grid-size-large;
-		@include edit-post__fade-in-animation();
-
-		.block-editor-block-card {
-			min-height: 6em;
-			padding-bottom: $grid-size-large;
-			margin-bottom: $grid-size-large;
-			border-bottom: $border-width solid $light-gray-500;
-		}
-
-		// Create a white overlay at the bottom of the preview to soft-crop the preview.
-		&::after {
-			content: "";
+		.is-from-toolbar & {
 			display: block;
-			position: absolute;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			height: $grid-size-large;
-			background: $white;
+			position: relative;
+			min-height: 480px;
+			height: 50%;
+			max-height: 640px;
+			overflow: hidden;
+			padding: $grid-size-large;
+			@include edit-post__fade-in-animation();
+
+			.block-editor-block-card {
+				min-height: 6em;
+				padding-bottom: $grid-size-large;
+				margin-bottom: $grid-size-large;
+				border-bottom: $border-width solid $light-gray-500;
+			}
+
+			// Create a white overlay at the bottom of the preview to soft-crop the preview.
+			&::after {
+				content: "";
+				display: block;
+				position: absolute;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				height: $grid-size-large;
+				background: $white;
+			}
 		}
 	}
 }
