@@ -46,7 +46,9 @@ export const image = {
 		}
 
 		static getDerivedStateFromProps( props, state ) {
-			const { activeObjectAttributes: { style } } = props;
+			const {
+				activeObjectAttributes: { style },
+			} = props;
 
 			if ( style === state.previousStyle ) {
 				return null;
@@ -90,40 +92,46 @@ export const image = {
 			return (
 				<MediaUploadCheck>
 					<RichTextToolbarButton
-						icon={ <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M4 16h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2zM4 5h10v9H4V5zm14 9v2h4v-2h-4zM2 20h20v-2H2v2zm6.4-8.8L7 9.4 5 12h8l-2.6-3.4-2 2.6z" /></SVG> }
+						icon={
+							<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+								<Path d="M4 16h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2zM4 5h10v9H4V5zm14 9v2h4v-2h-4zM2 20h20v-2H2v2zm6.4-8.8L7 9.4 5 12h8l-2.6-3.4-2 2.6z" />
+							</SVG>
+						}
 						title={ title }
 						onClick={ this.openModal }
 						isActive={ isObjectActive }
 					/>
-					{ this.state.modal && <MediaUpload
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						onSelect={ ( { id, url, alt, width } ) => {
-							this.closeModal();
-							onChange( insertObject( value, {
-								type: name,
-								attributes: {
-									className: `wp-image-${ id }`,
-									style: `width: ${ Math.min( width, 150 ) }px;`,
-									url,
-									alt,
-								},
-							} ) );
-							onFocus();
-						} }
-						onClose={ this.closeModal }
-						render={ ( { open } ) => {
-							open();
-							return null;
-						} }
-					/> }
-					{ isObjectActive &&
-						<Popover
-							position="bottom center"
-							focusOnMount={ false }
-							anchorRef={ getRange() }
-						>
-							{ // Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */ }
+					{ this.state.modal && (
+						<MediaUpload
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							onSelect={ ( { id, url, alt, width } ) => {
+								this.closeModal();
+								onChange(
+									insertObject( value, {
+										type: name,
+										attributes: {
+											className: `wp-image-${ id }`,
+											style: `width: ${ Math.min( width, 150 ) }px;`,
+											url,
+											alt,
+										},
+									} )
+								);
+								onFocus();
+							} }
+							onClose={ this.closeModal }
+							render={ ( { open } ) => {
+								open();
+								return null;
+							} }
+						/>
+					) }
+					{ isObjectActive && (
+						<Popover position="bottom center" focusOnMount={ false } anchorRef={ getRange() }>
+							{
+								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+							 }
 							<form
 								className="block-editor-format-toolbar__image-container-content"
 								onKeyPress={ stopKeyPropagation }
@@ -159,7 +167,7 @@ export const image = {
 							</form>
 							{ /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */ }
 						</Popover>
-					}
+					) }
 				</MediaUploadCheck>
 			);
 		}

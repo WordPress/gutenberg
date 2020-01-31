@@ -12,9 +12,21 @@ import { Spinner, withSpokenMessages } from '@wordpress/components';
  */
 import DownloadableBlocksList from '../downloadable-blocks-list';
 
-function DownloadableBlocksPanel( { downloadableItems, onSelect, onHover, hasPermission, isLoading, isWaiting, debouncedSpeak } ) {
+function DownloadableBlocksPanel( {
+	downloadableItems,
+	onSelect,
+	onHover,
+	hasPermission,
+	isLoading,
+	isWaiting,
+	debouncedSpeak,
+} ) {
 	if ( ! hasPermission ) {
-		debouncedSpeak( __( 'No blocks found in your library. Please contact your site administrator to install new blocks.' ) );
+		debouncedSpeak(
+			__(
+				'No blocks found in your library. Please contact your site administrator to install new blocks.'
+			)
+		);
 		return (
 			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				{ __( 'No blocks found in your library.' ) }
@@ -41,7 +53,11 @@ function DownloadableBlocksPanel( { downloadableItems, onSelect, onHover, hasPer
 	}
 
 	const resultsFoundMessage = sprintf(
-		_n( 'No blocks found in your library. We did find %d block available for download.', 'No blocks found in your library. We did find %d blocks available for download.', downloadableItems.length ),
+		_n(
+			'No blocks found in your library. We did find %d block available for download.',
+			'No blocks found in your library. We did find %d blocks available for download.',
+			downloadableItems.length
+		),
 		downloadableItems.length
 	);
 
@@ -51,7 +67,11 @@ function DownloadableBlocksPanel( { downloadableItems, onSelect, onHover, hasPer
 			<p className="block-directory-downloadable-blocks-panel__description">
 				{ __( 'No blocks found in your library. These blocks can be downloaded and installed:' ) }
 			</p>
-			<DownloadableBlocksList items={ downloadableItems } onSelect={ onSelect } onHover={ onHover } />
+			<DownloadableBlocksList
+				items={ downloadableItems }
+				onSelect={ onSelect }
+				onHover={ onHover }
+			/>
 		</Fragment>
 	);
 }

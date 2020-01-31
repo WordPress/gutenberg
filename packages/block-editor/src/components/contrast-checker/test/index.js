@@ -33,7 +33,8 @@ describe( 'ContrastChecker', () => {
 				textColor={ textColor }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor } />
+				fallbackTextColor={ fallbackTextColor }
+			/>
 		);
 
 		expect( wrapper.html() ).toBeNull();
@@ -46,10 +47,18 @@ describe( 'ContrastChecker', () => {
 				textColor={ sameShade }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor } />
+				fallbackTextColor={ fallbackTextColor }
+			/>
 		);
 
-		expect( wrapper.find( Notice ).children().text() ).toBe( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' );
+		expect(
+			wrapper
+				.find( Notice )
+				.children()
+				.text()
+		).toBe(
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+		);
 	} );
 
 	test( 'should render render null if background color contains a transparency', () => {
@@ -59,7 +68,8 @@ describe( 'ContrastChecker', () => {
 				textColor={ sameShade }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor } />
+				fallbackTextColor={ fallbackTextColor }
+			/>
 		);
 
 		expect( wrapper.html() ).toBeNull();
@@ -72,7 +82,8 @@ describe( 'ContrastChecker', () => {
 				textColor={ colorWithTransparency }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor } />
+				fallbackTextColor={ fallbackTextColor }
+			/>
 		);
 
 		expect( wrapper.html() ).toBeNull();
@@ -87,29 +98,36 @@ describe( 'ContrastChecker', () => {
 				textColor={ sameShade }
 				isLargeText={ ! isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor } />
+				fallbackTextColor={ fallbackTextColor }
+			/>
 		);
 
-		expect( wrapper.find( Notice ).children().text() ).toBe( 'This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.' );
+		expect(
+			wrapper
+				.find( Notice )
+				.children()
+				.text()
+		).toBe(
+			'This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.'
+		);
 	} );
 
 	test( 'should take into consideration wherever text is large or not', () => {
 		const wrapperSmallText = mount(
-			<ContrastChecker
-				backgroundColor="#C44B4B"
-				textColor="#000000"
-				isLargeText={ false }
-			/>
+			<ContrastChecker backgroundColor="#C44B4B" textColor="#000000" isLargeText={ false } />
 		);
 
-		expect( wrapperSmallText.find( Notice ).children().text() ).toBe( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' );
+		expect(
+			wrapperSmallText
+				.find( Notice )
+				.children()
+				.text()
+		).toBe(
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+		);
 
 		const wrapperLargeText = mount(
-			<ContrastChecker
-				backgroundColor="#C44B4B"
-				textColor="#000000"
-				isLargeText={ true }
-			/>
+			<ContrastChecker backgroundColor="#C44B4B" textColor="#000000" isLargeText={ true } />
 		);
 
 		expect( wrapperLargeText.html() ).toBeNull();
@@ -117,21 +135,20 @@ describe( 'ContrastChecker', () => {
 
 	test( 'should take into consideration the font size passed', () => {
 		const wrapperSmallFontSize = mount(
-			<ContrastChecker
-				backgroundColor="#C44B4B"
-				textColor="#000000"
-				fontSize={ 23 }
-			/>
+			<ContrastChecker backgroundColor="#C44B4B" textColor="#000000" fontSize={ 23 } />
 		);
 
-		expect( wrapperSmallFontSize.find( Notice ).children().text() ).toBe( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' );
+		expect(
+			wrapperSmallFontSize
+				.find( Notice )
+				.children()
+				.text()
+		).toBe(
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+		);
 
 		const wrapperLargeText = mount(
-			<ContrastChecker
-				backgroundColor="#C44B4B"
-				textColor="#000000"
-				fontSize={ 24 }
-			/>
+			<ContrastChecker backgroundColor="#C44B4B" textColor="#000000" fontSize={ 24 } />
 		);
 
 		expect( wrapperLargeText.html() ).toBeNull();
@@ -158,7 +175,14 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
-		expect( wrapperNoLargeText.find( Notice ).children().text() ).toBe( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' );
+		expect(
+			wrapperNoLargeText
+				.find( Notice )
+				.children()
+				.text()
+		).toBe(
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+		);
 	} );
 
 	test( 'should render null when the colors meet AA WCAG guidelines, with only fallback colors.', () => {
@@ -166,7 +190,8 @@ describe( 'ContrastChecker', () => {
 			<ContrastChecker
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
-				fallbackTextColor={ fallbackTextColor } />
+				fallbackTextColor={ fallbackTextColor }
+			/>
 		);
 
 		expect( wrapper.html() ).toBeNull();
@@ -174,11 +199,16 @@ describe( 'ContrastChecker', () => {
 
 	test( 'should render messages when the textColor is valid, but the fallback backgroundColor conflicts.', () => {
 		const wrapper = mount(
-			<ContrastChecker
-				textColor={ textColor }
-				fallbackBackgroundColor={ textColor } />
+			<ContrastChecker textColor={ textColor } fallbackBackgroundColor={ textColor } />
 		);
 
-		expect( wrapper.find( Notice ).children().text() ).toBe( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' );
+		expect(
+			wrapper
+				.find( Notice )
+				.children()
+				.text()
+		).toBe(
+			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+		);
 	} );
 } );

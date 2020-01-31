@@ -29,8 +29,8 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 	const setAngleCircleCenter = () => {
 		const rect = angleCircleRef.current.getBoundingClientRect();
 		angleCircleCenter.current = {
-			x: rect.x + ( rect.width / 2 ),
-			y: rect.y + ( rect.height / 2 ),
+			x: rect.x + rect.width / 2,
+			y: rect.y + rect.height / 2,
 		};
 	};
 
@@ -47,7 +47,7 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 		onDragMove: changeAngleToPosition,
 		onDragEnd: changeAngleToPosition,
 	} );
-	return	(
+	return (
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		<div
 			ref={ angleCircleRef }
@@ -71,25 +71,15 @@ export default function AnglePicker( { value, onChange, label = __( 'Angle' ) } 
 	const instanceId = useInstanceId( AnglePicker );
 	const inputId = `components-angle-picker__input-${ instanceId }`;
 	return (
-		<BaseControl
-			label={ label }
-			id={ inputId }
-			className="components-angle-picker"
-		>
-			<AngleCircle
-				value={ value }
-				onChange={ onChange }
-				aria-hidden="true"
-			/>
+		<BaseControl label={ label } id={ inputId } className="components-angle-picker">
+			<AngleCircle value={ value } onChange={ onChange } aria-hidden="true" />
 			<input
 				className="components-angle-picker__input-field"
 				type="number"
 				id={ inputId }
 				onChange={ ( event ) => {
 					const unprocessedValue = event.target.value;
-					const inputValue = unprocessedValue !== '' ?
-						parseInt( event.target.value, 10 ) :
-						0;
+					const inputValue = unprocessedValue !== '' ? parseInt( event.target.value, 10 ) : 0;
 					onChange( inputValue );
 				} }
 				value={ value }
@@ -100,4 +90,3 @@ export default function AnglePicker( { value, onChange, label = __( 'Angle' ) } 
 		</BaseControl>
 	);
 }
-

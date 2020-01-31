@@ -21,11 +21,7 @@ function FullscreenModeClose( { isActive, postType } ) {
 			<Button
 				icon="arrow-left-alt2"
 				href={ addQueryArgs( 'edit.php', { post_type: postType.slug } ) }
-				label={ get(
-					postType,
-					[ 'labels', 'view_items' ],
-					__( 'Back' )
-				) }
+				label={ get( postType, [ 'labels', 'view_items' ], __( 'Back' ) ) }
 			/>
 		</Toolbar>
 	);

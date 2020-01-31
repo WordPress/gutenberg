@@ -124,8 +124,9 @@ export function isEditorPanelRemoved( state, panelName ) {
 export function isEditorPanelEnabled( state, panelName ) {
 	const panels = getPreference( state, 'panels' );
 
-	return ! isEditorPanelRemoved( state, panelName ) &&
-		get( panels, [ panelName, 'enabled' ], true );
+	return (
+		! isEditorPanelRemoved( state, panelName ) && get( panels, [ panelName, 'enabled' ], true )
+	);
 }
 
 /**
@@ -139,10 +140,7 @@ export function isEditorPanelEnabled( state, panelName ) {
  */
 export function isEditorPanelOpened( state, panelName ) {
 	const panels = getPreference( state, 'panels' );
-	return (
-		get( panels, [ panelName ] ) === true ||
-		get( panels, [ panelName, 'opened' ] ) === true
-	);
+	return get( panels, [ panelName ] ) === true || get( panels, [ panelName, 'opened' ] ) === true;
 }
 
 /**
@@ -193,12 +191,11 @@ export function isPluginItemPinned( state, pluginName ) {
  */
 export const getActiveMetaBoxLocations = createSelector(
 	( state ) => {
-		return Object.keys( state.metaBoxes.locations )
-			.filter( ( location ) => isMetaBoxLocationActive( state, location ) );
+		return Object.keys( state.metaBoxes.locations ).filter( ( location ) =>
+			isMetaBoxLocationActive( state, location )
+		);
 	},
-	( state ) => [
-		state.metaBoxes.locations,
-	]
+	( state ) => [ state.metaBoxes.locations ]
 );
 
 /**
@@ -255,9 +252,7 @@ export const getAllMetaBoxes = createSelector(
 	( state ) => {
 		return flatten( values( state.metaBoxes.locations ) );
 	},
-	( state ) => [
-		state.metaBoxes.locations,
-	]
+	( state ) => [ state.metaBoxes.locations ]
 );
 
 /**

@@ -46,10 +46,7 @@ export default function( node, doc ) {
 		let sibling = node;
 		let noTeaser = false;
 		while ( ( sibling = sibling.nextSibling ) ) {
-			if (
-				sibling.nodeType === COMMENT_NODE &&
-				sibling.nodeValue === 'noteaser'
-			) {
+			if ( sibling.nodeType === COMMENT_NODE && sibling.nodeValue === 'noteaser' ) {
 				noTeaser = true;
 				remove( sibling );
 				break;

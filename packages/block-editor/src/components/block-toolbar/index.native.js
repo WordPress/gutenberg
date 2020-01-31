@@ -12,21 +12,15 @@ import UngroupButton from '../ungroup-button';
 
 export default function BlockToolbar() {
 	const { blockClientIds, isValid, mode } = useSelect( ( select ) => {
-		const {
-			getBlockMode,
-			getSelectedBlockClientIds,
-			isBlockValid,
-		} = select( 'core/block-editor' );
+		const { getBlockMode, getSelectedBlockClientIds, isBlockValid } = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 
 		return {
 			blockClientIds: selectedBlockClientIds,
-			isValid: selectedBlockClientIds.length === 1 ?
-				isBlockValid( selectedBlockClientIds[ 0 ] ) :
-				null,
-			mode: selectedBlockClientIds.length === 1 ?
-				getBlockMode( selectedBlockClientIds[ 0 ] ) :
-				null,
+			isValid:
+				selectedBlockClientIds.length === 1 ? isBlockValid( selectedBlockClientIds[ 0 ] ) : null,
+			mode:
+				selectedBlockClientIds.length === 1 ? getBlockMode( selectedBlockClientIds[ 0 ] ) : null,
 		};
 	}, [] );
 

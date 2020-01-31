@@ -17,7 +17,11 @@ import { Path, SVG } from '../../';
 
 describe( 'Icon', () => {
 	const className = 'example-class';
-	const svg = <SVG><Path d="M5 4v3h5.5v12h3V7H19V4z" /></SVG>;
+	const svg = (
+		<SVG>
+			<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+		</SVG>
+	);
 	const style = { fill: 'red' };
 
 	it( 'renders nothing when icon omitted', () => {
@@ -70,7 +74,16 @@ describe( 'Icon', () => {
 	} );
 
 	it( 'renders an svg element and passes the size as its width and height', () => {
-		const wrapper = shallow( <Icon icon={ <SVG width={ 64 } height={ 64 }><Path d="M5 4v3h5.5v12h3V7H19V4z" /></SVG> } size={ 32 } /> );
+		const wrapper = shallow(
+			<Icon
+				icon={
+					<SVG width={ 64 } height={ 64 }>
+						<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+					</SVG>
+				}
+				size={ 32 }
+			/>
+		);
 
 		expect( wrapper.prop( 'width' ) ).toBe( 64 );
 		expect( wrapper.prop( 'height' ) ).toBe( 64 );
@@ -89,16 +102,14 @@ describe( 'Icon', () => {
 				return <span />;
 			}
 		}
-		const wrapper = shallow(
-			<Icon icon={ MyComponent } />
-		);
+		const wrapper = shallow( <Icon icon={ MyComponent } /> );
 
 		expect( wrapper.name() ).toBe( 'MyComponent' );
 	} );
 
 	describe( 'props passing', () => {
 		class MyComponent extends Component {
-			render( ) {
+			render() {
 				return <span className={ this.props.className } />;
 			}
 		}

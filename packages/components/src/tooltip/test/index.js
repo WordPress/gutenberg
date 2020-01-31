@@ -15,7 +15,10 @@ describe( 'Tooltip', () => {
 		it( 'should render children (abort) if multiple children passed', () => {
 			// Mount: Enzyme shallow does not support wrapping multiple nodes
 			const wrapper = mount(
-				<Tooltip><div /><div /></Tooltip>
+				<Tooltip>
+					<div />
+					<div />
+				</Tooltip>
 			);
 
 			expect( wrapper.children() ).toHaveLength( 2 );
@@ -51,7 +54,12 @@ describe( 'Tooltip', () => {
 			expect( button.childAt( 1 ).name() ).toBe( 'Popover' );
 			expect( popover.prop( 'focusOnMount' ) ).toBe( false );
 			expect( popover.prop( 'position' ) ).toBe( 'bottom right' );
-			expect( popover.children().first().text() ).toBe( 'Help text' );
+			expect(
+				popover
+					.children()
+					.first()
+					.text()
+			).toBe( 'Help text' );
 		} );
 
 		it( 'should show popover on focus', () => {
@@ -59,10 +67,7 @@ describe( 'Tooltip', () => {
 			const event = { type: 'focus', currentTarget: {} };
 			const wrapper = shallow(
 				<Tooltip text="Help text">
-					<button
-						onMouseEnter={ originalFocus }
-						onFocus={ originalFocus }
-					>
+					<button onMouseEnter={ originalFocus } onFocus={ originalFocus }>
 						Hover Me!
 					</button>
 				</Tooltip>
@@ -82,10 +87,7 @@ describe( 'Tooltip', () => {
 			const originalOnMouseUp = jest.fn();
 			const wrapper = mount(
 				<Tooltip text="Help text">
-					<button
-						onMouseDown={ originalOnMouseDown }
-						onMouseUp={ originalOnMouseUp }
-					>
+					<button onMouseDown={ originalOnMouseDown } onMouseUp={ originalOnMouseUp }>
 						Hover Me!
 					</button>
 				</Tooltip>
@@ -97,9 +99,11 @@ describe( 'Tooltip', () => {
 
 			event = { type: 'mousedown' };
 			button.simulate( event.type, event );
-			expect( originalOnMouseDown ).toHaveBeenCalledWith( expect.objectContaining( {
-				type: event.type,
-			} ) );
+			expect( originalOnMouseDown ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: event.type,
+				} )
+			);
 
 			event = { type: 'focus', currentTarget: {} };
 			button.simulate( event.type, event );
@@ -110,19 +114,18 @@ describe( 'Tooltip', () => {
 
 			event = new window.MouseEvent( 'mouseup' );
 			document.dispatchEvent( event );
-			expect( originalOnMouseUp ).toHaveBeenCalledWith( expect.objectContaining( {
-				type: event.type,
-			} ) );
+			expect( originalOnMouseUp ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: event.type,
+				} )
+			);
 		} );
 
 		it( 'should show popover on delayed mouseenter', () => {
 			const originalMouseEnter = jest.fn();
 			const wrapper = TestUtils.renderIntoDocument(
 				<Tooltip text="Help text">
-					<button
-						onMouseEnter={ originalMouseEnter }
-						onFocus={ originalMouseEnter }
-					>
+					<button onMouseEnter={ originalMouseEnter } onFocus={ originalMouseEnter }>
 						<span>Hover Me!</span>
 					</button>
 				</Tooltip>
@@ -134,13 +137,17 @@ describe( 'Tooltip', () => {
 
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 			expect( wrapper.state.isOver ).toBe( false );
-			expect( TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' ) ).toHaveLength( 0 );
+			expect(
+				TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' )
+			).toHaveLength( 0 );
 
 			// Force delayedSetIsOver to be called
 			wrapper.delayedSetIsOver.flush();
 
 			expect( wrapper.state.isOver ).toBe( true );
-			expect( TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' ) ).toHaveLength( 1 );
+			expect(
+				TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' )
+			).toHaveLength( 1 );
 		} );
 
 		it( 'should ignore mouseenter on disabled elements', () => {
@@ -149,11 +156,7 @@ describe( 'Tooltip', () => {
 			const originalMouseEnter = jest.fn();
 			const wrapper = mount(
 				<Tooltip text="Help text">
-					<button
-						onMouseEnter={ originalMouseEnter }
-						onFocus={ originalMouseEnter }
-						disabled
-					>
+					<button onMouseEnter={ originalMouseEnter } onFocus={ originalMouseEnter } disabled>
 						<span>Hover Me!</span>
 					</button>
 				</Tooltip>
@@ -180,10 +183,7 @@ describe( 'Tooltip', () => {
 			const originalMouseEnter = jest.fn();
 			const wrapper = mount(
 				<Tooltip text="Help text">
-					<button
-						onMouseEnter={ originalMouseEnter }
-						onFocus={ originalMouseEnter }
-					>
+					<button onMouseEnter={ originalMouseEnter } onFocus={ originalMouseEnter }>
 						Hover Me!
 					</button>
 				</Tooltip>

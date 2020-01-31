@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	PanelBody,
-	ToggleControl,
-	Disabled,
-} from '@wordpress/components';
+import { PanelBody, ToggleControl, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';

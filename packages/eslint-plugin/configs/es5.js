@@ -1,14 +1,15 @@
 module.exports = {
-	extends: [
-		require.resolve( './jsdoc.js' ),
-	],
+	extends: [ require.resolve( './jsdoc.js' ) ],
 	rules: {
 		'array-bracket-spacing': [ 'error', 'always' ],
 		'array-callback-return': 'error',
 		'brace-style': [ 'error', '1tbs' ],
-		camelcase: [ 'error', {
-			properties: 'never',
-		} ],
+		camelcase: [
+			'error',
+			{
+				properties: 'never',
+			},
+		],
 		'comma-dangle': [ 'error', 'always-multiline' ],
 		'comma-spacing': 'error',
 		'comma-style': [ 'error', 'last' ],
@@ -64,18 +65,24 @@ module.exports = {
 		semi: 'error',
 		'semi-spacing': 'error',
 		'space-before-blocks': [ 'error', 'always' ],
-		'space-before-function-paren': [ 'error', {
-			anonymous: 'never',
-			named: 'never',
-			asyncArrow: 'always',
-		} ],
+		'space-before-function-paren': [
+			'error',
+			{
+				anonymous: 'never',
+				named: 'never',
+				asyncArrow: 'always',
+			},
+		],
 		'space-in-parens': [ 'error', 'always' ],
 		'space-infix-ops': 'error',
-		'space-unary-ops': [ 'error', {
-			overrides: {
-				'!': true,
+		'space-unary-ops': [
+			'error',
+			{
+				overrides: {
+					'!': true,
+				},
 			},
-		} ],
+		],
 		'valid-typeof': 'error',
 		'vars-on-top': 'error',
 		'wrap-iife': 'error',

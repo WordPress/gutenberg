@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { InspectorControls } from '@wordpress/block-editor';
-import {
-	Disabled,
-	PanelBody,
-	RangeControl,
-	ToggleControl,
-} from '@wordpress/components';
+import { Disabled, PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
 import ServerSideRender from '@wordpress/server-side-render';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -53,12 +48,7 @@ class LatestComments extends Component {
 	}
 
 	render() {
-		const {
-			commentsToShow,
-			displayAvatar,
-			displayDate,
-			displayExcerpt,
-		} = this.props.attributes;
+		const { commentsToShow, displayAvatar, displayDate, displayExcerpt } = this.props.attributes;
 
 		return (
 			<>
@@ -90,10 +80,7 @@ class LatestComments extends Component {
 					</PanelBody>
 				</InspectorControls>
 				<Disabled>
-					<ServerSideRender
-						block="core/latest-comments"
-						attributes={ this.props.attributes }
-					/>
+					<ServerSideRender block="core/latest-comments" attributes={ this.props.attributes } />
 				</Disabled>
 			</>
 		);

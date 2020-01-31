@@ -90,13 +90,32 @@ describe( 'Button', () => {
 
 		it( 'should render a Dashicon component matching the wordpress icon', () => {
 			const iconButton = shallow( <Button icon="wordpress" /> );
-			expect( iconButton.find( 'Icon' ).dive().shallow().hasClass( 'dashicons-wordpress' ) ).toBe( true );
+			expect(
+				iconButton
+					.find( 'Icon' )
+					.dive()
+					.shallow()
+					.hasClass( 'dashicons-wordpress' )
+			).toBe( true );
 		} );
 
 		it( 'should render child elements and icon', () => {
-			const iconButton = shallow( <Button icon="wordpress" children={ <p className="test">Test</p> } /> );
-			expect( iconButton.find( 'Icon' ).dive().shallow().hasClass( 'dashicons-wordpress' ) ).toBe( true );
-			expect( iconButton.find( '.test' ).shallow().text() ).toBe( 'Test' );
+			const iconButton = shallow(
+				<Button icon="wordpress" children={ <p className="test">Test</p> } />
+			);
+			expect(
+				iconButton
+					.find( 'Icon' )
+					.dive()
+					.shallow()
+					.hasClass( 'dashicons-wordpress' )
+			).toBe( true );
+			expect(
+				iconButton
+					.find( '.test' )
+					.shallow()
+					.text()
+			).toBe( 'Test' );
 		} );
 
 		it( 'should add an aria-label when the label property is used, with Tooltip wrapper', () => {
@@ -112,7 +131,9 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should allow tooltip disable', () => {
-			const iconButton = shallow( <Button icon="WordPress" label="WordPress" showTooltip={ false } /> );
+			const iconButton = shallow(
+				<Button icon="WordPress" label="WordPress" showTooltip={ false } />
+			);
 			expect( iconButton.name() ).toBe( 'button' );
 			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
@@ -124,12 +145,20 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should not show the tooltip when icon and children defined', () => {
-			const iconButton = shallow( <Button icon="WordPress" label="WordPress">Children</Button> );
+			const iconButton = shallow(
+				<Button icon="WordPress" label="WordPress">
+					Children
+				</Button>
+			);
 			expect( iconButton.name() ).toBe( 'button' );
 		} );
 
 		it( 'should force showing the tooltip even if icon and children defined', () => {
-			const iconButton = shallow( <Button icon="WordPress" label="WordPress" showTooltip>Children</Button> );
+			const iconButton = shallow(
+				<Button icon="WordPress" label="WordPress" showTooltip>
+					Children
+				</Button>
+			);
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 		} );
 	} );

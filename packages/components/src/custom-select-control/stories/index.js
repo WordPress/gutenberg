@@ -27,6 +27,4 @@ const options = [
 		style: { fontSize: '300%' },
 	},
 ];
-export const _default = () => (
-	<CustomSelectControl label="Font Size" options={ options } />
-);
+export const _default = () => <CustomSelectControl label="Font Size" options={ options } />;

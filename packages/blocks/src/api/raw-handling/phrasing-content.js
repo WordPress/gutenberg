@@ -68,7 +68,20 @@ const embeddedContentSchema = {
 	iframe: { attributes: [ 'src', 'srcdoc', 'name', 'sandbox', 'seamless', 'width', 'height' ] },
 	img: { attributes: [ 'alt', 'src', 'srcset', 'usemap', 'ismap', 'width', 'height' ] },
 	object: { attributes: [ 'data', 'type', 'name', 'usemap', 'form', 'width', 'height' ] },
-	video: { attributes: [ 'src', 'poster', 'preload', 'autoplay', 'mediagroup', 'loop', 'muted', 'controls', 'width', 'height' ] },
+	video: {
+		attributes: [
+			'src',
+			'poster',
+			'preload',
+			'autoplay',
+			'mediagroup',
+			'loop',
+			'muted',
+			'controls',
+			'width',
+			'height',
+		],
+	},
 };
 
 /**
@@ -96,21 +109,24 @@ export function getPhrasingContentSchema( context ) {
 		return phrasingContentSchema;
 	}
 
-	return omit( {
-		...phrasingContentSchema,
-		// We shouldn't paste potentially sensitive information which is not
-		// visible to the user when pasted, so strip the attributes.
-		ins: { children: phrasingContentSchema.ins.children },
-		del: { children: phrasingContentSchema.del.children },
-	}, [
-		'u', // Used to mark misspelling. Shouldn't be pasted.
-		'abbr', // Invisible.
-		'data', // Invisible.
-		'time', // Invisible.
-		'wbr', // Invisible.
-		'bdi', // Invisible.
-		'bdo', // Invisible.
-	] );
+	return omit(
+		{
+			...phrasingContentSchema,
+			// We shouldn't paste potentially sensitive information which is not
+			// visible to the user when pasted, so strip the attributes.
+			ins: { children: phrasingContentSchema.ins.children },
+			del: { children: phrasingContentSchema.del.children },
+		},
+		[
+			'u', // Used to mark misspelling. Shouldn't be pasted.
+			'abbr', // Invisible.
+			'data', // Invisible.
+			'time', // Invisible.
+			'wbr', // Invisible.
+			'bdi', // Invisible.
+			'bdo', // Invisible.
+		]
+	);
 }
 
 /**

@@ -7,17 +7,21 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	RichText,
-	getColorClassName,
-} from '@wordpress/block-editor';
+import { RichText, getColorClassName } from '@wordpress/block-editor';
 
 const colorsMigration = ( attributes ) => {
-	return omit( {
-		...attributes,
-		customTextColor: attributes.textColor && '#' === attributes.textColor[ 0 ] ? attributes.textColor : undefined,
-		customBackgroundColor: attributes.color && '#' === attributes.color[ 0 ] ? attributes.color : undefined,
-	}, [ 'color', 'textColor' ] );
+	return omit(
+		{
+			...attributes,
+			customTextColor:
+				attributes.textColor && '#' === attributes.textColor[ 0 ]
+					? attributes.textColor
+					: undefined,
+			customBackgroundColor:
+				attributes.color && '#' === attributes.color[ 0 ] ? attributes.color : undefined,
+		},
+		[ 'color', 'textColor' ]
+	);
 };
 
 const blockAttributes = {

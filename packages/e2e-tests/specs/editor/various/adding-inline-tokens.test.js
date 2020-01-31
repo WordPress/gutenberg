@@ -33,7 +33,14 @@ describe( 'adding inline tokens', () => {
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );
 		const inputElement = await page.$( '.media-modal input[type=file]' );
-		const testImagePath = path.join( __dirname, '..', '..', '..', 'assets', '10x10_e2e_test_image_z9T8jK.png' );
+		const testImagePath = path.join(
+			__dirname,
+			'..',
+			'..',
+			'..',
+			'assets',
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
 		const filename = uuid();
 		const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 		fs.copyFileSync( testImagePath, tmpFileName );
@@ -46,7 +53,9 @@ describe( 'adding inline tokens', () => {
 		await page.click( '.media-modal button.media-button-select' );
 
 		// Check the content.
-		const regex = new RegExp( `<!-- wp:paragraph -->\\s*<p>a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->` );
+		const regex = new RegExp(
+			`<!-- wp:paragraph -->\\s*<p>a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->`
+		);
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 } );

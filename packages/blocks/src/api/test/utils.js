@@ -7,12 +7,13 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import { createBlock } from '../factory';
-import { getBlockTypes, unregisterBlockType, registerBlockType, setDefaultBlockName } from '../registration';
 import {
-	isUnmodifiedDefaultBlock,
-	getAccessibleBlockLabel,
-	getBlockLabel,
-} from '../utils';
+	getBlockTypes,
+	unregisterBlockType,
+	registerBlockType,
+	setDefaultBlockName,
+} from '../registration';
+import { isUnmodifiedDefaultBlock, getAccessibleBlockLabel, getBlockLabel } from '../utils';
 
 describe( 'block helpers', () => {
 	beforeAll( () => {
@@ -164,7 +165,9 @@ describe( 'getAccessibleBlockLabel', () => {
 		const blockType = { title: 'Recipe', __experimentalLabel: ( { heading } ) => heading };
 		const attributes = { heading: 'Cupcakes!' };
 
-		expect( getAccessibleBlockLabel( blockType, attributes, 3 ) ).toBe( 'Recipe Block. Row 3. Cupcakes!' );
+		expect( getAccessibleBlockLabel( blockType, attributes, 3 ) ).toBe(
+			'Recipe Block. Row 3. Cupcakes!'
+		);
 	} );
 
 	it( 'outputs just the block title and row number when there no label is available for the block', () => {
@@ -174,4 +177,3 @@ describe( 'getAccessibleBlockLabel', () => {
 		expect( getAccessibleBlockLabel( blockType, attributes, 3 ) ).toBe( 'Recipe Block. Row 3' );
 	} );
 } );
-

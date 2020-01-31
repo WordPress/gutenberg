@@ -50,14 +50,9 @@ class PostPermalinkEditor extends Component {
 		/* eslint-disable jsx-a11y/no-autofocus */
 		// Autofocus is allowed here, as this mini-UI is only loaded when the user clicks to open it.
 		return (
-			<form
-				className="editor-post-permalink-editor"
-				onSubmit={ this.onSavePermalink }
-			>
+			<form className="editor-post-permalink-editor" onSubmit={ this.onSavePermalink }>
 				<span className="editor-post-permalink__editor-container">
-					<span className="editor-post-permalink-editor__prefix">
-						{ prefix }
-					</span>
+					<span className="editor-post-permalink-editor__prefix">{ prefix }</span>
 					<input
 						className="editor-post-permalink-editor__edit"
 						aria-label={ __( 'Edit post permalink' ) }
@@ -66,9 +61,7 @@ class PostPermalinkEditor extends Component {
 						type="text"
 						autoFocus
 					/>
-					<span className="editor-post-permalink-editor__suffix">
-						{ suffix }
-					</span>
+					<span className="editor-post-permalink-editor__suffix">{ suffix }</span>
 					&lrm;
 				</span>
 				<Button
@@ -96,4 +89,3 @@ export default compose( [
 		return { editPost };
 	} ),
 ] )( PostPermalinkEditor );
-

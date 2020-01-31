@@ -93,5 +93,5 @@ export default compose(
 		return {
 			togglePublishSidebar,
 		};
-	} ),
+	} )
 )( PostPublishButtonOrToggle );

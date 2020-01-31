@@ -115,13 +115,7 @@ const deprecated = [
 		},
 		supports,
 		save( { attributes } ) {
-			const {
-				hasFixedLayout,
-				head,
-				body,
-				foot,
-				backgroundColor,
-			} = attributes;
+			const { hasFixedLayout, head, body, foot, backgroundColor } = attributes;
 			const isEmpty = ! head.length && ! body.length && ! foot.length;
 
 			if ( isEmpty ) {
@@ -146,14 +140,14 @@ const deprecated = [
 					<Tag>
 						{ rows.map( ( { cells }, rowIndex ) => (
 							<tr key={ rowIndex }>
-								{ cells.map( ( { content, tag, scope }, cellIndex ) =>
+								{ cells.map( ( { content, tag, scope }, cellIndex ) => (
 									<RichText.Content
 										tagName={ tag }
 										value={ content }
 										key={ cellIndex }
 										scope={ tag === 'th' ? scope : undefined }
 									/>
-								) }
+								) ) }
 							</tr>
 						) ) }
 					</Tag>

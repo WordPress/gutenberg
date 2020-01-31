@@ -10,11 +10,7 @@ import classnames from 'classnames';
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	hasBlockSupport,
-	parseWithAttributeSchema,
-	getSaveContent,
-} from '@wordpress/blocks';
+import { hasBlockSupport, parseWithAttributeSchema, getSaveContent } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -153,6 +149,14 @@ export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
-addFilter( 'editor.BlockEdit', 'core/editor/custom-class-name/with-inspector-control', withInspectorControl );
+addFilter(
+	'editor.BlockEdit',
+	'core/editor/custom-class-name/with-inspector-control',
+	withInspectorControl
+);
 addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
-addFilter( 'blocks.getBlockAttributes', 'core/custom-class-name/addParsedDifference', addParsedDifference );
+addFilter(
+	'blocks.getBlockAttributes',
+	'core/custom-class-name/addParsedDifference',
+	addParsedDifference
+);

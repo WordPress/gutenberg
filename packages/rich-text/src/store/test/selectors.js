@@ -41,11 +41,7 @@ describe( 'selectors', () => {
 
 	describe( 'getFormatTypes', () => {
 		it( 'should get format types', () => {
-			const expected = [
-				formatType,
-				formatTypeClassName,
-				formatTypeBareTag,
-			];
+			const expected = [ formatType, formatTypeClassName, formatTypeBareTag ];
 			expect( getFormatTypes( defaultState ) ).toEqual( expected );
 		} );
 	} );

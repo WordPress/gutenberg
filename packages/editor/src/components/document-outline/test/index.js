@@ -23,8 +23,8 @@ describe( 'DocumentOutline', () => {
 		registerBlockType( 'core/heading', {
 			category: 'common',
 			title: 'Heading',
-			edit: () => { },
-			save: () => { },
+			edit: () => {},
+			save: () => {},
 			attributes: {
 				level: {
 					type: 'number',
@@ -39,14 +39,14 @@ describe( 'DocumentOutline', () => {
 		registerBlockType( 'core/paragraph', {
 			category: 'common',
 			title: 'Paragraph',
-			edit: () => { },
+			edit: () => {},
 			save: () => {},
 		} );
 
 		registerBlockType( 'core/columns', {
 			category: 'common',
 			title: 'Paragraph',
-			edit: () => { },
+			edit: () => {},
 			save: () => {},
 		} );
 
@@ -143,14 +143,24 @@ describe( 'DocumentOutline', () => {
 			const firstItemLevels = tableOfContentItems.at( 0 ).find( outlineLevelsSelector );
 			expect( firstItemLevels ).toHaveLength( 1 );
 			expect( firstItemLevels.at( 0 ).text() ).toEqual( 'H2' );
-			expect( tableOfContentItems.at( 0 ).find( outlineItemContentSelector ).text() ).toEqual( 'Heading parent' );
+			expect(
+				tableOfContentItems
+					.at( 0 )
+					.find( outlineItemContentSelector )
+					.text()
+			).toEqual( 'Heading parent' );
 
 			//nested heading test
 			const secondItemLevels = tableOfContentItems.at( 1 ).find( outlineLevelsSelector );
 			expect( secondItemLevels ).toHaveLength( 2 );
 			expect( secondItemLevels.at( 0 ).text() ).toEqual( 'Block Title' );
 			expect( secondItemLevels.at( 1 ).text() ).toEqual( 'H3' );
-			expect( tableOfContentItems.at( 1 ).find( outlineItemContentSelector ).text() ).toEqual( 'Heading child' );
+			expect(
+				tableOfContentItems
+					.at( 1 )
+					.find( outlineItemContentSelector )
+					.text()
+			).toEqual( 'Heading child' );
 		} );
 	} );
 } );

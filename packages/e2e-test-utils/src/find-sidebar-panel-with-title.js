@@ -14,7 +14,9 @@ import { first } from 'lodash';
  */
 export async function findSidebarPanelWithTitle( panelTitle ) {
 	const classSelect = ( className ) => `[contains(concat(" ", @class, " "), " ${ className } ")]`;
-	const buttonSelector = `//div${ classSelect( 'edit-post-sidebar' ) }//button${ classSelect( 'components-button' ) }${ classSelect( 'components-panel__body-toggle' ) }[contains(text(),"${ panelTitle }")]`;
+	const buttonSelector = `//div${ classSelect( 'edit-post-sidebar' ) }//button${ classSelect(
+		'components-button'
+	) }${ classSelect( 'components-panel__body-toggle' ) }[contains(text(),"${ panelTitle }")]`;
 	const panelSelector = `${ buttonSelector }/ancestor::*[contains(concat(" ", @class, " "), " components-panel__body ")]`;
 	return first( await page.$x( panelSelector ) );
 }

@@ -6,33 +6,26 @@ import { deepFilterHTML } from '../utils';
 
 describe( 'specialCommentConverter', () => {
 	it( 'should convert a single "more" comment into a basic block', () => {
-		expect( deepFilterHTML(
-			'<p><!--more--></p>',
-			[ specialCommentConverter ]
-		) ).toEqual(
+		expect( deepFilterHTML( '<p><!--more--></p>', [ specialCommentConverter ] ) ).toEqual(
 			'<p></p><wp-block data-block="core/more"></wp-block>'
 		);
 	} );
 	it( 'should convert a single "nextpage" comment into a basic block', () => {
-		expect(
-			deepFilterHTML( '<p><!--nextpage--></p>', [ specialCommentConverter ] )
-		).toEqual(
+		expect( deepFilterHTML( '<p><!--nextpage--></p>', [ specialCommentConverter ] ) ).toEqual(
 			'<p></p><wp-block data-block="core/nextpage"></wp-block>'
 		);
 	} );
 	it( 'should convert two comments into a block', () => {
-		expect( deepFilterHTML(
-			'<p><!--more--><!--noteaser--></p>',
-			[ specialCommentConverter ]
-		) ).toEqual(
-			'<p></p><wp-block data-block="core/more" data-no-teaser=""></wp-block>'
-		);
+		expect(
+			deepFilterHTML( '<p><!--more--><!--noteaser--></p>', [ specialCommentConverter ] )
+		).toEqual( '<p></p><wp-block data-block="core/more" data-no-teaser=""></wp-block>' );
 	} );
 	it( 'should pass custom text to the block', () => {
-		expect( deepFilterHTML(
-			'<p><!--more Read all about it!--><!--noteaser--></p>',
-			[ specialCommentConverter ]
-		) ).toEqual(
+		expect(
+			deepFilterHTML( '<p><!--more Read all about it!--><!--noteaser--></p>', [
+				specialCommentConverter,
+			] )
+		).toEqual(
 			'<p></p><wp-block data-block="core/more" data-custom-text="Read all about it!" data-no-teaser=""></wp-block>'
 		);
 	} );
@@ -52,10 +45,9 @@ describe( 'specialCommentConverter', () => {
 
 	describe( 'when tags have been reformatted', () => {
 		it( 'should parse special comments', () => {
-			const output = deepFilterHTML(
-				'<p><!--more--><!--noteaser--></p>',
-				[ specialCommentConverter ]
-			);
+			const output = deepFilterHTML( '<p><!--more--><!--noteaser--></p>', [
+				specialCommentConverter,
+			] );
 			expect( output ).toEqual(
 				'<p></p><wp-block data-block="core/more" data-no-teaser=""></wp-block>'
 			);

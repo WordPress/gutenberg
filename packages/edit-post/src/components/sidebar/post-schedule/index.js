@@ -3,15 +3,17 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
-import { PostSchedule as PostScheduleForm, PostScheduleLabel, PostScheduleCheck } from '@wordpress/editor';
+import {
+	PostSchedule as PostScheduleForm,
+	PostScheduleLabel,
+	PostScheduleCheck,
+} from '@wordpress/editor';
 
 export function PostSchedule() {
 	return (
 		<PostScheduleCheck>
 			<PanelRow className="edit-post-post-schedule">
-				<span>
-					{ __( 'Publish' ) }
-				</span>
+				<span>{ __( 'Publish' ) }</span>
 				<Dropdown
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"

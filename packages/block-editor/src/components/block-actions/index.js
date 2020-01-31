@@ -55,10 +55,7 @@ export default compose( [
 			);
 		} );
 
-		const canInsertDefaultBlock = canInsertBlockType(
-			getDefaultBlockName(),
-			rootClientId
-		);
+		const canInsertDefaultBlock = canInsertBlockType( getDefaultBlockName(), rootClientId );
 
 		return {
 			blocks,
@@ -70,10 +67,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, props, { select } ) => {
-		const {
-			clientIds,
-			blocks,
-		} = props;
+		const { clientIds, blocks } = props;
 
 		const {
 			removeBlocks,
@@ -101,9 +95,7 @@ export default compose( [
 					return;
 				}
 
-				const {
-					getGroupingBlockName,
-				} = select( 'core/blocks' );
+				const { getGroupingBlockName } = select( 'core/blocks' );
 
 				const groupingBlockName = getGroupingBlockName();
 
@@ -113,10 +105,7 @@ export default compose( [
 				if ( ! newBlocks ) {
 					return;
 				}
-				replaceBlocks(
-					clientIds,
-					newBlocks
-				);
+				replaceBlocks( clientIds, newBlocks );
 			},
 
 			onUngroup() {
@@ -130,10 +119,7 @@ export default compose( [
 					return;
 				}
 
-				replaceBlocks(
-					clientIds,
-					innerBlocks
-				);
+				replaceBlocks( clientIds, innerBlocks );
 			},
 		};
 	} ),

@@ -241,6 +241,7 @@
 			"wp-scripts lint-style"
 		],
 		"*.js": [
+			"wp-scripts format-js",
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [

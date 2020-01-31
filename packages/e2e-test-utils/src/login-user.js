@@ -14,9 +14,7 @@ import { pressKeyWithModifier } from './press-key-with-modifier';
  */
 export async function loginUser( username = WP_USERNAME, password = WP_PASSWORD ) {
 	if ( ! isCurrentURL( 'wp-login.php' ) ) {
-		await page.goto(
-			createURL( 'wp-login.php' )
-		);
+		await page.goto( createURL( 'wp-login.php' ) );
 	}
 
 	await page.focus( '#user_login' );

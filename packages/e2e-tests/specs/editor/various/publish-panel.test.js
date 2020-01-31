@@ -14,7 +14,7 @@ import {
 describe( 'PostPublishPanel', () => {
 	let werePrePublishChecksEnabled;
 	beforeEach( async () => {
-		await createNewPost( );
+		await createNewPost();
 		werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
 		if ( ! werePrePublishChecksEnabled ) {
 			await enablePrePublishChecks();

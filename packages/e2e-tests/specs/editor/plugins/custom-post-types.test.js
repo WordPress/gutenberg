@@ -50,7 +50,10 @@ describe( 'Test Custom Post Types', () => {
 		// Reload the child post and verify it is still correctly selected as a child post.
 		await page.reload();
 		await page.waitForSelector( SELECT_OPTION_SELECTOR );
-		const selectedValue = await page.$eval( '.editor-page-attributes__parent select', ( el ) => el.value );
+		const selectedValue = await page.$eval(
+			'.editor-page-attributes__parent select',
+			( el ) => el.value
+		);
 		expect( selectedValue ).toEqual( valueToSelect );
 	} );
 } );

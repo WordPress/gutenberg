@@ -134,12 +134,13 @@ function entity( entityConfig ) {
 	return flowRight( [
 		// Limit to matching action type so we don't attempt to replace action on
 		// an unhandled action.
-		ifMatchingAction( ( action ) => (
-			action.name &&
-			action.kind &&
-			action.name === entityConfig.name &&
-			action.kind === entityConfig.kind
-		) ),
+		ifMatchingAction(
+			( action ) =>
+				action.name &&
+				action.kind &&
+				action.name === entityConfig.name &&
+				action.kind === entityConfig.kind
+		),
 
 		// Inject the entity config into the action.
 		replaceAction( ( action ) => {
@@ -239,10 +240,7 @@ function entity( entityConfig ) {
 export function entitiesConfig( state = defaultEntities, action ) {
 	switch ( action.type ) {
 		case 'ADD_ENTITIES':
-			return [
-				...state,
-				...action.entities,
-			];
+			return [ ...state, ...action.entities ];
 	}
 
 	return state;
@@ -263,18 +261,22 @@ export const entities = ( state = {}, action ) => {
 	let entitiesDataReducer = state.reducer;
 	if ( ! entitiesDataReducer || newConfig !== state.config ) {
 		const entitiesByKind = groupBy( newConfig, 'kind' );
-		entitiesDataReducer = combineReducers( Object.entries( entitiesByKind ).reduce( ( memo, [ kind, subEntities ] ) => {
-			const kindReducer = combineReducers( subEntities.reduce(
-				( kindMemo, entityConfig ) => ( {
-					...kindMemo,
-					[ entityConfig.name ]: entity( entityConfig ),
-				} ),
-				{}
-			) );
+		entitiesDataReducer = combineReducers(
+			Object.entries( entitiesByKind ).reduce( ( memo, [ kind, subEntities ] ) => {
+				const kindReducer = combineReducers(
+					subEntities.reduce(
+						( kindMemo, entityConfig ) => ( {
+							...kindMemo,
+							[ entityConfig.name ]: entity( entityConfig ),
+						} ),
+						{}
+					)
+				);
 
-			memo[ kind ] = kindReducer;
-			return memo;
-		}, {} ) );
+				memo[ kind ] = kindReducer;
+				return memo;
+			}, {} )
+		);
 	}
 
 	const newData = entitiesDataReducer( state.data, action );
@@ -310,8 +312,7 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 		case 'EDIT_ENTITY_RECORD':
 		case 'CREATE_UNDO_LEVEL':
 			let isCreateUndoLevel = action.type === 'CREATE_UNDO_LEVEL';
-			const isUndoOrRedo =
-				! isCreateUndoLevel && ( action.meta.isUndo || action.meta.isRedo );
+			const isUndoOrRedo = ! isCreateUndoLevel && ( action.meta.isUndo || action.meta.isRedo );
 			if ( isCreateUndoLevel ) {
 				action = lastEditAction;
 			} else if ( ! isUndoOrRedo ) {
@@ -388,9 +389,7 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 					kind: action.kind,
 					name: action.name,
 					recordId: action.recordId,
-					edits: isCreateUndoLevel ?
-						{ ...state.flattenedUndo, ...action.edits } :
-						action.edits,
+					edits: isCreateUndoLevel ? { ...state.flattenedUndo, ...action.edits } : action.edits,
 				} );
 			}
 			return nextState;

@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { createBlobURL } from '@wordpress/blob';
-import {
-	createBlock,
-	getBlockAttributes,
-} from '@wordpress/blocks';
+import { createBlock, getBlockAttributes } from '@wordpress/blocks';
 
 export function stripFirstImage( attributes, { shortcode } ) {
 	const { body } = document.implementation.createHTMLDocument( '' );
@@ -33,10 +30,7 @@ function getFirstAnchorAttributeFormHTML( html, attributeName ) {
 
 	const { firstElementChild } = body;
 
-	if (
-		firstElementChild &&
-		firstElementChild.nodeName === 'A'
-	) {
+	if ( firstElementChild && firstElementChild.nodeName === 'A' ) {
 		return firstElementChild.getAttribute( attributeName ) || undefined;
 	}
 }
@@ -82,8 +76,16 @@ const transforms = {
 				const linkDestination = anchorElement && anchorElement.href ? 'custom' : undefined;
 				const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
 				const rel = anchorElement && anchorElement.rel ? anchorElement.rel : undefined;
-				const linkClass = anchorElement && anchorElement.className ? anchorElement.className : undefined;
-				const attributes = getBlockAttributes( 'core/image', node.outerHTML, { align, id, linkDestination, href, rel, linkClass } );
+				const linkClass =
+					anchorElement && anchorElement.className ? anchorElement.className : undefined;
+				const attributes = getBlockAttributes( 'core/image', node.outerHTML, {
+					align,
+					id,
+					linkDestination,
+					href,
+					rel,
+					linkClass,
+				} );
 				return createBlock( 'core/image', attributes );
 			},
 		},

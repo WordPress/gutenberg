@@ -6,18 +6,9 @@ import crossSpawn from 'cross-spawn';
 /**
  * Internal dependencies
  */
-import {
-	hasArgInCLI,
-	hasProjectFile,
-	spawnScript,
-} from '../';
-import {
-	getPackagePath as getPackagePathMock,
-} from '../package';
-import {
-	exit as exitMock,
-	getArgsFromCLI as getArgsFromCLIMock,
-} from '../process';
+import { hasArgInCLI, hasProjectFile, spawnScript } from '../';
+import { getPackagePath as getPackagePathMock } from '../package';
+import { exit as exitMock, getArgsFromCLI as getArgsFromCLIMock } from '../process';
 
 jest.mock( '../package', () => {
 	const module = require.requireActual( '../package' );
@@ -122,7 +113,9 @@ describe( 'utils', () => {
 
 			expect( () => spawnScript( scriptName ) ).toThrow( 'Exit code: 0.' );
 			expect( crossSpawnMock ).toHaveBeenCalledWith(
-				'node', [ expect.stringContaining( scriptName ) ], { stdio: 'inherit' }
+				'node',
+				[ expect.stringContaining( scriptName ) ],
+				{ stdio: 'inherit' }
 			);
 		} );
 
@@ -132,7 +125,9 @@ describe( 'utils', () => {
 
 			expect( () => spawnScript( scriptName, args ) ).toThrow( 'Exit code: 0.' );
 			expect( crossSpawnMock ).toHaveBeenCalledWith(
-				'node', [ expect.stringContaining( scriptName ), ...args ], { stdio: 'inherit' }
+				'node',
+				[ expect.stringContaining( scriptName ), ...args ],
+				{ stdio: 'inherit' }
 			);
 		} );
 	} );

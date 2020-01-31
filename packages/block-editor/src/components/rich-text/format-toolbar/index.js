@@ -19,17 +19,22 @@ const FormatToolbar = () => {
 	return (
 		<div className="block-editor-format-toolbar">
 			<Toolbar>
-				{ [ 'bold', 'italic', 'link' ].map( ( format ) =>
+				{ [ 'bold', 'italic', 'link' ].map( ( format ) => (
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
-				) }
+				) ) }
 				<Slot name="RichText.ToolbarControls">
-					{ ( fills ) => fills.length !== 0 &&
-						<DropdownMenu
-							icon={ false }
-							label={ __( 'More rich text controls' ) }
-							controls={ orderBy( fills.map( ( [ { props } ] ) => props ), 'title' ) }
-							popoverProps={ POPOVER_PROPS }
-						/>
+					{ ( fills ) =>
+						fills.length !== 0 && (
+							<DropdownMenu
+								icon={ false }
+								label={ __( 'More rich text controls' ) }
+								controls={ orderBy(
+									fills.map( ( [ { props } ] ) => props ),
+									'title'
+								) }
+								popoverProps={ POPOVER_PROPS }
+							/>
+						)
 					}
 				</Slot>
 			</Toolbar>

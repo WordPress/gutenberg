@@ -13,7 +13,14 @@ import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 
-const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId, onResizeStart, onResizeStop } ) => {
+const SpacerEdit = ( {
+	attributes,
+	isSelected,
+	setAttributes,
+	instanceId,
+	onResizeStart,
+	onResizeStop,
+} ) => {
 	const { height } = attributes;
 	const id = `block-spacer-height-input-${ instanceId }`;
 	const [ inputHeightValue, setInputHeightValue ] = useState( height );
@@ -21,10 +28,9 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId, onResi
 	return (
 		<>
 			<ResizableBox
-				className={ classnames(
-					'block-library-spacer__resize-container',
-					{ 'is-selected': isSelected },
-				) }
+				className={ classnames( 'block-library-spacer__resize-container', {
+					'is-selected': isSelected,
+				} ) }
 				size={ {
 					height,
 				} }

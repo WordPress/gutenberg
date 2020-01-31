@@ -10,15 +10,10 @@ import { isFunction } from 'lodash';
 /**
  * Internal dependencies
  */
-import {
-	Icon,
-	SelectControl,
-} from '../';
+import { Icon, SelectControl } from '../';
 import { __ } from '@wordpress/i18n';
 
-import {
-	Fragment,
-} from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -44,19 +39,17 @@ export function DimensionControl( props ) {
 			value: slug,
 		} ) );
 
-		return [ {
-			label: __( 'Default' ),
-			value: '',
-		} ].concat( options );
+		return [
+			{
+				label: __( 'Default' ),
+				value: '',
+			},
+		].concat( options );
 	};
 
 	const selectLabel = (
 		<Fragment>
-			{ icon && (
-				<Icon
-					icon={ icon }
-				/>
-			) }
+			{ icon && <Icon icon={ icon } /> }
 			{ label }
 		</Fragment>
 	);

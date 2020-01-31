@@ -15,10 +15,7 @@ function ConvertToGroupButtons( { clientIds } ) {
 		<__experimentalBlockSettingsMenuPluginsExtension>
 			{ ( { onClose } ) => (
 				<Fragment>
-					<ConvertToGroupButton
-						clientIds={ clientIds }
-						onToggle={ onClose }
-					/>
+					<ConvertToGroupButton clientIds={ clientIds } onToggle={ onClose } />
 				</Fragment>
 			) }
 		</__experimentalBlockSettingsMenuPluginsExtension>

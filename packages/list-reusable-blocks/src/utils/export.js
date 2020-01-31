@@ -23,11 +23,15 @@ async function exportReusableBlock( id ) {
 	const post = await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit` } );
 	const title = post.title.raw;
 	const content = post.content.raw;
-	const fileContent = JSON.stringify( {
-		__file: 'wp_block',
-		title,
-		content,
-	}, null, 2 );
+	const fileContent = JSON.stringify(
+		{
+			__file: 'wp_block',
+			title,
+			content,
+		},
+		null,
+		2
+	);
 	const fileName = kebabCase( title ) + '.json';
 
 	download( fileName, fileContent, 'application/json' );

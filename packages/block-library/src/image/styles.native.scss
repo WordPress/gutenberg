@@ -84,10 +84,18 @@
 	align-items: center;
 }
 
-.edit {
+.editContainer {
 	width: 44px;
 	height: 44px;
-	background-color: $dark-opacity-500;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.edit {
+	width: 30px;
+	height: 30px;
+	background-color: $gray-dark;
 	border-radius: 22px;
 	position: absolute;
 	top: 5px;
@@ -97,6 +105,6 @@
 .iconCustomise {
 	fill: #fff;
 	position: absolute;
-	top: 10px;
-	left: 10px;
+	top: 7px;
+	left: 7px;
 }

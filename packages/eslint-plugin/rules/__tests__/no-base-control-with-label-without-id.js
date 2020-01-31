@@ -61,14 +61,24 @@ ruleTester.run( 'no-base-control-with-label-without-id', rule, {
 			>
 				<input id="my-id" />
 			</BaseControl>`,
-			errors: [ { message: 'When using BaseControl component if a label property is passed an id property should also be passed.' } ],
+			errors: [
+				{
+					message:
+						'When using BaseControl component if a label property is passed an id property should also be passed.',
+				},
+			],
 		},
 		{
 			code: `
 			<BaseControl
 				label="ok"
 			/>`,
-			errors: [ { message: 'When using BaseControl component if a label property is passed an id property should also be passed.' } ],
+			errors: [
+				{
+					message:
+						'When using BaseControl component if a label property is passed an id property should also be passed.',
+				},
+			],
 		},
 	],
 } );

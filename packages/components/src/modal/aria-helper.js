@@ -3,13 +3,7 @@
  */
 import { forEach } from 'lodash';
 
-const LIVE_REGION_ARIA_ROLES = new Set( [
-	'alert',
-	'status',
-	'log',
-	'marquee',
-	'timer',
-] );
+const LIVE_REGION_ARIA_ROLES = new Set( [ 'alert', 'status', 'log', 'marquee', 'timer' ] );
 
 let hiddenElements = [],
 	isHidden = false;
@@ -32,9 +26,7 @@ export function hideApp( unhiddenElement ) {
 	}
 	const elements = document.body.children;
 	forEach( elements, ( element ) => {
-		if (
-			element === unhiddenElement
-		) {
+		if ( element === unhiddenElement ) {
 			return;
 		}
 		if ( elementShouldBeHidden( element ) ) {

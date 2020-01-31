@@ -167,16 +167,22 @@ class Sandbox extends Component {
 				<head>
 					<title>{ this.props.title }</title>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
-					{ ( this.props.styles && this.props.styles.map(
-						( rules, i ) => <style key={ i } dangerouslySetInnerHTML={ { __html: rules } } />
-					) ) }
+					{ this.props.styles &&
+						this.props.styles.map( ( rules, i ) => (
+							<style key={ i } dangerouslySetInnerHTML={ { __html: rules } } />
+						) ) }
 				</head>
-				<body data-resizable-iframe-connected="data-resizable-iframe-connected" className={ this.props.type }>
+				<body
+					data-resizable-iframe-connected="data-resizable-iframe-connected"
+					className={ this.props.type }
+				>
 					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />
-					<script type="text/javascript" dangerouslySetInnerHTML={ { __html: observeAndResizeJS } } />
-					{ ( this.props.scripts && this.props.scripts.map(
-						( src ) => <script key={ src } src={ src } />
-					) ) }
+					<script
+						type="text/javascript"
+						dangerouslySetInnerHTML={ { __html: observeAndResizeJS } }
+					/>
+					{ this.props.scripts &&
+						this.props.scripts.map( ( src ) => <script key={ src } src={ src } /> ) }
 				</body>
 			</html>
 		);
@@ -209,7 +215,8 @@ class Sandbox extends Component {
 				onLoad={ this.trySandbox }
 				onFocus={ onFocus }
 				width={ Math.ceil( this.state.width ) }
-				height={ Math.ceil( this.state.height ) } />
+				height={ Math.ceil( this.state.height ) }
+			/>
 		);
 	}
 }

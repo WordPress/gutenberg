@@ -40,11 +40,7 @@ export class DateTimePicker extends Component {
 			<div className="components-datetime">
 				{ ! this.state.calendarHelpIsVisible && (
 					<>
-						<TimePicker
-							currentTime={ currentDate }
-							onChange={ onChange }
-							is12Hour={ is12Hour }
-						/>
+						<TimePicker currentTime={ currentDate } onChange={ onChange } is12Hour={ is12Hour } />
 						<DatePicker
 							currentDate={ currentDate }
 							onChange={ onChange }
@@ -58,7 +54,11 @@ export class DateTimePicker extends Component {
 						<div className="components-datetime__calendar-help">
 							<h4>{ __( 'Click to Select' ) }</h4>
 							<ul>
-								<li>{ __( 'Click the right or left arrows to select other months in the past or the future.' ) }</li>
+								<li>
+									{ __(
+										'Click the right or left arrows to select other months in the past or the future.'
+									) }
+								</li>
 								<li>{ __( 'Click the desired day to select it.' ) }</li>
 							</ul>
 

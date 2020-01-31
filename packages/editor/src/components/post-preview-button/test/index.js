@@ -58,7 +58,8 @@ describe( 'PostPreviewButton', () => {
 					postId={ 1 }
 					currentPostLink="https://wordpress.org/?p=1"
 					isSaveable
-					modified="2017-08-03T15:05:50" />
+					modified="2017-08-03T15:05:50"
+				/>
 			);
 
 			const previewWindow = { location: {} };
@@ -91,12 +92,7 @@ describe( 'PostPreviewButton', () => {
 				},
 			} ) );
 
-			const wrapper = shallow(
-				<PostPreviewButton
-					postId={ 1 }
-					autosave={ autosave }
-				/>
-			);
+			const wrapper = shallow( <PostPreviewButton postId={ 1 } autosave={ autosave } /> );
 
 			wrapper.simulate( 'click', {
 				preventDefault,
@@ -123,11 +119,7 @@ describe( 'PostPreviewButton', () => {
 			} ) );
 
 			const wrapper = shallow(
-				<PostPreviewButton
-					postId={ 1 }
-					autosave={ autosave }
-					isAutosaveable
-				/>
+				<PostPreviewButton postId={ 1 } autosave={ autosave } isAutosaveable />
 			);
 
 			wrapper.simulate( 'click', { preventDefault } );
@@ -136,7 +128,9 @@ describe( 'PostPreviewButton', () => {
 			expect( window.open ).toHaveBeenCalledWith( '', 'wp-preview-1' );
 			expect( wrapper.instance().previewWindow.focus ).toHaveBeenCalled();
 			expect( autosave ).toHaveBeenCalled();
-			expect( wrapper.instance().previewWindow.document.write.mock.calls[ 0 ][ 0 ] ).toContain( 'Generating preview…' );
+			expect( wrapper.instance().previewWindow.document.write.mock.calls[ 0 ][ 0 ] ).toContain(
+				'Generating preview…'
+			);
 			expect( wrapper.instance().previewWindow.document.close ).toHaveBeenCalled();
 		} );
 	} );
@@ -157,11 +151,7 @@ describe( 'PostPreviewButton', () => {
 
 		it( 'should render currentPostLink otherwise', () => {
 			const wrapper = shallow(
-				<PostPreviewButton
-					postId={ 1 }
-					isSaveable
-					currentPostLink="https://wordpress.org/?p=1"
-				/>
+				<PostPreviewButton postId={ 1 } isSaveable currentPostLink="https://wordpress.org/?p=1" />
 			);
 
 			expect( wrapper ).toMatchSnapshot();
@@ -169,10 +159,7 @@ describe( 'PostPreviewButton', () => {
 
 		it( 'should be disabled if post is not saveable', () => {
 			const wrapper = shallow(
-				<PostPreviewButton
-					postId={ 1 }
-					currentPostLink="https://wordpress.org/?p=1"
-				/>
+				<PostPreviewButton postId={ 1 } currentPostLink="https://wordpress.org/?p=1" />
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );

@@ -1,15 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	deburr,
-	differenceWith,
-	find,
-	get,
-	intersectionWith,
-	isEmpty,
-	words,
-} from 'lodash';
+import { deburr, differenceWith, find, get, intersectionWith, isEmpty, words } from 'lodash';
 
 /**
  * Converts the search term into a list of normalized terms.
@@ -60,68 +52,63 @@ export const searchItems = ( items, categories, collections, searchTerm ) => {
 		return items;
 	}
 
-	return items.filter( ( { name, title, category, keywords = [], patterns = [] } ) => {
-		let unmatchedTerms = removeMatchingTerms(
-			normalizedSearchTerms,
-			title
-		);
+	return items
+		.filter( ( { name, title, category, keywords = [], patterns = [] } ) => {
+			let unmatchedTerms = removeMatchingTerms( normalizedSearchTerms, title );
 
-		if ( unmatchedTerms.length === 0 ) {
-			return true;
-		}
+			if ( unmatchedTerms.length === 0 ) {
+				return true;
+			}
 
-		unmatchedTerms = removeMatchingTerms(
-			unmatchedTerms,
-			keywords.join( ' ' ),
-		);
+			unmatchedTerms = removeMatchingTerms( unmatchedTerms, keywords.join( ' ' ) );
 
-		if ( unmatchedTerms.length === 0 ) {
-			return true;
-		}
+			if ( unmatchedTerms.length === 0 ) {
+				return true;
+			}
 
-		unmatchedTerms = removeMatchingTerms(
-			unmatchedTerms,
-			get( find( categories, { slug: category } ), [ 'title' ] ),
-		);
-
-		const itemCollection = collections[ name.split( '/' )[ 0 ] ];
-		if ( itemCollection ) {
 			unmatchedTerms = removeMatchingTerms(
 				unmatchedTerms,
-				itemCollection.title
+				get( find( categories, { slug: category } ), [ 'title' ] )
 			);
-		}
 
-		if ( unmatchedTerms.length === 0 ) {
-			return true;
-		}
+			const itemCollection = collections[ name.split( '/' )[ 0 ] ];
+			if ( itemCollection ) {
+				unmatchedTerms = removeMatchingTerms( unmatchedTerms, itemCollection.title );
+			}
 
-		unmatchedTerms = removeMatchingTerms(
-			unmatchedTerms,
-			patterns.map( ( pattern ) => pattern.title ).join( ' ' ),
-		);
+			if ( unmatchedTerms.length === 0 ) {
+				return true;
+			}
 
-		return unmatchedTerms.length === 0;
-	} ).map( ( item ) => {
-		if ( isEmpty( item.patterns ) ) {
-			return item;
-		}
+			unmatchedTerms = removeMatchingTerms(
+				unmatchedTerms,
+				patterns.map( ( pattern ) => pattern.title ).join( ' ' )
+			);
 
-		const matchedPatterns = item.patterns.filter( ( pattern ) => {
-			return intersectionWith(
-				normalizedSearchTerms,
-				normalizeSearchTerm( pattern.title ),
-				( termToMatch, labelTerm ) => labelTerm.includes( termToMatch )
-			).length > 0;
+			return unmatchedTerms.length === 0;
+		} )
+		.map( ( item ) => {
+			if ( isEmpty( item.patterns ) ) {
+				return item;
+			}
+
+			const matchedPatterns = item.patterns.filter( ( pattern ) => {
+				return (
+					intersectionWith(
+						normalizedSearchTerms,
+						normalizeSearchTerm( pattern.title ),
+						( termToMatch, labelTerm ) => labelTerm.includes( termToMatch )
+					).length > 0
+				);
+			} );
+			// When no partterns matched, fallback to all patterns.
+			if ( isEmpty( matchedPatterns ) ) {
+				return item;
+			}
+
+			return {
+				...item,
+				patterns: matchedPatterns,
+			};
 		} );
-		// When no partterns matched, fallback to all patterns.
-		if ( isEmpty( matchedPatterns ) ) {
-			return item;
-		}
-
-		return {
-			...item,
-			patterns: matchedPatterns,
-		};
-	} );
 };

@@ -48,21 +48,19 @@ export default function Guide( { children, className, contentLabel, finishButton
 			contentLabel={ contentLabel }
 			onRequestClose={ onFinish }
 		>
-
-			<KeyboardShortcuts key={ currentPage } shortcuts={ {
-				left: goBack,
-				right: goForward,
-			} } />
+			<KeyboardShortcuts
+				key={ currentPage }
+				shortcuts={ {
+					left: goBack,
+					right: goForward,
+				} }
+			/>
 
 			<div className="components-guide__container">
-
 				{ children[ currentPage ] }
 
 				{ ! canGoForward && (
-					<FinishButton
-						className="components-guide__inline-finish-button"
-						onClick={ onFinish }
-					>
+					<FinishButton className="components-guide__inline-finish-button" onClick={ onFinish }>
 						{ finishButtonText || __( 'Finish' ) }
 					</FinishButton>
 				) }
@@ -92,17 +90,12 @@ export default function Guide( { children, className, contentLabel, finishButton
 						</Button>
 					) }
 					{ ! canGoForward && (
-						<FinishButton
-							className="components-guide__finish-button"
-							onClick={ onFinish }
-						>
+						<FinishButton className="components-guide__finish-button" onClick={ onFinish }>
 							{ finishButtonText || __( 'Finish' ) }
 						</FinishButton>
 					) }
 				</div>
-
 			</div>
-
 		</Modal>
 	);
 }

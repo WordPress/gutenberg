@@ -24,12 +24,14 @@ import icon from './media-container-icon';
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 
 export function imageFillStyles( url, focalPoint ) {
-	return url ?
-		{
-			backgroundImage: `url(${ url })`,
-			backgroundPosition: focalPoint ? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%` : `50% 50%`,
-		} :
-		{};
+	return url
+		? {
+				backgroundImage: `url(${ url })`,
+				backgroundPosition: focalPoint
+					? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
+					: `50% 50%`,
+		  }
+		: {};
 }
 
 class MediaContainer extends Component {
@@ -102,7 +104,15 @@ class MediaContainer extends Component {
 	}
 
 	render() {
-		const { mediaPosition, mediaUrl, mediaType, mediaWidth, commitWidthChange, onWidthChange, toggleSelection } = this.props;
+		const {
+			mediaPosition,
+			mediaUrl,
+			mediaType,
+			mediaWidth,
+			commitWidthChange,
+			onWidthChange,
+			toggleSelection,
+		} = this.props;
 		if ( mediaType && mediaUrl ) {
 			const onResizeStart = () => {
 				toggleSelection( false );

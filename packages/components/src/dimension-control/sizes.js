@@ -38,7 +38,8 @@ export default [
 	{
 		name: __( 'Large' ),
 		slug: 'large',
-	}, {
+	},
+	{
 		name: __( 'Extra Large' ),
 		slug: 'xlarge',
 	},

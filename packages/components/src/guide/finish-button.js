@@ -20,12 +20,7 @@ export default function FinishButton( { className, onClick, children } ) {
 	}, [ button ] );
 
 	return (
-		<Button
-			ref={ button }
-			className={ className }
-			isPrimary
-			onClick={ onClick }
-		>
+		<Button ref={ button } className={ className } isPrimary onClick={ onClick }>
 			{ children }
 		</Button>
 	);

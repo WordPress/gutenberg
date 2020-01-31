@@ -4,14 +4,13 @@
 const getSymbolTagsByName = require( '../get-symbol-tags-by-name' );
 
 const cleanSpaces = ( paragraph ) =>
-	paragraph ?
-		paragraph.split( '\n' ).map(
-			( sentence ) => sentence.trim()
-		).reduce(
-			( acc, current ) => acc + ' ' + current,
-			''
-		).trim() :
-		'';
+	paragraph
+		? paragraph
+				.split( '\n' )
+				.map( ( sentence ) => sentence.trim() )
+				.reduce( ( acc, current ) => acc + ' ' + current, '' )
+				.trim()
+		: '';
 
 const formatTag = ( title, tags, formatter, docs ) => {
 	if ( tags && tags.length > 0 ) {
@@ -30,18 +29,14 @@ const formatExamples = ( tags, docs ) => {
 		docs.push( '*Usage*' );
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( ...tags.map(
-			( tag ) => `${ tag.description }`
-		).join( '\n\n' ) );
+		docs.push( ...tags.map( ( tag ) => `${ tag.description }` ).join( '\n\n' ) );
 	}
 };
 
 const formatDeprecated = ( tags, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
-		docs.push( ...tags.map(
-			( tag ) => `\n> **Deprecated** ${ cleanSpaces( tag.description ) }`
-		) );
+		docs.push( ...tags.map( ( tag ) => `\n> **Deprecated** ${ cleanSpaces( tag.description ) }` ) );
 	}
 };
 
@@ -104,7 +99,8 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 			formatTag(
 				'Parameters',
 				getSymbolTagsByName( symbol, 'param' ),
-				( tag ) => `\n- *${ tag.name }* ${ getTypeOutput( tag.type ) }: ${ cleanSpaces( tag.description ) }`,
+				( tag ) =>
+					`\n- *${ tag.name }* ${ getTypeOutput( tag.type ) }: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
@@ -122,7 +118,8 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 			formatTag(
 				'Properties',
 				getSymbolTagsByName( symbol, 'property' ),
-				( tag ) => `\n- *${ tag.name }* ${ getTypeOutput( tag.type ) }: ${ cleanSpaces( tag.description ) }`,
+				( tag ) =>
+					`\n- *${ tag.name }* ${ getTypeOutput( tag.type ) }: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			docs.push( '\n' );

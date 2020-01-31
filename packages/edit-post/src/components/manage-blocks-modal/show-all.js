@@ -11,14 +11,9 @@ export default function BlockManagerShowAll( { checked, onChange } ) {
 
 	return (
 		<div className="edit-post-manage-blocks-modal__show-all">
-			<label
-				htmlFor={ id }
-				className="edit-post-manage-blocks-modal__show-all-label"
-			>
-				{
-					/* translators: Checkbox toggle label */
-					__( 'Show section' )
-				}
+			<label htmlFor={ id } className="edit-post-manage-blocks-modal__show-all-label">
+				{ /* translators: Checkbox toggle label */
+				__( 'Show section' ) }
 			</label>
 			<FormToggle
 				id={ id }

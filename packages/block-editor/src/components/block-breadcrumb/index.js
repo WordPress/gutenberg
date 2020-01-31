@@ -18,11 +18,9 @@ import BlockTitle from '../block-title';
 const BlockBreadcrumb = function() {
 	const { selectBlock, clearSelectedBlock } = useDispatch( 'core/block-editor' );
 	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
-		const {
-			getSelectionStart,
-			getSelectedBlockClientId,
-			getBlockParents,
-		} = select( 'core/block-editor' );
+		const { getSelectionStart, getSelectedBlockClientId, getBlockParents } = select(
+			'core/block-editor'
+		);
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			parents: getBlockParents( selectedBlockClientId ),
@@ -37,7 +35,11 @@ const BlockBreadcrumb = function() {
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
 	return (
-		<ul className="block-editor-block-breadcrumb" role="list" aria-label={ __( 'Block breadcrumb' ) }>
+		<ul
+			className="block-editor-block-breadcrumb"
+			role="list"
+			aria-label={ __( 'Block breadcrumb' ) }
+		>
 			<li
 				className={ ! hasSelection ? 'block-editor-block-breadcrumb__current' : undefined }
 				aria-current={ ! hasSelection ? 'true' : undefined }

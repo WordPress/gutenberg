@@ -3,7 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextToolbarButton, RichTextShortcut, __unstableRichTextInputEvent } from '@wordpress/block-editor';
+import {
+	RichTextToolbarButton,
+	RichTextShortcut,
+	__unstableRichTextInputEvent,
+} from '@wordpress/block-editor';
 
 const name = 'core/italic';
 const title = __( 'Italic' );
@@ -25,11 +29,7 @@ export const italic = {
 
 		return (
 			<>
-				<RichTextShortcut
-					type="primary"
-					character="i"
-					onUse={ onToggle }
-				/>
+				<RichTextShortcut type="primary" character="i" onUse={ onToggle } />
 				<RichTextToolbarButton
 					name="italic"
 					icon="editor-italic"
@@ -39,10 +39,7 @@ export const italic = {
 					shortcutType="primary"
 					shortcutCharacter="i"
 				/>
-				<__unstableRichTextInputEvent
-					inputType="formatItalic"
-					onInput={ onToggle }
-				/>
+				<__unstableRichTextInputEvent inputType="formatItalic" onInput={ onToggle } />
 			</>
 		);
 	},

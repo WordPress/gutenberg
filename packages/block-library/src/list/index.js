@@ -27,7 +27,8 @@ export const settings = {
 	},
 	example: {
 		attributes: {
-			values: '<li>Alice.</li><li>The White Rabbit.</li><li>The Cheshire Cat.</li><li>The Mad Hatter.</li><li>The Queen of Hearts.</li>',
+			values:
+				'<li>Alice.</li><li>The White Rabbit.</li><li>The Cheshire Cat.</li><li>The Mad Hatter.</li><li>The Queen of Hearts.</li>',
 		},
 	},
 	transforms,

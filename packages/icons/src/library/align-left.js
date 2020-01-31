@@ -10,4 +10,3 @@ const alignLeft = (
 );
 
 export default alignLeft;
-
