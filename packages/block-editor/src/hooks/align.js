@@ -47,7 +47,11 @@ const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
  *
  * @return {string[]} Valid alignments.
  */
-export function getValidAlignments( blockAlign, hasWideBlockSupport = true, hasWideEnabled = true ) {
+export function getValidAlignments(
+	blockAlign,
+	hasWideBlockSupport = true,
+	hasWideEnabled = true
+) {
 	let validAlignments;
 	if ( Array.isArray( blockAlign ) ) {
 		validAlignments = blockAlign;
@@ -58,10 +62,7 @@ export function getValidAlignments( blockAlign, hasWideBlockSupport = true, hasW
 		validAlignments = [];
 	}
 
-	if (
-		! hasWideEnabled ||
-		( blockAlign === true && ! hasWideBlockSupport )
-	) {
+	if ( ! hasWideEnabled || ( blockAlign === true && ! hasWideBlockSupport ) ) {
 		return without( validAlignments, ...WIDE_ALIGNMENTS );
 	}
 
@@ -99,42 +100,40 @@ export function addAttribute( settings ) {
  * @return {Function}           Wrapped component
  */
 export const withToolbarControls = createHigherOrderComponent(
-	( BlockEdit ) => (
-		( props ) => {
-			const { name: blockName } = props;
-			// Compute valid alignments without taking into account,
-			// if the theme supports wide alignments or not.
-			// BlockAlignmentToolbar takes into account the theme support.
-			const validAlignments = getValidAlignments(
-				getBlockSupport( blockName, 'align' ),
-				hasBlockSupport( blockName, 'alignWide', true ),
-			);
+	( BlockEdit ) => ( props ) => {
+		const { name: blockName } = props;
+		// Compute valid alignments without taking into account,
+		// if the theme supports wide alignments or not.
+		// BlockAlignmentToolbar takes into account the theme support.
+		const validAlignments = getValidAlignments(
+			getBlockSupport( blockName, 'align' ),
+			hasBlockSupport( blockName, 'alignWide', true )
+		);
 
-			const updateAlignment = ( nextAlign ) => {
-				if ( ! nextAlign ) {
-					const blockType = getBlockType( props.name );
-					const blockDefaultAlign = get( blockType, [ 'attributes', 'align', 'default' ] );
-					if ( blockDefaultAlign ) {
-						nextAlign = '';
-					}
+		const updateAlignment = ( nextAlign ) => {
+			if ( ! nextAlign ) {
+				const blockType = getBlockType( props.name );
+				const blockDefaultAlign = get( blockType, [ 'attributes', 'align', 'default' ] );
+				if ( blockDefaultAlign ) {
+					nextAlign = '';
 				}
-				props.setAttributes( { align: nextAlign } );
-			};
+			}
+			props.setAttributes( { align: nextAlign } );
+		};
 
-			return [
-				validAlignments.length > 0 && props.isSelected && (
-					<BlockControls key="align-controls">
-						<BlockAlignmentToolbar
-							value={ props.attributes.align }
-							onChange={ updateAlignment }
-							controls={ validAlignments }
-						/>
-					</BlockControls>
-				),
-				<BlockEdit key="edit" { ...props } />,
-			];
-		}
-	),
+		return [
+			validAlignments.length > 0 && props.isSelected && (
+				<BlockControls key="align-controls">
+					<BlockAlignmentToolbar
+						value={ props.attributes.align }
+						onChange={ updateAlignment }
+						controls={ validAlignments }
+					/>
+				</BlockControls>
+			),
+			<BlockEdit key="edit" { ...props } />,
+		];
+	},
 	'withToolbarControls'
 );
 
@@ -203,4 +202,3 @@ addFilter( 'blocks.registerBlockType', 'core/align/addAttribute', addAttribute )
 addFilter( 'editor.BlockListBlock', 'core/editor/align/with-data-align', withDataAlign );
 addFilter( 'editor.BlockEdit', 'core/editor/align/with-toolbar-controls', withToolbarControls );
 addFilter( 'blocks.getSaveContent.extraProps', 'core/align/addAssignedAlign', addAssignedAlign );
-

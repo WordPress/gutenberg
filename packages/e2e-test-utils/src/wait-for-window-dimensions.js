@@ -10,7 +10,5 @@
 export async function waitForWindowDimensions( width, height ) {
 	await page
 		.mainFrame()
-		.waitForFunction(
-			`window.innerWidth === ${ width } && window.innerHeight === ${ height }`
-		);
+		.waitForFunction( `window.innerWidth === ${ width } && window.innerHeight === ${ height }` );
 }

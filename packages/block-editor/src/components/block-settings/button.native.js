@@ -7,12 +7,13 @@ import { withDispatch } from '@wordpress/data';
 
 const { Fill, Slot } = createSlotFill( 'SettingsToolbarButton' );
 
-const SettingsButton = ( { openGeneralSidebar } ) =>
+const SettingsButton = ( { openGeneralSidebar } ) => (
 	<ToolbarButton
 		title={ __( 'Open Settings' ) }
 		icon="admin-generic"
 		onClick={ openGeneralSidebar }
-	/>;
+	/>
+);
 
 const SettingsButtonFill = ( props ) => (
 	<Fill>

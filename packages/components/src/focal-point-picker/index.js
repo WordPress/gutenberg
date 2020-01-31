@@ -89,21 +89,11 @@ export class FocalPointPicker extends Component {
 				left: event.pageX - pickerDimensions.left,
 				top: event.pageY - pickerDimensions.top,
 			};
-			const left = Math.max(
-				bounds.left,
-				Math.min(
-					cursorPosition.left, bounds.right
-				)
-			);
-			const top = Math.max(
-				bounds.top,
-				Math.min(
-					cursorPosition.top, bounds.bottom
-				)
-			);
+			const left = Math.max( bounds.left, Math.min( cursorPosition.left, bounds.right ) );
+			const top = Math.max( bounds.top, Math.min( cursorPosition.top, bounds.bottom ) );
 			const percentages = {
-				x: ( ( left - bounds.left ) / ( pickerDimensions.width - ( bounds.left * 2 ) ) ).toFixed( 2 ),
-				y: ( ( top - bounds.top ) / ( pickerDimensions.height - ( bounds.top * 2 ) ) ).toFixed( 2 ),
+				x: ( ( left - bounds.left ) / ( pickerDimensions.width - bounds.left * 2 ) ).toFixed( 2 ),
+				y: ( ( top - bounds.top ) / ( pickerDimensions.height - bounds.top * 2 ) ).toFixed( 2 ),
 			};
 			this.setState( { percentages }, function() {
 				onChange( {
@@ -160,8 +150,8 @@ export class FocalPointPicker extends Component {
 		const { bounds, isDragging, percentages } = this.state;
 		const pickerDimensions = this.pickerDimensions();
 		const iconCoordinates = {
-			left: ( value.x * ( pickerDimensions.width - ( bounds.left * 2 ) ) ) + bounds.left,
-			top: ( value.y * ( pickerDimensions.height - ( bounds.top * 2 ) ) ) + bounds.top,
+			left: value.x * ( pickerDimensions.width - bounds.left * 2 ) + bounds.left,
+			top: value.y * ( pickerDimensions.height - bounds.top * 2 ) + bounds.top,
 		};
 		const iconContainerStyle = {
 			left: `${ iconCoordinates.left }px`,
@@ -196,9 +186,19 @@ export class FocalPointPicker extends Component {
 							draggable="false"
 						/>
 						<div className={ iconContainerClasses } style={ iconContainerStyle }>
-							<SVG className="components-focal-point-picker__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
-								<Path className="components-focal-point-picker__icon-outline" d="M15 1C7.3 1 1 7.3 1 15s6.3 14 14 14 14-6.3 14-14S22.7 1 15 1zm0 22c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" />
-								<Path className="components-focal-point-picker__icon-fill" d="M15 3C8.4 3 3 8.4 3 15s5.4 12 12 12 12-5.4 12-12S21.6 3 15 3zm0 22C9.5 25 5 20.5 5 15S9.5 5 15 5s10 4.5 10 10-4.5 10-10 10z" />
+							<SVG
+								className="components-focal-point-picker__icon"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 30 30"
+							>
+								<Path
+									className="components-focal-point-picker__icon-outline"
+									d="M15 1C7.3 1 1 7.3 1 15s6.3 14 14 14 14-6.3 14-14S22.7 1 15 1zm0 22c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"
+								/>
+								<Path
+									className="components-focal-point-picker__icon-fill"
+									d="M15 3C8.4 3 3 8.4 3 15s5.4 12 12 12 12-5.4 12-12S21.6 3 15 3zm0 22C9.5 25 5 20.5 5 15S9.5 5 15 5s10 4.5 10 10-4.5 10-10 10z"
+								/>
 							</SVG>
 						</div>
 					</div>

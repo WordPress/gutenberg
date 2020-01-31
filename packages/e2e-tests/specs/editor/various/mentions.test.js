@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createNewPost,
-	getEditedPostContent,
-	clickBlockAppender,
-} from '@wordpress/e2e-test-utils';
+import { createNewPost, getEditedPostContent, clickBlockAppender } from '@wordpress/e2e-test-utils';
 
 describe( 'autocomplete mentions', () => {
 	beforeAll( async () => {

@@ -72,22 +72,25 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 						<TextControl
 							className="html-anchor-control"
 							label={ __( 'HTML Anchor' ) }
-							help={ (
+							help={
 								<>
-									{ __( 'Enter a word or two — without spaces — to make a unique web address just for this heading, called an “anchor.” Then, you’ll be able to link directly to this section of your page.' ) }
+									{ __(
+										'Enter a word or two — without spaces — to make a unique web address just for this heading, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
+									) }
 
 									<ExternalLink href={ 'https://wordpress.org/support/article/page-jumps/' }>
 										{ __( 'Learn more about anchors' ) }
 									</ExternalLink>
 								</>
-							) }
+							}
 							value={ props.attributes.anchor || '' }
 							onChange={ ( nextValue ) => {
 								nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
 								props.setAttributes( {
 									anchor: nextValue,
 								} );
-							} } />
+							} }
+						/>
 					</InspectorAdvancedControls>
 				</>
 			);

@@ -7,17 +7,10 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import {
-	Button,
-	PanelBody,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
-import {
-	BlockControls,
-	InspectorControls,
-} from '@wordpress/block-editor';
+import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
 /**
@@ -70,9 +63,7 @@ class LegacyWidgetEdit extends Component {
 
 		const inspectorControls = widgetObject ? (
 			<InspectorControls>
-				<PanelBody title={ widgetObject.name }>
-					{ widgetObject.description }
-				</PanelBody>
+				<PanelBody title={ widgetObject.name }>{ widgetObject.description }</PanelBody>
 			</InspectorControls>
 		) : null;
 		if ( ! hasPermissionsToManageWidgets ) {
@@ -88,12 +79,8 @@ class LegacyWidgetEdit extends Component {
 			<>
 				<BlockControls>
 					<ToolbarGroup>
-						{ ( widgetObject && ! widgetObject.isHidden ) && (
-							<Button
-								onClick={ this.changeWidget }
-								label={ __( 'Change widget' ) }
-								icon="update"
-							/>
+						{ widgetObject && ! widgetObject.isHidden && (
+							<Button onClick={ this.changeWidget } label={ __( 'Change widget' ) } icon="update" />
 						) }
 						{ hasEditForm && (
 							<>
@@ -126,20 +113,18 @@ class LegacyWidgetEdit extends Component {
 						widgetName={ get( widgetObject, [ 'name' ] ) }
 						widgetClass={ attributes.widgetClass }
 						instance={ attributes.instance }
-						onInstanceChange={
-							( newInstance, newHasEditForm ) => {
-								if ( newInstance ) {
-									this.props.setAttributes( {
-										instance: newInstance,
-									} );
-								}
-								if ( newHasEditForm !== this.hasEditForm ) {
-									this.setState( {
-										hasEditForm: newHasEditForm,
-									} );
-								}
+						onInstanceChange={ ( newInstance, newHasEditForm ) => {
+							if ( newInstance ) {
+								this.props.setAttributes( {
+									instance: newInstance,
+								} );
 							}
-						}
+							if ( newHasEditForm !== this.hasEditForm ) {
+								this.setState( {
+									hasEditForm: newHasEditForm,
+								} );
+							}
+						} }
 					/>
 				) }
 				{ ( isPreview || ! hasEditForm ) && this.renderWidgetPreview() }
@@ -181,10 +166,7 @@ class LegacyWidgetEdit extends Component {
 
 export default withSelect( ( select ) => {
 	const editorSettings = select( 'core/block-editor' ).getSettings();
-	const {
-		availableLegacyWidgets,
-		hasPermissionsToManageWidgets,
-	} = editorSettings;
+	const { availableLegacyWidgets, hasPermissionsToManageWidgets } = editorSettings;
 	return {
 		hasPermissionsToManageWidgets,
 		availableLegacyWidgets,

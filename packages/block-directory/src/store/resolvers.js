@@ -7,10 +7,14 @@ import { camelCase, mapKeys } from 'lodash';
  * Internal dependencies
  */
 import { apiFetch } from './controls';
-import { fetchDownloadableBlocks, receiveDownloadableBlocks, setInstallBlocksPermission } from './actions';
+import {
+	fetchDownloadableBlocks,
+	receiveDownloadableBlocks,
+	setInstallBlocksPermission,
+} from './actions';
 
 export default {
-	* getDownloadableBlocks( filterValue ) {
+	*getDownloadableBlocks( filterValue ) {
 		if ( ! filterValue ) {
 			return;
 		}
@@ -20,9 +24,11 @@ export default {
 			const results = yield apiFetch( {
 				path: `__experimental/block-directory/search?term=${ filterValue }`,
 			} );
-			const blocks = results.map( ( result ) => mapKeys( result, ( value, key ) => {
-				return camelCase( key );
-			} ) );
+			const blocks = results.map( ( result ) =>
+				mapKeys( result, ( value, key ) => {
+					return camelCase( key );
+				} )
+			);
 
 			yield receiveDownloadableBlocks( blocks, filterValue );
 		} catch ( error ) {
@@ -31,7 +37,7 @@ export default {
 			}
 		}
 	},
-	* hasInstallBlocksPermission() {
+	*hasInstallBlocksPermission() {
 		try {
 			yield apiFetch( {
 				path: `__experimental/block-directory/search?term=`,

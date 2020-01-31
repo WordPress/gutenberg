@@ -67,11 +67,9 @@ export default function EntitiesSavedStates( {
 				contentLabel={ __( 'Select items to save.' ) }
 			>
 				{ Object.keys( entityRecordChangesByRecord ).map( ( changedKind ) =>
-					Object.keys( entityRecordChangesByRecord[ changedKind ] ).map(
-						( changedName ) =>
-							Object.keys(
-								entityRecordChangesByRecord[ changedKind ][ changedName ]
-							).map( ( changedKey ) => {
+					Object.keys( entityRecordChangesByRecord[ changedKind ] ).map( ( changedName ) =>
+						Object.keys( entityRecordChangesByRecord[ changedKind ][ changedName ] ).map(
+							( changedKey ) => {
 								const id = [ changedKind, changedName, changedKey ];
 								return (
 									<EntitiesSavedStatesCheckbox
@@ -79,15 +77,14 @@ export default function EntitiesSavedStates( {
 										id={ id }
 										name={ changedName }
 										changes={
-											entityRecordChangesByRecord[ changedKind ][ changedName ][
-												changedKey
-											]
+											entityRecordChangesByRecord[ changedKind ][ changedName ][ changedKey ]
 										}
 										checked={ checkedById.get( id ) }
 										setCheckedById={ setCheckedById }
 									/>
 								);
-							} )
+							}
+						)
 					)
 				) }
 				<Button

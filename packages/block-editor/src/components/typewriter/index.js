@@ -91,9 +91,7 @@ class Typewriter extends Component {
 	}
 
 	isLastEditableNode() {
-		const editableNodes = this.ref.current.querySelectorAll(
-			'[contenteditable="true"]'
-		);
+		const editableNodes = this.ref.current.querySelectorAll( '[contenteditable="true"]' );
 		const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
 		return lastEditableNode === document.activeElement;
 	}
@@ -145,16 +143,11 @@ class Typewriter extends Component {
 		}
 
 		const windowScroll = scrollContainer === document.body;
-		const scrollY = windowScroll ?
-			window.scrollY :
-			scrollContainer.scrollTop;
-		const scrollContainerY = windowScroll ?
-			0 :
-			scrollContainer.getBoundingClientRect().top;
-		const relativeScrollPosition = windowScroll ?
-			this.caretRect.top / window.innerHeight :
-			( this.caretRect.top - scrollContainerY ) /
-			( window.innerHeight - scrollContainerY );
+		const scrollY = windowScroll ? window.scrollY : scrollContainer.scrollTop;
+		const scrollContainerY = windowScroll ? 0 : scrollContainer.getBoundingClientRect().top;
+		const relativeScrollPosition = windowScroll
+			? this.caretRect.top / window.innerHeight
+			: ( this.caretRect.top - scrollContainerY ) / ( window.innerHeight - scrollContainerY );
 
 		// If the scroll position is at the start, the active editable element
 		// is the last one, and the caret is positioned within the initial
@@ -172,16 +165,13 @@ class Typewriter extends Component {
 			return;
 		}
 
-		const scrollContainerHeight = windowScroll ?
-			window.innerHeight :
-			scrollContainer.clientHeight;
+		const scrollContainerHeight = windowScroll ? window.innerHeight : scrollContainer.clientHeight;
 
 		// Abort if the target scroll position would scroll the caret out of
 		// view.
 		if (
 			// The caret is under the lower fold.
-			this.caretRect.top + this.caretRect.height >
-				scrollContainerY + scrollContainerHeight ||
+			this.caretRect.top + this.caretRect.height > scrollContainerY + scrollContainerHeight ||
 			// The caret is above the upper fold.
 			this.caretRect.top < scrollContainerY
 		) {

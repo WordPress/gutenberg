@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	activatePlugin,
-	createNewPost,
-	deactivatePlugin,
-} from '@wordpress/e2e-test-utils';
+import { activatePlugin, createNewPost, deactivatePlugin } from '@wordpress/e2e-test-utils';
 
 describe( 'new editor state', () => {
 	beforeAll( async () => {

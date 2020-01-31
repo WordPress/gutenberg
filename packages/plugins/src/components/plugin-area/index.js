@@ -72,8 +72,16 @@ class PluginArea extends Component {
 	}
 
 	componentDidMount() {
-		addAction( 'plugins.pluginRegistered', 'core/plugins/plugin-area/plugins-registered', this.setPlugins );
-		addAction( 'plugins.pluginUnregistered', 'core/plugins/plugin-area/plugins-unregistered', this.setPlugins );
+		addAction(
+			'plugins.pluginRegistered',
+			'core/plugins/plugin-area/plugins-registered',
+			this.setPlugins
+		);
+		addAction(
+			'plugins.pluginUnregistered',
+			'core/plugins/plugin-area/plugins-unregistered',
+			this.setPlugins
+		);
 	}
 
 	componentWillUnmount() {
@@ -89,10 +97,7 @@ class PluginArea extends Component {
 		return (
 			<div style={ { display: 'none' } }>
 				{ map( this.state.plugins, ( { context, Plugin } ) => (
-					<PluginContextProvider
-						key={ context.name }
-						value={ context }
-					>
+					<PluginContextProvider key={ context.name } value={ context }>
 						<Plugin />
 					</PluginContextProvider>
 				) ) }

@@ -40,9 +40,7 @@ export function outdentListItems( value ) {
 		const currentFormats = newFormats[ index ] || [];
 
 		// Omit the indentation level where the selection starts.
-		newFormats[ index ] = parentFormats.concat(
-			currentFormats.slice( parentFormats.length + 1 )
-		);
+		newFormats[ index ] = parentFormats.concat( currentFormats.slice( parentFormats.length + 1 ) );
 
 		if ( newFormats[ index ].length === 0 ) {
 			delete newFormats[ index ];

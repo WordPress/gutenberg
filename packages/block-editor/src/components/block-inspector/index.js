@@ -3,10 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
-import {
-	PanelBody,
-	__experimentalSlotFillConsumer,
-} from '@wordpress/components';
+import { PanelBody, __experimentalSlotFillConsumer } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -53,13 +50,8 @@ const BlockInspector = ( {
 			<BlockCard blockType={ blockType } />
 			{ hasBlockStyles && (
 				<div>
-					<PanelBody
-						title={ __( 'Styles' ) }
-						initialOpen={ false }
-					>
-						<BlockStyles
-							clientId={ selectedBlockClientId }
-						/>
+					<PanelBody title={ __( 'Styles' ) } initialOpen={ false }>
+						<BlockStyles clientId={ selectedBlockClientId } />
 						<DefaultStylePicker blockName={ blockType.name } />
 					</PanelBody>
 				</div>
@@ -85,20 +77,20 @@ const BlockInspector = ( {
 	);
 };
 
-export default withSelect(
-	( select ) => {
-		const { getSelectedBlockClientId, getSelectedBlockCount, getBlockName } = select( 'core/block-editor' );
-		const { getBlockStyles } = select( 'core/blocks' );
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const selectedBlockName = selectedBlockClientId && getBlockName( selectedBlockClientId );
-		const blockType = selectedBlockClientId && getBlockType( selectedBlockName );
-		const blockStyles = selectedBlockClientId && getBlockStyles( selectedBlockName );
-		return {
-			count: getSelectedBlockCount(),
-			hasBlockStyles: blockStyles && blockStyles.length > 0,
-			selectedBlockName,
-			selectedBlockClientId,
-			blockType,
-		};
-	}
-)( BlockInspector );
+export default withSelect( ( select ) => {
+	const { getSelectedBlockClientId, getSelectedBlockCount, getBlockName } = select(
+		'core/block-editor'
+	);
+	const { getBlockStyles } = select( 'core/blocks' );
+	const selectedBlockClientId = getSelectedBlockClientId();
+	const selectedBlockName = selectedBlockClientId && getBlockName( selectedBlockClientId );
+	const blockType = selectedBlockClientId && getBlockType( selectedBlockName );
+	const blockStyles = selectedBlockClientId && getBlockStyles( selectedBlockName );
+	return {
+		count: getSelectedBlockCount(),
+		hasBlockStyles: blockStyles && blockStyles.length > 0,
+		selectedBlockName,
+		selectedBlockClientId,
+		blockType,
+	};
+} )( BlockInspector );

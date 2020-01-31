@@ -64,10 +64,7 @@ export default function withFilters( hookName ) {
 			}
 
 			componentWillUnmount() {
-				FilteredComponentRenderer.instances = without(
-					FilteredComponentRenderer.instances,
-					this
-				);
+				FilteredComponentRenderer.instances = without( FilteredComponentRenderer.instances, this );
 
 				// If this was the last of the mounted components filtered on
 				// this hook, remove the hook handler.

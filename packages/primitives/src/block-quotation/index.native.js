@@ -21,9 +21,5 @@ export const BlockQuotation = ( props ) => {
 		}
 		return child;
 	} );
-	return (
-		<View style={ styles.wpBlockQuote } >
-			{ newChildren }
-		</View>
-	);
+	return <View style={ styles.wpBlockQuote }>{ newChildren }</View>;
 };

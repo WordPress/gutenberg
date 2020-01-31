@@ -48,32 +48,25 @@ export default function save( { attributes } ) {
 	const figure = (
 		<>
 			{ href ? (
-				<a
-					className={ linkClass }
-					href={ href }
-					target={ linkTarget }
-					rel={ newRel }
-				>
+				<a className={ linkClass } href={ href } target={ linkTarget } rel={ newRel }>
 					{ image }
 				</a>
-			) : image }
-			{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+			) : (
+				image
+			) }
+			{ ! RichText.isEmpty( caption ) && (
+				<RichText.Content tagName="figcaption" value={ caption } />
+			) }
 		</>
 	);
 
 	if ( 'left' === align || 'right' === align || 'center' === align ) {
 		return (
 			<div>
-				<figure className={ classes }>
-					{ figure }
-				</figure>
+				<figure className={ classes }>{ figure }</figure>
 			</div>
 		);
 	}
 
-	return (
-		<figure className={ classes }>
-			{ figure }
-		</figure>
-	);
+	return <figure className={ classes }>{ figure }</figure>;
 }

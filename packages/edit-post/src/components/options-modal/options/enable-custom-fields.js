@@ -17,7 +17,9 @@ export function CustomFieldsConfirmation( { willEnable } ) {
 	return (
 		<>
 			<p className="edit-post-options-modal__custom-fields-confirmation-message">
-				{ __( 'A page reload is required for this change. Make sure your content is saved before reloading.' ) }
+				{ __(
+					'A page reload is required for this change. Make sure your content is saved before reloading.'
+				) }
 			</p>
 			<Button
 				className="edit-post-options-modal__custom-fields-confirmation-button"
@@ -39,12 +41,10 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 	const [ isChecked, setIsChecked ] = useState( areCustomFieldsEnabled );
 
 	return (
-		<BaseOption
-			label={ label }
-			isChecked={ isChecked }
-			onChange={ setIsChecked }
-		>
-			{ isChecked !== areCustomFieldsEnabled && <CustomFieldsConfirmation willEnable={ isChecked } /> }
+		<BaseOption label={ label } isChecked={ isChecked } onChange={ setIsChecked }>
+			{ isChecked !== areCustomFieldsEnabled && (
+				<CustomFieldsConfirmation willEnable={ isChecked } />
+			) }
 		</BaseOption>
 	);
 }

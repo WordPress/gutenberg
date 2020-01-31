@@ -263,32 +263,56 @@ describe( 'Export entries', function() {
 		);
 		const name = getExportEntries( JSON.parse( token ) );
 		expect( name ).toHaveLength( 3 );
-		expect( name[ 0 ] ).toEqual(
-			{ localName: 'functionDeclaration', exportName: 'functionDeclaration', module: null, lineStart: 16, lineEnd: 16 }
-		);
-		expect( name[ 1 ] ).toEqual(
-			{ localName: 'variableDeclaration', exportName: 'variableDeclaration', module: null, lineStart: 16, lineEnd: 16 },
-		);
-		expect( name[ 2 ] ).toEqual(
-			{ localName: 'ClassDeclaration', exportName: 'ClassDeclaration', module: null, lineStart: 16, lineEnd: 16 },
-		);
+		expect( name[ 0 ] ).toEqual( {
+			localName: 'functionDeclaration',
+			exportName: 'functionDeclaration',
+			module: null,
+			lineStart: 16,
+			lineEnd: 16,
+		} );
+		expect( name[ 1 ] ).toEqual( {
+			localName: 'variableDeclaration',
+			exportName: 'variableDeclaration',
+			module: null,
+			lineStart: 16,
+			lineEnd: 16,
+		} );
+		expect( name[ 2 ] ).toEqual( {
+			localName: 'ClassDeclaration',
+			exportName: 'ClassDeclaration',
+			module: null,
+			lineStart: 16,
+			lineEnd: 16,
+		} );
 		const tokenIdentifiersAndInline = fs.readFileSync(
 			path.join( __dirname, './fixtures/named-identifiers-and-inline/exports.json' ),
 			'utf-8'
 		);
 		const nameInline0 = getExportEntries( JSON.parse( tokenIdentifiersAndInline )[ 0 ] );
 		expect( nameInline0 ).toHaveLength( 2 );
-		expect( nameInline0[ 0 ] ).toEqual(
-			{ localName: 'functionDeclaration', exportName: 'functionDeclaration', module: null, lineStart: 11, lineEnd: 11 },
-		);
-		expect( nameInline0[ 1 ] ).toEqual(
-			{ localName: 'ClassDeclaration', exportName: 'ClassDeclaration', module: null, lineStart: 11, lineEnd: 11 },
-		);
+		expect( nameInline0[ 0 ] ).toEqual( {
+			localName: 'functionDeclaration',
+			exportName: 'functionDeclaration',
+			module: null,
+			lineStart: 11,
+			lineEnd: 11,
+		} );
+		expect( nameInline0[ 1 ] ).toEqual( {
+			localName: 'ClassDeclaration',
+			exportName: 'ClassDeclaration',
+			module: null,
+			lineStart: 11,
+			lineEnd: 11,
+		} );
 		const nameInline1 = getExportEntries( JSON.parse( tokenIdentifiersAndInline )[ 1 ] );
 		expect( nameInline1 ).toHaveLength( 1 );
-		expect( nameInline1[ 0 ] ).toEqual(
-			{ localName: 'variableDeclaration', exportName: 'variableDeclaration', module: null, lineStart: 16, lineEnd: 16 },
-		);
+		expect( nameInline1[ 0 ] ).toEqual( {
+			localName: 'variableDeclaration',
+			exportName: 'variableDeclaration',
+			module: null,
+			lineStart: 16,
+			lineEnd: 16,
+		} );
 	} );
 
 	it( 'named import namespace', function() {
@@ -298,9 +322,13 @@ describe( 'Export entries', function() {
 		);
 		const name = getExportEntries( JSON.parse( token ) );
 		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual(
-			{ localName: 'variables', exportName: 'variables', module: null, lineStart: 3, lineEnd: 3 },
-		);
+		expect( name[ 0 ] ).toEqual( {
+			localName: 'variables',
+			exportName: 'variables',
+			module: null,
+			lineStart: 3,
+			lineEnd: 3,
+		} );
 	} );
 
 	it( 'named variable', function() {
@@ -326,12 +354,20 @@ describe( 'Export entries', function() {
 		);
 		const name = getExportEntries( JSON.parse( token ) );
 		expect( name ).toHaveLength( 2 );
-		expect( name[ 0 ] ).toEqual(
-			{ localName: 'firstDeclaration', exportName: 'firstDeclaration', module: null, lineStart: 4, lineEnd: 5 },
-		);
-		expect( name[ 1 ] ).toEqual(
-			{ localName: 'secondDeclaration', exportName: 'secondDeclaration', module: null, lineStart: 4, lineEnd: 5 },
-		);
+		expect( name[ 0 ] ).toEqual( {
+			localName: 'firstDeclaration',
+			exportName: 'firstDeclaration',
+			module: null,
+			lineStart: 4,
+			lineEnd: 5,
+		} );
+		expect( name[ 1 ] ).toEqual( {
+			localName: 'secondDeclaration',
+			exportName: 'secondDeclaration',
+			module: null,
+			lineStart: 4,
+			lineEnd: 5,
+		} );
 	} );
 
 	it( 'namespace (*)', function() {

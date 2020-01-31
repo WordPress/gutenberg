@@ -23,20 +23,14 @@ export const underline = {
 					attributes: {
 						style: 'text-decoration: underline;',
 					},
-				} ) );
+				} )
+			);
 		};
 
 		return (
 			<>
-				<RichTextShortcut
-					type="primary"
-					character="u"
-					onUse={ onToggle }
-				/>
-				<__unstableRichTextInputEvent
-					inputType="formatUnderline"
-					onInput={ onToggle }
-				/>
+				<RichTextShortcut type="primary" character="u" onUse={ onToggle } />
+				<__unstableRichTextInputEvent inputType="formatUnderline" onInput={ onToggle } />
 			</>
 		);
 	},

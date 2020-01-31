@@ -63,10 +63,7 @@ export const withLazySameState = ( reducer ) => ( state, action ) => {
  * @return {Object} Persistence interface.
  */
 export function createPersistenceInterface( options ) {
-	const {
-		storage = DEFAULT_STORAGE,
-		storageKey = DEFAULT_STORAGE_KEY,
-	} = options;
+	const { storage = DEFAULT_STORAGE, storageKey = DEFAULT_STORAGE_KEY } = options;
 
 	let data;
 
@@ -142,9 +139,13 @@ const persistencePlugin = function( registry, pluginOptions ) {
 			// to leverage its behavior of returning the same object when none
 			// of the property values changes. This allows a strict reference
 			// equality to bypass a persistence set on an unchanging state.
-			const reducers = keys.reduce( ( accumulator, key ) => Object.assign( accumulator, {
-				[ key ]: ( state, action ) => action.nextState[ key ],
-			} ), {} );
+			const reducers = keys.reduce(
+				( accumulator, key ) =>
+					Object.assign( accumulator, {
+						[ key ]: ( state, action ) => action.nextState[ key ],
+					} ),
+				{}
+			);
 
 			getPersistedState = withLazySameState( combineReducers( reducers ) );
 		} else {
@@ -196,11 +197,7 @@ const persistencePlugin = function( registry, pluginOptions ) {
 
 			const store = registry.registerStore( reducerKey, options );
 
-			store.subscribe( createPersistOnChange(
-				store.getState,
-				reducerKey,
-				options.persist
-			) );
+			store.subscribe( createPersistOnChange( store.getState, reducerKey, options.persist ) );
 
 			return store;
 		},
@@ -229,7 +226,12 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 
 	// Migrate 'areTipsEnabled' from 'core/nux' to 'showWelcomeGuide' in 'core/edit-post'
 	const areTipsEnabled = get( state, [ 'core/nux', 'preferences', 'areTipsEnabled' ] );
-	const hasWelcomeGuide = has( state, [ 'core/edit-post', 'preferences', 'features', 'welcomeGuide' ] );
+	const hasWelcomeGuide = has( state, [
+		'core/edit-post',
+		'preferences',
+		'features',
+		'welcomeGuide',
+	] );
 	if ( areTipsEnabled !== undefined && ! hasWelcomeGuide ) {
 		persistence.set(
 			'core/edit-post',

@@ -34,44 +34,45 @@ import { addFilter } from '@wordpress/hooks';
  *
  * @return {WPHigherOrderComponent} Higher-order component.
  */
-const createWithMetaAttributeSource = ( metaAttributes ) => createHigherOrderComponent(
-	( BlockEdit ) => ( { attributes, setAttributes, ...props } ) => {
-		const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
-		const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
+const createWithMetaAttributeSource = ( metaAttributes ) =>
+	createHigherOrderComponent(
+		( BlockEdit ) => ( { attributes, setAttributes, ...props } ) => {
+			const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
+			const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
 
-		const mergedAttributes = useMemo(
-			() => ( {
-				...attributes,
-				...mapValues( metaAttributes, ( metaKey ) => meta[ metaKey ] ),
-			} ),
-			[ attributes, meta ]
-		);
+			const mergedAttributes = useMemo(
+				() => ( {
+					...attributes,
+					...mapValues( metaAttributes, ( metaKey ) => meta[ metaKey ] ),
+				} ),
+				[ attributes, meta ]
+			);
 
-		return (
-			<BlockEdit
-				attributes={ mergedAttributes }
-				setAttributes={ ( nextAttributes ) => {
-					const nextMeta = mapKeys(
-						// Filter to intersection of keys between the updated
-						// attributes and those with an associated meta key.
-						pickBy( nextAttributes, ( value, key ) => metaAttributes[ key ] ),
+			return (
+				<BlockEdit
+					attributes={ mergedAttributes }
+					setAttributes={ ( nextAttributes ) => {
+						const nextMeta = mapKeys(
+							// Filter to intersection of keys between the updated
+							// attributes and those with an associated meta key.
+							pickBy( nextAttributes, ( value, key ) => metaAttributes[ key ] ),
 
-						// Rename the keys to the expected meta key name.
-						( value, attributeKey ) => metaAttributes[ attributeKey ],
-					);
+							// Rename the keys to the expected meta key name.
+							( value, attributeKey ) => metaAttributes[ attributeKey ]
+						);
 
-					if ( ! isEmpty( nextMeta ) ) {
-						setMeta( nextMeta );
-					}
+						if ( ! isEmpty( nextMeta ) ) {
+							setMeta( nextMeta );
+						}
 
-					setAttributes( nextAttributes );
-				} }
-				{ ...props }
-			/>
-		);
-	},
-	'withMetaAttributeSource'
-);
+						setAttributes( nextAttributes );
+					} }
+					{ ...props }
+				/>
+			);
+		},
+		'withMetaAttributeSource'
+	);
 
 /**
  * Filters a registered block's settings to enhance a block's `edit` component

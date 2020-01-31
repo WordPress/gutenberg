@@ -44,7 +44,13 @@ const getAbsolutePosition = ( element ) => {
  *
  * @return {Object} Style object.
  */
-function useMovingAnimation( ref, isSelected, adjustScrolling, enableAnimation, triggerAnimationOnChange ) {
+function useMovingAnimation(
+	ref,
+	isSelected,
+	adjustScrolling,
+	enableAnimation,
+	triggerAnimationOnChange
+) {
 	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
 	const [ triggeredAnimation, triggerAnimation ] = useReducer( counterReducer, 0 );
 	const [ finishedAnimation, endAnimation ] = useReducer( counterReducer, 0 );
@@ -80,11 +86,15 @@ function useMovingAnimation( ref, isSelected, adjustScrolling, enableAnimation, 
 		const newTransform = {
 			x: previous ? previous.left - destination.left : 0,
 			y: previous ? previous.top - destination.top : 0,
-			scrollTop: previous && scrollContainer ? scrollContainer.scrollTop - previous.top + destination.top : 0,
+			scrollTop:
+				previous && scrollContainer
+					? scrollContainer.scrollTop - previous.top + destination.top
+					: 0,
 		};
-		ref.current.style.transform = newTransform.x === 0 && newTransform.y === 0 ?
-			undefined :
-			`translate3d(${ newTransform.x }px,${ newTransform.y }px,0)`;
+		ref.current.style.transform =
+			newTransform.x === 0 && newTransform.y === 0
+				? undefined
+				: `translate3d(${ newTransform.x }px,${ newTransform.y }px,0)`;
 		triggerAnimation();
 		setTransform( newTransform );
 	}, [ triggerAnimationOnChange ] );
@@ -109,25 +119,17 @@ function useMovingAnimation( ref, isSelected, adjustScrolling, enableAnimation, 
 	} );
 
 	// Dismiss animations if disabled.
-	return prefersReducedMotion ?
-		{} :
-		{
-			transformOrigin: 'center',
-			transform: interpolate(
-				[
-					animationProps.x,
-					animationProps.y,
-				],
-				( x, y ) => x === 0 && y === 0 ? undefined : `translate3d(${ x }px,${ y }px,0)`
-			),
-			zIndex: interpolate(
-				[
-					animationProps.x,
-					animationProps.y,
-				],
-				( x, y ) => ! isSelected || ( x === 0 && y === 0 ) ? undefined : `1`
-			),
-		};
+	return prefersReducedMotion
+		? {}
+		: {
+				transformOrigin: 'center',
+				transform: interpolate( [ animationProps.x, animationProps.y ], ( x, y ) =>
+					x === 0 && y === 0 ? undefined : `translate3d(${ x }px,${ y }px,0)`
+				),
+				zIndex: interpolate( [ animationProps.x, animationProps.y ], ( x, y ) =>
+					! isSelected || ( x === 0 && y === 0 ) ? undefined : `1`
+				),
+		  };
 }
 
 export default useMovingAnimation;

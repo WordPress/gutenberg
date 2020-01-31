@@ -13,11 +13,7 @@ import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import {
-	STORE_KEY,
-	POST_UPDATE_TRANSACTION_ID,
-	TRASH_POST_NOTICE_ID,
-} from './constants';
+import { STORE_KEY, POST_UPDATE_TRANSACTION_ID, TRASH_POST_NOTICE_ID } from './constants';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
@@ -64,8 +60,7 @@ export function* setupEditor( post, edits, template ) {
 	if (
 		edits &&
 		Object.keys( edits ).some(
-			( key ) =>
-				edits[ key ] !== ( has( post, [ key, 'raw' ] ) ? post[ key ].raw : post[ key ] )
+			( key ) => edits[ key ] !== ( has( post, [ key, 'raw' ] ) ? post[ key ].raw : post[ key ] )
 		)
 	) {
 		yield editPost( edits );
@@ -189,15 +184,7 @@ export function setupEditorState( post ) {
  */
 export function* editPost( edits, options ) {
 	const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
-	yield dispatch(
-		'core',
-		'editEntityRecord',
-		'postType',
-		type,
-		id,
-		edits,
-		options
-	);
+	yield dispatch( 'core', 'editEntityRecord', 'postType', type, id, edits, options );
 }
 
 /**
@@ -244,14 +231,7 @@ export function* savePost( options = {} ) {
 		) ),
 		...edits,
 	};
-	yield dispatch(
-		'core',
-		'saveEntityRecord',
-		'postType',
-		previousRecord.type,
-		edits,
-		options
-	);
+	yield dispatch( 'core', 'saveEntityRecord', 'postType', previousRecord.type, edits, options );
 	yield __experimentalRequestPostUpdateFinish( options );
 
 	const error = yield select(
@@ -293,73 +273,38 @@ export function* savePost( options = {} ) {
  * Action generator for handling refreshing the current post.
  */
 export function* refreshPost() {
-	const post = yield select(
-		STORE_KEY,
-		'getCurrentPost'
-	);
-	const postTypeSlug = yield select(
-		STORE_KEY,
-		'getCurrentPostType'
-	);
-	const postType = yield select(
-		'core',
-		'getPostType',
-		postTypeSlug
-	);
-	const newPost = yield apiFetch(
-		{
-			// Timestamp arg allows caller to bypass browser caching, which is
-			// expected for this specific function.
-			path: `/wp/v2/${ postType.rest_base }/${ post.id }` +
-				`?context=edit&_timestamp=${ Date.now() }`,
-		}
-	);
-	yield dispatch(
-		STORE_KEY,
-		'resetPost',
-		newPost
-	);
+	const post = yield select( STORE_KEY, 'getCurrentPost' );
+	const postTypeSlug = yield select( STORE_KEY, 'getCurrentPostType' );
+	const postType = yield select( 'core', 'getPostType', postTypeSlug );
+	const newPost = yield apiFetch( {
+		// Timestamp arg allows caller to bypass browser caching, which is
+		// expected for this specific function.
+		path:
+			`/wp/v2/${ postType.rest_base }/${ post.id }` + `?context=edit&_timestamp=${ Date.now() }`,
+	} );
+	yield dispatch( STORE_KEY, 'resetPost', newPost );
 }
 
 /**
  * Action generator for trashing the current post in the editor.
  */
 export function* trashPost() {
-	const postTypeSlug = yield select(
-		STORE_KEY,
-		'getCurrentPostType'
-	);
-	const postType = yield select(
-		'core',
-		'getPostType',
-		postTypeSlug
-	);
-	yield dispatch(
-		'core/notices',
-		'removeNotice',
-		TRASH_POST_NOTICE_ID
-	);
+	const postTypeSlug = yield select( STORE_KEY, 'getCurrentPostType' );
+	const postType = yield select( 'core', 'getPostType', postTypeSlug );
+	yield dispatch( 'core/notices', 'removeNotice', TRASH_POST_NOTICE_ID );
 	try {
-		const post = yield select(
-			STORE_KEY,
-			'getCurrentPost'
-		);
-		yield apiFetch(
-			{
-				path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
-				method: 'DELETE',
-			}
-		);
+		const post = yield select( STORE_KEY, 'getCurrentPost' );
+		yield apiFetch( {
+			path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
+			method: 'DELETE',
+		} );
 
-		yield dispatch(
-			STORE_KEY,
-			'savePost'
-		);
+		yield dispatch( STORE_KEY, 'savePost' );
 	} catch ( error ) {
 		yield dispatch(
 			'core/notices',
 			'createErrorNotice',
-			...getNotificationArgumentsForTrashFail( { error } ),
+			...getNotificationArgumentsForTrashFail( { error } )
 		);
 	}
 }
@@ -370,11 +315,7 @@ export function* trashPost() {
  * @param {Object?} options Extra flags to identify the autosave.
  */
 export function* autosave( options ) {
-	yield dispatch(
-		STORE_KEY,
-		'savePost',
-		{ isAutosave: true, ...options }
-	);
+	yield dispatch( STORE_KEY, 'savePost', { isAutosave: true, ...options } );
 }
 
 export function* __experimentalLocalAutosave() {
@@ -686,26 +627,16 @@ export function unlockPostAutosaving( lockName ) {
  * @yield {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
-	const {
-		__unstableShouldCreateUndoLevel,
-		selectionStart,
-		selectionEnd,
-	} = options;
+	const { __unstableShouldCreateUndoLevel, selectionStart, selectionEnd } = options;
 	const edits = { blocks, selectionStart, selectionEnd };
 
 	if ( __unstableShouldCreateUndoLevel !== false ) {
 		const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
 		const noChange =
-			( yield select( 'core', 'getEditedEntityRecord', 'postType', type, id ) )
-				.blocks === edits.blocks;
+			( yield select( 'core', 'getEditedEntityRecord', 'postType', type, id ) ).blocks ===
+			edits.blocks;
 		if ( noChange ) {
-			return yield dispatch(
-				'core',
-				'__unstableCreateUndoLevel',
-				'postType',
-				type,
-				id
-			);
+			return yield dispatch( 'core', '__unstableCreateUndoLevel', 'postType', type, id );
 		}
 
 		// We create a new function here on every persistent edit
@@ -735,12 +666,13 @@ export function updateEditorSettings( settings ) {
  * Backward compatibility
  */
 
-const getBlockEditorAction = ( name ) => function* ( ...args ) {
-	deprecated( '`wp.data.dispatch( \'core/editor\' ).' + name + '`', {
-		alternative: '`wp.data.dispatch( \'core/block-editor\' ).' + name + '`',
-	} );
-	yield dispatch( 'core/block-editor', name, ...args );
-};
+const getBlockEditorAction = ( name ) =>
+	function*( ...args ) {
+		deprecated( "`wp.data.dispatch( 'core/editor' )." + name + '`', {
+			alternative: "`wp.data.dispatch( 'core/block-editor' )." + name + '`',
+		} );
+		yield dispatch( 'core/block-editor', name, ...args );
+	};
 
 /**
  * @see resetBlocks in core/block-editor store.

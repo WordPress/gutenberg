@@ -57,7 +57,13 @@ export const settings = {
 	transforms,
 	getEditWrapperProps( attributes ) {
 		const { align, width } = attributes;
-		if ( 'left' === align || 'center' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+		if (
+			'left' === align ||
+			'center' === align ||
+			'right' === align ||
+			'wide' === align ||
+			'full' === align
+		) {
 			return { 'data-align': align, 'data-resized': !! width };
 		}
 	},

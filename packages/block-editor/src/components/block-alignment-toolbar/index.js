@@ -45,7 +45,13 @@ const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
 const DEFAULT_CONTROL = 'center';
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
-export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS, isCollapsed = true, wideControlsEnabled = false } ) {
+export function BlockAlignmentToolbar( {
+	value,
+	onChange,
+	controls = DEFAULT_CONTROLS,
+	isCollapsed = true,
+	wideControlsEnabled = false,
+} ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
@@ -62,16 +68,14 @@ export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CON
 			isCollapsed={ isCollapsed }
 			icon={ activeAlignmentControl ? activeAlignmentControl.icon : defaultAlignmentControl.icon }
 			label={ __( 'Change alignment' ) }
-			controls={
-				enabledControls.map( ( control ) => {
-					return {
-						...BLOCK_ALIGNMENTS_CONTROLS[ control ],
-						isActive: value === control,
-						role: isCollapsed ? 'menuitemradio' : undefined,
-						onClick: applyOrUnset( control ),
-					};
-				} )
-			}
+			controls={ enabledControls.map( ( control ) => {
+				return {
+					...BLOCK_ALIGNMENTS_CONTROLS[ control ],
+					isActive: value === control,
+					role: isCollapsed ? 'menuitemradio' : undefined,
+					onClick: applyOrUnset( control ),
+				};
+			} ) }
 		/>
 	);
 }
@@ -88,5 +92,5 @@ export default compose(
 		return {
 			wideControlsEnabled: settings.alignWide,
 		};
-	} ),
+	} )
 )( BlockAlignmentToolbar );

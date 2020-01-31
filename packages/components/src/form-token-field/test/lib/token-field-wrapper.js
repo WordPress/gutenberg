@@ -14,7 +14,9 @@ import { Component } from '@wordpress/element';
 import fixtures from './fixtures';
 import TokenField from '../../';
 
-const { specialSuggestions: { default: suggestions } } = fixtures;
+const {
+	specialSuggestions: { default: suggestions },
+} = fixtures;
 
 function unescapeAndFormatSpaces( str ) {
 	const nbsp = String.fromCharCode( 160 );

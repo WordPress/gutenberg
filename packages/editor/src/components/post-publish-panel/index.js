@@ -61,7 +61,11 @@ export class PostPublishPanel extends Component {
 			PrePublishExtension,
 			...additionalProps
 		} = this.props;
-		const propsForPanel = omit( additionalProps, [ 'hasPublishAction', 'isDirty', 'isPostTypeViewable' ] );
+		const propsForPanel = omit( additionalProps, [
+			'hasPublishAction',
+			'isDirty',
+			'isPostTypeViewable',
+		] );
 		const isPublishedOrScheduled = isPublished || ( isScheduled && isBeingScheduled );
 		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
 		const isPostPublish = isPublishedOrScheduled && ! isSaving;
@@ -74,7 +78,12 @@ export class PostPublishPanel extends Component {
 						</div>
 					) : (
 						<div className="editor-post-publish-panel__header-publish-button">
-							<PostPublishButton focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
+							<PostPublishButton
+								focusOnMount={ true }
+								onSubmit={ this.onSubmit }
+								forceIsDirty={ forceIsDirty }
+								forceIsSaving={ forceIsSaving }
+							/>
 						</div>
 					) }
 					<Button
@@ -91,11 +100,11 @@ export class PostPublishPanel extends Component {
 						</PostPublishPanelPrepublish>
 					) }
 					{ isPostPublish && (
-						<PostPublishPanelPostpublish focusOnMount={ true } >
+						<PostPublishPanelPostpublish focusOnMount={ true }>
 							{ PostPublishExtension && <PostPublishExtension /> }
 						</PostPublishPanelPostpublish>
 					) }
-					{ isSaving && ( <Spinner /> ) }
+					{ isSaving && <Spinner /> }
 				</div>
 				<div className="editor-post-publish-panel__footer">
 					<CheckboxControl
@@ -138,7 +147,7 @@ export default compose( [
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
 		const { disablePublishSidebar, enablePublishSidebar } = dispatch( 'core/editor' );
 		return {
-			onTogglePublishSidebar: ( ) => {
+			onTogglePublishSidebar: () => {
 				if ( isPublishSidebarEnabled ) {
 					disablePublishSidebar();
 				} else {

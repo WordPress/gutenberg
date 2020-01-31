@@ -89,14 +89,17 @@ describe( 'i18n', () => {
 		} );
 
 		it( 'supports omitted plural forms expression', () => {
-			setLocaleData( {
-				'': {
-					domain: 'test_domain2',
-					lang: 'fr',
-				},
+			setLocaleData(
+				{
+					'': {
+						domain: 'test_domain2',
+						lang: 'fr',
+					},
 
-				'%d banana': [ '%d banane', '%d bananes' ],
-			}, 'test_domain2' );
+					'%d banana': [ '%d banane', '%d bananes' ],
+				},
+				'test_domain2'
+			);
 
 			expect( _n( '%d banana', '%d bananes', 2, 'test_domain2' ) ).toBe( '%d bananes' );
 		} );

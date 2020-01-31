@@ -12,11 +12,7 @@ import * as plugins from './plugins';
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as withRegistry } from './components/with-registry';
-export {
-	RegistryProvider,
-	RegistryConsumer,
-	useRegistry,
-} from './components/registry-provider';
+export { RegistryProvider, RegistryConsumer, useRegistry } from './components/registry-provider';
 export { default as useSelect } from './components/use-select';
 export {
 	useDispatch,

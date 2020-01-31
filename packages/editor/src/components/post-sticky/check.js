@@ -10,10 +10,7 @@ import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
 export function PostStickyCheck( { hasStickyAction, postType, children } ) {
-	if (
-		postType !== 'post' ||
-		! hasStickyAction
-	) {
+	if ( postType !== 'post' || ! hasStickyAction ) {
 		return null;
 	}
 

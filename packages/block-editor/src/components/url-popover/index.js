@@ -3,10 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import {
-	Button,
-	Popover,
-} from '@wordpress/components';
+import { Button, Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -41,9 +38,7 @@ class URLPopover extends Component {
 			...popoverProps
 		} = this.props;
 
-		const {
-			isSettingsExpanded,
-		} = this.state;
+		const { isSettingsExpanded } = this.state;
 
 		const showSettings = !! renderSettings && isSettingsExpanded;
 
@@ -74,9 +69,7 @@ class URLPopover extends Component {
 					) }
 				</div>
 				{ additionalControls && ! showSettings && (
-					<div
-						className="block-editor-url-popover__additional-controls"
-					>
+					<div className="block-editor-url-popover__additional-controls">
 						{ additionalControls }
 					</div>
 				) }

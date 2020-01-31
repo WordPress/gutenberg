@@ -24,11 +24,7 @@ export default function( node ) {
 	// Merge with previous list if:
 	// * There is a previous list of the same type.
 	// * There is only one list item.
-	if (
-		prevElement &&
-		prevElement.nodeName === node.nodeName &&
-		list.children.length === 1
-	) {
+	if ( prevElement && prevElement.nodeName === node.nodeName && list.children.length === 1 ) {
 		// Move all child nodes, including any text nodes, if any.
 		while ( list.firstChild ) {
 			prevElement.appendChild( list.firstChild );

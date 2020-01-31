@@ -9,8 +9,6 @@ export default function WelcomeGuideMenuItem() {
 	const { toggleFeature } = useDispatch( 'core/edit-post' );
 
 	return (
-		<MenuItem onClick={ () => toggleFeature( 'welcomeGuide' ) }>
-			{ __( 'Welcome Guide' ) }
-		</MenuItem>
+		<MenuItem onClick={ () => toggleFeature( 'welcomeGuide' ) }>{ __( 'Welcome Guide' ) }</MenuItem>
 	);
 }

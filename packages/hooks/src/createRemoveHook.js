@@ -50,9 +50,7 @@ function createRemoveHook( hooks, removeAll ) {
 			// Try to find the specified callback to remove.
 			const handlers = hooks[ hookName ].handlers;
 			for ( let i = handlers.length - 1; i >= 0; i-- ) {
-				if (
-					handlers[ i ].namespace === namespace
-				) {
+				if ( handlers[ i ].namespace === namespace ) {
 					handlers.splice( i, 1 );
 					handlersRemoved++;
 					// This callback may also be part of a hook that is

@@ -48,7 +48,7 @@ export default class Picker extends Component {
 				hideHeader
 			>
 				<View>
-					{ this.props.options.map( ( option, index ) =>
+					{ this.props.options.map( ( option, index ) => (
 						<BottomSheet.Cell
 							icon={ option.icon }
 							key={ index }
@@ -57,12 +57,14 @@ export default class Picker extends Component {
 							separatorType={ 'none' }
 							onPress={ () => this.onCellPress( option.value ) }
 						/>
+					) ) }
+					{ ! this.props.hideCancelButton && (
+						<BottomSheet.Cell
+							label={ __( 'Cancel' ) }
+							onPress={ this.onClose }
+							separatorType={ 'none' }
+						/>
 					) }
-					{ ! this.props.hideCancelButton && <BottomSheet.Cell
-						label={ __( 'Cancel' ) }
-						onPress={ this.onClose }
-						separatorType={ 'none' }
-					/> }
 				</View>
 			</BottomSheet>
 		);

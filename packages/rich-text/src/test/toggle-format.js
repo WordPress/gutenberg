@@ -35,7 +35,7 @@ describe( 'toggleFormat', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
 	} );
 
-	it( 'should apply format if it doesn\'t exist at start of selection', () => {
+	it( "should apply format if it doesn't exist at start of selection", () => {
 		const record = {
 			formats: [ , , , , [ em, strong ], [ em ], [ em ], , , , , , , ],
 			text: 'one two three',

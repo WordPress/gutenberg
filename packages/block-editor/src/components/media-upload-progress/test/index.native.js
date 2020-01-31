@@ -2,9 +2,7 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import {
-	sendMediaUpload,
-} from 'react-native-gutenberg-bridge';
+import { sendMediaUpload } from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
@@ -34,9 +32,7 @@ const MEDIA_ID = 123;
 
 describe( 'MediaUploadProgress component', () => {
 	it( 'renders without crashing', () => {
-		const wrapper = shallow(
-			<MediaUploadProgress renderContent={ () => {} } />
-		);
+		const wrapper = shallow( <MediaUploadProgress renderContent={ () => {} } /> );
 		expect( wrapper ).toBeTruthy();
 	} );
 

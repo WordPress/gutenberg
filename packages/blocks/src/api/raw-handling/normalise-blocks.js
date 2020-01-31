@@ -32,7 +32,7 @@ export default function( HTML ) {
 
 				accu.lastChild.appendChild( node );
 			}
-		// Element nodes.
+			// Element nodes.
 		} else if ( node.nodeType === ELEMENT_NODE ) {
 			// BR nodes: create a new paragraph on double, or append to previous.
 			if ( node.nodeName === 'BR' ) {
@@ -42,11 +42,7 @@ export default function( HTML ) {
 				}
 
 				// Don't append to an empty paragraph.
-				if (
-					accu.lastChild &&
-					accu.lastChild.nodeName === 'P' &&
-					accu.lastChild.hasChildNodes()
-				) {
+				if ( accu.lastChild && accu.lastChild.nodeName === 'P' && accu.lastChild.hasChildNodes() ) {
 					accu.lastChild.appendChild( node );
 				} else {
 					decu.removeChild( node );

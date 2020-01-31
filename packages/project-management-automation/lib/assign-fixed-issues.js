@@ -16,7 +16,9 @@ async function assignFixedIssues( payload, octokit ) {
 	while ( ( match = regex.exec( payload.pull_request.body ) ) ) {
 		const [ , issue ] = match;
 
-		debug( `assign-fixed-issues: Assigning issue #${ issue } to @${ payload.pull_request.user.login }` );
+		debug(
+			`assign-fixed-issues: Assigning issue #${ issue } to @${ payload.pull_request.user.login }`
+		);
 
 		await octokit.issues.addAssignees( {
 			owner: payload.repository.owner.login,

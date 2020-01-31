@@ -27,7 +27,7 @@ class ClipboardButton extends Component {
 		const { getText, onCopy } = this;
 		const container = this.containerRef.current;
 
-		this.clipboard = new Clipboard( container.firstChild,	{
+		this.clipboard = new Clipboard( container.firstChild, {
 			text: getText,
 			container,
 		} );

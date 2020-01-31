@@ -7,7 +7,8 @@ import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 function PostComments( { commentStatus = 'open', ...props } ) {
-	const onToggleComments = () => props.editPost( { comment_status: commentStatus === 'open' ? 'closed' : 'open' } );
+	const onToggleComments = () =>
+		props.editPost( { comment_status: commentStatus === 'open' ? 'closed' : 'open' } );
 
 	return (
 		<CheckboxControl

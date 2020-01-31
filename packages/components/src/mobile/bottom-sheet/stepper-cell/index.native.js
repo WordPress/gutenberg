@@ -93,7 +93,8 @@ class BottomSheetStepperCell extends Component {
 	announceValue( value ) {
 		const { label } = this.props;
 
-		if ( Platform.OS === 'ios' ) { // On Android it triggers the accessibilityLabel with the value change
+		if ( Platform.OS === 'ios' ) {
+			// On Android it triggers the accessibilityLabel with the value change
 			clearTimeout( this.timeoutAnnounceValue );
 			this.timeoutAnnounceValue = setTimeout( () => {
 				AccessibilityInfo.announceForAccessibility( `${ value } ${ label }` );
@@ -109,7 +110,8 @@ class BottomSheetStepperCell extends Component {
 		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
 			__( '%1$s. Current value is %2$s' ),
-			label, value
+			label,
+			value
 		);
 
 		return (
@@ -117,10 +119,7 @@ class BottomSheetStepperCell extends Component {
 				accessible={ true }
 				accessibilityRole="adjustable"
 				accessibilityLabel={ accessibilityLabel }
-				accessibilityActions={ [
-					{ name: 'increment' },
-					{ name: 'decrement' },
-				] }
+				accessibilityActions={ [ { name: 'increment' }, { name: 'decrement' } ] }
 				onAccessibilityAction={ ( event ) => {
 					switch ( event.nativeEvent.actionName ) {
 						case 'increment':
@@ -130,7 +129,8 @@ class BottomSheetStepperCell extends Component {
 							this.onDecrementValue();
 							break;
 					}
-				} }>
+				} }
+			>
 				<Cell
 					accessibilityRole="none"
 					accessible={ false }

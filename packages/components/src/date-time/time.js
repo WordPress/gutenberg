@@ -55,10 +55,7 @@ class TimePicker extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const { currentTime, is12Hour } = this.props;
-		if (
-			currentTime !== prevProps.currentTime ||
-			is12Hour !== prevProps.is12Hour
-		) {
+		if ( currentTime !== prevProps.currentTime || is12Hour !== prevProps.is12Hour ) {
 			this.syncState( this.props );
 		}
 	}
@@ -107,9 +104,9 @@ class TimePicker extends Component {
 			return;
 		}
 
-		const newDate = is12Hour ?
-			date.clone().hours( am === 'AM' ? value % 12 : ( ( ( value % 12 ) + 12 ) % 24 ) ) :
-			date.clone().hours( value );
+		const newDate = is12Hour
+			? date.clone().hours( am === 'AM' ? value % 12 : ( ( value % 12 ) + 12 ) % 24 )
+			: date.clone().hours( value );
 		this.changeDate( newDate );
 	}
 
@@ -192,13 +189,16 @@ class TimePicker extends Component {
 	onChangeMinutes( event ) {
 		const minutes = event.target.value;
 		this.setState( {
-			minutes: ( minutes === '' ) ? '' : ( '0' + minutes ).slice( -2 ),
+			minutes: minutes === '' ? '' : ( '0' + minutes ).slice( -2 ),
 		} );
 	}
 
 	renderMonth( month ) {
 		return (
-			<div key="render-month" className="components-datetime__time-field components-datetime__time-field-month">
+			<div
+				key="render-month"
+				className="components-datetime__time-field components-datetime__time-field-month"
+			>
 				<select
 					aria-label={ __( 'Month' ) }
 					className="components-datetime__time-field-month-select"
@@ -225,7 +225,10 @@ class TimePicker extends Component {
 
 	renderDay( day ) {
 		return (
-			<div key="render-day" className="components-datetime__time-field components-datetime__time-field-day">
+			<div
+				key="render-day"
+				className="components-datetime__time-field components-datetime__time-field-day"
+			>
 				<input
 					aria-label={ __( 'Day' ) }
 					className="components-datetime__time-field-day-input"
@@ -284,9 +287,9 @@ class TimePicker extends Component {
 								onChange={ this.onChangeHours }
 								onBlur={ this.updateHours }
 							/>
-							<span
-								className="components-datetime__time-separator"
-								aria-hidden="true">:</span>
+							<span className="components-datetime__time-separator" aria-hidden="true">
+								:
+							</span>
 							<input
 								aria-label={ __( 'Minutes' ) }
 								className="components-datetime__time-field-minutes-input"

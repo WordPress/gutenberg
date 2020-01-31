@@ -25,9 +25,9 @@ function filterWithReference( collection, predicate ) {
  * @return {boolean} Whether the given annotation is valid.
  */
 function isValidAnnotationRange( annotation ) {
-	return isNumber( annotation.start ) &&
-		isNumber( annotation.end ) &&
-		annotation.start <= annotation.end;
+	return (
+		isNumber( annotation.start ) && isNumber( annotation.end ) && annotation.start <= annotation.end
+	);
 }
 
 /**

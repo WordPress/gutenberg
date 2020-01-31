@@ -41,7 +41,12 @@ describe( 'applyFormat', () => {
 		const expected = {
 			...record,
 			activeFormats: [ em ],
-			formats: [ [ strong, em ], [ strong, em ], [ strong, em ], [ strong, em ] ],
+			formats: [
+				[ strong, em ],
+				[ strong, em ],
+				[ strong, em ],
+				[ strong, em ],
+			],
 		};
 		const result = applyFormat( deepFreeze( record ), em, 0, 4 );
 
@@ -58,7 +63,12 @@ describe( 'applyFormat', () => {
 		const expected = {
 			...record,
 			activeFormats: [ em ],
-			formats: [ [ strong, em ], [ strong, em ], [ strong, em ], [ strong, em ] ],
+			formats: [
+				[ strong, em ],
+				[ strong, em ],
+				[ strong, em ],
+				[ strong, em ],
+			],
 		};
 		const result = applyFormat( deepFreeze( record ), em, 0, 4 );
 

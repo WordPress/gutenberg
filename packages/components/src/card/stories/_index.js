@@ -31,13 +31,9 @@ export const _default = () => {
 
 	return (
 		<Card { ...props }>
-			{ header && (
-				<CardHeader isShady={ isHeaderShady }>{ header }</CardHeader>
-			) }
+			{ header && <CardHeader isShady={ isHeaderShady }>{ header }</CardHeader> }
 			{ body && <CardBody isShady={ isBodyShady }>{ body }</CardBody> }
-			{ footer && (
-				<CardFooter isShady={ isFooterShady }>{ footer }</CardFooter>
-			) }
+			{ footer && <CardFooter isShady={ isFooterShady }>{ footer }</CardFooter> }
 		</Card>
 	);
 };

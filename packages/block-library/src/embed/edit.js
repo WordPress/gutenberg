@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import { createUpgradedEmbedBlock, getClassNames, fallback, getAttributesFromPreview } from './util';
+import {
+	createUpgradedEmbedBlock,
+	getClassNames,
+	fallback,
+	getAttributesFromPreview,
+} from './util';
 import EmbedControls from './embed-controls';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
@@ -43,10 +48,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		handleIncomingPreview() {
 			this.setMergedAttributes();
 			if ( this.props.onReplace ) {
-				const upgradedBlock = createUpgradedEmbedBlock(
-					this.props,
-					this.getMergedAttributes()
-				);
+				const upgradedBlock = createUpgradedEmbedBlock( this.props, this.getMergedAttributes() );
 				if ( upgradedBlock ) {
 					this.props.onReplace( upgradedBlock );
 				}
@@ -56,7 +58,10 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		componentDidUpdate( prevProps ) {
 			const hasPreview = undefined !== this.props.preview;
 			const hadPreview = undefined !== prevProps.preview;
-			const previewChanged = prevProps.preview && this.props.preview && this.props.preview.html !== prevProps.preview.html;
+			const previewChanged =
+				prevProps.preview &&
+				this.props.preview &&
+				this.props.preview.html !== prevProps.preview.html;
 			const switchedPreview = previewChanged || ( hasPreview && ! hadPreview );
 			const switchedURL = this.props.attributes.url !== prevProps.attributes.url;
 
@@ -75,9 +80,12 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		}
 
 		resubmitWithoutTrailingSlash() {
-			this.setState( ( prevState ) => ( {
-				url: prevState.url.replace( /\/$/, '' ),
-			} ), this.setUrl );
+			this.setState(
+				( prevState ) => ( {
+					url: prevState.url.replace( /\/$/, '' ),
+				} ),
+				this.setUrl
+			);
 		}
 
 		setUrl( event ) {
@@ -96,7 +104,10 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		getMergedAttributes() {
 			const { preview } = this.props;
 			const { className, allowResponsive } = this.props.attributes;
-			return { ...this.props.attributes, ...getAttributesFromPreview( preview, title, className, responsive, allowResponsive ) };
+			return {
+				...this.props.attributes,
+				...getAttributesFromPreview( preview, title, className, responsive, allowResponsive ),
+			};
 		}
 
 		/***
@@ -112,7 +123,9 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		}
 
 		getResponsiveHelp( checked ) {
-			return checked ? __( 'This embed will preserve its aspect ratio when the browser is resized.' ) : __( 'This embed may not preserve its aspect ratio when the browser is resized.' );
+			return checked
+				? __( 'This embed will preserve its aspect ratio when the browser is resized.' )
+				: __( 'This embed may not preserve its aspect ratio when the browser is resized.' );
 		}
 
 		toggleResponsive() {
@@ -120,22 +133,26 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			const { html } = this.props.preview;
 			const newAllowResponsive = ! allowResponsive;
 
-			this.props.setAttributes(
-				{
-					allowResponsive: newAllowResponsive,
-					className: getClassNames( html, className, responsive && newAllowResponsive ),
-				}
-			);
+			this.props.setAttributes( {
+				allowResponsive: newAllowResponsive,
+				className: getClassNames( html, className, responsive && newAllowResponsive ),
+			} );
 		}
 
 		render() {
 			const { url, editingURL } = this.state;
-			const { fetching, setAttributes, isSelected, preview, cannotEmbed, themeSupportsResponsive, tryAgain } = this.props;
+			const {
+				fetching,
+				setAttributes,
+				isSelected,
+				preview,
+				cannotEmbed,
+				themeSupportsResponsive,
+				tryAgain,
+			} = this.props;
 
 			if ( fetching ) {
-				return (
-					<EmbedLoading />
-				);
+				return <EmbedLoading />;
 			}
 
 			// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists

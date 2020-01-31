@@ -18,11 +18,9 @@ export const Context = createContext();
 export const BlockNodes = createContext();
 
 function selector( select ) {
-	const {
-		getSelectedBlockClientId,
-		hasMultiSelection,
-		isMultiSelecting,
-	} = select( 'core/block-editor' );
+	const { getSelectedBlockClientId, hasMultiSelection, isMultiSelecting } = select(
+		'core/block-editor'
+	);
 
 	return {
 		selectedBlockClientId: getSelectedBlockClientId(),
@@ -47,11 +45,7 @@ function onDragStart( event ) {
 }
 
 function RootContainer( { children, className }, ref ) {
-	const {
-		selectedBlockClientId,
-		hasMultiSelection,
-		isMultiSelecting,
-	} = useSelect( selector, [] );
+	const { selectedBlockClientId, hasMultiSelection, isMultiSelecting } = useSelect( selector, [] );
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const onSelectionStart = useMultiSelection( ref );
 
@@ -83,15 +77,8 @@ function RootContainer( { children, className }, ref ) {
 		>
 			<BlockNodes.Provider value={ useState( {} ) }>
 				<BlockPopover />
-				<div
-					ref={ ref }
-					className={ className }
-					onFocus={ onFocus }
-					onDragStart={ onDragStart }
-				>
-					<Context.Provider value={ onSelectionStart }>
-						{ children }
-					</Context.Provider>
+				<div ref={ ref } className={ className } onFocus={ onFocus } onDragStart={ onDragStart }>
+					<Context.Provider value={ onSelectionStart }>{ children }</Context.Provider>
 				</div>
 			</BlockNodes.Provider>
 		</InsertionPoint>

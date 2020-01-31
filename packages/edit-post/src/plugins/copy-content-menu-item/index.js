@@ -15,20 +15,14 @@ function CopyContentMenuItem( { createNotice, editedPostContent, hasCopied, setS
 				className="components-menu-item__button"
 				onCopy={ () => {
 					setState( { hasCopied: true } );
-					createNotice(
-						'info',
-						__( 'All content copied.' ),
-						{
-							isDismissible: true,
-							type: 'snackbar',
-						}
-					);
+					createNotice( 'info', __( 'All content copied.' ), {
+						isDismissible: true,
+						type: 'snackbar',
+					} );
 				} }
 				onFinishCopy={ () => setState( { hasCopied: false } ) }
 			>
-				{ hasCopied ?
-					__( 'Copied!' ) :
-					__( 'Copy all content' ) }
+				{ hasCopied ? __( 'Copied!' ) : __( 'Copy all content' ) }
 			</ClipboardButton>
 		)
 	);
@@ -39,9 +33,7 @@ export default compose(
 		editedPostContent: select( 'core/editor' ).getEditedPostAttribute( 'content' ),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const {
-			createNotice,
-		} = dispatch( 'core/notices' );
+		const { createNotice } = dispatch( 'core/notices' );
 
 		return {
 			createNotice,

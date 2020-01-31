@@ -102,7 +102,7 @@ class InnerBlocks extends Component {
 
 		// Synchronize with templates. If the next set differs, replace.
 		const nextBlocks = synchronizeBlocksWithTemplate( innerBlocks, template );
-		if ( ! isEqual( nextBlocks, innerBlocks	) ) {
+		if ( ! isEqual( nextBlocks, innerBlocks ) ) {
 			replaceInnerBlocks( nextBlocks );
 		}
 	}
@@ -149,12 +149,7 @@ class InnerBlocks extends Component {
 
 		return (
 			<div className={ classes }>
-				{ ! templateInProcess && (
-					<BlockList
-						rootClientId={ clientId }
-						{ ...props }
-					/>
-				) }
+				{ ! templateInProcess && <BlockList rootClientId={ clientId } { ...props } /> }
 			</div>
 		);
 	}
@@ -181,7 +176,10 @@ InnerBlocks = compose( [
 		return {
 			block,
 			blockListSettings: getBlockListSettings( clientId ),
-			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
+			hasOverlay:
+				block.name !== 'core/template' &&
+				! isBlockSelected( clientId ) &&
+				! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
 			enableClickThrough: isNavigationMode() || isSmallScreen,
 			isLastBlockChangePersistent: isLastBlockChangePersistent(),
@@ -200,9 +198,7 @@ InnerBlocks = compose( [
 				replaceInnerBlocks(
 					clientId,
 					blocks,
-					block.innerBlocks.length === 0 &&
-						templateInsertUpdatesSelection &&
-						blocks.length !== 0
+					block.innerBlocks.length === 0 && templateInsertUpdatesSelection && blocks.length !== 0
 				);
 			},
 			__unstableMarkNextChangeAsNotPersistent,
@@ -217,9 +213,7 @@ InnerBlocks = compose( [
 InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
-InnerBlocks.Content = withBlockContentContext(
-	( { BlockContent } ) => <BlockContent />
-);
+InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => <BlockContent /> );
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md

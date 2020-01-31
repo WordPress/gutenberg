@@ -96,10 +96,7 @@ export class HTMLTextInput extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			getEditedPostContent,
-		} = select( 'core/editor' );
+		const { getEditedPostAttribute, getEditedPostContent } = select( 'core/editor' );
 
 		return {
 			title: getEditedPostAttribute( 'title' ),

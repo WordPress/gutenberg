@@ -27,7 +27,12 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 const DEFAULT_CONTROLS = [ 'top', 'center', 'bottom' ];
 const DEFAULT_CONTROL = 'top';
 
-export function BlockVerticalAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS, isCollapsed = true } ) {
+export function BlockVerticalAlignmentToolbar( {
+	value,
+	onChange,
+	controls = DEFAULT_CONTROLS,
+	isCollapsed = true,
+} ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
@@ -40,16 +45,14 @@ export function BlockVerticalAlignmentToolbar( { value, onChange, controls = DEF
 			isCollapsed={ isCollapsed }
 			icon={ activeAlignment ? activeAlignment.icon : defaultAlignmentControl.icon }
 			label={ _x( 'Change vertical alignment', 'Block vertical alignment setting label' ) }
-			controls={
-				controls.map( ( control ) => {
-					return {
-						...BLOCK_ALIGNMENTS_CONTROLS[ control ],
-						isActive: value === control,
-						role: isCollapsed ? 'menuitemradio' : undefined,
-						onClick: applyOrUnset( control ),
-					};
-				} )
-			}
+			controls={ controls.map( ( control ) => {
+				return {
+					...BLOCK_ALIGNMENTS_CONTROLS[ control ],
+					isActive: value === control,
+					role: isCollapsed ? 'menuitemradio' : undefined,
+					onClick: applyOrUnset( control ),
+				};
+			} ) }
 		/>
 	);
 }

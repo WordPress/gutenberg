@@ -2,14 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import {
-	get,
-	filter,
-	map,
-	last,
-	omit,
-	pick,
-} from 'lodash';
+import { get, filter, map, last, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,9 +32,7 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
-import {
-	Component,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -65,7 +56,10 @@ import {
 
 export const pickRelevantMediaFiles = ( image ) => {
 	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
-	imageProps.url = get( image, [ 'sizes', 'large', 'url' ] ) || get( image, [ 'media_details', 'sizes', 'large', 'source_url' ] ) || image.url;
+	imageProps.url =
+		get( image, [ 'sizes', 'large', 'url' ] ) ||
+		get( image, [ 'media_details', 'sizes', 'large', 'source_url' ] ) ||
+		image.url;
 	return imageProps;
 };
 
@@ -113,11 +107,7 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const {
-			attributes,
-			mediaUpload,
-			noticeOperations,
-		} = this.props;
+		const { attributes, mediaUpload, noticeOperations } = this.props;
 		const { id, url = '' } = attributes;
 
 		if ( isTemporaryImage( id, url ) ) {
@@ -231,9 +221,7 @@ export class ImageEdit extends Component {
 
 	onImageError( url ) {
 		// Check if there's an embed block that handles this URL.
-		const embedBlock = createUpgradedEmbedBlock(
-			{ attributes: { url } }
-		);
+		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
 		if ( undefined !== embedBlock ) {
 			this.props.onReplace( embedBlock );
 		}
@@ -269,9 +257,8 @@ export class ImageEdit extends Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
-			{ width: undefined, height: undefined } :
-			{};
+		const extraUpdatedAttributes =
+			[ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ? { width: undefined, height: undefined } : {};
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
@@ -301,7 +288,9 @@ export class ImageEdit extends Component {
 	getImageSizeOptions() {
 		const { imageSizes, image } = this.props;
 		return map(
-			filter( imageSizes, ( { slug } ) => ( get( image, [ 'media_details', 'sizes', slug, 'source_url' ] ) ) ),
+			filter( imageSizes, ( { slug } ) =>
+				get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
+			),
 			( { name, slug } ) => ( { value: slug, label: name } )
 		);
 	}
@@ -339,18 +328,17 @@ export class ImageEdit extends Component {
 		const isExternal = isExternalImage( id, url );
 		const controls = (
 			<BlockControls>
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ this.updateAlignment }
-				/>
-				{ url && <MediaReplaceFlow
-					mediaURL={ url }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
-					onSelect={ this.onSelectImage }
-					onSelectURL={ this.onSelectURL }
-					onError={ this.onUploadError }
-				/> }
+				<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
+				{ url && (
+					<MediaReplaceFlow
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*"
+						onSelect={ this.onSelectImage }
+						onSelectURL={ this.onSelectURL }
+						onError={ this.onUploadError }
+					/>
+				) }
 				{ url && (
 					<ToolbarGroup>
 						<ImageURLInputUI
@@ -370,14 +358,18 @@ export class ImageEdit extends Component {
 		const src = isExternal ? url : undefined;
 		const labels = {
 			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
-			instructions: __( 'Upload an image file, pick one from your media library, or add one with a URL.' ),
+			instructions: __(
+				'Upload an image file, pick one from your media library, or add one with a URL.'
+			),
 		};
-		const mediaPreview = ( !! url && <img
-			alt={ __( 'Edit image' ) }
-			title={ __( 'Edit image' ) }
-			className={ 'edit-image-preview' }
-			src={ url }
-		/> );
+		const mediaPreview = !! url && (
+			<img
+				alt={ __( 'Edit image' ) }
+				title={ __( 'Edit image' ) }
+				className={ 'edit-image-preview' }
+				src={ url }
+			/>
+		);
 		const mediaPlaceholder = (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
@@ -482,7 +474,10 @@ export class ImageEdit extends Component {
 							if ( alt ) {
 								defaultedAlt = alt;
 							} else if ( filename ) {
-								defaultedAlt = sprintf( __( 'This image has an empty alt attribute; its file name is %s' ), filename );
+								defaultedAlt = sprintf(
+									__( 'This image has an empty alt attribute; its file name is %s' ),
+									filename
+								);
 							} else {
 								defaultedAlt = __( 'This image has an empty alt attribute' );
 							}
@@ -507,9 +502,7 @@ export class ImageEdit extends Component {
 								return (
 									<>
 										{ getInspectorControls( imageWidth, imageHeight ) }
-										<div style={ { width, height } }>
-											{ img }
-										</div>
+										<div style={ { width, height } }>{ img }</div>
 									</>
 								);
 							}
@@ -622,13 +615,11 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
-		const { attributes: { id }, isSelected } = props;
 		const {
-			mediaUpload,
-			imageSizes,
-			isRTL,
-			maxWidth,
-		} = getSettings();
+			attributes: { id },
+			isSelected,
+		} = props;
+		const { mediaUpload, imageSizes, isRTL, maxWidth } = getSettings();
 
 		return {
 			image: id && isSelected ? getMedia( id ) : null,

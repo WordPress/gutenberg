@@ -68,8 +68,5 @@ export function getColorClassName( colorContextName, colorSlug ) {
  * @return {string} String with the color value of the most readable color.
  */
 export function getMostReadableColor( colors, colorValue ) {
-	return tinycolor.mostReadable(
-		colorValue,
-		map( colors, 'color' )
-	).toHexString();
+	return tinycolor.mostReadable( colorValue, map( colors, 'color' ) ).toHexString();
 }

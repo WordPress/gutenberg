@@ -138,15 +138,15 @@ describe( 'Block Grouping', () => {
 		it( 'does not show group transform if Grouping block is disabled', async () => {
 			const availableTransforms = await getAvailableBlockTransforms();
 
-			expect(
-				availableTransforms
-			).not.toContain( 'Group' );
+			expect( availableTransforms ).not.toContain( 'Group' );
 		} );
 
 		it( 'does not show group option in the options toolbar if Grouping block is disabled ', async () => {
 			await clickBlockToolbarButton( 'More options' );
 
-			const blockOptionsDropdownHTML = await page.evaluate( () => document.querySelector( '.block-editor-block-settings-menu__popover' ).innerHTML );
+			const blockOptionsDropdownHTML = await page.evaluate(
+				() => document.querySelector( '.block-editor-block-settings-menu__popover' ).innerHTML
+			);
 
 			expect( blockOptionsDropdownHTML ).not.toContain( 'Group' );
 		} );

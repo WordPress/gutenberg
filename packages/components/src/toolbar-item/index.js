@@ -20,12 +20,16 @@ function ToolbarItem( { children, ...props }, ref ) {
 	const itemProps = useToolbarItem( accessibleToolbarState, { ...props, ref } );
 
 	if ( typeof children !== 'function' ) {
-		warning( '`ToolbarItem` is a generic headless component that accepts only function children props' );
+		warning(
+			'`ToolbarItem` is a generic headless component that accepts only function children props'
+		);
 		return null;
 	}
 
 	if ( ! accessibleToolbarState ) {
-		warning( '`ToolbarItem` should be rendered within `<Toolbar __experimentalAccessibilityLabel="label">`' );
+		warning(
+			'`ToolbarItem` should be rendered within `<Toolbar __experimentalAccessibilityLabel="label">`'
+		);
 		return null;
 	}
 

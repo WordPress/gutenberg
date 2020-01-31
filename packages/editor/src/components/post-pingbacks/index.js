@@ -7,7 +7,8 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 function PostPingbacks( { pingStatus = 'open', ...props } ) {
-	const onTogglePingback = () => props.editPost( { ping_status: pingStatus === 'open' ? 'closed' : 'open' } );
+	const onTogglePingback = () =>
+		props.editPost( { ping_status: pingStatus === 'open' ? 'closed' : 'open' } );
 
 	return (
 		<CheckboxControl

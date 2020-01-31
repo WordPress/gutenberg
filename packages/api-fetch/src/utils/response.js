@@ -33,10 +33,9 @@ const parseJsonAndNormalizeError = ( response ) => {
 		throw invalidJsonError;
 	}
 
-	return response.json()
-		.catch( () => {
-			throw invalidJsonError;
-		} );
+	return response.json().catch( () => {
+		throw invalidJsonError;
+	} );
 };
 
 /**
@@ -48,8 +47,9 @@ const parseJsonAndNormalizeError = ( response ) => {
  * @return {Promise} Parsed response.
  */
 export const parseResponseAndNormalizeError = ( response, shouldParseResponse = true ) => {
-	return Promise.resolve( parseResponse( response, shouldParseResponse ) )
-		.catch( ( res ) => parseAndThrowError( res, shouldParseResponse ) );
+	return Promise.resolve( parseResponse( response, shouldParseResponse ) ).catch( ( res ) =>
+		parseAndThrowError( res, shouldParseResponse )
+	);
 };
 
 export function parseAndThrowError( response, shouldParseResponse = true ) {
@@ -57,14 +57,12 @@ export function parseAndThrowError( response, shouldParseResponse = true ) {
 		throw response;
 	}
 
-	return parseJsonAndNormalizeError( response )
-		.then( ( error ) => {
-			const unknownError = {
-				code: 'unknown_error',
-				message: __( 'An unknown error occurred.' ),
-			};
+	return parseJsonAndNormalizeError( response ).then( ( error ) => {
+		const unknownError = {
+			code: 'unknown_error',
+			message: __( 'An unknown error occurred.' ),
+		};
 
-			throw error || unknownError;
-		} );
+		throw error || unknownError;
+	} );
 }
-

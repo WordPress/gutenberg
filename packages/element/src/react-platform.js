@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	createPortal,
-	findDOMNode,
-	render,
-	unmountComponentAtNode,
-} from 'react-dom';
+import { createPortal, findDOMNode, render, unmountComponentAtNode } from 'react-dom';
 
 /**
  * Creates a portal into which a component can be rendered.

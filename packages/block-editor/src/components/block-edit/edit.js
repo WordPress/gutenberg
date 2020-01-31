@@ -18,9 +18,9 @@ export const Edit = ( props ) => {
 	}
 
 	// Generate a class name for the block's editable form
-	const generatedClassName = hasBlockSupport( blockType, 'className', true ) ?
-		getBlockDefaultClassName( name ) :
-		null;
+	const generatedClassName = hasBlockSupport( blockType, 'className', true )
+		? getBlockDefaultClassName( name )
+		: null;
 	const className = classnames( generatedClassName, attributes.className );
 
 	// `edit` and `save` are functions or components describing the markup
