@@ -12,13 +12,13 @@ function TreeGridRow( { children, level, positionInSet, setSize, isExpanded, ...
 		//
 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<tr
+			{ ...props }
 			ref={ ref }
 			role="row"
 			aria-level={ level }
 			aria-posinset={ positionInSet }
 			aria-setsize={ setSize }
 			aria-expanded={ isExpanded }
-			{ ...props }
 		>
 			{ children }
 		</tr>

@@ -109,7 +109,7 @@ export default function TreeGrid( { children, ...props } ) {
 		<RovingTabIndexContainer>
 			{ /* Disable reason: A treegrid is implemented using a table element. */ }
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role */ }
-			<table role="treegrid" onKeyDown={ onKeyDown } { ...props }>
+			<table { ...props } role="treegrid" onKeyDown={ onKeyDown }>
 				<tbody>
 					{ children }
 				</tbody>
