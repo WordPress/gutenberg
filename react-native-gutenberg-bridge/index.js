@@ -16,7 +16,7 @@ export const mediaSources = {
 	siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
 };
 
-export const showMediaEditorButton = isIOS;
+export const showMediaEditorButton = isIOS && __DEV__;
 
 // Console polyfill from react-native
 
