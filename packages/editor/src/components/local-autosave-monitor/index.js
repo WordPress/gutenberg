@@ -48,8 +48,10 @@ function useAutosaveNotice() {
 	const { postId, getEditedPostAttribute, hasRemoteAutosave } = useSelect(
 		( select ) => ( {
 			postId: select( 'core/editor' ).getCurrentPostId(),
-			getEditedPostAttribute: select( 'core/editor' ).getEditedPostAttribute,
-			hasRemoteAutosave: !! select( 'core/editor' ).getEditorSettings().autosave,
+			getEditedPostAttribute: select( 'core/editor' )
+				.getEditedPostAttribute,
+			hasRemoteAutosave: !! select( 'core/editor' ).getEditorSettings()
+				.autosave,
 		} ),
 		[]
 	);
@@ -93,7 +95,9 @@ function useAutosaveNotice() {
 
 		const noticeId = uniqueId( 'wpEditorAutosaveRestore' );
 		createWarningNotice(
-			__( 'The backup of this post in your browser is different from the version below.' ),
+			__(
+				'The backup of this post in your browser is different from the version below.'
+			),
 			{
 				id: noticeId,
 				actions: [
@@ -131,7 +135,8 @@ function useAutosavePurge() {
 	useEffect( () => {
 		if (
 			! didError &&
-			( ( lastIsAutosaving.current && ! isAutosaving ) || ( lastIsDirty.current && ! isDirty ) )
+			( ( lastIsAutosaving.current && ! isAutosaving ) ||
+				( lastIsDirty.current && ! isDirty ) )
 		) {
 			localAutosaveClear( postId );
 		}
@@ -158,7 +163,11 @@ function LocalAutosaveMonitor() {
 	);
 
 	return (
-		<AutosaveMonitor interval={ localAutosaveInterval } autosave={ autosave } shouldThrottle />
+		<AutosaveMonitor
+			interval={ localAutosaveInterval }
+			autosave={ autosave }
+			shouldThrottle
+		/>
 	);
 }
 

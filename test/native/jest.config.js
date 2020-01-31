@@ -31,15 +31,24 @@ module.exports = {
 	],
 	testEnvironment: 'jsdom',
 	testMatch: [ '**/test/*.native.[jt]s?(x)' ],
-	testPathIgnorePatterns: [ '/node_modules/', '/wordpress/', '/__device-tests__/' ],
+	testPathIgnorePatterns: [
+		'/node_modules/',
+		'/wordpress/',
+		'/__device-tests__/',
+	],
 	testURL: 'http://localhost/',
 	// Add the `Libraries/Utilities` subfolder to the module directories, otherwise haste/jest doesn't find Platform.js on Travis,
 	// and add it first so https://github.com/facebook/react-native/blob/v0.60.0/Libraries/react-native/react-native-implementation.js#L324-L326 doesn't pick up the Platform npm module.
-	moduleDirectories: [ 'node_modules/react-native/Libraries/Utilities', 'node_modules' ],
+	moduleDirectories: [
+		'node_modules/react-native/Libraries/Utilities',
+		'node_modules',
+	],
 	moduleNameMapper: {
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
 		'\\.(scss)$': '<rootDir>/' + configPath + '/__mocks__/styleMock.js',
-		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]: '<rootDir>/packages/$1/src',
+		[ `@wordpress\\/(${ transpiledPackageNames.join(
+			'|'
+		) })$` ]: '<rootDir>/packages/$1/src',
 	},
 	haste: {
 		defaultPlatform: rnPlatform,

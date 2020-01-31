@@ -15,9 +15,12 @@ export default compose(
 		isChecked: select( 'core/editor' ).isPublishSidebarEnabled(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { enablePublishSidebar, disablePublishSidebar } = dispatch( 'core/editor' );
+		const { enablePublishSidebar, disablePublishSidebar } = dispatch(
+			'core/editor'
+		);
 		return {
-			onChange: ( isEnabled ) => ( isEnabled ? enablePublishSidebar() : disablePublishSidebar() ),
+			onChange: ( isEnabled ) =>
+				isEnabled ? enablePublishSidebar() : disablePublishSidebar(),
 		};
 	} ),
 	// In < medium viewports we override this option and always show the publish sidebar.

@@ -19,14 +19,24 @@ function GroupEdit( { hasInnerBlocks, isSelected, getStylesFromColorScheme } ) {
 		return (
 			<View
 				style={ [
-					getStylesFromColorScheme( styles.groupPlaceholder, styles.groupPlaceholderDark ),
-					! hasInnerBlocks && { ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
+					getStylesFromColorScheme(
+						styles.groupPlaceholder,
+						styles.groupPlaceholderDark
+					),
+					! hasInnerBlocks && {
+						...styles.marginVerticalDense,
+						...styles.marginHorizontalNone,
+					},
 				] }
 			/>
 		);
 	}
 
-	return <InnerBlocks renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender } />;
+	return (
+		<InnerBlocks
+			renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
+		/>
+	);
 }
 
 export default compose( [

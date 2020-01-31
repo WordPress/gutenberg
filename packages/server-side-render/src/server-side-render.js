@@ -60,12 +60,19 @@ export class ServerSideRender extends Component {
 		// check if it is the current request, to avoid race conditions on slow networks.
 		const fetchRequest = ( this.currentFetchRequest = apiFetch( { path } )
 			.then( ( response ) => {
-				if ( this.isStillMounted && fetchRequest === this.currentFetchRequest && response ) {
+				if (
+					this.isStillMounted &&
+					fetchRequest === this.currentFetchRequest &&
+					response
+				) {
 					this.setState( { response: response.rendered } );
 				}
 			} )
 			.catch( ( error ) => {
-				if ( this.isStillMounted && fetchRequest === this.currentFetchRequest ) {
+				if (
+					this.isStillMounted &&
+					fetchRequest === this.currentFetchRequest
+				) {
 					this.setState( {
 						response: {
 							error: true,
@@ -87,11 +94,26 @@ export class ServerSideRender extends Component {
 		} = this.props;
 
 		if ( response === '' ) {
-			return <EmptyResponsePlaceholder response={ response } { ...this.props } />;
+			return (
+				<EmptyResponsePlaceholder
+					response={ response }
+					{ ...this.props }
+				/>
+			);
 		} else if ( ! response ) {
-			return <LoadingResponsePlaceholder response={ response } { ...this.props } />;
+			return (
+				<LoadingResponsePlaceholder
+					response={ response }
+					{ ...this.props }
+				/>
+			);
 		} else if ( response.error ) {
-			return <ErrorResponsePlaceholder response={ response } { ...this.props } />;
+			return (
+				<ErrorResponsePlaceholder
+					response={ response }
+					{ ...this.props }
+				/>
+			);
 		}
 
 		return (
@@ -104,12 +126,19 @@ export class ServerSideRender extends Component {
 
 ServerSideRender.defaultProps = {
 	EmptyResponsePlaceholder: ( { className } ) => (
-		<Placeholder className={ className }>{ __( 'Block rendered as empty.' ) }</Placeholder>
+		<Placeholder className={ className }>
+			{ __( 'Block rendered as empty.' ) }
+		</Placeholder>
 	),
 	ErrorResponsePlaceholder: ( { response, className } ) => {
 		// translators: %s: error message describing the problem
-		const errorMessage = sprintf( __( 'Error loading block: %s' ), response.errorMsg );
-		return <Placeholder className={ className }>{ errorMessage }</Placeholder>;
+		const errorMessage = sprintf(
+			__( 'Error loading block: %s' ),
+			response.errorMsg
+		);
+		return (
+			<Placeholder className={ className }>{ errorMessage }</Placeholder>
+		);
 	},
 	LoadingResponsePlaceholder: ( { className } ) => {
 		return (

@@ -16,7 +16,12 @@ import styles from './style.scss';
 
 class VisualEditor extends Component {
 	renderHeader() {
-		const { editTitle, setTitleRef, title, getStylesFromColorScheme } = this.props;
+		const {
+			editTitle,
+			setTitleRef,
+			title,
+			getStylesFromColorScheme,
+		} = this.props;
 		const blockHolderFocusedStyle = getStylesFromColorScheme(
 			styles.blockHolderFocused,
 			styles.blockHolderFocusedDark

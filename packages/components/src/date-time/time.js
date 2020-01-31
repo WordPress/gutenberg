@@ -55,7 +55,10 @@ class TimePicker extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const { currentTime, is12Hour } = this.props;
-		if ( currentTime !== prevProps.currentTime || is12Hour !== prevProps.is12Hour ) {
+		if (
+			currentTime !== prevProps.currentTime ||
+			is12Hour !== prevProps.is12Hour
+		) {
 			this.syncState( this.props );
 		}
 	}
@@ -105,7 +108,11 @@ class TimePicker extends Component {
 		}
 
 		const newDate = is12Hour
-			? date.clone().hours( am === 'AM' ? value % 12 : ( ( value % 12 ) + 12 ) % 24 )
+			? date
+					.clone()
+					.hours(
+						am === 'AM' ? value % 12 : ( ( value % 12 ) + 12 ) % 24
+					)
 			: date.clone().hours( value );
 		this.changeDate( newDate );
 	}
@@ -162,7 +169,9 @@ class TimePicker extends Component {
 			}
 			let newDate;
 			if ( value === 'PM' ) {
-				newDate = date.clone().hours( ( ( parseInt( hours, 10 ) % 12 ) + 12 ) % 24 );
+				newDate = date
+					.clone()
+					.hours( ( ( parseInt( hours, 10 ) % 12 ) + 12 ) % 24 );
 			} else {
 				newDate = date.clone().hours( parseInt( hours, 10 ) % 12 );
 			}
@@ -255,7 +264,9 @@ class TimePicker extends Component {
 		return (
 			<div className={ classnames( 'components-datetime__time' ) }>
 				<fieldset>
-					<legend className="components-datetime__time-legend invisible">{ __( 'Date' ) }</legend>
+					<legend className="components-datetime__time-legend invisible">
+						{ __( 'Date' ) }
+					</legend>
 					<div className="components-datetime__time-wrapper">
 						{ this.renderDayMonthFormat( is12Hour ) }
 						<div className="components-datetime__time-field components-datetime__time-field-year">
@@ -273,7 +284,9 @@ class TimePicker extends Component {
 				</fieldset>
 
 				<fieldset>
-					<legend className="components-datetime__time-legend invisible">{ __( 'Time' ) }</legend>
+					<legend className="components-datetime__time-legend invisible">
+						{ __( 'Time' ) }
+					</legend>
 					<div className="components-datetime__time-wrapper">
 						<div className="components-datetime__time-field components-datetime__time-field-time">
 							<input
@@ -287,7 +300,10 @@ class TimePicker extends Component {
 								onChange={ this.onChangeHours }
 								onBlur={ this.updateHours }
 							/>
-							<span className="components-datetime__time-separator" aria-hidden="true">
+							<span
+								className="components-datetime__time-separator"
+								aria-hidden="true"
+							>
 								:
 							</span>
 							<input

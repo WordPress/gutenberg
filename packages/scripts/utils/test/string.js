@@ -17,7 +17,9 @@ describe( 'string', () => {
 
 		test( 'converts dashes into camel case', () => {
 			expect( camelCaseDash( 'api-fetch' ) ).toBe( 'apiFetch' );
-			expect( camelCaseDash( 'list-reusable-blocks' ) ).toBe( 'listReusableBlocks' );
+			expect( camelCaseDash( 'list-reusable-blocks' ) ).toBe(
+				'listReusableBlocks'
+			);
 		} );
 	} );
 } );

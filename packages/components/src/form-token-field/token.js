@@ -61,7 +61,9 @@ export default function Token( {
 				className="components-form-token-field__token-text"
 				id={ `components-form-token-field__token-text-${ instanceId }` }
 			>
-				<VisuallyHidden as="span">{ termPositionAndCount }</VisuallyHidden>
+				<VisuallyHidden as="span">
+					{ termPositionAndCount }
+				</VisuallyHidden>
 				<span aria-hidden="true">{ transformedValue }</span>
 			</span>
 

@@ -43,7 +43,9 @@ function Indicator( { clientId } ) {
 		return null;
 	}
 
-	return <div className="block-editor-block-list__insertion-point-indicator" />;
+	return (
+		<div className="block-editor-block-list__insertion-point-indicator" />
+	);
 }
 
 export default function InsertionPoint( {
@@ -69,9 +71,11 @@ export default function InsertionPoint( {
 
 		const rect = event.target.getBoundingClientRect();
 		const offset = event.clientY - rect.top;
-		const element = Array.from( event.target.children ).find( ( blockEl ) => {
-			return blockEl.offsetTop > offset;
-		} );
+		const element = Array.from( event.target.children ).find(
+			( blockEl ) => {
+				return blockEl.offsetTop > offset;
+			}
+		);
 
 		if ( ! element ) {
 			return;
@@ -85,7 +89,10 @@ export default function InsertionPoint( {
 
 		const elementRect = element.getBoundingClientRect();
 
-		if ( event.clientX > elementRect.right || event.clientX < elementRect.left ) {
+		if (
+			event.clientX > elementRect.right ||
+			event.clientX < elementRect.left
+		) {
 			if ( isInserterShown ) {
 				setIsInserterShown( false );
 			}
@@ -149,17 +156,28 @@ export default function InsertionPoint( {
 							//
 							// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 							tabIndex={ -1 }
-							className={ classnames( 'block-editor-block-list__insertion-point-inserter', {
-								// Hide the inserter above the selected block.
-								'is-inserter-hidden': inserterClientId === selectedBlockClientId,
-							} ) }
+							className={ classnames(
+								'block-editor-block-list__insertion-point-inserter',
+								{
+									// Hide the inserter above the selected block.
+									'is-inserter-hidden':
+										inserterClientId ===
+										selectedBlockClientId,
+								}
+							) }
 						>
 							<Inserter clientId={ inserterClientId } />
 						</div>
 					</div>
 				</Popover>
 			) }
-			<div onMouseMove={ ! isInserterForced && ! isMultiSelecting ? onMouseMove : undefined }>
+			<div
+				onMouseMove={
+					! isInserterForced && ! isMultiSelecting
+						? onMouseMove
+						: undefined
+				}
+			>
 				{ children }
 			</div>
 		</>

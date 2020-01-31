@@ -101,7 +101,11 @@ class InlineLinkUI extends Component {
 	}
 
 	onKeyDown( event ) {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
+		if (
+			[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf(
+				event.keyCode
+			) > -1
+		) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
 			event.stopPropagation();
 		}
@@ -156,7 +160,12 @@ class InlineLinkUI extends Component {
 		event.preventDefault();
 
 		if ( isCollapsed( value ) && ! isActive ) {
-			const toInsert = applyFormat( create( { text: url } ), format, 0, url.length );
+			const toInsert = applyFormat(
+				create( { text: url } ),
+				format,
+				0,
+				url.length
+			);
 			onChange( insert( value, toInsert ) );
 		} else {
 			onChange( applyFormat( value, format ) );
@@ -168,7 +177,9 @@ class InlineLinkUI extends Component {
 
 		if ( ! isValidHref( url ) ) {
 			speak(
-				__( 'Warning: the link has been inserted but may have errors. Please test it.' ),
+				__(
+					'Warning: the link has been inserted but may have errors. Please test it.'
+				),
 				'assertive'
 			);
 		} else if ( isActive ) {
@@ -184,7 +195,10 @@ class InlineLinkUI extends Component {
 		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
 		// return to avoid the popover being closed.
 		const autocompleteElement = this.autocompleteRef.current;
-		if ( autocompleteElement && autocompleteElement.contains( document.activeElement ) ) {
+		if (
+			autocompleteElement &&
+			autocompleteElement.contains( document.activeElement )
+		) {
 			return;
 		}
 
@@ -243,7 +257,11 @@ class InlineLinkUI extends Component {
 						onKeyPress={ stopKeyPropagation }
 						url={ url }
 						onEditLinkClick={ this.editLink }
-						linkClassName={ isValidHref( prependHTTP( url ) ) ? undefined : 'has-invalid-link' }
+						linkClassName={
+							isValidHref( prependHTTP( url ) )
+								? undefined
+								: 'has-invalid-link'
+						}
 					/>
 				) }
 			</URLPopoverAtLink>

@@ -12,7 +12,10 @@ export function serializeGradientPosition( { type, value } ) {
 }
 
 export function serializeGradientColorStop( { type, value, length } ) {
-	return `${ serializeGradientColor( { type, value } ) } ${ serializeGradientPosition( length ) }`;
+	return `${ serializeGradientColor( {
+		type,
+		value,
+	} ) } ${ serializeGradientPosition( length ) }`;
 }
 
 export function serializeGradientOrientation( orientation ) {
@@ -27,11 +30,13 @@ export function serializeGradient( { type, orientation, colorStops } ) {
 	const serializedColorStops = colorStops
 		.sort( ( colorStop1, colorStop2 ) => {
 			return (
-				get( colorStop1, [ 'length', 'value' ], 0 ) - get( colorStop2, [ 'length', 'value' ], 0 )
+				get( colorStop1, [ 'length', 'value' ], 0 ) -
+				get( colorStop2, [ 'length', 'value' ], 0 )
 			);
 		} )
 		.map( serializeGradientColorStop );
-	return `${ type }(${ compact( [ serializedOrientation, ...serializedColorStops ] ).join(
-		','
-	) })`;
+	return `${ type }(${ compact( [
+		serializedOrientation,
+		...serializedColorStops,
+	] ).join( ',' ) })`;
 }

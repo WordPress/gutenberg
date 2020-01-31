@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost, clickOnMoreMenuItem, toggleMoreMenu } from '@wordpress/e2e-test-utils';
+import {
+	createNewPost,
+	clickOnMoreMenuItem,
+	toggleMoreMenu,
+} from '@wordpress/e2e-test-utils';
 
 describe( 'Fullscreen Mode', () => {
 	beforeAll( async () => {
@@ -18,7 +22,9 @@ describe( 'Fullscreen Mode', () => {
 
 		expect( isFullscreenEnabled ).toBe( true );
 
-		const fullscreenToolbar = await page.$( '.edit-post-fullscreen-mode-close__toolbar' );
+		const fullscreenToolbar = await page.$(
+			'.edit-post-fullscreen-mode-close__toolbar'
+		);
 
 		expect( fullscreenToolbar ).not.toBeNull();
 	} );

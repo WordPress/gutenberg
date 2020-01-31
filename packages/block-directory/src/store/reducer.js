@@ -55,7 +55,10 @@ export const blockManagement = (
 		case 'ADD_INSTALLED_BLOCK_TYPE':
 			return {
 				...state,
-				installedBlockTypes: [ ...state.installedBlockTypes, action.item ],
+				installedBlockTypes: [
+					...state.installedBlockTypes,
+					action.item,
+				],
 			};
 		case 'REMOVE_INSTALLED_BLOCK_TYPE':
 			return {

@@ -64,7 +64,11 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 const Fill = ( props ) => (
 	<Consumer>
 		{ ( { registerFill, unregisterFill } ) => (
-			<FillComponent { ...props } registerFill={ registerFill } unregisterFill={ unregisterFill } />
+			<FillComponent
+				{ ...props }
+				registerFill={ registerFill }
+				unregisterFill={ unregisterFill }
+			/>
 		) }
 	</Consumer>
 );

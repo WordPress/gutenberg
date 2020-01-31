@@ -34,7 +34,11 @@ export const settings = {
 		},
 	},
 	styles: [
-		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
+		{
+			name: 'default',
+			label: _x( 'Default', 'block style' ),
+			isDefault: true,
+		},
 		{ name: 'rounded', label: _x( 'Rounded', 'block style' ) },
 	],
 	__experimentalLabel( attributes, { context } ) {

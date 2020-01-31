@@ -18,13 +18,22 @@ describe( 'DimensionControl', () => {
 
 	describe( 'rendering', () => {
 		it( 'renders with defaults', () => {
-			const wrapper = shallow( <DimensionControl instanceId={ uniqueId() } label={ 'Padding' } /> );
+			const wrapper = shallow(
+				<DimensionControl
+					instanceId={ uniqueId() }
+					label={ 'Padding' }
+				/>
+			);
 			expect( wrapper ).toMatchSnapshot();
 		} );
 
 		it( 'renders with icon and default icon label', () => {
 			const wrapper = shallow(
-				<DimensionControl instanceId={ uniqueId() } label={ 'Margin' } icon={ 'tablet' } />
+				<DimensionControl
+					instanceId={ uniqueId() }
+					label={ 'Margin' }
+					icon={ 'tablet' }
+				/>
 			);
 			expect( wrapper ).toMatchSnapshot();
 		} );

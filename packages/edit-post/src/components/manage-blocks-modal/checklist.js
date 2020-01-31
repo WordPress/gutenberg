@@ -13,7 +13,10 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 	return (
 		<ul className="edit-post-manage-blocks-modal__checklist">
 			{ blockTypes.map( ( blockType ) => (
-				<li key={ blockType.name } className="edit-post-manage-blocks-modal__checklist-item">
+				<li
+					key={ blockType.name }
+					className="edit-post-manage-blocks-modal__checklist-item"
+				>
 					<CheckboxControl
 						label={
 							<>

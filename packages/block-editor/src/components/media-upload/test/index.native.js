@@ -3,7 +3,10 @@
  */
 import { shallow } from 'enzyme';
 import { TouchableWithoutFeedback } from 'react-native';
-import { requestMediaPicker, mediaSources } from 'react-native-gutenberg-bridge';
+import {
+	requestMediaPicker,
+	mediaSources,
+} from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
@@ -21,7 +24,9 @@ const MEDIA_ID = 123;
 
 describe( 'MediaUpload component', () => {
 	it( 'renders without crashing', () => {
-		const wrapper = shallow( <MediaUpload allowedTypes={ [] } render={ () => {} } /> );
+		const wrapper = shallow(
+			<MediaUpload allowedTypes={ [] } render={ () => {} } />
+		);
 		expect( wrapper ).toBeTruthy();
 	} );
 
@@ -66,15 +71,21 @@ describe( 'MediaUpload component', () => {
 		expectOptionForMediaType( MEDIA_TYPE_VIDEO, OPTION_TAKE_VIDEO );
 	} );
 
-	const expectMediaPickerForOption = ( option, allowMultiple, requestFunction ) => {
-		requestFunction.mockImplementation( ( source, mediaTypes, multiple, callback ) => {
-			expect( mediaTypes[ 0 ] ).toEqual( MEDIA_TYPE_VIDEO );
-			if ( multiple ) {
-				callback( [ { id: MEDIA_ID, url: MEDIA_URL } ] );
-			} else {
-				callback( { id: MEDIA_ID, url: MEDIA_URL } );
+	const expectMediaPickerForOption = (
+		option,
+		allowMultiple,
+		requestFunction
+	) => {
+		requestFunction.mockImplementation(
+			( source, mediaTypes, multiple, callback ) => {
+				expect( mediaTypes[ 0 ] ).toEqual( MEDIA_TYPE_VIDEO );
+				if ( multiple ) {
+					callback( [ { id: MEDIA_ID, url: MEDIA_URL } ] );
+				} else {
+					callback( { id: MEDIA_ID, url: MEDIA_URL } );
+				}
 			}
-		} );
+		);
 
 		const onSelect = jest.fn();
 
@@ -98,26 +109,48 @@ describe( 'MediaUpload component', () => {
 		expect( requestFunction ).toHaveBeenCalledTimes( 1 );
 
 		expect( onSelect ).toHaveBeenCalledTimes( 1 );
-		expect( onSelect ).toHaveBeenCalledWith( allowMultiple ? [ media ] : media );
+		expect( onSelect ).toHaveBeenCalledWith(
+			allowMultiple ? [ media ] : media
+		);
 	};
 
 	it( 'can select media from device library', () => {
-		expectMediaPickerForOption( mediaSources.deviceLibrary, false, requestMediaPicker );
+		expectMediaPickerForOption(
+			mediaSources.deviceLibrary,
+			false,
+			requestMediaPicker
+		);
 	} );
 
 	it( 'can select media from WP media library', () => {
-		expectMediaPickerForOption( mediaSources.siteMediaLibrary, false, requestMediaPicker );
+		expectMediaPickerForOption(
+			mediaSources.siteMediaLibrary,
+			false,
+			requestMediaPicker
+		);
 	} );
 
 	it( 'can select media by capturig', () => {
-		expectMediaPickerForOption( mediaSources.deviceCamera, false, requestMediaPicker );
+		expectMediaPickerForOption(
+			mediaSources.deviceCamera,
+			false,
+			requestMediaPicker
+		);
 	} );
 
 	it( 'can select multiple media from device library', () => {
-		expectMediaPickerForOption( mediaSources.deviceLibrary, true, requestMediaPicker );
+		expectMediaPickerForOption(
+			mediaSources.deviceLibrary,
+			true,
+			requestMediaPicker
+		);
 	} );
 
 	it( 'can select multiple media from WP media library', () => {
-		expectMediaPickerForOption( mediaSources.siteMediaLibrary, true, requestMediaPicker );
+		expectMediaPickerForOption(
+			mediaSources.siteMediaLibrary,
+			true,
+			requestMediaPicker
+		);
 	} );
 } );

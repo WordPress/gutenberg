@@ -19,7 +19,8 @@ import {
 
 export default function WelcomeGuide() {
 	const isActive = useSelect(
-		( select ) => select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ),
+		( select ) =>
+			select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ),
 		[]
 	);
 
@@ -49,7 +50,9 @@ export default function WelcomeGuide() {
 			</GuidePage>
 
 			<GuidePage className="edit-post-welcome-guide__page">
-				<h1 className="edit-post-welcome-guide__heading">{ __( 'Make each block your own' ) }</h1>
+				<h1 className="edit-post-welcome-guide__heading">
+					{ __( 'Make each block your own' ) }
+				</h1>
 				<EditorImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
 					{ __(
@@ -83,8 +86,14 @@ export default function WelcomeGuide() {
 				</h1>
 				<DocumentationImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
-					{ __( 'New to the Block Editor? Want to learn more about using it? ' ) }
-					<ExternalLink href={ __( 'https://wordpress.org/support/article/wordpress-editor/' ) }>
+					{ __(
+						'New to the Block Editor? Want to learn more about using it? '
+					) }
+					<ExternalLink
+						href={ __(
+							'https://wordpress.org/support/article/wordpress-editor/'
+						) }
+					>
 						{ __( "Here's a detailed guide." ) }
 					</ExternalLink>
 				</p>

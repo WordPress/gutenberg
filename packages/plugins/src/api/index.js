@@ -128,7 +128,9 @@ export function registerPlugin( name, settings ) {
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
 
 	if ( ! isFunction( settings.render ) ) {
-		console.error( 'The "render" property must be specified and must be a valid function.' );
+		console.error(
+			'The "render" property must be specified and must be a valid function.'
+		);
 		return null;
 	}
 

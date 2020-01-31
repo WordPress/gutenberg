@@ -23,7 +23,10 @@ export const settings = {
 	keywords: [ __( 'embed' ) ],
 	example: {
 		attributes: {
-			content: '<marquee>' + __( 'Welcome to the wonderful world of blocks…' ) + '</marquee>',
+			content:
+				'<marquee>' +
+				__( 'Welcome to the wonderful world of blocks…' ) +
+				'</marquee>',
 		},
 	},
 	supports: {

@@ -9,21 +9,37 @@ import { __ } from '@wordpress/i18n';
 import { EntitiesSavedStates } from '@wordpress/editor';
 
 export default function SaveButton() {
-	const [ , setStatus ] = useEntityProp( 'postType', 'wp_template', 'status' );
+	const [ , setStatus ] = useEntityProp(
+		'postType',
+		'wp_template',
+		'status'
+	);
 	// Publish template if not done yet.
 	useEffect( () => setStatus( 'publish' ), [] );
 
 	const { isDirty, isSaving } = useSelect( ( select ) => {
-		const { getEntityRecordChangesByRecord, isSavingEntityRecord } = select( 'core' );
+		const { getEntityRecordChangesByRecord, isSavingEntityRecord } = select(
+			'core'
+		);
 		const entityRecordChangesByRecord = getEntityRecordChangesByRecord();
 		const changedKinds = Object.keys( entityRecordChangesByRecord );
 		return {
 			isDirty: changedKinds.length > 0,
 			isSaving: changedKinds.some( ( changedKind ) =>
-				Object.keys( entityRecordChangesByRecord[ changedKind ] ).some( ( changedName ) =>
+				Object.keys(
+					entityRecordChangesByRecord[ changedKind ]
+				).some( ( changedName ) =>
 					Object.keys(
-						entityRecordChangesByRecord[ changedKind ][ changedName ]
-					).some( ( changedKey ) => isSavingEntityRecord( changedKind, changedName, changedKey ) )
+						entityRecordChangesByRecord[ changedKind ][
+							changedName
+						]
+					).some( ( changedKey ) =>
+						isSavingEntityRecord(
+							changedKind,
+							changedName,
+							changedKey
+						)
+					)
 				)
 			),
 		};

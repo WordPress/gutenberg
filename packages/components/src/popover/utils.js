@@ -80,7 +80,9 @@ export function computePopoverXAxisPosition(
 	const rightAlignment = {
 		popoverLeft: rightAlignmentX,
 		contentWidth:
-			rightAlignmentX + width > window.innerWidth ? window.innerWidth - rightAlignmentX : width,
+			rightAlignmentX + width > window.innerWidth
+				? window.innerWidth - rightAlignmentX
+				: width,
 	};
 
 	// Choosing the x axis
@@ -92,12 +94,20 @@ export function computePopoverXAxisPosition(
 			chosenXAxis = 'center';
 		} else if ( xAxis === 'left' && leftAlignment.contentWidth === width ) {
 			chosenXAxis = 'left';
-		} else if ( xAxis === 'right' && rightAlignment.contentWidth === width ) {
+		} else if (
+			xAxis === 'right' &&
+			rightAlignment.contentWidth === width
+		) {
 			chosenXAxis = 'right';
 		} else {
-			chosenXAxis = leftAlignment.contentWidth > rightAlignment.contentWidth ? 'left' : 'right';
+			chosenXAxis =
+				leftAlignment.contentWidth > rightAlignment.contentWidth
+					? 'left'
+					: 'right';
 			const chosenWidth =
-				chosenXAxis === 'left' ? leftAlignment.contentWidth : rightAlignment.contentWidth;
+				chosenXAxis === 'left'
+					? leftAlignment.contentWidth
+					: rightAlignment.contentWidth;
 			contentWidth = chosenWidth !== width ? chosenWidth : null;
 		}
 	}
@@ -146,7 +156,8 @@ export function computePopoverYAxisPosition(
 	const { height } = contentSize;
 
 	if ( sticky ) {
-		const scrollContainerEl = getScrollContainer( anchorRef ) || document.body;
+		const scrollContainerEl =
+			getScrollContainer( anchorRef ) || document.body;
 		const scrollRect = scrollContainerEl.getBoundingClientRect();
 
 		if ( anchorRect.top - height <= scrollRect.top ) {
@@ -181,7 +192,9 @@ export function computePopoverYAxisPosition(
 	const topAlignment = {
 		popoverTop: anchorRect.top,
 		contentHeight:
-			anchorRect.top - HEIGHT_OFFSET - height > 0 ? height : anchorRect.top - HEIGHT_OFFSET,
+			anchorRect.top - HEIGHT_OFFSET - height > 0
+				? height
+				: anchorRect.top - HEIGHT_OFFSET,
 	};
 	const bottomAlignment = {
 		popoverTop: anchorRect.bottom,
@@ -200,12 +213,20 @@ export function computePopoverYAxisPosition(
 			chosenYAxis = 'middle';
 		} else if ( yAxis === 'top' && topAlignment.contentHeight === height ) {
 			chosenYAxis = 'top';
-		} else if ( yAxis === 'bottom' && bottomAlignment.contentHeight === height ) {
+		} else if (
+			yAxis === 'bottom' &&
+			bottomAlignment.contentHeight === height
+		) {
 			chosenYAxis = 'bottom';
 		} else {
-			chosenYAxis = topAlignment.contentHeight > bottomAlignment.contentHeight ? 'top' : 'bottom';
+			chosenYAxis =
+				topAlignment.contentHeight > bottomAlignment.contentHeight
+					? 'top'
+					: 'bottom';
 			const chosenHeight =
-				chosenYAxis === 'top' ? topAlignment.contentHeight : bottomAlignment.contentHeight;
+				chosenYAxis === 'top'
+					? topAlignment.contentHeight
+					: bottomAlignment.contentHeight;
 			contentHeight = chosenHeight !== height ? chosenHeight : null;
 		}
 	}

@@ -25,7 +25,12 @@ function NavigableToolbar( { children, focusOnMount, ...props } ) {
 	}, [] );
 
 	return (
-		<NavigableMenu orientation="horizontal" role="toolbar" ref={ wrapper } { ...props }>
+		<NavigableMenu
+			orientation="horizontal"
+			role="toolbar"
+			ref={ wrapper }
+			{ ...props }
+		>
 			{ children }
 		</NavigableMenu>
 	);

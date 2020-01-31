@@ -18,7 +18,9 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Code' ),
-	description: __( 'Display code snippets that respect your spacing and tabs.' ),
+	description: __(
+		'Display code snippets that respect your spacing and tabs.'
+	),
 	icon,
 	example: {
 		attributes: {

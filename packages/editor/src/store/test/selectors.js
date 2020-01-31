@@ -34,7 +34,10 @@ selectorNames.forEach( ( name ) => {
 			},
 
 			getEntityRecordChangesByRecord() {
-				return state.getEntityRecordChangesByRecord && state.getEntityRecordChangesByRecord();
+				return (
+					state.getEntityRecordChangesByRecord &&
+					state.getEntityRecordChangesByRecord()
+				);
 			},
 
 			getEntityRecordEdits() {
@@ -48,7 +51,8 @@ selectorNames.forEach( ( name ) => {
 					};
 				}
 
-				const { value: blocks, isDirty } = ( present && present.blocks ) || {};
+				const { value: blocks, isDirty } =
+					( present && present.blocks ) || {};
 				if ( blocks && isDirty !== false ) {
 					edits = {
 						...edits,
@@ -82,11 +86,19 @@ selectorNames.forEach( ( name ) => {
 			},
 
 			hasUndo() {
-				return Boolean( state.editor && state.editor.past && state.editor.past.length );
+				return Boolean(
+					state.editor &&
+						state.editor.past &&
+						state.editor.past.length
+				);
 			},
 
 			hasRedo() {
-				return Boolean( state.editor && state.editor.future && state.editor.future.length );
+				return Boolean(
+					state.editor &&
+						state.editor.future &&
+						state.editor.future.length
+				);
 			},
 
 			getCurrentUser() {
@@ -110,7 +122,8 @@ selectorNames.forEach( ( name ) => {
 
 		return _selectors[ name ]( state, ...args );
 	};
-	selectors[ name ].isRegistrySelector = _selectors[ name ].isRegistrySelector;
+	selectors[ name ].isRegistrySelector =
+		_selectors[ name ].isRegistrySelector;
 	if ( selectors[ name ].isRegistrySelector ) {
 		selectors[ name ].registry = {
 			select: () => _selectors[ name ].registry.select(),
@@ -497,7 +510,9 @@ describe( 'selectors', () => {
 					__experimentalEnableFullSiteEditing: true,
 				},
 				getEntityRecordChangesByRecord() {
-					return { postType: { post: { 1: {} }, wp_template: { 1: {} } } };
+					return {
+						postType: { post: { 1: {} }, wp_template: { 1: {} } },
+					};
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( true );
@@ -617,7 +632,9 @@ describe( 'selectors', () => {
 				currentPost: {},
 			};
 
-			expect( getCurrentPostAttribute( state, 'valueOf' ) ).toBeUndefined();
+			expect(
+				getCurrentPostAttribute( state, 'valueOf' )
+			).toBeUndefined();
 		} );
 
 		it( 'should return the value of an attribute', () => {
@@ -627,7 +644,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getCurrentPostAttribute( state, 'title' ) ).toBe( 'Hello World' );
+			expect( getCurrentPostAttribute( state, 'title' ) ).toBe(
+				'Hello World'
+			);
 		} );
 	} );
 
@@ -643,7 +662,9 @@ describe( 'selectors', () => {
 				initialEdits: {},
 			};
 
-			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'post slug' );
+			expect( getEditedPostAttribute( state, 'slug' ) ).toBe(
+				'post slug'
+			);
 		} );
 
 		it( 'should return the latest slug if edits have been made to the post', () => {
@@ -659,7 +680,9 @@ describe( 'selectors', () => {
 				initialEdits: {},
 			};
 
-			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'new slug' );
+			expect( getEditedPostAttribute( state, 'slug' ) ).toBe(
+				'new slug'
+			);
 		} );
 
 		it( 'should return the post saved title if the title is not edited', () => {
@@ -705,7 +728,9 @@ describe( 'selectors', () => {
 				initialEdits: {},
 			};
 
-			expect( getEditedPostAttribute( state, 'valueOf' ) ).toBeUndefined();
+			expect(
+				getEditedPostAttribute( state, 'valueOf' )
+			).toBeUndefined();
 		} );
 
 		it( 'should merge mergeable properties with current post value', () => {
@@ -1548,7 +1573,10 @@ describe( 'selectors', () => {
 
 		it( 'should return true if title or excerpt have changed', () => {
 			for ( const variantField of [ 'title', 'excerpt' ] ) {
-				for ( const constantField of without( [ 'title', 'excerpt' ], variantField ) ) {
+				for ( const constantField of without(
+					[ 'title', 'excerpt' ],
+					variantField
+				) ) {
 					const state = {
 						editor: {
 							present: {
@@ -2368,7 +2396,9 @@ describe( 'selectors', () => {
 
 			const content = getEditedPostContent( state );
 
-			expect( content ).toBe( '<!-- wp:test-default {"modified":true} /-->' );
+			expect( content ).toBe(
+				'<!-- wp:test-default {"modified":true} /-->'
+			);
 		} );
 	} );
 
@@ -2460,7 +2490,9 @@ describe( 'selectors', () => {
 					isPublishSidebarEnabled: true,
 				},
 			};
-			expect( isPublishSidebarEnabled( state ) ).toBe( state.preferences.isPublishSidebarEnabled );
+			expect( isPublishSidebarEnabled( state ) ).toBe(
+				state.preferences.isPublishSidebarEnabled
+			);
 		} );
 
 		it( 'should return the value on state if it is falsy', () => {
@@ -2469,7 +2501,9 @@ describe( 'selectors', () => {
 					isPublishSidebarEnabled: false,
 				},
 			};
-			expect( isPublishSidebarEnabled( state ) ).toBe( state.preferences.isPublishSidebarEnabled );
+			expect( isPublishSidebarEnabled( state ) ).toBe(
+				state.preferences.isPublishSidebarEnabled
+			);
 		} );
 
 		it( 'should return the default value if there is no isPublishSidebarEnabled key on state', () => {
@@ -2712,7 +2746,9 @@ describe( 'selectors', () => {
 
 		it( 'should be false if the permalink is not of an editable kind', () => {
 			const state = {
-				currentPost: { permalink_template: 'http://foo.test/bar/%baz%/' },
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%baz%/',
+				},
 				editor: {
 					present: {
 						edits: {},
@@ -2726,7 +2762,9 @@ describe( 'selectors', () => {
 
 		it( 'should be true if the permalink has %postname%', () => {
 			const state = {
-				currentPost: { permalink_template: 'http://foo.test/bar/%postname%/' },
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%postname%/',
+				},
 				editor: {
 					present: {
 						edits: {},
@@ -2740,7 +2778,9 @@ describe( 'selectors', () => {
 
 		it( 'should be true if the permalink has %pagename%', () => {
 			const state = {
-				currentPost: { permalink_template: 'http://foo.test/bar/%pagename%/' },
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%pagename%/',
+				},
 				editor: {
 					present: {
 						edits: {},

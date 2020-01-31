@@ -18,7 +18,11 @@ function escape( text ) {
 }
 
 function isGroup( expression ) {
-	return [ 'choice', 'action', 'labeled', 'sequence' ].indexOf( expression.type ) >= 0;
+	return (
+		[ 'choice', 'action', 'labeled', 'sequence' ].indexOf(
+			expression.type
+		) >= 0
+	);
 }
 
 function flattenUnary( expression ) {
@@ -41,7 +45,11 @@ function flatten( expression ) {
 				'[' +
 				( expression.inverted ? '^' : '' ) +
 				expression.parts
-					.map( ( part ) => escape( Array.isArray( part ) ? part.join( '-' ) : part ) )
+					.map( ( part ) =>
+						escape(
+							Array.isArray( part ) ? part.join( '-' ) : part
+						)
+					)
 					.join( '' ) +
 				']' +
 				( expression.ignoreCase ? 'i' : '' )
@@ -80,7 +88,10 @@ function flatten( expression ) {
 			return `<dl>${ expression.rules.map( flatten ).join( '' ) }</dl>`;
 		case 'rule':
 			expression.expression.isRuleTop = true;
-			const displayName = expression.expression.type === 'named' ? expression.expression.name : '';
+			const displayName =
+				expression.expression.type === 'named'
+					? expression.expression.name
+					: '';
 			return (
 				`<dt>${ displayName }</dt>` +
 				`<dd><pre><header>${ expression.name }</header>  = ` +

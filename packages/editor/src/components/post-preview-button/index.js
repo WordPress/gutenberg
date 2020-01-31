@@ -219,11 +219,15 @@ export default compose( [
 		return {
 			postId: getCurrentPostId(),
 			currentPostLink: getCurrentPostAttribute( 'link' ),
-			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : previewLink,
+			previewLink:
+				forcePreviewLink !== undefined ? forcePreviewLink : previewLink,
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
-			isDraft: [ 'draft', 'auto-draft' ].indexOf( getEditedPostAttribute( 'status' ) ) !== -1,
+			isDraft:
+				[ 'draft', 'auto-draft' ].indexOf(
+					getEditedPostAttribute( 'status' )
+				) !== -1,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

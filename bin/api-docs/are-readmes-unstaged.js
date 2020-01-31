@@ -19,7 +19,9 @@ const getUnstagedFiles = () =>
 const readmeFiles = getPackages().map( ( [ packageName ] ) =>
 	join( 'packages', packageName, 'README.md' )
 );
-const unstagedReadmes = getUnstagedFiles().filter( ( element ) => readmeFiles.includes( element ) );
+const unstagedReadmes = getUnstagedFiles().filter( ( element ) =>
+	readmeFiles.includes( element )
+);
 
 if ( unstagedReadmes.length > 0 ) {
 	process.exitCode = 1;

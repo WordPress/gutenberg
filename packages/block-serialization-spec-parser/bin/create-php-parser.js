@@ -5,7 +5,10 @@ const phpegjs = require( 'phpegjs' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 
-const peg = fs.readFileSync( path.join( __dirname, '..', 'grammar.pegjs' ), 'utf8' );
+const peg = fs.readFileSync(
+	path.join( __dirname, '..', 'grammar.pegjs' ),
+	'utf8'
+);
 
 const parser = pegjs.generate( peg, {
 	plugins: [ phpegjs ],

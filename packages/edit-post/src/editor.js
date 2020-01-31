@@ -8,9 +8,17 @@ import { size, map, without } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
+import {
+	EditorProvider,
+	ErrorBoundary,
+	PostLockedModal,
+} from '@wordpress/editor';
 import { StrictMode, Component } from '@wordpress/element';
-import { KeyboardShortcuts, SlotFillProvider, DropZoneProvider } from '@wordpress/components';
+import {
+	KeyboardShortcuts,
+	SlotFillProvider,
+	DropZoneProvider,
+} from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -63,7 +71,10 @@ class Editor extends Component {
 					? map( blockTypes, 'name' )
 					: settings.allowedBlockTypes || [];
 
-			settings.allowedBlockTypes = without( defaultAllowedBlockTypes, ...hiddenBlockTypes );
+			settings.allowedBlockTypes = without(
+				defaultAllowedBlockTypes,
+				...hiddenBlockTypes
+			);
 		}
 
 		return settings;
@@ -118,7 +129,9 @@ class Editor extends Component {
 								<ErrorBoundary onError={ onError }>
 									<EditorInitialization postId={ postId } />
 									<Layout />
-									<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
+									<KeyboardShortcuts
+										shortcuts={ preventEventDiscovery }
+									/>
 								</ErrorBoundary>
 								<PostLockedModal />
 							</EditorProvider>
@@ -141,10 +154,14 @@ export default compose( [
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 			focusMode: isFeatureActive( 'focusMode' ),
 			post: getEntityRecord( 'postType', postType, postId ),
-			preferredStyleVariations: getPreference( 'preferredStyleVariations' ),
+			preferredStyleVariations: getPreference(
+				'preferredStyleVariations'
+			),
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
 			blockTypes: getBlockTypes(),
-			__experimentalLocalAutosaveInterval: getPreference( 'localAutosaveInterval' ),
+			__experimentalLocalAutosaveInterval: getPreference(
+				'localAutosaveInterval'
+			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

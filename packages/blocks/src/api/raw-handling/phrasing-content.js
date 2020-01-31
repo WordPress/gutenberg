@@ -62,12 +62,51 @@ without( Object.keys( textContentSchema ), '#text', 'br' ).forEach( ( tag ) => {
  * @see https://www.w3.org/TR/2011/WD-html5-20110525/content-models.html#embedded-content-0
  */
 const embeddedContentSchema = {
-	audio: { attributes: [ 'src', 'preload', 'autoplay', 'mediagroup', 'loop', 'muted' ] },
+	audio: {
+		attributes: [
+			'src',
+			'preload',
+			'autoplay',
+			'mediagroup',
+			'loop',
+			'muted',
+		],
+	},
 	canvas: { attributes: [ 'width', 'height' ] },
 	embed: { attributes: [ 'src', 'type', 'width', 'height' ] },
-	iframe: { attributes: [ 'src', 'srcdoc', 'name', 'sandbox', 'seamless', 'width', 'height' ] },
-	img: { attributes: [ 'alt', 'src', 'srcset', 'usemap', 'ismap', 'width', 'height' ] },
-	object: { attributes: [ 'data', 'type', 'name', 'usemap', 'form', 'width', 'height' ] },
+	iframe: {
+		attributes: [
+			'src',
+			'srcdoc',
+			'name',
+			'sandbox',
+			'seamless',
+			'width',
+			'height',
+		],
+	},
+	img: {
+		attributes: [
+			'alt',
+			'src',
+			'srcset',
+			'usemap',
+			'ismap',
+			'width',
+			'height',
+		],
+	},
+	object: {
+		attributes: [
+			'data',
+			'type',
+			'name',
+			'usemap',
+			'form',
+			'width',
+			'height',
+		],
+	},
 	video: {
 		attributes: [
 			'src',

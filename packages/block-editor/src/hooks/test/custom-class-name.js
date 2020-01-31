@@ -22,7 +22,10 @@ describe( 'custom className', () => {
 	};
 
 	describe( 'addAttribute()', () => {
-		const addAttribute = applyFilters.bind( null, 'blocks.registerBlockType' );
+		const addAttribute = applyFilters.bind(
+			null,
+			'blocks.registerBlockType'
+		);
 
 		it( 'should do nothing if the block settings disable custom className support', () => {
 			const settings = addAttribute( {
@@ -43,7 +46,10 @@ describe( 'custom className', () => {
 	} );
 
 	describe( 'addSaveProps', () => {
-		const addSaveProps = applyFilters.bind( null, 'blocks.getSaveContent.extraProps' );
+		const addSaveProps = applyFilters.bind(
+			null,
+			'blocks.getSaveContent.extraProps'
+		);
 
 		it( 'should do nothing if the block settings do not define custom className support', () => {
 			const attributes = { className: 'foo' };
@@ -63,7 +69,11 @@ describe( 'custom className', () => {
 
 		it( 'should inject the custom className', () => {
 			const attributes = { className: 'bar' };
-			const extraProps = addSaveProps( { className: 'foo' }, blockSettings, attributes );
+			const extraProps = addSaveProps(
+				{ className: 'foo' },
+				blockSettings,
+				attributes
+			);
 
 			expect( extraProps.className ).toBe( 'foo bar' );
 		} );
@@ -77,14 +87,19 @@ describe( 'custom className', () => {
 		} );
 
 		it( 'return an array of parsed classes from inner HTML', () => {
-			const classes = getHTMLRootElementClasses( '<div class="  foo  bar "></div>' );
+			const classes = getHTMLRootElementClasses(
+				'<div class="  foo  bar "></div>'
+			);
 
 			expect( classes ).toEqual( [ 'foo', 'bar' ] );
 		} );
 	} );
 
 	describe( 'addParsedDifference', () => {
-		const addParsedDifference = applyFilters.bind( null, 'blocks.getBlockAttributes' );
+		const addParsedDifference = applyFilters.bind(
+			null,
+			'blocks.getBlockAttributes'
+		);
 
 		it( 'should do nothing if the block settings do not define custom className support', () => {
 			const attributes = addParsedDifference(
@@ -112,7 +127,11 @@ describe( 'custom className', () => {
 		} );
 
 		it( 'should assign as undefined if there are no classes', () => {
-			const attributes = addParsedDifference( {}, blockSettings, '<div class=""></div>' );
+			const attributes = addParsedDifference(
+				{},
+				blockSettings,
+				'<div class=""></div>'
+			);
 
 			expect( attributes.className ).toBeUndefined();
 		} );
@@ -138,7 +157,11 @@ describe( 'custom className', () => {
 		} );
 
 		it( 'should remove the custom class from an element originally without a class', () => {
-			const attributes = addParsedDifference( { className: 'foo' }, blockSettings, '<div></div>' );
+			const attributes = addParsedDifference(
+				{ className: 'foo' },
+				blockSettings,
+				'<div></div>'
+			);
 
 			expect( attributes.className ).toBeUndefined();
 		} );

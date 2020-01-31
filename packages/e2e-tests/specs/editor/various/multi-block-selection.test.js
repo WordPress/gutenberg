@@ -15,15 +15,17 @@ async function getSelectedFlatIndices() {
 		const indices = [];
 		let single;
 
-		Array.from( document.querySelectorAll( '.wp-block' ) ).forEach( ( node, index ) => {
-			if ( node.classList.contains( 'is-selected' ) ) {
-				single = index;
-			}
+		Array.from( document.querySelectorAll( '.wp-block' ) ).forEach(
+			( node, index ) => {
+				if ( node.classList.contains( 'is-selected' ) ) {
+					single = index;
+				}
 
-			if ( node.classList.contains( 'is-multi-selected' ) ) {
-				indices.push( index );
+				if ( node.classList.contains( 'is-multi-selected' ) ) {
+					indices.push( index );
+				}
 			}
-		} );
+		);
 
 		return single !== undefined ? single : indices;
 	} );
@@ -37,7 +39,9 @@ async function testNativeSelection() {
 	await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
 	await page.evaluate( () => {
 		const selection = window.getSelection();
-		const elements = Array.from( document.querySelectorAll( '.is-multi-selected' ) );
+		const elements = Array.from(
+			document.querySelectorAll( '.is-multi-selected' )
+		);
 
 		if ( ! elements.length ) {
 			const element = document.querySelector( '.is-selected' );
@@ -270,7 +274,9 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'ArrowUp' );
 
 		const [ coord1, coord2 ] = await page.evaluate( () => {
-			const elements = Array.from( document.querySelectorAll( '.wp-block-paragraph' ) );
+			const elements = Array.from(
+				document.querySelectorAll( '.wp-block-paragraph' )
+			);
 			const rect1 = elements[ 0 ].getBoundingClientRect();
 			const rect2 = elements[ 1 ].getBoundingClientRect();
 			return [
@@ -304,7 +310,9 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '2' );
 
 		const [ coord1, coord2 ] = await page.evaluate( () => {
-			const elements = Array.from( document.querySelectorAll( '.wp-block-paragraph' ) );
+			const elements = Array.from(
+				document.querySelectorAll( '.wp-block-paragraph' )
+			);
 			const rect1 = elements[ 0 ].getBoundingClientRect();
 			const rect2 = elements[ 1 ].getBoundingClientRect();
 			return [
@@ -401,7 +409,9 @@ describe( 'Multi-block selection', () => {
 		await page.mouse.up();
 
 		// Wait for the selection to update.
-		await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 
 		// Only "1" should be deleted.
 		await page.keyboard.press( 'Backspace' );
@@ -418,7 +428,9 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '3' );
 
 		const [ coord1, coord2 ] = await page.evaluate( () => {
-			const elements = Array.from( document.querySelectorAll( '.wp-block-paragraph' ) );
+			const elements = Array.from(
+				document.querySelectorAll( '.wp-block-paragraph' )
+			);
 			const rect1 = elements[ 2 ].getBoundingClientRect();
 			const rect2 = elements[ 1 ].getBoundingClientRect();
 			return [

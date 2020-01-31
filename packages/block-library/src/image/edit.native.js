@@ -2,7 +2,13 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
+import {
+	View,
+	ImageBackground,
+	Text,
+	TouchableWithoutFeedback,
+	Dimensions,
+} from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -71,7 +77,10 @@ const sizeOptionLabels = {
 	[ IMAGE_SIZE_LARGE ]: __( 'Large' ),
 	[ IMAGE_SIZE_FULL_SIZE ]: __( 'Full Size' ),
 };
-const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( { value: option, label } ) );
+const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( {
+	value: option,
+	label,
+} ) );
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -88,10 +97,16 @@ export class ImageEdit extends React.Component {
 			isCaptionSelected: false,
 		};
 
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
+			this
+		);
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
+			this
+		);
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind( this );
+		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
+			this
+		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
@@ -116,7 +131,11 @@ export class ImageEdit extends React.Component {
 		}
 
 		// Detect any pasted image and start an upload
-		if ( ! attributes.id && attributes.url && attributes.url.indexOf( 'file:' ) === 0 ) {
+		if (
+			! attributes.id &&
+			attributes.url &&
+			attributes.url.indexOf( 'file:' ) === 0
+		) {
 			requestMediaImport( attributes.url, ( id, url ) => {
 				if ( url ) {
 					setAttributes( { id, url } );
@@ -133,8 +152,14 @@ export class ImageEdit extends React.Component {
 
 	componentWillUnmount() {
 		// this action will only exist if the user pressed the trash button on the block holder
-		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
-			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
+		if (
+			hasAction( 'blocks.onRemoveBlockCheckUpload' ) &&
+			this.state.isUploadInProgress
+		) {
+			doAction(
+				'blocks.onRemoveBlockCheckUpload',
+				this.props.attributes.id
+			);
 		}
 	}
 
@@ -162,7 +187,10 @@ export class ImageEdit extends React.Component {
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
 		} else if ( ! this.state.isCaptionSelected ) {
-			requestImageFullscreenPreview( attributes.url, image && image.source_url );
+			requestImageFullscreenPreview(
+				attributes.url,
+				image && image.source_url
+			);
 		}
 
 		this.setState( {
@@ -207,7 +235,11 @@ export class ImageEdit extends React.Component {
 	}
 
 	updateImageURL( url ) {
-		this.props.setAttributes( { url, width: undefined, height: undefined } );
+		this.props.setAttributes( {
+			url,
+			width: undefined,
+			height: undefined,
+		} );
 	}
 
 	updateAlignment( nextAlign ) {
@@ -222,7 +254,10 @@ export class ImageEdit extends React.Component {
 	}
 
 	onSetNewTab( value ) {
-		const updatedLinkTarget = getUpdatedLinkTargetSettings( value, this.props.attributes );
+		const updatedLinkTarget = getUpdatedLinkTargetSettings(
+			value,
+			this.props.attributes
+		);
 		this.props.setAttributes( updatedLinkTarget );
 	}
 
@@ -303,7 +338,10 @@ export class ImageEdit extends React.Component {
 				);
 				break;
 			case ICON_TYPE.UPLOAD:
-				iconStyle = this.props.getStylesFromColorScheme( styles.iconUpload, styles.iconUploadDark );
+				iconStyle = this.props.getStylesFromColorScheme(
+					styles.iconUpload,
+					styles.iconUploadDark
+				);
 				break;
 		}
 		return <Icon icon={ icon } { ...iconStyle } />;
@@ -311,14 +349,33 @@ export class ImageEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected, image } = this.props;
-		const { align, url, height, width, alt, href, id, linkTarget, sizeSlug } = attributes;
+		const {
+			align,
+			url,
+			height,
+			width,
+			alt,
+			href,
+			id,
+			linkTarget,
+			sizeSlug,
+		} = attributes;
 
-		const actions = [ { label: __( 'Clear All Settings' ), onPress: this.onClearSettings } ];
+		const actions = [
+			{
+				label: __( 'Clear All Settings' ),
+				onPress: this.onClearSettings,
+			},
+		];
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton title={ __( 'Edit image' ) } icon={ editImageIcon } onClick={ open } />
+					<ToolbarButton
+						title={ __( 'Edit image' ) }
+						icon={ editImageIcon }
+						onClick={ open }
+					/>
 				</ToolbarGroup>
 				<BlockAlignmentToolbar
 					value={ align }
@@ -353,8 +410,14 @@ export class ImageEdit extends React.Component {
 							hideCancelButton
 							icon={ 'editor-expand' }
 							label={ __( 'Size' ) }
-							value={ sizeOptionLabels[ sizeSlug || DEFAULT_SIZE_SLUG ] }
-							onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
+							value={
+								sizeOptionLabels[
+									sizeSlug || DEFAULT_SIZE_SLUG
+								]
+							}
+							onChangeValue={ ( newValue ) =>
+								this.onSetSizeSlug( newValue )
+							}
 							options={ sizeOptions }
 						/>
 					) }
@@ -392,14 +455,19 @@ export class ImageEdit extends React.Component {
 			wide: 'center',
 		};
 
-		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
+		const imageContainerHeight =
+			Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 
 		const editImageComponent = ( { open, mediaOptions } ) => (
 			<TouchableWithoutFeedback onPress={ open }>
 				<View style={ styles.editContainer }>
 					<View style={ styles.edit }>
 						{ mediaOptions() }
-						<Icon size={ 16 } icon={ SvgIconCustomize } { ...styles.iconCustomise } />
+						<Icon
+							size={ 16 }
+							icon={ SvgIconCustomize }
+							{ ...styles.iconCustomise }
+						/>
 					</View>
 				</View>
 			</TouchableWithoutFeedback>
@@ -415,15 +483,20 @@ export class ImageEdit extends React.Component {
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
 					{ getMediaOptions() }
-					{ ! this.state.isCaptionSelected && getToolbarEditButton( openMediaOptions ) }
+					{ ! this.state.isCaptionSelected &&
+						getToolbarEditButton( openMediaOptions ) }
 					<MediaUploadProgress
 						height={ height }
 						width={ width }
 						coverUrl={ url }
 						mediaId={ id }
 						onUpdateMediaProgress={ this.updateMediaProgress }
-						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+						onFinishMediaUploadWithSuccess={
+							this.finishMediaUploadWithSuccess
+						}
+						onFinishMediaUploadWithFailure={
+							this.finishMediaUploadWithFailure
+						}
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( {
 							isUploadInProgress,
@@ -436,12 +509,18 @@ export class ImageEdit extends React.Component {
 							const opacity = isUploadInProgress ? 0.3 : 1;
 							const imageBorderOnSelectedStyle =
 								isSelected &&
-								! ( isUploadInProgress || isUploadFailed || this.state.isCaptionSelected )
+								! (
+									isUploadInProgress ||
+									isUploadFailed ||
+									this.state.isCaptionSelected
+								)
 									? styles.imageBorder
 									: '';
 
 							const iconRetryContainer = (
-								<View style={ styles.modalIcon }>{ this.getIcon( ICON_TYPE.RETRY ) }</View>
+								<View style={ styles.modalIcon }>
+									{ this.getIcon( ICON_TYPE.RETRY ) }
+								</View>
 							);
 
 							return (
@@ -451,7 +530,9 @@ export class ImageEdit extends React.Component {
 										// only set alignSelf if an image exists because alignSelf causes the placeholder
 										// to disappear when an aligned image can't be downloaded
 										// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
-										alignSelf: imageWidthWithinContainer && alignToFlex[ align ],
+										alignSelf:
+											imageWidthWithinContainer &&
+											alignToFlex[ align ],
 									} }
 								>
 									{ ! imageWidthWithinContainer && (
@@ -461,11 +542,19 @@ export class ImageEdit extends React.Component {
 													styles.imageContainerUpload,
 													styles.imageContainerUploadDark
 												),
-												{ height: imageContainerHeight },
+												{
+													height: imageContainerHeight,
+												},
 											] }
 										>
-											<View style={ styles.imageUploadingIconContainer }>
-												{ this.getIcon( ICON_TYPE.UPLOAD ) }
+											<View
+												style={
+													styles.imageUploadingIconContainer
+												}
+											>
+												{ this.getIcon(
+													ICON_TYPE.UPLOAD
+												) }
 											</View>
 										</View>
 									) }
@@ -473,11 +562,17 @@ export class ImageEdit extends React.Component {
 										accessible={ true }
 										disabled={ ! isSelected }
 										accessibilityLabel={ alt }
-										accessibilityHint={ __( 'Double tap and hold to edit' ) }
+										accessibilityHint={ __(
+											'Double tap and hold to edit'
+										) }
 										accessibilityRole={ 'imagebutton' }
 										style={ [
 											imageBorderOnSelectedStyle,
-											{ width: finalWidth, height: finalHeight, opacity },
+											{
+												width: finalWidth,
+												height: finalHeight,
+												opacity,
+											},
 										] }
 										resizeMethod="scale"
 										source={ { uri: url } }
@@ -487,11 +582,21 @@ export class ImageEdit extends React.Component {
 											<View
 												style={ [
 													styles.imageContainer,
-													{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+													{
+														flex: 1,
+														backgroundColor:
+															'rgba(0, 0, 0, 0.5)',
+													},
 												] }
 											>
 												{ iconRetryContainer }
-												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
+												<Text
+													style={
+														styles.uploadFailedText
+													}
+												>
+													{ retryMessage }
+												</Text>
 											</View>
 										) }
 										{ isSelected &&
@@ -501,11 +606,20 @@ export class ImageEdit extends React.Component {
 											finalHeight &&
 											showMediaEditorButton && (
 												<MediaEdit
-													allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
-													onSelect={ this.onSelectMediaUploadOption }
+													allowedTypes={ [
+														MEDIA_TYPE_IMAGE,
+													] }
+													onSelect={
+														this
+															.onSelectMediaUploadOption
+													}
 													source={ { uri: url } }
-													openReplaceMediaOptions={ openMediaOptions }
-													render={ editImageComponent }
+													openReplaceMediaOptions={
+														openMediaOptions
+													}
+													render={
+														editImageComponent
+													}
 												/>
 											) }
 									</ImageBackground>

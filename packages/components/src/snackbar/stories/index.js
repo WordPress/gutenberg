@@ -20,7 +20,10 @@ export const _default = () => {
 };
 
 export const withActions = () => {
-	const content = text( 'Content', 'Use Snackbars with an action link to an external page.' );
+	const content = text(
+		'Content',
+		'Use Snackbars with an action link to an external page.'
+	);
 	const actions = [
 		{
 			label: text( 'Label', 'Open WP.org' ),

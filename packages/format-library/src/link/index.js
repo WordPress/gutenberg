@@ -12,7 +12,10 @@ import {
 	isCollapsed,
 } from '@wordpress/rich-text';
 import { isURL, isEmail } from '@wordpress/url';
-import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor';
+import {
+	RichTextToolbarButton,
+	RichTextShortcut,
+} from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -37,7 +40,9 @@ export const link = {
 			return value;
 		}
 
-		const pastedText = ( html || plainText ).replace( /<[^>]+>/g, '' ).trim();
+		const pastedText = ( html || plainText )
+			.replace( /<[^>]+>/g, '' )
+			.trim();
 
 		// A URL was pasted, turn the selection into a link
 		if ( ! isURL( pastedText ) ) {
@@ -72,9 +77,19 @@ export const link = {
 				const text = getTextContent( slice( value ) );
 
 				if ( text && isURL( text ) ) {
-					onChange( applyFormat( value, { type: name, attributes: { url: text } } ) );
+					onChange(
+						applyFormat( value, {
+							type: name,
+							attributes: { url: text },
+						} )
+					);
 				} else if ( text && isEmail( text ) ) {
-					onChange( applyFormat( value, { type: name, attributes: { url: `mailto:${ text }` } } ) );
+					onChange(
+						applyFormat( value, {
+							type: name,
+							attributes: { url: `mailto:${ text }` },
+						} )
+					);
 				} else {
 					this.setState( { addingLink: true } );
 				}
@@ -92,12 +107,26 @@ export const link = {
 			}
 
 			render() {
-				const { isActive, activeAttributes, value, onChange, onFocus } = this.props;
+				const {
+					isActive,
+					activeAttributes,
+					value,
+					onChange,
+					onFocus,
+				} = this.props;
 
 				return (
 					<>
-						<RichTextShortcut type="primary" character="k" onUse={ this.addLink } />
-						<RichTextShortcut type="primaryShift" character="k" onUse={ this.onRemoveFormat } />
+						<RichTextShortcut
+							type="primary"
+							character="k"
+							onUse={ this.addLink }
+						/>
+						<RichTextShortcut
+							type="primaryShift"
+							character="k"
+							onUse={ this.onRemoveFormat }
+						/>
 						{ isActive && (
 							<RichTextToolbarButton
 								name="link"

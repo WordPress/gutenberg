@@ -80,7 +80,9 @@ describe( 'InnerBlocks Template Sync', () => {
 
 describe( 'Container block without paragraph support', () => {
 	beforeAll( async () => {
-		await activatePlugin( 'gutenberg-test-container-block-without-paragraph' );
+		await activatePlugin(
+			'gutenberg-test-container-block-without-paragraph'
+		);
 	} );
 
 	beforeEach( async () => {
@@ -88,7 +90,9 @@ describe( 'Container block without paragraph support', () => {
 	} );
 
 	afterAll( async () => {
-		await deactivatePlugin( 'gutenberg-test-container-block-without-paragraph' );
+		await deactivatePlugin(
+			'gutenberg-test-container-block-without-paragraph'
+		);
 	} );
 
 	it( 'ensures we can use the alternative block appender properly', async () => {
@@ -100,7 +104,9 @@ describe( 'Container block without paragraph support', () => {
 		);
 
 		// Insert an image block.
-		const insertButton = ( await page.$x( `//button//span[contains(text(), 'Image')]` ) )[ 0 ];
+		const insertButton = (
+			await page.$x( `//button//span[contains(text(), 'Image')]` )
+		 )[ 0 ];
 		await insertButton.click();
 
 		// Check the inserted content.

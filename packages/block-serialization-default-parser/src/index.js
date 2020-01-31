@@ -203,7 +203,12 @@ function proceed() {
 			if ( 0 === stackDepth ) {
 				if ( null !== leadingHtmlStart ) {
 					output.push(
-						Freeform( document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ) )
+						Freeform(
+							document.substr(
+								leadingHtmlStart,
+								startOffset - leadingHtmlStart
+							)
+						)
 					);
 				}
 				output.push( Block( blockName, attrs, [], '', [] ) );
@@ -212,7 +217,11 @@ function proceed() {
 			}
 
 			// otherwise we found an inner block
-			addInnerBlock( Block( blockName, attrs, [], '', [] ), startOffset, tokenLength );
+			addInnerBlock(
+				Block( blockName, attrs, [], '', [] ),
+				startOffset,
+				tokenLength
+			);
 			offset = startOffset + tokenLength;
 			return true;
 
@@ -252,7 +261,10 @@ function proceed() {
 			// otherwise we're nested and we have to close out the current
 			// block and add it as a innerBlock to the parent
 			const stackTop = stack.pop();
-			const html = document.substr( stackTop.prevOffset, startOffset - stackTop.prevOffset );
+			const html = document.substr(
+				stackTop.prevOffset,
+				startOffset - stackTop.prevOffset
+			);
 			stackTop.block.innerHTML += html;
 			stackTop.block.innerContent.push( html );
 			stackTop.prevOffset = startOffset + tokenLength;
@@ -355,7 +367,10 @@ function addFreeform( rawLength ) {
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	parent.block.innerBlocks.push( block );
-	const html = document.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+	const html = document.substr(
+		parent.prevOffset,
+		tokenStart - parent.prevOffset
+	);
 
 	if ( html ) {
 		parent.block.innerHTML += html;
@@ -379,7 +394,14 @@ function addBlockFromStack( endOffset ) {
 	}
 
 	if ( null !== leadingHtmlStart ) {
-		output.push( Freeform( document.substr( leadingHtmlStart, tokenStart - leadingHtmlStart ) ) );
+		output.push(
+			Freeform(
+				document.substr(
+					leadingHtmlStart,
+					tokenStart - leadingHtmlStart
+				)
+			)
+		);
 	}
 
 	output.push( block );

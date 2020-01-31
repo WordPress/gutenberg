@@ -28,7 +28,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// Change editing mode from "Visual" to "HTML".
 		await clickBlockToolbarButton( 'More options' );
-		let changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
+		let changeModeButton = await page.waitForXPath(
+			'//button[text()="Edit as HTML"]'
+		);
 		await changeModeButton.click();
 
 		// Wait for the block to be converted to HTML editing mode.
@@ -43,7 +45,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// Change editing mode from "HTML" back to "Visual".
 		await clickBlockToolbarButton( 'More options' );
-		changeModeButton = await page.waitForXPath( '//button[text()="Edit visually"]' );
+		changeModeButton = await page.waitForXPath(
+			'//button[text()="Edit visually"]'
+		);
 		await changeModeButton.click();
 
 		// This block should be in "visual" mode by default.
@@ -60,7 +64,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// Change editing mode from "Visual" to "HTML".
 		await clickBlockToolbarButton( 'More options' );
-		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
+		const changeModeButton = await page.waitForXPath(
+			'//button[text()="Edit as HTML"]'
+		);
 		await changeModeButton.click();
 
 		// The font size picker for the paragraph block should appear, even in
@@ -78,7 +84,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// Change editing mode from "Visual" to "HTML".
 		await clickBlockToolbarButton( 'More options' );
-		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
+		const changeModeButton = await page.waitForXPath(
+			'//button[text()="Edit as HTML"]'
+		);
 		await changeModeButton.click();
 
 		// Make sure the paragraph content is rendered as expected.
@@ -90,14 +98,18 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// Change the font size using the sidebar.
 		await page.click( '.components-font-size-picker__select' );
-		await page.click( '.components-custom-select-control__item:nth-child(5)' );
+		await page.click(
+			'.components-custom-select-control__item:nth-child(5)'
+		);
 
 		// Make sure the HTML content updated.
 		htmlBlockContent = await page.$eval(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea',
 			( node ) => node.textContent
 		);
-		expect( htmlBlockContent ).toEqual( '<p class="has-large-font-size">Hello world!</p>' );
+		expect( htmlBlockContent ).toEqual(
+			'<p class="has-large-font-size">Hello world!</p>'
+		);
 	} );
 
 	it( 'the code editor should unselect blocks and disable the inserter', async () => {
@@ -124,7 +136,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// No block is selected
 		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
-		const noBlocksElement = await page.$( '.block-editor-block-inspector__no-blocks' );
+		const noBlocksElement = await page.$(
+			'.block-editor-block-inspector__no-blocks'
+		);
 		expect( noBlocksElement ).not.toBeNull();
 
 		// The inserter is disabled

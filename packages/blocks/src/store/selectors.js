@@ -2,7 +2,17 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { deburr, filter, findLast, first, flow, get, includes, map, some } from 'lodash';
+import {
+	deburr,
+	filter,
+	findLast,
+	first,
+	flow,
+	get,
+	includes,
+	map,
+	some,
+} from 'lodash';
 
 /** @typedef {import('../api/registration').WPBlockPatternScope} WPBlockPatternScope */
 
@@ -16,7 +26,9 @@ import { deburr, filter, findLast, first, flow, get, includes, map, some } from 
  * @return {Object} Block type object.
  */
 const getNormalizedBlockType = ( state, nameOrType ) =>
-	'string' === typeof nameOrType ? getBlockType( state, nameOrType ) : nameOrType;
+	'string' === typeof nameOrType
+		? getBlockType( state, nameOrType )
+		: nameOrType;
 
 /**
  * Returns all the available block types.
@@ -30,7 +42,10 @@ export const getBlockTypes = createSelector(
 		return Object.values( state.blockTypes ).map( ( blockType ) => {
 			return {
 				...blockType,
-				patterns: __experimentalGetBlockPatterns( state, blockType.name ),
+				patterns: __experimentalGetBlockPatterns(
+					state,
+					blockType.name
+				),
 			};
 		} );
 	},
@@ -92,7 +107,11 @@ export function __experimentalGetBlockPatterns( state, blockName, scope ) {
  *
  * @return {?WPBlockPattern} The default block pattern.
  */
-export function __experimentalGetDefaultBlockPattern( state, blockName, scope ) {
+export function __experimentalGetDefaultBlockPattern(
+	state,
+	blockName,
+	scope
+) {
 	const patterns = __experimentalGetBlockPatterns( state, blockName, scope );
 
 	return findLast( patterns, 'isDefault' ) || first( patterns );
@@ -195,7 +214,12 @@ export const getChildBlockNames = createSelector(
  *
  * @return {?*} Block support value
  */
-export const getBlockSupport = ( state, nameOrType, feature, defaultSupports ) => {
+export const getBlockSupport = (
+	state,
+	nameOrType,
+	feature,
+	defaultSupports
+) => {
 	const blockType = getNormalizedBlockType( state, nameOrType );
 
 	return get( blockType, [ 'supports', feature ], defaultSupports );
@@ -247,7 +271,8 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 
 	const isSearchMatch = flow( [
 		getNormalizedSearchTerm,
-		( normalizedCandidate ) => includes( normalizedCandidate, normalizedSearchTerm ),
+		( normalizedCandidate ) =>
+			includes( normalizedCandidate, normalizedSearchTerm ),
 	] );
 
 	return (

@@ -45,18 +45,27 @@ function ContrastChecker( {
 	isLargeText,
 	textColor,
 } ) {
-	if ( ! ( backgroundColor || fallbackBackgroundColor ) || ! ( textColor || fallbackTextColor ) ) {
+	if (
+		! ( backgroundColor || fallbackBackgroundColor ) ||
+		! ( textColor || fallbackTextColor )
+	) {
 		return null;
 	}
-	const tinyBackgroundColor = tinycolor( backgroundColor || fallbackBackgroundColor );
+	const tinyBackgroundColor = tinycolor(
+		backgroundColor || fallbackBackgroundColor
+	);
 	const tinyTextColor = tinycolor( textColor || fallbackTextColor );
-	const hasTransparency = tinyBackgroundColor.getAlpha() !== 1 || tinyTextColor.getAlpha() !== 1;
+	const hasTransparency =
+		tinyBackgroundColor.getAlpha() !== 1 || tinyTextColor.getAlpha() !== 1;
 
 	if (
 		hasTransparency ||
 		tinycolor.isReadable( tinyBackgroundColor, tinyTextColor, {
 			level: 'AA',
-			size: isLargeText || ( isLargeText !== false && fontSize >= 24 ) ? 'large' : 'small',
+			size:
+				isLargeText || ( isLargeText !== false && fontSize >= 24 )
+					? 'large'
+					: 'small',
 		} )
 	) {
 		return null;

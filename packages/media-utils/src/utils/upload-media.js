@@ -42,7 +42,10 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
 	return flatMap( wpMimeTypesObject, ( mime, extensionsString ) => {
 		const [ type ] = mime.split( '/' );
 		const extensions = extensionsString.split( '|' );
-		return [ mime, ...map( extensions, ( extension ) => `${ type }/${ extension }` ) ];
+		return [
+			mime,
+			...map( extensions, ( extension ) => `${ type }/${ extension }` ),
+		];
 	} );
 }
 
@@ -103,7 +106,11 @@ export async function uploadMedia( {
 
 	// Build the error message including the filename
 	const triggerError = ( error ) => {
-		error.message = [ <strong key="filename">{ error.file.name }</strong>, ': ', error.message ];
+		error.message = [
+			<strong key="filename">{ error.file.name }</strong>,
+			': ',
+			error.message,
+		];
 
 		onError( error );
 	};
@@ -112,10 +119,15 @@ export async function uploadMedia( {
 
 	for ( const mediaFile of files ) {
 		// verify if user is allowed to upload this mime type
-		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
+		if (
+			allowedMimeTypesForUser &&
+			! isAllowedMimeTypeForUser( mediaFile.type )
+		) {
 			triggerError( {
 				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
-				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
+				message: __(
+					'Sorry, this file type is not permitted for security reasons.'
+				),
 				file: mediaFile,
 			} );
 			continue;
@@ -135,7 +147,9 @@ export async function uploadMedia( {
 		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
 			triggerError( {
 				code: 'SIZE_ABOVE_LIMIT',
-				message: __( 'This file exceeds the maximum upload size for this site.' ),
+				message: __(
+					'This file exceeds the maximum upload size for this site.'
+				),
 				file: mediaFile,
 			} );
 			continue;
@@ -162,7 +176,10 @@ export async function uploadMedia( {
 	for ( let idx = 0; idx < validFiles.length; ++idx ) {
 		const mediaFile = validFiles[ idx ];
 		try {
-			const savedMedia = await createMediaFromFile( mediaFile, additionalData );
+			const savedMedia = await createMediaFromFile(
+				mediaFile,
+				additionalData
+			);
 			const mediaObject = {
 				...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
 				alt: savedMedia.alt_text,

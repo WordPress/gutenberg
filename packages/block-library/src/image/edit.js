@@ -132,11 +132,18 @@ export class ImageEdit extends Component {
 		const { id: prevID, url: prevURL = '' } = prevProps.attributes;
 		const { id, url = '' } = this.props.attributes;
 
-		if ( isTemporaryImage( prevID, prevURL ) && ! isTemporaryImage( id, url ) ) {
+		if (
+			isTemporaryImage( prevID, prevURL ) &&
+			! isTemporaryImage( id, url )
+		) {
 			revokeBlobURL( url );
 		}
 
-		if ( ! this.props.isSelected && prevProps.isSelected && this.state.captionFocused ) {
+		if (
+			! this.props.isSelected &&
+			prevProps.isSelected &&
+			this.state.captionFocused
+		) {
 			this.setState( {
 				captionFocused: false,
 			} );
@@ -161,7 +168,13 @@ export class ImageEdit extends Component {
 			return;
 		}
 
-		const { id, url, alt, caption, linkDestination } = this.props.attributes;
+		const {
+			id,
+			url,
+			alt,
+			caption,
+			linkDestination,
+		} = this.props.attributes;
 
 		let mediaAttributes = pickRelevantMediaFiles( media );
 
@@ -258,14 +271,24 @@ export class ImageEdit extends Component {
 
 	updateAlignment( nextAlign ) {
 		const extraUpdatedAttributes =
-			[ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ? { width: undefined, height: undefined } : {};
-		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
+			[ 'wide', 'full' ].indexOf( nextAlign ) !== -1
+				? { width: undefined, height: undefined }
+				: {};
+		this.props.setAttributes( {
+			...extraUpdatedAttributes,
+			align: nextAlign,
+		} );
 	}
 
 	updateImage( sizeSlug ) {
 		const { image } = this.props;
 
-		const url = get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
+		const url = get( image, [
+			'media_details',
+			'sizes',
+			sizeSlug,
+			'source_url',
+		] );
 		if ( ! url ) {
 			return null;
 		}
@@ -328,7 +351,10 @@ export class ImageEdit extends Component {
 		const isExternal = isExternalImage( id, url );
 		const controls = (
 			<BlockControls>
-				<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ this.updateAlignment }
+				/>
 				{ url && (
 					<MediaReplaceFlow
 						mediaURL={ url }
@@ -345,8 +371,12 @@ export class ImageEdit extends Component {
 							url={ href || '' }
 							onChangeUrl={ this.onSetHref }
 							linkDestination={ linkDestination }
-							mediaUrl={ this.props.image && this.props.image.source_url }
-							mediaLink={ this.props.image && this.props.image.link }
+							mediaUrl={
+								this.props.image && this.props.image.source_url
+							}
+							mediaLink={
+								this.props.image && this.props.image.link
+							}
 							linkTarget={ linkTarget }
 							linkClass={ linkClass }
 							rel={ rel }
@@ -402,7 +432,8 @@ export class ImageEdit extends Component {
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 		} );
 
-		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
+		const isResizable =
+			[ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 
 		const imageSizeOptions = this.getImageSizeOptions();
 
@@ -417,9 +448,13 @@ export class ImageEdit extends Component {
 							help={
 								<>
 									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-										{ __( 'Describe the purpose of the image' ) }
+										{ __(
+											'Describe the purpose of the image'
+										) }
 									</ExternalLink>
-									{ __( 'Leave empty if the image is purely decorative.' ) }
+									{ __(
+										'Leave empty if the image is purely decorative.'
+									) }
 								</>
 							}
 						/>
@@ -443,9 +478,13 @@ export class ImageEdit extends Component {
 						onChange={ this.onSetTitle }
 						help={
 							<>
-								{ __( 'Describe the role of this image on the page.' ) }
+								{ __(
+									'Describe the role of this image on the page.'
+								) }
 								<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
-									{ __( '(Note: many devices and browsers do not display this text.)' ) }
+									{ __(
+										'(Note: many devices and browsers do not display this text.)'
+									) }
 								</ExternalLink>
 							</>
 						}
@@ -475,11 +514,15 @@ export class ImageEdit extends Component {
 								defaultedAlt = alt;
 							} else if ( filename ) {
 								defaultedAlt = sprintf(
-									__( 'This image has an empty alt attribute; its file name is %s' ),
+									__(
+										'This image has an empty alt attribute; its file name is %s'
+									),
 									filename
 								);
 							} else {
-								defaultedAlt = __( 'This image has an empty alt attribute' );
+								defaultedAlt = __(
+									'This image has an empty alt attribute'
+								);
 							}
 
 							const img = (
@@ -491,28 +534,46 @@ export class ImageEdit extends Component {
 										src={ url }
 										alt={ defaultedAlt }
 										onClick={ this.onImageClick }
-										onError={ () => this.onImageError( url ) }
+										onError={ () =>
+											this.onImageError( url )
+										}
 									/>
 									{ isBlobURL( url ) && <Spinner /> }
 								</>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 							);
 
-							if ( ! isResizable || ! imageWidthWithinContainer ) {
+							if (
+								! isResizable ||
+								! imageWidthWithinContainer
+							) {
 								return (
 									<>
-										{ getInspectorControls( imageWidth, imageHeight ) }
-										<div style={ { width, height } }>{ img }</div>
+										{ getInspectorControls(
+											imageWidth,
+											imageHeight
+										) }
+										<div style={ { width, height } }>
+											{ img }
+										</div>
 									</>
 								);
 							}
 
-							const currentWidth = width || imageWidthWithinContainer;
-							const currentHeight = height || imageHeightWithinContainer;
+							const currentWidth =
+								width || imageWidthWithinContainer;
+							const currentHeight =
+								height || imageHeightWithinContainer;
 
 							const ratio = imageWidth / imageHeight;
-							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
-							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
+							const minWidth =
+								imageWidth < imageHeight
+									? MIN_SIZE
+									: MIN_SIZE * ratio;
+							const minHeight =
+								imageHeight < imageWidth
+									? MIN_SIZE
+									: MIN_SIZE / ratio;
 
 							// With the current implementation of ResizableBox, an image needs an explicit pixel value for the max-width.
 							// In absence of being able to set the content-width, this max-width is currently dictated by the vanilla editor style.
@@ -552,7 +613,10 @@ export class ImageEdit extends Component {
 
 							return (
 								<>
-									{ getInspectorControls( imageWidth, imageHeight ) }
+									{ getInspectorControls(
+										imageWidth,
+										imageHeight
+									) }
 									<ResizableBox
 										size={ {
 											width,
@@ -570,11 +634,23 @@ export class ImageEdit extends Component {
 											left: showLeftHandle,
 										} }
 										onResizeStart={ onResizeStart }
-										onResizeStop={ ( event, direction, elt, delta ) => {
+										onResizeStop={ (
+											event,
+											direction,
+											elt,
+											delta
+										) => {
 											onResizeStop();
 											setAttributes( {
-												width: parseInt( currentWidth + delta.width, 10 ),
-												height: parseInt( currentHeight + delta.height, 10 ),
+												width: parseInt(
+													currentWidth + delta.width,
+													10
+												),
+												height: parseInt(
+													currentHeight +
+														delta.height,
+													10
+												),
 											} );
 										} }
 									>
@@ -590,7 +666,9 @@ export class ImageEdit extends Component {
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
 							unstableOnFocus={ this.onFocusCaption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( { caption: value } )
+							}
 							isSelected={ this.state.captionFocused }
 							inlineToolbar
 						/>

@@ -28,7 +28,9 @@ export default function withFormatTypes( RichText ) {
 		const selectProps = useSelect(
 			( select ) => {
 				return formatTypes.reduce( ( acc, settings ) => {
-					if ( ! settings.__experimentalGetPropsForEditableTreePreparation ) {
+					if (
+						! settings.__experimentalGetPropsForEditableTreePreparation
+					) {
 						return acc;
 					}
 
@@ -36,10 +38,13 @@ export default function withFormatTypes( RichText ) {
 					return {
 						...acc,
 						...mapKeys(
-							settings.__experimentalGetPropsForEditableTreePreparation( select, {
-								richTextIdentifier: identifier,
-								blockClientId: clientId,
-							} ),
+							settings.__experimentalGetPropsForEditableTreePreparation(
+								select,
+								{
+									richTextIdentifier: identifier,
+									blockClientId: clientId,
+								}
+							),
 							( value, key ) => selectPrefix + key
 						),
 					};
@@ -50,7 +55,9 @@ export default function withFormatTypes( RichText ) {
 		const dispatchProps = __unstableUseDispatchWithMap(
 			( dispatch ) => {
 				return formatTypes.reduce( ( acc, settings ) => {
-					if ( ! settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
+					if (
+						! settings.__experimentalGetPropsForEditableTreeChangeHandler
+					) {
 						return acc;
 					}
 
@@ -58,10 +65,13 @@ export default function withFormatTypes( RichText ) {
 					return {
 						...acc,
 						...mapKeys(
-							settings.__experimentalGetPropsForEditableTreeChangeHandler( dispatch, {
-								richTextIdentifier: identifier,
-								blockClientId: clientId,
-							} ),
+							settings.__experimentalGetPropsForEditableTreeChangeHandler(
+								dispatch,
+								{
+									richTextIdentifier: identifier,
+									blockClientId: clientId,
+								}
+							),
 							( value, key ) => dispatchPrefix + key
 						),
 					};
@@ -87,17 +97,22 @@ export default function withFormatTypes( RichText ) {
 				const { name } = settings;
 				const selectPrefix = `format_prepare_props_(${ name })_`;
 				const dispatchPrefix = `format_on_change_props_(${ name })_`;
-				const propsByPrefix = Object.keys( combined ).reduce( ( accumulator, key ) => {
-					if ( key.startsWith( selectPrefix ) ) {
-						accumulator[ key.slice( selectPrefix.length ) ] = combined[ key ];
-					}
+				const propsByPrefix = Object.keys( combined ).reduce(
+					( accumulator, key ) => {
+						if ( key.startsWith( selectPrefix ) ) {
+							accumulator[ key.slice( selectPrefix.length ) ] =
+								combined[ key ];
+						}
 
-					if ( key.startsWith( dispatchPrefix ) ) {
-						accumulator[ key.slice( dispatchPrefix.length ) ] = combined[ key ];
-					}
+						if ( key.startsWith( dispatchPrefix ) ) {
+							accumulator[ key.slice( dispatchPrefix.length ) ] =
+								combined[ key ];
+						}
 
-					return accumulator;
-				}, {} );
+						return accumulator;
+					},
+					{}
+				);
 
 				if ( settings.__experimentalCreateOnChangeEditableValue ) {
 					return {
@@ -123,6 +138,13 @@ export default function withFormatTypes( RichText ) {
 			}, {} );
 		}, [ formatTypes, clientId, identifier, selectProps, dispatchProps ] );
 
-		return <RichText { ...props } { ...selectProps } { ...newProps } formatTypes={ formatTypes } />;
+		return (
+			<RichText
+				{ ...props }
+				{ ...selectProps }
+				{ ...newProps }
+				formatTypes={ formatTypes }
+			/>
+		);
 	};
 }

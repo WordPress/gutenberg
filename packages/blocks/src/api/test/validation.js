@@ -62,7 +62,9 @@ describe( 'validation', () => {
 		} );
 
 		it( 'returns false for an invalid character reference', () => {
-			const result = isValidCharacterReference( ' Test</h2><h2>Test &amp' );
+			const result = isValidCharacterReference(
+				' Test</h2><h2>Test &amp'
+			);
 
 			expect( result ).toBe( false );
 		} );
@@ -70,7 +72,9 @@ describe( 'validation', () => {
 
 	describe( 'DecodeEntityParser', () => {
 		it( 'can be constructed', () => {
-			expect( new DecodeEntityParser() instanceof DecodeEntityParser ).toBe( true );
+			expect(
+				new DecodeEntityParser() instanceof DecodeEntityParser
+			).toBe( true );
 		} );
 
 		it( 'returns parse as decoded value', () => {
@@ -159,9 +163,13 @@ describe( 'validation', () => {
 
 	describe( 'getNormalizedStyleValue()', () => {
 		it( 'omits whitespace and quotes from url value', () => {
-			const normalizedValue = getNormalizedStyleValue( 'url( "https://wordpress.org/img.png" )' );
+			const normalizedValue = getNormalizedStyleValue(
+				'url( "https://wordpress.org/img.png" )'
+			);
 
-			expect( normalizedValue ).toBe( 'url(https://wordpress.org/img.png)' );
+			expect( normalizedValue ).toBe(
+				'url(https://wordpress.org/img.png)'
+			);
 		} );
 	} );
 
@@ -181,19 +189,28 @@ describe( 'validation', () => {
 	describe( 'isEqualAttributesOfName', () => {
 		describe( '.class()', () => {
 			it( 'ignores ordering', () => {
-				const isEqual = isEqualAttributesOfName.class( 'a b c', 'b a c' );
+				const isEqual = isEqualAttributesOfName.class(
+					'a b c',
+					'b a c'
+				);
 
 				expect( isEqual ).toBe( true );
 			} );
 
 			it( 'ignores whitespace', () => {
-				const isEqual = isEqualAttributesOfName.class( 'a  b    c', 'b   a c' );
+				const isEqual = isEqualAttributesOfName.class(
+					'a  b    c',
+					'b   a c'
+				);
 
 				expect( isEqual ).toBe( true );
 			} );
 
 			it( 'returns false if not equal', () => {
-				const isEqual = isEqualAttributesOfName.class( 'a b c', 'b a c d' );
+				const isEqual = isEqualAttributesOfName.class(
+					'a b c',
+					'b a c d'
+				);
 
 				expect( isEqual ).toBe( false );
 			} );
@@ -234,7 +251,10 @@ describe( 'validation', () => {
 				[ [ 'class', 'b   a c' ] ],
 				[
 					[ 'class', 'c  a b' ],
-					[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+					[
+						'style',
+						'background-image: url( "https://wordpress.org/img.png" ); color: red;',
+					],
 				]
 			);
 
@@ -246,12 +266,18 @@ describe( 'validation', () => {
 			const isEqual = isEqualTagAttributePairs(
 				[
 					[ 'class', 'b   a c' ],
-					[ 'style', 'color: red;  background-image: url( "https://wordpress.org/img.png" );' ],
+					[
+						'style',
+						'color: red;  background-image: url( "https://wordpress.org/img.png" );',
+					],
 					[ 'controls', '' ],
 				],
 				[
 					[ 'class', 'c  a b' ],
-					[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+					[
+						'style',
+						'background-image: url( "https://wordpress.org/img.png" ); color: red;',
+					],
 					[ 'controls', 'true' ],
 				]
 			);
@@ -280,7 +306,10 @@ describe( 'validation', () => {
 	describe( 'isEqualTokensOfType', () => {
 		describe( '.StartTag()', () => {
 			it( 'returns false if tag name not the same', () => {
-				const isEqual = isEqualTokensOfType.StartTag( { tagName: 'p' }, { tagName: 'section' } );
+				const isEqual = isEqualTokensOfType.StartTag(
+					{ tagName: 'p' },
+					{ tagName: 'section' }
+				);
 
 				expect( console ).toHaveWarned();
 				expect( isEqual ).toBe( false );
@@ -296,7 +325,10 @@ describe( 'validation', () => {
 						tagName: 'p',
 						attributes: [
 							[ 'class', 'c  a b' ],
-							[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+							[
+								'style',
+								'background-image: url( "https://wordpress.org/img.png" ); color: red;',
+							],
 						],
 					}
 				);
@@ -311,14 +343,20 @@ describe( 'validation', () => {
 						tagName: 'p',
 						attributes: [
 							[ 'class', 'b   a c' ],
-							[ 'style', 'color: red;  background-image: url( "https://wordpress.org/img.png" );' ],
+							[
+								'style',
+								'color: red;  background-image: url( "https://wordpress.org/img.png" );',
+							],
 						],
 					},
 					{
 						tagName: 'p',
 						attributes: [
 							[ 'class', 'c  a b' ],
-							[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+							[
+								'style',
+								'background-image: url( "https://wordpress.org/img.png" ); color: red;',
+							],
 						],
 					}
 				);
@@ -454,46 +492,67 @@ describe( 'validation', () => {
 		} );
 
 		it( 'should return false when more tokens in first', () => {
-			const isEquivalent = isEquivalentHTML( '<div>Hello</div>', '<div>Hello' );
+			const isEquivalent = isEquivalentHTML(
+				'<div>Hello</div>',
+				'<div>Hello'
+			);
 
 			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
 		it( 'should return false when more tokens in second', () => {
-			const isEquivalent = isEquivalentHTML( '<div>Hello', '<div>Hello</div>' );
+			const isEquivalent = isEquivalentHTML(
+				'<div>Hello',
+				'<div>Hello</div>'
+			);
 
 			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
 		it( 'should return true when first has trailing whitespace', () => {
-			const isEquivalent = isEquivalentHTML( '<div>Hello</div>  ', '<div>Hello</div>' );
+			const isEquivalent = isEquivalentHTML(
+				'<div>Hello</div>  ',
+				'<div>Hello</div>'
+			);
 
 			expect( isEquivalent ).toBe( true );
 		} );
 
 		it( 'should return true when second has trailing whitespace', () => {
-			const isEquivalent = isEquivalentHTML( '<div>Hello</div>', '<div>Hello</div>  ' );
+			const isEquivalent = isEquivalentHTML(
+				'<div>Hello</div>',
+				'<div>Hello</div>  '
+			);
 
 			expect( isEquivalent ).toBe( true );
 		} );
 
 		it( 'should return true when difference of empty non-boolean, non-enumerated attribute', () => {
-			const isEquivalent = isEquivalentHTML( '<div class="">Hello</div>', '<div>Hello</div>' );
+			const isEquivalent = isEquivalentHTML(
+				'<div class="">Hello</div>',
+				'<div>Hello</div>'
+			);
 
 			expect( isEquivalent ).toBe( true );
 		} );
 
 		it( 'should return false when difference of empty boolean attribute', () => {
-			const isEquivalent = isEquivalentHTML( '<input disabled>', '<input>' );
+			const isEquivalent = isEquivalentHTML(
+				'<input disabled>',
+				'<input>'
+			);
 
 			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
 		it( 'should return false when difference of empty enumerated attribute', () => {
-			const isEquivalent = isEquivalentHTML( '<div contenteditable>', '<div>' );
+			const isEquivalent = isEquivalentHTML(
+				'<div contenteditable>',
+				'<div>'
+			);
 
 			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
@@ -507,7 +566,10 @@ describe( 'validation', () => {
 		} );
 
 		it( 'should return false when difference of boolean attribute', () => {
-			const isEquivalent = isEquivalentHTML( '<video controls></video>', '<video></video>' );
+			const isEquivalent = isEquivalentHTML(
+				'<video controls></video>',
+				'<video></video>'
+			);
 
 			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
@@ -594,7 +656,11 @@ describe( 'validation', () => {
 		it( 'returns false if block is not valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlockContent( 'core/test-block', { fruit: 'Bananas' }, 'Apples' );
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Apples'
+			);
 
 			expect( console ).toHaveWarned();
 			expect( console ).toHaveErrored();
@@ -609,7 +675,11 @@ describe( 'validation', () => {
 				},
 			} );
 
-			const isValid = isValidBlockContent( 'core/test-block', { fruit: 'Bananas' }, 'Bananas' );
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Bananas'
+			);
 
 			expect( console ).toHaveErrored();
 			expect( isValid ).toBe( false );
@@ -618,7 +688,11 @@ describe( 'validation', () => {
 		it( 'returns true is block is valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlockContent( 'core/test-block', { fruit: 'Bananas' }, 'Bananas' );
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Bananas'
+			);
 
 			expect( isValid ).toBe( true );
 		} );

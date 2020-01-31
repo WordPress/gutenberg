@@ -217,9 +217,13 @@ export function registerBlockType( name, settings ) {
 	}
 	if (
 		'category' in settings &&
-		! some( select( 'core/blocks' ).getCategories(), { slug: settings.category } )
+		! some( select( 'core/blocks' ).getCategories(), {
+			slug: settings.category,
+		} )
 	) {
-		console.error( 'The block "' + name + '" must have a registered category.' );
+		console.error(
+			'The block "' + name + '" must have a registered category.'
+		);
 		return;
 	}
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
@@ -389,7 +393,11 @@ export function getBlockTypes() {
  * @return {?*} Block support value
  */
 export function getBlockSupport( nameOrType, feature, defaultSupports ) {
-	return select( 'core/blocks' ).getBlockSupport( nameOrType, feature, defaultSupports );
+	return select( 'core/blocks' ).getBlockSupport(
+		nameOrType,
+		feature,
+		defaultSupports
+	);
 }
 
 /**
@@ -403,7 +411,11 @@ export function getBlockSupport( nameOrType, feature, defaultSupports ) {
  * @return {boolean} Whether block supports feature.
  */
 export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
-	return select( 'core/blocks' ).hasBlockSupport( nameOrType, feature, defaultSupports );
+	return select( 'core/blocks' ).hasBlockSupport(
+		nameOrType,
+		feature,
+		defaultSupports
+	);
 }
 
 /**
@@ -450,7 +462,9 @@ export const hasChildBlocks = ( blockName ) => {
  *                   and false otherwise.
  */
 export const hasChildBlocksWithInserterSupport = ( blockName ) => {
-	return select( 'core/blocks' ).hasChildBlocksWithInserterSupport( blockName );
+	return select( 'core/blocks' ).hasChildBlocksWithInserterSupport(
+		blockName
+	);
 };
 
 /**
@@ -470,7 +484,10 @@ export const registerBlockStyle = ( blockName, styleVariation ) => {
  * @param {string} styleVariationName Name of class applied to the block.
  */
 export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
-	dispatch( 'core/blocks' ).removeBlockStyles( blockName, styleVariationName );
+	dispatch( 'core/blocks' ).removeBlockStyles(
+		blockName,
+		styleVariationName
+	);
 };
 
 /**
@@ -480,7 +497,10 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
  * @param {WPBlockPattern} pattern   Object describing a block pattern.
  */
 export const __experimentalRegisterBlockPattern = ( blockName, pattern ) => {
-	dispatch( 'core/blocks' ).__experimentalAddBlockPatterns( blockName, pattern );
+	dispatch( 'core/blocks' ).__experimentalAddBlockPatterns(
+		blockName,
+		pattern
+	);
 };
 
 /**
@@ -489,6 +509,12 @@ export const __experimentalRegisterBlockPattern = ( blockName, pattern ) => {
  * @param {string} blockName   Name of the block (example: “core/columns”).
  * @param {string} patternName Name of the pattern defined for the block.
  */
-export const __experimentalUnregisterBlockPattern = ( blockName, patternName ) => {
-	dispatch( 'core/blocks' ).__experimentalRemoveBlockPatterns( blockName, patternName );
+export const __experimentalUnregisterBlockPattern = (
+	blockName,
+	patternName
+) => {
+	dispatch( 'core/blocks' ).__experimentalRemoveBlockPatterns(
+		blockName,
+		patternName
+	);
 };

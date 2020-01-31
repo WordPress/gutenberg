@@ -20,7 +20,8 @@ import { __ } from '@wordpress/i18n';
  * @param  {string} slug  a string representation of the size (eg: `medium`)
  * @return {Object}       the matching size definition
  */
-export const findSizeBySlug = ( sizes, slug ) => sizes.find( ( size ) => slug === size.slug );
+export const findSizeBySlug = ( sizes, slug ) =>
+	sizes.find( ( size ) => slug === size.slug );
 
 export default [
 	{

@@ -42,8 +42,14 @@ export class BlockInvalidWarning extends Component {
 		const hasHTMLBlock = !! getBlockType( 'core/html' );
 		const { compare } = this.state;
 		const hiddenActions = [
-			{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
-			{ title: __( 'Attempt Block Recovery' ), onClick: attemptBlockRecovery },
+			{
+				title: __( 'Convert to Classic Block' ),
+				onClick: convertToClassic,
+			},
+			{
+				title: __( 'Attempt Block Recovery' ),
+				onClick: attemptBlockRecovery,
+			},
 		];
 
 		return (
@@ -60,14 +66,20 @@ export class BlockInvalidWarning extends Component {
 							_x( 'Resolve', 'imperative verb' ) }
 						</Button>,
 						hasHTMLBlock && (
-							<Button key="edit" onClick={ convertToHTML } isPrimary>
+							<Button
+								key="edit"
+								onClick={ convertToHTML }
+								isPrimary
+							>
 								{ __( 'Convert to HTML' ) }
 							</Button>
 						),
 					] }
 					secondaryActions={ hiddenActions }
 				>
-					{ __( 'This block contains unexpected or invalid content.' ) }
+					{ __(
+						'This block contains unexpected or invalid content.'
+					) }
 				</Warning>
 				{ compare && (
 					<Modal

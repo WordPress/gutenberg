@@ -32,11 +32,17 @@ function checkPrettier() {
 		const prettierPackageJson = readPkgUp( { cwd: prettierResolvePath } );
 		const prettierPackageName = prettierPackageJson.pkg.name;
 
-		if ( ! [ 'wp-prettier', '@wordpress/prettier' ].includes( prettierPackageName ) ) {
+		if (
+			! [ 'wp-prettier', '@wordpress/prettier' ].includes(
+				prettierPackageName
+			)
+		) {
 			return {
 				success: false,
 				message:
-					chalk.red( 'Incompatible version of Prettier was found in your project\n' ) +
+					chalk.red(
+						'Incompatible version of Prettier was found in your project\n'
+					) +
 					"You need to install the 'wp-prettier' package to get " +
 					'code formatting compliant with the WordPress coding standards.\n\n',
 			};
@@ -45,7 +51,9 @@ function checkPrettier() {
 		return {
 			success: false,
 			message:
-				chalk.red( "The 'prettier' package was not found in your project\n" ) +
+				chalk.red(
+					"The 'prettier' package was not found in your project\n"
+				) +
 				"You need to install the 'wp-prettier' package under an alias to get " +
 				'code formatting compliant with the WordPress coding standards.\n\n',
 		};
@@ -66,7 +74,9 @@ function checkPrettier() {
 		return {
 			success: false,
 			message:
-				chalk.red( 'The Prettier config file was not found in your project\n' ) +
+				chalk.red(
+					'The Prettier config file was not found in your project\n'
+				) +
 				'You need to create a top-level Prettier config file in your project to get ' +
 				'automatic code formatting that works with IDE and editor integrations.\n\n',
 		};
@@ -94,7 +104,9 @@ const ignoreArgs = [ '--ignore-path', ignorePath ];
 
 // forward the --require-pragma option that formats only files that already have the @format
 // pragma in the first docblock.
-const pragmaArgs = hasArgInCLI( '--require-pragma' ) ? [ '--require-pragma' ] : [];
+const pragmaArgs = hasArgInCLI( '--require-pragma' )
+	? [ '--require-pragma' ]
+	: [];
 
 // Get the files and directories to format and convert them to globs
 let fileArgs = getFileArgsFromCLI();

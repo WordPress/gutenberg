@@ -31,7 +31,9 @@ function DownloadableBlocksPanel( {
 			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				{ __( 'No blocks found in your library.' ) }
 				<br />
-				{ __( 'Please contact your site administrator to install new blocks.' ) }
+				{ __(
+					'Please contact your site administrator to install new blocks.'
+				) }
 			</p>
 		);
 	}
@@ -65,7 +67,9 @@ function DownloadableBlocksPanel( {
 	return (
 		<Fragment>
 			<p className="block-directory-downloadable-blocks-panel__description">
-				{ __( 'No blocks found in your library. These blocks can be downloaded and installed:' ) }
+				{ __(
+					'No blocks found in your library. These blocks can be downloaded and installed:'
+				) }
 			</p>
 			<DownloadableBlocksList
 				items={ downloadableItems }
@@ -86,7 +90,9 @@ export default compose( [
 		} = select( 'core/block-directory' );
 
 		const hasPermission = hasInstallBlocksPermission();
-		const downloadableItems = hasPermission ? getDownloadableBlocks( filterValue ) : [];
+		const downloadableItems = hasPermission
+			? getDownloadableBlocks( filterValue )
+			: [];
 		const isLoading = isRequestingDownloadableBlocks();
 
 		return {

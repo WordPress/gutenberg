@@ -13,14 +13,17 @@ const openPageAttributesPanel = async () => {
 	const openButton = await findSidebarPanelWithTitle( 'Page Attributes' );
 
 	// Get the classes from the panel
-	const buttonClassName = await ( await openButton.getProperty( 'className' ) ).jsonValue();
+	const buttonClassName = await (
+		await openButton.getProperty( 'className' )
+	 ).jsonValue();
 
 	// Open the panel if needed.
 	if ( -1 === buttonClassName.indexOf( 'is-opened' ) ) {
 		await openButton.click();
 	}
 };
-const SELECT_OPTION_SELECTOR = '.editor-page-attributes__parent option:nth-child(2)';
+const SELECT_OPTION_SELECTOR =
+	'.editor-page-attributes__parent option:nth-child(2)';
 
 describe( 'Test Custom Post Types', () => {
 	beforeAll( async () => {
@@ -42,8 +45,13 @@ describe( 'Test Custom Post Types', () => {
 		await openPageAttributesPanel();
 		await page.waitForSelector( SELECT_OPTION_SELECTOR );
 		const optionToSelect = await page.$( SELECT_OPTION_SELECTOR );
-		const valueToSelect = await ( await optionToSelect.getProperty( 'value' ) ).jsonValue();
-		await page.select( '.editor-page-attributes__parent select', valueToSelect );
+		const valueToSelect = await (
+			await optionToSelect.getProperty( 'value' )
+		 ).jsonValue();
+		await page.select(
+			'.editor-page-attributes__parent select',
+			valueToSelect
+		);
 		await page.click( '.block-editor-writing-flow' );
 		await page.keyboard.type( 'Child Post' );
 		await publishPost();

@@ -29,7 +29,11 @@ export const bold = {
 
 		return (
 			<>
-				<RichTextShortcut type="primary" character="b" onUse={ onToggle } />
+				<RichTextShortcut
+					type="primary"
+					character="b"
+					onUse={ onToggle }
+				/>
 				<RichTextToolbarButton
 					name="bold"
 					icon="editor-bold"
@@ -39,7 +43,10 @@ export const bold = {
 					shortcutType="primary"
 					shortcutCharacter="b"
 				/>
-				<__unstableRichTextInputEvent inputType="formatBold" onInput={ onToggle } />
+				<__unstableRichTextInputEvent
+					inputType="formatBold"
+					onInput={ onToggle }
+				/>
 			</>
 		);
 	},

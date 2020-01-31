@@ -8,7 +8,11 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { __experimentalRichText as RichText, create, insert } from '@wordpress/rich-text';
+import {
+	__experimentalRichText as RichText,
+	create,
+	insert,
+} from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
@@ -61,14 +65,28 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { placeholder, style, title, focusedBorderColor, borderStyle, isDimmed } = this.props;
+		const {
+			placeholder,
+			style,
+			title,
+			focusedBorderColor,
+			borderStyle,
+			isDimmed,
+		} = this.props;
 
 		const decodedPlaceholder = decodeEntities( placeholder );
-		const borderColor = this.props.isSelected ? focusedBorderColor : 'transparent';
+		const borderColor = this.props.isSelected
+			? focusedBorderColor
+			: 'transparent';
 
 		return (
 			<View
-				style={ [ styles.titleContainer, borderStyle, { borderColor }, isDimmed && styles.dimmed ] }
+				style={ [
+					styles.titleContainer,
+					borderStyle,
+					{ borderColor },
+					isDimmed && styles.dimmed,
+				] }
 				accessible={ ! this.props.isSelected }
 				accessibilityLabel={
 					isEmpty( title )
@@ -113,7 +131,9 @@ export default compose(
 	withSelect( ( select ) => {
 		const { isPostTitleSelected } = select( 'core/editor' );
 
-		const { getSelectedBlockClientId, getBlockRootClientId } = select( 'core/block-editor' );
+		const { getSelectedBlockClientId, getBlockRootClientId } = select(
+			'core/block-editor'
+		);
 
 		const selectedId = getSelectedBlockClientId();
 		const selectionIsNested = !! getBlockRootClientId( selectedId );
@@ -125,9 +145,13 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { undo, redo, togglePostTitleSelection } = dispatch( 'core/editor' );
+		const { undo, redo, togglePostTitleSelection } = dispatch(
+			'core/editor'
+		);
 
-		const { clearSelectedBlock, insertDefaultBlock } = dispatch( 'core/block-editor' );
+		const { clearSelectedBlock, insertDefaultBlock } = dispatch(
+			'core/block-editor'
+		);
 
 		return {
 			onEnterPress() {

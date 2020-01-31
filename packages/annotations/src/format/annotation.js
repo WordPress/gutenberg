@@ -69,7 +69,9 @@ function retrieveAnnotationPositions( formats ) {
 
 	formats.forEach( ( characterFormats, i ) => {
 		characterFormats = characterFormats || [];
-		characterFormats = characterFormats.filter( ( format ) => format.type === FORMAT_NAME );
+		characterFormats = characterFormats.filter(
+			( format ) => format.type === FORMAT_NAME
+		);
 		characterFormats.forEach( ( format ) => {
 			let { id } = format.attributes;
 			id = id.replace( ANNOTATION_ATTRIBUTE_PREFIX, '' );
@@ -116,7 +118,11 @@ function updateAnnotationsWithPositions(
 
 		const { start, end } = currentAnnotation;
 		if ( start !== position.start || end !== position.end ) {
-			updateAnnotationRange( currentAnnotation.id, position.start, position.end );
+			updateAnnotationRange(
+				currentAnnotation.id,
+				position.start,
+				position.end
+			);
 		}
 	} );
 }
@@ -138,7 +144,9 @@ export const annotation = {
 		{ richTextIdentifier, blockClientId }
 	) {
 		return {
-			annotations: select( STORE_KEY ).__experimentalGetAnnotationsForRichText(
+			annotations: select(
+				STORE_KEY
+			).__experimentalGetAnnotationsForRichText(
 				blockClientId,
 				richTextIdentifier
 			),
@@ -157,14 +165,20 @@ export const annotation = {
 	},
 	__experimentalGetPropsForEditableTreeChangeHandler( dispatch ) {
 		return {
-			removeAnnotation: dispatch( STORE_KEY ).__experimentalRemoveAnnotation,
-			updateAnnotationRange: dispatch( STORE_KEY ).__experimentalUpdateAnnotationRange,
+			removeAnnotation: dispatch( STORE_KEY )
+				.__experimentalRemoveAnnotation,
+			updateAnnotationRange: dispatch( STORE_KEY )
+				.__experimentalUpdateAnnotationRange,
 		};
 	},
 	__experimentalCreateOnChangeEditableValue( props ) {
 		return ( formats ) => {
 			const positions = retrieveAnnotationPositions( formats );
-			const { removeAnnotation, updateAnnotationRange, annotations } = props;
+			const {
+				removeAnnotation,
+				updateAnnotationRange,
+				annotations,
+			} = props;
 
 			updateAnnotationsWithPositions( annotations, positions, {
 				removeAnnotation,

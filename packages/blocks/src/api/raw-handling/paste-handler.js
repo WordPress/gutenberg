@@ -28,7 +28,12 @@ import googleDocsUIDRemover from './google-docs-uid-remover';
 import htmlFormattingRemover from './html-formatting-remover';
 import brRemover from './br-remover';
 import { getPhrasingContentSchema } from './phrasing-content';
-import { deepFilterHTML, isPlain, removeInvalidHTML, getBlockContentSchema } from './utils';
+import {
+	deepFilterHTML,
+	isPlain,
+	removeInvalidHTML,
+	getBlockContentSchema,
+} from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 
 /**
@@ -44,8 +49,14 @@ const { console } = window;
  * @return {string} HTML only containing phrasing content.
  */
 function filterInlineHTML( HTML ) {
-	HTML = deepFilterHTML( HTML, [ googleDocsUIDRemover, phrasingContentReducer, commentRemover ] );
-	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), { inline: true } );
+	HTML = deepFilterHTML( HTML, [
+		googleDocsUIDRemover,
+		phrasingContentReducer,
+		commentRemover,
+	] );
+	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
+		inline: true,
+	} );
 	HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
 
 	// Allows us to ask for this information when we get a report.
@@ -55,14 +66,18 @@ function filterInlineHTML( HTML ) {
 }
 
 function getRawTransformations() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map( ( transform ) => {
-		return transform.isMatch
-			? transform
-			: {
-					...transform,
-					isMatch: ( node ) => transform.selector && node.matches( transform.selector ),
-			  };
-	} );
+	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map(
+		( transform ) => {
+			return transform.isMatch
+				? transform
+				: {
+						...transform,
+						isMatch: ( node ) =>
+							transform.selector &&
+							node.matches( transform.selector ),
+				  };
+		}
+	);
 }
 
 /**
@@ -82,7 +97,9 @@ function htmlToBlocks( { html, rawTransforms } ) {
 	doc.body.innerHTML = html;
 
 	return Array.from( doc.body.children ).map( ( node ) => {
-		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) => isMatch( node ) );
+		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) =>
+			isMatch( node )
+		);
 
 		if ( ! rawTransform ) {
 			return createBlock(
@@ -98,7 +115,10 @@ function htmlToBlocks( { html, rawTransforms } ) {
 			return transform( node );
 		}
 
-		return createBlock( blockName, getBlockAttributes( blockName, node.outerHTML ) );
+		return createBlock(
+			blockName,
+			getBlockAttributes( blockName, node.outerHTML )
+		);
 	} );
 }
 
@@ -127,8 +147,14 @@ export function pasteHandler( {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/g, '' );
 	// Strip Windows markers.
-	HTML = HTML.replace( /^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i, '' );
-	HTML = HTML.replace( /(?:<!--\s*EndFragment\s*-->\s*)?<\/body>\s*<\/html>\s*$/i, '' );
+	HTML = HTML.replace(
+		/^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i,
+		''
+	);
+	HTML = HTML.replace(
+		/(?:<!--\s*EndFragment\s*-->\s*)?<\/body>\s*<\/html>\s*$/i,
+		''
+	);
 
 	// If we detect block delimiters in HTML, parse entirely as blocks.
 	if ( mode !== 'INLINE' ) {
@@ -185,13 +211,21 @@ export function pasteHandler( {
 	// empty HTML strings are included.
 	const hasShortcodes = pieces.length > 1;
 
-	if ( mode === 'AUTO' && ! hasShortcodes && isInlineContent( HTML, tagName ) ) {
+	if (
+		mode === 'AUTO' &&
+		! hasShortcodes &&
+		isInlineContent( HTML, tagName )
+	) {
 		return filterInlineHTML( HTML );
 	}
 
 	const rawTransforms = getRawTransformations();
 	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
-	const blockContentSchema = getBlockContentSchema( rawTransforms, phrasingContentSchema, true );
+	const blockContentSchema = getBlockContentSchema(
+		rawTransforms,
+		phrasingContentSchema,
+		true
+	);
 
 	const blocks = compact(
 		flatMap( pieces, ( piece ) => {
@@ -250,8 +284,14 @@ export function pasteHandler( {
 	) {
 		const trimmedPlainText = plainText.trim();
 
-		if ( trimmedPlainText !== '' && trimmedPlainText.indexOf( '\n' ) === -1 ) {
-			return removeInvalidHTML( getBlockContent( blocks[ 0 ] ), phrasingContentSchema );
+		if (
+			trimmedPlainText !== '' &&
+			trimmedPlainText.indexOf( '\n' ) === -1
+		) {
+			return removeInvalidHTML(
+				getBlockContent( blocks[ 0 ] ),
+				phrasingContentSchema
+			);
 		}
 	}
 

@@ -32,13 +32,23 @@ describe( 'Basic rendering', () => {
 		'should highlight the singular occurance of the text "%s" in the text if it exists',
 		( highlight ) => {
 			act( () => {
-				render( <TextHighlight text={ defaultText } highlight={ highlight } />, container );
+				render(
+					<TextHighlight
+						text={ defaultText }
+						highlight={ highlight }
+					/>,
+					container
+				);
 			} );
 
-			const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
+			const highlightedEls = Array.from(
+				container.querySelectorAll( 'mark' )
+			);
 
 			highlightedEls.forEach( ( el ) => {
-				expect( el.innerHTML ).toEqual( expect.stringContaining( highlight ) );
+				expect( el.innerHTML ).toEqual(
+					expect.stringContaining( highlight )
+				);
 			} );
 		}
 	);
@@ -47,15 +57,22 @@ describe( 'Basic rendering', () => {
 		const highlight = 'edit';
 
 		act( () => {
-			render( <TextHighlight text={ defaultText } highlight={ highlight } />, container );
+			render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				container
+			);
 		} );
 
-		const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
+		const highlightedEls = Array.from(
+			container.querySelectorAll( 'mark' )
+		);
 
 		expect( highlightedEls ).toHaveLength( 2 );
 
 		highlightedEls.forEach( ( el ) => {
-			expect( el.innerHTML ).toEqual( expect.stringContaining( highlight ) );
+			expect( el.innerHTML ).toEqual(
+				expect.stringContaining( highlight )
+			);
 		} );
 	} );
 
@@ -63,10 +80,15 @@ describe( 'Basic rendering', () => {
 		const highlight = 'The'; // note this occurs in both sentance of lowercase forms
 
 		act( () => {
-			render( <TextHighlight text={ defaultText } highlight={ highlight } />, container );
+			render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				container
+			);
 		} );
 
-		const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
+		const highlightedEls = Array.from(
+			container.querySelectorAll( 'mark' )
+		);
 
 		// Our component matcher is case insensitive so string.Containing will
 		// return a false failure
@@ -83,10 +105,15 @@ describe( 'Basic rendering', () => {
 		const highlight = 'Antidisestablishmentarianism';
 
 		act( () => {
-			render( <TextHighlight text={ defaultText } highlight={ highlight } />, container );
+			render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				container
+			);
 		} );
 
-		const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
+		const highlightedEls = Array.from(
+			container.querySelectorAll( 'mark' )
+		);
 
 		expect( highlightedEls ).toHaveLength( 0 );
 	} );

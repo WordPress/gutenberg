@@ -55,7 +55,10 @@ const effects = {
 
 			// Save metaboxes on save completion, except for autosaves that are not a post preview.
 			const shouldTriggerMetaboxesSave =
-				hasActiveMetaBoxes && wasSavingPost && ! isSavingPost && ! wasAutosavingPost;
+				hasActiveMetaBoxes &&
+				wasSavingPost &&
+				! isSavingPost &&
+				! wasAutosavingPost;
 
 			// Save current state for next inspection.
 			wasSavingPost = isSavingPost;
@@ -78,18 +81,23 @@ const effects = {
 		// If we do not provide this data, the post will be overridden with the default values.
 		const post = select( 'core/editor' ).getCurrentPost( state );
 		const additionalData = [
-			post.comment_status ? [ 'comment_status', post.comment_status ] : false,
+			post.comment_status
+				? [ 'comment_status', post.comment_status ]
+				: false,
 			post.ping_status ? [ 'ping_status', post.ping_status ] : false,
 			post.sticky ? [ 'sticky', post.sticky ] : false,
 			post.author ? [ 'post_author', post.author ] : false,
 		].filter( Boolean );
 
 		// We gather all the metaboxes locations data and the base form data
-		const baseFormData = new window.FormData( document.querySelector( '.metabox-base-form' ) );
+		const baseFormData = new window.FormData(
+			document.querySelector( '.metabox-base-form' )
+		);
 		const formDataToMerge = [
 			baseFormData,
 			...getActiveMetaBoxLocations( state ).map(
-				( location ) => new window.FormData( getMetaBoxContainer( location ) )
+				( location ) =>
+					new window.FormData( getMetaBoxContainer( location ) )
 			),
 		];
 
@@ -104,7 +112,9 @@ const effects = {
 			},
 			new window.FormData()
 		);
-		additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
+		additionalData.forEach( ( [ key, value ] ) =>
+			formData.append( key, value )
+		);
 
 		// Save the metaboxes
 		apiFetch( {
@@ -121,7 +131,9 @@ const effects = {
 		}
 
 		const message =
-			action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
+			action.mode === 'visual'
+				? __( 'Visual editor selected' )
+				: __( 'Code editor selected' );
 		speak( message, 'assertive' );
 	},
 };

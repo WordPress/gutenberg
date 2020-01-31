@@ -72,14 +72,19 @@ const ViewportMatchWidthContext = createContext( null );
 const useViewportMatch = ( breakpoint, operator = '>=' ) => {
 	const simulatedWidth = useContext( ViewportMatchWidthContext );
 	const mediaQuery =
-		! simulatedWidth && `(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
+		! simulatedWidth &&
+		`(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
 	const mediaQueryResult = useMediaQuery( mediaQuery );
 	if ( simulatedWidth ) {
-		return OPERATOR_EVALUATORS[ operator ]( BREAKPOINTS[ breakpoint ], simulatedWidth );
+		return OPERATOR_EVALUATORS[ operator ](
+			BREAKPOINTS[ breakpoint ],
+			simulatedWidth
+		);
 	}
 	return mediaQueryResult;
 };
 
-useViewportMatch.__experimentalWidthProvider = ViewportMatchWidthContext.Provider;
+useViewportMatch.__experimentalWidthProvider =
+	ViewportMatchWidthContext.Provider;
 
 export default useViewportMatch;

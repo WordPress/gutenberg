@@ -11,7 +11,11 @@ import { InspectorControls } from '@wordpress/block-editor';
  */
 import styles from './container.native.scss';
 
-function BottomSheetSettings( { editorSidebarOpened, closeGeneralSidebar, ...props } ) {
+function BottomSheetSettings( {
+	editorSidebarOpened,
+	closeGeneralSidebar,
+	...props
+} ) {
 	return (
 		<BottomSheet
 			isVisible={ editorSidebarOpened }

@@ -13,24 +13,33 @@ import { useEffect, useRef } from '@wordpress/element';
 const BlockDraggable = ( { children, clientIds } ) => {
 	const { srcRootClientId, index, isDraggable } = useSelect(
 		( select ) => {
-			const { getBlockIndex, getBlockRootClientId, getTemplateLock } = select(
-				'core/block-editor'
-			);
+			const {
+				getBlockIndex,
+				getBlockRootClientId,
+				getTemplateLock,
+			} = select( 'core/block-editor' );
 			const normalizedClientIds = castArray( clientIds );
 			const rootClientId =
-				normalizedClientIds.length === 1 ? getBlockRootClientId( normalizedClientIds[ 0 ] ) : null;
-			const templateLock = rootClientId ? getTemplateLock( rootClientId ) : null;
+				normalizedClientIds.length === 1
+					? getBlockRootClientId( normalizedClientIds[ 0 ] )
+					: null;
+			const templateLock = rootClientId
+				? getTemplateLock( rootClientId )
+				: null;
 
 			return {
 				index: getBlockIndex( normalizedClientIds[ 0 ], rootClientId ),
 				srcRootClientId: rootClientId,
-				isDraggable: normalizedClientIds.length === 1 && 'all' !== templateLock,
+				isDraggable:
+					normalizedClientIds.length === 1 && 'all' !== templateLock,
 			};
 		},
 		[ clientIds ]
 	);
 	const isDragging = useRef( false );
-	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch( 'core/block-editor' );
+	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
+		'core/block-editor'
+	);
 
 	// Stop dragging blocks if the block draggable is unmounted
 	useEffect( () => {

@@ -6,7 +6,12 @@ import { renderToString } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getSerializeCapableElement, concat, toHTML, fromDOM } from '../children';
+import {
+	getSerializeCapableElement,
+	concat,
+	toHTML,
+	fromDOM,
+} from '../children';
 
 describe( 'getSerializeCapableElement', () => {
 	it( 'returns a serialize capable element', () => {
@@ -28,7 +33,9 @@ describe( 'getSerializeCapableElement', () => {
 		// since all that is cared about is that it can be serialized.
 		const html = renderToString( element );
 
-		expect( html ).toBe( 'This <strong class="is-extra-strong">is</strong> a test' );
+		expect( html ).toBe(
+			'This <strong class="is-extra-strong">is</strong> a test'
+		);
 	} );
 } );
 
@@ -109,7 +116,8 @@ describe( 'toHTML', () => {
 describe( 'fromDOM', () => {
 	it( 'should return an equivalent block children', () => {
 		const node = document.createElement( 'div' );
-		node.innerHTML = 'This <strong class="is-extra-strong">is</strong> a test';
+		node.innerHTML =
+			'This <strong class="is-extra-strong">is</strong> a test';
 
 		const blockNode = fromDOM( node.childNodes );
 

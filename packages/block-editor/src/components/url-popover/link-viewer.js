@@ -11,7 +11,10 @@ import { ExternalLink, Button } from '@wordpress/components';
 import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 
 function LinkViewerUrl( { url, urlLabel, className } ) {
-	const linkClassName = classnames( className, 'block-editor-url-popover__link-viewer-url' );
+	const linkClassName = classnames(
+		className,
+		'block-editor-url-popover__link-viewer-url'
+	);
 
 	if ( ! url ) {
 		return <span className={ linkClassName }></span>;
@@ -34,12 +37,23 @@ export default function LinkViewer( {
 } ) {
 	return (
 		<div
-			className={ classnames( 'block-editor-url-popover__link-viewer', className ) }
+			className={ classnames(
+				'block-editor-url-popover__link-viewer',
+				className
+			) }
 			{ ...props }
 		>
-			<LinkViewerUrl url={ url } urlLabel={ urlLabel } className={ linkClassName } />
+			<LinkViewerUrl
+				url={ url }
+				urlLabel={ urlLabel }
+				className={ linkClassName }
+			/>
 			{ onEditLinkClick && (
-				<Button icon="edit" label={ __( 'Edit' ) } onClick={ onEditLinkClick } />
+				<Button
+					icon="edit"
+					label={ __( 'Edit' ) }
+					onClick={ onEditLinkClick }
+				/>
 			) }
 		</div>
 	);

@@ -18,7 +18,11 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 
 	return (
 		selectedBlockClientId && (
-			<Button isSecondary className="block-editor-skip-to-selected-block" onClick={ onClick }>
+			<Button
+				isSecondary
+				className="block-editor-skip-to-selected-block"
+				onClick={ onClick }
+			>
 				{ __( 'Skip to the selected block' ) }
 			</Button>
 		)
@@ -27,6 +31,8 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 
 export default withSelect( ( select ) => {
 	return {
-		selectedBlockClientId: select( 'core/block-editor' ).getBlockSelectionStart(),
+		selectedBlockClientId: select(
+			'core/block-editor'
+		).getBlockSelectionStart(),
 	};
 } )( SkipToSelectedBlock );

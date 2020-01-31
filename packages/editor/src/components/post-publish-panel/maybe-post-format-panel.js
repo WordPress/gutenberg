@@ -16,7 +16,11 @@ import { Button, PanelBody } from '@wordpress/components';
  */
 import { POST_FORMATS } from '../post-format';
 
-const PostFormatSuggestion = ( { suggestedPostFormat, suggestionText, onUpdatePostFormat } ) => (
+const PostFormatSuggestion = ( {
+	suggestedPostFormat,
+	suggestionText,
+	onUpdatePostFormat,
+} ) => (
 	<Button isLink onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }>
 		{ suggestionText }
 	</Button>
@@ -41,7 +45,10 @@ const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
 				<PostFormatSuggestion
 					onUpdatePostFormat={ onUpdatePostFormat }
 					suggestedPostFormat={ suggestion.id }
-					suggestionText={ sprintf( __( 'Apply the "%1$s" format.' ), suggestion.caption ) }
+					suggestionText={ sprintf(
+						__( 'Apply the "%1$s" format.' ),
+						suggestion.caption
+					) }
 				/>
 			</p>
 		</PanelBody>
@@ -49,17 +56,28 @@ const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
 };
 
 const getSuggestion = ( supportedFormats, suggestedPostFormat ) => {
-	const formats = POST_FORMATS.filter( ( format ) => includes( supportedFormats, format.id ) );
+	const formats = POST_FORMATS.filter( ( format ) =>
+		includes( supportedFormats, format.id )
+	);
 	return find( formats, ( format ) => format.id === suggestedPostFormat );
 };
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getSuggestedPostFormat } = select( 'core/editor' );
-		const supportedFormats = get( select( 'core' ).getThemeSupports(), [ 'formats' ], [] );
+		const { getEditedPostAttribute, getSuggestedPostFormat } = select(
+			'core/editor'
+		);
+		const supportedFormats = get(
+			select( 'core' ).getThemeSupports(),
+			[ 'formats' ],
+			[]
+		);
 		return {
 			currentPostFormat: getEditedPostAttribute( 'format' ),
-			suggestion: getSuggestion( supportedFormats, getSuggestedPostFormat() ),
+			suggestion: getSuggestion(
+				supportedFormats,
+				getSuggestedPostFormat()
+			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
@@ -68,6 +86,7 @@ export default compose(
 		},
 	} ) ),
 	ifCondition(
-		( { suggestion, currentPostFormat } ) => suggestion && suggestion.id !== currentPostFormat
+		( { suggestion, currentPostFormat } ) =>
+			suggestion && suggestion.id !== currentPostFormat
 	)
 )( PostFormatPanel );

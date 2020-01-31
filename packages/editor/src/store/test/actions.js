@@ -7,17 +7,25 @@ import { select, dispatch, apiFetch } from '@wordpress/data-controls';
  * Internal dependencies
  */
 import * as actions from '../actions';
-import { STORE_KEY, TRASH_POST_NOTICE_ID, POST_UPDATE_TRANSACTION_ID } from '../constants';
+import {
+	STORE_KEY,
+	TRASH_POST_NOTICE_ID,
+	POST_UPDATE_TRANSACTION_ID,
+} from '../constants';
 
 jest.mock( '@wordpress/data-controls' );
 
 select.mockImplementation( ( ...args ) => {
-	const { select: actualSelect } = jest.requireActual( '@wordpress/data-controls' );
+	const { select: actualSelect } = jest.requireActual(
+		'@wordpress/data-controls'
+	);
 	return actualSelect( ...args );
 } );
 
 dispatch.mockImplementation( ( ...args ) => {
-	const { dispatch: actualDispatch } = jest.requireActual( '@wordpress/data-controls' );
+	const { dispatch: actualDispatch } = jest.requireActual(
+		'@wordpress/data-controls'
+	);
 	return actualDispatch( ...args );
 } );
 
@@ -31,7 +39,9 @@ const apiFetchThrowError = ( error ) => {
 const apiFetchDoActual = () => {
 	apiFetch.mockClear();
 	apiFetch.mockImplementation( ( ...args ) => {
-		const { apiFetch: fetch } = jest.requireActual( '@wordpress/data-controls' );
+		const { apiFetch: fetch } = jest.requireActual(
+			'@wordpress/data-controls'
+		);
 		return fetch( ...args );
 	} );
 };
@@ -68,7 +78,9 @@ describe( 'Post generator actions', () => {
 				() => {
 					reset( isAutosave );
 					const { value } = fulfillment.next();
-					expect( value ).toEqual( select( STORE_KEY, 'isEditedPostSaveable' ) );
+					expect( value ).toEqual(
+						select( STORE_KEY, 'isEditedPostSaveable' )
+					);
 				},
 			],
 			[
@@ -76,7 +88,9 @@ describe( 'Post generator actions', () => {
 				() => true,
 				() => {
 					const { value } = fulfillment.next( true );
-					expect( value ).toEqual( select( STORE_KEY, 'getEditedPostContent' ) );
+					expect( value ).toEqual(
+						select( STORE_KEY, 'getEditedPostContent' )
+					);
 				},
 			],
 			[
@@ -87,7 +101,9 @@ describe( 'Post generator actions', () => {
 						const edits = { content: currentPost().content };
 						const { value } = fulfillment.next( edits.content );
 						expect( value ).toEqual(
-							dispatch( STORE_KEY, 'editPost', edits, { undoIgnore: true } )
+							dispatch( STORE_KEY, 'editPost', edits, {
+								undoIgnore: true,
+							} )
 						);
 					}
 				},
@@ -108,7 +124,9 @@ describe( 'Post generator actions', () => {
 				() => true,
 				() => {
 					const { value } = fulfillment.next();
-					expect( value ).toEqual( select( STORE_KEY, 'getCurrentPost' ) );
+					expect( value ).toEqual(
+						select( STORE_KEY, 'getCurrentPost' )
+					);
 				},
 			],
 			[
@@ -118,7 +136,13 @@ describe( 'Post generator actions', () => {
 					const post = currentPost();
 					const { value } = fulfillment.next( post );
 					expect( value ).toEqual(
-						select( 'core', 'getEntityRecordNonTransientEdits', 'postType', post.type, post.id )
+						select(
+							'core',
+							'getEntityRecordNonTransientEdits',
+							'postType',
+							post.type,
+							post.id
+						)
 					);
 				},
 			],
@@ -160,7 +184,13 @@ describe( 'Post generator actions', () => {
 					const post = currentPost();
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
-						select( 'core', 'getLastEntitySaveError', 'postType', post.type, post.id )
+						select(
+							'core',
+							'getLastEntitySaveError',
+							'postType',
+							post.type,
+							post.id
+						)
 					);
 				},
 			],
@@ -169,7 +199,9 @@ describe( 'Post generator actions', () => {
 				() => true,
 				() => {
 					const { value } = fulfillment.next();
-					expect( value ).toEqual( select( STORE_KEY, 'getCurrentPost' ) );
+					expect( value ).toEqual(
+						select( STORE_KEY, 'getCurrentPost' )
+					);
 				},
 			],
 			[
@@ -178,7 +210,9 @@ describe( 'Post generator actions', () => {
 				() => {
 					const post = currentPost();
 					const { value } = fulfillment.next( post );
-					expect( value ).toEqual( select( 'core', 'getPostType', post.type ) );
+					expect( value ).toEqual(
+						select( 'core', 'getPostType', post.type )
+					);
 				},
 			],
 			[
@@ -188,11 +222,16 @@ describe( 'Post generator actions', () => {
 					if ( ! isAutosave && currentPostStatus === 'publish' ) {
 						const { value } = fulfillment.next( postType );
 						expect( value ).toEqual(
-							dispatch( 'core/notices', 'createSuccessNotice', 'Updated Post', {
-								actions: [],
-								id: 'SAVE_POST_NOTICE_ID',
-								type: 'snackbar',
-							} )
+							dispatch(
+								'core/notices',
+								'createSuccessNotice',
+								'Updated Post',
+								{
+									actions: [],
+									id: 'SAVE_POST_NOTICE_ID',
+									type: 'snackbar',
+								}
+							)
 						);
 					}
 				},
@@ -204,7 +243,10 @@ describe( 'Post generator actions', () => {
 					if ( ! isAutosave ) {
 						const { value } = fulfillment.next();
 						expect( value ).toEqual(
-							dispatch( 'core/block-editor', '__unstableMarkLastChangeAsPersistent' )
+							dispatch(
+								'core/block-editor',
+								'__unstableMarkLastChangeAsPersistent'
+							)
 						);
 					}
 				},
@@ -278,17 +320,28 @@ describe( 'Post generator actions', () => {
 		it( 'yields expected action for selecting the current post type slug', () => {
 			reset();
 			const { value } = fulfillment.next();
-			expect( value ).toEqual( select( STORE_KEY, 'getCurrentPostType' ) );
+			expect( value ).toEqual(
+				select( STORE_KEY, 'getCurrentPostType' )
+			);
 		} );
 		it( 'yields expected action for selecting the post type object', () => {
 			const { value } = fulfillment.next( postTypeSlug );
-			expect( value ).toEqual( select( 'core', 'getPostType', postTypeSlug ) );
+			expect( value ).toEqual(
+				select( 'core', 'getPostType', postTypeSlug )
+			);
 		} );
 		it(
-			'yields expected action for dispatching removing the trash notice ' + 'for the post',
+			'yields expected action for dispatching removing the trash notice ' +
+				'for the post',
 			() => {
 				const { value } = fulfillment.next( postType );
-				expect( value ).toEqual( dispatch( 'core/notices', 'removeNotice', TRASH_POST_NOTICE_ID ) );
+				expect( value ).toEqual(
+					dispatch(
+						'core/notices',
+						'removeNotice',
+						TRASH_POST_NOTICE_ID
+					)
+				);
 			}
 		);
 		it( 'yields expected action for selecting the currentPost', () => {
@@ -301,9 +354,14 @@ describe( 'Post generator actions', () => {
 				apiFetchThrowError( error );
 				const { value } = fulfillment.next( currentPost );
 				expect( value ).toEqual(
-					dispatch( 'core/notices', 'createErrorNotice', 'Trashing failed', {
-						id: TRASH_POST_NOTICE_ID,
-					} )
+					dispatch(
+						'core/notices',
+						'createErrorNotice',
+						'Trashing failed',
+						{
+							id: TRASH_POST_NOTICE_ID,
+						}
+					)
 				);
 			} );
 		} );
@@ -336,11 +394,15 @@ describe( 'Post generator actions', () => {
 		} );
 		it( 'yields expected action for selecting the current post type', () => {
 			const { value } = fulfillment.next( currentPost );
-			expect( value ).toEqual( select( STORE_KEY, 'getCurrentPostType' ) );
+			expect( value ).toEqual(
+				select( STORE_KEY, 'getCurrentPostType' )
+			);
 		} );
 		it( 'yields expected action for selecting the post type object', () => {
 			const { value } = fulfillment.next( postTypeSlug );
-			expect( value ).toEqual( select( 'core', 'getPostType', postTypeSlug ) );
+			expect( value ).toEqual(
+				select( 'core', 'getPostType', postTypeSlug )
+			);
 		} );
 		it( 'yields expected action for the api fetch call', () => {
 			const { value } = fulfillment.next( postType );
@@ -355,7 +417,9 @@ describe( 'Post generator actions', () => {
 		} );
 		it( 'yields expected action for dispatching the reset of the post', () => {
 			const { value } = fulfillment.next( currentPost );
-			expect( value ).toEqual( dispatch( STORE_KEY, 'resetPost', currentPost ) );
+			expect( value ).toEqual(
+				dispatch( STORE_KEY, 'resetPost', currentPost )
+			);
 		} );
 	} );
 } );
@@ -505,10 +569,12 @@ describe( 'Editor actions', () => {
 		} );
 
 		it( 'should take an optional id argument', () => {
-			expect( actions.__experimentalFetchReusableBlocks( 123 ) ).toEqual( {
-				type: 'FETCH_REUSABLE_BLOCKS',
-				id: 123,
-			} );
+			expect( actions.__experimentalFetchReusableBlocks( 123 ) ).toEqual(
+				{
+					type: 'FETCH_REUSABLE_BLOCKS',
+					id: 123,
+				}
+			);
 		} );
 	} );
 
@@ -523,17 +589,21 @@ describe( 'Editor actions', () => {
 
 	describe( 'deleteReusableBlock', () => {
 		it( 'should return the DELETE_REUSABLE_BLOCK action', () => {
-			expect( actions.__experimentalDeleteReusableBlock( 123 ) ).toEqual( {
-				type: 'DELETE_REUSABLE_BLOCK',
-				id: 123,
-			} );
+			expect( actions.__experimentalDeleteReusableBlock( 123 ) ).toEqual(
+				{
+					type: 'DELETE_REUSABLE_BLOCK',
+					id: 123,
+				}
+			);
 		} );
 	} );
 
 	describe( 'convertBlockToStatic', () => {
 		it( 'should return the CONVERT_BLOCK_TO_STATIC action', () => {
 			const clientId = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( actions.__experimentalConvertBlockToStatic( clientId ) ).toEqual( {
+			expect(
+				actions.__experimentalConvertBlockToStatic( clientId )
+			).toEqual( {
 				type: 'CONVERT_BLOCK_TO_STATIC',
 				clientId,
 			} );
@@ -543,7 +613,9 @@ describe( 'Editor actions', () => {
 	describe( 'convertBlockToReusable', () => {
 		it( 'should return the CONVERT_BLOCK_TO_REUSABLE action', () => {
 			const clientId = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( actions.__experimentalConvertBlockToReusable( clientId ) ).toEqual( {
+			expect(
+				actions.__experimentalConvertBlockToReusable( clientId )
+			).toEqual( {
 				type: 'CONVERT_BLOCK_TO_REUSABLE',
 				clientIds: [ clientId ],
 			} );

@@ -59,7 +59,15 @@ class LegacyWidgetEditHandler extends Component {
 	}
 
 	render() {
-		const { instanceId, id, number, idBase, instance, isSelected, widgetName } = this.props;
+		const {
+			instanceId,
+			id,
+			number,
+			idBase,
+			instance,
+			isSelected,
+			widgetName,
+		} = this.props;
 		const { form } = this.state;
 
 		if ( ! form ) {
@@ -79,7 +87,11 @@ class LegacyWidgetEditHandler extends Component {
 		}
 		return (
 			<>
-				{ title && <div className="wp-block-legacy-widget__edit-widget-title">{ title }</div> }
+				{ title && (
+					<div className="wp-block-legacy-widget__edit-widget-title">
+						{ title }
+					</div>
+				) }
 				<div
 					className="wp-block-legacy-widget__edit-container"
 					// Display none is used because when we switch from edit to preview,

@@ -30,7 +30,9 @@ describe( 'Custom Taxonomies labels are used', () => {
 		expect( openButton ).not.toBeFalsy();
 
 		// Get the classes from the panel
-		const buttonClassName = await ( await openButton.getProperty( 'className' ) ).jsonValue();
+		const buttonClassName = await (
+			await openButton.getProperty( 'className' )
+		 ).jsonValue();
 
 		// Open the panel if needed.
 		if ( -1 === buttonClassName.indexOf( 'is-opened' ) ) {
@@ -44,7 +46,10 @@ describe( 'Custom Taxonomies labels are used', () => {
 		expect( labelNew ).not.toBeFalsy();
 
 		// Fill with one entry
-		await page.type( 'input.components-form-token-field__input', 'Model 1' );
+		await page.type(
+			'input.components-form-token-field__input',
+			'Model 1'
+		);
 		await page.keyboard.press( 'Enter' );
 
 		// Check the "Remove Model"

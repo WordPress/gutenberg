@@ -20,7 +20,9 @@ describe( 'invalid blocks', () => {
 		await clickBlockToolbarButton( 'More options' );
 
 		// Change to HTML mode and close the options
-		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
+		const changeModeButton = await page.waitForXPath(
+			'//button[text()="Edit as HTML"]'
+		);
 		await changeModeButton.click();
 
 		// Focus on the textarea and enter an invalid paragraph
@@ -42,6 +44,8 @@ describe( 'invalid blocks', () => {
 			'.block-editor-block-compare__html',
 			( node ) => node.textContent
 		);
-		expect( htmlBlockContent ).toEqual( '<p>hello</p><p>invalid paragraph' );
+		expect( htmlBlockContent ).toEqual(
+			'<p>hello</p><p>invalid paragraph'
+		);
 	} );
 } );

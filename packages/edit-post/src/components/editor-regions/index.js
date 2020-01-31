@@ -9,7 +9,14 @@ import classnames from 'classnames';
 import { navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function EditorRegions( { footer, header, sidebar, content, publish, className } ) {
+function EditorRegions( {
+	footer,
+	header,
+	sidebar,
+	content,
+	publish,
+	className,
+} ) {
 	return (
 		<div className={ classnames( className, 'edit-post-editor-regions' ) }>
 			{ !! header && (

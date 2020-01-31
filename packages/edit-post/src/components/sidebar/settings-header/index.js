@@ -10,7 +10,11 @@ import { withDispatch } from '@wordpress/data';
  */
 import SidebarHeader from '../sidebar-header';
 
-const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName } ) => {
+const SettingsHeader = ( {
+	openDocumentSettings,
+	openBlockSettings,
+	sidebarName,
+} ) => {
 	const blockLabel = __( 'Block' );
 	const [ documentAriaLabel, documentActiveClass ] =
 		sidebarName === 'edit-post/document'
@@ -27,7 +31,10 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 			  [ __( 'Block' ), '' ];
 
 	return (
-		<SidebarHeader className="edit-post-sidebar__panel-tabs" closeLabel={ __( 'Close settings' ) }>
+		<SidebarHeader
+			className="edit-post-sidebar__panel-tabs"
+			closeLabel={ __( 'Close settings' ) }
+		>
 			{ /* Use a list so screen readers will announce how many tabs there are. */ }
 			<ul>
 				<li>

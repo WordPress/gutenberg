@@ -51,7 +51,8 @@ const withSelect = ( mapSelectToProps ) =>
 	createHigherOrderComponent(
 		( WrappedComponent ) =>
 			pure( ( ownProps ) => {
-				const mapSelect = ( select, registry ) => mapSelectToProps( select, ownProps, registry );
+				const mapSelect = ( select, registry ) =>
+					mapSelectToProps( select, ownProps, registry );
 				const mergeProps = useSelect( mapSelect );
 				return <WrappedComponent { ...ownProps } { ...mergeProps } />;
 			} ),

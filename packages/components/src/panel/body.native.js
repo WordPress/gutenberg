@@ -23,7 +23,9 @@ export class PanelBody extends Component {
 
 		return (
 			<View style={ styles.panelContainer }>
-				{ title && <Text style={ styles.sectionHeaderText }>{ title }</Text> }
+				{ title && (
+					<Text style={ styles.sectionHeaderText }>{ title }</Text>
+				) }
 				{ children }
 			</View>
 		);

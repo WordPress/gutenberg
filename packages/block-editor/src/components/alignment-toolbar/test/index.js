@@ -12,7 +12,9 @@ describe( 'AlignmentToolbar', () => {
 	const alignment = 'left';
 	const onChangeSpy = jest.fn();
 
-	const wrapper = shallow( <AlignmentToolbar value={ alignment } onChange={ onChangeSpy } /> );
+	const wrapper = shallow(
+		<AlignmentToolbar value={ alignment } onChange={ onChangeSpy } />
+	);
 
 	const controls = wrapper.props().controls;
 
@@ -34,7 +36,9 @@ describe( 'AlignmentToolbar', () => {
 	} );
 
 	test( 'should call on change a new value when the control is not active', () => {
-		const inactiveControl = controls.find( ( { align } ) => align === 'center' );
+		const inactiveControl = controls.find(
+			( { align } ) => align === 'center'
+		);
 		inactiveControl.onClick();
 
 		expect( inactiveControl.isActive ).toBe( false );
@@ -66,7 +70,9 @@ describe( 'AlignmentToolbar', () => {
 		expect( customControls ).toHaveLength( 2 );
 
 		// should correctly call on change when right alignment is pressed (active alignment)
-		const rightControl = customControls.find( ( { align } ) => align === 'custom-right' );
+		const rightControl = customControls.find(
+			( { align } ) => align === 'custom-right'
+		);
 		expect( rightControl.title ).toBe( 'My custom right' );
 		rightControl.onClick();
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
@@ -74,7 +80,9 @@ describe( 'AlignmentToolbar', () => {
 		onChangeSpy.mockClear();
 
 		// should correctly call on change when right alignment is pressed (inactive alignment)
-		const leftControl = customControls.find( ( { align } ) => align === 'custom-left' );
+		const leftControl = customControls.find(
+			( { align } ) => align === 'custom-left'
+		);
 		expect( leftControl.title ).toBe( 'My custom left' );
 		leftControl.onClick();
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );

@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import { isInTheFuture, getDate, setSettings, __experimentalGetSettings } from '../';
+import {
+	isInTheFuture,
+	getDate,
+	setSettings,
+	__experimentalGetSettings,
+} from '../';
 
 describe( 'isInTheFuture', () => {
 	it( 'should return true if the date is in the future', () => {

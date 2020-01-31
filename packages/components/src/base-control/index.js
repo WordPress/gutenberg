@@ -8,7 +8,14 @@ import classnames from 'classnames';
  */
 import VisuallyHidden from '../visually-hidden';
 
-function BaseControl( { id, label, hideLabelFromVision, help, className, children } ) {
+function BaseControl( {
+	id,
+	label,
+	hideLabelFromVision,
+	help,
+	className,
+	children,
+} ) {
 	return (
 		<div className={ classnames( 'components-base-control', className ) }>
 			<div className="components-base-control__field">
@@ -19,7 +26,10 @@ function BaseControl( { id, label, hideLabelFromVision, help, className, childre
 							{ label }
 						</VisuallyHidden>
 					) : (
-						<label className="components-base-control__label" htmlFor={ id }>
+						<label
+							className="components-base-control__label"
+							htmlFor={ id }
+						>
 							{ label }
 						</label>
 					) ) }
@@ -28,12 +38,17 @@ function BaseControl( { id, label, hideLabelFromVision, help, className, childre
 					( hideLabelFromVision ? (
 						<VisuallyHidden as="label">{ label }</VisuallyHidden>
 					) : (
-						<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
+						<BaseControl.VisualLabel>
+							{ label }
+						</BaseControl.VisualLabel>
 					) ) }
 				{ children }
 			</div>
 			{ !! help && (
-				<p id={ id + '__help' } className="components-base-control__help">
+				<p
+					id={ id + '__help' }
+					className="components-base-control__help"
+				>
 					{ help }
 				</p>
 			) }
