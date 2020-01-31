@@ -61,14 +61,20 @@ export default function NavigableTreeGrid( { children, ...props } ) {
 		const currentColumnIndex = focusablesInRow.indexOf( activeElement );
 
 		if ( includes( [ LEFT, RIGHT ], keyCode ) ) {
-			// Cycle to the next element and focus it.
+			// Calculate to the next element.
 			let nextIndex;
 			if ( keyCode === LEFT ) {
-				nextIndex = ( currentColumnIndex - 1 ) < 0 ? 0 : currentColumnIndex - 1;
+				nextIndex = Math.max( 0, currentColumnIndex - 1 );
 			} else {
-				nextIndex = ( currentColumnIndex + 1 ) >= focusablesInRow.length ? focusablesInRow.length - 1 : currentColumnIndex + 1;
+				nextIndex = Math.min( currentColumnIndex + 1, focusablesInRow.length - 1 );
 			}
 
+			// Focus is either at the left or right edge of the grid. Do nothing.
+			if ( nextIndex === currentColumnIndex ) {
+				return;
+			}
+
+			// Focus the next element.
 			focusablesInRow[ nextIndex ].focus();
 		} else if ( includes( [ UP, DOWN ], keyCode ) ) {
 			// Calculate the rowIndex of the next row.
@@ -82,7 +88,7 @@ export default function NavigableTreeGrid( { children, ...props } ) {
 				nextRowIndex = Math.min( currentRowIndex + 1, rows.length - 1 );
 			}
 
-			// Navigation is either at the top or bottom of the grid. Do nothing.
+			// Focus is either at the top or bottom edge of the grid. Do nothing.
 			if ( nextRowIndex === currentRowIndex ) {
 				return;
 			}
