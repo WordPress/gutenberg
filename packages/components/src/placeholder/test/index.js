@@ -1,4 +1,3 @@
-jest.mock( 'react-resize-aware' );
 /**
  * External dependencies
  */
@@ -10,8 +9,12 @@ import useResizeAware from 'react-resize-aware';
  */
 import Placeholder from '../';
 
+jest.mock( 'react-resize-aware' );
+
 describe( 'Placeholder', () => {
-	useResizeAware.mockReturnValue( [ <div key="1" />, { width: 320 } ] );
+	beforeEach( () => {
+		useResizeAware.mockReturnValue( [ <div key="1" />, { width: 320 } ] );
+	} );
 
 	describe( 'basic rendering', () => {
 		it( 'should by default render label section and fieldset.', () => {
@@ -75,6 +78,28 @@ describe( 'Placeholder', () => {
 		it( 'should add additional props to the top level container', () => {
 			const placeholder = shallow( <Placeholder test="test" /> );
 			expect( placeholder.prop( 'test' ) ).toBe( 'test' );
+		} );
+	} );
+
+	describe( 'resize aware', () => {
+		it( 'should not assign modifier class in first-pass `null` width from `useResizeAware`', () => {
+			useResizeAware.mockReturnValue( [ <div key="1" />, { width: 320 } ] );
+
+			const placeholder = shallow( <Placeholder /> );
+
+			expect( placeholder.hasClass( 'is-large' ) ).toBe( true );
+			expect( placeholder.hasClass( 'is-medium' ) ).toBe( false );
+			expect( placeholder.hasClass( 'is-small' ) ).toBe( false );
+		} );
+
+		it( 'should assign modifier class', () => {
+			useResizeAware.mockReturnValue( [ <div key="1" />, { width: null } ] );
+
+			const placeholder = shallow( <Placeholder /> );
+
+			expect( placeholder.hasClass( 'is-large' ) ).toBe( false );
+			expect( placeholder.hasClass( 'is-medium' ) ).toBe( false );
+			expect( placeholder.hasClass( 'is-small' ) ).toBe( false );
 		} );
 	} );
 } );
