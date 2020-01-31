@@ -81,6 +81,7 @@ export class RichText extends Component {
 		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.willTrimSpaces = this.willTrimSpaces.bind( this );
+		this.countBreaksBeforeParagraphTag = this.countBreaksBeforeParagraphTag.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
 		this.state = {
 			activeFormats: [],
@@ -649,6 +650,16 @@ export class RichText extends Component {
 		return value;
 	}
 
+	countBreaksBeforeParagraphTag( html ) {
+		// The following regular expression is used in Aztec here:
+		// https://github.com/wordpress-mobile/AztecEditor-Android/blob/b1fad439d56fa6d4aa0b78526fef355c59d00dd3/aztec/src/main/kotlin/org/wordpress/aztec/AztecParser.kt#L656
+		const brBeforeParaMatches = html.match( /(<br>)+<\/p>$/g );
+		if (brBeforeParaMatches) {
+			return ( brBeforeParaMatches[ 0 ].match( /br/g ) || [] ).length;
+		}
+		return 0;
+	}
+
 	render() {
 		const {
 			tagName,
@@ -693,23 +704,18 @@ export class RichText extends Component {
 					console.warn( 'Oops, selection will land outside the text, skipping setting it...' );
 					selection = null;
 				} else {
-					// The following regular expression is used in Aztec here:
-					// https://github.com/wordpress-mobile/AztecEditor-Android/blob/b1fad439d56fa6d4aa0b78526fef355c59d00dd3/aztec/src/main/kotlin/org/wordpress/aztec/AztecParser.kt#L656
-					const brBeforeParaMatches = html.match( /(<br>)+<\/p>$/g );
-					if ( brBeforeParaMatches ) {
+					const count = this.countBreaksBeforeParagraphTag( html );
+					if ( count > 0 ) {
 						console.warn( 'Oops, BR tag(s) at the end of content. Aztec will remove them, adapting the selection...' );
-						const count = ( brBeforeParaMatches[ 0 ].match( /br/g ) || [] ).length;
-						if ( count > 0 ) {
-							let newSelectionStart = this.props.selectionStart - count;
-							if ( newSelectionStart < 0 ) {
-								newSelectionStart = 0;
-							}
-							let newSelectionEnd = this.props.selectionEnd - count;
-							if ( newSelectionEnd < 0 ) {
-								newSelectionEnd = 0;
-							}
-							selection = { start: newSelectionStart, end: newSelectionEnd };
+						let newSelectionStart = this.props.selectionStart - count;
+						if ( newSelectionStart < 0 ) {
+							newSelectionStart = 0;
 						}
+						let newSelectionEnd = this.props.selectionEnd - count;
+						if ( newSelectionEnd < 0 ) {
+							newSelectionEnd = 0;
+						}
+						selection = { start: newSelectionStart, end: newSelectionEnd };
 					}
 				}
 			}
