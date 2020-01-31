@@ -81,21 +81,30 @@ describe( 'block', () => {
 			// Intentionally omitted keyword list
 		};
 
-		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndKeywords ) )
-			.toEqual( [ 'formatting', 'foo-keyword-1', 'foo-keyword-2', 'foo' ] );
-		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndEmptyKeywords ) )
-			.toEqual( [ 'common', 'bar' ] );
-		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndUndefinedKeywords ) )
-			.toEqual( [ 'widgets', 'baz' ] );
+		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndKeywords ) ).toEqual( [
+			'formatting',
+			'foo-keyword-1',
+			'foo-keyword-2',
+			'foo',
+		] );
+		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndEmptyKeywords ) ).toEqual( [
+			'common',
+			'bar',
+		] );
+		expect(
+			blockCompleter.getOptionKeywords( inserterItemWithTitleAndUndefinedKeywords )
+		).toEqual( [ 'widgets', 'baz' ] );
 	} );
 
 	it( 'should render a block option label', () => {
-		const labelComponents = shallow( <div>
-			{ blockCompleter.getOptionLabel( {
-				icon: 'expected-icon',
-				title: 'expected-text',
-			} ) }
-		</div> ).children();
+		const labelComponents = shallow(
+			<div>
+				{ blockCompleter.getOptionLabel( {
+					icon: 'expected-icon',
+					title: 'expected-text',
+				} ) }
+			</div>
+		).children();
 
 		expect( labelComponents ).toHaveLength( 2 );
 		expect( labelComponents.at( 0 ).name() ).toBe( 'BlockIcon' );

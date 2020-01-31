@@ -23,12 +23,7 @@ describe( 'PostTextEditor', () => {
 
 	it( 'should render via the state value when edits made', () => {
 		const onChange = jest.fn();
-		const wrapper = create(
-			<PostTextEditor
-				value="Hello World"
-				onChange={ onChange }
-			/>
-		);
+		const wrapper = create( <PostTextEditor value="Hello World" onChange={ onChange } /> );
 
 		const textarea = wrapper.root.findByType( Textarea );
 		textarea.props.onChange( { target: { value: 'Hello Chicken' } } );
@@ -39,22 +34,12 @@ describe( 'PostTextEditor', () => {
 
 	it( 'should render via the state value when edits made, even if prop value changes', () => {
 		const onChange = jest.fn();
-		const wrapper = create(
-			<PostTextEditor
-				value="Hello World"
-				onChange={ onChange }
-			/>
-		);
+		const wrapper = create( <PostTextEditor value="Hello World" onChange={ onChange } /> );
 
 		const textarea = wrapper.root.findByType( Textarea );
 		textarea.props.onChange( { target: { value: 'Hello Chicken' } } );
 
-		wrapper.update(
-			<PostTextEditor
-				value="Goodbye World"
-				onChange={ onChange }
-			/>
-		);
+		wrapper.update( <PostTextEditor value="Goodbye World" onChange={ onChange } /> );
 
 		expect( textarea.props.value ).toBe( 'Hello Chicken' );
 		expect( onChange ).toHaveBeenCalledWith( 'Hello Chicken' );
@@ -62,22 +47,12 @@ describe( 'PostTextEditor', () => {
 
 	it( 'should render via the state value when edits made, even if prop value changes and state value empty', () => {
 		const onChange = jest.fn();
-		const wrapper = create(
-			<PostTextEditor
-				value="Hello World"
-				onChange={ onChange }
-			/>
-		);
+		const wrapper = create( <PostTextEditor value="Hello World" onChange={ onChange } /> );
 
 		const textarea = wrapper.root.findByType( Textarea );
 		textarea.props.onChange( { target: { value: '' } } );
 
-		wrapper.update(
-			<PostTextEditor
-				value="Goodbye World"
-				onChange={ onChange }
-			/>
-		);
+		wrapper.update( <PostTextEditor value="Goodbye World" onChange={ onChange } /> );
 
 		expect( textarea.props.value ).toBe( '' );
 		expect( onChange ).toHaveBeenCalledWith( '' );
@@ -86,11 +61,7 @@ describe( 'PostTextEditor', () => {
 	it( 'calls onPersist after changes made and user stops editing', () => {
 		const onPersist = jest.fn();
 		const wrapper = create(
-			<PostTextEditor
-				value="Hello World"
-				onChange={ () => {} }
-				onPersist={ onPersist }
-			/>
+			<PostTextEditor value="Hello World" onChange={ () => {} } onPersist={ onPersist } />
 		);
 
 		const textarea = wrapper.root.findByType( Textarea );
@@ -103,11 +74,7 @@ describe( 'PostTextEditor', () => {
 	it( 'does not call onPersist after user stops editing without changes', () => {
 		const onPersist = jest.fn();
 		const wrapper = create(
-			<PostTextEditor
-				value="Hello World"
-				onChange={ () => {} }
-				onPersist={ onPersist }
-			/>
+			<PostTextEditor value="Hello World" onChange={ () => {} } onPersist={ onPersist } />
 		);
 
 		const textarea = wrapper.root.findByType( Textarea );
@@ -122,22 +89,14 @@ describe( 'PostTextEditor', () => {
 		// test here is more an edge case to stress that it's intentionally
 		// differentiating between state and prop values.
 		const wrapper = create(
-			<PostTextEditor
-				value="Hello World"
-				onChange={ () => {} }
-				onPersist={ () => {} }
-			/>
+			<PostTextEditor value="Hello World" onChange={ () => {} } onPersist={ () => {} } />
 		);
 
 		const textarea = wrapper.root.findByType( Textarea );
 		textarea.props.onChange( { target: { value: '' } } );
 
 		wrapper.update(
-			<PostTextEditor
-				value="Goodbye World"
-				onChange={ () => {} }
-				onPersist={ () => {} }
-			/>
+			<PostTextEditor value="Goodbye World" onChange={ () => {} } onPersist={ () => {} } />
 		);
 
 		textarea.props.onBlur();

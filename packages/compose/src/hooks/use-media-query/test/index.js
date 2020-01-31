@@ -70,9 +70,7 @@ describe( 'useMediaQuery', () => {
 		await act( async () => {
 			root.unmount();
 		} );
-		expect( removeListener.mock.calls ).toEqual( [
-			[ updateMatchFunction ],
-		] );
+		expect( removeListener.mock.calls ).toEqual( [ [ updateMatchFunction ] ] );
 	} );
 
 	it( 'should return false when the query does not matches', async () => {

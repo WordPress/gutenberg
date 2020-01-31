@@ -21,10 +21,7 @@ module.exports = class LibraryExportDefaultPlugin {
 			};
 
 			for ( const template of [ mainTemplate, chunkTemplate ] ) {
-				template.hooks.renderWithEntry.tap(
-					'LibraryExportDefaultPlugin',
-					onRenderWithEntry
-				);
+				template.hooks.renderWithEntry.tap( 'LibraryExportDefaultPlugin', onRenderWithEntry );
 			}
 
 			mainTemplate.hooks.hash.tap( 'LibraryExportDefaultPlugin', ( hash ) => {

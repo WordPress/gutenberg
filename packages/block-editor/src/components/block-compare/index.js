@@ -27,7 +27,11 @@ class BlockCompare extends Component {
 				'block-editor-block-compare__removed': item.removed,
 			} );
 
-			return <span key={ pos } className={ classes }>{ item.value }</span>;
+			return (
+				<span key={ pos } className={ classes }>
+					{ item.value }
+				</span>
+			);
 		} );
 	}
 
@@ -43,8 +47,12 @@ class BlockCompare extends Component {
 		const newBlocks = castArray( block );
 
 		// Get converted block details
-		const newContent = newBlocks.map( ( item ) => getSaveContent( item.name, item.attributes, item.innerBlocks ) );
-		const renderedContent = newBlocks.map( ( item ) => getSaveElement( item.name, item.attributes, item.innerBlocks ) );
+		const newContent = newBlocks.map( ( item ) =>
+			getSaveContent( item.name, item.attributes, item.innerBlocks )
+		);
+		const renderedContent = newBlocks.map( ( item ) =>
+			getSaveElement( item.name, item.attributes, item.innerBlocks )
+		);
 
 		return {
 			rawContent: newContent.join( '' ),

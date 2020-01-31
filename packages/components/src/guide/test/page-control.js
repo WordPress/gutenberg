@@ -27,13 +27,12 @@ describe( 'PageControl', () => {
 	it( 'sets the current page when a button is clicked', () => {
 		const setCurrentPage = jest.fn();
 		const wrapper = shallow(
-			<PageControl
-				currentPage={ 0 }
-				numberOfPages={ 2 }
-				setCurrentPage={ setCurrentPage }
-			/>
+			<PageControl currentPage={ 0 } numberOfPages={ 2 } setCurrentPage={ setCurrentPage } />
 		);
-		wrapper.find( Button ).at( 1 ).simulate( 'click' );
+		wrapper
+			.find( Button )
+			.at( 1 )
+			.simulate( 'click' );
 		expect( setCurrentPage ).toHaveBeenCalledWith( 1 );
 	} );
 } );

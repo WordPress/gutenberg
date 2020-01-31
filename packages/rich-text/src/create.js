@@ -10,11 +10,7 @@ import { select } from '@wordpress/data';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
-import {
-	LINE_SEPARATOR,
-	OBJECT_REPLACEMENT_CHARACTER,
-	ZWNBSP,
-} from './special-characters';
+import { LINE_SEPARATOR, OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
 
 /**
  * Browser dependencies
@@ -46,7 +42,9 @@ function toFormat( { type, attributes } ) {
 
 		if ( formatType ) {
 			// Preserve any additional classes.
-			attributes.class = ` ${ attributes.class } `.replace( ` ${ formatType.className } `, ' ' ).trim();
+			attributes.class = ` ${ attributes.class } `
+				.replace( ` ${ formatType.className } `, ' ' )
+				.trim();
 
 			if ( ! attributes.class ) {
 				delete attributes.class;
@@ -201,22 +199,19 @@ function accumulateSelection( accumulator, node, range, value ) {
 	// Selection can be extracted from value.
 	if ( value.start !== undefined ) {
 		accumulator.start = currentLength + value.start;
-	// Range indicates that the current node has selection.
+		// Range indicates that the current node has selection.
 	} else if ( node === startContainer && node.nodeType === TEXT_NODE ) {
 		accumulator.start = currentLength + startOffset;
-	// Range indicates that the current node is selected.
-	} else if (
-		parentNode === startContainer &&
-		node === startContainer.childNodes[ startOffset ]
-	) {
+		// Range indicates that the current node is selected.
+	} else if ( parentNode === startContainer && node === startContainer.childNodes[ startOffset ] ) {
 		accumulator.start = currentLength;
-	// Range indicates that the selection is after the current node.
+		// Range indicates that the selection is after the current node.
 	} else if (
 		parentNode === startContainer &&
 		node === startContainer.childNodes[ startOffset - 1 ]
 	) {
 		accumulator.start = currentLength + value.text.length;
-	// Fallback if no child inside handled the selection.
+		// Fallback if no child inside handled the selection.
 	} else if ( node === startContainer ) {
 		accumulator.start = currentLength;
 	}
@@ -224,22 +219,16 @@ function accumulateSelection( accumulator, node, range, value ) {
 	// Selection can be extracted from value.
 	if ( value.end !== undefined ) {
 		accumulator.end = currentLength + value.end;
-	// Range indicates that the current node has selection.
+		// Range indicates that the current node has selection.
 	} else if ( node === endContainer && node.nodeType === TEXT_NODE ) {
 		accumulator.end = currentLength + endOffset;
-	// Range indicates that the current node is selected.
-	} else if (
-		parentNode === endContainer &&
-		node === endContainer.childNodes[ endOffset - 1 ]
-	) {
+		// Range indicates that the current node is selected.
+	} else if ( parentNode === endContainer && node === endContainer.childNodes[ endOffset - 1 ] ) {
 		accumulator.end = currentLength + value.text.length;
-	// Range indicates that the selection is before the current node.
-	} else if (
-		parentNode === endContainer &&
-		node === endContainer.childNodes[ endOffset ]
-	) {
+		// Range indicates that the selection is before the current node.
+	} else if ( parentNode === endContainer && node === endContainer.childNodes[ endOffset ] ) {
 		accumulator.end = currentLength;
-	// Fallback if no child inside handled the selection.
+		// Fallback if no child inside handled the selection.
 	} else if ( node === endContainer ) {
 		accumulator.end = currentLength + endOffset;
 	}
@@ -340,8 +329,7 @@ function createFromElement( {
 			let filter = removePadding;
 
 			if ( ! preserveWhiteSpace ) {
-				filter = ( string ) =>
-					removePadding( collapseWhiteSpace( string ) );
+				filter = ( string ) => removePadding( collapseWhiteSpace( string ) );
 			}
 
 			const text = filter( node.nodeValue );
@@ -359,12 +347,13 @@ function createFromElement( {
 			continue;
 		}
 
-		if ( isEditableTree && (
+		if (
+			isEditableTree &&
 			// Ignore any placeholders.
-			node.getAttribute( 'data-rich-text-placeholder' ) ||
-			// Ignore any line breaks that are not inserted by us.
-			( type === 'br' && ! node.getAttribute( 'data-rich-text-line-break' ) )
-		) ) {
+			( node.getAttribute( 'data-rich-text-placeholder' ) ||
+				// Ignore any line breaks that are not inserted by us.
+				( type === 'br' && ! node.getAttribute( 'data-rich-text-line-break' ) ) )
+		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
 		}

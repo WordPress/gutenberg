@@ -104,12 +104,9 @@ function computeAnchorRect(
 }
 
 function withoutPadding( rect, element ) {
-	const {
-		paddingTop,
-		paddingBottom,
-		paddingLeft,
-		paddingRight,
-	} = window.getComputedStyle( element );
+	const { paddingTop, paddingBottom, paddingLeft, paddingRight } = window.getComputedStyle(
+		element
+	);
 	const top = paddingTop ? parseInt( paddingTop, 10 ) : 0;
 	const bottom = paddingBottom ? parseInt( paddingBottom, 10 ) : 0;
 	const left = paddingLeft ? parseInt( paddingLeft, 10 ) : 0;
@@ -148,8 +145,8 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
 			}
 
 			if ( focusOnMount === 'firstElement' ) {
-			// Find first tabbable node within content and shift focus, falling
-			// back to the popover panel itself.
+				// Find first tabbable node within content and shift focus, falling
+				// back to the popover panel itself.
 				const firstTabbable = focus.tabbable.find( contentRef.current )[ 0 ];
 
 				if ( firstTabbable ) {
@@ -162,8 +159,8 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
 			}
 
 			if ( focusOnMount === 'container' ) {
-			// Focus the popover panel itself so items in the popover are easily
-			// accessed via keyboard navigation.
+				// Focus the popover panel itself so items in the popover are easily
+				// accessed via keyboard navigation.
 				contentRef.current.focus();
 			}
 		}, 0 );
@@ -325,7 +322,14 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, containerRef.current, relativeOffsetTop );
+			} = computePopoverPosition(
+				anchor,
+				contentRect.current,
+				position,
+				__unstableSticky,
+				containerRef.current,
+				relativeOffsetTop
+			);
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
 				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
@@ -343,11 +347,23 @@ const Popover = ( {
 				}
 			}
 
-			setClass( containerRef.current, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
+			setClass(
+				containerRef.current,
+				'is-without-arrow',
+				noArrow || ( xAxis === 'center' && yAxis === 'middle' )
+			);
 			setAttribute( containerRef.current, 'data-x-axis', xAxis );
 			setAttribute( containerRef.current, 'data-y-axis', yAxis );
-			setStyle( contentRef.current, 'maxHeight', typeof contentHeight === 'number' ? contentHeight + 'px' : '' );
-			setStyle( contentRef.current, 'maxWidth', typeof contentWidth === 'number' ? contentWidth + 'px' : '' );
+			setStyle(
+				contentRef.current,
+				'maxHeight',
+				typeof contentHeight === 'number' ? contentHeight + 'px' : ''
+			);
+			setStyle(
+				contentRef.current,
+				'maxWidth',
+				typeof contentWidth === 'number' ? contentWidth + 'px' : ''
+			);
 
 			// Compute the animation position
 			const yAxisMapping = {
@@ -392,10 +408,8 @@ const Popover = ( {
 
 		let observer;
 
-		const observeElement = (
-			__unstableAllowVerticalSubpixelPosition ||
-			__unstableAllowHorizontalSubpixelPosition
-		);
+		const observeElement =
+			__unstableAllowVerticalSubpixelPosition || __unstableAllowHorizontalSubpixelPosition;
 
 		if ( observeElement ) {
 			observer = new window.MutationObserver( () => refresh( { subpixels: true } ) );
@@ -407,7 +421,7 @@ const Popover = ( {
 			window.clearInterval( intervalHandle );
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
-			window.addEventListener( 'click', refreshOnAnimationFrame );
+			window.removeEventListener( 'click', refreshOnAnimationFrame );
 			window.cancelAnimationFrame( rafId );
 
 			if ( observer ) {
@@ -469,7 +483,23 @@ const Popover = ( {
 			clickEvent = new window.MouseEvent( 'click' );
 		} catch ( error ) {
 			clickEvent = document.createEvent( 'MouseEvent' );
-			clickEvent.initMouseEvent( 'click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null );
+			clickEvent.initMouseEvent(
+				'click',
+				true,
+				true,
+				window,
+				0,
+				0,
+				0,
+				0,
+				0,
+				false,
+				false,
+				false,
+				false,
+				0,
+				null
+			);
 		}
 
 		Object.defineProperty( clickEvent, 'target', {
@@ -494,15 +524,10 @@ const Popover = ( {
 			>
 				{ ( { className: animateClassName } ) => (
 					<IsolatedEventContainer
-						className={ classnames(
-							'components-popover',
-							className,
-							animateClassName,
-							{
-								'is-expanded': isExpanded,
-								'is-without-arrow': noArrow,
-							}
-						) }
+						className={ classnames( 'components-popover', className, animateClassName, {
+							'is-expanded': isExpanded,
+							'is-without-arrow': noArrow,
+						} ) }
 						{ ...contentProps }
 						onKeyDown={ maybeClose }
 						ref={ containerRef }
@@ -510,17 +535,11 @@ const Popover = ( {
 						{ isExpanded && <ScrollLock /> }
 						{ isExpanded && (
 							<div className="components-popover__header">
-								<span className="components-popover__header-title">
-									{ headerTitle }
-								</span>
+								<span className="components-popover__header-title">{ headerTitle }</span>
 								<Button className="components-popover__close" icon="no-alt" onClick={ onClose } />
 							</div>
 						) }
-						<div
-							ref={ contentRef }
-							className="components-popover__content"
-							tabIndex="-1"
-						>
+						<div ref={ contentRef } className="components-popover__content" tabIndex="-1">
 							{ children }
 						</div>
 					</IsolatedEventContainer>
@@ -548,11 +567,7 @@ const Popover = ( {
 					return content;
 				}
 
-				return (
-					<span ref={ anchorRefFallback }>
-						{ content }
-					</span>
-				);
+				return <span ref={ anchorRefFallback }>{ content }</span>;
 			} }
 		</Consumer>
 	);
@@ -560,7 +575,6 @@ const Popover = ( {
 
 const PopoverContainer = Popover;
 
-PopoverContainer.Slot = ( { name = SLOT_NAME } ) =>
-	<Slot bubblesVirtually name={ name } />;
+PopoverContainer.Slot = ( { name = SLOT_NAME } ) => <Slot bubblesVirtually name={ name } />;
 
 export default PopoverContainer;

@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	__experimentalAddBlockPatterns,
-	__experimentalRemoveBlockPatterns,
-} from '../actions';
+import { __experimentalAddBlockPatterns, __experimentalRemoveBlockPatterns } from '../actions';
 
 describe( 'actions', () => {
 	describe( 'addBlockPatterns', () => {
@@ -22,9 +19,7 @@ describe( 'actions', () => {
 			const result = __experimentalAddBlockPatterns( blockName, pattern );
 			expect( result ).toEqual( {
 				type: 'ADD_BLOCK_PATTERNS',
-				patterns: [
-					pattern,
-				],
+				patterns: [ pattern ],
 				blockName,
 			} );
 		} );
@@ -33,9 +28,7 @@ describe( 'actions', () => {
 			const result = __experimentalRemoveBlockPatterns( blockName, patternName );
 			expect( result ).toEqual( {
 				type: 'REMOVE_BLOCK_PATTERNS',
-				patternNames: [
-					patternName,
-				],
+				patternNames: [ patternName ],
 				blockName,
 			} );
 		} );

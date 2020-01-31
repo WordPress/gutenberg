@@ -66,10 +66,7 @@ class SlotFillProvider extends Component {
 	}
 
 	registerFill( name, instance ) {
-		this.fills[ name ] = [
-			...( this.fills[ name ] || [] ),
-			instance,
-		];
+		this.fills[ name ] = [ ...( this.fills[ name ] || [] ), instance ];
 		this.forceUpdateSlot( name );
 	}
 
@@ -86,10 +83,7 @@ class SlotFillProvider extends Component {
 	}
 
 	unregisterFill( name, instance ) {
-		this.fills[ name ] = without(
-			this.fills[ name ],
-			instance
-		);
+		this.fills[ name ] = without( this.fills[ name ], instance );
 		this.resetFillOccurrence( name );
 		this.forceUpdateSlot( name );
 	}
@@ -138,11 +132,7 @@ class SlotFillProvider extends Component {
 	}
 
 	render() {
-		return (
-			<Provider value={ this.contextValue }>
-				{ this.props.children }
-			</Provider>
-		);
+		return <Provider value={ this.contextValue }>{ this.props.children }</Provider>;
 	}
 }
 

@@ -18,12 +18,7 @@ import { Button } from '../';
 
 const NOTICE_TIMEOUT = 10000;
 
-function Snackbar( {
-	className,
-	children,
-	actions = [],
-	onRemove = noop,
-}, ref ) {
+function Snackbar( { className, children, actions = [], onRemove = noop }, ref ) {
 	useEffect( () => {
 		const timeoutHandle = setTimeout( () => {
 			onRemove();
@@ -52,35 +47,24 @@ function Snackbar( {
 		>
 			<div className="components-snackbar__content">
 				{ children }
-				{ actions.map(
-					(
-						{
-							label,
-							onClick,
-							url,
-						},
-						index
-					) => {
-						return (
-							<Button
-								key={ index }
-								href={ url }
-								isTertiary
-								onClick={ ( event ) => {
-									event.stopPropagation();
-									if ( onClick ) {
-										onClick( event );
-									}
-								} }
-								className="components-snackbar__action"
-
-							>
-								{ label }
-							</Button>
-						);
-					}
-
-				) }
+				{ actions.map( ( { label, onClick, url }, index ) => {
+					return (
+						<Button
+							key={ index }
+							href={ url }
+							isTertiary
+							onClick={ ( event ) => {
+								event.stopPropagation();
+								if ( onClick ) {
+									onClick( event );
+								}
+							} }
+							className="components-snackbar__action"
+						>
+							{ label }
+						</Button>
+					);
+				} ) }
 			</div>
 		</div>
 	);

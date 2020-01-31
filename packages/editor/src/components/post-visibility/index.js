@@ -33,7 +33,8 @@ export class PostVisibility extends Component {
 	}
 
 	setPrivate() {
-		if ( ! window.confirm( __( 'Would you like to privately publish this post now?' ) ) ) { // eslint-disable-line no-alert
+		// eslint-disable-next-line no-alert
+		if ( ! window.confirm( __( 'Would you like to privately publish this post now?' ) ) ) {
 			return;
 		}
 
@@ -97,7 +98,14 @@ export class PostVisibility extends Component {
 						>
 							{ label }
 						</label>
-						{ <p id={ `editor-post-${ value }-${ instanceId }-description` } className="editor-post-visibility__dialog-info">{ info }</p> }
+						{
+							<p
+								id={ `editor-post-${ value }-${ instanceId }-description` }
+								className="editor-post-visibility__dialog-info"
+							>
+								{ info }
+							</p>
+						}
 					</div>
 				) ) }
 			</fieldset>,
@@ -125,10 +133,7 @@ export class PostVisibility extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			getEditedPostVisibility,
-		} = select( 'core/editor' );
+		const { getEditedPostAttribute, getEditedPostVisibility } = select( 'core/editor' );
 		return {
 			status: getEditedPostAttribute( 'status' ),
 			visibility: getEditedPostVisibility(),

@@ -11,7 +11,11 @@ import {
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
 	await clickBlockToolbarButton( 'More options' );
-	const itemButton = ( await page.$x( `//*[contains(@class, "block-editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
+	const itemButton = (
+		await page.$x(
+			`//*[contains(@class, "block-editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]`
+		)
+	 )[ 0 ];
 	await itemButton.click();
 };
 
@@ -47,7 +51,9 @@ describe( 'Using Plugins API', () => {
 		await page.keyboard.type( end + '' );
 
 		// Click add annotation button.
-		const addAnnotationButton = ( await page.$x( "//button[contains(text(), 'Add annotation')]" ) )[ 0 ];
+		const addAnnotationButton = (
+			await page.$x( "//button[contains(text(), 'Add annotation')]" )
+		 )[ 0 ];
 		await addAnnotationButton.click();
 		await page.evaluate( () => document.querySelector( '[contenteditable]' ).focus() );
 	}
@@ -59,7 +65,9 @@ describe( 'Using Plugins API', () => {
 	 */
 	async function removeAnnotations() {
 		// Click remove annotations button.
-		const addAnnotationButton = ( await page.$x( "//button[contains(text(), 'Remove annotations')]" ) )[ 0 ];
+		const addAnnotationButton = (
+			await page.$x( "//button[contains(text(), 'Remove annotations')]" )
+		 )[ 0 ];
 		await addAnnotationButton.click();
 		await page.evaluate( () => document.querySelector( '[contenteditable]' ).focus() );
 	}

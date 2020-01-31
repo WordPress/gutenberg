@@ -9,13 +9,10 @@ function Animate( { type, options = {}, children } ) {
 		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
 
 		return children( {
-			className: classnames(
-				'components-animate__appear',
-				{
-					[ 'is-from-' + xAxis ]: xAxis !== 'center',
-					[ 'is-from-' + yAxis ]: yAxis !== 'middle',
-				},
-			),
+			className: classnames( 'components-animate__appear', {
+				[ 'is-from-' + xAxis ]: xAxis !== 'center',
+				[ 'is-from-' + yAxis ]: yAxis !== 'middle',
+			} ),
 		} );
 	}
 
@@ -23,18 +20,13 @@ function Animate( { type, options = {}, children } ) {
 		const { origin = 'left' } = options;
 
 		return children( {
-			className: classnames(
-				'components-animate__slide-in',
-				'is-from-' + origin,
-			),
+			className: classnames( 'components-animate__slide-in', 'is-from-' + origin ),
 		} );
 	}
 
 	if ( type === 'loading' ) {
 		return children( {
-			className: classnames(
-				'components-animate__loading',
-			),
+			className: classnames( 'components-animate__loading' ),
 		} );
 	}
 

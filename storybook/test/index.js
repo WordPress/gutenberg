@@ -14,9 +14,7 @@ initStoryshots( {
 			const currentElement = element.type && document.createElement( element.type );
 
 			if ( story.kind === 'Components/ClipboardButton' ) {
-				currentElement.appendChild(
-					document.createElement( 'button' )
-				);
+				currentElement.appendChild( document.createElement( 'button' ) );
 			}
 			if ( story.kind === 'Components/Popover' ) {
 				const parentElement = document.createElement( 'div' );

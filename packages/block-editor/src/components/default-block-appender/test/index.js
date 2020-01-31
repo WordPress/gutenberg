@@ -40,7 +40,9 @@ describe( 'DefaultBlockAppender', () => {
 
 	it( 'should optionally show without prompt', () => {
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt={ false } /> );
+		const wrapper = shallow(
+			<DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt={ false } />
+		);
 		const input = wrapper.find( 'TextareaAutosize' );
 
 		expect( input.prop( 'value' ) ).toEqual( '' );

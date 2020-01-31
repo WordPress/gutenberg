@@ -28,9 +28,7 @@ export function buildTermsTree( flatTerms ) {
 			const children = termsByParent[ term.id ];
 			return {
 				...term,
-				children: children && children.length ?
-					fillWithChildren( children ) :
-					[],
+				children: children && children.length ? fillWithChildren( children ) : [],
 			};
 		} );
 	};

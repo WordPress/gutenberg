@@ -94,9 +94,7 @@ export class PostPublishButton extends Component {
 			postType,
 			postId,
 		} = this.props;
-		const {
-			entitiesSavedStatesCallback,
-		} = this.state;
+		const { entitiesSavedStatesCallback } = this.state;
 
 		const isButtonDisabled =
 			isSaving ||
@@ -176,13 +174,9 @@ export class PostPublishButton extends Component {
 				<Button
 					ref={ this.buttonNode }
 					{ ...componentProps }
-					className={ classnames(
-						componentProps.className,
-						'editor-post-publish-button__button',
-						{
-							'has-changes-dot': hasNonPostEntityChanges,
-						}
-					) }
+					className={ classnames( componentProps.className, 'editor-post-publish-button__button', {
+						'has-changes-dot': hasNonPostEntityChanges,
+					} ) }
 				>
 					{ componentChildren }
 				</Button>

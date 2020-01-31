@@ -118,7 +118,7 @@ const controls = {
 		return registry.dispatch( storeName )[ dispatcherName ]( ...args );
 	} ),
 	API_FETCH( { request } ) {
-		return wpApiFetch( { ... request } );
+		return wpApiFetch( { ...request } );
 	},
 	LOAD_ASSETS( { assets } ) {
 		return new Promise( ( resolve, reject ) => {
@@ -128,20 +128,28 @@ const controls = {
 				forEach( assets, ( asset ) => {
 					if ( asset.match( /\.js$/ ) !== null ) {
 						scriptsCount++;
-						loadScript( asset, () => {
-							scriptsCount--;
-							if ( scriptsCount === 0 ) {
-								return resolve( scriptsCount );
-							}
-						}, reject );
+						loadScript(
+							asset,
+							() => {
+								scriptsCount--;
+								if ( scriptsCount === 0 ) {
+									return resolve( scriptsCount );
+								}
+							},
+							reject
+						);
 					} else {
 						loadStyle( asset );
 					}
 				} );
 			} else {
-				loadScript( assets.editor_script, () => {
-					return resolve( 0 );
-				}, reject );
+				loadScript(
+					assets.editor_script,
+					() => {
+						return resolve( 0 );
+					},
+					reject
+				);
 				loadStyle( assets.style );
 			}
 		} );

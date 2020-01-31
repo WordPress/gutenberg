@@ -162,7 +162,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should disable the publish sidebar', () => {
-			const original = deepFreeze( preferences( undefined, { } ) );
+			const original = deepFreeze( preferences( undefined, {} ) );
 			const state = preferences( original, {
 				type: 'DISABLE_PUBLISH_SIDEBAR',
 			} );
@@ -171,7 +171,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should enable the publish sidebar', () => {
-			const original = deepFreeze( preferences( { isPublishSidebarEnabled: false }, { } ) );
+			const original = deepFreeze( preferences( { isPublishSidebarEnabled: false }, {} ) );
 			const state = preferences( original, {
 				type: 'ENABLE_PUBLISH_SIDEBAR',
 			} );
@@ -204,13 +204,18 @@ describe( 'state', () => {
 		} );
 
 		it( 'should add received reusable blocks', () => {
-			const state = reusableBlocks( {}, {
-				type: 'RECEIVE_REUSABLE_BLOCKS',
-				results: [ {
-					id: 123,
-					title: 'My cool block',
-				} ],
-			} );
+			const state = reusableBlocks(
+				{},
+				{
+					type: 'RECEIVE_REUSABLE_BLOCKS',
+					results: [
+						{
+							id: 123,
+							title: 'My cool block',
+						},
+					],
+				}
+			);
 
 			expect( state ).toEqual( {
 				data: {

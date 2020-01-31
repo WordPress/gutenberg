@@ -103,11 +103,9 @@ function BlockStyles( {
 				return (
 					<div
 						key={ style.name }
-						className={ classnames(
-							'block-editor-block-styles__item', {
-								'is-active': activeStyle === style,
-							}
-						) }
+						className={ classnames( 'block-editor-block-styles__item', {
+							'is-active': activeStyle === style,
+						} ) }
 						onClick={ () => updateClassName( style ) }
 						onKeyDown={ ( event ) => {
 							if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
@@ -125,12 +123,12 @@ function BlockStyles( {
 							<BlockPreview
 								viewportWidth={ 500 }
 								blocks={
-									type.example ?
-										getBlockFromExample( block.name, {
-											attributes: { ...type.example.attributes, className: styleClassName },
-											innerBlocks: type.example.innerBlocks,
-										} ) :
-										cloneBlock( block, { className: styleClassName } )
+									type.example
+										? getBlockFromExample( block.name, {
+												attributes: { ...type.example.attributes, className: styleClassName },
+												innerBlocks: type.example.innerBlocks,
+										  } )
+										: cloneBlock( block, { className: styleClassName } )
 								}
 							/>
 						</div>

@@ -30,7 +30,10 @@ describe( 'msListConverter', () => {
 		const input2 = '<p style="mso-list:l0 level2 lfo1"><span>* </span>test</p>';
 		const input3 = '<p style="mso-list:l0 level3 lfo1"><span>* </span>test</p>';
 		const input4 = '<p style="mso-list:l0 level1 lfo1"><span>* </span>test</p>';
-		const output = '<ul><li>test<ul><li>test<ul><li>test</li></ul></li></ul></li><li>test</li></ul>';
-		expect( deepFilterHTML( input1 + input2 + input3 + input4, [ msListConverter ] ) ).toEqual( output );
+		const output =
+			'<ul><li>test<ul><li>test<ul><li>test</li></ul></li></ul></li><li>test</li></ul>';
+		expect( deepFilterHTML( input1 + input2 + input3 + input4, [ msListConverter ] ) ).toEqual(
+			output
+		);
 	} );
 } );

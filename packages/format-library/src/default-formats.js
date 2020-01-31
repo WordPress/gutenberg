@@ -9,12 +9,4 @@ import { link } from './link';
 import { strikethrough } from './strikethrough';
 import { underline } from './underline';
 
-export default [
-	bold,
-	code,
-	image,
-	italic,
-	link,
-	strikethrough,
-	underline,
-];
+export default [ bold, code, image, italic, link, strikethrough, underline ];

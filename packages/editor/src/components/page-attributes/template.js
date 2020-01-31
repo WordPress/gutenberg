@@ -21,12 +21,10 @@ export function PageTemplate( { availableTemplates, selectedTemplate, onUpdate }
 			value={ selectedTemplate }
 			onChange={ onUpdate }
 			className="editor-page-attributes__template"
-			options={
-				map( availableTemplates, ( templateName, templateSlug ) => ( {
-					value: templateSlug,
-					label: templateName,
-				} ) )
-			}
+			options={ map( availableTemplates, ( templateName, templateSlug ) => ( {
+				value: templateSlug,
+				label: templateName,
+			} ) ) }
 		/>
 	);
 }
@@ -44,5 +42,5 @@ export default compose(
 		onUpdate( templateSlug ) {
 			dispatch( 'core/editor' ).editPost( { template: templateSlug || '' } );
 		},
-	} ) ),
+	} ) )
 )( PageTemplate );

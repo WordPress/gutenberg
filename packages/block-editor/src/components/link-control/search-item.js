@@ -8,13 +8,16 @@ import classnames from 'classnames';
  */
 import { safeDecodeURI } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	Icon,
-	TextHighlight,
-} from '@wordpress/components';
+import { Button, Icon, TextHighlight } from '@wordpress/components';
 
-export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = false, onClick, isURL = false, searchTerm = '' } ) => {
+export const LinkControlSearchItem = ( {
+	itemProps,
+	suggestion,
+	isSelected = false,
+	onClick,
+	isURL = false,
+	searchTerm = '',
+} ) => {
 	return (
 		<Button
 			{ ...itemProps }
@@ -34,9 +37,7 @@ export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = fal
 				</span>
 				<span aria-hidden={ ! isURL } className="block-editor-link-control__search-item-info">
 					{ ! isURL && ( safeDecodeURI( suggestion.url ) || '' ) }
-					{ isURL && (
-						__( 'Press ENTER to add this link' )
-					) }
+					{ isURL && __( 'Press ENTER to add this link' ) }
 				</span>
 			</span>
 			{ suggestion.type && (
@@ -47,4 +48,3 @@ export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = fal
 };
 
 export default LinkControlSearchItem;
-

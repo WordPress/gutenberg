@@ -20,12 +20,7 @@ function ToolbarContainer( { accessibilityLabel, ...props }, ref ) {
 	return (
 		// This will provide state for `ToolbarButton`'s
 		<ToolbarContext.Provider value={ toolbarState }>
-			<Toolbar
-				ref={ ref }
-				aria-label={ accessibilityLabel }
-				{ ...toolbarState }
-				{ ...props }
-			/>
+			<Toolbar ref={ ref } aria-label={ accessibilityLabel } { ...toolbarState } { ...props } />
 		</ToolbarContext.Provider>
 	);
 }

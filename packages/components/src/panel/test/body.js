@@ -23,7 +23,12 @@ describe( 'PanelBody', () => {
 			expect( panelBody.state( 'opened' ) ).toBe( true );
 			expect( button.prop( 'onClick' ) ).toBe( panelBody.instance().toggle );
 			expect( button.childAt( 0 ).name() ).toBe( 'span' );
-			expect( button.childAt( 0 ).childAt( 0 ).name() ).toBe( 'SVG' );
+			expect(
+				button
+					.childAt( 0 )
+					.childAt( 0 )
+					.name()
+			).toBe( 'Icon' );
 			expect( button.childAt( 1 ).text() ).toBe( 'Some Text' );
 		} );
 
@@ -34,7 +39,9 @@ describe( 'PanelBody', () => {
 		} );
 
 		it( 'should use the "opened" prop instead of state if provided', () => {
-			const panelBody = shallow( <PanelBody title="Some Text" opened={ true } initialOpen={ false } /> );
+			const panelBody = shallow(
+				<PanelBody title="Some Text" opened={ true } initialOpen={ false } />
+			);
 			expect( panelBody.state( 'opened' ) ).toBe( false );
 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
 		} );

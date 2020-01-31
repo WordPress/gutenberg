@@ -79,7 +79,7 @@ class PostPermalink extends Component {
 
 		const { prefix, suffix } = permalinkParts;
 		const slug = safeDecodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID;
-		const samplePermalink = ( isEditable ) ? prefix + slug + suffix : prefix;
+		const samplePermalink = isEditable ? prefix + slug + suffix : prefix;
 
 		return (
 			<div className="editor-post-permalink">
@@ -94,26 +94,26 @@ class PostPermalink extends Component {
 
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 
-				{ ! isEditingPermalink &&
+				{ ! isEditingPermalink && (
 					<ExternalLink
 						className="editor-post-permalink__link"
 						href={ ! isPublished ? postLink : samplePermalink }
 						target="_blank"
-						ref={ ( linkElement ) => this.linkElement = linkElement }
+						ref={ ( linkElement ) => ( this.linkElement = linkElement ) }
 					>
 						{ safeDecodeURI( samplePermalink ) }
 						&lrm;
 					</ExternalLink>
-				}
+				) }
 
-				{ isEditingPermalink &&
+				{ isEditingPermalink && (
 					<PostPermalinkEditor
 						slug={ slug }
 						onSave={ () => this.setState( { isEditingPermalink: false } ) }
 					/>
-				}
+				) }
 
-				{ isEditable && ! isEditingPermalink &&
+				{ isEditable && ! isEditingPermalink && (
 					<Button
 						className="editor-post-permalink__edit"
 						isSecondary
@@ -121,7 +121,7 @@ class PostPermalink extends Component {
 					>
 						{ __( 'Edit' ) }
 					</Button>
-				}
+				) }
 			</div>
 		);
 	}
@@ -137,9 +137,7 @@ export default compose( [
 			getEditedPostAttribute,
 			isCurrentPostPublished,
 		} = select( 'core/editor' );
-		const {
-			getPostType,
-		} = select( 'core' );
+		const { getPostType } = select( 'core' );
 
 		const { id, link } = getCurrentPost();
 

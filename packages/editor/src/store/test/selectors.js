@@ -34,10 +34,7 @@ selectorNames.forEach( ( name ) => {
 			},
 
 			getEntityRecordChangesByRecord() {
-				return (
-					state.getEntityRecordChangesByRecord &&
-					state.getEntityRecordChangesByRecord()
-				);
+				return state.getEntityRecordChangesByRecord && state.getEntityRecordChangesByRecord();
 			},
 
 			getEntityRecordEdits() {
@@ -85,15 +82,11 @@ selectorNames.forEach( ( name ) => {
 			},
 
 			hasUndo() {
-				return Boolean(
-					state.editor && state.editor.past && state.editor.past.length
-				);
+				return Boolean( state.editor && state.editor.past && state.editor.past.length );
 			},
 
 			hasRedo() {
-				return Boolean(
-					state.editor && state.editor.future && state.editor.future.length
-				);
+				return Boolean( state.editor && state.editor.future && state.editor.future.length );
 			},
 
 			getCurrentUser() {
@@ -264,9 +257,7 @@ describe( 'selectors', () => {
 		it( 'should return true when the past history is not empty', () => {
 			const state = {
 				editor: {
-					past: [
-						{},
-					],
+					past: [ {} ],
 				},
 			};
 
@@ -288,9 +279,7 @@ describe( 'selectors', () => {
 		it( 'should return true when the future history is not empty', () => {
 			const state = {
 				editor: {
-					future: [
-						{},
-					],
+					future: [ {} ],
 				},
 			};
 
@@ -1628,14 +1617,16 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 123,
-								name: 'core/test-block-a',
-								isValid: true,
-								attributes: {
-									text: '',
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-block-a',
+									isValid: true,
+									attributes: {
+										text: '',
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -1657,13 +1648,15 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 'block1',
-								name: 'core/test-default',
-								attributes: {
-									modified: false,
+							value: [
+								{
+									clientId: 'block1',
+									name: 'core/test-default',
+									attributes: {
+										modified: false,
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -1680,14 +1673,16 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 123,
-								name: 'core/test-block-a',
-								isValid: true,
-								attributes: {
-									text: '',
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-block-a',
+									isValid: true,
+									attributes: {
+										text: '',
+									},
 								},
-							} ],
+							],
 						},
 						edits: {
 							content: '',
@@ -1746,14 +1741,16 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 123,
-								name: 'core/test-freeform',
-								isValid: true,
-								attributes: {
-									content: '',
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -1770,14 +1767,16 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 123,
-								name: 'core/test-freeform',
-								isValid: true,
-								attributes: {
-									content: '',
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -1796,14 +1795,16 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 123,
-								name: 'core/test-freeform',
-								isValid: true,
-								attributes: {
-									content: 'Test Data',
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: 'Test Data',
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -1856,7 +1857,7 @@ describe( 'selectors', () => {
 
 	describe( 'isEditedPostBeingScheduled', () => {
 		it( 'should return true for posts with a future date', () => {
-			const time = Date.now() + ( 1000 * 3600 * 24 * 7 ); // 7 days in the future
+			const time = Date.now() + 1000 * 3600 * 24 * 7; // 7 days in the future
 			const date = new Date( time );
 			const state = {
 				editor: {
@@ -2275,7 +2276,7 @@ describe( 'selectors', () => {
 			expect( content ).toBe( '<!-- wp:block /-->' );
 		} );
 
-		it( 'returns removep\'d serialization of blocks for single unknown', () => {
+		it( "returns removep'd serialization of blocks for single unknown", () => {
 			const unknownBlock = createBlock( 'core/test-freeform', {
 				content: '<p>foo</p>',
 			} );
@@ -2297,7 +2298,7 @@ describe( 'selectors', () => {
 			expect( content ).toBe( 'foo' );
 		} );
 
-		it( 'returns non-removep\'d serialization of blocks for multiple unknown', () => {
+		it( "returns non-removep'd serialization of blocks for multiple unknown", () => {
 			const firstUnknown = createBlock( 'core/test-freeform', {
 				content: '<p>foo</p>',
 			} );
@@ -2348,13 +2349,15 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								...defaultBlock,
-								attributes: {
-									...defaultBlock.attributes,
-									modified: true,
+							value: [
+								{
+									...defaultBlock,
+									attributes: {
+										...defaultBlock.attributes,
+										modified: true,
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -2365,7 +2368,7 @@ describe( 'selectors', () => {
 
 			const content = getEditedPostContent( state );
 
-			expect( content ).toBe( '<!-- wp:test-default {\"modified\":true} /-->' );
+			expect( content ).toBe( '<!-- wp:test-default {"modified":true} /-->' );
 		} );
 	} );
 
@@ -2471,9 +2474,11 @@ describe( 'selectors', () => {
 
 		it( 'should return the default value if there is no isPublishSidebarEnabled key on state', () => {
 			const state = {
-				preferences: { },
+				preferences: {},
 			};
-			expect( isPublishSidebarEnabled( state ) ).toBe( PREFERENCES_DEFAULTS.isPublishSidebarEnabled );
+			expect( isPublishSidebarEnabled( state ) ).toBe(
+				PREFERENCES_DEFAULTS.isPublishSidebarEnabled
+			);
 		} );
 	} );
 
@@ -2535,43 +2540,52 @@ describe( 'selectors', () => {
 
 	describe( 'getStateBeforeOptimisticTransaction', () => {
 		it( 'should return null if no transaction can be found', () => {
-			const beforeState = getStateBeforeOptimisticTransaction( {
-				optimist: [],
-			}, 'foo' );
+			const beforeState = getStateBeforeOptimisticTransaction(
+				{
+					optimist: [],
+				},
+				'foo'
+			);
 
 			expect( beforeState ).toBe( null );
 		} );
 
 		it( 'should return null if a transaction with ID can be found, but lacks before state', () => {
-			const beforeState = getStateBeforeOptimisticTransaction( {
-				optimist: [
-					{
-						action: {
-							optimist: {
-								id: 'foo',
+			const beforeState = getStateBeforeOptimisticTransaction(
+				{
+					optimist: [
+						{
+							action: {
+								optimist: {
+									id: 'foo',
+								},
 							},
 						},
-					},
-				],
-			}, 'foo' );
+					],
+				},
+				'foo'
+			);
 
 			expect( beforeState ).toBe( null );
 		} );
 
 		it( 'should return the before state matching the given transaction id', () => {
 			const expectedBeforeState = {};
-			const beforeState = getStateBeforeOptimisticTransaction( {
-				optimist: [
-					{
-						beforeState: expectedBeforeState,
-						action: {
-							optimist: {
-								id: 'foo',
+			const beforeState = getStateBeforeOptimisticTransaction(
+				{
+					optimist: [
+						{
+							beforeState: expectedBeforeState,
+							action: {
+								optimist: {
+									id: 'foo',
+								},
 							},
 						},
-					},
-				],
-			}, 'foo' );
+					],
+				},
+				'foo'
+			);
 
 			expect( beforeState ).toBe( expectedBeforeState );
 		} );

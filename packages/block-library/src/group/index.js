@@ -100,7 +100,9 @@ export const settings = {
 					// Determine the widest setting of all the blocks to be grouped
 					const widestAlignment = blocks.reduce( ( accumulator, block ) => {
 						const { align } = block.attributes;
-						return alignments.indexOf( align ) > alignments.indexOf( accumulator ) ? align : accumulator;
+						return alignments.indexOf( align ) > alignments.indexOf( accumulator )
+							? align
+							: accumulator;
 					}, undefined );
 
 					// Clone the Blocks to be Grouped
@@ -112,12 +114,15 @@ export const settings = {
 						return createBlock( block.name, block.attributes, block.innerBlocks );
 					} );
 
-					return createBlock( 'core/group', {
-						align: widestAlignment,
-					}, groupInnerBlocks );
+					return createBlock(
+						'core/group',
+						{
+							align: widestAlignment,
+						},
+						groupInnerBlocks
+					);
 				},
 			},
-
 		],
 	},
 

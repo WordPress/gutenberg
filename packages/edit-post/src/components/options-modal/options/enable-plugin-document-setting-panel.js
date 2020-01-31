@@ -12,10 +12,7 @@ const { Fill, Slot } = createSlotFill( 'EnablePluginDocumentSettingPanelOption' 
 
 const EnablePluginDocumentSettingPanelOption = ( { label, panelName } ) => (
 	<Fill>
-		<EnablePanelOption
-			label={ label }
-			panelName={ panelName }
-		/>
+		<EnablePanelOption label={ label } panelName={ panelName } />
 	</Fill>
 );
 

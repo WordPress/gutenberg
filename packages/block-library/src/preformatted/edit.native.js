@@ -15,16 +15,17 @@ import styles from './styles.scss';
 function PreformattedEdit( props ) {
 	const { getStylesFromColorScheme } = props;
 	const richTextStyle = getStylesFromColorScheme( styles.wpRichTextLight, styles.wpRichTextDark );
-	const wpBlockPreformatted = getStylesFromColorScheme( styles.wpBlockPreformattedLight, styles.wpBlockPreformattedDark );
+	const wpBlockPreformatted = getStylesFromColorScheme(
+		styles.wpBlockPreformattedLight,
+		styles.wpBlockPreformattedDark
+	);
 	const propsWithStyle = {
 		...props,
 		style: richTextStyle,
 	};
 	return (
-		<View style={ wpBlockPreformatted } >
-			<WebPreformattedEdit
-				{ ...propsWithStyle }
-			/>
+		<View style={ wpBlockPreformatted }>
+			<WebPreformattedEdit { ...propsWithStyle } />
 		</View>
 	);
 }

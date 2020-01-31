@@ -51,10 +51,7 @@ class ToggleControl extends Component {
 					onChange={ this.onChange }
 					aria-describedby={ describedBy }
 				/>
-				<label
-					htmlFor={ id }
-					className="components-toggle-control__label"
-				>
+				<label htmlFor={ id } className="components-toggle-control__label">
 					{ label }
 				</label>
 			</BaseControl>

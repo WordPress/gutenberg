@@ -29,9 +29,7 @@ export const __experimentalGetAnnotationsForBlock = createSelector(
 			return annotation.selector === 'block';
 		} );
 	},
-	( state, blockClientId ) => [
-		get( state, blockClientId, EMPTY_ARRAY ),
-	]
+	( state, blockClientId ) => [ get( state, blockClientId, EMPTY_ARRAY ) ]
 );
 
 export const __experimentalGetAllAnnotationsForBlock = function( state, blockClientId ) {
@@ -52,21 +50,22 @@ export const __experimentalGetAllAnnotationsForBlock = function( state, blockCli
  */
 export const __experimentalGetAnnotationsForRichText = createSelector(
 	( state, blockClientId, richTextIdentifier ) => {
-		return get( state, blockClientId, [] ).filter( ( annotation ) => {
-			return annotation.selector === 'range' &&
-				richTextIdentifier === annotation.richTextIdentifier;
-		} ).map( ( annotation ) => {
-			const { range, ...other } = annotation;
+		return get( state, blockClientId, [] )
+			.filter( ( annotation ) => {
+				return (
+					annotation.selector === 'range' && richTextIdentifier === annotation.richTextIdentifier
+				);
+			} )
+			.map( ( annotation ) => {
+				const { range, ...other } = annotation;
 
-			return {
-				...range,
-				...other,
-			};
-		} );
+				return {
+					...range,
+					...other,
+				};
+			} );
 	},
-	( state, blockClientId ) => [
-		get( state, blockClientId, EMPTY_ARRAY ),
-	]
+	( state, blockClientId ) => [ get( state, blockClientId, EMPTY_ARRAY ) ]
 );
 
 /**

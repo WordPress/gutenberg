@@ -51,18 +51,18 @@ const isValueEmpty = ( data ) => {
 		return true;
 	} else if ( data.source === 'hsl' && ( ! data.h || ! data.s || ! data.l ) ) {
 		return true;
-	} else if ( data.source === 'rgb' && (
+	} else if (
+		data.source === 'rgb' &&
 		( ! data.r || ! data.g || ! data.b ) &&
 		( ! data.h || ! data.s || ! data.v || ! data.a ) &&
 		( ! data.h || ! data.s || ! data.l || ! data.a )
-	) ) {
+	) {
 		return true;
 	}
 	return false;
 };
-const isValidColor = ( colors ) => colors.hex ?
-	isValidHex( colors.hex ) :
-	simpleCheckForValidColor( colors );
+const isValidColor = ( colors ) =>
+	colors.hex ? isValidHex( colors.hex ) : simpleCheckForValidColor( colors );
 
 /**
  * Function that creates the new color object
@@ -126,13 +126,14 @@ export default class ColorPicker extends Component {
 
 		if ( isValidColor( data ) ) {
 			const colors = colorToState( data, data.h || oldHue );
-			this.setState( {
-				...colors,
-				draftHex: toLowerCase( colors.hex ),
-				draftHsl: colors.hsl,
-				draftRgb: colors.rgb,
-			},
-			debounce( partial( onChangeComplete, colors ), 100 )
+			this.setState(
+				{
+					...colors,
+					draftHex: toLowerCase( colors.hex ),
+					draftHsl: colors.hsl,
+					draftRgb: colors.rgb,
+				},
+				debounce( partial( onChangeComplete, colors ), 100 )
 			);
 		}
 	}
@@ -178,15 +179,7 @@ export default class ColorPicker extends Component {
 
 	render() {
 		const { className, disableAlpha } = this.props;
-		const {
-			color,
-			hsl,
-			hsv,
-			rgb,
-			draftHex,
-			draftHsl,
-			draftRgb,
-		} = this.state;
+		const { color, hsl, hsv, rgb, draftHex, draftHsl, draftRgb } = this.state;
 		const classes = classnames( className, {
 			'components-color-picker': true,
 			'is-alpha-disabled': disableAlpha,
@@ -196,11 +189,7 @@ export default class ColorPicker extends Component {
 		return (
 			<div className={ classes }>
 				<div className="components-color-picker__saturation">
-					<Saturation
-						hsl={ hsl }
-						hsv={ hsv }
-						onChange={ this.commitValues }
-					/>
+					<Saturation hsl={ hsl } hsv={ hsv } onChange={ this.commitValues } />
 				</div>
 
 				<div className="components-color-picker__body">
@@ -217,11 +206,7 @@ export default class ColorPicker extends Component {
 						<div className="components-color-picker__toggles">
 							<Hue hsl={ hsl } onChange={ this.commitValues } />
 							{ disableAlpha ? null : (
-								<Alpha
-									rgb={ rgb }
-									hsl={ hsl }
-									onChange={ this.commitValues }
-								/>
+								<Alpha rgb={ rgb } hsl={ hsl } onChange={ this.commitValues } />
 							) }
 						</div>
 					</div>

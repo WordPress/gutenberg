@@ -16,10 +16,7 @@ export async function uninstallPlugin( slug ) {
 	const confirmPromise = new Promise( ( resolve ) => {
 		page.once( 'dialog', () => resolve() );
 	} );
-	await Promise.all( [
-		confirmPromise,
-		page.click( `tr[data-slug="${ slug }"] .delete a` ),
-	] );
+	await Promise.all( [ confirmPromise, page.click( `tr[data-slug="${ slug }"] .delete a` ) ] );
 	await page.waitForSelector( `tr[data-slug="${ slug }"].deleted` );
 	await switchUserToTest();
 }

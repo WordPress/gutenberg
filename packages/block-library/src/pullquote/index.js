@@ -23,10 +23,11 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			value: '<p>' +
-			// translators: Quote serving as example for the Pullquote block. Attributed to Matt Mullenweg.
-			__( 'One of the hardest things to do in technology is disrupt yourself.' ) +
-			'</p>',
+			value:
+				'<p>' +
+				// translators: Quote serving as example for the Pullquote block. Attributed to Matt Mullenweg.
+				__( 'One of the hardest things to do in technology is disrupt yourself.' ) +
+				'</p>',
 			citation: __( 'Matt Mullenweg' ),
 		},
 	},

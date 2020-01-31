@@ -16,9 +16,7 @@ describe( 'ReusableBlockConvertButton', () => {
 	}
 
 	it( 'should not render when isVisible false', () => {
-		const wrapper = getShallowRenderOutput(
-			<ReusableBlockConvertButton isVisible={ false } />
-		);
+		const wrapper = getShallowRenderOutput( <ReusableBlockConvertButton isVisible={ false } /> );
 		expect( wrapper ).toBe( null );
 	} );
 
@@ -41,11 +39,7 @@ describe( 'ReusableBlockConvertButton', () => {
 	it( 'should allow converting a reusable block to static', () => {
 		const onConvert = jest.fn();
 		const wrapper = getShallowRenderOutput(
-			<ReusableBlockConvertButton
-				isVisible
-				isReusable
-				onConvertToStatic={ onConvert }
-			/>
+			<ReusableBlockConvertButton isVisible isReusable onConvertToStatic={ onConvert } />
 		);
 		expect( wrapper.props.children[ 0 ] ).toBeFalsy();
 		const button = wrapper.props.children[ 1 ];

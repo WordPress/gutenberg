@@ -10,7 +10,11 @@ import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { BottomSheetSettings, __experimentalPageTemplatePicker, __experimentalWithPageTemplatePickerVisible } from '@wordpress/block-editor';
+import {
+	BottomSheetSettings,
+	__experimentalPageTemplatePicker,
+	__experimentalWithPageTemplatePickerVisible,
+} from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
@@ -45,7 +49,10 @@ class Layout extends Component {
 	}
 
 	componentWillUnmount() {
-		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		SafeArea.removeEventListener(
+			'safeAreaInsetsForRootViewDidChange',
+			this.onSafeAreaInsetsUpdate
+		);
 		this._isMounted = false;
 	}
 
@@ -76,15 +83,11 @@ class Layout extends Component {
 	}
 
 	renderHTML() {
-		return (
-			<HTMLTextInput parentHeight={ this.state.rootViewHeight } />
-		);
+		return <HTMLTextInput parentHeight={ this.state.rootViewHeight } />;
 	}
 
 	renderVisual() {
-		const {
-			isReady,
-		} = this.props;
+		const { isReady } = this.props;
 
 		if ( ! isReady ) {
 			return null;
@@ -99,16 +102,13 @@ class Layout extends Component {
 	}
 
 	render() {
-		const {
-			mode,
-			getStylesFromColorScheme,
-			showPageTemplatePicker,
-		} = this.props;
+		const { mode, getStylesFromColorScheme, showPageTemplatePicker } = this.props;
 
 		const isHtmlView = mode === 'text';
 
 		// add a margin view at the bottom for the header
-		const marginBottom = Platform.OS === 'android' && ! isHtmlView ? headerToolbarStyles.container.height : 0;
+		const marginBottom =
+			Platform.OS === 'android' && ! isHtmlView ? headerToolbarStyles.container.height : 0;
 
 		const toolbarKeyboardAvoidingViewStyle = {
 			...styles.toolbarKeyboardAvoidingView,
@@ -118,7 +118,10 @@ class Layout extends Component {
 		};
 
 		return (
-			<SafeAreaView style={ getStylesFromColorScheme( styles.container, styles.containerDark ) } onLayout={ this.onRootViewLayout }>
+			<SafeAreaView
+				style={ getStylesFromColorScheme( styles.container, styles.containerDark ) }
+				onLayout={ this.onRootViewLayout }
+			>
 				<AutosaveMonitor />
 				<View style={ getStylesFromColorScheme( styles.background, styles.backgroundDark ) }>
 					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
@@ -132,7 +135,8 @@ class Layout extends Component {
 						{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
 						<Header />
 						<BottomSheetSettings />
-					</KeyboardAvoidingView> ) }
+					</KeyboardAvoidingView>
+				) }
 			</SafeAreaView>
 		);
 	}
@@ -140,12 +144,8 @@ class Layout extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			__unstableIsEditorReady: isEditorReady,
-		} = select( 'core/editor' );
-		const {
-			getEditorMode,
-		} = select( 'core/edit-post' );
+		const { __unstableIsEditorReady: isEditorReady } = select( 'core/editor' );
+		const { getEditorMode } = select( 'core/edit-post' );
 
 		return {
 			isReady: isEditorReady(),

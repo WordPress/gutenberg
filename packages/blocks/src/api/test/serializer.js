@@ -60,10 +60,7 @@ describe( 'block serializer', () => {
 					save: fruitBlockSave,
 				} );
 
-				const saved = getSaveContent(
-					'core/fruit',
-					{ fruit: 'Bananas' }
-				);
+				const saved = getSaveContent( 'core/fruit', { fruit: 'Bananas' } );
 
 				expect( saved ).toBe( '<div>Bananas</div>' );
 			} );
@@ -148,7 +145,9 @@ describe( 'block serializer', () => {
 
 	describe( 'serializeAttributes()', () => {
 		it( 'should not break HTML comments', () => {
-			expect( serializeAttributes( { a: '-- and --' } ) ).toBe( '{"a":"\\u002d\\u002d and \\u002d\\u002d"}' );
+			expect( serializeAttributes( { a: '-- and --' } ) ).toBe(
+				'{"a":"\\u002d\\u002d and \\u002d\\u002d"}'
+			);
 		} );
 
 		it( 'should not break standard-non-compliant tools for "<"', () => {
@@ -170,45 +169,27 @@ describe( 'block serializer', () => {
 
 	describe( 'getCommentDelimitedContent()', () => {
 		it( 'should generate empty attributes void', () => {
-			const content = getCommentDelimitedContent(
-				'core/test-block',
-				{},
-				''
-			);
+			const content = getCommentDelimitedContent( 'core/test-block', {}, '' );
 
 			expect( content ).toBe( '<!-- wp:test-block /-->' );
 		} );
 
 		it( 'should include the namespace for non-core blocks', () => {
-			const content = getCommentDelimitedContent(
-				'my-wonderful-namespace/test-block',
-				{},
-				''
-			);
+			const content = getCommentDelimitedContent( 'my-wonderful-namespace/test-block', {}, '' );
 
 			expect( content ).toBe( '<!-- wp:my-wonderful-namespace/test-block /-->' );
 		} );
 
 		it( 'should generate empty attributes non-void', () => {
-			const content = getCommentDelimitedContent(
-				'core/test-block',
-				{},
-				'Delicious'
-			);
+			const content = getCommentDelimitedContent( 'core/test-block', {}, 'Delicious' );
 
 			expect( content ).toBe( '<!-- wp:test-block -->\nDelicious\n<!-- /wp:test-block -->' );
 		} );
 
 		it( 'should generate non-empty attributes void', () => {
-			const content = getCommentDelimitedContent(
-				'core/test-block',
-				{ fruit: 'Banana' },
-				''
-			);
+			const content = getCommentDelimitedContent( 'core/test-block', { fruit: 'Banana' }, '' );
 
-			expect( content ).toBe(
-				'<!-- wp:test-block {"fruit":"Banana"} /-->'
-			);
+			expect( content ).toBe( '<!-- wp:test-block {"fruit":"Banana"} /-->' );
 		} );
 
 		it( 'should generate non-empty attributes non-void', () => {
@@ -260,9 +241,9 @@ describe( 'block serializer', () => {
 			const content = serializeBlock( block, { isInnerBlocks: true } );
 
 			expect( content ).toBe(
-				'<!-- wp:freeform-block {\"fruit\":\"Bananas\"} -->\n' +
-				'Bananas\n' +
-				'<!-- /wp:freeform-block -->'
+				'<!-- wp:freeform-block {"fruit":"Bananas"} -->\n' +
+					'Bananas\n' +
+					'<!-- /wp:freeform-block -->'
 			);
 		} );
 		it( 'serializes the unregistered fallback block without comment delimiters', () => {
@@ -309,11 +290,7 @@ describe( 'block serializer', () => {
 						throw new Error();
 					}
 
-					return (
-						<p>
-							{ attributes.content }
-						</p>
-					);
+					return <p>{ attributes.content }</p>;
 				},
 				category: 'common',
 				title: 'block title',
@@ -326,7 +303,8 @@ describe( 'block serializer', () => {
 				content: 'Ribs & Chicken',
 				stuff: 'left & right -- but <not>',
 			} );
-			const expectedPostContent = '<!-- wp:test-block {"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p>Ribs &amp; Chicken</p>\n<!-- /wp:test-block -->';
+			const expectedPostContent =
+				'<!-- wp:test-block {"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p>Ribs &amp; Chicken</p>\n<!-- /wp:test-block -->';
 
 			expect( serialize( [ block ] ) ).toEqual( expectedPostContent );
 			expect( serialize( block ) ).toEqual( expectedPostContent );
@@ -375,7 +353,7 @@ describe( 'block serializer', () => {
 				title: 'block title',
 			};
 			registerBlockType( 'core/chicken', blockType );
-			const block =	{
+			const block = {
 				name: 'core/chicken',
 				attributes: {
 					content: 'chicken',

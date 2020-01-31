@@ -32,19 +32,19 @@ function PluginSidebar( props ) {
 		<>
 			{ isPinnable && (
 				<PinnedPlugins>
-					{ isPinned && <Button
-						icon={ icon }
-						label={ title }
-						onClick={ toggleSidebar }
-						isPressed={ isActive }
-						aria-expanded={ isActive }
-					/> }
+					{ isPinned && (
+						<Button
+							icon={ icon }
+							label={ title }
+							onClick={ toggleSidebar }
+							isPressed={ isActive }
+							aria-expanded={ isActive }
+						/>
+					) }
 				</PinnedPlugins>
 			) }
 			<Sidebar name={ sidebarName }>
-				<SidebarHeader
-					closeLabel={ __( 'Close plugin' ) }
-				>
+				<SidebarHeader closeLabel={ __( 'Close plugin' ) }>
 					<strong>{ title }</strong>
 					{ isPinnable && (
 						<Button
@@ -56,9 +56,7 @@ function PluginSidebar( props ) {
 						/>
 					) }
 				</SidebarHeader>
-				<Panel className={ className }>
-					{ children }
-				</Panel>
+				<Panel className={ className }>{ children }</Panel>
 			</Sidebar>
 		</>
 	);
@@ -136,10 +134,7 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { sidebarName } ) => {
-		const {
-			getActiveGeneralSidebarName,
-			isPluginItemPinned,
-		} = select( 'core/edit-post' );
+		const { getActiveGeneralSidebarName, isPluginItemPinned } = select( 'core/edit-post' );
 
 		return {
 			isActive: getActiveGeneralSidebarName() === sidebarName,
@@ -147,11 +142,9 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { isActive, sidebarName } ) => {
-		const {
-			closeGeneralSidebar,
-			openGeneralSidebar,
-			togglePinnedPluginItem,
-		} = dispatch( 'core/edit-post' );
+		const { closeGeneralSidebar, openGeneralSidebar, togglePinnedPluginItem } = dispatch(
+			'core/edit-post'
+		);
 
 		return {
 			togglePin() {
@@ -165,5 +158,5 @@ export default compose(
 				}
 			},
 		};
-	} ),
+	} )
 )( PluginSidebar );

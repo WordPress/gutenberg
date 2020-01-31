@@ -42,7 +42,9 @@ describe( 'postcss-themes', () => {
 	} );
 
 	it( 'replaces multiple rules in the same declaration', () => {
-		return run( 'a{ background: linear-gradient( -45deg, theme(main) 50%, theme(highlight) 50% ) }' ).then( ( result ) => {
+		return run(
+			'a{ background: linear-gradient( -45deg, theme(main) 50%, theme(highlight) 50% ) }'
+		).then( ( result ) => {
 			expect( result.css ).toMatchSnapshot();
 			expect( result.warnings() ).toHaveLength( 0 );
 		} );

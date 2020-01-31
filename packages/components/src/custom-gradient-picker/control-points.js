@@ -1,4 +1,3 @@
-
 /**
  * External dependencies
  */
@@ -26,11 +25,7 @@ import {
 	getHorizontalRelativeGradientPosition,
 	isControlPointOverlapping,
 } from './utils';
-import {
-	COLOR_POPOVER_PROPS,
-	GRADIENT_MARKERS_WIDTH,
-	MINIMUM_SIGNIFICANT_MOVE,
-} from './constants';
+import { COLOR_POPOVER_PROPS, GRADIENT_MARKERS_WIDTH, MINIMUM_SIGNIFICANT_MOVE } from './constants';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
 class ControlPointKeyboardMove extends Component {
@@ -60,11 +55,7 @@ class ControlPointKeyboardMove extends Component {
 	}
 	render() {
 		const { children } = this.props;
-		return (
-			<KeyboardShortcuts shortcuts={ this.shortcuts }>
-				{ children }
-			</KeyboardShortcuts>
-		);
+		return <KeyboardShortcuts shortcuts={ this.shortcuts }>{ children }</KeyboardShortcuts>;
 	}
 }
 
@@ -86,30 +77,23 @@ function ControlPointButton( {
 			gradientAST={ gradientAST }
 		>
 			<Button
-				aria-label={
-					sprintf(
-						// translators: %1$s: gradient position e.g: 70%, %2$s: gradient color code e.g: rgb(52,121,151).
-						__( 'Gradient control point at position %1$s with color code %2$s.' ),
-						position,
-						color
-					)
-				}
+				aria-label={ sprintf(
+					// translators: %1$s: gradient position e.g: 70%, %2$s: gradient color code e.g: rgb(52,121,151).
+					__( 'Gradient control point at position %1$s with color code %2$s.' ),
+					position,
+					color
+				) }
 				aria-describedby={ descriptionId }
 				aria-expanded={ isOpen }
-				className={
-					classnames(
-						'components-custom-gradient-picker__control-point-button',
-						{ 'is-active': isOpen }
-					)
-				}
+				className={ classnames( 'components-custom-gradient-picker__control-point-button', {
+					'is-active': isOpen,
+				} ) }
 				style={ {
 					left: position,
 				} }
 				{ ...additionalProps }
 			/>
-			<div
-				className="screen-reader-text"
-				id={ descriptionId }>
+			<div className="screen-reader-text" id={ descriptionId }>
 				{ __(
 					'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
 				) }
@@ -133,7 +117,7 @@ export default function ControlPoints( {
 		const relativePosition = getHorizontalRelativeGradientPosition(
 			event.clientX,
 			gradientPickerDomRef.current,
-			GRADIENT_MARKERS_WIDTH,
+			GRADIENT_MARKERS_WIDTH
 		);
 		const {
 			gradientAST: referenceGradientAST,
@@ -156,8 +140,10 @@ export default function ControlPoints( {
 
 	const cleanEventListeners = () => {
 		if (
-			window && window.removeEventListener &&
-			controlPointMoveState.current && controlPointMoveState.current.listenersActivated
+			window &&
+			window.removeEventListener &&
+			controlPointMoveState.current &&
+			controlPointMoveState.current.listenersActivated
 		) {
 			window.removeEventListener( 'mousemove', onMouseMove );
 			window.removeEventListener( 'mouseup', cleanEventListeners );
@@ -173,8 +159,9 @@ export default function ControlPoints( {
 	}, [] );
 
 	return markerPoints.map(
-		( point, index ) => (
-			point && ignoreMarkerPosition !== point.positionValue && (
+		( point, index ) =>
+			point &&
+			ignoreMarkerPosition !== point.positionValue && (
 				<Dropdown
 					key={ index }
 					onClose={ onStopControlPointChange }
@@ -217,17 +204,13 @@ export default function ControlPoints( {
 							<ColorPicker
 								color={ point.color }
 								onChangeComplete={ ( { rgb } ) => {
-									onChange(
-										getGradientWithColorAtIndexChanged( gradientAST, index, rgb )
-									);
+									onChange( getGradientWithColorAtIndexChanged( gradientAST, index, rgb ) );
 								} }
 							/>
 							<Button
 								className="components-custom-gradient-picker__remove-control-point"
 								onClick={ () => {
-									onChange(
-										getGradientWithControlPointRemoved( gradientAST, index )
-									);
+									onChange( getGradientWithControlPointRemoved( gradientAST, index ) );
 									onClose();
 								} }
 								isLink
@@ -239,6 +222,5 @@ export default function ControlPoints( {
 					popoverProps={ COLOR_POPOVER_PROPS }
 				/>
 			)
-		)
 	);
 }

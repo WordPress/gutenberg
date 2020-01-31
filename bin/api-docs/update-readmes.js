@@ -24,7 +24,7 @@ getPackages().forEach( ( entry ) => {
 				`--use-token "${ token }"`,
 				'--ignore "/unstable|experimental/i"',
 			],
-			{ shell: true },
+			{ shell: true }
 		);
 
 		if ( status !== 0 ) {

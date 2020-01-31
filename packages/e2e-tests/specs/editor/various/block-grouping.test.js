@@ -138,15 +138,15 @@ describe( 'Block Grouping', () => {
 		it( 'does not show group transform if Grouping block is disabled', async () => {
 			const availableTransforms = await getAvailableBlockTransforms();
 
-			expect(
-				availableTransforms
-			).not.toContain( 'Group' );
+			expect( availableTransforms ).not.toContain( 'Group' );
 		} );
 
 		it( 'does not show group option in the options toolbar if Grouping block is disabled ', async () => {
 			await clickBlockToolbarButton( 'More options' );
 
-			const blockOptionsDropdownHTML = await page.evaluate( () => document.querySelector( '.block-editor-block-settings-menu__popover' ).innerHTML );
+			const blockOptionsDropdownHTML = await page.evaluate(
+				() => document.querySelector( '.block-editor-block-settings-menu__popover' ).innerHTML
+			);
 
 			expect( blockOptionsDropdownHTML ).not.toContain( 'Group' );
 		} );
@@ -160,12 +160,14 @@ describe( 'Block Grouping', () => {
 			// Full width image.
 			await insertBlock( 'Image' );
 			await clickBlockToolbarButton( 'Change alignment' );
-			await page.click( '.components-dropdown-menu__menu button svg.dashicons-align-full-width' );
+			const FULL_WIDTH_BUTTON_XPATH = `//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), 'Full width')]`;
+			await ( await page.$x( FULL_WIDTH_BUTTON_XPATH ) )[ 0 ].click();
 
 			// Wide width image.
 			await insertBlock( 'Image' );
 			await clickBlockToolbarButton( 'Change alignment' );
-			await page.click( '.components-dropdown-menu__menu button svg.dashicons-align-wide' );
+			const WIDE_BUTTON_XPATH = `//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), 'Wide width')]`;
+			await ( await page.$x( WIDE_BUTTON_XPATH ) )[ 0 ].click();
 
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( 'Some paragraph' );

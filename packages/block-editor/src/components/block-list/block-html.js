@@ -1,4 +1,3 @@
-
 /**
  * External dependencies
  */
@@ -9,13 +8,22 @@ import TextareaAutosize from 'react-autosize-textarea';
  */
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { getBlockAttributes, getBlockContent, getBlockType, isValidBlockContent, getSaveContent } from '@wordpress/blocks';
+import {
+	getBlockAttributes,
+	getBlockContent,
+	getBlockType,
+	isValidBlockContent,
+	getSaveContent,
+} from '@wordpress/blocks';
 
 function BlockHTML( { clientId } ) {
 	const [ html, setHtml ] = useState( '' );
-	const { block } = useSelect( ( select ) => ( {
-		block: select( 'core/block-editor' ).getBlock( clientId ),
-	} ), [ clientId ] );
+	const { block } = useSelect(
+		( select ) => ( {
+			block: select( 'core/block-editor' ).getBlock( clientId ),
+		} ),
+		[ clientId ]
+	);
 	const { updateBlock } = useDispatch( 'core/block-editor' );
 	const onChange = () => {
 		const blockType = getBlockType( block.name );

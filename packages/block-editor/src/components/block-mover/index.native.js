@@ -27,14 +27,15 @@ const BlockMover = ( {
 	return (
 		<>
 			<ToolbarButton
-				title={ ! isFirst ?
-					sprintf(
-						/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-						__( 'Move block up from row %1$s to row %2$s' ),
-						firstIndex + 1,
-						firstIndex
-					) :
-					__( 'Move block up' )
+				title={
+					! isFirst
+						? sprintf(
+								/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+								__( 'Move block up from row %1$s to row %2$s' ),
+								firstIndex + 1,
+								firstIndex
+						  )
+						: __( 'Move block up' )
 				}
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
@@ -43,14 +44,15 @@ const BlockMover = ( {
 			/>
 
 			<ToolbarButton
-				title={ ! isLast ?
-					sprintf(
-						/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-						__( 'Move block down from row %1$s to row %2$s' ),
-						firstIndex + 1,
-						firstIndex + 2
-					) :
-					__( 'Move block down' )
+				title={
+					! isLast
+						? sprintf(
+								/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+								__( 'Move block down from row %1$s to row %2$s' ),
+								firstIndex + 1,
+								firstIndex + 2
+						  )
+						: __( 'Move block down' )
 				}
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
@@ -63,7 +65,9 @@ const BlockMover = ( {
 
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlockIndex, getTemplateLock, getBlockRootClientId, getBlockOrder } = select( 'core/block-editor' );
+		const { getBlockIndex, getTemplateLock, getBlockRootClientId, getBlockOrder } = select(
+			'core/block-editor'
+		);
 		const normalizedClientIds = castArray( clientIds );
 		const firstClientId = first( normalizedClientIds );
 		const rootClientId = getBlockRootClientId( firstClientId );
@@ -86,5 +90,5 @@ export default compose(
 			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
 		};
 	} ),
-	withInstanceId,
+	withInstanceId
 )( BlockMover );

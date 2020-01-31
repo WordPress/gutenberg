@@ -17,7 +17,9 @@ import withFocusReturn, { Provider } from '../';
 class Test extends Component {
 	render() {
 		return (
-			<div className="test"><textarea /></div>
+			<div className="test">
+				<textarea />
+			</div>
 		);
 	}
 }
@@ -29,9 +31,7 @@ describe( 'withFocusReturn()', () => {
 		const switchFocusTo = document.createElement( 'input' );
 
 		const getInstance = ( wrapper ) => {
-			return wrapper.root.find(
-				( node ) => node.instance instanceof Component
-			).instance;
+			return wrapper.root.find( ( node ) => node.instance instanceof Component ).instance;
 		};
 
 		beforeEach( () => {
@@ -81,7 +81,10 @@ describe( 'withFocusReturn()', () => {
 
 		it( 'should switch focus back when unmounted while having focus', () => {
 			const wrapper = mount( <Composite /> );
-			wrapper.find( 'textarea' ).at( 0 ).simulate( 'focus' );
+			wrapper
+				.find( 'textarea' )
+				.at( 0 )
+				.simulate( 'focus' );
 
 			// Should return to the activeElement saved with this component.
 			wrapper.unmount();

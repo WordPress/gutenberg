@@ -49,10 +49,7 @@ const { getSelection, getComputedStyle } = window;
  *
  * @return {boolean} Whether element is a tabbable text field.
  */
-const isTabbableTextField = overEvery( [
-	isTextField,
-	focus.tabbable.isTabbableIndex,
-] );
+const isTabbableTextField = overEvery( [ isTextField, focus.tabbable.isTabbableIndex ] );
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -65,7 +62,7 @@ const isTabbableTextField = overEvery( [
  * @return {boolean} Whether element should consider edge navigation.
  */
 export function isNavigationCandidate( element, keyCode, hasModifier ) {
-	const isVertical = ( keyCode === UP || keyCode === DOWN );
+	const isVertical = keyCode === UP || keyCode === DOWN;
 
 	// Currently, all elements support unmodified vertical navigation.
 	if ( isVertical && ! hasModifier ) {
@@ -176,8 +173,12 @@ function selector( select ) {
 	return {
 		selectedBlockClientId,
 		selectionStartClientId,
-		selectionBeforeEndClientId: getPreviousBlockClientId( selectionEndClientId || selectedBlockClientId ),
-		selectionAfterEndClientId: getNextBlockClientId( selectionEndClientId || selectedBlockClientId ),
+		selectionBeforeEndClientId: getPreviousBlockClientId(
+			selectionEndClientId || selectedBlockClientId
+		),
+		selectionAfterEndClientId: getNextBlockClientId(
+			selectionEndClientId || selectedBlockClientId
+		),
 		selectedFirstClientId: getFirstMultiSelectedBlockClientId(),
 		selectedLastClientId: getLastMultiSelectedBlockClientId(),
 		hasMultiSelection: hasMultiSelection(),
@@ -224,12 +225,9 @@ export default function WritingFlow( { children } ) {
 		blockSelectionStart,
 		isMultiSelecting,
 	} = useSelect( selector, [] );
-	const {
-		multiSelect,
-		selectBlock,
-		clearSelectedBlock,
-		setNavigationMode,
-	} = useDispatch( 'core/block-editor' );
+	const { multiSelect, selectBlock, clearSelectedBlock, setNavigationMode } = useDispatch(
+		'core/block-editor'
+	);
 
 	function onMouseDown( event ) {
 		verticalRect.current = null;
@@ -258,11 +256,11 @@ export default function WritingFlow( { children } ) {
 						multiSelect( blockSelectionStart, clientId );
 						event.preventDefault();
 					}
-				// Allow user to escape out of a multi-selection to a singular
-				// selection of a block via click. This is handled here since
-				// focus handling excludes blocks when there is multiselection,
-				// as focus can be incurred by starting a multiselection (focus
-				// moved to first block's multi-controls).
+					// Allow user to escape out of a multi-selection to a singular
+					// selection of a block via click. This is handled here since
+					// focus handling excludes blocks when there is multiselection,
+					// as focus can be incurred by starting a multiselection (focus
+					// moved to first block's multi-controls).
 				} else if ( hasMultiSelection ) {
 					selectBlock( clientId );
 				}
@@ -271,15 +269,12 @@ export default function WritingFlow( { children } ) {
 	}
 
 	function expandSelection( isReverse ) {
-		const nextSelectionEndClientId = isReverse ?
-			selectionBeforeEndClientId :
-			selectionAfterEndClientId;
+		const nextSelectionEndClientId = isReverse
+			? selectionBeforeEndClientId
+			: selectionAfterEndClientId;
 
 		if ( nextSelectionEndClientId ) {
-			multiSelect(
-				selectionStartClientId || selectedBlockClientId,
-				nextSelectionEndClientId
-			);
+			multiSelect( selectionStartClientId || selectedBlockClientId, nextSelectionEndClientId );
 		}
 	}
 
@@ -455,20 +450,15 @@ export default function WritingFlow( { children } ) {
 		// In the case of RTL scripts, right means previous and left means next,
 		// which is the exact reverse of LTR.
 		const { direction } = getComputedStyle( target );
-		const isReverseDir = direction === 'rtl' ? ( ! isReverse ) : isReverse;
+		const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
 
 		if ( isShift ) {
 			if (
-				(
-					// Ensure that there is a target block.
-					( isReverse && selectionBeforeEndClientId ) ||
-					( ! isReverse && selectionAfterEndClientId )
-				) && (
-					hasMultiSelection || (
-						isTabbableEdge( target, isReverse ) &&
-						isNavEdge( target, isReverse )
-					)
-				)
+				// Ensure that there is a target block.
+				( ( isReverse && selectionBeforeEndClientId ) ||
+					( ! isReverse && selectionAfterEndClientId ) ) &&
+				( hasMultiSelection ||
+					( isTabbableEdge( target, isReverse ) && isNavEdge( target, isReverse ) ) )
 			) {
 				// Shift key is down, and there is multi selection or we're at
 				// the end of the current block.
@@ -486,7 +476,11 @@ export default function WritingFlow( { children } ) {
 				placeCaretAtVerticalEdge( closestTabbable, isReverse, verticalRect.current );
 				event.preventDefault();
 			}
-		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverseDir ) ) {
+		} else if (
+			isHorizontal &&
+			getSelection().isCollapsed &&
+			isHorizontalEdge( target, isReverseDir )
+		) {
 			const closestTabbable = getClosestTabbable( target, isReverseDir, container.current );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverseDir );
 			event.preventDefault();
@@ -524,11 +518,7 @@ export default function WritingFlow( { children } ) {
 				hasMultiSelection={ hasMultiSelection }
 				multiSelectionContainer={ multiSelectionContainer }
 			/>
-			<div
-				ref={ container }
-				onKeyDown={ onKeyDown }
-				onMouseDown={ onMouseDown }
-			>
+			<div ref={ container } onKeyDown={ onKeyDown } onMouseDown={ onMouseDown }>
 				<div
 					ref={ multiSelectionContainer }
 					tabIndex={ hasMultiSelection ? '0' : undefined }

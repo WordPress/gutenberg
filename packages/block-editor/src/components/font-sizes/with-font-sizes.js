@@ -27,14 +27,20 @@ import { getFontSize, getFontSizeClass } from './utils';
  */
 export default ( ...fontSizeNames ) => {
 	/*
-	* Computes an object whose key is the font size attribute name as passed in the array,
-	* and the value is the custom font size attribute name.
-	* Custom font size is automatically compted by appending custom followed by the font size attribute name in with the first letter capitalized.
-	*/
-	const fontSizeAttributeNames = reduce( fontSizeNames, ( fontSizeAttributeNamesAccumulator, fontSizeAttributeName ) => {
-		fontSizeAttributeNamesAccumulator[ fontSizeAttributeName ] = `custom${ upperFirst( fontSizeAttributeName ) }`;
-		return fontSizeAttributeNamesAccumulator;
-	}, {} );
+	 * Computes an object whose key is the font size attribute name as passed in the array,
+	 * and the value is the custom font size attribute name.
+	 * Custom font size is automatically compted by appending custom followed by the font size attribute name in with the first letter capitalized.
+	 */
+	const fontSizeAttributeNames = reduce(
+		fontSizeNames,
+		( fontSizeAttributeNamesAccumulator, fontSizeAttributeName ) => {
+			fontSizeAttributeNamesAccumulator[ fontSizeAttributeName ] = `custom${ upperFirst(
+				fontSizeAttributeName
+			) }`;
+			return fontSizeAttributeNamesAccumulator;
+		},
+		{}
+	);
 
 	return createHigherOrderComponent(
 		compose( [
@@ -55,20 +61,29 @@ export default ( ...fontSizeNames ) => {
 					}
 
 					createSetters() {
-						return reduce( fontSizeAttributeNames, ( settersAccumulator, customFontSizeAttributeName, fontSizeAttributeName ) => {
-							const upperFirstFontSizeAttributeName = upperFirst( fontSizeAttributeName );
-							settersAccumulator[ `set${ upperFirstFontSizeAttributeName }` ] =
-								this.createSetFontSize( fontSizeAttributeName, customFontSizeAttributeName );
-							return settersAccumulator;
-						}, {} );
+						return reduce(
+							fontSizeAttributeNames,
+							( settersAccumulator, customFontSizeAttributeName, fontSizeAttributeName ) => {
+								const upperFirstFontSizeAttributeName = upperFirst( fontSizeAttributeName );
+								settersAccumulator[
+									`set${ upperFirstFontSizeAttributeName }`
+								] = this.createSetFontSize( fontSizeAttributeName, customFontSizeAttributeName );
+								return settersAccumulator;
+							},
+							{}
+						);
 					}
 
 					createSetFontSize( fontSizeAttributeName, customFontSizeAttributeName ) {
 						return ( fontSizeValue ) => {
-							const fontSizeObject = find( this.props.fontSizes, { size: Number( fontSizeValue ) } );
+							const fontSizeObject = find( this.props.fontSizes, {
+								size: Number( fontSizeValue ),
+							} );
 							this.props.setAttributes( {
-								[ fontSizeAttributeName ]: fontSizeObject && fontSizeObject.slug ? fontSizeObject.slug : undefined,
-								[ customFontSizeAttributeName ]: fontSizeObject && fontSizeObject.slug ? undefined : fontSizeValue,
+								[ fontSizeAttributeName ]:
+									fontSizeObject && fontSizeObject.slug ? fontSizeObject.slug : undefined,
+								[ customFontSizeAttributeName ]:
+									fontSizeObject && fontSizeObject.slug ? undefined : fontSizeValue,
 							} );
 						};
 					}
@@ -78,10 +93,16 @@ export default ( ...fontSizeNames ) => {
 							if ( previousState[ fontSizeAttributeName ] ) {
 								// if new font size is name compare with the previous slug
 								if ( attributes[ fontSizeAttributeName ] ) {
-									return attributes[ fontSizeAttributeName ] !== previousState[ fontSizeAttributeName ].slug;
+									return (
+										attributes[ fontSizeAttributeName ] !==
+										previousState[ fontSizeAttributeName ].slug
+									);
 								}
 								// if font size is not named, update when the font size value changes.
-								return previousState[ fontSizeAttributeName ].size !== attributes[ customFontSizeAttributeName ];
+								return (
+									previousState[ fontSizeAttributeName ].size !==
+									attributes[ customFontSizeAttributeName ]
+								);
 							}
 							// in this case we need to build the font size object
 							return true;

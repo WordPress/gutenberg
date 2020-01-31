@@ -15,7 +15,7 @@ const getStylesFromColorScheme = () => {
 
 const setAttributes = jest.fn();
 
-const getImageComponent = ( attributes = { } ) => (
+const getImageComponent = ( attributes = {} ) => (
 	<ImageEdit
 		setAttributes={ setAttributes }
 		attributes={ attributes }
@@ -44,7 +44,9 @@ describe( 'Image Block', () => {
 	} );
 
 	it( 'unset link target', () => {
-		const component = renderer.create( getImageComponent( { linkTarget: '_blank', rel: NEW_TAB_REL.join( ' ' ) } ) );
+		const component = renderer.create(
+			getImageComponent( { linkTarget: '_blank', rel: NEW_TAB_REL.join( ' ' ) } )
+		);
 		const instance = component.getInstance();
 
 		instance.onSetNewTab( false );
@@ -52,4 +54,3 @@ describe( 'Image Block', () => {
 		expect( setAttributes ).toHaveBeenCalledWith( { linkTarget: undefined, rel: undefined } );
 	} );
 } );
-

@@ -11,10 +11,7 @@ import {
 	MINIMUM_ABSOLUTE_LEFT_POSITION,
 	MINIMUM_DISTANCE_BETWEEN_POINTS,
 } from './constants';
-import {
-	serializeGradientColor,
-	serializeGradientPosition,
-} from './serializer';
+import { serializeGradientColor, serializeGradientPosition } from './serializer';
 
 function tinyColorRgbToGradientColorStop( { r, g, b, a } ) {
 	if ( a === 1 ) {
@@ -37,30 +34,25 @@ export function getGradientWithColorStopAdded( gradientAST, relativePosition, rg
 	};
 	return {
 		...gradientAST,
-		colorStops: [
-			...gradientAST.colorStops,
-			colorStop,
-		],
+		colorStops: [ ...gradientAST.colorStops, colorStop ],
 	};
 }
 
 export function getGradientWithPositionAtIndexChanged( gradientAST, index, relativePosition ) {
 	return {
 		...gradientAST,
-		colorStops: gradientAST.colorStops.map(
-			( colorStop, colorStopIndex ) => {
-				if ( colorStopIndex !== index ) {
-					return colorStop;
-				}
-				return {
-					...colorStop,
-					length: {
-						...colorStop.length,
-						value: relativePosition,
-					},
-				};
+		colorStops: gradientAST.colorStops.map( ( colorStop, colorStopIndex ) => {
+			if ( colorStopIndex !== index ) {
+				return colorStop;
 			}
-		),
+			return {
+				...colorStop,
+				length: {
+					...colorStop.length,
+					value: relativePosition,
+				},
+			};
+		} ),
 	};
 }
 
@@ -69,16 +61,14 @@ export function isControlPointOverlapping( gradientAST, position, initialIndex )
 	const minPosition = Math.min( initialPosition, position );
 	const maxPosition = Math.max( initialPosition, position );
 
-	return some(
-		gradientAST.colorStops,
-		( { length }, index ) => {
-			const itemPosition = parseInt( length.value );
-			return index !== initialIndex && (
-				Math.abs( itemPosition - position ) < MINIMUM_DISTANCE_BETWEEN_POINTS ||
-				( minPosition < itemPosition && itemPosition < maxPosition )
-			);
-		}
-	);
+	return some( gradientAST.colorStops, ( { length }, index ) => {
+		const itemPosition = parseInt( length.value );
+		return (
+			index !== initialIndex &&
+			( Math.abs( itemPosition - position ) < MINIMUM_DISTANCE_BETWEEN_POINTS ||
+				( minPosition < itemPosition && itemPosition < maxPosition ) )
+		);
+	} );
 }
 
 function getGradientWithPositionAtIndexSummed( gradientAST, index, valueToSum ) {
@@ -91,31 +81,41 @@ function getGradientWithPositionAtIndexSummed( gradientAST, index, valueToSum ) 
 }
 
 export function getGradientWithPositionAtIndexIncreased( gradientAST, index ) {
-	return getGradientWithPositionAtIndexSummed( gradientAST, index, MINIMUM_DISTANCE_BETWEEN_POINTS );
+	return getGradientWithPositionAtIndexSummed(
+		gradientAST,
+		index,
+		MINIMUM_DISTANCE_BETWEEN_POINTS
+	);
 }
 
 export function getGradientWithPositionAtIndexDecreased( gradientAST, index ) {
-	return getGradientWithPositionAtIndexSummed( gradientAST, index, -MINIMUM_DISTANCE_BETWEEN_POINTS );
+	return getGradientWithPositionAtIndexSummed(
+		gradientAST,
+		index,
+		-MINIMUM_DISTANCE_BETWEEN_POINTS
+	);
 }
 
 export function getGradientWithColorAtIndexChanged( gradientAST, index, rgbaColor ) {
 	return {
 		...gradientAST,
-		colorStops: gradientAST.colorStops.map(
-			( colorStop, colorStopIndex ) => {
-				if ( colorStopIndex !== index ) {
-					return colorStop;
-				}
-				return {
-					...colorStop,
-					...tinyColorRgbToGradientColorStop( rgbaColor ),
-				};
+		colorStops: gradientAST.colorStops.map( ( colorStop, colorStopIndex ) => {
+			if ( colorStopIndex !== index ) {
+				return colorStop;
 			}
-		),
+			return {
+				...colorStop,
+				...tinyColorRgbToGradientColorStop( rgbaColor ),
+			};
+		} ),
 	};
 }
 
-export function getGradientWithColorAtPositionChanged( gradientAST, relativePositionValue, rgbaColor ) {
+export function getGradientWithColorAtPositionChanged(
+	gradientAST,
+	relativePositionValue,
+	rgbaColor
+) {
 	const index = findIndex( gradientAST.colorStops, ( colorStop ) => {
 		return (
 			colorStop &&
@@ -136,12 +136,17 @@ export function getGradientWithControlPointRemoved( gradientAST, index ) {
 	};
 }
 
-export function getHorizontalRelativeGradientPosition( mouseXCoordinate, containerElement, positionedElementWidth ) {
+export function getHorizontalRelativeGradientPosition(
+	mouseXCoordinate,
+	containerElement,
+	positionedElementWidth
+) {
 	if ( ! containerElement ) {
 		return;
 	}
 	const { x, width } = containerElement.getBoundingClientRect();
-	const absolutePositionValue = mouseXCoordinate - x - MINIMUM_ABSOLUTE_LEFT_POSITION - ( positionedElementWidth / 2 );
+	const absolutePositionValue =
+		mouseXCoordinate - x - MINIMUM_ABSOLUTE_LEFT_POSITION - positionedElementWidth / 2;
 	const availableWidth = width - MINIMUM_ABSOLUTE_LEFT_POSITION - INSERT_POINT_WIDTH;
 	return Math.round(
 		Math.min( Math.max( ( absolutePositionValue * 100 ) / availableWidth, 0 ), 100 )

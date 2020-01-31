@@ -33,9 +33,7 @@ const getFeaturedImageMediaFrame = () => {
 		 */
 		createStates: function createStates() {
 			this.on( 'toolbar:create:featured-image', this.featuredImageToolbar, this );
-			this.states.add( [
-				new wp.media.controller.FeaturedImage(),
-			] );
+			this.states.add( [ new wp.media.controller.FeaturedImage() ] );
 		},
 	} );
 };
@@ -50,7 +48,6 @@ const getGalleryDetailsMediaFrame = () => {
 	 * @class
 	 */
 	return wp.media.view.MediaFrame.Post.extend( {
-
 		/**
 		 * Create the default states.
 		 *
@@ -67,9 +64,14 @@ const getGalleryDetailsMediaFrame = () => {
 					multiple: 'add',
 					editable: false,
 
-					library: wp.media.query( defaults( {
-						type: 'image',
-					}, this.options.library ) ),
+					library: wp.media.query(
+						defaults(
+							{
+								type: 'image',
+							},
+							this.options.library
+						)
+					),
 				} ),
 
 				new wp.media.controller.GalleryEdit( {
@@ -154,12 +156,7 @@ class MediaUpload extends Component {
 	}
 
 	buildAndSetGalleryFrame() {
-		const {
-			addToGallery = false,
-			allowedTypes,
-			multiple = false,
-			value = null,
-		} = this.props;
+		const { addToGallery = false, allowedTypes, multiple = false, value = null } = this.props;
 		// If the value did not changed there is no need to rebuild the frame,
 		// we can continue to use the existing one.
 		if ( value === this.lastGalleryValue ) {
@@ -192,7 +189,7 @@ class MediaUpload extends Component {
 			state: currentState,
 			multiple,
 			selection,
-			editing: ( value ) ? true : false,
+			editing: value ? true : false,
 		} );
 		wp.media.frame = this.frame;
 		this.initializeListeners();
@@ -209,7 +206,7 @@ class MediaUpload extends Component {
 			state: 'featured-image',
 			multiple: this.props.multiple,
 			selection,
-			editing: ( this.props.value ) ? true : false,
+			editing: this.props.value ? true : false,
 		} );
 		wp.media.frame = this.frame;
 	}
@@ -230,19 +227,18 @@ class MediaUpload extends Component {
 		if ( multiple ) {
 			onSelect( selectedImages.models.map( ( model ) => slimImageObject( model.toJSON() ) ) );
 		} else {
-			onSelect( slimImageObject( ( selectedImages.models[ 0 ].toJSON() ) ) );
+			onSelect( slimImageObject( selectedImages.models[ 0 ].toJSON() ) );
 		}
 	}
 
 	onSelect() {
 		const { onSelect, multiple = false } = this.props;
 		// Get media attachment details from the frame state
-		const attachment = this.frame.state().get( 'selection' ).toJSON();
-		onSelect(
-			multiple ?
-				attachment :
-				attachment[ 0 ]
-		);
+		const attachment = this.frame
+			.state()
+			.get( 'selection' )
+			.toJSON();
+		onSelect( multiple ? attachment : attachment[ 0 ] );
 	}
 
 	onOpen() {
@@ -287,11 +283,7 @@ class MediaUpload extends Component {
 	}
 
 	openModal() {
-		if (
-			this.props.gallery &&
-			this.props.value &&
-			this.props.value.length > 0
-		) {
+		if ( this.props.gallery && this.props.value && this.props.value.length > 0 ) {
 			this.buildAndSetGalleryFrame();
 		}
 		this.frame.open();
@@ -303,4 +295,3 @@ class MediaUpload extends Component {
 }
 
 export default MediaUpload;
-

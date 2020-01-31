@@ -25,10 +25,7 @@ export const _default = () => {
 			isColumnLayout={ isColumnLayout }
 		>
 			<div>
-				<TextControl
-					label="Sample Field"
-					placeholder="Enter something here"
-				/>
+				<TextControl label="Sample Field" placeholder="Enter something here" />
 			</div>
 		</Placeholder>
 	);

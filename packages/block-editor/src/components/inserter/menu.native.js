@@ -39,7 +39,10 @@ export class InserterMenu extends Component {
 	calculateNumberOfColumns() {
 		const bottomSheetWidth = BottomSheet.getWidth();
 		const { paddingLeft: itemPaddingLeft, paddingRight: itemPaddingRight } = styles.modalItem;
-		const { paddingLeft: containerPaddingLeft, paddingRight: containerPaddingRight } = styles.content;
+		const {
+			paddingLeft: containerPaddingLeft,
+			paddingRight: containerPaddingRight,
+		} = styles.content;
 		const { width: itemWidth } = styles.modalIconWrapper;
 		const itemTotalWidth = itemWidth + itemPaddingLeft + itemPaddingRight;
 		const containerTotalWidth = bottomSheetWidth - ( containerPaddingLeft + containerPaddingRight );
@@ -63,9 +66,15 @@ export class InserterMenu extends Component {
 	render() {
 		const { getStylesFromColorScheme } = this.props;
 		const bottomPadding = styles.contentBottomPadding;
-		const modalIconWrapperStyle = getStylesFromColorScheme( styles.modalIconWrapper, styles.modalIconWrapperDark );
+		const modalIconWrapperStyle = getStylesFromColorScheme(
+			styles.modalIconWrapper,
+			styles.modalIconWrapperDark
+		);
 		const modalIconStyle = getStylesFromColorScheme( styles.modalIcon, styles.modalIconDark );
-		const modalItemLabelStyle = getStylesFromColorScheme( styles.modalItemLabel, styles.modalItemLabelDark );
+		const modalItemLabelStyle = getStylesFromColorScheme(
+			styles.modalItemLabel,
+			styles.modalItemLabelDark
+		);
 
 		return (
 			<BottomSheet
@@ -81,27 +90,30 @@ export class InserterMenu extends Component {
 					keyboardShouldPersistTaps="always"
 					numColumns={ this.state.numberOfColumns }
 					data={ this.props.items }
-					ItemSeparatorComponent={ () =>
-						<View style={ styles.rowSeparator } />
-					}
+					ItemSeparatorComponent={ () => <View style={ styles.rowSeparator } /> }
 					keyExtractor={ ( item ) => item.name }
-					renderItem={ ( { item } ) =>
+					renderItem={ ( { item } ) => (
 						<TouchableHighlight
 							style={ styles.touchableArea }
 							underlayColor="transparent"
-							activeOpacity={ .5 }
+							activeOpacity={ 0.5 }
 							accessibilityLabel={ item.title }
-							onPress={ () => this.props.onSelect( item ) }>
+							onPress={ () => this.props.onSelect( item ) }
+						>
 							<View style={ styles.modalItem }>
 								<View style={ modalIconWrapperStyle }>
 									<View style={ modalIconStyle }>
-										<Icon icon={ item.icon.src } fill={ modalIconStyle.fill } size={ modalIconStyle.width } />
+										<Icon
+											icon={ item.icon.src }
+											fill={ modalIconStyle.fill }
+											size={ modalIconStyle.width }
+										/>
 									</View>
 								</View>
 								<Text style={ modalItemLabelStyle }>{ item.title }</Text>
 							</View>
 						</TouchableHighlight>
-					}
+					) }
 				/>
 			</BottomSheet>
 		);
@@ -117,9 +129,7 @@ export default compose(
 			getBlockSelectionEnd,
 			getSettings,
 		} = select( 'core/block-editor' );
-		const {
-			getChildBlockNames,
-		} = select( 'core/blocks' );
+		const { getChildBlockNames } = select( 'core/blocks' );
 
 		let destinationRootClientId = rootClientId;
 		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
@@ -153,10 +163,7 @@ export default compose(
 		return {
 			showInsertionPoint() {
 				if ( ownProps.shouldReplaceBlock ) {
-					const {
-						getBlockOrder,
-						getBlockCount,
-					} = select( 'core/block-editor' );
+					const { getBlockOrder, getBlockCount } = select( 'core/block-editor' );
 
 					const count = getBlockCount();
 					if ( count === 1 ) {
@@ -165,17 +172,14 @@ export default compose(
 						clearSelectedBlock();
 						resetBlocks( [] );
 					} else {
-						const blockToReplace = getBlockOrder(
-							ownProps.destinationRootClientId
-						)[ ownProps.insertionIndex ];
+						const blockToReplace = getBlockOrder( ownProps.destinationRootClientId )[
+							ownProps.insertionIndex
+						];
 
 						removeBlock( blockToReplace, false );
 					}
 				}
-				showInsertionPoint(
-					ownProps.destinationRootClientId,
-					ownProps.insertionIndex,
-				);
+				showInsertionPoint( ownProps.destinationRootClientId, ownProps.insertionIndex );
 			},
 			hideInsertionPoint,
 			onSelect( item ) {
@@ -183,23 +187,15 @@ export default compose(
 
 				const insertedBlock = createBlock( name, initialAttributes );
 
-				insertBlock(
-					insertedBlock,
-					ownProps.insertionIndex,
-					ownProps.destinationRootClientId
-				);
+				insertBlock( insertedBlock, ownProps.insertionIndex, ownProps.destinationRootClientId );
 
 				ownProps.onSelect();
 			},
 			insertDefaultBlock() {
-				insertDefaultBlock(
-					{},
-					ownProps.destinationRootClientId,
-					ownProps.insertionIndex,
-				);
+				insertDefaultBlock( {}, ownProps.destinationRootClientId, ownProps.insertionIndex );
 			},
 		};
 	} ),
 	withInstanceId,
-	withPreferredColorScheme,
+	withPreferredColorScheme
 )( InserterMenu );

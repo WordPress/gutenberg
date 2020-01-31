@@ -104,30 +104,37 @@ export function Button( props ) {
 		states.push( 'disabled' );
 	}
 
-	const subscriptInactive = getStylesFromColorScheme( styles.subscriptInactive, styles.subscriptInactiveDark );
+	const subscriptInactive = getStylesFromColorScheme(
+		styles.subscriptInactive,
+		styles.subscriptInactiveDark
+	);
 
 	const newChildren = Children.map( children, ( child ) => {
-		return child ? cloneElement( child, { colorScheme: props.preferredColorScheme, isPressed } ) : child;
+		return child
+			? cloneElement( child, { colorScheme: props.preferredColorScheme, isPressed } )
+			: child;
 	} );
 
 	// Should show the tooltip if...
-	const shouldShowTooltip = ! isDisabled && (
+	const shouldShowTooltip =
+		! isDisabled &&
 		// an explicit tooltip is passed or...
-		( showTooltip && label ) ||
-		// there's a shortcut or...
-		shortcut ||
-		(
+		( ( showTooltip && label ) ||
+			// there's a shortcut or...
+			shortcut ||
 			// there's a label and...
-			!! label &&
-			// the children are empty and...
-			( ! children || ( isArray( children ) && ! children.length ) ) &&
-			// the tooltip is not explicitly disabled.
-			false !== showTooltip
-		)
-	);
+			( !! label &&
+				// the children are empty and...
+				( ! children || ( isArray( children ) && ! children.length ) ) &&
+				// the tooltip is not explicitly disabled.
+				false !== showTooltip ) );
 
-	const newIcon = icon ? cloneElement( ( <Icon icon={ icon } size={ iconSize } /> ),
-		{ colorScheme: props.preferredColorScheme, isPressed } ) : null;
+	const newIcon = icon
+		? cloneElement( <Icon icon={ icon } size={ iconSize } />, {
+				colorScheme: props.preferredColorScheme,
+				isPressed,
+		  } )
+		: null;
 
 	const element = (
 		<TouchableOpacity
@@ -147,7 +154,11 @@ export function Button( props ) {
 				<View style={ { flexDirection: 'row' } }>
 					{ newIcon }
 					{ newChildren }
-					{ subscript && ( <Text style={ isPressed ? styles.subscriptActive : subscriptInactive }>{ subscript }</Text> ) }
+					{ subscript && (
+						<Text style={ isPressed ? styles.subscriptActive : subscriptInactive }>
+							{ subscript }
+						</Text>
+					) }
 				</View>
 			</View>
 		</TouchableOpacity>

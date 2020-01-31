@@ -1,7 +1,7 @@
 const Benchmark = require( 'benchmark' );
 const { __ } = require( '../' );
 
-const suite = new Benchmark.Suite;
+const suite = new Benchmark.Suite();
 
 suite
 	.add( '__', () => {

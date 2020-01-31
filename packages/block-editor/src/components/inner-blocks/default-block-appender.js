@@ -17,19 +17,14 @@ import withClientId from './with-client-id';
 
 export const DefaultBlockAppender = ( { clientId, lastBlockClientId } ) => {
 	return (
-		<BaseDefaultBlockAppender
-			rootClientId={ clientId }
-			lastBlockClientId={ lastBlockClientId }
-		/>
+		<BaseDefaultBlockAppender rootClientId={ clientId } lastBlockClientId={ lastBlockClientId } />
 	);
 };
 
 export default compose( [
 	withClientId,
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlockOrder,
-		} = select( 'core/block-editor' );
+		const { getBlockOrder } = select( 'core/block-editor' );
 
 		const blockClientIds = getBlockOrder( clientId );
 

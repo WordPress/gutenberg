@@ -11,18 +11,19 @@ const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
 } );
 
 // Duplicates parsing functionality from apiFetch.
-const parseResponse = ( response ) => response.json ?
-	response.json() :
-	Promise.reject( response );
+const parseResponse = ( response ) =>
+	response.json ? response.json() : Promise.reject( response );
 
 const parseLinkHeader = ( linkHeader ) => {
 	if ( ! linkHeader ) {
 		return {};
 	}
 	const match = linkHeader.match( /<([^>]+)>; rel="next"/ );
-	return match ? {
-		next: match[ 1 ],
-	} : {};
+	return match
+		? {
+				next: match[ 1 ],
+		  }
+		: {};
 };
 
 const getNextPageUrl = ( response ) => {

@@ -23,10 +23,7 @@ function compare( input, output, options = {} ) {
 describe( 'babel-plugin', function() {
 	it( 'should replace warning calls with import declaration', () => {
 		compare(
-			join(
-				'import warning from "@wordpress/warning";',
-				'warning("a");'
-			),
+			join( 'import warning from "@wordpress/warning";', 'warning("a");' ),
 			join(
 				'import warning from "@wordpress/warning";',
 				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;'
@@ -35,10 +32,7 @@ describe( 'babel-plugin', function() {
 	} );
 
 	it( 'should not replace warning calls without import declaration', () => {
-		compare(
-			'warning("a");',
-			'warning("a");'
-		);
+		compare( 'warning("a");', 'warning("a");' );
 	} );
 
 	it( 'should replace warning calls without import declaration with plugin options', () => {
@@ -55,7 +49,7 @@ describe( 'babel-plugin', function() {
 				'import warning from "@wordpress/warning";',
 				'warning("a");',
 				'warning("b");',
-				'warning("c");',
+				'warning("c");'
 			),
 			join(
 				'import warning from "@wordpress/warning";',
@@ -68,12 +62,7 @@ describe( 'babel-plugin', function() {
 
 	it( 'should identify warning callee name', () => {
 		compare(
-			join(
-				'import warn from "@wordpress/warning";',
-				'warn("a");',
-				'warn("b");',
-				'warn("c");',
-			),
+			join( 'import warn from "@wordpress/warning";', 'warn("a");', 'warn("b");', 'warn("c");' ),
 			join(
 				'import warn from "@wordpress/warning";',
 				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("a") : void 0;',
@@ -85,12 +74,7 @@ describe( 'babel-plugin', function() {
 
 	it( 'should identify warning callee name by ', () => {
 		compare(
-			join(
-				'import warn from "@wordpress/warning";',
-				'warn("a");',
-				'warn("b");',
-				'warn("c");',
-			),
+			join( 'import warn from "@wordpress/warning";', 'warn("a");', 'warn("b");', 'warn("c");' ),
 			join(
 				'import warn from "@wordpress/warning";',
 				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("a") : void 0;',

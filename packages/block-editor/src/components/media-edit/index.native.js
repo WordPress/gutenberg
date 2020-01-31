@@ -2,10 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import {
-	requestMediaEditor,
-	mediaSources,
-} from 'react-native-gutenberg-bridge';
+import { requestMediaEditor, mediaSources } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -72,7 +69,7 @@ export class MediaEdit extends React.Component {
 		const mediaOptions = () => (
 			<Picker
 				hideCancelButton
-				ref={ ( instance ) => this.picker = instance }
+				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }
 				onChange={ this.onPickerSelect }
 			/>

@@ -44,8 +44,12 @@ export function replace( { formats, replacements, text, start, end }, pattern, r
 			}
 		}
 
-		formats = formats.slice( 0, offset ).concat( newFormats, formats.slice( offset + match.length ) );
-		replacements = replacements.slice( 0, offset ).concat( newReplacements, replacements.slice( offset + match.length ) );
+		formats = formats
+			.slice( 0, offset )
+			.concat( newFormats, formats.slice( offset + match.length ) );
+		replacements = replacements
+			.slice( 0, offset )
+			.concat( newReplacements, replacements.slice( offset + match.length ) );
 
 		if ( start ) {
 			start = end = offset + newText.length;

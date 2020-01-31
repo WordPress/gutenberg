@@ -55,11 +55,8 @@ export function validateBlocksToTemplate( action, store ) {
 
 	// Unlocked templates are considered always valid because they act
 	// as default values only.
-	const isBlocksValidToTemplate = (
-		! template ||
-		templateLock !== 'all' ||
-		doBlocksMatchTemplate( action.blocks, template )
-	);
+	const isBlocksValidToTemplate =
+		! template || templateLock !== 'all' || doBlocksMatchTemplate( action.blocks, template );
 
 	// Update if validity has changed.
 	if ( isBlocksValidToTemplate !== isValidTemplate( state ) ) {
@@ -86,7 +83,7 @@ export default {
 		const { clientId, attributeKey, offset } = getSelectionStart( state );
 		const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
 		const attributeDefinition = selectedBlockType.attributes[ attributeKey ];
-		const canRestoreTextSelection = (
+		const canRestoreTextSelection =
 			( clientId === clientIdA || clientId === clientIdB ) &&
 			attributeKey !== undefined &&
 			offset !== undefined &&
@@ -94,8 +91,7 @@ export default {
 			// is not a defined block attribute key. This can be the case if the
 			// fallback intance ID is used to store selection (and no RichText
 			// identifier is set), or when the identifier is wrong.
-			!! attributeDefinition
-		);
+			!! attributeDefinition;
 
 		if ( ! attributeDefinition ) {
 			if ( typeof attributeKey === 'number' ) {
@@ -125,12 +121,17 @@ export default {
 				__unstableMultilineWrapperTags: multilineWrapperTags,
 				__unstablePreserveWhiteSpace: preserveWhiteSpace,
 			} = attributeDefinition;
-			const value = insert( create( {
-				html,
-				multilineTag,
-				multilineWrapperTags,
-				preserveWhiteSpace,
-			} ), START_OF_SELECTED_AREA, offset, offset );
+			const value = insert(
+				create( {
+					html,
+					multilineTag,
+					multilineWrapperTags,
+					preserveWhiteSpace,
+				} ),
+				START_OF_SELECTED_AREA,
+				offset,
+				offset
+			);
 
 			selectedBlock.attributes[ attributeKey ] = toHTMLString( {
 				value,
@@ -141,9 +142,8 @@ export default {
 
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
-		const blocksWithTheSameType = blockA.name === blockB.name ?
-			[ cloneB ] :
-			switchToBlockType( cloneB, blockA.name );
+		const blocksWithTheSameType =
+			blockA.name === blockB.name ? [ cloneB ] : switchToBlockType( cloneB, blockA.name );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
@@ -157,8 +157,9 @@ export default {
 		);
 
 		if ( canRestoreTextSelection ) {
-			const newAttributeKey = findKey( updatedAttributes, ( v ) =>
-				typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
+			const newAttributeKey = findKey(
+				updatedAttributes,
+				( v ) => typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
 			);
 			const convertedHtml = updatedAttributes[ newAttributeKey ];
 			const {
@@ -182,36 +183,34 @@ export default {
 
 			updatedAttributes[ newAttributeKey ] = newHtml;
 
-			dispatch( selectionChange(
-				blockA.clientId,
-				newAttributeKey,
-				newOffset,
-				newOffset
-			) );
+			dispatch( selectionChange( blockA.clientId, newAttributeKey, newOffset, newOffset ) );
 		}
 
-		dispatch( replaceBlocks(
-			[ blockA.clientId, blockB.clientId ],
-			[
-				{
-					...blockA,
-					attributes: {
-						...blockA.attributes,
-						...updatedAttributes,
+		dispatch(
+			replaceBlocks(
+				[ blockA.clientId, blockB.clientId ],
+				[
+					{
+						...blockA,
+						attributes: {
+							...blockA.attributes,
+							...updatedAttributes,
+						},
 					},
-				},
-				...blocksWithTheSameType.slice( 1 ),
-			]
-		) );
+					...blocksWithTheSameType.slice( 1 ),
+				]
+			)
+		);
 	},
-	RESET_BLOCKS: [
-		validateBlocksToTemplate,
-	],
+	RESET_BLOCKS: [ validateBlocksToTemplate ],
 	MULTI_SELECT: ( action, { getState } ) => {
 		const blockCount = getSelectedBlockCount( getState() );
 
 		/* translators: %s: number of selected blocks */
-		speak( sprintf( _n( '%s block selected.', '%s blocks selected.', blockCount ), blockCount ), 'assertive' );
+		speak(
+			sprintf( _n( '%s block selected.', '%s blocks selected.', blockCount ), blockCount ),
+			'assertive'
+		);
 	},
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
 		const state = getState();
