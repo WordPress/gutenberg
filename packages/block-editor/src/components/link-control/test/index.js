@@ -767,7 +767,7 @@ describe( 'Selecting links', () => {
 		);
 	} );
 
-	it( 'does not forcefully regain focus if onChange handler had ', () => {
+	it( 'does not forcefully regain focus if onChange handler had shifted it', () => {
 		// Regression: Previously, there had been issues where if `onChange`
 		// would programmatically shift focus, LinkControl would try to force it
 		// back, based on its internal logic to determine whether it had focus
