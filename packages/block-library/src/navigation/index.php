@@ -122,7 +122,6 @@ function render_submenu_icon() {
 /**
  * Renders the `core/navigation` block on server.
  *
- * @param array $attributes The block attributes.
  * @param array $content The saved content.
  * @param array $block The parsed block.
  *
@@ -267,7 +266,7 @@ function register_block_core_navigation() {
 	register_block_type(
 		'core/navigation',
 		array(
-			'attributes'      => array(
+			'attributes' => array(
 				'className'             => array(
 					'type' => 'string',
 				),
