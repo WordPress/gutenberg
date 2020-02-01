@@ -8,7 +8,7 @@ The [Make WordPress Design blog](https://make.wordpress.org/design/) is the prim
 
 Real-time discussions for design take place in the `#design` channel in [Slack](https://make.wordpress.org/chat). Weekly meetings for Design are on Weds at 19:00UTC.
 
-## How Can Designers Contribute?
+## How Can Designers Contribute
 
 The Gutenberg project uses Github for managing code and tracking issues. The main repository is at: [https://github.com/WordPress/gutenberg](https://github.com/WordPress/gutenberg).
 
