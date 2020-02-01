@@ -292,8 +292,8 @@ function LinkControl( {
 							) }
 							suggestion={ suggestion }
 							onClick={ () => {
-								stopEditing();
 								onChange( { ...value, ...suggestion } );
+								stopEditing();
 							} }
 							isSelected={ index === selectedSuggestion }
 							isURL={ manualLinkEntryTypes.includes(
@@ -318,8 +318,8 @@ function LinkControl( {
 					value={ inputValue }
 					onChange={ onInputChange }
 					onSelect={ ( suggestion ) => {
-						stopEditing();
 						onChange( { ...value, ...suggestion } );
+						stopEditing();
 					} }
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
