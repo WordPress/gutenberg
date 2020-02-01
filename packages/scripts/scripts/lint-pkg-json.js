@@ -28,8 +28,8 @@ const hasLintConfig =
 	hasProjectFile( '.npmpackagejsonlintrc.json' ) ||
 	hasProjectFile( '.npmpackagejsonlintrc.yaml' ) ||
 	hasProjectFile( '.npmpackagejsonlintrc.yml' ) ||
-	hasProjectFile( '.npmpackagejsonlintrc' ) ||
 	hasProjectFile( 'npmpackagejsonlint.config.js' ) ||
+	hasProjectFile( '.npmpackagejsonlintrc' ) ||
 	hasPackageProp( 'npmpackagejsonlint' ) ||
 	// npm-package-json-lint v3.x used a different prop name.
 	hasPackageProp( 'npmPackageJsonLintConfig' );

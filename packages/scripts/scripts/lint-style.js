@@ -27,8 +27,8 @@ const hasLintConfig =
 	hasProjectFile( '.stylelintrc.json' ) ||
 	hasProjectFile( '.stylelintrc.yaml' ) ||
 	hasProjectFile( '.stylelintrc.yml' ) ||
-	hasProjectFile( '.stylelintrc' ) ||
 	hasProjectFile( 'stylelint.config.js' ) ||
+	hasProjectFile( '.stylelintrc' ) ||
 	hasPackageProp( 'stylelint' );
 
 const defaultConfigArgs = ! hasLintConfig
