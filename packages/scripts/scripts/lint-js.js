@@ -25,9 +25,10 @@ const hasLintConfig =
 	hasArgInCLI( '-c' ) ||
 	hasArgInCLI( '--config' ) ||
 	hasProjectFile( '.eslintrc.js' ) ||
+	hasProjectFile( '.eslintrc.json' ) ||
 	hasProjectFile( '.eslintrc.yaml' ) ||
 	hasProjectFile( '.eslintrc.yml' ) ||
-	hasProjectFile( '.eslintrc.json' ) ||
+	hasProjectFile( 'eslintrc.config.js' ) ||
 	hasProjectFile( '.eslintrc' ) ||
 	hasPackageProp( 'eslintConfig' );
 
