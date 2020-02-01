@@ -138,6 +138,7 @@ function Navigation( {
 	const blockClassNames = classnames( className, {
 		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 		[ fontSize.class ]: fontSize.class,
+		[ attributes.className ]: attributes.className,
 	} );
 	const blockInlineStyles = {
 		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
