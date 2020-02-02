@@ -26,7 +26,8 @@ const hasLintConfig =
 	hasArgInCLI( '--config' ) ||
 	hasProjectFile( '.markdownlint.json' ) ||
 	hasProjectFile( '.markdownlint.yaml' ) ||
-	hasProjectFile( '.markdownlint.yml' );
+	hasProjectFile( '.markdownlint.yml' ) ||
+	hasProjectFile( '.markdownlintrc' );
 
 // When a configuration is not provided by the project, use from the default
 // provided with the scripts module.

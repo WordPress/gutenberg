@@ -61,13 +61,13 @@ function checkPrettier() {
 
 	// See: https://prettier.io/docs/en/configuration.html
 	const hasProjectPrettierConfig =
-		hasProjectFile( '.prettierrc' ) ||
+		hasProjectFile( '.prettierrc.js' ) ||
 		hasProjectFile( '.prettierrc.json' ) ||
+		hasProjectFile( '.prettierrc.toml' ) ||
 		hasProjectFile( '.prettierrc.yaml' ) ||
 		hasProjectFile( '.prettierrc.yml' ) ||
-		hasProjectFile( '.prettierrc.js' ) ||
-		hasProjectFile( '.prettierrc.config.js' ) ||
-		hasProjectFile( '.prettierrc.toml' ) ||
+		hasProjectFile( 'prettier.config.js' ) ||
+		hasProjectFile( '.prettierrc' ) ||
 		hasPackageProp( 'prettier' );
 
 	if ( ! hasProjectPrettierConfig ) {

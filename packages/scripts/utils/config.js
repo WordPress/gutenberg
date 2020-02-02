@@ -15,10 +15,13 @@ const {
 const { fromConfigRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
 
+// See https://babeljs.io/docs/en/config-files#configuration-file-types
 const hasBabelConfig = () =>
-	hasProjectFile( '.babelrc' ) ||
 	hasProjectFile( '.babelrc.js' ) ||
+	hasProjectFile( '.babelrc.json' ) ||
 	hasProjectFile( 'babel.config.js' ) ||
+	hasProjectFile( 'babel.config.json' ) ||
+	hasProjectFile( '.babelrc' ) ||
 	hasPackageProp( 'babel' );
 
 const hasJestConfig = () =>

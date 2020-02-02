@@ -20,12 +20,16 @@ const args = getArgsFromCLI();
 
 const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '.' ];
 
-// See: https://github.com/tclindner/npm-package-json-lint/wiki/configuration#configuration.
+// See: https://npmpackagejsonlint.org/docs/en/configuration
 const hasLintConfig =
 	hasArgInCLI( '-c' ) ||
 	hasArgInCLI( '--configFile' ) ||
+	hasProjectFile( '.npmpackagejsonlintrc.js' ) ||
 	hasProjectFile( '.npmpackagejsonlintrc.json' ) ||
+	hasProjectFile( '.npmpackagejsonlintrc.yaml' ) ||
+	hasProjectFile( '.npmpackagejsonlintrc.yml' ) ||
 	hasProjectFile( 'npmpackagejsonlint.config.js' ) ||
+	hasProjectFile( '.npmpackagejsonlintrc' ) ||
 	hasPackageProp( 'npmpackagejsonlint' ) ||
 	// npm-package-json-lint v3.x used a different prop name.
 	hasPackageProp( 'npmPackageJsonLintConfig' );
