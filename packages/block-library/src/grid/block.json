@@ -1,0 +1,23 @@
+{
+	"name": "core/grid",
+	"category": "layout",
+	"supports": { "align": true },
+	"attributes": {
+		"grid": {
+			"type": "array",
+			"default": []
+		},
+		"breakpoint": {
+			"type": "string",
+			"default": "small"
+		},
+		"cols": {
+			"type": "number",
+			"default": 2
+		},
+		"rows": {
+			"type": "number",
+			"default": 2
+		}
+	}
+}

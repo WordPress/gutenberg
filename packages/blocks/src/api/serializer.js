@@ -134,7 +134,7 @@ export function getSaveElement(
 	);
 
 	return (
-		<BlockContentProvider innerBlocks={ innerBlocks }>
+		<BlockContentProvider attributes={ attributes } innerBlocks={ innerBlocks }>
 			{ element }
 		</BlockContentProvider>
 	);

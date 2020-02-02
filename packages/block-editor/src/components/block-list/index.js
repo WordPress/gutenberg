@@ -6,8 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
+import { Toolbar } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { BREAKPOINTS } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -16,6 +19,8 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import RootContainer from './root-container';
 import useBlockDropZone from '../block-drop-zone';
+import BlockGrid from './grid';
+import BlockControls from '../block-controls';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -37,6 +42,7 @@ function BlockList( {
 	isDraggable,
 	renderAppender,
 	__experimentalUIParts = {},
+	__experimentalGridMode,
 } ) {
 	function selector( select ) {
 		const {
@@ -47,8 +53,9 @@ function BlockList( {
 			hasMultiSelection,
 			getGlobalBlockCount,
 			isTyping,
+			getBlockAttributes,
 		} = select( 'core/block-editor' );
-
+		const attributes = getBlockAttributes( rootClientId ) || {};
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
 			isMultiSelecting: isMultiSelecting(),
@@ -58,6 +65,10 @@ function BlockList( {
 			enableAnimation:
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+			attributes,
+			gridModeEnabled: select( 'core/viewport' ).isViewportMatch(
+				attributes.breakpoint || 'small'
+			),
 		};
 	}
 
@@ -68,7 +79,10 @@ function BlockList( {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		enableAnimation,
+		attributes,
+		gridModeEnabled,
 	} = useSelect( selector, [ rootClientId ] );
+	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 
 	const Container = rootClientId ? 'div' : RootContainer;
 	const ref = useRef();
@@ -79,6 +93,79 @@ function BlockList( {
 	const __experimentalContainerProps = rootClientId
 		? {}
 		: { hasPopover: __experimentalUIParts.hasPopover };
+
+	const gridModeControls = __experimentalGridMode ? (
+		<BlockControls>
+			<Toolbar
+				icon="smartphone"
+				label={ __( 'Change breakpoint' ) }
+				controls={ Object.keys( BREAKPOINTS ).map(
+					( _breakpoint ) => ( {
+						title: `${ _breakpoint } (>= ${ BREAKPOINTS[ _breakpoint ] }px)`,
+						isActive: attributes.breakpoint === _breakpoint,
+						onClick: () =>
+							updateBlockAttributes( rootClientId, {
+								breakpoint: _breakpoint,
+							} ),
+					} )
+				) }
+				isCollapsed
+			/>
+			<Toolbar
+				icon="image-flip-horizontal"
+				label={ __( 'Change number of columns' ) }
+				controls={ [ 2, 3, 4 ].map( ( cols ) => ( {
+					title: cols,
+					isActive: attributes.cols === cols,
+					onClick: () =>
+						updateBlockAttributes( rootClientId, {
+							cols,
+						} ),
+				} ) ) }
+				isCollapsed
+			/>
+			<Toolbar
+				icon="image-flip-vertical"
+				label={ __( 'Change number of rows' ) }
+				controls={ [ 2, 3, 4 ].map( ( rows ) => ( {
+					title: rows,
+					isActive: attributes.rows === rows,
+					onClick: () =>
+						updateBlockAttributes( rootClientId, {
+							rows,
+						} ),
+				} ) ) }
+				isCollapsed
+			/>
+		</BlockControls>
+	) : null;
+
+	if ( __experimentalGridMode && gridModeEnabled ) {
+		return (
+			<Container
+				ref={ ref }
+				className={ classnames(
+					'block-editor-block-list__layout',
+					className
+				) }
+			>
+				<BlockGrid
+					rootClientId={ rootClientId }
+					blockClientIds={ blockClientIds }
+					className={ className }
+					hasMultiSelection={ hasMultiSelection }
+					multiSelectedBlockClientIds={ multiSelectedBlockClientIds }
+					selectedBlockClientId={ selectedBlockClientId }
+					isDraggable={ isDraggable }
+					isMultiSelecting={ isMultiSelecting }
+					enableAnimation={ enableAnimation }
+					__experimentalUIParts={ __experimentalUIParts }
+					targetClientId={ targetClientId }
+				/>
+				{ gridModeControls }
+			</Container>
+		);
+	}
 
 	return (
 		<Container
@@ -128,6 +215,7 @@ function BlockList( {
 					targetClientId === null ? 'is-drop-target' : undefined
 				}
 			/>
+			{ gridModeControls }
 		</Container>
 	);
 }
@@ -135,4 +223,6 @@ function BlockList( {
 // This component needs to always be synchronous
 // as it's the one changing the async mode
 // depending on the block selection.
-export default forceSyncUpdates( BlockList );
+BlockList = forceSyncUpdates( BlockList );
+BlockList.GridContent = BlockGrid.Content;
+export default BlockList;

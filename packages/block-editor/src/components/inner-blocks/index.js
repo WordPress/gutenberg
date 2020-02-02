@@ -232,9 +232,14 @@ InnerBlocks = compose( [
 InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
-InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
-	<BlockContent />
-) );
+InnerBlocks.Content = withBlockContentContext(
+	( { BlockContent, __experimentalGridMode } ) =>
+		__experimentalGridMode ? (
+			<BlockList.GridContent attributes={ BlockContent.attributes } innerBlocks={ BlockContent.innerBlocks } />
+		) : (
+			<BlockContent />
+		)
+);
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
