@@ -103,7 +103,7 @@ class ModalFrame extends Component {
 			this.focusFirstTabbable();
 		} else {
 			this.containerRef.current.focus();
-		}			
+		}
 	}
 
 	/**
@@ -116,8 +116,11 @@ class ModalFrame extends Component {
 		} else {
 			this.containerRef.current.focus();
 		}
+<<<<<<< HEAD
 		return true;
 >>>>>>> 93e0cff0be (Allow the focusOnMount prop to be either boolean or string)
+=======
+>>>>>>> d44204c5c8 (Remove added return from focusFirstTabbable)
 	}
 
 	/**
