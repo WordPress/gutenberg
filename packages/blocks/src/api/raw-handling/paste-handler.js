@@ -111,7 +111,7 @@ function htmlToBlocks( { html, rawTransforms, canUserUseUnfilteredHTML } ) {
 		}
 
 		if (
-			canUserUseUnfilteredHTML &&
+			! canUserUseUnfilteredHTML &&
 			checkForUntransformedIframe( rawTransform, node )
 		) {
 			return [];
