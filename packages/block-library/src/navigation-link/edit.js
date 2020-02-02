@@ -194,7 +194,14 @@ function NavigationLinkEdit( {
 					backgroundColor: rgbBackgroundColor,
 				} }
 			>
-				<div className="wp-block-navigation-link__content">
+				<div
+					className={ classnames(
+						'wp-block-navigation-link__content',
+						{
+							[ attributes.className ]: attributes.className,
+						}
+					) }
+				>
 					<RichText
 						ref={ ref }
 						tagName="span"

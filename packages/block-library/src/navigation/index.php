@@ -194,7 +194,8 @@ function core_block_navigation_build_html( $attributes, $block, $colors, $font_s
 	$html            = '';
 	$classes         = array_merge(
 		$colors['css_classes'],
-		$font_sizes['css_classes']
+		$font_sizes['css_classes'],
+		isset( $block['attrs']['className'] ) ? array( $block['attrs']['className'] ) : array()
 	);
 	$classes[]       = 'wp-block-navigation-link';
 	$css_classes     = trim( implode( ' ', $classes ) );
