@@ -15,3 +15,12 @@ export default function( node ) {
 		remove( node );
 	}
 }
+
+export function checkForUntransformedIframe( rawTransform, node ) {
+	const frameRegex = /(?:<iframe[^>]*)(?:(?:\/>)|(?:>.*?<\/iframe>))/gi;
+	return (
+		rawTransform &&
+		frameRegex.exec( node.innerHTML ) &&
+		rawTransform.blockName === 'core/html'
+	);
+}

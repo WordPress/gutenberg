@@ -23,7 +23,7 @@ import blockquoteNormaliser from './blockquote-normaliser';
 import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
 import markdownConverter from './markdown-converter';
-import iframeRemover from './iframe-remover';
+import { checkForUntransformedIframe } from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
 import htmlFormattingRemover from './html-formatting-remover';
 import brRemover from './br-remover';
@@ -88,10 +88,11 @@ function getRawTransformations() {
  * @param  {Object} $1               Named parameters.
  * @param  {string} $1.html          HTML to convert.
  * @param  {Array}  $1.rawTransforms Transforms that can be used.
+ * @param {boolean} $1.canUserUseUnfilteredHTML Whether or not the user can use unfiltered HTML.
  *
  * @return {Array} An array of blocks.
  */
-function htmlToBlocks( { html, rawTransforms } ) {
+function htmlToBlocks( { html, rawTransforms, canUserUseUnfilteredHTML } ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 
 	doc.body.innerHTML = html;
@@ -107,6 +108,13 @@ function htmlToBlocks( { html, rawTransforms } ) {
 				'core/html',
 				getBlockAttributes( 'core/html', node.outerHTML )
 			);
+		}
+
+		if (
+			canUserUseUnfilteredHTML &&
+			checkForUntransformedIframe( rawTransform, node )
+		) {
+			return [];
 		}
 
 		const { transform, blockName } = rawTransform;
@@ -247,11 +255,6 @@ export function pasteHandler( {
 				blockquoteNormaliser,
 			];
 
-			if ( ! canUserUseUnfilteredHTML ) {
-				// Should run before `figureContentReducer`.
-				filters.unshift( iframeRemover );
-			}
-
 			const schema = {
 				...blockContentSchema,
 				// Keep top-level phrasing content, normalised by `normaliseBlocks`.
@@ -270,7 +273,11 @@ export function pasteHandler( {
 			// Allows us to ask for this information when we get a report.
 			console.log( 'Processed HTML piece:\n\n', piece );
 
-			return htmlToBlocks( { html: piece, rawTransforms } );
+			return htmlToBlocks( {
+				html: piece,
+				rawTransforms,
+				canUserUseUnfilteredHTML,
+			} );
 		} )
 	);
 
