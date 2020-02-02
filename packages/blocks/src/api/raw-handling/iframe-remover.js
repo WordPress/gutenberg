@@ -20,7 +20,8 @@ export function checkForUntransformedIframe( rawTransform, node ) {
 	const frameRegex = /(?:<iframe[^>]*)(?:(?:\/>)|(?:>.*?<\/iframe>))/gi;
 	return (
 		rawTransform &&
-		frameRegex.exec( node.innerHTML ) &&
-		rawTransform.blockName === 'core/html'
+		node.nodeName === 'FIGURE' &&
+		rawTransform.blockName === 'core/html' &&
+		frameRegex.exec( node.innerHTML )
 	);
 }
