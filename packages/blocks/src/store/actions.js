@@ -3,6 +3,8 @@
  */
 import { castArray } from 'lodash';
 
+/** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
+
 /**
  * Returns an action object used in signalling that block types have been added.
  *
@@ -87,7 +89,10 @@ export function __experimentalAddBlockVariations( blockName, variations ) {
  *
  * @return {Object} Action object.
  */
-export function __experimentalRemoveBlockVariations( blockName, variationNames ) {
+export function __experimentalRemoveBlockVariations(
+	blockName,
+	variationNames
+) {
 	return {
 		type: 'REMOVE_BLOCK_VARIATIONS',
 		variationNames: castArray( variationNames ),

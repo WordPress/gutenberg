@@ -14,6 +14,8 @@ import {
 	some,
 } from 'lodash';
 
+/** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
+
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
 
 /**
