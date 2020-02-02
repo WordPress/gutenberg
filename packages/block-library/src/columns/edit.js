@@ -14,7 +14,7 @@ import {
 	InnerBlocks,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
-	__experimentalBlockPatternPicker,
+	__experimentalBlockVariationPicker,
 	__experimentalUseColors,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
@@ -210,24 +210,29 @@ const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, name } = props;
-	const { blockType, defaultPattern, hasInnerBlocks, patterns } = useSelect(
+	const {
+		blockType,
+		defaultVariation,
+		hasInnerBlocks,
+		variations,
+	} = useSelect(
 		( select ) => {
 			const {
-				__experimentalGetBlockPatterns,
+				__experimentalGetBlockVariations,
 				getBlockType,
-				__experimentalGetDefaultBlockPattern,
+				__experimentalGetDefaultBlockVariation,
 			} = select( 'core/blocks' );
 
 			return {
 				blockType: getBlockType( name ),
-				defaultPattern: __experimentalGetDefaultBlockPattern(
+				defaultVariation: __experimentalGetDefaultBlockVariation(
 					name,
 					'block'
 				),
 				hasInnerBlocks:
 					select( 'core/block-editor' ).getBlocks( clientId ).length >
 					0,
-				patterns: __experimentalGetBlockPatterns( name, 'block' ),
+				variations: __experimentalGetBlockVariations( name, 'block' ),
 			};
 		},
 		[ clientId, name ]
@@ -240,19 +245,19 @@ const ColumnsEdit = ( props ) => {
 	}
 
 	return (
-		<__experimentalBlockPatternPicker
+		<__experimentalBlockVariationPicker
 			icon={ get( blockType, [ 'icon', 'src' ] ) }
 			label={ get( blockType, [ 'title' ] ) }
-			patterns={ patterns }
-			onSelect={ ( nextPattern = defaultPattern ) => {
-				if ( nextPattern.attributes ) {
-					props.setAttributes( nextPattern.attributes );
+			variations={ variations }
+			onSelect={ ( nextVariation = defaultVariation ) => {
+				if ( nextVariation.attributes ) {
+					props.setAttributes( nextVariation.attributes );
 				}
-				if ( nextPattern.innerBlocks ) {
+				if ( nextVariation.innerBlocks ) {
 					replaceInnerBlocks(
 						props.clientId,
 						createBlocksFromInnerBlocksTemplate(
-							nextPattern.innerBlocks
+							nextVariation.innerBlocks
 						)
 					);
 				}

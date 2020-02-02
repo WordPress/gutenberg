@@ -24,26 +24,26 @@ export const textItem = {
 	utility: 1,
 };
 
-export const withPatternsItem = {
-	id: 'core/block-with-patterns',
-	name: 'core/block-with-patterns',
+export const withVariationsItem = {
+	id: 'core/block-with-variations',
+	name: 'core/block-with-variations',
 	initialAttributes: {},
-	title: 'With Patterns',
+	title: 'With Variations',
 	category: 'widgets',
 	isDisabled: false,
 	utility: 0,
-	patterns: [
+	variations: [
 		{
-			name: 'pattern-one',
-			title: 'Pattern One',
+			name: 'variation-one',
+			title: 'Variation One',
 		},
 		{
-			name: 'pattern-two',
-			title: 'Pattern Two',
+			name: 'variation-two',
+			title: 'Variation Two',
 		},
 		{
-			name: 'pattern-three',
-			title: 'Pattern Three',
+			name: 'variation-three',
+			title: 'Variation Three',
 		},
 	],
 };
@@ -111,7 +111,7 @@ export const reusableItem = {
 
 export default [
 	textItem,
-	withPatternsItem,
+	withVariationsItem,
 	advancedTextItem,
 	someOtherItem,
 	moreItem,

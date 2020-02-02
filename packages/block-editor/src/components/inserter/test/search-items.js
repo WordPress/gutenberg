@@ -73,31 +73,33 @@ describe( 'searchItems', () => {
 		).toEqual( [ youtubeItem ] );
 	} );
 
-	it( 'should match words using also patterns and return all matched patterns', () => {
+	it( 'should match words using also variations and return all matched variations', () => {
 		const filteredItems = searchItems(
 			items,
 			categories,
 			collections,
-			'pattern'
+			'variation'
 		);
 
 		expect( filteredItems ).toHaveLength( 1 );
-		expect( filteredItems[ 0 ].patterns ).toHaveLength( 3 );
+		expect( filteredItems[ 0 ].variations ).toHaveLength( 3 );
 	} );
 
-	it( 'should match words using also patterns and filter out unmatched patterns', () => {
+	it( 'should match words using also variations and filter out unmatched variations', () => {
 		const filteredItems = searchItems(
 			items,
 			categories,
 			collections,
-			'patterns two three'
+			'variations two three'
 		);
 
 		expect( filteredItems ).toHaveLength( 1 );
-		expect( filteredItems[ 0 ].patterns ).toHaveLength( 2 );
-		expect( filteredItems[ 0 ].patterns[ 0 ].title ).toBe( 'Pattern Two' );
-		expect( filteredItems[ 0 ].patterns[ 1 ].title ).toBe(
-			'Pattern Three'
+		expect( filteredItems[ 0 ].variations ).toHaveLength( 2 );
+		expect( filteredItems[ 0 ].variations[ 0 ].title ).toBe(
+			'Variation Two'
+		);
+		expect( filteredItems[ 0 ].variations[ 1 ].title ).toBe(
+			'Variation Three'
 		);
 	} );
 } );

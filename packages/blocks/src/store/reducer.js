@@ -109,14 +109,14 @@ export function blockStyles( state = {}, action ) {
 }
 
 /**
- * Reducer managing the block patterns.
+ * Reducer managing the block variations.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function blockPatterns( state = {}, action ) {
+export function blockVariations( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
@@ -126,32 +126,32 @@ export function blockPatterns( state = {}, action ) {
 					( blockType ) => {
 						return uniqBy(
 							[
-								...get( blockType, [ 'patterns' ], [] ),
+								...get( blockType, [ 'variations' ], [] ),
 								...get( state, [ blockType.name ], [] ),
 							],
-							( pattern ) => pattern.name
+							( variation ) => variation.name
 						);
 					}
 				),
 			};
-		case 'ADD_BLOCK_PATTERNS':
+		case 'ADD_BLOCK_VARIATIONS':
 			return {
 				...state,
 				[ action.blockName ]: uniqBy(
 					[
 						...get( state, [ action.blockName ], [] ),
-						...action.patterns,
+						...action.variations,
 					],
-					( pattern ) => pattern.name
+					( variation ) => variation.name
 				),
 			};
-		case 'REMOVE_BLOCK_PATTERNS':
+		case 'REMOVE_BLOCK_VARIATIONS':
 			return {
 				...state,
 				[ action.blockName ]: filter(
 					get( state, [ action.blockName ], [] ),
-					( pattern ) =>
-						action.patternNames.indexOf( pattern.name ) === -1
+					( variation ) =>
+						action.variationNames.indexOf( variation.name ) === -1
 				),
 			};
 	}
@@ -248,7 +248,7 @@ export function collections( state = {}, action ) {
 export default combineReducers( {
 	blockTypes,
 	blockStyles,
-	blockPatterns,
+	blockVariations,
 	defaultBlockName,
 	freeformFallbackBlockName,
 	unregisteredFallbackBlockName,
