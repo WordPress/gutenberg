@@ -25,7 +25,9 @@ const Caption = ( {
 } ) => (
 	<View
 		accessibilityLabel={
-			accessibilityLabelCreator ? accessibilityLabelCreator( value ) : undefined
+			accessibilityLabelCreator
+				? accessibilityLabelCreator( value )
+				: undefined
 		}
 		accessibilityRole="button"
 		accessible={ accessible }

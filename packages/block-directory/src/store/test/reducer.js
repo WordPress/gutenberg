@@ -39,7 +39,9 @@ describe( 'state', () => {
 				downloadableBlocks: [ downloadableBlock ],
 			} );
 			expect( state.results ).toHaveProperty( downloadableBlock.title );
-			expect( state.results[ downloadableBlock.title ] ).toHaveLength( 1 );
+			expect( state.results[ downloadableBlock.title ] ).toHaveLength(
+				1
+			);
 
 			// It should append to the results
 			const updatedState = downloadableBlocks( state, {

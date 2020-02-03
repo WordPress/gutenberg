@@ -31,7 +31,8 @@ const BUNDLED_PACKAGES = [ '@wordpress/icons' ];
 const gutenbergPackages = Object.keys( dependencies )
 	.filter(
 		( packageName ) =>
-			! BUNDLED_PACKAGES.includes( packageName ) && packageName.startsWith( WORDPRESS_NAMESPACE )
+			! BUNDLED_PACKAGES.includes( packageName ) &&
+			packageName.startsWith( WORDPRESS_NAMESPACE )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
@@ -62,9 +63,14 @@ module.exports = {
 		new DefinePlugin( {
 			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
 			'process.env.GUTENBERG_PHASE': JSON.stringify(
-				parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1
+				parseInt(
+					process.env.npm_package_config_GUTENBERG_PHASE,
+					10
+				) || 1
 			),
-			'process.env.FORCE_REDUCED_MOTION': JSON.stringify( process.env.FORCE_REDUCED_MOTION ),
+			'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
+				process.env.FORCE_REDUCED_MOTION
+			),
 		} ),
 		new CustomTemplatedPathPlugin( {
 			basename( path, data ) {
@@ -119,7 +125,10 @@ module.exports = {
 								],
 							} ),
 						] )
-							.process( content, { from: 'src/app.css', to: 'dest/app.css' } )
+							.process( content, {
+								from: 'src/app.css',
+								to: 'dest/app.css',
+							} )
 							.then( ( result ) => result.css );
 					}
 					return content;
@@ -129,7 +138,9 @@ module.exports = {
 		new CopyWebpackPlugin( [
 			{
 				from: './packages/block-library/src/**/index.php',
-				test: new RegExp( `([\\w-]+)${ escapeRegExp( sep ) }index\\.php$` ),
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }index\\.php$`
+				),
 				to: 'build/block-library/blocks/[1].php',
 				transform( content ) {
 					content = content.toString();
@@ -147,7 +158,9 @@ module.exports = {
 								// other core prefix (e.g. "wp_").
 								return result.replace(
 									new RegExp( functionName, 'g' ),
-									( match ) => 'gutenberg_' + match.replace( /^wp_/, '' )
+									( match ) =>
+										'gutenberg_' +
+										match.replace( /^wp_/, '' )
 								);
 							}, content )
 							// The core blocks override procedure takes place in
@@ -167,7 +180,9 @@ module.exports = {
 			},
 			{
 				from: './packages/block-library/src/*/block.json',
-				test: new RegExp( `([\\w-]+)${ escapeRegExp( sep ) }block\\.json$` ),
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }block\\.json$`
+				),
 				to: 'build/block-library/blocks/[1]/block.json',
 			},
 		] ),

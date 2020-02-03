@@ -102,7 +102,9 @@ describe( 'Links', () => {
 	it( 'can be created instantly when a URL is selected', async () => {
 		// Create a block with some text
 		await clickBlockAppender();
-		await page.keyboard.type( 'This is Gutenberg: https://wordpress.org/gutenberg' );
+		await page.keyboard.type(
+			'This is Gutenberg: https://wordpress.org/gutenberg'
+		);
 
 		// Select the URL
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
@@ -191,7 +193,9 @@ describe( 'Links', () => {
 	const toggleFixedToolbar = async ( isFixed ) => {
 		await page.evaluate( ( _isFixed ) => {
 			const { select, dispatch } = wp.data;
-			const isCurrentlyFixed = select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
+			const isCurrentlyFixed = select( 'core/edit-post' ).isFeatureActive(
+				'fixedToolbar'
+			);
 			if ( isCurrentlyFixed !== _isFixed ) {
 				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
 			}
@@ -264,9 +268,14 @@ describe( 'Links', () => {
 		await page.click( '.editor-post-publish-button' );
 
 		// Return the URL of the new post
-		await page.waitForSelector( '.post-publish-panel__postpublish-post-address input' );
+		await page.waitForSelector(
+			'.post-publish-panel__postpublish-post-address input'
+		);
 		return page.evaluate(
-			() => document.querySelector( '.post-publish-panel__postpublish-post-address input' ).value
+			() =>
+				document.querySelector(
+					'.post-publish-panel__postpublish-post-address input'
+				).value
 		);
 	};
 
@@ -351,10 +360,16 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'K' );
 		await waitForAutoFocus();
 		const activeElementParentClasses = await page.evaluate( () =>
-			Object.values( document.activeElement.parentElement.parentElement.classList )
+			Object.values(
+				document.activeElement.parentElement.parentElement.classList
+			)
 		);
-		expect( activeElementParentClasses ).toContain( 'block-editor-url-input' );
-		const activeElementValue = await page.evaluate( () => document.activeElement.value );
+		expect( activeElementParentClasses ).toContain(
+			'block-editor-url-input'
+		);
+		const activeElementValue = await page.evaluate(
+			() => document.activeElement.value
+		);
 		expect( activeElementValue ).toBe( URL );
 	} );
 
@@ -402,7 +417,9 @@ describe( 'Links', () => {
 
 		await page.mouse.move( bounds.x, bounds.y );
 		await page.mouse.down();
-		await page.mouse.move( bounds.x + bounds.width / 2, bounds.y, { steps: 10 } );
+		await page.mouse.move( bounds.x + bounds.width / 2, bounds.y, {
+			steps: 10,
+		} );
 		await page.mouse.up();
 
 		// The link popover should still be visible
@@ -472,7 +489,9 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 		await page.keyboard.press( 'Tab' );
-		const isChecked = await page.evaluate( () => document.activeElement.checked );
+		const isChecked = await page.evaluate(
+			() => document.activeElement.checked
+		);
 		expect( isChecked ).toBe( false );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

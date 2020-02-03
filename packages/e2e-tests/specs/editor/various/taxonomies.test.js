@@ -46,9 +46,11 @@ describe( 'Taxonomies', () => {
 		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
 		return page.evaluate(
 			( node, selector ) => {
-				return Array.from( node.querySelectorAll( selector ) ).map( ( field ) => {
-					return field.innerText;
-				} );
+				return Array.from( node.querySelectorAll( selector ) ).map(
+					( field ) => {
+						return field.innerText;
+					}
+				);
 			},
 			tagsPanel,
 			TAG_TOKEN_SELECTOR
@@ -74,10 +76,14 @@ describe( 'Taxonomies', () => {
 			return;
 		}
 
-		await page.waitForSelector( 'button.editor-post-taxonomies__hierarchical-terms-add' );
+		await page.waitForSelector(
+			'button.editor-post-taxonomies__hierarchical-terms-add'
+		);
 
 		// Click add new category button.
-		await page.click( 'button.editor-post-taxonomies__hierarchical-terms-add' );
+		await page.click(
+			'button.editor-post-taxonomies__hierarchical-terms-add'
+		);
 
 		// Type the category name in the field.
 		await page.type(
@@ -86,7 +92,9 @@ describe( 'Taxonomies', () => {
 		);
 
 		// Click the submit button.
-		await page.click( '.editor-post-taxonomies__hierarchical-terms-submit' );
+		await page.click(
+			'.editor-post-taxonomies__hierarchical-terms-submit'
+		);
 
 		// Wait for the categories to load.
 		await page.waitForSelector(
@@ -136,7 +144,9 @@ describe( 'Taxonomies', () => {
 		expect( await page.$$( TAG_TOKEN_SELECTOR ) ).toHaveLength( 0 );
 
 		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
-		const tagInput = await tagsPanel.$( '.components-form-token-field__input' );
+		const tagInput = await tagsPanel.$(
+			'.components-form-token-field__input'
+		);
 
 		// Click the tag input field.
 		await tagInput.click();

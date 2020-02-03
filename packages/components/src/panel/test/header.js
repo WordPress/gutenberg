@@ -12,7 +12,9 @@ describe( 'PanelHeader', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render PanelHeader with empty div inside', () => {
 			const panelHeader = shallow( <PanelHeader /> );
-			expect( panelHeader.hasClass( 'components-panel__header' ) ).toBe( true );
+			expect( panelHeader.hasClass( 'components-panel__header' ) ).toBe(
+				true
+			);
 			expect( panelHeader.type() ).toBe( 'div' );
 			expect(
 				panelHeader
@@ -41,7 +43,9 @@ describe( 'PanelHeader', () => {
 		} );
 
 		it( 'should render both child elements and label when passed in', () => {
-			const panelHeader = shallow( <PanelHeader label="Some Label" children="Some Text" /> );
+			const panelHeader = shallow(
+				<PanelHeader label="Some Label" children="Some Text" />
+			);
 			expect(
 				panelHeader
 					.find( 'div' )

@@ -33,7 +33,9 @@ export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlock } = select( 'core/block-editor' );
+		const { getSelectedBlockClientId, getBlock } = select(
+			'core/block-editor'
+		);
 
 		const { getGroupingBlockName } = select( 'core/blocks' );
 

@@ -12,7 +12,9 @@ import { DotTip } from '..';
 describe( 'DotTip', () => {
 	it( 'should not render anything if invisible', () => {
 		const wrapper = shallow(
-			<DotTip>It looks like you’re writing a letter. Would you like help?</DotTip>
+			<DotTip>
+				It looks like you’re writing a letter. Would you like help?
+			</DotTip>
 		);
 		expect( wrapper.isEmptyRender() ).toBe( true );
 	} );

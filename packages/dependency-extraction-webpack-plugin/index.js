@@ -9,7 +9,10 @@ const { RawSource } = require( 'webpack-sources' );
 /**
  * Internal dependencies
  */
-const { defaultRequestToExternal, defaultRequestToHandle } = require( './util' );
+const {
+	defaultRequestToExternal,
+	defaultRequestToHandle,
+} = require( './util' );
 
 class DependencyExtractionWebpackPlugin {
 	constructor( options ) {
@@ -30,7 +33,10 @@ class DependencyExtractionWebpackPlugin {
 		this.externalizedDeps = new Set();
 
 		// Offload externalization work to the ExternalsPlugin.
-		this.externalsPlugin = new ExternalsPlugin( 'this', this.externalizeWpDeps.bind( this ) );
+		this.externalsPlugin = new ExternalsPlugin(
+			'this',
+			this.externalizeWpDeps.bind( this )
+		);
 	}
 
 	externalizeWpDeps( context, request, callback ) {
@@ -42,7 +48,10 @@ class DependencyExtractionWebpackPlugin {
 		}
 
 		// Cascade to default if unhandled and enabled
-		if ( typeof externalRequest === 'undefined' && this.options.useDefaults ) {
+		if (
+			typeof externalRequest === 'undefined' &&
+			this.options.useDefaults
+		) {
 			externalRequest = defaultRequestToExternal( request );
 		}
 
@@ -78,7 +87,9 @@ class DependencyExtractionWebpackPlugin {
 
 	stringify( asset ) {
 		if ( this.options.outputFormat === 'php' ) {
-			return `<?php return ${ json2php( JSON.parse( JSON.stringify( asset ) ) ) };`;
+			return `<?php return ${ json2php(
+				JSON.parse( JSON.stringify( asset ) )
+			) };`;
 		}
 
 		return JSON.stringify( asset );
@@ -94,7 +105,10 @@ class DependencyExtractionWebpackPlugin {
 			const { injectPolyfill, outputFormat } = this.options;
 
 			// Process each entry point independently.
-			for ( const [ entrypointName, entrypoint ] of compilation.entrypoints.entries() ) {
+			for ( const [
+				entrypointName,
+				entrypoint,
+			] of compilation.entrypoints.entries() ) {
 				const entrypointExternalizedWpDeps = new Set();
 				if ( injectPolyfill ) {
 					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
@@ -104,8 +118,12 @@ class DependencyExtractionWebpackPlugin {
 				for ( const chunk of entrypoint.chunks ) {
 					for ( const { userRequest } of chunk.modulesIterable ) {
 						if ( this.externalizedDeps.has( userRequest ) ) {
-							const scriptDependency = this.mapRequestToDependency( userRequest );
-							entrypointExternalizedWpDeps.add( scriptDependency );
+							const scriptDependency = this.mapRequestToDependency(
+								userRequest
+							);
+							entrypointExternalizedWpDeps.add(
+								scriptDependency
+							);
 						}
 					}
 				}
@@ -114,7 +132,9 @@ class DependencyExtractionWebpackPlugin {
 
 				// Get a stable, stringified representation of the WordPress script asset.
 				const assetString = this.stringify( {
-					dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
+					dependencies: Array.from(
+						entrypointExternalizedWpDeps
+					).sort(),
 					version: runtimeChunk.hash,
 				} );
 
@@ -130,10 +150,15 @@ class DependencyExtractionWebpackPlugin {
 							.update( assetString )
 							.digest( 'hex' ),
 					} )
-					.replace( /\.js$/i, '.asset.' + ( outputFormat === 'php' ? 'php' : 'json' ) );
+					.replace(
+						/\.js$/i,
+						'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
+					);
 
 				// Add source and file into compilation for webpack to output.
-				compilation.assets[ assetFilename ] = new RawSource( assetString );
+				compilation.assets[ assetFilename ] = new RawSource(
+					assetString
+				);
 				runtimeChunk.files.push( assetFilename );
 			}
 		} );

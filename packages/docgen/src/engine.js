@@ -22,9 +22,11 @@ const getAST = ( source ) =>
 
 const getExportTokens = ( ast ) =>
 	ast.body.filter( ( node ) =>
-		[ 'ExportNamedDeclaration', 'ExportDefaultDeclaration', 'ExportAllDeclaration' ].some(
-			( declaration ) => declaration === node.type
-		)
+		[
+			'ExportNamedDeclaration',
+			'ExportDefaultDeclaration',
+			'ExportAllDeclaration',
+		].some( ( declaration ) => declaration === node.type )
 	);
 
 const engine = ( path, code, getIRFromPath = () => {} ) => {
@@ -33,7 +35,12 @@ const engine = ( path, code, getIRFromPath = () => {} ) => {
 	result.tokens = getExportTokens( result.ast );
 	result.ir = flatten(
 		result.tokens.map( ( token ) =>
-			getIntermediateRepresentation( path, token, result.ast, getIRFromPath )
+			getIntermediateRepresentation(
+				path,
+				token,
+				result.ast,
+				getIRFromPath
+			)
 		)
 	);
 

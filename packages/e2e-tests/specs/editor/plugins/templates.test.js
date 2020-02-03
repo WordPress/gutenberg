@@ -66,17 +66,24 @@ describe( 'templates', () => {
 			await switchUserToAdmin();
 			await visitAdminPage( 'options-writing.php' );
 			await page.select( '#default_post_format', format );
-			await Promise.all( [ page.waitForNavigation(), page.click( '#submit' ) ] );
+			await Promise.all( [
+				page.waitForNavigation(),
+				page.click( '#submit' ),
+			] );
 			await switchUserToTest();
 		}
 
 		beforeAll( async () => {
-			await activatePlugin( 'gutenberg-test-plugin-post-formats-support' );
+			await activatePlugin(
+				'gutenberg-test-plugin-post-formats-support'
+			);
 			await setPostFormat( 'image' );
 		} );
 		afterAll( async () => {
 			await setPostFormat( STANDARD_FORMAT_VALUE );
-			await deactivatePlugin( 'gutenberg-test-plugin-post-formats-support' );
+			await deactivatePlugin(
+				'gutenberg-test-plugin-post-formats-support'
+			);
 		} );
 
 		it( 'should populate new post with default block for format', async () => {

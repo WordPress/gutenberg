@@ -8,7 +8,11 @@ import { uniqWith } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
+import {
+	MediaUpload,
+	MEDIA_TYPE_IMAGE,
+	MEDIA_TYPE_VIDEO,
+} from '@wordpress/block-editor';
 import { Dashicon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
@@ -92,8 +96,12 @@ function MediaPlaceholder( props ) {
 			return (
 				<>
 					<View style={ styles.modalIcon }>{ icon }</View>
-					<Text style={ emptyStateTitleStyle }>{ placeholderTitle }</Text>
-					<Text style={ styles.emptyStateDescription }>{ instructions }</Text>
+					<Text style={ emptyStateTitleStyle }>
+						{ placeholderTitle }
+					</Text>
+					<Text style={ styles.emptyStateDescription }>
+						{ instructions }
+					</Text>
 				</>
 			);
 		} else if ( isAppender && ! disableMediaButtons ) {
@@ -112,7 +120,10 @@ function MediaPlaceholder( props ) {
 		return null;
 	}
 
-	const appenderStyle = getStylesFromColorScheme( styles.appender, styles.appenderDark );
+	const appenderStyle = getStylesFromColorScheme(
+		styles.appender,
+		styles.appenderDark
+	);
 	const emptyStateContainerStyle = getStylesFromColorScheme(
 		styles.emptyStateContainer,
 		styles.emptyStateContainerDark
@@ -139,7 +150,12 @@ function MediaPlaceholder( props ) {
 								open();
 							} }
 						>
-							<View style={ [ emptyStateContainerStyle, isAppender && appenderStyle ] }>
+							<View
+								style={ [
+									emptyStateContainerStyle,
+									isAppender && appenderStyle,
+								] }
+							>
 								{ getMediaOptions() }
 								{ renderContent() }
 							</View>

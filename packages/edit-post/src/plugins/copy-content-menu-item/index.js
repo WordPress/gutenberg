@@ -6,7 +6,12 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { withState, compose } from '@wordpress/compose';
 
-function CopyContentMenuItem( { createNotice, editedPostContent, hasCopied, setState } ) {
+function CopyContentMenuItem( {
+	createNotice,
+	editedPostContent,
+	hasCopied,
+	setState,
+} ) {
 	return (
 		editedPostContent.length > 0 && (
 			<ClipboardButton
@@ -30,7 +35,9 @@ function CopyContentMenuItem( { createNotice, editedPostContent, hasCopied, setS
 
 export default compose(
 	withSelect( ( select ) => ( {
-		editedPostContent: select( 'core/editor' ).getEditedPostAttribute( 'content' ),
+		editedPostContent: select( 'core/editor' ).getEditedPostAttribute(
+			'content'
+		),
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { createNotice } = dispatch( 'core/notices' );

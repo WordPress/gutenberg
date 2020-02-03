@@ -28,7 +28,9 @@ const withSpinner = ( command ) => ( ...args ) => {
 		( message ) => {
 			time = process.hrtime( time );
 			spinner.succeed(
-				`${ message || spinner.text } (in ${ time[ 0 ] }s ${ ( time[ 1 ] / 1e6 ).toFixed( 0 ) }ms)`
+				`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
+					time[ 1 ] / 1e6
+				).toFixed( 0 ) }ms)`
 			);
 		},
 		( err ) => {
@@ -66,7 +68,9 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'stop',
-		wpRed( 'Stops running WordPress for development and tests and frees the ports.' ),
+		wpRed(
+			'Stops running WordPress for development and tests and frees the ports.'
+		),
 		() => {},
 		withSpinner( env.stop )
 	);

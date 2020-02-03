@@ -8,7 +8,10 @@ import { pick, isEqual } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
+import {
+	synchronizeBlocksWithTemplate,
+	withBlockContentContext,
+} from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { compose } from '@wordpress/compose';
 
@@ -59,7 +62,10 @@ class InnerBlocks extends Component {
 		this.updateNestedSettings();
 		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
 		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
-			const hasTemplateChanged = ! isEqual( template, prevProps.template );
+			const hasTemplateChanged = ! isEqual(
+				template,
+				prevProps.template
+			);
 			if ( hasTemplateChanged ) {
 				this.synchronizeBlocksWithTemplate();
 			}
@@ -76,14 +82,21 @@ class InnerBlocks extends Component {
 		const { innerBlocks } = block;
 
 		// Synchronize with templates. If the next set differs, replace.
-		const nextBlocks = synchronizeBlocksWithTemplate( innerBlocks, template );
+		const nextBlocks = synchronizeBlocksWithTemplate(
+			innerBlocks,
+			template
+		);
 		if ( ! isEqual( nextBlocks, innerBlocks ) ) {
 			replaceInnerBlocks( nextBlocks );
 		}
 	}
 
 	updateNestedSettings() {
-		const { blockListSettings, allowedBlocks, updateNestedSettings } = this.props;
+		const {
+			blockListSettings,
+			allowedBlocks,
+			updateNestedSettings,
+		} = this.props;
 
 		const newSettings = {
 			allowedBlocks,
@@ -140,15 +153,22 @@ InnerBlocks = compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { replaceInnerBlocks, updateBlockListSettings } = dispatch( 'core/block-editor' );
-		const { block, clientId, templateInsertUpdatesSelection = true } = ownProps;
+		const { replaceInnerBlocks, updateBlockListSettings } = dispatch(
+			'core/block-editor'
+		);
+		const {
+			block,
+			clientId,
+			templateInsertUpdatesSelection = true,
+		} = ownProps;
 
 		return {
 			replaceInnerBlocks( blocks ) {
 				replaceInnerBlocks(
 					clientId,
 					blocks,
-					block.innerBlocks.length === 0 && templateInsertUpdatesSelection
+					block.innerBlocks.length === 0 &&
+						templateInsertUpdatesSelection
 				);
 			},
 			updateNestedSettings( settings ) {
@@ -162,7 +182,9 @@ InnerBlocks = compose( [
 InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
-InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => <BlockContent /> );
+InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
+	<BlockContent />
+) );
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md

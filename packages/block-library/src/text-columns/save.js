@@ -14,7 +14,10 @@ export default function save( { attributes } ) {
 		<div className={ `align${ width } columns-${ columns }` }>
 			{ times( columns, ( index ) => (
 				<div className="wp-block-column" key={ `column-${ index }` }>
-					<RichText.Content tagName="p" value={ get( content, [ index, 'children' ] ) } />
+					<RichText.Content
+						tagName="p"
+						value={ get( content, [ index, 'children' ] ) }
+					/>
 				</div>
 			) ) }
 		</div>

@@ -26,12 +26,21 @@ function Warning( {
 } ) {
 	icon = icon && normalizeIconObject( icon );
 	const internalIconClass = 'warning-icon' + '-' + preferredColorScheme;
-	const titleStyle = getStylesFromColorScheme( styles.title, styles.titleDark );
-	const messageStyle = getStylesFromColorScheme( styles.message, styles.messageDark );
+	const titleStyle = getStylesFromColorScheme(
+		styles.title,
+		styles.titleDark
+	);
+	const messageStyle = getStylesFromColorScheme(
+		styles.message,
+		styles.messageDark
+	);
 
 	return (
 		<View
-			style={ getStylesFromColorScheme( styles.container, styles.containerDark ) }
+			style={ getStylesFromColorScheme(
+				styles.container,
+				styles.containerDark
+			) }
 			{ ...viewProps }
 		>
 			{ icon && (

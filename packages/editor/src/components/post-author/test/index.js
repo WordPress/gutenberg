@@ -45,7 +45,11 @@ describe( 'PostAuthor', () => {
 		it( 'should update author', () => {
 			const onUpdateAuthor = jest.fn();
 			const wrapper = shallow(
-				<PostAuthor authors={ authors } user={ user } onUpdateAuthor={ onUpdateAuthor } />
+				<PostAuthor
+					authors={ authors }
+					user={ user }
+					onUpdateAuthor={ onUpdateAuthor }
+				/>
 			);
 
 			wrapper.find( 'select' ).simulate( 'change', {

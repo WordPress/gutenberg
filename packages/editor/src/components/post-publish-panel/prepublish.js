@@ -20,7 +20,11 @@ import PostScheduleLabel from '../post-schedule/label';
 import MaybeTagsPanel from './maybe-tags-panel';
 import MaybePostFormatPanel from './maybe-post-format-panel';
 
-function PostPublishPanelPrepublish( { hasPublishAction, isBeingScheduled, children } ) {
+function PostPublishPanelPrepublish( {
+	hasPublishAction,
+	isBeingScheduled,
+	children,
+} ) {
 	let prePublishTitle, prePublishBodyText;
 
 	if ( ! hasPublishAction ) {
@@ -30,10 +34,14 @@ function PostPublishPanelPrepublish( { hasPublishAction, isBeingScheduled, child
 		);
 	} else if ( isBeingScheduled ) {
 		prePublishTitle = __( 'Are you ready to schedule?' );
-		prePublishBodyText = __( 'Your work will be published at the specified date and time.' );
+		prePublishBodyText = __(
+			'Your work will be published at the specified date and time.'
+		);
 	} else {
 		prePublishTitle = __( 'Are you ready to publish?' );
-		prePublishBodyText = __( 'Double-check your settings before publishing.' );
+		prePublishBodyText = __(
+			'Double-check your settings before publishing.'
+		);
 	}
 
 	return (
@@ -48,7 +56,10 @@ function PostPublishPanelPrepublish( { hasPublishAction, isBeingScheduled, child
 						initialOpen={ false }
 						title={ [
 							__( 'Visibility:' ),
-							<span className="editor-post-publish-panel__link" key="label">
+							<span
+								className="editor-post-publish-panel__link"
+								key="label"
+							>
 								<PostVisibilityLabel />
 							</span>,
 						] }
@@ -59,7 +70,10 @@ function PostPublishPanelPrepublish( { hasPublishAction, isBeingScheduled, child
 						initialOpen={ false }
 						title={ [
 							__( 'Publish:' ),
-							<span className="editor-post-publish-panel__link" key="label">
+							<span
+								className="editor-post-publish-panel__link"
+								key="label"
+							>
 								<PostScheduleLabel />
 							</span>,
 						] }
@@ -76,9 +90,15 @@ function PostPublishPanelPrepublish( { hasPublishAction, isBeingScheduled, child
 }
 
 export default withSelect( ( select ) => {
-	const { getCurrentPost, isEditedPostBeingScheduled } = select( 'core/editor' );
+	const { getCurrentPost, isEditedPostBeingScheduled } = select(
+		'core/editor'
+	);
 	return {
-		hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+		hasPublishAction: get(
+			getCurrentPost(),
+			[ '_links', 'wp:action-publish' ],
+			false
+		),
 		isBeingScheduled: isEditedPostBeingScheduled(),
 	};
 } )( PostPublishPanelPrepublish );

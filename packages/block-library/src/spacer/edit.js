@@ -28,9 +28,12 @@ const SpacerEdit = ( {
 	return (
 		<>
 			<ResizableBox
-				className={ classnames( 'block-library-spacer__resize-container', {
-					'is-selected': isSelected,
-				} ) }
+				className={ classnames(
+					'block-library-spacer__resize-container',
+					{
+						'is-selected': isSelected,
+					}
+				) }
 				size={ {
 					height,
 				} }
@@ -62,7 +65,10 @@ const SpacerEdit = ( {
 							type="number"
 							id={ id }
 							onChange={ ( event ) => {
-								let spacerHeight = parseInt( event.target.value, 10 );
+								let spacerHeight = parseInt(
+									event.target.value,
+									10
+								);
 								setInputHeightValue( spacerHeight );
 								if ( isNaN( spacerHeight ) ) {
 									// Set spacer height to default size and input box to empty string

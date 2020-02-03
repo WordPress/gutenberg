@@ -16,49 +16,85 @@ import { PostPublishButton } from '../';
 describe( 'PostPublishButton', () => {
 	describe( 'aria-disabled', () => {
 		it( 'should be true if post is currently saving', () => {
-			const wrapper = shallow( <PostPublishButton isPublishable isSaveable isSaving /> );
+			const wrapper = shallow(
+				<PostPublishButton isPublishable isSaveable isSaving />
+			);
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should be true if forceIsSaving is true', () => {
-			const wrapper = shallow( <PostPublishButton isPublishable isSaveable forceIsSaving /> );
+			const wrapper = shallow(
+				<PostPublishButton isPublishable isSaveable forceIsSaving />
+			);
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should be true if post is not publishable and not forceIsDirty', () => {
 			const wrapper = shallow(
-				<PostPublishButton isSaveable isPublishable={ false } forceIsDirty={ false } />
+				<PostPublishButton
+					isSaveable
+					isPublishable={ false }
+					forceIsDirty={ false }
+				/>
 			);
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should be true if post is not saveable', () => {
-			const wrapper = shallow( <PostPublishButton isPublishable isSaveable={ false } /> );
+			const wrapper = shallow(
+				<PostPublishButton isPublishable isSaveable={ false } />
+			);
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should be true if post saving is locked', () => {
-			const wrapper = shallow( <PostPublishButton isPublishable isSaveable isPostSavingLocked /> );
+			const wrapper = shallow(
+				<PostPublishButton
+					isPublishable
+					isSaveable
+					isPostSavingLocked
+				/>
+			);
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should be false if post is saveable but not publishable and forceIsDirty is true', () => {
 			const wrapper = shallow(
-				<PostPublishButton isSaveable isPublishable={ false } forceIsDirty />
+				<PostPublishButton
+					isSaveable
+					isPublishable={ false }
+					forceIsDirty
+				/>
 			);
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( false );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should be false if post is publishave and saveable', () => {
-			const wrapper = shallow( <PostPublishButton isPublishable isSaveable /> );
+			const wrapper = shallow(
+				<PostPublishButton isPublishable isSaveable />
+			);
 
-			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( false );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
+				false
+			);
 		} );
 	} );
 

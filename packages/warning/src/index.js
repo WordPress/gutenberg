@@ -1,5 +1,9 @@
 function isDev() {
-	return typeof process !== 'undefined' && process.env && process.env.NODE_ENV !== 'production';
+	return (
+		typeof process !== 'undefined' &&
+		process.env &&
+		process.env.NODE_ENV !== 'production'
+	);
 }
 
 /**

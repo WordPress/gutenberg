@@ -84,7 +84,9 @@ class LatestPostsEdit extends Component {
 					<ToggleControl
 						label={ __( 'Post Content' ) }
 						checked={ displayPostContent }
-						onChange={ ( value ) => setAttributes( { displayPostContent: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { displayPostContent: value } )
+						}
 					/>
 					{ displayPostContent && (
 						<RadioControl
@@ -92,27 +94,39 @@ class LatestPostsEdit extends Component {
 							selected={ displayPostContentRadio }
 							options={ [
 								{ label: __( 'Excerpt' ), value: 'excerpt' },
-								{ label: __( 'Full Post' ), value: 'full_post' },
+								{
+									label: __( 'Full Post' ),
+									value: 'full_post',
+								},
 							] }
-							onChange={ ( value ) => setAttributes( { displayPostContentRadio: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									displayPostContentRadio: value,
+								} )
+							}
 						/>
 					) }
-					{ displayPostContent && displayPostContentRadio === 'excerpt' && (
-						<RangeControl
-							label={ __( 'Max number of words in excerpt' ) }
-							value={ excerptLength }
-							onChange={ ( value ) => setAttributes( { excerptLength: value } ) }
-							min={ 10 }
-							max={ 100 }
-						/>
-					) }
+					{ displayPostContent &&
+						displayPostContentRadio === 'excerpt' && (
+							<RangeControl
+								label={ __( 'Max number of words in excerpt' ) }
+								value={ excerptLength }
+								onChange={ ( value ) =>
+									setAttributes( { excerptLength: value } )
+								}
+								min={ 10 }
+								max={ 100 }
+							/>
+						) }
 				</PanelBody>
 
 				<PanelBody title={ __( 'Post meta settings' ) }>
 					<ToggleControl
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
-						onChange={ ( value ) => setAttributes( { displayPostDate: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { displayPostDate: value } )
+						}
 					/>
 				</PanelBody>
 
@@ -122,21 +136,36 @@ class LatestPostsEdit extends Component {
 						numberOfItems={ postsToShow }
 						categoriesList={ categoriesList }
 						selectedCategoryId={ categories }
-						onOrderChange={ ( value ) => setAttributes( { order: value } ) }
-						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
-						onCategoryChange={ ( value ) =>
-							setAttributes( { categories: '' !== value ? value : undefined } )
+						onOrderChange={ ( value ) =>
+							setAttributes( { order: value } )
 						}
-						onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
+						onOrderByChange={ ( value ) =>
+							setAttributes( { orderBy: value } )
+						}
+						onCategoryChange={ ( value ) =>
+							setAttributes( {
+								categories: '' !== value ? value : undefined,
+							} )
+						}
+						onNumberOfItemsChange={ ( value ) =>
+							setAttributes( { postsToShow: value } )
+						}
 					/>
 					{ postLayout === 'grid' && (
 						<RangeControl
 							label={ __( 'Columns' ) }
 							value={ columns }
-							onChange={ ( value ) => setAttributes( { columns: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( { columns: value } )
+							}
 							min={ 2 }
 							max={
-								! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length )
+								! hasPosts
+									? MAX_POSTS_COLUMNS
+									: Math.min(
+											MAX_POSTS_COLUMNS,
+											latestPosts.length
+									  )
 							}
 							required
 						/>
@@ -150,8 +179,15 @@ class LatestPostsEdit extends Component {
 			return (
 				<>
 					{ inspectorControls }
-					<Placeholder icon="admin-post" label={ __( 'Latest Posts' ) }>
-						{ ! Array.isArray( latestPosts ) ? <Spinner /> : __( 'No posts found.' ) }
+					<Placeholder
+						icon="admin-post"
+						label={ __( 'Latest Posts' ) }
+					>
+						{ ! Array.isArray( latestPosts ) ? (
+							<Spinner />
+						) : (
+							__( 'No posts found.' )
+						) }
 					</Placeholder>
 				</>
 			);
@@ -159,7 +195,9 @@ class LatestPostsEdit extends Component {
 
 		// Removing posts from display should be instant.
 		const displayPosts =
-			latestPosts.length > postsToShow ? latestPosts.slice( 0, postsToShow ) : latestPosts;
+			latestPosts.length > postsToShow
+				? latestPosts.slice( 0, postsToShow )
+				: latestPosts;
 
 		const layoutControls = [
 			{
@@ -200,45 +238,74 @@ class LatestPostsEdit extends Component {
 						}
 						const excerptElement = document.createElement( 'div' );
 						excerptElement.innerHTML = excerpt;
-						excerpt = excerptElement.textContent || excerptElement.innerText || '';
+						excerpt =
+							excerptElement.textContent ||
+							excerptElement.innerText ||
+							'';
 						return (
 							<li key={ i }>
-								<a href={ post.link } target="_blank" rel="noreferrer noopener">
-									{ titleTrimmed ? <RawHTML>{ titleTrimmed }</RawHTML> : __( '(no title)' ) }
+								<a
+									href={ post.link }
+									target="_blank"
+									rel="noreferrer noopener"
+								>
+									{ titleTrimmed ? (
+										<RawHTML>{ titleTrimmed }</RawHTML>
+									) : (
+										__( '(no title)' )
+									) }
 								</a>
 								{ displayPostDate && post.date_gmt && (
 									<time
-										dateTime={ format( 'c', post.date_gmt ) }
+										dateTime={ format(
+											'c',
+											post.date_gmt
+										) }
 										className="wp-block-latest-posts__post-date"
 									>
-										{ dateI18n( dateFormat, post.date_gmt ) }
+										{ dateI18n(
+											dateFormat,
+											post.date_gmt
+										) }
 									</time>
 								) }
-								{ displayPostContent && displayPostContentRadio === 'excerpt' && (
-									<div className="wp-block-latest-posts__post-excerpt">
-										<RawHTML key="html">
-											{ excerptLength < excerpt.trim().split( ' ' ).length
-												? excerpt
-														.trim()
-														.split( ' ', excerptLength )
-														.join( ' ' ) +
-												  ' ... <a href=' +
-												  post.link +
-												  'target="_blank" rel="noopener noreferrer">' +
-												  __( 'Read more' ) +
-												  '</a>'
-												: excerpt
-														.trim()
-														.split( ' ', excerptLength )
-														.join( ' ' ) }
-										</RawHTML>
-									</div>
-								) }
-								{ displayPostContent && displayPostContentRadio === 'full_post' && (
-									<div className="wp-block-latest-posts__post-full-content">
-										<RawHTML key="html">{ post.content.raw.trim() }</RawHTML>
-									</div>
-								) }
+								{ displayPostContent &&
+									displayPostContentRadio === 'excerpt' && (
+										<div className="wp-block-latest-posts__post-excerpt">
+											<RawHTML key="html">
+												{ excerptLength <
+												excerpt.trim().split( ' ' )
+													.length
+													? excerpt
+															.trim()
+															.split(
+																' ',
+																excerptLength
+															)
+															.join( ' ' ) +
+													  ' ... <a href=' +
+													  post.link +
+													  'target="_blank" rel="noopener noreferrer">' +
+													  __( 'Read more' ) +
+													  '</a>'
+													: excerpt
+															.trim()
+															.split(
+																' ',
+																excerptLength
+															)
+															.join( ' ' ) }
+											</RawHTML>
+										</div>
+									) }
+								{ displayPostContent &&
+									displayPostContentRadio === 'full_post' && (
+										<div className="wp-block-latest-posts__post-full-content">
+											<RawHTML key="html">
+												{ post.content.raw.trim() }
+											</RawHTML>
+										</div>
+									) }
 							</li>
 						);
 					} ) }

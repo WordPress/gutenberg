@@ -12,7 +12,11 @@ import * as plugins from './plugins';
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as withRegistry } from './components/with-registry';
-export { RegistryProvider, RegistryConsumer, useRegistry } from './components/registry-provider';
+export {
+	RegistryProvider,
+	RegistryConsumer,
+	useRegistry,
+} from './components/registry-provider';
 export { default as useSelect } from './components/use-select';
 export {
 	useDispatch,
@@ -105,7 +109,8 @@ export const select = defaultRegistry.select;
  *
  * @return {Object} Object containing the store's promise-wrapped selectors.
  */
-export const __experimentalResolveSelect = defaultRegistry.__experimentalResolveSelect;
+export const __experimentalResolveSelect =
+	defaultRegistry.__experimentalResolveSelect;
 
 /**
  * Given the name of a registered store, returns an object of the store's action creators.

@@ -27,7 +27,9 @@ async function assignFixedIssues( payload, octokit ) {
 			assignees: [ payload.pull_request.user.login ],
 		} );
 
-		debug( `assign-fixed-issues: Applying '[Status] In Progress' label to issue #${ issue }` );
+		debug(
+			`assign-fixed-issues: Applying '[Status] In Progress' label to issue #${ issue }`
+		);
 
 		await octokit.issues.addLabels( {
 			owner: payload.repository.owner.login,

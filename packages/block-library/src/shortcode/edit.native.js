@@ -17,13 +17,25 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import styles from './style.scss';
 
 export function ShortcodeEdit( props ) {
-	const { attributes, setAttributes, onFocus, onBlur, getStylesFromColorScheme } = props;
-	const titleStyle = getStylesFromColorScheme( styles.blockTitle, styles.blockTitleDark );
+	const {
+		attributes,
+		setAttributes,
+		onFocus,
+		onBlur,
+		getStylesFromColorScheme,
+	} = props;
+	const titleStyle = getStylesFromColorScheme(
+		styles.blockTitle,
+		styles.blockTitleDark
+	);
 	const shortcodeStyle = getStylesFromColorScheme(
 		styles.blockShortcode,
 		styles.blockShortcodeDark
 	);
-	const placeholderStyle = getStylesFromColorScheme( styles.placeholder, styles.placeholderDark );
+	const placeholderStyle = getStylesFromColorScheme(
+		styles.placeholder,
+		styles.placeholderDark
+	);
 
 	return (
 		<View>
@@ -46,7 +58,9 @@ export function ShortcodeEdit( props ) {
 				 * Following the suggestion below we added the keyboard type as well.
 				 * https://stackoverflow.com/questions/37001070/how-to-avoid-the-suggestions-of-keyboard-for-android-in-react-native/51411575#51411575
 				 */
-				keyboardType={ Platform.OS === 'ios' ? 'default' : 'visible-password' }
+				keyboardType={
+					Platform.OS === 'ios' ? 'default' : 'visible-password'
+				}
 				placeholderTextColor={ placeholderStyle.color }
 			/>
 		</View>

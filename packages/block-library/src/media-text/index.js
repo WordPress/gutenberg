@@ -36,7 +36,9 @@ export const settings = {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: __( 'The wren<br>Earns his living<br>Noiselessly.' ),
+					content: __(
+						'The wren<br>Earns his living<br>Noiselessly.'
+					),
 				},
 			},
 			{

@@ -51,7 +51,12 @@ const transforms = {
 					return backgroundType === IMAGE_BACKGROUND_TYPE;
 				}
 				// If a url is not set the transform could happen if the cover has no background color or gradient;
-				return ! overlayColor && ! customOverlayColor && ! gradient && ! customGradient;
+				return (
+					! overlayColor &&
+					! customOverlayColor &&
+					! gradient &&
+					! customGradient
+				);
 			},
 			transform: ( { title, url, align, id } ) =>
 				createBlock( 'core/image', {
@@ -77,7 +82,12 @@ const transforms = {
 					return backgroundType === VIDEO_BACKGROUND_TYPE;
 				}
 				// If a url is not set the transform could happen if the cover has no background color or gradient;
-				return ! overlayColor && ! customOverlayColor && ! gradient && ! customGradient;
+				return (
+					! overlayColor &&
+					! customOverlayColor &&
+					! gradient &&
+					! customGradient
+				);
 			},
 			transform: ( { title, url, align, id } ) =>
 				createBlock( 'core/video', {

@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { PanelRow } from '@wordpress/components';
-import { PostAuthor as PostAuthorForm, PostAuthorCheck } from '@wordpress/editor';
+import {
+	PostAuthor as PostAuthorForm,
+	PostAuthorCheck,
+} from '@wordpress/editor';
 
 export function PostAuthor() {
 	return (

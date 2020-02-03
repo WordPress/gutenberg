@@ -36,19 +36,29 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		await page.waitForSelector( APPENDER_SELECTOR );
 		// Verify if the custom block appender text is the expected one.
 		expect(
-			await page.evaluate( ( el ) => el.innerText, await page.$( `${ APPENDER_SELECTOR } > span` ) )
+			await page.evaluate(
+				( el ) => el.innerText,
+				await page.$( `${ APPENDER_SELECTOR } > span` )
+			)
 		).toEqual( 'My custom awesome appender' );
 
 		// Open the inserter of our custom block appender and expand all the categories.
-		await page.click( `${ APPENDER_SELECTOR } .block-editor-button-block-appender` );
+		await page.click(
+			`${ APPENDER_SELECTOR } .block-editor-button-block-appender`
+		);
 		await openAllBlockInserterCategories();
 
 		// Verify if the blocks the custom inserter is rendering are the expected ones.
-		expect( await getAllBlockInserterItemTitles() ).toEqual( [ 'Quote', 'Video' ] );
+		expect( await getAllBlockInserterItemTitles() ).toEqual( [
+			'Quote',
+			'Video',
+		] );
 
 		// Find the quote block insert button option within the inserter popover.
 		const inserterPopover = await page.$( INSERTER_RESULTS_SELECTOR );
-		const quoteButton = ( await inserterPopover.$x( QUOTE_INSERT_BUTTON_SELECTOR ) )[ 0 ];
+		const quoteButton = (
+			await inserterPopover.$x( QUOTE_INSERT_BUTTON_SELECTOR )
+		 )[ 0 ];
 
 		// Insert a quote block.
 		await quoteButton.click();
@@ -74,11 +84,16 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		await openAllBlockInserterCategories();
 
 		// Verify if the blocks the custom inserter is rendering are the expected ones.
-		expect( await getAllBlockInserterItemTitles() ).toEqual( [ 'Quote', 'Video' ] );
+		expect( await getAllBlockInserterItemTitles() ).toEqual( [
+			'Quote',
+			'Video',
+		] );
 
 		// Find the quote block insert button option within the inserter popover.
 		const inserterPopover = await page.$( INSERTER_RESULTS_SELECTOR );
-		const quoteButton = ( await inserterPopover.$x( QUOTE_INSERT_BUTTON_SELECTOR ) )[ 0 ];
+		const quoteButton = (
+			await inserterPopover.$x( QUOTE_INSERT_BUTTON_SELECTOR )
+		 )[ 0 ];
 
 		// Insert a quote block.
 		await quoteButton.click();

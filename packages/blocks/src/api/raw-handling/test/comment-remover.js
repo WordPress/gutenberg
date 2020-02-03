@@ -6,7 +6,9 @@ import { deepFilterHTML } from '../utils';
 
 describe( 'commentRemover', () => {
 	it( 'should remove a single comment', () => {
-		expect( deepFilterHTML( '<!-- Comment -->', [ commentRemover ] ) ).toEqual( '' );
+		expect(
+			deepFilterHTML( '<!-- Comment -->', [ commentRemover ] )
+		).toEqual( '' );
 	} );
 	it( 'should remove multiple comments', () => {
 		expect(
@@ -17,9 +19,11 @@ describe( 'commentRemover', () => {
 		).toEqual( '<p>First paragraph.</p><p>Second paragraph.</p>' );
 	} );
 	it( 'should remove nested comments', () => {
-		expect( deepFilterHTML( '<p>Paragraph.<!-- Comment --></p>', [ commentRemover ] ) ).toEqual(
-			'<p>Paragraph.</p>'
-		);
+		expect(
+			deepFilterHTML( '<p>Paragraph.<!-- Comment --></p>', [
+				commentRemover,
+			] )
+		).toEqual( '<p>Paragraph.</p>' );
 	} );
 	it( 'should remove multi-line comments', () => {
 		expect(

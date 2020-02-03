@@ -59,9 +59,14 @@ class Video extends Component {
 				if ( ! supported ) {
 					Alert.alert(
 						__( 'Problem opening the video' ),
-						__( 'No application can handle this request. Please install a Web browser.' )
+						__(
+							'No application can handle this request. Please install a Web browser.'
+						)
 					);
-					window.console.warn( 'No application found that can open the video with URL: ' + url );
+					window.console.warn(
+						'No application found that can open the video with URL: ' +
+							url
+					);
 				} else {
 					return Linking.openURL( url );
 				}
@@ -71,7 +76,10 @@ class Video extends Component {
 					__( 'Problem opening the video' ),
 					__( 'An unknown error occurred. Please try again.' )
 				);
-				window.console.error( 'An error occurred while opening the video URL: ' + url, err );
+				window.console.error(
+					'An error occurred while opening the video URL: ' + url,
+					err
+				);
 			} );
 	}
 
@@ -110,7 +118,11 @@ class Video extends Component {
 						style={ [ style, styles.overlayContainer ] }
 					>
 						<View style={ styles.blackOverlay } />
-						<Icon icon={ PlayIcon } style={ styles.playIcon } size={ styles.playIcon.size } />
+						<Icon
+							icon={ PlayIcon }
+							style={ styles.playIcon }
+							size={ styles.playIcon.size }
+						/>
 					</TouchableOpacity>
 				) }
 			</View>

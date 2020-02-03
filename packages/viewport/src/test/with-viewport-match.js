@@ -46,7 +46,9 @@ describe( 'withViewportMatch()', () => {
 		useViewportMatchMock.mockReturnValueOnce( true );
 		useViewportMatchMock.mockReturnValueOnce( false );
 
-		const wrapper = renderer.create( getTestComponent( EnhancedComponent ) );
+		const wrapper = renderer.create(
+			getTestComponent( EnhancedComponent )
+		);
 
 		expect( useViewportMatchMock.mock.calls ).toEqual( [
 			[ 'wide', '>=' ],

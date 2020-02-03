@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
-import { BaseControl, Button, Disabled, PanelBody, withNotices } from '@wordpress/components';
+import {
+	BaseControl,
+	Button,
+	Disabled,
+	PanelBody,
+	withNotices,
+} from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -40,7 +46,12 @@ class VideoEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, mediaUpload, noticeOperations, setAttributes } = this.props;
+		const {
+			attributes,
+			mediaUpload,
+			noticeOperations,
+			setAttributes,
+		} = this.props;
 		const { id, src = '' } = attributes;
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
@@ -71,7 +82,9 @@ class VideoEdit extends Component {
 
 		if ( newSrc !== src ) {
 			// Check if there's an embed block that handles this URL.
-			const embedBlock = createUpgradedEmbedBlock( { attributes: { url: newSrc } } );
+			const embedBlock = createUpgradedEmbedBlock( {
+				attributes: { url: newSrc },
+			} );
 			if ( undefined !== embedBlock ) {
 				this.props.onReplace( embedBlock );
 				return;
@@ -101,7 +114,14 @@ class VideoEdit extends Component {
 
 	render() {
 		const { caption, controls, poster, src } = this.props.attributes;
-		const { className, instanceId, isSelected, noticeUI, attributes, setAttributes } = this.props;
+		const {
+			className,
+			instanceId,
+			isSelected,
+			noticeUI,
+			attributes,
+			setAttributes,
+		} = this.props;
 		const onSelectVideo = ( media ) => {
 			if ( ! media || ! media.url ) {
 				// in this case there was an error
@@ -146,20 +166,29 @@ class VideoEdit extends Component {
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Video settings' ) }>
-						<VideoCommonSettings setAttributes={ setAttributes } attributes={ attributes } />
+						<VideoCommonSettings
+							setAttributes={ setAttributes }
+							attributes={ attributes }
+						/>
 						<MediaUploadCheck>
 							<BaseControl className="editor-video-poster-control">
-								<BaseControl.VisualLabel>{ __( 'Poster Image' ) }</BaseControl.VisualLabel>
+								<BaseControl.VisualLabel>
+									{ __( 'Poster Image' ) }
+								</BaseControl.VisualLabel>
 								<MediaUpload
 									title={ __( 'Select Poster Image' ) }
 									onSelect={ this.onSelectPoster }
-									allowedTypes={ VIDEO_POSTER_ALLOWED_MEDIA_TYPES }
+									allowedTypes={
+										VIDEO_POSTER_ALLOWED_MEDIA_TYPES
+									}
 									render={ ( { open } ) => (
 										<Button
 											isSecondary
 											onClick={ open }
 											ref={ this.posterImageButton }
-											aria-describedby={ videoPosterDescription }
+											aria-describedby={
+												videoPosterDescription
+											}
 										>
 											{ ! this.props.attributes.poster
 												? __( 'Select Poster Image' )
@@ -170,13 +199,21 @@ class VideoEdit extends Component {
 								<p id={ videoPosterDescription } hidden>
 									{ this.props.attributes.poster
 										? sprintf(
-												__( 'The current poster image url is %s' ),
+												__(
+													'The current poster image url is %s'
+												),
 												this.props.attributes.poster
 										  )
-										: __( 'There is no poster image currently selected' ) }
+										: __(
+												'There is no poster image currently selected'
+										  ) }
 								</p>
 								{ !! this.props.attributes.poster && (
-									<Button onClick={ this.onRemovePoster } isLink isDestructive>
+									<Button
+										onClick={ this.onRemovePoster }
+										isLink
+										isDestructive
+									>
 										{ __( 'Remove Poster Image' ) }
 									</Button>
 								) }
@@ -190,14 +227,21 @@ class VideoEdit extends Component {
 						video when the controls are enabled.
 					*/ }
 					<Disabled>
-						<video controls={ controls } poster={ poster } src={ src } ref={ this.videoPlayer } />
+						<video
+							controls={ controls }
+							poster={ poster }
+							src={ src }
+							ref={ this.videoPlayer }
+						/>
 					</Disabled>
 					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( { caption: value } )
+							}
 							inlineToolbar
 						/>
 					) }

@@ -1,7 +1,8 @@
 const pluginBase = {
 	name: 'boxer/boxer',
 	title: 'Boxer',
-	description: 'Boxer is a Block that puts your WordPress posts into boxes on a page.',
+	description:
+		'Boxer is a Block that puts your WordPress posts into boxes on a page.',
 	id: 'boxer-block',
 	rating: 5,
 	rating_count: 1,

@@ -20,7 +20,9 @@ function GradientPickerWithGradients( props ) {
 	);
 	return (
 		<__experimentalGradientPicker
-			gradients={ props.gradients !== undefined ? props.gradient : gradients }
+			gradients={
+				props.gradients !== undefined ? props.gradient : gradients
+			}
 			disableCustomGradients={
 				props.disableCustomGradients !== undefined
 					? props.disableCustomGradients
@@ -33,7 +35,8 @@ function GradientPickerWithGradients( props ) {
 
 export default function( props ) {
 	const ComponentToUse =
-		props.gradients !== undefined && props.disableCustomGradients !== undefined
+		props.gradients !== undefined &&
+		props.disableCustomGradients !== undefined
 			? __experimentalGradientPicker
 			: GradientPickerWithGradients;
 	return <ComponentToUse { ...props } />;

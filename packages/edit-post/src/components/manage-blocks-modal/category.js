@@ -40,9 +40,13 @@ function BlockManagerCategory( {
 		return null;
 	}
 
-	const checkedBlockNames = without( map( filteredBlockTypes, 'name' ), ...hiddenBlockTypes );
+	const checkedBlockNames = without(
+		map( filteredBlockTypes, 'name' ),
+		...hiddenBlockTypes
+	);
 
-	const titleId = 'edit-post-manage-blocks-modal__category-title-' + instanceId;
+	const titleId =
+		'edit-post-manage-blocks-modal__category-title-' + instanceId;
 
 	const isAllChecked = checkedBlockNames.length === filteredBlockTypes.length;
 

@@ -10,7 +10,11 @@ const {
 	spawnScript,
 } = require( './cli' );
 const { getWebpackArgs, hasBabelConfig, hasJestConfig } = require( './config' );
-const { buildWordPress, downloadWordPressZip, mergeYAMLConfigs } = require( './env' );
+const {
+	buildWordPress,
+	downloadWordPressZip,
+	mergeYAMLConfigs,
+} = require( './env' );
 const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
 const { camelCaseDash } = require( './string' );

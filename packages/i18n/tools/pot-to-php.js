@@ -15,7 +15,9 @@ const fileHeader =
 	].join( NEWLINE ) + NEWLINE;
 
 const fileFooter =
-	NEWLINE + [ ');', '/* THIS IS THE END OF THE GENERATED FILE */' ].join( NEWLINE ) + NEWLINE;
+	NEWLINE +
+	[ ');', '/* THIS IS THE END OF THE GENERATED FILE */' ].join( NEWLINE ) +
+	NEWLINE;
 
 /**
  * Escapes single quotes.
@@ -48,19 +50,24 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 			php +=
 				TAB +
 				'// Reference: ' +
-				comments.reference.split( NEWLINE ).join( NEWLINE + TAB + '// Reference: ' ) +
+				comments.reference
+					.split( NEWLINE )
+					.join( NEWLINE + TAB + '// Reference: ' ) +
 				NEWLINE;
 		}
 
 		if ( ! isEmpty( comments.translator ) ) {
 			// All extracted comments are split by newlines, add a tab to line them up nicely.
-			const translator = comments.translator.split( NEWLINE ).join( NEWLINE + TAB + '   ' );
+			const translator = comments.translator
+				.split( NEWLINE )
+				.join( NEWLINE + TAB + '   ' );
 
 			php += TAB + `/* ${ translator } */${ NEWLINE }`;
 		}
 
 		if ( ! isEmpty( comments.extracted ) ) {
-			php += TAB + `/* translators: ${ comments.extracted } */${ NEWLINE }`;
+			php +=
+				TAB + `/* translators: ${ comments.extracted } */${ NEWLINE }`;
 		}
 	}
 
@@ -71,13 +78,17 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 			if ( isEmpty( context ) ) {
 				php += TAB + `__( '${ original }', '${ textdomain }' )`;
 			} else {
-				php += TAB + `_x( '${ original }', '${ translation.msgctxt }', '${ textdomain }' )`;
+				php +=
+					TAB +
+					`_x( '${ original }', '${ translation.msgctxt }', '${ textdomain }' )`;
 			}
 		} else {
 			const plural = escapeSingleQuotes( translation.msgid_plural );
 
 			if ( isEmpty( context ) ) {
-				php += TAB + `_n_noop( '${ original }', '${ plural }', '${ textdomain }' )`;
+				php +=
+					TAB +
+					`_n_noop( '${ original }', '${ plural }', '${ textdomain }' )`;
 			} else {
 				php +=
 					TAB +
@@ -99,13 +110,20 @@ function convertPOTToPHP( potFile, phpFile, options ) {
 		const translations = parsedPO.translations[ context ];
 
 		const newOutput = Object.values( translations )
-			.map( ( translation ) => convertTranslationToPHP( translation, options.textdomain, context ) )
+			.map( ( translation ) =>
+				convertTranslationToPHP(
+					translation,
+					options.textdomain,
+					context
+				)
+			)
 			.filter( ( php ) => php !== '' );
 
 		output = [ ...output, ...newOutput ];
 	}
 
-	const fileOutput = fileHeader + output.join( ',' + NEWLINE + NEWLINE ) + fileFooter;
+	const fileOutput =
+		fileHeader + output.join( ',' + NEWLINE + NEWLINE ) + fileFooter;
 
 	fs.writeFileSync( phpFile, fileOutput );
 }

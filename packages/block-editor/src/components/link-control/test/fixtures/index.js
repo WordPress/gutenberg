@@ -36,8 +36,13 @@ export const fauxEntitySuggestions = [
 ];
 
 /* eslint-disable no-unused-vars */
-export const fetchFauxEntitySuggestions = ( val = '', { perPage = null } = {} ) => {
-	const suggestions = perPage ? take( fauxEntitySuggestions, perPage ) : fauxEntitySuggestions;
+export const fetchFauxEntitySuggestions = (
+	val = '',
+	{ perPage = null } = {}
+) => {
+	const suggestions = perPage
+		? take( fauxEntitySuggestions, perPage )
+		: fauxEntitySuggestions;
 	return Promise.resolve( suggestions );
 };
 /* eslint-enable no-unused-vars */

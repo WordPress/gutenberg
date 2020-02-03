@@ -23,7 +23,9 @@ export default function GradientPicker( {
 	clearable = true,
 	disableCustomGradients = false,
 } ) {
-	const clearGradient = useCallback( () => onChange( undefined ), [ onChange ] );
+	const clearGradient = useCallback( () => onChange( undefined ), [
+		onChange,
+	] );
 	const gradientOptions = useMemo( () => {
 		return map( gradients, ( { gradient, name } ) => (
 			<CircularOptionPicker.Option
@@ -36,7 +38,11 @@ export default function GradientPicker( {
 					sprintf( __( 'Gradient code: %s' ), gradient )
 				}
 				style={ { color: 'rgba( 0,0,0,0 )', background: gradient } }
-				onClick={ value === gradient ? clearGradient : () => onChange( gradient ) }
+				onClick={
+					value === gradient
+						? clearGradient
+						: () => onChange( gradient )
+				}
 				aria-label={
 					name
 						? // translators: %s: The name of the gradient e.g: "Angular red to blue".
@@ -53,13 +59,17 @@ export default function GradientPicker( {
 			options={ gradientOptions }
 			actions={
 				clearable && (
-					<CircularOptionPicker.ButtonAction onClick={ clearGradient }>
+					<CircularOptionPicker.ButtonAction
+						onClick={ clearGradient }
+					>
 						{ __( 'Clear' ) }
 					</CircularOptionPicker.ButtonAction>
 				)
 			}
 		>
-			{ ! disableCustomGradients && <CustomGradientPicker value={ value } onChange={ onChange } /> }
+			{ ! disableCustomGradients && (
+				<CustomGradientPicker value={ value } onChange={ onChange } />
+			) }
 		</CircularOptionPicker>
 	);
 }

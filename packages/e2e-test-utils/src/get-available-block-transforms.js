@@ -13,10 +13,14 @@ export const getAvailableBlockTransforms = async () => {
 	if ( ! ( await hasBlockSwitcher() ) ) {
 		return [];
 	}
-	await page.click( '.block-editor-block-toolbar .block-editor-block-switcher' );
+	await page.click(
+		'.block-editor-block-toolbar .block-editor-block-switcher'
+	);
 	return page.evaluate( ( buttonSelector ) => {
-		return Array.from( document.querySelectorAll( buttonSelector ) ).map( ( button ) => {
-			return button.textContent;
-		} );
+		return Array.from( document.querySelectorAll( buttonSelector ) ).map(
+			( button ) => {
+				return button.textContent;
+			}
+		);
 	}, '.block-editor-block-types-list .block-editor-block-types-list__list-item button' );
 };

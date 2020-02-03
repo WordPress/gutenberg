@@ -32,7 +32,8 @@ async function emulateSelectAll() {
 				key: isMac ? 'Meta' : 'Control',
 				code: isMac ? 'MetaLeft' : 'ControlLeft',
 				location: window.KeyboardEvent.DOM_KEY_LOCATION_LEFT,
-				getModifierState: ( keyArg ) => keyArg === ( isMac ? 'Meta' : 'Control' ),
+				getModifierState: ( keyArg ) =>
+					keyArg === ( isMac ? 'Meta' : 'Control' ),
 				ctrlKey: ! isMac,
 				metaKey: isMac,
 				charCode: 0,
@@ -47,7 +48,8 @@ async function emulateSelectAll() {
 			key: 'a',
 			code: 'KeyA',
 			location: window.KeyboardEvent.DOM_KEY_LOCATION_STANDARD,
-			getModifierState: ( keyArg ) => keyArg === ( isMac ? 'Meta' : 'Control' ),
+			getModifierState: ( keyArg ) =>
+				keyArg === ( isMac ? 'Meta' : 'Control' ),
 			ctrlKey: ! isMac,
 			metaKey: isMac,
 			charCode: 0,
@@ -137,7 +139,8 @@ export async function pressKeyWithModifier( modifier, key ) {
 	const isAppleOS = () => process.platform === 'darwin';
 	const overWrittenModifiers = {
 		...modifiers,
-		shiftAlt: ( _isApple ) => ( _isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ] ),
+		shiftAlt: ( _isApple ) =>
+			_isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
 	};
 	const mappedModifiers = overWrittenModifiers[ modifier ]( isAppleOS );
 	const ctrlSwap = ( mod ) => ( mod === CTRL ? 'control' : mod );

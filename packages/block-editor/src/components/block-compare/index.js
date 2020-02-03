@@ -61,10 +61,19 @@ class BlockCompare extends Component {
 	}
 
 	render() {
-		const { block, onKeep, onConvert, convertor, convertButtonText } = this.props;
+		const {
+			block,
+			onKeep,
+			onConvert,
+			convertor,
+			convertButtonText,
+		} = this.props;
 		const original = this.getOriginalContent( block );
 		const converted = this.getConvertedContent( convertor( block ) );
-		const difference = this.getDifference( original.rawContent, converted.rawContent );
+		const difference = this.getDifference(
+			original.rawContent,
+			converted.rawContent
+		);
 
 		return (
 			<div className="block-editor-block-compare__wrapper">

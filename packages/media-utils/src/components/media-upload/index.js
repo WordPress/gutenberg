@@ -32,7 +32,11 @@ const getFeaturedImageMediaFrame = () => {
 		 * @return {void}
 		 */
 		createStates: function createStates() {
-			this.on( 'toolbar:create:featured-image', this.featuredImageToolbar, this );
+			this.on(
+				'toolbar:create:featured-image',
+				this.featuredImageToolbar,
+				this
+			);
 			this.states.add( [ new wp.media.controller.FeaturedImage() ] );
 		},
 	} );
@@ -91,7 +95,17 @@ const getGalleryDetailsMediaFrame = () => {
 // the media library image object contains numerous attributes
 // we only need this set to display the image in the library
 const slimImageObject = ( img ) => {
-	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt', 'link', 'caption' ];
+	const attrSet = [
+		'sizes',
+		'mime',
+		'type',
+		'subtype',
+		'id',
+		'url',
+		'alt',
+		'link',
+		'caption',
+	];
 	return pick( img, attrSet );
 };
 
@@ -156,7 +170,12 @@ class MediaUpload extends Component {
 	}
 
 	buildAndSetGalleryFrame() {
-		const { addToGallery = false, allowedTypes, multiple = false, value = null } = this.props;
+		const {
+			addToGallery = false,
+			allowedTypes,
+			multiple = false,
+			value = null,
+		} = this.props;
 		// If the value did not changed there is no need to rebuild the frame,
 		// we can continue to use the existing one.
 		if ( value === this.lastGalleryValue ) {
@@ -225,7 +244,11 @@ class MediaUpload extends Component {
 		}
 
 		if ( multiple ) {
-			onSelect( selectedImages.models.map( ( model ) => slimImageObject( model.toJSON() ) ) );
+			onSelect(
+				selectedImages.models.map( ( model ) =>
+					slimImageObject( model.toJSON() )
+				)
+			);
 		} else {
 			onSelect( slimImageObject( selectedImages.models[ 0 ].toJSON() ) );
 		}
@@ -272,7 +295,9 @@ class MediaUpload extends Component {
 			const collection = frameContent.collection;
 
 			// clean all attachments we have in memory.
-			collection.toArray().forEach( ( model ) => model.trigger( 'destroy', model ) );
+			collection
+				.toArray()
+				.forEach( ( model ) => model.trigger( 'destroy', model ) );
 
 			// reset has more flag, if library had small amount of items all items may have been loaded before.
 			collection.mirroring._hasMore = true;
@@ -283,7 +308,11 @@ class MediaUpload extends Component {
 	}
 
 	openModal() {
-		if ( this.props.gallery && this.props.value && this.props.value.length > 0 ) {
+		if (
+			this.props.gallery &&
+			this.props.value &&
+			this.props.value.length > 0
+		) {
 			this.buildAndSetGalleryFrame();
 		}
 		this.frame.open();

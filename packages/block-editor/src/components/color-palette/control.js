@@ -3,7 +3,11 @@
  */
 import ColorGradientControl from '../colors-gradients/control';
 
-export default function ColorPaletteControl( { onChange, value, ...otherProps } ) {
+export default function ColorPaletteControl( {
+	onChange,
+	value,
+	...otherProps
+} ) {
 	return (
 		<ColorGradientControl
 			{ ...otherProps }

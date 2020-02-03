@@ -16,7 +16,13 @@ export const defaultProps = {
 };
 
 export function Card( props ) {
-	const { className, isBorderless, isElevated, size, ...additionalProps } = props;
+	const {
+		className,
+		isBorderless,
+		isElevated,
+		size,
+		...additionalProps
+	} = props;
 	const { Provider } = CardContext;
 
 	const contextProps = {

@@ -35,7 +35,12 @@ describe( 'MenuItem', () => {
 
 	it( 'should match snapshot when isSelected and role are optionally provided', () => {
 		const wrapper = shallow(
-			<MenuItem className="my-class" icon="wordpress" onClick={ noop } shortcut="mod+shift+alt+w">
+			<MenuItem
+				className="my-class"
+				icon="wordpress"
+				onClick={ noop }
+				shortcut="mod+shift+alt+w"
+			>
 				My item
 			</MenuItem>
 		);
@@ -44,7 +49,9 @@ describe( 'MenuItem', () => {
 	} );
 
 	it( 'should match snapshot when info is provided', () => {
-		const wrapper = shallow( <MenuItem info="Extended description of My Item">My item</MenuItem> );
+		const wrapper = shallow(
+			<MenuItem info="Extended description of My Item">My item</MenuItem>
+		);
 
 		expect( wrapper ).toMatchSnapshot();
 	} );

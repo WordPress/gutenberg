@@ -7,7 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
+import {
+	AlignmentToolbar,
+	BlockControls,
+	RichText,
+} from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 
@@ -47,7 +51,8 @@ export default function QuoteEdit( {
 					}
 					onMerge={ mergeBlocks }
 					onRemove={ ( forward ) => {
-						const hasEmptyCitation = ! citation || citation.length === 0;
+						const hasEmptyCitation =
+							! citation || citation.length === 0;
 						if ( ! forward && hasEmptyCitation ) {
 							onReplace( [] );
 						}
@@ -63,7 +68,9 @@ export default function QuoteEdit( {
 							value: piece,
 						} )
 					}
-					__unstableOnSplitMiddle={ () => createBlock( 'core/paragraph' ) }
+					__unstableOnSplitMiddle={ () =>
+						createBlock( 'core/paragraph' )
+					}
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText

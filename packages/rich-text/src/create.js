@@ -10,7 +10,11 @@ import { select } from '@wordpress/data';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
-import { LINE_SEPARATOR, OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
+import {
+	LINE_SEPARATOR,
+	OBJECT_REPLACEMENT_CHARACTER,
+	ZWNBSP,
+} from './special-characters';
 
 /**
  * Browser dependencies
@@ -38,7 +42,9 @@ function toFormat( { type, attributes } ) {
 	let formatType;
 
 	if ( attributes && attributes.class ) {
-		formatType = select( 'core/rich-text' ).getFormatTypeForClassName( attributes.class );
+		formatType = select( 'core/rich-text' ).getFormatTypeForClassName(
+			attributes.class
+		);
 
 		if ( formatType ) {
 			// Preserve any additional classes.
@@ -53,7 +59,9 @@ function toFormat( { type, attributes } ) {
 	}
 
 	if ( ! formatType ) {
-		formatType = select( 'core/rich-text' ).getFormatTypeForBareElement( type );
+		formatType = select( 'core/rich-text' ).getFormatTypeForBareElement(
+			type
+		);
 	}
 
 	if ( ! formatType ) {
@@ -203,7 +211,10 @@ function accumulateSelection( accumulator, node, range, value ) {
 	} else if ( node === startContainer && node.nodeType === TEXT_NODE ) {
 		accumulator.start = currentLength + startOffset;
 		// Range indicates that the current node is selected.
-	} else if ( parentNode === startContainer && node === startContainer.childNodes[ startOffset ] ) {
+	} else if (
+		parentNode === startContainer &&
+		node === startContainer.childNodes[ startOffset ]
+	) {
 		accumulator.start = currentLength;
 		// Range indicates that the selection is after the current node.
 	} else if (
@@ -223,10 +234,16 @@ function accumulateSelection( accumulator, node, range, value ) {
 	} else if ( node === endContainer && node.nodeType === TEXT_NODE ) {
 		accumulator.end = currentLength + endOffset;
 		// Range indicates that the current node is selected.
-	} else if ( parentNode === endContainer && node === endContainer.childNodes[ endOffset - 1 ] ) {
+	} else if (
+		parentNode === endContainer &&
+		node === endContainer.childNodes[ endOffset - 1 ]
+	) {
 		accumulator.end = currentLength + value.text.length;
 		// Range indicates that the selection is before the current node.
-	} else if ( parentNode === endContainer && node === endContainer.childNodes[ endOffset ] ) {
+	} else if (
+		parentNode === endContainer &&
+		node === endContainer.childNodes[ endOffset ]
+	) {
 		accumulator.end = currentLength;
 		// Fallback if no child inside handled the selection.
 	} else if ( node === endContainer ) {
@@ -329,7 +346,8 @@ function createFromElement( {
 			let filter = removePadding;
 
 			if ( ! preserveWhiteSpace ) {
-				filter = ( string ) => removePadding( collapseWhiteSpace( string ) );
+				filter = ( string ) =>
+					removePadding( collapseWhiteSpace( string ) );
 			}
 
 			const text = filter( node.nodeValue );
@@ -352,7 +370,8 @@ function createFromElement( {
 			// Ignore any placeholders.
 			( node.getAttribute( 'data-rich-text-placeholder' ) ||
 				// Ignore any line breaks that are not inserted by us.
-				( type === 'br' && ! node.getAttribute( 'data-rich-text-line-break' ) ) )
+				( type === 'br' &&
+					! node.getAttribute( 'data-rich-text-line-break' ) ) )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
@@ -364,15 +383,21 @@ function createFromElement( {
 			continue;
 		}
 
-		const lastFormats = accumulator.formats[ accumulator.formats.length - 1 ];
+		const lastFormats =
+			accumulator.formats[ accumulator.formats.length - 1 ];
 		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
 		const newFormat = toFormat( {
 			type,
 			attributes: getAttributes( { element: node } ),
 		} );
-		const format = isFormatEqual( newFormat, lastFormat ) ? lastFormat : newFormat;
+		const format = isFormatEqual( newFormat, lastFormat )
+			? lastFormat
+			: newFormat;
 
-		if ( multilineWrapperTags && multilineWrapperTags.indexOf( type ) !== -1 ) {
+		if (
+			multilineWrapperTags &&
+			multilineWrapperTags.indexOf( type ) !== -1
+		) {
 			const value = createFromMultilineElement( {
 				element: node,
 				range,
@@ -417,7 +442,9 @@ function createFromElement( {
 					return mergeFormats.newFormats;
 				}
 
-				const newFormats = formats ? [ format, ...formats ] : [ format ];
+				const newFormats = formats
+					? [ format, ...formats ]
+					: [ format ];
 
 				mergeFormats.formats = formats;
 				mergeFormats.newFormats = newFormats;
@@ -496,7 +523,10 @@ function createFromMultilineElement( {
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
 			mergePair( accumulator, {
 				formats: [ , ],
-				replacements: currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ],
+				replacements:
+					currentWrapperTags.length > 0
+						? [ currentWrapperTags ]
+						: [ , ],
 				text: LINE_SEPARATOR,
 			} );
 		}

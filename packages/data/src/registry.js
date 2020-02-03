@@ -99,8 +99,13 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 				( selector, selectorName ) => {
 					return ( ...args ) => {
 						return new Promise( ( resolve ) => {
-							const hasFinished = () => selectors.hasFinishedResolution( selectorName, args );
-							const getResult = () => selector.apply( null, args );
+							const hasFinished = () =>
+								selectors.hasFinishedResolution(
+									selectorName,
+									args
+								);
+							const getResult = () =>
+								selector.apply( null, args );
 
 							// trigger the selector (to trigger the resolver)
 							const result = getResult();

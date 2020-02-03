@@ -7,14 +7,26 @@ import { deepFilterHTML } from '../utils';
 describe( 'phrasingContentReducer', () => {
 	it( 'should transform font weight', () => {
 		expect(
-			deepFilterHTML( '<span style="font-weight:bold">test</span>', [ phrasingContentReducer ], {} )
-		).toEqual( '<strong><span style="font-weight:bold">test</span></strong>' );
+			deepFilterHTML(
+				'<span style="font-weight:bold">test</span>',
+				[ phrasingContentReducer ],
+				{}
+			)
+		).toEqual(
+			'<strong><span style="font-weight:bold">test</span></strong>'
+		);
 	} );
 
 	it( 'should transform numeric font weight', () => {
 		expect(
-			deepFilterHTML( '<span style="font-weight:700">test</span>', [ phrasingContentReducer ], {} )
-		).toEqual( '<strong><span style="font-weight:700">test</span></strong>' );
+			deepFilterHTML(
+				'<span style="font-weight:700">test</span>',
+				[ phrasingContentReducer ],
+				{}
+			)
+		).toEqual(
+			'<strong><span style="font-weight:700">test</span></strong>'
+		);
 	} );
 
 	it( 'should transform font style', () => {
@@ -40,21 +52,30 @@ describe( 'phrasingContentReducer', () => {
 	} );
 
 	it( 'should normalise the rel attribute', () => {
-		const input = '<a href="https://wordpress.org" target="_blank">WordPress</a>';
+		const input =
+			'<a href="https://wordpress.org" target="_blank">WordPress</a>';
 		const output =
 			'<a href="https://wordpress.org" target="_blank" rel="noreferrer noopener">WordPress</a>';
-		expect( deepFilterHTML( input, [ phrasingContentReducer ], {} ) ).toEqual( output );
+		expect(
+			deepFilterHTML( input, [ phrasingContentReducer ], {} )
+		).toEqual( output );
 	} );
 
 	it( 'should only allow target="_blank"', () => {
-		const input = '<a href="https://wordpress.org" target="_self">WordPress</a>';
+		const input =
+			'<a href="https://wordpress.org" target="_self">WordPress</a>';
 		const output = '<a href="https://wordpress.org">WordPress</a>';
-		expect( deepFilterHTML( input, [ phrasingContentReducer ], {} ) ).toEqual( output );
+		expect(
+			deepFilterHTML( input, [ phrasingContentReducer ], {} )
+		).toEqual( output );
 	} );
 
 	it( 'should remove the rel attribute when target is not set', () => {
-		const input = '<a href="https://wordpress.org" rel="noopener">WordPress</a>';
+		const input =
+			'<a href="https://wordpress.org" rel="noopener">WordPress</a>';
 		const output = '<a href="https://wordpress.org">WordPress</a>';
-		expect( deepFilterHTML( input, [ phrasingContentReducer ], {} ) ).toEqual( output );
+		expect(
+			deepFilterHTML( input, [ phrasingContentReducer ], {} )
+		).toEqual( output );
 	} );
 } );

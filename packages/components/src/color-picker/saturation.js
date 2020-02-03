@@ -69,7 +69,11 @@ export class Saturation extends Component {
 
 	saturate( amount = 0.01 ) {
 		const { hsv, onChange = noop } = this.props;
-		const intSaturation = clamp( hsv.s + Math.round( amount * 100 ), 0, 100 );
+		const intSaturation = clamp(
+			hsv.s + Math.round( amount * 100 ),
+			0,
+			100
+		);
 		const change = {
 			h: hsv.h,
 			s: intSaturation,
@@ -97,7 +101,11 @@ export class Saturation extends Component {
 
 	handleChange( e ) {
 		const { onChange = noop } = this.props;
-		const change = calculateSaturationChange( e, this.props, this.container.current );
+		const change = calculateSaturationChange(
+			e,
+			this.props,
+			this.container.current
+		);
 		this.throttle( onChange, change, e );
 	}
 
@@ -165,7 +173,9 @@ export class Saturation extends Component {
 						style={ pointerLocation }
 						onKeyDown={ this.preventKeyEvents }
 					/>
-					<VisuallyHidden id={ `color-picker-saturation-${ instanceId }` }>
+					<VisuallyHidden
+						id={ `color-picker-saturation-${ instanceId }` }
+					>
 						{ __(
 							'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.'
 						) }

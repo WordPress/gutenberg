@@ -36,7 +36,9 @@ describe( 'jest-console', () => {
 
 		test( `${ matcherNameWith } works when not called`, () => {
 			expect( console ).not[ matcherNameWith ]( message );
-			expect( () => expect( console )[ matcherNameWith ]( message ) ).toThrow(
+			expect( () =>
+				expect( console )[ matcherNameWith ]( message )
+			).toThrow(
 				/Expected mock function to be called with:.*but it was called with:/s
 			);
 		} );
@@ -46,7 +48,9 @@ describe( 'jest-console', () => {
 			console[ methodName ]( message, 'Unknown param.' );
 
 			expect( console ).not[ matcherNameWith ]( message );
-			expect( () => expect( console )[ matcherNameWith ]( message ) ).toThrow(
+			expect( () =>
+				expect( console )[ matcherNameWith ]( message )
+			).toThrow(
 				/Expected mock function to be called with:.*but it was called with:.*Unknown param./s
 			);
 		} );
@@ -71,7 +75,9 @@ describe( 'jest-console', () => {
 				// own lifecycle is defined to run before ours. Infer
 				// that we're being watched by testing the console
 				// method as being a spy.
-				expect( console[ methodName ].assertionsNumber ).toBeGreaterThanOrEqual( 0 );
+				expect(
+					console[ methodName ].assertionsNumber
+				).toBeGreaterThanOrEqual( 0 );
 			} );
 
 			it( 'captures logging in lifecycle', () => {} );

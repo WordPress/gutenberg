@@ -28,8 +28,12 @@ describe( 'ToggleControl', () => {
 	it( 'triggers change callback with numeric value', () => {
 		// Mount: With shallow, cannot find input child of BaseControl
 		const onChange = jest.fn();
-		const wrapper = renderer.create( getTestComponent( ToggleControl, { onChange } ) );
-		wrapper.root.findByType( 'input' ).props.onChange( { target: { checked: true } } );
+		const wrapper = renderer.create(
+			getTestComponent( ToggleControl, { onChange } )
+		);
+		wrapper.root
+			.findByType( 'input' )
+			.props.onChange( { target: { checked: true } } );
 
 		expect( onChange ).toHaveBeenCalledWith( true );
 	} );
@@ -38,7 +42,9 @@ describe( 'ToggleControl', () => {
 		it( 'does not render input with describedby if no help prop', () => {
 			// Mount: With shallow, cannot find input child of BaseControl
 			const onChange = jest.fn();
-			const wrapper = renderer.create( getTestComponent( ToggleControl, { onChange } ) );
+			const wrapper = renderer.create(
+				getTestComponent( ToggleControl, { onChange } )
+			);
 
 			const input = wrapper.root.findByType( 'input' );
 
@@ -54,7 +60,9 @@ describe( 'ToggleControl', () => {
 
 			const input = wrapper.root.findByType( 'input' );
 
-			expect( input.props[ 'aria-describedby' ] ).toMatch( /^inspector-toggle-control-.*__help$/ );
+			expect( input.props[ 'aria-describedby' ] ).toMatch(
+				/^inspector-toggle-control-.*__help$/
+			);
 		} );
 	} );
 } );

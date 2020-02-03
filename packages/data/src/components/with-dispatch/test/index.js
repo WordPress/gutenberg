@@ -37,7 +37,9 @@ describe( 'withDispatch', () => {
 					const actionReturnedFromDispatch = Promise.resolve(
 						_dispatch( 'counter' ).increment( count )
 					);
-					return expect( actionReturnedFromDispatch ).resolves.toEqual( {
+					return expect(
+						actionReturnedFromDispatch
+					).resolves.toEqual( {
 						type: 'increment',
 						count,
 					} );
@@ -55,7 +57,8 @@ describe( 'withDispatch', () => {
 		} );
 		const testInstance = testRenderer.root;
 
-		const incrementBeforeSetProps = testInstance.findByType( 'button' ).props.onClick;
+		const incrementBeforeSetProps = testInstance.findByType( 'button' )
+			.props.onClick;
 
 		// Verify that dispatch respects props at the time of being invoked by
 		// changing props after the initial mount.
@@ -68,7 +71,9 @@ describe( 'withDispatch', () => {
 		} );
 
 		// Function value reference should not have changed in props update.
-		expect( testInstance.findByType( 'button' ).props.onClick ).toBe( incrementBeforeSetProps );
+		expect( testInstance.findByType( 'button' ).props.onClick ).toBe(
+			incrementBeforeSetProps
+		);
 
 		act( () => {
 			incrementBeforeSetProps();
@@ -141,7 +146,8 @@ describe( 'withDispatch', () => {
 	} );
 
 	it(
-		'always calls select with the latest state in the handler passed to ' + 'the component',
+		'always calls select with the latest state in the handler passed to ' +
+			'the component',
 		() => {
 			const store = registry.registerStore( 'counter', {
 				reducer: ( state = 0, action ) => {
@@ -158,22 +164,26 @@ describe( 'withDispatch', () => {
 				},
 			} );
 
-			const Component = withDispatch( ( _dispatch, ownProps, { select: _select } ) => {
-				const outerCount = _select( 'counter' ).getCount();
-				return {
-					update: () => {
-						const innerCount = _select( 'counter' ).getCount();
-						expect( innerCount ).toBe( outerCount );
-						const actionReturnedFromDispatch = Promise.resolve(
-							_dispatch( 'counter' ).update( innerCount + 1 )
-						);
-						return expect( actionReturnedFromDispatch ).resolves.toEqual( {
-							type: 'update',
-							count: innerCount + 1,
-						} );
-					},
-				};
-			} )( ( props ) => <button onClick={ props.update } /> );
+			const Component = withDispatch(
+				( _dispatch, ownProps, { select: _select } ) => {
+					const outerCount = _select( 'counter' ).getCount();
+					return {
+						update: () => {
+							const innerCount = _select( 'counter' ).getCount();
+							expect( innerCount ).toBe( outerCount );
+							const actionReturnedFromDispatch = Promise.resolve(
+								_dispatch( 'counter' ).update( innerCount + 1 )
+							);
+							return expect(
+								actionReturnedFromDispatch
+							).resolves.toEqual( {
+								type: 'update',
+								count: innerCount + 1,
+							} );
+						},
+					};
+				}
+			)( ( props ) => <button onClick={ props.update } /> );
 
 			let testRenderer;
 			act( () => {
@@ -184,7 +194,9 @@ describe( 'withDispatch', () => {
 				);
 			} );
 
-			const counterUpdateHandler = testRenderer.root.findByType( 'button' ).props.onClick;
+			const counterUpdateHandler = testRenderer.root.findByType(
+				'button'
+			).props.onClick;
 
 			act( () => {
 				counterUpdateHandler();

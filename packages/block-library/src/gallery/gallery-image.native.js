@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import { Image, StyleSheet, View, ScrollView, Text, TouchableWithoutFeedback } from 'react-native';
+import {
+	Image,
+	StyleSheet,
+	View,
+	ScrollView,
+	Text,
+	TouchableWithoutFeedback,
+} from 'react-native';
 import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
@@ -26,7 +33,9 @@ import style from './gallery-image-style.scss';
 
 const { compose } = StyleSheet;
 
-const separatorStyle = compose( style.separator, { borderRightWidth: StyleSheet.hairlineWidth } );
+const separatorStyle = compose( style.separator, {
+	borderRightWidth: StyleSheet.hairlineWidth,
+} );
 const buttonStyle = compose( style.button, { aspectRatio: 1 } );
 const removeButtonStyle = compose( style.removeButton, { aspectRatio: 1 } );
 const ICON_SIZE_ARROW = 15;
@@ -43,8 +52,12 @@ class GalleryImage extends Component {
 		this.bindContainer = this.bindContainer.bind( this );
 
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
+			this
+		);
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
+			this
+		);
 		this.renderContent = this.renderContent.bind( this );
 
 		this.state = {
@@ -114,7 +127,11 @@ class GalleryImage extends Component {
 
 		// unselect the caption so when the user selects other image and comeback
 		// the caption is not immediately selected
-		if ( this.state.captionSelected && ! isSelected && prevProps.isSelected ) {
+		if (
+			this.state.captionSelected &&
+			! isSelected &&
+			prevProps.isSelected
+		) {
 			this.setState( {
 				captionSelected: false,
 			} );
@@ -171,7 +188,10 @@ class GalleryImage extends Component {
 			isUploadInProgress ? style.imageUploading : undefined,
 		];
 
-		const overlayStyle = compose( style.overlay, isSelected ? style.overlaySelected : undefined );
+		const overlayStyle = compose(
+			style.overlay,
+			isSelected ? style.overlaySelected : undefined
+		);
 
 		const captionPlaceholderStyle = getStylesFromColorScheme(
 			style.captionPlaceholder,
@@ -179,7 +199,8 @@ class GalleryImage extends Component {
 		);
 
 		const shouldShowCaptionEditable = ! isUploadFailed && isSelected;
-		const shouldShowCaptionExpanded = ! isUploadFailed && ! isSelected && !! caption;
+		const shouldShowCaptionExpanded =
+			! isUploadFailed && ! isSelected && !! caption;
 
 		const captionContainerStyle = shouldShowCaptionExpanded
 			? style.captionExpandedContainer
@@ -201,9 +222,14 @@ class GalleryImage extends Component {
 				{ isUploadFailed && (
 					<View style={ style.uploadFailedContainer }>
 						<View style={ style.uploadFailed }>
-							<Icon icon={ 'warning' } { ...style.uploadFailedIcon } />
+							<Icon
+								icon={ 'warning' }
+								{ ...style.uploadFailedIcon }
+							/>
 						</View>
-						<Text style={ style.uploadFailedText }>{ retryMessage }</Text>
+						<Text style={ style.uploadFailedText }>
+							{ retryMessage }
+						</Text>
 					</View>
 				) }
 				<View style={ overlayStyle }>
@@ -216,8 +242,14 @@ class GalleryImage extends Component {
 											style={ buttonStyle }
 											icon="arrow-left-alt"
 											iconSize={ ICON_SIZE_ARROW }
-											onClick={ isFirstItem ? undefined : onMoveBackward }
-											accessibilityLabel={ __( 'Move Image Backward' ) }
+											onClick={
+												isFirstItem
+													? undefined
+													: onMoveBackward
+											}
+											accessibilityLabel={ __(
+												'Move Image Backward'
+											) }
 											aria-disabled={ isFirstItem }
 											disabled={ ! isSelected }
 										/>
@@ -226,8 +258,14 @@ class GalleryImage extends Component {
 											style={ buttonStyle }
 											icon="arrow-right-alt"
 											iconSize={ ICON_SIZE_ARROW }
-											onClick={ isLastItem ? undefined : onMoveForward }
-											accessibilityLabel={ __( 'Move Image Forward' ) }
+											onClick={
+												isLastItem
+													? undefined
+													: onMoveForward
+											}
+											accessibilityLabel={ __(
+												'Move Image Forward'
+											) }
 											aria-disabled={ isLastItem }
 											disabled={ ! isSelected }
 										/>
@@ -237,21 +275,33 @@ class GalleryImage extends Component {
 										icon="no-alt"
 										iconSize={ ICON_SIZE_REMOVE }
 										onClick={ onRemove }
-										accessibilityLabel={ __( 'Remove Image' ) }
+										accessibilityLabel={ __(
+											'Remove Image'
+										) }
 										disabled={ ! isSelected }
 									/>
 								</View>
 							) }
-							{ ( shouldShowCaptionEditable || shouldShowCaptionExpanded ) && (
+							{ ( shouldShowCaptionEditable ||
+								shouldShowCaptionExpanded ) && (
 								<View style={ captionContainerStyle }>
-									<ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
+									<ScrollView
+										nestedScrollEnabled
+										keyboardShouldPersistTaps="handled"
+									>
 										<Caption
 											inlineToolbar
 											isSelected={ captionSelected }
 											onChange={ this.onCaptionChange }
 											onFocus={ this.onSelectCaption }
-											placeholder={ isSelected ? __( 'Write caption…' ) : null }
-											placeholderTextColor={ captionPlaceholderStyle.color }
+											placeholder={
+												isSelected
+													? __( 'Write caption…' )
+													: null
+											}
+											placeholderTextColor={
+												captionPlaceholderStyle.color
+											}
 											style={ captionStyle }
 											value={ caption }
 										/>
@@ -266,7 +316,12 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { id, onRemove, getStylesFromColorScheme, isSelected } = this.props;
+		const {
+			id,
+			onRemove,
+			getStylesFromColorScheme,
+			isSelected,
+		} = this.props;
 
 		const containerStyle = getStylesFromColorScheme(
 			style.galleryImageContainer,
@@ -284,8 +339,12 @@ class GalleryImage extends Component {
 					<MediaUploadProgress
 						mediaId={ id }
 						onUpdateMediaProgress={ this.updateMediaProgress }
-						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+						onFinishMediaUploadWithSuccess={
+							this.finishMediaUploadWithSuccess
+						}
+						onFinishMediaUploadWithFailure={
+							this.finishMediaUploadWithFailure
+						}
 						onMediaUploadStateReset={ onRemove }
 						renderContent={ this.renderContent }
 					/>

@@ -9,7 +9,9 @@
 export async function getBlockSetting( blockName, setting ) {
 	return page.evaluate(
 		( _blockName, _setting ) => {
-			const blockType = wp.data.select( 'core/blocks' ).getBlockType( _blockName );
+			const blockType = wp.data
+				.select( 'core/blocks' )
+				.getBlockType( _blockName );
 			return blockType && blockType[ _setting ];
 		},
 		blockName,

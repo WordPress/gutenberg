@@ -32,14 +32,18 @@ describe( 'element', () => {
 
 		it( 'should return a string from an array', () => {
 			expect(
-				renderToString( [ 'Zucchini ', createElement( 'em', null, 'is a' ), ' summer squash' ] )
+				renderToString( [
+					'Zucchini ',
+					createElement( 'em', null, 'is a' ),
+					' summer squash',
+				] )
 			).toBe( 'Zucchini <em>is a</em> summer squash' );
 		} );
 
 		it( 'should return a string from an element', () => {
-			expect( renderToString( createElement( 'strong', null, 'Courgette' ) ) ).toBe(
-				'<strong>Courgette</strong>'
-			);
+			expect(
+				renderToString( createElement( 'strong', null, 'Courgette' ) )
+			).toBe( '<strong>Courgette</strong>' );
 		} );
 
 		it( 'should escape attributes and html', () => {
@@ -66,7 +70,9 @@ describe( 'element', () => {
 		it( 'strips raw html wrapper', () => {
 			const html = '<p>So scary!</p>';
 
-			expect( renderToString( <RawHTML>{ html }</RawHTML> ) ).toBe( html );
+			expect( renderToString( <RawHTML>{ html }</RawHTML> ) ).toBe(
+				html
+			);
 		} );
 	} );
 

@@ -8,6 +8,7 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	switchEditorModeTo,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'InnerBlocks Template Sync', () => {
@@ -45,6 +46,8 @@ describe( 'InnerBlocks Template Sync', () => {
 		);
 		// Press "Enter" inside the Code Editor to fire the `onChange` event for the new value.
 		await page.click( '.editor-post-text-editor' );
+		await pressKeyWithModifier( 'primary', 'A' );
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 		await switchEditorModeTo( 'Visual' );
 	};
@@ -77,7 +80,9 @@ describe( 'InnerBlocks Template Sync', () => {
 
 describe( 'Container block without paragraph support', () => {
 	beforeAll( async () => {
-		await activatePlugin( 'gutenberg-test-container-block-without-paragraph' );
+		await activatePlugin(
+			'gutenberg-test-container-block-without-paragraph'
+		);
 	} );
 
 	beforeEach( async () => {
@@ -85,7 +90,9 @@ describe( 'Container block without paragraph support', () => {
 	} );
 
 	afterAll( async () => {
-		await deactivatePlugin( 'gutenberg-test-container-block-without-paragraph' );
+		await deactivatePlugin(
+			'gutenberg-test-container-block-without-paragraph'
+		);
 	} );
 
 	it( 'ensures we can use the alternative block appender properly', async () => {
@@ -97,7 +104,9 @@ describe( 'Container block without paragraph support', () => {
 		);
 
 		// Insert an image block.
-		const insertButton = ( await page.$x( `//button//span[contains(text(), 'Image')]` ) )[ 0 ];
+		const insertButton = (
+			await page.$x( `//button//span[contains(text(), 'Image')]` )
+		 )[ 0 ];
 		await insertButton.click();
 
 		// Check the inserted content.

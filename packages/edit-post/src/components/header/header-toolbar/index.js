@@ -11,17 +11,24 @@ import {
 	BlockNavigationDropdown,
 	ToolSelector,
 } from '@wordpress/block-editor';
-import { TableOfContents, EditorHistoryRedo, EditorHistoryUndo } from '@wordpress/editor';
+import {
+	TableOfContents,
+	EditorHistoryRedo,
+	EditorHistoryUndo,
+} from '@wordpress/editor';
 
 function HeaderToolbar() {
 	const { hasFixedToolbar, showInserter, isTextModeEnabled } = useSelect(
 		( select ) => ( {
-			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
+				'fixedToolbar'
+			),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			showInserter:
 				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
 				select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-			isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
+			isTextModeEnabled:
+				select( 'core/edit-post' ).getEditorMode() === 'text',
 		} ),
 		[]
 	);
@@ -34,8 +41,15 @@ function HeaderToolbar() {
 		  __( 'Document tools' );
 
 	return (
-		<NavigableToolbar className="edit-post-header-toolbar" aria-label={ toolbarAriaLabel }>
-			<Inserter disabled={ ! showInserter } position="bottom right" showInserterHelpPanel />
+		<NavigableToolbar
+			className="edit-post-header-toolbar"
+			aria-label={ toolbarAriaLabel }
+		>
+			<Inserter
+				disabled={ ! showInserter }
+				position="bottom right"
+				showInserterHelpPanel
+			/>
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />

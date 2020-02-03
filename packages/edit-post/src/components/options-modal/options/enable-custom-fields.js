@@ -28,10 +28,14 @@ export function CustomFieldsConfirmation( { willEnable } ) {
 				disabled={ isReloading }
 				onClick={ () => {
 					setIsReloading( true );
-					document.getElementById( 'toggle-custom-fields-form' ).submit();
+					document
+						.getElementById( 'toggle-custom-fields-form' )
+						.submit();
 				} }
 			>
-				{ willEnable ? __( 'Enable & Reload' ) : __( 'Disable & Reload' ) }
+				{ willEnable
+					? __( 'Enable & Reload' )
+					: __( 'Disable & Reload' ) }
 			</Button>
 		</>
 	);
@@ -41,7 +45,11 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 	const [ isChecked, setIsChecked ] = useState( areCustomFieldsEnabled );
 
 	return (
-		<BaseOption label={ label } isChecked={ isChecked } onChange={ setIsChecked }>
+		<BaseOption
+			label={ label }
+			isChecked={ isChecked }
+			onChange={ setIsChecked }
+		>
 			{ isChecked !== areCustomFieldsEnabled && (
 				<CustomFieldsConfirmation willEnable={ isChecked } />
 			) }
@@ -50,5 +58,6 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 }
 
 export default withSelect( ( select ) => ( {
-	areCustomFieldsEnabled: !! select( 'core/editor' ).getEditorSettings().enableCustomFields,
+	areCustomFieldsEnabled: !! select( 'core/editor' ).getEditorSettings()
+		.enableCustomFields,
 } ) )( EnableCustomFieldsOption );

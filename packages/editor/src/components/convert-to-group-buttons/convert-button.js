@@ -45,18 +45,25 @@ export function ConvertToGroupButton( {
 
 export default compose( [
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlockRootClientId, getBlocksByClientId, canInsertBlockType } = select(
-			'core/block-editor'
-		);
+		const {
+			getBlockRootClientId,
+			getBlocksByClientId,
+			canInsertBlockType,
+		} = select( 'core/block-editor' );
 
 		const { getGroupingBlockName } = select( 'core/blocks' );
 
 		const groupingBlockName = getGroupingBlockName();
 
 		const rootClientId =
-			clientIds && clientIds.length > 0 ? getBlockRootClientId( clientIds[ 0 ] ) : undefined;
+			clientIds && clientIds.length > 0
+				? getBlockRootClientId( clientIds[ 0 ] )
+				: undefined;
 
-		const groupingBlockAvailable = canInsertBlockType( groupingBlockName, rootClientId );
+		const groupingBlockAvailable = canInsertBlockType(
+			groupingBlockName,
+			rootClientId
+		);
 
 		const blocksSelection = getBlocksByClientId( clientIds );
 
@@ -70,10 +77,14 @@ export default compose( [
 		// 2. One or more blocks selected
 		// (we allow single Blocks to become groups unless
 		// they are a soltiary group block themselves)
-		const isGroupable = groupingBlockAvailable && blocksSelection.length && ! isSingleGroupingBlock;
+		const isGroupable =
+			groupingBlockAvailable &&
+			blocksSelection.length &&
+			! isSingleGroupingBlock;
 
 		// Do we have a single Group Block selected and does that group have inner blocks?
-		const isUngroupable = isSingleGroupingBlock && !! blocksSelection[ 0 ].innerBlocks.length;
+		const isUngroupable =
+			isSingleGroupingBlock && !! blocksSelection[ 0 ].innerBlocks.length;
 
 		return {
 			isGroupable,
@@ -83,7 +94,15 @@ export default compose( [
 		};
 	} ),
 	withDispatch(
-		( dispatch, { clientIds, onToggle = noop, blocksSelection = [], groupingBlockName } ) => {
+		(
+			dispatch,
+			{
+				clientIds,
+				onToggle = noop,
+				blocksSelection = [],
+				groupingBlockName,
+			}
+		) => {
 			const { replaceBlocks } = dispatch( 'core/block-editor' );
 
 			return {
@@ -93,7 +112,10 @@ export default compose( [
 					}
 
 					// Activate the `transform` on the Grouping Block which does the conversion
-					const newBlocks = switchToBlockType( blocksSelection, groupingBlockName );
+					const newBlocks = switchToBlockType(
+						blocksSelection,
+						groupingBlockName
+					);
 
 					if ( newBlocks ) {
 						replaceBlocks( clientIds, newBlocks );

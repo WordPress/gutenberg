@@ -13,7 +13,11 @@ import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { STORE_KEY, POST_UPDATE_TRANSACTION_ID, TRASH_POST_NOTICE_ID } from './constants';
+import {
+	STORE_KEY,
+	POST_UPDATE_TRANSACTION_ID,
+	TRASH_POST_NOTICE_ID,
+} from './constants';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
@@ -55,12 +59,16 @@ export function* setupEditor( post, edits, template ) {
 		edits,
 		template,
 	};
-	yield resetEditorBlocks( blocks, { __unstableShouldCreateUndoLevel: false } );
+	yield resetEditorBlocks( blocks, {
+		__unstableShouldCreateUndoLevel: false,
+	} );
 	yield setupEditorState( post );
 	if (
 		edits &&
 		Object.keys( edits ).some(
-			( key ) => edits[ key ] !== ( has( post, [ key, 'raw' ] ) ? post[ key ].raw : post[ key ] )
+			( key ) =>
+				edits[ key ] !==
+				( has( post, [ key, 'raw' ] ) ? post[ key ].raw : post[ key ] )
 		)
 	) {
 		yield editPost( edits );
@@ -184,7 +192,15 @@ export function setupEditorState( post ) {
  */
 export function* editPost( edits, options ) {
 	const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
-	yield dispatch( 'core', 'editEntityRecord', 'postType', type, id, edits, options );
+	yield dispatch(
+		'core',
+		'editEntityRecord',
+		'postType',
+		type,
+		id,
+		edits,
+		options
+	);
 }
 
 /**
@@ -231,7 +247,14 @@ export function* savePost( options = {} ) {
 		) ),
 		...edits,
 	};
-	yield dispatch( 'core', 'saveEntityRecord', 'postType', previousRecord.type, edits, options );
+	yield dispatch(
+		'core',
+		'saveEntityRecord',
+		'postType',
+		previousRecord.type,
+		edits,
+		options
+	);
 	yield __experimentalRequestPostUpdateFinish( options );
 
 	const error = yield select(
@@ -264,7 +287,10 @@ export function* savePost( options = {} ) {
 		// Make sure that any edits after saving create an undo level and are
 		// considered for change detection.
 		if ( ! options.isAutosave ) {
-			yield dispatch( 'core/block-editor', '__unstableMarkLastChangeAsPersistent' );
+			yield dispatch(
+				'core/block-editor',
+				'__unstableMarkLastChangeAsPersistent'
+			);
 		}
 	}
 }
@@ -280,7 +306,8 @@ export function* refreshPost() {
 		// Timestamp arg allows caller to bypass browser caching, which is
 		// expected for this specific function.
 		path:
-			`/wp/v2/${ postType.rest_base }/${ post.id }` + `?context=edit&_timestamp=${ Date.now() }`,
+			`/wp/v2/${ postType.rest_base }/${ post.id }` +
+			`?context=edit&_timestamp=${ Date.now() }`,
 	} );
 	yield dispatch( STORE_KEY, 'resetPost', newPost );
 }
@@ -321,8 +348,16 @@ export function* autosave( options ) {
 export function* __experimentalLocalAutosave() {
 	const post = yield select( STORE_KEY, 'getCurrentPost' );
 	const title = yield select( STORE_KEY, 'getEditedPostAttribute', 'title' );
-	const content = yield select( STORE_KEY, 'getEditedPostAttribute', 'content' );
-	const excerpt = yield select( STORE_KEY, 'getEditedPostAttribute', 'excerpt' );
+	const content = yield select(
+		STORE_KEY,
+		'getEditedPostAttribute',
+		'content'
+	);
+	const excerpt = yield select(
+		STORE_KEY,
+		'getEditedPostAttribute',
+		'excerpt'
+	);
 	yield {
 		type: 'LOCAL_AUTOSAVE_SET',
 		postId: post.id,
@@ -627,16 +662,31 @@ export function unlockPostAutosaving( lockName ) {
  * @yield {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
-	const { __unstableShouldCreateUndoLevel, selectionStart, selectionEnd } = options;
+	const {
+		__unstableShouldCreateUndoLevel,
+		selectionStart,
+		selectionEnd,
+	} = options;
 	const edits = { blocks, selectionStart, selectionEnd };
 
 	if ( __unstableShouldCreateUndoLevel !== false ) {
 		const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
 		const noChange =
-			( yield select( 'core', 'getEditedEntityRecord', 'postType', type, id ) ).blocks ===
-			edits.blocks;
+			( yield select(
+				'core',
+				'getEditedEntityRecord',
+				'postType',
+				type,
+				id
+			) ).blocks === edits.blocks;
 		if ( noChange ) {
-			return yield dispatch( 'core', '__unstableCreateUndoLevel', 'postType', type, id );
+			return yield dispatch(
+				'core',
+				'__unstableCreateUndoLevel',
+				'postType',
+				type,
+				id
+			);
 		}
 
 		// We create a new function here on every persistent edit
@@ -669,7 +719,8 @@ export function updateEditorSettings( settings ) {
 const getBlockEditorAction = ( name ) =>
 	function*( ...args ) {
 		deprecated( "`wp.data.dispatch( 'core/editor' )." + name + '`', {
-			alternative: "`wp.data.dispatch( 'core/block-editor' )." + name + '`',
+			alternative:
+				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
 		} );
 		yield dispatch( 'core/block-editor', name, ...args );
 	};
@@ -692,7 +743,9 @@ export const updateBlock = getBlockEditorAction( 'updateBlock' );
 /**
  * @see updateBlockAttributes in core/block-editor store.
  */
-export const updateBlockAttributes = getBlockEditorAction( 'updateBlockAttributes' );
+export const updateBlockAttributes = getBlockEditorAction(
+	'updateBlockAttributes'
+);
 
 /**
  * @see selectBlock in core/block-editor store.
@@ -747,7 +800,9 @@ export const moveBlocksUp = getBlockEditorAction( 'moveBlocksUp' );
 /**
  * @see moveBlockToPosition in core/block-editor store.
  */
-export const moveBlockToPosition = getBlockEditorAction( 'moveBlockToPosition' );
+export const moveBlockToPosition = getBlockEditorAction(
+	'moveBlockToPosition'
+);
 
 /**
  * @see insertBlock in core/block-editor store.
@@ -772,12 +827,16 @@ export const hideInsertionPoint = getBlockEditorAction( 'hideInsertionPoint' );
 /**
  * @see setTemplateValidity in core/block-editor store.
  */
-export const setTemplateValidity = getBlockEditorAction( 'setTemplateValidity' );
+export const setTemplateValidity = getBlockEditorAction(
+	'setTemplateValidity'
+);
 
 /**
  * @see synchronizeTemplate in core/block-editor store.
  */
-export const synchronizeTemplate = getBlockEditorAction( 'synchronizeTemplate' );
+export const synchronizeTemplate = getBlockEditorAction(
+	'synchronizeTemplate'
+);
 
 /**
  * @see mergeBlocks in core/block-editor store.
@@ -827,4 +886,6 @@ export const insertDefaultBlock = getBlockEditorAction( 'insertDefaultBlock' );
 /**
  * @see updateBlockListSettings in core/block-editor store.
  */
-export const updateBlockListSettings = getBlockEditorAction( 'updateBlockListSettings' );
+export const updateBlockListSettings = getBlockEditorAction(
+	'updateBlockListSettings'
+);

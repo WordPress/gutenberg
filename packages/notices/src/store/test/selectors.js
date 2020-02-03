@@ -32,7 +32,9 @@ describe( 'selectors', () => {
 				foo: [ { id: 'c', content: 'message 3' } ],
 			};
 
-			expect( getNotices( state, 'foo' ) ).toEqual( [ { id: 'c', content: 'message 3' } ] );
+			expect( getNotices( state, 'foo' ) ).toEqual( [
+				{ id: 'c', content: 'message 3' },
+			] );
 		} );
 	} );
 } );

@@ -103,7 +103,14 @@ describe( 'DOM', () => {
 		 *
 		 * @type {string[]}
 		 */
-		const NON_TEXT_INPUT_TYPES = [ 'button', 'checkbox', 'image', 'hidden', 'radio', 'submit' ];
+		const NON_TEXT_INPUT_TYPES = [
+			'button',
+			'checkbox',
+			'image',
+			'hidden',
+			'radio',
+			'submit',
+		];
 
 		/**
 		 * A sampling of input types expected to be text eligible.
@@ -131,7 +138,9 @@ describe( 'DOM', () => {
 		} );
 
 		it( 'should return true for an textarea element', () => {
-			expect( isTextField( document.createElement( 'textarea' ) ) ).toBe( true );
+			expect( isTextField( document.createElement( 'textarea' ) ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should return true for a contenteditable element', () => {
@@ -143,13 +152,17 @@ describe( 'DOM', () => {
 		} );
 
 		it( 'should return true for a normal div element', () => {
-			expect( isTextField( document.createElement( 'div' ) ) ).toBe( false );
+			expect( isTextField( document.createElement( 'div' ) ) ).toBe(
+				false
+			);
 		} );
 	} );
 
 	describe( 'stripHTML', () => {
 		it( 'removes any HTML from a text string', () => {
-			expect( stripHTML( 'This is <em>emphasized</em>' ) ).toBe( 'This is emphasized' );
+			expect( stripHTML( 'This is <em>emphasized</em>' ) ).toBe(
+				'This is emphasized'
+			);
 		} );
 
 		it( 'removes script tags, but does not execute them', () => {

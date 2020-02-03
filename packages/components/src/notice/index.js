@@ -24,9 +24,14 @@ function Notice( {
 	actions = [],
 	__unstableHTML,
 } ) {
-	const classes = classnames( className, 'components-notice', 'is-' + status, {
-		'is-dismissible': isDismissible,
-	} );
+	const classes = classnames(
+		className,
+		'components-notice',
+		'is-' + status,
+		{
+			'is-dismissible': isDismissible,
+		}
+	);
 
 	if ( __unstableHTML ) {
 		children = <RawHTML>{ children }</RawHTML>;
@@ -38,7 +43,13 @@ function Notice( {
 				{ children }
 				{ actions.map(
 					(
-						{ className: buttonCustomClasses, label, noDefaultClasses = false, onClick, url },
+						{
+							className: buttonCustomClasses,
+							label,
+							noDefaultClasses = false,
+							onClick,
+							url,
+						},
 						index
 					) => {
 						return (
@@ -48,7 +59,10 @@ function Notice( {
 								isSecondary={ ! noDefaultClasses && ! url }
 								isLink={ ! noDefaultClasses && !! url }
 								onClick={ url ? undefined : onClick }
-								className={ classnames( 'components-notice__action', buttonCustomClasses ) }
+								className={ classnames(
+									'components-notice__action',
+									buttonCustomClasses
+								) }
 							>
 								{ label }
 							</Button>

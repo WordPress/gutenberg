@@ -17,9 +17,14 @@ const getUnstagedFiles = () =>
 		.filter( ( element ) => '' !== element );
 const readmeFiles = getPackages().map(
 	( [ packageName ] ) =>
-		`docs/designers-developers/developers/data/data-${ packageName.replace( '/', '-' ) }.md`
+		`docs/designers-developers/developers/data/data-${ packageName.replace(
+			'/',
+			'-'
+		) }.md`
 );
-const unstagedReadmes = getUnstagedFiles().filter( ( element ) => readmeFiles.includes( element ) );
+const unstagedReadmes = getUnstagedFiles().filter( ( element ) =>
+	readmeFiles.includes( element )
+);
 
 if ( unstagedReadmes.length > 0 ) {
 	process.exitCode = 1;

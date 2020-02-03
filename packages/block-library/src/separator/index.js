@@ -18,7 +18,9 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Separator' ),
-	description: __( 'Create a break between ideas or sections with a horizontal separator.' ),
+	description: __(
+		'Create a break between ideas or sections with a horizontal separator.'
+	),
 	icon,
 	keywords: [ __( 'horizontal-line' ), 'hr', __( 'divider' ) ],
 	example: {

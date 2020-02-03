@@ -118,7 +118,10 @@ Compiler.prototype.supports = function( node ) {
 
 Compiler.prototype.keyframes = function( node ) {
 	return (
-		this.emit( '@' + ( node.vendor || '' ) + 'keyframes ' + node.name, node.position ) +
+		this.emit(
+			'@' + ( node.vendor || '' ) + 'keyframes ' + node.name,
+			node.position
+		) +
 		this.emit( '{' ) +
 		this.mapVisit( node.keyframes ) +
 		this.emit( '}' )
@@ -186,7 +189,10 @@ Compiler.prototype.host = function( node ) {
  */
 
 Compiler.prototype[ 'custom-media' ] = function( node ) {
-	return this.emit( '@custom-media ' + node.name + ' ' + node.media + ';', node.position );
+	return this.emit(
+		'@custom-media ' + node.name + ' ' + node.media + ';',
+		node.position
+	);
 };
 
 /**
@@ -212,5 +218,8 @@ Compiler.prototype.rule = function( node ) {
  */
 
 Compiler.prototype.declaration = function( node ) {
-	return this.emit( node.property + ':' + node.value, node.position ) + this.emit( ';' );
+	return (
+		this.emit( node.property + ':' + node.value, node.position ) +
+		this.emit( ';' )
+	);
 };

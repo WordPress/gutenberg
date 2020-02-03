@@ -19,7 +19,9 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Verse' ),
-	description: __( 'Insert poetry. Use special spacing formats. Or quote song lyrics.' ),
+	description: __(
+		'Insert poetry. Use special spacing formats. Or quote song lyrics.'
+	),
 	icon,
 	example: {
 		attributes: {
