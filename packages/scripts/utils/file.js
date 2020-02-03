@@ -25,6 +25,7 @@ const hasScriptFile = ( scriptName ) =>
 	existsSync( fromScriptsRoot( scriptName ) );
 
 module.exports = {
+	fromProjectRoot,
 	fromConfigRoot,
 	fromScriptsRoot,
 	hasProjectFile,

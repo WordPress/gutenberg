@@ -29,9 +29,12 @@ const stateReducer = (
 			return {
 				selectedItem:
 					items[
-						selectedItem ?
-							Math.min( items.indexOf( selectedItem ) + 1, items.length - 1 ) :
-							0
+						selectedItem
+							? Math.min(
+									items.indexOf( selectedItem ) + 1,
+									items.length - 1
+							  )
+							: 0
 					],
 			};
 		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowUp:
@@ -40,9 +43,9 @@ const stateReducer = (
 			return {
 				selectedItem:
 					items[
-						selectedItem ?
-							Math.max( items.indexOf( selectedItem ) - 1, 0 ) :
-							items.length - 1
+						selectedItem
+							? Math.max( items.indexOf( selectedItem ) - 1, 0 )
+							: items.length - 1
 					],
 			};
 		default:
@@ -73,6 +76,7 @@ export default function CustomSelectControl( {
 		selectedItem: _selectedItem,
 		stateReducer,
 	} );
+
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',
 	} );
@@ -80,19 +84,29 @@ export default function CustomSelectControl( {
 	// fully ARIA compliant.
 	if (
 		menuProps[ 'aria-activedescendant' ] &&
-		menuProps[ 'aria-activedescendant' ].slice( 0, 'downshift-null'.length ) ===
-			'downshift-null'
+		menuProps[ 'aria-activedescendant' ].slice(
+			0,
+			'downshift-null'.length
+		) === 'downshift-null'
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
 	return (
-		<div className={ classnames( 'components-custom-select-control', className ) }>
+		<div
+			className={ classnames(
+				'components-custom-select-control',
+				className
+			) }
+		>
 			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */ }
 			<label
 				{ ...getLabelProps( {
-					className: classnames( 'components-custom-select-control__label', {
-						'screen-reader-text': hideLabelFromVision,
-					} ),
+					className: classnames(
+						'components-custom-select-control__label',
+						{
+							'screen-reader-text': hideLabelFromVision,
+						}
+					),
 				} ) }
 			>
 				{ label }
@@ -103,6 +117,7 @@ export default function CustomSelectControl( {
 					'aria-label': label,
 					'aria-labelledby': undefined,
 					className: 'components-custom-select-control__button',
+					isSmall: true,
 				} ) }
 			>
 				{ itemToString( selectedItem ) }
@@ -123,7 +138,8 @@ export default function CustomSelectControl( {
 								className: classnames(
 									'components-custom-select-control__item',
 									{
-										'is-highlighted': index === highlightedIndex,
+										'is-highlighted':
+											index === highlightedIndex,
 									}
 								),
 								style: item.style,

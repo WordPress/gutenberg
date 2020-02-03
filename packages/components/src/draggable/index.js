@@ -47,10 +47,18 @@ class Draggable extends Component {
 	 * @param  {Object} event The non-custom DragEvent.
 	 */
 	onDragOver( event ) {
-		this.cloneWrapper.style.top =
-			`${ parseInt( this.cloneWrapper.style.top, 10 ) + event.clientY - this.cursorTop }px`;
-		this.cloneWrapper.style.left =
-			`${ parseInt( this.cloneWrapper.style.left, 10 ) + event.clientX - this.cursorLeft }px`;
+		this.cloneWrapper.style.top = `${ parseInt(
+			this.cloneWrapper.style.top,
+			10
+		) +
+			event.clientY -
+			this.cursorTop }px`;
+		this.cloneWrapper.style.left = `${ parseInt(
+			this.cloneWrapper.style.left,
+			10
+		) +
+			event.clientX -
+			this.cursorLeft }px`;
 
 		// Update cursor coordinates.
 		this.cursorLeft = event.clientX;
@@ -100,7 +108,8 @@ class Draggable extends Component {
 		clone.id = `clone-${ elementId }`;
 		this.cloneWrapper = document.createElement( 'div' );
 		this.cloneWrapper.classList.add( cloneWrapperClass );
-		this.cloneWrapper.style.width = `${ elementRect.width + ( clonePadding * 2 ) }px`;
+		this.cloneWrapper.style.width = `${ elementRect.width +
+			clonePadding * 2 }px`;
 
 		if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
 			// Scale down clone if original element is larger than 700px.
@@ -111,12 +120,16 @@ class Draggable extends Component {
 			this.cloneWrapper.style.left = `${ event.clientX }px`;
 		} else {
 			// Position clone right over the original element (20px padding).
-			this.cloneWrapper.style.top = `${ elementTopOffset - clonePadding }px`;
-			this.cloneWrapper.style.left = `${ elementLeftOffset - clonePadding }px`;
+			this.cloneWrapper.style.top = `${ elementTopOffset -
+				clonePadding }px`;
+			this.cloneWrapper.style.left = `${ elementLeftOffset -
+				clonePadding }px`;
 		}
 
 		// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
-		Array.from( clone.querySelectorAll( 'iframe' ) ).forEach( ( child ) => child.parentNode.removeChild( child ) );
+		Array.from( clone.querySelectorAll( 'iframe' ) ).forEach( ( child ) =>
+			child.parentNode.removeChild( child )
+		);
 
 		this.cloneWrapper.appendChild( clone );
 		elementWrapper.appendChild( this.cloneWrapper );

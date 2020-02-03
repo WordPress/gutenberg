@@ -96,5 +96,7 @@ export const positioning = () => {
 	const content = text( 'Example: Content', 'Popover' );
 	const noArrow = boolean( 'noArrow', false );
 
-	return <DragExample label={ label } content={ content } noArrow={ noArrow } />;
+	return (
+		<DragExample label={ label } content={ content } noArrow={ noArrow } />
+	);
 };

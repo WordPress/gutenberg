@@ -21,13 +21,17 @@ describe( 'new editor state', () => {
 	} );
 
 	it( 'should show the New Post page in Gutenberg', async () => {
-		expect( page.url() ).toEqual( expect.stringContaining( 'post-new.php' ) );
+		expect( page.url() ).toEqual(
+			expect.stringContaining( 'post-new.php' )
+		);
 		// Should display the blank title.
 		const title = await page.$( '[placeholder="Add title"]' );
 		expect( title ).not.toBeNull();
 		expect( title.innerHTML ).toBeFalsy();
 		// Should display the Preview button.
-		const postPreviewButton = await page.$( '.editor-post-preview.components-button' );
+		const postPreviewButton = await page.$(
+			'.editor-post-preview.components-button'
+		);
 		expect( postPreviewButton ).not.toBeNull();
 		// Should display the Post Formats UI.
 		const postFormatsUi = await page.$( '.editor-post-format' );
@@ -35,8 +39,12 @@ describe( 'new editor state', () => {
 	} );
 
 	it( 'should have no history', async () => {
-		const undoButton = await page.$( '.editor-history__undo[aria-disabled="false"]' );
-		const redoButton = await page.$( '.editor-history__redo[aria-disabled="false"]' );
+		const undoButton = await page.$(
+			'.editor-history__undo[aria-disabled="false"]'
+		);
+		const redoButton = await page.$(
+			'.editor-history__redo[aria-disabled="false"]'
+		);
 
 		expect( undoButton ).toBeNull();
 		expect( redoButton ).toBeNull();
@@ -70,7 +78,9 @@ describe( 'new editor state', () => {
 			return document.activeElement.tagName.toLowerCase();
 		} );
 
-		expect( activeElementClasses ).not.toContain( 'editor-post-title__input' );
+		expect( activeElementClasses ).not.toContain(
+			'editor-post-title__input'
+		);
 		// The document `body` should be the `activeElement`, because nothing is
 		// focused by default when a post already has a title.
 		expect( activeElementTagName ).toEqual( 'body' );

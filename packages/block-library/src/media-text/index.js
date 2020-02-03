@@ -29,13 +29,16 @@ export const settings = {
 	example: {
 		attributes: {
 			mediaType: 'image',
-			mediaUrl: 'https://s.w.org/images/core/5.3/Biologia_Centrali-Americana_-_Cantorchilus_semibadius_1902.jpg',
+			mediaUrl:
+				'https://s.w.org/images/core/5.3/Biologia_Centrali-Americana_-_Cantorchilus_semibadius_1902.jpg',
 		},
 		innerBlocks: [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: __( 'The wren<br>Earns his living<br>Noiselessly.' ),
+					content: __(
+						'The wren<br>Earns his living<br>Noiselessly.'
+					),
 				},
 			},
 			{

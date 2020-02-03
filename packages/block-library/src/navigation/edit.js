@@ -7,11 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	useMemo,
-	Fragment,
-	useRef,
-} from '@wordpress/element';
+import { useMemo, Fragment, useRef } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -74,7 +70,13 @@ function Navigation( {
 			{ name: 'backgroundColor', className: 'background-color' },
 		],
 		{
-			contrastCheckers: [ { backgroundColor: true, textColor: true, fontSize: fontSize.size } ],
+			contrastCheckers: [
+				{
+					backgroundColor: true,
+					textColor: true,
+					fontSize: fontSize.size,
+				},
+			],
 			colorDetector: { targetRef: ref },
 			colorPanelProps: {
 				initialOpen: true,
@@ -84,37 +86,37 @@ function Navigation( {
 	);
 
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
-	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
+	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
+		clientId
+	);
 
 	// Builds navigation links from default Pages.
-	const defaultPagesNavigationItems = useMemo(
-		() => {
-			if ( ! pages ) {
-				return null;
-			}
+	const defaultPagesNavigationItems = useMemo( () => {
+		if ( ! pages ) {
+			return null;
+		}
 
-			return pages.map( ( { title, type, link: url, id } ) => (
-				createBlock( 'core/navigation-link',
-					{
-						type,
-						id,
-						url,
-						label: ! title.rendered ? __( '(no title)' ) : escape( title.rendered ),
-						title: ! title.raw ? __( '(no title)' ) : escape( title.raw ),
-						opensInNewTab: false,
-					}
-				)
-			) );
-		},
-		[ pages ]
-	);
+		return pages.map( ( { title, type, link: url, id } ) =>
+			createBlock( 'core/navigation-link', {
+				type,
+				id,
+				url,
+				label: ! title.rendered
+					? __( '(no title)' )
+					: escape( title.rendered ),
+				title: ! title.raw ? __( '(no title)' ) : escape( title.raw ),
+				opensInNewTab: false,
+			} )
+		);
+	}, [ pages ] );
 
 	//
 	// HANDLERS
 	//
 	function handleItemsAlignment( align ) {
 		return () => {
-			const itemsJustification = attributes.itemsJustification === align ? undefined : align;
+			const itemsJustification =
+				attributes.itemsJustification === align ? undefined : align;
 			setAttributes( {
 				itemsJustification,
 			} );
@@ -151,7 +153,9 @@ function Navigation( {
 					className="wp-block-navigation-placeholder"
 					icon="menu"
 					label={ __( 'Navigation' ) }
-					instructions={ __( 'Create a Navigation from all existing pages, or create an empty one.' ) }
+					instructions={ __(
+						'Create a Navigation from all existing pages, or create an empty one.'
+					) }
 				>
 					<div
 						ref={ ref }
@@ -184,18 +188,40 @@ function Navigation( {
 		<Fragment>
 			<BlockControls>
 				<Toolbar
-					icon={ attributes.itemsJustification ? navIcons[ `justify${ upperFirst( attributes.itemsJustification ) }Icon` ] : navIcons.justifyLeftIcon }
+					icon={
+						attributes.itemsJustification
+							? navIcons[
+									`justify${ upperFirst(
+										attributes.itemsJustification
+									) }Icon`
+							  ]
+							: navIcons.justifyLeftIcon
+					}
 					label={ __( 'Change items justification' ) }
 					isCollapsed
 					controls={ [
-						{ icon: navIcons.justifyLeftIcon, title: __( 'Justify items left' ), isActive: 'left' === attributes.itemsJustification, onClick: handleItemsAlignment( 'left' ) },
-						{ icon: navIcons.justifyCenterIcon, title: __( 'Justify items center' ), isActive: 'center' === attributes.itemsJustification, onClick: handleItemsAlignment( 'center' ) },
-						{ icon: navIcons.justifyRightIcon, title: __( 'Justify items right' ), isActive: 'right' === attributes.itemsJustification, onClick: handleItemsAlignment( 'right' ) },
+						{
+							icon: navIcons.justifyLeftIcon,
+							title: __( 'Justify items left' ),
+							isActive: 'left' === attributes.itemsJustification,
+							onClick: handleItemsAlignment( 'left' ),
+						},
+						{
+							icon: navIcons.justifyCenterIcon,
+							title: __( 'Justify items center' ),
+							isActive:
+								'center' === attributes.itemsJustification,
+							onClick: handleItemsAlignment( 'center' ),
+						},
+						{
+							icon: navIcons.justifyRightIcon,
+							title: __( 'Justify items right' ),
+							isActive: 'right' === attributes.itemsJustification,
+							onClick: handleItemsAlignment( 'right' ),
+						},
 					] }
 				/>
-				<ToolbarGroup>
-					{ navigatorToolbarButton }
-				</ToolbarGroup>
+				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
 
 				<BlockColorsStyleSelector
 					TextColor={ TextColor }
@@ -206,9 +232,7 @@ function Navigation( {
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
-				<PanelBody
-					title={ __( 'Navigation Structure' ) }
-				>
+				<PanelBody title={ __( 'Navigation Structure' ) }>
 					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
 				<PanelBody title={ __( 'Text settings' ) }>
@@ -220,9 +244,7 @@ function Navigation( {
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
 			<InspectorControls>
-				<PanelBody
-					title={ __( 'Display settings' ) }
-				>
+				<PanelBody title={ __( 'Display settings' ) }>
 					<ToggleControl
 						checked={ attributes.showSubmenuIcon }
 						onChange={ ( value ) => {
@@ -239,14 +261,17 @@ function Navigation( {
 						className={ blockClassNames }
 						style={ blockInlineStyles }
 					>
-						{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
+						{ ! hasExistingNavItems && isRequestingPages && (
+							<>
+								<Spinner /> { __( 'Loading Navigation…' ) }{ ' ' }
+							</>
+						) }
 
 						<InnerBlocks
 							allowedBlocks={ [ 'core/navigation-link' ] }
 							templateInsertUpdatesSelection={ false }
 							__experimentalMoverDirection={ 'horizontal' }
 						/>
-
 					</div>
 				</BackgroundColor>
 			</TextColor>
@@ -265,19 +290,34 @@ export default compose( [
 			orderby: 'id',
 		};
 
-		const pagesSelect = [ 'core', 'getEntityRecords', [ 'postType', 'page', filterDefaultPages ] ];
+		const pagesSelect = [
+			'core',
+			'getEntityRecords',
+			[ 'postType', 'page', filterDefaultPages ],
+		];
 
 		return {
 			hasExistingNavItems: !! innerBlocks.length,
-			pages: select( 'core' ).getEntityRecords( 'postType', 'page', filterDefaultPages ),
-			isRequestingPages: select( 'core/data' ).isResolving( ...pagesSelect ),
-			hasResolvedPages: select( 'core/data' ).hasFinishedResolution( ...pagesSelect ),
+			pages: select( 'core' ).getEntityRecords(
+				'postType',
+				'page',
+				filterDefaultPages
+			),
+			isRequestingPages: select( 'core/data' ).isResolving(
+				...pagesSelect
+			),
+			hasResolvedPages: select( 'core/data' ).hasFinishedResolution(
+				...pagesSelect
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
 		return {
 			updateNavItemBlocks( blocks ) {
-				dispatch( 'core/block-editor' ).replaceInnerBlocks( clientId, blocks );
+				dispatch( 'core/block-editor' ).replaceInnerBlocks(
+					clientId,
+					blocks
+				);
 			},
 		};
 	} ),

@@ -7,9 +7,7 @@ import { isFinite, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	RawHTML,
-} from '@wordpress/element';
+import { RawHTML } from '@wordpress/element';
 import {
 	getColorClassName,
 	getFontSizeClass,
@@ -80,7 +78,10 @@ const deprecated = [
 			} = attributes;
 
 			const textClass = getColorClassName( 'color', textColor );
-			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
 			const fontSizeClass = getFontSizeClass( fontSize );
 
 			const className = classnames( {
@@ -93,7 +94,9 @@ const deprecated = [
 			} );
 
 			const styles = {
-				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				backgroundColor: backgroundClass
+					? undefined
+					: customBackgroundColor,
 				color: textClass ? undefined : customTextColor,
 				fontSize: fontSizeClass ? undefined : customFontSize,
 				textAlign: align,
@@ -133,7 +136,10 @@ const deprecated = [
 			} = attributes;
 
 			const textClass = getColorClassName( 'color', textColor );
-			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
 			const fontSizeClass = fontSize && `is-${ fontSize }-text`;
 
 			const className = classnames( {
@@ -146,7 +152,9 @@ const deprecated = [
 			} );
 
 			const styles = {
-				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				backgroundColor: backgroundClass
+					? undefined
+					: customBackgroundColor,
 				color: textClass ? undefined : customTextColor,
 				fontSize: fontSizeClass ? undefined : customFontSize,
 				textAlign: align,
@@ -164,14 +172,27 @@ const deprecated = [
 	},
 	{
 		supports,
-		attributes: omit( {
-			...blockAttributes,
-			fontSize: {
-				type: 'number',
+		attributes: omit(
+			{
+				...blockAttributes,
+				fontSize: {
+					type: 'number',
+				},
 			},
-		}, 'customFontSize', 'customTextColor', 'customBackgroundColor' ),
+			'customFontSize',
+			'customTextColor',
+			'customBackgroundColor'
+		),
 		save( { attributes } ) {
-			const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+			const {
+				width,
+				align,
+				content,
+				dropCap,
+				backgroundColor,
+				textColor,
+				fontSize,
+			} = attributes;
 			const className = classnames( {
 				[ `align${ width }` ]: width,
 				'has-background': backgroundColor,
@@ -184,15 +205,35 @@ const deprecated = [
 				textAlign: align,
 			};
 
-			return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+			return (
+				<p
+					style={ styles }
+					className={ className ? className : undefined }
+				>
+					{ content }
+				</p>
+			);
 		},
 		migrate( attributes ) {
-			return omit( {
-				...attributes,
-				customFontSize: isFinite( attributes.fontSize ) ? attributes.fontSize : undefined,
-				customTextColor: attributes.textColor && '#' === attributes.textColor[ 0 ] ? attributes.textColor : undefined,
-				customBackgroundColor: attributes.backgroundColor && '#' === attributes.backgroundColor[ 0 ] ? attributes.backgroundColor : undefined,
-			}, [ 'fontSize', 'textColor', 'backgroundColor' ] );
+			return omit(
+				{
+					...attributes,
+					customFontSize: isFinite( attributes.fontSize )
+						? attributes.fontSize
+						: undefined,
+					customTextColor:
+						attributes.textColor &&
+						'#' === attributes.textColor[ 0 ]
+							? attributes.textColor
+							: undefined,
+					customBackgroundColor:
+						attributes.backgroundColor &&
+						'#' === attributes.backgroundColor[ 0 ]
+							? attributes.backgroundColor
+							: undefined,
+				},
+				[ 'fontSize', 'textColor', 'backgroundColor' ]
+			);
 		},
 	},
 	{

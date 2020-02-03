@@ -13,11 +13,13 @@ import Container from './container';
 import getDefaultTemplates from './default-templates';
 import Preview from './preview';
 
-const __experimentalPageTemplatePicker = ( { templates = getDefaultTemplates() } ) => {
+const __experimentalPageTemplatePicker = ( {
+	templates = getDefaultTemplates(),
+} ) => {
 	const { editPost } = useDispatch( 'core/editor' );
 	const [ templatePreview, setTemplatePreview ] = useState();
 
-	const onApply = ( ) => {
+	const onApply = () => {
 		editPost( {
 			title: templatePreview.name,
 			blocks: parse( templatePreview.content ),

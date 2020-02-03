@@ -62,16 +62,27 @@ export class PostSavedState extends Component {
 			// TODO: Classes generation should be common across all return
 			// paths of this function, including proper naming convention for
 			// the "Save Draft" button.
-			const classes = classnames( 'editor-post-saved-state', 'is-saving', {
-				'is-autosaving': isAutosaving,
-			} );
+			const classes = classnames(
+				'editor-post-saved-state',
+				'is-saving',
+				{
+					'is-autosaving': isAutosaving,
+				}
+			);
 
 			return (
 				<Animate type="loading">
 					{ ( { className: animateClassName } ) => (
-						<span className={ classnames( classes, animateClassName ) }>
+						<span
+							className={ classnames(
+								classes,
+								animateClassName
+							) }
+						>
 							<Dashicon icon="cloud" />
-							{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
+							{ isAutosaving
+								? __( 'Autosaving' )
+								: __( 'Saving' ) }
 						</span>
 					) }
 				</Animate>
@@ -97,7 +108,11 @@ export class PostSavedState extends Component {
 
 		// Once the post has been submitted for review this button
 		// is not needed for the contributor role.
-		const hasPublishAction = get( post, [ '_links', 'wp:action-publish' ], false );
+		const hasPublishAction = get(
+			post,
+			[ '_links', 'wp:action-publish' ],
+			false
+		);
 		if ( ! hasPublishAction && isPending ) {
 			return null;
 		}

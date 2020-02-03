@@ -15,7 +15,10 @@ export default function save( { attributes } ) {
 		customBackgroundColor,
 	} = attributes;
 
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+	const backgroundClass = getColorClassName(
+		'background-color',
+		backgroundColor
+	);
 
 	const className = classnames( {
 		'has-background': backgroundColor || customBackgroundColor,

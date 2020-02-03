@@ -31,7 +31,10 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	renderHelpIcon() {
-		const infoIconStyle = this.props.getStylesFromColorScheme( styles.infoIcon, styles.infoIconDark );
+		const infoIconStyle = this.props.getStylesFromColorScheme(
+			styles.infoIcon,
+			styles.infoIconDark
+		);
 
 		return (
 			<TouchableWithoutFeedback
@@ -40,7 +43,7 @@ export class UnsupportedBlockEdit extends Component {
 				accessibilityHint={ __( 'Tap here to show help' ) }
 				onPress={ this.toggleSheet.bind( this ) }
 			>
-				<View style={ styles.helpIconContainer } >
+				<View style={ styles.helpIconContainer }>
 					<Icon
 						className="unsupported-icon-help"
 						label={ __( 'Help icon' ) }
@@ -54,18 +57,29 @@ export class UnsupportedBlockEdit extends Component {
 
 	renderSheet( title ) {
 		const { getStylesFromColorScheme } = this.props;
-		const infoTextStyle = getStylesFromColorScheme( styles.infoText, styles.infoTextDark );
-		const infoTitleStyle = getStylesFromColorScheme( styles.infoTitle, styles.infoTitleDark );
-		const infoDescriptionStyle = getStylesFromColorScheme( styles.infoDescription, styles.infoDescriptionDark );
-		const infoSheetIconStyle = getStylesFromColorScheme( styles.infoSheetIcon, styles.infoSheetIconDark );
+		const infoTextStyle = getStylesFromColorScheme(
+			styles.infoText,
+			styles.infoTextDark
+		);
+		const infoTitleStyle = getStylesFromColorScheme(
+			styles.infoTitle,
+			styles.infoTitleDark
+		);
+		const infoDescriptionStyle = getStylesFromColorScheme(
+			styles.infoDescription,
+			styles.infoDescriptionDark
+		);
+		const infoSheetIconStyle = getStylesFromColorScheme(
+			styles.infoSheetIcon,
+			styles.infoSheetIconDark
+		);
 
 		// translators: %s: Name of the block
-		const titleFormat = Platform.OS === 'android' ? __( '\'%s\' isn\'t yet supported on WordPress for Android' ) :
-			__( '\'%s\' isn\'t yet supported on WordPress for iOS' );
-		const infoTitle = sprintf(
-			titleFormat,
-			title,
-		);
+		const titleFormat =
+			Platform.OS === 'android'
+				? __( "'%s' isn't yet supported on WordPress for Android" )
+				: __( "'%s' isn't yet supported on WordPress for iOS" );
+		const infoTitle = sprintf( titleFormat, title );
 
 		return (
 			<BottomSheet
@@ -73,13 +87,19 @@ export class UnsupportedBlockEdit extends Component {
 				hideHeader
 				onClose={ this.toggleSheet.bind( this ) }
 			>
-				<View style={ styles.infoContainer } >
-					<Icon icon="editor-help" color={ infoSheetIconStyle.color } size={ styles.infoSheetIcon.size } />
+				<View style={ styles.infoContainer }>
+					<Icon
+						icon="editor-help"
+						color={ infoSheetIconStyle.color }
+						size={ styles.infoSheetIcon.size }
+					/>
 					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ __( 'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' ) }
+						{ __(
+							'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
+						) }
 					</Text>
 				</View>
 			</BottomSheet>
@@ -92,18 +112,40 @@ export class UnsupportedBlockEdit extends Component {
 		const blockType = coreBlocks[ originalName ];
 
 		const title = blockType ? blockType.settings.title : originalName;
-		const titleStyle = getStylesFromColorScheme( styles.unsupportedBlockMessage, styles.unsupportedBlockMessageDark );
+		const titleStyle = getStylesFromColorScheme(
+			styles.unsupportedBlockMessage,
+			styles.unsupportedBlockMessageDark
+		);
 
-		const subTitleStyle = getStylesFromColorScheme( styles.unsupportedBlockSubtitle, styles.unsupportedBlockSubtitleDark );
-		const subtitle = <Text style={ subTitleStyle }>{ __( 'Unsupported' ) }</Text>;
+		const subTitleStyle = getStylesFromColorScheme(
+			styles.unsupportedBlockSubtitle,
+			styles.unsupportedBlockSubtitleDark
+		);
+		const subtitle = (
+			<Text style={ subTitleStyle }>{ __( 'Unsupported' ) }</Text>
+		);
 
-		const icon = blockType ? normalizeIconObject( blockType.settings.icon ) : 'admin-plugins';
-		const iconStyle = getStylesFromColorScheme( styles.unsupportedBlockIcon, styles.unsupportedBlockIconDark );
+		const icon = blockType
+			? normalizeIconObject( blockType.settings.icon )
+			: 'admin-plugins';
+		const iconStyle = getStylesFromColorScheme(
+			styles.unsupportedBlockIcon,
+			styles.unsupportedBlockIconDark
+		);
 		const iconClassName = 'unsupported-icon' + '-' + preferredColorScheme;
 		return (
-			<View style={ getStylesFromColorScheme( styles.unsupportedBlock, styles.unsupportedBlockDark ) }>
+			<View
+				style={ getStylesFromColorScheme(
+					styles.unsupportedBlock,
+					styles.unsupportedBlockDark
+				) }
+			>
 				{ this.renderHelpIcon() }
-				<Icon className={ iconClassName } icon={ icon && icon.src ? icon.src : icon } color={ iconStyle.color } />
+				<Icon
+					className={ iconClassName }
+					icon={ icon && icon.src ? icon.src : icon }
+					color={ iconStyle.color }
+				/>
 				<Text style={ titleStyle }>{ title }</Text>
 				{ subtitle }
 				{ this.renderSheet( title ) }

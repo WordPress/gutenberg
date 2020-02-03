@@ -67,7 +67,9 @@ jest.mock( 'react-native-safe-area', () => {
 
 jest.mock( 'react-native-recyclerview-list' );
 
-jest.mock( '@react-native-community/slider', () => () => 'Slider', { virtual: true } );
+jest.mock( '@react-native-community/slider', () => () => 'Slider', {
+	virtual: true,
+} );
 
 if ( ! global.window.matchMedia ) {
 	global.window.matchMedia = () => ( {
@@ -92,6 +94,8 @@ Object.keys( mockNativeModules ).forEach( ( module ) => {
 	try {
 		jest.doMock( module, () => mockNativeModules[ module ] ); // needed by FacebookSDK-test
 	} catch ( error ) {
-		jest.doMock( module, () => mockNativeModules[ module ], { virtual: true } );
+		jest.doMock( module, () => mockNativeModules[ module ], {
+			virtual: true,
+		} );
 	}
 } );

@@ -8,12 +8,14 @@ import { animated } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useLayoutEffect, useState, useContext } from '@wordpress/element';
 import {
-	focus,
-	isTextField,
-	placeCaretAtHorizontalEdge,
-} from '@wordpress/dom';
+	useRef,
+	useEffect,
+	useLayoutEffect,
+	useState,
+	useContext,
+} from '@wordpress/element';
+import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
 	getBlockType,
@@ -24,11 +26,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	withDispatch,
-	withSelect,
-	useSelect,
-} from '@wordpress/data';
+import { withDispatch, withSelect, useSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 
@@ -133,7 +131,11 @@ function BlockListBlock( {
 			.find( wrapper.current )
 			.filter( isTextField )
 			// Exclude inner blocks
-			.filter( ( node ) => ! ignoreInnerBlocks || isInsideRootBlock( wrapper.current, node ) );
+			.filter(
+				( node ) =>
+					! ignoreInnerBlocks ||
+					isInsideRootBlock( wrapper.current, node )
+			);
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
@@ -157,14 +159,16 @@ function BlockListBlock( {
 		}
 
 		isMounting.current = false;
-	}, [
-		isSelected,
-		isMultiSelecting,
-		isNavigationMode,
-	] );
+	}, [ isSelected, isMultiSelecting, isNavigationMode ] );
 
 	// Block Reordering animation
-	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, isSelected || isFirstMultiSelected, enableAnimation, animateOnChange );
+	const animationStyle = useMovingAnimation(
+		wrapper,
+		isSelected || isPartOfMultiSelection,
+		isSelected || isFirstMultiSelected,
+		enableAnimation,
+		animateOnChange
+	);
 
 	// Other event handlers
 
@@ -214,14 +218,16 @@ function BlockListBlock( {
 
 	// If the block is selected and we're typing the block should not appear.
 	// Empty paragraph blocks should always show up as unselected.
-	const showEmptyBlockSideInserter = ! isNavigationMode && isSelected && isEmptyDefaultBlock && isValid;
+	const showEmptyBlockSideInserter =
+		! isNavigationMode && isSelected && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
 		! isFocusMode &&
 		! showEmptyBlockSideInserter &&
 		isSelected &&
 		! isTypingWithinBlock;
 
-	const isDragging = isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
+	const isDragging =
+		isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType.getEditWrapperProps ) {
@@ -245,7 +251,8 @@ function BlockListBlock( {
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
 			'is-typing': isTypingWithinBlock,
-			'is-focused': isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
+			'is-focused':
+				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
 			'is-block-collapsed': isAligned,
@@ -301,12 +308,12 @@ function BlockListBlock( {
 			role="group"
 			{ ...wrapperProps }
 			style={
-				wrapperProps && wrapperProps.style ?
-					{
-						...wrapperProps.style,
-						...animationStyle,
-					} :
-					animationStyle
+				wrapperProps && wrapperProps.style
+					? {
+							...wrapperProps.style,
+							...animationStyle,
+					  }
+					: animationStyle
 			}
 		>
 			<BlockCrashBoundary onError={ onBlockError }>
@@ -355,7 +362,10 @@ const applyWithSelect = withSelect(
 		const checkDeep = true;
 
 		// "ancestor" is the more appropriate label due to "deep" check
-		const isAncestorOfSelectedBlock = hasSelectedInnerBlock( clientId, checkDeep );
+		const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
+			clientId,
+			checkDeep
+		);
 
 		// The fallback to `{}` is a temporary fix.
 		// This function should never be called when a block is not present in the state.
@@ -365,9 +375,11 @@ const applyWithSelect = withSelect(
 		return {
 			isMultiSelected: isBlockMultiSelected( clientId ),
 			isPartOfMultiSelection:
-				isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
+				isBlockMultiSelected( clientId ) ||
+				isAncestorMultiSelected( clientId ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
-			isLastMultiSelected: getLastMultiSelectedBlockClientId() === clientId,
+			isLastMultiSelected:
+				getLastMultiSelectedBlockClientId() === clientId,
 
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
@@ -376,7 +388,9 @@ const applyWithSelect = withSelect(
 
 			mode: getBlockMode( clientId ),
 			isSelectionEnabled: isSelectionEnabled(),
-			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
+			initialPosition: isSelected
+				? getSelectedBlocksInitialCaretPosition()
+				: null,
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
 			isLocked: !! templateLock,
@@ -421,17 +435,13 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onInsertDefaultBlockAfter() {
 			const { clientId, rootClientId } = ownProps;
-			const {
-				getBlockIndex,
-			} = select( 'core/block-editor' );
+			const { getBlockIndex } = select( 'core/block-editor' );
 			const index = getBlockIndex( clientId, rootClientId );
 			insertDefaultBlock( {}, rootClientId, index + 1 );
 		},
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
-			const {
-				getBlockIndex,
-			} = select( 'core/block-editor' );
+			const { getBlockIndex } = select( 'core/block-editor' );
 			const index = getBlockIndex( clientId, rootClientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
@@ -440,10 +450,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onMerge( forward ) {
 			const { clientId } = ownProps;
-			const {
-				getPreviousBlockClientId,
-				getNextBlockClientId,
-			} = select( 'core/block-editor' );
+			const { getPreviousBlockClientId, getNextBlockClientId } = select(
+				'core/block-editor'
+			);
 
 			if ( forward ) {
 				const nextBlockClientId = getNextBlockClientId( clientId );
@@ -451,7 +460,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 					mergeBlocks( clientId, nextBlockClientId );
 				}
 			} else {
-				const previousBlockClientId = getPreviousBlockClientId( clientId );
+				const previousBlockClientId = getPreviousBlockClientId(
+					clientId
+				);
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
 				}

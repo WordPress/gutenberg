@@ -16,22 +16,19 @@
  *
  * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/applying-styles-with-stylesheets/
  */
-function {{machineName}}_block_init() {
+function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	$dir = dirname( __FILE__ );
 
-	$script_asset_path = "$dir/build/index.asset.php";
-	if ( ! file_exists( $script_asset_path ) ) {
-		throw new Error(
-			'You need to run `npm start` or `npm run build` for the "{{namespace}}/{{slug}}" block first.'
-		);
-	}
-	$index_js     = 'build/index.js';
-	$script_asset = require( $script_asset_path );
+	$index_js = 'index.js';
 	wp_register_script(
 		'{{namespace}}-{{slug}}-block-editor',
 		plugins_url( $index_js, __FILE__ ),
-		$script_asset['dependencies'],
-		$script_asset['version']
+		array(
+			'wp-blocks',
+			'wp-i18n',
+			'wp-element',
+		),
+		filemtime( "$dir/$index_js" )
 	);
 
 	$editor_css = 'editor.css';
@@ -56,4 +53,4 @@ function {{machineName}}_block_init() {
 		'style'         => '{{namespace}}-{{slug}}-block',
 	) );
 }
-add_action( 'init', '{{machineName}}_block_init' );
+add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );

@@ -27,14 +27,18 @@ export class PostPublishButton extends Component {
 		this.buttonNode = createRef();
 
 		this.createOnClick = this.createOnClick.bind( this );
-		this.closeEntitiesSavedStates = this.closeEntitiesSavedStates.bind( this );
+		this.closeEntitiesSavedStates = this.closeEntitiesSavedStates.bind(
+			this
+		);
 
 		this.state = {
 			entitiesSavedStatesCallback: false,
 		};
 		this.createIgnoredForSave = memoize(
 			( postType, postId ) =>
-				new EquivalentKeyMap( [ [ [ 'postType', postType, String( postId ) ], true ] ] ),
+				new EquivalentKeyMap( [
+					[ [ 'postType', postType, String( postId ) ], true ],
+				] ),
 			{ maxSize: 1 }
 		);
 	}
@@ -65,7 +69,10 @@ export class PostPublishButton extends Component {
 		const { postType, postId } = this.props;
 		const { entitiesSavedStatesCallback } = this.state;
 		this.setState( { entitiesSavedStatesCallback: false }, () => {
-			if ( savedById && savedById.has( [ 'postType', postType, String( postId ) ] ) ) {
+			if (
+				savedById &&
+				savedById.has( [ 'postType', postType, String( postId ) ] )
+			) {
 				// The post entity was checked, call the held callback from `createOnClick`.
 				entitiesSavedStatesCallback();
 			}
@@ -94,9 +101,7 @@ export class PostPublishButton extends Component {
 			postType,
 			postId,
 		} = this.props;
-		const {
-			entitiesSavedStatesCallback,
-		} = this.state;
+		const { entitiesSavedStatesCallback } = this.state;
 
 		const isButtonDisabled =
 			isSaving ||
@@ -156,7 +161,9 @@ export class PostPublishButton extends Component {
 			onClick: this.createOnClick( onClickToggle ),
 		};
 
-		const toggleChildren = isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' );
+		const toggleChildren = isBeingScheduled
+			? __( 'Schedule…' )
+			: __( 'Publish…' );
 		const buttonChildren = (
 			<PublishButtonLabel
 				forceIsSaving={ forceIsSaving }
@@ -171,7 +178,10 @@ export class PostPublishButton extends Component {
 				<EntitiesSavedStates
 					isOpen={ Boolean( entitiesSavedStatesCallback ) }
 					onRequestClose={ this.closeEntitiesSavedStates }
-					ignoredForSave={ this.createIgnoredForSave( postType, postId ) }
+					ignoredForSave={ this.createIgnoredForSave(
+						postType,
+						postId
+					) }
 				/>
 				<Button
 					ref={ this.buttonNode }
@@ -214,7 +224,11 @@ export default compose( [
 			isPostSavingLocked: isPostSavingLocked(),
 			isPublishable: isEditedPostPublishable(),
 			isPublished: isCurrentPostPublished(),
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: get(
+				getCurrentPost(),
+				[ '_links', 'wp:action-publish' ],
+				false
+			),
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
@@ -223,7 +237,8 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { editPost, savePost } = dispatch( 'core/editor' );
 		return {
-			onStatusChange: ( status ) => editPost( { status }, { undoIgnore: true } ),
+			onStatusChange: ( status ) =>
+				editPost( { status }, { undoIgnore: true } ),
 			onSave: savePost,
 		};
 	} ),

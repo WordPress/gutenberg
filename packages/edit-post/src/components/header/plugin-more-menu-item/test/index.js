@@ -23,9 +23,7 @@ describe( 'PluginMoreMenuItem', () => {
 	test( 'renders menu item as button properly', () => {
 		const component = ReactTestRenderer.create(
 			<SlotFillProvider>
-				<PluginMoreMenuItem
-					icon="smiley"
-				>
+				<PluginMoreMenuItem icon="smiley">
 					My plugin button menu item
 				</PluginMoreMenuItem>
 				<PluginsMoreMenuGroup.Slot fillProps={ fillProps } />
@@ -39,10 +37,7 @@ describe( 'PluginMoreMenuItem', () => {
 		const url = 'https://make.wordpress.org';
 		const component = ReactTestRenderer.create(
 			<SlotFillProvider>
-				<PluginMoreMenuItem
-					icon="smiley"
-					href={ url }
-				>
+				<PluginMoreMenuItem icon="smiley" href={ url }>
 					My plugin link menu item
 				</PluginMoreMenuItem>
 				<PluginsMoreMenuGroup.Slot fillProps={ fillProps } />

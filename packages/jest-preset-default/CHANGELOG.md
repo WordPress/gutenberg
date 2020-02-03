@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fixes
+
+- Use `require.resolve()` instead of `<rootDir>` to resolve `jest` config files according to the NodeJS lookup algorithm. ([#19957](https://github.com/WordPress/gutenberg/pull/19957))
+
 ## 5.3.1 (2020-01-01)
 
 ### Bug Fixes

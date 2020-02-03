@@ -15,7 +15,9 @@ import Icon from '../';
 
 export default { title: 'Components/Icon', component: Icon };
 
-const IconSizeLabel = ( { size } ) => <div style={ { fontSize: 12 } }>{ size }px</div>;
+const IconSizeLabel = ( { size } ) => (
+	<div style={ { fontSize: 12 } }>{ size }px</div>
+);
 
 export const _default = () => {
 	const icon = text( 'Icon', 'screenoptions' );
@@ -35,7 +37,10 @@ export const sizes = () => {
 	return (
 		<>
 			{ iconSizes.map( ( size ) => (
-				<div key={ size } style={ { padding: 20, display: 'inline-block' } }>
+				<div
+					key={ size }
+					style={ { padding: 20, display: 'inline-block' } }
+				>
 					<Icon icon="screenoptions" size={ size } />
 					<IconSizeLabel size={ size } />
 				</div>

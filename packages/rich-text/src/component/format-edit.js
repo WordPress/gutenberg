@@ -31,11 +31,7 @@ export default function FormatEdit( {
 	allowedFormats,
 	withoutInteractiveFormatting,
 } ) {
-	return formatTypes.map( ( {
-		name,
-		edit: Edit,
-		tagName,
-	} ) => {
+	return formatTypes.map( ( { name, edit: Edit, tagName } ) => {
 		if ( ! Edit ) {
 			return null;
 		}
@@ -54,7 +50,8 @@ export default function FormatEdit( {
 		const activeFormat = getActiveFormat( value, name );
 		const isActive = activeFormat !== undefined;
 		const activeObject = getActiveObject( value );
-		const isObjectActive = activeObject !== undefined && activeObject.type === name;
+		const isObjectActive =
+			activeObject !== undefined && activeObject.type === name;
 
 		return (
 			<Edit

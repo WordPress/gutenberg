@@ -3,10 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import {
-	PostPreviewButton,
-	PostSavedState,
-} from '@wordpress/editor';
+import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -26,19 +23,36 @@ function Header() {
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
-	} = useSelect( ( select ) => ( {
-		shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
-	} ), [] );
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch( 'core/edit-post' );
+	} = useSelect(
+		( select ) => ( {
+			shortcut: select(
+				'core/keyboard-shortcuts'
+			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+			isEditorSidebarOpened: select(
+				'core/edit-post'
+			).isEditorSidebarOpened(),
+			isPublishSidebarOpened: select(
+				'core/edit-post'
+			).isPublishSidebarOpened(),
+			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			getBlockSelectionStart: select( 'core/block-editor' )
+				.getBlockSelectionStart,
+		} ),
+		[]
+	);
+	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
+		'core/edit-post'
+	);
 
-	const toggleGeneralSidebar = isEditorSidebarOpened ?
-		closeGeneralSidebar :
-		() => openGeneralSidebar( getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document' );
+	const toggleGeneralSidebar = isEditorSidebarOpened
+		? closeGeneralSidebar
+		: () =>
+				openGeneralSidebar(
+					getBlockSelectionStart()
+						? 'edit-post/block'
+						: 'edit-post/document'
+				);
 
 	return (
 		<div className="edit-post-header">

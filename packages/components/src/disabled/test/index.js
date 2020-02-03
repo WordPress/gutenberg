@@ -25,13 +25,15 @@ jest.mock( '@wordpress/dom', () => {
 					// In JSDOM, all elements have zero'd widths and height.
 					// This is a metric for focusable's `isVisible`, so find
 					// and apply an arbitrary non-zero width.
-					Array.from( context.querySelectorAll( '*' ) ).forEach( ( element ) => {
-						Object.defineProperties( element, {
-							offsetWidth: {
-								get: () => 1,
-							},
-						} );
-					} );
+					Array.from( context.querySelectorAll( '*' ) ).forEach(
+						( element ) => {
+							Object.defineProperties( element, {
+								offsetWidth: {
+									get: () => 1,
+								},
+							} );
+						}
+					);
 
 					return focus.focusable.find( ...arguments );
 				},
@@ -56,13 +58,28 @@ describe( 'Disabled', () => {
 		window.MutationObserver = MutationObserver;
 	} );
 
-	const Form = () => <form><input /><div contentEditable tabIndex="0" /></form>;
+	const Form = () => (
+		<form>
+			<input />
+			<div contentEditable tabIndex="0" />
+		</form>
+	);
 
 	it( 'will disable all fields', () => {
-		const wrapper = TestUtils.renderIntoDocument( <Disabled><Form /></Disabled> );
+		const wrapper = TestUtils.renderIntoDocument(
+			<Disabled>
+				<Form />
+			</Disabled>
+		);
 
-		const input = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'input' );
-		const div = TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'div' )[ 1 ];
+		const input = TestUtils.findRenderedDOMComponentWithTag(
+			wrapper,
+			'input'
+		);
+		const div = TestUtils.scryRenderedDOMComponentsWithTag(
+			wrapper,
+			'div'
+		)[ 1 ];
 
 		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
 		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
@@ -83,16 +100,23 @@ describe( 'Disabled', () => {
 			}
 
 			render() {
-				return this.state.isDisabled ?
-					<Disabled><Form /></Disabled> :
-					<Form />;
+				return this.state.isDisabled ? (
+					<Disabled>
+						<Form />
+					</Disabled>
+				) : (
+					<Form />
+				);
 			}
 		}
 
 		const wrapper = TestUtils.renderIntoDocument( <MaybeDisable /> );
 		wrapper.setState( { isDisabled: false } );
 
-		const input = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'input' );
+		const input = TestUtils.findRenderedDOMComponentWithTag(
+			wrapper,
+			'input'
+		);
 		const div = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'div' );
 
 		expect( input.hasAttribute( 'disabled' ) ).toBe( false );
@@ -115,7 +139,9 @@ describe( 'Disabled', () => {
 				return (
 					<p>
 						<Disabled.Consumer>
-							{ ( isDisabled ) => isDisabled ? 'Disabled' : 'Not disabled' }
+							{ ( isDisabled ) =>
+								isDisabled ? 'Disabled' : 'Not disabled'
+							}
 						</Disabled.Consumer>
 					</p>
 				);
@@ -123,14 +149,24 @@ describe( 'Disabled', () => {
 		}
 
 		test( "lets components know that they're disabled via context", () => {
-			const wrapper = TestUtils.renderIntoDocument( <Disabled><DisabledStatus /></Disabled> );
-			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'p' );
+			const wrapper = TestUtils.renderIntoDocument(
+				<Disabled>
+					<DisabledStatus />
+				</Disabled>
+			);
+			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
+				wrapper,
+				'p'
+			);
 			expect( wrapperElement.textContent ).toBe( 'Disabled' );
 		} );
 
 		test( "lets components know that they're not disabled via context", () => {
 			const wrapper = TestUtils.renderIntoDocument( <DisabledStatus /> );
-			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'p' );
+			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
+				wrapper,
+				'p'
+			);
 			expect( wrapperElement.textContent ).toBe( 'Not disabled' );
 		} );
 	} );

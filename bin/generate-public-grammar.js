@@ -2,7 +2,10 @@
 const parser = require( '../node_modules/pegjs/lib/parser.js' );
 const fs = require( 'fs' );
 const path = require( 'path' );
-const grammarSource = fs.readFileSync( './packages/block-serialization-spec-parser/grammar.pegjs', 'utf8' );
+const grammarSource = fs.readFileSync(
+	'./packages/block-serialization-spec-parser/grammar.pegjs',
+	'utf8'
+);
 const grammar = parser.parse( grammarSource );
 
 function escape( text ) {
@@ -15,12 +18,11 @@ function escape( text ) {
 }
 
 function isGroup( expression ) {
-	return [
-		'choice',
-		'action',
-		'labeled',
-		'sequence',
-	].indexOf( expression.type ) >= 0;
+	return (
+		[ 'choice', 'action', 'labeled', 'sequence' ].indexOf(
+			expression.type
+		) >= 0
+	);
 }
 
 function flattenUnary( expression ) {
@@ -40,11 +42,17 @@ function flatten( expression ) {
 			return '"' + escape( expression.value ) + '"';
 		case 'class':
 			return (
-				'[' + ( expression.inverted ? '^' : '' ) +
-				expression.parts.map( ( part ) =>
-					escape( Array.isArray( part ) ? part.join( '-' ) : part )
-				).join( '' ) +
-				']' + ( expression.ignoreCase ? 'i' : '' )
+				'[' +
+				( expression.inverted ? '^' : '' ) +
+				expression.parts
+					.map( ( part ) =>
+						escape(
+							Array.isArray( part ) ? part.join( '-' ) : part
+						)
+					)
+					.join( '' ) +
+				']' +
+				( expression.ignoreCase ? 'i' : '' )
 			);
 
 		// Unary
@@ -80,11 +88,15 @@ function flatten( expression ) {
 			return `<dl>${ expression.rules.map( flatten ).join( '' ) }</dl>`;
 		case 'rule':
 			expression.expression.isRuleTop = true;
-			const displayName = expression.expression.type === 'named' ?
-				expression.expression.name : '';
-			return `<dt>${ displayName }</dt>` +
+			const displayName =
+				expression.expression.type === 'named'
+					? expression.expression.name
+					: '';
+			return (
+				`<dt>${ displayName }</dt>` +
 				`<dd><pre><header>${ expression.name }</header>  = ` +
-				`${ flatten( expression.expression ) }</pre></dd>`;
+				`${ flatten( expression.expression ) }</pre></dd>`
+			);
 
 		default:
 			throw new Error( JSON.stringify( expression ) );
@@ -92,8 +104,10 @@ function flatten( expression ) {
 }
 
 fs.writeFileSync(
-	path.join( __dirname, '..', 'docs', 'grammar.md' ), `
+	path.join( __dirname, '..', 'docs', 'grammar.md' ),
+	`
 # Block Grammar
 
 ${ flatten( grammar ) }
-` );
+`
+);

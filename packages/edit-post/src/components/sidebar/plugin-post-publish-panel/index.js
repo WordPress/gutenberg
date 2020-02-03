@@ -7,7 +7,13 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 
 const { Fill, Slot } = createSlotFill( 'PluginPostPublishPanel' );
 
-const PluginPostPublishPanelFill = ( { children, className, title, initialOpen = false, icon } ) => (
+const PluginPostPublishPanelFill = ( {
+	children,
+	className,
+	title,
+	initialOpen = false,
+	icon,
+} ) => (
 	<Fill>
 		<PanelBody
 			className={ className }
@@ -73,7 +79,7 @@ const PluginPostPublishPanel = compose(
 		return {
 			icon: ownProps.icon || context.icon,
 		};
-	} ),
+	} )
 )( PluginPostPublishPanelFill );
 
 PluginPostPublishPanel.Slot = Slot;

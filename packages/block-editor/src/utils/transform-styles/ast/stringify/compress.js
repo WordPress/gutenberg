@@ -36,9 +36,7 @@ inherits( Compiler, Base );
  */
 
 Compiler.prototype.compile = function( node ) {
-	return node.stylesheet
-		.rules.map( this.visit, this )
-		.join( '' );
+	return node.stylesheet.rules.map( this.visit, this ).join( '' );
 };
 
 /**
@@ -62,10 +60,12 @@ Compiler.prototype.import = function( node ) {
  */
 
 Compiler.prototype.media = function( node ) {
-	return this.emit( '@media ' + node.media, node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.rules ) +
-    this.emit( '}' );
+	return (
+		this.emit( '@media ' + node.media, node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.rules ) +
+		this.emit( '}' )
+	);
 };
 
 /**
@@ -75,10 +75,12 @@ Compiler.prototype.media = function( node ) {
 Compiler.prototype.document = function( node ) {
 	const doc = '@' + ( node.vendor || '' ) + 'document ' + node.document;
 
-	return this.emit( doc, node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.rules ) +
-    this.emit( '}' );
+	return (
+		this.emit( doc, node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.rules ) +
+		this.emit( '}' )
+	);
 };
 
 /**
@@ -102,10 +104,12 @@ Compiler.prototype.namespace = function( node ) {
  */
 
 Compiler.prototype.supports = function( node ) {
-	return this.emit( '@supports ' + node.supports, node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.rules ) +
-    this.emit( '}' );
+	return (
+		this.emit( '@supports ' + node.supports, node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.rules ) +
+		this.emit( '}' )
+	);
 };
 
 /**
@@ -113,13 +117,15 @@ Compiler.prototype.supports = function( node ) {
  */
 
 Compiler.prototype.keyframes = function( node ) {
-	return this.emit( '@' +
-    ( node.vendor || '' ) +
-    'keyframes ' +
-    node.name, node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.keyframes ) +
-    this.emit( '}' );
+	return (
+		this.emit(
+			'@' + ( node.vendor || '' ) + 'keyframes ' + node.name,
+			node.position
+		) +
+		this.emit( '{' ) +
+		this.mapVisit( node.keyframes ) +
+		this.emit( '}' )
+	);
 };
 
 /**
@@ -129,10 +135,12 @@ Compiler.prototype.keyframes = function( node ) {
 Compiler.prototype.keyframe = function( node ) {
 	const decls = node.declarations;
 
-	return this.emit( node.values.join( ',' ), node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( decls ) +
-    this.emit( '}' );
+	return (
+		this.emit( node.values.join( ',' ), node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( decls ) +
+		this.emit( '}' )
+	);
 };
 
 /**
@@ -140,14 +148,14 @@ Compiler.prototype.keyframe = function( node ) {
  */
 
 Compiler.prototype.page = function( node ) {
-	const sel = node.selectors.length ?
-		node.selectors.join( ', ' ) :
-		'';
+	const sel = node.selectors.length ? node.selectors.join( ', ' ) : '';
 
-	return this.emit( '@page ' + sel, node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.declarations ) +
-    this.emit( '}' );
+	return (
+		this.emit( '@page ' + sel, node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.declarations ) +
+		this.emit( '}' )
+	);
 };
 
 /**
@@ -155,10 +163,12 @@ Compiler.prototype.page = function( node ) {
  */
 
 Compiler.prototype[ 'font-face' ] = function( node ) {
-	return this.emit( '@font-face', node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.declarations ) +
-    this.emit( '}' );
+	return (
+		this.emit( '@font-face', node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.declarations ) +
+		this.emit( '}' )
+	);
 };
 
 /**
@@ -166,10 +176,12 @@ Compiler.prototype[ 'font-face' ] = function( node ) {
  */
 
 Compiler.prototype.host = function( node ) {
-	return this.emit( '@host', node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( node.rules ) +
-    this.emit( '}' );
+	return (
+		this.emit( '@host', node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.rules ) +
+		this.emit( '}' )
+	);
 };
 
 /**
@@ -177,7 +189,10 @@ Compiler.prototype.host = function( node ) {
  */
 
 Compiler.prototype[ 'custom-media' ] = function( node ) {
-	return this.emit( '@custom-media ' + node.name + ' ' + node.media + ';', node.position );
+	return this.emit(
+		'@custom-media ' + node.name + ' ' + node.media + ';',
+		node.position
+	);
 };
 
 /**
@@ -190,10 +205,12 @@ Compiler.prototype.rule = function( node ) {
 		return '';
 	}
 
-	return this.emit( node.selectors.join( ',' ), node.position ) +
-    this.emit( '{' ) +
-    this.mapVisit( decls ) +
-    this.emit( '}' );
+	return (
+		this.emit( node.selectors.join( ',' ), node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( decls ) +
+		this.emit( '}' )
+	);
 };
 
 /**
@@ -201,5 +218,8 @@ Compiler.prototype.rule = function( node ) {
  */
 
 Compiler.prototype.declaration = function( node ) {
-	return this.emit( node.property + ':' + node.value, node.position ) + this.emit( ';' );
+	return (
+		this.emit( node.property + ':' + node.value, node.position ) +
+		this.emit( ';' )
+	);
 };

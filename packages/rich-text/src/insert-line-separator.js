@@ -20,11 +20,12 @@ import { LINE_SEPARATOR } from './special-characters';
 export function insertLineSeparator(
 	value,
 	startIndex = value.start,
-	endIndex = value.end,
+	endIndex = value.end
 ) {
 	const beforeText = getTextContent( value ).slice( 0, startIndex );
 	const previousLineSeparatorIndex = beforeText.lastIndexOf( LINE_SEPARATOR );
-	const previousLineSeparatorFormats = value.replacements[ previousLineSeparatorIndex ];
+	const previousLineSeparatorFormats =
+		value.replacements[ previousLineSeparatorIndex ];
 	let replacements = [ , ];
 
 	if ( previousLineSeparatorFormats ) {

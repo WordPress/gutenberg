@@ -130,18 +130,21 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 
 	const [ isDirty, isSaving, _select ] = useSelect(
 		( select ) => {
-			const { getEntityRecordNonTransientEdits, isSavingEntityRecord } = select(
-				'core'
-			);
+			const {
+				getEntityRecordNonTransientEdits,
+				isSavingEntityRecord,
+			} = select( 'core' );
 			const editKeys = Object.keys(
 				getEntityRecordNonTransientEdits( kind, type, id )
 			);
 			return [
-				props ?
-					editKeys.some( ( key ) =>
-						typeof props === 'string' ? key === props : props.includes( key )
-					) :
-					editKeys.length > 0,
+				props
+					? editKeys.some( ( key ) =>
+							typeof props === 'string'
+								? key === props
+								: props.includes( key )
+					  )
+					: editKeys.length > 0,
 				isSavingEntityRecord( kind, type, id ),
 				select,
 			];
@@ -162,12 +165,15 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 		if ( typeof props === 'string' ) {
 			filteredEdits = { [ props ]: filteredEdits[ props ] };
 		} else if ( props ) {
-			filteredEdits = Object.keys( filteredEdits ).reduce( ( acc, key ) => {
-				if ( props.includes( key ) ) {
-					acc[ key ] = filteredEdits[ key ];
-				}
-				return acc;
-			}, {} );
+			filteredEdits = Object.keys( filteredEdits ).reduce(
+				( acc, key ) => {
+					if ( props.includes( key ) ) {
+						acc[ key ] = filteredEdits[ key ];
+					}
+					return acc;
+				},
+				{}
+			);
 		}
 		saveEntityRecord( kind, type, { id, ...filteredEdits } );
 	}, [ kind, type, id, props, _select ] );
@@ -206,7 +212,9 @@ export function useEntityBlockEditor(
 	const id = useEntityId( kind, type );
 	const initialBlocks = useMemo( () => {
 		if ( initialEdits ) {
-			editEntityRecord( kind, type, id, initialEdits, { undoIgnore: true } );
+			editEntityRecord( kind, type, id, initialEdits, {
+				undoIgnore: true,
+			} );
 		}
 
 		// Guard against other instances that might have

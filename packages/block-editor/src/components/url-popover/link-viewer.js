@@ -7,10 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	ExternalLink,
-	Button,
-} from '@wordpress/components';
+import { ExternalLink, Button } from '@wordpress/components';
 import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 
 function LinkViewerUrl( { url, urlLabel, className } ) {
@@ -24,10 +21,7 @@ function LinkViewerUrl( { url, urlLabel, className } ) {
 	}
 
 	return (
-		<ExternalLink
-			className={ linkClassName }
-			href={ url }
-		>
+		<ExternalLink className={ linkClassName } href={ url }>
 			{ urlLabel || filterURLForDisplay( safeDecodeURI( url ) ) }
 		</ExternalLink>
 	);
@@ -49,8 +43,18 @@ export default function LinkViewer( {
 			) }
 			{ ...props }
 		>
-			<LinkViewerUrl url={ url } urlLabel={ urlLabel } className={ linkClassName } />
-			{ onEditLinkClick && <Button icon="edit" label={ __( 'Edit' ) } onClick={ onEditLinkClick } /> }
+			<LinkViewerUrl
+				url={ url }
+				urlLabel={ urlLabel }
+				className={ linkClassName }
+			/>
+			{ onEditLinkClick && (
+				<Button
+					icon="edit"
+					label={ __( 'Edit' ) }
+					onClick={ onEditLinkClick }
+				/>
+			) }
 		</div>
 	);
 }
