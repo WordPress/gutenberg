@@ -63,6 +63,19 @@ describe( 'Gutenberg Editor tests for List block', () => {
 		await editorPage.verifyHtmlContent( testData.listHtml );
 	} );
 
+	it( 'should update format to ordered list, using toolbar button', async () => {
+		const listBlockElement = await editorPage.getListBlockAtPosition( 1 );
+
+		// Click List block to force EditText focus
+		await listBlockElement.click();
+
+		// Send a click on the order list format button
+		await editorPage.clickOrderedListToolBarButton();
+
+		// switch to html and verify html
+		await editorPage.verifyHtmlContent( testData.listHtmlOrdered );
+	} );
+
 	afterAll( async () => {
 		if ( ! isLocalEnvironment() ) {
 			driver.sauceJobStatus( allPassed );
