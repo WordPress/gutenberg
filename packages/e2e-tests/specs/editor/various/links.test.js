@@ -320,6 +320,12 @@ describe( 'Links', () => {
 			)
 		).toBeNull();
 
+		// Confirm that selection is returned to where it was before launching
+		// the link editor, with "Gutenberg" as an uncollapsed selection.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '.' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
 
@@ -492,7 +498,4 @@ describe( 'Links', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
-
-	// TODO: Assert: Verify that pressing Escape while editing a link returns
-	// focus to the correct selection in the paragraph.
 } );

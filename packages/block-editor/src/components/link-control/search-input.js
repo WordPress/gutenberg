@@ -35,7 +35,6 @@ const LinkControlSearchInput = ( {
 	onSelect,
 	renderSuggestions,
 	fetchSuggestions,
-	onReset,
 	showInitialSuggestions,
 } ) => {
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState();
@@ -80,14 +79,6 @@ const LinkControlSearchInput = ( {
 					label={ __( 'Submit' ) }
 					icon="editor-break"
 					className="block-editor-link-control__search-submit"
-				/>
-				<Button
-					disabled={ ! value.length }
-					type="reset"
-					label={ __( 'Reset' ) }
-					icon="no-alt"
-					className="block-editor-link-control__search-reset"
-					onClick={ onReset }
 				/>
 			</div>
 		</form>
