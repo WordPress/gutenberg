@@ -47,7 +47,11 @@ const MediaReplaceFlow = ( {
 	};
 
 	const stopPropagationRelevantKeys = ( event ) => {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
+		if (
+			[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf(
+				event.keyCode
+			) > -1
+		) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
 			event.stopPropagation();
 		}
@@ -109,7 +113,9 @@ const MediaReplaceFlow = ( {
 				isFullWidth={ true }
 				className="block-editor-media-replace-flow__link-viewer"
 				url={ mediaURLValue }
-				onEditLinkClick={ () => setShowEditURLInput( ! showEditURLInput ) }
+				onEditLinkClick={ () =>
+					setShowEditURLInput( ! showEditURLInput )
+				}
 			/>
 		);
 	}
@@ -165,7 +171,9 @@ const MediaReplaceFlow = ( {
 						{ onSelectURL && (
 							<MenuItem
 								icon="admin-links"
-								onClick={ () => setShowURLInput( ! showURLInput ) }
+								onClick={ () =>
+									setShowURLInput( ! showURLInput )
+								}
 								aria-expanded={ showURLInput }
 							>
 								<div> { __( 'Insert from URL' ) } </div>
@@ -173,7 +181,9 @@ const MediaReplaceFlow = ( {
 						) }
 					</NavigableMenu>
 					{ showURLInput && (
-						<div className="block-editor-media-flow__url-input">{ urlInputUIContent }</div>
+						<div className="block-editor-media-flow__url-input">
+							{ urlInputUIContent }
+						</div>
 					) }
 				</>
 			) }

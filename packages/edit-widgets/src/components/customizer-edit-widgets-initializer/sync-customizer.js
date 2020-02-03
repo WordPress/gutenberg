@@ -48,18 +48,32 @@ const waitForSelectValue = ( listener, value, changeTrigger ) => {
 
 // Get widget areas from the store in an `id => blocks` mapping.
 const getWidgetAreasObject = () => {
-	const { getEntityRecords, getEditedEntityRecord } = window.wp.data.select( 'core' );
+	const { getEntityRecords, getEditedEntityRecord } = window.wp.data.select(
+		'core'
+	);
 
-	return getEntityRecords( 'root', 'widgetArea' ).reduce( ( widgetAreasObject, { id } ) => {
-		widgetAreasObject[ id ] = getEditedEntityRecord( 'root', 'widgetArea', id ).blocks;
-		return widgetAreasObject;
-	}, {} );
+	return getEntityRecords( 'root', 'widgetArea' ).reduce(
+		( widgetAreasObject, { id } ) => {
+			widgetAreasObject[ id ] = getEditedEntityRecord(
+				'root',
+				'widgetArea',
+				id
+			).blocks;
+			return widgetAreasObject;
+		},
+		{}
+	);
 };
 
 // Serialize the provided blocks and render them in the widget area with the provided ID.
 const previewBlocksInWidgetArea = throttle( ( id, blocks ) => {
-	const customizePreviewIframe = document.querySelector( '#customize-preview > iframe' );
-	if ( ! customizePreviewIframe || ! customizePreviewIframe.contentDocument ) {
+	const customizePreviewIframe = document.querySelector(
+		'#customize-preview > iframe'
+	);
+	if (
+		! customizePreviewIframe ||
+		! customizePreviewIframe.contentDocument
+	) {
 		return;
 	}
 
@@ -74,7 +88,9 @@ const previewBlocksInWidgetArea = throttle( ( id, blocks ) => {
 
 // Update the hidden input that has 2-way data binding with Customizer settings.
 const updateSettingInputValue = throttle( ( nextWidgetAreas ) => {
-	const settingInput = document.getElementById( '_customize-input-gutenberg_widget_blocks' );
+	const settingInput = document.getElementById(
+		'_customize-input-gutenberg_widget_blocks'
+	);
 	if ( settingInput ) {
 		settingInput.value = JSON.stringify(
 			Object.keys( nextWidgetAreas ).reduce( ( value, id ) => {
@@ -105,12 +121,17 @@ if ( window.wp && window.wp.customize && window.wp.data ) {
 			let widgetAreas;
 			try {
 				widgetAreas = JSON.parse(
-					document.getElementById( '_customize-input-gutenberg_widget_blocks' ).value
+					document.getElementById(
+						'_customize-input-gutenberg_widget_blocks'
+					).value
 				);
-				widgetAreas = Object.keys( widgetAreas ).reduce( ( value, id ) => {
-					value[ id ] = parse( widgetAreas[ id ] );
-					return value;
-				}, {} );
+				widgetAreas = Object.keys( widgetAreas ).reduce(
+					( value, id ) => {
+						value[ id ] = parse( widgetAreas[ id ] );
+						return value;
+					},
+					{}
+				);
 			} catch ( err ) {
 				widgetAreas = {};
 			}
@@ -122,15 +143,23 @@ if ( window.wp && window.wp.customize && window.wp.data ) {
 				() =>
 					window.wp.data
 						.select( 'core' )
-						.hasFinishedResolution( 'getEntityRecords', [ 'root', 'widgetArea' ] ),
+						.hasFinishedResolution( 'getEntityRecords', [
+							'root',
+							'widgetArea',
+						] ),
 				true,
-				() => window.wp.data.select( 'core' ).getEntityRecords( 'root', 'widgetArea' )
+				() =>
+					window.wp.data
+						.select( 'core' )
+						.getEntityRecords( 'root', 'widgetArea' )
 			).then( () => {
 				Object.keys( widgetAreas ).forEach( ( id ) => {
-					window.wp.data.dispatch( 'core' ).editEntityRecord( 'root', 'widgetArea', id, {
-						content: serialize( widgetAreas[ id ] ),
-						blocks: widgetAreas[ id ],
-					} );
+					window.wp.data
+						.dispatch( 'core' )
+						.editEntityRecord( 'root', 'widgetArea', id, {
+							content: serialize( widgetAreas[ id ] ),
+							blocks: widgetAreas[ id ],
+						} );
 				} );
 				widgetAreas = getWidgetAreasObject();
 				window.wp.data.subscribe( () => {
@@ -139,7 +168,10 @@ if ( window.wp && window.wp.customize && window.wp.data ) {
 					let didUpdate = false;
 					for ( const id of Object.keys( nextWidgetAreas ) ) {
 						if ( widgetAreas[ id ] !== nextWidgetAreas[ id ] ) {
-							previewBlocksInWidgetArea( id, nextWidgetAreas[ id ] );
+							previewBlocksInWidgetArea(
+								id,
+								nextWidgetAreas[ id ]
+							);
 							didUpdate = true;
 						}
 					}

@@ -23,9 +23,13 @@ class SuggestionsList extends Component {
 		// when already expanded
 		if ( this.props.selectedIndex > -1 && this.props.scrollIntoView ) {
 			this.scrollingIntoView = true;
-			scrollIntoView( this.list.children[ this.props.selectedIndex ], this.list, {
-				onlyScrollIfNeeded: true,
-			} );
+			scrollIntoView(
+				this.list.children[ this.props.selectedIndex ],
+				this.list,
+				{
+					onlyScrollIfNeeded: true,
+				}
+			);
 
 			this.props.setTimeout( () => {
 				this.scrollingIntoView = false;
@@ -57,7 +61,9 @@ class SuggestionsList extends Component {
 	}
 
 	computeSuggestionMatch( suggestion ) {
-		const match = this.props.displayTransform( this.props.match || '' ).toLocaleLowerCase();
+		const match = this.props
+			.displayTransform( this.props.match || '' )
+			.toLocaleLowerCase();
 		if ( match.length === 0 ) {
 			return null;
 		}
@@ -67,8 +73,13 @@ class SuggestionsList extends Component {
 
 		return {
 			suggestionBeforeMatch: suggestion.substring( 0, indexOfMatch ),
-			suggestionMatch: suggestion.substring( indexOfMatch, indexOfMatch + match.length ),
-			suggestionAfterMatch: suggestion.substring( indexOfMatch + match.length ),
+			suggestionMatch: suggestion.substring(
+				indexOfMatch,
+				indexOfMatch + match.length
+			),
+			suggestionAfterMatch: suggestion.substring(
+				indexOfMatch + match.length
+			),
 		};
 	}
 
@@ -86,9 +97,12 @@ class SuggestionsList extends Component {
 			>
 				{ map( this.props.suggestions, ( suggestion, index ) => {
 					const match = this.computeSuggestionMatch( suggestion );
-					const classeName = classnames( 'components-form-token-field__suggestion', {
-						'is-selected': index === this.props.selectedIndex,
-					} );
+					const classeName = classnames(
+						'components-form-token-field__suggestion',
+						{
+							'is-selected': index === this.props.selectedIndex,
+						}
+					);
 
 					/* eslint-disable jsx-a11y/click-events-have-key-events */
 					return (
@@ -103,7 +117,11 @@ class SuggestionsList extends Component {
 							aria-selected={ index === this.props.selectedIndex }
 						>
 							{ match ? (
-								<span aria-label={ this.props.displayTransform( suggestion ) }>
+								<span
+									aria-label={ this.props.displayTransform(
+										suggestion
+									) }
+								>
 									{ match.suggestionBeforeMatch }
 									<strong className="components-form-token-field__suggestion-match">
 										{ match.suggestionMatch }

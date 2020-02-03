@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
+import {
+	Button,
+	PanelBody,
+	ToggleControl,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 
 const EmbedControls = ( props ) => {
@@ -31,7 +36,10 @@ const EmbedControls = ( props ) => {
 			</BlockControls>
 			{ themeSupportsResponsive && blockSupportsResponsive && (
 				<InspectorControls>
-					<PanelBody title={ __( 'Media settings' ) } className="blocks-responsive">
+					<PanelBody
+						title={ __( 'Media settings' ) }
+						className="blocks-responsive"
+					>
 						<ToggleControl
 							label={ __( 'Resize for smaller devices' ) }
 							checked={ allowResponsive }

@@ -14,7 +14,9 @@ const jestE2EConfig = {
 	testPathIgnorePatterns: [ '/node_modules/', '/wordpress/' ],
 	reporters:
 		'TRAVIS' in process.env && 'CI' in process.env
-			? [ '@wordpress/jest-preset-default/scripts/travis-fold-passes-reporter.js' ]
+			? [
+					'@wordpress/jest-preset-default/scripts/travis-fold-passes-reporter.js',
+			  ]
 			: undefined,
 };
 

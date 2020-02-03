@@ -40,22 +40,30 @@ export default function FormatEdit( {
 			return null;
 		}
 
-		if ( withoutInteractiveFormatting && interactiveContentTags.has( tagName ) ) {
+		if (
+			withoutInteractiveFormatting &&
+			interactiveContentTags.has( tagName )
+		) {
 			return null;
 		}
 
 		const activeFormat = getActiveFormat( value, name );
 		const isActive = activeFormat !== undefined;
 		const activeObject = getActiveObject( value );
-		const isObjectActive = activeObject !== undefined && activeObject.type === name;
+		const isObjectActive =
+			activeObject !== undefined && activeObject.type === name;
 
 		return (
 			<Edit
 				key={ name }
 				isActive={ isActive }
-				activeAttributes={ isActive ? activeFormat.attributes || {} : {} }
+				activeAttributes={
+					isActive ? activeFormat.attributes || {} : {}
+				}
 				isObjectActive={ isObjectActive }
-				activeObjectAttributes={ isObjectActive ? activeObject.attributes || {} : {} }
+				activeObjectAttributes={
+					isObjectActive ? activeObject.attributes || {} : {}
+				}
 				value={ value }
 				onChange={ onChange }
 				onFocus={ onFocus }

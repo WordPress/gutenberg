@@ -54,14 +54,19 @@ export function MenuItem( {
 			icon={ icon }
 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
 			aria-checked={
-				role === 'menuitemcheckbox' || role === 'menuitemradio' ? isSelected : undefined
+				role === 'menuitemcheckbox' || role === 'menuitemradio'
+					? isSelected
+					: undefined
 			}
 			role={ role }
 			className={ className }
 			{ ...props }
 		>
 			{ children }
-			<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
+			<Shortcut
+				className="components-menu-item__shortcut"
+				shortcut={ shortcut }
+			/>
 		</Button>
 	);
 }

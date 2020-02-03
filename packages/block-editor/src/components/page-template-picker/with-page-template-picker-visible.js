@@ -11,7 +11,12 @@ import __experimentalUsePageTemplatePickerVisible from './use-page-template-pick
 const __experimentalWithPageTemplatePickerVisible = createHigherOrderComponent(
 	( WrappedComponent ) => ( props ) => {
 		const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
-		return <WrappedComponent { ...props } showPageTemplatePicker={ showPageTemplatePicker } />;
+		return (
+			<WrappedComponent
+				{ ...props }
+				showPageTemplatePicker={ showPageTemplatePicker }
+			/>
+		);
 	},
 	'__experimentalWithPageTemplatePickerVisible'
 );

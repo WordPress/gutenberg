@@ -43,7 +43,13 @@ const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
  *
  * @return {Frame} The stack frame tracking parse progress.
  */
-function Frame( element, tokenStart, tokenLength, prevOffset, leadingTextStart ) {
+function Frame(
+	element,
+	tokenStart,
+	tokenLength,
+	prevOffset,
+	leadingTextStart
+) {
 	return {
 		element,
 		tokenStart,
@@ -115,7 +121,11 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 const isValidConversionMap = ( conversionMap ) => {
 	const isObject = typeof conversionMap === 'object';
 	const values = isObject && Object.values( conversionMap );
-	return isObject && values.length && values.every( ( element ) => isValidElement( element ) );
+	return (
+		isObject &&
+		values.length &&
+		values.every( ( element ) => isValidElement( element ) )
+	);
 };
 
 /**
@@ -139,7 +149,10 @@ function proceed( conversionMap ) {
 	switch ( tokenType ) {
 		case 'no-more-tokens':
 			if ( stackDepth !== 0 ) {
-				const { leadingTextStart: stackLeadingText, tokenStart } = stack.pop();
+				const {
+					leadingTextStart: stackLeadingText,
+					tokenStart,
+				} = stack.pop();
 				output.push( indoc.substr( stackLeadingText, tokenStart ) );
 			}
 			addText();
@@ -148,7 +161,12 @@ function proceed( conversionMap ) {
 		case 'self-closed':
 			if ( 0 === stackDepth ) {
 				if ( null !== leadingTextStart ) {
-					output.push( indoc.substr( leadingTextStart, startOffset - leadingTextStart ) );
+					output.push(
+						indoc.substr(
+							leadingTextStart,
+							startOffset - leadingTextStart
+						)
+					);
 				}
 				output.push( conversionMap[ name ] );
 				offset = startOffset + tokenLength;
@@ -156,7 +174,9 @@ function proceed( conversionMap ) {
 			}
 
 			// otherwise we found an inner element
-			addChild( new Frame( conversionMap[ name ], startOffset, tokenLength ) );
+			addChild(
+				new Frame( conversionMap[ name ], startOffset, tokenLength )
+			);
 			offset = startOffset + tokenLength;
 			return true;
 
@@ -184,7 +204,10 @@ function proceed( conversionMap ) {
 			// otherwise we're nested and we have to close out the current
 			// block and add it as a innerBlock to the parent
 			const stackTop = stack.pop();
-			const text = indoc.substr( stackTop.prevOffset, startOffset - stackTop.prevOffset );
+			const text = indoc.substr(
+				stackTop.prevOffset,
+				startOffset - stackTop.prevOffset
+			);
 			stackTop.children.push( text );
 			stackTop.prevOffset = startOffset + tokenLength;
 			const frame = new Frame(
@@ -256,7 +279,10 @@ function addText() {
 function addChild( frame ) {
 	const { element, tokenStart, tokenLength, prevOffset, children } = frame;
 	const parent = stack[ stack.length - 1 ];
-	const text = indoc.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+	const text = indoc.substr(
+		parent.prevOffset,
+		tokenStart - parent.prevOffset
+	);
 
 	if ( text ) {
 		parent.children.push( text );
@@ -279,7 +305,13 @@ function addChild( frame ) {
  *                           the element.
  */
 function closeOuterElement( endOffset ) {
-	const { element, leadingTextStart, prevOffset, tokenStart, children } = stack.pop();
+	const {
+		element,
+		leadingTextStart,
+		prevOffset,
+		tokenStart,
+		children,
+	} = stack.pop();
 
 	const text = endOffset
 		? indoc.substr( prevOffset, endOffset - prevOffset )
@@ -290,7 +322,9 @@ function closeOuterElement( endOffset ) {
 	}
 
 	if ( null !== leadingTextStart ) {
-		output.push( indoc.substr( leadingTextStart, tokenStart - leadingTextStart ) );
+		output.push(
+			indoc.substr( leadingTextStart, tokenStart - leadingTextStart )
+		);
 	}
 
 	output.push( cloneElement( element, null, ...children ) );

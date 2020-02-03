@@ -25,7 +25,11 @@ import {
 	getHorizontalRelativeGradientPosition,
 	isControlPointOverlapping,
 } from './utils';
-import { COLOR_POPOVER_PROPS, GRADIENT_MARKERS_WIDTH, MINIMUM_SIGNIFICANT_MOVE } from './constants';
+import {
+	COLOR_POPOVER_PROPS,
+	GRADIENT_MARKERS_WIDTH,
+	MINIMUM_SIGNIFICANT_MOVE,
+} from './constants';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
 class ControlPointKeyboardMove extends Component {
@@ -43,7 +47,12 @@ class ControlPointKeyboardMove extends Component {
 		// to another editor area.
 		event.stopPropagation();
 		const { gradientIndex, onChange, gradientAST } = this.props;
-		onChange( getGradientWithPositionAtIndexIncreased( gradientAST, gradientIndex ) );
+		onChange(
+			getGradientWithPositionAtIndexIncreased(
+				gradientAST,
+				gradientIndex
+			)
+		);
 	}
 
 	decrease( event ) {
@@ -51,11 +60,20 @@ class ControlPointKeyboardMove extends Component {
 		// to another editor area.
 		event.stopPropagation();
 		const { gradientIndex, onChange, gradientAST } = this.props;
-		onChange( getGradientWithPositionAtIndexDecreased( gradientAST, gradientIndex ) );
+		onChange(
+			getGradientWithPositionAtIndexDecreased(
+				gradientAST,
+				gradientIndex
+			)
+		);
 	}
 	render() {
 		const { children } = this.props;
-		return <KeyboardShortcuts shortcuts={ this.shortcuts }>{ children }</KeyboardShortcuts>;
+		return (
+			<KeyboardShortcuts shortcuts={ this.shortcuts }>
+				{ children }
+			</KeyboardShortcuts>
+		);
 	}
 }
 
@@ -79,15 +97,20 @@ function ControlPointButton( {
 			<Button
 				aria-label={ sprintf(
 					// translators: %1$s: gradient position e.g: 70%, %2$s: gradient color code e.g: rgb(52,121,151).
-					__( 'Gradient control point at position %1$s with color code %2$s.' ),
+					__(
+						'Gradient control point at position %1$s with color code %2$s.'
+					),
 					position,
 					color
 				) }
 				aria-describedby={ descriptionId }
 				aria-expanded={ isOpen }
-				className={ classnames( 'components-custom-gradient-picker__control-point-button', {
-					'is-active': isOpen,
-				} ) }
+				className={ classnames(
+					'components-custom-gradient-picker__control-point-button',
+					{
+						'is-active': isOpen,
+					}
+				) }
 				style={ {
 					left: position,
 				} }
@@ -125,15 +148,29 @@ export default function ControlPoints( {
 			significantMoveHappened,
 		} = controlPointMoveState.current;
 		if ( ! significantMoveHappened ) {
-			const initialPosition = referenceGradientAST.colorStops[ position ].length.value;
-			if ( Math.abs( initialPosition - relativePosition ) >= MINIMUM_SIGNIFICANT_MOVE ) {
+			const initialPosition =
+				referenceGradientAST.colorStops[ position ].length.value;
+			if (
+				Math.abs( initialPosition - relativePosition ) >=
+				MINIMUM_SIGNIFICANT_MOVE
+			) {
 				controlPointMoveState.current.significantMoveHappened = true;
 			}
 		}
 
-		if ( ! isControlPointOverlapping( referenceGradientAST, relativePosition, position ) ) {
+		if (
+			! isControlPointOverlapping(
+				referenceGradientAST,
+				relativePosition,
+				position
+			)
+		) {
 			onChange(
-				getGradientWithPositionAtIndexChanged( referenceGradientAST, position, relativePosition )
+				getGradientWithPositionAtIndexChanged(
+					referenceGradientAST,
+					position,
+					relativePosition
+				)
 			);
 		}
 	};
@@ -171,7 +208,8 @@ export default function ControlPoints( {
 							onClick={ () => {
 								if (
 									controlPointMoveState.current &&
-									controlPointMoveState.current.significantMoveHappened
+									controlPointMoveState.current
+										.significantMoveHappened
 								) {
 									return;
 								}
@@ -187,8 +225,14 @@ export default function ControlPoints( {
 										listenersActivated: true,
 									};
 									onStartControlPointChange();
-									window.addEventListener( 'mousemove', onMouseMove );
-									window.addEventListener( 'mouseup', cleanEventListeners );
+									window.addEventListener(
+										'mousemove',
+										onMouseMove
+									);
+									window.addEventListener(
+										'mouseup',
+										cleanEventListeners
+									);
 								}
 							} }
 							isOpen={ isOpen }
@@ -204,13 +248,24 @@ export default function ControlPoints( {
 							<ColorPicker
 								color={ point.color }
 								onChangeComplete={ ( { rgb } ) => {
-									onChange( getGradientWithColorAtIndexChanged( gradientAST, index, rgb ) );
+									onChange(
+										getGradientWithColorAtIndexChanged(
+											gradientAST,
+											index,
+											rgb
+										)
+									);
 								} }
 							/>
 							<Button
 								className="components-custom-gradient-picker__remove-control-point"
 								onClick={ () => {
-									onChange( getGradientWithControlPointRemoved( gradientAST, index ) );
+									onChange(
+										getGradientWithControlPointRemoved(
+											gradientAST,
+											index
+										)
+									);
 									onClose();
 								} }
 								isLink

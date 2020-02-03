@@ -13,7 +13,10 @@ describe( 'BlockVerticalAlignmentToolbar', () => {
 	const onChange = jest.fn();
 
 	const wrapper = shallow(
-		<BlockVerticalAlignmentToolbar value={ alignment } onChange={ onChange } />
+		<BlockVerticalAlignmentToolbar
+			value={ alignment }
+			onChange={ onChange }
+		/>
 	);
 
 	const controls = wrapper.props().controls;

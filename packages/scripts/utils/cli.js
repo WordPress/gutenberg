@@ -54,14 +54,21 @@ const spawnScript = ( scriptName, args = [] ) => {
 	if ( ! hasScriptFile( scriptName ) ) {
 		// eslint-disable-next-line no-console
 		console.log(
-			'Unknown script "' + scriptName + '". ' + 'Perhaps you need to update @wordpress/scripts?'
+			'Unknown script "' +
+				scriptName +
+				'". ' +
+				'Perhaps you need to update @wordpress/scripts?'
 		);
 		exit( 1 );
 	}
 
-	const { signal, status } = spawn.sync( 'node', [ fromScriptsRoot( scriptName ), ...args ], {
-		stdio: 'inherit',
-	} );
+	const { signal, status } = spawn.sync(
+		'node',
+		[ fromScriptsRoot( scriptName ), ...args ],
+		{
+			stdio: 'inherit',
+		}
+	);
 
 	if ( signal ) {
 		handleSignal( signal );

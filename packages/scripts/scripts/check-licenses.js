@@ -82,7 +82,10 @@ const otherOssLicenses = [
 	'LGPL',
 ];
 
-const licenses = [ ...gpl2CompatibleLicenses, ...( gpl2 ? [] : otherOssLicenses ) ];
+const licenses = [
+	...gpl2CompatibleLicenses,
+	...( gpl2 ? [] : otherOssLicenses ),
+];
 
 /*
  * Some packages don't included a license string in their package.json file, but they
@@ -106,7 +109,9 @@ const licenseFiles = [
  */
 const licenseFileStrings = {
 	'Apache-2.0': [ 'Licensed under the Apache License, Version 2.0' ],
-	BSD: [ 'Redistributions in binary form must reproduce the above copyright notice,' ],
+	BSD: [
+		'Redistributions in binary form must reproduce the above copyright notice,',
+	],
 	'BSD-3-Clause-W3C': [ 'W3C 3-clause BSD License' ],
 	MIT: [
 		'Permission is hereby granted, free of charge,',
@@ -159,7 +164,9 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	// We can then check our array of licenses against the allowedLicense.
 	return (
 		undefined !==
-		subLicenseTypes.find( ( subLicenseType ) => checkLicense( allowedLicense, subLicenseType ) )
+		subLicenseTypes.find( ( subLicenseType ) =>
+			checkLicense( allowedLicense, subLicenseType )
+		)
 	);
 };
 
@@ -213,13 +220,16 @@ modules.forEach( ( path ) => {
 	const packageInfo = require( filename );
 	const license =
 		packageInfo.license ||
-		( packageInfo.licenses && packageInfo.licenses.map( ( l ) => l.type || l ).join( ' OR ' ) );
+		( packageInfo.licenses &&
+			packageInfo.licenses.map( ( l ) => l.type || l ).join( ' OR ' ) );
 	let licenseType = typeof license === 'object' ? license.type : license;
 
 	// Check if the license we've detected is telling us to look in the license file, instead.
 	if (
 		licenseType &&
-		licenseFiles.find( ( licenseFile ) => licenseType.includes( licenseFile ) )
+		licenseFiles.find( ( licenseFile ) =>
+			licenseType.includes( licenseFile )
+		)
 	) {
 		licenseType = undefined;
 	}
@@ -242,14 +252,18 @@ modules.forEach( ( path ) => {
 				// Check if the file contains any of the strings in licenseFileStrings
 				return Object.keys( licenseFileStrings ).reduce(
 					( stringDetectedType, licenseStringType ) => {
-						const licenseFileString = licenseFileStrings[ licenseStringType ];
+						const licenseFileString =
+							licenseFileStrings[ licenseStringType ];
 
-						return licenseFileString.reduce( ( currentDetectedType, fileString ) => {
-							if ( licenseText.includes( fileString ) ) {
-								return licenseStringType;
-							}
-							return currentDetectedType;
-						}, stringDetectedType );
+						return licenseFileString.reduce(
+							( currentDetectedType, fileString ) => {
+								if ( licenseText.includes( fileString ) ) {
+									return licenseStringType;
+								}
+								return currentDetectedType;
+							},
+							stringDetectedType
+						);
 					},
 					detectedType
 				);

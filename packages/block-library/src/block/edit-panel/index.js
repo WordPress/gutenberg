@@ -57,13 +57,22 @@ class ReusableBlockEditPanel extends Component {
 	}
 
 	render() {
-		const { isEditing, title, isSaving, isEditDisabled, onEdit, instanceId } = this.props;
+		const {
+			isEditing,
+			title,
+			isSaving,
+			isEditDisabled,
+			onEdit,
+			instanceId,
+		} = this.props;
 
 		return (
 			<>
 				{ ! isEditing && ! isSaving && (
 					<div className="reusable-block-edit-panel">
-						<b className="reusable-block-edit-panel__info">{ title }</b>
+						<b className="reusable-block-edit-panel__info">
+							{ title }
+						</b>
 						<Button
 							ref={ this.editButton }
 							isSecondary
@@ -76,7 +85,10 @@ class ReusableBlockEditPanel extends Component {
 					</div>
 				) }
 				{ ( isEditing || isSaving ) && (
-					<form className="reusable-block-edit-panel" onSubmit={ this.handleFormSubmit }>
+					<form
+						className="reusable-block-edit-panel"
+						onSubmit={ this.handleFormSubmit }
+					>
 						<label
 							htmlFor={ `reusable-block-edit-panel__title-${ instanceId }` }
 							className="reusable-block-edit-panel__label"

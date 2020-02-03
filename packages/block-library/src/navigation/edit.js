@@ -70,7 +70,13 @@ function Navigation( {
 			{ name: 'backgroundColor', className: 'background-color' },
 		],
 		{
-			contrastCheckers: [ { backgroundColor: true, textColor: true, fontSize: fontSize.size } ],
+			contrastCheckers: [
+				{
+					backgroundColor: true,
+					textColor: true,
+					fontSize: fontSize.size,
+				},
+			],
 			colorDetector: { targetRef: ref },
 			colorPanelProps: {
 				initialOpen: true,
@@ -80,7 +86,9 @@ function Navigation( {
 	);
 
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
-	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
+	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
+		clientId
+	);
 
 	// Builds navigation links from default Pages.
 	const defaultPagesNavigationItems = useMemo( () => {
@@ -93,7 +101,9 @@ function Navigation( {
 				type,
 				id,
 				url,
-				label: ! title.rendered ? __( '(no title)' ) : escape( title.rendered ),
+				label: ! title.rendered
+					? __( '(no title)' )
+					: escape( title.rendered ),
 				title: ! title.raw ? __( '(no title)' ) : escape( title.raw ),
 				opensInNewTab: false,
 			} )
@@ -105,7 +115,8 @@ function Navigation( {
 	//
 	function handleItemsAlignment( align ) {
 		return () => {
-			const itemsJustification = attributes.itemsJustification === align ? undefined : align;
+			const itemsJustification =
+				attributes.itemsJustification === align ? undefined : align;
 			setAttributes( {
 				itemsJustification,
 			} );
@@ -146,7 +157,10 @@ function Navigation( {
 						'Create a Navigation from all existing pages, or create an empty one.'
 					) }
 				>
-					<div ref={ ref } className="wp-block-navigation-placeholder__buttons">
+					<div
+						ref={ ref }
+						className="wp-block-navigation-placeholder__buttons"
+					>
 						<Button
 							isSecondary
 							className="wp-block-navigation-placeholder__button"
@@ -176,7 +190,11 @@ function Navigation( {
 				<Toolbar
 					icon={
 						attributes.itemsJustification
-							? navIcons[ `justify${ upperFirst( attributes.itemsJustification ) }Icon` ]
+							? navIcons[
+									`justify${ upperFirst(
+										attributes.itemsJustification
+									) }Icon`
+							  ]
 							: navIcons.justifyLeftIcon
 					}
 					label={ __( 'Change items justification' ) }
@@ -191,7 +209,8 @@ function Navigation( {
 						{
 							icon: navIcons.justifyCenterIcon,
 							title: __( 'Justify items center' ),
-							isActive: 'center' === attributes.itemsJustification,
+							isActive:
+								'center' === attributes.itemsJustification,
 							onClick: handleItemsAlignment( 'center' ),
 						},
 						{
@@ -204,7 +223,10 @@ function Navigation( {
 				/>
 				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
 
-				<BlockColorsStyleSelector TextColor={ TextColor } BackgroundColor={ BackgroundColor }>
+				<BlockColorsStyleSelector
+					TextColor={ TextColor }
+					BackgroundColor={ BackgroundColor }
+				>
 					{ ColorPanel }
 				</BlockColorsStyleSelector>
 			</BlockControls>
@@ -214,7 +236,10 @@ function Navigation( {
 					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
 				<PanelBody title={ __( 'Text settings' ) }>
-					<FontSizePicker value={ fontSize.size } onChange={ setFontSize } />
+					<FontSizePicker
+						value={ fontSize.size }
+						onChange={ setFontSize }
+					/>
 				</PanelBody>
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
@@ -231,7 +256,11 @@ function Navigation( {
 			</InspectorControls>
 			<TextColor>
 				<BackgroundColor>
-					<div ref={ ref } className={ blockClassNames } style={ blockInlineStyles }>
+					<div
+						ref={ ref }
+						className={ blockClassNames }
+						style={ blockInlineStyles }
+					>
 						{ ! hasExistingNavItems && isRequestingPages && (
 							<>
 								<Spinner /> { __( 'Loading Navigation…' ) }{ ' ' }
@@ -261,19 +290,34 @@ export default compose( [
 			orderby: 'id',
 		};
 
-		const pagesSelect = [ 'core', 'getEntityRecords', [ 'postType', 'page', filterDefaultPages ] ];
+		const pagesSelect = [
+			'core',
+			'getEntityRecords',
+			[ 'postType', 'page', filterDefaultPages ],
+		];
 
 		return {
 			hasExistingNavItems: !! innerBlocks.length,
-			pages: select( 'core' ).getEntityRecords( 'postType', 'page', filterDefaultPages ),
-			isRequestingPages: select( 'core/data' ).isResolving( ...pagesSelect ),
-			hasResolvedPages: select( 'core/data' ).hasFinishedResolution( ...pagesSelect ),
+			pages: select( 'core' ).getEntityRecords(
+				'postType',
+				'page',
+				filterDefaultPages
+			),
+			isRequestingPages: select( 'core/data' ).isResolving(
+				...pagesSelect
+			),
+			hasResolvedPages: select( 'core/data' ).hasFinishedResolution(
+				...pagesSelect
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
 		return {
 			updateNavItemBlocks( blocks ) {
-				dispatch( 'core/block-editor' ).replaceInnerBlocks( clientId, blocks );
+				dispatch( 'core/block-editor' ).replaceInnerBlocks(
+					clientId,
+					blocks
+				);
 			},
 		};
 	} ),

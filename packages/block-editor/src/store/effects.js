@@ -56,7 +56,9 @@ export function validateBlocksToTemplate( action, store ) {
 	// Unlocked templates are considered always valid because they act
 	// as default values only.
 	const isBlocksValidToTemplate =
-		! template || templateLock !== 'all' || doBlocksMatchTemplate( action.blocks, template );
+		! template ||
+		templateLock !== 'all' ||
+		doBlocksMatchTemplate( action.blocks, template );
 
 	// Update if validity has changed.
 	if ( isBlocksValidToTemplate !== isValidTemplate( state ) ) {
@@ -81,8 +83,10 @@ export default {
 		const blockB = getBlock( state, clientIdB );
 		const blockBType = getBlockType( blockB.name );
 		const { clientId, attributeKey, offset } = getSelectionStart( state );
-		const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
-		const attributeDefinition = selectedBlockType.attributes[ attributeKey ];
+		const selectedBlockType =
+			clientId === clientIdA ? blockAType : blockBType;
+		const attributeDefinition =
+			selectedBlockType.attributes[ attributeKey ];
 		const canRestoreTextSelection =
 			( clientId === clientIdA || clientId === clientIdB ) &&
 			attributeKey !== undefined &&
@@ -143,7 +147,9 @@ export default {
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
 		const blocksWithTheSameType =
-			blockA.name === blockB.name ? [ cloneB ] : switchToBlockType( cloneB, blockA.name );
+			blockA.name === blockB.name
+				? [ cloneB ]
+				: switchToBlockType( cloneB, blockA.name );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
@@ -159,7 +165,9 @@ export default {
 		if ( canRestoreTextSelection ) {
 			const newAttributeKey = findKey(
 				updatedAttributes,
-				( v ) => typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
+				( v ) =>
+					typeof v === 'string' &&
+					v.indexOf( START_OF_SELECTED_AREA ) !== -1
 			);
 			const convertedHtml = updatedAttributes[ newAttributeKey ];
 			const {
@@ -173,7 +181,9 @@ export default {
 				multilineWrapperTags,
 				preserveWhiteSpace,
 			} );
-			const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
+			const newOffset = convertedValue.text.indexOf(
+				START_OF_SELECTED_AREA
+			);
 			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
 			const newHtml = toHTMLString( {
 				value: newValue,
@@ -183,7 +193,14 @@ export default {
 
 			updatedAttributes[ newAttributeKey ] = newHtml;
 
-			dispatch( selectionChange( blockA.clientId, newAttributeKey, newOffset, newOffset ) );
+			dispatch(
+				selectionChange(
+					blockA.clientId,
+					newAttributeKey,
+					newOffset,
+					newOffset
+				)
+			);
 		}
 
 		dispatch(
@@ -208,7 +225,10 @@ export default {
 
 		/* translators: %s: number of selected blocks */
 		speak(
-			sprintf( _n( '%s block selected.', '%s blocks selected.', blockCount ), blockCount ),
+			sprintf(
+				_n( '%s block selected.', '%s blocks selected.', blockCount ),
+				blockCount
+			),
 			'assertive'
 		);
 	},
@@ -216,7 +236,10 @@ export default {
 		const state = getState();
 		const blocks = getBlocks( state );
 		const template = getTemplate( state );
-		const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
+		const updatedBlockList = synchronizeBlocksWithTemplate(
+			blocks,
+			template
+		);
 
 		return resetBlocks( updatedBlockList );
 	},

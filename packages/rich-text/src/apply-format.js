@@ -28,28 +28,49 @@ function replace( array, index, value ) {
  *
  * @return {Object} A new value with the format applied.
  */
-export function applyFormat( value, format, startIndex = value.start, endIndex = value.end ) {
+export function applyFormat(
+	value,
+	format,
+	startIndex = value.start,
+	endIndex = value.end
+) {
 	const { formats, activeFormats } = value;
 	const newFormats = formats.slice();
 
 	// The selection is collapsed.
 	if ( startIndex === endIndex ) {
-		const startFormat = find( newFormats[ startIndex ], { type: format.type } );
+		const startFormat = find( newFormats[ startIndex ], {
+			type: format.type,
+		} );
 
 		// If the caret is at a format of the same type, expand start and end to
 		// the edges of the format. This is useful to apply new attributes.
 		if ( startFormat ) {
 			const index = newFormats[ startIndex ].indexOf( startFormat );
 
-			while ( newFormats[ startIndex ] && newFormats[ startIndex ][ index ] === startFormat ) {
-				newFormats[ startIndex ] = replace( newFormats[ startIndex ], index, format );
+			while (
+				newFormats[ startIndex ] &&
+				newFormats[ startIndex ][ index ] === startFormat
+			) {
+				newFormats[ startIndex ] = replace(
+					newFormats[ startIndex ],
+					index,
+					format
+				);
 				startIndex--;
 			}
 
 			endIndex++;
 
-			while ( newFormats[ endIndex ] && newFormats[ endIndex ][ index ] === startFormat ) {
-				newFormats[ endIndex ] = replace( newFormats[ endIndex ], index, format );
+			while (
+				newFormats[ endIndex ] &&
+				newFormats[ endIndex ][ index ] === startFormat
+			) {
+				newFormats[ endIndex ] = replace(
+					newFormats[ endIndex ],
+					index,
+					format
+				);
 				endIndex++;
 			}
 		}
@@ -59,7 +80,9 @@ export function applyFormat( value, format, startIndex = value.start, endIndex =
 
 		for ( let index = startIndex; index < endIndex; index++ ) {
 			if ( newFormats[ index ] ) {
-				newFormats[ index ] = newFormats[ index ].filter( ( { type } ) => type !== format.type );
+				newFormats[ index ] = newFormats[ index ].filter(
+					( { type } ) => type !== format.type
+				);
 
 				const length = newFormats[ index ].length;
 
@@ -83,6 +106,9 @@ export function applyFormat( value, format, startIndex = value.start, endIndex =
 		// Always revise active formats. This serves as a placeholder for new
 		// inputs with the format so new input appears with the format applied,
 		// and ensures a format of the same type uses the latest values.
-		activeFormats: [ ...reject( activeFormats, { type: format.type } ), format ],
+		activeFormats: [
+			...reject( activeFormats, { type: format.type } ),
+			format,
+		],
 	} );
 }

@@ -32,12 +32,17 @@ if ( existsSync( normalize( cwd() + '/wordpress/wp-config-sample.php' ) ) ) {
 }
 
 if ( commandExistsSync( 'git' ) ) {
-	execSync( 'git clone --depth=1 git://develop.git.wordpress.org/ wordpress', {
-		stdio: 'inherit',
-	} );
+	execSync(
+		'git clone --depth=1 git://develop.git.wordpress.org/ wordpress',
+		{
+			stdio: 'inherit',
+		}
+	);
 	buildWordPress( true, false );
 } else {
-	stdout.write( "Git isn't available. Switching to downloading a zip version.\n" );
+	stdout.write(
+		"Git isn't available. Switching to downloading a zip version.\n"
+	);
 	downloadWordPressZip().then( () => {
 		buildWordPress( true, false );
 	} );

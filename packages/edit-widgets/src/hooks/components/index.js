@@ -6,4 +6,8 @@ import { MediaUpload } from '@wordpress/media-utils';
 
 const replaceMediaUpload = () => MediaUpload;
 
-addFilter( 'editor.MediaUpload', 'core/edit-widgets/replace-media-upload', replaceMediaUpload );
+addFilter(
+	'editor.MediaUpload',
+	'core/edit-widgets/replace-media-upload',
+	replaceMediaUpload
+);

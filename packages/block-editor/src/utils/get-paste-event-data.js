@@ -56,12 +56,16 @@ export function getPasteEventData( { clipboardData } ) {
 		}
 	} );
 
-	files = files.filter( ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+	files = files.filter( ( { type } ) =>
+		/^image\/(?:jpe?g|png|gif)$/.test( type )
+	);
 
 	// Only process files if no HTML is present.
 	// A pasted file may have the URL as plain text.
 	if ( files.length && ! html ) {
-		html = files.map( ( file ) => `<img src="${ createBlobURL( file ) }">` ).join( '' );
+		html = files
+			.map( ( file ) => `<img src="${ createBlobURL( file ) }">` )
+			.join( '' );
 		plainText = '';
 	}
 

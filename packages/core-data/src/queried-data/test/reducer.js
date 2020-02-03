@@ -12,11 +12,25 @@ describe( 'getMergedItemIds', () => {
 	it( 'should receive a page', () => {
 		const result = getMergedItemIds( [], [ 4, 5, 6 ], 2, 3 );
 
-		expect( result ).toEqual( [ undefined, undefined, undefined, 4, 5, 6 ] );
+		expect( result ).toEqual( [
+			undefined,
+			undefined,
+			undefined,
+			4,
+			5,
+			6,
+		] );
 	} );
 
 	it( 'should merge into existing items', () => {
-		const original = deepFreeze( [ undefined, undefined, undefined, 4, 5, 6 ] );
+		const original = deepFreeze( [
+			undefined,
+			undefined,
+			undefined,
+			4,
+			5,
+			6,
+		] );
 		const result = getMergedItemIds( original, [ 1, 2, 3 ], 1, 3 );
 
 		expect( result ).toEqual( [ 1, 2, 3, 4, 5, 6 ] );

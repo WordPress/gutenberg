@@ -14,7 +14,9 @@ import { useKeyboardShortcut } from '@wordpress/compose';
 function useShortcut( name, callback, options ) {
 	const shortcuts = useSelect(
 		( select ) => {
-			return select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( name );
+			return select(
+				'core/keyboard-shortcuts'
+			).getAllShortcutRawKeyCombinations( name );
 		},
 		[ name ]
 	);

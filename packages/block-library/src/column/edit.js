@@ -29,7 +29,13 @@ import {
 	getRedistributedColumnWidths,
 } from '../columns/utils';
 
-function ColumnEdit( { attributes, className, updateAlignment, updateWidth, hasChildBlocks } ) {
+function ColumnEdit( {
+	attributes,
+	className,
+	updateAlignment,
+	updateWidth,
+	hasChildBlocks,
+} ) {
 	const { verticalAlignment, width } = attributes;
 
 	const classes = classnames( className, 'block-core-columns', {
@@ -39,7 +45,10 @@ function ColumnEdit( { attributes, className, updateAlignment, updateWidth, hasC
 	return (
 		<div className={ classes }>
 			<BlockControls>
-				<BlockVerticalAlignmentToolbar onChange={ updateAlignment } value={ verticalAlignment } />
+				<BlockVerticalAlignmentToolbar
+					onChange={ updateAlignment }
+					value={ verticalAlignment }
+				/>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Column settings' ) }>
@@ -56,7 +65,11 @@ function ColumnEdit( { attributes, className, updateAlignment, updateWidth, hasC
 			</InspectorControls>
 			<InnerBlocks
 				templateLock={ false }
-				renderAppender={ hasChildBlocks ? undefined : () => <InnerBlocks.ButtonBlockAppender /> }
+				renderAppender={
+					hasChildBlocks
+						? undefined
+						: () => <InnerBlocks.ButtonBlockAppender />
+				}
 			/>
 		</div>
 	);
@@ -75,20 +88,30 @@ export default compose(
 		return {
 			updateAlignment( verticalAlignment ) {
 				const { clientId, setAttributes } = ownProps;
-				const { updateBlockAttributes } = dispatch( 'core/block-editor' );
-				const { getBlockRootClientId } = registry.select( 'core/block-editor' );
+				const { updateBlockAttributes } = dispatch(
+					'core/block-editor'
+				);
+				const { getBlockRootClientId } = registry.select(
+					'core/block-editor'
+				);
 
 				// Update own alignment.
 				setAttributes( { verticalAlignment } );
 
 				// Reset Parent Columns Block
 				const rootClientId = getBlockRootClientId( clientId );
-				updateBlockAttributes( rootClientId, { verticalAlignment: null } );
+				updateBlockAttributes( rootClientId, {
+					verticalAlignment: null,
+				} );
 			},
 			updateWidth( width ) {
 				const { clientId } = ownProps;
-				const { updateBlockAttributes } = dispatch( 'core/block-editor' );
-				const { getBlockRootClientId, getBlocks } = registry.select( 'core/block-editor' );
+				const { updateBlockAttributes } = dispatch(
+					'core/block-editor'
+				);
+				const { getBlockRootClientId, getBlocks } = registry.select(
+					'core/block-editor'
+				);
 
 				// Constrain or expand siblings to account for gain or loss of
 				// total columns area.
@@ -100,7 +123,10 @@ export default compose(
 				const occupiedWidth =
 					width +
 					getTotalColumnsWidth(
-						difference( columns, [ find( columns, { clientId } ), ...adjacentColumns ] )
+						difference( columns, [
+							find( columns, { clientId } ),
+							...adjacentColumns,
+						] )
 					);
 
 				// Compute _all_ next column widths, in case the updated column
@@ -110,12 +136,21 @@ export default compose(
 				const nextColumnWidths = {
 					...getColumnWidths( columns, columns.length ),
 					[ clientId ]: toWidthPrecision( width ),
-					...getRedistributedColumnWidths( adjacentColumns, 100 - occupiedWidth, columns.length ),
+					...getRedistributedColumnWidths(
+						adjacentColumns,
+						100 - occupiedWidth,
+						columns.length
+					),
 				};
 
-				forEach( nextColumnWidths, ( nextColumnWidth, columnClientId ) => {
-					updateBlockAttributes( columnClientId, { width: nextColumnWidth } );
-				} );
+				forEach(
+					nextColumnWidths,
+					( nextColumnWidth, columnClientId ) => {
+						updateBlockAttributes( columnClientId, {
+							width: nextColumnWidth,
+						} );
+					}
+				);
 			},
 		};
 	} )

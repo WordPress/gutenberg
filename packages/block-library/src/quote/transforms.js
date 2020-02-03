@@ -14,7 +14,9 @@ const transforms = {
 				return createBlock( 'core/quote', {
 					value: toHTMLString( {
 						value: join(
-							attributes.map( ( { content } ) => create( { html: content } ) ),
+							attributes.map( ( { content } ) =>
+								create( { html: content } )
+							),
 							'\u2028'
 						),
 						multilineTag: 'p',
@@ -70,7 +72,9 @@ const transforms = {
 					node.nodeName === 'BLOCKQUOTE' &&
 					// The quote block can only handle multiline paragraph
 					// content with an optional cite child.
-					Array.from( node.childNodes ).every( isParagraphOrSingleCite )
+					Array.from( node.childNodes ).every(
+						isParagraphOrSingleCite
+					)
 				);
 			},
 			schema: ( { phrasingContentSchema } ) => ( {
@@ -95,7 +99,10 @@ const transforms = {
 				const paragraphs = [];
 				if ( value && value !== '<p></p>' ) {
 					paragraphs.push(
-						...split( create( { html: value, multilineTag: 'p' } ), '\u2028' ).map( ( piece ) =>
+						...split(
+							create( { html: value, multilineTag: 'p' } ),
+							'\u2028'
+						).map( ( piece ) =>
 							createBlock( 'core/paragraph', {
 								content: toHTMLString( { value: piece } ),
 							} )
@@ -132,7 +139,10 @@ const transforms = {
 					} );
 				}
 
-				const pieces = split( create( { html: value, multilineTag: 'p' } ), '\u2028' );
+				const pieces = split(
+					create( { html: value, multilineTag: 'p' } ),
+					'\u2028'
+				);
 
 				const headingBlock = createBlock( 'core/heading', {
 					content: toHTMLString( { value: pieces[ 0 ] } ),
@@ -148,7 +158,9 @@ const transforms = {
 					...attrs,
 					citation,
 					value: toHTMLString( {
-						value: quotePieces.length ? join( pieces.slice( 1 ), '\u2028' ) : create(),
+						value: quotePieces.length
+							? join( pieces.slice( 1 ), '\u2028' )
+							: create(),
 						multilineTag: 'p',
 					} ),
 				} );

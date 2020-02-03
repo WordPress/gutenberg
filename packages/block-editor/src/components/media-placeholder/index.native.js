@@ -8,14 +8,27 @@ import { uniqWith } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
+import {
+	MediaUpload,
+	MEDIA_TYPE_IMAGE,
+	MEDIA_TYPE_VIDEO,
+} from '@wordpress/block-editor';
 import { Dashicon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+
+// remove duplicates after gallery append
+const dedupMedia = ( media ) =>
+	uniqWith(
+		media,
+		( media1, media2 ) =>
+			media1.id === media2.id || media1.url === media2.url
+	);
 
 function MediaPlaceholder( props ) {
 	const {
@@ -31,13 +44,16 @@ function MediaPlaceholder( props ) {
 		value = [],
 	} = props;
 
+	// use ref to keep media array current for callbacks during rerenders
+	const mediaRef = useRef( value );
+	mediaRef.current = value;
+
+	// append and deduplicate media array for gallery use case
 	const setMedia =
 		multiple && addToGallery
 			? ( selected ) =>
 					onSelect(
-						uniqWith( [ ...value, ...selected ], ( media1, media2 ) => {
-							return media1.id === media2.id || media1.url === media2.url;
-						} )
+						dedupMedia( [ ...mediaRef.current, ...selected ] )
 					)
 			: onSelect;
 
@@ -87,8 +103,12 @@ function MediaPlaceholder( props ) {
 			return (
 				<>
 					<View style={ styles.modalIcon }>{ icon }</View>
-					<Text style={ emptyStateTitleStyle }>{ placeholderTitle }</Text>
-					<Text style={ styles.emptyStateDescription }>{ instructions }</Text>
+					<Text style={ emptyStateTitleStyle }>
+						{ placeholderTitle }
+					</Text>
+					<Text style={ styles.emptyStateDescription }>
+						{ instructions }
+					</Text>
 				</>
 			);
 		} else if ( isAppender && ! disableMediaButtons ) {
@@ -107,7 +127,10 @@ function MediaPlaceholder( props ) {
 		return null;
 	}
 
-	const appenderStyle = getStylesFromColorScheme( styles.appender, styles.appenderDark );
+	const appenderStyle = getStylesFromColorScheme(
+		styles.appender,
+		styles.appenderDark
+	);
 	const emptyStateContainerStyle = getStylesFromColorScheme(
 		styles.emptyStateContainer,
 		styles.emptyStateContainerDark
@@ -134,7 +157,12 @@ function MediaPlaceholder( props ) {
 								open();
 							} }
 						>
-							<View style={ [ emptyStateContainerStyle, isAppender && appenderStyle ] }>
+							<View
+								style={ [
+									emptyStateContainerStyle,
+									isAppender && appenderStyle,
+								] }
+							>
 								{ getMediaOptions() }
 								{ renderContent() }
 							</View>

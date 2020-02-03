@@ -18,7 +18,10 @@ import { Button } from '../';
 
 const NOTICE_TIMEOUT = 10000;
 
-function Snackbar( { className, children, actions = [], onRemove = noop }, ref ) {
+function Snackbar(
+	{ className, children, actions = [], onRemove = noop },
+	ref
+) {
 	useEffect( () => {
 		const timeoutHandle = setTimeout( () => {
 			onRemove();
@@ -30,7 +33,9 @@ function Snackbar( { className, children, actions = [], onRemove = noop }, ref )
 	const classes = classnames( className, 'components-snackbar' );
 	if ( actions && actions.length > 1 ) {
 		// we need to inform developers that snackbar only accepts 1 action
-		warning( 'Snackbar can only have 1 action, use Notice if your message require many messages' );
+		warning(
+			'Snackbar can only have 1 action, use Notice if your message require many messages'
+		);
 		// return first element only while keeping it inside an array
 		actions = [ actions[ 0 ] ];
 	}

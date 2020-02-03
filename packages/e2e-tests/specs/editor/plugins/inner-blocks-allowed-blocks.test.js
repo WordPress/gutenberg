@@ -12,7 +12,8 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
-	const paragraphSelector = '.block-editor-rich-text__editable.wp-block-paragraph';
+	const paragraphSelector =
+		'.block-editor-rich-text__editable.wp-block-paragraph';
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-innerblocks-allowed-blocks' );
 	} );
@@ -33,7 +34,9 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		await page.click( childParagraphSelector );
 		await openGlobalBlockInserter();
 		await openAllBlockInserterCategories();
-		expect( ( await getAllBlockInserterItemTitles() ).length ).toBeGreaterThan( 20 );
+		expect(
+			( await getAllBlockInserterItemTitles() ).length
+		).toBeGreaterThan( 20 );
 	} );
 
 	it( 'allows the blocks if the allowed blocks setting was set', async () => {
@@ -61,12 +64,20 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		await page.waitForSelector( appenderSelector );
 		await page.click( appenderSelector );
 		await openAllBlockInserterCategories();
-		expect( await getAllBlockInserterItemTitles() ).toEqual( [ 'Image', 'List' ] );
-		const insertButton = ( await page.$x( `//button//span[contains(text(), 'List')]` ) )[ 0 ];
+		expect( await getAllBlockInserterItemTitles() ).toEqual( [
+			'Image',
+			'List',
+		] );
+		const insertButton = (
+			await page.$x( `//button//span[contains(text(), 'List')]` )
+		 )[ 0 ];
 		await insertButton.click();
 		await insertBlock( 'Image' );
 		await page.click( appenderSelector );
 		await openAllBlockInserterCategories();
-		expect( await getAllBlockInserterItemTitles() ).toEqual( [ 'Gallery', 'Video' ] );
+		expect( await getAllBlockInserterItemTitles() ).toEqual( [
+			'Gallery',
+			'Video',
+		] );
 	} );
 } );

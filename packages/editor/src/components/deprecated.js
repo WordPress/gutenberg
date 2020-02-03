@@ -73,7 +73,10 @@ function deprecateComponent( name, Wrapped, staticsToHoist = [] ) {
 	} );
 
 	staticsToHoist.forEach( ( staticName ) => {
-		Component[ staticName ] = deprecateComponent( name + '.' + staticName, Wrapped[ staticName ] );
+		Component[ staticName ] = deprecateComponent(
+			name + '.' + staticName,
+			Wrapped[ staticName ]
+		);
 	} );
 
 	return Component;
@@ -90,16 +93,29 @@ function deprecateFunction( name, func ) {
 }
 
 const RichText = deprecateComponent( 'RichText', RootRichText, [ 'Content' ] );
-RichText.isEmpty = deprecateFunction( 'RichText.isEmpty', RootRichText.isEmpty );
+RichText.isEmpty = deprecateFunction(
+	'RichText.isEmpty',
+	RootRichText.isEmpty
+);
 
 export { RichText };
-export const Autocomplete = deprecateComponent( 'Autocomplete', RootAutocomplete );
-export const AlignmentToolbar = deprecateComponent( 'AlignmentToolbar', RootAlignmentToolbar );
+export const Autocomplete = deprecateComponent(
+	'Autocomplete',
+	RootAutocomplete
+);
+export const AlignmentToolbar = deprecateComponent(
+	'AlignmentToolbar',
+	RootAlignmentToolbar
+);
 export const BlockAlignmentToolbar = deprecateComponent(
 	'BlockAlignmentToolbar',
 	RootBlockAlignmentToolbar
 );
-export const BlockControls = deprecateComponent( 'BlockControls', RootBlockControls, [ 'Slot' ] );
+export const BlockControls = deprecateComponent(
+	'BlockControls',
+	RootBlockControls,
+	[ 'Slot' ]
+);
 export const BlockEdit = deprecateComponent( 'BlockEdit', RootBlockEdit );
 export const BlockEditorKeyboardShortcuts = deprecateComponent(
 	'BlockEditorKeyboardShortcuts',
@@ -111,7 +127,10 @@ export const BlockFormatControls = deprecateComponent(
 	[ 'Slot' ]
 );
 export const BlockIcon = deprecateComponent( 'BlockIcon', RootBlockIcon );
-export const BlockInspector = deprecateComponent( 'BlockInspector', RootBlockInspector );
+export const BlockInspector = deprecateComponent(
+	'BlockInspector',
+	RootBlockInspector
+);
 export const BlockList = deprecateComponent( 'BlockList', RootBlockList );
 export const BlockMover = deprecateComponent( 'BlockMover', RootBlockMover );
 export const BlockNavigationDropdown = deprecateComponent(
@@ -122,17 +141,32 @@ export const BlockSelectionClearer = deprecateComponent(
 	'BlockSelectionClearer',
 	RootBlockSelectionClearer
 );
-export const BlockSettingsMenu = deprecateComponent( 'BlockSettingsMenu', RootBlockSettingsMenu );
+export const BlockSettingsMenu = deprecateComponent(
+	'BlockSettingsMenu',
+	RootBlockSettingsMenu
+);
 export const BlockTitle = deprecateComponent( 'BlockTitle', RootBlockTitle );
-export const BlockToolbar = deprecateComponent( 'BlockToolbar', RootBlockToolbar );
-export const ColorPalette = deprecateComponent( 'ColorPalette', RootColorPalette );
-export const ContrastChecker = deprecateComponent( 'ContrastChecker', RootContrastChecker );
+export const BlockToolbar = deprecateComponent(
+	'BlockToolbar',
+	RootBlockToolbar
+);
+export const ColorPalette = deprecateComponent(
+	'ColorPalette',
+	RootColorPalette
+);
+export const ContrastChecker = deprecateComponent(
+	'ContrastChecker',
+	RootContrastChecker
+);
 export const CopyHandler = deprecateComponent( 'CopyHandler', RootCopyHandler );
 export const DefaultBlockAppender = deprecateComponent(
 	'DefaultBlockAppender',
 	RootDefaultBlockAppender
 );
-export const FontSizePicker = deprecateComponent( 'FontSizePicker', RootFontSizePicker );
+export const FontSizePicker = deprecateComponent(
+	'FontSizePicker',
+	RootFontSizePicker
+);
 export const Inserter = deprecateComponent( 'Inserter', RootInserter );
 export const InnerBlocks = deprecateComponent( 'InnerBlocks', RootInnerBlocks, [
 	'ButtonBlockAppender',
@@ -144,15 +178,20 @@ export const InspectorAdvancedControls = deprecateComponent(
 	RootInspectorAdvancedControls,
 	[ 'Slot' ]
 );
-export const InspectorControls = deprecateComponent( 'InspectorControls', RootInspectorControls, [
-	'Slot',
-] );
+export const InspectorControls = deprecateComponent(
+	'InspectorControls',
+	RootInspectorControls,
+	[ 'Slot' ]
+);
 export const PanelColorSettings = deprecateComponent(
 	'PanelColorSettings',
 	RootPanelColorSettings
 );
 export const PlainText = deprecateComponent( 'PlainText', RootPlainText );
-export const RichTextShortcut = deprecateComponent( 'RichTextShortcut', RootRichTextShortcut );
+export const RichTextShortcut = deprecateComponent(
+	'RichTextShortcut',
+	RootRichTextShortcut
+);
 export const RichTextToolbarButton = deprecateComponent(
 	'RichTextToolbarButton',
 	RootRichTextToolbarButton
@@ -161,9 +200,15 @@ export const __unstableRichTextInputEvent = deprecateComponent(
 	'__unstableRichTextInputEvent',
 	__unstableRootRichTextInputEvent
 );
-export const MediaPlaceholder = deprecateComponent( 'MediaPlaceholder', RootMediaPlaceholder );
+export const MediaPlaceholder = deprecateComponent(
+	'MediaPlaceholder',
+	RootMediaPlaceholder
+);
 export const MediaUpload = deprecateComponent( 'MediaUpload', RootMediaUpload );
-export const MediaUploadCheck = deprecateComponent( 'MediaUploadCheck', RootMediaUploadCheck );
+export const MediaUploadCheck = deprecateComponent(
+	'MediaUploadCheck',
+	RootMediaUploadCheck
+);
 export const MultiBlocksSwitcher = deprecateComponent(
 	'MultiBlocksSwitcher',
 	RootMultiBlocksSwitcher
@@ -172,8 +217,14 @@ export const MultiSelectScrollIntoView = deprecateComponent(
 	'MultiSelectScrollIntoView',
 	RootMultiSelectScrollIntoView
 );
-export const NavigableToolbar = deprecateComponent( 'NavigableToolbar', RootNavigableToolbar );
-export const ObserveTyping = deprecateComponent( 'ObserveTyping', RootObserveTyping );
+export const NavigableToolbar = deprecateComponent(
+	'NavigableToolbar',
+	RootNavigableToolbar
+);
+export const ObserveTyping = deprecateComponent(
+	'ObserveTyping',
+	RootObserveTyping
+);
 export const PreserveScrollInReorder = deprecateComponent(
 	'PreserveScrollInReorder',
 	RootPreserveScrollInReorder
@@ -183,7 +234,10 @@ export const SkipToSelectedBlock = deprecateComponent(
 	RootSkipToSelectedBlock
 );
 export const URLInput = deprecateComponent( 'URLInput', RootURLInput );
-export const URLInputButton = deprecateComponent( 'URLInputButton', RootURLInputButton );
+export const URLInputButton = deprecateComponent(
+	'URLInputButton',
+	RootURLInputButton
+);
 export const URLPopover = deprecateComponent( 'URLPopover', RootURLPopover );
 export const Warning = deprecateComponent( 'Warning', RootWarning );
 export const WritingFlow = deprecateComponent( 'WritingFlow', RootWritingFlow );
@@ -192,7 +246,10 @@ export const createCustomColorsHOC = deprecateFunction(
 	'createCustomColorsHOC',
 	rootCreateCustomColorsHOC
 );
-export const getColorClassName = deprecateFunction( 'getColorClassName', rootGetColorClassName );
+export const getColorClassName = deprecateFunction(
+	'getColorClassName',
+	rootGetColorClassName
+);
 export const getColorObjectByAttributeValues = deprecateFunction(
 	'getColorObjectByAttributeValues',
 	rootGetColorObjectByAttributeValues
@@ -202,7 +259,16 @@ export const getColorObjectByColorValue = deprecateFunction(
 	rootGetColorObjectByColorValue
 );
 export const getFontSize = deprecateFunction( 'getFontSize', rootGetFontSize );
-export const getFontSizeClass = deprecateFunction( 'getFontSizeClass', rootGetFontSizeClass );
-export const withColorContext = deprecateFunction( 'withColorContext', rootWithColorContext );
+export const getFontSizeClass = deprecateFunction(
+	'getFontSizeClass',
+	rootGetFontSizeClass
+);
+export const withColorContext = deprecateFunction(
+	'withColorContext',
+	rootWithColorContext
+);
 export const withColors = deprecateFunction( 'withColors', rootWithColors );
-export const withFontSizes = deprecateFunction( 'withFontSizes', rootWithFontSizes );
+export const withFontSizes = deprecateFunction(
+	'withFontSizes',
+	rootWithFontSizes
+);

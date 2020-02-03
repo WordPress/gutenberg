@@ -27,7 +27,10 @@ export { installPlugin } from './install-plugin';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
 export { loginUser } from './login-user';
-export { enableFocusLossObservation, disableFocusLossObservation } from './observe-focus-loss';
+export {
+	enableFocusLossObservation,
+	disableFocusLossObservation,
+} from './observe-focus-loss';
 export { openAllBlockInserterCategories } from './open-all-block-inserter-categories';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openGlobalBlockInserter } from './open-global-block-inserter';

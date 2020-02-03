@@ -8,7 +8,13 @@ import { animated } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useLayoutEffect, useState, useContext } from '@wordpress/element';
+import {
+	useRef,
+	useEffect,
+	useLayoutEffect,
+	useState,
+	useContext,
+} from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
@@ -125,7 +131,11 @@ function BlockListBlock( {
 			.find( wrapper.current )
 			.filter( isTextField )
 			// Exclude inner blocks
-			.filter( ( node ) => ! ignoreInnerBlocks || isInsideRootBlock( wrapper.current, node ) );
+			.filter(
+				( node ) =>
+					! ignoreInnerBlocks ||
+					isInsideRootBlock( wrapper.current, node )
+			);
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
@@ -211,9 +221,13 @@ function BlockListBlock( {
 	const showEmptyBlockSideInserter =
 		! isNavigationMode && isSelected && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
-		! isFocusMode && ! showEmptyBlockSideInserter && isSelected && ! isTypingWithinBlock;
+		! isFocusMode &&
+		! showEmptyBlockSideInserter &&
+		isSelected &&
+		! isTypingWithinBlock;
 
-	const isDragging = isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
+	const isDragging =
+		isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType.getEditWrapperProps ) {
@@ -237,7 +251,8 @@ function BlockListBlock( {
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
 			'is-typing': isTypingWithinBlock,
-			'is-focused': isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
+			'is-focused':
+				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
 			'is-block-collapsed': isAligned,
@@ -303,10 +318,17 @@ function BlockListBlock( {
 		>
 			<BlockCrashBoundary onError={ onBlockError }>
 				{ isValid && blockEdit }
-				{ isValid && mode === 'html' && <BlockHtml clientId={ clientId } /> }
+				{ isValid && mode === 'html' && (
+					<BlockHtml clientId={ clientId } />
+				) }
 				{ ! isValid && [
-					<BlockInvalidWarning key="invalid-warning" clientId={ clientId } />,
-					<div key="invalid-preview">{ getSaveElement( blockType, attributes ) }</div>,
+					<BlockInvalidWarning
+						key="invalid-warning"
+						clientId={ clientId }
+					/>,
+					<div key="invalid-preview">
+						{ getSaveElement( blockType, attributes ) }
+					</div>,
 				] }
 			</BlockCrashBoundary>
 			{ !! hasError && <BlockCrashWarning /> }
@@ -314,69 +336,81 @@ function BlockListBlock( {
 	);
 }
 
-const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeViewport } ) => {
-	const {
-		isBlockSelected,
-		isAncestorMultiSelected,
-		isBlockMultiSelected,
-		isFirstMultiSelectedBlock,
-		getLastMultiSelectedBlockClientId,
-		isTyping,
-		getBlockMode,
-		isSelectionEnabled,
-		getSelectedBlocksInitialCaretPosition,
-		getSettings,
-		hasSelectedInnerBlock,
-		getTemplateLock,
-		__unstableGetBlockWithoutInnerBlocks,
-		isNavigationMode,
-	} = select( 'core/block-editor' );
+const applyWithSelect = withSelect(
+	( select, { clientId, rootClientId, isLargeViewport } ) => {
+		const {
+			isBlockSelected,
+			isAncestorMultiSelected,
+			isBlockMultiSelected,
+			isFirstMultiSelectedBlock,
+			getLastMultiSelectedBlockClientId,
+			isTyping,
+			getBlockMode,
+			isSelectionEnabled,
+			getSelectedBlocksInitialCaretPosition,
+			getSettings,
+			hasSelectedInnerBlock,
+			getTemplateLock,
+			__unstableGetBlockWithoutInnerBlocks,
+			isNavigationMode,
+		} = select( 'core/block-editor' );
 
-	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
-	const isSelected = isBlockSelected( clientId );
-	const { focusMode, isRTL } = getSettings();
-	const templateLock = getTemplateLock( rootClientId );
-	const checkDeep = true;
+		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+		const isSelected = isBlockSelected( clientId );
+		const { focusMode, isRTL } = getSettings();
+		const templateLock = getTemplateLock( rootClientId );
+		const checkDeep = true;
 
-	// "ancestor" is the more appropriate label due to "deep" check
-	const isAncestorOfSelectedBlock = hasSelectedInnerBlock( clientId, checkDeep );
+		// "ancestor" is the more appropriate label due to "deep" check
+		const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
+			clientId,
+			checkDeep
+		);
 
-	// The fallback to `{}` is a temporary fix.
-	// This function should never be called when a block is not present in the state.
-	// It happens now because the order in withSelect rendering is not correct.
-	const { name, attributes, isValid } = block || {};
+		// The fallback to `{}` is a temporary fix.
+		// This function should never be called when a block is not present in the state.
+		// It happens now because the order in withSelect rendering is not correct.
+		const { name, attributes, isValid } = block || {};
 
-	return {
-		isMultiSelected: isBlockMultiSelected( clientId ),
-		isPartOfMultiSelection: isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
-		isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
-		isLastMultiSelected: getLastMultiSelectedBlockClientId() === clientId,
+		return {
+			isMultiSelected: isBlockMultiSelected( clientId ),
+			isPartOfMultiSelection:
+				isBlockMultiSelected( clientId ) ||
+				isAncestorMultiSelected( clientId ),
+			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
+			isLastMultiSelected:
+				getLastMultiSelectedBlockClientId() === clientId,
 
-		// We only care about this prop when the block is selected
-		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
-		isTypingWithinBlock: ( isSelected || isAncestorOfSelectedBlock ) && isTyping(),
+			// We only care about this prop when the block is selected
+			// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
+			isTypingWithinBlock:
+				( isSelected || isAncestorOfSelectedBlock ) && isTyping(),
 
-		mode: getBlockMode( clientId ),
-		isSelectionEnabled: isSelectionEnabled(),
-		initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
-		isEmptyDefaultBlock: name && isUnmodifiedDefaultBlock( { name, attributes } ),
-		isLocked: !! templateLock,
-		isFocusMode: focusMode && isLargeViewport,
-		isNavigationMode: isNavigationMode(),
-		isRTL,
+			mode: getBlockMode( clientId ),
+			isSelectionEnabled: isSelectionEnabled(),
+			initialPosition: isSelected
+				? getSelectedBlocksInitialCaretPosition()
+				: null,
+			isEmptyDefaultBlock:
+				name && isUnmodifiedDefaultBlock( { name, attributes } ),
+			isLocked: !! templateLock,
+			isFocusMode: focusMode && isLargeViewport,
+			isNavigationMode: isNavigationMode(),
+			isRTL,
 
-		// Users of the editor.BlockListBlock filter used to be able to access the block prop
-		// Ideally these blocks would rely on the clientId prop only.
-		// This is kept for backward compatibility reasons.
-		block,
+			// Users of the editor.BlockListBlock filter used to be able to access the block prop
+			// Ideally these blocks would rely on the clientId prop only.
+			// This is kept for backward compatibility reasons.
+			block,
 
-		name,
-		attributes,
-		isValid,
-		isSelected,
-		isAncestorOfSelectedBlock,
-	};
-} );
+			name,
+			attributes,
+			isValid,
+			isSelected,
+			isAncestorOfSelectedBlock,
+		};
+	}
+);
 
 const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	const {
@@ -416,7 +450,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onMerge( forward ) {
 			const { clientId } = ownProps;
-			const { getPreviousBlockClientId, getNextBlockClientId } = select( 'core/block-editor' );
+			const { getPreviousBlockClientId, getNextBlockClientId } = select(
+				'core/block-editor'
+			);
 
 			if ( forward ) {
 				const nextBlockClientId = getNextBlockClientId( clientId );
@@ -424,14 +460,19 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 					mergeBlocks( clientId, nextBlockClientId );
 				}
 			} else {
-				const previousBlockClientId = getPreviousBlockClientId( clientId );
+				const previousBlockClientId = getPreviousBlockClientId(
+					clientId
+				);
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
 				}
 			}
 		},
 		onReplace( blocks, indexToSelect ) {
-			if ( blocks.length && ! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] ) ) {
+			if (
+				blocks.length &&
+				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
+			) {
 				__unstableMarkLastChangeAsPersistent();
 			}
 			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );

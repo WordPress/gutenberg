@@ -25,9 +25,15 @@ import { getQueriedItems } from './queried-data';
  *
  * @return {boolean} Whether a request is in progress for an embed preview.
  */
-export const isRequestingEmbedPreview = createRegistrySelector( ( select ) => ( state, url ) => {
-	return select( 'core/data' ).isResolving( REDUCER_KEY, 'getEmbedPreview', [ url ] );
-} );
+export const isRequestingEmbedPreview = createRegistrySelector(
+	( select ) => ( state, url ) => {
+		return select( 'core/data' ).isResolving(
+			REDUCER_KEY,
+			'getEmbedPreview',
+			[ url ]
+		);
+	}
+);
 
 /**
  * Returns all available authors.
@@ -104,7 +110,13 @@ export function getEntity( state, kind, name ) {
  * @return {Object?} Record.
  */
 export function getEntityRecord( state, kind, name, key ) {
-	return get( state.entities.data, [ kind, name, 'queriedData', 'items', key ] );
+	return get( state.entities.data, [
+		kind,
+		name,
+		'queriedData',
+		'items',
+		key,
+	] );
 }
 
 /**
@@ -141,7 +153,11 @@ export const getRawEntityRecord = createSelector(
 				// Because edits are the "raw" attribute values,
 				// we return those from record selectors to make rendering,
 				// comparisons, and joins with edits easier.
-				accumulator[ _key ] = get( record[ _key ], 'raw', record[ _key ] );
+				accumulator[ _key ] = get(
+					record[ _key ],
+					'raw',
+					record[ _key ]
+				);
 				return accumulator;
 			}, {} )
 		);
@@ -160,7 +176,11 @@ export const getRawEntityRecord = createSelector(
  * @return {Array} Records.
  */
 export function getEntityRecords( state, kind, name, query ) {
-	const queriedState = get( state.entities.data, [ kind, name, 'queriedData' ] );
+	const queriedState = get( state.entities.data, [
+		kind,
+		name,
+		'queriedData',
+	] );
 	if ( ! queriedState ) {
 		return [];
 	}
@@ -184,7 +204,9 @@ export const getEntityRecordChangesByRecord = createSelector(
 		} = state;
 		return Object.keys( data ).reduce( ( acc, kind ) => {
 			Object.keys( data[ kind ] ).forEach( ( name ) => {
-				const editsKeys = Object.keys( data[ kind ][ name ].edits ).filter( ( editsKey ) =>
+				const editsKeys = Object.keys(
+					data[ kind ][ name ].edits
+				).filter( ( editsKey ) =>
 					hasEditsForEntityRecord( state, kind, name, editsKey )
 				);
 				if ( editsKeys.length ) {
@@ -197,8 +219,18 @@ export const getEntityRecordChangesByRecord = createSelector(
 					editsKeys.forEach(
 						( editsKey ) =>
 							( acc[ kind ][ name ][ editsKey ] = {
-								rawRecord: getRawEntityRecord( state, kind, name, editsKey ),
-								edits: getEntityRecordNonTransientEdits( state, kind, name, editsKey ),
+								rawRecord: getRawEntityRecord(
+									state,
+									kind,
+									name,
+									editsKey
+								),
+								edits: getEntityRecordNonTransientEdits(
+									state,
+									kind,
+									name,
+									editsKey
+								),
 							} )
 					);
 				}
@@ -269,7 +301,9 @@ export const getEntityRecordNonTransientEdits = createSelector(
 export function hasEditsForEntityRecord( state, kind, name, recordId ) {
 	return (
 		isSavingEntityRecord( state, kind, name, recordId ) ||
-		Object.keys( getEntityRecordNonTransientEdits( state, kind, name, recordId ) ).length > 0
+		Object.keys(
+			getEntityRecordNonTransientEdits( state, kind, name, recordId )
+		).length > 0
 	);
 }
 
@@ -321,7 +355,11 @@ export function isAutosavingEntityRecord( state, kind, name, recordId ) {
  * @return {boolean} Whether the entity record is saving or not.
  */
 export function isSavingEntityRecord( state, kind, name, recordId ) {
-	return get( state.entities.data, [ kind, name, 'saving', recordId, 'pending' ], false );
+	return get(
+		state.entities.data,
+		[ kind, name, 'saving', recordId, 'pending' ],
+		false
+	);
 }
 
 /**
@@ -335,7 +373,13 @@ export function isSavingEntityRecord( state, kind, name, recordId ) {
  * @return {Object?} The entity record's save error.
  */
 export function getLastEntitySaveError( state, kind, name, recordId ) {
-	return get( state.entities.data, [ kind, name, 'saving', recordId, 'error' ] );
+	return get( state.entities.data, [
+		kind,
+		name,
+		'saving',
+		recordId,
+		'error',
+	] );
 }
 
 /**
@@ -536,7 +580,10 @@ export function getAutosave( state, postType, postId, authorId ) {
  */
 export const hasFetchedAutosaves = createRegistrySelector(
 	( select ) => ( state, postType, postId ) => {
-		return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [ postType, postId ] );
+		return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [
+			postType,
+			postId,
+		] );
 	}
 );
 

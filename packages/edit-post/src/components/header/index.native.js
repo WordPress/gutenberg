@@ -44,6 +44,10 @@ export default class Header extends Component {
 	}
 
 	render() {
-		return <HeaderToolbar showKeyboardHideButton={ this.state.isKeyboardVisible } />;
+		return (
+			<HeaderToolbar
+				showKeyboardHideButton={ this.state.isKeyboardVisible }
+			/>
+		);
 	}
 }

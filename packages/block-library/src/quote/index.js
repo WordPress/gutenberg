@@ -26,13 +26,18 @@ export const settings = {
 	keywords: [ __( 'blockquote' ), __( 'cite' ) ],
 	example: {
 		attributes: {
-			value: '<p>' + __( 'In quoting others, we cite ourselves.' ) + '</p>',
+			value:
+				'<p>' + __( 'In quoting others, we cite ourselves.' ) + '</p>',
 			citation: 'Julio Cortázar',
 			className: 'is-style-large',
 		},
 	},
 	styles: [
-		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
+		{
+			name: 'default',
+			label: _x( 'Default', 'block style' ),
+			isDefault: true,
+		},
 		{ name: 'large', label: _x( 'Large', 'block style' ) },
 	],
 	transforms,

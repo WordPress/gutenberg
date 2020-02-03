@@ -45,7 +45,9 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 						title: _x( 'Left to right', 'editor button' ),
 						isActive: direction === 'ltr',
 						onClick() {
-							setDirection( direction === 'ltr' ? undefined : 'ltr' );
+							setDirection(
+								direction === 'ltr' ? undefined : 'ltr'
+							);
 						},
 					},
 				] }
@@ -59,7 +61,9 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 	useEffect( () => {
 		const element = querySelector( PARAGRAPH_DROP_CAP_SELECTOR );
 		if ( isDropCap && element ) {
-			setMinimumHeight( getComputedStyle( element, 'first-letter' ).lineHeight );
+			setMinimumHeight(
+				getComputedStyle( element, 'first-letter' ).lineHeight
+			);
 		} else if ( minimumHeight ) {
 			setMinimumHeight( undefined );
 		}
@@ -79,14 +83,26 @@ function ParagraphBlock( {
 	const { align, content, dropCap, placeholder, direction } = attributes;
 
 	const ref = useRef();
-	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [ fontSize.size ] );
-	const { TextColor, BackgroundColor, InspectorControlsColorPanel } = __experimentalUseColors(
+	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
+		fontSize.size,
+	] );
+	const {
+		TextColor,
+		BackgroundColor,
+		InspectorControlsColorPanel,
+	} = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
 			{ name: 'backgroundColor', className: 'has-background' },
 		],
 		{
-			contrastCheckers: [ { backgroundColor: true, textColor: true, fontSize: fontSize.size } ],
+			contrastCheckers: [
+				{
+					backgroundColor: true,
+					textColor: true,
+					fontSize: fontSize.size,
+				},
+			],
 			colorDetector: { targetRef: ref },
 		},
 		[ fontSize.size ]
@@ -97,20 +113,29 @@ function ParagraphBlock( {
 			<BlockControls>
 				<AlignmentToolbar
 					value={ align }
-					onChange={ ( newAlign ) => setAttributes( { align: newAlign } ) }
+					onChange={ ( newAlign ) =>
+						setAttributes( { align: newAlign } )
+					}
 				/>
 				<ParagraphRTLToolbar
 					direction={ direction }
-					setDirection={ ( newDirection ) => setAttributes( { direction: newDirection } ) }
+					setDirection={ ( newDirection ) =>
+						setAttributes( { direction: newDirection } )
+					}
 				/>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Text settings' ) }>
-					<FontSizePicker value={ fontSize.size } onChange={ setFontSize } />
+					<FontSizePicker
+						value={ fontSize.size }
+						onChange={ setFontSize }
+					/>
 					<ToggleControl
 						label={ __( 'Drop Cap' ) }
 						checked={ !! dropCap }
-						onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
+						onChange={ () =>
+							setAttributes( { dropCap: ! dropCap } )
+						}
 						help={
 							dropCap
 								? __( 'Showing large initial letter.' )
@@ -126,18 +151,26 @@ function ParagraphBlock( {
 						ref={ ref }
 						identifier="content"
 						tagName="p"
-						className={ classnames( 'wp-block-paragraph', className, {
-							'has-drop-cap': dropCap,
-							[ `has-text-align-${ align }` ]: align,
-							[ fontSize.class ]: fontSize.class,
-						} ) }
+						className={ classnames(
+							'wp-block-paragraph',
+							className,
+							{
+								'has-drop-cap': dropCap,
+								[ `has-text-align-${ align }` ]: align,
+								[ fontSize.class ]: fontSize.class,
+							}
+						) }
 						style={ {
-							fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+							fontSize: fontSize.size
+								? fontSize.size + 'px'
+								: undefined,
 							direction,
 							minHeight: dropCapMinimumHeight,
 						} }
 						value={ content }
-						onChange={ ( newContent ) => setAttributes( { content: newContent } ) }
+						onChange={ ( newContent ) =>
+							setAttributes( { content: newContent } )
+						}
 						onSplit={ ( value ) => {
 							if ( ! value ) {
 								return createBlock( name );
@@ -150,13 +183,20 @@ function ParagraphBlock( {
 						} }
 						onMerge={ mergeBlocks }
 						onReplace={ onReplace }
-						onRemove={ onReplace ? () => onReplace( [] ) : undefined }
+						onRemove={
+							onReplace ? () => onReplace( [] ) : undefined
+						}
 						aria-label={
 							content
 								? __( 'Paragraph block' )
-								: __( 'Empty block; start writing or type forward slash to choose a block' )
+								: __(
+										'Empty block; start writing or type forward slash to choose a block'
+								  )
 						}
-						placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
+						placeholder={
+							placeholder ||
+							__( 'Start writing or type / to choose a block' )
+						}
 						__unstableEmbedURLOnPaste
 						__unstableAllowPrefixTransformations
 					/>
@@ -166,6 +206,8 @@ function ParagraphBlock( {
 	);
 }
 
-const ParagraphEdit = compose( [ withFontSizes( 'fontSize' ) ] )( ParagraphBlock );
+const ParagraphEdit = compose( [ withFontSizes( 'fontSize' ) ] )(
+	ParagraphBlock
+);
 
 export default ParagraphEdit;

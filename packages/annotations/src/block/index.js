@@ -12,9 +12,9 @@ import { withSelect } from '@wordpress/data';
  */
 const addAnnotationClassName = ( OriginalComponent ) => {
 	return withSelect( ( select, { clientId } ) => {
-		const annotations = select( 'core/annotations' ).__experimentalGetAnnotationsForBlock(
-			clientId
-		);
+		const annotations = select(
+			'core/annotations'
+		).__experimentalGetAnnotationsForBlock( clientId );
 
 		return {
 			className: annotations
@@ -26,4 +26,8 @@ const addAnnotationClassName = ( OriginalComponent ) => {
 	} )( OriginalComponent );
 };
 
-addFilter( 'editor.BlockListBlock', 'core/annotations', addAnnotationClassName );
+addFilter(
+	'editor.BlockListBlock',
+	'core/annotations',
+	addAnnotationClassName
+);

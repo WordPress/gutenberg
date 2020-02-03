@@ -14,7 +14,8 @@ const { version } = require( './package' );
  *
  * @type {string}
  */
-const majorMinorRegExp = escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+const majorMinorRegExp =
+	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -29,7 +30,10 @@ const developmentFiles = [
 
 module.exports = {
 	root: true,
-	extends: [ 'plugin:@wordpress/eslint-plugin/recommended', 'plugin:eslint-comments/recommended' ],
+	extends: [
+		'plugin:@wordpress/eslint-plugin/recommended',
+		'plugin:eslint-comments/recommended',
+	],
 	plugins: [ 'import' ],
 	globals: {
 		wp: 'off',
@@ -44,37 +48,46 @@ module.exports = {
 			// we'll get a `SyntaxError` (Invalid regular expression: \ at end of pattern)
 			// here. That's why we use \\u002F in the regexes below.
 			{
-				selector: 'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
-				message: 'Path access on WordPress dependencies is not allowed.',
+				selector:
+					'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
+				message:
+					'Path access on WordPress dependencies is not allowed.',
 			},
 			{
-				selector: 'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb.cjs)/]',
-				message: 'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
+				selector:
+					'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb.cjs)/]',
+				message:
+					'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
 			},
 			{
 				selector:
 					'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' +
 					majorMinorRegExp +
 					'/]',
-				message: 'Deprecated functions must be removed before releasing this version.',
+				message:
+					'Deprecated functions must be removed before releasing this version.',
 			},
 			{
 				selector:
 					'CallExpression[callee.name=/^(__|_n|_nx|_x)$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])',
-				message: 'Translate function arguments must be string literals.',
+				message:
+					'Translate function arguments must be string literals.',
 			},
 			{
 				selector:
 					'CallExpression[callee.name=/^(_n|_nx|_x)$/]:not([arguments.1.type=/^Literal|BinaryExpression$/])',
-				message: 'Translate function arguments must be string literals.',
+				message:
+					'Translate function arguments must be string literals.',
 			},
 			{
 				selector:
 					'CallExpression[callee.name=_nx]:not([arguments.3.type=/^Literal|BinaryExpression$/])',
-				message: 'Translate function arguments must be string literals.',
+				message:
+					'Translate function arguments must be string literals.',
 			},
 			{
-				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
+				selector:
+					'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
 				message: 'Use ellipsis character (…) in place of three dots',
 			},
 			{
@@ -83,22 +96,26 @@ module.exports = {
 				message: 'Use `combineReducers` from `@wordpress/data`',
 			},
 			{
-				selector: 'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
+				selector:
+					'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
 				message: 'Use memize instead of Lodash’s memoize',
 			},
 			{
-				selector: 'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+				selector:
+					'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{
 				selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
-				message: 'Do not use string literals for IDs; use withInstanceId instead.',
+				message:
+					'Do not use string literals for IDs; use withInstanceId instead.',
 			},
 			{
 				// Discourage the usage of `Math.random()` as it's a code smell
 				// for UUID generation, for which we already have a higher-order
 				// component: `withInstanceId`.
-				selector: 'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
+				selector:
+					'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
 				message:
 					'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
 			},
@@ -119,14 +136,20 @@ module.exports = {
 	overrides: [
 		{
 			files: [ 'packages/**/*.js' ],
-			excludedFiles: [ '**/*.@(android|ios|native).js', ...developmentFiles ],
+			excludedFiles: [
+				'**/*.@(android|ios|native).js',
+				...developmentFiles,
+			],
 			rules: {
 				'import/no-extraneous-dependencies': 'error',
 			},
 		},
 		{
 			files: [ 'packages/**/*.js' ],
-			excludedFiles: [ 'packages/block-library/src/*/save.js', ...developmentFiles ],
+			excludedFiles: [
+				'packages/block-library/src/*/save.js',
+				...developmentFiles,
+			],
 			rules: {
 				'react/forbid-elements': [
 					'error',

@@ -12,7 +12,9 @@ export const _default = () => (
 	<>
 		<VisuallyHidden>This should not show.</VisuallyHidden>
 		<div>
-			This text will <VisuallyHidden as="span">but not inline </VisuallyHidden> always show.
+			This text will{ ' ' }
+			<VisuallyHidden as="span">but not inline </VisuallyHidden> always
+			show.
 		</div>
 	</>
 );

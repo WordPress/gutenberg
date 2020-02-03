@@ -30,7 +30,8 @@ const defaultConfigArgs = ! hasLintConfig
 	: [];
 
 // See: https://eslint.org/docs/user-guide/configuring#ignoring-files-and-directories.
-const hasIgnoredFiles = hasArgInCLI( '--ignore-path' ) || hasProjectFile( '.eslintignore' );
+const hasIgnoredFiles =
+	hasArgInCLI( '--ignore-path' ) || hasProjectFile( '.eslintignore' );
 
 const defaultIgnoreArgs = ! hasIgnoredFiles
 	? [ '--ignore-path', fromConfigRoot( '.eslintignore' ) ]
@@ -38,7 +39,12 @@ const defaultIgnoreArgs = ! hasIgnoredFiles
 
 const result = spawn(
 	resolveBin( 'eslint' ),
-	[ ...defaultConfigArgs, ...defaultIgnoreArgs, ...args, ...defaultFilesArgs ],
+	[
+		...defaultConfigArgs,
+		...defaultIgnoreArgs,
+		...args,
+		...defaultFilesArgs,
+	],
 	{ stdio: 'inherit' }
 );
 

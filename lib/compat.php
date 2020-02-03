@@ -44,6 +44,9 @@ add_filter( 'safe_style_css', 'gutenberg_safe_style_css_column_flex_basis' );
  */
 function gutenberg_provide_render_callback_with_block_object( $pre_render, $block ) {
 	global $post;
+	if ( 'core/navigation' !== $block['blockName'] ) {
+		return $pre_render;
+	}
 
 	$source_block = $block;
 

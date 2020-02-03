@@ -16,17 +16,28 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					<ToggleControl
 						label={ __( 'Display as Dropdown' ) }
 						checked={ displayAsDropdown }
-						onChange={ () => setAttributes( { displayAsDropdown: ! displayAsDropdown } ) }
+						onChange={ () =>
+							setAttributes( {
+								displayAsDropdown: ! displayAsDropdown,
+							} )
+						}
 					/>
 					<ToggleControl
 						label={ __( 'Show Post Counts' ) }
 						checked={ showPostCounts }
-						onChange={ () => setAttributes( { showPostCounts: ! showPostCounts } ) }
+						onChange={ () =>
+							setAttributes( {
+								showPostCounts: ! showPostCounts,
+							} )
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>
 			<Disabled>
-				<ServerSideRender block="core/archives" attributes={ attributes } />
+				<ServerSideRender
+					block="core/archives"
+					attributes={ attributes }
+				/>
 			</Disabled>
 		</>
 	);

@@ -13,7 +13,14 @@ import { Button } from '@wordpress/components';
  */
 import BlockIcon from '../block-icon';
 
-function InserterListItem( { icon, onClick, isDisabled, title, className, ...props } ) {
+function InserterListItem( {
+	icon,
+	onClick,
+	isDisabled,
+	title,
+	className,
+	...props
+} ) {
 	const itemIconStyle = icon
 		? {
 				backgroundColor: icon.background,
@@ -24,7 +31,10 @@ function InserterListItem( { icon, onClick, isDisabled, title, className, ...pro
 	return (
 		<li className="block-editor-block-types-list__list-item">
 			<Button
-				className={ classnames( 'block-editor-block-types-list__item', className ) }
+				className={ classnames(
+					'block-editor-block-types-list__item',
+					className
+				) }
 				onClick={ ( event ) => {
 					event.preventDefault();
 					onClick();
@@ -32,10 +42,15 @@ function InserterListItem( { icon, onClick, isDisabled, title, className, ...pro
 				disabled={ isDisabled }
 				{ ...props }
 			>
-				<span className="block-editor-block-types-list__item-icon" style={ itemIconStyle }>
+				<span
+					className="block-editor-block-types-list__item-icon"
+					style={ itemIconStyle }
+				>
 					<BlockIcon icon={ icon } showColors />
 				</span>
-				<span className="block-editor-block-types-list__item-title">{ title }</span>
+				<span className="block-editor-block-types-list__item-title">
+					{ title }
+				</span>
 			</Button>
 		</li>
 	);

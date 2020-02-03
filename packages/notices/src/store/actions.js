@@ -41,7 +41,11 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
  *                                                             presented with notice.
  */
-export function* createNotice( status = DEFAULT_STATUS, content, options = {} ) {
+export function* createNotice(
+	status = DEFAULT_STATUS,
+	content,
+	options = {}
+) {
 	const {
 		speak = true,
 		isDismissible = true,

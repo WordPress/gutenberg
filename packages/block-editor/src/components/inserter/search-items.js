@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { deburr, differenceWith, find, get, intersectionWith, isEmpty, words } from 'lodash';
+import {
+	deburr,
+	differenceWith,
+	find,
+	get,
+	intersectionWith,
+	isEmpty,
+	words,
+} from 'lodash';
 
 /**
  * Converts the search term into a list of normalized terms.
@@ -31,7 +39,8 @@ const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
 	return differenceWith(
 		unmatchedTerms,
 		normalizeSearchTerm( unprocessedTerms ),
-		( unmatchedTerm, unprocessedTerm ) => unprocessedTerm.includes( unmatchedTerm )
+		( unmatchedTerm, unprocessedTerm ) =>
+			unprocessedTerm.includes( unmatchedTerm )
 	);
 };
 
@@ -53,62 +62,76 @@ export const searchItems = ( items, categories, collections, searchTerm ) => {
 	}
 
 	return items
-		.filter( ( { name, title, category, keywords = [], patterns = [] } ) => {
-			let unmatchedTerms = removeMatchingTerms( normalizedSearchTerms, title );
+		.filter(
+			( { name, title, category, keywords = [], variations = [] } ) => {
+				let unmatchedTerms = removeMatchingTerms(
+					normalizedSearchTerms,
+					title
+				);
 
-			if ( unmatchedTerms.length === 0 ) {
-				return true;
+				if ( unmatchedTerms.length === 0 ) {
+					return true;
+				}
+
+				unmatchedTerms = removeMatchingTerms(
+					unmatchedTerms,
+					keywords.join( ' ' )
+				);
+
+				if ( unmatchedTerms.length === 0 ) {
+					return true;
+				}
+
+				unmatchedTerms = removeMatchingTerms(
+					unmatchedTerms,
+					get( find( categories, { slug: category } ), [ 'title' ] )
+				);
+
+				const itemCollection = collections[ name.split( '/' )[ 0 ] ];
+				if ( itemCollection ) {
+					unmatchedTerms = removeMatchingTerms(
+						unmatchedTerms,
+						itemCollection.title
+					);
+				}
+
+				if ( unmatchedTerms.length === 0 ) {
+					return true;
+				}
+
+				unmatchedTerms = removeMatchingTerms(
+					unmatchedTerms,
+					variations
+						.map( ( variation ) => variation.title )
+						.join( ' ' )
+				);
+
+				return unmatchedTerms.length === 0;
 			}
-
-			unmatchedTerms = removeMatchingTerms( unmatchedTerms, keywords.join( ' ' ) );
-
-			if ( unmatchedTerms.length === 0 ) {
-				return true;
-			}
-
-			unmatchedTerms = removeMatchingTerms(
-				unmatchedTerms,
-				get( find( categories, { slug: category } ), [ 'title' ] )
-			);
-
-			const itemCollection = collections[ name.split( '/' )[ 0 ] ];
-			if ( itemCollection ) {
-				unmatchedTerms = removeMatchingTerms( unmatchedTerms, itemCollection.title );
-			}
-
-			if ( unmatchedTerms.length === 0 ) {
-				return true;
-			}
-
-			unmatchedTerms = removeMatchingTerms(
-				unmatchedTerms,
-				patterns.map( ( pattern ) => pattern.title ).join( ' ' )
-			);
-
-			return unmatchedTerms.length === 0;
-		} )
+		)
 		.map( ( item ) => {
-			if ( isEmpty( item.patterns ) ) {
+			if ( isEmpty( item.variations ) ) {
 				return item;
 			}
 
-			const matchedPatterns = item.patterns.filter( ( pattern ) => {
+			const matchedVariations = item.variations.filter( ( variation ) => {
 				return (
 					intersectionWith(
 						normalizedSearchTerms,
-						normalizeSearchTerm( pattern.title ),
-						( termToMatch, labelTerm ) => labelTerm.includes( termToMatch )
+						normalizeSearchTerm( variation.title ),
+						( termToMatch, labelTerm ) =>
+							labelTerm.includes( termToMatch )
 					).length > 0
 				);
 			} );
-			// When no partterns matched, fallback to all patterns.
-			if ( isEmpty( matchedPatterns ) ) {
+			// When no partterns matched, fallback to all variations.
+			if ( isEmpty( matchedVariations ) ) {
 				return item;
 			}
 
 			return {
 				...item,
-				patterns: matchedPatterns,
+				variations: matchedVariations,
 			};
 		} );
 };

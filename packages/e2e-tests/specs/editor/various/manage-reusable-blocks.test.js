@@ -16,7 +16,9 @@ describe( 'Managing reusable blocks', () => {
 	 * @return {Promise} Promise resolving to number of post list entries.
 	 */
 	async function getNumberOfEntries() {
-		return page.evaluate( () => document.querySelectorAll( '.hentry' ).length );
+		return page.evaluate(
+			() => document.querySelectorAll( '.hentry' ).length
+		);
 	}
 
 	beforeAll( async () => {
@@ -28,7 +30,9 @@ describe( 'Managing reusable blocks', () => {
 
 		// Import Reusable block
 		await page.waitForSelector( '.list-reusable-blocks__container' );
-		const importButton = await page.$( '.list-reusable-blocks__container button' );
+		const importButton = await page.$(
+			'.list-reusable-blocks__container button'
+		);
 		await importButton.click();
 
 		// Select the file to upload
@@ -44,13 +48,20 @@ describe( 'Managing reusable blocks', () => {
 		await input.uploadFile( testReusableBlockFile );
 
 		// Submit the form
-		const button = await page.$( '.list-reusable-blocks-import-form__button' );
+		const button = await page.$(
+			'.list-reusable-blocks-import-form__button'
+		);
 		await button.click();
 
 		// Wait for the success notice
 		await page.waitForSelector( '.notice-success' );
-		const noticeContent = await page.$eval( '.notice-success', ( element ) => element.textContent );
-		expect( noticeContent ).toEqual( 'Reusable block imported successfully!' );
+		const noticeContent = await page.$eval(
+			'.notice-success',
+			( element ) => element.textContent
+		);
+		expect( noticeContent ).toEqual(
+			'Reusable block imported successfully!'
+		);
 
 		// Refresh the page
 		await visitAdminPage( 'edit.php', 'post_type=wp_block' );

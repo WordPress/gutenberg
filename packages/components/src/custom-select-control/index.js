@@ -18,7 +18,10 @@ const itemToString = ( item ) => item && item.name;
 // the menu does not necessarily open on
 // key up/down, you can still switch between
 // options with the menu closed.
-const stateReducer = ( { selectedItem }, { type, changes, props: { items } } ) => {
+const stateReducer = (
+	{ selectedItem },
+	{ type, changes, props: { items } }
+) => {
 	switch ( type ) {
 		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowDown:
 			// If we already have a selected item, try to select the next one,
@@ -26,7 +29,12 @@ const stateReducer = ( { selectedItem }, { type, changes, props: { items } } ) =
 			return {
 				selectedItem:
 					items[
-						selectedItem ? Math.min( items.indexOf( selectedItem ) + 1, items.length - 1 ) : 0
+						selectedItem
+							? Math.min(
+									items.indexOf( selectedItem ) + 1,
+									items.length - 1
+							  )
+							: 0
 					],
 			};
 		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowUp:
@@ -35,7 +43,9 @@ const stateReducer = ( { selectedItem }, { type, changes, props: { items } } ) =
 			return {
 				selectedItem:
 					items[
-						selectedItem ? Math.max( items.indexOf( selectedItem ) - 1, 0 ) : items.length - 1
+						selectedItem
+							? Math.max( items.indexOf( selectedItem ) - 1, 0 )
+							: items.length - 1
 					],
 			};
 		default:
@@ -74,18 +84,29 @@ export default function CustomSelectControl( {
 	// fully ARIA compliant.
 	if (
 		menuProps[ 'aria-activedescendant' ] &&
-		menuProps[ 'aria-activedescendant' ].slice( 0, 'downshift-null'.length ) === 'downshift-null'
+		menuProps[ 'aria-activedescendant' ].slice(
+			0,
+			'downshift-null'.length
+		) === 'downshift-null'
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
 	return (
-		<div className={ classnames( 'components-custom-select-control', className ) }>
+		<div
+			className={ classnames(
+				'components-custom-select-control',
+				className
+			) }
+		>
 			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */ }
 			<label
 				{ ...getLabelProps( {
-					className: classnames( 'components-custom-select-control__label', {
-						'screen-reader-text': hideLabelFromVision,
-					} ),
+					className: classnames(
+						'components-custom-select-control__label',
+						{
+							'screen-reader-text': hideLabelFromVision,
+						}
+					),
 				} ) }
 			>
 				{ label }
@@ -114,14 +135,21 @@ export default function CustomSelectControl( {
 								item,
 								index,
 								key: item.key,
-								className: classnames( 'components-custom-select-control__item', {
-									'is-highlighted': index === highlightedIndex,
-								} ),
+								className: classnames(
+									'components-custom-select-control__item',
+									{
+										'is-highlighted':
+											index === highlightedIndex,
+									}
+								),
 								style: item.style,
 							} ) }
 						>
 							{ item === selectedItem && (
-								<Icon icon={ check } className="components-custom-select-control__item-icon" />
+								<Icon
+									icon={ check }
+									className="components-custom-select-control__item-icon"
+								/>
 							) }
 							{ item.name }
 						</li>

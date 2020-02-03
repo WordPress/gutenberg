@@ -26,7 +26,9 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 	} );
 
 	if ( totalCount !== 0 ) {
-		debug( `add-first-time-contributor-label: ${ totalCount } commits found. Aborting` );
+		debug(
+			`add-first-time-contributor-label: ${ totalCount } commits found. Aborting`
+		);
 		return;
 	}
 

@@ -19,11 +19,15 @@ export function BlockModeToggle( {
 	small = false,
 	isCodeEditingEnabled = true,
 } ) {
-	if ( ! hasBlockSupport( blockType, 'html', true ) || ! isCodeEditingEnabled ) {
+	if (
+		! hasBlockSupport( blockType, 'html', true ) ||
+		! isCodeEditingEnabled
+	) {
 		return null;
 	}
 
-	const label = mode === 'visual' ? __( 'Edit as HTML' ) : __( 'Edit visually' );
+	const label =
+		mode === 'visual' ? __( 'Edit as HTML' ) : __( 'Edit visually' );
 
 	return (
 		<MenuItem onClick={ onToggleMode } icon="html">
@@ -34,7 +38,9 @@ export function BlockModeToggle( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlock, getBlockMode, getSettings } = select( 'core/block-editor' );
+		const { getBlock, getBlockMode, getSettings } = select(
+			'core/block-editor'
+		);
 		const block = getBlock( clientId );
 		const isCodeEditingEnabled = getSettings().codeEditingEnabled;
 

@@ -67,7 +67,10 @@ describe( 'Tooltip', () => {
 			const event = { type: 'focus', currentTarget: {} };
 			const wrapper = shallow(
 				<Tooltip text="Help text">
-					<button onMouseEnter={ originalFocus } onFocus={ originalFocus }>
+					<button
+						onMouseEnter={ originalFocus }
+						onFocus={ originalFocus }
+					>
 						Hover Me!
 					</button>
 				</Tooltip>
@@ -87,7 +90,10 @@ describe( 'Tooltip', () => {
 			const originalOnMouseUp = jest.fn();
 			const wrapper = mount(
 				<Tooltip text="Help text">
-					<button onMouseDown={ originalOnMouseDown } onMouseUp={ originalOnMouseUp }>
+					<button
+						onMouseDown={ originalOnMouseDown }
+						onMouseUp={ originalOnMouseUp }
+					>
 						Hover Me!
 					</button>
 				</Tooltip>
@@ -125,20 +131,29 @@ describe( 'Tooltip', () => {
 			const originalMouseEnter = jest.fn();
 			const wrapper = TestUtils.renderIntoDocument(
 				<Tooltip text="Help text">
-					<button onMouseEnter={ originalMouseEnter } onFocus={ originalMouseEnter }>
+					<button
+						onMouseEnter={ originalMouseEnter }
+						onFocus={ originalMouseEnter }
+					>
 						<span>Hover Me!</span>
 					</button>
 				</Tooltip>
 			);
 
-			const button = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
+			const button = TestUtils.findRenderedDOMComponentWithTag(
+				wrapper,
+				'button'
+			);
 			// eslint-disable-next-line react/no-find-dom-node
 			TestUtils.Simulate.mouseEnter( ReactDOM.findDOMNode( button ) );
 
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 			expect( wrapper.state.isOver ).toBe( false );
 			expect(
-				TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' )
+				TestUtils.scryRenderedDOMComponentsWithClass(
+					wrapper,
+					'components-popover'
+				)
 			).toHaveLength( 0 );
 
 			// Force delayedSetIsOver to be called
@@ -146,7 +161,10 @@ describe( 'Tooltip', () => {
 
 			expect( wrapper.state.isOver ).toBe( true );
 			expect(
-				TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' )
+				TestUtils.scryRenderedDOMComponentsWithClass(
+					wrapper,
+					'components-popover'
+				)
 			).toHaveLength( 1 );
 		} );
 
@@ -156,7 +174,11 @@ describe( 'Tooltip', () => {
 			const originalMouseEnter = jest.fn();
 			const wrapper = mount(
 				<Tooltip text="Help text">
-					<button onMouseEnter={ originalMouseEnter } onFocus={ originalMouseEnter } disabled>
+					<button
+						onMouseEnter={ originalMouseEnter }
+						onFocus={ originalMouseEnter }
+						disabled
+					>
 						<span>Hover Me!</span>
 					</button>
 				</Tooltip>
@@ -183,7 +205,10 @@ describe( 'Tooltip', () => {
 			const originalMouseEnter = jest.fn();
 			const wrapper = mount(
 				<Tooltip text="Help text">
-					<button onMouseEnter={ originalMouseEnter } onFocus={ originalMouseEnter }>
+					<button
+						onMouseEnter={ originalMouseEnter }
+						onFocus={ originalMouseEnter }
+					>
 						Hover Me!
 					</button>
 				</Tooltip>

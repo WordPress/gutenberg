@@ -13,9 +13,13 @@ describe( 'createCustomColorsHOC', () => {
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );
-		const EnhancedComponent = withCustomColors( 'backgroundColor' )( () => <div /> );
+		const EnhancedComponent = withCustomColors( 'backgroundColor' )( () => (
+			<div />
+		) );
 
-		const wrapper = shallow( <EnhancedComponent attributes={ { backgroundColor: null } } /> );
+		const wrapper = shallow(
+			<EnhancedComponent attributes={ { backgroundColor: null } } />
+		);
 
 		expect( wrapper.dive() ).toMatchSnapshot();
 	} );
@@ -24,14 +28,21 @@ describe( 'createCustomColorsHOC', () => {
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );
-		const EnhancedComponent = withCustomColors( 'backgroundColor' )( ( props ) => (
-			<button onClick={ () => props.setBackgroundColor( 'ff0000' ) }>Test Me</button>
+		const EnhancedComponent = withCustomColors(
+			'backgroundColor'
+		)( ( props ) => (
+			<button onClick={ () => props.setBackgroundColor( 'ff0000' ) }>
+				Test Me
+			</button>
 		) );
 
 		const setAttributes = jest.fn();
 
 		const wrapper = mount(
-			<EnhancedComponent attributes={ { backgroundColor: null } } setAttributes={ setAttributes } />
+			<EnhancedComponent
+				attributes={ { backgroundColor: null } }
+				setAttributes={ setAttributes }
+			/>
 		);
 
 		wrapper.find( 'button' ).simulate( 'click' );
@@ -45,14 +56,21 @@ describe( 'createCustomColorsHOC', () => {
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );
-		const EnhancedComponent = withCustomColors( 'backgroundColor' )( ( props ) => (
-			<button onClick={ () => props.setBackgroundColor( '000000' ) }>Test Me</button>
+		const EnhancedComponent = withCustomColors(
+			'backgroundColor'
+		)( ( props ) => (
+			<button onClick={ () => props.setBackgroundColor( '000000' ) }>
+				Test Me
+			</button>
 		) );
 
 		const setAttributes = jest.fn();
 
 		const wrapper = mount(
-			<EnhancedComponent attributes={ { backgroundColor: null } } setAttributes={ setAttributes } />
+			<EnhancedComponent
+				attributes={ { backgroundColor: null } }
+				setAttributes={ setAttributes }
+			/>
 		);
 
 		wrapper.find( 'button' ).simulate( 'click' );

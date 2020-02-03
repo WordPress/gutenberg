@@ -48,7 +48,12 @@ export default function save( { attributes } ) {
 	const figure = (
 		<>
 			{ href ? (
-				<a className={ linkClass } href={ href } target={ linkTarget } rel={ newRel }>
+				<a
+					className={ linkClass }
+					href={ href }
+					target={ linkTarget }
+					rel={ newRel }
+				>
 					{ image }
 				</a>
 			) : (

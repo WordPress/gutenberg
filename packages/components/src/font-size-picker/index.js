@@ -17,7 +17,9 @@ const CUSTOM_FONT_SIZE = 'custom';
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
-		const fontSizeValue = fontSizes.find( ( font ) => font.size === Number( value ) );
+		const fontSizeValue = fontSizes.find(
+			( font ) => font.size === Number( value )
+		);
 		return fontSizeValue ? fontSizeValue.slug : CUSTOM_FONT_SIZE;
 	}
 	return DEFAULT_FONT_SIZE;
@@ -27,7 +29,9 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 	optionsArray = [
 		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ) },
 		...optionsArray,
-		...( disableCustomFontSizes ? [] : [ { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } ] ),
+		...( disableCustomFontSizes
+			? []
+			: [ { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } ] ),
 	];
 	return optionsArray.map( ( option ) => ( {
 		key: option.slug,
@@ -94,7 +98,9 @@ export default function FontSizePicker( {
 	const rangeControlNumberId = `components-range-control__number#${ instanceId }`;
 	return (
 		<fieldset className="components-font-size-picker">
-			<legend className="screen-reader-text">{ __( 'Font Size' ) }</legend>
+			<legend className="screen-reader-text">
+				{ __( 'Font Size' ) }
+			</legend>
 			<div className="components-font-size-picker__controls">
 				{ fontSizes.length > 0 && (
 					<CustomSelectControl
@@ -102,14 +108,18 @@ export default function FontSizePicker( {
 						label={ __( 'Preset Size' ) }
 						options={ options }
 						value={
-							options.find( ( option ) => option.key === currentSelectValue ) || options[ 0 ]
+							options.find(
+								( option ) => option.key === currentSelectValue
+							) || options[ 0 ]
 						}
 						onChange={ onSelectChangeValue }
 					/>
 				) }
 				{ ! withSlider && ! disableCustomFontSizes && (
 					<div className="components-range-control__number-container">
-						<label htmlFor={ rangeControlNumberId }>{ __( 'Custom' ) }</label>
+						<label htmlFor={ rangeControlNumberId }>
+							{ __( 'Custom' ) }
+						</label>
 						<input
 							id={ rangeControlNumberId }
 							className="components-range-control__number"

@@ -41,7 +41,9 @@ describe( 'Align Hook Works As Expected', () => {
 
 		const buttonLabels = await page.evaluate( () => {
 			return Array.from(
-				document.querySelectorAll( '.components-dropdown-menu__menu button' )
+				document.querySelectorAll(
+					'.components-dropdown-menu__menu button'
+				)
 			).map( ( button ) => {
 				return button.innerText;
 			} );
@@ -63,7 +65,9 @@ describe( 'Align Hook Works As Expected', () => {
 
 			// verify no alignment button is in pressed state
 			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
-			const pressedButtons = await page.$$( '.components-dropdown-menu__menu button.is-active' );
+			const pressedButtons = await page.$$(
+				'.components-dropdown-menu__menu button.is-active'
+			);
 			expect( pressedButtons ).toHaveLength( 0 );
 		} );
 	};
@@ -75,10 +79,14 @@ describe( 'Align Hook Works As Expected', () => {
 		expect( blocks[ 0 ].isValid ).toBeTruthy();
 	};
 
-	const createCorrectlyAppliesAndRemovesAlignmentTest = ( blockName, alignment ) => {
+	const createCorrectlyAppliesAndRemovesAlignmentTest = (
+		blockName,
+		alignment
+	) => {
 		it( 'Correctly applies the selected alignment and correctly removes the alignment', async () => {
 			const BUTTON_XPATH = `//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), '${ alignLabels[ alignment ] }')]`;
-			const BUTTON_PRESSED_SELECTOR = '.components-dropdown-menu__menu button.is-active';
+			const BUTTON_PRESSED_SELECTOR =
+				'.components-dropdown-menu__menu button.is-active';
 			// set the specified alignment.
 			await insertBlock( blockName );
 			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
@@ -97,7 +105,9 @@ describe( 'Align Hook Works As Expected', () => {
 			// verify the markup can be correctly parsed
 			await verifyMarkupIsValid( htmlMarkup );
 
-			await selectBlockByClientId( ( await getAllBlocks() )[ 0 ].clientId );
+			await selectBlockByClientId(
+				( await getAllBlocks() )[ 0 ].clientId
+			);
 
 			// remove the alignment.
 			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
@@ -115,7 +125,9 @@ describe( 'Align Hook Works As Expected', () => {
 			// verify the markup when no alignment is set is valid
 			await verifyMarkupIsValid( htmlMarkup );
 
-			await selectBlockByClientId( ( await getAllBlocks() )[ 0 ].clientId );
+			await selectBlockByClientId(
+				( await getAllBlocks() )[ 0 ].clientId
+			);
 
 			// verify no alignment button is in pressed state after parsing the block.
 			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
@@ -128,7 +140,9 @@ describe( 'Align Hook Works As Expected', () => {
 		const BLOCK_NAME = 'Test No Alignment Set';
 		it( 'Shows no alignment buttons on the alignment toolbar', async () => {
 			await insertBlock( BLOCK_NAME );
-			const changeAlignmentButton = await page.$( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			const changeAlignmentButton = await page.$(
+				CHANGE_ALIGNMENT_BUTTON_SELECTOR
+			);
 			expect( changeAlignmentButton ).toBe( null );
 		} );
 
@@ -157,7 +171,10 @@ describe( 'Align Hook Works As Expected', () => {
 	describe( 'Block with align array', () => {
 		const BLOCK_NAME = 'Test Align Array';
 
-		createShowsTheExpectedButtonsTest( BLOCK_NAME, [ alignLabels.left, alignLabels.center ] );
+		createShowsTheExpectedButtonsTest( BLOCK_NAME, [
+			alignLabels.left,
+			alignLabels.center,
+		] );
 
 		createDoesNotApplyAlignmentByDefaultTest( BLOCK_NAME );
 
@@ -180,7 +197,9 @@ describe( 'Align Hook Works As Expected', () => {
 			await insertBlock( BLOCK_NAME );
 			// verify the correct alignment button is pressed
 			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
-			const selectedAlignmentControls = await page.$x( SELECTED_ALIGNMENT_CONTROL_SELECTOR );
+			const selectedAlignmentControls = await page.$x(
+				SELECTED_ALIGNMENT_CONTROL_SELECTOR
+			);
 			expect( selectedAlignmentControls ).toHaveLength( 1 );
 		} );
 
@@ -195,7 +214,9 @@ describe( 'Align Hook Works As Expected', () => {
 			await insertBlock( BLOCK_NAME );
 			// remove the alignment.
 			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
-			const [ selectedAlignmentControl ] = await page.$x( SELECTED_ALIGNMENT_CONTROL_SELECTOR );
+			const [ selectedAlignmentControl ] = await page.$x(
+				SELECTED_ALIGNMENT_CONTROL_SELECTOR
+			);
 			await selectedAlignmentControl.click();
 			const markup = await getEditedPostContent();
 			expect( markup ).toContain( '"align":""' );

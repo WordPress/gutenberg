@@ -32,7 +32,13 @@ import {
 	getMarkerPoints,
 } from './utils';
 
-function InsertPoint( { onChange, gradientAST, onOpenInserter, onCloseInserter, insertPosition } ) {
+function InsertPoint( {
+	onChange,
+	gradientAST,
+	onOpenInserter,
+	onCloseInserter,
+	insertPosition,
+} ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
 	return (
 		<Dropdown
@@ -51,7 +57,10 @@ function InsertPoint( { onChange, gradientAST, onOpenInserter, onCloseInserter, 
 					className="components-custom-gradient-picker__insert-point"
 					icon={ plusCircle }
 					style={ {
-						left: insertPosition !== null ? `${ insertPosition }%` : undefined,
+						left:
+							insertPosition !== null
+								? `${ insertPosition }%`
+								: undefined,
 					} }
 				/>
 			) }
@@ -66,7 +75,11 @@ function InsertPoint( { onChange, gradientAST, onOpenInserter, onCloseInserter, 
 								rgb
 							);
 						} else {
-							newGradient = getGradientWithColorStopAdded( gradientAST, insertPosition, rgb );
+							newGradient = getGradientWithColorStopAdded(
+								gradientAST,
+								insertPosition,
+								rgb
+							);
 							setAlreadyInsertedPoint( true );
 						}
 						onChange( newGradient );
@@ -165,7 +178,10 @@ export default function CustomGradientPicker( { value, onChange } ) {
 		// If the insert point is close to an existing control point don't show it.
 		if (
 			some( markerPoints, ( { positionValue } ) => {
-				return Math.abs( insertPosition - positionValue ) < MINIMUM_DISTANCE_BETWEEN_POINTS;
+				return (
+					Math.abs( insertPosition - positionValue ) <
+					MINIMUM_DISTANCE_BETWEEN_POINTS
+				);
 			} )
 		) {
 			if ( gradientBarState.id === 'MOVING_INSERTER' ) {
@@ -182,7 +198,8 @@ export default function CustomGradientPicker( { value, onChange } ) {
 	};
 
 	const isMovingInserter = gradientBarState.id === 'MOVING_INSERTER';
-	const isInsertingControlPoint = gradientBarState.id === 'INSERTING_CONTROL_POINT';
+	const isInsertingControlPoint =
+		gradientBarState.id === 'INSERTING_CONTROL_POINT';
 
 	return (
 		<div
@@ -204,26 +221,36 @@ export default function CustomGradientPicker( { value, onChange } ) {
 						onChange={ onGradientStructureChange }
 						gradientAST={ gradientAST }
 						onOpenInserter={ () => {
-							gradientBarStateDispatch( { type: 'OPEN_INSERTER' } );
+							gradientBarStateDispatch( {
+								type: 'OPEN_INSERTER',
+							} );
 						} }
 						onCloseInserter={ () => {
-							gradientBarStateDispatch( { type: 'CLOSE_INSERTER' } );
+							gradientBarStateDispatch( {
+								type: 'CLOSE_INSERTER',
+							} );
 						} }
 					/>
 				) }
 				<ControlPoints
 					gradientPickerDomRef={ gradientPickerDomRef }
 					ignoreMarkerPosition={
-						isInsertingControlPoint ? gradientBarState.insertPosition : undefined
+						isInsertingControlPoint
+							? gradientBarState.insertPosition
+							: undefined
 					}
 					markerPoints={ markerPoints }
 					onChange={ onGradientStructureChange }
 					gradientAST={ gradientAST }
 					onStartControlPointChange={ () => {
-						gradientBarStateDispatch( { type: 'START_CONTROL_CHANGE' } );
+						gradientBarStateDispatch( {
+							type: 'START_CONTROL_CHANGE',
+						} );
 					} }
 					onStopControlPointChange={ () => {
-						gradientBarStateDispatch( { type: 'STOP_CONTROL_CHANGE' } );
+						gradientBarStateDispatch( {
+							type: 'STOP_CONTROL_CHANGE',
+						} );
 					} }
 				/>
 			</div>

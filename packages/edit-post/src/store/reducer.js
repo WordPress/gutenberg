@@ -79,7 +79,9 @@ export const preferences = flow( [
 
 			case 'TOGGLE_PANEL_OPENED': {
 				const { panelName } = action;
-				const isOpen = state[ panelName ] === true || get( state, [ panelName, 'opened' ], false );
+				const isOpen =
+					state[ panelName ] === true ||
+					get( state, [ panelName, 'opened' ], false );
 				return {
 					...state,
 					[ panelName ]: {
@@ -113,7 +115,11 @@ export const preferences = flow( [
 		if ( action.type === 'TOGGLE_PINNED_PLUGIN_ITEM' ) {
 			return {
 				...state,
-				[ action.pluginName ]: ! get( state, [ action.pluginName ], true ),
+				[ action.pluginName ]: ! get(
+					state,
+					[ action.pluginName ],
+					true
+				),
 			};
 		}
 		return state;
@@ -184,7 +190,10 @@ export function removedPanels( state = [], action ) {
  *
  * @return {?string} Updated state.
  */
-export function activeGeneralSidebar( state = DEFAULT_ACTIVE_GENERAL_SIDEBAR, action ) {
+export function activeGeneralSidebar(
+	state = DEFAULT_ACTIVE_GENERAL_SIDEBAR,
+	action
+) {
 	switch ( action.type ) {
 		case 'OPEN_GENERAL_SIDEBAR':
 			return action.name;

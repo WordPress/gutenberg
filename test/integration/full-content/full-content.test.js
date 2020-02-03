@@ -38,7 +38,9 @@ function normalizeParsedBlocks( blocks ) {
 		// Clone and remove React-instance-specific stuff; also, attribute
 		// values that equal `undefined` will be removed. Validation issues
 		// add too much noise so they get removed as well.
-		block = JSON.parse( JSON.stringify( omit( block, 'validationIssues' ) ) );
+		block = JSON.parse(
+			JSON.stringify( omit( block, 'validationIssues' ) )
+		);
 
 		// Change client IDs to a predictable value
 		block.clientId = '_clientId_' + index;
@@ -52,7 +54,9 @@ function normalizeParsedBlocks( blocks ) {
 
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
-		unstable__bootstrapServerSideBlockDefinitions( require( './server-registered.json' ) );
+		unstable__bootstrapServerSideBlockDefinitions(
+			require( './server-registered.json' )
+		);
 		const settings = {
 			__experimentalEnableLegacyWidgetBlock: true,
 			__experimentalEnableFullSiteEditing: true,
@@ -67,11 +71,14 @@ describe( 'full post content fixture', () => {
 
 	blockBasenames.forEach( ( basename ) => {
 		it( basename, () => {
-			const { filename: htmlFixtureFileName, file: htmlFixtureContent } = getBlockFixtureHTML(
-				basename
-			);
+			const {
+				filename: htmlFixtureFileName,
+				file: htmlFixtureContent,
+			} = getBlockFixtureHTML( basename );
 			if ( htmlFixtureContent === null ) {
-				throw new Error( `Missing fixture file: ${ htmlFixtureFileName }` );
+				throw new Error(
+					`Missing fixture file: ${ htmlFixtureFileName }`
+				);
 			}
 
 			const {
@@ -83,13 +90,21 @@ describe( 'full post content fixture', () => {
 			if ( parsedJSONFixtureContent ) {
 				parserOutputExpectedString = parsedJSONFixtureContent;
 			} else if ( process.env.GENERATE_MISSING_FIXTURES ) {
-				parserOutputExpectedString = JSON.stringify( parserOutputActual, null, 4 ) + '\n';
-				writeBlockFixtureParsedJSON( basename, parserOutputExpectedString );
+				parserOutputExpectedString =
+					JSON.stringify( parserOutputActual, null, 4 ) + '\n';
+				writeBlockFixtureParsedJSON(
+					basename,
+					parserOutputExpectedString
+				);
 			} else {
-				throw new Error( `Missing fixture file: ${ parsedJSONFixtureFileName }` );
+				throw new Error(
+					`Missing fixture file: ${ parsedJSONFixtureFileName }`
+				);
 			}
 
-			const parserOutputExpected = JSON.parse( parserOutputExpectedString );
+			const parserOutputExpected = JSON.parse(
+				parserOutputExpectedString
+			);
 			try {
 				expect( parserOutputActual ).toEqual( parserOutputExpected );
 			} catch ( err ) {
@@ -116,20 +131,26 @@ describe( 'full post content fixture', () => {
 				/* eslint-enable no-console */
 			}
 
-			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
-			const { filename: jsonFixtureFileName, file: jsonFixtureContent } = getBlockFixtureJSON(
-				basename
+			const blocksActualNormalized = normalizeParsedBlocks(
+				blocksActual
 			);
+			const {
+				filename: jsonFixtureFileName,
+				file: jsonFixtureContent,
+			} = getBlockFixtureJSON( basename );
 
 			let blocksExpectedString;
 
 			if ( jsonFixtureContent ) {
 				blocksExpectedString = jsonFixtureContent;
 			} else if ( process.env.GENERATE_MISSING_FIXTURES ) {
-				blocksExpectedString = JSON.stringify( blocksActualNormalized, null, 4 ) + '\n';
+				blocksExpectedString =
+					JSON.stringify( blocksActualNormalized, null, 4 ) + '\n';
 				writeBlockFixtureJSON( basename, blocksExpectedString );
 			} else {
-				throw new Error( `Missing fixture file: ${ jsonFixtureFileName }` );
+				throw new Error(
+					`Missing fixture file: ${ jsonFixtureFileName }`
+				);
 			}
 
 			const blocksExpected = JSON.parse( blocksExpectedString );
@@ -160,7 +181,9 @@ describe( 'full post content fixture', () => {
 				serializedExpected = serializedActual;
 				writeBlockFixtureSerializedHTML( basename, serializedExpected );
 			} else {
-				throw new Error( `Missing fixture file: ${ serializedHTMLFileName }` );
+				throw new Error(
+					`Missing fixture file: ${ serializedHTMLFileName }`
+				);
 			}
 
 			try {
@@ -185,23 +208,36 @@ describe( 'full post content fixture', () => {
 			// We don't want tests for each oembed provider, which all have the same
 			// `save` functions and attributes.
 			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
-			.filter( ( name ) => name.indexOf( 'core-embed' ) !== 0 && name !== 'core/template' )
+			.filter(
+				( name ) =>
+					name.indexOf( 'core-embed' ) !== 0 &&
+					name !== 'core/template'
+			)
 			.forEach( ( name ) => {
 				const nameToFilename = blockNameToFixtureBasename( name );
 				const foundFixtures = blockBasenames
 					.filter(
 						( basename ) =>
-							basename === nameToFilename || startsWith( basename, nameToFilename + '__' )
+							basename === nameToFilename ||
+							startsWith( basename, nameToFilename + '__' )
 					)
 					.map( ( basename ) => {
-						const { filename: htmlFixtureFileName } = getBlockFixtureHTML( basename );
-						const { file: jsonFixtureContent } = getBlockFixtureJSON( basename );
+						const {
+							filename: htmlFixtureFileName,
+						} = getBlockFixtureHTML( basename );
+						const {
+							file: jsonFixtureContent,
+						} = getBlockFixtureJSON( basename );
 						// The parser output for this test.  For missing files,
 						// JSON.parse( null ) === null.
 						const parserOutput = JSON.parse( jsonFixtureContent );
 						// The name of the first block that this fixture file
 						// contains (if any).
-						const firstBlock = get( parserOutput, [ '0', 'name' ], null );
+						const firstBlock = get(
+							parserOutput,
+							[ '0', 'name' ],
+							null
+						);
 						return {
 							filename: htmlFixtureFileName,
 							parserOutput,
@@ -223,14 +259,20 @@ describe( 'full post content fixture', () => {
 				foundFixtures.forEach( ( fixture ) => {
 					if ( name !== fixture.firstBlock ) {
 						errors.push(
-							format( "Expected fixture file '%s' to test the '%s' block.", fixture.filename, name )
+							format(
+								"Expected fixture file '%s' to test the '%s' block.",
+								fixture.filename,
+								name
+							)
 						);
 					}
 				} );
 			} );
 
 		if ( errors.length ) {
-			throw new Error( 'Problem(s) with fixture files:\n\n' + errors.join( '\n' ) );
+			throw new Error(
+				'Problem(s) with fixture files:\n\n' + errors.join( '\n' )
+			);
 		}
 	} );
 } );

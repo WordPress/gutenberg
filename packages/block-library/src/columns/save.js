@@ -9,9 +9,16 @@ import classnames from 'classnames';
 import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { verticalAlignment, backgroundColor, customBackgroundColor } = attributes;
+	const {
+		verticalAlignment,
+		backgroundColor,
+		customBackgroundColor,
+	} = attributes;
 
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+	const backgroundClass = getColorClassName(
+		'background-color',
+		backgroundColor
+	);
 
 	const className = classnames( {
 		'has-background': backgroundColor || customBackgroundColor,

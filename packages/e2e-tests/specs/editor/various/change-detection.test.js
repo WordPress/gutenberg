@@ -81,7 +81,9 @@ describe( 'Change detection', () => {
 
 		// Force autosave to occur immediately.
 		await Promise.all( [
-			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+			page.evaluate( () =>
+				window.wp.data.dispatch( 'core/editor' ).autosave()
+			),
 			page.waitForSelector( '.editor-post-saved-state.is-autosaving' ),
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 		] );
@@ -103,7 +105,9 @@ describe( 'Change detection', () => {
 
 		// Force autosave to occur immediately.
 		await Promise.all( [
-			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+			page.evaluate( () =>
+				window.wp.data.dispatch( 'core/editor' ).autosave()
+			),
 			page.waitForSelector( '.editor-post-saved-state.is-autosaving' ),
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 		] );
@@ -118,7 +122,9 @@ describe( 'Change detection', () => {
 
 		// Close publish panel.
 		await Promise.all( [
-			page.waitForFunction( () => ! document.querySelector( '.editor-post-publish-panel' ) ),
+			page.waitForFunction(
+				() => ! document.querySelector( '.editor-post-publish-panel' )
+			),
 			page.click( '.editor-post-publish-panel__header button' ),
 		] );
 
@@ -127,8 +133,12 @@ describe( 'Change detection', () => {
 
 		await Promise.all( [
 			page.waitForSelector( '.editor-post-publish-button.is-busy' ),
-			page.waitForSelector( '.editor-post-publish-button:not( .is-busy )' ),
-			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+			page.waitForSelector(
+				'.editor-post-publish-button:not( .is-busy )'
+			),
+			page.evaluate( () =>
+				window.wp.data.dispatch( 'core/editor' ).autosave()
+			),
 		] );
 
 		await assertIsDirty( true );
@@ -309,7 +319,9 @@ describe( 'Change detection', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/14766
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).__experimentalReceiveReusableBlocks( [] )
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.__experimentalReceiveReusableBlocks( [] )
 		);
 
 		await assertIsDirty( false );
@@ -324,7 +336,10 @@ describe( 'Change detection', () => {
 		await saveDraft();
 
 		// Verify that the title is empty.
-		const title = await page.$eval( '.editor-post-title__input', ( element ) => element.innerHTML );
+		const title = await page.$eval(
+			'.editor-post-title__input',
+			( element ) => element.innerHTML
+		);
 		expect( title ).toBe( '' );
 
 		// Verify that the post is not dirty.
@@ -353,7 +368,12 @@ describe( 'Change detection', () => {
 			await page.waitForNavigation(),
 		] );
 
-		expect( isCurrentURL( '/wp-admin/edit.php', `post_type=post&ids=${ postId }` ) ).toBe( true );
+		expect(
+			isCurrentURL(
+				'/wp-admin/edit.php',
+				`post_type=post&ids=${ postId }`
+			)
+		).toBe( true );
 	} );
 
 	it( 'consecutive edits to the same attribute should mark the post as dirty after a save', async () => {
@@ -374,7 +394,9 @@ describe( 'Change detection', () => {
 		// Increase the paragraph's font size.
 		await page.click( '[data-type="core/paragraph"]' );
 		await page.click( '.components-font-size-picker__select' );
-		await page.click( '.components-custom-select-control__item:nth-child(3)' );
+		await page.click(
+			'.components-custom-select-control__item:nth-child(3)'
+		);
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.
@@ -389,7 +411,9 @@ describe( 'Change detection', () => {
 		// Increase the paragraph's font size again.
 		await page.click( '[data-type="core/paragraph"]' );
 		await page.click( '.components-font-size-picker__select' );
-		await page.click( '.components-custom-select-control__item:nth-child(4)' );
+		await page.click(
+			'.components-custom-select-control__item:nth-child(4)'
+		);
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.

@@ -43,7 +43,9 @@ export default function deprecated( feature, options = {} ) {
 	const versionMessage = version
 		? ` and will be removed${ pluginMessage } in version ${ version }`
 		: '';
-	const useInsteadMessage = alternative ? ` Please use ${ alternative } instead.` : '';
+	const useInsteadMessage = alternative
+		? ` Please use ${ alternative } instead.`
+		: '';
 	const linkMessage = link ? ` See: ${ link }` : '';
 	const hintMessage = hint ? ` Note: ${ hint }` : '';
 	const message = `${ feature } is deprecated${ versionMessage }.${ useInsteadMessage }${ linkMessage }${ hintMessage }`;

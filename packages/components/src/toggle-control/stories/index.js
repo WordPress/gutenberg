@@ -15,7 +15,11 @@ import ToggleControl from '../';
 
 export default { title: 'Components/ToggleControl', component: ToggleControl };
 
-const ToggleControlWithState = ( { helpTextChecked, helpTextUnchecked, ...props } ) => {
+const ToggleControlWithState = ( {
+	helpTextChecked,
+	helpTextUnchecked,
+	...props
+} ) => {
 	const [ hasFixedBackground, setHasFixedBackground ] = useState( true );
 	return (
 		<ToggleControl
@@ -35,8 +39,14 @@ export const _default = () => {
 
 export const withHelpText = () => {
 	const label = text( 'Label', 'Does this have a fixed background?' );
-	const helpTextChecked = text( 'Help When Checked', 'Has fixed background.' );
-	const helpTextUnchecked = text( 'Help When Unchecked', 'No fixed background.' );
+	const helpTextChecked = text(
+		'Help When Checked',
+		'Has fixed background.'
+	);
+	const helpTextUnchecked = text(
+		'Help When Unchecked',
+		'No fixed background.'
+	);
 
 	return (
 		<ToggleControlWithState

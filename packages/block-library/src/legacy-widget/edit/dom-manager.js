@@ -30,14 +30,23 @@ class LegacyWidgetEditDomManager extends Component {
 		let shouldTriggerWidgetUpdateEvent = false;
 		// We can not leverage react render otherwise we would destroy dom changes applied by the plugins.
 		// We manually update the required dom node replicating what the widget screen and the customizer do.
-		if ( nextProps.idBase !== this.props.idBase && this.idBaseInputRef.current ) {
+		if (
+			nextProps.idBase !== this.props.idBase &&
+			this.idBaseInputRef.current
+		) {
 			this.idBaseInputRef.current.value = nextProps.idBase;
 			shouldTriggerWidgetUpdateEvent = true;
 		}
-		if ( nextProps.number !== this.props.number && this.widgetNumberInputRef.current ) {
+		if (
+			nextProps.number !== this.props.number &&
+			this.widgetNumberInputRef.current
+		) {
 			this.widgetNumberInputRef.current.value = nextProps.number;
 		}
-		if ( nextProps.form !== this.props.form && this.widgetContentRef.current ) {
+		if (
+			nextProps.form !== this.props.form &&
+			this.widgetContentRef.current
+		) {
 			const widgetContent = this.widgetContentRef.current;
 			widgetContent.innerHTML = nextProps.form;
 			shouldTriggerWidgetUpdateEvent = true;
@@ -61,10 +70,16 @@ class LegacyWidgetEditDomManager extends Component {
 							if ( this.shouldTriggerInstanceUpdate() ) {
 								if ( isReferenceWidget ) {
 									if ( this.containerRef.current ) {
-										window.wpWidgets.save( window.jQuery( this.containerRef.current ) );
+										window.wpWidgets.save(
+											window.jQuery(
+												this.containerRef.current
+											)
+										);
 									}
 								}
-								this.props.onInstanceChange( this.retrieveUpdatedInstance() );
+								this.props.onInstanceChange(
+									this.retrieveUpdatedInstance()
+								);
 							}
 						} }
 					>
@@ -75,7 +90,12 @@ class LegacyWidgetEditDomManager extends Component {
 						/>
 						{ isReferenceWidget && (
 							<>
-								<input type="hidden" name="widget-id" className="widget-id" value={ id } />
+								<input
+									type="hidden"
+									name="widget-id"
+									className="widget-id"
+									value={ id }
+								/>
 								<input
 									ref={ this.idBaseInputRef }
 									type="hidden"
@@ -90,8 +110,18 @@ class LegacyWidgetEditDomManager extends Component {
 									className="widget_number"
 									value={ number }
 								/>
-								<input type="hidden" name="multi_number" className="multi_number" value="" />
-								<input type="hidden" name="add_new" className="add_new" value="" />
+								<input
+									type="hidden"
+									name="multi_number"
+									className="multi_number"
+									value=""
+								/>
+								<input
+									type="hidden"
+									name="add_new"
+									className="add_new"
+									value=""
+								/>
 							</>
 						) }
 					</form>
@@ -115,7 +145,10 @@ class LegacyWidgetEditDomManager extends Component {
 		}
 		for ( const rawKey of currentFormDataKeys ) {
 			if (
-				! isShallowEqual( currentFormData.getAll( rawKey ), this.previousFormData.getAll( rawKey ) )
+				! isShallowEqual(
+					currentFormData.getAll( rawKey ),
+					this.previousFormData.getAll( rawKey )
+				)
 			) {
 				this.previousFormData = currentFormData;
 				return true;
@@ -139,12 +172,22 @@ class LegacyWidgetEditDomManager extends Component {
 				// This fields are added to the form because the widget JavaScript code may use this values.
 				// They are not relevant for the update mechanism.
 				if (
-					includes( [ 'widget-id', 'id_base', 'widget_number', 'multi_number', 'add_new' ], rawKey )
+					includes(
+						[
+							'widget-id',
+							'id_base',
+							'widget_number',
+							'multi_number',
+							'add_new',
+						],
+						rawKey
+					)
 				) {
 					continue;
 				}
 				const matches = rawKey.match( /[^\[]*\[[-\d]*\]\[([^\]]*)\]/ );
-				const keyParsed = matches && matches[ 1 ] ? matches[ 1 ] : rawKey;
+				const keyParsed =
+					matches && matches[ 1 ] ? matches[ 1 ] : rawKey;
 				const value = formData.getAll( rawKey );
 				if ( value.length > 1 ) {
 					updatedInstance[ keyParsed ] = value;

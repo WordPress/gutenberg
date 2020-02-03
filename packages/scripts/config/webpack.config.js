@@ -45,14 +45,19 @@ const config = {
 							// Babel uses a directory within local node_modules
 							// by default. Use the environment variable option
 							// to enable more persistent caching.
-							cacheDirectory: process.env.BABEL_CACHE_DIRECTORY || true,
+							cacheDirectory:
+								process.env.BABEL_CACHE_DIRECTORY || true,
 
 							// Provide a fallback configuration if there's not
 							// one explicitly available in the project.
 							...( ! hasBabelConfig() && {
 								babelrc: false,
 								configFile: false,
-								presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+								presets: [
+									require.resolve(
+										'@wordpress/babel-preset-default'
+									),
+								],
 							} ),
 						},
 					},
@@ -70,7 +75,10 @@ const config = {
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload works
 		// when running watch mode.
-		! isProduction && new LiveReloadPlugin( { port: process.env.WP_LIVE_RELOAD_PORT || 35729 } ),
+		! isProduction &&
+			new LiveReloadPlugin( {
+				port: process.env.WP_LIVE_RELOAD_PORT || 35729,
+			} ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	].filter( Boolean ),
 	stats: {
