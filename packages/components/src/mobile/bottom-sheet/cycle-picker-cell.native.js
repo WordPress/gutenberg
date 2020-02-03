@@ -11,15 +11,22 @@ export default function BottomSheetCyclePickerCell( props ) {
 	const { value, options, onChangeValue, ...cellProps } = props;
 
 	const nextOptionValue = () => {
-		const selectedOptionIndex = findIndex( options, [ 'value', value ] );
 		return options[ ( selectedOptionIndex + 1 ) % options.length ].value;
 	};
 
+	const selectedOptionIndex = findIndex( options, [ 'value', value ] );
+	const optionsContainsValue =
+		options.length > 0 && selectedOptionIndex !== -1;
+
 	return (
 		<Cell
-			onPress={ () => onChangeValue( nextOptionValue() ) }
+			onPress={ () =>
+				optionsContainsValue && onChangeValue( nextOptionValue() )
+			}
 			editable={ false }
-			value={ options[ findIndex( options, [ 'value', value ] ) ].label }
+			value={
+				optionsContainsValue && options[ selectedOptionIndex ].label
+			}
 			{ ...cellProps }
 		/>
 	);

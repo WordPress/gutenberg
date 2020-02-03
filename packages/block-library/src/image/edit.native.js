@@ -17,7 +17,7 @@ import {
 	requestImageFullscreenPreview,
 	showMediaEditorButton,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty, map, get } from 'lodash';
+import { isEmpty, get, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -357,7 +357,14 @@ export class ImageEdit extends React.Component {
 			},
 		];
 
-		const sizeOptions = imageSizes.map( ( { label, slug } ) => ( { value: slug, label } ) );
+		const sizeOptions = imageSizes.map( ( { label, slug } ) => ( {
+			value: slug,
+			label,
+		} ) );
+		const sizeOptionsValid = find( sizeOptions, [
+			'value',
+			DEFAULT_SIZE_SLUG,
+		] );
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -396,14 +403,17 @@ export class ImageEdit extends React.Component {
 						onChange={ this.onSetNewTab }
 					/>
 					{ // eslint-disable-next-line no-undef
-						image && __DEV__ &&
+					image && sizeOptionsValid && __DEV__ && (
 						<CycleSelectControl
 							icon={ 'editor-expand' }
 							label={ __( 'Size' ) }
 							value={ sizeSlug || DEFAULT_SIZE_SLUG }
-							onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
+							onChangeValue={ ( newValue ) =>
+								this.onSetSizeSlug( newValue )
+							}
 							options={ sizeOptions }
-						/> }
+						/>
+					) }
 					<TextControl
 						icon={ 'editor-textcolor' }
 						label={ __( 'Alt Text' ) }
@@ -651,9 +661,7 @@ export default compose( [
 			attributes: { id },
 			isSelected,
 		} = props;
-		const {
-			imageSizes,
-		} = getSettings();
+		const { imageSizes } = getSettings();
 
 		return {
 			image: id && isSelected ? getMedia( id ) : null,
