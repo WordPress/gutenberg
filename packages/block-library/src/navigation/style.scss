@@ -134,7 +134,7 @@ $navigation-sub-menu-width: $grid-size * 25;
 			position: absolute;
 			z-index: 1;
 			top: 100%;
-			left: $grid-size * 2; // just under the main menu item.
+			left: 0; // just under the main menu item.
 
 			// Position (nested levels)
 			.block-editor-inner-blocks,
