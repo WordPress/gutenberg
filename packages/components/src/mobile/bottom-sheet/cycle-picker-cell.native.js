@@ -8,20 +8,16 @@ import { findIndex } from 'lodash';
 import Cell from './cell';
 
 export default function BottomSheetCyclePickerCell( props ) {
-	const {
-		value,
-		options,
-		onChangeValue,
-		...cellProps
-	} = props;
+	const { value, options, onChangeValue, ...cellProps } = props;
 
-	const cycleOptionValue = () => {
-		return options[ ( findIndex( options, [ 'value', value ] ) + 1 ) % options.length ].value;
+	const nextOptionValue = () => {
+		const selectedOptionIndex = findIndex( options, [ 'value', value ] );
+		return options[ ( selectedOptionIndex + 1 ) % options.length ].value;
 	};
 
 	return (
 		<Cell
-			onPress={ () => onChangeValue( cycleOptionValue() ) }
+			onPress={ () => onChangeValue( nextOptionValue() ) }
 			editable={ false }
 			value={ options[ findIndex( options, [ 'value', value ] ) ].label }
 			{ ...cellProps }
