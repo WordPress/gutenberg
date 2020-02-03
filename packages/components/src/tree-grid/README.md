@@ -1,6 +1,13 @@
-# TreeGrid components
+# TreeGrid
 
-`TreeGrid`, `TreeGridRow`, and `TreeGridCell` are components used to create a tree hierarchy. They're not visually styled components, but instead help with adding keyboard navigation and roving tab index behaviours to tree grid structures. 
+## Table of contents
+
+1. [Development guidelines](#development-guidelines)
+2. [Related components](#related-components)
+
+## Development guidelines
+
+`TreeGrid`, `TreeGridRow`, and `TreeGridCell` are components used to create a tree hierarchy. They're not visually styled components, but instead help with adding keyboard navigation and roving tab index behaviours to tree grid structures.
 
 A tree grid is a hierarchical 2 dimensional UI component, for example it could be used to implement a file system browser.
 
@@ -12,7 +19,7 @@ For more information on a tree grid, see the following links:
 
 ## Usage
 
-Wrap the tree with `<TreeGrid />`:
+The `TreeGrid` renders both a `table` and `tbody` element, and is intended to be used with `TreeGridRow` (`tr`) and `TreeGridCell` (`td`) to build out a grid.
 
 ```jsx
 function TreeMenu() {
@@ -56,45 +63,59 @@ function TreeMenu() {
 }
 ```
 
-# TreeGrid
+### Sub-Components
 
-## Properties
+#### TreeGrid
+
+##### Props
 
 `TreeGrid` accepts no specific props. Any props specified will be passed to the `table` element rendered by `TreeGrid`.
 
 `TreeGrid` should always have children.
 
-# TreeGridRow
+#### TreeGridRow
 
-## Properties
+##### Props
 
 Additional props other than those specified below will be passed to the `tr` element rendered by `TreeGridRow`, so for example, it is possible to also set a `className` on a row.
 
-### `level: number`
+###### level
 
 An integer value designating the level in the hierarchical tree structure. Counting starts at 1. A value of `1` indicates the root level of the structure.
 
-### `positionInSet: number`
+- Type: `Number`
+- Required: Yes
+
+###### positionInSet
 
 An integer value that represents the position in the set. A set is the count of elements at a specific level. Counting starts at 1.
 
-### `setSize: number`
+- Type: `Number`
+- Required: Yes
+
+###### setSize
 
 An integer value that represents the total number of items in the set ... that is the total number of items at this specific level of the hierarchy.
 
-### `isExpanded: boolean`
+- Type: `Number`
+- Required: Yes
+
+###### isExpanded
 
 An optional value that designates whether a row is expanded or collapsed. Currently this value only sets the correct aria-expanded property on a row, it has no other built-in behaviour.
 
-# TreeGridCell
+- Type: `Boolean`
+- Required: No
 
-## Properties
+### TreeGridCell
+
+#### Props
 
 `TreeGridCell` accepts no specific props. Any props specified will be passed to the `td` element rendered by `TreeGridCell`.
 
-## Render prop
+#### `children` as a function
 
-`TreeGridCell` renders children using a render prop function:
+`TreeGridCell` renders children using a function:
 
 ```jsx
 <TreeGridCell>
@@ -103,3 +124,6 @@ An optional value that designates whether a row is expanded or collapsed. Curren
 ```
 
 Props passed as an argument to the render prop must be passed to the child focusable component/element within the cell. If a component is used, it must correctly handle the `onFocus`, `tabIndex`, and `ref` props, passing these to the element it renders. These props are used to handle the roving tab index functionality of the tree grid.
+
+## Related components
+- This component implements `RovingTabIndex`.
