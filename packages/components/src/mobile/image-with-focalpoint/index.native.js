@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image } from 'react-native';
+import { Image, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -13,23 +13,33 @@ import { useState, useEffect, memo } from '@wordpress/element';
  */
 import styles from './style.scss';
 
-const ImageWithFocalPoint = ( {
-	containerSize,
-	contentHeight,
-	focalPoint,
-	url,
-} ) => {
+const ImageWithFocalPoint = ( { focalPoint, url } ) => {
 	const [ originalImageData, setOriginalImageData ] = useState( null );
+	const [ containerSize, setContainerSize ] = useState( null );
 
 	useEffect( () => {
 		if ( url ) {
 			Image.getSize( url, ( width, height ) => {
-				setOriginalImageData( { width, height, aspectRatio: width / height } );
+				setOriginalImageData( {
+					width,
+					height,
+					aspectRatio: width / height,
+				} );
 			} );
 		}
 	}, [] );
 
-	const getFocalPointOffset = ( imageRatio, container, imageSize, focusPoint ) => {
+	const onContainerLayout = ( event ) => {
+		const { height, width } = event.nativeEvent.layout;
+		setContainerSize( { width, height } );
+	};
+
+	const getFocalPointOffset = (
+		imageRatio,
+		container,
+		imageSize,
+		focusPoint
+	) => {
 		const containerCenter = Math.floor( container / 2 );
 		const scaledImage = Math.floor( imageSize / imageRatio );
 		const focus = Math.floor( focusPoint * scaledImage );
@@ -59,11 +69,21 @@ const ImageWithFocalPoint = ( {
 			imageStyle.resizeMode = 'stretch';
 
 			if ( widthRatio > heightRatio ) {
-				horizontalOffset = getFocalPointOffset( heightRatio, containerSize.width, originalImageData.width, focalPoint.x );
+				horizontalOffset = getFocalPointOffset(
+					heightRatio,
+					containerSize.width,
+					originalImageData.width,
+					focalPoint.x
+				);
 				imageStyle.width = undefined;
 				imageStyle.left = horizontalOffset;
 			} else if ( widthRatio < heightRatio ) {
-				verticalOffset = getFocalPointOffset( widthRatio, containerSize.height, originalImageData.height, focalPoint.y );
+				verticalOffset = getFocalPointOffset(
+					widthRatio,
+					containerSize.height,
+					originalImageData.height,
+					focalPoint.y
+				);
 				imageStyle.height = undefined;
 				imageStyle.top = verticalOffset;
 			}
@@ -74,11 +94,27 @@ const ImageWithFocalPoint = ( {
 		return imageStyle;
 	};
 
-	return <Image
-		aspectRatio={ originalImageData ? originalImageData.aspectRatio : undefined }
-		style={ [ styles.image, { height: contentHeight }, getImageStyles() ] }
-		source={ { uri: url } }
-	/>;
+	return (
+		<View style={ styles.container } onLayout={ onContainerLayout }>
+			<Image
+				aspectRatio={
+					originalImageData
+						? originalImageData.aspectRatio
+						: undefined
+				}
+				style={ [
+					styles.image,
+					{
+						height: containerSize
+							? containerSize.height
+							: undefined,
+					},
+					getImageStyles(),
+				] }
+				source={ { uri: url } }
+			/>
+		</View>
+	);
 };
 
 export default memo( ImageWithFocalPoint );

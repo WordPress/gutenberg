@@ -22,7 +22,7 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { cover as icon } from '@wordpress/icons';
 
 /**
@@ -69,7 +69,6 @@ const Cover = ( {
 		minHeight,
 		url,
 	} = attributes;
-	const [ containerSize, setContainerSize ] = useState( null );
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
 	// Used to set a default color for its InnerBlocks
@@ -94,11 +93,6 @@ const Cover = ( {
 
 	const onOpactiyChange = ( value ) => {
 		setAttributes( { dimRatio: value } );
-	};
-
-	const onContainerLayout = ( event ) => {
-		const { height, width } = event.nativeEvent.layout;
-		setContainerSize( { width, height } );
 	};
 
 	const getOpacity = () => {
@@ -181,10 +175,7 @@ const Cover = ( {
 	return (
 		<View style={ containerStyles }>
 			{ controls }
-			<View
-				onLayout={ onContainerLayout }
-				style={ [ styles.backgroundContainer ] }
-			>
+			<View style={ [ styles.backgroundContainer ] }>
 				<View
 					style={ [
 						styles.content,
@@ -198,12 +189,6 @@ const Cover = ( {
 
 				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 					<ImageWithFocalPoint
-						containerSize={ containerSize }
-						contentHeight={
-							containerSize
-								? containerSize.height
-								: CONTAINER_HEIGHT
-						}
 						focalPoint={ focalPoint }
 						url={ url }
 					/>
