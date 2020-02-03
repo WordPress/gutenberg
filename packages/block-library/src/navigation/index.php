@@ -234,7 +234,15 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes ) {
 		$html .= '</span>';
 
 		// Append submenu icon to top-level item.
-		if ( isset( $attributes['showSubmenuIcon'] ) && $attributes['showSubmenuIcon'] !== false && $has_submenu ) {
+		// it shows the icon as default, when 'showSubmenuIcon' is not set,
+		// or when it's set and also not False.
+		if (
+			(
+				isset( $attributes['showSubmenuIcon'] ) && false !== $attributes['showSubmenuIcon'] ||
+				! isset( $attributes['showSubmenuIcon'] )
+			) &&
+			$has_submenu
+		) {
 			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . render_submenu_icon() . '</span>';
 		}
 
@@ -261,7 +269,7 @@ function register_block_core_navigation() {
 	register_block_type(
 		'core/navigation',
 		array(
-			'attributes'      => array(
+			'attributes' => array(
 				'className'          => array(
 					'type' => 'string',
 				),
@@ -287,7 +295,7 @@ function register_block_core_navigation() {
 					'type' => 'string',
 				),
 				'showSubmenuIcon'    => array(
-					'type' => 'boolean',
+					'type'    => 'boolean',
 					'default' => true,
 				),
 			),
