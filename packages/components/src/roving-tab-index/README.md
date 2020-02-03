@@ -1,6 +1,13 @@
-# RovingTabIndex components
+# RovingTabIndex
 
-`RovingTabIndexContainer` and `RovingTabIndexItem` are components that help to manage focus in the style of a roving tab index.
+## Table of contents
+
+1. [Development guidelines](#development-guidelines)
+2. [Related components](#related-components)
+
+## Development guidelines
+
+`RovingTabIndex` and `RovingTabIndexItem` are components that help to manage focus in the style of a roving tab index.
 
 A roving tab index is helpful for a UI component that contains multiple focusable elements, it reduces the number of tab stops in such a component to a single tab stop. Some more information is available here:
 
@@ -20,12 +27,12 @@ This component doesn't implement any keyboard navigation, instead it handles set
 
 ## Usage
 
-Wrap the component with `<RovingTabIndexContainer />` and individual focusables within the component with `<RovingTabIndexItem />`.
+Wrap the component with `RovingTabIndex` and declare individual focusable elements within the component with `RovingTabIndexItem`.
 
 ```jsx
 function TreeMenu() {
 	return (
-		<RovingTabIndexContainer>
+		<RovingTabIndex>
 			<ul role="tree">
 				<li role="treeitem">
 					<span>First item</span>
@@ -40,22 +47,24 @@ function TreeMenu() {
 					</RovingTabIndexItem>
 				</li>
 			</ul>
-		</RovingTabIndexContainer>
+		</RovingTabIndex>
 	);
 }
 ```
 
-# `RovingTabIndexContainer`
+### Sub-Components
 
-## Properties
+#### RovingTabIndex
+
+##### Props
 
 This component takes no props, but should always have `children`.
 
-# `RovingTabIndexItem`
+#### `RovingTabIndexItem`
 
-## Properties
+##### Props
 
-### `as: <Component>`
+###### as
 
 Specify the component that the item should render as. For example the following renders a button with the text 'Close':
 
@@ -80,3 +89,9 @@ As an alternative to `as`, `RovingTabIndexItem` also supports a render prop func
 ```
 
 The `props` passed to `Button` in this example contain the aforementioned `onFocus`, `tabIndex`, and `ref` props. For the roving tab index functionality to work, they should always be passed onto the `RovingTabIndexItem`'s child and handled correctly by that child.
+
+- Type: `React Component`
+- Required: No
+
+## Related components
+- `TreeGrid` implements a `RovingTabIndex`.

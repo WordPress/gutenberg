@@ -11,7 +11,7 @@ import { RovingTabIndexProvider } from './context';
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/roving-tab-index/README.md
  */
-export default function RovingTabIndexContainer( { children } ) {
+export default function RovingTabIndex( { children } ) {
 	const [ providerValue, setProviderValue ] = useState( {
 		lastFocusedElement: undefined,
 		setLastFocusedElement: ( element ) =>
