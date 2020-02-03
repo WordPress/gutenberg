@@ -85,12 +85,24 @@ async function addMilestone( payload, octokit ) {
 		`add-milestone: Creating 'Gutenberg ${ major }.${ minor }' milestone, due on ${ dueDate.toISOString() }`
 	);
 
-	await octokit.issues.createMilestone( {
-		owner: payload.repository.owner.login,
-		repo: payload.repository.name,
-		title: `Gutenberg ${ major }.${ minor }`,
-		due_on: dueDate.toISOString(),
-	} );
+	try {
+		await octokit.issues.createMilestone( {
+			owner: payload.repository.owner.login,
+			repo: payload.repository.name,
+			title: `Gutenberg ${ major }.${ minor }`,
+			due_on: dueDate.toISOString(),
+		} );
+
+		debug( 'add-milestone: Milestone created' );
+	} catch ( error ) {
+		if ( error.code !== 'already_exists' ) {
+			throw error;
+		}
+
+		debug(
+			'add-milestone: Milestone already exists, proceeding with assignment'
+		);
+	}
 
 	debug( 'add-milestone: Fetching all milestones' );
 
