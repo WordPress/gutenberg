@@ -204,17 +204,16 @@ function NavigationLinkEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<div
-				className={ classnames(
-					'wp-block-navigation-link', {
-						'is-editing': isSelected || isParentOfSelectedBlock,
-						'is-selected': isSelected,
-						'has-link': !! url,
-						'has-child': hasDescendants,
-						'has-text-color': rgbTextColor,
-						[ `has-${ textColor }-color` ]: !! textColor,
-						'has-background-color': rgbBackgroundColor,
-						[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
-					} ) }
+				className={ classnames( 'wp-block-navigation-link', {
+					'is-editing': isSelected || isParentOfSelectedBlock,
+					'is-selected': isSelected,
+					'has-link': !! url,
+					'has-child': hasDescendants,
+					'has-text-color': rgbTextColor,
+					[ `has-${ textColor }-color` ]: !! textColor,
+					'has-background-color': rgbBackgroundColor,
+					[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+				} ) }
 				style={ {
 					color: rgbTextColor,
 					backgroundColor: rgbBackgroundColor,
@@ -316,8 +315,10 @@ export default compose( [
 		const { clientId } = ownProps;
 		const rootBlock = getBlockParents( clientId )[ 0 ];
 		const navigationBlockAttributes = getBlockAttributes( rootBlock );
-		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] ).length;
-		const showSubmenuIcon = navigationBlockAttributes.showSubmenuIcon && hasDescendants;
+		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
+			.length;
+		const showSubmenuIcon =
+			!! navigationBlockAttributes.showSubmenuIcon && hasDescendants;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
 		return {

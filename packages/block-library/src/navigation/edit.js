@@ -7,12 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	useMemo,
-	Fragment,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
+import { useMemo, Fragment, useRef, useEffect } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -149,12 +144,10 @@ function Navigation( {
 
 	const hasPages = hasResolvedPages && pages && pages.length;
 
-	const blockClassNames = classnames(
-		className, {
-			[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-			[ fontSize.class ]: fontSize.class,
-		}
-	);
+	const blockClassNames = classnames( className, {
+		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+		[ fontSize.class ]: fontSize.class,
+	} );
 	const blockInlineStyles = {
 		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 	};
