@@ -18,17 +18,27 @@ const DownloadableBlockNotice = ( { block, errorNotices, onClick } ) => {
 	let copy = __( 'Block could not be added.' );
 
 	if ( errorNotices[ block.id ] === DOWNLOAD_ERROR_NOTICE_ID ) {
-		copy = __( 'Block could not be added. There is a problem with the block.' );
+		copy = __(
+			'Block could not be added. There is a problem with the block.'
+		);
 	}
 
 	return (
-		<Notice status="error" isDismissible={ false } className="block-directory-downloadable-blocks-notice">
+		<Notice
+			status="error"
+			isDismissible={ false }
+			className="block-directory-downloadable-blocks-notice"
+		>
 			<span className="block-directory-downloadable-blocks-notice-content">
 				{ copy }
 			</span>
-			<Button isSmall isPrimary onClick={ () => {
-				onClick( block );
-			} }>
+			<Button
+				isSmall
+				isPrimary
+				onClick={ () => {
+					onClick( block );
+				} }
+			>
 				{ __( 'Retry' ) }
 			</Button>
 		</Notice>

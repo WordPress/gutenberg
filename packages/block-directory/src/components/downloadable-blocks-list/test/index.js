@@ -44,7 +44,9 @@ describe( 'DownloadableBlocksList', () => {
 		it( 'should render plugins items into the list', () => {
 			const wrapper = getContainer( { blocks: items } );
 
-			expect( wrapper.find( DownloadableBlockListItem ).length ).toBe( items.length );
+			expect( wrapper.find( DownloadableBlockListItem ).length ).toBe(
+				items.length
+			);
 		} );
 	} );
 	describe( 'Behaviour', () => {
@@ -53,7 +55,12 @@ describe( 'DownloadableBlocksList', () => {
 			const download = jest.fn();
 			const errorNotices = {};
 
-			const wrapper = getContainer( { blocks: [ plugin ], installAndDownload, download, errorNotices } );
+			const wrapper = getContainer( {
+				blocks: [ plugin ],
+				installAndDownload,
+				download,
+				errorNotices,
+			} );
 			const listItems = wrapper.find( DownloadableBlockListItem );
 
 			listItems.get( 0 ).props.onClick();
@@ -68,7 +75,12 @@ describe( 'DownloadableBlocksList', () => {
 				[ plugin.id ]: DOWNLOAD_ERROR_NOTICE_ID,
 			};
 
-			const wrapper = getContainer( { blocks: [ plugin ], installAndDownload, download, errorNotices } );
+			const wrapper = getContainer( {
+				blocks: [ plugin ],
+				installAndDownload,
+				download,
+				errorNotices,
+			} );
 			const listItems = wrapper.find( DownloadableBlockListItem );
 
 			listItems.get( 0 ).props.onClick();

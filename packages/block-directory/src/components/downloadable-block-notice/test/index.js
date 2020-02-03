@@ -49,7 +49,11 @@ describe( 'DownloadableBlockNotice', () => {
 			};
 
 			const onClick = jest.fn();
-			const wrapper = getContainer( { block: plugin, onClick, errorNotices } );
+			const wrapper = getContainer( {
+				block: plugin,
+				onClick,
+				errorNotices,
+			} );
 
 			wrapper.find( Button ).simulate( 'click', { event: {} } );
 

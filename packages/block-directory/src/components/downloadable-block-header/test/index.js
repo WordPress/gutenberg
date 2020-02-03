@@ -15,7 +15,11 @@ import { Button } from '@wordpress/components';
 import DownloadableBlockHeader from '../index';
 import { pluginWithImg, pluginWithIcon } from './fixtures';
 
-const getContainer = ( { icon, title, rating, ratingCount }, onClick = jest.fn(), isLoading = false ) => {
+const getContainer = (
+	{ icon, title, rating, ratingCount },
+	onClick = jest.fn(),
+	isLoading = false
+) => {
 	return shallow(
 		<DownloadableBlockHeader
 			icon={ icon }

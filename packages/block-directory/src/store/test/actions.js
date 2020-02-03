@@ -6,10 +6,7 @@ import * as blockFunctions from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import {
-	downloadBlock,
-	installBlock,
-} from '../actions';
+import { downloadBlock, installBlock } from '../actions';
 import * as controls from '../controls';
 
 const ACTIONS = {
@@ -38,9 +35,9 @@ describe( 'actions', () => {
 	} );
 
 	const callsTheApi = ( generator ) => {
-		return expect(
-			generator.next( { success: true } ).value.type,
-		).toEqual( ACTIONS.apiFetch );
+		return expect( generator.next( { success: true } ).value.type ).toEqual(
+			ACTIONS.apiFetch
+		);
 	};
 
 	const expectTest = ( hasCall, noCall ) => {
@@ -61,9 +58,13 @@ describe( 'actions', () => {
 			const onSuccess = jest.fn();
 			const onError = jest.fn();
 
-			const generator = downloadBlock( {
-				assets: [],
-			}, onSuccess, onError );
+			const generator = downloadBlock(
+				{
+					assets: [],
+				},
+				onSuccess,
+				onError
+			);
 
 			// Move onto the onError callback
 			generator.next();
@@ -119,9 +120,9 @@ describe( 'actions', () => {
 			callsTheApi( generator );
 
 			// It triggers ADD_INSTALLED_BLOCK_TYPE
-			expect(
-				generator.next( { success: true } ).value.type,
-			).toEqual( ACTIONS.addInstalledBlockType );
+			expect( generator.next( { success: true } ).value.type ).toEqual(
+				ACTIONS.addInstalledBlockType
+			);
 
 			// Move on to success
 			generator.next();

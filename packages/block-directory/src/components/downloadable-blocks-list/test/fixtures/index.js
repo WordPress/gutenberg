@@ -1,7 +1,8 @@
 export const plugin = {
 	name: 'boxer/boxer',
 	title: 'Boxer',
-	description: 'Boxer is a Block that puts your WordPress posts into boxes on a page.',
+	description:
+		'Boxer is a Block that puts your WordPress posts into boxes on a page.',
 	id: 'boxer-block',
 	icon: 'block-default',
 	rating: 5,
