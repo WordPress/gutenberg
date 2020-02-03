@@ -55,7 +55,13 @@ export function getFirstRow( state ) {
  */
 export function getCellAttribute( state, cellLocation, attributeName ) {
 	const { sectionName, rowIndex, columnIndex } = cellLocation;
-	return get( state, [ sectionName, rowIndex, 'cells', columnIndex, attributeName ] );
+	return get( state, [
+		sectionName,
+		rowIndex,
+		'cells',
+		columnIndex,
+		attributeName,
+	] );
 }
 
 /**
@@ -73,7 +79,10 @@ export function updateSelectedCell( state, selection, updateCell ) {
 	}
 
 	const tableSections = pick( state, [ 'head', 'body', 'foot' ] );
-	const { sectionName: selectionSectionName, rowIndex: selectionRowIndex } = selection;
+	const {
+		sectionName: selectionSectionName,
+		rowIndex: selectionRowIndex,
+	} = selection;
 
 	return mapValues( tableSections, ( section, sectionName ) => {
 		if ( selectionSectionName && selectionSectionName !== sectionName ) {
@@ -119,7 +128,10 @@ export function isCellSelected( cellLocation, selection ) {
 
 	switch ( selection.type ) {
 		case 'column':
-			return selection.type === 'column' && cellLocation.columnIndex === selection.columnIndex;
+			return (
+				selection.type === 'column' &&
+				cellLocation.columnIndex === selection.columnIndex
+			);
 		case 'cell':
 			return (
 				selection.type === 'cell' &&
@@ -143,7 +155,9 @@ export function isCellSelected( cellLocation, selection ) {
 export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 	const firstRow = getFirstRow( state );
 	const cellCount =
-		columnCount === undefined ? get( firstRow, [ 'cells', 'length' ] ) : columnCount;
+		columnCount === undefined
+			? get( firstRow, [ 'cells', 'length' ] )
+			: columnCount;
 
 	// Bail early if the function cannot determine how many cells to add.
 	if ( ! cellCount ) {
@@ -155,8 +169,15 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 			...state[ sectionName ].slice( 0, rowIndex ),
 			{
 				cells: times( cellCount, ( index ) => {
-					const firstCellInColumn = get( firstRow, [ 'cells', index ], {} );
-					const inheritedAttributes = pick( firstCellInColumn, INHERITED_COLUMN_ATTRIBUTES );
+					const firstCellInColumn = get(
+						firstRow,
+						[ 'cells', index ],
+						{}
+					);
+					const inheritedAttributes = pick(
+						firstCellInColumn,
+						INHERITED_COLUMN_ATTRIBUTES
+					);
 
 					return {
 						...inheritedAttributes,
@@ -182,7 +203,9 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
  */
 export function deleteRow( state, { sectionName, rowIndex } ) {
 	return {
-		[ sectionName ]: state[ sectionName ].filter( ( row, index ) => index !== rowIndex ),
+		[ sectionName ]: state[ sectionName ].filter(
+			( row, index ) => index !== rowIndex
+		),
 	};
 }
 
@@ -247,7 +270,9 @@ export function deleteColumn( state, { columnIndex } ) {
 			.map( ( row ) => ( {
 				cells:
 					row.cells.length >= columnIndex
-						? row.cells.filter( ( cell, index ) => index !== columnIndex )
+						? row.cells.filter(
+								( cell, index ) => index !== columnIndex
+						  )
 						: row.cells,
 			} ) )
 			.filter( ( row ) => row.cells.length );

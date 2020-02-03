@@ -45,7 +45,9 @@ export const link = {
 				this.addLink = this.addLink.bind( this );
 				this.stopAddingLink = this.stopAddingLink.bind( this );
 				this.onRemoveFormat = this.onRemoveFormat.bind( this );
-				this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
+				this.getURLFromClipboard = this.getURLFromClipboard.bind(
+					this
+				);
 				this.state = {
 					addingLink: false,
 				};
@@ -56,7 +58,12 @@ export const link = {
 				const text = getTextContent( slice( value ) );
 
 				if ( text && isURL( text ) ) {
-					onChange( applyFormat( value, { type: name, attributes: { url: text } } ) );
+					onChange(
+						applyFormat( value, {
+							type: name,
+							attributes: { url: text },
+						} )
+					);
 				} else {
 					this.setState( { addingLink: true } );
 					this.getURLFromClipboard();

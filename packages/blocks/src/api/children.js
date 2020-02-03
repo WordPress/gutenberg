@@ -65,7 +65,8 @@ export function concat( ...blockNodes ) {
 		for ( let j = 0; j < blockNode.length; j++ ) {
 			const child = blockNode[ j ];
 			const canConcatToPreviousString =
-				typeof child === 'string' && typeof result[ result.length - 1 ] === 'string';
+				typeof child === 'string' &&
+				typeof result[ result.length - 1 ] === 'string';
 
 			if ( canConcatToPreviousString ) {
 				result[ result.length - 1 ] += child;

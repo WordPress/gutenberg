@@ -15,12 +15,23 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './editor.scss';
 
-export function NextPageEdit( { attributes, isSelected, onFocus, getStylesFromColorScheme } ) {
+export function NextPageEdit( {
+	attributes,
+	isSelected,
+	onFocus,
+	getStylesFromColorScheme,
+} ) {
 	const { customText = __( 'Page break' ) } = attributes;
 	const accessibilityTitle = attributes.customText || '';
 	const accessibilityState = isSelected ? [ 'selected' ] : [];
-	const textStyle = getStylesFromColorScheme( styles.nextpageText, styles.nextpageTextDark );
-	const lineStyle = getStylesFromColorScheme( styles.nextpageLine, styles.nextpageLineDark );
+	const textStyle = getStylesFromColorScheme(
+		styles.nextpageText,
+		styles.nextpageTextDark
+	);
+	const lineStyle = getStylesFromColorScheme(
+		styles.nextpageLine,
+		styles.nextpageLineDark
+	);
 
 	return (
 		<View

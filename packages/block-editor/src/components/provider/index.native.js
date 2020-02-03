@@ -112,7 +112,8 @@ class BlockEditorProvider extends Component {
 
 			if (
 				newBlocks !== blocks &&
-				( this.isSyncingIncomingValue || __unstableIsLastBlockChangeIgnored() )
+				( this.isSyncingIncomingValue ||
+					__unstableIsLastBlockChangeIgnored() )
 			) {
 				this.isSyncingIncomingValue = null;
 				blocks = newBlocks;
@@ -156,7 +157,9 @@ class BlockEditorProvider extends Component {
 export default compose( [
 	withRegistryProvider,
 	withDispatch( ( dispatch ) => {
-		const { updateSettings, resetBlocks, resetSelection } = dispatch( 'core/block-editor' );
+		const { updateSettings, resetBlocks, resetSelection } = dispatch(
+			'core/block-editor'
+		);
 
 		return {
 			updateSettings,

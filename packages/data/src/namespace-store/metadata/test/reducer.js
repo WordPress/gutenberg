@@ -85,18 +85,22 @@ describe( 'reducer', () => {
 		expect( state.getFoo.get( [ 'block' ] ) ).toBe( true );
 	} );
 
-	it( 'should remove invalidation for store level and leave others ' + 'intact', () => {
-		const original = reducer( undefined, {
-			type: 'FINISH_RESOLUTION',
-			selectorName: 'getFoo',
-			args: [ 'post' ],
-		} );
-		const state = reducer( deepFreeze( original ), {
-			type: 'INVALIDATE_RESOLUTION_FOR_STORE',
-		} );
+	it(
+		'should remove invalidation for store level and leave others ' +
+			'intact',
+		() => {
+			const original = reducer( undefined, {
+				type: 'FINISH_RESOLUTION',
+				selectorName: 'getFoo',
+				args: [ 'post' ],
+			} );
+			const state = reducer( deepFreeze( original ), {
+				type: 'INVALIDATE_RESOLUTION_FOR_STORE',
+			} );
 
-		expect( state ).toEqual( {} );
-	} );
+			expect( state ).toEqual( {} );
+		}
+	);
 
 	it(
 		'should remove invalidation for store and selector name level and ' +

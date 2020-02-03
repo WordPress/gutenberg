@@ -47,7 +47,9 @@ const SettingsSidebar = ( { sidebarName } ) => (
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getActiveGeneralSidebarName, isEditorSidebarOpened } = select( 'core/edit-post' );
+		const { getActiveGeneralSidebarName, isEditorSidebarOpened } = select(
+			'core/edit-post'
+		);
 
 		return {
 			isEditorSidebarOpened: isEditorSidebarOpened(),

@@ -11,7 +11,9 @@ const transpiledPackageNames = glob( 'packages/*/src/index.js' ).map(
 module.exports = {
 	rootDir: '../../',
 	moduleNameMapper: {
-		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]: 'packages/$1/src',
+		[ `@wordpress\\/(${ transpiledPackageNames.join(
+			'|'
+		) })$` ]: 'packages/$1/src',
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [

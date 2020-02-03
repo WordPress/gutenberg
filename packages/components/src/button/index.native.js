@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
+import {
+	StyleSheet,
+	TouchableOpacity,
+	Text,
+	View,
+	Platform,
+} from 'react-native';
 import { isArray } from 'lodash';
 
 /**
@@ -111,7 +117,10 @@ export function Button( props ) {
 
 	const newChildren = Children.map( children, ( child ) => {
 		return child
-			? cloneElement( child, { colorScheme: props.preferredColorScheme, isPressed } )
+			? cloneElement( child, {
+					colorScheme: props.preferredColorScheme,
+					isPressed,
+			  } )
 			: child;
 	} );
 
@@ -125,7 +134,8 @@ export function Button( props ) {
 			// there's a label and...
 			( !! label &&
 				// the children are empty and...
-				( ! children || ( isArray( children ) && ! children.length ) ) &&
+				( ! children ||
+					( isArray( children ) && ! children.length ) ) &&
 				// the tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
@@ -155,7 +165,13 @@ export function Button( props ) {
 					{ newIcon }
 					{ newChildren }
 					{ subscript && (
-						<Text style={ isPressed ? styles.subscriptActive : subscriptInactive }>
+						<Text
+							style={
+								isPressed
+									? styles.subscriptActive
+									: subscriptInactive
+							}
+						>
 							{ subscript }
 						</Text>
 					) }
@@ -169,7 +185,11 @@ export function Button( props ) {
 	}
 
 	return (
-		<Tooltip text={ label } shortcut={ shortcut } position={ tooltipPosition }>
+		<Tooltip
+			text={ label }
+			shortcut={ shortcut }
+			position={ tooltipPosition }
+		>
 			{ element }
 		</Tooltip>
 	);

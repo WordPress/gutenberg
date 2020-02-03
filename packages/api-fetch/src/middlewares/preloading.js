@@ -53,7 +53,11 @@ function createPreloadingMiddleware( preloadedData ) {
 
 			if ( parse && 'GET' === method && cache[ path ] ) {
 				return Promise.resolve( cache[ path ].body );
-			} else if ( 'OPTIONS' === method && cache[ method ] && cache[ method ][ path ] ) {
+			} else if (
+				'OPTIONS' === method &&
+				cache[ method ] &&
+				cache[ method ][ path ]
+			) {
 				return Promise.resolve( cache[ method ][ path ] );
 			}
 		}

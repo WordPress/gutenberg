@@ -26,7 +26,14 @@ describe( 'create', () => {
 	} );
 
 	spec.forEach(
-		( { description, multilineTag, multilineWrapperTags, html, createRange, record } ) => {
+		( {
+			description,
+			multilineTag,
+			multilineWrapperTags,
+			html,
+			createRange,
+			record,
+		} ) => {
 			if ( html === undefined ) {
 				return;
 			}
@@ -41,7 +48,9 @@ describe( 'create', () => {
 					multilineWrapperTags,
 				} );
 				const formatsLength = getSparseArrayLength( record.formats );
-				const createdFormatsLength = getSparseArrayLength( createdRecord.formats );
+				const createdFormatsLength = getSparseArrayLength(
+					createdRecord.formats
+				);
 
 				expect( createdRecord ).toEqual( record );
 				expect( createdFormatsLength ).toEqual( formatsLength );
@@ -50,7 +59,13 @@ describe( 'create', () => {
 	);
 
 	specWithRegistration.forEach(
-		( { description, formatName, formatType, html, value: expectedValue } ) => {
+		( {
+			description,
+			formatName,
+			formatType,
+			html,
+			value: expectedValue,
+		} ) => {
 			it( description, () => {
 				if ( formatName ) {
 					registerFormatType( formatName, formatType );

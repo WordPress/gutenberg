@@ -23,7 +23,10 @@ export default function LinkEditor( {
 } ) {
 	return (
 		<form
-			className={ classnames( 'block-editor-url-popover__link-editor', className ) }
+			className={ classnames(
+				'block-editor-url-popover__link-editor',
+				className
+			) }
 			{ ...props }
 		>
 			<URLInput

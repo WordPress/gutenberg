@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getColorClassName, getFontSizeClass, RichText } from '@wordpress/block-editor';
+import {
+	getColorClassName,
+	getFontSizeClass,
+	RichText,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -23,7 +27,10 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const textClass = getColorClassName( 'color', textColor );
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+	const backgroundClass = getColorClassName(
+		'background-color',
+		backgroundColor
+	);
 	const fontSizeClass = getFontSizeClass( fontSize );
 
 	const className = classnames( {

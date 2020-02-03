@@ -10,9 +10,11 @@ import Shortcut from './shortcut';
 
 function DynamicShortcut( { name } ) {
 	const { keyCombination, description, aliases } = useSelect( ( select ) => {
-		const { getShortcutKeyCombination, getShortcutDescription, getShortcutAliases } = select(
-			'core/keyboard-shortcuts'
-		);
+		const {
+			getShortcutKeyCombination,
+			getShortcutDescription,
+			getShortcutAliases,
+		} = select( 'core/keyboard-shortcuts' );
 
 		return {
 			keyCombination: getShortcutKeyCombination( name ),
@@ -26,7 +28,11 @@ function DynamicShortcut( { name } ) {
 	}
 
 	return (
-		<Shortcut keyCombination={ keyCombination } description={ description } aliases={ aliases } />
+		<Shortcut
+			keyCombination={ keyCombination }
+			description={ description }
+			aliases={ aliases }
+		/>
 	);
 }
 

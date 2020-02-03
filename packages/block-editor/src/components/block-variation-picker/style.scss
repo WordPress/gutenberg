@@ -1,4 +1,4 @@
-.block-editor-block-pattern-picker {
+.block-editor-block-variation-picker {
 	.components-placeholder__instructions {
 		// Defer to vertical margins applied by template picker options.
 		margin-bottom: 0;
@@ -10,14 +10,14 @@
 		flex-direction: column;
 	}
 
-	&.has-many-patterns .components-placeholder__fieldset {
+	&.has-many-variations .components-placeholder__fieldset {
 		// Allow options to occupy a greater amount of the available space if
 		// many options exist.
 		max-width: 90%;
 	}
 }
 
-.block-editor-block-pattern-picker__patterns.block-editor-block-pattern-picker__patterns {
+.block-editor-block-variation-picker__variations.block-editor-block-variation-picker__variations {
 	display: flex;
 	justify-content: flex-start;
 	flex-direction: row;
@@ -34,12 +34,12 @@
 		max-width: 100px;
 	}
 
-	.block-editor-block-pattern-picker__pattern {
+	.block-editor-block-variation-picker__variation {
 		padding: $grid-size;
 	}
 }
 
-.block-editor-block-pattern-picker__pattern {
+.block-editor-block-variation-picker__variation {
 	width: 100%;
 
 	&.components-button.has-icon {

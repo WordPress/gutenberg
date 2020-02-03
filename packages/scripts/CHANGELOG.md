@@ -14,6 +14,9 @@
 - Add `lint-md-docs` script to lint the markup of markdown files, uses the `markdownlint` module ([#19855](https://github.com/WordPress/gutenberg/pull/19855)).
 - Add `packages-update` script to update WordPress packages to the latest version automatically ([#19448](https://github.com/WordPress/gutenberg/pull/19448)).
 
+### Bug Fixes
+- Fixes and updates valid _rc_ configuration filenames for Babel, ESLint, markdownlint, npmpackagejsonlint, stylelint, and Prettier ([#19994](https://github.com/WordPress/gutenberg/pull/19994)).
+
 ## 6.1.1 (2020-01-01)
 
 ### Bug Fixes

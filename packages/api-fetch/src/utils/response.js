@@ -46,10 +46,13 @@ const parseJsonAndNormalizeError = ( response ) => {
  *
  * @return {Promise} Parsed response.
  */
-export const parseResponseAndNormalizeError = ( response, shouldParseResponse = true ) => {
-	return Promise.resolve( parseResponse( response, shouldParseResponse ) ).catch( ( res ) =>
-		parseAndThrowError( res, shouldParseResponse )
-	);
+export const parseResponseAndNormalizeError = (
+	response,
+	shouldParseResponse = true
+) => {
+	return Promise.resolve(
+		parseResponse( response, shouldParseResponse )
+	).catch( ( res ) => parseAndThrowError( res, shouldParseResponse ) );
 };
 
 export function parseAndThrowError( response, shouldParseResponse = true ) {

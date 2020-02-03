@@ -7,7 +7,14 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Dropdown, Button, Toolbar, PanelBody, Path, SVG } from '@wordpress/components';
+import {
+	Dropdown,
+	Button,
+	Toolbar,
+	PanelBody,
+	Path,
+	SVG,
+} from '@wordpress/components';
 import {
 	getBlockType,
 	getPossibleBlockTransformations,
@@ -42,7 +49,12 @@ export class BlockSwitcher extends Component {
 	}
 
 	render() {
-		const { blocks, onTransform, inserterItems, hasBlockStyles } = this.props;
+		const {
+			blocks,
+			onTransform,
+			inserterItems,
+			hasBlockStyles,
+		} = this.props;
 		const { hoveredClassName } = this.state;
 
 		if ( ! blocks || ! blocks.length ) {
@@ -50,7 +62,9 @@ export class BlockSwitcher extends Component {
 		}
 
 		const hoveredBlock = hoveredClassName ? blocks[ 0 ] : null;
-		const hoveredBlockType = hoveredClassName ? getBlockType( hoveredBlock.name ) : null;
+		const hoveredBlockType = hoveredClassName
+			? getBlockType( hoveredBlock.name )
+			: null;
 
 		const itemsByName = mapKeys( inserterItems, ( { name } ) => name );
 		const possibleBlockTransformations = orderBy(
@@ -64,7 +78,8 @@ export class BlockSwitcher extends Component {
 
 		// When selection consists of blocks of multiple types, display an
 		// appropriate icon to communicate the non-uniformity.
-		const isSelectionOfSameType = uniq( map( blocks, 'name' ) ).length === 1;
+		const isSelectionOfSameType =
+			uniq( map( blocks, 'name' ) ).length === 1;
 
 		let icon;
 		if ( isSelectionOfSameType ) {
@@ -105,7 +120,11 @@ export class BlockSwitcher extends Component {
 						1 === blocks.length
 							? __( 'Change block type or style' )
 							: sprintf(
-									_n( 'Change type of %d block', 'Change type of %d blocks', blocks.length ),
+									_n(
+										'Change type of %d block',
+										'Change type of %d blocks',
+										blocks.length
+									),
 									blocks.length
 							  );
 
@@ -137,25 +156,39 @@ export class BlockSwitcher extends Component {
 				} }
 				renderContent={ ( { onClose } ) => (
 					<>
-						{ ( hasBlockStyles || possibleBlockTransformations.length !== 0 ) && (
+						{ ( hasBlockStyles ||
+							possibleBlockTransformations.length !== 0 ) && (
 							<div className="block-editor-block-switcher__container">
 								{ hasBlockStyles && (
-									<PanelBody title={ __( 'Block Styles' ) } initialOpen>
+									<PanelBody
+										title={ __( 'Block Styles' ) }
+										initialOpen
+									>
 										<BlockStyles
 											clientId={ blocks[ 0 ].clientId }
 											onSwitch={ onClose }
-											onHoverClassName={ this.onHoverClassName }
+											onHoverClassName={
+												this.onHoverClassName
+											}
 										/>
 									</PanelBody>
 								) }
 								{ possibleBlockTransformations.length !== 0 && (
-									<PanelBody title={ __( 'Transform To:' ) } initialOpen>
+									<PanelBody
+										title={ __( 'Transform To:' ) }
+										initialOpen
+									>
 										<BlockTypesList
-											items={ possibleBlockTransformations.map( ( destinationBlockType ) => ( {
-												id: destinationBlockType.name,
-												icon: destinationBlockType.icon,
-												title: destinationBlockType.title,
-											} ) ) }
+											items={ possibleBlockTransformations.map(
+												( destinationBlockType ) => ( {
+													id:
+														destinationBlockType.name,
+													icon:
+														destinationBlockType.icon,
+													title:
+														destinationBlockType.title,
+												} )
+											) }
 											onSelect={ ( item ) => {
 												onTransform( blocks, item.id );
 												onClose();
@@ -174,14 +207,24 @@ export class BlockSwitcher extends Component {
 									viewportWidth={ 500 }
 									blocks={
 										hoveredBlockType.example
-											? getBlockFromExample( hoveredBlock.name, {
-													attributes: {
-														...hoveredBlockType.example.attributes,
-														className: hoveredClassName,
-													},
-													innerBlocks: hoveredBlockType.example.innerBlocks,
+											? getBlockFromExample(
+													hoveredBlock.name,
+													{
+														attributes: {
+															...hoveredBlockType
+																.example
+																.attributes,
+															className: hoveredClassName,
+														},
+														innerBlocks:
+															hoveredBlockType
+																.example
+																.innerBlocks,
+													}
+											  )
+											: cloneBlock( hoveredBlock, {
+													className: hoveredClassName,
 											  } )
-											: cloneBlock( hoveredBlock, { className: hoveredClassName } )
 									}
 								/>
 							</div>
@@ -195,11 +238,15 @@ export class BlockSwitcher extends Component {
 
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlocksByClientId, getBlockRootClientId, getInserterItems } = select(
-			'core/block-editor'
-		);
+		const {
+			getBlocksByClientId,
+			getBlockRootClientId,
+			getInserterItems,
+		} = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
-		const rootClientId = getBlockRootClientId( first( castArray( clientIds ) ) );
+		const rootClientId = getBlockRootClientId(
+			first( castArray( clientIds ) )
+		);
 		const blocks = getBlocksByClientId( clientIds );
 		const firstBlock = blocks && blocks.length === 1 ? blocks[ 0 ] : null;
 		const styles = firstBlock && getBlockStyles( firstBlock.name );

@@ -25,7 +25,8 @@ const pure = createHigherOrderComponent( ( Wrapped ) => {
 		return class extends Wrapped {
 			shouldComponentUpdate( nextProps, nextState ) {
 				return (
-					! isShallowEqual( nextProps, this.props ) || ! isShallowEqual( nextState, this.state )
+					! isShallowEqual( nextProps, this.props ) ||
+					! isShallowEqual( nextState, this.state )
 				);
 			}
 		};

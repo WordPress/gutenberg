@@ -43,7 +43,11 @@ const transforms = {
 
 				attributes.level = getLevelFromHeadingNodeName( node.nodeName );
 
-				if ( textAlign === 'left' || textAlign === 'center' || textAlign === 'right' ) {
+				if (
+					textAlign === 'left' ||
+					textAlign === 'center' ||
+					textAlign === 'right'
+				) {
 					attributes.align = textAlign;
 				}
 

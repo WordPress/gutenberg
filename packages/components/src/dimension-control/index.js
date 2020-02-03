@@ -21,7 +21,14 @@ import { Fragment } from '@wordpress/element';
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {
-	const { label, value, sizes = sizesTable, icon, onChange, className = '' } = props;
+	const {
+		label,
+		value,
+		sizes = sizesTable,
+		icon,
+		onChange,
+		className = '',
+	} = props;
 
 	const onChangeSpacingSize = ( val ) => {
 		const theSize = findSizeBySlug( sizes, val );
@@ -56,7 +63,10 @@ export function DimensionControl( props ) {
 
 	return (
 		<SelectControl
-			className={ classnames( className, 'block-editor-dimension-control' ) }
+			className={ classnames(
+				className,
+				'block-editor-dimension-control'
+			) }
 			label={ selectLabel }
 			hideLabelFromVision={ false }
 			value={ value }

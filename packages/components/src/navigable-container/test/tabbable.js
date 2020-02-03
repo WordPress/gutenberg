@@ -17,7 +17,9 @@ import { TabbableContainer } from '../tabbable';
 function simulateVisible( wrapper, selector ) {
 	const elements = wrapper.getDOMNode().querySelectorAll( selector );
 	each( elements, ( elem ) => {
-		elem.getClientRects = () => [ 'trick-jsdom-into-having-size-for-element-rect' ];
+		elem.getClientRects = () => [
+			'trick-jsdom-into-having-size-for-element-rect',
+		];
 	} );
 }
 
@@ -47,7 +49,10 @@ describe( 'TabbableContainer', () => {
 				`withInstanceId`. In this case, it's fine to use literal IDs.
 			*/
 			/* eslint-disable no-restricted-syntax */
-			<TabbableContainer className="wrapper" onNavigate={ ( index ) => ( currentIndex = index ) }>
+			<TabbableContainer
+				className="wrapper"
+				onNavigate={ ( index ) => ( currentIndex = index ) }
+			>
 				<div className="section" id="section1" tabIndex="0">
 					Section One
 				</div>
@@ -75,7 +80,12 @@ describe( 'TabbableContainer', () => {
 			.focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex, expectedStop ) {
+		function assertKeyDown(
+			keyCode,
+			shiftKey,
+			expectedActiveIndex,
+			expectedStop
+		) {
 			const interaction = fireKeyDown( container, keyCode, shiftKey );
 			expect( currentIndex ).toBe( expectedActiveIndex );
 			expect( interaction.stopped ).toBe( expectedStop );
@@ -127,7 +137,12 @@ describe( 'TabbableContainer', () => {
 			.focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex, expectedStop ) {
+		function assertKeyDown(
+			keyCode,
+			shiftKey,
+			expectedActiveIndex,
+			expectedStop
+		) {
 			const interaction = fireKeyDown( container, keyCode, shiftKey );
 			expect( currentIndex ).toBe( expectedActiveIndex );
 			expect( interaction.stopped ).toBe( expectedStop );

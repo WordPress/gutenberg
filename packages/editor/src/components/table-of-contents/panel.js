@@ -37,22 +37,30 @@ function TableOfContentsPanel( {
 					</li>
 					<li className="table-of-contents__count">
 						{ __( 'Headings' ) }
-						<span className="table-of-contents__number">{ headingCount }</span>
+						<span className="table-of-contents__number">
+							{ headingCount }
+						</span>
 					</li>
 					<li className="table-of-contents__count">
 						{ __( 'Paragraphs' ) }
-						<span className="table-of-contents__number">{ paragraphCount }</span>
+						<span className="table-of-contents__number">
+							{ paragraphCount }
+						</span>
 					</li>
 					<li className="table-of-contents__count">
 						{ __( 'Blocks' ) }
-						<span className="table-of-contents__number">{ numberOfBlocks }</span>
+						<span className="table-of-contents__number">
+							{ numberOfBlocks }
+						</span>
 					</li>
 				</ul>
 			</div>
 			{ headingCount > 0 && (
 				<>
 					<hr />
-					<h2 className="table-of-contents__title">{ __( 'Document Outline' ) }</h2>
+					<h2 className="table-of-contents__title">
+						{ __( 'Document Outline' ) }
+					</h2>
 					<DocumentOutline
 						onSelect={ onRequestClose }
 						hasOutlineItemsDisabled={ hasOutlineItemsDisabled }

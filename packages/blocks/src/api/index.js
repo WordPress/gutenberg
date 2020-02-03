@@ -7,8 +7,16 @@ export {
 	findTransform,
 	getBlockFromExample,
 } from './factory';
-export { default as parse, getBlockAttributes, parseWithAttributeSchema } from './parser';
-export { pasteHandler, rawHandler, getPhrasingContentSchema } from './raw-handling';
+export {
+	default as parse,
+	getBlockAttributes,
+	parseWithAttributeSchema,
+} from './parser';
+export {
+	pasteHandler,
+	rawHandler,
+	getPhrasingContentSchema,
+} from './raw-handling';
 export {
 	default as serialize,
 	getBlockContent,
@@ -42,8 +50,8 @@ export {
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	registerBlockStyle,
 	unregisterBlockStyle,
-	__experimentalRegisterBlockPattern,
-	__experimentalUnregisterBlockPattern,
+	__experimentalRegisterBlockVariation,
+	__experimentalUnregisterBlockVariation,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,
@@ -52,6 +60,9 @@ export {
 	getBlockLabel as __experimentalGetBlockLabel,
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
 } from './utils';
-export { doBlocksMatchTemplate, synchronizeBlocksWithTemplate } from './templates';
+export {
+	doBlocksMatchTemplate,
+	synchronizeBlocksWithTemplate,
+} from './templates';
 export { default as children } from './children';
 export { default as node } from './node';

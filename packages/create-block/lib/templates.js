@@ -17,14 +17,21 @@ const templates = {
 			namespace,
 			slug: 'es5-example',
 			title: 'ES5 Example',
-			description: 'Example block written with ES5 standard and no JSX – no build step required.',
+			description:
+				'Example block written with ES5 standard and no JSX – no build step required.',
 			dashicon,
 			category,
 			author,
 			license,
 			version,
 		},
-		outputFiles: [ '.editorconfig', 'editor.css', 'index.js', '$slug.php', 'style.css' ],
+		outputFiles: [
+			'.editorconfig',
+			'editor.css',
+			'index.js',
+			'$slug.php',
+			'style.css',
+		],
 	},
 	esnext: {
 		defaultValues: {
@@ -54,7 +61,9 @@ const templates = {
 const getTemplate = ( templateName ) => {
 	if ( ! templates[ templateName ] ) {
 		throw new CliError(
-			`Invalid template type name. Allowed values: ${ Object.keys( templates ).join( ', ' ) }.`
+			`Invalid template type name. Allowed values: ${ Object.keys(
+				templates
+			).join( ', ' ) }.`
 		);
 	}
 	return templates[ templateName ];

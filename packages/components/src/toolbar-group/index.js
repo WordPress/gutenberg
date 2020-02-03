@@ -48,7 +48,14 @@ import ToolbarContext from '../toolbar-context';
  * @param {WPBlockTypeIconRender} [props.icon]        The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
  * @param {string}                [props.label]       The menu item text.
  */
-function ToolbarGroup( { controls = [], children, className, isCollapsed, title, ...props } ) {
+function ToolbarGroup( {
+	controls = [],
+	children,
+	className,
+	isCollapsed,
+	title,
+	...props
+} ) {
 	// It'll contain state if `ToolbarGroup` is being used within
 	// `<Toolbar accessibilityLabel="label" />`
 	const accessibleToolbarState = useContext( ToolbarContext );
@@ -60,7 +67,9 @@ function ToolbarGroup( { controls = [], children, className, isCollapsed, title,
 	const finalClassName = classnames(
 		// Unfortunately, there's legacy code referencing to `.components-toolbar`
 		// So we can't get rid of it
-		accessibleToolbarState ? 'components-toolbar-group' : 'components-toolbar',
+		accessibleToolbarState
+			? 'components-toolbar-group'
+			: 'components-toolbar',
 		className
 	);
 
@@ -89,7 +98,9 @@ function ToolbarGroup( { controls = [], children, className, isCollapsed, title,
 					<ToolbarButton
 						key={ [ indexOfSet, indexOfControl ].join() }
 						containerClassName={
-							indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null
+							indexOfSet > 0 && indexOfControl === 0
+								? 'has-left-divider'
+								: null
 						}
 						{ ...control }
 					/>

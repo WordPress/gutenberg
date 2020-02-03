@@ -31,7 +31,10 @@ import { useEffect } from '@wordpress/element';
 function isAppleOS( _window = window ) {
 	const { platform } = _window.navigator;
 
-	return platform.indexOf( 'Mac' ) !== -1 || includes( [ 'iPad', 'iPhone' ], platform );
+	return (
+		platform.indexOf( 'Mac' ) !== -1 ||
+		includes( [ 'iPad', 'iPhone' ], platform )
+	);
 }
 
 /**
@@ -61,14 +64,17 @@ function useKeyboardShortcut(
 			// Determines whether a key is a modifier by the length of the string.
 			// E.g. if I add a pass a shortcut Shift+Cmd+M, it'll determine that
 			// the modifiers are Shift and Cmd because they're not a single character.
-			const modifiers = new Set( keys.filter( ( value ) => value.length > 1 ) );
+			const modifiers = new Set(
+				keys.filter( ( value ) => value.length > 1 )
+			);
 			const hasAlt = modifiers.has( 'alt' );
 			const hasShift = modifiers.has( 'shift' );
 
 			// This should be better moved to the shortcut registration instead.
 			if (
 				isAppleOS() &&
-				( ( modifiers.size === 1 && hasAlt ) || ( modifiers.size === 2 && hasAlt && hasShift ) )
+				( ( modifiers.size === 1 && hasAlt ) ||
+					( modifiers.size === 2 && hasAlt && hasShift ) )
 			) {
 				throw new Error(
 					`Cannot bind ${ shortcut }. Alt and Shift+Alt modifiers are reserved for character input.`

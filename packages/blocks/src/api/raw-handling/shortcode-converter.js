@@ -15,7 +15,11 @@ import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
 import { getBlockAttributes } from '../parser';
 
-function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = [] ) {
+function segmentHTMLToShortcodeBlock(
+	HTML,
+	lastIndex = 0,
+	excludedBlockNames = []
+) {
 	// Get all matches.
 	const transformsFrom = getBlockTransforms( 'from' );
 
@@ -24,7 +28,9 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 		( transform ) =>
 			excludedBlockNames.indexOf( transform.blockName ) === -1 &&
 			transform.type === 'shortcode' &&
-			some( castArray( transform.tag ), ( tag ) => regexp( tag ).test( HTML ) )
+			some( castArray( transform.tag ), ( tag ) =>
+				regexp( tag ).test( HTML )
+			)
 	);
 
 	if ( ! transformation ) {
@@ -32,7 +38,9 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 	}
 
 	const transformTags = castArray( transformation.tag );
-	const transformTag = find( transformTags, ( tag ) => regexp( tag ).test( HTML ) );
+	const transformTag = find( transformTags, ( tag ) =>
+		regexp( tag ).test( HTML )
+	);
 
 	let match;
 	const previousIndex = lastIndex;
@@ -48,7 +56,10 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 		// this segment.
 		if (
 			! includes( match.shortcode.content || '', '<' ) &&
-			! ( /(\n|<p>)\s*$/.test( beforeHTML ) && /^\s*(\n|<\/p>)/.test( afterHTML ) )
+			! (
+				/(\n|<p>)\s*$/.test( beforeHTML ) &&
+				/^\s*(\n|<\/p>)/.test( afterHTML )
+			)
 		) {
 			return segmentHTMLToShortcodeBlock( HTML, lastIndex );
 		}
@@ -61,7 +72,10 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 		// should skip that argument as a way to reset the exclusion state, so
 		// that one `isMatch` fail in an HTML fragment doesn't prevent any
 		// valid matches in subsequent fragments.
-		if ( transformation.isMatch && ! transformation.isMatch( match.shortcode.attrs ) ) {
+		if (
+			transformation.isMatch &&
+			! transformation.isMatch( match.shortcode.attrs )
+		) {
 			return segmentHTMLToShortcodeBlock( HTML, previousIndex, [
 				...excludedBlockNames,
 				transformation.blockName,
@@ -89,7 +103,11 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = 
 			)
 		);
 
-		return [ beforeHTML, block, ...segmentHTMLToShortcodeBlock( HTML.substr( lastIndex ) ) ];
+		return [
+			beforeHTML,
+			block,
+			...segmentHTMLToShortcodeBlock( HTML.substr( lastIndex ) ),
+		];
 	}
 
 	return [ HTML ];

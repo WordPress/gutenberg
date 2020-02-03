@@ -1,7 +1,9 @@
 module.exports = function( api ) {
 	let wpBuildOpts = {};
 	const isWPBuild = ( name ) =>
-		[ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some( ( buildName ) => name === buildName );
+		[ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
+			( buildName ) => name === buildName
+		);
 
 	const isTestEnv = api.env() === 'test';
 
@@ -74,7 +76,9 @@ module.exports = function( api ) {
 					pragmaFrag: 'Fragment',
 				},
 			],
-			require.resolve( '@babel/plugin-proposal-async-generator-functions' ),
+			require.resolve(
+				'@babel/plugin-proposal-async-generator-functions'
+			),
 			maybeGetPluginTransformRuntime(),
 		].filter( Boolean ),
 	};

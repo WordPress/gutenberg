@@ -38,7 +38,8 @@ class TabPanel extends Component {
 		this.onNavigate = this.onNavigate.bind( this );
 
 		this.state = {
-			selected: initialTabName || ( tabs.length > 0 ? tabs[ 0 ].name : null ),
+			selected:
+				initialTabName || ( tabs.length > 0 ? tabs[ 0 ].name : null ),
 		};
 	}
 
@@ -77,9 +78,13 @@ class TabPanel extends Component {
 				>
 					{ tabs.map( ( tab ) => (
 						<TabButton
-							className={ classnames( tab.className, { [ activeClass ]: tab.name === selected } ) }
+							className={ classnames( tab.className, {
+								[ activeClass ]: tab.name === selected,
+							} ) }
 							tabId={ instanceId + '-' + tab.name }
-							aria-controls={ instanceId + '-' + tab.name + '-view' }
+							aria-controls={
+								instanceId + '-' + tab.name + '-view'
+							}
 							selected={ tab.name === selected }
 							key={ tab.name }
 							onClick={ partial( this.handleClick, tab.name ) }

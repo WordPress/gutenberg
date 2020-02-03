@@ -12,7 +12,10 @@ import { KeyboardShortcutHelpModal } from '../index';
 describe( 'KeyboardShortcutHelpModal', () => {
 	it( 'should match snapshot when the modal is active', () => {
 		const wrapper = shallow(
-			<KeyboardShortcutHelpModal isModalActive={ true } toggleModal={ noop } />
+			<KeyboardShortcutHelpModal
+				isModalActive={ true }
+				toggleModal={ noop }
+			/>
 		);
 
 		expect( wrapper ).toMatchSnapshot();
@@ -20,7 +23,10 @@ describe( 'KeyboardShortcutHelpModal', () => {
 
 	it( 'should match snapshot when the modal is not active', () => {
 		const wrapper = shallow(
-			<KeyboardShortcutHelpModal isModalActive={ false } toggleModal={ noop } />
+			<KeyboardShortcutHelpModal
+				isModalActive={ false }
+				toggleModal={ noop }
+			/>
 		);
 
 		expect( wrapper ).toMatchSnapshot();

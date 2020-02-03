@@ -9,7 +9,10 @@ export function PostScheduleLabel( { date, isFloating } ) {
 	const settings = __experimentalGetSettings();
 
 	return date && ! isFloating
-		? dateI18n( `${ settings.formats.date } ${ settings.formats.time }`, date )
+		? dateI18n(
+				`${ settings.formats.date } ${ settings.formats.time }`,
+				date
+		  )
 		: __( 'Immediately' );
 }
 

@@ -51,7 +51,9 @@ describe( 'postcss-themes', () => {
 	} );
 
 	it( 'gather several declaration in a unique rule', () => {
-		return run( 'a{ color: theme( main ); background: theme(highlight); }' ).then( ( result ) => {
+		return run(
+			'a{ color: theme( main ); background: theme(highlight); }'
+		).then( ( result ) => {
 			expect( result.css ).toMatchSnapshot();
 			expect( result.warnings() ).toHaveLength( 0 );
 		} );

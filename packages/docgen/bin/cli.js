@@ -19,7 +19,8 @@ const optionator = require( 'optionator' )( {
 		{
 			option: 'ignore',
 			type: 'RegExp',
-			description: 'A regular expression used to ignore symbols whose name match it.',
+			description:
+				'A regular expression used to ignore symbols whose name match it.',
 		},
 		{
 			option: 'to-section',
@@ -46,7 +47,8 @@ const optionator = require( 'optionator' )( {
 			option: 'debug',
 			type: 'Boolean',
 			default: false,
-			description: 'Run in debug mode, which outputs some intermediate files useful for debugging.',
+			description:
+				'Run in debug mode, which outputs some intermediate files useful for debugging.',
 		},
 	],
 } );

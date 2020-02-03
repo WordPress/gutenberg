@@ -8,7 +8,12 @@ import classnames from 'classnames';
  */
 import { cloneElement, Children } from '@wordpress/element';
 
-function ResponsiveWrapper( { naturalWidth, naturalHeight, children, isInline = false } ) {
+function ResponsiveWrapper( {
+	naturalWidth,
+	naturalHeight,
+	children,
+	isInline = false,
+} ) {
 	if ( Children.count( children ) !== 1 ) {
 		return null;
 	}
@@ -20,7 +25,10 @@ function ResponsiveWrapper( { naturalWidth, naturalHeight, children, isInline = 
 		<TagName className="components-responsive-wrapper">
 			<TagName style={ imageStyle } />
 			{ cloneElement( children, {
-				className: classnames( 'components-responsive-wrapper__content', children.props.className ),
+				className: classnames(
+					'components-responsive-wrapper__content',
+					children.props.className
+				),
 			} ) }
 		</TagName>
 	);

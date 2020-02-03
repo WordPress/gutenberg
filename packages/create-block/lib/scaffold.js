@@ -16,7 +16,17 @@ const { hasWPScriptsEnabled, getOutputFiles } = require( './templates' );
 
 module.exports = async function(
 	templateName,
-	{ namespace, slug, title, description, dashicon, category, author, license, version }
+	{
+		namespace,
+		slug,
+		title,
+		description,
+		dashicon,
+		category,
+		author,
+		license,
+		version,
+	}
 ) {
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
@@ -41,11 +51,17 @@ module.exports = async function(
 	await Promise.all(
 		getOutputFiles( templateName ).map( async ( file ) => {
 			const template = await readFile(
-				join( __dirname, `templates/${ templateName }/${ file }.mustache` ),
+				join(
+					__dirname,
+					`templates/${ templateName }/${ file }.mustache`
+				),
 				'utf8'
 			);
 			// Output files can have names that depend on the slug provided.
-			const outputFilePath = `${ slug }/${ file.replace( /\$slug/g, slug ) }`;
+			const outputFilePath = `${ slug }/${ file.replace(
+				/\$slug/g,
+				slug
+			) }`;
 			await makeDir( dirname( outputFilePath ) );
 			writeFile( outputFilePath, render( template, view ) );
 		} )
@@ -56,7 +72,9 @@ module.exports = async function(
 	}
 
 	info( '' );
-	success( `Done: block "${ title }" bootstrapped in the "${ slug }" folder.` );
+	success(
+		`Done: block "${ title }" bootstrapped in the "${ slug }" folder.`
+	);
 	if ( hasWPScriptsEnabled( templateName ) ) {
 		info( '' );
 		info( 'Inside that directory, you can run several commands:' );

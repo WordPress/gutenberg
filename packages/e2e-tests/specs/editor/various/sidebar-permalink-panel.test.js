@@ -26,7 +26,9 @@ describe( 'Sidebar Permalink Panel', () => {
 	it( 'should not render permalink sidebar panel while the post is new', async () => {
 		await createNewPost();
 		await openDocumentSettingsSidebar();
-		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Permalink' )
+		).toBeUndefined();
 	} );
 
 	it( 'should render permalink sidebar panel after the post is published and allow its removal', async () => {
@@ -40,7 +42,9 @@ describe( 'Sidebar Permalink Panel', () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
 			removeEditorPanel( 'post-link' );
 		} );
-		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Permalink' )
+		).toBeUndefined();
 	} );
 
 	it( 'should not render link panel when post is publicly queryable but not public', async () => {
@@ -49,7 +53,9 @@ describe( 'Sidebar Permalink Panel', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
-		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Permalink' )
+		).toBeUndefined();
 	} );
 
 	it( 'should not render link panel when post is public but not publicly queryable', async () => {
@@ -58,7 +64,9 @@ describe( 'Sidebar Permalink Panel', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
-		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Permalink' )
+		).toBeUndefined();
 	} );
 
 	it( 'should render link panel when post is public and publicly queryable', async () => {

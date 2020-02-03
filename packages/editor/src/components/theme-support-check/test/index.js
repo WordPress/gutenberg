@@ -10,7 +10,9 @@ import { ThemeSupportCheck } from '../index';
 
 describe( 'ThemeSupportCheck', () => {
 	it( "should not render if there's no support check provided", () => {
-		const wrapper = shallow( <ThemeSupportCheck>foobar</ThemeSupportCheck> );
+		const wrapper = shallow(
+			<ThemeSupportCheck>foobar</ThemeSupportCheck>
+		);
 		expect( wrapper.type() ).toBe( null );
 	} );
 
@@ -20,7 +22,10 @@ describe( 'ThemeSupportCheck', () => {
 		};
 		const supportKeys = 'post-thumbnails';
 		const wrapper = shallow(
-			<ThemeSupportCheck supportKeys={ supportKeys } themeSupports={ themeSupports }>
+			<ThemeSupportCheck
+				supportKeys={ supportKeys }
+				themeSupports={ themeSupports }
+			>
 				foobar
 			</ThemeSupportCheck>
 		);
@@ -84,7 +89,10 @@ describe( 'ThemeSupportCheck', () => {
 		};
 		const supportKeys = 'post-thumbnails';
 		const wrapper = shallow(
-			<ThemeSupportCheck supportKeys={ supportKeys } themeSupports={ themeSupports }>
+			<ThemeSupportCheck
+				supportKeys={ supportKeys }
+				themeSupports={ themeSupports }
+			>
 				foobar
 			</ThemeSupportCheck>
 		);

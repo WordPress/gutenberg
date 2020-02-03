@@ -14,7 +14,10 @@ import styles from './styles.scss';
 
 function PreformattedEdit( props ) {
 	const { getStylesFromColorScheme } = props;
-	const richTextStyle = getStylesFromColorScheme( styles.wpRichTextLight, styles.wpRichTextDark );
+	const richTextStyle = getStylesFromColorScheme(
+		styles.wpRichTextLight,
+		styles.wpRichTextDark
+	);
 	const wpBlockPreformatted = getStylesFromColorScheme(
 		styles.wpBlockPreformattedLight,
 		styles.wpBlockPreformattedDark

@@ -25,7 +25,10 @@ class WpEmbedPreview extends Component {
 	checkFocus() {
 		const { activeElement } = document;
 
-		if ( activeElement.tagName !== 'IFRAME' || activeElement.parentNode !== this.node.current ) {
+		if (
+			activeElement.tagName !== 'IFRAME' ||
+			activeElement.parentNode !== this.node.current
+		) {
 			return;
 		}
 

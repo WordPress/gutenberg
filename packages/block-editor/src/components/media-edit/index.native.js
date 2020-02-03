@@ -2,7 +2,10 @@
  * External dependencies
  */
 import React from 'react';
-import { requestMediaEditor, mediaSources } from 'react-native-gutenberg-bridge';
+import {
+	requestMediaEditor,
+	mediaSources,
+} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -75,7 +78,10 @@ export class MediaEdit extends React.Component {
 			/>
 		);
 
-		return this.props.render( { open: this.onPickerPresent, mediaOptions } );
+		return this.props.render( {
+			open: this.onPickerPresent,
+			mediaOptions,
+		} );
 	}
 }
 

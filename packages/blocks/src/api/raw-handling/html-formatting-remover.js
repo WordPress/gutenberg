@@ -4,7 +4,12 @@
 import { getSibling } from './utils';
 
 function isFormattingSpace( character ) {
-	return character === ' ' || character === '\r' || character === '\n' || character === '\t';
+	return (
+		character === ' ' ||
+		character === '\r' ||
+		character === '\n' ||
+		character === '\t'
+	);
 }
 
 /**

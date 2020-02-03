@@ -34,7 +34,9 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 		breakpoints,
 		( result, width, name ) => {
 			forEach( operators, ( condition, operator ) => {
-				const list = window.matchMedia( `(${ condition }: ${ width }px)` );
+				const list = window.matchMedia(
+					`(${ condition }: ${ width }px)`
+				);
 				list.addListener( setIsMatching );
 
 				const key = [ operator, name ].join( ' ' );

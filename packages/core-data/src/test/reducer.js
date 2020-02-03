@@ -42,7 +42,10 @@ describe( 'entities', () => {
 	it( 'returns the default state for all defined entities', () => {
 		const state = entities( undefined, {} );
 
-		expect( state.data.root.postType.queriedData ).toEqual( { items: {}, queries: {} } );
+		expect( state.data.root.postType.queriedData ).toEqual( {
+			items: {},
+			queries: {},
+		} );
 	} );
 
 	it( 'returns with received post types by slug', () => {
@@ -141,7 +144,11 @@ describe( 'undo', () => {
 			// We need to "apply" the undo level here and build
 			// the action to move the offset.
 			lastEdits =
-				undoState[ undoState.length + undoState.offset - ( args[ 0 ] === 'isUndo' ? 2 : 0 ) ].edits;
+				undoState[
+					undoState.length +
+						undoState.offset -
+						( args[ 0 ] === 'isUndo' ? 2 : 0 )
+				].edits;
 			action = {
 				type: 'EDIT_ENTITY_RECORD',
 				meta: {
@@ -172,7 +179,10 @@ describe( 'undo', () => {
 		// Check that the first edit creates an undo level for the current state and
 		// one for the new one.
 		undoState = createNextUndoState( { value: 1 } );
-		expectedUndoState.push( createEditActionPart( {} ), createEditActionPart( { value: 1 } ) );
+		expectedUndoState.push(
+			createEditActionPart( {} ),
+			createEditActionPart( { value: 1 } )
+		);
 		expect( undoState ).toEqual( expectedUndoState );
 
 		// Check that the second and third edits just create an undo level for
@@ -233,7 +243,10 @@ describe( 'undo', () => {
 	it( 'handles flattened undos/redos', () => {
 		undoState = createNextUndoState();
 		undoState = createNextUndoState( { value: 1 } );
-		undoState = createNextUndoState( { transientValue: 2 }, { transientValue: true } );
+		undoState = createNextUndoState(
+			{ transientValue: 2 },
+			{ transientValue: true }
+		);
 		undoState = createNextUndoState( { value: 3 } );
 		expectedUndoState.push(
 			createEditActionPart( {} ),
@@ -250,14 +263,22 @@ describe( 'undo', () => {
 		// transient edits.
 		undoState = createNextUndoState( { value: 1 } );
 		undoState = createNextUndoState( 'isCreate' );
-		expectedUndoState.push( createEditActionPart( {} ), createEditActionPart( { value: 1 } ) );
+		expectedUndoState.push(
+			createEditActionPart( {} ),
+			createEditActionPart( { value: 1 } )
+		);
 		expect( undoState ).toEqual( expectedUndoState );
 
 		// Check that transient edits are merged into the last
 		// edits.
-		undoState = createNextUndoState( { transientValue: 2 }, { transientValue: true } );
+		undoState = createNextUndoState(
+			{ transientValue: 2 },
+			{ transientValue: true }
+		);
 		undoState = createNextUndoState( 'isCreate' );
-		expectedUndoState[ expectedUndoState.length - 1 ].edits.transientValue = 2;
+		expectedUndoState[
+			expectedUndoState.length - 1
+		].edits.transientValue = 2;
 		expect( undoState ).toEqual( expectedUndoState );
 
 		// Check that undo levels are created with the latest action,
@@ -273,7 +294,10 @@ describe( 'undo', () => {
 	it( 'explicitly creates an undo level when undoing while there are pending transient edits', () => {
 		undoState = createNextUndoState();
 		undoState = createNextUndoState( { value: 1 } );
-		undoState = createNextUndoState( { transientValue: 2 }, { transientValue: true } );
+		undoState = createNextUndoState(
+			{ transientValue: 2 },
+			{ transientValue: true }
+		);
 		undoState = createNextUndoState( 'isUndo' );
 		expectedUndoState.push(
 			createEditActionPart( {} ),

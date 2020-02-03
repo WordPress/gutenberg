@@ -30,7 +30,9 @@ function getDeprecatedLayoutColumn( originalContent ) {
 
 	doc.body.innerHTML = originalContent;
 	for ( const classListItem of doc.body.firstChild.classList ) {
-		if ( ( columnMatch = classListItem.match( /^layout-column-(\d+)$/ ) ) ) {
+		if (
+			( columnMatch = classListItem.match( /^layout-column-(\d+)$/ ) )
+		) {
 			return Number( columnMatch[ 1 ] ) - 1;
 		}
 	}
@@ -60,7 +62,9 @@ export default [
 			// Only if the fast pass is considered eligible is the more
 			// accurate, durable, slower condition performed.
 			return innerBlocks.some(
-				( innerBlock ) => getDeprecatedLayoutColumn( innerBlock.originalContent ) !== undefined
+				( innerBlock ) =>
+					getDeprecatedLayoutColumn( innerBlock.originalContent ) !==
+					undefined
 			);
 		},
 		migrate( attributes, innerBlocks ) {

@@ -35,7 +35,9 @@ describe( 'BlockMover', () => {
 					instanceId={ 1 }
 				/>
 			);
-			expect( blockMover.hasClass( 'block-editor-block-mover' ) ).toBe( true );
+			expect( blockMover.hasClass( 'block-editor-block-mover' ) ).toBe(
+				true
+			);
 
 			const moveUp = blockMover.childAt( 0 );
 			const drag = blockMover.childAt( 1 );
@@ -51,7 +53,8 @@ describe( 'BlockMover', () => {
 				label: 'Move up',
 				icon: chevronUp,
 				'aria-disabled': undefined,
-				'aria-describedby': 'block-editor-block-mover__up-description-1',
+				'aria-describedby':
+					'block-editor-block-mover__up-description-1',
 			} );
 			expect( moveDown.props() ).toMatchObject( {
 				className: 'block-editor-block-mover__control',
@@ -59,10 +62,15 @@ describe( 'BlockMover', () => {
 				label: 'Move down',
 				icon: chevronDown,
 				'aria-disabled': undefined,
-				'aria-describedby': 'block-editor-block-mover__down-description-1',
+				'aria-describedby':
+					'block-editor-block-mover__down-description-1',
 			} );
-			expect( moveUpDesc.text() ).toBe( 'Move 2 blocks from position 1 up by one place' );
-			expect( moveDownDesc.text() ).toBe( 'Move 2 blocks from position 1 down by one place' );
+			expect( moveUpDesc.text() ).toBe(
+				'Move 2 blocks from position 1 up by one place'
+			);
+			expect( moveDownDesc.text() ).toBe(
+				'Move 2 blocks from position 1 down by one place'
+			);
 		} );
 
 		it( 'should render the up arrow with a onMoveUp callback', () => {

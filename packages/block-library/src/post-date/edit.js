@@ -10,7 +10,9 @@ function PostDateDisplay() {
 	const settings = __experimentalGetSettings();
 
 	return date ? (
-		<time dateTime={ dateI18n( 'c', date ) }>{ dateI18n( settings.formats.date, date ) }</time>
+		<time dateTime={ dateI18n( 'c', date ) }>
+			{ dateI18n( settings.formats.date, date ) }
+		</time>
 	) : (
 		__( 'No Date' )
 	);

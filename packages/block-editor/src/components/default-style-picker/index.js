@@ -12,13 +12,25 @@ import { SelectControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 export default function DefaultStylePicker( { blockName } ) {
-	const { preferredStyle, onUpdatePreferredStyleVariations, styles } = useSelect(
+	const {
+		preferredStyle,
+		onUpdatePreferredStyleVariations,
+		styles,
+	} = useSelect(
 		( select ) => {
 			const settings = select( 'core/block-editor' ).getSettings();
-			const preferredStyleVariations = settings.__experimentalPreferredStyleVariations;
+			const preferredStyleVariations =
+				settings.__experimentalPreferredStyleVariations;
 			return {
-				preferredStyle: get( preferredStyleVariations, [ 'value', blockName ] ),
-				onUpdatePreferredStyleVariations: get( preferredStyleVariations, [ 'onChange' ], null ),
+				preferredStyle: get( preferredStyleVariations, [
+					'value',
+					blockName,
+				] ),
+				onUpdatePreferredStyleVariations: get(
+					preferredStyleVariations,
+					[ 'onChange' ],
+					null
+				),
 				styles: select( 'core/blocks' ).getBlockStyles( blockName ),
 			};
 		},

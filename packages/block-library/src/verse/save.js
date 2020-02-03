@@ -15,5 +15,11 @@ export default function save( { attributes } ) {
 		[ `has-text-align-${ textAlign }` ]: textAlign,
 	} );
 
-	return <RichText.Content tagName="pre" className={ className } value={ content } />;
+	return (
+		<RichText.Content
+			tagName="pre"
+			className={ className }
+			value={ content }
+		/>
+	);
 }

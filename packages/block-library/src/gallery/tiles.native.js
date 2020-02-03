@@ -47,7 +47,8 @@ function Tiles( props ) {
 		 */
 
 		const row = Math.floor( index / columns );
-		const rowLength = row === lastRow ? ( lastTile % columns ) + 1 : columns;
+		const rowLength =
+			row === lastRow ? ( lastTile % columns ) + 1 : columns;
 		const indexInRow = index % columns;
 
 		return (
@@ -57,7 +58,8 @@ function Tiles( props ) {
 					{
 						width: `${ 100 / rowLength }%`,
 						paddingLeft: spacing * ( indexInRow / rowLength ),
-						paddingRight: spacing * ( 1 - ( indexInRow + 1 ) / rowLength ),
+						paddingRight:
+							spacing * ( 1 - ( indexInRow + 1 ) / rowLength ),
 						paddingTop: row === 0 ? 0 : spacing / 2,
 						paddingBottom: row === lastRow ? 0 : spacing / 2,
 					},

@@ -49,7 +49,8 @@ function ResponsiveBlockControl( props ) {
 
 	/* translators: 'Toggle control label. Should the property be the same across all screen sizes or unique per screen size.'. %s property value for the control (eg: margin, padding...etc) */
 	const toggleControlLabel =
-		toggleLabel || sprintf( __( 'Use the same %s on all screensizes.' ), property );
+		toggleLabel ||
+		sprintf( __( 'Use the same %s on all screensizes.' ), property );
 
 	/* translators: 'Help text for the responsive mode toggle control.' */
 	const toggleHelpText = __(
@@ -57,7 +58,10 @@ function ResponsiveBlockControl( props ) {
 	);
 
 	const defaultControl = renderDefaultControl(
-		<ResponsiveBlockControlLabel property={ property } viewport={ defaultLabel } />,
+		<ResponsiveBlockControlLabel
+			property={ property }
+			viewport={ defaultLabel }
+		/>,
 		defaultLabel
 	);
 
@@ -65,7 +69,10 @@ function ResponsiveBlockControl( props ) {
 		return viewports.map( ( viewport ) => (
 			<Fragment key={ viewport.id }>
 				{ renderDefaultControl(
-					<ResponsiveBlockControlLabel property={ property } viewport={ viewport } />,
+					<ResponsiveBlockControlLabel
+						property={ property }
+						viewport={ viewport }
+					/>,
 					viewport
 				) }
 			</Fragment>
@@ -74,7 +81,9 @@ function ResponsiveBlockControl( props ) {
 
 	return (
 		<fieldset className="block-editor-responsive-block-control">
-			<legend className="block-editor-responsive-block-control__title">{ title }</legend>
+			<legend className="block-editor-responsive-block-control__title">
+				{ title }
+			</legend>
 
 			<div className="block-editor-responsive-block-control__inner">
 				<ToggleControl

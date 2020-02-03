@@ -30,8 +30,9 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
-import { Fragment, useState, useEffect } from '@wordpress/element';
-
+import { isURL, prependHTTP } from '@wordpress/url';
+import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
@@ -46,7 +47,14 @@ function NavigationLinkEdit( {
 	showSubmenuIcon,
 	insertLinkBlock,
 } ) {
-	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
+	const {
+		label,
+		opensInNewTab,
+		title,
+		url,
+		nofollow,
+		description,
+	} = attributes;
 	const link = {
 		title: title ? unescape( title ) : '',
 		url,
@@ -54,6 +62,7 @@ function NavigationLinkEdit( {
 	};
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const itemLabelPlaceholder = __( 'Add link…' );
+	const ref = useRef();
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -65,6 +74,49 @@ function NavigationLinkEdit( {
 		}
 	}, [] );
 
+	/**
+	 * The hook shouldn't be necessary but due to a focus loss happening
+	 * when selecting a suggestion in the link popover, we force close on block unselection.
+	 */
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsLinkOpen( false );
+		}
+	}, [ isSelected ] );
+
+	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
+	useEffect( () => {
+		if ( isLinkOpen && url ) {
+			// Close the link.
+			setIsLinkOpen( false );
+
+			// Does this look like a URL and have something TLD-ish?
+			if (
+				isURL( prependHTTP( label ) ) &&
+				/^.+\.[a-z]+/.test( label )
+			) {
+				// Focus and select the label text.
+				selectLabelText();
+			} else {
+				// Focus it (but do not select).
+				placeCaretAtHorizontalEdge( ref.current, true );
+			}
+		}
+	}, [ url ] );
+
+	/**
+	 * Focus the navigation link label text and select it.
+	 */
+	function selectLabelText() {
+		ref.current.focus();
+		const selection = window.getSelection();
+		const range = document.createRange();
+		// Get the range of the current ref contents so we can add this range to the selection.
+		range.selectNodeContents( ref.current );
+		selection.removeAllRanges();
+		selection.addRange( range );
+	}
+
 	return (
 		<Fragment>
 			<BlockControls>
@@ -72,7 +124,8 @@ function NavigationLinkEdit( {
 					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
-							[ rawShortcut.primary( 'k' ) ]: () => setIsLinkOpen( true ),
+							[ rawShortcut.primary( 'k' ) ]: () =>
+								setIsLinkOpen( true ),
 						} }
 					/>
 					<ToolbarButton
@@ -98,7 +151,9 @@ function NavigationLinkEdit( {
 							setAttributes( { title: titleValue } );
 						} }
 						label={ __( 'Title Attribute' ) }
-						help={ __( 'Provide more context about where the link goes.' ) }
+						help={ __(
+							'Provide more context about where the link goes.'
+						) }
 					/>
 					<ToggleControl
 						checked={ nofollow }
@@ -108,10 +163,14 @@ function NavigationLinkEdit( {
 						label={ __( 'Add nofollow to link' ) }
 						help={
 							<Fragment>
-								{ __( "Don't let search engines follow this link." ) }
+								{ __(
+									"Don't let search engines follow this link."
+								) }
 								<ExternalLink
 									className="wp-block-navigation-link__nofollow-external-link"
-									href={ __( 'https://codex.wordpress.org/Nofollow' ) }
+									href={ __(
+										'https://codex.wordpress.org/Nofollow'
+									) }
 								>
 									{ __( "What's this?" ) }
 								</ExternalLink>
@@ -141,19 +200,32 @@ function NavigationLinkEdit( {
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
+						ref={ ref }
 						tagName="span"
 						className="wp-block-navigation-link__label"
 						value={ label }
-						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
+						onChange={ ( labelValue ) =>
+							setAttributes( { label: labelValue } )
+						}
 						placeholder={ itemLabelPlaceholder }
 						withoutInteractiveFormatting
-						allowedFormats={ [ 'core/bold', 'core/italic', 'core/image', 'core/strikethrough' ] }
+						allowedFormats={ [
+							'core/bold',
+							'core/italic',
+							'core/image',
+							'core/strikethrough',
+						] }
 					/>
 					{ showSubmenuIcon && (
-						<span className="wp-block-navigation-link__submenu-icon">{ itemSubmenuIcon }</span>
+						<span className="wp-block-navigation-link__submenu-icon">
+							{ itemSubmenuIcon }
+						</span>
 					) }
 					{ isLinkOpen && (
-						<Popover position="bottom center" onClose={ () => setIsLinkOpen( false ) }>
+						<Popover
+							position="bottom center"
+							onClose={ () => setIsLinkOpen( false ) }
+						>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
@@ -168,16 +240,26 @@ function NavigationLinkEdit( {
 										title: escape( newTitle ),
 										url: encodeURI( newURL ),
 										label: ( () => {
-											const normalizedTitle = newTitle.replace( /http(s?):\/\//gi, '' );
-											const normalizedURL = newURL.replace( /http(s?):\/\//gi, '' );
+											const normalizedTitle = newTitle.replace(
+												/http(s?):\/\//gi,
+												''
+											);
+											const normalizedURL = newURL.replace(
+												/http(s?):\/\//gi,
+												''
+											);
 											if (
 												newTitle !== '' &&
-												normalizedTitle !== normalizedURL &&
+												normalizedTitle !==
+													normalizedURL &&
 												label !== newTitle
 											) {
 												return escape( newTitle );
+											} else if ( label ) {
+												return label;
 											}
-											return label;
+											// If there's no label, add the URL.
+											return escape( normalizedURL );
 										} )(),
 										opensInNewTab: newOpensInNewTab,
 										id,
@@ -190,7 +272,8 @@ function NavigationLinkEdit( {
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
 					renderAppender={
-						( hasDescendants && isSelected ) || isParentOfSelectedBlock
+						( hasDescendants && isSelected ) ||
+						isParentOfSelectedBlock
 							? InnerBlocks.DefaultAppender
 							: false
 					}
@@ -213,9 +296,13 @@ export default compose( [
 		const rootBlock = getBlockParents( clientId )[ 0 ];
 		const parentBlock = getBlockParents( clientId, true )[ 0 ];
 		const rootBlockAttributes = getBlockAttributes( rootBlock );
-		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] ).length;
+		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
+			.length;
 		const isLevelZero = getBlockName( parentBlock ) === 'core/navigation';
-		const showSubmenuIcon = rootBlockAttributes.showSubmenuIcon && isLevelZero && hasDescendants;
+		const showSubmenuIcon =
+			rootBlockAttributes.showSubmenuIcon &&
+			isLevelZero &&
+			hasDescendants;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
 		return {
@@ -231,7 +318,9 @@ export default compose( [
 
 				const { insertBlock } = dispatch( 'core/block-editor' );
 
-				const { getClientIdsOfDescendants } = registry.select( 'core/block-editor' );
+				const { getClientIdsOfDescendants } = registry.select(
+					'core/block-editor'
+				);
 				const navItems = getClientIdsOfDescendants( [ clientId ] );
 				const insertionPoint = navItems.length ? navItems.length : 0;
 

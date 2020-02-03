@@ -20,13 +20,27 @@ const ICON_SIZE = 24;
 
 const Button = withPreferredColorScheme(
 	( { icon, onPress, title, isPrimary, getStylesFromColorScheme } ) => {
-		const titleStyle = getStylesFromColorScheme( styles.title, styles.titleDark );
+		const titleStyle = getStylesFromColorScheme(
+			styles.title,
+			styles.titleDark
+		);
 		return (
 			<TouchableOpacity onPress={ onPress }>
 				{ icon ? (
-					<Icon icon={ icon } size={ ICON_SIZE } style={ styles.icon } />
+					<Icon
+						icon={ icon }
+						size={ ICON_SIZE }
+						style={ styles.icon }
+					/>
 				) : (
-					<Text style={ [ titleStyle, isPrimary && styles.titlePrimary ] }>{ title }</Text>
+					<Text
+						style={ [
+							titleStyle,
+							isPrimary && styles.titlePrimary,
+						] }
+					>
+						{ title }
+					</Text>
 				) }
 			</TouchableOpacity>
 		);

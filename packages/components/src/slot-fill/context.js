@@ -6,7 +6,13 @@ import { sortBy, forEach, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createContext, useContext, useState, useEffect } from '@wordpress/element';
+import {
+	Component,
+	createContext,
+	useContext,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 
 const SlotFillContext = createContext( {
 	registerSlot: () => {},
@@ -132,7 +138,11 @@ class SlotFillProvider extends Component {
 	}
 
 	render() {
-		return <Provider value={ this.contextValue }>{ this.props.children }</Provider>;
+		return (
+			<Provider value={ this.contextValue }>
+				{ this.props.children }
+			</Provider>
+		);
 	}
 }
 
