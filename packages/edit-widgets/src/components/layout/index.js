@@ -7,6 +7,7 @@ import {
 	DropZoneProvider,
 	Popover,
 	SlotFillProvider,
+	__experimentalSlotFillProvider as SlotFillProvider2,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
@@ -23,28 +24,30 @@ function Layout( { blockEditorSettings } ) {
 	const [ selectedArea, setSelectedArea ] = useState( null );
 	return (
 		<SlotFillProvider>
-			<DropZoneProvider>
-				<BlockEditorKeyboardShortcuts.Register />
-				<Header />
-				<Sidebar />
-				<Notices />
-				<div
-					className="edit-widgets-layout__content"
-					role="region"
-					aria-label={ __( 'Widgets screen content' ) }
-					tabIndex="-1"
-					onFocus={ () => {
-						setSelectedArea( null );
-					} }
-				>
-					<WidgetAreas
-						selectedArea={ selectedArea }
-						setSelectedArea={ setSelectedArea }
-						blockEditorSettings={ blockEditorSettings }
-					/>
-				</div>
-				<Popover.Slot />
-			</DropZoneProvider>
+			<SlotFillProvider2>
+				<DropZoneProvider>
+					<BlockEditorKeyboardShortcuts.Register />
+					<Header />
+					<Sidebar />
+					<Notices />
+					<div
+						className="edit-widgets-layout__content"
+						role="region"
+						aria-label={ __( 'Widgets screen content' ) }
+						tabIndex="-1"
+						onFocus={ () => {
+							setSelectedArea( null );
+						} }
+					>
+						<WidgetAreas
+							selectedArea={ selectedArea }
+							setSelectedArea={ setSelectedArea }
+							blockEditorSettings={ blockEditorSettings }
+						/>
+					</div>
+					<Popover.Slot />
+				</DropZoneProvider>
+			</SlotFillProvider2>
 		</SlotFillProvider>
 	);
 }

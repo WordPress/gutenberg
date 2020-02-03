@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, ToolbarGroup } from '@wordpress/components';
+import { Button, ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -107,15 +107,12 @@ export class BlockMover extends Component {
 					'is-horizontal': orientation === 'horizontal',
 				} ) }
 			>
-				<Button
+				<ToolbarButton
 					className="block-editor-block-mover__control"
 					onClick={ isFirst ? null : onMoveUp }
 					icon={ getArrowIcon( 'up' ) }
 					// translators: %s: Horizontal direction of block movement ( left, right )
-					label={ sprintf(
-						__( 'Move %s' ),
-						getMovementDirection( 'up' )
-					) }
+					label={ sprintf( __( 'Move %s' ), getMovementDirection( 'up' ) ) }
 					aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
 					aria-disabled={ isFirst }
 					onFocus={ this.onFocus }
@@ -134,19 +131,17 @@ export class BlockMover extends Component {
 							onDragStart={ onDraggableStart }
 							onDragEnd={ onDraggableEnd }
 							draggable
+							data-experimental-toolbar-item
 						/>
 					) }
 				</BlockDraggable>
 
-				<Button
+				<ToolbarButton
 					className="block-editor-block-mover__control"
 					onClick={ isLast ? null : onMoveDown }
 					icon={ getArrowIcon( 'down' ) }
 					// translators: %s: Horizontal direction of block movement ( left, right )
-					label={ sprintf(
-						__( 'Move %s' ),
-						getMovementDirection( 'down' )
-					) }
+					label={ sprintf( __( 'Move %s' ), getMovementDirection( 'down' ) ) }
 					aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
 					aria-disabled={ isLast }
 					onFocus={ this.onFocus }

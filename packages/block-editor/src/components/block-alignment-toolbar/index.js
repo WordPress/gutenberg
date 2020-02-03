@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
+import { ToolbarGroup } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import {
@@ -58,16 +58,14 @@ export function BlockAlignmentToolbar( {
 
 	const enabledControls = wideControlsEnabled
 		? controls
-		: controls.filter(
-				( control ) => WIDE_CONTROLS.indexOf( control ) === -1
-		  );
+		: controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
 
 	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value ];
 	const defaultAlignmentControl =
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	return (
-		<Toolbar
+		<ToolbarGroup
 			isCollapsed={ isCollapsed }
 			icon={
 				activeAlignmentControl

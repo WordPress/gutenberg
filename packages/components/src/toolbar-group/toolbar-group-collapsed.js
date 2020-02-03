@@ -19,7 +19,7 @@ function ToolbarGroupCollapsed( { controls = [], ...props } ) {
 		<DropdownMenu
 			hasArrowIndicator
 			controls={ controls }
-			toggleProps={ toggleProps }
+			toggleProps={ { ...toggleProps, 'data-experimental-toolbar-item': true } }
 			{ ...props }
 		/>
 	);

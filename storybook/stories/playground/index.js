@@ -13,6 +13,7 @@ import {
 import {
 	Popover,
 	SlotFillProvider,
+	__experimentalSlotFillProvider as SlotFillProvider2,
 	DropZoneProvider,
 } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
@@ -33,26 +34,28 @@ function App() {
 	return (
 		<div className="playground">
 			<SlotFillProvider>
-				<DropZoneProvider>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ updateBlocks }
-						onChange={ updateBlocks }
-					>
-						<div className="playground__sidebar">
-							<BlockInspector />
-						</div>
-						<div className="editor-styles-wrapper">
-							<BlockEditorKeyboardShortcuts />
-							<WritingFlow>
-								<ObserveTyping>
-									<BlockList />
-								</ObserveTyping>
-							</WritingFlow>
-						</div>
-						<Popover.Slot />
-					</BlockEditorProvider>
-				</DropZoneProvider>
+				<SlotFillProvider2>
+					<DropZoneProvider>
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ updateBlocks }
+							onChange={ updateBlocks }
+						>
+							<div className="playground__sidebar">
+								<BlockInspector />
+							</div>
+							<div className="editor-styles-wrapper">
+								<BlockEditorKeyboardShortcuts />
+								<WritingFlow>
+									<ObserveTyping>
+										<BlockList />
+									</ObserveTyping>
+								</WritingFlow>
+							</div>
+							<Popover.Slot />
+						</BlockEditorProvider>
+					</DropZoneProvider>
+				</SlotFillProvider2>
 			</SlotFillProvider>
 		</div>
 	);

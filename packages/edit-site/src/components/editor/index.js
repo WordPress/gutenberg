@@ -4,6 +4,7 @@
 import { useSelect } from '@wordpress/data';
 import {
 	SlotFillProvider,
+	__experimentalSlotFillProvider as SlotFillProvider2,
 	DropZoneProvider,
 	Popover,
 	navigateRegions,
@@ -30,19 +31,21 @@ function Editor( { settings } ) {
 	);
 	return template ? (
 		<SlotFillProvider>
-			<DropZoneProvider>
-				<EntityProvider
-					kind="postType"
-					type="wp_template"
-					id={ settings.templateId }
-				>
-					<Notices />
-					<Header />
-					<Sidebar />
-					<BlockEditor settings={ settings } />
-					<Popover.Slot />
-				</EntityProvider>
-			</DropZoneProvider>
+			<SlotFillProvider2>
+				<DropZoneProvider>
+					<EntityProvider
+						kind="postType"
+						type="wp_template"
+						id={ settings.templateId }
+					>
+						<Notices />
+						<Header />
+						<Sidebar />
+						<BlockEditor settings={ settings } />
+						<Popover.Slot />
+					</EntityProvider>
+				</DropZoneProvider>
+			</SlotFillProvider2>
 		</SlotFillProvider>
 	) : null;
 }

@@ -83,14 +83,8 @@ export default function BlockToolbar() {
 			{ mode === 'visual' && isValid && (
 				<>
 					<BlockSwitcher clientIds={ blockClientIds } />
-					<BlockControls.Slot
-						bubblesVirtually
-						className="block-editor-block-toolbar__slot"
-					/>
-					<BlockFormatControls.Slot
-						bubblesVirtually
-						className="block-editor-block-toolbar__slot"
-					/>
+					<BlockControls.Slot className="block-editor-block-toolbar__slot" />
+					<BlockFormatControls.Slot className="block-editor-block-toolbar__slot" />
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />

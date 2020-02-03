@@ -47,6 +47,7 @@ function ToolbarButton( {
 					) }
 					isPressed={ props.isActive }
 					disabled={ props.isDisabled }
+					data-experimental-toolbar-item
 					{ ...extraProps }
 				/>
 				{ children }

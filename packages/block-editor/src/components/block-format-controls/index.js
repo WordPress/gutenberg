@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import { useContext } from '@wordpress/element';
+import {
+	__experimentalCreateSlotFill as createSlotFill,
+	__experimentalToolbarContext as ToolbarContext,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -10,8 +14,25 @@ import { ifBlockEditSelected } from '../block-edit/context';
 
 const { Fill, Slot } = createSlotFill( 'BlockFormatControls' );
 
-const BlockFormatControls = ifBlockEditSelected( Fill );
+function BlockFormatControlsSlot( props ) {
+	const accessibleToolbarState = useContext( ToolbarContext );
+	return <Slot { ...props } fillProps={ accessibleToolbarState || null } />;
+}
 
-BlockFormatControls.Slot = Slot;
+function BlockFormatControlsFill( props ) {
+	return (
+		<Fill { ...props }>
+			{ ( fillProps ) => (
+				<ToolbarContext.Provider value={ fillProps }>
+					{ props.children }
+				</ToolbarContext.Provider>
+			) }
+		</Fill>
+	);
+}
+
+const BlockFormatControls = ifBlockEditSelected( BlockFormatControlsFill );
+
+BlockFormatControls.Slot = BlockFormatControlsSlot;
 
 export default BlockFormatControls;

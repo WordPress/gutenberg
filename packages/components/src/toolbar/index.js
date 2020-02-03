@@ -4,6 +4,11 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import ToolbarGroup from '../toolbar-group';
@@ -16,8 +21,9 @@ import ToolbarContainer from './toolbar-container';
  *
  * @param {Object} props             Component props.
  * @param {string} [props.className] Class to set on the container div.
+ * @param {Object} ref               React Element ref.
  */
-function Toolbar( { className, __experimentalAccessibilityLabel, ...props } ) {
+function Toolbar( { className, __experimentalAccessibilityLabel, ...props }, ref ) {
 	if ( __experimentalAccessibilityLabel ) {
 		return (
 			<ToolbarContainer
@@ -27,6 +33,7 @@ function Toolbar( { className, __experimentalAccessibilityLabel, ...props } ) {
 					className
 				) }
 				accessibilityLabel={ __experimentalAccessibilityLabel }
+				ref={ ref }
 				{ ...props }
 			/>
 		);
@@ -35,4 +42,4 @@ function Toolbar( { className, __experimentalAccessibilityLabel, ...props } ) {
 	return <ToolbarGroup { ...props } className={ className } />;
 }
 
-export default Toolbar;
+export default forwardRef( Toolbar );

@@ -9,8 +9,8 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	Dropdown,
-	Button,
-	Toolbar,
+	ToolbarButton,
+	ToolbarGroup,
 	PanelBody,
 	Path,
 	SVG,
@@ -92,14 +92,14 @@ export class BlockSwitcher extends Component {
 
 		if ( ! hasBlockStyles && ! possibleBlockTransformations.length ) {
 			return (
-				<Toolbar>
-					<Button
+				<ToolbarGroup>
+					<ToolbarButton
 						disabled
 						className="block-editor-block-switcher__no-switcher-icon"
 						label={ __( 'Block icon' ) }
 						icon={ <BlockIcon icon={ icon } showColors /> }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 			);
 		}
 
@@ -120,17 +120,13 @@ export class BlockSwitcher extends Component {
 						1 === blocks.length
 							? __( 'Change block type or style' )
 							: sprintf(
-									_n(
-										'Change type of %d block',
-										'Change type of %d blocks',
-										blocks.length
-									),
-									blocks.length
-							  );
+								_n( 'Change type of %d block', 'Change type of %d blocks', blocks.length ),
+								blocks.length
+							);
 
 					return (
-						<Toolbar>
-							<Button
+						<ToolbarGroup>
+							<ToolbarButton
 								className="block-editor-block-switcher__toggle"
 								onClick={ onToggle }
 								aria-haspopup="true"
@@ -151,44 +147,30 @@ export class BlockSwitcher extends Component {
 									</>
 								}
 							/>
-						</Toolbar>
+						</ToolbarGroup>
 					);
 				} }
 				renderContent={ ( { onClose } ) => (
 					<>
-						{ ( hasBlockStyles ||
-							possibleBlockTransformations.length !== 0 ) && (
+						{ ( hasBlockStyles || possibleBlockTransformations.length !== 0 ) && (
 							<div className="block-editor-block-switcher__container">
 								{ hasBlockStyles && (
-									<PanelBody
-										title={ __( 'Block Styles' ) }
-										initialOpen
-									>
+									<PanelBody title={ __( 'Block Styles' ) } initialOpen>
 										<BlockStyles
 											clientId={ blocks[ 0 ].clientId }
 											onSwitch={ onClose }
-											onHoverClassName={
-												this.onHoverClassName
-											}
+											onHoverClassName={ this.onHoverClassName }
 										/>
 									</PanelBody>
 								) }
 								{ possibleBlockTransformations.length !== 0 && (
-									<PanelBody
-										title={ __( 'Transform To:' ) }
-										initialOpen
-									>
+									<PanelBody title={ __( 'Transform To:' ) } initialOpen>
 										<BlockTypesList
-											items={ possibleBlockTransformations.map(
-												( destinationBlockType ) => ( {
-													id:
-														destinationBlockType.name,
-													icon:
-														destinationBlockType.icon,
-													title:
-														destinationBlockType.title,
-												} )
-											) }
+											items={ possibleBlockTransformations.map( ( destinationBlockType ) => ( {
+												id: destinationBlockType.name,
+												icon: destinationBlockType.icon,
+												title: destinationBlockType.title,
+											} ) ) }
 											onSelect={ ( item ) => {
 												onTransform( blocks, item.id );
 												onClose();
@@ -207,24 +189,16 @@ export class BlockSwitcher extends Component {
 									viewportWidth={ 500 }
 									blocks={
 										hoveredBlockType.example
-											? getBlockFromExample(
-													hoveredBlock.name,
-													{
-														attributes: {
-															...hoveredBlockType
-																.example
-																.attributes,
-															className: hoveredClassName,
-														},
-														innerBlocks:
-															hoveredBlockType
-																.example
-																.innerBlocks,
-													}
-											  )
-											: cloneBlock( hoveredBlock, {
+											? getBlockFromExample( hoveredBlock.name, {
+												attributes: {
+													...hoveredBlockType.example.attributes,
 													className: hoveredClassName,
-											  } )
+												},
+												innerBlocks: hoveredBlockType.example.innerBlocks,
+											} )
+											: cloneBlock( hoveredBlock, {
+												className: hoveredClassName,
+											} )
 									}
 								/>
 							</div>
