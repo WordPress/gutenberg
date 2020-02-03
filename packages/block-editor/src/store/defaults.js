@@ -157,27 +157,32 @@ export const SETTINGS_DEFAULTS = {
 	gradients: [
 		{
 			name: __( 'Vivid cyan blue to vivid purple' ),
-			gradient: 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
+			gradient:
+				'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
 			slug: 'vivid-cyan-blue-to-vivid-purple',
 		},
 		{
 			name: __( 'Light green cyan to vivid green cyan' ),
-			gradient: 'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)',
+			gradient:
+				'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)',
 			slug: 'light-green-cyan-to-vivid-green-cyan',
 		},
 		{
 			name: __( 'Luminous vivid amber to luminous vivid orange' ),
-			gradient: 'linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%)',
+			gradient:
+				'linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%)',
 			slug: 'luminous-vivid-amber-to-luminous-vivid-orange',
 		},
 		{
 			name: __( 'Luminous vivid orange to vivid red' ),
-			gradient: 'linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%)',
+			gradient:
+				'linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%)',
 			slug: 'luminous-vivid-orange-to-vivid-red',
 		},
 		{
 			name: __( 'Very light gray to cyan bluish gray' ),
-			gradient: 'linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%)',
+			gradient:
+				'linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%)',
 			slug: 'very-light-gray-to-cyan-bluish-gray',
 		},
 		{
@@ -188,12 +193,14 @@ export const SETTINGS_DEFAULTS = {
 		},
 		{
 			name: __( 'Blush light purple' ),
-			gradient: 'linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)',
+			gradient:
+				'linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)',
 			slug: 'blush-light-purple',
 		},
 		{
 			name: __( 'Blush bordeaux' ),
-			gradient: 'linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%)',
+			gradient:
+				'linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%)',
 			slug: 'blush-bordeaux',
 		},
 		{
@@ -210,12 +217,14 @@ export const SETTINGS_DEFAULTS = {
 		},
 		{
 			name: __( 'Electric grass' ),
-			gradient: 'linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%)',
+			gradient:
+				'linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%)',
 			slug: 'electric-grass',
 		},
 		{
 			name: __( 'Midnight' ),
-			gradient: 'linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%)',
+			gradient:
+				'linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%)',
 			slug: 'midnight',
 		},
 	],

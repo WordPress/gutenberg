@@ -17,7 +17,14 @@ getPackages().forEach( ( entry ) => {
 		// until docgen provides a way to update many tokens at once, we need to make sure
 		// the output file is updated before starting the second pass for the next token.
 		const { status, stderr } = spawnSync(
-			join( __dirname, '..', '..', 'node_modules', '.bin', 'docgen' ).replace( / /g, '\\ ' ),
+			join(
+				__dirname,
+				'..',
+				'..',
+				'node_modules',
+				'.bin',
+				'docgen'
+			).replace( / /g, '\\ ' ),
 			[
 				target,
 				`--output docs/designers-developers/developers/data/data-${ packageName.replace(

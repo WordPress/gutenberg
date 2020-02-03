@@ -39,7 +39,8 @@ describe( 'block serializer', () => {
 
 	describe( 'getSaveContent()', () => {
 		describe( 'function save', () => {
-			const fruitBlockSave = ( { attributes } ) => createElement( 'div', null, attributes.fruit );
+			const fruitBlockSave = ( { attributes } ) =>
+				createElement( 'div', null, attributes.fruit );
 
 			it( 'should return element as string if save returns element', () => {
 				const saved = getSaveContent(
@@ -60,7 +61,9 @@ describe( 'block serializer', () => {
 					save: fruitBlockSave,
 				} );
 
-				const saved = getSaveContent( 'core/fruit', { fruit: 'Bananas' } );
+				const saved = getSaveContent( 'core/fruit', {
+					fruit: 'Bananas',
+				} );
 
 				expect( saved ).toBe( '<div>Bananas</div>' );
 			} );
@@ -72,7 +75,11 @@ describe( 'block serializer', () => {
 					{
 						save: class extends Component {
 							render() {
-								return createElement( 'div', null, this.props.attributes.fruit );
+								return createElement(
+									'div',
+									null,
+									this.props.attributes.fruit
+								);
 							}
 						},
 						name: 'core/fruit',
@@ -151,45 +158,75 @@ describe( 'block serializer', () => {
 		} );
 
 		it( 'should not break standard-non-compliant tools for "<"', () => {
-			expect( serializeAttributes( { a: '< and <' } ) ).toBe( '{"a":"\\u003c and \\u003c"}' );
+			expect( serializeAttributes( { a: '< and <' } ) ).toBe(
+				'{"a":"\\u003c and \\u003c"}'
+			);
 		} );
 
 		it( 'should not break standard-non-compliant tools for ">"', () => {
-			expect( serializeAttributes( { a: '> and >' } ) ).toBe( '{"a":"\\u003e and \\u003e"}' );
+			expect( serializeAttributes( { a: '> and >' } ) ).toBe(
+				'{"a":"\\u003e and \\u003e"}'
+			);
 		} );
 
 		it( 'should not break standard-non-compliant tools for "&"', () => {
-			expect( serializeAttributes( { a: '& and &' } ) ).toBe( '{"a":"\\u0026 and \\u0026"}' );
+			expect( serializeAttributes( { a: '& and &' } ) ).toBe(
+				'{"a":"\\u0026 and \\u0026"}'
+			);
 		} );
 
 		it( 'should replace quotation marks', () => {
-			expect( serializeAttributes( { a: '" and "' } ) ).toBe( '{"a":"\\u0022 and \\u0022"}' );
+			expect( serializeAttributes( { a: '" and "' } ) ).toBe(
+				'{"a":"\\u0022 and \\u0022"}'
+			);
 		} );
 	} );
 
 	describe( 'getCommentDelimitedContent()', () => {
 		it( 'should generate empty attributes void', () => {
-			const content = getCommentDelimitedContent( 'core/test-block', {}, '' );
+			const content = getCommentDelimitedContent(
+				'core/test-block',
+				{},
+				''
+			);
 
 			expect( content ).toBe( '<!-- wp:test-block /-->' );
 		} );
 
 		it( 'should include the namespace for non-core blocks', () => {
-			const content = getCommentDelimitedContent( 'my-wonderful-namespace/test-block', {}, '' );
+			const content = getCommentDelimitedContent(
+				'my-wonderful-namespace/test-block',
+				{},
+				''
+			);
 
-			expect( content ).toBe( '<!-- wp:my-wonderful-namespace/test-block /-->' );
+			expect( content ).toBe(
+				'<!-- wp:my-wonderful-namespace/test-block /-->'
+			);
 		} );
 
 		it( 'should generate empty attributes non-void', () => {
-			const content = getCommentDelimitedContent( 'core/test-block', {}, 'Delicious' );
+			const content = getCommentDelimitedContent(
+				'core/test-block',
+				{},
+				'Delicious'
+			);
 
-			expect( content ).toBe( '<!-- wp:test-block -->\nDelicious\n<!-- /wp:test-block -->' );
+			expect( content ).toBe(
+				'<!-- wp:test-block -->\nDelicious\n<!-- /wp:test-block -->'
+			);
 		} );
 
 		it( 'should generate non-empty attributes void', () => {
-			const content = getCommentDelimitedContent( 'core/test-block', { fruit: 'Banana' }, '' );
+			const content = getCommentDelimitedContent(
+				'core/test-block',
+				{ fruit: 'Banana' },
+				''
+			);
 
-			expect( content ).toBe( '<!-- wp:test-block {"fruit":"Banana"} /-->' );
+			expect( content ).toBe(
+				'<!-- wp:test-block {"fruit":"Banana"} /-->'
+			);
 		} );
 
 		it( 'should generate non-empty attributes non-void', () => {
@@ -218,7 +255,9 @@ describe( 'block serializer', () => {
 				save: ( { attributes } ) => attributes.fruit,
 			} );
 			setFreeformContentHandlerName( 'core/freeform-block' );
-			const block = createBlock( 'core/freeform-block', { fruit: 'Bananas' } );
+			const block = createBlock( 'core/freeform-block', {
+				fruit: 'Bananas',
+			} );
 
 			const content = serializeBlock( block );
 
@@ -236,7 +275,9 @@ describe( 'block serializer', () => {
 				save: ( { attributes } ) => attributes.fruit,
 			} );
 			setFreeformContentHandlerName( 'core/freeform-block' );
-			const block = createBlock( 'core/freeform-block', { fruit: 'Bananas' } );
+			const block = createBlock( 'core/freeform-block', {
+				fruit: 'Bananas',
+			} );
 
 			const content = serializeBlock( block, { isInnerBlocks: true } );
 
@@ -258,7 +299,9 @@ describe( 'block serializer', () => {
 				save: ( { attributes } ) => attributes.fruit,
 			} );
 			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
-			const block = createBlock( 'core/unregistered-block', { fruit: 'Bananas' } );
+			const block = createBlock( 'core/unregistered-block', {
+				fruit: 'Bananas',
+			} );
 
 			const content = serializeBlock( block );
 

@@ -7,7 +7,12 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import { getPhrasingContentSchema } from '../phrasing-content';
-import { getBlockContentSchema, isEmpty, isPlain, removeInvalidHTML } from '../utils';
+import {
+	getBlockContentSchema,
+	isEmpty,
+	isPlain,
+	removeInvalidHTML,
+} from '../utils';
 
 jest.mock( '@wordpress/data', () => {
 	return {
@@ -16,7 +21,10 @@ jest.mock( '@wordpress/data', () => {
 				case 'core/blocks': {
 					return {
 						hasBlockSupport: ( blockName, supports ) => {
-							return blockName === 'core/paragraph' && supports === 'anchor';
+							return (
+								blockName === 'core/paragraph' &&
+								supports === 'anchor'
+							);
 						},
 					};
 				}
@@ -176,11 +184,14 @@ describe( 'removeInvalidHTML', () => {
 	it( 'should break up block content with phrasing schema', () => {
 		const input = '<p>test</p><p>test</p>';
 		const output = 'test<br>test';
-		expect( removeInvalidHTML( input, phrasingContentSchema, true ) ).toBe( output );
+		expect( removeInvalidHTML( input, phrasingContentSchema, true ) ).toBe(
+			output
+		);
 	} );
 
 	it( 'should unwrap node that does not satisfy require', () => {
-		const input = '<figure><p>test</p><figcaption>test</figcaption></figure>';
+		const input =
+			'<figure><p>test</p><figcaption>test</figcaption></figure>';
 		const output = '<p>test</p>test';
 		expect( removeInvalidHTML( input, schema ) ).toBe( output );
 	} );

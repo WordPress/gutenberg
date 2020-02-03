@@ -15,9 +15,15 @@ function ReusableBlocksButtons( { clientIds } ) {
 		<__experimentalBlockSettingsMenuPluginsExtension>
 			{ ( { onClose } ) => (
 				<>
-					<ReusableBlockConvertButton clientIds={ clientIds } onToggle={ onClose } />
+					<ReusableBlockConvertButton
+						clientIds={ clientIds }
+						onToggle={ onClose }
+					/>
 					{ clientIds.length === 1 && (
-						<ReusableBlockDeleteButton clientId={ clientIds[ 0 ] } onToggle={ onClose } />
+						<ReusableBlockDeleteButton
+							clientId={ clientIds[ 0 ] }
+							onToggle={ onClose }
+						/>
 					) }
 				</>
 			) }

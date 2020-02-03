@@ -32,7 +32,9 @@ function getTranslateStrings( functionName, args ) {
 			return;
 	}
 
-	return args.filter( ( arg ) => arg.type === 'Literal' ).map( ( arg ) => arg.value );
+	return args
+		.filter( ( arg ) => arg.type === 'Literal' )
+		.map( ( arg ) => arg.value );
 }
 
 module.exports = {
@@ -49,12 +51,18 @@ module.exports = {
 				}
 
 				if ( ! args.length ) {
-					context.report( node, 'sprintf must be called with a format string' );
+					context.report(
+						node,
+						'sprintf must be called with a format string'
+					);
 					return;
 				}
 
 				if ( args.length < 2 ) {
-					context.report( node, 'sprintf must be called with placeholder value argument(s)' );
+					context.report(
+						node,
+						'sprintf must be called with placeholder value argument(s)'
+					);
 					return;
 				}
 
@@ -71,7 +79,10 @@ module.exports = {
 					case 'CallExpression':
 						// All possible options (arguments) from a translate
 						// function must be valid.
-						candidates = getTranslateStrings( args[ 0 ].callee.name, args[ 0 ].arguments );
+						candidates = getTranslateStrings(
+							args[ 0 ].callee.name,
+							args[ 0 ].arguments
+						);
 
 						// An unknown function call may produce a valid string
 						// value. Ideally its result is verified, but this is
@@ -93,7 +104,10 @@ module.exports = {
 				}
 
 				if ( ! candidates.length ) {
-					context.report( node, 'sprintf must be called with a valid format string' );
+					context.report(
+						node,
+						'sprintf must be called with a valid format string'
+					);
 					return;
 				}
 
@@ -104,7 +118,10 @@ module.exports = {
 					// Prioritize placeholder number consistency over matching
 					// placeholder, since it's a more common error to omit a
 					// placeholder from the singular form of pluralization.
-					if ( numPlaceholders !== undefined && ( ! match || numPlaceholders !== match.length ) ) {
+					if (
+						numPlaceholders !== undefined &&
+						( ! match || numPlaceholders !== match.length )
+					) {
 						context.report(
 							node,
 							'sprintf format string options must have the same number of placeholders'
@@ -113,7 +130,10 @@ module.exports = {
 					}
 
 					if ( ! match ) {
-						context.report( node, 'sprintf format string must contain at least one placeholder' );
+						context.report(
+							node,
+							'sprintf format string must contain at least one placeholder'
+						);
 						return;
 					}
 

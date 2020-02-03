@@ -98,7 +98,11 @@ describe( 'WordCounter', () => {
 		},
 	];
 
-	const types = [ 'words', 'characters_excluding_spaces', 'characters_including_spaces' ];
+	const types = [
+		'words',
+		'characters_excluding_spaces',
+		'characters_including_spaces',
+	];
 
 	dataProvider.forEach( ( item ) => {
 		types.forEach( ( type ) => {

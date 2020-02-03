@@ -51,7 +51,11 @@ const transforms = {
 
 								// When converting only one block, transform
 								// every line to a list item.
-								return replace( value, /\n/g, __UNSTABLE_LINE_SEPARATOR );
+								return replace(
+									value,
+									/\n/g,
+									__UNSTABLE_LINE_SEPARATOR
+								);
 							} ),
 							__UNSTABLE_LINE_SEPARATOR
 						),

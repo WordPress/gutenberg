@@ -7,7 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useCallback, useState, useRef } from '@wordpress/element';
-import { createHigherOrderComponent, useKeyboardShortcut } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	useKeyboardShortcut,
+} from '@wordpress/compose';
 import { rawShortcut } from '@wordpress/keycodes';
 
 const defaultShortcuts = {
@@ -24,7 +27,9 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 		} );
 
 		function focusRegion( offset ) {
-			const regions = Array.from( container.current.querySelectorAll( '[role="region"]' ) );
+			const regions = Array.from(
+				container.current.querySelectorAll( '[role="region"]' )
+			);
 			if ( ! regions.length ) {
 				return;
 			}
@@ -40,10 +45,14 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 			nextRegion.focus();
 			setIsFocusingRegions( true );
 		}
-		const focusPrevious = useCallback( () => focusRegion( -1 ), [ container ] );
+		const focusPrevious = useCallback( () => focusRegion( -1 ), [
+			container,
+		] );
 		const focusNext = useCallback( () => focusRegion( 1 ), [ container ] );
 
-		useKeyboardShortcut( shortcuts.previous, focusPrevious, { bindGlobal: true } );
+		useKeyboardShortcut( shortcuts.previous, focusPrevious, {
+			bindGlobal: true,
+		} );
 		useKeyboardShortcut( shortcuts.next, focusNext, { bindGlobal: true } );
 
 		// Disable reason: Clicking the editor should dismiss the regions focus style

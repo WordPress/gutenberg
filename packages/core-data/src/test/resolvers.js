@@ -22,16 +22,22 @@ describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
 
 	it( 'yields with requested post type', async () => {
-		const entities = [ { name: 'postType', kind: 'root', baseURL: '/wp/v2/types' } ];
+		const entities = [
+			{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
+		];
 		const fulfillment = getEntityRecord( 'root', 'postType', 'post' );
 		// Trigger generator
 		fulfillment.next();
 		// Provide entities and trigger apiFetch
 		const { value: apiFetchAction } = fulfillment.next( entities );
-		expect( apiFetchAction.request ).toEqual( { path: '/wp/v2/types/post?context=edit' } );
+		expect( apiFetchAction.request ).toEqual( {
+			path: '/wp/v2/types/post?context=edit',
+		} );
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( POST_TYPE );
-		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', POST_TYPE ) );
+		expect( received ).toEqual(
+			receiveEntityRecords( 'root', 'postType', POST_TYPE )
+		);
 	} );
 } );
 
@@ -42,18 +48,27 @@ describe( 'getEntityRecords', () => {
 	};
 
 	it( 'yields with requested post type', async () => {
-		const entities = [ { name: 'postType', kind: 'root', baseURL: '/wp/v2/types' } ];
+		const entities = [
+			{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
+		];
 		const fulfillment = getEntityRecords( 'root', 'postType' );
 
 		// Trigger generator
 		fulfillment.next();
 		// Provide entities and trigger apiFetch
 		const { value: apiFetchAction } = fulfillment.next( entities );
-		expect( apiFetchAction.request ).toEqual( { path: '/wp/v2/types?context=edit' } );
+		expect( apiFetchAction.request ).toEqual( {
+			path: '/wp/v2/types?context=edit',
+		} );
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( POST_TYPES );
 		expect( received ).toEqual(
-			receiveEntityRecords( 'root', 'postType', Object.values( POST_TYPES ), {} )
+			receiveEntityRecords(
+				'root',
+				'postType',
+				Object.values( POST_TYPES ),
+				{}
+			)
 		);
 	} );
 } );
@@ -69,8 +84,11 @@ describe( 'getEmbedPreview', () => {
 		// Trigger generator
 		fulfillment.next();
 		// Provide apiFetch response and trigger Action
-		const received = ( await fulfillment.next( SUCCESSFUL_EMBED_RESPONSE ) ).value;
-		expect( received ).toEqual( receiveEmbedPreview( EMBEDDABLE_URL, SUCCESSFUL_EMBED_RESPONSE ) );
+		const received = ( await fulfillment.next( SUCCESSFUL_EMBED_RESPONSE ) )
+			.value;
+		expect( received ).toEqual(
+			receiveEmbedPreview( EMBEDDABLE_URL, SUCCESSFUL_EMBED_RESPONSE )
+		);
 	} );
 
 	it( 'yields false if the URL cannot be embedded', async () => {
@@ -79,7 +97,9 @@ describe( 'getEmbedPreview', () => {
 		fulfillment.next();
 		// Provide invalid response and trigger Action
 		const received = ( await fulfillment.throw( { status: 404 } ) ).value;
-		expect( received ).toEqual( receiveEmbedPreview( UNEMBEDDABLE_URL, UNEMBEDDABLE_RESPONSE ) );
+		expect( received ).toEqual(
+			receiveEmbedPreview( UNEMBEDDABLE_URL, UNEMBEDDABLE_RESPONSE )
+		);
 	} );
 } );
 
@@ -121,7 +141,9 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual( receiveUserPermission( 'create/media', false ) );
+		expect( received.value ).toEqual(
+			receiveUserPermission( 'create/media', false )
+		);
 
 		received = generator.next();
 		expect( received.done ).toBe( true );
@@ -147,7 +169,9 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual( receiveUserPermission( 'create/media', true ) );
+		expect( received.value ).toEqual(
+			receiveUserPermission( 'create/media', true )
+		);
 
 		received = generator.next();
 		expect( received.done ).toBe( true );
@@ -173,7 +197,9 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual( receiveUserPermission( 'update/blocks/123', true ) );
+		expect( received.value ).toEqual(
+			receiveUserPermission( 'update/blocks/123', true )
+		);
 
 		received = generator.next();
 		expect( received.done ).toBe( true );
@@ -208,8 +234,11 @@ describe( 'getAutosaves', () => {
 		} );
 
 		// Provide apiFetch response and trigger Action
-		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) ).value;
-		expect( received ).toEqual( receiveAutosaves( 1, SUCCESSFUL_RESPONSE ) );
+		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) )
+			.value;
+		expect( received ).toEqual(
+			receiveAutosaves( 1, SUCCESSFUL_RESPONSE )
+		);
 	} );
 
 	it( ' yields undefined if no autosaves exist for the post', async () => {
@@ -247,7 +276,8 @@ describe( 'getCurrentUser', () => {
 		fulfillment.next();
 
 		// Provide apiFetch response and trigger Action
-		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) ).value;
+		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) )
+			.value;
 		expect( received ).toEqual( receiveCurrentUser( SUCCESSFUL_RESPONSE ) );
 	} );
 } );

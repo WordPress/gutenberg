@@ -113,17 +113,25 @@ export function hasChangedContent( state ) {
  *
  * @return {boolean} Whether unsaved values exist.
  */
-export const isEditedPostDirty = createRegistrySelector( ( select ) => ( state ) => {
-	// Edits should contain only fields which differ from the saved post (reset
-	// at initial load and save complete). Thus, a non-empty edits state can be
-	// inferred to contain unsaved values.
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	if ( select( 'core' ).hasEditsForEntityRecord( 'postType', postType, postId ) ) {
-		return true;
+export const isEditedPostDirty = createRegistrySelector(
+	( select ) => ( state ) => {
+		// Edits should contain only fields which differ from the saved post (reset
+		// at initial load and save complete). Thus, a non-empty edits state can be
+		// inferred to contain unsaved values.
+		const postType = getCurrentPostType( state );
+		const postId = getCurrentPostId( state );
+		if (
+			select( 'core' ).hasEditsForEntityRecord(
+				'postType',
+				postType,
+				postId
+			)
+		) {
+			return true;
+		}
+		return false;
 	}
-	return false;
-} );
+);
 
 /**
  * Returns true if there are unsaved edits for entities other than
@@ -133,49 +141,61 @@ export const isEditedPostDirty = createRegistrySelector( ( select ) => ( state )
  *
  * @return {boolean} Whether there are edits or not.
  */
-export const hasNonPostEntityChanges = createRegistrySelector( ( select ) => ( state ) => {
-	const enableFullSiteEditing = getEditorSettings( state ).__experimentalEnableFullSiteEditing;
-	if ( ! enableFullSiteEditing ) {
+export const hasNonPostEntityChanges = createRegistrySelector(
+	( select ) => ( state ) => {
+		const enableFullSiteEditing = getEditorSettings( state )
+			.__experimentalEnableFullSiteEditing;
+		if ( ! enableFullSiteEditing ) {
+			return false;
+		}
+
+		const entityRecordChangesByRecord = select(
+			'core'
+		).getEntityRecordChangesByRecord();
+		const changedKinds = Object.keys( entityRecordChangesByRecord );
+		if (
+			changedKinds.length > 1 ||
+			( changedKinds.length === 1 &&
+				! entityRecordChangesByRecord.postType )
+		) {
+			// Return true if there is more than one edited entity kind
+			// or the edited entity kind is not the editor's post's kind.
+			return true;
+		} else if ( ! entityRecordChangesByRecord.postType ) {
+			// Don't continue if there are no edited entity kinds.
+			return false;
+		}
+
+		const { type, id } = getCurrentPost( state );
+		const changedPostTypes = Object.keys(
+			entityRecordChangesByRecord.postType
+		);
+		if (
+			changedPostTypes.length > 1 ||
+			( changedPostTypes.length === 1 &&
+				! entityRecordChangesByRecord.postType[ type ] )
+		) {
+			// Return true if there is more than one edited post type
+			// or the edited entity's post type is not the editor's post's post type.
+			return true;
+		}
+
+		const changedPosts = Object.keys(
+			entityRecordChangesByRecord.postType[ type ]
+		);
+		if (
+			changedPosts.length > 1 ||
+			( changedPosts.length === 1 &&
+				! entityRecordChangesByRecord.postType[ type ][ id ] )
+		) {
+			// Return true if there is more than one edited post
+			// or the edited post is not the editor's post.
+			return true;
+		}
+
 		return false;
 	}
-
-	const entityRecordChangesByRecord = select( 'core' ).getEntityRecordChangesByRecord();
-	const changedKinds = Object.keys( entityRecordChangesByRecord );
-	if (
-		changedKinds.length > 1 ||
-		( changedKinds.length === 1 && ! entityRecordChangesByRecord.postType )
-	) {
-		// Return true if there is more than one edited entity kind
-		// or the edited entity kind is not the editor's post's kind.
-		return true;
-	} else if ( ! entityRecordChangesByRecord.postType ) {
-		// Don't continue if there are no edited entity kinds.
-		return false;
-	}
-
-	const { type, id } = getCurrentPost( state );
-	const changedPostTypes = Object.keys( entityRecordChangesByRecord.postType );
-	if (
-		changedPostTypes.length > 1 ||
-		( changedPostTypes.length === 1 && ! entityRecordChangesByRecord.postType[ type ] )
-	) {
-		// Return true if there is more than one edited post type
-		// or the edited entity's post type is not the editor's post's post type.
-		return true;
-	}
-
-	const changedPosts = Object.keys( entityRecordChangesByRecord.postType[ type ] );
-	if (
-		changedPosts.length > 1 ||
-		( changedPosts.length === 1 && ! entityRecordChangesByRecord.postType[ type ][ id ] )
-	) {
-		// Return true if there is more than one edited post
-		// or the edited post is not the editor's post.
-		return true;
-	}
-
-	return false;
-} );
+);
 
 /**
  * Returns true if there are no unsaved values for the current edit session and
@@ -198,20 +218,26 @@ export function isCleanNewPost( state ) {
  *
  * @return {Object} Post object.
  */
-export const getCurrentPost = createRegistrySelector( ( select ) => ( state ) => {
-	const postId = getCurrentPostId( state );
-	const postType = getCurrentPostType( state );
+export const getCurrentPost = createRegistrySelector(
+	( select ) => ( state ) => {
+		const postId = getCurrentPostId( state );
+		const postType = getCurrentPostType( state );
 
-	const post = select( 'core' ).getRawEntityRecord( 'postType', postType, postId );
-	if ( post ) {
-		return post;
+		const post = select( 'core' ).getRawEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
+		if ( post ) {
+			return post;
+		}
+
+		// This exists for compatibility with the previous selector behavior
+		// which would guarantee an object return based on the editor reducer's
+		// default empty object state.
+		return EMPTY_OBJECT;
 	}
-
-	// This exists for compatibility with the previous selector behavior
-	// which would guarantee an object return based on the editor reducer's
-	// default empty object state.
-	return EMPTY_OBJECT;
-} );
+);
 
 /**
  * Returns the post type of the post currently being edited.
@@ -244,7 +270,11 @@ export function getCurrentPostId( state ) {
  * @return {number} Number of revisions.
  */
 export function getCurrentPostRevisionsCount( state ) {
-	return get( getCurrentPost( state ), [ '_links', 'version-history', 0, 'count' ], 0 );
+	return get(
+		getCurrentPost( state ),
+		[ '_links', 'version-history', 0, 'count' ],
+		0
+	);
 }
 
 /**
@@ -256,7 +286,11 @@ export function getCurrentPostRevisionsCount( state ) {
  * @return {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
-	return get( getCurrentPost( state ), [ '_links', 'predecessor-version', 0, 'id' ], null );
+	return get(
+		getCurrentPost( state ),
+		[ '_links', 'predecessor-version', 0, 'id' ],
+		null
+	);
 }
 
 /**
@@ -270,7 +304,10 @@ export function getCurrentPostLastRevisionId( state ) {
 export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	return select( 'core' ).getEntityRecordEdits( 'postType', postType, postId ) || EMPTY_OBJECT;
+	return (
+		select( 'core' ).getEntityRecordEdits( 'postType', postType, postId ) ||
+		EMPTY_OBJECT
+	);
 } );
 
 /**
@@ -293,13 +330,19 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  *
  * @return {*} A value whose reference will change only when an edit occurs.
  */
-export const getReferenceByDistinctEdits = createRegistrySelector( ( select ) => (/* state */) => {
-	deprecated( "`wp.data.select( 'core/editor' ).getReferenceByDistinctEdits`", {
-		alternative: "`wp.data.select( 'core' ).getReferenceByDistinctEdits`",
-	} );
+export const getReferenceByDistinctEdits = createRegistrySelector(
+	( select ) => (/* state */) => {
+		deprecated(
+			"`wp.data.select( 'core/editor' ).getReferenceByDistinctEdits`",
+			{
+				alternative:
+					"`wp.data.select( 'core' ).getReferenceByDistinctEdits`",
+			}
+		);
 
-	return select( 'core' ).getReferenceByDistinctEdits();
-} );
+		return select( 'core' ).getReferenceByDistinctEdits();
+	}
+);
 
 /**
  * Returns an attribute value of the saved post.
@@ -396,14 +439,23 @@ export function getEditedPostAttribute( state, attributeName ) {
  */
 export const getAutosaveAttribute = createRegistrySelector(
 	( select ) => ( state, attributeName ) => {
-		if ( ! includes( AUTOSAVE_PROPERTIES, attributeName ) && attributeName !== 'preview_link' ) {
+		if (
+			! includes( AUTOSAVE_PROPERTIES, attributeName ) &&
+			attributeName !== 'preview_link'
+		) {
 			return;
 		}
 
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
-		const autosave = select( 'core' ).getAutosave( postType, postId, currentUserId );
+		const currentUserId = get( select( 'core' ).getCurrentUser(), [
+			'id',
+		] );
+		const autosave = select( 'core' ).getAutosave(
+			postType,
+			postId,
+			currentUserId
+		);
 
 		if ( autosave ) {
 			return getPostRawValue( autosave[ attributeName ] );
@@ -459,7 +511,9 @@ export function isCurrentPostPublished( state, currentPost ) {
 	return (
 		[ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
 		( post.status === 'future' &&
-			! isInTheFuture( new Date( Number( getDate( post.date ) ) - ONE_MINUTE_IN_MS ) ) )
+			! isInTheFuture(
+				new Date( Number( getDate( post.date ) ) - ONE_MINUTE_IN_MS )
+			) )
 	);
 }
 
@@ -471,7 +525,10 @@ export function isCurrentPostPublished( state, currentPost ) {
  * @return {boolean} Whether current post is scheduled to be posted.
  */
 export function isCurrentPostScheduled( state ) {
-	return getCurrentPost( state ).status === 'future' && ! isCurrentPostPublished( state );
+	return (
+		getCurrentPost( state ).status === 'future' &&
+		! isCurrentPostPublished( state )
+	);
 }
 
 /**
@@ -490,7 +547,8 @@ export function isEditedPostPublishable( state ) {
 	//  See: <PostPublishButton /> (`isButtonEnabled` assigned by `isSaveable`)
 
 	return (
-		isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1
+		isEditedPostDirty( state ) ||
+		[ 'publish', 'private', 'future' ].indexOf( post.status ) === -1
 	);
 }
 
@@ -562,7 +620,10 @@ export function isEditedPostEmpty( state ) {
 		// For all other content, the single block is assumed to make a post
 		// non-empty, if only by virtue of its own comment delimiters.
 		const blockName = blocks[ 0 ].name;
-		if ( blockName !== getDefaultBlockName() && blockName !== getFreeformContentHandlerName() ) {
+		if (
+			blockName !== getDefaultBlockName() &&
+			blockName !== getFreeformContentHandlerName()
+		) {
 			return false;
 		}
 	}
@@ -593,14 +654,23 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 
 			const postType = getCurrentPostType( state );
 			const postId = getCurrentPostId( state );
-			const hasFetchedAutosave = select( 'core' ).hasFetchedAutosaves( postType, postId );
-			const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
+			const hasFetchedAutosave = select( 'core' ).hasFetchedAutosaves(
+				postType,
+				postId
+			);
+			const currentUserId = get( select( 'core' ).getCurrentUser(), [
+				'id',
+			] );
 
 			// Disable reason - this line causes the side-effect of fetching the autosave
 			// via a resolver, moving below the return would result in the autosave never
 			// being fetched.
 			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-			const autosave = select( 'core' ).getAutosave( postType, postId, currentUserId );
+			const autosave = select( 'core' ).getAutosave(
+				postType,
+				postId,
+				currentUserId
+			);
 
 			// If any existing autosaves have not yet been fetched, this function is
 			// unable to determine if the post is autosaveable, so return false.
@@ -623,7 +693,9 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 
 			// If the title or excerpt has changed, the post is autosaveable.
 			return [ 'title', 'excerpt' ].some(
-				( field ) => getPostRawValue( autosave[ field ] ) !== getEditedPostAttribute( state, field )
+				( field ) =>
+					getPostRawValue( autosave[ field ] ) !==
+					getEditedPostAttribute( state, field )
 			);
 		}
 );
@@ -642,14 +714,19 @@ export const isEditedPostAutosaveable = createRegistrySelector(
  */
 export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
 	deprecated( "`wp.data.select( 'core/editor' ).getAutosave()`", {
-		alternative: "`wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
+		alternative:
+			"`wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
 		plugin: 'Gutenberg',
 	} );
 
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
 	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
-	const autosave = select( 'core' ).getAutosave( postType, postId, currentUserId );
+	const autosave = select( 'core' ).getAutosave(
+		postType,
+		postId,
+		currentUserId
+	);
 	return mapValues( pick( autosave, AUTOSAVE_PROPERTIES ), getPostRawValue );
 } );
 
@@ -665,7 +742,8 @@ export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
  */
 export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
 	deprecated( "`wp.data.select( 'core/editor' ).hasAutosave()`", {
-		alternative: "`!! wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
+		alternative:
+			"`!! wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
 		plugin: 'Gutenberg',
 	} );
 
@@ -686,7 +764,9 @@ export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
 export function isEditedPostBeingScheduled( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	// Offset the date by one minute (network latency)
-	const checkedDate = new Date( Number( getDate( date ) ) - ONE_MINUTE_IN_MS );
+	const checkedDate = new Date(
+		Number( getDate( date ) ) - ONE_MINUTE_IN_MS
+	);
 
 	return isInTheFuture( checkedDate );
 }
@@ -708,7 +788,11 @@ export function isEditedPostDateFloating( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	const modified = getEditedPostAttribute( state, 'modified' );
 	const status = getEditedPostAttribute( state, 'status' );
-	if ( status === 'draft' || status === 'auto-draft' || status === 'pending' ) {
+	if (
+		status === 'draft' ||
+		status === 'auto-draft' ||
+		status === 'pending'
+	) {
 		return date === modified;
 	}
 	return false;
@@ -724,7 +808,11 @@ export function isEditedPostDateFloating( state ) {
 export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	return select( 'core' ).isSavingEntityRecord( 'postType', postType, postId );
+	return select( 'core' ).isSavingEntityRecord(
+		'postType',
+		postType,
+		postId
+	);
 } );
 
 /**
@@ -735,11 +823,17 @@ export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
  *
  * @return {boolean} Whether the post was saved successfully.
  */
-export const didPostSaveRequestSucceed = createRegistrySelector( ( select ) => ( state ) => {
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	return ! select( 'core' ).getLastEntitySaveError( 'postType', postType, postId );
-} );
+export const didPostSaveRequestSucceed = createRegistrySelector(
+	( select ) => ( state ) => {
+		const postType = getCurrentPostType( state );
+		const postId = getCurrentPostId( state );
+		return ! select( 'core' ).getLastEntitySaveError(
+			'postType',
+			postType,
+			postId
+		);
+	}
+);
 
 /**
  * Returns true if a previous post save was attempted but failed, or false
@@ -749,11 +843,17 @@ export const didPostSaveRequestSucceed = createRegistrySelector( ( select ) => (
  *
  * @return {boolean} Whether the post save failed.
  */
-export const didPostSaveRequestFail = createRegistrySelector( ( select ) => ( state ) => {
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	return !! select( 'core' ).getLastEntitySaveError( 'postType', postType, postId );
-} );
+export const didPostSaveRequestFail = createRegistrySelector(
+	( select ) => ( state ) => {
+		const postType = getCurrentPostType( state );
+		const postId = getCurrentPostId( state );
+		return !! select( 'core' ).getLastEntitySaveError(
+			'postType',
+			postType,
+			postId
+		);
+	}
+);
 
 /**
  * Returns true if the post is autosaving, or false otherwise.
@@ -903,21 +1003,27 @@ export function getBlocksForSerialization( state ) {
  *
  * @return {string} Post content.
  */
-export const getEditedPostContent = createRegistrySelector( ( select ) => ( state ) => {
-	const postId = getCurrentPostId( state );
-	const postType = getCurrentPostType( state );
-	const record = select( 'core' ).getEditedEntityRecord( 'postType', postType, postId );
-	if ( record ) {
-		if ( typeof record.content === 'function' ) {
-			return record.content( record );
-		} else if ( record.blocks ) {
-			return serializeBlocks( record.blocks );
-		} else if ( record.content ) {
-			return record.content;
+export const getEditedPostContent = createRegistrySelector(
+	( select ) => ( state ) => {
+		const postId = getCurrentPostId( state );
+		const postType = getCurrentPostType( state );
+		const record = select( 'core' ).getEditedEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
+		if ( record ) {
+			if ( typeof record.content === 'function' ) {
+				return record.content( record );
+			} else if ( record.blocks ) {
+				return serializeBlocks( record.blocks );
+			} else if ( record.content ) {
+				return record.content;
+			}
 		}
+		return '';
 	}
-	return '';
-} );
+);
 
 /**
  * Returns the reusable block with the given ID.
@@ -998,7 +1104,9 @@ export const __experimentalGetReusableBlocks = createSelector(
 export function getStateBeforeOptimisticTransaction( state, transactionId ) {
 	const transaction = find(
 		state.optimist,
-		( entry ) => entry.beforeState && get( entry.action, [ 'optimist', 'id' ] ) === transactionId
+		( entry ) =>
+			entry.beforeState &&
+			get( entry.action, [ 'optimist', 'id' ] ) === transactionId
 	);
 
 	return transaction ? transaction.beforeState : null;
@@ -1031,7 +1139,10 @@ export function isPublishingPost( state ) {
 
 	// Consider as publishing when current post prior to request was not
 	// considered published
-	return !! stateBeforeRequest && ! isCurrentPostPublished( null, stateBeforeRequest.currentPost );
+	return (
+		!! stateBeforeRequest &&
+		! isCurrentPostPublished( null, stateBeforeRequest.currentPost )
+	);
 }
 
 /**
@@ -1042,7 +1153,10 @@ export function isPublishingPost( state ) {
  * @return {boolean} Whether or not the permalink is editable.
  */
 export function isPermalinkEditable( state ) {
-	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
+	const permalinkTemplate = getEditedPostAttribute(
+		state,
+		'permalink_template'
+	);
 
 	return PERMALINK_POSTNAME_REGEX.test( permalinkTemplate );
 }
@@ -1079,15 +1193,21 @@ export function getPermalink( state ) {
  *                  the permalink, or null if the post is not viewable.
  */
 export function getPermalinkParts( state ) {
-	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
+	const permalinkTemplate = getEditedPostAttribute(
+		state,
+		'permalink_template'
+	);
 	if ( ! permalinkTemplate ) {
 		return null;
 	}
 
 	const postName =
-		getEditedPostAttribute( state, 'slug' ) || getEditedPostAttribute( state, 'generated_slug' );
+		getEditedPostAttribute( state, 'slug' ) ||
+		getEditedPostAttribute( state, 'generated_slug' );
 
-	const [ prefix, suffix ] = permalinkTemplate.split( PERMALINK_POSTNAME_REGEX );
+	const [ prefix, suffix ] = permalinkTemplate.split(
+		PERMALINK_POSTNAME_REGEX
+	);
 
 	return {
 		prefix,
@@ -1113,7 +1233,9 @@ export function inSomeHistory( state, predicate ) {
 		return false;
 	}
 
-	return optimist.some( ( { beforeState } ) => beforeState && predicate( beforeState ) );
+	return optimist.some(
+		( { beforeState } ) => beforeState && predicate( beforeState )
+	);
 }
 
 /**
@@ -1190,7 +1312,10 @@ export function getActivePostLock( state ) {
  * @return {boolean} Whether the user can or can't post unfiltered HTML.
  */
 export function canUserUseUnfilteredHTML( state ) {
-	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered-html' ] );
+	return has( getCurrentPost( state ), [
+		'_links',
+		'wp:action-unfiltered-html',
+	] );
 }
 
 /**
@@ -1297,7 +1422,9 @@ export const isBlockValid = getBlockEditorSelector( 'isBlockValid' );
 /**
  * @see getBlockAttributes in core/block-editor store.
  */
-export const getBlockAttributes = getBlockEditorSelector( 'getBlockAttributes' );
+export const getBlockAttributes = getBlockEditorSelector(
+	'getBlockAttributes'
+);
 
 /**
  * @see getBlock in core/block-editor store.
@@ -1319,22 +1446,30 @@ export const __unstableGetBlockWithoutInnerBlocks = getBlockEditorSelector(
 /**
  * @see getClientIdsOfDescendants in core/block-editor store.
  */
-export const getClientIdsOfDescendants = getBlockEditorSelector( 'getClientIdsOfDescendants' );
+export const getClientIdsOfDescendants = getBlockEditorSelector(
+	'getClientIdsOfDescendants'
+);
 
 /**
  * @see getClientIdsWithDescendants in core/block-editor store.
  */
-export const getClientIdsWithDescendants = getBlockEditorSelector( 'getClientIdsWithDescendants' );
+export const getClientIdsWithDescendants = getBlockEditorSelector(
+	'getClientIdsWithDescendants'
+);
 
 /**
  * @see getGlobalBlockCount in core/block-editor store.
  */
-export const getGlobalBlockCount = getBlockEditorSelector( 'getGlobalBlockCount' );
+export const getGlobalBlockCount = getBlockEditorSelector(
+	'getGlobalBlockCount'
+);
 
 /**
  * @see getBlocksByClientId in core/block-editor store.
  */
-export const getBlocksByClientId = getBlockEditorSelector( 'getBlocksByClientId' );
+export const getBlocksByClientId = getBlockEditorSelector(
+	'getBlocksByClientId'
+);
 
 /**
  * @see getBlockCount in core/block-editor store.
@@ -1344,17 +1479,23 @@ export const getBlockCount = getBlockEditorSelector( 'getBlockCount' );
 /**
  * @see getBlockSelectionStart in core/block-editor store.
  */
-export const getBlockSelectionStart = getBlockEditorSelector( 'getBlockSelectionStart' );
+export const getBlockSelectionStart = getBlockEditorSelector(
+	'getBlockSelectionStart'
+);
 
 /**
  * @see getBlockSelectionEnd in core/block-editor store.
  */
-export const getBlockSelectionEnd = getBlockEditorSelector( 'getBlockSelectionEnd' );
+export const getBlockSelectionEnd = getBlockEditorSelector(
+	'getBlockSelectionEnd'
+);
 
 /**
  * @see getSelectedBlockCount in core/block-editor store.
  */
-export const getSelectedBlockCount = getBlockEditorSelector( 'getSelectedBlockCount' );
+export const getSelectedBlockCount = getBlockEditorSelector(
+	'getSelectedBlockCount'
+);
 
 /**
  * @see hasSelectedBlock in core/block-editor store.
@@ -1364,7 +1505,9 @@ export const hasSelectedBlock = getBlockEditorSelector( 'hasSelectedBlock' );
 /**
  * @see getSelectedBlockClientId in core/block-editor store.
  */
-export const getSelectedBlockClientId = getBlockEditorSelector( 'getSelectedBlockClientId' );
+export const getSelectedBlockClientId = getBlockEditorSelector(
+	'getSelectedBlockClientId'
+);
 
 /**
  * @see getSelectedBlock in core/block-editor store.
@@ -1374,7 +1517,9 @@ export const getSelectedBlock = getBlockEditorSelector( 'getSelectedBlock' );
 /**
  * @see getBlockRootClientId in core/block-editor store.
  */
-export const getBlockRootClientId = getBlockEditorSelector( 'getBlockRootClientId' );
+export const getBlockRootClientId = getBlockEditorSelector(
+	'getBlockRootClientId'
+);
 
 /**
  * @see getBlockHierarchyRootClientId in core/block-editor store.
@@ -1386,17 +1531,23 @@ export const getBlockHierarchyRootClientId = getBlockEditorSelector(
 /**
  * @see getAdjacentBlockClientId in core/block-editor store.
  */
-export const getAdjacentBlockClientId = getBlockEditorSelector( 'getAdjacentBlockClientId' );
+export const getAdjacentBlockClientId = getBlockEditorSelector(
+	'getAdjacentBlockClientId'
+);
 
 /**
  * @see getPreviousBlockClientId in core/block-editor store.
  */
-export const getPreviousBlockClientId = getBlockEditorSelector( 'getPreviousBlockClientId' );
+export const getPreviousBlockClientId = getBlockEditorSelector(
+	'getPreviousBlockClientId'
+);
 
 /**
  * @see getNextBlockClientId in core/block-editor store.
  */
-export const getNextBlockClientId = getBlockEditorSelector( 'getNextBlockClientId' );
+export const getNextBlockClientId = getBlockEditorSelector(
+	'getNextBlockClientId'
+);
 
 /**
  * @see getSelectedBlocksInitialCaretPosition in core/block-editor store.
@@ -1415,7 +1566,9 @@ export const getMultiSelectedBlockClientIds = getBlockEditorSelector(
 /**
  * @see getMultiSelectedBlocks in core/block-editor store.
  */
-export const getMultiSelectedBlocks = getBlockEditorSelector( 'getMultiSelectedBlocks' );
+export const getMultiSelectedBlocks = getBlockEditorSelector(
+	'getMultiSelectedBlocks'
+);
 
 /**
  * @see getFirstMultiSelectedBlockClientId in core/block-editor store.
@@ -1434,17 +1587,23 @@ export const getLastMultiSelectedBlockClientId = getBlockEditorSelector(
 /**
  * @see isFirstMultiSelectedBlock in core/block-editor store.
  */
-export const isFirstMultiSelectedBlock = getBlockEditorSelector( 'isFirstMultiSelectedBlock' );
+export const isFirstMultiSelectedBlock = getBlockEditorSelector(
+	'isFirstMultiSelectedBlock'
+);
 
 /**
  * @see isBlockMultiSelected in core/block-editor store.
  */
-export const isBlockMultiSelected = getBlockEditorSelector( 'isBlockMultiSelected' );
+export const isBlockMultiSelected = getBlockEditorSelector(
+	'isBlockMultiSelected'
+);
 
 /**
  * @see isAncestorMultiSelected in core/block-editor store.
  */
-export const isAncestorMultiSelected = getBlockEditorSelector( 'isAncestorMultiSelected' );
+export const isAncestorMultiSelected = getBlockEditorSelector(
+	'isAncestorMultiSelected'
+);
 
 /**
  * @see getMultiSelectedBlocksStartClientId in core/block-editor store.
@@ -1478,12 +1637,16 @@ export const isBlockSelected = getBlockEditorSelector( 'isBlockSelected' );
 /**
  * @see hasSelectedInnerBlock in core/block-editor store.
  */
-export const hasSelectedInnerBlock = getBlockEditorSelector( 'hasSelectedInnerBlock' );
+export const hasSelectedInnerBlock = getBlockEditorSelector(
+	'hasSelectedInnerBlock'
+);
 
 /**
  * @see isBlockWithinSelection in core/block-editor store.
  */
-export const isBlockWithinSelection = getBlockEditorSelector( 'isBlockWithinSelection' );
+export const isBlockWithinSelection = getBlockEditorSelector(
+	'isBlockWithinSelection'
+);
 
 /**
  * @see hasMultiSelection in core/block-editor store.
@@ -1498,7 +1661,9 @@ export const isMultiSelecting = getBlockEditorSelector( 'isMultiSelecting' );
 /**
  * @see isSelectionEnabled in core/block-editor store.
  */
-export const isSelectionEnabled = getBlockEditorSelector( 'isSelectionEnabled' );
+export const isSelectionEnabled = getBlockEditorSelector(
+	'isSelectionEnabled'
+);
 
 /**
  * @see getBlockMode in core/block-editor store.
@@ -1513,12 +1678,16 @@ export const isTyping = getBlockEditorSelector( 'isTyping' );
 /**
  * @see isCaretWithinFormattedText in core/block-editor store.
  */
-export const isCaretWithinFormattedText = getBlockEditorSelector( 'isCaretWithinFormattedText' );
+export const isCaretWithinFormattedText = getBlockEditorSelector(
+	'isCaretWithinFormattedText'
+);
 
 /**
  * @see getBlockInsertionPoint in core/block-editor store.
  */
-export const getBlockInsertionPoint = getBlockEditorSelector( 'getBlockInsertionPoint' );
+export const getBlockInsertionPoint = getBlockEditorSelector(
+	'getBlockInsertionPoint'
+);
 
 /**
  * @see isBlockInsertionPointVisible in core/block-editor store.
@@ -1545,7 +1714,9 @@ export const getTemplateLock = getBlockEditorSelector( 'getTemplateLock' );
 /**
  * @see canInsertBlockType in core/block-editor store.
  */
-export const canInsertBlockType = getBlockEditorSelector( 'canInsertBlockType' );
+export const canInsertBlockType = getBlockEditorSelector(
+	'canInsertBlockType'
+);
 
 /**
  * @see getInserterItems in core/block-editor store.
@@ -1560,4 +1731,6 @@ export const hasInserterItems = getBlockEditorSelector( 'hasInserterItems' );
 /**
  * @see getBlockListSettings in core/block-editor store.
  */
-export const getBlockListSettings = getBlockEditorSelector( 'getBlockListSettings' );
+export const getBlockListSettings = getBlockEditorSelector(
+	'getBlockListSettings'
+);

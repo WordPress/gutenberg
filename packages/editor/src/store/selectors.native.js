@@ -6,7 +6,11 @@ import { createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { isEditedPostDirty, isEditedPostSaveable, hasChangedContent } from './selectors.js';
+import {
+	isEditedPostDirty,
+	isEditedPostSaveable,
+	hasChangedContent,
+} from './selectors.js';
 
 export * from './selectors.js';
 

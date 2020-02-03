@@ -15,10 +15,17 @@ import { Button, Dashicon } from '@wordpress/components';
 import Inserter from '../inserter';
 import styles from './styles.scss';
 
-function ButtonBlockAppender( { rootClientId, getStylesFromColorScheme, showSeparator } ) {
+function ButtonBlockAppender( {
+	rootClientId,
+	getStylesFromColorScheme,
+	showSeparator,
+} ) {
 	const appenderStyle = {
 		...styles.appender,
-		...getStylesFromColorScheme( styles.appenderLight, styles.appenderDark ),
+		...getStylesFromColorScheme(
+			styles.appenderLight,
+			styles.appenderDark
+		),
 	};
 	const addBlockButtonStyle = getStylesFromColorScheme(
 		styles.addBlockButton,

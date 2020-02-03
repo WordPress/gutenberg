@@ -16,7 +16,11 @@ import {
 	__experimentalWithPageTemplatePickerVisible,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordpress/components';
+import {
+	HTMLTextInput,
+	KeyboardAvoidingView,
+	ReadableContentView,
+} from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
 
 /**
@@ -40,12 +44,17 @@ class Layout extends Component {
 			isFullyBordered: true,
 		};
 
-		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
+		SafeArea.getSafeAreaInsetsForRootView().then(
+			this.onSafeAreaInsetsUpdate
+		);
 	}
 
 	componentDidMount() {
 		this._isMounted = true;
-		SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		SafeArea.addEventListener(
+			'safeAreaInsetsForRootViewDidChange',
+			this.onSafeAreaInsetsUpdate
+		);
 	}
 
 	componentWillUnmount() {
@@ -102,13 +111,19 @@ class Layout extends Component {
 	}
 
 	render() {
-		const { mode, getStylesFromColorScheme, showPageTemplatePicker } = this.props;
+		const {
+			mode,
+			getStylesFromColorScheme,
+			showPageTemplatePicker,
+		} = this.props;
 
 		const isHtmlView = mode === 'text';
 
 		// add a margin view at the bottom for the header
 		const marginBottom =
-			Platform.OS === 'android' && ! isHtmlView ? headerToolbarStyles.container.height : 0;
+			Platform.OS === 'android' && ! isHtmlView
+				? headerToolbarStyles.container.height
+				: 0;
 
 		const toolbarKeyboardAvoidingViewStyle = {
 			...styles.toolbarKeyboardAvoidingView,
@@ -119,20 +134,36 @@ class Layout extends Component {
 
 		return (
 			<SafeAreaView
-				style={ getStylesFromColorScheme( styles.container, styles.containerDark ) }
+				style={ getStylesFromColorScheme(
+					styles.container,
+					styles.containerDark
+				) }
 				onLayout={ this.onRootViewLayout }
 			>
 				<AutosaveMonitor />
-				<View style={ getStylesFromColorScheme( styles.background, styles.backgroundDark ) }>
+				<View
+					style={ getStylesFromColorScheme(
+						styles.background,
+						styles.backgroundDark
+					) }
+				>
 					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 				</View>
-				<View style={ { flex: 0, flexBasis: marginBottom, height: marginBottom } } />
+				<View
+					style={ {
+						flex: 0,
+						flexBasis: marginBottom,
+						height: marginBottom,
+					} }
+				/>
 				{ ! isHtmlView && (
 					<KeyboardAvoidingView
 						parentHeight={ this.state.rootViewHeight }
 						style={ toolbarKeyboardAvoidingViewStyle }
 					>
-						{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
+						{ showPageTemplatePicker && (
+							<__experimentalPageTemplatePicker />
+						) }
 						<Header />
 						<BottomSheetSettings />
 					</KeyboardAvoidingView>
@@ -144,7 +175,9 @@ class Layout extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { __unstableIsEditorReady: isEditorReady } = select( 'core/editor' );
+		const { __unstableIsEditorReady: isEditorReady } = select(
+			'core/editor'
+		);
 		const { getEditorMode } = select( 'core/edit-post' );
 
 		return {

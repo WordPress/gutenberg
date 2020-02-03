@@ -61,8 +61,16 @@ class MediaContainer extends Component {
 	}
 
 	renderImage() {
-		const { mediaAlt, mediaUrl, className, imageFill, focalPoint } = this.props;
-		const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
+		const {
+			mediaAlt,
+			mediaUrl,
+			className,
+			imageFill,
+			focalPoint,
+		} = this.props;
+		const backgroundStyles = imageFill
+			? imageFillStyles( mediaUrl, focalPoint )
+			: {};
 		return (
 			<>
 				{ this.renderToolbarEditButton() }

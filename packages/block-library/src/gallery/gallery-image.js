@@ -84,7 +84,11 @@ class GalleryImage extends Component {
 
 		// unselect the caption so when the user selects other image and comeback
 		// the caption is not immediately selected
-		if ( this.state.captionSelected && ! isSelected && prevProps.isSelected ) {
+		if (
+			this.state.captionSelected &&
+			! isSelected &&
+			prevProps.isSelected
+		) {
 			this.setState( {
 				captionSelected: false,
 			} );
@@ -179,10 +183,14 @@ class GalleryImage extends Component {
 				{ ( isSelected || caption ) && (
 					<RichText
 						tagName="figcaption"
-						placeholder={ isSelected ? __( 'Write caption…' ) : null }
+						placeholder={
+							isSelected ? __( 'Write caption…' ) : null
+						}
 						value={ caption }
 						isSelected={ this.state.captionSelected }
-						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+						onChange={ ( newCaption ) =>
+							setAttributes( { caption: newCaption } )
+						}
 						unstableOnFocus={ this.onSelectCaption }
 						inlineToolbar
 					/>

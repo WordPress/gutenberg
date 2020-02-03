@@ -67,7 +67,9 @@ export default function( css, options ) {
 	const errorsList = [];
 
 	function error( msg ) {
-		const err = new Error( options.source + ':' + lineno + ':' + column + ': ' + msg );
+		const err = new Error(
+			options.source + ':' + lineno + ':' + column + ': ' + msg
+		);
 		err.reason = msg;
 		err.filename = options.source;
 		err.line = lineno;
@@ -123,7 +125,11 @@ export default function( css, options ) {
 		const accumulator = [];
 		whitespace();
 		comments( accumulator );
-		while ( css.length && css.charAt( 0 ) !== '}' && ( node = atrule() || rule() ) ) {
+		while (
+			css.length &&
+			css.charAt( 0 ) !== '}' &&
+			( node = atrule() || rule() )
+		) {
 			if ( node !== false ) {
 				accumulator.push( node );
 				comments( accumulator );
@@ -182,7 +188,10 @@ export default function( css, options ) {
 		}
 
 		let i = 2;
-		while ( '' !== css.charAt( i ) && ( '*' !== css.charAt( i ) || '/' !== css.charAt( i + 1 ) ) ) {
+		while (
+			'' !== css.charAt( i ) &&
+			( '*' !== css.charAt( i ) || '/' !== css.charAt( i + 1 ) )
+		) {
 			++i;
 		}
 		i += 2;
@@ -244,7 +253,9 @@ export default function( css, options ) {
 		}
 
 		// val
-		const val = match( /^((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^\)]*?\)|[^};])+)/ );
+		const val = match(
+			/^((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^\)]*?\)|[^};])+)/
+		);
 
 		const ret = pos( {
 			type: 'declaration',

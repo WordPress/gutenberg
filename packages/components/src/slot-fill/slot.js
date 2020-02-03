@@ -6,7 +6,12 @@ import { isFunction, isString, map, negate } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Children, Component, cloneElement, isEmptyElement } from '@wordpress/element';
+import {
+	Children,
+	Component,
+	cloneElement,
+	isEmptyElement,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -61,7 +66,9 @@ class SlotComponent extends Component {
 
 		const fills = map( getFills( name, this ), ( fill ) => {
 			const fillKey = fill.occurrence;
-			const fillChildren = isFunction( fill.children ) ? fill.children( fillProps ) : fill.children;
+			const fillChildren = isFunction( fill.children )
+				? fill.children( fillProps )
+				: fill.children;
 
 			return Children.map( fillChildren, ( child, childIndex ) => {
 				if ( ! child || isString( child ) ) {

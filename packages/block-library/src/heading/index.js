@@ -62,7 +62,9 @@ export const settings = {
 	deprecated,
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: ( attributes.content || '' ) + ( attributesToMerge.content || '' ),
+			content:
+				( attributes.content || '' ) +
+				( attributesToMerge.content || '' ),
 		};
 	},
 	edit,

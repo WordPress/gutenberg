@@ -15,7 +15,9 @@ class URLPopover extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.toggleSettingsVisibility = this.toggleSettingsVisibility.bind( this );
+		this.toggleSettingsVisibility = this.toggleSettingsVisibility.bind(
+			this
+		);
 
 		this.state = {
 			isSettingsExpanded: false,

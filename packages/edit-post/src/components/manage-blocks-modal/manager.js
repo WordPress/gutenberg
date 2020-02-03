@@ -32,7 +32,8 @@ function BlockManager( {
 		( blockType ) =>
 			hasBlockSupport( blockType, 'inserter', true ) &&
 			( ! search || isMatchingSearchTerm( blockType, search ) ) &&
-			( ! blockType.parent || includes( blockType.parent, 'core/post-content' ) )
+			( ! blockType.parent ||
+				includes( blockType.parent, 'core/post-content' ) )
 	);
 
 	return (
@@ -51,7 +52,11 @@ function BlockManager( {
 			{ !! numberOfHiddenBlocks && (
 				<div className="edit-post-manage-blocks-modal__disabled-blocks-count">
 					{ sprintf(
-						_n( '%1$d block is disabled.', '%1$d blocks are disabled.', numberOfHiddenBlocks ),
+						_n(
+							'%1$d block is disabled.',
+							'%1$d blocks are disabled.',
+							numberOfHiddenBlocks
+						),
 						numberOfHiddenBlocks
 					) }
 				</div>
@@ -63,7 +68,9 @@ function BlockManager( {
 				className="edit-post-manage-blocks-modal__results"
 			>
 				{ blockTypes.length === 0 && (
-					<p className="edit-post-manage-blocks-modal__no-results">{ __( 'No blocks found.' ) }</p>
+					<p className="edit-post-manage-blocks-modal__no-results">
+						{ __( 'No blocks found.' ) }
+					</p>
 				) }
 				{ categories.map( ( category ) => (
 					<BlockManagerCategory
@@ -82,12 +89,16 @@ function BlockManager( {
 export default compose( [
 	withState( { search: '' } ),
 	withSelect( ( select ) => {
-		const { getBlockTypes, getCategories, hasBlockSupport, isMatchingSearchTerm } = select(
-			'core/blocks'
-		);
+		const {
+			getBlockTypes,
+			getCategories,
+			hasBlockSupport,
+			isMatchingSearchTerm,
+		} = select( 'core/blocks' );
 		const { getPreference } = select( 'core/edit-post' );
 		const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
-		const numberOfHiddenBlocks = isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
+		const numberOfHiddenBlocks =
+			isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
 
 		return {
 			blockTypes: getBlockTypes(),

@@ -102,8 +102,12 @@ describe( 'isValidAttributeName', () => {
 
 describe( 'escapeEditableHTML', () => {
 	it( 'should escape < and all ampersands', () => {
-		const result = escapeEditableHTML( '<a href="https://w.org">WP</a> & &lt;strong&gt;' );
+		const result = escapeEditableHTML(
+			'<a href="https://w.org">WP</a> & &lt;strong&gt;'
+		);
 
-		expect( result ).toBe( '&lt;a href="https://w.org">WP&lt;/a> &amp; &amp;lt;strong&amp;gt;' );
+		expect( result ).toBe(
+			'&lt;a href="https://w.org">WP&lt;/a> &amp; &amp;lt;strong&amp;gt;'
+		);
 	} );
 } );

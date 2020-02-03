@@ -22,7 +22,9 @@ import {
 export const useBlockSelectionListener = ( postId ) => {
 	const { hasBlockSelection, isEditorSidebarOpened } = useSelect(
 		( select ) => ( {
-			hasBlockSelection: !! select( 'core/block-editor' ).getBlockSelectionStart(),
+			hasBlockSelection: !! select(
+				'core/block-editor'
+			).getBlockSelectionStart(),
 			isEditorSidebarOpened: select( STORE_KEY ).isEditorSidebarOpened(),
 		} ),
 		[ postId ]
@@ -52,12 +54,16 @@ export const useAdjustSidebarListener = ( postId ) => {
 	const { isSmall, activeGeneralSidebarName } = useSelect(
 		( select ) => ( {
 			isSmall: select( 'core/viewport' ).isViewportMatch( '< medium' ),
-			activeGeneralSidebarName: select( STORE_KEY ).getActiveGeneralSidebarName(),
+			activeGeneralSidebarName: select(
+				STORE_KEY
+			).getActiveGeneralSidebarName(),
 		} ),
 		[ postId ]
 	);
 
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch( STORE_KEY );
+	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
+		STORE_KEY
+	);
 
 	const previousIsSmall = useRef( null );
 	const sidebarToReOpenOnExpand = useRef( null );
@@ -73,7 +79,10 @@ export const useAdjustSidebarListener = ( postId ) => {
 			if ( activeGeneralSidebarName ) {
 				closeGeneralSidebar();
 			}
-		} else if ( sidebarToReOpenOnExpand.current && ! activeGeneralSidebarName ) {
+		} else if (
+			sidebarToReOpenOnExpand.current &&
+			! activeGeneralSidebarName
+		) {
 			openGeneralSidebar( sidebarToReOpenOnExpand.current );
 			sidebarToReOpenOnExpand.current = null;
 		}

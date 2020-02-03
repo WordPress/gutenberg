@@ -63,7 +63,10 @@ export const withLazySameState = ( reducer ) => ( state, action ) => {
  * @return {Object} Persistence interface.
  */
 export function createPersistenceInterface( options ) {
-	const { storage = DEFAULT_STORAGE, storageKey = DEFAULT_STORAGE_KEY } = options;
+	const {
+		storage = DEFAULT_STORAGE,
+		storageKey = DEFAULT_STORAGE_KEY,
+	} = options;
 
 	let data;
 
@@ -147,15 +150,21 @@ const persistencePlugin = function( registry, pluginOptions ) {
 				{}
 			);
 
-			getPersistedState = withLazySameState( combineReducers( reducers ) );
+			getPersistedState = withLazySameState(
+				combineReducers( reducers )
+			);
 		} else {
 			getPersistedState = ( state, action ) => action.nextState;
 		}
 
-		let lastState = getPersistedState( undefined, { nextState: getState() } );
+		let lastState = getPersistedState( undefined, {
+			nextState: getState(),
+		} );
 
 		return () => {
-			const state = getPersistedState( lastState, { nextState: getState() } );
+			const state = getPersistedState( lastState, {
+				nextState: getState(),
+			} );
 			if ( state !== lastState ) {
 				persistence.set( reducerKey, state );
 				lastState = state;
@@ -176,7 +185,10 @@ const persistencePlugin = function( registry, pluginOptions ) {
 					type: '@@WP/PERSISTENCE_RESTORE',
 				} );
 
-				if ( isPlainObject( initialState ) && isPlainObject( persistedState ) ) {
+				if (
+					isPlainObject( initialState ) &&
+					isPlainObject( persistedState )
+				) {
 					// If state is an object, ensure that:
 					// - Other keys are left intact when persisting only a
 					//   subset of keys.
@@ -197,7 +209,13 @@ const persistencePlugin = function( registry, pluginOptions ) {
 
 			const store = registry.registerStore( reducerKey, options );
 
-			store.subscribe( createPersistOnChange( store.getState, reducerKey, options.persist ) );
+			store.subscribe(
+				createPersistOnChange(
+					store.getState,
+					reducerKey,
+					options.persist
+				)
+			);
 
 			return store;
 		},
@@ -215,7 +233,11 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const state = persistence.get();
 
 	// Migrate 'insertUsage' from 'core/editor' to 'core/block-editor'
-	const insertUsage = get( state, [ 'core/editor', 'preferences', 'insertUsage' ] );
+	const insertUsage = get( state, [
+		'core/editor',
+		'preferences',
+		'insertUsage',
+	] );
 	if ( insertUsage ) {
 		persistence.set( 'core/block-editor', {
 			preferences: {
@@ -225,7 +247,11 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	}
 
 	// Migrate 'areTipsEnabled' from 'core/nux' to 'showWelcomeGuide' in 'core/edit-post'
-	const areTipsEnabled = get( state, [ 'core/nux', 'preferences', 'areTipsEnabled' ] );
+	const areTipsEnabled = get( state, [
+		'core/nux',
+		'preferences',
+		'areTipsEnabled',
+	] );
 	const hasWelcomeGuide = has( state, [
 		'core/edit-post',
 		'preferences',

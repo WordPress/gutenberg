@@ -20,7 +20,9 @@ const defaultAttributes = {
 };
 
 const getTestComponentWithContent = ( attributes = defaultAttributes ) => {
-	return renderer.create( <UnsupportedBlockEdit attributes={ attributes } /> );
+	return renderer.create(
+		<UnsupportedBlockEdit attributes={ attributes } />
+	);
 };
 
 describe( 'Missing block', () => {

@@ -41,7 +41,10 @@ export default ( mapNodeToProps ) =>
 			grabFallbackStyles() {
 				const { grabStylesCompleted, fallbackStyles } = this.state;
 				if ( this.nodeRef && ! grabStylesCompleted ) {
-					const newFallbackStyles = mapNodeToProps( this.nodeRef, this.props );
+					const newFallbackStyles = mapNodeToProps(
+						this.nodeRef,
+						this.props
+					);
 					if ( ! isEqual( newFallbackStyles, fallbackStyles ) ) {
 						this.setState( {
 							fallbackStyles: newFallbackStyles,
@@ -53,7 +56,10 @@ export default ( mapNodeToProps ) =>
 
 			render() {
 				const wrappedComponent = (
-					<WrappedComponent { ...this.props } { ...this.state.fallbackStyles } />
+					<WrappedComponent
+						{ ...this.props }
+						{ ...this.state.fallbackStyles }
+					/>
 				);
 				return this.props.node ? (
 					wrappedComponent

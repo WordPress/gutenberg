@@ -28,9 +28,15 @@ const ShortcutList = ( { shortcuts } ) => (
 	 * Safari+VoiceOver won't announce the list otherwise.
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
-	<ul className="edit-post-keyboard-shortcut-help-modal__shortcut-list" role="list">
+	<ul
+		className="edit-post-keyboard-shortcut-help-modal__shortcut-list"
+		role="list"
+	>
 		{ shortcuts.map( ( shortcut, index ) => (
-			<li className="edit-post-keyboard-shortcut-help-modal__shortcut" key={ index }>
+			<li
+				className="edit-post-keyboard-shortcut-help-modal__shortcut"
+				key={ index }
+			>
 				{ isString( shortcut ) ? (
 					<DynamicShortcut name={ shortcut } />
 				) : (
@@ -43,16 +49,25 @@ const ShortcutList = ( { shortcuts } ) => (
 );
 
 const ShortcutSection = ( { title, shortcuts, className } ) => (
-	<section className={ classnames( 'edit-post-keyboard-shortcut-help-modal__section', className ) }>
+	<section
+		className={ classnames(
+			'edit-post-keyboard-shortcut-help-modal__section',
+			className
+		) }
+	>
 		{ !! title && (
-			<h2 className="edit-post-keyboard-shortcut-help-modal__section-title">{ title }</h2>
+			<h2 className="edit-post-keyboard-shortcut-help-modal__section-title">
+				{ title }
+			</h2>
 		) }
 		<ShortcutList shortcuts={ shortcuts } />
 	</section>
 );
 
 export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
-	useShortcut( 'core/edit-post/keyboard-shortcuts', toggleModal, { bindGlobal: true } );
+	useShortcut( 'core/edit-post/keyboard-shortcuts', toggleModal, {
+		bindGlobal: true,
+	} );
 
 	if ( ! isModalActive ) {
 		return null;
@@ -85,7 +100,10 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 			/>
 			<ShortcutSection
 				title={ __( 'Selection shortcuts' ) }
-				shortcuts={ [ 'core/block-editor/select-all', 'core/block-editor/unselect' ] }
+				shortcuts={ [
+					'core/block-editor/select-all',
+					'core/block-editor/unselect',
+				] }
 			/>
 			<ShortcutSection
 				title={ __( 'Block shortcuts' ) }
@@ -96,13 +114,18 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 					'core/block-editor/insert-after',
 					{
 						keyCombination: { character: '/' },
-						description: __( 'Change the block type after adding a new paragraph.' ),
+						description: __(
+							'Change the block type after adding a new paragraph.'
+						),
 						/* translators: The forward-slash character. e.g. '/'. */
 						ariaLabel: __( 'Forward-slash' ),
 					},
 				] }
 			/>
-			<ShortcutSection title={ __( 'Text formatting' ) } shortcuts={ textFormattingShortcuts } />
+			<ShortcutSection
+				title={ __( 'Text formatting' ) }
+				shortcuts={ textFormattingShortcuts }
+			/>
 		</Modal>
 	);
 }
@@ -115,7 +138,8 @@ export default compose( [
 		const { openModal, closeModal } = dispatch( 'core/edit-post' );
 
 		return {
-			toggleModal: () => ( isModalActive ? closeModal() : openModal( MODAL_NAME ) ),
+			toggleModal: () =>
+				isModalActive ? closeModal() : openModal( MODAL_NAME ),
 		};
 	} ),
 ] )( KeyboardShortcutHelpModal );

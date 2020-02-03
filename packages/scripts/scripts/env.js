@@ -25,7 +25,8 @@ if ( ! args.length ) {
 			'If you have a WordPress respository already, define the ' +
 			chalk.magenta( 'WP_DEVELOP_DIR' ) +
 			' environment variable with the path to your repository, then run this command to add this plugin to it.',
-		start: "This will start a container that you've already installed and connected to.",
+		start:
+			"This will start a container that you've already installed and connected to.",
 		stop: "And this will stop it when you're done!",
 		update:
 			'If you used ' +
@@ -52,7 +53,12 @@ if ( ! args.length ) {
 	stdout.write( chalk.white( '.\n\n' ) );
 
 	Object.keys( scripts ).forEach( ( script ) => {
-		stdout.write( chalk.green( script ) + '\n    ' + chalk.white( scripts[ script ] ) + '\n\n' );
+		stdout.write(
+			chalk.green( script ) +
+				'\n    ' +
+				chalk.white( scripts[ script ] ) +
+				'\n\n'
+		);
 	} );
 	exit( 0 );
 }
@@ -60,7 +66,9 @@ if ( ! args.length ) {
 const command = args.shift();
 
 if ( ! env.WP_DEVELOP_DIR && command !== 'install' ) {
-	if ( existsSync( normalize( cwd() + '/wordpress/wp-config-sample.php' ) ) ) {
+	if (
+		existsSync( normalize( cwd() + '/wordpress/wp-config-sample.php' ) )
+	) {
 		env.WP_DEVELOP_DIR = normalize( cwd() + '/wordpress' );
 		env.MANAGED_WP = true;
 	} else {

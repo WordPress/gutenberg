@@ -36,7 +36,11 @@ export const KeyboardAwareFlatList = ( {
 				) {
 					// Reset the content position if keyboard is still closed
 					if ( this.scrollViewRef ) {
-						this.scrollViewRef.props.scrollToPosition( 0, this.latestContentOffsetY, true );
+						this.scrollViewRef.props.scrollToPosition(
+							0,
+							this.latestContentOffsetY,
+							true
+						);
 					}
 				}
 			}, 50 );

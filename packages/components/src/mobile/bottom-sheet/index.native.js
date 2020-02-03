@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import { Text, View, Platform, PanResponder, Dimensions, ScrollView } from 'react-native';
+import {
+	Text,
+	View,
+	Platform,
+	PanResponder,
+	Dimensions,
+	ScrollView,
+} from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
 
@@ -35,7 +42,9 @@ class BottomSheet extends Component {
 			maxHeight: 0,
 		};
 
-		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
+		SafeArea.getSafeAreaInsetsForRootView().then(
+			this.onSafeAreaInsetsUpdate
+		);
 		Dimensions.addEventListener( 'change', this.onSetMaxHeight );
 	}
 
@@ -70,7 +79,10 @@ class BottomSheet extends Component {
 	}
 
 	isCloseToBottom( { layoutMeasurement, contentOffset, contentSize } ) {
-		return layoutMeasurement.height + contentOffset.y >= contentSize.height - contentOffset.y;
+		return (
+			layoutMeasurement.height + contentOffset.y >=
+			contentSize.height - contentOffset.y
+		);
 	}
 
 	isCloseToTop( { contentOffset } ) {
@@ -90,10 +102,10 @@ class BottomSheet extends Component {
 		const { height, width } = Dimensions.get( 'window' );
 		const { safeAreaBottomInset } = this.state;
 
-		// Horizontal mode
+		// On horizontal mode `maxHeight` has to be set on 90% of width
 		if ( width > height ) {
 			this.setState( { maxHeight: 0.9 * height } );
-			//	Vertical mode
+			//	On vertical mode `maxHeight` has to be set on 50% of width
 		} else this.setState( { maxHeight: height / 2 - safeAreaBottomInset } );
 	}
 
@@ -139,7 +151,10 @@ class BottomSheet extends Component {
 			</View>
 		);
 
-		const backgroundStyle = getStylesFromColorScheme( styles.background, styles.backgroundDark );
+		const backgroundStyle = getStylesFromColorScheme(
+			styles.background,
+			styles.backgroundDark
+		);
 
 		return (
 			<Modal
@@ -153,17 +168,29 @@ class BottomSheet extends Component {
 				onBackdropPress={ this.props.onClose }
 				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
-				onDismiss={ Platform.OS === 'ios' ? this.props.onDismiss : undefined }
-				onModalHide={ Platform.OS === 'android' ? this.props.onDismiss : undefined }
+				onDismiss={
+					Platform.OS === 'ios' ? this.props.onDismiss : undefined
+				}
+				onModalHide={
+					Platform.OS === 'android' ? this.props.onDismiss : undefined
+				}
 				swipeDirection="down"
-				onMoveShouldSetResponder={ panResponder.panHandlers.onMoveShouldSetResponder }
-				onMoveShouldSetResponderCapture={ panResponder.panHandlers.onMoveShouldSetResponderCapture }
+				onMoveShouldSetResponder={
+					panResponder.panHandlers.onMoveShouldSetResponder
+				}
+				onMoveShouldSetResponderCapture={
+					panResponder.panHandlers.onMoveShouldSetResponderCapture
+				}
 				onAccessibilityEscape={ this.props.onClose }
 				{ ...rest }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ { ...backgroundStyle, borderColor: 'rgba(0, 0, 0, 0.1)', ...style } }
+					style={ {
+						...backgroundStyle,
+						borderColor: 'rgba(0, 0, 0, 0.1)',
+						...style,
+					} }
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
@@ -180,7 +207,9 @@ class BottomSheet extends Component {
 						] }
 					>
 						{ this.props.children }
-						<View style={ { height: this.state.safeAreaBottomInset } } />
+						<View
+							style={ { height: this.state.safeAreaBottomInset } }
+						/>
 					</ScrollView>
 				</KeyboardAvoidingView>
 			</Modal>
@@ -189,7 +218,10 @@ class BottomSheet extends Component {
 }
 
 function getWidth() {
-	return Math.min( Dimensions.get( 'window' ).width, styles.background.maxWidth );
+	return Math.min(
+		Dimensions.get( 'window' ).width,
+		styles.background.maxWidth
+	);
 }
 
 const ThemedBottomSheet = withPreferredColorScheme( BottomSheet );

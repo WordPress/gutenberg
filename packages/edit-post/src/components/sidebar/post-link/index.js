@@ -34,17 +34,30 @@ function PostLink( {
 } ) {
 	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
-	const currentSlug = safeDecodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID;
+	const currentSlug =
+		safeDecodeURIComponent( postSlug ) ||
+		cleanForSlug( postTitle ) ||
+		postID;
 	if ( isEditable ) {
-		prefixElement = prefix && <span className="edit-post-post-link__link-prefix">{ prefix }</span>;
-		postNameElement = currentSlug && (
-			<span className="edit-post-post-link__link-post-name">{ currentSlug }</span>
+		prefixElement = prefix && (
+			<span className="edit-post-post-link__link-prefix">{ prefix }</span>
 		);
-		suffixElement = suffix && <span className="edit-post-post-link__link-suffix">{ suffix }</span>;
+		postNameElement = currentSlug && (
+			<span className="edit-post-post-link__link-post-name">
+				{ currentSlug }
+			</span>
+		);
+		suffixElement = suffix && (
+			<span className="edit-post-post-link__link-suffix">{ suffix }</span>
+		);
 	}
 
 	return (
-		<PanelBody title={ __( 'Permalink' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+		<PanelBody
+			title={ __( 'Permalink' ) }
+			opened={ isOpened }
+			onToggle={ onTogglePanel }
+		>
 			{ isEditable && (
 				<div className="editor-post-link">
 					<TextControl
@@ -87,9 +100,15 @@ function PostLink( {
 					</p>
 				</div>
 			) }
-			<p className="edit-post-post-link__preview-label">{ postTypeLabel || __( 'View post' ) }</p>
+			<p className="edit-post-post-link__preview-label">
+				{ postTypeLabel || __( 'View post' ) }
+			</p>
 			<div className="edit-post-post-link__preview-link-container">
-				<ExternalLink className="edit-post-post-link__link" href={ postLink } target="_blank">
+				<ExternalLink
+					className="edit-post-post-link__link"
+					href={ postLink }
+					target="_blank"
+				>
 					{ isEditable ? (
 						<>
 							{ prefixElement }
@@ -115,7 +134,9 @@ export default compose( [
 			getPermalinkParts,
 			getEditedPostAttribute,
 		} = select( 'core/editor' );
-		const { isEditorPanelEnabled, isEditorPanelOpened } = select( 'core/edit-post' );
+		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
+			'core/edit-post'
+		);
 		const { getPostType } = select( 'core' );
 
 		const { link, id } = getCurrentPost();
@@ -138,9 +159,13 @@ export default compose( [
 			postTypeLabel: get( postType, [ 'labels', 'view_item' ] ),
 		};
 	} ),
-	ifCondition( ( { isEnabled, isNew, postLink, isViewable, permalinkParts } ) => {
-		return isEnabled && ! isNew && postLink && isViewable && permalinkParts;
-	} ),
+	ifCondition(
+		( { isEnabled, isNew, postLink, isViewable, permalinkParts } ) => {
+			return (
+				isEnabled && ! isNew && postLink && isViewable && permalinkParts
+			);
+		}
+	),
 	withDispatch( ( dispatch ) => {
 		const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );
 		const { editPost } = dispatch( 'core/editor' );

@@ -22,7 +22,9 @@ function createHasHook( hooks ) {
 		if ( 'undefined' !== typeof namespace ) {
 			return (
 				hookName in hooks &&
-				hooks[ hookName ].handlers.some( ( hook ) => hook.namespace === namespace )
+				hooks[ hookName ].handlers.some(
+					( hook ) => hook.namespace === namespace
+				)
 			);
 		}
 

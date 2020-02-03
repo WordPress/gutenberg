@@ -2,7 +2,7 @@
 
 exports[`core/embed block edit matches snapshot 1`] = `
 <div
-  class="components-placeholder is-small wp-block-embed"
+  class="components-placeholder wp-block-embed"
 >
   <iframe
     aria-hidden="true"

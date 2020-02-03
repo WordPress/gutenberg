@@ -47,14 +47,22 @@ const DragExample = ( props ) => {
 			<div style={ { position: 'absolute', color: '#555' } }>
 				<p>Move the gray box around.</p>
 				<p>
-					The <strong style={ { background: 'pink' } }>pink bordered</strong> element is a parent.
+					The{ ' ' }
+					<strong style={ { background: 'pink' } }>
+						pink bordered
+					</strong>{ ' ' }
+					element is a parent.
 				</p>
 				<p>
-					The <strong style={ { background: 'cyan' } }>cyan bordered</strong> element is a sibling
-					to <strong>Popover</strong>.
+					The{ ' ' }
+					<strong style={ { background: 'cyan' } }>
+						cyan bordered
+					</strong>{ ' ' }
+					element is a sibling to <strong>Popover</strong>.
 				</p>
 				<p>
-					<strong>Popover</strong> aligns to the content within parent.
+					<strong>Popover</strong> aligns to the content within
+					parent.
 				</p>
 			</div>
 			<div
@@ -88,5 +96,7 @@ export const positioning = () => {
 	const content = text( 'Example: Content', 'Popover' );
 	const noArrow = boolean( 'noArrow', false );
 
-	return <DragExample label={ label } content={ content } noArrow={ noArrow } />;
+	return (
+		<DragExample label={ label } content={ content } noArrow={ noArrow } />
+	);
 };

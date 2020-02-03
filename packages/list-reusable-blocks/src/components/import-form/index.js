@@ -76,12 +76,22 @@ class ImportForm extends Component {
 		const { file, isLoading, error } = this.state;
 		const inputId = 'list-reusable-blocks-import-form-' + instanceId;
 		return (
-			<form className="list-reusable-blocks-import-form" onSubmit={ this.onSubmit }>
+			<form
+				className="list-reusable-blocks-import-form"
+				onSubmit={ this.onSubmit }
+			>
 				{ error && <Notice status="error">{ error }</Notice> }
-				<label htmlFor={ inputId } className="list-reusable-blocks-import-form__label">
+				<label
+					htmlFor={ inputId }
+					className="list-reusable-blocks-import-form__label"
+				>
 					{ __( 'File' ) }
 				</label>
-				<input id={ inputId } type="file" onChange={ this.onChangeFile } />
+				<input
+					id={ inputId }
+					type="file"
+					onChange={ this.onChangeFile }
+				/>
 				<Button
 					type="submit"
 					isBusy={ isLoading }

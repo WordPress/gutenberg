@@ -94,12 +94,19 @@ export default [
 					<img
 						src={ mediaUrl }
 						alt={ mediaAlt }
-						className={ mediaId && mediaType === 'image' ? `wp-image-${ mediaId }` : null }
+						className={
+							mediaId && mediaType === 'image'
+								? `wp-image-${ mediaId }`
+								: null
+						}
 					/>
 				),
 				video: () => <video controls src={ mediaUrl } />,
 			};
-			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
 			const className = classnames( {
 				'has-media-on-the-right': 'right' === mediaPosition,
 				[ backgroundClass ]: backgroundClass,
@@ -107,20 +114,29 @@ export default [
 				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 				'is-image-fill': imageFill,
 			} );
-			const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
+			const backgroundStyles = imageFill
+				? imageFillStyles( mediaUrl, focalPoint )
+				: {};
 
 			let gridTemplateColumns;
 			if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
 				gridTemplateColumns =
-					'right' === mediaPosition ? `auto ${ mediaWidth }%` : `${ mediaWidth }% auto`;
+					'right' === mediaPosition
+						? `auto ${ mediaWidth }%`
+						: `${ mediaWidth }% auto`;
 			}
 			const style = {
-				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				backgroundColor: backgroundClass
+					? undefined
+					: customBackgroundColor,
 				gridTemplateColumns,
 			};
 			return (
 				<div className={ className } style={ style }>
-					<figure className="wp-block-media-text__media" style={ backgroundStyles }>
+					<figure
+						className="wp-block-media-text__media"
+						style={ backgroundStyles }
+					>
 						{ ( mediaTypeRenders[ mediaType ] || noop )() }
 					</figure>
 					<div className="wp-block-media-text__content">
@@ -147,7 +163,10 @@ export default [
 				image: () => <img src={ mediaUrl } alt={ mediaAlt } />,
 				video: () => <video controls src={ mediaUrl } />,
 			};
-			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
 			const className = classnames( {
 				'has-media-on-the-right': 'right' === mediaPosition,
 				[ backgroundClass ]: backgroundClass,
@@ -157,10 +176,14 @@ export default [
 			let gridTemplateColumns;
 			if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
 				gridTemplateColumns =
-					'right' === mediaPosition ? `auto ${ mediaWidth }%` : `${ mediaWidth }% auto`;
+					'right' === mediaPosition
+						? `auto ${ mediaWidth }%`
+						: `${ mediaWidth }% auto`;
 			}
 			const style = {
-				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				backgroundColor: backgroundClass
+					? undefined
+					: customBackgroundColor,
 				gridTemplateColumns,
 			};
 			return (

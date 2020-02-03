@@ -58,15 +58,22 @@ export function BlockAlignmentToolbar( {
 
 	const enabledControls = wideControlsEnabled
 		? controls
-		: controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
+		: controls.filter(
+				( control ) => WIDE_CONTROLS.indexOf( control ) === -1
+		  );
 
 	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value ];
-	const defaultAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
+	const defaultAlignmentControl =
+		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	return (
 		<Toolbar
 			isCollapsed={ isCollapsed }
-			icon={ activeAlignmentControl ? activeAlignmentControl.icon : defaultAlignmentControl.icon }
+			icon={
+				activeAlignmentControl
+					? activeAlignmentControl.icon
+					: defaultAlignmentControl.icon
+			}
 			label={ __( 'Change alignment' ) }
 			controls={ enabledControls.map( ( control ) => {
 				return {

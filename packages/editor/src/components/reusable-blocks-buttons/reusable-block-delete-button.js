@@ -12,13 +12,21 @@ import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function ReusableBlockDeleteButton( { isVisible, isDisabled, onDelete } ) {
+export function ReusableBlockDeleteButton( {
+	isVisible,
+	isDisabled,
+	onDelete,
+} ) {
 	if ( ! isVisible ) {
 		return null;
 	}
 
 	return (
-		<MenuItem icon="no" disabled={ isDisabled } onClick={ () => onDelete() }>
+		<MenuItem
+			icon="no"
+			disabled={ isDisabled }
+			onClick={ () => onDelete() }
+		>
 			{ __( 'Remove from Reusable blocks' ) }
 		</MenuItem>
 	);
@@ -28,19 +36,27 @@ export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlock } = select( 'core/block-editor' );
 		const { canUser } = select( 'core' );
-		const { __experimentalGetReusableBlock: getReusableBlock } = select( 'core/editor' );
+		const { __experimentalGetReusableBlock: getReusableBlock } = select(
+			'core/editor'
+		);
 		const block = getBlock( clientId );
 
 		const reusableBlock =
-			block && isReusableBlock( block ) ? getReusableBlock( block.attributes.ref ) : null;
+			block && isReusableBlock( block )
+				? getReusableBlock( block.attributes.ref )
+				: null;
 
 		return {
-			isVisible: !! reusableBlock && !! canUser( 'delete', 'blocks', reusableBlock.id ),
+			isVisible:
+				!! reusableBlock &&
+				!! canUser( 'delete', 'blocks', reusableBlock.id ),
 			isDisabled: reusableBlock && reusableBlock.isTemporary,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, onToggle = noop }, { select } ) => {
-		const { __experimentalDeleteReusableBlock: deleteReusableBlock } = dispatch( 'core/editor' );
+		const {
+			__experimentalDeleteReusableBlock: deleteReusableBlock,
+		} = dispatch( 'core/editor' );
 		const { getBlock } = select( 'core/block-editor' );
 
 		return {

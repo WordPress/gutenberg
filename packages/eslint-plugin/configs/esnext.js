@@ -23,7 +23,11 @@ module.exports = {
 		'no-var': 'error',
 		'object-shorthand': 'error',
 		'prefer-const': 'error',
-		quotes: [ 'error', 'single', { allowTemplateLiterals: true, avoidEscape: true } ],
+		quotes: [
+			'error',
+			'single',
+			{ allowTemplateLiterals: true, avoidEscape: true },
+		],
 		'space-unary-ops': [
 			'error',
 			{

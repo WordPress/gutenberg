@@ -175,10 +175,13 @@ describe( 'state', () => {
 		} );
 
 		it( 'should toggle a feature flag', () => {
-			const state = preferences( deepFreeze( { features: { chicken: true } } ), {
-				type: 'TOGGLE_FEATURE',
-				feature: 'chicken',
-			} );
+			const state = preferences(
+				deepFreeze( { features: { chicken: true } } ),
+				{
+					type: 'TOGGLE_FEATURE',
+					feature: 'chicken',
+				}
+			);
 
 			expect( state.features ).toEqual( { chicken: false } );
 		} );
@@ -197,7 +200,9 @@ describe( 'state', () => {
 					pluginName: 'foo/does-not-exist',
 				} );
 
-				expect( state.pinnedPluginItems[ 'foo/does-not-exist' ] ).toBe( false );
+				expect( state.pinnedPluginItems[ 'foo/does-not-exist' ] ).toBe(
+					false
+				);
 			} );
 
 			it( 'should disable a pinned plugin flag when it is enabled', () => {
@@ -206,7 +211,9 @@ describe( 'state', () => {
 					pluginName: 'foo/enabled',
 				} );
 
-				expect( state.pinnedPluginItems[ 'foo/enabled' ] ).toBe( false );
+				expect( state.pinnedPluginItems[ 'foo/enabled' ] ).toBe(
+					false
+				);
 			} );
 
 			it( 'should enable a pinned plugin flag when it is disabled', () => {
@@ -215,7 +222,9 @@ describe( 'state', () => {
 					pluginName: 'foo/disabled',
 				} );
 
-				expect( state.pinnedPluginItems[ 'foo/disabled' ] ).toBe( true );
+				expect( state.pinnedPluginItems[ 'foo/disabled' ] ).toBe(
+					true
+				);
 			} );
 		} );
 

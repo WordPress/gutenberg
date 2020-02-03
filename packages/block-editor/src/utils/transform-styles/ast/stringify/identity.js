@@ -56,7 +56,10 @@ Compiler.prototype.stylesheet = function( node ) {
  */
 
 Compiler.prototype.comment = function( node ) {
-	return this.emit( this.indent() + '/*' + node.comment + '*/', node.position );
+	return this.emit(
+		this.indent() + '/*' + node.comment + '*/',
+		node.position
+	);
 };
 
 /**
@@ -130,7 +133,10 @@ Compiler.prototype.supports = function( node ) {
 
 Compiler.prototype.keyframes = function( node ) {
 	return (
-		this.emit( '@' + ( node.vendor || '' ) + 'keyframes ' + node.name, node.position ) +
+		this.emit(
+			'@' + ( node.vendor || '' ) + 'keyframes ' + node.name,
+			node.position
+		) +
 		this.emit( ' {\n' + this.indent( 1 ) ) +
 		this.mapVisit( node.keyframes, '\n' ) +
 		this.emit( this.indent( -1 ) + '}' )
@@ -203,7 +209,10 @@ Compiler.prototype.host = function( node ) {
  */
 
 Compiler.prototype[ 'custom-media' ] = function( node ) {
-	return this.emit( '@custom-media ' + node.name + ' ' + node.media + ';', node.position );
+	return this.emit(
+		'@custom-media ' + node.name + ' ' + node.media + ';',
+		node.position
+	);
 };
 
 /**

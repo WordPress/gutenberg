@@ -22,14 +22,18 @@ export { pasteHandler } from './paste-handler';
 export { getPhrasingContentSchema };
 
 function getRawTransformations() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map( ( transform ) => {
-		return transform.isMatch
-			? transform
-			: {
-					...transform,
-					isMatch: ( node ) => transform.selector && node.matches( transform.selector ),
-			  };
-	} );
+	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map(
+		( transform ) => {
+			return transform.isMatch
+				? transform
+				: {
+						...transform,
+						isMatch: ( node ) =>
+							transform.selector &&
+							node.matches( transform.selector ),
+				  };
+		}
+	);
 }
 
 /**
@@ -49,7 +53,9 @@ function htmlToBlocks( { html, rawTransforms } ) {
 	doc.body.innerHTML = html;
 
 	return Array.from( doc.body.children ).map( ( node ) => {
-		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) => isMatch( node ) );
+		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) =>
+			isMatch( node )
+		);
 
 		if ( ! rawTransform ) {
 			return createBlock(
@@ -65,7 +71,10 @@ function htmlToBlocks( { html, rawTransforms } ) {
 			return transform( node );
 		}
 
-		return createBlock( blockName, getBlockAttributes( blockName, node.outerHTML ) );
+		return createBlock(
+			blockName,
+			getBlockAttributes( blockName, node.outerHTML )
+		);
 	} );
 }
 
@@ -88,7 +97,10 @@ export function rawHandler( { HTML = '' } ) {
 	const pieces = shortcodeConverter( HTML );
 	const rawTransforms = getRawTransformations();
 	const phrasingContentSchema = getPhrasingContentSchema();
-	const blockContentSchema = getBlockContentSchema( rawTransforms, phrasingContentSchema );
+	const blockContentSchema = getBlockContentSchema(
+		rawTransforms,
+		phrasingContentSchema
+	);
 
 	return compact(
 		flatMap( pieces, ( piece ) => {

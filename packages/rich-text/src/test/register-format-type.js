@@ -91,7 +91,10 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should accept valid format names', () => {
-		const format = registerFormatType( 'my-plugin/fancy-format-4', validSettings );
+		const format = registerFormatType(
+			'my-plugin/fancy-format-4',
+			validSettings
+		);
 		expect( console ).not.toHaveErrored();
 		expect( format ).toEqual( {
 			name: 'my-plugin/fancy-format-4',
@@ -102,7 +105,9 @@ describe( 'registerFormatType', () => {
 	it( 'should error on already registered name', () => {
 		registerFormatType( validName, validSettings );
 		const duplicateFormat = registerFormatType( validName, validSettings );
-		expect( console ).toHaveErroredWith( 'Format "plugin/test" is already registered.' );
+		expect( console ).toHaveErroredWith(
+			'Format "plugin/test" is already registered.'
+		);
 		expect( duplicateFormat ).toBeUndefined();
 	} );
 
@@ -110,7 +115,9 @@ describe( 'registerFormatType', () => {
 		const settings = { ...validSettings };
 		delete settings.tagName;
 		const format = registerFormatType( validName, settings );
-		expect( console ).toHaveErroredWith( 'Format tag names must be a string.' );
+		expect( console ).toHaveErroredWith(
+			'Format tag names must be a string.'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
@@ -119,7 +126,9 @@ describe( 'registerFormatType', () => {
 			...validSettings,
 			tagName: '',
 		} );
-		expect( console ).toHaveErroredWith( 'Format tag names must be a string.' );
+		expect( console ).toHaveErroredWith(
+			'Format tag names must be a string.'
+		);
 		expect( format ).toBeUndefined();
 	} );
 
@@ -157,7 +166,10 @@ describe( 'registerFormatType', () => {
 
 	it( 'should error on already registered tagName', () => {
 		registerFormatType( validName, validSettings );
-		const duplicateTagNameFormat = registerFormatType( 'plugin/second', validSettings );
+		const duplicateTagNameFormat = registerFormatType(
+			'plugin/second',
+			validSettings
+		);
 		expect( console ).toHaveErroredWith(
 			'Format "plugin/test" is already registered to handle bare tag name "test".'
 		);
@@ -183,7 +195,9 @@ describe( 'registerFormatType', () => {
 		const settings = { ...validSettings };
 		delete settings.title;
 		const format = registerFormatType( validName, settings );
-		expect( console ).toHaveErroredWith( `The format "${ validName }" must have a title.` );
+		expect( console ).toHaveErroredWith(
+			`The format "${ validName }" must have a title.`
+		);
 		expect( format ).toBeUndefined();
 	} );
 
@@ -192,7 +206,9 @@ describe( 'registerFormatType', () => {
 			...validSettings,
 			title: '',
 		} );
-		expect( console ).toHaveErroredWith( 'The format "plugin/test" must have a title.' );
+		expect( console ).toHaveErroredWith(
+			'The format "plugin/test" must have a title.'
+		);
 		expect( format ).toBeUndefined();
 	} );
 

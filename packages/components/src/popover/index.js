@@ -25,7 +25,9 @@ import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
 import Animate from '../animate';
 
-const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
+const FocusManaged = withConstrainedTabbing(
+	withFocusReturn( ( { children } ) => children )
+);
 
 /**
  * Name of slot in which popover should fill.
@@ -104,9 +106,12 @@ function computeAnchorRect(
 }
 
 function withoutPadding( rect, element ) {
-	const { paddingTop, paddingBottom, paddingLeft, paddingRight } = window.getComputedStyle(
-		element
-	);
+	const {
+		paddingTop,
+		paddingBottom,
+		paddingLeft,
+		paddingRight,
+	} = window.getComputedStyle( element );
 	const top = paddingTop ? parseInt( paddingTop, 10 ) : 0;
 	const bottom = paddingBottom ? parseInt( paddingBottom, 10 ) : 0;
 	const left = paddingLeft ? parseInt( paddingLeft, 10 ) : 0;
@@ -147,7 +152,9 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
 			if ( focusOnMount === 'firstElement' ) {
 				// Find first tabbable node within content and shift focus, falling
 				// back to the popover panel itself.
-				const firstTabbable = focus.tabbable.find( contentRef.current )[ 0 ];
+				const firstTabbable = focus.tabbable.find(
+					contentRef.current
+				)[ 0 ];
 
 				if ( firstTabbable ) {
 					firstTabbable.focus();
@@ -331,18 +338,40 @@ const Popover = ( {
 				relativeOffsetTop
 			);
 
-			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
+			if (
+				typeof popoverTop === 'number' &&
+				typeof popoverLeft === 'number'
+			) {
 				if ( subpixels && __unstableAllowVerticalSubpixelPosition ) {
-					setStyle( containerRef.current, 'left', popoverLeft + 'px' );
+					setStyle(
+						containerRef.current,
+						'left',
+						popoverLeft + 'px'
+					);
 					setStyle( containerRef.current, 'top' );
-					setStyle( containerRef.current, 'transform', `translateY(${ popoverTop }px)` );
-				} else if ( subpixels && __unstableAllowHorizontalSubpixelPosition ) {
+					setStyle(
+						containerRef.current,
+						'transform',
+						`translateY(${ popoverTop }px)`
+					);
+				} else if (
+					subpixels &&
+					__unstableAllowHorizontalSubpixelPosition
+				) {
 					setStyle( containerRef.current, 'top', popoverTop + 'px' );
 					setStyle( containerRef.current, 'left' );
-					setStyle( containerRef.current, 'transform', `translate(${ popoverLeft }px)` );
+					setStyle(
+						containerRef.current,
+						'transform',
+						`translate(${ popoverLeft }px)`
+					);
 				} else {
 					setStyle( containerRef.current, 'top', popoverTop + 'px' );
-					setStyle( containerRef.current, 'left', popoverLeft + 'px' );
+					setStyle(
+						containerRef.current,
+						'left',
+						popoverLeft + 'px'
+					);
 					setStyle( containerRef.current, 'transform' );
 				}
 			}
@@ -409,10 +438,13 @@ const Popover = ( {
 		let observer;
 
 		const observeElement =
-			__unstableAllowVerticalSubpixelPosition || __unstableAllowHorizontalSubpixelPosition;
+			__unstableAllowVerticalSubpixelPosition ||
+			__unstableAllowHorizontalSubpixelPosition;
 
 		if ( observeElement ) {
-			observer = new window.MutationObserver( () => refresh( { subpixels: true } ) );
+			observer = new window.MutationObserver( () =>
+				refresh( { subpixels: true } )
+			);
 			observer.observe( observeElement, { attributes: true } );
 		}
 
@@ -524,10 +556,15 @@ const Popover = ( {
 			>
 				{ ( { className: animateClassName } ) => (
 					<IsolatedEventContainer
-						className={ classnames( 'components-popover', className, animateClassName, {
-							'is-expanded': isExpanded,
-							'is-without-arrow': noArrow,
-						} ) }
+						className={ classnames(
+							'components-popover',
+							className,
+							animateClassName,
+							{
+								'is-expanded': isExpanded,
+								'is-without-arrow': noArrow,
+							}
+						) }
 						{ ...contentProps }
 						onKeyDown={ maybeClose }
 						ref={ containerRef }
@@ -535,11 +572,21 @@ const Popover = ( {
 						{ isExpanded && <ScrollLock /> }
 						{ isExpanded && (
 							<div className="components-popover__header">
-								<span className="components-popover__header-title">{ headerTitle }</span>
-								<Button className="components-popover__close" icon="no-alt" onClick={ onClose } />
+								<span className="components-popover__header-title">
+									{ headerTitle }
+								</span>
+								<Button
+									className="components-popover__close"
+									icon="no-alt"
+									onClick={ onClose }
+								/>
 							</div>
 						) }
-						<div ref={ contentRef } className="components-popover__content" tabIndex="-1">
+						<div
+							ref={ contentRef }
+							className="components-popover__content"
+							tabIndex="-1"
+						>
 							{ children }
 						</div>
 					</IsolatedEventContainer>
@@ -560,7 +607,9 @@ const Popover = ( {
 				// In case there is no slot context in which to render,
 				// default to an in-place rendering.
 				if ( getSlot && getSlot( __unstableSlotName ) ) {
-					content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
+					content = (
+						<Fill name={ __unstableSlotName }>{ content }</Fill>
+					);
 				}
 
 				if ( anchorRef || anchorRect ) {
@@ -575,6 +624,8 @@ const Popover = ( {
 
 const PopoverContainer = Popover;
 
-PopoverContainer.Slot = ( { name = SLOT_NAME } ) => <Slot bubblesVirtually name={ name } />;
+PopoverContainer.Slot = ( { name = SLOT_NAME } ) => (
+	<Slot bubblesVirtually name={ name } />
+);
 
 export default PopoverContainer;

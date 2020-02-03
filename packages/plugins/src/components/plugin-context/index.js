@@ -26,7 +26,10 @@ export const withPluginContext = ( mapContextToProps ) =>
 		return ( props ) => (
 			<Consumer>
 				{ ( context ) => (
-					<OriginalComponent { ...props } { ...mapContextToProps( context, props ) } />
+					<OriginalComponent
+						{ ...props }
+						{ ...mapContextToProps( context, props ) }
+					/>
 				) }
 			</Consumer>
 		);

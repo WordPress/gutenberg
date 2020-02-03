@@ -14,10 +14,16 @@ export default function createElement( type ) {
 			let isHidden = false;
 			let node = this;
 			do {
-				isHidden = node.style.display === 'none' || node.style.visibility === 'hidden';
+				isHidden =
+					node.style.display === 'none' ||
+					node.style.visibility === 'hidden';
 
 				node = node.parentNode;
-			} while ( ! isHidden && node && node.nodeType === window.Node.ELEMENT_NODE );
+			} while (
+				! isHidden &&
+				node &&
+				node.nodeType === window.Node.ELEMENT_NODE
+			);
 
 			return isHidden ? elseValue : value;
 		};

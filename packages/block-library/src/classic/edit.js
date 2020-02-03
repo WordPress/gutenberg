@@ -113,7 +113,10 @@ export default class ClassicEdit extends Component {
 		} );
 
 		editor.on( 'keydown', ( event ) => {
-			if ( ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) && isTmceEmpty( editor ) ) {
+			if (
+				( event.keyCode === BACKSPACE || event.keyCode === DELETE ) &&
+				isTmceEmpty( editor )
+			) {
 				// delete the block
 				this.props.onReplace( [] );
 				event.preventDefault();
@@ -145,7 +148,10 @@ export default class ClassicEdit extends Component {
 
 		// Show the second, third, etc. toolbars when the `kitchensink` button is removed by a plugin.
 		editor.on( 'init', function() {
-			if ( editor.settings.toolbar1 && editor.settings.toolbar1.indexOf( 'kitchensink' ) === -1 ) {
+			if (
+				editor.settings.toolbar1 &&
+				editor.settings.toolbar1.indexOf( 'kitchensink' ) === -1
+			) {
 				editor.dom.addClass( ref, 'has-advanced-toolbar' );
 			}
 		} );

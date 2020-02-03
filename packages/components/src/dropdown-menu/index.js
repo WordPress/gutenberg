@@ -24,7 +24,10 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	};
 
 	if ( props.className && defaultProps.className ) {
-		mergedProps.className = classnames( props.className, defaultProps.className );
+		mergedProps.className = classnames(
+			props.className,
+			defaultProps.className
+		);
 	}
 
 	return mergedProps;
@@ -92,9 +95,12 @@ function DropdownMenu( {
 				};
 				const mergedToggleProps = mergeProps(
 					{
-						className: classnames( 'components-dropdown-menu__toggle', {
-							'is-opened': isOpen,
-						} ),
+						className: classnames(
+							'components-dropdown-menu__toggle',
+							{
+								'is-opened': isOpen,
+							}
+						),
 					},
 					toggleProps
 				);
@@ -141,7 +147,10 @@ function DropdownMenu( {
 						{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
 							controlSet.map( ( control, indexOfControl ) => (
 								<Button
-									key={ [ indexOfSet, indexOfControl ].join() }
+									key={ [
+										indexOfSet,
+										indexOfControl,
+									].join() }
 									onClick={ ( event ) => {
 										event.stopPropagation();
 										props.onClose();
@@ -149,18 +158,25 @@ function DropdownMenu( {
 											control.onClick();
 										}
 									} }
-									className={ classnames( 'components-dropdown-menu__menu-item', {
-										'has-separator': indexOfSet > 0 && indexOfControl === 0,
-										'is-active': control.isActive,
-									} ) }
+									className={ classnames(
+										'components-dropdown-menu__menu-item',
+										{
+											'has-separator':
+												indexOfSet > 0 &&
+												indexOfControl === 0,
+											'is-active': control.isActive,
+										}
+									) }
 									icon={ control.icon }
 									aria-checked={
-										control.role === 'menuitemcheckbox' || control.role === 'menuitemradio'
+										control.role === 'menuitemcheckbox' ||
+										control.role === 'menuitemradio'
 											? control.isActive
 											: undefined
 									}
 									role={
-										control.role === 'menuitemcheckbox' || control.role === 'menuitemradio'
+										control.role === 'menuitemcheckbox' ||
+										control.role === 'menuitemradio'
 											? control.role
 											: 'menuitem'
 									}

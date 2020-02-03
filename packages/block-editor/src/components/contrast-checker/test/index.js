@@ -114,7 +114,11 @@ describe( 'ContrastChecker', () => {
 
 	test( 'should take into consideration wherever text is large or not', () => {
 		const wrapperSmallText = mount(
-			<ContrastChecker backgroundColor="#C44B4B" textColor="#000000" isLargeText={ false } />
+			<ContrastChecker
+				backgroundColor="#C44B4B"
+				textColor="#000000"
+				isLargeText={ false }
+			/>
 		);
 
 		expect(
@@ -127,7 +131,11 @@ describe( 'ContrastChecker', () => {
 		);
 
 		const wrapperLargeText = mount(
-			<ContrastChecker backgroundColor="#C44B4B" textColor="#000000" isLargeText={ true } />
+			<ContrastChecker
+				backgroundColor="#C44B4B"
+				textColor="#000000"
+				isLargeText={ true }
+			/>
 		);
 
 		expect( wrapperLargeText.html() ).toBeNull();
@@ -135,7 +143,11 @@ describe( 'ContrastChecker', () => {
 
 	test( 'should take into consideration the font size passed', () => {
 		const wrapperSmallFontSize = mount(
-			<ContrastChecker backgroundColor="#C44B4B" textColor="#000000" fontSize={ 23 } />
+			<ContrastChecker
+				backgroundColor="#C44B4B"
+				textColor="#000000"
+				fontSize={ 23 }
+			/>
 		);
 
 		expect(
@@ -148,7 +160,11 @@ describe( 'ContrastChecker', () => {
 		);
 
 		const wrapperLargeText = mount(
-			<ContrastChecker backgroundColor="#C44B4B" textColor="#000000" fontSize={ 24 } />
+			<ContrastChecker
+				backgroundColor="#C44B4B"
+				textColor="#000000"
+				fontSize={ 24 }
+			/>
 		);
 
 		expect( wrapperLargeText.html() ).toBeNull();
@@ -199,7 +215,10 @@ describe( 'ContrastChecker', () => {
 
 	test( 'should render messages when the textColor is valid, but the fallback backgroundColor conflicts.', () => {
 		const wrapper = mount(
-			<ContrastChecker textColor={ textColor } fallbackBackgroundColor={ textColor } />
+			<ContrastChecker
+				textColor={ textColor }
+				fallbackBackgroundColor={ textColor }
+			/>
 		);
 
 		expect(

@@ -4,7 +4,11 @@
 
 import { getActiveFormats } from './get-active-formats';
 import { getFormatType } from './get-format-type';
-import { LINE_SEPARATOR, OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
+import {
+	LINE_SEPARATOR,
+	OBJECT_REPLACEMENT_CHARACTER,
+	ZWNBSP,
+} from './special-characters';
 
 /**
  * Converts a format object to information that can be used to create an element
@@ -22,7 +26,13 @@ import { LINE_SEPARATOR, OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-
  * @return {Object}                            Information to be used for
  *                                             element creation.
  */
-function fromFormat( { type, attributes, unregisteredAttributes, object, boundaryClass } ) {
+function fromFormat( {
+	type,
+	attributes,
+	unregisteredAttributes,
+	object,
+	boundaryClass,
+} ) {
 	const formatType = getFormatType( type );
 
 	let elementAttributes = {};
@@ -42,7 +52,9 @@ function fromFormat( { type, attributes, unregisteredAttributes, object, boundar
 	elementAttributes = { ...unregisteredAttributes, ...elementAttributes };
 
 	for ( const name in attributes ) {
-		const key = formatType.attributes ? formatType.attributes[ name ] : false;
+		const key = formatType.attributes
+			? formatType.attributes[ name ]
+			: false;
 
 		if ( key ) {
 			elementAttributes[ key ] = attributes[ name ];
@@ -135,7 +147,9 @@ export function toTree( {
 		// Set multiline tags in queue for building the tree.
 		if ( multilineTag ) {
 			if ( character === LINE_SEPARATOR ) {
-				characterFormats = lastSeparatorFormats = ( replacements[ i ] || [] ).reduce(
+				characterFormats = lastSeparatorFormats = (
+					replacements[ i ] || []
+				).reduce(
 					( accumulator, format ) => {
 						accumulator.push( format, multilineFormat );
 						return accumulator;
@@ -143,7 +157,10 @@ export function toTree( {
 					[ multilineFormat ]
 				);
 			} else {
-				characterFormats = [ ...lastSeparatorFormats, ...( characterFormats || [] ) ];
+				characterFormats = [
+					...lastSeparatorFormats,
+					...( characterFormats || [] ),
+				];
 			}
 		}
 
@@ -182,10 +199,15 @@ export function toTree( {
 					pointer &&
 					lastCharacterFormats &&
 					// Reuse the last element if all formats remain the same.
-					isEqualUntil( characterFormats, lastCharacterFormats, formatIndex ) &&
+					isEqualUntil(
+						characterFormats,
+						lastCharacterFormats,
+						formatIndex
+					) &&
 					// Do not reuse the last element if the character is a
 					// line separator.
-					( character !== LINE_SEPARATOR || characterFormats.length - 1 !== formatIndex )
+					( character !== LINE_SEPARATOR ||
+						characterFormats.length - 1 !== formatIndex )
 				) {
 					pointer = getLastChild( pointer );
 					return;
@@ -194,7 +216,9 @@ export function toTree( {
 				const { type, attributes, unregisteredAttributes } = format;
 
 				const boundaryClass =
-					isEditableTree && character !== LINE_SEPARATOR && format === deepestActiveFormat;
+					isEditableTree &&
+					character !== LINE_SEPARATOR &&
+					format === deepestActiveFormat;
 
 				const parent = getParent( pointer );
 				const newNode = append(

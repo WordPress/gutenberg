@@ -31,7 +31,9 @@ export default function BlockIcon( { icon, showColors = false, className } ) {
 	return (
 		<span
 			style={ style }
-			className={ classnames( 'block-editor-block-icon', className, { 'has-colors': showColors } ) }
+			className={ classnames( 'block-editor-block-icon', className, {
+				'has-colors': showColors,
+			} ) }
 		>
 			{ renderedIcon }
 		</span>

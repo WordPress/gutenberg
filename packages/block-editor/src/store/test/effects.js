@@ -70,7 +70,10 @@ describe( 'effects', () => {
 
 			const dispatch = jest.fn();
 			const getState = () => ( {} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
+				dispatch,
+				getState,
+			} );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken' ) );
@@ -83,7 +86,10 @@ describe( 'effects', () => {
 				},
 				merge( attributes, attributesToMerge ) {
 					return {
-						content: attributes.content + ' ' + attributesToMerge.content,
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
 					};
 				},
 				save: noop,
@@ -113,11 +119,19 @@ describe( 'effects', () => {
 					offset: 0,
 				},
 			} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
+				dispatch,
+				getState,
+			} );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			expect( dispatch ).toHaveBeenCalledWith(
-				selectionChange( blockA.clientId, 'content', 'chicken'.length + 1, 'chicken'.length + 1 )
+				selectionChange(
+					blockA.clientId,
+					'content',
+					'chicken'.length + 1,
+					'chicken'.length + 1
+				)
 			);
 			const lastCall = dispatch.mock.calls[ 1 ];
 			expect( lastCall ).toHaveLength( 1 );
@@ -132,7 +146,9 @@ describe( 'effects', () => {
 					},
 				]
 			);
-			expect( Array.from( lastCallArgument ) ).toEqual( Array.from( expectedGenerator ) );
+			expect( Array.from( lastCallArgument ) ).toEqual(
+				Array.from( expectedGenerator )
+			);
 		} );
 
 		it( 'should not merge the blocks have different types without transformation', () => {
@@ -142,7 +158,10 @@ describe( 'effects', () => {
 				},
 				merge( attributes, attributesToMerge ) {
 					return {
-						content: attributes.content + ' ' + attributesToMerge.content,
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
 					};
 				},
 				save: noop,
@@ -173,7 +192,10 @@ describe( 'effects', () => {
 					offset: 0,
 				},
 			} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
+				dispatch,
+				getState,
+			} );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -187,7 +209,10 @@ describe( 'effects', () => {
 				},
 				merge( attributes, attributesToMerge ) {
 					return {
-						content: attributes.content + ' ' + attributesToMerge.content,
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
 					};
 				},
 				save: noop,
@@ -240,11 +265,19 @@ describe( 'effects', () => {
 					offset: 0,
 				},
 			} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
+				dispatch,
+				getState,
+			} );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			expect( dispatch ).toHaveBeenCalledWith(
-				selectionChange( blockA.clientId, 'content', 'chicken'.length + 1, 'chicken'.length + 1 )
+				selectionChange(
+					blockA.clientId,
+					'content',
+					'chicken'.length + 1,
+					'chicken'.length + 1
+				)
 			);
 			const expectedGenerator = replaceBlocks(
 				[ 'chicken', 'ribs' ],
@@ -259,7 +292,9 @@ describe( 'effects', () => {
 			const lastCall = dispatch.mock.calls[ 1 ];
 			expect( lastCall ).toHaveLength( 1 );
 			const [ lastCallArgument ] = lastCall;
-			expect( Array.from( lastCallArgument ) ).toEqual( Array.from( expectedGenerator ) );
+			expect( Array.from( lastCallArgument ) ).toEqual(
+				Array.from( expectedGenerator )
+			);
 		} );
 	} );
 

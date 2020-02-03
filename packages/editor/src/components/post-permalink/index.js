@@ -54,7 +54,10 @@ class PostPermalink extends Component {
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'visibilitychange', this.addVisibilityCheck );
+		window.removeEventListener(
+			'visibilitychange',
+			this.addVisibilityCheck
+		);
 	}
 
 	render() {
@@ -75,16 +78,23 @@ class PostPermalink extends Component {
 		}
 
 		const { isCopied, isEditingPermalink } = this.state;
-		const ariaLabel = isCopied ? __( 'Permalink copied' ) : __( 'Copy the permalink' );
+		const ariaLabel = isCopied
+			? __( 'Permalink copied' )
+			: __( 'Copy the permalink' );
 
 		const { prefix, suffix } = permalinkParts;
-		const slug = safeDecodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID;
+		const slug =
+			safeDecodeURIComponent( postSlug ) ||
+			cleanForSlug( postTitle ) ||
+			postID;
 		const samplePermalink = isEditable ? prefix + slug + suffix : prefix;
 
 		return (
 			<div className="editor-post-permalink">
 				<ClipboardButton
-					className={ classnames( 'editor-post-permalink__copy', { 'is-copied': isCopied } ) }
+					className={ classnames( 'editor-post-permalink__copy', {
+						'is-copied': isCopied,
+					} ) }
 					text={ samplePermalink }
 					label={ ariaLabel }
 					onCopy={ () => this.setState( { isCopied: true } ) }
@@ -92,14 +102,18 @@ class PostPermalink extends Component {
 					icon="admin-links"
 				/>
 
-				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
+				<span className="editor-post-permalink__label">
+					{ __( 'Permalink:' ) }
+				</span>
 
 				{ ! isEditingPermalink && (
 					<ExternalLink
 						className="editor-post-permalink__link"
 						href={ ! isPublished ? postLink : samplePermalink }
 						target="_blank"
-						ref={ ( linkElement ) => ( this.linkElement = linkElement ) }
+						ref={ ( linkElement ) =>
+							( this.linkElement = linkElement )
+						}
 					>
 						{ safeDecodeURI( samplePermalink ) }
 						&lrm;
@@ -109,7 +123,9 @@ class PostPermalink extends Component {
 				{ isEditingPermalink && (
 					<PostPermalinkEditor
 						slug={ slug }
-						onSave={ () => this.setState( { isEditingPermalink: false } ) }
+						onSave={ () =>
+							this.setState( { isEditingPermalink: false } )
+						}
 					/>
 				) }
 
@@ -117,7 +133,9 @@ class PostPermalink extends Component {
 					<Button
 						className="editor-post-permalink__edit"
 						isSecondary
-						onClick={ () => this.setState( { isEditingPermalink: true } ) }
+						onClick={ () =>
+							this.setState( { isEditingPermalink: true } )
+						}
 					>
 						{ __( 'Edit' ) }
 					</Button>

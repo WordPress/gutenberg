@@ -38,7 +38,14 @@ const colorsAndGradientKeys = [
 	'disableCustomGradients',
 ];
 
-function VisualLabel( { colors, gradients, label, currentTab, colorValue, gradientValue } ) {
+function VisualLabel( {
+	colors,
+	gradients,
+	label,
+	currentTab,
+	colorValue,
+	gradientValue,
+} ) {
 	let value, ariaLabel;
 	if ( currentTab === 'color' ) {
 		if ( colorValue ) {
@@ -49,15 +56,23 @@ function VisualLabel( { colors, gradients, label, currentTab, colorValue, gradie
 		}
 	} else if ( currentTab === 'gradient' && gradientValue ) {
 		value = gradientValue;
-		const gradientObject = __experimentalGetGradientObjectByGradientValue( gradients, value );
+		const gradientObject = __experimentalGetGradientObjectByGradientValue(
+			gradients,
+			value
+		);
 		const gradientName = gradientObject && gradientObject.name;
-		ariaLabel = sprintf( gradientIndicatorAriaLabel, gradientName || value );
+		ariaLabel = sprintf(
+			gradientIndicatorAriaLabel,
+			gradientName || value
+		);
 	}
 
 	return (
 		<>
 			{ label }
-			{ !! value && <ColorIndicator colorValue={ value } aria-label={ ariaLabel } /> }
+			{ !! value && (
+				<ColorIndicator colorValue={ value } aria-label={ ariaLabel } />
+			) }
 		</>
 	);
 }
@@ -74,9 +89,11 @@ function ColorGradientControlInner( {
 	colorValue,
 	gradientValue,
 } ) {
-	const canChooseAColor = onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
+	const canChooseAColor =
+		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
 	const canChooseAGradient =
-		onGradientChange && ( ! isEmpty( gradients ) || ! disableCustomGradients );
+		onGradientChange &&
+		( ! isEmpty( gradients ) || ! disableCustomGradients );
 	const [ currentTab, setCurrentTab ] = useState(
 		gradientValue ? 'gradient' : !! canChooseAColor && 'color'
 	);
@@ -85,7 +102,12 @@ function ColorGradientControlInner( {
 		return null;
 	}
 	return (
-		<BaseControl className={ classnames( 'block-editor-color-gradient-control', className ) }>
+		<BaseControl
+			className={ classnames(
+				'block-editor-color-gradient-control',
+				className
+			) }
+		>
 			<fieldset>
 				<legend>
 					<BaseControl.VisualLabel>
@@ -155,11 +177,17 @@ function ColorGradientControlSelect( props ) {
 		const settings = select( 'core/block-editor' ).getSettings();
 		return pick( settings, colorsAndGradientKeys );
 	} );
-	return <ColorGradientControlInner { ...{ ...colorGradientSettings, ...props } } />;
+	return (
+		<ColorGradientControlInner
+			{ ...{ ...colorGradientSettings, ...props } }
+		/>
+	);
 }
 
 function ColorGradientControl( props ) {
-	if ( every( colorsAndGradientKeys, ( key ) => props.hasOwnProperty( key ) ) ) {
+	if (
+		every( colorsAndGradientKeys, ( key ) => props.hasOwnProperty( key ) )
+	) {
 		return <ColorGradientControlInner { ...props } />;
 	}
 	return <ColorGradientControlSelect { ...props } />;

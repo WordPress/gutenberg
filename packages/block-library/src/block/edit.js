@@ -10,7 +10,11 @@ import { Component } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEditorProvider, BlockList, WritingFlow } from '@wordpress/block-editor';
+import {
+	BlockEditorProvider,
+	BlockList,
+	WritingFlow,
+} from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { parse, serialize } from '@wordpress/blocks';
 
@@ -53,7 +57,10 @@ class ReusableBlockEdit extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( prevProps.reusableBlock !== this.props.reusableBlock && this.state.title === null ) {
+		if (
+			prevProps.reusableBlock !== this.props.reusableBlock &&
+			this.state.title === null
+		) {
 			this.setState( {
 				title: this.props.reusableBlock.title,
 				blocks: parse( this.props.reusableBlock.content ),
@@ -116,7 +123,11 @@ class ReusableBlockEdit extends Component {
 		}
 
 		if ( ! reusableBlock ) {
-			return <Placeholder>{ __( 'Block has been deleted or is unavailable.' ) }</Placeholder>;
+			return (
+				<Placeholder>
+					{ __( 'Block has been deleted or is unavailable.' ) }
+				</Placeholder>
+			);
 		}
 
 		let element = (
@@ -164,7 +175,9 @@ export default compose( [
 			__experimentalIsSavingReusableBlock: isSavingReusableBlock,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
-		const { __experimentalGetParsedReusableBlock, getSettings } = select( 'core/block-editor' );
+		const { __experimentalGetParsedReusableBlock, getSettings } = select(
+			'core/block-editor'
+		);
 		const { ref } = ownProps.attributes;
 		const reusableBlock = getReusableBlock( ref );
 
@@ -172,9 +185,13 @@ export default compose( [
 			reusableBlock,
 			isFetching: isFetchingReusableBlock( ref ),
 			isSaving: isSavingReusableBlock( ref ),
-			blocks: reusableBlock ? __experimentalGetParsedReusableBlock( reusableBlock.id ) : null,
+			blocks: reusableBlock
+				? __experimentalGetParsedReusableBlock( reusableBlock.id )
+				: null,
 			canUpdateBlock:
-				!! reusableBlock && ! reusableBlock.isTemporary && !! canUser( 'update', 'blocks', ref ),
+				!! reusableBlock &&
+				! reusableBlock.isTemporary &&
+				!! canUser( 'update', 'blocks', ref ),
 			settings: getSettings(),
 		};
 	} ),

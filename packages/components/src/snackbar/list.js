@@ -32,7 +32,10 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 	const transitions = useTransition( notices, ( notice ) => notice.id, {
 		from: { opacity: 0, height: 0 },
 		enter: ( item ) => async ( next ) =>
-			await next( { opacity: 1, height: refMap.get( item ).offsetHeight } ),
+			await next( {
+				opacity: 1,
+				height: refMap.get( item ).offsetHeight,
+			} ),
 		leave: () => async ( next ) => {
 			await next( { opacity: 0 } );
 			await next( { height: 0 } );
@@ -52,7 +55,10 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 						className="components-snackbar-list__notice-container"
 						ref={ ( ref ) => ref && refMap.set( notice, ref ) }
 					>
-						<Snackbar { ...omit( notice, [ 'content' ] ) } onRemove={ removeNotice( notice ) }>
+						<Snackbar
+							{ ...omit( notice, [ 'content' ] ) }
+							onRemove={ removeNotice( notice ) }
+						>
 							{ notice.content }
 						</Snackbar>
 					</div>

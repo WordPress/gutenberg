@@ -26,7 +26,11 @@ export default function save( { attributes } ) {
 					</a>
 				) }
 				{ showDownloadButton && (
-					<a href={ href } className="wp-block-file__button" download={ true }>
+					<a
+						href={ href }
+						className="wp-block-file__button"
+						download={ true }
+					>
 						<RichText.Content value={ downloadButtonText } />
 					</a>
 				) }

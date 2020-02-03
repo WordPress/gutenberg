@@ -11,7 +11,9 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const getActiveBlockName = async () =>
-	page.evaluate( () => wp.data.select( 'core/block-editor' ).getSelectedBlock().name );
+	page.evaluate(
+		() => wp.data.select( 'core/block-editor' ).getSelectedBlock().name
+	);
 
 describe( 'Writing Flow', () => {
 	beforeEach( async () => {
@@ -63,7 +65,9 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate( () => document.activeElement.textContent );
+		activeElementText = await page.evaluate(
+			() => document.activeElement.textContent
+		);
 		expect( activeElementText ).toBe( '2nd col' );
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
@@ -74,7 +78,9 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate( () => document.activeElement.textContent );
+		activeElementText = await page.evaluate(
+			() => document.activeElement.textContent
+		);
 		expect( activeElementText ).toBe( '1st col' );
 
 		// Arrow up from first text field in nested context focuses column and
@@ -100,7 +106,9 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate( () => document.activeElement.textContent );
+		activeElementText = await page.evaluate(
+			() => document.activeElement.textContent
+		);
 		expect( activeElementText ).toBe( 'First paragraph' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -474,9 +482,13 @@ describe( 'Writing Flow', () => {
 		const y = paragraphRect.y + paragraphRect.height + 1;
 
 		await page.mouse.move( x, y );
-		await page.waitForSelector( '.block-editor-block-list__insertion-point-inserter' );
+		await page.waitForSelector(
+			'.block-editor-block-list__insertion-point-inserter'
+		);
 
-		const inserter = await page.$( '.block-editor-block-list__insertion-point-inserter' );
+		const inserter = await page.$(
+			'.block-editor-block-list__insertion-point-inserter'
+		);
 		const inserterRect = await inserter.boundingBox();
 		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
 
@@ -500,9 +512,13 @@ describe( 'Writing Flow', () => {
 		const y = paragraphRect.y + paragraphRect.height + 1;
 
 		await page.mouse.move( x, y );
-		await page.waitForSelector( '.block-editor-block-list__insertion-point-inserter' );
+		await page.waitForSelector(
+			'.block-editor-block-list__insertion-point-inserter'
+		);
 
-		const inserter = await page.$( '.block-editor-block-list__insertion-point-inserter' );
+		const inserter = await page.$(
+			'.block-editor-block-list__insertion-point-inserter'
+		);
 		const inserterRect = await inserter.boundingBox();
 		const upperInserterY = inserterRect.y + inserterRect.height / 3;
 

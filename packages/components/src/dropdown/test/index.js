@@ -11,7 +11,10 @@ import Dropdown from '../';
 describe( 'Dropdown', () => {
 	const expectPopoverVisible = ( wrapper, visible ) => {
 		expect(
-			TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' )
+			TestUtils.scryRenderedDOMComponentsWithClass(
+				wrapper,
+				'components-popover'
+			)
 		).toHaveLength( visible ? 1 : 0 );
 	};
 	const buttonElement = ( wrapper ) =>
@@ -21,10 +24,12 @@ describe( 'Dropdown', () => {
 
 	it( 'should toggle the dropdown properly', () => {
 		const expectButtonExpanded = ( wrapper, expanded ) => {
-			expect( TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'button' ) ).toHaveLength( 1 );
-			expect( buttonElement( wrapper ).getAttribute( 'aria-expanded' ) ).toBe(
-				expanded.toString()
-			);
+			expect(
+				TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'button' )
+			).toHaveLength( 1 );
+			expect(
+				buttonElement( wrapper ).getAttribute( 'aria-expanded' )
+			).toBe( expanded.toString() );
 		};
 
 		const wrapper = TestUtils.renderIntoDocument(
@@ -55,7 +60,12 @@ describe( 'Dropdown', () => {
 				className="container"
 				contentClassName="content"
 				renderToggle={ ( { isOpen, onToggle, onClose } ) => [
-					<button key="open" className="open" aria-expanded={ isOpen } onClick={ onToggle }>
+					<button
+						key="open"
+						className="open"
+						aria-expanded={ isOpen }
+						onClick={ onToggle }
+					>
 						Toggleee
 					</button>,
 					<button key="close" className="close" onClick={ onClose }>

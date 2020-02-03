@@ -234,7 +234,11 @@ export function switchChildrenNodeName( children, nodeName ) {
 				return createElement( nodeName, { key: index }, elt );
 			}
 			const { children: childrenProp, ...props } = elt.props;
-			return createElement( nodeName, { key: index, ...props }, childrenProp );
+			return createElement(
+				nodeName,
+				{ key: index, ...props },
+				childrenProp
+			);
 		} )
 	);
 }

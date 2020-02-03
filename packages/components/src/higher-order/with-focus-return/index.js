@@ -64,7 +64,11 @@ function withFocusReturn( options ) {
 			}
 
 			componentWillUnmount() {
-				const { activeElementOnMount, isFocused, ownFocusedElements } = this;
+				const {
+					activeElementOnMount,
+					isFocused,
+					ownFocusedElements,
+				} = this;
 
 				if ( ! isFocused ) {
 					return;
@@ -80,7 +84,10 @@ function withFocusReturn( options ) {
 				}
 
 				const stack = [
-					...without( this.props.focus.focusHistory, ...ownFocusedElements ),
+					...without(
+						this.props.focus.focusHistory,
+						...ownFocusedElements
+					),
 					activeElementOnMount,
 				];
 
@@ -95,7 +102,10 @@ function withFocusReturn( options ) {
 
 			render() {
 				return (
-					<div onFocus={ this.setIsFocusedTrue } onBlur={ this.setIsFocusedFalse }>
+					<div
+						onFocus={ this.setIsFocusedTrue }
+						onBlur={ this.setIsFocusedFalse }
+					>
 						<WrappedComponent { ...this.props.childProps } />
 					</div>
 				);
@@ -103,7 +113,11 @@ function withFocusReturn( options ) {
 		}
 
 		return ( props ) => (
-			<Consumer>{ ( context ) => <FocusReturn childProps={ props } focus={ context } /> }</Consumer>
+			<Consumer>
+				{ ( context ) => (
+					<FocusReturn childProps={ props } focus={ context } />
+				) }
+			</Consumer>
 		);
 	};
 }

@@ -9,7 +9,11 @@ import { assign, get, has, includes, without } from 'lodash';
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { getBlockSupport, getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockSupport,
+	getBlockType,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -62,7 +66,10 @@ export function getValidAlignments(
 		validAlignments = [];
 	}
 
-	if ( ! hasWideEnabled || ( blockAlign === true && ! hasWideBlockSupport ) ) {
+	if (
+		! hasWideEnabled ||
+		( blockAlign === true && ! hasWideBlockSupport )
+	) {
 		return without( validAlignments, ...WIDE_ALIGNMENTS );
 	}
 
@@ -113,7 +120,11 @@ export const withToolbarControls = createHigherOrderComponent(
 		const updateAlignment = ( nextAlign ) => {
 			if ( ! nextAlign ) {
 				const blockType = getBlockType( props.name );
-				const blockDefaultAlign = get( blockType, [ 'attributes', 'align', 'default' ] );
+				const blockDefaultAlign = get( blockType, [
+					'attributes',
+					'align',
+					'default',
+				] );
 				if ( blockDefaultAlign ) {
 					nextAlign = '';
 				}
@@ -143,33 +154,36 @@ export const withToolbarControls = createHigherOrderComponent(
  * @param  {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
  */
-export const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => ( props ) => {
-	const { name, attributes } = props;
-	const { align } = attributes;
-	const hasWideEnabled = useSelect(
-		( select ) => !! select( 'core/block-editor' ).getSettings().alignWide,
-		[]
-	);
+export const withDataAlign = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		const { name, attributes } = props;
+		const { align } = attributes;
+		const hasWideEnabled = useSelect(
+			( select ) =>
+				!! select( 'core/block-editor' ).getSettings().alignWide,
+			[]
+		);
 
-	// If an alignment is not assigned, there's no need to go through the
-	// effort to validate or assign its value.
-	if ( align === undefined ) {
-		return <BlockListBlock { ...props } />;
+		// If an alignment is not assigned, there's no need to go through the
+		// effort to validate or assign its value.
+		if ( align === undefined ) {
+			return <BlockListBlock { ...props } />;
+		}
+
+		const validAlignments = getValidAlignments(
+			getBlockSupport( name, 'align' ),
+			hasBlockSupport( name, 'alignWide', true ),
+			hasWideEnabled
+		);
+
+		let wrapperProps = props.wrapperProps;
+		if ( includes( validAlignments, align ) ) {
+			wrapperProps = { ...wrapperProps, 'data-align': align };
+		}
+
+		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
 	}
-
-	const validAlignments = getValidAlignments(
-		getBlockSupport( name, 'align' ),
-		hasBlockSupport( name, 'alignWide', true ),
-		hasWideEnabled
-	);
-
-	let wrapperProps = props.wrapperProps;
-	if ( includes( validAlignments, align ) ) {
-		wrapperProps = { ...wrapperProps, 'data-align': align };
-	}
-
-	return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-} );
+);
 
 /**
  * Override props assigned to save component to inject alignment class name if
@@ -198,7 +212,23 @@ export function addAssignedAlign( props, blockType, attributes ) {
 	return props;
 }
 
-addFilter( 'blocks.registerBlockType', 'core/align/addAttribute', addAttribute );
-addFilter( 'editor.BlockListBlock', 'core/editor/align/with-data-align', withDataAlign );
-addFilter( 'editor.BlockEdit', 'core/editor/align/with-toolbar-controls', withToolbarControls );
-addFilter( 'blocks.getSaveContent.extraProps', 'core/align/addAssignedAlign', addAssignedAlign );
+addFilter(
+	'blocks.registerBlockType',
+	'core/align/addAttribute',
+	addAttribute
+);
+addFilter(
+	'editor.BlockListBlock',
+	'core/editor/align/with-data-align',
+	withDataAlign
+);
+addFilter(
+	'editor.BlockEdit',
+	'core/editor/align/with-toolbar-controls',
+	withToolbarControls
+);
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'core/align/addAssignedAlign',
+	addAssignedAlign
+);
