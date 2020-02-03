@@ -7,9 +7,12 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import edit from './edit';
-import socialList from './social-list';
+import variations from './variations';
 
-const commonAttributes = {
+export const name = 'core/social-link';
+
+export const settings = {
+	title: __( 'Social Icon' ),
 	category: 'widgets',
 	parent: [ 'core/social-links' ],
 	supports: {
@@ -17,30 +20,17 @@ const commonAttributes = {
 		html: false,
 	},
 	edit,
-};
-
-// Create individual blocks out of each site in social-list.js
-export const sites = Object.keys( socialList ).map( ( site ) => {
-	const siteParams = socialList[ site ];
-	return {
-		name: 'core/social-link-' + site,
-		settings: {
-			title: siteParams.name,
-			icon: siteParams.icon,
-			description: __( 'Link to ' + siteParams.name ),
-			...commonAttributes,
-			attributes: {
-				url: {
-					type: 'string',
-				},
-				site: {
-					type: 'string',
-					default: site,
-				},
-				label: {
-					type: 'string',
-				},
-			},
+	description: __( 'Create a link to the wider Web' ),
+	attributes: {
+		url: {
+			type: 'string',
 		},
-	};
-} );
+		site: {
+			type: 'string',
+		},
+		label: {
+			type: 'string',
+		},
+	},
+	variations,
+};

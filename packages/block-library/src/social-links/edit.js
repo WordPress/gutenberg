@@ -4,23 +4,16 @@
 
 import { InnerBlocks } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import socialList from '../social-link/social-list';
-
-const ALLOWED_BLOCKS = Object.keys( socialList ).map( ( site ) => {
-	return 'core/social-link-' + site;
-} );
+const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
 // Template contains the links that show when start.
 const TEMPLATE = [
-	[ 'core/social-link-wordpress', { url: 'https://wordpress.org' } ],
-	[ 'core/social-link-facebook' ],
-	[ 'core/social-link-twitter' ],
-	[ 'core/social-link-instagram' ],
-	[ 'core/social-link-linkedin' ],
-	[ 'core/social-link-youtube' ],
+	[ 'core/social-link', { site: 'wordpress', url: 'https://wordpress.org' } ],
+	[ 'core/social-link', { site: 'facebook' } ],
+	[ 'core/social-link', { site: 'twitter' } ],
+	[ 'core/social-link', { site: 'instagram' } ],
+	[ 'core/social-link', { site: 'linkedin' } ],
+	[ 'core/social-link', { site: 'youtube' } ],
 ];
 
 export const SocialLinksEdit = function( { className } ) {

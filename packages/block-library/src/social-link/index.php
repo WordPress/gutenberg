@@ -92,6 +92,24 @@ function register_block_core_social_link() {
 			)
 		);
 	}
+
+	register_block_type(
+		'core/social-link',
+		array(
+			'attributes'      => array(
+				'url'   => array(
+					'type' => 'string',
+				),
+				'site'  => array(
+					'type' => 'string',
+				),
+				'label' => array(
+					'type' => 'string',
+				),
+			),
+			'render_callback' => 'render_core_social_link',
+		)
+	);
 }
 add_action( 'init', 'register_block_core_social_link' );
 

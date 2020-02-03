@@ -33,8 +33,8 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	} );
 
 	// Import icon.
-	const IconComponent = getIconBySite( site );
-	const socialLinkName = getNameBySite( site );
+	const IconComponent = site ? getIconBySite( site ) : null;
+	const socialLinkName = site ? getNameBySite( site ) : '';
 
 	return (
 		<Fragment>
@@ -58,7 +58,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 				</PanelBody>
 			</InspectorControls>
 			<Button className={ classes } onClick={ () => setPopover( true ) }>
-				<IconComponent />
+				{ IconComponent && <IconComponent /> }
 				{ isSelected && showURLPopover && (
 					<URLPopover onClose={ () => setPopover( false ) }>
 						<form
