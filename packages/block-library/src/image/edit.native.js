@@ -357,12 +357,7 @@ export class ImageEdit extends React.Component {
 			},
 		];
 
-		const getImageSizeOptions = () => map( imageSizes, ( { label, slug } ) => {
-			return {
-				value: slug,
-				label,
-			};
-		} );
+		const sizeOptions = imageSizes.map( ( { label, slug } ) => ( { value: slug, label } ) );
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -407,7 +402,7 @@ export class ImageEdit extends React.Component {
 							label={ __( 'Size' ) }
 							value={ sizeSlug || DEFAULT_SIZE_SLUG }
 							onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
-							options={ getImageSizeOptions() }
+							options={ sizeOptions }
 						/> }
 					<TextControl
 						icon={ 'editor-textcolor' }
