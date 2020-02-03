@@ -24,7 +24,11 @@ import styles from './styles.scss';
 
 // remove duplicates after gallery append
 const dedupMedia = ( media ) =>
-	uniqWith( media, ( media1, media2 ) => media1.id === media2.id || media1.url === media2.url );
+	uniqWith(
+		media,
+		( media1, media2 ) =>
+			media1.id === media2.id || media1.url === media2.url
+	);
 
 function MediaPlaceholder( props ) {
 	const {
@@ -47,7 +51,10 @@ function MediaPlaceholder( props ) {
 	// append and deduplicate media array for gallery use case
 	const setMedia =
 		multiple && addToGallery
-			? ( selected ) => onSelect( dedupMedia( [ ...mediaRef.current, ...selected ] ) )
+			? ( selected ) =>
+					onSelect(
+						dedupMedia( [ ...mediaRef.current, ...selected ] )
+					)
 			: onSelect;
 
 	const isOneType = allowedTypes.length === 1;
