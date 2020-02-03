@@ -36,7 +36,7 @@ import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { toolbarSubmenuIcon, itemSubmenuIcon } from './icons';
+import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
 
 function NavigationLinkEdit( {
 	attributes,
@@ -46,6 +46,7 @@ function NavigationLinkEdit( {
 	setAttributes,
 	showSubmenuIcon,
 	insertLinkBlock,
+	navigationBlockAttributes,
 } ) {
 	const {
 		label,
@@ -55,6 +56,17 @@ function NavigationLinkEdit( {
 		nofollow,
 		description,
 	} = attributes;
+
+	/*
+	 * Navigation Block attributes.
+	 */
+	const {
+		textColor,
+		rgbTextColor,
+		backgroundColor,
+		rgbBackgroundColor,
+	} = navigationBlockAttributes;
+
 	const link = {
 		title: title ? unescape( title ) : '',
 		url,
@@ -137,7 +149,7 @@ function NavigationLinkEdit( {
 					/>
 					<ToolbarButton
 						name="submenu"
-						icon={ toolbarSubmenuIcon }
+						icon={ <ToolbarSubmenuIcon /> }
 						title={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
@@ -196,7 +208,16 @@ function NavigationLinkEdit( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
 					'is-selected': isSelected,
 					'has-link': !! url,
+					'has-child': hasDescendants,
+					'has-text-color': rgbTextColor,
+					[ `has-${ textColor }-color` ]: !! textColor,
+					'has-background-color': rgbBackgroundColor,
+					[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 				} ) }
+				style={ {
+					color: rgbTextColor,
+					backgroundColor: rgbBackgroundColor,
+				} }
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
@@ -218,7 +239,7 @@ function NavigationLinkEdit( {
 					/>
 					{ showSubmenuIcon && (
 						<span className="wp-block-navigation-link__submenu-icon">
-							{ itemSubmenuIcon }
+							<ItemSubmenuIcon />
 						</span>
 					) }
 					{ isLinkOpen && (
@@ -286,7 +307,6 @@ function NavigationLinkEdit( {
 export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
-			getBlockName,
 			getBlockAttributes,
 			getBlockParents,
 			getClientIdsOfDescendants,
@@ -294,21 +314,18 @@ export default compose( [
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 		const rootBlock = getBlockParents( clientId )[ 0 ];
-		const parentBlock = getBlockParents( clientId, true )[ 0 ];
-		const rootBlockAttributes = getBlockAttributes( rootBlock );
+		const navigationBlockAttributes = getBlockAttributes( rootBlock );
 		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
 			.length;
-		const isLevelZero = getBlockName( parentBlock ) === 'core/navigation';
 		const showSubmenuIcon =
-			rootBlockAttributes.showSubmenuIcon &&
-			isLevelZero &&
-			hasDescendants;
+			!! navigationBlockAttributes.showSubmenuIcon && hasDescendants;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
 		return {
 			isParentOfSelectedBlock,
 			hasDescendants,
 			showSubmenuIcon,
+			navigationBlockAttributes,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {

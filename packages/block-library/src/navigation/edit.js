@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, Fragment, useRef } from '@wordpress/element';
+import { useMemo, Fragment, useRef, useEffect } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -51,6 +51,7 @@ function Navigation( {
 	setAttributes,
 	setFontSize,
 	updateNavItemBlocks,
+	className,
 } ) {
 	//
 	// HOOKS
@@ -67,7 +68,7 @@ function Navigation( {
 	} = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'background-color' },
+			{ name: 'backgroundColor', className: 'has-background-color' },
 		],
 		{
 			contrastCheckers: [
@@ -84,6 +85,14 @@ function Navigation( {
 		},
 		[ fontSize.size ]
 	);
+
+	// Pickup and store text and background colors in grb format into attrs object.
+	useEffect( () => {
+		setAttributes( {
+			rgbTextColor: TextColor.color,
+			rgbBackgroundColor: BackgroundColor.color,
+		} );
+	}, [ TextColor.color, BackgroundColor.color ] );
 
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
@@ -135,7 +144,7 @@ function Navigation( {
 
 	const hasPages = hasResolvedPages && pages && pages.length;
 
-	const blockClassNames = classnames( 'wp-block-navigation', {
+	const blockClassNames = classnames( className, {
 		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 		[ fontSize.class ]: fontSize.class,
 	} );
@@ -250,7 +259,7 @@ function Navigation( {
 						onChange={ ( value ) => {
 							setAttributes( { showSubmenuIcon: value } );
 						} }
-						label={ __( 'Show submenu icon for top-level items' ) }
+						label={ __( 'Show submenu indicator icons' ) }
 					/>
 				</PanelBody>
 			</InspectorControls>
