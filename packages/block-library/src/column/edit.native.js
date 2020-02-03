@@ -28,7 +28,7 @@ import styles from './editor.scss';
 function ColumnEdit( {
 	attributes,
 	setAttributes,
-	hasInnerBlocks,
+	hasChildren,
 	isSelected,
 	getStylesFromColorScheme,
 	isParentSelected,
@@ -59,53 +59,37 @@ function ColumnEdit( {
 	const columnsInRow = getColumnsInRow( columnsCount );
 	const columnBaseWidth = minWidth / columnsInRow;
 
-	const applyColumnPlaceholderStyle = () => {
+	const applyBlockStyle = ( placeholder = false ) => {
 		if ( isMobile ) {
 			return;
 		}
+		
+		const pullWidth = ( name ) => ( styles[`column-${name}-margin`] || {} ).width
 
 		let width = columnBaseWidth;
 
 		if ( isParentSelected ) {
-			width -= 24;
+			width -= pullWidth( placeholder ? 'placeholder-selected' : 'parent-selected' );
+		} else if ( isSelected && ! placeholder ) {
+			width -= ( ! hasChildren ? pullWidth('selected') : pullWidth('descendant-selected') );
 		} else if ( isDescendantOfParentSelected ) {
-			width -= 28;
-		} else {
-			width -= ( columnsInRow === 1 ? 12 : 32 );
+			width += pullWidth( placeholder ? 'selected' : 'descendant-selected');
+		} else if ( placeholder ) {
+			width -= ( columnsInRow === 1 ? pullWidth('parent-selected') : pullWidth('placeholder-multicol') );
 		}
 
 		return { width };
-		// return { width: columnBaseWidth - ( isParentSelected ? 24 : isDescendantOfParentSelected ? 28 : columnsInRow === 1 ? 12 : 32 ) }
-	};
-
-	const applyColumnBlockStyle = () => {
-		if ( isMobile ) {
-			return;
-		}
-
-		let width = columnBaseWidth;
-
-		if ( isParentSelected ) {
-			width -= 12;
-		} else if ( isSelected ) {
-			width -= ( ! hasInnerBlocks ? 28 : 4 );
-		} else if ( isDescendantOfParentSelected ) {
-			width += 4;
-		}
-
-		return { width };
-		// return { width: columnBaseWidth - ( isParentSelected ? 12 : isSelected ? ! hasInnerBlocks ? 28 : 4 : isDescendantOfParentSelected ? -4 : 0 ) }
 	};
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
 	};
 
-	if ( ! isSelected && ! hasInnerBlocks ) {
+	if ( ! isSelected && ! hasChildren ) {
 		return (
 			<View style={ [
 				! isParentSelected && getStylesFromColorScheme( styles.columnPlaceholder, styles.columnPlaceholderDark ),
-				applyColumnPlaceholderStyle(),
+				applyBlockStyle( true ),
 				{ ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
 			] } >
 				{ isParentSelected && <InnerBlocks.ButtonBlockAppender /> }
@@ -129,7 +113,7 @@ function ColumnEdit( {
 					isCollapsed={ false }
 				/>
 			</BlockControls>
-			<View style={ applyColumnBlockStyle() } >
+			<View style={ applyBlockStyle() } >
 				<InnerBlocks
 					renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
 				/>
@@ -141,22 +125,23 @@ function ColumnEdit( {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const {
-			getBlock,
 			getBlockParents,
+			getBlockCount,
+			getBlockRootClientId,
 			getSelectedBlockClientId,
+			getBlockListSettings,
 		} = select( 'core/block-editor' );
-
-		const block = getBlock( clientId );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const isSelected = selectedBlockClientId === clientId;
 
-		const parents = getBlockParents( clientId, true );
-		const parentId = parents[ 0 ] || '';
+		const parentId = getBlockRootClientId( clientId );
 
-		const parentBlock = getBlock( parentId );
-		const columnsCount = parentBlock && parentBlock.innerBlocks.length;
-		const columnsContainerWidth = parentBlock && parentBlock.attributes.width;
+		const columnsContainerSettings = getBlockListSettings( parentId );
+
+		const columnsCount = getBlockCount( parentId );
+		const hasChildren = getBlockCount( clientId );
+		const columnsContainerWidth = columnsContainerSettings && columnsContainerSettings.width;
 
 		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parentId;
 
@@ -164,7 +149,7 @@ export default compose( [
 		const isDescendantOfParentSelected = selectedParents.includes( parentId );
 
 		return {
-			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+			hasChildren,
 			isParentSelected,
 			isSelected,
 			columnsCount,

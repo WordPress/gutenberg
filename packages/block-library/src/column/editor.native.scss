@@ -30,3 +30,23 @@
 .column-container-base {
 	max-width: $content-width - 2 * ( $block-selected-margin + $block-selected-border-width );
 }
+
+.column-placeholder-selected-margin {
+	width: 2 * $block-selected-to-content;
+}
+
+.column-placeholder-multicol-margin {
+	width: 2 * $block-edge-to-content;
+}
+
+.column-parent-selected-margin {
+	width: $block-selected-to-content;
+}
+
+.column-selected-margin {
+	width: 2 * $block-padding;
+}
+
+.column-descendant-selected-margin {
+	width: $block-selected-margin + $block-selected-border-width;
+}

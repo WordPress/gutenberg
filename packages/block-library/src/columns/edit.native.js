@@ -58,13 +58,15 @@ const MAX_COLUMNS_NUMBER = 6;
 
 function ColumnsEditContainer( {
 	attributes,
-	setAttributes,
+	updateBlockSettings,
+	blockListSettings,
 	updateAlignment,
 	updateColumns,
 	clientId,
 	isMobile,
 } ) {
-	const { verticalAlignment, width } = attributes;
+	const { verticalAlignment } = attributes;
+	const { width } = blockListSettings;
 
 	const { count } = useSelect( ( select ) => {
 		return {
@@ -108,7 +110,7 @@ function ColumnsEditContainer( {
 			<View onLayout={ ( event ) => {
 				const { width: newWidth } = event.nativeEvent.layout;
 				if ( newWidth !== width ) {
-					setAttributes( { width: newWidth } );
+					updateBlockSettings( { ...blockListSettings, width: newWidth } );
 				}
 			} }>
 				<InnerBlocks
@@ -144,7 +146,11 @@ const ColumnsEditContainerWrapper = withDispatch( ( dispatch, ownProps, registry
 			} );
 		} );
 	},
-
+	updateBlockSettings( settings ) {
+		const { clientId } = ownProps;
+		const { updateBlockListSettings } = dispatch( 'core/block-editor' );
+		updateBlockListSettings( clientId, settings );
+	},
 	/**
 	 * Updates the column count, including necessary revisions to child Column
 	 * blocks to grant required or redistribute available space.
@@ -180,27 +186,29 @@ const ColumnsEditContainerWrapper = withDispatch( ( dispatch, ownProps, registry
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, isSelected, getStylesFromColorScheme } = props;
-	const { hasInnerBlocks } = useSelect( ( select ) => {
+	const { hasChildren, blockListSettings } = useSelect( ( select ) => {
 		const {
 			getBlocks,
+			getBlockListSettings,
 		} = select( 'core/block-editor' );
 
 		return {
-			hasInnerBlocks: getBlocks( clientId ).length > 0,
+			hasChildren: getBlocks( clientId ).length > 0,
+			blockListSettings: getBlockListSettings( clientId ) || {},
 		};
 	}, [ clientId ] );
 
-	if ( ! isSelected && ! hasInnerBlocks ) {
+	if ( ! isSelected && ! hasChildren ) {
 		return (
 			<View style={ [
 				getStylesFromColorScheme( styles.columnsPlaceholder, styles.columnsPlaceholderDark ),
-				! hasInnerBlocks && { ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
+				! hasChildren && { ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
 			] } />
 		);
 	}
 
 	return (
-		<ColumnsEditContainerWrapper { ...props } />
+		<ColumnsEditContainerWrapper blockListSettings={ blockListSettings } { ...props } />
 	);
 };
 
