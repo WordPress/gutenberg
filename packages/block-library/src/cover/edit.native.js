@@ -45,7 +45,6 @@ const INNER_BLOCKS_TEMPLATE = [
 		'core/paragraph',
 		{
 			align: 'center',
-			fontSize: 'large',
 			placeholder: __( 'Write title…' ),
 		},
 	],
