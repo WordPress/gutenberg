@@ -5,10 +5,7 @@ import { View, AccessibilityInfo, Platform, Clipboard } from 'react-native';
 /**
  * WordPress dependencies
  */
-import {
-	withInstanceId,
-	compose,
-} from '@wordpress/compose';
+import { withInstanceId, compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
@@ -26,9 +23,7 @@ import {
 	ToolbarButton,
 	BottomSheet,
 } from '@wordpress/components';
-import {
-	Component,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
 
@@ -72,17 +67,28 @@ class ButtonEdit extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const { selectedId, setAttributes, editorSidebarOpened, attributes: { url } } = this.props;
+		const {
+			selectedId,
+			setAttributes,
+			editorSidebarOpened,
+			attributes: { url },
+		} = this.props;
 		const { isLinkSheetVisible, isButtonFocused } = this.state;
 
 		// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
-		if ( ( prevProps.editorSidebarOpened && ! editorSidebarOpened ) || ( prevState.isLinkSheetVisible && ! isLinkSheetVisible ) ) {
+		if (
+			( prevProps.editorSidebarOpened && ! editorSidebarOpened ) ||
+			( prevState.isLinkSheetVisible && ! isLinkSheetVisible )
+		) {
 			this.isEditingURL = false;
 		}
 
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
 		// to avoid flashing caret after closing one of them
-		if ( ( ! prevProps.editorSidebarOpened && editorSidebarOpened ) || ( ! prevState.isLinkSheetVisible && isLinkSheetVisible ) ) {
+		if (
+			( ! prevProps.editorSidebarOpened && editorSidebarOpened ) ||
+			( ! prevState.isLinkSheetVisible && isLinkSheetVisible )
+		) {
 			if ( Platform.OS === 'android' && this.richTextRef ) {
 				this.richTextRef.blur();
 				this.onToggleButtonFocus( false );
@@ -106,15 +112,17 @@ class ButtonEdit extends Component {
 				this.onToggleButtonFocus( false );
 			}
 
-			if ( selectedRichText && selectedId !== prevProps.selectedId && ! isButtonFocused ) {
-				AccessibilityInfo.isScreenReaderEnabled().then(
-					( enabled ) => {
-						if ( enabled ) {
-							this.onToggleButtonFocus( true );
-							this.richTextRef.focus();
-						}
+			if (
+				selectedRichText &&
+				selectedId !== prevProps.selectedId &&
+				! isButtonFocused
+			) {
+				AccessibilityInfo.isScreenReaderEnabled().then( ( enabled ) => {
+					if ( enabled ) {
+						this.onToggleButtonFocus( true );
+						this.richTextRef.focus();
 					}
-				);
+				} );
 			}
 		}
 	}
@@ -143,8 +151,9 @@ class ButtonEdit extends Component {
 			// `backgroundColor` which should be set when we can’t resolve
 			// the button `backgroundColor` that was created on web
 			return styles.fallbackButton.backgroundColor;
-		// `backgroundColor` which should be set when `Button` is created on mobile
-		} return styles.button.backgroundColor;
+			// `backgroundColor` which should be set when `Button` is created on mobile
+		}
+		return styles.button.backgroundColor;
 	}
 
 	onChangeText( value ) {
@@ -229,23 +238,34 @@ class ButtonEdit extends Component {
 		} = attributes;
 		const { maxWidth, isLinkSheetVisible, isButtonFocused } = this.state;
 
-		const borderRadiusValue = borderRadius !== undefined ? borderRadius : styles.button.borderRadius;
-		const outlineBorderRadius = borderRadiusValue > 0 ? borderRadiusValue + styles.button.paddingTop + styles.button.borderWidth : 0;
+		const borderRadiusValue =
+			borderRadius !== undefined
+				? borderRadius
+				: styles.button.borderRadius;
+		const outlineBorderRadius =
+			borderRadiusValue > 0
+				? borderRadiusValue +
+				  styles.button.paddingTop +
+				  styles.button.borderWidth
+				: 0;
 
 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
 		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
 		// different than empty string.
-		const minWidth = isButtonFocused || ( ! isButtonFocused && text && text !== '' ) ? 1 : styles.button.minWidth;
+		const minWidth =
+			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
+				? 1
+				: styles.button.minWidth;
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,
 		// because `AztecView` is calculating a `minWidth` based on placeholder text.
-		const placeholderText = isButtonFocused || ( ! isButtonFocused && text && text !== '' ) ? '' : ( placeholder || __( 'Add text…' ) );
+		const placeholderText =
+			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
+				? ''
+				: placeholder || __( 'Add text…' );
 
 		return (
-			<View
-				style={ { flex: 1 } }
-				onLayout={ this.onLayout }
-			>
+			<View style={ { flex: 1 } } onLayout={ this.onLayout }>
 				<View
 					style={ [
 						styles.container,
@@ -280,27 +300,32 @@ class ButtonEdit extends Component {
 							id={ clientId }
 							isSelected={ isButtonFocused }
 							withoutInteractiveFormatting
-							unstableOnFocus={ () => this.onToggleButtonFocus( true ) }
+							unstableOnFocus={ () =>
+								this.onToggleButtonFocus( true )
+							}
 							__unstableMobileNoFocusOnMount={ ! isSelected }
 						/>
 					</ColorBackground>
 
-					{ isButtonFocused && <BlockControls>
-						<ToolbarGroup>
-							<ToolbarButton
-								title={ __( 'Edit image' ) }
-								icon={ 'admin-links' }
-								onClick={ this.onToggleLinkSettings }
-							/>
-						</ToolbarGroup>
-					</BlockControls> }
+					{ isButtonFocused && (
+						<BlockControls>
+							<ToolbarGroup>
+								<ToolbarButton
+									title={ __( 'Edit image' ) }
+									icon={ 'admin-links' }
+									onClick={ this.onToggleLinkSettings }
+								/>
+							</ToolbarGroup>
+						</BlockControls>
+					) }
 
 					<BottomSheet
 						isVisible={ isLinkSheetVisible }
 						onClose={ this.onToggleLinkSettings }
 						hideHeader
 					>
-						{ /* eslint-disable jsx-a11y/no-autofocus */
+						{
+							/* eslint-disable jsx-a11y/no-autofocus */
 							<BottomSheet.Cell
 								icon={ 'admin-links' }
 								label={ __( 'Button URL' ) }
@@ -312,7 +337,8 @@ class ButtonEdit extends Component {
 								keyboardType="url"
 								autoFocus={ Platform.OS === 'ios' }
 							/>
-							/* eslint-enable jsx-a11y/no-autofocus */ }
+							/* eslint-enable jsx-a11y/no-autofocus */
+						}
 						<BottomSheet.Cell
 							icon={ LinkRelIcon }
 							label={ __( 'Add Rel' ) }
@@ -337,7 +363,7 @@ class ButtonEdit extends Component {
 					</BottomSheet>
 
 					<InspectorControls>
-						<PanelBody title={ __( 'Border Settings' ) } >
+						<PanelBody title={ __( 'Border Settings' ) }>
 							<RangeControl
 								label={ __( 'Border Radius' ) }
 								minimumValue={ MIN_BORDER_RADIUS_VALUE }
@@ -347,7 +373,7 @@ class ButtonEdit extends Component {
 								separatorType="none"
 							/>
 						</PanelBody>
-						<PanelBody title={ __( 'Link Settings' ) } >
+						<PanelBody title={ __( 'Link Settings' ) }>
 							<TextControl
 								label={ __( 'Button URL' ) }
 								value={ url || '' }
@@ -375,9 +401,11 @@ class ButtonEdit extends Component {
 								keyboardType="url"
 							/>
 						</PanelBody>
-						<PanelBody title={ __( 'Color Settings' ) } >
+						<PanelBody title={ __( 'Color Settings' ) }>
 							<UnsupportedFooterControl
-								label={ __( 'Note: Theme colors are not available at this time.' ) }
+								label={ __(
+									'Note: Theme colors are not available at this time.'
+								) }
 								separatorType="none"
 							/>
 						</PanelBody>
@@ -392,9 +420,7 @@ export default compose( [
 	withInstanceId,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select ) => {
-		const {
-			isEditorSidebarOpened,
-		} = select( 'core/edit-post' );
+		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const { getSelectedBlockClientId } = select( 'core/block-editor' );
 
 		const selectedId = getSelectedBlockClientId();

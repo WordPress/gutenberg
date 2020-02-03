@@ -6,9 +6,7 @@ import LinearGradient from 'react-native-linear-gradient';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalUseGradient,
-} from '@wordpress/block-editor';
+import { __experimentalUseGradient } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
@@ -29,14 +27,20 @@ function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
 		const matchColorGroup = /(rgba|rgb|#)(.+?)[\%]/g;
 		const matchDeg = /(\d.+)deg/g;
 
-		const colorGroup = gradientValue.match( matchColorGroup ).map( ( color ) => color.split( ' ' ) );
+		const colorGroup = gradientValue
+			.match( matchColorGroup )
+			.map( ( color ) => color.split( ' ' ) );
 
 		const colors = colorGroup.map( ( color ) => color[ 0 ] );
-		const locations = colorGroup.map( ( location ) => Number( location[ 1 ].replace( '%', '' ) ) / 100 );
+		const locations = colorGroup.map(
+			( location ) => Number( location[ 1 ].replace( '%', '' ) ) / 100
+		);
 		const angle = Number( matchDeg.exec( gradientValue )[ 1 ] );
 
 		return {
-			colors, locations, angle,
+			colors,
+			locations,
+			angle,
 		};
 	}
 
@@ -54,13 +58,8 @@ function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
 				{ children }
 			</LinearGradient>
 		);
-	} return (
-		<View
-			style={ wrapperStyles }
-		>
-			{ children }
-		</View>
-	);
+	}
+	return <View style={ wrapperStyles }>{ children }</View>;
 }
 
 export default ColorBackground;

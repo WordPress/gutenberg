@@ -807,7 +807,9 @@ export class RichText extends Component {
 					} }
 					style={ {
 						...style,
-						...( this.isIOS && minWidth && maxWidth ? { width } : {} ),
+						...( this.isIOS && minWidth && maxWidth
+							? { width }
+							: {} ),
 						minHeight: this.state.height,
 					} }
 					text={ {
@@ -855,7 +857,9 @@ export class RichText extends Component {
 					<FormatEdit
 						formatTypes={ formatTypes }
 						value={ record }
-						withoutInteractiveFormatting={ withoutInteractiveFormatting }
+						withoutInteractiveFormatting={
+							withoutInteractiveFormatting
+						}
 						onChange={ this.onFormatChange }
 						onFocus={ () => {} }
 					/>

@@ -9,9 +9,7 @@ import Cell from './cell';
 import styles from './styles.scss';
 
 function UnsupportedFooterCell( props ) {
-	const {
-		...cellProps
-	} = props;
+	const { ...cellProps } = props;
 
 	return (
 		<Cell
