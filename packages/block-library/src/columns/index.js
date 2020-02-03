@@ -10,8 +10,8 @@ import { columns as icon } from '@wordpress/icons';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
-import patterns from './patterns';
 import save from './save';
+import variations from './variations';
 
 const { name } = metadata;
 
@@ -27,7 +27,7 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 		html: false,
 	},
-	patterns,
+	variations,
 	example: {
 		innerBlocks: [
 			{
@@ -45,14 +45,17 @@ export const settings = {
 					{
 						name: 'core/image',
 						attributes: {
-							url: 'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
+							url:
+								'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
 						},
 					},
 					{
 						name: 'core/paragraph',
 						attributes: {
 							/* translators: example text. */
-							content: __( 'Suspendisse commodo neque lacus, a dictum orci interdum et.' ),
+							content: __(
+								'Suspendisse commodo neque lacus, a dictum orci interdum et.'
+							),
 						},
 					},
 				],

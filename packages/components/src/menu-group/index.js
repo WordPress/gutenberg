@@ -22,7 +22,11 @@ export function MenuGroup( { children, className = '', label } ) {
 	return (
 		<div className={ classNames }>
 			{ label && (
-				<div className="components-menu-group__label" id={ labelId } aria-hidden="true">
+				<div
+					className="components-menu-group__label"
+					id={ labelId }
+					aria-hidden="true"
+				>
 					{ label }
 				</div>
 			) }

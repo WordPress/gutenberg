@@ -55,7 +55,10 @@ describe( 'PostTypeSupportCheck', () => {
 			},
 		};
 		const tree = create(
-			<PostTypeSupportCheck postType={ postType } supportKeys={ [ 'title', 'thumbnail' ] }>
+			<PostTypeSupportCheck
+				postType={ postType }
+				supportKeys={ [ 'title', 'thumbnail' ] }
+			>
 				Supported
 			</PostTypeSupportCheck>
 		);
@@ -68,7 +71,10 @@ describe( 'PostTypeSupportCheck', () => {
 			supports: {},
 		};
 		const tree = create(
-			<PostTypeSupportCheck postType={ postType } supportKeys={ [ 'title', 'thumbnail' ] }>
+			<PostTypeSupportCheck
+				postType={ postType }
+				supportKeys={ [ 'title', 'thumbnail' ] }
+			>
 				Supported
 			</PostTypeSupportCheck>
 		);

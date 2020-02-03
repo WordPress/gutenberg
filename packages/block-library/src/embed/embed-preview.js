@@ -75,8 +75,15 @@ class EmbedPreview extends Component {
 			.join( '.' );
 		const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedHostBaseUrl );
 		// translators: %s: host providing embed content e.g: www.youtube.com
-		const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedHostBaseUrl );
-		const sandboxClassnames = classnames( type, className, 'wp-block-embed__wrapper' );
+		const iframeTitle = sprintf(
+			__( 'Embedded content from %s' ),
+			parsedHostBaseUrl
+		);
+		const sandboxClassnames = classnames(
+			type,
+			className,
+			'wp-block-embed__wrapper'
+		);
 
 		// Disabled because the overlay div doesn't actually have a role or functionality
 		// as far as the user is concerned. We're just catching the first click so that
@@ -111,14 +118,19 @@ class EmbedPreview extends Component {
 				} ) }
 			>
 				{ cannotPreview ? (
-					<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label }>
+					<Placeholder
+						icon={ <BlockIcon icon={ icon } showColors /> }
+						label={ label }
+					>
 						<p className="components-placeholder__error">
 							<a href={ url }>{ url }</a>
 						</p>
 						<p className="components-placeholder__error">
 							{ /* translators: %s: host providing embed content e.g: www.youtube.com */
 							sprintf(
-								__( "Embedded content from %s can't be previewed in the editor." ),
+								__(
+									"Embedded content from %s can't be previewed in the editor."
+								),
 								parsedHostBaseUrl
 							) }
 						</p>

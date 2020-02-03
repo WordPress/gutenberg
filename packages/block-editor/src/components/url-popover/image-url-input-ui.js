@@ -64,7 +64,11 @@ const ImageURLInputUI = ( {
 	};
 
 	const stopPropagationRelevantKeys = ( event ) => {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
+		if (
+			[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf(
+				event.keyCode
+			) > -1
+		) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
 			event.stopPropagation();
 		}
@@ -137,7 +141,10 @@ const ImageURLInputUI = ( {
 			// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
 			// return to avoid the popover being closed.
 			const autocompleteElement = autocompleteRef.current;
-			if ( autocompleteElement && autocompleteElement.contains( event.target ) ) {
+			if (
+				autocompleteElement &&
+				autocompleteElement.contains( event.target )
+			) {
 				return;
 			}
 			setIsOpen( false );
@@ -243,8 +250,10 @@ const ImageURLInputUI = ( {
 
 	const linkEditorValue = urlInput !== null ? urlInput : url;
 
-	const urlLabel = ( find( getLinkDestinations(), [ 'linkDestination', linkDestination ] ) || {} )
-		.title;
+	const urlLabel = (
+		find( getLinkDestinations(), [ 'linkDestination', linkDestination ] ) ||
+		{}
+	).title;
 
 	return (
 		<>
@@ -300,7 +309,11 @@ const ImageURLInputUI = ( {
 								onEditLinkClick={ startEditLink }
 								urlLabel={ urlLabel }
 							/>
-							<Button icon="no" label={ __( 'Remove link' ) } onClick={ onLinkRemove } />
+							<Button
+								icon="no"
+								label={ __( 'Remove link' ) }
+								onClick={ onLinkRemove }
+							/>
 						</>
 					) }
 				</URLPopover>

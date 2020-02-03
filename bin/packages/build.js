@@ -57,7 +57,9 @@ function createStyleEntryTransform() {
 			}
 
 			packages.add( packageName );
-			const entries = await glob( path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' ) );
+			const entries = await glob(
+				path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+			);
 			entries.forEach( ( entry ) => this.push( entry ) );
 			callback();
 		},
@@ -78,7 +80,9 @@ function createBlockJsonEntryTransform() {
 	return new Transform( {
 		objectMode: true,
 		async transform( file, encoding, callback ) {
-			const matches = /block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec( file );
+			const matches = /block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec(
+				file
+			);
 			const blockName = matches ? matches[ 1 ] : undefined;
 
 			// Only block.json files in the block-library folder are subject to this transform.
@@ -109,7 +113,9 @@ if ( files.length ) {
 	stream = new Readable( { encoding: 'utf8' } );
 	files.forEach( ( file ) => stream.push( file ) );
 	stream.push( null );
-	stream = stream.pipe( createStyleEntryTransform() ).pipe( createBlockJsonEntryTransform() );
+	stream = stream
+		.pipe( createStyleEntryTransform() )
+		.pipe( createBlockJsonEntryTransform() );
 } else {
 	const bar = new ProgressBar( 'Build Progress: [:bar] :percent', {
 		width: 30,
@@ -119,10 +125,17 @@ if ( files.length ) {
 
 	bar.tick( 0 );
 
-	stream = glob.stream( [ `${ PACKAGES_DIR }/*/src/**/*.js`, `${ PACKAGES_DIR }/*/src/*.scss` ], {
-		ignore: [ `**/benchmark/**`, `**/{__mocks__,__tests__,test}/**`, `**/{storybook,stories}/**` ],
-		onlyFiles: true,
-	} );
+	stream = glob.stream(
+		[ `${ PACKAGES_DIR }/*/src/**/*.js`, `${ PACKAGES_DIR }/*/src/*.scss` ],
+		{
+			ignore: [
+				`**/benchmark/**`,
+				`**/{__mocks__,__tests__,test}/**`,
+				`**/{storybook,stories}/**`,
+			],
+			onlyFiles: true,
+		}
+	);
 
 	// Pause to avoid data flow which would begin on the `data` event binding,
 	// but should wait until worker processing below.

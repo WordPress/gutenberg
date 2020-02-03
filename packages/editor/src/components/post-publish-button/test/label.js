@@ -5,7 +5,10 @@ import { PublishButtonLabel } from '../label';
 
 describe( 'PublishButtonLabel', () => {
 	it( 'should show publishing if publishing in progress', () => {
-		const label = PublishButtonLabel( { hasPublishAction: true, isPublishing: true } );
+		const label = PublishButtonLabel( {
+			hasPublishAction: true,
+			isPublishing: true,
+		} );
 		expect( label ).toBe( 'Publishing…' );
 	} );
 
@@ -42,12 +45,18 @@ describe( 'PublishButtonLabel', () => {
 	} );
 
 	it( 'should show update for already published', () => {
-		const label = PublishButtonLabel( { hasPublishAction: true, isPublished: true } );
+		const label = PublishButtonLabel( {
+			hasPublishAction: true,
+			isPublished: true,
+		} );
 		expect( label ).toBe( 'Update' );
 	} );
 
 	it( 'should show schedule for scheduled', () => {
-		const label = PublishButtonLabel( { hasPublishAction: true, isBeingScheduled: true } );
+		const label = PublishButtonLabel( {
+			hasPublishAction: true,
+			isBeingScheduled: true,
+		} );
 		expect( label ).toBe( 'Schedule' );
 	} );
 

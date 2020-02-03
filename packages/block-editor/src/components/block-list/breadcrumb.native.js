@@ -19,7 +19,12 @@ import SubdirectorSVG from './subdirectory-icon';
 
 import styles from './breadcrumb.scss';
 
-const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } ) => {
+const BlockBreadcrumb = ( {
+	clientId,
+	blockIcon,
+	rootClientId,
+	rootBlockIcon,
+} ) => {
 	return (
 		<View style={ styles.breadcrumbContainer }>
 			<TouchableOpacity
@@ -27,7 +32,9 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } )
 				onPress={ () => {
 					/* Open BottomSheet with markup */
 				} }
-				disabled={ true } /* Disable temporarily since onPress function is empty */
+				disabled={
+					true
+				} /* Disable temporarily since onPress function is empty */
 			>
 				{ rootClientId &&
 					rootBlockIcon && [
@@ -41,7 +48,11 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } )
 							<SubdirectorSVG fill={ styles.arrow.color } />
 						</View>,
 					] }
-				<Icon size={ 24 } icon={ blockIcon.src } fill={ styles.icon.color } />
+				<Icon
+					size={ 24 }
+					icon={ blockIcon.src }
+					fill={ styles.icon.color }
+				/>
 				<Text
 					maxFontSizeMultiplier={ 1.25 }
 					ellipsizeMode="tail"
@@ -57,7 +68,9 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } )
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockRootClientId, getBlockName } = select( 'core/block-editor' );
+		const { getBlockRootClientId, getBlockName } = select(
+			'core/block-editor'
+		);
 
 		const blockName = getBlockName( clientId );
 		const blockType = getBlockType( blockName );

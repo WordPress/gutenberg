@@ -1,9 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 
-const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+const useIsomorphicLayoutEffect =
+	typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
@@ -20,7 +27,9 @@ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 	}, [ onDragStart, onDragMove, onDragEnd ] );
 
 	const onMouseMove = useCallback(
-		( ...args ) => eventsRef.current.onDragMove && eventsRef.current.onDragMove( ...args ),
+		( ...args ) =>
+			eventsRef.current.onDragMove &&
+			eventsRef.current.onDragMove( ...args ),
 		[]
 	);
 	const endDrag = useCallback( ( ...args ) => {

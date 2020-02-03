@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { ifCondition, compose, createHigherOrderComponent } from '@wordpress/compose';
+import {
+	ifCondition,
+	compose,
+	createHigherOrderComponent,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies

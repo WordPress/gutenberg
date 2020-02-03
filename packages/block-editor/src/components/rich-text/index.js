@@ -7,7 +7,13 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, Platform, useRef, useCallback, forwardRef } from '@wordpress/element';
+import {
+	RawHTML,
+	Platform,
+	useRef,
+	useCallback,
+	forwardRef,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	pasteHandler,
@@ -135,13 +141,17 @@ function RichTextWrapper(
 
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		const { __experimentalCanUserUseUnfilteredHTML, __experimentalUndo: undo } = getSettings();
+		const {
+			__experimentalCanUserUseUnfilteredHTML,
+			__experimentalUndo: undo,
+		} = getSettings();
 
 		let isSelected;
 
 		if ( originalIsSelected === undefined ) {
 			isSelected =
-				selectionStart.clientId === clientId && selectionStart.attributeKey === identifier;
+				selectionStart.clientId === clientId &&
+				selectionStart.attributeKey === identifier;
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
 		}
@@ -151,8 +161,10 @@ function RichTextWrapper(
 			// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
 			// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
 			// This apparently assumes functionality the BlockHlder actually
-			const block = clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
-			const shouldBlurOnUnmount = block && isSelected && isUnmodifiedDefaultBlock( block );
+			const block =
+				clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
+			const shouldBlurOnUnmount =
+				block && isSelected && isUnmodifiedDefaultBlock( block );
 			extraProps = {
 				shouldBlurOnUnmount,
 			};
@@ -192,8 +204,12 @@ function RichTextWrapper(
 		__unstableMarkAutomaticChange,
 	} = useDispatch( 'core/block-editor' );
 	const multilineTag = getMultilineTag( multiline );
-	const adjustedAllowedFormats = getAllowedFormats( { allowedFormats, formattingControls } );
-	const hasFormats = ! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
+	const adjustedAllowedFormats = getAllowedFormats( {
+		allowedFormats,
+		formattingControls,
+	} );
+	const hasFormats =
+		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
 	let adjustedValue = originalValue;
 	let adjustedOnChange = originalOnChange;
 
@@ -202,7 +218,9 @@ function RichTextWrapper(
 		adjustedValue = childrenSource.toHTML( originalValue );
 		adjustedOnChange = ( newValue ) =>
 			originalOnChange(
-				childrenSource.fromDOM( __unstableCreateElement( document, newValue ).childNodes )
+				childrenSource.fromDOM(
+					__unstableCreateElement( document, newValue ).childNodes
+				)
 			);
 	}
 
@@ -299,13 +317,17 @@ function RichTextWrapper(
 			const canSplit = onReplace && onSplit;
 
 			if ( onReplace ) {
-				const transforms = getBlockTransforms( 'from' ).filter( ( { type } ) => type === 'enter' );
+				const transforms = getBlockTransforms( 'from' ).filter(
+					( { type } ) => type === 'enter'
+				);
 				const transformation = findTransform( transforms, ( item ) => {
 					return item.regExp.test( value.text );
 				} );
 
 				if ( transformation ) {
-					onReplace( [ transformation.transform( { content: value.text } ) ] );
+					onReplace( [
+						transformation.transform( { content: value.text } ),
+					] );
 					__unstableMarkAutomaticChange();
 				}
 			}
@@ -324,7 +346,13 @@ function RichTextWrapper(
 				splitValue( value );
 			}
 		},
-		[ onReplace, onSplit, __unstableMarkAutomaticChange, multiline, splitValue ]
+		[
+			onReplace,
+			onSplit,
+			__unstableMarkAutomaticChange,
+			multiline,
+			splitValue,
+		]
 	);
 
 	const onPaste = useCallback(
@@ -353,7 +381,11 @@ function RichTextWrapper(
 
 			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
 
-			if ( __unstableEmbedURLOnPaste && isEmpty( value ) && isURL( plainText.trim() ) ) {
+			if (
+				__unstableEmbedURLOnPaste &&
+				isEmpty( value ) &&
+				isURL( plainText.trim() )
+			) {
 				mode = 'BLOCKS';
 			}
 
@@ -383,7 +415,11 @@ function RichTextWrapper(
 				// If the content should be multiline, we should process text
 				// separated by a line break as separate lines.
 				if ( multiline ) {
-					valueToInsert = replace( valueToInsert, /\n+/g, LINE_SEPARATOR );
+					valueToInsert = replace(
+						valueToInsert,
+						/\n+/g,
+						LINE_SEPARATOR
+					);
 				}
 
 				onChange( insert( value, valueToInsert ) );
@@ -424,9 +460,12 @@ function RichTextWrapper(
 			const prefixTransforms = getBlockTransforms( 'from' ).filter(
 				( { type } ) => type === 'prefix'
 			);
-			const transformation = findTransform( prefixTransforms, ( { prefix } ) => {
-				return trimmedTextBefore === prefix;
-			} );
+			const transformation = findTransform(
+				prefixTransforms,
+				( { prefix } ) => {
+					return trimmedTextBefore === prefix;
+				}
+			);
 
 			if ( ! transformation ) {
 				return;
@@ -479,14 +518,27 @@ function RichTextWrapper(
 			reversed={ reversed }
 			// Native props.
 			onCaretVerticalPositionChange={ onCaretVerticalPositionChange }
-			blockIsSelected={ originalIsSelected !== undefined ? originalIsSelected : blockIsSelected }
+			blockIsSelected={
+				originalIsSelected !== undefined
+					? originalIsSelected
+					: blockIsSelected
+			}
 			shouldBlurOnUnmount={ shouldBlurOnUnmount }
 		>
-			{ ( { isSelected: nestedIsSelected, value, onChange, onFocus, Editable } ) => (
+			{ ( {
+				isSelected: nestedIsSelected,
+				value,
+				onChange,
+				onFocus,
+				Editable,
+			} ) => (
 				<>
 					{ children && children( { value, onChange, onFocus } ) }
 					{ nestedIsSelected && hasFormats && (
-						<FormatToolbarContainer inline={ inlineToolbar } anchorRef={ ref.current } />
+						<FormatToolbarContainer
+							inline={ inlineToolbar }
+							anchorRef={ ref.current }
+						/>
 					) }
 					{ nestedIsSelected && <RemoveBrowserShortcuts /> }
 					<Autocomplete
@@ -498,7 +550,9 @@ function RichTextWrapper(
 					>
 						{ ( { listBoxId, activeId, onKeyDown } ) => (
 							<Editable
-								aria-autocomplete={ listBoxId ? 'list' : undefined }
+								aria-autocomplete={
+									listBoxId ? 'list' : undefined
+								}
 								aria-owns={ listBoxId }
 								aria-activedescendant={ activeId }
 								start={ startAttr }
@@ -520,12 +574,21 @@ function RichTextWrapper(
 		alternative: 'className prop or create your own wrapper div',
 	} );
 
-	return <div className={ classnames( wrapperClasses, wrapperClassName ) }>{ content }</div>;
+	return (
+		<div className={ classnames( wrapperClasses, wrapperClassName ) }>
+			{ content }
+		</div>
+	);
 }
 
 const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
 
-ForwardedRichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
+ForwardedRichTextContainer.Content = ( {
+	value,
+	tagName: Tag,
+	multiline,
+	...props
+} ) => {
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
 		value = childrenSource.toHTML( value );

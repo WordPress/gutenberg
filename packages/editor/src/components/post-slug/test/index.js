@@ -24,7 +24,9 @@ describe( 'PostSlug', () => {
 
 		it( 'should update slug', () => {
 			const onUpdateSlug = jest.fn();
-			const wrapper = shallow( <PostSlug postSlug="index" onUpdateSlug={ onUpdateSlug } /> );
+			const wrapper = shallow(
+				<PostSlug postSlug="index" onUpdateSlug={ onUpdateSlug } />
+			);
 
 			wrapper.find( 'input' ).simulate( 'blur', {
 				target: {

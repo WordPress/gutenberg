@@ -25,7 +25,11 @@ function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
 	return (
 		<PostFeaturedImageCheck>
 			<PanelBody
-				title={ get( postType, [ 'labels', 'featured_image' ], __( 'Featured image' ) ) }
+				title={ get(
+					postType,
+					[ 'labels', 'featured_image' ],
+					__( 'Featured image' )
+				) }
 				opened={ isOpened }
 				onToggle={ onTogglePanel }
 			>
@@ -38,7 +42,9 @@ function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
 const applyWithSelect = withSelect( ( select ) => {
 	const { getEditedPostAttribute } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
-	const { isEditorPanelEnabled, isEditorPanelOpened } = select( 'core/edit-post' );
+	const { isEditorPanelEnabled, isEditorPanelOpened } = select(
+		'core/edit-post'
+	);
 
 	return {
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),

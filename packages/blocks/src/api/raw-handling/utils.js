@@ -28,11 +28,17 @@ const { ELEMENT_NODE, TEXT_NODE } = window.Node;
  *
  * @return {Object} A complete block content schema.
  */
-export function getBlockContentSchema( transforms, phrasingContentSchema, isPaste ) {
+export function getBlockContentSchema(
+	transforms,
+	phrasingContentSchema,
+	isPaste
+) {
 	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
 		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
 
-		schema = isFunction( schema ) ? schema( { phrasingContentSchema, isPaste } ) : schema;
+		schema = isFunction( schema )
+			? schema( { phrasingContentSchema, isPaste } )
+			: schema;
 
 		// If the block does not has anchor support and the transform does not
 		// provides an isMatch we can return the schema right away.
@@ -190,7 +196,13 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
 		) {
 			if ( node.nodeType === ELEMENT_NODE ) {
-				const { attributes = [], classes = [], children, require = [], allowEmpty } = schema[ tag ];
+				const {
+					attributes = [],
+					classes = [],
+					children,
+					require = [],
+					allowEmpty,
+				} = schema[ tag ];
 
 				// If the node is empty and it's supposed to have children,
 				// remove the node.
@@ -202,7 +214,10 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 				if ( node.hasAttributes() ) {
 					// Strip invalid attributes.
 					Array.from( node.attributes ).forEach( ( { name } ) => {
-						if ( name !== 'class' && ! includes( attributes, name ) ) {
+						if (
+							name !== 'class' &&
+							! includes( attributes, name )
+						) {
 							node.removeAttribute( name );
 						}
 					} );
@@ -222,7 +237,11 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 						} );
 
 						Array.from( node.classList ).forEach( ( name ) => {
-							if ( ! mattchers.some( ( isMatch ) => isMatch( name ) ) ) {
+							if (
+								! mattchers.some( ( isMatch ) =>
+									isMatch( name )
+								)
+							) {
 								node.classList.remove( name );
 							}
 						} );
@@ -243,22 +262,45 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 					if ( children ) {
 						// If a parent requires certain children, but it does
 						// not have them, drop the parent and continue.
-						if ( require.length && ! node.querySelector( require.join( ',' ) ) ) {
-							cleanNodeList( node.childNodes, doc, schema, inline );
+						if (
+							require.length &&
+							! node.querySelector( require.join( ',' ) )
+						) {
+							cleanNodeList(
+								node.childNodes,
+								doc,
+								schema,
+								inline
+							);
 							unwrap( node );
 							// If the node is at the top, phrasing content, and
 							// contains children that are block content, unwrap
 							// the node because it is invalid.
-						} else if ( node.parentNode.nodeName === 'BODY' && isPhrasingContent( node ) ) {
-							cleanNodeList( node.childNodes, doc, schema, inline );
+						} else if (
+							node.parentNode.nodeName === 'BODY' &&
+							isPhrasingContent( node )
+						) {
+							cleanNodeList(
+								node.childNodes,
+								doc,
+								schema,
+								inline
+							);
 
 							if (
-								Array.from( node.childNodes ).some( ( child ) => ! isPhrasingContent( child ) )
+								Array.from( node.childNodes ).some(
+									( child ) => ! isPhrasingContent( child )
+								)
 							) {
 								unwrap( node );
 							}
 						} else {
-							cleanNodeList( node.childNodes, doc, children, inline );
+							cleanNodeList(
+								node.childNodes,
+								doc,
+								children,
+								inline
+							);
 						}
 						// Remove children if the node is not supposed to have any.
 					} else {
@@ -274,7 +316,11 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 
 			// For inline mode, insert a line break when unwrapping nodes that
 			// are not phrasing content.
-			if ( inline && ! isPhrasingContent( node ) && node.nextElementSibling ) {
+			if (
+				inline &&
+				! isPhrasingContent( node ) &&
+				node.nextElementSibling
+			) {
 				insertAfter( doc.createElement( 'br' ), node );
 			}
 

@@ -33,9 +33,13 @@ class FileEdit extends Component {
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.confirmCopyURL = this.confirmCopyURL.bind( this );
 		this.resetCopyConfirmation = this.resetCopyConfirmation.bind( this );
-		this.changeLinkDestinationOption = this.changeLinkDestinationOption.bind( this );
+		this.changeLinkDestinationOption = this.changeLinkDestinationOption.bind(
+			this
+		);
 		this.changeOpenInNewWindow = this.changeOpenInNewWindow.bind( this );
-		this.changeShowDownloadButton = this.changeShowDownloadButton.bind( this );
+		this.changeShowDownloadButton = this.changeShowDownloadButton.bind(
+			this
+		);
 		this.onUploadError = this.onUploadError.bind( this );
 
 		this.state = {
@@ -45,7 +49,12 @@ class FileEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, mediaUpload, noticeOperations, setAttributes } = this.props;
+		const {
+			attributes,
+			mediaUpload,
+			noticeOperations,
+			setAttributes,
+		} = this.props;
 		const { downloadButtonText, href } = attributes;
 
 		// Upload a file drag-and-dropped into the editor
@@ -120,7 +129,14 @@ class FileEdit extends Component {
 	}
 
 	render() {
-		const { className, isSelected, attributes, setAttributes, noticeUI, media } = this.props;
+		const {
+			className,
+			isSelected,
+			attributes,
+			setAttributes,
+			noticeUI,
+			media,
+		} = this.props;
 		const {
 			fileName,
 			href,
@@ -138,7 +154,9 @@ class FileEdit extends Component {
 					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
 						title: __( 'File' ),
-						instructions: __( 'Upload a file or pick one from your media library.' ),
+						instructions: __(
+							'Upload a file or pick one from your media library.'
+						),
 					} }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }
@@ -159,7 +177,8 @@ class FileEdit extends Component {
 					{ ...{
 						openInNewWindow: !! textLinkTarget,
 						showDownloadButton,
-						changeLinkDestinationOption: this.changeLinkDestinationOption,
+						changeLinkDestinationOption: this
+							.changeLinkDestinationOption,
 						changeOpenInNewWindow: this.changeOpenInNewWindow,
 						changeShowDownloadButton: this.changeShowDownloadButton,
 					} }
@@ -174,7 +193,12 @@ class FileEdit extends Component {
 				</BlockControls>
 				<Animate type={ isBlobURL( href ) ? 'loading' : null }>
 					{ ( { className: animateClassName } ) => (
-						<div className={ classnames( classes, animateClassName ) }>
+						<div
+							className={ classnames(
+								classes,
+								animateClassName
+							) }
+						>
 							<div className={ 'wp-block-file__content-wrapper' }>
 								<div className="wp-block-file__textlink">
 									<RichText
@@ -182,19 +206,31 @@ class FileEdit extends Component {
 										value={ fileName }
 										placeholder={ __( 'Write file name…' ) }
 										withoutInteractiveFormatting
-										onChange={ ( text ) => setAttributes( { fileName: text } ) }
+										onChange={ ( text ) =>
+											setAttributes( { fileName: text } )
+										}
 									/>
 								</div>
 								{ showDownloadButton && (
-									<div className={ 'wp-block-file__button-richtext-wrapper' }>
+									<div
+										className={
+											'wp-block-file__button-richtext-wrapper'
+										}
+									>
 										{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
 										<RichText
 											tagName="div" // must be block-level or else cursor disappears
-											className={ 'wp-block-file__button' }
+											className={
+												'wp-block-file__button'
+											}
 											value={ downloadButtonText }
 											withoutInteractiveFormatting
 											placeholder={ __( 'Add text…' ) }
-											onChange={ ( text ) => setAttributes( { downloadButtonText: text } ) }
+											onChange={ ( text ) =>
+												setAttributes( {
+													downloadButtonText: text,
+												} )
+											}
 										/>
 									</div>
 								) }
@@ -203,12 +239,16 @@ class FileEdit extends Component {
 								<ClipboardButton
 									isSecondary
 									text={ href }
-									className={ 'wp-block-file__copy-url-button' }
+									className={
+										'wp-block-file__copy-url-button'
+									}
 									onCopy={ this.confirmCopyURL }
 									onFinishCopy={ this.resetCopyConfirmation }
 									disabled={ isBlobURL( href ) }
 								>
-									{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
+									{ showCopyConfirmation
+										? __( 'Copied!' )
+										: __( 'Copy URL' ) }
 								</ClipboardButton>
 							) }
 						</div>

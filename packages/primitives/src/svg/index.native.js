@@ -19,7 +19,12 @@ export const SVG = ( { className = '', isPressed, ...props } ) => {
 	const defaultStyle = isPressed
 		? styles[ 'is-pressed' ]
 		: styles[ 'components-toolbar__control-' + colorScheme ];
-	const styleValues = Object.assign( {}, defaultStyle, props.style, ...stylesFromClasses );
+	const styleValues = Object.assign(
+		{},
+		defaultStyle,
+		props.style,
+		...stylesFromClasses
+	);
 
 	const appliedProps = { ...props, style: styleValues };
 

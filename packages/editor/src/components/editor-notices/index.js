@@ -30,7 +30,10 @@ export function EditorNotices( { notices, onRemove } ) {
 
 	return (
 		<>
-			<NoticeList notices={ nonDismissibleNotices } className="components-editor-notices__pinned" />
+			<NoticeList
+				notices={ nonDismissibleNotices }
+				className="components-editor-notices__pinned"
+			/>
 			<NoticeList
 				notices={ dismissibleNotices }
 				className="components-editor-notices__dismissible"

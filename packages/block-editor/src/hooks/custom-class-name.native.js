@@ -8,7 +8,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport, getSaveContent, parseWithAttributeSchema } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	getSaveContent,
+	parseWithAttributeSchema,
+} from '@wordpress/blocks';
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
@@ -43,8 +47,14 @@ export function addAttribute( settings ) {
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
-	if ( hasBlockSupport( blockType, 'customClassName', true ) && attributes.className ) {
-		extraProps.className = classnames( extraProps.className, attributes.className );
+	if (
+		hasBlockSupport( blockType, 'customClassName', true ) &&
+		attributes.className
+	) {
+		extraProps.className = classnames(
+			extraProps.className,
+			attributes.className
+		);
 	}
 
 	return extraProps;
@@ -93,9 +103,10 @@ export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 		const parsedClasses = getHTMLRootElementClasses( innerHTML );
 		const customClasses = difference( parsedClasses, classes );
 
-		const filteredClassName = compact( [ blockAttributes.className, ...customClasses ] ).join(
-			' '
-		);
+		const filteredClassName = compact( [
+			blockAttributes.className,
+			...customClasses,
+		] ).join( ' ' );
 
 		if ( filteredClassName ) {
 			blockAttributes.className = filteredClassName;
@@ -107,8 +118,16 @@ export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 	return blockAttributes;
 }
 
-addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
-addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
+addFilter(
+	'blocks.registerBlockType',
+	'core/custom-class-name/attribute',
+	addAttribute
+);
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'core/custom-class-name/save-props',
+	addSaveProps
+);
 addFilter(
 	'blocks.getBlockAttributes',
 	'core/custom-class-name/addParsedDifference',

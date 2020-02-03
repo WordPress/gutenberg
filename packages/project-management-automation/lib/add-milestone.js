@@ -25,7 +25,9 @@ async function addMilestone( payload, octokit ) {
 	}
 
 	if ( payload.pull_request.base.ref !== 'master' ) {
-		debug( 'add-milestone: Pull request is not based on `master`. Aborting' );
+		debug(
+			'add-milestone: Pull request is not based on `master`. Aborting'
+		);
 		return;
 	}
 
@@ -40,7 +42,9 @@ async function addMilestone( payload, octokit ) {
 	} );
 
 	if ( milestone ) {
-		debug( 'add-milestone: Pull request already has a milestone. Aborting' );
+		debug(
+			'add-milestone: Pull request already has a milestone. Aborting'
+		);
 		return;
 	}
 
@@ -54,7 +58,9 @@ async function addMilestone( payload, octokit ) {
 		path: 'package.json',
 	} );
 
-	const { version } = JSON.parse( Buffer.from( content, encoding ).toString() );
+	const { version } = JSON.parse(
+		Buffer.from( content, encoding ).toString()
+	);
 
 	let [ major, minor ] = version.split( '.' ).map( Number );
 
@@ -67,7 +73,8 @@ async function addMilestone( payload, octokit ) {
 		minor += 1;
 	}
 
-	const numVersionsElapsed = ( major - REFERENCE_MAJOR ) * 10 + ( minor - REFERENCE_MINOR );
+	const numVersionsElapsed =
+		( major - REFERENCE_MAJOR ) * 10 + ( minor - REFERENCE_MINOR );
 	const numDaysElapsed = numVersionsElapsed * DAYS_PER_RELEASE;
 
 	// Using UTC for the calculation ensures it's not affected by daylight savings.

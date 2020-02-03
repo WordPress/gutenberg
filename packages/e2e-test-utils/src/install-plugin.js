@@ -15,7 +15,9 @@ export async function installPlugin( slug, searchTerm ) {
 	await switchUserToAdmin();
 	await visitAdminPage(
 		'plugin-install.php',
-		's=' + encodeURIComponent( searchTerm || slug ) + '&tab=search&type=term'
+		's=' +
+			encodeURIComponent( searchTerm || slug ) +
+			'&tab=search&type=term'
 	);
 	await page.click( `.install-now[data-slug="${ slug }"]` );
 	await page.waitForSelector( `.activate-now[data-slug="${ slug }"]` );

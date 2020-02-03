@@ -65,6 +65,8 @@ describe( 'registerPlugin', () => {
 		registerPlugin( 'plugin', {
 			render: () => 'plugin content',
 		} );
-		expect( console ).toHaveErroredWith( 'Plugin "plugin" is already registered.' );
+		expect( console ).toHaveErroredWith(
+			'Plugin "plugin" is already registered.'
+		);
 	} );
 } );

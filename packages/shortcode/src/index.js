@@ -267,7 +267,10 @@ export function fromMatch( match ) {
  */
 const shortcode = extend(
 	function( options ) {
-		extend( this, pick( options || {}, 'tag', 'attrs', 'type', 'content' ) );
+		extend(
+			this,
+			pick( options || {}, 'tag', 'attrs', 'type', 'content' )
+		);
 
 		const attributes = this.attrs;
 
@@ -285,7 +288,9 @@ const shortcode = extend(
 		if ( isString( attributes ) ) {
 			this.attrs = attrs( attributes );
 			// Identify a correctly formatted `attrs` object.
-		} else if ( isEqual( Object.keys( attributes ), [ 'named', 'numeric' ] ) ) {
+		} else if (
+			isEqual( Object.keys( attributes ), [ 'named', 'numeric' ] )
+		) {
 			this.attrs = attributes;
 			// Handle a flat object of attributes.
 		} else {

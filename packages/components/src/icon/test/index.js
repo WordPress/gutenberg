@@ -33,7 +33,9 @@ describe( 'Icon', () => {
 	it( 'renders a dashicon by slug', () => {
 		const wrapper = shallow( <Icon icon="format-image" /> );
 
-		expect( wrapper.find( 'Dashicon' ).prop( 'icon' ) ).toBe( 'format-image' );
+		expect( wrapper.find( 'Dashicon' ).prop( 'icon' ) ).toBe(
+			'format-image'
+		);
 	} );
 
 	it( 'renders a dashicon by slug and with a default size of 20', () => {
@@ -43,7 +45,9 @@ describe( 'Icon', () => {
 	} );
 
 	it( 'renders a dashicon by element and with a default size of 20', () => {
-		const wrapper = shallow( <Icon icon={ <Dashicon icon="format-image" /> } /> );
+		const wrapper = shallow(
+			<Icon icon={ <Dashicon icon="format-image" /> } />
+		);
 
 		expect( wrapper.find( 'Dashicon' ).prop( 'size' ) ).toBe( 20 );
 	} );
@@ -135,7 +139,13 @@ describe( 'Icon', () => {
 			} );
 
 			it( 'should pass through all other props', () => {
-				const wrapper = shallow( <Icon { ...props } style={ style } className={ className } /> );
+				const wrapper = shallow(
+					<Icon
+						{ ...props }
+						style={ style }
+						className={ className }
+					/>
+				);
 
 				expect( wrapper.prop( 'style' ) ).toBe( style );
 				expect( wrapper.prop( 'className' ) ).toBe( className );

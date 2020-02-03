@@ -8,10 +8,15 @@ module.exports = {
 			"JSXOpeningElement[name.name='BaseControl']": ( node ) => {
 				const containsAttribute = ( attrName ) => {
 					return node.attributes.some( ( attribute ) => {
-						return attribute.name && attribute.name.name === attrName;
+						return (
+							attribute.name && attribute.name.name === attrName
+						);
 					} );
 				};
-				if ( containsAttribute( 'label' ) && ! containsAttribute( 'id' ) ) {
+				if (
+					containsAttribute( 'label' ) &&
+					! containsAttribute( 'id' )
+				) {
 					context.report( {
 						node,
 						message:

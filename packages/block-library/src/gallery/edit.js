@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { every, filter, find, forEach, get, isEmpty, map, reduce, some } from 'lodash';
+import {
+	every,
+	filter,
+	find,
+	forEach,
+	get,
+	isEmpty,
+	map,
+	reduce,
+	some,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -37,7 +47,9 @@ const linkOptions = [
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PLACEHOLDER_TEXT = Platform.select( {
-	web: __( 'Drag images, upload new ones or select files from your library.' ),
+	web: __(
+		'Drag images, upload new ones or select files from your library.'
+	),
 	native: __( 'ADD MEDIA' ),
 } );
 
@@ -133,7 +145,10 @@ class GalleryEdit extends Component {
 
 	onRemoveImage( index ) {
 		return () => {
-			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
+			const images = filter(
+				this.props.attributes.images,
+				( img, i ) => index !== i
+			);
 			const { columns } = this.props.attributes;
 			this.setState( { selectedImage: null } );
 			this.setAttributes( {
@@ -146,7 +161,9 @@ class GalleryEdit extends Component {
 	selectCaption( newImage, images, attachmentCaptions ) {
 		const currentImage = find( images, { id: newImage.id } );
 
-		const currentImageCaption = currentImage ? currentImage.caption : newImage.caption;
+		const currentImageCaption = currentImage
+			? currentImage.caption
+			: newImage.caption;
 
 		if ( ! attachmentCaptions ) {
 			return currentImageCaption;
@@ -174,7 +191,11 @@ class GalleryEdit extends Component {
 		this.setAttributes( {
 			images: newImages.map( ( newImage ) => ( {
 				...pickRelevantMediaFiles( newImage, sizeSlug ),
-				caption: this.selectCaption( newImage, images, attachmentCaptions ),
+				caption: this.selectCaption(
+					newImage,
+					images,
+					attachmentCaptions
+				),
 			} ) ),
 			columns: columns ? Math.min( newImages.length, columns ) : columns,
 		} );
@@ -199,7 +220,9 @@ class GalleryEdit extends Component {
 	}
 
 	getImageCropHelp( checked ) {
-		return checked ? __( 'Thumbnails are cropped to align.' ) : __( 'Thumbnails are not cropped.' );
+		return checked
+			? __( 'Thumbnails are cropped to align.' )
+			: __( 'Thumbnails are not cropped.' );
 	}
 
 	onFocusGalleryCaption() {
@@ -231,7 +254,9 @@ class GalleryEdit extends Component {
 	getImagesSizeOptions() {
 		const { imageSizes, resizedImages } = this.props;
 		return map(
-			filter( imageSizes, ( { slug } ) => some( resizedImages, ( sizes ) => sizes[ slug ] ) ),
+			filter( imageSizes, ( { slug } ) =>
+				some( resizedImages, ( sizes ) => sizes[ slug ] )
+			),
 			( { name, slug } ) => ( { value: slug, label: name } )
 		);
 	}
@@ -246,7 +271,10 @@ class GalleryEdit extends Component {
 			if ( ! image.id ) {
 				return image;
 			}
-			const url = get( resizedImages, [ parseInt( image.id, 10 ), sizeSlug ] );
+			const url = get( resizedImages, [
+				parseInt( image.id, 10 ),
+				sizeSlug,
+			] );
 			return {
 				...image,
 				...( url && { url } ),
@@ -325,7 +353,8 @@ class GalleryEdit extends Component {
 		}
 
 		const imageSizeOptions = this.getImagesSizeOptions();
-		const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+		const shouldShowSizeOptions =
+			hasImages && ! isEmpty( imageSizeOptions );
 		// This is needed to fix a separator fence-post issue on mobile.
 		const mobileLinkToProps = shouldShowSizeOptions
 			? MOBILE_CONTROL_PROPS
@@ -406,7 +435,11 @@ export default compose( [
 					const sizes = reduce(
 						imageSizes,
 						( currentSizes, size ) => {
-							const defaultUrl = get( image, [ 'sizes', size.slug, 'url' ] );
+							const defaultUrl = get( image, [
+								'sizes',
+								size.slug,
+								'url',
+							] );
 							const mediaDetailsUrl = get( image, [
 								'media_details',
 								'sizes',

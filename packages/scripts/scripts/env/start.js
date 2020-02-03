@@ -17,7 +17,9 @@ if ( env.MANAGED_WP ) {
 	if ( false && commandExistsSync( 'git' ) ) {
 		stat = statSync( normalize( env.WP_DEVELOP_DIR + '/.git' ) );
 	} else {
-		stat = statSync( normalize( env.WP_DEVELOP_DIR + '/wp-config-sample.php' ) );
+		stat = statSync(
+			normalize( env.WP_DEVELOP_DIR + '/wp-config-sample.php' )
+		);
 	}
 
 	const lastUpdated = new Date( stat.mtimeMs );

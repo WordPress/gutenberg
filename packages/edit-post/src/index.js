@@ -34,9 +34,22 @@ import Editor from './editor';
  *                               considered as non-user-initiated (bypass for
  *                               unsaved changes prompt).
  */
-export function reinitializeEditor( postType, postId, target, settings, initialEdits ) {
+export function reinitializeEditor(
+	postType,
+	postId,
+	target,
+	settings,
+	initialEdits
+) {
 	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, initialEdits );
+	const reboot = reinitializeEditor.bind(
+		null,
+		postType,
+		postId,
+		target,
+		settings,
+		initialEdits
+	);
 
 	render(
 		<Editor
@@ -65,16 +78,30 @@ export function reinitializeEditor( postType, postId, target, settings, initialE
  *                               considered as non-user-initiated (bypass for
  *                               unsaved changes prompt).
  */
-export function initializeEditor( id, postType, postId, settings, initialEdits ) {
+export function initializeEditor(
+	id,
+	postType,
+	postId,
+	settings,
+	initialEdits
+) {
 	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, initialEdits );
+	const reboot = reinitializeEditor.bind(
+		null,
+		postType,
+		postId,
+		target,
+		settings,
+		initialEdits
+	);
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
-	const documentMode = document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks';
+	const documentMode =
+		document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks';
 	if ( documentMode !== 'Standards' ) {
 		// eslint-disable-next-line no-console
 		console.warn(
@@ -99,7 +126,8 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 				// Scroll element into view by scrolling the editor container by the same amount
 				// that Mobile Safari tried to scroll the html element upwards.
 				if ( window.scrollY > 100 ) {
-					editorScrollContainer.scrollTop = editorScrollContainer.scrollTop + window.scrollY;
+					editorScrollContainer.scrollTop =
+						editorScrollContainer.scrollTop + window.scrollY;
 				}
 				//Undo unwanted scroll on html element
 				window.scrollTo( 0, 0 );

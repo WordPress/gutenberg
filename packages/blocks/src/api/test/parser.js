@@ -211,22 +211,28 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should return the matcher’s true boolean attribute value on explicit attribute value', () => {
-			const value = parseWithAttributeSchema( '<audio src="#" loop="loop">', {
-				type: 'boolean',
-				source: 'attribute',
-				selector: 'audio',
-				attribute: 'loop',
-			} );
+			const value = parseWithAttributeSchema(
+				'<audio src="#" loop="loop">',
+				{
+					type: 'boolean',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'loop',
+				}
+			);
 			expect( value ).toBe( true );
 		} );
 
 		it( 'should return the matcher’s false boolean attribute value', () => {
-			const value = parseWithAttributeSchema( '<audio src="#" autoplay>', {
-				type: 'boolean',
-				source: 'attribute',
-				selector: 'audio',
-				attribute: 'loop',
-			} );
+			const value = parseWithAttributeSchema(
+				'<audio src="#" autoplay>',
+				{
+					type: 'boolean',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'loop',
+				}
+			);
 			expect( value ).toBe( false );
 		} );
 
@@ -397,12 +403,14 @@ describe( 'block parser', () => {
 			const innerHTML = '<div data-number="10">Ribs</div>';
 			const attrs = { align: null, invalid: true };
 
-			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {
-				content: 'Ribs',
-				align: null,
-				topic: 'none',
-				undefAmbiguousStringWithDefault: 'ok',
-			} );
+			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual(
+				{
+					content: 'Ribs',
+					align: null,
+					topic: 'none',
+					undefAmbiguousStringWithDefault: 'ok',
+				}
+			);
 		} );
 
 		it( 'should work when block type is passed as string', () => {
@@ -432,7 +440,8 @@ describe( 'block parser', () => {
 			const block = deepFreeze( {
 				name: 'core/test-block',
 				attributes: parsedAttributes,
-				originalContent: '<span class="wp-block-test-block">Bananas</span>',
+				originalContent:
+					'<span class="wp-block-test-block">Bananas</span>',
 				isValid: false,
 			} );
 			registerBlockType( 'core/test-block', defaultBlockSettings );
@@ -447,7 +456,8 @@ describe( 'block parser', () => {
 			const block = deepFreeze( {
 				name: 'core/test-block',
 				attributes: parsedAttributes,
-				originalContent: '<span class="wp-block-test-block">Bananas</span>',
+				originalContent:
+					'<span class="wp-block-test-block">Bananas</span>',
 				isValid: false,
 			} );
 			registerBlockType( 'core/test-block', {
@@ -487,7 +497,9 @@ describe( 'block parser', () => {
 								selector: 'span',
 							},
 						},
-						save: ( props ) => <span>{ props.attributes.fruit }</span>,
+						save: ( props ) => (
+							<span>{ props.attributes.fruit }</span>
+						),
 					},
 				],
 			} );
@@ -517,7 +529,9 @@ describe( 'block parser', () => {
 								selector: 'span',
 							},
 						},
-						save: ( props ) => <span>{ props.attributes.fruit }</span>,
+						save: ( props ) => (
+							<span>{ props.attributes.fruit }</span>
+						),
 						migrate: ( attributes ) => {
 							return [
 								{ newFruit: attributes.fruit },
@@ -535,10 +549,16 @@ describe( 'block parser', () => {
 
 			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
-			expect( migratedBlock.attributes ).toEqual( { newFruit: 'Bananas' } );
+			expect( migratedBlock.attributes ).toEqual( {
+				newFruit: 'Bananas',
+			} );
 			expect( migratedBlock.innerBlocks ).toHaveLength( 1 );
-			expect( migratedBlock.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
-			expect( migratedBlock.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+			expect( migratedBlock.innerBlocks[ 0 ].name ).toEqual(
+				'core/test-block'
+			);
+			expect( migratedBlock.innerBlocks[ 0 ].attributes ).toEqual( {
+				aaa: 'bbb',
+			} );
 		} );
 
 		it( 'should ignore valid uneligible blocks', () => {
@@ -667,7 +687,10 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should fall back to the unregistered type handler for unregistered blocks if present', () => {
-			registerBlockType( 'core/unregistered-block', unknownBlockSettings );
+			registerBlockType(
+				'core/unregistered-block',
+				unknownBlockSettings
+			);
 			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
 
 			const block = createBlockWithFallback( {
@@ -718,8 +741,12 @@ describe( 'block parser', () => {
 								selector: 'span',
 							},
 						},
-						save: ( { attributes } ) => <span>{ attributes.fruit }</span>,
-						migrate: ( attributes ) => ( { fruit: 'Big ' + attributes.fruit } ),
+						save: ( { attributes } ) => (
+							<span>{ attributes.fruit }</span>
+						),
+						migrate: ( attributes ) => ( {
+							fruit: 'Big ' + attributes.fruit,
+						} ),
 					},
 				],
 			} );
@@ -780,7 +807,11 @@ describe( 'block parser', () => {
 							},
 						],
 						innerHTML: '<div class="wp-block-column"></div>',
-						innerContent: [ '<div class="wp-block-column">', null, '</div>' ],
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
 					},
 					{
 						blockName: 'core/column',
@@ -794,8 +825,11 @@ describe( 'block parser', () => {
 										blockName: 'core/list',
 										attrs: {},
 										innerBlocks: [],
-										innerHTML: '<ul><li>B</li><li>C</li></ul>',
-										innerContent: [ '<ul><li>B</li><li>C</li></ul>' ],
+										innerHTML:
+											'<ul><li>B</li><li>C</li></ul>',
+										innerContent: [
+											'<ul><li>B</li><li>C</li></ul>',
+										],
 									},
 									{
 										blockName: 'core/paragraph',
@@ -817,11 +851,21 @@ describe( 'block parser', () => {
 							},
 						],
 						innerHTML: '<div class="wp-block-column"></div>',
-						innerContent: [ '<div class="wp-block-column">', null, '</div>' ],
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
 					},
 				],
 				innerHTML: '<div class="wp-block-columns has-2-columns"></div>',
-				innerContent: [ '<div class="wp-block-columns has-2-columns">', null, '', null, '</div>' ],
+				innerContent: [
+					'<div class="wp-block-columns has-2-columns">',
+					null,
+					'',
+					null,
+					'</div>',
+				],
 			};
 			const actual = serializeBlockNode( input );
 
@@ -970,24 +1014,35 @@ describe( 'block parser', () => {
 				'core/test-block',
 				'core/unknown-block',
 			] );
-			expect( parsed[ 0 ].attributes.content ).toEqual( '<p>Cauliflower</p>' );
-			expect( parsed[ 2 ].attributes.content ).toEqual( '<p>Broccoli</p>' );
-			expect( parsed[ 4 ].attributes.content ).toEqual( '<p>Romanesco</p>' );
+			expect( parsed[ 0 ].attributes.content ).toEqual(
+				'<p>Cauliflower</p>'
+			);
+			expect( parsed[ 2 ].attributes.content ).toEqual(
+				'<p>Broccoli</p>'
+			);
+			expect( parsed[ 4 ].attributes.content ).toEqual(
+				'<p>Romanesco</p>'
+			);
 		} );
 
 		it( 'should parse blocks with empty content', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			const parsed = parse( '<!-- wp:core/test-block --><!-- /wp:core/test-block -->' );
+			const parsed = parse(
+				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->'
+			);
 
 			expect( parsed ).toHaveLength( 1 );
-			expect( parsed.map( ( { name } ) => name ) ).toEqual( [ 'core/test-block' ] );
+			expect( parsed.map( ( { name } ) => name ) ).toEqual( [
+				'core/test-block',
+			] );
 		} );
 
 		it( 'should parse void blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/void-block', defaultBlockSettings );
 			const parsed = parse(
-				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->' + '<!-- wp:core/void-block /-->'
+				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->' +
+					'<!-- wp:core/void-block /-->'
 			);
 
 			expect( parsed ).toHaveLength( 2 );

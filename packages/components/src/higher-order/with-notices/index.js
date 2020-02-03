@@ -71,7 +71,9 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 		 */
 		removeNotice( id ) {
 			this.setState( ( state ) => ( {
-				noticeList: state.noticeList.filter( ( notice ) => notice.id !== id ),
+				noticeList: state.noticeList.filter(
+					( notice ) => notice.id !== id
+				),
 			} ) );
 		}
 

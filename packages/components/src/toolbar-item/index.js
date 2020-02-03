@@ -17,7 +17,10 @@ import ToolbarContext from '../toolbar-context';
 function ToolbarItem( { children, ...props }, ref ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
 	// https://reakit.io/docs/composition/#props-hooks
-	const itemProps = useToolbarItem( accessibleToolbarState, { ...props, ref } );
+	const itemProps = useToolbarItem( accessibleToolbarState, {
+		...props,
+		ref,
+	} );
 
 	if ( typeof children !== 'function' ) {
 		warning(

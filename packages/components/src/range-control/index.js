@@ -62,7 +62,9 @@ function RangeControl( {
 		onChange( newValue === '' ? undefined : parseFloat( newValue ) );
 	};
 
-	const initialFallbackValue = isFinite( initialPosition ) ? initialPosition : '';
+	const initialFallbackValue = isFinite( initialPosition )
+		? initialPosition
+		: '';
 
 	const initialSliderValue = isFinite( currentInputValue )
 		? currentInputValue

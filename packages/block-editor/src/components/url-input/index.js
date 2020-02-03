@@ -11,7 +11,13 @@ import scrollIntoView from 'dom-scroll-into-view';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
-import { BaseControl, Button, Spinner, withSpokenMessages, Popover } from '@wordpress/components';
+import {
+	BaseControl,
+	Button,
+	Spinner,
+	withSpokenMessages,
+	Popover,
+} from '@wordpress/components';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
@@ -32,7 +38,10 @@ class URLInput extends Component {
 		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
 		this.autocompleteRef = props.autocompleteRef || createRef();
 		this.inputRef = createRef();
-		this.updateSuggestions = throttle( this.updateSuggestions.bind( this ), 200 );
+		this.updateSuggestions = throttle(
+			this.updateSuggestions.bind( this ),
+			200
+		);
 
 		this.suggestionNodes = [];
 
@@ -50,12 +59,20 @@ class URLInput extends Component {
 
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
-		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
+		if (
+			showSuggestions &&
+			selectedSuggestion !== null &&
+			! this.scrollingIntoView
+		) {
 			this.scrollingIntoView = true;
 
-			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.autocompleteRef.current, {
-				onlyScrollIfNeeded: true,
-			} );
+			scrollIntoView(
+				this.suggestionNodes[ selectedSuggestion ],
+				this.autocompleteRef.current,
+				{
+					onlyScrollIfNeeded: true,
+				}
+			);
 
 			this.props.setTimeout( () => {
 				this.scrollingIntoView = false;
@@ -85,7 +102,10 @@ class URLInput extends Component {
 
 	shouldShowInitialSuggestions() {
 		const { suggestions } = this.state;
-		const { __experimentalShowInitialSuggestions = false, value } = this.props;
+		const {
+			__experimentalShowInitialSuggestions = false,
+			value,
+		} = this.props;
 		return (
 			! this.isUpdatingSuggestions &&
 			__experimentalShowInitialSuggestions &&
@@ -162,7 +182,10 @@ class URLInput extends Component {
 						'assertive'
 					);
 				} else {
-					this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
+					this.props.debouncedSpeak(
+						__( 'No results.' ),
+						'assertive'
+					);
 				}
 				this.isUpdatingSuggestions = false;
 			} )
@@ -190,7 +213,12 @@ class URLInput extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { showSuggestions, selectedSuggestion, suggestions, loading } = this.state;
+		const {
+			showSuggestions,
+			selectedSuggestion,
+			suggestions,
+			loading,
+		} = this.state;
 
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
@@ -216,12 +244,17 @@ class URLInput extends Component {
 				// When DOWN is pressed, if the caret is not at the end of the text, move it to the
 				// last position.
 				case DOWN: {
-					if ( this.props.value.length !== event.target.selectionStart ) {
+					if (
+						this.props.value.length !== event.target.selectionStart
+					) {
 						event.stopPropagation();
 						event.preventDefault();
 
 						// Set the input caret to the last position
-						event.target.setSelectionRange( this.props.value.length, this.props.value.length );
+						event.target.setSelectionRange(
+							this.props.value.length,
+							this.props.value.length
+						);
 					}
 					break;
 				}
@@ -230,7 +263,9 @@ class URLInput extends Component {
 			return;
 		}
 
-		const suggestion = this.state.suggestions[ this.state.selectedSuggestion ];
+		const suggestion = this.state.suggestions[
+			this.state.selectedSuggestion
+		];
 
 		switch ( event.keyCode ) {
 			case UP: {
@@ -248,7 +283,8 @@ class URLInput extends Component {
 				event.stopPropagation();
 				event.preventDefault();
 				const nextIndex =
-					selectedSuggestion === null || selectedSuggestion === suggestions.length - 1
+					selectedSuggestion === null ||
+					selectedSuggestion === suggestions.length - 1
 						? 0
 						: selectedSuggestion + 1;
 				this.setState( {
@@ -289,7 +325,11 @@ class URLInput extends Component {
 	}
 
 	static getDerivedStateFromProps(
-		{ value, disableSuggestions, __experimentalShowInitialSuggestions = false },
+		{
+			value,
+			disableSuggestions,
+			__experimentalShowInitialSuggestions = false,
+		},
 		{ showSuggestions }
 	) {
 		let shouldShowSuggestions = showSuggestions;
@@ -323,7 +363,12 @@ class URLInput extends Component {
 			__experimentalShowInitialSuggestions = false,
 		} = this.props;
 
-		const { showSuggestions, suggestions, selectedSuggestion, loading } = this.state;
+		const {
+			showSuggestions,
+			suggestions,
+			selectedSuggestion,
+			loading,
+		} = this.state;
 
 		const id = `url-input-control-${ instanceId }`;
 
@@ -391,33 +436,50 @@ class URLInput extends Component {
 						isLoading: loading,
 						handleSuggestionClick: this.handleOnClick,
 						isInitialSuggestions:
-							__experimentalShowInitialSuggestions && ! ( value && value.length ),
+							__experimentalShowInitialSuggestions &&
+							! ( value && value.length ),
 					} ) }
 
-				{ ! isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length && (
-					<Popover position="bottom" noArrow focusOnMount={ false }>
-						<div
-							{ ...suggestionsListProps }
-							className={ classnames(
-								'block-editor-url-input__suggestions',
-								`${ className }__suggestions`
-							) }
+				{ ! isFunction( renderSuggestions ) &&
+					showSuggestions &&
+					!! suggestions.length && (
+						<Popover
+							position="bottom"
+							noArrow
+							focusOnMount={ false }
 						>
-							{ suggestions.map( ( suggestion, index ) => (
-								<Button
-									{ ...buildSuggestionItemProps( suggestion, index ) }
-									key={ suggestion.id }
-									className={ classnames( 'block-editor-url-input__suggestion', {
-										'is-selected': index === selectedSuggestion,
-									} ) }
-									onClick={ () => this.handleOnClick( suggestion ) }
-								>
-									{ suggestion.title }
-								</Button>
-							) ) }
-						</div>
-					</Popover>
-				) }
+							<div
+								{ ...suggestionsListProps }
+								className={ classnames(
+									'block-editor-url-input__suggestions',
+									`${ className }__suggestions`
+								) }
+							>
+								{ suggestions.map( ( suggestion, index ) => (
+									<Button
+										{ ...buildSuggestionItemProps(
+											suggestion,
+											index
+										) }
+										key={ suggestion.id }
+										className={ classnames(
+											'block-editor-url-input__suggestion',
+											{
+												'is-selected':
+													index ===
+													selectedSuggestion,
+											}
+										) }
+										onClick={ () =>
+											this.handleOnClick( suggestion )
+										}
+									>
+										{ suggestion.title }
+									</Button>
+								) ) }
+							</div>
+						</Popover>
+					) }
 			</BaseControl>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
@@ -439,7 +501,8 @@ export default compose(
 		}
 		const { getSettings } = select( 'core/block-editor' );
 		return {
-			__experimentalFetchLinkSuggestions: getSettings().__experimentalFetchLinkSuggestions,
+			__experimentalFetchLinkSuggestions: getSettings()
+				.__experimentalFetchLinkSuggestions,
 		};
 	} )
 )( URLInput );

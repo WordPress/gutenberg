@@ -62,7 +62,8 @@ export function getQueryParts( query ) {
 				// implementation for our use here, vs. iterating an object
 				// with only a single key.
 				parts.stableKey +=
-					( parts.stableKey ? '&' : '' ) + addQueryArgs( '', { [ key ]: value } ).slice( 1 );
+					( parts.stableKey ? '&' : '' ) +
+					addQueryArgs( '', { [ key ]: value } ).slice( 1 );
 		}
 	}
 

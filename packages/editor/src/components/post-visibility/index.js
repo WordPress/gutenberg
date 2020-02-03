@@ -33,8 +33,12 @@ export class PostVisibility extends Component {
 	}
 
 	setPrivate() {
-		// eslint-disable-next-line no-alert
-		if ( ! window.confirm( __( 'Would you like to privately publish this post now?' ) ) ) {
+		if (
+			// eslint-disable-next-line no-alert
+			! window.confirm(
+				__( 'Would you like to privately publish this post now?' )
+			)
+		) {
 			return;
 		}
 
@@ -48,7 +52,10 @@ export class PostVisibility extends Component {
 	setPasswordProtected() {
 		const { visibility, onUpdateVisibility, status, password } = this.props;
 
-		onUpdateVisibility( visibility === 'private' ? 'draft' : status, password || '' );
+		onUpdateVisibility(
+			visibility === 'private' ? 'draft' : status,
+			password || ''
+		);
 		this.setState( { hasPassword: true } );
 	}
 
@@ -76,12 +83,18 @@ export class PostVisibility extends Component {
 		};
 
 		return [
-			<fieldset key="visibility-selector" className="editor-post-visibility__dialog-fieldset">
+			<fieldset
+				key="visibility-selector"
+				className="editor-post-visibility__dialog-fieldset"
+			>
 				<legend className="editor-post-visibility__dialog-legend">
 					{ __( 'Post Visibility' ) }
 				</legend>
 				{ visibilityOptions.map( ( { value, label, info } ) => (
-					<div key={ value } className="editor-post-visibility__choice">
+					<div
+						key={ value }
+						className="editor-post-visibility__choice"
+					>
 						<input
 							type="radio"
 							name={ `editor-post-visibility__setting-${ instanceId }` }
@@ -110,7 +123,10 @@ export class PostVisibility extends Component {
 				) ) }
 			</fieldset>,
 			this.state.hasPassword && (
-				<div className="editor-post-visibility__dialog-password" key="password-selector">
+				<div
+					className="editor-post-visibility__dialog-password"
+					key="password-selector"
+				>
 					<label
 						htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
 						className="screen-reader-text"
@@ -133,7 +149,9 @@ export class PostVisibility extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getEditedPostVisibility } = select( 'core/editor' );
+		const { getEditedPostAttribute, getEditedPostVisibility } = select(
+			'core/editor'
+		);
 		return {
 			status: getEditedPostAttribute( 'status' ),
 			visibility: getEditedPostVisibility(),

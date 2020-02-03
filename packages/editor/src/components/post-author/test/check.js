@@ -46,7 +46,10 @@ describe( 'PostAuthorCheck', () => {
 
 	it( 'should not render anything if single user', () => {
 		const wrapper = shallow(
-			<PostAuthorCheck authors={ users.data.slice( 0, 1 ) } hasAssignAuthorAction={ true }>
+			<PostAuthorCheck
+				authors={ users.data.slice( 0, 1 ) }
+				hasAssignAuthorAction={ true }
+			>
 				authors
 			</PostAuthorCheck>
 		);

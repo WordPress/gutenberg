@@ -6,7 +6,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { parseAndThrowError, parseResponseAndNormalizeError } from '../utils/response';
+import {
+	parseAndThrowError,
+	parseResponseAndNormalizeError,
+} from '../utils/response';
 
 /**
  * Middleware handling media upload failures and retries.
@@ -49,8 +52,14 @@ function mediaUploadMiddleware( options, next ) {
 
 	return next( { ...options, parse: false } )
 		.catch( ( response ) => {
-			const attachmentId = response.headers.get( 'x-wp-upload-attachment-id' );
-			if ( response.status >= 500 && response.status < 600 && attachmentId ) {
+			const attachmentId = response.headers.get(
+				'x-wp-upload-attachment-id'
+			);
+			if (
+				response.status >= 500 &&
+				response.status < 600 &&
+				attachmentId
+			) {
 				return postProcess( attachmentId ).catch( () => {
 					if ( options.parse !== false ) {
 						return Promise.reject( {
@@ -66,7 +75,9 @@ function mediaUploadMiddleware( options, next ) {
 			}
 			return parseAndThrowError( response, options.parse );
 		} )
-		.then( ( response ) => parseResponseAndNormalizeError( response, options.parse ) );
+		.then( ( response ) =>
+			parseResponseAndNormalizeError( response, options.parse )
+		);
 }
 
 export default mediaUploadMiddleware;

@@ -24,7 +24,8 @@ const Example = () => {
 				</Button>
 				{ isScrollLocked && <ScrollLock /> }
 				<p>
-					Scroll locked: <strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
+					Scroll locked:{ ' ' }
+					<strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
 				</p>
 			</ToggleContainer>
 		</StripedBackground>
@@ -36,7 +37,8 @@ function StripedBackground( props ) {
 		<div
 			style={ {
 				backgroundColor: '#fff',
-				backgroundImage: 'linear-gradient(transparent 50%, rgba(0, 0, 0, 0.05) 50%)',
+				backgroundImage:
+					'linear-gradient(transparent 50%, rgba(0, 0, 0, 0.05) 50%)',
 				backgroundSize: '50px 50px',
 				height: 3000,
 				position: 'relative',

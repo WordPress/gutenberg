@@ -22,13 +22,20 @@ const MODES = [
 ];
 
 function ModeSwitcher() {
-	const { shortcut, isRichEditingEnabled, isCodeEditingEnabled, mode } = useSelect(
+	const {
+		shortcut,
+		isRichEditingEnabled,
+		isCodeEditingEnabled,
+		mode,
+	} = useSelect(
 		( select ) => ( {
-			shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(
-				'core/edit-post/toggle-mode'
-			),
-			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-			isCodeEditingEnabled: select( 'core/editor' ).getEditorSettings().codeEditingEnabled,
+			shortcut: select(
+				'core/keyboard-shortcuts'
+			).getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
+			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+				.richEditingEnabled,
+			isCodeEditingEnabled: select( 'core/editor' ).getEditorSettings()
+				.codeEditingEnabled,
 			mode: select( 'core/edit-post' ).getEditorMode(),
 		} ),
 		[]
@@ -48,7 +55,11 @@ function ModeSwitcher() {
 
 	return (
 		<MenuGroup label={ __( 'Editor' ) }>
-			<MenuItemsChoice choices={ choices } value={ mode } onSelect={ switchEditorMode } />
+			<MenuItemsChoice
+				choices={ choices }
+				value={ mode }
+				onSelect={ switchEditorMode }
+			/>
 		</MenuGroup>
 	);
 }

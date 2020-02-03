@@ -13,12 +13,21 @@ import { useState } from '@wordpress/element';
  */
 import FontSizePicker from '../';
 
-export default { title: 'Components/FontSizePicker', component: FontSizePicker };
+export default {
+	title: 'Components/FontSizePicker',
+	component: FontSizePicker,
+};
 
 const FontSizePickerWithState = ( { ...props } ) => {
 	const [ fontSize, setFontSize ] = useState( 16 );
 
-	return <FontSizePicker { ...props } value={ fontSize } onChange={ setFontSize } />;
+	return (
+		<FontSizePicker
+			{ ...props }
+			value={ fontSize }
+			onChange={ setFontSize }
+		/>
+	);
 };
 
 export const _default = () => {
@@ -88,5 +97,10 @@ export const withoutCustomSizes = () => {
 			size: 26,
 		},
 	] );
-	return <FontSizePickerWithState fontSizes={ fontSizes } disableCustomFontSizes />;
+	return (
+		<FontSizePickerWithState
+			fontSizes={ fontSizes }
+			disableCustomFontSizes
+		/>
+	);
 };

@@ -81,7 +81,11 @@ class TagCloudEdit extends Component {
 		return (
 			<>
 				{ inspectorControls }
-				<ServerSideRender key="tag-cloud" block="core/tag-cloud" attributes={ attributes } />
+				<ServerSideRender
+					key="tag-cloud"
+					block="core/tag-cloud"
+					attributes={ attributes }
+				/>
 			</>
 		);
 	}

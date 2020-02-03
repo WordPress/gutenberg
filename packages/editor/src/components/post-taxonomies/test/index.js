@@ -12,7 +12,9 @@ describe( 'PostTaxonomies', () => {
 	it( 'should render no children if taxonomy data not available', () => {
 		const taxonomies = {};
 
-		const wrapper = shallow( <PostTaxonomies postType="page" taxonomies={ taxonomies } /> );
+		const wrapper = shallow(
+			<PostTaxonomies postType="page" taxonomies={ taxonomies } />
+		);
 
 		expect( wrapper.at( 0 ) ).toHaveLength( 0 );
 	} );
@@ -41,7 +43,10 @@ describe( 'PostTaxonomies', () => {
 		};
 
 		const wrapperOne = shallow(
-			<PostTaxonomies postType="book" taxonomies={ [ genresTaxonomy, categoriesTaxonomy ] } />
+			<PostTaxonomies
+				postType="book"
+				taxonomies={ [ genresTaxonomy, categoriesTaxonomy ] }
+			/>
 		);
 
 		expect( wrapperOne ).toHaveLength( 1 );

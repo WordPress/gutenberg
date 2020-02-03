@@ -18,7 +18,11 @@ describe( 'ColorPalette', () => {
 	const onChange = jest.fn();
 
 	const wrapper = mount(
-		<ColorPalette colors={ colors } value={ currentColor } onChange={ onChange } />
+		<ColorPalette
+			colors={ colors }
+			value={ currentColor }
+			onChange={ onChange }
+		/>
 	);
 	const buttons = wrapper.find( 'Option button' );
 
@@ -35,7 +39,9 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should call onClick on an active button with undefined', () => {
-		const activeButton = buttons.findWhere( ( button ) => button.hasClass( 'is-pressed' ) );
+		const activeButton = buttons.findWhere( ( button ) =>
+			button.hasClass( 'is-pressed' )
+		);
 		activeButton.simulate( 'click' );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
@@ -86,7 +92,9 @@ describe( 'ColorPalette', () => {
 			const isOpen = true;
 			const onToggle = jest.fn();
 
-			const renderedToggleButton = shallow( dropdown.props().renderToggle( { isOpen, onToggle } ) );
+			const renderedToggleButton = shallow(
+				dropdown.props().renderToggle( { isOpen, onToggle } )
+			);
 
 			test( 'should render dropdown content', () => {
 				expect( renderedToggleButton ).toMatchSnapshot();

@@ -35,7 +35,9 @@ export default function ColorPalette( {
 					sprintf( __( 'Color code: %s' ), color )
 				}
 				style={ { color } }
-				onClick={ value === color ? clearColor : () => onChange( color ) }
+				onClick={
+					value === color ? clearColor : () => onChange( color )
+				}
 				aria-label={
 					name
 						? // translators: %s: The name of the color e.g: "vivid red".
@@ -67,7 +69,8 @@ export default function ColorPalette( {
 						<CircularOptionPicker.DropdownLinkAction
 							dropdownProps={ {
 								renderContent: renderCustomColorPicker,
-								contentClassName: 'components-color-palette__picker',
+								contentClassName:
+									'components-color-palette__picker',
 							} }
 							buttonProps={ {
 								'aria-label': __( 'Custom color picker' ),
@@ -76,7 +79,9 @@ export default function ColorPalette( {
 						/>
 					) }
 					{ !! clearable && (
-						<CircularOptionPicker.ButtonAction onClick={ clearColor }>
+						<CircularOptionPicker.ButtonAction
+							onClick={ clearColor }
+						>
 							{ __( 'Clear' ) }
 						</CircularOptionPicker.ButtonAction>
 					) }

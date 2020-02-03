@@ -84,7 +84,10 @@ module.exports = {
 				locality = '(External|Node)';
 			}
 
-			const pattern = new RegExp( `^\\*?\\n \\* ${ locality } dependencies\\.?\\n $`, 'i' );
+			const pattern = new RegExp(
+				`^\\*?\\n \\* ${ locality } dependencies\\.?\\n $`,
+				'i'
+			);
 			return pattern.test( value );
 		}
 
@@ -191,7 +194,10 @@ module.exports = {
 					verified.add( locality );
 
 					// Determine whether a correction must be made.
-					const correction = getDependencyBlockCorrection( child, locality );
+					const correction = getDependencyBlockCorrection(
+						child,
+						locality
+					);
 					if ( ! correction ) {
 						return;
 					}

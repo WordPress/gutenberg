@@ -55,7 +55,9 @@ describe( 'Using Plugins API', () => {
 			await page.$x( "//button[contains(text(), 'Add annotation')]" )
 		 )[ 0 ];
 		await addAnnotationButton.click();
-		await page.evaluate( () => document.querySelector( '[contenteditable]' ).focus() );
+		await page.evaluate( () =>
+			document.querySelector( '[contenteditable]' ).focus()
+		);
 	}
 
 	/**
@@ -69,7 +71,9 @@ describe( 'Using Plugins API', () => {
 			await page.$x( "//button[contains(text(), 'Remove annotations')]" )
 		 )[ 0 ];
 		await addAnnotationButton.click();
-		await page.evaluate( () => document.querySelector( '[contenteditable]' ).focus() );
+		await page.evaluate( () =>
+			document.querySelector( '[contenteditable]' ).focus()
+		);
 	}
 
 	/**
@@ -99,7 +103,9 @@ describe( 'Using Plugins API', () => {
 
 	describe( 'Annotations', () => {
 		it( 'Allows a block to be annotated', async () => {
-			await page.keyboard.type( 'Title' + '\n' + 'Paragraph to annotate' );
+			await page.keyboard.type(
+				'Title' + '\n' + 'Paragraph to annotate'
+			);
 
 			await clickOnMoreMenuItem( 'Annotations Sidebar' );
 
@@ -116,7 +122,9 @@ describe( 'Using Plugins API', () => {
 
 			await clickOnBlockSettingsMenuItem( 'Edit as HTML' );
 
-			const htmlContent = await page.$$( '.block-editor-block-list__block-html-textarea' );
+			const htmlContent = await page.$$(
+				'.block-editor-block-list__block-html-textarea'
+			);
 			const html = await page.evaluate( ( el ) => {
 				return el.innerHTML;
 			}, htmlContent[ 0 ] );

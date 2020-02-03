@@ -16,7 +16,9 @@ const { execSync } = require( 'child_process' );
  */
 const { fromConfigRoot, mergeYAMLConfigs } = require( '../../utils' );
 
-const composeFile = normalize( `${ env.WP_DEVELOP_DIR }/docker-compose.override.yml` );
+const composeFile = normalize(
+	`${ env.WP_DEVELOP_DIR }/docker-compose.override.yml`
+);
 let compose = {};
 if ( existsSync( composeFile ) ) {
 	try {
@@ -30,7 +32,9 @@ if ( existsSync( composeFile ) ) {
 	}
 }
 
-const coreComposeFile = normalize( `${ env.WP_DEVELOP_DIR }/docker-compose.yml` );
+const coreComposeFile = normalize(
+	`${ env.WP_DEVELOP_DIR }/docker-compose.yml`
+);
 if ( ! existsSync( coreComposeFile ) ) {
 	stdout.write(
 		"docker-compose.yml doesn't seem to exist. Are you sure WP_DEVELOP_DIR is a WordPress source directory?\n"
@@ -74,7 +78,11 @@ stdout.write( 'Updating docker-compose.override.yml...\n' );
 
 compose.version = coreCompose.version;
 
-const mergedCompose = mergeYAMLConfigs( compose, pluginCompose, pluginMountDir );
+const mergedCompose = mergeYAMLConfigs(
+	compose,
+	pluginCompose,
+	pluginMountDir
+);
 
 writeFileSync( composeFile, yaml.safeDump( mergedCompose, { lineWidth: -1 } ) );
 

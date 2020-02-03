@@ -70,7 +70,11 @@ export function Button( props, ref ) {
 	const tagProps =
 		Tag === 'a'
 			? { href, target }
-			: { type: 'button', disabled: trulyDisabled, 'aria-pressed': isPressed };
+			: {
+					type: 'button',
+					disabled: trulyDisabled,
+					'aria-pressed': isPressed,
+			  };
 
 	if ( disabled && isFocusable ) {
 		// In this case, the button will be disabled, but still focusable and
@@ -95,7 +99,8 @@ export function Button( props, ref ) {
 			// there's a label and...
 			( !! label &&
 				// the children are empty and...
-				( ! children || ( isArray( children ) && ! children.length ) ) &&
+				( ! children ||
+					( isArray( children ) && ! children.length ) ) &&
 				// the tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
@@ -117,7 +122,11 @@ export function Button( props, ref ) {
 	}
 
 	return (
-		<Tooltip text={ label } shortcut={ shortcut } position={ tooltipPosition }>
+		<Tooltip
+			text={ label }
+			shortcut={ shortcut }
+			position={ tooltipPosition }
+		>
 			{ element }
 		</Tooltip>
 	);

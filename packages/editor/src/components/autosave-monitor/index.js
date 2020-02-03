@@ -7,7 +7,12 @@ import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
-		const { isDirty, editsReference, isAutosaveable, isAutosaving } = this.props;
+		const {
+			isDirty,
+			editsReference,
+			isAutosaveable,
+			isAutosaving,
+		} = this.props;
 
 		// The edits reference is held for comparison to avoid scheduling an
 		// autosave if an edit has not been made since the last autosave
@@ -29,7 +34,9 @@ export class AutosaveMonitor extends Component {
 			prevProps.isAutosaveable !== isAutosaveable ||
 			prevProps.editsReference !== editsReference
 		) {
-			this.toggleTimer( isDirty && isAutosaveable && ! this.didAutosaveForEditsReference );
+			this.toggleTimer(
+				isDirty && isAutosaveable && ! this.didAutosaveForEditsReference
+			);
 		}
 	}
 

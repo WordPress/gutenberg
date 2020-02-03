@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
-import { useInstanceId, __experimentalUseDragging as useDragging } from '@wordpress/compose';
+import {
+	useInstanceId,
+	__experimentalUseDragging as useDragging,
+} from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -57,7 +60,9 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 			{ ...props }
 		>
 			<div
-				style={ value ? { transform: `rotate(${ value }deg)` } : undefined }
+				style={
+					value ? { transform: `rotate(${ value }deg)` } : undefined
+				}
 				className="components-angle-picker__angle-circle-indicator-wrapper"
 			>
 				<span className="components-angle-picker__angle-circle-indicator" />
@@ -67,19 +72,34 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 	);
 };
 
-export default function AnglePicker( { value, onChange, label = __( 'Angle' ) } ) {
+export default function AnglePicker( {
+	value,
+	onChange,
+	label = __( 'Angle' ),
+} ) {
 	const instanceId = useInstanceId( AnglePicker );
 	const inputId = `components-angle-picker__input-${ instanceId }`;
 	return (
-		<BaseControl label={ label } id={ inputId } className="components-angle-picker">
-			<AngleCircle value={ value } onChange={ onChange } aria-hidden="true" />
+		<BaseControl
+			label={ label }
+			id={ inputId }
+			className="components-angle-picker"
+		>
+			<AngleCircle
+				value={ value }
+				onChange={ onChange }
+				aria-hidden="true"
+			/>
 			<input
 				className="components-angle-picker__input-field"
 				type="number"
 				id={ inputId }
 				onChange={ ( event ) => {
 					const unprocessedValue = event.target.value;
-					const inputValue = unprocessedValue !== '' ? parseInt( event.target.value, 10 ) : 0;
+					const inputValue =
+						unprocessedValue !== ''
+							? parseInt( event.target.value, 10 )
+							: 0;
 					onChange( inputValue );
 				} }
 				value={ value }

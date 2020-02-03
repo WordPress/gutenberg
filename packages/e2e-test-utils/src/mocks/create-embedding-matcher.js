@@ -13,7 +13,9 @@ import { createURLMatcher } from './create-url-matcher';
 function parameterEquals( parameterName, value ) {
 	return ( request ) => {
 		const url = request.url();
-		const match = new RegExp( `.*${ parameterName }=([^&]+).*` ).exec( url );
+		const match = new RegExp( `.*${ parameterName }=([^&]+).*` ).exec(
+			url
+		);
 		if ( ! match ) {
 			return false;
 		}

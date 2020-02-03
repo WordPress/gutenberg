@@ -13,7 +13,9 @@ import { __ } from '@wordpress/i18n';
 function KeyboardShortcuts() {
 	// Shortcuts Logic
 	const { clientIds, rootBlocksClientIds } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds, getBlockOrder } = select( 'core/block-editor' );
+		const { getSelectedBlockClientIds, getBlockOrder } = select(
+			'core/block-editor'
+		);
 		return {
 			clientIds: getSelectedBlockClientIds(),
 			rootBlocksClientIds: getBlockOrder(),
@@ -101,7 +103,10 @@ function KeyboardShortcuts() {
 		useCallback(
 			( event ) => {
 				event.preventDefault();
-				multiSelect( first( rootBlocksClientIds ), last( rootBlocksClientIds ) );
+				multiSelect(
+					first( rootBlocksClientIds ),
+					last( rootBlocksClientIds )
+				);
 			},
 			[ rootBlocksClientIds, multiSelect ]
 		)
@@ -150,7 +155,9 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/insert-before',
 			category: 'block',
-			description: __( 'Insert a new block before the selected block(s).' ),
+			description: __(
+				'Insert a new block before the selected block(s).'
+			),
 			keyCombination: {
 				modifier: 'primaryAlt',
 				character: 't',
@@ -160,7 +167,9 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/insert-after',
 			category: 'block',
-			description: __( 'Insert a new block after the selected block(s).' ),
+			description: __(
+				'Insert a new block after the selected block(s).'
+			),
 			keyCombination: {
 				modifier: 'primaryAlt',
 				character: 'y',
@@ -184,7 +193,9 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/select-all',
 			category: 'selection',
-			description: __( 'Select all text when typing. Press again to select all blocks.' ),
+			description: __(
+				'Select all text when typing. Press again to select all blocks.'
+			),
 			keyCombination: {
 				modifier: 'primary',
 				character: 'a',

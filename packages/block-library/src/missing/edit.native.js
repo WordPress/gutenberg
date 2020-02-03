@@ -57,8 +57,14 @@ export class UnsupportedBlockEdit extends Component {
 
 	renderSheet( title ) {
 		const { getStylesFromColorScheme } = this.props;
-		const infoTextStyle = getStylesFromColorScheme( styles.infoText, styles.infoTextDark );
-		const infoTitleStyle = getStylesFromColorScheme( styles.infoTitle, styles.infoTitleDark );
+		const infoTextStyle = getStylesFromColorScheme(
+			styles.infoText,
+			styles.infoTextDark
+		);
+		const infoTitleStyle = getStylesFromColorScheme(
+			styles.infoTitle,
+			styles.infoTitleDark
+		);
 		const infoDescriptionStyle = getStylesFromColorScheme(
 			styles.infoDescription,
 			styles.infoDescriptionDark
@@ -87,7 +93,9 @@ export class UnsupportedBlockEdit extends Component {
 						color={ infoSheetIconStyle.color }
 						size={ styles.infoSheetIcon.size }
 					/>
-					<Text style={ [ infoTextStyle, infoTitleStyle ] }>{ infoTitle }</Text>
+					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
+						{ infoTitle }
+					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 						{ __(
 							'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
@@ -113,9 +121,13 @@ export class UnsupportedBlockEdit extends Component {
 			styles.unsupportedBlockSubtitle,
 			styles.unsupportedBlockSubtitleDark
 		);
-		const subtitle = <Text style={ subTitleStyle }>{ __( 'Unsupported' ) }</Text>;
+		const subtitle = (
+			<Text style={ subTitleStyle }>{ __( 'Unsupported' ) }</Text>
+		);
 
-		const icon = blockType ? normalizeIconObject( blockType.settings.icon ) : 'admin-plugins';
+		const icon = blockType
+			? normalizeIconObject( blockType.settings.icon )
+			: 'admin-plugins';
 		const iconStyle = getStylesFromColorScheme(
 			styles.unsupportedBlockIcon,
 			styles.unsupportedBlockIconDark
@@ -123,7 +135,10 @@ export class UnsupportedBlockEdit extends Component {
 		const iconClassName = 'unsupported-icon' + '-' + preferredColorScheme;
 		return (
 			<View
-				style={ getStylesFromColorScheme( styles.unsupportedBlock, styles.unsupportedBlockDark ) }
+				style={ getStylesFromColorScheme(
+					styles.unsupportedBlock,
+					styles.unsupportedBlockDark
+				) }
 			>
 				{ this.renderHelpIcon() }
 				<Icon

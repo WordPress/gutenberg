@@ -32,7 +32,10 @@ export const __experimentalGetAnnotationsForBlock = createSelector(
 	( state, blockClientId ) => [ get( state, blockClientId, EMPTY_ARRAY ) ]
 );
 
-export const __experimentalGetAllAnnotationsForBlock = function( state, blockClientId ) {
+export const __experimentalGetAllAnnotationsForBlock = function(
+	state,
+	blockClientId
+) {
 	return get( state, blockClientId, EMPTY_ARRAY );
 };
 
@@ -53,7 +56,8 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
 		return get( state, blockClientId, [] )
 			.filter( ( annotation ) => {
 				return (
-					annotation.selector === 'range' && richTextIdentifier === annotation.richTextIdentifier
+					annotation.selector === 'range' &&
+					richTextIdentifier === annotation.richTextIdentifier
 				);
 			} )
 			.map( ( annotation ) => {

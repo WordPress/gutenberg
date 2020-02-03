@@ -23,7 +23,12 @@ export default function CheckboxControl( {
 	const onChangeValue = ( event ) => onChange( event.target.checked );
 
 	return (
-		<BaseControl label={ heading } id={ id } help={ help } className={ className }>
+		<BaseControl
+			label={ heading }
+			id={ id }
+			help={ help }
+			className={ className }
+		>
 			<span className="components-checkbox-control__input-container">
 				<input
 					id={ id }
@@ -43,7 +48,10 @@ export default function CheckboxControl( {
 					/>
 				) : null }
 			</span>
-			<label className="components-checkbox-control__label" htmlFor={ id }>
+			<label
+				className="components-checkbox-control__label"
+				htmlFor={ id }
+			>
 				{ label }
 			</label>
 		</BaseControl>

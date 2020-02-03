@@ -24,7 +24,9 @@ function ImportDropdown( { onUpload } ) {
 					{ __( 'Import from JSON' ) }
 				</Button>
 			) }
-			renderContent={ ( { onClose } ) => <ImportForm onUpload={ flow( onClose, onUpload ) } /> }
+			renderContent={ ( { onClose } ) => (
+				<ImportForm onUpload={ flow( onClose, onUpload ) } />
+			) }
 		/>
 	);
 }
