@@ -69,8 +69,7 @@ export const blockManagement = (
 					( blockType ) => blockType.name !== action.item.name
 				),
 			};
-		case 'FETCH_INSTALL_BLOCK' :
-		case 'RECEIVE_INSTALL_BLOCKS':
+		case 'SET_INSTALLING_BLOCK' :
 			return {
 				...state,
 				isInstalling: action.isInstalling,

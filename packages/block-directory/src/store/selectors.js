@@ -54,7 +54,7 @@ export function getInstalledBlockTypes( state ) {
  * @return {boolean} Whether its currently installing
  */
 export function isInstalling( state ) {
-	return state.downloadableBlocks.isInstalling;
+	return state.blockManagement.isInstalling;
 }
 
 /**
