@@ -2,6 +2,7 @@ package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
 import androidx.annotation.Nullable;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -197,7 +198,15 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public void fetchRequest(String path, Promise promise) {
         mGutenbergBridgeJS2Parent.performRequest(path,
                 promise::resolve,
-                errorMessage -> promise.reject(new Error(errorMessage)));
+                errorBundle -> {
+                    WritableMap writableMap = Arguments.makeNativeMap(errorBundle);
+                    if (writableMap.hasKey("code")) {
+                        String code = String.valueOf(writableMap.getInt("code"));
+                        promise.reject(code, new Error(), writableMap);
+                    } else {
+                        promise.reject(new Error(), writableMap);
+                    }
+                });
     }
 
     private OtherMediaOptionsReceivedCallback getNewOtherMediaReceivedCallback(final Callback jsCallback) {
