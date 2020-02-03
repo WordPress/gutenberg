@@ -133,7 +133,7 @@ $navigation-sub-menu-width: $grid-size * 25;
 			// Position (first level)
 			position: absolute;
 			z-index: 1;
-			top: $navigation-menu-height - ( $block-padding / 2 );
+			top: 100%;
 			left: $grid-size * 2; // just under the main menu item.
 
 			// Position (nested levels)
