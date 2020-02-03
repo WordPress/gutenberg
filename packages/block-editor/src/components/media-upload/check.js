@@ -3,7 +3,11 @@
  */
 import { withSelect } from '@wordpress/data';
 
-export function MediaUploadCheck( { hasUploadPermissions, fallback = null, children } ) {
+export function MediaUploadCheck( {
+	hasUploadPermissions,
+	fallback = null,
+	children,
+} ) {
 	return hasUploadPermissions ? children : fallback;
 }
 

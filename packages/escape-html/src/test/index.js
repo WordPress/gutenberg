@@ -21,9 +21,13 @@ function testUnstableEscapeGreaterThan( implementation ) {
 
 function testEscapeAmpersand( implementation ) {
 	it( 'should escape ampersand', () => {
-		const result = implementation( 'foo & bar &amp; &AMP; baz &#931; &#bad; &#x3A3; &#X3a3; &#xevil;' );
+		const result = implementation(
+			'foo & bar &amp; &AMP; baz &#931; &#bad; &#x3A3; &#X3a3; &#xevil;'
+		);
 
-		expect( result ).toBe( 'foo &amp; bar &amp; &AMP; baz &#931; &amp;#bad; &#x3A3; &#X3a3; &amp;#xevil;' );
+		expect( result ).toBe(
+			'foo &amp; bar &amp; &AMP; baz &#931; &amp;#bad; &#x3A3; &#X3a3; &amp;#xevil;'
+		);
 	} );
 }
 
@@ -98,8 +102,12 @@ describe( 'isValidAttributeName', () => {
 
 describe( 'escapeEditableHTML', () => {
 	it( 'should escape < and all ampersands', () => {
-		const result = escapeEditableHTML( '<a href="https://w.org">WP</a> & &lt;strong&gt;' );
+		const result = escapeEditableHTML(
+			'<a href="https://w.org">WP</a> & &lt;strong&gt;'
+		);
 
-		expect( result ).toBe( '&lt;a href="https://w.org">WP&lt;/a> &amp; &amp;lt;strong&amp;gt;' );
+		expect( result ).toBe(
+			'&lt;a href="https://w.org">WP&lt;/a> &amp; &amp;lt;strong&amp;gt;'
+		);
 	} );
 } );

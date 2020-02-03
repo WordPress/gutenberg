@@ -29,13 +29,19 @@ module.exports = {
 		 * @return {boolean} Whether declarator is emempt from consideration.
 		 */
 		function isExemptObjectDestructureDeclarator( node ) {
-			return node.id.type === 'ObjectPattern' && node.id.properties.length > 1;
+			return (
+				node.id.type === 'ObjectPattern' &&
+				node.id.properties.length > 1
+			);
 		}
 
 		return {
 			ReturnStatement( node ) {
 				let functionScope = context.getScope();
-				while ( functionScope.type !== 'function' && functionScope.upper ) {
+				while (
+					functionScope.type !== 'function' &&
+					functionScope.upper
+				) {
 					functionScope = functionScope.upper;
 				}
 
@@ -64,16 +70,20 @@ module.exports = {
 
 					if (
 						excludePattern !== undefined &&
-						new RegExp( excludePattern ).test( declaratorCandidate.node.init.callee.name )
+						new RegExp( excludePattern ).test(
+							declaratorCandidate.node.init.callee.name
+						)
 					) {
 						return;
 					}
 
 					// The first entry in `references` is the declaration
 					// itself, which can be ignored.
-					const isUsedBeforeReturn = variable.references.slice( 1 ).some( ( reference ) => {
-						return reference.identifier.end < node.end;
-					} );
+					const isUsedBeforeReturn = variable.references
+						.slice( 1 )
+						.some( ( reference ) => {
+							return reference.identifier.end < node.end;
+						} );
 
 					if ( isUsedBeforeReturn ) {
 						continue;
@@ -82,7 +92,7 @@ module.exports = {
 					context.report(
 						declaratorCandidate.node,
 						'Variables should not be assigned until just prior its first reference. ' +
-						'An early return statement may leave this variable unused.'
+							'An early return statement may leave this variable unused.'
 					);
 				}
 			},

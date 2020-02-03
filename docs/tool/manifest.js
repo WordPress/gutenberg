@@ -85,9 +85,13 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 			parent,
 		} );
 		if ( Array.isArray( children ) && children.length ) {
-			pageItems = pageItems.concat( generateRootManifestFromTOCItems( children, slug ) );
+			pageItems = pageItems.concat(
+				generateRootManifestFromTOCItems( children, slug )
+			);
 		} else if ( children === '{{components}}' ) {
-			pageItems = pageItems.concat( getComponentManifest( componentPaths ) );
+			pageItems = pageItems.concat(
+				getComponentManifest( componentPaths )
+			);
 		} else if ( children === '{{packages}}' ) {
 			pageItems = pageItems.concat( getPackageManifest( packagePaths ) );
 		}

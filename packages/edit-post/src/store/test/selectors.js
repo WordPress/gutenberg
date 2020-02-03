@@ -65,7 +65,9 @@ describe( 'selectors', () => {
 				preferences: {},
 			};
 
-			expect( getPreference( state, 'ribs', 'chicken' ) ).toEqual( 'chicken' );
+			expect( getPreference( state, 'ribs', 'chicken' ) ).toEqual(
+				'chicken'
+			);
 		} );
 	} );
 
@@ -171,7 +173,9 @@ describe( 'selectors', () => {
 				activeGeneralSidebar: 'edit-post/block',
 			};
 
-			expect( getActiveGeneralSidebarName( state ) ).toBe( 'edit-post/block' );
+			expect( getActiveGeneralSidebarName( state ) ).toBe(
+				'edit-post/block'
+			);
 		} );
 	} );
 
@@ -207,14 +211,14 @@ describe( 'selectors', () => {
 				removedPanels: [],
 			} );
 
-			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( false );
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return true when panel was removed', () => {
 			const state = deepFreeze( {
-				removedPanels: [
-					'post-status',
-				],
+				removedPanels: [ 'post-status' ],
 			} );
 
 			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
@@ -253,7 +257,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( false );
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return false when a panel is enabled but removed', () => {
@@ -268,7 +274,9 @@ describe( 'selectors', () => {
 				removedPanels: [ 'post-status' ],
 			} );
 
-			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( false );
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe(
+				false
+			);
 		} );
 	} );
 
@@ -378,8 +386,7 @@ describe( 'selectors', () => {
 		it( 'should return false if feature is not referred', () => {
 			const state = {
 				preferences: {
-					features: {
-					},
+					features: {},
 				},
 			};
 

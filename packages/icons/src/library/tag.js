@@ -10,4 +10,3 @@ const tag = (
 );
 
 export default tag;
-

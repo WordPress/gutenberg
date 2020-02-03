@@ -24,9 +24,14 @@ function Notice( {
 	actions = [],
 	__unstableHTML,
 } ) {
-	const classes = classnames( className, 'components-notice', 'is-' + status, {
-		'is-dismissible': isDismissible,
-	} );
+	const classes = classnames(
+		className,
+		'components-notice',
+		'is-' + status,
+		{
+			'is-dismissible': isDismissible,
+		}
+	);
 
 	if ( __unstableHTML ) {
 		children = <RawHTML>{ children }</RawHTML>;
@@ -63,7 +68,6 @@ function Notice( {
 							</Button>
 						);
 					}
-
 				) }
 			</div>
 			{ isDismissible && (

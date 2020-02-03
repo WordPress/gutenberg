@@ -4,7 +4,10 @@
 import { createSlotFill, Panel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export const { Fill: BlockSidebarFill, Slot: BlockSidebarSlot } = createSlotFill( 'EditWidgetsBlockSidebar' );
+export const {
+	Fill: BlockSidebarFill,
+	Slot: BlockSidebarSlot,
+} = createSlotFill( 'EditWidgetsBlockSidebar' );
 
 function Sidebar() {
 	return (

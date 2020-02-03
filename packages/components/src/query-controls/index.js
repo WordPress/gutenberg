@@ -26,7 +26,7 @@ export default function QueryControls( {
 	onOrderByChange,
 } ) {
 	return [
-		( onOrderChange && onOrderByChange ) && (
+		onOrderChange && onOrderByChange && (
 			<SelectControl
 				key="query-controls-order-select"
 				label={ __( 'Order by' ) }
@@ -70,7 +70,8 @@ export default function QueryControls( {
 				noOptionLabel={ __( 'All' ) }
 				selectedCategoryId={ selectedCategoryId }
 				onChange={ onCategoryChange }
-			/> ),
+			/>
+		),
 		onNumberOfItemsChange && (
 			<RangeControl
 				key="query-controls-range-control"

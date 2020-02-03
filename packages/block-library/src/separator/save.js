@@ -6,15 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	getColorClassName,
-} from '@wordpress/block-editor';
+import { getColorClassName } from '@wordpress/block-editor';
 
 export default function separatorSave( { attributes } ) {
-	const {
-		color,
-		customColor,
-	} = attributes;
+	const { color, customColor } = attributes;
 
 	// the hr support changing color using border-color, since border-color
 	// is not yet supported in the color palette, we use background-color
@@ -34,8 +29,5 @@ export default function separatorSave( { attributes } ) {
 		color: colorClass ? undefined : customColor,
 	};
 
-	return ( <hr
-		className={ separatorClasses }
-		style={ separatorStyle }
-	/> );
+	return <hr className={ separatorClasses } style={ separatorStyle } />;
 }

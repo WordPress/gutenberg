@@ -15,28 +15,24 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 
-function Option( {
-	className,
-	isSelected,
-	tooltipText,
-	...additionalProps
-} ) {
+function Option( { className, isSelected, tooltipText, ...additionalProps } ) {
 	const optionButton = (
 		<Button
 			isPressed={ isSelected }
 			className={ classnames(
 				className,
-				'components-circular-option-picker__option',
+				'components-circular-option-picker__option'
 			) }
 			{ ...additionalProps }
 		/>
 	);
 	return (
 		<div className="components-circular-option-picker__option-wrapper">
-			{ tooltipText ?
-				( <Tooltip text={ tooltipText }>{ optionButton }</Tooltip> ) :
+			{ tooltipText ? (
+				<Tooltip text={ tooltipText }>{ optionButton }</Tooltip>
+			) : (
 				optionButton
-			}
+			) }
 			{ isSelected && <Icon icon={ check } /> }
 		</div>
 	);
@@ -69,11 +65,7 @@ function DropdownLinkAction( {
 	);
 }
 
-function ButtonAction( {
-	className,
-	children,
-	...additionalProps
-} ) {
+function ButtonAction( { className, children, ...additionalProps } ) {
 	return (
 		<Button
 			className={ classnames(
@@ -96,7 +88,12 @@ export default function CircularOptionPicker( {
 	children,
 } ) {
 	return (
-		<div className={ classnames( 'components-circular-option-picker', className ) }>
+		<div
+			className={ classnames(
+				'components-circular-option-picker',
+				className
+			) }
+		>
 			{ options }
 			{ children }
 			{ actions && (

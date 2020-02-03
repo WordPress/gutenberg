@@ -31,7 +31,9 @@ describe( 'ToggleControl', () => {
 		const wrapper = renderer.create(
 			getTestComponent( ToggleControl, { onChange } )
 		);
-		wrapper.root.findByType( 'input' ).props.onChange( { target: { checked: true } } );
+		wrapper.root
+			.findByType( 'input' )
+			.props.onChange( { target: { checked: true } } );
 
 		expect( onChange ).toHaveBeenCalledWith( true );
 	} );
@@ -58,7 +60,9 @@ describe( 'ToggleControl', () => {
 
 			const input = wrapper.root.findByType( 'input' );
 
-			expect( input.props[ 'aria-describedby' ] ).toMatch( /^inspector-toggle-control-.*__help$/ );
+			expect( input.props[ 'aria-describedby' ] ).toMatch(
+				/^inspector-toggle-control-.*__help$/
+			);
 		} );
 	} );
 } );

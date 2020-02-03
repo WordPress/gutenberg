@@ -10,9 +10,14 @@ import { gallery as icon } from '@wordpress/icons';
  */
 import styles from './styles.scss';
 
-const IconWithColorScheme = withPreferredColorScheme( ( { getStylesFromColorScheme } ) => {
-	const colorSchemeStyles = getStylesFromColorScheme( styles.icon, styles.iconDark );
-	return <Icon icon={ icon } { ...colorSchemeStyles } />;
-} );
+const IconWithColorScheme = withPreferredColorScheme(
+	( { getStylesFromColorScheme } ) => {
+		const colorSchemeStyles = getStylesFromColorScheme(
+			styles.icon,
+			styles.iconDark
+		);
+		return <Icon icon={ icon } { ...colorSchemeStyles } />;
+	}
+);
 
 export const sharedIcon = <IconWithColorScheme />;

@@ -34,7 +34,10 @@ function isAbsolutePath( filePath ) {
  */
 function isValidURL( meta ) {
 	// ignore hashes or data uris
-	if ( meta.value.indexOf( 'data:' ) === 0 || meta.value.indexOf( '#' ) === 0 ) {
+	if (
+		meta.value.indexOf( 'data:' ) === 0 ||
+		meta.value.indexOf( '#' ) === 0
+	) {
 		return false;
 	}
 

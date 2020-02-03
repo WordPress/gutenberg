@@ -3,7 +3,7 @@
  */
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
-import { get, escape } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -91,15 +91,20 @@ class PostTitle extends Component {
 				<div className="editor-post-title">
 					<div className={ className }>
 						<div>
-							<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
+							<label
+								htmlFor={ `post-title-${ instanceId }` }
+								className="screen-reader-text"
+							>
 								{ decodedPlaceholder || __( 'Add title' ) }
 							</label>
 							<Textarea
 								id={ `post-title-${ instanceId }` }
 								className="editor-post-title__input"
-								value={ decodeEntities( title ) }
+								value={ title }
 								onChange={ this.onChange }
-								placeholder={ decodedPlaceholder || __( 'Add title' ) }
+								placeholder={
+									decodedPlaceholder || __( 'Add title' )
+								}
 								onFocus={ this.onSelect }
 								onKeyDown={ this.onKeyDown }
 								onKeyPress={ this.onUnselect }
@@ -110,11 +115,16 @@ class PostTitle extends Component {
 									right away, without needing to click anything.
 								*/
 								/* eslint-disable jsx-a11y/no-autofocus */
-								autoFocus={ document.body === document.activeElement && isCleanNewPost }
+								autoFocus={
+									document.body === document.activeElement &&
+									isCleanNewPost
+								}
 								/* eslint-enable jsx-a11y/no-autofocus */
 							/>
 						</div>
-						{ isSelected && isPostTypeViewable && <PostPermalink /> }
+						{ isSelected && isPostTypeViewable && (
+							<PostPermalink />
+						) }
 					</div>
 				</div>
 			</PostTypeSupportCheck>
@@ -140,10 +150,9 @@ const applyWithSelect = withSelect( ( select ) => {
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const {
-		insertDefaultBlock,
-		clearSelectedBlock,
-	} = dispatch( 'core/block-editor' );
+	const { insertDefaultBlock, clearSelectedBlock } = dispatch(
+		'core/block-editor'
+	);
 	const { editPost } = dispatch( 'core/editor' );
 
 	return {
@@ -151,7 +160,7 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 			insertDefaultBlock( undefined, undefined, 0 );
 		},
 		onUpdate( title ) {
-			editPost( { title: escape( title ) } );
+			editPost( { title } );
 		},
 		clearSelectedBlock,
 	};

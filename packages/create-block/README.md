@@ -53,6 +53,8 @@ Options:
 -h, --help             output usage information
 ```
 
+_Please note that `--version` and `--help` options don't work with `npm init`. You have to use `npx` instead, as presented in the examples._
+
 More examples:
 
 1. Interactive mode - it gives a chance to customize a few most important options

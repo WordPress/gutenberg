@@ -139,7 +139,9 @@ function observeConsoleLogging() {
 		// See: https://core.trac.wordpress.org/ticket/37000
 		// See: https://www.chromestatus.com/feature/5088147346030592
 		// See: https://www.chromestatus.com/feature/5633521622188032
-		if ( text.includes( 'A cookie associated with a cross-site resource' ) ) {
+		if (
+			text.includes( 'A cookie associated with a cross-site resource' )
+		) {
 			return;
 		}
 
@@ -151,7 +153,10 @@ function observeConsoleLogging() {
 
 		// Network errors are ignored only if we are intentionally testing
 		// offline mode.
-		if ( text.includes( 'net::ERR_INTERNET_DISCONNECTED' ) && isOfflineMode() ) {
+		if (
+			text.includes( 'net::ERR_INTERNET_DISCONNECTED' ) &&
+			isOfflineMode()
+		) {
 			return;
 		}
 
@@ -184,7 +189,11 @@ function observeConsoleLogging() {
 		// correctly. Instead, the logic here synchronously inspects the
 		// internal object shape of the JSHandle to find the error text. If it
 		// cannot be found, the default text value is used instead.
-		text = get( message.args(), [ 0, '_remoteObject', 'description' ], text );
+		text = get(
+			message.args(),
+			[ 0, '_remoteObject', 'description' ],
+			text
+		);
 
 		// Disable reason: We intentionally bubble up the console message
 		// which, unless the test explicitly anticipates the logging via
@@ -202,7 +211,7 @@ function observeConsoleLogging() {
  * @return {?Promise} Promise resolving once Axe texts are finished.
  */
 async function runAxeTestsForBlockEditor() {
-	if ( ! await page.$( '.block-editor' ) ) {
+	if ( ! ( await page.$( '.block-editor' ) ) ) {
 		return;
 	}
 

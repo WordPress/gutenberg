@@ -93,10 +93,20 @@ const deprecated = [
 			};
 		},
 		save( { attributes } ) {
-			const { images, columns = defaultColumnsNumber( attributes ), imageCrop, caption, linkTo } = attributes;
+			const {
+				images,
+				columns = defaultColumnsNumber( attributes ),
+				imageCrop,
+				caption,
+				linkTo,
+			} = attributes;
 
 			return (
-				<figure className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+				<figure
+					className={ `columns-${ columns } ${
+						imageCrop ? 'is-cropped' : ''
+					}` }
+				>
 					<ul className="blocks-gallery-grid">
 						{ images.map( ( image ) => {
 							let href;
@@ -117,23 +127,46 @@ const deprecated = [
 									data-id={ image.id }
 									data-full-url={ image.fullUrl }
 									data-link={ image.link }
-									className={ image.id ? `wp-image-${ image.id }` : null }
+									className={
+										image.id
+											? `wp-image-${ image.id }`
+											: null
+									}
 								/>
 							);
 
 							return (
-								<li key={ image.id || image.url } className="blocks-gallery-item">
+								<li
+									key={ image.id || image.url }
+									className="blocks-gallery-item"
+								>
 									<figure>
-										{ href ? <a href={ href }>{ img }</a> : img }
-										{ ! RichText.isEmpty( image.caption ) && (
-											<RichText.Content tagName="figcaption" className="blocks-gallery-item__caption" value={ image.caption } />
+										{ href ? (
+											<a href={ href }>{ img }</a>
+										) : (
+											img
+										) }
+										{ ! RichText.isEmpty(
+											image.caption
+										) && (
+											<RichText.Content
+												tagName="figcaption"
+												className="blocks-gallery-item__caption"
+												value={ image.caption }
+											/>
 										) }
 									</figure>
 								</li>
 							);
 						} ) }
 					</ul>
-					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" className="blocks-gallery-caption" value={ caption } /> }
+					{ ! RichText.isEmpty( caption ) && (
+						<RichText.Content
+							tagName="figcaption"
+							className="blocks-gallery-caption"
+							value={ caption }
+						/>
+					) }
 				</figure>
 			);
 		},
@@ -199,9 +232,18 @@ const deprecated = [
 			align: true,
 		},
 		save( { attributes } ) {
-			const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
+			const {
+				images,
+				columns = defaultColumnsNumber( attributes ),
+				imageCrop,
+				linkTo,
+			} = attributes;
 			return (
-				<ul className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+				<ul
+					className={ `columns-${ columns } ${
+						imageCrop ? 'is-cropped' : ''
+					}` }
+				>
 					{ images.map( ( image ) => {
 						let href;
 
@@ -221,17 +263,30 @@ const deprecated = [
 								data-id={ image.id }
 								data-full-url={ image.fullUrl }
 								data-link={ image.link }
-								className={ image.id ? `wp-image-${ image.id }` : null }
+								className={
+									image.id ? `wp-image-${ image.id }` : null
+								}
 							/>
 						);
 
 						return (
-							<li key={ image.id || image.url } className="blocks-gallery-item">
+							<li
+								key={ image.id || image.url }
+								className="blocks-gallery-item"
+							>
 								<figure>
-									{ href ? <a href={ href }>{ img }</a> : img }
-									{ image.caption && image.caption.length > 0 && (
-										<RichText.Content tagName="figcaption" value={ image.caption } />
+									{ href ? (
+										<a href={ href }>{ img }</a>
+									) : (
+										img
 									) }
+									{ image.caption &&
+										image.caption.length > 0 && (
+											<RichText.Content
+												tagName="figcaption"
+												value={ image.caption }
+											/>
+										) }
 								</figure>
 							</li>
 						);
@@ -289,18 +344,18 @@ const deprecated = [
 			},
 		},
 		isEligible( { images, ids } ) {
-			return images &&
+			return (
+				images &&
 				images.length > 0 &&
-				(
-					( ! ids && images ) ||
+				( ( ! ids && images ) ||
 					( ids && images && ids.length !== images.length ) ||
 					some( images, ( id, index ) => {
 						if ( ! id && ids[ index ] !== null ) {
 							return true;
 						}
 						return parseInt( id, 10 ) !== ids[ index ];
-					} )
-				);
+					} ) )
+			);
 		},
 		migrate( attributes ) {
 			return {
@@ -317,9 +372,18 @@ const deprecated = [
 			align: true,
 		},
 		save( { attributes } ) {
-			const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
+			const {
+				images,
+				columns = defaultColumnsNumber( attributes ),
+				imageCrop,
+				linkTo,
+			} = attributes;
 			return (
-				<ul className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+				<ul
+					className={ `columns-${ columns } ${
+						imageCrop ? 'is-cropped' : ''
+					}` }
+				>
 					{ images.map( ( image ) => {
 						let href;
 
@@ -332,15 +396,36 @@ const deprecated = [
 								break;
 						}
 
-						const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } className={ image.id ? `wp-image-${ image.id }` : null } />;
+						const img = (
+							<img
+								src={ image.url }
+								alt={ image.alt }
+								data-id={ image.id }
+								data-link={ image.link }
+								className={
+									image.id ? `wp-image-${ image.id }` : null
+								}
+							/>
+						);
 
 						return (
-							<li key={ image.id || image.url } className="blocks-gallery-item">
+							<li
+								key={ image.id || image.url }
+								className="blocks-gallery-item"
+							>
 								<figure>
-									{ href ? <a href={ href }>{ img }</a> : img }
-									{ image.caption && image.caption.length > 0 && (
-										<RichText.Content tagName="figcaption" value={ image.caption } />
+									{ href ? (
+										<a href={ href }>{ img }</a>
+									) : (
+										img
 									) }
+									{ image.caption &&
+										image.caption.length > 0 && (
+											<RichText.Content
+												tagName="figcaption"
+												value={ image.caption }
+											/>
+										) }
 								</figure>
 							</li>
 						);
@@ -355,7 +440,8 @@ const deprecated = [
 				type: 'array',
 				default: [],
 				source: 'query',
-				selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
+				selector:
+					'div.wp-block-gallery figure.blocks-gallery-image img',
 				query: {
 					url: {
 						source: 'attribute',
@@ -392,13 +478,19 @@ const deprecated = [
 			align: true,
 		},
 		save( { attributes } ) {
-			const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+			const {
+				images,
+				columns = defaultColumnsNumber( attributes ),
+				align,
+				imageCrop,
+				linkTo,
+			} = attributes;
 			const className = classnames( `columns-${ columns }`, {
 				alignnone: align === 'none',
 				'is-cropped': imageCrop,
 			} );
 			return (
-				<div className={ className } >
+				<div className={ className }>
 					{ images.map( ( image ) => {
 						let href;
 
@@ -411,10 +503,19 @@ const deprecated = [
 								break;
 						}
 
-						const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } />;
+						const img = (
+							<img
+								src={ image.url }
+								alt={ image.alt }
+								data-id={ image.id }
+							/>
+						);
 
 						return (
-							<figure key={ image.id || image.url } className="blocks-gallery-image">
+							<figure
+								key={ image.id || image.url }
+								className="blocks-gallery-image"
+							>
 								{ href ? <a href={ href }>{ img }</a> : img }
 							</figure>
 						);

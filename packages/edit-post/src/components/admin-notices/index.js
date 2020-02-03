@@ -27,7 +27,9 @@ const NOTICE_CLASS_STATUSES = {
 function getAdminNotices() {
 	// The order is reversed to match expectations of rendered order, since a
 	// NoticesList is itself rendered in reverse order (newest to oldest).
-	return Array.from( document.querySelectorAll( '#wpbody-content > .notice' ) ).reverse();
+	return Array.from(
+		document.querySelectorAll( '#wpbody-content > .notice' )
+	).reverse();
 }
 
 /**
@@ -81,7 +83,9 @@ export class AdminNotices extends Component {
 			// Convert and create.
 			const status = getNoticeStatus( element );
 			const content = getNoticeHTML( element );
-			const isDismissible = element.classList.contains( 'is-dismissible' );
+			const isDismissible = element.classList.contains(
+				'is-dismissible'
+			);
 			createNotice( status, content, {
 				speak: false,
 				__unstableHTML: true,
