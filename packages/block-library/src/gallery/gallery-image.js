@@ -75,7 +75,12 @@ class GalleryImage extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { isSelected, image, url, __unstableMarkNextChangeAsNotPersistent } = this.props;
+		const {
+			isSelected,
+			image,
+			url,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = this.props;
 		if ( image && ! url ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			this.props.setAttributes( {
