@@ -15,6 +15,7 @@ function DownloadableBlockHeader( {
 	title,
 	rating,
 	ratingCount,
+	isLoading,
 	onClick,
 } ) {
 	return (
@@ -45,12 +46,15 @@ function DownloadableBlockHeader( {
 			</div>
 			<Button
 				isSecondary
+				isBusy={ isLoading }
 				onClick={ ( event ) => {
 					event.preventDefault();
-					onClick();
+					if ( ! isLoading ) {
+						onClick();
+					}
 				} }
 			>
-				{ __( 'Add block' ) }
+				{ isLoading ? __( 'Adding…' ) : __( 'Add block' ) }
 			</Button>
 		</div>
 	);

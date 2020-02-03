@@ -5,7 +5,7 @@ import DownloadableBlockHeader from '../downloadable-block-header';
 import DownloadableBlockAuthorInfo from '../downloadable-block-author-info';
 import DownloadableBlockInfo from '../downloadable-block-info';
 
-function DownloadableBlockListItem( { item, onClick } ) {
+function DownloadableBlockListItem( { item, onClick, isLoading, children } ) {
 	const {
 		icon,
 		title,
@@ -29,9 +29,11 @@ function DownloadableBlockListItem( { item, onClick } ) {
 						title={ title }
 						rating={ rating }
 						ratingCount={ ratingCount }
+						isLoading={ isLoading }
 					/>
 				</header>
 				<section className="block-directory-downloadable-block-list-item__body">
+					{ children }
 					<DownloadableBlockInfo
 						activeInstalls={ activeInstalls }
 						description={ description }

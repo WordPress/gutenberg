@@ -6,28 +6,60 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	getBlockMenuDefaultClassName,
-	unregisterBlockType,
-} from '@wordpress/blocks';
-import { withDispatch } from '@wordpress/data';
+import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
+import DownloadableBlockNotice from '../downloadable-block-notice';
+import {
+	DOWNLOAD_ERROR_NOTICE_ID,
+	INSTALL_ERROR_NOTICE_ID,
+} from '../../store/constants';
 
-const DOWNLOAD_ERROR_NOTICE_ID = 'block-download-error';
-const INSTALL_ERROR_NOTICE_ID = 'block-install-error';
+/**
+ * Returns either installAndDownload or download function.
+ *
+ * @param {Object} item The block item.
+ * @param {Object} errorNotices An object with errors. Ie: "my-block/block : block-download-error"
+ * @param {Function} installAndDownload The function that installs and downloads the block.
+ * @param {Function} download The function that downloads the block.
+ *
+ * @return {Function} Function to continue install process.
+ */
+const getNoticeCallback = (
+	item,
+	errorNotices,
+	installAndDownload,
+	download
+) => {
+	// We don't want to try installing again, the API will throw an install error
+	if (
+		errorNotices[ item.id ] &&
+		errorNotices[ item.id ] === DOWNLOAD_ERROR_NOTICE_ID
+	) {
+		return download;
+	}
 
-function DownloadableBlocksList( {
+	return installAndDownload;
+};
+
+export function DownloadableBlocksList( {
 	items,
 	onHover = noop,
 	children,
-	downloadAndInstallBlock,
+	isLoading,
+	errorNotices,
+	installAndDownload,
+	download,
 } ) {
+	if ( ! items.length ) {
+		return null;
+	}
+
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -35,14 +67,21 @@ function DownloadableBlocksList( {
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-directory-downloadable-blocks-list">
-			{ items &&
-				items.map( ( item ) => (
+			{ items.map( ( item ) => {
+				const callBack = getNoticeCallback(
+					item,
+					errorNotices,
+					installAndDownload,
+					download
+				);
+
+				return (
 					<DownloadableBlockListItem
 						key={ item.id }
 						className={ getBlockMenuDefaultClassName( item.id ) }
 						icons={ item.icons }
 						onClick={ () => {
-							downloadAndInstallBlock( item );
+							callBack( item );
 							onHover( null );
 						} }
 						onFocus={ () => onHover( item ) }
@@ -50,8 +89,16 @@ function DownloadableBlocksList( {
 						onMouseLeave={ () => onHover( null ) }
 						onBlur={ () => onHover( null ) }
 						item={ item }
-					/>
-				) ) }
+						isLoading={ isLoading }
+					>
+						<DownloadableBlockNotice
+							onClick={ callBack }
+							errorNotices={ errorNotices }
+							block={ item }
+						/>
+					</DownloadableBlockListItem>
+				);
+			} ) }
 			{ children }
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
@@ -59,79 +106,67 @@ function DownloadableBlocksList( {
 }
 
 export default compose(
-	withDispatch( ( dispatch, props ) => {
-		const { installBlock, downloadBlock } = dispatch(
+	withSelect( ( select ) => {
+		const { getErrorNotices, isInstalling } = select(
 			'core/block-directory'
 		);
-		const { createErrorNotice, removeNotice } = dispatch( 'core/notices' );
-		const { removeBlocks } = dispatch( 'core/block-editor' );
-		const { onSelect } = props;
+
+		const errorNotices = getErrorNotices();
+		const isLoading = isInstalling();
 
 		return {
-			downloadAndInstallBlock: ( item ) => {
-				const onDownloadError = () => {
-					createErrorNotice( __( 'Block previews can’t load.' ), {
-						id: DOWNLOAD_ERROR_NOTICE_ID,
-						actions: [
-							{
-								label: __( 'Retry' ),
-								onClick: () => {
-									removeNotice( DOWNLOAD_ERROR_NOTICE_ID );
-									downloadBlock(
-										item,
-										onSuccess,
-										onDownloadError
-									);
-								},
-							},
-						],
-					} );
-				};
+			errorNotices,
+			isLoading,
+		};
+	} ),
+	withDispatch( ( dispatch, props ) => {
+		const {
+			downloadBlock,
+			installBlock,
+			setErrorNotice,
+			clearErrorNotice,
+			setIsInstalling,
+		} = dispatch( 'core/block-directory' );
+		const { onSelect } = props;
 
+		const download = ( item ) => {
+			clearErrorNotice( item.id );
+			setIsInstalling( true );
+
+			const onDownloadError = () => {
+				setErrorNotice( item.id, DOWNLOAD_ERROR_NOTICE_ID );
+				setIsInstalling( false );
+			};
+
+			const onDownloadSuccess = () => {
+				onSelect( item );
+				setIsInstalling( false );
+			};
+
+			downloadBlock( item, onDownloadSuccess, onDownloadError );
+		};
+
+		const install = ( item, onSuccess ) => {
+			clearErrorNotice( item.id );
+			setIsInstalling( true );
+
+			const onInstallBlockError = () => {
+				setErrorNotice( item.id, INSTALL_ERROR_NOTICE_ID );
+				setIsInstalling( false );
+			};
+
+			installBlock( item, onSuccess, onInstallBlockError );
+		};
+
+		return {
+			installAndDownload( item ) {
 				const onSuccess = () => {
-					const createdBlock = onSelect( item );
-
-					const onInstallBlockError = () => {
-						createErrorNotice(
-							__( "Block previews can't install." ),
-							{
-								id: INSTALL_ERROR_NOTICE_ID,
-								actions: [
-									{
-										label: __( 'Retry' ),
-										onClick: () => {
-											removeNotice(
-												INSTALL_ERROR_NOTICE_ID
-											);
-											installBlock(
-												item,
-												noop,
-												onInstallBlockError
-											);
-										},
-									},
-									{
-										label: __( 'Remove' ),
-										onClick: () => {
-											removeNotice(
-												INSTALL_ERROR_NOTICE_ID
-											);
-											removeBlocks(
-												createdBlock.clientId
-											);
-											unregisterBlockType( item.name );
-										},
-									},
-								],
-							}
-						);
-					};
-
-					installBlock( item, noop, onInstallBlockError );
+					download( item );
 				};
 
-				downloadBlock( item, onSuccess, onDownloadError );
+				install( item, onSuccess );
 			},
+			download,
 		};
 	} )
 )( DownloadableBlocksList );
