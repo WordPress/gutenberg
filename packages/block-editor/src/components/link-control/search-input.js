@@ -74,7 +74,6 @@ const LinkControlSearchInput = ( {
 			/>
 			<div className="block-editor-link-control__search-actions">
 				<Button
-					disabled={ ! value.length }
 					type="submit"
 					label={ __( 'Submit' ) }
 					icon="editor-break"
