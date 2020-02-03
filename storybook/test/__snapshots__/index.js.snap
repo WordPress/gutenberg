@@ -3200,7 +3200,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   min-height: 30px;
 }
 
-[dir=rtl] .emotion-14 {
+[dir='rtl'] .emotion-14 {
   margin-right: 10px;
 }
 
@@ -3272,7 +3272,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   user-select: none;
 }
 
-[dir=rtl] .emotion-10 {
+[dir='rtl'] .emotion-10 {
   margin-left: 0;
   margin-right: -10px;
 }
@@ -3311,9 +3311,9 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -3346,17 +3346,17 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   bottom: -6px;
 }
 
-@media (prefers-reduced-motion:reduce) {
+@media ( prefers-reduced-motion:reduce ) {
   .emotion-12 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[dir=rtl] .emotion-12 {
-  -webkit-transform: translateX(50%);
-  -ms-transform: translateX(50%);
-  transform: translateX(50%);
+[dir='rtl'] .emotion-12 {
+  -webkit-transform: translateX( 50% );
+  -ms-transform: translateX( 50% );
+  transform: translateX( 50% );
 }
 
 .emotion-16 {
@@ -3377,7 +3377,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   max-width: 120px;
 }
 
-input[type="number"].emotion-18 {
+input[type='number'].emotion-18 {
   height: 30px;
   min-height: 30px;
 }
@@ -4843,7 +4843,7 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   user-select: none;
 }
 
-[dir=rtl] .emotion-30 {
+[dir='rtl'] .emotion-30 {
   margin-left: 0;
   margin-right: -10px;
 }
@@ -4882,9 +4882,9 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -4917,17 +4917,17 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   bottom: -6px;
 }
 
-@media (prefers-reduced-motion:reduce) {
+@media ( prefers-reduced-motion:reduce ) {
   .emotion-32 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[dir=rtl] .emotion-32 {
-  -webkit-transform: translateX(50%);
-  -ms-transform: translateX(50%);
-  transform: translateX(50%);
+[dir='rtl'] .emotion-32 {
+  -webkit-transform: translateX( 50% );
+  -ms-transform: translateX( 50% );
+  transform: translateX( 50% );
 }
 
 .emotion-36 {
@@ -4939,7 +4939,7 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   max-width: 120px;
 }
 
-input[type="number"].emotion-36 {
+input[type='number'].emotion-36 {
   height: 30px;
   min-height: 30px;
 }
@@ -4961,7 +4961,7 @@ input[type="number"].emotion-36 {
   margin-bottom: 16px;
 }
 
-[dir=rtl] .emotion-34 {
+[dir='rtl'] .emotion-34 {
   margin-right: 10px;
 }
 
@@ -4993,9 +4993,9 @@ input[type="number"].emotion-36 {
   font-size: 11px;
   position: absolute;
   top: 12px;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
   white-space: nowrap;
   color: #6c7781;
 }
@@ -5017,9 +5017,9 @@ input[type="number"].emotion-36 {
   font-size: 11px;
   position: absolute;
   top: 12px;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
   white-space: nowrap;
   color: #d7dade;
 }
@@ -5263,7 +5263,7 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
   min-height: 30px;
 }
 
-[dir=rtl] .emotion-10 {
+[dir='rtl'] .emotion-10 {
   margin-right: 10px;
 }
 
@@ -5335,7 +5335,7 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
   user-select: none;
 }
 
-[dir=rtl] .emotion-8 {
+[dir='rtl'] .emotion-8 {
   margin-left: 0;
   margin-right: -10px;
 }
@@ -5371,7 +5371,7 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
   max-width: 120px;
 }
 
-input[type="number"].emotion-12 {
+input[type='number'].emotion-12 {
   height: 30px;
   min-height: 30px;
 }
@@ -5504,7 +5504,7 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   min-height: 30px;
 }
 
-[dir=rtl] .emotion-12 {
+[dir='rtl'] .emotion-12 {
   margin-right: 10px;
 }
 
@@ -5576,7 +5576,7 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   user-select: none;
 }
 
-[dir=rtl] .emotion-8 {
+[dir='rtl'] .emotion-8 {
   margin-left: 0;
   margin-right: -10px;
 }
@@ -5615,9 +5615,9 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -5650,17 +5650,17 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   bottom: -6px;
 }
 
-@media (prefers-reduced-motion:reduce) {
+@media ( prefers-reduced-motion:reduce ) {
   .emotion-10 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[dir=rtl] .emotion-10 {
-  -webkit-transform: translateX(50%);
-  -ms-transform: translateX(50%);
-  transform: translateX(50%);
+[dir='rtl'] .emotion-10 {
+  -webkit-transform: translateX( 50% );
+  -ms-transform: translateX( 50% );
+  transform: translateX( 50% );
 }
 
 .emotion-14 {
@@ -5672,7 +5672,7 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   max-width: 120px;
 }
 
-input[type="number"].emotion-14 {
+input[type='number'].emotion-14 {
   height: 30px;
   min-height: 30px;
 }
@@ -5810,7 +5810,7 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   min-height: 30px;
 }
 
-[dir=rtl] .emotion-12 {
+[dir='rtl'] .emotion-12 {
   margin-right: 10px;
 }
 
@@ -5882,7 +5882,7 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   user-select: none;
 }
 
-[dir=rtl] .emotion-8 {
+[dir='rtl'] .emotion-8 {
   margin-left: 0;
   margin-right: -10px;
 }
@@ -5921,9 +5921,9 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -5956,17 +5956,17 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   bottom: -6px;
 }
 
-@media (prefers-reduced-motion:reduce) {
+@media ( prefers-reduced-motion:reduce ) {
   .emotion-10 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[dir=rtl] .emotion-10 {
-  -webkit-transform: translateX(50%);
-  -ms-transform: translateX(50%);
-  transform: translateX(50%);
+[dir='rtl'] .emotion-10 {
+  -webkit-transform: translateX( 50% );
+  -ms-transform: translateX( 50% );
+  transform: translateX( 50% );
 }
 
 .emotion-14 {
@@ -5978,7 +5978,7 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   max-width: 120px;
 }
 
-input[type="number"].emotion-14 {
+input[type='number'].emotion-14 {
   height: 30px;
   min-height: 30px;
 }
@@ -6123,7 +6123,7 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   min-height: 30px;
 }
 
-[dir=rtl] .emotion-12 {
+[dir='rtl'] .emotion-12 {
   margin-right: 10px;
 }
 
@@ -6195,7 +6195,7 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   user-select: none;
 }
 
-[dir=rtl] .emotion-8 {
+[dir='rtl'] .emotion-8 {
   margin-left: 0;
   margin-right: -10px;
 }
@@ -6234,9 +6234,9 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -6269,17 +6269,17 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   bottom: -6px;
 }
 
-@media (prefers-reduced-motion:reduce) {
+@media ( prefers-reduced-motion:reduce ) {
   .emotion-10 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[dir=rtl] .emotion-10 {
-  -webkit-transform: translateX(50%);
-  -ms-transform: translateX(50%);
-  transform: translateX(50%);
+[dir='rtl'] .emotion-10 {
+  -webkit-transform: translateX( 50% );
+  -ms-transform: translateX( 50% );
+  transform: translateX( 50% );
 }
 
 .emotion-14 {
@@ -6300,7 +6300,7 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   max-width: 120px;
 }
 
-input[type="number"].emotion-16 {
+input[type='number'].emotion-16 {
   height: 30px;
   min-height: 30px;
 }
@@ -6465,7 +6465,7 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   min-height: 30px;
 }
 
-[dir=rtl] .emotion-14 {
+[dir='rtl'] .emotion-14 {
   margin-right: 10px;
 }
 
@@ -6537,7 +6537,7 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   user-select: none;
 }
 
-[dir=rtl] .emotion-10 {
+[dir='rtl'] .emotion-10 {
   margin-left: 0;
   margin-right: -10px;
 }
@@ -6576,9 +6576,9 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -6611,17 +6611,17 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   bottom: -6px;
 }
 
-@media (prefers-reduced-motion:reduce) {
+@media ( prefers-reduced-motion:reduce ) {
   .emotion-12 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[dir=rtl] .emotion-12 {
-  -webkit-transform: translateX(50%);
-  -ms-transform: translateX(50%);
-  transform: translateX(50%);
+[dir='rtl'] .emotion-12 {
+  -webkit-transform: translateX( 50% );
+  -ms-transform: translateX( 50% );
+  transform: translateX( 50% );
 }
 
 .emotion-16 {
@@ -6633,7 +6633,7 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   max-width: 120px;
 }
 
-input[type="number"].emotion-16 {
+input[type='number'].emotion-16 {
   height: 30px;
   min-height: 30px;
 }
@@ -6789,7 +6789,7 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   min-height: 30px;
 }
 
-[dir=rtl] .emotion-12 {
+[dir='rtl'] .emotion-12 {
   margin-right: 10px;
 }
 
@@ -6861,7 +6861,7 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   user-select: none;
 }
 
-[dir=rtl] .emotion-8 {
+[dir='rtl'] .emotion-8 {
   margin-left: 0;
   margin-right: -10px;
 }
@@ -6900,9 +6900,9 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -6935,17 +6935,17 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   bottom: -6px;
 }
 
-@media (prefers-reduced-motion:reduce) {
+@media ( prefers-reduced-motion:reduce ) {
   .emotion-10 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[dir=rtl] .emotion-10 {
-  -webkit-transform: translateX(50%);
-  -ms-transform: translateX(50%);
-  transform: translateX(50%);
+[dir='rtl'] .emotion-10 {
+  -webkit-transform: translateX( 50% );
+  -ms-transform: translateX( 50% );
+  transform: translateX( 50% );
 }
 
 .emotion-14 {
@@ -6957,7 +6957,7 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   max-width: 120px;
 }
 
-input[type="number"].emotion-14 {
+input[type='number'].emotion-14 {
   height: 30px;
   min-height: 30px;
 }
@@ -7095,7 +7095,7 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   min-height: 30px;
 }
 
-[dir=rtl] .emotion-12 {
+[dir='rtl'] .emotion-12 {
   margin-right: 10px;
 }
 
@@ -7167,7 +7167,7 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   user-select: none;
 }
 
-[dir=rtl] .emotion-8 {
+[dir='rtl'] .emotion-8 {
   margin-left: 0;
   margin-right: -10px;
 }
@@ -7206,9 +7206,9 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -7241,17 +7241,17 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   bottom: -6px;
 }
 
-@media (prefers-reduced-motion:reduce) {
+@media ( prefers-reduced-motion:reduce ) {
   .emotion-10 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[dir=rtl] .emotion-10 {
-  -webkit-transform: translateX(50%);
-  -ms-transform: translateX(50%);
-  transform: translateX(50%);
+[dir='rtl'] .emotion-10 {
+  -webkit-transform: translateX( 50% );
+  -ms-transform: translateX( 50% );
+  transform: translateX( 50% );
 }
 
 .emotion-14 {
@@ -7263,7 +7263,7 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   max-width: 120px;
 }
 
-input[type="number"].emotion-14 {
+input[type='number'].emotion-14 {
   height: 30px;
   min-height: 30px;
 }
