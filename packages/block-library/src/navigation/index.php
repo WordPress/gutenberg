@@ -170,11 +170,10 @@ function render_block_navigation( $content, $block ) {
  * @param array $block         The NavigationItem block.
  * @param array $colors        Contains inline styles and CSS classes to apply to navigation item.
  * @param array $font_sizes    Contains inline styles and CSS classes to apply to navigation item.
- * @param bool  $is_level_zero True whether is main menu (level zero). Otherwise, False.
  *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_level_zero = true ) {
+function build_navigation_html( $attributes, $block, $colors, $font_sizes ) {
 	$html            = '';
 	$classes         = array_merge(
 		$colors['css_classes'],
