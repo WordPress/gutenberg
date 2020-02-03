@@ -33,11 +33,15 @@ export const _default = () => {
 		step: number( 'step', 1 ),
 		marks: boolean( 'marks', false ),
 		showTooltip: boolean( 'showTooltip', false ),
-		tooltipPosition: select( 'tooltipPosition', {
-			top: 'top',
-			bottom: 'bottom',
-			auto: 'auto',
-		}, 'auto' ),
+		tooltipPosition: select(
+			'tooltipPosition',
+			{
+				top: 'top',
+				bottom: 'bottom',
+				auto: 'auto',
+			},
+			'auto'
+		),
 		beforeIcon: text( 'beforeIcon', '' ),
 		afterIcon: text( 'afterIcon', '' ),
 		withInputField: boolean( 'withInputField', true ),

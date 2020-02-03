@@ -40,7 +40,7 @@ import {
 	Wrapper,
 } from './styles/range-control-styles';
 
-const BaseRangeControlNext = forwardRef(
+const BaseRangeControl = forwardRef(
 	(
 		{
 			afterIcon,
@@ -77,7 +77,11 @@ const BaseRangeControlNext = forwardRef(
 		const isRTL = document.documentElement.dir === 'rtl';
 
 		const sliderValue = initialPosition || valueProp;
-		const [ value, setValue ] = useControlledRangeValue( { min, max, value: sliderValue } );
+		const [ value, setValue ] = useControlledRangeValue( {
+			min,
+			max,
+			value: sliderValue,
+		} );
 		const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 		const [ isFocused, setIsFocused ] = useState( false );
 		const originalValueRef = useRef( value );
@@ -154,8 +158,17 @@ const BaseRangeControlNext = forwardRef(
 		};
 
 		return (
-			<BaseControl className={ classes } label={ label } id={ id } help={ help }>
-				<Root className="components-range-control__root" isRTL={ isRTL } width={ width }>
+			<BaseControl
+				className={ classes }
+				label={ label }
+				id={ id }
+				help={ help }
+			>
+				<Root
+					className="components-range-control__root"
+					isRTL={ isRTL }
+					width={ width }
+				>
 					{ beforeIcon && (
 						<BeforeIconWrapper>
 							<Dashicon icon={ beforeIcon } />
@@ -200,7 +213,10 @@ const BaseRangeControlNext = forwardRef(
 							style={ { width: fillValueOffset } }
 						/>
 						<ThumbWrapper style={ offsetStyle }>
-							<Thumb aria-hidden={ true } isFocused={ isThumbFocused } />
+							<Thumb
+								aria-hidden={ true }
+								isFocused={ isThumbFocused }
+							/>
 						</ThumbWrapper>
 						{ enableTooltip && (
 							<SimpleTooltip
@@ -330,6 +346,6 @@ function useDebouncedHoverInteraction( {
 	};
 }
 
-export const RangeControlNext = compose( withInstanceId )( BaseRangeControlNext );
+export const RangeControlNext = compose( withInstanceId )( BaseRangeControl );
 
 export default RangeControlNext;

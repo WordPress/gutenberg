@@ -25,25 +25,26 @@ export const Root = styled.span`
 	touch-action: none;
 	width: 100%;
 
-	${ rootRtl }
-	${ rootWidth };
+	${rootRtl}
+	${rootWidth};
 `;
 
-const wrapperMargin = ( { marks } ) => css( { marginBottom: marks ? 16 : null } );
+const wrapperMargin = ( { marks } ) =>
+	css( { marginBottom: marks ? 16 : null } );
 
 export const Wrapper = styled.span`
 	box-sizing: border-box;
-	color: ${ color( 'blue.medium.focus' ) };
+	color: ${color( 'blue.medium.focus' )};
 	display: block;
 	padding-top: 15px;
 	position: relative;
 	margin-left: 10px;
 	width: 100%;
 
-	${ rangeHeight };
-	${ wrapperMargin };
+	${rangeHeight};
+	${wrapperMargin};
 
-	[dir=rtl] & {
+	[dir='rtl'] & {
 		margin-right: 10px;
 	}
 `;
@@ -67,7 +68,7 @@ export const AfterIconWrapper = styled.span`
 `;
 
 export const Rail = styled.span`
-	background-color: ${ color( 'lightGray.600' ) };
+	background-color: ${color( 'lightGray.600' )};
 	box-sizing: border-box;
 	left: 0;
 	pointer-events: none;
@@ -113,7 +114,7 @@ export const Mark = styled.span`
 	top: -4px;
 	width: 1px;
 
-	${ markFill };
+	${markFill};
 `;
 
 const markLabelFill = ( { isFilled } ) => {
@@ -124,15 +125,15 @@ const markLabelFill = ( { isFilled } ) => {
 
 export const MarkLabel = styled.span`
 	box-sizing: border-box;
-	color: ${ color( 'lightGray.600' ) };
+	color: ${color( 'lightGray.600' )};
 	left: 0;
 	font-size: 11px;
 	position: absolute;
 	top: 12px;
-	transform: translateX(-50%);
+	transform: translateX( -50% );
 	white-space: nowrap;
 
-	${ markLabelFill };
+	${markLabelFill};
 `;
 
 export const ThumbWrapper = styled.span`
@@ -150,7 +151,7 @@ export const ThumbWrapper = styled.span`
 	top: 0;
 	user-select: none;
 
-	[dir=rtl] & {
+	[dir='rtl'] & {
 		margin-left: 0;
 		margin-right: -10px;
 	}
@@ -158,7 +159,7 @@ export const ThumbWrapper = styled.span`
 
 const handleReducedMotion = () => {
 	return css`
-		@media (prefers-reduced-motion: reduce) {
+		@media ( prefers-reduced-motion: reduce ) {
 			transition: none !important;
 		}
 	`;
@@ -166,12 +167,14 @@ const handleReducedMotion = () => {
 
 const thumbFocus = ( { isFocused } ) => {
 	return css( {
-		borderColor: isFocused ? color( 'blue.medium.focus' ) : color( 'darkGray.200' ),
-		boxShadow: isFocused ?
-			`
+		borderColor: isFocused
+			? color( 'blue.medium.focus' )
+			: color( 'darkGray.200' ),
+		boxShadow: isFocused
+			? `
 				0 0 0 1px ${ color( 'blue.medium.focus' ) }
-			` :
 			`
+			: `
 				0 0 0 rgba(0, 0, 0, 0)
 			`,
 	} );
@@ -181,7 +184,7 @@ export const Thumb = styled.span`
 	align-items: center;
 	background-color: white;
 	border-radius: 50%;
-	border: 1px solid ${ color( 'darkGray.200' ) };
+	border: 1px solid ${color( 'darkGray.200' )};
 	box-sizing: border-box;
 	height: 100%;
 	outline: 0;
@@ -190,7 +193,7 @@ export const Thumb = styled.span`
 	user-select: none;
 	width: 100%;
 
-	${ thumbFocus };
+	${thumbFocus};
 `;
 
 export const InputRange = styled.input`
@@ -243,7 +246,7 @@ const tooltipPosition = ( { position } ) => {
 };
 
 export const Tooltip = styled.span`
-	background: ${ color( 'darkGray.800' ) };
+	background: ${color( 'darkGray.800' )};
 	border-radius: 3px;
 	box-sizing: border-box;
 	color: white;
@@ -254,12 +257,12 @@ export const Tooltip = styled.span`
 	padding: 8px;
 	position: absolute;
 	text-align: center;
-	transform: translateX(-50%);
+	transform: translateX( -50% );
 	transition: opacity 120ms ease;
 	user-select: none;
 
 	&::after {
-		border: 6px solid ${ color( 'darkGray.800' ) };
+		border: 6px solid ${color( 'darkGray.800' )};
 		border-left-color: transparent;
 		border-right-color: transparent;
 		bottom: -6px;
@@ -273,13 +276,12 @@ export const Tooltip = styled.span`
 		width: 0;
 	}
 
-	${ tooltipShow };
-	${ tooltipPosition };
-	${ handleReducedMotion };
+	${tooltipShow};
+	${tooltipPosition};
+	${handleReducedMotion};
 
-
-	[dir=rtl] & {
-		transform: translateX(50%);
+	[dir='rtl'] & {
+		transform: translateX( 50% );
 	}
 `;
 
@@ -291,8 +293,8 @@ export const InputNumber = styled.input`
 	min-width: 54px;
 	max-width: 120px;
 
-	input[type="number"]& {
-		${ rangeHeight };
+	input[type='number']& {
+		${rangeHeight};
 	}
 `;
 
@@ -305,6 +307,6 @@ export const ActionRightWrapper = styled.span`
 	button,
 	button.is-small {
 		margin-left: 0;
-		${ rangeHeight };
+		${rangeHeight};
 	}
 `;
