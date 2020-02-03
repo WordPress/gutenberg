@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useLayoutEffect, useContext } from '@wordpress/element';
+import {
+	useEffect,
+	useRef,
+	useLayoutEffect,
+	useContext,
+} from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -24,10 +29,10 @@ export default function Slot( {
 		return () => {
 			registry.unregister( name );
 		};
-	// We are not including fillProps in the deps because we don't want to
-	// unregister and register the slot whenever fillProps change, which would
-	// cause the fill to be re-mounted. We are only considering the initial value
-	// of fillProps.
+		// We are not including fillProps in the deps because we don't want to
+		// unregister and register the slot whenever fillProps change, which would
+		// cause the fill to be re-mounted. We are only considering the initial value
+		// of fillProps.
 	}, [ registry.register, registry.unregister, name ] );
 
 	// fillProps may be an update that interact with the layout, so

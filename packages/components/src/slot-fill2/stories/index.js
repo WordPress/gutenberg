@@ -19,8 +19,12 @@ export const _default = () => {
 	return (
 		<SlotFillProvider>
 			<h2>Profile</h2>
-			<p>Name: <Slot as="span" name="name" /></p>
-			<p>Age: <Slot as="span" name="age" /></p>
+			<p>
+				Name: <Slot as="span" name="name" />
+			</p>
+			<p>
+				Age: <Slot as="span" name="age" />
+			</p>
 			<Fill name="name">Grace</Fill>
 			<Fill name="age">33</Fill>
 		</SlotFillProvider>
@@ -33,8 +37,12 @@ export const withFillProps = () => {
 	return (
 		<SlotFillProvider>
 			<h2>Profile</h2>
-			<p>Name: <Slot as="span" name="name" fillProps={ { name } } /></p>
-			<p>Age: <Slot as="span" name="age" fillProps={ { age } } /></p>
+			<p>
+				Name: <Slot as="span" name="name" fillProps={ { name } } />
+			</p>
+			<p>
+				Age: <Slot as="span" name="age" fillProps={ { age } } />
+			</p>
 			<Fill name="name">{ ( fillProps ) => fillProps.name }</Fill>
 			<Fill name="age">{ ( fillProps ) => fillProps.age }</Fill>
 		</SlotFillProvider>
@@ -50,8 +58,12 @@ export const withContext = () => {
 	return (
 		<SlotFillProvider>
 			<h2>Profile</h2>
-			<p>Name: <Slot as="span" name="name" /></p>
-			<p>Age: <Slot as="span" name="age" /></p>
+			<p>
+				Name: <Slot as="span" name="name" />
+			</p>
+			<p>
+				Age: <Slot as="span" name="age" />
+			</p>
 			<Context.Provider value="Grace">
 				<ContextFill name="name" />
 			</Context.Provider>
