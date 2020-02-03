@@ -67,7 +67,8 @@ function BlockPopover( {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ blockNodes ] = useContext( BlockNodes );
 
-	const showEmptyBlockSideInserter = ! isNavigationMode && isEmptyDefaultBlock && isValid;
+	const showEmptyBlockSideInserter =
+		! isNavigationMode && isEmptyDefaultBlock && isValid;
 	const shouldShowBreadcrumb = isNavigationMode;
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
@@ -85,7 +86,11 @@ function BlockPopover( {
 	useShortcut(
 		'core/block-editor/focus-toolbar',
 		useCallback( () => setIsToolbarForced( true ), [] ),
-		{ bindGlobal: true, eventName: 'keydown', isDisabled: ! canFocusHiddenToolbar }
+		{
+			bindGlobal: true,
+			eventName: 'keydown',
+			isDisabled: ! canFocusHiddenToolbar,
+		}
 	);
 
 	if (
@@ -141,7 +146,9 @@ function BlockPopover( {
 	// left corner. For the side inserter, pop out towards the left, and
 	// position in the right corner.
 	// To do: refactor `Popover` to make this prop clearer.
-	const popoverPosition = showEmptyBlockSideInserter ? 'top left right' : 'top right left';
+	const popoverPosition = showEmptyBlockSideInserter
+		? 'top left right'
+		: 'top right left';
 
 	return (
 		<Popover
@@ -154,8 +161,12 @@ function BlockPopover( {
 			__unstableSticky={ ! showEmptyBlockSideInserter }
 			__unstableSlotName="block-toolbar"
 			// Allow subpixel positioning for the block movement animation.
-			__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && node }
-			__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && node }
+			__unstableAllowVerticalSubpixelPosition={
+				moverDirection !== 'horizontal' && node
+			}
+			__unstableAllowHorizontalSubpixelPosition={
+				moverDirection === 'horizontal' && node
+			}
 			onBlur={ () => setIsToolbarForced( false ) }
 			shouldAnchorIncludePadding
 		>
@@ -172,10 +183,15 @@ function BlockPopover( {
 					tabIndex={ -1 }
 					className={ classnames(
 						'block-editor-block-list__block-popover-inserter',
-						{ 'is-visible': isInserterShown }
+						{
+							'is-visible': isInserterShown,
+						}
 					) }
 				>
-					<Inserter clientId={ clientId } rootClientId={ rootClientId } />
+					<Inserter
+						clientId={ clientId }
+						rootClientId={ rootClientId }
+					/>
 				</div>
 			) }
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
@@ -219,28 +235,39 @@ function wrapperSelector( select ) {
 		__experimentalGetBlockListSettingsForBlocks,
 	} = select( 'core/block-editor' );
 
-	const clientId = getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
+	const clientId =
+		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
 	if ( ! clientId ) {
 		return;
 	}
 
 	const rootClientId = getBlockRootClientId( clientId );
-	const { name, attributes = {}, isValid } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
+	const { name, attributes = {}, isValid } =
+		__unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
-	const { __experimentalMoverDirection } = getBlockListSettings( rootClientId ) || {};
+	const { __experimentalMoverDirection } =
+		getBlockListSettings( rootClientId ) || {};
 
 	// Get Block List Settings for all ancestors of the current Block clientId
-	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks( blockParentsClientIds );
+	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks(
+		blockParentsClientIds
+	);
 
 	// Find the index of the first Block with the `captureDescendantsToolbars` prop defined
 	// This will be the top most ancestor because getBlockParents() returns tree from top -> bottom
-	const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [ '__experimentalCaptureToolbars', true ] );
+	const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex(
+		ancestorBlockListSettings,
+		[ '__experimentalCaptureToolbars', true ]
+	);
 
 	let capturingClientId;
 
 	if ( topmostAncestorWithCaptureDescendantsToolbarsIndex !== -1 ) {
-		capturingClientId = blockParentsClientIds[ topmostAncestorWithCaptureDescendantsToolbarsIndex ];
+		capturingClientId =
+			blockParentsClientIds[
+				topmostAncestorWithCaptureDescendantsToolbarsIndex
+			];
 	}
 
 	return {
@@ -250,7 +277,8 @@ function wrapperSelector( select ) {
 		align: attributes.align,
 		isValid,
 		moverDirection: __experimentalMoverDirection,
-		isEmptyDefaultBlock: name && isUnmodifiedDefaultBlock( { name, attributes } ),
+		isEmptyDefaultBlock:
+			name && isUnmodifiedDefaultBlock( { name, attributes } ),
 		capturingClientId,
 	};
 }

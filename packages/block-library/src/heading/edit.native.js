@@ -29,7 +29,9 @@ const HeadingEdit = ( {
 				minLevel={ 2 }
 				maxLevel={ 7 }
 				selectedLevel={ attributes.level }
-				onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) }
+				onChange={ ( newLevel ) =>
+					setAttributes( { level: newLevel } )
+				}
 				isCollapsed={ false }
 			/>
 		</BlockControls>

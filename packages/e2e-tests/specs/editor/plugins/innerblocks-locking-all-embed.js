@@ -18,12 +18,15 @@ describe( 'Embed block inside a locked all parent', () => {
 	} );
 
 	afterAll( async () => {
-		await deactivatePlugin( 'gutenberg-test-innerblocks-locking-all-embed' );
+		await deactivatePlugin(
+			'gutenberg-test-innerblocks-locking-all-embed'
+		);
 	} );
 
 	it( 'embed block should be able to embed external content', async () => {
 		await insertBlock( 'Test Inner Blocks Locking All Embed' );
-		const embedInputSelector = '.components-placeholder__input[aria-label="Embed URL"]';
+		const embedInputSelector =
+			'.components-placeholder__input[aria-label="Embed URL"]';
 		await page.waitForSelector( embedInputSelector );
 		await page.click( embedInputSelector );
 		// This URL should not have a trailing slash.

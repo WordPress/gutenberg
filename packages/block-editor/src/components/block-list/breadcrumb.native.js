@@ -19,27 +19,49 @@ import SubdirectorSVG from './subdirectory-icon';
 
 import styles from './breadcrumb.scss';
 
-const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } ) => {
+const BlockBreadcrumb = ( {
+	clientId,
+	blockIcon,
+	rootClientId,
+	rootBlockIcon,
+} ) => {
 	const renderIcon = ( icon, key ) => {
 		if ( typeof icon.src === 'function' ) {
-			return <Icon key={ key } icon={ icon.src( { size: 24, fill: styles.icon.color } ) } />;
+			return (
+				<Icon
+					key={ key }
+					icon={ icon.src( { size: 24, fill: styles.icon.color } ) }
+				/>
+			);
 		}
-		return 	<Icon key={ key } size={ 24 } icon={ icon.src } fill={ styles.icon.color } />;
+		return (
+			<Icon
+				key={ key }
+				size={ 24 }
+				icon={ icon.src }
+				fill={ styles.icon.color }
+			/>
+		);
 	};
 
 	return (
 		<View style={ styles.breadcrumbContainer }>
 			<TouchableOpacity
 				style={ styles.button }
-				onPress={ () => {/* Open BottomSheet with markup */} }
-				disabled={ true } /* Disable temporarily since onPress function is empty */
+				onPress={ () => {
+					/* Open BottomSheet with markup */
+				} }
+				disabled={
+					true
+				} /* Disable temporarily since onPress function is empty */
 			>
-				{ rootClientId && rootBlockIcon && (
-					[
+				{ rootClientId &&
+					rootBlockIcon && [
 						renderIcon( rootBlockIcon, 'parent-icon' ),
-						<View key="subdirectory-icon" style={ styles.arrow }><SubdirectorSVG fill={ styles.arrow.color } /></View>,
-					]
-				) }
+						<View key="subdirectory-icon" style={ styles.arrow }>
+							<SubdirectorSVG fill={ styles.arrow.color } />
+						</View>,
+					] }
 				{ renderIcon( blockIcon ) }
 				<Text
 					maxFontSizeMultiplier={ 1.25 }
@@ -56,10 +78,9 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } )
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlockRootClientId,
-			getBlockName,
-		} = select( 'core/block-editor' );
+		const { getBlockRootClientId, getBlockName } = select(
+			'core/block-editor'
+		);
 
 		const blockName = getBlockName( clientId );
 		const blockType = getBlockType( blockName );

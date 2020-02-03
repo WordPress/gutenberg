@@ -11,9 +11,7 @@ import { MultiBlocksSwitcher } from '../multi-blocks-switcher';
 describe( 'MultiBlocksSwitcher', () => {
 	test( 'should return null when the selection is not a multi block selection.', () => {
 		const isMultiBlockSelection = false;
-		const selectedBlockClientIds = [
-			'clientid',
-		];
+		const selectedBlockClientIds = [ 'clientid' ];
 		const wrapper = shallow(
 			<MultiBlocksSwitcher
 				isMultiBlockSelection={ isMultiBlockSelection }
@@ -26,10 +24,7 @@ describe( 'MultiBlocksSwitcher', () => {
 
 	test( 'should return a BlockSwitcher element matching the snapshot.', () => {
 		const isMultiBlockSelection = true;
-		const selectedBlockClientIds = [
-			'clientid-1',
-			'clientid-2',
-		];
+		const selectedBlockClientIds = [ 'clientid-1', 'clientid-2' ];
 		const wrapper = shallow(
 			<MultiBlocksSwitcher
 				isMultiBlockSelection={ isMultiBlockSelection }

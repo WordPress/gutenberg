@@ -38,9 +38,18 @@ export class PanelBody extends Component {
 	}
 
 	render() {
-		const { title, children, opened, className, icon, forwardedRef } = this.props;
+		const {
+			title,
+			children,
+			opened,
+			className,
+			icon,
+			forwardedRef,
+		} = this.props;
 		const isOpened = opened === undefined ? this.state.opened : opened;
-		const classes = classnames( 'components-panel__body', className, { 'is-opened': isOpened } );
+		const classes = classnames( 'components-panel__body', className, {
+			'is-opened': isOpened,
+		} );
 
 		return (
 			<div className={ classes } ref={ forwardedRef }>
@@ -56,10 +65,19 @@ export class PanelBody extends Component {
 								repaints the whole element, so this wrapping span hides that.
 							*/ }
 							<span aria-hidden="true">
-								<Icon className="components-panel__arrow" icon={ isOpened ? chevronUp : chevronDown } />
+								<Icon
+									className="components-panel__arrow"
+									icon={ isOpened ? chevronUp : chevronDown }
+								/>
 							</span>
 							{ title }
-							{ icon && <Icon icon={ icon } className="components-panel__icon" size={ 20 } /> }
+							{ icon && (
+								<Icon
+									icon={ icon }
+									className="components-panel__icon"
+									size={ 20 }
+								/>
+							) }
 						</Button>
 					</h2>
 				) }

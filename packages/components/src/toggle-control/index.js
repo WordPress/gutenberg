@@ -43,7 +43,10 @@ class ToggleControl extends Component {
 			<BaseControl
 				id={ id }
 				help={ helpLabel }
-				className={ classnames( 'components-toggle-control', className ) }
+				className={ classnames(
+					'components-toggle-control',
+					className
+				) }
 			>
 				<FormToggle
 					id={ id }

@@ -9,13 +9,26 @@ import { Icon, check } from '@wordpress/icons';
  */
 import BaseControl from '../base-control';
 
-export default function CheckboxControl( { label, className, heading, checked, help, onChange, ...props } ) {
+export default function CheckboxControl( {
+	label,
+	className,
+	heading,
+	checked,
+	help,
+	onChange,
+	...props
+} ) {
 	const instanceId = useInstanceId( CheckboxControl );
 	const id = `inspector-checkbox-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.checked );
 
 	return (
-		<BaseControl label={ heading } id={ id } help={ help } className={ className }>
+		<BaseControl
+			label={ heading }
+			id={ id }
+			help={ help }
+			className={ className }
+		>
 			<span className="components-checkbox-control__input-container">
 				<input
 					id={ id }
@@ -27,9 +40,18 @@ export default function CheckboxControl( { label, className, heading, checked, h
 					aria-describedby={ !! help ? id + '__help' : undefined }
 					{ ...props }
 				/>
-				{ checked ? <Icon icon={ check } className="components-checkbox-control__checked" role="presentation" /> : null }
+				{ checked ? (
+					<Icon
+						icon={ check }
+						className="components-checkbox-control__checked"
+						role="presentation"
+					/>
+				) : null }
 			</span>
-			<label className="components-checkbox-control__label" htmlFor={ id }>
+			<label
+				className="components-checkbox-control__label"
+				htmlFor={ id }
+			>
 				{ label }
 			</label>
 		</BaseControl>

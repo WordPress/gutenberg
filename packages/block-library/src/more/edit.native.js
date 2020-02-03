@@ -31,8 +31,14 @@ export class MoreEdit extends Component {
 		const { defaultText } = this.state;
 
 		const content = customText || defaultText;
-		const textStyle = getStylesFromColorScheme( styles.moreText, styles.moreTextDark );
-		const lineStyle = getStylesFromColorScheme( styles.moreLine, styles.moreLineDark );
+		const textStyle = getStylesFromColorScheme(
+			styles.moreText,
+			styles.moreTextDark
+		);
+		const lineStyle = getStylesFromColorScheme(
+			styles.moreLine,
+			styles.moreLineDark
+		);
 
 		return (
 			<View>

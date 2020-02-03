@@ -107,9 +107,13 @@ class TimePicker extends Component {
 			return;
 		}
 
-		const newDate = is12Hour ?
-			date.clone().hours( am === 'AM' ? value % 12 : ( ( ( value % 12 ) + 12 ) % 24 ) ) :
-			date.clone().hours( value );
+		const newDate = is12Hour
+			? date
+					.clone()
+					.hours(
+						am === 'AM' ? value % 12 : ( ( value % 12 ) + 12 ) % 24
+					)
+			: date.clone().hours( value );
 		this.changeDate( newDate );
 	}
 
@@ -165,7 +169,9 @@ class TimePicker extends Component {
 			}
 			let newDate;
 			if ( value === 'PM' ) {
-				newDate = date.clone().hours( ( ( parseInt( hours, 10 ) % 12 ) + 12 ) % 24 );
+				newDate = date
+					.clone()
+					.hours( ( ( parseInt( hours, 10 ) % 12 ) + 12 ) % 24 );
 			} else {
 				newDate = date.clone().hours( parseInt( hours, 10 ) % 12 );
 			}
@@ -192,13 +198,16 @@ class TimePicker extends Component {
 	onChangeMinutes( event ) {
 		const minutes = event.target.value;
 		this.setState( {
-			minutes: ( minutes === '' ) ? '' : ( '0' + minutes ).slice( -2 ),
+			minutes: minutes === '' ? '' : ( '0' + minutes ).slice( -2 ),
 		} );
 	}
 
 	renderMonth( month ) {
 		return (
-			<div key="render-month" className="components-datetime__time-field components-datetime__time-field-month">
+			<div
+				key="render-month"
+				className="components-datetime__time-field components-datetime__time-field-month"
+			>
 				<select
 					aria-label={ __( 'Month' ) }
 					className="components-datetime__time-field-month-select"
@@ -225,7 +234,10 @@ class TimePicker extends Component {
 
 	renderDay( day ) {
 		return (
-			<div key="render-day" className="components-datetime__time-field components-datetime__time-field-day">
+			<div
+				key="render-day"
+				className="components-datetime__time-field components-datetime__time-field-day"
+			>
 				<input
 					aria-label={ __( 'Day' ) }
 					className="components-datetime__time-field-day-input"
@@ -252,7 +264,9 @@ class TimePicker extends Component {
 		return (
 			<div className={ classnames( 'components-datetime__time' ) }>
 				<fieldset>
-					<legend className="components-datetime__time-legend invisible">{ __( 'Date' ) }</legend>
+					<legend className="components-datetime__time-legend invisible">
+						{ __( 'Date' ) }
+					</legend>
 					<div className="components-datetime__time-wrapper">
 						{ this.renderDayMonthFormat( is12Hour ) }
 						<div className="components-datetime__time-field components-datetime__time-field-year">
@@ -270,7 +284,9 @@ class TimePicker extends Component {
 				</fieldset>
 
 				<fieldset>
-					<legend className="components-datetime__time-legend invisible">{ __( 'Time' ) }</legend>
+					<legend className="components-datetime__time-legend invisible">
+						{ __( 'Time' ) }
+					</legend>
 					<div className="components-datetime__time-wrapper">
 						<div className="components-datetime__time-field components-datetime__time-field-time">
 							<input
@@ -286,7 +302,10 @@ class TimePicker extends Component {
 							/>
 							<span
 								className="components-datetime__time-separator"
-								aria-hidden="true">:</span>
+								aria-hidden="true"
+							>
+								:
+							</span>
 							<input
 								aria-label={ __( 'Minutes' ) }
 								className="components-datetime__time-field-minutes-input"

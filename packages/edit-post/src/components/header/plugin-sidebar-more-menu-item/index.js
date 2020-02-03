@@ -11,7 +11,12 @@ import { check } from '@wordpress/icons';
  */
 import PluginMoreMenuItem from '../plugin-more-menu-item';
 
-const PluginSidebarMoreMenuItem = ( { children, icon, isSelected, onClick } ) => (
+const PluginSidebarMoreMenuItem = ( {
+	children,
+	icon,
+	isSelected,
+	onClick,
+} ) => (
 	<PluginMoreMenuItem
 		icon={ isSelected ? check : icon }
 		isSelected={ isSelected }
@@ -75,23 +80,20 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { sidebarName } ) => {
-		const {
-			getActiveGeneralSidebarName,
-		} = select( 'core/edit-post' );
+		const { getActiveGeneralSidebarName } = select( 'core/edit-post' );
 
 		return {
 			isSelected: getActiveGeneralSidebarName() === sidebarName,
 		};
 	} ),
 	withDispatch( ( dispatch, { isSelected, sidebarName } ) => {
-		const {
-			closeGeneralSidebar,
-			openGeneralSidebar,
-		} = dispatch( 'core/edit-post' );
-		const onClick = isSelected ?
-			closeGeneralSidebar :
-			() => openGeneralSidebar( sidebarName );
+		const { closeGeneralSidebar, openGeneralSidebar } = dispatch(
+			'core/edit-post'
+		);
+		const onClick = isSelected
+			? closeGeneralSidebar
+			: () => openGeneralSidebar( sidebarName );
 
 		return { onClick };
-	} ),
+	} )
 )( PluginSidebarMoreMenuItem );

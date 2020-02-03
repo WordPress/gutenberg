@@ -9,7 +9,10 @@ const transforms = {
 		{
 			type: 'files',
 			isMatch( files ) {
-				return files.length === 1 && files[ 0 ].type.indexOf( 'video/' ) === 0;
+				return (
+					files.length === 1 &&
+					files[ 0 ].type.indexOf( 'video/' ) === 0
+				);
 			},
 			transform( files ) {
 				const file = files[ 0 ];
@@ -28,7 +31,9 @@ const transforms = {
 			attributes: {
 				src: {
 					type: 'string',
-					shortcode: ( { named: { src, mp4, m4v, webm, ogv, flv } } ) => {
+					shortcode: ( {
+						named: { src, mp4, m4v, webm, ogv, flv },
+					} ) => {
 						return src || mp4 || m4v || webm || ogv || flv;
 					},
 				},

@@ -89,9 +89,11 @@ const defaultTemplates = [
 	},
 ];
 
-const parsedTemplates = memoize( () => defaultTemplates.map( ( template ) => ( {
-	...template,
-	blocks: parse( template.content ),
-} ) ) );
+const parsedTemplates = memoize( () =>
+	defaultTemplates.map( ( template ) => ( {
+		...template,
+		blocks: parse( template.content ),
+	} ) )
+);
 
 export default parsedTemplates;

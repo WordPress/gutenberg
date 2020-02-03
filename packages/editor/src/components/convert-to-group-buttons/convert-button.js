@@ -27,19 +27,16 @@ export function ConvertToGroupButton( {
 	return (
 		<Fragment>
 			{ isGroupable && (
-				<MenuItem
-					icon={ Group }
-					onClick={ onConvertToGroup }
-				>
+				<MenuItem icon={ Group } onClick={ onConvertToGroup }>
 					{ _x( 'Group', 'verb' ) }
 				</MenuItem>
 			) }
 			{ isUngroupable && (
-				<MenuItem
-					icon={ Ungroup }
-					onClick={ onConvertFromGroup }
-				>
-					{ _x( 'Ungroup', 'Ungrouping blocks from within a Group block back into individual blocks within the Editor ' ) }
+				<MenuItem icon={ Ungroup } onClick={ onConvertFromGroup }>
+					{ _x(
+						'Ungroup',
+						'Ungrouping blocks from within a Group block back into individual blocks within the Editor '
+					) }
 				</MenuItem>
 			) }
 		</Fragment>
@@ -54,35 +51,40 @@ export default compose( [
 			canInsertBlockType,
 		} = select( 'core/block-editor' );
 
-		const {
-			getGroupingBlockName,
-		} = select( 'core/blocks' );
+		const { getGroupingBlockName } = select( 'core/blocks' );
 
 		const groupingBlockName = getGroupingBlockName();
 
-		const rootClientId = clientIds && clientIds.length > 0 ?
-			getBlockRootClientId( clientIds[ 0 ] ) :
-			undefined;
+		const rootClientId =
+			clientIds && clientIds.length > 0
+				? getBlockRootClientId( clientIds[ 0 ] )
+				: undefined;
 
-		const groupingBlockAvailable = canInsertBlockType( groupingBlockName, rootClientId );
+		const groupingBlockAvailable = canInsertBlockType(
+			groupingBlockName,
+			rootClientId
+		);
 
 		const blocksSelection = getBlocksByClientId( clientIds );
 
-		const isSingleGroupingBlock = blocksSelection.length === 1 && blocksSelection[ 0 ] && blocksSelection[ 0 ].name === groupingBlockName;
+		const isSingleGroupingBlock =
+			blocksSelection.length === 1 &&
+			blocksSelection[ 0 ] &&
+			blocksSelection[ 0 ].name === groupingBlockName;
 
 		// Do we have
 		// 1. Grouping block available to be inserted?
 		// 2. One or more blocks selected
 		// (we allow single Blocks to become groups unless
 		// they are a soltiary group block themselves)
-		const isGroupable = (
+		const isGroupable =
 			groupingBlockAvailable &&
 			blocksSelection.length &&
-			! isSingleGroupingBlock
-		);
+			! isSingleGroupingBlock;
 
 		// Do we have a single Group Block selected and does that group have inner blocks?
-		const isUngroupable = isSingleGroupingBlock && !! blocksSelection[ 0 ].innerBlocks.length;
+		const isUngroupable =
+			isSingleGroupingBlock && !! blocksSelection[ 0 ].innerBlocks.length;
 
 		return {
 			isGroupable,
@@ -91,47 +93,52 @@ export default compose( [
 			groupingBlockName,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientIds, onToggle = noop, blocksSelection = [], groupingBlockName } ) => {
-		const {
-			replaceBlocks,
-		} = dispatch( 'core/block-editor' );
+	withDispatch(
+		(
+			dispatch,
+			{
+				clientIds,
+				onToggle = noop,
+				blocksSelection = [],
+				groupingBlockName,
+			}
+		) => {
+			const { replaceBlocks } = dispatch( 'core/block-editor' );
 
-		return {
-			onConvertToGroup() {
-				if ( ! blocksSelection.length ) {
-					return;
-				}
+			return {
+				onConvertToGroup() {
+					if ( ! blocksSelection.length ) {
+						return;
+					}
 
-				// Activate the `transform` on the Grouping Block which does the conversion
-				const newBlocks = switchToBlockType( blocksSelection, groupingBlockName );
-
-				if ( newBlocks ) {
-					replaceBlocks(
-						clientIds,
-						newBlocks
+					// Activate the `transform` on the Grouping Block which does the conversion
+					const newBlocks = switchToBlockType(
+						blocksSelection,
+						groupingBlockName
 					);
-				}
 
-				onToggle();
-			},
-			onConvertFromGroup() {
-				if ( ! blocksSelection.length ) {
-					return;
-				}
+					if ( newBlocks ) {
+						replaceBlocks( clientIds, newBlocks );
+					}
 
-				const innerBlocks = blocksSelection[ 0 ].innerBlocks;
+					onToggle();
+				},
+				onConvertFromGroup() {
+					if ( ! blocksSelection.length ) {
+						return;
+					}
 
-				if ( ! innerBlocks.length ) {
-					return;
-				}
+					const innerBlocks = blocksSelection[ 0 ].innerBlocks;
 
-				replaceBlocks(
-					clientIds,
-					innerBlocks
-				);
+					if ( ! innerBlocks.length ) {
+						return;
+					}
 
-				onToggle();
-			},
-		};
-	} ),
+					replaceBlocks( clientIds, innerBlocks );
+
+					onToggle();
+				},
+			};
+		}
+	),
 ] )( ConvertToGroupButton );

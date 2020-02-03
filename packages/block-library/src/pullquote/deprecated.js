@@ -12,9 +12,7 @@ import {
 	getColorObjectByAttributeValues,
 	RichText,
 } from '@wordpress/block-editor';
-import {
-	select,
-} from '@wordpress/data';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -88,23 +86,28 @@ const deprecated = [
 
 			// Is solid color style
 			if ( isSolidColorStyle ) {
-				const backgroundClass = getColorClassName( 'background-color', mainColor );
+				const backgroundClass = getColorClassName(
+					'background-color',
+					mainColor
+				);
 
 				figureClasses = classnames( {
-					'has-background': ( backgroundClass || customMainColor ),
+					'has-background': backgroundClass || customMainColor,
 					[ backgroundClass ]: backgroundClass,
 				} );
 
 				figureStyles = {
-					backgroundColor: backgroundClass ? undefined : customMainColor,
+					backgroundColor: backgroundClass
+						? undefined
+						: customMainColor,
 				};
-			// Is normal style and a custom color is being used ( we can set a style directly with its value)
+				// Is normal style and a custom color is being used ( we can set a style directly with its value)
 			} else if ( customMainColor ) {
 				figureStyles = {
 					borderColor: customMainColor,
 				};
-			// If normal style and a named color are being used, we need to retrieve the color value to set the style,
-			// as there is no expectation that themes create classes that set border colors.
+				// If normal style and a named color are being used, we need to retrieve the color value to set the style,
+				// as there is no expectation that themes create classes that set border colors.
 			} else if ( mainColor ) {
 				// Previously here we queried the color settings to know the color value
 				// of a named color. This made the save function impure and the block was refactored,
@@ -117,18 +120,33 @@ const deprecated = [
 				};
 			}
 
-			const blockquoteTextColorClass = getColorClassName( 'color', textColor );
-			const blockquoteClasses = ( textColor || customTextColor ) && classnames( 'has-text-color', {
-				[ blockquoteTextColorClass ]: blockquoteTextColorClass,
-			} );
+			const blockquoteTextColorClass = getColorClassName(
+				'color',
+				textColor
+			);
+			const blockquoteClasses =
+				( textColor || customTextColor ) &&
+				classnames( 'has-text-color', {
+					[ blockquoteTextColorClass ]: blockquoteTextColorClass,
+				} );
 
-			const blockquoteStyles = blockquoteTextColorClass ? undefined : { color: customTextColor };
+			const blockquoteStyles = blockquoteTextColorClass
+				? undefined
+				: { color: customTextColor };
 
 			return (
 				<figure className={ figureClasses } style={ figureStyles }>
-					<blockquote className={ blockquoteClasses } style={ blockquoteStyles } >
+					<blockquote
+						className={ blockquoteClasses }
+						style={ blockquoteStyles }
+					>
 						<RichText.Content value={ value } multiline />
-						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+						{ ! RichText.isEmpty( citation ) && (
+							<RichText.Content
+								tagName="cite"
+								value={ citation }
+							/>
+						) }
 					</blockquote>
 				</figure>
 			);
@@ -158,13 +176,24 @@ const deprecated = [
 	{
 		attributes: blockAttributes,
 		save( { attributes } ) {
-			const { mainColor, customMainColor, textColor, customTextColor, value, citation, className } = attributes;
+			const {
+				mainColor,
+				customMainColor,
+				textColor,
+				customTextColor,
+				value,
+				citation,
+				className,
+			} = attributes;
 			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
 
 			let figureClass, figureStyles;
 			// Is solid color style
 			if ( isSolidColorStyle ) {
-				figureClass = getColorClassName( 'background-color', mainColor );
+				figureClass = getColorClassName(
+					'background-color',
+					mainColor
+				);
 				if ( ! figureClass ) {
 					figureStyles = {
 						backgroundColor: customMainColor,
@@ -178,23 +207,46 @@ const deprecated = [
 				// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
 				// as there is no expectation that themes create classes that set border colors.
 			} else if ( mainColor ) {
-				const colors = get( select( 'core/block-editor' ).getSettings(), [ 'colors' ], [] );
-				const colorObject = getColorObjectByAttributeValues( colors, mainColor );
+				const colors = get(
+					select( 'core/block-editor' ).getSettings(),
+					[ 'colors' ],
+					[]
+				);
+				const colorObject = getColorObjectByAttributeValues(
+					colors,
+					mainColor
+				);
 				figureStyles = {
 					borderColor: colorObject.color,
 				};
 			}
 
-			const blockquoteTextColorClass = getColorClassName( 'color', textColor );
-			const blockquoteClasses = textColor || customTextColor ? classnames( 'has-text-color', {
-				[ blockquoteTextColorClass ]: blockquoteTextColorClass,
-			} ) : undefined;
-			const blockquoteStyle = blockquoteTextColorClass ? undefined : { color: customTextColor };
+			const blockquoteTextColorClass = getColorClassName(
+				'color',
+				textColor
+			);
+			const blockquoteClasses =
+				textColor || customTextColor
+					? classnames( 'has-text-color', {
+							[ blockquoteTextColorClass ]: blockquoteTextColorClass,
+					  } )
+					: undefined;
+			const blockquoteStyle = blockquoteTextColorClass
+				? undefined
+				: { color: customTextColor };
 			return (
 				<figure className={ figureClass } style={ figureStyles }>
-					<blockquote className={ blockquoteClasses } style={ blockquoteStyle } >
+					<blockquote
+						className={ blockquoteClasses }
+						style={ blockquoteStyle }
+					>
 						<RichText.Content value={ value } multiline />
-						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+						{ ! RichText.isEmpty( citation ) && (
+							<RichText.Content
+								tagName="cite"
+								value={ citation }
+							/>
+						) }
 					</blockquote>
 				</figure>
 			);
@@ -209,11 +261,14 @@ const deprecated = [
 			return (
 				<blockquote>
 					<RichText.Content value={ value } multiline />
-					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+					{ ! RichText.isEmpty( citation ) && (
+						<RichText.Content tagName="cite" value={ citation } />
+					) }
 				</blockquote>
 			);
 		},
-	}, {
+	},
+	{
 		attributes: {
 			...blockAttributes,
 			citation: {
@@ -233,7 +288,9 @@ const deprecated = [
 			return (
 				<blockquote className={ `align${ align }` }>
 					<RichText.Content value={ value } multiline />
-					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
+					{ ! RichText.isEmpty( citation ) && (
+						<RichText.Content tagName="footer" value={ citation } />
+					) }
 				</blockquote>
 			);
 		},

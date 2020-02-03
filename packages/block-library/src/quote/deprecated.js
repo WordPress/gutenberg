@@ -36,7 +36,9 @@ const deprecated = [
 			return (
 				<blockquote style={ { textAlign: align ? align : null } }>
 					<RichText.Content multiline value={ value } />
-					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+					{ ! RichText.isEmpty( citation ) && (
+						<RichText.Content tagName="cite" value={ citation } />
+					) }
 				</blockquote>
 			);
 		},
@@ -54,7 +56,9 @@ const deprecated = [
 			if ( attributes.style === 2 ) {
 				return {
 					...omit( attributes, [ 'style' ] ),
-					className: attributes.className ? attributes.className + ' is-style-large' : 'is-style-large',
+					className: attributes.className
+						? attributes.className + ' is-style-large'
+						: 'is-style-large',
 				};
 			}
 
@@ -70,7 +74,9 @@ const deprecated = [
 					style={ { textAlign: align ? align : null } }
 				>
 					<RichText.Content multiline value={ value } />
-					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+					{ ! RichText.isEmpty( citation ) && (
+						<RichText.Content tagName="cite" value={ citation } />
+					) }
 				</blockquote>
 			);
 		},
@@ -99,7 +105,9 @@ const deprecated = [
 					style={ { textAlign: align ? align : null } }
 				>
 					<RichText.Content multiline value={ value } />
-					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
+					{ ! RichText.isEmpty( citation ) && (
+						<RichText.Content tagName="footer" value={ citation } />
+					) }
 				</blockquote>
 			);
 		},

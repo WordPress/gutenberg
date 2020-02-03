@@ -108,15 +108,11 @@ const plugins = {};
  */
 export function registerPlugin( name, settings ) {
 	if ( typeof settings !== 'object' ) {
-		console.error(
-			'No settings object provided!'
-		);
+		console.error( 'No settings object provided!' );
 		return null;
 	}
 	if ( typeof name !== 'string' ) {
-		console.error(
-			'Plugin names must be strings.'
-		);
+		console.error( 'Plugin names must be strings.' );
 		return null;
 	}
 	if ( ! /^[a-z][a-z0-9-]*$/.test( name ) ) {
@@ -126,9 +122,7 @@ export function registerPlugin( name, settings ) {
 		return null;
 	}
 	if ( plugins[ name ] ) {
-		console.error(
-			`Plugin "${ name }" is already registered.`
-		);
+		console.error( `Plugin "${ name }" is already registered.` );
 	}
 
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
@@ -177,9 +171,7 @@ export function registerPlugin( name, settings ) {
  */
 export function unregisterPlugin( name ) {
 	if ( ! plugins[ name ] ) {
-		console.error(
-			'Plugin "' + name + '" is not registered.'
-		);
+		console.error( 'Plugin "' + name + '" is not registered.' );
 		return;
 	}
 	const oldPlugin = plugins[ name ];

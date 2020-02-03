@@ -41,7 +41,10 @@ export function AlignmentToolbar( props ) {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const activeAlignment = find( alignmentControls, ( control ) => control.align === value );
+	const activeAlignment = find(
+		alignmentControls,
+		( control ) => control.align === value
+	);
 
 	return (
 		<Toolbar
@@ -50,7 +53,7 @@ export function AlignmentToolbar( props ) {
 			label={ label }
 			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;
-				const isActive = ( value === align );
+				const isActive = value === align;
 
 				return {
 					...control,

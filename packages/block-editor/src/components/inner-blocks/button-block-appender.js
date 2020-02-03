@@ -6,7 +6,10 @@ import withClientId from './with-client-id';
 
 export const ButtonBlockAppender = ( { clientId, showSeparator } ) => {
 	return (
-		<BaseButtonBlockAppender rootClientId={ clientId } showSeparator={ showSeparator } />
+		<BaseButtonBlockAppender
+			rootClientId={ clientId }
+			showSeparator={ showSeparator }
+		/>
 	);
 };
 

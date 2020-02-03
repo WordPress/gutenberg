@@ -32,13 +32,14 @@ import { withSelect } from '@wordpress/data';
  *
  * @return {Function} Higher-order component.
  */
-const withViewportMatch = ( queries ) => createHigherOrderComponent(
-	withSelect( ( select ) => {
-		return mapValues( queries, ( query ) => {
-			return select( 'core/viewport' ).isViewportMatch( query );
-		} );
-	} ),
-	'withViewportMatch'
-);
+const withViewportMatch = ( queries ) =>
+	createHigherOrderComponent(
+		withSelect( ( select ) => {
+			return mapValues( queries, ( query ) => {
+				return select( 'core/viewport' ).isViewportMatch( query );
+			} );
+		} ),
+		'withViewportMatch'
+	);
 
 export default withViewportMatch;

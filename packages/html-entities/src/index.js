@@ -21,8 +21,13 @@ export function decodeEntities( html ) {
 
 	// create a textarea for decoding entities, that we can reuse
 	if ( undefined === _decodeTextArea ) {
-		if ( document.implementation && document.implementation.createHTMLDocument ) {
-			_decodeTextArea = document.implementation.createHTMLDocument( '' ).createElement( 'textarea' );
+		if (
+			document.implementation &&
+			document.implementation.createHTMLDocument
+		) {
+			_decodeTextArea = document.implementation
+				.createHTMLDocument( '' )
+				.createElement( 'textarea' );
 		} else {
 			_decodeTextArea = document.createElement( 'textarea' );
 		}
