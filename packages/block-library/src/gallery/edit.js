@@ -60,6 +60,10 @@ const MOBILE_CONTROL_PROPS = Platform.select( {
 	web: {},
 	native: { separatorType: 'fullWidth' },
 } );
+const MOBILE_CONTROL_PROPS_SEPARATOR_NONE = Platform.select( {
+	web: {},
+	native: { separatorType: 'none' },
+} );
 
 class GalleryEdit extends Component {
 	constructor() {
@@ -339,7 +343,16 @@ class GalleryEdit extends Component {
 			return mediaPlaceholder;
 		}
 
-		const imageSizeOptions = this.getImagesSizeOptions();
+		// disable image size options on mobile for now
+		const imageSizeOptions = Platform.select( {
+			web: this.getImagesSizeOptions(),
+			native: [],
+		} );
+		const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+		// This is needed to fix a separator fence-post issue on mobile.
+		const mobileLinkToProps = shouldShowSizeOptions ?
+			MOBILE_CONTROL_PROPS :
+			MOBILE_CONTROL_PROPS_SEPARATOR_NONE;
 
 		return (
 			<>
@@ -363,14 +376,15 @@ class GalleryEdit extends Component {
 						/>
 						<SelectControl
 							label={ __( 'Link To' ) }
-							{ ...MOBILE_CONTROL_PROPS }
+							{ ...mobileLinkToProps }
 							value={ linkTo }
 							onChange={ this.setLinkTo }
 							options={ linkOptions }
 						/>
-						{ hasImages && ! isEmpty( imageSizeOptions ) && (
+						{ shouldShowSizeOptions && (
 							<SelectControl
 								label={ __( 'Images Size' ) }
+								{ ...MOBILE_CONTROL_PROPS_SEPARATOR_NONE }
 								value={ sizeSlug }
 								options={ imageSizeOptions }
 								onChange={ this.updateImagesSize }

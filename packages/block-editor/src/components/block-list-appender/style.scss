@@ -10,6 +10,16 @@
 	}
 }
 
+.block-list-appender.is-drop-target > div::before {
+	content: "";
+	position: absolute;
+	right: -$block-padding;
+	left: -$block-padding;
+	top: -$block-padding;
+	bottom: -$block-padding;
+	border: 3px solid theme(primary);
+}
+
 .block-list-appender > .block-editor-inserter {
 	display: block;
 }

@@ -32,6 +32,7 @@ export const settings = {
 		align: true,
 		alignWide: false,
 	},
+	parent: [ 'core/buttons' ],
 	styles: [
 		{ name: 'fill', label: __( 'Fill' ), isDefault: true },
 		{ name: 'outline', label: __( 'Outline' ) },

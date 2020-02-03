@@ -43,8 +43,8 @@ const TEMPLATE = [
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
-export const LINK_DESTINATION_MEDIA = 'media';
-export const LINK_DESTINATION_ATTACHMENT = 'attachment';
+const LINK_DESTINATION_MEDIA = 'media';
+const LINK_DESTINATION_ATTACHMENT = 'attachment';
 
 class MediaTextEdit extends Component {
 	constructor() {

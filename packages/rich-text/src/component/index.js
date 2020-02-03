@@ -36,6 +36,7 @@ import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
 import withFormatTypes from './with-format-types';
 import { BoundaryStyle } from './boundary-style';
+import { InlineWarning } from './inline-warning';
 
 /**
  * Browser dependencies
@@ -188,15 +189,6 @@ class RichText extends Component {
 	}
 
 	componentDidMount() {
-		if ( process.env.NODE_ENV === 'development' ) {
-			const computedStyle = getComputedStyle( this.props.forwardedRef.current );
-
-			if ( computedStyle.display === 'inline' ) {
-				// eslint-disable-next-line no-console
-				console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
-			}
-		}
-
 		this.applyRecord( this.record, { domOnly: true } );
 	}
 
@@ -358,19 +350,29 @@ class RichText extends Component {
 			unstableOnFocus();
 		}
 
-		// We know for certain that on focus, the old selection is invalid. It
-		// will be recalculated on the next mouseup, keyup, or touchend event.
-		const index = undefined;
-		const activeFormats = EMPTY_ACTIVE_FORMATS;
+		if ( ! this.props.__unstableIsSelected ) {
+			// We know for certain that on focus, the old selection is invalid. It
+			// will be recalculated on the next mouseup, keyup, or touchend event.
+			const index = undefined;
+			const activeFormats = EMPTY_ACTIVE_FORMATS;
 
-		this.record = {
-			...this.record,
-			start: index,
-			end: index,
-			activeFormats,
-		};
-		this.props.onSelectionChange( index, index );
-		this.setState( { activeFormats } );
+			this.record = {
+				...this.record,
+				start: index,
+				end: index,
+				activeFormats,
+			};
+			this.props.onSelectionChange( index, index );
+			this.setState( { activeFormats } );
+		} else {
+			this.props.onSelectionChange( this.record.start, this.record.end );
+			this.setState( {
+				activeFormats: getActiveFormats( {
+					...this.record,
+					activeFormats: undefined,
+				}, EMPTY_ACTIVE_FORMATS ),
+			} );
+		}
 
 		// Update selection as soon as possible, which is at the next animation
 		// frame. The event listener for selection changes may be added too late
@@ -1067,23 +1069,31 @@ class RichText extends Component {
 		} = this.props;
 		const { activeFormats } = this.state;
 
+		const onFocus = () => {
+			forwardedRef.current.focus();
+			this.applyRecord( this.record );
+		};
+
 		return (
 			<>
 				<BoundaryStyle
 					activeFormats={ activeFormats }
 					forwardedRef={ forwardedRef }
 				/>
+				<InlineWarning forwardedRef={ forwardedRef } />
 				{ isSelected && <FormatEdit
 					allowedFormats={ allowedFormats }
 					withoutInteractiveFormatting={ withoutInteractiveFormatting }
 					value={ this.record }
 					onChange={ this.onChange }
+					onFocus={ onFocus }
 					formatTypes={ formatTypes }
 				/> }
 				{ children && children( {
 					isSelected,
 					value: this.record,
 					onChange: this.onChange,
+					onFocus,
 					Editable: this.Editable,
 				} ) }
 				{ ! children && <this.Editable /> }

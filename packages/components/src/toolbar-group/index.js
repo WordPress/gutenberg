@@ -53,9 +53,8 @@ function ToolbarGroup( {
 	children,
 	className,
 	isCollapsed,
-	icon,
 	title,
-	...otherProps
+	...props
 } ) {
 	// It'll contain state if `ToolbarGroup` is being used within
 	// `<Toolbar accessibilityLabel="label" />`
@@ -81,18 +80,17 @@ function ToolbarGroup( {
 	if ( isCollapsed ) {
 		return (
 			<ToolbarGroupCollapsed
-				icon={ icon }
 				label={ title }
 				controls={ controlSets }
 				className={ finalClassName }
 				children={ children }
-				{ ...otherProps }
+				{ ...props }
 			/>
 		);
 	}
 
 	return (
-		<ToolbarGroupContainer className={ finalClassName } { ...otherProps }>
+		<ToolbarGroupContainer className={ finalClassName } { ...props }>
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
 				controlSet.map( ( control, indexOfControl ) => (
 					<ToolbarButton

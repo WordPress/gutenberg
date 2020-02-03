@@ -6,18 +6,21 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 
-function EditorModeKeyboardShortcuts() {
+function KeyboardShortcuts() {
 	const {
 		getBlockSelectionStart,
-		getEditorSettings,
 		getEditorMode,
-		isEditorSidebarOpen,
+		isEditorSidebarOpened,
+		richEditingEnabled,
+		codeEditingEnabled,
 	} = useSelect( ( select ) => {
+		const settings = select( 'core/editor' ).getEditorSettings();
 		return {
 			getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
-			getEditorSettings: select( 'core/editor' ).getEditorSettings,
 			getEditorMode: select( 'core/edit-post' ).getEditorMode,
 			isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened,
+			richEditingEnabled: settings.richEditingEnabled,
+			codeEditingEnabled: settings.codeEditingEnabled,
 		};
 	} );
 
@@ -36,6 +39,16 @@ function EditorModeKeyboardShortcuts() {
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'm',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-post/toggle-block-navigation',
+			category: 'global',
+			description: __( 'Open the block navigation menu.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'o',
 			},
 		} );
 
@@ -76,22 +89,28 @@ function EditorModeKeyboardShortcuts() {
 				character: 'p',
 			} ],
 		} );
+
+		registerShortcut( {
+			name: 'core/edit-post/keyboard-shortcuts',
+			category: 'main',
+			description: __( 'Display these keyboard shortcuts.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'h',
+			},
+		} );
 	}, [] );
 
 	useShortcut( 'core/edit-post/toggle-mode', () => {
-		const { richEditingEnabled, codeEditingEnabled } = getEditorSettings();
-		if ( ! richEditingEnabled || ! codeEditingEnabled ) {
-			return;
-		}
 		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
-	}, { bindGlobal: true } );
+	}, { bindGlobal: true, isDisabled: ! richEditingEnabled || ! codeEditingEnabled } );
 
 	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
 		// This shortcut has no known clashes, but use preventDefault to prevent any
 		// obscure shortcuts from triggering.
 		event.preventDefault();
 
-		if ( isEditorSidebarOpen ) {
+		if ( isEditorSidebarOpened() ) {
 			closeGeneralSidebar();
 		} else {
 			const sidebarToOpen = getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document';
@@ -102,4 +121,4 @@ function EditorModeKeyboardShortcuts() {
 	return null;
 }
 
-export default EditorModeKeyboardShortcuts;
+export default KeyboardShortcuts;

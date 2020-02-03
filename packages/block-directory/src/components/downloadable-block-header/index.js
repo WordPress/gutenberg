@@ -14,7 +14,7 @@ function DownloadableBlockHeader( { icon, title, rating, ratingCount, onClick } 
 	return (
 		<div className="block-directory-downloadable-block-header__row">
 			{
-				icon.match( /\.(jpeg|jpg|gif|png)$/ ) !== null ?
+				icon.match( /\.(jpeg|jpg|gif|png)(?:\?.*)?$/ ) !== null ?
 					// translators: %s: Name of the plugin e.g: "Akismet".
 					<img src={ icon } alt={ sprintf( __( '%s block icon' ), title ) } /> :
 					<span >
@@ -35,7 +35,7 @@ function DownloadableBlockHeader( { icon, title, rating, ratingCount, onClick } 
 					onClick();
 				} }
 			>
-				{ __( 'Add' ) }
+				{ __( 'Add block' ) }
 			</Button>
 		</div>
 	);

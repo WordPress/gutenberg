@@ -4,7 +4,7 @@
 import Animate from '../';
 import Notice from '../../notice';
 
-export default { title: 'Components|Animate', component: Animate };
+export default { title: 'Components/Animate', component: Animate };
 
 export const _default = () => (
 	<Animate>
@@ -18,10 +18,7 @@ export const _default = () => (
 
 // Unexported helper for different origins.
 const Appear = ( { origin } ) => (
-	<Animate
-		type="appear"
-		options={ { origin } }
-	>
+	<Animate type="appear" options={ { origin } }>
 		{ ( { className } ) => (
 			<Notice className={ className } status="success">
 				<p>Appear animation. Origin: { origin }.</p>

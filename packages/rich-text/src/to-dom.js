@@ -278,10 +278,7 @@ export function applySelection( { startPath, endPath }, current ) {
 	range.setStart( startContainer, startOffset );
 	range.setEnd( endContainer, endOffset );
 
-	// Set back focus if focus is lost.
-	if ( ownerDocument.activeElement !== current ) {
-		current.focus();
-	}
+	const { activeElement } = ownerDocument;
 
 	if ( selection.rangeCount > 0 ) {
 		// If the to be added range and the live range are the same, there's no
@@ -294,4 +291,5 @@ export function applySelection( { startPath, endPath }, current ) {
 	}
 
 	selection.addRange( range );
+	activeElement.focus();
 }
