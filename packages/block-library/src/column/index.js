@@ -38,4 +38,3 @@ export const settings = {
 	edit,
 	save,
 };
-

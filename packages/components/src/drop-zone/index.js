@@ -70,11 +70,14 @@ function DropZoneComponent( {
 	onDrop,
 } ) {
 	const element = useRef();
-	const {
-		isDraggingOverDocument,
-		isDraggingOverElement,
-		type,
-	} = useDropZone( { element, onFilesDrop, onHTMLDrop, onDrop } );
+	const { isDraggingOverDocument, isDraggingOverElement, type } = useDropZone(
+		{
+			element,
+			onFilesDrop,
+			onHTMLDrop,
+			onDrop,
+		}
+	);
 
 	let children;
 
@@ -94,11 +97,11 @@ function DropZoneComponent( {
 	}
 
 	const classes = classnames( 'components-drop-zone', className, {
-		'is-active': ( isDraggingOverDocument || isDraggingOverElement ) && (
-			( type === 'file' && onFilesDrop ) ||
-			( type === 'html' && onHTMLDrop ) ||
-			( type === 'default' && onDrop )
-		),
+		'is-active':
+			( isDraggingOverDocument || isDraggingOverElement ) &&
+			( ( type === 'file' && onFilesDrop ) ||
+				( type === 'html' && onHTMLDrop ) ||
+				( type === 'default' && onDrop ) ),
 		'is-dragging-over-document': isDraggingOverDocument,
 		'is-dragging-over-element': isDraggingOverElement,
 		[ `is-dragging-${ type }` ]: !! type,

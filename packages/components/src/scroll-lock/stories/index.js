@@ -24,7 +24,8 @@ const Example = () => {
 				</Button>
 				{ isScrollLocked && <ScrollLock /> }
 				<p>
-					Scroll locked: <strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
+					Scroll locked:{ ' ' }
+					<strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
 				</p>
 			</ToggleContainer>
 		</StripedBackground>

@@ -20,9 +20,7 @@ const BlockCaption = ( {
 	shouldDisplay,
 	text,
 } ) => (
-	<View
-		style={ { flex: 1, padding: 12 } }
-	>
+	<View style={ { flex: 1, padding: 12 } }>
 		<Caption
 			accessibilityLabelCreator={ accessibilityLabelCreator }
 			accessible={ accessible }
@@ -38,16 +36,16 @@ const BlockCaption = ( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlockAttributes,
-			getSelectedBlockClientId,
-		} = select( 'core/block-editor' );
+		const { getBlockAttributes, getSelectedBlockClientId } = select(
+			'core/block-editor'
+		);
 		const { caption } = getBlockAttributes( clientId );
 		const isBlockSelected = getSelectedBlockClientId() === clientId;
 
 		// We'll render the caption so that the soft keyboard is not forced to close on Android
 		// but still hide it by setting its display style to none. See wordpress-mobile/gutenberg-mobile#1221
-		const shouldDisplay = ! RichText.isEmpty( caption ) > 0 || isBlockSelected;
+		const shouldDisplay =
+			! RichText.isEmpty( caption ) > 0 || isBlockSelected;
 
 		return {
 			shouldDisplay,

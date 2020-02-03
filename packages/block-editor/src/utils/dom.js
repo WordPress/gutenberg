@@ -43,7 +43,10 @@ export function isBlockFocusStop( element ) {
  * @return {boolean} Whether elements are in the same block.
  */
 export function isInSameBlock( a, b ) {
-	return a.closest( '.block-editor-block-list__block' ) === b.closest( '.block-editor-block-list__block' );
+	return (
+		a.closest( '.block-editor-block-list__block' ) ===
+		b.closest( '.block-editor-block-list__block' )
+	);
 }
 
 /**
@@ -55,9 +58,12 @@ export function isInSameBlock( a, b ) {
  * @return {boolean} Whether element is in the block Element but not its children.
  */
 export function isInsideRootBlock( blockElement, element ) {
-	const innerBlocksContainer = blockElement.querySelector( '.block-editor-block-list__layout' );
-	return blockElement.contains( element ) && (
-		! innerBlocksContainer || ! innerBlocksContainer.contains( element )
+	const innerBlocksContainer = blockElement.querySelector(
+		'.block-editor-block-list__layout'
+	);
+	return (
+		blockElement.contains( element ) &&
+		( ! innerBlocksContainer || ! innerBlocksContainer.contains( element ) )
 	);
 }
 

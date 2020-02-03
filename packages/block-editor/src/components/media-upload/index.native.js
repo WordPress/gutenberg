@@ -53,7 +53,12 @@ const siteLibrarySource = {
 	mediaLibrary: true,
 };
 
-const internalSources = [ deviceLibrarySource, cameraImageSource, cameraVideoSource, siteLibrarySource ];
+const internalSources = [
+	deviceLibrarySource,
+	cameraImageSource,
+	cameraVideoSource,
+	siteLibrarySource,
+];
 
 export class MediaUpload extends React.Component {
 	constructor( props ) {
@@ -70,13 +75,15 @@ export class MediaUpload extends React.Component {
 	componentDidMount() {
 		const { allowedTypes = [] } = this.props;
 		getOtherMediaOptions( allowedTypes, ( otherMediaOptions ) => {
-			const otherMediaOptionsWithIcons = otherMediaOptions.map( ( option ) => {
-				return {
-					...option,
-					types: allowedTypes,
-					id: option.value,
-				};
-			} );
+			const otherMediaOptionsWithIcons = otherMediaOptions.map(
+				( option ) => {
+					return {
+						...option,
+						types: allowedTypes,
+						id: option.value,
+					};
+				}
+			);
 
 			this.setState( { otherMediaOptions: otherMediaOptionsWithIcons } );
 		} );
@@ -87,7 +94,11 @@ export class MediaUpload extends React.Component {
 	}
 
 	getMediaOptionsItems() {
-		const { allowedTypes = [], multiple = false, onlyMediaLibrary } = this.props;
+		const {
+			allowedTypes = [],
+			multiple = false,
+			onlyMediaLibrary,
+		} = this.props;
 
 		// disable upload sources for now when multiple flag is set
 		// eslint-disable-next-line no-undef
@@ -97,14 +108,20 @@ export class MediaUpload extends React.Component {
 			}
 		}
 
-		return this.getAllSources().filter( ( source ) => {
-			return onlyMediaLibrary ? source.mediaLibrary : allowedTypes.filter( ( allowedType ) => source.types.includes( allowedType ) ).length > 0;
-		} ).map( ( source ) => {
-			return {
-				...source,
-				icon: source.icon || this.getChooseFromDeviceIcon(),
-			};
-		} );
+		return this.getAllSources()
+			.filter( ( source ) => {
+				return onlyMediaLibrary
+					? source.mediaLibrary
+					: allowedTypes.filter( ( allowedType ) =>
+							source.types.includes( allowedType )
+					  ).length > 0;
+			} )
+			.map( ( source ) => {
+				return {
+					...source,
+					icon: source.icon || this.getChooseFromDeviceIcon(),
+				};
+			} );
 	}
 
 	getChooseFromDeviceIcon() {
@@ -129,8 +146,12 @@ export class MediaUpload extends React.Component {
 
 	onPickerSelect( value ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
-		const mediaSource = this.getAllSources().filter( ( source ) => source.value === value ).shift();
-		const types = allowedTypes.filter( ( type ) => mediaSource.types.includes( type ) );
+		const mediaSource = this.getAllSources()
+			.filter( ( source ) => source.value === value )
+			.shift();
+		const types = allowedTypes.filter( ( type ) =>
+			mediaSource.types.includes( type )
+		);
 
 		requestMediaPicker( mediaSource.id, types, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
@@ -143,13 +164,16 @@ export class MediaUpload extends React.Component {
 		const getMediaOptions = () => (
 			<Picker
 				hideCancelButton
-				ref={ ( instance ) => this.picker = instance }
+				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }
 				onChange={ this.onPickerSelect }
 			/>
 		);
 
-		return this.props.render( { open: this.onPickerPresent, getMediaOptions } );
+		return this.props.render( {
+			open: this.onPickerPresent,
+			getMediaOptions,
+		} );
 	}
 }
 

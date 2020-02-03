@@ -3,7 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { AlignmentToolbar,
+import {
+	AlignmentToolbar,
 	BlockControls,
 	RichText,
 	__experimentalUseColors,
@@ -11,25 +12,19 @@ import { AlignmentToolbar,
 
 const name = 'core/paragraph';
 
-function ParagraphBlock(
-	{
-		attributes,
-		mergeBlocks,
-		onReplace,
-		setAttributes,
-		style,
-	}
-) {
-	const {
-		align,
-		content,
-		placeholder,
-	} = attributes;
+function ParagraphBlock( {
+	attributes,
+	mergeBlocks,
+	onReplace,
+	setAttributes,
+	style,
+} ) {
+	const { align, content, placeholder } = attributes;
 
 	/* eslint-disable @wordpress/no-unused-vars-before-return */
-	const { TextColor } = __experimentalUseColors(
-		[ { name: 'textColor', property: 'color' } ],
-	);
+	const { TextColor } = __experimentalUseColors( [
+		{ name: 'textColor', property: 'color' },
+	] );
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 
 	return (

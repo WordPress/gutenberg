@@ -1,4 +1,13 @@
-export { SVG, Path, Circle, Polygon, Rect, G, HorizontalRule, BlockQuotation } from '@wordpress/primitives';
+export {
+	SVG,
+	Path,
+	Circle,
+	Polygon,
+	Rect,
+	G,
+	HorizontalRule,
+	BlockQuotation,
+} from '@wordpress/primitives';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as Dashicon } from './dashicon';
@@ -10,7 +19,12 @@ export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
 export { default as Spinner } from './spinner';
-export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
+export {
+	createSlotFill,
+	Slot,
+	Fill,
+	Provider as SlotFillProvider,
+} from './slot-fill';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';

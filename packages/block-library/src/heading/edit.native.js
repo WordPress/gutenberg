@@ -27,17 +27,12 @@ const HeadingEdit = ( {
 	setAttributes,
 	style,
 } ) => {
-	const {
-		align,
-		content,
-		level,
-		placeholder,
-	} = attributes;
+	const { align, content, level, placeholder } = attributes;
 
 	/* eslint-disable @wordpress/no-unused-vars-before-return */
-	const { TextColor } = __experimentalUseColors(
-		[ { name: 'textColor', property: 'color' } ],
-	);
+	const { TextColor } = __experimentalUseColors( [
+		{ name: 'textColor', property: 'color' },
+	] );
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 
 	return (
@@ -47,7 +42,9 @@ const HeadingEdit = ( {
 					minLevel={ 2 }
 					maxLevel={ 7 }
 					selectedLevel={ level }
-					onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
 					isCollapsed={ false }
 				/>
 			</BlockControls>
@@ -57,7 +54,9 @@ const HeadingEdit = ( {
 					tagName={ 'h' + level }
 					value={ content }
 					style={ style }
-					onChange={ ( value ) => setAttributes( { content: value } ) }
+					onChange={ ( value ) =>
+						setAttributes( { content: value } )
+					}
 					onMerge={ mergeBlocks }
 					onSplit={ ( value ) => {
 						if ( ! value ) {

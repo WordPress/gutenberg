@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
-import { useInstanceId, __experimentalUseDragging as useDragging } from '@wordpress/compose';
+import {
+	useInstanceId,
+	__experimentalUseDragging as useDragging,
+} from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -29,8 +32,8 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 	const setAngleCircleCenter = () => {
 		const rect = angleCircleRef.current.getBoundingClientRect();
 		angleCircleCenter.current = {
-			x: rect.x + ( rect.width / 2 ),
-			y: rect.y + ( rect.height / 2 ),
+			x: rect.x + rect.width / 2,
+			y: rect.y + rect.height / 2,
 		};
 	};
 
@@ -47,7 +50,7 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 		onDragMove: changeAngleToPosition,
 		onDragEnd: changeAngleToPosition,
 	} );
-	return	(
+	return (
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		<div
 			ref={ angleCircleRef }
@@ -57,7 +60,9 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 			{ ...props }
 		>
 			<div
-				style={ value ? { transform: `rotate(${ value }deg)` } : undefined }
+				style={
+					value ? { transform: `rotate(${ value }deg)` } : undefined
+				}
 				className="components-angle-picker__angle-circle-indicator-wrapper"
 			>
 				<span className="components-angle-picker__angle-circle-indicator" />
@@ -67,7 +72,11 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 	);
 };
 
-export default function AnglePicker( { value, onChange, label = __( 'Angle' ) } ) {
+export default function AnglePicker( {
+	value,
+	onChange,
+	label = __( 'Angle' ),
+} ) {
 	const instanceId = useInstanceId( AnglePicker );
 	const inputId = `components-angle-picker__input-${ instanceId }`;
 	return (
@@ -87,9 +96,10 @@ export default function AnglePicker( { value, onChange, label = __( 'Angle' ) } 
 				id={ inputId }
 				onChange={ ( event ) => {
 					const unprocessedValue = event.target.value;
-					const inputValue = unprocessedValue !== '' ?
-						parseInt( event.target.value, 10 ) :
-						0;
+					const inputValue =
+						unprocessedValue !== ''
+							? parseInt( event.target.value, 10 )
+							: 0;
 					onChange( inputValue );
 				} }
 				value={ value }
@@ -100,4 +110,3 @@ export default function AnglePicker( { value, onChange, label = __( 'Angle' ) } 
 		</BaseControl>
 	);
 }
-

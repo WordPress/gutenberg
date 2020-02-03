@@ -18,7 +18,9 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Video' ),
-	description: __( 'Embed a video from your media library or upload a new one.' ),
+	description: __(
+		'Embed a video from your media library or upload a new one.'
+	),
 	icon,
 	keywords: [ __( 'movie' ) ],
 	transforms,

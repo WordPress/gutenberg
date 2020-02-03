@@ -12,10 +12,8 @@ import { createNotice, removeNotice } from '../actions';
 import { getNotices } from '../selectors';
 import { DEFAULT_CONTEXT } from '../constants';
 
-const getYieldedOfType = ( generatorAction, type ) => find(
-	Array.from( generatorAction ),
-	matchesProperty( [ 'type' ], type )
-);
+const getYieldedOfType = ( generatorAction, type ) =>
+	find( Array.from( generatorAction ), matchesProperty( [ 'type' ], type ) );
 
 describe( 'reducer', () => {
 	it( 'should default to an empty object', () => {
@@ -25,7 +23,10 @@ describe( 'reducer', () => {
 	} );
 
 	it( 'should track a notice', () => {
-		const action = getYieldedOfType( createNotice( 'error', 'save error' ), 'CREATE_NOTICE' );
+		const action = getYieldedOfType(
+			createNotice( 'error', 'save error' ),
+			'CREATE_NOTICE'
+		);
 		const state = reducer( undefined, action );
 
 		expect( state ).toEqual( {
@@ -43,7 +44,10 @@ describe( 'reducer', () => {
 	} );
 
 	it( 'should track a notice by context', () => {
-		const action = getYieldedOfType( createNotice( 'error', 'save error', { context: 'foo' } ), 'CREATE_NOTICE' );
+		const action = getYieldedOfType(
+			createNotice( 'error', 'save error', { context: 'foo' } ),
+			'CREATE_NOTICE'
+		);
 		const state = reducer( undefined, action );
 
 		expect( state ).toEqual( {
@@ -61,10 +65,16 @@ describe( 'reducer', () => {
 	} );
 
 	it( 'should track notices, respecting order by which they were created', () => {
-		let action = getYieldedOfType( createNotice( 'error', 'save error' ), 'CREATE_NOTICE' );
+		let action = getYieldedOfType(
+			createNotice( 'error', 'save error' ),
+			'CREATE_NOTICE'
+		);
 		const original = deepFreeze( reducer( undefined, action ) );
 
-		action = getYieldedOfType( createNotice( 'success', 'successfully saved' ), 'CREATE_NOTICE' );
+		action = getYieldedOfType(
+			createNotice( 'success', 'successfully saved' ),
+			'CREATE_NOTICE'
+		);
 		const state = reducer( original, action );
 
 		expect( state ).toEqual( {
@@ -90,7 +100,10 @@ describe( 'reducer', () => {
 	} );
 
 	it( 'should omit a removed notice', () => {
-		const action = getYieldedOfType( createNotice( 'error', 'save error' ), 'CREATE_NOTICE' );
+		const action = getYieldedOfType(
+			createNotice( 'error', 'save error' ),
+			'CREATE_NOTICE'
+		);
 		const original = deepFreeze( reducer( undefined, action ) );
 		const id = getNotices( original )[ 0 ].id;
 
@@ -102,7 +115,10 @@ describe( 'reducer', () => {
 	} );
 
 	it( 'should omit a removed notice by context', () => {
-		const action = getYieldedOfType( createNotice( 'error', 'save error', { context: 'foo' } ), 'CREATE_NOTICE' );
+		const action = getYieldedOfType(
+			createNotice( 'error', 'save error', { context: 'foo' } ),
+			'CREATE_NOTICE'
+		);
 		const original = deepFreeze( reducer( undefined, action ) );
 		const id = getNotices( original, 'foo' )[ 0 ].id;
 
@@ -114,7 +130,10 @@ describe( 'reducer', () => {
 	} );
 
 	it( 'should omit a removed notice across contexts', () => {
-		const action = getYieldedOfType( createNotice( 'error', 'save error' ), 'CREATE_NOTICE' );
+		const action = getYieldedOfType(
+			createNotice( 'error', 'save error' ),
+			'CREATE_NOTICE'
+		);
 		const original = deepFreeze( reducer( undefined, action ) );
 		const id = getNotices( original )[ 0 ].id;
 
@@ -124,10 +143,16 @@ describe( 'reducer', () => {
 	} );
 
 	it( 'should dedupe distinct ids, preferring new', () => {
-		let action = getYieldedOfType( createNotice( 'error', 'save error (1)', { id: 'error-message' } ), 'CREATE_NOTICE' );
+		let action = getYieldedOfType(
+			createNotice( 'error', 'save error (1)', { id: 'error-message' } ),
+			'CREATE_NOTICE'
+		);
 		const original = deepFreeze( reducer( undefined, action ) );
 
-		action = getYieldedOfType( createNotice( 'error', 'save error (2)', { id: 'error-message' } ), 'CREATE_NOTICE' );
+		action = getYieldedOfType(
+			createNotice( 'error', 'save error (2)', { id: 'error-message' } ),
+			'CREATE_NOTICE'
+		);
 		const state = reducer( original, action );
 
 		expect( state ).toEqual( {

@@ -20,9 +20,7 @@ export function KeyboardShortcutsHelpMenuItem( { openModal } ) {
 }
 
 export default withDispatch( ( dispatch ) => {
-	const {
-		openModal,
-	} = dispatch( 'core/edit-post' );
+	const { openModal } = dispatch( 'core/edit-post' );
 
 	return {
 		openModal,

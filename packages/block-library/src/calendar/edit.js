@@ -7,9 +7,7 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import {
-	Disabled,
-} from '@wordpress/components';
+import { Disabled } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import ServerSideRender from '@wordpress/server-side-render';
@@ -17,13 +15,14 @@ import ServerSideRender from '@wordpress/server-side-render';
 class CalendarEdit extends Component {
 	constructor() {
 		super( ...arguments );
-		this.getYearMonth = memoize(
-			this.getYearMonth.bind( this ),
-			{ maxSize: 1 }
-		);
+		this.getYearMonth = memoize( this.getYearMonth.bind( this ), {
+			maxSize: 1,
+		} );
 		this.getServerSideAttributes = memoize(
 			this.getServerSideAttributes.bind( this ),
-			{ maxSize: 1 }
+			{
+				maxSize: 1,
+			}
 		);
 	}
 
@@ -65,16 +64,13 @@ export default withSelect( ( select ) => {
 	if ( ! coreEditorSelect ) {
 		return;
 	}
-	const {
-		getEditedPostAttribute,
-	} = coreEditorSelect;
+	const { getEditedPostAttribute } = coreEditorSelect;
 	const postType = getEditedPostAttribute( 'type' );
 	// Dates are used to overwrite year and month used on the calendar.
 	// This overwrite should only happen for 'post' post types.
 	// For other post types the calendar always displays the current month.
 	return {
-		date: postType === 'post' ?
-			getEditedPostAttribute( 'date' ) :
-			undefined,
+		date:
+			postType === 'post' ? getEditedPostAttribute( 'date' ) : undefined,
 	};
 } )( CalendarEdit );

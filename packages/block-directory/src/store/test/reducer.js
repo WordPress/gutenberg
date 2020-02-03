@@ -6,11 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import {
-	downloadableBlocks,
-	blockManagement,
-	hasPermission,
-} from '../reducer';
+import { downloadableBlocks, blockManagement, hasPermission } from '../reducer';
 import { installedItem, downloadableBlock } from './fixtures';
 
 describe( 'state', () => {
@@ -36,14 +32,16 @@ describe( 'state', () => {
 			expect( state.isRequestingDownloadableBlocks ).toBe( false );
 		} );
 
-		it( 'should set user\'s search term and save results', () => {
+		it( "should set user's search term and save results", () => {
 			const state = downloadableBlocks( undefined, {
 				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
 				filterValue: downloadableBlock.title,
 				downloadableBlocks: [ downloadableBlock ],
 			} );
 			expect( state.results ).toHaveProperty( downloadableBlock.title );
-			expect( state.results[ downloadableBlock.title ] ).toHaveLength( 1 );
+			expect( state.results[ downloadableBlock.title ] ).toHaveLength(
+				1
+			);
 
 			// It should append to the results
 			const updatedState = downloadableBlocks( state, {

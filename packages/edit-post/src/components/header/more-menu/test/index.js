@@ -10,9 +10,7 @@ import MoreMenu from '../index';
 
 describe( 'MoreMenu', () => {
 	it( 'should match snapshot', () => {
-		const wrapper = mount(
-			<MoreMenu />
-		);
+		const wrapper = mount( <MoreMenu /> );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );

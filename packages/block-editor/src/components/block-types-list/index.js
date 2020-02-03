@@ -8,34 +8,45 @@ import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
  */
 import InserterListItem from '../inserter-list-item';
 
-function BlockTypesList( { items = [], onSelect, onHover = () => {}, children } ) {
+function BlockTypesList( {
+	items = [],
+	onSelect,
+	onHover = () => {},
+	children,
+} ) {
 	const normalizedItems = items.reduce( ( result, item ) => {
-		const { patterns = [] } = item;
-		const hasDefaultPattern = patterns.some( ( { isDefault } ) => isDefault );
+		const { variations = [] } = item;
+		const hasDefaultVariation = variations.some(
+			( { isDefault } ) => isDefault
+		);
 
-		// If there is no default inserter pattern provided,
+		// If there is no default inserter variation provided,
 		// then default block type is displayed.
-		if ( ! hasDefaultPattern ) {
+		if ( ! hasDefaultVariation ) {
 			result.push( item );
 		}
 
-		if ( patterns.length ) {
-			result = result.concat( patterns.map( ( pattern ) => {
-				return {
-					...item,
-					id: `${ item.id }-${ pattern.name }`,
-					icon: pattern.icon || item.icon,
-					title: pattern.title || item.title,
-					description: pattern.description || item.description,
-					// If `example` is explicitly undefined for the pattern, the preview will not be shown.
-					example: pattern.hasOwnProperty( 'example' ) ? pattern.example : item.example,
-					initialAttributes: {
-						...item.initialAttributes,
-						...pattern.attributes,
-					},
-					innerBlocks: pattern.innerBlocks,
-				};
-			} ) );
+		if ( variations.length ) {
+			result = result.concat(
+				variations.map( ( variation ) => {
+					return {
+						...item,
+						id: `${ item.id }-${ variation.name }`,
+						icon: variation.icon || item.icon,
+						title: variation.title || item.title,
+						description: variation.description || item.description,
+						// If `example` is explicitly undefined for the variation, the preview will not be shown.
+						example: variation.hasOwnProperty( 'example' )
+							? variation.example
+							: item.example,
+						initialAttributes: {
+							...item.initialAttributes,
+							...variation.attributes,
+						},
+						innerBlocks: variation.innerBlocks,
+					};
+				} )
+			);
 		}
 
 		return result;

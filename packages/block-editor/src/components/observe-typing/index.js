@@ -41,12 +41,11 @@ function isKeyDownEligibleForStartTyping( event ) {
 	return ! shiftKey && includes( KEY_DOWN_ELIGIBLE_KEY_CODES, keyCode );
 }
 
-function ObserveTyping( {
-	children,
-	setTimeout: setSafeTimeout,
-} ) {
+function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	const lastMouseMove = useRef();
-	const isTyping = useSelect( ( select ) => select( 'core/block-editor' ).isTyping() );
+	const isTyping = useSelect( ( select ) =>
+		select( 'core/block-editor' ).isTyping()
+	);
 	const { startTyping, stopTyping } = useDispatch( 'core/block-editor' );
 	useEffect( () => {
 		toggleEventBindings( isTyping );
@@ -61,7 +60,10 @@ function ObserveTyping( {
 	 */
 	function toggleEventBindings( isBound ) {
 		const bindFn = isBound ? 'addEventListener' : 'removeEventListener';
-		document[ bindFn ]( 'selectionchange', stopTypingOnSelectionUncollapse );
+		document[ bindFn ](
+			'selectionchange',
+			stopTypingOnSelectionUncollapse
+		);
 		document[ bindFn ]( 'mousemove', stopTypingOnMouseMove );
 	}
 
@@ -95,7 +97,8 @@ function ObserveTyping( {
 	 */
 	function stopTypingOnSelectionUncollapse() {
 		const selection = window.getSelection();
-		const isCollapsed = selection.rangeCount > 0 && selection.getRangeAt( 0 ).collapsed;
+		const isCollapsed =
+			selection.rangeCount > 0 && selection.getRangeAt( 0 ).collapsed;
 
 		if ( ! isCollapsed ) {
 			stopTyping();
@@ -124,14 +127,21 @@ function ObserveTyping( {
 		// Abort early if already typing, or key press is incurred outside a
 		// text field (e.g. arrow-ing through toolbar buttons).
 		// Ignore typing in a block toolbar
-		if ( isTyping || ! isTextField( target ) || target.closest( '.block-editor-block-toolbar' ) ) {
+		if (
+			isTyping ||
+			! isTextField( target ) ||
+			target.closest( '.block-editor-block-toolbar' )
+		) {
 			return;
 		}
 
 		// Special-case keydown because certain keys do not emit a keypress
 		// event. Conversely avoid keydown as the canonical event since there
 		// are many keydown which are explicitly not targeted for typing.
-		if ( type === 'keydown' && ! isKeyDownEligibleForStartTyping( event ) ) {
+		if (
+			type === 'keydown' &&
+			! isKeyDownEligibleForStartTyping( event )
+		) {
 			return;
 		}
 
@@ -164,7 +174,10 @@ function ObserveTyping( {
 		<div
 			onFocus={ stopTypingOnNonTextField }
 			onKeyPress={ startTypingInTextField }
-			onKeyDown={ over( [ startTypingInTextField, stopTypingOnEscapeKey ] ) }
+			onKeyDown={ over( [
+				startTypingInTextField,
+				stopTypingOnEscapeKey,
+			] ) }
 		>
 			{ children }
 		</div>

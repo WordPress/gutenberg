@@ -15,7 +15,5 @@ export default {
 
 export const _default = () => {
 	const color = text( 'Color', '#0073aa' );
-	return (
-		<ColorIndicator colorValue={ color } />
-	);
+	return <ColorIndicator colorValue={ color } />;
 };

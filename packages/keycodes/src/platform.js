@@ -13,6 +13,8 @@ import { includes } from 'lodash';
 export function isAppleOS( _window = window ) {
 	const { platform } = _window.navigator;
 
-	return platform.indexOf( 'Mac' ) !== -1 ||
-		includes( [ 'iPad', 'iPhone' ], platform );
+	return (
+		platform.indexOf( 'Mac' ) !== -1 ||
+		includes( [ 'iPad', 'iPhone' ], platform )
+	);
 }

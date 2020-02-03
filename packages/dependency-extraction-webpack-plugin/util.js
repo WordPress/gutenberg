@@ -40,7 +40,10 @@ function defaultRequestToExternal( request ) {
 	}
 
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
-		return [ 'wp', camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ) ];
+		return [
+			'wp',
+			camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ),
+		];
 	}
 }
 
@@ -83,7 +86,9 @@ function defaultRequestToHandle( request ) {
  * @return {string} Camel-cased string.
  */
 function camelCaseDash( string ) {
-	return string.replace( /-([a-z])/g, ( match, letter ) => letter.toUpperCase() );
+	return string.replace( /-([a-z])/g, ( match, letter ) =>
+		letter.toUpperCase()
+	);
 }
 
 module.exports = {
