@@ -30,18 +30,25 @@ import { cover as icon } from '@wordpress/icons';
  */
 import styles from './style.scss';
 import { onCoverSelectMedia } from './edit.js';
-import { COVER_MIN_HEIGHT, IMAGE_BACKGROUND_TYPE, VIDEO_BACKGROUND_TYPE } from './shared';
+import {
+	COVER_MIN_HEIGHT,
+	IMAGE_BACKGROUND_TYPE,
+	VIDEO_BACKGROUND_TYPE,
+} from './shared';
 
 /**
  * Constants
  */
 const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE ];
 const INNER_BLOCKS_TEMPLATE = [
-	[ 'core/paragraph', {
-		align: 'center',
-		fontSize: 'large',
-		placeholder: __( 'Write title…' ),
-	} ],
+	[
+		'core/paragraph',
+		{
+			align: 'center',
+			fontSize: 'large',
+			placeholder: __( 'Write title…' ),
+		},
+	],
 ];
 const COVER_MAX_HEIGHT = 1000;
 const COVER_DEFAULT_HEIGHT = 300;
@@ -101,18 +108,17 @@ const Cover = ( {
 			return 1;
 		}
 
-		if ( url ) {
-			return dimRatio !== 0 ? dimRatio / 100 : 0;
-		}
-
-		return url ? 0.5 : 1;
+		return url ? dimRatio / 100 : 1;
 	};
 
 	const getOverlayStyles = () => {
 		return [
 			styles.overlay,
 			{
-				backgroundColor: overlayColor && overlayColor.color ? overlayColor.color : styles.overlay.color,
+				backgroundColor:
+					overlayColor && overlayColor.color
+						? overlayColor.color
+						: styles.overlay.color,
 				opacity: getOpacity(),
 			},
 		];
@@ -122,7 +128,7 @@ const Cover = ( {
 
 	const controls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Dimensions' ) } >
+			<PanelBody title={ __( 'Dimensions' ) }>
 				<RangeControl
 					label={ __( 'Minimum height in pixels' ) }
 					minimumValue={ COVER_MIN_HEIGHT }
@@ -133,8 +139,8 @@ const Cover = ( {
 					style={ styles.rangeCellContainer }
 				/>
 			</PanelBody>
-			{ url ?
-				<PanelBody title={ __( 'Overlay' ) } >
+			{ url ? (
+				<PanelBody title={ __( 'Overlay' ) }>
 					<RangeControl
 						label={ __( 'Background Opacity' ) }
 						minimumValue={ 0 }
@@ -144,28 +150,33 @@ const Cover = ( {
 						onChange={ onOpactiyChange }
 						style={ styles.rangeCellContainer }
 					/>
-				</PanelBody> : null }
+				</PanelBody>
+			) : null }
 		</InspectorControls>
 	);
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 
 	const containerStyles = {
-		...( isParentSelected || isAncestorSelected ? styles.denseMediaPadding : styles.regularMediaPadding ),
+		...( isParentSelected || isAncestorSelected
+			? styles.denseMediaPadding
+			: styles.regularMediaPadding ),
 		...( isSelected && styles.innerPadding ),
 	};
 
 	if ( ! hasBackground ) {
-		return <MediaPlaceholder
-			icon={ placeholderIcon }
-			labels={ {
-				title: __( 'Cover' ),
-			} }
-			onSelect={ onSelectMedia }
-			onlyMediaLibrary={ true }
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			onFocus={ onFocus }
-		/>;
+		return (
+			<MediaPlaceholder
+				icon={ placeholderIcon }
+				labels={ {
+					title: __( 'Cover' ),
+				} }
+				onSelect={ onSelectMedia }
+				onlyMediaLibrary={ true }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				onFocus={ onFocus }
+			/>
+		);
 	}
 
 	return (
@@ -173,11 +184,15 @@ const Cover = ( {
 			{ controls }
 			<View
 				onLayout={ onContainerLayout }
-				style={ [ styles.backgroundContainer ] }>
-				<View style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] } >
-					<InnerBlocks
-						template={ INNER_BLOCKS_TEMPLATE }
-					/>
+				style={ [ styles.backgroundContainer ] }
+			>
+				<View
+					style={ [
+						styles.content,
+						{ minHeight: CONTAINER_HEIGHT },
+					] }
+				>
+					<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 				</View>
 
 				<View style={ getOverlayStyles() } />
@@ -185,7 +200,11 @@ const Cover = ( {
 				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 					<ImageWithFocalPoint
 						containerSize={ containerSize }
-						contentHeight={ containerSize ? containerSize.height : CONTAINER_HEIGHT }
+						contentHeight={
+							containerSize
+								? containerSize.height
+								: CONTAINER_HEIGHT
+						}
 						focalPoint={ focalPoint }
 						url={ url }
 					/>
@@ -207,8 +226,11 @@ export default compose( [
 		const parents = getBlockParents( clientId, true );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const isParentSelected = selectedBlockClientId && selectedBlockClientId === getBlockRootClientId( clientId );
-		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
+		const isParentSelected =
+			selectedBlockClientId &&
+			selectedBlockClientId === getBlockRootClientId( clientId );
+		const isAncestorSelected =
+			selectedBlockClientId && parents.includes( selectedBlockClientId );
 
 		return {
 			isSelected: selectedBlockClientId === clientId,
@@ -218,4 +240,3 @@ export default compose( [
 	} ),
 	withPreferredColorScheme,
 ] )( Cover );
-
