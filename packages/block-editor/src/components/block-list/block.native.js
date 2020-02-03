@@ -143,6 +143,9 @@ class BlockListBlock extends Component {
 					styles.dashedBorderColor,
 					styles.dashedBorderColorDark
 				),
+				...( ! hasChildren &&
+					this.props.name === 'core/column' &&
+					styles.alternatePlaceholderStyle ),
 			};
 
 			// return apply childOfSelected or childOfSelectedLeaf

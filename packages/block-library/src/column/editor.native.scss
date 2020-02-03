@@ -32,11 +32,11 @@
 }
 
 .column-placeholder-selected-margin {
-	width: 2 * $block-selected-to-content;
+	width: $block-selected-to-content;
 }
 
 .column-placeholder-multicol-margin {
-	width: 2 * $block-edge-to-content;
+	width: 2 * $block-selected-to-content;
 }
 
 .column-parent-selected-margin {
