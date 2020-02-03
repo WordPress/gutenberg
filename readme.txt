@@ -79,4 +79,4 @@ See also <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTIN
 
 == Changelog ==
 
-To read the changelog for Gutenberg 7.3.0, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v7.3.0">release page</a>.
+To read the changelog for Gutenberg 7.4.0-rc.1, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v7.4.0-rc.1">release page</a>.
