@@ -29,7 +29,7 @@ import { cover as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import styles from './style.scss';
-import { onCoverSelectMedia } from './edit.js';
+import { attributesFromMedia } from './utils';
 import {
 	COVER_MIN_HEIGHT,
 	IMAGE_BACKGROUND_TYPE,
@@ -83,7 +83,7 @@ const Cover = ( {
 	}, [ setAttributes ] );
 
 	const onSelectMedia = ( media ) => {
-		const onSelect = onCoverSelectMedia( setAttributes );
+		const onSelect = attributesFromMedia( setAttributes );
 		onSelect( media );
 	};
 
