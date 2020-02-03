@@ -42,8 +42,8 @@ function build_css_colors( $attributes ) {
 
 	// If has background color.
 	if ( $has_custom_background_color || $has_named_background_color ) {
-		// Add has-background-color class.
-		$colors['css_classes'][] = 'has-background-color';
+		// Add has-background class.
+		$colors['css_classes'][] = 'has-background';
 	}
 
 	if ( $has_named_background_color ) {

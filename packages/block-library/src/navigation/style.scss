@@ -208,8 +208,8 @@ $navigation-sub-menu-width: $grid-size * 25;
 		}
 
 		// No background color
-		&:not(.has-background-color) > .block-editor-inner-blocks,
-		&:not(.has-background-color) > .wp-block-navigation__container {
+		&:not(.has-background) > .block-editor-inner-blocks,
+		&:not(.has-background) > .wp-block-navigation__container {
 			background-color: $light-style-sub-menu-background-color;
 		}
 	}
@@ -223,8 +223,8 @@ $navigation-sub-menu-width: $grid-size * 25;
 		}
 
 		// No background color
-		&:not(.has-background-color) > .block-editor-inner-blocks,
-		&:not(.has-background-color) > .wp-block-navigation__container {
+		&:not(.has-background) > .block-editor-inner-blocks,
+		&:not(.has-background) > .wp-block-navigation__container {
 			background-color: $dark-style-sub-menu-background-color;
 		}
 	}

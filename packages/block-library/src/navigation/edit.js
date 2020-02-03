@@ -68,7 +68,7 @@ function Navigation( {
 	} = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'has-background-color' },
+			{ name: 'backgroundColor', className: 'has-background' },
 		],
 		{
 			contrastCheckers: [

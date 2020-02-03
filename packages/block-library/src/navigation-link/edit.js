@@ -211,7 +211,7 @@ function NavigationLinkEdit( {
 					'has-child': hasDescendants,
 					'has-text-color': rgbTextColor,
 					[ `has-${ textColor }-color` ]: !! textColor,
-					'has-background-color': rgbBackgroundColor,
+					'has-background': rgbBackgroundColor,
 					[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 				} ) }
 				style={ {
