@@ -109,17 +109,13 @@ class BottomSheetStepperCell extends Component {
 	}
 
 	render() {
-		const {
-			label,
-			icon,
-			min,
-			max,
-			value,
-			separatorType,
-		} = this.props;
+		const { label, icon, min, max, value, separatorType } = this.props;
 		const isMinValue = value === min;
 		const isMaxValue = value === max;
-		const labelStyle = [ styles.cellLabel, ! icon ? styles.cellLabelNoIcon : {} ];
+		const labelStyle = [
+			styles.cellLabel,
+			! icon ? styles.cellLabelNoIcon : {},
+		];
 		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
 			__( '%1$s. Current value is %2$s' ),

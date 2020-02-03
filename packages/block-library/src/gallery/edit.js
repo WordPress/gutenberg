@@ -366,15 +366,17 @@ class GalleryEdit extends Component {
 			<>
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
-						{ images.length > 1 && <ColumnsControl
-							label={ __( 'Columns' ) }
-							{ ...MOBILE_CONTROL_PROPS }
-							value={ columns }
-							onChange={ this.setColumnsNumber }
-							min={ 1 }
-							max={ Math.min( MAX_COLUMNS, images.length ) }
-							required
-						/> }
+						{ images.length > 1 && (
+							<ColumnsControl
+								label={ __( 'Columns' ) }
+								{ ...MOBILE_CONTROL_PROPS }
+								value={ columns }
+								onChange={ this.setColumnsNumber }
+								min={ 1 }
+								max={ Math.min( MAX_COLUMNS, images.length ) }
+								required
+							/>
+						) }
 
 						<ToggleControl
 							label={ __( 'Crop Images' ) }
