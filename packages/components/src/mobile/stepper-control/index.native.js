@@ -13,16 +13,18 @@ function StepperControl( {
 	step,
 	value,
 } ) {
-	return <StepperCell
-		icon={ icon }
-		label={ label }
-		max={ max }
-		min={ min }
-		onChange={ onChange }
-		separatorType={ separatorType }
-		step={ step }
-		value={ value }
-	/>;
+	return (
+		<StepperCell
+			icon={ icon }
+			label={ label }
+			max={ max }
+			min={ min }
+			onChange={ onChange }
+			separatorType={ separatorType }
+			step={ step }
+			value={ value }
+		/>
+	);
 }
 
 export default StepperControl;
