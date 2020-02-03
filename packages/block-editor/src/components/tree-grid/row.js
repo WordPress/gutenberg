@@ -3,7 +3,10 @@
  */
 import { forwardRef } from '@wordpress/element';
 
-function TreeGridRow( { children, level, positionInSet, setSize, isExpanded, ...props }, ref ) {
+function TreeGridRow(
+	{ children, level, positionInSet, setSize, isExpanded, ...props },
+	ref
+) {
 	return (
 		// Disable reason: Due to an error in the ARIA 1.1 specification, the
 		// aria-posinset and aria-setsize properties are not supported on row

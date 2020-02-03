@@ -64,7 +64,10 @@ export default function TreeGrid( { children, ...props } ) {
 			if ( keyCode === LEFT ) {
 				nextIndex = Math.max( 0, currentColumnIndex - 1 );
 			} else {
-				nextIndex = Math.min( currentColumnIndex + 1, focusablesInRow.length - 1 );
+				nextIndex = Math.min(
+					currentColumnIndex + 1,
+					focusablesInRow.length - 1
+				);
 			}
 
 			// Focus is either at the left or right edge of the grid. Do nothing.
@@ -76,7 +79,9 @@ export default function TreeGrid( { children, ...props } ) {
 			focusablesInRow[ nextIndex ].focus();
 		} else if ( includes( [ UP, DOWN ], keyCode ) ) {
 			// Calculate the rowIndex of the next row.
-			const rows = Array.from( treeGridElement.querySelectorAll( '[role="row"]' ) );
+			const rows = Array.from(
+				treeGridElement.querySelectorAll( '[role="row"]' )
+			);
 			const currentRowIndex = rows.indexOf( activeRow );
 			let nextRowIndex;
 
@@ -92,7 +97,9 @@ export default function TreeGrid( { children, ...props } ) {
 			}
 
 			// Get the focusables in the next row.
-			const focusablesInNextRow = getRowFocusables( rows[ nextRowIndex ] );
+			const focusablesInNextRow = getRowFocusables(
+				rows[ nextRowIndex ]
+			);
 
 			// If for some reason there are no focusables in the next row, do nothing.
 			if ( ! focusablesInNextRow || ! focusablesInNextRow.length ) {
@@ -100,7 +107,10 @@ export default function TreeGrid( { children, ...props } ) {
 			}
 
 			// Try to focus the element in the next row that's at a similar column to the activeElement.
-			const nextIndex = Math.min( currentColumnIndex, focusablesInNextRow.length - 1 );
+			const nextIndex = Math.min(
+				currentColumnIndex,
+				focusablesInNextRow.length - 1
+			);
 			focusablesInNextRow[ nextIndex ].focus();
 		}
 	};
@@ -110,9 +120,7 @@ export default function TreeGrid( { children, ...props } ) {
 			{ /* Disable reason: A treegrid is implemented using a table element. */ }
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role */ }
 			<table { ...props } role="treegrid" onKeyDown={ onKeyDown }>
-				<tbody>
-					{ children }
-				</tbody>
+				<tbody>{ children }</tbody>
 			</table>
 		</RovingTabIndexContainer>
 	);

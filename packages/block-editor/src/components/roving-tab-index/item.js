@@ -8,9 +8,16 @@ import { useRef } from '@wordpress/element';
  */
 import { useRovingTabIndexContext } from './context';
 
-export default function RovingTabIndexItem( { children, as: Component, ...props } ) {
+export default function RovingTabIndexItem( {
+	children,
+	as: Component,
+	...props
+} ) {
 	const ref = useRef();
-	const { lastFocusedElement, setLastFocusedElement } = useRovingTabIndexContext();
+	const {
+		lastFocusedElement,
+		setLastFocusedElement,
+	} = useRovingTabIndexContext();
 	let tabIndex;
 
 	if ( lastFocusedElement ) {

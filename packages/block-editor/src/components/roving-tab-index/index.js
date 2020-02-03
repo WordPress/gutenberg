@@ -14,7 +14,11 @@ import { RovingTabIndexProvider } from './context';
 export default function RovingTabIndexContainer( { children } ) {
 	const [ providerValue, setProviderValue ] = useState( {
 		lastFocusedElement: undefined,
-		setLastFocusedElement: ( element ) => setProviderValue( { ...providerValue, lastFocusedElement: element } ),
+		setLastFocusedElement: ( element ) =>
+			setProviderValue( {
+				...providerValue,
+				lastFocusedElement: element,
+			} ),
 	} );
 
 	return (
