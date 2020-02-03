@@ -15,6 +15,7 @@ export default function save( { attributes } ) {
 		alt,
 		caption,
 		align,
+		captionAlign,
 		href,
 		rel,
 		linkClass,
@@ -60,7 +61,13 @@ export default function save( { attributes } ) {
 				image
 			) }
 			{ ! RichText.isEmpty( caption ) && (
-				<RichText.Content tagName="figcaption" value={ caption } />
+				<RichText.Content
+					tagName="figcaption"
+					value={ caption }
+					className={ classnames( {
+						[ `has-text-align-${ captionAlign }` ]: captionAlign,
+					} ) }
+				/>
 			) }
 		</>
 	);

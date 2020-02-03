@@ -22,6 +22,7 @@ import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	BlockAlignmentToolbar,
+	AlignmentToolbar,
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
@@ -90,6 +91,7 @@ export class ImageEdit extends Component {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
+		this.updateCaptionAlignment = this.updateCaptionAlignment.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
@@ -280,6 +282,12 @@ export class ImageEdit extends Component {
 		} );
 	}
 
+	updateCaptionAlignment( nextAlign ) {
+		this.props.setAttributes( {
+			captionAlign: nextAlign,
+		} );
+	}
+
 	updateImage( sizeSlug ) {
 		const { image } = this.props;
 
@@ -336,6 +344,7 @@ export class ImageEdit extends Component {
 			alt,
 			caption,
 			align,
+			captionAlign,
 			id,
 			href,
 			rel,
@@ -354,6 +363,10 @@ export class ImageEdit extends Component {
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
+				/>
+				<AlignmentToolbar
+					value={ align }
+					onChange={ this.updateCaptionAlignment }
 				/>
 				{ url && (
 					<MediaReplaceFlow
@@ -671,6 +684,11 @@ export class ImageEdit extends Component {
 							}
 							isSelected={ this.state.captionFocused }
 							inlineToolbar
+							style={
+								captionAlign
+									? { textAlign: captionAlign }
+									: undefined
+							}
 						/>
 					) }
 				</figure>
