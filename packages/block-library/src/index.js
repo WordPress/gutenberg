@@ -3,7 +3,6 @@
  */
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
-import '@wordpress/editor';
 import {
 	registerBlockType,
 	setDefaultBlockName,
@@ -176,30 +175,30 @@ export const registerCoreBlocks = () => {
  * ```
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
-	process.env.GUTENBERG_PHASE === 2 ?
-		( settings ) => {
-			const {
-				__experimentalEnableLegacyWidgetBlock,
-				__experimentalEnableFullSiteEditing,
-			} = settings;
+	process.env.GUTENBERG_PHASE === 2
+		? ( settings ) => {
+				const {
+					__experimentalEnableLegacyWidgetBlock,
+					__experimentalEnableFullSiteEditing,
+				} = settings;
 
-			[
-				__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
-				socialLinks,
-				...socialLink.sites,
+				[
+					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
+					socialLinks,
+					...socialLink.sites,
 
-				// Register Full Site Editing Blocks.
-				...( __experimentalEnableFullSiteEditing ?
-					[
-						siteTitle,
-						templatePart,
-						postTitle,
-						postContent,
-						postAuthor,
-						postDate,
-						postExcerpt,
-					] :
-					[] ),
-			].forEach( registerBlock );
-		} :
-		undefined;
+					// Register Full Site Editing Blocks.
+					...( __experimentalEnableFullSiteEditing
+						? [
+								siteTitle,
+								templatePart,
+								postTitle,
+								postContent,
+								postAuthor,
+								postDate,
+								postExcerpt,
+						  ]
+						: [] ),
+				].forEach( registerBlock );
+		  }
+		: undefined;

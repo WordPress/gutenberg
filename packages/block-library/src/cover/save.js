@@ -35,17 +35,23 @@ export default function save( { attributes } ) {
 		url,
 		minHeight,
 	} = attributes;
-	const overlayColorClass = getColorClassName( 'background-color', overlayColor );
+	const overlayColorClass = getColorClassName(
+		'background-color',
+		overlayColor
+	);
 	const gradientClass = __experimentalGetGradientClass( gradient );
 
-	const style = backgroundType === IMAGE_BACKGROUND_TYPE ?
-		backgroundImageStyles( url ) :
-		{};
+	const style =
+		backgroundType === IMAGE_BACKGROUND_TYPE
+			? backgroundImageStyles( url )
+			: {};
 	if ( ! overlayColorClass ) {
 		style.backgroundColor = customOverlayColor;
 	}
 	if ( focalPoint && ! hasParallax ) {
-		style.backgroundPosition = `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`;
+		style.backgroundPosition = `${ Math.round(
+			focalPoint.x * 100
+		) }% ${ Math.round( focalPoint.y * 100 ) }%`;
 	}
 	if ( customGradient && ! url ) {
 		style.background = customGradient;
@@ -60,7 +66,7 @@ export default function save( { attributes } ) {
 			'has-parallax': hasParallax,
 			'has-background-gradient': customGradient,
 			[ gradientClass ]: ! url && gradientClass,
-		},
+		}
 	);
 
 	return (
@@ -72,16 +78,22 @@ export default function save( { attributes } ) {
 						'wp-block-cover__gradient-background',
 						gradientClass
 					) }
-					style={ customGradient ? { background: customGradient } : undefined }
+					style={
+						customGradient
+							? { background: customGradient }
+							: undefined
+					}
 				/>
 			) }
-			{ VIDEO_BACKGROUND_TYPE === backgroundType && url && ( <video
-				className="wp-block-cover__video-background"
-				autoPlay
-				muted
-				loop
-				src={ url }
-			/> ) }
+			{ VIDEO_BACKGROUND_TYPE === backgroundType && url && (
+				<video
+					className="wp-block-cover__video-background"
+					autoPlay
+					muted
+					loop
+					src={ url }
+				/>
+			) }
 			<div className="wp-block-cover__inner-container">
 				<InnerBlocks.Content />
 			</div>

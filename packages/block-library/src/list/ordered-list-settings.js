@@ -3,15 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
-import {
-	TextControl,
-	PanelBody,
-	ToggleControl,
-} from '@wordpress/components';
+import { TextControl, PanelBody, ToggleControl } from '@wordpress/components';
 
 const OrderedListSettings = ( { setAttributes, reversed, start } ) => (
 	<InspectorControls>
-		<PanelBody title={ __( 'Ordered List Settings' ) }>
+		<PanelBody title={ __( 'Ordered list settings' ) }>
 			<TextControl
 				label={ __( 'Start Value' ) }
 				type="number"
@@ -38,6 +34,7 @@ const OrderedListSettings = ( { setAttributes, reversed, start } ) => (
 				} }
 			/>
 		</PanelBody>
-	</InspectorControls> );
+	</InspectorControls>
+);
 
 export default OrderedListSettings;

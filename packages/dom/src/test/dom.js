@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import { isHorizontalEdge, placeCaretAtHorizontalEdge, isTextField, stripHTML } from '../dom';
+import {
+	isHorizontalEdge,
+	placeCaretAtHorizontalEdge,
+	isTextField,
+	__unstableStripHTML as stripHTML,
+} from '../dom';
 
 describe( 'DOM', () => {
 	let parent;
@@ -112,12 +117,7 @@ describe( 'DOM', () => {
 		 *
 		 * @type {string[]}
 		 */
-		const TEXT_INPUT_TYPES = [
-			'text',
-			'password',
-			'search',
-			'url',
-		];
+		const TEXT_INPUT_TYPES = [ 'text', 'password', 'search', 'url' ];
 
 		it( 'should return false for non-text input elements', () => {
 			NON_TEXT_INPUT_TYPES.forEach( ( type ) => {
@@ -138,7 +138,9 @@ describe( 'DOM', () => {
 		} );
 
 		it( 'should return true for an textarea element', () => {
-			expect( isTextField( document.createElement( 'textarea' ) ) ).toBe( true );
+			expect( isTextField( document.createElement( 'textarea' ) ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should return true for a contenteditable element', () => {
@@ -150,13 +152,17 @@ describe( 'DOM', () => {
 		} );
 
 		it( 'should return true for a normal div element', () => {
-			expect( isTextField( document.createElement( 'div' ) ) ).toBe( false );
+			expect( isTextField( document.createElement( 'div' ) ) ).toBe(
+				false
+			);
 		} );
 	} );
 
 	describe( 'stripHTML', () => {
 		it( 'removes any HTML from a text string', () => {
-			expect( stripHTML( 'This is <em>emphasized</em>' ) ).toBe( 'This is emphasized' );
+			expect( stripHTML( 'This is <em>emphasized</em>' ) ).toBe(
+				'This is emphasized'
+			);
 		} );
 
 		it( 'removes script tags, but does not execute them', () => {

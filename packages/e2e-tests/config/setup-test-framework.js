@@ -83,8 +83,8 @@ async function trashExistingPosts() {
 	}
 
 	// Select all posts.
-	await page.waitForSelector( '#cb-select-all-1' );
-	await page.click( '#cb-select-all-1' );
+	await page.waitForSelector( '[id^=cb-select-all-]' );
+	await page.click( '[id^=cb-select-all-]' );
 	// Select the "bulk actions" > "trash" option.
 	await page.select( '#bulk-action-selector-top', 'trash' );
 	// Submit the form to send all draft/scheduled/published posts to the trash.
@@ -139,7 +139,9 @@ function observeConsoleLogging() {
 		// See: https://core.trac.wordpress.org/ticket/37000
 		// See: https://www.chromestatus.com/feature/5088147346030592
 		// See: https://www.chromestatus.com/feature/5633521622188032
-		if ( text.includes( 'A cookie associated with a cross-site resource' ) ) {
+		if (
+			text.includes( 'A cookie associated with a cross-site resource' )
+		) {
 			return;
 		}
 
@@ -151,7 +153,18 @@ function observeConsoleLogging() {
 
 		// Network errors are ignored only if we are intentionally testing
 		// offline mode.
-		if ( text.includes( 'net::ERR_INTERNET_DISCONNECTED' ) && isOfflineMode() ) {
+		if (
+			text.includes( 'net::ERR_INTERNET_DISCONNECTED' ) &&
+			isOfflineMode()
+		) {
+			return;
+		}
+
+		// As of WordPress 5.3.2 in Chrome 79, navigating to the block editor
+		// (Posts > Add New) will display a console warning about
+		// non - unique IDs.
+		// See: https://core.trac.wordpress.org/ticket/23165
+		if ( text.includes( 'elements with non-unique id #_wpnonce' ) ) {
 			return;
 		}
 
@@ -176,7 +189,11 @@ function observeConsoleLogging() {
 		// correctly. Instead, the logic here synchronously inspects the
 		// internal object shape of the JSHandle to find the error text. If it
 		// cannot be found, the default text value is used instead.
-		text = get( message.args(), [ 0, '_remoteObject', 'description' ], text );
+		text = get(
+			message.args(),
+			[ 0, '_remoteObject', 'description' ],
+			text
+		);
 
 		// Disable reason: We intentionally bubble up the console message
 		// which, unless the test explicitly anticipates the logging via
@@ -194,7 +211,7 @@ function observeConsoleLogging() {
  * @return {?Promise} Promise resolving once Axe texts are finished.
  */
 async function runAxeTestsForBlockEditor() {
-	if ( ! await page.$( '.block-editor' ) ) {
+	if ( ! ( await page.$( '.block-editor' ) ) ) {
 		return;
 	}
 

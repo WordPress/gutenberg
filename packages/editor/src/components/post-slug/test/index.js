@@ -11,10 +11,7 @@ import { PostSlug } from '../';
 describe( 'PostSlug', () => {
 	describe( '#render()', () => {
 		it( 'should update internal slug', () => {
-			const wrapper = shallow(
-				<PostSlug
-					postSlug="index" />
-			);
+			const wrapper = shallow( <PostSlug postSlug="index" /> );
 
 			wrapper.find( 'input' ).simulate( 'change', {
 				target: {
@@ -28,9 +25,7 @@ describe( 'PostSlug', () => {
 		it( 'should update slug', () => {
 			const onUpdateSlug = jest.fn();
 			const wrapper = shallow(
-				<PostSlug
-					postSlug="index"
-					onUpdateSlug={ onUpdateSlug } />
+				<PostSlug postSlug="index" onUpdateSlug={ onUpdateSlug } />
 			);
 
 			wrapper.find( 'input' ).simulate( 'blur', {

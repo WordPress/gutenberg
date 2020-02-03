@@ -10,6 +10,7 @@ import { ToolbarButton } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,11 +19,7 @@ import styles from './style.scss';
 import BlockMover from '../block-mover';
 import { BlockSettingsButton } from '../block-settings';
 
-const BlockMobileToolbar = ( {
-	clientId,
-	onDelete,
-	order,
-} ) => (
+const BlockMobileToolbar = ( { clientId, onDelete, order } ) => (
 	<View style={ styles.toolbar }>
 		<BlockMover clientIds={ [ clientId ] } />
 
@@ -31,15 +28,13 @@ const BlockMobileToolbar = ( {
 		<BlockSettingsButton.Slot />
 
 		<ToolbarButton
-			title={
-				sprintf(
-					/* translators: accessibility text. %s: current block position (number). */
-					__( 'Remove block at row %s' ),
-					order + 1
-				)
-			}
+			title={ sprintf(
+				/* translators: accessibility text. %s: current block position (number). */
+				__( 'Remove block at row %s' ),
+				order + 1
+			) }
 			onClick={ onDelete }
-			icon="trash"
+			icon={ trash }
 			extraProps={ { hint: __( 'Double tap to remove the block' ) } }
 		/>
 	</View>
@@ -47,9 +42,7 @@ const BlockMobileToolbar = ( {
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlockIndex,
-		} = select( 'core/block-editor' );
+		const { getBlockIndex } = select( 'core/block-editor' );
 
 		return {
 			order: getBlockIndex( clientId ),
@@ -63,5 +56,5 @@ export default compose(
 				removeBlock( clientId, rootClientId );
 			},
 		};
-	} ),
+	} )
 )( BlockMobileToolbar );

@@ -7,7 +7,12 @@ import { isEmpty, noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, ButtonGroup, SelectControl, TextControl } from '@wordpress/components';
+import {
+	Button,
+	ButtonGroup,
+	SelectControl,
+	TextControl,
+} from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
 class ImageSizeControl extends Component {
@@ -63,7 +68,9 @@ class ImageSizeControl extends Component {
 								label={ __( 'Width' ) }
 								value={ width || imageWidth || '' }
 								min={ 1 }
-								onChange={ ( value ) => onChange( { width: parseInt( value, 10 ) } ) }
+								onChange={ ( value ) =>
+									onChange( { width: parseInt( value, 10 ) } )
+								}
 							/>
 							<TextControl
 								type="number"
@@ -71,16 +78,26 @@ class ImageSizeControl extends Component {
 								label={ __( 'Height' ) }
 								value={ height || imageHeight || '' }
 								min={ 1 }
-								onChange={ ( value ) => onChange( { height: parseInt( value, 10 ) } ) }
+								onChange={ ( value ) =>
+									onChange( {
+										height: parseInt( value, 10 ),
+									} )
+								}
 							/>
 						</div>
 						<div className="block-editor-image-size-control__row">
 							<ButtonGroup aria-label={ __( 'Image Size' ) }>
 								{ [ 25, 50, 75, 100 ].map( ( scale ) => {
-									const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
-									const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
+									const scaledWidth = Math.round(
+										imageWidth * ( scale / 100 )
+									);
+									const scaledHeight = Math.round(
+										imageHeight * ( scale / 100 )
+									);
 
-									const isCurrent = width === scaledWidth && height === scaledHeight;
+									const isCurrent =
+										width === scaledWidth &&
+										height === scaledHeight;
 
 									return (
 										<Button
@@ -88,17 +105,17 @@ class ImageSizeControl extends Component {
 											isSmall
 											isPrimary={ isCurrent }
 											isPressed={ isCurrent }
-											onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
+											onClick={ this.updateDimensions(
+												scaledWidth,
+												scaledHeight
+											) }
 										>
 											{ scale }%
 										</Button>
 									);
 								} ) }
 							</ButtonGroup>
-							<Button
-								isSmall
-								onClick={ this.updateDimensions() }
-							>
+							<Button isSmall onClick={ this.updateDimensions() }>
 								{ __( 'Reset' ) }
 							</Button>
 						</div>

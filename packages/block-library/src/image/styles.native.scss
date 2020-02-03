@@ -83,3 +83,28 @@
 	justify-content: center;
 	align-items: center;
 }
+
+.editContainer {
+	width: 44px;
+	height: 44px;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.edit {
+	width: 30px;
+	height: 30px;
+	background-color: $gray-dark;
+	border-radius: 22px;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+
+.iconCustomise {
+	fill: #fff;
+	position: absolute;
+	top: 7px;
+	left: 7px;
+}

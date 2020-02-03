@@ -9,7 +9,13 @@ import { map } from 'lodash';
 import { useRef, Children } from '@wordpress/element';
 import { useKeyboardShortcut } from '@wordpress/compose';
 
-function KeyboardShortcut( { target, callback, shortcut, bindGlobal, eventName } ) {
+function KeyboardShortcut( {
+	target,
+	callback,
+	shortcut,
+	bindGlobal,
+	eventName,
+} ) {
 	useKeyboardShortcut( shortcut, callback, {
 		bindGlobal,
 		target,

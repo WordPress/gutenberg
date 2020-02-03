@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { html as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -23,7 +23,10 @@ export const settings = {
 	keywords: [ __( 'embed' ) ],
 	example: {
 		attributes: {
-			content: '<marquee>' + __( 'Welcome to the wonderful world of blocks…' ) + '</marquee>',
+			content:
+				'<marquee>' +
+				__( 'Welcome to the wonderful world of blocks…' ) +
+				'</marquee>',
 		},
 	},
 	supports: {

@@ -3,10 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component, createRef, useMemo } from '@wordpress/element';
-import {
-	ToggleControl,
-	withSpokenMessages,
-} from '@wordpress/components';
+import { ToggleControl, withSpokenMessages } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
 import {
@@ -83,7 +80,9 @@ class InlineLinkUI extends Component {
 	}
 
 	static getDerivedStateFromProps( props, state ) {
-		const { activeAttributes: { url, target } } = props;
+		const {
+			activeAttributes: { url, target },
+		} = props;
 		const opensInNewWindow = target === '_blank';
 
 		if ( ! isShowingInput( props, state ) ) {
@@ -102,7 +101,11 @@ class InlineLinkUI extends Component {
 	}
 
 	onKeyDown( event ) {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
+		if (
+			[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf(
+				event.keyCode
+			) > -1
+		) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
 			event.stopPropagation();
 		}
@@ -113,7 +116,11 @@ class InlineLinkUI extends Component {
 	}
 
 	setLinkTarget( opensInNewWindow ) {
-		const { activeAttributes: { url = '' }, value, onChange } = this.props;
+		const {
+			activeAttributes: { url = '' },
+			value,
+			onChange,
+		} = this.props;
 
 		this.setState( { opensInNewWindow } );
 
@@ -121,11 +128,16 @@ class InlineLinkUI extends Component {
 		if ( ! isShowingInput( this.props, this.state ) ) {
 			const selectedText = getTextContent( slice( value ) );
 
-			onChange( applyFormat( value, createLinkFormat( {
-				url,
-				opensInNewWindow,
-				text: selectedText,
-			} ) ) );
+			onChange(
+				applyFormat(
+					value,
+					createLinkFormat( {
+						url,
+						opensInNewWindow,
+						text: selectedText,
+					} )
+				)
+			);
 		}
 	}
 
@@ -148,7 +160,12 @@ class InlineLinkUI extends Component {
 		event.preventDefault();
 
 		if ( isCollapsed( value ) && ! isActive ) {
-			const toInsert = applyFormat( create( { text: url } ), format, 0, url.length );
+			const toInsert = applyFormat(
+				create( { text: url } ),
+				format,
+				0,
+				url.length
+			);
 			onChange( insert( value, toInsert ) );
 		} else {
 			onChange( applyFormat( value, format ) );
@@ -159,7 +176,12 @@ class InlineLinkUI extends Component {
 		this.resetState();
 
 		if ( ! isValidHref( url ) ) {
-			speak( __( 'Warning: the link has been inserted but may have errors. Please test it.' ), 'assertive' );
+			speak(
+				__(
+					'Warning: the link has been inserted but may have errors. Please test it.'
+				),
+				'assertive'
+			);
 		} else if ( isActive ) {
 			speak( __( 'Link edited.' ), 'assertive' );
 		} else {
@@ -173,7 +195,10 @@ class InlineLinkUI extends Component {
 		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
 		// return to avoid the popover being closed.
 		const autocompleteElement = this.autocompleteRef.current;
-		if ( autocompleteElement && autocompleteElement.contains( document.activeElement ) ) {
+		if (
+			autocompleteElement &&
+			autocompleteElement.contains( document.activeElement )
+		) {
 			return;
 		}
 
@@ -186,7 +211,12 @@ class InlineLinkUI extends Component {
 	}
 
 	render() {
-		const { isActive, activeAttributes: { url }, addingLink, value } = this.props;
+		const {
+			isActive,
+			activeAttributes: { url },
+			addingLink,
+			value,
+		} = this.props;
 
 		if ( ! isActive && ! addingLink ) {
 			return null;
@@ -227,7 +257,11 @@ class InlineLinkUI extends Component {
 						onKeyPress={ stopKeyPropagation }
 						url={ url }
 						onEditLinkClick={ this.editLink }
-						linkClassName={ isValidHref( prependHTTP( url ) ) ? undefined : 'has-invalid-link' }
+						linkClassName={
+							isValidHref( prependHTTP( url ) )
+								? undefined
+								: 'has-invalid-link'
+						}
 					/>
 				) }
 			</URLPopoverAtLink>

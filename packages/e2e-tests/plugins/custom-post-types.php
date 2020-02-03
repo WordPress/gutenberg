@@ -66,3 +66,23 @@ function public_queryable_true_public_true_cpt() {
 	);
 }
 add_action( 'init', 'public_queryable_true_public_true_cpt' );
+
+/**
+ * Registers a custom post type that is hierarchical and does not supports the title attribute.
+ */
+function hierarchical_without_title_cpt() {
+	register_post_type(
+		'hierar-no-title',
+		array(
+			'public'       => true,
+			'label'        => 'Hierarchical No Title',
+			'show_in_rest' => true,
+			'hierarchical' => true,
+			'supports'     => array( 'page-attributes', 'editor', 'thumbnail', 'comments', 'post-formats' ),
+			'show_ui'      => true,
+			'show_in_menu' => true,
+		)
+	);
+}
+add_action( 'init', 'hierarchical_without_title_cpt' );
+

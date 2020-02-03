@@ -30,9 +30,13 @@ describe( 'ifViewportMatches()', () => {
 			testRenderer = TestRenderer.create( <EnhancedComponent /> );
 		} );
 
-		expect( useViewportMatchMock.mock.calls ).toEqual( [ [ 'wide', '<' ] ] );
+		expect( useViewportMatchMock.mock.calls ).toEqual( [
+			[ 'wide', '<' ],
+		] );
 
-		expect( testRenderer.root.findAllByType( Component ) ).toHaveLength( 0 );
+		expect( testRenderer.root.findAllByType( Component ) ).toHaveLength(
+			0
+		);
 	} );
 
 	it( 'should render if query does match', () => {
@@ -43,8 +47,12 @@ describe( 'ifViewportMatches()', () => {
 			testRenderer = TestRenderer.create( <EnhancedComponent /> );
 		} );
 
-		expect( useViewportMatchMock.mock.calls ).toEqual( [ [ 'wide', '>=' ] ] );
+		expect( useViewportMatchMock.mock.calls ).toEqual( [
+			[ 'wide', '>=' ],
+		] );
 
-		expect( testRenderer.root.findAllByType( Component ) ).toHaveLength( 1 );
+		expect( testRenderer.root.findAllByType( Component ) ).toHaveLength(
+			1
+		);
 	} );
 } );

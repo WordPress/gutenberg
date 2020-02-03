@@ -15,13 +15,12 @@ const transforms = {
 		},
 		{
 			type: 'raw',
-			isMatch: ( node ) => (
+			isMatch: ( node ) =>
 				node.nodeName === 'PRE' &&
 				! (
 					node.children.length === 1 &&
 					node.firstChild.nodeName === 'CODE'
-				)
-			),
+				),
 			schema: ( { phrasingContentSchema } ) => ( {
 				pre: {
 					children: phrasingContentSchema,

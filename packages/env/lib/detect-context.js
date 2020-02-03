@@ -37,15 +37,20 @@ module.exports = async function detectContext( directoryPath = process.cwd() ) {
 
 	// Race multiple file read streams against each other until
 	// a plugin or theme header is found.
-	const files = ( await readDir( absPath ) ).filter(
-		( file ) => path.extname( file ) === '.php' || path.basename( file ) === 'style.css'
-	).map( ( fileName ) => path.join( absPath, fileName ) );
+	const files = ( await readDir( absPath ) )
+		.filter(
+			( file ) =>
+				path.extname( file ) === '.php' ||
+				path.basename( file ) === 'style.css'
+		)
+		.map( ( fileName ) => path.join( absPath, fileName ) );
 
 	const streams = [];
 	for ( const file of files ) {
 		const fileStream = fs.createReadStream( file, 'utf8' );
 		fileStream.on( 'data', ( text ) => {
-			const [ , type ] = text.match( /(Plugin|Theme) Name: .*[\r\n]/ ) || [];
+			const [ , type ] =
+				text.match( /(Plugin|Theme) Name: .*[\r\n]/ ) || [];
 			if ( type ) {
 				context.type = type.toLowerCase();
 				context.path = absPath;
@@ -54,13 +59,17 @@ module.exports = async function detectContext( directoryPath = process.cwd() ) {
 				// Stop the creation of new streams by mutating the iterated array. We can't `break`, because we are inside a function.
 				files.splice( 0 );
 				fileStream.destroy();
-				streams.forEach( ( otherFileStream ) => otherFileStream.destroy() );
+				streams.forEach( ( otherFileStream ) =>
+					otherFileStream.destroy()
+				);
 			}
 		} );
 		streams.push( fileStream );
 	}
 	await Promise.all(
-		streams.map( ( fileStream ) => finished( fileStream ).catch( () => {} ) )
+		streams.map( ( fileStream ) =>
+			finished( fileStream ).catch( () => {} )
+		)
 	);
 
 	return context;

@@ -1,3 +1,6 @@
+$navigation-height: 60px;
+$navigation-item-height: 46px;
+
 // Reduce the paddings, margins, and UI of inner-blocks.
 // @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
 // When that happens, leverage that instead of the following overrides.
@@ -30,15 +33,13 @@
 		width: auto;
 		padding-left: 0;
 		padding-right: 0;
-		margin-left: 0;
-		margin-right: 0;
-		margin-bottom: 1em; // Useful for when items wrap.
+		margin: 0;
 	}
 
-	// 3. Remove vertical margins on subsequent block container.
+	// 3. Set a min height for nav items.
+	// It's needed in order to hide the sub-items when the navigation is not selected.
 	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout .wp-block > [data-block] {
-		margin-top: 0;
-		margin-bottom: 0;
+		min-height: $navigation-item-height;
 	}
 
 	.wp-block-navigation .block-editor-block-list__block::before {
@@ -47,7 +48,6 @@
 	}
 
 	// Remove the dashed outlines for child blocks.
-	&.is-hovered .wp-block-navigation .block-editor-block-list__block::before,
 	&.is-selected .wp-block-navigation .block-editor-block-list__block::before,
 	&.has-child-selected .wp-block-navigation .block-editor-block-list__block::before {
 		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
@@ -61,9 +61,15 @@
 	// Polish the Appender.
 	.wp-block-navigation .block-list-appender {
 		margin: 0;
+		width: 28px;
+		height: 28px;
+		margin-top: $grid-size-small;
+		margin-left: $grid-size + $block-side-ui-clearance;
 
 		.block-editor-button-block-appender {
 			padding: $grid-size;
+			padding-bottom: $grid-size-small;
+			padding-top: $grid-size-small;
 			outline: none;
 			background: none;
 		}
@@ -74,6 +80,14 @@
 .wp-block-navigation {
 	display: flex;
 	flex-wrap: wrap;
+}
+
+// Vertical aligment.
+.wp-block-navigation {
+	min-height: $navigation-height;
+	padding-top: 7px;
+	padding-bottom: 7px;
+	align-items: center;
 }
 
 .wp-block-navigation__inserter-content {
@@ -150,12 +164,8 @@ $color-control-label-height: 20px;
 		float: right;
 		margin-top: 2px;
 	}
-}
 
-.block-editor-block-mover {
-	&.is-horizontal {
-		.block-editor-block-mover__control-drag-handle {
-			display: none;
-		}
+	.components-panel__body-title {
+		display: none;
 	}
 }

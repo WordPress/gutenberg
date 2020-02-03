@@ -10,7 +10,10 @@ import {
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
-const getActiveBlockName = async () => page.evaluate( () => wp.data.select( 'core/block-editor' ).getSelectedBlock().name );
+const getActiveBlockName = async () =>
+	page.evaluate(
+		() => wp.data.select( 'core/block-editor' ).getSelectedBlock().name
+	);
 
 describe( 'Writing Flow', () => {
 	beforeEach( async () => {
@@ -62,7 +65,9 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate( () => document.activeElement.textContent );
+		activeElementText = await page.evaluate(
+			() => document.activeElement.textContent
+		);
 		expect( activeElementText ).toBe( '2nd col' );
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
@@ -73,23 +78,25 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate( () => document.activeElement.textContent );
+		activeElementText = await page.evaluate(
+			() => document.activeElement.textContent
+		);
 		expect( activeElementText ).toBe( '1st col' );
 
 		// Arrow up from first text field in nested context focuses column and
 		// columns wrappers before escaping out.
 		let activeElementBlockType;
 		await page.keyboard.press( 'ArrowUp' );
-		activeElementBlockType = await page.evaluate( () => (
+		activeElementBlockType = await page.evaluate( () =>
 			document.activeElement.getAttribute( 'data-type' )
-		) );
+		);
 		expect( activeElementBlockType ).toBe( 'core/column' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/column' );
 		await page.keyboard.press( 'ArrowUp' );
-		activeElementBlockType = await page.evaluate( () => (
+		activeElementBlockType = await page.evaluate( () =>
 			document.activeElement.getAttribute( 'data-type' )
-		) );
+		);
 		expect( activeElementBlockType ).toBe( 'core/columns' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/columns' );
@@ -99,7 +106,9 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate( () => document.activeElement.textContent );
+		activeElementText = await page.evaluate(
+			() => document.activeElement.textContent
+		);
 		expect( activeElementText ).toBe( 'First paragraph' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -256,23 +265,23 @@ describe( 'Writing Flow', () => {
 
 		// Should remain in title upon ArrowRight:
 		await page.keyboard.press( 'ArrowRight' );
-		let isInTitle = await page.evaluate( () => (
-			!! document.activeElement.closest( '.editor-post-title' )
-		) );
+		let isInTitle = await page.evaluate(
+			() => !! document.activeElement.closest( '.editor-post-title' )
+		);
 		expect( isInTitle ).toBe( true );
 
 		// Should remain in title upon modifier + ArrowDown:
 		await pressKeyWithModifier( 'primary', 'ArrowDown' );
-		isInTitle = await page.evaluate( () => (
-			!! document.activeElement.closest( '.editor-post-title' )
-		) );
+		isInTitle = await page.evaluate(
+			() => !! document.activeElement.closest( '.editor-post-title' )
+		);
 		expect( isInTitle ).toBe( true );
 
 		// Should navigate into blocks list upon ArrowDown:
 		await page.keyboard.press( 'ArrowDown' );
-		const isInBlock = await page.evaluate( () => (
-			!! document.activeElement.closest( '[data-type]' )
-		) );
+		const isInBlock = await page.evaluate(
+			() => !! document.activeElement.closest( '[data-type]' )
+		);
 		expect( isInBlock ).toBe( true );
 	} );
 
@@ -436,6 +445,84 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '3' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should allow selecting entire list with longer last item', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '* b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'cd' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+
+		// Ensure multi selection is not triggered and selection stays within
+		// the list.
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not have a dead zone between blocks (lower)', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Find a point outside the paragraph between the blocks where it's
+		// expected that the sibling inserter would be placed.
+		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const paragraphRect = await paragraph.boundingBox();
+		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
+		const y = paragraphRect.y + paragraphRect.height + 1;
+
+		await page.mouse.move( x, y );
+		await page.waitForSelector(
+			'.block-editor-block-list__insertion-point-inserter'
+		);
+
+		const inserter = await page.$(
+			'.block-editor-block-list__insertion-point-inserter'
+		);
+		const inserterRect = await inserter.boundingBox();
+		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
+
+		await page.mouse.click( x, lowerInserterY );
+		await page.keyboard.type( '3' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not have a dead zone between blocks (upper)', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		// Find a point outside the paragraph between the blocks where it's
+		// expected that the sibling inserter would be placed.
+		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const paragraphRect = await paragraph.boundingBox();
+		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
+		const y = paragraphRect.y + paragraphRect.height + 1;
+
+		await page.mouse.move( x, y );
+		await page.waitForSelector(
+			'.block-editor-block-list__insertion-point-inserter'
+		);
+
+		const inserter = await page.$(
+			'.block-editor-block-list__insertion-point-inserter'
+		);
+		const inserterRect = await inserter.boundingBox();
+		const upperInserterY = inserterRect.y + inserterRect.height / 3;
+
+		await page.mouse.click( x, upperInserterY );
 		await page.keyboard.type( '3' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

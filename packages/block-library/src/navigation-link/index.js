@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Path, SVG } from '@wordpress/components';
+import { navigation as icon } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
@@ -18,7 +19,7 @@ export const settings = {
 
 	parent: [ 'core/navigation' ],
 
-	icon: <SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24"><Path d="M12 7.27l4.28 10.43-3.47-1.53-.81-.36-.81.36-3.47 1.53L12 7.27M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z" /></SVG>,
+	icon,
 
 	description: __( 'Add a page, link, or another item to your navigation.' ),
 
@@ -32,4 +33,3 @@ export const settings = {
 	edit,
 	save,
 };
-

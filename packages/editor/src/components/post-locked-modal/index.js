@@ -131,7 +131,14 @@ class PostLockedModal extends Component {
 	}
 
 	render() {
-		const { user, postId, isLocked, isTakeover, postLockUtils, postType } = this.props;
+		const {
+			user,
+			postId,
+			isLocked,
+			isTakeover,
+			postLockUtils,
+			postType,
+		} = this.props;
 		if ( ! isLocked ) {
 			return null;
 		}
@@ -152,7 +159,11 @@ class PostLockedModal extends Component {
 		const allPostsLabel = __( 'Exit the Editor' );
 		return (
 			<Modal
-				title={ isTakeover ? __( 'Someone else has taken over this post.' ) : __( 'This post is already being edited.' ) }
+				title={
+					isTakeover
+						? __( 'Someone else has taken over this post.' )
+						: __( 'This post is already being edited.' )
+				}
 				focusOnMount={ true }
 				shouldCloseOnClickOutside={ false }
 				shouldCloseOnEsc={ false }
@@ -169,14 +180,17 @@ class PostLockedModal extends Component {
 				{ !! isTakeover && (
 					<div>
 						<div>
-							{ userDisplayName ?
-								sprintf(
-									/* translators: %s: user's display name */
-									__( '%s now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' ),
-									userDisplayName
-								) :
-								__( 'Another user now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' )
-							}
+							{ userDisplayName
+								? sprintf(
+										/* translators: %s: user's display name */
+										__(
+											'%s now has editing control of this post. Don’t worry, your changes up to this moment have been saved.'
+										),
+										userDisplayName
+								  )
+								: __(
+										'Another user now has editing control of this post. Don’t worry, your changes up to this moment have been saved.'
+								  ) }
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">
@@ -189,14 +203,17 @@ class PostLockedModal extends Component {
 				{ ! isTakeover && (
 					<div>
 						<div>
-							{ userDisplayName ?
-								sprintf(
-									/* translators: %s: user's display name */
-									__( '%s is currently working on this post, which means you cannot make changes, unless you take over.' ),
-									userDisplayName
-								) :
-								__( 'Another user is currently working on this post, which means you cannot make changes, unless you take over.' )
-							}
+							{ userDisplayName
+								? sprintf(
+										/* translators: %s: user's display name */
+										__(
+											'%s is currently working on this post, which means you cannot make changes, unless you take over.'
+										),
+										userDisplayName
+								  )
+								: __(
+										'Another user is currently working on this post, which means you cannot make changes, unless you take over.'
+								  ) }
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">

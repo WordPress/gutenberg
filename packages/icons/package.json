@@ -1,0 +1,33 @@
+{
+	"name": "@wordpress/icons",
+	"version": "1.0.0",
+	"description": "WordPress Icons package, based on dashicon.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"icons",
+		"dashicon",
+		"wordpress"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/icons/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/icons"
+	},
+	"sideEffects": false,
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.8.3",
+		"@wordpress/element": "../element",
+		"@wordpress/primitives": "../primitives"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

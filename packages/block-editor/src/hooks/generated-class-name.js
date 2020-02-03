@@ -29,7 +29,9 @@ export function addGeneratedClassName( extraProps, blockType ) {
 			extraProps.className = uniq( [
 				getBlockDefaultClassName( blockType.name ),
 				...extraProps.className.split( ' ' ),
-			] ).join( ' ' ).trim();
+			] )
+				.join( ' ' )
+				.trim();
 		} else {
 			// There is no string in the className variable,
 			// so we just dump the default name in there
@@ -39,4 +41,8 @@ export function addGeneratedClassName( extraProps, blockType ) {
 	return extraProps;
 }
 
-addFilter( 'blocks.getSaveContent.extraProps', 'core/generated-class-name/save-props', addGeneratedClassName );
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'core/generated-class-name/save-props',
+	addGeneratedClassName
+);

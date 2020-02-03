@@ -37,17 +37,15 @@ export const logged = Object.create( null );
  * ```
  */
 export default function deprecated( feature, options = {} ) {
-	const {
-		version,
-		alternative,
-		plugin,
-		link,
-		hint,
-	} = options;
+	const { version, alternative, plugin, link, hint } = options;
 
 	const pluginMessage = plugin ? ` from ${ plugin }` : '';
-	const versionMessage = version ? ` and will be removed${ pluginMessage } in version ${ version }` : '';
-	const useInsteadMessage = alternative ? ` Please use ${ alternative } instead.` : '';
+	const versionMessage = version
+		? ` and will be removed${ pluginMessage } in version ${ version }`
+		: '';
+	const useInsteadMessage = alternative
+		? ` Please use ${ alternative } instead.`
+		: '';
 	const linkMessage = link ? ` See: ${ link }` : '';
 	const hintMessage = hint ? ` Note: ${ hint }` : '';
 	const message = `${ feature } is deprecated${ versionMessage }.${ useInsteadMessage }${ linkMessage }${ hintMessage }`;

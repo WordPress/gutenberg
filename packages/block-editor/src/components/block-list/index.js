@@ -35,7 +35,6 @@ const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
 function BlockList( {
 	className,
 	rootClientId,
-	__experimentalMoverDirection: moverDirection = 'vertical',
 	isDraggable,
 	renderAppender,
 	__experimentalUIParts = {},
@@ -57,10 +56,9 @@ function BlockList( {
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
-			enableAnimation: (
+			enableAnimation:
 				! isTyping() &&
-				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD
-			),
+				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 		};
 	}
 
@@ -89,25 +87,33 @@ function BlockList( {
 			) }
 		>
 			{ blockClientIds.map( ( clientId, index ) => {
-				const isBlockInSelection = hasMultiSelection ?
-					multiSelectedBlockClientIds.includes( clientId ) :
-					selectedBlockClientId === clientId;
+				const isBlockInSelection = hasMultiSelection
+					? multiSelectedBlockClientIds.includes( clientId )
+					: selectedBlockClientId === clientId;
 
 				return (
-					<AsyncModeProvider key={ clientId } value={ ! isBlockInSelection }>
+					<AsyncModeProvider
+						key={ clientId }
+						value={ ! isBlockInSelection }
+					>
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
 							isDraggable={ isDraggable }
-							moverDirection={ moverDirection }
 							isMultiSelecting={ isMultiSelecting }
 							// This prop is explicitely computed and passed down
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
 							animateOnChange={ index }
 							enableAnimation={ enableAnimation }
-							hasSelectedUI={ __experimentalUIParts.hasSelectedUI }
-							className={ clientId === targetClientId ? 'is-drop-target' : undefined }
+							hasSelectedUI={
+								__experimentalUIParts.hasSelectedUI
+							}
+							className={
+								clientId === targetClientId
+									? 'is-drop-target'
+									: undefined
+							}
 						/>
 					</AsyncModeProvider>
 				);
@@ -115,7 +121,9 @@ function BlockList( {
 			<BlockListAppender
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
-				className={ targetClientId === null ? 'is-drop-target' : undefined }
+				className={
+					targetClientId === null ? 'is-drop-target' : undefined
+				}
 			/>
 			<__experimentalBlockListFooter.Slot />
 		</Container>

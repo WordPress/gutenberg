@@ -1,16 +1,10 @@
-
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { LEFT,
-	RIGHT,
-	UP,
-	DOWN,
-	BACKSPACE,
-	ENTER,
-} from '@wordpress/keycodes';
+import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -27,7 +21,12 @@ const handleLinkControlOnKeyDown = ( event ) => {
 };
 
 const handleLinkControlOnKeyPress = ( event ) => {
+	const { keyCode } = event;
+
 	event.stopPropagation();
+
+	if ( keyCode === ENTER ) {
+	}
 };
 
 const LinkControlSearchInput = ( {
@@ -37,22 +36,26 @@ const LinkControlSearchInput = ( {
 	renderSuggestions,
 	fetchSuggestions,
 	onReset,
+	showInitialSuggestions,
 } ) => {
+	const [ selectedSuggestion, setSelectedSuggestion ] = useState();
+
 	const selectItemHandler = ( selection, suggestion ) => {
 		onChange( selection );
-
-		if ( suggestion ) {
-			onSelect( suggestion );
-		}
+		setSelectedSuggestion( suggestion );
 	};
 
-	const stopFormEventsPropagation = ( event ) => {
+	function selectSuggestionOrCurrentInputValue( event ) {
+		// Avoid default forms behavior, since it's being handled custom here.
 		event.preventDefault();
-		event.stopPropagation();
-	};
+
+		// Interpret the selected value as either the selected suggestion, if
+		// exists, or otherwise the current input value as entered.
+		onSelect( selectedSuggestion || { url: value } );
+	}
 
 	return (
-		<form onSubmit={ stopFormEventsPropagation }>
+		<form onSubmit={ selectSuggestionOrCurrentInputValue }>
 			<URLInput
 				className="block-editor-link-control__search-input"
 				value={ value }
@@ -68,6 +71,7 @@ const LinkControlSearchInput = ( {
 				__experimentalRenderSuggestions={ renderSuggestions }
 				__experimentalFetchLinkSuggestions={ fetchSuggestions }
 				__experimentalHandleURLSuggestions={ true }
+				__experimentalShowInitialSuggestions={ showInitialSuggestions }
 			/>
 
 			<Button
@@ -78,7 +82,6 @@ const LinkControlSearchInput = ( {
 				className="block-editor-link-control__search-reset"
 				onClick={ onReset }
 			/>
-
 		</form>
 	);
 };

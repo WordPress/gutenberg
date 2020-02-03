@@ -20,29 +20,27 @@ const commonAttributes = {
 };
 
 // Create individual blocks out of each site in social-list.js
-export const sites = Object.keys( socialList ).map(
-	( site ) => {
-		const siteParams = socialList[ site ];
-		return {
-			name: 'core/social-link-' + site,
-			settings: {
-				title: siteParams.name,
-				icon: siteParams.icon,
-				description: __( 'Link to ' + siteParams.name ),
-				...commonAttributes,
-				attributes: {
-					url: {
-						type: 'string',
-					},
-					site: {
-						type: 'string',
-						default: site,
-					},
-					label: {
-						type: 'string',
-					},
+export const sites = Object.keys( socialList ).map( ( site ) => {
+	const siteParams = socialList[ site ];
+	return {
+		name: 'core/social-link-' + site,
+		settings: {
+			title: siteParams.name,
+			icon: siteParams.icon,
+			description: __( 'Link to ' + siteParams.name ),
+			...commonAttributes,
+			attributes: {
+				url: {
+					type: 'string',
+				},
+				site: {
+					type: 'string',
+					default: site,
+				},
+				label: {
+					type: 'string',
 				},
 			},
-		};
-	}
-);
+		},
+	};
+} );

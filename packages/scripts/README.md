@@ -16,6 +16,8 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
+**Note**: This package requires `node` 10.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
+
 ## Setup
 
 This package offers a command-line interface and exposes a binary called `wp-scripts` so you can call it directly with `npx` – an npm package runner. However, this module is designed to be configured using the `scripts` section in the `package.json` file of your project. This comprehensive example demonstrates the most of the capabilities included.
@@ -28,9 +30,13 @@ _Example:_
 		"build": "wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses",
+		"format:js": "wp-scripts format-js",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
+		"lint:md:docs": "wp-scripts lint-md-docs",
+		"lint:md:js": "wp-scripts lint-md-js",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"packages-update": "wp-scripts packages-update",
 		"start": "wp-scripts start",
 		"test:e2e": "wp-scripts test-e2e",
 		"test:unit": "wp-scripts test-unit-js"
@@ -44,7 +50,7 @@ It might also be a good idea to get familiar with the [JavaScript Build Setup tu
 
 To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
 
-In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md) for potential breaking changes.
+In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `update-packages` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
 
 We commit to keeping the breaking changes minimal so you can upgrade `@wordpress/scripts` as seamless as possible.
 
@@ -94,7 +100,7 @@ This is how you execute the script with presented setup:
 
 #### Advanced information
 
-It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. Similarly to this package, the default requirements are `node` 10.0.0 or later, and `npm` 6.9.0 or later. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-licenses`
 
@@ -166,6 +172,29 @@ In the `wp-env` config block, each entry can be configured like so:
 - `test-php`: Runs your plugin's PHPUnit tests. You will need to have an appropriately configured `phpunit.xml.dist` file.
 - `docker-run`: For more advanced debugging, contributors may sometimes need to run commands in the Docker containers. This is the equivalent of running `docker-compose run` within the WordPress directory.
 
+### `format-js`
+
+It helps to enforce coding style guidelines for your JavaScript files by formatting source code in a consistent way.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"format:js": "wp-scripts format-js",
+		"format:js:src": "wp-scripts format-js ./src"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+
+* `npm run format:js` - formats JavaScript files in the entire project’s directories.
+* `npm run format:js:src` - formats JavaScript files in the project’s `src` subfolder’s directories.
+
+When you run commands similar to the `npm run format:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
+
+By default, files located in `build` and `node_modules` folders are ignored.
 
 ### `lint-js`
 
@@ -223,6 +252,54 @@ By default, files located in `build` and `node_modules` folders are ignored.
 
 It uses [npm-package-json-lint](https://www.npmjs.com/package/npm-package-json-lint) with the set of recommended rules defined in [@wordpress/npm-package-json-lint-config](https://www.npmjs.com/package/@wordpress/npm-package-json-lint-config) npm package. You can override default rules with your own as described in [npm-package-json-lint wiki](https://github.com/tclindner/npm-package-json-lint/wiki). Learn more in the [Advanced Usage](#advanced-usage) section.
 
+### `lint-md-docs`
+
+Uses markdownlint to lint the markup of markdown files to enforce standards.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"lint:md:docs": "wp-scripts lint-md-docs"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+
+* `npm run lint:md:docs` - lints markdown files in the entire project’s directories.
+
+By default, files located in `build` and `node_modules` folders are ignored.
+
+#### Advanced information
+
+It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
+
+### `lint-md-js`
+
+Uses ESLint to lint the source included in markdown files to enforce standards for JS code.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"lint:md:js": "wp-scripts lint-md-js"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+
+* `npm run lint:md:js` - lints markdown files in the entire project’s directories.
+
+By default, files located in `build` and `node_modules` folders are ignored.
+
+#### Advanced information
+
+It uses [eslint-plugin-markdown](https://github.com/eslint/eslint-plugin-markdown) with the [.eslintrc-md.js](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/config/.eslintrc-md.js) configuration. This configuration tunes down the linting rules since documentation often includes just snippets of code. It is recommended to use the markdown linting as a check, but not necessarily a blocker since it might report more false errors.
+
 ### `lint-style`
 
 Helps enforce coding style guidelines for your style files.
@@ -250,6 +327,25 @@ By default, files located in `build` and `node_modules` folders are ignored.
 #### Advanced information
 
 It uses [stylelint](https://github.com/stylelint/stylelint) with the [stylelint-config-wordpress](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress) configuration per the [WordPress CSS Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://github.com/stylelint/stylelint/docs/user-guide.md). Learn more in the [Advanced Usage](#advanced-usage) section.
+
+### `packages-update`
+
+Updates the WordPress packages used in the project to their latest version.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"packages-update": "wp-scripts packages-update",
+		"postpackages-update": "npm run build"
+	}
+}
+```
+
+#### Advanced information
+
+The command checks which packages whose name starts with `@wordpress/` are used in the project by reading the package.json file, and then executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one.
 
 ### `start`
 

@@ -13,7 +13,7 @@ Deprecations are defined on a block type as its `deprecated` property, an array 
 - `supports` (Object): The [supports definition](/docs/designers-developers/developers/block-api/block-registration.md) of the deprecated form of the block.
 - `save` (Function): The [save implementation](/docs/designers-developers/developers/block-api/block-edit-save.md) of the deprecated form of the block.
 - `migrate` (Function, Optional): A function which, given the old attributes and inner blocks is expected to return either the new attributes or a tuple array of `[ attributes, innerBlocks ]` compatible with the block.
-- `isEligible` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, returns true if the deprecation can handle the block migration. This is particularly useful in cases where a block is technically valid even once deprecated, and requires updates to its attributes or inner blocks.
+- `isEligible` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, returns true if the deprecation can handle the block migration even if the block is valid. This function is not called when the block is invalid. This is particularly useful in cases where a block is technically valid even once deprecated, and requires updates to its attributes or inner blocks.
 
 It's important to note that `attributes`, `supports`, and `save` are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
 

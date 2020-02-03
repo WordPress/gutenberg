@@ -18,8 +18,13 @@ export {
 	__unstableRichTextInputEvent,
 } from './rich-text';
 export { default as MediaPlaceholder } from './media-placeholder';
-export { default as MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from './media-upload';
+export {
+	default as MediaUpload,
+	MEDIA_TYPE_IMAGE,
+	MEDIA_TYPE_VIDEO,
+} from './media-upload';
 export { default as MediaUploadProgress } from './media-upload-progress';
+export { default as MediaEdit } from './media-edit';
 export { default as URLInput } from './url-input';
 export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
 export { default as BlockCaption } from './block-caption';
@@ -29,7 +34,11 @@ export { BottomSheetSettings, BlockSettingsButton } from './block-settings';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
 // Content Related Components
-export { __experimentalPageTemplatePicker, __experimentalWithPageTemplatePickerVisible } from './page-template-picker';
+export {
+	__experimentalPageTemplatePicker,
+	__experimentalUsePageTemplatePickerVisible,
+	__experimentalWithPageTemplatePickerVisible,
+} from './page-template-picker';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';

@@ -6,10 +6,40 @@
 		"parent": null
 	},
 	{
+		"title": "Project Overview",
+		"slug": "principles",
+		"markdown_source": "../docs/contributors/principles.md",
+		"parent": null
+	},
+	{
 		"title": "Key Concepts",
 		"slug": "key-concepts",
 		"markdown_source": "../docs/designers-developers/key-concepts.md",
-		"parent": null
+		"parent": "principles"
+	},
+	{
+		"title": "Glossary",
+		"slug": "glossary",
+		"markdown_source": "../docs/designers-developers/glossary.md",
+		"parent": "principles"
+	},
+	{
+		"title": "Frequently Asked Questions",
+		"slug": "faq",
+		"markdown_source": "../docs/designers-developers/faq.md",
+		"parent": "principles"
+	},
+	{
+		"title": "History",
+		"slug": "history",
+		"markdown_source": "../docs/contributors/history.md",
+		"parent": "principles"
+	},
+	{
+		"title": "Outreach",
+		"slug": "outreach",
+		"markdown_source": "../docs/contributors/outreach.md",
+		"parent": "principles"
 	},
 	{
 		"title": "Developer Documentation",
@@ -234,34 +264,10 @@
 		"parent": "designers"
 	},
 	{
-		"title": "Contributor Documentation",
+		"title": "Contributor Guide",
 		"slug": "contributors",
 		"markdown_source": "../docs/contributors/readme.md",
 		"parent": null
-	},
-	{
-		"title": "Principles",
-		"slug": "principles",
-		"markdown_source": "../docs/contributors/principles.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Design Principles & Vision",
-		"slug": "design",
-		"markdown_source": "../docs/contributors/design.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Blocks are the Interface",
-		"slug": "the-block",
-		"markdown_source": "../docs/contributors/principles/the-block.md",
-		"parent": "design"
-	},
-	{
-		"title": "Reference",
-		"slug": "reference",
-		"markdown_source": "../docs/contributors/reference.md",
-		"parent": "design"
 	},
 	{
 		"title": "Developer Contributions",
@@ -318,16 +324,28 @@
 		"parent": "develop"
 	},
 	{
-		"title": "Localizing Gutenberg Plugin",
-		"slug": "localizing",
-		"markdown_source": "../docs/contributors/localizing.md",
-		"parent": "develop"
-	},
-	{
 		"title": "React Native based mobile Gutenberg",
 		"slug": "native-mobile",
 		"markdown_source": "../docs/contributors/native-mobile.md",
 		"parent": "develop"
+	},
+	{
+		"title": "Design Principles & Vision",
+		"slug": "design",
+		"markdown_source": "../docs/contributors/design.md",
+		"parent": "contributors"
+	},
+	{
+		"title": "Blocks are the Interface",
+		"slug": "the-block",
+		"markdown_source": "../docs/contributors/principles/the-block.md",
+		"parent": "design"
+	},
+	{
+		"title": "Reference",
+		"slug": "reference",
+		"markdown_source": "../docs/contributors/reference.md",
+		"parent": "design"
 	},
 	{
 		"title": "Documentation Contributions",
@@ -342,33 +360,15 @@
 		"parent": "document"
 	},
 	{
-		"title": "History",
-		"slug": "history",
-		"markdown_source": "../docs/contributors/history.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Glossary",
-		"slug": "glossary",
-		"markdown_source": "../docs/designers-developers/glossary.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Frequently Asked Questions",
-		"slug": "faq",
-		"markdown_source": "../docs/designers-developers/faq.md",
+		"title": "Localizing Gutenberg Plugin",
+		"slug": "localizing",
+		"markdown_source": "../docs/contributors/localizing.md",
 		"parent": "contributors"
 	},
 	{
 		"title": "Repository Management",
 		"slug": "repository-management",
 		"markdown_source": "../docs/contributors/repository-management.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Outreach",
-		"slug": "outreach",
-		"markdown_source": "../docs/contributors/outreach.md",
 		"parent": "contributors"
 	},
 	{
@@ -882,24 +882,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "BlockQuotation",
-		"slug": "block-quotation",
-		"markdown_source": "../packages/components/src/primitives/block-quotation/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "HorizontalRule",
-		"slug": "horizontal-rule",
-		"markdown_source": "../packages/components/src/primitives/horizontal-rule/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "Svg",
-		"slug": "svg",
-		"markdown_source": "../packages/components/src/primitives/svg/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "QueryControls",
 		"slug": "query-controls",
 		"markdown_source": "../packages/components/src/query-controls/README.md",
@@ -1206,6 +1188,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/create-block",
+		"slug": "packages-create-block",
+		"markdown_source": "../packages/create-block/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/custom-templated-path-webpack-plugin",
 		"slug": "packages-custom-templated-path-webpack-plugin",
 		"markdown_source": "../packages/custom-templated-path-webpack-plugin/README.md",
@@ -1344,6 +1332,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/icons",
+		"slug": "packages-icons",
+		"markdown_source": "../packages/icons/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/is-shallow-equal",
 		"slug": "packages-is-shallow-equal",
 		"markdown_source": "../packages/is-shallow-equal/README.md",
@@ -1428,6 +1422,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/primitives",
+		"slug": "packages-primitives",
+		"markdown_source": "../packages/primitives/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/priority-queue",
 		"slug": "packages-priority-queue",
 		"markdown_source": "../packages/priority-queue/README.md",
@@ -1485,6 +1485,12 @@
 		"title": "@wordpress/viewport",
 		"slug": "packages-viewport",
 		"markdown_source": "../packages/viewport/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/warning",
+		"slug": "packages-warning",
+		"markdown_source": "../packages/warning/README.md",
 		"parent": "packages"
 	},
 	{
