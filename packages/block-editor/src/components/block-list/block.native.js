@@ -148,7 +148,9 @@ class BlockListBlock extends Component {
 			// return apply childOfSelected or childOfSelectedLeaf
 			// margins depending if block has children or not
 			return {
-				...( hasChildren ? styles.childOfSelected : styles.childOfSelectedLeaf ),
+				...( hasChildren
+					? styles.childOfSelected
+					: styles.childOfSelectedLeaf ),
 				...dashedBorderStyle,
 				...( ! isLastBlock && styles.marginVerticalChild ),
 			};
@@ -158,7 +160,10 @@ class BlockListBlock extends Component {
 			// ancestor of a block is selected
 			return {
 				...styles.descendantOfSelectedLeaf,
-				...( hasChildren && { ...styles.marginHorizontalNone, ...styles.marginVerticalNone } ),
+				...( hasChildren && {
+					...styles.marginHorizontalNone,
+					...styles.marginVerticalNone,
+				} ),
 				...( ! isLastBlock && styles.marginVerticalDescendant ),
 			};
 		}
