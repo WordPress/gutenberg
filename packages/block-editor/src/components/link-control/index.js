@@ -150,10 +150,6 @@ function LinkControl( {
 		setInputValue( val );
 	};
 
-	const resetInput = () => {
-		setInputValue( '' );
-	};
-
 	const handleDirectEntry = ( val ) => {
 		let type = 'URL';
 
@@ -323,7 +319,6 @@ function LinkControl( {
 					} }
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
-					onReset={ resetInput }
 					showInitialSuggestions={ showInitialSuggestions }
 				/>
 			) : (
