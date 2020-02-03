@@ -38,15 +38,19 @@ export class InserterMenu extends Component {
 		this.props.hideInsertionPoint();
 	}
 
+	calculateItemWidth() {
+		const { paddingLeft: itemPaddingLeft, paddingRight: itemPaddingRight } = styles.modalItem;
+		const { width: itemWidth } = styles.modalIconWrapper;
+		return itemWidth + itemPaddingLeft + itemPaddingRight;
+	}
+
 	calculateNumberOfColumns() {
 		const bottomSheetWidth = BottomSheet.getWidth();
-		const { paddingLeft: itemPaddingLeft, paddingRight: itemPaddingRight } = styles.modalItem;
 		const {
 			paddingLeft: containerPaddingLeft,
 			paddingRight: containerPaddingRight,
 		} = styles.content;
-		const { width: itemWidth } = styles.modalIconWrapper;
-		const itemTotalWidth = itemWidth + itemPaddingLeft + itemPaddingRight;
+		const itemTotalWidth = this.calculateItemWidth();
 		const containerTotalWidth = bottomSheetWidth - ( containerPaddingLeft + containerPaddingRight );
 		return Math.floor( containerTotalWidth / itemTotalWidth );
 	}
@@ -77,7 +81,6 @@ export class InserterMenu extends Component {
 			styles.modalItemLabel,
 			styles.modalItemLabelDark
 		);
-		const modalItemMaxWidth = BottomSheet.getWidth() / this.state.numberOfColumns;
 
 		return (
 			<BottomSheet
@@ -104,7 +107,7 @@ export class InserterMenu extends Component {
 								accessibilityLabel={ item.title }
 								onPress={ () => this.props.onSelect( item ) }
 							>
-								<View style={ [ styles.modalItem, { flex: 1, maxWidth: modalItemMaxWidth } ] }>
+								<View style={ [ styles.modalItem, { width: this.calculateItemWidth() } ] }>
 									<View style={ modalIconWrapperStyle }>
 										<View style={ modalIconStyle }>
 											<Icon

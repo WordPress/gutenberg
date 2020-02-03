@@ -87,10 +87,14 @@ class BottomSheet extends Component {
 	}
 
 	onSetMaxHeight() {
-		const { height } = Dimensions.get( 'window' );
+		const { height, width } = Dimensions.get( 'window' );
 		const { safeAreaBottomInset } = this.state;
 
-		this.setState( { maxHeight: height / 2 - safeAreaBottomInset } );
+		// Horizontal mode
+		if ( width > height ) {
+			this.setState( { maxHeight: 0.9 * height } );
+			//	Vertical mode
+		} else this.setState( { maxHeight: height / 2 - safeAreaBottomInset } );
 	}
 
 	render() {
@@ -172,11 +176,11 @@ class BottomSheet extends Component {
 						contentContainerStyle={ [
 							styles.content,
 							hideHeader && styles.emptyHeader,
-							{ paddingBottom: this.state.safeAreaBottomInset },
 							contentStyle,
 						] }
 					>
 						{ this.props.children }
+						<View style={ { height: this.state.safeAreaBottomInset } } />
 					</ScrollView>
 				</KeyboardAvoidingView>
 			</Modal>
