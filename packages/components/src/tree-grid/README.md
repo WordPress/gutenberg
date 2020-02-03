@@ -17,7 +17,7 @@ For more information on a tree grid, see the following links:
 
 - https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html
 
-## Usage
+### Usage
 
 The `TreeGrid` renders both a `table` and `tbody` element, and is intended to be used with `TreeGridRow` (`tr`) and `TreeGridCell` (`td`) to build out a grid.
 

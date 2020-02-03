@@ -9,7 +9,7 @@ import { useState } from '@wordpress/element';
 import { RovingTabIndexProvider } from './context';
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/roving-tab-index/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/roving-tab-index/README.md
  */
 export default function RovingTabIndex( { children } ) {
 	const [ providerValue, setProviderValue ] = useState( {

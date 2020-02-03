@@ -25,7 +25,7 @@ Some patterns that implement a roving tab index are:
 
 This component doesn't implement any keyboard navigation, instead it handles setting the correct `tabIndex` value on focusable elements. It should be composed with another component that implements keyboard navigation (e.g. arrow key navigation).
 
-## Usage
+### Usage
 
 Wrap the component with `RovingTabIndex` and declare individual focusable elements within the component with `RovingTabIndexItem`.
 
