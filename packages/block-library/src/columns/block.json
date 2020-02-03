@@ -10,6 +10,9 @@
 		},
 		"customBackgroundColor": {
 			"type": "string"
+		},
+		"textColor": {
+			"type": "string"
 		}
 	}
 }
