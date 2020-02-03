@@ -36,6 +36,11 @@ describe( 'Buttons', () => {
 		await pressKeyWithModifier( 'primary', 'k' );
 		await page.keyboard.type( 'https://www.wordpress.org/' );
 		await page.keyboard.press( 'Enter' );
+		// Make sure that the dialog is still opened, and that focus is retained
+		// within (focusing on the link preview).
+		await page.waitForSelector(
+			':focus.block-editor-link-control__search-item-title'
+		);
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

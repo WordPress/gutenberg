@@ -22,30 +22,45 @@ describe( 'generated className', () => {
 	};
 
 	describe( 'addSaveProps', () => {
-		const addSaveProps = applyFilters.bind( null, 'blocks.getSaveContent.extraProps' );
+		const addSaveProps = applyFilters.bind(
+			null,
+			'blocks.getSaveContent.extraProps'
+		);
 
 		it( 'should do nothing if the block settings do not define generated className support', () => {
 			const attributes = { className: 'foo' };
-			const extraProps = addSaveProps( {}, {
-				...blockSettings,
-				supports: {
-					className: false,
+			const extraProps = addSaveProps(
+				{},
+				{
+					...blockSettings,
+					supports: {
+						className: false,
+					},
 				},
-			}, attributes );
+				attributes
+			);
 
 			expect( extraProps ).not.toHaveProperty( 'className' );
 		} );
 
 		it( 'should inject the generated className', () => {
 			const attributes = { className: 'bar' };
-			const extraProps = addSaveProps( { className: 'foo' }, blockSettings, attributes );
+			const extraProps = addSaveProps(
+				{ className: 'foo' },
+				blockSettings,
+				attributes
+			);
 
 			expect( extraProps.className ).toBe( 'wp-block-chicken-ribs foo' );
 		} );
 
 		it( 'should not inject duplicates into className', () => {
 			const attributes = { className: 'bar' };
-			const extraProps = addSaveProps( { className: 'foo wp-block-chicken-ribs' }, blockSettings, attributes );
+			const extraProps = addSaveProps(
+				{ className: 'foo wp-block-chicken-ribs' },
+				blockSettings,
+				attributes
+			);
 
 			expect( extraProps.className ).toBe( 'wp-block-chicken-ribs foo' );
 		} );

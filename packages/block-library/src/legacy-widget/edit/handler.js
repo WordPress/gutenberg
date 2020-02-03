@@ -59,7 +59,15 @@ class LegacyWidgetEditHandler extends Component {
 	}
 
 	render() {
-		const { instanceId, id, number, idBase, instance, isSelected, widgetName } = this.props;
+		const {
+			instanceId,
+			id,
+			number,
+			idBase,
+			instance,
+			isSelected,
+			widgetName,
+		} = this.props;
 		const { form } = this.state;
 
 		if ( ! form ) {
@@ -94,7 +102,6 @@ class LegacyWidgetEditHandler extends Component {
 						display: this.props.isVisible ? 'block' : 'none',
 					} }
 				>
-
 					<LegacyWidgetEditDomManager
 						isReferenceWidget={ !! id }
 						ref={ ( ref ) => {
@@ -172,18 +179,16 @@ class LegacyWidgetEditHandler extends Component {
 					instance_changes: instanceChanges,
 				},
 				method: 'POST',
-			} ).then(
-				( response ) => {
-					if ( isStillMounted ) {
-						this.setState( {
-							form: response.form,
-						} );
-						if ( callback ) {
-							callback( response );
-						}
+			} ).then( ( response ) => {
+				if ( isStillMounted ) {
+					this.setState( {
+						form: response.form,
+					} );
+					if ( callback ) {
+						callback( response );
 					}
 				}
-			);
+			} );
 		}
 	}
 }

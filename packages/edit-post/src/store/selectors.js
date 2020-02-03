@@ -25,7 +25,10 @@ export function getEditorMode( state ) {
 export function isEditorSidebarOpened( state ) {
 	const activeGeneralSidebar = getActiveGeneralSidebarName( state );
 
-	return includes( [ 'edit-post/document', 'edit-post/block' ], activeGeneralSidebar );
+	return includes(
+		[ 'edit-post/document', 'edit-post/block' ],
+		activeGeneralSidebar
+	);
 }
 
 /**
@@ -55,7 +58,11 @@ export function isPluginSidebarOpened( state ) {
  */
 export function getActiveGeneralSidebarName( state ) {
 	// Dismissal takes precedent.
-	const isDismissed = getPreference( state, 'isGeneralSidebarDismissed', false );
+	const isDismissed = getPreference(
+		state,
+		'isGeneralSidebarDismissed',
+		false
+	);
 	if ( isDismissed ) {
 		return null;
 	}
@@ -124,8 +131,10 @@ export function isEditorPanelRemoved( state, panelName ) {
 export function isEditorPanelEnabled( state, panelName ) {
 	const panels = getPreference( state, 'panels' );
 
-	return ! isEditorPanelRemoved( state, panelName ) &&
-		get( panels, [ panelName, 'enabled' ], true );
+	return (
+		! isEditorPanelRemoved( state, panelName ) &&
+		get( panels, [ panelName, 'enabled' ], true )
+	);
 }
 
 /**
@@ -193,12 +202,11 @@ export function isPluginItemPinned( state, pluginName ) {
  */
 export const getActiveMetaBoxLocations = createSelector(
 	( state ) => {
-		return Object.keys( state.metaBoxes.locations )
-			.filter( ( location ) => isMetaBoxLocationActive( state, location ) );
+		return Object.keys( state.metaBoxes.locations ).filter( ( location ) =>
+			isMetaBoxLocationActive( state, location )
+		);
 	},
-	( state ) => [
-		state.metaBoxes.locations,
-	]
+	( state ) => [ state.metaBoxes.locations ]
 );
 
 /**
@@ -255,9 +263,7 @@ export const getAllMetaBoxes = createSelector(
 	( state ) => {
 		return flatten( values( state.metaBoxes.locations ) );
 	},
-	( state ) => [
-		state.metaBoxes.locations,
-	]
+	( state ) => [ state.metaBoxes.locations ]
 );
 
 /**

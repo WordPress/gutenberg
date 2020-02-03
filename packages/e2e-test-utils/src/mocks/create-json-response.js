@@ -10,5 +10,6 @@ import { getJSONResponse } from '../shared/get-json-response';
  * @return {Promise} Promise that responds to a request with the mock JSON response.
  */
 export function createJSONResponse( mockResponse ) {
-	return async ( request ) => request.respond( getJSONResponse( mockResponse ) );
+	return async ( request ) =>
+		request.respond( getJSONResponse( mockResponse ) );
 }

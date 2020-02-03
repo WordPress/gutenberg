@@ -16,7 +16,9 @@ import BlockTitle from '../block-title';
  * @return {WPElement} Block Breadcrumb.
  */
 const BlockBreadcrumb = function() {
-	const { selectBlock, clearSelectedBlock } = useDispatch( 'core/block-editor' );
+	const { selectBlock, clearSelectedBlock } = useDispatch(
+		'core/block-editor'
+	);
 	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
 		const {
 			getSelectionStart,
@@ -37,9 +39,17 @@ const BlockBreadcrumb = function() {
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
 	return (
-		<ul className="block-editor-block-breadcrumb" role="list" aria-label={ __( 'Block breadcrumb' ) }>
+		<ul
+			className="block-editor-block-breadcrumb"
+			role="list"
+			aria-label={ __( 'Block breadcrumb' ) }
+		>
 			<li
-				className={ ! hasSelection ? 'block-editor-block-breadcrumb__current' : undefined }
+				className={
+					! hasSelection
+						? 'block-editor-block-breadcrumb__current'
+						: undefined
+				}
 				aria-current={ ! hasSelection ? 'true' : undefined }
 			>
 				{ hasSelection && (
@@ -65,7 +75,10 @@ const BlockBreadcrumb = function() {
 				</li>
 			) ) }
 			{ !! clientId && (
-				<li className="block-editor-block-breadcrumb__current" aria-current="true">
+				<li
+					className="block-editor-block-breadcrumb__current"
+					aria-current="true"
+				>
 					<BlockTitle clientId={ clientId } />
 				</li>
 			) }

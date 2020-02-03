@@ -20,17 +20,9 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { Component, createRef } from '@wordpress/element';
-import {
-	__,
-	sprintf,
-} from '@wordpress/i18n';
-import {
-	compose,
-	withInstanceId,
-} from '@wordpress/compose';
-import {
-	withSelect,
-} from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { compose, withInstanceId } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 
 /**
@@ -90,9 +82,9 @@ class VideoEdit extends Component {
 
 		if ( newSrc !== src ) {
 			// Check if there's an embed block that handles this URL.
-			const embedBlock = createUpgradedEmbedBlock(
-				{ attributes: { url: newSrc } }
-			);
+			const embedBlock = createUpgradedEmbedBlock( {
+				attributes: { url: newSrc },
+			} );
 			if ( undefined !== embedBlock ) {
 				this.props.onReplace( embedBlock );
 				return;
@@ -121,12 +113,7 @@ class VideoEdit extends Component {
 	}
 
 	render() {
-		const {
-			caption,
-			controls,
-			poster,
-			src,
-		} = this.props.attributes;
+		const { caption, controls, poster, src } = this.props.attributes;
 		const {
 			className,
 			instanceId,
@@ -184,41 +171,52 @@ class VideoEdit extends Component {
 							attributes={ attributes }
 						/>
 						<MediaUploadCheck>
-							<BaseControl
-								className="editor-video-poster-control"
-							>
+							<BaseControl className="editor-video-poster-control">
 								<BaseControl.VisualLabel>
 									{ __( 'Poster Image' ) }
 								</BaseControl.VisualLabel>
 								<MediaUpload
 									title={ __( 'Select Poster Image' ) }
 									onSelect={ this.onSelectPoster }
-									allowedTypes={ VIDEO_POSTER_ALLOWED_MEDIA_TYPES }
+									allowedTypes={
+										VIDEO_POSTER_ALLOWED_MEDIA_TYPES
+									}
 									render={ ( { open } ) => (
 										<Button
 											isSecondary
 											onClick={ open }
 											ref={ this.posterImageButton }
-											aria-describedby={ videoPosterDescription }
+											aria-describedby={
+												videoPosterDescription
+											}
 										>
-											{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
+											{ ! this.props.attributes.poster
+												? __( 'Select Poster Image' )
+												: __( 'Replace image' ) }
 										</Button>
 									) }
 								/>
-								<p
-									id={ videoPosterDescription }
-									hidden
-								>
-									{ this.props.attributes.poster ?
-										sprintf( __( 'The current poster image url is %s' ), this.props.attributes.poster ) :
-										__( 'There is no poster image currently selected' )
-									}
+								<p id={ videoPosterDescription } hidden>
+									{ this.props.attributes.poster
+										? sprintf(
+												__(
+													'The current poster image url is %s'
+												),
+												this.props.attributes.poster
+										  )
+										: __(
+												'There is no poster image currently selected'
+										  ) }
 								</p>
-								{ !! this.props.attributes.poster &&
-									<Button onClick={ this.onRemovePoster } isLink isDestructive>
+								{ !! this.props.attributes.poster && (
+									<Button
+										onClick={ this.onRemovePoster }
+										isLink
+										isDestructive
+									>
 										{ __( 'Remove Poster Image' ) }
 									</Button>
-								}
+								) }
 							</BaseControl>
 						</MediaUploadCheck>
 					</PanelBody>
@@ -241,7 +239,9 @@ class VideoEdit extends Component {
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( { caption: value } )
+							}
 							inlineToolbar
 						/>
 					) }

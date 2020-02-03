@@ -33,7 +33,9 @@ describe( 'getSerializeCapableElement', () => {
 		// since all that is cared about is that it can be serialized.
 		const html = renderToString( element );
 
-		expect( html ).toBe( 'This <strong class="is-extra-strong">is</strong> a test' );
+		expect( html ).toBe(
+			'This <strong class="is-extra-strong">is</strong> a test'
+		);
 	} );
 } );
 
@@ -52,7 +54,7 @@ describe( 'concat', () => {
 				props: {
 					children: [ 'world' ],
 				},
-			},
+			}
 		);
 
 		expect( result ).toEqual( [
@@ -73,16 +75,12 @@ describe( 'concat', () => {
 	} );
 
 	it( 'should merge adjacent strings', () => {
-		const result = concat(
-			'Hello',
-			' ',
-			{
-				type: 'strong',
-				props: {
-					children: [ 'World' ],
-				},
+		const result = concat( 'Hello', ' ', {
+			type: 'strong',
+			props: {
+				children: [ 'World' ],
 			},
-		);
+		} );
 
 		expect( result ).toEqual( [
 			'Hello ',
@@ -118,7 +116,8 @@ describe( 'toHTML', () => {
 describe( 'fromDOM', () => {
 	it( 'should return an equivalent block children', () => {
 		const node = document.createElement( 'div' );
-		node.innerHTML = 'This <strong class="is-extra-strong">is</strong> a test';
+		node.innerHTML =
+			'This <strong class="is-extra-strong">is</strong> a test';
 
 		const blockNode = fromDOM( node.childNodes );
 
