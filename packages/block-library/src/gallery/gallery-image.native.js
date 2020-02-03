@@ -145,14 +145,14 @@ class GalleryImage extends Component {
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
-		this.props.setAttributes( {
-			id: payload.mediaServerId,
-			url: payload.mediaUrl,
-		} );
-
 		this.setState( {
 			isUploadInProgress: false,
 			didUploadFail: false,
+		} );
+
+		this.props.setAttributes( {
+			id: payload.mediaServerId,
+			url: payload.mediaUrl,
 		} );
 	}
 
