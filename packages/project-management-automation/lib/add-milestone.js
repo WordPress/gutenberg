@@ -23,7 +23,7 @@ const DAYS_PER_RELEASE = 14;
  *
  * @param {Error} error Error to test.
  *
- * @return {boolean} Whether error is duplicate validation request error.
+ * @return {boolean} Whether error is a duplicate validation request error.
  */
 const isDuplicateValidationError = ( error ) =>
 	Array.isArray( error.errors ) &&
