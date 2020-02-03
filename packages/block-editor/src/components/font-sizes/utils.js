@@ -14,7 +14,11 @@ import { find, kebabCase } from 'lodash';
  * @return {?string} If fontSizeAttribute is set and an equal slug is found in fontSizes it returns the font size object for that slug.
  * 					 Otherwise, an object with just the size value based on customFontSize is returned.
  */
-export const getFontSize = ( fontSizes, fontSizeAttribute, customFontSizeAttribute ) => {
+export const getFontSize = (
+	fontSizes,
+	fontSizeAttribute,
+	customFontSizeAttribute
+) => {
 	if ( fontSizeAttribute ) {
 		const fontSizeObject = find( fontSizes, { slug: fontSizeAttribute } );
 		if ( fontSizeObject ) {

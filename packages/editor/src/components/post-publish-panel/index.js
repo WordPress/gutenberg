@@ -34,7 +34,11 @@ export class PostPublishPanel extends Component {
 	componentDidUpdate( prevProps ) {
 		// Automatically collapse the publish sidebar when a post
 		// is published and the user makes an edit.
-		if ( prevProps.isPublished && ! this.props.isSaving && this.props.isDirty ) {
+		if (
+			prevProps.isPublished &&
+			! this.props.isSaving &&
+			this.props.isDirty
+		) {
 			this.props.onClose();
 		}
 	}
@@ -66,7 +70,8 @@ export class PostPublishPanel extends Component {
 			'isDirty',
 			'isPostTypeViewable',
 		] );
-		const isPublishedOrScheduled = isPublished || ( isScheduled && isBeingScheduled );
+		const isPublishedOrScheduled =
+			isPublished || ( isScheduled && isBeingScheduled );
 		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
 		const isPostPublish = isPublishedOrScheduled && ! isSaving;
 		return (
@@ -74,7 +79,9 @@ export class PostPublishPanel extends Component {
 				<div className="editor-post-publish-panel__header">
 					{ isPostPublish ? (
 						<div className="editor-post-publish-panel__header-published">
-							{ isScheduled ? __( 'Scheduled' ) : __( 'Published' ) }
+							{ isScheduled
+								? __( 'Scheduled' )
+								: __( 'Published' ) }
 						</div>
 					) : (
 						<div className="editor-post-publish-panel__header-publish-button">
@@ -134,7 +141,11 @@ export default compose( [
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: get(
+				getCurrentPost(),
+				[ '_links', 'wp:action-publish' ],
+				false
+			),
 			isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isDirty: isEditedPostDirty(),
@@ -145,7 +156,9 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
-		const { disablePublishSidebar, enablePublishSidebar } = dispatch( 'core/editor' );
+		const { disablePublishSidebar, enablePublishSidebar } = dispatch(
+			'core/editor'
+		);
 		return {
 			onTogglePublishSidebar: () => {
 				if ( isPublishSidebarEnabled ) {

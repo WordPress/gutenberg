@@ -65,7 +65,13 @@ const processFile = ( rootDir, inputFile ) => {
 	}
 };
 
-const runCustomFormatter = ( customFormatterFile, rootDir, doc, symbols, headingTitle ) => {
+const runCustomFormatter = (
+	customFormatterFile,
+	rootDir,
+	doc,
+	symbols,
+	headingTitle
+) => {
 	try {
 		const customFormatter = require( customFormatterFile );
 		const output = customFormatter( rootDir, doc, symbols, headingTitle );
@@ -101,7 +107,9 @@ module.exports = function( sourceFile, options ) {
 	const ast = inputBase + '-ast.json';
 	const tokens = inputBase + '-exports.json';
 	const ir = inputBase + '-ir.json';
-	const doc = options.output ? path.join( processDir, options.output ) : inputBase + '-api.md';
+	const doc = options.output
+		? path.join( processDir, options.output )
+		: inputBase + '-api.md';
 
 	// Process
 	const result = processFile( processDir, sourceFile );
@@ -119,7 +127,9 @@ module.exports = function( sourceFile, options ) {
 
 	// Ouput
 	if ( result === undefined ) {
-		process.stdout.write( '\nFile was processed, but contained no ES6 module exports:' );
+		process.stdout.write(
+			'\nFile was processed, but contained no ES6 module exports:'
+		);
 		process.stdout.write( `\n${ sourceFile }` );
 		process.stdout.write( '\n\n' );
 		process.exit( 0 );

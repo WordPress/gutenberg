@@ -54,7 +54,10 @@ export function hasSameKeys( a, b ) {
  * @return {boolean} Whether actions are updating the same post property.
  */
 export function isUpdatingSamePostProperty( action, previousAction ) {
-	return action.type === 'EDIT_POST' && hasSameKeys( action.edits, previousAction.edits );
+	return (
+		action.type === 'EDIT_POST' &&
+		hasSameKeys( action.edits, previousAction.edits )
+	);
 }
 
 /**

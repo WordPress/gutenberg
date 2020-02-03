@@ -15,9 +15,12 @@ const TextHighlight = ( { text = '', highlight = '' } ) => {
 
 	const regex = new RegExp( `(${ escapeRegExp( highlight ) })`, 'gi' );
 
-	return __experimentalCreateInterpolateElement( text.replace( regex, '<mark>$&</mark>' ), {
-		mark: <mark />,
-	} );
+	return __experimentalCreateInterpolateElement(
+		text.replace( regex, '<mark>$&</mark>' ),
+		{
+			mark: <mark />,
+		}
+	);
 };
 
 export default TextHighlight;

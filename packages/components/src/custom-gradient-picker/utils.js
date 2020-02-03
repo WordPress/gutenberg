@@ -11,7 +11,10 @@ import {
 	MINIMUM_ABSOLUTE_LEFT_POSITION,
 	MINIMUM_DISTANCE_BETWEEN_POINTS,
 } from './constants';
-import { serializeGradientColor, serializeGradientPosition } from './serializer';
+import {
+	serializeGradientColor,
+	serializeGradientPosition,
+} from './serializer';
 
 function tinyColorRgbToGradientColorStop( { r, g, b, a } ) {
 	if ( a === 1 ) {
@@ -26,7 +29,11 @@ function tinyColorRgbToGradientColorStop( { r, g, b, a } ) {
 	};
 }
 
-export function getGradientWithColorStopAdded( gradientAST, relativePosition, rgbaColor ) {
+export function getGradientWithColorStopAdded(
+	gradientAST,
+	relativePosition,
+	rgbaColor
+) {
 	const colorStop = tinyColorRgbToGradientColorStop( rgbaColor );
 	colorStop.length = {
 		type: '%',
@@ -38,26 +45,38 @@ export function getGradientWithColorStopAdded( gradientAST, relativePosition, rg
 	};
 }
 
-export function getGradientWithPositionAtIndexChanged( gradientAST, index, relativePosition ) {
+export function getGradientWithPositionAtIndexChanged(
+	gradientAST,
+	index,
+	relativePosition
+) {
 	return {
 		...gradientAST,
-		colorStops: gradientAST.colorStops.map( ( colorStop, colorStopIndex ) => {
-			if ( colorStopIndex !== index ) {
-				return colorStop;
+		colorStops: gradientAST.colorStops.map(
+			( colorStop, colorStopIndex ) => {
+				if ( colorStopIndex !== index ) {
+					return colorStop;
+				}
+				return {
+					...colorStop,
+					length: {
+						...colorStop.length,
+						value: relativePosition,
+					},
+				};
 			}
-			return {
-				...colorStop,
-				length: {
-					...colorStop.length,
-					value: relativePosition,
-				},
-			};
-		} ),
+		),
 	};
 }
 
-export function isControlPointOverlapping( gradientAST, position, initialIndex ) {
-	const initialPosition = parseInt( gradientAST.colorStops[ initialIndex ].length.value );
+export function isControlPointOverlapping(
+	gradientAST,
+	position,
+	initialIndex
+) {
+	const initialPosition = parseInt(
+		gradientAST.colorStops[ initialIndex ].length.value
+	);
 	const minPosition = Math.min( initialPosition, position );
 	const maxPosition = Math.max( initialPosition, position );
 
@@ -65,19 +84,31 @@ export function isControlPointOverlapping( gradientAST, position, initialIndex )
 		const itemPosition = parseInt( length.value );
 		return (
 			index !== initialIndex &&
-			( Math.abs( itemPosition - position ) < MINIMUM_DISTANCE_BETWEEN_POINTS ||
+			( Math.abs( itemPosition - position ) <
+				MINIMUM_DISTANCE_BETWEEN_POINTS ||
 				( minPosition < itemPosition && itemPosition < maxPosition ) )
 		);
 	} );
 }
 
-function getGradientWithPositionAtIndexSummed( gradientAST, index, valueToSum ) {
+function getGradientWithPositionAtIndexSummed(
+	gradientAST,
+	index,
+	valueToSum
+) {
 	const currentPosition = gradientAST.colorStops[ index ].length.value;
-	const newPosition = Math.max( 0, Math.min( 100, parseInt( currentPosition ) + valueToSum ) );
+	const newPosition = Math.max(
+		0,
+		Math.min( 100, parseInt( currentPosition ) + valueToSum )
+	);
 	if ( isControlPointOverlapping( gradientAST, newPosition, index ) ) {
 		return gradientAST;
 	}
-	return getGradientWithPositionAtIndexChanged( gradientAST, index, newPosition );
+	return getGradientWithPositionAtIndexChanged(
+		gradientAST,
+		index,
+		newPosition
+	);
 }
 
 export function getGradientWithPositionAtIndexIncreased( gradientAST, index ) {
@@ -96,18 +127,24 @@ export function getGradientWithPositionAtIndexDecreased( gradientAST, index ) {
 	);
 }
 
-export function getGradientWithColorAtIndexChanged( gradientAST, index, rgbaColor ) {
+export function getGradientWithColorAtIndexChanged(
+	gradientAST,
+	index,
+	rgbaColor
+) {
 	return {
 		...gradientAST,
-		colorStops: gradientAST.colorStops.map( ( colorStop, colorStopIndex ) => {
-			if ( colorStopIndex !== index ) {
-				return colorStop;
+		colorStops: gradientAST.colorStops.map(
+			( colorStop, colorStopIndex ) => {
+				if ( colorStopIndex !== index ) {
+					return colorStop;
+				}
+				return {
+					...colorStop,
+					...tinyColorRgbToGradientColorStop( rgbaColor ),
+				};
 			}
-			return {
-				...colorStop,
-				...tinyColorRgbToGradientColorStop( rgbaColor ),
-			};
-		} ),
+		),
 	};
 }
 
@@ -146,10 +183,17 @@ export function getHorizontalRelativeGradientPosition(
 	}
 	const { x, width } = containerElement.getBoundingClientRect();
 	const absolutePositionValue =
-		mouseXCoordinate - x - MINIMUM_ABSOLUTE_LEFT_POSITION - positionedElementWidth / 2;
-	const availableWidth = width - MINIMUM_ABSOLUTE_LEFT_POSITION - INSERT_POINT_WIDTH;
+		mouseXCoordinate -
+		x -
+		MINIMUM_ABSOLUTE_LEFT_POSITION -
+		positionedElementWidth / 2;
+	const availableWidth =
+		width - MINIMUM_ABSOLUTE_LEFT_POSITION - INSERT_POINT_WIDTH;
 	return Math.round(
-		Math.min( Math.max( ( absolutePositionValue * 100 ) / availableWidth, 0 ), 100 )
+		Math.min(
+			Math.max( ( absolutePositionValue * 100 ) / availableWidth, 0 ),
+			100
+		)
 	);
 }
 
@@ -169,7 +213,11 @@ export function getMarkerPoints( gradientAST ) {
 		return [];
 	}
 	return map( gradientAST.colorStops, ( colorStop ) => {
-		if ( ! colorStop || ! colorStop.length || colorStop.length.type !== '%' ) {
+		if (
+			! colorStop ||
+			! colorStop.length ||
+			colorStop.length.type !== '%'
+		) {
 			return null;
 		}
 		return {

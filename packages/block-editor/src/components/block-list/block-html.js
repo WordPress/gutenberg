@@ -27,13 +27,23 @@ function BlockHTML( { clientId } ) {
 	const { updateBlock } = useDispatch( 'core/block-editor' );
 	const onChange = () => {
 		const blockType = getBlockType( block.name );
-		const attributes = getBlockAttributes( blockType, html, block.attributes );
+		const attributes = getBlockAttributes(
+			blockType,
+			html,
+			block.attributes
+		);
 
 		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
 		const content = html ? html : getSaveContent( blockType, attributes );
-		const isValid = html ? isValidBlockContent( blockType, attributes, content ) : true;
+		const isValid = html
+			? isValidBlockContent( blockType, attributes, content )
+			: true;
 
-		updateBlock( clientId, { attributes, originalContent: content, isValid } );
+		updateBlock( clientId, {
+			attributes,
+			originalContent: content,
+			isValid,
+		} );
 
 		// Ensure the state is updated if we reset so it displays the default content
 		if ( ! html ) {

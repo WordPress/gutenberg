@@ -56,19 +56,25 @@ describe( 'babel-plugin', () => {
 		}
 
 		it( 'should not return translator comment on same line but after call expression', () => {
-			const comment = getCommentFromString( "__( 'Hello world' ); // translators: Greeting" );
+			const comment = getCommentFromString(
+				"__( 'Hello world' ); // translators: Greeting"
+			);
 
 			expect( comment ).toBeUndefined();
 		} );
 
 		it( 'should return translator comment on leading comments', () => {
-			const comment = getCommentFromString( "// translators: Greeting\n__( 'Hello world' );" );
+			const comment = getCommentFromString(
+				"// translators: Greeting\n__( 'Hello world' );"
+			);
 
 			expect( comment ).toBe( 'Greeting' );
 		} );
 
 		it( 'should be case insensitive to translator prefix', () => {
-			const comment = getCommentFromString( "// TrANslAtORs: Greeting\n__( 'Hello world' );" );
+			const comment = getCommentFromString(
+				"// TrANslAtORs: Greeting\n__( 'Hello world' );"
+			);
 
 			expect( comment ).toBe( 'Greeting' );
 		} );
@@ -82,7 +88,9 @@ describe( 'babel-plugin', () => {
 		} );
 
 		it( 'should not consider comment if it does not end on same or previous line', () => {
-			const comment = getCommentFromString( "// translators: Greeting\n\n__( 'Hello world' );" );
+			const comment = getCommentFromString(
+				"// translators: Greeting\n\n__( 'Hello world' );"
+			);
 
 			expect( comment ).toBeUndefined();
 		} );
@@ -121,7 +129,9 @@ describe( 'babel-plugin', () => {
 		} );
 
 		it( 'should be a concatenated binary expression string value', () => {
-			const string = getNodeAsStringFromArgument( '__( "hello" + " world" );' );
+			const string = getNodeAsStringFromArgument(
+				'__( "hello" + " world" );'
+			);
 
 			expect( string ).toBe( 'hello world' );
 		} );

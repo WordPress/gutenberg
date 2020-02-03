@@ -18,7 +18,9 @@ import {
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 function readFile( filePath ) {
-	return fs.existsSync( filePath ) ? fs.readFileSync( filePath, 'utf8' ).trim() : '';
+	return fs.existsSync( filePath )
+		? fs.readFileSync( filePath, 'utf8' ).trim()
+		: '';
 }
 
 describe( 'Blocks raw handling', () => {
@@ -47,7 +49,9 @@ describe( 'Blocks raw handling', () => {
 							ids: {
 								type: 'array',
 								shortcode: ( { named: { ids } } ) =>
-									ids.split( ',' ).map( ( id ) => parseInt( id, 10 ) ),
+									ids
+										.split( ',' )
+										.map( ( id ) => parseInt( id, 10 ) ),
 							},
 						},
 						priority: 9,
@@ -68,11 +72,14 @@ describe( 'Blocks raw handling', () => {
 					{
 						type: 'raw',
 						isMatch: ( node ) => {
-							return 'words to live by' === node.textContent.trim();
+							return (
+								'words to live by' === node.textContent.trim()
+							);
 						},
 						transform: () => {
 							return createBlock( 'core-embed/youtube', {
-								url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+								url:
+									'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 							} );
 						},
 					},
@@ -121,7 +128,9 @@ describe( 'Blocks raw handling', () => {
 			.map( getBlockContent )
 			.join( '' );
 
-		expect( filtered ).toBe( '<ul><li>one</li><li>two</li><li>three</li></ul>' );
+		expect( filtered ).toBe(
+			'<ul><li>one</li><li>two</li><li>three</li></ul>'
+		);
 		expect( console ).toHaveLogged();
 	} );
 
@@ -138,7 +147,8 @@ describe( 'Blocks raw handling', () => {
 
 	it( 'should parse HTML in plainText', () => {
 		const filtered = pasteHandler( {
-			HTML: '&lt;p&gt;Some &lt;strong&gt;bold&lt;/strong&gt; text.&lt;/p&gt;',
+			HTML:
+				'&lt;p&gt;Some &lt;strong&gt;bold&lt;/strong&gt; text.&lt;/p&gt;',
 			plainText: '<p>Some <strong>bold</strong> text.</p>',
 			mode: 'AUTO',
 		} );
@@ -156,7 +166,9 @@ describe( 'Blocks raw handling', () => {
 			.map( getBlockContent )
 			.join( '' );
 
-		expect( filtered ).toBe( '<h1>Some <em>heading</em></h1><p>A paragraph.</p>' );
+		expect( filtered ).toBe(
+			'<h1>Some <em>heading</em></h1><p>A paragraph.</p>'
+		);
 		expect( console ).toHaveLogged();
 	} );
 
@@ -223,7 +235,9 @@ describe( 'Blocks raw handling', () => {
 			.map( getBlockContent )
 			.join( '' );
 
-		expect( filtered ).toBe( '<ul><li>One</li><li>Two</li><li>Three</li></ul>' );
+		expect( filtered ).toBe(
+			'<ul><li>One</li><li>Two</li><li>Three</li></ul>'
+		);
 		expect( console ).toHaveLogged();
 	} );
 
@@ -235,7 +249,9 @@ describe( 'Blocks raw handling', () => {
 			.map( getBlockContent )
 			.join( '' );
 
-		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>chicken</p></blockquote>' );
+		expect( filtered ).toBe(
+			'<blockquote class="wp-block-quote"><p>chicken</p></blockquote>'
+		);
 		expect( console ).toHaveLogged();
 	} );
 	it( 'should correctly handle quotes with multiple paragraphs and no citation', () => {
@@ -282,7 +298,8 @@ describe( 'Blocks raw handling', () => {
 
 	it( 'should handle a citation in the middle of the content', () => {
 		const filtered = pasteHandler( {
-			HTML: '<blockquote><p>chicken</p><cite>ribs</cite><p>ribs</p></blockquote>',
+			HTML:
+				'<blockquote><p>chicken</p><cite>ribs</cite><p>ribs</p></blockquote>',
 			mode: 'AUTO',
 		} )
 			.map( getBlockContent )
@@ -322,7 +339,8 @@ describe( 'Blocks raw handling', () => {
 
 	it( 'should convert to paragraph quotes with more than one cite and at least one paragraph', () => {
 		const filtered = pasteHandler( {
-			HTML: '<blockquote><p>chicken</p><cite>ribs</cite><cite>ribs</cite></blockquote>',
+			HTML:
+				'<blockquote><p>chicken</p><cite>ribs</cite><cite>ribs</cite></blockquote>',
 			mode: 'AUTO',
 		} )
 			.map( getBlockContent )
@@ -366,16 +384,29 @@ describe( 'Blocks raw handling', () => {
 			'shortcode-matching',
 		].forEach( ( type ) => {
 			it( type, () => {
-				const HTML = readFile( path.join( __dirname, `fixtures/${ type }-in.html` ) );
-				const plainText = readFile( path.join( __dirname, `fixtures/${ type }-in.txt` ) );
-				const output = readFile( path.join( __dirname, `fixtures/${ type }-out.html` ) );
+				const HTML = readFile(
+					path.join( __dirname, `fixtures/${ type }-in.html` )
+				);
+				const plainText = readFile(
+					path.join( __dirname, `fixtures/${ type }-in.txt` )
+				);
+				const output = readFile(
+					path.join( __dirname, `fixtures/${ type }-out.html` )
+				);
 
 				if ( ! ( HTML || plainText ) || ! output ) {
 					throw new Error( `Expected fixtures for type ${ type }` );
 				}
 
-				const converted = pasteHandler( { HTML, plainText, canUserUseUnfilteredHTML: true } );
-				const serialized = typeof converted === 'string' ? converted : serialize( converted );
+				const converted = pasteHandler( {
+					HTML,
+					plainText,
+					canUserUseUnfilteredHTML: true,
+				} );
+				const serialized =
+					typeof converted === 'string'
+						? converted
+						: serialize( converted );
 
 				expect( serialized ).toBe( output );
 
@@ -392,19 +423,26 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		it( 'should remove extra blank lines', () => {
-			const HTML = readFile( path.join( __dirname, 'fixtures/google-docs-blank-lines.html' ) );
+			const HTML = readFile(
+				path.join( __dirname, 'fixtures/google-docs-blank-lines.html' )
+			);
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
 		} );
 
 		it( 'should strip windows data', () => {
-			const HTML = readFile( path.join( __dirname, 'fixtures/windows.html' ) );
+			const HTML = readFile(
+				path.join( __dirname, 'fixtures/windows.html' )
+			);
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 		} );
 
 		it( 'should strip HTML formatting space from inline text', () => {
 			const HTML = readFile(
-				path.join( __dirname, 'fixtures/inline-with-html-formatting-space.html' )
+				path.join(
+					__dirname,
+					'fixtures/inline-with-html-formatting-space.html'
+				)
 			);
 			expect( pasteHandler( { HTML } ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
@@ -414,29 +452,40 @@ describe( 'Blocks raw handling', () => {
 
 describe( 'rawHandler', () => {
 	it( 'should convert HTML post to blocks with minimal content changes', () => {
-		const HTML = readFile( path.join( __dirname, 'fixtures/wordpress-convert.html' ) );
+		const HTML = readFile(
+			path.join( __dirname, 'fixtures/wordpress-convert.html' )
+		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
 	it( 'should convert a caption shortcode', () => {
-		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption.html' ) );
+		const HTML = readFile(
+			path.join( __dirname, 'fixtures/shortcode-caption.html' )
+		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
 	it( 'should convert a caption shortcode with link', () => {
-		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption-with-link.html' ) );
+		const HTML = readFile(
+			path.join( __dirname, 'fixtures/shortcode-caption-with-link.html' )
+		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
 	it( 'should convert a caption shortcode with caption', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/shortcode-caption-with-caption-link.html' )
+			path.join(
+				__dirname,
+				'fixtures/shortcode-caption-with-caption-link.html'
+			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
 	it( 'should convert a list with attributes', () => {
-		const HTML = readFile( path.join( __dirname, 'fixtures/list-with-attributes.html' ) );
+		const HTML = readFile(
+			path.join( __dirname, 'fixtures/list-with-attributes.html' )
+		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 

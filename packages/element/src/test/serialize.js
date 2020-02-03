@@ -76,7 +76,9 @@ describe( 'serialize()', () => {
 			</Provider>
 		);
 
-		expect( result ).toBe( 'FunctionComponent: Hello!' + 'ClassComponent: Hello!' );
+		expect( result ).toBe(
+			'FunctionComponent: Hello!' + 'ClassComponent: Hello!'
+		);
 	} );
 
 	it( 'should render with forwardRef', () => {
@@ -118,7 +120,9 @@ describe( 'serialize()', () => {
 	describe( 'boolean attributes', () => {
 		it( 'should render elements with false boolean attributes', () => {
 			[ false, null, undefined ].forEach( ( controls ) => {
-				const result = serialize( <video src="/" controls={ controls } /> );
+				const result = serialize(
+					<video src="/" controls={ controls } />
+				);
 
 				expect( result ).toBe( '<video src="/"></video>' );
 			} );
@@ -126,7 +130,9 @@ describe( 'serialize()', () => {
 
 		it( 'should render elements with true boolean attributes', () => {
 			[ true, 'true', 'false', '' ].forEach( ( controls ) => {
-				const result = serialize( <video src="/" controls={ controls } /> );
+				const result = serialize(
+					<video src="/" controls={ controls } />
+				);
 
 				expect( result ).toBe( '<video src="/" controls></video>' );
 			} );
@@ -250,7 +256,9 @@ describe( 'renderElement()', () => {
 			value: 'default',
 		} );
 
-		const result = renderElement( <Consumer>{ ( context ) => context.value }</Consumer> );
+		const result = renderElement(
+			<Consumer>{ ( context ) => context.value }</Consumer>
+		);
 
 		expect( result ).toBe( 'default' );
 	} );
@@ -316,7 +324,9 @@ describe( 'renderElement()', () => {
 	} );
 
 	it( 'renders RawHTML with wrapper if props passed', () => {
-		const result = renderElement( <RawHTML className="foo">{ '<img/>' }</RawHTML> );
+		const result = renderElement(
+			<RawHTML className="foo">{ '<img/>' }</RawHTML>
+		);
 
 		expect( result ).toBe( '<div class="foo"><img/></div>' );
 	} );
@@ -337,13 +347,18 @@ describe( 'renderElement()', () => {
 describe( 'renderNativeComponent()', () => {
 	describe( 'textarea', () => {
 		it( 'should render textarea value as its content', () => {
-			const result = renderNativeComponent( 'textarea', { value: 'Hello', children: [] } );
+			const result = renderNativeComponent( 'textarea', {
+				value: 'Hello',
+				children: [],
+			} );
 
 			expect( result ).toBe( '<textarea>Hello</textarea>' );
 		} );
 
 		it( 'should render textarea children as its content', () => {
-			const result = renderNativeComponent( 'textarea', { children: [ 'Hello' ] } );
+			const result = renderNativeComponent( 'textarea', {
+				children: [ 'Hello' ],
+			} );
 
 			expect( result ).toBe( '<textarea>Hello</textarea>' );
 		} );
@@ -351,7 +366,9 @@ describe( 'renderNativeComponent()', () => {
 
 	describe( 'escaping', () => {
 		it( 'should escape children', () => {
-			const result = renderNativeComponent( 'div', { children: [ '<img/>' ] } );
+			const result = renderNativeComponent( 'div', {
+				children: [ '<img/>' ],
+			} );
 
 			expect( result ).toBe( '<div>&lt;img/></div>' );
 		} );
@@ -381,7 +398,10 @@ describe( 'renderNativeComponent()', () => {
 		} );
 
 		it( 'should ignore self-closing elements children', () => {
-			const result = renderNativeComponent( 'img', { src: 'foo.png', children: [ 'Surprise!' ] } );
+			const result = renderNativeComponent( 'img', {
+				src: 'foo.png',
+				children: [ 'Surprise!' ],
+			} );
 
 			expect( result ).toBe( '<img src="foo.png"/>' );
 		} );
@@ -389,7 +409,9 @@ describe( 'renderNativeComponent()', () => {
 
 	describe( 'with children', () => {
 		it( 'should render single literal child', () => {
-			const result = renderNativeComponent( 'div', { children: 'Hello' } );
+			const result = renderNativeComponent( 'div', {
+				children: 'Hello',
+			} );
 
 			expect( result ).toBe( '<div>Hello</div>' );
 		} );
@@ -507,7 +529,9 @@ describe( 'renderAttributes()', () => {
 				contentEditable: true,
 			} );
 
-			expect( result ).toBe( ' for="foo" class="bar" contenteditable="true"' );
+			expect( result ).toBe(
+				' for="foo" class="bar" contenteditable="true"'
+			);
 		} );
 	} );
 

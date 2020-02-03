@@ -11,7 +11,10 @@ import {
 
 async function getActiveLabel() {
 	return await page.evaluate( () => {
-		return document.activeElement.getAttribute( 'aria-label' ) || document.activeElement.innerHTML;
+		return (
+			document.activeElement.getAttribute( 'aria-label' ) ||
+			document.activeElement.innerHTML
+		);
 	} );
 }
 
@@ -33,9 +36,9 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
-	await expect( await page.evaluate( () => document.activeElement.innerHTML ) ).toBe(
-		paragraphText
-	);
+	await expect(
+		await page.evaluate( () => document.activeElement.innerHTML )
+	).toBe( paragraphText );
 
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Document' );
@@ -123,10 +126,14 @@ describe( 'Order of block keyboard navigation', () => {
 		).toBe( 'Add title' );
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 1. 0' );
+		await expect( await getActiveLabel() ).toBe(
+			'Paragraph Block. Row 1. 0'
+		);
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 2. 1' );
+		await expect( await getActiveLabel() ).toBe(
+			'Paragraph Block. Row 2. 1'
+		);
 
 		await page.keyboard.press( 'Tab' );
 		await expect( await getActiveLabel() ).toBe( 'Document (selected)' );
@@ -144,14 +151,20 @@ describe( 'Order of block keyboard navigation', () => {
 		// Clear the selected block and put focus behind the block list.
 		await page.evaluate( () => {
 			document.querySelector( '.edit-post-visual-editor' ).focus();
-			document.querySelector( '.edit-post-editor-regions__sidebar' ).focus();
+			document
+				.querySelector( '.edit-post-editor-regions__sidebar' )
+				.focus();
 		} );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 2. 1' );
+		await expect( await getActiveLabel() ).toBe(
+			'Paragraph Block. Row 2. 1'
+		);
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 1. 0' );
+		await expect( await getActiveLabel() ).toBe(
+			'Paragraph Block. Row 1. 0'
+		);
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect(
@@ -181,7 +194,9 @@ describe( 'Order of block keyboard navigation', () => {
 		await expect( await getActiveLabel() ).toBe( 'Document' );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Multiple selected blocks' );
+		await expect( await getActiveLabel() ).toBe(
+			'Multiple selected blocks'
+		);
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect( await getActiveLabel() ).toBe( 'More options' );

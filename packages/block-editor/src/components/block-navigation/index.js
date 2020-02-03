@@ -16,7 +16,12 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockNavigationList from './list';
 
-function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, selectBlock } ) {
+function BlockNavigation( {
+	rootBlock,
+	rootBlocks,
+	selectedBlockClientId,
+	selectBlock,
+} ) {
 	if ( ! rootBlocks || rootBlocks.length === 0 ) {
 		return null;
 	}
@@ -27,8 +32,13 @@ function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, select
 			( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 ) );
 
 	return (
-		<NavigableMenu role="presentation" className="block-editor-block-navigation__container">
-			<p className="block-editor-block-navigation__label">{ __( 'Block navigation' ) }</p>
+		<NavigableMenu
+			role="presentation"
+			className="block-editor-block-navigation__container"
+		>
+			<p className="block-editor-block-navigation__label">
+				{ __( 'Block navigation' ) }
+			</p>
 			{ hasHierarchy && (
 				<BlockNavigationList
 					blocks={ [ rootBlock ] }
@@ -50,14 +60,19 @@ function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, select
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockHierarchyRootClientId, getBlock, getBlocks } = select(
-			'core/block-editor'
-		);
+		const {
+			getSelectedBlockClientId,
+			getBlockHierarchyRootClientId,
+			getBlock,
+			getBlocks,
+		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			rootBlocks: getBlocks(),
 			rootBlock: selectedBlockClientId
-				? getBlock( getBlockHierarchyRootClientId( selectedBlockClientId ) )
+				? getBlock(
+						getBlockHierarchyRootClientId( selectedBlockClientId )
+				  )
 				: null,
 			selectedBlockClientId,
 		};

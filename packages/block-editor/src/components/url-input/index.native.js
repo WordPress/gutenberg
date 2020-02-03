@@ -8,7 +8,12 @@ import { TextInput } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 
-export default function URLInput( { value = '', autoFocus = true, onChange, ...extraProps } ) {
+export default function URLInput( {
+	value = '',
+	autoFocus = true,
+	onChange,
+	...extraProps
+} ) {
 	/* eslint-disable jsx-a11y/no-autofocus */
 	return (
 		<TextInput

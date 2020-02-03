@@ -405,7 +405,10 @@ test( 'that autop treats inline elements as inline', () => {
 test( 'element sanity', () => {
 	[
 		[ 'Hello <a\nhref="world">', '<p>Hello <a\nhref="world"></p>\n' ],
-		[ 'Hello <!-- a\nhref="world" -->', '<p>Hello <!-- a\nhref="world" --></p>\n' ],
+		[
+			'Hello <!-- a\nhref="world" -->',
+			'<p>Hello <!-- a\nhref="world" --></p>\n',
+		],
 		[
 			'Hello <!-- <object>\n<param>\n<param>\n<embed>\n</embed>\n</object>\n -->',
 			'<p>Hello <!-- <object>\n<param>\n<param>\n<embed>\n</embed>\n</object>\n --></p>\n',
@@ -481,7 +484,8 @@ test( 'that text before blocks is peed', () => {
 } );
 
 test( 'that autop doses not add extra closing p in figure', () => {
-	const content1 = '<figure><img src="example.jpg" /><figcaption>Caption</figcaption></figure>';
+	const content1 =
+		'<figure><img src="example.jpg" /><figcaption>Caption</figcaption></figure>';
 	const expected1 = content1;
 
 	const content2 = `<figure>
@@ -497,8 +501,10 @@ test( 'that autop doses not add extra closing p in figure', () => {
 } );
 
 test( 'that autop correctly adds a start and end tag when followed by a div', () => {
-	const content = 'Testing autop with a div\n<div class="wp-some-class">content</div>';
-	const expected = '<p>Testing autop with a div</p>\n<div class="wp-some-class">content</div>';
+	const content =
+		'Testing autop with a div\n<div class="wp-some-class">content</div>';
+	const expected =
+		'<p>Testing autop with a div</p>\n<div class="wp-some-class">content</div>';
 
 	expect( autop( content ).trim() ).toBe( expected );
 } );

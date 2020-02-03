@@ -31,7 +31,8 @@ const isSourceFile = ( filename ) => {
 		! [
 			/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+.js$/,
 			/.\.(spec|test)\.js$/,
-		].some( ( regex ) => regex.test( filename ) ) && /.\.(js|json|scss)$/.test( filename )
+		].some( ( regex ) => regex.test( filename ) ) &&
+		/.\.(js|json|scss)$/.test( filename )
 	);
 };
 
@@ -41,29 +42,44 @@ getPackages().forEach( ( p ) => {
 	const srcDir = path.resolve( p, 'src' );
 	try {
 		fs.accessSync( srcDir, fs.F_OK );
-		watch( path.resolve( p, 'src' ), { recursive: true }, ( event, filename ) => {
-			if ( ! isSourceFile( filename ) ) {
-				return;
-			}
+		watch(
+			path.resolve( p, 'src' ),
+			{ recursive: true },
+			( event, filename ) => {
+				if ( ! isSourceFile( filename ) ) {
+					return;
+				}
 
-			const filePath = path.resolve( srcDir, filename );
-			if ( event === 'update' && exists( filePath ) ) {
-				// eslint-disable-next-line no-console
-				console.log( chalk.green( '->' ), `${ event }: ${ filename }` );
-				rebuild( filePath );
-			} else {
-				const buildFile = path.resolve( srcDir, '..', 'build', filename );
-				try {
-					fs.unlinkSync( buildFile );
-					process.stdout.write(
-						chalk.red( '  \u2022 ' ) +
-							path.relative( path.resolve( srcDir, '..', '..' ), buildFile ) +
-							' (deleted)' +
-							'\n'
+				const filePath = path.resolve( srcDir, filename );
+				if ( event === 'update' && exists( filePath ) ) {
+					// eslint-disable-next-line no-console
+					console.log(
+						chalk.green( '->' ),
+						`${ event }: ${ filename }`
 					);
-				} catch ( e ) {}
+					rebuild( filePath );
+				} else {
+					const buildFile = path.resolve(
+						srcDir,
+						'..',
+						'build',
+						filename
+					);
+					try {
+						fs.unlinkSync( buildFile );
+						process.stdout.write(
+							chalk.red( '  \u2022 ' ) +
+								path.relative(
+									path.resolve( srcDir, '..', '..' ),
+									buildFile
+								) +
+								' (deleted)' +
+								'\n'
+						);
+					} catch ( e ) {}
+				}
 			}
-		} );
+		);
 	} catch ( e ) {
 		// doesn't exist
 	}

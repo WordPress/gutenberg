@@ -29,14 +29,21 @@ const formatExamples = ( tags, docs ) => {
 		docs.push( '*Usage*' );
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( ...tags.map( ( tag ) => `${ tag.description }` ).join( '\n\n' ) );
+		docs.push(
+			...tags.map( ( tag ) => `${ tag.description }` ).join( '\n\n' )
+		);
 	}
 };
 
 const formatDeprecated = ( tags, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
-		docs.push( ...tags.map( ( tag ) => `\n> **Deprecated** ${ cleanSpaces( tag.description ) }` ) );
+		docs.push(
+			...tags.map(
+				( tag ) =>
+					`\n> **Deprecated** ${ cleanSpaces( tag.description ) }`
+			)
+		);
 	}
 };
 
@@ -58,7 +65,13 @@ const getTypeOutput = ( type ) => {
 	return type ? `\`${ type }\`` : '(unknown type)';
 };
 
-module.exports = function( rootDir, docPath, symbols, headingTitle, headingStartIndex ) {
+module.exports = function(
+	rootDir,
+	docPath,
+	symbols,
+	headingTitle,
+	headingStartIndex
+) {
 	const docs = [];
 	let headingIndex = headingStartIndex || 1;
 	if ( headingTitle ) {
@@ -81,7 +94,10 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 	if ( symbols && symbols.length > 0 ) {
 		symbols.forEach( ( symbol ) => {
 			docs.push( getSymbolHeading( symbol.name ) );
-			formatDeprecated( getSymbolTagsByName( symbol, 'deprecated' ), docs );
+			formatDeprecated(
+				getSymbolTagsByName( symbol, 'deprecated' ),
+				docs
+			);
 			formatDescription( symbol.description, docs );
 			formatTag(
 				'Related',
@@ -93,20 +109,28 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 			formatTag(
 				'Type',
 				getSymbolTagsByName( symbol, 'type' ),
-				( tag ) => `\n- ${ getTypeOutput( tag.type ) } ${ cleanSpaces( tag.description ) }`,
+				( tag ) =>
+					`\n- ${ getTypeOutput( tag.type ) } ${ cleanSpaces(
+						tag.description
+					) }`,
 				docs
 			);
 			formatTag(
 				'Parameters',
 				getSymbolTagsByName( symbol, 'param' ),
 				( tag ) =>
-					`\n- *${ tag.name }* ${ getTypeOutput( tag.type ) }: ${ cleanSpaces( tag.description ) }`,
+					`\n- *${ tag.name }* ${ getTypeOutput(
+						tag.type
+					) }: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Returns',
 				getSymbolTagsByName( symbol, 'return' ),
-				( tag ) => `\n- ${ getTypeOutput( tag.type ) }: ${ cleanSpaces( tag.description ) }`,
+				( tag ) =>
+					`\n- ${ getTypeOutput( tag.type ) }: ${ cleanSpaces(
+						tag.description
+					) }`,
 				docs
 			);
 			formatTag(
@@ -119,7 +143,9 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 				'Properties',
 				getSymbolTagsByName( symbol, 'property' ),
 				( tag ) =>
-					`\n- *${ tag.name }* ${ getTypeOutput( tag.type ) }: ${ cleanSpaces( tag.description ) }`,
+					`\n- *${ tag.name }* ${ getTypeOutput(
+						tag.type
+					) }: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			docs.push( '\n' );

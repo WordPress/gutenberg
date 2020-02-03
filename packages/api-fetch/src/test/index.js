@@ -50,14 +50,17 @@ describe( 'apiFetch', () => {
 			body,
 		} );
 
-		expect( window.fetch ).toHaveBeenCalledWith( '/wp/v2/media?_locale=user', {
-			credentials: 'include',
-			headers: {
-				Accept: 'application/json, */*;q=0.1',
-			},
-			method: 'POST',
-			body,
-		} );
+		expect( window.fetch ).toHaveBeenCalledWith(
+			'/wp/v2/media?_locale=user',
+			{
+				credentials: 'include',
+				headers: {
+					Accept: 'application/json, */*;q=0.1',
+				},
+				method: 'POST',
+				body,
+			}
+		);
 	} );
 
 	it( 'should fetch with a JSON body', () => {
@@ -72,15 +75,18 @@ describe( 'apiFetch', () => {
 			data: {},
 		} );
 
-		expect( window.fetch ).toHaveBeenCalledWith( '/wp/v2/posts?_locale=user', {
-			body: '{}',
-			credentials: 'include',
-			headers: {
-				Accept: 'application/json, */*;q=0.1',
-				'Content-Type': 'application/json',
-			},
-			method: 'POST',
-		} );
+		expect( window.fetch ).toHaveBeenCalledWith(
+			'/wp/v2/posts?_locale=user',
+			{
+				body: '{}',
+				credentials: 'include',
+				headers: {
+					Accept: 'application/json, */*;q=0.1',
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+			}
+		);
 	} );
 
 	it( 'should respect developer-provided options', () => {
@@ -93,15 +99,18 @@ describe( 'apiFetch', () => {
 			credentials: 'omit',
 		} );
 
-		expect( window.fetch ).toHaveBeenCalledWith( '/wp/v2/posts?_locale=user', {
-			body: '{}',
-			credentials: 'omit',
-			headers: {
-				Accept: 'application/json, */*;q=0.1',
-				'Content-Type': 'application/json',
-			},
-			method: 'POST',
-		} );
+		expect( window.fetch ).toHaveBeenCalledWith(
+			'/wp/v2/posts?_locale=user',
+			{
+				body: '{}',
+				credentials: 'omit',
+				headers: {
+					Accept: 'application/json, */*;q=0.1',
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+			}
+		);
 	} );
 
 	it( 'should return the error message properly', () => {
@@ -188,11 +197,13 @@ describe( 'apiFetch', () => {
 			} )
 		);
 
-		return apiFetch( { path: '/random', parse: false } ).then( ( response ) => {
-			expect( response ).toEqual( {
-				status: 200,
-			} );
-		} );
+		return apiFetch( { path: '/random', parse: false } ).then(
+			( response ) => {
+				expect( response ).toEqual( {
+					status: 200,
+				} );
+			}
+		);
 	} );
 
 	it( 'should not try to parse the error', () => {
@@ -202,11 +213,13 @@ describe( 'apiFetch', () => {
 			} )
 		);
 
-		return apiFetch( { path: '/random', parse: false } ).catch( ( response ) => {
-			expect( response ).toEqual( {
-				status: 400,
-			} );
-		} );
+		return apiFetch( { path: '/random', parse: false } ).catch(
+			( response ) => {
+				expect( response ).toEqual( {
+					status: 400,
+				} );
+			}
+		);
 	} );
 
 	it( 'should not use the default fetch handler when using a custom fetch handler', () => {

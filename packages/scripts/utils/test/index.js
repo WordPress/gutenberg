@@ -8,7 +8,10 @@ import crossSpawn from 'cross-spawn';
  */
 import { hasArgInCLI, hasProjectFile, spawnScript } from '../';
 import { getPackagePath as getPackagePathMock } from '../package';
-import { exit as exitMock, getArgsFromCLI as getArgsFromCLIMock } from '../process';
+import {
+	exit as exitMock,
+	getArgsFromCLI as getArgsFromCLIMock,
+} from '../process';
 
 jest.mock( '../package', () => {
 	const module = require.requireActual( '../package' );
@@ -31,7 +34,11 @@ describe( 'utils', () => {
 
 	describe( 'hasArgInCLI', () => {
 		beforeAll( () => {
-			getArgsFromCLIMock.mockReturnValue( [ '-a', '--b', '--config=test' ] );
+			getArgsFromCLIMock.mockReturnValue( [
+				'-a',
+				'--b',
+				'--config=test',
+			] );
 		} );
 
 		afterAll( () => {
@@ -88,7 +95,9 @@ describe( 'utils', () => {
 		} );
 
 		test( 'should exit when an unknown script name provided', () => {
-			expect( () => spawnScript( 'unknown-script' ) ).toThrow( 'Exit code: 1.' );
+			expect( () => spawnScript( 'unknown-script' ) ).toThrow(
+				'Exit code: 1.'
+			);
 			expect( console ).toHaveLoggedWith(
 				'Unknown script "unknown-script". Perhaps you need to update @wordpress/scripts?'
 			);
@@ -97,21 +106,27 @@ describe( 'utils', () => {
 		test( 'should exit when the script failed because of SIGKILL signal', () => {
 			crossSpawnMock.mockReturnValueOnce( { signal: 'SIGKILL' } );
 
-			expect( () => spawnScript( scriptName ) ).toThrow( 'Exit code: 1.' );
+			expect( () => spawnScript( scriptName ) ).toThrow(
+				'Exit code: 1.'
+			);
 			expect( console ).toHaveLogged();
 		} );
 
 		test( 'should exit when the script failed because of SIGTERM signal', () => {
 			crossSpawnMock.mockReturnValueOnce( { signal: 'SIGTERM' } );
 
-			expect( () => spawnScript( scriptName ) ).toThrow( 'Exit code: 1.' );
+			expect( () => spawnScript( scriptName ) ).toThrow(
+				'Exit code: 1.'
+			);
 			expect( console ).toHaveLogged();
 		} );
 
 		test( 'should finish successfully when the script properly executed', () => {
 			crossSpawnMock.mockReturnValueOnce( { status: 0 } );
 
-			expect( () => spawnScript( scriptName ) ).toThrow( 'Exit code: 0.' );
+			expect( () => spawnScript( scriptName ) ).toThrow(
+				'Exit code: 0.'
+			);
 			expect( crossSpawnMock ).toHaveBeenCalledWith(
 				'node',
 				[ expect.stringContaining( scriptName ) ],
@@ -123,7 +138,9 @@ describe( 'utils', () => {
 			crossSpawnMock.mockReturnValueOnce( { status: 0 } );
 			const args = [ '-a', '--bbb', '-c=ccccc' ];
 
-			expect( () => spawnScript( scriptName, args ) ).toThrow( 'Exit code: 0.' );
+			expect( () => spawnScript( scriptName, args ) ).toThrow(
+				'Exit code: 0.'
+			);
 			expect( crossSpawnMock ).toHaveBeenCalledWith(
 				'node',
 				[ expect.stringContaining( scriptName ), ...args ],

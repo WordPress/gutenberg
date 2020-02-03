@@ -27,8 +27,12 @@ class PullQuoteEdit extends Component {
 		super( props );
 
 		this.wasTextColorAutomaticallyComputed = false;
-		this.pullQuoteMainColorSetter = this.pullQuoteMainColorSetter.bind( this );
-		this.pullQuoteTextColorSetter = this.pullQuoteTextColorSetter.bind( this );
+		this.pullQuoteMainColorSetter = this.pullQuoteMainColorSetter.bind(
+			this
+		);
+		this.pullQuoteTextColorSetter = this.pullQuoteTextColorSetter.bind(
+			this
+		);
 	}
 
 	pullQuoteMainColorSetter( colorValue ) {
@@ -41,8 +45,10 @@ class PullQuoteEdit extends Component {
 			className,
 		} = this.props;
 		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
-		const needTextColor = ! textColor.color || this.wasTextColorAutomaticallyComputed;
-		const shouldSetTextColor = isSolidColorStyle && needTextColor && colorValue;
+		const needTextColor =
+			! textColor.color || this.wasTextColorAutomaticallyComputed;
+		const shouldSetTextColor =
+			isSolidColorStyle && needTextColor && colorValue;
 
 		if ( isSolidColorStyle ) {
 			// If we use the solid color style, set the color using the normal mechanism.
@@ -77,12 +83,22 @@ class PullQuoteEdit extends Component {
 			// Remove the named color, and set the color as a custom color.
 			// This is done because named colors use classes, in the default style we use a border color,
 			// and themes don't set classes for border colors.
-			setAttributes( { mainColor: undefined, customMainColor: mainColor.color } );
+			setAttributes( {
+				mainColor: undefined,
+				customMainColor: mainColor.color,
+			} );
 		}
 	}
 
 	render() {
-		const { attributes, mainColor, textColor, setAttributes, isSelected, className } = this.props;
+		const {
+			attributes,
+			mainColor,
+			textColor,
+			setAttributes,
+			isSelected,
+			className,
+		} = this.props;
 
 		const { value, citation } = attributes;
 
@@ -101,12 +117,18 @@ class PullQuoteEdit extends Component {
 		};
 
 		const blockquoteClasses =
-			textColor.color && classnames( 'has-text-color', { [ textColor.class ]: textColor.class } );
+			textColor.color &&
+			classnames( 'has-text-color', {
+				[ textColor.class ]: textColor.class,
+			} );
 
 		return (
 			<>
 				<figure style={ figureStyles } className={ figureClasses }>
-					<blockquote style={ blockquoteStyles } className={ blockquoteClasses }>
+					<blockquote
+						style={ blockquoteStyles }
+						className={ blockquoteClasses }
+					>
 						<RichText
 							multiline
 							value={ value }
@@ -169,4 +191,7 @@ class PullQuoteEdit extends Component {
 	}
 }
 
-export default withColors( { mainColor: 'background-color', textColor: 'color' } )( PullQuoteEdit );
+export default withColors( {
+	mainColor: 'background-color',
+	textColor: 'color',
+} )( PullQuoteEdit );

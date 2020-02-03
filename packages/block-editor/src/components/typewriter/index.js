@@ -18,12 +18,18 @@ class Typewriter extends Component {
 
 		this.ref = createRef();
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.addSelectionChangeListener = this.addSelectionChangeListener.bind( this );
-		this.computeCaretRectOnSelectionChange = this.computeCaretRectOnSelectionChange.bind( this );
+		this.addSelectionChangeListener = this.addSelectionChangeListener.bind(
+			this
+		);
+		this.computeCaretRectOnSelectionChange = this.computeCaretRectOnSelectionChange.bind(
+			this
+		);
 		this.maintainCaretPosition = this.maintainCaretPosition.bind( this );
 		this.computeCaretRect = this.computeCaretRect.bind( this );
 		this.onScrollResize = this.onScrollResize.bind( this );
-		this.isSelectionEligibleForScroll = this.isSelectionEligibleForScroll.bind( this );
+		this.isSelectionEligibleForScroll = this.isSelectionEligibleForScroll.bind(
+			this
+		);
 	}
 
 	componentDidMount() {
@@ -36,7 +42,10 @@ class Typewriter extends Component {
 	componentWillUnmount() {
 		window.removeEventListener( 'scroll', this.onScrollResize, true );
 		window.removeEventListener( 'resize', this.onScrollResize, true );
-		document.removeEventListener( 'selectionchange', this.computeCaretRectOnSelectionChange );
+		document.removeEventListener(
+			'selectionchange',
+			this.computeCaretRectOnSelectionChange
+		);
 
 		if ( this.onScrollResize.rafId ) {
 			window.cancelAnimationFrame( this.onScrollResize.rafId );
@@ -61,7 +70,10 @@ class Typewriter extends Component {
 	 * event. Also removes the listener, so it acts as a one-time listener.
 	 */
 	computeCaretRectOnSelectionChange() {
-		document.removeEventListener( 'selectionchange', this.computeCaretRectOnSelectionChange );
+		document.removeEventListener(
+			'selectionchange',
+			this.computeCaretRectOnSelectionChange
+		);
 		this.computeCaretRect();
 	}
 
@@ -91,7 +103,9 @@ class Typewriter extends Component {
 	}
 
 	isLastEditableNode() {
-		const editableNodes = this.ref.current.querySelectorAll( '[contenteditable="true"]' );
+		const editableNodes = this.ref.current.querySelectorAll(
+			'[contenteditable="true"]'
+		);
 		const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
 		return lastEditableNode === document.activeElement;
 	}
@@ -143,11 +157,16 @@ class Typewriter extends Component {
 		}
 
 		const windowScroll = scrollContainer === document.body;
-		const scrollY = windowScroll ? window.scrollY : scrollContainer.scrollTop;
-		const scrollContainerY = windowScroll ? 0 : scrollContainer.getBoundingClientRect().top;
+		const scrollY = windowScroll
+			? window.scrollY
+			: scrollContainer.scrollTop;
+		const scrollContainerY = windowScroll
+			? 0
+			: scrollContainer.getBoundingClientRect().top;
 		const relativeScrollPosition = windowScroll
 			? this.caretRect.top / window.innerHeight
-			: ( this.caretRect.top - scrollContainerY ) / ( window.innerHeight - scrollContainerY );
+			: ( this.caretRect.top - scrollContainerY ) /
+			  ( window.innerHeight - scrollContainerY );
 
 		// If the scroll position is at the start, the active editable element
 		// is the last one, and the caret is positioned within the initial
@@ -165,13 +184,16 @@ class Typewriter extends Component {
 			return;
 		}
 
-		const scrollContainerHeight = windowScroll ? window.innerHeight : scrollContainer.clientHeight;
+		const scrollContainerHeight = windowScroll
+			? window.innerHeight
+			: scrollContainer.clientHeight;
 
 		// Abort if the target scroll position would scroll the caret out of
 		// view.
 		if (
 			// The caret is under the lower fold.
-			this.caretRect.top + this.caretRect.height > scrollContainerY + scrollContainerHeight ||
+			this.caretRect.top + this.caretRect.height >
+				scrollContainerY + scrollContainerHeight ||
 			// The caret is above the upper fold.
 			this.caretRect.top < scrollContainerY
 		) {
@@ -192,7 +214,10 @@ class Typewriter extends Component {
 	 * maintained.
 	 */
 	addSelectionChangeListener() {
-		document.addEventListener( 'selectionchange', this.computeCaretRectOnSelectionChange );
+		document.addEventListener(
+			'selectionchange',
+			this.computeCaretRectOnSelectionChange
+		);
 	}
 
 	onKeyDown( event ) {

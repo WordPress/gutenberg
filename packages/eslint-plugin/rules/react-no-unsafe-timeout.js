@@ -7,7 +7,11 @@
  */
 function isComponent( node ) {
 	// Assume function component by naming convention of UpperCamelCase.
-	if ( node.type === 'FunctionDeclaration' && node.id && /^[A-Z]/.test( node.id.name ) ) {
+	if (
+		node.type === 'FunctionDeclaration' &&
+		node.id &&
+		/^[A-Z]/.test( node.id.name )
+	) {
 		return true;
 	}
 
@@ -43,7 +47,8 @@ module.exports = {
 				// If the result of a `setTimeout` call is assigned to a
 				// variable, assume the timer ID is handled by a cancellation.
 				const hasAssignment =
-					node.parent.type === 'AssignmentExpression' || node.parent.type === 'VariableDeclarator';
+					node.parent.type === 'AssignmentExpression' ||
+					node.parent.type === 'VariableDeclarator';
 				if ( hasAssignment ) {
 					return;
 				}
@@ -78,7 +83,10 @@ module.exports = {
 					return;
 				}
 
-				context.report( node, 'setTimeout in a component must be cancelled on unmount' );
+				context.report(
+					node,
+					'setTimeout in a component must be cancelled on unmount'
+				);
 			},
 		};
 	},

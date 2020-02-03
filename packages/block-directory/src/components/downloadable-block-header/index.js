@@ -10,12 +10,21 @@ import { __, sprintf } from '@wordpress/i18n';
 import { BlockIcon } from '@wordpress/block-editor';
 import BlockRatings from '../block-ratings';
 
-function DownloadableBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
+function DownloadableBlockHeader( {
+	icon,
+	title,
+	rating,
+	ratingCount,
+	onClick,
+} ) {
 	return (
 		<div className="block-directory-downloadable-block-header__row">
 			{ icon.match( /\.(jpeg|jpg|gif|png)(?:\?.*)?$/ ) !== null ? (
 				// translators: %s: Name of the plugin e.g: "Akismet".
-				<img src={ icon } alt={ sprintf( __( '%s block icon' ), title ) } />
+				<img
+					src={ icon }
+					alt={ sprintf( __( '%s block icon' ), title ) }
+				/>
 			) : (
 				<span>
 					<BlockIcon icon={ icon } showColors />
@@ -23,7 +32,10 @@ function DownloadableBlockHeader( { icon, title, rating, ratingCount, onClick } 
 			) }
 
 			<div className="block-directory-downloadable-block-header__column">
-				<span role="heading" className="block-directory-downloadable-block-header__title">
+				<span
+					role="heading"
+					className="block-directory-downloadable-block-header__title"
+				>
 					{ title }
 				</span>
 				<BlockRatings rating={ rating } ratingCount={ ratingCount } />

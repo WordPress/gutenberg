@@ -24,7 +24,10 @@ export const PageAttributesOrder = withState( {
 			orderInput: value,
 		} );
 		const newOrder = Number( value );
-		if ( Number.isInteger( newOrder ) && invoke( value, [ 'trim' ] ) !== '' ) {
+		if (
+			Number.isInteger( newOrder ) &&
+			invoke( value, [ 'trim' ] ) !== ''
+		) {
 			onUpdateOrder( Number( value ) );
 		}
 	};
@@ -57,7 +60,9 @@ function PageAttributesOrderWithChecks( props ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			order: select( 'core/editor' ).getEditedPostAttribute( 'menu_order' ),
+			order: select( 'core/editor' ).getEditedPostAttribute(
+				'menu_order'
+			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

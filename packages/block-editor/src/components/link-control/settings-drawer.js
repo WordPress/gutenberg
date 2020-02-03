@@ -16,7 +16,11 @@ const defaultSettings = [
 	},
 ];
 
-const LinkControlSettingsDrawer = ( { value, onChange = noop, settings = defaultSettings } ) => {
+const LinkControlSettingsDrawer = ( {
+	value,
+	onChange = noop,
+	settings = defaultSettings,
+} ) => {
 	if ( ! settings || ! settings.length ) {
 		return null;
 	}
@@ -40,7 +44,9 @@ const LinkControlSettingsDrawer = ( { value, onChange = noop, settings = default
 
 	return (
 		<fieldset className="block-editor-link-control__settings">
-			<legend className="screen-reader-text">{ __( 'Currently selected link settings' ) }</legend>
+			<legend className="screen-reader-text">
+				{ __( 'Currently selected link settings' ) }
+			</legend>
 			{ theSettings }
 		</fieldset>
 	);

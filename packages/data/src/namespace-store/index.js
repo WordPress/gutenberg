@@ -48,8 +48,10 @@ export default function createNamespace( key, options, registry ) {
 	);
 	let selectors = mapSelectors(
 		{
-			...mapValues( metadataSelectors, ( selector ) => ( state, ...args ) =>
-				selector( state.metadata, ...args )
+			...mapValues(
+				metadataSelectors,
+				( selector ) => ( state, ...args ) =>
+					selector( state.metadata, ...args )
 			),
 			...mapValues( options.selectors, ( selector ) => {
 				if ( selector.isRegistrySelector ) {
@@ -119,7 +121,10 @@ export default function createNamespace( key, options, registry ) {
  * @return {Object} Newly created redux store.
  */
 function createReduxStore( key, options, registry ) {
-	const middlewares = [ createResolversCacheMiddleware( registry, key ), promise ];
+	const middlewares = [
+		createResolversCacheMiddleware( registry, key ),
+		promise,
+	];
 
 	if ( options.controls ) {
 		const normalizedControls = mapValues( options.controls, ( control ) => {
@@ -129,8 +134,16 @@ function createReduxStore( key, options, registry ) {
 	}
 
 	const enhancers = [ applyMiddleware( ...middlewares ) ];
-	if ( typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
-		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: key, instanceId: key } ) );
+	if (
+		typeof window !== 'undefined' &&
+		window.__REDUX_DEVTOOLS_EXTENSION__
+	) {
+		enhancers.push(
+			window.__REDUX_DEVTOOLS_EXTENSION__( {
+				name: key,
+				instanceId: key,
+			} )
+		);
 	}
 
 	const { reducer, initialState } = options;
@@ -139,7 +152,11 @@ function createReduxStore( key, options, registry ) {
 		root: reducer,
 	} );
 
-	return createStore( enhancedReducer, { root: initialState }, flowRight( enhancers ) );
+	return createStore(
+		enhancedReducer,
+		{ root: initialState },
+		flowRight( enhancers )
+	);
 }
 
 /**
@@ -227,13 +244,28 @@ function mapResolvers( resolvers, selectors, store ) {
 				}
 
 				const { metadata } = store.__unstableOriginalGetState();
-				if ( metadataSelectors.hasStartedResolution( metadata, selectorName, args ) ) {
+				if (
+					metadataSelectors.hasStartedResolution(
+						metadata,
+						selectorName,
+						args
+					)
+				) {
 					return;
 				}
 
-				store.dispatch( metadataActions.startResolution( selectorName, args ) );
-				await fulfillResolver( store, mappedResolvers, selectorName, ...args );
-				store.dispatch( metadataActions.finishResolution( selectorName, args ) );
+				store.dispatch(
+					metadataActions.startResolution( selectorName, args )
+				);
+				await fulfillResolver(
+					store,
+					mappedResolvers,
+					selectorName,
+					...args
+				);
+				store.dispatch(
+					metadataActions.finishResolution( selectorName, args )
+				);
 			}
 
 			fulfillSelector( ...args );

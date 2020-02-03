@@ -112,7 +112,10 @@ export class BlockMover extends Component {
 					onClick={ isFirst ? null : onMoveUp }
 					icon={ getArrowIcon( 'up' ) }
 					// translators: %s: Horizontal direction of block movement ( left, right )
-					label={ sprintf( __( 'Move %s' ), getMovementDirection( 'up' ) ) }
+					label={ sprintf(
+						__( 'Move %s' ),
+						getMovementDirection( 'up' )
+					) }
 					aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
 					aria-disabled={ isFirst }
 					onFocus={ this.onFocus }
@@ -140,7 +143,10 @@ export class BlockMover extends Component {
 					onClick={ isLast ? null : onMoveDown }
 					icon={ getArrowIcon( 'down' ) }
 					// translators: %s: Horizontal direction of block movement ( left, right )
-					label={ sprintf( __( 'Move %s' ), getMovementDirection( 'down' ) ) }
+					label={ sprintf(
+						__( 'Move %s' ),
+						getMovementDirection( 'down' )
+					) }
 					aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
 					aria-disabled={ isLast }
 					onFocus={ this.onFocus }
@@ -193,10 +199,15 @@ export default compose(
 		const normalizedClientIds = castArray( clientIds );
 		const firstClientId = first( normalizedClientIds );
 		const block = getBlock( firstClientId );
-		const rootClientId = getBlockRootClientId( first( normalizedClientIds ) );
+		const rootClientId = getBlockRootClientId(
+			first( normalizedClientIds )
+		);
 		const blockOrder = getBlockOrder( rootClientId );
 		const firstIndex = getBlockIndex( firstClientId, rootClientId );
-		const lastIndex = getBlockIndex( last( normalizedClientIds ), rootClientId );
+		const lastIndex = getBlockIndex(
+			last( normalizedClientIds ),
+			rootClientId
+		);
 		const { getSettings } = select( 'core/block-editor' );
 		const { isRTL } = getSettings();
 
@@ -211,7 +222,9 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
-		const { moveBlocksDown, moveBlocksUp } = dispatch( 'core/block-editor' );
+		const { moveBlocksDown, moveBlocksUp } = dispatch(
+			'core/block-editor'
+		);
 		return {
 			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
 			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),

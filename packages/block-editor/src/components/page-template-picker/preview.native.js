@@ -40,7 +40,8 @@ BlockPreview.displayName = 'BlockPreview';
 const Preview = ( props ) => {
 	const { template, onDismiss, onApply } = props;
 	const preferredColorScheme = usePreferredColorScheme();
-	const containerBackgroundColor = preferredColorScheme === 'dark' ? 'black' : 'white';
+	const containerBackgroundColor =
+		preferredColorScheme === 'dark' ? 'black' : 'white';
 
 	if ( template === undefined ) {
 		return null;
@@ -49,7 +50,11 @@ const Preview = ( props ) => {
 	const leftButton = <ModalHeaderBar.CloseButton onPress={ onDismiss } />;
 
 	const rightButton = (
-		<ModalHeaderBar.Button onPress={ onApply } title={ __( 'Apply' ) } isPrimary={ true } />
+		<ModalHeaderBar.Button
+			onPress={ onApply }
+			title={ __( 'Apply' ) }
+			isPrimary={ true }
+		/>
 	);
 
 	return (
@@ -59,7 +64,9 @@ const Preview = ( props ) => {
 			onRequestClose={ onDismiss }
 			supportedOrientations={ [ 'portrait', 'landscape' ] }
 		>
-			<SafeAreaView style={ { flex: 1, backgroundColor: containerBackgroundColor } }>
+			<SafeAreaView
+				style={ { flex: 1, backgroundColor: containerBackgroundColor } }
+			>
 				<ModalHeaderBar
 					leftButton={ leftButton }
 					rightButton={ rightButton }

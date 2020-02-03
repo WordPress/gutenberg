@@ -46,17 +46,37 @@ function getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ) {
 	};
 }
 
-function WidgetArea( { id, blockEditorSettings, initialOpen, isSelectedArea, onBlockSelected } ) {
-	const { blocks, widgetAreaName, hasUploadPermissions, rawContent } = useSelect(
+function WidgetArea( {
+	id,
+	blockEditorSettings,
+	initialOpen,
+	isSelectedArea,
+	onBlockSelected,
+} ) {
+	const {
+		blocks,
+		widgetAreaName,
+		hasUploadPermissions,
+		rawContent,
+	} = useSelect(
 		( select ) => {
 			const { canUser, getEditedEntityRecord } = select( 'core' );
-			const widgetArea = getEditedEntityRecord( 'root', 'widgetArea', id );
+			const widgetArea = getEditedEntityRecord(
+				'root',
+				'widgetArea',
+				id
+			);
 			const widgetAreaContent = get( widgetArea, [ 'content' ], '' );
 			return {
 				blocks: widgetArea && widgetArea.blocks,
-				rawContent: widgetAreaContent.raw ? widgetAreaContent.raw : widgetAreaContent,
+				rawContent: widgetAreaContent.raw
+					? widgetAreaContent.raw
+					: widgetAreaContent,
 				widgetAreaName: widgetArea && widgetArea.name,
-				hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
+				hasUploadPermissions: defaultTo(
+					canUser( 'create', 'media' ),
+					true
+				),
 			};
 		},
 		[ id ]
@@ -78,7 +98,8 @@ function WidgetArea( { id, blockEditorSettings, initialOpen, isSelectedArea, onB
 		[ editEntityRecord, id ]
 	);
 	const settings = useMemo(
-		() => getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ),
+		() =>
+			getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ),
 		[ blockEditorSettings, hasUploadPermissions ]
 	);
 	useEffect( () => {
@@ -117,7 +138,9 @@ function WidgetArea( { id, blockEditorSettings, initialOpen, isSelectedArea, onB
 							onBlockSelected={ onBlockSelected }
 						/>
 						<Sidebar.Inspector>
-							<BlockInspector showNoBlockSelectedMessage={ false } />
+							<BlockInspector
+								showNoBlockSelectedMessage={ false }
+							/>
 						</Sidebar.Inspector>
 						<div className="editor-styles-wrapper">
 							<WritingFlow>

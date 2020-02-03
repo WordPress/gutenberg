@@ -105,7 +105,9 @@ describe( 'BlockSwitcher', () => {
 			{ name: 'core/paragraph', frecency: 1 },
 		];
 
-		const wrapper = shallow( <BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } /> );
+		const wrapper = shallow(
+			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+		);
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
@@ -117,7 +119,9 @@ describe( 'BlockSwitcher', () => {
 			{ name: 'core/paragraph', frecency: 1 },
 		];
 
-		const wrapper = shallow( <BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } /> );
+		const wrapper = shallow(
+			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+		);
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
@@ -129,7 +133,9 @@ describe( 'BlockSwitcher', () => {
 			{ name: 'core/paragraph', frecency: 1 },
 		];
 
-		const wrapper = shallow( <BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } /> );
+		const wrapper = shallow(
+			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+		);
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
@@ -177,9 +183,14 @@ describe( 'BlockSwitcher', () => {
 				const toggleClosed = shallow(
 					getDropdown()
 						.props()
-						.renderToggle( { onToggle: onToggleStub, isOpen: false } )
+						.renderToggle( {
+							onToggle: onToggleStub,
+							isOpen: false,
+						} )
 				);
-				const iconButtonClosed = toggleClosed.find( 'ForwardRef(Button)' );
+				const iconButtonClosed = toggleClosed.find(
+					'ForwardRef(Button)'
+				);
 
 				iconButtonClosed.simulate( 'keydown', mockKeyDown );
 
@@ -190,7 +201,10 @@ describe( 'BlockSwitcher', () => {
 				const toggleOpen = shallow(
 					getDropdown()
 						.props()
-						.renderToggle( { onToggle: onToggleStub, isOpen: true } )
+						.renderToggle( {
+							onToggle: onToggleStub,
+							isOpen: true,
+						} )
 				);
 				const iconButtonOpen = toggleOpen.find( 'ForwardRef(Button)' );
 

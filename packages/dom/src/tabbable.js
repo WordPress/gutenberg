@@ -172,7 +172,9 @@ export function findNext( element = document.activeElement ) {
 	const index = focusables.indexOf( element );
 
 	// Remove all focusables before and inside `element`.
-	const remaining = focusables.slice( index + 1 ).filter( ( node ) => ! element.contains( node ) );
+	const remaining = focusables
+		.slice( index + 1 )
+		.filter( ( node ) => ! element.contains( node ) );
 
 	return first( filterTabbable( remaining ) );
 }

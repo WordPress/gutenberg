@@ -43,7 +43,9 @@ const getStylesFromColorScheme = () => {
 describe( 'HTMLTextInput', () => {
 	it( 'HTMLTextInput renders', () => {
 		const wrapper = shallow(
-			<HTMLTextInput getStylesFromColorScheme={ getStylesFromColorScheme } />
+			<HTMLTextInput
+				getStylesFromColorScheme={ getStylesFromColorScheme }
+			/>
 		);
 		expect( wrapper ).toBeTruthy();
 	} );
@@ -52,7 +54,10 @@ describe( 'HTMLTextInput', () => {
 		const onChange = jest.fn();
 
 		const wrapper = shallow(
-			<HTMLTextInput onChange={ onChange } getStylesFromColorScheme={ getStylesFromColorScheme } />
+			<HTMLTextInput
+				onChange={ onChange }
+				getStylesFromColorScheme={ getStylesFromColorScheme }
+			/>
 		);
 
 		expect( wrapper.instance().state.isDirty ).toBeFalsy();

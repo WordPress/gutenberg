@@ -28,7 +28,9 @@ export default compose( [
 			getSettings,
 		} = select( 'core/block-editor' );
 		const { removeBlocks, replaceBlocks } = dispatch( 'core/block-editor' );
-		const { __experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML } = getSettings();
+		const {
+			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
+		} = getSettings();
 
 		return {
 			handler( event ) {
@@ -47,7 +49,9 @@ export default compose( [
 				event.preventDefault();
 
 				if ( event.type === 'copy' || event.type === 'cut' ) {
-					const blocks = getBlocksByClientId( selectedBlockClientIds );
+					const blocks = getBlocksByClientId(
+						selectedBlockClientIds
+					);
 					const serialized = serialize( blocks );
 
 					event.clipboardData.setData( 'text/plain', serialized );

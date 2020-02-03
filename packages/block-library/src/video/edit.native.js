@@ -17,7 +17,12 @@ import {
 /**
  * WordPress dependencies
  */
-import { Icon, ToolbarButton, ToolbarGroup, PanelBody } from '@wordpress/components';
+import {
+	Icon,
+	ToolbarButton,
+	ToolbarGroup,
+	PanelBody,
+} from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
 	BlockCaption,
@@ -58,9 +63,15 @@ class VideoEdit extends React.Component {
 		};
 
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
+			this
+		);
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
+			this
+		);
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
+			this
+		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.onVideoPressed = this.onVideoPressed.bind( this );
 		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
@@ -76,8 +87,14 @@ class VideoEdit extends React.Component {
 
 	componentWillUnmount() {
 		// this action will only exist if the user pressed the trash button on the block holder
-		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
-			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
+		if (
+			hasAction( 'blocks.onRemoveBlockCheckUpload' ) &&
+			this.state.isUploadInProgress
+		) {
+			doAction(
+				'blocks.onRemoveBlockCheckUpload',
+				this.props.attributes.id
+			);
 		}
 	}
 
@@ -156,7 +173,10 @@ class VideoEdit extends React.Component {
 			case ICON_TYPE.RETRY:
 				return <Icon icon={ SvgIconRetry } { ...style.icon } />;
 			case ICON_TYPE.PLACEHOLDER:
-				iconStyle = this.props.getStylesFromColorScheme( style.icon, style.iconDark );
+				iconStyle = this.props.getStylesFromColorScheme(
+					style.icon,
+					style.iconDark
+				);
 				break;
 			case ICON_TYPE.UPLOAD:
 				iconStyle = this.props.getStylesFromColorScheme(
@@ -182,7 +202,11 @@ class VideoEdit extends React.Component {
 					return (
 						<ToolbarGroup>
 							{ getMediaOptions() }
-							<ToolbarButton label={ __( 'Edit video' ) } icon="edit" onClick={ open } />
+							<ToolbarButton
+								label={ __( 'Edit video' ) }
+								icon="edit"
+								onClick={ open }
+							/>
 						</ToolbarGroup>
 					);
 				} }
@@ -209,24 +233,50 @@ class VideoEdit extends React.Component {
 				disabled={ ! isSelected }
 			>
 				<View style={ { flex: 1 } }>
-					{ ! this.state.isCaptionSelected && <BlockControls>{ toolbarEditButton }</BlockControls> }
+					{ ! this.state.isCaptionSelected && (
+						<BlockControls>{ toolbarEditButton }</BlockControls>
+					) }
 					<InspectorControls>
 						<PanelBody title={ __( 'Video settings' ) }>
-							<VideoCommonSettings setAttributes={ setAttributes } attributes={ attributes } />
+							<VideoCommonSettings
+								setAttributes={ setAttributes }
+								attributes={ attributes }
+							/>
 						</PanelBody>
 					</InspectorControls>
 					<MediaUploadProgress
 						mediaId={ id }
-						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+						onFinishMediaUploadWithSuccess={
+							this.finishMediaUploadWithSuccess
+						}
+						onFinishMediaUploadWithFailure={
+							this.finishMediaUploadWithFailure
+						}
 						onUpdateMediaProgress={ this.updateMediaProgress }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( { isUploadInProgress, isUploadFailed, retryMessage } ) => {
-							const showVideo = isURL( src ) && ! isUploadInProgress && ! isUploadFailed;
-							const icon = this.getIcon( isUploadFailed ? ICON_TYPE.RETRY : ICON_TYPE.UPLOAD );
-							const styleIconContainer = isUploadFailed ? style.modalIconRetry : style.modalIcon;
+						renderContent={ ( {
+							isUploadInProgress,
+							isUploadFailed,
+							retryMessage,
+						} ) => {
+							const showVideo =
+								isURL( src ) &&
+								! isUploadInProgress &&
+								! isUploadFailed;
+							const icon = this.getIcon(
+								isUploadFailed
+									? ICON_TYPE.RETRY
+									: ICON_TYPE.UPLOAD
+							);
+							const styleIconContainer = isUploadFailed
+								? style.modalIconRetry
+								: style.modalIcon;
 
-							const iconContainer = <View style={ styleIconContainer }>{ icon }</View>;
+							const iconContainer = (
+								<View style={ styleIconContainer }>
+									{ icon }
+								</View>
+							);
 
 							const videoStyle = {
 								height: videoContainerHeight,
@@ -234,14 +284,23 @@ class VideoEdit extends React.Component {
 							};
 
 							const containerStyle =
-								showVideo && isSelected ? style.containerFocused : style.container;
+								showVideo && isSelected
+									? style.containerFocused
+									: style.container;
 
 							return (
-								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
+								<View
+									onLayout={ this.onVideoContanerLayout }
+									style={ containerStyle }
+								>
 									{ showVideo && (
 										<View style={ style.videoContainer }>
 											<VideoPlayer
-												isSelected={ isSelected && ! this.state.isCaptionSelected }
+												isSelected={
+													isSelected &&
+													! this.state
+														.isCaptionSelected
+												}
 												style={ videoStyle }
 												source={ { uri: src } }
 												paused={ true }
@@ -259,9 +318,16 @@ class VideoEdit extends React.Component {
 												),
 											} }
 										>
-											{ videoContainerHeight > 0 && iconContainer }
+											{ videoContainerHeight > 0 &&
+												iconContainer }
 											{ isUploadFailed && (
-												<Text style={ style.uploadFailedText }>{ retryMessage }</Text>
+												<Text
+													style={
+														style.uploadFailedText
+													}
+												>
+													{ retryMessage }
+												</Text>
 											) }
 										</View>
 									) }

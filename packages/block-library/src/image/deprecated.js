@@ -73,7 +73,16 @@ const deprecated = [
 	{
 		attributes: blockAttributes,
 		save( { attributes } ) {
-			const { url, alt, caption, align, href, width, height, id } = attributes;
+			const {
+				url,
+				alt,
+				caption,
+				align,
+				href,
+				width,
+				height,
+				id,
+			} = attributes;
 
 			const classes = classnames( {
 				[ `align${ align }` ]: align,
@@ -94,7 +103,10 @@ const deprecated = [
 				<figure className={ classes }>
 					{ href ? <a href={ href }>{ image }</a> : image }
 					{ ! RichText.isEmpty( caption ) && (
-						<RichText.Content tagName="figcaption" value={ caption } />
+						<RichText.Content
+							tagName="figcaption"
+							value={ caption }
+						/>
 					) }
 				</figure>
 			);
@@ -103,7 +115,16 @@ const deprecated = [
 	{
 		attributes: blockAttributes,
 		save( { attributes } ) {
-			const { url, alt, caption, align, href, width, height, id } = attributes;
+			const {
+				url,
+				alt,
+				caption,
+				align,
+				href,
+				width,
+				height,
+				id,
+			} = attributes;
 
 			const image = (
 				<img
@@ -119,7 +140,10 @@ const deprecated = [
 				<figure className={ align ? `align${ align }` : null }>
 					{ href ? <a href={ href }>{ image }</a> : image }
 					{ ! RichText.isEmpty( caption ) && (
-						<RichText.Content tagName="figcaption" value={ caption } />
+						<RichText.Content
+							tagName="figcaption"
+							value={ caption }
+						/>
 					) }
 				</figure>
 			);
@@ -128,9 +152,19 @@ const deprecated = [
 	{
 		attributes: blockAttributes,
 		save( { attributes } ) {
-			const { url, alt, caption, align, href, width, height } = attributes;
+			const {
+				url,
+				alt,
+				caption,
+				align,
+				href,
+				width,
+				height,
+			} = attributes;
 			const extraImageProps = width || height ? { width, height } : {};
-			const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+			const image = (
+				<img src={ url } alt={ alt } { ...extraImageProps } />
+			);
 
 			let figureStyle = {};
 
@@ -141,10 +175,16 @@ const deprecated = [
 			}
 
 			return (
-				<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
+				<figure
+					className={ align ? `align${ align }` : null }
+					style={ figureStyle }
+				>
 					{ href ? <a href={ href }>{ image }</a> : image }
 					{ ! RichText.isEmpty( caption ) && (
-						<RichText.Content tagName="figcaption" value={ caption } />
+						<RichText.Content
+							tagName="figcaption"
+							value={ caption }
+						/>
 					) }
 				</figure>
 			);

@@ -49,7 +49,10 @@ const toLowerCase = ( value ) => String( value ).toLowerCase();
 const isValueEmpty = ( data ) => {
 	if ( data.source === 'hex' && ! data.hex ) {
 		return true;
-	} else if ( data.source === 'hsl' && ( ! data.h || ! data.s || ! data.l ) ) {
+	} else if (
+		data.source === 'hsl' &&
+		( ! data.h || ! data.s || ! data.l )
+	) {
 		return true;
 	} else if (
 		data.source === 'rgb' &&
@@ -179,7 +182,15 @@ export default class ColorPicker extends Component {
 
 	render() {
 		const { className, disableAlpha } = this.props;
-		const { color, hsl, hsv, rgb, draftHex, draftHsl, draftRgb } = this.state;
+		const {
+			color,
+			hsl,
+			hsv,
+			rgb,
+			draftHex,
+			draftHsl,
+			draftRgb,
+		} = this.state;
 		const classes = classnames( className, {
 			'components-color-picker': true,
 			'is-alpha-disabled': disableAlpha,
@@ -189,7 +200,11 @@ export default class ColorPicker extends Component {
 		return (
 			<div className={ classes }>
 				<div className="components-color-picker__saturation">
-					<Saturation hsl={ hsl } hsv={ hsv } onChange={ this.commitValues } />
+					<Saturation
+						hsl={ hsl }
+						hsv={ hsv }
+						onChange={ this.commitValues }
+					/>
 				</div>
 
 				<div className="components-color-picker__body">
@@ -198,7 +213,8 @@ export default class ColorPicker extends Component {
 							<div
 								className="components-color-picker__active"
 								style={ {
-									backgroundColor: color && color.toRgbString(),
+									backgroundColor:
+										color && color.toRgbString(),
 								} }
 							/>
 						</div>
@@ -206,7 +222,11 @@ export default class ColorPicker extends Component {
 						<div className="components-color-picker__toggles">
 							<Hue hsl={ hsl } onChange={ this.commitValues } />
 							{ disableAlpha ? null : (
-								<Alpha rgb={ rgb } hsl={ hsl } onChange={ this.commitValues } />
+								<Alpha
+									rgb={ rgb }
+									hsl={ hsl }
+									onChange={ this.commitValues }
+								/>
 							) }
 						</div>
 					</div>

@@ -15,7 +15,9 @@ import { withBlockEditContext } from '../block-edit/context';
 
 const withClientId = createHigherOrderComponent(
 	( WrappedComponent ) =>
-		withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) )( WrappedComponent ),
+		withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) )(
+			WrappedComponent
+		),
 	'withClientId'
 );
 

@@ -70,7 +70,10 @@ describe( 'Using Plugins API', () => {
 		it( 'Should open plugins sidebar using More Menu item and render content', async () => {
 			await clickOnMoreMenuItem( 'Sidebar title plugin' );
 
-			const pluginSidebarContent = await page.$eval( '.edit-post-sidebar', ( el ) => el.innerHTML );
+			const pluginSidebarContent = await page.$eval(
+				'.edit-post-sidebar',
+				( el ) => el.innerHTML
+			);
 			expect( pluginSidebarContent ).toMatchSnapshot();
 		} );
 

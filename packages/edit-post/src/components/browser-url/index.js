@@ -52,7 +52,10 @@ export class BrowserURL extends Component {
 			return;
 		}
 
-		if ( ( postId !== prevProps.postId || postId !== historyId ) && postStatus !== 'auto-draft' ) {
+		if (
+			( postId !== prevProps.postId || postId !== historyId ) &&
+			postStatus !== 'auto-draft'
+		) {
 			this.setBrowserURL( postId );
 		}
 	}
@@ -77,7 +80,11 @@ export class BrowserURL extends Component {
 	 * @param {number} postId Post ID for which to generate post editor URL.
 	 */
 	setBrowserURL( postId ) {
-		window.history.replaceState( { id: postId }, 'Post ' + postId, getPostEditURL( postId ) );
+		window.history.replaceState(
+			{ id: postId },
+			'Post ' + postId,
+			getPostEditURL( postId )
+		);
 
 		this.setState( () => ( {
 			historyId: postId,

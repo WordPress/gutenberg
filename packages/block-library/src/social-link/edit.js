@@ -6,9 +6,18 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { InspectorControls, URLPopover, URLInput } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	URLPopover,
+	URLInput,
+} from '@wordpress/block-editor';
 import { Fragment, useState } from '@wordpress/element';
-import { Button, PanelBody, PanelRow, TextControl } from '@wordpress/components';
+import {
+	Button,
+	PanelBody,
+	PanelRow,
+	TextControl,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -30,13 +39,20 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	return (
 		<Fragment>
 			<InspectorControls>
-				<PanelBody title={ sprintf( __( '%s label' ), socialLinkName ) } initialOpen={ false }>
+				<PanelBody
+					title={ sprintf( __( '%s label' ), socialLinkName ) }
+					initialOpen={ false }
+				>
 					<PanelRow>
 						<TextControl
 							label={ __( 'Link Label' ) }
-							help={ __( 'Briefly describe the link to help screen reader users.' ) }
+							help={ __(
+								'Briefly describe the link to help screen reader users.'
+							) }
 							value={ label }
-							onChange={ ( value ) => setAttributes( { label: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( { label: value } )
+							}
 						/>
 					</PanelRow>
 				</PanelBody>
@@ -55,12 +71,18 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 							<div className="block-editor-url-input">
 								<URLInput
 									value={ url }
-									onChange={ ( nextURL ) => setAttributes( { url: nextURL } ) }
+									onChange={ ( nextURL ) =>
+										setAttributes( { url: nextURL } )
+									}
 									placeholder={ __( 'Enter Address' ) }
 									disableSuggestions={ true }
 								/>
 							</div>
-							<Button icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+							<Button
+								icon="editor-break"
+								label={ __( 'Apply' ) }
+								type="submit"
+							/>
 						</form>
 					</URLPopover>
 				) }

@@ -58,7 +58,9 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should open menu on arrow down (controls)', () => {
 			const wrapper = mount( <DropdownMenu controls={ controls } /> );
-			const button = wrapper.find( Button ).filter( '.components-dropdown-menu__toggle' );
+			const button = wrapper
+				.find( Button )
+				.filter( '.components-dropdown-menu__toggle' );
 
 			button.simulate( 'keydown', {
 				stopPropagation: () => {},
@@ -68,13 +70,17 @@ describe( 'DropdownMenu', () => {
 
 			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
 			expect(
-				wrapper.find( Button ).filter( '.components-dropdown-menu__menu-item' )
+				wrapper
+					.find( Button )
+					.filter( '.components-dropdown-menu__menu-item' )
 			).toHaveLength( controls.length );
 		} );
 
 		it( 'should open menu on arrow down (children)', () => {
 			const wrapper = mount( <DropdownMenu children={ children } /> );
-			const button = wrapper.find( Button ).filter( '.components-dropdown-menu__toggle' );
+			const button = wrapper
+				.find( Button )
+				.filter( '.components-dropdown-menu__toggle' );
 
 			button.simulate( 'keydown', {
 				stopPropagation: () => {},

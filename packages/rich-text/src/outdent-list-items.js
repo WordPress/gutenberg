@@ -23,7 +23,8 @@ export function outdentListItems( value ) {
 	const { text, replacements, start, end } = value;
 	const startingLineIndex = getLineIndex( value, start );
 	const newFormats = replacements.slice( 0 );
-	const parentFormats = replacements[ getParentLineIndex( value, startingLineIndex ) ] || [];
+	const parentFormats =
+		replacements[ getParentLineIndex( value, startingLineIndex ) ] || [];
 	const endingLineIndex = getLineIndex( value, end );
 	const lastChildIndex = getLastChildIndex( value, endingLineIndex );
 
@@ -40,7 +41,9 @@ export function outdentListItems( value ) {
 		const currentFormats = newFormats[ index ] || [];
 
 		// Omit the indentation level where the selection starts.
-		newFormats[ index ] = parentFormats.concat( currentFormats.slice( parentFormats.length + 1 ) );
+		newFormats[ index ] = parentFormats.concat(
+			currentFormats.slice( parentFormats.length + 1 )
+		);
 
 		if ( newFormats[ index ].length === 0 ) {
 			delete newFormats[ index ];

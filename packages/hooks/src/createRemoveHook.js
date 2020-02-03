@@ -59,7 +59,10 @@ function createRemoveHook( hooks, removeAll ) {
 					// otherwise we need to decrease the execution index of any
 					// other runs by 1 to account for the removed element.
 					( hooks.__current || [] ).forEach( ( hookInfo ) => {
-						if ( hookInfo.name === hookName && hookInfo.currentIndex >= i ) {
+						if (
+							hookInfo.name === hookName &&
+							hookInfo.currentIndex >= i
+						) {
 							hookInfo.currentIndex--;
 						}
 					} );

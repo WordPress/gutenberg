@@ -17,7 +17,10 @@ import withClientId from './with-client-id';
 
 export const DefaultBlockAppender = ( { clientId, lastBlockClientId } ) => {
 	return (
-		<BaseDefaultBlockAppender rootClientId={ clientId } lastBlockClientId={ lastBlockClientId } />
+		<BaseDefaultBlockAppender
+			rootClientId={ clientId }
+			lastBlockClientId={ lastBlockClientId }
+		/>
 	);
 };
 

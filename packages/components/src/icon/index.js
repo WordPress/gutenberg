@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { cloneElement, createElement, Component, isValidElement } from '@wordpress/element';
+import {
+	cloneElement,
+	createElement,
+	Component,
+	isValidElement,
+} from '@wordpress/element';
 import { SVG } from '@wordpress/primitives';
 
 /**
@@ -14,7 +19,13 @@ function Icon( { icon = null, size, ...additionalProps } ) {
 	const dashiconSize = size || 20;
 
 	if ( 'string' === typeof icon ) {
-		return <Dashicon icon={ icon } size={ dashiconSize } { ...additionalProps } />;
+		return (
+			<Dashicon
+				icon={ icon }
+				size={ dashiconSize }
+				{ ...additionalProps }
+			/>
+		);
 	}
 
 	if ( icon && Dashicon === icon.type ) {
@@ -28,7 +39,10 @@ function Icon( { icon = null, size, ...additionalProps } ) {
 	const iconSize = size || 24;
 	if ( 'function' === typeof icon ) {
 		if ( icon.prototype instanceof Component ) {
-			return createElement( icon, { size: iconSize, ...additionalProps } );
+			return createElement( icon, {
+				size: iconSize,
+				...additionalProps,
+			} );
 		}
 
 		return icon( { size: iconSize, ...additionalProps } );

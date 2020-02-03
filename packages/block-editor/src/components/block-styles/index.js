@@ -12,7 +12,11 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { _x } from '@wordpress/i18n';
-import { getBlockType, cloneBlock, getBlockFromExample } from '@wordpress/blocks';
+import {
+	getBlockType,
+	cloneBlock,
+	getBlockFromExample,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -90,7 +94,11 @@ function BlockStyles( {
 
 	const activeStyle = getActiveStyle( styles, className );
 	function updateClassName( style ) {
-		const updatedClassName = replaceActiveStyle( className, activeStyle, style );
+		const updatedClassName = replaceActiveStyle(
+			className,
+			activeStyle,
+			style
+		);
 		onChangeClassName( updatedClassName );
 		onHoverClassName( null );
 		onSwitch();
@@ -99,21 +107,33 @@ function BlockStyles( {
 	return (
 		<div className="block-editor-block-styles">
 			{ styles.map( ( style ) => {
-				const styleClassName = replaceActiveStyle( className, activeStyle, style );
+				const styleClassName = replaceActiveStyle(
+					className,
+					activeStyle,
+					style
+				);
 				return (
 					<div
 						key={ style.name }
-						className={ classnames( 'block-editor-block-styles__item', {
-							'is-active': activeStyle === style,
-						} ) }
+						className={ classnames(
+							'block-editor-block-styles__item',
+							{
+								'is-active': activeStyle === style,
+							}
+						) }
 						onClick={ () => updateClassName( style ) }
 						onKeyDown={ ( event ) => {
-							if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
+							if (
+								ENTER === event.keyCode ||
+								SPACE === event.keyCode
+							) {
 								event.preventDefault();
 								updateClassName( style );
 							}
 						} }
-						onMouseEnter={ () => onHoverClassName( styleClassName ) }
+						onMouseEnter={ () =>
+							onHoverClassName( styleClassName )
+						}
 						onMouseLeave={ () => onHoverClassName( null ) }
 						role="button"
 						tabIndex="0"
@@ -125,10 +145,16 @@ function BlockStyles( {
 								blocks={
 									type.example
 										? getBlockFromExample( block.name, {
-												attributes: { ...type.example.attributes, className: styleClassName },
-												innerBlocks: type.example.innerBlocks,
+												attributes: {
+													...type.example.attributes,
+													className: styleClassName,
+												},
+												innerBlocks:
+													type.example.innerBlocks,
 										  } )
-										: cloneBlock( block, { className: styleClassName } )
+										: cloneBlock( block, {
+												className: styleClassName,
+										  } )
 								}
 							/>
 						</div>
@@ -159,9 +185,12 @@ export default compose( [
 	withDispatch( ( dispatch, { clientId } ) => {
 		return {
 			onChangeClassName( newClassName ) {
-				dispatch( 'core/block-editor' ).updateBlockAttributes( clientId, {
-					className: newClassName,
-				} );
+				dispatch( 'core/block-editor' ).updateBlockAttributes(
+					clientId,
+					{
+						className: newClassName,
+					}
+				);
 			},
 		};
 	} ),

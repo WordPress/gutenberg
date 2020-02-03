@@ -13,7 +13,9 @@ describe( 'AutosaveMonitor', () => {
 	let wrapper;
 	beforeEach( () => {
 		toggleTimer.mockClear();
-		wrapper = shallow( <AutosaveMonitor />, { lifecycleExperimental: true } );
+		wrapper = shallow( <AutosaveMonitor />, {
+			lifecycleExperimental: true,
+		} );
 
 		wrapper.instance().toggleTimer = toggleTimer;
 	} );

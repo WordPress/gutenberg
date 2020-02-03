@@ -7,7 +7,9 @@ import { useSelect, useDispatch } from '@wordpress/data';
 export default function BlockNavigationList( { clientId } ) {
 	const { block, selectedBlockClientId } = useSelect(
 		( select ) => {
-			const { getSelectedBlockClientId, getBlock } = select( 'core/block-editor' );
+			const { getSelectedBlockClientId, getBlock } = select(
+				'core/block-editor'
+			);
 
 			return {
 				block: getBlock( clientId ),

@@ -55,7 +55,10 @@ export default compose( [
 			);
 		} );
 
-		const canInsertDefaultBlock = canInsertBlockType( getDefaultBlockName(), rootClientId );
+		const canInsertDefaultBlock = canInsertBlockType(
+			getDefaultBlockName(),
+			rootClientId
+		);
 
 		return {
 			blocks,
@@ -100,7 +103,10 @@ export default compose( [
 				const groupingBlockName = getGroupingBlockName();
 
 				// Activate the `transform` on `core/group` which does the conversion
-				const newBlocks = switchToBlockType( blocks, groupingBlockName );
+				const newBlocks = switchToBlockType(
+					blocks,
+					groupingBlockName
+				);
 
 				if ( ! newBlocks ) {
 					return;

@@ -32,18 +32,24 @@ const transforms = {
 				// Init the align and size from the first item which may be either the placeholder or an image.
 				let { align, sizeSlug } = attributes[ 0 ];
 				// Loop through all the images and check if they have the same align and size.
-				align = every( attributes, [ 'align', align ] ) ? align : undefined;
-				sizeSlug = every( attributes, [ 'sizeSlug', sizeSlug ] ) ? sizeSlug : undefined;
+				align = every( attributes, [ 'align', align ] )
+					? align
+					: undefined;
+				sizeSlug = every( attributes, [ 'sizeSlug', sizeSlug ] )
+					? sizeSlug
+					: undefined;
 
 				const validImages = filter( attributes, ( { url } ) => url );
 
 				return createBlock( 'core/gallery', {
-					images: validImages.map( ( { id, url, alt, caption } ) => ( {
-						id,
-						url,
-						alt,
-						caption,
-					} ) ),
+					images: validImages.map(
+						( { id, url, alt, caption } ) => ( {
+							id,
+							url,
+							alt,
+							caption,
+						} )
+					),
 					ids: validImages.map( ( { id } ) => id ),
 					align,
 					sizeSlug,
@@ -87,7 +93,11 @@ const transforms = {
 			type: 'files',
 			isMatch( files ) {
 				return (
-					files.length !== 1 && every( files, ( file ) => file.type.indexOf( 'image/' ) === 0 )
+					files.length !== 1 &&
+					every(
+						files,
+						( file ) => file.type.indexOf( 'image/' ) === 0
+					)
 				);
 			},
 			transform( files ) {

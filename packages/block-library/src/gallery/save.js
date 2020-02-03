@@ -18,7 +18,11 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	return (
-		<figure className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+		<figure
+			className={ `columns-${ columns } ${
+				imageCrop ? 'is-cropped' : ''
+			}` }
+		>
 			<ul className="blocks-gallery-grid">
 				{ images.map( ( image ) => {
 					let href;
@@ -39,12 +43,17 @@ export default function save( { attributes } ) {
 							data-id={ image.id }
 							data-full-url={ image.fullUrl }
 							data-link={ image.link }
-							className={ image.id ? `wp-image-${ image.id }` : null }
+							className={
+								image.id ? `wp-image-${ image.id }` : null
+							}
 						/>
 					);
 
 					return (
-						<li key={ image.id || image.url } className="blocks-gallery-item">
+						<li
+							key={ image.id || image.url }
+							className="blocks-gallery-item"
+						>
 							<figure>
 								{ href ? <a href={ href }>{ img }</a> : img }
 								{ ! RichText.isEmpty( image.caption ) && (

@@ -78,7 +78,9 @@ describe( 'Block Grouping', () => {
 
 			await clickBlockToolbarButton( 'More options' );
 
-			const groupButton = await page.waitForXPath( '//button[text()="Group"]' );
+			const groupButton = await page.waitForXPath(
+				'//button[text()="Group"]'
+			);
 			await groupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -92,14 +94,18 @@ describe( 'Block Grouping', () => {
 
 			// Group
 			await clickBlockToolbarButton( 'More options' );
-			const groupButton = await page.waitForXPath( '//button[text()="Group"]' );
+			const groupButton = await page.waitForXPath(
+				'//button[text()="Group"]'
+			);
 			await groupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
 			// UnGroup
 			await clickBlockToolbarButton( 'More options' );
-			const unGroupButton = await page.waitForXPath( '//button[text()="Ungroup"]' );
+			const unGroupButton = await page.waitForXPath(
+				'//button[text()="Ungroup"]'
+			);
 			await unGroupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -108,7 +114,9 @@ describe( 'Block Grouping', () => {
 		it( 'does not allow ungrouping a group block that has no children', async () => {
 			await insertBlock( 'Group' );
 			await clickBlockToolbarButton( 'More options' );
-			const ungroupButtons = await page.$x( '//button[text()="Ungroup"]' );
+			const ungroupButtons = await page.$x(
+				'//button[text()="Ungroup"]'
+			);
 			expect( ungroupButtons ).toHaveLength( 0 );
 		} );
 	} );
@@ -145,7 +153,10 @@ describe( 'Block Grouping', () => {
 			await clickBlockToolbarButton( 'More options' );
 
 			const blockOptionsDropdownHTML = await page.evaluate(
-				() => document.querySelector( '.block-editor-block-settings-menu__popover' ).innerHTML
+				() =>
+					document.querySelector(
+						'.block-editor-block-settings-menu__popover'
+					).innerHTML
 			);
 
 			expect( blockOptionsDropdownHTML ).not.toContain( 'Group' );
@@ -199,7 +210,9 @@ describe( 'Block Grouping', () => {
 		it( 'should use registered grouping block for grouping interactions', async () => {
 			// Set custom Block as the Block to use for Grouping
 			await page.evaluate( () => {
-				window.wp.blocks.setGroupingBlockName( 'test/alternative-group-block' );
+				window.wp.blocks.setGroupingBlockName(
+					'test/alternative-group-block'
+				);
 			} );
 
 			// Creating test blocks
@@ -213,7 +226,9 @@ describe( 'Block Grouping', () => {
 			// as opposed to "transformTo()" which uses whatever is passed to it. To
 			// ensure this test is meaningful we must rely on what is registered.
 			await clickBlockToolbarButton( 'More options' );
-			const groupButton = await page.waitForXPath( '//button[text()="Group"]' );
+			const groupButton = await page.waitForXPath(
+				'//button[text()="Group"]'
+			);
 			await groupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();

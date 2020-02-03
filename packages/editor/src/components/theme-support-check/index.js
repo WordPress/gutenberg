@@ -8,7 +8,12 @@ import { castArray, includes, isArray, get, some } from 'lodash';
  */
 import { withSelect } from '@wordpress/data';
 
-export function ThemeSupportCheck( { themeSupports, children, postType, supportKeys } ) {
+export function ThemeSupportCheck( {
+	themeSupports,
+	children,
+	postType,
+	supportKeys,
+} ) {
 	const isSupported = some( castArray( supportKeys ), ( key ) => {
 		const supported = get( themeSupports, [ key ], false );
 		// 'post-thumbnails' can be boolean or an array of post types.

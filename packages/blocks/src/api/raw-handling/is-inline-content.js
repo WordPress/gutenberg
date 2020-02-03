@@ -39,12 +39,18 @@ function isInline( node, contextTag ) {
 
 function deepCheck( nodes, contextTag ) {
 	return nodes.every(
-		( node ) => isInline( node, contextTag ) && deepCheck( Array.from( node.children ), contextTag )
+		( node ) =>
+			isInline( node, contextTag ) &&
+			deepCheck( Array.from( node.children ), contextTag )
 	);
 }
 
 function isDoubleBR( node ) {
-	return node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
+	return (
+		node.nodeName === 'BR' &&
+		node.previousSibling &&
+		node.previousSibling.nodeName === 'BR'
+	);
 }
 
 export default function( HTML, contextTag ) {

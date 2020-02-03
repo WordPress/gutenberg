@@ -8,7 +8,11 @@ import { isFinite, omit } from 'lodash';
  * WordPress dependencies
  */
 import { RawHTML } from '@wordpress/element';
-import { getColorClassName, getFontSizeClass, RichText } from '@wordpress/block-editor';
+import {
+	getColorClassName,
+	getFontSizeClass,
+	RichText,
+} from '@wordpress/block-editor';
 
 const supports = {
 	className: false,
@@ -74,7 +78,10 @@ const deprecated = [
 			} = attributes;
 
 			const textClass = getColorClassName( 'color', textColor );
-			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
 			const fontSizeClass = getFontSizeClass( fontSize );
 
 			const className = classnames( {
@@ -87,7 +94,9 @@ const deprecated = [
 			} );
 
 			const styles = {
-				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				backgroundColor: backgroundClass
+					? undefined
+					: customBackgroundColor,
 				color: textClass ? undefined : customTextColor,
 				fontSize: fontSizeClass ? undefined : customFontSize,
 				textAlign: align,
@@ -127,7 +136,10 @@ const deprecated = [
 			} = attributes;
 
 			const textClass = getColorClassName( 'color', textColor );
-			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
 			const fontSizeClass = fontSize && `is-${ fontSize }-text`;
 
 			const className = classnames( {
@@ -140,7 +152,9 @@ const deprecated = [
 			} );
 
 			const styles = {
-				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				backgroundColor: backgroundClass
+					? undefined
+					: customBackgroundColor,
 				color: textClass ? undefined : customTextColor,
 				fontSize: fontSizeClass ? undefined : customFontSize,
 				textAlign: align,
@@ -170,7 +184,15 @@ const deprecated = [
 			'customBackgroundColor'
 		),
 		save( { attributes } ) {
-			const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+			const {
+				width,
+				align,
+				content,
+				dropCap,
+				backgroundColor,
+				textColor,
+				fontSize,
+			} = attributes;
 			const className = classnames( {
 				[ `align${ width }` ]: width,
 				'has-background': backgroundColor,
@@ -184,7 +206,10 @@ const deprecated = [
 			};
 
 			return (
-				<p style={ styles } className={ className ? className : undefined }>
+				<p
+					style={ styles }
+					className={ className ? className : undefined }
+				>
 					{ content }
 				</p>
 			);
@@ -193,13 +218,17 @@ const deprecated = [
 			return omit(
 				{
 					...attributes,
-					customFontSize: isFinite( attributes.fontSize ) ? attributes.fontSize : undefined,
+					customFontSize: isFinite( attributes.fontSize )
+						? attributes.fontSize
+						: undefined,
 					customTextColor:
-						attributes.textColor && '#' === attributes.textColor[ 0 ]
+						attributes.textColor &&
+						'#' === attributes.textColor[ 0 ]
 							? attributes.textColor
 							: undefined,
 					customBackgroundColor:
-						attributes.backgroundColor && '#' === attributes.backgroundColor[ 0 ]
+						attributes.backgroundColor &&
+						'#' === attributes.backgroundColor[ 0 ]
 							? attributes.backgroundColor
 							: undefined,
 				},

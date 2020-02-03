@@ -444,7 +444,8 @@ export const spec = [
 		description: 'should handle multiline list value',
 		multilineTag: 'li',
 		multilineWrapperTags: [ 'ul', 'ol' ],
-		html: '<li>one<ul><li>a</li><li>b<ol><li>1</li><li>2</li></ol></li></ul></li><li>three</li>',
+		html:
+			'<li>one<ul><li>a</li><li>b<ol><li>1</li><li>2</li></ol></li></ul></li><li>three</li>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
 			startContainer: element,
@@ -457,7 +458,25 @@ export const spec = [
 			start: 0,
 			end: 9,
 			formats: [ , , , , , , , , , , , , , , , , , ],
-			replacements: [ , , , [ ul ], , [ ul ], , [ ul, ol ], , [ ul, ol ], , , , , , , , ],
+			replacements: [
+				,
+				,
+				,
+				[ ul ],
+				,
+				[ ul ],
+				,
+				[ ul, ol ],
+				,
+				[ ul, ol ],
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+			],
 			text: 'one\u2028a\u2028b\u20281\u20282\u2028three',
 		},
 	},
@@ -774,7 +793,8 @@ export const specWithRegistration = [
 		noToHTMLString: true,
 	},
 	{
-		description: 'should create format if editable tree only but changes need to be recorded',
+		description:
+			'should create format if editable tree only but changes need to be recorded',
 		formatName: 'my-plugin/link',
 		formatType: {
 			title: 'Custom Link',

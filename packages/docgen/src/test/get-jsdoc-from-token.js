@@ -69,7 +69,8 @@ describe( 'JSDoc', () => {
 				],
 			} )
 		).toEqual( {
-			description: 'Constant to document the meaning of life,\nthe universe and everything else.',
+			description:
+				'Constant to document the meaning of life,\nthe universe and everything else.',
 			tags: [
 				{
 					title: 'type',

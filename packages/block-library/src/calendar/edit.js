@@ -15,10 +15,15 @@ import ServerSideRender from '@wordpress/server-side-render';
 class CalendarEdit extends Component {
 	constructor() {
 		super( ...arguments );
-		this.getYearMonth = memoize( this.getYearMonth.bind( this ), { maxSize: 1 } );
-		this.getServerSideAttributes = memoize( this.getServerSideAttributes.bind( this ), {
+		this.getYearMonth = memoize( this.getYearMonth.bind( this ), {
 			maxSize: 1,
 		} );
+		this.getServerSideAttributes = memoize(
+			this.getServerSideAttributes.bind( this ),
+			{
+				maxSize: 1,
+			}
+		);
 	}
 
 	getYearMonth( date ) {
@@ -44,7 +49,10 @@ class CalendarEdit extends Component {
 			<Disabled>
 				<ServerSideRender
 					block="core/calendar"
-					attributes={ this.getServerSideAttributes( this.props.attributes, this.props.date ) }
+					attributes={ this.getServerSideAttributes(
+						this.props.attributes,
+						this.props.date
+					) }
 				/>
 			</Disabled>
 		);
@@ -62,6 +70,7 @@ export default withSelect( ( select ) => {
 	// This overwrite should only happen for 'post' post types.
 	// For other post types the calendar always displays the current month.
 	return {
-		date: postType === 'post' ? getEditedPostAttribute( 'date' ) : undefined,
+		date:
+			postType === 'post' ? getEditedPostAttribute( 'date' ) : undefined,
 	};
 } )( CalendarEdit );

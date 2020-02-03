@@ -19,7 +19,10 @@ import AxePuppeteer from 'axe-puppeteer';
 function formatViolations( violations ) {
 	return violations
 		.map( ( { help, helpUrl, id, nodes } ) => {
-			let output = `Rule: "${ id }" (${ help })\n` + `Help: ${ helpUrl }\n` + 'Affected Nodes:\n';
+			let output =
+				`Rule: "${ id }" (${ help })\n` +
+				`Help: ${ helpUrl }\n` +
+				'Affected Nodes:\n';
 
 			nodes.forEach( ( node ) => {
 				if ( node.any.length ) {
@@ -73,7 +76,10 @@ function formatViolations( violations ) {
  *
  * @return {Object} A matcher object with two keys `pass` and `message`.
  */
-async function toPassAxeTests( page, { include, exclude, disabledRules, options, config } = {} ) {
+async function toPassAxeTests(
+	page,
+	{ include, exclude, disabledRules, options, config } = {}
+) {
 	const axe = new AxePuppeteer( page );
 
 	if ( include ) {

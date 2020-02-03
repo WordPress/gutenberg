@@ -15,8 +15,12 @@ jest.mock( '@wordpress/blob', () => ( {
 } ) );
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
-const xmlFile = new window.File( [ 'fake_file' ], 'test.xml', { type: 'text/xml' } );
-const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', { type: 'image/jpeg' } );
+const xmlFile = new window.File( [ 'fake_file' ], 'test.xml', {
+	type: 'text/xml',
+} );
+const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', {
+	type: 'image/jpeg',
+} );
 
 describe( 'uploadMedia', () => {
 	it( 'should do nothing on no files', async () => {
@@ -191,7 +195,10 @@ describe( 'getMimeTypesArray', () => {
 	} );
 
 	it( 'should return the type plus a new mime type with type and subtype with the extension if a type is passed', () => {
-		expect( getMimeTypesArray( { ext: 'chicken' } ) ).toEqual( [ 'chicken', 'chicken/ext' ] );
+		expect( getMimeTypesArray( { ext: 'chicken' } ) ).toEqual( [
+			'chicken',
+			'chicken/ext',
+		] );
 	} );
 
 	it( 'should return the mime type passed and a new mime type with type and the extension as subtype', () => {
@@ -202,16 +209,15 @@ describe( 'getMimeTypesArray', () => {
 	} );
 
 	it( 'should return the mime type passed and an additional mime type per extension supported', () => {
-		expect( getMimeTypesArray( { 'jpg|jpeg|jpe': 'image/jpeg' } ) ).toEqual( [
-			'image/jpeg',
-			'image/jpg',
-			'image/jpeg',
-			'image/jpe',
-		] );
+		expect(
+			getMimeTypesArray( { 'jpg|jpeg|jpe': 'image/jpeg' } )
+		).toEqual( [ 'image/jpeg', 'image/jpg', 'image/jpeg', 'image/jpe' ] );
 	} );
 
 	it( 'should handle multiple mime types', () => {
-		expect( getMimeTypesArray( { 'ext|aaa': 'chicken/ribs', aaa: 'bbb' } ) ).toEqual( [
+		expect(
+			getMimeTypesArray( { 'ext|aaa': 'chicken/ribs', aaa: 'bbb' } )
+		).toEqual( [
 			'chicken/ribs',
 			'chicken/ext',
 			'chicken/aaa',

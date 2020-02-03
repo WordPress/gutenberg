@@ -110,7 +110,8 @@ export const DocumentOutline = ( {
 						! item.isEmpty &&
 						! isIncorrectLevel &&
 						!! item.level &&
-						( item.level !== 1 || ( ! hasMultipleH1 && ! hasTitle ) );
+						( item.level !== 1 ||
+							( ! hasMultipleH1 && ! hasTitle ) );
 					prevHeadingLevel = item.level;
 
 					return (
@@ -125,10 +126,19 @@ export const DocumentOutline = ( {
 						>
 							{ item.isEmpty
 								? emptyHeadingContent
-								: getTextContent( create( { html: item.attributes.content } ) ) }
+								: getTextContent(
+										create( {
+											html: item.attributes.content,
+										} )
+								  ) }
 							{ isIncorrectLevel && incorrectLevelContent }
-							{ item.level === 1 && hasMultipleH1 && multipleH1Headings }
-							{ hasTitle && item.level === 1 && ! hasMultipleH1 && singleH1Headings }
+							{ item.level === 1 &&
+								hasMultipleH1 &&
+								multipleH1Headings }
+							{ hasTitle &&
+								item.level === 1 &&
+								! hasMultipleH1 &&
+								singleH1Headings }
 						</DocumentOutlineItem>
 					);
 				} ) }

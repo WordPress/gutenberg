@@ -61,19 +61,26 @@ export const Gallery = ( props ) => {
 					);
 
 					return (
-						<li className="blocks-gallery-item" key={ img.id || img.url }>
+						<li
+							className="blocks-gallery-item"
+							key={ img.id || img.url }
+						>
 							<GalleryImage
 								url={ img.url }
 								alt={ img.alt }
 								id={ img.id }
 								isFirstItem={ index === 0 }
 								isLastItem={ index + 1 === images.length }
-								isSelected={ isSelected && selectedImage === index }
+								isSelected={
+									isSelected && selectedImage === index
+								}
 								onMoveBackward={ onMoveBackward( index ) }
 								onMoveForward={ onMoveForward( index ) }
 								onRemove={ onRemoveImage( index ) }
 								onSelect={ onSelectImage( index ) }
-								setAttributes={ ( attrs ) => onSetImageAttributes( index, attrs ) }
+								setAttributes={ ( attrs ) =>
+									onSetImageAttributes( index, attrs )
+								}
 								caption={ img.caption }
 								aria-label={ ariaLabel }
 							/>
