@@ -13,6 +13,23 @@ const REFERENCE_DATE = '2019-08-12';
 const DAYS_PER_RELEASE = 14;
 
 /**
+ * Returns true if the given error object represents a duplicate entry error, or
+ * false otherwise. The error is expected to be (though not verified explicitly
+ * as) an instance of Octokit's RequestError (`@octokit/request-error`).
+ *
+ * @see https://github.com/octokit/rest.js/issues/684
+ * @see https://developer.github.com/v3/#client-errors
+ * @see https://github.com/octokit/request.js/blob/2a1d768/src/fetch-wrapper.ts#L79-L80
+ *
+ * @param {Error} error Error to test.
+ *
+ * @return {boolean} Whether error is a duplicate validation request error.
+ */
+const isDuplicateValidationError = ( error ) =>
+	Array.isArray( error.errors ) &&
+	error.errors.some( ( { code } ) => code === 'already_exists' );
+
+/**
  * Assigns the correct milestone to PRs once merged.
  *
  * @param {Object} payload Pull request event payload, see https://developer.github.com/v3/activity/events/types/#pullrequestevent.
@@ -95,7 +112,7 @@ async function addMilestone( payload, octokit ) {
 
 		debug( 'add-milestone: Milestone created' );
 	} catch ( error ) {
-		if ( error.code !== 'already_exists' ) {
+		if ( ! isDuplicateValidationError( error ) ) {
 			throw error;
 		}
 
