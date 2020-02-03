@@ -69,7 +69,7 @@ export const blockManagement = (
 					( blockType ) => blockType.name !== action.item.name
 				),
 			};
-		case 'SET_INSTALLING_BLOCK' :
+		case 'SET_INSTALLING_BLOCK':
 			return {
 				...state,
 				isInstalling: action.isInstalling,
@@ -102,11 +102,14 @@ export function hasPermission( state = true, action ) {
  *
  * @return {Object} Updated state.
  */
-export const errorNotices = ( state = {
-	notices: {},
-}, action ) => {
+export const errorNotices = (
+	state = {
+		notices: {},
+	},
+	action
+) => {
 	switch ( action.type ) {
-		case 'SET_ERROR_NOTICE_ID' :
+		case 'SET_ERROR_NOTICE_ID':
 			return {
 				...state,
 				notices: {
