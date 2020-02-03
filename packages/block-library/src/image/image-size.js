@@ -60,7 +60,10 @@ class ImageSize extends Component {
 	}
 
 	calculateSize() {
-		const { width, height } = calculatePreferedImageSize( this.image, this.container );
+		const { width, height } = calculatePreferedImageSize(
+			this.image,
+			this.container
+		);
 		this.setState( { width, height } );
 	}
 

@@ -10,4 +10,3 @@ const alignCenter = (
 );
 
 export default alignCenter;
-

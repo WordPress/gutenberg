@@ -4,7 +4,11 @@
 import { Fragment } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
-function DownloadableBlockAuthorInfo( { author, authorBlockCount, authorBlockRating } ) {
+function DownloadableBlockAuthorInfo( {
+	author,
+	authorBlockCount,
+	authorBlockRating,
+} ) {
 	return (
 		<Fragment>
 			<span className="block-directory-downloadable-block-author-info__content-author">

@@ -24,7 +24,11 @@ const Caption = ( {
 	value,
 } ) => (
 	<View
-		accessibilityLabel={ accessibilityLabelCreator ? accessibilityLabelCreator( value ) : undefined }
+		accessibilityLabel={
+			accessibilityLabelCreator
+				? accessibilityLabelCreator( value )
+				: undefined
+		}
 		accessibilityRole="button"
 		accessible={ accessible }
 		style={ { flex: 1, display: shouldDisplay ? 'flex' : 'none' } }

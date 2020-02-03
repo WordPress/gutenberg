@@ -4,12 +4,6 @@
  */
 const chalk = require( 'chalk' );
 
-const clear = () => {
-	process.stdout.write(
-		process.platform === 'win32' ? '\x1B[2J\x1B[0f' : '\x1B[2J\x1B[3J\x1B[H'
-	);
-};
-
 const code = ( input ) => {
 	console.log( chalk.cyan( input ) );
 };
@@ -27,7 +21,6 @@ const success = ( input ) => {
 
 module.exports = {
 	code,
-	clear,
 	error,
 	info,
 	success,

@@ -7,58 +7,64 @@ import { TAB } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
 
 const withConstrainedTabbing = createHigherOrderComponent(
-	( WrappedComponent ) => class extends Component {
-		constructor() {
-			super( ...arguments );
+	( WrappedComponent ) =>
+		class extends Component {
+			constructor() {
+				super( ...arguments );
 
-			this.focusContainRef = createRef();
-			this.handleTabBehaviour = this.handleTabBehaviour.bind( this );
-		}
-
-		handleTabBehaviour( event ) {
-			if ( event.keyCode !== TAB ) {
-				return;
+				this.focusContainRef = createRef();
+				this.handleTabBehaviour = this.handleTabBehaviour.bind( this );
 			}
 
-			const tabbables = focus.tabbable.find( this.focusContainRef.current );
-			if ( ! tabbables.length ) {
-				return;
-			}
-			const firstTabbable = tabbables[ 0 ];
-			const lastTabbable = tabbables[ tabbables.length - 1 ];
+			handleTabBehaviour( event ) {
+				if ( event.keyCode !== TAB ) {
+					return;
+				}
 
-			if ( event.shiftKey && event.target === firstTabbable ) {
-				event.preventDefault();
-				lastTabbable.focus();
-			} else if ( ! event.shiftKey && event.target === lastTabbable ) {
-				event.preventDefault();
-				firstTabbable.focus();
-			/*
-			 * When pressing Tab and none of the tabbables has focus, the keydown
-			 * event happens on the wrapper div: move focus on the first tabbable.
-			 */
-			} else if ( ! tabbables.includes( event.target ) ) {
-				event.preventDefault();
-				firstTabbable.focus();
-			}
-		}
+				const tabbables = focus.tabbable.find(
+					this.focusContainRef.current
+				);
+				if ( ! tabbables.length ) {
+					return;
+				}
+				const firstTabbable = tabbables[ 0 ];
+				const lastTabbable = tabbables[ tabbables.length - 1 ];
 
-		render() {
-			// Disable reason: this component is non-interactive, but must capture
-			// events from the wrapped component to determine when the Tab key is used.
-			/* eslint-disable jsx-a11y/no-static-element-interactions */
-			return (
-				<div
-					onKeyDown={ this.handleTabBehaviour }
-					ref={ this.focusContainRef }
-					tabIndex="-1"
-				>
-					<WrappedComponent { ...this.props } />
-				</div>
-			);
-			/* eslint-enable jsx-a11y/no-static-element-interactions */
-		}
-	},
+				if ( event.shiftKey && event.target === firstTabbable ) {
+					event.preventDefault();
+					lastTabbable.focus();
+				} else if (
+					! event.shiftKey &&
+					event.target === lastTabbable
+				) {
+					event.preventDefault();
+					firstTabbable.focus();
+					/*
+					 * When pressing Tab and none of the tabbables has focus, the keydown
+					 * event happens on the wrapper div: move focus on the first tabbable.
+					 */
+				} else if ( ! tabbables.includes( event.target ) ) {
+					event.preventDefault();
+					firstTabbable.focus();
+				}
+			}
+
+			render() {
+				// Disable reason: this component is non-interactive, but must capture
+				// events from the wrapped component to determine when the Tab key is used.
+				/* eslint-disable jsx-a11y/no-static-element-interactions */
+				return (
+					<div
+						onKeyDown={ this.handleTabBehaviour }
+						ref={ this.focusContainRef }
+						tabIndex="-1"
+					>
+						<WrappedComponent { ...this.props } />
+					</div>
+				);
+				/* eslint-enable jsx-a11y/no-static-element-interactions */
+			}
+		},
 	'withConstrainedTabbing'
 );
 

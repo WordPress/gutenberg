@@ -14,11 +14,10 @@ function NavigableToolbar( { children, focusOnMount, ...props } ) {
 			tabbables[ 0 ].focus();
 		}
 	}, [] );
-	useShortcut(
-		'core/block-editor/focus-toolbar',
-		focusToolbar,
-		{ bindGlobal: true, eventName: 'keydown' }
-	);
+	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar, {
+		bindGlobal: true,
+		eventName: 'keydown',
+	} );
 	useEffect( () => {
 		if ( focusOnMount ) {
 			focusToolbar();

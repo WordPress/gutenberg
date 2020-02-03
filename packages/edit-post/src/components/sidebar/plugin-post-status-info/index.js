@@ -53,9 +53,7 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  */
 const PluginPostStatusInfo = ( { children, className } ) => (
 	<Fill>
-		<PanelRow className={ className }>
-			{ children }
-		</PanelRow>
+		<PanelRow className={ className }>{ children }</PanelRow>
 	</Fill>
 );
 

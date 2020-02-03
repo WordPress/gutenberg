@@ -8,6 +8,4 @@ import styled from '@emotion/native';
  */
 import { text } from './mixins';
 
-export const __experimentalText = styled.Text(
-	text
-);
+export const __experimentalText = styled.Text( text );

@@ -15,12 +15,10 @@ const NAMESPACE_EXPORT = '*';
 const DEFAULT_EXPORT = 'default';
 
 const hasClassWithName = ( node, name ) =>
-	node.type === 'ClassDeclaration' &&
-	node.id.name === name;
+	node.type === 'ClassDeclaration' && node.id.name === name;
 
 const hasFunctionWithName = ( node, name ) =>
-	node.type === 'FunctionDeclaration' &&
-	node.id.name === name;
+	node.type === 'FunctionDeclaration' && node.id.name === name;
 
 const hasVariableWithName = ( node, name ) =>
 	node.type === 'VariableDeclaration' &&
@@ -34,11 +32,10 @@ const hasVariableWithName = ( node, name ) =>
 	} );
 
 const hasNamedExportWithName = ( node, name ) =>
-	node.type === 'ExportNamedDeclaration' && (
-		( node.declaration && hasClassWithName( node.declaration, name ) ) ||
+	node.type === 'ExportNamedDeclaration' &&
+	( ( node.declaration && hasClassWithName( node.declaration, name ) ) ||
 		( node.declaration && hasFunctionWithName( node.declaration, name ) ) ||
-		( node.declaration && hasVariableWithName( node.declaration, name ) )
-	);
+		( node.declaration && hasVariableWithName( node.declaration, name ) ) );
 
 const hasImportWithName = ( node, name ) =>
 	node.type === 'ImportDeclaration' &&
@@ -49,10 +46,16 @@ const isImportDeclaration = ( node ) => node.type === 'ImportDeclaration';
 const someImportMatchesName = ( name, token ) => {
 	let matches = false;
 	token.specifiers.forEach( ( specifier ) => {
-		if ( ( specifier.type === 'ImportDefaultSpecifier' ) && ( name === 'default' ) ) {
+		if (
+			specifier.type === 'ImportDefaultSpecifier' &&
+			name === 'default'
+		) {
 			matches = true;
 		}
-		if ( ( specifier.type === 'ImportSpecifier' ) && ( name === specifier.imported.name ) ) {
+		if (
+			specifier.type === 'ImportSpecifier' &&
+			name === specifier.imported.name
+		) {
 			matches = true;
 		}
 	} );
@@ -61,7 +64,8 @@ const someImportMatchesName = ( name, token ) => {
 
 const someEntryMatchesName = ( name, entry, token ) =>
 	( token.type === 'ExportNamedDeclaration' && entry.localName === name ) ||
-	( token.type === 'ImportDeclaration' && someImportMatchesName( name, token ) );
+	( token.type === 'ImportDeclaration' &&
+		someImportMatchesName( name, token ) );
 
 const getJSDocFromDependency = ( token, entry, parseDependency ) => {
 	let doc;
@@ -69,7 +73,9 @@ const getJSDocFromDependency = ( token, entry, parseDependency ) => {
 	if ( entry.localName === NAMESPACE_EXPORT ) {
 		doc = ir.filter( ( { name } ) => name !== DEFAULT_EXPORT );
 	} else {
-		doc = ir.find( ( { name } ) => someEntryMatchesName( name, entry, token ) );
+		doc = ir.find( ( { name } ) =>
+			someEntryMatchesName( name, entry, token )
+		);
 	}
 	return doc;
 };
@@ -78,18 +84,20 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 	let doc;
 	if ( entry.localName !== NAMESPACE_EXPORT ) {
 		doc = getJSDocFromToken( token );
-		if ( ( doc !== undefined ) ) {
+		if ( doc !== undefined ) {
 			return doc;
 		}
 	}
 
 	if ( entry && entry.module === null ) {
 		const candidates = ast.body.filter( ( node ) => {
-			return hasClassWithName( node, entry.localName ) ||
+			return (
+				hasClassWithName( node, entry.localName ) ||
 				hasFunctionWithName( node, entry.localName ) ||
 				hasVariableWithName( node, entry.localName ) ||
 				hasNamedExportWithName( node, entry.localName ) ||
-				hasImportWithName( node, entry.localName );
+				hasImportWithName( node, entry.localName )
+			);
 		} );
 		if ( candidates.length !== 1 ) {
 			return doc;
@@ -121,7 +129,12 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
  *
  * @return {Object} Intermediate Representation in JSON.
  */
-module.exports = function( path, token, ast = { body: [] }, parseDependency = () => {} ) {
+module.exports = function(
+	path,
+	token,
+	ast = { body: [] },
+	parseDependency = () => {}
+) {
 	const exportEntries = getExportEntries( token );
 	const ir = [];
 	exportEntries.forEach( ( entry ) => {

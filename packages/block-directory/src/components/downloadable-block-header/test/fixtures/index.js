@@ -1,7 +1,8 @@
 const pluginBase = {
 	name: 'boxer/boxer',
 	title: 'Boxer',
-	description: 'Boxer is a Block that puts your WordPress posts into boxes on a page.',
+	description:
+		'Boxer is a Block that puts your WordPress posts into boxes on a page.',
 	id: 'boxer-block',
 	rating: 5,
 	rating_count: 1,
@@ -17,4 +18,7 @@ const pluginBase = {
 };
 
 export const pluginWithIcon = { ...pluginBase, icon: 'block-default' };
-export const pluginWithImg = { ...pluginBase, icon: 'https://ps.w.org/listicles/assets/icon-128x128.png' };
+export const pluginWithImg = {
+	...pluginBase,
+	icon: 'https://ps.w.org/listicles/assets/icon-128x128.png',
+};

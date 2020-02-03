@@ -1,4 +1,3 @@
-
 /**
  * WordPress dependencies
  */
@@ -7,9 +6,9 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	insertBlock,
-	pressKeyWithModifier,
 	setUpResponseMocking,
 	clickBlockToolbarButton,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 async function mockPagesResponse( pages ) {
@@ -25,7 +24,12 @@ async function mockPagesResponse( pages ) {
 
 	await setUpResponseMocking( [
 		{
-			match: ( request ) => request.url().includes( `rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }` ),
+			match: ( request ) =>
+				request
+					.url()
+					.includes(
+						`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`
+					),
 			onRequestMatch: createJSONResponse( mappedPages ),
 		},
 	] );
@@ -42,7 +46,9 @@ async function mockSearchResponse( items ) {
 
 	await setUpResponseMocking( [
 		{
-			match: ( request ) => request.url().includes( `rest_route` ) && request.url().includes( `search` ),
+			match: ( request ) =>
+				request.url().includes( `rest_route` ) &&
+				request.url().includes( `search` ),
 			onRequestMatch: createJSONResponse( mappedItems ),
 		},
 	] );
@@ -52,26 +58,28 @@ async function updateActiveNavigationLink( { url, label } ) {
 	if ( url ) {
 		await page.type( 'input[placeholder="Search or type url"]', url );
 		// Wait for the autocomplete suggestion item to appear.
-		await page.waitForXPath( `//span[@class="block-editor-link-control__search-item-title"]/mark[text()="${ url }"]` );
+		await page.waitForXPath(
+			`//span[@class="block-editor-link-control__search-item-title"]/mark[text()="${ url }"]`
+		);
 		// Navigate to the first suggestion.
 		await page.keyboard.press( 'ArrowDown' );
 		// Select the suggestion.
 		await page.keyboard.press( 'Enter' );
-		// Make sure that the dialog is still opened, and that focus is retained
-		// within (focusing on the link preview).
-		await page.waitForSelector( ':focus.block-editor-link-control__search-item-title' );
 	}
 
 	if ( label ) {
-		await page.click( '.is-selected .wp-block-navigation-link__label' );
+		// With https://github.com/WordPress/gutenberg/pull/19686, we're auto-selecting the label if the label is URL-ish.
+		// In this case, it means we have to select and delete the label if it's _not_ the url.
+		if ( label !== url ) {
+			// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
+			// to select all text like other tests do.
+			// Unfortunately, these tests don't seem to pass on Travis CI when
+			// using that approach, while using `Home` and `End` they do pass.
+			await page.keyboard.press( 'Home' );
+			await pressKeyWithModifier( 'shift', 'End' );
+			await page.keyboard.press( 'Backspace' );
+		}
 
-		// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
-		// to select all text like other tests do.
-		// Unfortunately, these tests don't seem to pass on Travis CI when
-		// using that approach, while using `Home` and `End` they do pass.
-		await page.keyboard.press( 'Home' );
-		await pressKeyWithModifier( 'shift', 'End' );
-		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( label );
 	}
 }
@@ -108,8 +116,12 @@ describe( 'Navigation', () => {
 
 		// Create an empty nav block. The 'create' button is disabled until pages are loaded,
 		// so we must wait for it to become not-disabled.
-		await page.waitForXPath( '//button[text()="Create from all top-level pages"][not(@disabled)]' );
-		const [ createFromExistingButton ] = await page.$x( '//button[text()="Create from all top-level pages"][not(@disabled)]' );
+		await page.waitForXPath(
+			'//button[text()="Create from all top-level pages"][not(@disabled)]'
+		);
+		const [ createFromExistingButton ] = await page.$x(
+			'//button[text()="Create from all top-level pages"][not(@disabled)]'
+		);
 		await createFromExistingButton.click();
 
 		// Snapshot should contain the mocked pages.
@@ -122,11 +134,16 @@ describe( 'Navigation', () => {
 
 		// Create an empty nav block.
 		await page.waitForSelector( '.wp-block-navigation-placeholder' );
-		const [ createEmptyButton ] = await page.$x( '//button[text()="Create empty"]' );
+		const [ createEmptyButton ] = await page.$x(
+			'//button[text()="Create empty"]'
+		);
 		await createEmptyButton.click();
 
 		// Add a link to the default Navigation Link block.
-		await updateActiveNavigationLink( { url: 'https://wordpress.org', label: 'WP' } );
+		await updateActiveNavigationLink( {
+			url: 'https://wordpress.org',
+			label: 'WP',
+		} );
 
 		// Move the mouse to reveal the block movers. Without this the test seems to fail.
 		await page.mouse.move( 100, 100 );
@@ -139,15 +156,18 @@ describe( 'Navigation', () => {
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
-		const isInURLInput = await page.evaluate( () => (
-			!! document.activeElement.closest( '.block-editor-url-input' )
-		) );
+		const isInURLInput = await page.evaluate(
+			() => !! document.activeElement.closest( '.block-editor-url-input' )
+		);
 		expect( isInURLInput ).toBe( true );
 		await page.keyboard.press( 'Escape' );
-		const isInLinkRichText = await page.evaluate( () => (
-			document.activeElement.classList.contains( 'rich-text' ) &&
-			!! document.activeElement.closest( '.block-editor-block-list__block' )
-		) );
+		const isInLinkRichText = await page.evaluate(
+			() =>
+				document.activeElement.classList.contains( 'rich-text' ) &&
+				!! document.activeElement.closest(
+					'.block-editor-block-list__block'
+				)
+		);
 		expect( isInLinkRichText ).toBe( true );
 
 		// Now, trigger the link dialog once more.
@@ -155,10 +175,15 @@ describe( 'Navigation', () => {
 
 		// For the second nav link block use an existing internal page.
 		// Mock the api response so that it's consistent.
-		await mockSearchResponse( [ { title: 'Contact Us', slug: 'contact-us' } ] );
+		await mockSearchResponse( [
+			{ title: 'Contact Us', slug: 'contact-us' },
+		] );
 
 		// Add a link to the default Navigation Link block.
-		await updateActiveNavigationLink( { url: 'Contact Us', label: 'Get in touch' } );
+		await updateActiveNavigationLink( {
+			url: 'Contact Us',
+			label: 'Get in touch',
+		} );
 
 		// Expect a Navigation Block with two Navigation Links in the snapshot.
 		expect( await getEditedPostContent() ).toMatchSnapshot();

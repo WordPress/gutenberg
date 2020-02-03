@@ -79,11 +79,13 @@ describe( 'addFirstTimeContributorLabel', () => {
 		};
 		const octokit = {
 			issues: {
-				get: jest.fn( () => Promise.resolve( {
-					data: {
-						milestone: 'Gutenberg 6.4',
-					},
-				} ) ),
+				get: jest.fn( () =>
+					Promise.resolve( {
+						data: {
+							milestone: 'Gutenberg 6.4',
+						},
+					} )
+				),
 				createMilestone: jest.fn(),
 				listMilestonesForRepo: jest.fn(),
 				update: jest.fn(),
@@ -124,30 +126,38 @@ describe( 'addFirstTimeContributorLabel', () => {
 		};
 		const octokit = {
 			issues: {
-				get: jest.fn( () => Promise.resolve( {
-					data: {
-						milestone: null,
-					},
-				} ) ),
+				get: jest.fn( () =>
+					Promise.resolve( {
+						data: {
+							milestone: null,
+						},
+					} )
+				),
 				createMilestone: jest.fn(),
-				listMilestonesForRepo: jest.fn( () => Promise.resolve( {
-					data: [
-						{ title: 'Gutenberg 6.2', number: 10 },
-						{ title: 'Gutenberg 6.3', number: 11 },
-						{ title: 'Gutenberg 6.4', number: 12 },
-					],
-				} ) ),
+				listMilestonesForRepo: jest.fn( () =>
+					Promise.resolve( {
+						data: [
+							{ title: 'Gutenberg 6.2', number: 10 },
+							{ title: 'Gutenberg 6.3', number: 11 },
+							{ title: 'Gutenberg 6.4', number: 12 },
+						],
+					} )
+				),
 				update: jest.fn(),
 			},
 			repos: {
-				getContents: jest.fn( () => Promise.resolve( {
-					data: {
-						content: Buffer.from( JSON.stringify( {
-							version: '6.3.0',
-						} ) ).toString( 'base64' ),
-						encoding: 'base64',
-					},
-				} ) ),
+				getContents: jest.fn( () =>
+					Promise.resolve( {
+						data: {
+							content: Buffer.from(
+								JSON.stringify( {
+									version: '6.3.0',
+								} )
+							).toString( 'base64' ),
+							encoding: 'base64',
+						},
+					} )
+				),
 			},
 		};
 
@@ -199,30 +209,38 @@ describe( 'addFirstTimeContributorLabel', () => {
 		};
 		const octokit = {
 			issues: {
-				get: jest.fn( () => Promise.resolve( {
-					data: {
-						milestone: null,
-					},
-				} ) ),
+				get: jest.fn( () =>
+					Promise.resolve( {
+						data: {
+							milestone: null,
+						},
+					} )
+				),
 				createMilestone: jest.fn(),
-				listMilestonesForRepo: jest.fn( () => Promise.resolve( {
-					data: [
-						{ title: 'Gutenberg 6.8', number: 10 },
-						{ title: 'Gutenberg 6.9', number: 11 },
-						{ title: 'Gutenberg 7.0', number: 12 },
-					],
-				} ) ),
+				listMilestonesForRepo: jest.fn( () =>
+					Promise.resolve( {
+						data: [
+							{ title: 'Gutenberg 6.8', number: 10 },
+							{ title: 'Gutenberg 6.9', number: 11 },
+							{ title: 'Gutenberg 7.0', number: 12 },
+						],
+					} )
+				),
 				update: jest.fn(),
 			},
 			repos: {
-				getContents: jest.fn( () => Promise.resolve( {
-					data: {
-						content: Buffer.from( JSON.stringify( {
-							version: '6.9.0',
-						} ) ).toString( 'base64' ),
-						encoding: 'base64',
-					},
-				} ) ),
+				getContents: jest.fn( () =>
+					Promise.resolve( {
+						data: {
+							content: Buffer.from(
+								JSON.stringify( {
+									version: '6.9.0',
+								} )
+							).toString( 'base64' ),
+							encoding: 'base64',
+						},
+					} )
+				),
 			},
 		};
 

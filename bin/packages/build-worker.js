@@ -84,8 +84,14 @@ function getBuildPath( file, buildFolder ) {
  */
 const BUILD_TASK_BY_EXTENSION = {
 	async '.scss'( file ) {
-		const outputFile = getBuildPath( file.replace( '.scss', '.css' ), 'build-style' );
-		const outputFileRTL = getBuildPath( file.replace( '.scss', '-rtl.css' ), 'build-style' );
+		const outputFile = getBuildPath(
+			file.replace( '.scss', '.css' ),
+			'build-style'
+		);
+		const outputFileRTL = getBuildPath(
+			file.replace( '.scss', '-rtl.css' ),
+			'build-style'
+		);
 
 		const [ , contents ] = await Promise.all( [
 			makeDir( path.dirname( outputFile ) ),
@@ -95,7 +101,7 @@ const BUILD_TASK_BY_EXTENSION = {
 		const builtSass = await renderSass( {
 			file,
 			includePaths: [ path.join( PACKAGES_DIR, 'base-styles' ) ],
-			data: (
+			data:
 				[
 					'colors',
 					'breakpoints',
@@ -103,20 +109,26 @@ const BUILD_TASK_BY_EXTENSION = {
 					'mixins',
 					'animations',
 					'z-index',
-				].map( ( imported ) => `@import "${ imported }";` ).join( ' ' )	+
-				contents
-			),
+				]
+					.map( ( imported ) => `@import "${ imported }";` )
+					.join( ' ' ) + contents,
 		} );
 
-		const result = await postcss( require( './post-css-config' ) ).process( builtSass.css, {
-			from: 'src/app.css',
-			to: 'dest/app.css',
-		} );
+		const result = await postcss( require( './post-css-config' ) ).process(
+			builtSass.css,
+			{
+				from: 'src/app.css',
+				to: 'dest/app.css',
+			}
+		);
 
-		const resultRTL = await postcss( [ require( 'rtlcss' )() ] ).process( result.css, {
-			from: 'src/app.css',
-			to: 'dest/app.css',
-		} );
+		const resultRTL = await postcss( [ require( 'rtlcss' )() ] ).process(
+			result.css,
+			{
+				from: 'src/app.css',
+				to: 'dest/app.css',
+			}
+		);
 
 		await Promise.all( [
 			writeFile( outputFile, result.css ),
@@ -125,9 +137,14 @@ const BUILD_TASK_BY_EXTENSION = {
 	},
 
 	async '.js'( file ) {
-		for ( const [ environment, buildDir ] of Object.entries( JS_ENVIRONMENTS ) ) {
+		for ( const [ environment, buildDir ] of Object.entries(
+			JS_ENVIRONMENTS
+		) ) {
 			const destPath = getBuildPath( file, buildDir );
-			const babelOptions = getBabelConfig( environment, file.replace( PACKAGES_DIR, '@wordpress' ) );
+			const babelOptions = getBabelConfig(
+				environment,
+				file.replace( PACKAGES_DIR, '@wordpress' )
+			);
 
 			const [ , transformed ] = await Promise.all( [
 				makeDir( path.dirname( destPath ) ),
@@ -135,8 +152,17 @@ const BUILD_TASK_BY_EXTENSION = {
 			] );
 
 			await Promise.all( [
-				writeFile( destPath + '.map', JSON.stringify( transformed.map ) ),
-				writeFile( destPath, transformed.code + '\n//# sourceMappingURL=' + path.basename( destPath ) + '.map' ),
+				writeFile(
+					destPath + '.map',
+					JSON.stringify( transformed.map )
+				),
+				writeFile(
+					destPath,
+					transformed.code +
+						'\n//# sourceMappingURL=' +
+						path.basename( destPath ) +
+						'.map'
+				),
 			] );
 		}
 	},

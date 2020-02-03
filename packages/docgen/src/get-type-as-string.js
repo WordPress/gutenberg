@@ -18,9 +18,12 @@ const getType = function( param, defaultValue ) {
 		} else if ( param.type === 'NullableType' ) {
 			return `?${ getType( param.expression, defaultValue ) }`;
 		} else if ( param.type === 'TypeApplication' ) {
-			return `${ getType( param.expression, defaultValue ) }<${
-				param.applications.map( ( application ) => getType( application ) ).join( ',' )
-			}>`;
+			return `${ getType(
+				param.expression,
+				defaultValue
+			) }<${ param.applications
+				.map( ( application ) => getType( application ) )
+				.join( ',' ) }>`;
 		} else if ( param.type === 'OptionalType' ) {
 			return `[${ getType( param.expression, defaultValue ) }]`;
 		}

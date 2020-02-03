@@ -9,8 +9,14 @@ import { View, Dimensions } from 'react-native';
 import styles from './style.scss';
 
 const ReadableContentView = ( { reversed, children } ) => (
-	<View style={ styles.container } >
-		<View style={ reversed ? styles.reversedCenteredContent : styles.centeredContent } >
+	<View style={ styles.container }>
+		<View
+			style={
+				reversed
+					? styles.reversedCenteredContent
+					: styles.centeredContent
+			}
+		>
 			{ children }
 		</View>
 	</View>
