@@ -17,7 +17,7 @@ import {
 	requestImageFullscreenPreview,
 	showMediaEditorButton,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty, get, find } from 'lodash';
+import { isEmpty, get, find, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -357,7 +357,7 @@ export class ImageEdit extends React.Component {
 			},
 		];
 
-		const sizeOptions = imageSizes.map( ( { label, slug } ) => ( {
+		const sizeOptions = map( imageSizes, ( { label, slug } ) => ( {
 			value: slug,
 			label,
 		} ) );
