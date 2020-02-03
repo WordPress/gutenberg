@@ -15,7 +15,10 @@ import { compose } from '@wordpress/compose';
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
 import DownloadableBlockNotice from '../downloadable-block-notice';
-import { DOWNLOAD_ERROR_NOTICE_ID, INSTALL_ERROR_NOTICE_ID } from '../../store/constants';
+import {
+	DOWNLOAD_ERROR_NOTICE_ID,
+	INSTALL_ERROR_NOTICE_ID,
+} from '../../store/constants';
 
 /**
  * Returns either installAndDownload or download function.
@@ -27,9 +30,17 @@ import { DOWNLOAD_ERROR_NOTICE_ID, INSTALL_ERROR_NOTICE_ID } from '../../store/c
  *
  * @return {Function} Function to continue install process.
  */
-const getNoticeCallback = ( item, errorNotices, installAndDownload, download ) => {
+const getNoticeCallback = (
+	item,
+	errorNotices,
+	installAndDownload,
+	download
+) => {
 	// We don't want to try installing again, the API will throw an install error
-	if ( errorNotices[ item.id ] && errorNotices[ item.id ] === DOWNLOAD_ERROR_NOTICE_ID ) {
+	if (
+		errorNotices[ item.id ] &&
+		errorNotices[ item.id ] === DOWNLOAD_ERROR_NOTICE_ID
+	) {
 		return download;
 	}
 
@@ -43,7 +54,7 @@ export function DownloadableBlocksList( {
 	isLoading,
 	errorNotices,
 	installAndDownload,
-	download
+	download,
 } ) {
 	if ( ! items.length ) {
 		return null;
@@ -57,7 +68,12 @@ export function DownloadableBlocksList( {
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-directory-downloadable-blocks-list">
 			{ items.map( ( item ) => {
-				const callBack = getNoticeCallback( item, errorNotices, installAndDownload, download );
+				const callBack = getNoticeCallback(
+					item,
+					errorNotices,
+					installAndDownload,
+					download
+				);
 
 				return (
 					<DownloadableBlockListItem
@@ -75,11 +91,14 @@ export function DownloadableBlocksList( {
 						item={ item }
 						isLoading={ isLoading }
 					>
-						<DownloadableBlockNotice onClick={ callBack } errorNotices={ errorNotices } block={ item } />
+						<DownloadableBlockNotice
+							onClick={ callBack }
+							errorNotices={ errorNotices }
+							block={ item }
+						/>
 					</DownloadableBlockListItem>
 				);
-			}
-			) }
+			} ) }
 			{ children }
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
@@ -88,10 +107,9 @@ export function DownloadableBlocksList( {
 
 export default compose(
 	withSelect( ( select ) => {
-		const {
-			getErrorNotices,
-			isInstalling,
-		} = select( 'core/block-directory' );
+		const { getErrorNotices, isInstalling } = select(
+			'core/block-directory'
+		);
 
 		const errorNotices = getErrorNotices();
 		const isLoading = isInstalling();
@@ -107,7 +125,7 @@ export default compose(
 			installBlock,
 			setErrorNotice,
 			clearErrorNotice,
-			setIsInstalling
+			setIsInstalling,
 		} = dispatch( 'core/block-directory' );
 		const { onSelect } = props;
 

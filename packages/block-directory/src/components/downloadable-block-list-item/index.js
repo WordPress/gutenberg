@@ -5,12 +5,7 @@ import DownloadableBlockHeader from '../downloadable-block-header';
 import DownloadableBlockAuthorInfo from '../downloadable-block-author-info';
 import DownloadableBlockInfo from '../downloadable-block-info';
 
-function DownloadableBlockListItem( {
-	item,
-	onClick,
-	isLoading,
-	children,
-} ) {
+function DownloadableBlockListItem( { item, onClick, isLoading, children } ) {
 	const {
 		icon,
 		title,
