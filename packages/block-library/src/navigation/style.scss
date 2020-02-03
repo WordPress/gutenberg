@@ -74,6 +74,7 @@ $navigation-sub-menu-width: $grid-size * 25;
 .wp-block-navigation,
 .wp-block-navigation .block-editor-block-list__layout {
 	display: flex;
+	flex-wrap: wrap;
 }
 
 .wp-block-navigation {
@@ -86,6 +87,7 @@ $navigation-sub-menu-width: $grid-size * 25;
 	// Remove paddings on subsequent immediate children.
 	.block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
 		margin: 0;
+		width: auto;
 	}
 
 	&,
