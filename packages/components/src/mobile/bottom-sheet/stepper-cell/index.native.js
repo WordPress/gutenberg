@@ -16,7 +16,7 @@ import Cell from '../cell';
 import Stepper from './stepper';
 import styles from './style.scss';
 
-const STEP_SPEED = 200;
+const STEP_DELAY = 200;
 const DEFAULT_STEP = 1;
 
 class BottomSheetStepperCell extends Component {
@@ -77,7 +77,7 @@ class BottomSheetStepperCell extends Component {
 		clearInterval( this.interval );
 	}
 
-	startPressInterval( callback ) {
+	startPressInterval( callback, speed = STEP_DELAY ) {
 		let counter = 0;
 		this.interval = setInterval( () => {
 			callback();
@@ -85,9 +85,9 @@ class BottomSheetStepperCell extends Component {
 
 			if ( counter === 10 ) {
 				clearInterval( this.interval );
-				this.startPressInterval( callback, STEP_SPEED / 2 );
+				this.startPressInterval( callback, speed / 2 );
 			}
-		}, STEP_SPEED );
+		}, speed );
 	}
 
 	announceValue( value ) {
