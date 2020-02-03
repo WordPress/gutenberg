@@ -38,7 +38,7 @@
 	}
 
 	// The toolbar library.
-	&.is-from-toolbar > .components-popover__content {
+	&.is-top-toolbar-inserter > .components-popover__content {
 		@include break-medium {
 			overflow-y: visible;
 			height: 92vh; // This is limited by a max-height from the popover component itself.
@@ -69,7 +69,7 @@
 	@include break-medium {
 		width: 400px;
 
-		.is-from-toolbar & {
+		.is-top-toolbar-inserter & {
 			width: 100%;
 			min-width: 480px;
 			position: relative;
@@ -79,7 +79,7 @@
 	.components-tip {
 		display: none;
 
-		.is-from-toolbar & {
+		.is-top-toolbar-inserter & {
 			padding: $grid-size-large;
 			display: flex;
 			align-items: center;
@@ -88,8 +88,8 @@
 }
 
 // When opened from toolbar, show popover background behind main menu and preview.
-.is-from-toolbar .block-editor-inserter__main-area,
-.is-from-toolbar .block-editor-inserter__preview-panel {
+.is-top-toolbar-inserter .block-editor-inserter__main-area,
+.is-top-toolbar-inserter .block-editor-inserter__preview-panel {
 	background: $white;
 
 	@include break-medium() {
@@ -109,7 +109,7 @@
 	width: 100%;
 
 	@include break-medium {
-		.is-from-toolbar & {
+		.is-top-toolbar-inserter & {
 			position: relative;
 			margin-right: $grid-size-large;
 
@@ -210,7 +210,7 @@
 
 	// Show preview panel when inserter is not modal, and opened from inserter.
 	@include break-medium () {
-		.is-from-toolbar & {
+		.is-top-toolbar-inserter & {
 			display: block;
 			position: relative;
 			min-height: 480px;

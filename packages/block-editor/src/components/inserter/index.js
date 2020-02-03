@@ -144,7 +144,7 @@ class Inserter extends Component {
 				className="block-editor-inserter"
 				contentClassName={ classnames(
 					'block-editor-inserter__popover',
-					{ 'is-from-toolbar': !isAppender }
+					{ 'is-top-toolbar-inserter': ! isAppender }
 				) }
 				position={ position }
 				onToggle={ this.onToggle }
