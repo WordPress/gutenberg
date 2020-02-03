@@ -48,14 +48,8 @@ const automations = [
 			event === context.eventName &&
 			action === context.payload.action
 		) {
-			try {
-				debug( `main: Starting task ${ task.name }` );
-				await task( context.payload, octokit );
-			} catch ( error ) {
-				debug(
-					`main: Task ${ task.name } failed with error: ${ error }`
-				);
-			}
+			debug( `main: Starting task ${ task.name }` );
+			await task( context.payload, octokit );
 		}
 	}
 
