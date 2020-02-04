@@ -10,6 +10,13 @@ import { noop, startsWith, uniqueId } from 'lodash';
 import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
+	useRef,
+	useCallback,
+	useState,
+	Fragment,
+	useEffect,
+} from '@wordpress/element';
+import {
 	safeDecodeURI,
 	filterURLForDisplay,
 	isURL,
@@ -251,23 +258,23 @@ function LinkControl( {
 		( val, args ) => {
 			const isInternal = startsWith( val, '#' );
 
-			const handleManualEntry =
+			const maybeURL =
 				isInternal || isURL( val ) || ( val && val.includes( 'www.' ) );
 
-			return handleManualEntry
+			return maybeURL
 				? handleDirectEntry( val, args )
 				: handleEntitySearch( val, args );
 		},
 		[ handleDirectEntry, fetchSearchSuggestions ]
 	);
 
-	const handleOnCreate = async (entityTitle) => {
+	const handleOnCreate = async ( entityTitle ) => {
 		let newEntity;
 
 		setIsResolvingLink( true );
 		setErrorMsg( null );
 		try {
-			newEntity = await createEntity('page', entityTitle );
+			newEntity = await createEntity( 'page', entityTitle );
 		} catch ( error ) {
 			setErrorMsg(
 				error.msg ||
@@ -343,6 +350,12 @@ function LinkControl( {
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
+				{ isInitialSuggestions ? (
+					SearchResultsLabel
+				) : (
+					<VisuallyHidden>{ SearchResultsLabel }</VisuallyHidden>
+				) }
+
 				<div
 					{ ...suggestionsListProps }
 					className={ resultsListClasses }
@@ -357,8 +370,8 @@ function LinkControl( {
 								<LinkControlSearchCreate
 									searchTerm={ inputValue }
 									onClick={ () => {
-										handleOnCreate(suggestion.title);
-									 } }
+										handleOnCreate( suggestion.title );
+									} }
 									key={ `${ suggestion.id }-${ suggestion.type }` }
 									itemProps={ buildSuggestionItemProps(
 										suggestion,
@@ -420,10 +433,12 @@ function LinkControl( {
 					onSelect={ ( suggestion ) => {
                         stopEditing();
 
-						if (suggestion.type && CREATE_TYPE === suggestion.type) {
-							handleOnCreate(inputValue);
+						if (
+							suggestion.type &&
+							CREATE_TYPE === suggestion.type
+						) {
+							handleOnCreate( inputValue );
 						} else {
-
 							handleSelectSuggestion( suggestion, value )();
 						}
 					} }
