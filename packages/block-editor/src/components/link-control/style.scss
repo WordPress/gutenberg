@@ -38,7 +38,7 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__search-error {
-	margin: 0 20px 20px 20px;
+	margin: -$grid-size-large/2 $grid-size-large $grid-size-large;
 }
 
 .block-editor-link-control__search-actions {
@@ -97,7 +97,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control__search-results {
 	margin: 0;
-	padding: $grid-size-large/2 $grid-size-large $grid-size-large;
+	padding: $grid-size-large/2 $grid-size-large $grid-size-large/2;
 	max-height: 200px;
 	overflow-y: auto; // allow results list to scroll
 
