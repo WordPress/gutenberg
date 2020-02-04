@@ -32,17 +32,14 @@ export default function RangeRail( {
 	);
 }
 
-function Marks( {
-	marks = false,
-	min = 0,
-	max = 100,
-	step = 1,
-	value = 0,
-} ) {
+function Marks( { marks = false, min = 0, max = 100, step = 1, value = 0 } ) {
 	const marksData = useMarks( { marks, min, max, step, value } );
 
 	return (
-		<MarksWrapper aria-hidden="true" className="components-range-control__marks">
+		<MarksWrapper
+			aria-hidden="true"
+			className="components-range-control__marks"
+		>
 			{ marksData.map( ( mark ) => (
 				<RangeMark { ...mark } key={ mark.key } aria-hidden="true" />
 			) ) }
@@ -60,9 +57,11 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
 	const isCustomMarks = Array.isArray( marks );
 
 	const markCount = ( max - min ) / step;
-	const marksArray = isCustomMarks ? marks :
-		[ ...Array( markCount + 1 ) ]
-			.map( ( _, index ) => ( { value: index } ) );
+	const marksArray = isCustomMarks
+		? marks
+		: [ ...Array( markCount + 1 ) ].map( ( _, index ) => ( {
+				value: index,
+		  } ) );
 
 	const enhancedMarks = marksArray.map( ( mark, index ) => {
 		const markValue = ! isUndefined( mark.value ) ? mark.value : value;
