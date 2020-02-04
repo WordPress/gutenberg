@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
+import { render } from 'react-dom';
+import { act } from 'react-dom/test-utils';
 
 /**
  * WordPress dependencies
@@ -259,5 +261,31 @@ describe( 'ContrastChecker', () => {
 		).toBe(
 			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
 		);
+	} );
+
+	test( 'should re-announce if colors change, but still insufficient contrast', () => {
+		const appRoot = document.createElement( 'div' );
+
+		act( () => {
+			render(
+				<ContrastChecker
+					textColor={ textColor }
+					fallbackBackgroundColor={ textColor }
+				/>,
+				appRoot
+			);
+		} );
+
+		act( () => {
+			render(
+				<ContrastChecker
+					textColor={ backgroundColor }
+					fallbackBackgroundColor={ backgroundColor }
+				/>,
+				appRoot
+			);
+		} );
+
+		expect( speak ).toHaveBeenCalledTimes( 2 );
 	} );
 } );
