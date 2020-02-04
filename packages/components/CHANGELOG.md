@@ -4,6 +4,7 @@
 
 - The `Notice` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
 - The `Snackbar` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
+- A `Notice` `actions` member can now assign `isPrimary` to render a primary button action associated with a notice message.
 
 ### Bug Fixes
 

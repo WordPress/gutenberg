@@ -28,7 +28,11 @@ describe( 'Notice', () => {
 		renderer.render(
 			<Notice
 				status="success"
-				actions={ [ { label: 'View', url: 'https://example.com' } ] }
+				actions={ [
+					{ label: 'More information', url: 'https://example.com' },
+					{ label: 'Cancel', onClick() {} },
+					{ label: 'Submit', onClick() {}, isPrimary: true },
+				] }
 			>
 				Example
 			</Notice>
