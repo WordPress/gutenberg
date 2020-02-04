@@ -420,7 +420,7 @@ function LinkControl( {
 		>
 			{ isResolvingLink && (
 				<div className="block-editor-link-control__loading">
-					{ __( 'Loading' ) }...
+					{ __( 'Creating Page' ) }
 				</div>
 			) }
 
