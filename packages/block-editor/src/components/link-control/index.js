@@ -7,7 +7,12 @@ import { noop, startsWith, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
+import {
+	Button,
+	ExternalLink,
+	Spinner,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useRef,
@@ -420,7 +425,7 @@ function LinkControl( {
 		>
 			{ isResolvingLink && (
 				<div className="block-editor-link-control__loading">
-					{ __( 'Creating Page' ) }
+					<Spinner /> { __( 'Creating Page' ) }
 				</div>
 			) }
 

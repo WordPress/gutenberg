@@ -195,6 +195,12 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control__loading {
 	margin: $grid-size-large; // when only loading control is shown it requires it's own spacing.
+	display: flex;
+	align-items: center;
+
+	.components-spinner {
+		margin-top: 0;
+	}
 }
 
 .block-editor-link-control__search-create {
