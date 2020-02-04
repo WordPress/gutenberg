@@ -816,6 +816,54 @@ describe( 'Selecting links', () => {
 		);
 		expect( isExpectedFocusTarget ).toBe( true );
 	} );
+
+	it( 'should update a selected link value', ( done ) => {
+		// Regression: Previously, the behavior of updating a value was to merge
+		// the previous value with the newly selected suggestion. If the keys
+		// between the two objects were not the same, it could wrongly leave
+		// lingering values from the previous value.
+
+		const LinkControlConsumer = () => (
+			<LinkControl
+				value={ { url: 'https://wordpress.org', title: 'WordPress' } }
+				onChange={ ( nextValue ) => {
+					expect( nextValue ).toEqual( {
+						url: 'https://example.com',
+					} );
+
+					done();
+				} }
+			/>
+		);
+
+		act( () => {
+			render( <LinkControlConsumer />, container );
+		} );
+
+		// Toggle edit.
+		document
+			.querySelector( '.block-editor-link-control__search-item-action' )
+			.click();
+
+		// Change value.
+		const form = container.querySelector( 'form' );
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: 'https://example.com' },
+			} );
+		} );
+		act( () => {
+			Simulate.keyDown( searchInput, { keyCode: ENTER } );
+		} );
+		act( () => {
+			Simulate.submit( form );
+		} );
+	} );
 } );
 
 describe( 'Addition Settings UI', () => {
