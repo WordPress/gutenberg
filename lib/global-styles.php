@@ -228,22 +228,21 @@ function gutenberg_experimental_global_styles_wp_gs_class_editor( $classes ) {
 }
 
 /**
- * Makes the CPT ID and the base Global Styles (core, theme)
+ * Makes the base Global Styles (core, theme)
+ * and the ID of the CPT that stores the user's Global Styles
  * available to the client, to be used for live rendering the styles.
  *
  * @param array $settings Existing block editor settings.
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	// Add CPT ID
-	$settings['__experimentalGlobalStylesId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
+	$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 
-	// Make base Global Styles (core+theme) available.
 	$global_styles = array_merge(
 		gutenberg_experimental_global_styles_get_core(),
 		gutenberg_experimental_global_styles_get_theme(),
 	);
-	$settings['__experimentalGlobalStyles'] = $global_styles;
+	$settings['__experimentalGlobalStylesBase'] = $global_styles;
 
 	return $settings;
 }
