@@ -159,6 +159,10 @@ function gutenberg_global_styles_add_wp_gs_class_editor( $classes ) {
 add_filter( 'admin_body_class', 'gutenberg_global_styles_add_wp_gs_class_editor' );
 
 function gutenberg_global_styles_experimental_settings( $settings ) {
+	if ( ! gutenberg_global_styles_has_theme_support() ) {
+		return $settings;
+	}
+
 	// Add CPT ID
 	$recent_posts = wp_get_recent_posts( [
 		'numberposts' => 1,
@@ -191,6 +195,10 @@ function gutenberg_global_styles_experimental_settings( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_global_styles_experimental_settings' );
 
 function gutenberg_global_styles_experimental_register_cpt() {
+	if ( ! gutenberg_global_styles_has_theme_support() ) {
+		return;
+	}
+
 	$args = [
 		'label'        => 'Global Styles', 'gutenberg',
 		'description'  => 'CPT to store user design tokens',
