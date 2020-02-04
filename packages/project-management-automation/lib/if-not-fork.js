@@ -1,5 +1,5 @@
 /**
- * Higher-order function which executes and returns the resutl of the given
+ * Higher-order function which executes and returns the result of the given
  * handler only if the enhanced function is called with a payload indicating a
  * pull request event which did not originate from a forked repository.
  *
