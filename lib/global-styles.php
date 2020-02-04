@@ -187,6 +187,10 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
  * and enqueues the resulting CSS custom properties.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
+	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
+		return;
+	}
+
 	$global_styles = array_merge(
 		gutenberg_experimental_global_styles_get_core(),
 		gutenberg_experimental_global_styles_get_theme(),
@@ -210,6 +214,10 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array The filtered array of body classes.
  */
 function gutenberg_experimental_global_styles_wp_gs_class_front_end( $classes ) {
+	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
+		return $classes;
+	}
+
 	return array_merge( $classes, array( 'wp-gs' ) );
 }
 
@@ -220,6 +228,10 @@ function gutenberg_experimental_global_styles_wp_gs_class_front_end( $classes ) 
  * @return string The filtered string of body classes.
  */
 function gutenberg_experimental_global_styles_wp_gs_class_editor( $classes ) {
+	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
+		return $classes;
+	}
+
 	global $current_screen;
 	if ( $current_screen->is_block_editor() ) {
 		return $classes . ' wp-gs';
@@ -236,6 +248,10 @@ function gutenberg_experimental_global_styles_wp_gs_class_editor( $classes ) {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
+	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
+		return $settings;
+	}
+
 	$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 
 	$global_styles = array_merge(
@@ -251,6 +267,10 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
  * Registers a Custom Post Type to store the user's Global Styles.
  */
 function gutenberg_experimental_global_styles_register_cpt() {
+	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
+		return;
+	}
+
 	$args = [
 		'label'        => 'Global Styles', 'gutenberg',
 		'description'  => 'CPT to store user design tokens',
@@ -276,10 +296,8 @@ function gutenberg_experimental_global_styles_register_cpt() {
 	register_post_type( 'wp_global_styles', $args );
 }
 
-if ( gutenberg_experimental_global_styles_has_theme_support() ) {
-	add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
-	add_filter( 'body_class', 'gutenberg_experimental_global_styles_wp_gs_class_front_end' );
-	add_filter( 'admin_body_class', 'gutenberg_experimental_global_styles_wp_gs_class_editor' );
-	add_action( 'enqueue_block_assets', 'gutenberg_experimental_global_styles_enqueue_assets' );
-	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
-}
+add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
+add_filter( 'body_class', 'gutenberg_experimental_global_styles_wp_gs_class_front_end' );
+add_filter( 'admin_body_class', 'gutenberg_experimental_global_styles_wp_gs_class_editor' );
+add_action( 'enqueue_block_assets', 'gutenberg_experimental_global_styles_enqueue_assets' );
+add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
