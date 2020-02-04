@@ -1,4 +1,3 @@
-
 /**
  * External dependencies
  */
@@ -15,10 +14,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
-import {
-	Toolbar,
-	ToolbarButton,
-} from '@wordpress/components';
+import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
@@ -63,19 +59,29 @@ function ColumnEdit( {
 		if ( isMobile ) {
 			return;
 		}
-		
-		const pullWidth = ( name ) => ( styles[`column-${name}-margin`] || {} ).width
+
+		const pullWidth = ( name ) =>
+			( styles[ `column-${ name }-margin` ] || {} ).width;
 
 		let width = columnBaseWidth;
 
 		if ( isParentSelected ) {
-			width -= pullWidth( placeholder ? 'placeholder-selected' : 'parent-selected' );
+			width -= pullWidth(
+				placeholder ? 'placeholder-selected' : 'parent-selected'
+			);
 		} else if ( isSelected && ! placeholder ) {
-			width -= ( ! hasChildren ? pullWidth('selected') : pullWidth('descendant-selected') );
+			width -= ! hasChildren
+				? pullWidth( 'selected' )
+				: pullWidth( 'descendant-selected' );
 		} else if ( isDescendantOfParentSelected ) {
-			width += pullWidth( placeholder ? 'selected' : 'descendant-selected');
+			width += pullWidth(
+				placeholder ? 'selected' : 'descendant-selected'
+			);
 		} else if ( placeholder ) {
-			width -= ( columnsInRow === 1 ? pullWidth('parent-selected') : pullWidth('placeholder-multicol') );
+			width -=
+				columnsInRow === 1
+					? pullWidth( 'parent-selected' )
+					: pullWidth( 'placeholder-multicol' );
 		}
 
 		return { width };
@@ -87,11 +93,20 @@ function ColumnEdit( {
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
-			<View style={ [
-				! isParentSelected && getStylesFromColorScheme( styles.columnPlaceholder, styles.columnPlaceholderDark ),
-				applyBlockStyle( true ),
-				{ ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
-			] } >
+			<View
+				style={ [
+					! isParentSelected &&
+						getStylesFromColorScheme(
+							styles.columnPlaceholder,
+							styles.columnPlaceholderDark
+						),
+					applyBlockStyle( true ),
+					{
+						...styles.marginVerticalDense,
+						...styles.marginHorizontalNone,
+					},
+				] }
+			>
 				{ isParentSelected && <InnerBlocks.ButtonBlockAppender /> }
 			</View>
 		);
@@ -113,9 +128,11 @@ function ColumnEdit( {
 					isCollapsed={ false }
 				/>
 			</BlockControls>
-			<View style={ applyBlockStyle() } >
+			<View style={ applyBlockStyle() }>
 				<InnerBlocks
-					renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
+					renderAppender={
+						isSelected && InnerBlocks.ButtonBlockAppender
+					}
 				/>
 			</View>
 		</>
@@ -141,12 +158,18 @@ export default compose( [
 
 		const columnsCount = getBlockCount( parentId );
 		const hasChildren = getBlockCount( clientId );
-		const columnsContainerWidth = columnsContainerSettings && columnsContainerSettings.width;
+		const columnsContainerWidth =
+			columnsContainerSettings && columnsContainerSettings.width;
 
-		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parentId;
+		const isParentSelected =
+			selectedBlockClientId && selectedBlockClientId === parentId;
 
-		const selectedParents = selectedBlockClientId ? getBlockParents( selectedBlockClientId ) : [];
-		const isDescendantOfParentSelected = selectedParents.includes( parentId );
+		const selectedParents = selectedBlockClientId
+			? getBlockParents( selectedBlockClientId )
+			: [];
+		const isDescendantOfParentSelected = selectedParents.includes(
+			parentId
+		);
 
 		return {
 			hasChildren,

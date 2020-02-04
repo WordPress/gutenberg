@@ -13,7 +13,9 @@ export const KeyboardAwareFlatList = ( { containerStyle, ...props } ) => (
 		<FlatList
 			scrollEnabled={ containerStyle ? false : true }
 			horizontal={ containerStyle ? true : false }
-			contentContainerStyle={ containerStyle ? containerStyle : undefined }
+			contentContainerStyle={
+				containerStyle ? containerStyle : undefined
+			}
 			{ ...props }
 		/>
 	</KeyboardAvoidingView>

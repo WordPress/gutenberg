@@ -20,10 +20,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
-import {
-	withDispatch,
-	useSelect,
-} from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
@@ -75,7 +72,10 @@ function ColumnsEditContainer( {
 	} );
 
 	useEffect( () => {
-		updateColumns( count, Math.min( MAX_COLUMNS_NUMBER, count || DEFAULT_COLUMNS ) );
+		updateColumns(
+			count,
+			Math.min( MAX_COLUMNS_NUMBER, count || DEFAULT_COLUMNS )
+		);
 	}, [] );
 
 	return (
@@ -87,7 +87,9 @@ function ColumnsEditContainer( {
 						icon="columns"
 						value={ count }
 						defaultValue={ DEFAULT_COLUMNS }
-						onChangeValue={ ( value ) => updateColumns( count, value ) }
+						onChangeValue={ ( value ) =>
+							updateColumns( count, value )
+						}
 						minValue={ MIN_COLUMNS_NUMBER }
 						maxValue={ MAX_COLUMNS_NUMBER }
 					/>
@@ -107,14 +109,21 @@ function ColumnsEditContainer( {
 					isCollapsed={ false }
 				/>
 			</BlockControls>
-			<View onLayout={ ( event ) => {
-				const { width: newWidth } = event.nativeEvent.layout;
-				if ( newWidth !== width ) {
-					updateBlockSettings( { ...blockListSettings, width: newWidth } );
-				}
-			} }>
+			<View
+				onLayout={ ( event ) => {
+					const { width: newWidth } = event.nativeEvent.layout;
+					if ( newWidth !== width ) {
+						updateBlockSettings( {
+							...blockListSettings,
+							width: newWidth,
+						} );
+					}
+				} }
+			>
 				<InnerBlocks
-					containerStyle={ ! isMobile ? styles.columnsContainer : undefined }
+					containerStyle={
+						! isMobile ? styles.columnsContainer : undefined
+					}
 					allowedBlocks={ ALLOWED_BLOCKS }
 				/>
 			</View>
@@ -122,93 +131,111 @@ function ColumnsEditContainer( {
 	);
 }
 
-const ColumnsEditContainerWrapper = withDispatch( ( dispatch, ownProps, registry ) => ( {
-	/**
-	 * Update all child Column blocks with a new vertical alignment setting
-	 * based on whatever alignment is passed in. This allows change to parent
-	 * to overide anything set on a individual column basis.
-	 *
-	 * @param {string} verticalAlignment the vertical alignment setting
-	 */
-	updateAlignment( verticalAlignment ) {
-		const { clientId, setAttributes } = ownProps;
-		const { updateBlockAttributes } = dispatch( 'core/block-editor' );
-		const { getBlockOrder } = registry.select( 'core/block-editor' );
+const ColumnsEditContainerWrapper = withDispatch(
+	( dispatch, ownProps, registry ) => ( {
+		/**
+		 * Update all child Column blocks with a new vertical alignment setting
+		 * based on whatever alignment is passed in. This allows change to parent
+		 * to overide anything set on a individual column basis.
+		 *
+		 * @param {string} verticalAlignment the vertical alignment setting
+		 */
+		updateAlignment( verticalAlignment ) {
+			const { clientId, setAttributes } = ownProps;
+			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
+			const { getBlockOrder } = registry.select( 'core/block-editor' );
 
-		// Update own alignment.
-		setAttributes( { verticalAlignment } );
+			// Update own alignment.
+			setAttributes( { verticalAlignment } );
 
-		// Update all child Column Blocks to match
-		const innerBlockClientIds = getBlockOrder( clientId );
-		innerBlockClientIds.forEach( ( innerBlockClientId ) => {
-			updateBlockAttributes( innerBlockClientId, {
-				verticalAlignment,
+			// Update all child Column Blocks to match
+			const innerBlockClientIds = getBlockOrder( clientId );
+			innerBlockClientIds.forEach( ( innerBlockClientId ) => {
+				updateBlockAttributes( innerBlockClientId, {
+					verticalAlignment,
+				} );
 			} );
-		} );
-	},
-	updateBlockSettings( settings ) {
-		const { clientId } = ownProps;
-		const { updateBlockListSettings } = dispatch( 'core/block-editor' );
-		updateBlockListSettings( clientId, settings );
-	},
-	/**
-	 * Updates the column count, including necessary revisions to child Column
-	 * blocks to grant required or redistribute available space.
-	 *
-	 * @param {number} previousColumns Previous column count.
-	 * @param {number} newColumns      New column count.
-	 */
-	updateColumns( previousColumns, newColumns ) {
-		const { clientId } = ownProps;
-		const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
-		const { getBlocks } = registry.select( 'core/block-editor' );
+		},
+		updateBlockSettings( settings ) {
+			const { clientId } = ownProps;
+			const { updateBlockListSettings } = dispatch( 'core/block-editor' );
+			updateBlockListSettings( clientId, settings );
+		},
+		/**
+		 * Updates the column count, including necessary revisions to child Column
+		 * blocks to grant required or redistribute available space.
+		 *
+		 * @param {number} previousColumns Previous column count.
+		 * @param {number} newColumns      New column count.
+		 */
+		updateColumns( previousColumns, newColumns ) {
+			const { clientId } = ownProps;
+			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+			const { getBlocks } = registry.select( 'core/block-editor' );
 
-		let innerBlocks = getBlocks( clientId );
+			let innerBlocks = getBlocks( clientId );
 
-		// Redistribute available width for existing inner blocks.
-		const isAddingColumn = newColumns > previousColumns;
+			// Redistribute available width for existing inner blocks.
+			const isAddingColumn = newColumns > previousColumns;
 
-		if ( isAddingColumn ) {
-			innerBlocks = [
-				...innerBlocks,
-				...times( newColumns - previousColumns, () => {
-					return createBlock( 'core/column' );
-				} ),
-			];
-		} else {
-			// The removed column will be the last of the inner blocks.
-			innerBlocks = dropRight( innerBlocks, previousColumns - newColumns );
-		}
+			if ( isAddingColumn ) {
+				innerBlocks = [
+					...innerBlocks,
+					...times( newColumns - previousColumns, () => {
+						return createBlock( 'core/column' );
+					} ),
+				];
+			} else {
+				// The removed column will be the last of the inner blocks.
+				innerBlocks = dropRight(
+					innerBlocks,
+					previousColumns - newColumns
+				);
+			}
 
-		replaceInnerBlocks( clientId, innerBlocks, false );
-	},
-} ) )( ColumnsEditContainer );
+			replaceInnerBlocks( clientId, innerBlocks, false );
+		},
+	} )
+)( ColumnsEditContainer );
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, isSelected, getStylesFromColorScheme } = props;
-	const { hasChildren, blockListSettings } = useSelect( ( select ) => {
-		const {
-			getBlocks,
-			getBlockListSettings,
-		} = select( 'core/block-editor' );
+	const { hasChildren, blockListSettings } = useSelect(
+		( select ) => {
+			const { getBlocks, getBlockListSettings } = select(
+				'core/block-editor'
+			);
 
-		return {
-			hasChildren: getBlocks( clientId ).length > 0,
-			blockListSettings: getBlockListSettings( clientId ) || {},
-		};
-	}, [ clientId ] );
+			return {
+				hasChildren: getBlocks( clientId ).length > 0,
+				blockListSettings: getBlockListSettings( clientId ) || {},
+			};
+		},
+		[ clientId ]
+	);
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
-			<View style={ [
-				getStylesFromColorScheme( styles.columnsPlaceholder, styles.columnsPlaceholderDark ),
-				! hasChildren && { ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
-			] } />
+			<View
+				style={ [
+					getStylesFromColorScheme(
+						styles.columnsPlaceholder,
+						styles.columnsPlaceholderDark
+					),
+					! hasChildren && {
+						...styles.marginVerticalDense,
+						...styles.marginHorizontalNone,
+					},
+				] }
+			/>
 		);
 	}
 
 	return (
-		<ColumnsEditContainerWrapper blockListSettings={ blockListSettings } { ...props } />
+		<ColumnsEditContainerWrapper
+			blockListSettings={ blockListSettings }
+			{ ...props }
+		/>
 	);
 };
 
