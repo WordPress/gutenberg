@@ -38,9 +38,9 @@ add_filter( 'safe_style_css', 'gutenberg_safe_style_css_column_flex_basis' );
  *
  * This can be removed when plugin support requires WordPress 5.4.0+.
  *
+ * @see https://core.trac.wordpress.org/ticket/49360
  * @see https://developer.mozilla.org/en-US/docs/Web/API/URL/URL
  * @see https://developer.wordpress.org/reference/functions/wp_default_packages_vendor/
- * @see (TODO: Trac Ticket TBD)
  *
  * @since 7.3.0
  *
