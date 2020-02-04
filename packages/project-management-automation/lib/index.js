@@ -11,17 +11,18 @@ const assignFixedIssues = require( './assign-fixed-issues' );
 const addFirstTimeContributorLabel = require( './add-first-time-contributor-label' );
 const addMilestone = require( './add-milestone' );
 const debug = require( './debug' );
+const ifNotFork = require( './if-not-fork' );
 
 const automations = [
 	{
 		event: 'pull_request',
 		action: 'opened',
-		task: assignFixedIssues,
+		task: ifNotFork( assignFixedIssues ),
 	},
 	{
 		event: 'pull_request',
 		action: 'opened',
-		task: addFirstTimeContributorLabel,
+		task: ifNotFork( addFirstTimeContributorLabel ),
 	},
 	{
 		event: 'pull_request',
