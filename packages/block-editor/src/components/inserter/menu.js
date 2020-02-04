@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, findIndex, flow, groupBy, isEmpty, map, sortBy, without, includes } from 'lodash';
+import { filter, findIndex, flow, get, groupBy, isEmpty, map, sortBy, without, includes } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 import classnames from 'classnames';
 
@@ -251,12 +251,7 @@ export class InserterMenu extends Component {
 			! isEmpty( itemsPerCollection );
 		const hoveredItemBlockType = hoveredItem ? getBlockType( hoveredItem.name ) : null;
 		const hasHelpPanel = hasItems && showInserterHelpPanel;
-		const viewportWidth =
-			hoveredItemBlockType &&
-			hoveredItemBlockType.example &&
-			hoveredItemBlockType.example.viewportWidth
-				? hoveredItemBlockType.example.viewportWidth
-				: 500;
+		const viewportWidth = get( hoveredItemBlockType, 'example.viewportWidth', 500);
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of autoFocus via
