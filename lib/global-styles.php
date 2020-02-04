@@ -67,9 +67,31 @@ function gutenberg_global_styles_get_from_file( $global_styles_path ) {
  *
  * @return array Global Styles design tokens.
  */
-function gutenberg_global_styles_get_from_cpt() {
+function gutenberg_global_styles_get_user() {
 	// TODO: fetch from CPT.
 	return [];
+}
+
+/**
+ * Return core's Global Styles design tokens.
+ *
+ * @return array Global Styles.
+ */
+function gutenberg_global_styles_get_core() {
+	return gutenberg_global_styles_get_from_file(
+		dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json'
+	);
+}
+
+/**
+ * Return theme's Global Styles design tokens.
+ *
+ * @return array Global Styles.
+ */
+function gutenberg_global_styles_get_theme() {
+	return gutenberg_global_styles_get_from_file(
+		locate_template( 'experimental-theme.json' )
+	);
 }
 
 /**
@@ -106,13 +128,10 @@ function gutenberg_global_styles_enqueue_assets() {
 		return;
 	}
 
-	$default_global_styles = gutenberg_global_styles_get_from_file( dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json' );
-	$theme_global_styles   = gutenberg_global_styles_get_from_file( locate_template( 'experimental-theme.json' ) );
-	$user_global_styles    = gutenberg_global_styles_get_from_cpt();
-	$global_styles         = array_merge(
-		$default_global_styles,
-		$theme_global_styles,
-		$user_global_styles,
+	$global_styles = array_merge(
+		gutenberg_global_styles_get_core(),
+		gutenberg_global_styles_get_theme(),
+		gutenberg_global_styles_get_user(),
 	);
 
 	$inline_style = gutenberg_global_styles_resolver( $global_styles );
@@ -177,18 +196,11 @@ function gutenberg_global_styles_experimental_settings( $settings ) {
 	}
 
 	// Make base Global Styles (core+theme) available.
-	$settings['__experimentalGlobalStyles'] = [
-		'core' => [
-			'color'=> [
-				'text' => 'black',
-			],
-		],
-		'core/paragraph' => [
-			'color' => [
-				'text' => 'black',
-			],
-		],
-	];
+	$global_styles = array_merge(
+		gutenberg_global_styles_get_core(),
+		gutenberg_global_styles_get_theme(),
+	);
+	$settings['__experimentalGlobalStyles'] = $global_styles;
 
 	return $settings;
 }
