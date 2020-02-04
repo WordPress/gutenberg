@@ -203,7 +203,8 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 }
 
-.block-editor-link-control__search-create {
+// Separate Create button when following other suggestions.
+.components-button + .block-editor-link-control__search-create {
 	margin-top: 20px;
 	overflow: visible;
 
