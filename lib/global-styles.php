@@ -34,6 +34,27 @@ function gutenberg_global_styles_get_css_vars( $global_styles_branch, $prefix = 
 }
 
 /**
+ * Returns an array containing the Global Styles
+ * design tokens found in a file. A void array if none.
+ *
+ * @param string $global_styles_path Path to file.
+ * @return array Global Styles design tokens.
+ */
+function gutenberg_global_styles_get_from_file( $global_styles_path ) {
+	$global_styles = [];
+	if ( file_exists( $global_styles_path ) ) {
+		$decoded_file = json_decode(
+			file_get_contents( $global_styles_path ),
+			true
+		);
+		if ( is_array( $decoded_file ) ) {
+			$global_styles = $decoded_file;
+		}
+	}
+	return $global_styles;
+}
+
+/**
  * Function responsible for enqueuing the style that define the global styles css variables.
  */
 function gutenberg_global_styles_enqueue_assets() {
@@ -41,23 +62,8 @@ function gutenberg_global_styles_enqueue_assets() {
 		return;
 	}
 
-	$default_global_styles      = null;
-	$default_global_styles_path = dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json';
-	if ( file_exists( $default_global_styles_path ) ) {
-		$default_global_styles = json_decode(
-			file_get_contents( $default_global_styles_path ),
-			true
-		);
-	}
-
-	$theme_global_styles      = null;
-	$theme_global_styles_path = locate_template( 'experimental-theme.json' );
-	if ( file_exists( $theme_global_styles_path ) ) {
-		$theme_global_styles = json_decode(
-			file_get_contents( $theme_global_styles_path ),
-			true
-		);
-	}
+	$default_global_styles = gutenberg_global_styles_get_from_file( dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json' );
+	$theme_global_styles   = gutenberg_global_styles_get_from_file( locate_template( 'experimental-theme.json' ) );
 
 	// To-do: Load user customizations from a CPT.
 	$css_vars = array();
