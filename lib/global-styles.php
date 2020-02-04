@@ -10,7 +10,7 @@
  *
  * @return boolean
  */
-function gutenberg_global_styles_has_theme_support() {
+function gutenberg_experimental_global_styles_has_theme_support() {
 	return is_readable( locate_template( 'experimental-theme.json' ) );
 }
 
@@ -23,7 +23,7 @@ function gutenberg_global_styles_has_theme_support() {
  * @param string $prefix Prefix to append to each variable.
  * @return array The flattened tree.
  */
-function gutenberg_global_styles_get_css_vars( $global_styles, $prefix = '' ) {
+function gutenberg_experimental_global_styles_get_css_vars( $global_styles, $prefix = '' ) {
 	$result = array();
 	foreach ( $global_styles as $key => $value ) {
 		$new_key = $prefix . str_replace( '/', '-', $key );
@@ -31,7 +31,7 @@ function gutenberg_global_styles_get_css_vars( $global_styles, $prefix = '' ) {
 		if ( is_array( $value ) ) {
 			$result = array_merge(
 				$result,
-				gutenberg_global_styles_get_css_vars( $value, $new_key . '-' )
+				gutenberg_experimental_global_styles_get_css_vars( $value, $new_key . '-' )
 			);
 		} else {
 			$result[ $new_key ] = $value;
@@ -47,7 +47,7 @@ function gutenberg_global_styles_get_css_vars( $global_styles, $prefix = '' ) {
  * @param string $global_styles_path Path to file.
  * @return array Global Styles design tokens.
  */
-function gutenberg_global_styles_get_from_file( $global_styles_path ) {
+function gutenberg_experimental_global_styles_get_from_file( $global_styles_path ) {
 	$global_styles = [];
 	if ( file_exists( $global_styles_path ) ) {
 		$decoded_file = json_decode(
@@ -67,7 +67,7 @@ function gutenberg_global_styles_get_from_file( $global_styles_path ) {
  *
  * @return array Global Styles design tokens.
  */
-function gutenberg_global_styles_get_user() {
+function gutenberg_experimental_global_styles_get_user() {
 	// TODO: fetch from CPT.
 	return [];
 }
@@ -77,8 +77,8 @@ function gutenberg_global_styles_get_user() {
  *
  * @return array Global Styles.
  */
-function gutenberg_global_styles_get_core() {
-	return gutenberg_global_styles_get_from_file(
+function gutenberg_experimental_global_styles_get_core() {
+	return gutenberg_experimental_global_styles_get_from_file(
 		dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json'
 	);
 }
@@ -88,8 +88,8 @@ function gutenberg_global_styles_get_core() {
  *
  * @return array Global Styles.
  */
-function gutenberg_global_styles_get_theme() {
-	return gutenberg_global_styles_get_from_file(
+function gutenberg_experimental_global_styles_get_theme() {
+	return gutenberg_experimental_global_styles_get_from_file(
 		locate_template( 'experimental-theme.json' )
 	);
 }
@@ -102,10 +102,10 @@ function gutenberg_global_styles_get_theme() {
  * @param array $global_styles Global Styles design tokens.
  * @return string Resulting CSS rule.
  */
-function gutenberg_global_styles_resolver( $global_styles ) {
+function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 	$css_rule = '';
 
-	$css_vars = gutenberg_global_styles_get_css_vars( $global_styles, '--wp-' );
+	$css_vars = gutenberg_experimental_global_styles_get_css_vars( $global_styles, '--wp-' );
 	if ( empty( $css_vars ) ) {
 		return $css_rule;
 	}
@@ -123,18 +123,18 @@ function gutenberg_global_styles_resolver( $global_styles ) {
  * Fetches the Global Styles design tokens (defaults, theme, user),
  * and enqueues the resulting CSS custom properties if any.
  */
-function gutenberg_global_styles_enqueue_assets() {
-	if ( ! gutenberg_global_styles_has_theme_support() ) {
+function gutenberg_experimental_global_styles_enqueue_assets() {
+	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
 		return;
 	}
 
 	$global_styles = array_merge(
-		gutenberg_global_styles_get_core(),
-		gutenberg_global_styles_get_theme(),
-		gutenberg_global_styles_get_user(),
+		gutenberg_experimental_global_styles_get_core(),
+		gutenberg_experimental_global_styles_get_theme(),
+		gutenberg_experimental_global_styles_get_user(),
 	);
 
-	$inline_style = gutenberg_global_styles_resolver( $global_styles );
+	$inline_style = gutenberg_experimental_global_styles_resolver( $global_styles );
 	if ( empty ( $inline_style ) ) {
 		return;
 	}
@@ -143,7 +143,7 @@ function gutenberg_global_styles_enqueue_assets() {
 	wp_add_inline_style( 'global-styles', $inline_style );
 	wp_enqueue_style( 'global-styles' );
 }
-add_action( 'enqueue_block_assets', 'gutenberg_global_styles_enqueue_assets' );
+add_action( 'enqueue_block_assets', 'gutenberg_experimental_global_styles_enqueue_assets' );
 
 /**
  * Adds class wp-gs to the frontend body class
@@ -152,13 +152,13 @@ add_action( 'enqueue_block_assets', 'gutenberg_global_styles_enqueue_assets' );
  * @param array $classes Existing body classes.
  * @return array The filtered array of body classes.
  */
-function gutenberg_global_styles_add_wp_gs_class_front_end( $classes ) {
-	if ( gutenberg_global_styles_has_theme_support() ) {
+function gutenberg_experimental_global_styles_wp_gs_class_front_end( $classes ) {
+	if ( gutenberg_experimental_global_styles_has_theme_support() ) {
 		return array_merge( $classes, array( 'wp-gs' ) );
 	}
 	return $classes;
 }
-add_filter( 'body_class', 'gutenberg_global_styles_add_wp_gs_class_front_end' );
+add_filter( 'body_class', 'gutenberg_experimental_global_styles_wp_gs_class_front_end' );
 
 
 /**
@@ -168,17 +168,17 @@ add_filter( 'body_class', 'gutenberg_global_styles_add_wp_gs_class_front_end' );
  * @param string $classes Existing body classes separated by space.
  * @return string The filtered string of body classes.
  */
-function gutenberg_global_styles_add_wp_gs_class_editor( $classes ) {
+function gutenberg_experimental_global_styles_wp_gs_class_editor( $classes ) {
 	global $current_screen;
-	if ( $current_screen->is_block_editor() && gutenberg_global_styles_has_theme_support() ) {
+	if ( $current_screen->is_block_editor() && gutenberg_experimental_global_styles_has_theme_support() ) {
 		return $classes . ' wp-gs';
 	}
 	return $classes;
 }
-add_filter( 'admin_body_class', 'gutenberg_global_styles_add_wp_gs_class_editor' );
+add_filter( 'admin_body_class', 'gutenberg_experimental_global_styles_wp_gs_class_editor' );
 
-function gutenberg_global_styles_experimental_settings( $settings ) {
-	if ( ! gutenberg_global_styles_has_theme_support() ) {
+function gutenberg_experimental_global_styles_settings( $settings ) {
+	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
 		return $settings;
 	}
 
@@ -197,17 +197,17 @@ function gutenberg_global_styles_experimental_settings( $settings ) {
 
 	// Make base Global Styles (core+theme) available.
 	$global_styles = array_merge(
-		gutenberg_global_styles_get_core(),
-		gutenberg_global_styles_get_theme(),
+		gutenberg_experimental_global_styles_get_core(),
+		gutenberg_experimental_global_styles_get_theme(),
 	);
 	$settings['__experimentalGlobalStyles'] = $global_styles;
 
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_global_styles_experimental_settings' );
+add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
 
-function gutenberg_global_styles_experimental_register_cpt() {
-	if ( ! gutenberg_global_styles_has_theme_support() ) {
+function gutenberg_experimental_global_styles_register_cpt() {
+	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
 		return;
 	}
 
@@ -235,4 +235,4 @@ function gutenberg_global_styles_experimental_register_cpt() {
 	];
 	register_post_type( 'wp_global_styles', $args );
 }
-add_action( 'init', 'gutenberg_global_styles_experimental_register_cpt' );
+add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
