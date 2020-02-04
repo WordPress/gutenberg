@@ -27,6 +27,8 @@ import { BottomSheet, Icon } from '@wordpress/components';
  */
 import styles from './style.scss';
 
+const MIN_COL_NUM = 3;
+
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
@@ -34,7 +36,7 @@ export class InserterMenu extends Component {
 		this.onClose = this.onClose.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.state = {
-			numberOfColumns: this.calculateNumberOfColumns(),
+			numberOfColumns: MIN_COL_NUM,
 		};
 
 		Dimensions.addEventListener( 'change', this.onLayout );
@@ -48,6 +50,10 @@ export class InserterMenu extends Component {
 		this.props.hideInsertionPoint();
 	}
 
+	calculateMinItemWidth( bottomSheetWidth ) {
+		return ( bottomSheetWidth - 64 ) / MIN_COL_NUM;
+	}
+
 	calculateItemWidth() {
 		const {
 			paddingLeft: itemPaddingLeft,
@@ -57,7 +63,7 @@ export class InserterMenu extends Component {
 		return itemWidth + itemPaddingLeft + itemPaddingRight;
 	}
 
-	calculateNumberOfColumns() {
+	calculateColumns() {
 		const bottomSheetWidth = BottomSheet.getWidth();
 		const {
 			paddingLeft: containerPaddingLeft,
@@ -66,7 +72,17 @@ export class InserterMenu extends Component {
 		const itemTotalWidth = this.calculateItemWidth();
 		const containerTotalWidth =
 			bottomSheetWidth - ( containerPaddingLeft + containerPaddingRight );
-		return Math.floor( containerTotalWidth / itemTotalWidth );
+		const numofColumns = Math.floor( containerTotalWidth / itemTotalWidth );
+
+		if ( numofColumns < MIN_COL_NUM ) {
+			return {
+				numOfColumns: MIN_COL_NUM,
+				itemWidth: this.calculateMinItemWidth( bottomSheetWidth ),
+			};
+		}
+		return {
+			numOfColumns: numofColumns,
+		};
 	}
 
 	onClose() {
@@ -79,7 +95,9 @@ export class InserterMenu extends Component {
 	}
 
 	onLayout() {
-		const numberOfColumns = this.calculateNumberOfColumns();
+		const calculateColumns = this.calculateColumns();
+		const numberOfColumns = calculateColumns.numOfColumns;
+
 		this.setState( { numberOfColumns } );
 	}
 
@@ -98,6 +116,8 @@ export class InserterMenu extends Component {
 			styles.modalItemLabel,
 			styles.modalItemLabelDark
 		);
+
+		const calculateColumns = this.calculateColumns();
 
 		return (
 			<BottomSheet
@@ -126,13 +146,16 @@ export class InserterMenu extends Component {
 								accessibilityLabel={ item.title }
 								onPress={ () => this.props.onSelect( item ) }
 							>
-								<View
-									style={ [
-										styles.modalItem,
-										{ width: this.calculateItemWidth() },
-									] }
-								>
-									<View style={ modalIconWrapperStyle }>
+								<View style={ styles.modalItem }>
+									<View
+										style={ [
+											modalIconWrapperStyle,
+											calculateColumns.itemWidth && {
+												width:
+													calculateColumns.itemWidth,
+											},
+										] }
+									>
 										<View style={ modalIconStyle }>
 											<Icon
 												icon={ item.icon.src }
