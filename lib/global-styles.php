@@ -14,7 +14,7 @@
  * @param bool   $is_start Indicates if we are on the first call to gutenberg_get_css_vars (outside the recursion).
  * @return array An array whose keys are css variable names and whose values are the css variables value.
  */
-function gutenberg_get_css_vars( $global_styles_branch, $prefix = '', $is_start = true ) {
+function gutenberg_global_styles_get_css_vars( $global_styles_branch, $prefix = '', $is_start = true ) {
 	$result = array();
 	foreach ( $global_styles_branch as $key => $value ) {
 		$processed_key = str_replace( '/', '-', $key );
@@ -24,7 +24,7 @@ function gutenberg_get_css_vars( $global_styles_branch, $prefix = '', $is_start 
 		if ( is_array( $value ) ) {
 			$result = array_merge(
 				$result,
-				gutenberg_get_css_vars( $value, $new_key, false )
+				gutenberg_global_styles_get_css_vars( $value, $new_key, false )
 			);
 		} else {
 			$result[ $new_key ] = $value;
@@ -36,7 +36,7 @@ function gutenberg_get_css_vars( $global_styles_branch, $prefix = '', $is_start 
 /**
  * Function responsible for enqueuing the style that define the global styles css variables.
  */
-function gutenberg_enqueue_global_styles_assets() {
+function gutenberg_global_styles_enqueue_assets() {
 	if ( ! locate_template( 'experimental-theme.json' ) ) {
 		return;
 	}
@@ -73,13 +73,13 @@ function gutenberg_enqueue_global_styles_assets() {
 		if ( isset( $global_styles_definition['global'] ) ) {
 			$css_vars = array_merge(
 				$css_vars,
-				gutenberg_get_css_vars( $global_styles_definition['global'], '--wp-' )
+				gutenberg_global_styles_get_css_vars( $global_styles_definition['global'], '--wp-' )
 			);
 		}
 		if ( isset( $global_styles_definition['blocks'] ) ) {
 			$css_vars = array_merge(
 				$css_vars,
-				gutenberg_get_css_vars( $global_styles_definition['blocks'], '--wp-block-' )
+				gutenberg_global_styles_get_css_vars( $global_styles_definition['blocks'], '--wp-block-' )
 			);
 		}
 	}
@@ -98,7 +98,7 @@ function gutenberg_enqueue_global_styles_assets() {
 	wp_add_inline_style( 'global-styles', $inline_style );
 	wp_enqueue_style( 'global-styles' );
 }
-add_action( 'enqueue_block_assets', 'gutenberg_enqueue_global_styles_assets' );
+add_action( 'enqueue_block_assets', 'gutenberg_global_styles_enqueue_assets' );
 
 /**
  * Adds class wp-gs to the frontend body class if the theme defines a experimental-theme.json.
@@ -106,13 +106,13 @@ add_action( 'enqueue_block_assets', 'gutenberg_enqueue_global_styles_assets' );
  * @param array $classes Existing body classes.
  * @return array The filtered array of body classes.
  */
-function gutenberg_add_wp_gs_class_front_end( $classes ) {
+function gutenberg_global_styles_add_wp_gs_class_front_end( $classes ) {
 	if ( locate_template( 'experimental-theme.json' ) ) {
 		return array_merge( $classes, array( 'wp-gs' ) );
 	}
 	return $classes;
 }
-add_filter( 'body_class', 'gutenberg_add_wp_gs_class_front_end' );
+add_filter( 'body_class', 'gutenberg_global_styles_add_wp_gs_class_front_end' );
 
 
 /**
@@ -121,11 +121,11 @@ add_filter( 'body_class', 'gutenberg_add_wp_gs_class_front_end' );
  * @param string $classes Existing body classes separated by space.
  * @return string The filtered string of body classes.
  */
-function gutenberg_add_wp_gs_class_editor( $classes ) {
+function gutenberg_global_styles_add_wp_gs_class_editor( $classes ) {
 	global $current_screen;
 	if ( $current_screen->is_block_editor() && locate_template( 'experimental-theme.json' ) ) {
 		return $classes . ' wp-gs';
 	}
 	return $classes;
 }
-add_filter( 'admin_body_class', 'gutenberg_add_wp_gs_class_editor' );
+add_filter( 'admin_body_class', 'gutenberg_global_styles_add_wp_gs_class_editor' );
