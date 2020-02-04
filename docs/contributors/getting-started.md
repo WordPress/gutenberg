@@ -50,7 +50,7 @@ In Windows, you can set the `WP_DEVELOP_DIR` environment variable using the appr
 
     CMD: set WP_DEVELOP_DIR=/path/to/wordpress-develop
     PowerShell: $env:WP_DEVELOP_DIR = "/path/to/wordpress-develop"
-	
+
 ### Step 2: Accessing and Configuring the Local WordPress Install
 #### Accessing the Local WordPress Install
 
@@ -132,13 +132,10 @@ To use Prettier, you should install the [Prettier - Code formatter extension](ht
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
 },
+"prettier.configPath": "packages/scripts/config/.prettierrc.js"
 ```
 
-This will use the `.prettierrc.js` file in the root folder of the Gutenberg repository and the version of Prettier that is installed in the root `node_modules` folder. To test it out prior to PR #18048 being merged, you should:
-
-1. git switch add/prettier
-2. npm ci
-3. Edit a JavaScript file and on save it will format it as defined
+This will use the `.prettierrc.js` file included in the scripts package of the Gutenberg repository.
 
 ### TypeScript
 
