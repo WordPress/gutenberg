@@ -102,14 +102,14 @@ class LatestPostsEdit extends Component {
 			categories,
 			postsToShow,
 			excerptLength,
-			imageAlign,
-			imageSizeSlug,
-			imageSizeWidth,
-			imageSizeHeight,
+			featuredImageAlign,
+			featuredImageSizeSlug,
+			featuredImageSizeWidth,
+			featuredImageSizeHeight,
 		} = attributes;
 
 		const [ imageWidth, imageHeight ] = getImageDimensionsFromSlug(
-			imageSizeSlug
+			featuredImageSizeSlug
 		);
 
 		const inspectorControls = (
@@ -166,7 +166,7 @@ class LatestPostsEdit extends Component {
 
 				<PanelBody title={ __( 'Featured Image Settings' ) }>
 					<ToggleControl
-						label={ __( 'Disaply featured image' ) }
+						label={ __( 'Display featured image' ) }
 						checked={ displayFeaturedImage }
 						onChange={ ( value ) =>
 							setAttributes( { displayFeaturedImage: value } )
@@ -178,24 +178,26 @@ class LatestPostsEdit extends Component {
 								onChange={ ( value ) => {
 									const newAttrs = {};
 									if ( value.hasOwnProperty( 'width' ) ) {
-										newAttrs.imageSizeWidth = value.width;
+										newAttrs.featuredImageSizeWidth =
+											value.width;
 									}
 									if ( value.hasOwnProperty( 'height' ) ) {
-										newAttrs.imageSizeHeight = value.height;
+										newAttrs.featuredImageSizeHeight =
+											value.height;
 									}
 									setAttributes( newAttrs );
 								} }
-								slug={ imageSizeSlug }
-								width={ imageSizeWidth }
-								height={ imageSizeHeight }
+								slug={ featuredImageSizeSlug }
+								width={ featuredImageSizeWidth }
+								height={ featuredImageSizeHeight }
 								imageWidth={ imageWidth }
 								imageHeight={ imageHeight }
 								imageSizeOptions={ imageSizeOptions }
 								onChangeImage={ ( value ) =>
 									setAttributes( {
-										imageSizeSlug: value,
-										imageSizeWidth: undefined,
-										imageSizeHeight: undefined,
+										featuredImageSizeSlug: value,
+										featuredImageSizeWidth: undefined,
+										featuredImageSizeHeight: undefined,
 									} )
 								}
 							/>
@@ -204,9 +206,11 @@ class LatestPostsEdit extends Component {
 									{ __( 'Image Alignment' ) }
 								</BaseControl.VisualLabel>
 								<BlockAlignmentToolbar
-									value={ imageAlign }
+									value={ featuredImageAlign }
 									onChange={ ( value ) =>
-										setAttributes( { imageAlign: value } )
+										setAttributes( {
+											featuredImageAlign: value,
+										} )
 									}
 									controls={ [ 'left', 'center', 'right' ] }
 									isCollapsed={ false }
@@ -330,12 +334,12 @@ class LatestPostsEdit extends Component {
 
 						const imageSourceUrl = getFeaturedMediaSourceUrl(
 							post.featured_media,
-							imageSizeSlug
+							featuredImageSizeSlug
 						);
-						const imageClasses = classnames( [
-							'wp-block-latest-posts__featured-image',
-							imageAlign && `align${ imageAlign }`,
-						] );
+						const imageClasses = classnames( {
+							'wp-block-latest-posts__featured-image': true,
+							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
+						} );
 
 						return (
 							<li key={ i }>
@@ -346,8 +350,8 @@ class LatestPostsEdit extends Component {
 												src={ imageSourceUrl }
 												alt=""
 												style={ {
-													maxWidth: imageSizeWidth,
-													maxHeight: imageSizeHeight,
+													maxWidth: featuredImageSizeWidth,
+													maxHeight: featuredImageSizeHeight,
 												} }
 											/>
 										) }

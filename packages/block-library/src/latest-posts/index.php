@@ -34,16 +34,16 @@ function render_block_core_latest_posts( $attributes ) {
 
 		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post ) ) {
 			$image_style = '';
-			if ( isset( $attributes['imageSizeWidth'] ) ) {
-				$image_style .= sprintf( 'max-width:%spx;', $attributes['imageSizeWidth'] );
+			if ( isset( $attributes['featuredImageSizeWidth'] ) ) {
+				$image_style .= sprintf( 'max-width:%spx;', $attributes['featuredImageSizeWidth'] );
 			}
-			if ( isset( $attributes['imageSizeHeight'] ) ) {
-				$image_style .= sprintf( 'max-height:%spx;', $attributes['imageSizeHeight'] );
+			if ( isset( $attributes['featuredImageSizeHeight'] ) ) {
+				$image_style .= sprintf( 'max-height:%spx;', $attributes['featuredImageSizeHeight'] );
 			}
 
 			$image_classes = 'wp-block-latest-posts__featured-image';
-			if ( isset( $attributes['imageAlign'] ) ) {
-				$image_classes .= ' align' . $attributes['imageAlign'];
+			if ( isset( $attributes['featuredImageAlign'] ) ) {
+				$image_classes .= ' align' . $attributes['featuredImageAlign'];
 			}
 
 			$list_items_markup .= sprintf(
@@ -51,7 +51,7 @@ function render_block_core_latest_posts( $attributes ) {
 				$image_classes,
 				get_the_post_thumbnail(
 					$post,
-					$attributes['imageSizeSlug'],
+					$attributes['featuredImageSizeSlug'],
 					array(
 						'style' => $image_style,
 					)
@@ -197,19 +197,19 @@ function register_block_core_latest_posts() {
 					'type'    => 'boolean',
 					'default' => false,
 				),
-				'imageAlign'              => array(
+				'featuredImageAlign'      => array(
 					'type' => 'string',
 					'enum' => array( 'left', 'center', 'right' ),
 				),
-				'imageSizeSlug'           => array(
+				'featuredImageSizeSlug'   => array(
 					'type'    => 'string',
 					'default' => 'thumbnail',
 				),
-				'imageSizeWidth'          => array(
+				'featuredImageSizeWidth'  => array(
 					'type'    => 'number',
 					'default' => null,
 				),
-				'imageSizeHeight'         => array(
+				'featuredImageSizeHeight' => array(
 					'type'    => 'number',
 					'default' => null,
 				),
