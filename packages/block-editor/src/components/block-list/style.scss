@@ -134,7 +134,7 @@
 
 	// The primary indicator of selection in text is the native selection marker.
 	// When selecting multiple blocks, we provide an additional selection indicator.
-	.block-editor-block-list__block.is-selected.is-navigate-mode,
+	.is-navigate-mode & .block-editor-block-list__block.is-selected,
 	.block-editor-block-list__block.is-multi-selected {
 
 
