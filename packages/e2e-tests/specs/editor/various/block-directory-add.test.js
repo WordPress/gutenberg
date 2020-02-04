@@ -109,7 +109,7 @@ describe( 'adding blocks from block directory', () => {
 				onRequestMatch: createJSONResponse( JSON.stringify( true ) ),
 			},
 			{
-				// Mock the response  response for the js asset once it gets injects
+				// Mock the response for the js asset once it gets injected
 				match: ( request ) => request.url().includes( mockBlock1.assets[ 0 ] ),
 				onRequestMatch: createJSONResponse( Buffer.from( block, 'utf8' ), 'application/javascript; charset=utf-8' ),
 			},
