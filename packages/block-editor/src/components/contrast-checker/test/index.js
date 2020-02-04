@@ -7,11 +7,14 @@ import { mount } from 'enzyme';
  * WordPress dependencies
  */
 import { Notice } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import ContrastChecker from '../';
+
+jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
 describe( 'ContrastChecker', () => {
 	const backgroundColor = '#ffffff';
@@ -21,6 +24,10 @@ describe( 'ContrastChecker', () => {
 	const fallbackTextColor = '#000';
 	const sameShade = '#666';
 	const colorWithTransparency = 'rgba(102,102,102,0.5)';
+
+	beforeEach( () => {
+		speak.mockReset();
+	} );
 
 	test( 'should render null when no colors are provided', () => {
 		expect( mount( <ContrastChecker /> ).html() ).toBeNull();
@@ -37,6 +44,7 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).not.toHaveBeenCalled();
 		expect( wrapper.html() ).toBeNull();
 	} );
 
@@ -51,6 +59,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapper
 				.find( Notice )
@@ -72,6 +83,7 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).not.toHaveBeenCalled();
 		expect( wrapper.html() ).toBeNull();
 	} );
 
@@ -86,6 +98,7 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).not.toHaveBeenCalled();
 		expect( wrapper.html() ).toBeNull();
 	} );
 
@@ -102,6 +115,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapper
 				.find( Notice )
@@ -121,6 +137,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapperSmallText
 				.find( Notice )
@@ -150,6 +169,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapperSmallFontSize
 				.find( Notice )
@@ -180,6 +202,7 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).not.toHaveBeenCalled();
 		expect( wrapper.html() ).toBeNull();
 
 		const wrapperNoLargeText = mount(
@@ -191,6 +214,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapperNoLargeText
 				.find( Notice )
@@ -210,6 +236,7 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).not.toHaveBeenCalled();
 		expect( wrapper.html() ).toBeNull();
 	} );
 
@@ -221,6 +248,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapper
 				.find( Notice )

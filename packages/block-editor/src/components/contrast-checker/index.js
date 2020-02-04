@@ -36,7 +36,11 @@ function ContrastCheckerMessage( {
 
 	return (
 		<div className="block-editor-contrast-checker">
-			<Notice status="warning" isDismissible={ false }>
+			<Notice
+				spokenMessage={ null }
+				status="warning"
+				isDismissible={ false }
+			>
 				{ msg }
 			</Notice>
 		</div>
