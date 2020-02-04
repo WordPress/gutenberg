@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, unescape } from 'lodash';
+import { escape, unescape, head } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -308,12 +308,14 @@ export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
 			getBlockAttributes,
-			getBlockParents,
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
+			getBlockParentsByBlockName,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
-		const rootBlock = getBlockParents( clientId )[ 0 ];
+		const rootBlock = head(
+			getBlockParentsByBlockName( clientId, 'core/navigation' )
+		);
 		const navigationBlockAttributes = getBlockAttributes( rootBlock );
 		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
 			.length;
