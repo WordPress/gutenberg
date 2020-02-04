@@ -45,6 +45,14 @@ add_filter( 'safe_style_css', 'gutenberg_safe_style_css_column_flex_basis' );
  * @param WP_Scripts $scripts WP_Scripts object.
  */
 function gutenberg_add_url_polyfill( $scripts ) {
+	// Only register polyfill if not already registered. This prevents handling
+	// in an environment where core has updated to manage the polyfill. This
+	// depends on the action being handled after default script registration.
+	$is_polyfill_script_registered = (bool) $scripts->query( 'wp-polyfill-url', 'registered' );
+	if ( $is_polyfill_script_registered ) {
+		return;
+	}
+
 	gutenberg_register_vendor_script(
 		$scripts,
 		'wp-polyfill-url',
@@ -63,7 +71,7 @@ function gutenberg_add_url_polyfill( $scripts ) {
 		)
 	);
 }
-add_action( 'wp_default_scripts', 'gutenberg_add_url_polyfill' );
+add_action( 'wp_default_scripts', 'gutenberg_add_url_polyfill', 20 );
 
 /**
  * Sets the current post for usage in template blocks.
