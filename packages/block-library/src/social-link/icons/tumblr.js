@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-
-import { Path, SVG } from '@wordpress/components';
+import { Path, SVG } from '@wordpress/primitives';
 
 export const TumblrIcon = () => (
 	<SVG width="24" height="24" viewBox="0 0 24 24" version="1.1">

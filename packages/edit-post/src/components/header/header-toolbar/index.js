@@ -57,7 +57,7 @@ function HeaderToolbar() {
 			<ToolSelector />
 			{ ( hasFixedToolbar || ! isLargeViewport ) && (
 				<div className="edit-post-header-toolbar__block-toolbar">
-					<BlockToolbar />
+					<BlockToolbar hideDragHandle />
 				</div>
 			) }
 		</NavigableToolbar>
