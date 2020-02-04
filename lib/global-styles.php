@@ -69,7 +69,7 @@ function gutenberg_experimental_global_styles_get_from_file( $global_styles_path
  */
 function gutenberg_experimental_global_styles_get_user() {
 	$global_styles = [];
-	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt();
+	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt( [ 'publish' ] );
 	if ( in_array( 'post_content', $user_cpt ) ) {
 		$decoded_data = json_decode( $user_cpt[ 'post_content' ], true );
 		if ( is_array( $decoded_data ) ) {
@@ -85,18 +85,32 @@ function gutenberg_experimental_global_styles_get_user() {
  *
  * @return array CPT.
  */
-function gutenberg_experimental_global_styles_get_user_cpt() {
+function gutenberg_experimental_global_styles_get_user_cpt( $post_status = [ 'publish' ], $should_create_draft = false ) {
 	$user_cpt = [];
+	$post_type = 'wp_global_styles';
+	$post_name = 'wp_global_styles_' . strtolower( wp_get_theme()->get( 'Name' ) );
 	$recent_posts = wp_get_recent_posts( [
 		'numberposts' => 1,
 		'orderby'     => 'date',
 		'order'       => 'desc',
-		'post_type'   => 'wp_global_styles',
-		'name'        => 'wp_global_styles_' . strtolower( wp_get_theme()->get( 'Name' ) ),
+		'post_type'   => $post_type,
+		'post_status' => $post_status,
+		'name'        => $post_name,
 	] );
 
 	if ( is_array( $recent_posts ) && ( count( $recent_posts ) === 1 ) ) {
 		$user_cpt = $recent_posts[ 0 ];
+	} else if ( $should_create_draft ) {
+		$cpt_post_id = wp_insert_post(
+			[
+				'post_content' => json_encode( [] ),
+				'post_status'  => 'draft',
+				'post_type'    => $post_type,
+				'post_name'    => $post_name,
+			],
+			true,
+		);
+		$user_cpt = get_post( $cpt_post_id, ARRAY_A );
 	}
 
 	return $user_cpt;
@@ -109,7 +123,7 @@ function gutenberg_experimental_global_styles_get_user_cpt() {
  */
 function gutenberg_experimental_global_styles_get_user_cpt_id() {
 	$user_cpt_id = null;
-	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt();
+	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt( [ 'publish', 'draft' ], true );
 	if ( in_array( 'ID', $user_cpt ) ) {
 		$user_cpt_id = $user_cpt[ 'ID' ];
 	}
