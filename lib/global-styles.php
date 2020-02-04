@@ -31,7 +31,7 @@ function gutenberg_global_styles_get_css_vars( $global_styles, $prefix = '' ) {
 		if ( is_array( $value ) ) {
 			$result = array_merge(
 				$result,
-				gutenberg_global_styles_get_css_vars( $value, $new_key )
+				gutenberg_global_styles_get_css_vars( $value, $new_key . '-' )
 			);
 		} else {
 			$result[ $new_key ] = $value;
@@ -90,9 +90,9 @@ function gutenberg_global_styles_resolver( $global_styles ) {
 
 	$css_rule = ":root {\n";
 	foreach ( $css_vars as $var => $value ) {
-		$css_rule = "\t" . $var . ': ' . $value . ";\n";
+		$css_rule .= "\t" . $var . ': ' . $value . ";\n";
 	}
-	$css_rule = '}';
+	$css_rule .= '}';
 
 	return $css_rule;
 }
