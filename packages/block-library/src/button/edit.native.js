@@ -242,6 +242,15 @@ class ButtonEdit extends Component {
 					}
 					keyboardType="url"
 				/>
+				<ToggleControl
+					icon={ ! isCompatibleWithSettings && 'external' }
+					label={ __( 'Open in new tab' ) }
+					checked={ linkTarget === '_blank' }
+					onChange={ this.onChangeOpenInNewTab }
+					separatorType={
+						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
+					}
+				/>
 				<TextControl
 					icon={ ! isCompatibleWithSettings && LinkRelIcon }
 					label={ __( 'Link Rel' ) }
@@ -250,17 +259,8 @@ class ButtonEdit extends Component {
 					onChange={ this.onChangeLinkRel }
 					autoCapitalize="none"
 					autoCorrect={ false }
-					separatorType={
-						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
-					}
+					separatorType={ 'fullWidth' }
 					keyboardType="url"
-				/>
-				<ToggleControl
-					icon={ ! isCompatibleWithSettings && 'external' }
-					label={ __( 'Open in new tab' ) }
-					checked={ linkTarget === '_blank' }
-					onChange={ this.onChangeOpenInNewTab }
-					separatorType="fullWidth"
 				/>
 			</>
 		);
@@ -344,6 +344,7 @@ class ButtonEdit extends Component {
 								this.onToggleButtonFocus( true )
 							}
 							__unstableMobileNoFocusOnMount={ ! isSelected }
+							selectionColor={ textColor.color || '#fff' }
 						/>
 					</ColorBackground>
 
