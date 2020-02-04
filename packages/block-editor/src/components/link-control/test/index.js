@@ -615,7 +615,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			expect( currentLinkLabel ).toBeNull();
 			expect( loadingIndicator.innerHTML ).toEqual(
-				expect.stringContaining( 'Loading' )
+				expect.stringContaining( 'Creating' )
 			);
 
 			// Resolve the `createEntity` promise
