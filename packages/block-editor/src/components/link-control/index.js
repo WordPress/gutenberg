@@ -431,8 +431,6 @@ function LinkControl( {
 					value={ inputValue }
 					onChange={ onInputChange }
 					onSelect={ ( suggestion ) => {
-                        stopEditing();
-
 						if (
 							suggestion.type &&
 							CREATE_TYPE === suggestion.type
@@ -441,6 +439,10 @@ function LinkControl( {
 						} else {
 							handleSelectSuggestion( suggestion, value )();
 						}
+
+						// Must be called after handling to ensure focus is
+						// managed correctly.
+						stopEditing();
 					} }
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
