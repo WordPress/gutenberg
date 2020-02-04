@@ -6,6 +6,15 @@
  */
 
 /**
+ * Whether theme has support for Global Styles
+ *
+ * @return boolean
+ */
+function gutenberg_global_styles_has_theme_support() {
+	return is_readable( locate_template( 'experimental-theme.json' ) );
+}
+
+/**
  * Function that given a branch of the global styles object recursively generates
  * an array defining all the css vars that the global styles object represents.
  *
@@ -56,7 +65,7 @@ function gutenberg_global_styles_get_from_file( $global_styles_path ) {
 
 /**
  * Returns an array containing the Global Styles
- * design tokens found in a file. A void array if none.
+ * design tokens found in a given CPT. A void array if none.
  *
  * @return array Global Styles design tokens.
  */
@@ -67,11 +76,10 @@ function gutenberg_global_styles_get_from_cpt() {
 
 /**
  * Fetches the Global Styles design tokens (defaults, theme, user),
- * transforms them into a single tree,
- * and enqueues the CSS custom properties.
+ * and enqueues the resulting CSS custom properties if any.
  */
 function gutenberg_global_styles_enqueue_assets() {
-	if ( ! locate_template( 'experimental-theme.json' ) ) {
+	if ( ! gutenberg_global_styles_has_theme_support() ) {
 		return;
 	}
 
@@ -102,13 +110,14 @@ function gutenberg_global_styles_enqueue_assets() {
 add_action( 'enqueue_block_assets', 'gutenberg_global_styles_enqueue_assets' );
 
 /**
- * Adds class wp-gs to the frontend body class if the theme defines a experimental-theme.json.
+ * Adds class wp-gs to the frontend body class
+ * if the theme has support for Global Styles.
  *
  * @param array $classes Existing body classes.
  * @return array The filtered array of body classes.
  */
 function gutenberg_global_styles_add_wp_gs_class_front_end( $classes ) {
-	if ( locate_template( 'experimental-theme.json' ) ) {
+	if ( gutenberg_global_styles_has_theme_support() ) {
 		return array_merge( $classes, array( 'wp-gs' ) );
 	}
 	return $classes;
@@ -117,14 +126,15 @@ add_filter( 'body_class', 'gutenberg_global_styles_add_wp_gs_class_front_end' );
 
 
 /**
- * Adds class wp-gs to the block-editor body class if the theme defines a experimental-theme.json.
+ * Adds class wp-gs to the block-editor body class
+ * if the theme has support for Global Styles.
  *
  * @param string $classes Existing body classes separated by space.
  * @return string The filtered string of body classes.
  */
 function gutenberg_global_styles_add_wp_gs_class_editor( $classes ) {
 	global $current_screen;
-	if ( $current_screen->is_block_editor() && locate_template( 'experimental-theme.json' ) ) {
+	if ( $current_screen->is_block_editor() && gutenberg_global_styles_has_theme_support() ) {
 		return $classes . ' wp-gs';
 	}
 	return $classes;
