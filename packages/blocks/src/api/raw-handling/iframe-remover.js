@@ -16,16 +16,28 @@ export default function( node ) {
 	}
 }
 
-export function checkForUntransformedIframe( rawTransform, node ) {
+export function isUntransformedIframe( rawTransform, node ) {
 	const iframeRegex = /(?:<iframe[^>]*)(?:(?:\/>)|(?:>.*?<\/iframe>))/gi;
 
 	return (
-		( ! rawTransform &&
-			( node.nodeName === 'IFRAME' ||
-				iframeRegex.test( node.innerHTML ) ) ) ||
+		( ! rawTransform && containsIframe( node, iframeRegex ) ) ||
 		( rawTransform &&
-			node.nodeName === 'FIGURE' &&
-			rawTransform.blockName === 'core/html' &&
-			iframeRegex.test( node.innerHTML ) )
+			containsCoreHtmlIframeTransform(
+				node,
+				rawTransform.blockName,
+				iframeRegex
+			) )
+	);
+}
+
+function containsIframe( node, iframeRegex ) {
+	return node.nodeName === 'IFRAME' || iframeRegex.test( node.innerHTML );
+}
+
+function containsCoreHtmlIframeTransform( node, blockName, iframeRegex ) {
+	return (
+		node.nodeName === 'FIGURE' &&
+		blockName === 'core/html' &&
+		iframeRegex.test( node.innerHTML )
 	);
 }

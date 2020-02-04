@@ -23,7 +23,7 @@ import blockquoteNormaliser from './blockquote-normaliser';
 import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
 import markdownConverter from './markdown-converter';
-import { checkForUntransformedIframe } from './iframe-remover';
+import { isUntransformedIframe } from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
 import htmlFormattingRemover from './html-formatting-remover';
 import brRemover from './br-remover';
@@ -110,7 +110,7 @@ export function htmlToBlocks( {
 
 			if (
 				! canUserUseUnfilteredHTML &&
-				checkForUntransformedIframe( rawTransform, node )
+				isUntransformedIframe( rawTransform, node )
 			) {
 				return undefined;
 			}
