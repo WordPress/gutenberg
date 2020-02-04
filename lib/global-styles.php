@@ -40,9 +40,9 @@ function gutenberg_enqueue_global_styles_assets() {
 	if ( ! locate_template( 'experimental-theme.json' ) ) {
 		return;
 	}
-	$default_global_styles_path = dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json';
-	$default_global_styles      = null;
 
+	$default_global_styles      = null;
+	$default_global_styles_path = dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json';
 	if ( file_exists( $default_global_styles_path ) ) {
 		$default_global_styles = json_decode(
 			file_get_contents( $default_global_styles_path ),
@@ -50,11 +50,11 @@ function gutenberg_enqueue_global_styles_assets() {
 		);
 	}
 
-	$theme_json_path          = locate_template( 'experimental-theme.json' );
-	$theme_json_global_styles = null;
-	if ( $theme_json_path ) {
-		$theme_json_global_styles = json_decode(
-			file_get_contents( $theme_json_path ),
+	$theme_global_styles      = null;
+	$theme_global_styles_path = locate_template( 'experimental-theme.json' );
+	if ( file_exists( $theme_global_styles_path ) ) {
+		$theme_global_styles = json_decode(
+			file_get_contents( $theme_global_styles_path ),
 			true
 		);
 	}
@@ -64,7 +64,7 @@ function gutenberg_enqueue_global_styles_assets() {
 	foreach (
 		array(
 			$default_global_styles,
-			$theme_json_global_styles,
+			$theme_global_styles,
 		) as $global_styles_definition
 	) {
 		if ( ! $global_styles_definition ) {
@@ -90,9 +90,9 @@ function gutenberg_enqueue_global_styles_assets() {
 
 	$inline_style = ":root {\n";
 	foreach ( $css_vars as $var => $value ) {
-		$inline_style .= "\t" . $var . ': ' . $value . ";\n";
+		$inline_style = "\t" . $var . ': ' . $value . ";\n";
 	}
-	$inline_style .= '}';
+	$inline_style = '}';
 
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $inline_style );
