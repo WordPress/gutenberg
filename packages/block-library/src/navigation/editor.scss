@@ -57,6 +57,11 @@ $navigation-item-height: 46px;
 			background: none;
 		}
 	}
+
+	// Applies color to the appender if the background has been set.
+	.wp-block-navigation.has-background .block-list-appender .block-editor-button-block-appender {
+		color: inherit;
+	}
 }
 
 .wp-block-navigation__inserter-content {
