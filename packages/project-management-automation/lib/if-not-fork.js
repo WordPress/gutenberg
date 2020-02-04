@@ -22,7 +22,7 @@ function ifNotFork( handler ) {
 		}
 		debug( `main: Skipping ${ handler.name } because we are in a fork.` );
 	};
-	newHandler.name = handler.name;
+	Object.defineProperty( newHandler, 'name', { value: handler.name } );
 	return newHandler;
 }
 
