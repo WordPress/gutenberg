@@ -68,8 +68,45 @@ function gutenberg_experimental_global_styles_get_from_file( $global_styles_path
  * @return array Global Styles design tokens.
  */
 function gutenberg_experimental_global_styles_get_user() {
-	// TODO: fetch from CPT.
+	$global_styles = [];
+	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt();
+	if ( in_array( 'post_content', $user_cpt ) ) {
+		$global_styles = $user_cpt[ 'post_content' ];
+	}
+	return $global_styles;
+}
+
+/**
+ * Returns the CPT containing the user global styles.
+ *
+ * @return array CPT.
+ */
+function gutenberg_experimental_global_styles_get_user_cpt() {
+	// TODO:
+	// - sort by date
+	// - also filter by name: wp_global_styles_ACTIVE_THEME
+	$recent_posts = wp_get_recent_posts( [
+		'numberposts' => 1,
+		'orderby'     => 'ID',
+		'order'       => 'desc',
+		'post_type'   => 'wp_global_styles',
+	] );
+	if ( is_array( $recent_posts ) && ( count( $recent_posts ) === 1 ) ) {
+		return $recent_posts[ 0 ];
+	}
 	return [];
+}
+
+/**
+ * Returns the post ID of the CPT containing the user global styles.
+ *
+ * @return integer CPT ID.
+ */
+function gutenberg_experimental_global_styles_get_user_cpt_id() {
+	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt();
+	if ( in_array( 'ID', $user_cpt ) ) {
+		$settings['__experimentalGlobalStylesId'] = $user_cpt[ 'ID' ];
+	}
 }
 
 /**
@@ -183,17 +220,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	// Add CPT ID
-	$recent_posts = wp_get_recent_posts( [
-		'numberposts' => 1,
-		'orderby'     => 'ID',
-		'order'       => 'desc',
-		'post_type'   => 'wp_global_styles',
-	] );
-	if ( is_array( $recent_posts ) && ( count( $recent_posts ) > 0 ) ) {
-		$settings['__experimentalGlobalStylesId'] = $recent_posts[ 0 ][ 'ID' ];
-	} else {
-		$settings['__experimentalGlobalStylesId'] = null;
-	}
+	$settings['__experimentalGlobalStylesId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 
 	// Make base Global Styles (core+theme) available.
 	$global_styles = array_merge(
