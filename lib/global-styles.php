@@ -86,6 +86,7 @@ function gutenberg_experimental_global_styles_get_user() {
  * @return array CPT.
  */
 function gutenberg_experimental_global_styles_get_user_cpt() {
+	$user_cpt = [];
 	$recent_posts = wp_get_recent_posts( [
 		'numberposts' => 1,
 		'orderby'     => 'date',
@@ -93,10 +94,12 @@ function gutenberg_experimental_global_styles_get_user_cpt() {
 		'post_type'   => 'wp_global_styles',
 		'name'        => 'wp_global_styles_' . strtolower( wp_get_theme()->get( 'Name' ) ),
 	] );
+
 	if ( is_array( $recent_posts ) && ( count( $recent_posts ) === 1 ) ) {
-		return $recent_posts[ 0 ];
+		$user_cpt = $recent_posts[ 0 ];
 	}
-	return [];
+
+	return $user_cpt;
 }
 
 /**
@@ -105,10 +108,12 @@ function gutenberg_experimental_global_styles_get_user_cpt() {
  * @return integer CPT ID.
  */
 function gutenberg_experimental_global_styles_get_user_cpt_id() {
+	$user_cpt_id = null;
 	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt();
 	if ( in_array( 'ID', $user_cpt ) ) {
-		$settings['__experimentalGlobalStylesId'] = $user_cpt[ 'ID' ];
+		$user_cpt_id = $user_cpt[ 'ID' ];
 	}
+	return $user_cpt_id;
 }
 
 /**
