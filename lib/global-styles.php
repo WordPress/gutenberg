@@ -1,6 +1,6 @@
 <?php
 /**
- * Global styles functions, filters and actions, etc.
+ * Bootstraping Global Styles data mechanisms.
  *
  * @package gutenberg
  */
@@ -182,10 +182,6 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
  * and enqueues the resulting CSS custom properties if any.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
-		return;
-	}
-
 	$global_styles = array_merge(
 		gutenberg_experimental_global_styles_get_core(),
 		gutenberg_experimental_global_styles_get_theme(),
@@ -201,7 +197,6 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 	wp_add_inline_style( 'global-styles', $inline_style );
 	wp_enqueue_style( 'global-styles' );
 }
-add_action( 'enqueue_block_assets', 'gutenberg_experimental_global_styles_enqueue_assets' );
 
 /**
  * Adds class wp-gs to the frontend body class
@@ -211,13 +206,8 @@ add_action( 'enqueue_block_assets', 'gutenberg_experimental_global_styles_enqueu
  * @return array The filtered array of body classes.
  */
 function gutenberg_experimental_global_styles_wp_gs_class_front_end( $classes ) {
-	if ( gutenberg_experimental_global_styles_has_theme_support() ) {
-		return array_merge( $classes, array( 'wp-gs' ) );
-	}
-	return $classes;
+	return array_merge( $classes, array( 'wp-gs' ) );
 }
-add_filter( 'body_class', 'gutenberg_experimental_global_styles_wp_gs_class_front_end' );
-
 
 /**
  * Adds class wp-gs to the block-editor body class
@@ -228,18 +218,13 @@ add_filter( 'body_class', 'gutenberg_experimental_global_styles_wp_gs_class_fron
  */
 function gutenberg_experimental_global_styles_wp_gs_class_editor( $classes ) {
 	global $current_screen;
-	if ( $current_screen->is_block_editor() && gutenberg_experimental_global_styles_has_theme_support() ) {
+	if ( $current_screen->is_block_editor() ) {
 		return $classes . ' wp-gs';
 	}
 	return $classes;
 }
-add_filter( 'admin_body_class', 'gutenberg_experimental_global_styles_wp_gs_class_editor' );
 
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
-		return $settings;
-	}
-
 	// Add CPT ID
 	$settings['__experimentalGlobalStylesId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 
@@ -252,13 +237,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
 
 function gutenberg_experimental_global_styles_register_cpt() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
-		return;
-	}
-
 	$args = [
 		'label'        => 'Global Styles', 'gutenberg',
 		'description'  => 'CPT to store user design tokens',
@@ -283,4 +263,11 @@ function gutenberg_experimental_global_styles_register_cpt() {
 	];
 	register_post_type( 'wp_global_styles', $args );
 }
-add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
+
+if ( gutenberg_experimental_global_styles_has_theme_support() ) {
+	add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
+	add_filter( 'body_class', 'gutenberg_experimental_global_styles_wp_gs_class_front_end' );
+	add_filter( 'admin_body_class', 'gutenberg_experimental_global_styles_wp_gs_class_editor' );
+	add_action( 'enqueue_block_assets', 'gutenberg_experimental_global_styles_enqueue_assets' );
+	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
+}
