@@ -86,14 +86,12 @@ function gutenberg_experimental_global_styles_get_user() {
  * @return array CPT.
  */
 function gutenberg_experimental_global_styles_get_user_cpt() {
-	// TODO:
-	// - sort by date
-	// - also filter by name: wp_global_styles_ACTIVE_THEME
 	$recent_posts = wp_get_recent_posts( [
 		'numberposts' => 1,
-		'orderby'     => 'ID',
+		'orderby'     => 'date',
 		'order'       => 'desc',
 		'post_type'   => 'wp_global_styles',
+		'name'        => 'wp_global_styles_' . strtolower( wp_get_theme()->get( 'Name' ) ),
 	] );
 	if ( is_array( $recent_posts ) && ( count( $recent_posts ) === 1 ) ) {
 		return $recent_posts[ 0 ];
