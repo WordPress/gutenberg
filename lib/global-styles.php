@@ -15,25 +15,23 @@ function gutenberg_global_styles_has_theme_support() {
 }
 
 /**
- * Function that given a branch of the global styles object recursively generates
- * an array defining all the css vars that the global styles object represents.
+ * Given Global Styles tree it creates a flattened tree
+ * whose keys are the CSS custom properties
+ * and its values the CSS custom properties' values.
  *
- * @param array  $global_styles_branch Array representing a brach of the global styles object.
+ * @param array  $global_styles Global Styles object to process.
  * @param string $prefix Prefix to append to each variable.
- * @param bool   $is_start Indicates if we are on the first call to gutenberg_get_css_vars (outside the recursion).
- * @return array An array whose keys are css variable names and whose values are the css variables value.
+ * @return array The flattened tree.
  */
-function gutenberg_global_styles_get_css_vars( $global_styles_branch, $prefix = '', $is_start = true ) {
+function gutenberg_global_styles_get_css_vars( $global_styles, $prefix = '' ) {
 	$result = array();
-	foreach ( $global_styles_branch as $key => $value ) {
-		$processed_key = str_replace( '/', '-', $key );
-		$separator     = $is_start ? '' : '--';
-		$new_key       = ( $prefix ? $prefix . $separator : '' ) . $processed_key;
+	foreach ( $global_styles as $key => $value ) {
+		$new_key = $prefix . str_replace( '/', '-', $key );
 
 		if ( is_array( $value ) ) {
 			$result = array_merge(
 				$result,
-				gutenberg_global_styles_get_css_vars( $value, $new_key, false )
+				gutenberg_global_styles_get_css_vars( $value, $new_key )
 			);
 		} else {
 			$result[ $new_key ] = $value;
