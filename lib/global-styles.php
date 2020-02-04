@@ -66,7 +66,9 @@ function gutenberg_global_styles_get_from_cpt() {
 }
 
 /**
- * Function responsible for enqueuing the style that define the global styles css variables.
+ * Fetches the Global Styles design tokens (defaults, theme, user),
+ * transforms them into a single tree,
+ * and enqueues the CSS custom properties.
  */
 function gutenberg_global_styles_enqueue_assets() {
 	if ( ! locate_template( 'experimental-theme.json' ) ) {
