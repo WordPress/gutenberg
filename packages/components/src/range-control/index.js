@@ -30,13 +30,15 @@ function RangeControl( {
 	min,
 	max,
 	setState,
+	initialValue,
 	...props
 } ) {
 	const id = `inspector-range-control-${ instanceId }`;
 	const currentInputValue = currentInput === null ? value : currentInput;
+	const initialInputValue = ( initialValue && initialValue >= min && initialValue <= max ) ? parseFloat( initialValue ) : undefined;
 	const resetValue = () => {
 		resetCurrentInput();
-		onChange();
+		onChange( initialInputValue );
 	};
 	const resetCurrentInput = () => {
 		if ( currentInput !== null ) {
@@ -45,7 +47,6 @@ function RangeControl( {
 			} );
 		}
 	};
-
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
 		// If the input value is invalid temporarily save it to the state,
