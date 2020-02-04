@@ -16,7 +16,6 @@ Add this to your `package.json` file:
 
 ```json
 prettier": "@wordpress/prettier-config"
-]
 ```
 
 Alternatively, add this to `.prettierrc` file:
