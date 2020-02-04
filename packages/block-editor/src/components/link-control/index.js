@@ -430,12 +430,13 @@ function LinkControl( {
 				<LinkControlSearchInput
 					value={ inputValue }
 					onChange={ onInputChange }
-					onSelect={ ( suggestion ) => {
+					onSelect={ async ( suggestion ) => {
 						if (
 							suggestion.type &&
 							CREATE_TYPE === suggestion.type
 						) {
-							handleOnCreate( inputValue );
+							// Await the promise to ensure `stopEditing` is not called prematurely.
+							await handleOnCreate( inputValue );
 						} else {
 							handleSelectSuggestion( suggestion, value )();
 						}
