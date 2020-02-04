@@ -268,7 +268,6 @@ export default compose( [
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
-			getBlock,
 			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
@@ -292,10 +291,8 @@ export default compose( [
 		const parentId = parents[ 0 ] || '';
 
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
-		const rootBlock = getBlock( rootBlockId );
-		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
+		const showFloatingToolbar = isSelected;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
