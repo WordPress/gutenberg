@@ -71,8 +71,12 @@ function gutenberg_experimental_global_styles_get_user() {
 	$global_styles = [];
 	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt();
 	if ( in_array( 'post_content', $user_cpt ) ) {
-		$global_styles = $user_cpt[ 'post_content' ];
+		$decoded_data = json_decode( $user_cpt[ 'post_content' ], true );
+		if ( is_array( $decoded_data ) ) {
+			$global_styles = $decoded_data;
+		}
 	}
+
 	return $global_styles;
 }
 
