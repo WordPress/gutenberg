@@ -8,7 +8,7 @@ Once you have Node installed, run these scripts from within your local Gutenberg
 
 Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system.
 
-```
+```bash
 npm install
 npm run build
 ```
@@ -20,6 +20,7 @@ If you don't have a local WordPress environment to load Gutenberg in, we can hel
 ## Local Environment
 
 ### Step 1: Installing a Local Environment
+
 #### Quickest Method: Using Docker
 
 The quickest way to get up and running is to use the provided Docker setup. If you don't already have it, you'll need to install Docker and Docker Compose.
@@ -30,16 +31,17 @@ To install Docker Compose, [follow their instructions here](https://docs.docker.
 
 Once Docker is installed and running, run this script to install WordPress, and build your local environment:
 
-```
+```bash
 npm run env install
 ```
 
 #### Alternative Method: Using an Existing Local WordPress Install
+
 WordPress will be installed in the `wordpress` directory, if you need to access WordPress core files directly, you can find them there.
 
 If you already have WordPress checked out in a different directory, you can use that installation, instead, by running these commands:
 
-```
+```bash
 export WP_DEVELOP_DIR=/path/to/wordpress-develop
 npm run env connect
 ```
@@ -48,10 +50,11 @@ This will use WordPress' own local environment, and mount your Gutenberg directo
 
 In Windows, you can set the `WP_DEVELOP_DIR` environment variable using the appropriate method for your shell:
 
-    CMD: set WP_DEVELOP_DIR=/path/to/wordpress-develop
-    PowerShell: $env:WP_DEVELOP_DIR = "/path/to/wordpress-develop"
+- CMD: `set WP_DEVELOP_DIR=/path/to/wordpress-develop`
+- PowerShell: `$env:WP_DEVELOP_DIR = "/path/to/wordpress-develop"`
 
 ### Step 2: Accessing and Configuring the Local WordPress Install
+
 #### Accessing the Local WordPress Install
 
 Whether you decided to use Docker or an existing local WordPress install, the WordPress installation should now be available at `http://localhost:8889` (**Username**: `admin`, **Password**: `password`).
@@ -71,9 +74,11 @@ To shut down this local WordPress instance run `npm run env stop`. To start it b
 WordPress comes with specific [debug systems](https://wordpress.org/support/article/debugging-in-wordpress/) designed to simplify the process as well as standardize code across core, plugins and themes. It is possible to use environment variables (`LOCAL_WP_DEBUG` and `LOCAL_SCRIPT_DEBUG`) to update a site's configuration constants located in `wp-config.php` file. Both flags can be disabled at any time by running the following command:
 
 Example on Linux/MacOS:
-```
+
+```bash
 LOCAL_SCRIPT_DEBUG=false LOCAL_WP_DEBUG=false npm run env install
 ```
+
 By default, both flags will be set to `true`.
 
 #### Troubleshooting
