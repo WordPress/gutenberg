@@ -157,3 +157,30 @@ function gutenberg_global_styles_add_wp_gs_class_editor( $classes ) {
 	return $classes;
 }
 add_filter( 'admin_body_class', 'gutenberg_global_styles_add_wp_gs_class_editor' );
+
+function gutenberg_global_styles_experimental_register_cpt() {
+	$args = [
+		'label'        => 'Global Styles', 'gutenberg',
+		'description'  => 'CPT to store user design tokens',
+		'public'       => false,
+		'show_ui'      => false,
+		'show_in_rest' => true,
+		'rest_base'    => '__experimental/global-styles',
+		'capabilities' => [
+			'read'                   => 'edit_theme_options',
+			'create_posts'           => 'edit_theme_options',
+			'edit_posts'             => 'edit_theme_options',
+			'edit_published_posts'   => 'edit_theme_options',
+			'delete_published_posts' => 'edit_theme_options',
+			'edit_others_posts'      => 'edit_theme_options',
+			'delete_others_posts'    => 'edit_theme_options',
+		],
+		'map_meta_cap' => true,
+		'supports'     => [
+			'editor',
+			'revisions',
+		]
+	];
+	register_post_type( 'wp_global_styles', $args );
+}
+add_action( 'init', 'gutenberg_global_styles_experimental_register_cpt' );
