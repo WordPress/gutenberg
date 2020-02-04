@@ -17,11 +17,15 @@ export default function( node ) {
 }
 
 export function checkForUntransformedIframe( rawTransform, node ) {
-	const frameRegex = /(?:<iframe[^>]*)(?:(?:\/>)|(?:>.*?<\/iframe>))/gi;
+	const iframeRegex = /(?:<iframe[^>]*)(?:(?:\/>)|(?:>.*?<\/iframe>))/gi;
+
 	return (
-		rawTransform &&
-		node.nodeName === 'FIGURE' &&
-		rawTransform.blockName === 'core/html' &&
-		frameRegex.exec( node.innerHTML )
+		( ! rawTransform &&
+			( node.nodeName === 'IFRAME' ||
+				iframeRegex.test( node.innerHTML ) ) ) ||
+		( rawTransform &&
+			node.nodeName === 'FIGURE' &&
+			rawTransform.blockName === 'core/html' &&
+			iframeRegex.test( node.innerHTML ) )
 	);
 }

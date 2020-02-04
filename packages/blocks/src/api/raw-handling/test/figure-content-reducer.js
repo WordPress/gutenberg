@@ -9,6 +9,7 @@ describe( 'figureContentReducer', () => {
 		figure: {
 			children: {
 				img: {},
+				iframe: {},
 				a: {
 					children: {
 						img: {},
@@ -21,6 +22,15 @@ describe( 'figureContentReducer', () => {
 	it( 'should wrap image in figure', () => {
 		const input = '<img>';
 		const output = '<figure><img></figure>';
+
+		expect(
+			deepFilterHTML( input, [ figureContentReducer ], schema )
+		).toEqual( output );
+	} );
+
+	it( 'should wrap iframe in figure', () => {
+		const input = '<iframe></iframe>';
+		const output = '<figure><iframe></iframe></figure>';
 
 		expect(
 			deepFilterHTML( input, [ figureContentReducer ], schema )

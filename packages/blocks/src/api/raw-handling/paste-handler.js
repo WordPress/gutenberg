@@ -92,42 +92,49 @@ function getRawTransformations() {
  *
  * @return {Array} An array of blocks.
  */
-function htmlToBlocks( { html, rawTransforms, canUserUseUnfilteredHTML } ) {
+export function htmlToBlocks( {
+	html,
+	rawTransforms,
+	canUserUseUnfilteredHTML,
+} ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 
 	doc.body.innerHTML = html;
 
-	return Array.from( doc.body.children ).map( ( node ) => {
-		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) =>
-			isMatch( node )
-		);
-
-		if ( ! rawTransform ) {
-			return createBlock(
-				// Should not be hardcoded.
-				'core/html',
-				getBlockAttributes( 'core/html', node.outerHTML )
+	return Array.from( doc.body.children )
+		.map( ( node ) => {
+			const rawTransform = findTransform(
+				rawTransforms,
+				( { isMatch } ) => isMatch( node )
 			);
-		}
 
-		if (
-			! canUserUseUnfilteredHTML &&
-			checkForUntransformedIframe( rawTransform, node )
-		) {
-			return [];
-		}
+			if (
+				! canUserUseUnfilteredHTML &&
+				checkForUntransformedIframe( rawTransform, node )
+			) {
+				return undefined;
+			}
 
-		const { transform, blockName } = rawTransform;
+			if ( ! rawTransform ) {
+				return createBlock(
+					// Should not be hardcoded.
+					'core/html',
+					getBlockAttributes( 'core/html', node.outerHTML )
+				);
+			}
 
-		if ( transform ) {
-			return transform( node );
-		}
+			const { transform, blockName } = rawTransform;
 
-		return createBlock(
-			blockName,
-			getBlockAttributes( blockName, node.outerHTML )
-		);
-	} );
+			if ( transform ) {
+				return transform( node );
+			}
+
+			return createBlock(
+				blockName,
+				getBlockAttributes( blockName, node.outerHTML )
+			);
+		} )
+		.filter( ( block ) => block !== undefined );
 }
 
 /**
