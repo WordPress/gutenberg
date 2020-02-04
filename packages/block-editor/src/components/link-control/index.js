@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, startsWith, uniqueId } from 'lodash';
+import { noop, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -196,7 +196,6 @@ function LinkControl( {
 
 		return Promise.resolve( [
 			{
-				id: uniqueId(),
 				title: val,
 				url: type === 'URL' ? prependHTTP( val ) : val,
 				type,
@@ -236,7 +235,6 @@ function LinkControl( {
 		// to the text value of the `<input>` otherwise it will result in an
 		// incorrectly named entity being created.
 		return results.concat( {
-			id: uniqueId(),
 			title: val, // placeholder
 			url: val, // must match the existing `<input>`s text value
 			type: CREATE_TYPE,
