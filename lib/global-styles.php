@@ -76,32 +76,13 @@ function gutenberg_global_styles_enqueue_assets() {
 	$default_global_styles = gutenberg_global_styles_get_from_file( dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json' );
 	$theme_global_styles   = gutenberg_global_styles_get_from_file( locate_template( 'experimental-theme.json' ) );
 	$user_global_styles    = gutenberg_global_styles_get_from_cpt();
+	$global_styles         = array_merge(
+		$default_global_styles,
+		$theme_global_styles,
+		$user_global_styles,
+	);
 
-	$css_vars = array();
-	foreach (
-		array(
-			$default_global_styles,
-			$theme_global_styles,
-			$user_global_styles,
-		) as $global_styles_definition
-	) {
-		if ( ! $global_styles_definition ) {
-			continue;
-		}
-		if ( isset( $global_styles_definition['global'] ) ) {
-			$css_vars = array_merge(
-				$css_vars,
-				gutenberg_global_styles_get_css_vars( $global_styles_definition['global'], '--wp-' )
-			);
-		}
-		if ( isset( $global_styles_definition['blocks'] ) ) {
-			$css_vars = array_merge(
-				$css_vars,
-				gutenberg_global_styles_get_css_vars( $global_styles_definition['blocks'], '--wp-block-' )
-			);
-		}
-	}
-
+	$css_vars = gutenberg_global_styles_get_css_vars( $global_styles, '--wp-' );
 	if ( empty( $css_vars ) ) {
 		return;
 	}
