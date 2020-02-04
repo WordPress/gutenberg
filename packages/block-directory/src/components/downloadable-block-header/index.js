@@ -41,7 +41,7 @@ function DownloadableBlockHeader( {
 				<BlockRatings rating={ rating } ratingCount={ ratingCount } />
 			</div>
 			<Button
-				isDefault
+				isSecondary
 				onClick={ ( event ) => {
 					event.preventDefault();
 					onClick();
