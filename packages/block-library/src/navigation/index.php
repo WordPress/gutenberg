@@ -12,7 +12,7 @@
  * @param  array $attributes Navigation block attributes.
  * @return array Colors CSS classes and inline styles.
  */
-function build_css_colors( $attributes ) {
+function core_block_navigation_build_css_colors( $attributes ) {
 	$colors = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
@@ -64,7 +64,7 @@ function build_css_colors( $attributes ) {
  * @param  array $attributes Navigation block attributes.
  * @return array Font size CSS classes and inline styles.
  */
-function build_css_font_sizes( $attributes ) {
+function core_block_navigation_build_css_font_sizes( $attributes ) {
 	// CSS classes.
 	$font_sizes = array(
 		'css_classes'   => array(),
@@ -91,7 +91,7 @@ function build_css_font_sizes( $attributes ) {
  * @param array $blocks Navigation link inner blocks from the Navigation block.
  * @return array Blocks that had valid labels
  */
-function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
+function core_block_navigation_empty_navigation_links_recursive( $blocks ) {
 	$blocks = array_filter(
 		$blocks,
 		function( $block ) {
@@ -102,7 +102,7 @@ function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
 	if ( ! empty( $blocks ) ) {
 		foreach ( $blocks as $key => $block ) {
 			if ( ! empty( $block['innerBlocks'] ) ) {
-				$blocks[ $key ]['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+				$blocks[ $key ]['innerBlocks'] = core_block_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
 			}
 		}
 	}
@@ -115,7 +115,7 @@ function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
  *
  * @return string
  */
-function render_submenu_icon() {
+function core_block_navigation_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" transform="rotate(90)"><path d="M8 5v14l11-7z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
 }
 
@@ -134,14 +134,14 @@ function render_block_navigation( $content, $block ) {
 	}
 
 	$attributes           = $block['attrs'];
-	$block['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+	$block['innerBlocks'] = core_block_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
 
 	if ( empty( $block['innerBlocks'] ) ) {
 		return '';
 	}
 
-	$colors          = build_css_colors( $attributes );
-	$font_sizes      = build_css_font_sizes( $attributes );
+	$colors          = core_block_navigation_build_css_colors( $attributes );
+	$font_sizes      = core_block_navigation_build_css_font_sizes( $attributes );
 	$classes         = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
@@ -159,7 +159,7 @@ function render_block_navigation( $content, $block ) {
 		'<nav %1$s %2$s>%3$s</nav>',
 		$class_attribute,
 		$style_attribute,
-		build_navigation_html( $attributes, $block, $colors, $font_sizes, true )
+		core_block_navigation_build_html( $attributes, $block, $colors, $font_sizes, true )
 	);
 }
 
@@ -173,7 +173,7 @@ function render_block_navigation( $content, $block ) {
  *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function build_navigation_html( $attributes, $block, $colors, $font_sizes ) {
+function core_block_navigation_build_html( $attributes, $block, $colors, $font_sizes ) {
 	$html            = '';
 	$classes         = array_merge(
 		$colors['css_classes'],
@@ -243,14 +243,14 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes ) {
 			) &&
 			$has_submenu
 		) {
-			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . render_submenu_icon() . '</span>';
+			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . core_block_navigation_render_submenu_icon() . '</span>';
 		}
 
 		$html .= '</a>';
 		// End anchor tag content.
 
 		if ( $has_submenu ) {
-			$html .= build_navigation_html( $attributes, $block, $colors, $font_sizes, false );
+			$html .= core_block_navigation_build_html( $attributes, $block, $colors, $font_sizes, false );
 		}
 
 		$html .= '</li>';
