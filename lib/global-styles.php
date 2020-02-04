@@ -75,6 +75,31 @@ function gutenberg_global_styles_get_from_cpt() {
 }
 
 /**
+ * Takes a Global Styles design tokens tree
+ * and returns the corresponding CSS rule
+ * that contains the CSS custom properties.
+ *
+ * @param array $global_styles Global Styles design tokens.
+ * @return string Resulting CSS rule.
+ */
+function gutenberg_global_styles_resolver( $global_styles ) {
+	$css_rule = '';
+
+	$css_vars = gutenberg_global_styles_get_css_vars( $global_styles, '--wp-' );
+	if ( empty( $css_vars ) ) {
+		return $css_rule;
+	}
+
+	$css_rule = ":root {\n";
+	foreach ( $css_vars as $var => $value ) {
+		$css_rule = "\t" . $var . ': ' . $value . ";\n";
+	}
+	$css_rule = '}';
+
+	return $css_rule;
+}
+
+/**
  * Fetches the Global Styles design tokens (defaults, theme, user),
  * and enqueues the resulting CSS custom properties if any.
  */
@@ -92,16 +117,10 @@ function gutenberg_global_styles_enqueue_assets() {
 		$user_global_styles,
 	);
 
-	$css_vars = gutenberg_global_styles_get_css_vars( $global_styles, '--wp-' );
-	if ( empty( $css_vars ) ) {
+	$inline_style = gutenberg_global_styles_resolver( $global_styles );
+	if ( empty ( $inline_style ) ) {
 		return;
 	}
-
-	$inline_style = ":root {\n";
-	foreach ( $css_vars as $var => $value ) {
-		$inline_style = "\t" . $var . ': ' . $value . ";\n";
-	}
-	$inline_style = '}';
 
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $inline_style );
