@@ -12,7 +12,7 @@ This repo is the development hub for the <a href="https://make.wordpress.org/cor
 - **Contribute:** Development of Gutenberg happens in this GitHub repo. Get started by <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">reading the contributor guidelines</a>.
 - **Learn:** <a href="https://wordpress.org/gutenberg/">Discover more about the project on WordPress.org</a>.
 
-**Gutenberg is more than an editor.** While the project is currently focused on building the new post editor for WordPress, it doesn't end there. Instead it lays the groundwork for a new model for WordPress Core that will ultimately impact the entire publishing experience.
+**Gutenberg is more than an editor.** The project lays the groundwork for a new model for WordPress Core that will ultimately impact the entire publishing experience.
 
 ## Editing focus
 
