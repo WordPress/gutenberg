@@ -21,7 +21,6 @@ export default function BlockToolbar() {
 		mode,
 		moverDirection,
 		hasMovers = true,
-		hasToolbar = true,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockMode,
@@ -49,13 +48,8 @@ export default function BlockToolbar() {
 				null,
 			moverDirection: __experimentalMoverDirection,
 			hasMovers: __experimentalUIParts.hasMovers,
-			hasToolbar: __experimentalUIParts.hasToolbar,
 		};
 	}, [] );
-
-	if ( ! hasToolbar ) {
-		return null;
-	}
 
 	if ( blockClientIds.length === 0 ) {
 		return null;
