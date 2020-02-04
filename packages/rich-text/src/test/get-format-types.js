@@ -42,7 +42,10 @@ describe( 'getFormatTypes', () => {
 			formatTestSetting: 'settingTestValue',
 		};
 		registerFormatType( 'core/test-format', testFormat );
-		registerFormatType( 'core/test-format-with-settings', testFormatWithSettings );
+		registerFormatType(
+			'core/test-format-with-settings',
+			testFormatWithSettings
+		);
 		expect( getFormatTypes() ).toEqual( [
 			{
 				name: 'core/test-format',

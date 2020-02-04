@@ -83,7 +83,7 @@ icon: 'book-alt',
 icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
 ```
 
-**Note:** Custom SVG icons are automatically wrapped in the [`wp.components.SVG` component](/packages/components/src/primitives/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
+**Note:** Custom SVG icons are automatically wrapped in the [`wp.primitives.SVG` component](/packages/primitives/src/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
 
@@ -652,4 +652,39 @@ By default all blocks can be converted to a reusable block. If supports reusable
 ```js
 // Don't allow the block to be converted into a reusable block.
 reusable: false,
+```
+
+## Block Collections
+
+## `registerBlockCollection`
+
+* **Type:** `Function`
+
+Blocks can be added to collections, grouping together all blocks from the same origin
+
+`registerBlockCollection` takes two parameters, `namespace` and an object of settings including `title` and `icon`.
+
+### Namespace
+
+* **Type:** `String`
+
+This should match the namespace declared in the block name; the name of your plugin or theme.
+
+### Settings
+
+#### Title
+
+* **Type:** `String`
+
+This will display in the block inserter section, which will list all blocks in this collection.
+
+#### Icon
+
+* **Type:** `Object`
+
+(Optional) An icon to display alongside the title in the block inserter.
+
+```js
+// Registering a block collection
+registerBlockCollection( 'my-plugin', { title: 'My Plugin' } );
 ```

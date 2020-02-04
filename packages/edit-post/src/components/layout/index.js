@@ -52,7 +52,9 @@ import WelcomeGuide from '../welcome-guide';
 
 function Layout() {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
-	const { closePublishSidebar, togglePublishSidebar } = useDispatch( 'core/edit-post' );
+	const { closePublishSidebar, togglePublishSidebar } = useDispatch(
+		'core/edit-post'
+	);
 	const {
 		mode,
 		isRichEditingEnabled,
@@ -65,21 +67,37 @@ function Layout() {
 		previousShortcut,
 		nextShortcut,
 	} = useSelect( ( select ) => {
-		return ( {
-			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-			editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-			pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
-			publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+		return {
+			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
+				'fixedToolbar'
+			),
+			editorSidebarOpened: select(
+				'core/edit-post'
+			).isEditorSidebarOpened(),
+			pluginSidebarOpened: select(
+				'core/edit-post'
+			).isPluginSidebarOpened(),
+			publishSidebarOpened: select(
+				'core/edit-post'
+			).isPublishSidebarOpened(),
 			mode: select( 'core/edit-post' ).getEditorMode(),
-			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+				.richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			previousShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/previous-region' ),
-			nextShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-		} );
+			previousShortcut: select(
+				'core/keyboard-shortcuts'
+			).getAllShortcutRawKeyCombinations(
+				'core/edit-post/previous-region'
+			),
+			nextShortcut: select(
+				'core/keyboard-shortcuts'
+			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
+		};
 	}, [] );
 	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
-	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
+	const sidebarIsOpened =
+		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
@@ -99,50 +117,66 @@ function Layout() {
 				<EditorRegions
 					className={ className }
 					header={ <Header /> }
-					sidebar={ ! publishSidebarOpened && (
-						<>
-							<SettingsSidebar />
-							<Sidebar.Slot />
-						</>
-					) }
+					sidebar={
+						! publishSidebarOpened && (
+							<>
+								<SettingsSidebar />
+								<Sidebar.Slot />
+							</>
+						)
+					}
 					content={
 						<>
 							<EditorNotices />
-							<Popover.Slot name="block-toolbar" />
-							{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
-							{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
+							{ ( mode === 'text' || ! isRichEditingEnabled ) && (
+								<TextEditor />
+							) }
+							{ isRichEditingEnabled && mode === 'visual' && (
+								<VisualEditor />
+							) }
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />
 								<MetaBoxes location="advanced" />
 							</div>
-							{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
+							{ isMobileViewport && sidebarIsOpened && (
+								<ScrollLock />
+							) }
 						</>
 					}
-					footer={ isRichEditingEnabled && mode === 'visual' && (
-						<div className="edit-post-layout__footer">
-							<BlockBreadcrumb />
-						</div>
-					) }
-					publish={ publishSidebarOpened ? (
-						<PostPublishPanel
-							onClose={ closePublishSidebar }
-							forceIsDirty={ hasActiveMetaboxes }
-							forceIsSaving={ isSaving }
-							PrePublishExtension={ PluginPrePublishPanel.Slot }
-							PostPublishExtension={ PluginPostPublishPanel.Slot }
-						/>
-					) : (
-						<div className="edit-post-toggle-publish-panel">
-							<Button
-								isSecondary
-								className="edit-post-toggle-publish-panel__button"
-								onClick={ togglePublishSidebar }
-								aria-expanded={ false }
-							>
-								{ __( 'Open publish panel' ) }
-							</Button>
-						</div>
-					) }
+					footer={
+						isRichEditingEnabled &&
+						mode === 'visual' && (
+							<div className="edit-post-layout__footer">
+								<BlockBreadcrumb />
+							</div>
+						)
+					}
+					publish={
+						publishSidebarOpened ? (
+							<PostPublishPanel
+								onClose={ closePublishSidebar }
+								forceIsDirty={ hasActiveMetaboxes }
+								forceIsSaving={ isSaving }
+								PrePublishExtension={
+									PluginPrePublishPanel.Slot
+								}
+								PostPublishExtension={
+									PluginPostPublishPanel.Slot
+								}
+							/>
+						) : (
+							<div className="edit-post-toggle-publish-panel">
+								<Button
+									isSecondary
+									className="edit-post-toggle-publish-panel__button"
+									onClick={ togglePublishSidebar }
+									aria-expanded={ false }
+								>
+									{ __( 'Open publish panel' ) }
+								</Button>
+							</div>
+						)
+					}
 					shortcuts={ {
 						previous: previousShortcut,
 						next: nextShortcut,
@@ -154,9 +188,10 @@ function Layout() {
 				<WelcomeGuide />
 				<Popover.Slot />
 				<PluginArea />
-				{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
+				{ showPageTemplatePicker && (
+					<__experimentalPageTemplatePicker />
+				) }
 			</FocusReturnProvider>
-
 		</>
 	);
 }

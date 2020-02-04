@@ -23,7 +23,9 @@ function RangeControl( {
 
 	const currentInputValue = currentInput === null ? value : currentInput;
 
-	const initialSliderValue = isFinite( currentInputValue ) ? currentInputValue : initialPosition;
+	const initialSliderValue = isFinite( currentInputValue )
+		? currentInputValue
+		: initialPosition;
 
 	return (
 		<RangeCell

@@ -112,11 +112,14 @@ export const SHIFT = 'shift';
  * - `shiftAlt`
  */
 export const modifiers = {
-	primary: ( _isApple ) => _isApple() ? [ COMMAND ] : [ CTRL ],
-	primaryShift: ( _isApple ) => _isApple() ? [ SHIFT, COMMAND ] : [ CTRL, SHIFT ],
-	primaryAlt: ( _isApple ) => _isApple() ? [ ALT, COMMAND ] : [ CTRL, ALT ],
-	secondary: ( _isApple ) => _isApple() ? [ SHIFT, ALT, COMMAND ] : [ CTRL, SHIFT, ALT ],
-	access: ( _isApple ) => _isApple() ? [ CTRL, ALT ] : [ SHIFT, ALT ],
+	primary: ( _isApple ) => ( _isApple() ? [ COMMAND ] : [ CTRL ] ),
+	primaryShift: ( _isApple ) =>
+		_isApple() ? [ SHIFT, COMMAND ] : [ CTRL, SHIFT ],
+	primaryAlt: ( _isApple ) =>
+		_isApple() ? [ ALT, COMMAND ] : [ CTRL, ALT ],
+	secondary: ( _isApple ) =>
+		_isApple() ? [ SHIFT, ALT, COMMAND ] : [ CTRL, SHIFT, ALT ],
+	access: ( _isApple ) => ( _isApple() ? [ CTRL, ALT ] : [ SHIFT, ALT ] ),
 	ctrl: () => [ CTRL ],
 	alt: () => [ ALT ],
 	ctrlShift: () => [ CTRL, SHIFT ],
@@ -154,15 +157,18 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 			[ SHIFT ]: isApple ? '⇧' : 'Shift',
 		};
 
-		const modifierKeys = modifier( _isApple ).reduce( ( accumulator, key ) => {
-			const replacementKey = get( replacementKeyMap, key, key );
-			// If on the Mac, adhere to platform convention and don't show plus between keys.
-			if ( isApple ) {
-				return [ ...accumulator, replacementKey ];
-			}
+		const modifierKeys = modifier( _isApple ).reduce(
+			( accumulator, key ) => {
+				const replacementKey = get( replacementKeyMap, key, key );
+				// If on the Mac, adhere to platform convention and don't show plus between keys.
+				if ( isApple ) {
+					return [ ...accumulator, replacementKey ];
+				}
 
-			return [ ...accumulator, replacementKey, '+' ];
-		}, [] );
+				return [ ...accumulator, replacementKey, '+' ];
+			},
+			[]
+		);
 
 		const capitalizedCharacter = capitalize( character );
 		return [ ...modifierKeys, capitalizedCharacter ];
@@ -176,9 +182,13 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
  * @type {WPKeycodeHandlerByModifier} Keyed map of functions to display
  *                                    shortcuts.
  */
-export const displayShortcut = mapValues( displayShortcutList, ( shortcutList ) => {
-	return ( character, _isApple = isAppleOS ) => shortcutList( character, _isApple ).join( '' );
-} );
+export const displayShortcut = mapValues(
+	displayShortcutList,
+	( shortcutList ) => {
+		return ( character, _isApple = isAppleOS ) =>
+			shortcutList( character, _isApple ).join( '' );
+	}
+);
 
 /**
  * An object that contains functions to return an aria label for a keyboard shortcut.

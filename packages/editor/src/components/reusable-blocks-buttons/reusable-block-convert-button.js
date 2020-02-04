@@ -26,7 +26,6 @@ export function ReusableBlockConvertButton( {
 		<>
 			{ ! isReusable && (
 				<MenuItem
-					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 					icon="controls-repeat"
 					onClick={ onConvertToReusable }
 				>
@@ -34,11 +33,7 @@ export function ReusableBlockConvertButton( {
 				</MenuItem>
 			) }
 			{ isReusable && (
-				<MenuItem
-					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-					icon="controls-repeat"
-					onClick={ onConvertToStatic }
-				>
+				<MenuItem icon="controls-repeat" onClick={ onConvertToStatic }>
 					{ __( 'Convert to Regular Block' ) }
 				</MenuItem>
 			) }
@@ -48,43 +43,39 @@ export function ReusableBlockConvertButton( {
 
 export default compose( [
 	withSelect( ( select, { clientIds } ) => {
-		const {
-			getBlocksByClientId,
-			canInsertBlockType,
-		} = select( 'core/block-editor' );
-		const {
-			__experimentalGetReusableBlock: getReusableBlock,
-		} = select( 'core/editor' );
+		const { getBlocksByClientId, canInsertBlockType } = select(
+			'core/block-editor'
+		);
+		const { __experimentalGetReusableBlock: getReusableBlock } = select(
+			'core/editor'
+		);
 		const { canUser } = select( 'core' );
 
 		const blocks = getBlocksByClientId( clientIds );
 
-		const isReusable = (
+		const isReusable =
 			blocks.length === 1 &&
 			blocks[ 0 ] &&
 			isReusableBlock( blocks[ 0 ] ) &&
-			!! getReusableBlock( blocks[ 0 ].attributes.ref )
-		);
+			!! getReusableBlock( blocks[ 0 ].attributes.ref );
 
 		// Show 'Convert to Regular Block' when selected block is a reusable block
-		const isVisible = isReusable || (
+		const isVisible =
+			isReusable ||
 			// Hide 'Add to Reusable blocks' when reusable blocks are disabled
-			canInsertBlockType( 'core/block' ) &&
-
-			every( blocks, ( block ) => (
-				// Guard against the case where a regular block has *just* been converted
-				!! block &&
-
-				// Hide 'Add to Reusable blocks' on invalid blocks
-				block.isValid &&
-
-				// Hide 'Add to Reusable blocks' when block doesn't support being made reusable
-				hasBlockSupport( block.name, 'reusable', true )
-			) ) &&
-
-			// Hide 'Add to Reusable blocks' when current doesn't have permission to do that
-			!! canUser( 'create', 'blocks' )
-		);
+			( canInsertBlockType( 'core/block' ) &&
+				every(
+					blocks,
+					( block ) =>
+						// Guard against the case where a regular block has *just* been converted
+						!! block &&
+						// Hide 'Add to Reusable blocks' on invalid blocks
+						block.isValid &&
+						// Hide 'Add to Reusable blocks' when block doesn't support being made reusable
+						hasBlockSupport( block.name, 'reusable', true )
+				) &&
+				// Hide 'Add to Reusable blocks' when current doesn't have permission to do that
+				!! canUser( 'create', 'blocks' ) );
 
 		return {
 			isReusable,

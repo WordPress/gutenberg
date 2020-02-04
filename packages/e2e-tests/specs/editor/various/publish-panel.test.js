@@ -14,7 +14,7 @@ import {
 describe( 'PostPublishPanel', () => {
 	let werePrePublishChecksEnabled;
 	beforeEach( async () => {
-		await createNewPost( );
+		await createNewPost();
 		werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
 		if ( ! werePrePublishChecksEnabled ) {
 			await enablePrePublishChecks();
@@ -31,10 +31,15 @@ describe( 'PostPublishPanel', () => {
 		await page.type( '.editor-post-title__input', 'E2E Test Post' );
 		await openPublishPanel();
 
-		const focusedElementClassList = await page.$eval( ':focus', ( focusedElement ) => {
-			return Object.values( focusedElement.classList );
-		} );
-		expect( focusedElementClassList ).toContain( 'editor-post-publish-button' );
+		const focusedElementClassList = await page.$eval(
+			':focus',
+			( focusedElement ) => {
+				return Object.values( focusedElement.classList );
+			}
+		);
+		expect( focusedElementClassList ).toContain(
+			'editor-post-publish-button'
+		);
 	} );
 
 	it( 'PostPublish: post link should have the focus', async () => {
@@ -42,12 +47,18 @@ describe( 'PostPublishPanel', () => {
 		await page.type( '.editor-post-title__input', postTitle );
 		await publishPost();
 
-		const focusedElementTag = await page.$eval( ':focus', ( focusedElement ) => {
-			return focusedElement.tagName.toLowerCase();
-		} );
-		const focusedElementText = await page.$eval( ':focus', ( focusedElement ) => {
-			return focusedElement.text;
-		} );
+		const focusedElementTag = await page.$eval(
+			':focus',
+			( focusedElement ) => {
+				return focusedElement.tagName.toLowerCase();
+			}
+		);
+		const focusedElementText = await page.$eval(
+			':focus',
+			( focusedElement ) => {
+				return focusedElement.text;
+			}
+		);
 		expect( focusedElementTag ).toBe( 'a' );
 		expect( focusedElementText ).toBe( postTitle );
 	} );
@@ -57,9 +68,14 @@ describe( 'PostPublishPanel', () => {
 		await openPublishPanel();
 		await pressKeyWithModifier( 'shift', 'Tab' );
 
-		const focusedElementClassList = await page.$eval( ':focus', ( focusedElement ) => {
-			return Object.values( focusedElement.classList );
-		} );
-		expect( focusedElementClassList ).toContain( 'components-checkbox-control__input' );
+		const focusedElementClassList = await page.$eval(
+			':focus',
+			( focusedElement ) => {
+				return Object.values( focusedElement.classList );
+			}
+		);
+		expect( focusedElementClassList ).toContain(
+			'components-checkbox-control__input'
+		);
 	} );
 } );

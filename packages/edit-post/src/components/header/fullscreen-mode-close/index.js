@@ -20,7 +20,9 @@ function FullscreenModeClose( { isActive, postType } ) {
 		<Toolbar className="edit-post-fullscreen-mode-close__toolbar">
 			<Button
 				icon="arrow-left-alt2"
-				href={ addQueryArgs( 'edit.php', { post_type: postType.slug } ) }
+				href={ addQueryArgs( 'edit.php', {
+					post_type: postType.slug,
+				} ) }
 				label={ get(
 					postType,
 					[ 'labels', 'view_items' ],

@@ -21,20 +21,20 @@ function InserterListItem( {
 	className,
 	...props
 } ) {
-	const itemIconStyle = icon ? {
-		backgroundColor: icon.background,
-		color: icon.foreground,
-	} : {};
+	const itemIconStyle = icon
+		? {
+				backgroundColor: icon.background,
+				color: icon.foreground,
+		  }
+		: {};
 
 	return (
 		<li className="block-editor-block-types-list__list-item">
 			<Button
-				className={
-					classnames(
-						'block-editor-block-types-list__item',
-						className
-					)
-				}
+				className={ classnames(
+					'block-editor-block-types-list__item',
+					className
+				) }
 				onClick={ ( event ) => {
 					event.preventDefault();
 					onClick();

@@ -1,14 +1,19 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { paragraph as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -24,7 +29,9 @@ export const settings = {
 	keywords: [ __( 'text' ) ],
 	example: {
 		attributes: {
-			content: __( 'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.' ),
+			content: __(
+				'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.'
+			),
 			customFontSize: 28,
 			dropCap: true,
 		},
@@ -33,11 +40,19 @@ export const settings = {
 		className: false,
 		__unstablePasteTextInline: true,
 	},
+	__experimentalLabel( attributes, { context } ) {
+		if ( context === 'accessibility' ) {
+			const { content } = attributes;
+			return isEmpty( content ) ? __( 'Empty' ) : content;
+		}
+	},
 	transforms,
 	deprecated,
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: ( attributes.content || '' ) + ( attributesToMerge.content || '' ),
+			content:
+				( attributes.content || '' ) +
+				( attributesToMerge.content || '' ),
 		};
 	},
 	getEditWrapperProps( attributes ) {

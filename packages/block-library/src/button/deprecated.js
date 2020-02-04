@@ -7,17 +7,23 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	RichText,
-	getColorClassName,
-} from '@wordpress/block-editor';
+import { RichText, getColorClassName } from '@wordpress/block-editor';
 
 const colorsMigration = ( attributes ) => {
-	return omit( {
-		...attributes,
-		customTextColor: attributes.textColor && '#' === attributes.textColor[ 0 ] ? attributes.textColor : undefined,
-		customBackgroundColor: attributes.color && '#' === attributes.color[ 0 ] ? attributes.color : undefined,
-	}, [ 'color', 'textColor' ] );
+	return omit(
+		{
+			...attributes,
+			customTextColor:
+				attributes.textColor && '#' === attributes.textColor[ 0 ]
+					? attributes.textColor
+					: undefined,
+			customBackgroundColor:
+				attributes.color && '#' === attributes.color[ 0 ]
+					? attributes.color
+					: undefined,
+		},
+		[ 'color', 'textColor' ]
+	);
 };
 
 const blockAttributes = {
@@ -77,12 +83,17 @@ const deprecated = [
 			},
 		},
 		isEligible( attribute ) {
-			return attribute.className && attribute.className.includes( 'is-style-squared' );
+			return (
+				attribute.className &&
+				attribute.className.includes( 'is-style-squared' )
+			);
 		},
 		migrate( attributes ) {
 			let newClassName = attributes.className;
 			if ( newClassName ) {
-				newClassName = newClassName.replace( /is-style-squared[\s]?/, '' ).trim();
+				newClassName = newClassName
+					.replace( /is-style-squared[\s]?/, '' )
+					.trim();
 			}
 			return {
 				...attributes,
@@ -104,7 +115,10 @@ const deprecated = [
 			} = attributes;
 
 			const textClass = getColorClassName( 'color', textColor );
-			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
 
 			const buttonClasses = classnames( 'wp-block-button__link', {
 				'has-text-color': textColor || customTextColor,
@@ -114,7 +128,9 @@ const deprecated = [
 			} );
 
 			const buttonStyle = {
-				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				backgroundColor: backgroundClass
+					? undefined
+					: customBackgroundColor,
 				color: textClass ? undefined : customTextColor,
 			};
 
@@ -166,7 +182,10 @@ const deprecated = [
 			} = attributes;
 
 			const textClass = getColorClassName( 'color', textColor );
-			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
 
 			const buttonClasses = classnames( 'wp-block-button__link', {
 				'has-text-color': textColor || customTextColor,
@@ -176,7 +195,9 @@ const deprecated = [
 			} );
 
 			const buttonStyle = {
-				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				backgroundColor: backgroundClass
+					? undefined
+					: customBackgroundColor,
 				color: textClass ? undefined : customTextColor,
 			};
 
@@ -252,7 +273,10 @@ const deprecated = [
 			const { url, text, title, align, color, textColor } = attributes;
 
 			return (
-				<div className={ `align${ align }` } style={ { backgroundColor: color } }>
+				<div
+					className={ `align${ align }` }
+					style={ { backgroundColor: color } }
+				>
 					<RichText.Content
 						tagName="a"
 						href={ url }

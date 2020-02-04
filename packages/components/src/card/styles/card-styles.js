@@ -4,9 +4,13 @@
 import styled from '@emotion/styled';
 
 /**
+ * WordPress dependencies
+ */
+import { HorizontalRule } from '@wordpress/primitives';
+
+/**
  * Internal dependencies
  */
-import { HorizontalRule } from '../../primitives';
 import { color } from '../../utils/colors';
 
 export const styleProps = {
@@ -18,33 +22,33 @@ export const styleProps = {
 const { borderColor, borderRadius, backgroundShady } = styleProps;
 
 export const CardUI = styled.div`
-	background: ${ color( 'white' ) };
+	background: ${color( 'white' )};
 	box-sizing: border-box;
-	border-radius: ${ borderRadius };
-	border: 1px solid ${ borderColor };
+	border-radius: ${borderRadius};
+	border: 1px solid ${borderColor};
 
-	${ handleBorderless };
+	${handleBorderless};
 
 	&.is-elevated {
-		box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
-			0px 1px 1px 0px rgba(0, 0, 0, 0.14),
-			0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+		box-shadow: 0px 1px 3px 0px rgba( 0, 0, 0, 0.2 ),
+			0px 1px 1px 0px rgba( 0, 0, 0, 0.14 ),
+			0px 2px 1px -1px rgba( 0, 0, 0, 0.12 );
 	}
 `;
 
 export const HeaderUI = styled.div`
-	border-bottom: 1px solid ${ borderColor };
-	border-top-left-radius: ${ borderRadius };
-	border-top-right-radius: ${ borderRadius };
+	border-bottom: 1px solid ${borderColor};
+	border-top-left-radius: ${borderRadius};
+	border-top-right-radius: ${borderRadius};
 	box-sizing: border-box;
 
 	&:last-child {
 		border-bottom: none;
 	}
 
-	${ headerFooterSizes };
-	${ handleBorderless };
-	${ handleShady };
+	${headerFooterSizes};
+	${handleBorderless};
+	${handleShady};
 `;
 
 export const MediaUI = styled.div`
@@ -60,41 +64,41 @@ export const MediaUI = styled.div`
 	}
 
 	&:first-of-type {
-		border-top-left-radius: ${ borderRadius };
-		border-top-right-radius: ${ borderRadius };
+		border-top-left-radius: ${borderRadius};
+		border-top-right-radius: ${borderRadius};
 	}
 
 	&:last-of-type {
-		border-bottom-left-radius: ${ borderRadius };
-		border-bottom-right-radius: ${ borderRadius };
+		border-bottom-left-radius: ${borderRadius};
+		border-bottom-right-radius: ${borderRadius};
 	}
 `;
 
 export const BodyUI = styled.div`
 	box-sizing: border-box;
 
-	${ bodySize };
-	${ handleShady };
+	${bodySize};
+	${handleShady};
 `;
 
 export const FooterUI = styled.div`
-	border-top: 1px solid ${ borderColor };
-	border-bottom-left-radius: ${ borderRadius };
-	border-bottom-right-radius: ${ borderRadius };
+	border-top: 1px solid ${borderColor};
+	border-bottom-left-radius: ${borderRadius};
+	border-bottom-right-radius: ${borderRadius};
 	box-sizing: border-box;
 
 	&:first-of-type {
 		border-top: none;
 	}
 
-	${ headerFooterSizes };
-	${ handleBorderless };
-	${ handleShady };
+	${headerFooterSizes};
+	${handleBorderless};
+	${handleShady};
 `;
 
 export const DividerUI = styled( HorizontalRule )`
 	all: unset;
-	border-top: 1px solid ${ borderColor };
+	border-top: 1px solid ${borderColor};
 	box-sizing: border-box;
 	display: block;
 	height: 0;

@@ -22,7 +22,9 @@ describe( 'Fullscreen Mode', () => {
 
 		expect( isFullscreenEnabled ).toBe( true );
 
-		const fullscreenToolbar = await page.$( '.edit-post-fullscreen-mode-close__toolbar' );
+		const fullscreenToolbar = await page.$(
+			'.edit-post-fullscreen-mode-close__toolbar'
+		);
 
 		expect( fullscreenToolbar ).not.toBeNull();
 	} );

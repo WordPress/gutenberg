@@ -25,19 +25,24 @@ class DatePicker extends Component {
 	}
 
 	/*
-	* Todo: We should remove this function ASAP.
-	* It is kept because focus is lost when we click on the previous and next month buttons.
-	* This focus loss closes the date picker popover.
-	* Ideally we should add an upstream commit on react-dates to fix this issue.
-	*/
+	 * Todo: We should remove this function ASAP.
+	 * It is kept because focus is lost when we click on the previous and next month buttons.
+	 * This focus loss closes the date picker popover.
+	 * Ideally we should add an upstream commit on react-dates to fix this issue.
+	 */
 	keepFocusInside() {
 		if ( ! this.nodeRef.current ) {
 			return;
 		}
 		// If focus was lost.
-		if ( ! document.activeElement || ! this.nodeRef.current.contains( document.activeElement ) ) {
+		if (
+			! document.activeElement ||
+			! this.nodeRef.current.contains( document.activeElement )
+		) {
 			// Retrieve the focus region div.
-			const focusRegion = this.nodeRef.current.querySelector( '.DayPicker_focusRegion' );
+			const focusRegion = this.nodeRef.current.querySelector(
+				'.DayPicker_focusRegion'
+			);
 			if ( ! focusRegion ) {
 				return;
 			}
@@ -80,10 +85,7 @@ class DatePicker extends Component {
 		const momentDate = this.getMomentDate( currentDate );
 
 		return (
-			<div
-				className="components-datetime__date"
-				ref={ this.nodeRef }
-			>
+			<div className="components-datetime__date" ref={ this.nodeRef }>
 				<DayPickerSingleDateController
 					date={ momentDate }
 					daySize={ 30 }
@@ -91,7 +93,9 @@ class DatePicker extends Component {
 					hideKeyboardShortcutsPanel
 					// This is a hack to force the calendar to update on month or year change
 					// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
-					key={ `datepicker-controller-${ momentDate ? momentDate.format( 'MM-YYYY' ) : 'null' }` }
+					key={ `datepicker-controller-${
+						momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
+					}` }
 					noBorder
 					numberOfMonths={ 1 }
 					onDateChange={ this.onChangeMoment }

@@ -11,6 +11,7 @@
 
 # Blocks
 /packages/block-library                         @Soean @ajitbohra @jorgefilipecosta @talldan
+/packages/block-library/src/gallery             @mkevins @pinarol
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
 
@@ -37,6 +38,7 @@
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @youknowriad @gziolo @ntwb @nerrad @ajitbohra
 /packages/browserslist-config                   @gziolo @ntwb @nerrad @ajitbohra
+/packages/create-block                          @gziolo
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/docgen                                @nosolosw
 /packages/e2e-test-utils                        @gziolo @ntwb @nerrad @ajitbohra

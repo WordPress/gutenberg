@@ -49,7 +49,9 @@ export default compose( [
 				event.preventDefault();
 
 				if ( event.type === 'copy' || event.type === 'cut' ) {
-					const blocks = getBlocksByClientId( selectedBlockClientIds );
+					const blocks = getBlocksByClientId(
+						selectedBlockClientIds
+					);
 					const serialized = serialize( blocks );
 
 					event.clipboardData.setData( 'text/plain', serialized );

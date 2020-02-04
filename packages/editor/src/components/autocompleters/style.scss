@@ -5,6 +5,14 @@
 }
 
 .editor-autocompleters__user {
+	.editor-autocompleters__no-avatar::before {
+		/* stylelint-disable */
+		font: normal 20px/1 dashicons;
+		/* stylelint-enable */
+		content: "\f110";
+		margin-right: 5px;
+		vertical-align: middle;
+	}
 	.editor-autocompleters__user-avatar {
 		margin-right: 8px;
 		flex-grow: 0;

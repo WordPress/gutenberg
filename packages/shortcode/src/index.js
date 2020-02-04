@@ -90,7 +90,16 @@ export function next( tag, text, index = 0 ) {
  * @return {string} Text with shortcodes replaced.
  */
 export function replace( tag, text, callback ) {
-	return text.replace( regexp( tag ), function( match, left, $3, attrs, slash, content, closing, right ) {
+	return text.replace( regexp( tag ), function(
+		match,
+		left,
+		$3,
+		attrs,
+		slash,
+		content,
+		closing,
+		right
+	) {
 		// If both extra brackets exist, the shortcode has been properly
 		// escaped.
 		if ( left === '[' && right === ']' ) {
@@ -144,7 +153,12 @@ export function string( options ) {
  * @return {RegExp} Shortcode RegExp.
  */
 export function regexp( tag ) {
-	return new RegExp( '\\[(\\[?)(' + tag + ')(?![\\w-])([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*(?:\\[(?!\\/\\2\\])[^\\[]*)*)(\\[\\/\\2\\]))?)(\\]?)', 'g' );
+	return new RegExp(
+		'\\[(\\[?)(' +
+			tag +
+			')(?![\\w-])([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*(?:\\[(?!\\/\\2\\])[^\\[]*)*)(\\[\\/\\2\\]))?)(\\]?)',
+		'g'
+	);
 }
 
 /**
@@ -251,44 +265,51 @@ export function fromMatch( match ) {
  *
  * @return {WPShortcode} Shortcode instance.
  */
-const shortcode = extend( function( options ) {
-	extend( this, pick( options || {}, 'tag', 'attrs', 'type', 'content' ) );
+const shortcode = extend(
+	function( options ) {
+		extend(
+			this,
+			pick( options || {}, 'tag', 'attrs', 'type', 'content' )
+		);
 
-	const attributes = this.attrs;
+		const attributes = this.attrs;
 
-	// Ensure we have a correctly formatted `attrs` object.
-	this.attrs = {
-		named: {},
-		numeric: [],
-	};
+		// Ensure we have a correctly formatted `attrs` object.
+		this.attrs = {
+			named: {},
+			numeric: [],
+		};
 
-	if ( ! attributes ) {
-		return;
+		if ( ! attributes ) {
+			return;
+		}
+
+		// Parse a string of attributes.
+		if ( isString( attributes ) ) {
+			this.attrs = attrs( attributes );
+			// Identify a correctly formatted `attrs` object.
+		} else if (
+			isEqual( Object.keys( attributes ), [ 'named', 'numeric' ] )
+		) {
+			this.attrs = attributes;
+			// Handle a flat object of attributes.
+		} else {
+			forEach( attributes, ( value, key ) => {
+				this.set( key, value );
+			} );
+		}
+	},
+	{
+		next,
+		replace,
+		string,
+		regexp,
+		attrs,
+		fromMatch,
 	}
-
-	// Parse a string of attributes.
-	if ( isString( attributes ) ) {
-		this.attrs = attrs( attributes );
-	// Identify a correctly formatted `attrs` object.
-	} else if ( isEqual( Object.keys( attributes ), [ 'named', 'numeric' ] ) ) {
-		this.attrs = attributes;
-	// Handle a flat object of attributes.
-	} else {
-		forEach( attributes, ( value, key ) => {
-			this.set( key, value );
-		} );
-	}
-}, {
-	next,
-	replace,
-	string,
-	regexp,
-	attrs,
-	fromMatch,
-} );
+);
 
 extend( shortcode.prototype, {
-
 	/**
 	 * Get a shortcode attribute.
 	 *
@@ -357,7 +378,6 @@ extend( shortcode.prototype, {
 		// Add the closing tag.
 		return text + '[/' + this.tag + ']';
 	},
-
 } );
 
 export default shortcode;

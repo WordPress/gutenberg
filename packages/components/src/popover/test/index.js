@@ -65,9 +65,14 @@ describe( 'Popover', () => {
 	it( 'should render content', () => {
 		let wrapper;
 		TestUtils.act( () => {
-			wrapper = TestUtils.renderIntoDocument( <PopoverWrapper>Hello</PopoverWrapper> );
+			wrapper = TestUtils.renderIntoDocument(
+				<PopoverWrapper>Hello</PopoverWrapper>
+			);
 		} );
-		const content = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'span' );
+		const content = TestUtils.findRenderedDOMComponentWithTag(
+			wrapper,
+			'span'
+		);
 
 		expect( content ).toMatchSnapshot();
 	} );
@@ -75,9 +80,14 @@ describe( 'Popover', () => {
 	it( 'should pass additional props to portaled element', () => {
 		let wrapper;
 		TestUtils.act( () => {
-			wrapper = TestUtils.renderIntoDocument( <PopoverWrapper role="tooltip">Hello</PopoverWrapper> );
+			wrapper = TestUtils.renderIntoDocument(
+				<PopoverWrapper role="tooltip">Hello</PopoverWrapper>
+			);
 		} );
-		const content = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'span' );
+		const content = TestUtils.findRenderedDOMComponentWithTag(
+			wrapper,
+			'span'
+		);
 
 		expect( content ).toMatchSnapshot();
 	} );

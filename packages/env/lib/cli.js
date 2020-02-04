@@ -28,9 +28,9 @@ const withSpinner = ( command ) => ( ...args ) => {
 		( message ) => {
 			time = process.hrtime( time );
 			spinner.succeed(
-				`${ message || spinner.text } (in ${ time[ 0 ] }s ${ ( time[ 1 ] / 1e6 ).toFixed(
-					0
-				) }ms)`
+				`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
+					time[ 1 ] / 1e6
+				).toFixed( 0 ) }ms)`
 			);
 		},
 		( err ) => {

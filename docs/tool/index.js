@@ -18,4 +18,7 @@ const manifestOutput = path.resolve( __dirname, '../manifest-devhub.json' );
 execFileSync( 'node', [ join( __dirname, 'update-data.js' ) ] );
 
 // Process TOC file and generate manifest handbook
-fs.writeFileSync( manifestOutput, JSON.stringify( getRootManifest( tocFileInput ), undefined, '\t' ) );
+fs.writeFileSync(
+	manifestOutput,
+	JSON.stringify( getRootManifest( tocFileInput ), undefined, '\t' )
+);

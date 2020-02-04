@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	PanelBody,
-	SelectControl,
-	ToggleControl,
-} from '@wordpress/components';
+import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
 
 export default function FileBlockInspector( {

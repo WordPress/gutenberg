@@ -3,7 +3,9 @@
  */
 import { createSlotFill } from '@wordpress/components';
 
-const { Fill: __experimentalBlockListFooter, Slot } = createSlotFill( '__experimentalBlockListFooter' );
+const { Fill: __experimentalBlockListFooter, Slot } = createSlotFill(
+	'__experimentalBlockListFooter'
+);
 
 __experimentalBlockListFooter.Slot = Slot;
 

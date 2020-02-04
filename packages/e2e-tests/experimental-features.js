@@ -10,14 +10,16 @@ async function setExperimentalFeaturesState( features, enable ) {
 	} );
 	await visitAdminPage( '/admin.php', query );
 
-	await Promise.all( features.map( async ( feature ) => {
-		await page.waitForSelector( feature );
-		const checkedSelector = `${ feature }[checked=checked]`;
-		const isChecked = !! ( await page.$( checkedSelector ) );
-		if ( ( ! isChecked && enable ) || ( isChecked && ! enable ) ) {
-			await page.click( feature );
-		}
-	} ) );
+	await Promise.all(
+		features.map( async ( feature ) => {
+			await page.waitForSelector( feature );
+			const checkedSelector = `${ feature }[checked=checked]`;
+			const isChecked = !! ( await page.$( checkedSelector ) );
+			if ( ( ! isChecked && enable ) || ( isChecked && ! enable ) ) {
+				await page.click( feature );
+			}
+		} )
+	);
 	await Promise.all( [
 		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
 		page.click( '#submit' ),

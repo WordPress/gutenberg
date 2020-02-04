@@ -25,9 +25,13 @@ class BottomSheetStepperCell extends Component {
 
 		this.announceValue = this.announceValue.bind( this );
 		this.onDecrementValue = this.onDecrementValue.bind( this );
-		this.onDecrementValuePressIn = this.onDecrementValuePressIn.bind( this );
+		this.onDecrementValuePressIn = this.onDecrementValuePressIn.bind(
+			this
+		);
 		this.onIncrementValue = this.onIncrementValue.bind( this );
-		this.onIncrementValuePressIn = this.onIncrementValuePressIn.bind( this );
+		this.onIncrementValuePressIn = this.onIncrementValuePressIn.bind(
+			this
+		);
 		this.onPressOut = this.onPressOut.bind( this );
 		this.startPressInterval = this.startPressInterval.bind( this );
 	}
@@ -93,23 +97,34 @@ class BottomSheetStepperCell extends Component {
 	announceValue( value ) {
 		const { label } = this.props;
 
-		if ( Platform.OS === 'ios' ) { // On Android it triggers the accessibilityLabel with the value change
+		if ( Platform.OS === 'ios' ) {
+			// On Android it triggers the accessibilityLabel with the value change
 			clearTimeout( this.timeoutAnnounceValue );
 			this.timeoutAnnounceValue = setTimeout( () => {
-				AccessibilityInfo.announceForAccessibility( `${ value } ${ label }` );
+				AccessibilityInfo.announceForAccessibility(
+					`${ value } ${ label }`
+				);
 			}, 300 );
 		}
 	}
 
 	render() {
-		const { label, icon, minValue, maxValue, value, separatorType } = this.props;
+		const {
+			label,
+			icon,
+			minValue,
+			maxValue,
+			value,
+			separatorType,
+		} = this.props;
 		const isMinValue = value === minValue;
 		const isMaxValue = value === maxValue;
 
 		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
 			__( '%1$s. Current value is %2$s' ),
-			label, value
+			label,
+			value
 		);
 
 		return (
@@ -130,7 +145,8 @@ class BottomSheetStepperCell extends Component {
 							this.onDecrementValue();
 							break;
 					}
-				} }>
+				} }
+			>
 				<Cell
 					accessibilityRole="none"
 					accessible={ false }

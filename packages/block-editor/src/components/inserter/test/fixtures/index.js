@@ -7,6 +7,13 @@ export const categories = [
 	{ slug: 'reusable', title: 'Reusable blocks' },
 ];
 
+export const collections = {
+	core: {
+		icon: undefined,
+		title: 'Core',
+	},
+};
+
 export const textItem = {
 	id: 'core/text-block',
 	name: 'core/text-block',
@@ -15,6 +22,30 @@ export const textItem = {
 	category: 'common',
 	isDisabled: false,
 	utility: 1,
+};
+
+export const withVariationsItem = {
+	id: 'core/block-with-variations',
+	name: 'core/block-with-variations',
+	initialAttributes: {},
+	title: 'With Variations',
+	category: 'widgets',
+	isDisabled: false,
+	utility: 0,
+	variations: [
+		{
+			name: 'variation-one',
+			title: 'Variation One',
+		},
+		{
+			name: 'variation-two',
+			title: 'Variation Two',
+		},
+		{
+			name: 'variation-three',
+			title: 'Variation Three',
+		},
+	],
 };
 
 export const advancedTextItem = {
@@ -80,6 +111,7 @@ export const reusableItem = {
 
 export default [
 	textItem,
+	withVariationsItem,
 	advancedTextItem,
 	someOtherItem,
 	moreItem,

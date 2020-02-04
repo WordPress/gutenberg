@@ -27,6 +27,7 @@
 		background: $white;
 		padding: 6px 8px;
 		height: $icon-button-size-small;
+		max-width: 100%;
 
 		&:focus {
 			box-shadow: none;

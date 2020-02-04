@@ -3,15 +3,9 @@
  */
 import DropdownMenu from '../dropdown-menu';
 
-function ToolbarGroupCollapsed( { controls = [], className, icon, label } ) {
+function ToolbarGroupCollapsed( { controls = [], ...props } ) {
 	return (
-		<DropdownMenu
-			hasArrowIndicator
-			icon={ icon }
-			label={ label }
-			controls={ controls }
-			className={ className }
-		/>
+		<DropdownMenu hasArrowIndicator controls={ controls } { ...props } />
 	);
 }
 

@@ -8,9 +8,7 @@ import {
 	BlockControls,
 	RichTextShortcut,
 } from '@wordpress/block-editor';
-import {
-	ToolbarGroup,
-} from '@wordpress/components';
+import { ToolbarGroup } from '@wordpress/components';
 import {
 	__unstableCanIndentListItems as canIndentListItems,
 	__unstableCanOutdentListItems as canOutdentListItems,
@@ -38,38 +36,44 @@ export default function ListEdit( {
 	const { ordered, values, type, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
-	const controls = ( { value, onChange } ) => (
+	const controls = ( { value, onChange, onFocus } ) => (
 		<>
-			{ ( isSelected && <>
-				<RichTextShortcut
-					type="primary"
-					character="["
-					onUse={ () => {
-						onChange( outdentListItems( value ) );
-					} }
-				/>
-				<RichTextShortcut
-					type="primary"
-					character="]"
-					onUse={ () => {
-						onChange( indentListItems( value, { type: tagName } ) );
-					} }
-				/>
-				<RichTextShortcut
-					type="primary"
-					character="m"
-					onUse={ () => {
-						onChange( indentListItems( value, { type: tagName } ) );
-					} }
-				/>
-				<RichTextShortcut
-					type="primaryShift"
-					character="m"
-					onUse={ () => {
-						onChange( outdentListItems( value ) );
-					} }
-				/>
-			</> ) }
+			{ isSelected && (
+				<>
+					<RichTextShortcut
+						type="primary"
+						character="["
+						onUse={ () => {
+							onChange( outdentListItems( value ) );
+						} }
+					/>
+					<RichTextShortcut
+						type="primary"
+						character="]"
+						onUse={ () => {
+							onChange(
+								indentListItems( value, { type: tagName } )
+							);
+						} }
+					/>
+					<RichTextShortcut
+						type="primary"
+						character="m"
+						onUse={ () => {
+							onChange(
+								indentListItems( value, { type: tagName } )
+							);
+						} }
+					/>
+					<RichTextShortcut
+						type="primaryShift"
+						character="m"
+						onUse={ () => {
+							onChange( outdentListItems( value ) );
+						} }
+					/>
+				</>
+			) }
 			<BlockControls>
 				<ToolbarGroup
 					controls={ [
@@ -78,7 +82,10 @@ export default function ListEdit( {
 							title: __( 'Convert to unordered list' ),
 							isActive: isActiveListType( value, 'ul', tagName ),
 							onClick() {
-								onChange( changeListType( value, { type: 'ul' } ) );
+								onChange(
+									changeListType( value, { type: 'ul' } )
+								);
+								onFocus();
 
 								if ( isListRootSelected( value ) ) {
 									setAttributes( { ordered: false } );
@@ -90,7 +97,10 @@ export default function ListEdit( {
 							title: __( 'Convert to ordered list' ),
 							isActive: isActiveListType( value, 'ol', tagName ),
 							onClick() {
-								onChange( changeListType( value, { type: 'ol' } ) );
+								onChange(
+									changeListType( value, { type: 'ol' } )
+								);
+								onFocus();
 
 								if ( isListRootSelected( value ) ) {
 									setAttributes( { ordered: true } );
@@ -104,6 +114,7 @@ export default function ListEdit( {
 							isDisabled: ! canOutdentListItems( value ),
 							onClick() {
 								onChange( outdentListItems( value ) );
+								onFocus();
 							},
 						},
 						{
@@ -112,7 +123,10 @@ export default function ListEdit( {
 							shortcut: _x( 'Space', 'keyboard key' ),
 							isDisabled: ! canIndentListItems( value ),
 							onClick() {
-								onChange( indentListItems( value, { type: tagName } ) );
+								onChange(
+									indentListItems( value, { type: tagName } )
+								);
+								onFocus();
 							},
 						},
 					] }
@@ -121,32 +135,41 @@ export default function ListEdit( {
 		</>
 	);
 
-	return <>
-		<RichText
-			identifier="values"
-			multiline="li"
-			tagName={ tagName }
-			onChange={ ( nextValues ) => setAttributes( { values: nextValues } ) }
-			value={ values }
-			className={ className }
-			placeholder={ __( 'Write list…' ) }
-			onMerge={ mergeBlocks }
-			onSplit={ ( value ) => createBlock( name, { ...attributes, values: value } ) }
-			__unstableOnSplitMiddle={ () => createBlock( 'core/paragraph' ) }
-			onReplace={ onReplace }
-			onRemove={ () => onReplace( [] ) }
-			start={ start }
-			reversed={ reversed }
-			type={ type }
-		>
-			{ controls }
-		</RichText>
-		{ ordered && (
-			<OrderedListSettings
-				setAttributes={ setAttributes }
-				ordered={ ordered }
-				reversed={ reversed }
+	return (
+		<>
+			<RichText
+				identifier="values"
+				multiline="li"
+				tagName={ tagName }
+				onChange={ ( nextValues ) =>
+					setAttributes( { values: nextValues } )
+				}
+				value={ values }
+				className={ className }
+				placeholder={ __( 'Write list…' ) }
+				onMerge={ mergeBlocks }
+				onSplit={ ( value ) =>
+					createBlock( name, { ...attributes, values: value } )
+				}
+				__unstableOnSplitMiddle={ () =>
+					createBlock( 'core/paragraph' )
+				}
+				onReplace={ onReplace }
+				onRemove={ () => onReplace( [] ) }
 				start={ start }
-			/> ) }
-	</>;
+				reversed={ reversed }
+				type={ type }
+			>
+				{ controls }
+			</RichText>
+			{ ordered && (
+				<OrderedListSettings
+					setAttributes={ setAttributes }
+					ordered={ ordered }
+					reversed={ reversed }
+					start={ start }
+				/>
+			) }
+		</>
+	);
 }
