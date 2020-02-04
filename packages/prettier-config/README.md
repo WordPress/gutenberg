@@ -7,7 +7,7 @@ WordPress Prettier shareable config for [Prettier](https://prettier.io).
 Install the module
 
 ```shell
-$ npm install @wordpress/Prettier-config --save-dev
+$ npm install @wordpress/prettier-config --save-dev
 ```
 
 ## Usage
