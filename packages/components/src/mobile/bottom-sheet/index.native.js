@@ -106,7 +106,9 @@ class BottomSheet extends Component {
 		if ( width > height ) {
 			this.setState( { maxHeight: 0.9 * height } );
 			//	On vertical mode `maxHeight` has to be set on 50% of width
-		} else this.setState( { maxHeight: height / 2 - safeAreaBottomInset } );
+		} else {
+			this.setState( { maxHeight: height / 2 - safeAreaBottomInset } );
+		}
 	}
 
 	render() {
@@ -196,6 +198,7 @@ class BottomSheet extends Component {
 					<View style={ styles.dragIndicator } />
 					{ ! hideHeader && getHeader() }
 					<ScrollView
+						accessible={ false }
 						bounces={ this.state.bounces }
 						onScroll={ this.onScroll }
 						scrollEventThrottle={ 16 }

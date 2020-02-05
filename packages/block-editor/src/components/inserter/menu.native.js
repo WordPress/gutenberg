@@ -126,7 +126,7 @@ export class InserterMenu extends Component {
 				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
 			>
-				<TouchableHighlight>
+				<TouchableHighlight accessible={ false } >
 					<FlatList
 						onLayout={ this.onLayout }
 						scrollEnabled={ false }
