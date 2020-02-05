@@ -115,11 +115,17 @@ export default compose(
 					return columnWidth;
 				} );
 				// Check if sum of all column widths exceeds 100. (We are using 'fr' units but treating them as percentages.)
-				const resetAdjacentColumns = columnWidths.reduce( ( total, columnWidth ) => total + columnWidth ) > 100;
+				const resetAdjacentColumns =
+					columnWidths.reduce(
+						( total, columnWidth ) => total + columnWidth
+					) > 100;
 
 				// If total widths exceed 100, reset adjacent column widths.
 				columns.forEach( ( column ) => {
-					if ( ( resetAdjacentColumns || ! column.attributes.width ) && column.clientId !== clientId ) {
+					if (
+						( resetAdjacentColumns || ! column.attributes.width ) &&
+						column.clientId !== clientId
+					) {
 						updateBlockAttributes( column.clientId, { width: '' } );
 					}
 				} );
