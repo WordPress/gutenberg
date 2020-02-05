@@ -364,16 +364,12 @@ function LinkControl( {
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				{ isInitialSuggestions ? (
-					SearchResultsLabel
-				) : (
-					<VisuallyHidden>{ SearchResultsLabel }</VisuallyHidden>
-				) }
-
+				{ isInitialSuggestions && SearchResultsLabel }
 				<div
 					{ ...suggestionsListProps }
 					className={ resultsListClasses }
-					aria-labelledby={ searchResultsLabelId }
+					aria-label={ ariaLabel } // will only be present if there is no visible label
+					aria-labelledby={ searchResultsLabelId } // references the visible label, if there is one
 				>
 					{ suggestions.map( ( suggestion, index ) => {
 						if (
