@@ -22,7 +22,9 @@ export const settings = {
 		html: false,
 	},
 	edit,
-	description: __( 'Create a link to the wider Web' ),
+	description: __(
+		'Display an icon linking to a social media profile or website.'
+	),
 	variations,
 	deprecated: [
 		{
