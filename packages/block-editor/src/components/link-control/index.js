@@ -432,7 +432,7 @@ function LinkControl( {
 		>
 			{ isResolvingLink && (
 				<div className="block-editor-link-control__loading">
-					<Spinner /> { __( 'Creating Page' ) }
+					<Spinner /> { __( 'Creating' ) }…
 				</div>
 			) }
 
