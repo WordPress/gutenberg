@@ -30,7 +30,6 @@ import { focus } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
@@ -148,10 +147,6 @@ function LinkControl( {
 	 */
 	const onInputChange = ( val = '' ) => {
 		setInputValue( val );
-	};
-
-	const resetInput = () => {
-		setInputValue( '' );
 	};
 
 	const handleDirectEntry = ( val ) => {
@@ -308,15 +303,16 @@ function LinkControl( {
 		>
 			{ isEditingLink || ! value ? (
 				<LinkControlSearchInput
-					value={ inputValue }
+					inputValue={ inputValue }
+					value={ value }
 					onChange={ onInputChange }
-					onSelect={ ( suggestion ) => {
-						onChange( { ...value, ...suggestion } );
+					onSelect={ ( nextValue ) => {
+						onChange( nextValue );
 						stopEditing();
 					} }
+					settings={ settings }
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
-					onReset={ resetInput }
 					showInitialSuggestions={ showInitialSuggestions }
 				/>
 			) : (
@@ -359,11 +355,6 @@ function LinkControl( {
 							{ __( 'Edit' ) }
 						</Button>
 					</div>
-					<LinkControlSettingsDrawer
-						value={ value }
-						settings={ settings }
-						onChange={ onChange }
-					/>
 				</Fragment>
 			) }
 		</div>

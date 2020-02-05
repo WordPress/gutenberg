@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToggleControl } from '@wordpress/components';
+import { CheckboxControl } from '@wordpress/components';
 
 const defaultSettings = [
 	{
@@ -33,7 +33,7 @@ const LinkControlSettingsDrawer = ( {
 	};
 
 	const theSettings = settings.map( ( setting ) => (
-		<ToggleControl
+		<CheckboxControl
 			className="block-editor-link-control__setting"
 			key={ setting.id }
 			label={ setting.title }
