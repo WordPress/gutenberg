@@ -728,7 +728,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		); //title
 	} );
 
-	describe( 'No create option', () => {
+	describe( 'Do not show create option', () => {
 		it.each( [ [ undefined ], [ null ], [ false ] ] )(
 			'should not show not show an option to create an entity when "createEntity" handler is %s',
 			async ( handler ) => {
@@ -796,39 +796,53 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			expect( createButton ).toBeFalsy(); // shouldn't exist!
 		} );
 
-		// it.each( [
-		// 	'https://wordpress.org',
-		// 	'www.wordpress.org',
-		// 	'mailto:example123456@wordpress.org',
-		// 	'tel:example123456@wordpress.org',
-		// 	'#internal-anchor',
-		// ] )( 'should not show option to "Create Page" when text is a form of direct entry (eg: %s)', async ( inputText ) => {
-		// 	act( () => {
-		// 		render(
-		// 			<LinkControl
-		// 				showCreateEntity={ true }
-		// 				createEntity={ jest.fn() }
-		// 			/>, container
-		// 		);
-		// 	} );
+		it.each( [
+			'https://wordpress.org',
+			'www.wordpress.org',
+			'mailto:example123456@wordpress.org',
+			'tel:example123456@wordpress.org',
+			'#internal-anchor',
+		] )(
+			'should not show option to "Create Page" when text is a form of direct entry (eg: %s)',
+			async ( inputText ) => {
+				act( () => {
+					render(
+						<LinkControl
+							showCreateEntity={ true }
+							createEntity={ jest.fn() }
+						/>,
+						container
+					);
+				} );
 
-		// 	// Search Input UI
-		// 	const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+				// Search Input UI
+				const searchInput = container.querySelector(
+					'input[aria-label="URL"]'
+				);
 
-		// 	// Simulate searching for a term
-		// 	act( () => {
-		// 		Simulate.change( searchInput, { target: { value: inputText } } );
-		// 	} );
+				// Simulate searching for a term
+				act( () => {
+					Simulate.change( searchInput, {
+						target: { value: inputText },
+					} );
+				} );
 
-		// 	await eventLoopTick();
+				await eventLoopTick();
 
-		// 	// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		// 	const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+				const searchResultElements = container.querySelectorAll(
+					'[role="listbox"] [role="option"]'
+				);
 
-		// 	const createButton = Array.from( searchResultElements ).filter( ( result ) => result.innerHTML.includes( 'Create new' ) );
+				const createButton = Array.from(
+					searchResultElements
+				).filter( ( result ) =>
+					result.innerHTML.includes( 'Create new' )
+				);
 
-		// 	expect( createButton ).toBeNull();
-		// } );
+				expect( createButton ).toBeNull();
+			}
+		);
 	} );
 
 	describe( 'Error handling', () => {
