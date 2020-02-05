@@ -18,7 +18,9 @@ const transforms = {
 				createBlock(
 					name,
 					{},
-					props.map( ( prop ) => createBlock( 'core/button', prop ) )
+					props.map( ( singleProps ) =>
+						createBlock( 'core/button', singleProps )
+					)
 				),
 		},
 	],
