@@ -120,7 +120,7 @@ class EditorProvider extends Component {
 				'__experimentalEnableFullSiteEditingDemo',
 				'__mobileEnablePageTemplates',
 				'__experimentalEnablePageTemplates',
-				'__experimentalGlobalStylesUserEntityID',
+				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBase',
 				'showInserterHelpPanel',
 				'gradients',
