@@ -27,21 +27,21 @@ export const settings = {
 			{
 				name: 'core/social-link',
 				attributes: {
-					type: 'wordpress',
+					site: 'wordpress',
 					url: 'https://wordpress.org',
 				},
 			},
 			{
 				name: 'core/social-link',
 				attributes: {
-					type: 'facebook',
+					site: 'facebook',
 					url: 'https://www.facebook.com/WordPress/',
 				},
 			},
 			{
 				name: 'core/social-link',
 				attributes: {
-					type: 'twitter',
+					site: 'twitter',
 					url: 'https://twitter.com/WordPress',
 				},
 			},
