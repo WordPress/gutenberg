@@ -63,7 +63,11 @@ function ColumnsEditContainer( {
 		BackgroundColor,
 		InspectorControlsColorPanel,
 	} = __experimentalUseColors( [
-		{ name: 'backgroundColor', className: 'has-background' },
+		{
+			name: 'backgroundColor',
+			className: 'has-background',
+			label: __( 'Background Color' ),
+		},
 	] );
 
 	const classes = classnames( className, {

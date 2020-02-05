@@ -296,9 +296,8 @@ export default function __experimentalUseColors(
 				name, // E.g. 'backgroundColor'.
 				property = name, // E.g. 'backgroundColor'.
 				className,
-
-				panelLabel = startCase( name ), // E.g. 'Background Color'.
-				componentName = panelLabel.replace( /\s/g, '' ), // E.g. 'BackgroundColor'.
+				label,
+				componentName = startCase( name ).replace( /\s/g, '' ), // E.g. 'BackgroundColor'.
 
 				color = colorConfig.color,
 				colors = settingsColors,
@@ -333,7 +332,7 @@ export default function __experimentalUseColors(
 					? _color.color
 					: attributes[ camelCase( `custom ${ name }` ) ],
 				onChange: acc[ componentName ].setColor,
-				label: panelLabel,
+				label,
 				colors,
 			};
 			// These settings will be spread over the `colors` in

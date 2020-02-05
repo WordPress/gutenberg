@@ -5,6 +5,7 @@ import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { InnerBlocks, __experimentalUseColors } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 function GroupEdit( { hasInnerBlocks } ) {
 	const ref = useRef();
@@ -14,8 +15,16 @@ function GroupEdit( { hasInnerBlocks } ) {
 		InspectorControlsColorPanel,
 	} = __experimentalUseColors(
 		[
-			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'has-background' },
+			{
+				name: 'textColor',
+				property: 'color',
+				label: __( 'Text Color' ),
+			},
+			{
+				name: 'backgroundColor',
+				className: 'has-background',
+				label: __( 'Background Color' ),
+			},
 		],
 		{
 			contrastCheckers: { backgroundColor: true, textColor: true },

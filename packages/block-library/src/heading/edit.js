@@ -32,7 +32,7 @@ function HeadingEdit( {
 } ) {
 	const ref = useRef();
 	const { TextColor, InspectorControlsColorPanel } = __experimentalUseColors(
-		[ { name: 'textColor', property: 'color' } ],
+		[ { name: 'textColor', property: 'color', label: __( 'Text Color' ) } ],
 		{
 			contrastCheckers: { backgroundColor: true, textColor: true },
 			colorDetector: { targetRef: ref },

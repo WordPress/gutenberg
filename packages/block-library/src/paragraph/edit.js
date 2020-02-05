@@ -92,8 +92,12 @@ function ParagraphBlock( {
 		InspectorControlsColorPanel,
 	} = __experimentalUseColors(
 		[
-			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'has-background' },
+			{ name: 'textColor', property: 'color', label: __( 'Text Color' ) },
+			{
+				name: 'backgroundColor',
+				className: 'has-background',
+				label: __( 'Background Color' ),
+			},
 		],
 		{
 			contrastCheckers: [
