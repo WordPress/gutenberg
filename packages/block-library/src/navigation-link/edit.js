@@ -310,29 +310,29 @@ export default compose( [
 		const rootBlock = head(
 			getBlockParentsByBlockName( clientId, 'core/navigation' )
 		);
-		const navBlockAttrs = getBlockAttributes( rootBlock );
+		const navigationBlockAttributes = getBlockAttributes( rootBlock );
 		const colors = get( getSettings(), 'colors', [] );
 		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
 			.length;
 		const showSubmenuIcon =
-			!! navBlockAttrs.showSubmenuIcon && hasDescendants;
+			!! navigationBlockAttributes.showSubmenuIcon && hasDescendants;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
 		return {
 			isParentOfSelectedBlock,
 			hasDescendants,
 			showSubmenuIcon,
-			textColor: navBlockAttrs.textColor,
-			backgroundColor: navBlockAttrs.backgroundColor,
+			textColor: navigationBlockAttributes.textColor,
+			backgroundColor: navigationBlockAttributes.backgroundColor,
 			rgbTextColor: getColorObjectByColorSlug(
 				colors,
-				navBlockAttrs.textColor,
-				navBlockAttrs.customTextColor
+				navigationBlockAttributes.textColor,
+				navigationBlockAttributes.customTextColor
 			),
 			rgbBackgroundColor: getColorObjectByColorSlug(
 				colors,
-				navBlockAttrs.backgroundColor,
-				navBlockAttrs.customBackgroundColor
+				navigationBlockAttributes.backgroundColor,
+				navigationBlockAttributes.customBackgroundColor
 			),
 		};
 	} ),
