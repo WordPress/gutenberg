@@ -48,7 +48,7 @@ function gutenberg_experimental_global_styles_get_css_vars( $global_styles, $pre
  * @return array Global Styles tree.
  */
 function gutenberg_experimental_global_styles_get_from_file( $global_styles_path ) {
-	$global_styles = [];
+	$global_styles = array();
 	if ( file_exists( $global_styles_path ) ) {
 		$decoded_file = json_decode(
 			file_get_contents( $global_styles_path ),
@@ -68,10 +68,10 @@ function gutenberg_experimental_global_styles_get_from_file( $global_styles_path
  * @return array Global Styles tree.
  */
 function gutenberg_experimental_global_styles_get_user() {
-	$global_styles = [];
-	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt( [ 'publish' ] );
-	if ( in_array( 'post_content', $user_cpt ) ) {
-		$decoded_data = json_decode( $user_cpt[ 'post_content' ], true );
+	$global_styles = array();
+	$user_cpt      = gutenberg_experimental_global_styles_get_user_cpt( array( 'publish' ) );
+	if ( in_array( 'post_content', $user_cpt, true ) ) {
+		$decoded_data = json_decode( $user_cpt['post_content'], true );
 		if ( is_array( $decoded_data ) ) {
 			$global_styles = $decoded_data;
 		}
@@ -87,36 +87,38 @@ function gutenberg_experimental_global_styles_get_user() {
  *
  * @param array $post_status_filter Filter CPT by post status.
  *                                  By default, only fetches published posts.
- * @param bool $should_create_draft Whether a new draft should be created
- *                                  if no CPT was found. False by default.
+ * @param bool  $should_create_draft Whether a new draft should be created
+ *                                   if no CPT was found. False by default.
  * @return array Custom Post Type for the user's Global Styles.
  */
-function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter = [ 'publish' ], $should_create_draft = false ) {
-	$user_cpt = [];
+function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter = array( 'publish' ), $should_create_draft = false ) {
+	$user_cpt         = array();
 	$post_type_filter = 'wp_global_styles';
 	$post_name_filter = 'wp-global-styles-' . strtolower( wp_get_theme()->get( 'Name' ) );
-	$recent_posts = wp_get_recent_posts( [
-		'numberposts' => 1,
-		'orderby'     => 'date',
-		'order'       => 'desc',
-		'post_type'   => $post_type_filter,
-		'post_status' => $post_status_filter,
-		'name'        => $post_name_filter,
-	] );
+	$recent_posts     = wp_get_recent_posts(
+		array(
+			'numberposts' => 1,
+			'orderby'     => 'date',
+			'order'       => 'desc',
+			'post_type'   => $post_type_filter,
+			'post_status' => $post_status_filter,
+			'name'        => $post_name_filter,
+		)
+	);
 
 	if ( is_array( $recent_posts ) && ( count( $recent_posts ) === 1 ) ) {
-		$user_cpt = $recent_posts[ 0 ];
-	} else if ( $should_create_draft ) {
+		$user_cpt = $recent_posts[0];
+	} elseif ( $should_create_draft ) {
 		$cpt_post_id = wp_insert_post(
-			[
+			array(
 				'post_content' => '{}',
 				'post_status'  => 'draft',
 				'post_type'    => $post_type_filter,
 				'post_name'    => $post_name_filter,
-			],
-			true,
+			),
+			true
 		);
-		$user_cpt = get_post( $cpt_post_id, ARRAY_A );
+		$user_cpt    = get_post( $cpt_post_id, ARRAY_A );
 	}
 
 	return $user_cpt;
@@ -129,9 +131,9 @@ function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter 
  */
 function gutenberg_experimental_global_styles_get_user_cpt_id() {
 	$user_cpt_id = null;
-	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt( [ 'publish', 'draft' ], true );
-	if ( in_array( 'ID', $user_cpt ) ) {
-		$user_cpt_id = $user_cpt[ 'ID' ];
+	$user_cpt    = gutenberg_experimental_global_styles_get_user_cpt( array( 'publish', 'draft' ), true );
+	if ( in_array( 'ID', $user_cpt, true ) ) {
+		$user_cpt_id = $user_cpt['ID'];
 	}
 	return $user_cpt_id;
 }
@@ -194,11 +196,11 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 	$global_styles = array_merge(
 		gutenberg_experimental_global_styles_get_core(),
 		gutenberg_experimental_global_styles_get_theme(),
-		gutenberg_experimental_global_styles_get_user(),
+		gutenberg_experimental_global_styles_get_user()
 	);
 
 	$inline_style = gutenberg_experimental_global_styles_resolver( $global_styles );
-	if ( empty ( $inline_style ) ) {
+	if ( empty( $inline_style ) ) {
 		return;
 	}
 
@@ -256,8 +258,9 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 	$global_styles = array_merge(
 		gutenberg_experimental_global_styles_get_core(),
-		gutenberg_experimental_global_styles_get_theme(),
+		gutenberg_experimental_global_styles_get_theme()
 	);
+
 	$settings['__experimentalGlobalStylesBase'] = $global_styles;
 
 	return $settings;
@@ -271,14 +274,14 @@ function gutenberg_experimental_global_styles_register_cpt() {
 		return;
 	}
 
-	$args = [
-		'label'        => 'Global Styles', 'gutenberg',
+	$args = array(
+		'label'        => __( 'Global Styles', 'gutenberg' ),
 		'description'  => 'CPT to store user design tokens',
 		'public'       => false,
 		'show_ui'      => false,
 		'show_in_rest' => true,
 		'rest_base'    => '__experimental/global-styles',
-		'capabilities' => [
+		'capabilities' => array(
 			'read'                   => 'edit_theme_options',
 			'create_posts'           => 'edit_theme_options',
 			'edit_posts'             => 'edit_theme_options',
@@ -286,13 +289,13 @@ function gutenberg_experimental_global_styles_register_cpt() {
 			'delete_published_posts' => 'edit_theme_options',
 			'edit_others_posts'      => 'edit_theme_options',
 			'delete_others_posts'    => 'edit_theme_options',
-		],
+		),
 		'map_meta_cap' => true,
-		'supports'     => [
+		'supports'     => array(
 			'editor',
 			'revisions',
-		]
-	];
+		),
+	);
 	register_post_type( 'wp_global_styles', $args );
 }
 
