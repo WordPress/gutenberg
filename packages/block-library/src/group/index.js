@@ -21,7 +21,12 @@ export const settings = {
 	title: __( 'Group' ),
 	icon,
 	description: __( 'A block that groups other blocks.' ),
-	keywords: [ __( 'container' ), __( 'wrapper' ), __( 'row' ), __( 'section' ) ],
+	keywords: [
+		__( 'container' ),
+		__( 'wrapper' ),
+		__( 'row' ),
+		__( 'section' ),
+	],
 	example: {
 		attributes: {
 			customBackgroundColor: '#ffffff',
@@ -91,17 +96,26 @@ export const settings = {
 				blocks: [ '*' ],
 				__experimentalConvert( blocks ) {
 					// Avoid transforming a single `core/group` Block
-					if ( blocks.length === 1 && blocks[ 0 ].name === 'core/group' ) {
+					if (
+						blocks.length === 1 &&
+						blocks[ 0 ].name === 'core/group'
+					) {
 						return;
 					}
 
 					const alignments = [ 'wide', 'full' ];
 
 					// Determine the widest setting of all the blocks to be grouped
-					const widestAlignment = blocks.reduce( ( accumulator, block ) => {
-						const { align } = block.attributes;
-						return alignments.indexOf( align ) > alignments.indexOf( accumulator ) ? align : accumulator;
-					}, undefined );
+					const widestAlignment = blocks.reduce(
+						( accumulator, block ) => {
+							const { align } = block.attributes;
+							return alignments.indexOf( align ) >
+								alignments.indexOf( accumulator )
+								? align
+								: accumulator;
+						},
+						undefined
+					);
 
 					// Clone the Blocks to be Grouped
 					// Failing to create new block references causes the original blocks
@@ -109,15 +123,22 @@ export const settings = {
 					// are removed both from their original location and within the
 					// new group block.
 					const groupInnerBlocks = blocks.map( ( block ) => {
-						return createBlock( block.name, block.attributes, block.innerBlocks );
+						return createBlock(
+							block.name,
+							block.attributes,
+							block.innerBlocks
+						);
 					} );
 
-					return createBlock( 'core/group', {
-						align: widestAlignment,
-					}, groupInnerBlocks );
+					return createBlock(
+						'core/group',
+						{
+							align: widestAlignment,
+						},
+						groupInnerBlocks
+					);
 				},
 			},
-
 		],
 	},
 

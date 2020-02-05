@@ -9,12 +9,18 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { close } from '@wordpress/icons';
 
 const SidebarHeader = ( { children, className, closeLabel } ) => {
-	const { shortcut, title } = useSelect( ( select ) => ( {
-		shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-		title: select( 'core/editor' ).getEditedPostAttribute( 'title' ),
-	} ), [] );
+	const { shortcut, title } = useSelect(
+		( select ) => ( {
+			shortcut: select(
+				'core/keyboard-shortcuts'
+			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			title: select( 'core/editor' ).getEditedPostAttribute( 'title' ),
+		} ),
+		[]
+	);
 	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 
 	return (
@@ -25,15 +31,20 @@ const SidebarHeader = ( { children, className, closeLabel } ) => {
 				</span>
 				<Button
 					onClick={ closeGeneralSidebar }
-					icon="no-alt"
+					icon={ close }
 					label={ closeLabel }
 				/>
 			</div>
-			<div className={ classnames( 'components-panel__header edit-post-sidebar-header', className ) }>
+			<div
+				className={ classnames(
+					'components-panel__header edit-post-sidebar-header',
+					className
+				) }
+			>
 				{ children }
 				<Button
 					onClick={ closeGeneralSidebar }
-					icon="no-alt"
+					icon={ close }
 					label={ closeLabel }
 					shortcut={ shortcut }
 				/>

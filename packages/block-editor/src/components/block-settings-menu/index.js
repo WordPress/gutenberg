@@ -14,6 +14,7 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { trash, moreHorizontal } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -36,12 +37,20 @@ export function BlockSettingsMenu( { clientIds } ) {
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutRepresentation } = select( 'core/keyboard-shortcuts' );
+		const { getShortcutRepresentation } = select(
+			'core/keyboard-shortcuts'
+		);
 		return {
-			duplicate: getShortcutRepresentation( 'core/block-editor/duplicate' ),
+			duplicate: getShortcutRepresentation(
+				'core/block-editor/duplicate'
+			),
 			remove: getShortcutRepresentation( 'core/block-editor/remove' ),
-			insertAfter: getShortcutRepresentation( 'core/block-editor/insert-after' ),
-			insertBefore: getShortcutRepresentation( 'core/block-editor/insert-before' ),
+			insertAfter: getShortcutRepresentation(
+				'core/block-editor/insert-after'
+			),
+			insertBefore: getShortcutRepresentation(
+				'core/block-editor/insert-before'
+			),
 		};
 	}, [] );
 
@@ -58,7 +67,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 			} ) => (
 				<Toolbar>
 					<DropdownMenu
-						icon="ellipsis"
+						icon={ moreHorizontal }
 						label={ __( 'More options' ) }
 						className="block-editor-block-settings-menu"
 						popoverProps={ POPOVER_PROPS }
@@ -81,7 +90,10 @@ export function BlockSettingsMenu( { clientIds } ) {
 									) }
 									{ canDuplicate && (
 										<MenuItem
-											onClick={ flow( onClose, onDuplicate ) }
+											onClick={ flow(
+												onClose,
+												onDuplicate
+											) }
 											icon="admin-page"
 											shortcut={ shortcuts.duplicate }
 										>
@@ -91,16 +103,26 @@ export function BlockSettingsMenu( { clientIds } ) {
 									{ canInsertDefaultBlock && (
 										<>
 											<MenuItem
-												onClick={ flow( onClose, onInsertBefore ) }
+												onClick={ flow(
+													onClose,
+													onInsertBefore
+												) }
 												icon="insert-before"
-												shortcut={ shortcuts.insertBefore }
+												shortcut={
+													shortcuts.insertBefore
+												}
 											>
 												{ __( 'Insert Before' ) }
 											</MenuItem>
 											<MenuItem
-												onClick={ flow( onClose, onInsertAfter ) }
+												onClick={ flow(
+													onClose,
+													onInsertAfter
+												) }
 												icon="insert-after"
-												shortcut={ shortcuts.insertAfter }
+												shortcut={
+													shortcuts.insertAfter
+												}
 											>
 												{ __( 'Insert After' ) }
 											</MenuItem>
@@ -119,11 +141,18 @@ export function BlockSettingsMenu( { clientIds } ) {
 								<MenuGroup>
 									{ ! isLocked && (
 										<MenuItem
-											onClick={ flow( onClose, onRemove ) }
-											icon="trash"
+											onClick={ flow(
+												onClose,
+												onRemove
+											) }
+											icon={ trash }
 											shortcut={ shortcuts.remove }
 										>
-											{ _n( 'Remove Block', 'Remove Blocks', count ) }
+											{ _n(
+												'Remove Block',
+												'Remove Blocks',
+												count
+											) }
 										</MenuItem>
 									) }
 								</MenuGroup>

@@ -1,12 +1,13 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-const { upperFirst } = require( './utils' );
+const { upperFirst } = require( 'lodash' );
 
 const slug = {
 	type: 'input',
 	name: 'slug',
-	message: 'The block slug used for identification (also the plugin and output folder name):',
+	message:
+		'The block slug used for identification (also the plugin and output folder name):',
 	validate( input ) {
 		if ( ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
 			return 'Invalid block slug specified. Block slug can contain only lowercase alphanumeric characters or dashes, and start with a letter.';
@@ -19,7 +20,8 @@ const slug = {
 const namespace = {
 	type: 'input',
 	name: 'namespace',
-	message: 'The internal namespace for the block name (something unique for your products):',
+	message:
+		'The internal namespace for the block name (something unique for your products):',
 	validate( input ) {
 		if ( ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
 			return 'Invalid block namespace specified. Block namespace can contain only lowercase alphanumeric characters or dashes, and start with a letter.';
@@ -50,7 +52,8 @@ const description = {
 const dashicon = {
 	type: 'input',
 	name: 'dashicon',
-	message: 'The dashicon to make it easier to identify your block (optional):',
+	message:
+		'The dashicon to make it easier to identify your block (optional):',
 	validate( input ) {
 		if ( ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
 			return 'Invalid dashicon name specified. Visit https://developer.wordpress.org/resource/dashicons/ to discover available names.';
@@ -59,8 +62,7 @@ const dashicon = {
 		return true;
 	},
 	filter( input ) {
-		return input &&
-			input.replace( /dashicon(s)?-/, '' );
+		return input && input.replace( /dashicon(s)?-/, '' );
 	},
 };
 

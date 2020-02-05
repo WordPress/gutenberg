@@ -21,7 +21,9 @@ export const settings = {
 		inserter: false,
 	},
 	title: __( 'Text Columns (deprecated)' ),
-	description: __( 'This block is deprecated. Please use the Columns block instead.' ),
+	description: __(
+		'This block is deprecated. Please use the Columns block instead.'
+	),
 	transforms,
 	getEditWrapperProps( attributes ) {
 		const { width } = attributes;

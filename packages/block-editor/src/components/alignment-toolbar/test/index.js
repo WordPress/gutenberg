@@ -12,7 +12,9 @@ describe( 'AlignmentToolbar', () => {
 	const alignment = 'left';
 	const onChangeSpy = jest.fn();
 
-	const wrapper = shallow( <AlignmentToolbar value={ alignment } onChange={ onChangeSpy } /> );
+	const wrapper = shallow(
+		<AlignmentToolbar value={ alignment } onChange={ onChangeSpy } />
+	);
 
 	const controls = wrapper.props().controls;
 
@@ -34,7 +36,9 @@ describe( 'AlignmentToolbar', () => {
 	} );
 
 	test( 'should call on change a new value when the control is not active', () => {
-		const inactiveControl = controls.find( ( { align } ) => align === 'center' );
+		const inactiveControl = controls.find(
+			( { align } ) => align === 'center'
+		);
 		inactiveControl.onClick();
 
 		expect( inactiveControl.isActive ).toBe( false );

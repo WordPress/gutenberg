@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, unescape } from 'lodash';
+import { escape, unescape, head } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,10 +21,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import {
-	rawShortcut,
-	displayShortcut,
-} from '@wordpress/keycodes';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -33,12 +30,13 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
-import { Fragment, useState, useEffect } from '@wordpress/element';
-
+import { isURL, prependHTTP } from '@wordpress/url';
+import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { toolbarSubmenuIcon, itemSubmenuIcon } from './icons';
+import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
 
 function NavigationLinkEdit( {
 	attributes,
@@ -48,8 +46,27 @@ function NavigationLinkEdit( {
 	setAttributes,
 	showSubmenuIcon,
 	insertLinkBlock,
+	navigationBlockAttributes,
 } ) {
-	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
+	const {
+		label,
+		opensInNewTab,
+		title,
+		url,
+		nofollow,
+		description,
+	} = attributes;
+
+	/*
+	 * Navigation Block attributes.
+	 */
+	const {
+		textColor,
+		rgbTextColor,
+		backgroundColor,
+		rgbBackgroundColor,
+	} = navigationBlockAttributes;
+
 	const link = {
 		title: title ? unescape( title ) : '',
 		url,
@@ -57,6 +74,7 @@ function NavigationLinkEdit( {
 	};
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const itemLabelPlaceholder = __( 'Add link…' );
+	const ref = useRef();
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -78,6 +96,39 @@ function NavigationLinkEdit( {
 		}
 	}, [ isSelected ] );
 
+	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
+	useEffect( () => {
+		if ( isLinkOpen && url ) {
+			// Close the link.
+			setIsLinkOpen( false );
+
+			// Does this look like a URL and have something TLD-ish?
+			if (
+				isURL( prependHTTP( label ) ) &&
+				/^.+\.[a-z]+/.test( label )
+			) {
+				// Focus and select the label text.
+				selectLabelText();
+			} else {
+				// Focus it (but do not select).
+				placeCaretAtHorizontalEdge( ref.current, true );
+			}
+		}
+	}, [ url ] );
+
+	/**
+	 * Focus the navigation link label text and select it.
+	 */
+	function selectLabelText() {
+		ref.current.focus();
+		const selection = window.getSelection();
+		const range = document.createRange();
+		// Get the range of the current ref contents so we can add this range to the selection.
+		range.selectNodeContents( ref.current );
+		selection.removeAllRanges();
+		selection.addRange( range );
+	}
+
 	return (
 		<Fragment>
 			<BlockControls>
@@ -85,7 +136,8 @@ function NavigationLinkEdit( {
 					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
-							[ rawShortcut.primary( 'k' ) ]: () => setIsLinkOpen( true ),
+							[ rawShortcut.primary( 'k' ) ]: () =>
+								setIsLinkOpen( true ),
 						} }
 					/>
 					<ToolbarButton
@@ -97,35 +149,23 @@ function NavigationLinkEdit( {
 					/>
 					<ToolbarButton
 						name="submenu"
-						icon={ toolbarSubmenuIcon }
+						icon={ <ToolbarSubmenuIcon /> }
 						title={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody
-					title={ __( 'Link settings' ) }
-				>
-					<TextareaControl
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( { description: descriptionValue } );
-						} }
-						label={ __( 'Description' ) }
-						help={ __( 'The description will be displayed in the menu if the current theme supports it.' ) }
-					/>
-				</PanelBody>
-				<PanelBody
-					title={ __( 'SEO settings' ) }
-				>
+				<PanelBody title={ __( 'SEO settings' ) }>
 					<TextControl
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
 						} }
 						label={ __( 'Title Attribute' ) }
-						help={ __( 'Provide more context about where the link goes.' ) }
+						help={ __(
+							'Provide more context about where the link goes.'
+						) }
 					/>
 					<ToggleControl
 						checked={ nofollow }
@@ -133,33 +173,61 @@ function NavigationLinkEdit( {
 							setAttributes( { nofollow: nofollowValue } );
 						} }
 						label={ __( 'Add nofollow to link' ) }
-						help={ (
+						help={
 							<Fragment>
-								{ __( 'Don\'t let search engines follow this link.' ) }
+								{ __(
+									"Don't let search engines follow this link."
+								) }
 								<ExternalLink
 									className="wp-block-navigation-link__nofollow-external-link"
-									href={ __( 'https://codex.wordpress.org/Nofollow' ) }
+									href={ __(
+										'https://codex.wordpress.org/Nofollow'
+									) }
 								>
-									{ __( 'What\'s this?' ) }
+									{ __( "What's this?" ) }
 								</ExternalLink>
 							</Fragment>
+						}
+					/>
+				</PanelBody>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<TextareaControl
+						value={ description || '' }
+						onChange={ ( descriptionValue ) => {
+							setAttributes( { description: descriptionValue } );
+						} }
+						label={ __( 'Description' ) }
+						help={ __(
+							'The description will be displayed in the menu if the current theme supports it.'
 						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div className={ classnames(
-				'wp-block-navigation-link', {
+			<div
+				className={ classnames( 'wp-block-navigation-link', {
 					'is-editing': isSelected || isParentOfSelectedBlock,
 					'is-selected': isSelected,
 					'has-link': !! url,
+					'has-child': hasDescendants,
+					'has-text-color': rgbTextColor,
+					[ `has-${ textColor }-color` ]: !! textColor,
+					'has-background': rgbBackgroundColor,
+					[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 				} ) }
+				style={ {
+					color: rgbTextColor,
+					backgroundColor: rgbBackgroundColor,
+				} }
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
+						ref={ ref }
 						tagName="span"
 						className="wp-block-navigation-link__label"
 						value={ label }
-						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
+						onChange={ ( labelValue ) =>
+							setAttributes( { label: labelValue } )
+						}
 						placeholder={ itemLabelPlaceholder }
 						withoutInteractiveFormatting
 						allowedFormats={ [
@@ -169,11 +237,11 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
-					{ showSubmenuIcon &&
+					{ showSubmenuIcon && (
 						<span className="wp-block-navigation-link__submenu-icon">
-							{ itemSubmenuIcon }
+							<ItemSubmenuIcon />
 						</span>
-					}
+					) }
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
@@ -188,30 +256,48 @@ function NavigationLinkEdit( {
 									url: newURL = '',
 									opensInNewTab: newOpensInNewTab,
 									id,
-								} = {} ) => setAttributes( {
-									title: escape( newTitle ),
-									url: encodeURI( newURL ),
-									label: ( () => {
-										const normalizedTitle = newTitle.replace( /http(s?):\/\//gi, '' );
-										const normalizedURL = newURL.replace( /http(s?):\/\//gi, '' );
-										if (
-											newTitle !== '' &&
-											normalizedTitle !== normalizedURL &&
-											label !== newTitle ) {
-											return escape( newTitle );
-										}
-										return label;
-									} )(),
-									opensInNewTab: newOpensInNewTab,
-									id,
-								} ) }
+								} = {} ) =>
+									setAttributes( {
+										title: escape( newTitle ),
+										url: encodeURI( newURL ),
+										label: ( () => {
+											const normalizedTitle = newTitle.replace(
+												/http(s?):\/\//gi,
+												''
+											);
+											const normalizedURL = newURL.replace(
+												/http(s?):\/\//gi,
+												''
+											);
+											if (
+												newTitle !== '' &&
+												normalizedTitle !==
+													normalizedURL &&
+												label !== newTitle
+											) {
+												return escape( newTitle );
+											} else if ( label ) {
+												return label;
+											}
+											// If there's no label, add the URL.
+											return escape( normalizedURL );
+										} )(),
+										opensInNewTab: newOpensInNewTab,
+										id,
+									} )
+								}
 							/>
 						</Popover>
 					) }
 				</div>
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
-					renderAppender={ ( ( hasDescendants && isSelected ) || isParentOfSelectedBlock ) ? InnerBlocks.DefaultAppender : false }
+					renderAppender={
+						( hasDescendants && isSelected ) ||
+						isParentOfSelectedBlock
+							? InnerBlocks.DefaultAppender
+							: false
+					}
 				/>
 			</div>
 		</Fragment>
@@ -221,25 +307,27 @@ function NavigationLinkEdit( {
 export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
-			getBlockName,
 			getBlockAttributes,
-			getBlockParents,
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
+			getBlockParentsByBlockName,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
-		const rootBlock = getBlockParents( clientId )[ 0 ];
-		const parentBlock = getBlockParents( clientId, true )[ 0 ];
-		const rootBlockAttributes = getBlockAttributes( rootBlock );
-		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] ).length;
-		const isLevelZero = getBlockName( parentBlock ) === 'core/navigation';
-		const showSubmenuIcon = rootBlockAttributes.showSubmenuIcon && isLevelZero && hasDescendants;
+		const rootBlock = head(
+			getBlockParentsByBlockName( clientId, 'core/navigation' )
+		);
+		const navigationBlockAttributes = getBlockAttributes( rootBlock );
+		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
+			.length;
+		const showSubmenuIcon =
+			!! navigationBlockAttributes.showSubmenuIcon && hasDescendants;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
 		return {
 			isParentOfSelectedBlock,
 			hasDescendants,
 			showSubmenuIcon,
+			navigationBlockAttributes,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
@@ -247,21 +335,17 @@ export default compose( [
 			insertLinkBlock() {
 				const { clientId } = ownProps;
 
-				const {
-					insertBlock,
-				} = dispatch( 'core/block-editor' );
+				const { insertBlock } = dispatch( 'core/block-editor' );
 
-				const { getClientIdsOfDescendants } = registry.select( 'core/block-editor' );
+				const { getClientIdsOfDescendants } = registry.select(
+					'core/block-editor'
+				);
 				const navItems = getClientIdsOfDescendants( [ clientId ] );
 				const insertionPoint = navItems.length ? navItems.length : 0;
 
 				const blockToInsert = createBlock( 'core/navigation-link' );
 
-				insertBlock(
-					blockToInsert,
-					insertionPoint,
-					clientId,
-				);
+				insertBlock( blockToInsert, insertionPoint, clientId );
 			},
 		};
 	} ),

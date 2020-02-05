@@ -4,13 +4,8 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { LEFT,
-	RIGHT,
-	UP,
-	DOWN,
-	BACKSPACE,
-	ENTER,
-} from '@wordpress/keycodes';
+import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -32,7 +27,6 @@ const handleLinkControlOnKeyPress = ( event ) => {
 	event.stopPropagation();
 
 	if ( keyCode === ENTER ) {
-
 	}
 };
 
@@ -85,11 +79,10 @@ const LinkControlSearchInput = ( {
 				disabled={ ! value.length }
 				type="reset"
 				label={ __( 'Reset' ) }
-				icon="no-alt"
+				icon={ close }
 				className="block-editor-link-control__search-reset"
 				onClick={ onReset }
 			/>
-
 		</form>
 	);
 };

@@ -28,10 +28,7 @@ const BlockPreview = ( { blocks } ) => {
 	};
 
 	return (
-		<BlockEditorProvider
-			value={ blocks }
-			settings={ settings }
-		>
+		<BlockEditorProvider value={ blocks } settings={ settings }>
 			<View style={ { flex: 1 } }>
 				<BlockList />
 			</View>
@@ -43,15 +40,14 @@ BlockPreview.displayName = 'BlockPreview';
 const Preview = ( props ) => {
 	const { template, onDismiss, onApply } = props;
 	const preferredColorScheme = usePreferredColorScheme();
-	const containerBackgroundColor = preferredColorScheme === 'dark' ? 'black' : 'white';
+	const containerBackgroundColor =
+		preferredColorScheme === 'dark' ? 'black' : 'white';
 
 	if ( template === undefined ) {
 		return null;
 	}
 
-	const leftButton = (
-		<ModalHeaderBar.CloseButton onPress={ onDismiss } />
-	);
+	const leftButton = <ModalHeaderBar.CloseButton onPress={ onDismiss } />;
 
 	const rightButton = (
 		<ModalHeaderBar.Button
@@ -68,16 +64,16 @@ const Preview = ( props ) => {
 			onRequestClose={ onDismiss }
 			supportedOrientations={ [ 'portrait', 'landscape' ] }
 		>
-			<SafeAreaView style={ { flex: 1, backgroundColor: containerBackgroundColor } }>
+			<SafeAreaView
+				style={ { flex: 1, backgroundColor: containerBackgroundColor } }
+			>
 				<ModalHeaderBar
 					leftButton={ leftButton }
 					rightButton={ rightButton }
 					title={ template.name }
 					subtitle={ __( 'Template Preview' ) }
 				/>
-				<BlockPreview
-					blocks={ template.blocks }
-				/>
+				<BlockPreview blocks={ template.blocks } />
 			</SafeAreaView>
 		</Modal>
 	);

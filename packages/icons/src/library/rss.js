@@ -10,4 +10,3 @@ const rss = (
 );
 
 export default rss;
-

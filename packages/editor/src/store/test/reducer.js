@@ -52,7 +52,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return false if not editing the same post properties', () => {
@@ -69,7 +71,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return true if updating the same post properties', () => {
@@ -86,7 +90,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( true );
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe(
+				true
+			);
 		} );
 	} );
 
@@ -100,7 +106,9 @@ describe( 'state', () => {
 			};
 			const previousAction = undefined;
 
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+			expect( shouldOverwriteState( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return false if the action types are different', () => {
@@ -117,7 +125,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+			expect( shouldOverwriteState( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return true if updating same post property', () => {
@@ -134,7 +144,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( true );
+			expect( shouldOverwriteState( action, previousAction ) ).toBe(
+				true
+			);
 		} );
 	} );
 
@@ -162,7 +174,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should disable the publish sidebar', () => {
-			const original = deepFreeze( preferences( undefined, { } ) );
+			const original = deepFreeze( preferences( undefined, {} ) );
 			const state = preferences( original, {
 				type: 'DISABLE_PUBLISH_SIDEBAR',
 			} );
@@ -171,7 +183,9 @@ describe( 'state', () => {
 		} );
 
 		it( 'should enable the publish sidebar', () => {
-			const original = deepFreeze( preferences( { isPublishSidebarEnabled: false }, { } ) );
+			const original = deepFreeze(
+				preferences( { isPublishSidebarEnabled: false }, {} )
+			);
 			const state = preferences( original, {
 				type: 'ENABLE_PUBLISH_SIDEBAR',
 			} );
@@ -204,13 +218,18 @@ describe( 'state', () => {
 		} );
 
 		it( 'should add received reusable blocks', () => {
-			const state = reusableBlocks( {}, {
-				type: 'RECEIVE_REUSABLE_BLOCKS',
-				results: [ {
-					id: 123,
-					title: 'My cool block',
-				} ],
-			} );
+			const state = reusableBlocks(
+				{},
+				{
+					type: 'RECEIVE_REUSABLE_BLOCKS',
+					results: [
+						{
+							id: 123,
+							title: 'My cool block',
+						},
+					],
+				}
+			);
 
 			expect( state ).toEqual( {
 				data: {

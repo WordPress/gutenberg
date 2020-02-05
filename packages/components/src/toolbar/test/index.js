@@ -48,7 +48,9 @@ describe( 'Toolbar', () => {
 				},
 			];
 			const wrapper = mount( <Toolbar controls={ controls } /> );
-			const button = wrapper.find( '[aria-label="WordPress"]' ).hostNodes();
+			const button = wrapper
+				.find( '[aria-label="WordPress"]' )
+				.hostNodes();
 			expect( button.props() ).toMatchObject( {
 				'aria-label': 'WordPress',
 				'aria-pressed': false,

@@ -7,5 +7,4 @@ packages/e2e-tests/plugins
 playground/dist
 vendor
 wordpress
-
-!.eslintrc.js
+!.*.js

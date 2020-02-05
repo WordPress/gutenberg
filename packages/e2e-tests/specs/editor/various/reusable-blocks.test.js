@@ -37,7 +37,9 @@ describe( 'Reusable blocks', () => {
 
 		await clickBlockToolbarButton( 'More options' );
 
-		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable blocks"]' );
+		const convertButton = await page.waitForXPath(
+			'//button[text()="Add to Reusable blocks"]'
+		);
 		await convertButton.click();
 
 		// Wait for creation to finish
@@ -59,7 +61,9 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$(
+			'.block-editor-block-list__block[data-type="core/block"]'
+		);
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
@@ -77,7 +81,9 @@ describe( 'Reusable blocks', () => {
 
 		await clickBlockToolbarButton( 'More options' );
 
-		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable blocks"]' );
+		const convertButton = await page.waitForXPath(
+			'//button[text()="Add to Reusable blocks"]'
+		);
 		await convertButton.click();
 
 		// Wait for creation to finish
@@ -93,7 +99,9 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$(
+			'.block-editor-block-list__block[data-type="core/block"]'
+		);
 		expect( block ).not.toBeNull();
 
 		// Check that it is untitled
@@ -134,7 +142,9 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$(
+			'.block-editor-block-list__block[data-type="core/block"]'
+		);
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
@@ -164,7 +174,9 @@ describe( 'Reusable blocks', () => {
 		await convertButton.click();
 
 		// Check that we have a paragraph block on the page
-		const block = await page.$( '.block-editor-block-list__block[data-type="core/paragraph"]' );
+		const block = await page.$(
+			'.block-editor-block-list__block[data-type="core/paragraph"]'
+		);
 		expect( block ).not.toBeNull();
 
 		// Check that its content is up to date
@@ -181,7 +193,9 @@ describe( 'Reusable blocks', () => {
 
 		// Delete the block and accept the confirmation dialog
 		await clickBlockToolbarButton( 'More options' );
-		const deleteButton = await page.waitForXPath( '//button[text()="Remove from Reusable blocks"]' );
+		const deleteButton = await page.waitForXPath(
+			'//button[text()="Remove from Reusable blocks"]'
+		);
 		await Promise.all( [ waitForAndAcceptDialog(), deleteButton.click() ] );
 
 		// Wait for deletion to finish
@@ -217,7 +231,9 @@ describe( 'Reusable blocks', () => {
 
 		// Convert block to a reusable block
 		await clickBlockToolbarButton( 'More options' );
-		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable blocks"]' );
+		const convertButton = await page.waitForXPath(
+			'//button[text()="Add to Reusable blocks"]'
+		);
 		await convertButton.click();
 
 		// Wait for creation to finish
@@ -239,7 +255,9 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$(
+			'.block-editor-block-list__block[data-type="core/block"]'
+		);
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed

@@ -76,7 +76,7 @@ export default class TokenList {
 	 *
 	 * @return {IterableIterator<string>} TokenList iterator.
 	 */
-	* [ Symbol.iterator ]() {
+	*[ Symbol.iterator ]() {
 		return yield* this._valueAsArray;
 	}
 

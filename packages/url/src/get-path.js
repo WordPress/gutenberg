@@ -12,7 +12,9 @@
  * @return {string|void} The path part of the URL.
  */
 export function getPath( url ) {
-	const matches = /^[^\/\s:]+:(?:\/\/)?[^\/\s#?]+[\/]([^\s#?]+)[#?]{0,1}\S*$/.exec( url );
+	const matches = /^[^\/\s:]+:(?:\/\/)?[^\/\s#?]+[\/]([^\s#?]+)[#?]{0,1}\S*$/.exec(
+		url
+	);
 	if ( matches ) {
 		return matches[ 1 ];
 	}

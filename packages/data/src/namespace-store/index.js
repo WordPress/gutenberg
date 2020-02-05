@@ -2,11 +2,7 @@
  * External dependencies
  */
 import { createStore, applyMiddleware } from 'redux';
-import {
-	flowRight,
-	get,
-	mapValues,
-} from 'lodash';
+import { flowRight, get, mapValues } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
 
 /**
@@ -43,20 +39,30 @@ export default function createNamespace( key, options, registry ) {
 	const store = createReduxStore( key, options, registry );
 
 	let resolvers;
-	const actions = mapActions( {
-		...metadataActions,
-		...options.actions,
-	}, store );
-	let selectors = mapSelectors( {
-		...mapValues( metadataSelectors, ( selector ) => ( state, ...args ) => selector( state.metadata, ...args ) ),
-		...mapValues( options.selectors, ( selector ) => {
-			if ( selector.isRegistrySelector ) {
-				selector.registry = registry;
-			}
+	const actions = mapActions(
+		{
+			...metadataActions,
+			...options.actions,
+		},
+		store
+	);
+	let selectors = mapSelectors(
+		{
+			...mapValues(
+				metadataSelectors,
+				( selector ) => ( state, ...args ) =>
+					selector( state.metadata, ...args )
+			),
+			...mapValues( options.selectors, ( selector ) => {
+				if ( selector.isRegistrySelector ) {
+					selector.registry = registry;
+				}
 
-			return ( state, ...args ) => selector( state.root, ...args );
-		} ),
-	}, store );
+				return ( state, ...args ) => selector( state.root, ...args );
+			} ),
+		},
+		store
+	);
 	if ( options.resolvers ) {
 		const result = mapResolvers( options.resolvers, selectors, store );
 		resolvers = result.resolvers;
@@ -74,18 +80,20 @@ export default function createNamespace( key, options, registry ) {
 
 	// Customize subscribe behavior to call listeners only on effective change,
 	// not on every dispatch.
-	const subscribe = store && function( listener ) {
-		let lastState = store.__unstableOriginalGetState();
-		store.subscribe( () => {
-			const state = store.__unstableOriginalGetState();
-			const hasChanged = state !== lastState;
-			lastState = state;
+	const subscribe =
+		store &&
+		function( listener ) {
+			let lastState = store.__unstableOriginalGetState();
+			store.subscribe( () => {
+				const state = store.__unstableOriginalGetState();
+				const hasChanged = state !== lastState;
+				lastState = state;
 
-			if ( hasChanged ) {
-				listener();
-			}
-		} );
-	};
+				if ( hasChanged ) {
+					listener();
+				}
+			} );
+		};
 
 	// This can be simplified to just { subscribe, getSelectors, getActions }
 	// Once we remove the use function.
@@ -125,11 +133,17 @@ function createReduxStore( key, options, registry ) {
 		middlewares.push( createReduxRoutineMiddleware( normalizedControls ) );
 	}
 
-	const enhancers = [
-		applyMiddleware( ...middlewares ),
-	];
-	if ( typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
-		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: key, instanceId: key } ) );
+	const enhancers = [ applyMiddleware( ...middlewares ) ];
+	if (
+		typeof window !== 'undefined' &&
+		window.__REDUX_DEVTOOLS_EXTENSION__
+	) {
+		enhancers.push(
+			window.__REDUX_DEVTOOLS_EXTENSION__( {
+				name: key,
+				instanceId: key,
+			} )
+		);
 	}
 
 	const { reducer, initialState } = options;
@@ -222,18 +236,36 @@ function mapResolvers( resolvers, selectors, store ) {
 		const selectorResolver = ( ...args ) => {
 			async function fulfillSelector() {
 				const state = store.getState();
-				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state, ...args ) ) {
+				if (
+					typeof resolver.isFulfilled === 'function' &&
+					resolver.isFulfilled( state, ...args )
+				) {
 					return;
 				}
 
 				const { metadata } = store.__unstableOriginalGetState();
-				if ( metadataSelectors.hasStartedResolution( metadata, selectorName, args ) ) {
+				if (
+					metadataSelectors.hasStartedResolution(
+						metadata,
+						selectorName,
+						args
+					)
+				) {
 					return;
 				}
 
-				store.dispatch( metadataActions.startResolution( selectorName, args ) );
-				await fulfillResolver( store, mappedResolvers, selectorName, ...args );
-				store.dispatch( metadataActions.finishResolution( selectorName, args ) );
+				store.dispatch(
+					metadataActions.startResolution( selectorName, args )
+				);
+				await fulfillResolver(
+					store,
+					mappedResolvers,
+					selectorName,
+					...args
+				);
+				store.dispatch(
+					metadataActions.finishResolution( selectorName, args )
+				);
 			}
 
 			fulfillSelector( ...args );

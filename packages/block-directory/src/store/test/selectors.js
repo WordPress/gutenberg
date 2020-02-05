@@ -1,9 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	getInstalledBlockTypes,
-} from '../selectors';
+import { getInstalledBlockTypes } from '../selectors';
 
 describe( 'selectors', () => {
 	describe( 'getInstalledBlockTypes', () => {

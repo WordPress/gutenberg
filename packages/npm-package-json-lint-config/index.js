@@ -102,9 +102,7 @@ const defaultConfig = {
 		'require-version': 'error',
 		'scripts-type': 'error',
 		'valid-values-author': 'off',
-		'valid-values-license': [ 'error', [
-			'GPL-2.0-or-later',
-		] ],
+		'valid-values-license': [ 'error', [ 'GPL-2.0-or-later' ] ],
 		'valid-values-private': 'off',
 		'version-format': 'error',
 		'version-type': 'error',
