@@ -137,7 +137,7 @@ function NavigationLinkEdit( {
 				( entityProp ) => ! entity.hasOwnProperty( entityProp )
 			);
 
-			if ( Boolean( entityMissingProperty ) ) {
+			if ( entityMissingProperty ) {
 				throw new TypeError(
 					`API response returned invalid entity. Missing required property "${ entityMissingProperty }".`,
 					entity
