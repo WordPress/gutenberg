@@ -239,8 +239,8 @@ function LinkControl( {
 			? results
 			: results.concat( {
 					id: cleanForSlug( val ),
-					title: val, // // must match the existing `<input>`s text value
-					url: '', // placeholder - not used when creating
+					title: val, // must match the existing `<input>`s text value
+					url: val, // must match the existing `<input>`s text value
 					type: CREATE_TYPE,
 			  } );
 	};
