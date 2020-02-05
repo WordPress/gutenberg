@@ -12,18 +12,14 @@ const transforms = {
 	from: [
 		{
 			type: 'block',
+			isMultiBlock: true,
 			blocks: [ 'core/button' ],
 			transform: ( props ) =>
-				createBlock( name, { attributes: props }, [
-					createBlock( 'core/button', props ),
-				] ),
-		},
-	],
-	to: [
-		{
-			type: 'block',
-			blocks: [ name ],
-			transform: ( { content } ) => createBlock( name, { content } ),
+				createBlock(
+					name,
+					{},
+					props.map( ( prop ) => createBlock( 'core/button', prop ) )
+				),
 		},
 	],
 };
