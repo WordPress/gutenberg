@@ -467,9 +467,17 @@ describe( 'Default search suggestions', () => {
 			'[role="listbox"] [role="option"]'
 		);
 
-		expect( searchResultElements ).toHaveLength( 0 );
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
 
-		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
+		// search input is set to the URL value
+		expect( searchInput.value ).toEqual( fauxEntitySuggestions[ 0 ].url );
+
+		// it should match any url that's like ?p= and also include a URL option
+		expect( searchResultElements ).toHaveLength( 5 );
+
+		expect( mockFetchSearchSuggestions ).toHaveBeenCalled();
 
 		// Reset the search to empty and check the initial suggestions are now shown.
 		const searchInput = container.querySelector(
