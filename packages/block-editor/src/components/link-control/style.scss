@@ -6,7 +6,7 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 // Provides positioning context for reset button. Without this then when an
-// error notice is displayed above the input the reset button is incorrectly positioned.
+// error notice is displayed the input's reset button is incorrectly positioned.
 .block-editor-link-control__search-input-wrapper {
 	position: relative;
 }
