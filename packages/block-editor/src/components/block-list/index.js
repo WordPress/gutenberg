@@ -37,7 +37,7 @@ function BlockList( {
 	rootClientId,
 	isDraggable,
 	renderAppender,
-	__experimentalUIParts = { },
+	__experimentalUIParts = {},
 } ) {
 	function selector( select ) {
 		const {
