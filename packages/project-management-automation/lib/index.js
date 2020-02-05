@@ -27,7 +27,7 @@ const automations = [
 	{
 		event: 'pull_request',
 		action: 'closed',
-		task: addMilestone,
+		task: ifNotFork( addMilestone ),
 	},
 ];
 
