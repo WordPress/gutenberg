@@ -242,7 +242,7 @@ function LinkControl( {
 	};
 
 	/**
-	 * Detmineres which type of search handler to use based on the users input.
+	 * Determines which type of search handler to use based on the users input.
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
 	 * else a API search should made for matching Entities.
