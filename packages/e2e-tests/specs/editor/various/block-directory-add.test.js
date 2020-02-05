@@ -10,12 +10,8 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 // Urls to mock
-const SEARCH_URL = `rest_route=${ encodeURIComponent(
-	'/__experimental/block-directory/search'
-) }`;
-const INSTALL_URL = `rest_route=${ encodeURIComponent(
-	'/__experimental/block-directory/install'
-) }`;
+const SEARCH_URL = '/__experimental/block-directory/search';
+const INSTALL_URL = '/__experimental/block-directory/install';
 
 // Example Blocks
 const mockBlock1 = {
