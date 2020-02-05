@@ -214,17 +214,10 @@ function LinkControl( {
 	// Effects
 	const getSearchHandler = useCallback(
 		( val, args ) => {
-			const protocol = getProtocol( val ) || '';
-			const isMailto = protocol.includes( 'mailto' );
 			const isInternal = startsWith( val, '#' );
-			const isTel = protocol.includes( 'tel' );
 
 			const handleManualEntry =
-				isInternal ||
-				isMailto ||
-				isTel ||
-				isURL( val ) ||
-				( val && val.includes( 'www.' ) );
+				isInternal || isURL( val ) || ( val && val.includes( 'www.' ) );
 
 			return handleManualEntry
 				? handleDirectEntry( val, args )
@@ -292,8 +285,8 @@ function LinkControl( {
 							) }
 							suggestion={ suggestion }
 							onClick={ () => {
-								stopEditing();
 								onChange( { ...value, ...suggestion } );
+								stopEditing();
 							} }
 							isSelected={ index === selectedSuggestion }
 							isURL={ manualLinkEntryTypes.includes(
@@ -318,8 +311,8 @@ function LinkControl( {
 					value={ inputValue }
 					onChange={ onInputChange }
 					onSelect={ ( suggestion ) => {
-						stopEditing();
 						onChange( { ...value, ...suggestion } );
+						stopEditing();
 					} }
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }

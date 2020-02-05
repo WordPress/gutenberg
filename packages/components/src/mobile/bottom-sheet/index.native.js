@@ -198,7 +198,6 @@ class BottomSheet extends Component {
 					<View style={ styles.dragIndicator } />
 					{ ! hideHeader && getHeader() }
 					<ScrollView
-						accessible={ false }
 						bounces={ this.state.bounces }
 						onScroll={ this.onScroll }
 						scrollEventThrottle={ 16 }

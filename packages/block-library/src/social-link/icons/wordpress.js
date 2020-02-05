@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-
-import { Path, SVG } from '@wordpress/components';
+import { Path, SVG } from '@wordpress/primitives';
 
 export const WordPressIcon = () => (
 	<SVG
