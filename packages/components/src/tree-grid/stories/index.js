@@ -39,7 +39,7 @@ const simpsonsCharacters = [
 	},
 ];
 
-const Decender = ( { level } ) => {
+const Descender = ( { level } ) => {
 	if ( level === 1 ) {
 		return '';
 	}
@@ -60,7 +60,7 @@ const Rows = ( { people, level = 1 } ) => {
 					<TreeGridCell>
 						{ ( props ) => (
 							<>
-								<Decender level={ level } />
+								<Descender level={ level } />
 								<Button isPrimary { ...props }>
 									{ person.name }
 								</Button>
