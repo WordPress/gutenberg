@@ -13,17 +13,17 @@
  * @return string Rendered HTML of the referenced block.
  */
 function render_core_social_link( $attributes ) {
-	$site  = ( isset( $attributes['site'] ) ) ? $attributes['site'] : 'Icon';
+	$service  = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
 	$url   = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
-	$label = ( isset( $attributes['label'] ) ) ? $attributes['label'] : __( 'Link to ' ) . core_social_link_get_name( $site );
+	$label = ( isset( $attributes['label'] ) ) ? $attributes['label'] : __( 'Link to ' ) . core_social_link_get_name( $service );
 
 	// Don't render a link if there is no URL set.
 	if ( ! $url ) {
 		return '';
 	}
 
-	$icon = core_social_link_get_icon( $site );
-	return '<li class="wp-social-link wp-social-link-' . $site . '"><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '"> ' . $icon . '</a></li>';
+	$icon = core_social_link_get_icon( $service );
+	return '<li class="wp-social-link wp-social-link-' . $service . '"><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '"> ' . $icon . '</a></li>';
 }
 
 /**
