@@ -23,37 +23,26 @@
     "url": "https://github.com/WordPress/gutenberg/issues"
   },
   "engines": {
-    "node": ">=8.0.0 <9.0.0 || >=10.0.0",
-    "npm": ">=6.0.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run prettier:check"
-    }
+    "node": ">=10",
+    "npm": ">=6.9"
   },
   "dependencies": {
-    "@babel/runtime": "^7.3.1",
+    "@babel/runtime": "^7.4.4",
     "@react-native-community/cli": "^1.5.2",
-    "@wordpress/block-editor": "file:../block-editor",
-    "@wordpress/block-library": "file:../block-library",
-    "@wordpress/blocks": "file:../blocks",
     "@wordpress/data": "file:../data",
     "@wordpress/edit-post": "file:../edit-post",
     "@wordpress/element": "file:../element",
-    "@wordpress/format-library": "file:../format-library",
     "@wordpress/i18n": "file:../i18n",
     "@wordpress/react-native-aztec": "file:../react-native-aztec",
     "@wordpress/react-native-bridge": "file:../react-native-bridge",
+    "@wordpress/scripts": "file:../scripts",
     "fast-average-color": "^4.3.0",
-    "gettext-parser": "^4.0.2",
-    "hpq": "^1.2.0",
     "jed": "^1.1.1",
-    "jest-serializer-enzyme": "^1.0.0",
-    "js-beautify": "^1.7.5",
     "jsc-android": "^241213.1.0",
     "jsdom-jscore-rn": "git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800",
-    "metro-react-native-babel-transformer": "^0.53.0",
+    "node-fetch": "^2.3.0",
     "node-libs-react-native": "^1.0.2",
+    "react-native": "jtreanor/react-native#v0.60.0-patched",
     "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.7",
