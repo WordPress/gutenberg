@@ -147,7 +147,7 @@ function NavigationLinkEdit( {
 			return {
 				id: entity.id,
 				type,
-				title: entity.title.raw, // TODO: use raw or rendered?
+				title: entity.title.rendered,
 				url: entity.link,
 			};
 		} );
