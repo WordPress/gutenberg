@@ -130,17 +130,20 @@ With the extension installed, ESLint will use the [.eslintrc.js](https://github.
 
 [Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESlint are similar, Prettier is more about formatting and style, while ESlint is for detecting coding errors.
 
-To use Prettier, you should install the [Prettier - Code formatter extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) in Visual Studio Code. You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings.
+To use Prettier with Visual Studio Code, you should install the [Prettier - Code formatter extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode). You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings.
 
 ```json
 "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
 },
-"prettier.configPath": "packages/scripts/config/.prettierrc.js"
 ```
 
-This will use the `.prettierrc.js` file included in the scripts package of the Gutenberg repository.
+This will use the `.prettierrc.js` file included in the root of the Gutenberg repository.
+
+If you only want to use this configuration with the Gutenberg project, create a directory called .vscode at the top-level of Gutenberg, and place your settings in a settings.json there. Visual Studio Code refers to this as Workplace Settings, and only apply to the project.
+
+For other editors, see [Prettier's Editor Integration docs](https://prettier.io/docs/en/editors.html)
 
 ### TypeScript
 

@@ -72,8 +72,7 @@ if ( ! checkResult.success ) {
 // needed for config, otherwise pass in args to default config in packages
 // See: https://prettier.io/docs/en/configuration.html
 let configArgs = [];
-const hasProjectPrettierConfig =
-	hasProjectFile( '.prettierrc.js' ) ||
+const hasProjectPrettierConfig = hasProjectFile( '.prettierrc.js' ) ||
 	hasProjectFile( '.prettierrc.json' ) ||
 	hasProjectFile( '.prettierrc.toml' ) ||
 	hasProjectFile( '.prettierrc.yaml' ) ||
