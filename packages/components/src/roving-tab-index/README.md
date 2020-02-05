@@ -84,7 +84,7 @@ As an alternative to `as`, `RovingTabIndexItem` also supports a render prop func
 
 ```jsx
 <RovingTabIndexItem>
-	( props ) => <Button onClick={ onClose } { ...props }>Close</Button>
+	{ ( props ) => <Button onClick={ onClose } { ...props }>Close</Button> }
 </RovingTabIndexItem>
 ```
 
