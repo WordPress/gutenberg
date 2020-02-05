@@ -67,6 +67,10 @@ export function getResponseObject( obj, contentType ) {
 }
 
 export function createResponse( mockResponse, contentType = undefined ) {
+	// eslint-disable-next-line no-console
+	console.log( '----- This is the response object -----' );
+	// eslint-disable-next-line no-console
+	console.log( JSON.stringify( mockResponse ) );
 	return async ( request ) =>
 		request.respond( getResponseObject( mockResponse, contentType ) );
 }
@@ -110,7 +114,13 @@ describe( 'adding blocks from block directory', () => {
 		await setUpResponseMocking( [
 			{
 				// Mock response for search with the block
-				match: ( request ) => request.url().includes( SEARCH_URL ),
+				match: ( request ) => {
+					// eslint-disable-next-line no-console
+					console.log( '------ HERE IS THE REQUEST URL ------' );
+					// eslint-disable-next-line no-console
+					console.log( request.url() );
+					return request.url().includes( SEARCH_URL );
+				},
 				onRequestMatch: createResponse(
 					JSON.stringify( [ mockBlock1, mockBlock2 ] )
 				),
