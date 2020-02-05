@@ -10,6 +10,7 @@ import { useContext, useMemo } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { CheckboxControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -18,11 +19,11 @@ import BlockTypesChecklist from './checklist';
 import EditPostSettings from '../edit-post-settings';
 
 function BlockManagerCategory( {
-	callToAction,
-	instanceId,
-	category,
 	blockTypes,
+	category,
 	hiddenBlockTypes,
+	instanceId,
+	manageLink,
 	toggleVisible,
 	toggleAllVisible,
 } ) {
@@ -73,7 +74,9 @@ function BlockManagerCategory( {
 					aria-checked={ ariaChecked }
 					label={ <span id={ titleId }>{ category.title }</span> }
 				/>
-				{ callToAction }
+				{ manageLink && (
+					<a href={ manageLink }>{ __( 'Edit blocks' ) }</a>
+				) }
 			</div>
 			<BlockTypesChecklist
 				blockTypes={ filteredBlockTypes }
@@ -106,6 +109,7 @@ export default compose( [
 			},
 			toggleAllVisible( nextIsChecked ) {
 				const blockNames = map( ownProps.blockTypes, 'name' );
+
 				if ( nextIsChecked ) {
 					showBlockTypes( blockNames );
 				} else {

@@ -10,6 +10,7 @@ import { withSelect } from '@wordpress/data';
 import { compose, withState } from '@wordpress/compose';
 import { TextControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -24,6 +25,7 @@ function BlockManager( {
 	hasBlockSupport,
 	isMatchingSearchTerm,
 	numberOfHiddenBlocks,
+	reusableBlocks,
 } ) {
 	// Filtering occurs here (as opposed to `withSelect`) to avoid wasted
 	// wasted renders by consequence of `Array#filter` producing a new
@@ -35,6 +37,25 @@ function BlockManager( {
 			( ! blockType.parent ||
 				includes( blockType.parent, 'core/post-content' ) )
 	);
+	const reusableCategory = categories.find(
+		( { slug } ) => slug === 'reusable'
+	);
+	const reusableBlockTypes = reusableCategory
+		? reusableBlocks
+				.map( ( { id, title } ) => {
+					return {
+						id,
+						name: `core/block/${ id }`,
+						title,
+						category: reusableCategory.slug,
+						keywords: [],
+					};
+				} )
+				.filter(
+					( blockType ) =>
+						! search || isMatchingSearchTerm( blockType, search )
+				)
+		: [];
 
 	return (
 		<div className="edit-post-manage-blocks-modal__content">
@@ -67,11 +88,12 @@ function BlockManager( {
 				aria-label={ __( 'Available block types' ) }
 				className="edit-post-manage-blocks-modal__results"
 			>
-				{ blockTypes.length === 0 && (
-					<p className="edit-post-manage-blocks-modal__no-results">
-						{ __( 'No blocks found.' ) }
-					</p>
-				) }
+				{ blockTypes.length === 0 &&
+					reusableBlockTypes.length === 0 && (
+						<p className="edit-post-manage-blocks-modal__no-results">
+							{ __( 'No blocks found.' ) }
+						</p>
+					) }
 				{ categories.map( ( category ) => (
 					<BlockManagerCategory
 						key={ category.slug }
@@ -79,17 +101,18 @@ function BlockManager( {
 						blockTypes={ filter( blockTypes, {
 							category: category.slug,
 						} ) }
-						callToAction={
-							category.slug === 'reusable' ? (
-								<a href="edit.php?post_type=wp_block">
-									Edit blocks
-								</a>
-							) : (
-								undefined
-							)
-						}
 					/>
 				) ) }
+				{ reusableCategory && (
+					<BlockManagerCategory
+						key={ reusableCategory.slug }
+						category={ reusableCategory }
+						blockTypes={ reusableBlockTypes }
+						manageLink={ addQueryArgs( 'edit.php', {
+							post_type: 'wp_block',
+						} ) }
+					/>
+				) }
 			</div>
 		</div>
 	);
@@ -104,6 +127,9 @@ export default compose( [
 			hasBlockSupport,
 			isMatchingSearchTerm,
 		} = select( 'core/blocks' );
+		const { __experimentalGetReusableBlocks: getReusableBlocks } = select(
+			'core/editor'
+		);
 		const { getPreference } = select( 'core/edit-post' );
 		const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
 		const numberOfHiddenBlocks =
@@ -111,6 +137,7 @@ export default compose( [
 
 		return {
 			blockTypes: getBlockTypes(),
+			reusableBlocks: getReusableBlocks(),
 			categories: getCategories(),
 			hasBlockSupport,
 			isMatchingSearchTerm,
