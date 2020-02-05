@@ -127,7 +127,11 @@ function InlineLinkUI( {
 			onClose={ stopAddingLink }
 			position="bottom center"
 		>
-			<LinkControl value={ linkValue } onChange={ onChangeLink } />
+			<LinkControl
+				value={ linkValue }
+				onChange={ onChangeLink }
+				forceIsEditingLink={ addingLink }
+			/>
 		</Popover>
 	);
 }
