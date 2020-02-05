@@ -10,4 +10,3 @@ const moreHorizontal = (
 );
 
 export default moreHorizontal;
-
