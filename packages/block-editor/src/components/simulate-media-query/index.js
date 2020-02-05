@@ -1,10 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	filter,
-	get,
-} from 'lodash';
+import { filter, get } from 'lodash';
 import { match } from 'css-mediaquery';
 
 /**
@@ -22,7 +19,8 @@ function getStyleSheetsThatMatchHostname() {
 		get( window, [ 'document', 'styleSheets' ], [] ),
 		( styleSheet ) => {
 			return (
-				styleSheet.href && styleSheet.href.includes( window.location.hostname )
+				styleSheet.href &&
+				styleSheet.href.includes( window.location.hostname )
 			);
 		}
 	);
@@ -44,13 +42,10 @@ function replaceRule( styleSheet, newRuleText, index ) {
 function replaceMediaQueryWithWidthEvaluation( ruleText, widthValue ) {
 	return ruleText.replace( VALID_MEDIA_QUERY_REGEX, ( matchedSubstring ) => {
 		if (
-			match(
-				matchedSubstring,
-				{
-					type: 'screen',
-					width: widthValue,
-				}
-			)
+			match( matchedSubstring, {
+				type: 'screen',
+				width: widthValue,
+			} )
 		) {
 			return ENABLED_MEDIA_QUERY;
 		}
@@ -65,53 +60,67 @@ function replaceMediaQueryWithWidthEvaluation( ruleText, widthValue ) {
  * @param {number} width Viewport width to simulate.
  */
 export default function useSimulatedMediaQuery( width ) {
-	useEffect(
-		() => {
-			const styleSheets = getStyleSheetsThatMatchHostname( );
-			const originalStyles = [];
-			styleSheets.forEach( ( styleSheet, styleSheetIndex ) => {
-				let relevantSection = false;
-				for ( let ruleIndex = 0; ruleIndex < styleSheet.cssRules.length; ++ruleIndex ) {
-					const rule = styleSheet.cssRules[ ruleIndex ];
+	useEffect( () => {
+		const styleSheets = getStyleSheetsThatMatchHostname();
+		const originalStyles = [];
+		styleSheets.forEach( ( styleSheet, styleSheetIndex ) => {
+			let relevantSection = false;
+			for (
+				let ruleIndex = 0;
+				ruleIndex < styleSheet.cssRules.length;
+				++ruleIndex
+			) {
+				const rule = styleSheet.cssRules[ ruleIndex ];
 
-					if ( ! relevantSection && !! rule.cssText.match( /#start-resizable-editor-section/ ) ) {
-						relevantSection = true;
-					}
+				if (
+					! relevantSection &&
+					!! rule.cssText.match( /#start-resizable-editor-section/ )
+				) {
+					relevantSection = true;
+				}
 
-					if ( relevantSection && !! rule.cssText.match( /#end-resizable-editor-section/ ) ) {
-						relevantSection = false;
-					}
+				if (
+					relevantSection &&
+					!! rule.cssText.match( /#end-resizable-editor-section/ )
+				) {
+					relevantSection = false;
+				}
 
-					if ( ! relevantSection || ! isReplaceableMediaRule( rule ) ) {
-						continue;
+				if ( ! relevantSection || ! isReplaceableMediaRule( rule ) ) {
+					continue;
+				}
+				const ruleText = rule.cssText;
+				if ( ! originalStyles[ styleSheetIndex ] ) {
+					originalStyles[ styleSheetIndex ] = [];
+				}
+				originalStyles[ styleSheetIndex ][ ruleIndex ] = ruleText;
+				replaceRule(
+					styleSheet,
+					replaceMediaQueryWithWidthEvaluation( ruleText, width ),
+					ruleIndex
+				);
+			}
+		} );
+		return () => {
+			originalStyles.forEach( ( rulesCollection, styleSheetIndex ) => {
+				if ( ! rulesCollection ) {
+					return;
+				}
+				for (
+					let ruleIndex = 0;
+					ruleIndex < rulesCollection.length;
+					++ruleIndex
+				) {
+					const originalRuleText = rulesCollection[ ruleIndex ];
+					if ( originalRuleText ) {
+						replaceRule(
+							styleSheets[ styleSheetIndex ],
+							originalRuleText,
+							ruleIndex
+						);
 					}
-					const ruleText = rule.cssText;
-					if ( ! originalStyles[ styleSheetIndex ] ) {
-						originalStyles[ styleSheetIndex ] = [];
-					}
-					originalStyles[ styleSheetIndex ][ ruleIndex ] = ruleText;
-					replaceRule(
-						styleSheet,
-						replaceMediaQueryWithWidthEvaluation( ruleText, width ),
-						ruleIndex
-					);
 				}
 			} );
-			return () => {
-				originalStyles.forEach( ( rulesCollection, styleSheetIndex ) => {
-					if ( ! rulesCollection ) {
-						return;
-					}
-					for ( let ruleIndex = 0; ruleIndex < rulesCollection.length; ++ruleIndex ) {
-						const originalRuleText = rulesCollection[ ruleIndex ];
-						if ( originalRuleText ) {
-							replaceRule( styleSheets[ styleSheetIndex ], originalRuleText, ruleIndex );
-						}
-					}
-				} );
-			};
-		},
-		[ width ]
-	);
+		};
+	}, [ width ] );
 }
-

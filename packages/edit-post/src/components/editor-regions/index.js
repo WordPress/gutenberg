@@ -12,7 +12,14 @@ import { useSimulatedMediaQuery } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
-function EditorRegions( { footer, header, sidebar, content, publish, className } ) {
+function EditorRegions( {
+	footer,
+	header,
+	sidebar,
+	content,
+	publish,
+	className,
+} ) {
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getDeviceType();
 	}, [] );
@@ -45,7 +52,7 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
 	};
 
-	const marginValue = () => window.innerHeight < 800 ? 36 : 72;
+	const marginValue = () => ( window.innerHeight < 800 ? 36 : 72 );
 
 	const contentInlineStyles = ( device ) => {
 		switch ( device ) {
