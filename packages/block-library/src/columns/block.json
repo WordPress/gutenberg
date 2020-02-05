@@ -5,9 +5,6 @@
 		"verticalAlignment": {
 			"type": "string"
 		},
-		"width": {
-			"type": "number"
-		},
 		"backgroundColor": {
 			"type": "string"
 		},

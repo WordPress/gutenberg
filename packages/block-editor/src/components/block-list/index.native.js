@@ -157,24 +157,17 @@ export class BlockList extends Component {
 			getBlockAttributes,
 		} = this.props;
 
-		const getVerticalAlignmentRemap = ( newAlignment ) => {
-			let alingment;
-			switch ( newAlignment ) {
-				case 'center':
-					alingment = 'center';
-					break;
+		const getVerticalAlignmentRemap = ( alingment ) => {
+			if ( ! alingment ) return;
 
-				case 'bottom':
-					alingment = 'flex-end';
-					break;
+			const mapping = {
+				top: 'flex-start',
+				center: 'center',
+				bottom: 'flex-end',
+			};
 
-				case 'top':
-					alingment = 'flex-start';
-					break;
-
-				default:
-					alingment = newAlignment;
-			}
+			const newAlingment = mapping[ alingment ];
+			if ( ! newAlingment ) return;
 			return { justifyContent: alingment };
 		};
 
