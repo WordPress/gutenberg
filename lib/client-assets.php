@@ -687,7 +687,7 @@ add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload
  */
 function gutenberg_extend_settings_image_dimensions( $settings ) {
 	$image_dimensions = array();
-	$all_sizes = wp_get_registered_image_subsizes();
+	$all_sizes        = wp_get_registered_image_subsizes();
 	foreach ( $settings['imageSizes'] as $size ) {
 		$key = $size['slug'];
 		if ( isset( $all_sizes[ $key ] ) ) {

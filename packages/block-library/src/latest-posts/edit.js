@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isUndefined, map, pickBy } from 'lodash';
+import { get, isUndefined, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -39,19 +39,6 @@ const CATEGORIES_LIST_QUERY = {
 };
 const MAX_POSTS_COLUMNS = 6;
 
-// @todo This should be retrieved dynamically, or from site settings, since it can be changed by the site owner.
-function getImageDimensionsFromSlug( slug = 'thumbnail' ) {
-	switch ( slug ) {
-		case 'large':
-			return [ 1024, 1024 ];
-		case 'medium':
-			return [ 300, 300 ];
-		case 'thumbnail':
-		default:
-			return [ 150, 150 ];
-	}
-}
-
 class LatestPostsEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -87,6 +74,8 @@ class LatestPostsEdit extends Component {
 			setAttributes,
 			imageSizeOptions,
 			latestPosts,
+			defaultImageWidth,
+			defaultImageHeight,
 		} = this.props;
 		const { categoriesList } = this.state;
 		const {
@@ -106,10 +95,6 @@ class LatestPostsEdit extends Component {
 			featuredImageSizeWidth,
 			featuredImageSizeHeight,
 		} = attributes;
-
-		const [ imageWidth, imageHeight ] = getImageDimensionsFromSlug(
-			featuredImageSizeSlug
-		);
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -189,8 +174,8 @@ class LatestPostsEdit extends Component {
 								slug={ featuredImageSizeSlug }
 								width={ featuredImageSizeWidth }
 								height={ featuredImageSizeHeight }
-								imageWidth={ imageWidth }
-								imageHeight={ imageHeight }
+								imageWidth={ defaultImageWidth }
+								imageHeight={ defaultImageHeight }
 								imageSizeOptions={ imageSizeOptions }
 								onChangeImage={ ( value ) =>
 									setAttributes( {
@@ -435,7 +420,7 @@ export default withSelect( ( select, props ) => {
 	} = props.attributes;
 	const { getEntityRecords, getMedia } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
-	const { imageSizes } = getSettings();
+	const { imageSizes, imageDimensions } = getSettings();
 	const latestPostsQuery = pickBy(
 		{
 			categories,
@@ -447,12 +432,14 @@ export default withSelect( ( select, props ) => {
 	);
 
 	const posts = getEntityRecords( 'postType', 'post', latestPostsQuery );
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) => slug !== 'full' )
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	return {
-		imageSizeOptions: map( imageSizes, ( { name, slug } ) => ( {
-			value: slug,
-			label: name,
-		} ) ),
+		defaultImageWidth: imageDimensions[ featuredImageSizeSlug ].width,
+		defaultImageHeight: imageDimensions[ featuredImageSizeSlug ].height,
+		imageSizeOptions,
 		latestPosts: ! Array.isArray( posts )
 			? posts
 			: posts.map( ( post ) => {
