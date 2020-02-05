@@ -31,9 +31,7 @@ import {
 import { useInstanceId, withSafeTimeout } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
-/* eslint-disable import/no-extraneous-dependencies */
 import { focus } from '@wordpress/dom';
-/* eslint-enable import/no-extraneous-dependencies */
 
 /**
  * Internal dependencies
