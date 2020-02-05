@@ -117,7 +117,7 @@ function LinkControl( {
 			: ! value || ! value.url
 	);
 	const [ isResolvingLink, setIsResolvingLink ] = useState( false );
-	const [ errorMsg, setErrorMsg ] = useState( null );
+	const [ errorMessage, setErrorMessage ] = useState( null );
 	const isEndingEditWithFocus = useRef( false );
 
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
