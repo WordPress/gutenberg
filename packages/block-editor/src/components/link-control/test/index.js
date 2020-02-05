@@ -828,13 +828,13 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					'[role="listbox"] [role="option"]'
 				);
 
-				const createButton = Array.from(
-					searchResultElements
-				).filter( ( result ) =>
-					result.innerHTML.includes( 'Create new' )
+				const createButton = first(
+					Array.from( searchResultElements ).filter( ( result ) =>
+						result.innerHTML.includes( 'Create new' )
+					)
 				);
 
-				expect( createButton ).toBeNull();
+				expect( createButton ).toBeFalsy(); // shouldn't exist!
 			}
 		);
 	} );

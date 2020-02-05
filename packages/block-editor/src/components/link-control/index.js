@@ -232,11 +232,13 @@ function LinkControl( {
 		// controlled components the value of the `url` property must correspond
 		// to the text value of the `<input>` otherwise it will result in an
 		// incorrectly named entity being created.
-		return results.concat( {
-			title: val, // placeholder
-			url: val, // must match the existing `<input>`s text value
-			type: CREATE_TYPE,
-		} );
+		return maybeURL( val )
+			? results
+			: results.concat( {
+					title: val, // placeholder
+					url: val, // must match the existing `<input>`s text value
+					type: CREATE_TYPE,
+			  } );
 	};
 
 	/**
@@ -253,15 +255,16 @@ function LinkControl( {
 		setIsEditingLink( false );
 	}
 
+	function maybeURL( val ) {
+		const isInternal = startsWith( val, '#' );
+
+		return isInternal || isURL( val ) || ( val && val.includes( 'www.' ) );
+	}
+
 	// Effects
 	const getSearchHandler = useCallback(
 		( val, args ) => {
-			const isInternal = startsWith( val, '#' );
-
-			const maybeURL =
-				isInternal || isURL( val ) || ( val && val.includes( 'www.' ) );
-
-			return maybeURL
+			return maybeURL( val )
 				? handleDirectEntry( val, args )
 				: handleEntitySearch( val, args );
 		},
