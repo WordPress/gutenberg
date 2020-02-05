@@ -201,6 +201,7 @@ class BottomSheet extends Component {
 						bounces={ this.state.bounces }
 						onScroll={ this.onScroll }
 						scrollEventThrottle={ 16 }
+						disableScrollViewPanResponder
 						style={ { maxHeight: this.state.maxHeight } }
 						contentContainerStyle={ [
 							styles.content,
