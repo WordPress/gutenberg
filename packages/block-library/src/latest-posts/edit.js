@@ -85,7 +85,6 @@ class LatestPostsEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
-			getFeaturedMediaSourceUrl,
 			imageSizeOptions,
 			latestPosts,
 		} = this.props;
@@ -332,10 +331,8 @@ class LatestPostsEdit extends Component {
 							excerptElement.innerText ||
 							'';
 
-						const imageSourceUrl = getFeaturedMediaSourceUrl(
-							post.featured_media,
-							featuredImageSizeSlug
-						);
+						const imageSourceUrl = post.featuredImageSourceUrl;
+
 						const imageClasses = classnames( {
 							'wp-block-latest-posts__featured-image': true,
 							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
@@ -429,10 +426,16 @@ class LatestPostsEdit extends Component {
 }
 
 export default withSelect( ( select, props ) => {
-	const { postsToShow, order, orderBy, categories } = props.attributes;
+	const {
+		featuredImageSizeSlug,
+		postsToShow,
+		order,
+		orderBy,
+		categories,
+	} = props.attributes;
+	const { getEntityRecords, getMedia } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
 	const { imageSizes } = getSettings();
-	const { getEntityRecords, getMedia } = select( 'core' );
 	const latestPostsQuery = pickBy(
 		{
 			categories,
@@ -442,27 +445,35 @@ export default withSelect( ( select, props ) => {
 		},
 		( value ) => ! isUndefined( value )
 	);
+
+	const posts = getEntityRecords( 'postType', 'post', latestPostsQuery );
+
 	return {
 		imageSizeOptions: map( imageSizes, ( { name, slug } ) => ( {
 			value: slug,
 			label: name,
 		} ) ),
-		// @todo get size dynamically based on size selected.
-		getFeaturedMediaSourceUrl( featuredImageId, sizeSlug ) {
-			if ( featuredImageId ) {
-				const image = getMedia( featuredImageId );
-				const url = get(
-					image,
-					[ 'media_details', 'sizes', sizeSlug, 'source_url' ],
-					null
-				);
-				if ( ! url ) {
-					return get( image, 'source_url', null );
-				}
-				return url;
-			}
-			return null;
-		},
-		latestPosts: getEntityRecords( 'postType', 'post', latestPostsQuery ),
+		latestPosts: ! Array.isArray( posts )
+			? posts
+			: posts.map( ( post ) => {
+					if ( post.featured_media ) {
+						const image = getMedia( post.featured_media );
+						let url = get(
+							image,
+							[
+								'media_details',
+								'sizes',
+								featuredImageSizeSlug,
+								'source_url',
+							],
+							null
+						);
+						if ( ! url ) {
+							url = get( image, 'source_url', null );
+						}
+						return { ...post, featuredImageSourceUrl: url };
+					}
+					return post;
+			  } ),
 	};
 } )( LatestPostsEdit );
