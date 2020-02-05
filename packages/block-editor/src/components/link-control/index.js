@@ -74,8 +74,9 @@ import LinkControlSearchInput from './search-input';
  *
  * @property {(WPLinkControlSetting[])=}  settings               An array of settings objects. Each object will used to
  *                                                               render a `ToggleControl` for that setting.
- * @property {(search:string)=>Promise=}  fetchSearchSuggestions Fetches suggestions for a given search term,
- *                                                               returning a promise resolving once fetch is complete.
+ * @property {boolean=}                   forceIsEditingLink     If passed as either `true` or `false`, controls the
+ *                                                               internal editing state of the component to respective
+ *                                                               show or not show the URL input field.
  * @property {WPLinkControlValue=}        value                  Current link value.
  * @property {WPLinkControlOnChangeProp=} onChange               Value change handler, called with the updated value if
  *                                                               the user selects a new link or updates settings.
@@ -94,6 +95,7 @@ function LinkControl( {
 	settings,
 	onChange = noop,
 	showInitialSuggestions,
+	forceIsEditingLink,
 } ) {
 	const wrapperNode = useRef();
 	const instanceId = useInstanceId( LinkControl );
@@ -101,7 +103,9 @@ function LinkControl( {
 		( value && value.url ) || ''
 	);
 	const [ isEditingLink, setIsEditingLink ] = useState(
-		! value || ! value.url
+		forceIsEditingLink !== undefined
+			? forceIsEditingLink
+			: ! value || ! value.url
 	);
 	const isEndingEditWithFocus = useRef( false );
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
@@ -113,6 +117,15 @@ function LinkControl( {
 	}, [] );
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ) ) ) || '';
+
+	useEffect( () => {
+		if (
+			forceIsEditingLink !== undefined &&
+			forceIsEditingLink !== isEditingLink
+		) {
+			setIsEditingLink( forceIsEditingLink );
+		}
+	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
 		// When `isEditingLink` is set to `false`, a focus loss could occur
