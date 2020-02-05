@@ -21,7 +21,7 @@ _Returns_
 
 <a name="getCategoryShortcuts" href="#getCategoryShortcuts">#</a> **getCategoryShortcuts**
 
-Returns the shortcut names list for a give category name.
+Returns the shortcut names list for a given category name.
 
 _Parameters_
 

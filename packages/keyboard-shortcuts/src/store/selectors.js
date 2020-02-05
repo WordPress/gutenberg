@@ -140,7 +140,7 @@ export const getAllShortcutRawKeyCombinations = createSelector(
 );
 
 /**
- * Returns the shortcut names list for a give category name.
+ * Returns the shortcut names list for a given category name.
  *
  * @param {Object} state Global state.
  * @param {string} name  Category name.
