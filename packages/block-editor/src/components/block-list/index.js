@@ -37,7 +37,7 @@ function BlockList( {
 	rootClientId,
 	isDraggable,
 	renderAppender,
-	__experimentalUIParts = { hasPopover: true },
+	__experimentalUIParts = { },
 } ) {
 	function selector( select ) {
 		const {
@@ -86,7 +86,7 @@ function BlockList( {
 				'block-editor-block-list__layout',
 				className
 			) }
-			__experimentalUIParts={ __experimentalUIParts }
+			hasPopover={ __experimentalUIParts.hasPopover }
 		>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection ?
