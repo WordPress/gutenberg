@@ -229,14 +229,14 @@ function LinkControl( {
 		// the a11y benefits afforded by `URLInput` to all suggestions (eg:
 		// keyboard handling, ARIA roles...etc).
 		// Note also that due to the flow of data and the nature of the
-		// controlled components the value of the `url` property must correspond
-		// to the text value of the `<input>` otherwise it will result in an
-		// incorrectly named entity being created.
+		// controlled components the value of the `title` property must correspond
+		// to the text value of the `<input>`. This is because `title` is used
+		// when creating the entity.
 		return maybeURL( val )
 			? results
 			: results.concat( {
-					title: val, // placeholder
-					url: val, // must match the existing `<input>`s text value
+					title: val, // // must match the existing `<input>`s text value
+					url: '', // placeholder - not used when creating
 					type: CREATE_TYPE,
 			  } );
 	};
