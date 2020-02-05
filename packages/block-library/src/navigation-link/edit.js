@@ -116,42 +116,39 @@ function NavigationLinkEdit( {
 		selection.addRange( range );
 	}
 
-	function handleCreatePage( pageTitle ) {
+	async function handleCreatePage( pageTitle ) {
 		const type = 'page';
-		return saveEntityRecord( 'postType', type, {
+		const page = await saveEntityRecord( 'postType', type, {
 			title: pageTitle,
 			status: 'publish',
-		} ).then( ( page ) => {
-			// `page` may not reject the Promise
-			// but may still be invalid. Here we
-			// tests for unexpected values and throw accordingly.
-			if ( null === page || undefined === page ) {
-				throw new TypeError(
-					'API response returned invalid Page.',
-					page
-				);
-			}
-
-			const requiredEntityProps = [ 'id', 'title', 'link' ];
-
-			const pageMissingProperty = requiredEntityProps.find(
-				( pageProp ) => ! page.hasOwnProperty( pageProp )
-			);
-
-			if ( pageMissingProperty ) {
-				throw new TypeError(
-					`API response returned invalid page. Missing required property "${ pageMissingProperty }".`,
-					page
-				);
-			}
-
-			return {
-				id: page.id,
-				type,
-				title: page.title.rendered,
-				url: page.link,
-			};
 		} );
+
+		// `page` may not reject the Promise
+		// but may still be invalid. Here we
+		// tests for unexpected values and throw accordingly.
+		if ( null === page || undefined === page ) {
+			throw new TypeError( 'API response returned invalid Page.', page );
+		}
+
+		const requiredEntityProps = [ 'id', 'title', 'link' ];
+
+		const pageMissingProperty = requiredEntityProps.find(
+			( pageProp ) => ! page.hasOwnProperty( pageProp )
+		);
+
+		if ( pageMissingProperty ) {
+			throw new TypeError(
+				`API response returned invalid page. Missing required property "${ pageMissingProperty }".`,
+				page
+			);
+		}
+
+		return {
+			id: page.id,
+			type,
+			title: page.title.rendered,
+			url: page.link,
+		};
 	}
 
 	return (
