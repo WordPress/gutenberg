@@ -432,8 +432,8 @@ export function createBlockWithFallback( blockNode ) {
 	// Convert derivative blocks such as 'core/social-link-wordpress' to the
 	// canonical form 'core/social-link'.
 	if ( name && name.indexOf( 'core/social-link-' ) === 0 ) {
-		// Capture `social-link-wordpress` into `{"site":"wordpress"}`
-		attributes.site = name.substring( 17 );
+		// Capture `social-link-wordpress` into `{"service":"wordpress"}`
+		attributes.service = name.substring( 17 );
 		name = 'core/social-link';
 	}
 

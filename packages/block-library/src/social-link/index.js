@@ -24,4 +24,25 @@ export const settings = {
 	edit,
 	description: __( 'Create a link to the wider Web' ),
 	variations,
+	deprecated: [
+		{
+			attributes: {
+				url: { type: 'string' },
+				site: { type: 'string' },
+				label: { type: 'string' },
+			},
+			migrate( { site, ...attributes } ) {
+				return {
+					...attributes,
+					service: site,
+				};
+			},
+			isEligible( attributes ) {
+				return attributes.hasOwnProperty( 'site' );
+			},
+			save() {
+				return null;
+			},
+		},
+	],
 };

@@ -6,7 +6,7 @@
             {
                 "blockName": "core/social-link",
                 "attrs": {
-                    "site": "mastodon",
+                    "service": "mastodon",
                     "url": "https://mastodon.social/@marcuskaz"
                 },
                 "innerBlocks": [],

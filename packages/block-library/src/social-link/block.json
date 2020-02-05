@@ -5,7 +5,7 @@
 		"url": {
 			"type": "string"
 		},
-		"site": {
+		"service": {
 			"type": "string"
 		},
 		"label": {

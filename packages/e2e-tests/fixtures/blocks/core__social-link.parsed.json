@@ -2,7 +2,7 @@
     {
         "blockName": "core/social-link",
         "attrs": {
-            "site": "spotify",
+            "service": "spotify",
             "url": "https://example.com/"
         },
         "innerBlocks": [],

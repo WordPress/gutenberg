@@ -8,12 +8,15 @@ const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
 // Template contains the links that show when start.
 const TEMPLATE = [
-	[ 'core/social-link', { site: 'wordpress', url: 'https://wordpress.org' } ],
-	[ 'core/social-link', { site: 'facebook' } ],
-	[ 'core/social-link', { site: 'twitter' } ],
-	[ 'core/social-link', { site: 'instagram' } ],
-	[ 'core/social-link', { site: 'linkedin' } ],
-	[ 'core/social-link', { site: 'youtube' } ],
+	[
+		'core/social-link',
+		{ service: 'wordpress', url: 'https://wordpress.org' },
+	],
+	[ 'core/social-link', { service: 'facebook' } ],
+	[ 'core/social-link', { service: 'twitter' } ],
+	[ 'core/social-link', { service: 'instagram' } ],
+	[ 'core/social-link', { service: 'linkedin' } ],
+	[ 'core/social-link', { service: 'youtube' } ],
 ];
 
 export const SocialLinksEdit = function( { className } ) {

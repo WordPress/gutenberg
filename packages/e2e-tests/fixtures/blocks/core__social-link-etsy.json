@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://example.com/",
-            "site": "etsy"
+            "service": "etsy"
         },
         "innerBlocks": [],
         "originalContent": ""
