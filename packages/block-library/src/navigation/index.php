@@ -12,7 +12,7 @@
  * @param  array $attributes Navigation block attributes.
  * @return array Colors CSS classes and inline styles.
  */
-function build_css_colors( $attributes ) {
+function core_block_navigation_build_css_colors( $attributes ) {
 	$colors = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
@@ -20,7 +20,7 @@ function build_css_colors( $attributes ) {
 
 	// Text color.
 	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-	$has_custom_text_color = array_key_exists( 'customTextColor', $attributes );
+	$has_custom_text_color = array_key_exists( 'rgbTextColor', $attributes );
 
 	// If has text color.
 	if ( $has_custom_text_color || $has_named_text_color ) {
@@ -33,17 +33,17 @@ function build_css_colors( $attributes ) {
 		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['rgbTextColor'] );
 	}
 
 	// Background color.
 	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $attributes );
+	$has_custom_background_color = array_key_exists( 'rgbBackgroundColor', $attributes );
 
 	// If has background color.
 	if ( $has_custom_background_color || $has_named_background_color ) {
-		// Add has-background-color class.
-		$colors['css_classes'][] = 'has-background-color';
+		// Add has-background class.
+		$colors['css_classes'][] = 'has-background';
 	}
 
 	if ( $has_named_background_color ) {
@@ -51,7 +51,7 @@ function build_css_colors( $attributes ) {
 		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['rgbBackgroundColor'] );
 	}
 
 	return $colors;
@@ -64,7 +64,7 @@ function build_css_colors( $attributes ) {
  * @param  array $attributes Navigation block attributes.
  * @return array Font size CSS classes and inline styles.
  */
-function build_css_font_sizes( $attributes ) {
+function core_block_navigation_build_css_font_sizes( $attributes ) {
 	// CSS classes.
 	$font_sizes = array(
 		'css_classes'   => array(),
@@ -91,7 +91,7 @@ function build_css_font_sizes( $attributes ) {
  * @param array $blocks Navigation link inner blocks from the Navigation block.
  * @return array Blocks that had valid labels
  */
-function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
+function core_block_navigation_empty_navigation_links_recursive( $blocks ) {
 	$blocks = array_filter(
 		$blocks,
 		function( $block ) {
@@ -102,7 +102,7 @@ function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
 	if ( ! empty( $blocks ) ) {
 		foreach ( $blocks as $key => $block ) {
 			if ( ! empty( $block['innerBlocks'] ) ) {
-				$blocks[ $key ]['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+				$blocks[ $key ]['innerBlocks'] = core_block_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
 			}
 		}
 	}
@@ -115,28 +115,33 @@ function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
  *
  * @return string
  */
-function render_submenu_icon() {
-	return '<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" role="img" aria-hidden="true" focusable="false"><polygon points="9,13.5 14.7,7.9 13.2,6.5 9,10.7 4.8,6.5 3.3,7.9 "></polygon></svg>';
+function core_block_navigation_render_submenu_icon() {
+	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" transform="rotate(90)"><path d="M8 5v14l11-7z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
 }
 
 /**
  * Renders the `core/navigation` block on server.
  *
- * @param array $attributes The block attributes.
  * @param array $content The saved content.
  * @param array $block The parsed block.
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_navigation( $attributes, $content, $block ) {
-	$block['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+function render_block_navigation( $content, $block ) {
+
+	if ( 'core/navigation' !== $block['blockName'] ) {
+		return $content;
+	}
+
+	$attributes           = $block['attrs'];
+	$block['innerBlocks'] = core_block_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
 
 	if ( empty( $block['innerBlocks'] ) ) {
 		return '';
 	}
 
-	$colors          = build_css_colors( $attributes );
-	$font_sizes      = build_css_font_sizes( $attributes );
+	$colors          = core_block_navigation_build_css_colors( $attributes );
+	$font_sizes      = core_block_navigation_build_css_font_sizes( $attributes );
 	$classes         = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
@@ -154,7 +159,7 @@ function render_block_navigation( $attributes, $content, $block ) {
 		'<nav %1$s %2$s>%3$s</nav>',
 		$class_attribute,
 		$style_attribute,
-		build_navigation_html( $attributes, $block, $colors, $font_sizes, true )
+		core_block_navigation_build_html( $attributes, $block, $colors, $font_sizes, true )
 	);
 }
 
@@ -165,18 +170,17 @@ function render_block_navigation( $attributes, $content, $block ) {
  * @param array $block         The NavigationItem block.
  * @param array $colors        Contains inline styles and CSS classes to apply to navigation item.
  * @param array $font_sizes    Contains inline styles and CSS classes to apply to navigation item.
- * @param bool  $is_level_zero True whether is main menu (level zero). Otherwise, False.
  *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_level_zero = true ) {
+function core_block_navigation_build_html( $attributes, $block, $colors, $font_sizes ) {
 	$html            = '';
 	$classes         = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes']
 	);
-	$css_classes     = implode( ' ', $classes );
-	$class_attribute = sprintf( ' class="wp-block-navigation-link__content %s"', esc_attr( trim( $css_classes ) ) );
+	$classes[]       = 'wp-block-navigation-link';
+	$css_classes     = trim( implode( ' ', $classes ) );
 	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
 		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
 		: '';
@@ -184,12 +188,8 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_l
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
 		$has_submenu = count( (array) $block['innerBlocks'] ) > 0;
 
-		$html .= '<li class="wp-block-navigation-link' . ( $has_submenu ? ' has-submenu' : '' ) . '">' .
-			'<a';
-
-		if ( $is_level_zero ) {
-			$html .= $class_attribute . $style_attribute;
-		}
+		$html .= '<li class="' . esc_attr( $css_classes . ( $has_submenu ? ' has-child' : '' ) ) . '"' . $style_attribute . '>' .
+			'<a class="wp-block-navigation-link__content"';
 
 		// Start appending HTML attributes to anchor tag.
 		if ( isset( $block['attrs']['url'] ) ) {
@@ -234,20 +234,28 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes, $is_l
 		$html .= '</span>';
 
 		// Append submenu icon to top-level item.
-		if ( $attributes['showSubmenuIcon'] && $is_level_zero && $has_submenu ) {
-			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . render_submenu_icon() . '</span>';
+		// it shows the icon as default, when 'showSubmenuIcon' is not set,
+		// or when it's set and also not False.
+		if (
+			(
+				isset( $attributes['showSubmenuIcon'] ) && false !== $attributes['showSubmenuIcon'] ||
+				! isset( $attributes['showSubmenuIcon'] )
+			) &&
+			$has_submenu
+		) {
+			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . core_block_navigation_render_submenu_icon() . '</span>';
 		}
 
 		$html .= '</a>';
 		// End anchor tag content.
 
 		if ( $has_submenu ) {
-			$html .= build_navigation_html( $attributes, $block, $colors, $font_sizes, false );
+			$html .= core_block_navigation_build_html( $attributes, $block, $colors, $font_sizes, false );
 		}
 
 		$html .= '</li>';
 	}
-	return '<ul>' . $html . '</ul>';
+	return '<ul class="wp-block-navigation__container">' . $html . '</ul>';
 }
 
 /**
@@ -261,39 +269,38 @@ function register_block_core_navigation() {
 	register_block_type(
 		'core/navigation',
 		array(
-			'attributes'      => array(
-				'className'             => array(
+			'attributes' => array(
+				'className'          => array(
 					'type' => 'string',
 				),
-				'textColor'             => array(
+				'textColor'          => array(
 					'type' => 'string',
 				),
-				'customTextColor'       => array(
+				'rgbTextColor'       => array(
 					'type' => 'string',
 				),
-				'backgroundColor'       => array(
+				'backgroundColor'    => array(
 					'type' => 'string',
 				),
-				'customBackgroundColor' => array(
+				'rgbBackgroundColor' => array(
 					'type' => 'string',
 				),
-				'fontSize'              => array(
+				'fontSize'           => array(
 					'type' => 'string',
 				),
-				'customFontSize'        => array(
+				'customFontSize'     => array(
 					'type' => 'number',
 				),
-				'itemsJustification'    => array(
+				'itemsJustification' => array(
 					'type' => 'string',
 				),
-				'showSubmenuIcon'       => array(
+				'showSubmenuIcon'    => array(
 					'type'    => 'boolean',
-					'default' => false,
+					'default' => true,
 				),
 			),
-
-			'render_callback' => 'render_block_navigation',
 		)
 	);
 }
 add_action( 'init', 'register_block_core_navigation' );
+add_filter( 'render_block', 'render_block_navigation', 10, 2 );

@@ -4,14 +4,14 @@ export default function compareWidths( operator, queryWidth, containerWidth ) {
 			return containerWidth < queryWidth;
 		case '<=':
 			return containerWidth <= queryWidth;
-		case '===' :
-		case '==' :
-		case '=' :
+		case '===':
+		case '==':
+		case '=':
 			return containerWidth === queryWidth;
-		case '!==' :
-		case '!=' :
+		case '!==':
+		case '!=':
 			return containerWidth !== queryWidth;
-		case '>' :
+		case '>':
 			return containerWidth > queryWidth;
 		case '>=':
 			return containerWidth >= queryWidth;

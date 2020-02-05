@@ -54,17 +54,33 @@ class Video extends Component {
 
 	// Tries opening the URL outside of the app
 	openURL( url ) {
-		Linking.canOpenURL( url ).then( ( supported ) => {
-			if ( ! supported ) {
-				Alert.alert( __( 'Problem opening the video' ), __( 'No application can handle this request. Please install a Web browser.' ) );
-				window.console.warn( 'No application found that can open the video with URL: ' + url );
-			} else {
-				return Linking.openURL( url );
-			}
-		} ).catch( ( err ) => {
-			Alert.alert( __( 'Problem opening the video' ), __( 'An unknown error occurred. Please try again.' ) );
-			window.console.error( 'An error occurred while opening the video URL: ' + url, err );
-		} );
+		Linking.canOpenURL( url )
+			.then( ( supported ) => {
+				if ( ! supported ) {
+					Alert.alert(
+						__( 'Problem opening the video' ),
+						__(
+							'No application can handle this request. Please install a Web browser.'
+						)
+					);
+					window.console.warn(
+						'No application found that can open the video with URL: ' +
+							url
+					);
+				} else {
+					return Linking.openURL( url );
+				}
+			} )
+			.catch( ( err ) => {
+				Alert.alert(
+					__( 'Problem opening the video' ),
+					__( 'An unknown error occurred. Please try again.' )
+				);
+				window.console.error(
+					'An error occurred while opening the video URL: ' + url,
+					err
+				);
+			} );
 	}
 
 	render() {
@@ -93,14 +109,22 @@ class Video extends Component {
 						this.setState( { isFullScreen: false } );
 					} }
 				/>
-				{ showPlayButton &&
-				// If we add the play icon as a subview to VideoPlayer then react-native-video decides to show control buttons
-				// even if we set controls={ false }, so we are adding our play button as a sibling overlay view.
-				<TouchableOpacity disabled={ ! isSelected } onPress={ this.onPressPlay } style={ [ style, styles.overlayContainer ] }>
-					<View style={ styles.blackOverlay } />
-					<Icon icon={ PlayIcon } style={ styles.playIcon } size={ styles.playIcon.size } />
-				</TouchableOpacity>
-				}
+				{ showPlayButton && (
+					// If we add the play icon as a subview to VideoPlayer then react-native-video decides to show control buttons
+					// even if we set controls={ false }, so we are adding our play button as a sibling overlay view.
+					<TouchableOpacity
+						disabled={ ! isSelected }
+						onPress={ this.onPressPlay }
+						style={ [ style, styles.overlayContainer ] }
+					>
+						<View style={ styles.blackOverlay } />
+						<Icon
+							icon={ PlayIcon }
+							style={ styles.playIcon }
+							size={ styles.playIcon.size }
+						/>
+					</TouchableOpacity>
+				) }
 			</View>
 		);
 	}

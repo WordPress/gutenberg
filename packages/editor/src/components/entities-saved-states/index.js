@@ -38,7 +38,9 @@ export default function EntitiesSavedStates( {
 	);
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
-	const [ checkedById, _setCheckedById ] = useState( () => new EquivalentKeyMap() );
+	const [ checkedById, _setCheckedById ] = useState(
+		() => new EquivalentKeyMap()
+	);
 	const setCheckedById = ( id, checked ) =>
 		_setCheckedById( ( prevCheckedById ) => {
 			const nextCheckedById = new EquivalentKeyMap( prevCheckedById );
@@ -53,7 +55,9 @@ export default function EntitiesSavedStates( {
 		checkedById.forEach( ( _checked, id ) => {
 			if ( ! ignoredForSave.has( id ) ) {
 				saveEditedEntityRecord(
-					...id.filter( ( s, i ) => i !== id.length - 1 || s !== 'undefined' )
+					...id.filter(
+						( s, i ) => i !== id.length - 1 || s !== 'undefined'
+					)
 				);
 			}
 		} );
@@ -66,29 +70,37 @@ export default function EntitiesSavedStates( {
 				onRequestClose={ () => onRequestClose() }
 				contentLabel={ __( 'Select items to save.' ) }
 			>
-				{ Object.keys( entityRecordChangesByRecord ).map( ( changedKind ) =>
-					Object.keys( entityRecordChangesByRecord[ changedKind ] ).map(
-						( changedName ) =>
+				{ Object.keys( entityRecordChangesByRecord ).map(
+					( changedKind ) =>
+						Object.keys(
+							entityRecordChangesByRecord[ changedKind ]
+						).map( ( changedName ) =>
 							Object.keys(
-								entityRecordChangesByRecord[ changedKind ][ changedName ]
+								entityRecordChangesByRecord[ changedKind ][
+									changedName
+								]
 							).map( ( changedKey ) => {
-								const id = [ changedKind, changedName, changedKey ];
+								const id = [
+									changedKind,
+									changedName,
+									changedKey,
+								];
 								return (
 									<EntitiesSavedStatesCheckbox
 										key={ id.join( ' | ' ) }
 										id={ id }
 										name={ changedName }
 										changes={
-											entityRecordChangesByRecord[ changedKind ][ changedName ][
-												changedKey
-											]
+											entityRecordChangesByRecord[
+												changedKind
+											][ changedName ][ changedKey ]
 										}
 										checked={ checkedById.get( id ) }
 										setCheckedById={ setCheckedById }
 									/>
 								);
 							} )
-					)
+						)
 				) }
 				<Button
 					isPrimary

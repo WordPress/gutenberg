@@ -23,22 +23,24 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			head: [ {
-				cells: [
-					{
-						content: __( 'Version' ),
-						tag: 'th',
-					},
-					{
-						content: __( 'Jazz Musician' ),
-						tag: 'th',
-					},
-					{
-						content: __( 'Release Date' ),
-						tag: 'th',
-					},
-				],
-			} ],
+			head: [
+				{
+					cells: [
+						{
+							content: __( 'Version' ),
+							tag: 'th',
+						},
+						{
+							content: __( 'Jazz Musician' ),
+							tag: 'th',
+						},
+						{
+							content: __( 'Release Date' ),
+							tag: 'th',
+						},
+					],
+				},
+			],
 			body: [
 				{
 					cells: [
@@ -92,7 +94,11 @@ export const settings = {
 		},
 	},
 	styles: [
-		{ name: 'regular', label: _x( 'Default', 'block style' ), isDefault: true },
+		{
+			name: 'regular',
+			label: _x( 'Default', 'block style' ),
+			isDefault: true,
+		},
 		{ name: 'stripes', label: __( 'Stripes' ) },
 	],
 	supports: {

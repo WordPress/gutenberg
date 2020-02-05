@@ -36,5 +36,7 @@ export const _default = () => {
 	const isPrimary = boolean( 'Is primary', true );
 	const copyText = text( 'Text', 'Text' );
 
-	return <ClipboardButtonWithState isPrimary={ isPrimary } text={ copyText } />;
+	return (
+		<ClipboardButtonWithState isPrimary={ isPrimary } text={ copyText } />
+	);
 };

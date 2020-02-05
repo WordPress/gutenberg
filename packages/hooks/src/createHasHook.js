@@ -20,8 +20,12 @@ function createHasHook( hooks ) {
 	return function hasHook( hookName, namespace ) {
 		// Use the namespace if provided.
 		if ( 'undefined' !== typeof namespace ) {
-			return hookName in hooks &&
-				hooks[ hookName ].handlers.some( ( hook ) => hook.namespace === namespace );
+			return (
+				hookName in hooks &&
+				hooks[ hookName ].handlers.some(
+					( hook ) => hook.namespace === namespace
+				)
+			);
 		}
 
 		return hookName in hooks;

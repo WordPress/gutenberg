@@ -67,7 +67,9 @@ function ToolbarGroup( {
 	const finalClassName = classnames(
 		// Unfortunately, there's legacy code referencing to `.components-toolbar`
 		// So we can't get rid of it
-		accessibleToolbarState ? 'components-toolbar-group' : 'components-toolbar',
+		accessibleToolbarState
+			? 'components-toolbar-group'
+			: 'components-toolbar',
 		className
 	);
 
@@ -96,7 +98,9 @@ function ToolbarGroup( {
 					<ToolbarButton
 						key={ [ indexOfSet, indexOfControl ].join() }
 						containerClassName={
-							indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null
+							indexOfSet > 0 && indexOfControl === 0
+								? 'has-left-divider'
+								: null
 						}
 						{ ...control }
 					/>

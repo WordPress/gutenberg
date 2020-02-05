@@ -34,13 +34,18 @@ function PostLink( {
 } ) {
 	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
-	const currentSlug = safeDecodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID;
+	const currentSlug =
+		safeDecodeURIComponent( postSlug ) ||
+		cleanForSlug( postTitle ) ||
+		postID;
 	if ( isEditable ) {
 		prefixElement = prefix && (
 			<span className="edit-post-post-link__link-prefix">{ prefix }</span>
 		);
 		postNameElement = currentSlug && (
-			<span className="edit-post-post-link__link-post-name">{ currentSlug }</span>
+			<span className="edit-post-post-link__link-post-name">
+				{ currentSlug }
+			</span>
 		);
 		suffixElement = suffix && (
 			<span className="edit-post-post-link__link-suffix">{ suffix }</span>
@@ -88,8 +93,7 @@ function PostLink( {
 						} }
 					/>
 					<p>
-						{ __( 'The last part of the URL.' ) }
-						{ ' ' }
+						{ __( 'The last part of the URL.' ) }{ ' ' }
 						<ExternalLink href="https://wordpress.org/support/article/writing-posts/#post-field-descriptions">
 							{ __( 'Read about permalinks' ) }
 						</ExternalLink>
@@ -105,12 +109,15 @@ function PostLink( {
 					href={ postLink }
 					target="_blank"
 				>
-					{ isEditable ?
-						( <>
-							{ prefixElement }{ postNameElement }{ suffixElement }
-						</> ) :
+					{ isEditable ? (
+						<>
+							{ prefixElement }
+							{ postNameElement }
+							{ suffixElement }
+						</>
+					) : (
 						postLink
-					}
+					) }
 				</ExternalLink>
 			</div>
 		</PanelBody>
@@ -127,13 +134,10 @@ export default compose( [
 			getPermalinkParts,
 			getEditedPostAttribute,
 		} = select( 'core/editor' );
-		const {
-			isEditorPanelEnabled,
-			isEditorPanelOpened,
-		} = select( 'core/edit-post' );
-		const {
-			getPostType,
-		} = select( 'core' );
+		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
+			'core/edit-post'
+		);
+		const { getPostType } = select( 'core' );
 
 		const { link, id } = getCurrentPost();
 
@@ -155,9 +159,13 @@ export default compose( [
 			postTypeLabel: get( postType, [ 'labels', 'view_item' ] ),
 		};
 	} ),
-	ifCondition( ( { isEnabled, isNew, postLink, isViewable, permalinkParts } ) => {
-		return isEnabled && ! isNew && postLink && isViewable && permalinkParts;
-	} ),
+	ifCondition(
+		( { isEnabled, isNew, postLink, isViewable, permalinkParts } ) => {
+			return (
+				isEnabled && ! isNew && postLink && isViewable && permalinkParts
+			);
+		}
+	),
 	withDispatch( ( dispatch ) => {
 		const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );
 		const { editPost } = dispatch( 'core/editor' );

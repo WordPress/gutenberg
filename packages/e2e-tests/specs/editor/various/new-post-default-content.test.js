@@ -33,7 +33,9 @@ describe( 'new editor filtered state', () => {
 
 		// open the sidebar, we want to see the excerpt.
 		await openDocumentSettingsSidebar();
-		const excerptButton = await findSidebarPanelToggleButtonWithTitle( 'Excerpt' );
+		const excerptButton = await findSidebarPanelToggleButtonWithTitle(
+			'Excerpt'
+		);
 		if ( excerptButton ) {
 			await excerptButton.click( 'button' );
 		}

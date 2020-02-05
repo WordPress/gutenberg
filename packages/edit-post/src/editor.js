@@ -8,7 +8,11 @@ import { size, map, without } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
+import {
+	EditorProvider,
+	ErrorBoundary,
+	PostLockedModal,
+} from '@wordpress/editor';
 import { StrictMode, Component } from '@wordpress/element';
 import {
 	KeyboardShortcuts,
@@ -43,7 +47,7 @@ class Editor extends Component {
 		blockTypes,
 		preferredStyleVariations,
 		__experimentalLocalAutosaveInterval,
-		updatePreferredStyleVariations,
+		updatePreferredStyleVariations
 	) {
 		settings = {
 			...settings,
@@ -62,15 +66,14 @@ class Editor extends Component {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
-			const defaultAllowedBlockTypes = (
-				true === settings.allowedBlockTypes ?
-					map( blockTypes, 'name' ) :
-					( settings.allowedBlockTypes || [] )
-			);
+			const defaultAllowedBlockTypes =
+				true === settings.allowedBlockTypes
+					? map( blockTypes, 'name' )
+					: settings.allowedBlockTypes || [];
 
 			settings.allowedBlockTypes = without(
 				defaultAllowedBlockTypes,
-				...hiddenBlockTypes,
+				...hiddenBlockTypes
 			);
 		}
 
@@ -108,7 +111,7 @@ class Editor extends Component {
 			blockTypes,
 			preferredStyleVariations,
 			__experimentalLocalAutosaveInterval,
-			updatePreferredStyleVariations,
+			updatePreferredStyleVariations
 		);
 
 		return (
@@ -126,7 +129,9 @@ class Editor extends Component {
 								<ErrorBoundary onError={ onError }>
 									<EditorInitialization postId={ postId } />
 									<Layout />
-									<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
+									<KeyboardShortcuts
+										shortcuts={ preventEventDiscovery }
+									/>
 								</ErrorBoundary>
 								<PostLockedModal />
 							</EditorProvider>
@@ -149,10 +154,14 @@ export default compose( [
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 			focusMode: isFeatureActive( 'focusMode' ),
 			post: getEntityRecord( 'postType', postType, postId ),
-			preferredStyleVariations: getPreference( 'preferredStyleVariations' ),
+			preferredStyleVariations: getPreference(
+				'preferredStyleVariations'
+			),
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
 			blockTypes: getBlockTypes(),
-			__experimentalLocalAutosaveInterval: getPreference( 'localAutosaveInterval' ),
+			__experimentalLocalAutosaveInterval: getPreference(
+				'localAutosaveInterval'
+			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

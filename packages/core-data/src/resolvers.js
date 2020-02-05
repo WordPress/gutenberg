@@ -28,7 +28,9 @@ import { apiFetch, resolveSelect } from './controls';
  * Requests authors from the REST API.
  */
 export function* getAuthors() {
-	const users = yield apiFetch( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
+	const users = yield apiFetch( {
+		path: '/wp/v2/users/?who=authors&per_page=-1',
+	} );
 	yield receiveUserQuery( 'authors', users );
 }
 
@@ -53,7 +55,9 @@ export function* getEntityRecord( kind, name, key = '' ) {
 	if ( ! entity ) {
 		return;
 	}
-	const record = yield apiFetch( { path: `${ entity.baseURL }/${ key }?context=edit` } );
+	const record = yield apiFetch( {
+		path: `${ entity.baseURL }/${ key }?context=edit`,
+	} );
 	yield receiveEntityRecords( kind, name, record );
 }
 
@@ -91,7 +95,9 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
  * Requests theme supports data from the index.
  */
 export function* getThemeSupports() {
-	const activeThemes = yield apiFetch( { path: '/wp/v2/themes?status=active' } );
+	const activeThemes = yield apiFetch( {
+		path: '/wp/v2/themes?status=active',
+	} );
 	yield receiveThemeSupports( activeThemes[ 0 ].theme_supports );
 }
 
@@ -102,7 +108,9 @@ export function* getThemeSupports() {
  */
 export function* getEmbedPreview( url ) {
 	try {
-		const embedProxyResponse = yield apiFetch( { path: addQueryArgs( '/oembed/1.0/proxy', { url } ) } );
+		const embedProxyResponse = yield apiFetch( {
+			path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
+		} );
 		yield receiveEmbedPreview( url, embedProxyResponse );
 	} catch ( error ) {
 		// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
@@ -187,8 +195,13 @@ export function* canUser( action, resource, id ) {
  * @param {number} postId   The id of the parent post.
  */
 export function* getAutosaves( postType, postId ) {
-	const { rest_base: restBase } = yield resolveSelect( 'getPostType', postType );
-	const autosaves = yield apiFetch( { path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit` } );
+	const { rest_base: restBase } = yield resolveSelect(
+		'getPostType',
+		postType
+	);
+	const autosaves = yield apiFetch( {
+		path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
+	} );
 
 	if ( autosaves && autosaves.length ) {
 		yield receiveAutosaves( postId, autosaves );

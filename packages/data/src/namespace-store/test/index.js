@@ -14,7 +14,7 @@ describe( 'controls', () => {
 	describe( 'should call registry-aware controls', () => {
 		it( 'registers multiple selectors to the public API', () => {
 			const action1 = jest.fn( () => ( { type: 'NOTHING' } ) );
-			const action2 = function * () {
+			const action2 = function*() {
 				yield { type: 'DISPATCH', store: 'store1', action: 'action1' };
 			};
 			registry.registerStore( 'store1', {
@@ -29,9 +29,11 @@ describe( 'controls', () => {
 					action2,
 				},
 				controls: {
-					DISPATCH: createRegistryControl( ( reg ) => ( { store, action } ) => {
-						return reg.dispatch( store )[ action ]();
-					} ),
+					DISPATCH: createRegistryControl(
+						( reg ) => ( { store, action } ) => {
+							return reg.dispatch( store )[ action ]();
+						}
+					),
 				},
 			} );
 
@@ -58,22 +60,30 @@ describe( 'controls', () => {
 				getItems: ( state ) => state,
 			},
 			resolvers: {
-				* getItems() {
+				*getItems() {
 					yield actions.wait();
 					yield actions.receive( [ 1, 2, 3 ] );
 				},
 			},
 			controls: {
 				WAIT() {
-					return new Promise( ( resolve ) => process.nextTick( resolve ) );
+					return new Promise( ( resolve ) =>
+						process.nextTick( resolve )
+					);
 				},
 			},
 		} );
 
 		registry.subscribe( () => {
-			const isFinished = registry.select( 'store' ).hasFinishedResolution( 'getItems' );
+			const isFinished = registry
+				.select( 'store' )
+				.hasFinishedResolution( 'getItems' );
 			if ( isFinished ) {
-				expect( registry.select( 'store' ).getItems() ).toEqual( [ 1, 2, 3 ] );
+				expect( registry.select( 'store' ).getItems() ).toEqual( [
+					1,
+					2,
+					3,
+				] );
 				done();
 			}
 		} );
@@ -89,13 +99,17 @@ describe( 'controls', () => {
 					getItem: ( state ) => state,
 				},
 				resolvers: {
-					* getItems() {
+					*getItems() {
 						yield 'foo';
 					},
 				},
 			} );
-			expect( registry.select( 'store' ).getItems.hasResolver ).toBe( true );
-			expect( registry.select( 'store' ).getItem.hasResolver ).toBe( false );
+			expect( registry.select( 'store' ).getItems.hasResolver ).toBe(
+				true
+			);
+			expect( registry.select( 'store' ).getItem.hasResolver ).toBe(
+				false
+			);
 		} );
 		it( 'when custom store does not have resolvers defined', () => {
 			registry.registerStore( 'store', {
@@ -104,7 +118,9 @@ describe( 'controls', () => {
 					getItems: ( state ) => state,
 				},
 			} );
-			expect( registry.select( 'store' ).getItems.hasResolver ).toBe( false );
+			expect( registry.select( 'store' ).getItems.hasResolver ).toBe(
+				false
+			);
 		} );
 	} );
 	describe( 'various action types have expected response and resolve as expected with controls middleware', () => {
@@ -135,43 +151,54 @@ describe( 'controls', () => {
 				actions,
 			} );
 		} );
-		it( 'action generator returning a yielded promise control descriptor ' +
-			'resolves as expected', async () => {
-			const withPromise = registry.dispatch( 'store' ).withPromise();
-			await expect( withPromise ).resolves.toEqual( 10 );
-		} );
-		it( 'action generator yielding normal action objects resolves as ' +
-			'expected', async () => {
-			const withNormal = registry.dispatch( 'store' ).withNormal();
-			await expect( withNormal ).resolves.toBeUndefined();
-		} );
+		it(
+			'action generator returning a yielded promise control descriptor ' +
+				'resolves as expected',
+			async () => {
+				const withPromise = registry.dispatch( 'store' ).withPromise();
+				await expect( withPromise ).resolves.toEqual( 10 );
+			}
+		);
+		it(
+			'action generator yielding normal action objects resolves as ' +
+				'expected',
+			async () => {
+				const withNormal = registry.dispatch( 'store' ).withNormal();
+				await expect( withNormal ).resolves.toBeUndefined();
+			}
+		);
 		it( 'action generator returning a non action like value', async () => {
-			const withNonActionLikeValue = registry.dispatch( 'store' )
+			const withNonActionLikeValue = registry
+				.dispatch( 'store' )
 				.withNonActionLikeValue();
 			await expect( withNonActionLikeValue ).resolves.toEqual( 10 );
 		} );
-		it( 'normal dispatch action throwing error because no action ' +
-			'returned', () => {
-			const testDispatch = () => registry.dispatch( 'store' ).normalShouldFail();
-			expect( testDispatch ).toThrow(
-				'Actions must be plain objects. Use custom middleware for async actions.'
-			);
-		} );
+		it(
+			'normal dispatch action throwing error because no action ' +
+				'returned',
+			() => {
+				const testDispatch = () =>
+					registry.dispatch( 'store' ).normalShouldFail();
+				expect( testDispatch ).toThrow(
+					'Actions must be plain objects. Use custom middleware for async actions.'
+				);
+			}
+		);
 		it( 'returns action object for normal dispatch action', async () => {
-			await expect( registry.dispatch( 'store' ).normal() )
-				.resolves
-				.toEqual( { type: 'NORMAL' } );
+			await expect(
+				registry.dispatch( 'store' ).normal()
+			).resolves.toEqual( { type: 'NORMAL' } );
 		} );
 	} );
 	describe( 'action type resolves as expected with just promise middleware', () => {
 		const actions = {
 			normal: () => ( { type: 'NORMAL' } ),
-			withPromiseAndAction: () => new Promise(
-				( resolve ) => resolve( { type: 'WITH_PROMISE' } )
-			),
-			withPromiseAndNonAction: () => new Promise(
-				( resolve ) => resolve( 10 )
-			),
+			withPromiseAndAction: () =>
+				new Promise( ( resolve ) =>
+					resolve( { type: 'WITH_PROMISE' } )
+				),
+			withPromiseAndNonAction: () =>
+				new Promise( ( resolve ) => resolve( 10 ) ),
 		};
 		beforeEach( () => {
 			registry.registerStore( 'store', {
@@ -180,18 +207,24 @@ describe( 'controls', () => {
 			} );
 		} );
 		it( 'normal action returns action object', async () => {
-			await expect( registry.dispatch( 'store' ).normal() )
-				.resolves
-				.toEqual( { type: 'NORMAL' } );
+			await expect(
+				registry.dispatch( 'store' ).normal()
+			).resolves.toEqual( { type: 'NORMAL' } );
 		} );
-		it( 'action with promise resolving to action returning ' +
-			'action object', async () => {
-			await expect( registry.dispatch( 'store' ).withPromiseAndAction() )
-				.resolves
-				.toEqual( { type: 'WITH_PROMISE' } );
-		} );
+		it(
+			'action with promise resolving to action returning ' +
+				'action object',
+			async () => {
+				await expect(
+					registry.dispatch( 'store' ).withPromiseAndAction()
+				).resolves.toEqual( {
+					type: 'WITH_PROMISE',
+				} );
+			}
+		);
 		it( 'action with promise returning non action throws error', async () => {
-			const dispatchedAction = registry.dispatch( 'store' )
+			const dispatchedAction = registry
+				.dispatch( 'store' )
 				.withPromiseAndNonAction();
 			await expect( dispatchedAction ).rejects.toThrow(
 				'Actions must be plain objects. Use custom middleware for async actions.'

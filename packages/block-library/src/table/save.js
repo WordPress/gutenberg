@@ -23,7 +23,10 @@ export default function save( { attributes } ) {
 		return null;
 	}
 
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+	const backgroundClass = getColorClassName(
+		'background-color',
+		backgroundColor
+	);
 
 	const classes = classnames( backgroundClass, {
 		'has-fixed-layout': hasFixedLayout,
@@ -43,22 +46,30 @@ export default function save( { attributes } ) {
 			<Tag>
 				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
-						{ cells.map( ( { content, tag, scope, align }, cellIndex ) => {
-							const cellClasses = classnames( {
-								[ `has-text-align-${ align }` ]: align,
-							} );
+						{ cells.map(
+							( { content, tag, scope, align }, cellIndex ) => {
+								const cellClasses = classnames( {
+									[ `has-text-align-${ align }` ]: align,
+								} );
 
-							return (
-								<RichText.Content
-									className={ cellClasses ? cellClasses : undefined }
-									data-align={ align }
-									tagName={ tag }
-									value={ content }
-									key={ cellIndex }
-									scope={ tag === 'th' ? scope : undefined }
-								/>
-							);
-						} ) }
+								return (
+									<RichText.Content
+										className={
+											cellClasses
+												? cellClasses
+												: undefined
+										}
+										data-align={ align }
+										tagName={ tag }
+										value={ content }
+										key={ cellIndex }
+										scope={
+											tag === 'th' ? scope : undefined
+										}
+									/>
+								);
+							}
+						) }
 					</tr>
 				) ) }
 			</Tag>
@@ -73,10 +84,7 @@ export default function save( { attributes } ) {
 				<Section type="foot" rows={ foot } />
 			</table>
 			{ hasCaption && (
-				<RichText.Content
-					tagName="figcaption"
-					value={ caption }
-				/>
+				<RichText.Content tagName="figcaption" value={ caption } />
 			) }
 		</figure>
 	);

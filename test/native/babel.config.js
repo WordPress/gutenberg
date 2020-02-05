@@ -1,25 +1,20 @@
 module.exports = function( api ) {
 	api.cache( true );
 	return {
-		presets: [
-			'module:metro-react-native-babel-preset',
-		],
+		presets: [ 'module:metro-react-native-babel-preset' ],
 		plugins: [
 			'@babel/plugin-proposal-async-generator-functions',
 			'@babel/plugin-transform-runtime',
 			[
 				'react-native-platform-specific-extensions',
 				{
-					extensions: [
-						'css',
-						'scss',
-						'sass',
-					],
+					extensions: [ 'css', 'scss', 'sass' ],
 				},
 			],
 		],
 		overrides: [
-			{ // Transforms JSX into JS function calls and use `createElement` instead of the default `React.createElement`
+			{
+				// Transforms JSX into JS function calls and use `createElement` instead of the default `React.createElement`
 				plugins: [
 					[
 						'@babel/plugin-transform-react-jsx',
@@ -31,7 +26,8 @@ module.exports = function( api ) {
 				],
 				exclude: /node_modules\/react-native/,
 			},
-			{ // Auto-add `import { createElement } from '@wordpress/element';` when JSX is found
+			{
+				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found
 				plugins: [
 					[
 						'../../packages/babel-plugin-import-jsx-pragma',
@@ -48,9 +44,7 @@ module.exports = function( api ) {
 		],
 		env: {
 			development: {
-				plugins: [
-					'@babel/transform-react-jsx-source',
-				],
+				plugins: [ '@babel/transform-react-jsx-source' ],
 			},
 		},
 	};

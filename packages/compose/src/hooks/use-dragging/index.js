@@ -20,41 +20,34 @@ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 		onDragMove,
 		onDragEnd,
 	} );
-	useIsomorphicLayoutEffect(
-		() => {
-			eventsRef.current.onDragStart = onDragStart;
-			eventsRef.current.onDragMove = onDragMove;
-			eventsRef.current.onDragEnd = onDragEnd;
-		},
-		[ onDragStart, onDragMove, onDragEnd ]
-	);
+	useIsomorphicLayoutEffect( () => {
+		eventsRef.current.onDragStart = onDragStart;
+		eventsRef.current.onDragMove = onDragMove;
+		eventsRef.current.onDragEnd = onDragEnd;
+	}, [ onDragStart, onDragMove, onDragEnd ] );
 
 	const onMouseMove = useCallback(
-		( ...args ) => ( eventsRef.current.onDragMove && eventsRef.current.onDragMove( ...args ) ),
+		( ...args ) =>
+			eventsRef.current.onDragMove &&
+			eventsRef.current.onDragMove( ...args ),
 		[]
 	);
-	const endDrag = useCallback(
-		( ...args ) => {
-			if ( eventsRef.current.onDragEnd ) {
-				eventsRef.current.onDragEnd( ...args );
-			}
-			document.removeEventListener( 'mousemove', onMouseMove );
-			document.removeEventListener( 'mouseup', endDrag );
-			setIsDragging( false );
-		},
-		[]
-	);
-	const startDrag = useCallback(
-		( ...args ) => {
-			if ( eventsRef.current.onDragStart ) {
-				eventsRef.current.onDragStart( ...args );
-			}
-			document.addEventListener( 'mousemove', onMouseMove );
-			document.addEventListener( 'mouseup', endDrag );
-			setIsDragging( true );
-		},
-		[]
-	);
+	const endDrag = useCallback( ( ...args ) => {
+		if ( eventsRef.current.onDragEnd ) {
+			eventsRef.current.onDragEnd( ...args );
+		}
+		document.removeEventListener( 'mousemove', onMouseMove );
+		document.removeEventListener( 'mouseup', endDrag );
+		setIsDragging( false );
+	}, [] );
+	const startDrag = useCallback( ( ...args ) => {
+		if ( eventsRef.current.onDragStart ) {
+			eventsRef.current.onDragStart( ...args );
+		}
+		document.addEventListener( 'mousemove', onMouseMove );
+		document.addEventListener( 'mouseup', endDrag );
+		setIsDragging( true );
+	}, [] );
 
 	// Remove the global events when unmounting if needed.
 	useEffect( () => {

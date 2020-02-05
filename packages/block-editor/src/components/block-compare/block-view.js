@@ -3,11 +3,20 @@
  */
 import { Button } from '@wordpress/components';
 
-const BlockView = ( { title, rawContent, renderedContent, action, actionText, className } ) => {
+const BlockView = ( {
+	title,
+	rawContent,
+	renderedContent,
+	action,
+	actionText,
+	className,
+} ) => {
 	return (
 		<div className={ className }>
 			<div className="block-editor-block-compare__content">
-				<h2 className="block-editor-block-compare__heading">{ title }</h2>
+				<h2 className="block-editor-block-compare__heading">
+					{ title }
+				</h2>
 
 				<div className="block-editor-block-compare__html">
 					{ rawContent }
@@ -19,7 +28,9 @@ const BlockView = ( { title, rawContent, renderedContent, action, actionText, cl
 			</div>
 
 			<div className="block-editor-block-compare__action">
-				<Button isSecondary tabIndex="0" onClick={ action }>{ actionText }</Button>
+				<Button isSecondary tabIndex="0" onClick={ action }>
+					{ actionText }
+				</Button>
 			</div>
 		</div>
 	);

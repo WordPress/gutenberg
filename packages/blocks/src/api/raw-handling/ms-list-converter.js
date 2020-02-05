@@ -73,7 +73,9 @@ export default function( node, doc ) {
 
 	// Make sure we append to a list.
 	if ( ! isList( receivingNode ) ) {
-		receivingNode = receivingNode.appendChild( doc.createElement( listType ) );
+		receivingNode = receivingNode.appendChild(
+			doc.createElement( listType )
+		);
 	}
 
 	// Append the list item to the list.

@@ -12,14 +12,22 @@ import { withSelect } from '@wordpress/data';
  */
 const addAnnotationClassName = ( OriginalComponent ) => {
 	return withSelect( ( select, { clientId } ) => {
-		const annotations = select( 'core/annotations' ).__experimentalGetAnnotationsForBlock( clientId );
+		const annotations = select(
+			'core/annotations'
+		).__experimentalGetAnnotationsForBlock( clientId );
 
 		return {
-			className: annotations.map( ( annotation ) => {
-				return 'is-annotated-by-' + annotation.source;
-			} ).join( ' ' ),
+			className: annotations
+				.map( ( annotation ) => {
+					return 'is-annotated-by-' + annotation.source;
+				} )
+				.join( ' ' ),
 		};
 	} )( OriginalComponent );
 };
 
-addFilter( 'editor.BlockListBlock', 'core/annotations', addAnnotationClassName );
+addFilter(
+	'editor.BlockListBlock',
+	'core/annotations',
+	addAnnotationClassName
+);

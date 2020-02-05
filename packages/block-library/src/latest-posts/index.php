@@ -29,8 +29,6 @@ function render_block_core_latest_posts( $attributes ) {
 
 	$list_items_markup = '';
 
-	$excerpt_length = $attributes['excerptLength'];
-
 	foreach ( $recent_posts as $post ) {
 		$title = get_the_title( $post );
 		if ( ! $title ) {
@@ -52,11 +50,8 @@ function render_block_core_latest_posts( $attributes ) {
 
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
 			&& isset( $attributes['displayPostContentRadio'] ) && 'excerpt' === $attributes['displayPostContentRadio'] ) {
-			$post_excerpt = $post->post_excerpt;
-			if ( ! ( $post_excerpt ) ) {
-				$post_excerpt = $post->post_content;
-			}
-			$trimmed_excerpt = esc_html( wp_trim_words( $post_excerpt, $excerpt_length, ' &hellip; ' ) );
+
+			$trimmed_excerpt = get_the_excerpt( $post );
 
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-excerpt">%1$s',

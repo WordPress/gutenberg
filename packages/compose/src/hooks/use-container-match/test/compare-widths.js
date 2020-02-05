@@ -29,6 +29,8 @@ describe( 'compareWidths()', () => {
 	} );
 
 	it( 'should throw an error when operator is wrong', () => {
-		expect( () => compareWidths( '=>', 300, 300 ) ).toThrow( new Error( 'Unsupported operator: =>' ) );
+		expect( () => compareWidths( '=>', 300, 300 ) ).toThrow(
+			new Error( 'Unsupported operator: =>' )
+		);
 	} );
 } );

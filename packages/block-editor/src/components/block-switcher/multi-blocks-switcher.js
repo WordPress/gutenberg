@@ -8,7 +8,10 @@ import { withSelect } from '@wordpress/data';
  */
 import BlockSwitcher from './';
 
-export function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockClientIds } ) {
+export function MultiBlocksSwitcher( {
+	isMultiBlockSelection,
+	selectedBlockClientIds,
+} ) {
 	if ( ! isMultiBlockSelection ) {
 		return null;
 	}
@@ -17,12 +20,12 @@ export function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockClien
 	);
 }
 
-export default withSelect(
-	( select ) => {
-		const selectedBlockClientIds = select( 'core/block-editor' ).getMultiSelectedBlockClientIds();
-		return {
-			isMultiBlockSelection: selectedBlockClientIds.length > 1,
-			selectedBlockClientIds,
-		};
-	}
-)( MultiBlocksSwitcher );
+export default withSelect( ( select ) => {
+	const selectedBlockClientIds = select(
+		'core/block-editor'
+	).getMultiSelectedBlockClientIds();
+	return {
+		isMultiBlockSelection: selectedBlockClientIds.length > 1,
+		selectedBlockClientIds,
+	};
+} )( MultiBlocksSwitcher );

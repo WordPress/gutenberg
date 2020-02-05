@@ -16,9 +16,11 @@ function readJSONFile( fileName ) {
 }
 
 function getWordPressPackages( packageJSON ) {
-	return Object.keys( packageJSON.dependencies ).
-		concat( Object.keys( packageJSON.devDependencies ) ).
-		filter( ( packageName ) => ( packageName.startsWith( WORDPRESS_PACKAGES_PREFIX ) ) );
+	return Object.keys( packageJSON.dependencies )
+		.concat( Object.keys( packageJSON.devDependencies ) )
+		.filter( ( packageName ) =>
+			packageName.startsWith( WORDPRESS_PACKAGES_PREFIX )
+		);
 }
 
 function getPackageVersionDiff( initialPackageJSON, finalPackageJSON ) {
@@ -26,8 +28,10 @@ function getPackageVersionDiff( initialPackageJSON, finalPackageJSON ) {
 		( result, keyPackageJSON ) => {
 			return Object.keys( finalPackageJSON[ keyPackageJSON ] ).reduce(
 				( _result, dependency ) => {
-					const initial = initialPackageJSON[ keyPackageJSON ][ dependency ];
-					const final = finalPackageJSON[ keyPackageJSON ][ dependency ];
+					const initial =
+						initialPackageJSON[ keyPackageJSON ][ dependency ];
+					const final =
+						finalPackageJSON[ keyPackageJSON ][ dependency ];
 					if ( initial !== final ) {
 						_result.push( { dependency, initial, final } );
 					}
@@ -43,22 +47,22 @@ function getPackageVersionDiff( initialPackageJSON, finalPackageJSON ) {
 
 function updatePackagesToLatestVersion( packages ) {
 	const packagesWithLatest = packages.map(
-		( packageName ) => ( `${ packageName }@latest` )
+		( packageName ) => `${ packageName }@latest`
 	);
-	return spawn.sync( 'npm', [
-		'install',
-		...packagesWithLatest,
-		'--save',
-	], { stdio: 'inherit' } );
+	return spawn.sync( 'npm', [ 'install', ...packagesWithLatest, '--save' ], {
+		stdio: 'inherit',
+	} );
 }
 
 function outputPackageDiffReport( packageDiff ) {
-	console.log( [
-		'The following package versions were changed:',
-		...packageDiff.map( ( { dependency, initial, final } ) => {
-			return `${ dependency }: ${ initial } -> ${ final }`;
-		} ),
-	].join( '\n' ) );
+	console.log(
+		[
+			'The following package versions were changed:',
+			...packageDiff.map( ( { dependency, initial, final } ) => {
+				return `${ dependency }: ${ initial } -> ${ final }`;
+			} ),
+		].join( '\n' )
+	);
 }
 
 function updatePackageJSON() {
@@ -66,7 +70,9 @@ function updatePackageJSON() {
 	const packages = getWordPressPackages( initialPackageJSON );
 	const result = updatePackagesToLatestVersion( packages );
 	const finalPackageJSON = readJSONFile( 'package.json' );
-	outputPackageDiffReport( getPackageVersionDiff( initialPackageJSON, finalPackageJSON ) );
+	outputPackageDiffReport(
+		getPackageVersionDiff( initialPackageJSON, finalPackageJSON )
+	);
 	process.exit( result.status );
 }
 

@@ -10,7 +10,9 @@ describe( 'CSS traverse', () => {
 			if ( node.type === 'rule' ) {
 				return {
 					...node,
-					selectors: node.selectors.map( ( selector ) => 'namespace ' + selector ),
+					selectors: node.selectors.map(
+						( selector ) => 'namespace ' + selector
+					),
 				};
 			}
 

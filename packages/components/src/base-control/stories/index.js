@@ -25,9 +25,7 @@ export const _default = () => {
 			hideLabelFromVision={ hideLabelFromVision }
 			className={ className }
 		>
-			<textarea
-				id={ id }
-			/>
+			<textarea id={ id } />
 		</BaseControl>
 	);
 };

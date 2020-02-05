@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fixes
+
+- `isURL` now correctly returns `true` for many other forms of a valid URL, as it now conforms to the [URL Living Standard](https://url.spec.whatwg.org/) definition of a [valid URL string](https://url.spec.whatwg.org/#valid-url-string).
+
 ## 2.3.3 (2019-01-03)
 
 ### Bug Fixes
