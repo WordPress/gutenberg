@@ -87,6 +87,7 @@ export {
 
 // Primitives with styled-system
 export { default as StyledPrimitives, styled } from './styled-primitives';
+export { default as PrimitiveButton } from './primitives/button';
 
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
