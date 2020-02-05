@@ -28,7 +28,7 @@ import {
 	prependHTTP,
 	getProtocol,
 } from '@wordpress/url';
-import { useInstanceId, withSafeTimeout } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 import { focus } from '@wordpress/dom';
@@ -532,4 +532,4 @@ function LinkControl( {
 	);
 }
 
-export default withSafeTimeout( LinkControl );
+export default LinkControl;
