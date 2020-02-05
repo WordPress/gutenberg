@@ -265,7 +265,6 @@ function NavigationLinkEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
-								showCreateEntity={ true }
 								createEntity={
 									userCanCreatePages
 										? handleCreateEntity
