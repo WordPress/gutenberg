@@ -44,7 +44,10 @@
 	> :last-child .components-toolbar {
 		border-right: none;
 	}
+}
 
+.block-editor-block-toolbar,
+.block-editor-format-toolbar {
 	// Toolbar buttons.
 	.components-button {
 		position: relative;

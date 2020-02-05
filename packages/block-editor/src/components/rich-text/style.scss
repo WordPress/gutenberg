@@ -53,6 +53,7 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	z-index: z-index(".components-popover.block-editor-rich-text__inline-format-toolbar");
 
 	.components-popover__content {
+		width: auto;
 		min-width: auto;
 		margin-bottom: $grid-unit;
 		box-shadow: none;
@@ -75,46 +76,4 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 		padding-left: $grid-unit-15;
 		padding-right: $grid-unit-15;
 	}
-
-	// Size multiple sequential buttons to be optically balanced.
-	// Icons are 36px, as set by a 24px icon and 12px padding.
-	.components-toolbar div > .components-button.has-icon {
-		min-width: $block-toolbar-height - $grid-unit-15;
-		padding-left: $grid-unit-15 / 2; // 6px.
-		padding-right: $grid-unit-15 / 2;
-
-		svg {
-			min-width: $icon-button-size-small; // This is the optimal icon size, and we size the whole button after this.
-		}
-
-		&::before {
-			left: 2px;
-			right: 2px;
-		}
-	}
-
-	// First button in a group.
-	.components-toolbar div:first-child .components-button {
-		min-width: $block-toolbar-height - $grid-unit-15 / 2;
-		padding-left: $grid-unit-15 - $border-width;
-		padding-right: $grid-unit-15 / 2;
-
-		&::before {
-			left: $grid-unit-10;
-			right: 2px;
-		}
-	}
-
-	// Last button in a group.
-	.components-toolbar div:last-child .components-button {
-		min-width: $block-toolbar-height - $grid-unit-15 / 2;
-		padding-left: $grid-unit-15 / 2;
-		padding-right: $grid-unit-15 - $border-width;
-
-		&::before {
-			left: 2px;
-			right: $grid-unit-10;
-		}
-	}
-
 }
