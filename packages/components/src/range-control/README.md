@@ -261,30 +261,6 @@ The stepping interval between `min` and `max` values. Step is used both for user
 - Required: No
 - Platform: Web
 
-#### tooltipPosition
-
-Determines the render position of the Tooltip. Either `auto` (default), `top`, or `bottom`.
-
-- Type: `String`
-- Required: No
-- Platform: Web
-
-#### tooltipTimeout
-
-Determines the `timeout` (ms) to hide the Tooltip based on mouse movements.
-
-- Type: `Number`
-- Required: No
-- Platform: Web
-
-#### tooltipZIndex
-
-Determines the CSS `z-index` property of the Tooltip.
-
-- Type: `Number`
-- Required: No
-- Platform: Web
-
 #### value
 
 The current value of the range slider.
@@ -292,14 +268,6 @@ The current value of the range slider.
 - Type: `Number`
 - Required: Yes
 - Platform: Web | Mobile
-
-#### width
-
-The width to render the Component.
-
-- Type: `Number|String`
-- Required: No
-- Platform: Web
 
 #### withInputField
 

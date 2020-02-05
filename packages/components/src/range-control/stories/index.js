@@ -2,7 +2,7 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-import { boolean, number, select, text } from '@storybook/addon-knobs';
+import { boolean, number, text } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -33,15 +33,6 @@ export const _default = () => {
 		step: number( 'step', 1 ),
 		marks: boolean( 'marks', false ),
 		showTooltip: boolean( 'showTooltip', false ),
-		tooltipPosition: select(
-			'tooltipPosition',
-			{
-				top: 'top',
-				bottom: 'bottom',
-				auto: 'auto',
-			},
-			'auto'
-		),
 		beforeIcon: text( 'beforeIcon', '' ),
 		afterIcon: text( 'afterIcon', '' ),
 		withInputField: boolean( 'withInputField', true ),

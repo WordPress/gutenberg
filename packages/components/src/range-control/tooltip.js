@@ -18,7 +18,7 @@ const TOOLTIP_OFFSET_HEIGHT = 32;
 export default function SimpleTooltip( {
 	className,
 	inputRef,
-	position: positionProp,
+	position: positionProp = 'auto',
 	show = false,
 	style = {},
 	value = 0,

@@ -64,11 +64,7 @@ const BaseRangeControl = forwardRef(
 			renderTooltipContent = ( v ) => v,
 			showTooltip: showTooltipProp,
 			step = 1,
-			tooltipPosition = 'auto',
-			tooltipTimeout = 250,
-			tooltipZIndex = 100,
 			value: valueProp = 0,
-			width = '100%',
 			withInputField = true,
 			...props
 		},
@@ -150,7 +146,6 @@ const BaseRangeControl = forwardRef(
 			onHide: handleHideTooltip,
 			onMouseEnter,
 			onMouseLeave,
-			timeout: tooltipTimeout,
 		} );
 
 		const offsetStyle = {
@@ -167,7 +162,6 @@ const BaseRangeControl = forwardRef(
 				<Root
 					className="components-range-control__root"
 					isRTL={ isRTL }
-					width={ width }
 				>
 					{ beforeIcon && (
 						<BeforeIconWrapper>
@@ -224,11 +218,9 @@ const BaseRangeControl = forwardRef(
 								className="components-range-control__tooltip"
 								inputRef={ inputRef }
 								renderTooltipContent={ renderTooltipContent }
-								position={ tooltipPosition }
 								show={ showTooltip || showTooltip }
 								style={ offsetStyle }
 								value={ value }
-								zIndex={ tooltipZIndex }
 							/>
 						) }
 					</Wrapper>

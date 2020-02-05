@@ -10,7 +10,6 @@ import styled from '@emotion/styled';
 import { color } from '../../utils/colors';
 
 const rangeHeight = () => css( { height: 30, minHeight: 30 } );
-const rootWidth = ( { width } ) => css( { width } );
 const rootRtl = ( { isRTL } ) => css( { direction: isRTL ? 'rtl' : 'ltr' } );
 
 export const Root = styled.span`
@@ -26,7 +25,6 @@ export const Root = styled.span`
 	width: 100%;
 
 	${rootRtl}
-	${rootWidth};
 `;
 
 const wrapperMargin = ( { marks } ) =>
