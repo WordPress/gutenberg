@@ -537,14 +537,14 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			let resolvedEntity;
 			let currentLinkLabel;
 
-			const createEntity = ( type, title ) =>
+			const createEntity = ( title ) =>
 				new Promise( ( resolve ) => {
 					resolver = resolve;
 					resolvedEntity = {
-						type,
 						title,
 						id: 123,
 						url: '/?p=123',
+						type: 'page',
 					};
 				} );
 
@@ -657,12 +657,12 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					onChange={ ( suggestion ) => {
 						setLink( suggestion );
 					} }
-					createEntity={ ( type, title ) =>
+					createEntity={ ( title ) =>
 						Promise.resolve( {
-							type,
 							title,
 							id: 123,
 							url: '/?p=123',
+							type: 'page',
 						} )
 					}
 				/>

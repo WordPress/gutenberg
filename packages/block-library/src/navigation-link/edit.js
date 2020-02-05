@@ -116,7 +116,8 @@ function NavigationLinkEdit( {
 		selection.addRange( range );
 	}
 
-	function handleCreateEntity( type, entityTitle ) {
+	function handleCreateEntity( entityTitle ) {
+		const type = 'page';
 		return saveEntityRecord( 'postType', type, {
 			title: entityTitle,
 			status: 'publish',
