@@ -76,6 +76,10 @@ describe( 'adding blocks from block directory', () => {
 		await createNewPost();
 	} );
 
+	afterEach( async () => {
+		await setUpResponseMocking( [] );
+	} );
+
 	it( 'Should show an empty state when no plugin is found.', async () => {
 		// Be super weird so there won't be a matching block installed
 		const impossibleBlockName = '@#$@@Dsdsdfw2#$@';
