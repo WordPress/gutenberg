@@ -13,6 +13,7 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
+	EditorRegions,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -39,7 +40,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import EditorRegions from '../editor-regions';
 import FullscreenMode from '../fullscreen-mode';
 import BrowserURL from '../browser-url';
 import Header from '../header';
