@@ -65,18 +65,30 @@ function ColumnsEditContainer( {
 	const { verticalAlignment } = attributes;
 	const { width } = blockListSettings;
 
-	const { count } = useSelect( ( select ) => {
+	const { columnCount } = useSelect( ( select ) => {
 		return {
-			count: select( 'core/block-editor' ).getBlockCount( clientId ),
+			columnCount: select( 'core/block-editor' ).getBlockCount(
+				clientId
+			),
 		};
 	} );
 
 	useEffect( () => {
 		updateColumns(
-			count,
-			Math.min( MAX_COLUMNS_NUMBER, count || DEFAULT_COLUMNS )
+			columnCount,
+			Math.min( MAX_COLUMNS_NUMBER, columnCount || DEFAULT_COLUMNS )
 		);
 	}, [] );
+
+	const getColumnsInRow = ( containerWidth, columnsNumber ) => {
+		if ( containerWidth < 480 ) {
+			return 1;
+		}
+		if ( containerWidth >= 480 && containerWidth < 768 ) {
+			return 2;
+		}
+		return columnsNumber;
+	};
 
 	return (
 		<>
@@ -85,10 +97,10 @@ function ColumnsEditContainer( {
 					<StepperControl
 						label={ __( 'Number of columns' ) }
 						icon="columns"
-						value={ count }
+						value={ columnCount }
 						defaultValue={ DEFAULT_COLUMNS }
 						onChangeValue={ ( value ) =>
-							updateColumns( count, value )
+							updateColumns( columnCount, value )
 						}
 						minValue={ MIN_COLUMNS_NUMBER }
 						maxValue={ MAX_COLUMNS_NUMBER }
@@ -115,6 +127,10 @@ function ColumnsEditContainer( {
 					if ( newWidth !== width ) {
 						updateBlockSettings( {
 							...blockListSettings,
+							columnsInRow: getColumnsInRow(
+								newWidth,
+								columnCount
+							),
 							width: newWidth,
 						} );
 					}
@@ -162,11 +178,11 @@ const ColumnsEditContainerWrapper = withDispatch(
 			updateBlockListSettings( clientId, settings );
 		},
 		/**
-		 * Updates the column count, including necessary revisions to child Column
+		 * Updates the column columnCount, including necessary revisions to child Column
 		 * blocks to grant required or redistribute available space.
 		 *
-		 * @param {number} previousColumns Previous column count.
-		 * @param {number} newColumns      New column count.
+		 * @param {number} previousColumns Previous column columnCount.
+		 * @param {number} newColumns      New column columnCount.
 		 */
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;

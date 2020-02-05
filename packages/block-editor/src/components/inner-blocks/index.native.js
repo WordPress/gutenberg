@@ -99,6 +99,7 @@ class InnerBlocks extends Component {
 		} = this.props;
 
 		const newSettings = {
+			...blockListSettings,
 			allowedBlocks,
 			templateLock: this.getTemplateLock(),
 		};

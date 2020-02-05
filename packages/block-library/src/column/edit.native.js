@@ -29,11 +29,14 @@ function ColumnEdit( {
 	getStylesFromColorScheme,
 	isParentSelected,
 	isDescendantOfParentSelected,
-	columnsCount,
-	columnsContainerWidth,
+	columnsContainerSettings,
 	isMobile,
 } ) {
 	const { verticalAlignment } = attributes;
+	const {
+		columnsInRow = 1,
+		columnsContainerWidth,
+	} = columnsContainerSettings;
 
 	const columnContainerBaseWidth = styles[ 'column-container-base' ].maxWidth;
 	const containerMaxWidth = styles[ 'columns-container' ].maxWidth;
@@ -41,18 +44,6 @@ function ColumnEdit( {
 	const containerWidth = columnsContainerWidth || containerMaxWidth;
 
 	const minWidth = Math.min( containerWidth, columnContainerBaseWidth );
-
-	const getColumnsInRow = ( columnsNumber ) => {
-		if ( minWidth < 480 ) {
-			return 1;
-		}
-		if ( minWidth >= 480 && minWidth < 768 ) {
-			return 2;
-		}
-		return columnsNumber;
-	};
-
-	const columnsInRow = getColumnsInRow( columnsCount );
 	const columnBaseWidth = minWidth / columnsInRow;
 
 	const applyBlockStyle = ( placeholder = false ) => {
@@ -61,7 +52,7 @@ function ColumnEdit( {
 		}
 
 		const pullWidth = ( name ) =>
-			( styles[ `column-${ name }-margin` ] || {} ).width;
+			( styles[ `column-${ name }-margin` ] || {} ).width || 0;
 
 		let width = columnBaseWidth;
 
@@ -153,13 +144,9 @@ export default compose( [
 		const isSelected = selectedBlockClientId === clientId;
 
 		const parentId = getBlockRootClientId( clientId );
+		const hasChildren = getBlockCount( clientId );
 
 		const columnsContainerSettings = getBlockListSettings( parentId );
-
-		const columnsCount = getBlockCount( parentId );
-		const hasChildren = getBlockCount( clientId );
-		const columnsContainerWidth =
-			columnsContainerSettings && columnsContainerSettings.width;
 
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
@@ -175,8 +162,7 @@ export default compose( [
 			hasChildren,
 			isParentSelected,
 			isSelected,
-			columnsCount,
-			columnsContainerWidth,
+			columnsContainerSettings,
 			isDescendantOfParentSelected,
 		};
 	} ),
