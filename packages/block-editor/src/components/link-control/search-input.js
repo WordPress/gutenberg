@@ -33,7 +33,7 @@ const LinkControlSearchInput = ( {
 		setSelectedSuggestion( suggestion );
 	};
 
-	function handleSubmit( event ) {
+	function selectSuggestionOrCurrentInputValue( event ) {
 		// Avoid default forms behavior, since it's being handled custom here.
 		event.preventDefault();
 
@@ -43,7 +43,7 @@ const LinkControlSearchInput = ( {
 	}
 
 	return (
-		<form onSubmit={ handleSubmit }>
+		<form onSubmit={ selectSuggestionOrCurrentInputValue }>
 			<div className="block-editor-link-control__search-input-wrapper">
 				<URLInput
 					className="block-editor-link-control__search-input"
