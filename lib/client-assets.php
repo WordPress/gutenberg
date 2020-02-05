@@ -678,22 +678,3 @@ function gutenberg_extend_block_editor_preload_paths( $preload_paths, $post ) {
 }
 add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload_paths', 10, 2 );
 
-/**
- * Extends default editor settings with editing canvas stylesheets.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_stylesheets_editor_settings( $settings ) {
-	$stylesheets_settings = array(
-		'resizableStyleSheets' => array(
-			'block-library',
-			'block-editor',
-			'load-styles',
-		),
-	);
-
-	return array_merge( $settings, $stylesheets_settings );
-}
-add_filter( 'block_editor_settings', 'gutenberg_stylesheets_editor_settings' );

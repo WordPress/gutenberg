@@ -4,7 +4,6 @@
 import {
 	filter,
 	get,
-	some,
 } from 'lodash';
 import { match } from 'css-mediaquery';
 
@@ -18,18 +17,12 @@ const DISABLED_MEDIA_QUERY = '(min-width:999999px)';
 
 const VALID_MEDIA_QUERY_REGEX = /\((min|max)-width:[^\(]*?\)/g;
 
-function getStyleSheetsThatMatchPaths( partialPaths ) {
+function getStyleSheetsThatMatchHostname() {
 	return filter(
 		get( window, [ 'document', 'styleSheets' ], [] ),
 		( styleSheet ) => {
 			return (
-				styleSheet.href &&
-				some(
-					partialPaths,
-					( partialPath ) => {
-						return styleSheet.href.includes( partialPath );
-					}
-				)
+				styleSheet.href && styleSheet.href.includes( window.location.hostname )
 			);
 		}
 	);
@@ -71,10 +64,10 @@ function replaceMediaQueryWithWidthEvaluation( ruleText, widthValue ) {
  * @param {Array} partialPaths Paths of stylesheets to manipulate.
  * @param {number} width Viewport width to simulate.
  */
-export default function useSimulatedMediaQuery( partialPaths, width ) {
+export default function useSimulatedMediaQuery( width ) {
 	useEffect(
 		() => {
-			const styleSheets = getStyleSheetsThatMatchPaths( partialPaths );
+			const styleSheets = getStyleSheetsThatMatchHostname( );
 			const originalStyles = [];
 			styleSheets.forEach( ( styleSheet, styleSheetIndex ) => {
 				let relevantSection = false;
@@ -118,7 +111,7 @@ export default function useSimulatedMediaQuery( partialPaths, width ) {
 				} );
 			};
 		},
-		[ partialPaths, width ]
+		[ width ]
 	);
 }
 
