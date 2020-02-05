@@ -94,7 +94,7 @@ function gutenberg_experimental_global_styles_get_user() {
 function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter = [ 'publish' ], $should_create_draft = false ) {
 	$user_cpt = [];
 	$post_type_filter = 'wp_global_styles';
-	$post_name_filter = 'wp_global_styles_' . strtolower( wp_get_theme()->get( 'Name' ) );
+	$post_name_filter = 'wp-global-styles-' . strtolower( wp_get_theme()->get( 'Name' ) );
 	$recent_posts = wp_get_recent_posts( [
 		'numberposts' => 1,
 		'orderby'     => 'date',
@@ -109,7 +109,7 @@ function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter 
 	} else if ( $should_create_draft ) {
 		$cpt_post_id = wp_insert_post(
 			[
-				'post_content' => json_encode( [] ),
+				'post_content' => '{}',
 				'post_status'  => 'draft',
 				'post_type'    => $post_type_filter,
 				'post_name'    => $post_name_filter,
