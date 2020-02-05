@@ -255,6 +255,13 @@ function LinkControl( {
 		setIsEditingLink( false );
 	}
 
+	/**
+	 * Determines whether a given value could be a URL. Note this does not
+	 * guarantee the value is a URL only that it looks like it might be one
+	 * (thus the naming of the method).
+	 *
+	 * @param {string} val the candidate for being a valid URL (or not).
+	 */
 	function maybeURL( val ) {
 		const isInternal = startsWith( val, '#' );
 
