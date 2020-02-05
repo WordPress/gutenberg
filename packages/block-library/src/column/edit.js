@@ -107,24 +107,22 @@ export default compose(
 
 				const rootClientId = getBlockRootClientId( clientId );
 				const columns = getBlocks( rootClientId );
+				// Get all explicit, positive, column widths.
+				const columnWidths = columns.map( ( columnWidth ) => {
+					if ( ! columnWidth || columnWidth < 0 ) {
+						return null;
+					}
+					return columnWidth;
+				} );
+				// Check if sum of all column widths exceeds 100. (We are using 'fr' units but treating them as percentages.)
+				const resetAdjacentColumns = columnWidths.reduce( ( total, columnWidth ) => total + columnWidth ) > 100;
 
-				// Check if sum of all column widths exceeds 100.
-				const totalAdjacentWidths = columns.filter( ( column ) => column.attributes.width && column.clientId !== clientId ).reduce( ( total, column ) => total += column.attributes.width, 0 );
-				const resetAdjacentColumns = totalAdjacentWidths + width > 100;
-
-				// Create the updated template string. If needed, reset adjacent column widths.
-				let columnsTemplate = ``;
+				// If total widths exceed 100, reset adjacent column widths.
 				columns.forEach( ( column ) => {
 					if ( ( resetAdjacentColumns || ! column.attributes.width ) && column.clientId !== clientId ) {
-						columnsTemplate += `1fr `;
 						updateBlockAttributes( column.clientId, { width: '' } );
-					} else if ( ! column.attributes.width ) {
-						columnsTemplate += `1fr `;
-					} else {
-						columnsTemplate += `${ column.attributes.width }% `;
 					}
 				} );
-				updateBlockAttributes( rootClientId, { columnsTemplate } );
 			},
 		};
 	} )

@@ -73,35 +73,49 @@ function ColumnsEditContainer( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	const { childColumnsAttributes } = useSelect( ( select ) => {
+	const { childColumnsWidths } = useSelect( ( select ) => {
 		const { getBlockOrder, getBlockAttributes } = select( 'core/block-editor' );
 		const childColumns = getBlockOrder( clientId );
 
 		return {
 
-			childColumnsAttributes: childColumns.map( ( block ) => getBlockAttributes( block ) ),
+			childColumnsWidths: childColumns.map( ( block ) => getBlockAttributes( block ).width ),
 
 		};
 	}, [ clientId ] );
 
-	let columnsTemplateString = ``;
+	let gridTemplateColumns = ``;
+	// Remove any negative widths.
+	const cleanedWidths = childColumnsWidths.map( ( width ) => {
+		if ( ! width || width < 0 ) {
+			return null;
+		}
+		return width;
+	} );
+	const colsWithoutWidth = cleanedWidths.filter( ( width ) => ! width ).length;
 
-	childColumnsAttributes.forEach( ( column ) => {
-		if ( ! column.width || column.width < 0 ) {
-			columnsTemplateString += `1fr `;
+	// We're not checking if total col width is > 100 because there's no way of deciding which columns to reset at this point.
+	// This logic will work like percentage widths (taking into account the grid-gap) for all columns with total width <= 100.
+	// For columns with total width > 100, the fr units work as a fraction of whatever the total is, so the layout never breaks.
+	const leftoverWidth = Math.abs( 100 - cleanedWidths.reduce( ( total, column ) => total + column ) );
+
+	cleanedWidths.forEach( ( width ) => {
+		if ( ! width ) {
+			// Set columns without explicit width to a fraction of the remaining width.
+			gridTemplateColumns += `${ leftoverWidth / colsWithoutWidth }fr `;
 		} else {
-			columnsTemplateString += `${ column.width }% `;
+			gridTemplateColumns += `${ width }fr `;
 		}
 	} );
 
 	useEffect( () => {
-		setAttributes( { columnsTemplate: columnsTemplateString } );
+		setAttributes( { columnsTemplate: gridTemplateColumns } );
 	}, [] );
 
 	const wrapper = wrapperRef.current;
 	if ( wrapper ) {
 		const layoutWrapper = wrapper.querySelector( '.block-editor-block-list__layout' );
-		layoutWrapper.style.setProperty( '--columns-template', columnsTemplateString );
+		layoutWrapper.style.setProperty( '--columns-template', gridTemplateColumns );
 	}
 
 	return (
