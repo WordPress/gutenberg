@@ -33,8 +33,8 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	} );
 
 	// Import icon.
-	const IconComponent = site ? getIconBySite( site ) : null;
-	const socialLinkName = site ? getNameBySite( site ) : '';
+	const IconComponent = getIconBySite( site );
+	const socialLinkName = getNameBySite( site );
 
 	return (
 		<Fragment>

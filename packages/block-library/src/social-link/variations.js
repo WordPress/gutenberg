@@ -43,7 +43,7 @@ import {
 	YouTubeIcon,
 } from './icons';
 
-const patterns = [
+const variations = [
 	{
 		isDefault: true,
 		name: 'wordpress',
@@ -282,4 +282,4 @@ const patterns = [
 	},
 ];
 
-export default patterns;
+export default variations;

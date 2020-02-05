@@ -1,0 +1,15 @@
+{
+	"name": "core/social-link",
+	"category": "widgets",
+	"attributes": {
+		"url": {
+			"type": "string"
+		},
+		"site": {
+			"type": "string"
+		},
+		"label": {
+			"type": "number"
+		}
+	}
+}

@@ -4,9 +4,15 @@
 import { find } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import variations from './variations';
+import { ChainIcon } from './icons';
 
 /**
  * Retrieves the social service's icon component.
@@ -16,7 +22,8 @@ import variations from './variations';
  * @return {WPComponent} Icon component for social service.
  */
 export const getIconBySite = ( name ) => {
-	return find( variations, { name } ).icon;
+	const variation = find( variations, { name } );
+	return variation ? variation.icon : ChainIcon;
 };
 
 /**
@@ -27,5 +34,6 @@ export const getIconBySite = ( name ) => {
  * @return {string} Display name for social service
  */
 export const getNameBySite = ( name ) => {
-	return find( variations, { name } ).title;
+	const variation = find( variations, { name } );
+	return variation ? variation.title : __( 'Social Icon' );
 };

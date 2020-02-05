@@ -72,42 +72,28 @@ function register_block_core_social_link() {
 		'youtube',
 	);
 
+	$path     = __DIR__ . '/social-link/block.json';
+	$metadata = json_decode( file_get_contents( $path ), true );
+
 	foreach ( $sites as $site ) {
 		register_block_type(
 			'core/social-link-' . $site,
-			array(
-				'attributes'      => array(
-					'url'   => array(
-						'type' => 'string',
-					),
-					'site'  => array(
-						'type'    => 'string',
-						'default' => $site,
-					),
-					'label' => array(
-						'type' => 'string',
-					),
-				),
-				'render_callback' => 'render_core_social_link',
+			array_merge(
+				$metadata,
+				array(
+					'render_callback' => 'render_core_social_link',
+				)
 			)
 		);
 	}
 
 	register_block_type(
-		'core/social-link',
-		array(
-			'attributes'      => array(
-				'url'   => array(
-					'type' => 'string',
-				),
-				'site'  => array(
-					'type' => 'string',
-				),
-				'label' => array(
-					'type' => 'string',
-				),
-			),
-			'render_callback' => 'render_core_social_link',
+		$metadata['name'],
+		array_merge(
+			$metadata,
+			array(
+				'render_callback' => 'render_core_social_link',
+			)
 		)
 	);
 }
