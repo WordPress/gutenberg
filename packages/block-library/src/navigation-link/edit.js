@@ -116,40 +116,40 @@ function NavigationLinkEdit( {
 		selection.addRange( range );
 	}
 
-	function handleCreateEntity( entityTitle ) {
+	function handleCreatePage( pageTitle ) {
 		const type = 'page';
 		return saveEntityRecord( 'postType', type, {
-			title: entityTitle,
+			title: pageTitle,
 			status: 'publish',
-		} ).then( ( entity ) => {
-			// `entity` may not reject the Promise
+		} ).then( ( page ) => {
+			// `page` may not reject the Promise
 			// but may still be invalid. Here we
 			// tests for unexpected values and throw accordingly.
-			if ( null === entity || undefined === entity ) {
+			if ( null === page || undefined === page ) {
 				throw new TypeError(
-					'API response returned invalid entity.',
-					entity
+					'API response returned invalid Page.',
+					page
 				);
 			}
 
 			const requiredEntityProps = [ 'id', 'title', 'link' ];
 
-			const entityMissingProperty = requiredEntityProps.find(
-				( entityProp ) => ! entity.hasOwnProperty( entityProp )
+			const pageMissingProperty = requiredEntityProps.find(
+				( pageProp ) => ! page.hasOwnProperty( pageProp )
 			);
 
-			if ( entityMissingProperty ) {
+			if ( pageMissingProperty ) {
 				throw new TypeError(
-					`API response returned invalid entity. Missing required property "${ entityMissingProperty }".`,
-					entity
+					`API response returned invalid page. Missing required property "${ pageMissingProperty }".`,
+					page
 				);
 			}
 
 			return {
-				id: entity.id,
+				id: page.id,
 				type,
-				title: entity.title.rendered,
-				url: entity.link,
+				title: page.title.rendered,
+				url: page.link,
 			};
 		} );
 	}
@@ -268,7 +268,7 @@ function NavigationLinkEdit( {
 								showInitialSuggestions={ true }
 								createSuggestion={
 									userCanCreatePages
-										? handleCreateEntity
+										? handleCreatePage
 										: undefined
 								}
 								onChange={ ( {
