@@ -65,9 +65,11 @@ function ColumnEdit( {
 				? pullWidth( 'selected' )
 				: pullWidth( 'descendant-selected' );
 		} else if ( isDescendantOfParentSelected ) {
-			width += pullWidth(
-				placeholder ? 'selected' : 'descendant-selected'
-			);
+			if ( placeholder ) {
+				width -= pullWidth( 'selected' );
+			} else {
+				width += pullWidth( 'descendant-selected' );
+			}
 		} else if ( placeholder ) {
 			width -=
 				columnsInRow === 1

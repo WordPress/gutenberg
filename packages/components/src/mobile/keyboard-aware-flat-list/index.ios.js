@@ -57,6 +57,7 @@ export const KeyboardAwareFlatList = ( {
 		<FlatList
 			{ ...listProps }
 			horizontal={ containerStyle ? true : false }
+			scrollEnabled={ containerStyle ? false : true }
 			contentContainerStyle={
 				containerStyle ? containerStyle : undefined
 			}
