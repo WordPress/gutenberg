@@ -58,8 +58,7 @@ const block = `( function() {
 	} );
 } )();`;
 
-// We need to optionally return a buffer (for the block js) so use local versions of getJSONResponse & createJSONResponse
-export function getJSONResponse( obj, contentType ) {
+export function getResponseObject( obj, contentType ) {
 	return {
 		status: 200,
 		contentType,
@@ -67,9 +66,9 @@ export function getJSONResponse( obj, contentType ) {
 	};
 }
 
-export function createJSONResponse( mockResponse, contentType = undefined ) {
+export function createResponse( mockResponse, contentType = undefined ) {
 	return async ( request ) =>
-		request.respond( getJSONResponse( mockResponse, contentType ) );
+		request.respond( getResponseObject( mockResponse, contentType ) );
 }
 
 describe( 'adding blocks from block directory', () => {
@@ -85,7 +84,7 @@ describe( 'adding blocks from block directory', () => {
 		await setUpResponseMocking( [
 			{
 				match: ( request ) => request.url().includes( SEARCH_URL ),
-				onRequestMatch: createJSONResponse( JSON.stringify( [] ) ),
+				onRequestMatch: createResponse( JSON.stringify( [] ) ),
 			},
 		] );
 
@@ -108,20 +107,20 @@ describe( 'adding blocks from block directory', () => {
 			{
 				// Mock response for search with the block
 				match: ( request ) => request.url().includes( SEARCH_URL ),
-				onRequestMatch: createJSONResponse(
+				onRequestMatch: createResponse(
 					JSON.stringify( [ mockBlock1, mockBlock2 ] )
 				),
 			},
 			{
 				// Mock response for install
 				match: ( request ) => request.url().includes( INSTALL_URL ),
-				onRequestMatch: createJSONResponse( JSON.stringify( true ) ),
+				onRequestMatch: createResponse( JSON.stringify( true ) ),
 			},
 			{
 				// Mock the response for the js asset once it gets injected
 				match: ( request ) =>
 					request.url().includes( mockBlock1.assets[ 0 ] ),
-				onRequestMatch: createJSONResponse(
+				onRequestMatch: createResponse(
 					Buffer.from( block, 'utf8' ),
 					'application/javascript; charset=utf-8'
 				),
