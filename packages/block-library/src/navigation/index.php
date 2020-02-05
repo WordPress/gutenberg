@@ -136,11 +136,13 @@ function render_block_navigation( $content, $block ) {
 	$block['innerBlocks'] = core_block_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
 	$attributes           = $block['attrs'];
 
-	// Deprecated:
-	// The rgbTextColor and rgbBackgroundColor attributes
-	// have been deprecated in favor of
-	// customTextColor and customBackgroundColor ones.
-	// Move the values from old attrs to the new ones.
+	/**
+	 * Deprecated:
+	 * The rgbTextColor and rgbBackgroundColor attributes
+	 * have been deprecated in favor of
+	 * customTextColor and customBackgroundColor ones.
+	 * Move the values from old attrs to the new ones.
+	 */
 	if ( isset( $attributes['rgbTextColor'] ) && empty( $attributes['textColor'] ) ) {
 		$attributes['customTextColor'] = $attributes['rgbTextColor'];
 	}
