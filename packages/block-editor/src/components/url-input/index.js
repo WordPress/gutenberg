@@ -55,8 +55,9 @@ class URLInput extends Component {
 		};
 	}
 
-	componentDidUpdate() {
+	componentDidUpdate( prevProps ) {
 		const { showSuggestions, selectedSuggestion } = this.state;
+		const { value } = this.props;
 
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
@@ -82,6 +83,11 @@ class URLInput extends Component {
 
 		if ( this.shouldShowInitialSuggestions() ) {
 			this.updateSuggestions();
+		}
+
+		// Reset the component to the starting state when things are cleared
+		if ( prevProps.value && ! value ) {
+			this.reset();
 		}
 	}
 
@@ -318,6 +324,13 @@ class URLInput extends Component {
 				break;
 			}
 		}
+	}
+
+	reset() {
+		// move focus to the input
+		this.inputRef.current.focus();
+		// reset our suggestions
+		this.updateSuggestions();
 	}
 
 	selectLink( suggestion ) {
