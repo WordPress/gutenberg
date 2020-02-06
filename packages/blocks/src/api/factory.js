@@ -22,6 +22,7 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -537,11 +538,17 @@ export function switchToBlockType( blocks, name ) {
  * @return {Object} block.
  */
 export const getBlockFromExample = ( name, example ) => {
+	if ( ! getBlockType( name ) ) {
+		warning( 'Block example used an unknown block type: ' + name );
+		return false;
+	}
 	return createBlock(
 		name,
 		example.attributes,
-		map( example.innerBlocks, ( innerBlock ) =>
-			getBlockFromExample( innerBlock.name, innerBlock )
+		filter(
+			map( example.innerBlocks, ( innerBlock ) =>
+				getBlockFromExample( innerBlock.name, innerBlock )
+			)
 		)
 	);
 };
