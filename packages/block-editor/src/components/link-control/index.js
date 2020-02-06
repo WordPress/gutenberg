@@ -372,13 +372,13 @@ function LinkControl( {
 							{ __( 'Edit' ) }
 						</Button>
 					</div>
-					<LinkControlSettingsDrawer
-						value={ value }
-						settings={ settings }
-						onChange={ onChange }
-					/>
 				</Fragment>
 			) }
+			<LinkControlSettingsDrawer
+				value={ value }
+				settings={ settings }
+				onChange={ onChange }
+			/>
 		</div>
 	);
 }

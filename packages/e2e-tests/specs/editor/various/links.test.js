@@ -350,7 +350,7 @@ describe( 'Links', () => {
 			)
 		).not.toBeNull();
 
-		// Tab to the "Advanced Settings" toggle.
+		// Tab to the "Open in New Tab" toggle.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 
@@ -443,17 +443,14 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'k' );
 		await waitForAutoFocus();
 
-		// Navigate to and expand the "Advanced Settings" toggle.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-
 		// Navigate to and toggle the "Open in New Tab" checkbox.
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 
-		// Submit change to "Open in New Tab".
-		await page.keyboard.press( 'Enter' );
+		// Close dialog. Expect that "Open in New Tab" would have been applied
+		// immediately.
+		await page.keyboard.press( 'Escape' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
@@ -473,17 +470,18 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'wordpress.org' );
 
-		// Navigate to and expand the "Advanced Settings" toggle.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-
-		// Navigate to and uncheck the "Open in New Tab" checkbox.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-
-		// Update the link.
+		// Update the link
 		await page.keyboard.press( 'Enter' );
+
+		// Navigate back to the popover
+		await pressKeyWithModifier( 'primary', 'k' );
+		await waitForAutoFocus();
+
+		// Navigate to the "Open in New Tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		// Uncheck the checkbox.
+		await page.keyboard.press( 'Space' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
