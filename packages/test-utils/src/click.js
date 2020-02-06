@@ -25,9 +25,9 @@ function getClosestLabel( element ) {
  * @return {HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement} Input element
  */
 function getInputFromLabel( element ) {
-	const input = element.htmlFor ?
-		element.ownerDocument.getElementById( element.htmlFor ) :
-		element.querySelector( 'input,textarea,select' );
+	const input = element.htmlFor
+		? element.ownerDocument.getElementById( element.htmlFor )
+		: element.querySelector( 'input,textarea,select' );
 	return input;
 }
 
@@ -37,11 +37,7 @@ function getInputFromLabel( element ) {
  * @param {Object} defaultPrevented
  * @param {Object} options
  */
-function clickLabel(
-	element,
-	defaultPrevented,
-	options
-) {
+function clickLabel( element, defaultPrevented, options ) {
 	const input = getInputFromLabel( element );
 	const isInputDisabled = Boolean( input && input.disabled );
 
@@ -80,10 +76,7 @@ function setSelected( element, selected ) {
  * @param {HTMLOptionElement} element
  * @param {Object} eventOptions
  */
-function clickOption(
-	element,
-	eventOptions
-) {
+function clickOption( element, eventOptions ) {
 	const select = element.closest( 'select' );
 
 	if ( ! select ) {
@@ -112,9 +105,9 @@ function clickOption(
 			const elementIndex = options.indexOf( element );
 			// https://stackoverflow.com/a/16530782/5513909
 			const referenceOption = select.lastOptionSelectedNotByShiftKey;
-			const referenceOptionIndex = referenceOption ?
-				options.indexOf( referenceOption ) :
-				-1;
+			const referenceOptionIndex = referenceOption
+				? options.indexOf( referenceOption )
+				: -1;
 
 			resetOptions();
 			// Select options between the reference option and the clicked element

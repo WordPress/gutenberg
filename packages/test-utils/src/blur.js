@@ -16,7 +16,11 @@ export default function blur( element ) {
 		element = getActiveElement();
 	}
 
-	if ( ! element || isBodyElement( element ) || getActiveElement( element ) !== element ) {
+	if (
+		! element ||
+		isBodyElement( element ) ||
+		getActiveElement( element ) !== element
+	) {
 		return;
 	}
 

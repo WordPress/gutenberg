@@ -25,10 +25,7 @@ const clickableInputTypes = [
  * @param {HTMLInputElement} element
  * @param {Object} options
  */
-function submitFormByPressingEnterOn(
-	element,
-	options
-) {
+function submitFormByPressingEnterOn( element, options ) {
 	const { form } = element;
 
 	if ( ! form ) {
@@ -55,8 +52,7 @@ function submitFormByPressingEnterOn(
 
 	const submitButton = elements.find(
 		( el ) =>
-			( [ 'INPUT', 'BUTTON' ].includes( el.tagName ) ) &&
-      el.type === 'submit'
+			[ 'INPUT', 'BUTTON' ].includes( el.tagName ) && el.type === 'submit'
 	);
 
 	if ( validInputs.length === 1 || submitButton ) {
@@ -67,9 +63,9 @@ function submitFormByPressingEnterOn(
 const keyDownMap = {
 	Tab( element, { shiftKey } ) {
 		const { body } = getDocument( element );
-		const nextElement = shiftKey ?
-			getPreviousTabbable( body ) :
-			getNextTabbable( body );
+		const nextElement = shiftKey
+			? getPreviousTabbable( body )
+			: getNextTabbable( body );
 		if ( nextElement ) {
 			focus( nextElement );
 		}
@@ -79,13 +75,13 @@ const keyDownMap = {
 		const nonSubmittableTypes = [ ...clickableInputTypes, 'hidden' ];
 
 		const isClickable =
-      element.tagName === 'BUTTON' ||
-      ( element.tagName === 'INPUT' &&
-        clickableInputTypes.includes( element.type ) );
+			element.tagName === 'BUTTON' ||
+			( element.tagName === 'INPUT' &&
+				clickableInputTypes.includes( element.type ) );
 
 		const isSubmittable =
-      element.tagName === 'INPUT' &&
-      ! nonSubmittableTypes.includes( element.type );
+			element.tagName === 'INPUT' &&
+			! nonSubmittableTypes.includes( element.type );
 
 		if ( isClickable ) {
 			fireEvent.click( element, options );
@@ -101,9 +97,9 @@ const keyUpMap = {
 		const spaceableTypes = [ ...clickableInputTypes, 'checkbox', 'radio' ];
 
 		const isSpaceable =
-      element.tagName === 'BUTTON' ||
-      ( element.tagName === 'INPUT' &&
-        spaceableTypes.includes( element.type ) );
+			element.tagName === 'BUTTON' ||
+			( element.tagName === 'INPUT' &&
+				spaceableTypes.includes( element.type ) );
 
 		if ( isSpaceable ) {
 			fireEvent.click( element, options );
@@ -118,11 +114,7 @@ const keyUpMap = {
  * @param {Element} [element]
  * @param {Object} [options]
  */
-export default function press(
-	key,
-	element,
-	options = {}
-) {
+export default function press( key, element, options = {} ) {
 	const document = getDocument( element );
 
 	// eslint-disable-next-line eqeqeq
@@ -157,7 +149,11 @@ export default function press(
 
 	fireEvent.keyDown( element, { key, ...options } );
 
-	if ( ! defaultPrevented.current && key in keyDownMap && ! options.metaKey ) {
+	if (
+		! defaultPrevented.current &&
+		key in keyDownMap &&
+		! options.metaKey
+	) {
 		keyDownMap[ key ]( element, options );
 	}
 

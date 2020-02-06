@@ -15,9 +15,11 @@ import './mock-client-rects';
  */
 export default function getPreviousTabbable( element ) {
 	const tabbableElements = focus.tabbable.find( getDocument( element ) );
-	const currentIndex = tabbableElements.indexOf( getActiveElement( element ) );
+	const currentIndex = tabbableElements.indexOf(
+		getActiveElement( element )
+	);
 	const previousIndex = currentIndex - 1;
-	return previousIndex < 0 ?
-		tabbableElements[ tabbableElements.length - 1 ] :
-		tabbableElements[ previousIndex ];
+	return previousIndex < 0
+		? tabbableElements[ tabbableElements.length - 1 ]
+		: tabbableElements[ previousIndex ];
 }

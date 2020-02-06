@@ -20,7 +20,9 @@ describe( 'press', () => {
 
 	it( 'should click button when pressing enter', () => {
 		const onClick = jest.fn();
-		const { getByText } = render( <button onClick={ onClick }>button</button> );
+		const { getByText } = render(
+			<button onClick={ onClick }>button</button>
+		);
 		const button = getByText( 'button' );
 		expect( onClick ).not.toHaveBeenCalled();
 		press.Enter( button );
@@ -30,7 +32,10 @@ describe( 'press', () => {
 	it( 'should not click button when pressing enter if event.preventDefault() was called on key down', () => {
 		const onClick = jest.fn();
 		const { getByText } = render(
-			<button onClick={ onClick } onKeyDown={ ( event ) => event.preventDefault() }>
+			<button
+				onClick={ onClick }
+				onKeyDown={ ( event ) => event.preventDefault() }
+			>
 				button
 			</button>
 		);
@@ -42,7 +47,9 @@ describe( 'press', () => {
 
 	it( 'should click button when pressing space', () => {
 		const onClick = jest.fn();
-		const { getByText } = render( <button onClick={ onClick }>button</button> );
+		const { getByText } = render(
+			<button onClick={ onClick }>button</button>
+		);
 		const button = getByText( 'button' );
 		expect( onClick ).not.toHaveBeenCalled();
 		press.Space( button );
@@ -52,7 +59,10 @@ describe( 'press', () => {
 	it( 'should not click button when pressing space if event.preventDefault() was called on key down', () => {
 		const onClick = jest.fn();
 		const { getByText } = render(
-			<button onClick={ onClick } onKeyDown={ ( event ) => event.preventDefault() }>
+			<button
+				onClick={ onClick }
+				onKeyDown={ ( event ) => event.preventDefault() }
+			>
 				button
 			</button>
 		);
@@ -65,7 +75,10 @@ describe( 'press', () => {
 	it( 'should not click button when pressing space if event.preventDefault() was called on key up', () => {
 		const onClick = jest.fn();
 		const { getByText } = render(
-			<button onClick={ onClick } onKeyUp={ ( event ) => event.preventDefault() }>
+			<button
+				onClick={ onClick }
+				onKeyUp={ ( event ) => event.preventDefault() }
+			>
 				button
 			</button>
 		);
@@ -151,7 +164,9 @@ describe( 'press', () => {
 			<>
 				<button>button1</button>
 				<span>span</span>
-				<button onKeyDown={ ( event ) => event.preventDefault() }>button2</button>
+				<button onKeyDown={ ( event ) => event.preventDefault() }>
+					button2
+				</button>
 			</>
 		);
 		const button1 = getByText( 'button1' );

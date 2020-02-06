@@ -19,7 +19,9 @@ describe( 'click', () => {
 
 	it( 'should not focus button on click when event.preventDefault() was called on mouse down', () => {
 		const { getByText } = render(
-			<button onMouseDown={ ( event ) => event.preventDefault() }>button</button>
+			<button onMouseDown={ ( event ) => event.preventDefault() }>
+				button
+			</button>
 		);
 		const button = getByText( 'button' );
 		click( button );

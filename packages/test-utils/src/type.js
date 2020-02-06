@@ -46,14 +46,23 @@ export default function type( text, element, options = {} ) {
 	for ( const char of text ) {
 		const key = char in charMap ? charMap[ char ] : char;
 		const value =
-			key in keyMap ? keyMap[ key ]( element, options ) : `${ element.value }${ char }`;
+			key in keyMap
+				? keyMap[ key ]( element, options )
+				: `${ element.value }${ char }`;
 
-		const defaultPrevented = subscribeDefaultPrevented( element, 'keydown' );
+		const defaultPrevented = subscribeDefaultPrevented(
+			element,
+			'keydown'
+		);
 
 		fireEvent.keyDown( element, { key, ...options } );
 
 		if ( ! defaultPrevented.current && ! element.readOnly ) {
-			fireEvent.input( element, { data: char, target: { value }, ...options } );
+			fireEvent.input( element, {
+				data: char,
+				target: { value },
+				...options,
+			} );
 		}
 
 		fireEvent.keyUp( element, { key, ...options } );
