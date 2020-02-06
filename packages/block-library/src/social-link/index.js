@@ -26,25 +26,4 @@ export const settings = {
 		'Display an icon linking to a social media profile or website.'
 	),
 	variations,
-	deprecated: [
-		{
-			attributes: {
-				url: { type: 'string' },
-				site: { type: 'string' },
-				label: { type: 'string' },
-			},
-			migrate( { site, ...attributes } ) {
-				return {
-					...attributes,
-					service: site,
-				};
-			},
-			isEligible( attributes ) {
-				return attributes.hasOwnProperty( 'site' );
-			},
-			save() {
-				return null;
-			},
-		},
-	],
 };

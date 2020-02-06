@@ -58,7 +58,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 				</PanelBody>
 			</InspectorControls>
 			<Button className={ classes } onClick={ () => setPopover( true ) }>
-				{ IconComponent && <IconComponent /> }
+				<IconComponent />
 				{ isSelected && showURLPopover && (
 					<URLPopover onClose={ () => setPopover( false ) }>
 						<form
