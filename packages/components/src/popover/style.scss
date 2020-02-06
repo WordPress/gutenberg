@@ -178,6 +178,10 @@ $arrow-size: 8px;
 		left: 100%;
 	}
 
+	.components-popover:not([data-y-axis="middle"])[data-x-axis="right"] & {
+		margin-left: -24px;
+	}
+
 	.components-popover[data-x-axis="left"] & {
 		position: absolute;
 		right: 100%;
