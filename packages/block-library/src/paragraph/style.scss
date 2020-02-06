@@ -35,3 +35,9 @@ p.has-background {
 p.has-text-color a {
 	color: inherit;
 }
+
+.wp-gs p {
+	color: var(--wp-color-text);
+	font-size: var(--wp-typography-fontSize);
+	line-height: var(--wp-typography-lineHeight);
+}
