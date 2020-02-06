@@ -1,0 +1,32 @@
+.richTextWrapper {
+	overflow: hidden;
+	align-self: flex-start;
+}
+
+.container {
+	padding: $block-spacing;
+	background-color: transparent;
+	align-self: flex-start;
+}
+
+.outlineBorder {
+	border-width: $border-width;
+}
+
+.button {
+	background-color: $button-default-bg;
+	border-width: $border-width;
+	border-radius: $border-width * 4;
+	padding: $block-spacing;
+	max-width: 580px;
+	min-width: 108px;
+	margin: $panel-padding;
+}
+
+.fallbackButton {
+	background-color: $button-fallback-bg;
+}
+
+.clearLinkButton {
+	color: $alert-red;
+}
