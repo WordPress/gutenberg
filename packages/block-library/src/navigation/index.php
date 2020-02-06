@@ -20,7 +20,7 @@ function core_block_navigation_build_css_colors( $attributes ) {
 
 	// Text color.
 	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-	$has_custom_text_color = array_key_exists( 'rgbTextColor', $attributes );
+	$has_custom_text_color = array_key_exists( 'customTextColor', $attributes );
 
 	// If has text color.
 	if ( $has_custom_text_color || $has_named_text_color ) {
@@ -33,12 +33,12 @@ function core_block_navigation_build_css_colors( $attributes ) {
 		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['rgbTextColor'] );
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
 	}
 
 	// Background color.
 	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-	$has_custom_background_color = array_key_exists( 'rgbBackgroundColor', $attributes );
+	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $attributes );
 
 	// If has background color.
 	if ( $has_custom_background_color || $has_named_background_color ) {
@@ -51,7 +51,7 @@ function core_block_navigation_build_css_colors( $attributes ) {
 		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['rgbBackgroundColor'] );
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
 	}
 
 	return $colors;
@@ -133,8 +133,25 @@ function render_block_navigation( $content, $block ) {
 		return $content;
 	}
 
-	$attributes           = $block['attrs'];
 	$block['innerBlocks'] = core_block_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
+	$attributes           = $block['attrs'];
+
+	/**
+	 * Deprecated:
+	 * The rgbTextColor and rgbBackgroundColor attributes
+	 * have been deprecated in favor of
+	 * customTextColor and customBackgroundColor ones.
+	 * Move the values from old attrs to the new ones.
+	 */
+	if ( isset( $attributes['rgbTextColor'] ) && empty( $attributes['textColor'] ) ) {
+		$attributes['customTextColor'] = $attributes['rgbTextColor'];
+	}
+
+	if ( isset( $attributes['rgbBackgroundColor'] ) && empty( $attributes['backgroundColor'] ) ) {
+		$attributes['customBackgroundColor'] = $attributes['rgbBackgroundColor'];
+	}
+
+	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
 	if ( empty( $block['innerBlocks'] ) ) {
 		return '';
@@ -267,31 +284,39 @@ function register_block_core_navigation() {
 		'core/navigation',
 		array(
 			'attributes' => array(
-				'className'          => array(
+				'className'             => array(
 					'type' => 'string',
 				),
-				'textColor'          => array(
+				'textColor'             => array(
 					'type' => 'string',
 				),
-				'rgbTextColor'       => array(
+				'customTextColor'       => array(
 					'type' => 'string',
 				),
-				'backgroundColor'    => array(
+				// deprecated.
+				'rgbTextColor'          => array(
 					'type' => 'string',
 				),
-				'rgbBackgroundColor' => array(
+				'backgroundColor'       => array(
 					'type' => 'string',
 				),
-				'fontSize'           => array(
+				'customBackgroundColor' => array(
 					'type' => 'string',
 				),
-				'customFontSize'     => array(
+				// deprecated.
+				'rgbBackgroundColor'    => array(
+					'type' => 'string',
+				),
+				'fontSize'              => array(
+					'type' => 'string',
+				),
+				'customFontSize'        => array(
 					'type' => 'number',
 				),
-				'itemsJustification' => array(
+				'itemsJustification'    => array(
 					'type' => 'string',
 				),
-				'showSubmenuIcon'    => array(
+				'showSubmenuIcon'       => array(
 					'type'    => 'boolean',
 					'default' => true,
 				),

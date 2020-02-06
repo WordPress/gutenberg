@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, head } from 'lodash';
+import { escape, get, head, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -45,20 +45,12 @@ function NavigationLinkEdit( {
 	setAttributes,
 	showSubmenuIcon,
 	insertLinkBlock,
-	navigationBlockAttributes,
+	textColor,
+	backgroundColor,
+	rgbTextColor,
+	rgbBackgroundColor,
 } ) {
 	const { label, opensInNewTab, url, nofollow, description } = attributes;
-
-	/*
-	 * Navigation Block attributes.
-	 */
-	const {
-		textColor,
-		rgbTextColor,
-		backgroundColor,
-		rgbBackgroundColor,
-	} = navigationBlockAttributes;
-
 	const link = {
 		url,
 		opensInNewTab,
@@ -284,6 +276,27 @@ function NavigationLinkEdit( {
 	);
 }
 
+/**
+ * Returns the color object matching the slug, or undefined.
+ *
+ * @param {Array}  colors      The editor settings colors array.
+ * @param {string} colorSlug   A string containing the color slug.
+ * @param {string} customColor A string containing the custom color value.
+ *
+ * @return {Object} Color object included in the editor settings colors, or Undefined.
+ */
+const getColorObjectByColorSlug = ( colors, colorSlug, customColor ) => {
+	if ( customColor ) {
+		return customColor;
+	}
+
+	if ( ! colors || ! colors.length ) {
+		return;
+	}
+
+	return get( find( colors, { slug: colorSlug } ), 'color' );
+};
+
 export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
@@ -291,12 +304,14 @@ export default compose( [
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
 			getBlockParentsByBlockName,
+			getSettings,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 		const rootBlock = head(
 			getBlockParentsByBlockName( clientId, 'core/navigation' )
 		);
 		const navigationBlockAttributes = getBlockAttributes( rootBlock );
+		const colors = get( getSettings(), 'colors', [] );
 		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
 			.length;
 		const showSubmenuIcon =
@@ -307,7 +322,18 @@ export default compose( [
 			isParentOfSelectedBlock,
 			hasDescendants,
 			showSubmenuIcon,
-			navigationBlockAttributes,
+			textColor: navigationBlockAttributes.textColor,
+			backgroundColor: navigationBlockAttributes.backgroundColor,
+			rgbTextColor: getColorObjectByColorSlug(
+				colors,
+				navigationBlockAttributes.textColor,
+				navigationBlockAttributes.customTextColor
+			),
+			rgbBackgroundColor: getColorObjectByColorSlug(
+				colors,
+				navigationBlockAttributes.backgroundColor,
+				navigationBlockAttributes.customBackgroundColor
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
