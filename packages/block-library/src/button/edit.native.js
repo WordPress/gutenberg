@@ -26,6 +26,7 @@ import {
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
+import { link } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -230,7 +231,7 @@ class ButtonEdit extends Component {
 		return (
 			<>
 				<TextControl
-					icon={ ! isCompatibleWithSettings && 'admin-links' }
+					icon={ ! isCompatibleWithSettings && link }
 					label={ __( 'Button URL' ) }
 					value={ url || '' }
 					valuePlaceholder={ __( 'Add URL' ) }
@@ -353,7 +354,7 @@ class ButtonEdit extends Component {
 							<ToolbarGroup>
 								<ToolbarButton
 									title={ __( 'Edit image' ) }
-									icon={ 'admin-links' }
+									icon={ link }
 									onClick={ this.onToggleLinkSettings }
 								/>
 							</ToolbarGroup>

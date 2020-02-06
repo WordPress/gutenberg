@@ -16,6 +16,7 @@ import {
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { link } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -170,7 +171,7 @@ const MediaReplaceFlow = ( {
 						</MediaUploadCheck>
 						{ onSelectURL && (
 							<MenuItem
-								icon="admin-links"
+								icon={ link }
 								onClick={ () =>
 									setShowURLInput( ! showURLInput )
 								}

@@ -631,12 +631,11 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-editor-bold"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -657,12 +656,11 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-editor-italic"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -5217,12 +5215,11 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-bold"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5246,12 +5243,11 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-italic"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5275,12 +5271,11 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-admin-links"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5376,12 +5371,11 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-editor-bold"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -5405,12 +5399,11 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-editor-italic"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -5434,12 +5427,11 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-admin-links"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -5469,12 +5461,11 @@ exports[`Storyshots Components/ToolbarGroup Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-bold"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5497,12 +5488,11 @@ exports[`Storyshots Components/ToolbarGroup Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-italic"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5525,12 +5515,11 @@ exports[`Storyshots Components/ToolbarGroup Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-admin-links"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5563,12 +5552,11 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-bold"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5593,12 +5581,11 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-italic"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5623,12 +5610,11 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-admin-links"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path

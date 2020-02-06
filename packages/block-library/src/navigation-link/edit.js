@@ -32,6 +32,8 @@ import {
 import { isURL, prependHTTP } from '@wordpress/url';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import { link as linkIcon } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
@@ -125,7 +127,7 @@ function NavigationLinkEdit( {
 					/>
 					<ToolbarButton
 						name="link"
-						icon="admin-links"
+						icon={ linkIcon }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => setIsLinkOpen( true ) }
