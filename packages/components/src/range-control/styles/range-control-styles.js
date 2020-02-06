@@ -7,10 +7,9 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { color } from '../../utils/colors';
+import { color, reduceMotion, rtl } from '../../utils/style-mixins';
 
 const rangeHeight = () => css( { height: 30, minHeight: 30 } );
-const rootRtl = ( { isRTL } ) => css( { direction: isRTL ? 'rtl' : 'ltr' } );
 
 export const Root = styled.span`
 	-webkit-tap-highlight-color: transparent;
@@ -24,7 +23,9 @@ export const Root = styled.span`
 	touch-action: none;
 	width: 100%;
 
-	${rootRtl}
+	${rtl( {
+		direction: 'ltr',
+	} )}
 `;
 
 const wrapperMargin = ( { marks } ) =>
@@ -36,33 +37,24 @@ export const Wrapper = styled.span`
 	display: block;
 	padding-top: 15px;
 	position: relative;
-	margin-left: 10px;
 	width: 100%;
 
 	${rangeHeight};
 	${wrapperMargin};
 
-	[dir='rtl'] & {
-		margin-right: 10px;
-	}
+	${rtl( { marginLeft: 10 } )}
 `;
 
 export const BeforeIconWrapper = styled.span`
-	margin-right: 6px;
-	margin-top: 5px;
+	margin-top: 3px;
 
-	> .dashicon {
-		margin: 0;
-	}
+	${rtl( { marginRight: 6 } )}
 `;
 
 export const AfterIconWrapper = styled.span`
-	margin-left: 16px;
-	margin-top: 5px;
+	margin-top: 3px;
 
-	> .dashicon {
-		margin: 0;
-	}
+	${rtl( { marginLeft: 16 } )}
 `;
 
 export const Rail = styled.span`
@@ -149,19 +141,8 @@ export const ThumbWrapper = styled.span`
 	top: 0;
 	user-select: none;
 
-	[dir='rtl'] & {
-		margin-left: 0;
-		margin-right: -10px;
-	}
+	${rtl( { marginLeft: -10 } )}
 `;
-
-const handleReducedMotion = () => {
-	return css`
-		@media ( prefers-reduced-motion: reduce ) {
-			transition: none !important;
-		}
-	`;
-};
 
 const thumbFocus = ( { isFocused } ) => {
 	return css( {
@@ -255,7 +236,6 @@ export const Tooltip = styled.span`
 	padding: 8px;
 	position: absolute;
 	text-align: center;
-	transform: translateX( -50% );
 	transition: opacity 120ms ease;
 	user-select: none;
 
@@ -276,17 +256,13 @@ export const Tooltip = styled.span`
 
 	${tooltipShow};
 	${tooltipPosition};
-	${handleReducedMotion};
-
-	[dir='rtl'] & {
-		transform: translateX( 50% );
-	}
+	${reduceMotion( 'transition' )};
+	${rtl( { transform: 'translateX(-50%)' } )}
 `;
 
 export const InputNumber = styled.input`
 	box-sizing: border-box;
 	display: inline-block;
-	margin-left: 16px;
 	margin-top: 0;
 	min-width: 54px;
 	max-width: 120px;
@@ -294,6 +270,8 @@ export const InputNumber = styled.input`
 	input[type='number']& {
 		${rangeHeight};
 	}
+
+	${rtl( { marginLeft: 16 } )}
 `;
 
 export const ActionRightWrapper = styled.span`

@@ -12,7 +12,6 @@ import RangeControl from '../';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Dashicon } from '@wordpress/components';
 
 describe( 'RangeControl', () => {
 	class TestWrapper extends Component {
@@ -64,24 +63,21 @@ describe( 'RangeControl', () => {
 		it( 'renders with icons', () => {
 			let wrapper, icons;
 			const iconElements = ( component ) =>
-				TestUtils.scryRenderedComponentsWithType( component, Dashicon );
+				TestUtils.scryRenderedDOMComponentsWithTag( component, 'svg' );
 			wrapper = getWrapper();
 			icons = iconElements( wrapper );
 			expect( icons ).toHaveLength( 0 );
 
-			wrapper = getWrapper( { beforeIcon: 'format-image' } );
+			wrapper = getWrapper( { beforeIcon: 'image' } );
 			icons = iconElements( wrapper );
 			expect( icons ).toHaveLength( 1 );
-			expect( icons[ 0 ].props.icon ).toBe( 'format-image' );
 
 			wrapper = getWrapper( {
-				beforeIcon: 'format-image',
-				afterIcon: 'format-video',
+				beforeIcon: 'image',
+				afterIcon: 'video',
 			} );
 			icons = iconElements( wrapper );
 			expect( icons ).toHaveLength( 2 );
-			expect( icons[ 0 ].props.icon ).toBe( 'format-image' );
-			expect( icons[ 1 ].props.icon ).toBe( 'format-video' );
 		} );
 	} );
 
