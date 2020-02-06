@@ -98,7 +98,9 @@ describe( 'adding blocks from block directory', () => {
 		// Return an empty list of plugins
 		await setUpResponseMocking( [
 			{
-				match: ( request ) => SEARCH_URLS.includes( request.url() ),
+				match: ( request ) =>
+					request.url().includes( SEARCH_URLS[ 0 ] ) ||
+					request.url().includes( SEARCH_URLS[ 1 ] ),
 				onRequestMatch: createResponse( JSON.stringify( [] ) ),
 			},
 		] );
@@ -122,11 +124,10 @@ describe( 'adding blocks from block directory', () => {
 			{
 				// Mock response for search with the block
 				match: ( request ) => {
-					// eslint-disable-next-line no-console
-					console.log( '------ HERE IS THE REQUEST URL ------' );
-					// eslint-disable-next-line no-console
-					console.log( request.url() );
-					return SEARCH_URLS.includes( request.url() );
+					const matches =
+						request.url().includes( SEARCH_URLS[ 0 ] ) ||
+						request.url().includes( SEARCH_URLS[ 1 ] );
+					return matches;
 				},
 				onRequestMatch: createResponse(
 					JSON.stringify( [ mockBlock1, mockBlock2 ] )
@@ -134,7 +135,9 @@ describe( 'adding blocks from block directory', () => {
 			},
 			{
 				// Mock response for install
-				match: ( request ) => INSTALL_URLS.includes( request.url() ),
+				match: ( request ) =>
+					request.url().includes( INSTALL_URLS[ 0 ] ) ||
+					request.url().includes( INSTALL_URLS[ 1 ] ),
 				onRequestMatch: createResponse( JSON.stringify( true ) ),
 			},
 			{
