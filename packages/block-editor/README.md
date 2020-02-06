@@ -225,10 +225,6 @@ _Returns_
 
 Undocumented declaration.
 
-<a name="EditorSkeleton" href="#EditorSkeleton">#</a> **EditorSkeleton**
-
-Undocumented declaration.
-
 <a name="FontSizePicker" href="#FontSizePicker">#</a> **FontSizePicker**
 
 Undocumented declaration.
