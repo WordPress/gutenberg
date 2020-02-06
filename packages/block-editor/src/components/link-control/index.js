@@ -31,7 +31,6 @@ import {
 } from '@wordpress/url';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-
 import { focus } from '@wordpress/dom';
 
 /**
