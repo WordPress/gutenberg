@@ -42,6 +42,35 @@ import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 import LinkControlSearchCreate from './search-create-button';
 const CREATE_TYPE = '__CREATE__';
+let cancelableOnCreate;
+let cancelableCreateSuggestion;
+
+/**
+ * Creates a wrapper around a promise which allows it to be programmatically
+ * cancelled.
+ * See: https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
+ *
+ * @param {Promise} promise the Promise to make cancelable
+ */
+const makeCancelable = ( promise ) => {
+	let hasCanceled_ = false;
+
+	const wrappedPromise = new Promise( ( resolve, reject ) => {
+		promise.then(
+			( val ) =>
+				hasCanceled_ ? reject( { isCanceled: true } ) : resolve( val ),
+			( error ) =>
+				hasCanceled_ ? reject( { isCanceled: true } ) : reject( error )
+		);
+	} );
+
+	return {
+		promise: wrappedPromise,
+		cancel() {
+			hasCanceled_ = true;
+		},
+	};
+};
 /**
  * Default properties associated with a link control value.
  *
@@ -168,6 +197,21 @@ function LinkControl( {
 	}, [ isEditingLink ] );
 
 	/**
+	 * Handles cancelling any pending Promises that have been made cancelable.
+	 */
+	useEffect( () => {
+		return () => {
+			// componentDidUnmount
+			if ( cancelableOnCreate ) {
+				cancelableOnCreate.cancel();
+			}
+			if ( cancelableCreateSuggestion ) {
+				cancelableCreateSuggestion.cancel();
+			}
+		};
+	}, [] );
+
+	/**
 	 * onChange LinkControlSearchInput event handler
 	 *
 	 * @param {string} val Current value returned by the search.
@@ -288,9 +332,20 @@ function LinkControl( {
 
 		setIsResolvingLink( true );
 		setErrorMessage( null );
+
+		// Make cancellable in order that we can avoid setting State
+		// if the component unmounts during the call to `createSuggestion`
+		cancelableCreateSuggestion = makeCancelable(
+			createSuggestion( suggestionTitle )
+		);
+
 		try {
-			newSuggestion = await createSuggestion( suggestionTitle );
+			newSuggestion = await cancelableCreateSuggestion.promise;
 		} catch ( error ) {
+			if ( error.isCanceled ) {
+				return; // bail out of state updates if the promise was cancelled
+			}
+
 			setErrorMessage(
 				error.msg ||
 					__(
@@ -439,20 +494,28 @@ function LinkControl( {
 				<LinkControlSearchInput
 					value={ inputValue }
 					onChange={ onInputChange }
-					onSelect={ async ( suggestion ) => {
+					onSelect={ ( suggestion ) => {
 						if (
 							suggestion.type &&
 							CREATE_TYPE === suggestion.type
 						) {
-							// Await the promise to ensure `stopEditing` is not called prematurely.
-							await handleOnCreate( inputValue );
+							cancelableOnCreate = makeCancelable(
+								handleOnCreate( inputValue )
+							)
+								.promise.then( () => stopEditing() )
+								.catch( ( error ) => {
+									if ( error.isCanceled ) {
+										return; // bail if canceled to avoid setting state
+									}
+
+									stopEditing();
+								} );
 						} else {
 							handleSelectSuggestion( suggestion, value );
+							// Must be called after handling to ensure focus is
+							// managed correctly.
+							stopEditing();
 						}
-
-						// Must be called after handling to ensure focus is
-						// managed correctly.
-						stopEditing();
 					} }
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
