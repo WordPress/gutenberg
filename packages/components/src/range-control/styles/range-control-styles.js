@@ -252,7 +252,10 @@ export const Tooltip = styled.span`
 	${tooltipShow};
 	${tooltipPosition};
 	${reduceMotion( 'transition' )};
-	${rtl( { transform: 'translateX(-50%)' } )}
+	${rtl(
+		{ transform: 'translateX(-50%)' },
+		{ transform: 'translateX(50%)' }
+	)}
 `;
 
 export const InputNumber = styled.input`
