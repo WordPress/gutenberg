@@ -1,5 +1,7 @@
 ## Master
 
+## 7.0.0 (2020-02-04)
+
 ### Breaking Changes
 
 - This package requires now `node` v10.0.0 or later, and `npm` v6.9.0 or later ([#18048](https://github.com/WordPress/gutenberg/pull/18048)).
