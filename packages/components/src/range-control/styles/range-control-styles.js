@@ -277,7 +277,6 @@ export const InputNumber = styled.input`
 export const ActionRightWrapper = styled.span`
 	box-sizing: border-box;
 	display: block;
-	margin-left: 8px;
 	margin-top: 0;
 
 	button,
@@ -285,4 +284,6 @@ export const ActionRightWrapper = styled.span`
 		margin-left: 0;
 		${rangeHeight};
 	}
+
+	${rtl( { marginLeft: 8 } )}
 `;

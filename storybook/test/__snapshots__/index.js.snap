@@ -7024,8 +7024,8 @@ input[type='number'].emotion-14 {
 .emotion-16 {
   box-sizing: border-box;
   display: block;
-  margin-left: 8px;
   margin-top: 0;
+  margin-left: 8px;
 }
 
 .emotion-16 button,
