@@ -41,22 +41,18 @@ export const settings = {
 		},
 		{ name: 'rounded', label: _x( 'Rounded', 'block style' ) },
 	],
-	__experimentalLabel( attributes, { context } ) {
-		if ( context === 'accessibility' ) {
-			const { caption, alt, url } = attributes;
-
-			if ( ! url ) {
-				return __( 'Empty' );
-			}
-
-			if ( ! alt ) {
-				return caption || '';
-			}
-
-			// This is intended to be read by a screen reader.
-			// A period simply means a pause, no need to translate it.
-			return alt + ( caption ? '. ' + caption : '' );
+	__experimentalGetAccessibilityLabel( { caption, alt, url } ) {
+		if ( ! url ) {
+			return __( 'Empty' );
 		}
+
+		if ( ! alt ) {
+			return caption || '';
+		}
+
+		// This is intended to be read by a screen reader.
+		// A period simply means a pause, no need to translate it.
+		return alt + ( caption ? '. ' + caption : '' );
 	},
 	transforms,
 	getEditWrapperProps( attributes ) {

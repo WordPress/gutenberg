@@ -40,23 +40,21 @@ export const settings = {
 			level: 2,
 		},
 	},
-	__experimentalLabel( attributes, { context } ) {
-		if ( context === 'accessibility' ) {
-			const { content, level } = attributes;
-
-			return isEmpty( content )
-				? sprintf(
-						/* translators: accessibility text. %s: heading level. */
-						__( 'Level %s. Empty.' ),
-						level
-				  )
-				: sprintf(
-						/* translators: accessibility text. 1: heading level. 2: heading content. */
-						__( 'Level %1$s. %2$s' ),
-						level,
-						content
-				  );
+	__experimentalGetAccessibilityLabel( { content, level } ) {
+		if ( isEmpty( content ) ) {
+			return sprintf(
+				/* translators: accessibility text. %s: heading level. */
+				__( 'Level %s. Empty.' ),
+				level
+			);
 		}
+
+		return sprintf(
+			/* translators: accessibility text. 1: heading level. 2: heading content. */
+			__( 'Level %1$s. %2$s' ),
+			level,
+			content
+		);
 	},
 	transforms,
 	deprecated,

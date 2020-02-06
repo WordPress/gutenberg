@@ -32,6 +32,20 @@ _Returns_
 
 -   `boolean`: Whether the last change was automatic.
 
+<a name="getAccessibleBlockLabel" href="#getAccessibleBlockLabel">#</a> **getAccessibleBlockLabel**
+
+Get a label for the block for use by screenreaders, this can include the block title, the
+position of the block, and the value of the `getAccessibilityLabel` function if it's specified.
+
+_Parameters_
+
+-   _state_ `Object`: Store state.
+-   _clientId_ `string`: ClientId for the block.
+
+_Returns_
+
+-   `string`: The accessibility label for the block.
+
 <a name="getAdjacentBlockClientId" href="#getAdjacentBlockClientId">#</a> **getAdjacentBlockClientId**
 
 Returns the client ID of the block adjacent one at the given reference
@@ -132,6 +146,20 @@ _Parameters_
 _Returns_
 
 -   `Object`: Insertion point object with `rootClientId`, `index`.
+
+<a name="getBlockLabel" href="#getBlockLabel">#</a> **getBlockLabel**
+
+Get the label for the block, usually this is either the block title,
+or the value of the attribute denoted by the block's `label` property.
+
+_Parameters_
+
+-   _state_ `Object`: Store state.
+-   _clientId_ `string`: ClientId for the block.
+
+_Returns_
+
+-   `string`: The block label.
 
 <a name="getBlockListSettings" href="#getBlockListSettings">#</a> **getBlockListSettings**
 

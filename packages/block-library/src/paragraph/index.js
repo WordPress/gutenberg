@@ -40,11 +40,8 @@ export const settings = {
 		className: false,
 		__unstablePasteTextInline: true,
 	},
-	__experimentalLabel( attributes, { context } ) {
-		if ( context === 'accessibility' ) {
-			const { content } = attributes;
-			return isEmpty( content ) ? __( 'Empty' ) : content;
-		}
+	__experimentalGetAccessibilityLabel( { content } ) {
+		return isEmpty( content ) ? __( 'Empty' ) : content;
 	},
 	transforms,
 	deprecated,

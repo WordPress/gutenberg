@@ -26,6 +26,7 @@ export { slice } from './slice';
 export { split } from './split';
 export { toDom as __unstableToDom } from './to-dom';
 export { toHTMLString } from './to-html-string';
+export { toPlainText } from './to-plain-text';
 export { toggleFormat } from './toggle-format';
 export { LINE_SEPARATOR as __UNSTABLE_LINE_SEPARATOR } from './special-characters';
 export { unregisterFormatType } from './unregister-format-type';

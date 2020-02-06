@@ -64,6 +64,8 @@ const {
 	INSERTER_UTILITY_MEDIUM,
 	INSERTER_UTILITY_LOW,
 	getLowestCommonAncestorWithSelectedBlock,
+	getBlockLabel,
+	getAccessibleBlockLabel,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -99,6 +101,10 @@ describe( 'selectors', () => {
 			keywords: [ 'testing' ],
 			supports: {
 				multiple: false,
+			},
+			__experimentalLabel: 'title',
+			__experimentalGetAccessibilityLabel( { content } ) {
+				return content;
 			},
 		} );
 
@@ -2677,6 +2683,142 @@ describe( 'selectors', () => {
 			expect(
 				getLowestCommonAncestorWithSelectedBlock( state, 'c' )
 			).toBe( 'a' );
+		} );
+	} );
+
+	describe( 'getLabel', () => {
+		const state = {
+			blocks: {
+				byClientId: {
+					123: { clientId: 123, name: 'core/test-block-a' },
+					456: { clientId: 456, name: 'core/test-block-b' },
+				},
+				attributes: {
+					123: {},
+					456: { title: 'A title', content: 'Some content' },
+				},
+			},
+		};
+
+		it( 'returns only the block title when the block has no `label` attribute', () => {
+			expect( getBlockLabel( state, 123 ) ).toBe( 'Test Block A' );
+		} );
+
+		it( 'returns the label when the `label` attribute is defined', () => {
+			expect( getBlockLabel( state, 456 ) ).toBe( 'A title' );
+		} );
+
+		it( 'returns the block title when the label attribute is defined but does not match an attribute', () => {
+			const stateWithEmptyAttributes = {
+				blocks: {
+					...state.blocks,
+					attributes: {
+						...state.blocks.attributes,
+						456: {},
+					},
+				},
+			};
+			expect( getBlockLabel( stateWithEmptyAttributes, 456 ) ).toBe( 'Test Block B' );
+		} );
+
+		it( 'removes any html elements from the attribute', () => {
+			const stateWithHTMLContent = {
+				blocks: {
+					...state.blocks,
+					attributes: {
+						...state.blocks.attributes,
+						456: { title: '<em>A title</em>' },
+					},
+				},
+			};
+			expect( getBlockLabel( stateWithHTMLContent, 456 ) ).toBe( 'A title' );
+		} );
+	} );
+
+	describe( 'getAccessibleBlockLabel', () => {
+		const state = {
+			blocks: {
+				byClientId: {
+					123: { clientId: 123, name: 'core/test-block-a' },
+					456: { clientId: 456, name: 'core/test-block-b' },
+				},
+				attributes: {
+					123: {},
+					456: { title: 'A title', content: 'Some content' },
+				},
+				order: {
+					'': [ 123, 456 ],
+				},
+				parents: {
+					123: '',
+					456: '',
+				},
+			},
+			blockListSettings: {
+				'': {},
+			},
+		};
+
+		it( 'returns the block title and row when the block has no `getAccessibilityLabel` function', () => {
+			expect( getAccessibleBlockLabel( state, 123 ) ).toBe( 'Test Block A Block. Row 1' );
+		} );
+
+		it( 'returns the block title with the row and label when the `getAccessibilityLabel` function returns a value', () => {
+			expect( getAccessibleBlockLabel( state, 456 ) ).toBe( 'Test Block B Block. Row 2. Some content' );
+		} );
+
+		it( 'returns column instead of row when the direction is horizontal', () => {
+			const stateWithHorizontalBlockList = {
+				...state,
+				blockListSettings: {
+					'': {
+						__experimentalMoverDirection: 'horizontal',
+					},
+				},
+			};
+			expect( getAccessibleBlockLabel( stateWithHorizontalBlockList, 456 ) ).toBe( 'Test Block B Block. Column 2. Some content' );
+		} );
+
+		it( 'returns the block title and row when attributes are undefined', () => {
+			const stateWithEmptyAttributes = {
+				...state,
+				blocks: {
+					...state.blocks,
+					attributes: {
+						...state.blocks.attributes,
+						456: {},
+					},
+				},
+			};
+			expect( getAccessibleBlockLabel( stateWithEmptyAttributes, 456 ) ).toBe( 'Test Block B Block. Row 2' );
+		} );
+
+		it( 'falls back to using the `label` when the accessibility label is undefined', () => {
+			const stateWithMissingAttribute = {
+				...state,
+				blocks: {
+					...state.blocks,
+					attributes: {
+						...state.blocks.attributes,
+						456: { title: 'A title' },
+					},
+				},
+			};
+			expect( getAccessibleBlockLabel( stateWithMissingAttribute, 456 ) ).toBe( 'Test Block B Block. Row 2. A title' );
+		} );
+
+		it( 'removes any html elements from the output of the `getLabel` function', () => {
+			const stateWithHTMLContent = {
+				...state,
+				blocks: {
+					...state.blocks,
+					attributes: {
+						...state.blocks.attributes,
+						456: { content: '<em>Some content</em>' },
+					},
+				},
+			};
+			expect( getAccessibleBlockLabel( stateWithHTMLContent, 456 ) ).toBe( 'Test Block B Block. Row 2. Some content' );
 		} );
 	} );
 } );

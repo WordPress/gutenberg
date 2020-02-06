@@ -2,23 +2,11 @@
  * External dependencies
  */
 import { isNil, map, omitBy } from 'lodash';
-import classnames from 'classnames';
-
-/**
- * WordPress dependencies
- */
-import { Button } from '@wordpress/components';
-import {
-	__experimentalGetBlockLabel as getBlockLabel,
-	getBlockType,
-} from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import BlockIcon from '../block-icon';
-import ButtonBlockAppender from '../button-block-appender';
+import BlockNavigationItem from './item';
 
 export default function BlockNavigationList( {
 	blocks,
@@ -40,30 +28,13 @@ export default function BlockNavigationList( {
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul className="block-editor-block-navigation__list" role="list">
 			{ map( omitBy( blocks, isNil ), ( block ) => {
-				const blockType = getBlockType( block.name );
-				const isSelected = block.clientId === selectedBlockClientId;
-
 				return (
-					<li key={ block.clientId }>
-						<div className="block-editor-block-navigation__item">
-							<Button
-								className={ classnames(
-									'block-editor-block-navigation__item-button',
-									{
-										'is-selected': isSelected,
-									}
-								) }
-								onClick={ () => selectBlock( block.clientId ) }
-							>
-								<BlockIcon icon={ blockType.icon } showColors />
-								{ getBlockLabel( blockType, block.attributes ) }
-								{ isSelected && (
-									<span className="screen-reader-text">
-										{ __( '(selected block)' ) }
-									</span>
-								) }
-							</Button>
-						</div>
+					<BlockNavigationItem
+						key={ block.clientId }
+						block={ block }
+						onClick={ () => selectBlock( block.clientId ) }
+						isSelected={ block.clientId === selectedBlockClientId }
+					>
 						{ showNestedBlocks &&
 							!! block.innerBlocks &&
 							!! block.innerBlocks.length && (
@@ -78,18 +49,13 @@ export default function BlockNavigationList( {
 									showNestedBlocks
 								/>
 							) }
-					</li>
+					</BlockNavigationItem>
 				);
 			} ) }
 			{ shouldShowAppender && (
-				<li>
-					<div className="block-editor-block-navigation__item">
-						<ButtonBlockAppender
-							rootClientId={ parentBlockClientId }
-							__experimentalSelectBlockOnInsert={ false }
-						/>
-					</div>
-				</li>
+				<BlockNavigationItem.Appender
+					parentBlockClientId={ parentBlockClientId }
+				/>
 			) }
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */

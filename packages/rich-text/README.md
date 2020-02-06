@@ -335,6 +335,18 @@ _Returns_
 
 -   `string`: HTML string.
 
+<a name="toPlainText" href="#toPlainText">#</a> **toPlainText**
+
+Removes any HTML tags from the provided string.
+
+_Parameters_
+
+-   _html_ `string`: The string containing html.
+
+_Returns_
+
+-   `string`: The text content with any html removed.
+
 <a name="unregisterFormatType" href="#unregisterFormatType">#</a> **unregisterFormatType**
 
 Unregisters a format.

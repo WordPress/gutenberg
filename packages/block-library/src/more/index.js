@@ -29,10 +29,8 @@ export const settings = {
 		multiple: false,
 	},
 	example: {},
-	__experimentalLabel( attributes, { context } ) {
-		if ( context === 'accessibility' ) {
-			return attributes.customText;
-		}
+	__experimentalGetAccessibilityLabel( { customText } ) {
+		return customText;
 	},
 	transforms,
 	edit,

@@ -43,7 +43,8 @@ $tree-item-height: 36px;
 		margin-left: 1.5em;
 	}
 
-	.block-editor-block-navigation__item {
+	.block-editor-block-navigation-item__block,
+	.block-editor-block-navigation-item__appender {
 		position: relative;
 
 		&::before {
@@ -57,7 +58,7 @@ $tree-item-height: 36px;
 		}
 	}
 
-	.block-editor-block-navigation__item-button {
+	.block-editor-block-navigation-item__button {
 		margin-left: 0.8em;
 		width: calc(100% - 0.8em);
 	}
@@ -76,7 +77,7 @@ $tree-item-height: 36px;
 	}
 }
 
-.block-editor-block-navigation__item-button {
+.block-editor-block-navigation-item__button {
 	display: flex;
 	align-items: center;
 	width: 100%;

@@ -12,7 +12,7 @@ import {
 async function openBlockNavigator() {
 	await pressKeyWithModifier( 'access', 'o' );
 	await page.waitForSelector(
-		'.block-editor-block-navigation__item-button.is-selected'
+		'.block-editor-block-navigation-item__button.is-selected'
 	);
 }
 
@@ -37,7 +37,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Block navigation"]' );
 		const columnsBlockMenuItem = (
 			await page.$x(
-				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]"
+				"//button[contains(@class,'block-editor-block-navigation-item__button') and contains(text(), 'Columns')]"
 			)
 		 )[ 0 ];
 		await columnsBlockMenuItem.click();
@@ -55,7 +55,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Block navigation"]' );
 		const lastColumnsBlockMenuItem = (
 			await page.$x(
-				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
+				"//button[contains(@class,'block-editor-block-navigation-item__button') and contains(text(), 'Column')]"
 			)
 		 )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
