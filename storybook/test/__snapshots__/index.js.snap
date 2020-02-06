@@ -3126,17 +3126,17 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
       />
     </div>
     <div
-      className="components-range-control__number-container"
+      className="components-font-size-picker__number-container"
     >
       <label
-        htmlFor="components-range-control__number#0"
+        htmlFor="components-font-size-picker__number#0"
       >
         Custom
       </label>
       <input
         aria-label="Custom"
-        className="components-range-control__number"
-        id="components-range-control__number#0"
+        className="components-font-size-picker__number"
+        id="components-font-size-picker__number#0"
         onChange={[Function]}
         type="number"
         value={16}
