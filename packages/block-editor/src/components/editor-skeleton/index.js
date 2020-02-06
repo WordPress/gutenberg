@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function EditorRegions( {
+function EditorSkeleton( {
 	footer,
 	header,
 	sidebar,
@@ -84,4 +84,4 @@ function EditorRegions( {
 	);
 }
 
-export default navigateRegions( EditorRegions );
+export default navigateRegions( EditorSkeleton );

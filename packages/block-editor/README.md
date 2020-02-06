@@ -225,7 +225,7 @@ _Returns_
 
 Undocumented declaration.
 
-<a name="EditorRegions" href="#EditorRegions">#</a> **EditorRegions**
+<a name="EditorSkeleton" href="#EditorSkeleton">#</a> **EditorSkeleton**
 
 Undocumented declaration.
 

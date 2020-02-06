@@ -17,7 +17,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
-	EditorRegions,
+	EditorSkeleton,
 	__experimentalPageTemplatePicker,
 	__experimentalUsePageTemplatePickerVisible,
 } from '@wordpress/block-editor';
@@ -124,7 +124,7 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
-				<EditorRegions
+				<EditorSkeleton
 					className={ className }
 					header={ <Header /> }
 					sidebar={
