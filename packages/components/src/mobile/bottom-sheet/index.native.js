@@ -91,7 +91,8 @@ class BottomSheet extends Component {
 			'safeAreaInsetsForRootViewDidChange',
 			this.onSafeAreaInsetsUpdate
 		);
-		Keyboard.removeAllListeners();
+		this.keyboardWillShowListener.remove();
+		this.keyboardDidHideListener.remove();
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
