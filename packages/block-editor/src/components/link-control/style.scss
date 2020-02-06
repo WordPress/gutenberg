@@ -145,6 +145,7 @@ $block-editor-link-control-number-of-actions: 1;
 	.block-editor-link-control__search-item-header {
 		display: block;
 		margin-right: $grid-size-xlarge;
+		margin-top: 2px;
 	}
 
 	.block-editor-link-control__search-item-icon {
@@ -211,6 +212,7 @@ $block-editor-link-control-number-of-actions: 1;
 .components-button + .block-editor-link-control__search-create {
 	margin-top: 20px;
 	overflow: visible;
+	padding: 12px 15px;
 
 	// Create fake border. We cannot use border because the button has a border
 	// radius applied to it
