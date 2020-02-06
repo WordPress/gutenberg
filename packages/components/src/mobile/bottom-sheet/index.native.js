@@ -8,6 +8,7 @@ import {
 	PanResponder,
 	Dimensions,
 	ScrollView,
+	Keyboard,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
@@ -33,22 +34,46 @@ class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
-		this.onScroll = this.onScroll.bind( this );
-		this.onSetMaxHeight = this.onSetMaxHeight.bind( this );
+		this.onDimensionsChange = this.onDimensionsChange.bind( this );
+		this.keyboardWillShow = this.keyboardWillShow.bind( this );
+		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
 		this.state = {
 			safeAreaBottomInset: 0,
 			bounces: false,
 			maxHeight: 0,
+			keyboardHeight: 0,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
 			this.onSafeAreaInsetsUpdate
 		);
-		Dimensions.addEventListener( 'change', this.onSetMaxHeight );
+		Dimensions.addEventListener( 'change', this.onDimensionsChange );
+	}
+
+	keyboardWillShow( e ) {
+		const { height } = e.endCoordinates;
+
+		this.setState( { keyboardHeight: height }, () =>
+			this.onSetMaxHeight()
+		);
+	}
+
+	keyboardDidHide() {
+		this.setState( { keyboardHeight: 0 }, () => this.onSetMaxHeight() );
 	}
 
 	componentDidMount() {
+		this.keyboardWillShowListener = Keyboard.addListener(
+			'keyboardWillShow',
+			this.keyboardWillShow
+		);
+
+		this.keyboardDidHideListener = Keyboard.addListener(
+			'keyboardDidHide',
+			this.keyboardDidHide
+		);
+
 		this.safeAreaEventSubscription = SafeArea.addEventListener(
 			'safeAreaInsetsForRootViewDidChange',
 			this.onSafeAreaInsetsUpdate
@@ -66,6 +91,7 @@ class BottomSheet extends Component {
 			'safeAreaInsetsForRootViewDidChange',
 			this.onSafeAreaInsetsUpdate
 		);
+		Keyboard.removeAllListeners();
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
@@ -78,37 +104,33 @@ class BottomSheet extends Component {
 		}
 	}
 
-	isCloseToBottom( { layoutMeasurement, contentOffset, contentSize } ) {
-		return (
-			layoutMeasurement.height + contentOffset.y >=
-			contentSize.height - contentOffset.y
-		);
-	}
-
-	isCloseToTop( { contentOffset } ) {
-		return contentOffset.y < 10;
-	}
-
-	onScroll( { nativeEvent } ) {
-		if ( this.isCloseToTop( nativeEvent ) ) {
-			this.setState( { bounces: false } );
-		}
-		if ( this.isCloseToBottom( nativeEvent ) ) {
-			this.setState( { bounces: true } );
-		}
-	}
-
 	onSetMaxHeight() {
 		const { height, width } = Dimensions.get( 'window' );
-		const { safeAreaBottomInset } = this.state;
+		const { safeAreaBottomInset, keyboardHeight } = this.state;
+
+		// `maxHeight` when modal is opened alon with a keyboard
+		const maxHeightWithOpenKeyboard =
+			0.95 * ( Dimensions.get( 'window' ).height - keyboardHeight );
 
 		// On horizontal mode `maxHeight` has to be set on 90% of width
 		if ( width > height ) {
-			this.setState( { maxHeight: 0.9 * height } );
+			this.setState( {
+				maxHeight: Math.min( 0.9 * height, maxHeightWithOpenKeyboard ),
+			} );
 			//	On vertical mode `maxHeight` has to be set on 50% of width
 		} else {
-			this.setState( { maxHeight: height / 2 - safeAreaBottomInset } );
+			this.setState( {
+				maxHeight: Math.min(
+					height / 2 - safeAreaBottomInset,
+					maxHeightWithOpenKeyboard
+				),
+			} );
 		}
+	}
+
+	onDimensionsChange() {
+		this.onSetMaxHeight();
+		this.setState( { bounces: false } );
 	}
 
 	render() {
@@ -198,10 +220,10 @@ class BottomSheet extends Component {
 					<View style={ styles.dragIndicator } />
 					{ ! hideHeader && getHeader() }
 					<ScrollView
+						disableScrollViewPanResponder
 						bounces={ this.state.bounces }
 						onScroll={ this.onScroll }
 						scrollEventThrottle={ 16 }
-						disableScrollViewPanResponder
 						style={ { maxHeight: this.state.maxHeight } }
 						contentContainerStyle={ [
 							styles.content,
