@@ -301,10 +301,9 @@ function LinkControl( {
 
 		setIsResolvingLink( false );
 
+		// Only set link if request is resolved, otherwise enable edit mode.
 		if ( newSuggestion ) {
-			// only set if request is resolved
 			onChange( newSuggestion );
-			setIsEditingLink( false );
 		} else {
 			setIsEditingLink( true );
 		}
