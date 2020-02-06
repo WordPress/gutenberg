@@ -523,7 +523,15 @@ describe( 'Default search suggestions', () => {
 		);
 		searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
+		// check the input is empty now
 		expect( searchInput.value ).toBe( '' );
+
+		const searchResultLabel = container.querySelector(
+			'.block-editor-link-control__search-results-label'
+		);
+
+		expect( searchResultLabel.innerHTML ).toBe( 'Recently updated' );
+
 		expect( searchResultElements ).toHaveLength( 3 );
 	} );
 } );
