@@ -840,7 +840,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 	} );
 
 	describe( 'Error handling', () => {
-		it( 'should display human readable error notice and re-show create button and search input if page creation request fails', async () => {
+		it( 'should display human-friendly, perceivable error notice and re-show create button and search input if page creation request fails', async () => {
 			const searchText = 'This page to be created';
 			let searchInput;
 
@@ -849,10 +849,14 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			};
 
 			const createSuggestion = () => Promise.reject( throwsError() );
+			const speakSpy = jest.fn();
 
 			act( () => {
 				render(
-					<LinkControl createSuggestion={ createSuggestion } />,
+					<LinkControl
+						createSuggestion={ createSuggestion }
+						speak={ speakSpy }
+					/>,
 					container
 				);
 			} );
@@ -879,6 +883,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				)
 			);
 
+			// Catch the error in the test to avoid test failures
+			expect( throwsError ).toThrow( Error );
+
 			await act( async () => {
 				Simulate.click( createButton );
 			} );
@@ -887,18 +894,23 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
-			// This is a Notice component wrapped in an aria-live div with role of "alert".
-			const errorNotice = container.querySelector( '[role="alert"]' );
+			// This is a Notice component
+			// we allow selecting by className here as an edge case because the
+			// a11y is handled via `speak`.
+			// See: https://github.com/WordPress/gutenberg/tree/master/packages/a11y#speak.
+			const errorNotice = container.querySelector(
+				'.block-editor-link-control__search-error'
+			);
 
-			// Catch the error in the test to avoid test failures
-			expect( throwsError ).toThrow( Error );
-
-			// Check human readable error notice is displayed
+			// Check human readable error notice is perceivable
 			expect( errorNotice ).not.toBeFalsy();
 			expect( errorNotice.innerHTML ).toEqual(
 				expect.stringContaining(
 					'An unknown error occurred during creation. Please try again.'
 				)
+			);
+			expect( speakSpy ).toHaveBeenCalledWith(
+				'An unknown error occurred during creation. Please try again.'
 			);
 
 			// Verify input is repopulated with original search text

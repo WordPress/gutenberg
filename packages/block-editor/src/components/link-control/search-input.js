@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, Notice } from '@wordpress/components';
+import { Button, Notice, withSpokenMessages } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -18,8 +23,15 @@ const LinkControlSearchInput = ( {
 	fetchSuggestions,
 	showInitialSuggestions,
 	errorMessage,
+	speak = noop,
 } ) => {
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState();
+
+	useEffect( () => {
+		if ( errorMessage ) {
+			speak( errorMessage, 'assertive' );
+		}
+	}, [ errorMessage ] );
 
 	/**
 	 * Handles the user moving between different suggestions. Does not handle
@@ -78,8 +90,18 @@ const LinkControlSearchInput = ( {
 					) }
 				</div>
 			</div>
+
+			{ errorMessage && (
+				<Notice
+					className="block-editor-link-control__search-error"
+					status="error"
+					isDismissible={ false }
+				>
+					{ errorMessage }
+				</Notice>
+			) }
 		</form>
 	);
 };
 
-export default LinkControlSearchInput;
+export default withSpokenMessages( LinkControlSearchInput );
