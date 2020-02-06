@@ -225,6 +225,10 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="EditorRegions" href="#EditorRegions">#</a> **EditorRegions**
+
+Undocumented declaration.
+
 <a name="FontSizePicker" href="#FontSizePicker">#</a> **FontSizePicker**
 
 Undocumented declaration.

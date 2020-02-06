@@ -13,11 +13,11 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
-	EditorRegions,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
+	EditorRegions,
 	__experimentalPageTemplatePicker,
 	__experimentalUsePageTemplatePickerVisible,
 } from '@wordpress/block-editor';
