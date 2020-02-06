@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { findIndex, sumBy, merge, mapValues } from 'lodash';
+import { findIndex, sumBy, merge } from 'lodash';
 
 /**
  * Returns a column width attribute value rounded to standard precision.
@@ -23,13 +23,15 @@ export const toWidthPrecision = ( value ) =>
  * @param {WPBlock[]} blocks   Block objects.
  * @param {string}    clientId Client ID to consider for adjacent blocks.
  *
- * @return {WPBlock} Adjacent block object.
+ * @return {WPBlock[]} Adjacent block objects.
  */
-export function getAdjacentBlock( blocks, clientId ) {
+export function getAdjacentBlocks( blocks, clientId ) {
 	const index = findIndex( blocks, { clientId } );
 	const isLastBlock = index === blocks.length - 1;
+	const before = blocks.slice( 0, index );
+	const after = blocks.slice( index + 1 );
 
-	return isLastBlock ? blocks[ index - 1 ] : blocks[ index + 1 ];
+	return isLastBlock ? before.reverse() : after.concat( before );
 }
 
 /**
@@ -98,12 +100,24 @@ export function getRedistributedColumnWidths(
 	totalBlockCount = blocks.length
 ) {
 	const totalWidth = getTotalColumnsWidth( blocks, totalBlockCount );
-	const difference = availableWidth - totalWidth;
-	const adjustment = difference / blocks.length;
+	let difference = availableWidth - totalWidth;
 
-	return mapValues( getColumnWidths( blocks, totalBlockCount ), ( width ) =>
-		toWidthPrecision( width + adjustment )
-	);
+	const widths = {};
+	for ( let i = 0; i < blocks.length; i++ ) {
+		const block = blocks[ i ];
+		const width = getEffectiveColumnWidth( block, totalBlockCount );
+		let nextWidth;
+		if ( difference !== 0 ) {
+			nextWidth = Math.min( Math.max( width + difference, 0 ), 100 );
+			difference += width - nextWidth;
+		} else {
+			nextWidth = width;
+		}
+
+		widths[ block.clientId ] = nextWidth;
+	}
+
+	return widths;
 }
 
 /**

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { forEach, find } from 'lodash';
+import { forEach } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,8 +24,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	toWidthPrecision,
 	getColumnWidths,
-	getAdjacentBlock,
-	getEffectiveColumnWidth,
+	getAdjacentBlocks,
+	getRedistributedColumnWidths,
 } from '../columns/utils';
 
 function ColumnEdit( {
@@ -115,17 +115,7 @@ export default compose(
 				// Constrain or expand siblings to account for gain or loss of
 				// total columns area.
 				const columns = getBlocks( getBlockRootClientId( clientId ) );
-				const column = find( columns, { clientId } );
-				const adjacentColumn = getAdjacentBlock( columns, clientId );
-				const adjacentColumnWidth = getEffectiveColumnWidth(
-					adjacentColumn,
-					columns.length
-				);
-				const previousWidth = getEffectiveColumnWidth(
-					column,
-					columns.length
-				);
-				const difference = width - previousWidth;
+				const adjacentColumns = getAdjacentBlocks( columns, clientId );
 
 				// Compute _all_ next column widths, in case the updated column
 				// is in the middle of a set of columns which don't yet have
@@ -134,8 +124,10 @@ export default compose(
 				const nextColumnWidths = {
 					...getColumnWidths( columns, columns.length ),
 					[ clientId ]: toWidthPrecision( width ),
-					[ adjacentColumn.clientId ]: toWidthPrecision(
-						adjacentColumnWidth - difference
+					...getRedistributedColumnWidths(
+						adjacentColumns,
+						100 - width,
+						columns.length
 					),
 				};
 

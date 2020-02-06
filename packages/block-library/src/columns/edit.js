@@ -154,7 +154,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 				// Redistribute in consideration of pending block insertion as
 				// constraining the available working width.
 				const widths = getRedistributedColumnWidths(
-					innerBlocks,
+					[ ...innerBlocks ].reverse(),
 					100 - newColumnWidth
 				);
 
@@ -183,7 +183,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 				if ( hasExplicitWidths ) {
 					// Redistribute as if block is already removed.
 					const widths = getRedistributedColumnWidths(
-						innerBlocks,
+						innerBlocks.reverse(),
 						100
 					);
 
