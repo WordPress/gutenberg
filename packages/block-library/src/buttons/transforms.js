@@ -14,12 +14,15 @@ const transforms = {
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ 'core/button' ],
-			transform: ( props ) =>
+			transform: ( buttons ) =>
+				// Creates the buttons block
 				createBlock(
 					name,
 					{},
-					props.map( ( singleProps ) =>
-						createBlock( 'core/button', singleProps )
+					// Loop the selected buttons
+					buttons.map( ( attributes ) =>
+						// Create singular button in the buttons block
+						createBlock( 'core/button', attributes )
 					)
 				),
 		},
