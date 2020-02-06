@@ -1933,6 +1933,98 @@ exports[`Storyshots Components/ClipboardButton Default 1`] = `
 </span>
 `;
 
+exports[`Storyshots Components/ColorControl Default 1`] = `
+.emotion-8 {
+  padding: 40px;
+  margin-left: auto;
+  width: 250px;
+}
+
+.emotion-4 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border-radius: 2px;
+  border: 1px solid #d7dade;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 36px;
+  overflow: hidden;
+  max-width: 110px;
+}
+
+.emotion-0 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: none;
+  border-right: 1px solid #d7dade;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 36px;
+  outline: none;
+  width: 36px;
+}
+
+.emotion-0:focus {
+  outline: none;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+  padding: 4px 8px;
+  width: 72px;
+  font-size: 12px;
+}
+
+<div
+  className="emotion-8 emotion-9"
+>
+  <div
+    className="components-color-control emotion-6 emotion-7"
+  >
+    <div
+      className="components-base-control"
+    >
+      <div
+        className="components-base-control__field"
+      >
+        <div
+          className="components-color-control__container emotion-4 emotion-5"
+        >
+          <div
+            className="components-dropdown components-color-control__swatch-picker"
+          >
+            <button
+              aria-expanded={false}
+              className="emotion-0 emotion-1"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              style={
+                Object {
+                  "backgroundColor": "#000000",
+                }
+              }
+            />
+          </div>
+          <div
+            className="components-color-control__label emotion-2 emotion-3"
+          >
+            #000000
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components/ColorIndicator Default 1`] = `
 <span
   className="component-color-indicator"
