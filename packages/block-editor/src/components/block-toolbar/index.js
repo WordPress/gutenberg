@@ -14,7 +14,7 @@ import BlockSwitcher from '../block-switcher';
 import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockMover from '../block-mover';
 
-export default function BlockToolbar() {
+export default function BlockToolbar( { hideDragHandle } ) {
 	const {
 		blockClientIds,
 		isValid,
@@ -64,6 +64,7 @@ export default function BlockToolbar() {
 					<BlockMover
 						clientIds={ blockClientIds }
 						__experimentalOrientation={ moverDirection }
+						hideDragHandle={ hideDragHandle }
 					/>
 				) }
 				<MultiBlocksSwitcher />
@@ -78,6 +79,7 @@ export default function BlockToolbar() {
 				<BlockMover
 					clientIds={ blockClientIds }
 					__experimentalOrientation={ moverDirection }
+					hideDragHandle={ hideDragHandle }
 				/>
 			) }
 			{ mode === 'visual' && isValid && (

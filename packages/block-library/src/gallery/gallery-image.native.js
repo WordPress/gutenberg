@@ -24,6 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
 import { isURL } from '@wordpress/url';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -272,7 +273,7 @@ class GalleryImage extends Component {
 									</View>
 									<Button
 										style={ removeButtonStyle }
-										icon="no-alt"
+										icon={ close }
 										iconSize={ ICON_SIZE_REMOVE }
 										onClick={ onRemove }
 										accessibilityLabel={ __(

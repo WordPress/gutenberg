@@ -126,10 +126,10 @@ export const SETTINGS_DEFAULTS = {
 	],
 
 	imageSizes: [
-		{ slug: 'thumbnail', label: __( 'Thumbnail' ) },
-		{ slug: 'medium', label: __( 'Medium' ) },
-		{ slug: 'large', label: __( 'Large' ) },
-		{ slug: 'full', label: __( 'Full Size' ) },
+		{ slug: 'thumbnail', name: __( 'Thumbnail' ) },
+		{ slug: 'medium', name: __( 'Medium' ) },
+		{ slug: 'large', name: __( 'Large' ) },
+		{ slug: 'full', name: __( 'Full Size' ) },
 	],
 
 	// This is current max width of the block inner area

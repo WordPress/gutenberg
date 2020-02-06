@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -73,7 +74,7 @@ function Notice( {
 			{ isDismissible && (
 				<Button
 					className="components-notice__dismiss"
-					icon="no-alt"
+					icon={ close }
 					label={ __( 'Dismiss this notice' ) }
 					onClick={ onRemove }
 					showTooltip={ false }

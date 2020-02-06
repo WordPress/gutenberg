@@ -85,6 +85,7 @@ function BlockList( {
 				'block-editor-block-list__layout',
 				className
 			) }
+			hasPopover={ __experimentalUIParts.hasPopover }
 		>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
