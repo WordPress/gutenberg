@@ -128,28 +128,24 @@ function Layout() {
 					className={ className }
 					header={ <Header /> }
 					sidebar={
-						! publishSidebarOpened && (
-							<>
-								{ ! sidebarIsOpened && (
-									<div className="edit-post-layout__toogle-sidebar-panel">
-										<Button
-											isSecondary
-											className="edit-post-layout__toogle-sidebar-panel-button"
-											onClick={ openSidebarPanel }
-											aria-expanded={ false }
-										>
-											{ hasBlockSelected
-												? __( 'Open block settings' )
-												: __(
-														'Open document settings'
-												  ) }
-										</Button>
-									</div>
-								) }
-								<SettingsSidebar />
-								<Sidebar.Slot />
-							</>
-						)
+						<>
+							{ ! sidebarIsOpened && (
+								<div className="edit-post-layout__toogle-sidebar-panel">
+									<Button
+										isSecondary
+										className="edit-post-layout__toogle-sidebar-panel-button"
+										onClick={ openSidebarPanel }
+										aria-expanded={ false }
+									>
+										{ hasBlockSelected
+											? __( 'Open block settings' )
+											: __( 'Open document settings' ) }
+									</Button>
+								</div>
+							) }
+							<SettingsSidebar />
+							<Sidebar.Slot />
+						</>
 					}
 					content={
 						<>
