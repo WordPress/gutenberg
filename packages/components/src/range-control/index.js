@@ -15,7 +15,6 @@ import {
 	useState,
 	forwardRef,
 } from '@wordpress/element';
-import * as WPIcons from '@wordpress/icons';
 import { compose, withInstanceId } from '@wordpress/compose';
 
 /**
@@ -23,6 +22,7 @@ import { compose, withInstanceId } from '@wordpress/compose';
  */
 import BaseControl from '../base-control';
 import Button from '../button';
+import Dashicon from '../dashicon';
 
 import { color } from '../utils/colors';
 import RangeRail from './rail';
@@ -40,8 +40,6 @@ import {
 	Wrapper,
 } from './styles/range-control-styles';
 import { useRtl } from '../utils/rtl';
-
-const { Icon, ...icons } = WPIcons;
 
 const BaseRangeControl = forwardRef(
 	(
@@ -155,9 +153,6 @@ const BaseRangeControl = forwardRef(
 			[ isRTL ? 'right' : 'left' ]: fillValueOffset,
 		};
 
-		const beforeIconComponent = icons[ beforeIcon ];
-		const afterIconComponent = icons[ afterIcon ];
-
 		return (
 			<BaseControl
 				className={ classes }
@@ -169,9 +164,9 @@ const BaseRangeControl = forwardRef(
 					className="components-range-control__root"
 					isRTL={ isRTL }
 				>
-					{ beforeIconComponent && (
+					{ beforeIcon && (
 						<BeforeIconWrapper>
-							<Icon icon={ beforeIconComponent } />
+							<Dashicon icon={ beforeIcon } />
 						</BeforeIconWrapper>
 					) }
 					<Wrapper
@@ -230,9 +225,9 @@ const BaseRangeControl = forwardRef(
 							/>
 						) }
 					</Wrapper>
-					{ afterIconComponent && (
+					{ afterIcon && (
 						<AfterIconWrapper>
-							<Icon icon={ afterIconComponent } />
+							<Dashicon icon={ afterIcon } />
 						</AfterIconWrapper>
 					) }
 					{ withInputField && (
