@@ -260,7 +260,7 @@ describe( 'Navigation', () => {
 		);
 		expect( isInLinkRichText ).toBe( true );
 
-		// Expect a Navigation Block with two Navigation Links in the snapshot.
+		// Expect a Navigation Block with a link for "My New Page".
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
