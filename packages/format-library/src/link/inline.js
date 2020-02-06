@@ -31,7 +31,6 @@ function InlineLinkUI( {
 	addingLink,
 	value,
 	onChange,
-	onFocus,
 	speak,
 	stopAddingLink,
 } ) {
@@ -109,7 +108,6 @@ function InlineLinkUI( {
 			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
 			linkValue.url === nextValue.url;
 		if ( ! didToggleSetting ) {
-			onFocus();
 			stopAddingLink();
 		}
 
