@@ -17,12 +17,16 @@ if ( env.MANAGED_WP ) {
 	if ( false && commandExistsSync( 'git' ) ) {
 		stat = statSync( normalize( env.WP_DEVELOP_DIR + '/.git' ) );
 	} else {
-		stat = statSync( normalize( env.WP_DEVELOP_DIR + '/wp-config-sample.php' ) );
+		stat = statSync(
+			normalize( env.WP_DEVELOP_DIR + '/wp-config-sample.php' )
+		);
 	}
 
 	const lastUpdated = new Date( stat.mtimeMs );
 	if ( Date.now() - lastUpdated.getTime() > 7 * 24 * 60 * 60 * 1000 ) {
-		stdout.write( "\nIt's been a while since you updated WordPress. Run `npm run env update` to update it.\n\n" );
+		stdout.write(
+			"\nIt's been a while since you updated WordPress. Run `npm run env update` to update it.\n\n"
+		);
 	}
 }
 

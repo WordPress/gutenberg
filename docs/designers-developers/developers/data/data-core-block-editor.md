@@ -203,6 +203,23 @@ _Returns_
 
 -   `Array`: ClientIDs of the parent blocks.
 
+<a name="getBlockParentsByBlockName" href="#getBlockParentsByBlockName">#</a> **getBlockParentsByBlockName**
+
+Given a block client ID and a block name,
+returns the list of all its parents from top to bottom,
+filtered by the given name.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which to find root client ID.
+-   _blockName_ `string`: Block name to filter.
+-   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
+
+_Returns_
+
+-   `Array`: ClientIDs of the parent blocks.
+
 <a name="getBlockRootClientId" href="#getBlockRootClientId">#</a> **getBlockRootClientId**
 
 Given a block client ID, returns the root block from which the block is

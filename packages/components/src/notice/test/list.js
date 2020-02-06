@@ -19,7 +19,9 @@ describe( 'NoticeList', () => {
 
 		renderer.render( <NoticeList notices={ [] } className="is-ok" /> );
 
-		const classes = new TokenList( renderer.getRenderOutput().props.className );
+		const classes = new TokenList(
+			renderer.getRenderOutput().props.className
+		);
 		expect( classes.contains( 'is-ok' ) ).toBe( true );
 		expect( classes.contains( 'components-notice-list' ) ).toBe( true );
 	} );

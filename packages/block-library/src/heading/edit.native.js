@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import HeadingToolbar from './heading-toolbar';
-import styles from './editor.scss';
 
 /**
  * External dependencies
@@ -30,7 +29,9 @@ const HeadingEdit = ( {
 				minLevel={ 2 }
 				maxLevel={ 7 }
 				selectedLevel={ attributes.level }
-				onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) }
+				onChange={ ( newLevel ) =>
+					setAttributes( { level: newLevel } )
+				}
 				isCollapsed={ false }
 			/>
 		</BlockControls>
@@ -38,10 +39,7 @@ const HeadingEdit = ( {
 			identifier="content"
 			tagName={ 'h' + attributes.level }
 			value={ attributes.content }
-			style={ {
-				...style,
-				minHeight: styles[ 'wp-block-heading' ].minHeight,
-			} }
+			style={ style }
 			onChange={ ( value ) => setAttributes( { content: value } ) }
 			onMerge={ mergeBlocks }
 			onSplit={ ( value ) => {

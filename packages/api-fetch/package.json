@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/api-fetch",
-	"version": "3.8.0",
+	"version": "3.10.0",
 	"description": "Utility to make WordPress REST API requests.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.8.3",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/url": "file:../url"
 	},

@@ -16,7 +16,8 @@ import {
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
 	url: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
-	html: '<div class="wp-embedded-content" data-secret="shhhh it is a secret">WordPress embed</div>',
+	html:
+		'<div class="wp-embedded-content" data-secret="shhhh it is a secret">WordPress embed</div>',
 	type: 'rich',
 	provider_name: 'WordPress',
 	provider_url: 'https://wordpress.org',
@@ -68,7 +69,8 @@ const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
 
 const MOCK_CANT_EMBED_RESPONSE = {
 	provider_name: 'Embed Handler',
-	html: '<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
+	html:
+		'<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
 };
 
 const MOCK_BAD_WORDPRESS_RESPONSE = {
@@ -82,27 +84,41 @@ const MOCK_BAD_WORDPRESS_RESPONSE = {
 
 const MOCK_RESPONSES = [
 	{
-		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook' ),
+		match: createEmbeddingMatcher(
+			'https://wordpress.org/gutenberg/handbook'
+		),
 		onRequestMatch: createJSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook/' ),
+		match: createEmbeddingMatcher(
+			'https://wordpress.org/gutenberg/handbook/'
+		),
 		onRequestMatch: createJSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
-		onRequestMatch: createJSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
+		match: createEmbeddingMatcher(
+			'https://wordpress.org/gutenberg/handbook/block-api/attributes/'
+		),
+		onRequestMatch: createJSONResponse(
+			MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE
+		),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' ),
+		match: createEmbeddingMatcher(
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
+		),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_VIDEO_SUCCESS_RESPONSE ),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://soundcloud.com/a-boogie-wit-da-hoodie/swervin' ),
+		match: createEmbeddingMatcher(
+			'https://soundcloud.com/a-boogie-wit-da-hoodie/swervin'
+		),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_AUDIO_SUCCESS_RESPONSE ),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://www.instagram.com/p/Bvl97o2AK6x/' ),
+		match: createEmbeddingMatcher(
+			'https://www.instagram.com/p/Bvl97o2AK6x/'
+		),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_IMAGE_SUCCESS_RESPONSE ),
 	},
 	{
@@ -122,7 +138,9 @@ const MOCK_RESPONSES = [
 		onRequestMatch: createJSONResponse( MOCK_BAD_EMBED_PROVIDER_RESPONSE ),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://twitter.com/wooyaygutenberg123454312' ),
+		match: createEmbeddingMatcher(
+			'https://twitter.com/wooyaygutenberg123454312'
+		),
 		onRequestMatch: createJSONResponse( MOCK_CANT_EMBED_RESPONSE ),
 	},
 	// Respond to the instagram URL with a non-image response, doesn't matter what it is,
@@ -152,9 +170,13 @@ describe( 'Embedding content', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '/embed' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
+		await page.keyboard.type(
+			'https://twitter.com/wooyaygutenberg123454312'
+		);
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( 'input[value="https://twitter.com/wooyaygutenberg123454312"]' );
+		await page.waitForSelector(
+			'input[value="https://twitter.com/wooyaygutenberg123454312"]'
+		);
 
 		// WordPress invalid content. Should render failed, edit state.
 		await clickBlockAppender();
@@ -162,7 +184,9 @@ describe( 'Embedding content', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/' );
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( 'input[value="https://wordpress.org/gutenberg/handbook/"]' );
+		await page.waitForSelector(
+			'input[value="https://wordpress.org/gutenberg/handbook/"]'
+		);
 
 		// Provider whose oembed API has gone wrong. Should render failed, edit
 		// state.
@@ -171,14 +195,18 @@ describe( 'Embedding content', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'https://twitter.com/thatbunty' );
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( 'input[value="https://twitter.com/thatbunty"]' );
+		await page.waitForSelector(
+			'input[value="https://twitter.com/thatbunty"]'
+		);
 
 		// WordPress content that can be embedded. Should render valid figure
 		// element.
 		await clickBlockAppender();
 		await page.keyboard.type( '/embed' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' );
+		await page.keyboard.type(
+			'https://wordpress.org/gutenberg/handbook/block-api/attributes/'
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( 'figure.wp-block-embed-wordpress' );
 
@@ -187,9 +215,13 @@ describe( 'Embedding content', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '/embed' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
+		await page.keyboard.type(
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
+		);
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( 'figure.wp-block-embed-youtube.wp-embed-aspect-16-9' );
+		await page.waitForSelector(
+			'figure.wp-block-embed-youtube.wp-embed-aspect-16-9'
+		);
 
 		// Photo content. Should render valid figure element.
 		await clickBlockAppender();
@@ -204,8 +236,13 @@ describe( 'Embedding content', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '/embed' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
+		await page.keyboard.type(
+			'https://twitter.com/wooyaygutenberg123454312'
+		);
 		await page.keyboard.press( 'Enter' );
+
+		// Wait for the request to fail and present an error.
+		await page.waitForSelector( '.components-placeholder__error' );
 
 		await clickButton( 'Convert to link' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -227,17 +264,25 @@ describe( 'Embedding content', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '/embed' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
-		await page.keyboard.press( 'Enter' );
-		// Set up a different mock to make sure that try again actually does make the request again.
-		await setUpResponseMocking(
-			[
-				{
-					match: createEmbeddingMatcher( 'https://twitter.com/wooyaygutenberg123454312' ),
-					onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
-				},
-			]
+		await page.keyboard.type(
+			'https://twitter.com/wooyaygutenberg123454312'
 		);
+		await page.keyboard.press( 'Enter' );
+
+		// Wait for the request to fail and present an error.
+		await page.waitForSelector( '.components-placeholder__error' );
+
+		// Set up a different mock to make sure that try again actually does make the request again.
+		await setUpResponseMocking( [
+			{
+				match: createEmbeddingMatcher(
+					'https://twitter.com/wooyaygutenberg123454312'
+				),
+				onRequestMatch: createJSONResponse(
+					MOCK_EMBED_RICH_SUCCESS_RESPONSE
+				),
+			},
+		] );
 		await clickButton( 'Try again' );
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
 	} );
@@ -251,7 +296,10 @@ describe( 'Embedding content', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 		await publishPost();
-		const postUrl = await page.$eval( '#inspector-text-control-0', ( el ) => el.value );
+		const postUrl = await page.$eval(
+			'[id^=inspector-text-control-]',
+			( el ) => el.value
+		);
 
 		// Start a new post, embed the previous post.
 		await createNewPost();

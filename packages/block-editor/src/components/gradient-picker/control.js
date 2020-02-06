@@ -1,4 +1,3 @@
-
 /**
  * External dependencies
  */
@@ -17,13 +16,21 @@ import { useSelect } from '@wordpress/data';
  */
 import GradientPicker from './';
 
-export default function( { className, value, onChange, label = __( 'Gradient Presets' ), ...props } ) {
-	const { gradients = [], disableCustomGradients } = useSelect( ( select ) => (
-		pick(
-			select( 'core/block-editor' ).getSettings(),
-			[ 'gradients', 'disableCustomGradients' ]
-		)
-	), [] );
+export default function( {
+	className,
+	value,
+	onChange,
+	label = __( 'Gradient Presets' ),
+	...props
+} ) {
+	const { gradients = [], disableCustomGradients } = useSelect(
+		( select ) =>
+			pick( select( 'core/block-editor' ).getSettings(), [
+				'gradients',
+				'disableCustomGradients',
+			] ),
+		[]
+	);
 	if ( isEmpty( gradients ) && disableCustomGradients ) {
 		return null;
 	}
@@ -34,9 +41,7 @@ export default function( { className, value, onChange, label = __( 'Gradient Pre
 				className
 			) }
 		>
-			<BaseControl.VisualLabel>
-				{ label }
-			</BaseControl.VisualLabel>
+			<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 			<GradientPicker
 				value={ value }
 				onChange={ onChange }

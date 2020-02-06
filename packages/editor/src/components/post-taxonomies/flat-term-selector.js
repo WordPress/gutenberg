@@ -34,7 +34,8 @@ const DEFAULT_QUERY = {
 	_fields: 'id,name',
 };
 const MAX_TERMS_SUGGESTIONS = 20;
-const isSameTermName = ( termA, termB ) => termA.toLowerCase() === termB.toLowerCase();
+const isSameTermName = ( termA, termB ) =>
+	termA.toLowerCase() === termB.toLowerCase();
 
 /**
  * Returns a term object with name unescaped.
@@ -118,7 +119,14 @@ class FlatTermSelector extends Component {
 		request.then( unescapeTerms ).then( ( terms ) => {
 			this.setState( ( state ) => ( {
 				availableTerms: state.availableTerms.concat(
-					terms.filter( ( term ) => ! find( state.availableTerms, ( availableTerm ) => availableTerm.id === term.id ) )
+					terms.filter(
+						( term ) =>
+							! find(
+								state.availableTerms,
+								( availableTerm ) =>
+									availableTerm.id === term.id
+							)
+					)
 				),
 			} ) );
 			this.updateSelectedTerms( this.props.terms );
@@ -129,7 +137,10 @@ class FlatTermSelector extends Component {
 
 	updateSelectedTerms( terms = [] ) {
 		const selectedTerms = terms.reduce( ( accumulator, termId ) => {
-			const termObject = find( this.state.availableTerms, ( term ) => term.id === termId );
+			const termObject = find(
+				this.state.availableTerms,
+				( term ) => term.id === termId
+			);
 			if ( termObject ) {
 				accumulator.push( termObject.name );
 			}
@@ -149,32 +160,44 @@ class FlatTermSelector extends Component {
 			path: `/wp/v2/${ taxonomy.rest_base }`,
 			method: 'POST',
 			data: { name: termNameEscaped },
-		} ).catch( ( error ) => {
-			const errorCode = error.code;
-			if ( errorCode === 'term_exists' ) {
-				// If the terms exist, fetch it instead of creating a new one.
-				this.addRequest = apiFetch( {
-					path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, { ...DEFAULT_QUERY, search: termNameEscaped } ),
-				} ).then( unescapeTerms );
-				return this.addRequest.then( ( searchResult ) => {
-					return find( searchResult, ( result ) => isSameTermName( result.name, termName ) );
-				} );
-			}
-			return Promise.reject( error );
-		} ).then( unescapeTerm );
+		} )
+			.catch( ( error ) => {
+				const errorCode = error.code;
+				if ( errorCode === 'term_exists' ) {
+					// If the terms exist, fetch it instead of creating a new one.
+					this.addRequest = apiFetch( {
+						path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, {
+							...DEFAULT_QUERY,
+							search: termNameEscaped,
+						} ),
+					} ).then( unescapeTerms );
+					return this.addRequest.then( ( searchResult ) => {
+						return find( searchResult, ( result ) =>
+							isSameTermName( result.name, termName )
+						);
+					} );
+				}
+				return Promise.reject( error );
+			} )
+			.then( unescapeTerm );
 	}
 
 	onChange( termNames ) {
 		const uniqueTerms = uniqBy( termNames, ( term ) => term.toLowerCase() );
 		this.setState( { selectedTerms: uniqueTerms } );
-		const newTermNames = uniqueTerms.filter( ( termName ) =>
-			! find( this.state.availableTerms, ( term ) => isSameTermName( term.name, termName ) )
+		const newTermNames = uniqueTerms.filter(
+			( termName ) =>
+				! find( this.state.availableTerms, ( term ) =>
+					isSameTermName( term.name, termName )
+				)
 		);
 		const termNamesToIds = ( names, availableTerms ) => {
-			return names
-				.map( ( termName ) =>
-					find( availableTerms, ( term ) => isSameTermName( term.name, termName ) ).id
-				);
+			return names.map(
+				( termName ) =>
+					find( availableTerms, ( term ) =>
+						isSameTermName( term.name, termName )
+					).id
+			);
 		};
 
 		if ( newTermNames.length === 0 ) {
@@ -183,16 +206,18 @@ class FlatTermSelector extends Component {
 				this.props.taxonomy.rest_base
 			);
 		}
-		Promise
-			.all( newTermNames.map( this.findOrCreateTerm ) )
-			.then( ( newTerms ) => {
-				const newAvailableTerms = this.state.availableTerms.concat( newTerms );
+		Promise.all( newTermNames.map( this.findOrCreateTerm ) ).then(
+			( newTerms ) => {
+				const newAvailableTerms = this.state.availableTerms.concat(
+					newTerms
+				);
 				this.setState( { availableTerms: newAvailableTerms } );
 				return this.props.onUpdateTerms(
 					termNamesToIds( uniqueTerms, newAvailableTerms ),
 					this.props.taxonomy.rest_base
 				);
-			} );
+			}
+		);
 	}
 
 	searchTerms( search = '' ) {
@@ -219,9 +244,18 @@ class FlatTermSelector extends Component {
 			[ 'labels', 'singular_name' ],
 			slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
 		);
-		const termAddedLabel = sprintf( _x( '%s added', 'term' ), singularName );
-		const termRemovedLabel = sprintf( _x( '%s removed', 'term' ), singularName );
-		const removeTermLabel = sprintf( _x( 'Remove %s', 'term' ), singularName );
+		const termAddedLabel = sprintf(
+			_x( '%s added', 'term' ),
+			singularName
+		);
+		const termRemovedLabel = sprintf(
+			_x( '%s removed', 'term' ),
+			singularName
+		);
+		const removeTermLabel = sprintf(
+			_x( 'Remove %s', 'term' ),
+			singularName
+		);
 
 		return (
 			<FormTokenField
@@ -248,9 +282,25 @@ export default compose(
 		const { getTaxonomy } = select( 'core' );
 		const taxonomy = getTaxonomy( slug );
 		return {
-			hasCreateAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-create-' + taxonomy.rest_base ], false ) : false,
-			hasAssignAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-assign-' + taxonomy.rest_base ], false ) : false,
-			terms: taxonomy ? select( 'core/editor' ).getEditedPostAttribute( taxonomy.rest_base ) : [],
+			hasCreateAction: taxonomy
+				? get(
+						getCurrentPost(),
+						[ '_links', 'wp:action-create-' + taxonomy.rest_base ],
+						false
+				  )
+				: false,
+			hasAssignAction: taxonomy
+				? get(
+						getCurrentPost(),
+						[ '_links', 'wp:action-assign-' + taxonomy.rest_base ],
+						false
+				  )
+				: false,
+			terms: taxonomy
+				? select( 'core/editor' ).getEditedPostAttribute(
+						taxonomy.rest_base
+				  )
+				: [],
 			taxonomy,
 		};
 	} ),
@@ -261,5 +311,5 @@ export default compose(
 			},
 		};
 	} ),
-	withFilters( 'editor.PostTaxonomyType' ),
+	withFilters( 'editor.PostTaxonomyType' )
 )( FlatTermSelector );

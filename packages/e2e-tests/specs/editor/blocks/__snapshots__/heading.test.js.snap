@@ -13,14 +13,14 @@ exports[`Heading can be created by prefixing number sign and a space 1`] = `
 `;
 
 exports[`Heading it should correctly apply custom colors 1`] = `
-"<!-- wp:heading {\\"level\\":3,\\"customTextColor\\":\\"#181717\\"} -->
-<h3 class=\\"has-text-color\\" style=\\"color:#181717\\">Heading</h3>
+"<!-- wp:heading {\\"level\\":3,\\"customTextColor\\":\\"#7700ff\\"} -->
+<h3 class=\\"has-text-color\\" style=\\"color:#7700ff\\">Heading</h3>
 <!-- /wp:heading -->"
 `;
 
 exports[`Heading it should correctly apply named colors 1`] = `
-"<!-- wp:heading {\\"textColor\\":\\"very-dark-gray\\"} -->
-<h2 class=\\"has-very-dark-gray-color has-text-color\\">Heading</h2>
+"<!-- wp:heading {\\"textColor\\":\\"luminous-vivid-orange\\"} -->
+<h2 class=\\"has-luminous-vivid-orange-color has-text-color\\">Heading</h2>
 <!-- /wp:heading -->"
 `;
 

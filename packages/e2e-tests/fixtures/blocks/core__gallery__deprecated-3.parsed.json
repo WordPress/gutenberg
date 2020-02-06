@@ -5,12 +5,13 @@
             "ids": [
                 null,
                 null
-            ]
+            ],
+            "align": "wide"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<ul class=\"wp-block-gallery columns-2 is-cropped\">\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"title\" />\n\t\t</figure>\n\t</li>\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" alt=\"title\" />\n\t\t</figure>\n\t</li>\n</ul>\n",
+        "innerHTML": "\n<ul class=\"wp-block-gallery columns-2 is-cropped alignwide\">\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"title\" />\n\t\t</figure>\n\t</li>\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" alt=\"title\" />\n\t\t</figure>\n\t</li>\n</ul>\n",
         "innerContent": [
-            "\n<ul class=\"wp-block-gallery columns-2 is-cropped\">\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"title\" />\n\t\t</figure>\n\t</li>\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" alt=\"title\" />\n\t\t</figure>\n\t</li>\n</ul>\n"
+            "\n<ul class=\"wp-block-gallery columns-2 is-cropped alignwide\">\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"title\" />\n\t\t</figure>\n\t</li>\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" alt=\"title\" />\n\t\t</figure>\n\t</li>\n</ul>\n"
         ]
     },
     {

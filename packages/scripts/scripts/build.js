@@ -10,9 +10,7 @@ const { sync: resolveBin } = require( 'resolve-bin' );
 const { getWebpackArgs } = require( '../utils' );
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
-const { status } = spawn(
-	resolveBin( 'webpack' ),
-	getWebpackArgs(),
-	{ stdio: 'inherit' }
-);
+const { status } = spawn( resolveBin( 'webpack' ), getWebpackArgs(), {
+	stdio: 'inherit',
+} );
 process.exit( status );

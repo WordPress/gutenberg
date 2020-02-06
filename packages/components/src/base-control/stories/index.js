@@ -8,7 +8,7 @@ import { boolean, text } from '@storybook/addon-knobs';
  */
 import BaseControl from '../';
 
-export default { title: 'Components|BaseControl', component: BaseControl };
+export default { title: 'Components/BaseControl', component: BaseControl };
 
 export const _default = () => {
 	const id = text( 'Id', 'textarea-1' );
@@ -25,9 +25,7 @@ export const _default = () => {
 			hideLabelFromVision={ hideLabelFromVision }
 			className={ className }
 		>
-			<textarea
-				id={ id }
-			/>
+			<textarea id={ id } />
 		</BaseControl>
 	);
 };

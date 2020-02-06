@@ -15,7 +15,7 @@ export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { default as __experimentalBlockNavigationList } from './block-navigation/list';
-export { default as __experimentalBlockPatternPicker } from './block-pattern-picker';
+export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
 export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
 export { default as ButtonBlockerAppender } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
@@ -26,6 +26,7 @@ export { default as __experimentalGradientPickerControl } from './gradient-picke
 export { default as __experimentalGradientPickerPanel } from './gradient-picker/panel';
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
+export { default as __experimentalImageSizeControl } from './image-size-control';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "3.9.0",
+	"version": "3.11.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,7 +23,7 @@
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.8.3",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"lodash": "^4.17.15",

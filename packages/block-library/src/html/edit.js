@@ -8,12 +8,7 @@ import {
 	PlainText,
 	transformStyles,
 } from '@wordpress/block-editor';
-import {
-	Button,
-	Disabled,
-	SandBox,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { Button, Disabled, SandBox, ToolbarGroup } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 class HTMLEdit extends Component {
@@ -41,10 +36,9 @@ class HTMLEdit extends Component {
 			}
 		`;
 
-		this.setState( { styles: [
-			defaultStyles,
-			...transformStyles( styles ),
-		] } );
+		this.setState( {
+			styles: [ defaultStyles, ...transformStyles( styles ) ],
+		} );
 	}
 
 	switchToPreview() {
@@ -80,18 +74,23 @@ class HTMLEdit extends Component {
 					</ToolbarGroup>
 				</BlockControls>
 				<Disabled.Consumer>
-					{ ( isDisabled ) => (
-						( isPreview || isDisabled ) ? (
-							<SandBox html={ attributes.content } styles={ styles } />
+					{ ( isDisabled ) =>
+						isPreview || isDisabled ? (
+							<SandBox
+								html={ attributes.content }
+								styles={ styles }
+							/>
 						) : (
 							<PlainText
 								value={ attributes.content }
-								onChange={ ( content ) => setAttributes( { content } ) }
+								onChange={ ( content ) =>
+									setAttributes( { content } )
+								}
 								placeholder={ __( 'Write HTML…' ) }
 								aria-label={ __( 'HTML' ) }
 							/>
 						)
-					) }
+					}
 				</Disabled.Consumer>
 			</div>
 		);

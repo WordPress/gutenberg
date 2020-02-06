@@ -27,8 +27,8 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 			blockValue: {
 				type: 'string',
 				source: 'meta',
-				meta: 'myguten_meta_block_field'
-			}
+				meta: 'myguten_meta_block_field',
+			},
 		},
 
 		edit: function( props ) {
@@ -36,7 +36,7 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 			var setAttributes = props.setAttributes;
 
 			function updateBlockValue( blockValue ) {
-				setAttributes({ blockValue });
+				setAttributes( { blockValue } );
 			}
 
 			return el(
@@ -45,7 +45,7 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 				el( TextControl, {
 					label: 'Meta Block Field',
 					value: props.attributes.blockValue,
-					onChange: updateBlockValue
+					onChange: updateBlockValue,
 				} )
 			);
 		},
@@ -54,7 +54,7 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 		// Data is saved to post meta via attributes
 		save: function() {
 			return null;
-		}
+		},
 	} );
 } )( window.wp );
 ```
@@ -77,7 +77,6 @@ registerBlockType( 'myguten/meta-block', {
 	},
 
 	edit( { className, setAttributes, attributes } ) {
-
 		function updateBlockValue( blockValue ) {
 			setAttributes( { blockValue } );
 		}
@@ -97,7 +96,7 @@ registerBlockType( 'myguten/meta-block', {
 	// Data is saved to post meta via attributes
 	save() {
 		return null;
-	}
+	},
 } );
 ```
 {% end %}

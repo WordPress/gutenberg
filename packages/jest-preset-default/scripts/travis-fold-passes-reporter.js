@@ -20,7 +20,9 @@ module.exports = class TravisFoldPassesReporter extends VerboseReporter {
 				this.foldedTestResults.length === 1 ? '' : 's'
 			}.`
 		);
-		this.foldedTestResults.forEach( ( args ) => super.onTestResult( ...args ) );
+		this.foldedTestResults.forEach( ( args ) =>
+			super.onTestResult( ...args )
+		);
 		this.log( 'travis_fold:end:TravisFoldPassesReporter' );
 		this.foldedTestResults = [];
 	}

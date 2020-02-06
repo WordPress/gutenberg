@@ -7,10 +7,11 @@
 	justify-content: space-between;
 	color: $dark-gray-400;
 	margin-top: $grid-size;
+	font-size: 12px;
 
 	.block-directory-downloadable-block-info__column {
 		display: flex;
-		align-items: flex-start;
+		align-items: center;
 
 		.dashicon {
 			font-size: 16px;

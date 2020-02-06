@@ -142,10 +142,14 @@ export function toDom( {
 		remove,
 		appendText,
 		onStartIndex( body, pointer ) {
-			startPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
+			startPath = createPathToNode( pointer, body, [
+				pointer.nodeValue.length,
+			] );
 		},
 		onEndIndex( body, pointer ) {
-			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
+			endPath = createPathToNode( pointer, body, [
+				pointer.nodeValue.length,
+			] );
 		},
 		isEditableTree,
 		placeholder,
@@ -203,7 +207,8 @@ export function applyValue( future, current ) {
 		} else if ( ! currentChild.isEqualNode( futureChild ) ) {
 			if (
 				currentChild.nodeName !== futureChild.nodeName ||
-				( currentChild.nodeType === TEXT_NODE && currentChild.data !== futureChild.data )
+				( currentChild.nodeType === TEXT_NODE &&
+					currentChild.data !== futureChild.data )
 			) {
 				current.replaceChild( futureChild, currentChild );
 			} else {
@@ -269,8 +274,14 @@ function isRangeEqual( a, b ) {
 }
 
 export function applySelection( { startPath, endPath }, current ) {
-	const { node: startContainer, offset: startOffset } = getNodeByPath( current, startPath );
-	const { node: endContainer, offset: endOffset } = getNodeByPath( current, endPath );
+	const { node: startContainer, offset: startOffset } = getNodeByPath(
+		current,
+		startPath
+	);
+	const { node: endContainer, offset: endOffset } = getNodeByPath(
+		current,
+		endPath
+	);
 	const selection = window.getSelection();
 	const { ownerDocument } = current;
 	const range = ownerDocument.createRange();
@@ -278,10 +289,7 @@ export function applySelection( { startPath, endPath }, current ) {
 	range.setStart( startContainer, startOffset );
 	range.setEnd( endContainer, endOffset );
 
-	// Set back focus if focus is lost.
-	if ( ownerDocument.activeElement !== current ) {
-		current.focus();
-	}
+	const { activeElement } = ownerDocument;
 
 	if ( selection.rangeCount > 0 ) {
 		// If the to be added range and the live range are the same, there's no
@@ -294,4 +302,5 @@ export function applySelection( { startPath, endPath }, current ) {
 	}
 
 	selection.addRange( range );
+	activeElement.focus();
 }

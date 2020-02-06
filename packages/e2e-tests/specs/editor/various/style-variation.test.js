@@ -20,7 +20,9 @@ describe( 'adding blocks', () => {
 
 		await clickBlockToolbarButton( 'Change block type or style' );
 
-		const styleVariations = await page.$$( '.block-editor-block-styles__item' );
+		const styleVariations = await page.$$(
+			'.block-editor-block-styles__item'
+		);
 		await styleVariations[ 1 ].click();
 
 		// Check the content

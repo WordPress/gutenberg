@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/viewport",
-	"version": "2.10.0",
+	"version": "2.12.0",
 	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,7 +21,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.8.3",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"lodash": "^4.17.15"

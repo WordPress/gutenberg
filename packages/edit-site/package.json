@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "1.0.0-beta.0",
+	"version": "1.1.0",
 	"private": true,
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
@@ -21,11 +21,14 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.8.3",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
+		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
+		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
+		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",

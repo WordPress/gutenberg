@@ -52,14 +52,17 @@ const getWidgetAreasObject = () => {
 		'core'
 	);
 
-	return getEntityRecords( 'root', 'widgetArea' ).reduce( ( widgetAreasObject, { id } ) => {
-		widgetAreasObject[ id ] = getEditedEntityRecord(
-			'root',
-			'widgetArea',
-			id
-		).blocks;
-		return widgetAreasObject;
-	}, {} );
+	return getEntityRecords( 'root', 'widgetArea' ).reduce(
+		( widgetAreasObject, { id } ) => {
+			widgetAreasObject[ id ] = getEditedEntityRecord(
+				'root',
+				'widgetArea',
+				id
+			).blocks;
+			return widgetAreasObject;
+		},
+		{}
+	);
 };
 
 // Serialize the provided blocks and render them in the widget area with the provided ID.
@@ -67,7 +70,10 @@ const previewBlocksInWidgetArea = throttle( ( id, blocks ) => {
 	const customizePreviewIframe = document.querySelector(
 		'#customize-preview > iframe'
 	);
-	if ( ! customizePreviewIframe || ! customizePreviewIframe.contentDocument ) {
+	if (
+		! customizePreviewIframe ||
+		! customizePreviewIframe.contentDocument
+	) {
 		return;
 	}
 
@@ -115,13 +121,17 @@ if ( window.wp && window.wp.customize && window.wp.data ) {
 			let widgetAreas;
 			try {
 				widgetAreas = JSON.parse(
-					document.getElementById( '_customize-input-gutenberg_widget_blocks' )
-						.value
+					document.getElementById(
+						'_customize-input-gutenberg_widget_blocks'
+					).value
 				);
-				widgetAreas = Object.keys( widgetAreas ).reduce( ( value, id ) => {
-					value[ id ] = parse( widgetAreas[ id ] );
-					return value;
-				}, {} );
+				widgetAreas = Object.keys( widgetAreas ).reduce(
+					( value, id ) => {
+						value[ id ] = parse( widgetAreas[ id ] );
+						return value;
+					},
+					{}
+				);
 			} catch ( err ) {
 				widgetAreas = {};
 			}
@@ -130,20 +140,26 @@ if ( window.wp && window.wp.customize && window.wp.data ) {
 			// if any, and subscribe to registry changes after that so that we can preview
 			// changes and update the hidden input's value when any of the widget areas change.
 			waitForSelectValue(
-				() => window.wp.data.select( 'core' ).hasFinishedResolution( 'getEntityRecords', [ 'root', 'widgetArea' ] ),
+				() =>
+					window.wp.data
+						.select( 'core' )
+						.hasFinishedResolution( 'getEntityRecords', [
+							'root',
+							'widgetArea',
+						] ),
 				true,
-				() => window.wp.data.select( 'core' ).getEntityRecords( 'root', 'widgetArea' )
+				() =>
+					window.wp.data
+						.select( 'core' )
+						.getEntityRecords( 'root', 'widgetArea' )
 			).then( () => {
 				Object.keys( widgetAreas ).forEach( ( id ) => {
-					window.wp.data.dispatch( 'core' ).editEntityRecord(
-						'root',
-						'widgetArea',
-						id,
-						{
+					window.wp.data
+						.dispatch( 'core' )
+						.editEntityRecord( 'root', 'widgetArea', id, {
 							content: serialize( widgetAreas[ id ] ),
 							blocks: widgetAreas[ id ],
-						}
-					);
+						} );
 				} );
 				widgetAreas = getWidgetAreasObject();
 				window.wp.data.subscribe( () => {
@@ -152,7 +168,10 @@ if ( window.wp && window.wp.customize && window.wp.data ) {
 					let didUpdate = false;
 					for ( const id of Object.keys( nextWidgetAreas ) ) {
 						if ( widgetAreas[ id ] !== nextWidgetAreas[ id ] ) {
-							previewBlocksInWidgetArea( id, nextWidgetAreas[ id ] );
+							previewBlocksInWidgetArea(
+								id,
+								nextWidgetAreas[ id ]
+							);
 							didUpdate = true;
 						}
 					}

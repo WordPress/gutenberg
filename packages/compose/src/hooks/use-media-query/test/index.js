@@ -34,7 +34,11 @@ describe( 'useMediaQuery', () => {
 	};
 
 	it( 'should return true when query matches', async () => {
-		global.matchMedia.mockReturnValue( { addListener, removeListener, matches: true } );
+		global.matchMedia.mockReturnValue( {
+			addListener,
+			removeListener,
+			matches: true,
+		} );
 
 		let root;
 
@@ -51,9 +55,21 @@ describe( 'useMediaQuery', () => {
 	} );
 
 	it( 'should correctly update the value when the query evaluation matches', async () => {
-		global.matchMedia.mockReturnValueOnce( { addListener, removeListener, matches: true } );
-		global.matchMedia.mockReturnValueOnce( { addListener, removeListener, matches: true } );
-		global.matchMedia.mockReturnValueOnce( { addListener, removeListener, matches: false } );
+		global.matchMedia.mockReturnValueOnce( {
+			addListener,
+			removeListener,
+			matches: true,
+		} );
+		global.matchMedia.mockReturnValueOnce( {
+			addListener,
+			removeListener,
+			matches: true,
+		} );
+		global.matchMedia.mockReturnValueOnce( {
+			addListener,
+			removeListener,
+			matches: false,
+		} );
 
 		let root, updateMatchFunction;
 		await act( async () => {
@@ -76,7 +92,11 @@ describe( 'useMediaQuery', () => {
 	} );
 
 	it( 'should return false when the query does not matches', async () => {
-		global.matchMedia.mockReturnValue( { addListener, removeListener, matches: false } );
+		global.matchMedia.mockReturnValue( {
+			addListener,
+			removeListener,
+			matches: false,
+		} );
 		let root;
 		await act( async () => {
 			root = create( <TestComponent query="(min-width: 782px)" /> );
@@ -90,7 +110,11 @@ describe( 'useMediaQuery', () => {
 	} );
 
 	it( 'should not call matchMedia if a query is not passed', async () => {
-		global.matchMedia.mockReturnValue( { addListener, removeListener, matches: false } );
+		global.matchMedia.mockReturnValue( {
+			addListener,
+			removeListener,
+			matches: false,
+		} );
 		let root;
 		await act( async () => {
 			root = create( <TestComponent /> );

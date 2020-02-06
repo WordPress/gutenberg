@@ -1,11 +1,18 @@
-on: pull_request
+on:
+  pull_request:
+    types: [opened]
+  push:
 name: Pull request automation
 
 jobs:
   pull-request-automation:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      # Checkout defaults to using the branch which triggered the event, which
+      # isn't necessarily `master` (e.g. in the case of a merge).
+      - uses: actions/checkout@v2
+        with:
+          ref: master
       # Changing into the action's directory and running `npm install` is much
       # faster than a full project-wide `npm ci`.
       - run: cd packages/project-management-automation && npm install

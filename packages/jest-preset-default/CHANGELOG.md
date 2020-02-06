@@ -1,8 +1,14 @@
-## master
+## Master
 
 ### New Features
 
 - Add `@wordpress/test-utils/extend-expect` to Jest setup ([18855](https://github.com/WordPress/gutenberg/pull/18855)).
+
+## 5.4.0 (2020-02-04)
+
+### Bug Fixes
+
+- Use `require.resolve()` instead of `<rootDir>` to resolve `jest` config files according to the NodeJS lookup algorithm. ([#19957](https://github.com/WordPress/gutenberg/pull/19957))
 
 ## 5.3.1 (2020-01-01)
 

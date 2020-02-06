@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "3.4.0",
+	"version": "3.6.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.8.3",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/blocks": "file:../blocks",
@@ -35,6 +35,7 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",

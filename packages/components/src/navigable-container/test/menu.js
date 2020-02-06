@@ -17,7 +17,9 @@ import { NavigableMenu } from '../menu';
 function simulateVisible( wrapper, selector ) {
 	const elements = wrapper.getDOMNode().querySelectorAll( selector );
 	each( elements, ( elem ) => {
-		elem.getClientRects = () => [ 'trick-jsdom-into-having-size-for-element-rect' ];
+		elem.getClientRects = () => [
+			'trick-jsdom-into-having-size-for-element-rect',
+		];
 	} );
 }
 
@@ -41,27 +43,41 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 describe( 'NavigableMenu', () => {
 	it( 'vertical: should navigate by up and down', () => {
 		let currentIndex = 0;
-		const wrapper = mount( (
+		const wrapper = mount(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
 			*/
 			/* eslint-disable no-restricted-syntax */
-			<NavigableMenu orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
-				<span tabIndex="-1" id="btn1">One</span>
-				<span tabIndex="-1" id="btn2">Two</span>
-				<span id="btn-deep-wrapper">
-					<span id="btn-deep" tabIndex="-1">Deep</span>
+			<NavigableMenu
+				orientation="vertical"
+				onNavigate={ ( index ) => ( currentIndex = index ) }
+			>
+				<span tabIndex="-1" id="btn1">
+					One
 				</span>
-				<span tabIndex="-1" id="btn3">Three</span>
+				<span tabIndex="-1" id="btn2">
+					Two
+				</span>
+				<span id="btn-deep-wrapper">
+					<span id="btn-deep" tabIndex="-1">
+						Deep
+					</span>
+				</span>
+				<span tabIndex="-1" id="btn3">
+					Three
+				</span>
 			</NavigableMenu>
 			/* eslint-enable no-restricted-syntax */
-		) );
+		);
 
 		simulateVisible( wrapper, '*' );
 
 		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
+		wrapper
+			.getDOMNode()
+			.querySelector( '#btn1' )
+			.focus();
 
 		// Navigate options
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
@@ -85,24 +101,37 @@ describe( 'NavigableMenu', () => {
 
 	it( 'vertical: should navigate by up and down, and stop at edges', () => {
 		let currentIndex = 0;
-		const wrapper = mount( (
+		const wrapper = mount(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
 			*/
 			/* eslint-disable no-restricted-syntax */
-			<NavigableMenu cycle={ false } orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
-				<span tabIndex="-1" id="btn1">One</span>
-				<span tabIndex="-1" id="btn2">Two</span>
-				<span tabIndex="-1" id="btn3">Three</span>
+			<NavigableMenu
+				cycle={ false }
+				orientation="vertical"
+				onNavigate={ ( index ) => ( currentIndex = index ) }
+			>
+				<span tabIndex="-1" id="btn1">
+					One
+				</span>
+				<span tabIndex="-1" id="btn2">
+					Two
+				</span>
+				<span tabIndex="-1" id="btn3">
+					Three
+				</span>
 			</NavigableMenu>
 			/* eslint-enable no-restricted-syntax */
-		) );
+		);
 
 		simulateVisible( wrapper, '*' );
 
 		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
+		wrapper
+			.getDOMNode()
+			.querySelector( '#btn1' )
+			.focus();
 
 		// Navigate options
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
@@ -124,27 +153,41 @@ describe( 'NavigableMenu', () => {
 
 	it( 'horizontal: should navigate by left and right', () => {
 		let currentIndex = 0;
-		const wrapper = mount( (
+		const wrapper = mount(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
 			*/
 			/* eslint-disable no-restricted-syntax */
-			<NavigableMenu orientation="horizontal" onNavigate={ ( index ) => currentIndex = index }>
-				<span tabIndex="-1" id="btn1">One</span>
-				<span tabIndex="-1" id="btn2">Two</span>
-				<span id="btn-deep-wrapper">
-					<span id="btn-deep" tabIndex="-1">Deep</span>
+			<NavigableMenu
+				orientation="horizontal"
+				onNavigate={ ( index ) => ( currentIndex = index ) }
+			>
+				<span tabIndex="-1" id="btn1">
+					One
 				</span>
-				<span tabIndex="-1" id="btn3">Three</span>
+				<span tabIndex="-1" id="btn2">
+					Two
+				</span>
+				<span id="btn-deep-wrapper">
+					<span id="btn-deep" tabIndex="-1">
+						Deep
+					</span>
+				</span>
+				<span tabIndex="-1" id="btn3">
+					Three
+				</span>
 			</NavigableMenu>
 			/* eslint-enable no-restricted-syntax */
-		) );
+		);
 
 		simulateVisible( wrapper, '*' );
 
 		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
+		wrapper
+			.getDOMNode()
+			.querySelector( '#btn1' )
+			.focus();
 
 		// Navigate options
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
@@ -168,24 +211,37 @@ describe( 'NavigableMenu', () => {
 
 	it( 'horizontal: should navigate by left and right, and stop at edges', () => {
 		let currentIndex = 0;
-		const wrapper = mount( (
+		const wrapper = mount(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
 			*/
 			/* eslint-disable no-restricted-syntax */
-			<NavigableMenu cycle={ false } orientation="horizontal" onNavigate={ ( index ) => currentIndex = index }>
-				<span tabIndex="-1" id="btn1">One</span>
-				<span tabIndex="-1" id="btn2">Two</span>
-				<span tabIndex="-1" id="btn3">Three</span>
+			<NavigableMenu
+				cycle={ false }
+				orientation="horizontal"
+				onNavigate={ ( index ) => ( currentIndex = index ) }
+			>
+				<span tabIndex="-1" id="btn1">
+					One
+				</span>
+				<span tabIndex="-1" id="btn2">
+					Two
+				</span>
+				<span tabIndex="-1" id="btn3">
+					Three
+				</span>
 			</NavigableMenu>
 			/* eslint-enable no-restricted-syntax */
-		) );
+		);
 
 		simulateVisible( wrapper, '*' );
 
 		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
+		wrapper
+			.getDOMNode()
+			.querySelector( '#btn1' )
+			.focus();
 
 		// Navigate options
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
@@ -207,24 +263,30 @@ describe( 'NavigableMenu', () => {
 
 	it( 'both: should navigate by up/down and left/right', () => {
 		let currentIndex = 0;
-		const wrapper = mount( (
+		const wrapper = mount(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
 			*/
 			/* eslint-disable no-restricted-syntax */
-			<NavigableMenu orientation="both" onNavigate={ ( index ) => currentIndex = index }>
+			<NavigableMenu
+				orientation="both"
+				onNavigate={ ( index ) => ( currentIndex = index ) }
+			>
 				<button id="btn1">One</button>
 				<button id="btn2">Two</button>
 				<button id="btn3">Three</button>
 			</NavigableMenu>
 			/* eslint-enable no-restricted-syntax */
-		) );
+		);
 
 		simulateVisible( wrapper, '*' );
 
 		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
+		wrapper
+			.getDOMNode()
+			.querySelector( '#btn1' )
+			.focus();
 
 		// Navigate options
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {

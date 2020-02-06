@@ -37,11 +37,21 @@ import MediaContainer from './media-container';
  * Constants
  */
 const TEMPLATE = [
-	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
+	[
+		'core/paragraph',
+		{
+			fontSize: 'large',
+			placeholder: _x( 'Content…', 'content placeholder' ),
+		},
+	],
 ];
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
-const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
+const applyWidthConstraints = ( width ) =>
+	Math.max(
+		WIDTH_CONSTRAINT_PERCENTAGE,
+		Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE )
+	);
 
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
@@ -57,7 +67,6 @@ class MediaTextEdit extends Component {
 			mediaWidth: null,
 		};
 		this.onSetHref = this.onSetHref.bind( this );
-		this.onSelectURL = this.onSelectURL.bind( this );
 	}
 
 	onSelectMedia( media ) {
@@ -75,13 +84,21 @@ class MediaTextEdit extends Component {
 				// video contain the media type of 'file' in the object returned from the rest api.
 				mediaType = 'video';
 			}
-		} else { // for media selections originated from existing files in the media library.
+		} else {
+			// for media selections originated from existing files in the media library.
 			mediaType = media.type;
 		}
 
 		if ( mediaType === 'image' ) {
 			// Try the "large" size URL, falling back to the "full" size URL below.
-			src = get( media, [ 'sizes', 'large', 'url' ] ) || get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
+			src =
+				get( media, [ 'sizes', 'large', 'url' ] ) ||
+				get( media, [
+					'media_details',
+					'sizes',
+					'large',
+					'source_url',
+				] );
 		}
 
 		let newHref = href;
@@ -103,7 +120,6 @@ class MediaTextEdit extends Component {
 			mediaUrl: src || media.url,
 			mediaLink: media.link || undefined,
 			href: newHref,
-			imageFill: undefined,
 			focalPoint: undefined,
 		} );
 	}
@@ -116,29 +132,6 @@ class MediaTextEdit extends Component {
 
 	onSetHref( props ) {
 		this.props.setAttributes( props );
-	}
-
-	onSelectURL( newURL ) {
-		const { mediaUrl, linkDestination, href } = this.props.attributes;
-
-		if ( newURL !== mediaUrl ) {
-			let newHref = href;
-			if ( linkDestination === LINK_DESTINATION_MEDIA ) {
-				// Update the media link.
-				newHref = newURL;
-			}
-
-			// Check if the image is linked to the attachment page.
-			if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
-				// Update the media link.
-				newHref = undefined;
-			}
-			this.props.setAttributes( {
-				mediaUrl: newURL,
-				href: newHref,
-				mediaId: undefined,
-			} );
-		}
 	}
 
 	commitWidthChange( width ) {
@@ -154,15 +147,32 @@ class MediaTextEdit extends Component {
 
 	renderMediaArea() {
 		const { attributes } = this.props;
-		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth, imageFill, focalPoint } = attributes;
+		const {
+			mediaAlt,
+			mediaId,
+			mediaPosition,
+			mediaType,
+			mediaUrl,
+			mediaWidth,
+			imageFill,
+			focalPoint,
+		} = attributes;
 		return (
 			<MediaContainer
 				className="block-library-media-text__media-container"
 				onSelectMedia={ this.onSelectMedia }
-				onSelectURL={ this.onSelectURL }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
-				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint } }
+				{ ...{
+					mediaAlt,
+					mediaId,
+					mediaType,
+					mediaUrl,
+					mediaPosition,
+					mediaWidth,
+					imageFill,
+					focalPoint,
+				} }
 			/>
 		);
 	}
@@ -198,35 +208,43 @@ class MediaTextEdit extends Component {
 		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-selected': isSelected,
-			'has-background': ( backgroundColor.class || backgroundColor.color ),
+			'has-background': backgroundColor.class || backgroundColor.color,
 			[ backgroundColor.class ]: backgroundColor.class,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 			'is-image-fill': imageFill,
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
-		const gridTemplateColumns = 'right' === mediaPosition ? `1fr ${ widthString }` : `${ widthString } 1fr`;
+		const gridTemplateColumns =
+			'right' === mediaPosition
+				? `1fr ${ widthString }`
+				: `${ widthString } 1fr`;
 		const style = {
 			gridTemplateColumns,
 			msGridColumns: gridTemplateColumns,
 			backgroundColor: backgroundColor.color,
 		};
-		const colorSettings = [ {
-			value: backgroundColor.color,
-			onChange: setBackgroundColor,
-			label: __( 'Background Color' ),
-		} ];
-		const toolbarControls = [ {
-			icon: 'align-pull-left',
-			title: __( 'Show media on left' ),
-			isActive: mediaPosition === 'left',
-			onClick: () => setAttributes( { mediaPosition: 'left' } ),
-		}, {
-			icon: 'align-pull-right',
-			title: __( 'Show media on right' ),
-			isActive: mediaPosition === 'right',
-			onClick: () => setAttributes( { mediaPosition: 'right' } ),
-		} ];
+		const colorSettings = [
+			{
+				value: backgroundColor.color,
+				onChange: setBackgroundColor,
+				label: __( 'Background Color' ),
+			},
+		];
+		const toolbarControls = [
+			{
+				icon: 'align-pull-left',
+				title: __( 'Show media on left' ),
+				isActive: mediaPosition === 'left',
+				onClick: () => setAttributes( { mediaPosition: 'left' } ),
+			},
+			{
+				icon: 'align-pull-right',
+				title: __( 'Show media on right' ),
+				isActive: mediaPosition === 'right',
+				onClick: () => setAttributes( { mediaPosition: 'right' } ),
+			},
+		];
 		const onMediaAltChange = ( newMediaAlt ) => {
 			setAttributes( { mediaAlt: newMediaAlt } );
 		};
@@ -234,40 +252,56 @@ class MediaTextEdit extends Component {
 			setAttributes( { verticalAlignment: alignment } );
 		};
 		const mediaTextGeneralSettings = (
-			<PanelBody title={ __( 'Media & Text Settings' ) }>
+			<PanelBody title={ __( 'Media & Text settings' ) }>
 				<ToggleControl
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }
-					onChange={ () => setAttributes( {
-						isStackedOnMobile: ! isStackedOnMobile,
-					} ) }
-				/>
-				{ mediaType === 'image' && ( <ToggleControl
-					label={ __( 'Crop image to fill entire column' ) }
-					checked={ imageFill }
-					onChange={ () => setAttributes( {
-						imageFill: ! imageFill,
-					} ) }
-				/> ) }
-				{ imageFill && ( <FocalPointPicker
-					label={ __( 'Focal Point Picker' ) }
-					url={ mediaUrl }
-					value={ focalPoint }
-					onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
-				/> ) }
-				{ mediaType === 'image' && ( <TextareaControl
-					label={ __( 'Alt Text (Alternative Text)' ) }
-					value={ mediaAlt }
-					onChange={ onMediaAltChange }
-					help={
-						<>
-							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-								{ __( 'Describe the purpose of the image' ) }
-							</ExternalLink>
-							{ __( 'Leave empty if the image is purely decorative.' ) }
-						</>
+					onChange={ () =>
+						setAttributes( {
+							isStackedOnMobile: ! isStackedOnMobile,
+						} )
 					}
-				/> ) }
+				/>
+				{ mediaType === 'image' && (
+					<ToggleControl
+						label={ __( 'Crop image to fill entire column' ) }
+						checked={ imageFill }
+						onChange={ () =>
+							setAttributes( {
+								imageFill: ! imageFill,
+							} )
+						}
+					/>
+				) }
+				{ imageFill && (
+					<FocalPointPicker
+						label={ __( 'Focal Point Picker' ) }
+						url={ mediaUrl }
+						value={ focalPoint }
+						onChange={ ( value ) =>
+							setAttributes( { focalPoint: value } )
+						}
+					/>
+				) }
+				{ mediaType === 'image' && (
+					<TextareaControl
+						label={ __( 'Alt Text (Alternative Text)' ) }
+						value={ mediaAlt }
+						onChange={ onMediaAltChange }
+						help={
+							<>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									{ __(
+										'Describe the purpose of the image'
+									) }
+								</ExternalLink>
+								{ __(
+									'Leave empty if the image is purely decorative.'
+								) }
+							</>
+						}
+					/>
+				) }
 			</PanelBody>
 		);
 
@@ -276,34 +310,34 @@ class MediaTextEdit extends Component {
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
 					<PanelColorSettings
-						title={ __( 'Color Settings' ) }
+						title={ __( 'Color settings' ) }
 						initialOpen={ false }
 						colorSettings={ colorSettings }
 					/>
 				</InspectorControls>
 				<BlockControls>
-					<ToolbarGroup
-						controls={ toolbarControls }
-					/>
+					<ToolbarGroup controls={ toolbarControls } />
 					<BlockVerticalAlignmentToolbar
 						onChange={ onVerticalAlignmentChange }
 						value={ verticalAlignment }
 					/>
-					{ mediaType === 'image' && ( <ToolbarGroup>
-						<ImageURLInputUI
-							url={ href || '' }
-							onChangeUrl={ this.onSetHref }
-							linkDestination={ linkDestination }
-							mediaType={ mediaType }
-							mediaUrl={ image && image.source_url }
-							mediaLink={ image && image.link }
-							linkTarget={ linkTarget }
-							linkClass={ linkClass }
-							rel={ rel }
-						/>
-					</ToolbarGroup> ) }
+					{ mediaType === 'image' && (
+						<ToolbarGroup>
+							<ImageURLInputUI
+								url={ href || '' }
+								onChangeUrl={ this.onSetHref }
+								linkDestination={ linkDestination }
+								mediaType={ mediaType }
+								mediaUrl={ image && image.source_url }
+								mediaLink={ image && image.link }
+								linkTarget={ linkTarget }
+								linkClass={ linkClass }
+								rel={ rel }
+							/>
+						</ToolbarGroup>
+					) }
 				</BlockControls>
-				<div className={ classNames } style={ style } >
+				<div className={ classNames } style={ style }>
 					{ this.renderMediaArea() }
 					<InnerBlocks
 						template={ TEMPLATE }
@@ -319,7 +353,10 @@ export default compose( [
 	withColors( 'backgroundColor' ),
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
-		const { attributes: { mediaId }, isSelected } = props;
+		const {
+			attributes: { mediaId },
+			isSelected,
+		} = props;
 		return {
 			image: mediaId && isSelected ? getMedia( mediaId ) : null,
 		};

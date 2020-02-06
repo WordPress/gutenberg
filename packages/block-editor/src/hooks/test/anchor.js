@@ -21,7 +21,10 @@ describe( 'anchor', () => {
 	};
 
 	describe( 'addAttribute()', () => {
-		const registerBlockType = applyFilters.bind( null, 'blocks.registerBlockType' );
+		const registerBlockType = applyFilters.bind(
+			null,
+			'blocks.registerBlockType'
+		);
 
 		it( 'should do nothing if the block settings do not define anchor support', () => {
 			const settings = registerBlockType( blockSettings );
@@ -54,40 +57,58 @@ describe( 'anchor', () => {
 				},
 			} );
 
-			expect( settings.attributes.anchor ).toEqual( { type: 'string', default: 'testAnchor' } );
+			expect( settings.attributes.anchor ).toEqual( {
+				type: 'string',
+				default: 'testAnchor',
+			} );
 		} );
 	} );
 
 	describe( 'addSaveProps', () => {
-		const getSaveContentExtraProps = applyFilters.bind( null, 'blocks.getSaveContent.extraProps' );
+		const getSaveContentExtraProps = applyFilters.bind(
+			null,
+			'blocks.getSaveContent.extraProps'
+		);
 
 		it( 'should do nothing if the block settings do not define anchor support', () => {
 			const attributes = { anchor: 'foo' };
-			const extraProps = getSaveContentExtraProps( {}, blockSettings, attributes );
+			const extraProps = getSaveContentExtraProps(
+				{},
+				blockSettings,
+				attributes
+			);
 
 			expect( extraProps ).not.toHaveProperty( 'id' );
 		} );
 
 		it( 'should inject anchor attribute ID', () => {
 			const attributes = { anchor: 'foo' };
-			const extraProps = getSaveContentExtraProps( {}, {
-				...blockSettings,
-				supports: {
-					anchor: true,
+			const extraProps = getSaveContentExtraProps(
+				{},
+				{
+					...blockSettings,
+					supports: {
+						anchor: true,
+					},
 				},
-			}, attributes );
+				attributes
+			);
 
 			expect( extraProps.id ).toBe( 'foo' );
 		} );
 
 		it( 'should remove an anchor attribute ID when feild is cleared', () => {
 			const attributes = { anchor: '' };
-			const extraProps = getSaveContentExtraProps( {}, {
-				...blockSettings,
-				supports: {
-					anchor: true,
+			const extraProps = getSaveContentExtraProps(
+				{},
+				{
+					...blockSettings,
+					supports: {
+						anchor: true,
+					},
 				},
-			}, attributes );
+				attributes
+			);
 
 			expect( extraProps.id ).toBe( null );
 		} );

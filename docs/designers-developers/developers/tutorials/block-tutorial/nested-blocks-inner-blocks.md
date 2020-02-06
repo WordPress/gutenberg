@@ -95,7 +95,6 @@ const MY_TEMPLATE = [
 //...
 
 	edit: function( props ) {
-
 		return el(
 			InnerBlocks,
 			{
@@ -116,7 +115,6 @@ const MY_TEMPLATE = [
 //...
 
 	edit: () => {
-
 		return (
 			<InnerBlocks
 				template={ MY_TEMPLATE }
@@ -145,7 +143,6 @@ add_action( 'init', function() {
 	);
 } );
 ```
-
 
 ## Parent-Child InnerBlocks
 

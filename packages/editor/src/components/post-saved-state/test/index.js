@@ -15,7 +15,8 @@ describe( 'PostSavedState', () => {
 				isNew
 				isDirty={ false }
 				isSaving={ true }
-				isSaveable={ false } />
+				isSaveable={ false }
+			/>
 		);
 
 		expect( wrapper.text() ).toContain( 'Saving' );
@@ -27,7 +28,8 @@ describe( 'PostSavedState', () => {
 				isNew
 				isDirty={ false }
 				isSaving={ false }
-				isSaveable={ false } />
+				isSaveable={ false }
+			/>
 		);
 
 		expect( wrapper.type() ).toBeNull();
@@ -45,10 +47,11 @@ describe( 'PostSavedState', () => {
 				isNew={ false }
 				isDirty={ false }
 				isSaving={ false }
-				isSaveable={ true } />
+				isSaveable={ true }
+			/>
 		);
 
-		expect( wrapper.childAt( 0 ).name() ).toBe( 'Dashicon' );
+		expect( wrapper.childAt( 0 ).name() ).toBe( 'Icon' );
 		expect( wrapper.childAt( 1 ).text() ).toBe( 'Saved' );
 	} );
 

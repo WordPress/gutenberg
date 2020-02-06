@@ -42,14 +42,20 @@ describe( 'entities', () => {
 	it( 'returns the default state for all defined entities', () => {
 		const state = entities( undefined, {} );
 
-		expect( state.data.root.postType.queriedData ).toEqual( { items: {}, queries: {} } );
+		expect( state.data.root.postType.queriedData ).toEqual( {
+			items: {},
+			queries: {},
+		} );
 	} );
 
 	it( 'returns with received post types by slug', () => {
 		const originalState = deepFreeze( {} );
 		const state = entities( originalState, {
 			type: 'RECEIVE_ITEMS',
-			items: [ { slug: 'b', title: 'beach' }, { slug: 's', title: 'sun' } ],
+			items: [
+				{ slug: 'b', title: 'beach' },
+				{ slug: 's', title: 'sun' },
+			],
 			kind: 'root',
 			name: 'postType',
 		} );
@@ -139,7 +145,9 @@ describe( 'undo', () => {
 			// the action to move the offset.
 			lastEdits =
 				undoState[
-					undoState.length + undoState.offset - ( args[ 0 ] === 'isUndo' ? 2 : 0 )
+					undoState.length +
+						undoState.offset -
+						( args[ 0 ] === 'isUndo' ? 2 : 0 )
 				].edits;
 			action = {
 				type: 'EDIT_ENTITY_RECORD',
@@ -268,7 +276,9 @@ describe( 'undo', () => {
 			{ transientValue: true }
 		);
 		undoState = createNextUndoState( 'isCreate' );
-		expectedUndoState[ expectedUndoState.length - 1 ].edits.transientValue = 2;
+		expectedUndoState[
+			expectedUndoState.length - 1
+		].edits.transientValue = 2;
 		expect( undoState ).toEqual( expectedUndoState );
 
 		// Check that undo levels are created with the latest action,
@@ -359,37 +369,44 @@ describe( 'autosaves', () => {
 	} );
 
 	it( 'returns the current state with the new autosaves merged in, keyed by the parent post id', () => {
-		const existingAutosaves = [ {
-			title: {
-				raw: 'Some',
+		const existingAutosaves = [
+			{
+				title: {
+					raw: 'Some',
+				},
+				content: {
+					raw: 'other',
+				},
+				excerpt: {
+					raw: 'autosave',
+				},
+				status: 'publish',
 			},
-			content: {
-				raw: 'other',
-			},
-			excerpt: {
-				raw: 'autosave',
-			},
-			status: 'publish',
-		} ];
+		];
 
-		const newAutosaves = [ {
-			title: {
-				raw: 'The Title',
+		const newAutosaves = [
+			{
+				title: {
+					raw: 'The Title',
+				},
+				content: {
+					raw: 'The Content',
+				},
+				excerpt: {
+					raw: 'The Excerpt',
+				},
+				status: 'draft',
 			},
-			content: {
-				raw: 'The Content',
-			},
-			excerpt: {
-				raw: 'The Excerpt',
-			},
-			status: 'draft',
-		} ];
+		];
 
-		const state = autosaves( { 1: existingAutosaves }, {
-			type: 'RECEIVE_AUTOSAVES',
-			postId: 2,
-			autosaves: newAutosaves,
-		} );
+		const state = autosaves(
+			{ 1: existingAutosaves },
+			{
+				type: 'RECEIVE_AUTOSAVES',
+				postId: 2,
+				autosaves: newAutosaves,
+			}
+		);
 
 		expect( state ).toEqual( {
 			1: existingAutosaves,
@@ -398,37 +415,44 @@ describe( 'autosaves', () => {
 	} );
 
 	it( 'overwrites any existing state if new autosaves are received with the same post id', () => {
-		const existingAutosaves = [ {
-			title: {
-				raw: 'Some',
+		const existingAutosaves = [
+			{
+				title: {
+					raw: 'Some',
+				},
+				content: {
+					raw: 'other',
+				},
+				excerpt: {
+					raw: 'autosave',
+				},
+				status: 'publish',
 			},
-			content: {
-				raw: 'other',
-			},
-			excerpt: {
-				raw: 'autosave',
-			},
-			status: 'publish',
-		} ];
+		];
 
-		const newAutosaves = [ {
-			title: {
-				raw: 'The Title',
+		const newAutosaves = [
+			{
+				title: {
+					raw: 'The Title',
+				},
+				content: {
+					raw: 'The Content',
+				},
+				excerpt: {
+					raw: 'The Excerpt',
+				},
+				status: 'draft',
 			},
-			content: {
-				raw: 'The Content',
-			},
-			excerpt: {
-				raw: 'The Excerpt',
-			},
-			status: 'draft',
-		} ];
+		];
 
-		const state = autosaves( { 1: existingAutosaves }, {
-			type: 'RECEIVE_AUTOSAVES',
-			postId: 1,
-			autosaves: newAutosaves,
-		} );
+		const state = autosaves(
+			{ 1: existingAutosaves },
+			{
+				type: 'RECEIVE_AUTOSAVES',
+				postId: 1,
+				autosaves: newAutosaves,
+			}
+		);
 
 		expect( state ).toEqual( {
 			1: newAutosaves,
@@ -445,10 +469,13 @@ describe( 'currentUser', () => {
 	it( 'returns the current user', () => {
 		const currentUserData = { id: 1 };
 
-		const state = currentUser( {}, {
-			type: 'RECEIVE_CURRENT_USER',
-			currentUser: currentUserData,
-		} );
+		const state = currentUser(
+			{},
+			{
+				type: 'RECEIVE_CURRENT_USER',
+				currentUser: currentUserData,
+			}
+		);
 
 		expect( state ).toEqual( currentUserData );
 	} );
@@ -456,10 +483,13 @@ describe( 'currentUser', () => {
 	it( 'overwrites any existing current user state', () => {
 		const currentUserData = { id: 2 };
 
-		const state = currentUser( { id: 1 }, {
-			type: 'RECEIVE_CURRENT_USER',
-			currentUser: currentUserData,
-		} );
+		const state = currentUser(
+			{ id: 1 },
+			{
+				type: 'RECEIVE_CURRENT_USER',
+				currentUser: currentUserData,
+			}
+		);
 
 		expect( state ).toEqual( currentUserData );
 	} );

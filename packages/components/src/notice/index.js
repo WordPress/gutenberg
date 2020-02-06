@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,9 +25,14 @@ function Notice( {
 	actions = [],
 	__unstableHTML,
 } ) {
-	const classes = classnames( className, 'components-notice', 'is-' + status, {
-		'is-dismissible': isDismissible,
-	} );
+	const classes = classnames(
+		className,
+		'components-notice',
+		'is-' + status,
+		{
+			'is-dismissible': isDismissible,
+		}
+	);
 
 	if ( __unstableHTML ) {
 		children = <RawHTML>{ children }</RawHTML>;
@@ -63,13 +69,12 @@ function Notice( {
 							</Button>
 						);
 					}
-
 				) }
 			</div>
 			{ isDismissible && (
 				<Button
 					className="components-notice__dismiss"
-					icon="no-alt"
+					icon={ close }
 					label={ __( 'Dismiss this notice' ) }
 					onClick={ onRemove }
 					showTooltip={ false }
