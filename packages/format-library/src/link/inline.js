@@ -102,8 +102,16 @@ function InlineLinkUI( {
 			onChange( applyFormat( value, format ) );
 		}
 
-		onFocus();
-		stopAddingLink();
+		// LinkControl calls `onChange` immediately upon the toggling of any
+		// settings, but focus should only be shifted back to the formatted
+		// segment when the URL is submitted.
+		const didToggleSetting =
+			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
+			linkValue.url === nextValue.url;
+		if ( ! didToggleSetting ) {
+			onFocus();
+			stopAddingLink();
+		}
 
 		if ( ! isValidHref( newUrl ) ) {
 			speak(

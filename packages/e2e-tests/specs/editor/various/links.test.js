@@ -397,18 +397,21 @@ describe( 'Links', () => {
 		// focused with the value previously inserted.
 		await pressKeyWithModifier( 'primary', 'K' );
 		await waitForAutoFocus();
-		const activeElementParentClasses = await page.evaluate( () =>
-			Object.values(
-				document.activeElement.parentElement.parentElement.classList
-			)
+		const isInURLInput = await page.evaluate(
+			() => !! document.activeElement.closest( '.block-editor-url-input' )
 		);
-		expect( activeElementParentClasses ).toContain(
-			'block-editor-url-input'
-		);
+		expect( isInURLInput ).toBe( true );
 		const activeElementValue = await page.evaluate(
 			() => document.activeElement.value
 		);
 		expect( activeElementValue ).toBe( URL );
+
+		// Confirm that submitting the input without any changes keeps the same
+		// value and moves focus back to the paragraph.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '.' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'adds an assertive message for screenreader users when an invalid link is set', async () => {
@@ -448,6 +451,10 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 
+		// Confirm that focus was not prematurely returned to the paragraph on
+		// a changing value of the setting.
+		await page.waitForSelector( ':focus.components-form-toggle__input' );
+
 		// Close dialog. Expect that "Open in New Tab" would have been applied
 		// immediately.
 		await page.keyboard.press( 'Escape' );
@@ -485,4 +492,7 @@ describe( 'Links', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	// TODO: Assert: Verify that pressing Escape while editing a link returns
+	// focus to the correct selection in the paragraph.
 } );
