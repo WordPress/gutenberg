@@ -12,10 +12,16 @@
 	height: $icon-button-size;
 	align-items: center;
 	box-sizing: border-box;
-	padding: 8px;
+	padding: 6px; // Centers 24px icons.
 	overflow: hidden;
 	border-radius: 2px;
 	color: $black;
+
+	// Legacy 20px icons get 2px margin to have a 24px dimensions, making them centered.
+	> .dashicon,
+	> svg[width="20"] {
+		margin: 0 2px;
+	}
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-primary):not(.is-tertiary):not(.is-link):hover {
 		color: $theme-color;
@@ -219,12 +225,6 @@
 
 		&.has-text svg {
 			margin-right: 8px;
-		}
-
-		// Icon buttons without text should be squared.
-		&:not(.has-text) {
-			width: 36px;
-			justify-content: center;
 		}
 	}
 
