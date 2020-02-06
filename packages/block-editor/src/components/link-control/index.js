@@ -84,6 +84,18 @@ import LinkControlSearchInput from './search-input';
  */
 
 /**
+ * Default settings configuration.
+ *
+ * @type {WPLinkControlSetting[]}
+ */
+const DEFAULT_SETTINGS = [
+	{
+		id: 'opensInNewTab',
+		title: __( 'Open in New Tab' ),
+	},
+];
+
+/**
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
  * for how that link is expected to behave.
@@ -92,7 +104,7 @@ import LinkControlSearchInput from './search-input';
  */
 function LinkControl( {
 	value,
-	settings,
+	settings = DEFAULT_SETTINGS,
 	onChange = noop,
 	showInitialSuggestions,
 } ) {
