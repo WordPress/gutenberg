@@ -502,14 +502,15 @@
  * Popovers.
  */
 
-.block-editor-block-list__insertion-point-popover {
+.block-editor-block-list__insertion-point-popover.is-without-arrow {
 	z-index: z-index(".block-editor-block-list__insertion-point-popover");
 
-	.components-popover__content {
+	.components-popover__content.components-popover__content { // Needs specificity.
 		background: none;
 		border: none;
 		box-shadow: none;
 		overflow-y: visible;
+		margin-left: 0;
 	}
 }
 
