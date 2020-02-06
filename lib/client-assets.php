@@ -275,6 +275,9 @@ function gutenberg_register_packages_scripts( &$scripts ) {
 			case 'wp-edit-site':
 				array_push( $dependencies, 'wp-dom-ready' );
 				break;
+			case 'wp-edit-global-styles':
+				array_push( $dependencies, 'wp-dom-ready' );
+				break;
 		}
 
 		// Get the path from Gutenberg directory as expected by `gutenberg_url`.
@@ -406,6 +409,15 @@ function gutenberg_register_packages_styles( &$styles ) {
 		filemtime( gutenberg_dir_path() . 'build/edit-site/style.css' )
 	);
 	$styles->add_data( 'wp-edit-site', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-edit-global-styles',
+		gutenberg_url( 'build/edit-global-styles/style.css' ),
+		array( 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'build/edit-global-styles/style.css' )
+	);
+	$styles->add_data( 'wp-edit-global-styles', 'rtl', 'replace' );
 
 	gutenberg_override_style(
 		$styles,

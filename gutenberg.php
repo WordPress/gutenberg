@@ -43,6 +43,16 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
+	// For now the page is only accessible by URL.
+	add_submenu_page(
+		'',
+		__( 'Edit Global Styles', 'gutenberg' ),
+		__( 'Edit Global Styles', 'gutenberg' ),
+		'edit_theme_options',
+		'gutenberg-edit-global-styles',
+		'the_gutenberg_edit_global_styles'
+	);
+
 	if ( get_option( 'gutenberg-experiments' ) ) {
 		if ( array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) ) {
 			add_submenu_page(

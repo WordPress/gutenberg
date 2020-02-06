@@ -1,0 +1,11 @@
+.edit-global-styles-layout__content {
+	min-height: 100%;
+	padding: 30px 0;
+
+	// Temporarily disable the sidebar on mobile
+	@include break-small() {
+		margin-left: 250px;
+		margin-right: $sidebar-width;
+		margin-top: $header-height;
+	}
+}
