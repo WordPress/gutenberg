@@ -1,23 +1,41 @@
 /**
  * WordPress dependencies
  */
-import { StyledPrimitives, styled } from '@wordpress/components';
-
-const Button = styled( StyledPrimitives.Button )`
-&:hover {
-	text-decoration: underline;
-	cursor: pointer;
-	color: ${ ( props ) => props.theme.colors.primary };
-}
-&:focus{
-	outline: none;
-	outline-offset: -2px;
-	box-shadow: none;
-}
-`;
+import { PrimitiveButton, useTheme } from '@wordpress/components';
 
 export default function BlockBreadcrumbButton( { children, ...props } ) {
-	return <Button
+	const theme = useTheme();
+	const additionalStyles = [
+		{
+			states: 'hover',
+			styles: {
+				'text-decoration': 'underline',
+				cursor: 'pointer',
+				color: theme.colors.primary,
+			},
+		},
+		{
+			states: 'focus',
+			styles: {
+				outline: 'none',
+				'outline-offset': '-2px',
+				'box-shadow': 'none',
+			},
+		},
+		{
+			states: 'focus:hover',
+			styles: {
+				color: 'pink',
+			},
+		},
+		{
+			states: 'focus:hover:active',
+			styles: {
+				color: 'orange',
+			},
+		},
+	];
+	return <PrimitiveButton
 		className="block-editor-block-breadcrumb__button"
 		px={ 'medium' }
 		py={ 0 }
@@ -29,8 +47,9 @@ export default function BlockBreadcrumbButton( { children, ...props } ) {
 		display={ 'inline-flex' }
 		textDecoration={ 'none' }
 		border={ 0 }
+		additionalStyles={ additionalStyles }
 		{ ...props }
 	>
 		{ children }
-	</Button>;
+	</PrimitiveButton>;
 }
