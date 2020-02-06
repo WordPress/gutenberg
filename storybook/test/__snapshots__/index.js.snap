@@ -3155,7 +3155,7 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
 `;
 
 exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
-.emotion-20 {
+.emotion-16 {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
   cursor: pointer;
@@ -3176,35 +3176,21 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   touch-action: none;
   width: 100%;
   direction: ltr;
-  width: 100%;
 }
 
-.emotion-0 {
-  margin-right: 6px;
-  margin-top: 5px;
-}
-
-.emotion-0 > .dashicon {
-  margin: 0;
-}
-
-.emotion-14 {
+.emotion-12 {
   box-sizing: border-box;
   color: #007cba;
   display: block;
   padding-top: 15px;
   position: relative;
-  margin-left: 10px;
   width: 100%;
   height: 30px;
   min-height: 30px;
+  margin-left: 10px;
 }
 
-[dir='rtl'] .emotion-14 {
-  margin-right: 10px;
-}
-
-.emotion-2 {
+.emotion-0 {
   box-sizing: border-box;
   cursor: pointer;
   display: block;
@@ -3219,7 +3205,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   width: 100%;
 }
 
-.emotion-4 {
+.emotion-2 {
   background-color: #d7dade;
   box-sizing: border-box;
   left: 0;
@@ -3232,7 +3218,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   top: 0;
 }
 
-.emotion-6 {
+.emotion-4 {
   background-color: currentColor;
   border-radius: 1px;
   box-sizing: border-box;
@@ -3244,7 +3230,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   top: 0;
 }
 
-.emotion-10 {
+.emotion-8 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -3270,14 +3256,10 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  margin-left: -10px;
 }
 
-[dir='rtl'] .emotion-10 {
-  margin-left: 0;
-  margin-right: -10px;
-}
-
-.emotion-8 {
+.emotion-6 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -3299,7 +3281,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
-.emotion-12 {
+.emotion-10 {
   background: #23282d;
   border-radius: 3px;
   box-sizing: border-box;
@@ -3311,9 +3293,6 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX( -50% );
-  -ms-transform: translateX( -50% );
-  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -3323,9 +3302,12 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   opacity: 0;
   margin-top: -4px;
   top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 
-.emotion-12::after {
+.emotion-10::after {
   border: 6px solid #23282d;
   border-left-color: transparent;
   border-right-color: transparent;
@@ -3340,44 +3322,29 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   width: 0;
 }
 
-.emotion-12::after {
+.emotion-10::after {
   border-bottom: none;
   border-top-style: solid;
   bottom: -6px;
 }
 
 @media ( prefers-reduced-motion:reduce ) {
-  .emotion-12 {
-    -webkit-transition: none !important;
-    transition: none !important;
+  .emotion-10 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
   }
 }
 
-[dir='rtl'] .emotion-12 {
-  -webkit-transform: translateX( 50% );
-  -ms-transform: translateX( 50% );
-  transform: translateX( 50% );
-}
-
-.emotion-16 {
-  margin-left: 16px;
-  margin-top: 5px;
-}
-
-.emotion-16 > .dashicon {
-  margin: 0;
-}
-
-.emotion-18 {
+.emotion-14 {
   box-sizing: border-box;
   display: inline-block;
-  margin-left: 16px;
   margin-top: 0;
   min-width: 54px;
   max-width: 120px;
+  margin-left: 16px;
 }
 
-input[type='number'].emotion-18 {
+input[type='number'].emotion-14 {
   height: 30px;
   min-height: 30px;
 }
@@ -3462,35 +3429,16 @@ input[type='number'].emotion-18 {
         Custom Size
       </label>
       <span
-        className="components-range-control__root emotion-20 emotion-21"
-        width="100%"
+        className="components-range-control__root emotion-16 emotion-17"
       >
         <span
-          className="emotion-0 emotion-1"
-        >
-          <svg
-            aria-hidden="true"
-            className="dashicon dashicons-editor-textcolor"
-            focusable="false"
-            height={20}
-            role="img"
-            viewBox="0 0 20 20"
-            width={20}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
-            />
-          </svg>
-        </span>
-        <span
-          className="components-range-control__wrapper emotion-14 emotion-15"
+          className="components-range-control__wrapper emotion-12 emotion-13"
           color="#00669b"
         >
           <input
             aria-hidden={false}
             aria-label="Custom Size"
-            className="components-range-control__slider emotion-2 emotion-3"
+            className="components-range-control__slider emotion-0 emotion-1"
             disabled={false}
             id="inspector-range-control-0"
             max={100}
@@ -3507,11 +3455,11 @@ input[type='number'].emotion-18 {
           />
           <span
             aria-hidden={true}
-            className="emotion-4 emotion-5"
+            className="emotion-2 emotion-3"
           />
           <span
             aria-hidden={true}
-            className="components-range-control__track emotion-6 emotion-7"
+            className="components-range-control__track emotion-4 emotion-5"
             style={
               Object {
                 "width": "4.545454545454546%",
@@ -3519,7 +3467,7 @@ input[type='number'].emotion-18 {
             }
           />
           <span
-            className="emotion-10 emotion-11"
+            className="emotion-8 emotion-9"
             style={
               Object {
                 "left": "4.545454545454546%",
@@ -3528,12 +3476,12 @@ input[type='number'].emotion-18 {
           >
             <span
               aria-hidden={true}
-              className="emotion-8 emotion-9"
+              className="emotion-6 emotion-7"
             />
           </span>
           <span
             aria-hidden={false}
-            className="components-simple-tooltip components-range-control__tooltip emotion-12 emotion-13"
+            className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             role="tooltip"
@@ -3547,27 +3495,9 @@ input[type='number'].emotion-18 {
             16
           </span>
         </span>
-        <span
-          className="emotion-16 emotion-17"
-        >
-          <svg
-            aria-hidden="true"
-            className="dashicon dashicons-editor-textcolor"
-            focusable="false"
-            height={20}
-            role="img"
-            viewBox="0 0 20 20"
-            width={20}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
-            />
-          </svg>
-        </span>
         <input
           aria-label="Custom Size"
-          className="components-range-control__number emotion-18 emotion-153"
+          className="components-range-control__number emotion-14 emotion-133"
           inputMode="decimal"
           max={100}
           min={12}
@@ -4772,7 +4702,6 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   touch-action: none;
   width: 100%;
   direction: ltr;
-  width: 100%;
 }
 
 .emotion-0 {
@@ -4841,11 +4770,7 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-[dir='rtl'] .emotion-30 {
-  margin-left: 0;
-  margin-right: -10px;
+  margin-left: -10px;
 }
 
 .emotion-28 {
@@ -4882,9 +4807,6 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX( -50% );
-  -ms-transform: translateX( -50% );
-  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -4894,6 +4816,9 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   opacity: 0;
   margin-top: -4px;
   top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 
 .emotion-32::after {
@@ -4919,24 +4844,18 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
 
 @media ( prefers-reduced-motion:reduce ) {
   .emotion-32 {
-    -webkit-transition: none !important;
-    transition: none !important;
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
   }
-}
-
-[dir='rtl'] .emotion-32 {
-  -webkit-transform: translateX( 50% );
-  -ms-transform: translateX( 50% );
-  transform: translateX( 50% );
 }
 
 .emotion-36 {
   box-sizing: border-box;
   display: inline-block;
-  margin-left: 16px;
   margin-top: 0;
   min-width: 54px;
   max-width: 120px;
+  margin-left: 16px;
 }
 
 input[type='number'].emotion-36 {
@@ -4954,15 +4873,11 @@ input[type='number'].emotion-36 {
   display: block;
   padding-top: 15px;
   position: relative;
-  margin-left: 10px;
   width: 100%;
   height: 30px;
   min-height: 30px;
   margin-bottom: 16px;
-}
-
-[dir='rtl'] .emotion-34 {
-  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .emotion-24 {
@@ -5035,7 +4950,6 @@ input[type='number'].emotion-36 {
     >
       <span
         className="components-range-control__root emotion-38 emotion-39"
-        width="100%"
       >
         <span
           className="components-range-control__wrapper is-marked emotion-34 emotion-35"
@@ -5248,7 +5162,6 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
   touch-action: none;
   width: 100%;
   direction: ltr;
-  width: 100%;
 }
 
 .emotion-10 {
@@ -5257,14 +5170,10 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
   display: block;
   padding-top: 15px;
   position: relative;
-  margin-left: 10px;
   width: 100%;
   height: 30px;
   min-height: 30px;
-}
-
-[dir='rtl'] .emotion-10 {
-  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .emotion-0 {
@@ -5333,11 +5242,7 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-[dir='rtl'] .emotion-8 {
-  margin-left: 0;
-  margin-right: -10px;
+  margin-left: -10px;
 }
 
 .emotion-6 {
@@ -5365,10 +5270,10 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
 .emotion-12 {
   box-sizing: border-box;
   display: inline-block;
-  margin-left: 16px;
   margin-top: 0;
   min-width: 54px;
   max-width: 120px;
+  margin-left: 16px;
 }
 
 input[type='number'].emotion-12 {
@@ -5397,9 +5302,7 @@ input[type='number'].emotion-12 {
       </label>
       <span
         className="components-range-control__root emotion-14 emotion-15"
-        width="100%"
       >
-        
         <span
           className="components-range-control__wrapper emotion-10 emotion-11"
           color="#00669b"
@@ -5449,7 +5352,6 @@ input[type='number'].emotion-12 {
             />
           </span>
         </span>
-        
         <input
           aria-label="Range Label"
           className="components-range-control__number emotion-12 emotion-113"
@@ -5489,7 +5391,6 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   touch-action: none;
   width: 100%;
   direction: ltr;
-  width: 100%;
 }
 
 .emotion-12 {
@@ -5498,14 +5399,10 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   display: block;
   padding-top: 15px;
   position: relative;
-  margin-left: 10px;
   width: 100%;
   height: 30px;
   min-height: 30px;
-}
-
-[dir='rtl'] .emotion-12 {
-  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .emotion-0 {
@@ -5574,11 +5471,7 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-[dir='rtl'] .emotion-8 {
-  margin-left: 0;
-  margin-right: -10px;
+  margin-left: -10px;
 }
 
 .emotion-6 {
@@ -5615,9 +5508,6 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX( -50% );
-  -ms-transform: translateX( -50% );
-  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -5627,6 +5517,9 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   opacity: 0;
   margin-top: -4px;
   top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 
 .emotion-10::after {
@@ -5652,24 +5545,18 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
 
 @media ( prefers-reduced-motion:reduce ) {
   .emotion-10 {
-    -webkit-transition: none !important;
-    transition: none !important;
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
   }
-}
-
-[dir='rtl'] .emotion-10 {
-  -webkit-transform: translateX( 50% );
-  -ms-transform: translateX( 50% );
-  transform: translateX( 50% );
 }
 
 .emotion-14 {
   box-sizing: border-box;
   display: inline-block;
-  margin-left: 16px;
   margin-top: 0;
   min-width: 54px;
   max-width: 120px;
+  margin-left: 16px;
 }
 
 input[type='number'].emotion-14 {
@@ -5691,7 +5578,6 @@ input[type='number'].emotion-14 {
     </label>
     <span
       className="components-range-control__root emotion-16 emotion-17"
-      width="100%"
     >
       <span
         className="components-range-control__wrapper emotion-12 emotion-13"
@@ -5795,7 +5681,6 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   touch-action: none;
   width: 100%;
   direction: ltr;
-  width: 100%;
 }
 
 .emotion-12 {
@@ -5804,14 +5689,10 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   display: block;
   padding-top: 15px;
   position: relative;
-  margin-left: 10px;
   width: 100%;
   height: 30px;
   min-height: 30px;
-}
-
-[dir='rtl'] .emotion-12 {
-  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .emotion-0 {
@@ -5880,11 +5761,7 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-[dir='rtl'] .emotion-8 {
-  margin-left: 0;
-  margin-right: -10px;
+  margin-left: -10px;
 }
 
 .emotion-6 {
@@ -5921,9 +5798,6 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX( -50% );
-  -ms-transform: translateX( -50% );
-  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -5933,6 +5807,9 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   opacity: 0;
   margin-top: -4px;
   top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 
 .emotion-10::after {
@@ -5958,24 +5835,18 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
 
 @media ( prefers-reduced-motion:reduce ) {
   .emotion-10 {
-    -webkit-transition: none !important;
-    transition: none !important;
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
   }
-}
-
-[dir='rtl'] .emotion-10 {
-  -webkit-transform: translateX( 50% );
-  -ms-transform: translateX( 50% );
-  transform: translateX( 50% );
 }
 
 .emotion-14 {
   box-sizing: border-box;
   display: inline-block;
-  margin-left: 16px;
   margin-top: 0;
   min-width: 54px;
   max-width: 120px;
+  margin-left: 16px;
 }
 
 input[type='number'].emotion-14 {
@@ -5997,7 +5868,6 @@ input[type='number'].emotion-14 {
     </label>
     <span
       className="components-range-control__root emotion-16 emotion-17"
-      width="100%"
     >
       <span
         className="components-range-control__wrapper emotion-12 emotion-13"
@@ -6087,7 +5957,7 @@ input[type='number'].emotion-14 {
 `;
 
 exports[`Storyshots Components/RangeControl With Icon After 1`] = `
-.emotion-18 {
+.emotion-16 {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
   cursor: pointer;
@@ -6108,7 +5978,6 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   touch-action: none;
   width: 100%;
   direction: ltr;
-  width: 100%;
 }
 
 .emotion-12 {
@@ -6117,14 +5986,10 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   display: block;
   padding-top: 15px;
   position: relative;
-  margin-left: 10px;
   width: 100%;
   height: 30px;
   min-height: 30px;
-}
-
-[dir='rtl'] .emotion-12 {
-  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .emotion-0 {
@@ -6193,11 +6058,7 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-[dir='rtl'] .emotion-8 {
-  margin-left: 0;
-  margin-right: -10px;
+  margin-left: -10px;
 }
 
 .emotion-6 {
@@ -6234,9 +6095,6 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX( -50% );
-  -ms-transform: translateX( -50% );
-  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -6246,6 +6104,9 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   opacity: 0;
   margin-top: -4px;
   top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 
 .emotion-10::after {
@@ -6271,36 +6132,21 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
 
 @media ( prefers-reduced-motion:reduce ) {
   .emotion-10 {
-    -webkit-transition: none !important;
-    transition: none !important;
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
   }
 }
 
-[dir='rtl'] .emotion-10 {
-  -webkit-transform: translateX( 50% );
-  -ms-transform: translateX( 50% );
-  transform: translateX( 50% );
-}
-
 .emotion-14 {
-  margin-left: 16px;
-  margin-top: 5px;
-}
-
-.emotion-14 > .dashicon {
-  margin: 0;
-}
-
-.emotion-16 {
   box-sizing: border-box;
   display: inline-block;
-  margin-left: 16px;
   margin-top: 0;
   min-width: 54px;
   max-width: 120px;
+  margin-left: 16px;
 }
 
-input[type='number'].emotion-16 {
+input[type='number'].emotion-14 {
   height: 30px;
   min-height: 30px;
 }
@@ -6318,8 +6164,7 @@ input[type='number'].emotion-16 {
       How many columns should this use?
     </label>
     <span
-      className="components-range-control__root emotion-18 emotion-19"
-      width="100%"
+      className="components-range-control__root emotion-16 emotion-17"
     >
       <span
         className="components-range-control__wrapper emotion-12 emotion-13"
@@ -6385,27 +6230,9 @@ input[type='number'].emotion-16 {
           5
         </span>
       </span>
-      <span
-        className="emotion-14 emotion-15"
-      >
-        <svg
-          aria-hidden="true"
-          className="dashicon dashicons-wordpress"
-          focusable="false"
-          height={20}
-          role="img"
-          viewBox="0 0 20 20"
-          width={20}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
-          />
-        </svg>
-      </span>
       <input
         aria-label="How many columns should this use?"
-        className="components-range-control__number emotion-16 emotion-133"
+        className="components-range-control__number emotion-14 emotion-133"
         inputMode="decimal"
         max={100}
         min={0}
@@ -6420,7 +6247,7 @@ input[type='number'].emotion-16 {
 `;
 
 exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
-.emotion-18 {
+.emotion-16 {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
   cursor: pointer;
@@ -6441,35 +6268,21 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   touch-action: none;
   width: 100%;
   direction: ltr;
-  width: 100%;
 }
 
-.emotion-0 {
-  margin-right: 6px;
-  margin-top: 5px;
-}
-
-.emotion-0 > .dashicon {
-  margin: 0;
-}
-
-.emotion-14 {
+.emotion-12 {
   box-sizing: border-box;
   color: #007cba;
   display: block;
   padding-top: 15px;
   position: relative;
-  margin-left: 10px;
   width: 100%;
   height: 30px;
   min-height: 30px;
+  margin-left: 10px;
 }
 
-[dir='rtl'] .emotion-14 {
-  margin-right: 10px;
-}
-
-.emotion-2 {
+.emotion-0 {
   box-sizing: border-box;
   cursor: pointer;
   display: block;
@@ -6484,7 +6297,7 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   width: 100%;
 }
 
-.emotion-4 {
+.emotion-2 {
   background-color: #d7dade;
   box-sizing: border-box;
   left: 0;
@@ -6497,7 +6310,7 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   top: 0;
 }
 
-.emotion-6 {
+.emotion-4 {
   background-color: currentColor;
   border-radius: 1px;
   box-sizing: border-box;
@@ -6509,7 +6322,7 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   top: 0;
 }
 
-.emotion-10 {
+.emotion-8 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -6535,14 +6348,10 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  margin-left: -10px;
 }
 
-[dir='rtl'] .emotion-10 {
-  margin-left: 0;
-  margin-right: -10px;
-}
-
-.emotion-8 {
+.emotion-6 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -6564,7 +6373,7 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
-.emotion-12 {
+.emotion-10 {
   background: #23282d;
   border-radius: 3px;
   box-sizing: border-box;
@@ -6576,9 +6385,6 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX( -50% );
-  -ms-transform: translateX( -50% );
-  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -6588,9 +6394,12 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   opacity: 0;
   margin-top: -4px;
   top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 
-.emotion-12::after {
+.emotion-10::after {
   border: 6px solid #23282d;
   border-left-color: transparent;
   border-right-color: transparent;
@@ -6605,35 +6414,29 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   width: 0;
 }
 
-.emotion-12::after {
+.emotion-10::after {
   border-bottom: none;
   border-top-style: solid;
   bottom: -6px;
 }
 
 @media ( prefers-reduced-motion:reduce ) {
-  .emotion-12 {
-    -webkit-transition: none !important;
-    transition: none !important;
+  .emotion-10 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
   }
 }
 
-[dir='rtl'] .emotion-12 {
-  -webkit-transform: translateX( 50% );
-  -ms-transform: translateX( 50% );
-  transform: translateX( 50% );
-}
-
-.emotion-16 {
+.emotion-14 {
   box-sizing: border-box;
   display: inline-block;
-  margin-left: 16px;
   margin-top: 0;
   min-width: 54px;
   max-width: 120px;
+  margin-left: 16px;
 }
 
-input[type='number'].emotion-16 {
+input[type='number'].emotion-14 {
   height: 30px;
   min-height: 30px;
 }
@@ -6651,35 +6454,16 @@ input[type='number'].emotion-16 {
       How many columns should this use?
     </label>
     <span
-      className="components-range-control__root emotion-18 emotion-19"
-      width="100%"
+      className="components-range-control__root emotion-16 emotion-17"
     >
       <span
-        className="emotion-0 emotion-1"
-      >
-        <svg
-          aria-hidden="true"
-          className="dashicon dashicons-wordpress"
-          focusable="false"
-          height={20}
-          role="img"
-          viewBox="0 0 20 20"
-          width={20}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
-          />
-        </svg>
-      </span>
-      <span
-        className="components-range-control__wrapper emotion-14 emotion-15"
+        className="components-range-control__wrapper emotion-12 emotion-13"
         color="#00669b"
       >
         <input
           aria-hidden={false}
           aria-label="How many columns should this use?"
-          className="components-range-control__slider emotion-2 emotion-3"
+          className="components-range-control__slider emotion-0 emotion-1"
           disabled={false}
           id="inspector-range-control-5"
           max={100}
@@ -6696,11 +6480,11 @@ input[type='number'].emotion-16 {
         />
         <span
           aria-hidden={true}
-          className="emotion-4 emotion-5"
+          className="emotion-2 emotion-3"
         />
         <span
           aria-hidden={true}
-          className="components-range-control__track emotion-6 emotion-7"
+          className="components-range-control__track emotion-4 emotion-5"
           style={
             Object {
               "width": "5%",
@@ -6708,7 +6492,7 @@ input[type='number'].emotion-16 {
           }
         />
         <span
-          className="emotion-10 emotion-11"
+          className="emotion-8 emotion-9"
           style={
             Object {
               "left": "5%",
@@ -6717,12 +6501,12 @@ input[type='number'].emotion-16 {
         >
           <span
             aria-hidden={true}
-            className="emotion-8 emotion-9"
+            className="emotion-6 emotion-7"
           />
         </span>
         <span
           aria-hidden={false}
-          className="components-simple-tooltip components-range-control__tooltip emotion-12 emotion-13"
+          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           role="tooltip"
@@ -6738,7 +6522,7 @@ input[type='number'].emotion-16 {
       </span>
       <input
         aria-label="How many columns should this use?"
-        className="components-range-control__number emotion-16 emotion-153"
+        className="components-range-control__number emotion-14 emotion-133"
         inputMode="decimal"
         max={100}
         min={0}
@@ -6774,7 +6558,6 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   touch-action: none;
   width: 100%;
   direction: ltr;
-  width: 100%;
 }
 
 .emotion-12 {
@@ -6783,14 +6566,10 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   display: block;
   padding-top: 15px;
   position: relative;
-  margin-left: 10px;
   width: 100%;
   height: 30px;
   min-height: 30px;
-}
-
-[dir='rtl'] .emotion-12 {
-  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .emotion-0 {
@@ -6859,11 +6638,7 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-[dir='rtl'] .emotion-8 {
-  margin-left: 0;
-  margin-right: -10px;
+  margin-left: -10px;
 }
 
 .emotion-6 {
@@ -6900,9 +6675,6 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX( -50% );
-  -ms-transform: translateX( -50% );
-  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -6912,6 +6684,9 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   opacity: 0;
   margin-top: -4px;
   top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 
 .emotion-10::after {
@@ -6937,24 +6712,18 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
 
 @media ( prefers-reduced-motion:reduce ) {
   .emotion-10 {
-    -webkit-transition: none !important;
-    transition: none !important;
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
   }
-}
-
-[dir='rtl'] .emotion-10 {
-  -webkit-transform: translateX( 50% );
-  -ms-transform: translateX( 50% );
-  transform: translateX( 50% );
 }
 
 .emotion-14 {
   box-sizing: border-box;
   display: inline-block;
-  margin-left: 16px;
   margin-top: 0;
   min-width: 54px;
   max-width: 120px;
+  margin-left: 16px;
 }
 
 input[type='number'].emotion-14 {
@@ -6976,7 +6745,6 @@ input[type='number'].emotion-14 {
     </label>
     <span
       className="components-range-control__root emotion-16 emotion-17"
-      width="100%"
     >
       <span
         className="components-range-control__wrapper emotion-12 emotion-13"
@@ -7080,7 +6848,6 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   touch-action: none;
   width: 100%;
   direction: ltr;
-  width: 100%;
 }
 
 .emotion-12 {
@@ -7089,14 +6856,10 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   display: block;
   padding-top: 15px;
   position: relative;
-  margin-left: 10px;
   width: 100%;
   height: 30px;
   min-height: 30px;
-}
-
-[dir='rtl'] .emotion-12 {
-  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .emotion-0 {
@@ -7165,11 +6928,7 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-[dir='rtl'] .emotion-8 {
-  margin-left: 0;
-  margin-right: -10px;
+  margin-left: -10px;
 }
 
 .emotion-6 {
@@ -7206,9 +6965,6 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   padding: 8px;
   position: absolute;
   text-align: center;
-  -webkit-transform: translateX( -50% );
-  -ms-transform: translateX( -50% );
-  transform: translateX( -50% );
   -webkit-transition: opacity 120ms ease;
   transition: opacity 120ms ease;
   -webkit-user-select: none;
@@ -7218,6 +6974,9 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   opacity: 0;
   margin-top: -4px;
   top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 
 .emotion-10::after {
@@ -7243,24 +7002,18 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
 
 @media ( prefers-reduced-motion:reduce ) {
   .emotion-10 {
-    -webkit-transition: none !important;
-    transition: none !important;
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
   }
-}
-
-[dir='rtl'] .emotion-10 {
-  -webkit-transform: translateX( 50% );
-  -ms-transform: translateX( 50% );
-  transform: translateX( 50% );
 }
 
 .emotion-14 {
   box-sizing: border-box;
   display: inline-block;
-  margin-left: 16px;
   margin-top: 0;
   min-width: 54px;
   max-width: 120px;
+  margin-left: 16px;
 }
 
 input[type='number'].emotion-14 {
@@ -7296,7 +7049,6 @@ input[type='number'].emotion-14 {
     </label>
     <span
       className="components-range-control__root emotion-18 emotion-19"
-      width="100%"
     >
       <span
         className="components-range-control__wrapper emotion-12 emotion-13"
