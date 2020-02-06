@@ -47,6 +47,9 @@ export class BlockList extends Component {
 		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind(
 			this
 		);
+		this.getVerticalAlignmentRemap = this.getVerticalAlignmentRemap.bind(
+			this
+		);
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -87,6 +90,20 @@ export class BlockList extends Component {
 	shouldShowInnerBlockAppender() {
 		const { blockClientIds, renderAppender } = this.props;
 		return renderAppender && blockClientIds.length > 0;
+	}
+
+	getVerticalAlignmentRemap( alingment ) {
+		if ( ! alingment ) return;
+
+		const mapping = {
+			top: 'flex-start',
+			center: 'center',
+			bottom: 'flex-end',
+		};
+
+		const newAlingment = mapping[ alingment ];
+		if ( ! newAlingment ) return;
+		return { justifyContent: alingment };
 	}
 
 	render() {
@@ -157,31 +174,17 @@ export class BlockList extends Component {
 			getBlockAttributes,
 		} = this.props;
 
-		const getVerticalAlignmentRemap = ( alingment ) => {
-			if ( ! alingment ) return;
-
-			const mapping = {
-				top: 'flex-start',
-				center: 'center',
-				bottom: 'flex-end',
-			};
-
-			const newAlingment = mapping[ alingment ];
-			if ( ! newAlingment ) return;
-			return { justifyContent: alingment };
-		};
-
 		const attributes = getBlockAttributes( clientId );
 		let columnContainerStyle = {};
 		if ( attributes ) {
-			columnContainerStyle = getVerticalAlignmentRemap(
+			columnContainerStyle = this.getVerticalAlignmentRemap(
 				attributes.verticalAlignment
 			);
 		}
 
 		return (
 			<ReadableContentView
-				style={ containerStyle ? columnContainerStyle : undefined }
+				style={ containerStyle && columnContainerStyle }
 			>
 				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
 					{ shouldShowInsertionPointBefore( clientId ) && (

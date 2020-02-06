@@ -19,62 +19,60 @@ import SubdirectorSVG from './subdirectory-icon';
 
 import styles from './breadcrumb.scss';
 
+const renderIcon = ( icon, key ) => {
+	if ( typeof icon.src === 'function' ) {
+		return (
+			<Icon
+				key={ key }
+				icon={ icon.src( { size: 24, fill: styles.icon.color } ) }
+			/>
+		);
+	}
+	return (
+		<Icon
+			key={ key }
+			size={ 24 }
+			icon={ icon.src }
+			fill={ styles.icon.color }
+		/>
+	);
+};
+
 const BlockBreadcrumb = ( {
 	clientId,
 	blockIcon,
 	rootClientId,
 	rootBlockIcon,
-} ) => {
-	const renderIcon = ( icon, key ) => {
-		if ( typeof icon.src === 'function' ) {
-			return (
-				<Icon
-					key={ key }
-					icon={ icon.src( { size: 24, fill: styles.icon.color } ) }
-				/>
-			);
-		}
-		return (
-			<Icon
-				key={ key }
-				size={ 24 }
-				icon={ icon.src }
-				fill={ styles.icon.color }
-			/>
-		);
-	};
-
-	return (
-		<View style={ styles.breadcrumbContainer }>
-			<TouchableOpacity
-				style={ styles.button }
-				onPress={ () => {
-					/* Open BottomSheet with markup */
-				} }
-				disabled={
-					true
-				} /* Disable temporarily since onPress function is empty */
+} ) => (
+	<View style={ styles.breadcrumbContainer }>
+		<TouchableOpacity
+			style={ styles.button }
+			onPress={ () => {
+				/* Open BottomSheet with markup */
+			} }
+			disabled={
+				true
+			} /* Disable temporarily since onPress function is empty */
+		>
+			{ rootClientId &&
+				rootBlockIcon && [
+					renderIcon( rootBlockIcon, 'parent-icon' ),
+					<View key="subdirectory-icon" style={ styles.arrow }>
+						<SubdirectorSVG fill={ styles.arrow.color } />
+					</View>,
+				] }
+			{ renderIcon( blockIcon ) }
+			<Text
+				maxFontSizeMultiplier={ 1.25 }
+				ellipsizeMode="tail"
+				numberOfLines={ 1 }
+				style={ styles.breadcrumbTitle }
 			>
-				{ rootClientId &&
-					rootBlockIcon && [
-						renderIcon( rootBlockIcon, 'parent-icon' ),
-						<View key="subdirectory-icon" style={ styles.arrow }>
-							<SubdirectorSVG fill={ styles.arrow.color } />
-						</View>,
-					] }
-				{ renderIcon( blockIcon ) }
-				<Text
-					maxFontSizeMultiplier={ 1.25 }
-					ellipsizeMode="tail"
-					numberOfLines={ 1 }
-					style={ styles.breadcrumbTitle }
-				>
-					<BlockTitle clientId={ clientId } />
-				</Text>
-			</TouchableOpacity>
-		</View>
-	);
-};
+				<BlockTitle clientId={ clientId } />
+			</Text>
+		</TouchableOpacity>
+	</View>
+);
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
