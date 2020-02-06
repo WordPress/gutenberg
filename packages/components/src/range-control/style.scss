@@ -1,0 +1,8 @@
+// Keeping this className style rule as it is currently being
+// used OUTSIDE of the RangeControl component.
+.components-range-control__number {
+	display: inline-block;
+	margin-left: $grid-size;
+	font-weight: 500;
+	width: 54px;
+}
