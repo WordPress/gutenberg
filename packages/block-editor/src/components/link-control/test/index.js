@@ -570,11 +570,15 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
+		searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Make sure focus is on the input after reset
+		expect( searchInput ).toEqual( document.activeElement );
+
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		searchResultElements = container.querySelectorAll(
 			'[role="listbox"] [role="option"]'
 		);
-		searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
 		// check the input is empty now
 		expect( searchInput.value ).toBe( '' );
