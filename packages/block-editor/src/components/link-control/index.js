@@ -526,15 +526,12 @@ function LinkControl( {
 			{ value && ! isEditingLink && ! isResolvingLink && (
 				<Fragment>
 					<VisuallyHidden>
-						<p
-							aria-label={ __( 'Currently selected' ) }
-							id={ `current-link-label-${ instanceId }` }
-						>
+						<p id={ `current-link-label-${ instanceId }` }>
 							{ __( 'Currently selected' ) }:
 						</p>
 					</VisuallyHidden>
 					<div
-						aria-labelledby={ `current-link-label-${ instanceId }` }
+						aria-label={ __( 'Currently selected' ) }
 						aria-selected="true"
 						className={ classnames(
 							'block-editor-link-control__search-item',
