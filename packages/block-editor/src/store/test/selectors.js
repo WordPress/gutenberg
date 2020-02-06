@@ -22,6 +22,7 @@ const {
 	getBlockName,
 	getBlock,
 	getBlocks,
+	getBlockParents,
 	getBlockCount,
 	getClientIdsWithDescendants,
 	getClientIdsOfDescendants,
@@ -326,6 +327,53 @@ describe( 'selectors', () => {
 					innerBlocks: [],
 				},
 			] );
+		} );
+	} );
+
+	describe( 'getBlockParents', () => {
+		it( 'should return parent blocks', () => {
+			const state = {
+				blocks: {
+					parents: {
+						'client-id-01': '',
+						'client-id-02': 'client-id-01',
+						'client-id-03': 'client-id-02',
+						'client-id-04': 'client-id-03',
+					},
+					byClientId: {
+						'client-id-01': {
+							clientId: 'client-id-01',
+							name: 'core/columns',
+						},
+						'client-id-02': {
+							clientId: 'client-id-02',
+							name: 'core/navigation',
+						},
+						'client-id-03': {
+							clientId: 'client-id-03',
+							name: 'core/navigation-link',
+						},
+						'client-id-04': {
+							clientId: 'client-id-04',
+							name: 'core/paragraph',
+						},
+					},
+					cache: {
+						'client-id-01': {},
+						'client-id-02': {},
+						'client-id-03': {},
+						'client-id-04': {},
+					},
+				},
+			};
+
+			expect( getBlockParents( state, 'client-id-04' ) ).toEqual( [
+				'client-id-01',
+				'client-id-02',
+				'client-id-03',
+			] );
+
+			expect( getBlockParents( state, 'client-id-0' ) ).toEqual( [] );
 		} );
 	} );
 
