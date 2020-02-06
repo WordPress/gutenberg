@@ -31,13 +31,15 @@
 		@supports (display: grid) {
 			--columns-template: 1fr;
 			display: grid;
-			grid-gap: $grid-size-large * 2;
+			column-gap: $grid-size-large * 2;
 			@include break-medium() {
 				grid-template-columns: var(--columns-template);
 			}
 		}
 
 		> [data-type="core/column"] {
+			margin: 0;
+
 			@include break-medium() {
 				+ [data-type="core/column"] {
 					margin-left: $grid-size-large * 2;
@@ -70,21 +72,6 @@
 			word-break: break-word; // For back-compat.
 			overflow-wrap: break-word; // New standard.
 		}
-	}
-}
-
-/**
- * Columns act as as a "passthrough container"
- * and therefore has its vertical margins/padding removed via negative margins
- * therefore we need to compensate for this here by doubling the spacing on the
- * vertical to ensure there is equal visual spacing around the inserter. Note there
- * is no formal API for a "passthrough" Block so this is an edge case overide
- */
-[data-type="core/columns"] {
-
-	.block-list-appender {
-		margin-top: $block-padding*2;
-		margin-bottom: $block-padding*2;
 	}
 }
 

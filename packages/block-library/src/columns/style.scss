@@ -30,7 +30,7 @@
 		--columns-template: 1fr;
 
 		display: grid;
-		grid-gap: $grid-size-large * 2;
+		column-gap: $grid-size-large * 2;
 
 		@include break-medium() {
 			grid-template-columns: var(--columns-template);
