@@ -299,7 +299,7 @@ function gutenberg_experimental_global_styles_register_cpt() {
 	register_post_type( 'wp_global_styles', $args );
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-global-styles' ) ) {
+if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
 	add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
 	add_filter( 'body_class', 'gutenberg_experimental_global_styles_wp_gs_class_front_end' );
 	add_filter( 'admin_body_class', 'gutenberg_experimental_global_styles_wp_gs_class_editor' );
