@@ -7,7 +7,7 @@ import { boolean, number, text } from '@storybook/addon-knobs';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,7 +23,10 @@ const RangeControlWithState = ( props ) => {
 	return <RangeControl { ...props } value={ value } onChange={ setValue } />;
 };
 
-export const _default = () => {
+const DefaultExample = () => {
+	const [ isRtl, setIsRtl ] = useState( false );
+
+	const rtl = boolean( 'RTL', false );
 	const props = {
 		allowReset: boolean( 'allowReset', false ),
 		label: text( 'label', 'Range Label' ),
@@ -38,11 +41,33 @@ export const _default = () => {
 		withInputField: boolean( 'withInputField', true ),
 	};
 
+	useEffect( () => {
+		if ( rtl !== isRtl ) {
+			setIsRtl( rtl );
+		}
+	}, [ rtl, isRtl ] );
+
+	useEffect( () => {
+		if ( isRtl ) {
+			document.documentElement.setAttribute( 'dir', 'rtl' );
+		} else {
+			document.documentElement.setAttribute( 'dir', 'ltr' );
+		}
+
+		return () => {
+			document.documentElement.setAttribute( 'dir', 'ltr' );
+		};
+	}, [ isRtl ] );
+
 	return (
 		<Wrapper>
 			<RangeControl { ...props } />
 		</Wrapper>
 	);
+};
+
+export const _default = () => {
+	return <DefaultExample />;
 };
 
 export const InitialValueZero = () => {
