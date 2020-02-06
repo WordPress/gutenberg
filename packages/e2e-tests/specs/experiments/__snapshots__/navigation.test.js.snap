@@ -17,3 +17,9 @@ exports[`Navigation allows a navigation menu to be created using existing pages 
 <!-- wp:navigation-link {\\"label\\":\\"Contact Us\\",\\"type\\":\\"page\\",\\"id\\":3,\\"url\\":\\"https://this/is/a/test/url/contact\\"} /-->
 <!-- /wp:navigation -->"
 `;
+
+exports[`Navigation allows pages to be created from the navigation block and their links added to menu 1`] = `
+"<!-- wp:navigation -->
+<!-- wp:navigation-link {\\"label\\":\\"My New Page\\",\\"title\\":\\"My New Page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/url/my-new-page\\"} /-->
+<!-- /wp:navigation -->"
+`;

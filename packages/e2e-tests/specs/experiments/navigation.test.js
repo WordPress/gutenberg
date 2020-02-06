@@ -54,6 +54,26 @@ async function mockSearchResponse( items ) {
 	] );
 }
 
+async function mockCreatePageResponse( title, slug ) {
+	const page = {
+		id: 1,
+		title: { raw: title, rendered: title },
+		type: 'page',
+		link: `https://this/is/a/test/url/${ slug }`,
+		slug,
+	};
+
+	await setUpResponseMocking( [
+		{
+			match: ( request ) =>
+				request.url().includes( `rest_route` ) &&
+				request.url().includes( `pages` ) &&
+				request.method() === 'POST',
+			onRequestMatch: createJSONResponse( page ),
+		},
+	] );
+}
+
 async function updateActiveNavigationLink( { url, label } ) {
 	if ( url ) {
 		await page.type( 'input[placeholder="Search or type url"]', url );
@@ -184,6 +204,61 @@ describe( 'Navigation', () => {
 			url: 'Contact Us',
 			label: 'Get in touch',
 		} );
+
+		// Expect a Navigation Block with two Navigation Links in the snapshot.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
+		// Add the navigation block.
+		await insertBlock( 'Navigation' );
+
+		// Create an empty nav block.
+		await page.waitForSelector( '.wp-block-navigation-placeholder' );
+		const [ createEmptyButton ] = await page.$x(
+			'//button[text()="Create empty"]'
+		);
+		await createEmptyButton.click();
+
+		// After adding a new block, search input should be shown immediately.
+		const isInURLInput = await page.evaluate(
+			() => !! document.activeElement.closest( '.block-editor-url-input' )
+		);
+		expect( isInURLInput ).toBe( true );
+
+		// Insert name for the new page.
+		await page.type(
+			'input[placeholder="Search or type url"]',
+			'My New Page'
+		);
+
+		// Mock request for creating pages.
+		await mockCreatePageResponse( 'My New Page', 'my-new-page' );
+
+		// Wait for the create button to appear and click it.
+		await page.waitForSelector(
+			'.block-editor-link-control__search-create'
+		);
+		const [ createPageButton ] = await page.$x(
+			'//button[contains(concat(" ", @class, " "), " block-editor-link-control__search-create ")]'
+		);
+		await createPageButton.click();
+
+		// Wait until the link editor disappears.
+		await page.waitForSelector(
+			'.block-editor-link-control__search-input-wrapper',
+			{ hidden: true }
+		);
+
+		// Confirm the new link is focused.
+		const isInLinkRichText = await page.evaluate(
+			() =>
+				document.activeElement.classList.contains( 'rich-text' ) &&
+				!! document.activeElement.closest(
+					'.block-editor-block-list__block'
+				)
+		);
+		expect( isInLinkRichText ).toBe( true );
 
 		// Expect a Navigation Block with two Navigation Links in the snapshot.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
