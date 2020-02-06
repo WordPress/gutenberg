@@ -78,6 +78,11 @@ export function getResponseObject( obj, contentType ) {
 }
 
 export function createResponse( mockResponse, contentType = undefined ) {
+	// eslint-disable-next-line no-console
+	console.log( ' The Mock response ' );
+	// eslint-disable-next-line no-console
+	console.log( JSON.stringify( mockResponse ) );
+
 	return async ( request ) =>
 		request.respond( getResponseObject( mockResponse, contentType ) );
 }
