@@ -31,9 +31,9 @@ module.exports = {
 	reporters:
 		'TRAVIS' in process.env && 'CI' in process.env
 			? [
-					require.resolve(
-						'@wordpress/jest-preset-default/scripts/travis-fold-passes-reporter.js'
-					),
-			  ]
+				require.resolve(
+					'@wordpress/jest-preset-default/scripts/travis-fold-passes-reporter.js'
+				),
+			]
 			: undefined,
 };
