@@ -74,6 +74,27 @@ html {
 }
 
 .edit-post-editor-regions__sidebar {
+	display: none;
+
+	@include break-medium() {
+		display: block;
+		z-index: z-index(".edit-post-editor-regions__sidebar");
+		position: fixed !important; // Need to override the default relative positionning
+		top: -9999em;
+		bottom: auto;
+		left: auto;
+		right: 0;
+		width: $sidebar-width;
+
+		&:focus {
+			top: auto;
+			bottom: 0;
+		}
+	}
+}
+
+.is-sidebar-opened .edit-post-editor-regions__sidebar {
+	display: block;
 	width: auto; // Keep the sidebar width flexible.
 	flex-shrink: 0;
 	position: absolute;
@@ -83,10 +104,6 @@ html {
 	bottom: 0;
 	left: 0;
 	background: $white;
-
-	&:empty {
-		display: none;
-	}
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
 	@include break-medium() {

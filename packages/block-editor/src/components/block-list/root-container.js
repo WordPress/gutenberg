@@ -46,7 +46,7 @@ function onDragStart( event ) {
 	}
 }
 
-function RootContainer( { children, className }, ref ) {
+function RootContainer( { children, className, hasPopover = true }, ref ) {
 	const {
 		selectedBlockClientId,
 		hasMultiSelection,
@@ -82,7 +82,7 @@ function RootContainer( { children, className }, ref ) {
 			containerRef={ ref }
 		>
 			<BlockNodes.Provider value={ useState( {} ) }>
-				<BlockPopover />
+				{ hasPopover ? <BlockPopover /> : null }
 				<div
 					ref={ ref }
 					className={ className }
