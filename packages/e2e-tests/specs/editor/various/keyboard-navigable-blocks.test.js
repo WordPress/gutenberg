@@ -152,7 +152,7 @@ describe( 'Order of block keyboard navigation', () => {
 		await page.evaluate( () => {
 			document.querySelector( '.edit-post-visual-editor' ).focus();
 			document
-				.querySelector( '.components-editor-regions__sidebar' )
+				.querySelector( '.block-editor-editor-regions__sidebar' )
 				.focus();
 		} );
 

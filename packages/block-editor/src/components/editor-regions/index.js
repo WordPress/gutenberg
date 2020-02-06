@@ -21,13 +21,13 @@ function EditorRegions( {
 		<div
 			className={ classnames(
 				className,
-				'components-editor-regions',
+				'block-editor-editor-regions',
 				'edit-post-editor-regions'
 			) }
 		>
 			{ !! header && (
 				<div
-					className="components-editor-regions__header edit-post-editor-regions__header"
+					className="block-editor-editor-regions__header edit-post-editor-regions__header"
 					role="region"
 					/* translators: accessibility text for the top bar landmark region. */
 					aria-label={ __( 'Editor top bar' ) }
@@ -36,9 +36,9 @@ function EditorRegions( {
 					{ header }
 				</div>
 			) }
-			<div className="components-editor-regions__body edit-post-editor-regions__body">
+			<div className="block-editor-editor-regions__body edit-post-editor-regions__body">
 				<div
-					className="components-editor-regions__content edit-post-editor-regions__content"
+					className="block-editor-editor-regions__content edit-post-editor-regions__content"
 					role="region"
 					/* translators: accessibility text for the content landmark region. */
 					aria-label={ __( 'Editor content' ) }
@@ -48,7 +48,7 @@ function EditorRegions( {
 				</div>
 				{ !! sidebar && (
 					<div
-						className="components-editor-regions__sidebar edit-post-editor-regions__sidebar"
+						className="block-editor-editor-regions__sidebar edit-post-editor-regions__sidebar"
 						role="region"
 						/* translators: accessibility text for the settings landmark region. */
 						aria-label={ __( 'Editor settings' ) }
@@ -59,7 +59,7 @@ function EditorRegions( {
 				) }
 				{ !! publish && (
 					<div
-						className="components-editor-regions__publish edit-post-editor-regions__publish"
+						className="block-editor-editor-regions__publish edit-post-editor-regions__publish"
 						role="region"
 						/* translators: accessibility text for the publish landmark region. */
 						aria-label={ __( 'Editor publish' ) }
@@ -71,7 +71,7 @@ function EditorRegions( {
 			</div>
 			{ !! footer && (
 				<div
-					className="components-editor-regions__footer edit-post-editor-regions__footer"
+					className="block-editor-editor-regions__footer edit-post-editor-regions__footer"
 					role="region"
 					/* translators: accessibility text for the footer landmark region. */
 					aria-label={ __( 'Editor footer' ) }
