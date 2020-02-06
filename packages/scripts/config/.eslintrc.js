@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const defaultPrettierConfig = require( '../config/.prettierrc' );
+const defaultPrettierConfig = require( './.prettierrc' );
 const { hasPrettierConfig } = require( '../utils' );
 
 const eslintConfig = {
