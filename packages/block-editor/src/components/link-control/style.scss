@@ -42,9 +42,11 @@ $block-editor-link-control-number-of-actions: 1;
 	 *  - Border (1px)
 	 *  - Vertically, for the difference in height between the input (40px) and
 	 *    the icon buttons.
+	 *  - Horizontally, pad to the minimum of: default input padding, or the
+	 *    equivalent of the vertical padding.
 	 */
 	top: $grid-size-large + 1px + ( ( 40px - $icon-button-size ) / 2 );
-	right: $grid-size-large + 1px;
+	right: $grid-size-large + 1px + min($grid-size, ( 40px - $icon-button-size ) / 2);
 }
 
 .block-editor-link-control__search-results-wrapper {
