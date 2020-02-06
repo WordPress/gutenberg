@@ -15,6 +15,7 @@ import {
 	useState,
 	forwardRef,
 } from '@wordpress/element';
+import * as WPIcons from '@wordpress/icons';
 import { compose, withInstanceId } from '@wordpress/compose';
 
 /**
@@ -22,7 +23,6 @@ import { compose, withInstanceId } from '@wordpress/compose';
  */
 import BaseControl from '../base-control';
 import Button from '../button';
-import Dashicon from '../dashicon';
 
 import { color } from '../utils/colors';
 import RangeRail from './rail';
@@ -39,6 +39,9 @@ import {
 	Thumb,
 	Wrapper,
 } from './styles/range-control-styles';
+import { useRtl } from '../utils/rtl';
+
+const { Icon, ...icons } = WPIcons;
 
 const BaseRangeControl = forwardRef(
 	(
@@ -70,7 +73,7 @@ const BaseRangeControl = forwardRef(
 		},
 		ref
 	) => {
-		const isRTL = document.documentElement.dir === 'rtl';
+		const isRTL = useRtl();
 
 		const sliderValue = initialPosition || valueProp;
 		const [ value, setValue ] = useControlledRangeValue( {
@@ -152,6 +155,9 @@ const BaseRangeControl = forwardRef(
 			[ isRTL ? 'right' : 'left' ]: fillValueOffset,
 		};
 
+		const beforeIconComponent = icons[ beforeIcon ];
+		const afterIconComponent = icons[ afterIcon ];
+
 		return (
 			<BaseControl
 				className={ classes }
@@ -163,9 +169,9 @@ const BaseRangeControl = forwardRef(
 					className="components-range-control__root"
 					isRTL={ isRTL }
 				>
-					{ beforeIcon && (
+					{ beforeIconComponent && (
 						<BeforeIconWrapper>
-							<Dashicon icon={ beforeIcon } />
+							<Icon icon={ beforeIconComponent } />
 						</BeforeIconWrapper>
 					) }
 					<Wrapper
@@ -224,9 +230,9 @@ const BaseRangeControl = forwardRef(
 							/>
 						) }
 					</Wrapper>
-					{ afterIcon && (
+					{ afterIconComponent && (
 						<AfterIconWrapper>
-							<Dashicon icon={ afterIcon } />
+							<Icon icon={ afterIconComponent } />
 						</AfterIconWrapper>
 					) }
 					{ withInputField && (
@@ -262,28 +268,29 @@ const BaseRangeControl = forwardRef(
 );
 
 /**
- * A Higher-Order function that creates a clamp function for a specific value.
+ * A float supported clamp function for a specific value.
+ *
+ * @param {number} value The value to clamp
+ * @param {number} min The minimum value
+ * @param {number} max The maxinum value
+ * @return {number} A (float) number
  */
-function createClampValue( { min = 0, max = 10 } ) {
-	return ( value ) => {
-		return parseFloat( clamp( value, min, max ) );
-	};
+function floatClamp( value, min, max ) {
+	return parseFloat( clamp( value, min, max ) );
 }
 
 /**
  * Hook to store a clamped value, derived from props.
  */
 function useControlledRangeValue( { min, max, value: valueProp = 0 } ) {
-	const clampValue = createClampValue( { min, max } );
-
-	const [ value, _setValue ] = useState( clampValue( valueProp ) );
+	const [ value, _setValue ] = useState( floatClamp( valueProp, min, max ) );
 	const valueRef = useRef( value );
 
 	const setValue = useCallback(
 		( nextValue ) => {
-			_setValue( clampValue( nextValue ) );
+			_setValue( floatClamp( nextValue, min, max ) );
 		},
-		[ _setValue ]
+		[ _setValue, min, max ]
 	);
 
 	useEffect( () => {
