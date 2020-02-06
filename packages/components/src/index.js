@@ -26,6 +26,7 @@ export { default as CardMedia } from './card/media';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as ColorIndicator } from './color-indicator';
+export { default as ColorControl } from './color-control';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
 export { default as CustomSelectControl } from './custom-select-control';

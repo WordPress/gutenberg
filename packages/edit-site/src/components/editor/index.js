@@ -21,6 +21,7 @@ import {
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { GlobalStylesStateProvider } from '@wordpress/global-styles';
 
 /**
  * Internal dependencies
@@ -64,34 +65,38 @@ function Editor( { settings: _settings } ) {
 		<>
 			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
-			<SlotFillProvider>
-				<DropZoneProvider>
-					<EntityProvider kind="root" type="site">
-						<EntityProvider
-							kind="postType"
-							type={ settings.templateType }
-							id={ settings.templateId }
-						>
-							<Context.Provider value={ context }>
-								<FocusReturnProvider>
-									<EditorSkeleton
-										sidebar={ ! isMobile && <Sidebar /> }
-										header={ <Header /> }
-										content={
-											<>
-												<Notices />
-												<Popover.Slot name="block-toolbar" />
-												<BlockEditor />
-											</>
-										}
-									/>
-									<Popover.Slot />
-								</FocusReturnProvider>
-							</Context.Provider>
+			<GlobalStylesStateProvider>
+				<SlotFillProvider>
+					<DropZoneProvider>
+						<EntityProvider kind="root" type="site">
+							<EntityProvider
+								kind="postType"
+								type={ settings.templateType }
+								id={ settings.templateId }
+							>
+								<Context.Provider value={ context }>
+									<FocusReturnProvider>
+										<EditorSkeleton
+											sidebar={
+												! isMobile && <Sidebar />
+											}
+											header={ <Header /> }
+											content={
+												<>
+													<Notices />
+													<Popover.Slot name="block-toolbar" />
+													<BlockEditor />
+												</>
+											}
+										/>
+										<Popover.Slot />
+									</FocusReturnProvider>
+								</Context.Provider>
+							</EntityProvider>
 						</EntityProvider>
-					</EntityProvider>
-				</DropZoneProvider>
-			</SlotFillProvider>
+					</DropZoneProvider>
+				</SlotFillProvider>
+			</GlobalStylesStateProvider>
 		</>
 	) : null;
 }

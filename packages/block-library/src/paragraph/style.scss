@@ -41,3 +41,11 @@ p.has-background {
 p.has-text-color a {
 	color: inherit;
 }
+
+.wp-gs p {
+	color: var(--wp-paragraph--color, var(--wp-color--text));
+	font-size: var(--wp-typography--fontSize);
+	font-weight: var(--wp-typography--fontWeight);
+	line-height: var(--wp-paragraph--lineHeight, var(--wp-typography--lineHeight));
+
+}

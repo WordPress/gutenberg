@@ -5,6 +5,7 @@ import { createSlotFill } from '@wordpress/components';
 import { ComplementaryArea } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { cog, pencil } from '@wordpress/icons';
+import { GlobalStylesPanel } from '@wordpress/global-styles';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
