@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, unescape } from 'lodash';
+import { escape, get, head, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,6 @@ import {
 	PanelBody,
 	Popover,
 	TextareaControl,
-	TextControl,
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -36,7 +35,7 @@ import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { toolbarSubmenuIcon, itemSubmenuIcon } from './icons';
+import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
 
 function NavigationLinkEdit( {
 	attributes,
@@ -46,17 +45,13 @@ function NavigationLinkEdit( {
 	setAttributes,
 	showSubmenuIcon,
 	insertLinkBlock,
+	textColor,
+	backgroundColor,
+	rgbTextColor,
+	rgbBackgroundColor,
 } ) {
-	const {
-		label,
-		opensInNewTab,
-		title,
-		url,
-		nofollow,
-		description,
-	} = attributes;
+	const { label, opensInNewTab, url, nofollow, description } = attributes;
 	const link = {
-		title: title ? unescape( title ) : '',
 		url,
 		opensInNewTab,
 	};
@@ -137,7 +132,7 @@ function NavigationLinkEdit( {
 					/>
 					<ToolbarButton
 						name="submenu"
-						icon={ toolbarSubmenuIcon }
+						icon={ <ToolbarSubmenuIcon /> }
 						title={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
@@ -145,16 +140,6 @@ function NavigationLinkEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'SEO settings' ) }>
-					<TextControl
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Title Attribute' ) }
-						help={ __(
-							'Provide more context about where the link goes.'
-						) }
-					/>
 					<ToggleControl
 						checked={ nofollow }
 						onChange={ ( nofollowValue ) => {
@@ -196,7 +181,16 @@ function NavigationLinkEdit( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
 					'is-selected': isSelected,
 					'has-link': !! url,
+					'has-child': hasDescendants,
+					'has-text-color': rgbTextColor,
+					[ `has-${ textColor }-color` ]: !! textColor,
+					'has-background': rgbBackgroundColor,
+					[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 				} ) }
+				style={ {
+					color: rgbTextColor,
+					backgroundColor: rgbBackgroundColor,
+				} }
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
@@ -218,7 +212,7 @@ function NavigationLinkEdit( {
 					/>
 					{ showSubmenuIcon && (
 						<span className="wp-block-navigation-link__submenu-icon">
-							{ itemSubmenuIcon }
+							<ItemSubmenuIcon />
 						</span>
 					) }
 					{ isLinkOpen && (
@@ -237,7 +231,6 @@ function NavigationLinkEdit( {
 									id,
 								} = {} ) =>
 									setAttributes( {
-										title: escape( newTitle ),
 										url: encodeURI( newURL ),
 										label: ( () => {
 											const normalizedTitle = newTitle.replace(
@@ -283,32 +276,64 @@ function NavigationLinkEdit( {
 	);
 }
 
+/**
+ * Returns the color object matching the slug, or undefined.
+ *
+ * @param {Array}  colors      The editor settings colors array.
+ * @param {string} colorSlug   A string containing the color slug.
+ * @param {string} customColor A string containing the custom color value.
+ *
+ * @return {Object} Color object included in the editor settings colors, or Undefined.
+ */
+const getColorObjectByColorSlug = ( colors, colorSlug, customColor ) => {
+	if ( customColor ) {
+		return customColor;
+	}
+
+	if ( ! colors || ! colors.length ) {
+		return;
+	}
+
+	return get( find( colors, { slug: colorSlug } ), 'color' );
+};
+
 export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
-			getBlockName,
 			getBlockAttributes,
-			getBlockParents,
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
+			getBlockParentsByBlockName,
+			getSettings,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
-		const rootBlock = getBlockParents( clientId )[ 0 ];
-		const parentBlock = getBlockParents( clientId, true )[ 0 ];
-		const rootBlockAttributes = getBlockAttributes( rootBlock );
+		const rootBlock = head(
+			getBlockParentsByBlockName( clientId, 'core/navigation' )
+		);
+		const navigationBlockAttributes = getBlockAttributes( rootBlock );
+		const colors = get( getSettings(), 'colors', [] );
 		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
 			.length;
-		const isLevelZero = getBlockName( parentBlock ) === 'core/navigation';
 		const showSubmenuIcon =
-			rootBlockAttributes.showSubmenuIcon &&
-			isLevelZero &&
-			hasDescendants;
+			!! navigationBlockAttributes.showSubmenuIcon && hasDescendants;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
 		return {
 			isParentOfSelectedBlock,
 			hasDescendants,
 			showSubmenuIcon,
+			textColor: navigationBlockAttributes.textColor,
+			backgroundColor: navigationBlockAttributes.backgroundColor,
+			rgbTextColor: getColorObjectByColorSlug(
+				colors,
+				navigationBlockAttributes.textColor,
+				navigationBlockAttributes.customTextColor
+			),
+			rgbBackgroundColor: getColorObjectByColorSlug(
+				colors,
+				navigationBlockAttributes.backgroundColor,
+				navigationBlockAttributes.customBackgroundColor
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {

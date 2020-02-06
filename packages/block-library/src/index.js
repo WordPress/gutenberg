@@ -185,7 +185,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				[
 					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
 					socialLinks,
-					...socialLink.sites,
+					socialLink,
 
 					// Register Full Site Editing Blocks.
 					...( __experimentalEnableFullSiteEditing

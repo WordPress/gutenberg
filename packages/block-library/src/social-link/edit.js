@@ -26,15 +26,15 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getIconBySite, getNameBySite } from './social-list';
 
 const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
-	const { url, site, label } = attributes;
+	const { url, service, label } = attributes;
 	const [ showURLPopover, setPopover ] = useState( false );
-	const classes = classNames( 'wp-social-link', 'wp-social-link-' + site, {
+	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
 	} );
 
 	// Import icon.
-	const IconComponent = getIconBySite( site );
-	const socialLinkName = getNameBySite( site );
+	const IconComponent = getIconBySite( service );
+	const socialLinkName = getNameBySite( service );
 
 	return (
 		<Fragment>
