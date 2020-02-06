@@ -10,8 +10,19 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 // Urls to mock
-const SEARCH_URL = '/__experimental/block-directory/search';
-const INSTALL_URL = '/__experimental/block-directory/install';
+const SEARCH_URLS = [
+	'/__experimental/block-directory/search',
+	`rest_route=${ encodeURIComponent(
+		'/__experimental/block-directory/search'
+	) }`,
+];
+
+const INSTALL_URLS = [
+	'/__experimental/block-directory/install',
+	`rest_route=${ encodeURIComponent(
+		'/__experimental/block-directory/install'
+	) }`,
+];
 
 // Example Blocks
 const mockBlock1 = {
@@ -67,10 +78,6 @@ export function getResponseObject( obj, contentType ) {
 }
 
 export function createResponse( mockResponse, contentType = undefined ) {
-	// eslint-disable-next-line no-console
-	console.log( '----- This is the response object -----' );
-	// eslint-disable-next-line no-console
-	console.log( JSON.stringify( mockResponse ) );
 	return async ( request ) =>
 		request.respond( getResponseObject( mockResponse, contentType ) );
 }
@@ -91,7 +98,7 @@ describe( 'adding blocks from block directory', () => {
 		// Return an empty list of plugins
 		await setUpResponseMocking( [
 			{
-				match: ( request ) => request.url().includes( SEARCH_URL ),
+				match: ( request ) => SEARCH_URLS.includes( request.url() ),
 				onRequestMatch: createResponse( JSON.stringify( [] ) ),
 			},
 		] );
@@ -119,7 +126,7 @@ describe( 'adding blocks from block directory', () => {
 					console.log( '------ HERE IS THE REQUEST URL ------' );
 					// eslint-disable-next-line no-console
 					console.log( request.url() );
-					return request.url().includes( SEARCH_URL );
+					return SEARCH_URLS.includes( request.url() );
 				},
 				onRequestMatch: createResponse(
 					JSON.stringify( [ mockBlock1, mockBlock2 ] )
@@ -127,7 +134,7 @@ describe( 'adding blocks from block directory', () => {
 			},
 			{
 				// Mock response for install
-				match: ( request ) => request.url().includes( INSTALL_URL ),
+				match: ( request ) => INSTALL_URLS.includes( request.url() ),
 				onRequestMatch: createResponse( JSON.stringify( true ) ),
 			},
 			{
