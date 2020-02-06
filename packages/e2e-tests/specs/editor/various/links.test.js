@@ -350,7 +350,7 @@ describe( 'Links', () => {
 			)
 		).not.toBeNull();
 
-		// Tab to the settings icon button.
+		// Tab to the "Advanced Settings" toggle.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 
@@ -396,12 +396,6 @@ describe( 'Links', () => {
 		// Press Cmd+K to edit the link and the url-input should become
 		// focused with the value previously inserted.
 		await pressKeyWithModifier( 'primary', 'K' );
-		await page.waitForSelector(
-			':focus.block-editor-link-control__search-item-title'
-		);
-		await page.keyboard.press( 'Tab' ); // Shift focus to "Edit" button
-		await page.keyboard.press( 'Enter' ); // Click "Edit" button
-
 		await waitForAutoFocus();
 		const activeElementParentClasses = await page.evaluate( () =>
 			Object.values(
@@ -447,16 +441,19 @@ describe( 'Links', () => {
 
 		// Navigate back to the popover
 		await pressKeyWithModifier( 'primary', 'k' );
-		await page.waitForSelector(
-			'.components-popover__content .block-editor-link-control'
-		);
+		await waitForAutoFocus();
 
-		// Navigate to the "Open in New Tab" checkbox.
+		// Navigate to and expand the "Advanced Settings" toggle.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-
-		// Check the checkbox.
 		await page.keyboard.press( 'Space' );
+
+		// Navigate to and toggle the "Open in New Tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		// Submit change to "Open in New Tab".
+		await page.keyboard.press( 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
@@ -472,29 +469,21 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		// Edit link.
 		await pressKeyWithModifier( 'primary', 'k' );
-		await page.waitForSelector(
-			':focus.block-editor-link-control__search-item-title'
-		);
-		await page.keyboard.press( 'Tab' ); // Shift focus to "Edit" button
-		await page.keyboard.press( 'Enter' ); // Click "Edit" button
 		await waitForAutoFocus();
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'wordpress.org' );
 
-		// Update the link
-		await page.keyboard.press( 'Enter' );
-
-		// Navigate back to the popover
-		await pressKeyWithModifier( 'primary', 'k' );
-		await page.waitForSelector(
-			'.components-popover__content .block-editor-link-control'
-		);
-
-		// Navigate to the "Open in New Tab" checkbox.
+		// Navigate to and expand the "Advanced Settings" toggle.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-		// Uncheck the checkbox.
 		await page.keyboard.press( 'Space' );
+
+		// Navigate to and uncheck the "Open in New Tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		// Update the link.
+		await page.keyboard.press( 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
