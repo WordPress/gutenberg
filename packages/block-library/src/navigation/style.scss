@@ -192,6 +192,10 @@ $navigation-sub-menu-width: $grid-size * 25;
 		.wp-block-navigation-link svg {
 			transform: rotate(0);
 		}
+
+		&.has-text-color .wp-block-navigation-link__content {
+			color: inherit;
+		}
 	}
 }
 
