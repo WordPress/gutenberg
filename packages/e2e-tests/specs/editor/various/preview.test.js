@@ -101,7 +101,7 @@ describe( 'Preview', () => {
 		// Disabled until content present.
 		const isPreviewDisabled = await editorPage.$$eval(
 			'.editor-post-preview__button-toggle:not( :disabled ):not( [aria-disabled="true"] )',
-			( enabledButtons ) => ! enabledButtons.length,
+			( enabledButtons ) => ! enabledButtons.length
 		);
 		expect( isPreviewDisabled ).toBe( true );
 
@@ -115,7 +115,7 @@ describe( 'Preview', () => {
 			await editorPage.waitForFunction( () => {
 				return window.location.search.match( /[\?&]post=(\d+)/ );
 			} )
-		).jsonValue();
+		 ).jsonValue();
 
 		const expectedPreviewURL = createURL(
 			'',

@@ -7,7 +7,16 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component, renderToString } from '@wordpress/element';
-import { Button, Dropdown, Icon, MenuGroup, MenuItem, Path, Polygon, SVG } from '@wordpress/components';
+import {
+	Button,
+	Dropdown,
+	Icon,
+	MenuGroup,
+	MenuItem,
+	Path,
+	Polygon,
+	SVG,
+} from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
@@ -100,7 +109,12 @@ function writeInterstitialMessage( targetDocument ) {
 }
 
 const downArrow = (
-	<SVG width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
+	<SVG
+		width="18"
+		height="18"
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 18 18"
+	>
 		<Polygon points="9,13.5 14.7,7.9 13.2,6.5 9,10.7 4.8,6.5 3.3,7.9 " />
 	</SVG>
 );
@@ -192,7 +206,12 @@ export class PostPreviewButton extends Component {
 	}
 
 	render() {
-		const { previewLink, currentPostLink, isSaveable, setDeviceType } = this.props;
+		const {
+			previewLink,
+			currentPostLink,
+			isSaveable,
+			setDeviceType,
+		} = this.props;
 
 		// Link to the `?preview=true` URL if we have it, since this lets us see
 		// changes that were autosaved since the post was last published. Otherwise,
@@ -206,38 +225,48 @@ export class PostPreviewButton extends Component {
 					contentClassName="editor-post-preview__dropdown-content"
 					popoverProps={ { role: 'menu' } }
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button onClick={ onToggle }
+						<Button
+							onClick={ onToggle }
 							className="editor-post-preview__button-toggle"
 							aria-expanded={ isOpen }
 							disabled={ ! isSaveable }
 						>
 							{ this.translateDropdownButtonText() }
-							<div className="editor-post-preview__button-separator">{ downArrow }</div>
+							<div className="editor-post-preview__button-separator">
+								{ downArrow }
+							</div>
 						</Button>
 					) }
 					renderContent={ () => (
 						<>
-							<MenuGroup
-								label={ _x( 'View', 'noun' ) }
-							>
+							<MenuGroup label={ _x( 'View', 'noun' ) }>
 								<MenuItem
 									className="editor-post-preview__button-resize"
 									onClick={ () => setDeviceType( 'Desktop' ) }
-									icon={ this.props.deviceType === 'Desktop' && 'yes' }
+									icon={
+										this.props.deviceType === 'Desktop' &&
+										'yes'
+									}
 								>
 									{ __( 'Desktop' ) }
 								</MenuItem>
 								<MenuItem
 									className="editor-post-preview__button-resize"
 									onClick={ () => setDeviceType( 'Tablet' ) }
-									icon={ this.props.deviceType === 'Tablet' && 'yes' }
+									icon={
+										this.props.deviceType === 'Tablet' &&
+										'yes'
+									}
 								>
 									{ __( 'Tablet' ) }
 								</MenuItem>
 								<MenuItem
 									className="editor-post-preview__button-resize"
 									onClick={ () => setDeviceType( 'Mobile' ) }
-									icon={ this.props.deviceType === 'Mobile' && 'yes' }
+									icon={
+										this.props.deviceType === 'Mobile' &&
+										'yes'
+									}
 								>
 									{ __( 'Mobile' ) }
 								</MenuItem>
@@ -252,10 +281,8 @@ export class PostPreviewButton extends Component {
 								>
 									{ __( 'Preview externally' ) }
 									<span className="screen-reader-text">
-										{
-										/* translators: accessibility text */
-											__( '(opens in a new tab)' )
-										}
+										{ /* translators: accessibility text */
+										__( '(opens in a new tab)' ) }
 									</span>
 									<Icon icon="external" />
 								</Button>
@@ -273,10 +300,8 @@ export class PostPreviewButton extends Component {
 				>
 					{ _x( 'Preview', 'imperative verb' ) }
 					<span className="screen-reader-text">
-						{
-						/* translators: accessibility text */
-							__( '(opens in a new tab)' )
-						}
+						{ /* translators: accessibility text */
+						__( '(opens in a new tab)' ) }
 					</span>
 				</Button>
 			</>
@@ -294,12 +319,8 @@ export default compose( [
 			isEditedPostAutosaveable,
 			getEditedPostPreviewLink,
 		} = select( 'core/editor' );
-		const {
-			getPostType,
-		} = select( 'core' );
-		const {
-			getDeviceType,
-		} = select( 'core/block-editor' );
+		const { getPostType } = select( 'core' );
+		const { getDeviceType } = select( 'core/block-editor' );
 
 		const previewLink = getEditedPostPreviewLink();
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
@@ -312,7 +333,10 @@ export default compose( [
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
-			isDraft: [ 'draft', 'auto-draft' ].indexOf( getEditedPostAttribute( 'status' ) ) !== -1,
+			isDraft:
+				[ 'draft', 'auto-draft' ].indexOf(
+					getEditedPostAttribute( 'status' )
+				) !== -1,
 			deviceType: getDeviceType(),
 		};
 	} ),
@@ -323,7 +347,6 @@ export default compose( [
 			savePost: dispatch( 'core/editor' ).savePost,
 			setDeviceType: dispatch( 'core/block-editor' ).setPreviewDeviceType,
 		};
-	}
-	),
+	} ),
 	ifCondition( ( { isViewable } ) => isViewable ),
 ] )( PostPreviewButton );
