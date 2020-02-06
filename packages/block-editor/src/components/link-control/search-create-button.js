@@ -33,7 +33,7 @@ export const LinkControlSearchCreate = ( {
 
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
-					{ sprintf( __( 'Create new Page: %s' ), searchTerm ) }
+					{ sprintf( __( 'New page: %s' ), searchTerm ) }
 				</span>
 			</span>
 		</Button>
