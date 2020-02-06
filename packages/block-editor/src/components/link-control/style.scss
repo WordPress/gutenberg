@@ -38,7 +38,7 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__search-error {
-	margin: -$grid-size-large/2 $grid-size-large $grid-size-large;
+	margin: -$grid-size-large/2 $grid-size-large $grid-size-large; // negative margin to bring the error a bit closer to the button
 }
 
 .block-editor-link-control__search-actions {
