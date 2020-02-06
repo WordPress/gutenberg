@@ -213,7 +213,7 @@ $block-editor-link-control-number-of-actions: 1;
 	&::before {
 		content: "";
 		position: absolute;
-		top: -10px;
+		top: -#{$block-selected-child-margin*2};
 		left: 0;
 		display: block;
 		width: 100%;
