@@ -46,6 +46,7 @@
 		"./packages/*/benchmark",
 		"./packages/**/test/**",
 		"./packages/**/build/**",
-		"./packages/**/build-module/**"
+		"./packages/**/build-module/**",
+		"./packages/**/react-native-*/**"
 	]
 }
