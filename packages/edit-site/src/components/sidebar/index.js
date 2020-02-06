@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import GlobalStyles from './global-styles';
+import GlobalStylesPanel from './global-styles-panel';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
@@ -21,7 +21,7 @@ function Sidebar() {
 			aria-label={ __( 'Site editor advanced settings.' ) }
 			tabIndex="-1"
 		>
-			<GlobalStyles />
+			<GlobalStylesPanel />
 			<Panel header={ __( 'Inspector' ) }>
 				<InspectorSlot bubblesVirtually />
 			</Panel>
