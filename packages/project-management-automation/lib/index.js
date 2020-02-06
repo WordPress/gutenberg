@@ -26,7 +26,7 @@ const automations = [
 	},
 	{
 		event: 'push',
-		task: ifNotFork( addMilestone ),
+		task: addMilestone,
 	},
 ];
 
