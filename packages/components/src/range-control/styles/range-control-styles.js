@@ -22,10 +22,6 @@ export const Root = styled.span`
 	position: relative;
 	touch-action: none;
 	width: 100%;
-
-	${rtl( {
-		direction: 'ltr',
-	} )}
 `;
 
 const wrapperMargin = ( { marks } ) =>
@@ -128,18 +124,17 @@ export const MarkLabel = styled.span`
 
 export const ThumbWrapper = styled.span`
 	align-items: center;
-	margin-left: -10px;
-	margin-top: 5px;
-	width: 20px;
 	box-sizing: border-box;
 	display: flex;
 	height: 20px;
 	justify-content: center;
+	margin-top: 5px;
 	outline: 0;
-	position: absolute;
 	pointer-events: none;
+	position: absolute;
 	top: 0;
 	user-select: none;
+	width: 20px;
 
 	${rtl( { marginLeft: -10 } )}
 `;

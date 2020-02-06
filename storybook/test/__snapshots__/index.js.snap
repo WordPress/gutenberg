@@ -3175,7 +3175,6 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   position: relative;
   touch-action: none;
   width: 100%;
-  direction: ltr;
 }
 
 .emotion-12 {
@@ -3235,9 +3234,6 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  margin-left: -10px;
-  margin-top: 5px;
-  width: 20px;
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -3248,14 +3244,16 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
+  margin-top: 5px;
   outline: 0;
-  position: absolute;
   pointer-events: none;
+  position: absolute;
   top: 0;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  width: 20px;
   margin-left: -10px;
 }
 
@@ -4701,7 +4699,6 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   position: relative;
   touch-action: none;
   width: 100%;
-  direction: ltr;
 }
 
 .emotion-0 {
@@ -4749,9 +4746,6 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  margin-left: -10px;
-  margin-top: 5px;
-  width: 20px;
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -4762,14 +4756,16 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
+  margin-top: 5px;
   outline: 0;
-  position: absolute;
   pointer-events: none;
+  position: absolute;
   top: 0;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  width: 20px;
   margin-left: -10px;
 }
 
@@ -5161,7 +5157,6 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
   position: relative;
   touch-action: none;
   width: 100%;
-  direction: ltr;
 }
 
 .emotion-10 {
@@ -5221,9 +5216,6 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  margin-left: -10px;
-  margin-top: 5px;
-  width: 20px;
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -5234,14 +5226,16 @@ exports[`Storyshots Components/RangeControl Default 1`] = `
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
+  margin-top: 5px;
   outline: 0;
-  position: absolute;
   pointer-events: none;
+  position: absolute;
   top: 0;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  width: 20px;
   margin-left: -10px;
 }
 
@@ -5390,7 +5384,6 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   position: relative;
   touch-action: none;
   width: 100%;
-  direction: ltr;
 }
 
 .emotion-12 {
@@ -5450,9 +5443,6 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  margin-left: -10px;
-  margin-top: 5px;
-  width: 20px;
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -5463,14 +5453,16 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
+  margin-top: 5px;
   outline: 0;
-  position: absolute;
   pointer-events: none;
+  position: absolute;
   top: 0;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  width: 20px;
   margin-left: -10px;
 }
 
@@ -5680,7 +5672,6 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   position: relative;
   touch-action: none;
   width: 100%;
-  direction: ltr;
 }
 
 .emotion-12 {
@@ -5740,9 +5731,6 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  margin-left: -10px;
-  margin-top: 5px;
-  width: 20px;
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -5753,14 +5741,16 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
+  margin-top: 5px;
   outline: 0;
-  position: absolute;
   pointer-events: none;
+  position: absolute;
   top: 0;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  width: 20px;
   margin-left: -10px;
 }
 
@@ -5977,7 +5967,6 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   position: relative;
   touch-action: none;
   width: 100%;
-  direction: ltr;
 }
 
 .emotion-12 {
@@ -6037,9 +6026,6 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  margin-left: -10px;
-  margin-top: 5px;
-  width: 20px;
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -6050,14 +6036,16 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
+  margin-top: 5px;
   outline: 0;
-  position: absolute;
   pointer-events: none;
+  position: absolute;
   top: 0;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  width: 20px;
   margin-left: -10px;
 }
 
@@ -6267,7 +6255,6 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   position: relative;
   touch-action: none;
   width: 100%;
-  direction: ltr;
 }
 
 .emotion-12 {
@@ -6327,9 +6314,6 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  margin-left: -10px;
-  margin-top: 5px;
-  width: 20px;
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -6340,14 +6324,16 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
+  margin-top: 5px;
   outline: 0;
-  position: absolute;
   pointer-events: none;
+  position: absolute;
   top: 0;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  width: 20px;
   margin-left: -10px;
 }
 
@@ -6557,7 +6543,6 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   position: relative;
   touch-action: none;
   width: 100%;
-  direction: ltr;
 }
 
 .emotion-12 {
@@ -6617,9 +6602,6 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  margin-left: -10px;
-  margin-top: 5px;
-  width: 20px;
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -6630,14 +6612,16 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
+  margin-top: 5px;
   outline: 0;
-  position: absolute;
   pointer-events: none;
+  position: absolute;
   top: 0;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  width: 20px;
   margin-left: -10px;
 }
 
@@ -6847,7 +6831,6 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   position: relative;
   touch-action: none;
   width: 100%;
-  direction: ltr;
 }
 
 .emotion-12 {
@@ -6907,9 +6890,6 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  margin-left: -10px;
-  margin-top: 5px;
-  width: 20px;
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -6920,14 +6900,16 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
+  margin-top: 5px;
   outline: 0;
-  position: absolute;
   pointer-events: none;
+  position: absolute;
   top: 0;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  width: 20px;
   margin-left: -10px;
 }
 
