@@ -87,10 +87,6 @@ describe( 'adding blocks from block directory', () => {
 		await createNewPost();
 	} );
 
-	afterEach( async () => {
-		await setUpResponseMocking( [] );
-	} );
-
 	it( 'Should show an empty state when no plugin is found.', async () => {
 		// Be super weird so there won't be a matching block installed
 		const impossibleBlockName = '@#$@@Dsdsdfw2#$@';
@@ -153,6 +149,17 @@ describe( 'adding blocks from block directory', () => {
 
 		// Search for the block via the inserter
 		await searchForBlock( mockBlock1.title );
+
+		const editor = await page.waitForSelector(
+			'.block-directory-downloadable-blocks-list'
+		);
+
+		const html = await page.evaluate( ( el ) => {
+			return el.innerHTML;
+		}, editor );
+
+		// eslint-disable-next-line no-console
+		console.log( html );
 
 		// Grab the first block in the list -> Needs to be the first one, the mock response expects it.
 		const addBtn = await page.waitForSelector(
