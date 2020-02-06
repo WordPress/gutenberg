@@ -47,7 +47,10 @@ export function isValidHref( href ) {
 
 		// Add some extra checks for http(s) URIs, since these are the most common use-case.
 		// This ensures URIs with an http protocol have exactly two forward slashes following the protocol.
-		if ( startsWith( protocol, 'http' ) && ! /^https?:\/\/[^\/\s]/i.test( trimmedHref ) ) {
+		if (
+			startsWith( protocol, 'http' ) &&
+			! /^https?:\/\/[^\/\s]/i.test( trimmedHref )
+		) {
 			return false;
 		}
 

@@ -10,7 +10,8 @@ import {
 	searchForBlock,
 } from '@wordpress/e2e-test-utils';
 
-const INSERTER_BUTTON_SELECTOR = '.components-popover__content .block-editor-block-types-list__item';
+const INSERTER_BUTTON_SELECTOR =
+	'.components-popover__content .block-editor-block-types-list__item';
 const INSERTER_ICON_WRAPPER_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .block-editor-block-types-list__item-icon`;
 const INSERTER_ICON_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .block-editor-block-icon`;
 const INSPECTOR_ICON_SELECTOR = '.edit-post-sidebar .block-editor-block-icon';
@@ -37,14 +38,19 @@ async function getFirstInserterIcon() {
 
 async function selectFirstBlock() {
 	await pressKeyWithModifier( 'access', 'o' );
-	const navButtons = await page.$$( '.block-editor-block-navigation__item-button' );
+	const navButtons = await page.$$(
+		'.block-editor-block-navigation__item-button'
+	);
 	await navButtons[ 0 ].click();
 }
 
 describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 	const dashIconRegex = /<svg.*?class=".*?dashicons-cart.*?">.*?<\/svg>/;
-	const circleString = '<circle cx="10" cy="10" r="10" fill="red" stroke="blue" stroke-width="10"></circle>';
-	const svgIcon = new RegExp( `<svg.*?viewBox="0 0 20 20".*?>${ circleString }</svg>` );
+	const circleString =
+		'<circle cx="10" cy="10" r="10" fill="red" stroke="blue" stroke-width="10"></circle>';
+	const svgIcon = new RegExp(
+		`<svg.*?viewBox="0 0 20 20".*?>${ circleString }</svg>`
+	);
 
 	const validateSvgIcon = ( iconHtml ) => {
 		expect( iconHtml ).toMatch( svgIcon );
@@ -75,7 +81,9 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 		it( 'Can insert the block', async () => {
 			await insertBlock( blockTitle );
 			expect(
-				await getInnerHTML( `[data-type="${ blockName }"] [data-type="core/paragraph"] p` )
+				await getInnerHTML(
+					`[data-type="${ blockName }"] [data-type="core/paragraph"] p`
+				)
 			).toEqual( blockTitle );
 		} );
 
@@ -109,18 +117,24 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 		it( 'Renders the icon in the inserter with the correct colors', async () => {
 			await searchForBlock( blockTitle );
 			validateDashIcon( await getFirstInserterIcon() );
-			expect( await getBackgroundColor( INSERTER_ICON_WRAPPER_SELECTOR ) ).toEqual( 'rgb(1, 0, 0)' );
-			expect( await getColor( INSERTER_ICON_WRAPPER_SELECTOR ) ).toEqual( 'rgb(254, 0, 0)' );
+			expect(
+				await getBackgroundColor( INSERTER_ICON_WRAPPER_SELECTOR )
+			).toEqual( 'rgb(1, 0, 0)' );
+			expect( await getColor( INSERTER_ICON_WRAPPER_SELECTOR ) ).toEqual(
+				'rgb(254, 0, 0)'
+			);
 		} );
 
 		it( 'Renders the icon in the inspector with the correct colors', async () => {
 			await insertBlock( blockTitle );
 			await selectFirstBlock();
-			validateDashIcon(
-				await getInnerHTML( INSPECTOR_ICON_SELECTOR )
+			validateDashIcon( await getInnerHTML( INSPECTOR_ICON_SELECTOR ) );
+			expect(
+				await getBackgroundColor( INSPECTOR_ICON_SELECTOR )
+			).toEqual( 'rgb(1, 0, 0)' );
+			expect( await getColor( INSPECTOR_ICON_SELECTOR ) ).toEqual(
+				'rgb(254, 0, 0)'
 			);
-			expect( await getBackgroundColor( INSPECTOR_ICON_SELECTOR ) ).toEqual( 'rgb(1, 0, 0)' );
-			expect( await getColor( INSPECTOR_ICON_SELECTOR ) ).toEqual( 'rgb(254, 0, 0)' );
 		} );
 	} );
 
@@ -129,18 +143,24 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 		it( 'Renders the icon in the inserter with the correct background color and an automatically compute readable foreground color', async () => {
 			await searchForBlock( blockTitle );
 			validateSvgIcon( await getFirstInserterIcon() );
-			expect( await getBackgroundColor( INSERTER_ICON_WRAPPER_SELECTOR ) ).toEqual( 'rgb(1, 0, 0)' );
-			expect( await getColor( INSERTER_ICON_WRAPPER_SELECTOR ) ).toEqual( 'rgb(248, 249, 249)' );
+			expect(
+				await getBackgroundColor( INSERTER_ICON_WRAPPER_SELECTOR )
+			).toEqual( 'rgb(1, 0, 0)' );
+			expect( await getColor( INSERTER_ICON_WRAPPER_SELECTOR ) ).toEqual(
+				'rgb(248, 249, 249)'
+			);
 		} );
 
 		it( 'Renders correctly the icon on the inspector', async () => {
 			await insertBlock( blockTitle );
 			await selectFirstBlock();
-			validateSvgIcon(
-				await getInnerHTML( INSPECTOR_ICON_SELECTOR )
+			validateSvgIcon( await getInnerHTML( INSPECTOR_ICON_SELECTOR ) );
+			expect(
+				await getBackgroundColor( INSPECTOR_ICON_SELECTOR )
+			).toEqual( 'rgb(1, 0, 0)' );
+			expect( await getColor( INSPECTOR_ICON_SELECTOR ) ).toEqual(
+				'rgb(248, 249, 249)'
 			);
-			expect( await getBackgroundColor( INSPECTOR_ICON_SELECTOR ) ).toEqual( 'rgb(1, 0, 0)' );
-			expect( await getColor( INSPECTOR_ICON_SELECTOR ) ).toEqual( 'rgb(248, 249, 249)' );
 		} );
 	} );
 } );

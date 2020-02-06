@@ -4,15 +4,21 @@
 import { __experimentalText as Text } from '../text.styles';
 
 export default {
-	title: 'Components|Experimental/Text',
+	title: 'Components/Experimental/Text',
 	component: Text,
 };
 
 export const _default = () => (
 	<>
-		<Text variant="title.large" as="h1">Title Large</Text>
-		<Text variant="title.medium" as="h2">Title Medium</Text>
-		<Text variant="title.small" as="h3">Title Small</Text>
+		<Text variant="title.large" as="h1">
+			Title Large
+		</Text>
+		<Text variant="title.medium" as="h2">
+			Title Medium
+		</Text>
+		<Text variant="title.small" as="h3">
+			Title Small
+		</Text>
 		<Text variant="subtitle">Subtitle</Text>
 		<Text variant="subtitle.small">Subtitle Small</Text>
 		<Text variant="body">Body</Text>
@@ -23,12 +29,26 @@ export const _default = () => (
 	</>
 );
 
-export const TitleLarge = () => <Text variant="title.large" as="h1">Title Large</Text>;
-export const TitleMedium = () => <Text variant="title.medium" as="h2">Title Medium</Text>;
-export const TitleSmall = () => <Text variant="title.small" as="h3">Title Small</Text>;
+export const TitleLarge = () => (
+	<Text variant="title.large" as="h1">
+		Title Large
+	</Text>
+);
+export const TitleMedium = () => (
+	<Text variant="title.medium" as="h2">
+		Title Medium
+	</Text>
+);
+export const TitleSmall = () => (
+	<Text variant="title.small" as="h3">
+		Title Small
+	</Text>
+);
 
 export const Subtitle = () => <Text variant="subtitle">Subtitle</Text>;
-export const SubtitleSmall = () => <Text variant="subtitle.small">Subtitle Small</Text>;
+export const SubtitleSmall = () => (
+	<Text variant="subtitle.small">Subtitle Small</Text>
+);
 
 export const Body = () => <Text variant="body">Body</Text>;
 export const BodySmall = () => <Text variant="body.small">Body Small</Text>;

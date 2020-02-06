@@ -15,7 +15,8 @@ export default function useMediaQuery( query ) {
 		if ( ! query ) {
 			return;
 		}
-		const updateMatch = () => setMatch( window.matchMedia( query ).matches );
+		const updateMatch = () =>
+			setMatch( window.matchMedia( query ).matches );
 		updateMatch();
 		const list = window.matchMedia( query );
 		list.addListener( updateMatch );

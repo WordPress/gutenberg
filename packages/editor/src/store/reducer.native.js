@@ -49,16 +49,18 @@ export const postTitle = combineReducers( {
 	},
 } );
 
-export default optimist( combineReducers( {
-	postId,
-	postType,
-	postTitle,
-	preferences,
-	saving,
-	postLock,
-	postSavingLock,
-	reusableBlocks,
-	template,
-	isReady,
-	editorSettings,
-} ) );
+export default optimist(
+	combineReducers( {
+		postId,
+		postType,
+		postTitle,
+		preferences,
+		saving,
+		postLock,
+		postSavingLock,
+		reusableBlocks,
+		template,
+		isReady,
+		editorSettings,
+	} )
+);

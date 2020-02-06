@@ -2,20 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useCallback,
-	useEffect,
-	useState,
-} from '@wordpress/element';
-import {
-	compose,
-} from '@wordpress/compose';
+import { useCallback, useState } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import {
 	KeyboardShortcuts,
 	PanelBody,
@@ -25,6 +18,7 @@ import {
 	withFallbackStyles,
 	ToolbarButton,
 	ToolbarGroup,
+	Popover,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -36,10 +30,7 @@ import {
 	withColors,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
-import {
-	rawShortcut,
-	displayShortcut,
-} from '@wordpress/keycodes';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
 const { getComputedStyle } = window;
 
@@ -48,10 +39,19 @@ const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	const backgroundColorValue = backgroundColor && backgroundColor.color;
 	const textColorValue = textColor && textColor.color;
 	//avoid the use of querySelector if textColor color is known and verify if node is available.
-	const textNode = ! textColorValue && node ? node.querySelector( '[contenteditable="true"]' ) : null;
+	const textNode =
+		! textColorValue && node
+			? node.querySelector( '[contenteditable="true"]' )
+			: null;
 	return {
-		fallbackBackgroundColor: backgroundColorValue || ! node ? undefined : getComputedStyle( node ).backgroundColor,
-		fallbackTextColor: textColorValue || ! textNode ? undefined : getComputedStyle( textNode ).color,
+		fallbackBackgroundColor:
+			backgroundColorValue || ! node
+				? undefined
+				: getComputedStyle( node ).backgroundColor,
+		fallbackTextColor:
+			textColorValue || ! textNode
+				? undefined
+				: getComputedStyle( textNode ).color,
 	};
 } );
 
@@ -68,7 +68,7 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 		[ setAttributes ]
 	);
 	return (
-		<PanelBody title={ __( 'Border Settings' ) }>
+		<PanelBody title={ __( 'Border settings' ) }>
 			<RangeControl
 				value={ borderRadius }
 				label={ __( 'Border Radius' ) }
@@ -82,37 +82,37 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 	);
 }
 
-function URLPicker( { isSelected, url, title, setAttributes, opensInNewTab, onToggleOpenInNewTab } ) {
+function URLPicker( {
+	isSelected,
+	url,
+	setAttributes,
+	opensInNewTab,
+	onToggleOpenInNewTab,
+} ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
-	useEffect(
-		() => {
-			if ( ! isSelected ) {
-				setIsURLPickerOpen( false );
-			}
-		},
-		[ isSelected ]
-	);
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
 	};
 	const linkControl = isURLPickerOpen && (
-		<LinkControl
-			className="wp-block-navigation-link__inline-link-input"
-			value={ { url, title, opensInNewTab } }
-			onChange={ ( { title: newTitle = '', url: newURL = '', opensInNewTab: newOpensInNewTab } ) => {
-				setAttributes( {
-					title: escape( newTitle ),
-					url: newURL,
-				} );
+		<Popover
+			position="bottom center"
+			onClose={ () => setIsURLPickerOpen( false ) }
+		>
+			<LinkControl
+				className="wp-block-navigation-link__inline-link-input"
+				value={ { url, opensInNewTab } }
+				onChange={ ( {
+					url: newURL = '',
+					opensInNewTab: newOpensInNewTab,
+				} ) => {
+					setAttributes( { url: newURL } );
 
-				if ( opensInNewTab !== newOpensInNewTab ) {
-					onToggleOpenInNewTab( newOpensInNewTab );
-				}
-			} }
-			onClose={ () => {
-				setIsURLPickerOpen( false );
-			} }
-		/>
+					if ( opensInNewTab !== newOpensInNewTab ) {
+						onToggleOpenInNewTab( newOpensInNewTab );
+					}
+				} }
+			/>
+		</Popover>
 	);
 	return (
 		<>
@@ -158,7 +158,6 @@ function ButtonEdit( {
 		placeholder,
 		rel,
 		text,
-		title,
 		url,
 	} = attributes;
 	const onSetLinkRel = useCallback(
@@ -193,33 +192,32 @@ function ButtonEdit( {
 	} = __experimentalUseGradient();
 
 	return (
-		<div className={ className } title={ title }>
+		<div className={ className }>
 			<RichText
 				placeholder={ placeholder || __( 'Add text…' ) }
 				value={ text }
 				onChange={ ( value ) => setAttributes( { text: value } ) }
 				withoutInteractiveFormatting
-				className={ classnames(
-					'wp-block-button__link', {
-						'has-background': backgroundColor.color || gradientValue,
-						[ backgroundColor.class ]: ! gradientValue && backgroundColor.class,
-						'has-text-color': textColor.color,
-						[ textColor.class ]: textColor.class,
-						[ gradientClass ]: gradientClass,
-						'no-border-radius': borderRadius === 0,
-					}
-				) }
+				className={ classnames( 'wp-block-button__link', {
+					'has-background': backgroundColor.color || gradientValue,
+					[ backgroundColor.class ]:
+						! gradientValue && backgroundColor.class,
+					'has-text-color': textColor.color,
+					[ textColor.class ]: textColor.class,
+					[ gradientClass ]: gradientClass,
+					'no-border-radius': borderRadius === 0,
+				} ) }
 				style={ {
-					...( ! backgroundColor.color && gradientValue ?
-						{ background: gradientValue } :
-						{ backgroundColor: backgroundColor.color }
-					),
+					...( ! backgroundColor.color && gradientValue
+						? { background: gradientValue }
+						: { backgroundColor: backgroundColor.color } ),
 					color: textColor.color,
-					borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+					borderRadius: borderRadius
+						? borderRadius + 'px'
+						: undefined,
 				} }
 			/>
 			<URLPicker
-				title={ title }
 				url={ url }
 				setAttributes={ setAttributes }
 				isSelected={ isSelected }

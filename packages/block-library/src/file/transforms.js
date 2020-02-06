@@ -27,11 +27,13 @@ const transforms = {
 					const blobURL = createBlobURL( file );
 
 					// File will be uploaded in componentDidMount()
-					blocks.push( createBlock( 'core/file', {
-						href: blobURL,
-						fileName: file.name,
-						textLinkHref: blobURL,
-					} ) );
+					blocks.push(
+						createBlock( 'core/file', {
+							href: blobURL,
+							fileName: file.name,
+							textLinkHref: blobURL,
+						} )
+					);
 				} );
 
 				return blocks;

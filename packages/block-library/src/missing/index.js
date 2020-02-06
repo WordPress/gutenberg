@@ -30,7 +30,9 @@ export const settings = {
 		if ( context === 'accessibility' ) {
 			const { originalName } = attributes;
 
-			const originalBlockType = originalName ? getBlockType( originalName ) : undefined;
+			const originalBlockType = originalName
+				? getBlockType( originalName )
+				: undefined;
 
 			if ( originalBlockType ) {
 				return originalBlockType.settings.title || originalName;

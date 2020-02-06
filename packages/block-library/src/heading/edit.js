@@ -46,15 +46,33 @@ function HeadingEdit( {
 	return (
 		<>
 			<BlockControls>
-				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-				<AlignmentToolbar value={ align } onChange={ ( nextAlign ) => {
-					setAttributes( { align: nextAlign } );
-				} } />
+				<HeadingToolbar
+					minLevel={ 2 }
+					maxLevel={ 5 }
+					selectedLevel={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
+				/>
+				<AlignmentToolbar
+					value={ align }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { align: nextAlign } );
+					} }
+				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Heading Settings' ) }>
+				<PanelBody title={ __( 'Heading settings' ) }>
 					<p>{ __( 'Level' ) }</p>
-					<HeadingToolbar isCollapsed={ false } minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+					<HeadingToolbar
+						isCollapsed={ false }
+						minLevel={ 1 }
+						maxLevel={ 7 }
+						selectedLevel={ level }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
+					/>
 				</PanelBody>
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
@@ -64,7 +82,9 @@ function HeadingEdit( {
 					identifier="content"
 					tagName={ tagName }
 					value={ content }
-					onChange={ ( value ) => setAttributes( { content: value } ) }
+					onChange={ ( value ) =>
+						setAttributes( { content: value } )
+					}
 					onMerge={ mergeBlocks }
 					onSplit={ ( value ) => {
 						if ( ! value ) {

@@ -21,7 +21,7 @@ export default class PlainText extends Component {
 
 	componentDidMount() {
 		// if isSelected is true, we should request the focus on this TextInput
-		if ( ( this._input.isFocused() === false ) && ( this._input.props.isSelected === true ) ) {
+		if ( this._input.isFocused() === false && this.props.isSelected ) {
 			this.focus();
 		}
 	}
@@ -40,14 +40,19 @@ export default class PlainText extends Component {
 		return (
 			<TextInput
 				{ ...this.props }
-				ref={ ( x ) => this._input = x }
+				ref={ ( x ) => ( this._input = x ) }
 				onChange={ ( event ) => {
 					this.props.onChange( event.nativeEvent.text );
 				} }
 				onFocus={ this.props.onFocus } // always assign onFocus as a props
 				onBlur={ this.props.onBlur } // always assign onBlur as a props
-				fontFamily={ ( this.props.style && this.props.style.fontFamily ) || ( styles[ 'block-editor-plain-text' ].fontFamily ) }
-				style={ this.props.style || styles[ 'block-editor-plain-text' ] }
+				fontFamily={
+					( this.props.style && this.props.style.fontFamily ) ||
+					styles[ 'block-editor-plain-text' ].fontFamily
+				}
+				style={
+					this.props.style || styles[ 'block-editor-plain-text' ]
+				}
 			/>
 		);
 	}

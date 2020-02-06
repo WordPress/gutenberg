@@ -3,6 +3,14 @@
 exports[`Buttons can jump to the link editor using the keyboard shortcut 1`] = `
 "<!-- wp:buttons -->
 <div class=\\"wp-block-buttons\\"><!-- wp:button -->
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\" href=\\"https://www.wordpress.org/\\">WordPress</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->"
+`;
+
+exports[`Buttons dismisses link editor when escape is pressed 1`] = `
+"<!-- wp:buttons -->
+<div class=\\"wp-block-buttons\\"><!-- wp:button -->
 <div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\">WordPress</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->"

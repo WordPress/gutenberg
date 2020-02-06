@@ -120,7 +120,7 @@ const registerBlock = ( block ) => {
 
 // only enable code block for development
 // eslint-disable-next-line no-undef
-const devOnly = ( block ) => !! __DEV__ ? block : null;
+const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 
 /**
  * Function to register core blocks provided by the block editor.
@@ -148,8 +148,9 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		preformatted,
 		gallery,
-		devOnly( group ),
+		group,
 		spacer,
+		shortcode,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

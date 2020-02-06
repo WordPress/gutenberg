@@ -279,7 +279,7 @@
 			left: $admin-sidebar-width-collapsed;
 		}
 
-		@include break-large() {
+		@media (min-width: #{ ($break-large + 1) }) {
 			left: $admin-sidebar-width;
 		}
 	}
@@ -428,7 +428,7 @@
 	}
 
 	select {
-		padding: 2px;
+		padding: 3px 24px 3px 8px;
 		font-size: $default-font-size;
 		color: $dark-gray-500;
 

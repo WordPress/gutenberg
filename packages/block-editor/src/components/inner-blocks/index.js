@@ -10,7 +10,10 @@ import classnames from 'classnames';
 import { withViewportMatch } from '@wordpress/viewport';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
+import {
+	synchronizeBlocksWithTemplate,
+	withBlockContentContext,
+} from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { compose } from '@wordpress/compose';
 
@@ -41,6 +44,7 @@ class InnerBlocks extends Component {
 			templateLock,
 			__experimentalBlocks,
 			replaceInnerBlocks,
+			__unstableMarkNextChangeAsNotPersistent,
 		} = this.props;
 		const { innerBlocks } = block;
 		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
@@ -56,6 +60,7 @@ class InnerBlocks extends Component {
 
 		// Set controlled blocks value from parent, if any.
 		if ( __experimentalBlocks ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			replaceInnerBlocks( __experimentalBlocks );
 		}
 	}
@@ -74,7 +79,10 @@ class InnerBlocks extends Component {
 		this.updateNestedSettings();
 		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
 		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
-			const hasTemplateChanged = ! isEqual( template, prevProps.template );
+			const hasTemplateChanged = ! isEqual(
+				template,
+				prevProps.template
+			);
 			if ( hasTemplateChanged ) {
 				this.synchronizeBlocksWithTemplate();
 			}
@@ -99,8 +107,11 @@ class InnerBlocks extends Component {
 		const { innerBlocks } = block;
 
 		// Synchronize with templates. If the next set differs, replace.
-		const nextBlocks = synchronizeBlocksWithTemplate( innerBlocks, template );
-		if ( ! isEqual( nextBlocks, innerBlocks	) ) {
+		const nextBlocks = synchronizeBlocksWithTemplate(
+			innerBlocks,
+			template
+		);
+		if ( ! isEqual( nextBlocks, innerBlocks ) ) {
 			replaceInnerBlocks( nextBlocks );
 		}
 	}
@@ -114,13 +125,17 @@ class InnerBlocks extends Component {
 			parentLock,
 			__experimentalCaptureToolbars,
 			__experimentalMoverDirection,
+			__experimentalUIParts,
 		} = this.props;
 
 		const newSettings = {
 			allowedBlocks,
-			templateLock: templateLock === undefined ? parentLock : templateLock,
-			__experimentalCaptureToolbars: __experimentalCaptureToolbars || false,
+			templateLock:
+				templateLock === undefined ? parentLock : templateLock,
+			__experimentalCaptureToolbars:
+				__experimentalCaptureToolbars || false,
 			__experimentalMoverDirection,
+			__experimentalUIParts,
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
@@ -146,10 +161,7 @@ class InnerBlocks extends Component {
 		return (
 			<div className={ classes }>
 				{ ! templateInProcess && (
-					<BlockList
-						rootClientId={ clientId }
-						{ ...props }
-					/>
+					<BlockList rootClientId={ clientId } { ...props } />
 				) }
 			</div>
 		);
@@ -177,7 +189,10 @@ InnerBlocks = compose( [
 		return {
 			block,
 			blockListSettings: getBlockListSettings( clientId ),
-			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
+			hasOverlay:
+				block.name !== 'core/template' &&
+				! isBlockSelected( clientId ) &&
+				! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
 			enableClickThrough: isNavigationMode() || isSmallScreen,
 			isLastBlockChangePersistent: isLastBlockChangePersistent(),
@@ -186,9 +201,14 @@ InnerBlocks = compose( [
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			replaceInnerBlocks,
+			__unstableMarkNextChangeAsNotPersistent,
 			updateBlockListSettings,
 		} = dispatch( 'core/block-editor' );
-		const { block, clientId, templateInsertUpdatesSelection = true } = ownProps;
+		const {
+			block,
+			clientId,
+			templateInsertUpdatesSelection = true,
+		} = ownProps;
 
 		return {
 			replaceInnerBlocks( blocks ) {
@@ -200,6 +220,7 @@ InnerBlocks = compose( [
 						blocks.length !== 0
 				);
 			},
+			__unstableMarkNextChangeAsNotPersistent,
 			updateNestedSettings( settings ) {
 				dispatch( updateBlockListSettings( clientId, settings ) );
 			},
@@ -211,9 +232,9 @@ InnerBlocks = compose( [
 InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
-InnerBlocks.Content = withBlockContentContext(
-	( { BlockContent } ) => <BlockContent />
-);
+InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
+	<BlockContent />
+) );
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md

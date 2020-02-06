@@ -10,7 +10,7 @@ import { isString } from 'lodash';
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect, withDispatch, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -28,16 +28,20 @@ const ShortcutList = ( { shortcuts } ) => (
 	 * Safari+VoiceOver won't announce the list otherwise.
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
-	<ul className="edit-post-keyboard-shortcut-help-modal__shortcut-list" role="list">
+	<ul
+		className="edit-post-keyboard-shortcut-help-modal__shortcut-list"
+		role="list"
+	>
 		{ shortcuts.map( ( shortcut, index ) => (
 			<li
 				className="edit-post-keyboard-shortcut-help-modal__shortcut"
 				key={ index }
 			>
-				{ isString( shortcut ) ?
-					<DynamicShortcut name={ shortcut } /> :
+				{ isString( shortcut ) ? (
+					<DynamicShortcut name={ shortcut } />
+				) : (
 					<Shortcut { ...shortcut } />
-				}
+				) }
 			</li>
 		) ) }
 	</ul>
@@ -45,7 +49,12 @@ const ShortcutList = ( { shortcuts } ) => (
 );
 
 const ShortcutSection = ( { title, shortcuts, className } ) => (
-	<section className={ classnames( 'edit-post-keyboard-shortcut-help-modal__section', className ) }>
+	<section
+		className={ classnames(
+			'edit-post-keyboard-shortcut-help-modal__section',
+			className
+		) }
+	>
 		{ !! title && (
 			<h2 className="edit-post-keyboard-shortcut-help-modal__section-title">
 				{ title }
@@ -55,8 +64,32 @@ const ShortcutSection = ( { title, shortcuts, className } ) => (
 	</section>
 );
 
+const ShortcutCategorySection = ( {
+	title,
+	categoryName,
+	additionalShortcuts = [],
+} ) => {
+	const categoryShortcuts = useSelect(
+		( select ) => {
+			return select( 'core/keyboard-shortcuts' ).getCategoryShortcuts(
+				categoryName
+			);
+		},
+		[ categoryName ]
+	);
+
+	return (
+		<ShortcutSection
+			title={ title }
+			shortcuts={ categoryShortcuts.concat( additionalShortcuts ) }
+		/>
+	);
+};
+
 export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
-	useShortcut( 'core/edit-post/keyboard-shortcuts', toggleModal, { bindGlobal: true } );
+	useShortcut( 'core/edit-post/keyboard-shortcuts', toggleModal, {
+		bindGlobal: true,
+	} );
 
 	if ( ! isModalActive ) {
 		return null;
@@ -73,37 +106,25 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 				className="edit-post-keyboard-shortcut-help-modal__main-shortcuts"
 				shortcuts={ [ 'core/edit-post/keyboard-shortcuts' ] }
 			/>
-			<ShortcutSection
+			<ShortcutCategorySection
 				title={ __( 'Global shortcuts' ) }
-				shortcuts={ [
-					'core/editor/save',
-					'core/editor/undo',
-					'core/editor/redo',
-					'core/edit-post/toggle-sidebar',
-					'core/edit-post/toggle-block-navigation',
-					'core/edit-post/next-region',
-					'core/edit-post/previous-region',
-					'core/block-editor/focus-toolbar',
-					'core/edit-post/toggle-mode',
-				] }
+				categoryName="global"
 			/>
-			<ShortcutSection
+
+			<ShortcutCategorySection
 				title={ __( 'Selection shortcuts' ) }
-				shortcuts={ [
-					'core/block-editor/select-all',
-					'core/block-editor/unselect',
-				] }
+				categoryName="selection"
 			/>
-			<ShortcutSection
+
+			<ShortcutCategorySection
 				title={ __( 'Block shortcuts' ) }
-				shortcuts={ [
-					'core/block-editor/duplicate',
-					'core/block-editor/remove',
-					'core/block-editor/insert-before',
-					'core/block-editor/insert-after',
+				categoryName="block"
+				additionalShortcuts={ [
 					{
 						keyCombination: { character: '/' },
-						description: __( 'Change the block type after adding a new paragraph.' ),
+						description: __(
+							'Change the block type after adding a new paragraph.'
+						),
 						/* translators: The forward-slash character. e.g. '/'. */
 						ariaLabel: __( 'Forward-slash' ),
 					},
@@ -122,13 +143,11 @@ export default compose( [
 		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
 	} ) ),
 	withDispatch( ( dispatch, { isModalActive } ) => {
-		const {
-			openModal,
-			closeModal,
-		} = dispatch( 'core/edit-post' );
+		const { openModal, closeModal } = dispatch( 'core/edit-post' );
 
 		return {
-			toggleModal: () => isModalActive ? closeModal() : openModal( MODAL_NAME ),
+			toggleModal: () =>
+				isModalActive ? closeModal() : openModal( MODAL_NAME ),
 		};
 	} ),
 ] )( KeyboardShortcutHelpModal );

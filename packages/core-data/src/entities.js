@@ -14,9 +14,27 @@ export const DEFAULT_ENTITY_KEY = 'id';
 export const defaultEntities = [
 	{ name: 'site', kind: 'root', baseURL: '/wp/v2/settings' },
 	{ name: 'postType', kind: 'root', key: 'slug', baseURL: '/wp/v2/types' },
-	{ name: 'media', kind: 'root', baseURL: '/wp/v2/media', plural: 'mediaItems' },
-	{ name: 'taxonomy', kind: 'root', key: 'slug', baseURL: '/wp/v2/taxonomies', plural: 'taxonomies' },
-	{ name: 'widgetArea', kind: 'root', baseURL: '/__experimental/widget-areas', plural: 'widgetAreas', transientEdits: { blocks: true } },
+	{
+		name: 'media',
+		kind: 'root',
+		baseURL: '/wp/v2/media',
+		plural: 'mediaItems',
+	},
+	{
+		name: 'taxonomy',
+		kind: 'root',
+		key: 'slug',
+		baseURL: '/wp/v2/taxonomies',
+		plural: 'taxonomies',
+	},
+	{
+		name: 'widgetArea',
+		kind: 'root',
+		baseURL: '/__experimental/widget-areas',
+		plural: 'widgetAreas',
+		transientEdits: { blocks: true },
+	},
+	{ name: 'user', kind: 'root', baseURL: '/wp/v2/users', plural: 'users' },
 ];
 
 export const kinds = [
@@ -52,7 +70,9 @@ function* loadPostTypeEntities() {
  * @return {Promise} Entities promise
  */
 function* loadTaxonomyEntities() {
-	const taxonomies = yield apiFetch( { path: '/wp/v2/taxonomies?context=edit' } );
+	const taxonomies = yield apiFetch( {
+		path: '/wp/v2/taxonomies?context=edit',
+	} );
 	return map( taxonomies, ( taxonomy, name ) => {
 		return {
 			kind: 'taxonomy',
@@ -72,11 +92,20 @@ function* loadTaxonomyEntities() {
  *
  * @return {string} Method name
  */
-export const getMethodName = ( kind, name, prefix = 'get', usePlural = false ) => {
+export const getMethodName = (
+	kind,
+	name,
+	prefix = 'get',
+	usePlural = false
+) => {
 	const entity = find( defaultEntities, { kind, name } );
 	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
-	const nameSuffix = upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
-	const suffix = usePlural && entity.plural ? upperFirst( camelCase( entity.plural ) ) : nameSuffix;
+	const nameSuffix =
+		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
+	const suffix =
+		usePlural && entity.plural
+			? upperFirst( camelCase( entity.plural ) )
+			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
 

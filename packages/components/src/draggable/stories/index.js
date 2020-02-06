@@ -9,7 +9,7 @@ import { useState } from '@wordpress/element';
 import Draggable from '../';
 import Dashicon from '../../dashicon';
 
-export default { title: 'Components|Draggable', component: Draggable };
+export default { title: 'Components/Draggable', component: Draggable };
 
 const Box = ( props ) => {
 	return (
@@ -35,7 +35,10 @@ const DraggalbeExample = () => {
 	return (
 		<div>
 			<p>Is Dragging? { isDragging ? 'Yes' : 'No' }</p>
-			<div id="draggable-example-box" style={ { display: 'inline-flex' } }>
+			<div
+				id="draggable-example-box"
+				style={ { display: 'inline-flex' } }
+			>
 				<Draggable elementId="draggable-example-box">
 					{ ( { onDraggableStart, onDraggableEnd } ) => {
 						const handleOnDragStart = ( event ) => {

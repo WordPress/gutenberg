@@ -40,9 +40,9 @@ const wpCliRun = ( command, isTests = false ) =>
 const setupSite = ( isTests = false ) =>
 	wpCliRun(
 		`wp core install --url=localhost:${
-			isTests ?
-				process.env.WP_ENV_TESTS_PORT || 8889 :
-				process.env.WP_ENV_PORT || 8888
+			isTests
+				? process.env.WP_ENV_TESTS_PORT || 8889
+				: process.env.WP_ENV_PORT || 8888
 		} --title=${ cwdName } --admin_user=admin --admin_password=password --admin_email=admin@wordpress.org`,
 		isTests
 	);
@@ -65,7 +65,8 @@ module.exports = {
 						// so received objects plus indexed objects should equal twice
 						// the total number of objects when done.
 						const percent = (
-							( ( progress.receivedObjects() + progress.indexedObjects() ) /
+							( ( progress.receivedObjects() +
+								progress.indexedObjects() ) /
 								( progress.totalObjects() * 2 ) ) *
 							100
 						).toFixed( 0 );
@@ -235,10 +236,14 @@ module.exports = {
 		);
 		if ( result.out ) {
 			// eslint-disable-next-line no-console
-			console.log( `\n\n${ result.out }\n\n` );
+			console.log(
+				process.stdout.isTTY ? `\n\n${ result.out }\n\n` : result.out
+			);
 		} else if ( result.err ) {
 			// eslint-disable-next-line no-console
-			console.error( `\n\n${ result.err }\n\n` );
+			console.error(
+				process.stdout.isTTY ? `\n\n${ result.err }\n\n` : result.err
+			);
 			throw result.err;
 		}
 

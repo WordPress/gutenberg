@@ -28,6 +28,7 @@ function gutenberg_edit_site_page() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
+	global $_wp_current_template_id;
 	if ( 'gutenberg_page_gutenberg-edit-site' !== $hook ) {
 		return;
 	}
@@ -72,6 +73,12 @@ function gutenberg_edit_site_init( $hook ) {
 	if ( false !== $font_sizes ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
+
+	// Get root template by trigerring `./template-loader.php`'s logic.
+	get_front_page_template();
+	get_index_template();
+	apply_filters( 'template_include', null );
+	$settings['templateId'] = $_wp_current_template_id;
 
 	// Initialize editor.
 	wp_add_inline_script(

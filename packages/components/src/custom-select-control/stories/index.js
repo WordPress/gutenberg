@@ -3,7 +3,10 @@
  */
 import CustomSelectControl from '../';
 
-export default { title: 'CustomSelectControl', component: CustomSelectControl };
+export default {
+	title: 'Components/CustomSelectControl',
+	component: CustomSelectControl,
+};
 
 const options = [
 	{
