@@ -59,37 +59,20 @@
 .block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__toggle.has-icon {
 	padding: 0;
 
-	.block-editor-block-icon,
-	.block-editor-block-switcher__transform {
+	.block-editor-block-icon {
 		height: 100%;
 		position: relative;
 		margin: 0 auto;
 		display: flex;
 		align-items: center;
-		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
-		@include reduce-motion("transition");
-	}
-
-	// Position the focus rectangle.
-	&:focus::before {
-		top: 50%;
-		transform: translateY(-50%);
-	}
-
-	// Block hover and focus style.
-	&[aria-expanded="true"] .block-editor-block-icon,
-	&[aria-expanded="true"] .block-editor-block-switcher__transform,
-	&:not(:disabled):hover .block-editor-block-icon,
-	&:not(:disabled):hover .block-editor-block-switcher__transform,
-	&:not(:disabled):focus .block-editor-block-icon,
-	&:not(:disabled):focus .block-editor-block-switcher__transform {
-		transform: translateY(-100%);
 	}
 
 	// Position the focus style correctly.
 	&::before {
-		left: $grid-unit-10;
+		top: $grid-unit-10;
 		right: $grid-unit-10;
+		bottom: $grid-unit-10;
+		left: $grid-unit-10;
 	}
 }
 
@@ -180,16 +163,6 @@
 
 		.block-editor-block-switcher__transform {
 			padding: $grid-unit-15;
-		}
-
-		// Block hover and focus style.
-		&[aria-expanded="true"] .block-editor-block-icon,
-		&[aria-expanded="true"] .block-editor-block-switcher__transform,
-		&:not(:disabled):hover .block-editor-block-icon,
-		&:not(:disabled):hover .block-editor-block-switcher__transform,
-		&:not(:disabled):focus .block-editor-block-icon,
-		&:not(:disabled):focus .block-editor-block-switcher__transform {
-			transform: translateY(-$block-toolbar-height);
 		}
 	}
 }
