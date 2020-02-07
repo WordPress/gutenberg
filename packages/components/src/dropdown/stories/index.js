@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
+import {
+	more,
+	arrowLeft,
+	arrowRight,
+	arrowUp,
+	arrowDown,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,7 +26,7 @@ const DropdownAndDropdownMenuExample = () => {
 			<div>
 				<p>This is a DropdownMenu component:</p>
 				<DropdownMenu
-					icon="move"
+					icon={ more }
 					label="Select a direction"
 					controls={ [
 						{
@@ -50,7 +56,7 @@ const DropdownAndDropdownMenuExample = () => {
 					position="bottom right"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
-							icon="move"
+							icon={ more }
 							onClick={ onToggle }
 							aria-expanded={ isOpen }
 							label="Select a direction"

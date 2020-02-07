@@ -2615,16 +2615,15 @@ exports[`Storyshots Components/Draggable Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-move"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M19 10l-4 4v-3h-4v4h3l-4 4-4-4h3v-4H5v3l-4-4 4-4v3h4V5H6l4-4 4 4h-3v4h4V6z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </div>
@@ -2657,16 +2656,15 @@ Array [
       >
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-move"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="0 0 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M19 10l-4 4v-3h-4v4h3l-4 4-4-4h3v-4H5v3l-4-4 4-4v3h4V5H6l4-4 4 4h-3v4h4V6z"
+            d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
           />
         </svg>
       </button>
@@ -2693,16 +2691,15 @@ Array [
       >
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-move"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="0 0 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M19 10l-4 4v-3h-4v4h3l-4 4-4-4h3v-4H5v3l-4-4 4-4v3h4V5H6l4-4 4 4h-3v4h4V6z"
+            d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
           />
         </svg>
       </button>

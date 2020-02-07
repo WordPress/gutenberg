@@ -60,11 +60,17 @@ Render a Dropdown Menu with a set of controls:
 
 ```jsx
 import { DropdownMenu } from '@wordpress/components';
-import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
+import {
+	more,
+	arrowLeft,
+	arrowRight,
+	arrowUp,
+	arrowDown,
+} from '@wordpress/icons';
 
 const MyDropdownMenu = () => (
 	<DropdownMenu
-		icon="move"
+		icon={ more }
 		label="Select a direction"
 		controls={ [
 			{
@@ -97,10 +103,10 @@ Alternatively, specify a `children` function which returns elements valid for us
 ```jsx
 import { Fragment } from '@wordpress/element';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
-import { arrowUp, arrowDown, trash } from '@wordpress/icons';
+import { more, arrowUp, arrowDown, trash } from '@wordpress/icons';
 
 const MyDropdownMenu = () => (
-	<DropdownMenu icon="move" label="Select a direction">
+	<DropdownMenu icon={ more } label="Select a direction">
 		{ ( { onClose } ) => (
 			<Fragment>
 				<MenuGroup>
