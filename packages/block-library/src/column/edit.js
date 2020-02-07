@@ -12,20 +12,10 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import {
-	PanelBody,
-	RangeControl,
-	RadioControl,
-	Notice,
-} from '@wordpress/components';
+import { PanelBody, RangeControl, Notice } from '@wordpress/components';
 import { withDispatch, withSelect, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { toWidthPrecision } from '../columns/utils';
 
 /**
  * Component which renders a notice if the sum total width of columns of the
@@ -83,10 +73,8 @@ function ColumnEdit( {
 	className,
 	updateAlignment,
 	hasChildBlocks,
-	totalColumns,
 } ) {
 	const { verticalAlignment, width } = attributes;
-	const hasExplicitWidth = width !== undefined;
 
 	const classes = classnames( className, 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
@@ -102,46 +90,19 @@ function ColumnEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Column settings' ) }>
-					<RadioControl
-						label={ __( 'Width' ) }
-						selected={ hasExplicitWidth ? 'manual' : 'auto' }
-						options={ [
-							{
-								label: __(
-									'Automatically adjust to occupy available space'
-								),
-								value: 'auto',
-							},
-							{
-								label: __( 'Manual width' ),
-								value: 'manual',
-							},
-						] }
-						onChange={ ( nextValue ) => {
-							setAttributes( {
-								width:
-									nextValue === 'manual'
-										? toWidthPrecision( 100 / totalColumns )
-										: undefined,
-							} );
+					<RangeControl
+						label={ __( 'Percentage width' ) }
+						value={ width || '' }
+						onChange={ ( nextWidth ) => {
+							setAttributes( { width: nextWidth } );
 						} }
+						min={ 0 }
+						max={ 100 }
+						step={ 0.1 }
+						required
+						allowReset
 					/>
-					{ hasExplicitWidth && (
-						<>
-							<RangeControl
-								label={ __( 'Percentage width' ) }
-								value={ width }
-								onChange={ ( nextWidth ) => {
-									setAttributes( { width: nextWidth } );
-								} }
-								min={ 0 }
-								max={ 100 }
-								step={ 0.1 }
-								required
-							/>
-							<InvalidWidthNotice clientId={ clientId } />
-						</>
-					) }
+					<InvalidWidthNotice clientId={ clientId } />
 				</PanelBody>
 			</InspectorControls>
 			<InnerBlocks
@@ -159,14 +120,10 @@ function ColumnEdit( {
 export default compose(
 	withSelect( ( select, ownProps ) => {
 		const { clientId } = ownProps;
-		const { getBlockOrder, getBlockRootClientId } = select(
-			'core/block-editor'
-		);
+		const { getBlockOrder } = select( 'core/block-editor' );
 
 		return {
 			hasChildBlocks: getBlockOrder( clientId ).length > 0,
-			totalColumns: getBlockOrder( getBlockRootClientId( clientId ) )
-				.length,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
