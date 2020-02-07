@@ -30,74 +30,8 @@ function render_core_social_link( $attributes ) {
  * Registers the `core/social-link` blocks.
  */
 function register_block_core_social_link() {
-	$sites = array(
-		'amazon',
-		'bandcamp',
-		'behance',
-		'chain',
-		'codepen',
-		'deviantart',
-		'dribbble',
-		'dropbox',
-		'etsy',
-		'facebook',
-		'feed',
-		'fivehundredpx',
-		'flickr',
-		'foursquare',
-		'goodreads',
-		'google',
-		'github',
-		'instagram',
-		'lastfm',
-		'linkedin',
-		'mail',
-		'mastodon',
-		'meetup',
-		'medium',
-		'pinterest',
-		'pocket',
-		'reddit',
-		'skype',
-		'snapchat',
-		'soundcloud',
-		'spotify',
-		'tumblr',
-		'twitch',
-		'twitter',
-		'vimeo',
-		'vk',
-		'wordpress',
-		'yelp',
-		'youtube',
-	);
-
 	$path     = __DIR__ . '/social-link/block.json';
 	$metadata = json_decode( file_get_contents( $path ), true );
-
-	foreach ( $sites as $site ) {
-		register_block_type(
-			'core/social-link-' . $site,
-			array_merge(
-				$metadata,
-				array(
-					'attributes'      => array(
-						'url'     => array(
-							'type' => 'string',
-						),
-						'service' => array(
-							'type'    => 'string',
-							'default' => $site,
-						),
-						'label'   => array(
-							'type' => 'string',
-						),
-					),
-					'render_callback' => 'render_core_social_link',
-				)
-			)
-		);
-	}
 
 	register_block_type(
 		$metadata['name'],
