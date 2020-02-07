@@ -2,10 +2,6 @@ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handle
 
 .components-custom-gradient-picker {
 	margin-top: $grid-size;
-
-	.components-custom-gradient-picker__toolbar {
-		border: none;
-	}
 }
 
 .components-custom-gradient-picker__gradient-bar:not(.has-gradient) {
@@ -80,5 +76,18 @@ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handle
 	.components-base-control.components-angle-picker,
 	.components-base-control.components-custom-gradient-picker__type-picker {
 		margin-bottom: 0;
+	}
+}
+
+.components-custom-gradient-picker .components-custom-gradient-picker__toolbar {
+	border: none;
+
+	button {
+		&.is-pressed {
+			> svg {
+				background: $white;
+				border: 1px solid $dark-gray-200;
+			}
+		}
 	}
 }
