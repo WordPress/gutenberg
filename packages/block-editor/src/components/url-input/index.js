@@ -221,7 +221,10 @@ class URLInput extends Component {
 		const inputValue = event.target.value;
 
 		this.props.onFocus( inputValue );
-		if ( ! this.props.disableSuggestions && inputValue ) {
+
+		// When opening the link editor, if there's a value present, we want to load the suggestions pane with the results for this input search value
+		if ( inputValue && ! this.props.disableSuggestions ) {
+			// Ensure the suggestions are updated with the current input value
 			this.updateSuggestions( inputValue );
 		}
 	}
