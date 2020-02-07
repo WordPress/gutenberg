@@ -12,12 +12,62 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { PanelBody, RangeControl } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { PanelBody, RangeControl, Notice } from '@wordpress/components';
+import { withDispatch, withSelect, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Component which renders a notice if the sum total width of columns of the
+ * root block (the Columns parent) are all explicitly assigned and not equal
+ * to 100%.
+ *
+ * @param {Object} props          Component props.
+ * @param {string} props.clientId Client ID of the selected column.
+ *
+ * @return {WPElement?} Notice element, if invalid.
+ */
+function InvalidWidthNotice( { clientId } ) {
+	const sumWidth = useSelect(
+		( select ) => {
+			const {
+				getBlockOrder,
+				getBlockAttributes,
+				getBlockRootClientId,
+			} = select( 'core/block-editor' );
+
+			const columns = getBlockOrder( getBlockRootClientId( clientId ) );
+			return columns.reduce(
+				( result, columnClientId ) =>
+					result + getBlockAttributes( columnClientId ).width,
+				0
+			);
+		},
+		[ clientId ]
+	);
+
+	// A value of `NaN` is anticipated when any of the columns do not have an
+	// explicit width assigned, since `result + undefined` in the `Array#reduce`
+	// above would taint the numeric result (intended and leveraged here). Round
+	// sum to allow some tolerance +/- 0.5%, which also ensures that the notice
+	// message would never display "100%" as an invalid width if e.g. 100.4%
+	// sum total width.
+	if ( isNaN( sumWidth ) || Math.round( sumWidth ) === 100 ) {
+		return null;
+	}
+
+	return (
+		<Notice status="warning" isDismissible={ false }>
+			{ sprintf(
+				__( 'The total width of columns (%d%%) does not equal 100%%.' ),
+				Math.round( sumWidth )
+			) }
+		</Notice>
+	);
+}
 
 function ColumnEdit( {
+	clientId,
 	attributes,
 	setAttributes,
 	className,
@@ -52,6 +102,7 @@ function ColumnEdit( {
 						required
 						allowReset
 					/>
+					<InvalidWidthNotice clientId={ clientId } />
 				</PanelBody>
 			</InspectorControls>
 			<InnerBlocks
