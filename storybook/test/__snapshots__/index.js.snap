@@ -316,16 +316,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -335,16 +334,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -354,16 +352,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -373,16 +370,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -392,16 +388,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
       Icon & Text
@@ -443,16 +438,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -462,16 +456,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -481,16 +474,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -500,16 +492,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -519,16 +510,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
       Icon & Text
@@ -669,7 +659,7 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
     </svg>
   </button>
   <button
-    aria-label="Underline"
+    aria-label="Link"
     className="components-button has-icon"
     onBlur={[Function]}
     onClick={[Function]}
@@ -681,16 +671,15 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-editor-underline"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M14 5h-2v5.71c0 1.99-1.12 2.98-2.45 2.98-1.32 0-2.55-1-2.55-2.96V5H5v5.87c0 1.91 1 4.54 4.48 4.54 3.49 0 4.52-2.58 4.52-4.5V5zm0 13v-2H5v2h9z"
+        d="M17.74 2.76c1.68 1.69 1.68 4.41 0 6.1l-1.53 1.52c-1.12 1.12-2.7 1.47-4.14 1.09l2.62-2.61.76-.77.76-.76c.84-.84.84-2.2 0-3.04-.84-.85-2.2-.85-3.04 0l-.77.76-3.38 3.38c-.37-1.44-.02-3.02 1.1-4.14l1.52-1.53c1.69-1.68 4.42-1.68 6.1 0zM8.59 13.43l5.34-5.34c.42-.42.42-1.1 0-1.52-.44-.43-1.13-.39-1.53 0l-5.33 5.34c-.42.42-.42 1.1 0 1.52.44.43 1.13.39 1.52 0zm-.76 2.29l4.14-4.15c.38 1.44.03 3.02-1.09 4.14l-1.52 1.53c-1.69 1.68-4.41 1.68-6.1 0-1.68-1.68-1.68-4.42 0-6.1l1.53-1.52c1.12-1.12 2.7-1.47 4.14-1.1l-4.14 4.15c-.85.84-.85 2.2 0 3.05.84.84 2.2.84 3.04 0z"
       />
     </svg>
   </button>
@@ -2336,16 +2325,15 @@ exports[`Storyshots Components/ColorPicker Alpha Enabled 1`] = `
         >
           <svg
             aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
             focusable="false"
-            height={20}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
             />
           </svg>
         </button>
@@ -2511,16 +2499,15 @@ exports[`Storyshots Components/ColorPicker Default 1`] = `
         >
           <svg
             aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
             focusable="false"
-            height={20}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
             />
           </svg>
         </button>
@@ -2553,16 +2540,16 @@ exports[`Storyshots Components/CustomSelectControl Default 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+      className="components-custom-select-control__button-icon"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="0 0 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+        d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
       />
     </svg>
   </button>
@@ -3092,16 +3079,16 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+          className="components-custom-select-control__button-icon"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="0 0 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
           />
         </svg>
       </button>
@@ -3180,16 +3167,16 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+          className="components-custom-select-control__button-icon"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="0 0 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
           />
         </svg>
       </button>
@@ -3312,16 +3299,16 @@ exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+          className="components-custom-select-control__button-icon"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="0 0 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
           />
         </svg>
       </button>
@@ -5127,16 +5114,15 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-paragraph"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M15 2H7.54c-.83 0-1.59.2-2.28.6-.7.41-1.25.96-1.65 1.65C3.2 4.94 3 5.7 3 6.52s.2 1.58.61 2.27c.4.69.95 1.24 1.65 1.64.69.41 1.45.61 2.28.61h.43V17c0 .27.1.51.29.71.2.19.44.29.71.29.28 0 .51-.1.71-.29.2-.2.3-.44.3-.71V5c0-.27.09-.51.29-.71.2-.19.44-.29.71-.29s.51.1.71.29c.19.2.29.44.29.71v12c0 .27.1.51.3.71.2.19.43.29.71.29.27 0 .51-.1.71-.29.19-.2.29-.44.29-.71V4H15c.27 0 .5-.1.7-.3.2-.19.3-.43.3-.7s-.1-.51-.3-.71C15.5 2.1 15.27 2 15 2z"
+          d="M11 5v7H9.5C7.6 12 6 10.4 6 8.5S7.6 5 9.5 5H11m8-2H9.5C6.5 3 4 5.5 4 8.5S6.5 14 9.5 14H11v7h2V5h2v16h2V5h2V3z"
         />
       </svg>
     </button>
@@ -5165,12 +5151,11 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       >
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-editor-alignleft"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="-2 -2 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
@@ -5329,16 +5314,15 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>

@@ -2,11 +2,16 @@
  * WordPress dependencies
  */
 import {
+	alignCenter,
+	alignLeft,
+	alignRight,
+	code,
 	formatBold,
 	formatItalic,
 	formatStrikethrough,
 	link,
-	code,
+	more,
+	paragraph,
 } from '@wordpress/icons';
 
 /**
@@ -41,27 +46,27 @@ export const _default = () => {
 			id="options-toolbar"
 		>
 			<ToolbarGroup>
-				<ToolbarButton icon="editor-paragraph" label="Paragraph" />
+				<ToolbarButton icon={ paragraph } label="Paragraph" />
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
 					{ ( toggleProps ) => (
 						<DropdownMenu
 							hasArrowIndicator
-							icon="editor-alignleft"
+							icon={ alignLeft }
 							label="Change text alignment"
 							controls={ [
 								{
-									icon: 'editor-alignleft',
+									icon: alignLeft,
 									title: 'Align left',
 									isActive: true,
 								},
 								{
-									icon: 'editor-aligncenter',
+									icon: alignCenter,
 									title: 'Align center',
 								},
 								{
-									icon: 'editor-alignright',
+									icon: alignRight,
 									title: 'Align right',
 								},
 							] }
@@ -91,17 +96,17 @@ export const _default = () => {
 			</ToolbarGroup>
 			<ToolbarGroup
 				hasArrowIndicator={ false }
-				icon="ellipsis"
+				icon={ more }
 				label="Change text alignment"
 				isCollapsed
 				controls={ [
 					{
-						icon: 'editor-alignleft',
+						icon: alignLeft,
 						title: 'Align left',
 						isActive: true,
 					},
-					{ icon: 'editor-aligncenter', title: 'Align center' },
-					{ icon: 'editor-alignright', title: 'Align right' },
+					{ icon: alignCenter, title: 'Align center' },
+					{ icon: alignRight, title: 'Align right' },
 				] }
 			/>
 		</Toolbar>

@@ -7,11 +7,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Icon, check } from '@wordpress/icons';
+import { Icon, check, chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { Button, Dashicon } from '../';
+import { Button } from '../';
 
 const itemToString = ( item ) => item && item.name;
 // This is needed so that in Windows, where
@@ -121,8 +121,8 @@ export default function CustomSelectControl( {
 				} ) }
 			>
 				{ itemToString( selectedItem ) }
-				<Dashicon
-					icon="arrow-down-alt2"
+				<Icon
+					icon={ chevronDown }
 					className="components-custom-select-control__button-icon"
 				/>
 			</Button>
