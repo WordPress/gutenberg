@@ -78,7 +78,7 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  * @see https://github.com/WordPress/gutenberg/pull/19887
  */
 function gutenberg_register_legacy_social_link_blocks() {
-	$sites = array(
+	$services = array(
 		'amazon',
 		'bandcamp',
 		'behance',
@@ -120,9 +120,9 @@ function gutenberg_register_legacy_social_link_blocks() {
 		'youtube',
 	);
 
-	foreach ( $sites as $site ) {
+	foreach ( $services as $service ) {
 		register_block_type(
-			'core/social-link-' . $site,
+			'core/social-link-' . $service,
 			array(
 				'category'        => 'widgets',
 				'attributes'      => array(
@@ -131,7 +131,7 @@ function gutenberg_register_legacy_social_link_blocks() {
 					),
 					'service' => array(
 						'type'    => 'string',
-						'default' => $site,
+						'default' => $service,
 					),
 					'label'   => array(
 						'type' => 'string',
