@@ -325,7 +325,10 @@ class URLInput extends Component {
 	}
 
 	reset() {
-		// move focus to the input
+		// When the input is cleared, we need to make sure it has focus. In LinkControl
+		// there is an option to "Reset" the input by clicking an "X" button. The "X"
+		// button is immediately disabled, throwing focus to the top of the DOM. By
+		// forcing focus here, we're able to retain a sensible focus management behavior.
 		this.inputRef.current.focus();
 	}
 
