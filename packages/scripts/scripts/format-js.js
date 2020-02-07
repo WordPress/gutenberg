@@ -21,7 +21,7 @@ const {
 	getArgFromCLI,
 	getFileArgsFromCLI,
 	hasArgInCLI,
-	hasPackageProp,
+	hasPrettierConfig,
 	hasProjectFile,
 } = require( '../utils' );
 
@@ -72,18 +72,8 @@ if ( ! checkResult.success ) {
 // needed for config, otherwise pass in args to default config in packages
 // See: https://prettier.io/docs/en/configuration.html
 let configArgs = [];
-const hasProjectPrettierConfig =
-	hasProjectFile( '.prettierrc.js' ) ||
-	hasProjectFile( '.prettierrc.json' ) ||
-	hasProjectFile( '.prettierrc.toml' ) ||
-	hasProjectFile( '.prettierrc.yaml' ) ||
-	hasProjectFile( '.prettierrc.yml' ) ||
-	hasProjectFile( 'prettier.config.js' ) ||
-	hasProjectFile( '.prettierrc' ) ||
-	hasPackageProp( 'prettier' );
-
 // TODO: once setup, use @wordpress/prettier-config
-if ( ! hasProjectPrettierConfig ) {
+if ( ! hasPrettierConfig() ) {
 	configArgs = [ '--config', fromConfigRoot( '.prettierrc.js' ) ];
 }
 
