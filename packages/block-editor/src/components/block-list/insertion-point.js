@@ -118,7 +118,14 @@ export default function InsertionPoint( {
 		const blockNode = getBlockDOMNode( inserterClientId );
 		const container = isReverse ? containerRef.current : blockNode;
 		const closest = getClosestTabbable( blockNode, true, container );
-		const rect = new window.DOMRect( clientX, clientY, 0, 16 );
+		const rect = {
+			left: clientX,
+			right: clientX,
+			top: clientY,
+			bottom: clientY + 16,
+			width: 0,
+			height: 16,
+		};
 
 		if ( closest ) {
 			placeCaretAtVerticalEdge( closest, isReverse, rect, false );

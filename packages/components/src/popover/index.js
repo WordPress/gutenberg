@@ -78,12 +78,14 @@ function computeAnchorRect(
 		const { top, bottom } = anchorRef;
 		const topRect = top.getBoundingClientRect();
 		const bottomRect = bottom.getBoundingClientRect();
-		const rect = new window.DOMRect(
-			topRect.left,
-			topRect.top,
-			topRect.width,
-			bottomRect.bottom - topRect.top
-		);
+		const rect = {
+			left: topRect.left,
+			right: topRect.right,
+			top: topRect.top,
+			bottom: bottomRect.bottom,
+			width: topRect.width,
+			height: bottomRect.bottom - topRect.top,
+		};
 
 		if ( shouldAnchorIncludePadding ) {
 			return rect;
@@ -313,12 +315,14 @@ const Popover = ( {
 				const offsetParentRect = offsetParent.getBoundingClientRect();
 
 				relativeOffsetTop = offsetParentRect.top;
-				anchor = new window.DOMRect(
-					anchor.left - offsetParentRect.left,
-					anchor.top - offsetParentRect.top,
-					anchor.width,
-					anchor.height
-				);
+				anchor = {
+					left: anchor.left - offsetParentRect.left,
+					right: anchor.left - offsetParentRect.left + anchor.width,
+					top: anchor.top - offsetParentRect.top,
+					bottom: anchor.top - offsetParentRect.top + anchor.height,
+					width: anchor.width,
+					height: anchor.height,
+				};
 			} else {
 				setStyle( containerRef.current, 'position' );
 			}
