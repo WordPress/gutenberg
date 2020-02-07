@@ -876,6 +876,84 @@ describe( 'Selecting links', () => {
 				expect( currentLinkAnchor ).not.toBeNull();
 			}
 		);
+
+		it( 'should allow selection of initial search results via the keyboard', async () => {
+			act( () => {
+				render( <LinkControl showInitialSuggestions />, container );
+			} );
+
+			await eventLoopTick();
+
+			const searchResultsWrapper = container.querySelector(
+				'[role="listbox"]'
+			);
+
+			const searchResultsLabel = container.querySelector(
+				`#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }`
+			);
+
+			expect( searchResultsLabel.innerHTML ).toEqual(
+				'Recently updated'
+			);
+
+			// Search Input UI
+			const searchInput = container.querySelector(
+				'input[aria-label="URL"]'
+			);
+
+			// Step down into the search results, highlighting the first result item
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: DOWN } );
+			} );
+
+			await eventLoopTick();
+
+			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+			const searchResultElements = container.querySelectorAll(
+				'[role="listbox"] [role="option"]'
+			);
+			const firstSearchSuggestion = first( searchResultElements );
+			const secondSearchSuggestion = nth( searchResultElements, 1 );
+
+			let selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should have highlighted the first item using the keyboard
+			expect( selectedSearchResultElement ).toEqual(
+				firstSearchSuggestion
+			);
+
+			// Check we can go down again using the down arrow
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: DOWN } );
+			} );
+
+			selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should have highlighted the first item using the keyboard
+			expect( selectedSearchResultElement ).toEqual(
+				secondSearchSuggestion
+			);
+
+			// Check we can go back up via up arrow
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: UP } );
+			} );
+
+			selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should be back to highlighting the first search result again
+			expect( selectedSearchResultElement ).toEqual(
+				firstSearchSuggestion
+			);
+
+			expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 
 	it( 'does not forcefully regain focus if onChange handler had shifted it', () => {
