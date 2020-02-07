@@ -56,6 +56,7 @@ function ColumnsEditContainer( {
 	attributes,
 	updateBlockSettings,
 	blockListSettings,
+	getBlockAttributes,
 	updateAlignment,
 	updateColumns,
 	clientId,
@@ -149,9 +150,16 @@ function ColumnsEditContainer( {
 						scrollEnabled: false,
 					} }
 					allowedBlocks={ ALLOWED_BLOCKS }
-					containerStyle={ getVerticalAlignmentRemap(
-						verticalAlignment
-					) }
+					containerStyle={ ( columnClientId ) => {
+						const columnAttributes = getBlockAttributes(
+							columnClientId
+						);
+						if ( columnAttributes ) {
+							return getVerticalAlignmentRemap(
+								columnAttributes.verticalAlignment
+							);
+						}
+					} }
 				/>
 			</View>
 		</>
@@ -227,15 +235,23 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, isSelected, getStylesFromColorScheme } = props;
-	const { hasChildren, blockListSettings } = useSelect(
+	const { hasChildren, blockListSettings, getBlockAttributes } = useSelect(
 		( select ) => {
-			const { getBlocks, getBlockListSettings } = select(
-				'core/block-editor'
-			);
+			const {
+				getBlocks,
+				getBlockListSettings,
+				__unstableGetBlockWithoutInnerBlocks,
+			} = select( 'core/block-editor' );
 
 			return {
 				hasChildren: getBlocks( clientId ).length > 0,
 				blockListSettings: getBlockListSettings( clientId ) || {},
+				getBlockAttributes: ( columnClientId ) =>
+					(
+						__unstableGetBlockWithoutInnerBlocks(
+							columnClientId
+						) || {}
+					).attributes,
 			};
 		},
 		[ clientId ]
@@ -260,6 +276,7 @@ const ColumnsEdit = ( props ) => {
 
 	return (
 		<ColumnsEditContainerWrapper
+			getBlockAttributes={ getBlockAttributes }
 			blockListSettings={ blockListSettings }
 			{ ...props }
 		/>

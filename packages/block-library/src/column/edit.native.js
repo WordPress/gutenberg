@@ -106,11 +106,6 @@ function ColumnEdit( {
 		);
 	}
 
-	const getVerticalAlignmentRemap = ( alignment ) => {
-		if ( ! alignment ) return;
-		return styles[ `is-vertically-aligned-${ alignment }` ];
-	};
-
 	return (
 		<>
 			<BlockControls>
@@ -132,9 +127,6 @@ function ColumnEdit( {
 					renderAppender={
 						isSelected && InnerBlocks.ButtonBlockAppender
 					}
-					containerStyle={ getVerticalAlignmentRemap(
-						verticalAlignment
-					) }
 				/>
 			</View>
 		</>
