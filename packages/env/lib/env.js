@@ -293,7 +293,7 @@ async function checkDatabaseConnection( { dockerComposeConfigPath } ) {
  * activating all plugins, and activating the first theme. These steps are
  * performed sequentially so as to not overload the WordPress instance.
  *
- * @param {string} environment The environment to clean. Either 'development', 'tests', or 'all'.
+ * @param {string} environment The environment to configure. Either 'development' or 'tests'.
  * @param {Config} config The wp-env config object.
  */
 async function configureWordPress( environment, config ) {
