@@ -1,3 +1,5 @@
+@import "./social";
+
 .wp-block-social-links {
 	display: flex;
 	justify-content: flex-start;
@@ -52,193 +54,192 @@
 	display: flex;
 }
 
-
 // Provide colors for a range of icons.
 .wp-block-social-links:not(.is-style-logos-only) {
 	// Generic items such as mail, feed, etc.
 	.wp-social-link {
-		background-color: #f0f0f0;
+		background-color: $link-color;
 		color: #444;
 	}
 
 	.wp-social-link-amazon {
-		background-color: #f90;
+		background-color: $amazon-color;
 		color: #fff;
 	}
 
 	.wp-social-link-bandcamp {
-		background-color: #1ea0c3;
+		background-color: $bandcamp-color;
 		color: #fff;
 	}
 
 	.wp-social-link-behance {
-		background-color: #0757fe;
+		background-color: $behance-color;
 		color: #fff;
 	}
 
 	.wp-social-link-codepen {
-		background-color: #1e1f26;
+		background-color: $codepen-color;
 		color: #fff;
 	}
 
 	.wp-social-link-deviantart {
-		background-color: #02e49b;
+		background-color: $deviantart-color;
 		color: #fff;
 	}
 
 	.wp-social-link-dribbble {
-		background-color: #e94c89;
+		background-color: $dribbble-color;
 		color: #fff;
 	}
 
 	.wp-social-link-dropbox {
-		background-color: #4280ff;
+		background-color: $dropbox-color;
 		color: #fff;
 	}
 
 	.wp-social-link-etsy {
-		background-color: #f45800;
+		background-color: $etsy-color;
 		color: #fff;
 	}
 
 	.wp-social-link-facebook {
-		background-color: #1977f2;
+		background-color: $facebook-color;
 		color: #fff;
 	}
 
 	.wp-social-link-fivehundredpx {
-		background-color: #000;
+		background-color: $fivehundredpx-color;
 		color: #fff;
 	}
 
 	.wp-social-link-flickr {
-		background-color: #0461dd;
+		background-color: $flickr-color;
 		color: #fff;
 	}
 
 	.wp-social-link-foursquare {
-		background-color: #e65678;
+		background-color: $foursquare-color;
 		color: #fff;
 	}
 
 	.wp-social-link-github {
-		background-color: #24292d;
+		background-color: $github-color;
 		color: #fff;
 	}
 
 	.wp-social-link-goodreads {
-		background-color: #eceadd;
+		background-color: $goodreads-color;
 		color: #382110;
 	}
 
 	.wp-social-link-google {
-		background-color: #ea4434;
+		background-color: $google-color;
 		color: #fff;
 	}
 
 	.wp-social-link-instagram {
-		background-color: #f00075;
+		background-color: $instagram-color;
 		color: #fff;
 	}
 
 	.wp-social-link-lastfm {
-		background-color: #e21b24;
+		background-color: $lastfm-color;
 		color: #fff;
 	}
 
 	.wp-social-link-linkedin {
-		background-color: #0577b5;
+		background-color: $linkedin-color;
 		color: #fff;
 	}
 
 	.wp-social-link-mastodon {
-		background-color: #3288d4;
+		background-color: $mastodon-color;
 		color: #fff;
 	}
 
 	.wp-social-link-medium {
-		background-color: #02ab6c;
+		background-color: $medium-color;
 		color: #fff;
 	}
 
 	.wp-social-link-meetup {
-		background-color: #f6405f;
+		background-color: $meetup-color;
 		color: #fff;
 	}
 
 	.wp-social-link-pinterest {
-		background-color: #e60122;
+		background-color: $pinterest-color;
 		color: #fff;
 	}
 
 	.wp-social-link-pocket {
-		background-color: #ef4155;
+		background-color: $pocket-color;
 		color: #fff;
 	}
 
 	.wp-social-link-reddit {
-		background-color: #fe4500;
+		background-color: $reddit-color;
 		color: #fff;
 	}
 
 	.wp-social-link-skype {
-		background-color: #0478d7;
+		background-color: $skype-color;
 		color: #fff;
 	}
 
 	.wp-social-link-snapchat {
-		background-color: #fefc00;
+		background-color: $snapchat-color;
 		color: #fff;
 		stroke: #000;
 	}
 
 	.wp-social-link-soundcloud {
-		background-color: #ff5600;
+		background-color: $soundcloud-color;
 		color: #fff;
 	}
 
 	.wp-social-link-spotify {
-		background-color: #1bd760;
+		background-color: $spotify-color;
 		color: #fff;
 	}
 
 	.wp-social-link-tumblr {
-		background-color: #011835;
+		background-color: $tumblr-color;
 		color: #fff;
 	}
 
 	.wp-social-link-twitch {
-		background-color: #6440a4;
+		background-color: $twitch-color;
 		color: #fff;
 	}
 
 	.wp-social-link-twitter {
-		background-color: #21a1f3;
+		background-color: $twitter-color;
 		color: #fff;
 	}
 
 	.wp-social-link-vimeo {
-		background-color: #1eb7ea;
+		background-color: $vimeo-color;
 		color: #fff;
 	}
 
 	.wp-social-link-vk {
-		background-color: #4680c2;
+		background-color: $vk-color;
 		color: #fff;
 	}
 
 	.wp-social-link-wordpress {
-		background-color: #3499cd;
+		background-color: $wordpress-color;
 		color: #fff;
 	}
 
 	.wp-social-link-yelp {
-		background-color: #d32422;
+		background-color: $yelp-color;
 		color: #fff;
 	}
 
 	.wp-social-link-youtube {
-		background-color: #ff0100;
+		background-color: $youtube-color;
 		color: #fff;
 	}
 }
@@ -257,149 +258,150 @@
 	}
 
 	.wp-social-link-amazon {
-		color: #f90;
+		color: $amazon-color;
 	}
 
 	.wp-social-link-bandcamp {
-		color: #1ea0c3;
+		color: $bandcamp-color;
 	}
 
 	.wp-social-link-behance {
-		color: #0757fe;
+		color: $behance-color;
 	}
 
 	.wp-social-link-codepen {
-		color: #1e1f26;
+		color: $codepen-color;
 	}
 
 	.wp-social-link-deviantart {
-		color: #02e49b;
+		color: $deviantart-color;
 	}
 
 	.wp-social-link-dribbble {
-		color: #e94c89;
+		color: $dribbble-color;
 	}
 
 	.wp-social-link-dropbox {
-		color: #4280ff;
+		color: $dropbox-color;
 	}
 
 	.wp-social-link-etsy {
-		color: #f45800;
+		color: $etsy-color;
 	}
 
 	.wp-social-link-facebook {
-		color: #1977f2;
+		color: $facebook-color;
 	}
 
 	.wp-social-link-fivehundredpx {
-		color: #000;
+		color: $fivehundredpx-color;
 	}
 
 	.wp-social-link-flickr {
-		color: #0461dd;
+		color: $flickr-color;
 	}
 
 	.wp-social-link-foursquare {
-		color: #e65678;
+		color: $foursquare-color;
 	}
 
 	.wp-social-link-github {
-		color: #24292d;
+		color: $github-color;
 	}
 
 	.wp-social-link-goodreads {
-		color: #382110;
+		color: $goodreads-color;
 	}
 
 	.wp-social-link-google {
-		color: #ea4434;
+		color: $google-color;
 	}
 
 	.wp-social-link-instagram {
-		color: #f00075;
+		color: $instagram-color;
 	}
 
 	.wp-social-link-lastfm {
-		color: #e21b24;
+		color: $lastfm-color;
 	}
 
 	.wp-social-link-linkedin {
-		color: #0577b5;
+		color: $linkedin-color;
 	}
 
 	.wp-social-link-mastodon {
-		color: #3288d4;
+		color: $mastodon-color;
+		background: url($mastodon-logo) no-repeat center center;
 	}
 
 	.wp-social-link-medium {
-		color: #02ab6c;
+		color: $medium-color;
 	}
 
 	.wp-social-link-meetup {
-		color: #f6405f;
+		color: $meetup-color;
 	}
 
 	.wp-social-link-pinterest {
-		color: #e60122;
+		color: $pinterest-color;
 	}
 
 	.wp-social-link-pocket {
-		color: #ef4155;
+		color: $pocket-color;
 	}
 
 	.wp-social-link-reddit {
-		color: #fe4500;
+		color: $reddit-color;
 	}
 
 	.wp-social-link-skype {
-		color: #0478d7;
+		color: $skype-color;
 	}
 
 	.wp-social-link-snapchat {
-		color: #fff;
-		stroke: #000;
+		color: $snapchat-color;
 	}
 
 	.wp-social-link-soundcloud {
-		color: #ff5600;
+		color: $soundcloud-color;
 	}
 
 	.wp-social-link-spotify {
-		color: #1bd760;
+		color: $spotify-color;
 	}
 
 	.wp-social-link-tumblr {
-		color: #011835;
+		color: $tumblr-color;
 	}
 
 	.wp-social-link-twitch {
-		color: #6440a4;
+		color: $twitch-color;
 	}
 
 	.wp-social-link-twitter {
-		color: #21a1f3;
+		color: $twitter-color;
+		background: url($twitter-logo) no-repeat center center;
 	}
 
 	.wp-social-link-vimeo {
-		color: #1eb7ea;
+		color: $vimeo-color;
 	}
 
 	.wp-social-link-vk {
-		color: #4680c2;
+		color: $vk-color;
 	}
 
 	.wp-social-link-wordpress {
-		color: #3499cd;
+		color: $wordpress-color;
+		background: url($wordpress-logo) no-repeat center center;
 	}
 
 	.wp-social-link-yelp {
-		background-color: #d32422;
-		color: #fff;
+		color: $yelp-color;
 	}
 
 	.wp-social-link-youtube {
-		color: #ff0100;
+		color: $youtube-color;
 	}
 }
 
@@ -414,3 +416,4 @@
 		padding-right: 16px;
 	}
 }
+
