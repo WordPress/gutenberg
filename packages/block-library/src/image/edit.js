@@ -103,9 +103,7 @@ export class ImageEdit extends Component {
 		this.updateMaxWidth = this.updateMaxWidth.bind( this );
 		// With the current implementation of ResizableBox, an image needs an explicit pixel value for the max-width.
 		// In absence of being able to set the content-width, this max-width is currently dictated by the vanilla editor style.
-		// The following variable adds a buffer to this vanilla style, so 3rd party themes have some wiggleroom.
-		// This does, in most cases, allow you to scale the image beyond the width of the main column, though not infinitely.
-		// @todo It would be good to revisit this once a content-width variable becomes available.
+		// The following variable adds a buffer to this vanilla style, to create a large buffer until updateMaxWidth is called.
 		this.maxWidthBuffer = this.props.maxWidth * 2.5;
 		// To limit scaling the image beyond the width of the main column, we will use resizeRef to find the parent block's width.
 		// This will then be used to reduce the maxWidth from the buffer value to a definitive value in componentDidUpdate.
