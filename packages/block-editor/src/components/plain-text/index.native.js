@@ -45,7 +45,7 @@ export default class PlainText extends Component {
 
 	componentWillUnmount() {
 		if ( this.isAndroid ) {
-			clearTimeout(this.timeoutID);
+			clearTimeout( this.timeoutID );
 		}
 	}
 
