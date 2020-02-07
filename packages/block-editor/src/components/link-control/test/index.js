@@ -586,7 +586,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'Create new' )
+					result.innerHTML.includes( 'New page' )
 				)
 			);
 
@@ -687,7 +687,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const form = container.querySelector( 'form' );
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'Create new' )
+				result.innerHTML.includes( 'New page' )
 			)
 		);
 
@@ -741,7 +741,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				);
 				const createButton = first(
 					Array.from( searchResultElements ).filter( ( result ) =>
-						result.innerHTML.includes( 'Create new' )
+						result.innerHTML.includes( 'New page' )
 					)
 				);
 
@@ -775,7 +775,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 			const createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'Create new' )
+					result.innerHTML.includes( 'New page' )
 				)
 			);
 
@@ -821,7 +821,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 				const createButton = first(
 					Array.from( searchResultElements ).filter( ( result ) =>
-						result.innerHTML.includes( 'Create new' )
+						result.innerHTML.includes( 'New page' )
 					)
 				);
 
@@ -870,7 +870,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 			let createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'Create new' )
+					result.innerHTML.includes( 'New page' )
 				)
 			);
 
@@ -914,7 +914,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 			createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'Create new' )
+					result.innerHTML.includes( 'New page' )
 				)
 			);
 
