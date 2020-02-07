@@ -81,6 +81,18 @@ function register_block_core_social_link() {
 			array_merge(
 				$metadata,
 				array(
+					'attributes'      => array(
+						'url'     => array(
+							'type' => 'string',
+						),
+						'service' => array(
+							'type'    => 'string',
+							'default' => $site,
+						),
+						'label'   => array(
+							'type' => 'string',
+						),
+					),
 					'render_callback' => 'render_core_social_link',
 				)
 			)
