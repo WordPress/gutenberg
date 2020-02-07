@@ -108,7 +108,6 @@ class URLInput extends Component {
 	}
 
 	shouldShowInitialSuggestions() {
-		const { suggestions } = this.state;
 		const {
 			__experimentalShowInitialSuggestions = false,
 			value,
@@ -116,8 +115,7 @@ class URLInput extends Component {
 		return (
 			! this.isUpdatingSuggestions &&
 			__experimentalShowInitialSuggestions &&
-			! ( value && value.length ) &&
-			! ( suggestions && suggestions.length )
+			! ( value && value.length )
 		);
 	}
 
