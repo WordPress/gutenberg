@@ -37,7 +37,8 @@ p.has-text-color a {
 }
 
 .wp-gs p {
-	color: var(--wp-color-text);
-	font-size: var(--wp-typography-fontSize);
-	line-height: var(--wp-typography-lineHeight);
+	color: var(--wp-color--text);
+	font-size: var(--wp-typography--fontSize);
+	font-weight: var(--wp-typography--fontWeight);
+	line-height: var(--wp-typography--lineHeight);
 }

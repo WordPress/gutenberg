@@ -5,26 +5,27 @@
 	h4,
 	h5,
 	h6 {
-		color: var(--wp-color-text);
-		line-height: var(--wp-typography-titleLineHeight);
+		color: var(--wp-color--text);
+		font-weight: var(--wp-heading--fontWeight);
+		line-height: var(--wp-typography--titleLineHeight);
 	}
 }
 
 .wp-gs h1 {
-	font-size: var(--wp-typography-fontSizeH1);
+	font-size: var(--wp-typography--fontSizeH1);
 }
 .wp-gs h2 {
-	font-size: var(--wp-typography-fontSizeH2);
+	font-size: var(--wp-typography--fontSizeH2);
 }
 .wp-gs h3 {
-	font-size: var(--wp-typography-fontSizeH3);
+	font-size: var(--wp-typography--fontSizeH3);
 }
 .wp-gs h4 {
-	font-size: var(--wp-typography-fontSizeH4);
+	font-size: var(--wp-typography--fontSizeH4);
 }
 .wp-gs h5 {
-	font-size: var(--wp-typography-fontSizeH5);
+	font-size: var(--wp-typography--fontSizeH5);
 }
 .wp-gs h6 {
-	font-size: var(--wp-typography-fontSizeH6);
+	font-size: var(--wp-typography--fontSizeH6);
 }
