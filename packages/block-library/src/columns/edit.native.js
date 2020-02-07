@@ -25,12 +25,11 @@ import { useEffect } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { withViewportMatch } from '@wordpress/viewport';
-
+import { columns as icon } from '@wordpress/icons'
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
-import Icon from './icon';
 
 /**
  * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
@@ -111,7 +110,7 @@ function ColumnsEditContainer( {
 				<Toolbar>
 					<ToolbarButton
 						title={ __( 'ColumnsButton' ) }
-						icon={ <Icon width={ 20 } height={ 20 } /> }
+						icon={ icon }
 						onClick={ () => {} }
 					/>
 				</Toolbar>

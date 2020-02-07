@@ -16,6 +16,7 @@ import {
 } from '@wordpress/block-editor';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { withViewportMatch } from '@wordpress/viewport';
+import { column as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -111,7 +112,7 @@ function ColumnEdit( {
 				<Toolbar>
 					<ToolbarButton
 						title={ __( 'ColumnButton' ) }
-						icon="columns"
+						icon={ icon }
 						onClick={ () => {} }
 					/>
 				</Toolbar>
