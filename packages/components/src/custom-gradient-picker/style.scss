@@ -88,12 +88,11 @@ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handle
 	}
 
 	button {
-		border-radius: 4px;
-
 		&.is-pressed {
 			> svg {
 				background: $white;
 				border: 1px solid $dark-gray-200;
+				border-radius: 2px;
 			}
 		}
 	}
