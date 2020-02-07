@@ -4,6 +4,11 @@
 import { text, number } from '@storybook/addon-knobs';
 
 /**
+ * WordPress dependencies
+ */
+import { formatBold, formatItalic } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import './style.css';
@@ -114,8 +119,8 @@ export const groupedIcons = () => {
 
 	return (
 		<GroupContainer>
-			<Button icon="editor-bold" label="Bold" />
-			<Button icon="editor-italic" label="Italic" />
+			<Button icon={ formatBold } label="Bold" />
+			<Button icon={ formatItalic } label="Italic" />
 			<Button icon="editor-underline" label="Underline" />
 		</GroupContainer>
 	);

@@ -18,6 +18,7 @@ import {
 	Path,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { link as linkIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -258,7 +259,7 @@ const ImageURLInputUI = ( {
 	return (
 		<>
 			<Button
-				icon="admin-links"
+				icon={ linkIcon }
 				className="components-toolbar__control"
 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
 				aria-expanded={ isOpen }

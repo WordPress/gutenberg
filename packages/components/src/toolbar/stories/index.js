@@ -1,4 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import {
+	formatBold,
+	formatItalic,
+	formatStrikethrough,
+	link,
+	code,
+} from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import Toolbar from '../';
@@ -61,18 +72,18 @@ export const _default = () => {
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarButton>Text</ToolbarButton>
-				<ToolbarButton icon="editor-bold" label="Bold" isPressed />
-				<ToolbarButton icon="editor-italic" label="Italic" />
-				<ToolbarButton icon="admin-links" label="Link" />
+				<ToolbarButton icon={ formatBold } label="Bold" isPressed />
+				<ToolbarButton icon={ formatItalic } label="Italic" />
+				<ToolbarButton icon={ link } label="Link" />
 				<ToolbarGroup
 					isCollapsed
 					icon={ false }
 					label="More rich text controls"
 					controls={ [
-						{ icon: 'editor-code', title: 'Inline code' },
+						{ icon: code, title: 'Inline code' },
 						{ icon: <InlineImageIcon />, title: 'Inline image' },
 						{
-							icon: 'editor-strikethrough',
+							icon: formatStrikethrough,
 							title: 'Strikethrough',
 						},
 					] }
@@ -104,9 +115,9 @@ export const withoutGroup = () => {
 			__experimentalAccessibilityLabel="Options"
 			id="options-toolbar-without-group"
 		>
-			<ToolbarButton icon="editor-bold" label="Bold" isPressed />
-			<ToolbarButton icon="editor-italic" label="Italic" />
-			<ToolbarButton icon="admin-links" label="Link" />
+			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
+			<ToolbarButton icon={ formatItalic } label="Italic" />
+			<ToolbarButton icon={ link } label="Link" />
 		</Toolbar>
 	);
 };

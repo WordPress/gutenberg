@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { Button } from '@wordpress/components';
+import { link } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,7 +38,7 @@ class URLInputButton extends Component {
 		return (
 			<div className="block-editor-url-input__button">
 				<Button
-					icon="admin-links"
+					icon={ link }
 					label={ buttonLabel }
 					onClick={ this.toggle }
 					className="components-toolbar__control"
