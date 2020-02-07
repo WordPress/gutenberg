@@ -327,8 +327,6 @@ class URLInput extends Component {
 	reset() {
 		// move focus to the input
 		this.inputRef.current.focus();
-		// reset our suggestions
-		this.updateSuggestions();
 	}
 
 	selectLink( suggestion ) {
