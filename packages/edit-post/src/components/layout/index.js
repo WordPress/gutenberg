@@ -17,6 +17,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
+	__experimentalEditorSkeleton as EditorSkeleton,
 	__experimentalPageTemplatePicker,
 	__experimentalUsePageTemplatePickerVisible,
 } from '@wordpress/block-editor';
@@ -39,7 +40,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import EditorRegions from '../editor-regions';
 import FullscreenMode from '../fullscreen-mode';
 import BrowserURL from '../browser-url';
 import Header from '../header';
@@ -124,7 +124,7 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
-				<EditorRegions
+				<EditorSkeleton
 					className={ className }
 					header={ <Header /> }
 					sidebar={
