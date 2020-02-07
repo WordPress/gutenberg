@@ -166,7 +166,29 @@ describe( 'hasExplicitColumnWidths', () => {
 	} );
 
 	it( 'returns true if a block has explicit width', () => {
-		const blocks = [ { attributes: { width: 10 } } ];
+		const blocks = [ { attributes: { width: 100 } } ];
+
+		const result = hasExplicitColumnWidths( blocks );
+
+		expect( result ).toBe( true );
+	} );
+
+	it( 'returns false if some, not all blocks have explicit width', () => {
+		const blocks = [
+			{ attributes: { width: 10 } },
+			{ attributes: { width: undefined } },
+		];
+
+		const result = hasExplicitColumnWidths( blocks );
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'returns true if all blocks have explicit width', () => {
+		const blocks = [
+			{ attributes: { width: 10 } },
+			{ attributes: { width: 90 } },
+		];
 
 		const result = hasExplicitColumnWidths( blocks );
 

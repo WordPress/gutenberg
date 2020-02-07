@@ -97,7 +97,7 @@ export function getRedistributedColumnWidths(
  * @return {boolean} Whether columns have explicit widths.
  */
 export function hasExplicitColumnWidths( blocks ) {
-	return blocks.some( ( block ) =>
+	return blocks.every( ( block ) =>
 		Number.isFinite( block.attributes.width )
 	);
 }
