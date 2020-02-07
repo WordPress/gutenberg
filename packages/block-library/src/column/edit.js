@@ -51,6 +51,9 @@ function ColumnEdit( {
 						step={ 0.1 }
 						required
 						allowReset
+						placeholder={
+							width === undefined ? __( 'Auto' ) : undefined
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>
