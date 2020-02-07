@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -15,10 +15,11 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Social links' ),
+	title: __( 'Social Icons' ),
 	description: __(
 		'Create a block of links to your social media or external sites'
 	),
+	keywords: [ _x( 'links', 'block keywords' ) ],
 	supports: {
 		align: [ 'left', 'center', 'right' ],
 	},
