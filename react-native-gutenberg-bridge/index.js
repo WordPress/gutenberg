@@ -16,6 +16,8 @@ export const mediaSources = {
 	siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
 };
 
+export const showMediaEditorButton = isIOS;
+
 // Console polyfill from react-native
 
 export function nativeLoggingHook( message, logLevel ) {
@@ -106,6 +108,10 @@ export function requestImageFullscreenPreview( currentImageUrl, originalImageUrl
 		return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( currentImageUrl, originalImageUrl );
 	}
 	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( originalImageUrl || currentImageUrl );
+}
+
+export function requestMediaEditor( mediaUrl, callback ) {
+	return RNReactNativeGutenbergBridge.requestMediaEditor( mediaUrl, callback );
 }
 
 export function fetchRequest( path ) {

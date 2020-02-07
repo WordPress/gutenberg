@@ -28,5 +28,7 @@ RCT_EXPORT_VIEW_PROPERTY(fontWeight, NSString)
 
 RCT_EXPORT_VIEW_PROPERTY(disableEditingMenu, BOOL)
 RCT_REMAP_VIEW_PROPERTY(textAlign, textAlignment, NSTextAlignment)
+RCT_REMAP_VIEW_PROPERTY(selectionColor, tintColor, UIColor)
+
 
 @end
