@@ -6,7 +6,7 @@ import { uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSpokenMessages, Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
@@ -50,6 +50,8 @@ function InlineLinkUI( {
 	 */
 	const mountingKey = useMemo( uniqueId, [ addingLink ] );
 
+	const [ nextLinkValue, setNextLinkValue ] = useState();
+
 	const anchorRef = useMemo( () => {
 		const selection = window.getSelection();
 
@@ -78,9 +80,21 @@ function InlineLinkUI( {
 	const linkValue = {
 		url: activeAttributes.url,
 		opensInNewTab: activeAttributes.target === '_blank',
+		...nextLinkValue,
 	};
 
 	function onChangeLink( nextValue ) {
+		nextValue = {
+			...nextLinkValue,
+			...nextValue,
+		};
+
+		setNextLinkValue( nextValue );
+
+		if ( nextValue.url === undefined ) {
+			return;
+		}
+
 		const newUrl = prependHTTP( nextValue.url );
 		const selectedText = getTextContent( slice( value ) );
 		const format = createLinkFormat( {
@@ -109,6 +123,7 @@ function InlineLinkUI( {
 			linkValue.url === nextValue.url;
 		if ( ! didToggleSetting ) {
 			stopAddingLink();
+			setNextLinkValue( undefined );
 		}
 
 		if ( ! isValidHref( newUrl ) ) {

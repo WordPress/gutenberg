@@ -67,7 +67,22 @@ describe( 'Links', () => {
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
-		// Press Enter to apply the link
+		// Navigate to and toggle the "Open in New Tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		// Toggle should still have focus and be checked.
+		await page.waitForSelector(
+			':focus:checked.components-form-toggle__input'
+		);
+
+		// Ensure that the contents of the post have not been changed, since at
+		// this point the link is still not inserted.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Tab back to the Submit and apply the link
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		// The link should have been inserted
