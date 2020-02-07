@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { identity, get } from 'lodash';
+import { identity } from 'lodash';
 import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 
 /**
@@ -47,9 +47,6 @@ export class BlockList extends Component {
 		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind(
 			this
 		);
-		this.getVerticalAlignmentRemap = this.getVerticalAlignmentRemap.bind(
-			this
-		);
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -93,13 +90,8 @@ export class BlockList extends Component {
 	}
 
 	getVerticalAlignmentRemap( alignment ) {
-		const mapping = {
-			top: 'flex-start',
-			center: 'center',
-			bottom: 'flex-end',
-		};
-		const newAlignment = get( mapping, alignment );
-		return newAlignment ? { justifyContent: newAlignment } : undefined;
+		if ( ! alignment ) return;
+		return styles[ `is-vertically-aligned-${ alignment }` ];
 	}
 
 	render() {
