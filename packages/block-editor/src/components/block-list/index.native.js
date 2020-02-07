@@ -89,11 +89,6 @@ export class BlockList extends Component {
 		return renderAppender && blockClientIds.length > 0;
 	}
 
-	getVerticalAlignmentRemap( alignment ) {
-		if ( ! alignment ) return;
-		return styles[ `is-vertically-aligned-${ alignment }` ];
-	}
-
 	render() {
 		const {
 			clearSelectedBlock,
@@ -158,22 +153,11 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
-			containerStyle,
-			getBlockAttributes,
+			readableContentViewStyle,
 		} = this.props;
 
-		const attributes = getBlockAttributes( clientId );
-		let columnContainerStyle = {};
-		if ( attributes ) {
-			columnContainerStyle = this.getVerticalAlignmentRemap(
-				attributes.verticalAlignment
-			);
-		}
-
 		return (
-			<ReadableContentView
-				style={ containerStyle && columnContainerStyle }
-			>
+			<ReadableContentView style={ readableContentViewStyle }>
 				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
 					{ shouldShowInsertionPointBefore( clientId ) && (
 						<BlockInsertionPoint />
@@ -223,7 +207,6 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSettings,
-			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -253,10 +236,6 @@ export default compose( [
 
 		const isReadOnly = getSettings().readOnly;
 
-		const getBlockAttributes = ( clientId ) =>
-			( __unstableGetBlockWithoutInnerBlocks( clientId ) || {} )
-				.attributes;
-
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -266,7 +245,6 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
-			getBlockAttributes,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

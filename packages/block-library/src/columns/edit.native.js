@@ -89,6 +89,11 @@ function ColumnsEditContainer( {
 		return columnsNumber;
 	};
 
+	const getVerticalAlignmentRemap = ( alignment ) => {
+		if ( ! alignment ) return;
+		return styles[ `is-vertically-aligned-${ alignment }` ];
+	};
+
 	return (
 		<>
 			<InspectorControls>
@@ -140,6 +145,9 @@ function ColumnsEditContainer( {
 						! isMobile ? styles.columnsContainer : undefined
 					}
 					allowedBlocks={ ALLOWED_BLOCKS }
+					readableContentViewStyle={ getVerticalAlignmentRemap(
+						verticalAlignment
+					) }
 				/>
 			</View>
 		</>
