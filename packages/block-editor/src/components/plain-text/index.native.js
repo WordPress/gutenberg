@@ -17,6 +17,7 @@ export default class PlainText extends Component {
 	constructor() {
 		super( ...arguments );
 		this.isIOS = Platform.OS === 'ios';
+		this.isAndroid = Platform.OS === 'android';
 	}
 
 	componentDidMount() {
