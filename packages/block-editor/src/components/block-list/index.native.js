@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { identity } from 'lodash';
+import { identity, get } from 'lodash';
 import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 
 /**
@@ -92,18 +92,14 @@ export class BlockList extends Component {
 		return renderAppender && blockClientIds.length > 0;
 	}
 
-	getVerticalAlignmentRemap( alingment ) {
-		if ( ! alingment ) return;
-
+	getVerticalAlignmentRemap( alignment ) {
 		const mapping = {
 			top: 'flex-start',
 			center: 'center',
 			bottom: 'flex-end',
 		};
-
-		const newAlingment = mapping[ alingment ];
-		if ( ! newAlingment ) return;
-		return { justifyContent: alingment };
+		const newAlignment = get( mapping, alignment );
+		return newAlignment ? { justifyContent: newAlignment } : undefined;
 	}
 
 	render() {
