@@ -470,24 +470,22 @@ export const getBlockParents = createSelector(
  *
  * @return {Array} ClientIDs of the parent blocks.
  */
-export const getBlockParentsByBlockName = (
-	state,
-	clientId,
-	blockName,
-	ascending = false
-) => {
-	const parents = getBlockParents( state, clientId, ascending );
-	return map(
-		filter(
-			map( parents, ( id ) => ( {
-				id,
-				name: getBlockName( state, id ),
-			} ) ),
-			{ name: blockName }
-		),
-		( { id } ) => id
-	);
-};
+export const getBlockParentsByBlockName = createSelector(
+	( state, clientId, blockName, ascending = false ) => {
+		const parents = getBlockParents( state, clientId, ascending );
+		return map(
+			filter(
+				map( parents, ( id ) => ( {
+					id,
+					name: getBlockName( state, id ),
+				} ) ),
+				{ name: blockName }
+			),
+			( { id } ) => id
+		);
+	},
+	( state ) => [ state.blocks.parents ]
+);
 
 /**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
