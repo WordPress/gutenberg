@@ -6,12 +6,12 @@ This is done by setting the `target` on `<PluginSidebarMoreMenuItem>` to match t
 ## Example
 
 ```js
-import { registerPlugin } from "@wordpress/plugins";
+import { registerPlugin } from '@wordpress/plugins';
 import {
 	PluginSidebar,
 	PluginSidebarMoreMenuItem
-} from "@wordpress/edit-post";
-import { image } from "@wordpress/icons";
+} from '@wordpress/edit-post';
+import { image } from '@wordpress/icons';
 
 const { Fragment } = wp.element;
 const myIcon =

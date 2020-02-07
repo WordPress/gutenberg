@@ -112,10 +112,10 @@ function PluginSidebar( props ) {
  * @example <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * import { __ } from "@wordpress/i18n";
- * import { PanelBody } from "@wordpress/components";
- * import { PluginSidebar } from "@wordpress/edit-post";
- * import { more } from "@wordpress/icons";
+ * import { __ } from '@wordpress/i18n';
+ * import { PanelBody } from '@wordpress/components';
+ * import { PluginSidebar } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * const MyPluginSidebar = () => (
  * 	<PluginSidebar

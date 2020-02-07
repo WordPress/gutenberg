@@ -186,9 +186,9 @@ function MyButtonMoreMenuItem() {
 
 ```jsx
 // Using ESNext syntax
-import { __ } from "@wordpress/i18n";
-import { PluginMoreMenuItem } from "@wordpress/edit-post";
-import { more } from "@wordpress/icons";
+import { __ } from '@wordpress/i18n';
+import { PluginMoreMenuItem } from '@wordpress/edit-post';
+import { more } from '@wordpress/icons';
 
 function onButtonClick() {
 	alert( 'Button clicked.' );
@@ -196,7 +196,7 @@ function onButtonClick() {
 
 const MyButtonMoreMenuItem = () => (
 	<PluginMoreMenuItem
-		icon={more}
+		icon={ more }
 		onClick={ onButtonClick }
 	>
 		{ __( 'My button title' ) }
@@ -411,10 +411,10 @@ function MyPluginSidebar() {
 
 ```jsx
 // Using ESNext syntax
-import { __ } from "@wordpress/i18n";
-import { PanelBody } from "@wordpress/components";
-import { PluginSidebar } from "@wordpress/edit-post";
-import { more } from "@wordpress/icons";
+import { __ } from '@wordpress/i18n';
+import { PanelBody } from '@wordpress/components';
+import { PluginSidebar } from '@wordpress/edit-post';
+import { more } from '@wordpress/icons';
 
 const MyPluginSidebar = () => (
 	<PluginSidebar
@@ -470,9 +470,9 @@ function MySidebarMoreMenuItem() {
 
 ```jsx
 // Using ESNext syntax
-import { __ } from "@wordpress/i18n";
-import { PluginSidebarMoreMenuItem } from "@wordpress/edit-post";
-import { more } from "@wordpress/icons";
+import { __ } from '@wordpress/i18n';
+import { PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+import { more } from '@wordpress/icons';
 
 const MySidebarMoreMenuItem = () => (
 	<PluginSidebarMoreMenuItem

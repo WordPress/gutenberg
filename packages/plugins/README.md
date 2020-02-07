@@ -117,9 +117,9 @@ registerPlugin( 'plugin-name', {
 
 ```js
 // Using ESNext syntax
-import { PluginSidebar, PluginSidebarMoreMenuItem } from "@wordpress/edit-post";
-import { registerPlugin } from "@wordpress/plugins";
-import { more } from "@wordpress/icons";
+import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+import { registerPlugin } from '@wordpress/plugins';
+import { more } from '@wordpress/icons';
 
 const Component = () => (
 	<>

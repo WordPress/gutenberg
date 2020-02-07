@@ -58,9 +58,9 @@ const PluginSidebarMoreMenuItem = ( {
  * @example <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * import { __ } from "@wordpress/i18n";
- * import { PluginSidebarMoreMenuItem } from "@wordpress/edit-post";
- * import { more } from "@wordpress/icons";
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * const MySidebarMoreMenuItem = () => (
  * 	<PluginSidebarMoreMenuItem

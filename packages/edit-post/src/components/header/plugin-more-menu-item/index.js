@@ -62,9 +62,9 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  * @example <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * import { __ } from "@wordpress/i18n";
- * import { PluginMoreMenuItem } from "@wordpress/edit-post";
- * import { more } from "@wordpress/icons";
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginMoreMenuItem } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * function onButtonClick() {
  * 	alert( 'Button clicked.' );
@@ -72,7 +72,7 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  *
  * const MyButtonMoreMenuItem = () => (
  * 	<PluginMoreMenuItem
- * 		icon={more}
+ * 		icon={ more }
  * 		onClick={ onButtonClick }
  * 	>
  * 		{ __( 'My button title' ) }
