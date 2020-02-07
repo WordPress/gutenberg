@@ -24,7 +24,7 @@ import { keyboardReturn } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { getIconBySite, getNameBySite } from './social-list';
+import { getTitleForService } from './social-list';
 
 const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	const { url, service, label } = attributes;
@@ -34,14 +34,13 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	} );
 
 	// Import icon.
-	const IconComponent = getIconBySite( service );
-	const socialLinkName = getNameBySite( service );
+	const socialLinkTitle = getTitleForService( service );
 
 	return (
 		<Fragment>
 			<InspectorControls>
 				<PanelBody
-					title={ sprintf( __( '%s label' ), socialLinkName ) }
+					title={ sprintf( __( '%s label' ), socialLinkTitle ) }
 					initialOpen={ false }
 				>
 					<PanelRow>
@@ -59,7 +58,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 				</PanelBody>
 			</InspectorControls>
 			<Button className={ classes } onClick={ () => setPopover( true ) }>
-				<IconComponent />
+				<span className="icon" />
 				{ isSelected && showURLPopover && (
 					<URLPopover onClose={ () => setPopover( false ) }>
 						<form

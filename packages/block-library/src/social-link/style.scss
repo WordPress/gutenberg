@@ -1,0 +1,78 @@
+.wp-social-link {
+	display: block;
+	width: 36px;
+	height: 36px;
+	border-radius: 36px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
+	margin-right: 8px;
+	transition: transform 0.1s ease;
+	@include reduce-motion("transition");
+
+	a {
+		padding: 6px;
+		display: block;
+		line-height: 0;
+		transition: transform 0.1s ease;
+	}
+
+	a,
+	a:hover,
+	a:active,
+	a:visited,
+	svg {
+		color: currentColor;
+		fill: currentColor;
+
+		// Some themes add underlines, false underlines (via shadows), and borders to <a>.
+		text-decoration: none;
+		border-bottom: 0;
+		box-shadow: none;
+	}
+
+	&:hover {
+		transform: scale(1.1);
+	}
+
+	// We use the inner element as a background for the icon.
+	span {
+		display: block;
+		width: 24px;
+		height: 24px;
+		text-indent: 100%;
+		overflow: hidden;
+	}
+}
+
+@mixin sociallink($logo, $color) {
+	/* This is shown to IE11 and older browsers. */
+	background-color: #fff;
+	box-shadow: 0 0 0 1px #000;
+
+	span {
+		background: url($logo) no-repeat center center;
+	}
+
+	@supports (mask-size: cover) or (-webkit-mask-size: cover) {
+		background-color: $color;
+		box-shadow: none;
+
+		span {
+			background: #fff;
+			-webkit-mask: url($logo) no-repeat center center;
+			mask: url($logo) no-repeat center center;
+			-webkit-mask-size: cover;
+			mask-size: cover;
+		}
+	}
+}
+
+.wp-social-link-mastodon {
+	@include sociallink( "https://cldup.com/a2oE4qAWQz.svg", #3288d4 );
+}
+
+.wp-social-link-twitter {
+	@include sociallink( "https://cldup.com/JPmc-H2Egd.svg", #21a1f3 );
+}
+
+.wp-social-link-wordpress {
+	@include sociallink( "https://cldup.com/w4j97g2E1Y.svg", #3499cd );
+}
