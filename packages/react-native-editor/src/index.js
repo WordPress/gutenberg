@@ -8,7 +8,7 @@
  * External dependencies
  */
 import { AppRegistry, I18nManager } from 'react-native';
-import React from 'react';
+import { Component } from '@wordpress/element';
 
 /**
  * WordPress dependencies
@@ -50,7 +50,7 @@ const setupLocale = ( locale, extraTranslations ) => {
 	}
 };
 
-export class RootComponent extends React.Component {
+export class RootComponent extends Component {
 	constructor( props ) {
 		super( props );
 		setupLocale( props.locale, props.translations );

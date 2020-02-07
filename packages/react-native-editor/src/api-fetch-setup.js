@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { fetchRequest } from 'react-native-gutenberg-bridge';
+import { fetchRequest } from '@wordpress/react-native-bridge';
 
 /**
  * WordPress dependencies

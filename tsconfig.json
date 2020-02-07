@@ -9,6 +9,7 @@
 		"noEmit": true,
 		"resolveJsonModule": true,
 		"target": "esnext",
+		"types": ["react", "node", "jest", "requestidlecallback"],
 
 		/* Project Imports */
 		"baseUrl": ".",
@@ -45,6 +46,7 @@
 		"./packages/*/benchmark",
 		"./packages/**/test/**",
 		"./packages/**/build/**",
-		"./packages/**/build-module/**"
+		"./packages/**/build-module/**",
+		"./packages/**/react-native-*/**"
 	]
 }

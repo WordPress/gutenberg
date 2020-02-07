@@ -3,6 +3,7 @@
 
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
+const glob = require( 'glob' ).sync;
 if ( process.env.TEST_RN_PLATFORM ) {
 	// eslint-disable-next-line no-console
 	console.log( 'Setting RN platform to: ' + process.env.TEST_RN_PLATFORM );
@@ -11,14 +12,20 @@ if ( process.env.TEST_RN_PLATFORM ) {
 	console.log( 'Setting RN platform to: default (' + defaultPlatform + ')' );
 }
 
+const configPath = 'test/native';
+
+const transpiledPackageNames = glob( '../../packages/*/src/index.js' )
+	.map( ( fileName ) => fileName.split( '/' )[ 3 ] );
+
 module.exports = {
 	verbose: true,
 	// Automatically clear mock calls and instances between every test
 	clearMocks: true,
 	preset: 'react-native',
+	rootDir: '../..',
 	setupFiles: [
-		'<rootDir>/gutenberg/test/native/setup.js',
-		'<rootDir>/gutenberg/test/native/enzyme.config.js',
+		'<rootDir>/test/native/setup.js',
+		'<rootDir>/test/native/enzyme.config.js',
 	],
 	testEnvironment: 'jsdom',
 	testMatch: [
@@ -28,20 +35,19 @@ module.exports = {
 	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
-		'<rootDir>/gutenberg/gutenberg-mobile/',
 		'/gutenberg/test/',
 		'/__device-tests__/',
 	],
 	testURL: 'http://localhost/',
-	modulePathIgnorePatterns: [
-		'<rootDir>/gutenberg/gutenberg-mobile',
-		'react-native-aztec-old-submodule',
-	],
-	moduleDirectories: [ 'node_modules', 'symlinked-packages' ],
+	moduleDirectories: [ 'node_modules' ],
 	moduleNameMapper: {
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
-		'\\.(scss)$': '<rootDir>/gutenberg/test/native/__mocks__/styleMock.js',
+		'\\.(scss)$': '<rootDir>/test/native/__mocks__/styleMock.js',
+		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]: '<rootDir>/packages/$1/src',
 	},
+	modulePathIgnorePatterns: [
+		'<rootDir>/packages/react-native-editor/node_modules',
+	],
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [ 'android', 'ios', 'native' ],

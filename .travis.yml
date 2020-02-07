@@ -20,6 +20,7 @@ branches:
     - master
     - rnmobile/master
     - rnmobile/releases
+    - feat/import-gutenberg-mobile-no-squash
     - /wp\/.*/
 
 env:

@@ -36,7 +36,7 @@
 
 ## Usage
 ```javascript
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
+import RNReactNativeGutenbergBridge from '@wordpress/react-native-bridge';
 
 // TODO: What to do with the module?
 RNReactNativeGutenbergBridge;

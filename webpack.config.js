@@ -29,7 +29,9 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
 
 const gutenbergPackages = Object.keys( dependencies )
 	.filter( ( packageName ) => packageName.startsWith( WORDPRESS_NAMESPACE ) )
-	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
+	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) )
+	// exclude react-native packages from the main build
+	.filter( ( packageName ) => ! packageName.startsWith( 'react-native' ) );
 
 module.exports = {
 	mode,
