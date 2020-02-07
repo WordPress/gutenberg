@@ -75,6 +75,7 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		<BaseControl className="components-custom-gradient-picker__type-picker">
 			<BaseControl.VisualLabel>{ __( 'Type' ) }</BaseControl.VisualLabel>
 			<ToolbarGroup
+				className="components-custom-gradient-picker__toolbar"
 				controls={ [
 					{
 						icon: <LinearGradientIcon />,

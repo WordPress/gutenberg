@@ -388,7 +388,7 @@ function CoverEdit( {
 									gradientValue,
 									onColorChange: setOverlayColor,
 									onGradientChange: setGradient,
-									label: __( 'Overlay' ),
+									label: __( 'Color' ),
 								},
 							] }
 						>
