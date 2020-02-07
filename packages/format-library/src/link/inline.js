@@ -50,6 +50,14 @@ function InlineLinkUI( {
 	 */
 	const mountingKey = useMemo( uniqueId, [ addingLink ] );
 
+	/**
+	 * Pending settings to be applied to the next link. When inserting a new
+	 * link, toggle values cannot be applied immediately, because there is not
+	 * yet a link for them to apply to. Thus, they are maintained in a state
+	 * value until the time that the link can be inserted or edited.
+	 *
+	 * @type {[Object|undefined,Function]}
+	 */
 	const [ nextLinkValue, setNextLinkValue ] = useState();
 
 	const anchorRef = useMemo( () => {
@@ -84,14 +92,30 @@ function InlineLinkUI( {
 	};
 
 	function onChangeLink( nextValue ) {
+		// Merge with values from state, both for the purpose of assigning the
+		// next state value, and for use in constructing the new link format if
+		// the link is ready to be applied.
 		nextValue = {
 			...nextLinkValue,
 			...nextValue,
 		};
 
-		setNextLinkValue( nextValue );
+		// LinkControl calls `onChange` immediately upon the toggling a setting.
+		const didToggleSetting =
+			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
+			linkValue.url === nextValue.url;
 
-		if ( nextValue.url === undefined ) {
+		// If change handler was called as a result of a settings change during
+		// link insertion, it must be held in state until the link is ready to
+		// be applied.
+		const didToggleSettingForNewLink =
+			didToggleSetting && nextValue.url === undefined;
+
+		// If link will be assigned, the state value can be considered flushed.
+		// Otherwise, persist the pending changes.
+		setNextLinkValue( didToggleSettingForNewLink ? nextValue : undefined );
+
+		if ( didToggleSettingForNewLink ) {
 			return;
 		}
 
@@ -115,15 +139,10 @@ function InlineLinkUI( {
 			onChange( applyFormat( value, format ) );
 		}
 
-		// LinkControl calls `onChange` immediately upon the toggling of any
-		// settings, but focus should only be shifted back to the formatted
-		// segment when the URL is submitted.
-		const didToggleSetting =
-			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
-			linkValue.url === nextValue.url;
+		// Focus should only be shifted back to the formatted segment when the
+		// URL is submitted.
 		if ( ! didToggleSetting ) {
 			stopAddingLink();
-			setNextLinkValue( undefined );
 		}
 
 		if ( ! isValidHref( newUrl ) ) {
