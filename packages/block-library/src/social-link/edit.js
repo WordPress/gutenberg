@@ -19,6 +19,7 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -79,7 +80,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 								/>
 							</div>
 							<Button
-								icon="editor-break"
+								icon={ keyboardReturn }
 								label={ __( 'Apply' ) }
 								type="submit"
 							/>

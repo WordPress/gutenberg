@@ -1,5 +1,4 @@
-URLPopover
-===========
+# URLPopover
 
 URLPopover is a presentational React component used to render a popover used for editing and viewing a url.
 
@@ -10,6 +9,7 @@ The component will be rendered adjacent to its parent.
 ```jsx
 import { ToggleControl, Button } from '@wordpress/components';
 import { URLPopover } from '@wordpress/block-editor';
+import { keyboardReturn } from '@wordpress/icons';
 
 class MyURLPopover extends Component {
 	constructor() {
@@ -71,8 +71,16 @@ class MyURLPopover extends Component {
 						) }
 					>
 						<form onSubmit={ this.submitURL }>
-							<input type="url" value={ url } onChange={ this.onChangeURL } />
-							<Button icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+							<input
+								type="url"
+								value={ url }
+								onChange={ this.onChangeURL }
+							/>
+							<Button
+								icon={ keyboardReturn }
+								label={ __( 'Apply' ) }
+								type="submit"
+							/>
 						</form>
 					</URLPopover>
 				) }
@@ -90,18 +98,18 @@ The component accepts the following props. Any other props are passed through to
 
 Where the Popover should be positioned relative to its parent. Defaults to "bottom center".
 
-- Type: `String`
-- Required: No
-- Default: "bottom center"
+-   Type: `String`
+-   Required: No
+-   Default: "bottom center"
 
 ### focusOnMount
 
 Provides control over which element is focused when the URLPopover mounts. Pass `false` to avoid focusing
 an element.
 
-- Type: `String`
-- Required: No
-- Default: "firstElement"
+-   Type: `String`
+-   Required: No
+-   Default: "firstElement"
 
 ### renderSettings
 
@@ -109,9 +117,8 @@ Callback used to return the React Elements that will be rendered inside the sett
 is provided, a toggle button will be rendered in the popover that allows the user to open and close the settings
 drawer.
 
-- Type: `Function`
-- Required: No
-
+-   Type: `Function`
+-   Required: No
 
 ## Useful UI pieces
 
@@ -125,40 +132,39 @@ The component accepts the following props. Any other props are passed through to
 
 ### className
 
-A class that together with "block-editor-url-popover__link-viewer" is used as a class of the wrapper div.
-If no className is passed only "block-editor-url-popover__link-viewer" is used.
+A class that together with "block-editor-url-popover**link-viewer" is used as a class of the wrapper div.
+If no className is passed only "block-editor-url-popover**link-viewer" is used.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ### linkClassName
 
-A class that will be used in the component that renders the link. 
+A class that will be used in the component that renders the link.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ### url
 
 The current URL to view.
 
-- Type: `String`
-- Required: Yes
+-   Type: `String`
+-   Required: Yes
 
 ### urlLabel
 
 The URL label, if not passed a label is automatically generated from the `url`.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ### onEditLinkClick
 
 A function called when the user presses the button that allows editing a link. If not passed the link-edit button is not rendered.
 
-- Type: `function`
-- Required: No
-
+-   Type: `function`
+-   Required: No
 
 ### LinkEditor
 
@@ -168,10 +174,10 @@ The component accepts the following props. Any other props are passed through to
 ### value
 
 This property should be set to the attribute (or component state) property used to store the URL.
-This property is directly passed to  `URLInput` component ([refer to its documentation](/packages/components/src/url-input/README.md)) to read additional details.
+This property is directly passed to `URLInput` component ([refer to its documentation](/packages/components/src/url-input/README.md)) to read additional details.
 
-- Type: `String`
-- Required: Yes
+-   Type: `String`
+-   Required: Yes
 
 ### onChange
 
@@ -179,12 +185,12 @@ Called when the value changes. The second parameter is `null` unless the user se
 More
 This property is directly passed to component `URLInput` ([refer to its documentation](/packages/components/src/url-input/README.md)) to read additional details.
 
-- Type: `function`
-- Required: Yes
+-   Type: `function`
+-   Required: Yes
 
 ### autocompleteRef
 
 Reference passed to the auto complete element of the ([URLInput component](/packages/components/src/url-input/README.md)).
 
-- Type: `Object`
-- Required: no
+-   Type: `Object`
+-   Required: no

@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import Dropdown from '../';
@@ -20,19 +25,19 @@ const DropdownAndDropdownMenuExample = () => {
 					controls={ [
 						{
 							title: 'Up',
-							icon: 'arrow-up-alt',
+							icon: arrowUp,
 						},
 						{
 							title: 'Right',
-							icon: 'arrow-right-alt',
+							icon: arrowRight,
 						},
 						{
 							title: 'Down',
-							icon: 'arrow-down-alt',
+							icon: arrowDown,
 						},
 						{
 							title: 'Left',
-							icon: 'arrow-left-alt',
+							icon: arrowLeft,
 						},
 					] }
 				/>
@@ -53,10 +58,10 @@ const DropdownAndDropdownMenuExample = () => {
 					) }
 					renderContent={ () => (
 						<MenuGroup>
-							<MenuItem icon="arrow-up-alt">Up</MenuItem>
-							<MenuItem icon="arrow-down-alt">Down</MenuItem>
-							<MenuItem icon="arrow-left-alt">Left</MenuItem>
-							<MenuItem icon="arrow-right-alt">Right</MenuItem>
+							<MenuItem icon={ arrowUp }>Up</MenuItem>
+							<MenuItem icon={ arrowDown }>Down</MenuItem>
+							<MenuItem icon={ arrowLeft }>Left</MenuItem>
+							<MenuItem icon={ arrowRight }>Right</MenuItem>
 						</MenuGroup>
 					) }
 				/>
