@@ -58,9 +58,9 @@ function gutenberg_add_url_polyfill( $scripts ) {
 	gutenberg_register_vendor_script(
 		$scripts,
 		'wp-polyfill-url',
-		'https://unpkg.com/polyfill-library@3.26.0-0/polyfills/URL/polyfill.js',
+		'https://unpkg.com/polyfill-library@3.42.0/polyfills/URL/polyfill.js',
 		array(),
-		'3.26.0-0'
+		'3.42.0'
 	);
 
 	did_action( 'init' ) && $scripts->add_inline_script(
