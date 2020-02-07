@@ -150,7 +150,7 @@ function ColumnsEditContainer( {
 						scrollEnabled: false,
 					} }
 					allowedBlocks={ ALLOWED_BLOCKS }
-					containerStyle={ ( columnClientId ) => {
+					getBlockContainerStyle={ ( columnClientId ) => {
 						const columnAttributes = getBlockAttributes(
 							columnClientId
 						);

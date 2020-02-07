@@ -113,7 +113,7 @@ class InnerBlocks extends Component {
 		const {
 			clientId,
 			renderAppender,
-			containerStyle,
+			getBlockContainerStyle,
 			flatListProps,
 		} = this.props;
 		const { templateInProcess } = this.state;
@@ -126,7 +126,7 @@ class InnerBlocks extends Component {
 						renderAppender={ renderAppender }
 						withFooter={ false }
 						isFullyBordered={ true }
-						containerStyle={ containerStyle }
+						getBlockContainerStyle={ getBlockContainerStyle }
 						flatListProps={ flatListProps }
 					/>
 				) }
