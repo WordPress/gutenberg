@@ -9,20 +9,18 @@ import {
 	switchEditorModeTo,
 } from '@wordpress/e2e-test-utils';
 
-// Urls to mock
-const SEARCH_URLS = [
-	'/__experimental/block-directory/search',
-	`rest_route=${ encodeURIComponent(
-		'/__experimental/block-directory/search'
-	) }`,
-];
+/**
+ * Internal dependencies
+ */
+import { enableExperimentalFeatures } from '../../../experimental-features';
 
-const INSTALL_URLS = [
-	'/__experimental/block-directory/install',
-	`rest_route=${ encodeURIComponent(
-		'/__experimental/block-directory/install'
-	) }`,
-];
+// Urls to mock
+const SEARCH_URL = `rest_route=${ encodeURIComponent(
+	'/__experimental/block-directory/search'
+) }`;
+const INSTALL_URL = `rest_route=${ encodeURIComponent(
+	'/__experimental/block-directory/install'
+) }`;
 
 // Example Blocks
 const mockBlock1 = {
@@ -78,17 +76,13 @@ export function getResponseObject( obj, contentType ) {
 }
 
 export function createResponse( mockResponse, contentType = undefined ) {
-	// eslint-disable-next-line no-console
-	console.log( ' The Mock response ' );
-	// eslint-disable-next-line no-console
-	console.log( JSON.stringify( mockResponse ) );
-
 	return async ( request ) =>
 		request.respond( getResponseObject( mockResponse, contentType ) );
 }
 
 describe( 'adding blocks from block directory', () => {
 	beforeEach( async () => {
+		await enableExperimentalFeatures( [ '#gutenberg-block-directory' ] );
 		await createNewPost();
 	} );
 
@@ -99,9 +93,7 @@ describe( 'adding blocks from block directory', () => {
 		// Return an empty list of plugins
 		await setUpResponseMocking( [
 			{
-				match: ( request ) =>
-					request.url().includes( SEARCH_URLS[ 0 ] ) ||
-					request.url().includes( SEARCH_URLS[ 1 ] ),
+				match: ( request ) => request.url().includes( SEARCH_URL ),
 				onRequestMatch: createResponse( JSON.stringify( [] ) ),
 			},
 		] );
@@ -125,9 +117,7 @@ describe( 'adding blocks from block directory', () => {
 			{
 				// Mock response for search with the block
 				match: ( request ) => {
-					const matches =
-						request.url().includes( SEARCH_URLS[ 0 ] ) ||
-						request.url().includes( SEARCH_URLS[ 1 ] );
+					const matches = request.url().includes( SEARCH_URL );
 					return matches;
 				},
 				onRequestMatch: createResponse(
@@ -136,9 +126,7 @@ describe( 'adding blocks from block directory', () => {
 			},
 			{
 				// Mock response for install
-				match: ( request ) =>
-					request.url().includes( INSTALL_URLS[ 0 ] ) ||
-					request.url().includes( INSTALL_URLS[ 1 ] ),
+				match: ( request ) => request.url().includes( INSTALL_URL ),
 				onRequestMatch: createResponse( JSON.stringify( true ) ),
 			},
 			{
@@ -154,17 +142,6 @@ describe( 'adding blocks from block directory', () => {
 
 		// Search for the block via the inserter
 		await searchForBlock( mockBlock1.title );
-
-		const editor = await page.waitForSelector(
-			'.block-directory-downloadable-blocks-list'
-		);
-
-		const html = await page.evaluate( ( el ) => {
-			return el.innerHTML;
-		}, editor );
-
-		// eslint-disable-next-line no-console
-		console.log( html );
 
 		// Grab the first block in the list -> Needs to be the first one, the mock response expects it.
 		const addBtn = await page.waitForSelector(
