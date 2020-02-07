@@ -15,7 +15,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
-import { rss } from '@wordpress/icons';
+import { rss, pencil } from '@wordpress/icons';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
@@ -85,7 +85,7 @@ class RSSEdit extends Component {
 
 		const toolbarControls = [
 			{
-				icon: 'edit',
+				icon: pencil,
 				title: __( 'Edit RSS URL' ),
 				onClick: () => this.setState( { editing: true } ),
 			},

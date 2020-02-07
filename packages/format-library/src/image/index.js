@@ -11,6 +11,7 @@ import {
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { keyboardReturn } from '@wordpress/icons';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -188,7 +189,7 @@ export const image = {
 									onChange={ this.onChange }
 								/>
 								<Button
-									icon="editor-break"
+									icon={ keyboardReturn }
 									label={ __( 'Apply' ) }
 									type="submit"
 								/>

@@ -7,6 +7,7 @@ import { shallow, mount } from 'enzyme';
  * WordPress dependencies
  */
 import { DOWN } from '@wordpress/keycodes';
+import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,22 +23,22 @@ describe( 'DropdownMenu', () => {
 		controls = [
 			{
 				title: 'Up',
-				icon: 'arrow-up-alt',
+				icon: arrowUp,
 				onClick: jest.fn(),
 			},
 			{
 				title: 'Right',
-				icon: 'arrow-right-alt',
+				icon: arrowRight,
 				onClick: jest.fn(),
 			},
 			{
 				title: 'Down',
-				icon: 'arrow-down-alt',
+				icon: arrowDown,
 				onClick: jest.fn(),
 			},
 			{
 				title: 'Left',
-				icon: 'arrow-left-alt',
+				icon: arrowLeft,
 				onClick: jest.fn(),
 			},
 		];
