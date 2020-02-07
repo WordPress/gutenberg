@@ -132,7 +132,7 @@ function ColumnEdit( {
 					renderAppender={
 						isSelected && InnerBlocks.ButtonBlockAppender
 					}
-					readableContentViewStyle={ getVerticalAlignmentRemap(
+					containerStyle={ getVerticalAlignmentRemap(
 						verticalAlignment
 					) }
 				/>

@@ -99,7 +99,7 @@ export class BlockList extends Component {
 			withFooter = true,
 			isReadOnly,
 			isRootList,
-			containerStyle,
+			flatListProps,
 		} = this.props;
 
 		return (
@@ -108,6 +108,7 @@ export class BlockList extends Component {
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
 				<KeyboardAwareFlatList
+					{ ...flatListProps }
 					{ ...( Platform.OS === 'android'
 						? { removeClippedSubviews: false }
 						: {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
@@ -117,7 +118,6 @@ export class BlockList extends Component {
 					extraScrollHeight={ innerToolbarHeight + 10 }
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
-					containerStyle={ containerStyle }
 					data={ blockClientIds }
 					extraData={ [ isFullyBordered ] }
 					keyExtractor={ identity }
@@ -153,11 +153,11 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
-			readableContentViewStyle,
+			containerStyle,
 		} = this.props;
 
 		return (
-			<ReadableContentView style={ readableContentViewStyle }>
+			<ReadableContentView style={ containerStyle }>
 				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
 					{ shouldShowInsertionPointBefore( clientId ) && (
 						<BlockInsertionPoint />

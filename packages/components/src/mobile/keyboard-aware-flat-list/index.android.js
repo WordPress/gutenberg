@@ -8,16 +8,9 @@ import { FlatList } from 'react-native';
  */
 import KeyboardAvoidingView from '../keyboard-avoiding-view';
 
-export const KeyboardAwareFlatList = ( { containerStyle, ...props } ) => (
+export const KeyboardAwareFlatList = ( props ) => (
 	<KeyboardAvoidingView style={ { flex: 1 } }>
-		<FlatList
-			scrollEnabled={ containerStyle ? false : true }
-			horizontal={ containerStyle ? true : false }
-			contentContainerStyle={
-				containerStyle ? containerStyle : undefined
-			}
-			{ ...props }
-		/>
+		<FlatList { ...props } />
 	</KeyboardAvoidingView>
 );
 

@@ -141,11 +141,15 @@ function ColumnsEditContainer( {
 				} }
 			>
 				<InnerBlocks
-					containerStyle={
-						! isMobile ? styles.columnsContainer : undefined
-					}
+					flatListProps={ {
+						...( ! isMobile && {
+							contentContainerStyle: styles.columnsContainer,
+						} ),
+						horizontal: ! isMobile,
+						scrollEnabled: false,
+					} }
 					allowedBlocks={ ALLOWED_BLOCKS }
-					readableContentViewStyle={ getVerticalAlignmentRemap(
+					containerStyle={ getVerticalAlignmentRemap(
 						verticalAlignment
 					) }
 				/>
