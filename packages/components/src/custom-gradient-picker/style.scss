@@ -82,7 +82,14 @@ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handle
 .components-custom-gradient-picker .components-custom-gradient-picker__toolbar {
 	border: none;
 
+	// Work-around to target the inner button containers rendered by <ToolbarGroup />
+	> div + div {
+		margin-left: 1px;
+	}
+
 	button {
+		border-radius: 4px;
+
 		&.is-pressed {
 			> svg {
 				background: $white;
