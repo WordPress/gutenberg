@@ -544,8 +544,6 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         private EventDispatcher mEventDispatcher;
         private ReactAztecText mEditText;
         private String mPreviousText;
-        private int mPreviousSelectionStart;
-        private int mPreviousSelectionEnd;
 
         public AztecTextWatcher(final ReactContext reactContext, final ReactAztecText aztecText) {
             mEventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
@@ -557,8 +555,6 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             // Incoming charSequence gets mutated before onTextChanged() is invoked
             mPreviousText = s.toString();
-            mPreviousSelectionStart = mEditText.getSelectionStart();
-            mPreviousSelectionEnd = mEditText.getSelectionEnd();
         }
 
         @Override
@@ -580,14 +576,14 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             // if the "Enter" handling is underway, don't sent text change events. The ReactAztecEnterEvent will have
             // the text (minus the Enter char itself).
             if (!mEditText.isEnterPressedUnderway()) {
-                final String content = mEditText.toHtml(mEditText.getText(), false);
+                int currentEventCount = mEditText.incrementAndGetEventCounter();
                 // The event that contains the event counter and updates it must be sent first.
                 // TODO: t7936714 merge these events
                 mEventDispatcher.dispatchEvent(
                         new ReactTextChangedEvent(
                                 mEditText.getId(),
-                                content,
-                                mEditText.incrementAndGetEventCounter()));
+                                mEditText.toHtml(mEditText.getText(), false),
+                                currentEventCount));
 
                 mEventDispatcher.dispatchEvent(
                         new ReactTextInputEvent(
@@ -596,20 +592,6 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                                 oldText,
                                 start,
                                 start + before));
-
-
-                final int selectionStart = mEditText.getSelectionStart();
-                final int selectionEnd = mEditText.getSelectionEnd();
-                if (selectionStart != mPreviousSelectionStart
-                        || selectionEnd != mPreviousSelectionEnd) {
-                    mEventDispatcher.dispatchEvent(
-                            new ReactAztecSelectionChangeEvent(
-                                    mEditText.getId(),
-                                    content,
-                                    selectionStart,
-                                    selectionEnd,
-                                    mEditText.incrementAndGetEventCounter()));
-                }
             }
 
 
