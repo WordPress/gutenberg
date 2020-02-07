@@ -532,16 +532,17 @@ export function switchToBlockType( blocks, name ) {
 
 /**
  * Create a block object from the example API.
+ * Can return `undefined` if the block can't be created.
  *
  * @param {string} name
  * @param {Object} example
  *
- * @return {Object} block.
+ * @return {?Object} block object or undefined.
  */
 export const getBlockFromExample = ( name, example ) => {
 	if ( ! getBlockType( name ) ) {
 		warning( 'Block example used an unknown block type: ' + name );
-		return false;
+		return;
 	}
 	return createBlock(
 		name,
