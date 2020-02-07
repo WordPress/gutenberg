@@ -3,6 +3,7 @@
  */
 import uuid from 'uuid/v4';
 import {
+	compact,
 	every,
 	reduce,
 	castArray,
@@ -545,7 +546,7 @@ export const getBlockFromExample = ( name, example ) => {
 	return createBlock(
 		name,
 		example.attributes,
-		filter(
+		compact(
 			map( example.innerBlocks, ( innerBlock ) =>
 				getBlockFromExample( innerBlock.name, innerBlock )
 			)
