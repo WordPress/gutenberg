@@ -25,7 +25,7 @@ import { useEffect } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { withViewportMatch } from '@wordpress/viewport';
-import { columns as icon } from '@wordpress/icons'
+import { columns as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
