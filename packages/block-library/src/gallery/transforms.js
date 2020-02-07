@@ -116,11 +116,11 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { images, align, sizeSlug } ) => {
+			transform: ( { images, align, sizeSlug, ids } ) => {
 				if ( images.length > 0 ) {
-					return images.map( ( { id, url, alt, caption } ) =>
+					return images.map( ( { url, alt, caption }, index ) =>
 						createBlock( 'core/image', {
-							id,
+							id: ids[ index ],
 							url,
 							alt,
 							caption,
