@@ -218,21 +218,18 @@ const ColumnsEdit = ( props ) => {
 	} = useSelect(
 		( select ) => {
 			const {
-				__experimentalGetBlockVariations,
+				getBlockVariations,
 				getBlockType,
-				__experimentalGetDefaultBlockVariation,
+				getDefaultBlockVariation,
 			} = select( 'core/blocks' );
 
 			return {
 				blockType: getBlockType( name ),
-				defaultVariation: __experimentalGetDefaultBlockVariation(
-					name,
-					'block'
-				),
+				defaultVariation: getDefaultBlockVariation( name, 'block' ),
 				hasInnerBlocks:
 					select( 'core/block-editor' ).getBlocks( clientId ).length >
 					0,
-				variations: __experimentalGetBlockVariations( name, 'block' ),
+				variations: getBlockVariations( name, 'block' ),
 			};
 		},
 		[ clientId, name ]
