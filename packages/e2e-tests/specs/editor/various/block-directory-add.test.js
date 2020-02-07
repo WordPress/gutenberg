@@ -15,12 +15,19 @@ import {
 import { enableExperimentalFeatures } from '../../../experimental-features';
 
 // Urls to mock
-const SEARCH_URL = `rest_route=${ encodeURIComponent(
-	'/__experimental/block-directory/search'
-) }`;
-const INSTALL_URL = `rest_route=${ encodeURIComponent(
-	'/__experimental/block-directory/install'
-) }`;
+const SEARCH_URLS = [
+	'/__experimental/block-directory/search',
+	`rest_route=${ encodeURIComponent(
+		'/__experimental/block-directory/search'
+	) }`,
+];
+
+const INSTALL_URLS = [
+	'/__experimental/block-directory/install',
+	`rest_route=${ encodeURIComponent(
+		'/__experimental/block-directory/install'
+	) }`,
+];
 
 // Example Blocks
 const mockBlock1 = {
@@ -80,6 +87,10 @@ export function createResponse( mockResponse, contentType = undefined ) {
 		request.respond( getResponseObject( mockResponse, contentType ) );
 }
 
+const matchUrl = ( reqUrl, urls ) => {
+	return urls.some( ( el ) => reqUrl.indexOf( el ) >= 0 );
+};
+
 describe( 'adding blocks from block directory', () => {
 	beforeEach( async () => {
 		await enableExperimentalFeatures( [ '#gutenberg-block-directory' ] );
@@ -93,7 +104,7 @@ describe( 'adding blocks from block directory', () => {
 		// Return an empty list of plugins
 		await setUpResponseMocking( [
 			{
-				match: ( request ) => request.url().includes( SEARCH_URL ),
+				match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
 				onRequestMatch: createResponse( JSON.stringify( [] ) ),
 			},
 		] );
@@ -116,17 +127,14 @@ describe( 'adding blocks from block directory', () => {
 		await setUpResponseMocking( [
 			{
 				// Mock response for search with the block
-				match: ( request ) => {
-					const matches = request.url().includes( SEARCH_URL );
-					return matches;
-				},
+				match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
 				onRequestMatch: createResponse(
 					JSON.stringify( [ mockBlock1, mockBlock2 ] )
 				),
 			},
 			{
 				// Mock response for install
-				match: ( request ) => request.url().includes( INSTALL_URL ),
+				match: ( request ) => matchUrl( request.url(), INSTALL_URLS ),
 				onRequestMatch: createResponse( JSON.stringify( true ) ),
 			},
 			{
