@@ -433,18 +433,23 @@ function LinkControl( {
 							return (
 								<LinkControlSearchCreate
 									searchTerm={ inputValue }
-									onClick={ () => {
-										cancelableOnCreate = makeCancelable(
-											handleOnCreate( suggestion.title )
-										)
-											.promise.then( () => stopEditing() )
-											.catch( ( error ) => {
-												if ( error.isCanceled ) {
-													return; // bail if canceled to avoid setting state
-												}
+									onClick={ async () => {
+										try {
+											cancelableOnCreate = makeCancelable(
+												handleOnCreate(
+													suggestion.title
+												)
+											);
 
-												stopEditing();
-											} );
+											await cancelableOnCreate.promise;
+										} catch ( error ) {
+											if ( error && error.isCanceled ) {
+												return; // bail if canceled to avoid setting state
+											}
+										}
+
+										// Only setState if not cancelled
+										stopEditing();
 									} }
 									key={ `${ suggestion.id }-${ suggestion.type }` }
 									itemProps={ buildSuggestionItemProps(
@@ -504,28 +509,29 @@ function LinkControl( {
 				<LinkControlSearchInput
 					value={ inputValue }
 					onChange={ onInputChange }
-					onSelect={ ( suggestion ) => {
+					onSelect={ async ( suggestion ) => {
 						if (
 							suggestion.type &&
 							CREATE_TYPE === suggestion.type
 						) {
-							cancelableOnCreate = makeCancelable(
-								handleOnCreate( inputValue )
-							)
-								.promise.then( () => stopEditing() )
-								.catch( ( error ) => {
-									if ( error.isCanceled ) {
-										return; // bail if canceled to avoid setting state
-									}
+							try {
+								cancelableOnCreate = makeCancelable(
+									handleOnCreate( inputValue )
+								);
 
-									stopEditing();
-								} );
+								await cancelableOnCreate.promise;
+							} catch ( error ) {
+								if ( error && error.isCanceled ) {
+									return; // bail if canceled to avoid setting state
+								}
+							}
 						} else {
 							handleSelectSuggestion( suggestion, value );
-							// Must be called after handling to ensure focus is
-							// managed correctly.
-							stopEditing();
 						}
+
+						// Must be called after handling to ensure focus is
+						// managed correctly.
+						stopEditing();
 					} }
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
