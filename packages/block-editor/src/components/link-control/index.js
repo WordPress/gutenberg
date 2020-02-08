@@ -434,7 +434,17 @@ function LinkControl( {
 								<LinkControlSearchCreate
 									searchTerm={ inputValue }
 									onClick={ () => {
-										handleOnCreate( suggestion.title );
+										cancelableOnCreate = makeCancelable(
+											handleOnCreate( suggestion.title )
+										)
+											.promise.then( () => stopEditing() )
+											.catch( ( error ) => {
+												if ( error.isCanceled ) {
+													return; // bail if canceled to avoid setting state
+												}
+
+												stopEditing();
+											} );
 									} }
 									key={ `${ suggestion.id }-${ suggestion.type }` }
 									itemProps={ buildSuggestionItemProps(
