@@ -5627,35 +5627,35 @@ Array [
 ]
 `;
 
-exports[`Storyshots Components|AnglePicker Default 1`] = `
+exports[`Storyshots Components|AnglePickerControl Default 1`] = `
 <div
-  className="components-base-control components-angle-picker"
+  className="components-base-control components-angle-picker-control"
 >
   <div
     className="components-base-control__field"
   >
     <label
       className="components-base-control__label"
-      htmlFor="components-angle-picker__input-0"
+      htmlFor="components-angle-picker-control__input-0"
     >
       Angle
     </label>
     <div
       aria-hidden="true"
-      className="components-angle-picker__angle-circle"
+      className="components-angle-picker-control__angle-circle"
       onMouseDown={[Function]}
     >
       <div
-        className="components-angle-picker__angle-circle-indicator-wrapper"
+        className="components-angle-picker-control__angle-circle-indicator-wrapper"
       >
         <span
-          className="components-angle-picker__angle-circle-indicator"
+          className="components-angle-picker-control__angle-circle-indicator"
         />
       </div>
     </div>
     <input
-      className="components-angle-picker__input-field"
-      id="components-angle-picker__input-0"
+      className="components-angle-picker-control__input-field"
+      id="components-angle-picker-control__input-0"
       max={360}
       min={0}
       onChange={[Function]}
