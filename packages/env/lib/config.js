@@ -128,7 +128,11 @@ module.exports = {
 				themes: [],
 				port: 8888,
 				testsPort: 8889,
-				config: { WP_DEBUG: true, SCRIPT_DEBUG: true },
+				config: {
+					WP_DEBUG: true,
+					SCRIPT_DEBUG: true,
+					WP_TESTS_DOMAIN: 'example.org',
+				},
 				mappings: {},
 			},
 			config,
