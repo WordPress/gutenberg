@@ -19,6 +19,7 @@ import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -43,7 +44,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 			/>
 			<Button
 				className="block-editor-media-placeholder__url-input-submit-button"
-				icon="editor-break"
+				icon={ keyboardReturn }
 				label={ __( 'Apply' ) }
 				type="submit"
 			/>

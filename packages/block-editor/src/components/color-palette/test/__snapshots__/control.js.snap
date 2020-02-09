@@ -9,20 +9,24 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   >
     <fieldset>
       <legend>
-        <span
-          className="components-base-control__label"
+        <div
+          className="block-editor-color-gradient-control__color-indicator"
         >
-          Test Color
           <span
-            aria-label="(Color: #f00)"
-            className="component-color-indicator"
-            style={
-              Object {
-                "background": "#f00",
+            className="components-base-control__label"
+          >
+            Test Color
+            <span
+              aria-label="(Color: #f00)"
+              className="component-color-indicator"
+              style={
+                Object {
+                  "background": "#f00",
+                }
               }
-            }
-          />
-        </span>
+            />
+          </span>
+        </div>
       </legend>
       <div
         className="components-circular-option-picker"

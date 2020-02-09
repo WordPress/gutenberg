@@ -48,7 +48,7 @@ import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { image as icon } from '@wordpress/icons';
+import { link, image as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -389,7 +389,7 @@ export class ImageEdit extends React.Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
 					<TextControl
-						icon={ 'admin-links' }
+						icon={ link }
 						label={ __( 'Link To' ) }
 						value={ href || '' }
 						valuePlaceholder={ __( 'Add URL' ) }

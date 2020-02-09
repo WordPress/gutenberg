@@ -57,6 +57,11 @@ $navigation-item-height: 46px;
 			background: none;
 		}
 	}
+
+	// Set a min width when the item is focused and empty in order to show the caret.
+	.wp-block-navigation .wp-block-navigation-link.is-selected .block-editor-rich-text__editable:focus {
+		min-width: 20px;
+	}
 }
 
 .wp-block-navigation__inserter-content {

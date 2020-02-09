@@ -8,11 +8,11 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { useContext, useEffect, useState, useRef } from '@wordpress/element';
+import { upload, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import Dashicon from '../dashicon';
 import { DropZoneConsumer, Context } from './provider';
 
 export function useDropZone( {
@@ -84,8 +84,8 @@ function DropZoneComponent( {
 	if ( isDraggingOverElement ) {
 		children = (
 			<div className="components-drop-zone__content">
-				<Dashicon
-					icon="upload"
+				<Icon
+					icon={ upload }
 					size="40"
 					className="components-drop-zone__content-icon"
 				/>
