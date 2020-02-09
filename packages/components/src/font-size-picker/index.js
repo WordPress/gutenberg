@@ -47,6 +47,7 @@ export default function FontSizePicker( {
 	onChange,
 	value,
 	withSlider = false,
+	label = __( 'Preset Size' ),
 } ) {
 	const instanceId = useInstanceId( FontSizePicker );
 	const [ currentSelectValue, setCurrentSelectValue ] = useState(
@@ -105,7 +106,7 @@ export default function FontSizePicker( {
 				{ fontSizes.length > 0 && (
 					<CustomSelectControl
 						className={ 'components-font-size-picker__select' }
-						label={ __( 'Preset Size' ) }
+						label={ label }
 						options={ options }
 						value={
 							options.find(
