@@ -167,7 +167,6 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
-						isSmallScreen={ false }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (
