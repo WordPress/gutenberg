@@ -8,9 +8,6 @@ import classnames from 'classnames';
  */
 import { navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSimulatedMediaQuery } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
 
 function EditorRegions( {
 	footer,
@@ -20,57 +17,6 @@ function EditorRegions( {
 	publish,
 	className,
 } ) {
-	const deviceType = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getDeviceType();
-	}, [] );
-
-	const [ actualWidth, updateActualWidth ] = useState( window.innerWidth );
-
-	useEffect( () => {
-		const resizeListener = () => updateActualWidth( window.innerWidth );
-		window.addEventListener( 'resize', resizeListener );
-
-		return () => {
-			window.removeEventListener( 'resize', resizeListener );
-		};
-	} );
-
-	const getCanvasWidth = ( device ) => {
-		let deviceWidth = 0;
-
-		switch ( device ) {
-			case 'Tablet':
-				deviceWidth = 780;
-				break;
-			case 'Mobile':
-				deviceWidth = 360;
-				break;
-			default:
-				deviceWidth = 2000;
-		}
-
-		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
-	};
-
-	const marginValue = () => ( window.innerHeight < 800 ? 36 : 72 );
-
-	const contentInlineStyles = ( device ) => {
-		switch ( device ) {
-			case 'Tablet':
-			case 'Mobile':
-				return {
-					width: getCanvasWidth( device ),
-					margin: marginValue() + 'px auto',
-					flexGrow: 0,
-					maxHeight: device === 'Mobile' ? '768px' : '1024px',
-				};
-			default:
-				return null;
-		}
-	};
-
-	useSimulatedMediaQuery( getCanvasWidth( deviceType ) );
-
 	return (
 		<div className={ classnames( className, 'edit-post-editor-regions' ) }>
 			{ !! header && (
@@ -91,7 +37,6 @@ function EditorRegions( {
 					/* translators: accessibility text for the content landmark region. */
 					aria-label={ __( 'Editor content' ) }
 					tabIndex="-1"
-					style={ contentInlineStyles( deviceType ) }
 				>
 					{ content }
 				</div>
