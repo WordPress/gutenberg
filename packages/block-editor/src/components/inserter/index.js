@@ -20,6 +20,33 @@ import {
  */
 import InserterMenu from './menu';
 
+const additionalStyles = [
+	{
+		states: 'enabled:hover',
+		styles: {
+			color: 'green',
+		},
+	},
+	{
+		states: 'enabled:focus',
+		styles: {
+			color: 'yellow',
+		},
+	},
+	{
+		states: 'enabled:focus:hover',
+		styles: {
+			color: 'pink',
+		},
+	},
+	{
+		states: 'enabled:focus:hover:active',
+		styles: {
+			color: 'orange',
+		},
+	},
+];
+
 const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingleBlockType } ) => {
 	let label;
 	if ( hasSingleBlockType ) {
@@ -46,6 +73,7 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingl
 			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
 			aria-expanded={ ! hasSingleBlockType ? isOpen : false }
 			disabled={ disabled }
+			additionalStyles={ additionalStyles }
 		/>
 	);
 };

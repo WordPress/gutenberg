@@ -16,6 +16,8 @@ import { forwardRef } from '@wordpress/element';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { Button as PrimitiveButton, A } from '../styled-primitives/button';
+import additionalStylesHelper from '../styled-primitives/additionalStylesHelper';
+
 import styles from './styles';
 
 export function Button( {
@@ -40,10 +42,7 @@ export function Button( {
 	shortcut,
 	label,
 	children,
-	hoverStyle,
-	focusedStyle,
-	disabledStyle,
-	activeStyle,
+	additionalStyles,
 	...additionalProps
 }, ref ) {
 	if ( isDefault ) {
@@ -90,19 +89,18 @@ export function Button( {
 
 	const element = (
 		<Tag
-			css={ ( theme ) => {
-				const allStyles = styles( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle );
-				return [
-					allStyles.base,
-					( isDefault || isSecondary ) && allStyles.secondary,
-					isPrimary && allStyles.primary,
-					isTertiary && allStyles.tertiary,
-					isLink && allStyles.link,
-					isSmall && allStyles.small,
-					!! icon && allStyles.hasIcon,
-					isBusy && allStyles.busy,
-				];
-			} }
+			css={ ( theme ) => [
+				styles.base( theme ),
+				( isDefault || isSecondary ) && styles.secondary( theme ),
+				isPrimary && styles.primary( theme ),
+				isTertiary && styles.tertiary( theme ),
+				isLink && styles.link( theme ),
+				isSmall && styles.small( theme ),
+				!! icon && styles.hasIcon( theme ),
+				isBusy && styles.busy( theme ),
+				additionalStyles && additionalStylesHelper( additionalStyles ),
+			]
+			}
 			font-size={ isSmall ? 'small' : 'default' }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
 			{ ...propsToPass }

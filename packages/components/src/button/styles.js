@@ -3,7 +3,7 @@
  */
 import { css } from '@emotion/core';
 
-const base = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => css`
+const base = ( theme ) => css`
 	border: 0;
 	cursor: pointer;
 	-webkit-appearance: none;
@@ -33,34 +33,30 @@ const base = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => 
 		}
 	}
 
-	&:hover:not(:disabled):not([aria-disabled="true"]) {
+	&:enabled:hover {
 		background-color: ${ theme.colors.white };
 		color: ${ theme.colors[ 'dark-gray-900' ] };
 		box-shadow: inset 0 0 0 1px ${ theme.colors[ 'dark-gray-500' ] }, inset 0 0 0 2px ${ theme.colors.white };
-		${ hoverStyle ? hoverStyle : '' }
 	}
 
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
+	&:enabled:focus {
 		color: ${ theme.colors[ 'dark-gray-900' ] };
 		box-shadow: inset 0 0 0 1px ${ theme.colors[ 'dark-gray-300' ] }, inset 0 0 0 2px ${ theme.colors.white };
 		outline: 2px solid transparent;
-		${ focusedStyle ? focusedStyle : '' }
 	}
 
-	&:active:not(:disabled):not([aria-disabled="true"]) {
+	&:enabled:active {
 		color: inherit;
-		${ activeStyle ? activeStyle : '' }
 	}
 
 	&:disabled,
 	&[aria-disabled="true"] {
 		cursor: default;
 		opacity: 0.3;
-		${ disabledStyle ? disabledStyle : '' }
 	}
 `;
 
-const secondary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => css`
+const secondary = ( theme ) => css`
 		border-style: solid;
 		white-space: nowrap;
 		background: #f3f5f6;
@@ -68,13 +64,12 @@ const secondary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle 
 		color: ${ theme.helpers.shade( theme.colors.primary, -5 ) };
 		border-color: ${ theme.helpers.shade( theme.colors.primary, -5 ) };
 
-		&:not(:disabled):not([aria-disabled="true"]):hover {
+		&:enabled:hover {
 			background: #f1f1f1;
 			text-decoration: none;
 			box-shadow: none;
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
 			color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
-			${ hoverStyle ? hoverStyle : '' }
 		}
 
 		&:focus:enabled {
@@ -84,7 +79,6 @@ const secondary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle 
 			color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -5 ) };
 			box-shadow: 0 0 0 ${ theme.space.borderWidth } ${ theme.helpers.shade( theme.colors.primary, -5 ) };
-			${ focusedStyle ? focusedStyle : '' }
 		}
 
 		&:active:enabled {
@@ -92,7 +86,6 @@ const secondary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle 
 			border-color: #7e8993;
 			box-shadow: none;
 			color: ${ theme.helpers.shade( theme.colors.primary, -5 ) };
-			${ activeStyle ? activeStyle : '' }
 		}
 
 		&:disabled,
@@ -103,7 +96,6 @@ const secondary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle 
 			transform: none;
 			opacity: 1;
 			text-shadow: 0 ${ theme.space.borderWidth } 0 ${ theme.colors.white };
-			${ disabledStyle ? disabledStyle : '' }
 		}
 
 		&.is-busy,
@@ -122,7 +114,7 @@ const secondary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle 
 		}
 `;
 
-const primary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => css`
+const primary = ( theme ) => css`
 		border-style: solid;
 		white-space: nowrap;
 		text-shadow: none;
@@ -131,12 +123,11 @@ const primary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) 
 		background: ${ theme.colors.primary };
 		border-color: ${ theme.colors.primary };
 
-		&:not(:disabled):not([aria-disabled="true"]):hover {
+		&:enabled:hover {
 			color: ${ theme.colors.white };
 			background: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
 			box-shadow: none;
-			${ hoverStyle ? hoverStyle : '' }
 		}
 
 		&:focus:enabled {
@@ -146,14 +137,12 @@ const primary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) 
 			box-shadow:
 				0 0 0 ${ theme.space.borderWidth } ${ theme.colors.white },
 				0 0 0 3px ${ theme.colors.primary };
-			${ focusedStyle ? focusedStyle : '' }
 		}
 
 		&:active:enabled {
 			color: ${ theme.colors.white };
 			background: ${ theme.helpers.shade( theme.colors.primary, -20 ) };
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -20 ) };
-			${ activeStyle ? activeStyle : '' }
 		}
 
 		&:disabled,
@@ -172,7 +161,6 @@ const primary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) 
 				${ theme.helpers.shade( theme.colors.primary, -20 ) } 72%,
 				${ theme.colors.button } 72%
 			);
-			${ disabledStyle ? disabledStyle : '' }
 
 			&:focus:enabled {
 				box-shadow:
@@ -186,11 +174,10 @@ const primary = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) 
 			color: ${ theme.colors.white };
 			background-size: 100px 100%;
 			border-color: ${ theme.colors.primary };
-			${ disabledStyle ? disabledStyle : '' }
 		}
 `;
 
-const link = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => css`
+const link = ( theme ) => css`
 	box-shadow: none;
 	border: 0;
 	background: none;
@@ -210,12 +197,10 @@ const link = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => 
 
 	&:not(:disabled):not([aria-disabled="true"]):hover {
 		color: #00a0d2;
-		${ hoverStyle ? hoverStyle : '' }
 	}
 
 	&:active {
 		color: #00a0d2;
-		${ activeStyle ? activeStyle : '' }
 	}
 
 	&:focus {
@@ -223,14 +208,13 @@ const link = ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => 
 		box-shadow:
 			0 0 0 ${ theme.space.borderWidth } #5b9dd9,
 			0 0 2px ${ theme.space.borderWidth } rgba(30, 140, 190, 0.8);
-		${ focusedStyle ? focusedStyle : '' }
 	}
 	&.is-destructive {
 		color: ${ theme.colors.alertRed };
 	}
 `;
 
-const busy = ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
+const busy = ( theme ) => css`
 		background-size: 100px 100%;
 		opacity: 1;
 		animation: components-button__busy-animation 2500ms infinite linear;
@@ -241,7 +225,6 @@ const busy = ( theme, hoverStyle, focusedStyle, disabledStyle ) => css`
 			${ theme.colors.white } 10px,
 			${ theme.colors[ 'light-gray-500' ] } 20px
 		);
-		${ disabledStyle ? disabledStyle : '' }
 `;
 const small = ( theme ) => css`
 	height: ${ theme.space.xlarge }px;
@@ -283,13 +266,13 @@ const hasIcon = ( theme ) => css`
 `;
 
 // TODO Support theme in additional styles
-export default ( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ) => ( {
-	base: base( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
-	secondary: secondary( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
-	primary: primary( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
-	link: link( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
-	small: small( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
-	tertiary: tertiary( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
-	hasIcon: hasIcon( theme ),
-	busy: busy( theme, hoverStyle, focusedStyle, disabledStyle, activeStyle ),
-} );
+export default {
+	base,
+	secondary,
+	primary,
+	link,
+	small,
+	tertiary,
+	hasIcon,
+	busy,
+};
