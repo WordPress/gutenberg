@@ -29,7 +29,10 @@ function VisualEditor() {
 	const inlineStyles = useResizeCanvas();
 
 	return (
-		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper" style={ inlineStyles }>
+		<BlockSelectionClearer
+			className="edit-post-visual-editor editor-styles-wrapper"
+			style={ inlineStyles }
+		>
 			<VisualEditorGlobalKeyboardShortcuts />
 			<MultiSelectScrollIntoView />
 			<Popover.Slot name="block-toolbar" />
