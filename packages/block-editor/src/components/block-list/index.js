@@ -77,6 +77,9 @@ function BlockList( {
 		element: ref,
 		rootClientId,
 	} );
+	const __experimentalContainerProps = rootClientId
+		? {}
+		: { hasPopover: __experimentalUIParts.hasPopover };
 
 	return (
 		<Container
@@ -85,7 +88,7 @@ function BlockList( {
 				'block-editor-block-list__layout',
 				className
 			) }
-			hasPopover={ __experimentalUIParts.hasPopover }
+			{ ...__experimentalContainerProps }
 		>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection

@@ -19,6 +19,7 @@ import {
 	getTextContent,
 	slice,
 } from '@wordpress/rich-text';
+import { link } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -160,7 +161,7 @@ class ModalLinkUI extends Component {
 				{
 					/* eslint-disable jsx-a11y/no-autofocus */
 					<BottomSheet.Cell
-						icon={ 'admin-links' }
+						icon={ link }
 						label={ __( 'URL' ) }
 						value={ this.state.inputValue }
 						placeholder={ __( 'Add URL' ) }

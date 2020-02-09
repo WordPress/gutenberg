@@ -7,9 +7,9 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	__experimentalAddBlockVariations,
+	addBlockVariations,
 	addBlockTypes,
-	__experimentalRemoveBlockVariations,
+	removeBlockVariations,
 } from '../actions';
 import {
 	blockVariations,
@@ -153,7 +153,7 @@ describe( 'blockVariations', () => {
 
 		const state = blockVariations(
 			initialState,
-			__experimentalAddBlockVariations( blockName, blockVariation )
+			addBlockVariations( blockName, blockVariation )
 		);
 
 		expect( state ).toEqual( {
@@ -168,7 +168,7 @@ describe( 'blockVariations', () => {
 
 		const state = blockVariations(
 			initialState,
-			__experimentalAddBlockVariations( blockName, secondBlockVariation )
+			addBlockVariations( blockName, secondBlockVariation )
 		);
 
 		expect( state ).toEqual( {
@@ -201,7 +201,7 @@ describe( 'blockVariations', () => {
 
 		const state = blockVariations(
 			initialState,
-			__experimentalRemoveBlockVariations( blockName, blockVariationName )
+			removeBlockVariations( blockName, blockVariationName )
 		);
 
 		expect( state ).toEqual( {

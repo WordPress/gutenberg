@@ -24,7 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
 import { isURL } from '@wordpress/url';
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { close } from '@wordpress/icons';
+import { close, arrowLeft, arrowRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -241,7 +241,7 @@ class GalleryImage extends Component {
 									<View style={ style.moverButtonContainer }>
 										<Button
 											style={ buttonStyle }
-											icon="arrow-left-alt"
+											icon={ arrowLeft }
 											iconSize={ ICON_SIZE_ARROW }
 											onClick={
 												isFirstItem
@@ -257,7 +257,7 @@ class GalleryImage extends Component {
 										<View style={ separatorStyle }></View>
 										<Button
 											style={ buttonStyle }
-											icon="arrow-right-alt"
+											icon={ arrowRight }
 											iconSize={ ICON_SIZE_ARROW }
 											onClick={
 												isLastItem

@@ -17,6 +17,7 @@ import {
 	RichTextShortcut,
 } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
+import { link as linkIcon, linkOff } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -130,7 +131,7 @@ export const link = {
 						{ isActive && (
 							<RichTextToolbarButton
 								name="link"
-								icon="editor-unlink"
+								icon={ linkOff }
 								title={ __( 'Unlink' ) }
 								onClick={ this.onRemoveFormat }
 								isActive={ isActive }
@@ -141,7 +142,7 @@ export const link = {
 						{ ! isActive && (
 							<RichTextToolbarButton
 								name="link"
-								icon="admin-links"
+								icon={ linkIcon }
 								title={ title }
 								onClick={ this.addLink }
 								isActive={ isActive }

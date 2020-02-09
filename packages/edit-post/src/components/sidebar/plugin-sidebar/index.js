@@ -90,6 +90,7 @@ function PluginSidebar( props ) {
  * var el = wp.element.createElement;
  * var PanelBody = wp.components.PanelBody;
  * var PluginSidebar = wp.editPost.PluginSidebar;
+ * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
  *
  * function MyPluginSidebar() {
  * 	return el(
@@ -97,7 +98,7 @@ function PluginSidebar( props ) {
  * 			{
  * 				name: 'my-sidebar',
  * 				title: 'My sidebar title',
- * 				icon: 'smiley',
+ * 				icon: moreIcon,
  * 			},
  * 			el(
  * 				PanelBody,
@@ -111,15 +112,16 @@ function PluginSidebar( props ) {
  * @example <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PanelBody } = wp.components;
- * const { PluginSidebar } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PanelBody } from '@wordpress/components';
+ * import { PluginSidebar } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * const MyPluginSidebar = () => (
  * 	<PluginSidebar
  * 		name="my-sidebar"
  * 		title="My sidebar title"
- * 		icon="smiley"
+ * 		icon={ more }
  * 	>
  * 		<PanelBody>
  * 			{ __( 'My sidebar content' ) }

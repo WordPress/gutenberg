@@ -9,7 +9,12 @@ const {
 	hasFileArgInCLI,
 	spawnScript,
 } = require( './cli' );
-const { getWebpackArgs, hasBabelConfig, hasJestConfig } = require( './config' );
+const {
+	getWebpackArgs,
+	hasBabelConfig,
+	hasJestConfig,
+	hasPrettierConfig,
+} = require( './config' );
 const {
 	buildWordPress,
 	downloadWordPressZip,
@@ -33,6 +38,7 @@ module.exports = {
 	hasFileArgInCLI,
 	hasJestConfig,
 	hasPackageProp,
+	hasPrettierConfig,
 	hasProjectFile,
 	downloadWordPressZip,
 	mergeYAMLConfigs,
