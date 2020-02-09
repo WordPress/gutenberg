@@ -26,18 +26,21 @@ export const getAssociatedGuide = createSelector(
 	( state, tipId ) => {
 		for ( const tipIds of state.guides ) {
 			if ( includes( tipIds, tipId ) ) {
-				const nonDismissedTips = difference( tipIds, keys( state.preferences.dismissedTips ) );
-				const [ currentTipId = null, nextTipId = null ] = nonDismissedTips;
+				const nonDismissedTips = difference(
+					tipIds,
+					keys( state.preferences.dismissedTips )
+				);
+				const [
+					currentTipId = null,
+					nextTipId = null,
+				] = nonDismissedTips;
 				return { tipIds, currentTipId, nextTipId };
 			}
 		}
 
 		return null;
 	},
-	( state ) => [
-		state.guides,
-		state.preferences.dismissedTips,
-	],
+	( state ) => [ state.guides, state.preferences.dismissedTips ]
 );
 
 /**

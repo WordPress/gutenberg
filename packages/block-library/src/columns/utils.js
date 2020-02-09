@@ -12,9 +12,7 @@ import { findIndex, sumBy, merge, mapValues } from 'lodash';
  * @return {number} Value rounded to standard precision.
  */
 export const toWidthPrecision = ( value ) =>
-	Number.isFinite( value ) ?
-		parseFloat( value.toFixed( 2 ) ) :
-		undefined;
+	Number.isFinite( value ) ? parseFloat( value.toFixed( 2 ) ) : undefined;
 
 /**
  * Returns the considered adjacent to that of the specified `clientId` for
@@ -57,8 +55,13 @@ export function getEffectiveColumnWidth( block, totalBlockCount ) {
  *
  * @return {number} Total width occupied by blocks.
  */
-export function getTotalColumnsWidth( blocks, totalBlockCount = blocks.length ) {
-	return sumBy( blocks, ( block ) => getEffectiveColumnWidth( block, totalBlockCount ) );
+export function getTotalColumnsWidth(
+	blocks,
+	totalBlockCount = blocks.length
+) {
+	return sumBy( blocks, ( block ) =>
+		getEffectiveColumnWidth( block, totalBlockCount )
+	);
 }
 
 /**
@@ -89,14 +92,17 @@ export function getColumnWidths( blocks, totalBlockCount = blocks.length ) {
  *
  * @return {Object<string,number>} Redistributed column widths.
  */
-export function getRedistributedColumnWidths( blocks, availableWidth, totalBlockCount = blocks.length ) {
+export function getRedistributedColumnWidths(
+	blocks,
+	availableWidth,
+	totalBlockCount = blocks.length
+) {
 	const totalWidth = getTotalColumnsWidth( blocks, totalBlockCount );
 	const difference = availableWidth - totalWidth;
 	const adjustment = difference / blocks.length;
 
-	return mapValues(
-		getColumnWidths( blocks, totalBlockCount ),
-		( width ) => toWidthPrecision( width + adjustment ),
+	return mapValues( getColumnWidths( blocks, totalBlockCount ), ( width ) =>
+		toWidthPrecision( width + adjustment )
 	);
 }
 
@@ -109,7 +115,9 @@ export function getRedistributedColumnWidths( blocks, availableWidth, totalBlock
  * @return {boolean} Whether columns have explicit widths.
  */
 export function hasExplicitColumnWidths( blocks ) {
-	return blocks.some( ( block ) => Number.isFinite( block.attributes.width ) );
+	return blocks.some( ( block ) =>
+		Number.isFinite( block.attributes.width )
+	);
 }
 
 /**
@@ -122,9 +130,11 @@ export function hasExplicitColumnWidths( blocks ) {
  * @return {WPBlock[]} blocks Mapped block objects.
  */
 export function getMappedColumnWidths( blocks, widths ) {
-	return blocks.map( ( block ) => merge( {}, block, {
-		attributes: {
-			width: widths[ block.clientId ],
-		},
-	} ) );
+	return blocks.map( ( block ) =>
+		merge( {}, block, {
+			attributes: {
+				width: widths[ block.clientId ],
+			},
+		} )
+	);
 }

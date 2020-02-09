@@ -10,15 +10,17 @@ function KeyboardShortcuts() {
 	const {
 		getBlockSelectionStart,
 		getEditorMode,
-		isEditorSidebarOpen,
+		isEditorSidebarOpened,
 		richEditingEnabled,
 		codeEditingEnabled,
 	} = useSelect( ( select ) => {
 		const settings = select( 'core/editor' ).getEditorSettings();
 		return {
-			getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
+			getBlockSelectionStart: select( 'core/block-editor' )
+				.getBlockSelectionStart,
 			getEditorMode: select( 'core/edit-post' ).getEditorMode,
-			isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened,
+			isEditorSidebarOpened: select( 'core/edit-post' )
+				.isEditorSidebarOpened,
 			richEditingEnabled: settings.richEditingEnabled,
 			codeEditingEnabled: settings.codeEditingEnabled,
 		};
@@ -70,10 +72,12 @@ function KeyboardShortcuts() {
 				modifier: 'ctrl',
 				character: '`',
 			},
-			aliases: [ {
-				modifier: 'access',
-				character: 'n',
-			} ],
+			aliases: [
+				{
+					modifier: 'access',
+					character: 'n',
+				},
+			],
 		} );
 
 		registerShortcut( {
@@ -84,10 +88,12 @@ function KeyboardShortcuts() {
 				modifier: 'ctrlShift',
 				character: '`',
 			},
-			aliases: [ {
-				modifier: 'access',
-				character: 'p',
-			} ],
+			aliases: [
+				{
+					modifier: 'access',
+					character: 'p',
+				},
+			],
 		} );
 
 		registerShortcut( {
@@ -101,22 +107,37 @@ function KeyboardShortcuts() {
 		} );
 	}, [] );
 
-	useShortcut( 'core/edit-post/toggle-mode', () => {
-		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
-	}, { bindGlobal: true, isDisabled: ! richEditingEnabled || ! codeEditingEnabled } );
-
-	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
-		// This shortcut has no known clashes, but use preventDefault to prevent any
-		// obscure shortcuts from triggering.
-		event.preventDefault();
-
-		if ( isEditorSidebarOpen ) {
-			closeGeneralSidebar();
-		} else {
-			const sidebarToOpen = getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document';
-			openGeneralSidebar( sidebarToOpen );
+	useShortcut(
+		'core/edit-post/toggle-mode',
+		() => {
+			switchEditorMode(
+				getEditorMode() === 'visual' ? 'text' : 'visual'
+			);
+		},
+		{
+			bindGlobal: true,
+			isDisabled: ! richEditingEnabled || ! codeEditingEnabled,
 		}
-	}, { bindGlobal: true } );
+	);
+
+	useShortcut(
+		'core/edit-post/toggle-sidebar',
+		( event ) => {
+			// This shortcut has no known clashes, but use preventDefault to prevent any
+			// obscure shortcuts from triggering.
+			event.preventDefault();
+
+			if ( isEditorSidebarOpened() ) {
+				closeGeneralSidebar();
+			} else {
+				const sidebarToOpen = getBlockSelectionStart()
+					? 'edit-post/block'
+					: 'edit-post/document';
+				openGeneralSidebar( sidebarToOpen );
+			}
+		},
+		{ bindGlobal: true }
+	);
 
 	return null;
 }

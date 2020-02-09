@@ -14,7 +14,10 @@ import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
 import mediaUploadMiddleware from './middlewares/media-upload';
-import { parseResponseAndNormalizeError, parseAndThrowError } from './utils/response';
+import {
+	parseResponseAndNormalizeError,
+	parseAndThrowError,
+} from './utils/response';
 
 /**
  * Default set of header values which should be sent with every request unless
@@ -72,33 +75,36 @@ const defaultFetchHandler = ( nextOptions ) => {
 		headers[ 'Content-Type' ] = 'application/json';
 	}
 
-	const responsePromise = window.fetch(
-		url || path,
-		{
-			...DEFAULT_OPTIONS,
-			...remainingOptions,
-			body,
-			headers,
-		}
-	);
+	const responsePromise = window.fetch( url || path, {
+		...DEFAULT_OPTIONS,
+		...remainingOptions,
+		body,
+		headers,
+	} );
 
-	return responsePromise
-		// Return early if fetch errors. If fetch error, there is most likely no
-		// network connection. Unfortunately fetch just throws a TypeError and
-		// the message might depend on the browser.
-		.then(
-			( value ) =>
-				Promise.resolve( value )
-					.then( checkStatus )
-					.catch( ( response ) => parseAndThrowError( response, parse ) )
-					.then( ( response ) => parseResponseAndNormalizeError( response, parse ) ),
-			() => {
-				throw {
-					code: 'fetch_error',
-					message: __( 'You are probably offline.' ),
-				};
-			}
-		);
+	return (
+		responsePromise
+			// Return early if fetch errors. If fetch error, there is most likely no
+			// network connection. Unfortunately fetch just throws a TypeError and
+			// the message might depend on the browser.
+			.then(
+				( value ) =>
+					Promise.resolve( value )
+						.then( checkStatus )
+						.catch( ( response ) =>
+							parseAndThrowError( response, parse )
+						)
+						.then( ( response ) =>
+							parseResponseAndNormalizeError( response, parse )
+						),
+				() => {
+					throw {
+						code: 'fetch_error',
+						message: __( 'You are probably offline.' ),
+					};
+				}
+			)
+	);
 };
 
 let fetchHandler = defaultFetchHandler;
@@ -135,7 +141,8 @@ function apiFetch( options ) {
 				}
 
 				// If the nonce is invalid, refresh it and try again.
-				window.fetch( apiFetch.nonceEndpoint )
+				window
+					.fetch( apiFetch.nonceEndpoint )
 					.then( checkStatus )
 					.then( ( data ) => data.text() )
 					.then( ( text ) => {

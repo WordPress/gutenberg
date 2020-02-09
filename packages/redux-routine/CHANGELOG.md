@@ -1,3 +1,11 @@
+## Master
+
+## 3.7.0 (2020-02-04)
+
+### Bug Fix
+
+- Change the `isGenerator` check for better compatibility with generator helper libraries ([#19666](https://github.com/WordPress/gutenberg/pull/19666)).
+
 ## 3.1.0 (2019-03-06)
 
 ### Bug Fixes

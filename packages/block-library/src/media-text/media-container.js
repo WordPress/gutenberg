@@ -24,12 +24,14 @@ import icon from './media-container-icon';
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 
 export function imageFillStyles( url, focalPoint ) {
-	return url ?
-		{
-			backgroundImage: `url(${ url })`,
-			backgroundPosition: focalPoint ? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%` : `50% 50%`,
-		} :
-		{};
+	return url
+		? {
+				backgroundImage: `url(${ url })`,
+				backgroundPosition: focalPoint
+					? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
+					: `50% 50%`,
+		  }
+		: {};
 }
 
 class MediaContainer extends Component {
@@ -45,7 +47,7 @@ class MediaContainer extends Component {
 	}
 
 	renderToolbarEditButton() {
-		const { onSelectMedia, onSelectURL, mediaUrl } = this.props;
+		const { onSelectMedia, mediaUrl } = this.props;
 		return (
 			<BlockControls>
 				<MediaReplaceFlow
@@ -53,15 +55,22 @@ class MediaContainer extends Component {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					accept="image/*,video/*"
 					onSelect={ onSelectMedia }
-					onSelectURL={ onSelectURL }
 				/>
 			</BlockControls>
 		);
 	}
 
 	renderImage() {
-		const { mediaAlt, mediaUrl, className, imageFill, focalPoint } = this.props;
-		const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
+		const {
+			mediaAlt,
+			mediaUrl,
+			className,
+			imageFill,
+			focalPoint,
+		} = this.props;
+		const backgroundStyles = imageFill
+			? imageFillStyles( mediaUrl, focalPoint )
+			: {};
 		return (
 			<>
 				{ this.renderToolbarEditButton() }
@@ -103,7 +112,15 @@ class MediaContainer extends Component {
 	}
 
 	render() {
-		const { mediaPosition, mediaUrl, mediaType, mediaWidth, commitWidthChange, onWidthChange, toggleSelection } = this.props;
+		const {
+			mediaPosition,
+			mediaUrl,
+			mediaType,
+			mediaWidth,
+			commitWidthChange,
+			onWidthChange,
+			toggleSelection,
+		} = this.props;
 		if ( mediaType && mediaUrl ) {
 			const onResizeStart = () => {
 				toggleSelection( false );

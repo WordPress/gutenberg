@@ -15,12 +15,9 @@ import {
 	withColors,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import {
-	ToolbarGroup,
-} from '@wordpress/components';
+import { ToolbarGroup } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -31,13 +28,23 @@ import styles from './style.scss';
 /**
  * Constants
  */
-const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/list' ];
-const TEMPLATE = [
-	[ 'core/paragraph' ],
+const ALLOWED_BLOCKS = [
+	'core/button',
+	'core/paragraph',
+	'core/heading',
+	'core/list',
 ];
+const TEMPLATE = [ [ 'core/paragraph' ] ];
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
-const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
+const BREAKPOINTS = {
+	mobile: 480,
+};
+const applyWidthConstraints = ( width ) =>
+	Math.max(
+		WIDTH_CONSTRAINT_PERCENTAGE,
+		Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE )
+	);
 
 class MediaTextEdit extends Component {
 	constructor() {
@@ -47,8 +54,11 @@ class MediaTextEdit extends Component {
 		this.onMediaUpdate = this.onMediaUpdate.bind( this );
 		this.onWidthChange = this.onWidthChange.bind( this );
 		this.commitWidthChange = this.commitWidthChange.bind( this );
+		this.onLayoutChange = this.onLayoutChange.bind( this );
+
 		this.state = {
 			mediaWidth: null,
+			containerWidth: 0,
 		};
 	}
 
@@ -66,13 +76,21 @@ class MediaTextEdit extends Component {
 				// video contain the media type of 'file' in the object returned from the rest api.
 				mediaType = 'video';
 			}
-		} else { // for media selections originated from existing files in the media library.
+		} else {
+			// for media selections originated from existing files in the media library.
 			mediaType = media.type;
 		}
 
 		if ( mediaType === 'image' && media.sizes ) {
 			// Try the "large" size URL, falling back to the "full" size URL below.
-			src = get( media, [ 'sizes', 'large', 'url' ] ) || get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
+			src =
+				get( media, [ 'sizes', 'large', 'url' ] ) ||
+				get( media, [
+					'media_details',
+					'sizes',
+					'large',
+					'source_url',
+				] );
 		}
 
 		setAttributes( {
@@ -111,9 +129,31 @@ class MediaTextEdit extends Component {
 		} );
 	}
 
+	onLayoutChange( { nativeEvent } ) {
+		const { width } = nativeEvent.layout;
+		const { containerWidth } = this.state;
+
+		if ( containerWidth === width ) {
+			return null;
+		}
+
+		this.setState( {
+			containerWidth: width,
+		} );
+	}
+
 	renderMediaArea() {
 		const { attributes, isSelected } = this.props;
-		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth, imageFill, focalPoint } = attributes;
+		const {
+			mediaAlt,
+			mediaId,
+			mediaPosition,
+			mediaType,
+			mediaUrl,
+			mediaWidth,
+			imageFill,
+			focalPoint,
+		} = attributes;
 
 		return (
 			<MediaContainer
@@ -122,7 +162,17 @@ class MediaTextEdit extends Component {
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
 				onFocus={ this.props.onFocus }
-				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint, isSelected } }
+				{ ...{
+					mediaAlt,
+					mediaId,
+					mediaType,
+					mediaUrl,
+					mediaPosition,
+					mediaWidth,
+					imageFill,
+					focalPoint,
+					isSelected,
+				} }
 			/>
 		);
 	}
@@ -132,7 +182,6 @@ class MediaTextEdit extends Component {
 			attributes,
 			backgroundColor,
 			setAttributes,
-			isMobile,
 			isSelected,
 			isParentSelected,
 			isAncestorSelected,
@@ -143,8 +192,13 @@ class MediaTextEdit extends Component {
 			mediaWidth,
 			verticalAlignment,
 		} = attributes;
+		const { containerWidth } = this.state;
+
+		const isMobile = containerWidth < BREAKPOINTS.mobile;
 		const shouldStack = isStackedOnMobile && isMobile;
-		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
+		const temporaryMediaWidth = shouldStack
+			? 100
+			: this.state.mediaWidth || mediaWidth;
 		const widthString = `${ temporaryMediaWidth }%`;
 
 		const innerBlockContainerStyle = ! shouldStack && {
@@ -154,30 +208,41 @@ class MediaTextEdit extends Component {
 		};
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
-			...styles[ `is-vertically-aligned-${ verticalAlignment || 'center' }` ],
-			...( mediaPosition === 'right' ? styles[ 'has-media-on-the-right' ] : {} ),
+			...styles[
+				`is-vertically-aligned-${ verticalAlignment || 'center' }`
+			],
+			...( mediaPosition === 'right'
+				? styles[ 'has-media-on-the-right' ]
+				: {} ),
 			...( shouldStack ? styles[ 'is-stacked-on-mobile' ] : {} ),
-			...( shouldStack && mediaPosition === 'right' ? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ] : {} ),
+			...( shouldStack && mediaPosition === 'right'
+				? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ]
+				: {} ),
 			backgroundColor: backgroundColor.color,
 		};
-		const innerBlockWidth = shouldStack ? 100 : ( 100 - temporaryMediaWidth );
+		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
 		const mediaContainerStyle = {
-			...( isParentSelected || isAncestorSelected ? styles.denseMediaPadding : styles.regularMediaPadding ),
+			...( isParentSelected || isAncestorSelected
+				? styles.denseMediaPadding
+				: styles.regularMediaPadding ),
 			...( isSelected && styles.innerPadding ),
 		};
 
-		const toolbarControls = [ {
-			icon: 'align-pull-left',
-			title: __( 'Show media on left' ),
-			isActive: mediaPosition === 'left',
-			onClick: () => setAttributes( { mediaPosition: 'left' } ),
-		}, {
-			icon: 'align-pull-right',
-			title: __( 'Show media on right' ),
-			isActive: mediaPosition === 'right',
-			onClick: () => setAttributes( { mediaPosition: 'right' } ),
-		} ];
+		const toolbarControls = [
+			{
+				icon: 'align-pull-left',
+				title: __( 'Show media on left' ),
+				isActive: mediaPosition === 'left',
+				onClick: () => setAttributes( { mediaPosition: 'left' } ),
+			},
+			{
+				icon: 'align-pull-right',
+				title: __( 'Show media on right' ),
+				isActive: mediaPosition === 'right',
+				onClick: () => setAttributes( { mediaPosition: 'right' } ),
+			},
+		];
 
 		const onVerticalAlignmentChange = ( alignment ) => {
 			setAttributes( { verticalAlignment: alignment } );
@@ -186,20 +251,28 @@ class MediaTextEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<ToolbarGroup
-						controls={ toolbarControls }
-					/>
+					<ToolbarGroup controls={ toolbarControls } />
 					<BlockVerticalAlignmentToolbar
 						onChange={ onVerticalAlignmentChange }
 						value={ verticalAlignment }
 						isCollapsed={ false }
 					/>
 				</BlockControls>
-				<View style={ containerStyles }>
-					<View style={ { width: widthString, ...mediaContainerStyle } } >
+				<View
+					style={ containerStyles }
+					onLayout={ this.onLayoutChange }
+				>
+					<View
+						style={ { width: widthString, ...mediaContainerStyle } }
+					>
 						{ this.renderMediaArea() }
 					</View>
-					<View style={ { width: innerBlockWidthString, ...innerBlockContainerStyle } }>
+					<View
+						style={ {
+							width: innerBlockWidthString,
+							...innerBlockContainerStyle,
+						} }
+					>
 						<InnerBlocks
 							allowedBlocks={ ALLOWED_BLOCKS }
 							template={ TEMPLATE }
@@ -214,7 +287,6 @@ class MediaTextEdit extends Component {
 
 export default compose(
 	withColors( 'backgroundColor' ),
-	withViewportMatch( { isMobile: '< small' } ),
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getSelectedBlockClientId,
@@ -225,13 +297,16 @@ export default compose(
 		const parents = getBlockParents( clientId, true );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const isParentSelected = selectedBlockClientId && selectedBlockClientId === getBlockRootClientId( clientId );
-		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
+		const isParentSelected =
+			selectedBlockClientId &&
+			selectedBlockClientId === getBlockRootClientId( clientId );
+		const isAncestorSelected =
+			selectedBlockClientId && parents.includes( selectedBlockClientId );
 
 		return {
 			isSelected: selectedBlockClientId === clientId,
 			isParentSelected,
 			isAncestorSelected,
 		};
-	} ),
+	} )
 )( MediaTextEdit );

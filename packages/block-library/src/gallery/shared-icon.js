@@ -2,10 +2,6 @@
  * WordPress dependencies
  */
 import { BlockIcon } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import { icon } from './icons.js';
+import { gallery as icon } from '@wordpress/icons';
 
 export const sharedIcon = <BlockIcon icon={ icon } />;

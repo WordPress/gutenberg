@@ -109,7 +109,7 @@ npm run build
 php bin/generate-gutenberg-php.php > gutenberg.tmp.php
 mv gutenberg.tmp.php gutenberg.php
 
-build_files=$(ls build/*/*.{js,css,asset.php} build/block-library/blocks/*.php)
+build_files=$(ls build/*/*.{js,css,asset.php} build/block-library/blocks/*.php build/block-library/blocks/*/block.json)
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"

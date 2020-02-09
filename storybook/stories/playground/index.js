@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/editor'; // This shouldn't be necessary
-
 import { useEffect, useState } from '@wordpress/element';
 import {
 	BlockEditorKeyboardShortcuts,
@@ -61,7 +59,7 @@ function App() {
 }
 
 export default {
-	title: 'Playground|Block Editor',
+	title: 'Playground/Block Editor',
 };
 
 export const _default = () => {

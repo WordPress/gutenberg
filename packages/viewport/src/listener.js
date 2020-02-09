@@ -13,10 +13,13 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 	 * Callback invoked when media query state should be updated. Is invoked a
 	 * maximum of one time per call stack.
 	 */
-	const setIsMatching = debounce( () => {
-		const values = mapValues( queries, ( query ) => query.matches );
-		dispatch( 'core/viewport' ).setIsMatching( values );
-	}, { leading: true } );
+	const setIsMatching = debounce(
+		() => {
+			const values = mapValues( queries, ( query ) => query.matches );
+			dispatch( 'core/viewport' ).setIsMatching( values );
+		},
+		{ leading: true }
+	);
 
 	/**
 	 * Hash of breakpoint names with generated MediaQueryList for corresponding
@@ -27,17 +30,23 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 	 *
 	 * @type {Object<string,MediaQueryList>}
 	 */
-	const queries = reduce( breakpoints, ( result, width, name ) => {
-		forEach( operators, ( condition, operator ) => {
-			const list = window.matchMedia( `(${ condition }: ${ width }px)` );
-			list.addListener( setIsMatching );
+	const queries = reduce(
+		breakpoints,
+		( result, width, name ) => {
+			forEach( operators, ( condition, operator ) => {
+				const list = window.matchMedia(
+					`(${ condition }: ${ width }px)`
+				);
+				list.addListener( setIsMatching );
 
-			const key = [ operator, name ].join( ' ' );
-			result[ key ] = list;
-		} );
+				const key = [ operator, name ].join( ' ' );
+				result[ key ] = list;
+			} );
 
-		return result;
-	}, {} );
+			return result;
+		},
+		{}
+	);
 
 	window.addEventListener( 'orientationchange', setIsMatching );
 
@@ -47,4 +56,3 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 };
 
 export default addDimensionsEventListener;
-

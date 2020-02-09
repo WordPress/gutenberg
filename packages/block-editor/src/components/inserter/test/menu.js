@@ -59,8 +59,9 @@ const assertNoResultsMessageNotToBePresent = ( element ) => {
 };
 
 const assertOpenedPanels = ( element, expectedOpen = 0 ) => {
-	expect( element.querySelectorAll( '.components-panel__body.is-opened ' ) )
-		.toHaveLength( expectedOpen );
+	expect(
+		element.querySelectorAll( '.components-panel__body.is-opened ' )
+	).toHaveLength( expectedOpen );
 };
 
 const getTabButtonWithContent = ( element, content ) => {
@@ -75,8 +76,12 @@ const getTabButtonWithContent = ( element, content ) => {
 };
 
 const performSearchWithText = ( element, searchText ) => {
-	const searchElement = element.querySelector( '.block-editor-inserter__search' );
-	TestUtils.Simulate.change( searchElement, { target: { value: searchText } } );
+	const searchElement = element.querySelector(
+		'.block-editor-inserter__search'
+	);
+	TestUtils.Simulate.change( searchElement, {
+		target: { value: searchText },
+	} );
 };
 
 describe( 'InserterMenu', () => {
@@ -89,9 +94,9 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should show nothing if there are no items', () => {
-		const element = initializeMenuDefaultStateAndReturnElement(
-			{ items: [] }
-		);
+		const element = initializeMenuDefaultStateAndReturnElement( {
+			items: [],
+		} );
 		const visibleBlocks = element.querySelector(
 			'.block-editor-block-types-list__item'
 		);
@@ -113,9 +118,9 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should limit the number of items shown in the suggested tab', () => {
-		const element = initializeMenuDefaultStateAndReturnElement(
-			{ maxSuggestedItems: 2 }
-		);
+		const element = initializeMenuDefaultStateAndReturnElement( {
+			maxSuggestedItems: 2,
+		} );
 		const visibleBlocks = element.querySelectorAll(
 			'.block-editor-block-types-list__list-item'
 		);
@@ -161,7 +166,10 @@ describe( 'InserterMenu', () => {
 
 	it( 'should show the common category blocks', () => {
 		const element = initializeAllClosedMenuStateAndReturnElement();
-		const commonBlocksTab = getTabButtonWithContent( element, 'Common blocks' );
+		const commonBlocksTab = getTabButtonWithContent(
+			element,
+			'Common blocks'
+		);
 
 		TestUtils.Simulate.click( commonBlocksTab );
 
@@ -186,7 +194,7 @@ describe( 'InserterMenu', () => {
 		TestUtils.Simulate.click( layoutTab );
 
 		const disabledBlocks = element.querySelectorAll(
-			'.block-editor-block-types-list__item[disabled]'
+			'.block-editor-block-types-list__item[disabled], .block-editor-block-types-list__item[aria-disabled="true"]'
 		);
 
 		expect( disabledBlocks ).toHaveLength( 1 );

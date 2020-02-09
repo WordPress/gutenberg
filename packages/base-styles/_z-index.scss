@@ -24,7 +24,7 @@ $z-layers: (
 	".block-library-gallery-item__inline-menu": 20,
 	".block-editor-url-input__suggestions": 30,
 	".edit-post-layout__footer": 30,
-	".edit-post-editor-regions__header": 30,
+	".block-editor-editor-skeleton__header": 30,
 	".edit-site-header": 62,
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
@@ -64,7 +64,7 @@ $z-layers: (
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
-	".edit-post-editor-regions__sidebar": 100000,
+	".block-editor-editor-skeleton__sidebar": 100000,
 	".edit-site-sidebar": 100000,
 	".edit-widgets-sidebar": 100000,
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
@@ -74,7 +74,7 @@ $z-layers: (
 
 	// Show sidebar in greater than small viewports above editor related elements
 	// but bellow #adminmenuback { z-index: 100 }
-	".edit-post-editor-regions__sidebar {greater than small}": 90,
+	".block-editor-editor-skeleton__sidebar {greater than small}": 90,
 	".edit-site-sidebar {greater than small}": 90,
 	".edit-widgets-sidebar {greater than small}": 90,
 
@@ -84,6 +84,9 @@ $z-layers: (
 
 	// Above the block list, under the header.
 	".block-editor-block-list__block-popover": 29,
+
+	// Under the block popover (block toolbar).
+	".block-editor-block-list__insertion-point-popover": 28,
 
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
@@ -105,7 +108,7 @@ $z-layers: (
 	".components-autocomplete__results": 1000000,
 
 	".skip-to-selected-block": 100000,
-	".edit-post-editor-regions__publish": 100000,
+	".block-editor-editor-skeleton__publish": 100000,
 
 	// Show NUX tips above popovers, wp-admin menus, submenus, and sidebar:
 	".nux-dot-tip": 1000001,
@@ -125,7 +128,7 @@ $z-layers: (
 
 	".components-circular-option-picker__option.is-pressed": 1,
 	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
-	".components-circular-option-picker__option.is-pressed + .dashicons-saved": 2
+	".components-circular-option-picker__option.is-pressed + svg": 2
 );
 
 @function z-index( $key ) {

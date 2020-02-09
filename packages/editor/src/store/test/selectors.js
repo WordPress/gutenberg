@@ -51,7 +51,8 @@ selectorNames.forEach( ( name ) => {
 					};
 				}
 
-				const { value: blocks, isDirty } = ( present && present.blocks ) || {};
+				const { value: blocks, isDirty } =
+					( present && present.blocks ) || {};
 				if ( blocks && isDirty !== false ) {
 					edits = {
 						...edits,
@@ -86,13 +87,17 @@ selectorNames.forEach( ( name ) => {
 
 			hasUndo() {
 				return Boolean(
-					state.editor && state.editor.past && state.editor.past.length
+					state.editor &&
+						state.editor.past &&
+						state.editor.past.length
 				);
 			},
 
 			hasRedo() {
 				return Boolean(
-					state.editor && state.editor.future && state.editor.future.length
+					state.editor &&
+						state.editor.future &&
+						state.editor.future.length
 				);
 			},
 
@@ -117,7 +122,8 @@ selectorNames.forEach( ( name ) => {
 
 		return _selectors[ name ]( state, ...args );
 	};
-	selectors[ name ].isRegistrySelector = _selectors[ name ].isRegistrySelector;
+	selectors[ name ].isRegistrySelector =
+		_selectors[ name ].isRegistrySelector;
 	if ( selectors[ name ].isRegistrySelector ) {
 		selectors[ name ].registry = {
 			select: () => _selectors[ name ].registry.select(),
@@ -264,9 +270,7 @@ describe( 'selectors', () => {
 		it( 'should return true when the past history is not empty', () => {
 			const state = {
 				editor: {
-					past: [
-						{},
-					],
+					past: [ {} ],
 				},
 			};
 
@@ -288,9 +292,7 @@ describe( 'selectors', () => {
 		it( 'should return true when the future history is not empty', () => {
 			const state = {
 				editor: {
-					future: [
-						{},
-					],
+					future: [ {} ],
 				},
 			};
 
@@ -508,7 +510,9 @@ describe( 'selectors', () => {
 					__experimentalEnableFullSiteEditing: true,
 				},
 				getEntityRecordChangesByRecord() {
-					return { postType: { post: { 1: {} }, wp_template: { 1: {} } } };
+					return {
+						postType: { post: { 1: {} }, wp_template: { 1: {} } },
+					};
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( true );
@@ -628,7 +632,9 @@ describe( 'selectors', () => {
 				currentPost: {},
 			};
 
-			expect( getCurrentPostAttribute( state, 'valueOf' ) ).toBeUndefined();
+			expect(
+				getCurrentPostAttribute( state, 'valueOf' )
+			).toBeUndefined();
 		} );
 
 		it( 'should return the value of an attribute', () => {
@@ -638,7 +644,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getCurrentPostAttribute( state, 'title' ) ).toBe( 'Hello World' );
+			expect( getCurrentPostAttribute( state, 'title' ) ).toBe(
+				'Hello World'
+			);
 		} );
 	} );
 
@@ -654,7 +662,9 @@ describe( 'selectors', () => {
 				initialEdits: {},
 			};
 
-			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'post slug' );
+			expect( getEditedPostAttribute( state, 'slug' ) ).toBe(
+				'post slug'
+			);
 		} );
 
 		it( 'should return the latest slug if edits have been made to the post', () => {
@@ -670,7 +680,9 @@ describe( 'selectors', () => {
 				initialEdits: {},
 			};
 
-			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'new slug' );
+			expect( getEditedPostAttribute( state, 'slug' ) ).toBe(
+				'new slug'
+			);
 		} );
 
 		it( 'should return the post saved title if the title is not edited', () => {
@@ -716,7 +728,9 @@ describe( 'selectors', () => {
 				initialEdits: {},
 			};
 
-			expect( getEditedPostAttribute( state, 'valueOf' ) ).toBeUndefined();
+			expect(
+				getEditedPostAttribute( state, 'valueOf' )
+			).toBeUndefined();
 		} );
 
 		it( 'should merge mergeable properties with current post value', () => {
@@ -1559,7 +1573,10 @@ describe( 'selectors', () => {
 
 		it( 'should return true if title or excerpt have changed', () => {
 			for ( const variantField of [ 'title', 'excerpt' ] ) {
-				for ( const constantField of without( [ 'title', 'excerpt' ], variantField ) ) {
+				for ( const constantField of without(
+					[ 'title', 'excerpt' ],
+					variantField
+				) ) {
 					const state = {
 						editor: {
 							present: {
@@ -1628,14 +1645,16 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 123,
-								name: 'core/test-block-a',
-								isValid: true,
-								attributes: {
-									text: '',
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-block-a',
+									isValid: true,
+									attributes: {
+										text: '',
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -1657,13 +1676,15 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 'block1',
-								name: 'core/test-default',
-								attributes: {
-									modified: false,
+							value: [
+								{
+									clientId: 'block1',
+									name: 'core/test-default',
+									attributes: {
+										modified: false,
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -1680,14 +1701,16 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 123,
-								name: 'core/test-block-a',
-								isValid: true,
-								attributes: {
-									text: '',
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-block-a',
+									isValid: true,
+									attributes: {
+										text: '',
+									},
 								},
-							} ],
+							],
 						},
 						edits: {
 							content: '',
@@ -1746,14 +1769,16 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 123,
-								name: 'core/test-freeform',
-								isValid: true,
-								attributes: {
-									content: '',
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -1770,14 +1795,16 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 123,
-								name: 'core/test-freeform',
-								isValid: true,
-								attributes: {
-									content: '',
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -1796,14 +1823,16 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								clientId: 123,
-								name: 'core/test-freeform',
-								isValid: true,
-								attributes: {
-									content: 'Test Data',
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: 'Test Data',
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -1856,7 +1885,7 @@ describe( 'selectors', () => {
 
 	describe( 'isEditedPostBeingScheduled', () => {
 		it( 'should return true for posts with a future date', () => {
-			const time = Date.now() + ( 1000 * 3600 * 24 * 7 ); // 7 days in the future
+			const time = Date.now() + 1000 * 3600 * 24 * 7; // 7 days in the future
 			const date = new Date( time );
 			const state = {
 				editor: {
@@ -2275,7 +2304,7 @@ describe( 'selectors', () => {
 			expect( content ).toBe( '<!-- wp:block /-->' );
 		} );
 
-		it( 'returns removep\'d serialization of blocks for single unknown', () => {
+		it( "returns removep'd serialization of blocks for single unknown", () => {
 			const unknownBlock = createBlock( 'core/test-freeform', {
 				content: '<p>foo</p>',
 			} );
@@ -2297,7 +2326,7 @@ describe( 'selectors', () => {
 			expect( content ).toBe( 'foo' );
 		} );
 
-		it( 'returns non-removep\'d serialization of blocks for multiple unknown', () => {
+		it( "returns non-removep'd serialization of blocks for multiple unknown", () => {
 			const firstUnknown = createBlock( 'core/test-freeform', {
 				content: '<p>foo</p>',
 			} );
@@ -2348,13 +2377,15 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							value: [ {
-								...defaultBlock,
-								attributes: {
-									...defaultBlock.attributes,
-									modified: true,
+							value: [
+								{
+									...defaultBlock,
+									attributes: {
+										...defaultBlock.attributes,
+										modified: true,
+									},
 								},
-							} ],
+							],
 						},
 						edits: {},
 					},
@@ -2365,7 +2396,9 @@ describe( 'selectors', () => {
 
 			const content = getEditedPostContent( state );
 
-			expect( content ).toBe( '<!-- wp:test-default {\"modified\":true} /-->' );
+			expect( content ).toBe(
+				'<!-- wp:test-default {"modified":true} /-->'
+			);
 		} );
 	} );
 
@@ -2457,7 +2490,9 @@ describe( 'selectors', () => {
 					isPublishSidebarEnabled: true,
 				},
 			};
-			expect( isPublishSidebarEnabled( state ) ).toBe( state.preferences.isPublishSidebarEnabled );
+			expect( isPublishSidebarEnabled( state ) ).toBe(
+				state.preferences.isPublishSidebarEnabled
+			);
 		} );
 
 		it( 'should return the value on state if it is falsy', () => {
@@ -2466,14 +2501,18 @@ describe( 'selectors', () => {
 					isPublishSidebarEnabled: false,
 				},
 			};
-			expect( isPublishSidebarEnabled( state ) ).toBe( state.preferences.isPublishSidebarEnabled );
+			expect( isPublishSidebarEnabled( state ) ).toBe(
+				state.preferences.isPublishSidebarEnabled
+			);
 		} );
 
 		it( 'should return the default value if there is no isPublishSidebarEnabled key on state', () => {
 			const state = {
-				preferences: { },
+				preferences: {},
 			};
-			expect( isPublishSidebarEnabled( state ) ).toBe( PREFERENCES_DEFAULTS.isPublishSidebarEnabled );
+			expect( isPublishSidebarEnabled( state ) ).toBe(
+				PREFERENCES_DEFAULTS.isPublishSidebarEnabled
+			);
 		} );
 	} );
 
@@ -2535,43 +2574,52 @@ describe( 'selectors', () => {
 
 	describe( 'getStateBeforeOptimisticTransaction', () => {
 		it( 'should return null if no transaction can be found', () => {
-			const beforeState = getStateBeforeOptimisticTransaction( {
-				optimist: [],
-			}, 'foo' );
+			const beforeState = getStateBeforeOptimisticTransaction(
+				{
+					optimist: [],
+				},
+				'foo'
+			);
 
 			expect( beforeState ).toBe( null );
 		} );
 
 		it( 'should return null if a transaction with ID can be found, but lacks before state', () => {
-			const beforeState = getStateBeforeOptimisticTransaction( {
-				optimist: [
-					{
-						action: {
-							optimist: {
-								id: 'foo',
+			const beforeState = getStateBeforeOptimisticTransaction(
+				{
+					optimist: [
+						{
+							action: {
+								optimist: {
+									id: 'foo',
+								},
 							},
 						},
-					},
-				],
-			}, 'foo' );
+					],
+				},
+				'foo'
+			);
 
 			expect( beforeState ).toBe( null );
 		} );
 
 		it( 'should return the before state matching the given transaction id', () => {
 			const expectedBeforeState = {};
-			const beforeState = getStateBeforeOptimisticTransaction( {
-				optimist: [
-					{
-						beforeState: expectedBeforeState,
-						action: {
-							optimist: {
-								id: 'foo',
+			const beforeState = getStateBeforeOptimisticTransaction(
+				{
+					optimist: [
+						{
+							beforeState: expectedBeforeState,
+							action: {
+								optimist: {
+									id: 'foo',
+								},
 							},
 						},
-					},
-				],
-			}, 'foo' );
+					],
+				},
+				'foo'
+			);
 
 			expect( beforeState ).toBe( expectedBeforeState );
 		} );
@@ -2698,7 +2746,9 @@ describe( 'selectors', () => {
 
 		it( 'should be false if the permalink is not of an editable kind', () => {
 			const state = {
-				currentPost: { permalink_template: 'http://foo.test/bar/%baz%/' },
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%baz%/',
+				},
 				editor: {
 					present: {
 						edits: {},
@@ -2712,7 +2762,9 @@ describe( 'selectors', () => {
 
 		it( 'should be true if the permalink has %postname%', () => {
 			const state = {
-				currentPost: { permalink_template: 'http://foo.test/bar/%postname%/' },
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%postname%/',
+				},
 				editor: {
 					present: {
 						edits: {},
@@ -2726,7 +2778,9 @@ describe( 'selectors', () => {
 
 		it( 'should be true if the permalink has %pagename%', () => {
 			const state = {
-				currentPost: { permalink_template: 'http://foo.test/bar/%pagename%/' },
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%pagename%/',
+				},
 				editor: {
 					present: {
 						edits: {},

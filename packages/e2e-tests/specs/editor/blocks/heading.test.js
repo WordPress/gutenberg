@@ -9,12 +9,12 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Heading', () => {
-	const TEXT_COLOR_TEXT = 'Text Color';
 	const CUSTOM_COLOR_TEXT = 'Custom Color';
-	const TEXT_COLOR_UI_X_SELECTOR = `//div[./span[contains(text(),'${ TEXT_COLOR_TEXT }')]]`;
 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `//button[contains(text(),'${ CUSTOM_COLOR_TEXT }')]`;
-	const COLOR_INPUT_FIELD_SELECTOR = '.components-color-palette__picker .components-text-control__input';
-	const COLOR_PANEL_TOGGLE_X_SELECTOR = '//button[./span[contains(text(),\'Color Settings\')]]';
+	const COLOR_INPUT_FIELD_SELECTOR =
+		'.components-color-palette__picker .components-text-control__input';
+	const COLOR_PANEL_TOGGLE_X_SELECTOR =
+		"//button[./span[contains(text(),'Color settings')]]";
 
 	beforeEach( async () => {
 		await createNewPost();
@@ -56,32 +56,41 @@ describe( 'Heading', () => {
 	it( 'it should correctly apply custom colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '### Heading' );
-		const [ colorPanelToggle ] = await page.$x( COLOR_PANEL_TOGGLE_X_SELECTOR );
+		const [ colorPanelToggle ] = await page.$x(
+			COLOR_PANEL_TOGGLE_X_SELECTOR
+		);
 		await colorPanelToggle.click();
 
 		const [ customTextColorButton ] = await page.$x(
-			`${ TEXT_COLOR_UI_X_SELECTOR }${ CUSTOM_COLOR_BUTTON_X_SELECTOR }`
+			`${ CUSTOM_COLOR_BUTTON_X_SELECTOR }`
 		);
+
 		await customTextColorButton.click();
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
-		await page.keyboard.type( '#181717' );
+		await page.keyboard.type( '#7700ff' );
 		await page.click( '[data-type="core/heading"] h3' );
-		await page.waitForSelector( '.component-color-indicator[aria-label="(Color: #181717)"]' );
+		await page.waitForSelector(
+			'.component-color-indicator[aria-label="(Color: #7700ff)"]'
+		);
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'it should correctly apply named colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '## Heading' );
-		const [ colorPanelToggle ] = await page.$x( COLOR_PANEL_TOGGLE_X_SELECTOR );
+		const [ colorPanelToggle ] = await page.$x(
+			COLOR_PANEL_TOGGLE_X_SELECTOR
+		);
 		await colorPanelToggle.click();
 
-		const colorButtonSelector = `${ TEXT_COLOR_UI_X_SELECTOR }//button[@aria-label='Color: Very dark gray']`;
+		const colorButtonSelector = `//button[@aria-label='Color: Luminous vivid orange']`;
 		const [ colorButton ] = await page.$x( colorButtonSelector );
 		await colorButton.click();
 		await page.click( '[data-type="core/heading"] h2' );
-		await page.waitForXPath( `${ colorButtonSelector }[@aria-pressed='true']` );
+		await page.waitForXPath(
+			`${ colorButtonSelector }[@aria-pressed='true']`
+		);
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

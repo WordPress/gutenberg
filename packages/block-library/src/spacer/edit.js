@@ -13,7 +13,14 @@ import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 
-const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId, onResizeStart, onResizeStop } ) => {
+const SpacerEdit = ( {
+	attributes,
+	isSelected,
+	setAttributes,
+	instanceId,
+	onResizeStart,
+	onResizeStop,
+} ) => {
 	const { height } = attributes;
 	const id = `block-spacer-height-input-${ instanceId }`;
 	const [ inputHeightValue, setInputHeightValue ] = useState( height );
@@ -23,7 +30,9 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId, onResi
 			<ResizableBox
 				className={ classnames(
 					'block-library-spacer__resize-container',
-					{ 'is-selected': isSelected },
+					{
+						'is-selected': isSelected,
+					}
 				) }
 				size={ {
 					height,
@@ -50,13 +59,16 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId, onResi
 				} }
 			/>
 			<InspectorControls>
-				<PanelBody title={ __( 'Spacer Settings' ) }>
+				<PanelBody title={ __( 'Spacer settings' ) }>
 					<BaseControl label={ __( 'Height in pixels' ) } id={ id }>
 						<input
 							type="number"
 							id={ id }
 							onChange={ ( event ) => {
-								let spacerHeight = parseInt( event.target.value, 10 );
+								let spacerHeight = parseInt(
+									event.target.value,
+									10
+								);
 								setInputHeightValue( spacerHeight );
 								if ( isNaN( spacerHeight ) ) {
 									// Set spacer height to default size and input box to empty string

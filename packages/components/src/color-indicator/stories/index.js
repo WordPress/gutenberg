@@ -9,13 +9,11 @@ import { text } from '@storybook/addon-knobs';
 import ColorIndicator from '../';
 
 export default {
-	title: 'Components|ColorIndicator',
+	title: 'Components/ColorIndicator',
 	component: ColorIndicator,
 };
 
 export const _default = () => {
 	const color = text( 'Color', '#0073aa' );
-	return (
-		<ColorIndicator colorValue={ color } />
-	);
+	return <ColorIndicator colorValue={ color } />;
 };

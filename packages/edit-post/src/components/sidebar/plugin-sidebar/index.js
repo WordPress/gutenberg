@@ -32,33 +32,35 @@ function PluginSidebar( props ) {
 		<>
 			{ isPinnable && (
 				<PinnedPlugins>
-					{ isPinned && <Button
-						icon={ icon }
-						label={ title }
-						onClick={ toggleSidebar }
-						isPressed={ isActive }
-						aria-expanded={ isActive }
-					/> }
+					{ isPinned && (
+						<Button
+							icon={ icon }
+							label={ title }
+							onClick={ toggleSidebar }
+							isPressed={ isActive }
+							aria-expanded={ isActive }
+						/>
+					) }
 				</PinnedPlugins>
 			) }
 			<Sidebar name={ sidebarName }>
-				<SidebarHeader
-					closeLabel={ __( 'Close plugin' ) }
-				>
+				<SidebarHeader closeLabel={ __( 'Close plugin' ) }>
 					<strong>{ title }</strong>
 					{ isPinnable && (
 						<Button
 							icon={ isPinned ? 'star-filled' : 'star-empty' }
-							label={ isPinned ? __( 'Unpin from toolbar' ) : __( 'Pin to toolbar' ) }
+							label={
+								isPinned
+									? __( 'Unpin from toolbar' )
+									: __( 'Pin to toolbar' )
+							}
 							onClick={ togglePin }
 							isPressed={ isPinned }
 							aria-expanded={ isPinned }
 						/>
 					) }
 				</SidebarHeader>
-				<Panel className={ className }>
-					{ children }
-				</Panel>
+				<Panel className={ className }>{ children }</Panel>
 			</Sidebar>
 		</>
 	);
@@ -88,6 +90,7 @@ function PluginSidebar( props ) {
  * var el = wp.element.createElement;
  * var PanelBody = wp.components.PanelBody;
  * var PluginSidebar = wp.editPost.PluginSidebar;
+ * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
  *
  * function MyPluginSidebar() {
  * 	return el(
@@ -95,7 +98,7 @@ function PluginSidebar( props ) {
  * 			{
  * 				name: 'my-sidebar',
  * 				title: 'My sidebar title',
- * 				icon: 'smiley',
+ * 				icon: moreIcon,
  * 			},
  * 			el(
  * 				PanelBody,
@@ -109,15 +112,16 @@ function PluginSidebar( props ) {
  * @example <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PanelBody } = wp.components;
- * const { PluginSidebar } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PanelBody } from '@wordpress/components';
+ * import { PluginSidebar } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * const MyPluginSidebar = () => (
  * 	<PluginSidebar
  * 		name="my-sidebar"
  * 		title="My sidebar title"
- * 		icon="smiley"
+ * 		icon={ more }
  * 	>
  * 		<PanelBody>
  * 			{ __( 'My sidebar content' ) }
@@ -136,10 +140,9 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { sidebarName } ) => {
-		const {
-			getActiveGeneralSidebarName,
-			isPluginItemPinned,
-		} = select( 'core/edit-post' );
+		const { getActiveGeneralSidebarName, isPluginItemPinned } = select(
+			'core/edit-post'
+		);
 
 		return {
 			isActive: getActiveGeneralSidebarName() === sidebarName,
@@ -165,5 +168,5 @@ export default compose(
 				}
 			},
 		};
-	} ),
+	} )
 )( PluginSidebar );

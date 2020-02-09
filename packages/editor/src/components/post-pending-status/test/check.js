@@ -19,7 +19,11 @@ describe( 'PostPendingStatusCheck', () => {
 	} );
 
 	it( 'should render if the user has the correct capability', () => {
-		const wrapper = shallow( <PostPendingStatusCheck hasPublishAction={ true }>status</PostPendingStatusCheck> );
+		const wrapper = shallow(
+			<PostPendingStatusCheck hasPublishAction={ true }>
+				status
+			</PostPendingStatusCheck>
+		);
 		expect( wrapper.type() ).not.toBe( null );
 	} );
 } );

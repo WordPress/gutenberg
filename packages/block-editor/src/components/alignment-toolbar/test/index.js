@@ -4,6 +4,11 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { alignLeft, alignCenter } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import { AlignmentToolbar } from '../';
@@ -12,7 +17,9 @@ describe( 'AlignmentToolbar', () => {
 	const alignment = 'left';
 	const onChangeSpy = jest.fn();
 
-	const wrapper = shallow( <AlignmentToolbar value={ alignment } onChange={ onChangeSpy } /> );
+	const wrapper = shallow(
+		<AlignmentToolbar value={ alignment } onChange={ onChangeSpy } />
+	);
 
 	const controls = wrapper.props().controls;
 
@@ -34,7 +41,9 @@ describe( 'AlignmentToolbar', () => {
 	} );
 
 	test( 'should call on change a new value when the control is not active', () => {
-		const inactiveControl = controls.find( ( { align } ) => align === 'center' );
+		const inactiveControl = controls.find(
+			( { align } ) => align === 'center'
+		);
 		inactiveControl.onClick();
 
 		expect( inactiveControl.isActive ).toBe( false );
@@ -49,12 +58,12 @@ describe( 'AlignmentToolbar', () => {
 				onChange={ onChangeSpy }
 				alignmentControls={ [
 					{
-						icon: 'editor-alignleft',
+						icon: alignLeft,
 						title: 'My custom left',
 						align: 'custom-left',
 					},
 					{
-						icon: 'editor-aligncenter',
+						icon: alignCenter,
 						title: 'My custom right',
 						align: 'custom-right',
 					},

@@ -14,7 +14,9 @@ export function PostSchedule( { date, onUpdateDate } ) {
 		settings.formats.time
 			.toLowerCase() // Test only the lower case a
 			.replace( /\\\\/g, '' ) // Replace "//" with empty strings
-			.split( '' ).reverse().join( '' ) // Reverse the string and test for "a" not followed by a slash
+			.split( '' )
+			.reverse()
+			.join( '' ) // Reverse the string and test for "a" not followed by a slash
 	);
 
 	return (

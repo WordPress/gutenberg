@@ -36,7 +36,9 @@ describe( 'Preloading Middleware', () => {
 				body,
 			},
 		};
-		const preloadingMiddleware = createPreloadingMiddleware( preloadedData );
+		const preloadingMiddleware = createPreloadingMiddleware(
+			preloadedData
+		);
 		const requestOptions = {
 			method: 'GET',
 			path: 'wp/v2/posts',
@@ -54,7 +56,9 @@ describe( 'Preloading Middleware', () => {
 			'wp/v2/demo-reverse-alphabetical?foo=bar&baz=quux': { body },
 			'wp/v2/demo-alphabetical?baz=quux&foo=bar': { body },
 		};
-		const preloadingMiddleware = createPreloadingMiddleware( preloadedData );
+		const preloadingMiddleware = createPreloadingMiddleware(
+			preloadedData
+		);
 
 		let requestOptions = {
 			method: 'GET',
@@ -73,16 +77,15 @@ describe( 'Preloading Middleware', () => {
 		expect( value ).toEqual( body );
 	} );
 
-	describe.each( [
-		[ 'GET' ],
-		[ 'OPTIONS' ],
-	] )( '%s', ( method ) => {
+	describe.each( [ [ 'GET' ], [ 'OPTIONS' ] ] )( '%s', ( method ) => {
 		describe.each( [
 			[ 'all empty', {} ],
 			[ 'method empty', { [ method ]: {} } ],
 		] )( '%s', ( label, preloadedData ) => {
 			it( 'should move to the next middleware if no preloaded data', () => {
-				const prelooadingMiddleware = createPreloadingMiddleware( preloadedData );
+				const prelooadingMiddleware = createPreloadingMiddleware(
+					preloadedData
+				);
 				const requestOptions = {
 					method,
 					path: 'wp/v2/posts',

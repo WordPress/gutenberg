@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
+import {
+	View,
+	ImageBackground,
+	Text,
+	TouchableWithoutFeedback,
+} from 'react-native';
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
@@ -11,12 +16,7 @@ import {
 /**
  * WordPress dependencies
  */
-import {
-	Icon,
-	Button,
-	ToolbarGroup,
-	withNotices,
-} from '@wordpress/components';
+import { Icon, Button, ToolbarGroup, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	MEDIA_TYPE_IMAGE,
@@ -31,6 +31,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { pencil } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -51,10 +52,16 @@ class MediaContainer extends Component {
 		super( ...arguments );
 		this.onUploadError = this.onUploadError.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
+			this
+		);
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
+			this
+		);
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind( this );
+		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
+			this
+		);
 		this.onMediaPressed = this.onMediaPressed.bind( this );
 
 		this.state = {
@@ -101,10 +108,19 @@ class MediaContainer extends Component {
 
 	getIcon( isRetryIcon, isVideo ) {
 		if ( isRetryIcon ) {
-			return <Icon icon={ SvgIconRetry } { ...( styles.iconRetry, isVideo ? styles.iconRetryVideo : {} ) } />;
+			return (
+				<Icon
+					icon={ SvgIconRetry }
+					{ ...( styles.iconRetry,
+					isVideo ? styles.iconRetryVideo : {} ) }
+				/>
+			);
 		}
 
-		const iconStyle = this.props.getStylesFromColorScheme( styles.icon, styles.iconDark );
+		const iconStyle = this.props.getStylesFromColorScheme(
+			styles.icon,
+			styles.iconDark
+		);
 		return <Icon icon={ icon } { ...iconStyle } />;
 	}
 
@@ -115,7 +131,7 @@ class MediaContainer extends Component {
 					<Button
 						className="components-toolbar__control"
 						label={ __( 'Edit media' ) }
-						icon="edit"
+						icon={ pencil }
 						onClick={ open }
 					/>
 				</ToolbarGroup>
@@ -153,10 +169,18 @@ class MediaContainer extends Component {
 	renderImage( params, openMediaOptions ) {
 		const { isUploadInProgress } = this.state;
 		const { mediaAlt, mediaUrl, isSelected } = this.props;
-		const { finalWidth, finalHeight, imageWidthWithinContainer, isUploadFailed, retryMessage } = params;
+		const {
+			finalWidth,
+			finalHeight,
+			imageWidthWithinContainer,
+			isUploadFailed,
+			retryMessage,
+		} = params;
 		const opacity = isUploadInProgress ? 0.3 : 1;
 
-		const contentStyle = ! imageWidthWithinContainer ? styles.content : styles.contentCentered;
+		const contentStyle = ! imageWidthWithinContainer
+			? styles.content
+			: styles.contentCentered;
 
 		return (
 			<TouchableWithoutFeedback
@@ -166,28 +190,42 @@ class MediaContainer extends Component {
 				disabled={ ! isSelected }
 			>
 				<View style={ contentStyle }>
-					{ ! imageWidthWithinContainer &&
+					{ ! imageWidthWithinContainer && (
 						<View style={ styles.imageContainer }>
 							{ this.getIcon( false ) }
-						</View> }
+						</View>
+					) }
 					<ImageBackground
 						accessible={ true }
 						accessibilityLabel={ mediaAlt }
-						accessibilityHint={ __( 'Double tap and hold to edit' ) }
+						accessibilityHint={ __(
+							'Double tap and hold to edit'
+						) }
 						accessibilityRole={ 'imagebutton' }
-						style={ { width: finalWidth, height: finalHeight, opacity } }
+						style={ {
+							width: finalWidth,
+							height: finalHeight,
+							opacity,
+						} }
 						resizeMethod="scale"
 						source={ { uri: mediaUrl } }
 						key={ mediaUrl }
 					>
-						{ isUploadFailed &&
-							<View style={ [ styles.imageContainer, styles.uploadFailed ] }>
+						{ isUploadFailed && (
+							<View
+								style={ [
+									styles.imageContainer,
+									styles.uploadFailed,
+								] }
+							>
 								<View style={ styles.modalIcon }>
 									{ this.getIcon( isUploadFailed ) }
 								</View>
-								<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
+								<Text style={ styles.uploadFailedText }>
+									{ retryMessage }
+								</Text>
 							</View>
-						}
+						) }
 					</ImageBackground>
 				</View>
 			</TouchableWithoutFeedback>
@@ -198,7 +236,8 @@ class MediaContainer extends Component {
 		const { mediaUrl, isSelected } = this.props;
 		const { isUploadInProgress } = this.state;
 		const { isUploadFailed, retryMessage } = params;
-		const showVideo = isURL( mediaUrl ) && ! isUploadInProgress && ! isUploadFailed;
+		const showVideo =
+			isURL( mediaUrl ) && ! isUploadInProgress && ! isUploadFailed;
 
 		return (
 			<TouchableWithoutFeedback
@@ -208,7 +247,7 @@ class MediaContainer extends Component {
 				disabled={ ! isSelected }
 			>
 				<View aspectRatio={ VIDEO_ASPECT_RATIO }>
-					{ showVideo &&
+					{ showVideo && (
 						<View style={ styles.videoContainer }>
 							<VideoPlayer
 								isSelected={ isSelected }
@@ -217,15 +256,26 @@ class MediaContainer extends Component {
 								paused={ true }
 							/>
 						</View>
-					}
-					{ ! showVideo &&
+					) }
+					{ ! showVideo && (
 						<View style={ styles.videoPlaceholder }>
-							<View style={ styles.modalIcon } >
-								{ isUploadFailed ? this.getIcon( isUploadFailed ) : this.getIcon( false ) }
+							<View style={ styles.modalIcon }>
+								{ isUploadFailed
+									? this.getIcon( isUploadFailed )
+									: this.getIcon( false ) }
 							</View>
-							{ isUploadFailed && <Text style={ [ styles.uploadFailedText, styles.uploadFailedTextVideo ] }>{ retryMessage }</Text> }
+							{ isUploadFailed && (
+								<Text
+									style={ [
+										styles.uploadFailedText,
+										styles.uploadFailedTextVideo,
+									] }
+								>
+									{ retryMessage }
+								</Text>
+							) }
 						</View>
-					}
+					) }
 				</View>
 			</TouchableWithoutFeedback>
 		);
@@ -281,14 +331,25 @@ class MediaContainer extends Component {
 									<MediaUploadProgress
 										coverUrl={ coverUrl }
 										mediaId={ mediaId }
-										onUpdateMediaProgress={ this.updateMediaProgress }
-										onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-										onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
-										onMediaUploadStateReset={ this.mediaUploadStateReset }
+										onUpdateMediaProgress={
+											this.updateMediaProgress
+										}
+										onFinishMediaUploadWithSuccess={
+											this.finishMediaUploadWithSuccess
+										}
+										onFinishMediaUploadWithFailure={
+											this.finishMediaUploadWithFailure
+										}
+										onMediaUploadStateReset={
+											this.mediaUploadStateReset
+										}
 										renderContent={ ( params ) => {
 											return (
 												<View style={ styles.content }>
-													{ this.renderContent( params, open ) }
+													{ this.renderContent(
+														params,
+														open
+													) }
 												</View>
 											);
 										} }
@@ -306,5 +367,5 @@ class MediaContainer extends Component {
 
 export default compose(
 	withNotices,
-	withPreferredColorScheme,
+	withPreferredColorScheme
 )( MediaContainer );

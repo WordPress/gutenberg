@@ -10,9 +10,11 @@ import { Component } from '@wordpress/element';
 import { Button, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { RichText } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
+import { compose } from '@wordpress/compose';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -64,7 +66,8 @@ class GalleryImage extends Component {
 	onRemoveImage( event ) {
 		if (
 			this.container === document.activeElement &&
-			this.props.isSelected && [ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
+			this.props.isSelected &&
+			[ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
 		) {
 			event.stopPropagation();
 			event.preventDefault();
@@ -73,8 +76,14 @@ class GalleryImage extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { isSelected, image, url } = this.props;
+		const {
+			isSelected,
+			image,
+			url,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = this.props;
 		if ( image && ! url ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			this.props.setAttributes( {
 				url: image.source_url,
 				alt: image.alt_text,
@@ -83,7 +92,11 @@ class GalleryImage extends Component {
 
 		// unselect the caption so when the user selects other image and comeback
 		// the caption is not immediately selected
-		if ( this.state.captionSelected && ! isSelected && prevProps.isSelected ) {
+		if (
+			this.state.captionSelected &&
+			! isSelected &&
+			prevProps.isSelected
+		) {
 			this.setState( {
 				captionSelected: false,
 			} );
@@ -91,7 +104,22 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption, onRemove, onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel } = this.props;
+		const {
+			url,
+			alt,
+			id,
+			linkTo,
+			link,
+			isFirstItem,
+			isLastItem,
+			isSelected,
+			caption,
+			onRemove,
+			onMoveForward,
+			onMoveBackward,
+			setAttributes,
+			'aria-label': ariaLabel,
+		} = this.props;
 
 		let href;
 
@@ -153,7 +181,7 @@ class GalleryImage extends Component {
 				</div>
 				<div className="block-library-gallery-item__inline-menu">
 					<Button
-						icon="no-alt"
+						icon={ close }
 						onClick={ onRemove }
 						className="blocks-gallery-item__remove"
 						label={ __( 'Remove image' ) }
@@ -163,10 +191,14 @@ class GalleryImage extends Component {
 				{ ( isSelected || caption ) && (
 					<RichText
 						tagName="figcaption"
-						placeholder={ isSelected ? __( 'Write caption…' ) : null }
+						placeholder={
+							isSelected ? __( 'Write caption…' ) : null
+						}
 						value={ caption }
 						isSelected={ this.state.captionSelected }
-						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+						onChange={ ( newCaption ) =>
+							setAttributes( { caption: newCaption } )
+						}
 						unstableOnFocus={ this.onSelectCaption }
 						inlineToolbar
 					/>
@@ -176,11 +208,21 @@ class GalleryImage extends Component {
 	}
 }
 
-export default withSelect( ( select, ownProps ) => {
-	const { getMedia } = select( 'core' );
-	const { id } = ownProps;
+export default compose( [
+	withSelect( ( select, ownProps ) => {
+		const { getMedia } = select( 'core' );
+		const { id } = ownProps;
 
-	return {
-		image: id ? getMedia( id ) : null,
-	};
-} )( GalleryImage );
+		return {
+			image: id ? getMedia( id ) : null,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { __unstableMarkNextChangeAsNotPersistent } = dispatch(
+			'core/block-editor'
+		);
+		return {
+			__unstableMarkNextChangeAsNotPersistent,
+		};
+	} ),
+] )( GalleryImage );

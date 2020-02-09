@@ -46,7 +46,7 @@
 
 		}
 
-		&:active:enabled {
+		&:not([aria-disabled="true"]):active:enabled {
 			background: #f3f5f6;
 			color: color(theme(button) shade(5%));
 			border-color: #7e8993;
@@ -87,7 +87,7 @@
 				0 0 0 3px color(theme(button));
 		}
 
-		&:active:enabled {
+		&:not([aria-disabled="true"]):active:enabled {
 			background: color(theme(button) shade(20%));
 			border-color: color(theme(button) shade(20%));
 			color: $white;
@@ -149,7 +149,7 @@
 		height: auto;
 
 		&:not(:disabled):not([aria-disabled="true"]):hover,
-		&:active {
+		&:not([aria-disabled="true"]):active {
 			color: #00a0d2;
 		}
 
@@ -166,7 +166,7 @@
 		color: $alert-red;
 	}
 
-	&:active {
+	&:not([aria-disabled="true"]):active {
 		color: inherit;
 	}
 
@@ -206,13 +206,7 @@
 			flex: 0 0 auto;
 		}
 
-		// Ensure that even SVG icons that don't include the .dashicon class are colored.
-		svg {
-			fill: currentColor;
-			outline: none;
-		}
-
-		&:active:focus:enabled {
+		&:not([aria-disabled="true"]):active:focus:enabled {
 			box-shadow: none;
 		}
 
@@ -227,15 +221,14 @@
 			flex: 0 0 auto;
 		}
 
-		// Ensure that even SVG icons that don't include the .dashicon class are colored.
-		svg {
-			fill: currentColor;
-			outline: none;
-		}
-
 		&.has-text svg {
 			margin-right: 8px;
 		}
+	}
+
+	svg {
+		fill: currentColor;
+		outline: none;
 	}
 
 	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.

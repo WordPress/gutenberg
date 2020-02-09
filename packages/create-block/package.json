@@ -1,0 +1,45 @@
+{
+	"name": "@wordpress/create-block",
+	"version": "0.6.0",
+	"description": "Generates PHP, JS and CSS code for registering a block for a WordPress plugin.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"block",
+		"scaffold"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/create-block/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/create-block"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=10.0",
+		"npm": ">=6.1"
+	},
+	"files": [
+		"lib"
+	],
+	"main": "index.js",
+	"bin": {
+		"wp-create-block": "./index.js"
+	},
+	"dependencies": {
+		"chalk": "^2.4.2",
+		"commander": "^4.1.0",
+		"execa": "^4.0.0",
+		"inquirer": "^7.0.3",
+		"lodash": "^4.17.15",
+		"make-dir": "^3.0.0",
+		"mustache": "^4.0.0",
+		"write-pkg": "^4.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

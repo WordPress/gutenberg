@@ -14,6 +14,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { withSafeTimeout, compose } from '@wordpress/compose';
 import { withViewportMatch } from '@wordpress/viewport';
+import { Icon, check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -61,16 +62,27 @@ export class PostSavedState extends Component {
 			// TODO: Classes generation should be common across all return
 			// paths of this function, including proper naming convention for
 			// the "Save Draft" button.
-			const classes = classnames( 'editor-post-saved-state', 'is-saving', {
-				'is-autosaving': isAutosaving,
-			} );
+			const classes = classnames(
+				'editor-post-saved-state',
+				'is-saving',
+				{
+					'is-autosaving': isAutosaving,
+				}
+			);
 
 			return (
 				<Animate type="loading">
 					{ ( { className: animateClassName } ) => (
-						<span className={ classnames( classes, animateClassName ) }>
+						<span
+							className={ classnames(
+								classes,
+								animateClassName
+							) }
+						>
 							<Dashicon icon="cloud" />
-							{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
+							{ isAutosaving
+								? __( 'Autosaving' )
+								: __( 'Saving' ) }
 						</span>
 					) }
 				</Animate>
@@ -88,7 +100,7 @@ export class PostSavedState extends Component {
 		if ( forceSavedMessage || ( ! isNew && ! isDirty ) ) {
 			return (
 				<span className="editor-post-saved-state is-saved">
-					<Dashicon icon="saved" />
+					<Icon icon={ check } />
 					{ __( 'Saved' ) }
 				</span>
 			);
@@ -96,7 +108,11 @@ export class PostSavedState extends Component {
 
 		// Once the post has been submitted for review this button
 		// is not needed for the contributor role.
-		const hasPublishAction = get( post, [ '_links', 'wp:action-publish' ], false );
+		const hasPublishAction = get(
+			post,
+			[ '_links', 'wp:action-publish' ],
+			false
+		);
 		if ( ! hasPublishAction && isPending ) {
 			return null;
 		}

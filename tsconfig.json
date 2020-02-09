@@ -38,7 +38,8 @@
 		"./packages/is-shallow-equal/**/*.js",
 		"./packages/priority-queue/**/*.js",
 		"./packages/token-list/**/*.js",
-		"./packages/url/**/*.js"
+		"./packages/url/**/*.js",
+		"./packages/warning/**/*.js",
 	],
 	"exclude": [
 		"./packages/*/benchmark",

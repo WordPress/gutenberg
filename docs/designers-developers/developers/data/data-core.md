@@ -166,7 +166,7 @@ _Parameters_
 
 _Returns_
 
--   `null`: The map of edited records with their edits.
+-   (unknown type): The map of edited records with their edits.
 
 <a name="getEntityRecordEdits" href="#getEntityRecordEdits">#</a> **getEntityRecordEdits**
 
