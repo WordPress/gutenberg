@@ -54,7 +54,11 @@ const InspectorControlsFontSizePanel = ( props ) => (
 
 export default function __experimentalUseFontSizes(
 	fontSizeConfigs,
-	{ panelTitle = __( 'Text settings' ), panelChildren } = {},
+	{
+		panelTitle = __( 'Text settings' ),
+		initialOpen = true,
+		panelChildren,
+	} = {},
 	deps = []
 ) {
 	const { clientId } = useBlockEditContext();
@@ -217,7 +221,7 @@ export default function __experimentalUseFontSizes(
 
 		const wrappedFontSizePanelProps = {
 			title: panelTitle,
-			initialOpen: false,
+			initialOpen,
 			fontSizeSettings,
 			panelChildren,
 		};
