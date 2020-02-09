@@ -93,7 +93,6 @@ export class BlockList extends Component {
 		const {
 			clearSelectedBlock,
 			blockClientIds,
-			isFullyBordered,
 			title,
 			header,
 			withFooter = true,
@@ -117,7 +116,7 @@ export class BlockList extends Component {
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					data={ blockClientIds }
-					extraData={ [ isFullyBordered ] }
+					extraData={ [ true ] }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={
