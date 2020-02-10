@@ -169,9 +169,9 @@ function useAutosavePurge() {
 }
 
 function LocalAutosaveMonitor() {
-	const { __experimentalLocalAutosave } = useDispatch( 'core/editor' );
+	const { localAutosave } = useDispatch( 'core/editor' );
 	const autosave = useCallback( () => {
-		requestIdleCallback( __experimentalLocalAutosave );
+		requestIdleCallback( localAutosave );
 	}, [] );
 	useAutosaveNotice();
 	useAutosavePurge();

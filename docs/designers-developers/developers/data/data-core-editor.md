@@ -1153,6 +1153,11 @@ _Related_
 
 -   insertDefaultBlock in core/block-editor store.
 
+<a name="localAutosave" href="#localAutosave">#</a> **localAutosave**
+
+Action generator used in signalling that the post should be locally
+autosaved (e.g. on the Web, it might be committed to Session Storage).
+
 <a name="lockPostAutosaving" href="#lockPostAutosaving">#</a> **lockPostAutosaving**
 
 Returns an action object used to signal that post autosaving is locked.
