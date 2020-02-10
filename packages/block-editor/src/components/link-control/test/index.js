@@ -214,6 +214,7 @@ describe( 'Searching for a link', () => {
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 		await eventLoopTick();
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 
 		const searchResultElements = getSearchResults();
 
@@ -261,6 +262,7 @@ describe( 'Searching for a link', () => {
 
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 			await eventLoopTick();
+			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 
 			const searchResultElements = getSearchResults();
 
@@ -579,7 +581,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			await eventLoopTick();
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 			const searchResultElements = container.querySelectorAll(
 				'[role="listbox"] [role="option"]'
 			);
@@ -680,7 +682,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		await eventLoopTick();
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 		const searchResultElements = container.querySelectorAll(
 			'[role="listbox"] [role="option"]'
 		);
@@ -735,7 +737,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					'input[aria-label="URL"]'
 				);
 
-				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+				// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 				const searchResultElements = container.querySelectorAll(
 					'[role="listbox"] [role="option"]'
 				);
@@ -769,7 +771,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				'input[aria-label="URL"]'
 			);
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 			const searchResultElements = container.querySelectorAll(
 				'[role="listbox"] [role="option"]'
 			);
@@ -814,7 +816,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 				await eventLoopTick();
 
-				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+				// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 				const searchResultElements = container.querySelectorAll(
 					'[role="listbox"] [role="option"]'
 				);
@@ -860,7 +862,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			await eventLoopTick();
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 			let searchResultElements = container.querySelectorAll(
 				'[role="listbox"] [role="option"]'
 			);

@@ -262,7 +262,7 @@ function LinkControl( {
 				: results[ 0 ];
 
 		// Here we append a faux suggestion to represent a "CREATE" option. This
-		// is detected in the rendering of the search results and handeled as a
+		// is detected in the rendering of the search results and handled as a
 		// special case. This is currently necessary because the suggestions
 		// dropdown will only appear if there are valid suggestions and
 		// therefore unless the create option is a suggestion it will not
