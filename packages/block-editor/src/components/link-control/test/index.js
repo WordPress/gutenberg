@@ -840,14 +840,10 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			};
 
 			const createSuggestion = () => Promise.reject( throwsError() );
-			const speakSpy = jest.fn();
 
 			act( () => {
 				render(
-					<LinkControl
-						createSuggestion={ createSuggestion }
-						speak={ speakSpy }
-					/>,
+					<LinkControl createSuggestion={ createSuggestion } />,
 					container
 				);
 			} );
@@ -874,9 +870,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				)
 			);
 
-			// Catch the error in the test to avoid test failures
-			expect( throwsError ).toThrow( Error );
-
 			await act( async () => {
 				Simulate.click( createButton );
 			} );
@@ -893,15 +886,15 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				'.block-editor-link-control__search-error'
 			);
 
+			// Catch the error in the test to avoid test failures
+			expect( throwsError ).toThrow( Error );
+
 			// Check human readable error notice is perceivable
 			expect( errorNotice ).not.toBeFalsy();
 			expect( errorNotice.innerHTML ).toEqual(
 				expect.stringContaining(
 					'An unknown error occurred during creation. Please try again.'
 				)
-			);
-			expect( speakSpy ).toHaveBeenCalledWith(
-				'An unknown error occurred during creation. Please try again.'
 			);
 
 			// Verify input is repopulated with original search text
