@@ -137,7 +137,7 @@ function gutenberg_register_legacy_social_link_blocks() {
 						'type' => 'string',
 					),
 				),
-				'render_callback' => 'gutenberg_render_core_social_link',
+				'render_callback' => 'gutenberg_render_block_core_social_link',
 			)
 		);
 	}
