@@ -14,7 +14,7 @@ The block editor first became available in December 2018, and we're still hard a
 
 ## Getting Started
 
-Get hands on, check out the [Block Editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
+Get hands on: check out the [Block Editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
 
 ### Using Gutenberg
 
@@ -28,7 +28,7 @@ Get hands on, check out the [Block Editor live demo](https://wordpress.org/guten
 
 Extending and customizing is at the heart of the WordPress platform, this is no different for the Gutenberg project. The editor and future products can be extended by third-party developers using plugins.
 
-See the [Developer Documentation](https://developer.wordpress.org/block-editor/developers/) for extensive tutorials, documentation, and API reference on how to extend the editor.
+See the [Developer Documentation](https://developer.wordpress.org/block-editor/developers/) for extensive tutorials, documentation, and API references on how to extend the editor.
 
 ### Contribute to Gutenberg
 
@@ -40,7 +40,7 @@ As with all WordPress projects, we want to ensure a welcoming environment for ev
 
 ## Get Involved
 
-You can join us in the `#core-editor` channel in Slack, see [WordPress Slack page](https://make.wordpress.org/chat/) for signup information, it is free to join.
+You can join us in the `#core-editor` channel in Slack, see the [WordPress Slack page](https://make.wordpress.org/chat/) for signup information; it is free to join.
 
 **Weekly meetings** The Editor Team meets weekly on Wednesdays at 14:00 UTC in Slack. If you can not join the meeting, agenda and notes are posted to the [Make WordPress Blog](https://make.wordpress.org/core/).
 
