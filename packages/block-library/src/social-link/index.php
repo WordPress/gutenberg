@@ -12,17 +12,17 @@
  *
  * @return string Rendered HTML of the referenced block.
  */
-function render_core_social_link( $attributes ) {
+function render_block_core_social_link( $attributes ) {
 	$service = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
 	$url     = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
-	$label   = ( isset( $attributes['label'] ) ) ? $attributes['label'] : __( 'Link to ' ) . core_social_link_get_name( $service );
+	$label   = ( isset( $attributes['label'] ) ) ? $attributes['label'] : __( 'Link to ' ) . block_core_social_link_get_name( $service );
 
 	// Don't render a link if there is no URL set.
 	if ( ! $url ) {
 		return '';
 	}
 
-	$icon = core_social_link_get_icon( $service );
+	$icon = block_core_social_link_get_icon( $service );
 	return '<li class="wp-social-link wp-social-link-' . $service . '"><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '"> ' . $icon . '</a></li>';
 }
 
@@ -38,7 +38,7 @@ function register_block_core_social_link() {
 		array_merge(
 			$metadata,
 			array(
-				'render_callback' => 'render_core_social_link',
+				'render_callback' => 'render_block_core_social_link',
 			)
 		)
 	);
@@ -53,8 +53,8 @@ add_action( 'init', 'register_block_core_social_link' );
  *
  * @return string SVG Element for site icon.
  */
-function core_social_link_get_icon( $site ) {
-	$sites = core_social_link_sites();
+function block_core_social_link_get_icon( $site ) {
+	$sites = block_core_social_link_sites();
 	if ( isset( $sites[ $site ] ) && isset( $sites[ $site ]['icon'] ) ) {
 		return $sites[ $site ]['icon'];
 	}
@@ -69,8 +69,8 @@ function core_social_link_get_icon( $site ) {
  *
  * @return string Brand label.
  */
-function core_social_link_get_name( $site ) {
-	$sites = core_social_link_sites();
+function block_core_social_link_get_name( $site ) {
+	$sites = block_core_social_link_sites();
 	if ( isset( $sites[ $site ] ) && isset( $sites[ $site ]['name'] ) ) {
 		return $sites[ $site ]['name'];
 	}
@@ -86,7 +86,7 @@ function core_social_link_get_name( $site ) {
  *
  * @return array|string
  */
-function core_social_link_sites( $site = '', $field = '' ) {
+function block_core_social_link_sites( $site = '', $field = '' ) {
 	$sites_data = array(
 		'fivehundredpx' => array(
 			'name' => '500px',
