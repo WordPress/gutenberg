@@ -1,5 +1,7 @@
 ## Master
 
+## 9.2.0 (2020-02-10)
+
 ### Enhancements
 
 - The `Notice` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.

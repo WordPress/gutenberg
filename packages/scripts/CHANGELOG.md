@@ -1,5 +1,7 @@
 ## Master
 
+## 7.1.0 (2020-02-10)
+
 ### Bug Fixes
 
 - Ensure the default Prettier config is used in the `lint-js` script when no Prettier config is found in the project ([#20071](https://github.com/WordPress/gutenberg/pull/20071)).

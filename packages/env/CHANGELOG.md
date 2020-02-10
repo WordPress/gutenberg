@@ -1,5 +1,7 @@
 ## Master
 
+## 1.0.0 (2020-02-10)
+
 ### Breaking Changes
 
 - `wp-env start` no longer accepts a WordPress branch or tag reference as its argument. Instead, create a `.wp-env.json` file and specify a `"core"` field.
