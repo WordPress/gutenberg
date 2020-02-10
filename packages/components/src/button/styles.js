@@ -265,7 +265,6 @@ const hasIcon = ( theme ) => css`
 	}
 `;
 
-// TODO Support theme in additional styles
 export default {
 	base,
 	secondary,
