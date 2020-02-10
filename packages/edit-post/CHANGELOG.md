@@ -1,6 +1,6 @@
 ## Master
 
-- Moved the internal `EditorRegions` component to the `@wordpress/block-editor` package, an rename to `EditorSkeleton`. Its class names have thus been renamed from `edit-post-editor-regions` to `block-editor-editor-skeleton`.
+- Move the internal `EditorRegions` component to the `@wordpress/block-editor` package, an rename to `EditorSkeleton`. Its class names have thus been renamed from `edit-post-editor-regions` to `block-editor-editor-skeleton`.
 
 ## 3.8.2
 
