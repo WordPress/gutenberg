@@ -125,6 +125,7 @@ class BlockListBlock extends Component {
 			isAncestorSelected,
 			hasParent,
 			getStylesFromColorScheme,
+			isLastBlock,
 		} = this.props;
 
 		// if block does not have parent apply neutral or full
@@ -146,16 +147,24 @@ class BlockListBlock extends Component {
 
 			// return apply childOfSelected or childOfSelectedLeaf
 			// margins depending if block has children or not
-			return hasChildren
-				? { ...styles.childOfSelected, ...dashedBorderStyle }
-				: { ...styles.childOfSelectedLeaf, ...dashedBorderStyle };
+			return {
+				...( hasChildren
+					? styles.childOfSelected
+					: styles.childOfSelectedLeaf ),
+				...dashedBorderStyle,
+				...( ! isLastBlock && styles.marginVerticalChild ),
+			};
 		}
 
 		if ( isAncestorSelected ) {
 			// ancestor of a block is selected
 			return {
 				...styles.descendantOfSelectedLeaf,
-				...( hasChildren && styles.marginHorizontalNone ),
+				...( hasChildren && {
+					...styles.marginHorizontalNone,
+					...styles.marginVerticalNone,
+				} ),
+				...( ! isLastBlock && styles.marginVerticalDescendant ),
 			};
 		}
 
@@ -255,7 +264,6 @@ export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
-			getBlocks,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
@@ -271,7 +279,7 @@ export default compose( [
 
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
-		const isLastBlock = order === getBlocks().length - 1;
+		const isLastBlock = order === getBlockCount( rootClientId ) - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
 

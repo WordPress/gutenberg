@@ -5,6 +5,11 @@ import { shallow } from 'enzyme';
 import useResizeAware from 'react-resize-aware';
 
 /**
+ * WordPress dependencies
+ */
+import { more } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import Placeholder from '../';
@@ -44,7 +49,7 @@ describe( 'Placeholder', () => {
 		} );
 
 		it( 'should render an Icon in the label section', () => {
-			const placeholder = shallow( <Placeholder icon="wordpress" /> );
+			const placeholder = shallow( <Placeholder icon={ more } /> );
 			const placeholderLabel = placeholder.find(
 				'.components-placeholder__label'
 			);

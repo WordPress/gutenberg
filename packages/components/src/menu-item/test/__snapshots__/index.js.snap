@@ -4,7 +4,19 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
 <ForwardRef(Button)
   aria-checked={true}
   className="components-menu-item__button my-class"
-  icon="wordpress"
+  icon={
+    <SVG
+      className="components-menu-items__item-icon"
+      height={20}
+      viewBox="0 0 24 24"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <Path
+        d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
+      />
+    </SVG>
+  }
   onClick={[Function]}
   role="menuitemcheckbox"
 >
@@ -40,7 +52,19 @@ exports[`MenuItem should match snapshot when info is provided 1`] = `
 exports[`MenuItem should match snapshot when isSelected and role are optionally provided 1`] = `
 <ForwardRef(Button)
   className="components-menu-item__button my-class"
-  icon="wordpress"
+  icon={
+    <SVG
+      className="components-menu-items__item-icon"
+      height={20}
+      viewBox="0 0 24 24"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <Path
+        d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
+      />
+    </SVG>
+  }
   onClick={[Function]}
   role="menuitem"
 >

@@ -15,11 +15,20 @@ import {
 } from '@wordpress/block-editor';
 import { Dashicon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+
+// remove duplicates after gallery append
+const dedupMedia = ( media ) =>
+	uniqWith(
+		media,
+		( media1, media2 ) =>
+			media1.id === media2.id || media1.url === media2.url
+	);
 
 function MediaPlaceholder( props ) {
 	const {
@@ -35,19 +44,16 @@ function MediaPlaceholder( props ) {
 		value = [],
 	} = props;
 
+	// use ref to keep media array current for callbacks during rerenders
+	const mediaRef = useRef( value );
+	mediaRef.current = value;
+
+	// append and deduplicate media array for gallery use case
 	const setMedia =
 		multiple && addToGallery
 			? ( selected ) =>
 					onSelect(
-						uniqWith(
-							[ ...value, ...selected ],
-							( media1, media2 ) => {
-								return (
-									media1.id === media2.id ||
-									media1.url === media2.url
-								);
-							}
-						)
+						dedupMedia( [ ...mediaRef.current, ...selected ] )
 					)
 			: onSelect;
 

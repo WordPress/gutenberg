@@ -138,3 +138,20 @@ export const getAllShortcutRawKeyCombinations = createSelector(
 	},
 	( state, name ) => [ state[ name ] ]
 );
+
+/**
+ * Returns the shortcut names list for a given category name.
+ *
+ * @param {Object} state Global state.
+ * @param {string} name  Category name.
+ *
+ * @return {string[]} Shortcut names.
+ */
+export const getCategoryShortcuts = createSelector(
+	( state, categoryName ) => {
+		return Object.entries( state )
+			.filter( ( [ , shortcut ] ) => shortcut.category === categoryName )
+			.map( ( [ name ] ) => name );
+	},
+	( state ) => [ state ]
+);

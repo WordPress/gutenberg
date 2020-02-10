@@ -24,6 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
 import { isURL } from '@wordpress/url';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { close, arrowLeft, arrowRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -145,14 +146,14 @@ class GalleryImage extends Component {
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
-		this.props.setAttributes( {
-			id: payload.mediaServerId,
-			url: payload.mediaUrl,
-		} );
-
 		this.setState( {
 			isUploadInProgress: false,
 			didUploadFail: false,
+		} );
+
+		this.props.setAttributes( {
+			id: payload.mediaServerId,
+			url: payload.mediaUrl,
 		} );
 	}
 
@@ -240,7 +241,7 @@ class GalleryImage extends Component {
 									<View style={ style.moverButtonContainer }>
 										<Button
 											style={ buttonStyle }
-											icon="arrow-left-alt"
+											icon={ arrowLeft }
 											iconSize={ ICON_SIZE_ARROW }
 											onClick={
 												isFirstItem
@@ -256,7 +257,7 @@ class GalleryImage extends Component {
 										<View style={ separatorStyle }></View>
 										<Button
 											style={ buttonStyle }
-											icon="arrow-right-alt"
+											icon={ arrowRight }
 											iconSize={ ICON_SIZE_ARROW }
 											onClick={
 												isLastItem
@@ -272,7 +273,7 @@ class GalleryImage extends Component {
 									</View>
 									<Button
 										style={ removeButtonStyle }
-										icon="no-alt"
+										icon={ close }
 										iconSize={ ICON_SIZE_REMOVE }
 										onClick={ onRemove }
 										accessibilityLabel={ __(

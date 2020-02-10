@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { ClipboardButton, Button, ExternalLink } from '@wordpress/components';
 import { safeDecodeURI, safeDecodeURIComponent } from '@wordpress/url';
+import { link as linkIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -99,7 +100,7 @@ class PostPermalink extends Component {
 					label={ ariaLabel }
 					onCopy={ () => this.setState( { isCopied: true } ) }
 					aria-disabled={ isCopied }
-					icon="admin-links"
+					icon={ linkIcon }
 				/>
 
 				<span className="editor-post-permalink__label">

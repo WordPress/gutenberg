@@ -138,13 +138,13 @@ $ wp-env start
 ### `wp-env start [ref]`
 
 ```sh
-wp-env start [ref]
+wp-env start
 
 Starts WordPress for development on port 8888 (​http://localhost:8888​)
 (override with WP_ENV_PORT) and tests on port 8889 (​http://localhost:8889​)
-(override with WP_ENV_TESTS_PORT). If the current working directory is a plugin
-and/or has e2e-tests with plugins and/or mu-plugins, they will be mounted
-appropriately.
+(override with WP_ENV_TESTS_PORT). The current working directory must be a
+WordPress installation, a plugin, a theme, or contain a .wp-env.json file.
+
 
 Positionals:
   ref  A `https://github.com/WordPress/WordPress` git repo branch or commit for
@@ -171,28 +171,84 @@ Positionals:
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 ```
 
-## Running with multiple plugins and/or themes
+## .wp-env.json
 
-`wp-env` also supports a configuration file. At the moment, this is only used for loading extra themes and plugins that you may be developing together with your main one. The script will attach the specified theme and plugin directories as volumes on the docker containers so that changes you make to them exist in the WordPress instance.
+You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
 
-### Example:
+`.wp-env.json` supports three fields:
 
-`wp-env.json`
+| Field | Type | Default | Description |
+| -- | -- | -- | -- |
+| `"core"` | `string|null` | `null` | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress. |
+| `"plugins"` | `string[]` | `[]` | A list of plugins to install and activate in the environment. |
+| `"themes"` | `string[]` | `[]` | A list of themes to install in the environment. The first theme in the list will be activated. |
+
+Several types of strings can be passed into these fields:
+
+| Type | Format | Example(s) |
+| -- | -- | -- |
+| Relative path | `.<path>|~<path>` | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
+| Absolute path | `/<path>|<letter>:\<path>` | `"/a/directory"`, `"C:\\a\\directory"` |
+| GitHub repository | `<owner>/<repo>[#<ref>]` | `"WordPress/WordPress"`, `"WordPress/gutenberg#master"` |
+
+Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
+
+### Examples
+
+#### Latest production WordPress + current directory as a plugin
+
+This is useful for plugin development.
+
 ```json
 {
-  "themes": [
-    "../path/to/theme/dir"
-  ],
+  "core": null,
   "plugins": [
-    "../path/to/plugin/dir"
+    "."
   ]
 }
 ```
 
-### Caveats:
+#### Latest development WordPress + current directory as a plugin
 
-The file should be located in the same directory from which you run `wp-env` commands for a project. So if you are running `wp-env` in the root directory of a plugin, `wp-env.json` should also be located there. 
+This is useful for plugin development when upstream Core changes need to be tested.
 
-Each item in the `themes` or `plugins` array should be an absolute or relative path to the root of a different theme or plugin directory. Relative paths will be resolved from the current working directory, which means they will be resolved from the location of the `wp-env.json` file.
+```json
+{
+  "core": "WordPress/WordPress#master",
+  "plugins": [
+    "."
+  ]
+}
+```
+
+#### Local `wordpress-develop` + current directory as a plugin
+
+This is useful for working on plugins and WordPress Core at the same time.
+
+```json
+{
+  "core": "../wordpress-develop/build",
+  "plugins": [
+    "."
+  ]
+}
+```
+
+#### A complete testing environment
+
+This is useful for integration testing: that is, testing how old versions of WordPress and different combinations of plugins and themes impact each other.
+
+```json
+{
+  "core": "WordPress/WordPress#5.2.0",
+  "plugins": [
+    "WordPress/wp-lazy-loading",
+    "WordPress/classic-editor",
+  ],
+  "themes": [
+    "WordPress/theme-experiments"
+  ]
+}
+```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

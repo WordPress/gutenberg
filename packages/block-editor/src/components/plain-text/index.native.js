@@ -21,10 +21,7 @@ export default class PlainText extends Component {
 
 	componentDidMount() {
 		// if isSelected is true, we should request the focus on this TextInput
-		if (
-			this._input.isFocused() === false &&
-			this._input.props.isSelected === true
-		) {
+		if ( this._input.isFocused() === false && this.props.isSelected ) {
 			this.focus();
 		}
 	}

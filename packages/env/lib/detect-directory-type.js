@@ -10,40 +10,41 @@ const path = require( 'path' );
 /**
  * Promisified dependencies
  */
+const exists = util.promisify( fs.exists );
 const readDir = util.promisify( fs.readdir );
 const finished = util.promisify( stream.finished );
 
 /**
- * @typedef Context
- * @type {Object}
- * @property {string} type
- * @property {string} path
- * @property {string} pathBasename
+ * Detects whether the given directory is a WordPress installation, a plugin or a theme.
+ *
+ * @param {string} directoryPath The directory to detect.
+ * @return {string|null} 'core' if the directory is a WordPress installation, 'plugin' if it is a plugin, 'theme' if it is a theme, or null if we can't tell.
  */
+module.exports = async function detectDirectoryType( directoryPath ) {
+	// If we have a `wp-includes/version.php` file, then this is a Core install.
+	if (
+		await exists(
+			path.resolve( directoryPath, 'wp-includes', 'version.php' )
+		)
+	) {
+		return 'core';
+	}
 
-/**
- * Detects the context of a given path.
- *
- * @param {string} [directoryPath=process.cwd()] The directory to detect. Should point to a directory, defaulting to the current working directory.
- *
- * @return {Context} The context of the directory. If a theme or plugin, the type property will contain 'theme' or 'plugin'.
- */
-module.exports = async function detectContext( directoryPath = process.cwd() ) {
-	const context = {};
+	let result = null;
 
 	// Use absolute paths to files so that we can properly read
 	// dependencies not in the current working directory.
-	const absPath = path.resolve( directoryPath );
+	const absolutePath = path.resolve( directoryPath );
 
 	// Race multiple file read streams against each other until
 	// a plugin or theme header is found.
-	const files = ( await readDir( absPath ) )
+	const files = ( await readDir( absolutePath ) )
 		.filter(
 			( file ) =>
 				path.extname( file ) === '.php' ||
 				path.basename( file ) === 'style.css'
 		)
-		.map( ( fileName ) => path.join( absPath, fileName ) );
+		.map( ( fileName ) => path.join( absolutePath, fileName ) );
 
 	const streams = [];
 	for ( const file of files ) {
@@ -52,11 +53,10 @@ module.exports = async function detectContext( directoryPath = process.cwd() ) {
 			const [ , type ] =
 				text.match( /(Plugin|Theme) Name: .*[\r\n]/ ) || [];
 			if ( type ) {
-				context.type = type.toLowerCase();
-				context.path = absPath;
-				context.pathBasename = path.basename( absPath );
+				result = type.toLowerCase();
 
-				// Stop the creation of new streams by mutating the iterated array. We can't `break`, because we are inside a function.
+				// Stop the creation of new streams by mutating the iterated
+				// array. We can't `break`, because we are inside a function.
 				files.splice( 0 );
 				fileStream.destroy();
 				streams.forEach( ( otherFileStream ) =>
@@ -72,5 +72,5 @@ module.exports = async function detectContext( directoryPath = process.cwd() ) {
 		)
 	);
 
-	return context;
+	return result;
 };

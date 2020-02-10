@@ -21,6 +21,7 @@ export { default as ButtonBlockerAppender } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';
 export { default as ContrastChecker } from './contrast-checker';
+export { default as __experimentalEditorSkeleton } from './editor-skeleton';
 export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as __experimentalGradientPickerControl } from './gradient-picker/control';
 export { default as __experimentalGradientPickerPanel } from './gradient-picker/panel';

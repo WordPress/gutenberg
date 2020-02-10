@@ -44,10 +44,7 @@ export const getBlockTypes = createSelector(
 		return Object.values( state.blockTypes ).map( ( blockType ) => {
 			return {
 				...blockType,
-				variations: __experimentalGetBlockVariations(
-					state,
-					blockType.name
-				),
+				variations: getBlockVariations( state, blockType.name ),
 			};
 		} );
 	},
@@ -87,7 +84,7 @@ export function getBlockStyles( state, name ) {
  *
  * @return {(WPBlockVariation[]|void)} Block variations.
  */
-export function __experimentalGetBlockVariations( state, blockName, scope ) {
+export function getBlockVariations( state, blockName, scope ) {
 	const variations = state.blockVariations[ blockName ];
 	if ( ! variations || ! scope ) {
 		return variations;
@@ -109,16 +106,8 @@ export function __experimentalGetBlockVariations( state, blockName, scope ) {
  *
  * @return {?WPBlockVariation} The default block variation.
  */
-export function __experimentalGetDefaultBlockVariation(
-	state,
-	blockName,
-	scope
-) {
-	const variations = __experimentalGetBlockVariations(
-		state,
-		blockName,
-		scope
-	);
+export function getDefaultBlockVariation( state, blockName, scope ) {
+	const variations = getBlockVariations( state, blockName, scope );
 
 	return findLast( variations, 'isDefault' ) || first( variations );
 }

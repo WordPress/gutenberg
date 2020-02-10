@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -32,6 +31,7 @@ import {
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
+import { link } from '@wordpress/icons';
 
 const { getComputedStyle } = window;
 
@@ -86,7 +86,6 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 function URLPicker( {
 	isSelected,
 	url,
-	title,
 	setAttributes,
 	opensInNewTab,
 	onToggleOpenInNewTab,
@@ -102,16 +101,12 @@ function URLPicker( {
 		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
-				value={ { url, title, opensInNewTab } }
+				value={ { url, opensInNewTab } }
 				onChange={ ( {
-					title: newTitle = '',
 					url: newURL = '',
 					opensInNewTab: newOpensInNewTab,
 				} ) => {
-					setAttributes( {
-						title: escape( newTitle ),
-						url: newURL,
-					} );
+					setAttributes( { url: newURL } );
 
 					if ( opensInNewTab !== newOpensInNewTab ) {
 						onToggleOpenInNewTab( newOpensInNewTab );
@@ -126,7 +121,7 @@ function URLPicker( {
 				<ToolbarGroup>
 					<ToolbarButton
 						name="link"
-						icon="admin-links"
+						icon={ link }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ openLinkControl }
@@ -164,7 +159,6 @@ function ButtonEdit( {
 		placeholder,
 		rel,
 		text,
-		title,
 		url,
 	} = attributes;
 	const onSetLinkRel = useCallback(
@@ -199,7 +193,7 @@ function ButtonEdit( {
 	} = __experimentalUseGradient();
 
 	return (
-		<div className={ className } title={ title }>
+		<div className={ className }>
 			<RichText
 				placeholder={ placeholder || __( 'Add text…' ) }
 				value={ text }
@@ -225,7 +219,6 @@ function ButtonEdit( {
 				} }
 			/>
 			<URLPicker
-				title={ title }
 				url={ url }
 				setAttributes={ setAttributes }
 				isSelected={ isSelected }

@@ -1,5 +1,12 @@
-.block-editor-color-gradient-control__button-tabs {
-	display: block;
+.block-editor-color-gradient-control {
+	&__color-indicator {
+		margin-bottom: $grid-size;
+	}
+
+	&__button-tabs {
+		display: block;
+		margin-bottom: $grid-size;
+	}
 }
 
 .block-editor-panel-color-gradient-settings {
@@ -7,8 +14,10 @@
 		vertical-align: text-bottom;
 	}
 
-	&__panel-title .component-color-indicator {
-		display: inline-block;
+	&__panel-title {
+		.component-color-indicator {
+			display: inline-block;
+		}
 	}
 
 	&.is-opened &__panel-title .component-color-indicator {
