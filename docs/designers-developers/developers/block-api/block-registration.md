@@ -188,6 +188,69 @@ example: {
 
 If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
 
+#### variations (optional)
+
+- **Type:** `Array`
+
+Similar to how the block's style variations can be declared, a block type can define block variations the user can pick from. The difference is that rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted. All variations by default will show up in the inserter in addition to the regular block type item. When the `isDefault` flag is set for any of the variations listed, then it overrides the regular block type item in the inserter instead.
+
+{% codetabs %}
+{% ES5 %}
+
+```js
+variations: [
+    {
+		name: 'wordpress',
+		isDefault: true,
+		title: __( 'WordPress' ),
+		description: __( 'Code is poetry!' ),
+		icon: WordPressIcon,
+		attributes: { service: 'wordpress' },
+	},
+	{
+		name: 'google',
+		title: __( 'Google' ),
+		icon: GoogleIcon,
+		attributes: { service: 'google' },
+	},
+	{
+		name: 'twitter',
+		title: __( 'Twitter' ),
+		icon: TwitterIcon,
+		attributes: { service: 'twitter' },
+	},
+],
+```
+
+{% ESNext %}
+
+```js
+variations: [
+    {
+		name: 'wordpress',
+		isDefault: true,
+		title: __( 'WordPress' ),
+		description: __( 'Code is poetry!' ),
+		icon: WordPressIcon,
+		attributes: { service: 'wordpress' },
+	},
+	{
+		name: 'google',
+		title: __( 'Google' ),
+		icon: GoogleIcon,
+		attributes: { service: 'google' },
+	},
+	{
+		name: 'twitter',
+		title: __( 'Twitter' ),
+		icon: TwitterIcon,
+		attributes: { service: 'twitter' },
+	},
+],
+```
+
+{% end %}
+
 #### transforms (optional)
 
 -   **Type:** `Array`
