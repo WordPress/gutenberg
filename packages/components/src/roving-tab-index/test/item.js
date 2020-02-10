@@ -49,7 +49,7 @@ describe( 'RovingTabIndexItem', () => {
 	} );
 
 	it( 'allows children to bue declared using a child render function as an alternative to `as`', () => {
-		const funcRenderer = TestRenderer.create(
+		const renderer = TestRenderer.create(
 			<RovingTabIndex>
 				<RovingTabIndexItem>
 					{ ( props ) => (
@@ -61,6 +61,6 @@ describe( 'RovingTabIndexItem', () => {
 			</RovingTabIndex>
 		);
 
-		expect( funcRenderer.toJSON() ).toMatchSnapshot();
+		expect( renderer.toJSON() ).toMatchSnapshot();
 	} );
 } );
