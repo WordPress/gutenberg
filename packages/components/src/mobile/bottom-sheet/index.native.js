@@ -20,6 +20,8 @@ import Cell from './cell';
 import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
+import UnsupportedFooterCell from './unsupported-footer-cell';
+
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 class BottomSheet extends Component {
@@ -30,11 +32,16 @@ class BottomSheet extends Component {
 			safeAreaBottomInset: 0,
 		};
 
-		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
+		SafeArea.getSafeAreaInsetsForRootView().then(
+			this.onSafeAreaInsetsUpdate
+		);
 	}
 
 	componentDidMount() {
-		this.safeAreaEventSubscription = SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		this.safeAreaEventSubscription = SafeArea.addEventListener(
+			'safeAreaInsetsForRootViewDidChange',
+			this.onSafeAreaInsetsUpdate
+		);
 	}
 
 	componentWillUnmount() {
@@ -43,7 +50,10 @@ class BottomSheet extends Component {
 		}
 		this.safeAreaEventSubscription.remove();
 		this.safeAreaEventSubscription = null;
-		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		SafeArea.removeEventListener(
+			'safeAreaInsetsForRootViewDidChange',
+			this.onSafeAreaInsetsUpdate
+		);
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
@@ -82,23 +92,20 @@ class BottomSheet extends Component {
 		const getHeader = () => (
 			<View>
 				<View style={ styles.head }>
-					<View style={ { flex: 1 } }>
-						{ leftButton }
-					</View>
+					<View style={ { flex: 1 } }>{ leftButton }</View>
 					<View style={ styles.titleContainer }>
-						<Text style={ styles.title }>
-							{ title }
-						</Text>
+						<Text style={ styles.title }>{ title }</Text>
 					</View>
-					<View style={ { flex: 1 } }>
-						{ rightButton }
-					</View>
+					<View style={ { flex: 1 } }>{ rightButton }</View>
 				</View>
 				<View style={ styles.separator } />
 			</View>
 		);
 
-		const backgroundStyle = getStylesFromColorScheme( styles.background, styles.backgroundDark );
+		const backgroundStyle = getStylesFromColorScheme(
+			styles.background,
+			styles.backgroundDark
+		);
 
 		return (
 			<Modal
@@ -112,34 +119,50 @@ class BottomSheet extends Component {
 				onBackdropPress={ this.props.onClose }
 				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
-				onDismiss={ Platform.OS === 'ios' ? this.props.onDismiss : undefined }
-				onModalHide={ Platform.OS === 'android' ? this.props.onDismiss : undefined }
+				onDismiss={
+					Platform.OS === 'ios' ? this.props.onDismiss : undefined
+				}
+				onModalHide={
+					Platform.OS === 'android' ? this.props.onDismiss : undefined
+				}
 				swipeDirection="down"
-				onMoveShouldSetResponder={ panResponder.panHandlers.onMoveShouldSetResponder }
-				onMoveShouldSetResponderCapture={ panResponder.panHandlers.onMoveShouldSetResponderCapture }
+				onMoveShouldSetResponder={
+					panResponder.panHandlers.onMoveShouldSetResponder
+				}
+				onMoveShouldSetResponderCapture={
+					panResponder.panHandlers.onMoveShouldSetResponderCapture
+				}
 				onAccessibilityEscape={ this.props.onClose }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ { ...backgroundStyle, borderColor: 'rgba(0, 0, 0, 0.1)', ...style } }
+					style={ {
+						...backgroundStyle,
+						borderColor: 'rgba(0, 0, 0, 0.1)',
+						...style,
+					} }
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
-					{ hideHeader && ( <View style={ styles.emptyHeaderSpace } /> ) }
+					{ hideHeader && <View style={ styles.emptyHeaderSpace } /> }
 					{ ! hideHeader && getHeader() }
 					<View style={ [ styles.content, contentStyle ] }>
 						{ this.props.children }
 					</View>
-					<View style={ { height: this.state.safeAreaBottomInset } } />
+					<View
+						style={ { height: this.state.safeAreaBottomInset } }
+					/>
 				</KeyboardAvoidingView>
 			</Modal>
-
 		);
 	}
 }
 
 function getWidth() {
-	return Math.min( Dimensions.get( 'window' ).width, styles.background.maxWidth );
+	return Math.min(
+		Dimensions.get( 'window' ).width,
+		styles.background.maxWidth
+	);
 }
 
 const ThemedBottomSheet = withPreferredColorScheme( BottomSheet );
@@ -150,5 +173,6 @@ ThemedBottomSheet.Cell = Cell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
+ThemedBottomSheet.UnsupportedFooterCell = UnsupportedFooterCell;
 
 export default ThemedBottomSheet;

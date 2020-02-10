@@ -196,6 +196,13 @@ export function updatePreferredStyleVariations( blockName, blockStyle ) {
 	};
 }
 
+/**
+ * Returns an action object used in signalling that the editor should attempt
+ * to locally autosave the current post every `interval` seconds.
+ *
+ * @param {number} interval The new interval, in seconds.
+ * @return {Object} Action object.
+ */
 export function __experimentalUpdateLocalAutosaveInterval( interval ) {
 	return {
 		type: 'UPDATE_LOCAL_AUTOSAVE_INTERVAL',

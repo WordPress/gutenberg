@@ -61,48 +61,63 @@ describe( 'DatePicker', () => {
 		it( 'should call onChange with a formated date of the input', () => {
 			const onChangeSpy = jest.fn();
 			const currentDate = '1986-10-18T11:00:00';
-			const wrapper = shallow( <DatePicker currentDate={ currentDate } onChange={ onChangeSpy } /> );
+			const wrapper = shallow(
+				<DatePicker
+					currentDate={ currentDate }
+					onChange={ onChangeSpy }
+				/>
+			);
 			const newDate = moment();
 
 			wrapper.instance().onChangeMoment( newDate );
 
-			expect( onChangeSpy ).toHaveBeenCalledWith( newDate.format( TIMEZONELESS_FORMAT ) );
+			expect( onChangeSpy ).toHaveBeenCalledWith(
+				newDate.format( TIMEZONELESS_FORMAT )
+			);
 		} );
 
 		it( 'should call onChange with hours, minutes, seconds of the current time when currentDate is undefined', () => {
 			let onChangeSpyArgument;
-			const onChangeSpy = ( arg ) => onChangeSpyArgument = arg;
+			const onChangeSpy = ( arg ) => ( onChangeSpyArgument = arg );
 			const wrapper = shallow( <DatePicker onChange={ onChangeSpy } /> );
 			const newDate = moment( '1986-10-18T11:00:00' );
 			const current = moment();
-			const newDateWithCurrentTime = newDate
-				.clone()
-				.set( {
-					hours: current.hours(),
-					minutes: current.minutes(),
-					seconds: current.seconds(),
-				} );
+			const newDateWithCurrentTime = newDate.clone().set( {
+				hours: current.hours(),
+				minutes: current.minutes(),
+				seconds: current.seconds(),
+			} );
 			wrapper.instance().onChangeMoment( newDate );
 
-			expect( moment( onChangeSpyArgument ).isSame( newDateWithCurrentTime, 'minute' ) ).toBe( true );
+			expect(
+				moment( onChangeSpyArgument ).isSame(
+					newDateWithCurrentTime,
+					'minute'
+				)
+			).toBe( true );
 		} );
 
 		it( 'should call onChange with hours, minutes, seconds of the current time when currentDate is null', () => {
 			let onChangeSpyArgument;
-			const onChangeSpy = ( arg ) => onChangeSpyArgument = arg;
-			const wrapper = shallow( <DatePicker currentDate={ null } onChange={ onChangeSpy } /> );
+			const onChangeSpy = ( arg ) => ( onChangeSpyArgument = arg );
+			const wrapper = shallow(
+				<DatePicker currentDate={ null } onChange={ onChangeSpy } />
+			);
 			const newDate = moment( '1986-10-18T11:00:00' );
 			const current = moment();
-			const newDateWithCurrentTime = newDate
-				.clone()
-				.set( {
-					hours: current.hours(),
-					minutes: current.minutes(),
-					seconds: current.seconds(),
-				} );
+			const newDateWithCurrentTime = newDate.clone().set( {
+				hours: current.hours(),
+				minutes: current.minutes(),
+				seconds: current.seconds(),
+			} );
 			wrapper.instance().onChangeMoment( newDate );
 
-			expect( moment( onChangeSpyArgument ).isSame( newDateWithCurrentTime, 'minute' ) ).toBe( true );
+			expect(
+				moment( onChangeSpyArgument ).isSame(
+					newDateWithCurrentTime,
+					'minute'
+				)
+			).toBe( true );
 		} );
 	} );
 } );

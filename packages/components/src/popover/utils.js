@@ -22,7 +22,14 @@ const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
  *
  * @return {Object} Popover xAxis position and constraints.
  */
-export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, corner, sticky, chosenYAxis ) {
+export function computePopoverXAxisPosition(
+	anchorRect,
+	contentSize,
+	xAxis,
+	corner,
+	sticky,
+	chosenYAxis
+) {
 	const { width } = contentSize;
 	const isRTL = document.documentElement.dir === 'rtl';
 
@@ -40,13 +47,14 @@ export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, cor
 	}
 
 	// x axis alignment choices
-	const anchorMidPoint = Math.round( anchorRect.left + ( anchorRect.width / 2 ) );
+	const anchorMidPoint = Math.round( anchorRect.left + anchorRect.width / 2 );
 	const centerAlignment = {
 		popoverLeft: anchorMidPoint,
-		contentWidth: (
-			( anchorMidPoint - ( width / 2 ) > 0 ? ( width / 2 ) : anchorMidPoint ) +
-			( anchorMidPoint + ( width / 2 ) > window.innerWidth ? window.innerWidth - anchorMidPoint : ( width / 2 ) )
-		),
+		contentWidth:
+			( anchorMidPoint - width / 2 > 0 ? width / 2 : anchorMidPoint ) +
+			( anchorMidPoint + width / 2 > window.innerWidth
+				? window.innerWidth - anchorMidPoint
+				: width / 2 ),
 	};
 
 	let leftAlignmentX = anchorRect.left;
@@ -71,7 +79,10 @@ export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, cor
 	};
 	const rightAlignment = {
 		popoverLeft: rightAlignmentX,
-		contentWidth: rightAlignmentX + width > window.innerWidth ? window.innerWidth - rightAlignmentX : width,
+		contentWidth:
+			rightAlignmentX + width > window.innerWidth
+				? window.innerWidth - rightAlignmentX
+				: width,
 	};
 
 	// Choosing the x axis
@@ -83,11 +94,20 @@ export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, cor
 			chosenXAxis = 'center';
 		} else if ( xAxis === 'left' && leftAlignment.contentWidth === width ) {
 			chosenXAxis = 'left';
-		} else if ( xAxis === 'right' && rightAlignment.contentWidth === width ) {
+		} else if (
+			xAxis === 'right' &&
+			rightAlignment.contentWidth === width
+		) {
 			chosenXAxis = 'right';
 		} else {
-			chosenXAxis = leftAlignment.contentWidth > rightAlignment.contentWidth ? 'left' : 'right';
-			const chosenWidth = chosenXAxis === 'left' ? leftAlignment.contentWidth : rightAlignment.contentWidth;
+			chosenXAxis =
+				leftAlignment.contentWidth > rightAlignment.contentWidth
+					? 'left'
+					: 'right';
+			const chosenWidth =
+				chosenXAxis === 'left'
+					? leftAlignment.contentWidth
+					: rightAlignment.contentWidth;
 			contentWidth = chosenWidth !== width ? chosenWidth : null;
 		}
 	}
@@ -111,48 +131,48 @@ export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, cor
 /**
  * Utility used to compute the popover position over the yAxis
  *
- * @param {Object}  anchorRect  Anchor Rect.
- * @param {Object}  contentSize Content Size.
- * @param {string}  yAxis       Desired yAxis.
- * @param {string}  corner      Desired corner.
- * @param {boolean} sticky      Whether or not to stick the popover to the
- *                              scroll container edge when part of the anchor
- *                              leaves view.
- * @param {Element} anchorRef   The anchor element.
+ * @param {Object}  anchorRect        Anchor Rect.
+ * @param {Object}  contentSize       Content Size.
+ * @param {string}  yAxis             Desired yAxis.
+ * @param {string}  corner            Desired corner.
+ * @param {boolean} sticky            Whether or not to stick the popover to the
+ *                                    scroll container edge when part of the
+ *                                    anchor leaves view.
+ * @param {Element} anchorRef         The anchor element.
+ * @param {Element} relativeOffsetTop If applicable, top offset of the relative
+ *                                    positioned parent container.
  *
  * @return {Object} Popover xAxis position and constraints.
  */
-export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis, corner, sticky, anchorRef ) {
+export function computePopoverYAxisPosition(
+	anchorRect,
+	contentSize,
+	yAxis,
+	corner,
+	sticky,
+	anchorRef,
+	relativeOffsetTop
+) {
 	const { height } = contentSize;
 
 	if ( sticky ) {
-		let topEl = anchorRef;
-		let bottomEl = anchorRef;
-
-		if ( typeof sticky === 'string' ) {
-			const elements = document.querySelectorAll( sticky );
-
-			if ( elements.length ) {
-				topEl = elements[ 0 ];
-				bottomEl = elements[ elements.length - 1 ];
-			}
-		}
-
-		const scrollContainerEl = getScrollContainer( topEl ) || document.body;
+		const scrollContainerEl =
+			getScrollContainer( anchorRef ) || document.body;
 		const scrollRect = scrollContainerEl.getBoundingClientRect();
-		const topRect = topEl.getBoundingClientRect();
-		const bottomRect = bottomEl.getBoundingClientRect();
 
-		if ( topRect.top - height <= scrollRect.top ) {
+		if ( anchorRect.top - height <= scrollRect.top ) {
 			return {
 				yAxis,
-				popoverTop: Math.min( bottomRect.bottom, scrollRect.top + height ),
+				popoverTop: Math.min(
+					anchorRect.bottom - relativeOffsetTop,
+					scrollRect.top + height - relativeOffsetTop
+				),
 			};
 		}
 	}
 
 	// y axis alignment choices
-	let anchorMidPoint = anchorRect.top + ( anchorRect.height / 2 );
+	let anchorMidPoint = anchorRect.top + anchorRect.height / 2;
 
 	if ( corner === 'bottom' ) {
 		anchorMidPoint = anchorRect.bottom;
@@ -162,19 +182,26 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis, cor
 
 	const middleAlignment = {
 		popoverTop: anchorMidPoint,
-		contentHeight: (
-			( anchorMidPoint - ( height / 2 ) > 0 ? ( height / 2 ) : anchorMidPoint ) +
-			( anchorMidPoint + ( height / 2 ) > window.innerHeight ? window.innerHeight - anchorMidPoint : ( height / 2 ) )
-		),
+		contentHeight:
+			( anchorMidPoint - height / 2 > 0 ? height / 2 : anchorMidPoint ) +
+			( anchorMidPoint + height / 2 > window.innerHeight
+				? window.innerHeight - anchorMidPoint
+				: height / 2 ),
 	};
 
 	const topAlignment = {
 		popoverTop: anchorRect.top,
-		contentHeight: anchorRect.top - HEIGHT_OFFSET - height > 0 ? height : anchorRect.top - HEIGHT_OFFSET,
+		contentHeight:
+			anchorRect.top - HEIGHT_OFFSET - height > 0
+				? height
+				: anchorRect.top - HEIGHT_OFFSET,
 	};
 	const bottomAlignment = {
 		popoverTop: anchorRect.bottom,
-		contentHeight: anchorRect.bottom + HEIGHT_OFFSET + height > window.innerHeight ? window.innerHeight - HEIGHT_OFFSET - anchorRect.bottom : height,
+		contentHeight:
+			anchorRect.bottom + HEIGHT_OFFSET + height > window.innerHeight
+				? window.innerHeight - HEIGHT_OFFSET - anchorRect.bottom
+				: height,
 	};
 
 	// Choosing the y axis
@@ -186,11 +213,20 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis, cor
 			chosenYAxis = 'middle';
 		} else if ( yAxis === 'top' && topAlignment.contentHeight === height ) {
 			chosenYAxis = 'top';
-		} else if ( yAxis === 'bottom' && bottomAlignment.contentHeight === height ) {
+		} else if (
+			yAxis === 'bottom' &&
+			bottomAlignment.contentHeight === height
+		) {
 			chosenYAxis = 'bottom';
 		} else {
-			chosenYAxis = topAlignment.contentHeight > bottomAlignment.contentHeight ? 'top' : 'bottom';
-			const chosenHeight = chosenYAxis === 'top' ? topAlignment.contentHeight : bottomAlignment.contentHeight;
+			chosenYAxis =
+				topAlignment.contentHeight > bottomAlignment.contentHeight
+					? 'top'
+					: 'bottom';
+			const chosenHeight =
+				chosenYAxis === 'top'
+					? topAlignment.contentHeight
+					: bottomAlignment.contentHeight;
 			contentHeight = chosenHeight !== height ? chosenHeight : null;
 		}
 	}
@@ -212,24 +248,48 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis, cor
 }
 
 /**
- * Utility used to compute the popover position and the content max width/height for a popover
- * given its anchor rect and its content size.
+ * Utility used to compute the popover position and the content max width/height
+ * for a popover given its anchor rect and its content size.
  *
- * @param {Object}  anchorRect  Anchor Rect.
- * @param {Object}  contentSize Content Size.
- * @param {string}  position    Position.
- * @param {boolean} sticky      Whether or not to stick the popover to the
- *                              scroll container edge when part of the anchor
- *                              leaves view.
- * @param {Element} anchorRef   The anchor element.
+ * @param {Object}  anchorRect        Anchor Rect.
+ * @param {Object}  contentSize       Content Size.
+ * @param {string}  position          Position.
+ * @param {boolean} sticky            Whether or not to stick the popover to the
+ *                                    scroll container edge when part of the
+ *                                    anchor leaves view.
+ * @param {Element} anchorRef         The anchor element.
+ * @param {number}  relativeOffsetTop If applicable, top offset of the relative
+ *                                    positioned parent container.
  *
  * @return {Object} Popover position and constraints.
  */
-export function computePopoverPosition( anchorRect, contentSize, position = 'top', sticky, anchorRef ) {
+export function computePopoverPosition(
+	anchorRect,
+	contentSize,
+	position = 'top',
+	sticky,
+	anchorRef,
+	relativeOffsetTop
+) {
 	const [ yAxis, xAxis = 'center', corner ] = position.split( ' ' );
 
-	const yAxisPosition = computePopoverYAxisPosition( anchorRect, contentSize, yAxis, corner, sticky, anchorRef );
-	const xAxisPosition = computePopoverXAxisPosition( anchorRect, contentSize, xAxis, corner, sticky, yAxisPosition.yAxis );
+	const yAxisPosition = computePopoverYAxisPosition(
+		anchorRect,
+		contentSize,
+		yAxis,
+		corner,
+		sticky,
+		anchorRef,
+		relativeOffsetTop
+	);
+	const xAxisPosition = computePopoverXAxisPosition(
+		anchorRect,
+		contentSize,
+		xAxis,
+		corner,
+		sticky,
+		yAxisPosition.yAxis
+	);
 
 	return {
 		...xAxisPosition,

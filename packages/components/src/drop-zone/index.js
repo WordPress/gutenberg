@@ -8,11 +8,11 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { useContext, useEffect, useState, useRef } from '@wordpress/element';
+import { upload, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import Dashicon from '../dashicon';
 import { DropZoneConsumer, Context } from './provider';
 
 export function useDropZone( {
@@ -70,19 +70,22 @@ function DropZoneComponent( {
 	onDrop,
 } ) {
 	const element = useRef();
-	const {
-		isDraggingOverDocument,
-		isDraggingOverElement,
-		type,
-	} = useDropZone( { element, onFilesDrop, onHTMLDrop, onDrop } );
+	const { isDraggingOverDocument, isDraggingOverElement, type } = useDropZone(
+		{
+			element,
+			onFilesDrop,
+			onHTMLDrop,
+			onDrop,
+		}
+	);
 
 	let children;
 
 	if ( isDraggingOverElement ) {
 		children = (
 			<div className="components-drop-zone__content">
-				<Dashicon
-					icon="upload"
+				<Icon
+					icon={ upload }
 					size="40"
 					className="components-drop-zone__content-icon"
 				/>
@@ -94,11 +97,11 @@ function DropZoneComponent( {
 	}
 
 	const classes = classnames( 'components-drop-zone', className, {
-		'is-active': ( isDraggingOverDocument || isDraggingOverElement ) && (
-			( type === 'file' && onFilesDrop ) ||
-			( type === 'html' && onHTMLDrop ) ||
-			( type === 'default' && onDrop )
-		),
+		'is-active':
+			( isDraggingOverDocument || isDraggingOverElement ) &&
+			( ( type === 'file' && onFilesDrop ) ||
+				( type === 'html' && onHTMLDrop ) ||
+				( type === 'default' && onDrop ) ),
 		'is-dragging-over-document': isDraggingOverDocument,
 		'is-dragging-over-element': isDraggingOverElement,
 		[ `is-dragging-${ type }` ]: !! type,

@@ -25,26 +25,23 @@ describe( 'babel-plugin', function() {
 		compare(
 			join(
 				'import warning from "@wordpress/warning";',
-				'warning(true, "a", "b");'
+				'warning("a");'
 			),
 			join(
 				'import warning from "@wordpress/warning";',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;'
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;'
 			)
 		);
 	} );
 
 	it( 'should not replace warning calls without import declaration', () => {
-		compare(
-			'warning(true, "a", "b");',
-			'warning(true, "a", "b");'
-		);
+		compare( 'warning("a");', 'warning("a");' );
 	} );
 
 	it( 'should replace warning calls without import declaration with plugin options', () => {
 		compare(
-			'warning(true, "a", "b");',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;',
+			'warning("a");',
+			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;',
 			{ callee: 'warning' }
 		);
 	} );
@@ -53,15 +50,15 @@ describe( 'babel-plugin', function() {
 		compare(
 			join(
 				'import warning from "@wordpress/warning";',
-				'warning(true, "a", "b");',
-				'warning(false, "b", "a");',
-				'warning(cond, "c");',
+				'warning("a");',
+				'warning("b");',
+				'warning("c");'
 			),
 			join(
 				'import warning from "@wordpress/warning";',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(false, "b", "a") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(cond, "c") : void 0;'
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("b") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("c") : void 0;'
 			)
 		);
 	} );
@@ -70,15 +67,15 @@ describe( 'babel-plugin', function() {
 		compare(
 			join(
 				'import warn from "@wordpress/warning";',
-				'warn(true, "a", "b");',
-				'warn(false, "b", "a");',
-				'warn(cond, "c");',
+				'warn("a");',
+				'warn("b");',
+				'warn("c");'
 			),
 			join(
 				'import warn from "@wordpress/warning";',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(true, "a", "b") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(false, "b", "a") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(cond, "c") : void 0;'
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("a") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("b") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("c") : void 0;'
 			)
 		);
 	} );
@@ -87,15 +84,15 @@ describe( 'babel-plugin', function() {
 		compare(
 			join(
 				'import warn from "@wordpress/warning";',
-				'warn(true, "a", "b");',
-				'warn(false, "b", "a");',
-				'warn(cond, "c");',
+				'warn("a");',
+				'warn("b");',
+				'warn("c");'
 			),
 			join(
 				'import warn from "@wordpress/warning";',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(true, "a", "b") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(false, "b", "a") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(cond, "c") : void 0;'
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("a") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("b") : void 0;',
+				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("c") : void 0;'
 			)
 		);
 	} );

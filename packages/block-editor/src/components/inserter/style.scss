@@ -24,13 +24,6 @@ $block-inserter-search-height: 38px;
 }
 
 .block-editor-inserter__toggle {
-	display: inline-flex;
-	align-items: center;
-	color: $dark-gray-500;
-	background: none;
-	cursor: pointer;
-	border: none;
-	outline: none;
 	transition: color 0.2s ease;
 	@include reduce-motion("transition");
 }

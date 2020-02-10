@@ -1,11 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	View,
-	Text,
-	TouchableWithoutFeedback,
-} from 'react-native';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -67,7 +63,9 @@ class BlockListBlock extends Component {
 				onReplace={ this.props.onReplace }
 				insertBlocksAfter={ this.insertBlocksAfter }
 				mergeBlocks={ this.props.mergeBlocks }
-				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
+				onCaretVerticalPositionChange={
+					this.props.onCaretVerticalPositionChange
+				}
 				clientId={ this.props.clientId }
 			/>
 		);
@@ -89,13 +87,18 @@ class BlockListBlock extends Component {
 			isRootListInnerBlockHolder,
 		} = this.props;
 
-		const fullSolidBorderStyle = { // define style for full border
+		const fullSolidBorderStyle = {
+			// define style for full border
 			...styles.fullSolidBordered,
-			...getStylesFromColorScheme( styles.solidBorderColor, styles.solidBorderColorDark ),
+			...getStylesFromColorScheme(
+				styles.solidBorderColor,
+				styles.solidBorderColorDark
+			),
 		};
 
-		if ( hasChildren ) { // if block has children apply style for selected parent
-			return { ...styles.selectedParent,	...fullSolidBorderStyle	};
+		if ( hasChildren ) {
+			// if block has children apply style for selected parent
+			return { ...styles.selectedParent, ...fullSolidBorderStyle };
 		}
 
 		// apply semi border selected style when screen is in vertical position
@@ -122,6 +125,7 @@ class BlockListBlock extends Component {
 			isAncestorSelected,
 			hasParent,
 			getStylesFromColorScheme,
+			isLastBlock,
 		} = this.props;
 
 		// if block does not have parent apply neutral or full
@@ -130,23 +134,37 @@ class BlockListBlock extends Component {
 			return hasChildren ? styles.neutral : styles.full;
 		}
 
-		if ( isParentSelected ) { // parent of a block is selected
-			const dashedBorderStyle = { // define style for dashed border
+		if ( isParentSelected ) {
+			// parent of a block is selected
+			const dashedBorderStyle = {
+				// define style for dashed border
 				...styles.dashedBordered,
-				...getStylesFromColorScheme( styles.dashedBorderColor, styles.dashedBorderColorDark ),
+				...getStylesFromColorScheme(
+					styles.dashedBorderColor,
+					styles.dashedBorderColorDark
+				),
 			};
 
 			// return apply childOfSelected or childOfSelectedLeaf
 			// margins depending if block has children or not
-			return hasChildren ?
-				{ ...styles.childOfSelected, ...dashedBorderStyle } :
-				{ ...styles.childOfSelectedLeaf, ...dashedBorderStyle };
+			return {
+				...( hasChildren
+					? styles.childOfSelected
+					: styles.childOfSelectedLeaf ),
+				...dashedBorderStyle,
+				...( ! isLastBlock && styles.marginVerticalChild ),
+			};
 		}
 
-		if ( isAncestorSelected ) { // ancestor of a block is selected
+		if ( isAncestorSelected ) {
+			// ancestor of a block is selected
 			return {
 				...styles.descendantOfSelectedLeaf,
-				...( hasChildren && styles.marginHorizontalNone ),
+				...( hasChildren && {
+					...styles.marginHorizontalNone,
+					...styles.marginVerticalNone,
+				} ),
+				...( ! isLastBlock && styles.marginVerticalDescendant ),
 			};
 		}
 
@@ -156,22 +174,18 @@ class BlockListBlock extends Component {
 	}
 
 	applyBlockStyle() {
-		const {
-			isSelected,
-			isDimmed,
-		} = this.props;
+		const { isSelected, isDimmed } = this.props;
 
 		return [
-			isSelected ? this.applySelectedBlockStyle() : this.applyUnSelectedBlockStyle(),
+			isSelected
+				? this.applySelectedBlockStyle()
+				: this.applyUnSelectedBlockStyle(),
 			isDimmed && styles.dimmed,
 		];
 	}
 
 	applyToolbarStyle() {
-		const {
-			hasChildren,
-			isUnregisteredBlock,
-		} = this.props;
+		const { hasChildren, isUnregisteredBlock } = this.props;
 
 		if ( ! hasChildren || isUnregisteredBlock ) {
 			return styles.neutralToolbar;
@@ -193,23 +207,29 @@ class BlockListBlock extends Component {
 			isTouchable,
 		} = this.props;
 
-		const accessibilityLabel = getAccessibleBlockLabel( blockType, attributes, order + 1 );
+		const accessibilityLabel = getAccessibleBlockLabel(
+			blockType,
+			attributes,
+			order + 1
+		);
 
 		return (
 			<>
-				{ showFloatingToolbar &&
-					( <FloatingToolbar>
+				{ showFloatingToolbar && (
+					<FloatingToolbar>
 						<Toolbar passedStyle={ styles.toolbar }>
 							<ToolbarButton
 								title={ __( 'Navigate Up' ) }
-								onClick={ () => this.props.onSelect( parentId ) }
+								onClick={ () =>
+									this.props.onSelect( parentId )
+								}
 								icon={ NavigateUpSVG }
 							/>
 							<View style={ styles.pipe } />
 						</Toolbar>
 						<Breadcrumbs clientId={ clientId } />
 					</FloatingToolbar>
-					) }
+				) }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
@@ -220,8 +240,19 @@ class BlockListBlock extends Component {
 						accessibilityLabel={ accessibilityLabel }
 						style={ this.applyBlockStyle() }
 					>
-						{ isValid ? this.getBlockForType() : <BlockInvalidWarning blockTitle={ title } icon={ icon } /> }
-						<View style={ this.applyToolbarStyle() } >{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }</View>
+						{ isValid ? (
+							this.getBlockForType()
+						) : (
+							<BlockInvalidWarning
+								blockTitle={ title }
+								icon={ icon }
+							/>
+						) }
+						<View style={ this.applyToolbarStyle() }>
+							{ isSelected && (
+								<BlockMobileToolbar clientId={ clientId } />
+							) }
+						</View>
 					</View>
 				</TouchableWithoutFeedback>
 			</>
@@ -233,7 +264,6 @@ export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
-			getBlocks,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
@@ -245,13 +275,11 @@ export default compose( [
 			getBlockCount,
 		} = select( 'core/block-editor' );
 
-		const {
-			getGroupingBlockName,
-		} = select( 'core/blocks' );
+		const { getGroupingBlockName } = select( 'core/blocks' );
 
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
-		const isLastBlock = order === getBlocks().length - 1;
+		const isLastBlock = order === getBlockCount( rootClientId ) - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
 
@@ -271,24 +299,47 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
-		const commonAncestor = getLowestCommonAncestorWithSelectedBlock( clientId );
+		const commonAncestor = getLowestCommonAncestorWithSelectedBlock(
+			clientId
+		);
 		const commonAncestorIndex = parents.indexOf( commonAncestor ) - 1;
-		const firstToSelectId = commonAncestor ? parents[ commonAncestorIndex ] : parents[ parents.length - 1 ];
+		const firstToSelectId = commonAncestor
+			? parents[ commonAncestorIndex ]
+			: parents[ parents.length - 1 ];
 
-		const hasChildren = ! isUnregisteredBlock && !! getBlockCount( clientId );
+		const hasChildren =
+			! isUnregisteredBlock && !! getBlockCount( clientId );
 		const hasParent = !! parentId;
-		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parentId;
-		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
-		const isSelectedBlockNested = !! getBlockRootClientId( selectedBlockClientId );
+		const isParentSelected =
+			selectedBlockClientId && selectedBlockClientId === parentId;
+		const isAncestorSelected =
+			selectedBlockClientId && parents.includes( selectedBlockClientId );
+		const isSelectedBlockNested = !! getBlockRootClientId(
+			selectedBlockClientId
+		);
 
-		const selectedParents = selectedBlockClientId ? getBlockParents( selectedBlockClientId ) : [];
+		const selectedParents = selectedBlockClientId
+			? getBlockParents( selectedBlockClientId )
+			: [];
 		const isDescendantSelected = selectedParents.includes( clientId );
-		const isDescendantOfParentSelected = selectedParents.includes( parentId );
-		const isTouchable = isSelected || isDescendantOfParentSelected || isParentSelected || parentId === '';
-		const isDimmed = ! isSelected && isSelectedBlockNested && ! isAncestorSelected && ! isDescendantSelected && ( isDescendantOfParentSelected || rootBlockId === clientId );
+		const isDescendantOfParentSelected = selectedParents.includes(
+			parentId
+		);
+		const isTouchable =
+			isSelected ||
+			isDescendantOfParentSelected ||
+			isParentSelected ||
+			parentId === '';
+		const isDimmed =
+			! isSelected &&
+			isSelectedBlockNested &&
+			! isAncestorSelected &&
+			! isDescendantSelected &&
+			( isDescendantOfParentSelected || rootBlockId === clientId );
 
 		const isInnerBlockHolder = name === getGroupingBlockName();
-		const isRootListInnerBlockHolder = ! isSelectedBlockNested && isInnerBlockHolder;
+		const isRootListInnerBlockHolder =
+			! isSelectedBlockNested && isInnerBlockHolder;
 
 		return {
 			icon,
@@ -336,7 +387,9 @@ export default compose( [
 						mergeBlocks( clientId, nextBlockClientId );
 					}
 				} else {
-					const previousBlockClientId = getPreviousBlockClientId( clientId );
+					const previousBlockClientId = getPreviousBlockClientId(
+						clientId
+					);
 					if ( previousBlockClientId ) {
 						mergeBlocks( previousBlockClientId, clientId );
 					}

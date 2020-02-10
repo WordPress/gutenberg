@@ -10,10 +10,7 @@ import { Platform } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { prependHTTP } from '@wordpress/url';
-import {
-	BottomSheet,
-	withSpokenMessages,
-} from '@wordpress/components';
+import { BottomSheet, withSpokenMessages } from '@wordpress/components';
 import {
 	create,
 	insert,
@@ -22,6 +19,7 @@ import {
 	getTextContent,
 	slice,
 } from '@wordpress/rich-text';
+import { link } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,7 +35,9 @@ class ModalLinkUI extends Component {
 		this.submitLink = this.submitLink.bind( this );
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
 		this.onChangeText = this.onChangeText.bind( this );
-		this.onChangeOpensInNewWindow = this.onChangeOpensInNewWindow.bind( this );
+		this.onChangeOpensInNewWindow = this.onChangeOpensInNewWindow.bind(
+			this
+		);
 		this.removeLink = this.removeLink.bind( this );
 		this.onDismiss = this.onDismiss.bind( this );
 
@@ -53,7 +53,9 @@ class ModalLinkUI extends Component {
 			return;
 		}
 
-		const { activeAttributes: { url, target } } = this.props;
+		const {
+			activeAttributes: { url, target },
+		} = this.props;
 		const opensInNewWindow = target === '_blank';
 
 		this.setState( {
@@ -86,21 +88,44 @@ class ModalLinkUI extends Component {
 			text: linkText,
 		} );
 
-		if ( isCollapsed( value ) && ! isActive ) { // insert link
-			const toInsert = applyFormat( create( { text: linkText } ), format, 0, linkText.length );
+		if ( isCollapsed( value ) && ! isActive ) {
+			// insert link
+			const toInsert = applyFormat(
+				create( { text: linkText } ),
+				format,
+				0,
+				linkText.length
+			);
 			const newAttributes = insert( value, toInsert );
 			onChange( { ...newAttributes, needsSelectionUpdate: true } );
-		} else if ( text !== getTextContent( slice( value ) ) ) { // edit text in selected link
-			const toInsert = applyFormat( create( { text } ), format, 0, text.length );
-			const newAttributes = insert( value, toInsert, value.start, value.end );
+		} else if ( text !== getTextContent( slice( value ) ) ) {
+			// edit text in selected link
+			const toInsert = applyFormat(
+				create( { text } ),
+				format,
+				0,
+				text.length
+			);
+			const newAttributes = insert(
+				value,
+				toInsert,
+				value.start,
+				value.end
+			);
 			onChange( { ...newAttributes, needsSelectionUpdate: true } );
-		} else { // transform selected text into link
+		} else {
+			// transform selected text into link
 			const newAttributes = applyFormat( value, format );
 			onChange( { ...newAttributes, needsSelectionUpdate: true } );
 		}
 
 		if ( ! isValidHref( url ) ) {
-			speak( __( 'Warning: the link has been inserted but may have errors. Please test it.' ), 'assertive' );
+			speak(
+				__(
+					'Warning: the link has been inserted but may have errors. Please test it.'
+				),
+				'assertive'
+			);
 		} else if ( isActive ) {
 			speak( __( 'Link edited.' ), 'assertive' );
 		} else {
@@ -133,9 +158,10 @@ class ModalLinkUI extends Component {
 				onClose={ this.onDismiss }
 				hideHeader
 			>
-				{ /* eslint-disable jsx-a11y/no-autofocus */
+				{
+					/* eslint-disable jsx-a11y/no-autofocus */
 					<BottomSheet.Cell
-						icon={ 'admin-links' }
+						icon={ link }
 						label={ __( 'URL' ) }
 						value={ this.state.inputValue }
 						placeholder={ __( 'Add URL' ) }
@@ -145,7 +171,8 @@ class ModalLinkUI extends Component {
 						onChangeValue={ this.onChangeInputValue }
 						autoFocus={ Platform.OS === 'ios' }
 					/>
-				/* eslint-enable jsx-a11y/no-autofocus */ }
+					/* eslint-enable jsx-a11y/no-autofocus */
+				}
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
 					label={ __( 'Link text' ) }

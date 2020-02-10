@@ -27,13 +27,18 @@ const deprecated = [
 		save( { attributes } ) {
 			const { backgroundColor, customBackgroundColor } = attributes;
 
-			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
 			const className = classnames( backgroundClass, {
 				'has-background': backgroundColor || customBackgroundColor,
 			} );
 
 			const styles = {
-				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				backgroundColor: backgroundClass
+					? undefined
+					: customBackgroundColor,
 			};
 
 			return (

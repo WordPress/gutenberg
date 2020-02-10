@@ -1,14 +1,33 @@
 ## Master
 
+### Bug Fixes
+
+- Ensure the default Prettier config is used in the `lint-js` script when no Prettier config is found in the project ([#20071](https://github.com/WordPress/gutenberg/pull/20071)).
+
+## 7.0.0 (2020-02-04)
+
+### Breaking Changes
+
+- This package requires now `node` v10.0.0 or later, and `npm` v6.9.0 or later ([#18048](https://github.com/WordPress/gutenberg/pull/18048)).
+- The minimum version required for `npm` in `check-engines` script was increased to `6.9.0+` ([#18048](https://github.com/WordPress/gutenberg/pull/18048)).
+
 ### New Features
 
-- Add SVGR support to compile SVG files to React components using the `@svgr/webpack` plugin.  [#18243](https://github.com/WordPress/gutenberg/pull/18243)
+- Add SVGR support to compile SVG files to React components using the `@svgr/webpack` plugin ([#18243](https://github.com/WordPress/gutenberg/pull/18243)).
+
+- Add `format-js` script to format JavaScript source code, it uses the [`wp-prettier`](https://github.com/Automattic/wp-prettier) – Prettier fork adjusted to WordPress coding style guidelines ([#18048](https://github.com/WordPress/gutenberg/pull/18048)).
+- Add `lint-md-js` script to lint JavaScript source code in markdown files, uses the `eslint-plugin-markdown` plugin ([#19518](https://github.com/WordPress/gutenberg/pull/19518)).
+- Add `lint-md-docs` script to lint the markup of markdown files, uses the `markdownlint` module ([#19855](https://github.com/WordPress/gutenberg/pull/19855)).
+- Add `packages-update` script to update WordPress packages to the latest version automatically ([#19448](https://github.com/WordPress/gutenberg/pull/19448)).
+
+### Bug Fixes
+- Fixes and updates valid _rc_ configuration filenames for Babel, ESLint, markdownlint, npmpackagejsonlint, stylelint, and Prettier ([#19994](https://github.com/WordPress/gutenberg/pull/19994)).
 
 ## 6.1.1 (2020-01-01)
 
 ### Bug Fixes
 
-- Update `jest-preset-default` dependency to fix preset file extension for inclusion in NPM deployments. ([#19306](https://github.com/WordPress/gutenberg/pull/19306)).
+- Update `jest-preset-default` dependency to fix preset file extension for inclusion in NPM deployments ([#19306](https://github.com/WordPress/gutenberg/pull/19306)).
 
 ## 6.1.0 (2019-12-20)
 

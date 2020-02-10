@@ -1,4 +1,5 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
+const BUNDLED_PACKAGES = [ '@wordpress/icons' ];
 
 /**
  * Default request to global transformation
@@ -34,8 +35,15 @@ function defaultRequestToExternal( request ) {
 			return 'ReactDOM';
 	}
 
+	if ( BUNDLED_PACKAGES.includes( request ) ) {
+		return undefined;
+	}
+
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
-		return [ 'wp', camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ) ];
+		return [
+			'wp',
+			camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ),
+		];
 	}
 }
 
@@ -78,7 +86,9 @@ function defaultRequestToHandle( request ) {
  * @return {string} Camel-cased string.
  */
 function camelCaseDash( string ) {
-	return string.replace( /-([a-z])/g, ( match, letter ) => letter.toUpperCase() );
+	return string.replace( /-([a-z])/g, ( match, letter ) =>
+		letter.toUpperCase()
+	);
 }
 
 module.exports = {

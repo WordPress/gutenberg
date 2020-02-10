@@ -2,19 +2,21 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { menu as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
 import save from './save';
+import deprecated from './deprecated';
 
 export const name = 'core/navigation';
 
 export const settings = {
 	title: __( 'Navigation' ),
 
-	icon: 'menu',
+	icon,
 
 	description: __( 'Add a navigation block to your site.' ),
 
@@ -38,4 +40,5 @@ export const settings = {
 
 	save,
 
+	deprecated,
 };

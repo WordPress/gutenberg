@@ -21,11 +21,15 @@ describe( 'Post visibility', () => {
 
 			await page.click( '.edit-post-post-visibility__toggle' );
 
-			const [ privateLabel ] = await page.$x( '//label[text()="Private"]' );
+			const [ privateLabel ] = await page.$x(
+				'//label[text()="Private"]'
+			);
 			await privateLabel.click();
 
 			const currentStatus = await page.evaluate( () => {
-				return wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+				return wp.data
+					.select( 'core/editor' )
+					.getEditedPostAttribute( 'status' );
 			} );
 
 			expect( currentStatus ).toBe( 'private' );
@@ -42,10 +46,14 @@ describe( 'Post visibility', () => {
 
 		// Set a publish date for the next month.
 		await page.click( '.edit-post-post-schedule__toggle' );
-		await page.click( 'div[aria-label="Move forward to switch to the next month."]' );
+		await page.click(
+			'div[aria-label="Move forward to switch to the next month."]'
+		);
 		await (
-			await page.$x( '//td[contains(concat(" ", @class, " "), " CalendarDay ")][text() = "15"]' )
-		)[ 0 ].click();
+			await page.$x(
+				'//td[contains(concat(" ", @class, " "), " CalendarDay ")][text() = "15"]'
+			)
+		 )[ 0 ].click();
 
 		await page.click( '.edit-post-post-visibility__toggle' );
 
@@ -58,7 +66,9 @@ describe( 'Post visibility', () => {
 		await page.click( '.editor-post-publish-button' );
 
 		const currentStatus = await page.evaluate( () => {
-			return wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+			return wp.data
+				.select( 'core/editor' )
+				.getEditedPostAttribute( 'status' );
 		} );
 
 		expect( currentStatus ).toBe( 'private' );

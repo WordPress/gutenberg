@@ -1,3 +1,11 @@
+## Master
+
+## 4.10.0 (2020-02-04)
+
+### New Feature
+
+- The bundled `@babel/core` dependency has been updated from requiring `^7.4.4` to requiring `^7.8.3`. All other Babel plugins were updated to the latest version. `@babel/preset-env` has now ESMAScript 2020 support enabled by default (see [Highlights](https://babeljs.io/blog/2020/01/11/7.8.0#highlights)). 
+
 ## 4.5.0 (2019-08-29)
 
 ### Bug Fixes

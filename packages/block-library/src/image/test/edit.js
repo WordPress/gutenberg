@@ -18,7 +18,10 @@ describe( 'core/image/edit', () => {
 			};
 			const setAttributes = jest.fn( () => {} );
 			const testRenderer = TestRenderer.create(
-				<ImageEdit attributes={ attributes } setAttributes={ setAttributes } />
+				<ImageEdit
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+				/>
 			);
 			const instance = testRenderer.getInstance();
 

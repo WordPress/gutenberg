@@ -7,10 +7,7 @@ import { noop, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	InnerBlocks,
-	getColorClassName,
-} from '@wordpress/block-editor';
+import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -40,11 +37,17 @@ export default function save( { attributes } ) {
 	} = attributes;
 	const newRel = isEmpty( rel ) ? undefined : rel;
 
-	let image = <img
-		src={ mediaUrl }
-		alt={ mediaAlt }
-		className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null }
-	/>;
+	let image = (
+		<img
+			src={ mediaUrl }
+			alt={ mediaAlt }
+			className={
+				mediaId && mediaType === 'image'
+					? `wp-image-${ mediaId }`
+					: null
+			}
+		/>
+	);
 
 	if ( href ) {
 		image = (
@@ -63,20 +66,28 @@ export default function save( { attributes } ) {
 		image: () => image,
 		video: () => <video controls src={ mediaUrl } />,
 	};
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+	const backgroundClass = getColorClassName(
+		'background-color',
+		backgroundColor
+	);
 	const className = classnames( {
 		'has-media-on-the-right': 'right' === mediaPosition,
-		'has-background': ( backgroundClass || customBackgroundColor ),
+		'has-background': backgroundClass || customBackgroundColor,
 		[ backgroundClass ]: backgroundClass,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		'is-image-fill': imageFill,
 	} );
-	const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
+	const backgroundStyles = imageFill
+		? imageFillStyles( mediaUrl, focalPoint )
+		: {};
 
 	let gridTemplateColumns;
 	if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
-		gridTemplateColumns = 'right' === mediaPosition ? `auto ${ mediaWidth }%` : `${ mediaWidth }% auto`;
+		gridTemplateColumns =
+			'right' === mediaPosition
+				? `auto ${ mediaWidth }%`
+				: `${ mediaWidth }% auto`;
 	}
 	const style = {
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
@@ -84,7 +95,10 @@ export default function save( { attributes } ) {
 	};
 	return (
 		<div className={ className } style={ style }>
-			<figure className="wp-block-media-text__media" style={ backgroundStyles }>
+			<figure
+				className="wp-block-media-text__media"
+				style={ backgroundStyles }
+			>
 				{ ( mediaTypeRenders[ mediaType ] || noop )() }
 			</figure>
 			<div className="wp-block-media-text__content">

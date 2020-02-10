@@ -204,18 +204,6 @@ _Returns_
 
 -   `Element`: The new node.
 
-<a name="stripHTML" href="#stripHTML">#</a> **stripHTML**
-
-Removes any HTML tags from the provided string.
-
-_Parameters_
-
--   _html_ `string`: The string containing html.
-
-_Returns_
-
--   `string`: The text content with any html removed.
-
 <a name="unwrap" href="#unwrap">#</a> **unwrap**
 
 Unwrap the given node. This means any child nodes are moved to the parent.

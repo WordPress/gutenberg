@@ -17,21 +17,15 @@ jest.mock( '../lib/env', () => ( {
 	start: jest.fn( Promise.resolve.bind( Promise ) ),
 	stop: jest.fn( Promise.resolve.bind( Promise ) ),
 	clean: jest.fn( Promise.resolve.bind( Promise ) ),
+	ValidationError: jest.requireActual( '../lib/env' ).ValidationError,
 } ) );
 
 describe( 'env cli', () => {
 	beforeEach( jest.clearAllMocks );
 
-	it( 'parses start commands for the default ref.', () => {
+	it( 'parses start commands.', () => {
 		cli().parse( [ 'start' ] );
-		const { ref, spinner } = env.start.mock.calls[ 0 ][ 0 ];
-		expect( ref ).toBe( 'master' );
-		expect( spinner.text ).toBe( '' );
-	} );
-	it( 'parses start commands for an explicit ref.', () => {
-		cli().parse( [ 'start', 'explicit' ] );
-		const { ref, spinner } = env.start.mock.calls[ 0 ][ 0 ];
-		expect( ref ).toBe( 'explicit' );
+		const { spinner } = env.start.mock.calls[ 0 ][ 0 ];
 		expect( spinner.text ).toBe( '' );
 	} );
 
@@ -103,7 +97,7 @@ describe( 'env cli', () => {
 		await env.start.mock.results[ 0 ].value.catch( () => {} );
 
 		expect( spinner.fail ).toHaveBeenCalledWith( 'failure message' );
-		expect( console.error ).toHaveBeenCalledWith( '\n\nfailure message\n\n' );
+		expect( console.error ).toHaveBeenCalled();
 		expect( process.exit ).toHaveBeenCalledWith( 2 );
 		console.error = consoleError;
 		process.exit = processExit;
@@ -122,7 +116,7 @@ describe( 'env cli', () => {
 		await env.start.mock.results[ 0 ].value.catch( () => {} );
 
 		expect( spinner.fail ).toHaveBeenCalledWith( 'failure error' );
-		expect( console.error ).toHaveBeenCalledWith( '\n\nfailure error\n\n' );
+		expect( console.error ).toHaveBeenCalled();
 		expect( process.exit ).toHaveBeenCalledWith( 1 );
 		console.error = consoleError;
 		process.exit = processExit;

@@ -30,11 +30,13 @@ export async function createNewPost( {
 	await visitAdminPage( 'post-new.php', query );
 
 	const isWelcomeGuideActive = await page.evaluate( () =>
-		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ) );
+		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' )
+	);
 
 	if ( showWelcomeGuide !== isWelcomeGuideActive ) {
 		await page.evaluate( () =>
-			wp.data.dispatch( 'core/edit-post' ).toggleFeature( 'welcomeGuide' ) );
+			wp.data.dispatch( 'core/edit-post' ).toggleFeature( 'welcomeGuide' )
+		);
 
 		await page.reload();
 	}

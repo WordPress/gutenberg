@@ -27,15 +27,28 @@ class PullQuoteEdit extends Component {
 		super( props );
 
 		this.wasTextColorAutomaticallyComputed = false;
-		this.pullQuoteMainColorSetter = this.pullQuoteMainColorSetter.bind( this );
-		this.pullQuoteTextColorSetter = this.pullQuoteTextColorSetter.bind( this );
+		this.pullQuoteMainColorSetter = this.pullQuoteMainColorSetter.bind(
+			this
+		);
+		this.pullQuoteTextColorSetter = this.pullQuoteTextColorSetter.bind(
+			this
+		);
 	}
 
 	pullQuoteMainColorSetter( colorValue ) {
-		const { colorUtils, textColor, setAttributes, setTextColor, setMainColor, className } = this.props;
+		const {
+			colorUtils,
+			textColor,
+			setAttributes,
+			setTextColor,
+			setMainColor,
+			className,
+		} = this.props;
 		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
-		const needTextColor = ! textColor.color || this.wasTextColorAutomaticallyComputed;
-		const shouldSetTextColor = isSolidColorStyle && needTextColor && colorValue;
+		const needTextColor =
+			! textColor.color || this.wasTextColorAutomaticallyComputed;
+		const shouldSetTextColor =
+			isSolidColorStyle && needTextColor && colorValue;
 
 		if ( isSolidColorStyle ) {
 			// If we use the solid color style, set the color using the normal mechanism.
@@ -59,19 +72,21 @@ class PullQuoteEdit extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const {
-			attributes,
-			className,
-			mainColor,
-			setAttributes,
-		} = this.props;
+		const { attributes, className, mainColor, setAttributes } = this.props;
 		// If the block includes a named color and we switched from the
 		// solid color style to the default style.
-		if ( attributes.mainColor && ! includes( className, SOLID_COLOR_CLASS ) && includes( prevProps.className, SOLID_COLOR_CLASS ) ) {
+		if (
+			attributes.mainColor &&
+			! includes( className, SOLID_COLOR_CLASS ) &&
+			includes( prevProps.className, SOLID_COLOR_CLASS )
+		) {
 			// Remove the named color, and set the color as a custom color.
 			// This is done because named colors use classes, in the default style we use a border color,
 			// and themes don't set classes for border colors.
-			setAttributes( { mainColor: undefined, customMainColor: mainColor.color } );
+			setAttributes( {
+				mainColor: undefined,
+				customMainColor: mainColor.color,
+			} );
 		}
 	}
 
@@ -88,9 +103,9 @@ class PullQuoteEdit extends Component {
 		const { value, citation } = attributes;
 
 		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
-		const figureStyles = isSolidColorStyle ?
-			{ backgroundColor: mainColor.color } :
-			{ borderColor: mainColor.color };
+		const figureStyles = isSolidColorStyle
+			? { backgroundColor: mainColor.color }
+			: { borderColor: mainColor.color };
 
 		const figureClasses = classnames( className, {
 			'has-background': isSolidColorStyle && mainColor.color,
@@ -101,20 +116,24 @@ class PullQuoteEdit extends Component {
 			color: textColor.color,
 		};
 
-		const blockquoteClasses = textColor.color && classnames(
-			'has-text-color',
-			{ [ textColor.class ]: textColor.class }
-		);
+		const blockquoteClasses =
+			textColor.color &&
+			classnames( 'has-text-color', {
+				[ textColor.class ]: textColor.class,
+			} );
 
 		return (
 			<>
 				<figure style={ figureStyles } className={ figureClasses }>
-					<blockquote style={ blockquoteStyles } className={ blockquoteClasses }>
+					<blockquote
+						style={ blockquoteStyles }
+						className={ blockquoteClasses }
+					>
 						<RichText
 							multiline
 							value={ value }
-							onChange={
-								( nextValue ) => setAttributes( {
+							onChange={ ( nextValue ) =>
+								setAttributes( {
 									value: nextValue,
 								} )
 							}
@@ -130,8 +149,8 @@ class PullQuoteEdit extends Component {
 									// translators: placeholder text used for the citation
 									__( 'Write citation…' )
 								}
-								onChange={
-									( nextCitation ) => setAttributes( {
+								onChange={ ( nextCitation ) =>
+									setAttributes( {
 										citation: nextCitation,
 									} )
 								}
@@ -142,7 +161,7 @@ class PullQuoteEdit extends Component {
 				</figure>
 				<InspectorControls>
 					<PanelColorSettings
-						title={ __( 'Color Settings' ) }
+						title={ __( 'Color settings' ) }
 						colorSettings={ [
 							{
 								value: mainColor.color,
@@ -172,6 +191,7 @@ class PullQuoteEdit extends Component {
 	}
 }
 
-export default withColors( { mainColor: 'background-color', textColor: 'color' } )(
-	PullQuoteEdit
-);
+export default withColors( {
+	mainColor: 'background-color',
+	textColor: 'color',
+} )( PullQuoteEdit );

@@ -32,19 +32,25 @@ function isInline( node, contextTag ) {
 		[ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 	];
 
-	return inlineWhitelistTagGroups.some( ( tagGroup ) =>
-		difference( [ tag, contextTag ], tagGroup ).length === 0
+	return inlineWhitelistTagGroups.some(
+		( tagGroup ) => difference( [ tag, contextTag ], tagGroup ).length === 0
 	);
 }
 
 function deepCheck( nodes, contextTag ) {
-	return nodes.every( ( node ) =>
-		isInline( node, contextTag ) && deepCheck( Array.from( node.children ), contextTag )
+	return nodes.every(
+		( node ) =>
+			isInline( node, contextTag ) &&
+			deepCheck( Array.from( node.children ), contextTag )
 	);
 }
 
 function isDoubleBR( node ) {
-	return node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
+	return (
+		node.nodeName === 'BR' &&
+		node.previousSibling &&
+		node.previousSibling.nodeName === 'BR'
+	);
 }
 
 export default function( HTML, contextTag ) {
