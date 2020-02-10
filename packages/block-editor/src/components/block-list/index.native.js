@@ -23,7 +23,6 @@ import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import BlockInsertionPoint from './insertion-point';
-import __experimentalBlockListFooter from '../block-list-footer';
 
 const innerToolbarHeight = 44;
 
@@ -189,7 +188,6 @@ export class BlockList extends Component {
 				>
 					<View style={ styles.blockListFooter } />
 				</TouchableWithoutFeedback>
-				<__experimentalBlockListFooter.Slot />
 			</>
 		);
 	}
