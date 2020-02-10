@@ -467,8 +467,8 @@ function LinkControl( {
 									suggestion,
 									index
 								) }
-								suggestion
-								index
+								suggestion={ suggestion }
+								index={ index }
 								onClick={ () => {
 									stopEditing();
 									onChange( { ...value, ...suggestion } );
