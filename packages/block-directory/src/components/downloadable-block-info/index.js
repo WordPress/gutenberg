@@ -4,6 +4,7 @@
 import { Fragment } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { update } from '@wordpress/icons';
 
 function DownloadableBlockInfo( {
 	description,
@@ -28,7 +29,7 @@ function DownloadableBlockInfo( {
 					) }
 				</div>
 				<div className="block-directory-downloadable-block-info__column">
-					<Icon icon="update"></Icon>
+					<Icon icon={ update }></Icon>
 					{ // translators: %s: Humanized date of last update e.g: "2 months ago".
 					sprintf( __( 'Updated %s' ), humanizedUpdated ) }
 				</div>

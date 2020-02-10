@@ -106,7 +106,14 @@ class AudioEdit extends Component {
 	}
 
 	render() {
-		const { autoplay, caption, loop, preload, src } = this.props.attributes;
+		const {
+			id,
+			autoplay,
+			caption,
+			loop,
+			preload,
+			src,
+		} = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeUI } = this.props;
 		const onSelectAudio = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -139,6 +146,7 @@ class AudioEdit extends Component {
 			<>
 				<BlockControls>
 					<MediaReplaceFlow
+						mediaId={ id }
 						mediaURL={ src }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						accept="audio/*"

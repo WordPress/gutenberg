@@ -17,6 +17,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
+	__experimentalEditorSkeleton as EditorSkeleton,
 	__experimentalPageTemplatePicker,
 	__experimentalUsePageTemplatePickerVisible,
 } from '@wordpress/block-editor';
@@ -39,7 +40,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import EditorRegions from '../editor-regions';
 import FullscreenMode from '../fullscreen-mode';
 import BrowserURL from '../browser-url';
 import Header from '../header';
@@ -52,9 +52,11 @@ import WelcomeGuide from '../welcome-guide';
 
 function Layout() {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
-	const { closePublishSidebar, togglePublishSidebar } = useDispatch(
-		'core/edit-post'
-	);
+	const {
+		closePublishSidebar,
+		openGeneralSidebar,
+		togglePublishSidebar,
+	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
 		isRichEditingEnabled,
@@ -66,6 +68,7 @@ function Layout() {
 		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
+		hasBlockSelected,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -93,6 +96,9 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
+			hasBlockSelected: select(
+				'core/block-editor'
+			).getBlockSelectionStart(),
 		};
 	}, [] );
 	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
@@ -103,6 +109,10 @@ function Layout() {
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 	} );
+	const openSidebarPanel = () =>
+		openGeneralSidebar(
+			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
+		);
 
 	return (
 		<>
@@ -114,16 +124,28 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
-				<EditorRegions
+				<EditorSkeleton
 					className={ className }
 					header={ <Header /> }
 					sidebar={
-						! publishSidebarOpened && (
-							<>
-								<SettingsSidebar />
-								<Sidebar.Slot />
-							</>
-						)
+						<>
+							{ ! sidebarIsOpened && (
+								<div className="edit-post-layout__toogle-sidebar-panel">
+									<Button
+										isSecondary
+										className="edit-post-layout__toogle-sidebar-panel-button"
+										onClick={ openSidebarPanel }
+										aria-expanded={ false }
+									>
+										{ hasBlockSelected
+											? __( 'Open block settings' )
+											: __( 'Open document settings' ) }
+									</Button>
+								</div>
+							) }
+							<SettingsSidebar />
+							<Sidebar.Slot />
+						</>
 					}
 					content={
 						<>
@@ -165,10 +187,10 @@ function Layout() {
 								}
 							/>
 						) : (
-							<div className="edit-post-toggle-publish-panel">
+							<div className="edit-post-layout__toogle-publish-panel">
 								<Button
 									isSecondary
-									className="edit-post-toggle-publish-panel__button"
+									className="edit-post-layout__toogle-publish-panel-button"
 									onClick={ togglePublishSidebar }
 									aria-expanded={ false }
 								>
