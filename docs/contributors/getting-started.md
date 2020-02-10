@@ -46,15 +46,7 @@ To shut down this local WordPress instance run `npx wp-env stop`. To start it ba
 
 #### Toggling Debug Systems
 
-WordPress comes with specific [debug systems](https://wordpress.org/support/article/debugging-in-wordpress/) designed to simplify the process as well as standardize code across core, plugins and themes. It is possible to use environment variables (`LOCAL_WP_DEBUG` and `LOCAL_SCRIPT_DEBUG`) to update a site's configuration constants located in `wp-config.php` file. Both flags can be disabled at any time by running the following command:
-
-Example on Linux/MacOS:
-
-```bash
-LOCAL_SCRIPT_DEBUG=false LOCAL_WP_DEBUG=false npx wp-env start
-```
-
-By default, both flags will be set to `true`.
+WordPress comes with specific [debug systems](https://wordpress.org/support/article/debugging-in-wordpress/) designed to simplify the process as well as standardize code across core, plugins and themes. In order to use with `wp-env,` you'll have to edit your local WordPress install's `wp-config.php`.
 
 #### Troubleshooting
 
