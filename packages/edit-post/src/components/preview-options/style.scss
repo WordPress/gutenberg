@@ -44,10 +44,14 @@
 	}
 }
 
-.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external {
+.editor-post-preview__grouping-external {
 	display: flex;
 	justify-content: space-between;
 	padding: $grid-size-large - 1;
+}
+
+.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external {
+	padding: 0;
 	height: auto;
 
 	&:focus {

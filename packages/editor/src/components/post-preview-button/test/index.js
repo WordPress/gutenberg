@@ -98,9 +98,7 @@ describe( 'PostPreviewButton', () => {
 				<PostPreviewButton postId={ 1 } autosave={ autosave } />
 			);
 
-			const previewButton = wrapper.find( '.editor-post-preview' );
-
-			previewButton.simulate( 'click', {
+			wrapper.simulate( 'click', {
 				preventDefault,
 				target: { href: 'https://wordpress.org/?p=1' },
 			} );
@@ -134,9 +132,7 @@ describe( 'PostPreviewButton', () => {
 				/>
 			);
 
-			const previewButton = wrapper.find( '.editor-post-preview' );
-
-			previewButton.simulate( 'click', { preventDefault } );
+			wrapper.simulate( 'click', { preventDefault } );
 
 			expect( preventDefault ).toHaveBeenCalled();
 			expect( window.open ).toHaveBeenCalledWith( '', 'wp-preview-1' );
@@ -161,7 +157,7 @@ describe( 'PostPreviewButton', () => {
 					previewLink="https://wordpress.org/?p=1&preview=true"
 					currentPostLink="https://wordpress.org/?p=1"
 				/>
-			).find( '.editor-post-preview' );
+			);
 
 			expect( wrapper ).toMatchSnapshot();
 		} );
@@ -173,7 +169,7 @@ describe( 'PostPreviewButton', () => {
 					isSaveable
 					currentPostLink="https://wordpress.org/?p=1"
 				/>
-			).find( '.editor-post-preview' );
+			);
 
 			expect( wrapper ).toMatchSnapshot();
 		} );
@@ -184,7 +180,7 @@ describe( 'PostPreviewButton', () => {
 					postId={ 1 }
 					currentPostLink="https://wordpress.org/?p=1"
 				/>
-			).find( '.editor-post-preview' );
+			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );

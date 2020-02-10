@@ -2,6 +2,8 @@
 	display: none;
 }
 
+// Only add styles for components that are used inside the editing canvas here
+
 @import "./components/block-icon/style.scss";
 @import "./components/block-inspector/style.scss";
 @import "./components/block-list/style.scss";
@@ -23,7 +25,6 @@
 @import "./components/colors-gradients/style.scss";
 @import "./components/contrast-checker/style.scss";
 @import "./components/default-block-appender/style.scss";
-@import "./components/editor-skeleton/style.scss";
 @import "./components/link-control/style.scss";
 @import "./components/image-size-control/style.scss";
 @import "./components/inner-blocks/style.scss";
@@ -47,3 +48,7 @@
 #end-resizable-editor-section {
 	display: none;
 }
+
+// Styles for components that are used outside of the editing canvas go here.
+
+@import "./components/editor-skeleton/style.scss";

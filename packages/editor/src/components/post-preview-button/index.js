@@ -2,21 +2,13 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { Component, renderToString } from '@wordpress/element';
-import {
-	Button,
-	Dropdown,
-	Icon,
-	MenuGroup,
-	MenuItem,
-	Path,
-	Polygon,
-	SVG,
-} from '@wordpress/components';
+import { Button, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
@@ -108,17 +100,6 @@ function writeInterstitialMessage( targetDocument ) {
 	targetDocument.close();
 }
 
-const downArrow = (
-	<SVG
-		width="18"
-		height="18"
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 18 18"
-	>
-		<Polygon points="9,13.5 14.7,7.9 13.2,6.5 9,10.7 4.8,6.5 3.3,7.9 " />
-	</SVG>
-);
-
 export class PostPreviewButton extends Component {
 	constructor() {
 		super( ...arguments );
@@ -194,117 +175,38 @@ export class PostPreviewButton extends Component {
 		writeInterstitialMessage( this.previewWindow.document );
 	}
 
-	translateDropdownButtonText() {
-		switch ( this.props.deviceType ) {
-			case 'Tablet':
-				return __( 'Tablet' );
-			case 'Mobile':
-				return __( 'Mobile' );
-			default:
-				return __( 'Desktop' );
-		}
-	}
-
 	render() {
-		const {
-			previewLink,
-			currentPostLink,
-			isSaveable,
-			setDeviceType,
-		} = this.props;
+		const { previewLink, currentPostLink, isSaveable } = this.props;
 
 		// Link to the `?preview=true` URL if we have it, since this lets us see
 		// changes that were autosaved since the post was last published. Otherwise,
 		// just link to the post's URL.
 		const href = previewLink || currentPostLink;
 
+		const classNames = classnames(
+			{
+				'editor-post-preview': ! this.props.className,
+			},
+			this.props.className
+		);
+
 		return (
-			<>
-				<Dropdown
-					className="editor-post-preview__dropdown"
-					contentClassName="editor-post-preview__dropdown-content"
-					popoverProps={ { role: 'menu' } }
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button
-							onClick={ onToggle }
-							className="editor-post-preview__button-toggle"
-							aria-expanded={ isOpen }
-							disabled={ ! isSaveable }
-						>
-							{ this.translateDropdownButtonText() }
-							<div className="editor-post-preview__button-separator">
-								{ downArrow }
-							</div>
-						</Button>
-					) }
-					renderContent={ () => (
-						<>
-							<MenuGroup label={ _x( 'View', 'noun' ) }>
-								<MenuItem
-									className="editor-post-preview__button-resize"
-									onClick={ () => setDeviceType( 'Desktop' ) }
-									icon={
-										this.props.deviceType === 'Desktop' &&
-										'yes'
-									}
-								>
-									{ __( 'Desktop' ) }
-								</MenuItem>
-								<MenuItem
-									className="editor-post-preview__button-resize"
-									onClick={ () => setDeviceType( 'Tablet' ) }
-									icon={
-										this.props.deviceType === 'Tablet' &&
-										'yes'
-									}
-								>
-									{ __( 'Tablet' ) }
-								</MenuItem>
-								<MenuItem
-									className="editor-post-preview__button-resize"
-									onClick={ () => setDeviceType( 'Mobile' ) }
-									icon={
-										this.props.deviceType === 'Mobile' &&
-										'yes'
-									}
-								>
-									{ __( 'Mobile' ) }
-								</MenuItem>
-							</MenuGroup>
-							<MenuGroup>
-								<Button
-									className="editor-post-preview__button-external"
-									href={ href }
-									target={ this.getWindowTarget() }
-									disabled={ ! isSaveable }
-									onClick={ this.openPreviewWindow }
-								>
-									{ __( 'Preview externally' ) }
-									<span className="screen-reader-text">
-										{ /* translators: accessibility text */
-										__( '(opens in a new tab)' ) }
-									</span>
-									<Icon icon="external" />
-								</Button>
-							</MenuGroup>
-						</>
-					) }
-				/>
-				<Button
-					isSecondary
-					className="editor-post-preview"
-					href={ href }
-					target={ this.getWindowTarget() }
-					disabled={ ! isSaveable }
-					onClick={ this.openPreviewWindow }
-				>
-					{ _x( 'Preview', 'imperative verb' ) }
-					<span className="screen-reader-text">
-						{ /* translators: accessibility text */
-						__( '(opens in a new tab)' ) }
-					</span>
-				</Button>
-			</>
+			<Button
+				isSecondary={ ! this.props.className }
+				className={ classNames }
+				href={ href }
+				target={ this.getWindowTarget() }
+				disabled={ ! isSaveable }
+				onClick={ this.openPreviewWindow }
+			>
+				{ this.props.textContent
+					? this.props.textContent
+					: _x( 'Preview', 'imperative verb' ) }
+				<span className="screen-reader-text">
+					{ /* translators: accessibility text */
+					__( '(opens in a new tab)' ) }
+				</span>
+			</Button>
 		);
 	}
 }
@@ -320,7 +222,6 @@ export default compose( [
 			getEditedPostPreviewLink,
 		} = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
-		const { getDeviceType } = select( 'core/block-editor' );
 
 		const previewLink = getEditedPostPreviewLink();
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
@@ -337,16 +238,11 @@ export default compose( [
 				[ 'draft', 'auto-draft' ].indexOf(
 					getEditedPostAttribute( 'status' )
 				) !== -1,
-			deviceType: getDeviceType(),
 		};
 	} ),
-	withDispatch( ( dispatch ) => {
-		// const { setPreviewDeviceType } = dispatch( 'core/block-editor' );
-		return {
-			autosave: dispatch( 'core/editor' ).autosave,
-			savePost: dispatch( 'core/editor' ).savePost,
-			setDeviceType: dispatch( 'core/block-editor' ).setPreviewDeviceType,
-		};
-	} ),
+	withDispatch( ( dispatch ) => ( {
+		autosave: dispatch( 'core/editor' ).autosave,
+		savePost: dispatch( 'core/editor' ).savePost,
+	} ) ),
 	ifCondition( ( { isViewable } ) => isViewable ),
 ] )( PostPreviewButton );
