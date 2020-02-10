@@ -1629,6 +1629,6 @@ export function didAutomaticChange( state ) {
  *
  * @return {string} Device type.
  */
-export function getDeviceType( state ) {
+export function getPreviewDeviceType( state ) {
 	return state.deviceType;
 }

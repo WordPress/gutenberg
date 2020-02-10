@@ -32,7 +32,7 @@ export default function PreviewOptions( {
 	const { setPreviewDeviceType } = useDispatch( 'core/block-editor' );
 
 	const deviceType = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getDeviceType();
+		return select( 'core/block-editor' ).getPreviewDeviceType();
 	}, [] );
 
 	const translateDropdownButtonText = () => {

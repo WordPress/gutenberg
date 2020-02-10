@@ -12,7 +12,7 @@ import { useEffect, useState } from '@wordpress/element';
  */
 export function useResizeCanvas() {
 	const deviceType = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getDeviceType();
+		return select( 'core/block-editor' ).getPreviewDeviceType();
 	}, [] );
 
 	const [ actualWidth, updateActualWidth ] = useState( window.innerWidth );

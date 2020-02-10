@@ -321,7 +321,7 @@ _Returns_
 
 -   `Array`: ids of top-level and descendant blocks.
 
-<a name="getDeviceType" href="#getDeviceType">#</a> **getDeviceType**
+<a name="getPreviewDeviceType" href="#getPreviewDeviceType">#</a> **getPreviewDeviceType**
 
 Returns the current editing canvas device type.
 
