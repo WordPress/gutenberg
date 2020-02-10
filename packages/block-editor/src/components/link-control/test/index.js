@@ -104,7 +104,7 @@ describe( 'Basic rendering', () => {
 
 			// Click the "Edit" button to trigger into the editing mode.
 			const editButton = container.querySelector(
-				'.block-editor-link-control__search-item-action--edit'
+				'.block-editor-link-control__search-item-action'
 			);
 			act( () => {
 				Simulate.click( editButton );
