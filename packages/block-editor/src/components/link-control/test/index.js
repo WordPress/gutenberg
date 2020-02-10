@@ -64,6 +64,69 @@ describe( 'Basic rendering', () => {
 		expect( searchInput ).not.toBeNull();
 		expect( container.innerHTML ).toMatchSnapshot();
 	} );
+
+	describe( 'forceIsEditingLink', () => {
+		const isEditing = () =>
+			!! container.querySelector( 'input[aria-label="URL"]' );
+
+		it( 'undefined', () => {
+			act( () => {
+				render(
+					<LinkControl value={ { url: 'https://example.com' } } />,
+					container
+				);
+			} );
+
+			expect( isEditing() ).toBe( false );
+		} );
+
+		it( 'true', () => {
+			act( () => {
+				render(
+					<LinkControl
+						value={ { url: 'https://example.com' } }
+						forceIsEditingLink
+					/>,
+					container
+				);
+			} );
+
+			expect( isEditing() ).toBe( true );
+		} );
+
+		it( 'false', () => {
+			act( () => {
+				render(
+					<LinkControl value={ { url: 'https://example.com' } } />,
+					container
+				);
+			} );
+
+			// Click the "Edit" button to trigger into the editing mode.
+			const editButton = container.querySelector(
+				'.block-editor-link-control__search-item-action--edit'
+			);
+			act( () => {
+				Simulate.click( editButton );
+			} );
+
+			expect( isEditing() ).toBe( true );
+
+			// If passed `forceIsEditingLink` of `false` while editing, should
+			// forcefully reset to the preview state.
+			act( () => {
+				render(
+					<LinkControl
+						value={ { url: 'https://example.com' } }
+						forceIsEditingLink={ false }
+					/>,
+					container
+				);
+			} );
+
+			expect( isEditing() ).toBe( false );
+		} );
+	} );
 } );
 
 describe( 'Searching for a link', () => {
@@ -217,56 +280,6 @@ describe( 'Searching for a link', () => {
 			);
 		}
 	);
-
-	it( 'should reset the input field and the search results when search term is cleared or reset', async () => {
-		const searchTerm = 'Hello world';
-
-		act( () => {
-			render( <LinkControl />, container );
-		} );
-
-		let searchResultElements;
-		let searchInput;
-
-		// Search Input UI
-		searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
-
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
-
-		// Check we have definitely rendered some suggestions
-		expect( searchResultElements ).toHaveLength(
-			fauxEntitySuggestions.length
-		);
-
-		// Grab the reset button now it's available
-		const resetUI = container.querySelector( '[aria-label="Reset"]' );
-
-		act( () => {
-			Simulate.click( resetUI );
-		} );
-
-		await eventLoopTick();
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
-		searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		expect( searchInput.value ).toBe( '' );
-		expect( searchResultElements ).toHaveLength( 0 );
-	} );
 } );
 
 describe( 'Manual link entry', () => {
@@ -458,13 +471,15 @@ describe( 'Default search suggestions', () => {
 
 		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 
-		//
 		// Reset the search to empty and check the initial suggestions are now shown.
-		//
-		const resetUI = container.querySelector( '[aria-label="Reset"]' );
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
 
 		act( () => {
-			Simulate.click( resetUI );
+			Simulate.change( searchInput, {
+				target: { value: '' },
+			} );
 		} );
 
 		await eventLoopTick();
