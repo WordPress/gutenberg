@@ -21,9 +21,7 @@ If you don't have a local WordPress environment to load Gutenberg in, we can hel
 
 ### Step 1: Installing a Local Environment
 
-#### Quickest Method: Using Docker
-
-The quickest way to get up and running is to use the provided Docker setup. If you don't already have it, you'll need to install Docker and Docker Compose.
+The quickest way to get up and running is to use the [`wp-env` command](https://github.com/WordPress/gutenberg/tree/master/packages/env), which is developed within the Gutenberg source repository, and published as `@wordpress/env` to npm. If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`.
 
 To install Docker, follow their instructions here for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If running Ubuntu, see these [extended instructions for help and troubleshooting](/docs/contributors/env-ubuntu.md).
 
@@ -32,7 +30,7 @@ To install Docker Compose, [follow their instructions here](https://docs.docker.
 Once Docker is installed and running, run this script to install WordPress, and build your local environment:
 
 ```bash
-npm run env install
+npx wp-env start
 ```
 
 #### Alternative Method: Using an Existing Local WordPress Install
@@ -57,17 +55,10 @@ In Windows, you can set the `WP_DEVELOP_DIR` environment variable using the appr
 
 #### Accessing the Local WordPress Install
 
-Whether you decided to use Docker or an existing local WordPress install, the WordPress installation should now be available at `http://localhost:8889` (**Username**: `admin`, **Password**: `password`).
-If this port is in use, you can override it using the `LOCAL_PORT` environment variable. For example running the below command on your computer will change the URL to
-`http://localhost:7777` .
+The WordPress installation should now be available at `http://localhost:8888` (**Username**: `admin`, **Password**: `password`).
+If this port is in use, you can override it using the `WP_ENV_PORT` environment variable. For more information, consult the `wp-env` [README](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md).
 
-Linux/macOS: `export LOCAL_PORT=7777`
-Windows using Command Prompt: `setx LOCAL_PORT "7777"`
-Windows using PowerShell: `$env:LOCAL_PORT = "7777"`
-
-If you're running [e2e tests](/docs/contributors/testing-overview.md#end-to-end-testing), this change will be used correctly.
-
-To shut down this local WordPress instance run `npm run env stop`. To start it back up again, run `npm run env start`.
+To shut down this local WordPress instance run `npx wp-env stop`. To start it back up again, run `npx wp-env start` again.
 
 #### Toggling Debug Systems
 
@@ -76,14 +67,14 @@ WordPress comes with specific [debug systems](https://wordpress.org/support/arti
 Example on Linux/MacOS:
 
 ```bash
-LOCAL_SCRIPT_DEBUG=false LOCAL_WP_DEBUG=false npm run env install
+LOCAL_SCRIPT_DEBUG=false LOCAL_WP_DEBUG=false npx wp-env start
 ```
 
 By default, both flags will be set to `true`.
 
 #### Troubleshooting
 
-You might find yourself stuck on a screen stating that "you are running WordPress without JavaScript and CSS files". If you tried installing WordPress via `npm run env install`, it probably means that something went wrong during the process. To fix it, try removing the `/wordpress` folder and running `npm run env install` again.
+See the [relevant section in `wp-env` docs](https://github.com/WordPress/gutenberg/tree/master/packages/env#troubleshooting-common-problems).
 
 ## On A Remote Server
 
