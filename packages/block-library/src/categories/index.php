@@ -33,7 +33,7 @@ function render_block_core_categories( $attributes ) {
 		$type                     = 'dropdown';
 
 		if ( ! is_admin() ) {
-			$wrapper_markup .= block_core_categories_build_dropdown_script( $id );
+			$wrapper_markup .= build_dropdown_script_block_core_categories( $id );
 		}
 	} else {
 		$wrapper_markup = '<ul class="%1$s">%2$s</ul>';
@@ -65,7 +65,7 @@ function render_block_core_categories( $attributes ) {
  *
  * @return string Returns the dropdown onChange redirection script.
  */
-function block_core_categories_build_dropdown_script( $dropdown_id ) {
+function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	ob_start();
 	?>
 	<script type='text/javascript'>
