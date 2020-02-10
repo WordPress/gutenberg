@@ -12,7 +12,42 @@ import { __experimentalUseGradient } from '@wordpress/block-editor';
  */
 import styles from './editor.scss';
 
-function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
+function OutlineWrapper( {
+	children,
+	borderRadiusValue,
+	isSelected,
+	backgroundColor,
+} ) {
+	const outlineBorderRadius =
+		borderRadiusValue > 0
+			? borderRadiusValue +
+			  styles.button.paddingTop +
+			  styles.button.borderWidth
+			: 0;
+
+	return (
+		<View
+			style={ [
+				styles.container,
+				isSelected && {
+					borderRadius: outlineBorderRadius,
+					borderWidth: styles.button.borderWidth,
+					borderColor: backgroundColor,
+					padding: styles.button.paddingTop,
+				},
+			] }
+		>
+			{ children }
+		</View>
+	);
+}
+
+function ColorBackground( {
+	children,
+	borderRadiusValue,
+	backgroundColor,
+	isSelected,
+} ) {
 	const wrapperStyles = [
 		styles.richTextWrapper,
 		{
@@ -47,19 +82,33 @@ function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
 	if ( gradientValue ) {
 		const { colors, locations, angle } = transformGradient();
 		return (
-			<LinearGradient
-				colors={ colors }
-				useAngle={ true }
-				angle={ angle }
-				locations={ locations }
-				angleCenter={ { x: 0.5, y: 0.5 } }
-				style={ wrapperStyles }
+			<OutlineWrapper
+				backgroundColor={ backgroundColor }
+				borderRadiusValue={ borderRadiusValue }
+				isSelected={ isSelected }
 			>
-				{ children }
-			</LinearGradient>
+				<LinearGradient
+					colors={ colors }
+					useAngle={ true }
+					angle={ angle }
+					locations={ locations }
+					angleCenter={ { x: 0.5, y: 0.5 } }
+					style={ wrapperStyles }
+				>
+					{ children }
+				</LinearGradient>
+			</OutlineWrapper>
 		);
 	}
-	return <View style={ wrapperStyles }>{ children }</View>;
+	return (
+		<OutlineWrapper
+			backgroundColor={ backgroundColor }
+			borderRadiusValue={ borderRadiusValue }
+			isSelected={ isSelected }
+		>
+			<View style={ wrapperStyles }>{ children }</View>
+		</OutlineWrapper>
+	);
 }
 
 export default ColorBackground;

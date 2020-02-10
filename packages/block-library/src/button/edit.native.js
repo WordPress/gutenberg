@@ -228,7 +228,7 @@ class ButtonEdit extends Component {
 			<>
 				<TextControl
 					icon={ ! isCompatibleWithSettings && link }
-					label={ __( 'Button URL' ) }
+					label={ __( 'Button Link URL' ) }
 					value={ url || '' }
 					valuePlaceholder={ __( 'Add URL' ) }
 					onChange={ this.onChangeURL }
@@ -256,7 +256,9 @@ class ButtonEdit extends Component {
 					onChange={ this.onChangeLinkRel }
 					autoCapitalize="none"
 					autoCorrect={ false }
-					separatorType={ 'fullWidth' }
+					separatorType={
+						isCompatibleWithSettings ? 'none' : 'fullWidth'
+					}
 					keyboardType="url"
 				/>
 			</>
@@ -285,12 +287,6 @@ class ButtonEdit extends Component {
 			borderRadius !== undefined
 				? borderRadius
 				: styles.button.borderRadius;
-		const outlineBorderRadius =
-			borderRadiusValue > 0
-				? borderRadiusValue +
-				  styles.button.paddingTop +
-				  styles.button.borderWidth
-				: 0;
 
 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
 		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
@@ -309,106 +305,93 @@ class ButtonEdit extends Component {
 
 		return (
 			<View style={ { flex: 1 } } onLayout={ this.onLayout }>
-				<View
-					style={ [
-						styles.container,
-						isSelected && {
-							borderColor: this.getBackgroundColor(),
-							borderRadius: outlineBorderRadius,
-							borderWidth: styles.button.borderWidth,
-						},
-					] }
+				<ColorBackground
+					borderRadiusValue={ borderRadiusValue }
+					backgroundColor={ this.getBackgroundColor() }
+					isSelected={ isSelected }
 				>
-					<ColorBackground
-						borderRadiusValue={ borderRadiusValue }
-						backgroundColor={ this.getBackgroundColor() }
-					>
-						<RichText
-							setRef={ ( richText ) => {
-								this.richTextRef = richText;
-							} }
-							placeholder={ placeholderText }
-							value={ text }
-							onChange={ this.onChangeText }
-							style={ {
-								...richTextStyle.richText,
-								color: textColor.color || '#fff',
-							} }
-							textAlign="center"
-							placeholderTextColor={ 'lightgray' }
-							identifier="content"
-							tagName="p"
-							minWidth={ minWidth }
-							maxWidth={ maxWidth }
-							id={ clientId }
-							isSelected={ isButtonFocused }
-							withoutInteractiveFormatting
-							unstableOnFocus={ () =>
-								this.onToggleButtonFocus( true )
-							}
-							__unstableMobileNoFocusOnMount={ ! isSelected }
-							selectionColor={ textColor.color || '#fff' }
-							onReplace={ onReplace }
-							onRemove={ () => onReplace( [] ) }
-						/>
-					</ColorBackground>
+					<RichText
+						setRef={ ( richText ) => {
+							this.richTextRef = richText;
+						} }
+						placeholder={ placeholderText }
+						value={ text }
+						onChange={ this.onChangeText }
+						style={ {
+							...richTextStyle.richText,
+							color: textColor.color || '#fff',
+						} }
+						textAlign="center"
+						placeholderTextColor={
+							styles.placeholderTextColor.color
+						}
+						identifier="content"
+						tagName="p"
+						minWidth={ minWidth }
+						maxWidth={ maxWidth }
+						id={ clientId }
+						isSelected={ isButtonFocused }
+						withoutInteractiveFormatting
+						unstableOnFocus={ () =>
+							this.onToggleButtonFocus( true )
+						}
+						__unstableMobileNoFocusOnMount={ ! isSelected }
+						selectionColor={ textColor.color || '#fff' }
+						onReplace={ onReplace }
+						onRemove={ () => onReplace( [] ) }
+					/>
+				</ColorBackground>
 
-					{ isSelected && (
-						<BlockControls>
-							<ToolbarGroup>
-								<ToolbarButton
-									title={ __( 'Edit image' ) }
-									icon={ link }
-									onClick={ this.onToggleLinkSettings }
-									isActive={ url && url !== PREPEND_HTTP }
-								/>
-							</ToolbarGroup>
-						</BlockControls>
-					) }
-
-					<BottomSheet
-						isVisible={ isLinkSheetVisible }
-						onClose={ this.onToggleLinkSettings }
-						hideHeader
-					>
-						{ this.getLinkSettings( url, rel, linkTarget ) }
-						<BottomSheet.Cell
-							label={ __( 'Remove link' ) }
-							labelStyle={ styles.clearLinkButton }
-							separatorType={ 'none' }
-							onPress={ this.onClearSettings }
-						/>
-					</BottomSheet>
-
-					<InspectorControls>
-						<PanelBody title={ __( 'Border Settings' ) }>
-							<RangeControl
-								label={ __( 'Border Radius' ) }
-								minimumValue={ MIN_BORDER_RADIUS_VALUE }
-								maximumValue={ MAX_BORDER_RADIUS_VALUE }
-								value={ borderRadiusValue }
-								onChange={ this.onChangeBorderRadius }
-								separatorType="none"
+				{ isSelected && (
+					<BlockControls>
+						<ToolbarGroup>
+							<ToolbarButton
+								title={ __( 'Edit image' ) }
+								icon={ link }
+								onClick={ this.onToggleLinkSettings }
+								isActive={ url && url !== PREPEND_HTTP }
 							/>
-						</PanelBody>
-						<PanelBody title={ __( 'Link Settings' ) }>
-							{ this.getLinkSettings(
-								url,
-								rel,
-								linkTarget,
-								true
+						</ToolbarGroup>
+					</BlockControls>
+				) }
+
+				<BottomSheet
+					isVisible={ isLinkSheetVisible }
+					onClose={ this.onToggleLinkSettings }
+					hideHeader
+				>
+					{ this.getLinkSettings( url, rel, linkTarget ) }
+					<BottomSheet.Cell
+						label={ __( 'Remove link' ) }
+						labelStyle={ styles.clearLinkButton }
+						separatorType={ 'none' }
+						onPress={ this.onClearSettings }
+					/>
+				</BottomSheet>
+
+				<InspectorControls>
+					<PanelBody title={ __( 'Border Settings' ) }>
+						<RangeControl
+							label={ __( 'Border Radius' ) }
+							minimumValue={ MIN_BORDER_RADIUS_VALUE }
+							maximumValue={ MAX_BORDER_RADIUS_VALUE }
+							value={ borderRadiusValue }
+							onChange={ this.onChangeBorderRadius }
+							separatorType="none"
+						/>
+					</PanelBody>
+					<PanelBody title={ __( 'Link Settings' ) }>
+						{ this.getLinkSettings( url, rel, linkTarget, true ) }
+					</PanelBody>
+					<PanelBody>
+						<UnsupportedFooterControl
+							label={ __(
+								'Button color settings are coming soon.'
 							) }
-						</PanelBody>
-						<PanelBody title={ __( 'Color Settings' ) }>
-							<UnsupportedFooterControl
-								label={ __(
-									'Note: Theme colors are not available at this time.'
-								) }
-								separatorType="none"
-							/>
-						</PanelBody>
-					</InspectorControls>
-				</View>
+							separatorType="none"
+						/>
+					</PanelBody>
+				</InspectorControls>
 			</View>
 		);
 	}

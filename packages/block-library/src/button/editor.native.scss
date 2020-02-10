@@ -4,7 +4,6 @@
 }
 
 .container {
-	padding: $block-spacing;
 	background-color: transparent;
 	align-self: flex-start;
 }
@@ -28,4 +27,8 @@
 
 .clearLinkButton {
 	color: $alert-red;
+}
+
+.placeholderTextColor {
+	color: rgba($color: $white, $alpha: 0.43);
 }
