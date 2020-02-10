@@ -333,19 +333,17 @@ function LinkControl( {
 		setIsResolvingLink( true );
 		setErrorMessage( null );
 
-		// Make cancellable in order that we can avoid setting State
-		// if the component unmounts during the call to `createSuggestion`
-		cancelableCreateSuggestion = makeCancelable(
-			createSuggestion( suggestionTitle )
-		);
-
 		try {
+			// Make cancellable in order that we can avoid setting State
+			// if the component unmounts during the call to `createSuggestion`
+			cancelableCreateSuggestion = makeCancelable(
+				createSuggestion( suggestionTitle )
+			);
 			newSuggestion = await cancelableCreateSuggestion.promise;
 		} catch ( error ) {
 			if ( error.isCanceled ) {
 				return; // bail out of state updates if the promise was cancelled
 			}
-
 			setErrorMessage(
 				error.msg ||
 					__(
