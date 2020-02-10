@@ -133,8 +133,6 @@ export const registerCoreBlocks = () => {
 		latestPosts,
 		missing,
 		more,
-		navigation,
-		navigationLink,
 		nextpage,
 		preformatted,
 		pullquote,
@@ -186,6 +184,8 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 
 				[
 					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
+					navigation,
+					navigationLink,
 
 					// Register Full Site Editing Blocks.
 					...( __experimentalEnableFullSiteEditing
