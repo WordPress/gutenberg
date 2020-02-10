@@ -230,7 +230,7 @@ class URLInput extends Component {
 		this.props.onFocus( inputValue );
 
 		// When opening the link editor, if there's a value present, we want to load the suggestions pane with the results for this input search value
-		// Don't re-run the suggestions on focus if there are already suggestions present (prevents searching again when tabbing between the X button and the input)
+		// Don't re-run the suggestions on focus if there are already suggestions present (prevents searching again when tabbing between the input and buttons)
 		if (
 			inputValue &&
 			! this.props.disableSuggestions &&

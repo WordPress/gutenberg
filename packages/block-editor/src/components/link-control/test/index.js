@@ -530,64 +530,6 @@ describe( 'Default search suggestions', () => {
 
 		expect( searchResultElements ).toHaveLength( 3 );
 	} );
-
-	it( 'should display initial suggestions when input value is reset', async () => {
-		const searchTerm = 'Hello world';
-
-		act( () => {
-			render( <LinkControl showInitialSuggestions />, container );
-		} );
-
-		let searchResultElements;
-		let searchInput;
-
-		// Search Input UI
-		searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
-
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		expect( searchInput.value ).toBe( searchTerm );
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
-
-		act( () => {
-			Simulate.change( searchInput, {
-				target: { value: '' },
-			} );
-		} );
-
-		await eventLoopTick();
-
-		searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		// Make sure focus is on the input after reset
-		expect( searchInput ).toEqual( document.activeElement );
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
-
-		// check the input is empty now
-		expect( searchInput.value ).toBe( '' );
-
-		const searchResultLabel = container.querySelector(
-			'.block-editor-link-control__search-results-label'
-		);
-
-		expect( searchResultLabel.innerHTML ).toBe( 'Recently updated' );
-
-		expect( searchResultElements ).toHaveLength( 3 );
-	} );
 } );
 
 describe( 'Selecting links', () => {
