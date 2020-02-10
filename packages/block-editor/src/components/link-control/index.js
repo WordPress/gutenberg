@@ -570,20 +570,6 @@ function LinkControl( {
 				</Fragment>
 			) }
 
-			{ isEditingLink && ! isResolvingLink && (
-				<LinkControlSearchInput
-					value={ inputValue }
-					onChange={ onInputChange }
-					onSelect={ ( suggestion ) => {
-						handleSelectSuggestion( suggestion, value )();
-					} }
-					renderSuggestions={ renderSearchResults }
-					fetchSuggestions={ getSearchHandler }
-					showInitialSuggestions={ showInitialSuggestions }
-					errorMessage={ errorMessage }
-				/>
-			) }
-
 			{ ! isEditingLink && ! isResolvingLink && (
 				<LinkControlSettingsDrawer
 					value={ value }
