@@ -52,30 +52,42 @@ function ColumnEdit( {
 			return;
 		}
 
-		const pullWidth = ( name ) =>
-			( styles[ `column-${ name }-margin` ] || {} ).width || 0;
+		const pullWidths = ( names ) =>
+			names.map(
+				( name ) =>
+					( styles[ `column-${ name }-margin` ] || {} ).width || 0
+			);
 
 		let width = columnBaseWidth;
+		const names = [
+			'selected',
+			'parent-selected',
+			'descendant-selected',
+			'placeholder-selected',
+		];
+		const [
+			selected,
+			parentSelected,
+			descendantSelected,
+			placeholderSelected,
+		] = pullWidths( names );
 
 		if ( isParentSelected ) {
-			width -= pullWidth(
-				placeholder ? 'placeholder-selected' : 'parent-selected'
-			);
-		} else if ( isSelected && ! placeholder ) {
-			width -= ! hasChildren
-				? pullWidth( 'selected' )
-				: pullWidth( 'descendant-selected' );
-		} else if ( isDescendantOfParentSelected ) {
-			if ( placeholder ) {
-				width -= pullWidth( 'selected' );
+			width -= parentSelected;
+			return { width };
+		}
+
+		if ( placeholder ) {
+			if ( isDescendantOfParentSelected ) {
+				width -= selected;
 			} else {
-				width += pullWidth( 'descendant-selected' );
+				width -=
+					columnsInRow === 1 ? parentSelected : placeholderSelected;
 			}
-		} else if ( placeholder ) {
-			width -=
-				columnsInRow === 1
-					? pullWidth( 'parent-selected' )
-					: pullWidth( 'placeholder-multicol' );
+		} else if ( isSelected ) {
+			width -= ! hasChildren ? selected : descendantSelected;
+		} else if ( isDescendantOfParentSelected ) {
+			width += descendantSelected;
 		}
 
 		return { width };
