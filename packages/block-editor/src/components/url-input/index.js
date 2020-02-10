@@ -229,7 +229,7 @@ class URLInput extends Component {
 		if (
 			inputValue &&
 			! this.props.disableSuggestions &&
-			! suggestions.length
+			! ( suggestions && suggestions.length )
 		) {
 			// Ensure the suggestions are updated with the current input value
 			this.updateSuggestions( inputValue );
