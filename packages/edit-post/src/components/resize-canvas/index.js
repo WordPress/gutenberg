@@ -54,6 +54,7 @@ export function useResizeCanvas() {
 					margin: marginValue() + 'px auto',
 					flexGrow: 0,
 					maxHeight: device === 'Mobile' ? '768px' : '1024px',
+					overflowY: 'auto',
 				};
 			default:
 				return null;

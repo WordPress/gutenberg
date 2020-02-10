@@ -28,7 +28,6 @@
 @import "./components/link-control/style.scss";
 @import "./components/image-size-control/style.scss";
 @import "./components/inner-blocks/style.scss";
-@import "./components/inserter/style.scss";
 @import "./components/inserter-list-item/style.scss";
 @import "./components/media-replace-flow/style.scss";
 @import "./components/media-placeholder/style.scss";
@@ -52,3 +51,4 @@
 // Styles for components that are used outside of the editing canvas go here.
 
 @import "./components/editor-skeleton/style.scss";
+@import "./components/inserter/style.scss";
