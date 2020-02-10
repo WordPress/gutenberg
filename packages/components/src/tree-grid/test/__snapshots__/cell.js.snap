@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TreeGridCell uses a child render function to render children 1`] = `
+<table
+  onKeyDown={[Function]}
+  role="treegrid"
+>
+  <tbody>
+    <tr>
+      <td
+        role="gridcell"
+      >
+        <button
+          className="my-button"
+          onFocus={[Function]}
+        >
+          Click Me!
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
