@@ -81,7 +81,11 @@ class URLInput extends Component {
 			}, 100 );
 		}
 
-		if ( this.shouldShowInitialSuggestions() ) {
+		// Only attempt an update on suggestions if the input value has actually changed.
+		if (
+			prevProps.value !== value &&
+			this.shouldShowInitialSuggestions()
+		) {
 			this.updateSuggestions();
 		}
 
@@ -108,10 +112,12 @@ class URLInput extends Component {
 	}
 
 	shouldShowInitialSuggestions() {
+		// const { suggestions } = this.state;
 		const {
 			__experimentalShowInitialSuggestions = false,
 			value,
 		} = this.props;
+
 		return (
 			! this.isUpdatingSuggestions &&
 			__experimentalShowInitialSuggestions &&
