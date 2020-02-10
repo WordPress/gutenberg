@@ -89,7 +89,7 @@ class URLInput extends Component {
 			this.updateSuggestions();
 		}
 
-		// Reset the component to the starting state when things are cleared
+		// Reset the component to the starting state when things are cleared.
 		if ( prevProps.value && ! value ) {
 			this.reset();
 		}
@@ -112,7 +112,6 @@ class URLInput extends Component {
 	}
 
 	shouldShowInitialSuggestions() {
-		// const { suggestions } = this.state;
 		const {
 			__experimentalShowInitialSuggestions = false,
 			value,
