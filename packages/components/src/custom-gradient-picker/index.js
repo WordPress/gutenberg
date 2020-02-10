@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import AnglePicker from '../angle-picker';
+import AnglePickerControl from '../angle-picker-control';
 import { LinearGradientIcon, RadialGradientIcon } from './icons';
 import CustomGradientBar from './custom-gradient-bar';
 import BaseControl from '../base-control';
@@ -41,7 +41,7 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		);
 	};
 	return (
-		<AnglePicker
+		<AnglePickerControl
 			value={ hasGradient ? angle : '' }
 			onChange={ onAngleChange }
 		/>
