@@ -40,6 +40,7 @@ const NEW_TAB_REL = 'noreferrer noopener';
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
+const PREPEND_HTTP = 'http://';
 
 class ButtonEdit extends Component {
 	constructor( props ) {
@@ -144,17 +145,12 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor, attributes } = this.props;
+		const { backgroundColor } = this.props;
 		if ( backgroundColor.color ) {
 			// `backgroundColor` which should be set when we are able to resolve it
 			return backgroundColor.color;
-		} else if ( attributes.backgroundColor ) {
-			// `backgroundColor` which should be set when we can’t resolve
-			// the button `backgroundColor` that was created on web
-			return styles.fallbackButton.backgroundColor;
-			// `backgroundColor` which should be set when `Button` is created on mobile
 		}
-		return styles.button.backgroundColor;
+		return styles.fallbackButton.backgroundColor;
 	}
 
 	onChangeText( value ) {
@@ -268,7 +264,13 @@ class ButtonEdit extends Component {
 	}
 
 	render() {
-		const { attributes, textColor, isSelected, clientId } = this.props;
+		const {
+			attributes,
+			textColor,
+			isSelected,
+			clientId,
+			onReplace,
+		} = this.props;
 		const {
 			placeholder,
 			text,
@@ -346,16 +348,19 @@ class ButtonEdit extends Component {
 							}
 							__unstableMobileNoFocusOnMount={ ! isSelected }
 							selectionColor={ textColor.color || '#fff' }
+							onReplace={ onReplace }
+							onRemove={ () => onReplace( [] ) }
 						/>
 					</ColorBackground>
 
-					{ isButtonFocused && (
+					{ isSelected && (
 						<BlockControls>
 							<ToolbarGroup>
 								<ToolbarButton
 									title={ __( 'Edit image' ) }
 									icon={ link }
 									onClick={ this.onToggleLinkSettings }
+									isActive={ url && url !== PREPEND_HTTP }
 								/>
 							</ToolbarGroup>
 						</BlockControls>
