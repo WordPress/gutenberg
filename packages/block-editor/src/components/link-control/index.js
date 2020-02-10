@@ -7,12 +7,7 @@ import { noop, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	ExternalLink,
-	Spinner,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { Button, ExternalLink, Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useRef,
@@ -540,11 +535,6 @@ function LinkControl( {
 
 			{ value && ! isEditingLink && ! isResolvingLink && (
 				<Fragment>
-					<VisuallyHidden>
-						<p id={ `current-link-label-${ instanceId }` }>
-							{ __( 'Currently selected' ) }:
-						</p>
-					</VisuallyHidden>
 					<div
 						aria-label={ __( 'Currently selected' ) }
 						aria-selected="true"
