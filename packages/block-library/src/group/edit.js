@@ -18,7 +18,7 @@ function GroupEdit( { hasInnerBlocks } ) {
 			{ name: 'backgroundColor', className: 'has-background' },
 		],
 		{
-			contrastCheckers: { backgroundColor: true, textColor: true },
+			contrastCheckers: [ { backgroundColor: true, textColor: true } ],
 			colorDetector: { targetRef: ref },
 		}
 	);
