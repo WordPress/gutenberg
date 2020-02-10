@@ -27,7 +27,8 @@ export const fauxEntitySuggestions = [
 	},
 	{
 		id: uniqueId(),
-		title: 'This is another Post with a much longer title just to be really annoying and to try and break the UI',
+		title:
+			'This is another Post with a much longer title just to be really annoying and to try and break the UI',
 		type: 'Post',
 		info: '1 month ago',
 		url: `?p=${ uniqueId() }`,
@@ -35,10 +36,13 @@ export const fauxEntitySuggestions = [
 ];
 
 /* eslint-disable no-unused-vars */
-export const fetchFauxEntitySuggestions = ( val = '', {
-	perPage = null,
-} = {} ) => {
-	const suggestions = perPage ? take( fauxEntitySuggestions, perPage ) : fauxEntitySuggestions;
+export const fetchFauxEntitySuggestions = (
+	val = '',
+	{ perPage = null } = {}
+) => {
+	const suggestions = perPage
+		? take( fauxEntitySuggestions, perPage )
+		: fauxEntitySuggestions;
 	return Promise.resolve( suggestions );
 };
 /* eslint-enable no-unused-vars */

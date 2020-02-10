@@ -81,7 +81,9 @@ describe( 'Change detection', () => {
 
 		// Force autosave to occur immediately.
 		await Promise.all( [
-			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+			page.evaluate( () =>
+				window.wp.data.dispatch( 'core/editor' ).autosave()
+			),
 			page.waitForSelector( '.editor-post-saved-state.is-autosaving' ),
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 		] );
@@ -96,12 +98,16 @@ describe( 'Change detection', () => {
 		// Toggle post as needing review (not persisted for autosave).
 		await ensureSidebarOpened();
 
-		const postPendingReviewButton = ( await page.$x( "//label[contains(text(), 'Pending review')]" ) )[ 0 ];
+		const postPendingReviewButton = (
+			await page.$x( "//label[contains(text(), 'Pending review')]" )
+		 )[ 0 ];
 		await postPendingReviewButton.click( 'button' );
 
 		// Force autosave to occur immediately.
 		await Promise.all( [
-			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+			page.evaluate( () =>
+				window.wp.data.dispatch( 'core/editor' ).autosave()
+			),
 			page.waitForSelector( '.editor-post-saved-state.is-autosaving' ),
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 		] );
@@ -116,7 +122,9 @@ describe( 'Change detection', () => {
 
 		// Close publish panel.
 		await Promise.all( [
-			page.waitForFunction( () => ! document.querySelector( '.editor-post-publish-panel' ) ),
+			page.waitForFunction(
+				() => ! document.querySelector( '.editor-post-publish-panel' )
+			),
 			page.click( '.editor-post-publish-panel__header button' ),
 		] );
 
@@ -125,8 +133,12 @@ describe( 'Change detection', () => {
 
 		await Promise.all( [
 			page.waitForSelector( '.editor-post-publish-button.is-busy' ),
-			page.waitForSelector( '.editor-post-publish-button:not( .is-busy )' ),
-			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+			page.waitForSelector(
+				'.editor-post-publish-button:not( .is-busy )'
+			),
+			page.evaluate( () =>
+				window.wp.data.dispatch( 'core/editor' ).autosave()
+			),
 		] );
 
 		await assertIsDirty( true );
@@ -210,7 +222,9 @@ describe( 'Change detection', () => {
 
 		await assertIsDirty( true );
 
-		expect( console ).toHaveErroredWith( 'Failed to load resource: net::ERR_INTERNET_DISCONNECTED' );
+		expect( console ).toHaveErroredWith(
+			'Failed to load resource: net::ERR_INTERNET_DISCONNECTED'
+		);
 	} );
 
 	it( 'Should prompt if changes and save is in-flight', async () => {
@@ -304,7 +318,11 @@ describe( 'Change detection', () => {
 		// long as the experimental reusable blocks fetching data flow exists.
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/14766
-		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalReceiveReusableBlocks( [] ) );
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.__experimentalReceiveReusableBlocks( [] )
+		);
 
 		await assertIsDirty( false );
 	} );
@@ -334,8 +352,8 @@ describe( 'Change detection', () => {
 
 		// Save
 		await saveDraft();
-		const postId = await page.evaluate(
-			() => window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		const postId = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getCurrentPostId()
 		);
 
 		// Trash post.
@@ -350,7 +368,12 @@ describe( 'Change detection', () => {
 			await page.waitForNavigation(),
 		] );
 
-		expect( isCurrentURL( '/wp-admin/edit.php', `post_type=post&ids=${ postId }` ) ).toBe( true );
+		expect(
+			isCurrentURL(
+				'/wp-admin/edit.php',
+				`post_type=post&ids=${ postId }`
+			)
+		).toBe( true );
 	} );
 
 	it( 'consecutive edits to the same attribute should mark the post as dirty after a save', async () => {
@@ -371,7 +394,9 @@ describe( 'Change detection', () => {
 		// Increase the paragraph's font size.
 		await page.click( '[data-type="core/paragraph"]' );
 		await page.click( '.components-font-size-picker__select' );
-		await page.click( '.components-custom-select-control__item:nth-child(3)' );
+		await page.click(
+			'.components-custom-select-control__item:nth-child(3)'
+		);
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.
@@ -386,7 +411,9 @@ describe( 'Change detection', () => {
 		// Increase the paragraph's font size again.
 		await page.click( '[data-type="core/paragraph"]' );
 		await page.click( '.components-font-size-picker__select' );
-		await page.click( '.components-custom-select-control__item:nth-child(4)' );
+		await page.click(
+			'.components-custom-select-control__item:nth-child(4)'
+		);
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.

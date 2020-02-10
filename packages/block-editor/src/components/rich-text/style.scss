@@ -16,15 +16,6 @@
 		font-size: inherit; // This is necessary to override upstream CSS.
 	}
 
-	&:focus {
-		// Removes outline added by the browser.
-		outline: none;
-
-		*[data-rich-text-format-boundary] {
-			border-radius: 2px;
-		}
-	}
-
 	[data-rich-text-placeholder] {
 		pointer-events: none;
 	}
@@ -36,9 +27,17 @@
 		opacity: 0.62;
 	}
 
-	// Could be unset for individual rich text instances.
-	&.is-selected:not(.keep-placeholder-on-focus) [data-rich-text-placeholder]::after {
-		display: none;
+	&:focus {
+		// Removes outline added by the browser.
+		outline: none;
+
+		[data-rich-text-format-boundary] {
+			border-radius: 2px;
+		}
+
+		&:not(.keep-placeholder-on-focus) [data-rich-text-placeholder]::after {
+			display: none;
+		}
 	}
 }
 

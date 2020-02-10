@@ -7,7 +7,8 @@ describe( 'assignFixedIssues', () => {
 	it( 'does nothing if there are no fixed issues', async () => {
 		const payload = {
 			pull_request: {
-				body: 'This pull request seeks to make Gutenberg better than ever.',
+				body:
+					'This pull request seeks to make Gutenberg better than ever.',
 			},
 		};
 		const octokit = {
@@ -26,7 +27,8 @@ describe( 'assignFixedIssues', () => {
 	it( 'assigns and labels fixed issues', async () => {
 		const payload = {
 			pull_request: {
-				body: 'This pull request seeks to close #123 and also fixes https://github.com/WordPress/gutenberg/issues/456.',
+				body:
+					'This pull request seeks to close #123 and also fixes https://github.com/WordPress/gutenberg/issues/456.',
 				user: {
 					login: 'matt',
 				},

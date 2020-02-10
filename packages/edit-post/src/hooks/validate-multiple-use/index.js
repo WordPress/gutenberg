@@ -44,23 +44,26 @@ const enhance = compose(
 		// Otherwise, only pass `originalBlockClientId` if it refers to a different
 		// block from the current one.
 		const blocks = select( 'core/block-editor' ).getBlocks();
-		const firstOfSameType = find( blocks, ( { name } ) => block.name === name );
-		const isInvalid = firstOfSameType && firstOfSameType.clientId !== block.clientId;
+		const firstOfSameType = find(
+			blocks,
+			( { name } ) => block.name === name
+		);
+		const isInvalid =
+			firstOfSameType && firstOfSameType.clientId !== block.clientId;
 		return {
 			originalBlockClientId: isInvalid && firstOfSameType.clientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { originalBlockClientId } ) => ( {
-		selectFirst: () => dispatch( 'core/block-editor' ).selectBlock( originalBlockClientId ),
-	} ) ),
+		selectFirst: () =>
+			dispatch( 'core/block-editor' ).selectBlock(
+				originalBlockClientId
+			),
+	} ) )
 );
 
 const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
-	return enhance( ( {
-		originalBlockClientId,
-		selectFirst,
-		...props
-	} ) => {
+	return enhance( ( { originalBlockClientId, selectFirst, ...props } ) => {
 		if ( ! originalBlockClientId ) {
 			return <BlockEdit { ...props } />;
 		}
@@ -75,22 +78,34 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 			<Warning
 				key="multiple-use-warning"
 				actions={ [
-					<Button key="find-original" isSecondary onClick={ selectFirst }>
+					<Button
+						key="find-original"
+						isSecondary
+						onClick={ selectFirst }
+					>
 						{ __( 'Find original' ) }
 					</Button>,
-					<Button key="remove" isSecondary onClick={ () => props.onReplace( [] ) }>
+					<Button
+						key="remove"
+						isSecondary
+						onClick={ () => props.onReplace( [] ) }
+					>
 						{ __( 'Remove' ) }
 					</Button>,
 					outboundType && (
 						<Button
 							key="transform"
 							isSecondary
-							onClick={ () => props.onReplace(
-								createBlock( outboundType.name, props.attributes )
-							) }
+							onClick={ () =>
+								props.onReplace(
+									createBlock(
+										outboundType.name,
+										props.attributes
+									)
+								)
+							}
 						>
-							{ __( 'Transform into:' ) }{ ' ' }
-							{ outboundType.title }
+							{ __( 'Transform into:' ) } { outboundType.title }
 						</Button>
 					),
 				] }

@@ -62,7 +62,12 @@ function example( number ) {
 
 	return number + foo;
 }`,
-			errors: [ { message: 'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.' } ],
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
 		},
 		{
 			code: `
@@ -74,7 +79,12 @@ function example() {
 
 	return number + foo;
 }`,
-			errors: [ { message: 'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.' } ],
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
 		},
 		{
 			code: `
@@ -87,7 +97,12 @@ function example() {
 	return number + foo;
 }`,
 			options: [ { excludePattern: '^run' } ],
-			errors: [ { message: 'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.' } ],
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
 		},
 	],
 } );

@@ -40,24 +40,21 @@ const SettingsSidebar = ( { sidebarName } ) => (
 					<MetaBoxes location="side" />
 				</>
 			) }
-			{ sidebarName === 'edit-post/block' && (
-				<BlockInspector />
-			) }
+			{ sidebarName === 'edit-post/block' && <BlockInspector /> }
 		</Panel>
 	</Sidebar>
 );
 
 export default compose(
 	withSelect( ( select ) => {
-		const {
-			getActiveGeneralSidebarName,
-			isEditorSidebarOpened,
-		} = select( 'core/edit-post' );
+		const { getActiveGeneralSidebarName, isEditorSidebarOpened } = select(
+			'core/edit-post'
+		);
 
 		return {
 			isEditorSidebarOpened: isEditorSidebarOpened(),
 			sidebarName: getActiveGeneralSidebarName(),
 		};
 	} ),
-	ifCondition( ( { isEditorSidebarOpened } ) => isEditorSidebarOpened ),
+	ifCondition( ( { isEditorSidebarOpened } ) => isEditorSidebarOpened )
 )( SettingsSidebar );

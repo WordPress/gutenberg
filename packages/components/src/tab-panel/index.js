@@ -17,7 +17,8 @@ import { NavigableMenu } from '../navigable-container';
 import Button from '../button';
 
 const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
-	<Button role="tab"
+	<Button
+		role="tab"
 		tabIndex={ selected ? null : -1 }
 		aria-selected={ selected }
 		id={ tabId }
@@ -37,7 +38,8 @@ class TabPanel extends Component {
 		this.onNavigate = this.onNavigate.bind( this );
 
 		this.state = {
-			selected: initialTabName || ( tabs.length > 0 ? tabs[ 0 ].name : null ),
+			selected:
+				initialTabName || ( tabs.length > 0 ? tabs[ 0 ].name : null ),
 		};
 	}
 
@@ -75,9 +77,14 @@ class TabPanel extends Component {
 					className="components-tab-panel__tabs"
 				>
 					{ tabs.map( ( tab ) => (
-						<TabButton className={ classnames( tab.className, { [ activeClass ]: tab.name === selected } ) }
+						<TabButton
+							className={ classnames( tab.className, {
+								[ activeClass ]: tab.name === selected,
+							} ) }
 							tabId={ instanceId + '-' + tab.name }
-							aria-controls={ instanceId + '-' + tab.name + '-view' }
+							aria-controls={
+								instanceId + '-' + tab.name + '-view'
+							}
 							selected={ tab.name === selected }
 							key={ tab.name }
 							onClick={ partial( this.handleClick, tab.name ) }
@@ -87,7 +94,8 @@ class TabPanel extends Component {
 					) ) }
 				</NavigableMenu>
 				{ selectedTab && (
-					<div aria-labelledby={ selectedId }
+					<div
+						aria-labelledby={ selectedId }
 						role="tabpanel"
 						id={ selectedId + '-view' }
 						className="components-tab-panel__tab-content"

@@ -10,16 +10,14 @@ import { hasBlockSwitcher } from './has-block-switcher';
  * @return {Promise} Promise resolving with an array containing all possible block transforms
  */
 export const getAvailableBlockTransforms = async () => {
-	if ( ! await hasBlockSwitcher() ) {
+	if ( ! ( await hasBlockSwitcher() ) ) {
 		return [];
 	}
-	await page.click( '.block-editor-block-toolbar .block-editor-block-switcher' );
+	await page.click(
+		'.block-editor-block-toolbar .block-editor-block-switcher'
+	);
 	return page.evaluate( ( buttonSelector ) => {
-		return Array.from(
-			document.querySelectorAll(
-				buttonSelector
-			)
-		).map(
+		return Array.from( document.querySelectorAll( buttonSelector ) ).map(
 			( button ) => {
 				return button.textContent;
 			}

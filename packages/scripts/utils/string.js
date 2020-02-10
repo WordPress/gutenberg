@@ -9,9 +9,8 @@
  * @return {string} Camel-cased string.
  */
 function camelCaseDash( string ) {
-	return string.replace(
-		/-([a-z])/g,
-		( match, letter ) => letter.toUpperCase()
+	return string.replace( /-([a-z])/g, ( match, letter ) =>
+		letter.toUpperCase()
 	);
 }
 

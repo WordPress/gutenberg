@@ -1,5 +1,4 @@
 .wp-block-navigation {
-
 	& > ul {
 		display: block;
 		list-style: none;
@@ -38,9 +37,12 @@
 			}
 		}
 
+		// ToDo: move navigation-link styles to navigation-link/style.scss
 		& > li {
 
 			& > a {
+				display: flex;
+				align-items: center;
 				padding-left: 0;
 
 				@include break-small {
@@ -54,6 +56,14 @@
 
 			&:last-of-type > a {
 				padding-right: 0;
+			}
+
+			.wp-block-navigation-link__submenu-icon {
+				margin-left: 4px;
+
+				svg {
+					fill: currentColor;
+				}
 			}
 		}
 
@@ -147,18 +157,6 @@
 			&:last-child {
 				padding-bottom: 13px;
 			}
-		}
-	}
-
-	// Top-level sub-menu indicators
-	& .has-sub-menu > a {
-
-		&::after {
-			content: "\00a0\25BC";
-			display: inline-block;
-			font-size: 0.6rem;
-			height: inherit;
-			width: inherit;
 		}
 	}
 

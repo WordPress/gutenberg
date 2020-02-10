@@ -24,10 +24,12 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"babel-eslint": "^10.0.2",
+		"babel-eslint": "^10.0.3",
+		"eslint-config-prettier": "^6.10.0",
 		"eslint-plugin-jest": "^22.15.1",
 		"eslint-plugin-jsdoc": "^15.8.0",
 		"eslint-plugin-jsx-a11y": "^6.2.3",
+		"eslint-plugin-prettier": "^3.1.2",
 		"eslint-plugin-react": "^7.14.3",
 		"eslint-plugin-react-hooks": "^1.6.1",
 		"globals": "^12.0.0",

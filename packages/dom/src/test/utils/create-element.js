@@ -9,20 +9,24 @@
 export default function createElement( type ) {
 	const element = document.createElement( type );
 
-	const ifNotHidden = ( value, elseValue ) => function() {
-		let isHidden = false;
-		let node = this;
-		do {
-			isHidden = (
-				node.style.display === 'none' ||
-				node.style.visibility === 'hidden'
+	const ifNotHidden = ( value, elseValue ) =>
+		function() {
+			let isHidden = false;
+			let node = this;
+			do {
+				isHidden =
+					node.style.display === 'none' ||
+					node.style.visibility === 'hidden';
+
+				node = node.parentNode;
+			} while (
+				! isHidden &&
+				node &&
+				node.nodeType === window.Node.ELEMENT_NODE
 			);
 
-			node = node.parentNode;
-		} while ( ! isHidden && node && node.nodeType === window.Node.ELEMENT_NODE );
-
-		return isHidden ? elseValue : value;
-	};
+			return isHidden ? elseValue : value;
+		};
 
 	Object.defineProperties( element, {
 		offsetHeight: {
@@ -33,14 +37,19 @@ export default function createElement( type ) {
 		},
 	} );
 
-	element.getClientRects = ifNotHidden( [ {
-		width: 10,
-		height: 10,
-		top: 0,
-		right: 10,
-		bottom: 10,
-		left: 0,
-	} ], [] );
+	element.getClientRects = ifNotHidden(
+		[
+			{
+				width: 10,
+				height: 10,
+				top: 0,
+				right: 10,
+				bottom: 10,
+				left: 0,
+			},
+		],
+		[]
+	);
 
 	return element;
 }

@@ -36,6 +36,10 @@ $blocks-button__height: 56px;
 	}
 }
 
+.wp-gs .wp-block-button__link:not(.has-background) {
+	background-color: var(--wp-block-core-button--color--background, var(--wp-color--primary, $dark-gray-700));
+}
+
 .is-style-squared .wp-block-button__link {
 	border-radius: 0;
 }

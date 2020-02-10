@@ -6,7 +6,11 @@ import { mount, shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { createBlock, registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -23,8 +27,8 @@ describe( 'DocumentOutline', () => {
 		registerBlockType( 'core/heading', {
 			category: 'common',
 			title: 'Heading',
-			edit: () => { },
-			save: () => { },
+			edit: () => {},
+			save: () => {},
 			attributes: {
 				level: {
 					type: 'number',
@@ -39,14 +43,14 @@ describe( 'DocumentOutline', () => {
 		registerBlockType( 'core/paragraph', {
 			category: 'common',
 			title: 'Paragraph',
-			edit: () => { },
+			edit: () => {},
 			save: () => {},
 		} );
 
 		registerBlockType( 'core/columns', {
 			category: 'common',
 			title: 'Paragraph',
-			edit: () => { },
+			edit: () => {},
 			save: () => {},
 		} );
 
@@ -64,7 +68,9 @@ describe( 'DocumentOutline', () => {
 			level: 3,
 		} );
 
-		nestedHeading = createBlock( 'core/columns', undefined, [ headingChild ] );
+		nestedHeading = createBlock( 'core/columns', undefined, [
+			headingChild,
+		] );
 	} );
 
 	afterAll( () => {
@@ -92,10 +98,12 @@ describe( 'DocumentOutline', () => {
 
 	describe( 'header blocks present', () => {
 		it( 'should match snapshot', () => {
-			const blocks = [ headingParent, headingChild ].map( ( block, index ) => {
-				// Set client IDs to a predictable value.
-				return { ...block, clientId: `clientId_${ index }` };
-			} );
+			const blocks = [ headingParent, headingChild ].map(
+				( block, index ) => {
+					// Set client IDs to a predictable value.
+					return { ...block, clientId: `clientId_${ index }` };
+				}
+			);
 			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
 
 			expect( wrapper ).toMatchSnapshot();
@@ -109,17 +117,25 @@ describe( 'DocumentOutline', () => {
 		} );
 
 		it( 'should render two items when two headings and some paragraphs provided', () => {
-			const blocks = [ paragraph, headingParent, paragraph, headingChild, paragraph ];
+			const blocks = [
+				paragraph,
+				headingParent,
+				paragraph,
+				headingChild,
+				paragraph,
+			];
 			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
 
 			expect( wrapper.find( 'TableOfContentsItem' ) ).toHaveLength( 2 );
 		} );
 
 		it( 'should render warnings for multiple h1 headings', () => {
-			const blocks = [ headingH1, paragraph, headingH1, paragraph ].map( ( block, index ) => {
-				// Set client IDs to a predictable value.
-				return { ...block, clientId: `clientId_${ index }` };
-			} );
+			const blocks = [ headingH1, paragraph, headingH1, paragraph ].map(
+				( block, index ) => {
+					// Set client IDs to a predictable value.
+					return { ...block, clientId: `clientId_${ index }` };
+				}
+			);
 			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
 
 			expect( wrapper ).toMatchSnapshot();
@@ -130,27 +146,44 @@ describe( 'DocumentOutline', () => {
 		it( 'should render even if the heading is nested', () => {
 			const tableOfContentItemsSelector = 'TableOfContentsItem';
 			const outlineLevelsSelector = '.document-outline__level';
-			const outlineItemContentSelector = '.document-outline__item-content';
+			const outlineItemContentSelector =
+				'.document-outline__item-content';
 
 			const blocks = [ headingParent, nestedHeading ];
 			const wrapper = mount( <DocumentOutline blocks={ blocks } /> );
 
 			//heading parent and nested heading should appear as items
-			const tableOfContentItems = wrapper.find( tableOfContentItemsSelector );
+			const tableOfContentItems = wrapper.find(
+				tableOfContentItemsSelector
+			);
 			expect( tableOfContentItems ).toHaveLength( 2 );
 
 			//heading parent test
-			const firstItemLevels = tableOfContentItems.at( 0 ).find( outlineLevelsSelector );
+			const firstItemLevels = tableOfContentItems
+				.at( 0 )
+				.find( outlineLevelsSelector );
 			expect( firstItemLevels ).toHaveLength( 1 );
 			expect( firstItemLevels.at( 0 ).text() ).toEqual( 'H2' );
-			expect( tableOfContentItems.at( 0 ).find( outlineItemContentSelector ).text() ).toEqual( 'Heading parent' );
+			expect(
+				tableOfContentItems
+					.at( 0 )
+					.find( outlineItemContentSelector )
+					.text()
+			).toEqual( 'Heading parent' );
 
 			//nested heading test
-			const secondItemLevels = tableOfContentItems.at( 1 ).find( outlineLevelsSelector );
+			const secondItemLevels = tableOfContentItems
+				.at( 1 )
+				.find( outlineLevelsSelector );
 			expect( secondItemLevels ).toHaveLength( 2 );
 			expect( secondItemLevels.at( 0 ).text() ).toEqual( 'Block Title' );
 			expect( secondItemLevels.at( 1 ).text() ).toEqual( 'H3' );
-			expect( tableOfContentItems.at( 1 ).find( outlineItemContentSelector ).text() ).toEqual( 'Heading child' );
+			expect(
+				tableOfContentItems
+					.at( 1 )
+					.find( outlineItemContentSelector )
+					.text()
+			).toEqual( 'Heading child' );
 		} );
 	} );
 } );

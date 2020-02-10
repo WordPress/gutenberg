@@ -6,7 +6,7 @@
 export async function clickBlockToolbarButton( buttonAriaLabel ) {
 	const BLOCK_TOOLBAR_SELECTOR = '.block-editor-block-toolbar';
 	const BUTTON_SELECTOR = `${ BLOCK_TOOLBAR_SELECTOR } button[aria-label="${ buttonAriaLabel }"]`;
-	if ( await page.$( BLOCK_TOOLBAR_SELECTOR ) === null ) {
+	if ( ( await page.$( BLOCK_TOOLBAR_SELECTOR ) ) === null ) {
 		// Move the mouse to show the block toolbar
 		await page.mouse.move( 0, 0 );
 		await page.mouse.move( 10, 10 );

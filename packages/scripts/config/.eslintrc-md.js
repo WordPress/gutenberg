@@ -6,14 +6,10 @@
 // that are assumed to be defined.
 module.exports = {
 	root: true,
-	plugins: [
-		'markdown',
-	],
-	extends: [
-		'plugin:@wordpress/eslint-plugin/recommended',
-	],
-	"rules": {
-		"no-undef": "off",
-		"no-unused-vars": "off"
+	plugins: [ 'markdown' ],
+	extends: [ 'plugin:@wordpress/eslint-plugin/recommended' ],
+	rules: {
+		'no-undef': 'off',
+		'no-unused-vars': 'off',
 	},
 };

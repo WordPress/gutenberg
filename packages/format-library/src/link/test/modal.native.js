@@ -9,9 +9,7 @@ import { shallow } from 'enzyme';
 
 describe( 'LinksUI', () => {
 	it( 'LinksUI renders', () => {
-		const wrapper = shallow(
-			<ModalLinkUI />
-		);
+		const wrapper = shallow( <ModalLinkUI /> );
 		expect( wrapper ).toBeTruthy();
 	} );
 
@@ -19,11 +17,10 @@ describe( 'LinksUI', () => {
 		// Given
 		const onRemove = jest.fn();
 		const wrapper = shallow(
-			<ModalLinkUI
-				onRemove={ onRemove }
-				onClose={ jest.fn() }
-			/>
-		).dive().dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
+			<ModalLinkUI onRemove={ onRemove } onClose={ jest.fn() } />
+		)
+			.dive()
+			.dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
 
 		// When
 
@@ -40,10 +37,7 @@ describe( 'LinksUI', () => {
 		// Given
 		const onRemove = jest.fn();
 		const wrapper = shallow(
-			<ModalLinkUI
-				onRemove={ onRemove }
-				onClose={ jest.fn() }
-			/>
+			<ModalLinkUI onRemove={ onRemove } onClose={ jest.fn() } />
 		).dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
 
 		// Mock `submitLink` for simplicity (we don't want to test submitLink itself here)
@@ -52,8 +46,15 @@ describe( 'LinksUI', () => {
 		// When
 
 		// Simulate user typing on the URL Cell.
-		const bottomSheet = wrapper.dive().find( 'BottomSheet' ).first();
-		const cell = bottomSheet.dive().find( 'WithPreferredColorScheme(BottomSheetCell)' ).first().dive();
+		const bottomSheet = wrapper
+			.dive()
+			.find( 'BottomSheet' )
+			.first();
+		const cell = bottomSheet
+			.dive()
+			.find( 'WithPreferredColorScheme(BottomSheetCell)' )
+			.first()
+			.dive();
 
 		cell.simulate( 'changeValue', 'wordpress.com' );
 

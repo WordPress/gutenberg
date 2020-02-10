@@ -27,7 +27,7 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 					</Button>
 					<TextEditorGlobalKeyboardShortcuts />
 				</div>
-			)	}
+			) }
 			<div className="edit-post-text-editor__body">
 				<PostTitle />
 				<PostTextEditor />
@@ -38,7 +38,8 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 
 export default compose(
 	withSelect( ( select ) => ( {
-		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+			.richEditingEnabled,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		return {

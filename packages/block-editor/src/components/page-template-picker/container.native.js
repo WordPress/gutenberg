@@ -19,7 +19,7 @@ const Container = ( { style, children } ) => {
 			style={ [ styles.container, style ] }
 		>
 			{ children }
-		</ScrollView >
+		</ScrollView>
 	);
 };
 
