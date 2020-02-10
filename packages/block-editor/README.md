@@ -488,7 +488,7 @@ Function that manipulates media queries from stylesheets to simulate a given vie
 
 _Parameters_
 
--   _partialPaths_ `Array`: Paths of stylesheets to manipulate.
+-   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
 -   _width_ `number`: Viewport width to simulate.
 
 <a name="Warning" href="#Warning">#</a> **Warning**

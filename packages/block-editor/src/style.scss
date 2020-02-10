@@ -1,8 +1,9 @@
+// This tag marks the start of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #start-resizable-editor-section {
 	display: none;
 }
 
-// Only add styles for components that are used inside the editing canvas here
+// Only add styles for components that are used inside the editing canvas here:
 
 @import "./components/block-icon/style.scss";
 @import "./components/block-inspector/style.scss";
@@ -44,11 +45,12 @@
 @import "./components/writing-flow/style.scss";
 @import "./hooks/anchor.scss";
 
+// This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {
 	display: none;
 }
 
-// Styles for components that are used outside of the editing canvas go here.
+// Styles for components that are used outside of the editing canvas go here:
 
 @import "./components/editor-skeleton/style.scss";
 @import "./components/inserter/style.scss";

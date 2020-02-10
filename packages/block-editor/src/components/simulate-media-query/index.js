@@ -56,10 +56,10 @@ function replaceMediaQueryWithWidthEvaluation( ruleText, widthValue ) {
 /**
  * Function that manipulates media queries from stylesheets to simulate a given viewport width.
  *
- * @param {Array} partialPaths Paths of stylesheets to manipulate.
+ * @param {string} marker CSS selector string defining start and end of manipulable styles.
  * @param {number} width Viewport width to simulate.
  */
-export default function useSimulatedMediaQuery( width ) {
+export default function useSimulatedMediaQuery( marker, width ) {
 	useEffect( () => {
 		const styleSheets = getStyleSheetsThatMatchHostname();
 		const originalStyles = [];
@@ -71,17 +71,16 @@ export default function useSimulatedMediaQuery( width ) {
 				++ruleIndex
 			) {
 				const rule = styleSheet.cssRules[ ruleIndex ];
-
 				if (
 					! relevantSection &&
-					!! rule.cssText.match( /#start-resizable-editor-section/ )
+					!! rule.cssText.match( new RegExp( `#start-${ marker }` ) )
 				) {
 					relevantSection = true;
 				}
 
 				if (
 					relevantSection &&
-					!! rule.cssText.match( /#end-resizable-editor-section/ )
+					!! rule.cssText.match( new RegExp( `#end-${ marker }` ) )
 				) {
 					relevantSection = false;
 				}

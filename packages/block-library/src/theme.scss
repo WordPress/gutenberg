@@ -1,3 +1,4 @@
+// This tag marks the start of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #start-resizable-editor-section {
 	display: none;
 }
@@ -16,6 +17,7 @@
 @import "./table/theme.scss";
 @import "./video/theme.scss";
 
+// This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {
 	display: none;
 }

@@ -8,8 +8,8 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Function to resize the editor window.
  *
+ * @return {Object} Inline styles to be added to resizable container.
  */
-
 export function useResizeCanvas() {
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getDeviceType();
@@ -61,7 +61,10 @@ export function useResizeCanvas() {
 		}
 	};
 
-	useSimulatedMediaQuery( getCanvasWidth( deviceType ) );
+	useSimulatedMediaQuery(
+		'resizable-editor-section',
+		getCanvasWidth( deviceType )
+	);
 
 	return contentInlineStyles( deviceType );
 }
