@@ -130,7 +130,9 @@ async function runGitRepositoryCloneStep( abortMessage ) {
 	await runStep( 'Cloning the Git repository', abortMessage, async () => {
 		console.log( '>> Cloning the Git repository' );
 		const simpleGit = SimpleGit();
-		await simpleGit.clone( gitRepoURL, gitWorkingDirectoryPath );
+		await simpleGit.clone( gitRepoURL, gitWorkingDirectoryPath, [
+			'--depth 1',
+		] );
 		console.log(
 			'>> The Gutenberg Git repository has been successfully cloned in the following temporary folder: ' +
 				success( gitWorkingDirectoryPath )
