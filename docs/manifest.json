@@ -270,7 +270,7 @@
 		"parent": null
 	},
 	{
-		"title": "Developer Contributions",
+		"title": "Code Contributions",
 		"slug": "develop",
 		"markdown_source": "../docs/contributors/develop.md",
 		"parent": "contributors"
@@ -330,7 +330,7 @@
 		"parent": "develop"
 	},
 	{
-		"title": "Design Principles & Vision",
+		"title": "Design Contributions",
 		"slug": "design",
 		"markdown_source": "../docs/contributors/design.md",
 		"parent": "contributors"
