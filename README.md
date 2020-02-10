@@ -28,7 +28,7 @@ Get hands on: check out the [Block Editor live demo](https://wordpress.org/guten
 
 Extending and customizing is at the heart of the WordPress platform, this is no different for the Gutenberg project. The editor and future products can be extended by third-party developers using plugins.
 
-See the [Developer Documentation](https://developer.wordpress.org/block-editor/developers/) for extensive tutorials, documentation, and API references on how to extend the editor.
+The <a href="/docs/contributors/getting-started.md">Getting Started guide</a> will help you run Gutenberg locally to tinker with. See the [Developer Documentation](https://developer.wordpress.org/block-editor/developers/) for extensive tutorials, documentation, and API references on how to extend the editor.
 
 ### Contribute to Gutenberg
 
