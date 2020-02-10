@@ -21,7 +21,9 @@ If you don't have a local WordPress environment to load Gutenberg in, we can hel
 
 ### Step 1: Installing a Local Environment
 
-The quickest way to get up and running is to use the [`wp-env` command](https://github.com/WordPress/gutenberg/tree/master/packages/env), which is developed within the Gutenberg source repository, and published as `@wordpress/env` to npm. If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`.
+The quickest way to get up and running is to use the [`wp-env` command](https://github.com/WordPress/gutenberg/tree/master/packages/env), which is developed within the Gutenberg source repository, and published as `@wordpress/env` to npm. In its default mode, it'll install and run a local WordPress environment for you; however, it's also possible to [configure](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md#wp-envjson) it to use a pre-existing local WordPress installation.
+
+If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`.
 
 To install Docker, follow their instructions here for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If running Ubuntu, see these [extended instructions for help and troubleshooting](/docs/contributors/env-ubuntu.md).
 
@@ -32,24 +34,6 @@ Once Docker is installed and running, run this script to install WordPress, and 
 ```bash
 npx wp-env start
 ```
-
-#### Alternative Method: Using an Existing Local WordPress Install
-
-WordPress will be installed in the `wordpress` directory, if you need to access WordPress core files directly, you can find them there.
-
-If you already have WordPress checked out in a different directory, you can use that installation, instead, by running these commands:
-
-```bash
-export WP_DEVELOP_DIR=/path/to/wordpress-develop
-npm run env connect
-```
-
-This will use WordPress' own local environment, and mount your Gutenberg directory as a volume there.
-
-In Windows, you can set the `WP_DEVELOP_DIR` environment variable using the appropriate method for your shell:
-
-- CMD: `set WP_DEVELOP_DIR=/path/to/wordpress-develop`
-- PowerShell: `$env:WP_DEVELOP_DIR = "/path/to/wordpress-develop"`
 
 ### Step 2: Accessing and Configuring the Local WordPress Install
 
