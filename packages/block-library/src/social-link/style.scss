@@ -47,7 +47,7 @@
 
 @mixin sociallink($logo, $color) {
 	span {
-		background: url($logo) no-repeat center center;
+		background: $logo no-repeat center center;
 	}
 
 	@supports (mask-size: cover) or (-webkit-mask-size: cover) {
@@ -56,8 +56,8 @@
 
 		span {
 			background: #fff;
-			-webkit-mask: url($logo) no-repeat center center;
-			mask: url($logo) no-repeat center center;
+			-webkit-mask: $logo no-repeat center center;
+			mask: $logo no-repeat center center;
 			-webkit-mask-size: cover;
 			mask-size: cover;
 		}
@@ -65,15 +65,152 @@
 }
 
 .wp-block-social-links:not(.is-style-logos-only) {
+	.wp-social-link {
+		@include sociallink( $link-logo, $link-color );
+	}
+
+	.wp-social-link-amazon {
+		@include sociallink( $amazon-logo, $amazon-color );
+	}
+
+	.wp-social-link-bandcamp {
+		@include sociallink( $bandcamp-logo, $bandcamp-color );
+	}
+
+	.wp-social-link-behance {
+		@include sociallink( $behance-logo, $behance-color );
+	}
+
+	.wp-social-link-codepen {
+		@include sociallink( $codepen-logo, $codepen-color );
+	}
+
+	.wp-social-link-deviantart {
+		@include sociallink( $deviantart-logo, $deviantart-color );
+	}
+
+	.wp-social-link-dribbble {
+		@include sociallink( $dribbble-logo, $dribbble-color );
+	}
+
+	.wp-social-link-dropbox {
+		@include sociallink( $dropbox-logo, $dropbox-color );
+	}
+
+	.wp-social-link-etsy {
+		@include sociallink( $etsy-logo, $etsy-color );
+	}
+
+	.wp-social-link-facebook {
+		@include sociallink( $facebook-logo, $facebook-color );
+	}
+
+	.wp-social-link-fivehundredpx {
+		@include sociallink( $fivehundredpx-logo, $fivehundredpx-color );
+	}
+
+	.wp-social-link-flickr {
+		@include sociallink( $flickr-logo, $flickr-color );
+	}
+
+	.wp-social-link-foursquare {
+		@include sociallink( $foursquare-logo, $foursquare-color );
+	}
+
+	.wp-social-link-github {
+		@include sociallink( $github-logo, $github-color );
+	}
+
+	.wp-social-link-goodreads {
+		@include sociallink( $goodreads-logo, $goodreads-color );
+	}
+
+	.wp-social-link-google {
+		@include sociallink( $google-logo, $google-color );
+	}
+
+	.wp-social-link-instagram {
+		@include sociallink( $instagram-logo, $instagram-color );
+	}
+
+	.wp-social-link-lastfm {
+		@include sociallink( $lastfm-logo, $lastfm-color );
+	}
+
+	.wp-social-link-linkedin {
+		@include sociallink( $linkedin-logo, $linkedin-color );
+	}
+
 	.wp-social-link-mastodon {
 		@include sociallink( $mastodon-logo, $mastodon-color );
+	}
+
+	.wp-social-link-medium {
+		@include sociallink( $medium-logo, $medium-color );
+	}
+
+	.wp-social-link-meetup {
+		@include sociallink( $meetup-logo, $meetup-color );
+	}
+
+	.wp-social-link-pinterest {
+		@include sociallink( $pinterest-logo, $pinterest-color );
+	}
+
+	.wp-social-link-pocket {
+		@include sociallink( $pocket-logo, $pocket-color );
+	}
+
+	.wp-social-link-reddit {
+		@include sociallink( $reddit-logo, $reddit-color );
+	}
+
+	.wp-social-link-skype {
+		@include sociallink( $skype-logo, $skype-color );
+	}
+
+	.wp-social-link-snapchat {
+		@include sociallink( $snapchat-logo, $snapchat-color );
+	}
+
+	.wp-social-link-soundcloud {
+		@include sociallink( $soundcloud-logo, $soundcloud-color );
+	}
+
+	.wp-social-link-spotify {
+		@include sociallink( $spotify-logo, $spotify-color );
+	}
+
+	.wp-social-link-tumblr {
+		@include sociallink( $tumblr-logo, $tumblr-color );
+	}
+
+	.wp-social-link-twitch {
+		@include sociallink( $twitch-logo, $twitch-color );
 	}
 
 	.wp-social-link-twitter {
 		@include sociallink( $twitter-logo, $twitter-color );
 	}
 
+	.wp-social-link-vimeo {
+		@include sociallink( $vimeo-logo, $vimeo-color );
+	}
+
+	.wp-social-link-vk {
+		@include sociallink( $vk-logo, $vk-color );
+	}
+
 	.wp-social-link-wordpress {
 		@include sociallink( $wordpress-logo, $wordpress-color );
 	}
+
+	.wp-social-link-yelp {
+		@include sociallink( $yelp-logo, $yelp-color );
+	}
+
+	.wp-social-link-youtube {
+		@include sociallink( $youtube-logo, $youtube-color );
+	}
+
 }

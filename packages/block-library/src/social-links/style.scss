@@ -54,196 +54,6 @@
 	display: flex;
 }
 
-// Provide colors for a range of icons.
-.wp-block-social-links:not(.is-style-logos-only) {
-	// Generic items such as mail, feed, etc.
-	.wp-social-link {
-		background-color: $link-color;
-		color: #444;
-	}
-
-	.wp-social-link-amazon {
-		background-color: $amazon-color;
-		color: #fff;
-	}
-
-	.wp-social-link-bandcamp {
-		background-color: $bandcamp-color;
-		color: #fff;
-	}
-
-	.wp-social-link-behance {
-		background-color: $behance-color;
-		color: #fff;
-	}
-
-	.wp-social-link-codepen {
-		background-color: $codepen-color;
-		color: #fff;
-	}
-
-	.wp-social-link-deviantart {
-		background-color: $deviantart-color;
-		color: #fff;
-	}
-
-	.wp-social-link-dribbble {
-		background-color: $dribbble-color;
-		color: #fff;
-	}
-
-	.wp-social-link-dropbox {
-		background-color: $dropbox-color;
-		color: #fff;
-	}
-
-	.wp-social-link-etsy {
-		background-color: $etsy-color;
-		color: #fff;
-	}
-
-	.wp-social-link-facebook {
-		background-color: $facebook-color;
-		color: #fff;
-	}
-
-	.wp-social-link-fivehundredpx {
-		background-color: $fivehundredpx-color;
-		color: #fff;
-	}
-
-	.wp-social-link-flickr {
-		background-color: $flickr-color;
-		color: #fff;
-	}
-
-	.wp-social-link-foursquare {
-		background-color: $foursquare-color;
-		color: #fff;
-	}
-
-	.wp-social-link-github {
-		background-color: $github-color;
-		color: #fff;
-	}
-
-	.wp-social-link-goodreads {
-		background-color: $goodreads-color;
-		color: #382110;
-	}
-
-	.wp-social-link-google {
-		background-color: $google-color;
-		color: #fff;
-	}
-
-	.wp-social-link-instagram {
-		background-color: $instagram-color;
-		color: #fff;
-	}
-
-	.wp-social-link-lastfm {
-		background-color: $lastfm-color;
-		color: #fff;
-	}
-
-	.wp-social-link-linkedin {
-		background-color: $linkedin-color;
-		color: #fff;
-	}
-
-	.wp-social-link-mastodon {
-		background-color: $mastodon-color;
-		color: #fff;
-	}
-
-	.wp-social-link-medium {
-		background-color: $medium-color;
-		color: #fff;
-	}
-
-	.wp-social-link-meetup {
-		background-color: $meetup-color;
-		color: #fff;
-	}
-
-	.wp-social-link-pinterest {
-		background-color: $pinterest-color;
-		color: #fff;
-	}
-
-	.wp-social-link-pocket {
-		background-color: $pocket-color;
-		color: #fff;
-	}
-
-	.wp-social-link-reddit {
-		background-color: $reddit-color;
-		color: #fff;
-	}
-
-	.wp-social-link-skype {
-		background-color: $skype-color;
-		color: #fff;
-	}
-
-	.wp-social-link-snapchat {
-		background-color: $snapchat-color;
-		color: #fff;
-		stroke: #000;
-	}
-
-	.wp-social-link-soundcloud {
-		background-color: $soundcloud-color;
-		color: #fff;
-	}
-
-	.wp-social-link-spotify {
-		background-color: $spotify-color;
-		color: #fff;
-	}
-
-	.wp-social-link-tumblr {
-		background-color: $tumblr-color;
-		color: #fff;
-	}
-
-	.wp-social-link-twitch {
-		background-color: $twitch-color;
-		color: #fff;
-	}
-
-	.wp-social-link-twitter {
-		background-color: $twitter-color;
-		color: #fff;
-	}
-
-	.wp-social-link-vimeo {
-		background-color: $vimeo-color;
-		color: #fff;
-	}
-
-	.wp-social-link-vk {
-		background-color: $vk-color;
-		color: #fff;
-	}
-
-	.wp-social-link-wordpress {
-		background-color: $wordpress-color;
-		color: #fff;
-	}
-
-	.wp-social-link-yelp {
-		background-color: $yelp-color;
-		color: #fff;
-	}
-
-	.wp-social-link-youtube {
-		background-color: $youtube-color;
-		color: #fff;
-	}
-}
-
 // Treatment for logos only style.
 .wp-block-social-links.is-style-logos-only {
 	.wp-social-link {
@@ -259,149 +69,182 @@
 
 	.wp-social-link-amazon {
 		color: $amazon-color;
+		background: $amazon-logo no-repeat center center;
 	}
 
 	.wp-social-link-bandcamp {
 		color: $bandcamp-color;
+		background: $bandcamp-logo no-repeat center center;
 	}
 
 	.wp-social-link-behance {
 		color: $behance-color;
+		background: $behance-logo no-repeat center center;
 	}
 
 	.wp-social-link-codepen {
 		color: $codepen-color;
+		background: $codepen-logo no-repeat center center;
 	}
 
 	.wp-social-link-deviantart {
 		color: $deviantart-color;
+		background: $deviantart-logo no-repeat center center;
 	}
 
 	.wp-social-link-dribbble {
 		color: $dribbble-color;
+		background: $dribbble-logo no-repeat center center;
 	}
 
 	.wp-social-link-dropbox {
 		color: $dropbox-color;
+		background: $dropbox-logo no-repeat center center;
 	}
 
 	.wp-social-link-etsy {
 		color: $etsy-color;
+		background: $etsy-logo no-repeat center center;
 	}
 
 	.wp-social-link-facebook {
 		color: $facebook-color;
+		background: $facebook-logo no-repeat center center;
 	}
 
 	.wp-social-link-fivehundredpx {
 		color: $fivehundredpx-color;
+		background: $fivehundredpx-logo no-repeat center center;
 	}
 
 	.wp-social-link-flickr {
 		color: $flickr-color;
+		background: $flickr-logo no-repeat center center;
 	}
 
 	.wp-social-link-foursquare {
 		color: $foursquare-color;
+		background: $foursquare-logo no-repeat center center;
 	}
 
 	.wp-social-link-github {
 		color: $github-color;
+		background: $github-logo no-repeat center center;
 	}
 
 	.wp-social-link-goodreads {
 		color: $goodreads-color;
+		background: $goodreads-logo no-repeat center center;
 	}
 
 	.wp-social-link-google {
 		color: $google-color;
+		background: $google-logo no-repeat center center;
 	}
 
 	.wp-social-link-instagram {
 		color: $instagram-color;
+		background: $instagram-logo no-repeat center center;
 	}
 
 	.wp-social-link-lastfm {
 		color: $lastfm-color;
+		background: $lastfm-logo no-repeat center center;
 	}
 
 	.wp-social-link-linkedin {
 		color: $linkedin-color;
+		background: $linkedin-logo no-repeat center center;
 	}
 
 	.wp-social-link-mastodon {
 		color: $mastodon-color;
-		background: url($mastodon-logo) no-repeat center center;
+		background: $mastodon-logo no-repeat center center;
 	}
 
 	.wp-social-link-medium {
 		color: $medium-color;
+		background: $medium-logo no-repeat center center;
 	}
 
 	.wp-social-link-meetup {
 		color: $meetup-color;
+		background: $meetup-logo no-repeat center center;
 	}
 
 	.wp-social-link-pinterest {
 		color: $pinterest-color;
+		background: $pinterest-logo no-repeat center center;
 	}
 
 	.wp-social-link-pocket {
 		color: $pocket-color;
+		background: $pocket-logo no-repeat center center;
 	}
 
 	.wp-social-link-reddit {
 		color: $reddit-color;
+		background: $reddit-logo no-repeat center center;
 	}
 
 	.wp-social-link-skype {
 		color: $skype-color;
+		background: $skype-logo no-repeat center center;
 	}
 
 	.wp-social-link-snapchat {
 		color: $snapchat-color;
+		background: $snapchat-logo no-repeat center center;
 	}
 
 	.wp-social-link-soundcloud {
 		color: $soundcloud-color;
+		background: $soundcloud-logo no-repeat center center;
 	}
 
 	.wp-social-link-spotify {
 		color: $spotify-color;
+		background: $spotify-logo no-repeat center center;
 	}
 
 	.wp-social-link-tumblr {
 		color: $tumblr-color;
+		background: $tumblr-logo no-repeat center center;
 	}
 
 	.wp-social-link-twitch {
 		color: $twitch-color;
+		background: $twitch-logo no-repeat center center;
 	}
 
 	.wp-social-link-twitter {
 		color: $twitter-color;
-		background: url($twitter-logo) no-repeat center center;
+		background: $twitter-logo no-repeat center center;
 	}
 
 	.wp-social-link-vimeo {
 		color: $vimeo-color;
+		background: $vimeo-logo no-repeat center center;
 	}
 
 	.wp-social-link-vk {
 		color: $vk-color;
+		background: $vk-logo no-repeat center center;
 	}
 
 	.wp-social-link-wordpress {
 		color: $wordpress-color;
-		background: url($wordpress-logo) no-repeat center center;
+		background: $wordpress-logo no-repeat center center;
 	}
 
 	.wp-social-link-yelp {
 		color: $yelp-color;
+		background: $yelp-logo no-repeat center center;
 	}
 
 	.wp-social-link-youtube {
 		color: $youtube-color;
+		background: $youtube-logo no-repeat center center;
 	}
 }
 
