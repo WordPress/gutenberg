@@ -9,6 +9,10 @@
 	}
 	&.wp-block-latest-posts__list {
 		list-style: none;
+
+		li {
+			clear: both;
+		}
 	}
 	&.is-grid {
 		display: flex;
@@ -39,4 +43,23 @@
 .wp-block-latest-posts__post-excerpt {
 	margin-top: $grid-size;
 	margin-bottom: $grid-size-large;
+}
+
+.wp-block-latest-posts__featured-image {
+	img {
+		height: auto;
+		width: auto;
+	}
+	&.alignleft {
+		/*rtl:ignore*/
+		margin-right: 1em;
+	}
+	&.alignright {
+		/*rtl:ignore*/
+		margin-left: 1em;
+	}
+	&.aligncenter {
+		margin-bottom: 1em;
+		text-align: center;
+	}
 }

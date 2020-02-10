@@ -193,9 +193,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		};
 	}
 
-	const gitHubFields = sourceString.match(
-		/^([\w-]+)\/([\w-]+)(?:#([\w-]+))?$/
-	);
+	const gitHubFields = sourceString.match( /^([^\/]+)\/([^#]+)(?:#(.+))?$/ );
 	if ( gitHubFields ) {
 		return {
 			type: 'git',
