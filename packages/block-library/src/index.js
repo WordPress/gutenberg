@@ -142,6 +142,8 @@ export const registerCoreBlocks = () => {
 		search,
 		separator,
 		reusableBlock,
+		socialLinks,
+		socialLink,
 		spacer,
 		subhead,
 		table,
@@ -184,8 +186,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 
 				[
 					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
-					socialLinks,
-					socialLink,
 
 					// Register Full Site Editing Blocks.
 					...( __experimentalEnableFullSiteEditing
