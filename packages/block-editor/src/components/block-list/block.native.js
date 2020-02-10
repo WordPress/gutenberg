@@ -187,7 +187,6 @@ class BlockListBlock extends Component {
 			isValid,
 			order,
 			title,
-			showFloatingToolbar,
 			parentId,
 			isTouchable,
 		} = this.props;
@@ -200,7 +199,7 @@ class BlockListBlock extends Component {
 
 		return (
 			<>
-				{ showFloatingToolbar && (
+				{ isSelected && (
 					<FloatingToolbar>
 						<Toolbar passedStyle={ styles.toolbar }>
 							<ToolbarButton
@@ -275,8 +274,6 @@ export default compose( [
 
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
 
-		const showFloatingToolbar = isSelected;
-
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		const commonAncestor = getLowestCommonAncestorWithSelectedBlock(
@@ -327,7 +324,6 @@ export default compose( [
 			isLastBlock,
 			isSelected,
 			isValid,
-			showFloatingToolbar,
 			parentId,
 			isParentSelected,
 			firstToSelectId,
