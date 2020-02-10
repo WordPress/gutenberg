@@ -170,6 +170,7 @@ describe( 'readConfig', () => {
 					plugins: [
 						'WordPress/gutenberg',
 						'WordPress/gutenberg#master',
+						'WordPress/gutenberg#5.0',
 					],
 				} )
 			)
@@ -188,6 +189,13 @@ describe( 'readConfig', () => {
 					type: 'git',
 					url: 'https://github.com/WordPress/gutenberg.git',
 					ref: 'master',
+					path: expect.stringMatching( /^\/.*gutenberg$/ ),
+					basename: 'gutenberg',
+				},
+				{
+					type: 'git',
+					url: 'https://github.com/WordPress/gutenberg.git',
+					ref: '5.0',
 					path: expect.stringMatching( /^\/.*gutenberg$/ ),
 					basename: 'gutenberg',
 				},
