@@ -580,7 +580,7 @@ function LinkControl( {
 					renderSuggestions={ renderSearchResults }
 					fetchSuggestions={ getSearchHandler }
 					showInitialSuggestions={ showInitialSuggestions }
-					errorMsg={ errorMsg }
+					errorMessage={ errorMessage }
 				/>
 			) }
 
