@@ -21,7 +21,7 @@ export default function save( { attributes } ) {
 		backgroundColor
 	);
 	const textClass = getColorClassName( 'color', textColor );
-	const className = classnames( backgroundClass, {
+	const className = classnames( backgroundClass, textClass, {
 		'has-text-color': textColor || customTextColor,
 		'has-background': backgroundColor || customBackgroundColor,
 	} );

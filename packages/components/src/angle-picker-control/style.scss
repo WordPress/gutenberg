@@ -1,16 +1,16 @@
-.components-angle-picker {
+.components-angle-picker-control {
 	width: 50%;
 	&.components-base-control .components-base-control__label {
 		display: block;
 	}
 }
 
-.components-angle-picker__input-field {
+.components-angle-picker-control__input-field {
 	width: calc(100% - #{$icon-button-size});
 	max-width: 100px;
 }
 
-.components-angle-picker__angle-circle {
+.components-angle-picker-control__angle-circle {
 	width: $icon-button-size - ( 2 * $grid-size-small );
 	height: $icon-button-size - ( 2 * $grid-size-small );
 	border: 2px solid $dark-gray-500;
@@ -20,13 +20,13 @@
 	cursor: grab;
 }
 
-.components-angle-picker__angle-circle-indicator-wrapper {
+.components-angle-picker-control__angle-circle-indicator-wrapper {
 	position: relative;
 	width: 100%;
 	height: 100%;
 }
 
-.components-angle-picker__angle-circle-indicator {
+.components-angle-picker-control__angle-circle-indicator {
 	width: 1px;
 	height: 1px;
 	border-radius: 50%;

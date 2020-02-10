@@ -65,7 +65,7 @@ _Returns_
 
 <a name="createNotice" href="#createNotice">#</a> **createNotice**
 
-Yields action objects used in signalling that a notice is to be created.
+Returns an action object used in signalling that a notice is to be created.
 
 _Parameters_
 
@@ -78,6 +78,10 @@ _Parameters_
 -   _options.type_ `[string]`: Type of notice, one of `default`, or `snackbar`.
 -   _options.speak_ `[boolean]`: Whether the notice content should be announced to screen readers.
 -   _options.actions_ `[Array<WPNoticeAction>]`: User actions to be presented with notice.
+
+_Returns_
+
+-   `Object`: Action object.
 
 <a name="createSuccessNotice" href="#createSuccessNotice">#</a> **createSuccessNotice**
 

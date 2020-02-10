@@ -59,6 +59,7 @@ export class BlockMover extends Component {
 			instanceId,
 			isHidden,
 			rootClientId,
+			hideDragHandle,
 		} = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
@@ -122,21 +123,23 @@ export class BlockMover extends Component {
 					onBlur={ this.onBlur }
 				/>
 
-				<BlockDraggable clientIds={ clientIds }>
-					{ ( { onDraggableStart, onDraggableEnd } ) => (
-						<Button
-							icon={ dragHandle }
-							className="block-editor-block-mover__control-drag-handle block-editor-block-mover__control"
-							aria-hidden="true"
-							// Should not be able to tab to drag handle as this
-							// button can only be used with a pointer device.
-							tabIndex="-1"
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							draggable
-						/>
-					) }
-				</BlockDraggable>
+				{ ! hideDragHandle && (
+					<BlockDraggable clientIds={ clientIds }>
+						{ ( { onDraggableStart, onDraggableEnd } ) => (
+							<Button
+								icon={ dragHandle }
+								className="block-editor-block-mover__control-drag-handle block-editor-block-mover__control"
+								aria-hidden="true"
+								// Should not be able to tab to drag handle as this
+								// button can only be used with a pointer device.
+								tabIndex="-1"
+								onDragStart={ onDraggableStart }
+								onDragEnd={ onDraggableEnd }
+								draggable
+							/>
+						) }
+					</BlockDraggable>
+				) }
 
 				<Button
 					className="block-editor-block-mover__control"

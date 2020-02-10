@@ -86,6 +86,7 @@ var Fragment = wp.element.Fragment;
 var PluginSidebar = wp.editPost.PluginSidebar;
 var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
 var registerPlugin = wp.plugins.registerPlugin;
+var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
 
 function Component() {
 	return el(
@@ -109,15 +110,16 @@ function Component() {
 	);
 }
 registerPlugin( 'plugin-name', {
-	icon: 'smiley',
+	icon: moreIcon,
 	render: Component,
 } );
 ```
 
 ```js
 // Using ESNext syntax
-const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
-const { registerPlugin } = wp.plugins;
+import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+import { registerPlugin } from '@wordpress/plugins';
+import { more } from '@wordpress/icons';
 
 const Component = () => (
 	<>
@@ -136,7 +138,7 @@ const Component = () => (
 );
 
 registerPlugin( 'plugin-name', {
-	icon: 'smiley',
+	icon: more,
 	render: Component,
 } );
 ```

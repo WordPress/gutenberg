@@ -6,13 +6,16 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import AnglePicker from '../';
+import AnglePickerControl from '../';
 
-export default { title: 'Components|AnglePicker', component: AnglePicker };
+export default {
+	title: 'Components|AnglePickerControl',
+	component: AnglePickerControl,
+};
 
 const AnglePickerWithState = () => {
 	const [ angle, setAngle ] = useState();
-	return <AnglePicker value={ angle } onChange={ setAngle } />;
+	return <AnglePickerControl value={ angle } onChange={ setAngle } />;
 };
 
 export const _default = () => {

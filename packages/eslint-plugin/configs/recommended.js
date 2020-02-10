@@ -1,6 +1,7 @@
 module.exports = {
 	extends: [
 		require.resolve( './recommended-with-formatting.js' ),
-		'eslint-config-prettier',
+		'plugin:prettier/recommended',
+		'prettier/react',
 	],
 };
