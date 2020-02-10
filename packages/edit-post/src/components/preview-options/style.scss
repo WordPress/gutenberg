@@ -45,14 +45,13 @@
 }
 
 .editor-post-preview__grouping-external {
-	display: flex;
-	justify-content: space-between;
-	padding: $grid-size-large - 1;
+	position: relative;
 }
 
 .editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external {
-	padding: 0;
+	padding: $grid-size-large - 1;
 	height: auto;
+	display: block;
 
 	&:focus {
 		color: $dark-gray-900;
@@ -67,6 +66,12 @@
 		box-shadow: none;
 		background: $light-gray-200;
 	}
+}
+
+.editor-post-preview__icon-external {
+	position: absolute;
+	right: $grid-size-large - 1;
+	top: $grid-size-large - 2;
 }
 
 @include break-small() {

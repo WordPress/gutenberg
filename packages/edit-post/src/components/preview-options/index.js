@@ -103,7 +103,7 @@ export default function PreviewOptions( {
 								forcePreviewLink={ forcePreviewLink }
 								textContent={ __( 'Preview externally' ) }
 							/>
-							<Icon icon="external" />
+							<Icon icon="external" className="editor-post-preview__icon-external" />
 						</div>
 					</MenuGroup>
 				</>

@@ -2,7 +2,7 @@
 	position: relative;
 	padding-top: 50px;
 	// Default background color so that grey .edit-post-editor-regions__content color doesn't show through.
-	background-color: #fff;
+	background-color: $white;
 
 	& .components-button {
 		font-family: $default-font;
