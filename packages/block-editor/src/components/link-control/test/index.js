@@ -559,9 +559,6 @@ describe( 'Default search suggestions', () => {
 			'[role="listbox"] [role="option"]'
 		);
 
-		// Grab the reset button now it's available
-		const resetUI = container.querySelector( '[aria-label="Reset"]' );
-
 		act( () => {
 			Simulate.change( searchInput, {
 				target: { value: '' },
