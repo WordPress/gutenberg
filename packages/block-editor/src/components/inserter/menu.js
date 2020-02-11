@@ -20,12 +20,8 @@ import classnames from 'classnames';
  */
 import { speak } from '@wordpress/a11y';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import {
-	Component,
-	__experimentalCreateInterpolateElement,
-	createRef,
-} from '@wordpress/element';
-import { PanelBody, withSpokenMessages, Tip } from '@wordpress/components';
+import { Component, createRef } from '@wordpress/element';
+import { PanelBody, withSpokenMessages } from '@wordpress/components';
 import {
 	isReusableBlock,
 	createBlock,
@@ -45,6 +41,7 @@ import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import BlockCard from '../block-card';
 import ChildBlocks from './child-blocks';
+import Tips from './tips';
 import __experimentalInserterMenuExtension from '../inserter-menu-extension';
 import { searchItems } from './search-items';
 
@@ -537,14 +534,7 @@ export class InserterMenu extends Component {
 										) }
 									</p>
 								</div>
-								<Tip>
-									{ __experimentalCreateInterpolateElement(
-										__(
-											'While writing, you can press <kbd>/</kbd> to quickly insert new blocks.'
-										),
-										{ kbd: <kbd /> }
-									) }
-								</Tip>
+								<Tips />
 							</div>
 						) }
 					</div>
