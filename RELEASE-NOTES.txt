@@ -1,3 +1,7 @@
+1.23.0
+------
+* New block: Group
+
 1.22.0
 ------
 * Add support for changing images size in Gallery block
