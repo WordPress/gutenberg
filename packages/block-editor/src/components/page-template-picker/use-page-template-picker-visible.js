@@ -13,7 +13,7 @@ const __experimentalUsePageTemplatePickerVisible = () => {
 		);
 
 		const isPageTemplatesEnabled = getSettings()
-			.__experimentalEnablePageTemplates;
+			.__mobileEnablePageTemplates;
 
 		const blocks = getBlockOrder();
 		const isEmptyBlockList = blocks.length === 0;
