@@ -92,7 +92,6 @@ export class BlockList extends Component {
 		const {
 			clearSelectedBlock,
 			blockClientIds,
-			isFullyBordered,
 			title,
 			header,
 			withFooter = true,
@@ -116,7 +115,6 @@ export class BlockList extends Component {
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					data={ blockClientIds }
-					extraData={ [ isFullyBordered ] }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={
@@ -166,7 +164,6 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
-						isSmallScreen={ ! this.props.isFullyBordered }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (
