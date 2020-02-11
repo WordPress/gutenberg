@@ -73,7 +73,7 @@ function gutenberg_experimental_global_styles_get_from_file( $global_styles_path
 function gutenberg_experimental_global_styles_get_user() {
 	$global_styles = array();
 	$user_cpt      = gutenberg_experimental_global_styles_get_user_cpt( array( 'publish' ) );
-	if ( in_array( 'post_content', $user_cpt, true ) ) {
+	if ( array_key_exists( 'post_content', $user_cpt ) ) {
 		$decoded_data = json_decode( $user_cpt['post_content'], true );
 		if ( is_array( $decoded_data ) ) {
 			$global_styles = $decoded_data;
@@ -97,7 +97,7 @@ function gutenberg_experimental_global_styles_get_user() {
 function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter = array( 'publish' ), $should_create_draft = false ) {
 	$user_cpt         = array();
 	$post_type_filter = 'wp_global_styles';
-	$post_name_filter = 'wp-global-styles-' . strtolower( wp_get_theme()->get( 'Name' ) );
+	$post_name_filter = 'wp-global-styles-' . strtolower( wp_get_theme()->get( 'TextDomain' ) );
 	$recent_posts     = wp_get_recent_posts(
 		array(
 			'numberposts' => 1,
