@@ -204,7 +204,7 @@ const isSpecificPostModeActive = ( { specificMode, specificPosts } ) =>
 const queryCriteriaFromAttributes = ( criteria ) => {
 	const {
 		per_page: perPage,
-		authors,
+		author,
 		categories,
 		tags,
 		specificPosts,
@@ -219,7 +219,7 @@ const queryCriteriaFromAttributes = ( criteria ) => {
 			: {
 					per_page: perPage,
 					categories,
-					author: authors,
+					author,
 					tags,
 			  },
 		( value ) => ! isUndefined( value )
