@@ -569,14 +569,11 @@ function LinkControl( {
 					</div>
 				</Fragment>
 			) }
-
-			{ ! isEditingLink && ! isResolvingLink && (
-				<LinkControlSettingsDrawer
-					value={ value }
-					settings={ settings }
-					onChange={ onChange }
-				/>
-			) }
+			<LinkControlSettingsDrawer
+				value={ value }
+				settings={ settings }
+				onChange={ onChange }
+			/>
 		</div>
 	);
 }
