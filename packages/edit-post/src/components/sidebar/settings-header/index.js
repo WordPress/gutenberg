@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 
@@ -9,19 +10,25 @@ import { withDispatch } from '@wordpress/data';
  */
 import SidebarHeader from '../sidebar-header';
 
-const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName } ) => {
+const SettingsHeader = ( {
+	openDocumentSettings,
+	openBlockSettings,
+	sidebarName,
+} ) => {
 	const blockLabel = __( 'Block' );
-	const [ documentAriaLabel, documentActiveClass ] = sidebarName === 'edit-post/document' ?
-		// translators: ARIA label for the Document sidebar tab, selected.
-		[ __( 'Document (selected)' ), 'is-active' ] :
-		// translators: ARIA label for the Document sidebar tab, not selected.
-		[ __( 'Document' ), '' ];
+	const [ documentAriaLabel, documentActiveClass ] =
+		sidebarName === 'edit-post/document'
+			? // translators: ARIA label for the Document sidebar tab, selected.
+			  [ __( 'Document (selected)' ), 'is-active' ]
+			: // translators: ARIA label for the Document sidebar tab, not selected.
+			  [ __( 'Document' ), '' ];
 
-	const [ blockAriaLabel, blockActiveClass ] = sidebarName === 'edit-post/block' ?
-		// translators: ARIA label for the Settings Sidebar tab, selected.
-		[ __( 'Block (selected)' ), 'is-active' ] :
-		// translators: ARIA label for the Settings Sidebar tab, not selected.
-		[ __( 'Block' ), '' ];
+	const [ blockAriaLabel, blockActiveClass ] =
+		sidebarName === 'edit-post/block'
+			? // translators: ARIA label for the Settings Sidebar tab, selected.
+			  [ __( 'Block (selected)' ), 'is-active' ]
+			: // translators: ARIA label for the Settings Sidebar tab, not selected.
+			  [ __( 'Block' ), '' ];
 
 	return (
 		<SidebarHeader
@@ -31,24 +38,24 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 			{ /* Use a list so screen readers will announce how many tabs there are. */ }
 			<ul>
 				<li>
-					<button
+					<Button
 						onClick={ openDocumentSettings }
 						className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
 						aria-label={ documentAriaLabel }
 						data-label={ __( 'Document' ) }
 					>
 						{ __( 'Document' ) }
-					</button>
+					</Button>
 				</li>
 				<li>
-					<button
+					<Button
 						onClick={ openBlockSettings }
 						className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
 						aria-label={ blockAriaLabel }
 						data-label={ blockLabel }
 					>
 						{ blockLabel }
-					</button>
+					</Button>
 				</li>
 			</ul>
 		</SidebarHeader>
@@ -57,11 +64,9 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 
 export default withDispatch( ( dispatch ) => {
 	const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-	const { clearSelectedBlock } = dispatch( 'core/block-editor' );
 	return {
 		openDocumentSettings() {
 			openGeneralSidebar( 'edit-post/document' );
-			clearSelectedBlock();
 		},
 		openBlockSettings() {
 			openGeneralSidebar( 'edit-post/block' );

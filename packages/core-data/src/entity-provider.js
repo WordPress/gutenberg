@@ -1,8 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useContext, useCallback } from '@wordpress/element';
+import {
+	createContext,
+	useContext,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { parse, serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -53,6 +59,17 @@ export default function EntityProvider( { kind, type, id, children } ) {
 }
 
 /**
+ * Hook that returns the ID for the nearest
+ * provided entity of the specified type.
+ *
+ * @param {string} kind The entity kind.
+ * @param {string} type The entity type.
+ */
+export function useEntityId( kind, type ) {
+	return useContext( getEntity( kind, type ).context );
+}
+
+/**
  * Hook that returns the value and a setter for the
  * specified property of the nearest provided
  * entity of the specified type.
@@ -66,11 +83,13 @@ export default function EntityProvider( { kind, type, id, children } ) {
  *                          setter.
  */
 export function useEntityProp( kind, type, prop ) {
-	const id = useContext( getEntity( kind, type ).context );
+	const id = useEntityId( kind, type );
 
 	const value = useSelect(
 		( select ) => {
-			const entity = select( 'core' ).getEditedEntityRecord( kind, type, id );
+			const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
+			getEntityRecord( kind, type, id ); // Trigger resolver.
+			const entity = getEditedEntityRecord( kind, type, id );
 			return entity && entity[ prop ];
 		},
 		[ kind, type, id, prop ]
@@ -87,4 +106,66 @@ export function useEntityProp( kind, type, prop ) {
 	);
 
 	return [ value, setValue ];
+}
+
+/**
+ * Hook that returns block content getters and setters for
+ * the nearest provided entity of the specified type.
+ *
+ * The return value has the shape `[ blocks, onInput, onChange ]`.
+ * `onInput` is for block changes that don't create undo levels
+ * or dirty the post, non-persistent changes, and `onChange` is for
+ * peristent changes. They map directly to the props of a
+ * `BlockEditorProvider` and are intended to be used with it,
+ * or similar components or hooks.
+ *
+ * @param {string} kind                            The entity kind.
+ * @param {string} type                            The entity type.
+ * @param {Object} options
+ * @param {Object} [options.initialEdits]          Initial edits object for the entity record.
+ * @param {string} [options.blocksProp='blocks']   The name of the entity prop that holds the blocks array.
+ * @param {string} [options.contentProp='content'] The name of the entity prop that holds the serialized blocks.
+ *
+ * @return {[WPBlock[], Function, Function]} The block array and setters.
+ */
+export function useEntityBlockEditor(
+	kind,
+	type,
+	{ initialEdits, blocksProp = 'blocks', contentProp = 'content' } = {}
+) {
+	const [ content, setContent ] = useEntityProp( kind, type, contentProp );
+
+	const { editEntityRecord } = useDispatch( 'core' );
+	const id = useEntityId( kind, type );
+	const initialBlocks = useMemo( () => {
+		if ( initialEdits ) {
+			editEntityRecord( kind, type, id, initialEdits, {
+				undoIgnore: true,
+			} );
+		}
+
+		// Guard against other instances that might have
+		// set content to a function already.
+		if ( typeof content !== 'function' ) {
+			const parsedContent = parse( content );
+			return parsedContent.length ? parsedContent : [];
+		}
+	}, [ id ] ); // Reset when the provided entity record changes.
+	const [ blocks = initialBlocks, onInput ] = useEntityProp(
+		kind,
+		type,
+		blocksProp
+	);
+
+	const onChange = useCallback(
+		( nextBlocks ) => {
+			onInput( nextBlocks );
+			// Use a function edit to avoid serializing often.
+			setContent( ( { blocks: blocksToSerialize } ) =>
+				serialize( blocksToSerialize )
+			);
+		},
+		[ onInput, setContent ]
+	);
+	return [ blocks, onInput, onChange ];
 }

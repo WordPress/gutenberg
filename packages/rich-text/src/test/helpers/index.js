@@ -4,7 +4,7 @@
 import { ZWNBSP } from '../../special-characters';
 
 export function getSparseArrayLength( array ) {
-	return array.reduce( ( i ) => i + 1, 0 );
+	return array.reduce( ( accumulator ) => accumulator + 1, 0 );
 }
 
 const em = { type: 'em' };
@@ -181,7 +181,12 @@ export const spec = [
 		record: {
 			start: 0,
 			end: 4,
-			formats: [ [ em, strong ], [ em, strong ], [ em, strong ], [ em, strong ] ],
+			formats: [
+				[ em, strong ],
+				[ em, strong ],
+				[ em, strong ],
+				[ em, strong ],
+			],
 			replacements: [ , , , , ],
 			text: 'test',
 		},
@@ -439,7 +444,8 @@ export const spec = [
 		description: 'should handle multiline list value',
 		multilineTag: 'li',
 		multilineWrapperTags: [ 'ul', 'ol' ],
-		html: '<li>one<ul><li>a</li><li>b<ol><li>1</li><li>2</li></ol></li></ul></li><li>three</li>',
+		html:
+			'<li>one<ul><li>a</li><li>b<ol><li>1</li><li>2</li></ol></li></ul></li><li>three</li>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
 			startContainer: element,
@@ -452,7 +458,25 @@ export const spec = [
 			start: 0,
 			end: 9,
 			formats: [ , , , , , , , , , , , , , , , , , ],
-			replacements: [ , , , [ ul ], , [ ul ], , [ ul, ol ], , [ ul, ol ], , , , , , , , ],
+			replacements: [
+				,
+				,
+				,
+				[ ul ],
+				,
+				[ ul ],
+				,
+				[ ul, ol ],
+				,
+				[ ul, ol ],
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+			],
 			text: 'one\u2028a\u2028b\u20281\u20282\u2028three',
 		},
 	},
@@ -609,6 +633,50 @@ export const spec = [
 			text: 'test',
 		},
 	},
+	{
+		description: 'should not error with overlapping formats (1)',
+		html: '<a href="#"><em>1</em><strong>2</strong></a>',
+		createRange: ( element ) => ( {
+			startOffset: 1,
+			startContainer: element.firstChild,
+			endOffset: 1,
+			endContainer: element.firstChild,
+		} ),
+		startPath: [ 0, 0, 0, 1 ],
+		endPath: [ 0, 0, 0, 1 ],
+		record: {
+			start: 1,
+			end: 1,
+			formats: [
+				[ a, em ],
+				[ a, strong ],
+			],
+			replacements: [ , , ],
+			text: '12',
+		},
+	},
+	{
+		description: 'should not error with overlapping formats (2)',
+		html: '<em><a href="#">1</a></em><strong><a href="#">2</a></strong>',
+		createRange: ( element ) => ( {
+			startOffset: 1,
+			startContainer: element.firstChild,
+			endOffset: 1,
+			endContainer: element.firstChild,
+		} ),
+		startPath: [ 0, 0, 0, 1 ],
+		endPath: [ 0, 0, 0, 1 ],
+		record: {
+			start: 1,
+			end: 1,
+			formats: [
+				[ em, a ],
+				[ strong, a ],
+			],
+			replacements: [ , , ],
+			text: '12',
+		},
+	},
 ];
 
 export const specWithRegistration = [
@@ -623,11 +691,15 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'my-plugin/link',
-				attributes: {},
-				unregisteredAttributes: {},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'my-plugin/link',
+						attributes: {},
+						unregisteredAttributes: {},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -643,13 +715,17 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format test">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'my-plugin/link',
-				attributes: {},
-				unregisteredAttributes: {
-					class: 'test',
-				},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'my-plugin/link',
+						attributes: {},
+						unregisteredAttributes: {
+							class: 'test',
+						},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -665,13 +741,17 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'core/link',
-				attributes: {},
-				unregisteredAttributes: {
-					class: 'custom-format',
-				},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'core/link',
+						attributes: {},
+						unregisteredAttributes: {
+							class: 'custom-format',
+						},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -680,12 +760,16 @@ export const specWithRegistration = [
 		description: 'should create fallback format',
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'a',
-				attributes: {
-					class: 'custom-format',
-				},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'a',
+						attributes: {
+							class: 'custom-format',
+						},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -709,7 +793,8 @@ export const specWithRegistration = [
 		noToHTMLString: true,
 	},
 	{
-		description: 'should create format if editable tree only but changes need to be recorded',
+		description:
+			'should create format if editable tree only but changes need to be recorded',
 		formatName: 'my-plugin/link',
 		formatType: {
 			title: 'Custom Link',
@@ -721,11 +806,15 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'my-plugin/link',
-				attributes: {},
-				unregisteredAttributes: {},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'my-plugin/link',
+						attributes: {},
+						unregisteredAttributes: {},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},

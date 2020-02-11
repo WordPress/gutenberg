@@ -4,15 +4,17 @@ $title-height: 32;
 
 .htmlView {
 	font-family: $htmlFont;
-	background-color: $backgroundColor;
 	padding-left: $padding;
 	padding-right: $padding;
 	padding-bottom: $title-height + $padding;
 }
 
+.htmlViewDark {
+	color: $textColorDark;
+}
+
 .htmlViewTitle {
 	font-family: $htmlFont;
-	background-color: $backgroundColor;
 	padding-left: $padding;
 	padding-right: $padding;
 	padding-top: $padding;

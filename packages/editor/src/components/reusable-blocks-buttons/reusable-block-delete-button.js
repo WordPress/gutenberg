@@ -11,20 +11,24 @@ import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { close } from '@wordpress/icons';
 
-export function ReusableBlockDeleteButton( { isVisible, isDisabled, onDelete } ) {
+export function ReusableBlockDeleteButton( {
+	isVisible,
+	isDisabled,
+	onDelete,
+} ) {
 	if ( ! isVisible ) {
 		return null;
 	}
 
 	return (
 		<MenuItem
-			className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-			icon="no"
+			icon={ close }
 			disabled={ isDisabled }
 			onClick={ () => onDelete() }
 		>
-			{ __( 'Remove from Reusable Blocks' ) }
+			{ __( 'Remove from Reusable blocks' ) }
 		</MenuItem>
 	);
 }
@@ -33,15 +37,20 @@ export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlock } = select( 'core/block-editor' );
 		const { canUser } = select( 'core' );
-		const { __experimentalGetReusableBlock: getReusableBlock } = select( 'core/editor' );
+		const { __experimentalGetReusableBlock: getReusableBlock } = select(
+			'core/editor'
+		);
 		const block = getBlock( clientId );
 
-		const reusableBlock = block && isReusableBlock( block ) ?
-			getReusableBlock( block.attributes.ref ) :
-			null;
+		const reusableBlock =
+			block && isReusableBlock( block )
+				? getReusableBlock( block.attributes.ref )
+				: null;
 
 		return {
-			isVisible: !! reusableBlock && !! canUser( 'delete', 'blocks', reusableBlock.id ),
+			isVisible:
+				!! reusableBlock &&
+				!! canUser( 'delete', 'blocks', reusableBlock.id ),
 			isDisabled: reusableBlock && reusableBlock.isTemporary,
 		};
 	} ),
@@ -55,10 +64,12 @@ export default compose( [
 			onDelete() {
 				// TODO: Make this a <Confirm /> component or similar
 				// eslint-disable-next-line no-alert
-				const hasConfirmed = window.confirm( __(
-					'Are you sure you want to delete this Reusable Block?\n\n' +
-					'It will be permanently removed from all posts and pages that use it.'
-				) );
+				const hasConfirmed = window.confirm(
+					__(
+						'Are you sure you want to delete this Reusable Block?\n\n' +
+							'It will be permanently removed from all posts and pages that use it.'
+					)
+				);
 
 				if ( hasConfirmed ) {
 					const block = getBlock( clientId );

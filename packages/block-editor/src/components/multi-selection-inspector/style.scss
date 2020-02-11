@@ -1,8 +1,7 @@
 .block-editor-multi-selection-inspector__card {
 	display: flex;
 	align-items: flex-start;
-	margin: -16px;
-	padding: 16px;
+	padding: $grid-size-large;
 }
 
 .block-editor-multi-selection-inspector__card-content {

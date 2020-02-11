@@ -6,8 +6,11 @@ import { mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import {
+	createHigherOrderComponent,
+	pure,
+	useViewportMatch,
+} from '@wordpress/compose';
 
 /**
  * Higher-order component creator, creating a new component which renders with
@@ -32,13 +35,26 @@ import { withSelect } from '@wordpress/data';
  *
  * @return {Function} Higher-order component.
  */
-const withViewportMatch = ( queries ) => createHigherOrderComponent(
-	withSelect( ( select ) => {
-		return mapValues( queries, ( query ) => {
-			return select( 'core/viewport' ).isViewportMatch( query );
+const withViewportMatch = ( queries ) => {
+	const useViewPortQueriesResult = () =>
+		mapValues( queries, ( query ) => {
+			let [ operator, breakpointName ] = query.split( ' ' );
+			if ( breakpointName === undefined ) {
+				breakpointName = operator;
+				operator = '>=';
+			}
+			// Hooks should unconditionally execute in the same order,
+			// we are respecting that as from the static query of the HOC we generate
+			// a hook that calls other hooks always in the same order (because the query never changes).
+			// eslint-disable-next-line react-hooks/rules-of-hooks
+			return useViewportMatch( breakpointName, operator );
 		} );
-	} ),
-	'withViewportMatch'
-);
+	return createHigherOrderComponent( ( WrappedComponent ) => {
+		return pure( ( props ) => {
+			const queriesResult = useViewPortQueriesResult();
+			return <WrappedComponent { ...props } { ...queriesResult } />;
+		} );
+	}, 'withViewportMatch' );
+};
 
 export default withViewportMatch;

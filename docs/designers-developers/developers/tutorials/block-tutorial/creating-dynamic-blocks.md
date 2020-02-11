@@ -18,31 +18,59 @@ Block attributes can be used for any content or setting you want to save for tha
 The following code example shows how to create a dynamic block that shows only the last post as a link.
 
 {% codetabs %}
+{% ESNext %}
+```jsx
+import { registerBlockType } from '@wordpress/blocks';
+import { withSelect } from '@wordpress/data';
+
+registerBlockType( 'gutenberg-examples/example-dynamic', {
+	title: 'Example: last post',
+	icon: 'megaphone',
+	category: 'widgets',
+
+	edit: withSelect( ( select ) => {
+		return {
+			posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
+		};
+	} )( ( { posts, className } ) => {
+		if ( ! posts ) {
+			return 'Loading...';
+		}
+
+		if ( posts && posts.length === 0 ) {
+			return 'No posts';
+		}
+
+		const post = posts[ 0 ];
+
+		return <a className={ className } href={ post.link }>
+			{ post.title.rendered }
+		</a>;
+	} ),
+} );
+```
 {% ES5 %}
 ```js
 ( function( blocks, element, data ) {
-
 	var el = element.createElement,
-	registerBlockType = blocks.registerBlockType,
-	withSelect = data.withSelect;
+		registerBlockType = blocks.registerBlockType,
+		withSelect = data.withSelect;
 
-	registerBlockType( 'gutenberg-examples/example-05-dynamic', {
+	registerBlockType( 'gutenberg-examples/example-dynamic', {
 		title: 'Example: last post',
 		icon: 'megaphone',
 		category: 'widgets',
-		
 		edit: withSelect( function( select ) {
 			return {
-				posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
+				posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
 			};
 		} )( function( props ) {
-
 			if ( ! props.posts ) {
-				return "Loading...";
+				return 'Loading...';
 			}
 
 			if ( props.posts.length === 0 ) {
-				return "No posts";
+				return 'No posts';
 			}
 			var className = props.className;
 			var post = props.posts[ 0 ];
@@ -60,38 +88,6 @@ The following code example shows how to create a dynamic block that shows only t
 	window.wp.data,
 ) );
 ```
-{% ESNext %}
-```js
-import { registerBlockType } from '@wordpress/blocks';
-import { withSelect } from '@wordpress/data';
-
-registerBlockType( 'gutenberg-examples/example-05-dynamic', {
-	title: 'Example: last post',
-	icon: 'megaphone',
-	category: 'widgets',
-
-	edit: withSelect( ( select ) => {
-		return {
-			posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
-		};
-	} )( ( { posts, className } ) => {
-
-		if ( ! posts ) {
-			return 'Loading...';
-		}
-
-		if ( posts && posts.length === 0 ) {
-			return 'No posts';
-		}
-
-		let post = posts[ 0 ];
-
-		return <a className={ className } href={ post.link }>
-			{ post.title.rendered }
-		</a>;
-	} ),
-} );
-```
 {% end %}
 
 Because it is a dynamic block it doesn't need to override the default `save` implementation on the client. Instead, it needs a server component. The contents in the front of your site depend on the function called by the `render_callback` property of `register_block_type`.
@@ -99,11 +95,11 @@ Because it is a dynamic block it doesn't need to override the default `save` imp
 ```php
 <?php
 
-/*
-Plugin Name: Gutenberg examples 05
-*/
+/**
+ * Plugin Name: Gutenberg examples dynamic
+ */
 
-function gutenberg_examples_05_dynamic_render_callback( $attributes, $content ) {
+function gutenberg_examples_dynamic_render_callback( $attributes, $content ) {
 	$recent_posts = wp_get_recent_posts( array(
 		'numberposts' => 1,
 		'post_status' => 'publish',
@@ -120,20 +116,24 @@ function gutenberg_examples_05_dynamic_render_callback( $attributes, $content ) 
 	);
 }
 
-function gutenberg_examples_05_dynamic() {
+function gutenberg_examples_dynamic() {
+	// automatically load dependencies and version
+	$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');
+
 	wp_register_script(
-		'gutenberg-examples-05',
-		plugins_url( 'block.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element', 'wp-data' )
+		'gutenberg-examples-dynamic',
+		plugins_url( 'build/block.js', __FILE__ ),
+		$asset_file['dependencies'],
+		$asset_file['version']
 	);
 
-	register_block_type( 'gutenberg-examples/example-05-dynamic', array(
-		'editor_script' => 'gutenberg-examples-05',
-		'render_callback' => 'gutenberg_examples_05_dynamic_render_callback'
+	register_block_type( 'gutenberg-examples/example-dynamic', array(
+		'editor_script' => 'gutenberg-examples-dynamic',
+		'render_callback' => 'gutenberg_examples_dynamic_render_callback'
 	) );
 
 }
-add_action( 'init', 'gutenberg_examples_05_dynamic' );
+add_action( 'init', 'gutenberg_examples_dynamic' );
 
 ```
 
@@ -150,41 +150,12 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-s
 *Server-side render is meant as a fallback; client-side rendering in JavaScript is always preferred (client rendering is faster and allows better editor manipulation).*
 
 {% codetabs %}
-{% ES5 %}
-```js
-( function( blocks, element, components ) {
-
-	var el = element.createElement,
-	registerBlockType = blocks.registerBlockType,
-	ServerSideRender = components.ServerSideRender;
-
-	registerBlockType( 'gutenberg-examples/example-05-dynamic', {
-		title: 'Example: last post',
-		icon: 'megaphone',
-		category: 'widgets',
-
-		edit: function( props ) {
-
-			return (
-				el(ServerSideRender, {
-					block: "gutenberg-examples/example-05-dynamic",
-					attributes: props.attributes
-				} )
-			);
-		},
-	} );
-}(
-	window.wp.blocks,
-	window.wp.element,
-	window.wp.components,
-) );
-```
 {% ESNext %}
-```js
+```jsx
 import { registerBlockType } from '@wordpress/blocks';
-import { ServerSideRender } from '@wordpress/components';
+import ServerSideRender from '@wordpress/server-side-render';
 
-registerBlockType( 'gutenberg-examples/example-05-dynamic', {
+registerBlockType( 'gutenberg-examples/example-dynamic', {
 	title: 'Example: last post',
 	icon: 'megaphone',
 	category: 'widgets',
@@ -192,13 +163,40 @@ registerBlockType( 'gutenberg-examples/example-05-dynamic', {
 	edit: function( props ) {
 		return (
 			<ServerSideRender
-				block="gutenberg-examples/example-05-dynamic"
+				block="gutenberg-examples/example-dynamic"
 				attributes={ props.attributes }
 			/>
 		);
 	},
 } );
 ```
+{% ES5 %}
+```js
+( function( blocks, element, serverSideRender ) {
+	var el = element.createElement,
+		registerBlockType = blocks.registerBlockType,
+		ServerSideRender = serverSideRender;
+
+	registerBlockType( 'gutenberg-examples/example-dynamic', {
+		title: 'Example: last post',
+		icon: 'megaphone',
+		category: 'widgets',
+
+		edit: function( props ) {
+			return (
+				el( ServerSideRender, {
+					block: 'gutenberg-examples/example-dynamic',
+					attributes: props.attributes,
+				} )
+			);
+		},
+	} );
+}(
+	window.wp.blocks,
+	window.wp.element,
+	window.wp.serverSideRender,
+) );
+```
 {% end %}
 
-Note that this code uses the `wp-components` package but not `wp-data`. Make sure to update the dependencies in the PHP code. You can use wp-scripts and ESNext setup for auto dependencies (see the [gutenberg-examples repo](https://github.com/WordPress/gutenberg-examples/tree/master/01-basic-esnext) for PHP code setup).
+Note that this code uses the `wp-server-side-render` package but not `wp-data`. Make sure to update the dependencies in the PHP code. You can use wp-scripts and ESNext setup for auto dependencies (see the [gutenberg-examples repo](https://github.com/WordPress/gutenberg-examples/tree/master/01-basic-esnext) for PHP code setup).

@@ -1,0 +1,333 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`List can be converted to a quote 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>one</p><p>two</p></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`List can be converted to paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p>one</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>two</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List can be converted when nested to paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p>one</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>two</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List can be created by converting a paragraph 1`] = `
+"<!-- wp:list -->
+<ul><li>test</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List can be created by converting a paragraph with line breaks 1`] = `
+"<!-- wp:list -->
+<ul><li>one</li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List can be created by converting a quote 1`] = `
+"<!-- wp:list -->
+<ul><li>one</li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List can be created by converting multiple paragraphs 1`] = `
+"<!-- wp:list -->
+<ul><li>one</li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List can be created by typing "/list" 1`] = `
+"<!-- wp:list -->
+<ul><li>I’m a list</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List can be created by typing an asterisk in front of text of a paragraph block 1`] = `
+"<!-- wp:list -->
+<ul><li>test</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List can be created by using a number at the start of a paragraph block 1`] = `
+"<!-- wp:list {\\"ordered\\":true} -->
+<ol><li>A list item</li></ol>
+<!-- /wp:list -->"
+`;
+
+exports[`List can be created by using an asterisk at the start of a paragraph block 1`] = `
+"<!-- wp:list -->
+<ul><li>A list item</li><li>Another list item</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List can undo asterisk transform 1`] = `
+"<!-- wp:paragraph -->
+<p>1. </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List first empty list item is graciously removed 1`] = `
+"<!-- wp:list -->
+<ul><li>2</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should be immeadiately saved on indentation 1`] = `
+"<!-- wp:list -->
+<ul><li>one<ul><li></li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should change the base list type 1`] = `
+"<!-- wp:list {\\"ordered\\":true} -->
+<ol><li></li></ol>
+<!-- /wp:list -->"
+`;
+
+exports[`List should change the indented list type 1`] = `
+"<!-- wp:list -->
+<ul><li>a<ol><li>1</li></ol></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 1`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>a<ul><li>i</li></ul></li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 2`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>a</li><li></li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 3`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>a</li></ul></li><li></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 4`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>a</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 5`] = `
+"<!-- wp:list -->
+<ul><li>1</li><li></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 6`] = `
+"<!-- wp:list -->
+<ul><li>1</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 7`] = `""`;
+
+exports[`List should create paragraph on split at end and merge back with content 1`] = `
+"<!-- wp:list -->
+<ul><li>one</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should create paragraph on split at end and merge back with content 2`] = `
+"<!-- wp:list -->
+<ul><li>one</li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 1 1`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 1 2`] = `
+"<!-- wp:list -->
+<ul><li>a</li><li>1</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 2 1`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1<ul><li>i</li></ul></li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 2 2`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1</li><li>i</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 2 3`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1</li></ul></li><li>i</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should insert a line break on shift+enter 1`] = `
+"<!-- wp:list -->
+<ul><li>a<br></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should insert a line break on shift+enter in a non trailing list item 1`] = `
+"<!-- wp:list -->
+<ul><li>a</li><li>b<br></li><li>c</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should not indent list on space with modifier 1`] = `
+"<!-- wp:list -->
+<ul><li>1</li><li> </li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should not transform lines in block when transforming multiple blocks 1`] = `
+"<!-- wp:list -->
+<ul><li>one<br>...</li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should not undo asterisk transform with backspace after selection change 1`] = `""`;
+
+exports[`List should not undo asterisk transform with backspace after typing 1`] = `""`;
+
+exports[`List should only convert to list when shortcut ends with space 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should outdent with children 1`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>b<ul><li>c</li></ul></li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should outdent with children 2`] = `
+"<!-- wp:list -->
+<ul><li>a</li><li>b<ul><li>c</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should place the caret in the right place with nested list 1`] = `
+"<!-- wp:list -->
+<ul><li>1</li><li>2<ul><li>a</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should preserve indentation after merging backward and forward 1`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>2</li><li>3</li></ul></li><li></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should preserve indentation after merging backward and forward 2`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>2</li><li>3</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should split indented list item 1`] = `
+"<!-- wp:list -->
+<ul><li>one<ul><li>two</li><li>three</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should split into two ordered lists with paragraph 1`] = `
+"<!-- wp:list {\\"ordered\\":true} -->
+<ol><li>one</li></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {\\"ordered\\":true} -->
+<ol><li>two</li></ol>
+<!-- /wp:list -->"
+`;
+
+exports[`List should split into two with paragraph and merge lists 1`] = `
+"<!-- wp:list -->
+<ul><li>one</li><li></li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should split into two with paragraph and merge lists 2`] = `
+"<!-- wp:list -->
+<ul><li>one</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should split into two with paragraph and merge lists 3`] = `
+"<!-- wp:list -->
+<ul><li>one</li><li></li></ul>
+<!-- /wp:list -->
+
+<!-- wp:list -->
+<ul><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should undo asterisk transform with backspace 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should undo asterisk transform with backspace after mouse move 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should undo asterisk transform with backspace after selection changes 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should undo asterisk transform with backspace after selection changes without requestIdleCallback 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should undo asterisk transform with escape 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;

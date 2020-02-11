@@ -32,7 +32,7 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  *
  * @param {Object} props Component properties.
  * @param {string} [props.href] When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
- * @param {string|Element} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
+ * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
  * @param {Function} [props.onClick=noop] The callback function to be executed when the user clicks the menu item.
  * @param {...*} [props.other] Any additional props are passed through to the underlying [MenuItem](/packages/components/src/menu-item/README.md) component.
  *
@@ -41,6 +41,7 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
  * var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
+ * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
  *
  * function onButtonClick() {
  * 	alert( 'Button clicked.' );
@@ -50,19 +51,20 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  * 	return wp.element.createElement(
  * 		PluginMoreMenuItem,
  * 		{
- * 			icon: 'smiley',
- * 			onClick: onButtonClick
+ * 			icon: moreIcon,
+ * 			onClick: onButtonClick,
  * 		},
  * 		__( 'My button title' )
- * 	)
+ * 	);
  * }
  * ```
  *
  * @example <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PluginMoreMenuItem } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginMoreMenuItem } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * function onButtonClick() {
  * 	alert( 'Button clicked.' );
@@ -70,7 +72,7 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  *
  * const MyButtonMoreMenuItem = () => (
  * 	<PluginMoreMenuItem
- * 		icon="smiley"
+ * 		icon={ more }
  * 		onClick={ onButtonClick }
  * 	>
  * 		{ __( 'My button title' ) }
@@ -78,12 +80,12 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  * );
  * ```
  *
- * @return {WPElement} The element to be rendered.
+ * @return {WPComponent} The component to be rendered.
  */
 export default compose(
 	withPluginContext( ( context, ownProps ) => {
 		return {
 			icon: ownProps.icon || context.icon,
 		};
-	} ),
+	} )
 )( PluginMoreMenuItem );

@@ -56,17 +56,17 @@ const MyNavigableContainer = () => (
 	<div>
 		<span>Navigable Menu:</span>
 		<NavigableMenu onNavigate={ onNavigate } orientation="horizontal">
-			<Button isDefault>Item 1</Button>
-			<Button isDefault>Item 2</Button>
-			<Button isDefault>Item 3</Button>
+			<Button isSecondary>Item 1</Button>
+			<Button isSecondary>Item 2</Button>
+			<Button isSecondary>Item 3</Button>
 		</NavigableMenu>
 		
 		<span>Tabbable Container:</span>
 		<TabbableContainer onNavigate={ onNavigate }>
-			<Button isDefault tabIndex="0">Section 1</Button>
-			<Button isDefault tabIndex="0">Section 2</Button>
-			<Button isDefault tabIndex="0">Section 3</Button>
-			<Button isDefault tabIndex="0">Section 4</Button>
+			<Button isSecondary tabIndex="0">Section 1</Button>
+			<Button isSecondary tabIndex="0">Section 2</Button>
+			<Button isSecondary tabIndex="0">Section 3</Button>
+			<Button isSecondary tabIndex="0">Section 4</Button>
 		</TabbableContainer>
 	</div>
 );

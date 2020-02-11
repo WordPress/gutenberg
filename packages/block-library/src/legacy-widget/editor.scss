@@ -20,3 +20,15 @@
 .wp-block-legacy-widget__preview {
 	overflow: auto;
 }
+
+.wp-block-legacy-widget__edit-widget-title {
+	margin: 0 -$block-padding 0 -$block-padding+1px 0;
+	background: $light-gray-100;
+	color: $dark-gray-500;
+	top: -$block-padding+1px;
+	position: relative;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	padding: $grid-size $block-padding;
+	font-weight: 600;
+}

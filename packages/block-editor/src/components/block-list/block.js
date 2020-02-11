@@ -2,19 +2,21 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { first, last } from 'lodash';
+import { first, last, omit } from 'lodash';
 import { animated } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useLayoutEffect, useState } from '@wordpress/element';
 import {
-	focus,
-	isTextField,
-	placeCaretAtHorizontalEdge,
-} from '@wordpress/dom';
-import { BACKSPACE, DELETE, ENTER, ESCAPE } from '@wordpress/keycodes';
+	useRef,
+	useEffect,
+	useLayoutEffect,
+	useState,
+	useContext,
+} from '@wordpress/element';
+import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
 	getBlockType,
 	getSaveElement,
@@ -22,12 +24,9 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { KeyboardShortcuts, withFilters } from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	withDispatch,
-	withSelect,
-} from '@wordpress/data';
+import { withDispatch, withSelect, useSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 
@@ -35,55 +34,31 @@ import { compose, pure, ifCondition } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockEdit from '../block-edit';
-import BlockMover from '../block-mover';
-import BlockDropZone from '../block-drop-zone';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import BlockBreadcrumb from './breadcrumb';
-import BlockContextualToolbar from './block-contextual-toolbar';
-import BlockMultiControls from './multi-controls';
-import BlockMobileToolbar from './block-mobile-toolbar';
-import BlockInsertionPoint from './insertion-point';
-import IgnoreNestedEvents from '../ignore-nested-events';
-import InserterWithShortcuts from '../inserter-with-shortcuts';
-import Inserter from '../inserter';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
-
-/**
- * Prevents default dragging behavior within a block to allow for multi-
- * selection to take effect unhampered.
- *
- * @param {DragEvent} event Drag event.
- */
-const preventDrag = ( event ) => {
-	event.preventDefault();
-};
+import { Context, BlockNodes } from './root-container';
 
 function BlockListBlock( {
-	blockRef,
 	mode,
 	isFocusMode,
-	hasFixedToolbar,
 	isLocked,
 	clientId,
-	rootClientId,
 	isSelected,
+	isMultiSelected,
 	isPartOfMultiSelection,
 	isFirstMultiSelected,
+	isLastMultiSelected,
 	isTypingWithinBlock,
-	isCaretWithinFormattedText,
 	isEmptyDefaultBlock,
-	isMovable,
-	isParentOfSelectedBlock,
-	isDraggable,
+	isAncestorOfSelectedBlock,
 	isSelectionEnabled,
 	className,
 	name,
 	isValid,
-	isLast,
 	attributes,
 	initialPosition,
 	wrapperProps,
@@ -91,112 +66,49 @@ function BlockListBlock( {
 	onReplace,
 	onInsertBlocksAfter,
 	onMerge,
-	onSelect,
 	onRemove,
 	onInsertDefaultBlockAfter,
 	toggleSelection,
-	onShiftSelection,
-	onSelectionStart,
 	animateOnChange,
 	enableAnimation,
 	isNavigationMode,
-	enableNavigationMode,
+	isMultiSelecting,
+	hasSelectedUI = true,
 } ) {
-	// Random state used to rerender the component if needed, ideally we don't need this
-	const [ , updateRerenderState ] = useState( {} );
-	const rerender = () => updateRerenderState( {} );
+	const onSelectionStart = useContext( Context );
+	const [ , setBlockNodes ] = useContext( BlockNodes );
+	// In addition to withSelect, we should favor using useSelect in this component going forward
+	// to avoid leaking new props to the public API (editor.BlockListBlock filter)
+	const { isDraggingBlocks } = useSelect( ( select ) => {
+		return {
+			isDraggingBlocks: select( 'core/block-editor' ).isDraggingBlocks(),
+		};
+	}, [] );
 
 	// Reference of the wrapper
 	const wrapper = useRef( null );
-	useEffect( () => {
-		blockRef( wrapper.current, clientId );
-	}, [] );
 
-	// Reference to the block edit node
-	const blockNodeRef = useRef();
-
-	const breadcrumb = useRef();
-
-	// Keep track of touchstart to disable hover on iOS
-	const hadTouchStart = useRef( false );
-	const onTouchStart = () => {
-		hadTouchStart.current = true;
-	};
-	const onTouchStop = () => {
-		// Clear touchstart detection
-		// Browser will try to emulate mouse events also see https://www.html5rocks.com/en/mobile/touchandmouse/
-		hadTouchStart.current = false;
-	};
-
-	// Handling isHovered
-	const [ isBlockHovered, setBlockHoveredState ] = useState( false );
-
-	/**
-	 * Sets the block state as unhovered if currently hovering. There are cases
-	 * where mouseleave may occur but the block is not hovered (multi-select),
-	 * so to avoid unnecesary renders, the state is only set if hovered.
-	 */
-	const hideHoverEffects = () => {
-		if ( isBlockHovered ) {
-			setBlockHoveredState( false );
+	// Provide the selected node, or the first and last nodes of a multi-
+	// selection, so it can be used to position the contextual block toolbar.
+	// We only provide what is necessary, and remove the nodes again when they
+	// are no longer selected.
+	useLayoutEffect( () => {
+		if ( isSelected || isFirstMultiSelected || isLastMultiSelected ) {
+			const node = wrapper.current;
+			setBlockNodes( ( nodes ) => ( { ...nodes, [ clientId ]: node } ) );
+			return () => {
+				setBlockNodes( ( nodes ) => omit( nodes, clientId ) );
+			};
 		}
-	};
-	/**
-	 * A mouseover event handler to apply hover effect when a pointer device is
-	 * placed within the bounds of the block. The mouseover event is preferred
-	 * over mouseenter because it may be the case that a previous mouseenter
-	 * event was blocked from being handled by a IgnoreNestedEvents component,
-	 * therefore transitioning out of a nested block to the bounds of the block
-	 * would otherwise not trigger a hover effect.
-	 *
-	 * @see https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
-	 */
-	const maybeHover = () => {
-		if (
-			isBlockHovered ||
-			isPartOfMultiSelection ||
-			isSelected ||
-			hadTouchStart.current
-		) {
-			return;
-		}
-		setBlockHoveredState( true );
-	};
-
-	// Set hover to false once we start typing or select the block.
-	useEffect( () => {
-		if ( isTypingWithinBlock || isSelected ) {
-			hideHoverEffects();
-		}
-	} );
-
-	// Handling the dragging state
-	const [ isDragging, setBlockDraggingState ] = useState( false );
-	const onDragStart = () => {
-		setBlockDraggingState( true );
-	};
-	const onDragEnd = () => {
-		setBlockDraggingState( false );
-	};
+	}, [ isSelected, isFirstMultiSelected, isLastMultiSelected ] );
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
-	const onBlockError = () => setErrorState( false );
+	const onBlockError = () => setErrorState( true );
 
-	// Handling of forceContextualToolbarFocus
-	const isForcingContextualToolbar = useRef( false );
-	useEffect( () => {
-		if ( isForcingContextualToolbar.current ) {
-			// The forcing of contextual toolbar should only be true during one update,
-			// after the first update normal conditions should apply.
-			isForcingContextualToolbar.current = false;
-		}
-	} );
-	const forceFocusedContextualToolbar = () => {
-		isForcingContextualToolbar.current = true;
-		// trigger a re-render
-		rerender();
-	};
+	const blockType = getBlockType( name );
+	// translators: %s: Type of block (i.e. Text, Image etc)
+	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 
 	// Handing the focus of the block on creation and update
 
@@ -214,17 +126,16 @@ function BlockListBlock( {
 			return;
 		}
 
-		if ( isNavigationMode ) {
-			breadcrumb.current.focus();
-			return;
-		}
-
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable
-			.find( blockNodeRef.current )
+			.find( wrapper.current )
 			.filter( isTextField )
 			// Exclude inner blocks
-			.filter( ( node ) => ! ignoreInnerBlocks || isInsideRootBlock( blockNodeRef.current, node ) );
+			.filter(
+				( node ) =>
+					! ignoreInnerBlocks ||
+					isInsideRootBlock( wrapper.current, node )
+			);
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
@@ -241,47 +152,25 @@ function BlockListBlock( {
 
 	// Focus the selected block's wrapper or inner input on mount and update
 	const isMounting = useRef( true );
+
 	useEffect( () => {
-		if ( isSelected ) {
+		if ( ! isMultiSelecting && ! isNavigationMode && isSelected ) {
 			focusTabbable( ! isMounting.current );
 		}
-		isMounting.current = false;
-	}, [ isSelected ] );
 
-	// Focus the first multi selected block
-	useEffect( () => {
-		if ( isFirstMultiSelected ) {
-			wrapper.current.focus();
-		}
-	}, [ isFirstMultiSelected ] );
+		isMounting.current = false;
+	}, [ isSelected, isMultiSelecting, isNavigationMode ] );
 
 	// Block Reordering animation
-	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, enableAnimation, animateOnChange );
-
-	// Focus the breadcrumb if the wrapper is focused on navigation mode.
-	// Focus the first editable or the wrapper if edit mode.
-	useLayoutEffect( () => {
-		if ( isSelected ) {
-			if ( isNavigationMode ) {
-				breadcrumb.current.focus();
-			} else {
-				focusTabbable( true );
-			}
-		}
-	}, [ isSelected, isNavigationMode ] );
+	const animationStyle = useMovingAnimation(
+		wrapper,
+		isSelected || isPartOfMultiSelection,
+		isSelected || isFirstMultiSelected,
+		enableAnimation,
+		animateOnChange
+	);
 
 	// Other event handlers
-
-	/**
-	 * Marks the block as selected when focused and not already selected. This
-	 * specifically handles the case where block does not set focus on its own
-	 * (via `setFocus`), typically if there is no focusable input in the block.
-	 */
-	const onFocus = () => {
-		if ( ! isSelected && ! isPartOfMultiSelection ) {
-			onSelect();
-		}
-	};
 
 	/**
 	 * Interprets keydown event intent to remove or insert after block if key
@@ -294,18 +183,9 @@ function BlockListBlock( {
 	const onKeyDown = ( event ) => {
 		const { keyCode, target } = event;
 
-		// ENTER/BACKSPACE Shortcuts are only available if the wrapper is focused
-		// and the block is not locked.
-		const canUseShortcuts = (
-			isSelected &&
-				! isLocked &&
-				( target === wrapper.current || target === breadcrumb.current )
-		);
-		const isEditMode = ! isNavigationMode;
-
 		switch ( keyCode ) {
 			case ENTER:
-				if ( canUseShortcuts && isEditMode ) {
+				if ( target === wrapper.current ) {
 					// Insert default block after current block if enter and event
 					// not already handled by descendant.
 					onInsertDefaultBlockAfter();
@@ -314,133 +194,40 @@ function BlockListBlock( {
 				break;
 			case BACKSPACE:
 			case DELETE:
-				if ( canUseShortcuts ) {
+				if ( target === wrapper.current ) {
 					// Remove block on backspace.
 					onRemove( clientId );
 					event.preventDefault();
 				}
 				break;
-			case ESCAPE:
-				if (
-					isSelected &&
-					isEditMode
-				) {
-					enableNavigationMode();
-					wrapper.current.focus();
-				}
-				break;
 		}
 	};
 
-	/**
-	 * Begins tracking cursor multi-selection when clicking down within block.
-	 *
-	 * @param {MouseEvent} event A mousedown event.
-	 */
-	const onPointerDown = ( event ) => {
-		// Not the main button.
-		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-		if ( event.button !== 0 ) {
-			return;
-		}
-
-		if ( event.shiftKey ) {
-			if ( ! isSelected ) {
-				onShiftSelection();
-				event.preventDefault();
-			}
-
-		// Avoid triggering multi-selection if we click toolbars/inspectors
-		// and all elements that are outside the Block Edit DOM tree.
-		} else if ( blockNodeRef.current.contains( event.target ) ) {
+	const onMouseLeave = ( { which, buttons } ) => {
+		// The primary button must be pressed to initiate selection. Fall back
+		// to `which` if the standard `buttons` property is falsy. There are
+		// cases where Firefox might always set `buttons` to `0`.
+		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
+		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/which
+		if ( ( buttons || which ) === 1 ) {
 			onSelectionStart( clientId );
-
-			// Allow user to escape out of a multi-selection to a singular
-			// selection of a block via click. This is handled here since
-			// onFocus excludes blocks involved in a multiselection, as
-			// focus can be incurred by starting a multiselection (focus
-			// moved to first block's multi-controls).
-			if ( isPartOfMultiSelection ) {
-				onSelect();
-			}
 		}
 	};
-
-	const selectOnOpen = ( open ) => {
-		if ( open && ! isSelected ) {
-			onSelect();
-		}
-	};
-
-	// Rendering the output
-	const isHovered = isBlockHovered && ! isPartOfMultiSelection;
-	const blockType = getBlockType( name );
-	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
-	// The block as rendered in the editor is composed of general block UI
-	// (mover, toolbar, wrapper) and the display of the block content.
 
 	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 
 	// If the block is selected and we're typing the block should not appear.
 	// Empty paragraph blocks should always show up as unselected.
-	const showInserterShortcuts = ! isNavigationMode && ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
-	const showEmptyBlockSideInserter = ! isNavigationMode && ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
+	const showEmptyBlockSideInserter =
+		! isNavigationMode && isSelected && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
 		! isFocusMode &&
 		! showEmptyBlockSideInserter &&
 		isSelected &&
 		! isTypingWithinBlock;
-	const shouldAppearHovered =
-		! isFocusMode &&
-		! hasFixedToolbar &&
-		isHovered &&
-		! isEmptyDefaultBlock;
-	// We render block movers and block settings to keep them tabbale even if hidden
-	const shouldRenderMovers =
-		! isNavigationMode &&
-		isSelected &&
-		! showEmptyBlockSideInserter &&
-		! isPartOfMultiSelection &&
-		! isTypingWithinBlock;
-	const shouldShowBreadcrumb =
-		( isSelected && isNavigationMode ) ||
-		( ! isNavigationMode && ! isFocusMode && isHovered && ! isEmptyDefaultBlock );
-	const shouldShowContextualToolbar =
-		! isNavigationMode &&
-		! hasFixedToolbar &&
-		! showEmptyBlockSideInserter &&
-		(
-			( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
-			isFirstMultiSelected
-		);
-	const shouldShowMobileToolbar = ! isNavigationMode && shouldAppearSelected;
 
-	// Insertion point can only be made visible if the block is at the
-	// the extent of a multi-selection, or not in a multi-selection.
-	const shouldShowInsertionPoint =
-		( isPartOfMultiSelection && isFirstMultiSelected ) ||
-		! isPartOfMultiSelection;
-
-	// The wp-block className is important for editor styles.
-	// Generate the wrapper class names handling the different states of the block.
-	const wrapperClassName = classnames(
-		'wp-block editor-block-list__block block-editor-block-list__block',
-		{
-			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-			'is-selected': shouldAppearSelected,
-			'is-navigate-mode': isNavigationMode,
-			'is-multi-selected': isPartOfMultiSelection,
-			'is-hovered': shouldAppearHovered,
-			'is-reusable': isReusableBlock( blockType ),
-			'is-dragging': isDragging,
-			'is-typing': isTypingWithinBlock,
-			'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
-			'is-focus-mode': isFocusMode,
-			'has-child-selected': isParentOfSelectedBlock,
-		},
-		className
-	);
+	const isDragging =
+		isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType.getEditWrapperProps ) {
@@ -449,6 +236,30 @@ function BlockListBlock( {
 			...blockType.getEditWrapperProps( attributes ),
 		};
 	}
+
+	const isAligned = wrapperProps && wrapperProps[ 'data-align' ];
+
+	// The wp-block className is important for editor styles.
+	// Generate the wrapper class names handling the different states of the block.
+	const wrapperClassName = classnames(
+		'wp-block block-editor-block-list__block',
+		{
+			'has-selected-ui': hasSelectedUI,
+			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
+			'is-selected': shouldAppearSelected && hasSelectedUI,
+			'is-multi-selected': isMultiSelected,
+			'is-reusable': isReusableBlock( blockType ),
+			'is-dragging': isDragging,
+			'is-typing': isTypingWithinBlock,
+			'is-focused':
+				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
+			'is-focus-mode': isFocusMode,
+			'has-child-selected': isAncestorOfSelectedBlock,
+			'is-block-collapsed': isAligned,
+		},
+		className
+	);
+
 	const blockElementId = `block-${ clientId }`;
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
@@ -469,139 +280,59 @@ function BlockListBlock( {
 			toggleSelection={ toggleSelection }
 		/>
 	);
+
+	// For aligned blocks, provide a wrapper element so the block can be
+	// positioned relative to the block column. This is enabled with the
+	// .is-block-content className.
+	if ( isAligned ) {
+		blockEdit = <div className="is-block-content">{ blockEdit }</div>;
+	}
+
 	if ( mode !== 'visual' ) {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
 	}
 
 	return (
-		<IgnoreNestedEvents
+		<animated.div
 			id={ blockElementId }
 			ref={ wrapper }
-			onMouseOver={ maybeHover }
-			onMouseOverHandled={ hideHoverEffects }
-			onMouseLeave={ hideHoverEffects }
 			className={ wrapperClassName }
+			data-block={ clientId }
 			data-type={ name }
-			onTouchStart={ onTouchStart }
-			onFocus={ onFocus }
-			onClick={ onTouchStop }
-			onKeyDown={ onKeyDown }
+			// Only allow shortcuts when a blocks is selected and not locked.
+			onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
+			// Only allow selection to be started from a selected block.
+			onMouseLeave={ isSelected ? onMouseLeave : undefined }
 			tabIndex="0"
 			aria-label={ blockLabel }
-			childHandledEvents={ [ 'onDragStart', 'onMouseDown' ] }
-			tagName={ animated.div }
+			role="group"
 			{ ...wrapperProps }
 			style={
-				wrapperProps && wrapperProps.style ?
-					{
-						...wrapperProps.style,
-						...animationStyle,
-					} :
-					animationStyle
+				wrapperProps && wrapperProps.style
+					? {
+							...wrapperProps.style,
+							...animationStyle,
+					  }
+					: animationStyle
 			}
 		>
-			{ shouldShowInsertionPoint && (
-				<BlockInsertionPoint
-					clientId={ clientId }
-					rootClientId={ rootClientId }
-				/>
-			) }
-			<BlockDropZone
-				clientId={ clientId }
-				rootClientId={ rootClientId }
-			/>
-			{ isFirstMultiSelected && (
-				<BlockMultiControls rootClientId={ rootClientId } />
-			) }
-			<div className="editor-block-list__block-edit block-editor-block-list__block-edit">
-				{ shouldRenderMovers && (
-					<BlockMover
-						clientIds={ clientId }
-						blockElementId={ blockElementId }
-						isHidden={ ! isSelected }
-						isDraggable={
-							isDraggable !== false &&
-							( ! isPartOfMultiSelection && isMovable )
-						}
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
-					/>
+			<BlockCrashBoundary onError={ onBlockError }>
+				{ isValid && blockEdit }
+				{ isValid && mode === 'html' && (
+					<BlockHtml clientId={ clientId } />
 				) }
-				{ shouldShowBreadcrumb && (
-					<BlockBreadcrumb
+				{ ! isValid && [
+					<BlockInvalidWarning
+						key="invalid-warning"
 						clientId={ clientId }
-						ref={ breadcrumb }
-					/>
-				) }
-				{ ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
-					<BlockContextualToolbar
-						// If the toolbar is being shown because of being forced
-						// it should focus the toolbar right after the mount.
-						focusOnMount={ isForcingContextualToolbar.current }
-					/>
-				) }
-				{
-					! isNavigationMode &&
-					! shouldShowContextualToolbar &&
-					isSelected &&
-					! hasFixedToolbar &&
-					! isEmptyDefaultBlock && (
-						<KeyboardShortcuts
-							bindGlobal
-							eventName="keydown"
-							shortcuts={ {
-								'alt+f10': forceFocusedContextualToolbar,
-							} }
-						/>
-					)
-				}
-				<IgnoreNestedEvents
-					ref={ blockNodeRef }
-					onDragStart={ preventDrag }
-					onMouseDown={ onPointerDown }
-					data-block={ clientId }
-				>
-					<BlockCrashBoundary onError={ onBlockError }>
-						{ isValid && blockEdit }
-						{ isValid && mode === 'html' && (
-							<BlockHtml clientId={ clientId } />
-						) }
-						{ ! isValid && [
-							<BlockInvalidWarning
-								key="invalid-warning"
-								clientId={ clientId }
-							/>,
-							<div key="invalid-preview">
-								{ getSaveElement( blockType, attributes ) }
-							</div>,
-						] }
-					</BlockCrashBoundary>
-					{ shouldShowMobileToolbar && (
-						<BlockMobileToolbar clientId={ clientId } />
-					) }
-					{ !! hasError && <BlockCrashWarning /> }
-				</IgnoreNestedEvents>
-			</div>
-			{ showInserterShortcuts && (
-				<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
-					<InserterWithShortcuts
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-						onToggle={ selectOnOpen }
-					/>
-				</div>
-			) }
-			{ showEmptyBlockSideInserter && (
-				<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
-					<Inserter
-						position="top right"
-						onToggle={ selectOnOpen }
-						rootClientId={ rootClientId }
-						clientId={ clientId }
-					/>
-				</div>
-			) }
-		</IgnoreNestedEvents>
+					/>,
+					<div key="invalid-preview">
+						{ getSaveElement( blockType, attributes ) }
+					</div>,
+				] }
+			</BlockCrashBoundary>
+			{ !! hasError && <BlockCrashWarning /> }
+		</animated.div>
 	);
 }
 
@@ -612,26 +343,29 @@ const applyWithSelect = withSelect(
 			isAncestorMultiSelected,
 			isBlockMultiSelected,
 			isFirstMultiSelectedBlock,
+			getLastMultiSelectedBlockClientId,
 			isTyping,
-			isCaretWithinFormattedText,
 			getBlockMode,
 			isSelectionEnabled,
 			getSelectedBlocksInitialCaretPosition,
 			getSettings,
 			hasSelectedInnerBlock,
 			getTemplateLock,
-			getBlockIndex,
-			getBlockOrder,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
 		} = select( 'core/block-editor' );
+
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
-		const { hasFixedToolbar, focusMode, isRTL } = getSettings();
+		const { focusMode, isRTL } = getSettings();
 		const templateLock = getTemplateLock( rootClientId );
-		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
-		const index = getBlockIndex( clientId, rootClientId );
-		const blockOrder = getBlockOrder( rootClientId );
+		const checkDeep = true;
+
+		// "ancestor" is the more appropriate label due to "deep" check
+		const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
+			clientId,
+			checkDeep
+		);
 
 		// The fallback to `{}` is a temporary fix.
 		// This function should never be called when a block is not present in the state.
@@ -639,24 +373,28 @@ const applyWithSelect = withSelect(
 		const { name, attributes, isValid } = block || {};
 
 		return {
+			isMultiSelected: isBlockMultiSelected( clientId ),
 			isPartOfMultiSelection:
-				isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
+				isBlockMultiSelected( clientId ) ||
+				isAncestorMultiSelected( clientId ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
+			isLastMultiSelected:
+				getLastMultiSelectedBlockClientId() === clientId,
+
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 			isTypingWithinBlock:
-				( isSelected || isParentOfSelectedBlock ) && isTyping(),
-			isCaretWithinFormattedText: isCaretWithinFormattedText(),
+				( isSelected || isAncestorOfSelectedBlock ) && isTyping(),
+
 			mode: getBlockMode( clientId ),
 			isSelectionEnabled: isSelectionEnabled(),
-			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
+			initialPosition: isSelected
+				? getSelectedBlocksInitialCaretPosition()
+				: null,
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
-			isMovable: 'all' !== templateLock,
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
-			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
-			isLast: index === blockOrder.length - 1,
 			isNavigationMode: isNavigationMode(),
 			isRTL,
 
@@ -669,7 +407,7 @@ const applyWithSelect = withSelect(
 			attributes,
 			isValid,
 			isSelected,
-			isParentOfSelectedBlock,
+			isAncestorOfSelectedBlock,
 		};
 	}
 );
@@ -677,15 +415,12 @@ const applyWithSelect = withSelect(
 const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	const {
 		updateBlockAttributes,
-		selectBlock,
-		multiSelect,
 		insertBlocks,
 		insertDefaultBlock,
 		removeBlock,
 		mergeBlocks,
 		replaceBlocks,
 		toggleSelection,
-		setNavigationMode,
 		__unstableMarkLastChangeAsPersistent,
 	} = dispatch( 'core/block-editor' );
 
@@ -694,26 +429,19 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			const { clientId } = ownProps;
 			updateBlockAttributes( clientId, newAttributes );
 		},
-		onSelect( clientId = ownProps.clientId, initialPosition ) {
-			selectBlock( clientId, initialPosition );
-		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;
 			insertBlocks( blocks, index, rootClientId );
 		},
 		onInsertDefaultBlockAfter() {
 			const { clientId, rootClientId } = ownProps;
-			const {
-				getBlockIndex,
-			} = select( 'core/block-editor' );
+			const { getBlockIndex } = select( 'core/block-editor' );
 			const index = getBlockIndex( clientId, rootClientId );
 			insertDefaultBlock( {}, rootClientId, index + 1 );
 		},
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
-			const {
-				getBlockIndex,
-			} = select( 'core/block-editor' );
+			const { getBlockIndex } = select( 'core/block-editor' );
 			const index = getBlockIndex( clientId, rootClientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
@@ -722,10 +450,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onMerge( forward ) {
 			const { clientId } = ownProps;
-			const {
-				getPreviousBlockClientId,
-				getNextBlockClientId,
-			} = select( 'core/block-editor' );
+			const { getPreviousBlockClientId, getNextBlockClientId } = select(
+				'core/block-editor'
+			);
 
 			if ( forward ) {
 				const nextBlockClientId = getNextBlockClientId( clientId );
@@ -733,7 +460,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 					mergeBlocks( clientId, nextBlockClientId );
 				}
 			} else {
-				const previousBlockClientId = getPreviousBlockClientId( clientId );
+				const previousBlockClientId = getPreviousBlockClientId(
+					clientId
+				);
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
 				}
@@ -748,26 +477,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			}
 			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
 		},
-		onShiftSelection() {
-			if ( ! ownProps.isSelectionEnabled ) {
-				return;
-			}
-
-			const {
-				getBlockSelectionStart,
-			} = select( 'core/block-editor' );
-
-			if ( getBlockSelectionStart() ) {
-				multiSelect( getBlockSelectionStart(), ownProps.clientId );
-			} else {
-				selectBlock( ownProps.clientId );
-			}
-		},
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );
-		},
-		enableNavigationMode() {
-			setNavigationMode( true );
 		},
 	};
 } );

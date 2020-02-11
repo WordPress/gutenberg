@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, Panel } from '@wordpress/components';
+import { Button, Panel } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { withPluginContext } from '@wordpress/plugins';
@@ -32,36 +32,35 @@ function PluginSidebar( props ) {
 		<>
 			{ isPinnable && (
 				<PinnedPlugins>
-					{ isPinned && <IconButton
-						icon={ icon }
-						label={ title }
-						onClick={ toggleSidebar }
-						isToggled={ isActive }
-						aria-expanded={ isActive }
-					/> }
+					{ isPinned && (
+						<Button
+							icon={ icon }
+							label={ title }
+							onClick={ toggleSidebar }
+							isPressed={ isActive }
+							aria-expanded={ isActive }
+						/>
+					) }
 				</PinnedPlugins>
 			) }
-			<Sidebar
-				name={ sidebarName }
-				label={ __( 'Editor plugins' ) }
-			>
-				<SidebarHeader
-					closeLabel={ __( 'Close plugin' ) }
-				>
+			<Sidebar name={ sidebarName }>
+				<SidebarHeader closeLabel={ __( 'Close plugin' ) }>
 					<strong>{ title }</strong>
 					{ isPinnable && (
-						<IconButton
+						<Button
 							icon={ isPinned ? 'star-filled' : 'star-empty' }
-							label={ isPinned ? __( 'Unpin from toolbar' ) : __( 'Pin to toolbar' ) }
+							label={
+								isPinned
+									? __( 'Unpin from toolbar' )
+									: __( 'Pin to toolbar' )
+							}
 							onClick={ togglePin }
-							isToggled={ isPinned }
+							isPressed={ isPinned }
 							aria-expanded={ isPinned }
 						/>
 					) }
 				</SidebarHeader>
-				<Panel className={ className }>
-					{ children }
-				</Panel>
+				<Panel className={ className }>{ children }</Panel>
 			</Sidebar>
 		</>
 	);
@@ -82,7 +81,7 @@ function PluginSidebar( props ) {
  * @param {string} [props.className] An optional class name added to the sidebar body.
  * @param {string} props.title Title displayed at the top of the sidebar.
  * @param {boolean} [props.isPinnable=true] Whether to allow to pin sidebar to toolbar.
- * @param {string|Element} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+ * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
  * @example <caption>ES5</caption>
  * ```js
@@ -91,6 +90,7 @@ function PluginSidebar( props ) {
  * var el = wp.element.createElement;
  * var PanelBody = wp.components.PanelBody;
  * var PluginSidebar = wp.editPost.PluginSidebar;
+ * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
  *
  * function MyPluginSidebar() {
  * 	return el(
@@ -98,7 +98,7 @@ function PluginSidebar( props ) {
  * 			{
  * 				name: 'my-sidebar',
  * 				title: 'My sidebar title',
- * 				icon: 'smiley',
+ * 				icon: moreIcon,
  * 			},
  * 			el(
  * 				PanelBody,
@@ -112,15 +112,16 @@ function PluginSidebar( props ) {
  * @example <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PanelBody } = wp.components;
- * const { PluginSidebar } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PanelBody } from '@wordpress/components';
+ * import { PluginSidebar } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * const MyPluginSidebar = () => (
  * 	<PluginSidebar
  * 		name="my-sidebar"
  * 		title="My sidebar title"
- * 		icon="smiley"
+ * 		icon={ more }
  * 	>
  * 		<PanelBody>
  * 			{ __( 'My sidebar content' ) }
@@ -129,7 +130,7 @@ function PluginSidebar( props ) {
  * );
  * ```
  *
- * @return {WPElement} Plugin sidebar component.
+ * @return {WPComponent} Plugin sidebar component.
  */
 export default compose(
 	withPluginContext( ( context, ownProps ) => {
@@ -139,10 +140,9 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { sidebarName } ) => {
-		const {
-			getActiveGeneralSidebarName,
-			isPluginItemPinned,
-		} = select( 'core/edit-post' );
+		const { getActiveGeneralSidebarName, isPluginItemPinned } = select(
+			'core/edit-post'
+		);
 
 		return {
 			isActive: getActiveGeneralSidebarName() === sidebarName,
@@ -168,5 +168,5 @@ export default compose(
 				}
 			},
 		};
-	} ),
+	} )
 )( PluginSidebar );

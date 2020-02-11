@@ -359,6 +359,30 @@ _Returns_
 
 -   `Array`: Block list.
 
+<a name="getEditorSelectionEnd" href="#getEditorSelectionEnd">#</a> **getEditorSelectionEnd**
+
+Returns the current selection end.
+
+_Parameters_
+
+-   _state_ `Object`: 
+
+_Returns_
+
+-   `WPBlockSelection`: The selection end.
+
+<a name="getEditorSelectionStart" href="#getEditorSelectionStart">#</a> **getEditorSelectionStart**
+
+Returns the current selection start.
+
+_Parameters_
+
+-   _state_ `Object`: 
+
+_Returns_
+
+-   `WPBlockSelection`: The selection start.
+
 <a name="getEditorSettings" href="#getEditorSettings">#</a> **getEditorSettings**
 
 Returns the post editor settings.
@@ -630,6 +654,19 @@ _Related_
 _Related_
 
 -   hasMultiSelection in core/block-editor store.
+
+<a name="hasNonPostEntityChanges" href="#hasNonPostEntityChanges">#</a> **hasNonPostEntityChanges**
+
+Returns true if there are unsaved edits for entities other than
+the editor's post, and false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether there are edits or not.
 
 <a name="hasSelectedBlock" href="#hasSelectedBlock">#</a> **hasSelectedBlock**
 
@@ -1103,6 +1140,23 @@ _Related_
 
 -   insertDefaultBlock in core/block-editor store.
 
+<a name="lockPostAutosaving" href="#lockPostAutosaving">#</a> **lockPostAutosaving**
+
+Returns an action object used to signal that post autosaving is locked.
+
+_Usage_
+
+    // Lock post autosaving with the lock key `mylock`:
+    wp.data.dispatch( 'core/editor' ).lockPostAutosaving( 'mylock' );
+
+_Parameters_
+
+-   _lockName_ `string`: The lock name.
+
+_Returns_
+
+-   `Object`: Action object
+
 <a name="lockPostSaving" href="#lockPostSaving">#</a> **lockPostSaving**
 
 Returns an action object used to signal that post saving is locked.
@@ -1361,6 +1415,23 @@ Action generator for trashing the current post in the editor.
 <a name="undo" href="#undo">#</a> **undo**
 
 Returns an action object used in signalling that undo history should pop.
+
+<a name="unlockPostAutosaving" href="#unlockPostAutosaving">#</a> **unlockPostAutosaving**
+
+Returns an action object used to signal that post autosaving is unlocked.
+
+_Usage_
+
+    // Unlock post saving with the lock key `mylock`:
+    wp.data.dispatch( 'core/editor' ).unlockPostAutosaving( 'mylock' );
+
+_Parameters_
+
+-   _lockName_ `string`: The lock name.
+
+_Returns_
+
+-   `Object`: Action object
 
 <a name="unlockPostSaving" href="#unlockPostSaving">#</a> **unlockPostSaving**
 

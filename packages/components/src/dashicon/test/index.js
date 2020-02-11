@@ -4,10 +4,14 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { SVG } from '@wordpress/primitives';
+
+/**
  * Internal dependencies
  */
 import Dashicon from '../';
-import { SVG } from '../../primitives';
 
 describe( 'Dashicon', () => {
 	describe( 'basic rendering', () => {
@@ -18,7 +22,9 @@ describe( 'Dashicon', () => {
 		} );
 
 		it( 'should render an empty null element when a non dashicon is provided', () => {
-			const dashicon = shallow( <Dashicon icon="zomg-never-gonna-be-an-icon-icon" /> );
+			const dashicon = shallow(
+				<Dashicon icon="zomg-never-gonna-be-an-icon-icon" />
+			);
 			// Unrendered element.
 			expect( dashicon.type() ).toBeNull();
 		} );
@@ -28,14 +34,18 @@ describe( 'Dashicon', () => {
 			expect( dashicon.hasClass( 'dashicon' ) ).toBe( true );
 			expect( dashicon.hasClass( 'dashicons-wordpress' ) ).toBe( true );
 			expect( dashicon.type() ).toBe( SVG );
-			expect( dashicon.prop( 'xmlns' ) ).toBe( 'http://www.w3.org/2000/svg' );
+			expect( dashicon.prop( 'xmlns' ) ).toBe(
+				'http://www.w3.org/2000/svg'
+			);
 			expect( dashicon.prop( 'width' ) ).toBe( 20 );
 			expect( dashicon.prop( 'height' ) ).toBe( 20 );
 			expect( dashicon.prop( 'viewBox' ) ).toBe( '0 0 20 20' );
 		} );
 
 		it( 'should render an additional class to the SVG element', () => {
-			const dashicon = shallow( <Dashicon icon="wordpress" className="capital-p-dangit" /> );
+			const dashicon = shallow(
+				<Dashicon icon="wordpress" className="capital-p-dangit" />
+			);
 			expect( dashicon.hasClass( 'capital-p-dangit' ) ).toBe( true );
 		} );
 	} );

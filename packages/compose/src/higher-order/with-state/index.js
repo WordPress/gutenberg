@@ -14,7 +14,7 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  *
  * @param {?Object} initialState Optional initial state of the component.
  *
- * @return {Component} Wrapped component.
+ * @return {WPComponent} Wrapped component.
  */
 export default function withState( initialState = {} ) {
 	return createHigherOrderComponent( ( OriginalComponent ) => {

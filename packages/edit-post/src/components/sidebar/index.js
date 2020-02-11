@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createSlotFill, withFocusReturn, Animate } from '@wordpress/components';
+import {
+	createSlotFill,
+	withFocusReturn,
+	Animate,
+} from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
 
@@ -17,14 +21,9 @@ const { Fill, Slot } = createSlotFill( 'Sidebar' );
  *
  * @return {Object} The rendered sidebar.
  */
-function Sidebar( { children, label, className } ) {
+function Sidebar( { children, className } ) {
 	return (
-		<div
-			className={ classnames( 'edit-post-sidebar', className ) }
-			role="region"
-			aria-label={ label }
-			tabIndex="-1"
-		>
+		<div className={ classnames( 'edit-post-sidebar', className ) }>
 			{ children }
 		</div>
 	);
@@ -32,7 +31,9 @@ function Sidebar( { children, label, className } ) {
 
 Sidebar = withFocusReturn( {
 	onFocusReturn() {
-		const button = document.querySelector( '.edit-post-header__settings [aria-label="Settings"]' );
+		const button = document.querySelector(
+			'.edit-post-header__settings [aria-label="Settings"]'
+		);
 		if ( button ) {
 			button.focus();
 			return false;
@@ -52,9 +53,10 @@ function AnimatedSidebarFill( props ) {
 
 const WrappedSidebar = compose(
 	withSelect( ( select, { name } ) => ( {
-		isActive: select( 'core/edit-post' ).getActiveGeneralSidebarName() === name,
+		isActive:
+			select( 'core/edit-post' ).getActiveGeneralSidebarName() === name,
 	} ) ),
-	ifCondition( ( { isActive } ) => isActive ),
+	ifCondition( ( { isActive } ) => isActive )
 )( AnimatedSidebarFill );
 
 WrappedSidebar.Slot = Slot;

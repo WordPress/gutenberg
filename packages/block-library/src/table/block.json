@@ -9,6 +9,12 @@
 		"backgroundColor": {
 			"type": "string"
 		},
+		"caption": {
+			"type": "string",
+			"source": "html",
+			"selector": "figcaption",
+			"default": ""
+		},
 		"head": {
 			"type": "array",
 			"default": [],

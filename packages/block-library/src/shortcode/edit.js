@@ -4,14 +4,18 @@
 import { __ } from '@wordpress/i18n';
 import { Dashicon } from '@wordpress/components';
 import { PlainText } from '@wordpress/block-editor';
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
-const ShortcodeEdit = ( { attributes, setAttributes, instanceId } ) => {
+export default function ShortcodeEdit( { attributes, setAttributes } ) {
+	const instanceId = useInstanceId( ShortcodeEdit );
 	const inputId = `blocks-shortcode-input-${ instanceId }`;
 
 	return (
 		<div className="wp-block-shortcode  components-placeholder">
-			<label htmlFor={ inputId } className="components-placeholder__label">
+			<label
+				htmlFor={ inputId }
+				className="components-placeholder__label"
+			>
 				<Dashicon icon="shortcode" />
 				{ __( 'Shortcode' ) }
 			</label>
@@ -24,6 +28,4 @@ const ShortcodeEdit = ( { attributes, setAttributes, instanceId } ) => {
 			/>
 		</div>
 	);
-};
-
-export default withInstanceId( ShortcodeEdit );
+}

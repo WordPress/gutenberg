@@ -8,7 +8,7 @@ function isList( node ) {
 }
 
 function shallowTextContent( element ) {
-	return [ ...element.childNodes ]
+	return Array.from( element.childNodes )
 		.map( ( { nodeValue = '' } ) => nodeValue )
 		.join( '' );
 }

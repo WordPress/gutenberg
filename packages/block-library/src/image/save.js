@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,7 +23,10 @@ export default function save( { attributes } ) {
 		id,
 		linkTarget,
 		sizeSlug,
+		title,
 	} = attributes;
+
+	const newRel = isEmpty( rel ) ? undefined : rel;
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
@@ -37,6 +41,7 @@ export default function save( { attributes } ) {
 			className={ id ? `wp-image-${ id }` : null }
 			width={ width }
 			height={ height }
+			title={ title }
 		/>
 	);
 
@@ -47,28 +52,26 @@ export default function save( { attributes } ) {
 					className={ linkClass }
 					href={ href }
 					target={ linkTarget }
-					rel={ rel }
+					rel={ newRel }
 				>
 					{ image }
 				</a>
-			) : image }
-			{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+			) : (
+				image
+			) }
+			{ ! RichText.isEmpty( caption ) && (
+				<RichText.Content tagName="figcaption" value={ caption } />
+			) }
 		</>
 	);
 
 	if ( 'left' === align || 'right' === align || 'center' === align ) {
 		return (
 			<div>
-				<figure className={ classes }>
-					{ figure }
-				</figure>
+				<figure className={ classes }>{ figure }</figure>
 			</div>
 		);
 	}
 
-	return (
-		<figure className={ classes }>
-			{ figure }
-		</figure>
-	);
+	return <figure className={ classes }>{ figure }</figure>;
 }

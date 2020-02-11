@@ -6,18 +6,19 @@ import { castArray, flow } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import {
 	Toolbar,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { trash, moreHorizontal } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { shortcuts } from '../block-editor-keyboard-shortcuts';
 import BlockActions from '../block-actions';
 import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
@@ -26,7 +27,7 @@ import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-firs
 import __experimentalBlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
 
 const POPOVER_PROPS = {
-	className: 'block-editor-block-settings-menu__popover editor-block-settings-menu__popover',
+	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
 };
 
@@ -34,6 +35,24 @@ export function BlockSettingsMenu( { clientIds } ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
+
+	const shortcuts = useSelect( ( select ) => {
+		const { getShortcutRepresentation } = select(
+			'core/keyboard-shortcuts'
+		);
+		return {
+			duplicate: getShortcutRepresentation(
+				'core/block-editor/duplicate'
+			),
+			remove: getShortcutRepresentation( 'core/block-editor/remove' ),
+			insertAfter: getShortcutRepresentation(
+				'core/block-editor/insert-after'
+			),
+			insertBefore: getShortcutRepresentation(
+				'core/block-editor/insert-before'
+			),
+		};
+	}, [] );
 
 	return (
 		<BlockActions clientIds={ clientIds }>
@@ -48,7 +67,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 			} ) => (
 				<Toolbar>
 					<DropdownMenu
-						icon="ellipsis"
+						icon={ moreHorizontal }
 						label={ __( 'More options' ) }
 						className="block-editor-block-settings-menu"
 						popoverProps={ POPOVER_PROPS }
@@ -71,10 +90,12 @@ export function BlockSettingsMenu( { clientIds } ) {
 									) }
 									{ canDuplicate && (
 										<MenuItem
-											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-											onClick={ flow( onClose, onDuplicate ) }
+											onClick={ flow(
+												onClose,
+												onDuplicate
+											) }
 											icon="admin-page"
-											shortcut={ shortcuts.duplicate.display }
+											shortcut={ shortcuts.duplicate }
 										>
 											{ __( 'Duplicate' ) }
 										</MenuItem>
@@ -82,18 +103,26 @@ export function BlockSettingsMenu( { clientIds } ) {
 									{ canInsertDefaultBlock && (
 										<>
 											<MenuItem
-												className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-												onClick={ flow( onClose, onInsertBefore ) }
+												onClick={ flow(
+													onClose,
+													onInsertBefore
+												) }
 												icon="insert-before"
-												shortcut={ shortcuts.insertBefore.display }
+												shortcut={
+													shortcuts.insertBefore
+												}
 											>
 												{ __( 'Insert Before' ) }
 											</MenuItem>
 											<MenuItem
-												className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-												onClick={ flow( onClose, onInsertAfter ) }
+												onClick={ flow(
+													onClose,
+													onInsertAfter
+												) }
 												icon="insert-after"
-												shortcut={ shortcuts.insertAfter.display }
+												shortcut={
+													shortcuts.insertAfter
+												}
 											>
 												{ __( 'Insert After' ) }
 											</MenuItem>
@@ -112,12 +141,18 @@ export function BlockSettingsMenu( { clientIds } ) {
 								<MenuGroup>
 									{ ! isLocked && (
 										<MenuItem
-											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-											onClick={ flow( onClose, onRemove ) }
-											icon="trash"
-											shortcut={ shortcuts.removeBlock.display }
+											onClick={ flow(
+												onClose,
+												onRemove
+											) }
+											icon={ trash }
+											shortcut={ shortcuts.remove }
 										>
-											{ __( 'Remove Block' ) }
+											{ _n(
+												'Remove Block',
+												'Remove Blocks',
+												count
+											) }
 										</MenuItem>
 									) }
 								</MenuGroup>

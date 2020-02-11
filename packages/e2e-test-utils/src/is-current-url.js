@@ -20,5 +20,5 @@ export function isCurrentURL( WPPath, query = '' ) {
 
 	currentURL.search = query;
 
-	return createURL( WPPath ) === currentURL.href;
+	return createURL( WPPath, query ) === currentURL.href;
 }

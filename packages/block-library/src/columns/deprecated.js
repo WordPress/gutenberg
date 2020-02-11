@@ -8,9 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import {
-	InnerBlocks,
-} from '@wordpress/block-editor';
+import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
  * Given an HTML string for a deprecated columns inner block, returns the
@@ -32,7 +30,9 @@ function getDeprecatedLayoutColumn( originalContent ) {
 
 	doc.body.innerHTML = originalContent;
 	for ( const classListItem of doc.body.firstChild.classList ) {
-		if ( ( columnMatch = classListItem.match( /^layout-column-(\d+)$/ ) ) ) {
+		if (
+			( columnMatch = classListItem.match( /^layout-column-(\d+)$/ ) )
+		) {
 			return Number( columnMatch[ 1 ] ) - 1;
 		}
 	}
@@ -51,9 +51,9 @@ export default [
 			// Columns block and a deprecation is the unlikely case due to
 			// its subsequent migration, optimize for the `false` condition
 			// by performing a naive, inaccurate pass at inner blocks.
-			const isFastPassEligible = innerBlocks.some( ( innerBlock ) => (
+			const isFastPassEligible = innerBlocks.some( ( innerBlock ) =>
 				/layout-column-\d+/.test( innerBlock.originalContent )
-			) );
+			);
 
 			if ( ! isFastPassEligible ) {
 				return false;
@@ -61,12 +61,14 @@ export default [
 
 			// Only if the fast pass is considered eligible is the more
 			// accurate, durable, slower condition performed.
-			return innerBlocks.some( ( innerBlock ) => (
-				getDeprecatedLayoutColumn( innerBlock.originalContent ) !== undefined
-			) );
+			return innerBlocks.some(
+				( innerBlock ) =>
+					getDeprecatedLayoutColumn( innerBlock.originalContent ) !==
+					undefined
+			);
 		},
 		migrate( attributes, innerBlocks ) {
-			const columns = innerBlocks.reduce( ( result, innerBlock ) => {
+			const columns = innerBlocks.reduce( ( accumulator, innerBlock ) => {
 				const { originalContent } = innerBlock;
 
 				let columnIndex = getDeprecatedLayoutColumn( originalContent );
@@ -74,23 +76,20 @@ export default [
 					columnIndex = 0;
 				}
 
-				if ( ! result[ columnIndex ] ) {
-					result[ columnIndex ] = [];
+				if ( ! accumulator[ columnIndex ] ) {
+					accumulator[ columnIndex ] = [];
 				}
 
-				result[ columnIndex ].push( innerBlock );
+				accumulator[ columnIndex ].push( innerBlock );
 
-				return result;
+				return accumulator;
 			}, [] );
 
-			const migratedInnerBlocks = columns.map( ( columnBlocks ) => (
+			const migratedInnerBlocks = columns.map( ( columnBlocks ) =>
 				createBlock( 'core/column', {}, columnBlocks )
-			) );
+			);
 
-			return [
-				omit( attributes, [ 'columns' ] ),
-				migratedInnerBlocks,
-			];
+			return [ omit( attributes, [ 'columns' ] ), migratedInnerBlocks ];
 		},
 		save( { attributes } ) {
 			const { columns } = attributes;

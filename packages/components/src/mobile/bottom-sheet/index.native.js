@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, View, Platform, PanResponder, Dimensions, Easing } from 'react-native';
+import { Text, View, Platform, PanResponder, Dimensions } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
 
@@ -9,6 +9,7 @@ import SafeArea from 'react-native-safe-area';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,6 +19,9 @@ import Button from './button';
 import Cell from './cell';
 import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
+import RangeCell from './range-cell';
+import UnsupportedFooterCell from './unsupported-footer-cell';
+
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 class BottomSheet extends Component {
@@ -28,11 +32,16 @@ class BottomSheet extends Component {
 			safeAreaBottomInset: 0,
 		};
 
-		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
+		SafeArea.getSafeAreaInsetsForRootView().then(
+			this.onSafeAreaInsetsUpdate
+		);
 	}
 
 	componentDidMount() {
-		this.safeAreaEventSubscription = SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		this.safeAreaEventSubscription = SafeArea.addEventListener(
+			'safeAreaInsetsForRootViewDidChange',
+			this.onSafeAreaInsetsUpdate
+		);
 	}
 
 	componentWillUnmount() {
@@ -41,7 +50,10 @@ class BottomSheet extends Component {
 		}
 		this.safeAreaEventSubscription.remove();
 		this.safeAreaEventSubscription = null;
-		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		SafeArea.removeEventListener(
+			'safeAreaInsetsForRootViewDidChange',
+			this.onSafeAreaInsetsUpdate
+		);
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
@@ -63,6 +75,7 @@ class BottomSheet extends Component {
 			hideHeader,
 			style = {},
 			contentStyle = {},
+			getStylesFromColorScheme,
 		} = this.props;
 
 		const panResponder = PanResponder.create( {
@@ -79,52 +92,26 @@ class BottomSheet extends Component {
 		const getHeader = () => (
 			<View>
 				<View style={ styles.head }>
-					<View style={ { flex: 1 } }>
-						{ leftButton }
-					</View>
+					<View style={ { flex: 1 } }>{ leftButton }</View>
 					<View style={ styles.titleContainer }>
-						<Text style={ styles.title }>
-							{ title }
-						</Text>
+						<Text style={ styles.title }>{ title }</Text>
 					</View>
-					<View style={ { flex: 1 } }>
-						{ rightButton }
-					</View>
+					<View style={ { flex: 1 } }>{ rightButton }</View>
 				</View>
 				<View style={ styles.separator } />
 			</View>
 		);
 
-		const { height } = Dimensions.get( 'window' );
-		const easing = Easing.bezier( 0.450, 0.000, 0.160, 1.020 );
-
-		const animationIn = {
-			easing,
-			from: {
-				translateY: height,
-			},
-			to: {
-				translateY: 0,
-			},
-		};
-
-		const animationOut = {
-			easing,
-			from: {
-				translateY: 0,
-			},
-			to: {
-				translateY: height,
-			},
-		};
+		const backgroundStyle = getStylesFromColorScheme(
+			styles.background,
+			styles.backgroundDark
+		);
 
 		return (
 			<Modal
 				isVisible={ isVisible }
 				style={ styles.bottomModal }
-				animationIn={ animationIn }
 				animationInTiming={ 600 }
-				animationOut={ animationOut }
 				animationOutTiming={ 250 }
 				backdropTransitionInTiming={ 50 }
 				backdropTransitionOutTiming={ 50 }
@@ -132,38 +119,60 @@ class BottomSheet extends Component {
 				onBackdropPress={ this.props.onClose }
 				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
+				onDismiss={
+					Platform.OS === 'ios' ? this.props.onDismiss : undefined
+				}
+				onModalHide={
+					Platform.OS === 'android' ? this.props.onDismiss : undefined
+				}
 				swipeDirection="down"
-				onMoveShouldSetResponder={ panResponder.panHandlers.onMoveShouldSetResponder }
-				onMoveShouldSetResponderCapture={ panResponder.panHandlers.onMoveShouldSetResponderCapture }
+				onMoveShouldSetResponder={
+					panResponder.panHandlers.onMoveShouldSetResponder
+				}
+				onMoveShouldSetResponderCapture={
+					panResponder.panHandlers.onMoveShouldSetResponderCapture
+				}
 				onAccessibilityEscape={ this.props.onClose }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ { ...styles.background, borderColor: 'rgba(0, 0, 0, 0.1)', ...style } }
+					style={ {
+						...backgroundStyle,
+						borderColor: 'rgba(0, 0, 0, 0.1)',
+						...style,
+					} }
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
-					{ hideHeader && ( <View style={ styles.emptyHeaderSpace } /> ) }
+					{ hideHeader && <View style={ styles.emptyHeaderSpace } /> }
 					{ ! hideHeader && getHeader() }
 					<View style={ [ styles.content, contentStyle ] }>
 						{ this.props.children }
 					</View>
-					<View style={ { height: this.state.safeAreaBottomInset } } />
+					<View
+						style={ { height: this.state.safeAreaBottomInset } }
+					/>
 				</KeyboardAvoidingView>
 			</Modal>
-
 		);
 	}
 }
 
 function getWidth() {
-	return Math.min( Dimensions.get( 'window' ).width, styles.background.maxWidth );
+	return Math.min(
+		Dimensions.get( 'window' ).width,
+		styles.background.maxWidth
+	);
 }
 
-BottomSheet.getWidth = getWidth;
-BottomSheet.Button = Button;
-BottomSheet.Cell = Cell;
-BottomSheet.PickerCell = PickerCell;
-BottomSheet.SwitchCell = SwitchCell;
+const ThemedBottomSheet = withPreferredColorScheme( BottomSheet );
 
-export default BottomSheet;
+ThemedBottomSheet.getWidth = getWidth;
+ThemedBottomSheet.Button = Button;
+ThemedBottomSheet.Cell = Cell;
+ThemedBottomSheet.PickerCell = PickerCell;
+ThemedBottomSheet.SwitchCell = SwitchCell;
+ThemedBottomSheet.RangeCell = RangeCell;
+ThemedBottomSheet.UnsupportedFooterCell = UnsupportedFooterCell;
+
+export default ThemedBottomSheet;

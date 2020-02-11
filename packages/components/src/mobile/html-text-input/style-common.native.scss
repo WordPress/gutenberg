@@ -1,6 +1,6 @@
 $padding: 8;
-$backgroundColor: $white;
 $htmlFont: $default-monospace-font;
+$textColorDark: $white;
 
 .keyboardAvoidingView {
 	position: absolute;
@@ -12,4 +12,12 @@ $htmlFont: $default-monospace-font;
 
 .container {
 	flex: 1;
+}
+
+.placeholder {
+	color: $gray;
+}
+
+.placeholderDark {
+	color: $gray-50;
 }

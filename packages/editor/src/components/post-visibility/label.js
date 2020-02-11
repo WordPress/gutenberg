@@ -14,7 +14,8 @@ import { withSelect } from '@wordpress/data';
 import { visibilityOptions } from './utils';
 
 function PostVisibilityLabel( { visibility } ) {
-	const getVisibilityLabel = () => find( visibilityOptions, { value: visibility } ).label;
+	const getVisibilityLabel = () =>
+		find( visibilityOptions, { value: visibility } ).label;
 
 	return getVisibilityLabel( visibility );
 }

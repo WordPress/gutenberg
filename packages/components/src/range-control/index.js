@@ -59,14 +59,16 @@ function RangeControl( {
 		// The input is valid, reset the local state property used to temporaly save the value,
 		// and call onChange with the new value as a number.
 		resetCurrentInput();
-		onChange( ( newValue === '' ) ?
-			undefined :
-			parseFloat( newValue )
-		);
+		onChange( newValue === '' ? undefined : parseFloat( newValue ) );
 	};
-	const initialSliderValue = isFinite( currentInputValue ) ?
-		currentInputValue :
-		initialPosition || '';
+
+	const initialFallbackValue = isFinite( initialPosition )
+		? initialPosition
+		: '';
+
+	const initialSliderValue = isFinite( currentInputValue )
+		? currentInputValue
+		: initialFallbackValue;
 
 	return (
 		<BaseControl
@@ -85,7 +87,8 @@ function RangeControl( {
 				aria-describedby={ !! help ? id + '__help' : undefined }
 				min={ min }
 				max={ max }
-				{ ...props } />
+				{ ...props }
+			/>
 			{ afterIcon && <Dashicon icon={ afterIcon } /> }
 			<input
 				className="components-range-control__number"
@@ -103,7 +106,7 @@ function RangeControl( {
 					onClick={ resetValue }
 					disabled={ value === undefined }
 					isSmall
-					isDefault
+					isSecondary
 					className="components-range-control__reset"
 				>
 					{ __( 'Reset' ) }

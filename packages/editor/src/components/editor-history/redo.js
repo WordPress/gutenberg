@@ -2,15 +2,16 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
+import { redo as redoIcon } from '@wordpress/icons';
 
 function EditorHistoryRedo( { hasRedo, redo } ) {
 	return (
-		<IconButton
-			icon="redo"
+		<Button
+			icon={ redoIcon }
 			label={ __( 'Redo' ) }
 			shortcut={ displayShortcut.primaryShift( 'z' ) }
 			// If there are no redo levels we don't want to actually disable this

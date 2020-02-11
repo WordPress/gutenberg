@@ -13,7 +13,9 @@ describe( 'addContainer', () => {
 			expect( container.id ).toBe( 'a11y-speak-polite' );
 			expect( container.getAttribute( 'style' ) ).not.toBeNull();
 			expect( container.getAttribute( 'aria-live' ) ).toBe( 'polite' );
-			expect( container.getAttribute( 'aria-relevant' ) ).toBe( 'additions text' );
+			expect( container.getAttribute( 'aria-relevant' ) ).toBe(
+				'additions text'
+			);
 			expect( container.getAttribute( 'aria-atomic' ) ).toBe( 'true' );
 		} );
 	} );
@@ -27,7 +29,9 @@ describe( 'addContainer', () => {
 			expect( container.id ).toBe( 'a11y-speak-assertive' );
 			expect( container.getAttribute( 'style' ) ).not.toBeNull();
 			expect( container.getAttribute( 'aria-live' ) ).toBe( 'assertive' );
-			expect( container.getAttribute( 'aria-relevant' ) ).toBe( 'additions text' );
+			expect( container.getAttribute( 'aria-relevant' ) ).toBe(
+				'additions text'
+			);
 			expect( container.getAttribute( 'aria-atomic' ) ).toBe( 'true' );
 		} );
 	} );
@@ -41,7 +45,9 @@ describe( 'addContainer', () => {
 			expect( container.id ).toBe( 'a11y-speak-polite' );
 			expect( container.getAttribute( 'style' ) ).not.toBeNull();
 			expect( container.getAttribute( 'aria-live' ) ).toBe( 'polite' );
-			expect( container.getAttribute( 'aria-relevant' ) ).toBe( 'additions text' );
+			expect( container.getAttribute( 'aria-relevant' ) ).toBe(
+				'additions text'
+			);
 			expect( container.getAttribute( 'aria-atomic' ) ).toBe( 'true' );
 		} );
 	} );

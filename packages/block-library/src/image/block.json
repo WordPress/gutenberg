@@ -23,6 +23,12 @@
 			"source": "html",
 			"selector": "figcaption"
 		},
+		"title": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "img",
+			"attribute": "title"
+		},
 		"href": {
 			"type": "string",
 			"source": "attribute",

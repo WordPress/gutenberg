@@ -7,10 +7,11 @@
 	overflow: hidden;
 	white-space: nowrap;
 
-	.dashicon {
+	svg {
 		display: inline-block;
 		flex: 0 0 auto;
-		margin-right: $grid-size;
+		margin-right: $grid-size-small;
+		fill: currentColor;
 	}
 
 	@include break-small() {

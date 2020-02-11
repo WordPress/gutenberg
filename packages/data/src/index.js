@@ -18,10 +18,11 @@ export {
 	useRegistry,
 } from './components/registry-provider';
 export { default as useSelect } from './components/use-select';
-export { useDispatch } from './components/use-dispatch';
 export {
-	AsyncModeProvider as __experimentalAsyncModeProvider,
-} from './components/async-mode-provider';
+	useDispatch,
+	useDispatchWithMap as __unstableUseDispatchWithMap,
+} from './components/use-dispatch';
+export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 
@@ -78,7 +79,7 @@ export { combineReducers };
  * The selector functions are been pre-bound to pass the current state automatically.
  * As a consumer, you need only pass arguments of the selector, if applicable.
  *
- * @param {string} name Store name
+ * @param {string} name Store name.
  *
  * @example
  * ```js
@@ -92,13 +93,33 @@ export { combineReducers };
 export const select = defaultRegistry.select;
 
 /**
+ * Given the name of a registered store, returns an object containing the store's
+ * selectors pre-bound to state so that you only need to supply additional arguments,
+ * and modified so that they return promises that resolve to their eventual values,
+ * after any resolvers have ran.
+ *
+ * @param {string} name Store name.
+ *
+ * @example
+ * ```js
+ * const { __experimentalResolveSelect } = wp.data;
+ *
+ * __experimentalResolveSelect( 'my-shop' ).getPrice( 'hammer' ).then(console.log)
+ * ```
+ *
+ * @return {Object} Object containing the store's promise-wrapped selectors.
+ */
+export const __experimentalResolveSelect =
+	defaultRegistry.__experimentalResolveSelect;
+
+/**
  * Given the name of a registered store, returns an object of the store's action creators.
  * Calling an action creator will cause it to be dispatched, updating the state value accordingly.
  *
  * Note: Action creators returned by the dispatch will return a promise when
  * they are called.
  *
- * @param {string} name Store name
+ * @param {string} name Store name.
  *
  * @example
  * ```js

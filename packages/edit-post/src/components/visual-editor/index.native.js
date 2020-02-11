@@ -4,7 +4,7 @@
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { BlockList } from '@wordpress/block-editor';
 import { PostTitle } from '@wordpress/editor';
 import { ReadableContentView } from '@wordpress/components';
@@ -20,8 +20,12 @@ class VisualEditor extends Component {
 			editTitle,
 			setTitleRef,
 			title,
+			getStylesFromColorScheme,
 		} = this.props;
-
+		const blockHolderFocusedStyle = getStylesFromColorScheme(
+			styles.blockHolderFocused,
+			styles.blockHolderFocusedDark
+		);
 		return (
 			<ReadableContentView>
 				<PostTitle
@@ -29,12 +33,8 @@ class VisualEditor extends Component {
 					title={ title }
 					onUpdate={ editTitle }
 					placeholder={ __( 'Add title' ) }
-					borderStyle={
-						this.props.isFullyBordered ?
-							styles.blockHolderFullBordered :
-							styles.blockHolderSemiBordered
-					}
-					focusedBorderColor={ styles.blockHolderFocused.borderColor }
+					borderStyle={ styles.blockHolderFullBordered }
+					focusedBorderColor={ blockHolderFocusedStyle.borderColor }
 					accessibilityLabel="post-title"
 				/>
 			</ReadableContentView>
@@ -42,16 +42,13 @@ class VisualEditor extends Component {
 	}
 
 	render() {
-		const {
-			isFullyBordered,
-			safeAreaBottomInset,
-		} = this.props;
+		const { safeAreaBottomInset } = this.props;
 
 		return (
 			<BlockList
 				header={ this.renderHeader() }
-				isFullyBordered={ isFullyBordered }
 				safeAreaBottomInset={ safeAreaBottomInset }
+				autoScroll={ true }
 			/>
 		);
 	}
@@ -59,18 +56,14 @@ class VisualEditor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-		} = select( 'core/editor' );
+		const { getEditedPostAttribute } = select( 'core/editor' );
 
 		return {
 			title: getEditedPostAttribute( 'title' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const {
-			editPost,
-		} = dispatch( 'core/editor' );
+		const { editPost } = dispatch( 'core/editor' );
 
 		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
 
@@ -81,4 +74,5 @@ export default compose( [
 			},
 		};
 	} ),
+	withPreferredColorScheme,
 ] )( VisualEditor );

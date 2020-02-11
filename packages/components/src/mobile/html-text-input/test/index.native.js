@@ -15,9 +15,12 @@ import { HTMLTextInput } from '..';
 
 // Utility to find a TextInput in a ShallowWrapper
 const findTextInputInWrapper = ( wrapper, matchingProps ) => {
-	return wrapper.dive().findWhere( ( node ) => {
-		return node.name() === 'TextInput' && node.is( matchingProps );
-	} ).first();
+	return wrapper
+		.dive()
+		.findWhere( ( node ) => {
+			return node.name() === 'TextInput' && node.is( matchingProps );
+		} )
+		.first();
 };
 
 // Finds the Content TextInput in our HTMLInputView
@@ -33,10 +36,16 @@ const findTitleTextInput = ( wrapper ) => {
 	return findTextInputInWrapper( wrapper, { placeholder } );
 };
 
+const getStylesFromColorScheme = () => {
+	return { color: 'white' };
+};
+
 describe( 'HTMLTextInput', () => {
 	it( 'HTMLTextInput renders', () => {
 		const wrapper = shallow(
-			<HTMLTextInput />
+			<HTMLTextInput
+				getStylesFromColorScheme={ getStylesFromColorScheme }
+			/>
 		);
 		expect( wrapper ).toBeTruthy();
 	} );
@@ -47,6 +56,7 @@ describe( 'HTMLTextInput', () => {
 		const wrapper = shallow(
 			<HTMLTextInput
 				onChange={ onChange }
+				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>
 		);
 
@@ -71,6 +81,7 @@ describe( 'HTMLTextInput', () => {
 			<HTMLTextInput
 				onPersist={ onPersist }
 				onChange={ jest.fn() }
+				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>
 		);
 
@@ -101,6 +112,7 @@ describe( 'HTMLTextInput', () => {
 		const wrapper = shallow(
 			<HTMLTextInput
 				editTitle={ editTitle }
+				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>
 		);
 
@@ -113,4 +125,3 @@ describe( 'HTMLTextInput', () => {
 		expect( editTitle ).toHaveBeenCalledWith( 'text' );
 	} );
 } );
-

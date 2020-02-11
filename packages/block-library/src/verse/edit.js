@@ -13,7 +13,12 @@ import {
 	AlignmentToolbar,
 } from '@wordpress/block-editor';
 
-export default function VerseEdit( { attributes, setAttributes, className, mergeBlocks } ) {
+export default function VerseEdit( {
+	attributes,
+	setAttributes,
+	className,
+	mergeBlocks,
+} ) {
 	const { textAlign, content } = attributes;
 
 	return (
@@ -28,6 +33,7 @@ export default function VerseEdit( { attributes, setAttributes, className, merge
 			</BlockControls>
 			<RichText
 				tagName="pre"
+				preserveWhiteSpace
 				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
@@ -35,8 +41,7 @@ export default function VerseEdit( { attributes, setAttributes, className, merge
 					} );
 				} }
 				placeholder={ __( 'Write…' ) }
-				wrapperClassName={ className }
-				className={ classnames( {
+				className={ classnames( className, {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 				onMerge={ mergeBlocks }

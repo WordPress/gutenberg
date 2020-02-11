@@ -7,7 +7,13 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 
 const { Fill, Slot } = createSlotFill( 'PluginPostPublishPanel' );
 
-const PluginPostPublishPanelFill = ( { children, className, title, initialOpen = false, icon } ) => (
+const PluginPostPublishPanelFill = ( {
+	children,
+	className,
+	title,
+	initialOpen = false,
+	icon,
+} ) => (
 	<Fill>
 		<PanelBody
 			className={ className }
@@ -27,7 +33,7 @@ const PluginPostPublishPanelFill = ( { children, className, title, initialOpen =
  * @param {string} [props.className] An optional class name added to the panel.
  * @param {string} [props.title] Title displayed at the top of the panel.
  * @param {boolean} [props.initialOpen=false] Whether to have the panel initially opened. When no title is provided it is always opened.
- * @param {string|Element} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+ * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
  * @example <caption>ES5</caption>
  * ```js
@@ -65,7 +71,7 @@ const PluginPostPublishPanelFill = ( { children, className, title, initialOpen =
  * );
  * ```
  *
- * @return {WPElement} The WPElement to be rendered.
+ * @return {WPComponent} The component to be rendered.
  */
 
 const PluginPostPublishPanel = compose(
@@ -73,7 +79,7 @@ const PluginPostPublishPanel = compose(
 		return {
 			icon: ownProps.icon || context.icon,
 		};
-	} ),
+	} )
 )( PluginPostPublishPanelFill );
 
 PluginPostPublishPanel.Slot = Slot;

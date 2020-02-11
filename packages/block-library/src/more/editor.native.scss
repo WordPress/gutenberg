@@ -1,13 +1,21 @@
 // @format
 
-.block-library-more__line {
+.moreLine {
 	background-color: $gray-lighten-20;
 	height: 2;
 }
 
-.block-library-more__text {
+.moreLineDark {
+	background-color: $gray-50;
+}
+
+.moreText {
 	color: $gray;
 	text-decoration-style: solid;
 	text-transform: uppercase;
+}
+
+.moreTextDark {
+	color: $gray-20;
 }
 

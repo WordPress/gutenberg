@@ -62,7 +62,11 @@ class PostPermalinkEditor extends Component {
 						className="editor-post-permalink-editor__edit"
 						aria-label={ __( 'Edit post permalink' ) }
 						value={ editedPostName }
-						onChange={ ( event ) => this.setState( { editedPostName: event.target.value } ) }
+						onChange={ ( event ) =>
+							this.setState( {
+								editedPostName: event.target.value,
+							} )
+						}
 						type="text"
 						autoFocus
 					/>
@@ -73,7 +77,7 @@ class PostPermalinkEditor extends Component {
 				</span>
 				<Button
 					className="editor-post-permalink-editor__save"
-					isLarge
+					isSecondary
 					onClick={ this.onSavePermalink }
 				>
 					{ __( 'Save' ) }
@@ -96,4 +100,3 @@ export default compose( [
 		return { editPost };
 	} ),
 ] )( PostPermalinkEditor );
-

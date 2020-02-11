@@ -1,0 +1,46 @@
+.edit-site-sidebar {
+	background: $white;
+	border-left: $border-width solid $light-gray-500;
+	bottom: 0;
+	color: $dark-gray-500;
+	height: 100vh;
+	overflow: hidden;
+	position: fixed;
+	right: 0;
+	top: 0;
+	width: $sidebar-width;
+	z-index: z-index(".edit-site-sidebar");
+
+	@include break-small() {
+		-webkit-overflow-scrolling: touch;
+		height: auto;
+		overflow: auto;
+		top: $admin-bar-height-big + $header-height;
+		z-index: z-index(".edit-site-sidebar {greater than small}");
+	}
+
+	@include break-medium() {
+		top: $admin-bar-height + $header-height;
+	}
+
+	// Temporarily disable the sidebar on mobile.
+	display: none;
+	@include break-small() {
+		display: block;
+	}
+
+	> .components-panel {
+		border-left: 0;
+		border-right: 0;
+		margin-bottom: -1px;
+		margin-top: -1px;
+
+		> .components-panel__header {
+			background: $light-gray-200;
+		}
+	}
+
+	.block-editor-block-inspector__card {
+		margin: 0;
+	}
+}

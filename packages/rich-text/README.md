@@ -84,6 +84,7 @@ _Parameters_
 -   _$1.range_ `[Range]`: Range to create value from.
 -   _$1.multilineTag_ `[string]`: Multiline tag if the structure is multiline.
 -   _$1.multilineWrapperTags_ `[Array]`: Tags where lines can be found if nesting is possible.
+-   _$1.preserveWhiteSpace_ `[?boolean]`: Whether or not to collapse white space characters.
 
 _Returns_
 
@@ -216,11 +217,7 @@ behavior.
 _Parameters_
 
 -   _name_ `string`: Format name.
--   _settings_ `Object`: Format settings.
--   _settings.tagName_ `string`: The HTML tag this format will wrap the selection with.
--   _settings.className_ `[string]`: A class to match the format.
--   _settings.title_ `string`: Name of the format.
--   _settings.edit_ `Function`: Should return a component for the user to interact with the new registered format.
+-   _settings_ `WPFormat`: Format settings.
 
 _Returns_
 
@@ -332,6 +329,7 @@ _Parameters_
 -   _$1_ `Object`: Named argements.
 -   _$1.value_ `Object`: Rich text value.
 -   _$1.multilineTag_ `[string]`: Multiline tag.
+-   _$1.preserveWhiteSpace_ `[?boolean]`: Whether or not to use newline characters for line breaks.
 
 _Returns_
 

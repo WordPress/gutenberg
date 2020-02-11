@@ -1,10 +1,16 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * Internal dependencies
  */
 import {
 	getChildBlockNames,
-	isMatchingSearchTerm,
+	getDefaultBlockVariation,
 	getGroupingBlockName,
+	isMatchingSearchTerm,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -78,7 +84,10 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [ 'child1', 'child3' ] );
+			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
+				'child1',
+				'child3',
+			] );
 		} );
 
 		it( 'should return an array with the child block names even if only one child exists', () => {
@@ -104,7 +113,9 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [ 'child1' ] );
+			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
+				'child1',
+			] );
 		} );
 
 		it( 'should return an array with the child block names even if children have multiple parents', () => {
@@ -134,8 +145,84 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [ 'child1', 'child2', 'child3' ] );
-			expect( getChildBlockNames( state, 'parent2' ) ).toEqual( [ 'child2' ] );
+			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
+				'child1',
+				'child2',
+				'child3',
+			] );
+			expect( getChildBlockNames( state, 'parent2' ) ).toEqual( [
+				'child2',
+			] );
+		} );
+	} );
+
+	describe( 'getDefaultBlockVariation', () => {
+		const blockName = 'block/name';
+		const createBlockVariationsState = ( variations ) => {
+			return deepFreeze( {
+				blockVariations: {
+					[ blockName ]: variations,
+				},
+			} );
+		};
+		const firstBlockVariation = {
+			name: 'first-block-variation',
+		};
+		const secondBlockVariation = {
+			name: 'second-block-variation',
+		};
+		const thirdBlockVariation = {
+			name: 'third-block-variation',
+		};
+
+		it( 'should return the default variation when set', () => {
+			const defaultBlockVariation = {
+				...secondBlockVariation,
+				isDefault: true,
+			};
+			const state = createBlockVariationsState( [
+				firstBlockVariation,
+				defaultBlockVariation,
+				thirdBlockVariation,
+			] );
+
+			const result = getDefaultBlockVariation( state, blockName );
+
+			expect( result ).toEqual( defaultBlockVariation );
+		} );
+
+		it( 'should return the last variation when multiple default variations added', () => {
+			const defaultBlockVariation = {
+				...thirdBlockVariation,
+				isDefault: true,
+			};
+			const state = createBlockVariationsState( [
+				{
+					...firstBlockVariation,
+					isDefault: true,
+				},
+				{
+					...secondBlockVariation,
+					isDefault: true,
+				},
+				defaultBlockVariation,
+			] );
+
+			const result = getDefaultBlockVariation( state, blockName );
+
+			expect( result ).toEqual( defaultBlockVariation );
+		} );
+
+		it( 'should return the first variation when no default variation set', () => {
+			const state = createBlockVariationsState( [
+				firstBlockVariation,
+				secondBlockVariation,
+				thirdBlockVariation,
+			] );
+
+			const result = getDefaultBlockVariation( state, blockName );
+
+			expect( result ).toEqual( firstBlockVariation );
 		} );
 	} );
 
@@ -158,43 +245,71 @@ describe( 'selectors', () => {
 			[ 'block type', blockType ],
 		] )( 'by %s', ( label, nameOrType ) => {
 			it( 'should return false if not match', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'Quote' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'Quote'
+				);
 
 				expect( result ).toBe( false );
 			} );
 
 			it( 'should return true if match by title', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'Paragraph' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'Paragraph'
+				);
 
 				expect( result ).toBe( true );
 			} );
 
 			it( 'should return true if match ignoring case', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'PARAGRAPH' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'PARAGRAPH'
+				);
 
 				expect( result ).toBe( true );
 			} );
 
 			it( 'should return true if match ignoring diacritics', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'PÁRAGRAPH' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'PÁRAGRAPH'
+				);
 
 				expect( result ).toBe( true );
 			} );
 
 			it( 'should return true if match ignoring whitespace', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, '  PARAGRAPH  ' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'  PARAGRAPH  '
+				);
 
 				expect( result ).toBe( true );
 			} );
 
 			it( 'should return true if match using the keywords', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'TEXT' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'TEXT'
+				);
 
 				expect( result ).toBe( true );
 			} );
 
 			it( 'should return true if match using the categories', () => {
-				const result = isMatchingSearchTerm( state, nameOrType, 'COMMON' );
+				const result = isMatchingSearchTerm(
+					state,
+					nameOrType,
+					'COMMON'
+				);
 
 				expect( result ).toBe( true );
 			} );

@@ -1,4 +1,6 @@
 .components-navigate-regions.is-focusing-regions [role="region"] {
+	position: relative;
+
 	// For browsers that don't support outline-offset (IE11).
 	&:focus::after {
 		content: "";

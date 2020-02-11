@@ -14,17 +14,15 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import { blockAutocompleter, userAutocompleter } from '../components';
 
-const defaultAutocompleters = [ userAutocompleter ];
+function setDefaultCompleters( completers = [], blockName ) {
+	// Provide copies so filters may directly modify them.
+	completers.push( clone( userAutocompleter ) );
 
-function setDefaultCompleters( completers, blockName ) {
-	if ( ! completers ) {
-		// Provide copies so filters may directly modify them.
-		completers = defaultAutocompleters.map( clone );
-		// Add blocks autocompleter for Paragraph block
-		if ( blockName === getDefaultBlockName() ) {
-			completers.push( clone( blockAutocompleter ) );
-		}
+	// Add blocks autocompleter for Paragraph block
+	if ( blockName === getDefaultBlockName() ) {
+		completers.push( clone( blockAutocompleter ) );
 	}
+
 	return completers;
 }
 

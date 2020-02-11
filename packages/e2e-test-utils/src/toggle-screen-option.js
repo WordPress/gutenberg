@@ -3,7 +3,6 @@
  */
 import { clickOnCloseModalButton } from './click-on-close-modal-button';
 import { clickOnMoreMenuItem } from './click-on-more-menu-item';
-import { toggleMoreMenu } from './toggle-more-menu';
 
 /**
  * Toggles the screen option with the given label.
@@ -14,7 +13,9 @@ import { toggleMoreMenu } from './toggle-more-menu';
  */
 export async function toggleScreenOption( label, shouldBeChecked = undefined ) {
 	await clickOnMoreMenuItem( 'Options' );
-	const [ handle ] = await page.$x( `//label[contains(text(), "${ label }")]` );
+	const [ handle ] = await page.$x(
+		`//label[contains(text(), "${ label }")]`
+	);
 
 	const isChecked = await page.evaluate(
 		( element ) => element.control.checked,
@@ -25,5 +26,4 @@ export async function toggleScreenOption( label, shouldBeChecked = undefined ) {
 	}
 
 	await clickOnCloseModalButton();
-	await toggleMoreMenu();
 }

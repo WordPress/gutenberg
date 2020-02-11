@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
  * @param {Object} args Keyword args.
  * @param {HTMLDocument} args.htmlDocument The document to lock the scroll for.
  * @param {string} args.className The name of the class used to lock scrolling.
- * @return {Component} The bound ScrollLock component.
+ * @return {WPComponent} The bound ScrollLock component.
  */
 export function createScrollLockComponent( {
 	htmlDocument = document,
@@ -35,7 +35,8 @@ export function createScrollLockComponent( {
 	 * @param {boolean} locked Whether or not scroll should be locked.
 	 */
 	function setLocked( locked ) {
-		const scrollingElement = htmlDocument.scrollingElement || htmlDocument.body;
+		const scrollingElement =
+			htmlDocument.scrollingElement || htmlDocument.body;
 
 		if ( locked ) {
 			previousScrollTop = scrollingElement.scrollTop;

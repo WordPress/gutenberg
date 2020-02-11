@@ -2,7 +2,7 @@
 
 exports[`URLPopover matches the snapshot in its default state 1`] = `
 <Popover
-  className="editor-url-popover block-editor-url-popover"
+  className="block-editor-url-popover"
   focusOnMount="firstElement"
   position="bottom center"
 >
@@ -10,15 +10,24 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
     className="block-editor-url-popover__input-container"
   >
     <div
-      className="editor-url-popover__row block-editor-url-popover__row"
+      className="block-editor-url-popover__row"
     >
       <div>
         Editor
       </div>
-      <ForwardRef(IconButton)
+      <ForwardRef(Button)
         aria-expanded={false}
-        className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
-        icon="arrow-down-alt2"
+        className="block-editor-url-popover__settings-toggle"
+        icon={
+          <SVG
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <Path
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+            />
+          </SVG>
+        }
         label="Link settings"
         onClick={[Function]}
       />
@@ -29,7 +38,7 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
 
 exports[`URLPopover matches the snapshot when the settings are toggled open 1`] = `
 <Popover
-  className="editor-url-popover block-editor-url-popover"
+  className="block-editor-url-popover"
   focusOnMount="firstElement"
   position="bottom center"
 >
@@ -37,21 +46,30 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
     className="block-editor-url-popover__input-container"
   >
     <div
-      className="editor-url-popover__row block-editor-url-popover__row"
+      className="block-editor-url-popover__row"
     >
       <div>
         Editor
       </div>
-      <ForwardRef(IconButton)
+      <ForwardRef(Button)
         aria-expanded={true}
-        className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
-        icon="arrow-down-alt2"
+        className="block-editor-url-popover__settings-toggle"
+        icon={
+          <SVG
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <Path
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+            />
+          </SVG>
+        }
         label="Link settings"
         onClick={[Function]}
       />
     </div>
     <div
-      className="editor-url-popover__row block-editor-url-popover__row editor-url-popover__settings block-editor-url-popover__settings"
+      className="block-editor-url-popover__row block-editor-url-popover__settings"
     >
       <div>
         Settings
@@ -63,7 +81,7 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
 
 exports[`URLPopover matches the snapshot when there are no settings 1`] = `
 <Popover
-  className="editor-url-popover block-editor-url-popover"
+  className="block-editor-url-popover"
   focusOnMount="firstElement"
   position="bottom center"
 >
@@ -71,7 +89,7 @@ exports[`URLPopover matches the snapshot when there are no settings 1`] = `
     className="block-editor-url-popover__input-container"
   >
     <div
-      className="editor-url-popover__row block-editor-url-popover__row"
+      className="block-editor-url-popover__row"
     >
       <div>
         Editor
