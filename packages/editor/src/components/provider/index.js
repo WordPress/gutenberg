@@ -119,7 +119,6 @@ class EditorProvider extends Component {
 				'__experimentalEnableFullSiteEditing',
 				'__experimentalEnableFullSiteEditingDemo',
 				'__mobileEnablePageTemplates',
-				'__experimentalEnablePageTemplates',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBase',
 				'showInserterHelpPanel',
