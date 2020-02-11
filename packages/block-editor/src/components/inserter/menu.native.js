@@ -51,7 +51,11 @@ export class InserterMenu extends Component {
 	}
 
 	calculateMinItemWidth( bottomSheetWidth ) {
-		return ( bottomSheetWidth - 64 ) / MIN_COL_NUM;
+		const { paddingLeft, paddingRight } = styles.columnPadding;
+		return (
+			( bottomSheetWidth - 2 * ( paddingLeft + paddingRight ) ) /
+			MIN_COL_NUM
+		);
 	}
 
 	calculateItemWidth() {
@@ -95,14 +99,16 @@ export class InserterMenu extends Component {
 	}
 
 	onLayout() {
-		const calculateColumns = this.calculateColumns();
-		const numberOfColumns = calculateColumns.numOfColumns;
+		const calculatedColumns = this.calculateColumns();
+		const numberOfColumns = calculatedColumns.numOfColumns;
 
 		this.setState( { numberOfColumns } );
 	}
 
 	render() {
-		const { getStylesFromColorScheme } = this.props;
+		const { getStylesFromColorScheme, items, onSelect } = this.props;
+		const { numberOfColumns } = this.state;
+
 		const bottomPadding = styles.contentBottomPadding;
 		const modalIconWrapperStyle = getStylesFromColorScheme(
 			styles.modalIconWrapper,
@@ -117,7 +123,7 @@ export class InserterMenu extends Component {
 			styles.modalItemLabelDark
 		);
 
-		const calculateColumns = this.calculateColumns();
+		const calculatedColumns = this.calculateColumns();
 
 		return (
 			<BottomSheet
@@ -130,10 +136,10 @@ export class InserterMenu extends Component {
 					<FlatList
 						onLayout={ this.onLayout }
 						scrollEnabled={ false }
-						key={ `InserterUI-${ this.state.numberOfColumns }` } //re-render when numberOfColumns changes
+						key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
 						keyboardShouldPersistTaps="always"
-						numColumns={ this.state.numberOfColumns }
-						data={ this.props.items }
+						numColumns={ numberOfColumns }
+						data={ items }
 						ItemSeparatorComponent={ () => (
 							<View style={ styles.rowSeparator } />
 						) }
@@ -144,15 +150,15 @@ export class InserterMenu extends Component {
 								underlayColor="transparent"
 								activeOpacity={ 0.5 }
 								accessibilityLabel={ item.title }
-								onPress={ () => this.props.onSelect( item ) }
+								onPress={ () => onSelect( item ) }
 							>
 								<View style={ styles.modalItem }>
 									<View
 										style={ [
 											modalIconWrapperStyle,
-											calculateColumns.itemWidth && {
+											calculatedColumns.itemWidth && {
 												width:
-													calculateColumns.itemWidth,
+													calculatedColumns.itemWidth,
 											},
 										] }
 									>
