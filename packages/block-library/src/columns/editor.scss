@@ -70,6 +70,8 @@
 			@include break-small() {
 				flex-basis: calc(50% - (#{$grid-size-large}));
 				flex-grow: 0;
+				margin-left: 0;
+				margin-right: 0;
 			}
 
 			// At large viewports, show all columns horizontally.
@@ -90,9 +92,6 @@
 				&[data-has-explicit-width] {
 					flex-grow: 0;
 				}
-
-				margin-left: 0;
-				margin-right: 0;
 			}
 
 			// Add space between columns. Themes can customize this if they wish to work differently.
