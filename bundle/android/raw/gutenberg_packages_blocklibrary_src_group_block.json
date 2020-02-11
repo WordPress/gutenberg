@@ -1,0 +1,18 @@
+{
+	"name": "core/group",
+	"category": "layout",
+	"attributes": {
+		"backgroundColor": {
+			"type": "string"
+		},
+		"customBackgroundColor": {
+			"type": "string"
+		},
+		"textColor": {
+			"type": "string"
+		},
+		"customTextColor": {
+			"type": "string"
+		}
+	}
+}
