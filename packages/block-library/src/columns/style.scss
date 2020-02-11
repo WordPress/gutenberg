@@ -30,7 +30,7 @@
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
 
-	// Beyond mobile, allow columns.
+	// Between mobile and large viewports, allow 2 columns.
 	@include break-small() {
 		flex-basis: calc(50% - #{$grid-size-large});
 		flex-grow: 0;
