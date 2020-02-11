@@ -97,7 +97,7 @@ export class MediaUpload extends React.Component {
 		const {
 			allowedTypes = [],
 			multiple = false,
-			onlyMediaLibrary,
+			__experimentalOnlyMediaLibrary,
 		} = this.props;
 
 		// disable upload sources for now when multiple flag is set
@@ -110,7 +110,7 @@ export class MediaUpload extends React.Component {
 
 		return this.getAllSources()
 			.filter( ( source ) => {
-				return onlyMediaLibrary
+				return __experimentalOnlyMediaLibrary
 					? source.mediaLibrary
 					: allowedTypes.filter( ( allowedType ) =>
 							source.types.includes( allowedType )

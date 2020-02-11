@@ -41,13 +41,13 @@ import { cover as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import {
+	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
 	backgroundImageStyles,
 	dimRatioToClass,
 } from './shared';
-import { attributesFromMedia } from './utils';
 
 /**
  * Module Constants

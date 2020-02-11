@@ -29,8 +29,8 @@ import { cover as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import styles from './style.scss';
-import { attributesFromMedia } from './utils';
 import {
+	attributesFromMedia,
 	COVER_MIN_HEIGHT,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
@@ -54,6 +54,7 @@ const COVER_DEFAULT_HEIGHT = 300;
 
 const Cover = ( {
 	attributes,
+	getStylesFromColorScheme,
 	isAncestorSelected,
 	isParentSelected,
 	isSelected,
@@ -95,16 +96,13 @@ const Cover = ( {
 		setAttributes( { dimRatio: value } );
 	};
 
-	const getOpacity = () => {
-		// Set opacity to 1 while video support is not available
-		if ( VIDEO_BACKGROUND_TYPE === backgroundType ) {
-			return 1;
-		}
-
-		return url ? dimRatio / 100 : 1;
-	};
-
 	const getOverlayStyles = () => {
+		// Set opacity to 1 while video support is not available
+		const opacity =
+			url && VIDEO_BACKGROUND_TYPE !== backgroundType
+				? dimRatio / 100
+				: 1;
+
 		return [
 			styles.overlay,
 			{
@@ -112,12 +110,17 @@ const Cover = ( {
 					overlayColor && overlayColor.color
 						? overlayColor.color
 						: styles.overlay.color,
-				opacity: getOpacity(),
+				opacity,
 			},
 		];
 	};
 
-	const placeholderIcon = <Icon icon={ icon } { ...styles.icon } />;
+	const placeholderIconStyle = getStylesFromColorScheme(
+		styles.icon,
+		styles.iconDark
+	);
+
+	const placeholderIcon = <Icon icon={ icon } { ...placeholderIconStyle } />;
 
 	const controls = (
 		<InspectorControls>
@@ -160,12 +163,12 @@ const Cover = ( {
 	if ( ! hasBackground ) {
 		return (
 			<MediaPlaceholder
+				__experimentalOnlyMediaLibrary={ true }
 				icon={ placeholderIcon }
 				labels={ {
 					title: __( 'Cover' ),
 				} }
 				onSelect={ onSelectMedia }
-				onlyMediaLibrary={ true }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onFocus={ onFocus }
 			/>
