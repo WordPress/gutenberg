@@ -321,18 +321,6 @@ _Returns_
 
 -   `Array`: ids of top-level and descendant blocks.
 
-<a name="getPreviewDeviceType" href="#getPreviewDeviceType">#</a> **getPreviewDeviceType**
-
-Returns the current editing canvas device type.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `string`: Device type.
-
 <a name="getFirstMultiSelectedBlockClientId" href="#getFirstMultiSelectedBlockClientId">#</a> **getFirstMultiSelectedBlockClientId**
 
 Returns the client ID of the first block in the multi-selection set, or null
@@ -511,6 +499,18 @@ _Parameters_
 _Returns_
 
 -   `?string`: Adjacent block's client ID, or null if none exists.
+
+<a name="getPreviewDeviceType" href="#getPreviewDeviceType">#</a> **getPreviewDeviceType**
+
+Returns the current editing canvas device type.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Device type.
 
 <a name="getPreviousBlockClientId" href="#getPreviousBlockClientId">#</a> **getPreviousBlockClientId**
 
