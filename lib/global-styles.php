@@ -135,7 +135,7 @@ function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter 
 function gutenberg_experimental_global_styles_get_user_cpt_id() {
 	$user_cpt_id = null;
 	$user_cpt    = gutenberg_experimental_global_styles_get_user_cpt( array( 'publish', 'draft' ), true );
-	if ( in_array( 'ID', $user_cpt, true ) ) {
+	if ( array_key_exists( 'ID', $user_cpt ) ) {
 		$user_cpt_id = $user_cpt['ID'];
 	}
 	return $user_cpt_id;
