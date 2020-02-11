@@ -93,7 +93,7 @@ export class MediaUpload extends React.Component {
 	}
 
 	getMediaOptionsItems() {
-		const { allowedTypes = [], multiple = false } = this.props;
+		const { allowedTypes = [] } = this.props;
 
 		return this.getAllSources()
 			.filter( ( source ) => {
