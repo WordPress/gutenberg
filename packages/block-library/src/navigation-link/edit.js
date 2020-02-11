@@ -86,9 +86,6 @@ function NavigationLinkEdit( {
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
 		if ( isLinkOpen && url ) {
-			// Close the link.
-			setIsLinkOpen( false );
-
 			// Does this look like a URL and have something TLD-ish?
 			if (
 				isURL( prependHTTP( label ) ) &&
