@@ -36,9 +36,12 @@ const getFeaturedImageMediaFrame = () => {
 		 *
 		 * @return {void}
 		 */
-		editState( ) {
+		editState() {
 			const selection = this.state( 'featured-image' ).get( 'selection' ),
-				view = new wp.media.view.EditImage( { model: selection.single(), controller: this } ).render();
+				view = new wp.media.view.EditImage( {
+					model: selection.single(),
+					controller: this,
+				} ).render();
 			this.content.set( view );
 
 			// after bringing in the frame, load the actual editor via an ajax call
@@ -51,12 +54,18 @@ const getFeaturedImageMediaFrame = () => {
 		 * @return {void}
 		 */
 		createStates: function createStates() {
-			this.on( 'toolbar:create:featured-image', this.featuredImageToolbar, this );
+			this.on(
+				'toolbar:create:featured-image',
+				this.featuredImageToolbar,
+				this
+			);
 			this.on( 'content:render:edit-image', this.editState, this );
 
 			this.states.add( [
 				new wp.media.controller.FeaturedImage(),
-				new wp.media.controller.EditImage( { model: this.options.editImage } ),
+				new wp.media.controller.EditImage( {
+					model: this.options.editImage,
+				} ),
 			] );
 		},
 	} );
@@ -76,40 +85,46 @@ const getGalleryDetailsMediaFrame = () => {
 	 * @class
 	 */
 	return wp.media.view.MediaFrame.Select.extend( {
-
 		/**
 		 * Set up gallery toolbar.
 		 *
 		 * @return {void}
 		 */
-		galleryToolbar( ) {
+		galleryToolbar() {
 			const editing = this.state().get( 'editing' );
-			this.toolbar.set( new wp.media.view.Toolbar( {
-				controller: this,
-				items: {
-					insert: {
-						style: 'primary',
-						text: editing ? wp.media.view.l10n.updateGallery : wp.media.view.l10n.insertGallery,
-						priority: 80,
-						requires: { library: true },
+			this.toolbar.set(
+				new wp.media.view.Toolbar( {
+					controller: this,
+					items: {
+						insert: {
+							style: 'primary',
+							text: editing
+								? wp.media.view.l10n.updateGallery
+								: wp.media.view.l10n.insertGallery,
+							priority: 80,
+							requires: { library: true },
 
-						/**
-						 * @fires wp.media.controller.State#update
-						 */
-						click() {
-							const controller = this.controller,
-								state = controller.state();
+							/**
+							 * @fires wp.media.controller.State#update
+							 */
+							click() {
+								const controller = this.controller,
+									state = controller.state();
 
-							controller.close();
-							state.trigger( 'update', state.get( 'library' ) );
+								controller.close();
+								state.trigger(
+									'update',
+									state.get( 'library' )
+								);
 
-							// Restore and reset the default state.
-							controller.setState( controller.options.state );
-							controller.reset();
+								// Restore and reset the default state.
+								controller.setState( controller.options.state );
+								controller.reset();
+							},
 						},
 					},
-				},
-			} ) );
+				} )
+			);
 		},
 
 		/**
@@ -117,9 +132,12 @@ const getGalleryDetailsMediaFrame = () => {
 		 *
 		 * @return {void}
 		 */
-		editState( ) {
+		editState() {
 			const selection = this.state( 'gallery' ).get( 'selection' ),
-				view = new wp.media.view.EditImage( { model: selection.single(), controller: this } ).render();
+				view = new wp.media.view.EditImage( {
+					model: selection.single(),
+					controller: this,
+				} ).render();
 			this.content.set( view );
 
 			// after bringing in the frame, load the actual editor via an ajax call
@@ -154,7 +172,9 @@ const getGalleryDetailsMediaFrame = () => {
 						)
 					),
 				} ),
-				new wp.media.controller.EditImage( { model: this.options.editImage } ),
+				new wp.media.controller.EditImage( {
+					model: this.options.editImage,
+				} ),
 
 				new wp.media.controller.GalleryEdit( {
 					library: this.options.selection,
