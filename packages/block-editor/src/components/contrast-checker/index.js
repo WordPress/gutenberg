@@ -25,12 +25,22 @@ function ContrastCheckerMessage( {
 			: __(
 					'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
 			  );
+
+	// Note: The `Notice` component can speak messages via its `spokenMessage`
+	// prop, but the contrast checker requires granular control over when the
+	// announcements are made. Notably, the message will be re-announced if a
+	// new color combination is selected and the contrast is still insufficient.
 	useEffect( () => {
 		speak( __( 'This color combination may be hard for people to read.' ) );
 	}, [ backgroundColor, textColor ] );
+
 	return (
 		<div className="block-editor-contrast-checker">
-			<Notice status="warning" isDismissible={ false }>
+			<Notice
+				spokenMessage={ null }
+				status="warning"
+				isDismissible={ false }
+			>
 				{ msg }
 			</Notice>
 		</div>

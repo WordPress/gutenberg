@@ -7,7 +7,7 @@
 	grid-template-columns: 50% 1fr;
 	grid-template-rows: auto;
 
-	.has-media-on-the-right {
+	&.has-media-on-the-right {
 		grid-template-columns: 1fr 50%;
 	}
 }

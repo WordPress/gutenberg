@@ -1,0 +1,160 @@
+// On Mobile devices, swiping the HTML element should not scroll.
+// By making it fixed, we prevent that.
+html {
+	position: fixed;
+	width: 100%;
+
+	@include break-medium() {
+		position: initial;
+		width: initial;
+	}
+}
+
+.block-editor-editor-skeleton {
+	display: flex;
+	flex-direction: column;
+	height: auto;
+	max-height: 100%;
+
+	// Fill the available space on Mobile.
+	position: fixed;
+	top: $admin-bar-height-big;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	// Adjust to admin-bar going small.
+	@include break-medium() {
+		top: $admin-bar-height;
+
+		.is-fullscreen-mode & {
+			top: 0;
+		}
+	}
+}
+
+@include editor-left(".block-editor-editor-skeleton");
+
+.block-editor-editor-skeleton__body {
+	flex-grow: 1;
+	display: flex;
+
+	// Even on Mobile, we choose to scroll this element on its own.
+	// This helps enable a fixed-to-top toolbar that makes the editing experience
+	// on Mobile Safari usable.
+	// Unfortunately an issue still exists where if you swipe the top toolbar
+	// or beyond the bottom of the page when the soft keyboard is showing, you scroll
+	// the body element and can scroll the toolbar out of view.
+	// This is still preferable, though, as it allows the editor to function at all.
+	overflow: auto;
+
+	// In future versions of Mobile Safari, hopefully overscroll-behavior will be supported.
+	// This allows us to disallow the scroll-chaining and rubber-banding that is currently
+	// is the cause of the issue outlined above.
+	// In other words, the following behavior doesn't yet work in Safari, but if/when
+	// it is added, it should take care of the issue.
+	// See also: https://drafts.csswg.org/css-overscroll/
+	overscroll-behavior-y: none;
+}
+
+.block-editor-editor-skeleton__content {
+	flex-grow: 1;
+
+	// Treat as flex container to allow children to grow to occupy full
+	// available height of the content area.
+	display: flex;
+	flex-direction: column;
+
+	// On Mobile the header is fixed to keep HTML as scrollable.
+	// Beyond the medium breakpoint, we allow the sidebar.
+	// The sidebar should scroll independently, so enable scroll here also.
+	@include break-medium() {
+		overflow: auto;
+	}
+}
+
+.block-editor-editor-skeleton__sidebar {
+	display: none;
+
+	@include break-medium() {
+		display: block;
+		z-index: z-index(".block-editor-editor-skeleton__sidebar");
+		position: fixed !important; // Need to override the default relative positionning
+		top: -9999em;
+		bottom: auto;
+		left: auto;
+		right: 0;
+		width: $sidebar-width;
+
+		&:focus {
+			top: auto;
+			bottom: 0;
+		}
+	}
+}
+
+.is-sidebar-opened .block-editor-editor-skeleton__sidebar {
+	display: block;
+	width: auto; // Keep the sidebar width flexible.
+	flex-shrink: 0;
+	position: absolute;
+	z-index: z-index(".block-editor-editor-skeleton__sidebar");
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: $white;
+
+	// On Mobile the header is fixed to keep HTML as scrollable.
+	@include break-medium() {
+		overflow: auto;
+		border-left: $border-width solid $light-gray-500;
+		position: relative !important;
+		z-index: z-index(".block-editor-editor-skeleton__sidebar {greater than small}");
+	}
+}
+
+.block-editor-editor-skeleton__header {
+	flex-shrink: 0;
+	height: auto;  // Keep the height flexible.
+	border-bottom: $border-width solid $light-gray-500;
+	z-index: z-index(".block-editor-editor-skeleton__header");
+
+	// On Mobile the header is sticky.
+	position: sticky;
+	top: 0;
+
+	// Cancel the fixed positioning used on Mobile.
+	@include break-small() {
+		position: initial;
+		top: 0;
+	}
+}
+
+.block-editor-editor-skeleton__footer {
+	height: auto;  // Keep the height flexible.
+	flex-shrink: 0;
+	overflow: auto;
+	border-top: $border-width solid $light-gray-500;
+
+	// On Mobile the footer is hidden
+	display: none;
+	@include break-medium() {
+		display: block;
+	}
+}
+
+.block-editor-editor-skeleton__publish {
+	z-index: z-index(".block-editor-editor-skeleton__publish");
+	position: fixed !important; // Need to override the default relative positionning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	width: $sidebar-width;
+
+	&:focus {
+		top: auto;
+		bottom: 0;
+	}
+}

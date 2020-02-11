@@ -17,8 +17,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
-	__experimentalPageTemplatePicker,
-	__experimentalUsePageTemplatePickerVisible,
+	__experimentalEditorSkeleton as EditorSkeleton,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -39,7 +38,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import EditorRegions from '../editor-regions';
 import FullscreenMode from '../fullscreen-mode';
 import BrowserURL from '../browser-url';
 import Header from '../header';
@@ -101,7 +99,6 @@ function Layout() {
 			).getBlockSelectionStart(),
 		};
 	}, [] );
-	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened =
 		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -124,32 +121,28 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
-				<EditorRegions
+				<EditorSkeleton
 					className={ className }
 					header={ <Header /> }
 					sidebar={
-						! publishSidebarOpened && (
-							<>
-								{ ! sidebarIsOpened && (
-									<div className="edit-post-layout__toogle-sidebar-panel">
-										<Button
-											isSecondary
-											className="edit-post-layout__toogle-sidebar-panel-button"
-											onClick={ openSidebarPanel }
-											aria-expanded={ false }
-										>
-											{ hasBlockSelected
-												? __( 'Open block settings' )
-												: __(
-														'Open document settings'
-												  ) }
-										</Button>
-									</div>
-								) }
-								<SettingsSidebar />
-								<Sidebar.Slot />
-							</>
-						)
+						<>
+							{ ! sidebarIsOpened && (
+								<div className="edit-post-layout__toogle-sidebar-panel">
+									<Button
+										isSecondary
+										className="edit-post-layout__toogle-sidebar-panel-button"
+										onClick={ openSidebarPanel }
+										aria-expanded={ false }
+									>
+										{ hasBlockSelected
+											? __( 'Open block settings' )
+											: __( 'Open document settings' ) }
+									</Button>
+								</div>
+							) }
+							<SettingsSidebar />
+							<Sidebar.Slot />
+						</>
 					}
 					content={
 						<>
@@ -214,9 +207,6 @@ function Layout() {
 				<WelcomeGuide />
 				<Popover.Slot />
 				<PluginArea />
-				{ showPageTemplatePicker && (
-					<__experimentalPageTemplatePicker />
-				) }
 			</FocusReturnProvider>
 		</>
 	);

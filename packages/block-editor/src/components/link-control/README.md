@@ -64,3 +64,10 @@ Value change handler, called with the updated value if the user selects a new li
 - Default: `false`
 
 Whether to present initial suggestions immediately.
+
+### forceIsEditingLink
+
+- Type: `boolean`
+- Required: No
+
+If passed as either `true` or `false`, controls the internal editing state of the component to respective show or not show the URL input field.

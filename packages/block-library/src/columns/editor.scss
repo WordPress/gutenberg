@@ -66,10 +66,18 @@
 			// Responsiveness: Show at most one columns on mobile.
 			flex-basis: 100%;
 
-			// Beyond mobile, allow 2 columns.
 			@include break-small() {
-				flex-basis: calc(50% - (#{$grid-size-large}));
-				flex-grow: 0;
+				flex-grow: 1;
+				flex-basis: auto;
+
+				// Beyond mobile, allow columns. Columns with an explicitly-
+				// assigned width should maintain their `flex-basis` width and
+				// not grow. All other blocks should automatically inherit the
+				// `flex-grow` to occupy the available space.
+				&[data-has-explicit-width] {
+					flex-grow: 0;
+				}
+
 				margin-left: 0;
 				margin-right: 0;
 			}
