@@ -537,7 +537,7 @@ export function switchToBlockType( blocks, name ) {
  * @param {string} name
  * @param {Object} example
  *
- * @return {?Object} block object or undefined.
+ * @return {Object|undefined} block object or undefined.
  */
 export const getBlockFromExample = ( name, example ) => {
 	if ( ! getBlockType( name ) ) {
