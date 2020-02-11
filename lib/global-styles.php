@@ -322,6 +322,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
 	add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
 	add_filter( 'body_class', 'gutenberg_experimental_global_styles_wp_gs_class_front_end' );
 	add_filter( 'admin_body_class', 'gutenberg_experimental_global_styles_wp_gs_class_editor' );
-	add_action( 'enqueue_block_assets', 'gutenberg_experimental_global_styles_enqueue_assets' );
 	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
+	// enqueue_block_assets is not fired in edit-site, so we use back/front hooks instead.
+	add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+	add_action( 'admin_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 }
