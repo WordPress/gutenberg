@@ -71,7 +71,11 @@ function ColorBackground( {
 			</LinearGradient>
 		);
 	}
-	return <View style={ wrapperStyles }>{ children }</View>;
+	return (
+		<View style={ wrapperStyles } onLayout={ onButtonLayout }>
+			{ children }
+		</View>
+	);
 }
 
 export default ColorBackground;
