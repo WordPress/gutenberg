@@ -160,6 +160,7 @@
 		"postcss": "7.0.13",
 		"postcss-loader": "3.0.0",
 		"prettier": "npm:wp-prettier@1.19.1",
+		"puppeteer": "npm:puppeteer-core@3.0.0",
 		"progress": "2.0.3",
 		"react": "16.9.0",
 		"react-dom": "16.9.0",
