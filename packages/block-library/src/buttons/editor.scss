@@ -1,6 +1,12 @@
-.wp-block-buttons .wp-block.block-editor-block-list__block[data-type="core/button"] {
-	display: inline-block;
-	width: auto;
+.wp-block-buttons {
+	.wp-block.block-editor-block-list__block[data-type="core/button"] {
+		display: inline-block;
+		width: auto;
+	}
+
+	&.is-style-vertical .wp-block.block-editor-block-list__block[data-type="core/button"] {
+		display: block;
+	}
 }
 
 .wp-block[data-align="center"] > .wp-block-buttons {
