@@ -17,7 +17,7 @@ const globalTips = [
 	),
 	__experimentalCreateInterpolateElement(
 		__(
-			'Indent a list by pressing <kbd>space</kbd> at the beginning of a line'
+			'Indent a list by pressing <kbd>space</kbd> at the beginning of a line.'
 		),
 		{ kbd: <kbd /> }
 	),
@@ -27,9 +27,9 @@ const globalTips = [
 		),
 		{ kbd: <kbd /> }
 	),
-	__( 'Drag files into the editor to create media blocks' ),
+	__( 'Drag files into the editor to quickly insert media blocks.' ),
 	__(
-		'Transform blocks into other blocks by pressing its icon on the toolbar'
+		'Transform blocks by pressing the block icon on the toolbar.'
 	),
 ];
 
