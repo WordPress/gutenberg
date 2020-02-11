@@ -20,18 +20,21 @@ function gutenberg_experimental_global_styles_has_theme_support() {
  * and its values the CSS custom properties' values.
  *
  * @param array  $global_styles Global Styles object to process.
- * @param string $prefix Prefix to append to each variable.
+ * @param string $prefix Prefix to prepend to each variable.
+ * @param string $token Token to use between levels.
+ *
  * @return array The flattened tree.
  */
-function gutenberg_experimental_global_styles_get_css_vars( $global_styles, $prefix = '' ) {
+function gutenberg_experimental_global_styles_get_css_vars( $global_styles, $prefix = '', $token = '--' ) {
 	$result = array();
 	foreach ( $global_styles as $key => $value ) {
 		$new_key = $prefix . str_replace( '/', '-', $key );
 
 		if ( is_array( $value ) ) {
-			$result = array_merge(
+			$new_prefix = $new_key . $token;
+			$result     = array_merge(
 				$result,
-				gutenberg_experimental_global_styles_get_css_vars( $value, $new_key . '-' )
+				gutenberg_experimental_global_styles_get_css_vars( $value, $new_prefix, $token )
 			);
 		} else {
 			$result[ $new_key ] = $value;
@@ -170,7 +173,9 @@ function gutenberg_experimental_global_styles_get_theme() {
 function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 	$css_rule = '';
 
-	$css_vars = gutenberg_experimental_global_styles_get_css_vars( $global_styles, '--wp-' );
+	$token    = '--';
+	$prefix   = '--wp' . $token;
+	$css_vars = gutenberg_experimental_global_styles_get_css_vars( $global_styles, $prefix, $token );
 	if ( empty( $css_vars ) ) {
 		return $css_rule;
 	}
