@@ -4,7 +4,16 @@ exports[`MoreMenu should match snapshot 1`] = `
 <MoreMenu>
   <DropdownMenu
     className="edit-post-more-menu"
-    icon="ellipsis"
+    icon={
+      <SVG
+        viewBox="-2 -2 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+        />
+      </SVG>
+    }
     label="More tools & options"
     popoverProps={
       Object {
@@ -36,7 +45,16 @@ exports[`MoreMenu should match snapshot 1`] = `
           aria-expanded={false}
           aria-haspopup="true"
           className="components-dropdown-menu__toggle"
-          icon="ellipsis"
+          icon={
+            <SVG
+              viewBox="-2 -2 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <Path
+                d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              />
+            </SVG>
+          }
           label="More tools & options"
           onClick={[Function]}
           onKeyDown={[Function]}
@@ -62,43 +80,42 @@ exports[`MoreMenu should match snapshot 1`] = `
               type="button"
             >
               <Icon
-                icon="ellipsis"
-                key="0,0"
-              >
-                <Dashicon
-                  icon="ellipsis"
-                  size={20}
-                >
+                icon={
                   <SVG
-                    aria-hidden={true}
-                    className="dashicon dashicons-ellipsis"
-                    focusable="false"
-                    height={20}
-                    role="img"
-                    viewBox="0 0 20 20"
-                    width={20}
+                    viewBox="-2 -2 24 24"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <svg
-                      aria-hidden="true"
-                      className="dashicon dashicons-ellipsis"
-                      focusable="false"
-                      height={20}
-                      role="img"
-                      viewBox="0 0 20 20"
-                      width={20}
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <Path
-                        d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                      >
-                        <path
-                          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                        />
-                      </Path>
-                    </svg>
+                    <Path
+                      d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    />
                   </SVG>
-                </Dashicon>
+                }
+                key="0,0"
+              >
+                <SVG
+                  height={24}
+                  viewBox="-2 -2 24 24"
+                  width={24}
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <svg
+                    aria-hidden="true"
+                    focusable="false"
+                    height={24}
+                    role="img"
+                    viewBox="-2 -2 24 24"
+                    width={24}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <Path
+                      d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    >
+                      <path
+                        d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                      />
+                    </Path>
+                  </svg>
+                </SVG>
               </Icon>
             </button>
           </Tooltip>

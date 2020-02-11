@@ -51,6 +51,7 @@ function Indicator( { clientId } ) {
 export default function InsertionPoint( {
 	className,
 	isMultiSelecting,
+	hasMultiSelection,
 	selectedBlockClientId,
 	children,
 	containerRef,
@@ -60,6 +61,15 @@ export default function InsertionPoint( {
 	const [ inserterElement, setInserterElement ] = useState( null );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
 	const ref = useRef();
+	const { multiSelectedBlockClientIds } = useSelect( ( select ) => {
+		const { getMultiSelectedBlockClientIds } = select(
+			'core/block-editor'
+		);
+
+		return {
+			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+		};
+	} );
 
 	function onMouseMove( event ) {
 		if ( event.target.className !== className ) {
@@ -125,6 +135,11 @@ export default function InsertionPoint( {
 		}
 	}
 
+	// Hide the inserter above the selected block and during multi-selection.
+	const isInserterHidden = hasMultiSelection
+		? multiSelectedBlockClientIds.includes( inserterClientId )
+		: inserterClientId === selectedBlockClientId;
+
 	return (
 		<>
 			{ ! isMultiSelecting && ( isInserterShown || isInserterForced ) && (
@@ -159,10 +174,7 @@ export default function InsertionPoint( {
 							className={ classnames(
 								'block-editor-block-list__insertion-point-inserter',
 								{
-									// Hide the inserter above the selected block.
-									'is-inserter-hidden':
-										inserterClientId ===
-										selectedBlockClientId,
+									'is-inserter-hidden': isInserterHidden,
 								}
 							) }
 						>

@@ -21,6 +21,9 @@ describe( 'Font Size Picker', () => {
 		await page.click(
 			'.components-custom-select-control__item:nth-child(5)'
 		);
+		await page.waitForXPath(
+			`//button[contains(@class, "components-custom-select-control__button") and contains(text(), 'Large')]`
+		);
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();

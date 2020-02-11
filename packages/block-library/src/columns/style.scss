@@ -32,9 +32,13 @@
 
 	@include break-small() {
 
-		// Beyond mobile, allow 2 columns.
-		flex-basis: calc(50% - #{$grid-size-large});
-		flex-grow: 0;
+		// Beyond mobile, allow columns. Columns with an explicitly-assigned
+		// width should maintain their `flex-basis` width and not grow. All
+		// other blocks should automatically inherit the `flex-grow` to occupy
+		// the available space.
+		&[style] {
+			flex-grow: 0;
+		}
 
 		// Add space between the multiple columns. Themes can customize this if they wish to work differently.
 		// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.

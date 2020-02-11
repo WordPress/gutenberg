@@ -9,7 +9,8 @@ import '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import './hooks';
+import { AlignmentHookSettingsProvider as __experimentalAlignmentHookSettingsProvider } from './hooks';
+export { __experimentalAlignmentHookSettingsProvider };
 export * from './components';
 export * from './utils';
 export { storeConfig } from './store';

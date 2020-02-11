@@ -677,3 +677,24 @@ function gutenberg_extend_block_editor_preload_paths( $preload_paths, $post ) {
 	return $preload_paths;
 }
 add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload_paths', 10, 2 );
+
+/**
+ * Extends block editor settings to include a list of image dimensions per size.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_image_dimensions( $settings ) {
+	$image_dimensions = array();
+	$all_sizes        = wp_get_registered_image_subsizes();
+	foreach ( $settings['imageSizes'] as $size ) {
+		$key = $size['slug'];
+		if ( isset( $all_sizes[ $key ] ) ) {
+			$image_dimensions[ $key ] = $all_sizes[ $key ];
+		}
+	}
+	$settings['imageDimensions'] = $image_dimensions;
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_image_dimensions' );
