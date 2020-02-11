@@ -28,14 +28,13 @@ import Cell from './cell';
 import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
-import UnsupportedFooterCell from './unsupported-footer-cell';
-
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
+		this.onScroll = this.onScroll.bind( this );
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
@@ -98,11 +97,12 @@ class BottomSheet extends Component {
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
+		const { safeAreaBottomInset } = this.state;
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
 		const { safeAreaInsets } = result;
-		if ( this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
+		if ( safeAreaBottomInset !== safeAreaInsets.bottom ) {
 			this.setState( { safeAreaBottomInset: safeAreaInsets.bottom } );
 		}
 	}
@@ -136,6 +136,26 @@ class BottomSheet extends Component {
 		this.setState( { bounces: false } );
 	}
 
+	isCloseToBottom( { layoutMeasurement, contentOffset, contentSize } ) {
+		return (
+			layoutMeasurement.height + contentOffset.y >=
+			contentSize.height - contentOffset.y
+		);
+	}
+
+	isCloseToTop( { contentOffset } ) {
+		return contentOffset.y < 10;
+	}
+
+	onScroll( { nativeEvent } ) {
+		if ( this.isCloseToTop( nativeEvent ) ) {
+			this.setState( { bounces: false } );
+		}
+		if ( this.isCloseToBottom( nativeEvent ) ) {
+			this.setState( { bounces: true } );
+		}
+	}
+
 	render() {
 		const {
 			title = '',
@@ -146,8 +166,12 @@ class BottomSheet extends Component {
 			style = {},
 			contentStyle = {},
 			getStylesFromColorScheme,
+			onClose,
+			onDismiss,
+			children,
 			...rest
 		} = this.props;
+		const { maxHeight, bounces, safeAreaBottomInset } = this.state;
 
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
@@ -156,7 +180,7 @@ class BottomSheet extends Component {
 				if ( Platform.OS === 'ios' ) {
 					// Activates swipe down over child Touchables if the swipe is long enough.
 					// With this we can adjust sensibility on the swipe vs tap gestures.
-					if ( gestureState.dy > 3 && ! this.state.bounces ) {
+					if ( gestureState.dy > 3 && ! bounces ) {
 						gestureState.dy = 0;
 						return true;
 					}
@@ -192,14 +216,12 @@ class BottomSheet extends Component {
 				backdropTransitionInTiming={ 50 }
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 0.2 }
-				onBackdropPress={ this.props.onClose }
-				onBackButtonPress={ this.props.onClose }
-				onSwipe={ this.props.onClose }
-				onDismiss={
-					Platform.OS === 'ios' ? this.props.onDismiss : undefined
-				}
+				onBackdropPress={ onClose }
+				onBackButtonPress={ onClose }
+				onSwipe={ onClose }
+				onDismiss={ Platform.OS === 'ios' ? onDismiss : undefined }
 				onModalHide={
-					Platform.OS === 'android' ? this.props.onDismiss : undefined
+					Platform.OS === 'android' ? onDismiss : undefined
 				}
 				swipeDirection="down"
 				onMoveShouldSetResponder={
@@ -208,7 +230,7 @@ class BottomSheet extends Component {
 				onMoveShouldSetResponderCapture={
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
-				onAccessibilityEscape={ this.props.onClose }
+				onAccessibilityEscape={ onClose }
 				{ ...rest }
 			>
 				<KeyboardAvoidingView
@@ -218,26 +240,24 @@ class BottomSheet extends Component {
 						borderColor: 'rgba(0, 0, 0, 0.1)',
 						...style,
 					} }
-					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
+					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
 					{ ! hideHeader && getHeader() }
 					<ScrollView
 						disableScrollViewPanResponder
-						bounces={ this.state.bounces }
+						bounces={ bounces }
 						onScroll={ this.onScroll }
 						scrollEventThrottle={ 16 }
-						style={ { maxHeight: this.state.maxHeight } }
+						style={ { maxHeight } }
 						contentContainerStyle={ [
 							styles.content,
 							hideHeader && styles.emptyHeader,
 							contentStyle,
 						] }
 					>
-						{ this.props.children }
-						<View
-							style={ { height: this.state.safeAreaBottomInset } }
-						/>
+						{ children }
+						<View style={ { height: safeAreaBottomInset } } />
 					</ScrollView>
 				</KeyboardAvoidingView>
 			</Modal>
@@ -260,6 +280,5 @@ ThemedBottomSheet.Cell = Cell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
-ThemedBottomSheet.UnsupportedFooterCell = UnsupportedFooterCell;
 
 export default ThemedBottomSheet;
