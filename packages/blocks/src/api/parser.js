@@ -429,6 +429,14 @@ export function createBlockWithFallback( blockNode ) {
 		name = 'core/paragraph';
 	}
 
+	// Convert derivative blocks such as 'core/social-link-wordpress' to the
+	// canonical form 'core/social-link'.
+	if ( name && name.indexOf( 'core/social-link-' ) === 0 ) {
+		// Capture `social-link-wordpress` into `{"service":"wordpress"}`
+		attributes.service = name.substring( 17 );
+		name = 'core/social-link';
+	}
+
 	// Fallback content may be upgraded from classic editor expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
 	// meaning there are no negative consequences to repeated autop calls.

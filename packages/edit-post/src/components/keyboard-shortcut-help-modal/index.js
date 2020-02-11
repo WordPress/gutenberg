@@ -10,7 +10,7 @@ import { isString } from 'lodash';
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect, withDispatch, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -64,6 +64,28 @@ const ShortcutSection = ( { title, shortcuts, className } ) => (
 	</section>
 );
 
+const ShortcutCategorySection = ( {
+	title,
+	categoryName,
+	additionalShortcuts = [],
+} ) => {
+	const categoryShortcuts = useSelect(
+		( select ) => {
+			return select( 'core/keyboard-shortcuts' ).getCategoryShortcuts(
+				categoryName
+			);
+		},
+		[ categoryName ]
+	);
+
+	return (
+		<ShortcutSection
+			title={ title }
+			shortcuts={ categoryShortcuts.concat( additionalShortcuts ) }
+		/>
+	);
+};
+
 export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 	useShortcut( 'core/edit-post/keyboard-shortcuts', toggleModal, {
 		bindGlobal: true,
@@ -84,34 +106,20 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 				className="edit-post-keyboard-shortcut-help-modal__main-shortcuts"
 				shortcuts={ [ 'core/edit-post/keyboard-shortcuts' ] }
 			/>
-			<ShortcutSection
+			<ShortcutCategorySection
 				title={ __( 'Global shortcuts' ) }
-				shortcuts={ [
-					'core/editor/save',
-					'core/editor/undo',
-					'core/editor/redo',
-					'core/edit-post/toggle-sidebar',
-					'core/edit-post/toggle-block-navigation',
-					'core/edit-post/next-region',
-					'core/edit-post/previous-region',
-					'core/block-editor/focus-toolbar',
-					'core/edit-post/toggle-mode',
-				] }
+				categoryName="global"
 			/>
-			<ShortcutSection
+
+			<ShortcutCategorySection
 				title={ __( 'Selection shortcuts' ) }
-				shortcuts={ [
-					'core/block-editor/select-all',
-					'core/block-editor/unselect',
-				] }
+				categoryName="selection"
 			/>
-			<ShortcutSection
+
+			<ShortcutCategorySection
 				title={ __( 'Block shortcuts' ) }
-				shortcuts={ [
-					'core/block-editor/duplicate',
-					'core/block-editor/remove',
-					'core/block-editor/insert-before',
-					'core/block-editor/insert-after',
+				categoryName="block"
+				additionalShortcuts={ [
 					{
 						keyCombination: { character: '/' },
 						description: __(

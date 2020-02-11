@@ -20,6 +20,8 @@ import Cell from './cell';
 import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
+import UnsupportedFooterCell from './unsupported-footer-cell';
+
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 class BottomSheet extends Component {
@@ -171,5 +173,6 @@ ThemedBottomSheet.Cell = Cell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
+ThemedBottomSheet.UnsupportedFooterCell = UnsupportedFooterCell;
 
 export default ThemedBottomSheet;

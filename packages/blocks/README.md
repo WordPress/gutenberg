@@ -660,6 +660,15 @@ _Returns_
 
 -   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
 
+<a name="registerBlockVariation" href="#registerBlockVariation">#</a> **registerBlockVariation**
+
+Registers a new block variation for the given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of the block (example: “core/columns”).
+-   _variation_ `WPBlockVariation`: Object describing a block variation.
+
 <a name="serialize" href="#serialize">#</a> **serialize**
 
 Takes a block or set of blocks and returns the serialized post content.
@@ -764,6 +773,15 @@ _Parameters_
 _Returns_
 
 -   `?WPBlock`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
+
+<a name="unregisterBlockVariation" href="#unregisterBlockVariation">#</a> **unregisterBlockVariation**
+
+Unregisters a block variation defined for the given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of the block (example: “core/columns”).
+-   _variationName_ `string`: Name of the variation defined for the block.
 
 <a name="updateCategory" href="#updateCategory">#</a> **updateCategory**
 

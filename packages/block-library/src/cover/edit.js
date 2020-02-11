@@ -221,6 +221,7 @@ function CoverEdit( {
 	noticeOperations,
 } ) {
 	const {
+		id,
 		backgroundType,
 		dimRatio,
 		focalPoint,
@@ -278,6 +279,7 @@ function CoverEdit( {
 			<BlockControls>
 				{ hasBackground && (
 					<MediaReplaceFlow
+						mediaId={ id }
 						mediaURL={ url }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						accept="image/*,video/*"
@@ -351,7 +353,7 @@ function CoverEdit( {
 									gradientValue,
 									onColorChange: setOverlayColor,
 									onGradientChange: setGradient,
-									label: __( 'Overlay' ),
+									label: __( 'Color' ),
 								},
 							] }
 						>
