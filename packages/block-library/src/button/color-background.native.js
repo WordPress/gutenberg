@@ -12,41 +12,11 @@ import { __experimentalUseGradient } from '@wordpress/block-editor';
  */
 import styles from './editor.scss';
 
-function OutlineWrapper( {
-	children,
-	borderRadiusValue,
-	isSelected,
-	backgroundColor,
-} ) {
-	const outlineBorderRadius =
-		borderRadiusValue > 0
-			? borderRadiusValue +
-			  styles.button.paddingTop +
-			  styles.button.borderWidth
-			: 0;
-
-	return (
-		<View
-			style={ [
-				styles.container,
-				isSelected && {
-					borderRadius: outlineBorderRadius,
-					borderWidth: styles.button.borderWidth,
-					borderColor: backgroundColor,
-					padding: styles.button.paddingTop,
-				},
-			] }
-		>
-			{ children }
-		</View>
-	);
-}
-
 function ColorBackground( {
 	children,
 	borderRadiusValue,
 	backgroundColor,
-	isSelected,
+	onLayout,
 } ) {
 	const wrapperStyles = [
 		styles.richTextWrapper,
@@ -57,6 +27,12 @@ function ColorBackground( {
 	];
 
 	const { gradientValue } = __experimentalUseGradient();
+
+	function onButtonLayout( { nativeEvent } ) {
+		const { width } = nativeEvent.layout;
+
+		return onLayout( width );
+	}
 
 	function transformGradient() {
 		const matchColorGroup = /(rgba|rgb|#)(.+?)[\%]/g;
@@ -82,33 +58,20 @@ function ColorBackground( {
 	if ( gradientValue ) {
 		const { colors, locations, angle } = transformGradient();
 		return (
-			<OutlineWrapper
-				backgroundColor={ backgroundColor }
-				borderRadiusValue={ borderRadiusValue }
-				isSelected={ isSelected }
+			<LinearGradient
+				colors={ colors }
+				useAngle={ true }
+				angle={ angle }
+				locations={ locations }
+				angleCenter={ { x: 0.5, y: 0.5 } }
+				style={ wrapperStyles }
+				onLayout={ onButtonLayout }
 			>
-				<LinearGradient
-					colors={ colors }
-					useAngle={ true }
-					angle={ angle }
-					locations={ locations }
-					angleCenter={ { x: 0.5, y: 0.5 } }
-					style={ wrapperStyles }
-				>
-					{ children }
-				</LinearGradient>
-			</OutlineWrapper>
+				{ children }
+			</LinearGradient>
 		);
 	}
-	return (
-		<OutlineWrapper
-			backgroundColor={ backgroundColor }
-			borderRadiusValue={ borderRadiusValue }
-			isSelected={ isSelected }
-		>
-			<View style={ wrapperStyles }>{ children }</View>
-		</OutlineWrapper>
-	);
+	return <View style={ wrapperStyles }>{ children }</View>;
 }
 
 export default ColorBackground;

@@ -3,13 +3,12 @@
 	align-self: flex-start;
 }
 
-.container {
-	background-color: transparent;
-	align-self: flex-start;
-}
-
-.outlineBorder {
-	border-width: $border-width;
+.outline {
+	position: absolute;
+	left: -($block-spacing + $border-width);
+	right: -($block-spacing + $border-width);
+	top: -($block-spacing + $border-width);
+	bottom: -($block-spacing + $border-width);
 }
 
 .button {

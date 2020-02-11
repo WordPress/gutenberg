@@ -51,7 +51,8 @@ class ButtonEdit extends Component {
 		this.onChangeOpenInNewTab = this.onChangeOpenInNewTab.bind( this );
 		this.onChangeURL = this.onChangeURL.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
-		this.onLayout = this.onLayout.bind( this );
+		this.onContainerLayout = this.onContainerLayout.bind( this );
+		this.onButtonLayout = this.onButtonLayout.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
@@ -65,6 +66,7 @@ class ButtonEdit extends Component {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
 			isButtonFocused: true,
+			buttonWidth: 0,
 		};
 	}
 
@@ -176,13 +178,6 @@ class ButtonEdit extends Component {
 		setAttributes( { url: value } );
 	}
 
-	onLayout( { nativeEvent } ) {
-		const { width } = nativeEvent.layout;
-		const { marginRight, paddingRight, borderWidth } = styles.button;
-		const buttonSpacing = 2 * ( marginRight + paddingRight + borderWidth );
-		this.setState( { maxWidth: width - buttonSpacing } );
-	}
-
 	onChangeOpenInNewTab( value ) {
 		const { setAttributes, attributes } = this.props;
 		const { rel } = attributes;
@@ -221,6 +216,17 @@ class ButtonEdit extends Component {
 		} );
 
 		this.setState( { isLinkSheetVisible: false } );
+	}
+
+	onContainerLayout( { nativeEvent } ) {
+		const { width } = nativeEvent.layout;
+		const { marginRight } = styles.button;
+		const buttonSpacing = 2 * marginRight;
+		this.setState( { maxWidth: width - buttonSpacing } );
+	}
+
+	onButtonLayout( width ) {
+		this.setState( { buttonWidth: width } );
 	}
 
 	getLinkSettings( url, rel, linkTarget, isCompatibleWithSettings ) {
@@ -281,12 +287,26 @@ class ButtonEdit extends Component {
 			linkTarget,
 			rel,
 		} = attributes;
-		const { maxWidth, isLinkSheetVisible, isButtonFocused } = this.state;
+		const {
+			maxWidth,
+			isLinkSheetVisible,
+			isButtonFocused,
+			buttonWidth,
+		} = this.state;
 
 		const borderRadiusValue =
 			borderRadius !== undefined
 				? borderRadius
 				: styles.button.borderRadius;
+		const outlineBorderRadius =
+			borderRadiusValue > 0
+				? borderRadiusValue +
+				  styles.button.paddingTop +
+				  styles.button.borderWidth
+				: 0;
+		const outlineWidth =
+			buttonWidth +
+			2 * ( styles.button.paddingTop + styles.button.borderWidth );
 
 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
 		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
@@ -304,11 +324,26 @@ class ButtonEdit extends Component {
 				: placeholder || __( 'Add text…' );
 
 		return (
-			<View style={ { flex: 1 } } onLayout={ this.onLayout }>
+			<View style={ { flex: 1 } } onLayout={ this.onContainerLayout }>
+				<View
+					pointerEvents="none"
+					style={
+						isSelected && [
+							styles.outline,
+							{
+								width: outlineWidth,
+								borderRadius: outlineBorderRadius,
+								borderWidth: styles.button.borderWidth,
+								borderColor: this.getBackgroundColor(),
+							},
+						]
+					}
+				/>
 				<ColorBackground
 					borderRadiusValue={ borderRadiusValue }
 					backgroundColor={ this.getBackgroundColor() }
 					isSelected={ isSelected }
+					onLayout={ this.onButtonLayout }
 				>
 					<RichText
 						setRef={ ( richText ) => {
