@@ -79,7 +79,7 @@ $ WP_ENV_PORT=3333 wp-env start
 
 Running `docker ps` and inspecting the `PORTS` column allows you to determine which port `wp-env` is currently using.
 
-You may also specify the port numbers in your `.wp-env.json` file.
+You may also specify the port numbers in your `.wp-env.json` file, but the environment variables take precedent.
 
 ### 3. Restart `wp-env`
 
@@ -186,6 +186,8 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"themes"` | `string[]` | `[]` | A list of themes to install in the environment. The first theme in the list will be activated. |
 | `"portNumber"` | `string` | `"8888"` | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
 | `"testsPortNumber"` | `string` | `"8889"` | The port number to use for the tests instance. |
+
+_Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
 Several types of strings can be passed into the `core`, `plugins`, and `themes` fields:
 
