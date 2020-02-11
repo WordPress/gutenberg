@@ -191,6 +191,16 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 
 /**
  * Fetches the Global Styles for each level (core, theme, user)
+ * and enqueues the resulting CSS custom properties for the editor.
+ */
+function gutenberg_experimental_global_styles_enqueue_assets_editor() {
+	if ( gutenberg_experimental_global_styles_is_site_editor() ) {
+		gutenberg_experimental_global_styles_enqueue_assets();
+	}
+}
+
+/**
+ * Fetches the Global Styles for each level (core, theme, user)
  * and enqueues the resulting CSS custom properties.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
@@ -235,14 +245,14 @@ function gutenberg_experimental_global_styles_wp_gs_class_front_end( $classes ) 
  * @return string The filtered string of body classes.
  */
 function gutenberg_experimental_global_styles_wp_gs_class_editor( $classes ) {
-	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
+	if (
+		! gutenberg_experimental_global_styles_has_theme_support() ||
+		! gutenberg_experimental_global_styles_is_site_editor()
+	) {
 		return $classes;
 	}
 
-	if ( gutenberg_experimental_global_styles_is_site_editor() ) {
-		return $classes . ' wp-gs';
-	}
-	return $classes;
+	return $classes . ' wp-gs';
 }
 
 /**
@@ -269,7 +279,10 @@ function gutenberg_experimental_global_styles_is_site_editor() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
+	if (
+		! gutenberg_experimental_global_styles_has_theme_support() ||
+		! gutenberg_experimental_global_styles_is_site_editor()
+	) {
 		return $settings;
 	}
 
@@ -323,7 +336,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
 	add_filter( 'body_class', 'gutenberg_experimental_global_styles_wp_gs_class_front_end' );
 	add_filter( 'admin_body_class', 'gutenberg_experimental_global_styles_wp_gs_class_editor' );
 	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
-	// enqueue_block_assets is not fired in edit-site, so we use back/front hooks instead.
+	// enqueue_block_assets is not fired in edit-site, so we use separate back/front hooks instead.
 	add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
-	add_action( 'admin_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+	add_action( 'admin_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets_editor' );
 }
