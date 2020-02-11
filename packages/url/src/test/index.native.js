@@ -1,14 +1,7 @@
 /**
- * External dependencies
- */
-import { every } from 'lodash';
-
-/**
  * Internal dependencies
  */
-import {
-	isURL,
-} from '../';
+import { isURL } from '../';
 
 describe( 'isURL', () => {
 	it.each( [
