@@ -25,7 +25,7 @@ Default properties include:
 
 - Type: `Array`
 - Required: No
-- Default: 
+- Default:
 ```
 [
 	{
@@ -54,7 +54,7 @@ Value change handler, called with the updated value if the user selects a new li
 	onChange={ ( nextValue ) => {
 		console.log( `The selected item URL: ${ nextValue.url }.` );
 	}
-/> 
+/>
 ```
 
 ### showInitialSuggestions
@@ -71,3 +71,47 @@ Whether to present initial suggestions immediately.
 - Required: No
 
 If passed as either `true` or `false`, controls the internal editing state of the component to respective show or not show the URL input field.
+
+
+### createSuggestion
+
+- Type: `function`
+- Required: No
+
+Used to handle the dynamic creation of new suggestions within the Link UI. When
+the prop is provided, an option is added to the end of all search
+results requests which when clicked will call `createSuggestion` callback
+(passing the current value of the search `<input>`) in
+order to afford the parent component the opportunity to dynamically create a new
+link `value` (see above).
+
+This is often used to allow on-the-fly creation of new entities (eg: `Posts`,
+`Pages`) based on the text the user has entered into the link search UI. For
+example, the Navigation Block uses this to create Pages on demand.
+
+When called, `createSuggestion` should return a `Promise` which resolves to a
+new link `value` (see above) with the shape:
+
+```js
+{
+	id: // unique identifier
+	type: // "url", "page", "post"...etc
+	title: // "My new suggestion"
+	url: // any string representing the URL value
+}
+```
+
+#### Example
+```jsx
+<LinkControl
+	createSuggestion={ async (inputText) => {
+        // Hard coded values. These could be dynamically created by calling out to an API which creates an entity (eg: https://developer.wordpress.org/rest-api/reference/pages/#create-a-page).
+		return {
+			id: 1234,
+			type: 'page',
+			title: inputText,
+			url: '/some-url-here'
+		}
+	}}
+/>
+```
