@@ -244,11 +244,8 @@ describe( 'Navigation', () => {
 		);
 		await createPageButton.click();
 
-		// Wait until the link editor disappears.
-		await page.waitForSelector(
-			'.block-editor-link-control__search-input-wrapper',
-			{ hidden: true }
-		);
+		// wait for the creating confirmation to go away, and we should now be focused on our text input
+		await page.waitForSelector( ':focus.rich-text' );
 
 		// Confirm the new link is focused.
 		const isInLinkRichText = await page.evaluate(
