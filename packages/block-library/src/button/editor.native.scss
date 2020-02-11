@@ -1,5 +1,5 @@
 .richTextWrapper {
-	overflow: hidden;
+	overflow: visible;
 	align-self: flex-start;
 }
 
@@ -9,6 +9,14 @@
 	right: -($block-spacing + $border-width);
 	top: -($block-spacing + $border-width);
 	bottom: -($block-spacing + $border-width);
+}
+
+.linearGradient {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
 }
 
 .button {

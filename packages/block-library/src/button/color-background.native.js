@@ -12,12 +12,7 @@ import { __experimentalUseGradient } from '@wordpress/block-editor';
  */
 import styles from './editor.scss';
 
-function ColorBackground( {
-	children,
-	borderRadiusValue,
-	backgroundColor,
-	onLayout,
-} ) {
+function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
 	const wrapperStyles = [
 		styles.richTextWrapper,
 		{
@@ -27,12 +22,6 @@ function ColorBackground( {
 	];
 
 	const { gradientValue } = __experimentalUseGradient();
-
-	function onButtonLayout( { nativeEvent } ) {
-		const { width } = nativeEvent.layout;
-
-		return onLayout( width );
-	}
 
 	function transformGradient() {
 		const matchColorGroup = /(rgba|rgb|#)(.+?)[\%]/g;
@@ -55,24 +44,25 @@ function ColorBackground( {
 		};
 	}
 
-	if ( gradientValue ) {
-		const { colors, locations, angle } = transformGradient();
-		return (
-			<LinearGradient
-				colors={ colors }
-				useAngle={ true }
-				angle={ angle }
-				locations={ locations }
-				angleCenter={ { x: 0.5, y: 0.5 } }
-				style={ wrapperStyles }
-				onLayout={ onButtonLayout }
-			>
-				{ children }
-			</LinearGradient>
-		);
-	}
+	const { colors, locations, angle } = gradientValue
+		? transformGradient()
+		: {};
+
 	return (
-		<View style={ wrapperStyles } onLayout={ onButtonLayout }>
+		<View style={ wrapperStyles }>
+			{ gradientValue && (
+				<LinearGradient
+					colors={ colors }
+					useAngle={ true }
+					angle={ angle }
+					locations={ locations }
+					angleCenter={ { x: 0.5, y: 0.5 } }
+					style={ [
+						styles.linearGradient,
+						{ borderRadius: borderRadiusValue },
+					] }
+				/>
+			) }
 			{ children }
 		</View>
 	);
