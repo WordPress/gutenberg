@@ -253,7 +253,8 @@ describe( 'Navigation', () => {
 				document.activeElement.classList.contains( 'rich-text' ) &&
 				!! document.activeElement.closest(
 					'.block-editor-block-list__block'
-				)
+				) &&
+				document.activeElement.innerText === 'My New Page'
 		);
 		expect( isInLinkRichText ).toBe( true );
 
