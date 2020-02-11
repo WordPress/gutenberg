@@ -1,11 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	getClassNames,
-	fallback,
-	getAttributesFromPreview,
-} from './util';
+import { getClassNames, fallback, getAttributesFromPreview } from './util';
 import EmbedControls from './embed-controls';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';

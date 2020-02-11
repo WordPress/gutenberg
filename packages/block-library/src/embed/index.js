@@ -8,7 +8,10 @@ import { common as commonEmbeds, others as otherEmbeds } from './core-embeds';
  */
 import { __, _x } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { embedContentIcon, getEmbedBlockSettings } from '@wordpress/embed-block';
+import {
+	embedContentIcon,
+	getEmbedBlockSettings,
+} from '@wordpress/embed-block';
 
 export const name = 'core/embed';
 

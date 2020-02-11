@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	G,
-	Path,
-	SVG,
-} from '@wordpress/components';
+import { G, Path, SVG } from '@wordpress/components';
 
 export const embedTwitterIcon = {
 	foreground: '#1da1f2',
