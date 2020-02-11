@@ -8,6 +8,7 @@ import {
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
 } from '@wordpress/block-editor';
+import { formatBold } from '@wordpress/icons';
 
 const name = 'core/bold';
 const title = __( 'Bold' );
@@ -36,7 +37,7 @@ export const bold = {
 				/>
 				<RichTextToolbarButton
 					name="bold"
-					icon="editor-bold"
+					icon={ formatBold }
 					title={ title }
 					onClick={ onClick }
 					isActive={ isActive }

@@ -113,7 +113,7 @@ class VideoEdit extends Component {
 	}
 
 	render() {
-		const { caption, controls, poster, src } = this.props.attributes;
+		const { id, caption, controls, poster, src } = this.props.attributes;
 		const {
 			className,
 			instanceId,
@@ -156,6 +156,7 @@ class VideoEdit extends Component {
 			<>
 				<BlockControls>
 					<MediaReplaceFlow
+						mediaId={ id }
 						mediaURL={ src }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						accept="video/*"

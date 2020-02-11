@@ -491,33 +491,21 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
 };
 
 /**
- * Registers a new block variation for the given block.
+ * Registers a new block variation for the given block type.
  *
  * @param {string}           blockName Name of the block (example: “core/columns”).
  * @param {WPBlockVariation} variation Object describing a block variation.
  */
-export const __experimentalRegisterBlockVariation = (
-	blockName,
-	variation
-) => {
-	dispatch( 'core/blocks' ).__experimentalAddBlockVariations(
-		blockName,
-		variation
-	);
+export const registerBlockVariation = ( blockName, variation ) => {
+	dispatch( 'core/blocks' ).addBlockVariations( blockName, variation );
 };
 
 /**
- * Unregisters a block variation defined for the given block.
+ * Unregisters a block variation defined for the given block type.
  *
  * @param {string} blockName     Name of the block (example: “core/columns”).
  * @param {string} variationName Name of the variation defined for the block.
  */
-export const __experimentalUnregisterBlockVariation = (
-	blockName,
-	variationName
-) => {
-	dispatch( 'core/blocks' ).__experimentalRemoveBlockVariations(
-		blockName,
-		variationName
-	);
+export const unregisterBlockVariation = ( blockName, variationName ) => {
+	dispatch( 'core/blocks' ).removeBlockVariations( blockName, variationName );
 };

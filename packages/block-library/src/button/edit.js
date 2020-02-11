@@ -31,6 +31,7 @@ import {
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
+import { link } from '@wordpress/icons';
 
 const { getComputedStyle } = window;
 
@@ -120,7 +121,7 @@ function URLPicker( {
 				<ToolbarGroup>
 					<ToolbarButton
 						name="link"
-						icon="admin-links"
+						icon={ link }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ openLinkControl }

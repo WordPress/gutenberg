@@ -106,6 +106,7 @@ class EditorProvider extends Component {
 				'hasFixedToolbar',
 				'hasPermissionsToManageWidgets',
 				'imageSizes',
+				'imageDimensions',
 				'isRTL',
 				'maxWidth',
 				'styles',

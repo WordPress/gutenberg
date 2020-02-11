@@ -149,12 +149,12 @@ function gutenberg_experiments_editor_settings( $settings ) {
 		'__experimentalEnablePageTemplates'       => gutenberg_is_experiment_enabled( 'gutenberg-page-templates' ),
 	);
 
-	$gradient_presets = current( (array) get_theme_support( '__experimental-editor-gradient-presets' ) );
+	$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );
 	if ( false !== $gradient_presets ) {
 		$experiments_settings['gradients'] = $gradient_presets;
 	}
 
-	$experiments_settings['disableCustomGradients'] = get_theme_support( '__experimental-disable-custom-gradients' );
+	$experiments_settings['disableCustomGradients'] = get_theme_support( 'disable-custom-gradients' );
 
 	return array_merge( $settings, $experiments_settings );
 }
