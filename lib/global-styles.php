@@ -239,11 +239,25 @@ function gutenberg_experimental_global_styles_wp_gs_class_editor( $classes ) {
 		return $classes;
 	}
 
-	global $current_screen;
-	if ( $current_screen->is_block_editor() ) {
+	if ( gutenberg_experimental_global_styles_is_site_editor() ) {
 		return $classes . ' wp-gs';
 	}
 	return $classes;
+}
+
+/**
+ * Whether the loaded page is the site editor.
+ *
+ * @return boolean Whether the loaded page is the site editor.
+ */
+function gutenberg_experimental_global_styles_is_site_editor() {
+	if ( ! function_exists( 'get_current_screen' ) ) {
+		return false;
+	}
+
+	$screen = get_current_screen();
+	return ! empty( $screen ) &&
+		( 'gutenberg_page_gutenberg-edit-site' === $screen->id );
 }
 
 /**
