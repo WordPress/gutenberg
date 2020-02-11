@@ -429,8 +429,6 @@ describe( 'Default search suggestions', () => {
 	} );
 
 	it( 'should not display initial suggestions when input value is present', async () => {
-		let searchResultElements;
-		//
 		// Render with an initial value an ensure that no initial suggestions
 		// are shown.
 		//
@@ -463,37 +461,74 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
-		searchResultElements = container.querySelectorAll(
+		const searchResultElements = container.querySelectorAll(
 			'[role="listbox"] [role="option"]'
 		);
 
-		expect( searchResultElements ).toHaveLength( 0 );
-
-		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
-
-		// Reset the search to empty and check the initial suggestions are now shown.
 		const searchInput = container.querySelector(
 			'input[aria-label="URL"]'
 		);
 
+		// search input is set to the URL value
+		expect( searchInput.value ).toEqual( fauxEntitySuggestions[ 0 ].url );
+
+		// it should match any url that's like ?p= and also include a URL option
+		expect( searchResultElements ).toHaveLength( 5 );
+
+		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should display initial suggestions when input value is manually deleted', async () => {
+		const searchTerm = 'Hello world';
+
 		act( () => {
-			Simulate.change( searchInput, {
-				target: { value: '' },
-			} );
+			render( <LinkControl showInitialSuggestions />, container );
 		} );
 
+		let searchResultElements;
+		let searchInput;
+
+		// Search Input UI
+		searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 		await eventLoopTick();
 
+		expect( searchInput.value ).toBe( searchTerm );
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		searchResultElements = container.querySelectorAll(
 			'[role="listbox"] [role="option"]'
 		);
 
-		expect( searchResultElements ).toHaveLength( 3 );
+		// delete the text
+		act( () => {
+			Simulate.change( searchInput, { target: { value: '' } } );
+		} );
 
-		// Ensure only called once as a guard against potential infinite
-		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
-		// which has calls to `setState` within it.
-		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
+		searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// check the input is empty now
+		expect( searchInput.value ).toBe( '' );
+
+		const searchResultLabel = container.querySelector(
+			'.block-editor-link-control__search-results-label'
+		);
+
+		expect( searchResultLabel.innerHTML ).toBe( 'Recently updated' );
+
+		expect( searchResultElements ).toHaveLength( 3 );
 	} );
 } );
 
@@ -780,6 +815,84 @@ describe( 'Selecting links', () => {
 				expect( currentLinkAnchor ).not.toBeNull();
 			}
 		);
+
+		it( 'should allow selection of initial search results via the keyboard', async () => {
+			act( () => {
+				render( <LinkControl showInitialSuggestions />, container );
+			} );
+
+			await eventLoopTick();
+
+			const searchResultsWrapper = container.querySelector(
+				'[role="listbox"]'
+			);
+
+			const searchResultsLabel = container.querySelector(
+				`#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }`
+			);
+
+			expect( searchResultsLabel.innerHTML ).toEqual(
+				'Recently updated'
+			);
+
+			// Search Input UI
+			const searchInput = container.querySelector(
+				'input[aria-label="URL"]'
+			);
+
+			// Step down into the search results, highlighting the first result item
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: DOWN } );
+			} );
+
+			await eventLoopTick();
+
+			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+			const searchResultElements = container.querySelectorAll(
+				'[role="listbox"] [role="option"]'
+			);
+			const firstSearchSuggestion = first( searchResultElements );
+			const secondSearchSuggestion = nth( searchResultElements, 1 );
+
+			let selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should have highlighted the first item using the keyboard
+			expect( selectedSearchResultElement ).toEqual(
+				firstSearchSuggestion
+			);
+
+			// Check we can go down again using the down arrow
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: DOWN } );
+			} );
+
+			selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should have highlighted the first item using the keyboard
+			expect( selectedSearchResultElement ).toEqual(
+				secondSearchSuggestion
+			);
+
+			// Check we can go back up via up arrow
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: UP } );
+			} );
+
+			selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should be back to highlighting the first search result again
+			expect( selectedSearchResultElement ).toEqual(
+				firstSearchSuggestion
+			);
+
+			expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 
 	it( 'does not forcefully regain focus if onChange handler had shifted it', () => {
