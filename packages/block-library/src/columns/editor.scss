@@ -66,8 +66,14 @@
 			// Responsiveness: Show at most one columns on mobile.
 			flex-basis: 100%;
 
-			// Beyond mobile, allow columns.
+			// Between mobile and large viewports, allow 2 columns.
 			@include break-small() {
+				flex-basis: calc(50% - (#{$grid-size-large}));
+				flex-grow: 0;
+			}
+
+			// At large viewports, show all columns horizontally.
+			@include break-medium() {
 				// Available space should be divided equally amongst columns
 				// without an assigned width. This is achieved by assigning a
 				// flex basis that is consistent (equal), would not cause the
@@ -76,8 +82,8 @@
 				// allows columns to maximally and equally occupy space
 				// remaining after subtracting the space occupied by columns
 				// with explicit widths (if any exist).
-				flex-grow: 1;
 				flex-basis: 0;
+				flex-grow: 1;
 
 				// Columns with an explicitly-assigned width should maintain
 				// their `flex-basis` width and not grow.
