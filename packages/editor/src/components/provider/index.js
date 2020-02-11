@@ -118,7 +118,6 @@ class EditorProvider extends Component {
 				'__experimentalEnableFullSiteEditing',
 				'__experimentalEnableFullSiteEditingDemo',
 				'__experimentalEnablePageTemplates',
-				'showInserterHelpPanel',
 				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,

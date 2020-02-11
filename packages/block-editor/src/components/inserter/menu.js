@@ -282,7 +282,6 @@ export class InserterMenu extends Component {
 			instanceId,
 			onSelect,
 			rootClientId,
-			showInserterHelpPanel,
 		} = this.props;
 		const {
 			childItems,
@@ -303,7 +302,6 @@ export class InserterMenu extends Component {
 		const hoveredItemBlockType = hoveredItem
 			? getBlockType( hoveredItem.name )
 			: null;
-		const hasHelpPanel = hasItems && showInserterHelpPanel;
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of autoFocus via
@@ -467,7 +465,9 @@ export class InserterMenu extends Component {
 
 					<Tip>
 						{ __experimentalCreateInterpolateElement(
-							__( 'While writing, you can press <kbd>/</kbd> to quickly insert new blocks.' ),
+							__(
+								'While writing, you can press <kbd>/</kbd> to quickly insert new blocks.'
+							),
 							{ kbd: <kbd /> }
 						) }
 					</Tip>
@@ -479,7 +479,8 @@ export class InserterMenu extends Component {
 							<BlockCard blockType={ hoveredItemBlockType } />
 						) }
 						<div className="block-editor-inserter__preview">
-							{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) ? (
+							{ isReusableBlock( hoveredItem ) ||
+							hoveredItemBlockType.example ? (
 								<div className="block-editor-inserter__preview-content">
 									<BlockPreview
 										padding={ 10 }
@@ -500,11 +501,11 @@ export class InserterMenu extends Component {
 																	.example
 																	.innerBlocks,
 														}
-													)
+												  )
 												: createBlock(
 														hoveredItem.name,
 														hoveredItem.initialAttributes
-													)
+												  )
 										}
 									/>
 								</div>
@@ -523,53 +524,43 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withSelect(
-		(
-			select,
-			{ clientId, isAppender, rootClientId, showInserterHelpPanel }
-		) => {
-			const {
-				getInserterItems,
-				getBlockName,
-				getBlockRootClientId,
-				getBlockSelectionEnd,
-				getSettings,
-			} = select( 'core/block-editor' );
-			const {
-				getCategories,
-				getCollections,
-				getChildBlockNames,
-			} = select( 'core/blocks' );
+	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
+		const {
+			getInserterItems,
+			getBlockName,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+			getSettings,
+		} = select( 'core/block-editor' );
+		const { getCategories, getCollections, getChildBlockNames } = select(
+			'core/blocks'
+		);
 
-			let destinationRootClientId = rootClientId;
-			if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
-				const end = getBlockSelectionEnd();
-				if ( end ) {
-					destinationRootClientId =
-						getBlockRootClientId( end ) || undefined;
-				}
+		let destinationRootClientId = rootClientId;
+		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
+			const end = getBlockSelectionEnd();
+			if ( end ) {
+				destinationRootClientId =
+					getBlockRootClientId( end ) || undefined;
 			}
-			const destinationRootBlockName = getBlockName(
-				destinationRootClientId
-			);
-
-			const {
-				showInserterHelpPanel: showInserterHelpPanelSetting,
-				__experimentalFetchReusableBlocks: fetchReusableBlocks,
-			} = getSettings();
-
-			return {
-				categories: getCategories(),
-				collections: getCollections(),
-				rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-				items: getInserterItems( destinationRootClientId ),
-				showInserterHelpPanel:
-					showInserterHelpPanel && showInserterHelpPanelSetting,
-				destinationRootClientId,
-				fetchReusableBlocks,
-			};
 		}
-	),
+		const destinationRootBlockName = getBlockName(
+			destinationRootClientId
+		);
+
+		const {
+			__experimentalFetchReusableBlocks: fetchReusableBlocks,
+		} = getSettings();
+
+		return {
+			categories: getCategories(),
+			collections: getCollections(),
+			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
+			items: getInserterItems( destinationRootClientId ),
+			destinationRootClientId,
+			fetchReusableBlocks,
+		};
+	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const { showInsertionPoint, hideInsertionPoint } = dispatch(
 			'core/block-editor'

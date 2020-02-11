@@ -111,7 +111,6 @@ class Inserter extends Component {
 			rootClientId,
 			clientId,
 			isAppender,
-			showInserterHelpPanel,
 			__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 		} = this.props;
 
@@ -121,7 +120,6 @@ class Inserter extends Component {
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				isAppender={ isAppender }
-				showInserterHelpPanel={ showInserterHelpPanel }
 				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 			/>
 		);

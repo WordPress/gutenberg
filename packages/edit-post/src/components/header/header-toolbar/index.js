@@ -45,11 +45,7 @@ function HeaderToolbar() {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<Inserter
-				disabled={ ! showInserter }
-				position="bottom right"
-				showInserterHelpPanel
-			/>
+			<Inserter disabled={ ! showInserter } position="bottom right" />
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />

@@ -28,7 +28,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {string} bodyPlaceholder Empty post placeholder
  * @property {string} titlePlaceholder Empty title placeholder
  * @property {boolean} codeEditingEnabled Whether or not the user can switch to the code editor
- * @property {boolean} showInserterHelpPanel Whether or not the inserter help panel is shown
  * @property {boolean} __experimentalCanUserUseUnfilteredHTML Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
  * @property {boolean} __experimentalEnableLegacyWidgetBlock Whether the user has enabled the Legacy Widget Block
  * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
@@ -147,7 +146,6 @@ export const SETTINGS_DEFAULTS = {
 
 	availableLegacyWidgets: {},
 	hasPermissionsToManageWidgets: false,
-	showInserterHelpPanel: true,
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalEnableLegacyWidgetBlock: false,
 	__experimentalBlockDirectory: false,
