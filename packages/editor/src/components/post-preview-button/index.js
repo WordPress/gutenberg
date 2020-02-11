@@ -178,6 +178,9 @@ export class PostPreviewButton extends Component {
 			<Button
 				isSecondary
 				className="editor-post-preview"
+				height={ 50 }
+				color={ 'toggle' }
+				borderRadius={ 25 }
 				href={ href }
 				target={ this.getWindowTarget() }
 				disabled={ ! isSaveable }

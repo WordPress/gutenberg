@@ -99,6 +99,7 @@ export function Button( {
 				!! icon && styles.hasIcon( theme ),
 				isBusy && styles.busy( theme ),
 				additionalStyles && additionalStylesHelper( additionalStyles ),
+				styles.styledSystem( { ...additionalProps, theme } ),
 			]
 			}
 			font-size={ isSmall ? 'small' : 'default' }

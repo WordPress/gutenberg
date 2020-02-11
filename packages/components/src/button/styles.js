@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { css } from '@emotion/core';
+import { color, space, layout, flexbox, background, border, position, shadow }
+	from 'styled-system';
 
 const base = ( theme ) => css`
 	border: 0;
@@ -64,7 +66,7 @@ const secondary = ( theme ) => css`
 		color: ${ theme.helpers.shade( theme.colors.primary, -5 ) };
 		border-color: ${ theme.helpers.shade( theme.colors.primary, -5 ) };
 
-		&:enabled:hover {
+		&:hover {
 			background: #f1f1f1;
 			text-decoration: none;
 			box-shadow: none;
@@ -72,7 +74,7 @@ const secondary = ( theme ) => css`
 			color: ${ theme.helpers.shade( theme.colors.primary, -25 ) };
 		}
 
-		&:focus:enabled {
+		&:focus {
 			outline: none;
 			background: #f3f5f6;
 			text-decoration: none;
@@ -81,7 +83,7 @@ const secondary = ( theme ) => css`
 			box-shadow: 0 0 0 ${ theme.space.borderWidth } ${ theme.helpers.shade( theme.colors.primary, -5 ) };
 		}
 
-		&:active:enabled {
+		&:active {
 			background: #f3f5f6;
 			border-color: #7e8993;
 			box-shadow: none;
@@ -123,14 +125,14 @@ const primary = ( theme ) => css`
 		background: ${ theme.colors.primary };
 		border-color: ${ theme.colors.primary };
 
-		&:enabled:hover {
+		&:hover {
 			color: ${ theme.colors.white };
 			background: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
 			box-shadow: none;
 		}
 
-		&:focus:enabled {
+		&:focus {
 			color: ${ theme.colors.white };
 			background: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -10 ) };
@@ -139,7 +141,7 @@ const primary = ( theme ) => css`
 				0 0 0 3px ${ theme.colors.primary };
 		}
 
-		&:active:enabled {
+		&:active {
 			color: ${ theme.colors.white };
 			background: ${ theme.helpers.shade( theme.colors.primary, -20 ) };
 			border-color: ${ theme.helpers.shade( theme.colors.primary, -20 ) };
@@ -195,7 +197,7 @@ const link = ( theme ) => css`
 		transition-duration: 0s;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):hover {
+	&:hover {
 		color: #00a0d2;
 	}
 
@@ -265,6 +267,17 @@ const hasIcon = ( theme ) => css`
 	}
 `;
 
+const styledSystem = ( props ) => css`
+	${ color( props ) }
+	${ space( props ) }
+	${ layout( props ) }
+	${ flexbox( props ) }
+	${ background( props ) }
+	${ border( props ) }
+	${ position( props ) }
+	${ shadow( props ) }
+`;
+
 export default {
 	base,
 	secondary,
@@ -274,4 +287,5 @@ export default {
 	tertiary,
 	hasIcon,
 	busy,
+	styledSystem,
 };
