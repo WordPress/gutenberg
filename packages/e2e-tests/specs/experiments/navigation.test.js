@@ -89,14 +89,14 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 
 	if ( url ) {
 		await page.type( 'input[placeholder="Search or type url"]', url );
+
+		const suggestionPath = `//button[contains(@class, 'block-editor-link-control__search-item') and contains(@class, '${ typeClasses[ type ] }')]/span/span[@class='block-editor-link-control__search-item-title']/mark[text()="${ url }"]`;
+
 		// Wait for the autocomplete suggestion item to appear.
-		await page.waitForXPath(
-			`//span[contains(@class, 'block-editor-link-control__search-item-title') and contains(@class, ${ typeClasses[ type ] })]/mark[text()="${ url }"]`
-		);
+		await page.waitForXPath( suggestionPath );
 		// Set the suggestion
-		const [ suggestion ] = await page.$x(
-			`//span[contains(@class, 'block-editor-link-control__search-item-title') and contains(@class, ${ typeClasses[ type ] })]/mark[text()="${ url }"]`
-		);
+		const [ suggestion ] = await page.$x( suggestionPath );
+
 		// Select it (so we're clicking the right one, even if it's further down the list)
 		await suggestion.click();
 	}
@@ -223,13 +223,13 @@ describe( 'Navigation', () => {
 		// For the second nav link block use an existing internal page.
 		// Mock the api response so that it's consistent.
 		await mockSearchResponse( [
-			{ title: 'Contact Us', slug: 'contact-us' },
+			{ title: 'Get in Touch', slug: 'get-in-touch' },
 		] );
 
 		// Add a link to the default Navigation Link block.
 		await updateActiveNavigationLink( {
-			url: 'Contact Us',
-			label: 'Get in touch',
+			url: 'Get in Touch',
+			label: 'Contact',
 			type: 'entity',
 		} );
 
