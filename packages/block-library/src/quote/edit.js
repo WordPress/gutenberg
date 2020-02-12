@@ -11,9 +11,13 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
+	InspectorControls,
 } from '@wordpress/block-editor';
-import { BlockQuotation } from '@wordpress/components';
+
+import { BlockQuotation, RangeControl } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
+
+import { StylesPanel, useGlobalStylesState } from '@wordpress/global-styles';
 
 export default function QuoteEdit( {
 	attributes,
@@ -24,6 +28,7 @@ export default function QuoteEdit( {
 	className,
 } ) {
 	const { align, value, citation } = attributes;
+	const { quoteFontSize, setQuoteFontSize } = useGlobalStylesState();
 
 	return (
 		<>
@@ -90,6 +95,18 @@ export default function QuoteEdit( {
 					/>
 				) }
 			</BlockQuotation>
+			<InspectorControls>
+				<StylesPanel title={ __( 'Quote styles' ) }>
+					<RangeControl
+						label={ __( 'Font Size' ) }
+						value={ quoteFontSize }
+						onChange={ setQuoteFontSize }
+						min={ 10 }
+						max={ 50 }
+						step={ 1 }
+					/>
+				</StylesPanel>
+			</InspectorControls>
 		</>
 	);
 }

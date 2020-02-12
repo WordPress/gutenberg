@@ -47,6 +47,7 @@
 		"@wordpress/format-library": "file:packages/format-library",
 		"@wordpress/hooks": "file:packages/hooks",
 		"@wordpress/html-entities": "file:packages/html-entities",
+		"@wordpress/global-styles": "file:packages/global-styles",
 		"@wordpress/i18n": "file:packages/i18n",
 		"@wordpress/icons": "file:packages/icons",
 		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",

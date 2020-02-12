@@ -9,6 +9,7 @@ import {
 	navigateRegions,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
+import { GlobalStylesStateProvider } from '@wordpress/global-styles';
 
 /**
  * Internal dependencies
@@ -29,21 +30,23 @@ function Editor( { settings } ) {
 		[]
 	);
 	return template ? (
-		<SlotFillProvider>
-			<DropZoneProvider>
-				<EntityProvider
-					kind="postType"
-					type="wp_template"
-					id={ settings.templateId }
-				>
-					<Notices />
-					<Header />
-					<Sidebar />
-					<BlockEditor settings={ settings } />
-					<Popover.Slot />
-				</EntityProvider>
-			</DropZoneProvider>
-		</SlotFillProvider>
+		<GlobalStylesStateProvider>
+			<SlotFillProvider>
+				<DropZoneProvider>
+					<EntityProvider
+						kind="postType"
+						type="wp_template"
+						id={ settings.templateId }
+					>
+						<Notices />
+						<Header />
+						<Sidebar />
+						<BlockEditor settings={ settings } />
+						<Popover.Slot />
+					</EntityProvider>
+				</DropZoneProvider>
+			</SlotFillProvider>
+		</GlobalStylesStateProvider>
 	) : null;
 }
 
