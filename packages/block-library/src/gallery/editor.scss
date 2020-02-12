@@ -6,8 +6,19 @@
 		list-style-type: none;
 	}
 
+	// @todo: this deserves a refactor, by being moved to the toolbar.
 	.block-editor-media-placeholder {
-		margin-bottom: $grid-unit-10;
+		margin-bottom: $grid-unit-15;
+		padding: $grid-unit-15;
+
+		// This element is empty here anyway.
+		.components-placeholder__label {
+			display: none;
+		}
+
+		.components-button {
+			margin-bottom: 0;
+		}
 	}
 }
 
@@ -26,12 +37,19 @@ figure.wp-block-gallery {
 .blocks-gallery-item {
 
 	// Hide the focus outline that otherwise briefly appears when selecting a block.
-	figure:not(.is-selected):focus {
+	figure:not(.is-selected):focus,
+	img:focus {
 		outline: none;
 	}
 
 	figure.is-selected {
-		outline: 4px solid theme(primary);
+		box-shadow: 0 0 0 $border-width $white, 0 0 0 3px $theme-color;
+		border-radius: $radius-block-ui;
+		outline: 2px solid transparent;
+
+		img {
+			border-radius: $radius-block-ui;
+		}
 	}
 
 	figure.is-transient img {
@@ -103,9 +121,9 @@ figure.wp-block-gallery {
 	left: -2px;
 }
 
-.blocks-gallery-item__move-backward,
-.blocks-gallery-item__move-forward,
-.blocks-gallery-item__remove {
+.blocks-gallery-item__move-backward.components-button,
+.blocks-gallery-item__move-forward.components-button,
+.blocks-gallery-item__remove.components-button {
 	padding: 0;
 }
 

@@ -36,35 +36,10 @@
 		outline: 1px solid transparent;
 	}
 
-	// Secondary/default button style.
-	&.is-secondary {
-		white-space: nowrap;
-		color: $theme-color;
-		background: transparent;
+	/**
+	 * Primary button style.
+	 */
 
-		&:hover:not(:disabled) {
-			border-color: $theme-color;
-		}
-
-		&:active:not(:disabled) {
-			background: #f3f5f6;
-			color: color($theme-color shade(5%));
-			border-color: #7e8993;
-			box-shadow: none;
-		}
-
-		&:disabled,
-		&[aria-disabled="true"] {
-			color: #a0a5aa;
-			border-color: #ddd;
-			background: #f7f7f7;
-			text-shadow: 0 $border-width 0 #fff;
-			transform: none;
-			opacity: 1;
-		}
-	}
-
-	// Primary button style.
 	&.is-primary {
 		white-space: nowrap;
 		background: color($theme-color);
@@ -126,7 +101,65 @@
 		}
 	}
 
-	/* Buttons that look like links, for a cross of good semantics with the visual */
+	/**
+	 * Secondary and tertiary buttons.
+	 */
+
+	&.is-secondary,
+	&.is-tertiary {
+		&:active:not(:disabled) {
+			background: $light-gray-tertiary;
+			color: color($theme-color shade(10%));
+			box-shadow: none;
+		}
+
+		&:hover:not(:disabled) {
+			color: color($theme-color shade(10%));
+			box-shadow: 0 0 0 $border-width color($theme-color shade(10%));
+		}
+
+		&:disabled,
+		&[aria-disabled="true"],
+		&[aria-disabled="true"]:hover {
+			color: lighten($medium-gray-text, 5%);
+			background: lighten($light-gray-tertiary, 5%);
+			transform: none;
+			opacity: 1;
+			box-shadow: none;
+		}
+	}
+
+	/**
+	 * Secondary button style.
+	 */
+
+	&.is-secondary {
+		box-shadow: 0 0 0 $border-width $theme-color;
+		outline: 1px solid transparent; // Shown in high contrast mode.
+		white-space: nowrap;
+		color: $theme-color;
+		background: transparent;
+	}
+
+	/**
+	 * Tertiary buttons.
+	 */
+
+	&.is-tertiary {
+		white-space: nowrap;
+		color: $theme-color;
+		background: transparent;
+
+		.dashicon {
+			display: inline-block;
+			flex: 0 0 auto;
+		}
+	}
+
+	/**
+	 * Link buttons.
+	 */
+
 	&.is-link {
 		margin: 0;
 		padding: 0;
@@ -158,7 +191,7 @@
 		}
 	}
 
-	/* Link buttons that are red to indicate destructive behavior. */
+	// Link buttons that are red to indicate destructive behavior.
 	&.is-link.is-destructive {
 		color: $alert-red;
 	}
@@ -191,20 +224,6 @@
 
 		&.has-icon:not(.has-text) {
 			width: 24px;
-		}
-	}
-
-	// Buttons that are text-based.
-	&.is-tertiary {
-		color: $theme-color;
-
-		.dashicon {
-			display: inline-block;
-			flex: 0 0 auto;
-		}
-
-		&:not(:disabled):not([aria-disabled="true"]):hover {
-			color: color($theme-color shade(25%));
 		}
 	}
 

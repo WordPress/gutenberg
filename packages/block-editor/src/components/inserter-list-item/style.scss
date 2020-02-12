@@ -35,10 +35,6 @@
 
 		&.is-active {
 			@include block-style__is-active();
-
-			&:focus {
-				@include block-style__is-active-focus();
-			}
 		}
 	}
 }

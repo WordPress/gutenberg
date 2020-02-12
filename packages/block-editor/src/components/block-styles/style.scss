@@ -20,14 +20,14 @@
 
 	&:hover {
 		@include block-style__hover;
+
+		.block-editor-block-styles__item-preview {
+			border-color: $theme-color;
+		}
 	}
 
 	&.is-active {
 		@include block-style__is-active();
-
-		&:focus {
-			@include block-style__is-active-focus();
-		}
 	}
 }
 
@@ -35,7 +35,7 @@
 .block-editor-block-styles__item-preview {
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
 	padding: 0;
-	border: $border-width solid rgba($dark-gray-900, 0.2);
+	border: $border-width solid rgba($dark-gray-primary, 0.2);
 	border-radius: $radius-round-rectangle;
 	display: flex;
 	overflow: hidden;

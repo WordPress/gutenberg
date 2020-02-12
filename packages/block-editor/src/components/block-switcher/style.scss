@@ -90,7 +90,15 @@
 	display: flex;
 	background: $white;
 	box-shadow: $shadow-popover;
-	padding: $grid-unit-30;
+	padding: 0;
+
+	.components-menu-group {
+		padding: $grid-unit-20 $grid-unit-30;
+	}
+
+	.components-menu-group + .components-menu-group {
+		border-color: $light-gray-secondary;
+	}
 }
 
 .block-editor-block-switcher__popover .components-popover__content {
@@ -98,6 +106,11 @@
 		min-width: 300px;
 		max-width: 340px;
 		width: 50%;
+	}
+
+	.block-editor-block-switcher__label {
+		margin-bottom: $grid-unit-10;
+		color: $medium-gray-text;
 	}
 
 	@include break-medium {
