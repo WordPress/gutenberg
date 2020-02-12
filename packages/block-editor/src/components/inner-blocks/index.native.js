@@ -20,10 +20,7 @@ import { compose } from '@wordpress/compose';
  */
 import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
-
-/**
- * Internal dependencies
- */
+import ButtonsBlockAppender from './buttons-block-appender';
 import BlockList from '../block-list';
 import { withBlockEditContext } from '../block-edit/context';
 
@@ -109,7 +106,11 @@ class InnerBlocks extends Component {
 	}
 
 	render() {
-		const { clientId, renderAppender } = this.props;
+		const {
+			clientId,
+			renderAppender,
+			__experimentalMoverDirection,
+		} = this.props;
 		const { templateInProcess } = this.state;
 
 		return (
@@ -119,6 +120,9 @@ class InnerBlocks extends Component {
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
 						withFooter={ false }
+						__experimentalMoverDirection={
+							__experimentalMoverDirection
+						}
 					/>
 				) }
 			</>
@@ -180,6 +184,7 @@ InnerBlocks = compose( [
 // Expose default appender placeholders as components.
 InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
+InnerBlocks.ButtonsBlockAppender = ButtonsBlockAppender;
 
 InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
 	<BlockContent />

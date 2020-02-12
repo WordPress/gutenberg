@@ -43,9 +43,14 @@ export class BlockList extends Component {
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind(
 			this
 		);
+		this.onLayout = this.onLayout.bind( this );
 		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind(
 			this
 		);
+
+		this.state = {
+			maxWidth: null,
+		};
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -69,6 +74,12 @@ export class BlockList extends Component {
 		return this.props.isBlockInsertionPointVisible;
 	}
 
+	onLayout( { nativeEvent } ) {
+		const { width } = nativeEvent.layout;
+
+		this.setState( { maxWidth: width } );
+	}
+
 	renderDefaultBlockAppender() {
 		const { shouldShowInsertionPointBefore } = this.props;
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
@@ -84,8 +95,15 @@ export class BlockList extends Component {
 	}
 
 	shouldShowInnerBlockAppender() {
-		const { blockClientIds, renderAppender } = this.props;
-		return renderAppender && blockClientIds.length > 0;
+		const {
+			blockClientIds,
+			renderAppender,
+			isSelectedButtonsBlock,
+		} = this.props;
+		if ( ! isSelectedButtonsBlock ) {
+			return renderAppender && blockClientIds.length > 0;
+		}
+		return false;
 	}
 
 	render() {
@@ -94,7 +112,6 @@ export class BlockList extends Component {
 			blockClientIds,
 			title,
 			header,
-			withFooter = true,
 			isReadOnly,
 			isRootList,
 		} = this.props;
@@ -103,6 +120,7 @@ export class BlockList extends Component {
 			<View
 				style={ { flex: isRootList ? 1 : 0 } }
 				onAccessibilityEscape={ clearSelectedBlock }
+				onLayout={ this.onLayout }
 			>
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android'
@@ -125,8 +143,13 @@ export class BlockList extends Component {
 					ListEmptyComponent={
 						! isReadOnly && this.renderDefaultBlockAppender
 					}
-					ListFooterComponent={
-						! isReadOnly && withFooter && this.renderBlockListFooter
+					ListFooterComponent={ this.renderBlockListFooter }
+					style={
+						this.props.__experimentalMoverDirection ===
+							'horizontal' && {
+							flexDirection: 'row',
+							flexWrap: 'wrap',
+						}
 					}
 				/>
 
@@ -164,6 +187,7 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
+						parentWidth={ this.state.maxWidth }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (
@@ -176,17 +200,29 @@ export class BlockList extends Component {
 
 	renderBlockListFooter() {
 		const paragraphBlock = createBlock( 'core/paragraph' );
-		return (
-			<>
-				<TouchableWithoutFeedback
-					onPress={ () => {
-						this.addBlockToEndOfPost( paragraphBlock );
-					} }
-				>
-					<View style={ styles.blockListFooter } />
-				</TouchableWithoutFeedback>
-			</>
-		);
+		const {
+			isReadOnly,
+			withFooter = true,
+			isSelectedButtonsBlock,
+			renderAppender,
+		} = this.props;
+
+		if ( ! isReadOnly && withFooter ) {
+			return (
+				<>
+					<TouchableWithoutFeedback
+						onPress={ () => {
+							this.addBlockToEndOfPost( paragraphBlock );
+						} }
+					>
+						<View style={ styles.blockListFooter } />
+					</TouchableWithoutFeedback>
+				</>
+			);
+		} else if ( isSelectedButtonsBlock && renderAppender ) {
+			return renderAppender();
+		}
+		return null;
 	}
 }
 
@@ -199,9 +235,11 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSettings,
+			getBlock,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectedBlock = getBlock( selectedBlockClientId );
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
@@ -226,6 +264,8 @@ export default compose( [
 			);
 		};
 
+		const isSelectedButtonsBlock =
+			selectedBlock && selectedBlock.name === 'core/buttons';
 		const isReadOnly = getSettings().readOnly;
 
 		return {
@@ -237,6 +277,7 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
+			isSelectedButtonsBlock,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
