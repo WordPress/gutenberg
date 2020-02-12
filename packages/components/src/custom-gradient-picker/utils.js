@@ -2,18 +2,22 @@
  * External dependencies
  */
 import { findIndex, map, some } from 'lodash';
+import gradientParser from 'gradient-parser';
 
 /**
  * Internal dependencies
  */
 import {
+	DEFAULT_GRADIENT,
 	INSERT_POINT_WIDTH,
 	MINIMUM_ABSOLUTE_LEFT_POSITION,
 	MINIMUM_DISTANCE_BETWEEN_POINTS,
+	HORIZONTAL_GRADIENT_ORIENTATION,
 } from './constants';
 import {
 	serializeGradientColor,
 	serializeGradientPosition,
+	serializeGradient,
 } from './serializer';
 
 function tinyColorRgbToGradientColorStop( { r, g, b, a } ) {
@@ -226,4 +230,34 @@ export function getMarkerPoints( gradientAST ) {
 			positionValue: parseInt( colorStop.length.value ),
 		};
 	} );
+}
+
+export function getLinearGradientRepresentationOfARadial( gradientAST ) {
+	return serializeGradient( {
+		type: 'linear-gradient',
+		orientation: HORIZONTAL_GRADIENT_ORIENTATION,
+		colorStops: gradientAST.colorStops,
+	} );
+}
+
+export function getGradientParsed( value ) {
+	let hasGradient = !! value;
+	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
+	// More information of its structure available at https://www.npmjs.com/package/gradient-parser#ast.
+	let gradientAST;
+	let gradientValue;
+	try {
+		gradientAST = gradientParser.parse( value || DEFAULT_GRADIENT )[ 0 ];
+		gradientValue = value || DEFAULT_GRADIENT;
+	} catch ( error ) {
+		hasGradient = false;
+		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
+		gradientValue = DEFAULT_GRADIENT;
+	}
+
+	return {
+		hasGradient,
+		gradientAST,
+		gradientValue,
+	};
 }

@@ -470,24 +470,22 @@ export const getBlockParents = createSelector(
  *
  * @return {Array} ClientIDs of the parent blocks.
  */
-export const getBlockParentsByBlockName = (
-	state,
-	clientId,
-	blockName,
-	ascending = false
-) => {
-	const parents = getBlockParents( state, clientId, ascending );
-	return map(
-		filter(
-			map( parents, ( id ) => ( {
-				id,
-				name: getBlockName( state, id ),
-			} ) ),
-			{ name: blockName }
-		),
-		( { id } ) => id
-	);
-};
+export const getBlockParentsByBlockName = createSelector(
+	( state, clientId, blockName, ascending = false ) => {
+		const parents = getBlockParents( state, clientId, ascending );
+		return map(
+			filter(
+				map( parents, ( id ) => ( {
+					id,
+					name: getBlockName( state, id ),
+				} ) ),
+				{ name: blockName }
+			),
+			( { id } ) => id
+		);
+	},
+	( state ) => [ state.blocks.parents ]
+);
 
 /**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -1622,4 +1620,15 @@ export function isNavigationMode( state ) {
  */
 export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
+}
+
+/**
+ * Returns the current editing canvas device type.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Device type.
+ */
+export function getPreviewDeviceType( state ) {
+	return state.deviceType;
 }

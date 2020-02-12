@@ -16,7 +16,7 @@ import {
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { link } from '@wordpress/icons';
+import { link, upload } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -28,6 +28,7 @@ import LinkViewer from '../url-popover/link-viewer';
 
 const MediaReplaceFlow = ( {
 	mediaURL,
+	mediaId,
 	allowedTypes,
 	accept,
 	onSelect,
@@ -141,6 +142,7 @@ const MediaReplaceFlow = ( {
 				<>
 					<NavigableMenu>
 						<MediaUpload
+							value={ mediaId }
 							onSelect={ ( media ) => selectMedia( media ) }
 							allowedTypes={ allowedTypes }
 							render={ ( { open } ) => (
@@ -158,7 +160,7 @@ const MediaReplaceFlow = ( {
 								render={ ( { openFileDialog } ) => {
 									return (
 										<MenuItem
-											icon="upload"
+											icon={ upload }
 											onClick={ () => {
 												openFileDialog();
 											} }

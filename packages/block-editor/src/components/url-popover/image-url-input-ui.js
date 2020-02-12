@@ -18,7 +18,7 @@ import {
 	Path,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { link as linkIcon } from '@wordpress/icons';
+import { link as linkIcon, close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -311,7 +311,7 @@ const ImageURLInputUI = ( {
 								urlLabel={ urlLabel }
 							/>
 							<Button
-								icon="no"
+								icon={ close }
 								label={ __( 'Remove link' ) }
 								onClick={ onLinkRemove }
 							/>

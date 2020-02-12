@@ -22,10 +22,12 @@ module.exports = function buildDockerComposeConfig( config ) {
 
 		// If this is is the Gutenberg plugin, then mount its E2E test plugins.
 		// TODO: Implement an API that lets Gutenberg mount test plugins without this workaround.
-		...( fs.existsSync( path.resolve( source.path, 'gutenberg.php' ) ) && [
-			`${ source.path }/packages/e2e-tests/plugins:/var/www/html/wp-content/plugins/gutenberg-test-plugins`,
-			`${ source.path }/packages/e2e-tests/mu-plugins:/var/www/html/wp-content/mu-plugins`,
-		] ),
+		...( fs.existsSync( path.resolve( source.path, 'gutenberg.php' ) )
+			? [
+					`${ source.path }/packages/e2e-tests/plugins:/var/www/html/wp-content/plugins/gutenberg-test-plugins`,
+					`${ source.path }/packages/e2e-tests/mu-plugins:/var/www/html/wp-content/mu-plugins`,
+			  ]
+			: [] ),
 	] );
 
 	const themeMounts = config.themeSources.map(

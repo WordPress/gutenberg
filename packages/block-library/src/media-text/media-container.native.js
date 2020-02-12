@@ -31,6 +31,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { pencil } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -130,7 +131,7 @@ class MediaContainer extends Component {
 					<Button
 						className="components-toolbar__control"
 						label={ __( 'Edit media' ) }
-						icon="edit"
+						icon={ pencil }
 						onClick={ open }
 					/>
 				</ToolbarGroup>
