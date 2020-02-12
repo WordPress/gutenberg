@@ -15,7 +15,7 @@ async function mockPagesResponse( pages ) {
 	const mappedPages = pages.map( ( { title, slug }, index ) => ( {
 		id: index + 1,
 		type: 'page',
-		link: `https://this/is/a/test/url/${ slug }`,
+		link: `https://this/is/a/test/page/${ slug }`,
 		title: {
 			rendered: title,
 			raw: title,
@@ -41,7 +41,7 @@ async function mockSearchResponse( items ) {
 		subtype: 'page',
 		title,
 		type: 'post',
-		url: `https://this/is/a/test/url/${ slug }`,
+		url: `https://this/is/a/test/search/${ slug }`,
 	} ) );
 
 	await setUpResponseMocking( [
@@ -59,7 +59,7 @@ async function mockCreatePageResponse( title, slug ) {
 		id: 1,
 		title: { raw: title, rendered: title },
 		type: 'page',
-		link: `https://this/is/a/test/url/${ slug }`,
+		link: `https://this/is/a/test/create/page/${ slug }`,
 		slug,
 	};
 
