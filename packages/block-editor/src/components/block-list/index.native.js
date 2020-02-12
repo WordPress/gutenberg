@@ -116,6 +116,8 @@ export class BlockList extends Component {
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					data={ blockClientIds }
 					keyExtractor={ identity }
+					// We need that prop because we want to call 'renderItem' even if the data prop is the same
+					extraData={ [ true ] }
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={
 						this.shouldFlatListPreventAutomaticScroll
