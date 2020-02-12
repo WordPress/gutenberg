@@ -30,7 +30,10 @@ class Sandbox extends Component {
 
 	componentDidUpdate( prevProps ) {
 		let refreshOnChange = false;
-		if ( prevProps.html !== this.props.html && this.props.refreshOnHtmlChange ) {
+		if (
+			prevProps.html !== this.props.html &&
+			this.props.refreshOnHtmlChange
+		) {
 			refreshOnChange = true;
 		}
 		this.trySandbox( refreshOnChange );
@@ -79,7 +82,10 @@ class Sandbox extends Component {
 		}
 
 		const body = this.iframe.current.contentDocument.body;
-		if ( null !== body.getAttribute( 'data-resizable-iframe-connected' ) && ! refreshOnChange ) {
+		if (
+			null !== body.getAttribute( 'data-resizable-iframe-connected' ) &&
+			! refreshOnChange
+		) {
 			return;
 		}
 
