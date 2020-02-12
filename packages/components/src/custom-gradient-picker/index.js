@@ -79,13 +79,13 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 				controls={ [
 					{
 						icon: <LinearGradientIcon />,
-						title: 'Linear Gradient',
+						title: __( 'Linear Gradient' ),
 						isActive: hasGradient && type === 'linear-gradient',
 						onClick: onSetLinearGradient,
 					},
 					{
 						icon: <RadialGradientIcon />,
-						title: 'Radial Gradient',
+						title: __( 'Radial Gradient' ),
 						isActive: hasGradient && type === 'radial-gradient',
 						onClick: onSetRadialGradient,
 					},
