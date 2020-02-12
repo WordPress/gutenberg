@@ -25,7 +25,7 @@ export default function BottomSheetCyclePickerCell( props ) {
 			}
 			editable={ false }
 			value={
-				optionsContainsValue && options[ selectedOptionIndex ].label
+				optionsContainsValue && options[ selectedOptionIndex ].name
 			}
 			{ ...cellProps }
 		/>

@@ -357,9 +357,9 @@ export class ImageEdit extends React.Component {
 			},
 		];
 
-		const sizeOptions = map( imageSizes, ( { label, slug } ) => ( {
+		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
 			value: slug,
-			label,
+			name,
 		} ) );
 		const sizeOptionsValid = find( sizeOptions, [
 			'value',
