@@ -12,7 +12,11 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import Edit from './edit';
-import { BlockEditContextProvider, useBlockEditContext } from './context';
+import {
+	BlockEditContextProvider,
+	useBlockEditContext,
+	ifBlockEditSelected,
+} from './context';
 
 class BlockEdit extends Component {
 	constructor() {
@@ -67,4 +71,4 @@ class BlockEdit extends Component {
 }
 
 export default BlockEdit;
-export { useBlockEditContext };
+export { useBlockEditContext, ifBlockEditSelected };

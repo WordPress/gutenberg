@@ -23,7 +23,10 @@ import {
 } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
-import { StylesPanel, useGlobalStylesState } from '@wordpress/global-styles';
+import {
+	GlobalStylesControls,
+	useGlobalStylesState,
+} from '@wordpress/global-styles';
 
 function HeadingEdit( {
 	attributes,
@@ -64,8 +67,8 @@ function HeadingEdit( {
 					} }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<StylesPanel title={ __( 'Heading styles' ) }>
+			<GlobalStylesControls>
+				<PanelBody title={ __( 'Heading' ) }>
 					<RangeControl
 						label={ __( 'Font Weight' ) }
 						value={ headingFontWeight }
@@ -74,7 +77,9 @@ function HeadingEdit( {
 						max={ 900 }
 						step={ 100 }
 					/>
-				</StylesPanel>
+				</PanelBody>
+			</GlobalStylesControls>
+			<InspectorControls>
 				<PanelBody title={ __( 'Heading settings' ) }>
 					<p>{ __( 'Level' ) }</p>
 					<HeadingToolbar
