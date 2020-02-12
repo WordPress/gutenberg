@@ -219,6 +219,15 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
+		// Ensure that no Pages are returned
+		await mockSearchResponse( [] );
+
+		// Mock request for creating pages.
+		await mockCreatePageResponse(
+			'A really long page name that will not exist',
+			'my-new-page'
+		);
+
 		// Add the navigation block.
 		await insertBlock( 'Navigation' );
 
@@ -246,11 +255,8 @@ describe( 'Navigation', () => {
 		// Insert name for the new page.
 		await page.type(
 			'input[placeholder="Search or type url"]',
-			'My New Page'
+			'A really long page name that will not exist'
 		);
-
-		// Mock request for creating pages.
-		await mockCreatePageResponse( 'My New Page', 'my-new-page' );
 
 		// Wait for URL input to be focused
 		await page.waitForSelector(
@@ -278,11 +284,12 @@ describe( 'Navigation', () => {
 				!! document.activeElement.closest(
 					'.block-editor-block-list__block'
 				) &&
-				document.activeElement.innerText === 'My New Page'
+				document.activeElement.innerText ===
+					'A really long page name that will not exist'
 		);
 		expect( isInLinkRichText ).toBe( true );
 
-		// Expect a Navigation Block with a link for "My New Page".
+		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
