@@ -52,7 +52,7 @@ const PLACEHOLDER_TEXT = Platform.select( {
 	web: __(
 		'Drag images, upload new ones or select files from your library.'
 	),
-	native: __( 'ADD MEDIA' ),
+	native: __( 'Add Media' ),
 } );
 
 // currently this is needed for consistent controls UI on mobile

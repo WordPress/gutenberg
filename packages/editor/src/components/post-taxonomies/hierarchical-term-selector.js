@@ -423,13 +423,13 @@ class HierarchicalTermSelector extends Component {
 			);
 		const newTermButtonLabel = labelWithFallback(
 			'add_new_item',
-			__( 'Add new category' ),
-			__( 'Add new term' )
+			__( 'Add New Category' ),
+			__( 'Add New Term' )
 		);
 		const newTermLabel = labelWithFallback(
 			'new_item_name',
-			__( 'Add new category' ),
-			__( 'Add new term' )
+			__( 'Add New Category' ),
+			__( 'Add New Term' )
 		);
 		const parentSelectLabel = labelWithFallback(
 			'parent_item',

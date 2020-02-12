@@ -135,7 +135,7 @@ function NavigationLinkEdit( {
 					<ToolbarButton
 						name="submenu"
 						icon={ <ToolbarSubmenuIcon /> }
-						title={ __( 'Add submenu' ) }
+						title={ __( 'Add Submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
 				</ToolbarGroup>
