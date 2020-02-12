@@ -96,6 +96,11 @@
 		// 2px outside.
 		box-shadow: 0 0 0 2px $blue-medium-focus;
 		border-radius: $radius-block-ui;
+
+		// Show a light color for dark themes.
+		.is-dark-theme & {
+			box-shadow: 0 0 0 2px $blue-medium-focus-dark;
+		}
 	}
 
 	// Spotlight mode.
@@ -137,7 +142,6 @@
 	.is-navigate-mode & .block-editor-block-list__block.is-selected,
 	.block-editor-block-list__block.is-multi-selected {
 
-
 		// Show selection borders around every non-nested block's actual footprint.
 		&::after {
 			position: absolute;
@@ -159,9 +163,9 @@
 			// Windows High Contrast mode will show this outline.
 			outline: 2px solid transparent;
 
-			// Show a lighter blue for dark themes.
+			// Show a lighter color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 1px $blue-medium-focus-dark, inset 0 0 0 1px $blue-medium-focus-dark;
+				box-shadow: 0 0 0 2px $blue-medium-focus-dark;
 			}
 		}
 
@@ -173,12 +177,43 @@
 		}
 	}
 
+	// Show a footprint fade effect when first selecting any block.
+	.block-editor-block-list__block.is-selected::before {
+		position: absolute;
+		z-index: 1;
+		pointer-events: none;
+		content: "";
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+
+		background: rgba($black, 0.04);
+
+		// Flash a white color for dark themes.
+		.is-dark-theme & {
+			background: rgba($white, 0.15);
+		}
+
+		animation: block-editor-block-list__block-fade-out-animation 0.3s ease-out 0.3s;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
+	}
+
+	@keyframes block-editor-block-list__block-fade-out-animation {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
+	}
+
 	// Hide the focus indicator for collapsed blocks.
 	// These serve as only as column containers for floated blocks.
 	.block-editor-block-list__block.is-block-collapsed::after {
 		content: none;
 	}
-
 }
 
 
