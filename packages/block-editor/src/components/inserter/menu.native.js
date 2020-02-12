@@ -48,6 +48,7 @@ export class InserterMenu extends Component {
 
 	componentWillUnmount() {
 		this.props.hideInsertionPoint();
+		Dimensions.removeEventListener( 'change', this.onLayout );
 	}
 
 	calculateMinItemWidth( bottomSheetWidth ) {
@@ -67,7 +68,7 @@ export class InserterMenu extends Component {
 		return itemWidth + itemPaddingLeft + itemPaddingRight;
 	}
 
-	calculateColumns() {
+	calculateColumnsProperties() {
 		const bottomSheetWidth = BottomSheet.getWidth();
 		const {
 			paddingLeft: containerPaddingLeft,
@@ -99,8 +100,8 @@ export class InserterMenu extends Component {
 	}
 
 	onLayout() {
-		const calculatedColumns = this.calculateColumns();
-		const numberOfColumns = calculatedColumns.numOfColumns;
+		const columnProperties = this.calculateColumnsProperties();
+		const numberOfColumns = columnProperties.numOfColumns;
 
 		this.setState( { numberOfColumns } );
 	}
@@ -123,7 +124,7 @@ export class InserterMenu extends Component {
 			styles.modalItemLabelDark
 		);
 
-		const calculatedColumns = this.calculateColumns();
+		const columnProperties = this.calculateColumnsProperties();
 
 		return (
 			<BottomSheet
@@ -156,9 +157,9 @@ export class InserterMenu extends Component {
 									<View
 										style={ [
 											modalIconWrapperStyle,
-											calculatedColumns.itemWidth && {
+											columnProperties.itemWidth && {
 												width:
-													calculatedColumns.itemWidth,
+													columnProperties.itemWidth,
 											},
 										] }
 									>
