@@ -219,10 +219,14 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
-		// Ensure that no Pages are returned
+		// Mock request for creating pages and the page search response.
+		// We mock the page search to return no results and we use a very long
+		// page name because if the search returns existing pages then the
+		// "Create" suggestion might be below the scroll fold within the
+		// `LinkControl` search suggestions UI. If this happens then it's not
+		// possible to wait for the element to appear and the test will
+		// erroneously fail.
 		await mockSearchResponse( [] );
-
-		// Mock request for creating pages.
 		await mockCreatePageResponse(
 			'A really long page name that will not exist',
 			'my-new-page'
