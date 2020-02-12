@@ -50,6 +50,28 @@ afterEach( () => {
 	mockFetchSearchSuggestions.mockReset();
 } );
 
+function getURLInput() {
+	return container.querySelector( 'input[aria-label="URL"]' );
+}
+
+function getSearchResults() {
+	const input = getURLInput();
+	// The input has `aria-owns` to indicate that it owns (and is related to)
+	// the search results with `role="listbox"`.
+	const relatedSelector = input.getAttribute( 'aria-owns' );
+
+	// Select by relationship as well as role
+	return container.querySelectorAll(
+		`#${ relatedSelector }[role="listbox"] [role="option"]`
+	);
+}
+
+function getCurrentLink() {
+	return container.querySelector(
+		'.block-editor-link-control__search-item.is-current'
+	);
+}
+
 describe( 'Basic rendering', () => {
 	it( 'should render', () => {
 		act( () => {
@@ -57,17 +79,14 @@ describe( 'Basic rendering', () => {
 		} );
 
 		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchInput = getURLInput();
 
 		expect( searchInput ).not.toBeNull();
 		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 
 	describe( 'forceIsEditingLink', () => {
-		const isEditing = () =>
-			!! container.querySelector( 'input[aria-label="URL"]' );
+		const isEditing = () => !! getURLInput();
 
 		it( 'undefined', () => {
 			act( () => {
@@ -147,9 +166,7 @@ describe( 'Searching for a link', () => {
 		} );
 
 		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchInput = getURLInput();
 
 		// Simulate searching for a term
 		act( () => {
@@ -160,9 +177,7 @@ describe( 'Searching for a link', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="menu"] button[role="menuitem"]'
-		);
+		const searchResultElements = getSearchResults();
 
 		let loadingUI = container.querySelector( '.components-spinner' );
 
@@ -190,9 +205,7 @@ describe( 'Searching for a link', () => {
 		} );
 
 		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchInput = getURLInput();
 
 		// Simulate searching for a term
 		act( () => {
@@ -203,9 +216,8 @@ describe( 'Searching for a link', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		const searchResultElements = getSearchResults();
+
 		const firstSearchResultItemHTML = first( searchResultElements )
 			.innerHTML;
 		const lastSearchResultItemHTML = last( searchResultElements ).innerHTML;
@@ -239,9 +251,7 @@ describe( 'Searching for a link', () => {
 			} );
 
 			// Search Input UI
-			const searchInput = container.querySelector(
-				'input[aria-label="URL"]'
-			);
+			const searchInput = getURLInput();
 
 			// Simulate searching for a term
 			act( () => {
@@ -254,9 +264,8 @@ describe( 'Searching for a link', () => {
 			await eventLoopTick();
 
 			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-			const searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
+			const searchResultElements = getSearchResults();
+
 			const lastSearchResultItemHTML = last( searchResultElements )
 				.innerHTML;
 			const additionalDefaultFallbackURLSuggestionLength = 1;
@@ -295,9 +304,7 @@ describe( 'Manual link entry', () => {
 			} );
 
 			// Search Input UI
-			const searchInput = container.querySelector(
-				'input[aria-label="URL"]'
-			);
+			const searchInput = getURLInput();
 
 			// Simulate searching for a term
 			act( () => {
@@ -310,9 +317,8 @@ describe( 'Manual link entry', () => {
 			await eventLoopTick();
 
 			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-			const searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
+			const searchResultElements = getSearchResults();
+
 			const firstSearchResultItemHTML =
 				searchResultElements[ 0 ].innerHTML;
 			const expectedResultsLength = 1;
@@ -345,9 +351,7 @@ describe( 'Manual link entry', () => {
 				} );
 
 				// Search Input UI
-				const searchInput = container.querySelector(
-					'input[aria-label="URL"]'
-				);
+				const searchInput = getURLInput();
 
 				// Simulate searching for a term
 				act( () => {
@@ -360,9 +364,8 @@ describe( 'Manual link entry', () => {
 				await eventLoopTick();
 
 				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
+				const searchResultElements = getSearchResults();
+
 				const firstSearchResultItemHTML =
 					searchResultElements[ 0 ].innerHTML;
 				const expectedResultsLength = 1;
@@ -395,9 +398,7 @@ describe( 'Default search suggestions', () => {
 		await eventLoopTick();
 
 		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchInput = getURLInput();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		const searchResultsWrapper = container.querySelector(
@@ -450,9 +451,7 @@ describe( 'Default search suggestions', () => {
 		// Click the "Edit/Change" button and check initial suggestions are not
 		// shown.
 		//
-		const currentLinkUI = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		const currentLinkUI = getCurrentLink();
 		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
 		act( () => {
@@ -461,13 +460,9 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
-		const searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		const searchResultElements = getSearchResults();
 
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchInput = getURLInput();
 
 		// search input is set to the URL value
 		expect( searchInput.value ).toEqual( fauxEntitySuggestions[ 0 ].url );
@@ -489,7 +484,7 @@ describe( 'Default search suggestions', () => {
 		let searchInput;
 
 		// Search Input UI
-		searchInput = container.querySelector( 'input[aria-label="URL"]' );
+		searchInput = getURLInput();
 
 		// Simulate searching for a term
 		act( () => {
@@ -502,9 +497,7 @@ describe( 'Default search suggestions', () => {
 		expect( searchInput.value ).toBe( searchTerm );
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		searchResultElements = getSearchResults();
 
 		// delete the text
 		act( () => {
@@ -514,10 +507,9 @@ describe( 'Default search suggestions', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
-		searchInput = container.querySelector( 'input[aria-label="URL"]' );
+		searchResultElements = getSearchResults();
+
+		searchInput = getURLInput();
 
 		// check the input is empty now
 		expect( searchInput.value ).toBe( '' );
@@ -547,9 +539,7 @@ describe( 'Selecting links', () => {
 		} );
 
 		// TODO: select by aria role or visible text
-		const currentLink = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		const currentLink = getCurrentLink();
 		const currentLinkHTML = currentLink.innerHTML;
 		const currentLinkAnchor = currentLink.querySelector(
 			`[href="${ selectedLink.url }"]`
@@ -584,9 +574,7 @@ describe( 'Selecting links', () => {
 		} );
 
 		// Required in order to select the button below
-		let currentLinkUI = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		let currentLinkUI = getCurrentLink();
 		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
 		// Simulate searching for a term
@@ -594,12 +582,8 @@ describe( 'Selecting links', () => {
 			Simulate.click( currentLinkBtn );
 		} );
 
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
-		currentLinkUI = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		const searchInput = getURLInput();
+		currentLinkUI = getCurrentLink();
 
 		// We should be back to showing the search input
 		expect( searchInput ).not.toBeNull();
@@ -639,9 +623,7 @@ describe( 'Selecting links', () => {
 				} );
 
 				// Search Input UI
-				const searchInput = container.querySelector(
-					'input[aria-label="URL"]'
-				);
+				const searchInput = getURLInput();
 
 				// Simulate searching for a term
 				act( () => {
@@ -654,9 +636,7 @@ describe( 'Selecting links', () => {
 				await eventLoopTick();
 
 				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
+				const searchResultElements = getSearchResults();
 
 				const firstSearchSuggestion = first( searchResultElements );
 
@@ -717,9 +697,7 @@ describe( 'Selecting links', () => {
 				} );
 
 				// Search Input UI
-				const searchInput = container.querySelector(
-					'input[aria-label="URL"]'
-				);
+				const searchInput = getURLInput();
 				const form = container.querySelector( 'form' );
 
 				// Simulate searching for a term
@@ -738,9 +716,8 @@ describe( 'Selecting links', () => {
 				} );
 
 				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
+				const searchResultElements = getSearchResults();
+
 				const firstSearchSuggestion = first( searchResultElements );
 				const secondSearchSuggestion = nth( searchResultElements, 1 );
 
@@ -836,9 +813,7 @@ describe( 'Selecting links', () => {
 			);
 
 			// Search Input UI
-			const searchInput = container.querySelector(
-				'input[aria-label="URL"]'
-			);
+			const searchInput = getURLInput();
 
 			// Step down into the search results, highlighting the first result item
 			act( () => {
@@ -848,9 +823,8 @@ describe( 'Selecting links', () => {
 			await eventLoopTick();
 
 			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-			const searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
+			const searchResultElements = getSearchResults();
+
 			const firstSearchSuggestion = first( searchResultElements );
 			const secondSearchSuggestion = nth( searchResultElements, 1 );
 
@@ -922,9 +896,7 @@ describe( 'Selecting links', () => {
 
 		// Change value.
 		const form = container.querySelector( 'form' );
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchInput = getURLInput();
 
 		// Simulate searching for a term
 		act( () => {
