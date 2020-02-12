@@ -1296,6 +1296,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/embed-block",
+		"slug": "packages-embed-block",
+		"markdown_source": "../packages/embed-block/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/env",
 		"slug": "packages-env",
 		"markdown_source": "../packages/env/README.md",
