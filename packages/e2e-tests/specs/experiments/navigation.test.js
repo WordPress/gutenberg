@@ -252,14 +252,20 @@ describe( 'Navigation', () => {
 		// Mock request for creating pages.
 		await mockCreatePageResponse( 'My New Page', 'my-new-page' );
 
+		// Wait for URL input to be focused
+		await page.waitForSelector(
+			'input.block-editor-url-input__input:focus'
+		);
+
 		// Wait for the create button to appear and click it.
 		await page.waitForSelector(
 			'.block-editor-link-control__search-create'
 		);
 
-		const [ createPageButton ] = await page.$x(
-			'//button[contains(concat(" ", @class, " "), " block-editor-link-control__search-create ")]'
+		const createPageButton = await page.$(
+			'.block-editor-link-control__search-create'
 		);
+
 		await createPageButton.click();
 
 		// wait for the creating confirmation to go away, and we should now be focused on our text input
