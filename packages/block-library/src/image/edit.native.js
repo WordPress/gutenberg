@@ -48,7 +48,7 @@ import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { link, image as icon } from '@wordpress/icons';
+import { external, link, image as icon, textColor } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -397,7 +397,7 @@ export class ImageEdit extends React.Component {
 						keyboardType="url"
 					/>
 					<ToggleControl
-						icon={ 'external' }
+						icon={ external }
 						label={ __( 'Open in new tab' ) }
 						checked={ linkTarget === '_blank' }
 						onChange={ this.onSetNewTab }
@@ -415,7 +415,7 @@ export class ImageEdit extends React.Component {
 						/>
 					) }
 					<TextControl
-						icon={ 'editor-textcolor' }
+						icon={ textColor }
 						label={ __( 'Alt Text' ) }
 						value={ alt || '' }
 						valuePlaceholder={ __( 'None' ) }
