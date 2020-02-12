@@ -192,7 +192,9 @@ If `example` is not defined, the preview will not be shown. So even if no-attrib
 
 - **Type:** `Array`
 
-Similar to how the block's style variations can be declared, a block type can define block variations the user can pick from. The difference is that rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted. All variations by default will show up in the inserter in addition to the regular block type item. When the `isDefault` flag is set for any of the variations listed, then it overrides the regular block type item in the inserter instead.
+Similarly to how the block's style variations can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted.
+
+By default, all variations will show up in the Inserter in addition to the regular block type item. However, setting the `isDefault` flag for any of the variations listed will override the regular block type in the Inserter.
 
 {% codetabs %}
 {% ES5 %}
