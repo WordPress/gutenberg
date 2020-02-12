@@ -176,8 +176,17 @@ describe( 'Navigation', () => {
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
+		// Wait for URL input to be focused
+		await page.waitForSelector(
+			'input.block-editor-url-input__input:focus'
+		);
+
+		// After adding a new block, search input should be shown immediately.
 		const isInURLInput = await page.evaluate(
-			() => !! document.activeElement.closest( '.block-editor-url-input' )
+			() =>
+				!! document.activeElement.matches(
+					'input.block-editor-url-input__input'
+				)
 		);
 		expect( isInURLInput ).toBe( true );
 		await page.keyboard.press( 'Escape' );
@@ -221,13 +230,15 @@ describe( 'Navigation', () => {
 		await createEmptyButton.click();
 
 		// Wait for URL input to be focused
-		await page.waitForSelector( ':focus.block-editor-url-input__input' );
+		await page.waitForSelector(
+			'input.block-editor-url-input__input:focus'
+		);
 
 		// After adding a new block, search input should be shown immediately.
 		const isInURLInput = await page.evaluate(
 			() =>
 				!! document.activeElement.matches(
-					'.block-editor-url-input__input'
+					'input.block-editor-url-input__input'
 				)
 		);
 		expect( isInURLInput ).toBe( true );
@@ -245,6 +256,7 @@ describe( 'Navigation', () => {
 		await page.waitForSelector(
 			'.block-editor-link-control__search-create'
 		);
+
 		const [ createPageButton ] = await page.$x(
 			'//button[contains(concat(" ", @class, " "), " block-editor-link-control__search-create ")]'
 		);
