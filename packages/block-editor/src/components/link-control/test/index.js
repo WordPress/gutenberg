@@ -55,7 +55,15 @@ function getURLInput() {
 }
 
 function getSearchResults() {
-	return container.querySelectorAll( '[role="listbox"] [role="option"]' );
+	const input = getURLInput();
+	// The input has `aria-owns` to indicate that it owns (and is related to)
+	// the search results with `role="listbox"`.
+	const relatedSelector = input.getAttribute( 'aria-owns' );
+
+	// Select by relationship as well as role
+	return container.querySelectorAll(
+		`#${ relatedSelector }[role="listbox"] [role="option"]`
+	);
 }
 
 function getCurrentLink() {
