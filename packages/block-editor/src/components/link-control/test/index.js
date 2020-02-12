@@ -54,6 +54,10 @@ function getURLInput() {
 	return container.querySelector( 'input[aria-label="URL"]' );
 }
 
+function getSearchResults() {
+	return container.querySelectorAll( '[role="listbox"] [role="option"]' );
+}
+
 describe( 'Basic rendering', () => {
 	it( 'should render', () => {
 		act( () => {
@@ -159,9 +163,7 @@ describe( 'Searching for a link', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="menu"] button[role="menuitem"]'
-		);
+		const searchResultElements = getSearchResults();
 
 		let loadingUI = container.querySelector( '.components-spinner' );
 
@@ -200,9 +202,8 @@ describe( 'Searching for a link', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		const searchResultElements = getSearchResults();
+
 		const firstSearchResultItemHTML = first( searchResultElements )
 			.innerHTML;
 		const lastSearchResultItemHTML = last( searchResultElements ).innerHTML;
@@ -249,9 +250,8 @@ describe( 'Searching for a link', () => {
 			await eventLoopTick();
 
 			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-			const searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
+			const searchResultElements = getSearchResults();
+
 			const lastSearchResultItemHTML = last( searchResultElements )
 				.innerHTML;
 			const additionalDefaultFallbackURLSuggestionLength = 1;
@@ -303,9 +303,8 @@ describe( 'Manual link entry', () => {
 			await eventLoopTick();
 
 			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-			const searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
+			const searchResultElements = getSearchResults();
+
 			const firstSearchResultItemHTML =
 				searchResultElements[ 0 ].innerHTML;
 			const expectedResultsLength = 1;
@@ -351,9 +350,8 @@ describe( 'Manual link entry', () => {
 				await eventLoopTick();
 
 				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
+				const searchResultElements = getSearchResults();
+
 				const firstSearchResultItemHTML =
 					searchResultElements[ 0 ].innerHTML;
 				const expectedResultsLength = 1;
@@ -450,9 +448,7 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
-		const searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		const searchResultElements = getSearchResults();
 
 		const searchInput = getURLInput();
 
@@ -489,9 +485,7 @@ describe( 'Default search suggestions', () => {
 		expect( searchInput.value ).toBe( searchTerm );
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		searchResultElements = getSearchResults();
 
 		// delete the text
 		act( () => {
@@ -501,9 +495,8 @@ describe( 'Default search suggestions', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		searchResultElements = getSearchResults();
+
 		searchInput = getURLInput();
 
 		// check the input is empty now
@@ -637,9 +630,7 @@ describe( 'Selecting links', () => {
 				await eventLoopTick();
 
 				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
+				const searchResultElements = getSearchResults();
 
 				const firstSearchSuggestion = first( searchResultElements );
 
@@ -719,9 +710,8 @@ describe( 'Selecting links', () => {
 				} );
 
 				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
+				const searchResultElements = getSearchResults();
+
 				const firstSearchSuggestion = first( searchResultElements );
 				const secondSearchSuggestion = nth( searchResultElements, 1 );
 
@@ -827,9 +817,8 @@ describe( 'Selecting links', () => {
 			await eventLoopTick();
 
 			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-			const searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
+			const searchResultElements = getSearchResults();
+
 			const firstSearchSuggestion = first( searchResultElements );
 			const secondSearchSuggestion = nth( searchResultElements, 1 );
 
