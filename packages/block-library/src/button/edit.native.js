@@ -61,10 +61,13 @@ class ButtonEdit extends Component {
 		// manually adding specific link
 		this.isEditingURL = false;
 
+		const shouldFocusButton =
+			Platform.OS === 'ios' ? ! props.hasParents : true;
+
 		this.state = {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
-			isButtonFocused: true,
+			isButtonFocused: shouldFocusButton,
 		};
 	}
 
@@ -316,17 +319,19 @@ class ButtonEdit extends Component {
 					backgroundColor={ this.getBackgroundColor() }
 					isSelected={ isSelected }
 				>
-					<View
-						pointerEvents="none"
-						style={ [
-							styles.outline,
-							{
-								borderRadius: outlineBorderRadius,
-								borderWidth: styles.button.borderWidth,
-								borderColor: this.getBackgroundColor(),
-							},
-						] }
-					/>
+					{ isSelected && (
+						<View
+							pointerEvents="none"
+							style={ [
+								styles.outline,
+								{
+									borderRadius: outlineBorderRadius,
+									borderWidth: styles.button.borderWidth,
+									borderColor: this.getBackgroundColor(),
+								},
+							] }
+						/>
+					) }
 					<RichText
 						setRef={ ( richText ) => {
 							this.richTextRef = richText;
@@ -419,13 +424,17 @@ export default compose( [
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+		const { getSelectedBlockClientId, getBlockParents } = select(
+			'core/block-editor'
+		);
 
 		const selectedId = getSelectedBlockClientId();
+		const hasParents = getBlockParents( selectedId ).length > 0;
 
 		return {
 			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
+			hasParents,
 		};
 	} ),
 ] )( ButtonEdit );
