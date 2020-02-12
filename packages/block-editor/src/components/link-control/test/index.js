@@ -177,7 +177,6 @@ describe( 'Searching for a link', () => {
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 		await eventLoopTick();
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		const searchResultElements = getSearchResults();
 
 		let loadingUI = container.querySelector( '.components-spinner' );
@@ -216,7 +215,6 @@ describe( 'Searching for a link', () => {
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 		await eventLoopTick();
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		const searchResultElements = getSearchResults();
 
 		const firstSearchResultItemHTML = first( searchResultElements )
@@ -264,7 +262,6 @@ describe( 'Searching for a link', () => {
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 			await eventLoopTick();
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 			const searchResultElements = getSearchResults();
 
 			const lastSearchResultItemHTML = last( searchResultElements )
@@ -317,7 +314,6 @@ describe( 'Manual link entry', () => {
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 			await eventLoopTick();
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 			const searchResultElements = getSearchResults();
 
 			const firstSearchResultItemHTML =
@@ -364,7 +360,6 @@ describe( 'Manual link entry', () => {
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 				await eventLoopTick();
 
-				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 				const searchResultElements = getSearchResults();
 
 				const firstSearchResultItemHTML =
@@ -401,7 +396,6 @@ describe( 'Default search suggestions', () => {
 		// Search Input UI
 		const searchInput = getURLInput();
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		const searchResultsWrapper = container.querySelector(
 			'[role="listbox"]'
 		);
@@ -497,7 +491,6 @@ describe( 'Default search suggestions', () => {
 
 		expect( searchInput.value ).toBe( searchTerm );
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		searchResultElements = getSearchResults();
 
 		// delete the text
@@ -507,7 +500,6 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		searchResultElements = getSearchResults();
 
 		searchInput = getURLInput();
@@ -636,7 +628,6 @@ describe( 'Selecting links', () => {
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 				await eventLoopTick();
 
-				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 				const searchResultElements = getSearchResults();
 
 				const firstSearchSuggestion = first( searchResultElements );
@@ -716,7 +707,6 @@ describe( 'Selecting links', () => {
 					Simulate.keyDown( searchInput, { keyCode: DOWN } );
 				} );
 
-				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 				const searchResultElements = getSearchResults();
 
 				const firstSearchSuggestion = first( searchResultElements );
@@ -823,7 +813,6 @@ describe( 'Selecting links', () => {
 
 			await eventLoopTick();
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 			const searchResultElements = getSearchResults();
 
 			const firstSearchSuggestion = first( searchResultElements );
