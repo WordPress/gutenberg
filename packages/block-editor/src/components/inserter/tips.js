@@ -27,10 +27,8 @@ const globalTips = [
 		),
 		{ kbd: <kbd /> }
 	),
-	__( 'Drag files into the editor to quickly insert media blocks.' ),
-	__(
-		'Transform blocks by pressing the block icon on the toolbar.'
-	),
+	__( 'Drag files into the editor to automatically insert media blocks.' ),
+	__( "Change a block's type by pressing the block icon on the toolbar." ),
 ];
 
 function Tips() {
