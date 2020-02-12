@@ -12,7 +12,7 @@
  *
  * @return string Returns the rendered widget as a string.
  */
-function render_widget_by_id( $id ) {
+function block_core_legacy_widget_render_widget_by_id( $id ) {
 	// Code extracted from src/wp-includes/widgets.php dynamic_sidebar function.
 	// Todo: When merging to core extract this part of dynamic_sidebar into its own function.
 	global $wp_registered_widgets;
@@ -71,7 +71,7 @@ function render_widget_by_id( $id ) {
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_legacy_widget( $attributes ) {
+function render_block_core_legacy_widget( $attributes ) {
 	$id           = null;
 	$widget_class = null;
 	if ( isset( $attributes['id'] ) ) {
@@ -82,7 +82,7 @@ function render_block_legacy_widget( $attributes ) {
 	}
 
 	if ( $id ) {
-		return render_widget_by_id( $id );
+		return block_core_legacy_widget_render_widget_by_id( $id );
 	}
 	if ( ! $widget_class ) {
 		return '';
@@ -121,7 +121,7 @@ function register_block_core_legacy_widget() {
 					'type' => 'object',
 				),
 			),
-			'render_callback' => 'render_block_legacy_widget',
+			'render_callback' => 'render_block_core_legacy_widget',
 		)
 	);
 }

@@ -1,4 +1,20 @@
 /**
+ * WordPress dependencies
+ */
+import {
+	alignCenter,
+	alignLeft,
+	alignRight,
+	code,
+	formatBold,
+	formatItalic,
+	formatStrikethrough,
+	link,
+	more,
+	paragraph,
+} from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import Toolbar from '../';
@@ -30,27 +46,27 @@ export const _default = () => {
 			id="options-toolbar"
 		>
 			<ToolbarGroup>
-				<ToolbarButton icon="editor-paragraph" label="Paragraph" />
+				<ToolbarButton icon={ paragraph } label="Paragraph" />
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
 					{ ( toggleProps ) => (
 						<DropdownMenu
 							hasArrowIndicator
-							icon="editor-alignleft"
+							icon={ alignLeft }
 							label="Change text alignment"
 							controls={ [
 								{
-									icon: 'editor-alignleft',
+									icon: alignLeft,
 									title: 'Align left',
 									isActive: true,
 								},
 								{
-									icon: 'editor-aligncenter',
+									icon: alignCenter,
 									title: 'Align center',
 								},
 								{
-									icon: 'editor-alignright',
+									icon: alignRight,
 									title: 'Align right',
 								},
 							] }
@@ -61,18 +77,18 @@ export const _default = () => {
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarButton>Text</ToolbarButton>
-				<ToolbarButton icon="editor-bold" label="Bold" isPressed />
-				<ToolbarButton icon="editor-italic" label="Italic" />
-				<ToolbarButton icon="admin-links" label="Link" />
+				<ToolbarButton icon={ formatBold } label="Bold" isPressed />
+				<ToolbarButton icon={ formatItalic } label="Italic" />
+				<ToolbarButton icon={ link } label="Link" />
 				<ToolbarGroup
 					isCollapsed
 					icon={ false }
 					label="More rich text controls"
 					controls={ [
-						{ icon: 'editor-code', title: 'Inline code' },
+						{ icon: code, title: 'Inline code' },
 						{ icon: <InlineImageIcon />, title: 'Inline image' },
 						{
-							icon: 'editor-strikethrough',
+							icon: formatStrikethrough,
 							title: 'Strikethrough',
 						},
 					] }
@@ -80,17 +96,17 @@ export const _default = () => {
 			</ToolbarGroup>
 			<ToolbarGroup
 				hasArrowIndicator={ false }
-				icon="ellipsis"
+				icon={ more }
 				label="Change text alignment"
 				isCollapsed
 				controls={ [
 					{
-						icon: 'editor-alignleft',
+						icon: alignLeft,
 						title: 'Align left',
 						isActive: true,
 					},
-					{ icon: 'editor-aligncenter', title: 'Align center' },
-					{ icon: 'editor-alignright', title: 'Align right' },
+					{ icon: alignCenter, title: 'Align center' },
+					{ icon: alignRight, title: 'Align right' },
 				] }
 			/>
 		</Toolbar>
@@ -104,9 +120,9 @@ export const withoutGroup = () => {
 			__experimentalAccessibilityLabel="Options"
 			id="options-toolbar-without-group"
 		>
-			<ToolbarButton icon="editor-bold" label="Bold" isPressed />
-			<ToolbarButton icon="editor-italic" label="Italic" />
-			<ToolbarButton icon="admin-links" label="Link" />
+			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
+			<ToolbarButton icon={ formatItalic } label="Italic" />
+			<ToolbarButton icon={ link } label="Link" />
 		</Toolbar>
 	);
 };

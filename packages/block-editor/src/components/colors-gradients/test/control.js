@@ -27,7 +27,7 @@ const getButtonWithAriaLabelStartPredicate = ( ariaLabelStart ) => (
 	);
 };
 
-const colorTabButtonPredicate = getButtonWithTestPredicate( 'Solid Color' );
+const colorTabButtonPredicate = getButtonWithTestPredicate( 'Solid' );
 const gradientTabButtonPredicate = getButtonWithTestPredicate( 'Gradient' );
 
 describe( 'ColorPaletteControl', () => {

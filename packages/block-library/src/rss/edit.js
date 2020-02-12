@@ -15,6 +15,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
+import { rss, pencil } from '@wordpress/icons';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
@@ -64,7 +65,7 @@ class RSSEdit extends Component {
 
 		if ( this.state.editing ) {
 			return (
-				<Placeholder icon="rss" label="RSS">
+				<Placeholder icon={ rss } label="RSS">
 					<form onSubmit={ this.onSubmitURL }>
 						<TextControl
 							placeholder={ __( 'Enter URL here…' ) }
@@ -84,7 +85,7 @@ class RSSEdit extends Component {
 
 		const toolbarControls = [
 			{
-				icon: 'edit',
+				icon: pencil,
 				title: __( 'Edit RSS URL' ),
 				onClick: () => this.setState( { editing: true } ),
 			},

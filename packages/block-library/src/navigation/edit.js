@@ -51,6 +51,7 @@ function Navigation( {
 	setAttributes,
 	setFontSize,
 	updateNavItemBlocks,
+	className,
 } ) {
 	//
 	// HOOKS
@@ -67,7 +68,7 @@ function Navigation( {
 	} = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'background-color' },
+			{ name: 'backgroundColor', className: 'has-background' },
 		],
 		{
 			contrastCheckers: [
@@ -104,7 +105,6 @@ function Navigation( {
 				label: ! title.rendered
 					? __( '(no title)' )
 					: escape( title.rendered ),
-				title: ! title.raw ? __( '(no title)' ) : escape( title.raw ),
 				opensInNewTab: false,
 			} )
 		);
@@ -135,7 +135,7 @@ function Navigation( {
 
 	const hasPages = hasResolvedPages && pages && pages.length;
 
-	const blockClassNames = classnames( 'wp-block-navigation', {
+	const blockClassNames = classnames( className, {
 		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 		[ fontSize.class ]: fontSize.class,
 	} );
@@ -250,7 +250,7 @@ function Navigation( {
 						onChange={ ( value ) => {
 							setAttributes( { showSubmenuIcon: value } );
 						} }
-						label={ __( 'Show submenu icon for top-level items' ) }
+						label={ __( 'Show submenu indicator icons' ) }
 					/>
 				</PanelBody>
 			</InspectorControls>

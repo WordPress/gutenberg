@@ -21,6 +21,8 @@ import CyclePickerCell from './cycle-picker-cell';
 import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
+import UnsupportedFooterCell from './unsupported-footer-cell';
+
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 class BottomSheet extends Component {
@@ -173,5 +175,6 @@ ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
+ThemedBottomSheet.UnsupportedFooterCell = UnsupportedFooterCell;
 
 export default ThemedBottomSheet;

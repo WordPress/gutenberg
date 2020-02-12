@@ -23,10 +23,16 @@ import { Popover } from '@wordpress/components';
  */
 import BlockInspectorButton from './block-inspector-button';
 import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-settings-menu-group';
+import { useResizeCanvas } from '../resize-canvas';
 
 function VisualEditor() {
+	const inlineStyles = useResizeCanvas();
+
 	return (
-		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
+		<BlockSelectionClearer
+			className="edit-post-visual-editor editor-styles-wrapper"
+			style={ inlineStyles }
+		>
 			<VisualEditorGlobalKeyboardShortcuts />
 			<MultiSelectScrollIntoView />
 			<Popover.Slot name="block-toolbar" />

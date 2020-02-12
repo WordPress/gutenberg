@@ -7,7 +7,6 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	pressKeyWithModifier,
-	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -44,8 +43,8 @@ describe( 'Links', () => {
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
-		// Click on the Apply button
-		await page.click( 'button[aria-label="Apply"]' );
+		// Submit the link
+		await page.keyboard.press( 'Enter' );
 
 		// The link should have been inserted
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -68,7 +67,22 @@ describe( 'Links', () => {
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
-		// Press Enter to apply the link
+		// Navigate to and toggle the "Open in New Tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		// Toggle should still have focus and be checked.
+		await page.waitForSelector(
+			':focus:checked.components-form-toggle__input'
+		);
+
+		// Ensure that the contents of the post have not been changed, since at
+		// this point the link is still not inserted.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Tab back to the Submit and apply the link
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		// The link should have been inserted
@@ -79,9 +93,6 @@ describe( 'Links', () => {
 		// Create a block with some text
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg: ' );
-
-		// Press escape to show the block toolbar
-		await page.keyboard.press( 'Escape' );
 
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
@@ -157,15 +168,16 @@ describe( 'Links', () => {
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
-		// Click on the Apply button
-		await page.click( 'button[aria-label="Apply"]' );
+		// Click on the Submit button
+		await page.keyboard.press( 'Enter' );
 	};
 
 	it( 'can be edited', async () => {
 		await createAndReselectLink();
 
 		// Click on the Edit button
-		await page.click( 'button[aria-label="Edit"]' );
+		const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+		await editButton.click();
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -173,8 +185,8 @@ describe( 'Links', () => {
 		// Change the URL
 		await page.keyboard.type( '/handbook' );
 
-		// Click on the Apply button
-		await page.click( 'button[aria-label="Apply"]' );
+		// Submit the link
+		await page.keyboard.press( 'Enter' );
 
 		// The link should have been updated
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -211,12 +223,16 @@ describe( 'Links', () => {
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let popover = await page.$( '.block-editor-url-popover' );
+		let popover = await page.$(
+			'.components-popover__content .block-editor-link-control'
+		);
 		expect( popover ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		popover = await page.$( '.block-editor-url-popover' );
+		popover = await page.$(
+			'.components-popover__content .block-editor-link-control'
+		);
 		expect( popover ).toBeNull();
 	} );
 
@@ -230,12 +246,16 @@ describe( 'Links', () => {
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let popover = await page.$( '.block-editor-url-popover' );
+		let popover = await page.$(
+			'.components-popover__content .block-editor-link-control'
+		);
 		expect( popover ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		popover = await page.$( '.block-editor-url-popover' );
+		popover = await page.$(
+			'.components-popover__content .block-editor-link-control'
+		);
 		expect( popover ).toBeNull();
 	} );
 
@@ -247,10 +267,11 @@ describe( 'Links', () => {
 		// Move the mouse to show the block toolbar
 		await page.mouse.move( 0, 0 );
 		await page.mouse.move( 10, 10 );
-		await page.click( 'button[aria-label="Edit"]' );
+		const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+		await editButton.click();
 		await waitForAutoFocus();
 		await page.keyboard.type( '/handbook' );
-		await page.click( 'button[aria-label="Apply"]' );
+		await page.keyboard.press( 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -295,42 +316,72 @@ describe( 'Links', () => {
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
-		expect( await page.$( '.block-editor-url-popover' ) ).not.toBeNull();
+		expect(
+			await page.$(
+				'.components-popover__content .block-editor-link-control'
+			)
+		).not.toBeNull();
 
 		// Trigger the autocomplete suggestion list and select the first suggestion.
 		await page.keyboard.type( titleText );
-		await page.waitForSelector( '.block-editor-url-input__suggestion' );
+		await page.waitForSelector( '.block-editor-link-control__search-item' );
 		await page.keyboard.press( 'ArrowDown' );
 
 		// Expect the the escape key to dismiss the popover when the autocomplete suggestion list is open.
 		await page.keyboard.press( 'Escape' );
-		expect( await page.$( '.block-editor-url-popover' ) ).toBeNull();
+		expect(
+			await page.$(
+				'.components-popover__content .block-editor-link-control'
+			)
+		).toBeNull();
+
+		// Confirm that selection is returned to where it was before launching
+		// the link editor, with "Gutenberg" as an uncollapsed selection.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '.' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
-		expect( await page.$( '.block-editor-url-popover' ) ).not.toBeNull();
+		expect(
+			await page.$(
+				'.components-popover__content .block-editor-link-control'
+			)
+		).not.toBeNull();
 
 		// Expect the the escape key to dismiss the popover normally.
 		await page.keyboard.press( 'Escape' );
-		expect( await page.$( '.block-editor-url-popover' ) ).toBeNull();
+		expect(
+			await page.$(
+				'.components-popover__content .block-editor-link-control'
+			)
+		).toBeNull();
 
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
-		expect( await page.$( '.block-editor-url-popover' ) ).not.toBeNull();
+		expect(
+			await page.$(
+				'.components-popover__content .block-editor-link-control'
+			)
+		).not.toBeNull();
 
-		// Tab to the settings icon button.
+		// Tab to the "Open in New Tab" toggle.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 
 		// Expect the the escape key to dismiss the popover normally.
 		await page.keyboard.press( 'Escape' );
-		expect( await page.$( '.block-editor-url-popover' ) ).toBeNull();
+		expect(
+			await page.$(
+				'.components-popover__content .block-editor-link-control'
+			)
+		).toBeNull();
 	} );
 
 	it( 'can be modified using the keyboard once a link has been set', async () => {
@@ -348,29 +399,40 @@ describe( 'Links', () => {
 		// Deselect the link text by moving the caret to the end of the line
 		// and the link popover should not be displayed.
 		await page.keyboard.press( 'End' );
-		expect( await page.$( '.block-editor-url-popover' ) ).toBeNull();
+		expect(
+			await page.$(
+				'.components-popover__content .block-editor-link-control'
+			)
+		).toBeNull();
 
 		// Move the caret back into the link text and the link popover
 		// should be displayed.
 		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( '.block-editor-url-popover' ) ).not.toBeNull();
+		expect(
+			await page.$(
+				'.components-popover__content .block-editor-link-control'
+			)
+		).not.toBeNull();
 
 		// Press Cmd+K to edit the link and the url-input should become
 		// focused with the value previously inserted.
 		await pressKeyWithModifier( 'primary', 'K' );
 		await waitForAutoFocus();
-		const activeElementParentClasses = await page.evaluate( () =>
-			Object.values(
-				document.activeElement.parentElement.parentElement.classList
-			)
+		const isInURLInput = await page.evaluate(
+			() => !! document.activeElement.closest( '.block-editor-url-input' )
 		);
-		expect( activeElementParentClasses ).toContain(
-			'block-editor-url-input'
-		);
+		expect( isInURLInput ).toBe( true );
 		const activeElementValue = await page.evaluate(
 			() => document.activeElement.value
 		);
 		expect( activeElementValue ).toBe( URL );
+
+		// Confirm that submitting the input without any changes keeps the same
+		// value and moves focus back to the paragraph.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '.' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'adds an assertive message for screenreader users when an invalid link is set', async () => {
@@ -389,44 +451,6 @@ describe( 'Links', () => {
 		);
 	} );
 
-	it( 'link popover remains visible after a mouse drag event', async () => {
-		// Create some blocks so we have components with event handlers on the page
-		for ( let loop = 0; loop < 5; loop++ ) {
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'This is Gutenberg' );
-		}
-
-		// Focus on first paragraph, so the link popover will appear over the subsequent ones
-		await page.click( '[aria-label="Block navigation"]' );
-		await page.click( '.block-editor-block-navigation__item button' );
-
-		// Select some text
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-
-		// Click on the Link button
-		await page.click( 'button[aria-label="Link"]' );
-		// Wait for the URL field to auto-focus
-		await waitForAutoFocus();
-
-		// Click on the Link Settings button
-		await page.click( 'button[aria-label="Link settings"]' );
-
-		// Move mouse over the 'open in new tab' section, then click and drag
-		const settings = await page.$( '.block-editor-url-popover__settings' );
-		const bounds = await settings.boundingBox();
-
-		await page.mouse.move( bounds.x, bounds.y );
-		await page.mouse.down();
-		await page.mouse.move( bounds.x + bounds.width / 2, bounds.y, {
-			steps: 10,
-		} );
-		await page.mouse.up();
-
-		// The link popover should still be visible
-		const popover = await page.$$( '.block-editor-url-popover' );
-		expect( popover ).toHaveLength( 1 );
-	} );
-
 	it( 'should contain a label when it should open in a new tab', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is WordPress' );
@@ -435,19 +459,26 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'k' );
 		await waitForAutoFocus();
 		await page.keyboard.type( 'w.org' );
-		// Navigate to the settings toggle.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		// Open settings.
-		await page.keyboard.press( 'Space' );
-		// Navigate to the "Open in New Tab" checkbox.
-		await page.keyboard.press( 'Tab' );
-		// Check the checkbox.
-		await page.keyboard.press( 'Space' );
-		// Navigate back to the input field.
-		await page.keyboard.press( 'Tab' );
-		// Submit the form.
+
+		// Insert the link
 		await page.keyboard.press( 'Enter' );
+
+		// Navigate back to the popover
+		await pressKeyWithModifier( 'primary', 'k' );
+		await waitForAutoFocus();
+
+		// Navigate to and toggle the "Open in New Tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		// Confirm that focus was not prematurely returned to the paragraph on
+		// a changing value of the setting.
+		await page.waitForSelector( ':focus.components-form-toggle__input' );
+
+		// Close dialog. Expect that "Open in New Tab" would have been applied
+		// immediately.
+		await page.keyboard.press( 'Escape' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
@@ -466,33 +497,19 @@ describe( 'Links', () => {
 		await waitForAutoFocus();
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'wordpress.org' );
-		// Navigate to the settings toggle.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		// Open settings.
-		await page.keyboard.press( 'Space' );
+
+		// Update the link
+		await page.keyboard.press( 'Enter' );
+
+		// Navigate back to the popover
+		await pressKeyWithModifier( 'primary', 'k' );
+		await waitForAutoFocus();
+
 		// Navigate to the "Open in New Tab" checkbox.
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		// Uncheck the checkbox.
 		await page.keyboard.press( 'Space' );
-		// Navigate back to the input field.
-		await page.keyboard.press( 'Tab' );
-		// Submit the form.
-		await page.keyboard.press( 'Enter' );
-
-		// Navigate back to inputs to verify appears as changed.
-		await pressKeyWithModifier( 'primary', 'k' );
-		await waitForAutoFocus();
-		const link = await page.evaluate( () => document.activeElement.value );
-		expect( link ).toBe( 'http://wordpress.org' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-		await page.keyboard.press( 'Tab' );
-		const isChecked = await page.evaluate(
-			() => document.activeElement.checked
-		);
-		expect( isChecked ).toBe( false );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

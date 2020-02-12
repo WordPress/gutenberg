@@ -158,9 +158,7 @@ export default compose( [
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
 		} = select( 'core/block-editor' );
-		const { __experimentalGetBlockVariations: getBlockVariations } = select(
-			'core/blocks'
-		);
+		const { getBlockVariations } = select( 'core/blocks' );
 
 		rootClientId =
 			rootClientId || getBlockRootClientId( clientId ) || undefined;
