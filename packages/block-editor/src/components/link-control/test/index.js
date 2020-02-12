@@ -58,6 +58,12 @@ function getSearchResults() {
 	return container.querySelectorAll( '[role="listbox"] [role="option"]' );
 }
 
+function getCurrentLink() {
+	return container.querySelector(
+		'.block-editor-link-control__search-item.is-current'
+	);
+}
+
 describe( 'Basic rendering', () => {
 	it( 'should render', () => {
 		act( () => {
@@ -437,9 +443,7 @@ describe( 'Default search suggestions', () => {
 		// Click the "Edit/Change" button and check initial suggestions are not
 		// shown.
 		//
-		const currentLinkUI = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		const currentLinkUI = getCurrentLink();
 		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
 		act( () => {
@@ -527,9 +531,7 @@ describe( 'Selecting links', () => {
 		} );
 
 		// TODO: select by aria role or visible text
-		const currentLink = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		const currentLink = getCurrentLink();
 		const currentLinkHTML = currentLink.innerHTML;
 		const currentLinkAnchor = currentLink.querySelector(
 			`[href="${ selectedLink.url }"]`
@@ -564,9 +566,7 @@ describe( 'Selecting links', () => {
 		} );
 
 		// Required in order to select the button below
-		let currentLinkUI = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		let currentLinkUI = getCurrentLink();
 		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
 		// Simulate searching for a term
@@ -575,9 +575,7 @@ describe( 'Selecting links', () => {
 		} );
 
 		const searchInput = getURLInput();
-		currentLinkUI = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		currentLinkUI = getCurrentLink();
 
 		// We should be back to showing the search input
 		expect( searchInput ).not.toBeNull();
