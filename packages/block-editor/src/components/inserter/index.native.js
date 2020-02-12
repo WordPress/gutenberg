@@ -9,7 +9,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import {
 	Icon,
-	plusCircleFull,
+	plusCircleFilled,
 	insertAfter,
 	insertBefore,
 } from '@wordpress/icons';
@@ -26,7 +26,7 @@ const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 		title={ __( 'Add block' ) }
 		icon={
 			<Icon
-				icon={ plusCircleFull }
+				icon={ plusCircleFilled }
 				style={ style }
 				color={ style.color }
 			/>
@@ -62,7 +62,7 @@ export class Inserter extends Component {
 		const replaceCurrentOption = {
 			value: 'replace',
 			label: __( 'Replace Current Block' ),
-			icon: plusCircleFull,
+			icon: plusCircleFilled,
 		};
 
 		const addAfterOption = {

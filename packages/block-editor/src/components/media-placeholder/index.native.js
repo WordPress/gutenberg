@@ -15,7 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
-import { Icon, plusCircleFull } from '@wordpress/icons';
+import { Icon, plusCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -114,7 +114,7 @@ function MediaPlaceholder( props ) {
 		} else if ( isAppender && ! disableMediaButtons ) {
 			return (
 				<Icon
-					icon={ plusCircleFull }
+					icon={ plusCircleFilled }
 					style={ addMediaButtonStyle }
 					color={ addMediaButtonStyle.color }
 					size={ addMediaButtonStyle.size }
