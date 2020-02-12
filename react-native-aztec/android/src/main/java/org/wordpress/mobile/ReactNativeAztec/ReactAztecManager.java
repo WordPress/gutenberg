@@ -7,6 +7,8 @@ import android.os.Build;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.ColorUtils;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.TextUtils;
@@ -488,7 +490,13 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     public void receiveCommand(final ReactAztecText parent, int commandType, @Nullable ReadableArray args) {
         Assertions.assertNotNull(parent);
         if (commandType == mFocusTextInputCommandCode) {
-            parent.requestFocusFromJS();
+            // schedule a request to focus in the next layout, to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1870
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    parent.requestFocusFromJS();
+                }
+            });
             return;
         } else if (commandType == mBlurTextInputCommandCode) {
             parent.clearFocusFromJS();
