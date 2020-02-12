@@ -78,18 +78,27 @@ async function mockCreatePageResponse( title, slug ) {
  * Interacts with the LinkControl to perform a search and select a returned suggestion
  * @param {string} url What will be typed in the search input
  * @param {string} label What the resulting label will be in the creating Navigation Link Block after the block is created.
+ * @param {string} type What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
  */
-async function updateActiveNavigationLink( { url, label } ) {
+async function updateActiveNavigationLink( { url, label, type } ) {
+	const typeClasses = {
+		create: 'block-editor-link-control__search-create',
+		entity: 'is-entity',
+		url: 'is-url',
+	};
+
 	if ( url ) {
 		await page.type( 'input[placeholder="Search or type url"]', url );
 		// Wait for the autocomplete suggestion item to appear.
 		await page.waitForXPath(
-			`//span[@class="block-editor-link-control__search-item-title"]/mark[text()="${ url }"]`
+			`//span[contains(@class, 'block-editor-link-control__search-item-title') and contains(@class, ${ typeClasses[ type ] })]/mark[text()="${ url }"]`
 		);
-		// Navigate to the first suggestion.
-		await page.keyboard.press( 'ArrowDown' );
-		// Select the suggestion.
-		await page.keyboard.press( 'Enter' );
+		// Set the suggestion
+		const [ suggestion ] = await page.$x(
+			`//span[contains(@class, 'block-editor-link-control__search-item-title') and contains(@class, ${ typeClasses[ type ] })]/mark[text()="${ url }"]`
+		);
+		// Select it (so we're clicking the right one, even if it's further down the list)
+		await suggestion.click();
 	}
 
 	if ( label ) {
@@ -168,6 +177,7 @@ describe( 'Navigation', () => {
 		await updateActiveNavigationLink( {
 			url: 'https://wordpress.org',
 			label: 'WP',
+			type: 'url',
 		} );
 
 		// Move the mouse to reveal the block movers. Without this the test seems to fail.
@@ -217,6 +227,7 @@ describe( 'Navigation', () => {
 		await updateActiveNavigationLink( {
 			url: 'Contact Us',
 			label: 'Get in touch',
+			type: 'entity',
 		} );
 
 		// Expect a Navigation Block with two Navigation Links in the snapshot.
