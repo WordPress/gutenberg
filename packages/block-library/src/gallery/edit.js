@@ -21,6 +21,7 @@ import {
 	PanelBody,
 	RangeControl,
 	SelectControl,
+	StepperControl,
 	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
@@ -38,6 +39,7 @@ import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
 
+const ColumnsControl = Platform.OS === 'web' ? RangeControl : StepperControl;
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
@@ -365,7 +367,7 @@ class GalleryEdit extends Component {
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
 						{ images.length > 1 && (
-							<RangeControl
+							<ColumnsControl
 								label={ __( 'Columns' ) }
 								{ ...MOBILE_CONTROL_PROPS }
 								value={ columns }
@@ -375,6 +377,7 @@ class GalleryEdit extends Component {
 								required
 							/>
 						) }
+
 						<ToggleControl
 							label={ __( 'Crop Images' ) }
 							{ ...MOBILE_CONTROL_PROPS }
