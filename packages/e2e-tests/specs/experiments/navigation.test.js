@@ -102,6 +102,9 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 	}
 
 	if ( label ) {
+		// Wait for rich text editor input to be focused before we start typing the label
+		await page.waitForSelector( ':focus.rich-text' );
+
 		// With https://github.com/WordPress/gutenberg/pull/19686, we're auto-selecting the label if the label is URL-ish.
 		// In this case, it means we have to select and delete the label if it's _not_ the url.
 		if ( label !== url ) {
