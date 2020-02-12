@@ -428,6 +428,7 @@ class URLInput extends Component {
 				} ) }
 			>
 				<input
+					className="block-editor-url-input__input"
 					autoFocus={ autoFocus }
 					type="text"
 					aria-label={ __( 'URL' ) }

@@ -220,9 +220,15 @@ describe( 'Navigation', () => {
 		);
 		await createEmptyButton.click();
 
+		// Wait for URL input to be focused
+		await page.waitForSelector( ':focus.block-editor-url-input__input' );
+
 		// After adding a new block, search input should be shown immediately.
 		const isInURLInput = await page.evaluate(
-			() => !! document.activeElement.closest( '.block-editor-url-input' )
+			() =>
+				!! document.activeElement.matches(
+					'.block-editor-url-input__input'
+				)
 		);
 		expect( isInURLInput ).toBe( true );
 
