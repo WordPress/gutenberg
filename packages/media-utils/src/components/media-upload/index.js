@@ -37,14 +37,16 @@ const getFeaturedImageMediaFrame = () => {
 		 * @return {void}
 		 */
 		editState() {
-			const selection = this.state( 'featured-image' ).get( 'selection' ),
-				view = new wp.media.view.EditImage( {
-					model: selection.single(),
-					controller: this,
-				} ).render();
+			const selection = this.state( 'featured-image' ).get( 'selection' );
+			const view = new wp.media.view.EditImage( {
+				model: selection.single(),
+				controller: this,
+			} ).render();
+
+			// Set the view to the EditImage frame using the selected image.
 			this.content.set( view );
 
-			// after bringing in the frame, load the actual editor via an ajax call
+			// After bringing in the frame, load the actual editor via an ajax call.
 			view.loadEditor();
 		},
 
@@ -133,14 +135,16 @@ const getGalleryDetailsMediaFrame = () => {
 		 * @return {void}
 		 */
 		editState() {
-			const selection = this.state( 'gallery' ).get( 'selection' ),
-				view = new wp.media.view.EditImage( {
-					model: selection.single(),
-					controller: this,
-				} ).render();
+			const selection = this.state( 'gallery' ).get( 'selection' );
+			const view = new wp.media.view.EditImage( {
+				model: selection.single(),
+				controller: this,
+			} ).render();
+
+			// Set the view to the EditImage frame using the selected image.
 			this.content.set( view );
 
-			// after bringing in the frame, load the actual editor via an ajax call
+			// After bringing in the frame, load the actual editor via an ajax call.
 			view.loadEditor();
 		},
 
