@@ -2,14 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import { RangeControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import { GlobalStylesPanelBody } from '../global-styles-panel-body';
 import { useGlobalStylesState } from '../store';
 
-export default function TypographyPanel() {
+export default function TypographyControls() {
 	const {
 		fontSize,
 		setFontSize,
@@ -22,7 +23,10 @@ export default function TypographyPanel() {
 	} = useGlobalStylesState();
 
 	return (
-		<PanelBody title={ __( 'Typography' ) } initialOpen={ false }>
+		<GlobalStylesPanelBody
+			title={ __( 'Typography' ) }
+			initialOpen={ false }
+		>
 			<RangeControl
 				label={ __( 'Font Size' ) }
 				value={ fontSize }
@@ -55,6 +59,6 @@ export default function TypographyPanel() {
 				step={ 100 }
 				onChange={ setFontWeight }
 			/>
-		</PanelBody>
+		</GlobalStylesPanelBody>
 	);
 }

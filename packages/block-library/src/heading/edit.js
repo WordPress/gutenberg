@@ -25,6 +25,7 @@ import { useRef } from '@wordpress/element';
 
 import {
 	GlobalStylesControls,
+	GlobalStylesPanelBody,
 	useGlobalStylesState,
 } from '@wordpress/global-styles';
 
@@ -68,7 +69,7 @@ function HeadingEdit( {
 				/>
 			</BlockControls>
 			<GlobalStylesControls>
-				<PanelBody title={ __( 'Heading' ) }>
+				<GlobalStylesPanelBody title={ __( 'Heading' ) }>
 					<RangeControl
 						label={ __( 'Font Weight' ) }
 						value={ headingFontWeight }
@@ -77,7 +78,7 @@ function HeadingEdit( {
 						max={ 900 }
 						step={ 100 }
 					/>
-				</PanelBody>
+				</GlobalStylesPanelBody>
 			</GlobalStylesControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading settings' ) }>
