@@ -2,6 +2,7 @@
 ------
 * New block: Group
 * Add support for upload options in Gallery block
+* [Android] Fix issue preventing correct placeholder image from displaying during image upload
 
 1.22.0
 ------
