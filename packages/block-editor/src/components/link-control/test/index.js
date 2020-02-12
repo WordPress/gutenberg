@@ -7,7 +7,7 @@ import { first, last, nth } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
@@ -63,6 +63,69 @@ describe( 'Basic rendering', () => {
 
 		expect( searchInput ).not.toBeNull();
 		expect( container.innerHTML ).toMatchSnapshot();
+	} );
+
+	describe( 'forceIsEditingLink', () => {
+		const isEditing = () =>
+			!! container.querySelector( 'input[aria-label="URL"]' );
+
+		it( 'undefined', () => {
+			act( () => {
+				render(
+					<LinkControl value={ { url: 'https://example.com' } } />,
+					container
+				);
+			} );
+
+			expect( isEditing() ).toBe( false );
+		} );
+
+		it( 'true', () => {
+			act( () => {
+				render(
+					<LinkControl
+						value={ { url: 'https://example.com' } }
+						forceIsEditingLink
+					/>,
+					container
+				);
+			} );
+
+			expect( isEditing() ).toBe( true );
+		} );
+
+		it( 'false', () => {
+			act( () => {
+				render(
+					<LinkControl value={ { url: 'https://example.com' } } />,
+					container
+				);
+			} );
+
+			// Click the "Edit" button to trigger into the editing mode.
+			const editButton = container.querySelector(
+				'.block-editor-link-control__search-item-action'
+			);
+			act( () => {
+				Simulate.click( editButton );
+			} );
+
+			expect( isEditing() ).toBe( true );
+
+			// If passed `forceIsEditingLink` of `false` while editing, should
+			// forcefully reset to the preview state.
+			act( () => {
+				render(
+					<LinkControl
+						value={ { url: 'https://example.com' } }
+						forceIsEditingLink={ false }
+					/>,
+					container
+				);
+			} );
+
+			expect( isEditing() ).toBe( false );
+		} );
 	} );
 } );
 
@@ -217,56 +280,6 @@ describe( 'Searching for a link', () => {
 			);
 		}
 	);
-
-	it( 'should reset the input field and the search results when search term is cleared or reset', async () => {
-		const searchTerm = 'Hello world';
-
-		act( () => {
-			render( <LinkControl />, container );
-		} );
-
-		let searchResultElements;
-		let searchInput;
-
-		// Search Input UI
-		searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
-
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
-
-		// Check we have definitely rendered some suggestions
-		expect( searchResultElements ).toHaveLength(
-			fauxEntitySuggestions.length
-		);
-
-		// Grab the reset button now it's available
-		const resetUI = container.querySelector( '[aria-label="Reset"]' );
-
-		act( () => {
-			Simulate.click( resetUI );
-		} );
-
-		await eventLoopTick();
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
-		searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		expect( searchInput.value ).toBe( '' );
-		expect( searchResultElements ).toHaveLength( 0 );
-	} );
 } );
 
 describe( 'Manual link entry', () => {
@@ -416,8 +429,6 @@ describe( 'Default search suggestions', () => {
 	} );
 
 	it( 'should not display initial suggestions when input value is present', async () => {
-		let searchResultElements;
-		//
 		// Render with an initial value an ensure that no initial suggestions
 		// are shown.
 		//
@@ -450,35 +461,74 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
+		const searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
+
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
+
+		// search input is set to the URL value
+		expect( searchInput.value ).toEqual( fauxEntitySuggestions[ 0 ].url );
+
+		// it should match any url that's like ?p= and also include a URL option
+		expect( searchResultElements ).toHaveLength( 5 );
+
+		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should display initial suggestions when input value is manually deleted', async () => {
+		const searchTerm = 'Hello world';
+
+		act( () => {
+			render( <LinkControl showInitialSuggestions />, container );
+		} );
+
+		let searchResultElements;
+		let searchInput;
+
+		// Search Input UI
+		searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		expect( searchInput.value ).toBe( searchTerm );
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		searchResultElements = container.querySelectorAll(
 			'[role="listbox"] [role="option"]'
 		);
 
-		expect( searchResultElements ).toHaveLength( 0 );
-
-		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
-
-		//
-		// Reset the search to empty and check the initial suggestions are now shown.
-		//
-		const resetUI = container.querySelector( '[aria-label="Reset"]' );
-
+		// delete the text
 		act( () => {
-			Simulate.click( resetUI );
+			Simulate.change( searchInput, { target: { value: '' } } );
 		} );
 
 		await eventLoopTick();
 
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		searchResultElements = container.querySelectorAll(
 			'[role="listbox"] [role="option"]'
 		);
+		searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// check the input is empty now
+		expect( searchInput.value ).toBe( '' );
+
+		const searchResultLabel = container.querySelector(
+			'.block-editor-link-control__search-results-label'
+		);
+
+		expect( searchResultLabel.innerHTML ).toBe( 'Recently updated' );
 
 		expect( searchResultElements ).toHaveLength( 3 );
-
-		// Ensure only called once as a guard against potential infinite
-		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
-		// which has calls to `setState` within it.
-		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
 
@@ -765,6 +815,134 @@ describe( 'Selecting links', () => {
 				expect( currentLinkAnchor ).not.toBeNull();
 			}
 		);
+
+		it( 'should allow selection of initial search results via the keyboard', async () => {
+			act( () => {
+				render( <LinkControl showInitialSuggestions />, container );
+			} );
+
+			await eventLoopTick();
+
+			const searchResultsWrapper = container.querySelector(
+				'[role="listbox"]'
+			);
+
+			const searchResultsLabel = container.querySelector(
+				`#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }`
+			);
+
+			expect( searchResultsLabel.innerHTML ).toEqual(
+				'Recently updated'
+			);
+
+			// Search Input UI
+			const searchInput = container.querySelector(
+				'input[aria-label="URL"]'
+			);
+
+			// Step down into the search results, highlighting the first result item
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: DOWN } );
+			} );
+
+			await eventLoopTick();
+
+			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+			const searchResultElements = container.querySelectorAll(
+				'[role="listbox"] [role="option"]'
+			);
+			const firstSearchSuggestion = first( searchResultElements );
+			const secondSearchSuggestion = nth( searchResultElements, 1 );
+
+			let selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should have highlighted the first item using the keyboard
+			expect( selectedSearchResultElement ).toEqual(
+				firstSearchSuggestion
+			);
+
+			// Check we can go down again using the down arrow
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: DOWN } );
+			} );
+
+			selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should have highlighted the first item using the keyboard
+			expect( selectedSearchResultElement ).toEqual(
+				secondSearchSuggestion
+			);
+
+			// Check we can go back up via up arrow
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: UP } );
+			} );
+
+			selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should be back to highlighting the first search result again
+			expect( selectedSearchResultElement ).toEqual(
+				firstSearchSuggestion
+			);
+
+			expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	it( 'does not forcefully regain focus if onChange handler had shifted it', () => {
+		// Regression: Previously, there had been issues where if `onChange`
+		// would programmatically shift focus, LinkControl would try to force it
+		// back, based on its internal logic to determine whether it had focus
+		// when finishing an edit occuring _before_ `onChange` having been run.
+		//
+		// See: https://github.com/WordPress/gutenberg/pull/19462
+
+		const LinkControlConsumer = () => {
+			const focusTarget = useRef();
+
+			return (
+				<>
+					<div tabIndex={ -1 } data-expected ref={ focusTarget } />
+					<LinkControl
+						onChange={ () => focusTarget.current.focus() }
+					/>
+				</>
+			);
+		};
+
+		act( () => {
+			render( <LinkControlConsumer />, container );
+		} );
+
+		// Change value.
+		const form = container.querySelector( 'form' );
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: 'https://example.com' },
+			} );
+		} );
+		act( () => {
+			Simulate.keyDown( searchInput, { keyCode: ENTER } );
+		} );
+		act( () => {
+			Simulate.submit( form );
+		} );
+
+		const isExpectedFocusTarget = document.activeElement.hasAttribute(
+			'data-expected'
+		);
+		expect( isExpectedFocusTarget ).toBe( true );
 	} );
 } );
 

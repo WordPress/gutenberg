@@ -459,6 +459,35 @@ export const getBlockParents = createSelector(
 );
 
 /**
+ * Given a block client ID and a block name,
+ * returns the list of all its parents from top to bottom,
+ * filtered by the given name.
+ *
+ * @param {Object} state     Editor state.
+ * @param {string} clientId  Block from which to find root client ID.
+ * @param {string} blockName Block name to filter.
+ * @param {boolean} ascending Order results from bottom to top (true) or top to bottom (false).
+ *
+ * @return {Array} ClientIDs of the parent blocks.
+ */
+export const getBlockParentsByBlockName = createSelector(
+	( state, clientId, blockName, ascending = false ) => {
+		const parents = getBlockParents( state, clientId, ascending );
+		return map(
+			filter(
+				map( parents, ( id ) => ( {
+					id,
+					name: getBlockName( state, id ),
+				} ) ),
+				{ name: blockName }
+			),
+			( { id } ) => id
+		);
+	},
+	( state ) => [ state.blocks.parents ]
+);
+
+/**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
  *
  * @param {Object} state    Editor state.
@@ -1591,4 +1620,15 @@ export function isNavigationMode( state ) {
  */
 export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
+}
+
+/**
+ * Returns the current editing canvas device type.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Device type.
+ */
+export function getPreviewDeviceType( state ) {
+	return state.deviceType;
 }

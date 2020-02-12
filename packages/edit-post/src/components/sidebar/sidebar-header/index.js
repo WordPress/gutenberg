@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { close } from '@wordpress/icons';
 
 const SidebarHeader = ( { children, className, closeLabel } ) => {
 	const { shortcut, title } = useSelect(
@@ -30,7 +31,7 @@ const SidebarHeader = ( { children, className, closeLabel } ) => {
 				</span>
 				<Button
 					onClick={ closeGeneralSidebar }
-					icon="no-alt"
+					icon={ close }
 					label={ closeLabel }
 				/>
 			</div>
@@ -43,7 +44,7 @@ const SidebarHeader = ( { children, className, closeLabel } ) => {
 				{ children }
 				<Button
 					onClick={ closeGeneralSidebar }
-					icon="no-alt"
+					icon={ close }
 					label={ closeLabel }
 					shortcut={ shortcut }
 				/>

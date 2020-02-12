@@ -129,7 +129,12 @@ export function getEntityRecord( state, kind, name, key ) {
  *
  * @return {Object?} Record.
  */
-export function getEntityRecordNoResolver( state, kind, name, key ) {
+export function __experimentalGetEntityRecordNoResolver(
+	state,
+	kind,
+	name,
+	key
+) {
 	return getEntityRecord( state, kind, name, key );
 }
 

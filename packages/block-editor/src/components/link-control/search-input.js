@@ -35,7 +35,6 @@ const LinkControlSearchInput = ( {
 	onSelect,
 	renderSuggestions,
 	fetchSuggestions,
-	onReset,
 	showInitialSuggestions,
 } ) => {
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState();
@@ -60,6 +59,7 @@ const LinkControlSearchInput = ( {
 				className="block-editor-link-control__search-input"
 				value={ value }
 				onChange={ selectItemHandler }
+				onFocus={ selectItemHandler }
 				onKeyDown={ ( event ) => {
 					if ( event.keyCode === ENTER ) {
 						return;
@@ -73,15 +73,14 @@ const LinkControlSearchInput = ( {
 				__experimentalHandleURLSuggestions={ true }
 				__experimentalShowInitialSuggestions={ showInitialSuggestions }
 			/>
-
-			<Button
-				disabled={ ! value.length }
-				type="reset"
-				label={ __( 'Reset' ) }
-				icon="no-alt"
-				className="block-editor-link-control__search-reset"
-				onClick={ onReset }
-			/>
+			<div className="block-editor-link-control__search-actions">
+				<Button
+					type="submit"
+					label={ __( 'Submit' ) }
+					icon="editor-break"
+					className="block-editor-link-control__search-submit"
+				/>
+			</div>
 		</form>
 	);
 };

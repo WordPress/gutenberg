@@ -17,6 +17,7 @@ import {
 	RichTextShortcut,
 } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
+import { link as linkIcon, linkOff } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -97,6 +98,7 @@ export const link = {
 
 			stopAddingLink() {
 				this.setState( { addingLink: false } );
+				this.props.onFocus();
 			}
 
 			onRemoveFormat() {
@@ -112,7 +114,6 @@ export const link = {
 					activeAttributes,
 					value,
 					onChange,
-					onFocus,
 				} = this.props;
 
 				return (
@@ -130,7 +131,7 @@ export const link = {
 						{ isActive && (
 							<RichTextToolbarButton
 								name="link"
-								icon="editor-unlink"
+								icon={ linkOff }
 								title={ __( 'Unlink' ) }
 								onClick={ this.onRemoveFormat }
 								isActive={ isActive }
@@ -141,7 +142,7 @@ export const link = {
 						{ ! isActive && (
 							<RichTextToolbarButton
 								name="link"
-								icon="admin-links"
+								icon={ linkIcon }
 								title={ title }
 								onClick={ this.addLink }
 								isActive={ isActive }
@@ -149,16 +150,16 @@ export const link = {
 								shortcutCharacter="k"
 							/>
 						) }
-						<InlineLinkUI
-							key={ isActive } // Make sure link UI state resets when switching between links.
-							addingLink={ this.state.addingLink }
-							stopAddingLink={ this.stopAddingLink }
-							isActive={ isActive }
-							activeAttributes={ activeAttributes }
-							value={ value }
-							onChange={ onChange }
-							onFocus={ onFocus }
-						/>
+						{ ( this.state.addingLink || isActive ) && (
+							<InlineLinkUI
+								addingLink={ this.state.addingLink }
+								stopAddingLink={ this.stopAddingLink }
+								isActive={ isActive }
+								activeAttributes={ activeAttributes }
+								value={ value }
+								onChange={ onChange }
+							/>
+						) }
 					</>
 				);
 			}
