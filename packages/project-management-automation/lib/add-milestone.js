@@ -4,10 +4,10 @@
 const debug = require( './debug' );
 
 // Milestone due dates are calculated from a known due date:
-// 6.3, which was due on August 12 2019.
-const REFERENCE_MAJOR = 6;
-const REFERENCE_MINOR = 3;
-const REFERENCE_DATE = '2019-08-12';
+// 7.5, which was due on February 10 2020.
+const REFERENCE_MAJOR = 7;
+const REFERENCE_MINOR = 5;
+const REFERENCE_DATE = '2020-02-10';
 
 // Releases are every 14 days.
 const DAYS_PER_RELEASE = 14;
