@@ -1320,6 +1320,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/global-styles",
+		"slug": "packages-global-styles",
+		"markdown_source": "../packages/global-styles/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "../packages/hooks/README.md",
