@@ -23,16 +23,6 @@ class LatestPostsEdit extends Component {
 		const { getStylesFromColorScheme, name } = this.props;
 		const blockType = coreBlocks[ name ];
 
-		const titleStyle = getStylesFromColorScheme(
-			styles.latestPostMessage,
-			styles.latestPostBlockMessageDark
-		);
-
-		const subTitleStyle = getStylesFromColorScheme(
-			styles.latestPostBlockSubtitle,
-			styles.latestPostBlockSubtitleDark
-		);
-
 		const blockStyle = getStylesFromColorScheme(
 			styles.latestPostBlock,
 			styles.latestPostBlockDark
@@ -43,11 +33,21 @@ class LatestPostsEdit extends Component {
 			styles.latestPostBlockIconDark
 		);
 
+		const titleStyle = getStylesFromColorScheme(
+			styles.latestPostBlockMessage,
+			styles.latestPostBlockMessageDark
+		);
+
+		const subTitleStyle = getStylesFromColorScheme(
+			styles.latestPostBlockSubtitle,
+			styles.latestPostBlockSubtitleDark
+		);
+
 		return (
 			<View style={ blockStyle }>
 				<Icon icon={ icon } { ...iconStyle } />
 				<Text style={ titleStyle }>{ blockType.settings.title }</Text>
-				<Text style={ subTitleStyle }>{ __( 'Supported' ) }</Text>
+				<Text style={ subTitleStyle }>{ __( 'Configure' ) }</Text>
 			</View>
 		);
 	}

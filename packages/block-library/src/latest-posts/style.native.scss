@@ -18,8 +18,8 @@
 
 .latestPostBlockIcon {
 	fill: $gray-dark;
-	width: 30px;
-	height: 30px;
+	width: 24px;
+	height: 24px;
 }
 
 .latestPostBlockIconDark {
@@ -39,12 +39,12 @@
 }
 
 .latestPostBlockSubtitle {
-	margin-top: 2;
+	margin-top: 4;
 	text-align: center;
-	color: $gray-darken-20;
 	font-size: 12;
+	color: #0087be;
 }
 
 .latestPostBlockSubtitleDark {
-	color: $gray-20;
+	color: $white;
 }
