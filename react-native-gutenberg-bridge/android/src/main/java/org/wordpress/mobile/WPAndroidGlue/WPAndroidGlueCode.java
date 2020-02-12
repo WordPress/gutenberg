@@ -32,6 +32,7 @@ import com.facebook.react.shell.MainPackageConfig;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.horcrux.svg.SvgPackage;
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 
 import org.wordpress.android.util.AppLog;
@@ -321,6 +322,7 @@ public class WPAndroidGlueCode {
         return Arrays.asList(
                 new MainReactPackage(getMainPackageConfig(getImagePipelineConfig(sOkHttpClient))),
                 new SvgPackage(),
+                new LinearGradientPackage(),
                 new ReactAztecPackage(),
                 new ReactVideoPackage(),
                 new ReactSliderPackage(),

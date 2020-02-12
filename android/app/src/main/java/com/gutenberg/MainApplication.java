@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.core.util.Consumer;
 
 import com.facebook.react.ReactApplication;
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.facebook.react.bridge.ReadableArray;
@@ -136,6 +137,7 @@ public class MainApplication extends Application implements ReactApplication {
                         new ReactVideoPackage(),
                         new SvgPackage(),
                         new ReactAztecPackage(),
+                        new LinearGradientPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 
