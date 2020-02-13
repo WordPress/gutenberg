@@ -217,4 +217,49 @@ describe( 'readConfig', () => {
 			);
 		}
 	} );
+
+	it( 'should throw a validaton error if the ports are not numbers', async () => {
+		expect.assertions( 10 );
+		testPortNumberValidation( 'port', 'string' );
+		testPortNumberValidation( 'testsPort', [] );
+		testPortNumberValidation( 'port', {} );
+		testPortNumberValidation( 'testsPort', false );
+		testPortNumberValidation( 'port', null );
+	} );
+
+	it( 'should throw a validaton error if the ports are the same', async () => {
+		expect.assertions( 2 );
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( { port: 8888, testsPort: 8888 } ) )
+		);
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid .wp-env.json: "testsPort" and "port" must be different.'
+			);
+		}
+	} );
 } );
+
+/**
+ * Tests that readConfig will throw errors when invalid port numbers are passed.
+ *
+ * @param {string} portName The name of the port to test ('port' or 'testsPort')
+ * @param {any} value A value which should throw an error.
+ */
+async function testPortNumberValidation( portName, value ) {
+	readFile.mockImplementation( () =>
+		Promise.resolve( JSON.stringify( { [ portName ]: value } ) )
+	);
+	try {
+		await readConfig( '.wp-env.json' );
+	} catch ( error ) {
+		expect( error ).toBeInstanceOf( ValidationError );
+		expect( error.message ).toContain(
+			`Invalid .wp-env.json: "${ portName }" must be an integer.`
+		);
+	}
+	jest.clearAllMocks();
+}
