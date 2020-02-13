@@ -30,7 +30,7 @@ Default properties include:
 [
 	{
 		id: 'opensInNewTab',
-		title: 'Open in New Tab',
+		title: 'Open in new tab',
 	},
 ];
 ```

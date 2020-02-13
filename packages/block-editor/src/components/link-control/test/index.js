@@ -1381,7 +1381,7 @@ describe( 'Selecting links', () => {
 describe( 'Addition Settings UI', () => {
 	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
 		const selectedLink = first( fauxEntitySuggestions );
-		const expectedSettingText = 'Open in New Tab';
+		const expectedSettingText = 'Open in new tab';
 
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
@@ -1418,7 +1418,7 @@ describe( 'Addition Settings UI', () => {
 		const customSettings = [
 			{
 				id: 'newTab',
-				title: 'Open in New Tab',
+				title: 'Open in new tab',
 			},
 			{
 				id: 'noFollow',
