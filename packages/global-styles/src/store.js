@@ -25,18 +25,47 @@ export function GlobalStylesStateProvider( { children } ) {
 	);
 }
 
+export function useGlobalStylesDataState() {
+	const initialState = {
+		fontSize: 16,
+		fontWeight: 400,
+		headingFontWeight: 600,
+		fontScale: 1.2,
+		lineHeight: 1.5,
+		quoteFontSize: 24,
+		textColor: '#000000',
+		backgroundColor: '#ffffff',
+		primaryColor: '#0000ff',
+		paragraphColor: null,
+		paragraphLineHeight: null,
+	};
+
+	const [ state, _setState ] = useState( initialState );
+
+	const setState = ( nextState = {} ) => {
+		const mergedState = { ...state, ...nextState };
+		_setState( mergedState );
+	};
+
+	return [ state, setState ];
+}
+
 export function useGlobalStylesStore() {
 	// TODO: Replace with data/actions from wp.data
-	const [ fontSize, setFontSize ] = useState( 16 );
-	const [ fontWeight, setFontWeight ] = useState( 400 );
-	const [ headingFontWeight, setHeadingFontWeight ] = useState( 600 );
-	const [ fontScale, setFontScale ] = useState( 1.2 );
-	const [ lineHeight, setLineHeight ] = useState( 1.5 );
-	const [ quoteFontSize, setQuoteFontSize ] = useState( 24 );
-
-	const [ textColor, setTextColor ] = useState( '#000000' );
-	const [ backgroundColor, setBackgroundColor ] = useState( '#ffffff' );
-	const [ primaryColor, setPrimaryColor ] = useState( '#0000ff' );
+	const [ styleState, setStyles ] = useGlobalStylesDataState();
+	const {
+		fontSize,
+		fontScale,
+		lineHeight,
+		fontWeight,
+		headingFontWeight,
+		paragraphColor,
+		paragraphLineHeight,
+		quoteFontSize,
+		textColor,
+		backgroundColor,
+		primaryColor,
+	} = styleState;
 
 	const styles = {
 		color: {
@@ -56,29 +85,17 @@ export function useGlobalStylesStore() {
 		quote: {
 			fontSize: toPx( quoteFontSize ),
 		},
+		paragraph: {
+			color: paragraphColor,
+			lineHeight: paragraphLineHeight,
+		},
 	};
 
 	useRenderedGlobalStyles( styles );
 
 	return {
-		fontSize,
-		setFontSize,
-		fontScale,
-		setFontScale,
-		lineHeight,
-		setLineHeight,
-		fontWeight,
-		setFontWeight,
-		textColor,
-		setTextColor,
-		backgroundColor,
-		setBackgroundColor,
-		primaryColor,
-		setPrimaryColor,
-		headingFontWeight,
-		setHeadingFontWeight,
-		quoteFontSize,
-		setQuoteFontSize,
+		...styleState,
+		setStyles,
 	};
 }
 
@@ -89,7 +106,7 @@ export function useGlobalStylesStore() {
 function generateLineHeight( { lineHeight = 1.5 } ) {
 	return {
 		lineHeight,
-		titleLineHeight: lineHeight * 0.8,
+		titleLineHeight: ( lineHeight * 0.8 ).toFixed( 2 ),
 	};
 }
 

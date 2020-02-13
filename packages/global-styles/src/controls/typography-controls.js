@@ -13,13 +13,10 @@ import { useGlobalStylesState } from '../store';
 export default function TypographyControls() {
 	const {
 		fontSize,
-		setFontSize,
 		fontScale,
-		setFontScale,
 		lineHeight,
-		setLineHeight,
 		fontWeight,
-		setFontWeight,
+		setStyles,
 	} = useGlobalStylesState();
 
 	return (
@@ -33,7 +30,7 @@ export default function TypographyControls() {
 				min={ 10 }
 				max={ 30 }
 				step={ 1 }
-				onChange={ setFontSize }
+				onChange={ ( value ) => setStyles( { fontSize: value } ) }
 			/>
 			<RangeControl
 				label={ __( 'Font Scale' ) }
@@ -41,7 +38,7 @@ export default function TypographyControls() {
 				min={ 1.1 }
 				max={ 1.4 }
 				step={ 0.025 }
-				onChange={ setFontScale }
+				onChange={ ( value ) => setStyles( { fontScale: value } ) }
 			/>
 			<RangeControl
 				label={ __( 'Line Height' ) }
@@ -49,7 +46,7 @@ export default function TypographyControls() {
 				min={ 1 }
 				max={ 2 }
 				step={ 0.1 }
-				onChange={ setLineHeight }
+				onChange={ ( value ) => setStyles( { lineHeight: value } ) }
 			/>
 			<RangeControl
 				label={ __( 'Font Weight' ) }
@@ -57,7 +54,7 @@ export default function TypographyControls() {
 				min={ 100 }
 				max={ 900 }
 				step={ 100 }
-				onChange={ setFontWeight }
+				onChange={ ( value ) => setStyles( { fontWeight: value } ) }
 			/>
 		</GlobalStylesPanelBody>
 	);

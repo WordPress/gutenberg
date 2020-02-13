@@ -31,7 +31,7 @@ export default function QuoteEdit( {
 	className,
 } ) {
 	const { align, value, citation } = attributes;
-	const { quoteFontSize, setQuoteFontSize } = useGlobalStylesState();
+	const { quoteFontSize, setStyles } = useGlobalStylesState();
 
 	return (
 		<>
@@ -103,7 +103,9 @@ export default function QuoteEdit( {
 					<RangeControl
 						label={ __( 'Font Size' ) }
 						value={ quoteFontSize }
-						onChange={ setQuoteFontSize }
+						onChange={ ( nextValue ) =>
+							setStyles( { quoteFontSize: nextValue } )
+						}
 						min={ 10 }
 						max={ 50 }
 						step={ 1 }
