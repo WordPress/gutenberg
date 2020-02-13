@@ -35,8 +35,8 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @property {Source|null} coreSource The WordPress installation to load in the environment.
  * @property {Source[]} pluginSources Plugins to load in the environment.
  * @property {Source[]} themeSources Themes to load in the environment.
- * @property {number} port The port on which to start the main WordPress environment.
- * @property {number} testsPort The port on which to start the tests WordPress environment.
+ * @property {number} port The port on which to start the development WordPress environment.
+ * @property {number} testsPort The port on which to start the testing WordPress environment.
  */
 
 /**
