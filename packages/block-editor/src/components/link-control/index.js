@@ -129,8 +129,8 @@ function LinkControl( {
 	forceIsEditingLink,
 	createSuggestion,
 } ) {
-	let cancelableOnCreate;
-	let cancelableCreateSuggestion;
+	const cancelableOnCreate = useRef();
+	const cancelableCreateSuggestion = useRef();
 
 	const wrapperNode = useRef();
 	const instanceId = useInstanceId( LinkControl );
@@ -197,11 +197,11 @@ function LinkControl( {
 	useEffect( () => {
 		return () => {
 			// componentDidUnmount
-			if ( cancelableOnCreate ) {
-				cancelableOnCreate.cancel();
+			if ( cancelableOnCreate.current ) {
+				cancelableOnCreate.current.cancel();
 			}
-			if ( cancelableCreateSuggestion ) {
-				cancelableCreateSuggestion.cancel();
+			if ( cancelableCreateSuggestion.current ) {
+				cancelableCreateSuggestion.current.cancel();
 			}
 		};
 	}, [] );
@@ -331,12 +331,12 @@ function LinkControl( {
 		try {
 			// Make cancellable in order that we can avoid setting State
 			// if the component unmounts during the call to `createSuggestion`
-			cancelableCreateSuggestion = makeCancelable(
+			cancelableCreateSuggestion.current = makeCancelable(
 				// Using Promise.resolve to allow createSuggestion to return a
 				// non-Promise based value.
 				Promise.resolve( createSuggestion( suggestionTitle ) )
 			);
-			newSuggestion = await cancelableCreateSuggestion.promise;
+			newSuggestion = await cancelableCreateSuggestion.current.promise;
 		} catch ( error ) {
 			if ( error.isCanceled ) {
 				return; // bail out of state updates if the promise was cancelled
@@ -431,13 +431,14 @@ function LinkControl( {
 									searchTerm={ inputValue }
 									onClick={ async () => {
 										try {
-											cancelableOnCreate = makeCancelable(
+											cancelableOnCreate.current = makeCancelable(
 												handleOnCreate(
 													suggestion.title
 												)
 											);
 
-											await cancelableOnCreate.promise;
+											await cancelableOnCreate.current
+												.promise;
 										} catch ( error ) {
 											if ( error && error.isCanceled ) {
 												return; // bail if canceled to avoid setting state
@@ -511,11 +512,11 @@ function LinkControl( {
 							CREATE_TYPE === suggestion.type
 						) {
 							try {
-								cancelableOnCreate = makeCancelable(
+								cancelableOnCreate.current = makeCancelable(
 									handleOnCreate( inputValue )
 								);
 
-								await cancelableOnCreate.promise;
+								await cancelableOnCreate.current.promise;
 							} catch ( error ) {
 								if ( error && error.isCanceled ) {
 									return; // bail if canceled to avoid setting state
