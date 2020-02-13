@@ -241,6 +241,22 @@ describe( 'readConfig', () => {
 			);
 		}
 	} );
+
+	it( 'should parse custom ports', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					port: 1000,
+				} )
+			)
+		);
+		const config = await readConfig( '.wp-env.json' );
+		// Custom port is overriden while testsPort gets the deault value.
+		expect( config ).toMatchObject( {
+			port: 1000,
+			testsPort: 8889,
+		} );
+	} );
 } );
 
 /**
