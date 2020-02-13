@@ -62,7 +62,9 @@ it( 'should rerender with new emdeded content if html prop changes', () => {
 	expect( sandboxedIframe.src ).toEqual( 'https://super.embed/' );
 
 	act( () => {
-		button.dispatchEvent( new window.MouseEvent( 'click', { bubbles: true } ) );
+		button.dispatchEvent(
+			new window.MouseEvent( 'click', { bubbles: true } )
+		);
 	} );
 
 	sandboxedIframe = iframe.contentWindow.document.body.querySelector(
