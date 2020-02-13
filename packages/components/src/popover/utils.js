@@ -11,15 +11,15 @@ const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
 /**
  * Utility used to compute the popover position over the xAxis
  *
- * @param {Object}  anchorRect  Anchor Rect.
- * @param {Object}  contentSize Content Size.
- * @param {string}  xAxis       Desired xAxis.
- * @param {string}  corner      Desired corner.
- * @param {boolean} sticky      Whether or not to stick the popover to the
- *                              scroll container edge when part of the anchor
- *                              leaves view.
- * @param {string}  chosenYAxis yAxis to be used.
- * @param {Element} boundaryElement
+ * @param {Object}  anchorRect      Anchor Rect.
+ * @param {Object}  contentSize     Content Size.
+ * @param {string}  xAxis           Desired xAxis.
+ * @param {string}  corner          Desired corner.
+ * @param {boolean} sticky          Whether or not to stick the popover to the
+ *                                  scroll container edge when part of the anchor
+ *                                  leaves view.
+ * @param {string}  chosenYAxis     yAxis to be used.
+ * @param {Element} boundaryElement Boundary element.
  *
  * @return {Object} Popover xAxis position and constraints.
  */
@@ -267,6 +267,7 @@ export function computePopoverYAxisPosition(
  * @param {Element} anchorRef         The anchor element.
  * @param {number}  relativeOffsetTop If applicable, top offset of the relative
  *                                    positioned parent container.
+ * @param {Element} boundaryElement   Boundary element.
  *
  * @return {Object} Popover position and constraints.
  */
@@ -276,7 +277,8 @@ export function computePopoverPosition(
 	position = 'top',
 	sticky,
 	anchorRef,
-	relativeOffsetTop
+	relativeOffsetTop,
+	boundaryElement
 ) {
 	const [ yAxis, xAxis = 'center', corner ] = position.split( ' ' );
 
@@ -295,7 +297,8 @@ export function computePopoverPosition(
 		xAxis,
 		corner,
 		sticky,
-		yAxisPosition.yAxis
+		yAxisPosition.yAxis,
+		boundaryElement
 	);
 
 	return {
