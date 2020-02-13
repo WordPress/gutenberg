@@ -8,13 +8,7 @@ import { clamp, noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useCallback,
-	useRef,
-	useEffect,
-	useState,
-	forwardRef,
-} from '@wordpress/element';
+import { useRef, useState, forwardRef } from '@wordpress/element';
 import { compose, withInstanceId } from '@wordpress/compose';
 
 /**
@@ -25,6 +19,8 @@ import Button from '../button';
 import Dashicon from '../dashicon';
 
 import { color } from '../utils/colors';
+
+import { useControlledRangeValue, useDebouncedHoverInteraction } from './utils';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
 import {
@@ -261,84 +257,6 @@ const BaseRangeControl = forwardRef(
 		);
 	}
 );
-
-/**
- * A float supported clamp function for a specific value.
- *
- * @param {number} value The value to clamp
- * @param {number} min The minimum value
- * @param {number} max The maxinum value
- * @return {number} A (float) number
- */
-function floatClamp( value, min, max ) {
-	return parseFloat( clamp( value, min, max ) );
-}
-
-/**
- * Hook to store a clamped value, derived from props.
- */
-function useControlledRangeValue( { min, max, value: valueProp = 0 } ) {
-	const [ value, _setValue ] = useState( floatClamp( valueProp, min, max ) );
-	const valueRef = useRef( value );
-
-	const setValue = useCallback(
-		( nextValue ) => {
-			_setValue( floatClamp( nextValue, min, max ) );
-		},
-		[ _setValue, min, max ]
-	);
-
-	useEffect( () => {
-		if ( valueRef.current !== valueProp ) {
-			setValue( valueProp );
-			valueRef.current = valueProp;
-		}
-	}, [ valueRef, valueProp, setValue ] );
-
-	return [ value, setValue ];
-}
-
-/**
- * Hook to encapsulate the debouncing "hover" to better handle the showing
- * and hiding of the Tooltip.
- */
-function useDebouncedHoverInteraction( {
-	onShow = noop,
-	onHide = noop,
-	onMouseEnter = noop,
-	onMouseLeave = noop,
-	timeout = 250,
-} ) {
-	const [ show, setShow ] = useState( false );
-	const timeoutRef = useRef();
-
-	const handleOnMouseEnter = useCallback( ( event ) => {
-		onMouseEnter( event );
-
-		if ( timeoutRef.current ) {
-			window.clearTimeout( timeoutRef.current );
-		}
-
-		if ( ! show ) {
-			setShow( true );
-			onShow();
-		}
-	}, [] );
-
-	const handleOnMouseLeave = useCallback( ( event ) => {
-		onMouseLeave( event );
-
-		timeoutRef.current = setTimeout( () => {
-			setShow( false );
-			onHide();
-		}, timeout );
-	}, [] );
-
-	return {
-		onMouseEnter: handleOnMouseEnter,
-		onMouseLeave: handleOnMouseLeave,
-	};
-}
 
 export const RangeControlNext = compose( withInstanceId )( BaseRangeControl );
 
