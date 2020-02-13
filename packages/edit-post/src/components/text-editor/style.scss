@@ -1,6 +1,8 @@
 .edit-post-text-editor {
 	position: relative;
 	width: 100%;
+	background-color: $white;
+	flex-grow: 1;
 
 	// Always show outlines in code editor
 	.editor-post-title__block {

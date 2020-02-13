@@ -18,8 +18,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalEditorSkeleton as EditorSkeleton,
-	__experimentalPageTemplatePicker,
-	__experimentalUsePageTemplatePickerVisible,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -101,7 +99,6 @@ function Layout() {
 			).getBlockSelectionStart(),
 		};
 	}, [] );
-	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened =
 		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -210,9 +207,6 @@ function Layout() {
 				<WelcomeGuide />
 				<Popover.Slot />
 				<PluginArea />
-				{ showPageTemplatePicker && (
-					<__experimentalPageTemplatePicker />
-				) }
 			</FocusReturnProvider>
 		</>
 	);
