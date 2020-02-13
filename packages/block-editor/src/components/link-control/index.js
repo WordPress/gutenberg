@@ -332,7 +332,9 @@ function LinkControl( {
 			// Make cancellable in order that we can avoid setting State
 			// if the component unmounts during the call to `createSuggestion`
 			cancelableCreateSuggestion = makeCancelable(
-				createSuggestion( suggestionTitle )
+				// Using Promise.resolve to allow createSuggestion to return a
+				// non-Promise based value.
+				Promise.resolve( createSuggestion( suggestionTitle ) )
 			);
 			newSuggestion = await cancelableCreateSuggestion.promise;
 		} catch ( error ) {

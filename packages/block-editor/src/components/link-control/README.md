@@ -89,7 +89,7 @@ This is often used to allow on-the-fly creation of new entities (eg: `Posts`,
 `Pages`) based on the text the user has entered into the link search UI. For
 example, the Navigation Block uses this to create Pages on demand.
 
-When called, `createSuggestion` should return a `Promise` which resolves to a
+When called, `createSuggestion` may return either a new link `value` or a `Promise` which resolves to a
 new link `value` (see above) with the shape:
 
 ```js
@@ -103,6 +103,7 @@ new link `value` (see above) with the shape:
 
 #### Example
 ```jsx
+// Promise example
 <LinkControl
 	createSuggestion={ async (inputText) => {
         // Hard coded values. These could be dynamically created by calling out to an API which creates an entity (eg: https://developer.wordpress.org/rest-api/reference/pages/#create-a-page).
@@ -113,5 +114,17 @@ new link `value` (see above) with the shape:
 			url: '/some-url-here'
 		}
 	}}
+/>
+
+// Non-Promise example
+<LinkControl
+	createSuggestion={ (inputText) => (
+		{
+			id: 1234,
+			type: 'page',
+			title: inputText,
+			url: '/some-url-here'
+		}
+	)}
 />
 ```
