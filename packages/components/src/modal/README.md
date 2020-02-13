@@ -195,11 +195,13 @@ If this property is added, it will be added to the modal content `div` as `aria-
 
 #### focusOnMount
 
-If this property is true, it will focus the first tabbable element rendered in the modal.
+By default, the *first tabblable element* in the modal will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"` or true.
 
--   Type: `boolean`
--   Required: No
--   Default: true
+Set this prop to `false` to not focus on mount.
+
+- Type: `String` or `Boolean`
+- Required: No
+- Default: `firstElement`
 
 #### shouldCloseOnEsc
 
