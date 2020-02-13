@@ -392,18 +392,20 @@ function LinkControl( {
 		// According to guidelines aria-label should be added if the label
 		// itself is not visible.
 		// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
-		const searchResultsLabelId = isInitialSuggestions
-			? `block-editor-link-control-search-results-label-${ instanceId }`
-			: undefined;
+		const searchResultsLabelId = `block-editor-link-control-search-results-label-${ instanceId }`;
 		const labelText = isInitialSuggestions
 			? __( 'Recently updated' )
-			: sprintf( __( 'Search results for %s' ), inputValue );
-		const ariaLabel = isInitialSuggestions ? undefined : labelText;
+			: sprintf( __( 'Search results for "%s"' ), inputValue );
+
 		const searchResultsLabel = (
 			<span
-				className="block-editor-link-control__search-results-label"
+				className={ classnames(
+					'block-editor-link-control__search-results-label',
+					{
+						'screen-reader-text': ! isInitialSuggestions,
+					}
+				) }
 				id={ searchResultsLabelId }
-				aria-label={ ariaLabel }
 			>
 				{ labelText }
 			</span>
@@ -411,12 +413,11 @@ function LinkControl( {
 
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				{ isInitialSuggestions && searchResultsLabel }
+				{ searchResultsLabel }
 				<div
 					{ ...suggestionsListProps }
 					className={ resultsListClasses }
-					aria-label={ ariaLabel } // will only be present if there is no visible label
-					aria-labelledby={ searchResultsLabelId } // references the visible label, if there is one
+					aria-labelledby={ searchResultsLabelId }
 				>
 					{ suggestions.map( ( suggestion, index ) => {
 						if (
