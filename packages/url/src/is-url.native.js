@@ -13,6 +13,6 @@ const URL_REGEXP = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\
  * @return {boolean} Whether or not it looks like a URL.
  */
 export function isURL( url ) {
-	const match = url.match( URL_REGEXP ); // URL_REGEXP.match
+	const match = url.match( URL_REGEXP );
 	return match !== null && match.length >= 1 && match[ 0 ] === url;
 }
