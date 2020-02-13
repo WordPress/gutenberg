@@ -214,7 +214,7 @@ export default compose( [
 		const { id } = ownProps;
 
 		return {
-			image: id ? getMedia( id ) : null,
+			image: id ? getMedia( parseInt( id, 10 ) ) : null,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
