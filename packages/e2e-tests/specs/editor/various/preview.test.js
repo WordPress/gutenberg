@@ -22,7 +22,9 @@ import {
 async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();
 	const expectedTabsCount = openTabs.length + 1;
-	await editorPage.click( '.editor-post-preview' );
+	await editorPage.click( '.editor-post-preview__button-toggle' );
+	await editorPage.waitFor( '.editor-post-preview__button-external' );
+	await editorPage.click( '.editor-post-preview__button-external' );
 
 	// Wait for the new tab to open.
 	while ( openTabs.length < expectedTabsCount ) {
@@ -47,7 +49,7 @@ async function openPreviewPage( editorPage ) {
  * @return {Promise} Promise resolving once navigation completes.
  */
 async function waitForPreviewNavigation( previewPage ) {
-	await page.click( '.editor-post-preview' );
+	await page.click( '.editor-post-preview__button-external' );
 	return previewPage.waitForNavigation();
 }
 
@@ -98,7 +100,7 @@ describe( 'Preview', () => {
 
 		// Disabled until content present.
 		const isPreviewDisabled = await editorPage.$$eval(
-			'.editor-post-preview:not( :disabled ):not( [aria-disabled="true"] )',
+			'.editor-post-preview__button-toggle:not( :disabled ):not( [aria-disabled="true"] )',
 			( enabledButtons ) => ! enabledButtons.length
 		);
 		expect( isPreviewDisabled ).toBe( true );
