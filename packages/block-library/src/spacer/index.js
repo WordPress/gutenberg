@@ -17,7 +17,9 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Spacer' ),
-	description: __( 'Add white space between blocks and customize its height.' ),
+	description: __(
+		'Add white space between blocks and customize its height.'
+	),
 	icon,
 	edit,
 	save,

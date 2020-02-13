@@ -78,15 +78,16 @@ function BlockListAppender( {
 }
 
 export default withSelect( ( select, { rootClientId } ) => {
-	const {
-		getBlockOrder,
-		canInsertBlockType,
-		getTemplateLock,
-	} = select( 'core/block-editor' );
+	const { getBlockOrder, canInsertBlockType, getTemplateLock } = select(
+		'core/block-editor'
+	);
 
 	return {
 		isLocked: !! getTemplateLock( rootClientId ),
 		blockClientIds: getBlockOrder( rootClientId ),
-		canInsertDefaultBlock: canInsertBlockType( getDefaultBlockName(), rootClientId ),
+		canInsertDefaultBlock: canInsertBlockType(
+			getDefaultBlockName(),
+			rootClientId
+		),
 	};
 } )( BlockListAppender );

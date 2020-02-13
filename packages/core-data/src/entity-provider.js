@@ -109,73 +109,6 @@ export function useEntityProp( kind, type, prop ) {
 }
 
 /**
- * Hook that returns whether the nearest provided
- * entity of the specified type is dirty, saving,
- * and a function to save it.
- *
- * The last, optional parameter is for scoping the
- * selection to a single property or a list properties.
- *
- * By default, dirtyness detection and saving considers
- * and handles all properties of an entity, but this
- * last parameter lets you scope it to a single property
- * or a list of properties for each instance of this hook.
- *
- * @param {string}          kind    The entity kind.
- * @param {string}          type    The entity type.
- * @param {string|[string]} [props] The property name or list of property names.
- */
-export function __experimentalUseEntitySaving( kind, type, props ) {
-	const id = useEntityId( kind, type );
-
-	const [ isDirty, isSaving, _select ] = useSelect(
-		( select ) => {
-			const { getEntityRecordNonTransientEdits, isSavingEntityRecord } = select(
-				'core'
-			);
-			const editKeys = Object.keys(
-				getEntityRecordNonTransientEdits( kind, type, id )
-			);
-			return [
-				props ?
-					editKeys.some( ( key ) =>
-						typeof props === 'string' ? key === props : props.includes( key )
-					) :
-					editKeys.length > 0,
-				isSavingEntityRecord( kind, type, id ),
-				select,
-			];
-		},
-		[ kind, type, id, props ]
-	);
-
-	const { saveEntityRecord } = useDispatch( 'core' );
-	const save = useCallback( () => {
-		// We use the `select` from `useSelect` here instead of importing it from
-		// the data module so that we get the one bound to the provided registry,
-		// and not the default one.
-		let filteredEdits = _select( 'core' ).getEntityRecordNonTransientEdits(
-			kind,
-			type,
-			id
-		);
-		if ( typeof props === 'string' ) {
-			filteredEdits = { [ props ]: filteredEdits[ props ] };
-		} else if ( props ) {
-			filteredEdits = Object.keys( filteredEdits ).reduce( ( acc, key ) => {
-				if ( props.includes( key ) ) {
-					acc[ key ] = filteredEdits[ key ];
-				}
-				return acc;
-			}, {} );
-		}
-		saveEntityRecord( kind, type, { id, ...filteredEdits } );
-	}, [ kind, type, id, props, _select ] );
-
-	return [ isDirty, isSaving, save ];
-}
-
-/**
  * Hook that returns block content getters and setters for
  * the nearest provided entity of the specified type.
  *
@@ -206,7 +139,9 @@ export function useEntityBlockEditor(
 	const id = useEntityId( kind, type );
 	const initialBlocks = useMemo( () => {
 		if ( initialEdits ) {
-			editEntityRecord( kind, type, id, initialEdits, { undoIgnore: true } );
+			editEntityRecord( kind, type, id, initialEdits, {
+				undoIgnore: true,
+			} );
 		}
 
 		// Guard against other instances that might have

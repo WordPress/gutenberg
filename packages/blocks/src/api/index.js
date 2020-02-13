@@ -12,7 +12,11 @@ export {
 	getBlockAttributes,
 	parseWithAttributeSchema,
 } from './parser';
-export { pasteHandler, rawHandler, getPhrasingContentSchema } from './raw-handling';
+export {
+	pasteHandler,
+	rawHandler,
+	getPhrasingContentSchema,
+} from './raw-handling';
 export {
 	default as serialize,
 	getBlockContent,
@@ -22,11 +26,7 @@ export {
 	getSaveContent,
 } from './serializer';
 export { isValidBlockContent } from './validation';
-export {
-	getCategories,
-	setCategories,
-	updateCategory,
-} from './categories';
+export { getCategories, setCategories, updateCategory } from './categories';
 export {
 	registerBlockType,
 	registerBlockCollection,
@@ -50,8 +50,8 @@ export {
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	registerBlockStyle,
 	unregisterBlockStyle,
-	__experimentalRegisterBlockPattern,
-	__experimentalUnregisterBlockPattern,
+	registerBlockVariation,
+	unregisterBlockVariation,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,

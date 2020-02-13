@@ -18,7 +18,9 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Button' ),
-	description: __( 'Prompt visitors to take action with a button-style link.' ),
+	description: __(
+		'Prompt visitors to take action with a button-style link.'
+	),
 	icon,
 	keywords: [ __( 'link' ) ],
 	example: {

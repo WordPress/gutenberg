@@ -14,11 +14,9 @@ export async function getAllBlockInserterItemTitles() {
 			document.querySelectorAll(
 				'.block-editor-inserter__results .block-editor-block-types-list__item-title'
 			)
-		).map(
-			( inserterItem ) => {
-				return inserterItem.innerText;
-			}
-		);
+		).map( ( inserterItem ) => {
+			return inserterItem.innerText;
+		} );
 	} );
 	return sortBy( uniq( inserterItemTitles ) );
 }

@@ -1,14 +1,18 @@
 $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handles inside, that leaves 6px padding, half of which is 3.
 
-.components-custom-gradient-picker:not(.has-gradient) {
+.components-custom-gradient-picker {
+	margin-top: $grid-size;
+}
+
+.components-custom-gradient-picker__gradient-bar:not(.has-gradient) {
 	opacity: 0.4;
 }
 
-.components-custom-gradient-picker {
+.components-custom-gradient-picker__gradient-bar {
 	width: 100%;
 	height: $icon-button-size-small;
 	border-radius: $icon-button-size-small;
-	margin-bottom: $grid-size;
+	margin-bottom: $grid-size-large;
 	padding-left: $components-custom-gradient-picker__padding;
 	padding-right: $icon-button-size-small - $components-custom-gradient-picker__padding;
 
@@ -54,4 +58,42 @@ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handle
 
 .components-custom-gradient-picker__inserter {
 	width: 100%;
+}
+
+.components-custom-gradient-picker__liner-gradient-indicator {
+	display: inline-block;
+	flex: 0 auto;
+	width: 20px;
+	height: 20px;
+}
+
+.components-custom-gradient-picker__ui-line {
+	display: flex;
+	justify-content: space-between;
+}
+
+.components-custom-gradient-picker .components-custom-gradient-picker__ui-line {
+	.components-base-control.components-angle-picker,
+	.components-base-control.components-custom-gradient-picker__type-picker {
+		margin-bottom: 0;
+	}
+}
+
+.components-custom-gradient-picker .components-custom-gradient-picker__toolbar {
+	border: none;
+
+	// Work-around to target the inner button containers rendered by <ToolbarGroup />
+	> div + div {
+		margin-left: 1px;
+	}
+
+	button {
+		&.is-pressed {
+			> svg {
+				background: $white;
+				border: 1px solid $dark-gray-200;
+				border-radius: 2px;
+			}
+		}
+	}
 }

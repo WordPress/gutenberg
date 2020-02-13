@@ -13,30 +13,28 @@ export default function save( { attributes } ) {
 		downloadButtonText,
 	} = attributes;
 
-	return ( href &&
-		<div>
-			{ ! RichText.isEmpty( fileName ) &&
-				<a
-					href={ textLinkHref }
-					target={ textLinkTarget }
-					rel={ textLinkTarget ? 'noreferrer noopener' : false }
-				>
-					<RichText.Content
-						value={ fileName }
-					/>
-				</a>
-			}
-			{ showDownloadButton &&
-				<a
-					href={ href }
-					className="wp-block-file__button"
-					download={ true }
-				>
-					<RichText.Content
-						value={ downloadButtonText }
-					/>
-				</a>
-			}
-		</div>
+	return (
+		href && (
+			<div>
+				{ ! RichText.isEmpty( fileName ) && (
+					<a
+						href={ textLinkHref }
+						target={ textLinkTarget }
+						rel={ textLinkTarget ? 'noreferrer noopener' : false }
+					>
+						<RichText.Content value={ fileName } />
+					</a>
+				) }
+				{ showDownloadButton && (
+					<a
+						href={ href }
+						className="wp-block-file__button"
+						download={ true }
+					>
+						<RichText.Content value={ downloadButtonText } />
+					</a>
+				) }
+			</div>
+		)
 	);
 }

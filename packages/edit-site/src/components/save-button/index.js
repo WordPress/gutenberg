@@ -9,7 +9,11 @@ import { __ } from '@wordpress/i18n';
 import { EntitiesSavedStates } from '@wordpress/editor';
 
 export default function SaveButton() {
-	const [ , setStatus ] = useEntityProp( 'postType', 'wp_template', 'status' );
+	const [ , setStatus ] = useEntityProp(
+		'postType',
+		'wp_template',
+		'status'
+	);
 	// Publish template if not done yet.
 	useEffect( () => setStatus( 'publish' ), [] );
 
@@ -26,9 +30,15 @@ export default function SaveButton() {
 					entityRecordChangesByRecord[ changedKind ]
 				).some( ( changedName ) =>
 					Object.keys(
-						entityRecordChangesByRecord[ changedKind ][ changedName ]
+						entityRecordChangesByRecord[ changedKind ][
+							changedName
+						]
 					).some( ( changedKey ) =>
-						isSavingEntityRecord( changedKind, changedName, changedKey )
+						isSavingEntityRecord(
+							changedKind,
+							changedName,
+							changedKey
+						)
 					)
 				)
 			),

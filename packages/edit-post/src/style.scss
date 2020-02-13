@@ -1,6 +1,5 @@
 $footer-height: $icon-button-size-small;
 
-@import "./components/editor-regions/style.scss";
 @import "./components/fullscreen-mode/style.scss";
 @import "./components/header/style.scss";
 @import "./components/header/fullscreen-mode-close/style.scss";
@@ -11,6 +10,7 @@ $footer-height: $icon-button-size-small;
 @import "./components/layout/style.scss";
 @import "./components/manage-blocks-modal/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
+@import "./components/preview-options/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/last-revision/style.scss";
 @import "./components/sidebar/post-author/style.scss";

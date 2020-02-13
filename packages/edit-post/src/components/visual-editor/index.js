@@ -23,10 +23,16 @@ import { Popover } from '@wordpress/components';
  */
 import BlockInspectorButton from './block-inspector-button';
 import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-settings-menu-group';
+import { useResizeCanvas } from '../resize-canvas';
 
 function VisualEditor() {
+	const inlineStyles = useResizeCanvas();
+
 	return (
-		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
+		<BlockSelectionClearer
+			className="edit-post-visual-editor editor-styles-wrapper"
+			style={ inlineStyles }
+		>
 			<VisualEditorGlobalKeyboardShortcuts />
 			<MultiSelectScrollIntoView />
 			<Popover.Slot name="block-toolbar" />
@@ -43,10 +49,16 @@ function VisualEditor() {
 				</CopyHandler>
 			</Typewriter>
 			<__experimentalBlockSettingsMenuFirstItem>
-				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }
+				{ ( { onClose } ) => (
+					<BlockInspectorButton onClick={ onClose } />
+				) }
 			</__experimentalBlockSettingsMenuFirstItem>
 			<__experimentalBlockSettingsMenuPluginsExtension>
-				{ ( { clientIds, onClose } ) => <PluginBlockSettingsMenuGroup.Slot fillProps={ { clientIds, onClose } } /> }
+				{ ( { clientIds, onClose } ) => (
+					<PluginBlockSettingsMenuGroup.Slot
+						fillProps={ { clientIds, onClose } }
+					/>
+				) }
 			</__experimentalBlockSettingsMenuPluginsExtension>
 		</BlockSelectionClearer>
 	);

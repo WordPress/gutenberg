@@ -68,6 +68,8 @@ import * as templatePart from './template-part';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
 import * as postAuthor from './post-author';
+import * as postCommentsCount from './post-comments-count';
+import * as postCommentsForm from './post-comments-form';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 
@@ -133,8 +135,6 @@ export const registerCoreBlocks = () => {
 		latestPosts,
 		missing,
 		more,
-		navigation,
-		navigationLink,
 		nextpage,
 		preformatted,
 		pullquote,
@@ -142,6 +142,8 @@ export const registerCoreBlocks = () => {
 		search,
 		separator,
 		reusableBlock,
+		socialLinks,
+		socialLink,
 		spacer,
 		subhead,
 		table,
@@ -175,30 +177,32 @@ export const registerCoreBlocks = () => {
  * ```
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
-	process.env.GUTENBERG_PHASE === 2 ?
-		( settings ) => {
-			const {
-				__experimentalEnableLegacyWidgetBlock,
-				__experimentalEnableFullSiteEditing,
-			} = settings;
+	process.env.GUTENBERG_PHASE === 2
+		? ( settings ) => {
+				const {
+					__experimentalEnableLegacyWidgetBlock,
+					__experimentalEnableFullSiteEditing,
+				} = settings;
 
-			[
-				__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
-				socialLinks,
-				...socialLink.sites,
+				[
+					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
+					navigation,
+					navigationLink,
 
-				// Register Full Site Editing Blocks.
-				...( __experimentalEnableFullSiteEditing ?
-					[
-						siteTitle,
-						templatePart,
-						postTitle,
-						postContent,
-						postAuthor,
-						postDate,
-						postExcerpt,
-					] :
-					[] ),
-			].forEach( registerBlock );
-		} :
-		undefined;
+					// Register Full Site Editing Blocks.
+					...( __experimentalEnableFullSiteEditing
+						? [
+								siteTitle,
+								templatePart,
+								postTitle,
+								postContent,
+								postAuthor,
+								postCommentsCount,
+								postCommentsForm,
+								postDate,
+								postExcerpt,
+						  ]
+						: [] ),
+				].forEach( registerBlock );
+		  }
+		: undefined;

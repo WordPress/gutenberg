@@ -6,8 +6,8 @@ import { over, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useRef, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
 import {
 	UP,
@@ -18,7 +18,7 @@ import {
 	BACKSPACE,
 	ESCAPE,
 } from '@wordpress/keycodes';
-import { withSafeTimeout, compose } from '@wordpress/compose';
+import { withSafeTimeout } from '@wordpress/compose';
 
 /**
  * Set of key codes upon which typing is to be initiated on a keydown event.
@@ -41,37 +41,16 @@ function isKeyDownEligibleForStartTyping( event ) {
 	return ! shiftKey && includes( KEY_DOWN_ELIGIBLE_KEY_CODES, keyCode );
 }
 
-class ObserveTyping extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.stopTypingOnSelectionUncollapse = this.stopTypingOnSelectionUncollapse.bind( this );
-		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
-		this.startTypingInTextField = this.startTypingInTextField.bind( this );
-		this.stopTypingOnNonTextField = this.stopTypingOnNonTextField.bind( this );
-		this.stopTypingOnEscapeKey = this.stopTypingOnEscapeKey.bind( this );
-
-		this.onKeyDown = over( [
-			this.startTypingInTextField,
-			this.stopTypingOnEscapeKey,
-		] );
-
-		this.lastMouseMove = null;
-	}
-
-	componentDidMount() {
-		this.toggleEventBindings( this.props.isTyping );
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( this.props.isTyping !== prevProps.isTyping ) {
-			this.toggleEventBindings( this.props.isTyping );
-		}
-	}
-
-	componentWillUnmount() {
-		this.toggleEventBindings( false );
-	}
+function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
+	const lastMouseMove = useRef();
+	const isTyping = useSelect( ( select ) =>
+		select( 'core/block-editor' ).isTyping()
+	);
+	const { startTyping, stopTyping } = useDispatch( 'core/block-editor' );
+	useEffect( () => {
+		toggleEventBindings( isTyping );
+		return () => toggleEventBindings( false );
+	}, [ isTyping ] );
 
 	/**
 	 * Bind or unbind events to the document when typing has started or stopped
@@ -79,10 +58,13 @@ class ObserveTyping extends Component {
 	 *
 	 * @param {boolean} isBound Whether event bindings should be applied.
 	 */
-	toggleEventBindings( isBound ) {
+	function toggleEventBindings( isBound ) {
 		const bindFn = isBound ? 'addEventListener' : 'removeEventListener';
-		document[ bindFn ]( 'selectionchange', this.stopTypingOnSelectionUncollapse );
-		document[ bindFn ]( 'mousemove', this.stopTypingOnMouseMove );
+		document[ bindFn ](
+			'selectionchange',
+			stopTypingOnSelectionUncollapse
+		);
+		document[ bindFn ]( 'mousemove', stopTypingOnMouseMove );
 	}
 
 	/**
@@ -90,35 +72,36 @@ class ObserveTyping extends Component {
 	 *
 	 * @param {MouseEvent} event Mousemove event.
 	 */
-	stopTypingOnMouseMove( event ) {
+	function stopTypingOnMouseMove( event ) {
 		const { clientX, clientY } = event;
 
 		// We need to check that the mouse really moved because Safari triggers
 		// mousemove events when shift or ctrl are pressed.
-		if ( this.lastMouseMove ) {
+		if ( lastMouseMove.current ) {
 			const {
 				clientX: lastClientX,
 				clientY: lastClientY,
-			} = this.lastMouseMove;
+			} = lastMouseMove.current;
 
 			if ( lastClientX !== clientX || lastClientY !== clientY ) {
-				this.props.onStopTyping();
+				stopTyping();
 			}
 		}
 
-		this.lastMouseMove = { clientX, clientY };
+		lastMouseMove.current = { clientX, clientY };
 	}
 
 	/**
 	 * On selection change, unset typing flag if user has made an uncollapsed
 	 * (shift) selection.
 	 */
-	stopTypingOnSelectionUncollapse() {
+	function stopTypingOnSelectionUncollapse() {
 		const selection = window.getSelection();
-		const isCollapsed = selection.rangeCount > 0 && selection.getRangeAt( 0 ).collapsed;
+		const isCollapsed =
+			selection.rangeCount > 0 && selection.getRangeAt( 0 ).collapsed;
 
 		if ( ! isCollapsed ) {
-			this.props.onStopTyping();
+			stopTyping();
 		}
 	}
 
@@ -127,9 +110,9 @@ class ObserveTyping extends Component {
 	 *
 	 * @param {KeyboardEvent} event Keypress or keydown event to interpret.
 	 */
-	stopTypingOnEscapeKey( event ) {
-		if ( this.props.isTyping && event.keyCode === ESCAPE ) {
-			this.props.onStopTyping();
+	function stopTypingOnEscapeKey( event ) {
+		if ( isTyping && event.keyCode === ESCAPE ) {
+			stopTyping();
 		}
 	}
 
@@ -138,25 +121,31 @@ class ObserveTyping extends Component {
 	 *
 	 * @param {KeyboardEvent} event Keypress or keydown event to interpret.
 	 */
-	startTypingInTextField( event ) {
-		const { isTyping, onStartTyping } = this.props;
+	function startTypingInTextField( event ) {
 		const { type, target } = event;
 
 		// Abort early if already typing, or key press is incurred outside a
 		// text field (e.g. arrow-ing through toolbar buttons).
 		// Ignore typing in a block toolbar
-		if ( isTyping || ! isTextField( target ) || target.closest( '.block-editor-block-toolbar' ) ) {
+		if (
+			isTyping ||
+			! isTextField( target ) ||
+			target.closest( '.block-editor-block-toolbar' )
+		) {
 			return;
 		}
 
 		// Special-case keydown because certain keys do not emit a keypress
 		// event. Conversely avoid keydown as the canonical event since there
 		// are many keydown which are explicitly not targeted for typing.
-		if ( type === 'keydown' && ! isKeyDownEligibleForStartTyping( event ) ) {
+		if (
+			type === 'keydown' &&
+			! isKeyDownEligibleForStartTyping( event )
+		) {
 			return;
 		}
 
-		onStartTyping();
+		startTyping();
 	}
 
 	/**
@@ -164,59 +153,39 @@ class ObserveTyping extends Component {
 	 *
 	 * @param {FocusEvent} event Focus event.
 	 */
-	stopTypingOnNonTextField( event ) {
-		event.persist();
+	function stopTypingOnNonTextField( event ) {
+		const { target } = event;
 
 		// Since focus to a non-text field via arrow key will trigger before
 		// the keydown event, wait until after current stack before evaluating
 		// whether typing is to be stopped. Otherwise, typing will re-start.
-		this.props.setTimeout( () => {
-			const { isTyping, onStopTyping } = this.props;
-			const { target } = event;
+		setSafeTimeout( () => {
 			if ( isTyping && ! isTextField( target ) ) {
-				onStopTyping();
+				stopTyping();
 			}
 		} );
 	}
 
-	render() {
-		const { children } = this.props;
+	// Disable reason: This component is responsible for capturing bubbled
+	// keyboard events which are interpreted as typing intent.
 
-		// Disable reason: This component is responsible for capturing bubbled
-		// keyboard events which are interpreted as typing intent.
-
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return (
-			<div
-				onFocus={ this.stopTypingOnNonTextField }
-				onKeyPress={ this.startTypingInTextField }
-				onKeyDown={ this.onKeyDown }
-			>
-				{ children }
-			</div>
-		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
-	}
+	/* eslint-disable jsx-a11y/no-static-element-interactions */
+	return (
+		<div
+			onFocus={ stopTypingOnNonTextField }
+			onKeyPress={ startTypingInTextField }
+			onKeyDown={ over( [
+				startTypingInTextField,
+				stopTypingOnEscapeKey,
+			] ) }
+		>
+			{ children }
+		</div>
+	);
+	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/observe-typing/README.md
  */
-export default compose( [
-	withSelect( ( select ) => {
-		const { isTyping } = select( 'core/block-editor' );
-
-		return {
-			isTyping: isTyping(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { startTyping, stopTyping } = dispatch( 'core/block-editor' );
-
-		return {
-			onStartTyping: startTyping,
-			onStopTyping: stopTyping,
-		};
-	} ),
-	withSafeTimeout,
-] )( ObserveTyping );
+export default withSafeTimeout( ObserveTyping );

@@ -17,10 +17,7 @@ describe( 'MenuGroup', () => {
 
 	test( 'should match snapshot', () => {
 		const wrapper = shallow(
-			<MenuGroup
-				label="My group"
-				instanceId="1"
-			>
+			<MenuGroup label="My group" instanceId="1">
 				<p>My item</p>
 			</MenuGroup>
 		);

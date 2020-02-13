@@ -13,11 +13,9 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	BlockControls,
-	InspectorControls,
-} from '@wordpress/block-editor';
+import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
+import { rss, pencil } from '@wordpress/icons';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
@@ -67,15 +65,14 @@ class RSSEdit extends Component {
 
 		if ( this.state.editing ) {
 			return (
-				<Placeholder
-					icon="rss"
-					label="RSS"
-				>
+				<Placeholder icon={ rss } label="RSS">
 					<form onSubmit={ this.onSubmitURL }>
 						<TextControl
 							placeholder={ __( 'Enter URL here…' ) }
 							value={ feedURL }
-							onChange={ ( value ) => setAttributes( { feedURL: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( { feedURL: value } )
+							}
 							className={ 'components-placeholder__input' }
 						/>
 						<Button isSecondary type="submit">
@@ -88,7 +85,7 @@ class RSSEdit extends Component {
 
 		const toolbarControls = [
 			{
-				icon: 'edit',
+				icon: pencil,
 				title: __( 'Edit RSS URL' ),
 				onClick: () => this.setState( { editing: true } ),
 			},
@@ -112,11 +109,13 @@ class RSSEdit extends Component {
 					<ToolbarGroup controls={ toolbarControls } />
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'RSS Settings' ) }>
+					<PanelBody title={ __( 'RSS settings' ) }>
 						<RangeControl
 							label={ __( 'Number of items' ) }
 							value={ itemsToShow }
-							onChange={ ( value ) => setAttributes( { itemsToShow: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( { itemsToShow: value } )
+							}
 							min={ DEFAULT_MIN_ITEMS }
 							max={ DEFAULT_MAX_ITEMS }
 							required
@@ -134,28 +133,34 @@ class RSSEdit extends Component {
 						<ToggleControl
 							label={ __( 'Display excerpt' ) }
 							checked={ displayExcerpt }
-							onChange={ this.toggleAttribute( 'displayExcerpt' ) }
+							onChange={ this.toggleAttribute(
+								'displayExcerpt'
+							) }
 						/>
-						{ displayExcerpt &&
+						{ displayExcerpt && (
 							<RangeControl
 								label={ __( 'Max number of words in excerpt' ) }
 								value={ excerptLength }
-								onChange={ ( value ) => setAttributes( { excerptLength: value } ) }
+								onChange={ ( value ) =>
+									setAttributes( { excerptLength: value } )
+								}
 								min={ 10 }
 								max={ 100 }
 								required
 							/>
-						}
-						{ blockLayout === 'grid' &&
+						) }
+						{ blockLayout === 'grid' && (
 							<RangeControl
 								label={ __( 'Columns' ) }
 								value={ columns }
-								onChange={ ( value ) => setAttributes( { columns: value } ) }
+								onChange={ ( value ) =>
+									setAttributes( { columns: value } )
+								}
 								min={ 2 }
 								max={ 6 }
 								required
 							/>
-						}
+						) }
 					</PanelBody>
 				</InspectorControls>
 				<Disabled>

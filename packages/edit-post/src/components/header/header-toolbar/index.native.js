@@ -11,11 +11,9 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { __ } from '@wordpress/i18n';
-import {
-	Inserter,
-	BlockToolbar,
-} from '@wordpress/block-editor';
+import { Inserter, BlockToolbar } from '@wordpress/block-editor';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -39,7 +37,12 @@ function HeaderToolbar( {
 	};
 
 	return (
-		<View style={ getStylesFromColorScheme( styles.container, styles.containerDark ) }>
+		<View
+			style={ getStylesFromColorScheme(
+				styles.container,
+				styles.containerDark
+			) }
+		>
 			<ScrollView
 				ref={ scrollViewRef }
 				onContentSizeChange={ scrollToStart }
@@ -54,33 +57,37 @@ function HeaderToolbar( {
 					{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
 					<ToolbarButton
 						title={ __( 'Undo' ) }
-						icon="undo"
+						icon={ undoIcon }
 						isDisabled={ ! hasUndo }
 						onClick={ undo }
-						extraProps={ { hint: __( 'Double tap to undo last change' ) } }
+						extraProps={ {
+							hint: __( 'Double tap to undo last change' ),
+						} }
 					/>
 					<ToolbarButton
 						title={ __( 'Redo' ) }
-						icon="redo"
+						icon={ redoIcon }
 						isDisabled={ ! hasRedo }
 						onClick={ redo }
-						extraProps={ { hint: __( 'Double tap to redo last change' ) } }
+						extraProps={ {
+							hint: __( 'Double tap to redo last change' ),
+						} }
 					/>
 				</Toolbar>
-				{ hasFixedToolbar &&
-					<BlockToolbar />
-				}
+				{ hasFixedToolbar && <BlockToolbar /> }
 			</ScrollView>
-			{ showKeyboardHideButton &&
+			{ showKeyboardHideButton && (
 				<Toolbar passedStyle={ styles.keyboardHideContainer }>
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
 						icon="keyboard-hide"
 						onClick={ onHideKeyboard }
-						extraProps={ { hint: __( 'Tap to hide the keyboard' ) } }
+						extraProps={ {
+							hint: __( 'Tap to hide the keyboard' ),
+						} }
 					/>
 				</Toolbar>
-			}
+			) }
 		</View>
 	);
 }
@@ -89,10 +96,15 @@ export default compose( [
 	withSelect( ( select ) => ( {
 		hasRedo: select( 'core/editor' ).hasEditorRedo(),
 		hasUndo: select( 'core/editor' ).hasEditorUndo(),
-		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
+			'fixedToolbar'
+		),
 		// This setting (richEditingEnabled) should not live in the block editor's setting.
-		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
+		showInserter:
+			select( 'core/edit-post' ).getEditorMode() === 'visual' &&
+			select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+		isTextModeEnabled:
+			select( 'core/edit-post' ).getEditorMode() === 'text',
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock } = dispatch( 'core/block-editor' );

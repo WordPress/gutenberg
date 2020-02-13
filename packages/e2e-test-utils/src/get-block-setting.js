@@ -7,8 +7,14 @@
  * @return {Promise} Promise resolving with a string containing the block title.
  */
 export async function getBlockSetting( blockName, setting ) {
-	return page.evaluate( ( _blockName, _setting ) => {
-		const blockType = wp.data.select( 'core/blocks' ).getBlockType( _blockName );
-		return blockType && blockType[ _setting ];
-	}, blockName, setting );
+	return page.evaluate(
+		( _blockName, _setting ) => {
+			const blockType = wp.data
+				.select( 'core/blocks' )
+				.getBlockType( _blockName );
+			return blockType && blockType[ _setting ];
+		},
+		blockName,
+		setting
+	);
 }

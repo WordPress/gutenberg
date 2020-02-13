@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -15,16 +15,37 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Social links' ),
-	description: __( 'Create a block of links to your social media or external sites' ),
+	title: __( 'Social Icons' ),
+	description: __(
+		'Create a block of links to your social media or external sites.'
+	),
+	keywords: [ _x( 'links', 'block keywords' ) ],
 	supports: {
 		align: [ 'left', 'center', 'right' ],
 	},
 	example: {
 		innerBlocks: [
-			{ name: 'core/social-link-wordpress', attributes: { url: 'https://wordpress.org' } },
-			{ name: 'core/social-link-facebook', attributes: { url: 'https://www.facebook.com/WordPress/' } },
-			{ name: 'core/social-link-twitter', attributes: { url: 'https://twitter.com/WordPress' } },
+			{
+				name: 'core/social-link',
+				attributes: {
+					service: 'wordpress',
+					url: 'https://wordpress.org',
+				},
+			},
+			{
+				name: 'core/social-link',
+				attributes: {
+					service: 'facebook',
+					url: 'https://www.facebook.com/WordPress/',
+				},
+			},
+			{
+				name: 'core/social-link',
+				attributes: {
+					service: 'twitter',
+					url: 'https://twitter.com/WordPress',
+				},
+			},
 		],
 	},
 	styles: [

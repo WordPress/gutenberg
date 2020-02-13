@@ -48,12 +48,8 @@ $content-width: 580px; // This is optimized for 70 characters.
 // Block UI
 $border-width: 1px;
 $block-controls-height: 36px;
-$icon-button-size: 36px;
-$icon-button-size-small: 24px;
 $inserter-tabs-height: 36px;
 $block-toolbar-height: $block-controls-height + $border-width;
-$resize-handler-size: 15px;
-$resize-handler-container-size: $resize-handler-size + ($grid-size-small * 2); // Make the resize handle container larger so there's a larger grabbable area.
 
 // Blocks
 $block-left-border-width: $border-width * 3;
@@ -76,10 +72,17 @@ $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $b
 $block-selected-child-to-content: $block-selected-to-content - $block-selected-child-margin - $block-selected-child-border-width;
 $block-custom-appender-to-content: $block-selected-margin - $block-selected-border-width;
 $block-media-container-to-content: $block-selected-child-margin + $block-selected-border-width;
+$block-selected-vertical-margin-descendant: 2 * $block-selected-to-content;
+$block-selected-vertical-margin-child: $block-edge-to-content;
 
 // Buttons & UI Widgets
 $radius-round-rectangle: 4px;
 $radius-round: 50%;
+$icon-button-size: 36px;
+$icon-button-size-small: 24px;
+$resize-handler-size: 15px;
+$resize-handler-container-size: $resize-handler-size + ($grid-size-small * 2); // Make the resize handle container larger so there's a larger grabbable area.
+$spinner-size: 18px;
 
 // Widgets screen
 $widget-area-width: 700px;

@@ -13,11 +13,18 @@ export const G = ( props ) => createElement( 'g', props );
 export const Path = ( props ) => createElement( 'path', props );
 export const Polygon = ( props ) => createElement( 'polygon', props );
 export const Rect = ( props ) => createElement( 'rect', props );
+export const Defs = ( props ) => createElement( 'defs', props );
+export const RadialGradient = ( props ) =>
+	createElement( 'radialGradient', props );
+export const LinearGradient = ( props ) =>
+	createElement( 'linearGradient', props );
+export const Stop = ( props ) => createElement( 'stop', props );
 
 export const SVG = ( { className, isPressed, ...props } ) => {
 	const appliedProps = {
 		...props,
-		className: classnames( className, { 'is-pressed': isPressed } ) || undefined,
+		className:
+			classnames( className, { 'is-pressed': isPressed } ) || undefined,
 		role: 'img',
 		'aria-hidden': 'true',
 		focusable: 'false',

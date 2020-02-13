@@ -20,7 +20,9 @@ const defaultAttributes = {
 };
 
 const getTestComponentWithContent = ( attributes = defaultAttributes ) => {
-	return renderer.create( <UnsupportedBlockEdit attributes={ attributes } /> );
+	return renderer.create(
+		<UnsupportedBlockEdit attributes={ attributes } />
+	);
 };
 
 describe( 'Missing block', () => {
@@ -54,7 +56,12 @@ describe( 'Missing block', () => {
 			const bottomSheet = testInstance.findByType( BottomSheet );
 			const children = bottomSheet.props.children.props.children;
 			const expectedOSString = Platform.OS === 'ios' ? 'iOS' : 'Android';
-			expect( children[ 1 ].props.children ).toBe( '\'' + defaultAttributes.originalName + '\' isn\'t yet supported on WordPress for ' + expectedOSString );
+			expect( children[ 1 ].props.children ).toBe(
+				"'" +
+					defaultAttributes.originalName +
+					"' isn't yet supported on WordPress for " +
+					expectedOSString
+			);
 		} );
 	} );
 

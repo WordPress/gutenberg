@@ -47,7 +47,11 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 			);
 			if ( templatePart ) {
 				return (
-					<EntityProvider kind="postType" type="wp_template_part" id={ postId }>
+					<EntityProvider
+						kind="postType"
+						type="wp_template_part"
+						id={ postId }
+					>
 						<TemplatePartPreview />
 					</EntityProvider>
 				);
@@ -114,7 +118,11 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 				/>
 			</div>
 			{ preview }
-			<Button isPrimary disabled={ ! slug || ! theme } onClick={ onChooseOrCreate }>
+			<Button
+				isPrimary
+				disabled={ ! slug || ! theme }
+				onClick={ onChooseOrCreate }
+			>
 				{ postId ? __( 'Choose' ) : __( 'Create' ) }
 			</Button>
 		</Placeholder>

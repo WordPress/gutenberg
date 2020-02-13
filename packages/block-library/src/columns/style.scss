@@ -8,6 +8,10 @@
 	@include break-medium() {
 		flex-wrap: nowrap;
 	}
+
+	&.has-background {
+		padding: $block-bg-padding--v $block-bg-padding--h;
+	}
 }
 
 .wp-block-column {
@@ -26,9 +30,8 @@
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
 
+	// Between mobile and large viewports, allow 2 columns.
 	@include break-small() {
-
-		// Beyond mobile, allow 2 columns.
 		flex-basis: calc(50% - #{$grid-size-large});
 		flex-grow: 0;
 
@@ -39,7 +42,23 @@
 		}
 	}
 
+	// At large viewports, show all columns horizontally.
 	@include break-medium() {
+		// Available space should be divided equally amongst columns without an
+		// assigned width. This is achieved by assigning a flex basis that is
+		// consistent (equal), would not cause the sum total of column widths to
+		// exceed 100%, and which would cede to a column with an assigned width.
+		// The `flex-grow` allows columns to maximally and equally occupy space
+		// remaining after subtracting the space occupied by columns with
+		// explicit widths (if any exist).
+		flex-basis: 0;
+		flex-grow: 1;
+
+		// Columns with an explicitly-assigned width should maintain their
+		// `flex-basis` width and not grow.
+		&[style] {
+			flex-grow: 0;
+		}
 
 		// When columns are in a single row, add space before all except the first.
 		&:not(:first-child) {

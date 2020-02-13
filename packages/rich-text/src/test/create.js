@@ -25,56 +25,62 @@ describe( 'create', () => {
 		require( '../store' );
 	} );
 
-	spec.forEach( ( {
-		description,
-		multilineTag,
-		multilineWrapperTags,
-		html,
-		createRange,
-		record,
-	} ) => {
-		if ( html === undefined ) {
-			return;
-		}
+	spec.forEach(
+		( {
+			description,
+			multilineTag,
+			multilineWrapperTags,
+			html,
+			createRange,
+			record,
+		} ) => {
+			if ( html === undefined ) {
+				return;
+			}
 
-		it( description, () => {
-			const element = createElement( document, html );
-			const range = createRange( element );
-			const createdRecord = create( {
-				element,
-				range,
-				multilineTag,
-				multilineWrapperTags,
+			it( description, () => {
+				const element = createElement( document, html );
+				const range = createRange( element );
+				const createdRecord = create( {
+					element,
+					range,
+					multilineTag,
+					multilineWrapperTags,
+				} );
+				const formatsLength = getSparseArrayLength( record.formats );
+				const createdFormatsLength = getSparseArrayLength(
+					createdRecord.formats
+				);
+
+				expect( createdRecord ).toEqual( record );
+				expect( createdFormatsLength ).toEqual( formatsLength );
 			} );
-			const formatsLength = getSparseArrayLength( record.formats );
-			const createdFormatsLength = getSparseArrayLength( createdRecord.formats );
+		}
+	);
 
-			expect( createdRecord ).toEqual( record );
-			expect( createdFormatsLength ).toEqual( formatsLength );
-		} );
-	} );
+	specWithRegistration.forEach(
+		( {
+			description,
+			formatName,
+			formatType,
+			html,
+			value: expectedValue,
+		} ) => {
+			it( description, () => {
+				if ( formatName ) {
+					registerFormatType( formatName, formatType );
+				}
 
-	specWithRegistration.forEach( ( {
-		description,
-		formatName,
-		formatType,
-		html,
-		value: expectedValue,
-	} ) => {
-		it( description, () => {
-			if ( formatName ) {
-				registerFormatType( formatName, formatType );
-			}
+				const result = create( { html } );
 
-			const result = create( { html } );
+				if ( formatName ) {
+					unregisterFormatType( formatName );
+				}
 
-			if ( formatName ) {
-				unregisterFormatType( formatName );
-			}
-
-			expect( result ).toEqual( expectedValue );
-		} );
-	} );
+				expect( result ).toEqual( expectedValue );
+			} );
+		}
+	);
 
 	it( 'should reference formats', () => {
 		const value = create( { html: '<em>te<strong>st</strong></em>' } );

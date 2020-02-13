@@ -13,7 +13,9 @@ import { __ } from '@wordpress/i18n';
 function KeyboardShortcuts() {
 	// Shortcuts Logic
 	const { clientIds, rootBlocksClientIds } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds, getBlockOrder } = select( 'core/block-editor' );
+		const { getSelectedBlockClientIds, getBlockOrder } = select(
+			'core/block-editor'
+		);
 		return {
 			clientIds: getSelectedBlockClientIds(),
 			rootBlocksClientIds: getBlockOrder(),
@@ -33,10 +35,13 @@ function KeyboardShortcuts() {
 	// Prevents reposition Chrome devtools pane shortcut when devtools are open.
 	useShortcut(
 		'core/block-editor/duplicate',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			duplicateBlocks( clientIds );
-		}, [ clientIds, duplicateBlocks ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				duplicateBlocks( clientIds );
+			},
+			[ clientIds, duplicateBlocks ]
+		),
 		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
 	);
 
@@ -44,10 +49,13 @@ function KeyboardShortcuts() {
 	// is used to prevent any obscure unknown shortcuts from triggering.
 	useShortcut(
 		'core/block-editor/remove',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			removeBlocks( clientIds );
-		}, [ clientIds, removeBlocks ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				removeBlocks( clientIds );
+			},
+			[ clientIds, removeBlocks ]
+		),
 		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
 	);
 
@@ -55,44 +63,65 @@ function KeyboardShortcuts() {
 	// is used to prevent any obscure unknown shortcuts from triggering.
 	useShortcut(
 		'core/block-editor/insert-after',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			insertAfterBlock( last( clientIds ) );
-		}, [ clientIds, insertAfterBlock ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				insertAfterBlock( last( clientIds ) );
+			},
+			[ clientIds, insertAfterBlock ]
+		),
 		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
 	);
 
 	// Prevent 'view recently closed tabs' in Opera using preventDefault.
 	useShortcut(
 		'core/block-editor/insert-before',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			insertBeforeBlock( first( clientIds ) );
-		}, [ clientIds, insertBeforeBlock ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				insertBeforeBlock( first( clientIds ) );
+			},
+			[ clientIds, insertBeforeBlock ]
+		),
 		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
 	);
 
 	useShortcut(
 		'core/block-editor/delete-multi-selection',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			removeBlocks( clientIds );
-		}, [ clientIds, removeBlocks ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				removeBlocks( clientIds );
+			},
+			[ clientIds, removeBlocks ]
+		),
 		{ isDisabled: clientIds.length < 1 }
 	);
 
-	useShortcut( 'core/block-editor/select-all', useCallback( ( event ) => {
-		event.preventDefault();
-		multiSelect( first( rootBlocksClientIds ), last( rootBlocksClientIds ) );
-	}, [ rootBlocksClientIds, multiSelect ] ) );
+	useShortcut(
+		'core/block-editor/select-all',
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				multiSelect(
+					first( rootBlocksClientIds ),
+					last( rootBlocksClientIds )
+				);
+			},
+			[ rootBlocksClientIds, multiSelect ]
+		)
+	);
 
 	useShortcut(
 		'core/block-editor/unselect',
-		useCallback( ( event ) => {
-			event.preventDefault();
-			clearSelectedBlock();
-			window.getSelection().removeAllRanges();
-		}, [ clientIds, clearSelectedBlock ] ),
+		useCallback(
+			( event ) => {
+				event.preventDefault();
+				clearSelectedBlock();
+				window.getSelection().removeAllRanges();
+			},
+			[ clientIds, clearSelectedBlock ]
+		),
 		{ isDisabled: clientIds.length < 2 }
 	);
 
@@ -126,7 +155,9 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/insert-before',
 			category: 'block',
-			description: __( 'Insert a new block before the selected block(s).' ),
+			description: __(
+				'Insert a new block before the selected block(s).'
+			),
 			keyCombination: {
 				modifier: 'primaryAlt',
 				character: 't',
@@ -136,7 +167,9 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/insert-after',
 			category: 'block',
-			description: __( 'Insert a new block after the selected block(s).' ),
+			description: __(
+				'Insert a new block after the selected block(s).'
+			),
 			keyCombination: {
 				modifier: 'primaryAlt',
 				character: 'y',
@@ -150,15 +183,19 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				character: 'del',
 			},
-			aliases: [ {
-				character: 'backspace',
-			} ],
+			aliases: [
+				{
+					character: 'backspace',
+				},
+			],
 		} );
 
 		registerShortcut( {
 			name: 'core/block-editor/select-all',
 			category: 'selection',
-			description: __( 'Select all text when typing. Press again to select all blocks.' ),
+			description: __(
+				'Select all text when typing. Press again to select all blocks.'
+			),
 			keyCombination: {
 				modifier: 'primary',
 				character: 'a',
@@ -167,7 +204,7 @@ function KeyboardShortcutsRegister() {
 
 		registerShortcut( {
 			name: 'core/block-editor/unselect',
-			category: 'selections',
+			category: 'selection',
 			description: __( 'Clear selection.' ),
 			keyCombination: {
 				character: 'escape',

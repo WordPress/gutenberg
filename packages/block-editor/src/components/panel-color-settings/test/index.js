@@ -14,23 +14,25 @@ describe( 'PanelColorSettings', () => {
 		let root;
 
 		await act( async () => {
-			root = create( <PanelColorSettings
-				title="Test Title"
-				colors={ [] }
-				disableCustomColors={ true }
-				colorSettings={ [
-					{
-						value: '#000',
-						onChange: noop,
-						label: 'border color',
-					},
-					{
-						value: '#111',
-						onChange: noop,
-						label: 'background color',
-					},
-				] }
-			/> );
+			root = create(
+				<PanelColorSettings
+					title="Test Title"
+					colors={ [] }
+					disableCustomColors={ true }
+					colorSettings={ [
+						{
+							value: '#000',
+							onChange: noop,
+							label: 'border color',
+						},
+						{
+							value: '#111',
+							onChange: noop,
+							label: 'background color',
+						},
+					] }
+				/>
+			);
 		} );
 
 		expect( root.toJSON() ).toBe( null );
@@ -76,11 +78,13 @@ describe( 'PanelColorSettings', () => {
 							value: '#000',
 							onChange: noop,
 							label: 'border color',
-							colors: [ {
-								slug: 'red',
-								name: 'Red',
-								color: '#ff0000',
-							} ],
+							colors: [
+								{
+									slug: 'red',
+									name: 'Red',
+									color: '#ff0000',
+								},
+							],
 						},
 						{
 							value: '#111',

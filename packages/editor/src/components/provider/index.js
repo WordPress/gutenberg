@@ -25,9 +25,7 @@ import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 
-const fetchLinkSuggestions = async ( search, {
-	perPage = 20,
-} = {} ) => {
+const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
 	const posts = await apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
 			search,
@@ -58,11 +56,17 @@ class EditorProvider extends Component {
 		}
 
 		props.updatePostLock( props.settings.postLock );
-		props.setupEditor( props.post, props.initialEdits, props.settings.template );
+		props.setupEditor(
+			props.post,
+			props.initialEdits,
+			props.settings.template
+		);
 
 		if ( props.settings.autosave ) {
 			props.createWarningNotice(
-				__( 'There is an autosave of this post that is more recent than the version below.' ),
+				__(
+					'There is an autosave of this post that is more recent than the version below.'
+				),
 				{
 					id: 'autosave-exists',
 					actions: [
@@ -83,7 +87,7 @@ class EditorProvider extends Component {
 		hasUploadPermissions,
 		canUserUseUnfilteredHTML,
 		undo,
-		shouldInsertAtTheTop,
+		shouldInsertAtTheTop
 	) {
 		return {
 			...pick( settings, [
@@ -102,6 +106,7 @@ class EditorProvider extends Component {
 				'hasFixedToolbar',
 				'hasPermissionsToManageWidgets',
 				'imageSizes',
+				'imageDimensions',
 				'isRTL',
 				'maxWidth',
 				'styles',
@@ -113,7 +118,7 @@ class EditorProvider extends Component {
 				'__experimentalBlockDirectory',
 				'__experimentalEnableFullSiteEditing',
 				'__experimentalEnableFullSiteEditingDemo',
-				'__experimentalEnablePageTemplates',
+				'__mobileEnablePageTemplates',
 				'showInserterHelpPanel',
 				'gradients',
 			] ),
@@ -134,7 +139,10 @@ class EditorProvider extends Component {
 			return;
 		}
 
-		const updatedStyles = transformStyles( this.props.settings.styles, '.editor-styles-wrapper' );
+		const updatedStyles = transformStyles(
+			this.props.settings.styles,
+			'.editor-styles-wrapper'
+		);
 
 		map( updatedStyles, ( updatedCSS ) => {
 			if ( updatedCSS ) {
@@ -185,12 +193,16 @@ class EditorProvider extends Component {
 			hasUploadPermissions,
 			canUserUseUnfilteredHTML,
 			undo,
-			isPostTitleSelected,
+			isPostTitleSelected
 		);
 
 		return (
 			<EntityProvider kind="root" type="site">
-				<EntityProvider kind="postType" type={ post.type } id={ post.id }>
+				<EntityProvider
+					kind="postType"
+					type={ post.type }
+					id={ post.id }
+				>
 					<BlockEditorProvider
 						value={ blocks }
 						onInput={ resetEditorBlocksWithoutUndoLevel }
@@ -231,7 +243,10 @@ export default compose( [
 			selectionStart: getEditorSelectionStart(),
 			selectionEnd: getEditorSelectionEnd(),
 			reusableBlocks: __experimentalGetReusableBlocks(),
-			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
+			hasUploadPermissions: defaultTo(
+				canUser( 'create', 'media' ),
+				true
+			),
 			// This selector is only defined on mobile.
 			isPostTitleSelected: isPostTitleSelected && isPostTitleSelected(),
 		};

@@ -39,12 +39,7 @@
 		border-bottom: none;
 	}
 
-	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block.is-hovered:not(.is-navigate-mode)::before {
-		box-shadow: none;
-	}
-
 	// 4. Remove the dashed outlines for child blocks.
-	&.is-hovered .wp-block-social-links .block-editor-block-list__block::before,
 	&.is-selected .wp-block-social-links .block-editor-block-list__block::before,
 	&.has-child-selected .wp-block-social-links .block-editor-block-list__block::before {
 		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
@@ -73,20 +68,10 @@
 	justify-content: center;
 }
 
-// Improve the preview.
+// Improve the preview, ensure buttons are fully opaque despite being disabled.
 // @todo: Look at improving the preview component to make this unnecessary.
-.block-editor-block-preview__content {
-
-	// This ensures buttons in preview are fully opaque despite being disabled.
-	.wp-social-link:disabled {
-		opacity: 1;
-	}
-
-	// This ensures the preview is of a good size.
-	[data-type="core/social-links"] {
-		width: auto !important;
-		display: inline-block;
-	}
+.block-editor-block-preview__content .wp-social-link:disabled {
+	opacity: 1;
 }
 
 // Selected/unselected states.

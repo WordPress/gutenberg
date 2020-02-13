@@ -15,12 +15,16 @@ import PageControl from '../page-control';
 
 describe( 'PageControl', () => {
 	it( 'renders an empty list when there are no pages', () => {
-		const wrapper = shallow( <PageControl currentPage={ 0 } numberOfPages={ 0 } /> );
+		const wrapper = shallow(
+			<PageControl currentPage={ 0 } numberOfPages={ 0 } />
+		);
 		expect( wrapper.find( Button ) ).toHaveLength( 0 );
 	} );
 
 	it( 'renders a button for each page', () => {
-		const wrapper = shallow( <PageControl currentPage={ 0 } numberOfPages={ 5 } /> );
+		const wrapper = shallow(
+			<PageControl currentPage={ 0 } numberOfPages={ 5 } />
+		);
 		expect( wrapper.find( Button ) ).toHaveLength( 5 );
 	} );
 
@@ -33,7 +37,10 @@ describe( 'PageControl', () => {
 				setCurrentPage={ setCurrentPage }
 			/>
 		);
-		wrapper.find( Button ).at( 1 ).simulate( 'click' );
+		wrapper
+			.find( Button )
+			.at( 1 )
+			.simulate( 'click' );
 		expect( setCurrentPage ).toHaveBeenCalledWith( 1 );
 	} );
 } );

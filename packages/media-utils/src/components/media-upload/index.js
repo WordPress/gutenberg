@@ -32,10 +32,12 @@ const getFeaturedImageMediaFrame = () => {
 		 * @return {void}
 		 */
 		createStates: function createStates() {
-			this.on( 'toolbar:create:featured-image', this.featuredImageToolbar, this );
-			this.states.add( [
-				new wp.media.controller.FeaturedImage(),
-			] );
+			this.on(
+				'toolbar:create:featured-image',
+				this.featuredImageToolbar,
+				this
+			);
+			this.states.add( [ new wp.media.controller.FeaturedImage() ] );
 		},
 	} );
 };
@@ -50,7 +52,6 @@ const getGalleryDetailsMediaFrame = () => {
 	 * @class
 	 */
 	return wp.media.view.MediaFrame.Post.extend( {
-
 		/**
 		 * Create the default states.
 		 *
@@ -67,9 +68,14 @@ const getGalleryDetailsMediaFrame = () => {
 					multiple: 'add',
 					editable: false,
 
-					library: wp.media.query( defaults( {
-						type: 'image',
-					}, this.options.library ) ),
+					library: wp.media.query(
+						defaults(
+							{
+								type: 'image',
+							},
+							this.options.library
+						)
+					),
 				} ),
 
 				new wp.media.controller.GalleryEdit( {
@@ -89,7 +95,17 @@ const getGalleryDetailsMediaFrame = () => {
 // the media library image object contains numerous attributes
 // we only need this set to display the image in the library
 const slimImageObject = ( img ) => {
-	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt', 'link', 'caption' ];
+	const attrSet = [
+		'sizes',
+		'mime',
+		'type',
+		'subtype',
+		'id',
+		'url',
+		'alt',
+		'link',
+		'caption',
+	];
 	return pick( img, attrSet );
 };
 
@@ -192,7 +208,7 @@ class MediaUpload extends Component {
 			state: currentState,
 			multiple,
 			selection,
-			editing: ( value ) ? true : false,
+			editing: value ? true : false,
 		} );
 		wp.media.frame = this.frame;
 		this.initializeListeners();
@@ -209,7 +225,7 @@ class MediaUpload extends Component {
 			state: 'featured-image',
 			multiple: this.props.multiple,
 			selection,
-			editing: ( this.props.value ) ? true : false,
+			editing: this.props.value ? true : false,
 		} );
 		wp.media.frame = this.frame;
 	}
@@ -228,21 +244,24 @@ class MediaUpload extends Component {
 		}
 
 		if ( multiple ) {
-			onSelect( selectedImages.models.map( ( model ) => slimImageObject( model.toJSON() ) ) );
+			onSelect(
+				selectedImages.models.map( ( model ) =>
+					slimImageObject( model.toJSON() )
+				)
+			);
 		} else {
-			onSelect( slimImageObject( ( selectedImages.models[ 0 ].toJSON() ) ) );
+			onSelect( slimImageObject( selectedImages.models[ 0 ].toJSON() ) );
 		}
 	}
 
 	onSelect() {
 		const { onSelect, multiple = false } = this.props;
 		// Get media attachment details from the frame state
-		const attachment = this.frame.state().get( 'selection' ).toJSON();
-		onSelect(
-			multiple ?
-				attachment :
-				attachment[ 0 ]
-		);
+		const attachment = this.frame
+			.state()
+			.get( 'selection' )
+			.toJSON();
+		onSelect( multiple ? attachment : attachment[ 0 ] );
 	}
 
 	onOpen() {
@@ -276,7 +295,9 @@ class MediaUpload extends Component {
 			const collection = frameContent.collection;
 
 			// clean all attachments we have in memory.
-			collection.toArray().forEach( ( model ) => model.trigger( 'destroy', model ) );
+			collection
+				.toArray()
+				.forEach( ( model ) => model.trigger( 'destroy', model ) );
 
 			// reset has more flag, if library had small amount of items all items may have been loaded before.
 			collection.mirroring._hasMore = true;
@@ -303,4 +324,3 @@ class MediaUpload extends Component {
 }
 
 export default MediaUpload;
-

@@ -58,14 +58,14 @@
 	// the padding and margin of the more menu is intentionally non-standard
 	.components-button.has-icon {
 		width: auto;
-		padding: 8px 2px;
+		padding: 0 2px;
 	}
 
 	@include break-small() {
 		margin-left: 4px;
 
 		.components-button.has-icon {
-			padding: 8px 4px;
+			padding: 0 4px;
 		}
 	}
 

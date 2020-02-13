@@ -12,6 +12,7 @@
 	width: 36px;
 	margin: auto;
 	margin-top: 6px;
+	margin-bottom: 6px;
 	border-radius: 2px;
 }
 
@@ -25,9 +26,10 @@
 	background-color: $gray-70;
 }
 
-.emptyHeaderSpace {
-	height: 14;
+.emptyHeader {
+	margin-top: $panel-padding / 2;
 }
+
 
 .background {
 	background-color: $white;
@@ -158,4 +160,11 @@
 
 .iconDark {
 	color: #c3c4c7;
+}
+
+// Unsupported Footer Cell
+
+.unsupportedFooterCell {
+	font-size: $text-editor-font-size;
+	color: $gray;
 }

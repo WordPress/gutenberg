@@ -97,7 +97,10 @@ export default function useSelect( _mapSelect, deps ) {
 	let mapOutput;
 
 	try {
-		if ( latestMapSelect.current !== mapSelect || latestMapOutputError.current ) {
+		if (
+			latestMapSelect.current !== mapSelect ||
+			latestMapOutputError.current
+		) {
 			mapOutput = mapSelect( registry.select, registry );
 		} else {
 			mapOutput = latestMapOutput.current;
@@ -111,6 +114,9 @@ export default function useSelect( _mapSelect, deps ) {
 			errorMessage += 'Original stack trace:';
 
 			throw new Error( errorMessage );
+		} else {
+			// eslint-disable-next-line no-console
+			console.error( errorMessage );
 		}
 	}
 
@@ -138,7 +144,9 @@ export default function useSelect( _mapSelect, deps ) {
 						registry.select,
 						registry
 					);
-					if ( isShallowEqual( latestMapOutput.current, newMapOutput ) ) {
+					if (
+						isShallowEqual( latestMapOutput.current, newMapOutput )
+					) {
 						return;
 					}
 					latestMapOutput.current = newMapOutput;

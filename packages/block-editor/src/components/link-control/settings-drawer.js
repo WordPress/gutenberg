@@ -7,9 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	ToggleControl,
-} from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 
 const defaultSettings = [
 	{
@@ -18,7 +16,11 @@ const defaultSettings = [
 	},
 ];
 
-const LinkControlSettingsDrawer = ( { value, onChange = noop, settings = defaultSettings } ) => {
+const LinkControlSettingsDrawer = ( {
+	value,
+	onChange = noop,
+	settings = defaultSettings,
+} ) => {
 	if ( ! settings || ! settings.length ) {
 		return null;
 	}
@@ -36,7 +38,8 @@ const LinkControlSettingsDrawer = ( { value, onChange = noop, settings = default
 			key={ setting.id }
 			label={ setting.title }
 			onChange={ handleSettingChange( setting ) }
-			checked={ value ? value[ setting.id ] : false } />
+			checked={ value ? !! value[ setting.id ] : false }
+		/>
 	) );
 
 	return (

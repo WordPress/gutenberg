@@ -32,10 +32,10 @@ export const settings = {
 				style: {
 					flexBasis: width + '%',
 				},
+				'data-has-explicit-width': true,
 			};
 		}
 	},
 	edit,
 	save,
 };
-

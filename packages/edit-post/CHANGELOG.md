@@ -1,3 +1,11 @@
+## Master
+
+## 3.13.0 (2020-02-10)
+
+### Internal
+
+- Move the internal `EditorRegions` component to the `@wordpress/block-editor` package, an rename to `EditorSkeleton`. Its class names have thus been renamed from `edit-post-editor-regions` to `block-editor-editor-skeleton`.
+
 ## 3.8.2
 
 ### Bug Fixes
