@@ -157,10 +157,6 @@ if (isJitPack) {
     def assetsFolder = 'src/main/assets'
     def aarFolder = 'src/main/assets'
 
-    task removeReactNativeAztecOldSubmodule(type: Delete) {
-        delete '../../react-native-aztec-old-submodule'
-    }
-
     task buildJSBundle(type: YarnTask) {
         args = ['bundle:android']
     }
@@ -214,6 +210,5 @@ if (isJitPack) {
         backupHermesReleaseAAR.dependsOn(copyJSBundle)
         copyJSBundle.dependsOn(buildJSBundle)
         buildJSBundle.dependsOn(yarn_install, ensureAssetsDirectory)
-        ensureAssetsDirectory.dependsOn(removeReactNativeAztecOldSubmodule)
     }
 }
