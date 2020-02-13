@@ -320,7 +320,7 @@ class ButtonEdit extends Component {
 		const backgroundColor = this.getBackgroundColor();
 
 		return (
-			<View style={ styles.container } onLayout={ this.onLayout }>
+			<View style={ { flex: 1 } } onLayout={ this.onLayout }>
 				<ColorBackground
 					borderRadiusValue={ borderRadiusValue }
 					backgroundColor={ backgroundColor }
