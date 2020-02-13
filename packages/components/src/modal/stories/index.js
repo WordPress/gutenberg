@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, text } from '@storybook/addon-knobs';
+import { boolean, text, select } from '@storybook/addon-knobs';
 
 /**
  * Internal dependencies
@@ -42,7 +42,12 @@ export const _default = () => {
 	const title = text( 'title', 'Title' );
 	const icon = text( 'icon', '' );
 	const isDismissible = boolean( 'isDismissible', true );
-	const focusOnMount = boolean( 'focusOnMount', true );
+	const focusOnMount = select( 'focusOnMount', {
+		firstElement: 'firstElement',
+		container: 'container',
+		true: true,
+		false: false,
+	} );
 	const shouldCloseOnEsc = boolean( 'shouldCloseOnEsc', true );
 	const shouldCloseOnClickOutside = boolean(
 		'shouldCloseOnClickOutside',
