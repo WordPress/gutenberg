@@ -1,7 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
 	"version": "1.2.0",
-	"private": true,
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
