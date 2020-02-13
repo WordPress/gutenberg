@@ -36,7 +36,7 @@ describe( 'Font Size Picker', () => {
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
 		await page.click(
-			'.components-font-size-picker__controls .components-range-control__number'
+			'.components-font-size-picker__controls .components-font-size-picker__number'
 		);
 		// This should be the "small" font-size of the editor defaults.
 		await page.keyboard.type( '13' );
@@ -52,7 +52,7 @@ describe( 'Font Size Picker', () => {
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
 		await page.click(
-			'.components-font-size-picker__controls .components-range-control__number'
+			'.components-font-size-picker__controls .components-font-size-picker__number'
 		);
 		await page.keyboard.type( '23' );
 
@@ -99,7 +99,7 @@ describe( 'Font Size Picker', () => {
 
 		// Clear the custom font size input.
 		await page.click(
-			'.components-font-size-picker__controls .components-range-control__number'
+			'.components-font-size-picker__controls .components-font-size-picker__number'
 		);
 		await pressKeyTimes( 'ArrowRight', 5 );
 		await pressKeyTimes( 'Backspace', 5 );
@@ -115,14 +115,14 @@ describe( 'Font Size Picker', () => {
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
 		await page.click(
-			'.components-font-size-picker__controls .components-range-control__number'
+			'.components-font-size-picker__controls .components-font-size-picker__number'
 		);
 		await page.keyboard.type( '23' );
 
 		await page.keyboard.press( 'Backspace' );
 
 		await page.click(
-			'.components-font-size-picker__controls .components-range-control__number'
+			'.components-font-size-picker__controls .components-font-size-picker__number'
 		);
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
