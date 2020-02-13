@@ -79,6 +79,8 @@ $ WP_ENV_PORT=3333 wp-env start
 
 Running `docker ps` and inspecting the `PORTS` column allows you to determine which port `wp-env` is currently using.
 
+You may also specify the port numbers in your `.wp-env.json` file, but the environment variables take precedent.
+
 ### 3. Restart `wp-env`
 
 Restarting `wp-env` will restart the underlying Docker containers which can fix many issues.
@@ -175,15 +177,19 @@ Positionals:
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
 
-`.wp-env.json` supports three fields:
+`.wp-env.json` supports five fields:
 
 | Field | Type | Default | Description |
 | -- | -- | -- | -- |
 | `"core"` | `string|null` | `null` | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress. |
 | `"plugins"` | `string[]` | `[]` | A list of plugins to install and activate in the environment. |
 | `"themes"` | `string[]` | `[]` | A list of themes to install in the environment. The first theme in the list will be activated. |
+| `"port"` | `string` | `"8888"` | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
+| `"testsPort"` | `string` | `"8889"` | The port number to use for the tests instance. |
 
-Several types of strings can be passed into these fields:
+_Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
+
+Several types of strings can be passed into the `core`, `plugins`, and `themes` fields:
 
 | Type | Format | Example(s) |
 | -- | -- | -- |
@@ -248,6 +254,20 @@ This is useful for integration testing: that is, testing how old versions of Wor
   "themes": [
     "WordPress/theme-experiments"
   ]
+}
+```
+
+#### Custom Port Numbers
+
+You can tell `wp-env` to use a custom port number so that your instance does not conflict with other `wp-env` instances.
+
+```json
+{
+  "plugins": [
+    ".",
+  ],
+  "port": 4013,
+  "testsPort": 4012
 }
 ```
 
