@@ -101,7 +101,10 @@ class ModalFrame extends Component {
 		if ( this.props.focusOnMount === 'firstElement' ) {
 			this.focusFirstTabbable();
 		}
-		if ( this.props.focusOnMount === 'container' || this.props.focusOnMount === true ) {
+		if (
+			this.props.focusOnMount === 'container' ||
+			this.props.focusOnMount === true
+		) {
 			this.containerRef.current.focus();
 		}
 	}
