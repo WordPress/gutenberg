@@ -141,11 +141,11 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -156,16 +156,15 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
         >
           <svg
             aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
             focusable="false"
-            height={20}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
             />
           </svg>
         </button>
@@ -316,11 +315,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -331,16 +330,15 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
         >
           <svg
             aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
             focusable="false"
-            height={20}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
             />
           </svg>
         </button>
@@ -491,11 +489,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -506,16 +504,15 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
         >
           <svg
             aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
             focusable="false"
-            height={20}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
             />
           </svg>
         </button>
@@ -666,11 +663,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -681,16 +678,15 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
         >
           <svg
             aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
             focusable="false"
-            height={20}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
             />
           </svg>
         </button>
@@ -841,11 +837,11 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -856,16 +852,15 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
         >
           <svg
             aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
             focusable="false"
-            height={20}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
             />
           </svg>
         </button>
@@ -1016,11 +1011,11 @@ exports[`ColorPicker should render color picker 1`] = `
         </div>
       </div>
       <div
-        className="components-color-picker__inputs-toggle"
+        className="components-color-picker__inputs-toggle-wrapper"
       >
         <button
           aria-label="Change color format"
-          className="components-button has-icon"
+          className="components-button components-color-picker__inputs-toggle has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -1031,16 +1026,15 @@ exports[`ColorPicker should render color picker 1`] = `
         >
           <svg
             aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
             focusable="false"
-            height={20}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
             />
           </svg>
         </button>

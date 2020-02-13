@@ -37,9 +37,14 @@ import BlockContentProvider from '../block-content-provider';
 export function getBlockDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
 	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
-	const className = 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+	const className =
+		'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
 
-	return applyFilters( 'blocks.getBlockDefaultClassName', className, blockName );
+	return applyFilters(
+		'blocks.getBlockDefaultClassName',
+		className,
+		blockName
+	);
 }
 
 /**
@@ -52,9 +57,15 @@ export function getBlockDefaultClassName( blockName ) {
 export function getBlockMenuDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `editor-block-list-item-{name}` nomenclature.
 	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
-	const className = 'editor-block-list-item-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+	const className =
+		'editor-block-list-item-' +
+		blockName.replace( /\//, '-' ).replace( /^core-/, '' );
 
-	return applyFilters( 'blocks.getBlockMenuDefaultClassName', className, blockName );
+	return applyFilters(
+		'blocks.getBlockMenuDefaultClassName',
+		className,
+		blockName
+	);
 }
 
 /**
@@ -67,7 +78,11 @@ export function getBlockMenuDefaultClassName( blockName ) {
  *
  * @return {Object|string} Save element or raw HTML string.
  */
-export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) {
+export function getSaveElement(
+	blockTypeOrName,
+	attributes,
+	innerBlocks = []
+) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let { save } = blockType;
 
@@ -81,7 +96,10 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 
 	let element = save( { attributes, innerBlocks } );
 
-	if ( isObject( element ) && hasFilter( 'blocks.getSaveContent.extraProps' ) ) {
+	if (
+		isObject( element ) &&
+		hasFilter( 'blocks.getSaveContent.extraProps' )
+	) {
 		/**
 		 * Filters the props applied to the block save result element.
 		 *
@@ -108,7 +126,12 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 	 * @param {WPBlock}   blockType  Block type definition.
 	 * @param {Object}    attributes Block attributes.
 	 */
-	element = applyFilters( 'blocks.getSaveElement', element, blockType, attributes );
+	element = applyFilters(
+		'blocks.getSaveElement',
+		element,
+		blockType,
+		attributes
+	);
 
 	return (
 		<BlockContentProvider innerBlocks={ innerBlocks }>
@@ -130,7 +153,9 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 
-	return renderToString( getSaveElement( blockType, attributes, innerBlocks ) );
+	return renderToString(
+		getSaveElement( blockType, attributes, innerBlocks )
+	);
 }
 
 /**
@@ -150,28 +175,35 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( blockType, attributes ) {
-	return reduce( blockType.attributes, ( accumulator, attributeSchema, key ) => {
-		const value = attributes[ key ];
-		// Ignore undefined values.
-		if ( undefined === value ) {
-			return accumulator;
-		}
+	return reduce(
+		blockType.attributes,
+		( accumulator, attributeSchema, key ) => {
+			const value = attributes[ key ];
+			// Ignore undefined values.
+			if ( undefined === value ) {
+				return accumulator;
+			}
 
-		// Ignore all attributes but the ones with an "undefined" source
-		// "undefined" source refers to attributes saved in the block comment.
-		if ( attributeSchema.source !== undefined ) {
-			return accumulator;
-		}
+			// Ignore all attributes but the ones with an "undefined" source
+			// "undefined" source refers to attributes saved in the block comment.
+			if ( attributeSchema.source !== undefined ) {
+				return accumulator;
+			}
 
-		// Ignore default value.
-		if ( 'default' in attributeSchema && attributeSchema.default === value ) {
-			return accumulator;
-		}
+			// Ignore default value.
+			if (
+				'default' in attributeSchema &&
+				attributeSchema.default === value
+			) {
+				return accumulator;
+			}
 
-		// Otherwise, include in comment set.
-		accumulator[ key ] = value;
-		return accumulator;
-	}, {} );
+			// Otherwise, include in comment set.
+			accumulator[ key ] = value;
+			return accumulator;
+		},
+		{}
+	);
 }
 
 /**
@@ -183,20 +215,22 @@ export function getCommentAttributes( blockType, attributes ) {
  * @return {string} Serialized attributes.
  */
 export function serializeAttributes( attributes ) {
-	return JSON.stringify( attributes )
-		// Don't break HTML comments.
-		.replace( /--/g, '\\u002d\\u002d' )
+	return (
+		JSON.stringify( attributes )
+			// Don't break HTML comments.
+			.replace( /--/g, '\\u002d\\u002d' )
 
-		// Don't break non-standard-compliant tools.
-		.replace( /</g, '\\u003c' )
-		.replace( />/g, '\\u003e' )
-		.replace( /&/g, '\\u0026' )
+			// Don't break non-standard-compliant tools.
+			.replace( /</g, '\\u003c' )
+			.replace( />/g, '\\u003e' )
+			.replace( /&/g, '\\u0026' )
 
-		// Bypass server stripslashes behavior which would unescape stringify's
-		// escaping of quotation mark.
-		//
-		// See: https://developer.wordpress.org/reference/functions/wp_kses_stripslashes/
-		.replace( /\\"/g, '\\u0022' );
+			// Bypass server stripslashes behavior which would unescape stringify's
+			// escaping of quotation mark.
+			//
+			// See: https://developer.wordpress.org/reference/functions/wp_kses_stripslashes/
+			.replace( /\\"/g, '\\u0022' )
+	);
 }
 
 /**
@@ -217,7 +251,11 @@ export function getBlockContent( block ) {
 	let saveContent = block.originalContent;
 	if ( block.isValid || block.innerBlocks.length ) {
 		try {
-			saveContent = getSaveContent( block.name, block.attributes, block.innerBlocks );
+			saveContent = getSaveContent(
+				block.name,
+				block.attributes,
+				block.innerBlocks
+			);
 		} catch ( error ) {}
 	}
 
@@ -233,15 +271,19 @@ export function getBlockContent( block ) {
  *
  * @return {string} Comment-delimited block content.
  */
-export function getCommentDelimitedContent( rawBlockName, attributes, content ) {
-	const serializedAttributes = ! isEmpty( attributes ) ?
-		serializeAttributes( attributes ) + ' ' :
-		'';
+export function getCommentDelimitedContent(
+	rawBlockName,
+	attributes,
+	content
+) {
+	const serializedAttributes = ! isEmpty( attributes )
+		? serializeAttributes( attributes ) + ' '
+		: '';
 
 	// Strip core blocks of their namespace prefix.
-	const blockName = startsWith( rawBlockName, 'core/' ) ?
-		rawBlockName.slice( 5 ) :
-		rawBlockName;
+	const blockName = startsWith( rawBlockName, 'core/' )
+		? rawBlockName.slice( 5 )
+		: rawBlockName;
 
 	// @todo make the `wp:` prefix potentially configurable.
 
@@ -270,7 +312,7 @@ export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	const saveContent = getBlockContent( block );
 
 	if (
-		( blockName === getUnregisteredTypeHandlerName() ) ||
+		blockName === getUnregisteredTypeHandlerName() ||
 		( ! isInnerBlocks && blockName === getFreeformContentHandlerName() )
 	) {
 		return saveContent;

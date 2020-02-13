@@ -3,7 +3,9 @@
         "clientId": "_clientId_0",
         "name": "core/columns",
         "isValid": true,
-        "attributes": {},
+        "attributes": {
+            "backgroundColor": "secondary"
+        },
         "innerBlocks": [
             {
                 "clientId": "_clientId_0",
@@ -68,6 +70,6 @@
                 "originalContent": "<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>"
             }
         ],
-        "originalContent": "<div class=\"wp-block-columns\">\n\t\n\t\n</div>"
+        "originalContent": "<div class=\"wp-block-columns has-background has-secondary-background-color\">\n\t\n\t\n</div>"
     }
 ]

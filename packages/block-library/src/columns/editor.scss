@@ -30,7 +30,6 @@
 		}
 		// Set full heights on Columns to enable vertical alignment preview
 		> [data-type="core/column"],
-		> [data-type="core/column"] > div[data-block],
 		> [data-type="core/column"] .block-core-columns {
 			display: flex;
 			flex-direction: column;
@@ -53,6 +52,10 @@
 			margin-left: -$block-padding;
 			margin-right: -$block-padding;
 
+			// Zero out margins.
+			margin-top: 0;
+			margin-bottom: 0;
+
 			// Prevent the columns from growing wider than their distributed sizes.
 			min-width: 0;
 
@@ -63,12 +66,32 @@
 			// Responsiveness: Show at most one columns on mobile.
 			flex-basis: 100%;
 
-			// Beyond mobile, allow 2 columns.
+			// Between mobile and large viewports, allow 2 columns.
 			@include break-small() {
 				flex-basis: calc(50% - (#{$grid-size-large}));
 				flex-grow: 0;
 				margin-left: 0;
 				margin-right: 0;
+			}
+
+			// At large viewports, show all columns horizontally.
+			@include break-medium() {
+				// Available space should be divided equally amongst columns
+				// without an assigned width. This is achieved by assigning a
+				// flex basis that is consistent (equal), would not cause the
+				// sum total of column widths to exceed 100%, and which would
+				// cede to a column with an assigned width. The `flex-grow`
+				// allows columns to maximally and equally occupy space
+				// remaining after subtracting the space occupied by columns
+				// with explicit widths (if any exist).
+				flex-basis: 0;
+				flex-grow: 1;
+
+				// Columns with an explicitly-assigned width should maintain
+				// their `flex-basis` width and not grow.
+				&[data-has-explicit-width] {
+					flex-grow: 0;
+				}
 			}
 
 			// Add space between columns. Themes can customize this if they wish to work differently.
@@ -93,16 +116,10 @@
 				right: 0;
 			}
 
-			// Zero out margins.
-			> [data-block] {
-				margin-top: 0;
-				margin-bottom: 0;
-			}
-
 			// The Columns block is a flex-container, therefore it nullifies margin collapsing.
 			// Therefore, blocks inside this will appear to create a double margin.
 			// We compensate for this using negative margins.
-			> div > .block-core-columns > .block-editor-inner-blocks {
+			> .block-core-columns > .block-editor-inner-blocks {
 				margin-top: -$default-block-margin;
 				margin-bottom: -$default-block-margin;
 			}

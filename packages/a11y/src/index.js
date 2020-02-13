@@ -15,7 +15,9 @@ import filterMessage from './filterMessage';
  */
 export const setup = function() {
 	const containerPolite = document.getElementById( 'a11y-speak-polite' );
-	const containerAssertive = document.getElementById( 'a11y-speak-assertive' );
+	const containerAssertive = document.getElementById(
+		'a11y-speak-assertive'
+	);
 
 	if ( containerPolite === null ) {
 		addContainer( 'polite' );
@@ -56,7 +58,9 @@ export const speak = function( message, ariaLive ) {
 	message = filterMessage( message );
 
 	const containerPolite = document.getElementById( 'a11y-speak-polite' );
-	const containerAssertive = document.getElementById( 'a11y-speak-assertive' );
+	const containerAssertive = document.getElementById(
+		'a11y-speak-assertive'
+	);
 
 	if ( containerAssertive && 'assertive' === ariaLive ) {
 		containerAssertive.textContent = message;

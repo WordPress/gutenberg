@@ -1,3 +1,10 @@
+## Master
+
+## 1.7.0 (2020-02-04)
+
+### Bug
+- Fix errant `className` being output on default empty placeholder. [#19555](https://github.com/WordPress/gutenberg/pull/19555)
+
 ## 1.2.0 (2019-08-29)
 
 ### Feature

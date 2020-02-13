@@ -1,0 +1,60 @@
+.bar {
+	flex-direction: row;
+	width: 100%;
+	justify-content: space-between;
+	align-items: center;
+	height: 48px;
+	padding: 0 16px;
+}
+
+.subtitleBar {
+	height: 64px;
+}
+
+.leftContainer {
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+.rightContainer {
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+.titleContainer {
+	justify-content: center;
+	flex: 1;
+	flex-direction: column;
+}
+
+.title {
+	color: $dark-opacity-900;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.titleDark {
+	color: $white;
+}
+
+.subtitle {
+	flex-shrink: 0;
+	text-align: center;
+	font-size: 16px;
+	color: $dark-opacity-600;
+}
+
+.subtitleDark {
+	color: $light-opacity-200;
+}
+
+.separator {
+	background-color: $light-gray-400;
+	height: 1px;
+	width: 100%;
+}
+
+.separatorDark {
+	background-color: $gray-70;
+}

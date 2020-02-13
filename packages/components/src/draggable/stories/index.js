@@ -2,14 +2,14 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { Icon, more } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Draggable from '../';
-import Dashicon from '../../dashicon';
 
-export default { title: 'Components|Draggable', component: Draggable };
+export default { title: 'Components/Draggable', component: Draggable };
 
 const Box = ( props ) => {
 	return (
@@ -35,7 +35,10 @@ const DraggalbeExample = () => {
 	return (
 		<div>
 			<p>Is Dragging? { isDragging ? 'Yes' : 'No' }</p>
-			<div id="draggable-example-box" style={ { display: 'inline-flex' } }>
+			<div
+				id="draggable-example-box"
+				style={ { display: 'inline-flex' } }
+			>
 				<Draggable elementId="draggable-example-box">
 					{ ( { onDraggableStart, onDraggableEnd } ) => {
 						const handleOnDragStart = ( event ) => {
@@ -53,7 +56,7 @@ const DraggalbeExample = () => {
 								onDragEnd={ handleOnDragEnd }
 								draggable
 							>
-								<Dashicon icon="move" />
+								<Icon icon={ more } />
 							</Box>
 						);
 					} }

@@ -9,13 +9,13 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
+import { Path, SVG } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
 import withFocusOutside from '../higher-order/with-focus-outside';
-import { Path, SVG } from '../primitives';
 
 const TEXTCONTROL_MIN = 0;
 const TEXTCONTROL_MAX = 100;
@@ -31,8 +31,12 @@ export class FocalPointPicker extends Component {
 		};
 		this.containerRef = createRef();
 		this.imageRef = createRef();
-		this.horizontalPositionChanged = this.horizontalPositionChanged.bind( this );
-		this.verticalPositionChanged = this.verticalPositionChanged.bind( this );
+		this.horizontalPositionChanged = this.horizontalPositionChanged.bind(
+			this
+		);
+		this.verticalPositionChanged = this.verticalPositionChanged.bind(
+			this
+		);
 		this.onLoad = this.onLoad.bind( this );
 	}
 	componentDidUpdate( prevProps ) {
@@ -91,19 +95,21 @@ export class FocalPointPicker extends Component {
 			};
 			const left = Math.max(
 				bounds.left,
-				Math.min(
-					cursorPosition.left, bounds.right
-				)
+				Math.min( cursorPosition.left, bounds.right )
 			);
 			const top = Math.max(
 				bounds.top,
-				Math.min(
-					cursorPosition.top, bounds.bottom
-				)
+				Math.min( cursorPosition.top, bounds.bottom )
 			);
 			const percentages = {
-				x: ( ( left - bounds.left ) / ( pickerDimensions.width - ( bounds.left * 2 ) ) ).toFixed( 2 ),
-				y: ( ( top - bounds.top ) / ( pickerDimensions.height - ( bounds.top * 2 ) ) ).toFixed( 2 ),
+				x: (
+					( left - bounds.left ) /
+					( pickerDimensions.width - bounds.left * 2 )
+				).toFixed( 2 ),
+				y: (
+					( top - bounds.top ) /
+					( pickerDimensions.height - bounds.top * 2 )
+				).toFixed( 2 ),
 			};
 			this.setState( { percentages }, function() {
 				onChange( {
@@ -126,7 +132,9 @@ export class FocalPointPicker extends Component {
 		const { onChange } = this.props;
 		const { percentages } = this.state;
 		const cleanValue = Math.max( Math.min( parseInt( value ), 100 ), 0 );
-		percentages[ axis ] = ( cleanValue ? cleanValue / 100 : 0 ).toFixed( 2 );
+		percentages[ axis ] = ( cleanValue ? cleanValue / 100 : 0 ).toFixed(
+			2
+		);
 		this.setState( { percentages }, function() {
 			onChange( {
 				x: this.state.percentages.x,
@@ -139,7 +147,9 @@ export class FocalPointPicker extends Component {
 			return {
 				width: this.containerRef.current.clientWidth,
 				height: this.containerRef.current.clientHeight,
-				top: this.containerRef.current.getBoundingClientRect().top + document.body.scrollTop,
+				top:
+					this.containerRef.current.getBoundingClientRect().top +
+					document.body.scrollTop,
 				left: this.containerRef.current.getBoundingClientRect().left,
 			};
 		}
@@ -160,8 +170,12 @@ export class FocalPointPicker extends Component {
 		const { bounds, isDragging, percentages } = this.state;
 		const pickerDimensions = this.pickerDimensions();
 		const iconCoordinates = {
-			left: ( value.x * ( pickerDimensions.width - ( bounds.left * 2 ) ) ) + bounds.left,
-			top: ( value.y * ( pickerDimensions.height - ( bounds.top * 2 ) ) ) + bounds.top,
+			left:
+				value.x * ( pickerDimensions.width - bounds.left * 2 ) +
+				bounds.left,
+			top:
+				value.y * ( pickerDimensions.height - bounds.top * 2 ) +
+				bounds.top,
 		};
 		const iconContainerStyle = {
 			left: `${ iconCoordinates.left }px`,
@@ -175,13 +189,24 @@ export class FocalPointPicker extends Component {
 		const horizontalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
 		const verticalPositionId = `inspector-focal-point-picker-control-vertical-position-${ instanceId }`;
 		return (
-			<BaseControl label={ label } id={ id } help={ help } className={ className }>
+			<BaseControl
+				label={ label }
+				id={ id }
+				help={ help }
+				className={ className }
+			>
 				<div className="components-focal-point-picker-wrapper">
 					<div
 						className="components-focal-point-picker"
-						onMouseDown={ () => this.setState( { isDragging: true } ) }
-						onDragStart={ () => this.setState( { isDragging: true } ) }
-						onMouseUp={ () => this.setState( { isDragging: false } ) }
+						onMouseDown={ () =>
+							this.setState( { isDragging: true } )
+						}
+						onDragStart={ () =>
+							this.setState( { isDragging: true } )
+						}
+						onMouseUp={ () =>
+							this.setState( { isDragging: false } )
+						}
 						onDrop={ () => this.setState( { isDragging: false } ) }
 						onMouseMove={ this.onMouseMove }
 						ref={ this.containerRef }
@@ -195,16 +220,32 @@ export class FocalPointPicker extends Component {
 							src={ url }
 							draggable="false"
 						/>
-						<div className={ iconContainerClasses } style={ iconContainerStyle }>
-							<SVG className="components-focal-point-picker__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
-								<Path className="components-focal-point-picker__icon-outline" d="M15 1C7.3 1 1 7.3 1 15s6.3 14 14 14 14-6.3 14-14S22.7 1 15 1zm0 22c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" />
-								<Path className="components-focal-point-picker__icon-fill" d="M15 3C8.4 3 3 8.4 3 15s5.4 12 12 12 12-5.4 12-12S21.6 3 15 3zm0 22C9.5 25 5 20.5 5 15S9.5 5 15 5s10 4.5 10 10-4.5 10-10 10z" />
+						<div
+							className={ iconContainerClasses }
+							style={ iconContainerStyle }
+						>
+							<SVG
+								className="components-focal-point-picker__icon"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 30 30"
+							>
+								<Path
+									className="components-focal-point-picker__icon-outline"
+									d="M15 1C7.3 1 1 7.3 1 15s6.3 14 14 14 14-6.3 14-14S22.7 1 15 1zm0 22c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"
+								/>
+								<Path
+									className="components-focal-point-picker__icon-fill"
+									d="M15 3C8.4 3 3 8.4 3 15s5.4 12 12 12 12-5.4 12-12S21.6 3 15 3zm0 22C9.5 25 5 20.5 5 15S9.5 5 15 5s10 4.5 10 10-4.5 10-10 10z"
+								/>
 							</SVG>
 						</div>
 					</div>
 				</div>
 				<div className="components-focal-point-picker_position-display-container">
-					<BaseControl label={ __( 'Horizontal Pos.' ) } id={ horizontalPositionId }>
+					<BaseControl
+						label={ __( 'Horizontal Pos.' ) }
+						id={ horizontalPositionId }
+					>
 						<input
 							className="components-text-control__input"
 							id={ horizontalPositionId }
@@ -216,7 +257,10 @@ export class FocalPointPicker extends Component {
 						/>
 						<span>%</span>
 					</BaseControl>
-					<BaseControl label={ __( 'Vertical Pos.' ) } id={ verticalPositionId }>
+					<BaseControl
+						label={ __( 'Vertical Pos.' ) }
+						id={ verticalPositionId }
+					>
 						<input
 							className="components-text-control__input"
 							id={ verticalPositionId }
@@ -243,4 +287,6 @@ FocalPointPicker.defaultProps = {
 	onChange: () => {},
 };
 
-export default compose( [ withInstanceId, withFocusOutside ] )( FocalPointPicker );
+export default compose( [ withInstanceId, withFocusOutside ] )(
+	FocalPointPicker
+);

@@ -3,8 +3,8 @@
 	border-color: darken($alert-red, 15%);
 	justify-content: center;
 
-	&:hover,
-	&:focus {
+	&:not(:disabled):not([aria-disabled="true"]):hover,
+	&:not([aria-disabled="true"]):focus {
 		color: darken($alert-red, 20%);
 		border-color: darken($alert-red, 20%);
 	}

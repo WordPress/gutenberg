@@ -14,12 +14,7 @@ import { Children } from '@wordpress/element';
 import styles from './tiles-styles.scss';
 
 function Tiles( props ) {
-	const {
-		columns,
-		children,
-		spacing = 10,
-		style,
-	} = props;
+	const { columns, children, spacing = 10, style } = props;
 
 	const { compose } = StyleSheet;
 
@@ -52,17 +47,24 @@ function Tiles( props ) {
 		 */
 
 		const row = Math.floor( index / columns );
-		const rowLength = row === lastRow ? ( lastTile % columns ) + 1 : columns;
+		const rowLength =
+			row === lastRow ? ( lastTile % columns ) + 1 : columns;
 		const indexInRow = index % columns;
 
 		return (
-			<View style={ [ styles.tileStyle, {
-				width: `${ 100 / rowLength }%`,
-				paddingLeft: spacing * ( indexInRow / rowLength ),
-				paddingRight: spacing * ( 1 - ( ( indexInRow + 1 ) / rowLength ) ),
-				paddingTop: row === 0 ? 0 : spacing / 2,
-				paddingBottom: row === lastRow ? 0 : spacing / 2,
-			} ] }>
+			<View
+				style={ [
+					styles.tileStyle,
+					{
+						width: `${ 100 / rowLength }%`,
+						paddingLeft: spacing * ( indexInRow / rowLength ),
+						paddingRight:
+							spacing * ( 1 - ( indexInRow + 1 ) / rowLength ),
+						paddingTop: row === 0 ? 0 : spacing / 2,
+						paddingBottom: row === lastRow ? 0 : spacing / 2,
+					},
+				] }
+			>
 				{ child }
 			</View>
 		);
@@ -70,11 +72,7 @@ function Tiles( props ) {
 
 	const containerStyle = compose( styles.containerStyle, style );
 
-	return (
-		<View style={ containerStyle }>
-			{ wrappedChildren }
-		</View>
-	);
+	return <View style={ containerStyle }>{ wrappedChildren }</View>;
 }
 
 export default Tiles;

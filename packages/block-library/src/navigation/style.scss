@@ -1,51 +1,263 @@
+$navigation-menu-height: $grid-size * 7;
+$navigation-sub-menu-height: $grid-size * 5;
+$navigation-sub-menu-width: $grid-size * 25;
+
+/*
+* Frontend: reset the default list styles
+*/
+
+.wp-block-navigation > ul {
+	display: block;
+	list-style: none;
+	margin: 0;
+	padding-left: 0;
+
+	@include break-small {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	// Submenu
+	ul {
+		list-style: none;
+		padding-left: 0;
+		margin-top: 0;
+		margin-left: 0;
+
+		li {
+			margin: 0;
+		}
+	}
+}
+
+/*
+* Frontend: styles for submenu flyout
+*/
+
+.wp-block-navigation > ul {
+	li {
+		z-index: 1;
+
+		&:hover,
+		&:focus-within {
+			cursor: pointer;
+			z-index: 99999;
+		}
+
+		// Submenu Display
+		&:hover > ul,
+		&:focus-within > ul,
+		& ul:hover,
+		& ul:focus {
+			visibility: visible;
+			opacity: 1;
+			display: flex;
+			flex-direction: column;
+		}
+	}
+
+	& > li ul {
+		position: absolute;
+		left: 0;
+		top: 100%;
+		min-width: $navigation-sub-menu-width;
+		max-width: $navigation-sub-menu-width;
+		opacity: 0;
+		transition: opacity 0.1s linear;
+		visibility: hidden;
+	}
+}
+
+/*
+* Styles shared between editor and frontend
+*/
+.wp-block-navigation,
+.wp-block-navigation .block-editor-block-list__layout {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.wp-block-navigation {
+
+	// set a width on the editor submenus
+	.block-editor-block-list__layout .block-editor-block-list__layout {
+		width: $navigation-sub-menu-width;
+	}
+
+	// Remove paddings on subsequent immediate children.
+	.block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
+		margin: 0;
+		width: auto;
+	}
+
+	&,
+	> .wp-block-navigation__container {
+		align-items: center;
+		width: 100%;
+
+		> .wp-block-navigation-link {
+			display: flex;
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+	}
+
+	// Main menu
+	.wp-block-navigation-link {
+		position: relative;
+		margin: 0;
+		min-height: $navigation-menu-height;
+		display: flex;
+		line-height: 1.4;
+
+		// Sub menus
+		.wp-block,
+		.wp-block-navigation-link {
+			min-height: auto; // reset the min-height and rely on padding
+			padding: 0;
+		}
+
+		// Sub menus (editor canvas)
+		.wp-block .wp-block-navigation-link {
+			margin: 0;
+		}
+
+		> .block-editor-inner-blocks {
+			display: none;
+		}
+
+		&.has-child > .wp-block-navigation__container,
+		&.is-editing.has-child > .block-editor-inner-blocks {
+			// Box model
+			display: flex;
+			border: $border-width solid rgba(0, 0, 0, 0.15);
+
+			// Position (first level)
+			position: absolute;
+			z-index: 1;
+			top: 100%;
+			left: 0; // just under the main menu item.
+
+			// Position (nested levels)
+			.block-editor-inner-blocks,
+			.wp-block-navigation__container {
+				left: 100%;
+				top: - $border-width;
+			}
+		}
+
+		// Inherit colors from menu
+		.block-editor-inner-blocks,
+		.wp-block-navigation__container {
+			background-color: inherit;
+			color: inherit;
+		}
+
+		// All links
+		.wp-block-navigation-link__content {
+			display: flex;
+			align-items: center;
+			width: max-content;
+			padding: $grid-size * 0.75 $grid-size * 2;
+		}
+
+		// Submenu links only
+		.wp-block-navigation-link {
+
+			&:first-child:not(:only-child) .wp-block-navigation-link__content {
+				padding-top: $grid-size;
+			}
+
+			&:last-child .wp-block-navigation-link__content {
+				padding-bottom: $grid-size;
+			}
+		}
+
+		&.has-child .wp-block-navigation-link__content {
+			min-width: 100%;
+			padding-right: $grid-size * 4;
+			position: relative;
+		}
+
+		.wp-block-navigation-link__submenu-icon {
+			position: absolute;
+			right: $grid-size * 2;
+
+			svg {
+				fill: currentColor;
+			}
+		}
+
+		// reset rotation of submenu indicator icons on nested levels
+		.wp-block-navigation-link svg {
+			transform: rotate(0);
+		}
+
+		&.has-text-color .wp-block-navigation-link__content {
+			color: inherit;
+		}
+	}
+}
+
+// Styles
+.wp-block-navigation {
+
+	// Default / Light styles
+	.wp-block-navigation-link,
+	&.is-style-light .wp-block-navigation-link {
+		//  No text color
+		&:not(.has-text-color) > .block-editor-inner-blocks,
+		&:not(.has-text-color) > .wp-block-navigation__container {
+			color: $light-style-sub-menu-text-color;
+		}
+
+		// No background color
+		&:not(.has-background) > .block-editor-inner-blocks,
+		&:not(.has-background) > .wp-block-navigation__container {
+			background-color: $light-style-sub-menu-background-color;
+		}
+	}
+
+	// Dark styles.
+	&.is-style-dark .wp-block-navigation-link {
+		// No text color
+		&:not(.has-text-color) > .block-editor-inner-blocks,
+		&:not(.has-text-color) > .wp-block-navigation__container {
+			color: $dark-style-sub-menu-text-color;
+		}
+
+		// No background color
+		&:not(.has-background) > .block-editor-inner-blocks,
+		&:not(.has-background) > .wp-block-navigation__container {
+			background-color: $dark-style-sub-menu-background-color;
+		}
+	}
+}
+
+/*
+* Frontend: non-shared styles & overrides
+*/
+
+.wp-block-navigation {
+
+	.wp-block-navigation-link.has-child > .wp-block-navigation__container {
+		display: flex;
+		flex-direction: column;
+		padding: 0;
+	}
+}
+
+/*
+* TODO: organize/untangle styles below this line
+*/
+
 .wp-block-navigation {
 
 	& > ul {
-		display: block;
-		list-style: none;
-		margin: 0;
-		max-width: none;
-		padding-left: 0;
-		position: relative;
-
-		@include break-small {
-			display: flex;
-			flex-wrap: wrap;
-		}
-
-		ul {
-			padding-left: 0;
-		}
-
-		li {
-			position: relative;
-			z-index: 1;
-
-			&:hover,
-			&:focus-within {
-				cursor: pointer;
-				z-index: 99999;
-			}
-
-			// Submenu Display
-			&:hover > ul,
-			&:focus-within > ul,
-			& ul:hover,
-			& ul:focus {
-				visibility: visible;
-				opacity: 1;
-				display: block;
-			}
-		}
-
 		& > li {
-
 			& > a {
-				padding-left: 0;
-
-				@include break-small {
-					padding-left: 16px;
-				}
+				display: flex;
+				align-items: center;
 			}
 
 			&:first-of-type > a {
@@ -55,102 +267,6 @@
 			&:last-of-type > a {
 				padding-right: 0;
 			}
-		}
-
-		// Sub-menus Flyout
-		& > li > ul {
-			background: #fff;
-			-webkit-box-shadow: 0 3px 30px rgba(25, 30, 35, 0.1);
-			-moz-box-shadow: 0 3px 30px rgba(25, 30, 35, 0.1);
-			border-radius: 3px;
-			box-shadow: 0 3px 30px rgba(25, 30, 35, 0.1);
-			border: 1px solid #e2e4e7;
-			margin: 0;
-			position: absolute;
-			left: 0;
-			top: 80%;
-			min-width: max-content;
-			opacity: 0;
-			transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
-			transform: translateY(0.6rem);
-			visibility: hidden;
-			padding: 5px 0;
-
-
-			li {
-				margin: 2px 8px;
-			}
-
-			a {
-				text-decoration: none;
-
-				&:hover {
-					text-decoration: underline;
-				}
-			}
-
-			&::after,
-			&::before {
-				bottom: 100%;
-				left: 50%;
-				border: solid transparent;
-				content: " ";
-				height: 0;
-				width: 0;
-				position: absolute;
-				pointer-events: none;
-			}
-
-			&::after {
-				border-color: rgba(255, 255, 255, 0);
-				border-bottom-color: #fff;
-				border-width: 10px;
-				margin-left: -10px;
-			}
-
-			&::before {
-				border-color: rgba(226, 228, 231, 0);
-				border-bottom-color: #e2e4e7;
-				border-width: 11px;
-				margin-left: -11px;
-			}
-
-			ul {
-				width: 100%;
-			}
-		}
-	}
-
-	.has-background-color + ul {
-		background: inherit;
-	}
-
-	// Navigation Link
-	a {
-		display: block;
-		padding: 16px;
-	}
-
-	// Sub-menu depth indicators
-	ul ul {
-		list-style: none;
-		margin-left: 0;
-
-		li a {
-			padding-top: 8px;
-			padding-bottom: 8px;
-		}
-	}
-
-	// Top-level sub-menu indicators
-	& .has-sub-menu > a {
-
-		&::after {
-			content: "\00a0\25BC";
-			display: inline-block;
-			font-size: 0.6rem;
-			height: inherit;
-			width: inherit;
 		}
 	}
 
@@ -164,30 +280,5 @@
 
 	&.items-justified-right > ul {
 		justify-content: flex-end;
-	}
-}
-
-.is-style-dark > ul > li > ul {
-	background: #333;
-	border: 1px solid #111;
-
-	a {
-		text-decoration: none;
-		color: #fff;
-
-		&:hover {
-			text-decoration: underline;
-			color: #eee;
-		}
-	}
-
-	&::after {
-		border-color: rgba(51, 51, 51, 0);
-		border-bottom-color: #333;
-	}
-
-	&::before {
-		border-color: rgba(17, 17, 17, 0);
-		border-bottom-color: #111;
 	}
 }

@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	every,
-	get,
-	isArray,
-	noop,
-	startsWith,
-} from 'lodash';
+import { every, get, isArray, noop, startsWith } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -25,6 +19,7 @@ import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -49,7 +44,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 			/>
 			<Button
 				className="block-editor-media-placeholder__url-input-submit-button"
-				icon="editor-break"
+				icon={ keyboardReturn }
 				label={ __( 'Apply' ) }
 				type="submit"
 			/>
@@ -78,7 +73,9 @@ export class MediaPlaceholder extends Component {
 			return false;
 		}
 		return every( allowedTypes, ( allowedType ) => {
-			return allowedType === 'image' || startsWith( allowedType, 'image/' );
+			return (
+				allowedType === 'image' || startsWith( allowedType, 'image/' )
+			);
 		} );
 	}
 
@@ -87,7 +84,10 @@ export class MediaPlaceholder extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( get( prevProps.value, [ 'src' ], '' ) !== get( this.props.value, [ 'src' ], '' ) ) {
+		if (
+			get( prevProps.value, [ 'src' ], '' ) !==
+			get( this.props.value, [ 'src' ], '' )
+		) {
 			this.setState( { src: get( this.props.value, [ 'src' ], '' ) } );
 		}
 	}
@@ -166,7 +166,9 @@ export class MediaPlaceholder extends Component {
 		let title = labels.title;
 
 		if ( ! mediaUpload && ! onSelectURL ) {
-			instructions = __( 'To edit this block, you need permission to upload media.' );
+			instructions = __(
+				'To edit this block, you need permission to upload media.'
+			);
 		}
 
 		if ( instructions === undefined || title === undefined ) {
@@ -176,14 +178,22 @@ export class MediaPlaceholder extends Component {
 			const isVideo = isOneType && 'video' === allowedTypes[ 0 ];
 
 			if ( instructions === undefined && mediaUpload ) {
-				instructions = __( 'Upload a media file or pick one from your media library.' );
+				instructions = __(
+					'Upload a media file or pick one from your media library.'
+				);
 
 				if ( isAudio ) {
-					instructions = __( 'Upload an audio file, pick one from your media library, or add one with a URL.' );
+					instructions = __(
+						'Upload an audio file, pick one from your media library, or add one with a URL.'
+					);
 				} else if ( isImage ) {
-					instructions = __( 'Upload an image file, pick one from your media library, or add one with a URL.' );
+					instructions = __(
+						'Upload an image file, pick one from your media library, or add one with a URL.'
+					);
 				} else if ( isVideo ) {
-					instructions = __( 'Upload a video file, pick one from your media library, or add one with a URL.' );
+					instructions = __(
+						'Upload a video file, pick one from your media library, or add one with a URL.'
+					);
 				}
 			}
 
@@ -203,7 +213,9 @@ export class MediaPlaceholder extends Component {
 		const placeholderClassName = classnames(
 			'block-editor-media-placeholder',
 			className,
-			{ 'is-appender': isAppender }
+			{
+				'is-appender': isAppender,
+			}
 		);
 
 		return (
@@ -239,32 +251,27 @@ export class MediaPlaceholder extends Component {
 	}
 
 	renderCancelLink() {
-		const {
-			onCancel,
-		} = this.props;
-		return ( onCancel &&
-			<Button
-				className="block-editor-media-placeholder__cancel-button"
-				title={ __( 'Cancel' ) }
-				isLink
-				onClick={ onCancel }
-			>
-				{ __( 'Cancel' ) }
-			</Button>
+		const { onCancel } = this.props;
+		return (
+			onCancel && (
+				<Button
+					className="block-editor-media-placeholder__cancel-button"
+					title={ __( 'Cancel' ) }
+					isLink
+					onClick={ onCancel }
+				>
+					{ __( 'Cancel' ) }
+				</Button>
+			)
 		);
 	}
 
 	renderUrlSelectionUI() {
-		const {
-			onSelectURL,
-		} = this.props;
+		const { onSelectURL } = this.props;
 		if ( ! onSelectURL ) {
 			return null;
 		}
-		const {
-			isURLInputVisible,
-			src,
-		} = this.state;
+		const { isURLInputVisible, src } = this.state;
 		return (
 			<div className="block-editor-media-placeholder__url-input-container">
 				<Button
@@ -307,9 +314,7 @@ export class MediaPlaceholder extends Component {
 				onSelect={ onSelect }
 				allowedTypes={ allowedTypes }
 				value={
-					isArray( value ) ?
-						value.map( ( { id } ) => id ) :
-						value.id
+					isArray( value ) ? value.map( ( { id } ) => id ) : value.id
 				}
 				render={ ( { open } ) => {
 					return (
@@ -352,7 +357,10 @@ export class MediaPlaceholder extends Component {
 									{ this.renderCancelLink() }
 								</>
 							);
-							return this.renderPlaceholder( content, openFileDialog );
+							return this.renderPlaceholder(
+								content,
+								openFileDialog
+							);
 						} }
 					/>
 				</>
@@ -387,28 +395,28 @@ export class MediaPlaceholder extends Component {
 	}
 
 	render() {
-		const {
-			disableMediaButtons,
-			dropZoneUIOnly,
-		} = this.props;
+		const { disableMediaButtons, dropZoneUIOnly } = this.props;
 
 		if ( dropZoneUIOnly || disableMediaButtons ) {
 			if ( dropZoneUIOnly ) {
-				deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
-					alternative: 'disableMediaButtons',
-				} );
+				deprecated(
+					'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop',
+					{
+						alternative: 'disableMediaButtons',
+					}
+				);
 			}
 
 			return (
-				<MediaUploadCheck>
-					{ this.renderDropZone() }
-				</MediaUploadCheck>
+				<MediaUploadCheck>{ this.renderDropZone() }</MediaUploadCheck>
 			);
 		}
 
 		return (
 			<MediaUploadCheck
-				fallback={ this.renderPlaceholder( this.renderUrlSelectionUI() ) }
+				fallback={ this.renderPlaceholder(
+					this.renderUrlSelectionUI()
+				) }
 			>
 				{ this.renderMediaUploadChecked() }
 			</MediaUploadCheck>
@@ -429,5 +437,5 @@ const applyWithSelect = withSelect( ( select ) => {
  */
 export default compose(
 	applyWithSelect,
-	withFilters( 'editor.MediaPlaceholder' ),
+	withFilters( 'editor.MediaPlaceholder' )
 )( MediaPlaceholder );

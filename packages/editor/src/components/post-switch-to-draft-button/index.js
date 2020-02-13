@@ -21,9 +21,13 @@ function PostSwitchToDraftButton( {
 	const onSwitch = () => {
 		let alertMessage;
 		if ( isPublished ) {
-			alertMessage = __( 'Are you sure you want to unpublish this post?' );
+			alertMessage = __(
+				'Are you sure you want to unpublish this post?'
+			);
 		} else if ( isScheduled ) {
-			alertMessage = __( 'Are you sure you want to unschedule this post?' );
+			alertMessage = __(
+				'Are you sure you want to unschedule this post?'
+			);
 		}
 		// eslint-disable-next-line no-alert
 		if ( window.confirm( alertMessage ) ) {
@@ -45,7 +49,11 @@ function PostSwitchToDraftButton( {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isSavingPost, isCurrentPostPublished, isCurrentPostScheduled } = select( 'core/editor' );
+		const {
+			isSavingPost,
+			isCurrentPostPublished,
+			isCurrentPostScheduled,
+		} = select( 'core/editor' );
 		return {
 			isSaving: isSavingPost(),
 			isPublished: isCurrentPostPublished(),
@@ -62,4 +70,3 @@ export default compose( [
 		};
 	} ),
 ] )( PostSwitchToDraftButton );
-

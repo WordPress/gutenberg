@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { size } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -11,9 +11,8 @@ import { Dropdown, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import {
-	createBlock,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
+import { plusCircle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -47,17 +46,26 @@ const additionalStyles = [
 	},
 ];
 
-const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingleBlockType } ) => {
+const defaultRenderToggle = ( {
+	onToggle,
+	disabled,
+	isOpen,
+	blockTitle,
+	hasSingleBlockType,
+} ) => {
 	let label;
 	if ( hasSingleBlockType ) {
 		// translators: %s: the name of the block when there is only one
-		label = sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
+		label = sprintf(
+			_x( 'Add %s', 'directly add the only allowed block' ),
+			blockTitle
+		);
 	} else {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
 	return (
 		<Button
-			icon="insert"
+			icon={ plusCircle }
 			label={ label }
 			display={ 'inline-flex' }
 			alignItems={ 'center' }
@@ -114,7 +122,13 @@ class Inserter extends Component {
 			renderToggle = defaultRenderToggle,
 		} = this.props;
 
-		return renderToggle( { onToggle, isOpen, disabled, blockTitle, hasSingleBlockType } );
+		return renderToggle( {
+			onToggle,
+			isOpen,
+			disabled,
+			blockTitle,
+			hasSingleBlockType,
+		} );
 	}
 
 	/**
@@ -148,7 +162,11 @@ class Inserter extends Component {
 	}
 
 	render() {
-		const { position, hasSingleBlockType, insertOnlyAllowedBlock } = this.props;
+		const {
+			position,
+			hasSingleBlockType,
+			insertOnlyAllowedBlock,
+		} = this.props;
 
 		if ( hasSingleBlockType ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
@@ -170,15 +188,24 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
+			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
 		} = select( 'core/block-editor' );
+		const { getBlockVariations } = select( 'core/blocks' );
+
+		rootClientId =
+			rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
-		const hasSingleBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
+		const hasSingleBlockType =
+			size( allowedBlocks ) === 1 &&
+			size(
+				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
+			) === 0;
 
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
@@ -190,6 +217,7 @@ export default compose( [
 			hasSingleBlockType,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
 			allowedBlockType,
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
@@ -228,9 +256,7 @@ export default compose( [
 					return getBlockOrder( rootClientId ).length;
 				}
 
-				const {
-					insertBlock,
-				} = dispatch( 'core/block-editor' );
+				const { insertBlock } = dispatch( 'core/block-editor' );
 
 				const blockToInsert = createBlock( allowedBlockType.name );
 
@@ -243,7 +269,10 @@ export default compose( [
 
 				if ( ! selectBlockOnInsert ) {
 					// translators: %s: the name of the block that has been added
-					const message = sprintf( __( '%s block added' ), allowedBlockType.title );
+					const message = sprintf(
+						__( '%s block added' ),
+						allowedBlockType.title
+					);
 					speak( message );
 				}
 			},

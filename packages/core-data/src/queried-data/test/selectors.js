@@ -28,10 +28,7 @@ describe( 'getQueriedItems', () => {
 
 		const result = getQueriedItems( state );
 
-		expect( result ).toEqual( [
-			{ id: 1 },
-			{ id: 2 },
-		] );
+		expect( result ).toEqual( [ { id: 1 }, { id: 2 } ] );
 	} );
 
 	it( 'should cache on query by state', () => {

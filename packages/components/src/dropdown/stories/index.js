@@ -1,4 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import {
+	more,
+	arrowLeft,
+	arrowRight,
+	arrowUp,
+	arrowDown,
+} from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import Dropdown from '../';
@@ -7,7 +18,7 @@ import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import DropdownMenu from '../../dropdown-menu';
 
-export default { title: 'Components|Dropdown', component: Dropdown };
+export default { title: 'Components/Dropdown', component: Dropdown };
 
 const DropdownAndDropdownMenuExample = () => {
 	return (
@@ -15,24 +26,24 @@ const DropdownAndDropdownMenuExample = () => {
 			<div>
 				<p>This is a DropdownMenu component:</p>
 				<DropdownMenu
-					icon="move"
+					icon={ more }
 					label="Select a direction"
 					controls={ [
 						{
 							title: 'Up',
-							icon: 'arrow-up-alt',
+							icon: arrowUp,
 						},
 						{
 							title: 'Right',
-							icon: 'arrow-right-alt',
+							icon: arrowRight,
 						},
 						{
 							title: 'Down',
-							icon: 'arrow-down-alt',
+							icon: arrowDown,
 						},
 						{
 							title: 'Left',
-							icon: 'arrow-left-alt',
+							icon: arrowLeft,
 						},
 					] }
 				/>
@@ -45,7 +56,7 @@ const DropdownAndDropdownMenuExample = () => {
 					position="bottom right"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
-							icon="move"
+							icon={ more }
 							onClick={ onToggle }
 							aria-expanded={ isOpen }
 							label="Select a direction"
@@ -53,26 +64,10 @@ const DropdownAndDropdownMenuExample = () => {
 					) }
 					renderContent={ () => (
 						<MenuGroup>
-							<MenuItem
-								icon="arrow-up-alt"
-							>
-							Up
-							</MenuItem>
-							<MenuItem
-								icon="arrow-down-alt"
-							>
-							Down
-							</MenuItem>
-							<MenuItem
-								icon="arrow-left-alt"
-							>
-							Left
-							</MenuItem>
-							<MenuItem
-								icon="arrow-right-alt"
-							>
-							Right
-							</MenuItem>
+							<MenuItem icon={ arrowUp }>Up</MenuItem>
+							<MenuItem icon={ arrowDown }>Down</MenuItem>
+							<MenuItem icon={ arrowLeft }>Left</MenuItem>
+							<MenuItem icon={ arrowRight }>Right</MenuItem>
 						</MenuGroup>
 					) }
 				/>

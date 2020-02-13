@@ -1,11 +1,11 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/social-link-goodreads",
+        "name": "core/social-link",
         "isValid": true,
         "attributes": {
             "url": "https://example.com/",
-            "site": "goodreads"
+            "service": "goodreads"
         },
         "innerBlocks": [],
         "originalContent": ""

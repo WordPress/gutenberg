@@ -9,8 +9,9 @@
 	// Target plugin icons that can have arbitrary classes by using an aggressive selector.
 	.dashicon,
 	.components-menu-items__item-icon,
+	svg.components-menu-items__item-icon,
 	> span > svg {
-		margin-right: 5px;
+		margin-right: 4px;
 	}
 
 	.components-menu-items__item-icon {

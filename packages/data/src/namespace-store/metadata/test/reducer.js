@@ -85,39 +85,45 @@ describe( 'reducer', () => {
 		expect( state.getFoo.get( [ 'block' ] ) ).toBe( true );
 	} );
 
-	it( 'should remove invalidation for store level and leave others ' +
-		'intact', () => {
-		const original = reducer( undefined, {
-			type: 'FINISH_RESOLUTION',
-			selectorName: 'getFoo',
-			args: [ 'post' ],
-		} );
-		const state = reducer( deepFreeze( original ), {
-			type: 'INVALIDATE_RESOLUTION_FOR_STORE',
-		} );
+	it(
+		'should remove invalidation for store level and leave others ' +
+			'intact',
+		() => {
+			const original = reducer( undefined, {
+				type: 'FINISH_RESOLUTION',
+				selectorName: 'getFoo',
+				args: [ 'post' ],
+			} );
+			const state = reducer( deepFreeze( original ), {
+				type: 'INVALIDATE_RESOLUTION_FOR_STORE',
+			} );
 
-		expect( state ).toEqual( {} );
-	} );
+			expect( state ).toEqual( {} );
+		}
+	);
 
-	it( 'should remove invalidation for store and selector name level and ' +
-		'leave other selectors at store level intact', () => {
-		const original = reducer( undefined, {
-			type: 'FINISH_RESOLUTION',
-			selectorName: 'getFoo',
-			args: [ 'post' ],
-		} );
-		let state = reducer( deepFreeze( original ), {
-			type: 'FINISH_RESOLUTION',
-			selectorName: 'getBar',
-			args: [ 'postBar' ],
-		} );
-		state = reducer( deepFreeze( state ), {
-			type: 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR',
-			selectorName: 'getBar',
-		} );
+	it(
+		'should remove invalidation for store and selector name level and ' +
+			'leave other selectors at store level intact',
+		() => {
+			const original = reducer( undefined, {
+				type: 'FINISH_RESOLUTION',
+				selectorName: 'getFoo',
+				args: [ 'post' ],
+			} );
+			let state = reducer( deepFreeze( original ), {
+				type: 'FINISH_RESOLUTION',
+				selectorName: 'getBar',
+				args: [ 'postBar' ],
+			} );
+			state = reducer( deepFreeze( state ), {
+				type: 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR',
+				selectorName: 'getBar',
+			} );
 
-		expect( state.getBar ).toBeUndefined();
-		// { getFoo: EquivalentKeyMap( [] => false ) }
-		expect( state.getFoo.get( [ 'post' ] ) ).toBe( false );
-	} );
+			expect( state.getBar ).toBeUndefined();
+			// { getFoo: EquivalentKeyMap( [] => false ) }
+			expect( state.getFoo.get( [ 'post' ] ) ).toBe( false );
+		}
+	);
 } );

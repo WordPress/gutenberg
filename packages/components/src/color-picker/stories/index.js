@@ -1,4 +1,3 @@
-
 /**
  * WordPress dependencies
  */
@@ -9,7 +8,7 @@ import { useState } from '@wordpress/element';
  */
 import ColorPicker from '../';
 
-export default { title: 'Components|ColorPicker', component: ColorPicker };
+export default { title: 'Components/ColorPicker', component: ColorPicker };
 
 const ColorPickerWithState = ( { ...props } ) => {
 	const [ color, setColor ] = useState( '#f00' );
@@ -23,17 +22,9 @@ const ColorPickerWithState = ( { ...props } ) => {
 };
 
 export const _default = () => {
-	return (
-		<ColorPickerWithState
-			disableAlpha
-		/>
-	);
+	return <ColorPickerWithState disableAlpha />;
 };
 
 export const alphaEnabled = () => {
-	return (
-		<ColorPickerWithState
-			disableAlpha={ false }
-		/>
-	);
+	return <ColorPickerWithState disableAlpha={ false } />;
 };

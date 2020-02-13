@@ -19,32 +19,37 @@ import { Button as PrimitiveButton, A } from '../styled-primitives/button';
 import additionalStylesHelper from '../styled-primitives/additionalStylesHelper';
 
 import styles from './styles';
+const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
-export function Button( {
-	href,
-	target,
-	isPrimary,
-	isLarge,
-	isSmall,
-	isTertiary,
-	isPressed,
-	isBusy,
-	isDefault,
-	isSecondary,
-	isLink,
-	isDestructive,
-	className,
-	disabled,
-	icon,
-	iconSize,
-	showTooltip,
-	tooltipPosition,
-	shortcut,
-	label,
-	children,
-	additionalStyles,
-	...additionalProps
-}, ref ) {
+export function Button(
+	{
+		href,
+		target,
+		isPrimary,
+		isLarge,
+		isSmall,
+		isTertiary,
+		isPressed,
+		isBusy,
+		isDefault,
+		isSecondary,
+		isLink,
+		isDestructive,
+		className,
+		disabled,
+		icon,
+		iconSize,
+		showTooltip,
+		tooltipPosition,
+		shortcut,
+		label,
+		children,
+		__experimentalIsFocusable: isFocusable,
+		additionalStyles,
+		...additionalProps
+	},
+	ref
+) {
 	if ( isDefault ) {
 		deprecated( 'Button isDefault prop', {
 			alternative: 'isSecondary',
@@ -65,27 +70,51 @@ export function Button( {
 		'has-icon': !! icon,
 	} );
 
-	const Tag = href !== undefined && ! disabled ? A : PrimitiveButton;
-	const tagProps = Tag === A ?
-		{ href, target } :
-		{ type: 'button', disabled, 'aria-pressed': isPressed };
-	const propsToPass = { ...tagProps, ...additionalProps, className: classes, ref };
+	const trulyDisabled = disabled && ! isFocusable;
+	const Tag = href !== undefined && ! trulyDisabled ? A : PrimitiveButton;
+	const tagProps =
+		Tag === A
+			? { href, target }
+			: {
+					type: 'button',
+					disabled: trulyDisabled,
+					'aria-pressed': isPressed,
+			  };
+
+	if ( disabled && isFocusable ) {
+		// In this case, the button will be disabled, but still focusable and
+		// perceivable by screen reader users.
+		tagProps[ 'aria-disabled' ] = true;
+
+		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
+			additionalProps[ disabledEvent ] = ( event ) => {
+				event.stopPropagation();
+				event.preventDefault();
+			};
+		}
+	}
+
+	const propsToPass = {
+		...tagProps,
+		...additionalProps,
+		className: classes,
+		ref,
+	};
 
 	// Should show the tooltip if...
-	const shouldShowTooltip = ! disabled && (
+	const shouldShowTooltip =
+		! trulyDisabled &&
 		// an explicit tooltip is passed or...
-		( showTooltip && label ) ||
-		// there's a shortcut or...
-		shortcut ||
-		(
+		( ( showTooltip && label ) ||
+			// there's a shortcut or...
+			shortcut ||
 			// there's a label and...
-			!! label &&
-			// the children are empty and...
-			( ! children || ( isArray( children ) && ! children.length ) ) &&
-			// the tooltip is not explicitly disabled.
-			false !== showTooltip
-		)
-	);
+			( !! label &&
+				// the children are empty and...
+				( ! children ||
+					( isArray( children ) && ! children.length ) ) &&
+				// the tooltip is not explicitly disabled.
+				false !== showTooltip ) );
 
 	const element = (
 		<Tag
@@ -100,9 +129,7 @@ export function Button( {
 				isBusy && styles.busy( theme ),
 				additionalStyles && additionalStylesHelper( additionalStyles ),
 				styles.styledSystem( { ...additionalProps, theme } ),
-			]
-			}
-			font-size={ isSmall ? 'small' : 'default' }
+			] }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
 			{ ...propsToPass }
 		>
@@ -116,7 +143,11 @@ export function Button( {
 	}
 
 	return (
-		<Tooltip text={ label } shortcut={ shortcut } position={ tooltipPosition }>
+		<Tooltip
+			text={ label }
+			shortcut={ shortcut }
+			position={ tooltipPosition }
+		>
 			{ element }
 		</Tooltip>
 	);

@@ -42,7 +42,9 @@ export class PostAuthor extends Component {
 					className="editor-post-author__select"
 				>
 					{ authors.map( ( author ) => (
-						<option key={ author.id } value={ author.id }>{ decodeEntities( author.name ) }</option>
+						<option key={ author.id } value={ author.id }>
+							{ decodeEntities( author.name ) }
+						</option>
 					) ) }
 				</select>
 			</PostAuthorCheck>
@@ -54,7 +56,9 @@ export class PostAuthor extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			postAuthor: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
+			postAuthor: select( 'core/editor' ).getEditedPostAttribute(
+				'author'
+			),
 			authors: select( 'core' ).getAuthors(),
 		};
 	} ),
