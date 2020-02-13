@@ -59,7 +59,6 @@ const LinkControlSearchInput = ( {
 				className="block-editor-link-control__search-input"
 				value={ value }
 				onChange={ selectItemHandler }
-				onFocus={ selectItemHandler }
 				onKeyDown={ ( event ) => {
 					if ( event.keyCode === ENTER ) {
 						return;
