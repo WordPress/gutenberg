@@ -14,5 +14,9 @@ const URL_REGEXP = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\
  */
 export function isURL( url ) {
 	const match = url.match( URL_REGEXP );
+	// The current REGEX pattern will match strings where a valid url is part of it,
+	// so things like 'this is https://wordpress.com' will return true using `URL_REGEXP.test( url );`.
+	// This check will ensure that the matched url (the url found) is the same as the original string,
+	// so the given example will return false.
 	return match !== null && match.length >= 1 && match[ 0 ] === url;
 }
