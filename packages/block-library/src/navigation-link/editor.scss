@@ -1,6 +1,5 @@
 // Normalize navigation link and edit containers, to look mostly the same.
-.wp-block-navigation-link__field
-	.components-text-control__input.components-text-control__input,
+.wp-block-navigation-link__field .components-text-control__input.components-text-control__input,
 .wp-block-navigation-link__container {
 	border-radius: 0;
 	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
@@ -25,8 +24,7 @@
 		text-decoration: underline;
 	}
 
-	.block-editor-rich-text__editable.is-selected:not( .keep-placeholder-on-focus ):not( :focus )
-		[data-rich-text-placeholder]::after {
+	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus)[data-rich-text-placeholder]::after {
 		display: inline-block;
 	}
 
@@ -57,8 +55,7 @@
 	padding: $grid-unit-10 0;
 }
 
-.wp-block-navigation
-	.block-editor-block-list__block[data-type='core/navigation-link'] {
+.wp-block-navigation .block-editor-block-list__block[data-type="core/navigation-link"] {
 	& > .block-editor-block-list__insertion-point {
 		display: none;
 	}
