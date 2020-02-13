@@ -266,7 +266,7 @@ function ButtonEdit( {
 						checked={ linkTarget === '_blank' }
 					/>
 					<TextControl
-						label={ __( 'Link relationship' ) }
+						label={ __( 'Link rel' ) }
 						value={ rel || '' }
 						onChange={ onSetLinkRel }
 					/>

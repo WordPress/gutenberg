@@ -233,7 +233,7 @@ const ImageURLInputUI = ( {
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
-				label={ __( 'Link relationship' ) }
+				label={ __( 'Link rel' ) }
 				value={ removeNewTabRel( rel ) || '' }
 				onChange={ onSetLinkRel }
 				onKeyPress={ stopPropagation }
