@@ -1,5 +1,11 @@
+1.23.0
+------
+* New block: Group
+* Add support for upload options in Gallery block
+
 1.22.0
 ------
+* Add support for changing images size in Gallery block
 * Make inserter to show options on long-press to add before/after
 * Retry displaying image when connectivity restores
 * [iOS] Show an "Edit" button overlay on selected image blocks

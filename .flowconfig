@@ -31,6 +31,7 @@
 
 ; Ignore various node_modules
 <PROJECT_ROOT>/node_modules/react-native-gesture-handler/.*
+<PROJECT_ROOT>/node_modules/react-native-linear-gradient/.*
 <PROJECT_ROOT>/node_modules/expo/.*
 <PROJECT_ROOT>/node_modules/react-navigation/.*
 <PROJECT_ROOT>/node_modules/xdl/.*

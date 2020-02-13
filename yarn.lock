@@ -11479,6 +11479,10 @@ react-native-iphone-x-helper@^1.0.3:
     prop-types "^15.6.2"
     react-native-iphone-x-helper "^1.0.3"
 
+"react-native-linear-gradient@git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#52bf43077171cff8714ce3e0155f3ebb7f55bc37":
+  version "2.5.6"
+  resolved "git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#52bf43077171cff8714ce3e0155f3ebb7f55bc37"
+
 react-native-modal@^6.5.0:
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/react-native-modal/-/react-native-modal-6.5.0.tgz#46220b2289a41597d344c1db17454611b426a758"
