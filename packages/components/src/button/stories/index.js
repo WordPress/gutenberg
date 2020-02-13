@@ -4,6 +4,16 @@
 import { text, number } from '@storybook/addon-knobs';
 
 /**
+ * WordPress dependencies
+ */
+import {
+	formatBold,
+	formatItalic,
+	link as linkIcon,
+	more,
+} from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import './style.css';
@@ -114,9 +124,9 @@ export const groupedIcons = () => {
 
 	return (
 		<GroupContainer>
-			<Button icon="editor-bold" label="Bold" />
-			<Button icon="editor-italic" label="Italic" />
-			<Button icon="editor-underline" label="Underline" />
+			<Button icon={ formatBold } label="Bold" />
+			<Button icon={ formatItalic } label="Italic" />
+			<Button icon={ linkIcon } label="Link" />
 		</GroupContainer>
 	);
 };
@@ -136,11 +146,11 @@ export const buttons = () => {
 				<Button isTertiary isSmall>
 					Tertiary Button
 				</Button>
-				<Button isSmall icon="ellipsis" />
-				<Button isSmall isPrimary icon="ellipsis" />
-				<Button isSmall isSecondary icon="ellipsis" />
-				<Button isSmall isTertiary icon="ellipsis" />
-				<Button isSmall isPrimary icon="ellipsis">
+				<Button isSmall icon={ more } />
+				<Button isSmall isPrimary icon={ more } />
+				<Button isSmall isSecondary icon={ more } />
+				<Button isSmall isTertiary icon={ more } />
+				<Button isSmall isPrimary icon={ more }>
 					Icon & Text
 				</Button>
 			</div>
@@ -151,11 +161,11 @@ export const buttons = () => {
 				<Button isPrimary>Primary Button</Button>
 				<Button isSecondary>Secondary Button</Button>
 				<Button isTertiary>Tertiary Button</Button>
-				<Button icon="ellipsis" />
-				<Button isPrimary icon="ellipsis" />
-				<Button isSecondary icon="ellipsis" />
-				<Button isTertiary icon="ellipsis" />
-				<Button isPrimary icon="ellipsis">
+				<Button icon={ more } />
+				<Button isPrimary icon={ more } />
+				<Button isSecondary icon={ more } />
+				<Button isTertiary icon={ more } />
+				<Button isPrimary icon={ more }>
 					Icon & Text
 				</Button>
 			</div>

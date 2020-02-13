@@ -419,7 +419,7 @@ _Properties_
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
 -   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
--   _\_\_experimentalEnablePageTemplates_ `boolean`: Whether the user has enabled the Page Templates
+-   _\_\_mobileEnablePageTemplates_ `boolean`: Whether the user has enabled the Page Templates
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
@@ -481,6 +481,15 @@ _Related_
 <a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
 
 Undocumented declaration.
+
+<a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
+
+Function that manipulates media queries from stylesheets to simulate a given viewport width.
+
+_Parameters_
+
+-   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
+-   _width_ `number`: Viewport width to simulate.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 

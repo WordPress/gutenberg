@@ -1,5 +1,7 @@
 ## Master
 
+## 0.6.0 (2020-02-04)
+
 ### Enhancements
 
 - Removed the code that clears the terminal while the block is scaffolded ([#19867](https://github.com/WordPress/gutenberg/pull/19867)).

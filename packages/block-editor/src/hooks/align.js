@@ -7,6 +7,7 @@ import { assign, get, has, includes, without } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { createContext, useContext } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import {
@@ -99,6 +100,13 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
+const AlignmentHookSettings = createContext( {} );
+
+/**
+ * Allows to pass additional settings to the alignment hook.
+ */
+export const AlignmentHookSettingsProvider = AlignmentHookSettings.Provider;
+
 /**
  * Override the default edit UI to include new toolbar controls for block
  * alignment, if block defines support.
@@ -108,14 +116,17 @@ export function addAttribute( settings ) {
  */
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const { isEmbedButton } = useContext( AlignmentHookSettings );
 		const { name: blockName } = props;
 		// Compute valid alignments without taking into account,
 		// if the theme supports wide alignments or not.
 		// BlockAlignmentToolbar takes into account the theme support.
-		const validAlignments = getValidAlignments(
-			getBlockSupport( blockName, 'align' ),
-			hasBlockSupport( blockName, 'alignWide', true )
-		);
+		const validAlignments = isEmbedButton
+			? []
+			: getValidAlignments(
+					getBlockSupport( blockName, 'align' ),
+					hasBlockSupport( blockName, 'alignWide', true )
+			  );
 
 		const updateAlignment = ( nextAlign ) => {
 			if ( ! nextAlign ) {

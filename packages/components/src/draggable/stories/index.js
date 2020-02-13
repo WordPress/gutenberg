@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { Icon, more } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Draggable from '../';
-import Dashicon from '../../dashicon';
 
 export default { title: 'Components/Draggable', component: Draggable };
 
@@ -56,7 +56,7 @@ const DraggalbeExample = () => {
 								onDragEnd={ handleOnDragEnd }
 								draggable
 							>
-								<Dashicon icon="move" />
+								<Icon icon={ more } />
 							</Box>
 						);
 					} }

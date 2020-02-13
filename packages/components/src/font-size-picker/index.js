@@ -95,7 +95,7 @@ export default function FontSizePicker( {
 
 	const options = getSelectOptions( fontSizes, disableCustomFontSizes );
 
-	const rangeControlNumberId = `components-range-control__number#${ instanceId }`;
+	const fontSizePickerNumberId = `components-font-size-picker__number#${ instanceId }`;
 	return (
 		<fieldset className="components-font-size-picker">
 			<legend className="screen-reader-text">
@@ -116,13 +116,13 @@ export default function FontSizePicker( {
 					/>
 				) }
 				{ ! withSlider && ! disableCustomFontSizes && (
-					<div className="components-range-control__number-container">
-						<label htmlFor={ rangeControlNumberId }>
+					<div className="components-font-size-picker__number-container">
+						<label htmlFor={ fontSizePickerNumberId }>
 							{ __( 'Custom' ) }
 						</label>
 						<input
-							id={ rangeControlNumberId }
-							className="components-range-control__number"
+							id={ fontSizePickerNumberId }
+							className="components-font-size-picker__number"
 							type="number"
 							onChange={ onChangeValue }
 							aria-label={ __( 'Custom' ) }
