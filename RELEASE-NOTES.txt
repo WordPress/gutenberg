@@ -1,6 +1,7 @@
 1.23.0
 ------
 * New block: Group
+* Add support for upload options in Gallery block
 
 1.22.0
 ------
