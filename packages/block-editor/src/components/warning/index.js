@@ -34,7 +34,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 								position="bottom left"
 								renderToggle={ ( { isOpen, onToggle } ) => (
 									<Button
-										icon="ellipsis"
+										icon={ moreHorizontal }
 										label={ __( 'More options' ) }
 										onClick={ onToggle }
 										aria-expanded={ isOpen }

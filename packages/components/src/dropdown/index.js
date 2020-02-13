@@ -104,7 +104,11 @@ class Dropdown extends Component {
 						headerTitle={ headerTitle }
 						focusOnMount={ focusOnMount }
 						{ ...popoverProps }
-						className={ classnames( 'components-dropdown__content', popoverProps ? popoverProps.className : undefined, contentClassName ) }
+						className={ classnames(
+							'components-dropdown__content',
+							popoverProps ? popoverProps.className : undefined,
+							contentClassName
+						) }
 					>
 						{ renderContent( args ) }
 					</Popover>

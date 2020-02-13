@@ -17,8 +17,8 @@ $block-editor-link-control-number-of-actions: 1;
 	&.block-editor-link-control__search-input input[type="text"] {
 		width: calc(100% - #{$grid-unit-20*2});
 		display: block;
-		padding-right: ( $icon-button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
 		padding: 11px $grid-unit-20;
+		padding-right: ( $icon-button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
 		margin: $grid-unit-20;
 		position: relative;
 		border: 1px solid $light-gray-500;
