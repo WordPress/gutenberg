@@ -52,8 +52,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 	];
 
 	// Set the default ports based on the config values.
-	const mainPort = `\${WP_ENV_PORT:-${ config.portNumber }}:80`;
-	const testsPort = `\${WP_ENV_TESTS_PORT:-${ config.testsPortNumber }}:80`;
+	const mainPort = `\${WP_ENV_PORT:-${ config.port }}:80`;
+	const testsPort = `\${WP_ENV_TESTS_PORT:-${ config.testsPort }}:80`;
 
 	return {
 		version: '3.7',

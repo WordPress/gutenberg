@@ -35,8 +35,8 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @property {Source|null} coreSource The WordPress installation to load in the environment.
  * @property {Source[]} pluginSources Plugins to load in the environment.
  * @property {Source[]} themeSources Themes to load in the environment.
- * @property {number} portNumber The port on which to start the main WordPress environment.
- * @property {number} testsPortNumber The port on which to start the tests WordPress environment.
+ * @property {number} port The port on which to start the main WordPress environment.
+ * @property {number} testsPort The port on which to start the tests WordPress environment.
  */
 
 /**
@@ -98,8 +98,8 @@ module.exports = {
 				core: null,
 				plugins: [],
 				themes: [],
-				portNumber: 8888,
-				testsPortNumber: 8889,
+				port: 8888,
+				testsPort: 8889,
 			},
 			config
 		);
@@ -128,21 +128,21 @@ module.exports = {
 			);
 		}
 
-		if ( ! Number.isInteger( config.portNumber ) ) {
+		if ( ! Number.isInteger( config.port ) ) {
 			throw new ValidationError(
-				'Invalid .wp-env.json: "portNumber" must be an integer.'
+				'Invalid .wp-env.json: "port" must be an integer.'
 			);
 		}
 
-		if ( ! Number.isInteger( config.testsPortNumber ) ) {
+		if ( ! Number.isInteger( config.testsPort ) ) {
 			throw new ValidationError(
-				'Invalid .wp-env.json: "testsPortNumber" must be an integer.'
+				'Invalid .wp-env.json: "testsPort" must be an integer.'
 			);
 		}
 
-		if ( config.testsPortNumber === config.portNumber ) {
+		if ( config.port === config.testsPort ) {
 			throw new ValidationError(
-				'Invalid .wp-env.json: "testsPortNumber" and "portNumber" must be different.'
+				'Invalid .wp-env.json: "testsPort" and "port" must be different.'
 			);
 		}
 
@@ -156,8 +156,8 @@ module.exports = {
 			name: path.basename( configDirectoryPath ),
 			configDirectoryPath,
 			workDirectoryPath,
-			portNumber: config.portNumber,
-			testsPortNumber: config.testsPortNumber,
+			port: config.port,
+			testsPort: config.testsPort,
 			dockerComposeConfigPath: path.resolve(
 				workDirectoryPath,
 				'docker-compose.yml'
