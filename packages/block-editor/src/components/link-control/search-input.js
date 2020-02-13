@@ -78,17 +78,6 @@ const LinkControlSearchInput = ( {
 						className="block-editor-link-control__search-submit"
 					/>
 				</div>
-				<div role="alert" aria-live="assertive">
-					{ errorMessage && (
-						<Notice
-							className="block-editor-link-control__search-error"
-							status="error"
-							isDismissible={ false }
-						>
-							{ errorMessage }
-						</Notice>
-					) }
-				</div>
 			</div>
 
 			{ errorMessage && (
