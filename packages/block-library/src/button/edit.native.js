@@ -254,7 +254,7 @@ class ButtonEdit extends Component {
 				/>
 				<TextControl
 					icon={ ! isCompatibleWithSettings && LinkRelIcon }
-					label={ __( 'Link rel' ) }
+					label={ __( 'Link Rel' ) }
 					value={ rel || '' }
 					valuePlaceholder={ __( 'None' ) }
 					onChange={ this.onChangeLinkRel }
