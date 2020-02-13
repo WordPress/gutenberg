@@ -259,7 +259,7 @@ This is useful for integration testing: that is, testing how old versions of Wor
 
 #### Custom Port Numbers
 
-A custom port number so that your installation ports do not conflict with other wp-env instances.
+You can tell `wp-env` to use a custom port number so that your instance does not conflict with other `wp-env` instances.
 
 ```json
 {
