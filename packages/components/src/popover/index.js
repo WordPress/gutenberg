@@ -324,6 +324,13 @@ const Popover = ( {
 				setStyle( containerRef.current, 'position' );
 			}
 
+			let boundaryElement;
+			if ( __unstableBoundaryParent ) {
+				boundaryElement = containerRef.current.closest(
+					'.popover-slot'
+				).parentNode;
+			}
+
 			const {
 				popoverTop,
 				popoverLeft,
@@ -337,7 +344,8 @@ const Popover = ( {
 				position,
 				__unstableSticky,
 				containerRef.current,
-				relativeOffsetTop
+				relativeOffsetTop,
+				boundaryElement
 			);
 
 			if (
