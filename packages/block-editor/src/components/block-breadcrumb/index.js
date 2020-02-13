@@ -53,9 +53,7 @@ const BlockBreadcrumb = function() {
 				aria-current={ ! hasSelection ? 'true' : undefined }
 			>
 				{ hasSelection && (
-					<BlockBreadcrumbButton
-						onClick={ clearSelectedBlock }
-					>
+					<BlockBreadcrumbButton onClick={ clearSelectedBlock }>
 						{ __( 'Document' ) }
 					</BlockBreadcrumbButton>
 				) }
