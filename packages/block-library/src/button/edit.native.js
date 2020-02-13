@@ -51,23 +51,24 @@ class ButtonEdit extends Component {
 		this.onChangeOpenInNewTab = this.onChangeOpenInNewTab.bind( this );
 		this.onChangeURL = this.onChangeURL.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
-		this.onContainerLayout = this.onContainerLayout.bind( this );
+		this.onLayout = this.onLayout.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
+		this.setRef = this.setRef.bind( this );
 
 		// `isEditingURL` property is used to prevent from automatically pasting
 		// URL from clipboard while trying to clear `Button URL` field and then
 		// manually adding specific link
 		this.isEditingURL = false;
 
-		const shouldFocusButton =
+		const isButtonFocused =
 			Platform.OS === 'ios' ? ! props.hasParents : true;
 
 		this.state = {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
-			isButtonFocused: shouldFocusButton,
+			isButtonFocused,
 		};
 	}
 
@@ -219,7 +220,7 @@ class ButtonEdit extends Component {
 		this.setState( { isLinkSheetVisible: false } );
 	}
 
-	onContainerLayout( { nativeEvent } ) {
+	onLayout( { nativeEvent } ) {
 		const { width } = nativeEvent.layout;
 		const { marginRight } = styles.button;
 		const buttonSpacing = 2 * marginRight;
@@ -268,6 +269,10 @@ class ButtonEdit extends Component {
 		);
 	}
 
+	setRef( richText ) {
+		this.richTextRef = richText;
+	}
+
 	render() {
 		const {
 			attributes,
@@ -312,11 +317,13 @@ class ButtonEdit extends Component {
 				? ''
 				: placeholder || __( 'Add text…' );
 
+		const backgroundColor = this.getBackgroundColor();
+
 		return (
-			<View style={ { flex: 1 } } onLayout={ this.onContainerLayout }>
+			<View style={ styles.container } onLayout={ this.onLayout }>
 				<ColorBackground
 					borderRadiusValue={ borderRadiusValue }
-					backgroundColor={ this.getBackgroundColor() }
+					backgroundColor={ backgroundColor }
 					isSelected={ isSelected }
 				>
 					{ isSelected && (
@@ -327,15 +334,13 @@ class ButtonEdit extends Component {
 								{
 									borderRadius: outlineBorderRadius,
 									borderWidth: styles.button.borderWidth,
-									borderColor: this.getBackgroundColor(),
+									borderColor: backgroundColor,
 								},
 							] }
 						/>
 					) }
 					<RichText
-						setRef={ ( richText ) => {
-							this.richTextRef = richText;
-						} }
+						setRef={ this.setRef }
 						placeholder={ placeholderText }
 						value={ text }
 						onChange={ this.onChangeText }
