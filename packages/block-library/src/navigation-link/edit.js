@@ -370,7 +370,6 @@ export default compose( [
 			showSubmenuIcon,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,
-			navigationBlockAttributes,
 			userCanCreatePages,
 			rgbTextColor: getColorObjectByColorSlug(
 				colors,
