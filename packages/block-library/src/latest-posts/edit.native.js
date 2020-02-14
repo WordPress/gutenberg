@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { Component } from '@wordpress/element';
 import { View, Text } from 'react-native';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { __ } from '@wordpress/i18n';
