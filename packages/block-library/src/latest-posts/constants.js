@@ -1,0 +1,9 @@
+export const DEFAULT_SHOW_POST_CONTENT = false;
+export const DEFAULT_POST_CONTENT_RADIO = 'excerpt';
+export const DEFAULT_DISPLAY_POST_DATE = false;
+export const DEFAULT_EXCERPT_LENGTH = 55;
+export const MIN_EXCERPT_LENGTH = 10;
+export const MAX_EXCERPT_LENGTH = 100;
+export const DEFAULT_POSTS_TO_SHOW = 5;
+export const MIN_POSTS_TO_SHOW = 1;
+export const MAX_POSTS_TO_SHOW = 100;

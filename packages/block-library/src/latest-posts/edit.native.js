@@ -16,12 +16,23 @@ import {
 	PanelBody,
 	PanelActions,
 	ToggleControl,
+	SelectControl,
+	RangeControl,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
+import {
+	DEFAULT_SHOW_POST_CONTENT,
+	DEFAULT_POST_CONTENT_RADIO,
+	DEFAULT_DISPLAY_POST_DATE,
+	DEFAULT_EXCERPT_LENGTH,
+	MIN_EXCERPT_LENGTH,
+	MAX_EXCERPT_LENGTH,
+	DEFAULT_POSTS_TO_SHOW,
+} from './constants';
 
 const LatestPostsEdit = ( {
 	attributes,
@@ -29,9 +40,22 @@ const LatestPostsEdit = ( {
 	getStylesFromColorScheme,
 	name,
 } ) => {
+	const blockType = coreBlocks[ name ];
+
+	const {
+		displayPostContent,
+		displayPostContentRadio,
+		excerptLength,
+		displayPostDate,
+	} = attributes;
+
 	const onClearSettings = () => {
 		setAttributes( {
-			displayPostContent: attributes.displayPostContent.default,
+			excerptLength: DEFAULT_EXCERPT_LENGTH,
+			displayPostContent: DEFAULT_SHOW_POST_CONTENT,
+			displayPostContentRadio: DEFAULT_POST_CONTENT_RADIO,
+			displayPostDate: DEFAULT_DISPLAY_POST_DATE,
+			postsToShow: DEFAULT_POSTS_TO_SHOW,
 		} );
 	};
 
@@ -39,9 +63,17 @@ const LatestPostsEdit = ( {
 		setAttributes( { displayPostContent: value } );
 	};
 
-	const blockType = coreBlocks[ name ];
+	const onSetDisplayPostContentRadio = ( value ) => {
+		setAttributes( { displayPostContentRadio: value } );
+	};
 
-	const { displayPostContent } = attributes;
+	const onSetExcerptLength = ( value ) => {
+		setAttributes( { excerptLength: value } );
+	};
+
+	const onSetDisplayPostDate = ( value ) => {
+		setAttributes( { displayPostDate: value } );
+	};
 
 	const actions = [
 		{
@@ -52,13 +84,46 @@ const LatestPostsEdit = ( {
 
 	const getInspectorControls = () => (
 		<InspectorControls>
-			<PanelBody title={ __( 'Latest posts settings' ) }>
+			<PanelBody title={ __( 'Post meta settings' ) }>
+				<ToggleControl
+					label={ __( 'Display post date' ) }
+					checked={ displayPostDate }
+					onChange={ onSetDisplayPostDate }
+				/>
+			</PanelBody>
+
+			<PanelBody title={ __( 'Post Content Settings' ) }>
 				<ToggleControl
 					label={ __( 'Show Post Content' ) }
 					checked={ displayPostContent }
 					onChange={ onSetDisplayPostContent }
 				/>
+				{ displayPostContent && (
+					<SelectControl
+						label={ __( 'Show' ) }
+						value={ displayPostContentRadio }
+						onChangeValue={ onSetDisplayPostContentRadio }
+						options={ [
+							{ label: __( 'Excerpt' ), value: 'excerpt' },
+							{
+								label: __( 'Full Post' ),
+								value: 'full_post',
+							},
+						] }
+					/>
+				) }
+				{ displayPostContent &&
+					displayPostContentRadio === 'excerpt' && (
+						<RangeControl
+							label={ __( 'Max number of words in excerpt' ) }
+							value={ excerptLength }
+							onChange={ onSetExcerptLength }
+							min={ MIN_EXCERPT_LENGTH }
+							max={ MAX_EXCERPT_LENGTH }
+						/>
+					) }
 			</PanelBody>
+
 			<PanelActions actions={ actions } />
 		</InspectorControls>
 	);
