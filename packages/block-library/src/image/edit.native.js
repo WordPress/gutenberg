@@ -78,6 +78,8 @@ const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
 };
 
+const isFileUrl = ( url ) => url && url.startsWith( 'file:' );
+
 export class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
@@ -123,7 +125,7 @@ export class ImageEdit extends React.Component {
 		if (
 			! attributes.id &&
 			attributes.url &&
-			attributes.url.indexOf( 'file:' ) === 0
+			isFileUrl( attributes.url )
 		) {
 			requestMediaImport( attributes.url, ( id, url ) => {
 				if ( url ) {
@@ -658,13 +660,14 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
 		const {
-			attributes: { id },
+			attributes: { id, url },
 			isSelected,
 		} = props;
 		const { imageSizes } = getSettings();
 
+		const shouldGetMedia = id && isSelected && ! isFileUrl( url );
 		return {
-			image: id && isSelected ? getMedia( id ) : null,
+			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
 		};
 	} ),
