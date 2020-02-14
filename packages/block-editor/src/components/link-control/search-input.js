@@ -73,7 +73,6 @@ const LinkControlSearchInput = ( {
 					className="block-editor-link-control__search-error"
 					status="error"
 					isDismissible={ false }
-					politeness="assertive"
 				>
 					{ errorMessage }
 				</Notice>
