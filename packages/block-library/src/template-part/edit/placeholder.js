@@ -8,6 +8,7 @@ import { useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
 import { Placeholder, TextControl, Button } from '@wordpress/components';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -94,7 +95,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 	}, [ postId, slug, theme ] );
 	return (
 		<Placeholder
-			icon="layout"
+			icon={ layout }
 			label={ __( 'Template Part' ) }
 			instructions={ __(
 				'Choose a template part by slug and theme, or create a new one.'

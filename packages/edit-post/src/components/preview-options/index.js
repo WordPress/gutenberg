@@ -13,6 +13,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PostPreviewButton } from '@wordpress/editor';
 import { __, _x } from '@wordpress/i18n';
+import { external } from '@wordpress/icons';
 
 const downArrow = (
 	<SVG
@@ -104,7 +105,7 @@ export default function PreviewOptions( {
 								textContent={ __( 'Preview externally' ) }
 							/>
 							<Icon
-								icon="external"
+								icon={ external }
 								className="editor-post-preview__icon-external"
 							/>
 						</div>

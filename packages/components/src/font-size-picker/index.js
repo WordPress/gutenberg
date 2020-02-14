@@ -4,6 +4,7 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
+import { textColor } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -149,8 +150,8 @@ export default function FontSizePicker( {
 					onChange={ onSliderChangeValue }
 					min={ 12 }
 					max={ 100 }
-					beforeIcon="editor-textcolor"
-					afterIcon="editor-textcolor"
+					beforeIcon={ textColor }
+					afterIcon={ textColor }
 				/>
 			) }
 		</fieldset>
