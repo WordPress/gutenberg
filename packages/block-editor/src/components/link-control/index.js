@@ -276,7 +276,9 @@ function LinkControl( {
 		return maybeURL( val )
 			? results
 			: results.concat( {
-					id: val,
+					// the `id` prop is intentionally ommitted here because it
+					// is never exposed as part of the component's public API.
+					// see: https://github.com/WordPress/gutenberg/pull/19775#discussion_r378931316.
 					title: val, // must match the existing `<input>`s text value
 					url: val, // must match the existing `<input>`s text value
 					type: CREATE_TYPE,
@@ -442,7 +444,10 @@ function LinkControl( {
 											setIsEditingLink( true );
 										}
 									} }
-									key={ `${ suggestion.id }-${ suggestion.type }` }
+									// Intentionally only using `type` here as
+									// the constant is enough to uniquely
+									// identify the single "CREATE" suggestion.
+									key={ suggestion.type }
 									itemProps={ buildSuggestionItemProps(
 										suggestion,
 										index
