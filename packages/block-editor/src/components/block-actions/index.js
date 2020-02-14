@@ -51,7 +51,8 @@ export default compose( [
 			return (
 				!! block &&
 				hasBlockSupport( block.name, 'multiple', true ) &&
-				canInsertBlockType( block.name, rootClientId )
+				canInsertBlockType( block.name, rootClientId ) &&
+				hasBlockSupport( block.name, 'duplicate', true )
 			);
 		} );
 
