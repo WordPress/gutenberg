@@ -74,6 +74,10 @@ export default function useSimulatedMediaQuery( marker, width ) {
 				++ruleIndex
 			) {
 				const rule = styleSheet.cssRules[ ruleIndex ];
+				if ( rule.type !== window.CSSRule.STYLE_RULE ) {
+					continue;
+				}
+
 				if (
 					! relevantSection &&
 					!! rule.cssText.match( new RegExp( `#start-${ marker }` ) )
