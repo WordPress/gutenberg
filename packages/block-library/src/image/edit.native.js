@@ -404,8 +404,7 @@ export class ImageEdit extends React.Component {
 						checked={ linkTarget === '_blank' }
 						onChange={ this.onSetNewTab }
 					/>
-					{ // eslint-disable-next-line no-undef
-					image && sizeOptionsValid && __DEV__ && (
+					{ image && sizeOptionsValid && (
 						<CycleSelectControl
 							icon={ 'editor-expand' }
 							label={ __( 'Size' ) }

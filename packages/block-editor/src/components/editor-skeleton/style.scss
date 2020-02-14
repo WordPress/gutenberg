@@ -1,6 +1,6 @@
 // On Mobile devices, swiping the HTML element should not scroll.
 // By making it fixed, we prevent that.
-html {
+html.block-editor-editor-skeleton__html-container {
 	position: fixed;
 	width: 100%;
 

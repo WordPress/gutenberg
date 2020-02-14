@@ -49,7 +49,6 @@ const LinkControlSearchInput = ( {
 					className="block-editor-link-control__search-input"
 					value={ value }
 					onChange={ selectItemHandler }
-					onFocus={ selectItemHandler }
 					placeholder={ __( 'Search or type url' ) }
 					__experimentalRenderSuggestions={ renderSuggestions }
 					__experimentalFetchLinkSuggestions={ fetchSuggestions }
