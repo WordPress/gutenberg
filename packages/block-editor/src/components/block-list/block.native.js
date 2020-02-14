@@ -143,9 +143,6 @@ class BlockListBlock extends Component {
 					styles.dashedBorderColor,
 					styles.dashedBorderColorDark
 				),
-				...( ! hasChildren &&
-					this.props.name === 'core/column' &&
-					styles.alternatePlaceholderStyle ),
 			};
 
 			// return apply childOfSelected or childOfSelectedLeaf
@@ -155,7 +152,8 @@ class BlockListBlock extends Component {
 					? styles.childOfSelected
 					: styles.childOfSelectedLeaf ),
 				...dashedBorderStyle,
-				...( ! isLastBlock && styles.marginVerticalChild ),
+				...( ( ! isLastBlock || this.props.name === 'core/column' ) &&
+					styles.marginVerticalChild ),
 			};
 		}
 
@@ -177,13 +175,14 @@ class BlockListBlock extends Component {
 	}
 
 	applyBlockStyle() {
-		const { isSelected, isDimmed } = this.props;
+		const { isSelected, isDimmed, name } = this.props;
 
 		return [
 			isSelected
 				? this.applySelectedBlockStyle()
 				: this.applyUnSelectedBlockStyle(),
 			isDimmed && styles.dimmed,
+			name === 'core/column' && { flex: 1 },
 		];
 	}
 

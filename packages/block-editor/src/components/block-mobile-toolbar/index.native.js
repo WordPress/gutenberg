@@ -19,7 +19,7 @@ import styles from './style.scss';
 import BlockMover from '../block-mover';
 import { BlockSettingsButton } from '../block-settings';
 
-const BlockMobileToolbar = ( { clientId, onDelete, order } ) => (
+const BlockMobileToolbar = ( { clientId, onDelete, order, hideDelete } ) => (
 	<View style={ styles.toolbar }>
 		<BlockMover clientIds={ [ clientId ] } />
 
@@ -27,25 +27,31 @@ const BlockMobileToolbar = ( { clientId, onDelete, order } ) => (
 
 		<BlockSettingsButton.Slot />
 
-		<ToolbarButton
-			title={ sprintf(
-				/* translators: accessibility text. %s: current block position (number). */
-				__( 'Remove block at row %s' ),
-				order + 1
-			) }
-			onClick={ onDelete }
-			icon={ trash }
-			extraProps={ { hint: __( 'Double tap to remove the block' ) } }
-		/>
+		{ ! hideDelete && (
+			<ToolbarButton
+				title={ sprintf(
+					/* translators: accessibility text. %s: current block position (number). */
+					__( 'Remove block at row %s' ),
+					order + 1
+				) }
+				onClick={ onDelete }
+				icon={ trash }
+				extraProps={ { hint: __( 'Double tap to remove the block' ) } }
+			/>
+		) }
 	</View>
 );
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockIndex } = select( 'core/block-editor' );
+		const { getBlockIndex, __unstableGetBlockWithoutInnerBlocks } = select(
+			'core/block-editor'
+		);
+		const { name } = __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 
 		return {
 			order: getBlockIndex( clientId ),
+			hideDelete: name === 'core/column',
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId } ) => {

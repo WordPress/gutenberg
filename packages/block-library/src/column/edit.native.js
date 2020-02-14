@@ -73,7 +73,7 @@ function ColumnEdit( {
 		] = pullWidths( names );
 
 		if ( isParentSelected ) {
-			width -= parentSelected;
+			width -= placeholder ? placeholderSelected : parentSelected;
 			return { width };
 		}
 
@@ -136,12 +136,33 @@ function ColumnEdit( {
 			</BlockControls>
 			<View style={ applyBlockStyle() }>
 				<InnerBlocks
+					flatListProps={ {
+						scrollEnabled: false,
+					} }
 					renderAppender={
 						isSelected && InnerBlocks.ButtonBlockAppender
 					}
 				/>
 			</View>
 		</>
+	);
+}
+
+function ColumnEditWrapper( props ) {
+	const { verticalAlignment } = props.attributes;
+
+	const getVerticalAlignmentRemap = ( alignment ) => {
+		if ( ! alignment ) return styles.flexBase;
+		return {
+			...styles.flexBase,
+			...styles[ `is-vertically-aligned-${ alignment }` ],
+		};
+	};
+
+	return (
+		<View style={ getVerticalAlignmentRemap( verticalAlignment ) }>
+			<ColumnEdit { ...props } />
+		</View>
 	);
 }
 
@@ -183,4 +204,4 @@ export default compose( [
 	} ),
 	withViewportMatch( { isMobile: '< mobile' } ),
 	withPreferredColorScheme,
-] )( ColumnEdit );
+] )( ColumnEditWrapper );

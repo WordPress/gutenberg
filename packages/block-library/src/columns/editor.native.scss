@@ -29,15 +29,3 @@
 	max-width: $content-width;
 	overflow: hidden;
 }
-
-.is-vertically-aligned-top {
-	justify-content: flex-start;
-}
-
-.is-vertically-aligned-center {
-	justify-content: center;
-}
-
-.is-vertically-aligned-bottom {
-	justify-content: flex-end;
-}
