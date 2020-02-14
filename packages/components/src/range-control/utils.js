@@ -36,7 +36,7 @@ export function useControlledRangeValue( { min, max, value: valueProp = 0 } ) {
 			setValue( valueProp );
 			valueRef.current = valueProp;
 		}
-	}, [ valueRef, valueProp, setValue ] );
+	}, [ valueProp, setValue ] );
 
 	return [ value, setValue ];
 }
