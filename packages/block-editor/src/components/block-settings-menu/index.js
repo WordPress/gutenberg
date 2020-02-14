@@ -30,7 +30,7 @@ import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
-import __experimentalBlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
+import BlockSettingsMenuGroup from '../block-settings-menu-group';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -140,10 +140,10 @@ export function BlockSettingsMenu( { clientIds } ) {
 											onToggle={ onClose }
 										/>
 									) }
-									<__experimentalBlockSettingsMenuPluginsExtension.Slot
-										fillProps={ { clientIds, onClose } }
-									/>
 								</MenuGroup>
+								<BlockSettingsMenuGroup.Slot
+									fillProps={ { onClose } }
+								/>
 								<MenuGroup>
 									{ ! isLocked && (
 										<MenuItem

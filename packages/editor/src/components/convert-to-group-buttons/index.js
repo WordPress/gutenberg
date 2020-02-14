@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
-import { __experimentalBlockSettingsMenuPluginsExtension } from '@wordpress/block-editor';
+import { BlockSettingsMenuGroup } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -12,7 +12,7 @@ import ConvertToGroupButton from './convert-button';
 
 function ConvertToGroupButtons( { clientIds } ) {
 	return (
-		<__experimentalBlockSettingsMenuPluginsExtension>
+		<BlockSettingsMenuGroup>
 			{ ( { onClose } ) => (
 				<Fragment>
 					<ConvertToGroupButton
@@ -21,7 +21,7 @@ function ConvertToGroupButtons( { clientIds } ) {
 					/>
 				</Fragment>
 			) }
-		</__experimentalBlockSettingsMenuPluginsExtension>
+		</BlockSettingsMenuGroup>
 	);
 }
 

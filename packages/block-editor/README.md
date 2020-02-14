@@ -158,6 +158,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="BlockSettingsMenuGroup" href="#BlockSettingsMenuGroup">#</a> **BlockSettingsMenuGroup**
+
+Undocumented declaration.
+
 <a name="BlockTitle" href="#BlockTitle">#</a> **BlockTitle**
 
 Undocumented declaration.
