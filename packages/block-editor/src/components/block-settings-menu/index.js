@@ -14,7 +14,12 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { trash, moreHorizontal } from '@wordpress/icons';
+import {
+	trash,
+	moreHorizontal,
+	insertAfter,
+	insertBefore,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -107,7 +112,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 													onClose,
 													onInsertBefore
 												) }
-												icon="insert-before"
+												icon={ insertBefore }
 												shortcut={
 													shortcuts.insertBefore
 												}
@@ -119,7 +124,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 													onClose,
 													onInsertAfter
 												) }
-												icon="insert-after"
+												icon={ insertAfter }
 												shortcut={
 													shortcuts.insertAfter
 												}

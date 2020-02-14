@@ -152,6 +152,14 @@ If this property is true, a button to reset the the slider is rendered.
 - Required: No
 - Platform: Web | Mobile
 
+#### disabled
+
+Disables the `input`, preventing new values from being applied.
+
+- Type: `Boolean`
+- Required: No
+- Platform: Web
+
 #### initialPosition
 
 If no value exists this prop contains the slider starting position.
@@ -160,13 +168,41 @@ If no value exists this prop contains the slider starting position.
 - Required: No
 - Platform: Web | Mobile
 
-#### value
 
-The current value of the range slider.
+#### marks
 
-- Type: `Number`
-- Required: Yes
-- Platform: Web | Mobile
+Renders a visual representation of `step` ticks. Custom mark indicators can be provided by an `Array`.
+
+Example:
+
+```jsx
+const marks = [
+	{
+		value: 0,
+		label: '0',
+	},
+	{
+		value: 1,
+		label: '1',
+	},
+	{
+		value: 8,
+		label: '8',
+	},
+	{
+		value: 10,
+		label: '10',
+	},
+];
+
+const MyRangeControl() {
+	return (<RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } />)
+}
+```
+
+- Type: `Array|Boolean`
+- Required: No
+- Platform: Web
 
 #### onChange
 
@@ -192,6 +228,54 @@ The maximum value accepted. If higher values are inserted onChange will not be c
 - Type: `Number`
 - Required: No
 - Platform: Web | Mobile
+
+#### renderTooltipContent
+
+A way to customize the rendered UI of the value. Example:
+
+```jsx
+const customTooltipContent = value => `${value}%`
+
+const MyRangeControl() {
+	return (<RangeControl renderTooltipContent={ customTooltipContent } />)
+}
+```
+
+- Type: `Function`
+- Required: No
+- Platform: Web
+
+#### showTooltip
+
+Forcing the Tooltip UI to show or hide.
+
+- Type: `Boolean`
+- Required: No
+- Platform: Web
+
+#### step
+
+The stepping interval between `min` and `max` values. Step is used both for user interface and validation purposes.
+
+- Type: `Number`
+- Required: No
+- Platform: Web
+
+#### value
+
+The current value of the range slider.
+
+- Type: `Number`
+- Required: Yes
+- Platform: Web | Mobile
+
+#### withInputField
+
+Determines if the `input` number field will render next to the RangeControl.
+
+- Type: `Boolean`
+- Required: No
+- Platform: Web
 
 #### icon
 
