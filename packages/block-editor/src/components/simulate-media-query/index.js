@@ -75,7 +75,10 @@ export default function useSimulatedMediaQuery( marker, width ) {
 				++ruleIndex
 			) {
 				const rule = styleSheet.cssRules[ ruleIndex ];
-				if ( rule.type !== window.CSSRule.STYLE_RULE ) {
+				if (
+					rule.type !== window.CSSRule.STYLE_RULE &&
+					rule.type !== window.CSSRule.MEDIA_RULE
+				) {
 					continue;
 				}
 
