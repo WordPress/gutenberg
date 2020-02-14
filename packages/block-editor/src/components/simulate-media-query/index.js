@@ -15,9 +15,9 @@ const DISABLED_MEDIA_QUERY = '(min-width:999999px)';
 const VALID_MEDIA_QUERY_REGEX = /\((min|max)-width:[^\(]*?\)/g;
 
 function getStyleSheetsThatMatchHostname() {
-	if ( ! window ) {
-		return;
+	if ( typeof window === 'undefined' ) {
 	}
+
 	return filter(
 		get( window, [ 'document', 'styleSheets' ], [] ),
 		( styleSheet ) => {
