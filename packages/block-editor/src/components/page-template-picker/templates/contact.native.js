@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 const Contact = {
 	// translators: title for "Contact" page template
 	name: __( 'Contact' ),
-	icon: '✉️',
+	icon: '✉',
 	content: [
 		{
 			name: 'core/paragraph',

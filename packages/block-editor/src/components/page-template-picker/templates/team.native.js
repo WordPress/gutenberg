@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 const Team = {
 	// translators: title for "Team" page template
 	name: __( 'Team' ),
-	icon: '👩🏻‍💻',
+	icon: '👥',
 	content: [
 		{
 			name: 'core/paragraph',
