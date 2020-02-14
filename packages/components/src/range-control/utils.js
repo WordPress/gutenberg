@@ -84,6 +84,12 @@ export function useDebouncedHoverInteraction( {
 		} );
 	}, [] );
 
+	useEffect( () => {
+		return () => {
+			window.clearTimeout( timeoutRef.current );
+		};
+	} );
+
 	return {
 		onMouseEnter: handleOnMouseEnter,
 		onMouseLeave: handleOnMouseLeave,
