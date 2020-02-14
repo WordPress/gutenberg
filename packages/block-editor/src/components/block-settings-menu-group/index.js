@@ -36,5 +36,8 @@ const BlockSettingsMenuGroupSlot = ( { fillProps } ) => {
 };
 
 BlockSettingsMenuGroup.Slot = BlockSettingsMenuGroupSlot;
-
+/**
+ * SlotFill component that offers a hook
+ * into the BlockSettingsMenu.
+ */
 export default BlockSettingsMenuGroup;
