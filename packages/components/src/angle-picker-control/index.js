@@ -55,7 +55,7 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 		<div
 			ref={ angleCircleRef }
 			onMouseDown={ startDrag }
-			className="components-angle-picker__angle-circle"
+			className="components-angle-picker-control__angle-circle"
 			style={ isDragging ? { cursor: 'grabbing' } : undefined }
 			{ ...props }
 		>
@@ -63,27 +63,27 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 				style={
 					value ? { transform: `rotate(${ value }deg)` } : undefined
 				}
-				className="components-angle-picker__angle-circle-indicator-wrapper"
+				className="components-angle-picker-control__angle-circle-indicator-wrapper"
 			>
-				<span className="components-angle-picker__angle-circle-indicator" />
+				<span className="components-angle-picker-control__angle-circle-indicator" />
 			</div>
 		</div>
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	);
 };
 
-export default function AnglePicker( {
+export default function AnglePickerControl( {
 	value,
 	onChange,
 	label = __( 'Angle' ),
 } ) {
-	const instanceId = useInstanceId( AnglePicker );
-	const inputId = `components-angle-picker__input-${ instanceId }`;
+	const instanceId = useInstanceId( AnglePickerControl );
+	const inputId = `components-angle-picker-control__input-${ instanceId }`;
 	return (
 		<BaseControl
 			label={ label }
 			id={ inputId }
-			className="components-angle-picker"
+			className="components-angle-picker-control"
 		>
 			<AngleCircle
 				value={ value }
@@ -91,7 +91,7 @@ export default function AnglePicker( {
 				aria-hidden="true"
 			/>
 			<input
-				className="components-angle-picker__input-field"
+				className="components-angle-picker-control__input-field"
 				type="number"
 				id={ inputId }
 				onChange={ ( event ) => {

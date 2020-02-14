@@ -51,6 +51,10 @@ module.exports = function buildDockerComposeConfig( config ) {
 		...themeMounts,
 	];
 
+	// Set the default ports based on the config values.
+	const developmentPorts = `\${WP_ENV_PORT:-${ config.port }}:80`;
+	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.testsPort }}:80`;
+
 	return {
 		version: '3.7',
 		services: {
@@ -63,7 +67,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			wordpress: {
 				depends_on: [ 'mysql' ],
 				image: 'wordpress',
-				ports: [ '${WP_ENV_PORT:-8888}:80' ],
+				ports: [ developmentPorts ],
 				environment: {
 					WORDPRESS_DEBUG: '1',
 					WORDPRESS_DB_NAME: 'wordpress',
@@ -73,7 +77,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			'tests-wordpress': {
 				depends_on: [ 'mysql' ],
 				image: 'wordpress',
-				ports: [ '${WP_ENV_TESTS_PORT:-8889}:80' ],
+				ports: [ testsPorts ],
 				environment: {
 					WORDPRESS_DEBUG: '1',
 					WORDPRESS_DB_NAME: 'tests-wordpress',

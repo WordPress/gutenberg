@@ -125,7 +125,6 @@ class InnerBlocks extends Component {
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
 						withFooter={ false }
-						isFullyBordered={ true }
 						containerStyle={ containerStyle }
 						flatListProps={ flatListProps }
 					/>

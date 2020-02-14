@@ -38,7 +38,7 @@ const LinkControlSettingsDrawer = ( {
 			key={ setting.id }
 			label={ setting.title }
 			onChange={ handleSettingChange( setting ) }
-			checked={ value ? value[ setting.id ] : false }
+			checked={ value ? !! value[ setting.id ] : false }
 		/>
 	) );
 

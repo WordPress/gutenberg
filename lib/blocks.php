@@ -17,26 +17,28 @@ function gutenberg_reregister_core_block_types() {
 	}
 
 	$block_names = array(
-		'archives.php'        => 'core/archives',
-		'block.php'           => 'core/block',
-		'calendar.php'        => 'core/calendar',
-		'categories.php'      => 'core/categories',
-		'latest-comments.php' => 'core/latest-comments',
-		'latest-posts.php'    => 'core/latest-posts',
-		'legacy-widget.php'   => 'core/legacy-widget',
-		'navigation.php'      => 'core/navigation',
-		'rss.php'             => 'core/rss',
-		'shortcode.php'       => 'core/shortcode',
-		'search.php'          => 'core/search',
-		'social-link.php'     => 'core/social-link',
-		'tag-cloud.php'       => 'core/tag-cloud',
-		'site-title.php'      => 'core/site-title',
-		'template-part.php'   => 'core/template-part',
-		'post-title.php'      => 'core/post-title',
-		'post-content.php'    => 'core/post-content',
-		'post-author.php'     => 'core/post-author',
-		'post-date.php'       => 'core/post-date',
-		'post-excerpt.php'    => 'core/post-excerpt',
+		'archives.php'            => 'core/archives',
+		'block.php'               => 'core/block',
+		'calendar.php'            => 'core/calendar',
+		'categories.php'          => 'core/categories',
+		'latest-comments.php'     => 'core/latest-comments',
+		'latest-posts.php'        => 'core/latest-posts',
+		'legacy-widget.php'       => 'core/legacy-widget',
+		'navigation.php'          => 'core/navigation',
+		'rss.php'                 => 'core/rss',
+		'shortcode.php'           => 'core/shortcode',
+		'search.php'              => 'core/search',
+		'social-link.php'         => 'core/social-link',
+		'tag-cloud.php'           => 'core/tag-cloud',
+		'site-title.php'          => 'core/site-title',
+		'template-part.php'       => 'core/template-part',
+		'post-title.php'          => 'core/post-title',
+		'post-content.php'        => 'core/post-content',
+		'post-author.php'         => 'core/post-author',
+		'post-comments-count.php' => 'core/post-comments-count',
+		'post-comments-form.php'  => 'core/post-comments-form',
+		'post-date.php'           => 'core/post-date',
+		'post-excerpt.php'        => 'core/post-excerpt',
 	);
 
 	$registry = WP_Block_Type_Registry::get_instance();
@@ -137,7 +139,7 @@ function gutenberg_register_legacy_social_link_blocks() {
 						'type' => 'string',
 					),
 				),
-				'render_callback' => 'gutenberg_render_core_social_link',
+				'render_callback' => 'gutenberg_render_block_core_social_link',
 			)
 		);
 	}

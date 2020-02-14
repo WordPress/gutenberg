@@ -17,16 +17,16 @@ import {
 	requestImageFullscreenPreview,
 	showMediaEditorButton,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty, map, get } from 'lodash';
+import { isEmpty, get, find, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import {
+	CycleSelectControl,
 	Icon,
 	PanelBody,
 	PanelActions,
-	SelectControl,
 	TextControl,
 	ToggleControl,
 	ToolbarButton,
@@ -48,7 +48,7 @@ import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { link, image as icon } from '@wordpress/icons';
+import { external, link, image as icon, textColor } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -59,28 +59,17 @@ import SvgIconRetry from './icon-retry';
 import SvgIconCustomize from './icon-customize';
 import { getUpdatedLinkTargetSettings } from './utils';
 
-import { LINK_DESTINATION_CUSTOM, LINK_DESTINATION_NONE } from './constants';
+import {
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_NONE,
+	DEFAULT_SIZE_SLUG,
+} from './constants';
 
 const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
 	RETRY: 'retry',
 	UPLOAD: 'upload',
 };
-const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
-const IMAGE_SIZE_MEDIUM = 'medium';
-const IMAGE_SIZE_LARGE = 'large';
-const IMAGE_SIZE_FULL_SIZE = 'full';
-const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
-const sizeOptionLabels = {
-	[ IMAGE_SIZE_THUMBNAIL ]: __( 'Thumbnail' ),
-	[ IMAGE_SIZE_MEDIUM ]: __( 'Medium' ),
-	[ IMAGE_SIZE_LARGE ]: __( 'Large' ),
-	[ IMAGE_SIZE_FULL_SIZE ]: __( 'Full Size' ),
-};
-const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( {
-	value: option,
-	label,
-} ) );
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -348,7 +337,7 @@ export class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { attributes, isSelected, image } = this.props;
+		const { attributes, isSelected, image, imageSizes } = this.props;
 		const {
 			align,
 			url,
@@ -367,6 +356,15 @@ export class ImageEdit extends React.Component {
 				onPress: this.onClearSettings,
 			},
 		];
+
+		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
+			value: slug,
+			name,
+		} ) );
+		const sizeOptionsValid = find( sizeOptions, [
+			'value',
+			DEFAULT_SIZE_SLUG,
+		] );
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -399,22 +397,17 @@ export class ImageEdit extends React.Component {
 						keyboardType="url"
 					/>
 					<ToggleControl
-						icon={ 'external' }
+						icon={ external }
 						label={ __( 'Open in new tab' ) }
 						checked={ linkTarget === '_blank' }
 						onChange={ this.onSetNewTab }
 					/>
 					{ // eslint-disable-next-line no-undef
-					image && __DEV__ && (
-						<SelectControl
-							hideCancelButton
+					image && sizeOptionsValid && __DEV__ && (
+						<CycleSelectControl
 							icon={ 'editor-expand' }
 							label={ __( 'Size' ) }
-							value={
-								sizeOptionLabels[
-									sizeSlug || DEFAULT_SIZE_SLUG
-								]
-							}
+							value={ sizeSlug || DEFAULT_SIZE_SLUG }
 							onChangeValue={ ( newValue ) =>
 								this.onSetSizeSlug( newValue )
 							}
@@ -422,7 +415,7 @@ export class ImageEdit extends React.Component {
 						/>
 					) }
 					<TextControl
-						icon={ 'editor-textcolor' }
+						icon={ textColor }
 						label={ __( 'Alt Text' ) }
 						value={ alt || '' }
 						valuePlaceholder={ __( 'None' ) }
@@ -663,13 +656,16 @@ export class ImageEdit extends React.Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
+		const { getSettings } = select( 'core/block-editor' );
 		const {
 			attributes: { id },
 			isSelected,
 		} = props;
+		const { imageSizes } = getSettings();
 
 		return {
 			image: id && isSelected ? getMedia( id ) : null,
+			imageSizes,
 		};
 	} ),
 	withPreferredColorScheme,

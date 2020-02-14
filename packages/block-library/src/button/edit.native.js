@@ -26,7 +26,7 @@ import {
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { link } from '@wordpress/icons';
+import { link, external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -244,7 +244,7 @@ class ButtonEdit extends Component {
 					keyboardType="url"
 				/>
 				<ToggleControl
-					icon={ ! isCompatibleWithSettings && 'external' }
+					icon={ ! isCompatibleWithSettings && external }
 					label={ __( 'Open in new tab' ) }
 					checked={ linkTarget === '_blank' }
 					onChange={ this.onChangeOpenInNewTab }

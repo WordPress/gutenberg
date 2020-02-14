@@ -23,7 +23,6 @@ import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import BlockInsertionPoint from './insertion-point';
-import __experimentalBlockListFooter from '../block-list-footer';
 
 const innerToolbarHeight = 44;
 
@@ -93,7 +92,6 @@ export class BlockList extends Component {
 		const {
 			clearSelectedBlock,
 			blockClientIds,
-			isFullyBordered,
 			title,
 			header,
 			withFooter = true,
@@ -119,7 +117,6 @@ export class BlockList extends Component {
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					data={ blockClientIds }
-					extraData={ [ isFullyBordered ] }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={
@@ -173,7 +170,6 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
-						isSmallScreen={ ! this.props.isFullyBordered }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (
@@ -195,7 +191,6 @@ export class BlockList extends Component {
 				>
 					<View style={ styles.blockListFooter } />
 				</TouchableWithoutFeedback>
-				<__experimentalBlockListFooter.Slot />
 			</>
 		);
 	}

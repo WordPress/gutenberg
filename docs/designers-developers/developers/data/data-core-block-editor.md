@@ -500,6 +500,18 @@ _Returns_
 
 -   `?string`: Adjacent block's client ID, or null if none exists.
 
+<a name="getPreviewDeviceType" href="#getPreviewDeviceType">#</a> **getPreviewDeviceType**
+
+Returns the current editing canvas device type.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Device type.
+
 <a name="getPreviousBlockClientId" href="#getPreviousBlockClientId">#</a> **getPreviousBlockClientId**
 
 Returns the previous block's client ID from the given reference start ID.
@@ -1213,6 +1225,18 @@ Generators that triggers an action used to enable or disable the navigation mode
 _Parameters_
 
 -   _isNavigationMode_ `string`: Enable/Disable navigation mode.
+
+<a name="setPreviewDeviceType" href="#setPreviewDeviceType">#</a> **setPreviewDeviceType**
+
+Returns an action object used to toggle the width of the editing canvas
+
+_Parameters_
+
+-   _deviceType_ `string`: 
+
+_Returns_
+
+-   `Object`: Action object.
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 

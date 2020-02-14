@@ -1,5 +1,11 @@
 ## Master
 
+### New Feature
+
+- The `.wp-env.json` coniguration file now accepts `port` and `testsPort` options which can be used to set the ports on which the docker instance is mounted.
+
+## 1.0.0 (2020-02-10)
+
 ### Breaking Changes
 
 - `wp-env start` no longer accepts a WordPress branch or tag reference as its argument. Instead, create a `.wp-env.json` file and specify a `"core"` field.

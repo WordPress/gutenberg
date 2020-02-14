@@ -14,7 +14,6 @@ import { useRef } from '@wordpress/element';
  */
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import __experimentalBlockListFooter from '../block-list-footer';
 import RootContainer from './root-container';
 import useBlockDropZone from '../block-drop-zone';
 
@@ -129,7 +128,6 @@ function BlockList( {
 					targetClientId === null ? 'is-drop-target' : undefined
 				}
 			/>
-			<__experimentalBlockListFooter.Slot />
 		</Container>
 	);
 }

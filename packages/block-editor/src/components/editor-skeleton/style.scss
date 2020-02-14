@@ -59,6 +59,7 @@ html {
 
 .block-editor-editor-skeleton__content {
 	flex-grow: 1;
+	background-color: $light-gray-700;
 
 	// Treat as flex container to allow children to grow to occupy full
 	// available height of the content area.
@@ -68,9 +69,9 @@ html {
 	// On Mobile the header is fixed to keep HTML as scrollable.
 	// Beyond the medium breakpoint, we allow the sidebar.
 	// The sidebar should scroll independently, so enable scroll here also.
-	@include break-medium() {
-		overflow: auto;
-	}
+
+	overflow: auto;
+
 }
 
 .block-editor-editor-skeleton__sidebar {

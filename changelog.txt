@@ -1,5 +1,103 @@
 == Changelog ==
 
+= 7.5.0 =
+
+## Features
+
+- Mark the Social Links block as a stable block [20134](https://github.com/WordPress/gutenberg/pull/20134) [19887](https://github.com/WordPress/gutenberg/pull/19887) [20074](https://github.com/WordPress/gutenberg/pull/20074) [20150](https://github.com/WordPress/gutenberg/pull/20150) [20101](https://github.com/WordPress/gutenberg/pull/20101)
+- Support aadding featured images to Latest Posts block [17151](https://github.com/WordPress/gutenberg/pull/17151)
+- Add support for TikTok video Embeds [19345](https://github.com/WordPress/gutenberg/pull/19345)
+- Add inline text color support [16014](https://github.com/WordPress/gutenberg/pull/16014)
+- Add text color support to Columns block [20016](https://github.com/WordPress/gutenberg/pull/20016)
+
+## Enhancements
+
+- Add type and angle picking to the custom gradient component [19582](https://github.com/WordPress/gutenberg/pull/19582)
+- Add transform for button to buttons block [20063](https://github.com/WordPress/gutenberg/pull/20063)
+- Navigation block:
+	- Implement new design for sub-menus [19681](https://github.com/WordPress/gutenberg/pull/19681)
+	- Set inherit color to anchor elements [20038](https://github.com/WordPress/gutenberg/pull/20038)
+	- Fix getting Navigation parent block [20032](https://github.com/WordPress/gutenberg/pull/20032) [20057](https://github.com/WordPress/gutenberg/pull/20057)
+	- Set width in order to show caret [20075](https://github.com/WordPress/gutenberg/pull/20075)
+    - Improve colors handling [20022](https://github.com/WordPress/gutenberg/pull/20022)
+    - Rename background color CSS class [20018](https://github.com/WordPress/gutenberg/pull/20018)
+- Block Library: Avoid column width auto-adjustment when sibling width changes [19515](https://github.com/WordPress/gutenberg/pull/19515) [20169](https://github.com/WordPress/gutenberg/pull/20169)
+- A11y: 
+    - Incorporate settings in the edit state of the LinkControl component [20052](https://github.com/WordPress/gutenberg/pull/20052)
+    - Announce all Notice components messages [15745](https://github.com/WordPress/gutenberg/pull/15745)
+    - Button block: Remove title attribute [19735](https://github.com/WordPress/gutenberg/pull/19735)
+    - Navigation block: Remove title attribute [19990](https://github.com/WordPress/gutenberg/pull/19990)
+- Image block: Keep existing caption if the stored one is empty [19641](https://github.com/WordPress/gutenberg/pull/19641)
+- Enhance the custom gradient picker UI [20099](https://github.com/WordPress/gutenberg/pull/20099)
+
+## New APIs
+
+- Allow third-party keyboard shortcuts registration in the keyboard shortcuts modal [19965](https://github.com/WordPress/gutenberg/pull/19965)
+- Stabilize the AnglePickerControl component [20118](https://github.com/WordPress/gutenberg/pull/20118)
+- Add .wp-env.json config file support to @wordpress/env [20002](https://github.com/WordPress/gutenberg/pull/20002)
+- Blocks: Promote block variations to stable API [20068](https://github.com/WordPress/gutenberg/pull/20068)
+- Mark the gradients theme API as stable [20107](https://github.com/WordPress/gutenberg/pull/20107)
+
+## Experimental
+
+- Add ability to disable the block popover through __experimentalUIParts.hasPopover option [19922](https://github.com/WordPress/gutenberg/pull/19922)
+- Add the __experimentalEditorSkeleton component to the block-editor package [20050](https://github.com/WordPress/gutenberg/pull/20050) [20132](https://github.com/WordPress/gutenberg/pull/20132)
+
+## Bug Fixes
+
+- A11y: Show open button when the sidebar is closed and tabbing out of the content [19726](https://github.com/WordPress/gutenberg/pull/19726)
+- IE11 Compatibility: Add DOMRect polyfill [20110](https://github.com/WordPress/gutenberg/pull/20110)
+- Block Editor: Fix warning when rendering InnerBlocks [20082](https://github.com/WordPress/gutenberg/pull/20082)
+- Featured image appears cropped [20128](https://github.com/WordPress/gutenberg/pull/20128)
+- Fix predefined text colors used in the Group block on the frontend [20119](https://github.com/WordPress/gutenberg/pull/20119)
+- Use array form for contrast checkers. [20143](https://github.com/WordPress/gutenberg/pull/20143)
+- i18n: make experimentalUseColors labels translatable [20112](https://github.com/WordPress/gutenberg/pull/20112)
+- Multi select: remove inserter between selected blocks [20096](https://github.com/WordPress/gutenberg/pull/20096)
+- Remove alignment options from nested Button blocks [19824](https://github.com/WordPress/gutenberg/pull/19824)
+- URL: Conform to URL Living Standard definition of valid URL [19871](https://github.com/WordPress/gutenberg/pull/19871)
+- Select the correct media in the media modal when replacing existing media [20100](https://github.com/WordPress/gutenberg/pull/20100)
+- Avoid resizing the editor canvas when opening the publish panel [19843](https://github.com/WordPress/gutenberg/pull/19843)
+- Fix Media & Text block styling when media is set to show on the right [20125](https://github.com/WordPress/gutenberg/pull/20125)
+- Fix excerpt rendering in the Latest posts block [19669](https://github.com/WordPress/gutenberg/pull/19669)
+
+## Documentation
+
+- Docs: Contributor Guide update subpages [19939](https://github.com/WordPress/gutenberg/pull/19939)
+- Prettier: Update format-js to use default config, and update editor docs usage [20036](https://github.com/WordPress/gutenberg/pull/20036)
+- Target docs to manifest.json [15639](https://github.com/WordPress/gutenberg/pull/15639)
+- Update main project README [19743](https://github.com/WordPress/gutenberg/pull/19743)
+- Update the Getting Started Docs to use `wp-env` [20044](https://github.com/WordPress/gutenberg/pull/20044)
+- Typos and tweaks: [20055](https://github.com/WordPress/gutenberg/pull/20055) [20077](https://github.com/WordPress/gutenberg/pull/20077) [20025](https://github.com/WordPress/gutenberg/pull/20025) [20060](https://github.com/WordPress/gutenberg/pull/20060) [19470](https://github.com/WordPress/gutenberg/pull/19470)
+
+## Various
+
+- Block Editor: Update BEM syntax to CSS modifer guidelines [19738](https://github.com/WordPress/gutenberg/pull/19738)
+- Block Library: Standardize PHP function names used [20085](https://github.com/WordPress/gutenberg/pull/20085) [20039](https://github.com/WordPress/gutenberg/pull/20039)
+- Project Management Automation:
+	- Log skipped tasks and retain wrapped task names. [20034](https://github.com/WordPress/gutenberg/pull/20034)
+	- Support adding milestones for fork PRs. [20058](https://github.com/WordPress/gutenberg/pull/20058)
+	- Avoid gracefully handling error [20009](https://github.com/WordPress/gutenberg/pull/20009)
+	- Avoid milestone task for forks [20049](https://github.com/WordPress/gutenberg/pull/20049)
+	- Call core setFailed with error message [20012](https://github.com/WordPress/gutenberg/pull/20012)
+	- Check error object for parsed errors [20014](https://github.com/WordPress/gutenberg/pull/20014)
+	- Guard against non-matching commits in `addMilestone`. [20147](https://github.com/WordPress/gutenberg/pull/20147)
+	- Tolerate duplicate milestone [20011](https://github.com/WordPress/gutenberg/pull/20011)
+    - Pull Request Automation: Avoid automation tasks for forked repository [20021](https://github.com/WordPress/gutenberg/pull/20021)
+- @wordpress/env:
+	- Fix GitHub source pattern [20131](https://github.com/WordPress/gutenberg/pull/20131)
+	- Fix syntax error where spread operator could fail [20113](https://github.com/WordPress/gutenberg/pull/20113)
+- Move existing icons to the @wordpress/icons package [20091](https://github.com/WordPress/gutenberg/pull/20091) [20072](https://github.com/WordPress/gutenberg/pull/20072) [19959](https://github.com/WordPress/gutenberg/pull/19959) [20094](https://github.com/WordPress/gutenberg/pull/20094) [20087](https://github.com/WordPress/gutenberg/pull/20087)
+- Ensure the default Prettier config is used with `lint-js` when needed [20071](https://github.com/WordPress/gutenberg/pull/20071)
+- Data: Log first-pass `useSelect` errors [20122](https://github.com/WordPress/gutenberg/pull/20122)
+- Compat: Social Links: Remove legacy renderers from packages [20098](https://github.com/WordPress/gutenberg/pull/20098)
+- Core Data: Mark the `getEntityRecordNoResolver` selector as experimental. [20053](https://github.com/WordPress/gutenberg/pull/20053)
+- Core Data: Remove unused `__experimentalUseEntitySaving` hook. [20148](https://github.com/WordPress/gutenberg/pull/20148)
+- Hide the navigation block behind feature flag [20133](https://github.com/WordPress/gutenberg/pull/20133)
+- Fix Intermitent e2e test failures [20065](https://github.com/WordPress/gutenberg/pull/20065)
+- Move the e2e tests to the right folders [20135](https://github.com/WordPress/gutenberg/pull/20135)
+- Switch social link icons to import svg parts from primitives [19877](https://github.com/WordPress/gutenberg/pull/19877)
+
+
 = 7.4.0 =
 
 ### Features
