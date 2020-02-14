@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -12,12 +12,16 @@ import {
 	ImageWithFocalPoint,
 	PanelBody,
 	RangeControl,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
+	BlockControls,
 	InnerBlocks,
 	InspectorControls,
 	MEDIA_TYPE_IMAGE,
 	MediaPlaceholder,
+	MediaUpload,
 	withColors,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -35,6 +39,7 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 } from './shared';
+import { EditMediaIcon } from './edit-media-icon';
 
 /**
  * Constants
@@ -122,6 +127,18 @@ const Cover = ( {
 
 	const placeholderIcon = <Icon icon={ icon } { ...placeholderIconStyle } />;
 
+	const toolbarControls = ( open ) => (
+		<BlockControls>
+			<ToolbarGroup>
+				<ToolbarButton
+					title={ __( 'Edit cover media' ) }
+					icon={ EditMediaIcon }
+					onClick={ open }
+				/>
+			</ToolbarGroup>
+		</BlockControls>
+	);
+
 	const controls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Dimensions' ) }>
@@ -151,7 +168,12 @@ const Cover = ( {
 		</InspectorControls>
 	);
 
-	const hasBackground = !! ( url || overlayColor.color || gradientValue );
+	const hasBackground = !! (
+		url ||
+		attributes.overlayColor ||
+		overlayColor.color ||
+		gradientValue
+	);
 
 	const containerStyles = {
 		...( isParentSelected || isAncestorSelected
@@ -160,10 +182,30 @@ const Cover = ( {
 		...( isSelected && styles.innerPadding ),
 	};
 
+	const background = ( openMediaOptions, getMediaOptions ) => (
+		<TouchableWithoutFeedback
+			accessible={ ! isSelected }
+			onLongPress={ openMediaOptions }
+			disabled={ ! isSelected }
+		>
+			<View style={ styles.background }>
+				{ getMediaOptions() }
+				{ isSelected && toolbarControls( openMediaOptions ) }
+
+				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+					<ImageWithFocalPoint
+						focalPoint={ focalPoint }
+						url={ url }
+					/>
+				) }
+			</View>
+		</TouchableWithoutFeedback>
+	);
+
 	if ( ! hasBackground ) {
 		return (
 			<MediaPlaceholder
-				__experimentalOnlyMediaLibrary={ true }
+				__experimentalOnlyMediaLibrary
 				icon={ placeholderIcon }
 				labels={ {
 					title: __( 'Cover' ),
@@ -180,6 +222,7 @@ const Cover = ( {
 			{ controls }
 			<View style={ [ styles.backgroundContainer ] }>
 				<View
+					pointerEvents="box-none"
 					style={ [
 						styles.content,
 						{ minHeight: CONTAINER_HEIGHT },
@@ -188,14 +231,16 @@ const Cover = ( {
 					<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 				</View>
 
-				<View style={ getOverlayStyles() } />
+				<View pointerEvents="none" style={ getOverlayStyles() } />
 
-				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-					<ImageWithFocalPoint
-						focalPoint={ focalPoint }
-						url={ url }
-					/>
-				) }
+				<MediaUpload
+					__experimentalOnlyMediaLibrary
+					allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+					onSelect={ onSelectMedia }
+					render={ ( { open, getMediaOptions } ) => {
+						return background( open, getMediaOptions );
+					} }
+				/>
 			</View>
 		</View>
 	);
