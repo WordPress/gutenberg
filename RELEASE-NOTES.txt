@@ -2,6 +2,7 @@
 ------
 * New block: Group
 * Add support for upload options in Gallery block
+* Add support for size options in the Image block
 * New block: Button
 * Add scroll support inside block picker and block settings
 * [Android] Fix issue preventing correct placeholder image from displaying during image upload
