@@ -16,6 +16,7 @@ import {
 	RichText,
 	withFontSizes,
 	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
@@ -151,7 +152,7 @@ function ParagraphBlock( {
 					<RichText
 						ref={ ref }
 						identifier="content"
-						tagName="p"
+						tagName={ Block.p }
 						className={ classnames(
 							'wp-block-paragraph',
 							className,

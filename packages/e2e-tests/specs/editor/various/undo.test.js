@@ -22,9 +22,16 @@ const getSelection = async () => {
 			return {};
 		}
 
-		const editables = Array.from(
-			selectedBlock.querySelectorAll( '[contenteditable]' )
-		);
+		let editables;
+
+		if ( selectedBlock.getAttribute( 'contenteditable' ) ) {
+			editables = [ selectedBlock ];
+		} else {
+			editables = Array.from(
+				selectedBlock.querySelectorAll( '[contenteditable]' )
+			);
+		}
+
 		const editableIndex = editables.indexOf( document.activeElement );
 		const selection = window.getSelection();
 
