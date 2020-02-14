@@ -302,15 +302,13 @@ async function configureWordPress( environment, config ) {
 		commandOptions: [ '--rm' ],
 	};
 
+	const port = environment === 'development' ? config.port : config.testsPort;
+
 	// Install WordPress.
 	await dockerCompose.run(
 		environment === 'development' ? 'cli' : 'tests-cli',
 		`wp core install
-			--url=localhost:${
-				environment === 'development'
-					? process.env.WP_ENV_PORT || '8888'
-					: process.env.WP_ENV_TESTS_PORT || '8889'
-			}
+			--url=localhost:${ port }
 			--title='${ config.name }'
 			--admin_user=admin
 			--admin_password=password

@@ -257,6 +257,76 @@ describe( 'readConfig', () => {
 			testsPort: 8889,
 		} );
 	} );
+
+	it( 'should throw an error if the port number environment variable is invalid', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldPort = process.env.WP_ENV_PORT;
+		process.env.WP_ENV_PORT = 'hello';
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid environment variable: WP_ENV_PORT must be a number.'
+			);
+		}
+		process.env.WP_ENV_PORT = oldPort;
+	} );
+
+	it( 'should throw an error if the tests port number environment variable is invalid', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldPort = process.env.WP_ENV_TESTS_PORT;
+		process.env.WP_ENV_TESTS_PORT = 'hello';
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid environment variable: WP_ENV_TESTS_PORT must be a number.'
+			);
+		}
+		process.env.WP_ENV_TESTS_PORT = oldPort;
+	} );
+
+	it( 'should use port environment values rather than config values if both are defined', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					port: 1000,
+					testsPort: 2000,
+				} )
+			)
+		);
+		const oldPort = process.env.WP_ENV_PORT;
+		const oldTestsPort = process.env.WP_ENV_TESTS_PORT;
+		process.env.WP_ENV_PORT = 4000;
+		process.env.WP_ENV_TESTS_PORT = 3000;
+
+		const config = await readConfig( '.wp-env.json' );
+		expect( config ).toMatchObject( {
+			port: 4000,
+			testsPort: 3000,
+		} );
+
+		process.env.WP_ENV_PORT = oldPort;
+		process.env.WP_ENV_TESTS_PORT = oldTestsPort;
+	} );
+
+	it( 'should use 8888 and 8889 as the default port and testsPort values if nothing else is specified', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+
+		const config = await readConfig( '.wp-env.json' );
+		expect( config ).toMatchObject( {
+			port: 8888,
+			testsPort: 8889,
+		} );
+	} );
 } );
 
 /**
