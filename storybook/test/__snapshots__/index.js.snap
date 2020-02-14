@@ -4698,7 +4698,7 @@ exports[`Storyshots Components/RadioControl With Help 1`] = `
 `;
 
 exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
-.emotion-38 {
+.emotion-36 {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
   cursor: pointer;
@@ -4810,61 +4810,7 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
-.emotion-32 {
-  background: #23282d;
-  border-radius: 3px;
-  box-sizing: border-box;
-  color: white;
-  display: inline-block;
-  font-size: 11px;
-  min-width: 32px;
-  opacity: 0;
-  padding: 8px;
-  position: absolute;
-  text-align: center;
-  -webkit-transition: opacity 120ms ease;
-  transition: opacity 120ms ease;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  opacity: 0;
-  margin-top: -4px;
-  top: -100%;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
-}
-
-.emotion-32::after {
-  border: 6px solid #23282d;
-  border-left-color: transparent;
-  border-right-color: transparent;
-  bottom: -6px;
-  box-sizing: border-box;
-  content: '';
-  height: 0;
-  left: 50%;
-  line-height: 0;
-  margin-left: -6px;
-  position: absolute;
-  width: 0;
-}
-
-.emotion-32::after {
-  border-bottom: none;
-  border-top-style: solid;
-  bottom: -6px;
-}
-
-@media ( prefers-reduced-motion:reduce ) {
-  .emotion-32 {
-    -webkit-transition-duration: 0ms;
-    transition-duration: 0ms;
-  }
-}
-
-.emotion-36 {
+.emotion-34 {
   box-sizing: border-box;
   display: inline-block;
   margin-top: 0;
@@ -4873,16 +4819,16 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   margin-left: 16px;
 }
 
-input[type='number'].emotion-36 {
+input[type='number'].emotion-34 {
   height: 30px;
   min-height: 30px;
 }
 
-.emotion-40 {
+.emotion-38 {
   padding: 60px 40px;
 }
 
-.emotion-34 {
+.emotion-32 {
   box-sizing: border-box;
   color: #007cba;
   display: block;
@@ -4955,7 +4901,7 @@ input[type='number'].emotion-36 {
 }
 
 <div
-  className="emotion-40 emotion-41"
+  className="emotion-38 emotion-39"
 >
   <div
     className="components-base-control components-range-control"
@@ -4964,10 +4910,10 @@ input[type='number'].emotion-36 {
       className="components-base-control__field"
     >
       <span
-        className="components-range-control__root emotion-38 emotion-39"
+        className="components-range-control__root emotion-36 emotion-37"
       >
         <span
-          className="components-range-control__wrapper is-marked emotion-34 emotion-35"
+          className="components-range-control__wrapper is-marked emotion-32 emotion-33"
           color="#00669b"
         >
           <input
@@ -4985,7 +4931,7 @@ input[type='number'].emotion-36 {
             step={1}
             tabIndex={0}
             type="range"
-            value={0}
+            value=""
           />
           <span
             aria-hidden={true}
@@ -5106,7 +5052,7 @@ input[type='number'].emotion-36 {
             className="components-range-control__track emotion-26 emotion-27"
             style={
               Object {
-                "width": "0%",
+                "width": "50%",
               }
             }
           />
@@ -5114,7 +5060,7 @@ input[type='number'].emotion-36 {
             className="emotion-30 emotion-31"
             style={
               Object {
-                "left": "0%",
+                "left": "50%",
               }
             }
           >
@@ -5123,31 +5069,16 @@ input[type='number'].emotion-36 {
               className="emotion-28 emotion-29"
             />
           </span>
-          <span
-            aria-hidden={false}
-            className="components-simple-tooltip components-range-control__tooltip emotion-32 emotion-33"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            role="tooltip"
-            style={
-              Object {
-                "left": "0%",
-                "zIndex": 100,
-              }
-            }
-          >
-            0
-          </span>
         </span>
         <input
-          className="components-range-control__number emotion-36 emotion-353"
+          className="components-range-control__number emotion-34 emotion-333"
           inputMode="decimal"
           max={10}
           min={0}
           onChange={[Function]}
           step={1}
           type="number"
-          value={0}
+          value=""
         />
       </span>
     </div>
@@ -5337,7 +5268,7 @@ input[type='number'].emotion-12 {
             step={1}
             tabIndex={0}
             type="range"
-            value={0}
+            value=""
           />
           <span
             aria-hidden={true}
@@ -5348,7 +5279,7 @@ input[type='number'].emotion-12 {
             className="components-range-control__track emotion-4 emotion-5"
             style={
               Object {
-                "width": "0%",
+                "width": "50%",
               }
             }
           />
@@ -5356,7 +5287,7 @@ input[type='number'].emotion-12 {
             className="emotion-8 emotion-9"
             style={
               Object {
-                "left": "0%",
+                "left": "50%",
               }
             }
           >
@@ -5376,7 +5307,7 @@ input[type='number'].emotion-12 {
           onChange={[Function]}
           step={1}
           type="number"
-          value={0}
+          value=""
         />
       </span>
     </div>
@@ -5665,7 +5596,6 @@ input[type='number'].emotion-14 {
         onChange={[Function]}
         step={1}
         type="number"
-        value={0}
       />
     </span>
   </div>
