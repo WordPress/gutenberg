@@ -16,6 +16,7 @@ const VALID_MEDIA_QUERY_REGEX = /\((min|max)-width:[^\(]*?\)/g;
 
 function getStyleSheetsThatMatchHostname() {
 	if ( typeof window === 'undefined' ) {
+		return [];
 	}
 
 	return filter(
