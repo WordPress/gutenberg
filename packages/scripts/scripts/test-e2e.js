@@ -28,7 +28,7 @@ const {
 	hasJestConfig,
 } = require( '../utils' );
 
-const result = spawn( 'node', [ 'node_modules/puppeteer/install.js' ], {
+const result = spawn( 'node', [ require.resolve( 'puppeteer/install' ) ], {
 	stdio: 'inherit',
 } );
 
