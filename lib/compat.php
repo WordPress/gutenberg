@@ -33,10 +33,12 @@ function gutenberg_add_url_polyfill( $scripts ) {
 		return;
 	}
 
+	$suffix = SCRIPT_DEBUG ? '' : '.min';
+
 	gutenberg_register_vendor_script(
 		$scripts,
 		'wp-polyfill-url',
-		'https://unpkg.com/core-js-url-browser@3.6.4/url.min.js',
+		'https://unpkg.com/core-js-url-browser@3.6.4/url' . $suffix . '.js',
 		array(),
 		'3.6.4'
 	);
