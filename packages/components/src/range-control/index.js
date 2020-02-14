@@ -89,7 +89,9 @@ const BaseRangeControl = forwardRef(
 			}
 		};
 
+		const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
 		const isThumbFocused = ! disabled && isFocused;
+
 		const fillValue = ( ( value - min ) / ( max - min ) ) * 100;
 		const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
 
@@ -215,7 +217,7 @@ const BaseRangeControl = forwardRef(
 								className="components-range-control__tooltip"
 								inputRef={ inputRef }
 								renderTooltipContent={ renderTooltipContent }
-								show={ showTooltip || showTooltip }
+								show={ isCurrentlyFocused || showTooltip }
 								style={ offsetStyle }
 								value={ value }
 							/>
