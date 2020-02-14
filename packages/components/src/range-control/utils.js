@@ -57,9 +57,7 @@ export function useDebouncedHoverInteraction( {
 
 	const setDebouncedTimeout = useCallback(
 		( callback ) => {
-			if ( timeoutRef.current ) {
-				window.clearTimeout( timeoutRef.current );
-			}
+			window.clearTimeout( timeoutRef.current );
 
 			timeoutRef.current = setTimeout( callback, timeout );
 		},
