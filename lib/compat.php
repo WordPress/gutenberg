@@ -46,7 +46,7 @@ function gutenberg_add_url_polyfill( $scripts ) {
 		wp_get_script_polyfill(
 			$scripts,
 			array(
-				'\'URL\' in window' => 'wp-polyfill-url',
+				'window.URL && window.URL.prototype && window.URLSearchParams' => 'wp-polyfill-url',
 			)
 		)
 	);
