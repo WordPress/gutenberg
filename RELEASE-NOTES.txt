@@ -2,6 +2,7 @@
 ------
 * New block: Group
 * Add support for upload options in Gallery block
+* Add support for size options in the Image block
 
 1.22.0
 ------
