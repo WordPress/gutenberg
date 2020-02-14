@@ -18,6 +18,7 @@ import {
 	ToggleControl,
 	SelectControl,
 	RangeControl,
+	QueryControls,
 } from '@wordpress/components';
 
 /**
@@ -25,13 +26,15 @@ import {
  */
 import styles from './style.scss';
 import {
+	DEFAULT_POSTS_TO_SHOW,
+	DEFAULT_ORDER,
+	DEFAULT_ORDER_BY,
 	DEFAULT_SHOW_POST_CONTENT,
 	DEFAULT_POST_CONTENT_RADIO,
 	DEFAULT_DISPLAY_POST_DATE,
 	DEFAULT_EXCERPT_LENGTH,
 	MIN_EXCERPT_LENGTH,
 	MAX_EXCERPT_LENGTH,
-	DEFAULT_POSTS_TO_SHOW,
 } from './constants';
 
 const LatestPostsEdit = ( {
@@ -47,6 +50,9 @@ const LatestPostsEdit = ( {
 		displayPostContentRadio,
 		excerptLength,
 		displayPostDate,
+		order,
+		orderBy,
+		postsToShow,
 	} = attributes;
 
 	const onClearSettings = () => {
@@ -55,6 +61,8 @@ const LatestPostsEdit = ( {
 			displayPostContent: DEFAULT_SHOW_POST_CONTENT,
 			displayPostContentRadio: DEFAULT_POST_CONTENT_RADIO,
 			displayPostDate: DEFAULT_DISPLAY_POST_DATE,
+			order: DEFAULT_ORDER,
+			orderBy: DEFAULT_ORDER_BY,
 			postsToShow: DEFAULT_POSTS_TO_SHOW,
 		} );
 	};
@@ -75,6 +83,18 @@ const LatestPostsEdit = ( {
 		setAttributes( { displayPostDate: value } );
 	};
 
+	const onSetOrder = ( value ) => {
+		setAttributes( { order: value } );
+	};
+
+	const onSetOrderBy = ( value ) => {
+		setAttributes( { orderBy: value } );
+	};
+
+	const onSetPostsToShow = ( value ) => {
+		setAttributes( { postsToShow: value } );
+	};
+
 	const actions = [
 		{
 			label: __( 'Clear All Settings' ),
@@ -84,6 +104,18 @@ const LatestPostsEdit = ( {
 
 	const getInspectorControls = () => (
 		<InspectorControls>
+			<PanelBody title={ __( 'Sorting and filtering' ) }>
+				<QueryControls
+					{ ...{ order, orderBy } }
+					numberOfItems={ postsToShow }
+					// categoriesList={ categoriesList }
+					// selectedCategoryId={ categories }
+					onOrderChange={ onSetOrder }
+					onOrderByChange={ onSetOrderBy }
+					onNumberOfItemsChange={ onSetPostsToShow }
+				/>
+			</PanelBody>
+
 			<PanelBody title={ __( 'Post meta settings' ) }>
 				<ToggleControl
 					label={ __( 'Display post date' ) }
