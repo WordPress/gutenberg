@@ -99,10 +99,13 @@ const BaseRangeControl = forwardRef(
 		const inputSliderValue = isValueReset ? '' : value;
 		const currentInputValue = isValueReset ? '' : value || currentInput;
 
-		const fillValue = ( ( value - min ) / ( max - min ) ) * 100;
-		const fillValueOffset = isValueReset
-			? '50%'
-			: `${ clamp( fillValue, 0, 100 ) }%`;
+		const rangeFillValue = isValueReset
+			? floatClamp( max / 2, min, max )
+			: value;
+
+		const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
+		const fillValue = isValueReset ? 50 : calculatedFillValue;
+		const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
 
 		const classes = classnames( 'components-range-control', className );
 
@@ -205,7 +208,7 @@ const BaseRangeControl = forwardRef(
 							max={ max }
 							min={ min }
 							step={ step }
-							value={ value }
+							value={ rangeFillValue }
 						/>
 						<Track
 							aria-hidden={ true }

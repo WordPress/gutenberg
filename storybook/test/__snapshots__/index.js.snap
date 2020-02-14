@@ -4876,7 +4876,7 @@ input[type='number'].emotion-34 {
   color: #6c7781;
 }
 
-.emotion-8 {
+.emotion-16 {
   box-sizing: border-box;
   height: 9px;
   left: 0;
@@ -4886,7 +4886,7 @@ input[type='number'].emotion-34 {
   background-color: #d7dade;
 }
 
-.emotion-10 {
+.emotion-18 {
   box-sizing: border-box;
   color: #d7dade;
   left: 0;
@@ -4964,7 +4964,7 @@ input[type='number'].emotion-34 {
             </span>
             <span
               aria-hidden="true"
-              className="components-range-control__mark emotion-8 emotion-5"
+              className="components-range-control__mark is-filled emotion-4 emotion-5"
               style={
                 Object {
                   "left": "10%",
@@ -4974,7 +4974,7 @@ input[type='number'].emotion-34 {
             />
             <span
               aria-hidden="true"
-              className="components-range-control__mark-label emotion-10 emotion-7"
+              className="components-range-control__mark-label is-filled emotion-6 emotion-7"
               style={
                 Object {
                   "left": "10%",
@@ -4985,7 +4985,7 @@ input[type='number'].emotion-34 {
             </span>
             <span
               aria-hidden="true"
-              className="components-range-control__mark emotion-8 emotion-5"
+              className="components-range-control__mark is-filled emotion-4 emotion-5"
               style={
                 Object {
                   "left": "20%",
@@ -4995,7 +4995,7 @@ input[type='number'].emotion-34 {
             />
             <span
               aria-hidden="true"
-              className="components-range-control__mark-label emotion-10 emotion-7"
+              className="components-range-control__mark-label is-filled emotion-6 emotion-7"
               style={
                 Object {
                   "left": "20%",
@@ -5006,7 +5006,7 @@ input[type='number'].emotion-34 {
             </span>
             <span
               aria-hidden="true"
-              className="components-range-control__mark emotion-8 emotion-5"
+              className="components-range-control__mark emotion-16 emotion-5"
               style={
                 Object {
                   "left": "80%",
@@ -5016,7 +5016,7 @@ input[type='number'].emotion-34 {
             />
             <span
               aria-hidden="true"
-              className="components-range-control__mark-label emotion-10 emotion-7"
+              className="components-range-control__mark-label emotion-18 emotion-7"
               style={
                 Object {
                   "left": "80%",
@@ -5027,7 +5027,7 @@ input[type='number'].emotion-34 {
             </span>
             <span
               aria-hidden="true"
-              className="components-range-control__mark emotion-8 emotion-5"
+              className="components-range-control__mark emotion-16 emotion-5"
               style={
                 Object {
                   "left": "100%",
@@ -5037,7 +5037,7 @@ input[type='number'].emotion-34 {
             />
             <span
               aria-hidden="true"
-              className="components-range-control__mark-label emotion-10 emotion-7"
+              className="components-range-control__mark-label emotion-18 emotion-7"
               style={
                 Object {
                   "left": "100%",
