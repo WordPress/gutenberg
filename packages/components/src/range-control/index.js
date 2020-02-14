@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { clamp, noop } from 'lodash';
+import { clamp, isFinite, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -48,6 +48,7 @@ const BaseRangeControl = forwardRef(
 			allowReset = false,
 			beforeIcon,
 			className,
+			currentInput,
 			color: colorProp = color( 'blue.wordpress.700' ),
 			disabled = false,
 			help,
@@ -73,7 +74,7 @@ const BaseRangeControl = forwardRef(
 	) => {
 		const isRTL = useRtl();
 
-		const sliderValue = initialPosition || valueProp;
+		const sliderValue = valueProp || initialPosition;
 		const [ value, setValue ] = useControlledRangeValue( {
 			min,
 			max,
@@ -81,7 +82,6 @@ const BaseRangeControl = forwardRef(
 		} );
 		const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 		const [ isFocused, setIsFocused ] = useState( false );
-		const originalValueRef = useRef( value );
 
 		const inputRef = useRef();
 
@@ -94,8 +94,15 @@ const BaseRangeControl = forwardRef(
 		};
 
 		const isThumbFocused = ! disabled && isFocused;
+
+		const isValueReset = value === null;
+		const inputSliderValue = isValueReset ? '' : value;
+		const currentInputValue = isValueReset ? '' : value || currentInput;
+
 		const fillValue = ( ( value - min ) / ( max - min ) ) * 100;
-		const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
+		const fillValueOffset = isValueReset
+			? '50%'
+			: `${ clamp( fillValue, 0, 100 ) }%`;
 
 		const classes = classnames( 'components-range-control', className );
 
@@ -107,7 +114,7 @@ const BaseRangeControl = forwardRef(
 		const id = `inspector-range-control-${ instanceId }`;
 
 		const describedBy = !! help ? `${ id }__help` : undefined;
-		const enableTooltip = showTooltipProp !== false;
+		const enableTooltip = showTooltipProp !== false && isFinite( value );
 
 		const handleOnChange = ( event ) => {
 			if ( ! event.target.checkValidity() ) {
@@ -121,10 +128,8 @@ const BaseRangeControl = forwardRef(
 		};
 
 		const handleOnReset = () => {
-			const nextValue = originalValueRef.current;
-
-			setValue( nextValue );
-			onChange( nextValue );
+			setValue( null );
+			onChange( undefined );
 		};
 
 		const handleShowTooltip = () => setShowTooltip( true );
@@ -192,7 +197,7 @@ const BaseRangeControl = forwardRef(
 							step={ step }
 							tabIndex={ 0 }
 							type="range"
-							value={ value }
+							value={ inputSliderValue }
 						/>
 						<RangeRail
 							aria-hidden={ true }
@@ -240,7 +245,7 @@ const BaseRangeControl = forwardRef(
 							onChange={ handleOnChange }
 							step={ step }
 							type="number"
-							value={ value }
+							value={ currentInputValue }
 						/>
 					) }
 					{ allowReset && (
@@ -265,19 +270,23 @@ const BaseRangeControl = forwardRef(
 /**
  * A float supported clamp function for a specific value.
  *
- * @param {number} value The value to clamp
+ * @param {number|null} value The value to clamp
  * @param {number} min The minimum value
  * @param {number} max The maxinum value
  * @return {number} A (float) number
  */
 function floatClamp( value, min, max ) {
+	if ( ! isFinite( value ) ) {
+		return null;
+	}
+
 	return parseFloat( clamp( value, min, max ) );
 }
 
 /**
  * Hook to store a clamped value, derived from props.
  */
-function useControlledRangeValue( { min, max, value: valueProp = 0 } ) {
+function useControlledRangeValue( { min, max, value: valueProp } ) {
 	const [ value, _setValue ] = useState( floatClamp( valueProp, min, max ) );
 	const valueRef = useRef( value );
 
