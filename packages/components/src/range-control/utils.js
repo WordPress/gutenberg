@@ -27,12 +27,9 @@ export function useControlledRangeValue( { min, max, value: valueProp = 0 } ) {
 	const [ value, _setValue ] = useState( floatClamp( valueProp, min, max ) );
 	const valueRef = useRef( value );
 
-	const setValue = useCallback(
-		( nextValue ) => {
-			_setValue( floatClamp( nextValue, min, max ) );
-		},
-		[ _setValue, min, max ]
-	);
+	const setValue = ( nextValue ) => {
+		_setValue( floatClamp( nextValue, min, max ) );
+	};
 
 	useEffect( () => {
 		if ( valueRef.current !== valueProp ) {
