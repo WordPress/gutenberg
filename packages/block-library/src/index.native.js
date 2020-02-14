@@ -151,7 +151,7 @@ export const registerCoreBlocks = () => {
 		preformatted,
 		gallery,
 		group,
-		devOnly( button ),
+		button,
 		spacer,
 		shortcode,
 		devOnly( buttons ),

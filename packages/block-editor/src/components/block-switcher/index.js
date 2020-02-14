@@ -26,6 +26,7 @@ import { Component } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -87,7 +88,7 @@ export class BlockSwitcher extends Component {
 			const blockType = getBlockType( sourceBlockName );
 			icon = blockType.icon;
 		} else {
-			icon = 'layout';
+			icon = layout;
 		}
 
 		if ( ! hasBlockStyles && ! possibleBlockTransformations.length ) {

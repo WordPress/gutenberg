@@ -34,12 +34,33 @@ const withSpinner = ( command ) => ( ...args ) => {
 			);
 		},
 		( error ) => {
-			spinner.fail( error.message || error.err );
-			if ( ! ( error instanceof env.ValidationError ) ) {
+			if ( error instanceof env.ValidationError ) {
+				// Error is a validation error. That means the user did something wrong.
+				spinner.fail( error.message );
+				process.exit( 1 );
+			} else if (
+				'exitCode' in error &&
+				'err' in error &&
+				'out' in error
+			) {
+				// Error is a docker-compose error. That means something docker-related failed.
+				// https://github.com/PDMLab/docker-compose/blob/master/src/index.ts
+				spinner.fail( 'Error while running docker-compose command.' );
+				if ( error.out ) {
+					process.stdout.write( error.out );
+				}
+				if ( error.err ) {
+					process.stderr.write( error.err );
+				}
+				process.exit( error.exitCode );
+			} else {
+				// Error is an unknown error. That means there was a bug in our code.
+				spinner.fail( error.message );
+				// Disable reason: Using console.error() means we get a stack trace.
 				// eslint-disable-next-line no-console
-				console.error( `\n\n${ error.out || error.err }\n\n` );
+				console.error( error );
+				process.exit( 1 );
 			}
-			process.exit( error.exitCode || 1 );
 		}
 	);
 };

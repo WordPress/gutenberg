@@ -35,6 +35,8 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @property {Source|null} coreSource The WordPress installation to load in the environment.
  * @property {Source[]} pluginSources Plugins to load in the environment.
  * @property {Source[]} themeSources Themes to load in the environment.
+ * @property {number} port The port on which to start the development WordPress environment.
+ * @property {number} testsPort The port on which to start the testing WordPress environment.
  */
 
 /**
@@ -96,6 +98,8 @@ module.exports = {
 				core: null,
 				plugins: [],
 				themes: [],
+				port: 8888,
+				testsPort: 8889,
 			},
 			config
 		);
@@ -124,6 +128,24 @@ module.exports = {
 			);
 		}
 
+		if ( ! Number.isInteger( config.port ) ) {
+			throw new ValidationError(
+				'Invalid .wp-env.json: "port" must be an integer.'
+			);
+		}
+
+		if ( ! Number.isInteger( config.testsPort ) ) {
+			throw new ValidationError(
+				'Invalid .wp-env.json: "testsPort" must be an integer.'
+			);
+		}
+
+		if ( config.port === config.testsPort ) {
+			throw new ValidationError(
+				'Invalid .wp-env.json: "testsPort" and "port" must be different.'
+			);
+		}
+
 		const workDirectoryPath = path.resolve(
 			os.homedir(),
 			'.wp-env',
@@ -134,6 +156,8 @@ module.exports = {
 			name: path.basename( configDirectoryPath ),
 			configDirectoryPath,
 			workDirectoryPath,
+			port: config.port,
+			testsPort: config.testsPort,
 			dockerComposeConfigPath: path.resolve(
 				workDirectoryPath,
 				'docker-compose.yml'
