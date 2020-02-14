@@ -4,7 +4,7 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Notice } from '@wordpress/components';
-
+import { keyboardReturn } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -62,7 +62,7 @@ const LinkControlSearchInput = ( {
 					<Button
 						type="submit"
 						label={ __( 'Submit' ) }
-						icon={keyboardReturn}
+						icon={ keyboardReturn }
 						className="block-editor-link-control__search-submit"
 					/>
 				</div>
