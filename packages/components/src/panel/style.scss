@@ -68,10 +68,16 @@
 }
 
 // Hover States
-.components-panel__body > .components-panel__body-title:hover {
+.components-panel__body:not(.is-always-opened) > .components-panel__body-title:hover {
 	// Override the default button hover style
 	background: $light-gray-200 !important;
 	border: none !important;
+}
+
+.components-panel__body-text-title {
+	display: block;
+	padding: 15px;
+	font-weight: 600;
 }
 
 .components-panel__body-toggle.components-button {

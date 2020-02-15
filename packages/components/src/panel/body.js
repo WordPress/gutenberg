@@ -47,38 +47,48 @@ export class PanelBody extends Component {
 			forwardedRef,
 		} = this.props;
 		const isOpened = opened === undefined ? this.state.opened : opened;
+		const isAlwaysOpened = true === this.props.opened;
 		const classes = classnames( 'components-panel__body', className, {
 			'is-opened': isOpened,
+			'is-always-opened': isAlwaysOpened,
 		} );
 
 		return (
 			<div className={ classes } ref={ forwardedRef }>
 				{ !! title && (
 					<h2 className="components-panel__body-title">
-						<Button
-							className="components-panel__body-toggle"
-							onClick={ this.toggle }
-							aria-expanded={ isOpened }
-						>
-							{ /*
-								Firefox + NVDA don't announce aria-expanded because the browser
-								repaints the whole element, so this wrapping span hides that.
-							*/ }
-							<span aria-hidden="true">
-								<Icon
-									className="components-panel__arrow"
-									icon={ isOpened ? chevronUp : chevronDown }
-								/>
+						{ isAlwaysOpened ? (
+							<span className="components-panel__body-text-title">
+								{ title }
 							</span>
-							{ title }
-							{ icon && (
-								<Icon
-									icon={ icon }
-									className="components-panel__icon"
-									size={ 20 }
-								/>
-							) }
-						</Button>
+						) : (
+							<Button
+								className="components-panel__body-toggle"
+								onClick={ this.toggle }
+								aria-expanded={ isOpened }
+							>
+								{ /*
+									Firefox + NVDA don't announce aria-expanded because the browser
+									repaints the whole element, so this wrapping span hides that.
+									*/ }
+								<span aria-hidden="true">
+									<Icon
+										className="components-panel__arrow"
+										icon={
+											isOpened ? chevronUp : chevronDown
+										}
+									/>
+								</span>
+								{ title }
+								{ icon && (
+									<Icon
+										icon={ icon }
+										className="components-panel__icon"
+										size={ 20 }
+									/>
+								) }
+							</Button>
+						) }
 					</h2>
 				) }
 				{ isOpened && children }

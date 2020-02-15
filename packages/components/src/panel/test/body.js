@@ -99,4 +99,23 @@ describe( 'PanelBody', () => {
 			expect( panelBody.state( 'opened' ) ).toBe( true );
 		} );
 	} );
+
+	describe( 'button inclusion', () => {
+		const buttonSelector = '.components-panel__body-toggle';
+
+		it( 'should have a button if opened prop does not exist', () => {
+			const panelBody = mount( <PanelBody /> );
+			expect( panelBody.find( buttonSelector ).exists() ).toBe( true );
+		} );
+
+		it( 'should have a button if opened prop is not true', () => {
+			const panelBody = mount( <PanelBody opened={ false } /> );
+			expect( panelBody.find( buttonSelector ).exists() ).toBe( true );
+		} );
+
+		it( 'should not have a button if opened prop is true', () => {
+			const panelBody = mount( <PanelBody opened={ true } /> );
+			expect( panelBody.find( buttonSelector ).exists() ).toBe( false );
+		} );
+	} );
 } );
