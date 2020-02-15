@@ -137,6 +137,8 @@ $ wp-env start
 
 ## Command reference
 
+By default, the files wp-env generates are located at `~/.wp-env/$md5_of_project_path`. To change this location, set the `WP_ENV_SOURCE` environment variable. This changes the `~/.wp-env/` part of the path to wherever you wish. For example, running `WP_ENV_SOURCE="something" wp-env start` will download the project files to the directory `./something/$md5_of_project_path` (relative to the current directory.)
+
 ### `wp-env start [ref]`
 
 ```sh

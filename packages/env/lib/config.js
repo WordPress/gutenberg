@@ -150,11 +150,10 @@ module.exports = {
 			);
 		}
 
-		const workDirectoryPath = path.resolve(
-			os.homedir(),
-			'.wp-env',
-			md5( configPath )
-		);
+		const wpEnvHome =
+			process.env.WP_ENV_SOURCE || `${ os.homedir() }/.wp-env`;
+
+		const workDirectoryPath = path.resolve( wpEnvHome, md5( configPath ) );
 
 		return {
 			name: path.basename( configDirectoryPath ),
