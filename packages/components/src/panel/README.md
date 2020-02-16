@@ -108,7 +108,7 @@ Title of the `PanelBody`. This shows even when it is closed.
 
 ###### opened
 
-If opened is true then the `Panel` will remain open regardless of the `initialOpen` prop and the panel will be prevented from being closed.
+Passing `opened` turns `PanelBody` into a controlled component, overriding its internal state.
 
 -   Type: `Boolean`
 -   Required: No
@@ -141,6 +141,13 @@ Whether or not the panel will start open.
 -   Type: `Boolean`
 -   Required: No
 -   Default: true
+
+###### alwaysOpen
+
+If `alwaysOpen` is set to true, the `PanelBody` can't be closed by the user.
+
+-   Type: `Boolean`
+-   Required: No
 
 ---
 
