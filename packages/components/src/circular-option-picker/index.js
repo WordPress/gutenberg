@@ -18,7 +18,7 @@ import Tooltip from '../tooltip';
 function Option( {
 	className,
 	isSelected,
-	selectedIconProps = {},
+	selectedIconProps,
 	tooltipText,
 	...additionalProps
 } ) {
@@ -39,7 +39,12 @@ function Option( {
 			) : (
 				optionButton
 			) }
-			{ isSelected && <Icon icon={ check } { ...selectedIconProps } /> }
+			{ isSelected && (
+				<Icon
+					icon={ check }
+					{ ...( selectedIconProps ? selectedIconProps : {} ) }
+				/>
+			) }
 		</div>
 	);
 }

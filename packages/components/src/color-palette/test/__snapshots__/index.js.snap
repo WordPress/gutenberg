@@ -145,6 +145,14 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         aria-label="Color: red"
         isSelected={true}
         onClick={[Function]}
+        selectedIconProps={
+          Object {
+            "fill": "#111111",
+            "style": Object {
+              "backgroundColor": "#f00",
+            },
+          }
+        }
         style={
           Object {
             "color": "#f00",
@@ -156,6 +164,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         aria-label="Color: white"
         isSelected={false}
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
             "color": "#fff",
@@ -167,6 +176,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         aria-label="Color: blue"
         isSelected={false}
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
             "color": "#00f",
@@ -230,6 +240,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           aria-label="Color: red"
           isSelected={true}
           onClick={[Function]}
+          selectedIconProps={
+            Object {
+              "fill": "#111111",
+              "style": Object {
+                "backgroundColor": "#f00",
+              },
+            }
+          }
           style={
             Object {
               "color": "#f00",
@@ -241,6 +259,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           aria-label="Color: white"
           isSelected={false}
           onClick={[Function]}
+          selectedIconProps={Object {}}
           style={
             Object {
               "color": "#fff",
@@ -252,6 +271,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           aria-label="Color: blue"
           isSelected={false}
           onClick={[Function]}
+          selectedIconProps={Object {}}
           style={
             Object {
               "color": "#00f",
@@ -270,6 +290,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         isSelected={true}
         key="#f00"
         onClick={[Function]}
+        selectedIconProps={
+          Object {
+            "fill": "#111111",
+            "style": Object {
+              "backgroundColor": "#f00",
+            },
+          }
+        }
         style={
           Object {
             "color": "#f00",
@@ -319,6 +347,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             </ForwardRef(Button)>
           </Tooltip>
           <Icon
+            fill="#111111"
             icon={
               <SVG
                 viewBox="-2 -2 24 24"
@@ -329,18 +358,35 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 />
               </SVG>
             }
+            style={
+              Object {
+                "backgroundColor": "#f00",
+              }
+            }
           >
             <SVG
+              fill="#111111"
               height={24}
+              style={
+                Object {
+                  "backgroundColor": "#f00",
+                }
+              }
               viewBox="-2 -2 24 24"
               width={24}
               xmlns="http://www.w3.org/2000/svg"
             >
               <svg
                 aria-hidden="true"
+                fill="#111111"
                 focusable="false"
                 height={24}
                 role="img"
+                style={
+                  Object {
+                    "backgroundColor": "#f00",
+                  }
+                }
                 viewBox="-2 -2 24 24"
                 width={24}
                 xmlns="http://www.w3.org/2000/svg"
@@ -362,6 +408,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         isSelected={false}
         key="#fff"
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
             "color": "#fff",
@@ -417,6 +464,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         isSelected={false}
         key="#00f"
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
             "color": "#00f",
