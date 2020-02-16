@@ -90,13 +90,16 @@
 .wp-block-column {
 	&.is-vertically-aligned-top {
 		align-self: flex-start;
+		width: 100%;
 	}
 
 	&.is-vertically-aligned-center {
 		align-self: center;
+		width: 100%;
 	}
 
 	&.is-vertically-aligned-bottom {
 		align-self: flex-end;
+		width: 100%;
 	}
 }
