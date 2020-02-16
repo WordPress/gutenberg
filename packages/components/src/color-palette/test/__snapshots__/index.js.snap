@@ -155,6 +155,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         }
         style={
           Object {
+            "backgroundColor": "#f00",
             "color": "#f00",
           }
         }
@@ -167,6 +168,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#fff",
             "color": "#fff",
           }
         }
@@ -179,6 +181,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#00f",
             "color": "#00f",
           }
         }
@@ -250,6 +253,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           }
           style={
             Object {
+              "backgroundColor": "#f00",
               "color": "#f00",
             }
           }
@@ -262,6 +266,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           selectedIconProps={Object {}}
           style={
             Object {
+              "backgroundColor": "#fff",
               "color": "#fff",
             }
           }
@@ -274,6 +279,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           selectedIconProps={Object {}}
           style={
             Object {
+              "backgroundColor": "#00f",
               "color": "#00f",
             }
           }
@@ -300,6 +306,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         }
         style={
           Object {
+            "backgroundColor": "#f00",
             "color": "#f00",
           }
         }
@@ -323,6 +330,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               onMouseLeave={[Function]}
               style={
                 Object {
+                  "backgroundColor": "#f00",
                   "color": "#f00",
                 }
               }
@@ -339,6 +347,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 onMouseLeave={[Function]}
                 style={
                   Object {
+                    "backgroundColor": "#f00",
                     "color": "#f00",
                   }
                 }
@@ -411,6 +420,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#fff",
             "color": "#fff",
           }
         }
@@ -434,6 +444,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               onMouseLeave={[Function]}
               style={
                 Object {
+                  "backgroundColor": "#fff",
                   "color": "#fff",
                 }
               }
@@ -450,6 +461,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 onMouseLeave={[Function]}
                 style={
                   Object {
+                    "backgroundColor": "#fff",
                     "color": "#fff",
                   }
                 }
@@ -467,6 +479,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#00f",
             "color": "#00f",
           }
         }
@@ -490,6 +503,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               onMouseLeave={[Function]}
               style={
                 Object {
+                  "backgroundColor": "#00f",
                   "color": "#00f",
                 }
               }
@@ -506,6 +520,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 onMouseLeave={[Function]}
                 style={
                   Object {
+                    "backgroundColor": "#00f",
                     "color": "#00f",
                   }
                 }

@@ -1963,6 +1963,7 @@ exports[`Storyshots Components/ColorPalette Default 1`] = `
       onMouseLeave={[Function]}
       style={
         Object {
+          "backgroundColor": "#f00",
           "color": "#f00",
         }
       }
@@ -1984,6 +1985,7 @@ exports[`Storyshots Components/ColorPalette Default 1`] = `
       onMouseLeave={[Function]}
       style={
         Object {
+          "backgroundColor": "#fff",
           "color": "#fff",
         }
       }
@@ -2005,6 +2007,7 @@ exports[`Storyshots Components/ColorPalette Default 1`] = `
       onMouseLeave={[Function]}
       style={
         Object {
+          "backgroundColor": "#00f",
           "color": "#00f",
         }
       }
@@ -2057,6 +2060,7 @@ exports[`Storyshots Components/ColorPalette With Knobs 1`] = `
       onMouseLeave={[Function]}
       style={
         Object {
+          "backgroundColor": "#f00",
           "color": "#f00",
         }
       }
@@ -2078,6 +2082,7 @@ exports[`Storyshots Components/ColorPalette With Knobs 1`] = `
       onMouseLeave={[Function]}
       style={
         Object {
+          "backgroundColor": "#fff",
           "color": "#fff",
         }
       }
@@ -2099,6 +2104,7 @@ exports[`Storyshots Components/ColorPalette With Knobs 1`] = `
       onMouseLeave={[Function]}
       style={
         Object {
+          "backgroundColor": "#00f",
           "color": "#00f",
         }
       }

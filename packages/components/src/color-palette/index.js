@@ -47,7 +47,7 @@ export default function ColorPalette( {
 					// translators: %s: color hex code e.g: "#f00".
 					sprintf( __( 'Color code: %s' ), color )
 				}
-				style={ { color } }
+				style={ { backgroundColor: color, color } }
 				onClick={
 					value === color ? clearColor : () => onChange( color )
 				}

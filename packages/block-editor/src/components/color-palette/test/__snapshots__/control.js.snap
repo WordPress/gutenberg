@@ -46,6 +46,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             onMouseLeave={[Function]}
             style={
               Object {
+                "backgroundColor": "#f00",
                 "color": "#f00",
               }
             }
