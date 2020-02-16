@@ -148,9 +148,6 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         selectedIconProps={
           Object {
             "fill": "#111111",
-            "style": Object {
-              "backgroundColor": "#f00",
-            },
           }
         }
         style={
@@ -246,9 +243,6 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           selectedIconProps={
             Object {
               "fill": "#111111",
-              "style": Object {
-                "backgroundColor": "#f00",
-              },
             }
           }
           style={
@@ -299,9 +293,6 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         selectedIconProps={
           Object {
             "fill": "#111111",
-            "style": Object {
-              "backgroundColor": "#f00",
-            },
           }
         }
         style={
@@ -367,20 +358,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 />
               </SVG>
             }
-            style={
-              Object {
-                "backgroundColor": "#f00",
-              }
-            }
           >
             <SVG
               fill="#111111"
               height={24}
-              style={
-                Object {
-                  "backgroundColor": "#f00",
-                }
-              }
               viewBox="-2 -2 24 24"
               width={24}
               xmlns="http://www.w3.org/2000/svg"
@@ -391,11 +372,6 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 focusable="false"
                 height={24}
                 role="img"
-                style={
-                  Object {
-                    "backgroundColor": "#f00",
-                  }
-                }
                 viewBox="-2 -2 24 24"
                 width={24}
                 xmlns="http://www.w3.org/2000/svg"

@@ -36,9 +36,6 @@ export default function ColorPalette( {
 								fill: tinycolor
 									.mostReadable( color, [ '#111', '#fff' ] )
 									.toHexString(),
-								style: {
-									backgroundColor: color,
-								},
 						  }
 						: {}
 				}
