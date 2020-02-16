@@ -39,6 +39,7 @@ export class PanelBody extends Component {
 
 	render() {
 		const {
+			alwaysOpen,
 			title,
 			children,
 			opened,
@@ -47,17 +48,16 @@ export class PanelBody extends Component {
 			forwardedRef,
 		} = this.props;
 		const isOpened = opened === undefined ? this.state.opened : opened;
-		const canUserToggle = undefined === opened; // Opened state is controlled externally.
 		const classes = classnames( 'components-panel__body', className, {
 			'is-opened': isOpened,
-			'has-toggle': canUserToggle,
+			'is-always-open': alwaysOpen,
 		} );
 
 		return (
 			<div className={ classes } ref={ forwardedRef }>
 				{ !! title && (
 					<h2 className="components-panel__body-title">
-						{ canUserToggle ? (
+						{ ! alwaysOpen ? (
 							<Button
 								className="components-panel__body-toggle"
 								onClick={ this.toggle }

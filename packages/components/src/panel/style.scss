@@ -68,7 +68,7 @@
 }
 
 // Hover States
-.components-panel__body:not(.has-toggle) > .components-panel__body-title:hover {
+.components-panel__body:not(.is-always-open) > .components-panel__body-title:hover {
 	// Override the default button hover style
 	background: $light-gray-200 !important;
 	border: none !important;
