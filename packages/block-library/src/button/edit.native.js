@@ -78,8 +78,13 @@ class ButtonEdit extends Component {
 			setAttributes,
 			editorSidebarOpened,
 			attributes: { url },
+			parentWidth,
 		} = this.props;
 		const { isLinkSheetVisible, isButtonFocused } = this.state;
+
+		if ( prevProps.parentWidth !== parentWidth ) {
+			this.onLayout();
+		}
 
 		// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
 		if (
@@ -220,11 +225,13 @@ class ButtonEdit extends Component {
 		this.setState( { isLinkSheetVisible: false } );
 	}
 
-	onLayout( { nativeEvent } ) {
-		const { width } = nativeEvent.layout;
+	onLayout() {
+		const { parentWidth } = this.props;
 		const { marginRight } = styles.button;
 		const buttonSpacing = 2 * marginRight;
-		this.setState( { maxWidth: width - buttonSpacing } );
+		this.setState( {
+			maxWidth: parentWidth - 2 * buttonSpacing,
+		} );
 	}
 
 	getLinkSettings( url, rel, linkTarget, isCompatibleWithSettings ) {

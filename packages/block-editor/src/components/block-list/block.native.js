@@ -112,6 +112,7 @@ class BlockListBlock extends Component {
 			hasParent,
 			getStylesFromColorScheme,
 			isLastBlock,
+			name,
 		} = this.props;
 
 		// if block does not have parent apply neutral or full
@@ -138,7 +139,9 @@ class BlockListBlock extends Component {
 					? styles.childOfSelected
 					: styles.childOfSelectedLeaf ),
 				...dashedBorderStyle,
-				...( ! isLastBlock && styles.marginVerticalChild ),
+				...( ! isLastBlock &&
+					name !== 'core/button' &&
+					styles.marginVerticalChild ),
 			};
 		}
 
