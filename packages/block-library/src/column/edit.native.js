@@ -36,7 +36,7 @@ function ColumnEdit( {
 	const { verticalAlignment } = attributes;
 	const {
 		columnsInRow = 1,
-		columnsContainerWidth,
+		width: columnsContainerWidth,
 	} = columnsContainerSettings;
 
 	const columnContainerBaseWidth = styles[ 'column-container-base' ].maxWidth;
@@ -83,6 +83,7 @@ function ColumnEdit( {
 			} else {
 				width -=
 					columnsInRow === 1 ? parentSelected : placeholderSelected;
+				if ( ! hasChildren ) width -= 4;
 			}
 		} else if ( isSelected ) {
 			width -= ! hasChildren ? selected : descendantSelected;
