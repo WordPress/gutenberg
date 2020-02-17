@@ -40,7 +40,7 @@ export const _default = () => {
 	);
 };
 
-export const Library = () => {
+const LibraryExample = () => {
 	const [ filter, setFilter ] = useState( '' );
 	const filteredIcons = omitBy( availableIcons, ( icon, name ) => {
 		return name.indexOf( filter ) === -1;
@@ -75,3 +75,5 @@ export const Library = () => {
 		</div>
 	);
 };
+
+export const Library = () => <LibraryExample />;
