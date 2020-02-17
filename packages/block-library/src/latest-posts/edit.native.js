@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { TouchableWithoutFeedback, View, Text } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
 import { coreBlocks } from '@wordpress/block-library';
 import { __ } from '@wordpress/i18n';
 import { postList as icon } from '@wordpress/icons';
@@ -66,12 +67,20 @@ class LatestPostsEdit extends Component {
 		this.isStillMounted = false;
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( ! prevProps.isSelected && this.props.isSelected ) {
+			this.props.openGeneralSidebar();
+		}
+	}
+
 	render() {
 		const {
 			attributes,
 			setAttributes,
 			getStylesFromColorScheme,
 			name,
+			openGeneralSidebar,
+			isSelected,
 		} = this.props;
 
 		const blockType = coreBlocks[ name ];
@@ -222,14 +231,31 @@ class LatestPostsEdit extends Component {
 		);
 
 		return (
-			<View style={ blockStyle }>
-				{ getInspectorControls() }
-				<Icon icon={ icon } { ...iconStyle } />
-				<Text style={ titleStyle }>{ blockType.settings.title }</Text>
-				<Text style={ subTitleStyle }>{ __( 'Configure' ) }</Text>
-			</View>
+			<TouchableWithoutFeedback
+				accessible={ ! isSelected }
+				disabled={ ! isSelected }
+				onPress={ openGeneralSidebar }
+			>
+				<View style={ blockStyle }>
+					{ getInspectorControls() }
+					<Icon icon={ icon } { ...iconStyle } />
+					<Text style={ titleStyle }>
+						{ blockType.settings.title }
+					</Text>
+					<Text style={ subTitleStyle }>{ __( 'Configure' ) }</Text>
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
 
-export default withPreferredColorScheme( LatestPostsEdit );
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+
+		return {
+			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
+		};
+	} ),
+	withPreferredColorScheme,
+] )( LatestPostsEdit );
