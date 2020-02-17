@@ -89,8 +89,8 @@ This is often used to allow on-the-fly creation of new entities (eg: `Posts`,
 `Pages`) based on the text the user has entered into the link search UI. For
 example, the Navigation Block uses this to create Pages on demand.
 
-When called, `createSuggestion` may return either a new link `value` or a `Promise` which resolves to a
-new link `value` (see above) with the shape:
+When called, `createSuggestion` may return either a new suggestion directly or a `Promise` which resolves to a
+new suggestion. Suggestions have the following shape:
 
 ```js
 {
