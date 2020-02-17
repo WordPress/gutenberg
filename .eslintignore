@@ -6,5 +6,4 @@ packages/block-serialization-spec-parser/parser.js
 packages/e2e-tests/plugins
 playground/dist
 vendor
-wordpress
 !.*.js
