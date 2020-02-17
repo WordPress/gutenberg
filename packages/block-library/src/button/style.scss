@@ -1,7 +1,7 @@
 $blocks-button__height: 56px;
 
 .wp-block-button {
-	color: $white;
+	color: var(--wp--color--white, $white);
 
 	&.aligncenter {
 		text-align: center;
@@ -14,7 +14,7 @@ $blocks-button__height: 56px;
 }
 
 .wp-block-button__link {
-	background-color: $dark-gray-700;
+	background-color: var(--wp--color--background, $dark-gray-700);
 	border: none;
 	border-radius: $blocks-button__height / 2;
 	box-shadow: none;
@@ -36,10 +36,6 @@ $blocks-button__height: 56px;
 	}
 }
 
-.wp-gs .wp-block-button__link:not(.has-background) {
-	background-color: var(--wp--color--primary);
-}
-
 .is-style-squared .wp-block-button__link {
 	border-radius: 0;
 }
@@ -48,7 +44,7 @@ $blocks-button__height: 56px;
 }
 
 .is-style-outline {
-	color: $dark-gray-700;
+	color: var(--wp--color--background, $dark-gray-700);
 
 	.wp-block-button__link {
 		background-color: transparent;
