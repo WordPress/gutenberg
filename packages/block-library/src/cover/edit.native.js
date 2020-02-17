@@ -77,13 +77,23 @@ const Cover = ( {
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
+	const hasBackground = !! (
+		url ||
+		attributes.overlayColor ||
+		overlayColor.color ||
+		gradientValue
+	);
+
 	// Used to set a default color for its InnerBlocks
 	// since there's no system to inherit styles yet
 	// the RichText component will check if there are
 	// parent styles for the current block. If there are,
 	// it will use that color instead.
 	useEffect( () => {
-		setAttributes( { childrenStyles: styles.defaultColor } );
+		// While we don't support theme colors
+		if ( ! attributes.overlayColor || ( ! attributes.overlay && url ) ) {
+			setAttributes( { childrenStyles: styles.defaultColor } );
+		}
 	}, [ setAttributes ] );
 
 	const onSelectMedia = ( media ) => {
@@ -102,7 +112,7 @@ const Cover = ( {
 	};
 
 	const getOverlayStyles = () => {
-		// Set opacity to 1 while video support is not available
+		// Set opacity to 1 while video / theme color support is not available
 		const opacity =
 			url && VIDEO_BACKGROUND_TYPE !== backgroundType
 				? dimRatio / 100
@@ -117,6 +127,13 @@ const Cover = ( {
 						: styles.overlay.color,
 				opacity,
 			},
+			// While we don't support theme colors we add a default bg color
+			! overlayColor.color && ! url
+				? getStylesFromColorScheme(
+						styles.backgroundSolid,
+						styles.backgroundSolidDark
+				  )
+				: {},
 		];
 	};
 
@@ -166,13 +183,6 @@ const Cover = ( {
 				</PanelBody>
 			) : null }
 		</InspectorControls>
-	);
-
-	const hasBackground = !! (
-		url ||
-		attributes.overlayColor ||
-		overlayColor.color ||
-		gradientValue
 	);
 
 	const containerStyles = {

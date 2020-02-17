@@ -49,3 +49,11 @@
 	height: 100%;
 	position: absolute;
 }
+
+.backgroundSolid {
+	background-color: $gray-lighten-30;
+}
+
+.backgroundSolidDark {
+	background-color: $background-dark-secondary;
+}
