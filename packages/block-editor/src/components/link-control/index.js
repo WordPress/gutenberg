@@ -382,9 +382,10 @@ function LinkControl( {
 			}
 
 			setErrorMessage(
-				__(
-					'An unknown error occurred during creation. Please try again.'
-				)
+				error.message ||
+					__(
+						'An unknown error occurred during creation. Please try again.'
+					)
 			);
 			setIsResolvingLink( false );
 			setIsEditingLink( true );

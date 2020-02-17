@@ -964,7 +964,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			expect( errorNotice ).not.toBeFalsy();
 			expect( errorNotice.innerHTML ).toEqual(
 				expect.stringContaining(
-					'An unknown error occurred during creation. Please try again.'
+					'API response returned invalid entity'
 				)
 			);
 
