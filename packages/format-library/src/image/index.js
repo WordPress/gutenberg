@@ -45,6 +45,7 @@ export const image = {
 			this.onKeyDown = this.onKeyDown.bind( this );
 			this.openModal = this.openModal.bind( this );
 			this.closeModal = this.closeModal.bind( this );
+			this.anchorRef = null;
 			this.state = {
 				modal: false,
 			};
@@ -93,6 +94,22 @@ export const image = {
 
 		closeModal() {
 			this.setState( { modal: false } );
+		}
+
+		componentDidMount() {
+			this.anchorRef = getRange();
+		}
+
+		componentDidUpdate( prevProps ) {
+			// When the popover is open or when the selected image changes,
+			// update the anchorRef.
+			if (
+				( ! prevProps.isObjectActive && this.props.isObjectActive ) ||
+				prevProps.activeObjectAttributes.url !==
+					this.props.activeObjectAttributes.url
+			) {
+				this.anchorRef = getRange();
+			}
 		}
 
 		render() {
@@ -151,7 +168,7 @@ export const image = {
 						<Popover
 							position="bottom center"
 							focusOnMount={ false }
-							anchorRef={ getRange() }
+							anchorRef={ this.anchorRef }
 						>
 							{
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
