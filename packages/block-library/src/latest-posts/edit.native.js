@@ -96,6 +96,33 @@ class LatestPostsEdit extends Component {
 			categories,
 		} = attributes;
 
+		const blockStyle = getStylesFromColorScheme(
+			styles.latestPostBlock,
+			styles.latestPostBlockDark
+		);
+
+		const iconStyle = getStylesFromColorScheme(
+			styles.latestPostBlockIcon,
+			styles.latestPostBlockIconDark
+		);
+
+		const titleStyle = getStylesFromColorScheme(
+			styles.latestPostBlockMessage,
+			styles.latestPostBlockMessageDark
+		);
+
+		const subTitleStyle = getStylesFromColorScheme(
+			styles.latestPostBlockSubtitle,
+			styles.latestPostBlockSubtitleDark
+		);
+
+		const actions = [
+			{
+				label: __( 'Clear All Settings' ),
+				onPress: onClearSettings,
+			},
+		];
+
 		const onClearSettings = () => {
 			setAttributes( {
 				excerptLength: DEFAULT_EXCERPT_LENGTH,
@@ -141,13 +168,6 @@ class LatestPostsEdit extends Component {
 				categories: '' !== value ? value : undefined,
 			} );
 		};
-
-		const actions = [
-			{
-				label: __( 'Clear All Settings' ),
-				onPress: onClearSettings,
-			},
-		];
 
 		const getInspectorControls = () => (
 			<InspectorControls>
@@ -208,26 +228,6 @@ class LatestPostsEdit extends Component {
 
 				<PanelActions actions={ actions } />
 			</InspectorControls>
-		);
-
-		const blockStyle = getStylesFromColorScheme(
-			styles.latestPostBlock,
-			styles.latestPostBlockDark
-		);
-
-		const iconStyle = getStylesFromColorScheme(
-			styles.latestPostBlockIcon,
-			styles.latestPostBlockIconDark
-		);
-
-		const titleStyle = getStylesFromColorScheme(
-			styles.latestPostBlockMessage,
-			styles.latestPostBlockMessageDark
-		);
-
-		const subTitleStyle = getStylesFromColorScheme(
-			styles.latestPostBlockSubtitle,
-			styles.latestPostBlockSubtitleDark
 		);
 
 		return (
