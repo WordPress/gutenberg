@@ -65,17 +65,15 @@ function ColumnEdit( {
 			'descendant-selected',
 			'placeholder-selected',
 		];
-		const [
-			selected,
-			parentSelected,
-			descendantSelected,
-			placeholderSelected,
-		] = pullWidths( names );
+		const widths = pullWidths( names );
+		const [ , parentSelected, , placeholderSelected ] = widths;
 
 		if ( isParentSelected ) {
 			width -= placeholder ? placeholderSelected : parentSelected;
 			return { width };
 		}
+
+		const [ selected, , descendantSelected ] = widths;
 
 		if ( placeholder ) {
 			if ( isDescendantOfParentSelected ) {
