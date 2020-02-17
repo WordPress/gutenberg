@@ -12,6 +12,7 @@ import { coreBlocks } from '@wordpress/block-library';
 import { __ } from '@wordpress/i18n';
 import { postList as icon } from '@wordpress/icons';
 import { InspectorControls } from '@wordpress/block-editor';
+import { fetchRequest } from 'react-native-gutenberg-bridge';
 import {
 	Icon,
 	PanelBody,
@@ -39,6 +40,32 @@ import {
 } from './constants';
 
 class LatestPostsEdit extends Component {
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			categoriesList: [],
+		};
+	}
+
+	componentDidMount() {
+		this.isStillMounted = true;
+		this.fetchRequest = fetchRequest( '/wp/v2/categories?per_page=-1' )
+			.then( ( categoriesList ) => {
+				if ( this.isStillMounted ) {
+					this.setState( { categoriesList } );
+				}
+			} )
+			.catch( () => {
+				if ( this.isStillMounted ) {
+					this.setState( { categoriesList: [] } );
+				}
+			} );
+	}
+
+	componentWillUnmount() {
+		this.isStillMounted = false;
+	}
+
 	render() {
 		const {
 			attributes,
@@ -48,6 +75,7 @@ class LatestPostsEdit extends Component {
 		} = this.props;
 
 		const blockType = coreBlocks[ name ];
+		const { categoriesList } = this.state;
 		const {
 			displayPostContent,
 			displayPostContentRadio,
@@ -56,6 +84,7 @@ class LatestPostsEdit extends Component {
 			order,
 			orderBy,
 			postsToShow,
+			categories,
 		} = attributes;
 
 		const onClearSettings = () => {
@@ -98,6 +127,12 @@ class LatestPostsEdit extends Component {
 			setAttributes( { postsToShow: value } );
 		};
 
+		const onSetCategories = ( value ) => {
+			setAttributes( {
+				categories: '' !== value ? value : undefined,
+			} );
+		};
+
 		const actions = [
 			{
 				label: __( 'Clear All Settings' ),
@@ -111,8 +146,13 @@ class LatestPostsEdit extends Component {
 					<QueryControls
 						{ ...{ order, orderBy } }
 						numberOfItems={ postsToShow }
+						categoriesList={ categoriesList }
+						selectedCategoryId={
+							undefined !== categories ? categories : ''
+						}
 						onOrderChange={ onSetOrder }
 						onOrderByChange={ onSetOrderBy }
+						onCategoryChange={ onSetCategories }
 						onNumberOfItemsChange={ onSetPostsToShow }
 					/>
 				</PanelBody>
