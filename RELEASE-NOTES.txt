@@ -6,6 +6,7 @@
 * New block: Button
 * Add scroll support inside block picker and block settings
 * [Android] Fix issue preventing correct placeholder image from displaying during image upload
+* [iOS] Fix diplay of large numbers on ordered lists
 
 1.22.0
 ------
