@@ -103,18 +103,32 @@ const makeCancelable = ( promise ) => {
 /** @typedef {(nextValue:WPLinkControlValue)=>void} WPLinkControlOnChangeProp */
 
 /**
+ * Properties associated with a search suggestion used within the LinkControl.
+ *
+ * @typedef WPLinkControlSuggestion
+ *
+ * @property {string} id    Identifier to use to uniquely identify the suggestion.
+ * @property {string} type  Identifies the type of the suggestion (eg: `post`,
+ *                          `page`, `url`...etc)
+ * @property {string} title Human-readable label to show in user interface.
+ * @property {string} url   A URL for the suggestion.
+ */
+
+/** @typedef {(title:string)=>WPLinkControlSuggestion} WPLinkControlCreateSuggestionProp */
+
+/**
  * @typedef WPLinkControlProps
  *
- * @property {(WPLinkControlSetting[])=}  settings               An array of settings objects. Each object will used to
- *                                                               render a `ToggleControl` for that setting.
- * @property {boolean=}                   forceIsEditingLink     If passed as either `true` or `false`, controls the
- *                                                               internal editing state of the component to respective
- *                                                               show or not show the URL input field.
- * @property {WPLinkControlValue=}                               value                  Current link value.
- * @property {WPLinkControlOnChangeProp=}                        onChange               Value change handler, called with the updated value if
- *                                                                                      the user selects a new link or updates settings.
- * @property {boolean=}                                          showInitialSuggestions Whether to present initial suggestions immediately.
- * @property {(title:string)=>WPLinkControlValue=}               createSuggestion       Handler to manage creation of link value from suggestion.
+ * @property {(WPLinkControlSetting[])=}            settings               An array of settings objects. Each object will used to
+ *                                                                         render a `ToggleControl` for that setting.
+ * @property {boolean=}                             forceIsEditingLink     If passed as either `true` or `false`, controls the
+ *                                                                         internal editing state of the component to respective
+ *                                                                         show or not show the URL input field.
+ * @property {WPLinkControlValue=}                  value                  Current link value.
+ * @property {WPLinkControlOnChangeProp=}           onChange               Value change handler, called with the updated value if
+ *                                                                         the user selects a new link or updates settings.
+ * @property {boolean=}                             showInitialSuggestions Whether to present initial suggestions immediately.
+ * @property {WPLinkControlCreateSuggestionProp=}   createSuggestion       Handler to manage creation of link value from suggestion.
  */
 
 /**
