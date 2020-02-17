@@ -34,7 +34,7 @@ export default function ColorPalette( {
 					value === color
 						? {
 								fill: tinycolor
-									.mostReadable( color, [ '#111', '#fff' ] )
+									.mostReadable( color, [ '#000', '#fff' ] )
 									.toHexString(),
 						  }
 						: {}
