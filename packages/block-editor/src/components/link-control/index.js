@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, startsWith } from 'lodash';
+import { noop, startsWith, pick, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -85,6 +85,18 @@ import LinkControlSearchInput from './search-input';
  */
 
 /**
+ * Default settings configuration.
+ *
+ * @type {WPLinkControlSetting[]}
+ */
+const DEFAULT_SETTINGS = [
+	{
+		id: 'opensInNewTab',
+		title: __( 'Open in New Tab' ),
+	},
+];
+
+/**
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
  * for how that link is expected to behave.
@@ -93,7 +105,7 @@ import LinkControlSearchInput from './search-input';
  */
 function LinkControl( {
 	value,
-	settings,
+	settings = DEFAULT_SETTINGS,
 	onChange = noop,
 	showInitialSuggestions,
 	forceIsEditingLink,
@@ -220,6 +232,19 @@ function LinkControl( {
 		setIsEditingLink( false );
 	}
 
+	/**
+	 * Given a selected suggestion, returns the merged next value. The merged
+	 * value inherits only settings properties from the previous value.
+	 *
+	 * @param {WPLinkControlValue} suggestion Next value suggestion.
+	 *
+	 * @return {WPLinkControlValue} Merged next value.
+	 */
+	const getNextValue = ( suggestion ) => ( {
+		...pick( value, map( settings, 'id' ) ),
+		...suggestion,
+	} );
+
 	// Effects
 	const getSearchHandler = useCallback(
 		( val, args ) => {
@@ -294,7 +319,7 @@ function LinkControl( {
 							) }
 							suggestion={ suggestion }
 							onClick={ () => {
-								onChange( { ...value, ...suggestion } );
+								onChange( getNextValue( suggestion ) );
 								stopEditing();
 							} }
 							isSelected={ index === selectedSuggestion }
@@ -320,7 +345,7 @@ function LinkControl( {
 					value={ inputValue }
 					onChange={ onInputChange }
 					onSelect={ ( suggestion ) => {
-						onChange( { ...value, ...suggestion } );
+						onChange( getNextValue( suggestion ) );
 						stopEditing();
 					} }
 					renderSuggestions={ renderSearchResults }
