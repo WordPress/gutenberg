@@ -11,11 +11,15 @@ import { Button, Icon } from '@wordpress/components';
 import { __experimentalCreateInterpolateElement } from '@wordpress/element';
 
 export const LinkControlSearchCreate = ( {
-	searchTerm = '',
+	searchTerm,
 	onClick,
 	itemProps,
 	isSelected,
 } ) => {
+	if ( ! searchTerm ) {
+		return null;
+	}
+
 	return (
 		<Button
 			{ ...itemProps }
