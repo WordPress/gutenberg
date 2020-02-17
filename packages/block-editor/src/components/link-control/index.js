@@ -524,10 +524,7 @@ function LinkControl( {
 					value={ inputValue }
 					onChange={ onInputChange }
 					onSelect={ async ( suggestion ) => {
-						if (
-							suggestion.type &&
-							CREATE_TYPE === suggestion.type
-						) {
+						if ( CREATE_TYPE === suggestion.type ) {
 							try {
 								cancelableOnCreate.current = makeCancelable(
 									handleOnCreate( inputValue )
