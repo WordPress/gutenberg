@@ -34,6 +34,10 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 import LinkControlSearchCreate from './search-create-button';
+
+// Used as a unique identifier for the "Create" option within search results.
+// Used to help distinguish the "Create" suggestion within the search results in
+// order to handle it as a unique case.
 const CREATE_TYPE = '__CREATE__';
 
 /**
