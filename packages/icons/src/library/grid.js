@@ -3,10 +3,10 @@
  */
 import { SVG, Path } from '@wordpress/primitives';
 
-const table = (
+const grid = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24">
-		<Path d="M18 17V3H2v14h16zM16 7H4V5h12v2zm-7 4H4V9h5v2zm7 0h-5V9h5v2zm-7 4H4v-2h5v2zm7 0h-5v-2h5v2z" />
+		<Path d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z" />
 	</SVG>
 );
 
-export default table;
+export default grid;
