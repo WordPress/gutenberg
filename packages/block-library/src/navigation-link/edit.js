@@ -120,26 +120,6 @@ function NavigationLinkEdit( {
 			status: 'publish',
 		} );
 
-		// `page` may not reject the Promise
-		// but may still be invalid. Here we
-		// tests for unexpected values and throw accordingly.
-		if ( null === page || undefined === page ) {
-			throw new TypeError( 'API response returned invalid Page.', page );
-		}
-
-		const requiredEntityProps = [ 'id', 'title', 'link' ];
-
-		const pageMissingProperty = requiredEntityProps.find(
-			( pageProp ) => ! page.hasOwnProperty( pageProp )
-		);
-
-		if ( pageMissingProperty ) {
-			throw new TypeError(
-				`API response returned invalid page. Missing required property "${ pageMissingProperty }".`,
-				page
-			);
-		}
-
 		return {
 			id: page.id,
 			type,
