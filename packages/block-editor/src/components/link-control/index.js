@@ -352,24 +352,41 @@ function LinkControl( {
 		setIsResolvingLink( true );
 		setErrorMessage( null );
 
-		// Make cancellable in order that we can avoid setting State
-		// if the component unmounts during the call to `createSuggestion`
-		cancelableCreateSuggestion.current = makeCancelable(
-			// Using Promise.resolve to allow createSuggestion to return a
-			// non-Promise based value.
-			Promise.resolve( createSuggestion( suggestionTitle ) )
-		);
-		const newSuggestion = await cancelableCreateSuggestion.current.promise;
+		try {
+			// Make cancellable in order that we can avoid setting State
+			// if the component unmounts during the call to `createSuggestion`
+			cancelableCreateSuggestion.current = makeCancelable(
+				// Using Promise.resolve to allow createSuggestion to return a
+				// non-Promise based value.
+				Promise.resolve( createSuggestion( suggestionTitle ) )
+			);
 
-		// ********
-		// NOTE: if the above Promise rejects then code below here will never run
-		// ********
-		setIsResolvingLink( false );
+			const newSuggestion = await cancelableCreateSuggestion.current
+				.promise;
 
-		// Only set link if request is resolved, otherwise enable edit mode.
-		if ( newSuggestion ) {
-			onChange( newSuggestion );
-		} else {
+			// ********
+			// NOTE: if the above Promise rejects then code below here will never run
+			// ********
+			setIsResolvingLink( false );
+
+			// Only set link if request is resolved, otherwise enable edit mode.
+			if ( newSuggestion ) {
+				onChange( newSuggestion );
+				stopEditing();
+			} else {
+				setIsEditingLink( true );
+			}
+		} catch ( error ) {
+			if ( error && error.isCanceled ) {
+				return; // bail if canceled to avoid setting state
+			}
+
+			setErrorMessage(
+				__(
+					'An unknown error occurred during creation. Please try again.'
+				)
+			);
+			setIsResolvingLink( false );
 			setIsEditingLink( true );
 		}
 	};
@@ -445,30 +462,9 @@ function LinkControl( {
 								<LinkControlSearchCreate
 									searchTerm={ inputValue }
 									onClick={ async () => {
-										try {
-											cancelableOnCreate.current = makeCancelable(
-												handleOnCreate(
-													suggestion.title
-												)
-											);
-
-											await cancelableOnCreate.current
-												.promise;
-											// Only stop editing if not rejected
-											stopEditing();
-										} catch ( error ) {
-											if ( error && error.isCanceled ) {
-												return; // bail if canceled to avoid setting state
-											}
-
-											setErrorMessage(
-												__(
-													'An unknown error occurred during creation. Please try again.'
-												)
-											);
-											setIsResolvingLink( false );
-											setIsEditingLink( true );
-										}
+										await handleOnCreate(
+											suggestion.title
+										);
 									} }
 									// Intentionally only using `type` here as
 									// the constant is enough to uniquely
@@ -533,25 +529,7 @@ function LinkControl( {
 					onChange={ onInputChange }
 					onSelect={ async ( suggestion ) => {
 						if ( CREATE_TYPE === suggestion.type ) {
-							try {
-								cancelableOnCreate.current = makeCancelable(
-									handleOnCreate( inputValue )
-								);
-								await cancelableOnCreate.current.promise;
-								stopEditing();
-							} catch ( error ) {
-								if ( error && error.isCanceled ) {
-									return; // bail if canceled to avoid setting state
-								}
-
-								setErrorMessage(
-									__(
-										'An unknown error occurred during creation. Please try again.'
-									)
-								);
-								setIsResolvingLink( false );
-								setIsEditingLink( true );
-							}
+							await handleOnCreate( inputValue );
 						} else {
 							handleSelectSuggestion( suggestion, value );
 							stopEditing();
