@@ -83,8 +83,6 @@ class LatestPostsEdit extends Component {
 			isSelected,
 		} = this.props;
 
-		const blockType = coreBlocks[ name ];
-		const { categoriesList } = this.state;
 		const {
 			displayPostContent,
 			displayPostContentRadio,
@@ -95,6 +93,9 @@ class LatestPostsEdit extends Component {
 			postsToShow,
 			categories,
 		} = attributes;
+
+		const { categoriesList } = this.state;
+		const blockType = coreBlocks[ name ];
 
 		const blockStyle = getStylesFromColorScheme(
 			styles.latestPostBlock,
