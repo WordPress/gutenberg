@@ -26,8 +26,8 @@ const LinkControlSearchInput = ( {
 	 * Handles the user moving between different suggestions. Does not handle
 	 * choosing an individual item.
 	 *
-	 * @param {string} selection the url of the selected suggestion
-	 * @param {Object} suggestion the suggestion object
+	 * @param {string} selection the url of the selected suggestion.
+	 * @param {Object} suggestion the suggestion object.
 	 */
 	const selectItemHandler = ( selection, suggestion ) => {
 		onChange( selection );
