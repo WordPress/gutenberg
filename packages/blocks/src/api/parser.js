@@ -333,14 +333,14 @@ export function getMigratedBlock( block, parsedAttributes ) {
 	const { originalContent, innerBlocks } = block;
 
 	// By design, blocks lack any sort of version tracking. Instead, to process
-	// outdated content it operates a queue out of all the defined attribute
-	// shapes and tries each definition until the input produces a valid result.
-	// This mechanism seeks to avoid poluting the user-space with machine
-	// specific code. An invalid block is thus a block that could not be matched
-	// successfully to any of the registered deprecation definitions.
+	// outdated content the system operates a queue out of all the defined
+	// attribute shapes and tries each definition until the input produces a
+	// valid result. This mechanism seeks to avoid polluting the user-space with
+	// machine-specific code. An invalid block is thus a block that could not be
+	// matched successfully with any of the registered deprecation definitions.
 	for ( let i = 0; i < deprecatedDefinitions.length; i++ ) {
 		// A block can opt into a migration even if the block is valid by
-		// defining isEligible on its deprecation. If the block is both valid
+		// defining `isEligible` on its deprecation. If the block is both valid
 		// and does not opt to migrate, skip.
 		const { isEligible = stubFalse } = deprecatedDefinitions[ i ];
 		if ( block.isValid && ! isEligible( parsedAttributes, innerBlocks ) ) {
@@ -368,6 +368,8 @@ export function getMigratedBlock( block, parsedAttributes ) {
 			originalContent
 		);
 
+		// An invalid block does not imply incorrect HTML but the fact block
+		// source information could be lost on reserialization.
 		if ( ! isValid ) {
 			block = {
 				...block,
@@ -464,13 +466,15 @@ export function convertLegacyBlocks( name, attributes ) {
  */
 export function createBlockWithFallback( blockNode ) {
 	const { blockName: originalName } = blockNode;
-	// The tripartite structure of the block type includes its attributes, inner
-	// blocks, and inner HTML. It's important to distinguish inner blocks from
+
+	// The fundamental structure of a blocktype includes its attributes, inner
+	// blocks, and inner HTML. It is important to distinguish inner blocks from
 	// the HTML content of the block as only the latter is relevant for block
 	// validation and edit operations.
 	let { attrs: attributes, innerBlocks = [], innerHTML } = blockNode;
 	const { innerContent } = blockNode;
-	// Blocks that don't have a registered handler are considered "freeform".
+
+	// Blocks that don't have a registered handler are considered freeform.
 	const freeformContentFallbackBlock = getFreeformContentHandlerName();
 	const unregisteredFallbackBlock =
 		getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
@@ -484,32 +488,9 @@ export function createBlockWithFallback( blockNode ) {
 	// freeform content fallback.
 	let name = originalName || freeformContentFallbackBlock;
 
-<<<<<<< HEAD
 	( { name, attributes } = convertLegacyBlocks( name, attributes ) );
-=======
-	// TODO: move these fallbacks to a separate function / file as it muddies
-	// readability. It could also be a source of micro-optimizations for a site
-	// that doesn't need them.
-	// Convert 'core/cover-image' block in existing content to 'core/cover'.
-	if ( 'core/cover-image' === name ) {
-		name = 'core/cover';
-	}
 
-	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
-	if ( 'core/text' === name || 'core/cover-text' === name ) {
-		name = 'core/paragraph';
-	}
-
-	// Convert derivative blocks such as 'core/social-link-wordpress' to the
-	// canonical form 'core/social-link'.
-	if ( name && name.indexOf( 'core/social-link-' ) === 0 ) {
-		// Capture `social-link-wordpress` into `{"service":"wordpress"}`
-		attributes.service = name.substring( 17 );
-		name = 'core/social-link';
-	}
->>>>>>> Update block parser file with more comment context. Explain PEG parser inline.
-
-	// Fallback content may be upgraded from classic editor expecting implicit
+	// Fallback content may be upgraded from classic content expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
 	// meaning there are no negative consequences to repeated autop calls.
 	if ( name === freeformContentFallbackBlock ) {
@@ -532,7 +513,7 @@ export function createBlockWithFallback( blockNode ) {
 
 		// Preserve undelimited content for use by the unregistered type
 		// handler. A block node's `innerHTML` isn't enough, as that field only
-		// carries the block's own HTML and not its nested blocks'.
+		// carries the block's own HTML and not its nested blocks.
 		const originalUndelimitedContent = serializeBlockNode(
 			reconstitutedBlockNode,
 			{
@@ -690,7 +671,7 @@ const createParse = ( parseImplementation ) => ( content ) =>
 	}, [] );
 
 /**
- * Utilizes an optimized token driven parser based on the Gutenberg grammar spec
+ * Utilizes an optimized token-driven parser based on the Gutenberg grammar spec
  * defined through a parsing expression grammar to take advantage of the regular
  * cadence provided by block delimiters -- composed syntactically through HTML
  * comments -- which, given a general HTML document as an input, returns a block

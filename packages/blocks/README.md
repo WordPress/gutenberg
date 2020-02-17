@@ -594,7 +594,7 @@ _Returns_
 
 <a name="parse" href="#parse">#</a> **parse**
 
-Utilizes an optimized token driven parser based on the Gutenberg grammar spec
+Utilizes an optimized token-driven parser based on the Gutenberg grammar spec
 defined through a parsing expression grammar to take advantage of the regular
 cadence provided by block delimiters -- composed syntactically through HTML
 comments -- which, given a general HTML document as an input, returns a block
