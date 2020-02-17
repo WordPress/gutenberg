@@ -32,12 +32,20 @@ import {
 import { withSelect } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import {
+	MIN_EXCERPT_LENGTH,
+	MAX_EXCERPT_LENGTH,
+	MAX_POSTS_COLUMNS,
+} from './constants';
+
+/**
  * Module Constants
  */
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
 };
-const MAX_POSTS_COLUMNS = 6;
 
 class LatestPostsEdit extends Component {
 	constructor() {
@@ -132,8 +140,8 @@ class LatestPostsEdit extends Component {
 								onChange={ ( value ) =>
 									setAttributes( { excerptLength: value } )
 								}
-								min={ 10 }
-								max={ 100 }
+								min={ MIN_EXCERPT_LENGTH }
+								max={ MAX_EXCERPT_LENGTH }
 							/>
 						) }
 				</PanelBody>

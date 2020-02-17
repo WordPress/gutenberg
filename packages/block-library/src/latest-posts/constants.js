@@ -7,3 +7,4 @@ export const DEFAULT_DISPLAY_POST_DATE = false;
 export const DEFAULT_EXCERPT_LENGTH = 55;
 export const MIN_EXCERPT_LENGTH = 10;
 export const MAX_EXCERPT_LENGTH = 100;
+export const MAX_POSTS_COLUMNS = 6;

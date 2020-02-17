@@ -117,13 +117,6 @@ class LatestPostsEdit extends Component {
 			styles.latestPostBlockSubtitleDark
 		);
 
-		const actions = [
-			{
-				label: __( 'Clear All Settings' ),
-				onPress: onClearSettings,
-			},
-		];
-
 		const onClearSettings = () => {
 			setAttributes( {
 				excerptLength: DEFAULT_EXCERPT_LENGTH,
@@ -135,6 +128,13 @@ class LatestPostsEdit extends Component {
 				postsToShow: DEFAULT_POSTS_TO_SHOW,
 			} );
 		};
+
+		const actions = [
+			{
+				label: __( 'Clear All Settings' ),
+				onPress: onClearSettings,
+			},
+		];
 
 		const onSetDisplayPostContent = ( value ) => {
 			setAttributes( { displayPostContent: value } );
