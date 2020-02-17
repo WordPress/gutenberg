@@ -129,6 +129,7 @@ dependencies {
 
     if (rootProject.ext.buildGutenbergFromSource) {
         println "using gutenberg from source"
+        implementation project(':react-native-linear-gradient')
         implementation project(':react-native-svg')
         implementation project(':react-native-video')
         implementation project(':@react-native-community_slider')
@@ -139,6 +140,7 @@ dependencies {
 
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../package.json', 'react-native-video', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-linear-gradient', readHashedVersion('../../package.json', 'react-native-linear-gradient', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-slider', readHashedVersion('../../package.json', '@react-native-community/slider', 'dependencies')))
 
         // FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
