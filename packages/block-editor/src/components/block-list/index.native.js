@@ -114,6 +114,7 @@ export class BlockList extends Component {
 			header,
 			isReadOnly,
 			isRootList,
+			style,
 		} = this.props;
 
 		return (
@@ -144,13 +145,14 @@ export class BlockList extends Component {
 						! isReadOnly && this.renderDefaultBlockAppender
 					}
 					ListFooterComponent={ this.renderBlockListFooter }
-					style={
+					style={ [
 						this.props.__experimentalMoverDirection ===
 							'horizontal' && {
 							flexDirection: 'row',
 							flexWrap: 'wrap',
-						}
-					}
+						},
+						style,
+					] }
 				/>
 
 				{ this.shouldShowInnerBlockAppender() && (

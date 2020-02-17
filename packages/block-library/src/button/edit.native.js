@@ -24,7 +24,7 @@ import {
 	BottomSheet,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { link, external } from '@wordpress/icons';
 
@@ -56,6 +56,7 @@ class ButtonEdit extends Component {
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
+		this.onRemove = this.onRemove.bind( this );
 
 		// `isEditingURL` property is used to prevent from automatically pasting
 		// URL from clipboard while trying to clear `Button URL` field and then
@@ -234,6 +235,16 @@ class ButtonEdit extends Component {
 		} );
 	}
 
+	onRemove() {
+		const { numOfButtons, onDelete, onReplace } = this.props;
+
+		if ( numOfButtons === 1 ) {
+			onDelete();
+		} else {
+			onReplace( [] );
+		}
+	}
+
 	getLinkSettings( url, rel, linkTarget, isCompatibleWithSettings ) {
 		return (
 			<>
@@ -372,7 +383,7 @@ class ButtonEdit extends Component {
 						__unstableMobileNoFocusOnMount={ ! isSelected }
 						selectionColor={ textColor.color || '#fff' }
 						onReplace={ onReplace }
-						onRemove={ () => onReplace( [] ) }
+						onRemove={ this.onRemove }
 					/>
 				</ColorBackground>
 
@@ -436,17 +447,30 @@ export default compose( [
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getSelectedBlockClientId, getBlockParents } = select(
+		const { getSelectedBlockClientId, getBlockParents, getBlock } = select(
 			'core/block-editor'
 		);
 
 		const selectedId = getSelectedBlockClientId();
+		const parentId = getBlockParents( selectedId )[ 0 ];
 		const hasParents = getBlockParents( selectedId ).length > 0;
+		const buttonsBlock = getBlock( parentId );
+		const numOfButtons = buttonsBlock && buttonsBlock.innerBlocks.length;
 
 		return {
 			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
 			hasParents,
+			parentId,
+			numOfButtons,
+		};
+	} ),
+	withDispatch( ( dispatch, { parentId } ) => {
+		const { removeBlock } = dispatch( 'core/block-editor' );
+		return {
+			onDelete: () => {
+				removeBlock( parentId );
+			},
 		};
 	} ),
 ] )( ButtonEdit );

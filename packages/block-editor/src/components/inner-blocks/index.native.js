@@ -110,6 +110,7 @@ class InnerBlocks extends Component {
 			clientId,
 			renderAppender,
 			__experimentalMoverDirection,
+			style,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -123,6 +124,7 @@ class InnerBlocks extends Component {
 						__experimentalMoverDirection={
 							__experimentalMoverDirection
 						}
+						style={ style }
 					/>
 				) }
 			</>
