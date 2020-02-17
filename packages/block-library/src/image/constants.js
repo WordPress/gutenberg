@@ -5,4 +5,5 @@ export const LINK_DESTINATION_ATTACHMENT = 'attachment';
 export const LINK_DESTINATION_CUSTOM = 'custom';
 export const NEW_TAB_REL = [ 'noreferrer', 'noopener' ];
 export const ALLOWED_MEDIA_TYPES = [ 'image' ];
-export const DEFAULT_SIZE_SLUG = 'large';
+export const DEFAULT_SIZE_SLUG = 'large'; // use image_default_size from options
+export const DEFAULT_ALIGN_SLUG = 'center'; // use image_default_align from options
