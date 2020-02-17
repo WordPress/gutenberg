@@ -57,11 +57,62 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker.service
 ```
 
-After restarting the services, set the environment variable DOCKER_HOST and try starting using:
+After restarting the services, follow the instructions below to finish the installation. 
+
+#### 1. Clean up
 
 ```
-DOCKER_HOST=http://127.0.0.1:2376 npm run env start
+npm run clean:packages
+rm -rf wordpress
+```
+
+Without this step, you'll see the error message like below:
+
+```
+It looks like WordPress is already installed, please delete the `wordpress` directory for a fresh install, or run `npm run env start` to start the existing environment.
+```
+
+As WordPress isn't installed yet, we cannot run `npm run env start`.
+
+#### 2. Install
+
+```
+DOCKER_HOST=tcp://127.0.0.1:2376 npm run env install
+```
+
+If you run into the error message below, it means you used **http** rather than **tcp**. Please use **tcp**.
+
+```
+unable to resolve docker endpoint: Invalid bind address format: http://127.0.0.1:2376
+```
+
+When the installation finished successfully, you'll see the success message:
+
+```
+Plugin 'gutenberg' activated.
+Success: Activated 1 of 1 plugins.
+
+Welcome to...
+,⁻⁻⁻·       .                 |
+|  ،⁓’.   . |---  ,---. ,---. |---. ,---. ,---. ,---.
+|   | |   | |     |---' |   | |   | |---' |     |   |
+`---' `---' `---’ `---’ '   ` `---' `---’ `     `---|
+                                                `---'
+
+Run npm run dev to build the latest version of Gutenberg, then open http://localhost:8889 to get started!
+
+Access the above install using the following credentials:
+Default username: admin, password: password
+```
+
+#### 3. Start the server
+
+Set the environment variable DOCKER_HOST and try starting using:
+
+```
+DOCKER_HOST=tcp://127.0.0.1:2376 npm run env start
 ```
 
 Your environment should be setup at: http://localhost:8889/
 
+**NOTE:** DOCKER_HOST isn't permanant. So, you need to add `DOCKER_HOST=tcp://127.0.0.1:2376` whenever you start the dev server.
