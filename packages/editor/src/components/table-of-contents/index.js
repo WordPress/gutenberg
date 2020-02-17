@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { informationOutline } from '@wordpress/icons';
+import { info } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,7 +20,7 @@ function TableOfContents( { hasBlocks, hasOutlineItemsDisabled } ) {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					onClick={ hasBlocks ? onToggle : undefined }
-					icon={ informationOutline }
+					icon={ info }
 					aria-expanded={ isOpen }
 					label={ __( 'Content structure' ) }
 					tooltipPosition="bottom"

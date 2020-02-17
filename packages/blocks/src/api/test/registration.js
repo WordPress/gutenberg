@@ -10,7 +10,7 @@ import { noop, get, omit, pick } from 'lodash';
  */
 import { addFilter, removeAllFilters } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
-import { block as blockIcon } from '@wordpress/icons';
+import { blockDefault as blockIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies

@@ -8,12 +8,12 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
-import { block } from '@wordpress/icons';
+import { blockDefault } from '@wordpress/icons';
 
 export default function BlockIcon( { icon, showColors = false, className } ) {
 	if ( get( icon, [ 'src' ] ) === 'block-default' ) {
 		icon = {
-			src: block,
+			src: blockDefault,
 		};
 	}
 

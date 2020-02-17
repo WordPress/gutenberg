@@ -10,7 +10,7 @@ import { get, omit, pick, isFunction, isPlainObject, some } from 'lodash';
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
-import { block as blockIcon } from '@wordpress/icons';
+import { blockDefault } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -119,7 +119,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  * @type {Object}
  */
 export const DEFAULT_BLOCK_TYPE_SETTINGS = {
-	icon: blockIcon,
+	icon: blockDefault,
 	attributes: {},
 	keywords: [],
 	save: () => null,
