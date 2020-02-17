@@ -147,7 +147,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         onClick={[Function]}
         selectedIconProps={
           Object {
-            "fill": "#111111",
+            "fill": "#000000",
           }
         }
         style={
@@ -242,7 +242,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           onClick={[Function]}
           selectedIconProps={
             Object {
-              "fill": "#111111",
+              "fill": "#000000",
             }
           }
           style={
@@ -292,7 +292,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         onClick={[Function]}
         selectedIconProps={
           Object {
-            "fill": "#111111",
+            "fill": "#000000",
           }
         }
         style={
@@ -347,7 +347,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             </ForwardRef(Button)>
           </Tooltip>
           <Icon
-            fill="#111111"
+            fill="#000000"
             icon={
               <SVG
                 viewBox="-2 -2 24 24"
@@ -360,7 +360,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             }
           >
             <SVG
-              fill="#111111"
+              fill="#000000"
               height={24}
               viewBox="-2 -2 24 24"
               width={24}
@@ -368,7 +368,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             >
               <svg
                 aria-hidden="true"
-                fill="#111111"
+                fill="#000000"
                 focusable="false"
                 height={24}
                 role="img"
