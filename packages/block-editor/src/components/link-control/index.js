@@ -289,7 +289,7 @@ function LinkControl( {
 		//
 		// Note also that the value of the `title` and `url` properties must correspond
 		// to the text value of the `<input>`. This is because `title` is used
-		// when creating the entity. Similarly `url` is used when using keyboard to select
+		// when creating the suggestion. Similarly `url` is used when using keyboard to select
 		// the suggestion (the <form> `onSubmit` handler falls-back to `url`).
 		return maybeURL( val )
 			? results
@@ -393,7 +393,7 @@ function LinkControl( {
 			directLinkEntryTypes.includes(
 				suggestions[ 0 ].type.toLowerCase()
 			);
-		const shouldShowCreateEntity =
+		const shouldShowCreateSuggestion =
 			createSuggestion &&
 			! isSingleDirectEntryResult &&
 			! isInitialSuggestions;
@@ -430,7 +430,7 @@ function LinkControl( {
 				>
 					{ suggestions.map( ( suggestion, index ) => {
 						if (
-							shouldShowCreateEntity &&
+							shouldShowCreateSuggestion &&
 							CREATE_TYPE === suggestion.type
 						) {
 							return (
