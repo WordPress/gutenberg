@@ -49,7 +49,7 @@ class LatestPostsEdit extends Component {
 
 	componentDidMount() {
 		this.isStillMounted = true;
-		this.fetchRequest = fetchRequest( '/wp/v2/categories?per_page=-1' )
+		this.fetchRequest = fetchRequest( '/wp/v2/categories' )
 			.then( ( categoriesList ) => {
 				if ( this.isStillMounted ) {
 					this.setState( { categoriesList } );
@@ -142,29 +142,6 @@ class LatestPostsEdit extends Component {
 
 		const getInspectorControls = () => (
 			<InspectorControls>
-				<PanelBody title={ __( 'Sorting and filtering' ) }>
-					<QueryControls
-						{ ...{ order, orderBy } }
-						numberOfItems={ postsToShow }
-						categoriesList={ categoriesList }
-						selectedCategoryId={
-							undefined !== categories ? categories : ''
-						}
-						onOrderChange={ onSetOrder }
-						onOrderByChange={ onSetOrderBy }
-						onCategoryChange={ onSetCategories }
-						onNumberOfItemsChange={ onSetPostsToShow }
-					/>
-				</PanelBody>
-
-				<PanelBody title={ __( 'Post meta settings' ) }>
-					<ToggleControl
-						label={ __( 'Display post date' ) }
-						checked={ displayPostDate }
-						onChange={ onSetDisplayPostDate }
-					/>
-				</PanelBody>
-
 				<PanelBody title={ __( 'Post Content Settings' ) }>
 					<ToggleControl
 						label={ __( 'Show Post Content' ) }
@@ -195,6 +172,29 @@ class LatestPostsEdit extends Component {
 								max={ MAX_EXCERPT_LENGTH }
 							/>
 						) }
+				</PanelBody>
+
+				<PanelBody title={ __( 'Sorting and filtering' ) }>
+					<QueryControls
+						{ ...{ order, orderBy } }
+						numberOfItems={ postsToShow }
+						categoriesList={ categoriesList }
+						selectedCategoryId={
+							undefined !== categories ? categories : ''
+						}
+						onOrderChange={ onSetOrder }
+						onOrderByChange={ onSetOrderBy }
+						onCategoryChange={ onSetCategories }
+						onNumberOfItemsChange={ onSetPostsToShow }
+					/>
+				</PanelBody>
+
+				<PanelBody title={ __( 'Post meta settings' ) }>
+					<ToggleControl
+						label={ __( 'Display post date' ) }
+						checked={ displayPostDate }
+						onChange={ onSetDisplayPostDate }
+					/>
 				</PanelBody>
 
 				<PanelActions actions={ actions } />
