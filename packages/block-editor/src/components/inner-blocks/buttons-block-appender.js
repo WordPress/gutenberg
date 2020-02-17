@@ -8,7 +8,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import withClientId from './with-client-id';
-import styles from './style';
+import styles from './style.scss';
 import { StyledButtonAppender } from '../button-block-appender';
 
 function ButtonsAppender( { onAddNextButton } ) {
