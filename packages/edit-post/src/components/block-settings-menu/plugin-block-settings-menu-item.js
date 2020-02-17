@@ -6,7 +6,7 @@ import { difference } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { BlockSettingsMenuGroup, MenuItem } from '@wordpress/components';
+import { BlockSettingsMenuControls, MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) =>
@@ -88,7 +88,7 @@ const PluginBlockSettingsMenuItem = ( {
 	small,
 	role,
 } ) => (
-	<BlockSettingsMenuGroup>
+	<BlockSettingsMenuControls>
 		{ ( { selectedBlocks, onClose } ) => {
 			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
 				return null;
@@ -104,7 +104,7 @@ const PluginBlockSettingsMenuItem = ( {
 				</MenuItem>
 			);
 		} }
-	</BlockSettingsMenuGroup>
+	</BlockSettingsMenuControls>
 );
 
 export default PluginBlockSettingsMenuItem;

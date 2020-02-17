@@ -64,7 +64,7 @@ export { default as BlockMover } from './block-mover';
 export { default as BlockPreview } from './block-preview';
 export { default as BlockSelectionClearer } from './block-selection-clearer';
 export { default as BlockSettingsMenu } from './block-settings-menu';
-export { default as BlockSettingsMenuGroup } from './block-settings-menu-group';
+export { default as BlockSettingsMenuControls } from './block-settings-menu-controls';
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as CopyHandler } from './copy-handler';

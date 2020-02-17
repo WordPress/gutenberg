@@ -9,11 +9,11 @@ import { isEmpty, map } from 'lodash';
 import { createSlotFill, MenuGroup } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
-const { Fill: BlockSettingsMenuGroup, Slot } = createSlotFill(
-	'BlockSettingsMenuGroup'
+const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
+	'BlockSettingsMenuControls'
 );
 
-const BlockSettingsMenuGroupSlot = ( { fillProps } ) => {
+const BlockSettingsMenuControlsSlot = ( { fillProps } ) => {
 	const { selectedBlocks } = useSelect( ( select ) => {
 		const { getBlocksByClientId, getSelectedBlockClientIds } = select(
 			'core/block-editor'
@@ -35,9 +35,9 @@ const BlockSettingsMenuGroupSlot = ( { fillProps } ) => {
 	);
 };
 
-BlockSettingsMenuGroup.Slot = BlockSettingsMenuGroupSlot;
+BlockSettingsMenuControls.Slot = BlockSettingsMenuControlsSlot;
+
 /**
- * SlotFill component that offers a hook
- * into the BlockSettingsMenu.
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-settings-menu-controls/README.md
  */
-export default BlockSettingsMenuGroup;
+export default BlockSettingsMenuControls;
