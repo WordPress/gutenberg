@@ -633,10 +633,10 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			expect( currentLinkHTML ).toEqual(
 				expect.stringContaining( entityNameText )
-			); //title
+			);
 			expect( currentLinkHTML ).toEqual(
 				expect.stringContaining( '/?p=123' )
-			); // slug
+			);
 		}
 	);
 
@@ -785,7 +785,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		expect( currentLinkHTML ).toEqual(
 			expect.stringContaining( entityNameText )
-		); //title
+		);
 	} );
 
 	describe( 'Do not show create option', () => {
