@@ -7,7 +7,12 @@ import { noop, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, ExternalLink, Spinner } from '@wordpress/components';
+import {
+	Button,
+	ExternalLink,
+	Spinner,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useRef,
@@ -15,6 +20,7 @@ import {
 	useState,
 	Fragment,
 	useEffect,
+	createElement,
 } from '@wordpress/element';
 import {
 	safeDecodeURI,
@@ -408,14 +414,14 @@ function LinkControl( {
 			? __( 'Recently updated' )
 			: sprintf( __( 'Search results for "%s"' ), inputValue );
 
-		const searchResultsLabel = (
+		// VisuallyHidden rightly doesn't accept custom classNames
+		// so we conditionally render it as a wrapper to visually hide the label
+		// when that is required.
+		const searchResultsLabel = createElement(
+			isInitialSuggestions ? Fragment : VisuallyHidden,
+			{}, // empty props
 			<span
-				className={ classnames(
-					'block-editor-link-control__search-results-label',
-					{
-						'screen-reader-text': ! isInitialSuggestions,
-					}
-				) }
+				className="block-editor-link-control__search-results-label"
 				id={ searchResultsLabelId }
 			>
 				{ labelText }
