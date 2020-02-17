@@ -286,12 +286,12 @@ function getNumberFromEnvVariable( varName ) {
 }
 
 /**
- * Gets the wp-env home directory in which generated files are created.
+ * Gets the `wp-env` home directory in which generated files are created.
  *
  * By default, '~/.wp-env/'. On Linux, '~/wp-env/'. Can be overriden with the
  * WP_ENV_HOME environment variable.
  *
- * @return {string} The absolute path to the wp-env home directory.
+ * @return {string} The absolute path to the `wp-env` home directory.
  */
 function getWpEnvHomeDir() {
 	// Allow user to override download location.
