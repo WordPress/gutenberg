@@ -104,6 +104,10 @@ module.exports = {
 			config
 		);
 
+		config.port = getNumberFromEnvVariable( 'WP_ENV_PORT' ) || config.port;
+		config.testsPort =
+			getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) || config.testsPort;
+
 		if ( config.core !== null && typeof config.core !== 'string' ) {
 			throw new ValidationError(
 				'Invalid .wp-env.json: "core" must be null or a string.'
@@ -253,6 +257,33 @@ function includeTestsPath( source ) {
 			'tests-' + path.basename( source.path )
 		),
 	};
+}
+
+/**
+ * Parses an environment variable which should be a number.
+ *
+ * Throws an error if the variable cannot be parsed to a number.
+ * Returns null if the environment variable has not been specified.
+ *
+ * @param {string} varName The environment variable to check (e.g. WP_ENV_PORT).
+ * @return {null|number} The number. Null if it does not exist.
+ */
+function getNumberFromEnvVariable( varName ) {
+	// Allow use of the default if it does not exist.
+	if ( ! process.env[ varName ] ) {
+		return null;
+	}
+
+	const maybeNumber = parseInt( process.env[ varName ] );
+
+	// Throw an error if it is not parseable as a number.
+	if ( isNaN( maybeNumber ) ) {
+		throw new ValidationError(
+			`Invalid environment variable: ${ varName } must be a number.`
+		);
+	}
+
+	return maybeNumber;
 }
 
 /**
