@@ -102,14 +102,6 @@ module.exports = {
 			config: config.dockerComposeConfigPath,
 		} );
 
-		// Set correct permissions for the wp-config.php file.
-		if ( config.coreSource ) {
-			await Promise.all( [
-				setCoreConfigPermissions( config.coreSource.path ),
-				setCoreConfigPermissions( config.coreSource.testsPath ),
-			] );
-		}
-
 		try {
 			await checkDatabaseConnection( config );
 		} catch ( error ) {
@@ -383,29 +375,4 @@ async function resetDatabase( environment, { dockerComposeConfigPath } ) {
 	}
 
 	await Promise.all( tasks );
-}
-
-/**
- * Sets the correct user and permissions on the wp-config.php file.
- *
- * This is needed because the file can be generated under the wrong user and
- * group, which means we may not have permission to access it at runtime.
- *
- * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-586871441
- *
- * @param {string} coreSourcePath The path to the WordPress source code.
- */
-async function setCoreConfigPermissions( coreSourcePath ) {
-	// For now, Linux appears to be the only platform with issues.
-	if ( process.platform !== 'linux' ) {
-		return;
-	}
-
-	// Get the UID and GID of an existing file that works correctly.
-	const indexFile = path.resolve( coreSourcePath, 'index.php' );
-	const { uid, gid } = await fs.stat( indexFile );
-
-	// Use those IDs to set the user and group of the file with bad permissions.
-	const configFile = path.resolve( coreSourcePath, 'wp-config.php' );
-	await fs.chown( configFile, uid, gid );
 }
