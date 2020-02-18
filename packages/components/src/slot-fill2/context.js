@@ -10,7 +10,7 @@ import {
 } from '@wordpress/element';
 
 export const SlotFillContext = createContext( {
-	slots: [],
+	slots: {},
 	register: () => {},
 	update: () => {},
 	unregister: () => {},
