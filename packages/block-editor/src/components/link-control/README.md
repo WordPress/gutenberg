@@ -81,8 +81,6 @@ By default LinkControl utilizes the `__experimentalFetchLinkSuggestions` API
 from `core/block-editor` in order to retrieve search suggestions for matching
 `Page` post-type entities.
 
-It is however, possible to provide your own entity search handler via the `fetchSearchSuggestions` prop.
-
 ## Props
 
 ### value
