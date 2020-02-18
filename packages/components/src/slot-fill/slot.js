@@ -17,6 +17,7 @@ import {
  * Internal dependencies
  */
 import { Consumer } from './context';
+import { Slot as Slot2 } from '../slot-fill2';
 
 class SlotComponent extends Component {
 	constructor() {
@@ -89,17 +90,28 @@ class SlotComponent extends Component {
 	}
 }
 
-const Slot = ( props ) => (
-	<Consumer>
-		{ ( { registerSlot, unregisterSlot, getFills } ) => (
-			<SlotComponent
-				{ ...props }
-				registerSlot={ registerSlot }
-				unregisterSlot={ unregisterSlot }
-				getFills={ getFills }
+function Slot( props ) {
+	if ( props.bubblesVirtually ) {
+		return (
+			<Slot2
+				name={ props.name }
+				fillProps={ props.fillProps }
+				className={ props.className }
 			/>
-		) }
-	</Consumer>
-);
+		);
+	}
+	return (
+		<Consumer>
+			{ ( { registerSlot, unregisterSlot, getFills } ) => (
+				<SlotComponent
+					{ ...props }
+					registerSlot={ registerSlot }
+					unregisterSlot={ unregisterSlot }
+					getFills={ getFills }
+				/>
+			) }
+		</Consumer>
+	);
+}
 
 export default Slot;

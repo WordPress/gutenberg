@@ -14,6 +14,11 @@ import {
 	useEffect,
 } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { SlotFillProvider as SlotFillProvider2 } from '../slot-fill2';
+
 const SlotFillContext = createContext( {
 	registerSlot: () => {},
 	unregisterSlot: () => {},
@@ -140,7 +145,7 @@ class SlotFillProvider extends Component {
 	render() {
 		return (
 			<Provider value={ this.contextValue }>
-				{ this.props.children }
+				<SlotFillProvider2>{ this.props.children }</SlotFillProvider2>
 			</Provider>
 		);
 	}

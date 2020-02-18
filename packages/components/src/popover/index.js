@@ -24,6 +24,7 @@ import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
+import { useSlot } from '../slot-fill2/context';
 import Animate from '../animate';
 
 const FocusManaged = withConstrainedTabbing(
@@ -261,6 +262,7 @@ const Popover = ( {
 	const contentRect = useRef();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
+	const slot = useSlot( __unstableSlotName );
 	const isExpanded = expandOnMobile && isMobileViewport;
 
 	noArrow = isExpanded || noArrow;
@@ -600,6 +602,10 @@ const Popover = ( {
 	// the only "disabled" value.
 	if ( focusOnMount ) {
 		content = <FocusManaged>{ content }</FocusManaged>;
+	}
+
+	if ( slot ) {
+		content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
 	}
 
 	return (
