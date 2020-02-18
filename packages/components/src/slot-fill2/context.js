@@ -9,7 +9,12 @@ import {
 	useContext,
 } from '@wordpress/element';
 
-export const SlotFillContext = createContext();
+export const SlotFillContext = createContext( {
+	slots: [],
+	register: () => {},
+	update: () => {},
+	unregister: () => {},
+} );
 
 function useSlotRegistry() {
 	const [ slots, setSlots ] = useState( {} );
