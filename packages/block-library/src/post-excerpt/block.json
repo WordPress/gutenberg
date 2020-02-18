@@ -2,7 +2,7 @@
 	"name": "core/post-excerpt",
 	"category": "layout",
 	"attributes": {
-		"excerptLength": {
+		"wordCount": {
 			"type": "number",
 			"default": 55
 		},

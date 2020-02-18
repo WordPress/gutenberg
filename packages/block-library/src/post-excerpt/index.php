@@ -21,7 +21,7 @@ function render_block_core_post_excerpt( $attributes ) {
 	$more_text = isset( $attributes['moreText'] ) ? '<a href="' . esc_url( get_the_permalink( $post ) ) . '">' . $attributes['moreText'] . '</a>' : '';
 
 	$filter_excerpt_length = function() use ( $attributes ) {
-		return isset( $attributes['excerptLength'] ) ? $attributes['excerptLength'] : 55;
+		return isset( $attributes['wordCount'] ) ? $attributes['wordCount'] : 55;
 	};
 	add_filter(
 		'excerpt_length',
@@ -51,7 +51,7 @@ function register_block_core_post_excerpt() {
 		'core/post-excerpt',
 		array(
 			'attributes'      => array(
-				'excerptLength'     => array(
+				'wordCount'     => array(
 					'type'    => 'number',
 					'default' => 55,
 				),

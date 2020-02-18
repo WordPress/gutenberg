@@ -92,7 +92,10 @@ export function useEntityProp( kind, type, prop ) {
 			const editedEntity = getEditedEntityRecord( kind, type, id );
 			return (
 				entity &&
-				editedEntity && { value: editedEntity[ prop ], fullValue: entity[ prop ] }
+				editedEntity && {
+					value: editedEntity[ prop ],
+					fullValue: entity[ prop ],
+				}
 			);
 		},
 		[ kind, type, id, prop ]

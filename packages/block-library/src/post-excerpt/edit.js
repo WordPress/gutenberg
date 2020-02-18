@@ -7,7 +7,7 @@ import { InspectorControls, RichText } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function usePostContentExcerpt( excerptLength ) {
+function usePostContentExcerpt( wordCount ) {
 	const [ , , { raw: rawPostContent } ] = useEntityProp(
 		'postType',
 		'post',
@@ -23,18 +23,22 @@ function usePostContentExcerpt( excerptLength ) {
 			excerptElement.textContent || excerptElement.innerText || '';
 		return excerpt
 			.trim()
-			.split( ' ', excerptLength )
+			.split( ' ', wordCount )
 			.join( ' ' );
-	}, [ rawPostContent, excerptLength ] );
+	}, [ rawPostContent, wordCount ] );
 }
 
 function PostExcerptEditor( {
-	attributes: { excerptLength, moreText, showMoreOnNewLine },
+	attributes: { wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
 } ) {
-	const [ excerpt, setExcerpt ] = useEntityProp( 'postType', 'post', 'excerpt' );
-	const postContentExcerpt = usePostContentExcerpt( excerptLength );
+	const [ excerpt, setExcerpt ] = useEntityProp(
+		'postType',
+		'post',
+		'excerpt'
+	);
+	const postContentExcerpt = usePostContentExcerpt( wordCount );
 	return (
 		<>
 			<InspectorControls>
@@ -42,9 +46,9 @@ function PostExcerptEditor( {
 					{ ! excerpt && (
 						<RangeControl
 							label={ __( 'Max words' ) }
-							value={ excerptLength }
+							value={ wordCount }
 							onChange={ ( newExcerptLength ) =>
-								setAttributes( { excerptLength: newExcerptLength } )
+								setAttributes( { wordCount: newExcerptLength } )
 							}
 							min={ 10 }
 							max={ 100 }
@@ -54,14 +58,17 @@ function PostExcerptEditor( {
 						label={ __( 'Show link on new line' ) }
 						checked={ showMoreOnNewLine }
 						onChange={ ( newShowMoreOnNewLine ) =>
-							setAttributes( { showMoreOnNewLine: newShowMoreOnNewLine } )
+							setAttributes( {
+								showMoreOnNewLine: newShowMoreOnNewLine,
+							} )
 						}
 					/>
 				</PanelBody>
 			</InspectorControls>
 			<RichText
 				className={
-					! showMoreOnNewLine && 'wp-block-post-excerpt__excerpt is-inline'
+					! showMoreOnNewLine &&
+					'wp-block-post-excerpt__excerpt is-inline'
 				}
 				placeholder={ postContentExcerpt }
 				value={ excerpt || ( isSelected ? '' : postContentExcerpt ) }
@@ -69,12 +76,27 @@ function PostExcerptEditor( {
 				keepPlaceholderOnFocus
 			/>
 			{ ! showMoreOnNewLine && ' ' }
-			<RichText
-				tagName="a"
-				placeholder={ __( 'Read more…' ) }
-				value={ moreText }
-				onChange={ ( newMoreText ) => setAttributes( { moreText: newMoreText } ) }
-			/>
+			{ showMoreOnNewLine ? (
+				<p>
+					<RichText
+						tagName="a"
+						placeholder={ __( 'Read more…' ) }
+						value={ moreText }
+						onChange={ ( newMoreText ) =>
+							setAttributes( { moreText: newMoreText } )
+						}
+					/>
+				</p>
+			) : (
+				<RichText
+					tagName="a"
+					placeholder={ __( 'Read more…' ) }
+					value={ moreText }
+					onChange={ ( newMoreText ) =>
+						setAttributes( { moreText: newMoreText } )
+					}
+				/>
+			) }
 		</>
 	);
 }
