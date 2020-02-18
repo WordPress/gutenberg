@@ -27,7 +27,8 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import {
-	table as icon,
+	table,
+	blockTable as icon,
 	alignLeft,
 	alignRight,
 	alignCenter,
@@ -590,7 +591,7 @@ export class TableEdit extends Component {
 					<ToolbarGroup>
 						<DropdownMenu
 							hasArrowIndicator
-							icon="editor-table"
+							icon={ table }
 							label={ __( 'Edit table' ) }
 							controls={ this.getTableControls() }
 						/>

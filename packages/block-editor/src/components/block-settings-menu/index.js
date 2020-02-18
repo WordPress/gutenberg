@@ -15,6 +15,7 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
+	page,
 	trash,
 	moreHorizontal,
 	insertAfter,
@@ -99,7 +100,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 												onClose,
 												onDuplicate
 											) }
-											icon="admin-page"
+											icon={ page }
 											shortcut={ shortcuts.duplicate }
 										>
 											{ __( 'Duplicate' ) }
