@@ -225,3 +225,9 @@
 
 	@include reduce-motion("transition");
 }
+
+.block-editor-block-toolbar__block-switcher-wrapper {
+	.block-editor-block-switcher {
+		display: block;
+	}
+}
