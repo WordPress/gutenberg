@@ -424,6 +424,9 @@
 /**
  * Block Toolbar when contextual.
  */
+.block-editor-block-contextual-toolbar-wrapper {
+	padding-left: 48px;
+}
 
 .block-editor-block-contextual-toolbar {
 	// Adapt the height of the toolbar items.

@@ -196,3 +196,30 @@
 		display: inline-flex;
 	}
 }
+
+.block-editor-block-toolbar__mover-switcher-container {
+	display: flex;
+}
+
+.block-editor-block-toolbar__mover-trigger-container {
+	@include break-medium() {
+		left: -1px;
+		position: absolute;
+		top: -1px;
+		transform: translateX(-48px);
+		user-select: none;
+	}
+}
+
+.block-editor-block-toolbar__mover-trigger-wrapper {
+	@include break-medium() {
+		background-color: $white;
+		border: 1px solid $black;
+		border-bottom-left-radius: 2px;
+		border-top-left-radius: 2px;
+		border-right: none;
+		transition: all 60ms linear;
+	}
+
+	@include reduce-motion("transition");
+}

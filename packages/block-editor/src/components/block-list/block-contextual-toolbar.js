@@ -11,15 +11,17 @@ import { BlockToolbar } from '../';
 
 function BlockContextualToolbar( { focusOnMount, ...props } ) {
 	return (
-		<NavigableToolbar
-			focusOnMount={ focusOnMount }
-			className="block-editor-block-contextual-toolbar"
-			/* translators: accessibility text for the block toolbar */
-			aria-label={ __( 'Block tools' ) }
-			{ ...props }
-		>
-			<BlockToolbar />
-		</NavigableToolbar>
+		<div className="block-editor-block-contextual-toolbar-wrapper">
+			<NavigableToolbar
+				focusOnMount={ focusOnMount }
+				className="block-editor-block-contextual-toolbar"
+				/* translators: accessibility text for the block toolbar */
+				aria-label={ __( 'Block tools' ) }
+				{ ...props }
+			>
+				<BlockToolbar />
+			</NavigableToolbar>
+		</div>
 	);
 }
 
