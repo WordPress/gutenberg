@@ -34,10 +34,10 @@ module.exports = {
 	 */
 	async start( { spinner } ) {
 		/**
-		 * If the Docker image is already running and the wp-env files have been
+		 * If the Docker image is already running and the `wp-env` files have been
 		 * deleted, the start command will not complete successfully. Stopping
-		 * the container before continuing allows the docker entrypoint script
-		 * to run again when we start the containers.
+		 * the container before continuing allows the docker entrypoint script,
+		 * which restores the files, to run again when we start the containers.
 		 *
 		 * Additionally, this serves as a way to restart the container entirely
 		 * should the need arise.
@@ -101,6 +101,14 @@ module.exports = {
 		await dockerCompose.upMany( [ 'wordpress', 'tests-wordpress' ], {
 			config: config.dockerComposeConfigPath,
 		} );
+
+		// Set correct permissions for the wp-config.php file.
+		if ( config.coreSource ) {
+			await Promise.all( [
+				setCoreConfigPermissions( config.coreSource.path ),
+				setCoreConfigPermissions( config.coreSource.testsPath ),
+			] );
+		}
 
 		try {
 			await checkDatabaseConnection( config );
@@ -329,14 +337,6 @@ async function configureWordPress( environment, config ) {
 			--skip-email`,
 		options
 	);
-
-	// Set correct permissions for the wp-config.php file.
-	if ( config.coreSource ) {
-		await Promise.all( [
-			setCoreConfigPermissions( config.coreSource.path ),
-			setCoreConfigPermissions( config.coreSource.testsPath ),
-		] );
-	}
 
 	// Activate all plugins.
 	for ( const pluginSource of config.pluginSources ) {
