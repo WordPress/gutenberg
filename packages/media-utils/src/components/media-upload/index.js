@@ -86,7 +86,7 @@ const getGalleryDetailsMediaFrame = () => {
 	 * @class GalleryDetailsMediaFrame
 	 * @class
 	 */
-	return wp.media.view.MediaFrame.Select.extend( {
+	return wp.media.view.MediaFrame.Post.extend( {
 		/**
 		 * Set up gallery toolbar.
 		 *
