@@ -35,9 +35,9 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		}
 		if ( ! current_user_can( $tax_obj->cap->edit_terms ) ) {
 			if ( 'edit' === $request['context'] ) {
-				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit terms in this taxonomy.' ), array( 'status' => rest_authorization_required_code() ) );
+				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit terms in this taxonomy.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 			}
-			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you cannot view these menus, unless you have access to permission edit them. ' ), array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you cannot view these menus, unless you have access to permission edit them. ', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 		return true;
 	}
@@ -55,9 +55,9 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		}
 		if ( ! current_user_can( 'edit_term', $term->term_id ) ) {
 			if ( 'edit' === $request['context'] ) {
-				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit this term.' ), array( 'status' => rest_authorization_required_code() ) );
+				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit this term.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 			}
-			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you cannot view this menu, unless you have access to permission edit it. ' ), array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you cannot view this menu, unless you have access to permission edit it. ', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 		return true;
 	}
@@ -127,14 +127,14 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		}
 
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error( 'rest_cannot_assign_location', __( 'Sorry, you are not allowed to assign the provided locations.' ), array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error( 'rest_cannot_assign_location', __( 'Sorry, you are not allowed to assign the provided locations.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 
 		foreach ( $request['locations'] as $location ) {
 			if ( ! array_key_exists( $location, get_registered_nav_menus() ) ) {
 				return new WP_Error(
 					'rest_menu_location_invalid',
-					__( 'Invalid menu location.' ),
+					__( 'Invalid menu location.', 'gutenberg' ),
 					array(
 						'status'   => 400,
 						'location' => $location,
@@ -214,13 +214,13 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	public function create_item( $request ) {
 		if ( isset( $request['parent'] ) ) {
 			if ( ! is_taxonomy_hierarchical( $this->taxonomy ) ) {
-				return new WP_Error( 'rest_taxonomy_not_hierarchical', __( 'Cannot set parent term, taxonomy is not hierarchical.' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_taxonomy_not_hierarchical', __( 'Cannot set parent term, taxonomy is not hierarchical.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 
 			$parent = wp_get_nav_menu_object( (int) $request['parent'] );
 
 			if ( ! $parent ) {
-				return new WP_Error( 'rest_term_invalid', __( 'Parent term does not exist.' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_term_invalid', __( 'Parent term does not exist.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 		}
 
@@ -321,13 +321,13 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 
 		if ( isset( $request['parent'] ) ) {
 			if ( ! is_taxonomy_hierarchical( $this->taxonomy ) ) {
-				return new WP_Error( 'rest_taxonomy_not_hierarchical', __( 'Cannot set parent term, taxonomy is not hierarchical.' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_taxonomy_not_hierarchical', __( 'Cannot set parent term, taxonomy is not hierarchical.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 
 			$parent = get_term( (int) $request['parent'], $this->taxonomy );
 
 			if ( ! $parent ) {
-				return new WP_Error( 'rest_term_invalid', __( 'Parent term does not exist.' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_term_invalid', __( 'Parent term does not exist.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 		}
 
@@ -396,7 +396,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		// We don't support trashing for terms.
 		if ( ! $force ) {
 			/* translators: %s: force=true */
-			return new WP_Error( 'rest_trash_not_supported', sprintf( __( "Terms do not support trashing. Set '%s' to delete." ), 'force=true' ), array( 'status' => 501 ) );
+			return new WP_Error( 'rest_trash_not_supported', sprintf( __( "Terms do not support trashing. Set '%s' to delete.", 'gutenberg' ), 'force=true' ), array( 'status' => 501 ) );
 		}
 
 		$request->set_param( 'context', 'view' );
@@ -406,7 +406,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		$retval = wp_delete_nav_menu( $term );
 
 		if ( ! $retval ) {
-			return new WP_Error( 'rest_cannot_delete', __( 'The term cannot be deleted.' ), array( 'status' => 500 ) );
+			return new WP_Error( 'rest_cannot_delete', __( 'The term cannot be deleted.', 'gutenberg' ), array( 'status' => 500 ) );
 		}
 
 		$response = new WP_REST_Response();
@@ -449,7 +449,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		$new_locations  = array();
 		foreach ( $request['locations'] as $location ) {
 			if ( ! in_array( $location, $menu_locations, true ) ) {
-				return new WP_Error( 'invalid_menu_location', __( 'Menu location does not exist.' ), array( 'status' => 400 ) );
+				return new WP_Error( 'invalid_menu_location', __( 'Menu location does not exist.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 			$new_locations[ $location ] = $menu_id;
 		}
@@ -477,7 +477,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		unset( $schema['properties']['taxonomy'] );
 
 		$schema['properties']['locations'] = array(
-			'description' => __( 'The locations assigned to the menu.' ),
+			'description' => __( 'The locations assigned to the menu.', 'gutenberg' ),
 			'type'        => 'array',
 			'items'       => array(
 				'type' => 'string',

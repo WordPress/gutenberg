@@ -96,7 +96,6 @@ add_filter( 'rest_api_init', 'gutenberg_register_rest_block_directory' );
 
 /**
  * Registers the menu locations area REST API routes.
- *
  */
 function gutenberg_register_rest_menu_location() {
 	$nav_menu_location = new WP_REST_Menu_Locations_Controller();

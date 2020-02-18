@@ -158,14 +158,14 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
-		$nav_menu_id = wp_update_nav_menu_object(
+		wp_update_nav_menu_object(
 			0,
 			array(
 				'description' => 'Test get',
 				'menu-name'   => 'test Name get',
 			)
 		);
-		$request     = new WP_REST_Request( 'GET', '/__experimental/menus' );
+		$request = new WP_REST_Request( 'GET', '/__experimental/menus' );
 		$request->set_param( 'per_page', self::$per_page );
 		$response = rest_get_server()->dispatch( $request );
 		$this->check_get_taxonomy_terms_response( $response );

@@ -307,8 +307,8 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	 */
 	public function test_create_item_invalid_parent() {
 		wp_set_current_user( self::$admin_id );
-		$new_menu_id = wp_create_nav_menu( rand_str() );
-		$request     = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
+		wp_create_nav_menu( rand_str() );
+		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$params = $this->set_menu_item_data(
 			array(
@@ -650,7 +650,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 			// Base fields for every post.
 			$menu_item = wp_setup_nav_menu_item( $post );
 			/**
-			 * as the links for the post are "response_links" format in the data array we have to pull them out and parse them.
+			 * As the links for the post are "response_links" format in the data array we have to pull them out and parse them.
 			 */
 			$links = $data['_links'];
 			foreach ( $links as &$links_array ) {

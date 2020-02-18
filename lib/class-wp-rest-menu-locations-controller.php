@@ -47,7 +47,7 @@ class WP_REST_Menu_Locations_Controller extends WP_REST_Controller {
 			array(
 				'args'   => array(
 					'location' => array(
-						'description' => __( 'An alphanumeric identifier for the menu location.' ),
+						'description' => __( 'An alphanumeric identifier for the menu location.', 'gutenberg' ),
 						'type'        => 'string',
 					),
 				),
@@ -71,9 +71,9 @@ class WP_REST_Menu_Locations_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_Error|bool True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you are not allowed to view menu locations.' ), array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you are not allowed to view menu locations.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 
 		return true;
@@ -110,10 +110,10 @@ class WP_REST_Menu_Locations_Controller extends WP_REST_Controller {
 	 */
 	public function get_item_permissions_check( $request ) {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you are not allowed to view menu locations.' ), array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you are not allowed to view menu locations.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 		if ( ! array_key_exists( $request['location'], get_registered_nav_menus() ) ) {
-			return new WP_Error( 'rest_menu_location_invalid', __( 'Invalid menu location.' ), array( 'status' => 404 ) );
+			return new WP_Error( 'rest_menu_location_invalid', __( 'Invalid menu location.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		return true;
@@ -129,7 +129,7 @@ class WP_REST_Menu_Locations_Controller extends WP_REST_Controller {
 	public function get_item( $request ) {
 		$registered_menus = get_registered_nav_menus();
 		if ( ! array_key_exists( $request['location'], $registered_menus ) ) {
-			return new WP_Error( 'rest_menu_location_invalid', __( 'Invalid menu location.' ), array( 'status' => 404 ) );
+			return new WP_Error( 'rest_menu_location_invalid', __( 'Invalid menu location.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		$location              = new stdClass();
@@ -191,19 +191,19 @@ class WP_REST_Menu_Locations_Controller extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'name'        => array(
-					'description' => __( 'The name of the menu location.' ),
+					'description' => __( 'The name of the menu location.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'description' => array(
-					'description' => __( 'The description of the menu location.' ),
+					'description' => __( 'The description of the menu location.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'menu'        => array(
-					'description' => __( 'The ID of the assigned menu.' ),
+					'description' => __( 'The ID of the assigned menu.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
