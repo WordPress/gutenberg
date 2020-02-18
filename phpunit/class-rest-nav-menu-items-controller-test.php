@@ -734,7 +734,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 			$num = 0;
 			foreach ( $taxonomies as $key => $taxonomy ) {
 				$this->assertEquals( $taxonomy->name, $links['https://api.w.org/term'][ $num ]['attributes']['taxonomy'] );
-				$this->assertEquals( add_query_arg( 'post', $data['id'], rest_url( '__experimental/' . $taxonomy->rest_base ) ), $links['https://api.w.org/term'][ $num ]['href'] );
+				$this->assertEquals( add_query_arg( 'post', $data['id'], rest_url( 'wp/v2/' . $taxonomy->rest_base ) ), $links['https://api.w.org/term'][ $num ]['href'] );
 				$num ++;
 			}
 		}
