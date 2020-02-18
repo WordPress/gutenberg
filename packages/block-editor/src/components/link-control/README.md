@@ -1,7 +1,12 @@
 # Link Control
 
 `<LinkControl>` is a component designed to provide a standardized UI for the
-creation of hyperlinks within the Editor. Much of the context for this component
+creation of hyperlinks within the Editor.
+
+
+## History
+
+Much of the context for this component
 can be found in [the original Issue](https://github.com/WordPress/gutenberg/issues/17557).
 
 Previously iterations of a hyperlink UI existed within the Gutenberg interface
@@ -24,13 +29,26 @@ an experimental component which would consume `URLInput` internally. The API of
 facilitate the implementation of the new UI with the goal of eventually phasing
 out the use of `URLInput` entirely.
 
-Indeed, over time, is is expected that `URLInput` will be deprecated in favour of
-lower-level presentation components (eg: `<Combobox>`) which will not be tightly
-coupled to the concept of URL entry. This will allow `LinkControl` to become the
-canonical UI component for the creation of hyperlinks and will enable the
-simplification of the more complex internal mechanics of `LinkControl` which are
-currently necessary to enable it to mesh well with the older APIs exposed by
-`URLInput`.
+
+## Relationship to `<URLInput>`
+
+As of Gutenberg 7.4, `<LinkControl> became the default link creation interface
+within the Block Editor, replacing previous disparate uses of `<URLInput>` and
+standardising the UI.
+
+Nonetheless, it should be remembered that `<LinkControl>` builds **on top of**
+`<URLInput>` and makes use of it under the hood.
+
+The distinction between the two components is perhaps best represented as:
+
+* `<URLInput>` - an input for presenting and managing selection behaviors
+  associated with choosing a URL, optionally from a pool of available
+  candidates.
+* `<LinkControl>` - includes the features of `<URLInput>` , plus additional
+  UI and behaviors to control how this URL applies to the concept of a "link". This includes link
+  "settings" (eg: "opens in new tab", etc) and dynamic, "on the fly" link
+  creation capabilities.
+
 
 ## Search Suggestions
 
@@ -45,6 +63,14 @@ Currently LinkControl will handle two types of input to create hyperlinks:
    protocol links (eg: `tel: 0800 1234`) and `mailto` protocol links (eg:
    `mailto: hello@wordpress.org).
 
+In addition, `<LinkControl>` also allows for on-the-fly creation of links based
+on the **current content of the `<input>` element**. When enabled, a default
+"Create new" search suggestion is appended to all non-URL-like search results.
+When this suggestion is
+selected it will call the `createSuggestion` prop affording the developer the ability to create
+new links on the fly (the [Navigation Block uses this to allow creation of Pages
+from within the Block](https://github.com/WordPress/gutenberg/pull/19775/files)). See below for more details.
+
 ### Data sources
 
 By default LinkControl utilizes the `__experimentalFetchLinkSuggestions` API
@@ -54,6 +80,8 @@ from `core/block-editor` in order to retrieve search suggestions for matching
 It is however, possible to provide your own entity search handler via the `fetchSearchSuggestions` prop.
 
 ## Props
+
+`<LinkControl>` supports the following `props`:
 
 ### className
 
@@ -79,16 +107,13 @@ It is however, possible to provide your own entity search handler via the `fetch
 ];
 ```
 
-An array of settings objects. Each object will used to render a `ToggleControl` for that setting.
+An array of settings objects. Each object will used to render a `ToggleControl`
+for that setting.
+
+You may choose to provide additional settings by providing an alternative array
+of setting objects.
 
 ### fetchSearchSuggestions
-
-- Type: `Function`
-- Required: No
-
-## Event handlers
-
-### onClose
 
 - Type: `Function`
 - Required: No
