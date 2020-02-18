@@ -217,10 +217,12 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 	$css_rules = '';
 
 	// This is only for demo purposes, it should be pluggable
-	// so new selectors can be register (3rd party blocks, etc).
+	// so new selectors can be register
+	// (3rd party blocks, custom selectors, etc).
 	$selectors = array(
-		'core'           => ':root',
-		'core/paragraph' => '.entry-content p',
+		'core'                      => ':root',
+		'core/paragraph'            => '.entry-content p',
+		'custom/paragraph-in-quote' => '.wp-block-quote p',
 	);
 	foreach ( $global_styles as $blockname => $subtree ) {
 		$token    = '--';
