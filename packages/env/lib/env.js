@@ -375,6 +375,11 @@ async function resetDatabase( environment, { dockerComposeConfigPath } ) {
 /**
  * Sets the correct user and permissions on the wp-config.php file.
  *
+ * This is needed because the file can be generated under the wrong user and
+ * group, which means we may not have permission to access it at runtime.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-586871441
+ *
  * @param {string} coreSourcePath The path to the WordPress source code.
  */
 async function setCoreConfigPermissions( coreSourcePath ) {
