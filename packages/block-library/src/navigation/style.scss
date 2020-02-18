@@ -169,3 +169,22 @@
 .items-justified-right > ul {
 	justify-content: flex-end;
 }
+
+.wp-block-navigation-placeholder__actions {
+	display: flex;
+	align-items: flex-start;
+
+	.components-base-control {
+		margin-right: 5px;
+	}
+
+	.components-select-control__input {
+		margin: 0;
+		min-height: 36px; // match button height
+	}
+
+	.wp-block-navigation-placeholder__button {
+		height: 36px;
+	}
+}
+

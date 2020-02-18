@@ -1,15 +1,51 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Navigation allows a navigation menu to be created from an empty menu using a mixture of internal and external links 1`] = `
-"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
-<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"id\\":\\"https://wordpress.org\\",\\"url\\":\\"https://wordpress.org\\"} /-->
+exports[`Navigation Creating from existing Menus allows a navigation block to be created from existing menus 1`] = `
+"<!-- wp:navigation -->
+<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"id\\":94} /-->
 
-<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"Accusamus quo repellat illum magnam quas\\",\\"type\\":\\"post_type\\",\\"id\\":95} -->
+<!-- wp:navigation-link {\\"label\\":\\"Debitis cum consequatur sit doloremque\\",\\"type\\":\\"post_type\\",\\"id\\":96} /-->
+<!-- /wp:navigation-link -->
+
+<!-- wp:navigation-link {\\"label\\":\\"Est ea vero non nihil officiis in\\",\\"type\\":\\"post_type\\",\\"id\\":97} -->
+<!-- wp:navigation-link {\\"label\\":\\"Fuga odio quis tempora\\",\\"type\\":\\"post_type\\",\\"id\\":98} -->
+<!-- wp:navigation-link {\\"label\\":\\"In consectetur repellendus eveniet maiores aperiam\\",\\"type\\":\\"post_type\\",\\"id\\":99} -->
+<!-- wp:navigation-link {\\"label\\":\\"Mollitia maiores consequatur ea dolorem blanditiis\\",\\"type\\":\\"post_type\\",\\"id\\":100} -->
+<!-- wp:navigation-link {\\"label\\":\\"Necessitatibus nisi qui qui necessitatibus quaerat possimus\\",\\"type\\":\\"post_type\\",\\"id\\":101} /-->
+<!-- /wp:navigation-link -->
+<!-- /wp:navigation-link -->
+<!-- /wp:navigation-link -->
+<!-- /wp:navigation-link -->
+
+<!-- wp:navigation-link {\\"label\\":\\"Nulla omnis autem dolores eligendi\\",\\"type\\":\\"post_type\\",\\"id\\":102} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Sample Page\\",\\"type\\":\\"post_type\\",\\"id\\":103} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Beatae qui labore voluptas eveniet officia quia voluptas qui porro sequi et aut est\\",\\"type\\":\\"taxonomy\\",\\"id\\":104} -->
+<!-- wp:navigation-link {\\"label\\":\\"Et minus itaque velit tempore hic quisquam saepe quas asperiores\\",\\"type\\":\\"taxonomy\\",\\"id\\":105} -->
+<!-- wp:navigation-link {\\"label\\":\\"Et quas a et mollitia et voluptas optio voluptate quia quo unde aut in nostrum iste impedit quisquam id aut\\",\\"type\\":\\"taxonomy\\",\\"id\\":106} -->
+<!-- wp:navigation-link {\\"label\\":\\"Illo quis sit impedit itaque expedita earum deserunt magni doloremque velit eum id error\\",\\"type\\":\\"taxonomy\\",\\"id\\":107} /-->
+<!-- /wp:navigation-link -->
+<!-- /wp:navigation-link -->
+<!-- /wp:navigation-link -->
+
+<!-- wp:navigation-link {\\"label\\":\\"WordPress.org\\",\\"type\\":\\"custom\\",\\"id\\":108} -->
+<!-- wp:navigation-link {\\"label\\":\\"Google\\",\\"type\\":\\"custom\\",\\"id\\":109} /-->
+<!-- /wp:navigation-link -->
 <!-- /wp:navigation -->"
 `;
 
-exports[`Navigation allows a navigation menu to be created using existing pages 1`] = `
-"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
+exports[`Navigation Creating from existing Menus creates an empty navigation block when the selected existing menu is also empty 1`] = `
+"<!-- wp:navigation -->
+<!-- wp:navigation-link /-->
+<!-- /wp:navigation -->"
+`;
+
+exports[`Navigation Creating from existing Menus does not display option to create from existing menus if there are no menus 1`] = `"<!-- wp:navigation /-->"`;
+
+exports[`Navigation allows a navigation block to be created using existing pages 1`] = `
+"<!-- wp:navigation -->
 <!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/page/home\\"} /-->
 
 <!-- wp:navigation-link {\\"label\\":\\"About\\",\\"type\\":\\"page\\",\\"id\\":2,\\"url\\":\\"https://this/is/a/test/page/about\\"} /-->
@@ -18,8 +54,16 @@ exports[`Navigation allows a navigation menu to be created using existing pages 
 <!-- /wp:navigation -->"
 `;
 
+exports[`Navigation allows an empty navigation block to be created and manually populated using a mixture of internal and external links 1`] = `
+"<!-- wp:navigation -->
+<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"id\\":\\"https://wordpress.org\\",\\"url\\":\\"https://wordpress.org\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\"} /-->
+<!-- /wp:navigation -->"
+`;
+
 exports[`Navigation allows pages to be created from the navigation block and their links added to menu 1`] = `
-"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
+"<!-- wp:navigation -->
 <!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/create/page/my-new-page\\"} /-->
 <!-- /wp:navigation -->"
 `;
