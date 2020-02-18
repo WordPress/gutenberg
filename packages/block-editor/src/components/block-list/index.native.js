@@ -101,6 +101,9 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 		} = this.props;
 
+		const forceRefresh =
+			shouldShowInsertionPointBefore || shouldShowInsertionPointAfter;
+
 		return (
 			<View
 				style={ { flex: isRootList ? 1 : 0 } }
@@ -118,10 +121,7 @@ export class BlockList extends Component {
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					data={ blockClientIds }
 					keyExtractor={ identity }
-					extraData={
-						shouldShowInsertionPointBefore ||
-						shouldShowInsertionPointAfter
-					}
+					extraData={ forceRefresh }
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={
 						this.shouldFlatListPreventAutomaticScroll
