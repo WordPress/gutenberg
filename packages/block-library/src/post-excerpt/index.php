@@ -51,7 +51,7 @@ function register_block_core_post_excerpt() {
 		'core/post-excerpt',
 		array(
 			'attributes'      => array(
-				'wordCount'     => array(
+				'wordCount'         => array(
 					'type'    => 'number',
 					'default' => 55,
 				),
