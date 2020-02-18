@@ -30,7 +30,6 @@ const Team = {
 				align: 'wide',
 				mediaAlt: '',
 				mediaPosition: 'left',
-				mediaId: 622,
 				mediaUrl:
 					'https://a8ctm1.files.wordpress.com/2019/08/adult.jpg?w=640',
 				mediaType: 'image',
@@ -89,7 +88,6 @@ const Team = {
 				align: 'wide',
 				mediaAlt: '',
 				mediaPosition: 'right',
-				mediaId: 621,
 				mediaUrl:
 					'https://a8ctm1.files.wordpress.com/2019/08/activity.jpg?w=640',
 				mediaType: 'image',
@@ -148,7 +146,6 @@ const Team = {
 				align: 'wide',
 				mediaAlt: '',
 				mediaPosition: 'left',
-				mediaId: 652,
 				mediaUrl:
 					'https://a8ctm1.files.wordpress.com/2019/08/corgi-1.jpg?w=640',
 				mediaType: 'image',
