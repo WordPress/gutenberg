@@ -1,7 +1,9 @@
 {
-	"color": {
-		"primary": "#52accc",
-		"background": "white",
-		"text": "black"
+	"core": {
+		"color": {
+			"primary": "#52accc",
+			"background": "white",
+			"text": "black"
+		}
 	}
 }

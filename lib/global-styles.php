@@ -214,22 +214,30 @@ function gutenberg_experimental_global_styles_get_theme() {
  * @return string CSS rule.
  */
 function gutenberg_experimental_global_styles_resolver( $global_styles ) {
-	$css_rule = '';
+	$css_rules = '';
 
-	$token    = '--';
-	$prefix   = '--wp' . $token;
-	$css_vars = gutenberg_experimental_global_styles_get_css_vars( $global_styles, $prefix, $token );
-	if ( empty( $css_vars ) ) {
-		return $css_rule;
+	// This is only for demo purposes, it should be pluggable
+	// so new selectors can be register (3rd party blocks, etc).
+	$selectors = array(
+		'core'           => ':root',
+		'core/paragraph' => '.entry-content p',
+	);
+	foreach ( $global_styles as $blockname => $subtree ) {
+		$token    = '--';
+		$prefix   = '--wp' . $token;
+		$css_vars = gutenberg_experimental_global_styles_get_css_vars( $subtree, $prefix, $token );
+		if ( empty( $css_vars ) ) {
+			return $css_rules;
+		}
+
+		$css_rules .= $selectors[ $blockname ] . " {\n";
+		foreach ( $css_vars as $var => $value ) {
+			$css_rules .= "\t" . $var . ': ' . $value . ";\n";
+		}
+		$css_rules .= "}\n";
 	}
 
-	$css_rule = ":root {\n";
-	foreach ( $css_vars as $var => $value ) {
-		$css_rule .= "\t" . $var . ': ' . $value . ";\n";
-	}
-	$css_rule .= '}';
-
-	return $css_rule;
+	return $css_rules;
 }
 
 /**
