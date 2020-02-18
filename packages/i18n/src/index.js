@@ -151,6 +151,15 @@ export function _nx( single, plural, number, context, domain ) {
 }
 
 /**
+ * Check if current locale is RTL.
+ *
+ * @return {boolean} Whether locale is RTL.
+ */
+export function isRTL() {
+	return 'rtl' === _x( 'ltr', 'text direction' );
+}
+
+/**
  * Returns a formatted string. If an error occurs in applying the format, the
  * original format string is returned.
  *
