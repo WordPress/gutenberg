@@ -27,6 +27,13 @@ function ButtonsEdit( { isSelected, attributes, setAttributes } ) {
 		setAttributes( { align: nextAlign } );
 	}
 
+	function renderAppender() {
+		if ( isSelected ) {
+			return <InnerBlocks.ButtonBlockAppender flex={ false } />;
+		}
+		return null;
+	}
+
 	const buttonsStyle = { justifyContent: ALIGNMENT_MAP[ align ] };
 
 	return (
@@ -41,7 +48,7 @@ function ButtonsEdit( { isSelected, attributes, setAttributes } ) {
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
 				template={ BUTTONS_TEMPLATE }
-				renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
+				renderAppender={ renderAppender }
 				__experimentalMoverDirection="horizontal"
 				style={ buttonsStyle }
 			/>

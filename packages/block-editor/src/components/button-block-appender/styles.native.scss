@@ -8,6 +8,10 @@
 	border-radius: 4px;
 }
 
+.noFlexAppender {
+	flex: none;
+}
+
 .appenderLight {
 	background-color: $white;
 	border: $border-width solid $light-gray-500;

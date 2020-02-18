@@ -19,6 +19,7 @@ function ButtonBlockAppender( {
 	rootClientId,
 	getStylesFromColorScheme,
 	showSeparator,
+	flex,
 } ) {
 	const appenderStyle = {
 		...styles.appender,
@@ -43,7 +44,12 @@ function ButtonBlockAppender( {
 						disabled={ disabled }
 						fixedRatio={ false }
 					>
-						<View style={ appenderStyle }>
+						<View
+							style={ [
+								appenderStyle,
+								! flex && styles.noFlexAppender,
+							] }
+						>
 							<Dashicon
 								icon="plus-alt"
 								style={ addBlockButtonStyle }
