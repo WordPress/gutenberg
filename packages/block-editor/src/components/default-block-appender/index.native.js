@@ -16,6 +16,7 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import BlockInsertionPoint from '../block-list/insertion-point';
 import styles from './style.scss';
 
 export function DefaultBlockAppender( {
@@ -24,6 +25,7 @@ export function DefaultBlockAppender( {
 	onAppend,
 	placeholder,
 	containerStyle,
+	showSeparator,
 } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
@@ -40,7 +42,11 @@ export function DefaultBlockAppender( {
 				style={ [ styles.blockHolder, containerStyle ] }
 				pointerEvents="box-only"
 			>
-				<RichText placeholder={ value } onChange={ () => {} } />
+				{ showSeparator ? (
+					<BlockInsertionPoint />
+				) : (
+					<RichText placeholder={ value } onChange={ () => {} } />
+				) }
 			</View>
 		</TouchableWithoutFeedback>
 	);
