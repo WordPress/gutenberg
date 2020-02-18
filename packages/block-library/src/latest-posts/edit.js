@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isUndefined, pickBy } from 'lodash';
+import { get, invoke, isUndefined, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -303,7 +303,11 @@ class LatestPostsEdit extends Component {
 					} ) }
 				>
 					{ displayPosts.map( ( post, i ) => {
-						const titleTrimmed = post.title.rendered.trim();
+						const titleTrimmed = invoke( post, [
+							'title',
+							'rendered',
+							'trim',
+						] );
 						let excerpt = post.excerpt.rendered;
 
 						const excerptElement = document.createElement( 'div' );
