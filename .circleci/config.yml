@@ -131,7 +131,7 @@ jobs:
         - ios/vendor
     - run:
         name: Build (if needed)
-        command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app || yarn react-native run-ios --configuration Release --no-packager
+        command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app || SKIP_BUNDLING=true yarn test:e2e:build-app:ios
     - run:
         name: Bundle iOS
         command: yarn test:e2e:bundle:ios
