@@ -30,7 +30,7 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
-import { pin } from '@wordpress/icons';
+import { pin, list, grid } from '@wordpress/icons';
 
 /**
  * Module Constants
@@ -273,13 +273,13 @@ class LatestPostsEdit extends Component {
 
 		const layoutControls = [
 			{
-				icon: 'list-view',
+				icon: list,
 				title: __( 'List view' ),
 				onClick: () => setAttributes( { postLayout: 'list' } ),
 				isActive: postLayout === 'list',
 			},
 			{
-				icon: 'grid-view',
+				icon: grid,
 				title: __( 'Grid view' ),
 				onClick: () => setAttributes( { postLayout: 'grid' } ),
 				isActive: postLayout === 'grid',

@@ -8,6 +8,7 @@ import { difference } from 'lodash';
  */
 import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
+import { plugins } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -101,7 +102,7 @@ const PluginBlockSettingsMenuItem = ( {
 			return (
 				<MenuItem
 					onClick={ compose( onClick, onClose ) }
-					icon={ icon || 'admin-plugins' }
+					icon={ icon || plugins }
 					label={ small ? label : undefined }
 					role={ role }
 				>
