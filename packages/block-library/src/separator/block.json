@@ -7,6 +7,10 @@
 		},
 		"customColor": {
 			"type": "string"
+		},
+		"height": {
+			"type": "number",
+			"default": 20
 		}
 	}
 }
