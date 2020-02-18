@@ -199,7 +199,7 @@ function gutenberg_find_template( $template_file ) {
 			}
 		}
 		$_wp_current_template_id      = $current_template_post->ID;
-		$_wp_current_template_content = $current_template_post->post_content;
+		$_wp_current_template_content = empty( $current_template_post->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template_post->post_content;
 	}
 
 	// Add extra hooks for template canvas.

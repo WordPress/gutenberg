@@ -33,6 +33,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { addQueryArgs } from '@wordpress/url';
+import { controlsRepeat } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -422,7 +423,7 @@ export class InserterMenu extends Component {
 								title={ __( 'Reusable' ) }
 								opened={ isPanelOpen( 'reusable' ) }
 								onToggle={ this.onTogglePanel( 'reusable' ) }
-								icon="controls-repeat"
+								icon={ controlsRepeat }
 								ref={ this.bindPanel( 'reusable' ) }
 							>
 								<BlockTypesList
