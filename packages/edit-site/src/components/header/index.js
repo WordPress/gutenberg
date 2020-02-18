@@ -4,7 +4,6 @@
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { BlockNavigationDropdown, ToolSelector } from '@wordpress/block-editor';
-import { DropdownMenu } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -12,7 +11,6 @@ import { DropdownMenu } from '@wordpress/components';
 import { useEditorContext } from '../editor';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
-import ThemeExporter from '../theme-exporter';
 
 export default function Header() {
 	const { settings, setSettings } = useEditorContext();
@@ -65,21 +63,6 @@ export default function Header() {
 			</div>
 			<div className="edit-site-header__actions">
 				<SaveButton />
-				<DropdownMenu
-					icon="ellipsis"
-					label={ __( 'More tools & options' ) }
-					toggleProps={ {
-						labelPosition: 'bottom',
-					} }
-					className="edit-site-header__actions-more-menu"
-				>
-					{ () => (
-						<ThemeExporter
-							ids={ settings.templateIds }
-							templatePartIds={ settings.templatePartIds }
-						/>
-					) }
-				</DropdownMenu>
 			</div>
 		</div>
 	);
