@@ -97,6 +97,8 @@ export class BlockList extends Component {
 			withFooter = true,
 			isReadOnly,
 			isRootList,
+			shouldShowInsertionPointBefore,
+			shouldShowInsertionPointAfter,
 		} = this.props;
 
 		return (
@@ -116,8 +118,10 @@ export class BlockList extends Component {
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					data={ blockClientIds }
 					keyExtractor={ identity }
-					// We need that prop because we want to call 'renderItem' even if the data prop is the same
-					extraData={ [ true ] }
+					extraData={
+						shouldShowInsertionPointBefore ||
+						shouldShowInsertionPointAfter
+					}
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={
 						this.shouldFlatListPreventAutomaticScroll
