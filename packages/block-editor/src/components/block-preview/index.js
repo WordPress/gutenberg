@@ -85,7 +85,7 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
 			}
 
 			setIsReady( true );
-		}, 100 );
+		}, 0 );
 
 		// Cleanup
 		return () => {
