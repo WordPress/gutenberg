@@ -151,7 +151,7 @@ module.exports = {
 		}
 
 		const workDirectoryPath = path.resolve(
-			getWpEnvHomeDir(),
+			getHomeDirectory(),
 			md5( configPath )
 		);
 
@@ -293,7 +293,7 @@ function getNumberFromEnvVariable( varName ) {
  *
  * @return {string} The absolute path to the `wp-env` home directory.
  */
-function getWpEnvHomeDir() {
+function getHomeDirectory() {
 	// Allow user to override download location.
 	if ( process.env.WP_ENV_HOME ) {
 		return path.resolve( process.env.WP_ENV_HOME );
