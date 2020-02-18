@@ -61,7 +61,7 @@
 		background-color: transparent;
 
 		tbody tr:nth-child(odd) {
-			background-color: $light-gray-200;
+			background-color: var(--wp--color--foreground-200, $light-gray-200);
 		}
 
 		&.has-subtle-light-gray-background-color {
@@ -93,6 +93,6 @@
 			border-color: transparent;
 		}
 
-		border-bottom: 1px solid $light-gray-200;
+		border-bottom: 1px solid var(--wp--color--foreground-200, $light-gray-200);
 	}
 }

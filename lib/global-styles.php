@@ -265,6 +265,14 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $inline_style );
 	wp_enqueue_style( 'global-styles' );
+
+	wp_register_style(
+		'global-styles-block-library',
+		gutenberg_url( 'build/block-library/global.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/block-library/global.css' )
+	);
+	wp_enqueue_style( 'global-styles-block-library' );
 }
 
 /**

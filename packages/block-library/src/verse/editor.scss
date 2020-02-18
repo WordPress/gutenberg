@@ -1,5 +1,5 @@
 pre.wp-block-verse {
-	color: $dark-gray-900;
+	color: var(--wp--color--foreground-900, $dark-gray-900);
 	white-space: nowrap;
 	font-family: inherit;
 	font-size: inherit;
