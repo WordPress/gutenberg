@@ -60,9 +60,8 @@ const COVER_DEFAULT_HEIGHT = 300;
 const Cover = ( {
 	attributes,
 	getStylesFromColorScheme,
-	isAncestorSelected,
+	hasChildren,
 	isParentSelected,
-	isSelected,
 	onFocus,
 	overlayColor,
 	setAttributes,
@@ -185,22 +184,20 @@ const Cover = ( {
 		</InspectorControls>
 	);
 
-	const containerStyles = {
-		...( isParentSelected || isAncestorSelected
-			? styles.denseMediaPadding
-			: styles.regularMediaPadding ),
-		...( isSelected && styles.innerPadding ),
-	};
+	const containerStyles = [
+		hasChildren && ! isParentSelected && styles.regularMediaPadding,
+		hasChildren && isParentSelected && styles.innerPadding,
+	];
 
 	const background = ( openMediaOptions, getMediaOptions ) => (
 		<TouchableWithoutFeedback
-			accessible={ ! isSelected }
+			accessible={ ! isParentSelected }
 			onLongPress={ openMediaOptions }
-			disabled={ ! isSelected }
+			disabled={ ! isParentSelected }
 		>
 			<View style={ styles.background }>
 				{ getMediaOptions() }
-				{ isSelected && toolbarControls( openMediaOptions ) }
+				{ isParentSelected && toolbarControls( openMediaOptions ) }
 
 				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 					<ImageWithFocalPoint
@@ -214,23 +211,25 @@ const Cover = ( {
 
 	if ( ! hasBackground ) {
 		return (
-			<MediaPlaceholder
-				__experimentalOnlyMediaLibrary
-				icon={ placeholderIcon }
-				labels={ {
-					title: __( 'Cover' ),
-				} }
-				onSelect={ onSelectMedia }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				onFocus={ onFocus }
-			/>
+			<View style={ containerStyles }>
+				<MediaPlaceholder
+					__experimentalOnlyMediaLibrary
+					icon={ placeholderIcon }
+					labels={ {
+						title: __( 'Cover' ),
+					} }
+					onSelect={ onSelectMedia }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					onFocus={ onFocus }
+				/>
+			</View>
 		);
 	}
 
 	return (
 		<View style={ containerStyles }>
 			{ controls }
-			<View style={ [ styles.backgroundContainer ] }>
+			<View style={ styles.backgroundContainer }>
 				<View
 					pointerEvents="box-none"
 					style={ [
@@ -259,25 +258,16 @@ const Cover = ( {
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getSelectedBlockClientId,
-			getBlockRootClientId,
-			getBlockParents,
-		} = select( 'core/block-editor' );
-
-		const parents = getBlockParents( clientId, true );
+		const { getSelectedBlockClientId, getBlockCount } = select(
+			'core/block-editor'
+		);
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const isParentSelected =
-			selectedBlockClientId &&
-			selectedBlockClientId === getBlockRootClientId( clientId );
-		const isAncestorSelected =
-			selectedBlockClientId && parents.includes( selectedBlockClientId );
+		const hasChildren = getBlockCount( clientId );
 
 		return {
-			isSelected: selectedBlockClientId === clientId,
-			isParentSelected,
-			isAncestorSelected,
+			hasChildren,
+			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),
 	withPreferredColorScheme,
