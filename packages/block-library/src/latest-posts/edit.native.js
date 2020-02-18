@@ -166,7 +166,7 @@ class LatestPostsEdit extends Component {
 
 		const onSetCategories = ( value ) => {
 			setAttributes( {
-				categories: '' !== value ? value : undefined,
+				categories: '' !== value ? value.toString() : undefined,
 			} );
 		};
 
@@ -218,7 +218,7 @@ class LatestPostsEdit extends Component {
 						numberOfItems={ postsToShow }
 						categoriesList={ categoriesList }
 						selectedCategoryId={
-							undefined !== categories ? categories : ''
+							undefined !== categories ? Number(categories) : ''
 						}
 						onOrderChange={ onSetOrder }
 						onOrderByChange={ onSetOrderBy }
