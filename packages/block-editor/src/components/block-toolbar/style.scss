@@ -203,6 +203,7 @@
 
 .block-editor-block-toolbar__mover-trigger-container {
 	@include break-medium() {
+		bottom: -1px;
 		left: -1px;
 		position: absolute;
 		top: -1px;
@@ -218,6 +219,7 @@
 		border-bottom-left-radius: 2px;
 		border-top-left-radius: 2px;
 		border-right: none;
+		height: 100%;
 		transition: all 60ms linear;
 	}
 
