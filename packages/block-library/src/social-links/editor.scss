@@ -68,20 +68,10 @@
 	justify-content: center;
 }
 
-// Improve the preview.
+// Improve the preview, ensure buttons are fully opaque despite being disabled.
 // @todo: Look at improving the preview component to make this unnecessary.
-.block-editor-block-preview__content {
-
-	// This ensures buttons in preview are fully opaque despite being disabled.
-	.wp-social-link:disabled {
-		opacity: 1;
-	}
-
-	// This ensures the preview is of a good size.
-	[data-type="core/social-links"] {
-		width: auto !important;
-		display: inline-block;
-	}
+.block-editor-block-preview__content .wp-social-link:disabled {
+	opacity: 1;
 }
 
 // Selected/unselected states.

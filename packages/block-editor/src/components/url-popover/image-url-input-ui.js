@@ -228,7 +228,7 @@ const ImageURLInputUI = ( {
 	const advancedOptions = (
 		<>
 			<ToggleControl
-				label={ __( 'Open in New Tab' ) }
+				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }
 			/>

@@ -30,6 +30,7 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
+import { pin } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -261,10 +262,7 @@ class LatestPostsEdit extends Component {
 			return (
 				<>
 					{ inspectorControls }
-					<Placeholder
-						icon="admin-post"
-						label={ __( 'Latest Posts' ) }
-					>
+					<Placeholder icon={ pin } label={ __( 'Latest Posts' ) }>
 						{ ! Array.isArray( latestPosts ) ? (
 							<Spinner />
 						) : (

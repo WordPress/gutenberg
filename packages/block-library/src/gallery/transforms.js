@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every } from 'lodash';
+import { filter, every, toString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -44,13 +44,13 @@ const transforms = {
 				return createBlock( 'core/gallery', {
 					images: validImages.map(
 						( { id, url, alt, caption } ) => ( {
-							id,
+							id: toString( id ),
 							url,
 							alt,
 							caption,
 						} )
 					),
-					ids: validImages.map( ( { id } ) => id ),
+					ids: validImages.map( ( { id } ) => parseInt( id, 10 ) ),
 					align,
 					sizeSlug,
 				} );
@@ -64,7 +64,7 @@ const transforms = {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
 						return parseShortcodeIds( ids ).map( ( id ) => ( {
-							id,
+							id: toString( id ),
 						} ) );
 					},
 				},
@@ -116,11 +116,11 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { images, align, sizeSlug } ) => {
+			transform: ( { images, align, sizeSlug, ids } ) => {
 				if ( images.length > 0 ) {
-					return images.map( ( { id, url, alt, caption } ) =>
+					return images.map( ( { url, alt, caption }, index ) =>
 						createBlock( 'core/image', {
-							id,
+							id: ids[ index ],
 							url,
 							alt,
 							caption,

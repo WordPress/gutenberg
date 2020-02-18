@@ -80,6 +80,11 @@ function gutenberg_edit_site_init( $hook ) {
 	apply_filters( 'template_include', null );
 	$settings['templateId'] = $_wp_current_template_id;
 
+	// This is so other parts of the code can hook their own settings.
+	// Example: Global Styles.
+	global $post;
+	$settings = apply_filters( 'block_editor_settings', $settings, $post );
+
 	// Initialize editor.
 	wp_add_inline_script(
 		'wp-edit-site',

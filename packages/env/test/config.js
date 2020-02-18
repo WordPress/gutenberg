@@ -217,4 +217,135 @@ describe( 'readConfig', () => {
 			);
 		}
 	} );
+
+	it( 'should throw a validaton error if the ports are not numbers', async () => {
+		expect.assertions( 10 );
+		testPortNumberValidation( 'port', 'string' );
+		testPortNumberValidation( 'testsPort', [] );
+		testPortNumberValidation( 'port', {} );
+		testPortNumberValidation( 'testsPort', false );
+		testPortNumberValidation( 'port', null );
+	} );
+
+	it( 'should throw a validaton error if the ports are the same', async () => {
+		expect.assertions( 2 );
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( { port: 8888, testsPort: 8888 } ) )
+		);
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid .wp-env.json: "testsPort" and "port" must be different.'
+			);
+		}
+	} );
+
+	it( 'should parse custom ports', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					port: 1000,
+				} )
+			)
+		);
+		const config = await readConfig( '.wp-env.json' );
+		// Custom port is overriden while testsPort gets the deault value.
+		expect( config ).toMatchObject( {
+			port: 1000,
+			testsPort: 8889,
+		} );
+	} );
+
+	it( 'should throw an error if the port number environment variable is invalid', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldPort = process.env.WP_ENV_PORT;
+		process.env.WP_ENV_PORT = 'hello';
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid environment variable: WP_ENV_PORT must be a number.'
+			);
+		}
+		process.env.WP_ENV_PORT = oldPort;
+	} );
+
+	it( 'should throw an error if the tests port number environment variable is invalid', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldPort = process.env.WP_ENV_TESTS_PORT;
+		process.env.WP_ENV_TESTS_PORT = 'hello';
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid environment variable: WP_ENV_TESTS_PORT must be a number.'
+			);
+		}
+		process.env.WP_ENV_TESTS_PORT = oldPort;
+	} );
+
+	it( 'should use port environment values rather than config values if both are defined', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					port: 1000,
+					testsPort: 2000,
+				} )
+			)
+		);
+		const oldPort = process.env.WP_ENV_PORT;
+		const oldTestsPort = process.env.WP_ENV_TESTS_PORT;
+		process.env.WP_ENV_PORT = 4000;
+		process.env.WP_ENV_TESTS_PORT = 3000;
+
+		const config = await readConfig( '.wp-env.json' );
+		expect( config ).toMatchObject( {
+			port: 4000,
+			testsPort: 3000,
+		} );
+
+		process.env.WP_ENV_PORT = oldPort;
+		process.env.WP_ENV_TESTS_PORT = oldTestsPort;
+	} );
+
+	it( 'should use 8888 and 8889 as the default port and testsPort values if nothing else is specified', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+
+		const config = await readConfig( '.wp-env.json' );
+		expect( config ).toMatchObject( {
+			port: 8888,
+			testsPort: 8889,
+		} );
+	} );
 } );
+
+/**
+ * Tests that readConfig will throw errors when invalid port numbers are passed.
+ *
+ * @param {string} portName The name of the port to test ('port' or 'testsPort')
+ * @param {any} value A value which should throw an error.
+ */
+async function testPortNumberValidation( portName, value ) {
+	readFile.mockImplementation( () =>
+		Promise.resolve( JSON.stringify( { [ portName ]: value } ) )
+	);
+	try {
+		await readConfig( '.wp-env.json' );
+	} catch ( error ) {
+		expect( error ).toBeInstanceOf( ValidationError );
+		expect( error.message ).toContain(
+			`Invalid .wp-env.json: "${ portName }" must be an integer.`
+		);
+	}
+	jest.clearAllMocks();
+}

@@ -3,31 +3,13 @@
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { Button, Notice } from '@wordpress/components';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { URLInput } from '../';
-
-const handleLinkControlOnKeyDown = ( event ) => {
-	const { keyCode } = event;
-
-	if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
-		// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-		event.stopPropagation();
-	}
-};
-
-const handleLinkControlOnKeyPress = ( event ) => {
-	const { keyCode } = event;
-
-	event.stopPropagation();
-
-	if ( keyCode === ENTER ) {
-	}
-};
 
 const LinkControlSearchInput = ( {
 	value,
@@ -36,9 +18,17 @@ const LinkControlSearchInput = ( {
 	renderSuggestions,
 	fetchSuggestions,
 	showInitialSuggestions,
+	errorMessage,
 } ) => {
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState();
 
+	/**
+	 * Handles the user moving between different suggestions. Does not handle
+	 * choosing an individual item.
+	 *
+	 * @param {string} selection the url of the selected suggestion.
+	 * @param {Object} suggestion the suggestion object.
+	 */
 	const selectItemHandler = ( selection, suggestion ) => {
 		onChange( selection );
 		setSelectedSuggestion( suggestion );
@@ -55,32 +45,38 @@ const LinkControlSearchInput = ( {
 
 	return (
 		<form onSubmit={ selectSuggestionOrCurrentInputValue }>
-			<URLInput
-				className="block-editor-link-control__search-input"
-				value={ value }
-				onChange={ selectItemHandler }
-				onFocus={ selectItemHandler }
-				onKeyDown={ ( event ) => {
-					if ( event.keyCode === ENTER ) {
-						return;
+			<div className="block-editor-link-control__search-input-wrapper">
+				<URLInput
+					className="block-editor-link-control__search-input"
+					value={ value }
+					onChange={ selectItemHandler }
+					placeholder={ __( 'Search or type url' ) }
+					__experimentalRenderSuggestions={ renderSuggestions }
+					__experimentalFetchLinkSuggestions={ fetchSuggestions }
+					__experimentalHandleURLSuggestions={ true }
+					__experimentalShowInitialSuggestions={
+						showInitialSuggestions
 					}
-					handleLinkControlOnKeyDown( event );
-				} }
-				onKeyPress={ handleLinkControlOnKeyPress }
-				placeholder={ __( 'Search or type url' ) }
-				__experimentalRenderSuggestions={ renderSuggestions }
-				__experimentalFetchLinkSuggestions={ fetchSuggestions }
-				__experimentalHandleURLSuggestions={ true }
-				__experimentalShowInitialSuggestions={ showInitialSuggestions }
-			/>
-			<div className="block-editor-link-control__search-actions">
-				<Button
-					type="submit"
-					label={ __( 'Submit' ) }
-					icon="editor-break"
-					className="block-editor-link-control__search-submit"
 				/>
+				<div className="block-editor-link-control__search-actions">
+					<Button
+						type="submit"
+						label={ __( 'Submit' ) }
+						icon={ keyboardReturn }
+						className="block-editor-link-control__search-submit"
+					/>
+				</div>
 			</div>
+
+			{ errorMessage && (
+				<Notice
+					className="block-editor-link-control__search-error"
+					status="error"
+					isDismissible={ false }
+				>
+					{ errorMessage }
+				</Notice>
+			) }
 		</form>
 	);
 };
