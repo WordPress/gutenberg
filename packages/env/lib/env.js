@@ -317,6 +317,14 @@ async function configureWordPress( environment, config ) {
 		options
 	);
 
+	// Set correct permissions for the wp-config.php file.
+	if ( config.coreSource ) {
+		await Promise.all( [
+			setCoreConfigPermissions( config.coreSource.path ),
+			setCoreConfigPermissions( config.coreSource.testsPath ),
+		] );
+	}
+
 	// Activate all plugins.
 	for ( const pluginSource of config.pluginSources ) {
 		await dockerCompose.run(
@@ -362,4 +370,23 @@ async function resetDatabase( environment, { dockerComposeConfigPath } ) {
 	}
 
 	await Promise.all( tasks );
+}
+
+/**
+ * Sets the correct user and permissions on the wp-conf.php file.
+ *
+ * @param {string} coreSourcePath The path to the WordPress source code.
+ */
+async function setCoreConfigPermissions( coreSourcePath ) {
+	// For now, Linux appears to be the only platform with issues.
+	if ( process.platform !== 'linux' ) {
+		return;
+	}
+	// Get the UID and GID of an existing file that works correctly.
+	const indexFile = path.resolve( coreSourcePath, 'index.php' );
+	const { uid, gid } = await fs.stat( indexFile );
+
+	// Use those IDs to set the user and group of the file with bad permissions.
+	const configFile = path.resolve( coreSourcePath, 'wp-config.php' );
+	await fs.chown( configFile, uid, gid );
 }
