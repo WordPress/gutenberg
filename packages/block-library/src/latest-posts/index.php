@@ -151,7 +151,7 @@ function register_block_core_latest_posts() {
 		array_merge(
 			$metadata,
 			array(
-				'render_callback' => 'render_block_core_latest_posts'
+				'render_callback' => 'render_block_core_latest_posts',
 			)
 		)
 	);
