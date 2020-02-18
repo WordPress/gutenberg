@@ -6,7 +6,6 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -14,9 +13,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { withViewportMatch } from '@wordpress/viewport';
-import { column as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -120,13 +117,6 @@ function ColumnEdit( {
 	return (
 		<>
 			<BlockControls>
-				<Toolbar>
-					<ToolbarButton
-						title={ __( 'ColumnButton' ) }
-						icon={ icon }
-						onClick={ () => {} }
-					/>
-				</Toolbar>
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }

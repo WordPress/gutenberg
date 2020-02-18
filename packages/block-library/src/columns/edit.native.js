@@ -8,12 +8,7 @@ import { dropRight, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	PanelBody,
-	StepperControl,
-	Toolbar,
-	ToolbarButton,
-} from '@wordpress/components';
+import { PanelBody, StepperControl } from '@wordpress/components';
 import {
 	InspectorControls,
 	InnerBlocks,
@@ -25,7 +20,6 @@ import { useEffect } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { withViewportMatch } from '@wordpress/viewport';
-import { columns as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -107,13 +101,6 @@ function ColumnsEditContainer( {
 				</PanelBody>
 			</InspectorControls>
 			<BlockControls>
-				<Toolbar>
-					<ToolbarButton
-						title={ __( 'ColumnsButton' ) }
-						icon={ icon }
-						onClick={ () => {} }
-					/>
-				</Toolbar>
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }
