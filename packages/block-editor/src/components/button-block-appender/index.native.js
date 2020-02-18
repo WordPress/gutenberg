@@ -19,7 +19,7 @@ function ButtonBlockAppender( {
 	rootClientId,
 	getStylesFromColorScheme,
 	showSeparator,
-	flex,
+	flex = true,
 } ) {
 	const appenderStyle = {
 		...styles.appender,
