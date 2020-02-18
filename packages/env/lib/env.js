@@ -373,7 +373,7 @@ async function resetDatabase( environment, { dockerComposeConfigPath } ) {
 }
 
 /**
- * Sets the correct user and permissions on the wp-conf.php file.
+ * Sets the correct user and permissions on the wp-config.php file.
  *
  * @param {string} coreSourcePath The path to the WordPress source code.
  */
