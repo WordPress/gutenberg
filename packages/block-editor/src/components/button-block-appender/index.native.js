@@ -7,7 +7,8 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { Button, Dashicon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { Icon, plusCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -50,8 +51,8 @@ function ButtonBlockAppender( {
 								! flex && styles.noFlexAppender,
 							] }
 						>
-							<Dashicon
-								icon="plus-alt"
+							<Icon
+								icon={ plusCircleFilled }
 								style={ addBlockButtonStyle }
 								color={ addBlockButtonStyle.color }
 								size={ addBlockButtonStyle.size }

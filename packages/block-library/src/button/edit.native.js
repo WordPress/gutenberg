@@ -51,7 +51,7 @@ class ButtonEdit extends Component {
 		this.onChangeOpenInNewTab = this.onChangeOpenInNewTab.bind( this );
 		this.onChangeURL = this.onChangeURL.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
-		this.onLayout = this.onLayout.bind( this );
+		this.onSetMaxWidth = this.onSetMaxWidth.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
@@ -81,7 +81,7 @@ class ButtonEdit extends Component {
 		const { isLinkSheetVisible, isButtonFocused } = this.state;
 
 		if ( prevProps.parentWidth !== parentWidth ) {
-			this.onLayout();
+			this.onSetMaxWidth();
 		}
 
 		// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
@@ -223,16 +223,16 @@ class ButtonEdit extends Component {
 		this.setState( { isLinkSheetVisible: false } );
 	}
 
-	onLayout() {
+	onSetMaxWidth() {
 		const { parentWidth, isSelectedButtonsBlock } = this.props;
 		const { marginRight: unSelectedSpacing } = styles.button;
 		const { marginRight: selectedSpacing } = styles.buttonsSelected;
 
 		const buttonSpacing = isSelectedButtonsBlock
-			? 2 * selectedSpacing
-			: 4 * unSelectedSpacing;
+			? selectedSpacing
+			: unSelectedSpacing;
 
-		const maxWidth = parentWidth - buttonSpacing;
+		const maxWidth = parentWidth - 2 * buttonSpacing;
 		this.setState( {
 			maxWidth,
 		} );
