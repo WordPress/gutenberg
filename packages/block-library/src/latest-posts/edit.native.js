@@ -218,7 +218,7 @@ class LatestPostsEdit extends Component {
 						numberOfItems={ postsToShow }
 						categoriesList={ categoriesList }
 						selectedCategoryId={
-							undefined !== categories ? Number(categories) : ''
+							undefined !== categories ? Number( categories ) : ''
 						}
 						onOrderChange={ onSetOrder }
 						onOrderByChange={ onSetOrderBy }
