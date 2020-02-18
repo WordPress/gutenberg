@@ -1,15 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useViewportMatch } from '@wordpress/compose';
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 
-const {
-	cancelAnimationFrame,
-	clearTimeout,
-	setTimeout,
-	requestAnimationFrame,
-} = window;
+const { clearTimeout, setTimeout } = window;
 
 /**
  * Hook that creates a showMover state, as well as debounced show/hide callbacks
@@ -137,124 +131,5 @@ export function useShowMoversGestures( { ref, debounceTimeout = 500 } ) {
 			onMouseMove: debouncedShowMovers,
 			onMouseLeave: debouncedHideMovers,
 		},
-	};
-}
-
-const EDITOR_SELECTOR = '.editor-styles-wrapper';
-
-/**
- * This is experimental.
- */
-export function useExperimentalToolbarPositioning( { ref } ) {
-	const containerNode = document.querySelector( EDITOR_SELECTOR );
-	const translateXRef = useRef( 0 );
-	const isViewportSmall = useViewportMatch( 'medium', '<' );
-
-	// MATH values
-	const moverWidth = 48;
-	const buffer = 8;
-	const offsetLeft = moverWidth + buffer;
-
-	const updatePosition = useCallback( () => {
-		const node = ref.current;
-		if ( ! node ) return;
-
-		const targetNode = node.parentElement;
-		if ( ! targetNode ) return;
-
-		const { x: containerX, right: containerRight } = getCoords(
-			containerNode
-		);
-		const { x: nodeX, left: nodeLeft, right: nodeRight } = getCoords(
-			targetNode
-		);
-
-		if ( nodeLeft < 0 ) return;
-
-		const currentTranslateX = translateXRef.current;
-		let nextTranslateX;
-
-		// Computed values
-		const totalOffsetLeft = nodeX - offsetLeft;
-		const totalOffsetRight = nodeRight + buffer;
-
-		const isOverflowLeft = totalOffsetLeft < containerX;
-		const isOverflowRight = totalOffsetRight > containerRight;
-
-		if ( isOverflowLeft ) {
-			nextTranslateX = containerX - totalOffsetLeft + currentTranslateX;
-			translateXRef.current = nextTranslateX;
-		} else if ( isOverflowRight ) {
-			nextTranslateX =
-				containerRight - totalOffsetRight + currentTranslateX;
-			translateXRef.current = nextTranslateX;
-		} else {
-			// TODO: Improve reset rendering
-			translateXRef.current = 0;
-		}
-
-		if ( isViewportSmall ) {
-			nextTranslateX = 0;
-		}
-
-		if ( nextTranslateX ) {
-			const translateX = Math.round( nextTranslateX );
-			targetNode.style.transform = `translateX(${ translateX }px)`;
-		}
-
-		targetNode.style.opacity = 1;
-	}, [] );
-
-	useHideOnInitialRender( { ref } );
-	useRequestAnimationFrameLoop( updatePosition );
-}
-
-function useHideOnInitialRender( { ref } ) {
-	useEffect( () => {
-		const node = ref.current;
-		if ( ! node ) return;
-
-		const targetNode = node.parentElement;
-		targetNode.style.opacity = 0;
-	}, [ ref ] );
-}
-
-function useRequestAnimationFrameLoop( callback ) {
-	const rafLoopRef = useRef();
-
-	const rafCallback = ( ...args ) => {
-		if ( callback ) {
-			callback( ...args );
-		}
-		rafLoopRef.current = requestAnimationFrame( rafCallback );
-	};
-
-	useEffect( () => {
-		const cancelAnimationLoop = () => {
-			if ( rafLoopRef.current ) {
-				cancelAnimationFrame( rafLoopRef.current );
-			}
-		};
-
-		rafLoopRef.current = requestAnimationFrame( rafCallback );
-
-		return () => {
-			cancelAnimationLoop();
-		};
-	}, [ rafLoopRef ] );
-}
-
-function getCoords( node ) {
-	if ( ! node ) {
-		return new window.DOMRect( 0, 0, 0, 0 );
-	}
-
-	const { x, left, width } = node.getBoundingClientRect();
-
-	return {
-		x,
-		left,
-		width,
-		right: x + width,
 	};
 }

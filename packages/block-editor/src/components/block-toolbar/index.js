@@ -53,7 +53,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		};
 	}, [] );
 
-	const containerNodeRef = useRef();
 	const nodeRef = useRef();
 
 	const {
@@ -77,7 +76,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 	};
 
 	return (
-		<div className="block-editor-block-toolbar" ref={ containerNodeRef }>
+		<div className="block-editor-block-toolbar">
 			<div
 				className="block-editor-block-toolbar__mover-switcher-container"
 				ref={ nodeRef }
