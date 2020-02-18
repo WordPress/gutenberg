@@ -21,12 +21,11 @@ exports[`Storyshots Components/Animate Appear Bottom Left 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-no-alt"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -58,12 +57,11 @@ exports[`Storyshots Components/Animate Appear Bottom Right 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-no-alt"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -95,12 +93,11 @@ exports[`Storyshots Components/Animate Appear Top Left 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-no-alt"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -132,12 +129,11 @@ exports[`Storyshots Components/Animate Appear Top Right 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-no-alt"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -167,12 +163,11 @@ exports[`Storyshots Components/Animate Default 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-no-alt"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -202,12 +197,11 @@ exports[`Storyshots Components/Animate Loading 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-no-alt"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -237,12 +231,11 @@ exports[`Storyshots Components/Animate Slide In 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-no-alt"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -323,16 +316,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -342,16 +334,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -361,16 +352,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -380,16 +370,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -399,16 +388,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
       Icon & Text
@@ -450,16 +438,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -469,16 +456,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -488,16 +474,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -507,16 +492,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -526,16 +510,15 @@ exports[`Storyshots Components/Button Buttons 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
       Icon & Text
@@ -638,12 +621,11 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-editor-bold"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -664,12 +646,11 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-editor-italic"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -678,7 +659,7 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
     </svg>
   </button>
   <button
-    aria-label="Underline"
+    aria-label="Link"
     className="components-button has-icon"
     onBlur={[Function]}
     onClick={[Function]}
@@ -690,16 +671,15 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-editor-underline"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M14 5h-2v5.71c0 1.99-1.12 2.98-2.45 2.98-1.32 0-2.55-1-2.55-2.96V5H5v5.87c0 1.91 1 4.54 4.48 4.54 3.49 0 4.52-2.58 4.52-4.5V5zm0 13v-2H5v2h9z"
+        d="M17.74 2.76c1.68 1.69 1.68 4.41 0 6.1l-1.53 1.52c-1.12 1.12-2.7 1.47-4.14 1.09l2.62-2.61.76-.77.76-.76c.84-.84.84-2.2 0-3.04-.84-.85-2.2-.85-3.04 0l-.77.76-3.38 3.38c-.37-1.44-.02-3.02 1.1-4.14l1.52-1.53c1.69-1.68 4.42-1.68 6.1 0zM8.59 13.43l5.34-5.34c.42-.42.42-1.1 0-1.52-.44-.43-1.13-.39-1.53 0l-5.33 5.34c-.42.42-.42 1.1 0 1.52.44.43 1.13.39 1.52 0zm-.76 2.29l4.14-4.15c.38 1.44.03 3.02-1.09 4.14l-1.52 1.53c-1.69 1.68-4.41 1.68-6.1 0-1.68-1.68-1.68-4.42 0-6.1l1.53-1.52c1.12-1.12 2.7-1.47 4.14-1.1l-4.14 4.15c-.85.84-.85 2.2 0 3.05.84.84 2.2.84 3.04 0z"
       />
     </svg>
   </button>
@@ -2345,16 +2325,15 @@ exports[`Storyshots Components/ColorPicker Alpha Enabled 1`] = `
         >
           <svg
             aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
             focusable="false"
-            height={20}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
             />
           </svg>
         </button>
@@ -2520,16 +2499,15 @@ exports[`Storyshots Components/ColorPicker Default 1`] = `
         >
           <svg
             aria-hidden="true"
-            className="dashicon dashicons-arrow-down-alt2"
             focusable="false"
-            height={20}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
             />
           </svg>
         </button>
@@ -2562,16 +2540,16 @@ exports[`Storyshots Components/CustomSelectControl Default 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+      className="components-custom-select-control__button-icon"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="0 0 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+        d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
       />
     </svg>
   </button>
@@ -2637,16 +2615,15 @@ exports[`Storyshots Components/Draggable Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-move"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M19 10l-4 4v-3h-4v4h3l-4 4-4-4h3v-4H5v3l-4-4 4-4v3h4V5H6l4-4 4 4h-3v4h4V6z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </div>
@@ -2679,16 +2656,15 @@ Array [
       >
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-move"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="0 0 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M19 10l-4 4v-3h-4v4h3l-4 4-4-4h3v-4H5v3l-4-4 4-4v3h4V5H6l4-4 4 4h-3v4h4V6z"
+            d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
           />
         </svg>
       </button>
@@ -2715,16 +2691,15 @@ Array [
       >
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-move"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="0 0 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M19 10l-4 4v-3h-4v4h3l-4 4-4-4h3v-4H5v3l-4-4 4-4v3h4V5H6l4-4 4 4h-3v4h4V6z"
+            d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
           />
         </svg>
       </button>
@@ -3051,12 +3026,12 @@ exports[`Storyshots Components/ExternalLink Default 1`] = `
   </span>
   <svg
     aria-hidden="true"
-    className="dashicon dashicons-external components-external-link__icon"
+    className="components-external-link__icon"
     focusable="false"
-    height={20}
+    height={24}
     role="img"
-    viewBox="0 0 20 20"
-    width={20}
+    viewBox="-2 -2 24 24"
+    width={24}
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
@@ -3101,16 +3076,16 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+          className="components-custom-select-control__button-icon"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="0 0 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
           />
         </svg>
       </button>
@@ -3126,17 +3101,17 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
       />
     </div>
     <div
-      className="components-range-control__number-container"
+      className="components-font-size-picker__number-container"
     >
       <label
-        htmlFor="components-range-control__number#0"
+        htmlFor="components-font-size-picker__number#0"
       >
         Custom
       </label>
       <input
         aria-label="Custom"
-        className="components-range-control__number"
-        id="components-range-control__number#0"
+        className="components-font-size-picker__number"
+        id="components-font-size-picker__number#0"
         onChange={[Function]}
         type="number"
         value={16}
@@ -3155,6 +3130,208 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
 `;
 
 exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
+.emotion-20 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+}
+
+.emotion-0 {
+  margin-top: 3px;
+  margin-right: 6px;
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  color: #007cba;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  margin-left: 10px;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-4 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-6 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-10 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-top: 5px;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 20px;
+  margin-left: -10px;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.emotion-12 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  margin-top: -4px;
+  top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-12::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-12::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-12 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-16 {
+  margin-top: 3px;
+  margin-left: 16px;
+}
+
+.emotion-18 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+  margin-left: 16px;
+}
+
+input[type='number'].emotion-18 {
+  height: 30px;
+  min-height: 30px;
+}
+
 <fieldset
   className="components-font-size-picker"
 >
@@ -3189,16 +3366,16 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+          className="components-custom-select-control__button-icon"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="0 0 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
           />
         </svg>
       </button>
@@ -3234,53 +3411,119 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
       >
         Custom Size
       </label>
-      <svg
-        aria-hidden="true"
-        className="dashicon dashicons-editor-textcolor"
-        focusable="false"
-        height={20}
-        role="img"
-        viewBox="0 0 20 20"
-        width={20}
-        xmlns="http://www.w3.org/2000/svg"
+      <span
+        className="components-range-control__root emotion-20 emotion-21"
       >
-        <path
-          d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
+        <span
+          className="emotion-0 emotion-1"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height={24}
+            role="img"
+            viewBox="-2 -2 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
+            />
+          </svg>
+        </span>
+        <span
+          className="components-range-control__wrapper emotion-14 emotion-15"
+          color="#00669b"
+        >
+          <input
+            aria-hidden={false}
+            aria-label="Custom Size"
+            className="components-range-control__slider emotion-2 emotion-3"
+            disabled={false}
+            id="inspector-range-control-0"
+            max={100}
+            min={12}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            step={1}
+            tabIndex={0}
+            type="range"
+            value={16}
+          />
+          <span
+            aria-hidden={true}
+            className="emotion-4 emotion-5"
+          />
+          <span
+            aria-hidden={true}
+            className="components-range-control__track emotion-6 emotion-7"
+            style={
+              Object {
+                "width": "4.545454545454546%",
+              }
+            }
+          />
+          <span
+            className="emotion-10 emotion-11"
+            style={
+              Object {
+                "left": "4.545454545454546%",
+              }
+            }
+          >
+            <span
+              aria-hidden={true}
+              className="emotion-8 emotion-9"
+            />
+          </span>
+          <span
+            aria-hidden={false}
+            className="components-simple-tooltip components-range-control__tooltip emotion-12 emotion-13"
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            role="tooltip"
+            style={
+              Object {
+                "left": "4.545454545454546%",
+                "zIndex": 100,
+              }
+            }
+          >
+            16
+          </span>
+        </span>
+        <span
+          className="emotion-16 emotion-17"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height={24}
+            role="img"
+            viewBox="-2 -2 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
+            />
+          </svg>
+        </span>
+        <input
+          aria-label="Custom Size"
+          className="components-range-control__number emotion-18 emotion-153"
+          inputMode="decimal"
+          max={100}
+          min={12}
+          onChange={[Function]}
+          step={1}
+          type="number"
+          value={16}
         />
-      </svg>
-      <input
-        className="components-range-control__slider"
-        id="inspector-range-control-0"
-        max={100}
-        min={12}
-        onChange={[Function]}
-        type="range"
-        value={16}
-      />
-      <svg
-        aria-hidden="true"
-        className="dashicon dashicons-editor-textcolor"
-        focusable="false"
-        height={20}
-        role="img"
-        viewBox="0 0 20 20"
-        width={20}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
-        />
-      </svg>
-      <input
-        aria-label="Custom Size"
-        className="components-range-control__number"
-        max={100}
-        min={12}
-        onBlur={[Function]}
-        onChange={[Function]}
-        type="number"
-        value={16}
-      />
+      </span>
     </div>
   </div>
 </fieldset>
@@ -3321,16 +3564,16 @@ exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+          className="components-custom-select-control__button-icon"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="0 0 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
           />
         </svg>
       </button>
@@ -4454,39 +4697,886 @@ exports[`Storyshots Components/RadioControl With Help 1`] = `
 </div>
 `;
 
-exports[`Storyshots Components/RangeControl Default 1`] = `
+exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
+.emotion-38 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-26 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-30 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-top: 5px;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 20px;
+  margin-left: -10px;
+}
+
+.emotion-28 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.emotion-32 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  margin-top: -4px;
+  top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-32::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-32::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-32 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-36 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+  margin-left: 16px;
+}
+
+input[type='number'].emotion-36 {
+  height: 30px;
+  min-height: 30px;
+}
+
+.emotion-40 {
+  padding: 60px 40px;
+}
+
+.emotion-34 {
+  box-sizing: border-box;
+  color: #007cba;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  margin-bottom: 16px;
+  margin-left: 10px;
+}
+
+.emotion-24 {
+  box-sizing: border-box;
+  display: block;
+  position: relative;
+  width: 100%;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.emotion-4 {
+  box-sizing: border-box;
+  height: 9px;
+  left: 0;
+  position: absolute;
+  top: -4px;
+  width: 1px;
+  background-color: currentColor;
+}
+
+.emotion-6 {
+  box-sizing: border-box;
+  color: #d7dade;
+  left: 0;
+  font-size: 11px;
+  position: absolute;
+  top: 12px;
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
+  white-space: nowrap;
+  color: #6c7781;
+}
+
+.emotion-8 {
+  box-sizing: border-box;
+  height: 9px;
+  left: 0;
+  position: absolute;
+  top: -4px;
+  width: 1px;
+  background-color: #d7dade;
+}
+
+.emotion-10 {
+  box-sizing: border-box;
+  color: #d7dade;
+  left: 0;
+  font-size: 11px;
+  position: absolute;
+  top: 12px;
+  -webkit-transform: translateX( -50% );
+  -ms-transform: translateX( -50% );
+  transform: translateX( -50% );
+  white-space: nowrap;
+  color: #d7dade;
+}
+
 <div
-  className="components-base-control components-range-control"
+  className="emotion-40 emotion-41"
 >
   <div
-    className="components-base-control__field"
+    className="components-base-control components-range-control"
   >
-    <label
-      className="components-base-control__label"
-      htmlFor="inspector-range-control-1"
+    <div
+      className="components-base-control__field"
     >
-      How many columns should this use?
-    </label>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-1"
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
+      <span
+        className="components-range-control__root emotion-38 emotion-39"
+      >
+        <span
+          className="components-range-control__wrapper is-marked emotion-34 emotion-35"
+          color="#00669b"
+        >
+          <input
+            aria-hidden={false}
+            className="components-range-control__slider emotion-0 emotion-1"
+            disabled={false}
+            id="inspector-range-control-8"
+            max={10}
+            min={0}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            step={1}
+            tabIndex={0}
+            type="range"
+            value={0}
+          />
+          <span
+            aria-hidden={true}
+            className="emotion-2 emotion-3"
+          />
+          <span
+            aria-hidden="true"
+            className="components-range-control__marks emotion-24 emotion-25"
+          >
+            <span
+              aria-hidden="true"
+              className="components-range-control__mark is-filled emotion-4 emotion-5"
+              style={
+                Object {
+                  "left": "0%",
+                }
+              }
+              value={0}
+            />
+            <span
+              aria-hidden="true"
+              className="components-range-control__mark-label is-filled emotion-6 emotion-7"
+              style={
+                Object {
+                  "left": "0%",
+                }
+              }
+            >
+              0
+            </span>
+            <span
+              aria-hidden="true"
+              className="components-range-control__mark emotion-8 emotion-5"
+              style={
+                Object {
+                  "left": "10%",
+                }
+              }
+              value={1}
+            />
+            <span
+              aria-hidden="true"
+              className="components-range-control__mark-label emotion-10 emotion-7"
+              style={
+                Object {
+                  "left": "10%",
+                }
+              }
+            >
+              1
+            </span>
+            <span
+              aria-hidden="true"
+              className="components-range-control__mark emotion-8 emotion-5"
+              style={
+                Object {
+                  "left": "20%",
+                }
+              }
+              value={2}
+            />
+            <span
+              aria-hidden="true"
+              className="components-range-control__mark-label emotion-10 emotion-7"
+              style={
+                Object {
+                  "left": "20%",
+                }
+              }
+            >
+              2
+            </span>
+            <span
+              aria-hidden="true"
+              className="components-range-control__mark emotion-8 emotion-5"
+              style={
+                Object {
+                  "left": "80%",
+                }
+              }
+              value={8}
+            />
+            <span
+              aria-hidden="true"
+              className="components-range-control__mark-label emotion-10 emotion-7"
+              style={
+                Object {
+                  "left": "80%",
+                }
+              }
+            >
+              8
+            </span>
+            <span
+              aria-hidden="true"
+              className="components-range-control__mark emotion-8 emotion-5"
+              style={
+                Object {
+                  "left": "100%",
+                }
+              }
+              value={10}
+            />
+            <span
+              aria-hidden="true"
+              className="components-range-control__mark-label emotion-10 emotion-7"
+              style={
+                Object {
+                  "left": "100%",
+                }
+              }
+            >
+              10
+            </span>
+          </span>
+          <span
+            aria-hidden={true}
+            className="components-range-control__track emotion-26 emotion-27"
+            style={
+              Object {
+                "width": "0%",
+              }
+            }
+          />
+          <span
+            className="emotion-30 emotion-31"
+            style={
+              Object {
+                "left": "0%",
+              }
+            }
+          >
+            <span
+              aria-hidden={true}
+              className="emotion-28 emotion-29"
+            />
+          </span>
+          <span
+            aria-hidden={false}
+            className="components-simple-tooltip components-range-control__tooltip emotion-32 emotion-33"
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            role="tooltip"
+            style={
+              Object {
+                "left": "0%",
+                "zIndex": 100,
+              }
+            }
+          >
+            0
+          </span>
+        </span>
+        <input
+          className="components-range-control__number emotion-36 emotion-353"
+          inputMode="decimal"
+          max={10}
+          min={0}
+          onChange={[Function]}
+          step={1}
+          type="number"
+          value={0}
+        />
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components/RangeControl Default 1`] = `
+.emotion-14 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+}
+
+.emotion-10 {
+  box-sizing: border-box;
+  color: #007cba;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  margin-left: 10px;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-top: 5px;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 20px;
+  margin-left: -10px;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+  margin-left: 16px;
+}
+
+input[type='number'].emotion-12 {
+  height: 30px;
+  min-height: 30px;
+}
+
+.emotion-16 {
+  padding: 60px 40px;
+}
+
+<div
+  className="emotion-16 emotion-17"
+>
+  <div
+    className="components-base-control components-range-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-range-control-1"
+      >
+        Range Label
+      </label>
+      <span
+        className="components-range-control__root emotion-14 emotion-15"
+      >
+        
+        <span
+          className="components-range-control__wrapper emotion-10 emotion-11"
+          color="#00669b"
+        >
+          <input
+            aria-hidden={false}
+            aria-label="Range Label"
+            className="components-range-control__slider emotion-0 emotion-1"
+            disabled={false}
+            id="inspector-range-control-1"
+            max={10}
+            min={0}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            step={1}
+            tabIndex={0}
+            type="range"
+            value={0}
+          />
+          <span
+            aria-hidden={true}
+            className="emotion-2 emotion-3"
+          />
+          <span
+            aria-hidden={true}
+            className="components-range-control__track emotion-4 emotion-5"
+            style={
+              Object {
+                "width": "0%",
+              }
+            }
+          />
+          <span
+            className="emotion-8 emotion-9"
+            style={
+              Object {
+                "left": "0%",
+              }
+            }
+          >
+            <span
+              aria-hidden={true}
+              className="emotion-6 emotion-7"
+            />
+          </span>
+        </span>
+        
+        <input
+          aria-label="Range Label"
+          className="components-range-control__number emotion-12 emotion-113"
+          inputMode="decimal"
+          max={10}
+          min={0}
+          onChange={[Function]}
+          step={1}
+          type="number"
+          value={0}
+        />
+      </span>
+    </div>
   </div>
 </div>
 `;
 
 exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
+.emotion-16 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  color: #007cba;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  margin-left: 10px;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-top: 5px;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 20px;
+  margin-left: -10px;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  margin-top: -4px;
+  top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-10 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+  margin-left: 16px;
+}
+
+input[type='number'].emotion-14 {
+  height: 30px;
+  min-height: 30px;
+}
+
 <div
   className="components-base-control components-range-control"
 >
@@ -4499,30 +5589,282 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
     >
       How many columns should this use?
     </label>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-2"
-      max={20}
-      min={0}
-      onChange={[Function]}
-      type="range"
-      value={0}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      max={20}
-      min={0}
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={null}
-    />
+    <span
+      className="components-range-control__root emotion-16 emotion-17"
+    >
+      <span
+        className="components-range-control__wrapper emotion-12 emotion-13"
+        color="#00669b"
+      >
+        <input
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-0 emotion-1"
+          disabled={false}
+          id="inspector-range-control-2"
+          max={20}
+          min={0}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={0}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-2 emotion-3"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-4 emotion-5"
+          style={
+            Object {
+              "width": "0%",
+            }
+          }
+        />
+        <span
+          className="emotion-8 emotion-9"
+          style={
+            Object {
+              "left": "0%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-6 emotion-7"
+          />
+        </span>
+        <span
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "0%",
+              "zIndex": 100,
+            }
+          }
+        >
+          0
+        </span>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-14 emotion-133"
+        inputMode="decimal"
+        max={20}
+        min={0}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={0}
+      />
+    </span>
   </div>
 </div>
 `;
 
 exports[`Storyshots Components/RangeControl With Help 1`] = `
+.emotion-16 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  color: #007cba;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  margin-left: 10px;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-top: 5px;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 20px;
+  margin-left: -10px;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  margin-top: -4px;
+  top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-10 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+  margin-left: 16px;
+}
+
+input[type='number'].emotion-14 {
+  height: 30px;
+  min-height: 30px;
+}
+
 <div
   className="components-base-control components-range-control"
 >
@@ -4535,22 +5877,86 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
     >
       How many columns should this use?
     </label>
-    <input
-      aria-describedby="inspector-range-control-3__help"
-      className="components-range-control__slider"
-      id="inspector-range-control-3"
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
+    <span
+      className="components-range-control__root emotion-16 emotion-17"
+    >
+      <span
+        className="components-range-control__wrapper emotion-12 emotion-13"
+        color="#00669b"
+      >
+        <input
+          aria-describedby="inspector-range-control-3__help"
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-0 emotion-1"
+          disabled={false}
+          id="inspector-range-control-3"
+          max={100}
+          min={0}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={5}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-2 emotion-3"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-4 emotion-5"
+          style={
+            Object {
+              "width": "5%",
+            }
+          }
+        />
+        <span
+          className="emotion-8 emotion-9"
+          style={
+            Object {
+              "left": "5%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-6 emotion-7"
+          />
+        </span>
+        <span
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "5%",
+              "zIndex": 100,
+            }
+          }
+        >
+          5
+        </span>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-14 emotion-133"
+        inputMode="decimal"
+        max={100}
+        min={0}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={5}
+      />
+    </span>
   </div>
   <p
     className="components-base-control__help"
@@ -4562,6 +5968,203 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
 `;
 
 exports[`Storyshots Components/RangeControl With Icon After 1`] = `
+.emotion-18 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  color: #007cba;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  margin-left: 10px;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-top: 5px;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 20px;
+  margin-left: -10px;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  margin-top: -4px;
+  top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-10 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-14 {
+  margin-top: 3px;
+  margin-left: 16px;
+}
+
+.emotion-16 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+  margin-left: 16px;
+}
+
+input[type='number'].emotion-16 {
+  height: 30px;
+  min-height: 30px;
+}
+
 <div
   className="components-base-control components-range-control"
 >
@@ -4574,40 +6177,305 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
     >
       How many columns should this use?
     </label>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-6"
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <svg
-      aria-hidden="true"
-      className="dashicon dashicons-wordpress"
-      focusable="false"
-      height={20}
-      role="img"
-      viewBox="0 0 20 20"
-      width={20}
-      xmlns="http://www.w3.org/2000/svg"
+    <span
+      className="components-range-control__root emotion-18 emotion-19"
     >
-      <path
-        d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
+      <span
+        className="components-range-control__wrapper emotion-12 emotion-13"
+        color="#00669b"
+      >
+        <input
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-0 emotion-1"
+          disabled={false}
+          id="inspector-range-control-6"
+          max={100}
+          min={0}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={5}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-2 emotion-3"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-4 emotion-5"
+          style={
+            Object {
+              "width": "5%",
+            }
+          }
+        />
+        <span
+          className="emotion-8 emotion-9"
+          style={
+            Object {
+              "left": "5%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-6 emotion-7"
+          />
+        </span>
+        <span
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "5%",
+              "zIndex": 100,
+            }
+          }
+        >
+          5
+        </span>
+      </span>
+      <span
+        className="emotion-14 emotion-15"
+      >
+        <svg
+          aria-hidden="true"
+          className="dashicon dashicons-wordpress"
+          focusable="false"
+          height={20}
+          role="img"
+          viewBox="0 0 20 20"
+          width={20}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
+          />
+        </svg>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-16 emotion-133"
+        inputMode="decimal"
+        max={100}
+        min={0}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={5}
       />
-    </svg>
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
+    </span>
   </div>
 </div>
 `;
 
 exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
+.emotion-18 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+}
+
+.emotion-0 {
+  margin-top: 3px;
+  margin-right: 6px;
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  color: #007cba;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  margin-left: 10px;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-4 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-6 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-10 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-top: 5px;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 20px;
+  margin-left: -10px;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.emotion-12 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  margin-top: -4px;
+  top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-12::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-12::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-12 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-16 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+  margin-left: 16px;
+}
+
+input[type='number'].emotion-16 {
+  height: 30px;
+  min-height: 30px;
+}
+
 <div
   className="components-base-control components-range-control"
 >
@@ -4620,40 +6488,300 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
     >
       How many columns should this use?
     </label>
-    <svg
-      aria-hidden="true"
-      className="dashicon dashicons-wordpress"
-      focusable="false"
-      height={20}
-      role="img"
-      viewBox="0 0 20 20"
-      width={20}
-      xmlns="http://www.w3.org/2000/svg"
+    <span
+      className="components-range-control__root emotion-18 emotion-19"
     >
-      <path
-        d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
+      <span
+        className="emotion-0 emotion-1"
+      >
+        <svg
+          aria-hidden="true"
+          className="dashicon dashicons-wordpress"
+          focusable="false"
+          height={20}
+          role="img"
+          viewBox="0 0 20 20"
+          width={20}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
+          />
+        </svg>
+      </span>
+      <span
+        className="components-range-control__wrapper emotion-14 emotion-15"
+        color="#00669b"
+      >
+        <input
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-2 emotion-3"
+          disabled={false}
+          id="inspector-range-control-5"
+          max={100}
+          min={0}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={5}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-4 emotion-5"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-6 emotion-7"
+          style={
+            Object {
+              "width": "5%",
+            }
+          }
+        />
+        <span
+          className="emotion-10 emotion-11"
+          style={
+            Object {
+              "left": "5%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-8 emotion-9"
+          />
+        </span>
+        <span
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-12 emotion-13"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "5%",
+              "zIndex": 100,
+            }
+          }
+        >
+          5
+        </span>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-16 emotion-153"
+        inputMode="decimal"
+        max={100}
+        min={0}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={5}
       />
-    </svg>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-5"
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
+    </span>
   </div>
 </div>
 `;
 
 exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] = `
+.emotion-16 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  color: #007cba;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  margin-left: 10px;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-top: 5px;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 20px;
+  margin-left: -10px;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  margin-top: -4px;
+  top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-10 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+  margin-left: 16px;
+}
+
+input[type='number'].emotion-14 {
+  height: 30px;
+  min-height: 30px;
+}
+
 <div
   className="components-base-control components-range-control"
 >
@@ -4666,30 +6794,296 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
     >
       How many columns should this use?
     </label>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-4"
-      max={10}
-      min={2}
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      max={10}
-      min={2}
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
+    <span
+      className="components-range-control__root emotion-16 emotion-17"
+    >
+      <span
+        className="components-range-control__wrapper emotion-12 emotion-13"
+        color="#00669b"
+      >
+        <input
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-0 emotion-1"
+          disabled={false}
+          id="inspector-range-control-4"
+          max={10}
+          min={2}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={5}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-2 emotion-3"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-4 emotion-5"
+          style={
+            Object {
+              "width": "37.5%",
+            }
+          }
+        />
+        <span
+          className="emotion-8 emotion-9"
+          style={
+            Object {
+              "left": "37.5%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-6 emotion-7"
+          />
+        </span>
+        <span
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "37.5%",
+              "zIndex": 100,
+            }
+          }
+        >
+          5
+        </span>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-14 emotion-133"
+        inputMode="decimal"
+        max={10}
+        min={2}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={5}
+      />
+    </span>
   </div>
 </div>
 `;
 
 exports[`Storyshots Components/RangeControl With Reset 1`] = `
+.emotion-18 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  color: #007cba;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  margin-left: 10px;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-top: 5px;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 20px;
+  margin-left: -10px;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  margin-top: -4px;
+  top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-10 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+  margin-left: 16px;
+}
+
+input[type='number'].emotion-14 {
+  height: 30px;
+  min-height: 30px;
+}
+
+.emotion-16 {
+  box-sizing: border-box;
+  display: block;
+  margin-top: 0;
+  margin-left: 8px;
+}
+
+.emotion-16 button,
+.emotion-16 button.is-small {
+  margin-left: 0;
+  height: 30px;
+  min-height: 30px;
+}
+
 <div
   className="components-base-control components-range-control"
 >
@@ -4702,29 +7096,97 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
     >
       How many columns should this use?
     </label>
-    <input
-      className="components-range-control__slider"
-      id="inspector-range-control-7"
-      onChange={[Function]}
-      type="range"
-      value={5}
-    />
-    <input
-      aria-label="How many columns should this use?"
-      className="components-range-control__number"
-      onBlur={[Function]}
-      onChange={[Function]}
-      type="number"
-      value={5}
-    />
-    <button
-      className="components-button components-range-control__reset is-secondary is-small"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
+    <span
+      className="components-range-control__root emotion-18 emotion-19"
     >
-      Reset
-    </button>
+      <span
+        className="components-range-control__wrapper emotion-12 emotion-13"
+        color="#00669b"
+      >
+        <input
+          aria-hidden={false}
+          aria-label="How many columns should this use?"
+          className="components-range-control__slider emotion-0 emotion-1"
+          disabled={false}
+          id="inspector-range-control-7"
+          max={100}
+          min={0}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          step={1}
+          tabIndex={0}
+          type="range"
+          value={5}
+        />
+        <span
+          aria-hidden={true}
+          className="emotion-2 emotion-3"
+        />
+        <span
+          aria-hidden={true}
+          className="components-range-control__track emotion-4 emotion-5"
+          style={
+            Object {
+              "width": "5%",
+            }
+          }
+        />
+        <span
+          className="emotion-8 emotion-9"
+          style={
+            Object {
+              "left": "5%",
+            }
+          }
+        >
+          <span
+            aria-hidden={true}
+            className="emotion-6 emotion-7"
+          />
+        </span>
+        <span
+          aria-hidden={false}
+          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          role="tooltip"
+          style={
+            Object {
+              "left": "5%",
+              "zIndex": 100,
+            }
+          }
+        >
+          5
+        </span>
+      </span>
+      <input
+        aria-label="How many columns should this use?"
+        className="components-range-control__number emotion-14 emotion-133"
+        inputMode="decimal"
+        max={100}
+        min={0}
+        onChange={[Function]}
+        step={1}
+        type="number"
+        value={5}
+      />
+      <span
+        className="emotion-16 emotion-134"
+      >
+        <button
+          className="components-button components-range-control__reset is-secondary is-small"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          Reset
+        </button>
+      </span>
+    </span>
   </div>
 </div>
 `;
@@ -5184,16 +7646,15 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-paragraph"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M15 2H7.54c-.83 0-1.59.2-2.28.6-.7.41-1.25.96-1.65 1.65C3.2 4.94 3 5.7 3 6.52s.2 1.58.61 2.27c.4.69.95 1.24 1.65 1.64.69.41 1.45.61 2.28.61h.43V17c0 .27.1.51.29.71.2.19.44.29.71.29.28 0 .51-.1.71-.29.2-.2.3-.44.3-.71V5c0-.27.09-.51.29-.71.2-.19.44-.29.71-.29s.51.1.71.29c.19.2.29.44.29.71v12c0 .27.1.51.3.71.2.19.43.29.71.29.27 0 .51-.1.71-.29.19-.2.29-.44.29-.71V4H15c.27 0 .5-.1.7-.3.2-.19.3-.43.3-.7s-.1-.51-.3-.71C15.5 2.1 15.27 2 15 2z"
+          d="M11 5v7H9.5C7.6 12 6 10.4 6 8.5S7.6 5 9.5 5H11m8-2H9.5C6.5 3 4 5.5 4 8.5S6.5 14 9.5 14H11v7h2V5h2v16h2V5h2V3z"
         />
       </svg>
     </button>
@@ -5222,12 +7683,11 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       >
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-editor-alignleft"
           focusable="false"
-          height={20}
+          height={24}
           role="img"
-          viewBox="0 0 20 20"
-          width={20}
+          viewBox="-2 -2 24 24"
+          width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
@@ -5272,12 +7732,11 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-bold"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5301,12 +7760,11 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-italic"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5330,12 +7788,11 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-admin-links"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5389,16 +7846,15 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-ellipsis"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="0 0 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
         />
       </svg>
     </button>
@@ -5431,12 +7887,11 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-editor-bold"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -5460,12 +7915,11 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-editor-italic"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -5489,12 +7943,11 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-admin-links"
       focusable="false"
-      height={20}
+      height={24}
       role="img"
-      viewBox="0 0 20 20"
-      width={20}
+      viewBox="-2 -2 24 24"
+      width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -5524,12 +7977,11 @@ exports[`Storyshots Components/ToolbarGroup Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-bold"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5552,12 +8004,11 @@ exports[`Storyshots Components/ToolbarGroup Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-italic"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5580,12 +8031,11 @@ exports[`Storyshots Components/ToolbarGroup Default 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-admin-links"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5618,12 +8068,11 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-bold"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5648,12 +8097,11 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-editor-italic"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5678,12 +8126,11 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-admin-links"
         focusable="false"
-        height={20}
+        height={24}
         role="img"
-        viewBox="0 0 20 20"
-        width={20}
+        viewBox="-2 -2 24 24"
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -5715,35 +8162,35 @@ Array [
 ]
 `;
 
-exports[`Storyshots Components|AnglePicker Default 1`] = `
+exports[`Storyshots Components|AnglePickerControl Default 1`] = `
 <div
-  className="components-base-control components-angle-picker"
+  className="components-base-control components-angle-picker-control"
 >
   <div
     className="components-base-control__field"
   >
     <label
       className="components-base-control__label"
-      htmlFor="components-angle-picker__input-0"
+      htmlFor="components-angle-picker-control__input-0"
     >
       Angle
     </label>
     <div
       aria-hidden="true"
-      className="components-angle-picker__angle-circle"
+      className="components-angle-picker-control__angle-circle"
       onMouseDown={[Function]}
     >
       <div
-        className="components-angle-picker__angle-circle-indicator-wrapper"
+        className="components-angle-picker-control__angle-circle-indicator-wrapper"
       >
         <span
-          className="components-angle-picker__angle-circle-indicator"
+          className="components-angle-picker-control__angle-circle-indicator"
         />
       </div>
     </div>
     <input
-      className="components-angle-picker__input-field"
-      id="components-angle-picker__input-0"
+      className="components-angle-picker-control__input-field"
+      id="components-angle-picker-control__input-0"
       max={360}
       min={0}
       onChange={[Function]}

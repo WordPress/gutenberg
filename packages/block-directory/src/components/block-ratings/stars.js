@@ -7,7 +7,7 @@ import { times } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Icon } from '@wordpress/components';
+import { Icon, starEmpty, starFilled, starHalf } from '@wordpress/icons';
 
 function Stars( { rating } ) {
 	const stars = Math.round( rating / 0.5 ) * 0.5;
@@ -21,21 +21,21 @@ function Stars( { rating } ) {
 			{ times( fullStarCount, ( i ) => (
 				<Icon
 					key={ `full_stars_${ i }` }
-					icon="star-filled"
+					icon={ starFilled }
 					size={ 16 }
 				/>
 			) ) }
 			{ times( halfStarCount, ( i ) => (
 				<Icon
 					key={ `half_stars_${ i }` }
-					icon="star-half"
+					icon={ starHalf }
 					size={ 16 }
 				/>
 			) ) }
 			{ times( emptyStarCount, ( i ) => (
 				<Icon
 					key={ `empty_stars_${ i }` }
-					icon="star-empty"
+					icon={ starEmpty }
 					size={ 16 }
 				/>
 			) ) }

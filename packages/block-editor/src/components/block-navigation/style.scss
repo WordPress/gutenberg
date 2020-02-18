@@ -60,6 +60,7 @@ $tree-item-height: 36px;
 	.block-editor-block-navigation__item-button {
 		margin-left: 0.8em;
 		width: calc(100% - 0.8em);
+		height: auto;
 	}
 
 	& > li:last-child {

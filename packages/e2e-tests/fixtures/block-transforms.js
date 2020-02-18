@@ -489,7 +489,7 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'YouTube',
 	},
 	'core__social-links': {
-		originalBlock: 'Social links',
+		originalBlock: 'Social Icons',
 		availableTransforms: [ 'Group' ],
 	},
 	core__spacer: {

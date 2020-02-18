@@ -1,3 +1,11 @@
+## Master
+
+## 3.7.0 (2020-02-10)
+
+### New Features
+
+- Add new `__experimentalEditorSkeleton` component. This has been moved over from the `@wordpress/edit-post` package, where it was an internal component called `EditorRegions`. Its class names have thus been renamed from `edit-post-editor-regions` to `block-editor-editor-skeleton`.
+
 ## 3.3.0 (2019-11-14)
 
 ### New Features

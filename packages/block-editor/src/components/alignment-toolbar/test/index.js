@@ -4,6 +4,11 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { alignLeft, alignCenter } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import { AlignmentToolbar } from '../';
@@ -53,12 +58,12 @@ describe( 'AlignmentToolbar', () => {
 				onChange={ onChangeSpy }
 				alignmentControls={ [
 					{
-						icon: 'editor-alignleft',
+						icon: alignLeft,
 						title: 'My custom left',
 						align: 'custom-left',
 					},
 					{
-						icon: 'editor-aligncenter',
+						icon: alignCenter,
 						title: 'My custom right',
 						align: 'custom-right',
 					},

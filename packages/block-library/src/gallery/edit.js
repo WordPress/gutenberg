@@ -11,6 +11,7 @@ import {
 	map,
 	reduce,
 	some,
+	toString,
 } from 'lodash';
 
 /**
@@ -21,6 +22,7 @@ import {
 	PanelBody,
 	RangeControl,
 	SelectControl,
+	StepperControl,
 	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
@@ -38,6 +40,7 @@ import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
 
+const ColumnsControl = Platform.OS === 'web' ? RangeControl : StepperControl;
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
@@ -100,7 +103,9 @@ class GalleryEdit extends Component {
 		if ( attributes.images ) {
 			attributes = {
 				...attributes,
-				ids: map( attributes.images, 'id' ),
+				// Unlike images[ n ].id which is a string, always ensure the
+				// ids array contains numbers as per its attribute type.
+				ids: map( attributes.images, ( { id } ) => parseInt( id, 10 ) ),
 			};
 		}
 
@@ -159,7 +164,11 @@ class GalleryEdit extends Component {
 	}
 
 	selectCaption( newImage, images, attachmentCaptions ) {
-		const currentImage = find( images, { id: newImage.id } );
+		// The image id in both the images and attachmentCaptions arrays is a
+		// string, so ensure comparison works correctly by converting the
+		// newImage.id to a string.
+		const newImageId = toString( newImage.id );
+		const currentImage = find( images, { id: newImageId } );
 
 		const currentImageCaption = currentImage
 			? currentImage.caption
@@ -169,7 +178,9 @@ class GalleryEdit extends Component {
 			return currentImageCaption;
 		}
 
-		const attachment = find( attachmentCaptions, { id: newImage.id } );
+		const attachment = find( attachmentCaptions, {
+			id: newImageId,
+		} );
 
 		// if the attachment caption is updated
 		if ( attachment && attachment.caption !== newImage.caption ) {
@@ -184,7 +195,9 @@ class GalleryEdit extends Component {
 		const { attachmentCaptions } = this.state;
 		this.setState( {
 			attachmentCaptions: newImages.map( ( newImage ) => ( {
-				id: newImage.id,
+				// Store the attachmentCaption id as a string for consistency
+				// with the type of the id in the images attribute.
+				id: toString( newImage.id ),
 				caption: newImage.caption,
 			} ) ),
 		} );
@@ -196,6 +209,10 @@ class GalleryEdit extends Component {
 					images,
 					attachmentCaptions
 				),
+				// The id value is stored in a data attribute, so when the
+				// block is parsed it's converted to a string. Converting
+				// to a string here ensures it's type is consistent.
+				id: toString( newImage.id ),
 			} ) ),
 			columns: columns ? Math.min( newImages.length, columns ) : columns,
 		} );
@@ -365,7 +382,7 @@ class GalleryEdit extends Component {
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
 						{ images.length > 1 && (
-							<RangeControl
+							<ColumnsControl
 								label={ __( 'Columns' ) }
 								{ ...MOBILE_CONTROL_PROPS }
 								value={ columns }
@@ -375,6 +392,7 @@ class GalleryEdit extends Component {
 								required
 							/>
 						) }
+
 						<ToggleControl
 							label={ __( 'Crop Images' ) }
 							{ ...MOBILE_CONTROL_PROPS }

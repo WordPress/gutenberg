@@ -16,7 +16,7 @@ import Cell from '../cell';
 import Stepper from './stepper';
 import styles from './style.scss';
 
-const STEP_SPEED = 200;
+const STEP_DELAY = 200;
 const DEFAULT_STEP = 1;
 
 class BottomSheetStepperCell extends Component {
@@ -43,21 +43,21 @@ class BottomSheetStepperCell extends Component {
 	}
 
 	onIncrementValue() {
-		const { step, maxValue, onChangeValue, value } = this.props;
+		const { step, max, onChange, value } = this.props;
 		const newValue = value + step;
 
-		if ( newValue <= maxValue ) {
-			onChangeValue( newValue );
+		if ( newValue <= max ) {
+			onChange( newValue );
 			this.announceValue( newValue );
 		}
 	}
 
 	onDecrementValue() {
-		const { step, minValue, onChangeValue, value } = this.props;
+		const { step, min, onChange, value } = this.props;
 		const newValue = value - step;
 
-		if ( newValue >= minValue ) {
-			onChangeValue( newValue );
+		if ( newValue >= min ) {
+			onChange( newValue );
 			this.announceValue( newValue );
 		}
 	}
@@ -81,7 +81,7 @@ class BottomSheetStepperCell extends Component {
 		clearInterval( this.interval );
 	}
 
-	startPressInterval( callback ) {
+	startPressInterval( callback, speed = STEP_DELAY ) {
 		let counter = 0;
 		this.interval = setInterval( () => {
 			callback();
@@ -89,9 +89,9 @@ class BottomSheetStepperCell extends Component {
 
 			if ( counter === 10 ) {
 				clearInterval( this.interval );
-				this.startPressInterval( callback, STEP_SPEED / 2 );
+				this.startPressInterval( callback, speed / 2 );
 			}
-		}, STEP_SPEED );
+		}, speed );
 	}
 
 	announceValue( value ) {
@@ -109,17 +109,13 @@ class BottomSheetStepperCell extends Component {
 	}
 
 	render() {
-		const {
-			label,
-			icon,
-			minValue,
-			maxValue,
-			value,
-			separatorType,
-		} = this.props;
-		const isMinValue = value === minValue;
-		const isMaxValue = value === maxValue;
-
+		const { label, icon, min, max, value, separatorType } = this.props;
+		const isMinValue = value === min;
+		const isMaxValue = value === max;
+		const labelStyle = [
+			styles.cellLabel,
+			! icon ? styles.cellLabelNoIcon : {},
+		];
 		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
 			__( '%1$s. Current value is %2$s' ),
@@ -156,7 +152,8 @@ class BottomSheetStepperCell extends Component {
 					editable={ false }
 					icon={ icon }
 					label={ label }
-					labelStyle={ styles.cellLabel }
+					labelStyle={ labelStyle }
+					leftAlign={ true }
 					separatorType={ separatorType }
 				>
 					<Stepper

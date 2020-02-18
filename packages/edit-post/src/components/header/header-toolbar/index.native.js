@@ -13,6 +13,11 @@ import { withViewportMatch } from '@wordpress/viewport';
 import { __ } from '@wordpress/i18n';
 import { Inserter, BlockToolbar } from '@wordpress/block-editor';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
+import {
+	keyboardClose,
+	undo as undoIcon,
+	redo as redoIcon,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -56,7 +61,7 @@ function HeaderToolbar( {
 					{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
 					<ToolbarButton
 						title={ __( 'Undo' ) }
-						icon="undo"
+						icon={ undoIcon }
 						isDisabled={ ! hasUndo }
 						onClick={ undo }
 						extraProps={ {
@@ -65,7 +70,7 @@ function HeaderToolbar( {
 					/>
 					<ToolbarButton
 						title={ __( 'Redo' ) }
-						icon="redo"
+						icon={ redoIcon }
 						isDisabled={ ! hasRedo }
 						onClick={ redo }
 						extraProps={ {
@@ -79,7 +84,7 @@ function HeaderToolbar( {
 				<Toolbar passedStyle={ styles.keyboardHideContainer }>
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
-						icon="keyboard-hide"
+						icon={ keyboardClose }
 						onClick={ onHideKeyboard }
 						extraProps={ {
 							hint: __( 'Tap to hide the keyboard' ),

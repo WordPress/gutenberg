@@ -8,7 +8,7 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	getEntityRecord,
-	getEntityRecordNoResolver,
+	__experimentalGetEntityRecordNoResolver,
 	getEntityRecords,
 	getEntityRecordChangesByRecord,
 	getEntityRecordNonTransientEdits,
@@ -21,53 +21,53 @@ import {
 	getReferenceByDistinctEdits,
 } from '../selectors';
 
-// getEntityRecord and getEntityRecordNoResolver selectors share the same tests
-describe.each( [ [ getEntityRecord ], [ getEntityRecordNoResolver ] ] )(
-	'%p',
-	( selector ) => {
-		it( 'should return undefined for unknown record’s key', () => {
-			const state = deepFreeze( {
-				entities: {
-					data: {
-						root: {
-							postType: {
-								queriedData: {
-									items: {},
-									queries: {},
-								},
+// getEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests
+describe.each( [
+	[ getEntityRecord ],
+	[ __experimentalGetEntityRecordNoResolver ],
+] )( '%p', ( selector ) => {
+	it( 'should return undefined for unknown record’s key', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {},
+								queries: {},
 							},
 						},
 					},
 				},
-			} );
-			expect( selector( state, 'root', 'postType', 'post' ) ).toBe(
-				undefined
-			);
+			},
 		} );
+		expect( selector( state, 'root', 'postType', 'post' ) ).toBe(
+			undefined
+		);
+	} );
 
-		it( 'should return a record by key', () => {
-			const state = deepFreeze( {
-				entities: {
-					data: {
-						root: {
-							postType: {
-								queriedData: {
-									items: {
-										post: { slug: 'post' },
-									},
-									queries: {},
+	it( 'should return a record by key', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {
+									post: { slug: 'post' },
 								},
+								queries: {},
 							},
 						},
 					},
 				},
-			} );
-			expect( selector( state, 'root', 'postType', 'post' ) ).toEqual( {
-				slug: 'post',
-			} );
+			},
 		} );
-	}
-);
+		expect( selector( state, 'root', 'postType', 'post' ) ).toEqual( {
+			slug: 'post',
+		} );
+	} );
+} );
 
 describe( 'getEntityRecords', () => {
 	it( 'should return an null by default', () => {

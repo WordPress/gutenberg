@@ -34,7 +34,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
  * @property {boolean} __experimentalEnableFullSiteEditing Whether the user has enabled Full Site Editing
  * @property {boolean} __experimentalEnableFullSiteEditingDemo Whether the user has enabled Full Site Editing Demo Templates
- * @property {boolean} __experimentalEnablePageTemplates Whether the user has enabled the Page Templates
+ * @property {boolean} __mobileEnablePageTemplates Whether the user has enabled the Page Templates
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -126,10 +126,10 @@ export const SETTINGS_DEFAULTS = {
 	],
 
 	imageSizes: [
-		{ slug: 'thumbnail', label: __( 'Thumbnail' ) },
-		{ slug: 'medium', label: __( 'Medium' ) },
-		{ slug: 'large', label: __( 'Large' ) },
-		{ slug: 'full', label: __( 'Full Size' ) },
+		{ slug: 'thumbnail', name: __( 'Thumbnail' ) },
+		{ slug: 'medium', name: __( 'Medium' ) },
+		{ slug: 'large', name: __( 'Large' ) },
+		{ slug: 'full', name: __( 'Full Size' ) },
 	],
 
 	// This is current max width of the block inner area
@@ -153,7 +153,7 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalBlockDirectory: false,
 	__experimentalEnableFullSiteEditing: false,
 	__experimentalEnableFullSiteEditingDemo: false,
-	__experimentalEnablePageTemplates: false,
+	__mobileEnablePageTemplates: false,
 	gradients: [
 		{
 			name: __( 'Vivid cyan blue to vivid purple' ),

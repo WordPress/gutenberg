@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { Button } from '@wordpress/components';
+import { link, keyboardReturn, arrowLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,7 +38,7 @@ class URLInputButton extends Component {
 		return (
 			<div className="block-editor-url-input__button">
 				<Button
-					icon="admin-links"
+					icon={ link }
 					label={ buttonLabel }
 					onClick={ this.toggle }
 					className="components-toolbar__control"
@@ -51,7 +52,7 @@ class URLInputButton extends Component {
 						<div className="block-editor-url-input__button-modal-line">
 							<Button
 								className="block-editor-url-input__back"
-								icon="arrow-left-alt"
+								icon={ arrowLeft }
 								label={ __( 'Close' ) }
 								onClick={ this.toggle }
 							/>
@@ -60,7 +61,7 @@ class URLInputButton extends Component {
 								onChange={ onChange }
 							/>
 							<Button
-								icon="editor-break"
+								icon={ keyboardReturn }
 								label={ __( 'Submit' ) }
 								type="submit"
 							/>
