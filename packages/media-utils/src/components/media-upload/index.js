@@ -76,7 +76,7 @@ const getFeaturedImageMediaFrame = () => {
 /**
  * Prepares the Gallery toolbars and frames.
  *
- * @return {wp.media.view.MediaFrame.Select} The default media workflow.
+ * @return {wp.media.view.MediaFrame.Post} The default media workflow.
  */
 const getGalleryDetailsMediaFrame = () => {
 	/**
