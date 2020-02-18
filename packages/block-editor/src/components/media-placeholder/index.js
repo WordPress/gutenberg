@@ -278,7 +278,7 @@ export class MediaPlaceholder extends Component {
 					className="block-editor-media-placeholder__button"
 					onClick={ this.openURLInput }
 					isPressed={ isURLInputVisible }
-					isSecondary
+					isTertiary
 				>
 					{ __( 'Insert from URL' ) }
 				</Button>
@@ -319,7 +319,7 @@ export class MediaPlaceholder extends Component {
 				render={ ( { open } ) => {
 					return (
 						<Button
-							isSecondary
+							isTertiary
 							onClick={ ( event ) => {
 								event.stopPropagation();
 								open();

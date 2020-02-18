@@ -149,6 +149,7 @@
 		white-space: nowrap;
 		color: $theme-color;
 		background: transparent;
+		padding: 6px; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
 
 		.dashicon {
 			display: inline-block;
