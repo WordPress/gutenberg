@@ -204,6 +204,14 @@ class LatestPostsEdit extends Component {
 						) }
 				</PanelBody>
 
+				<PanelBody title={ __( 'Post meta settings' ) }>
+					<ToggleControl
+						label={ __( 'Display post date' ) }
+						checked={ displayPostDate }
+						onChange={ onSetDisplayPostDate }
+					/>
+				</PanelBody>
+
 				<PanelBody title={ __( 'Sorting and filtering' ) }>
 					<QueryControls
 						{ ...{ order, orderBy } }
@@ -216,14 +224,6 @@ class LatestPostsEdit extends Component {
 						onOrderByChange={ onSetOrderBy }
 						onCategoryChange={ onSetCategories }
 						onNumberOfItemsChange={ onSetPostsToShow }
-					/>
-				</PanelBody>
-
-				<PanelBody title={ __( 'Post meta settings' ) }>
-					<ToggleControl
-						label={ __( 'Display post date' ) }
-						checked={ displayPostDate }
-						onChange={ onSetDisplayPostDate }
 					/>
 				</PanelBody>
 

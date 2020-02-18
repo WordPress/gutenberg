@@ -10,7 +10,7 @@
 			"type": "string"
 		},
 		"categories": {
-			"type": "string"
+			"type": "number"
 		},
 		"postsToShow": {
 			"type": "number",
