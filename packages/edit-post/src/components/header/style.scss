@@ -87,6 +87,7 @@
 	.editor-post-saved-state,
 	.components-button.editor-post-switch-to-draft,
 	.components-button.editor-post-preview,
+	.components-button.editor-post-preview__dropdown,
 	.components-button.editor-post-publish-button,
 	.components-button.editor-post-publish-panel__toggle {
 		padding: 0 6px;
@@ -94,7 +95,7 @@
 
 		@include break-small() {
 			padding: 0 12px;
-			margin-right: $grid-unit-10;
+			margin-right: $grid-unit-15;
 		}
 	}
 }

@@ -1,37 +1,36 @@
 .editor-post-preview__dropdown {
 	display: none;
-	margin-right: $grid-size;
-	border: 1px solid $light-gray-600;
+	margin-right: $grid-unit-15;
+	box-shadow: inset 0 0 0 $border-width $light-gray-secondary;
+	border-radius: $radius-block-ui;
+	padding: 0;
 }
 
-.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle {
-	border-radius: 0;
+.editor-post-preview__button-toggle {
 	display: flex;
 	justify-content: space-between;
-	height: $block-toolbar-height - 2; // Needs to be 2px smaller to account for the box-shadow.
-	padding-top: 0;
-	padding-bottom: 0;
+	padding: 0 0 0 $grid-unit-15;
 
-	&:hover,
-	&:focus {
-		box-shadow: 0 0 0 1px $dark-gray-500, 0 0 0 2px $white;
+	&:focus:not(:disabled) {
+		box-shadow: inset 0 0 0 1px $white, 0 0 0 2px color($theme-color);
 	}
-
 }
 
 .editor-post-preview__button-resize.editor-post-preview__button-resize {
 	padding-left: 36px;
 
 	&.has-icon {
-		padding-left: $grid-size;
+		padding-left: $grid-unit-10;
 	}
 }
 
 .editor-post-preview__button-separator {
-	border-left: 1px solid $light-gray-600;
-	height: $icon-button-size;
-	padding: $grid-size 0 $grid-size $grid-size;
-	margin-left: $grid-size;
+	border-left: 1px solid $light-gray-secondary;
+	padding: $grid-unit-10 + $border-width;
+	margin-left: $grid-unit-15;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .editor-post-preview__dropdown-content {
@@ -49,32 +48,18 @@
 
 .editor-post-preview__grouping-external {
 	position: relative;
+	padding-top: $grid-unit-10;
 }
 
-.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external {
-	padding: $grid-size-large - 1;
-	height: auto;
+.editor-post-preview__button-external {
+	height: $icon-button-size;
 	display: block;
-
-	&:focus {
-		color: $dark-gray-900;
-		border: none;
-		box-shadow: none;
-		outline-offset: -2px;
-		outline: 1px dotted $dark-gray-500;
-	}
-	&:hover {
-		color: $dark-gray-900;
-		border: none;
-		box-shadow: none;
-		background: $light-gray-200;
-	}
 }
 
 .editor-post-preview__icon-external {
 	position: absolute;
-	right: $grid-size-large - 1;
-	top: $grid-size-large - 2;
+	right: $grid-unit-20 - $border-width;
+	top: $grid-unit-20 - $border-width - $border-width;
 }
 
 @include break-small() {

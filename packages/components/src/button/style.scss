@@ -115,7 +115,7 @@
 
 		&:hover:not(:disabled) {
 			color: color($theme-color shade(10%));
-			box-shadow: 0 0 0 $border-width color($theme-color shade(10%));
+			box-shadow: inset 0 0 0 $border-width color($theme-color shade(10%));
 		}
 
 		&:disabled,
@@ -134,7 +134,7 @@
 	 */
 
 	&.is-secondary {
-		box-shadow: 0 0 0 $border-width $theme-color;
+		box-shadow: inset 0 0 0 $border-width $theme-color;
 		outline: 1px solid transparent; // Shown in high contrast mode.
 		white-space: nowrap;
 		color: $theme-color;
