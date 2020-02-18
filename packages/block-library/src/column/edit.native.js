@@ -169,7 +169,7 @@ export default compose( [
 		const isSelected = selectedBlockClientId === clientId;
 
 		const parentId = getBlockRootClientId( clientId );
-		const hasChildren = getBlockCount( clientId );
+		const hasChildren = !! getBlockCount( clientId );
 
 		const columnsContainerSettings = getBlockListSettings( parentId );
 
