@@ -41,9 +41,7 @@ function ButtonsEdit( { isSelected, attributes, setAttributes } ) {
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
 				template={ BUTTONS_TEMPLATE }
-				renderAppender={
-					isSelected && InnerBlocks.ButtonsBlockAppender
-				}
+				renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
 				__experimentalMoverDirection="horizontal"
 				style={ buttonsStyle }
 			/>

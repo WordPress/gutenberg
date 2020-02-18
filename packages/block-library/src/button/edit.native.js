@@ -63,13 +63,10 @@ class ButtonEdit extends Component {
 		// manually adding specific link
 		this.isEditingURL = false;
 
-		const isButtonFocused =
-			Platform.OS === 'ios' ? ! props.hasParents : true;
-
 		this.state = {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
-			isButtonFocused,
+			isButtonFocused: Platform.OS !== 'ios',
 		};
 	}
 
@@ -227,11 +224,17 @@ class ButtonEdit extends Component {
 	}
 
 	onLayout() {
-		const { parentWidth } = this.props;
-		const { marginRight } = styles.button;
-		const buttonSpacing = 2 * marginRight;
+		const { parentWidth, isSelectedButtonsBlock } = this.props;
+		const { marginRight: unSelectedSpacing } = styles.button;
+		const { marginRight: selectedSpacing } = styles.buttonsSelected;
+
+		const buttonSpacing = isSelectedButtonsBlock
+			? 2 * selectedSpacing
+			: 4 * unSelectedSpacing;
+
+		const maxWidth = parentWidth - buttonSpacing;
 		this.setState( {
-			maxWidth: parentWidth - 2 * buttonSpacing,
+			maxWidth,
 		} );
 	}
 
@@ -338,7 +341,7 @@ class ButtonEdit extends Component {
 		const backgroundColor = this.getBackgroundColor();
 
 		return (
-			<View style={ { flex: 1 } } onLayout={ this.onLayout }>
+			<View style={ { flex: 1 } }>
 				<ColorBackground
 					borderRadiusValue={ borderRadiusValue }
 					backgroundColor={ backgroundColor }
@@ -445,24 +448,25 @@ class ButtonEdit extends Component {
 export default compose( [
 	withInstanceId,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
-	withSelect( ( select ) => {
+	withSelect( ( select, { clientId } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getSelectedBlockClientId, getBlockParents, getBlock } = select(
-			'core/block-editor'
-		);
+		const {
+			getSelectedBlockClientId,
+			getBlockCount,
+			getBlockRootClientId,
+		} = select( 'core/block-editor' );
 
+		const parentId = getBlockRootClientId( clientId );
 		const selectedId = getSelectedBlockClientId();
-		const parentId = getBlockParents( selectedId )[ 0 ];
-		const hasParents = getBlockParents( selectedId ).length > 0;
-		const buttonsBlock = getBlock( parentId );
-		const numOfButtons = buttonsBlock && buttonsBlock.innerBlocks.length;
+		const isSelectedButtonsBlock = parentId === selectedId;
+		const numOfButtons = getBlockCount( parentId );
 
 		return {
 			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
-			hasParents,
 			parentId,
 			numOfButtons,
+			isSelectedButtonsBlock,
 		};
 	} ),
 	withDispatch( ( dispatch, { parentId } ) => {

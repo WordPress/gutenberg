@@ -4,9 +4,9 @@
 import { __ } from '@wordpress/i18n';
 import { Dropdown, ToolbarButton, Picker } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { isUnmodifiedDefaultBlock, createBlock } from '@wordpress/blocks';
 import {
 	Icon,
 	plusCircleFilled,
@@ -158,14 +158,28 @@ export class Inserter extends Component {
 		);
 
 		const onPress = () => {
-			this.setState(
-				{
-					destinationRootClientId: this.props.destinationRootClientId,
-					shouldReplaceBlock: this.shouldReplaceBlock( 'default' ),
-					insertionIndex: this.getInsertionIndex( 'default' ),
-				},
-				onToggle
-			);
+			const {
+				isButtonsBlock,
+				onBlockAdd,
+				destinationRootClientId,
+			} = this.props;
+
+			const insertionIndex = this.getInsertionIndex( 'default' );
+
+			if ( isButtonsBlock ) {
+				onBlockAdd( destinationRootClientId, insertionIndex );
+			} else {
+				this.setState(
+					{
+						destinationRootClientId,
+						shouldReplaceBlock: this.shouldReplaceBlock(
+							'default'
+						),
+						insertionIndex,
+					},
+					onToggle
+				);
+			}
 		};
 
 		const onLongPress = () => {
@@ -175,16 +189,28 @@ export class Inserter extends Component {
 		};
 
 		const onPickerSelect = ( insertionType ) => {
-			this.setState(
-				{
-					destinationRootClientId: this.props.destinationRootClientId,
-					shouldReplaceBlock: this.shouldReplaceBlock(
-						insertionType
-					),
-					insertionIndex: this.getInsertionIndex( insertionType ),
-				},
-				onToggle
-			);
+			const {
+				isHorizontalBlock,
+				onBlockAdd,
+				destinationRootClientId,
+			} = this.props;
+
+			const insertionIndex = this.getInsertionIndex( insertionType );
+
+			if ( isHorizontalBlock ) {
+				onBlockAdd( destinationRootClientId, insertionIndex );
+			} else {
+				this.setState(
+					{
+						destinationRootClientId,
+						shouldReplaceBlock: this.shouldReplaceBlock(
+							insertionType
+						),
+						insertionIndex,
+					},
+					onToggle
+				);
+			}
 		};
 
 		return (
@@ -256,6 +282,8 @@ export default compose( [
 			getBlockOrder,
 			getBlockIndex,
 			getBlock,
+			getBlockName,
+			getInserterItems,
 		} = select( 'core/block-editor' );
 
 		const end = getBlockSelectionEnd();
@@ -274,6 +302,8 @@ export default compose( [
 		const isSelectedUnmodifiedDefaultBlock = isAnyBlockSelected
 			? isUnmodifiedDefaultBlock( getBlock( end ) )
 			: undefined;
+
+		const items = getInserterItems( destinationRootClientId );
 
 		function getDefaultInsertionIndex() {
 			const { getSettings } = select( 'core/block-editor' );
@@ -322,8 +352,26 @@ export default compose( [
 			insertionIndexAfter,
 			isAnyBlockSelected,
 			isSelectedBlockReplaceable: isSelectedUnmodifiedDefaultBlock,
+			isButtonsBlock:
+				getBlockName( destinationRootClientId ) === 'core/buttons',
+			item: items[ 0 ],
 		};
 	} ),
+	withDispatch( ( dispatch, { item } ) => {
+		const { insertBlock } = dispatch( 'core/block-editor' );
+		return {
+			onBlockAdd( destinationRootClientId, insertionIndex ) {
+				const { name, initialAttributes } = item;
 
+				const insertedBlock = createBlock( name, initialAttributes );
+
+				insertBlock(
+					insertedBlock,
+					insertionIndex,
+					destinationRootClientId
+				);
+			},
+		};
+	} ),
 	withPreferredColorScheme,
 ] )( Inserter );
