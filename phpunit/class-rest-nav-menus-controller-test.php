@@ -548,7 +548,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$this->assertEqualSets( $relations, array_keys( $links ) );
 		$this->assertContains( 'wp/v2/taxonomies/' . $term->taxonomy, $links['about'][0]['href'] );
-		$this->assertEquals( add_query_arg( 'menus', $term->term_id, rest_url( '__experimental/menu-items' ) ), $links['https://api.w.org/post_type'][0]['href'] );
+		$this->assertEquals( add_query_arg( 'menus', $term->term_id, rest_url( 'wp/v2/menu-items' ) ), $links['https://api.w.org/post_type'][0]['href'] );
 	}
 
 }
