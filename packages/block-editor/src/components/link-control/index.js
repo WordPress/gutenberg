@@ -501,7 +501,7 @@ function LinkControl( {
 								isURL={ directLinkEntryTypes.includes(
 									suggestion.type.toLowerCase()
 								) }
-								searchTerm={ inputValue.trim() }
+								searchTerm={ inputValue }
 							/>
 						);
 					} ) }
