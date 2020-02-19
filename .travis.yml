@@ -57,8 +57,8 @@ install:
     fi
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then
-      npm run wp-env run tests-cli user create author author@example.com --role=author --user_pass=authpass
-      npm run wp-env run tests-cli post update 1 --post_author=2
+      npm run wp-env run tests-cli wp user create author author@example.com --role=author --user_pass=authpass
+      npm run wp-env run tests-cli wp post update 1 --post_author=2
     fi
 
 jobs:
