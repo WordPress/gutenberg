@@ -17,7 +17,7 @@ import {
 /**
  * Internal dependencies
  */
-import { SlotFillProvider as SlotFillProvider2 } from '../slot-fill2';
+import SlotFillBubblesVirtuallyProvider from './bubbles-virtually/slot-fill-provider';
 
 const SlotFillContext = createContext( {
 	registerSlot: () => {},
@@ -145,7 +145,9 @@ class SlotFillProvider extends Component {
 	render() {
 		return (
 			<Provider value={ this.contextValue }>
-				<SlotFillProvider2>{ this.props.children }</SlotFillProvider2>
+				<SlotFillBubblesVirtuallyProvider>
+					{ this.props.children }
+				</SlotFillBubblesVirtuallyProvider>
 			</Provider>
 		);
 	}

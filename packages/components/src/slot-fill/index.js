@@ -1,13 +1,28 @@
 /**
  * Internal dependencies
  */
-import Slot from './slot';
-import Fill from './fill';
-import Provider, { Consumer } from './context';
+import BaseSlot from './slot';
+import BaseFill from './fill';
+import Provider from './context';
+import BubblesVirtuallySlot from './bubbles-virtually/slot';
+import BubblesVirtuallyFill from './bubbles-virtually/fill';
+import useSlot from './bubbles-virtually/use-slot';
 
-export { Slot };
-export { Fill };
-export { Provider, Consumer };
+export function Slot( { bubblesVirtually, ...props } ) {
+	if ( bubblesVirtually ) {
+		return <BubblesVirtuallySlot { ...props } />;
+	}
+	return <BaseSlot { ...props } />;
+}
+
+export function Fill( props ) {
+	return (
+		<>
+			<BaseFill { ...props } />
+			<BubblesVirtuallyFill { ...props } />
+		</>
+	);
+}
 
 export function createSlotFill( name ) {
 	const FillComponent = ( props ) => <Fill name={ name } { ...props } />;
@@ -21,3 +36,5 @@ export function createSlotFill( name ) {
 		Slot: SlotComponent,
 	};
 }
+
+export { useSlot, Provider };

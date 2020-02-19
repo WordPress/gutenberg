@@ -23,8 +23,7 @@ import PopoverDetectOutside from './detect-outside';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
-import { Slot, Fill, Consumer } from '../slot-fill';
-import { useSlot } from '../slot-fill2/context';
+import { Slot, Fill, useSlot } from '../slot-fill';
 import Animate from '../animate';
 
 const FocusManaged = withConstrainedTabbing(
@@ -604,29 +603,15 @@ const Popover = ( {
 		content = <FocusManaged>{ content }</FocusManaged>;
 	}
 
-	if ( slot ) {
+	if ( slot.ref ) {
 		content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
 	}
 
-	return (
-		<Consumer>
-			{ ( { getSlot } ) => {
-				// In case there is no slot context in which to render,
-				// default to an in-place rendering.
-				if ( getSlot && getSlot( __unstableSlotName ) ) {
-					content = (
-						<Fill name={ __unstableSlotName }>{ content }</Fill>
-					);
-				}
+	if ( anchorRef || anchorRect ) {
+		return content;
+	}
 
-				if ( anchorRef || anchorRect ) {
-					return content;
-				}
-
-				return <span ref={ anchorRefFallback }>{ content }</span>;
-			} }
-		</Consumer>
-	);
+	return <span ref={ anchorRefFallback }>{ content }</span>;
 };
 
 const PopoverContainer = Popover;

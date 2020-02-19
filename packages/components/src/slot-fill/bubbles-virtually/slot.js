@@ -12,7 +12,8 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
-import { SlotFillContext, useSlot } from './context';
+import SlotFillContext from './slot-fill-context';
+import useSlot from './use-slot';
 
 export default function Slot( {
 	name,
@@ -25,21 +26,21 @@ export default function Slot( {
 	const slot = useSlot( name );
 
 	useEffect( () => {
-		registry.register( name, ref, fillProps );
+		registry.registerSlot( name, ref, fillProps );
 		return () => {
-			registry.unregister( name );
+			registry.unregisterSlot( name );
 		};
 		// We are not including fillProps in the deps because we don't want to
 		// unregister and register the slot whenever fillProps change, which would
 		// cause the fill to be re-mounted. We are only considering the initial value
 		// of fillProps.
-	}, [ registry.register, registry.unregister, name ] );
+	}, [ registry.registerSlot, registry.unregisterSlot, name ] );
 
 	// fillProps may be an update that interact with the layout, so
 	// we useLayoutEffect
 	useLayoutEffect( () => {
-		if ( slot && ! isShallowEqual( slot.fillProps, fillProps ) ) {
-			registry.update( name, ref, fillProps );
+		if ( slot.fillProps && ! isShallowEqual( slot.fillProps, fillProps ) ) {
+			registry.updateSlot( name, ref, fillProps );
 		}
 	} );
 
