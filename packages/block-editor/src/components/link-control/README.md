@@ -43,6 +43,7 @@ When this suggestion is selected it will call the `createSuggestion` prop afford
 
 By default `LinkControl` utilizes the `__experimentalFetchLinkSuggestions` API from `core/block-editor` in order to retrieve search suggestions for matching `Page` post-type entities.
 
+
 ## Props
 
 ### value
@@ -111,7 +112,6 @@ Whether to present initial suggestions immediately.
 
 If passed as either `true` or `false`, controls the internal editing state of the component to respectively show or not to show the URL input field.
 
-
 ### createSuggestion
 
 - Type: `function`
@@ -127,8 +127,6 @@ This `suggestion` will then be _automatically_ passed to the `onChange` handler 
 
 As a result of the above, this prop is often used to allow on the fly creation of new entities (eg: `Posts`, `Pages`) based on the text the user has entered into the link search UI. As an example, the Navigation Block uses `createSuggestion` to create Pages on the fly from within the Block itself.
 
-
-
 #### Search `suggestion` values
 
 A `suggestion` should have the following shape:
@@ -141,8 +139,6 @@ A `suggestion` should have the following shape:
 	url: // any string representing a URL value
 }
 ```
-
-
 
 #### Example
 ```jsx
