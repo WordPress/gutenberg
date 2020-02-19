@@ -30,7 +30,7 @@ The distinction between the two components is perhaps best represented as:
 
 ## Search Suggestions
 
-Currently LinkControl will handle two types of input to create hyperlinks:
+Currently `LinkControl` will handle two types of input to create hyperlinks:
 
 1. Entity searches - the user may input text-based search queries for entities retrieved from remove data sources (in the context of WordPress these are `Pages`). For example a user might search for a `Page` they have just created by name (eg: About) and the UI will return a matching result if found.
 2. Direct entry - the user may also enter any arbitrary URL-like text. This includes full URLs (https://), URL fragements (eg: `#myinternallink`), `tel` protocol links (eg: `tel: 0800 1234`) and `mailto` protocol links (eg: `mailto: hello@wordpress.org`).
@@ -42,7 +42,7 @@ from within the Block](https://github.com/WordPress/gutenberg/pull/19775/files))
 
 ### Data sources
 
-By default LinkControl utilizes the `__experimentalFetchLinkSuggestions` API from `core/block-editor` in order to retrieve search suggestions for matching `Page` post-type entities.
+By default `LinkControl` utilizes the `__experimentalFetchLinkSuggestions` API from `core/block-editor` in order to retrieve search suggestions for matching `Page` post-type entities.
 
 ## Props
 
