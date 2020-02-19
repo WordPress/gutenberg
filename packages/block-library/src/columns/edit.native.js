@@ -169,7 +169,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+			const { replaceInnerBlocks, selectBlock } = dispatch(
+				'core/block-editor'
+			);
 			const { getBlocks } = registry.select( 'core/block-editor' );
 
 			let innerBlocks = getBlocks( clientId );
@@ -199,6 +201,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 						return createBlock( 'core/column' );
 					} ),
 				];
+				selectBlock( clientId );
 			}
 
 			replaceInnerBlocks( clientId, innerBlocks, false );
