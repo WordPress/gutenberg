@@ -125,7 +125,7 @@ const MediaReplaceFlow = ( {
 					{ onSelectURL && (
 						<div className="block-editor-media-flow__url-input">
 							<span className="block-editor-media-replace-flow__image-url-label">
-								{ __( ' Current media URL:' ) }
+								{ __( 'Current media URL:' ) }
 							</span>
 							<LinkControl
 								value={ { url: mediaURLValue } }
