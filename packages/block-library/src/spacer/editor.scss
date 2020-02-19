@@ -1,5 +1,9 @@
 .block-library-spacer__resize-container.is-selected {
 	background: $light-gray-200;
+
+	.is-dark-theme & {
+		background: $light-opacity-light-200;
+	}
 }
 
 .block-library-spacer__resize-container {

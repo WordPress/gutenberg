@@ -8,9 +8,10 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { Button, Placeholder } from '@wordpress/components';
+import { layout } from '@wordpress/icons';
 
 function BlockVariationPicker( {
-	icon = 'layout',
+	icon = layout,
 	label = __( 'Choose variation' ),
 	instructions = __( 'Select a variation to start with.' ),
 	variations,

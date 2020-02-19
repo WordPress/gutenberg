@@ -33,6 +33,19 @@ module.exports = {
 	 * @param {Object} options.spinner A CLI spinner which indicates progress.
 	 */
 	async start( { spinner } ) {
+		/**
+		 * If the Docker image is already running and the `wp-env` files have been
+		 * deleted, the start command will not complete successfully. Stopping
+		 * the container before continuing allows the docker entrypoint script,
+		 * which restores the files, to run again when we start the containers.
+		 *
+		 * Additionally, this serves as a way to restart the container entirely
+		 * should the need arise.
+		 *
+		 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
+		 */
+		await module.exports.stop( { spinner } );
+
 		const config = await initConfig();
 
 		spinner.text = 'Downloading WordPress.';
@@ -302,15 +315,13 @@ async function configureWordPress( environment, config ) {
 		commandOptions: [ '--rm' ],
 	};
 
+	const port = environment === 'development' ? config.port : config.testsPort;
+
 	// Install WordPress.
 	await dockerCompose.run(
 		environment === 'development' ? 'cli' : 'tests-cli',
 		`wp core install
-			--url=localhost:${
-				environment === 'development'
-					? process.env.WP_ENV_PORT || '8888'
-					: process.env.WP_ENV_TESTS_PORT || '8889'
-			}
+			--url=localhost:${ port }
 			--title='${ config.name }'
 			--admin_user=admin
 			--admin_password=password

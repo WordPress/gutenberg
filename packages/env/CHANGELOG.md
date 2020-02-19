@@ -2,6 +2,7 @@
 
 ### New Feature
 
+- You may now override the directory in which `wp-env` creates generated files with the `WP_ENV_HOME` environment variable. The default directory is `~/.wp-env/` (or `~/wp-env/` on Linux).
 - The `.wp-env.json` coniguration file now accepts `port` and `testsPort` options which can be used to set the ports on which the docker instance is mounted.
 
 ## 1.0.0 (2020-02-10)

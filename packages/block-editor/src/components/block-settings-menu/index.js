@@ -14,7 +14,13 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { trash, moreHorizontal } from '@wordpress/icons';
+import {
+	page,
+	trash,
+	moreHorizontal,
+	insertAfter,
+	insertBefore,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,7 +30,7 @@ import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
-import __experimentalBlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
+import BlockSettingsMenuControls from '../block-settings-menu-controls';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -94,7 +100,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 												onClose,
 												onDuplicate
 											) }
-											icon="admin-page"
+											icon={ page }
 											shortcut={ shortcuts.duplicate }
 										>
 											{ __( 'Duplicate' ) }
@@ -107,7 +113,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 													onClose,
 													onInsertBefore
 												) }
-												icon="insert-before"
+												icon={ insertBefore }
 												shortcut={
 													shortcuts.insertBefore
 												}
@@ -119,7 +125,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 													onClose,
 													onInsertAfter
 												) }
-												icon="insert-after"
+												icon={ insertAfter }
 												shortcut={
 													shortcuts.insertAfter
 												}
@@ -134,10 +140,10 @@ export function BlockSettingsMenu( { clientIds } ) {
 											onToggle={ onClose }
 										/>
 									) }
-									<__experimentalBlockSettingsMenuPluginsExtension.Slot
-										fillProps={ { clientIds, onClose } }
-									/>
 								</MenuGroup>
+								<BlockSettingsMenuControls.Slot
+									fillProps={ { onClose } }
+								/>
 								<MenuGroup>
 									{ ! isLocked && (
 										<MenuItem
