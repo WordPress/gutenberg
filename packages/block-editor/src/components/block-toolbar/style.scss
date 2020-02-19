@@ -196,3 +196,39 @@
 		display: inline-flex;
 	}
 }
+
+.block-editor-block-toolbar__mover-switcher-container {
+	display: flex;
+}
+
+.block-editor-block-toolbar__mover-trigger-container {
+	@include break-medium() {
+		bottom: -1px;
+		left: -1px;
+		position: absolute;
+		top: -1px;
+		transform: translateX(-48px);
+		user-select: none;
+		z-index: -1; // This makes it slide out from underneath the toolbar.
+	}
+}
+
+.block-editor-block-toolbar__mover-trigger-wrapper {
+	@include break-medium() {
+		background-color: $white;
+		border: 1px solid $black;
+		border-bottom-left-radius: 2px;
+		border-top-left-radius: 2px;
+		border-right: none;
+		height: 100%;
+		transition: all 60ms linear;
+	}
+
+	@include reduce-motion("transition");
+}
+
+.block-editor-block-toolbar__block-switcher-wrapper {
+	.block-editor-block-switcher {
+		display: block;
+	}
+}
