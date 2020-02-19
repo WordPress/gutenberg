@@ -36,9 +36,9 @@ out the use of `URLInput` entirely.
 
 ## Relationship to `<URLInput>`
 
-As of Gutenberg 7.4, `<LinkControl> became the default link creation interface
+As of Gutenberg 7.4, `<LinkControl>` became the default link creation interface
 within the Block Editor, replacing previous disparate uses of `<URLInput>` and
-standardising the UI.
+standardizing the UI.
 
 Nonetheless, it should be remembered that `<LinkControl>` builds **on top of**
 `<URLInput>` and makes use of it under the hood.
