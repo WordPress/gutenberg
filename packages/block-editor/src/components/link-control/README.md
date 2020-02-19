@@ -117,7 +117,7 @@ If passed as either `true` or `false`, controls the internal editing state of th
 
 - Type: `function`
 - Required: No
-- Returns: when called may return either a new `suggestion` directly or a `Promise` which resolves to a
+- Returns: When called may return either a new `suggestion` directly or a `Promise` which resolves to a
 new `suggestion`.
 
 Used to handle the dynamic creation of a new `suggestion` (and ultimately new link `value`) within the Link UI.
