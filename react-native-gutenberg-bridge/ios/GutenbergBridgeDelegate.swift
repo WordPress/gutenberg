@@ -64,6 +64,10 @@ extension RCTLogLevel {
     }
 }
 
+public enum GutenbergUserEvent: String {
+    case pageTemplateApplied = "page_template_applied"
+}
+
 public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that Gutenberg had returned the requested HTML content.
     /// You can request HTML content by calling `requestHTML()` on a Gutenberg bridge instance.
@@ -138,6 +142,12 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate to display the media editor from a given URL
     ///
     func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback)
+    
+    
+    /// Tells the delegate that the editor needs to log a custom event
+    /// - Parameter event: The event key to be logged
+    /// - Parameter properties: Any relevant properties related to the event
+    func gutenbergLogUserEvent(_ event: GutenbergUserEvent, properties: [AnyHashable: Any])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
