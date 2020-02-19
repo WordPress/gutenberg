@@ -231,7 +231,7 @@ class URLInput extends Component {
 			! ( suggestions && suggestions.length )
 		) {
 			// Ensure the suggestions are updated with the current input value
-			this.updateSuggestions( value );
+			this.updateSuggestions( value.trim() );
 		}
 	}
 
