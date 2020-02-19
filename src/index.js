@@ -22,6 +22,7 @@ import './globals';
 import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
+import setupJetpackEditor from './jetpack-editor-setup';
 
 const gutenbergSetup = () => {
 	const wpData = require( '@wordpress/data' );
@@ -56,6 +57,7 @@ export class RootComponent extends React.Component {
 		setupLocale( props.locale, props.translations );
 		setupApiFetch();
 		require( '@wordpress/edit-post' ).initializeEditor();
+		setupJetpackEditor( props.jetpackState || { blogId: 1, isJetpackActive: true } );
 
 		const isHermes = () => global.HermesInternal !== null;
 		// eslint-disable-next-line no-console
