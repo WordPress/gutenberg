@@ -15,7 +15,11 @@ import { blockDefault } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { isValidIcon, normalizeIconObject } from './utils';
+import {
+	isValidIcon,
+	normalizeIconObject,
+	addImplicitAttributes,
+} from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
 
 /**
@@ -244,6 +248,11 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+
+	settings.attributes = addImplicitAttributes(
+		settings.edit,
+		settings.attributes
+	);
 
 	dispatch( 'core/blocks' ).addBlockTypes( settings );
 

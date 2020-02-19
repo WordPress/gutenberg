@@ -7,7 +7,13 @@ import { default as tinycolor, mostReadable } from 'tinycolor2';
 /**
  * WordPress dependencies
  */
-import { Component, isValidElement } from '@wordpress/element';
+import {
+	Component,
+	isValidElement,
+	INTERNALS,
+	renderToString,
+	createElement,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
@@ -231,4 +237,74 @@ export function getAccessibleBlockLabel(
 		__( '%s Block' ),
 		title
 	);
+}
+
+export function addImplicitAttributes( edit, attributes ) {
+	if ( ! edit ) {
+		return attributes;
+	}
+	const currentDispatcher = INTERNALS.ReactCurrentDispatcher.current;
+	INTERNALS.ReactCurrentDispatcher.current = {
+		useState( initial ) {
+			return [
+				typeof initial === 'function' ? initial() : initial,
+				() => {},
+			];
+		},
+		useEffect() {},
+		useContext() {
+			return {
+				select() {
+					return new Proxy(
+						{},
+						{
+							get() {
+								return () => {
+									return {};
+								};
+							},
+						}
+					);
+				},
+				dispatch() {
+					return new Proxy(
+						{},
+						{
+							get() {
+								return () => {
+									return {};
+								};
+							},
+						}
+					);
+				},
+			};
+		},
+		useReducer( _reducer, initial ) {
+			return [ initial, () => {} ];
+		},
+		useCallback( callback ) {
+			return callback;
+		},
+		useMemo( memo ) {
+			return memo();
+		},
+		useRef( value ) {
+			return { current: value };
+		},
+		useImperativeHandle() {},
+		useLayoutEffect() {},
+		useDebugValue() {},
+	};
+	INTERNALS.useImplicitAttributes = ( newAttributes ) => {
+		attributes = { ...attributes, ...newAttributes };
+	};
+	try {
+		renderToString(
+			createElement( edit, { attributes: {}, fontSize: {} } )
+		);
+	} catch ( err ) {}
+	INTERNALS.ReactCurrentDispatcher.current = currentDispatcher;
+	INTERNALS.useImplicitAttributes = null;
+	return attributes;
 }

@@ -188,6 +188,12 @@ _Returns_
 
 A component which renders its children without any wrapping element.
 
+<a name="INTERNALS" href="#INTERNALS">#</a> **INTERNALS**
+
+_Related_
+
+-   <https://github.com/facebook/react/blob/master/packages/react/src/ReactSharedInternals.js>
+
 <a name="isEmptyElement" href="#isEmptyElement">#</a> **isEmptyElement**
 
 Checks if the provided WP element is empty.

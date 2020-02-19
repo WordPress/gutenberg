@@ -25,6 +25,7 @@ import {
 	useDebugValue,
 	lazy,
 	Suspense,
+	__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED as INTERNALS,
 } from 'react';
 import { isString } from 'lodash';
 
@@ -194,6 +195,11 @@ export { lazy };
  * @see https://reactjs.org/docs/react-api.html#reactsuspense
  */
 export { Suspense };
+
+/**
+ * @see https://github.com/facebook/react/blob/master/packages/react/src/ReactSharedInternals.js
+ */
+export { INTERNALS };
 
 /**
  * Concatenate two or more React children objects.

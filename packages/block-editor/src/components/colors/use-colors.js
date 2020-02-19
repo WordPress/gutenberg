@@ -17,6 +17,7 @@ import {
 	Children,
 	cloneElement,
 	useState,
+	INTERNALS,
 } from '@wordpress/element';
 
 /**
@@ -137,6 +138,16 @@ export default function __experimentalUseColors(
 	},
 	deps = []
 ) {
+	if ( INTERNALS.useImplicitAttributes ) {
+		INTERNALS.useImplicitAttributes(
+			colorConfigs.reduce( ( acc, { name } ) => {
+				acc[ name ] = { type: 'string' };
+				acc[ camelCase( `custom ${ name }` ) ] = { type: 'string' };
+				return acc;
+			}, {} )
+		);
+	}
+
 	const { clientId } = useBlockEditContext();
 	const { attributes, settingsColors } = useSelect(
 		( select ) => {
