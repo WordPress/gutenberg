@@ -3,6 +3,7 @@
 ### New Feature
 
 - Add `isRTL` function (#20298)
+- Add `I18n` class to allow creation of multiple i18n instances. (#19210)
 
 ## 3.1.0 (2018-11-15)
 
