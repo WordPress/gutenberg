@@ -209,6 +209,7 @@
 		top: -1px;
 		transform: translateX(-48px);
 		user-select: none;
+		z-index: -1; // This makes it slide out from underneath the toolbar.
 	}
 }
 
