@@ -8,12 +8,7 @@ import { dropRight, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	PanelBody,
-	StepperControl,
-	Toolbar,
-	ToolbarButton,
-} from '@wordpress/components';
+import { PanelBody, StepperControl } from '@wordpress/components';
 import {
 	InspectorControls,
 	InnerBlocks,
@@ -25,7 +20,6 @@ import { useEffect } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { withViewportMatch } from '@wordpress/viewport';
-import { columns as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -58,26 +52,18 @@ function ColumnsEditContainer( {
 	blockListSettings,
 	updateAlignment,
 	updateColumns,
-	clientId,
 	isMobile,
+	columnCount,
 } ) {
 	const { verticalAlignment } = attributes;
 	const { width } = blockListSettings;
-
-	const { columnCount } = useSelect( ( select ) => {
-		return {
-			columnCount: select( 'core/block-editor' ).getBlockCount(
-				clientId
-			),
-		};
-	} );
 
 	useEffect( () => {
 		updateColumns(
 			columnCount,
 			Math.min( MAX_COLUMNS_NUMBER, columnCount || DEFAULT_COLUMNS )
 		);
-	}, [] );
+	}, [ columnCount ] );
 
 	const getColumnsInRow = ( containerWidth, columnsNumber ) => {
 		if ( containerWidth < 480 ) {
@@ -107,13 +93,6 @@ function ColumnsEditContainer( {
 				</PanelBody>
 			</InspectorControls>
 			<BlockControls>
-				<Toolbar>
-					<ToolbarButton
-						title={ __( 'ColumnsButton' ) }
-						icon={ icon }
-						onClick={ () => {} }
-					/>
-				</Toolbar>
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }
@@ -190,7 +169,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+			const { replaceInnerBlocks, selectBlock } = dispatch(
+				'core/block-editor'
+			);
 			const { getBlocks } = registry.select( 'core/block-editor' );
 
 			let innerBlocks = getBlocks( clientId );
@@ -213,6 +194,16 @@ const ColumnsEditContainerWrapper = withDispatch(
 				);
 			}
 
+			if ( innerBlocks.length < MIN_COLUMNS_NUMBER ) {
+				innerBlocks = [
+					...innerBlocks,
+					...times( MIN_COLUMNS_NUMBER - innerBlocks.length, () => {
+						return createBlock( 'core/column' );
+					} ),
+				];
+				selectBlock( clientId );
+			}
+
 			replaceInnerBlocks( clientId, innerBlocks, false );
 		},
 	} )
@@ -220,15 +211,16 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, isSelected, getStylesFromColorScheme } = props;
-	const { hasChildren, blockListSettings } = useSelect(
+	const { hasChildren, blockListSettings, columnCount } = useSelect(
 		( select ) => {
-			const { getBlocks, getBlockListSettings } = select(
+			const { getBlocks, getBlockListSettings, getBlockCount } = select(
 				'core/block-editor'
 			);
 
 			return {
 				hasChildren: getBlocks( clientId ).length > 0,
 				blockListSettings: getBlockListSettings( clientId ) || {},
+				columnCount: getBlockCount( clientId ),
 			};
 		},
 		[ clientId ]
@@ -254,6 +246,7 @@ const ColumnsEdit = ( props ) => {
 	return (
 		<ColumnsEditContainerWrapper
 			blockListSettings={ blockListSettings }
+			columnCount={ columnCount }
 			{ ...props }
 		/>
 	);

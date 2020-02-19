@@ -74,6 +74,7 @@ $block-custom-appender-to-content: $block-selected-margin - $block-selected-bord
 $block-media-container-to-content: $block-selected-child-margin + $block-selected-border-width;
 $block-selected-vertical-margin-descendant: 2 * $block-selected-to-content;
 $block-selected-vertical-margin-child: $block-edge-to-content;
+$block-toolbar-margin: $block-selected-margin + $block-selected-border-width;
 
 // Buttons & UI Widgets
 $radius-round-rectangle: 4px;

@@ -6,7 +6,6 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -14,9 +13,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { withViewportMatch } from '@wordpress/viewport';
-import { column as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -36,7 +33,7 @@ function ColumnEdit( {
 	const { verticalAlignment } = attributes;
 	const {
 		columnsInRow = 1,
-		columnsContainerWidth,
+		width: columnsContainerWidth,
 	} = columnsContainerSettings;
 
 	const columnContainerBaseWidth = styles[ 'column-container-base' ].maxWidth;
@@ -65,17 +62,15 @@ function ColumnEdit( {
 			'descendant-selected',
 			'placeholder-selected',
 		];
-		const [
-			selected,
-			parentSelected,
-			descendantSelected,
-			placeholderSelected,
-		] = pullWidths( names );
+		const widths = pullWidths( names );
+		const [ , parentSelected, , placeholderSelected ] = widths;
 
 		if ( isParentSelected ) {
 			width -= placeholder ? placeholderSelected : parentSelected;
 			return { width };
 		}
+
+		const [ selected, , descendantSelected ] = widths;
 
 		if ( placeholder ) {
 			if ( isDescendantOfParentSelected ) {
@@ -83,6 +78,7 @@ function ColumnEdit( {
 			} else {
 				width -=
 					columnsInRow === 1 ? parentSelected : placeholderSelected;
+				if ( ! hasChildren ) width -= 4;
 			}
 		} else if ( isSelected ) {
 			width -= ! hasChildren ? selected : descendantSelected;
@@ -121,13 +117,6 @@ function ColumnEdit( {
 	return (
 		<>
 			<BlockControls>
-				<Toolbar>
-					<ToolbarButton
-						title={ __( 'ColumnButton' ) }
-						icon={ icon }
-						onClick={ () => {} }
-					/>
-				</Toolbar>
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }
@@ -180,7 +169,7 @@ export default compose( [
 		const isSelected = selectedBlockClientId === clientId;
 
 		const parentId = getBlockRootClientId( clientId );
-		const hasChildren = getBlockCount( clientId );
+		const hasChildren = !! getBlockCount( clientId );
 
 		const columnsContainerSettings = getBlockListSettings( parentId );
 
