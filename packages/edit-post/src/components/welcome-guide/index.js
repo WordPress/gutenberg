@@ -63,13 +63,13 @@ export default function WelcomeGuide() {
 
 			<GuidePage className="edit-post-welcome-guide__page">
 				<h1 className="edit-post-welcome-guide__heading">
-					{ __( 'Get to know the Block Library' ) }
+					{ __( 'Get to know the block library' ) }
 				</h1>
 				<BlockLibraryImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
 					{ __experimentalCreateInterpolateElement(
 						__(
-							'All of the blocks available to you live in the Block Library. You’ll find it wherever you see the <InserterIconImage /> icon.'
+							'All of the blocks available to you live in the block library. You’ll find it wherever you see the <InserterIconImage /> icon.'
 						),
 						{
 							InserterIconImage: (

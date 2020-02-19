@@ -55,7 +55,7 @@ describe( 'New User Experience (NUX)', () => {
 		// Press the right arrow key for Page 3
 		await page.keyboard.press( 'ArrowRight' );
 		await page.waitForXPath(
-			'//h1[contains(text(), "Get to know the Block Library")]'
+			'//h1[contains(text(), "Get to know the block library")]'
 		);
 
 		// Press the right arrow key for Page 4
