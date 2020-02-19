@@ -37,8 +37,7 @@ Currently `LinkControl` will handle two types of input to create hyperlinks:
 
 In addition, `<LinkControl>` also allows for on the fly creation of links based on the **current content of the `<input>` element**. When enabled, a default "Create new" search suggestion is appended to all non-URL-like search results.
 
-When this suggestion is selected it will call the `createSuggestion` prop affording the developer the ability to create new links on the fly (the [Navigation Block uses this to allow creation of Pages
-from within the Block](https://github.com/WordPress/gutenberg/pull/19775/files)). See below for more details.
+When this suggestion is selected it will call the `createSuggestion` prop affording the developer the ability to create new links on the fly (the [Navigation Block uses this to allow creation of Pages from within the Block](https://github.com/WordPress/gutenberg/pull/19775/files)). See below for more details.
 
 ### Data sources
 
