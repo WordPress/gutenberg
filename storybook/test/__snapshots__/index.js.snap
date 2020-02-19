@@ -8209,56 +8209,6 @@ exports[`Storyshots Components|AnglePickerControl Default 1`] = `
 </div>
 `;
 
-exports[`Storyshots Components|SlotFill Default 1`] = `
-Array [
-  <h2>
-    Profile
-  </h2>,
-  <p>
-    Name: 
-    <span />
-  </p>,
-  <p>
-    Age: 
-    <span />
-  </p>,
-]
-`;
-
-exports[`Storyshots Components|SlotFill With Context 1`] = `
-Array [
-  <h2>
-    Profile
-  </h2>,
-  <p>
-    Name: 
-    <span />
-  </p>,
-  <p>
-    Age: 
-    <span />
-  </p>,
-]
-`;
-
-exports[`Storyshots Components|SlotFill With Fill Props 1`] = `
-Array [
-  <h2>
-    Profile
-  </h2>,
-  <p>
-    Name:
-     
-    <span />
-  </p>,
-  <p>
-    Age:
-     
-    <span />
-  </p>,
-]
-`;
-
 exports[`Storyshots Icons/Icon Default 1`] = `
 Array [
   <div>
