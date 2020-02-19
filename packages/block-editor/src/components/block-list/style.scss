@@ -177,38 +177,6 @@
 		}
 	}
 
-	// Show a footprint fade effect when first selecting any block.
-	.block-editor-block-list__block.is-selected::before {
-		position: absolute;
-		z-index: 1;
-		pointer-events: none;
-		content: "";
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
-
-		background: rgba($black, 0.04);
-
-		// Flash a white color for dark themes.
-		.is-dark-theme & {
-			background: rgba($white, 0.15);
-		}
-
-		animation: block-editor-block-list__block-fade-out-animation 0.3s ease-out 0.3s;
-		animation-fill-mode: forwards;
-		@include reduce-motion("animation");
-	}
-
-	@keyframes block-editor-block-list__block-fade-out-animation {
-		from {
-			opacity: 1;
-		}
-		to {
-			opacity: 0;
-		}
-	}
-
 	// Hide the focus indicator for collapsed blocks.
 	// These serve as only as column containers for floated blocks.
 	.block-editor-block-list__block.is-block-collapsed::after {
