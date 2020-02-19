@@ -17,7 +17,7 @@ export function useDebouncedShowMovers( {
 	const timeoutRef = useRef();
 
 	const getIsHovered = () => {
-		return ref && ref.current.matches( ':hover' );
+		return ref?.current && ref.current.matches( ':hover' );
 	};
 
 	const shouldHideMovers = () => {
