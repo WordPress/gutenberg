@@ -31,6 +31,11 @@ For a complete example, see the [Internationalization section of the Block Edito
 
 Check if current locale is RTL.
 
+**RTL (Right To Left)** is a locale property indicating that text is written from right to left.
+For example, the `he` locale (for Hebrew) specifies right-to-left. Arabic (ar) is another common
+language written RTL. The opposite of RTL, LTR (Left To Right) is used in other languages,
+including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
+
 _Returns_
 
 -   `boolean`: Whether locale is RTL.
