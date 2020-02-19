@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback, View, Text } from 'react-native';
+import { TouchableWithoutFeedback, View, Text, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -53,7 +53,11 @@ class LatestPostsEdit extends Component {
 		this.fetchRequest = fetchRequest( '/wp/v2/categories' )
 			.then( ( categoriesList ) => {
 				if ( this.isStillMounted ) {
-					this.setState( { categoriesList } );
+					if ( Platform.OS === 'android' ) {
+						this.setState( { categoriesList:JSON.parse(categoriesList) } );
+					} else {
+						this.setState( { categoriesList } );
+					}
 				}
 			} )
 			.catch( () => {
