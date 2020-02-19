@@ -13,8 +13,7 @@ Previously iterations of a hyperlink UI existed within the Gutenberg interface b
 
 These older UIs tended to make use of two existing components: `URLInput` and `URLPopover`. When a requirement was raised to implement a new UI for hyperlink creation, an assessment of these existing components was undertaken and it was determined that they were too opinionated as to be easily refactored to accommodate the new use cases required by the new UI. Attempting to do so would also have meant unavoidable breaking changes to the interface of `URLInput` which would have (most probably) caused breaking changes to ripple across not only the Core codebase, but also that of 3rd party Plugins.
 
-As a result, it was agreed that a new component `LinkControl` would be created to realise the new hyperlink creation interface. This new UI would begin life as an experimental component which would consume `URLInput` internally. The API of `URLInput` would be enhanced as required with "experimental" features to facilitate the implementation of the new UI with the goal of eventually phasing
-out the use of `URLInput` entirely.
+As a result, it was agreed that a new component `LinkControl` would be created to realise the new hyperlink creation interface. This new UI would begin life as an experimental component which would consume `URLInput` internally. The API of `URLInput` would be enhanced as required with "experimental" features to facilitate the implementation of the new UI with the goal of eventually phasing out the use of `URLInput` entirely.
 
 
 ## Relationship to `<URLInput>`
