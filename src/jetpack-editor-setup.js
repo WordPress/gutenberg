@@ -3,6 +3,9 @@
 /**
  * External dependencies
  */
+/**
+ * Internal dependencies
+ */
 import { JETPACK_DATA_PATH } from '../jetpack/extensions/shared/get-jetpack-data';
 
 /**
@@ -13,26 +16,26 @@ import apiFetch from '@wordpress/api-fetch';
 const contactInfo = '../jetpack/extensions/blocks/contact-info/editor.js';
 const supportedJetpackBlocks = {
 	'contact-info': {
-		available: true
-	}
+		available: true,
+	},
 };
 
 const setInitialState = async ( {
-   isJetpackActive = false,
-   userData = null,
-   siteFragment = null,
-   blogId,
+	isJetpackActive = false,
+	userData = null,
+	siteFragment = null,
+	blogId,
 } ) => {
 	let availableBlocks = {};
 	if ( isJetpackActive ) {
-		availableBlocks = supportedJetpackBlocks;//await apiFetch( { path: `/wp/v2/gutenberg/available-extensions` } );
+		availableBlocks = supportedJetpackBlocks; //await apiFetch( { path: `/wp/v2/gutenberg/available-extensions` } );
 	}
 	const jetpackEditorInitialState = {
 		available_blocks: availableBlocks,
 		jetpack: {
 			is_active: isJetpackActive,
 		},
-		siteFragment: siteFragment,
+		siteFragment,
 		tracksUserData: userData,
 		wpcomBlogId: blogId,
 	};
@@ -53,4 +56,3 @@ export default async ( jetpackState ) => {
 	console.log( 'requiring jetpack/contact-info' );
 	require( contactInfo );
 };
-
