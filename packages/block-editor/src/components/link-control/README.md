@@ -127,7 +127,7 @@ When provided, an option is appended to all search results requests which when c
 
 This `suggestion` will then be _automatically_ passed to the `onChange` handler to create **the next link value**.
 
-As a result of the above, this prop is often used to allow on-the-fly creation of new entities (eg: `Posts`, `Pages`) based on the text the user has entered into the link search UI. As an example, the Navigation Block uses `createSuggestion` to create Pages on fly from within the Block itself.
+As a result of the above, this prop is often used to allow on-the-fly creation of new entities (eg: `Posts`, `Pages`) based on the text the user has entered into the link search UI. As an example, the Navigation Block uses `createSuggestion` to create Pages on the fly from within the Block itself.
 
 
 
