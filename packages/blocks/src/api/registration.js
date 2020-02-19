@@ -71,7 +71,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @property {string}   name                   The unique and machine-readable name.
  * @property {string}   title                  A human-readable variation title.
- * @property {string}   description            A detailed variation description.
+ * @property {string}   [description]          A detailed variation description.
  * @property {WPIcon}   [icon]                 An icon helping to visualize the variation.
  * @property {boolean}  [isDefault]            Indicates whether the current variation is
  *                                             the default one. Defaults to `false`.
