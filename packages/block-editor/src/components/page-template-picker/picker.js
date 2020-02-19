@@ -6,6 +6,11 @@ import { parse } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
 /**
+ * External dependencies
+ */
+import { logUserEvent, userEvents } from 'react-native-gutenberg-bridge';
+
+/**
  * Internal dependencies
  */
 import Button from './button';
@@ -25,6 +30,9 @@ const __experimentalPageTemplatePicker = ( {
 			blocks: parse( templatePreview.content ),
 		} );
 		setTemplatePreview( undefined );
+		logUserEvent( userEvents.pageTemplateApplied, {
+			template: templatePreview.name,
+		} );
 	};
 
 	return (
