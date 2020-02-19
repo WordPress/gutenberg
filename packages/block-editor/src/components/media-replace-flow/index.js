@@ -129,7 +129,7 @@ const MediaReplaceFlow = ( {
 							</span>
 							<LinkControl
 								value={ { url: mediaURLValue } }
-								settings={ false }
+								settings={ [] }
 								showSuggestions={ false }
 								onChange={ ( { url } ) => {
 									setMediaURLValue( url );
