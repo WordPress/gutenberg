@@ -21,6 +21,12 @@ function render_block_core_latest_posts( $attributes ) {
 		'suppress_filters' => false,
 	);
 
+	$excerpt_length        = $attributes['excerptLength'];
+	$excerpt_length_filter = function ( $length ) use ( $excerpt_length ) {
+		return $excerpt_length;
+	};
+	add_filter( 'excerpt_length', $excerpt_length_filter, 999 );
+
 	if ( isset( $attributes['categories'] ) ) {
 		$args['category'] = $attributes['categories'];
 	}
