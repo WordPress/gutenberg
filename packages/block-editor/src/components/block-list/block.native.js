@@ -193,6 +193,7 @@ class BlockListBlock extends Component {
 			title,
 			parentId,
 			isTouchable,
+			customOnDelete,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -238,7 +239,10 @@ class BlockListBlock extends Component {
 						) }
 						<View style={ this.applyToolbarStyle() }>
 							{ isSelected && (
-								<BlockMobileToolbar clientId={ clientId } />
+								<BlockMobileToolbar
+									clientId={ clientId }
+									customOnDelete={ customOnDelete }
+								/>
 							) }
 						</View>
 					</View>

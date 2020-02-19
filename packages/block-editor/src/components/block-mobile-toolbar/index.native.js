@@ -19,7 +19,12 @@ import styles from './style.scss';
 import BlockMover from '../block-mover';
 import { BlockSettingsButton } from '../block-settings';
 
-const BlockMobileToolbar = ( { clientId, onDelete, order } ) => (
+const BlockMobileToolbar = ( {
+	clientId,
+	onDelete,
+	order,
+	customOnDelete,
+} ) => (
 	<View style={ styles.toolbar }>
 		<BlockMover clientIds={ [ clientId ] } />
 
@@ -33,7 +38,7 @@ const BlockMobileToolbar = ( { clientId, onDelete, order } ) => (
 				__( 'Remove block at row %s' ),
 				order + 1
 			) }
-			onClick={ onDelete }
+			onClick={ customOnDelete || onDelete }
 			icon={ trash }
 			extraProps={ { hint: __( 'Double tap to remove the block' ) } }
 		/>
@@ -42,18 +47,24 @@ const BlockMobileToolbar = ( { clientId, onDelete, order } ) => (
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockIndex } = select( 'core/block-editor' );
+		const { getBlockIndex, getBlockRootClientId } = select(
+			'core/block-editor'
+		);
 
 		return {
 			order: getBlockIndex( clientId ),
+			rootClientId: getBlockRootClientId( clientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
-		const { removeBlock } = dispatch( 'core/block-editor' );
+		const { removeBlock, selectBlock } = dispatch( 'core/block-editor' );
 		return {
 			onDelete: () => {
 				Keyboard.dismiss();
 				removeBlock( clientId, rootClientId );
+				if ( !! rootClientId ) {
+					selectBlock( rootClientId );
+				}
 			},
 		};
 	} )

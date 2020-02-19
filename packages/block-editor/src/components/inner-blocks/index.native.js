@@ -110,6 +110,7 @@ class InnerBlocks extends Component {
 			renderAppender,
 			__experimentalMoverDirection,
 			style,
+			customOnDelete,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -124,6 +125,7 @@ class InnerBlocks extends Component {
 							__experimentalMoverDirection
 						}
 						style={ style }
+						customOnDelete={ customOnDelete }
 					/>
 				) }
 			</>

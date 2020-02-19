@@ -173,6 +173,7 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			customOnDelete,
 		} = this.props;
 
 		return (
@@ -190,6 +191,7 @@ export class BlockList extends Component {
 							this.onCaretVerticalPositionChange
 						}
 						parentWidth={ this.state.maxWidth }
+						customOnDelete={ customOnDelete }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (
