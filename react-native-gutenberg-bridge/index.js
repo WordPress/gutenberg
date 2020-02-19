@@ -16,10 +16,6 @@ export const mediaSources = {
 	siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
 };
 
-export const userEvents = {
-	pageTemplateApplied: 'page_template_applied',
-};
-
 export const showMediaEditorButton = isIOS;
 
 // Console polyfill from react-native
@@ -120,10 +116,6 @@ export function requestMediaEditor( mediaUrl, callback ) {
 
 export function fetchRequest( path ) {
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
-}
-
-export function logUserEvent( event, properties ) {
-	return RNReactNativeGutenbergBridge.logUserEvent( event, properties );
 }
 
 export default RNReactNativeGutenbergBridge;
