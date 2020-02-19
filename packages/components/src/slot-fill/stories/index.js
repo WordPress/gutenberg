@@ -13,7 +13,7 @@ import { createContext, useContext } from '@wordpress/element';
  */
 import { Slot, Fill, Provider } from '../';
 
-export default { title: 'Components|SlotFill', component: Slot };
+export default { title: 'Components/SlotFill', component: Slot };
 
 export const _default = () => {
 	return (
