@@ -200,27 +200,27 @@ class BlockListBlock extends Component {
 		);
 
 		return (
-			<>
-				{ isSelected && (
-					<FloatingToolbar>
-						<Toolbar passedStyle={ styles.toolbar }>
-							<ToolbarButton
-								title={ __( 'Navigate Up' ) }
-								onClick={ () =>
-									this.props.onSelect( parentId )
-								}
-								icon={ NavigateUpSVG }
-							/>
-							<View style={ styles.pipe } />
-						</Toolbar>
-						<Breadcrumbs clientId={ clientId } />
-					</FloatingToolbar>
-				) }
-				<TouchableWithoutFeedback
-					onPress={ this.onFocus }
-					accessible={ ! isSelected }
-					accessibilityRole={ 'button' }
-				>
+			<TouchableWithoutFeedback
+				onPress={ this.onFocus }
+				accessible={ ! isSelected }
+				accessibilityRole={ 'button' }
+			>
+				<View accessibilityLabel={ accessibilityLabel }>
+					{ isSelected && (
+						<FloatingToolbar>
+							<Toolbar passedStyle={ styles.toolbar }>
+								<ToolbarButton
+									title={ __( 'Navigate Up' ) }
+									onClick={ () =>
+										this.props.onSelect( parentId )
+									}
+									icon={ NavigateUpSVG }
+								/>
+								<View style={ styles.pipe } />
+							</Toolbar>
+							<Breadcrumbs clientId={ clientId } />
+						</FloatingToolbar>
+					) }
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
@@ -240,8 +240,8 @@ class BlockListBlock extends Component {
 							) }
 						</View>
 					</View>
-				</TouchableWithoutFeedback>
-			</>
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }

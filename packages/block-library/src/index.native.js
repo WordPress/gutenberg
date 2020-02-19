@@ -151,7 +151,7 @@ export const registerCoreBlocks = () => {
 		devOnly( columns ),
 		devOnly( column ),
 		group,
-		devOnly( button ),
+		button,
 		spacer,
 		shortcode,
 	].forEach( registerBlock );
