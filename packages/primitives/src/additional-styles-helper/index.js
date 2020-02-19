@@ -31,7 +31,7 @@ const stringStylesFromObjectStyles = ( objectStyles ) => {
 	return styles;
 };
 
-export default ( additionalStyles ) => {
+export const additionalStylesHelper = ( additionalStyles ) => {
 	let styles = ``;
 	additionalStyles.forEach( ( record ) => {
 		if ( record.states === '' ) {
@@ -45,7 +45,9 @@ export default ( additionalStyles ) => {
 		}
 	} );
 	if ( styles.length > 0 ) {
-		return css`${ styles }`;
+		return css`
+			${styles}
+		`;
 	}
 	return undefined;
 };

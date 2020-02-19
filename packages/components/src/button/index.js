@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { isArray } from 'lodash';
+import styled from '@emotion/styled';
 
 /**
  * WordPress dependencies
@@ -15,11 +16,13 @@ import { forwardRef } from '@wordpress/element';
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
-import { Button as PrimitiveButton, A } from '../styled-primitives/button';
-import additionalStylesHelper from '../styled-primitives/additionalStylesHelper';
+import { additionalStylesHelper } from '@wordpress/primitives';
 
 import styles from './styles';
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
+
+const PrimitiveButton = styled.button``;
+const A = styled.a``;
 
 export function Button(
 	{

@@ -8,6 +8,7 @@ export {
 	G,
 	HorizontalRule,
 	BlockQuotation,
+	PrimitiveButton,
 } from '@wordpress/primitives';
 
 // Components
@@ -100,10 +101,6 @@ export {
 	Provider as SlotFillProvider,
 	Consumer as __experimentalSlotFillConsumer,
 } from './slot-fill';
-
-// Primitives with styled-system
-export { default as StyledPrimitives, styled } from './styled-primitives';
-export { default as PrimitiveButton } from './primitives/button';
 
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';

@@ -35,21 +35,23 @@ export default function BlockBreadcrumbButton( { children, ...props } ) {
 			},
 		},
 	];
-	return <PrimitiveButton
-		className="block-editor-block-breadcrumb__button"
-		px={ 'medium' }
-		py={ 0 }
-		color={ 'dark-gray-500' }
-		fontSize={ 'inherit' }
-		line-height={ 'xlarge' }
-		height={ 28 }
-		isTertiary
-		display={ 'inline-flex' }
-		textDecoration={ 'none' }
-		border={ 0 }
-		additionalStyles={ additionalStyles }
-		{ ...props }
-	>
-		{ children }
-	</PrimitiveButton>;
+	return (
+		<PrimitiveButton
+			className="block-editor-block-breadcrumb__button"
+			px={ 'medium' }
+			py={ 0 }
+			color={ 'dark-gray-500' }
+			fontSize={ 'inherit' }
+			line-height={ 'xlarge' }
+			height={ 28 }
+			isTertiary
+			display={ 'inline-flex' }
+			textDecoration={ 'none' }
+			border={ 0 }
+			additionalStyles={ additionalStyles }
+			{ ...props }
+		>
+			{ children }
+		</PrimitiveButton>
+	);
 }
