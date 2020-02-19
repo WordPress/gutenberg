@@ -71,8 +71,8 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 
 	.components-toolbar__control,
 	.components-dropdown-menu__toggle {
-		min-width: $grid-unit-60;
-		min-height: $grid-unit-60;
+		min-width: $block-toolbar-height;
+		min-height: $block-toolbar-height;
 		padding-left: $grid-unit-15;
 		padding-right: $grid-unit-15;
 	}
