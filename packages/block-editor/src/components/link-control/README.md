@@ -90,13 +90,16 @@ from `core/block-editor` in order to retrieve search suggestions for matching
 
 Current link value.
 
-A link value contains is composed as a union of the default properties and any custom settings values.
+A link `value` is composed of a union between the values of default link properties and any
+custom link `settings`.
 
 Default properties include:
 
 - `url` (`string`): Link URL.
 - `title` (`string`, optional): Link title.
-- `opensInNewTab` (`boolean`, optional): Whether link should open in a new browser tab.This value is only assigned if not providing a custom `settings` prop.
+- `opensInNewTab` (`boolean`, optional): Whether link should open in a new
+  browser tab. This value is only assigned if not providing a custom `settings`
+  prop.
 
 ### settings
 
@@ -112,7 +115,9 @@ Default properties include:
 ];
 ```
 
-An array of settings objects. Each object will used to render a `ToggleControl` for that setting.
+An array of settings objects associated with a link (for example: a setting to
+determine whether or not the link
+opens in a new tab). Each object will used to render a `ToggleControl` for that setting.
 
 ### onClose
 
@@ -147,36 +152,49 @@ Whether to present initial suggestions immediately.
 - Type: `boolean`
 - Required: No
 
-If passed as either `true` or `false`, controls the internal editing state of the component to respective show or not show the URL input field.
+If passed as either `true` or `false`, controls the internal editing state of
+the component to respectively show or not to show the URL input field.
 
 
 ### createSuggestion
 
 - Type: `function`
 - Required: No
+- Returns: when called may return either a new `suggestion` directly or a `Promise` which resolves to a
+new `suggestion`.
 
-Used to handle the dynamic creation of new suggestions within the Link UI. When
-the prop is provided, an option is added to the end of all search
-results requests which when clicked will call `createSuggestion` callback
-(passing the current value of the search `<input>`) in
-order to afford the parent component the opportunity to dynamically create a new
-link `value` (see above).
+Used to handle the dynamic creation of a new `suggestion` (and ultimately new link
+`value`) within the Link UI.
 
-This is often used to allow on-the-fly creation of new entities (eg: `Posts`,
-`Pages`) based on the text the user has entered into the link search UI. For
-example, the Navigation Block uses this to create Pages on demand.
+When provided, an option is appended to all search
+results requests which when clicked will call the `createSuggestion` callback
+(passing the current value of the search `<input>`). This affords the parent component the opportunity to dynamically create a new
+link `suggestion` (see above).
 
-When called, `createSuggestion` may return either a new suggestion directly or a `Promise` which resolves to a
-new suggestion. Suggestions have the following shape:
+This `suggestion` will then be _automatically_ passed to the
+`onChange` handler to create **the next link value**.
+
+As a result of the above, this prop is often used to allow on-the-fly creation of new entities (eg: `Posts`,
+`Pages`) based on the text the user has entered into the link search UI. As an
+example, the Navigation Block uses `createSuggestion` to create Pages on fly
+from within the Block itself.
+
+
+
+#### Search `suggestion` values
+
+A `suggestion` should have the following shape:
 
 ```js
 {
-	id: // unique identifier
-	type: // "url", "page", "post"...etc
-	title: // "My new suggestion"
-	url: // any string representing the URL value
+	id: // uniquely identifies the suggestion.
+	type: // the type of the suggestion (eg: `post`).
+	title: // Human-readable label for the suggestion.
+	url: // any string representing a URL value
 }
 ```
+
+
 
 #### Example
 ```jsx
