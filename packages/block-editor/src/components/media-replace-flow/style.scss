@@ -5,17 +5,56 @@
 	display: none;
 }
 
-.block-editor-media-flow__url-input {
-	padding: 0 15px;
-	max-width: 255px;
-	padding-bottom: 10px;
+// Forcing some space above the list of options in
+// the dropdown to visually balance them.
+.block-editor-media-replace-flow__options .components-popover__content {
+	padding-top: 8px;
+}
 
-	input {
-		max-width: 180px;
+.block-editor-media-replace-flow__indicator {
+	margin-left: 4px;
+
+	&::after {
+		@include dropdown-arrow();
+	}
+}
+
+.block-editor-media-flow__url-input {
+
+	border-top: 1px solid $light-gray-800;
+	margin-top: 8px;
+
+	.block-editor-media-replace-flow__image-url-label {
+		color: $dark-gray-300;
+		font-size: $default-font-size;
+		display: block;
+		position: relative;
+		top: $grid-size-large;
+		padding-left: $grid-size-large;
+	}
+
+	.block-editor-link-control {
+		min-width: auto;
+		margin-top: -16px;
+		.block-editor-link-control__search-item-title {
+			max-width: 180px;
+			margin-top: $grid-size-large;
+		}
+		.block-editor-link-control__search-item.is-current {
+			width: auto;
+			padding: $grid-size-large;
+		}
 	}
 }
 
 .block-editor-media-replace-flow__link-viewer {
+	align-items: center;
+
+	.block-editor-url-popover__link-viewer-url {
+		margin: 0;
+		margin-right: 4px;
+	}
+
 	// Overflow is not working properly if we show the icon.
 	.components-external-link__icon {
 		display: none;
@@ -25,5 +64,10 @@
 	}
 	.components-button {
 		flex-shrink: 0;
+	}
+
+	button {
+		position: relative;
+		top: -8px;
 	}
 }
