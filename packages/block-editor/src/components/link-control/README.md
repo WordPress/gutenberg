@@ -59,7 +59,7 @@ Default properties include:
 
 - `url` (`string`): Link URL.
 - `title` (`string`, optional): Link title.
-- `opensInNewTab` (`boolean`, optional): Whether link should open in a new browser tab. This value is only assigned if not providing a custom `settings` prop.
+- `opensInNewTab` (`boolean`, optional): Whether link should open in a new browser tab. This value is only assigned when not providing a custom `settings` prop.
 
 ### settings
 
