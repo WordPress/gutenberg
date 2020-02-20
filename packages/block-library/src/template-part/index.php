@@ -32,7 +32,7 @@ function render_block_core_template_part( $attributes ) {
 	if ( is_null( $content ) ) {
 		return 'Template Part Not Found';
 	}
-	return apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
+	return apply_filters( 'the_template_part', str_replace( ']]>', ']]&gt;', $content ) );
 }
 
 /**
@@ -58,3 +58,13 @@ function register_block_core_template_part() {
 	);
 }
 add_action( 'init', 'register_block_core_template_part' );
+
+// Add the filters that process the_template_part for template_parts.
+add_filter( 'the_template_part', 'do_blocks', 9 );
+add_filter( 'the_template_part', 'wptexturize' );
+add_filter( 'the_template_part', 'convert_smilies', 20 );
+add_filter( 'the_template_part', 'wpautop' );
+add_filter( 'the_template_part', 'shortcode_unautop' );
+add_filter( 'the_template_part', 'prepend_attachment' );
+add_filter( 'the_template_part', 'wp_make_content_images_responsive' );
+add_filter( 'the_template_part', 'do_shortcode', 11 ); // AFTER wpautop().
