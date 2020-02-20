@@ -12,7 +12,7 @@ import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { help } from '@wordpress/icons';
+import { help, plugins } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -128,7 +128,7 @@ export class UnsupportedBlockEdit extends Component {
 
 		const icon = blockType
 			? normalizeIconObject( blockType.settings.icon )
-			: 'admin-plugins';
+			: plugins;
 		const iconStyle = getStylesFromColorScheme(
 			styles.unsupportedBlockIcon,
 			styles.unsupportedBlockIconDark
