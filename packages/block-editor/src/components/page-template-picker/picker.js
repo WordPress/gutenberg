@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -22,7 +21,7 @@ const __experimentalPageTemplatePicker = ( {
 	const onApply = () => {
 		editPost( {
 			title: templatePreview.name,
-			blocks: parse( templatePreview.content ),
+			blocks: templatePreview.blocks,
 		} );
 		setTemplatePreview( undefined );
 	};
