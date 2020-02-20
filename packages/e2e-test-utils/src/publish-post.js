@@ -12,8 +12,9 @@ import { openPublishPanel } from './open-publish-panel';
 export async function publishPost() {
 	await openPublishPanel();
 
-	// Publish the post
-	await page.click( '.editor-post-publish-button' );
+	// Publish the post. The publish post button should be focused so can be
+	// submitted using the Enter key.
+	await page.keyboard.press( 'Enter' );
 
 	// A success notice should show up
 	return page.waitForSelector( '.components-snackbar' );
