@@ -2,7 +2,7 @@
 
 Renders a link control. A link control is a controlled input which maintains a value associated with a link (HTML anchor element) and relevant settings for how that link is expected to behave.
 
-It is designed to provide a standardized UI for the creation of link throughout the Editor.
+It is designed to provide a standardized UI for the creation of a link throughout the Editor.
 
 
 ## History
