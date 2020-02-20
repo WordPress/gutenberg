@@ -27,11 +27,17 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import {
-	table,
-	blockTable as icon,
 	alignLeft,
 	alignRight,
 	alignCenter,
+	blockTable as icon,
+	tableColumnAfter,
+	tableColumnBefore,
+	tableColumnDelete,
+	tableRowAfter,
+	tableRowBefore,
+	tableRowDelete,
+	table,
 } from '@wordpress/icons';
 
 /**
@@ -409,37 +415,37 @@ export class TableEdit extends Component {
 
 		return [
 			{
-				icon: 'table-row-before',
+				icon: tableRowBefore,
 				title: __( 'Add Row Before' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onInsertRowBefore,
 			},
 			{
-				icon: 'table-row-after',
+				icon: tableRowAfter,
 				title: __( 'Add Row After' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onInsertRowAfter,
 			},
 			{
-				icon: 'table-row-delete',
+				icon: tableRowDelete,
 				title: __( 'Delete Row' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onDeleteRow,
 			},
 			{
-				icon: 'table-col-before',
+				icon: tableColumnBefore,
 				title: __( 'Add Column Before' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onInsertColumnBefore,
 			},
 			{
-				icon: 'table-col-after',
+				icon: tableColumnAfter,
 				title: __( 'Add Column After' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onInsertColumnAfter,
 			},
 			{
-				icon: 'table-col-delete',
+				icon: tableColumnDelete,
 				title: __( 'Delete Column' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onDeleteColumn,

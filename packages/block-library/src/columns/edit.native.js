@@ -123,6 +123,9 @@ function ColumnsEditContainer( {
 					} }
 					containerStyle={ { flex: 1 } }
 					allowedBlocks={ ALLOWED_BLOCKS }
+					disallowRemoveInnerBlocks={
+						columnCount <= MIN_COLUMNS_NUMBER
+					}
 				/>
 			</View>
 		</>
