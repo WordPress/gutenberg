@@ -35,9 +35,11 @@
 		"chalk": "^2.4.2",
 		"copy-dir": "^1.2.0",
 		"docker-compose": "^0.22.2",
+		"inquirer": "^7.0.4",
 		"js-yaml": "^3.13.1",
 		"nodegit": "^0.26.2",
 		"ora": "^4.0.2",
+		"rimraf": "^3.0.2",
 		"terminal-link": "^2.0.0",
 		"yargs": "^14.0.0"
 	},
