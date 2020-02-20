@@ -371,16 +371,6 @@
 		// Special dimensions for this button.
 		min-width: 32px;
 		height: 32px;
-
-		// Although this is a primary button, don't show it as such when in between blocks.
-		// @todo, this could use a separate iteration.
-		background: transparent;
-		color: $theme-color;
-
-		&:hover:not(:disabled) {
-			background: transparent;
-			color: $theme-color;
-		}
 	}
 }
 

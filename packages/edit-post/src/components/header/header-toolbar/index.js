@@ -13,6 +13,8 @@ import {
 } from '@wordpress/block-editor';
 import { EditorHistoryRedo, EditorHistoryUndo } from '@wordpress/editor';
 
+const inserterToggleProps = { isPrimary: true };
+
 function HeaderToolbar() {
 	const { hasFixedToolbar, showInserter, isTextModeEnabled } = useSelect(
 		( select ) => ( {
@@ -45,6 +47,7 @@ function HeaderToolbar() {
 				disabled={ ! showInserter }
 				position="bottom right"
 				showInserterHelpPanel
+				toggleProps={ inserterToggleProps }
 			/>
 			<ToolSelector />
 			<EditorHistoryUndo />
