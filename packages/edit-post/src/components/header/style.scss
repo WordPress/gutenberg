@@ -61,16 +61,6 @@
 		// Special dimensions for this button.
 		min-width: 32px;
 		height: 32px;
-
-		// Spot color button.
-		background-color: $blue-medium-focus;
-		color: $white;
-		border-radius: $radius-block-ui;
-
-		&:hover {
-			color: $white;
-			background-color: rgba($blue-medium-focus, 0.8);
-		}
 	}
 }
 

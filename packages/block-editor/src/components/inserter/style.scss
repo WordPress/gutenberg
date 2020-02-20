@@ -34,21 +34,6 @@ $block-inserter-search-height: 38px;
 	padding: 0;
 	transition: color 0.2s ease;
 	@include reduce-motion("transition");
-
-	&:hover:not(:disabled) {
-		background: color($theme-color shade(10%));
-		color: $white;
-	}
-
-	&:active:not(:disabled) {
-		background: color($theme-color shade(20%));
-		border-color: color($theme-color shade(20%));
-		color: $white;
-	}
-
-	&:focus:not(:disabled) {
-		box-shadow: inset 0 0 0 1px $white, 0 0 0 2px color($theme-color);
-	}
 }
 
 .block-editor-inserter__menu {

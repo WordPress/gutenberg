@@ -38,6 +38,7 @@ const defaultRenderToggle = ( {
 	}
 	return (
 		<Button
+			isPrimary
 			icon={ plusCircle }
 			label={ label }
 			tooltipPosition="bottom"

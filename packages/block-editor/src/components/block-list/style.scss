@@ -372,14 +372,14 @@
 		min-width: 32px;
 		height: 32px;
 
-		// Spot color button.
-		background-color: $blue-medium-focus;
-		color: $white;
-		border-radius: $radius-block-ui;
+		// Although this is a primary button, don't show it as such when in between blocks.
+		// @todo, this could use a separate iteration.
+		background: transparent;
+		color: $theme-color;
 
-		&:hover {
-			color: $white;
-			background-color: rgba($blue-medium-focus, 0.8);
+		&:hover:not(:disabled) {
+			background: transparent;
+			color: $theme-color;
 		}
 	}
 }
