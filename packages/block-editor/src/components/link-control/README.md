@@ -135,7 +135,7 @@ A `suggestion` should have the following shape:
 {
 	id: // uniquely identifies the suggestion.
 	type: // the type of the suggestion (eg: `post`).
-	title: // Human-readable label for the suggestion.
+	title: // human-readable label for the suggestion.
 	url: // any string representing a URL value
 }
 ```
