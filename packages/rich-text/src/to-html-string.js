@@ -97,18 +97,26 @@ function createElementHTML( { type, attributes, object, children } ) {
 			continue;
 		}
 
-		attributeString += ` ${ key }="${ escapeAttribute( attributes[ key ] ) }"`;
+		attributeString += ` ${ key }="${ escapeAttribute(
+			attributes[ key ]
+		) }"`;
 	}
 
 	if ( object ) {
 		return `<${ type }${ attributeString }>`;
 	}
 
-	return `<${ type }${ attributeString }>${ createChildrenHTML( children ) }</${ type }>`;
+	return `<${ type }${ attributeString }>${ createChildrenHTML(
+		children
+	) }</${ type }>`;
 }
 
 function createChildrenHTML( children = [] ) {
-	return children.map( ( child ) => {
-		return child.text === undefined ? createElementHTML( child ) : escapeEditableHTML( child.text );
-	} ).join( '' );
+	return children
+		.map( ( child ) => {
+			return child.text === undefined
+				? createElementHTML( child )
+				: escapeEditableHTML( child.text );
+		} )
+		.join( '' );
 }

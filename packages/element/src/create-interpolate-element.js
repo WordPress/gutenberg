@@ -3,10 +3,7 @@
  */
 import { createElement, cloneElement, Fragment, isValidElement } from 'react';
 
-let indoc,
-	offset,
-	output,
-	stack;
+let indoc, offset, output, stack;
 
 /**
  * Matches tags in the localized string
@@ -51,7 +48,7 @@ function Frame(
 	tokenStart,
 	tokenLength,
 	prevOffset,
-	leadingTextStart,
+	leadingTextStart
 ) {
 	return {
 		element,
@@ -124,9 +121,11 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 const isValidConversionMap = ( conversionMap ) => {
 	const isObject = typeof conversionMap === 'object';
 	const values = isObject && Object.values( conversionMap );
-	return isObject &&
+	return (
+		isObject &&
 		values.length &&
-		values.every( ( element ) => isValidElement( element ) );
+		values.every( ( element ) => isValidElement( element ) )
+	);
 };
 
 /**
@@ -150,7 +149,10 @@ function proceed( conversionMap ) {
 	switch ( tokenType ) {
 		case 'no-more-tokens':
 			if ( stackDepth !== 0 ) {
-				const { leadingTextStart: stackLeadingText, tokenStart } = stack.pop();
+				const {
+					leadingTextStart: stackLeadingText,
+					tokenStart,
+				} = stack.pop();
 				output.push( indoc.substr( stackLeadingText, tokenStart ) );
 			}
 			addText();
@@ -160,7 +162,10 @@ function proceed( conversionMap ) {
 			if ( 0 === stackDepth ) {
 				if ( null !== leadingTextStart ) {
 					output.push(
-						indoc.substr( leadingTextStart, startOffset - leadingTextStart )
+						indoc.substr(
+							leadingTextStart,
+							startOffset - leadingTextStart
+						)
 					);
 				}
 				output.push( conversionMap[ name ] );
@@ -209,7 +214,7 @@ function proceed( conversionMap ) {
 				stackTop.element,
 				stackTop.tokenStart,
 				stackTop.tokenLength,
-				startOffset + tokenLength,
+				startOffset + tokenLength
 			);
 			frame.children = stackTop.children;
 			addChild( frame );
@@ -274,15 +279,16 @@ function addText() {
 function addChild( frame ) {
 	const { element, tokenStart, tokenLength, prevOffset, children } = frame;
 	const parent = stack[ stack.length - 1 ];
-	const text = indoc.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+	const text = indoc.substr(
+		parent.prevOffset,
+		tokenStart - parent.prevOffset
+	);
 
 	if ( text ) {
 		parent.children.push( text );
 	}
 
-	parent.children.push(
-		cloneElement( element, null, ...children )
-	);
+	parent.children.push( cloneElement( element, null, ...children ) );
 	parent.prevOffset = prevOffset ? prevOffset : tokenStart + tokenLength;
 }
 
@@ -299,27 +305,29 @@ function addChild( frame ) {
  *                           the element.
  */
 function closeOuterElement( endOffset ) {
-	const { element, leadingTextStart, prevOffset, tokenStart, children } = stack.pop();
+	const {
+		element,
+		leadingTextStart,
+		prevOffset,
+		tokenStart,
+		children,
+	} = stack.pop();
 
-	const text = endOffset ?
-		indoc.substr( prevOffset, endOffset - prevOffset ) :
-		indoc.substr( prevOffset );
+	const text = endOffset
+		? indoc.substr( prevOffset, endOffset - prevOffset )
+		: indoc.substr( prevOffset );
 
 	if ( text ) {
 		children.push( text );
 	}
 
 	if ( null !== leadingTextStart ) {
-		output.push( indoc.substr( leadingTextStart, tokenStart - leadingTextStart ) );
+		output.push(
+			indoc.substr( leadingTextStart, tokenStart - leadingTextStart )
+		);
 	}
 
-	output.push(
-		cloneElement(
-			element,
-			null,
-			...children
-		)
-	);
+	output.push( cloneElement( element, null, ...children ) );
 }
 
 export default createInterpolateElement;

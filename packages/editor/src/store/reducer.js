@@ -2,12 +2,7 @@
  * External dependencies
  */
 import optimist from 'redux-optimist';
-import {
-	omit,
-	keys,
-	isEqual,
-	keyBy,
-} from 'lodash';
+import { omit, keys, isEqual, keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -380,16 +375,18 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
-export default optimist( combineReducers( {
-	postId,
-	postType,
-	preferences,
-	saving,
-	postLock,
-	reusableBlocks,
-	template,
-	postSavingLock,
-	isReady,
-	editorSettings,
-	postAutosavingLock,
-} ) );
+export default optimist(
+	combineReducers( {
+		postId,
+		postType,
+		preferences,
+		saving,
+		postLock,
+		reusableBlocks,
+		template,
+		postSavingLock,
+		isReady,
+		editorSettings,
+		postAutosavingLock,
+	} )
+);

@@ -18,7 +18,10 @@ export {
 	useRegistry,
 } from './components/registry-provider';
 export { default as useSelect } from './components/use-select';
-export { useDispatch } from './components/use-dispatch';
+export {
+	useDispatch,
+	useDispatchWithMap as __unstableUseDispatchWithMap,
+} from './components/use-dispatch';
 export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
@@ -106,7 +109,8 @@ export const select = defaultRegistry.select;
  *
  * @return {Object} Object containing the store's promise-wrapped selectors.
  */
-export const __experimentalResolveSelect = defaultRegistry.__experimentalResolveSelect;
+export const __experimentalResolveSelect =
+	defaultRegistry.__experimentalResolveSelect;
 
 /**
  * Given the name of a registered store, returns an object of the store's action creators.

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { StyleSheet, Text, View, Platform } from 'react-native';
+import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,6 +14,8 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import { Button as PrimitiveButton } from '../styled-primitives/button';
+import Tooltip from '../tooltip';
+import Icon from '../icon';
 
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
@@ -33,7 +36,7 @@ const styles = StyleSheet.create( {
 		backgroundColor: '#2e4453',
 	},
 	subscript: {
-		color: '#7b9ab1',
+		color: '#7b9ab1', // $toolbar-button
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
@@ -52,6 +55,7 @@ export function Button( props ) {
 	const {
 		children,
 		onClick,
+		onLongPress,
 		disabled,
 		hint,
 		fixedRatio = true,
@@ -61,13 +65,19 @@ export function Button( props ) {
 		isSmall,
 		isPrimary,
 		'aria-disabled': ariaDisabled,
-		'aria-label': ariaLabel,
 		'data-subscript': subscript,
+		testID,
+		icon,
+		iconSize,
+		showTooltip,
+		label,
+		shortcut,
+		tooltipPosition,
 		...otherProps
 	} = props;
 
 	// Support some of props from the web just to demonstrate.
-	// The markup is a bit different than on web and we style the View inside the Touchable instead.
+	// The markup is a bit different than on the web and we style the View inside the Touchable instead.
 	let pd = 3;
 	if ( isSmall ) {
 		pd = 8;
@@ -93,39 +103,93 @@ export function Button( props ) {
 		states.push( 'disabled' );
 	}
 
-	const subscriptDefault = getStylesFromColorScheme( styles.subscript, styles.subscriptDark );
+	const subscriptDefault = getStylesFromColorScheme(
+		styles.subscript,
+		styles.subscriptDark
+	);
 
 	const newChildren = Children.map( children, ( child ) => {
-		return child ? cloneElement( child, { colorScheme: props.preferredColorScheme, isPressed } ) : child;
+		return child
+			? cloneElement( child, {
+					colorScheme: props.preferredColorScheme,
+					isPressed,
+			  } )
+			: child;
 	} );
 
-	return (
+	// Should show the tooltip if...
+	const shouldShowTooltip =
+		! isDisabled &&
+		// an explicit tooltip is passed or...
+		( ( showTooltip && label ) ||
+			// there's a shortcut or...
+			shortcut ||
+			// there's a label and...
+			( !! label &&
+				// the children are empty and...
+				( ! children ||
+					( isArray( children ) && ! children.length ) ) &&
+				// the tooltip is not explicitly disabled.
+				false !== showTooltip ) );
+
+	const newIcon = icon
+		? cloneElement( <Icon icon={ icon } size={ iconSize } />, {
+				colorScheme: props.preferredColorScheme,
+				isPressed,
+		  } )
+		: null;
+
+	const element = (
 		<PrimitiveButton
+			flex={ 1 }
 			activeOpacity={ 0.7 }
 			accessible={ true }
-			accessibilityLabel={ ariaLabel }
+			accessibilityLabel={ label }
 			accessibilityStates={ states }
 			accessibilityRole={ 'button' }
 			accessibilityHint={ hint }
 			onPress={ onClick }
-			flex={ 1 }
 			p={ pd }
 			color={ isPrimary && 'white' }
 			backgroundColor={ isPrimary && 'primary' }
 			justifyContent={ 'center' }
 			alignItems={ 'center' }
 			disabled={ isDisabled }
+			onLongPress={ onLongPress }
+			testID={ testID }
 			{ ...otherProps }
 		>
 			<View style={ buttonViewStyle }>
-				{ newChildren }
-				{ subscript &&
-					( <Text style={ [ subscriptDefault, isPressed && styles.subscriptActive ] }>
-						{ subscript }
-					</Text> )
-				}
+				<View style={ { flexDirection: 'row' } }>
+					{ newIcon }
+					{ newChildren }
+					{ subscript && (
+						<Text
+							style={ [
+								subscriptDefault,
+								isPressed && styles.subscriptActive,
+							] }
+						>
+							{ subscript }
+						</Text>
+					) }
+				</View>
 			</View>
 		</PrimitiveButton>
+	);
+
+	if ( ! shouldShowTooltip ) {
+		return element;
+	}
+
+	return (
+		<Tooltip
+			text={ label }
+			shortcut={ shortcut }
+			position={ tooltipPosition }
+		>
+			{ element }
+		</Tooltip>
 	);
 }
 

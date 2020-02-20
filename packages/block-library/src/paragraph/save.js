@@ -27,7 +27,10 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const textClass = getColorClassName( 'color', textColor );
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+	const backgroundClass = getColorClassName(
+		'background-color',
+		backgroundColor
+	);
 	const fontSizeClass = getFontSizeClass( fontSize );
 
 	const className = classnames( {

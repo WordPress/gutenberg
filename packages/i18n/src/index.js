@@ -6,14 +6,18 @@ import memoize from 'memize';
 import sprintfjs from 'sprintf-js';
 
 /**
+ * @typedef {{[key: string]: any}} LocaleData
+ */
+
+/**
  * Default locale data to use for Tannin domain when not otherwise provided.
  * Assumes an English plural forms expression.
  *
- * @type {Object}
+ * @type {LocaleData}
  */
 const DEFAULT_LOCALE_DATA = {
 	'': {
-		plural_forms: ( n ) => n === 1 ? 0 : 1,
+		plural_forms: ( n ) => ( n === 1 ? 0 : 1 ),
 	},
 };
 
@@ -39,8 +43,8 @@ const i18n = new Tannin( {} );
  *
  * @see http://messageformat.github.io/Jed/
  *
- * @param {?Object} data   Locale data configuration.
- * @param {?string} domain Domain for which configuration applies.
+ * @param {LocaleData} [data]   Locale data configuration.
+ * @param {string}     [domain] Domain for which configuration applies.
  */
 export function setLocaleData( data, domain = 'default' ) {
 	i18n.data[ domain ] = {
@@ -61,13 +65,14 @@ export function setLocaleData( data, domain = 'default' ) {
  * Wrapper for Tannin's `dcnpgettext`. Populates default locale data if not
  * otherwise previously assigned.
  *
- * @param {?string} domain  Domain to retrieve the translated text.
- * @param {?string} context Context information for the translators.
- * @param {string}  single  Text to translate if non-plural. Used as fallback
- *                          return value on a caught error.
- * @param {?string} plural  The text to be used if the number is plural.
- * @param {?number} number  The number to compare against to use either the
- *                          singular or plural form.
+ * @param {string|undefined} domain   Domain to retrieve the translated text.
+ * @param {string|undefined} context  Context information for the translators.
+ * @param {string}           single   Text to translate if non-plural. Used as
+ *                                    fallback return value on a caught error.
+ * @param {string}           [plural] The text to be used if the number is
+ *                                    plural.
+ * @param {number}           [number] The number to compare against to use
+ *                                    either the singular or plural form.
  *
  * @return {string} The translated string.
  */
@@ -84,8 +89,8 @@ function dcnpgettext( domain = 'default', context, single, plural, number ) {
  *
  * @see https://developer.wordpress.org/reference/functions/__/
  *
- * @param {string}  text   Text to translate.
- * @param {?string} domain Domain to retrieve the translated text.
+ * @param {string} text     Text to translate.
+ * @param {string} [domain] Domain to retrieve the translated text.
  *
  * @return {string} Translated text.
  */
@@ -98,9 +103,9 @@ export function __( text, domain ) {
  *
  * @see https://developer.wordpress.org/reference/functions/_x/
  *
- * @param {string}  text    Text to translate.
- * @param {string}  context Context information for the translators.
- * @param {?string} domain  Domain to retrieve the translated text.
+ * @param {string} text     Text to translate.
+ * @param {string} context  Context information for the translators.
+ * @param {string} [domain] Domain to retrieve the translated text.
  *
  * @return {string} Translated context string without pipe.
  */
@@ -114,11 +119,11 @@ export function _x( text, context, domain ) {
  *
  * @see https://developer.wordpress.org/reference/functions/_n/
  *
- * @param {string}  single The text to be used if the number is singular.
- * @param {string}  plural The text to be used if the number is plural.
- * @param {number}  number The number to compare against to use either the
- *                         singular or plural form.
- * @param {?string} domain Domain to retrieve the translated text.
+ * @param {string} single   The text to be used if the number is singular.
+ * @param {string} plural   The text to be used if the number is plural.
+ * @param {number} number   The number to compare against to use either the
+ *                          singular or plural form.
+ * @param {string} [domain] Domain to retrieve the translated text.
  *
  * @return {string} The translated singular or plural form.
  */
@@ -132,12 +137,12 @@ export function _n( single, plural, number, domain ) {
  *
  * @see https://developer.wordpress.org/reference/functions/_nx/
  *
- * @param {string}  single  The text to be used if the number is singular.
- * @param {string}  plural  The text to be used if the number is plural.
- * @param {number}  number  The number to compare against to use either the
+ * @param {string} single   The text to be used if the number is singular.
+ * @param {string} plural   The text to be used if the number is plural.
+ * @param {number} number   The number to compare against to use either the
  *                          singular or plural form.
- * @param {string}  context Context information for the translators.
- * @param {?string} domain  Domain to retrieve the translated text.
+ * @param {string} context  Context information for the translators.
+ * @param {string} [domain] Domain to retrieve the translated text.
  *
  * @return {string} The translated singular or plural form.
  */
@@ -149,8 +154,8 @@ export function _nx( single, plural, number, context, domain ) {
  * Returns a formatted string. If an error occurs in applying the format, the
  * original format string is returned.
  *
- * @param {string}   format  The format of the string to generate.
- * @param {...string} args Arguments to apply to the format.
+ * @param {string}    format The format of the string to generate.
+ * @param {...string} args   Arguments to apply to the format.
  *
  * @see http://www.diveintojavascript.com/projects/javascript-sprintf
  *

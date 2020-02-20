@@ -52,7 +52,10 @@ export class BrowserURL extends Component {
 			return;
 		}
 
-		if ( ( postId !== prevProps.postId || postId !== historyId ) && postStatus !== 'auto-draft' ) {
+		if (
+			( postId !== prevProps.postId || postId !== historyId ) &&
+			postStatus !== 'auto-draft'
+		) {
 			this.setBrowserURL( postId );
 		}
 	}

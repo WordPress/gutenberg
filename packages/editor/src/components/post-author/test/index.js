@@ -48,7 +48,8 @@ describe( 'PostAuthor', () => {
 				<PostAuthor
 					authors={ authors }
 					user={ user }
-					onUpdateAuthor={ onUpdateAuthor } />
+					onUpdateAuthor={ onUpdateAuthor }
+				/>
 			);
 
 			wrapper.find( 'select' ).simulate( 'change', {

@@ -15,9 +15,22 @@ import { Button, Dashicon } from '@wordpress/components';
 import Inserter from '../inserter';
 import styles from './styles.scss';
 
-function ButtonBlockAppender( { rootClientId, getStylesFromColorScheme } ) {
-	const appenderStyle = { ...styles.appender, ...getStylesFromColorScheme( styles.appenderLight, styles.appenderDark ) };
-	const addBlockButtonStyle = getStylesFromColorScheme( styles.addBlockButton, styles.addBlockButtonDark );
+function ButtonBlockAppender( {
+	rootClientId,
+	getStylesFromColorScheme,
+	showSeparator,
+} ) {
+	const appenderStyle = {
+		...styles.appender,
+		...getStylesFromColorScheme(
+			styles.appenderLight,
+			styles.appenderDark
+		),
+	};
+	const addBlockButtonStyle = getStylesFromColorScheme(
+		styles.addBlockButton,
+		styles.addBlockButtonDark
+	);
 
 	return (
 		<>
@@ -43,6 +56,7 @@ function ButtonBlockAppender( { rootClientId, getStylesFromColorScheme } ) {
 					</Button>
 				) }
 				isAppender
+				showSeparator={ showSeparator }
 			/>
 		</>
 	);

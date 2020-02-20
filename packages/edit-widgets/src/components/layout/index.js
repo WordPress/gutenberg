@@ -9,6 +9,7 @@ import {
 	SlotFillProvider,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -23,6 +24,7 @@ function Layout( { blockEditorSettings } ) {
 	return (
 		<SlotFillProvider>
 			<DropZoneProvider>
+				<BlockEditorKeyboardShortcuts.Register />
 				<Header />
 				<Sidebar />
 				<Notices />

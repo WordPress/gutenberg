@@ -41,6 +41,7 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
  * var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
+ * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
  *
  * function onButtonClick() {
  * 	alert( 'Button clicked.' );
@@ -50,19 +51,20 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  * 	return wp.element.createElement(
  * 		PluginMoreMenuItem,
  * 		{
- * 			icon: 'smiley',
- * 			onClick: onButtonClick
+ * 			icon: moreIcon,
+ * 			onClick: onButtonClick,
  * 		},
  * 		__( 'My button title' )
- * 	)
+ * 	);
  * }
  * ```
  *
  * @example <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PluginMoreMenuItem } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginMoreMenuItem } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * function onButtonClick() {
  * 	alert( 'Button clicked.' );
@@ -70,7 +72,7 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  *
  * const MyButtonMoreMenuItem = () => (
  * 	<PluginMoreMenuItem
- * 		icon="smiley"
+ * 		icon={ more }
  * 		onClick={ onButtonClick }
  * 	>
  * 		{ __( 'My button title' ) }
@@ -85,5 +87,5 @@ export default compose(
 		return {
 			icon: ownProps.icon || context.icon,
 		};
-	} ),
+	} )
 )( PluginMoreMenuItem );

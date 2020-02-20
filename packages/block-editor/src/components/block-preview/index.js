@@ -9,7 +9,13 @@ import classnames from 'classnames';
  */
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { useLayoutEffect, useState, useRef, useReducer, useMemo } from '@wordpress/element';
+import {
+	useLayoutEffect,
+	useState,
+	useRef,
+	useReducer,
+	useMemo,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -37,24 +43,36 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
 			// If we're previewing a single block, scale the preview to fit it.
 			if ( blocks.length === 1 ) {
 				const block = blocks[ 0 ];
-				const previewElement = getBlockPreviewContainerDOMNode( block.clientId, containerElement );
+				const previewElement = getBlockPreviewContainerDOMNode(
+					block.clientId
+				);
 				if ( ! previewElement ) {
 					return;
 				}
 
 				let containerElementRect = containerElement.getBoundingClientRect();
 				containerElementRect = {
-					width: containerElementRect.width - ( padding * 2 ),
-					height: containerElementRect.height - ( padding * 2 ),
+					width: containerElementRect.width - padding * 2,
+					height: containerElementRect.height - padding * 2,
 					left: containerElementRect.left,
 					top: containerElementRect.top,
 				};
 				const scaledElementRect = previewElement.getBoundingClientRect();
 
-				const scale = containerElementRect.width / scaledElementRect.width || 1;
-				const offsetX = ( -( scaledElementRect.left - containerElementRect.left ) * scale ) + padding;
-				const offsetY = ( containerElementRect.height > scaledElementRect.height * scale ) ?
-					( ( containerElementRect.height - ( scaledElementRect.height * scale ) ) / 2 ) + padding : 0;
+				const scale =
+					containerElementRect.width / scaledElementRect.width || 1;
+				const offsetX =
+					-( scaledElementRect.left - containerElementRect.left ) *
+						scale +
+					padding;
+				const offsetY =
+					containerElementRect.height >
+					scaledElementRect.height * scale
+						? ( containerElementRect.height -
+								scaledElementRect.height * scale ) /
+								2 +
+						  padding
+						: 0;
 
 				setPreviewScale( scale );
 				setPosition( { x: offsetX, y: offsetY } );
@@ -92,34 +110,43 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
 	return (
 		<div
 			ref={ previewRef }
-			className={ classnames( 'block-editor-block-preview__container editor-styles-wrapper', {
-				'is-ready': isReady,
-			} ) }
+			className={ classnames(
+				'block-editor-block-preview__container editor-styles-wrapper',
+				{
+					'is-ready': isReady,
+				}
+			) }
 			aria-hidden
 		>
-			<Disabled style={ previewStyles } className="block-editor-block-preview__content">
+			<Disabled
+				style={ previewStyles }
+				className="block-editor-block-preview__content"
+			>
 				<BlockList />
 			</Disabled>
 		</div>
 	);
 }
 
-export function BlockPreview( { blocks, viewportWidth = 700, padding, settings } ) {
+export function BlockPreview( {
+	blocks,
+	viewportWidth = 700,
+	padding,
+	settings,
+} ) {
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
-	const [ recompute, triggerRecompute ] = useReducer( ( state ) => state + 1, 0 );
+	const [ recompute, triggerRecompute ] = useReducer(
+		( state ) => state + 1,
+		0
+	);
 	useLayoutEffect( triggerRecompute, [ blocks ] );
 	return (
-		<BlockEditorProvider
-			value={ renderedBlocks }
-			settings={ settings }
-		>
-			{
-				/*
-				 * The key prop is used to force recomputing the preview
-				 * by remounting the component, ScaledBlockPreview is not meant to
-				 * be rerendered.
-				 */
-			}
+		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+			{ /*
+			 * The key prop is used to force recomputing the preview
+			 * by remounting the component, ScaledBlockPreview is not meant to
+			 * be rerendered.
+			 */ }
 			<ScaledBlockPreview
 				key={ recompute }
 				blocks={ renderedBlocks }

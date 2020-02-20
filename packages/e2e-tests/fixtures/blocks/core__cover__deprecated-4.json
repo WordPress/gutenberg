@@ -1,0 +1,37 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/cover",
+        "isValid": true,
+        "attributes": {
+            "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+            "id": 35,
+            "hasParallax": false,
+            "dimRatio": 50,
+            "backgroundType": "image",
+            "focalPoint": {
+                "x": "0.07",
+                "y": "0.07"
+            },
+            "title": "",
+            "contentAlign": "center"
+        },
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "align": "center",
+                    "content": "<strong>Cover Block</strong>",
+                    "dropCap": false,
+                    "placeholder": "Write title…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "originalContent": "<p class=\"has-text-align-center has-large-font-size\"><strong>Cover Block</strong></p>"
+            }
+        ],
+        "originalContent": "<div class=\"wp-block-cover has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==);background-position:7.000000000000001% 7.000000000000001%\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+    }
+]

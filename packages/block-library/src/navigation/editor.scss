@@ -1,3 +1,6 @@
+$navigation-height: 60px;
+$navigation-item-height: 46px;
+
 // Reduce the paddings, margins, and UI of inner-blocks.
 // @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
 // When that happens, leverage that instead of the following overrides.
@@ -25,37 +28,14 @@
 		justify-content: flex-end;
 	}
 
-	// 2. Remove paddings on subsequent immediate children.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
-		width: auto;
-		padding-left: 0;
-		padding-right: 0;
-		margin-left: 0;
-		margin-right: 0;
-		margin-bottom: 1em; // Useful for when items wrap.
-	}
-
-	// 3. Remove margins on subsequent Edit container.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit {
-		margin-left: 0;
-		margin-right: 0;
-	}
-
-	// 4. Remove vertical margins on subsequent block container.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout .wp-block > .block-editor-block-list__block-edit > [data-block] {
-		margin-top: 0;
-		margin-bottom: 0;
-	}
-
-	.wp-block-navigation .block-editor-block-list__block-edit::before {
+	.wp-block-navigation .block-editor-block-list__block::before {
 		left: 0;
 		right: 0;
 	}
 
 	// Remove the dashed outlines for child blocks.
-	&.is-hovered .wp-block-navigation .block-editor-block-list__block-edit::before,
-	&.is-selected .wp-block-navigation .block-editor-block-list__block-edit::before,
-	&.has-child-selected .wp-block-navigation .block-editor-block-list__block-edit::before {
+	&.is-selected .wp-block-navigation .block-editor-block-list__block::before,
+	&.has-child-selected .wp-block-navigation .block-editor-block-list__block::before {
 		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
 	}
 
@@ -66,52 +46,26 @@
 
 	// Polish the Appender.
 	.wp-block-navigation .block-list-appender {
-		margin: 0;
+		width: 28px;
+		height: 28px;
 
 		.block-editor-button-block-appender {
 			padding: $grid-size;
+			padding-bottom: $grid-size-small;
+			padding-top: $grid-size-small;
 			outline: none;
 			background: none;
 		}
 	}
-}
 
-.wp-block-navigation .block-editor-block-list__layout,
-.wp-block-navigation {
-	display: flex;
-	flex-wrap: wrap;
+	// Set a min width when the item is focused and empty in order to show the caret.
+	.wp-block-navigation .wp-block-navigation-link.is-selected .block-editor-rich-text__editable:focus {
+		min-width: 20px;
+	}
 }
 
 .wp-block-navigation__inserter-content {
 	padding: $grid-size-large;
-}
-
-/*
- * Adjust Navigation Item.
- */
-.wp-block-navigation .wp-block-navigation-link {
-	margin-right: $grid-size;
-	margin-left: $grid-size;
-
-	.block-editor-block-list__layout {
-		display: block;
-		margin: $grid-size;
-	}
-
-	// Provide a base navigation item margin.
-	// This should be the same inside the field,
-	// and the edit container should compensate.
-	// This is to make sure the edit and view are the same.
-	padding: 0 $grid-size;
-
-	// Only display inner blocks when the block is being edited.
-	.block-editor-inner-blocks {
-		display: none;
-	}
-
-	&.is-editing .block-editor-inner-blocks {
-		display: block;
-	}
 }
 
 /**
@@ -143,13 +97,6 @@ $colors-selector-size: 22px;
 		// Add the button arrow.
 		&::after {
 			@include dropdown-arrow();
-		}
-
-		// Styling button states.
-		&:focus,
-		&:hover {
-			color: $dark-gray-500;
-			box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px #fff;
 		}
 	}
 
@@ -191,12 +138,8 @@ $color-control-label-height: 20px;
 		float: right;
 		margin-top: 2px;
 	}
-}
 
-.block-editor-block-mover {
-	&.is-horizontal {
-		.block-editor-block-mover__control-drag-handle {
-			display: none;
-		}
+	.components-panel__body-title {
+		display: none;
 	}
 }

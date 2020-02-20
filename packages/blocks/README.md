@@ -627,6 +627,15 @@ _Returns_
 
 -   `Array`: A list of blocks.
 
+<a name="registerBlockCollection" href="#registerBlockCollection">#</a> **registerBlockCollection**
+
+Registers a new block collection to group blocks in the same namespace in the inserter.
+
+_Parameters_
+
+-   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace
+-   _settings_ `Object`: An object composed of a title to show in the inserter, and an icon to show in the inserter
+
 <a name="registerBlockStyle" href="#registerBlockStyle">#</a> **registerBlockStyle**
 
 Registers a new block style variation for the given block.
@@ -650,6 +659,15 @@ _Parameters_
 _Returns_
 
 -   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
+
+<a name="registerBlockVariation" href="#registerBlockVariation">#</a> **registerBlockVariation**
+
+Registers a new block variation for the given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of the block (example: “core/columns”).
+-   _variation_ `WPBlockVariation`: Object describing a block variation.
 
 <a name="serialize" href="#serialize">#</a> **serialize**
 
@@ -755,6 +773,15 @@ _Parameters_
 _Returns_
 
 -   `?WPBlock`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
+
+<a name="unregisterBlockVariation" href="#unregisterBlockVariation">#</a> **unregisterBlockVariation**
+
+Unregisters a block variation defined for the given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of the block (example: “core/columns”).
+-   _variationName_ `string`: Name of the variation defined for the block.
 
 <a name="updateCategory" href="#updateCategory">#</a> **updateCategory**
 

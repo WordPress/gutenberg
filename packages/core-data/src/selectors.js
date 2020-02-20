@@ -25,9 +25,15 @@ import { getQueriedItems } from './queried-data';
  *
  * @return {boolean} Whether a request is in progress for an embed preview.
  */
-export const isRequestingEmbedPreview = createRegistrySelector( ( select ) => ( state, url ) => {
-	return select( 'core/data' ).isResolving( REDUCER_KEY, 'getEmbedPreview', [ url ] );
-} );
+export const isRequestingEmbedPreview = createRegistrySelector(
+	( select ) => ( state, url ) => {
+		return select( 'core/data' ).isResolving(
+			REDUCER_KEY,
+			'getEmbedPreview',
+			[ url ]
+		);
+	}
+);
 
 /**
  * Returns all available authors.
@@ -104,7 +110,32 @@ export function getEntity( state, kind, name ) {
  * @return {Object?} Record.
  */
 export function getEntityRecord( state, kind, name, key ) {
-	return get( state.entities.data, [ kind, name, 'queriedData', 'items', key ] );
+	return get( state.entities.data, [
+		kind,
+		name,
+		'queriedData',
+		'items',
+		key,
+	] );
+}
+
+/**
+ * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
+ *
+ * @param {Object} state  State tree
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {number} key    Record's key
+ *
+ * @return {Object?} Record.
+ */
+export function __experimentalGetEntityRecordNoResolver(
+	state,
+	kind,
+	name,
+	key
+) {
+	return getEntityRecord( state, kind, name, key );
 }
 
 /**
@@ -123,13 +154,17 @@ export const getRawEntityRecord = createSelector(
 		const record = getEntityRecord( state, kind, name, key );
 		return (
 			record &&
-							Object.keys( record ).reduce( ( accumulator, _key ) => {
-								// Because edits are the "raw" attribute values,
-								// we return those from record selectors to make rendering,
-								// comparisons, and joins with edits easier.
-								accumulator[ _key ] = get( record[ _key ], 'raw', record[ _key ] );
-								return accumulator;
-							}, {} )
+			Object.keys( record ).reduce( ( accumulator, _key ) => {
+				// Because edits are the "raw" attribute values,
+				// we return those from record selectors to make rendering,
+				// comparisons, and joins with edits easier.
+				accumulator[ _key ] = get(
+					record[ _key ],
+					'raw',
+					record[ _key ]
+				);
+				return accumulator;
+			}, {} )
 		);
 	},
 	( state ) => [ state.entities.data ]
@@ -146,12 +181,71 @@ export const getRawEntityRecord = createSelector(
  * @return {Array} Records.
  */
 export function getEntityRecords( state, kind, name, query ) {
-	const queriedState = get( state.entities.data, [ kind, name, 'queriedData' ] );
+	const queriedState = get( state.entities.data, [
+		kind,
+		name,
+		'queriedData',
+	] );
 	if ( ! queriedState ) {
 		return [];
 	}
 	return getQueriedItems( queriedState, query );
 }
+
+/**
+ * Returns a map of objects with each edited
+ * raw entity record and its corresponding edits.
+ *
+ * The map is keyed by entity `kind => name => key => { rawRecord, edits }`.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {{ [kind: string]: { [name: string]: { [key: string]: { rawRecord: Object<string,*>, edits: Object<string,*> } } } }} The map of edited records with their edits.
+ */
+export const getEntityRecordChangesByRecord = createSelector(
+	( state ) => {
+		const {
+			entities: { data },
+		} = state;
+		return Object.keys( data ).reduce( ( acc, kind ) => {
+			Object.keys( data[ kind ] ).forEach( ( name ) => {
+				const editsKeys = Object.keys(
+					data[ kind ][ name ].edits
+				).filter( ( editsKey ) =>
+					hasEditsForEntityRecord( state, kind, name, editsKey )
+				);
+				if ( editsKeys.length ) {
+					if ( ! acc[ kind ] ) {
+						acc[ kind ] = {};
+					}
+					if ( ! acc[ kind ][ name ] ) {
+						acc[ kind ][ name ] = {};
+					}
+					editsKeys.forEach(
+						( editsKey ) =>
+							( acc[ kind ][ name ][ editsKey ] = {
+								rawRecord: getRawEntityRecord(
+									state,
+									kind,
+									name,
+									editsKey
+								),
+								edits: getEntityRecordNonTransientEdits(
+									state,
+									kind,
+									name,
+									editsKey
+								),
+							} )
+					);
+				}
+			} );
+
+			return acc;
+		}, {} );
+	},
+	( state ) => [ state.entities.data ]
+);
 
 /**
  * Returns the specified entity record's edits.
@@ -212,8 +306,9 @@ export const getEntityRecordNonTransientEdits = createSelector(
 export function hasEditsForEntityRecord( state, kind, name, recordId ) {
 	return (
 		isSavingEntityRecord( state, kind, name, recordId ) ||
-		Object.keys( getEntityRecordNonTransientEdits( state, kind, name, recordId ) )
-			.length > 0
+		Object.keys(
+			getEntityRecordNonTransientEdits( state, kind, name, recordId )
+		).length > 0
 	);
 }
 
@@ -283,7 +378,13 @@ export function isSavingEntityRecord( state, kind, name, recordId ) {
  * @return {Object?} The entity record's save error.
  */
 export function getLastEntitySaveError( state, kind, name, recordId ) {
-	return get( state.entities.data, [ kind, name, 'saving', recordId, 'error' ] );
+	return get( state.entities.data, [
+		kind,
+		name,
+		'saving',
+		recordId,
+		'error',
+	] );
 }
 
 /**
@@ -482,9 +583,14 @@ export function getAutosave( state, postType, postId, authorId ) {
  *
  * @return {boolean} True if the REST request was completed. False otherwise.
  */
-export const hasFetchedAutosaves = createRegistrySelector( ( select ) => ( state, postType, postId ) => {
-	return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [ postType, postId ] );
-} );
+export const hasFetchedAutosaves = createRegistrySelector(
+	( select ) => ( state, postType, postId ) => {
+		return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [
+			postType,
+			postId,
+		] );
+	}
+);
 
 /**
  * Returns a new reference when edited values have changed. This is useful in
@@ -506,5 +612,5 @@ export const hasFetchedAutosaves = createRegistrySelector( ( select ) => ( state
  */
 export const getReferenceByDistinctEdits = createSelector(
 	() => [],
-	( state ) => [ state.undo.length, state.undo.offset ],
+	( state ) => [ state.undo.length, state.undo.offset ]
 );

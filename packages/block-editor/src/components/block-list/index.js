@@ -6,17 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import __experimentalBlockListFooter from '../block-list-footer';
-import useMultiSelection from './use-multi-selection';
+import RootContainer from './root-container';
+import useBlockDropZone from '../block-drop-zone';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -35,9 +34,9 @@ const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
 function BlockList( {
 	className,
 	rootClientId,
-	__experimentalMoverDirection: moverDirection = 'vertical',
 	isDraggable,
 	renderAppender,
+	__experimentalUIParts = {},
 } ) {
 	function selector( select ) {
 		const {
@@ -56,10 +55,9 @@ function BlockList( {
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
-			enableAnimation: (
+			enableAnimation:
 				! isTyping() &&
-				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD
-			),
+				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 		};
 	}
 
@@ -71,50 +69,66 @@ function BlockList( {
 		hasMultiSelection,
 		enableAnimation,
 	} = useSelect( selector, [ rootClientId ] );
+
+	const Container = rootClientId ? 'div' : RootContainer;
 	const ref = useRef();
-	const onSelectionStart = useMultiSelection( { ref, rootClientId } );
+	const targetClientId = useBlockDropZone( {
+		element: ref,
+		rootClientId,
+	} );
+	const __experimentalContainerProps = rootClientId
+		? {}
+		: { hasPopover: __experimentalUIParts.hasPopover };
 
 	return (
-		<div
+		<Container
 			ref={ ref }
 			className={ classnames(
 				'block-editor-block-list__layout',
 				className
 			) }
+			{ ...__experimentalContainerProps }
 		>
 			{ blockClientIds.map( ( clientId, index ) => {
-				const isBlockInSelection = hasMultiSelection ?
-					multiSelectedBlockClientIds.includes( clientId ) :
-					selectedBlockClientId === clientId;
+				const isBlockInSelection = hasMultiSelection
+					? multiSelectedBlockClientIds.includes( clientId )
+					: selectedBlockClientId === clientId;
 
 				return (
-					<BlockAsyncModeProvider
-						key={ 'block-' + clientId }
-						clientId={ clientId }
-						isBlockInSelection={ isBlockInSelection }
+					<AsyncModeProvider
+						key={ clientId }
+						value={ ! isBlockInSelection }
 					>
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
-							onSelectionStart={ onSelectionStart }
 							isDraggable={ isDraggable }
-							moverDirection={ moverDirection }
 							isMultiSelecting={ isMultiSelecting }
 							// This prop is explicitely computed and passed down
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
 							animateOnChange={ index }
 							enableAnimation={ enableAnimation }
+							hasSelectedUI={
+								__experimentalUIParts.hasSelectedUI
+							}
+							className={
+								clientId === targetClientId
+									? 'is-drop-target'
+									: undefined
+							}
 						/>
-					</BlockAsyncModeProvider>
+					</AsyncModeProvider>
 				);
 			} ) }
 			<BlockListAppender
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
+				className={
+					targetClientId === null ? 'is-drop-target' : undefined
+				}
 			/>
-			<__experimentalBlockListFooter.Slot />
-		</div>
+		</Container>
 	);
 }
 

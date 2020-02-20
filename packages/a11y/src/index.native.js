@@ -14,8 +14,6 @@ export const speak = function( message, ariaLive ) {
 	message = filterMessage( message );
 	//TODO: Use native module to speak message
 	if ( 'assertive' === ariaLive ) {
-
 	} else {
-
 	}
 };

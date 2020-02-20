@@ -1,3 +1,26 @@
+## Master
+
+## 5.4.0 (2020-02-04)
+
+### Bug Fixes
+
+- Use `require.resolve()` instead of `<rootDir>` to resolve `jest` config files according to the NodeJS lookup algorithm. ([#19957](https://github.com/WordPress/gutenberg/pull/19957))
+
+## 5.3.1 (2020-01-01)
+
+### Bug Fixes
+
+- Fix preset file extension for inclusion in NPM deployments. ([#19306](https://github.com/WordPress/gutenberg/pull/19306)).
+
+## 5.3.0 (2019-12-20)
+
+### New Features
+
+- Added support to collapse or omit successful test results from Travis CI builds ([#16744](https://github.com/WordPress/gutenberg/issues/16744))
+
+
+## 5.2.0 (2019-11-15)
+
 ## 5.1.0 (2019-09-03)
 
 ### Bug Fixes

@@ -3,7 +3,7 @@
  */
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
-import { get, escape, unescape } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { KeyboardShortcuts, withFocusOutside } from '@wordpress/components';
+import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
@@ -35,7 +35,6 @@ class PostTitle extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.redirectHistory = this.redirectHistory.bind( this );
 
 		this.state = {
 			isSelected: false,
@@ -67,26 +66,6 @@ class PostTitle extends Component {
 		}
 	}
 
-	/**
-	 * Emulates behavior of an undo or redo on its corresponding key press
-	 * combination. This is a workaround to React's treatment of undo in a
-	 * controlled textarea where characters are updated one at a time.
-	 * Instead, leverage the store's undo handling of title changes.
-	 *
-	 * @see https://github.com/facebook/react/issues/8514
-	 *
-	 * @param {KeyboardEvent} event Key event.
-	 */
-	redirectHistory( event ) {
-		if ( event.shiftKey ) {
-			this.props.onRedo();
-		} else {
-			this.props.onUndo();
-		}
-
-		event.preventDefault();
-	}
-
 	render() {
 		const {
 			hasFixedToolbar,
@@ -111,21 +90,21 @@ class PostTitle extends Component {
 			<PostTypeSupportCheck supportKeys="title">
 				<div className="editor-post-title">
 					<div className={ className }>
-						<KeyboardShortcuts
-							shortcuts={ {
-								'mod+z': this.redirectHistory,
-								'mod+shift+z': this.redirectHistory,
-							} }
-						>
-							<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
+						<div>
+							<label
+								htmlFor={ `post-title-${ instanceId }` }
+								className="screen-reader-text"
+							>
 								{ decodedPlaceholder || __( 'Add title' ) }
 							</label>
 							<Textarea
 								id={ `post-title-${ instanceId }` }
 								className="editor-post-title__input"
-								value={ unescape( title ) }
+								value={ title }
 								onChange={ this.onChange }
-								placeholder={ decodedPlaceholder || __( 'Add title' ) }
+								placeholder={
+									decodedPlaceholder || __( 'Add title' )
+								}
 								onFocus={ this.onSelect }
 								onKeyDown={ this.onKeyDown }
 								onKeyPress={ this.onUnselect }
@@ -136,11 +115,16 @@ class PostTitle extends Component {
 									right away, without needing to click anything.
 								*/
 								/* eslint-disable jsx-a11y/no-autofocus */
-								autoFocus={ document.body === document.activeElement && isCleanNewPost }
+								autoFocus={
+									document.body === document.activeElement &&
+									isCleanNewPost
+								}
 								/* eslint-enable jsx-a11y/no-autofocus */
 							/>
-						</KeyboardShortcuts>
-						{ isSelected && isPostTypeViewable && <PostPermalink /> }
+						</div>
+						{ isSelected && isPostTypeViewable && (
+							<PostPermalink />
+						) }
 					</div>
 				</div>
 			</PostTypeSupportCheck>
@@ -166,25 +150,18 @@ const applyWithSelect = withSelect( ( select ) => {
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const {
-		insertDefaultBlock,
-		clearSelectedBlock,
-	} = dispatch( 'core/block-editor' );
-	const {
-		editPost,
-		undo,
-		redo,
-	} = dispatch( 'core/editor' );
+	const { insertDefaultBlock, clearSelectedBlock } = dispatch(
+		'core/block-editor'
+	);
+	const { editPost } = dispatch( 'core/editor' );
 
 	return {
 		onEnterPress() {
 			insertDefaultBlock( undefined, undefined, 0 );
 		},
 		onUpdate( title ) {
-			editPost( { title: escape( title ) } );
+			editPost( { title } );
 		},
-		onUndo: undo,
-		onRedo: redo,
 		clearSelectedBlock,
 	};
 } );

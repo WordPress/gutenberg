@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RenderAppender prop of InnerBlocks  Users can customize the appender and can still insert blocks using exposed components 1`] = `
+"<!-- wp:test/inner-blocks-render-appender -->
+<div style=\\"outline:1px solid gray;padding:5px\\" class=\\"wp-block-test-inner-blocks-render-appender\\"><!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
+<!-- /wp:quote --></div>
+<!-- /wp:test/inner-blocks-render-appender -->"
+`;
+
+exports[`RenderAppender prop of InnerBlocks  Users can dynamically customize the appender 1`] = `
+"<!-- wp:test/inner-blocks-render-appender-dynamic -->
+<div style=\\"outline:1px solid gray;padding:5px\\" class=\\"wp-block-test-inner-blocks-render-appender-dynamic\\"><!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:video -->
+<figure class=\\"wp-block-video\\"></figure>
+<!-- /wp:video --></div>
+<!-- /wp:test/inner-blocks-render-appender-dynamic -->"
+`;

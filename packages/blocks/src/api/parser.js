@@ -31,12 +31,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @type {Set}
  */
-const STRING_SOURCES = new Set( [
-	'attribute',
-	'html',
-	'text',
-	'tag',
-] );
+const STRING_SOURCES = new Set( [ 'attribute', 'html', 'text', 'tag' ] );
 
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
@@ -49,23 +44,24 @@ const STRING_SOURCES = new Set( [
  *
  * @return {Function} Enhanced hpq matcher.
  */
-export const toBooleanAttributeMatcher = ( matcher ) => flow( [
-	matcher,
-	// Expected values from `attr( 'disabled' )`:
-	//
-	// <input>
-	// - Value:       `undefined`
-	// - Transformed: `false`
-	//
-	// <input disabled>
-	// - Value:       `''`
-	// - Transformed: `true`
-	//
-	// <input disabled="disabled">
-	// - Value:       `'disabled'`
-	// - Transformed: `true`
-	( value ) => value !== undefined,
-] );
+export const toBooleanAttributeMatcher = ( matcher ) =>
+	flow( [
+		matcher,
+		// Expected values from `attr( 'disabled' )`:
+		//
+		// <input>
+		// - Value:       `undefined`
+		// - Transformed: `false`
+		//
+		// <input disabled>
+		// - Value:       `''`
+		// - Transformed: `true`
+		//
+		// <input disabled="disabled">
+		// - Value:       `'disabled'`
+		// - Transformed: `true`
+		( value ) => value !== undefined,
+	] );
 
 /**
  * Returns true if value is of the given JSON schema type, or false otherwise.
@@ -195,12 +191,16 @@ export function matcherFromSource( sourceConfig ) {
 		case 'node':
 			return node( sourceConfig.selector );
 		case 'query':
-			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
+			const subMatchers = mapValues(
+				sourceConfig.query,
+				matcherFromSource
+			);
 			return query( sourceConfig.selector, subMatchers );
 		case 'tag':
 			return flow( [
 				prop( sourceConfig.selector, 'nodeName' ),
-				( nodeName ) => nodeName ? nodeName.toLowerCase() : undefined,
+				( nodeName ) =>
+					nodeName ? nodeName.toLowerCase() : undefined,
 			] );
 		default:
 			// eslint-disable-next-line no-console
@@ -233,14 +233,21 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
  *
  * @return {*} Attribute value.
  */
-export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
+export function getBlockAttribute(
+	attributeKey,
+	attributeSchema,
+	innerHTML,
+	commentAttributes
+) {
 	const { type, enum: enumSet } = attributeSchema;
 	let value;
 
 	switch ( attributeSchema.source ) {
 		// undefined source means that it's an attribute serialized to the block's "comment"
 		case undefined:
-			value = commentAttributes ? commentAttributes[ attributeKey ] : undefined;
+			value = commentAttributes
+				? commentAttributes[ attributeKey ]
+				: undefined;
 			break;
 		case 'attribute':
 		case 'property':
@@ -276,11 +283,23 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
  *
  * @return {Object} All block attributes.
  */
-export function getBlockAttributes( blockTypeOrName, innerHTML, attributes = {} ) {
+export function getBlockAttributes(
+	blockTypeOrName,
+	innerHTML,
+	attributes = {}
+) {
 	const blockType = normalizeBlockType( blockTypeOrName );
-	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
-		return getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
-	} );
+	const blockAttributes = mapValues(
+		blockType.attributes,
+		( attributeSchema, attributeKey ) => {
+			return getBlockAttribute(
+				attributeKey,
+				attributeSchema,
+				innerHTML,
+				attributes
+			);
+		}
+	);
 
 	return applyFilters(
 		'blocks.getBlockAttributes',
@@ -359,10 +378,10 @@ export function getMigratedBlock( block, parsedAttributes ) {
 		// inner blocks.
 		const { migrate } = deprecatedBlockType;
 		if ( migrate ) {
-			( [
+			[
 				migratedAttributes = parsedAttributes,
 				migratedInnerBlocks = innerBlocks,
-			] = castArray( migrate( migratedAttributes, innerBlocks ) ) );
+			] = castArray( migrate( migratedAttributes, innerBlocks ) );
 		}
 
 		block = {
@@ -385,14 +404,11 @@ export function getMigratedBlock( block, parsedAttributes ) {
  */
 export function createBlockWithFallback( blockNode ) {
 	const { blockName: originalName } = blockNode;
-	let {
-		attrs: attributes,
-		innerBlocks = [],
-		innerHTML,
-	} = blockNode;
+	let { attrs: attributes, innerBlocks = [], innerHTML } = blockNode;
 	const { innerContent } = blockNode;
 	const freeformContentFallbackBlock = getFreeformContentHandlerName();
-	const unregisteredFallbackBlock = getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
+	const unregisteredFallbackBlock =
+		getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
 
 	attributes = attributes || {};
 
@@ -411,6 +427,14 @@ export function createBlockWithFallback( blockNode ) {
 	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
 	if ( 'core/text' === name || 'core/cover-text' === name ) {
 		name = 'core/paragraph';
+	}
+
+	// Convert derivative blocks such as 'core/social-link-wordpress' to the
+	// canonical form 'core/social-link'.
+	if ( name && name.indexOf( 'core/social-link-' ) === 0 ) {
+		// Capture `social-link-wordpress` into `{"service":"wordpress"}`
+		attributes.service = name.substring( 17 );
+		name = 'core/social-link';
 	}
 
 	// Fallback content may be upgraded from classic editor expecting implicit
@@ -439,15 +463,16 @@ export function createBlockWithFallback( blockNode ) {
 		// carries the block's own HTML and not its nested blocks'.
 		const originalUndelimitedContent = serializeBlockNode(
 			reconstitutedBlockNode,
-			{ isCommentDelimited: false }
+			{
+				isCommentDelimited: false,
+			}
 		);
 
 		// Preserve full block content for use by the unregistered type
 		// handler, block boundaries included.
-		const originalContent = serializeBlockNode(
-			reconstitutedBlockNode,
-			{ isCommentDelimited: true }
-		);
+		const originalContent = serializeBlockNode( reconstitutedBlockNode, {
+			isCommentDelimited: true,
+		} );
 
 		// If detected as a block which is not registered, preserve comment
 		// delimiters in content of unregistered type handler.
@@ -456,7 +481,11 @@ export function createBlockWithFallback( blockNode ) {
 		}
 
 		name = unregisteredFallbackBlock;
-		attributes = { originalName, originalContent, originalUndelimitedContent };
+		attributes = {
+			originalName,
+			originalContent,
+			originalUndelimitedContent,
+		};
 		blockType = getBlockType( name );
 	}
 
@@ -469,10 +498,9 @@ export function createBlockWithFallback( blockNode ) {
 	// empty freeform block nodes. See https://github.com/WordPress/gutenberg/pull/17164.
 	innerBlocks = innerBlocks.filter( ( innerBlock ) => innerBlock );
 
-	const isFallbackBlock = (
+	const isFallbackBlock =
 		name === freeformContentFallbackBlock ||
-		name === unregisteredFallbackBlock
-	);
+		name === unregisteredFallbackBlock;
 
 	// Include in set only if type was determined.
 	if ( ! blockType || ( ! innerHTML && isFallbackBlock ) ) {
@@ -490,7 +518,11 @@ export function createBlockWithFallback( blockNode ) {
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
 	if ( ! isFallbackBlock ) {
-		const { isValid, validationIssues } = getBlockContentValidationResult( blockType, block.attributes, innerHTML );
+		const { isValid, validationIssues } = getBlockContentValidationResult(
+			blockType,
+			block.attributes,
+			innerHTML
+		);
 		block.isValid = isValid;
 		block.validationIssues = validationIssues;
 	}
@@ -512,7 +544,9 @@ export function createBlockWithFallback( blockNode ) {
 				block.originalContent
 			);
 		} else {
-			block.validationIssues.forEach( ( { log, args } ) => log( ...args ) );
+			block.validationIssues.forEach( ( { log, args } ) =>
+				log( ...args )
+			);
 		}
 	}
 
@@ -542,19 +576,28 @@ export function createBlockWithFallback( blockNode ) {
  */
 export function serializeBlockNode( blockNode, options = {} ) {
 	const { isCommentDelimited = true } = options;
-	const { blockName, attrs = {}, innerBlocks = [], innerContent = [] } = blockNode;
+	const {
+		blockName,
+		attrs = {},
+		innerBlocks = [],
+		innerContent = [],
+	} = blockNode;
 
 	let childIndex = 0;
-	const content = innerContent.map( ( item ) =>
-		// `null` denotes a nested block, otherwise we have an HTML fragment
-		item !== null ?
-			item :
-			serializeBlockNode( innerBlocks[ childIndex++ ], options )
-	).join( '\n' ).replace( /\n+/g, '\n' ).trim();
+	const content = innerContent
+		.map( ( item ) =>
+			// `null` denotes a nested block, otherwise we have an HTML fragment
+			item !== null
+				? item
+				: serializeBlockNode( innerBlocks[ childIndex++ ], options )
+		)
+		.join( '\n' )
+		.replace( /\n+/g, '\n' )
+		.trim();
 
-	return isCommentDelimited ?
-		getCommentDelimitedContent( blockName, attrs, content ) :
-		content;
+	return isCommentDelimited
+		? getCommentDelimitedContent( blockName, attrs, content )
+		: content;
 }
 
 /**
@@ -564,8 +607,8 @@ export function serializeBlockNode( blockNode, options = {} ) {
  *
  * @return {Function} An implementation which parses the post content.
  */
-const createParse = ( parseImplementation ) =>
-	( content ) => parseImplementation( content ).reduce( ( accumulator, blockNode ) => {
+const createParse = ( parseImplementation ) => ( content ) =>
+	parseImplementation( content ).reduce( ( accumulator, blockNode ) => {
 		const block = createBlockWithFallback( blockNode );
 		if ( block ) {
 			accumulator.push( block );

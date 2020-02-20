@@ -11,7 +11,9 @@ import {
 
 async function openBlockNavigator() {
 	await pressKeyWithModifier( 'access', 'o' );
-	await page.waitForSelector( '.block-editor-block-navigation__item-button.is-selected' );
+	await page.waitForSelector(
+		'.block-editor-block-navigation__item-button.is-selected'
+	);
 }
 
 describe( 'Navigating the block hierarchy', () => {
@@ -24,7 +26,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
-		await pressKeyTimes( 'Tab', 3 ); // Tab to inserter.
+		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
@@ -33,11 +35,17 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the columns blocks.
 		await page.click( '[aria-label="Block navigation"]' );
-		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]" ) )[ 0 ];
+		const columnsBlockMenuItem = (
+			await page.$x(
+				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]"
+			)
+		 )[ 0 ];
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
-		await page.focus( '.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]' );
+		await page.focus(
+			'.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]'
+		);
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );
@@ -45,13 +53,15 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the last column block.
 		await page.click( '[aria-label="Block navigation"]' );
-		const lastColumnsBlockMenuItem = ( await page.$x(
-			"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
-		) )[ 3 ];
+		const lastColumnsBlockMenuItem = (
+			await page.$x(
+				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
+			)
+		 )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
 
 		// Insert text in the last column block.
-		await pressKeyTimes( 'Tab', 3 ); // Tab to inserter.
+		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
@@ -66,7 +76,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
-		await pressKeyTimes( 'Tab', 3 ); // Tab to inserter.
+		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
@@ -78,7 +88,6 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Move focus to the sidebar area.
-		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
@@ -94,7 +103,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
 
 		// Insert text in the last column block
-		await pressKeyTimes( 'Tab', 3 ); // Tab to inserter.
+		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.

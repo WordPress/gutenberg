@@ -29,12 +29,18 @@ export const KeyboardAwareFlatList = ( {
 		} }
 		onKeyboardDidHide={ () => {
 			setTimeout( () => {
-				if ( ! this.keyboardWillShowIndicator &&
+				if (
+					! this.keyboardWillShowIndicator &&
 					this.latestContentOffsetY !== undefined &&
-					! shouldPreventAutomaticScroll() ) {
+					! shouldPreventAutomaticScroll()
+				) {
 					// Reset the content position if keyboard is still closed
 					if ( this.scrollViewRef ) {
-						this.scrollViewRef.props.scrollToPosition( 0, this.latestContentOffsetY, true );
+						this.scrollViewRef.props.scrollToPosition(
+							0,
+							this.latestContentOffsetY,
+							true
+						);
 					}
 				}
 			}, 50 );
@@ -44,16 +50,22 @@ export const KeyboardAwareFlatList = ( {
 		} }
 		onScroll={ ( event ) => {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
-		} } >
+		} }
+	>
 		<FlatList { ...listProps } />
 	</KeyboardAwareScrollView>
 );
 
-KeyboardAwareFlatList.handleCaretVerticalPositionChange = ( scrollView, targetId, caretY, previousCaretY ) => {
-	if ( previousCaretY ) { //if this is not the first tap
+KeyboardAwareFlatList.handleCaretVerticalPositionChange = (
+	scrollView,
+	targetId,
+	caretY,
+	previousCaretY
+) => {
+	if ( previousCaretY ) {
+		//if this is not the first tap
 		scrollView.props.refreshScrollForField( targetId );
 	}
 };
 
 export default KeyboardAwareFlatList;
-

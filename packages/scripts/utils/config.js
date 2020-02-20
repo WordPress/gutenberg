@@ -6,14 +6,22 @@ const { basename } = require( 'path' );
 /**
  * Internal dependencies
  */
-const { getArgsFromCLI, getFileArgsFromCLI, hasArgInCLI, hasFileArgInCLI } = require( './cli' );
+const {
+	getArgsFromCLI,
+	getFileArgsFromCLI,
+	hasArgInCLI,
+	hasFileArgInCLI,
+} = require( './cli' );
 const { fromConfigRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
 
+// See https://babeljs.io/docs/en/config-files#configuration-file-types
 const hasBabelConfig = () =>
-	hasProjectFile( '.babelrc' ) ||
 	hasProjectFile( '.babelrc.js' ) ||
+	hasProjectFile( '.babelrc.json' ) ||
 	hasProjectFile( 'babel.config.js' ) ||
+	hasProjectFile( 'babel.config.json' ) ||
+	hasProjectFile( '.babelrc' ) ||
 	hasPackageProp( 'babel' );
 
 const hasJestConfig = () =>
@@ -23,7 +31,18 @@ const hasJestConfig = () =>
 	hasProjectFile( 'jest.config.json' ) ||
 	hasPackageProp( 'jest' );
 
-const hasWebpackConfig = () => hasArgInCLI( '--config' ) ||
+const hasPrettierConfig = () =>
+	hasProjectFile( '.prettierrc.js' ) ||
+	hasProjectFile( '.prettierrc.json' ) ||
+	hasProjectFile( '.prettierrc.toml' ) ||
+	hasProjectFile( '.prettierrc.yaml' ) ||
+	hasProjectFile( '.prettierrc.yml' ) ||
+	hasProjectFile( 'prettier.config.js' ) ||
+	hasProjectFile( '.prettierrc' ) ||
+	hasPackageProp( 'prettier' );
+
+const hasWebpackConfig = () =>
+	hasArgInCLI( '--config' ) ||
 	hasProjectFile( 'webpack.config.js' ) ||
 	hasProjectFile( 'webpack.config.babel.js' );
 
@@ -40,7 +59,8 @@ const hasWebpackConfig = () => hasArgInCLI( '--config' ) ||
 const getWebpackArgs = ( additionalArgs = [] ) => {
 	let webpackArgs = getArgsFromCLI();
 
-	const hasWebpackOutputOption = hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
+	const hasWebpackOutputOption =
+		hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
 	if ( hasFileArgInCLI() && ! hasWebpackOutputOption ) {
 		/**
 		 * Converts a path to the entry format supported by webpack, e.g.:
@@ -64,7 +84,10 @@ const getWebpackArgs = ( additionalArgs = [] ) => {
 		// The following handles the support for multiple entry points in webpack, e.g.:
 		// `wp-scripts build one.js custom=./two.js` -> `webpack one=./one.js custom=./two.js`
 		webpackArgs = webpackArgs.map( ( cliArg ) => {
-			if ( getFileArgsFromCLI().includes( cliArg ) && ! cliArg.includes( '=' ) ) {
+			if (
+				getFileArgsFromCLI().includes( cliArg ) &&
+				! cliArg.includes( '=' )
+			) {
 				return pathToEntry( cliArg );
 			}
 
@@ -85,4 +108,5 @@ module.exports = {
 	getWebpackArgs,
 	hasBabelConfig,
 	hasJestConfig,
+	hasPrettierConfig,
 };

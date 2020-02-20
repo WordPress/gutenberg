@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * Returns true if application is requesting for downloadable blocks.
  *
  * @param {Object} state       Global application state.
@@ -37,7 +32,7 @@ export function getDownloadableBlocks( state, filterValue ) {
  * @return {boolean} User has permission to install blocks.
  */
 export function hasInstallBlocksPermission( state ) {
-	return state.downloadableBlocks.hasPermission;
+	return state.hasPermission;
 }
 
 /**
@@ -48,5 +43,5 @@ export function hasInstallBlocksPermission( state ) {
  * @return {Array} Block type items.
  */
 export function getInstalledBlockTypes( state ) {
-	return get( state, [ 'downloadableBlocks', 'installedBlockTypes' ], [] );
+	return state.blockManagement.installedBlockTypes;
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject, get } from 'lodash';
+import { merge, isPlainObject, get, has } from 'lodash';
 
 /**
  * Internal dependencies
@@ -142,19 +142,29 @@ const persistencePlugin = function( registry, pluginOptions ) {
 			// to leverage its behavior of returning the same object when none
 			// of the property values changes. This allows a strict reference
 			// equality to bypass a persistence set on an unchanging state.
-			const reducers = keys.reduce( ( accumulator, key ) => Object.assign( accumulator, {
-				[ key ]: ( state, action ) => action.nextState[ key ],
-			} ), {} );
+			const reducers = keys.reduce(
+				( accumulator, key ) =>
+					Object.assign( accumulator, {
+						[ key ]: ( state, action ) => action.nextState[ key ],
+					} ),
+				{}
+			);
 
-			getPersistedState = withLazySameState( combineReducers( reducers ) );
+			getPersistedState = withLazySameState(
+				combineReducers( reducers )
+			);
 		} else {
 			getPersistedState = ( state, action ) => action.nextState;
 		}
 
-		let lastState = getPersistedState( undefined, { nextState: getState() } );
+		let lastState = getPersistedState( undefined, {
+			nextState: getState(),
+		} );
 
 		return () => {
-			const state = getPersistedState( lastState, { nextState: getState() } );
+			const state = getPersistedState( lastState, {
+				nextState: getState(),
+			} );
 			if ( state !== lastState ) {
 				persistence.set( reducerKey, state );
 				lastState = state;
@@ -175,7 +185,10 @@ const persistencePlugin = function( registry, pluginOptions ) {
 					type: '@@WP/PERSISTENCE_RESTORE',
 				} );
 
-				if ( isPlainObject( initialState ) && isPlainObject( persistedState ) ) {
+				if (
+					isPlainObject( initialState ) &&
+					isPlainObject( persistedState )
+				) {
 					// If state is an object, ensure that:
 					// - Other keys are left intact when persisting only a
 					//   subset of keys.
@@ -196,11 +209,13 @@ const persistencePlugin = function( registry, pluginOptions ) {
 
 			const store = registry.registerStore( reducerKey, options );
 
-			store.subscribe( createPersistOnChange(
-				store.getState,
-				reducerKey,
-				options.persist
-			) );
+			store.subscribe(
+				createPersistOnChange(
+					store.getState,
+					reducerKey,
+					options.persist
+				)
+			);
 
 			return store;
 		},
@@ -208,25 +223,52 @@ const persistencePlugin = function( registry, pluginOptions ) {
 };
 
 /**
- * Deprecated: Remove this function once WordPress 5.3 is released.
+ * Deprecated: Remove this function and the code in WordPress Core that calls
+ * it once WordPress 5.4 is released.
  */
 
 persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const persistence = createPersistenceInterface( pluginOptions );
 
-	// Preferences migration to introduce the block editor module
-	const insertUsage = get( persistence.get(), [
+	const state = persistence.get();
+
+	// Migrate 'insertUsage' from 'core/editor' to 'core/block-editor'
+	const insertUsage = get( state, [
 		'core/editor',
 		'preferences',
 		'insertUsage',
 	] );
-
 	if ( insertUsage ) {
 		persistence.set( 'core/block-editor', {
 			preferences: {
 				insertUsage,
 			},
 		} );
+	}
+
+	// Migrate 'areTipsEnabled' from 'core/nux' to 'showWelcomeGuide' in 'core/edit-post'
+	const areTipsEnabled = get( state, [
+		'core/nux',
+		'preferences',
+		'areTipsEnabled',
+	] );
+	const hasWelcomeGuide = has( state, [
+		'core/edit-post',
+		'preferences',
+		'features',
+		'welcomeGuide',
+	] );
+	if ( areTipsEnabled !== undefined && ! hasWelcomeGuide ) {
+		persistence.set(
+			'core/edit-post',
+			merge( state[ 'core/edit-post' ], {
+				preferences: {
+					features: {
+						welcomeGuide: areTipsEnabled,
+					},
+				},
+			} )
+		);
 	}
 };
 

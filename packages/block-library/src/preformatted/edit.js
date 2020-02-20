@@ -4,7 +4,13 @@
 import { __ } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
 
-export default function PreformattedEdit( { attributes, mergeBlocks, setAttributes, className, style } ) {
+export default function PreformattedEdit( {
+	attributes,
+	mergeBlocks,
+	setAttributes,
+	className,
+	style,
+} ) {
 	const { content } = attributes;
 
 	return (

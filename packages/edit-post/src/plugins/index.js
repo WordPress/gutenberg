@@ -25,13 +25,26 @@ registerPlugin( 'edit-post', {
 							<ManageBlocksMenuItem onSelect={ onClose } />
 							<MenuItem
 								role="menuitem"
-								href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_block',
+								} ) }
 							>
-								{ __( 'Manage All Reusable Blocks' ) }
+								{ __( 'Manage all reusable blocks' ) }
 							</MenuItem>
-							<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
+							<KeyboardShortcutsHelpMenuItem
+								onSelect={ onClose }
+							/>
 							<WelcomeGuideMenuItem />
 							<CopyContentMenuItem />
+							<MenuItem
+								role="menuitem"
+								href={ __(
+									'https://wordpress.org/support/article/wordpress-editor/'
+								) }
+								target="_new"
+							>
+								{ __( 'Help' ) }
+							</MenuItem>
 						</>
 					) }
 				</ToolsMoreMenuGroup>

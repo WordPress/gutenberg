@@ -7,9 +7,10 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { IconButton, Toolbar } from '@wordpress/components';
+import { Button, Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+import { chevronLeft } from '@wordpress/icons';
 
 function FullscreenModeClose( { isActive, postType } ) {
 	if ( ! isActive || ! postType ) {
@@ -18,9 +19,11 @@ function FullscreenModeClose( { isActive, postType } ) {
 
 	return (
 		<Toolbar className="edit-post-fullscreen-mode-close__toolbar">
-			<IconButton
-				icon="arrow-left-alt2"
-				href={ addQueryArgs( 'edit.php', { post_type: postType.slug } ) }
+			<Button
+				icon={ chevronLeft }
+				href={ addQueryArgs( 'edit.php', {
+					post_type: postType.slug,
+				} ) }
 				label={ get(
 					postType,
 					[ 'labels', 'view_items' ],

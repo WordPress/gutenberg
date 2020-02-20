@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup } from '@wordpress/components';
+import { moreHorizontal } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,13 +19,13 @@ const POPOVER_PROPS = {
 	position: 'bottom left',
 };
 const TOGGLE_PROPS = {
-	labelPosition: 'bottom',
+	tooltipPosition: 'bottom',
 };
 
 const MoreMenu = () => (
 	<DropdownMenu
 		className="edit-post-more-menu"
-		icon="ellipsis"
+		icon={ moreHorizontal }
 		label={ __( 'More tools & options' ) }
 		popoverProps={ POPOVER_PROPS }
 		toggleProps={ TOGGLE_PROPS }

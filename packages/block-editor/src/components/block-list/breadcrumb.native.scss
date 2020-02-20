@@ -4,11 +4,13 @@
 	justify-content: flex-start;
 	padding-left: 5;
 	padding-right: 15;
+	flex-shrink: 1;
 }
 
 .breadcrumbTitle {
 	color: $white;
 	margin-left: 4;
+	flex-shrink: 1;
 }
 
 .icon {

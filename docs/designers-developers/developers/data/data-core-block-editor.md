@@ -203,6 +203,23 @@ _Returns_
 
 -   `Array`: ClientIDs of the parent blocks.
 
+<a name="getBlockParentsByBlockName" href="#getBlockParentsByBlockName">#</a> **getBlockParentsByBlockName**
+
+Given a block client ID and a block name,
+returns the list of all its parents from top to bottom,
+filtered by the given name.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which to find root client ID.
+-   _blockName_ `string`: Block name to filter.
+-   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
+
+_Returns_
+
+-   `Array`: ClientIDs of the parent blocks.
+
 <a name="getBlockRootClientId" href="#getBlockRootClientId">#</a> **getBlockRootClientId**
 
 Given a block client ID, returns the root block from which the block is
@@ -482,6 +499,18 @@ _Parameters_
 _Returns_
 
 -   `?string`: Adjacent block's client ID, or null if none exists.
+
+<a name="getPreviewDeviceType" href="#getPreviewDeviceType">#</a> **getPreviewDeviceType**
+
+Returns the current editing canvas device type.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Device type.
 
 <a name="getPreviousBlockClientId" href="#getPreviousBlockClientId">#</a> **getPreviousBlockClientId**
 
@@ -892,6 +921,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="duplicateBlocks" href="#duplicateBlocks">#</a> **duplicateBlocks**
+
+Generator that triggers an action used to duplicate a list of blocks.
+
+_Parameters_
+
+-   _clientIds_ `Array<string>`: 
+
 <a name="enterFormattedText" href="#enterFormattedText">#</a> **enterFormattedText**
 
 Returns an action object used in signalling that the caret has entered formatted text.
@@ -915,6 +952,22 @@ Returns an action object hiding the insertion point.
 _Returns_
 
 -   `Object`: Action object.
+
+<a name="insertAfterBlock" href="#insertAfterBlock">#</a> **insertAfterBlock**
+
+Generator used to insert an empty block before a given block.
+
+_Parameters_
+
+-   _clientId_ `string`: 
+
+<a name="insertBeforeBlock" href="#insertBeforeBlock">#</a> **insertBeforeBlock**
+
+Generator used to insert an empty block after a given block.
+
+_Parameters_
+
+-   _clientId_ `string`: 
 
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 
@@ -1172,6 +1225,18 @@ Generators that triggers an action used to enable or disable the navigation mode
 _Parameters_
 
 -   _isNavigationMode_ `string`: Enable/Disable navigation mode.
+
+<a name="setPreviewDeviceType" href="#setPreviewDeviceType">#</a> **setPreviewDeviceType**
+
+Returns an action object used to toggle the width of the editing canvas
+
+_Parameters_
+
+-   _deviceType_ `string`: 
+
+_Returns_
+
+-   `Object`: Action object.
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
