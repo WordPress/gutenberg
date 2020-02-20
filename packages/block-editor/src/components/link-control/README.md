@@ -22,7 +22,7 @@ As of Gutenberg 7.4, `<LinkControl>` became the default link creation interface 
 
 Nonetheless, it should be remembered that `<LinkControl>` builds **on top of** `<URLInput>` and makes use of it under the hood.
 
-The distinction between the two components is perhaps best represented as:
+The distinction between the two components is perhaps best summarized by the following definitions:
 
 * `<URLInput>` - an input for presenting and managing selection behaviors associated with choosing a URL, optionally from a pool of available candidates.
 * `<LinkControl>` - includes the features of `<URLInput>`, plus additional UI and behaviors to control how this URL applies to the concept of a "link". This includes link "settings" (eg: "opens in new tab", etc) and dynamic, "on the fly" link creation capabilities.
