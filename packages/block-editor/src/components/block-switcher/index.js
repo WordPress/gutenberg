@@ -7,7 +7,7 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Dropdown, Button, Toolbar, PanelBody } from '@wordpress/components';
+import { Dropdown, Button, Toolbar, MenuGroup } from '@wordpress/components';
 import {
 	getBlockType,
 	getPossibleBlockTransformations,
@@ -143,10 +143,10 @@ export class BlockSwitcher extends Component {
 							possibleBlockTransformations.length !== 0 ) && (
 							<div className="block-editor-block-switcher__container">
 								{ hasBlockStyles && (
-									<PanelBody
-										title={ __( 'Block Styles' ) }
-										initialOpen
-									>
+									<MenuGroup>
+										<div className="block-editor-block-switcher__label">
+											{ __( 'Styles' ) }
+										</div>
 										<BlockStyles
 											clientId={ blocks[ 0 ].clientId }
 											onSwitch={ onClose }
@@ -154,13 +154,13 @@ export class BlockSwitcher extends Component {
 												this.onHoverClassName
 											}
 										/>
-									</PanelBody>
+									</MenuGroup>
 								) }
 								{ possibleBlockTransformations.length !== 0 && (
-									<PanelBody
-										title={ __( 'Transform To:' ) }
-										initialOpen
-									>
+									<MenuGroup>
+										<div className="block-editor-block-switcher__label">
+											{ __( 'Transform to' ) }
+										</div>
 										<BlockTypesList
 											items={ possibleBlockTransformations.map(
 												( destinationBlockType ) => ( {
@@ -177,7 +177,7 @@ export class BlockSwitcher extends Component {
 												onClose();
 											} }
 										/>
-									</PanelBody>
+									</MenuGroup>
 								) }
 							</div>
 						) }

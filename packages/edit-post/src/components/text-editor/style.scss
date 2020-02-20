@@ -35,7 +35,7 @@
 	}
 
 	// Make room for toolbar.
-	padding-top: $block-controls-height + $grid-unit-10;
+	padding-top: $block-toolbar-height + $grid-unit-10;
 }
 
 // Exit Code Editor toolbar.
@@ -44,8 +44,8 @@
 	top: $grid-unit-10;
 	left: 0;
 	right: 0;
-	height: $block-controls-height;
-	line-height: $block-controls-height;
+	height: $block-toolbar-height;
+	line-height: $block-toolbar-height;
 	padding: 0 $grid-unit-10 0 $grid-unit-20;
 	display: flex;
 

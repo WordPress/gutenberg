@@ -12,8 +12,7 @@
 	}
 
 	// Hide table of contents and block navigation on mobile.
-	.block-editor-block-navigation,
-	.table-of-contents {
+	.block-editor-block-navigation {
 		display: none;
 
 		@include break-small() {
@@ -26,11 +25,10 @@
 .edit-post-header-toolbar__block-toolbar {
 	// Stack toolbar below Editor Bar.
 	position: absolute;
-	top: $header-height + 1px;
+	top: $header-height + $border-width;
 	left: 0;
 	right: 0;
 	background: $white;
-	min-height: 36px;
 	border-bottom: $border-width solid $light-gray-500;
 
 	&:empty {
@@ -61,18 +59,15 @@
 		right: auto;
 		background: none;
 		border-bottom: none;
-		min-height: auto;
 
 		.is-sidebar-opened & {
 			right: auto;
 		}
 
-		.block-editor-block-toolbar {
-			margin: -($grid-unit-10 + $border-width) 0;
-		}
-
 		.block-editor-block-toolbar .components-toolbar {
-			padding: ($grid-unit-10 - $border-width - $border-width) 0;
+			$top-toolbar-padding: ($header-height - $grid-unit-60) / 2;
+			height: $header-height;
+			padding: $top-toolbar-padding 0;
 		}
 	}
 }

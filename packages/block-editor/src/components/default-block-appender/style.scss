@@ -94,21 +94,6 @@
 	&:disabled {
 		display: none;
 	}
-
-	.block-editor-inserter__toggle {
-		border-radius: 50%;
-		width: $block-side-ui-width;
-		height: $block-side-ui-width;
-		padding: 0;
-
-		// Use opacity to work in various editor styles.
-		&:not(:hover) {
-			color: $dark-opacity-500;
-			.is-dark-theme & {
-				color: $light-opacity-500;
-			}
-		}
-	}
 }
 
 .block-editor-default-block-appender .block-editor-inserter {

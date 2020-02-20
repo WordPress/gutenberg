@@ -17,6 +17,11 @@
 		bottom: 10px;
 	}
 
+	// Hide focus rectangle on click.
+	&:active::before {
+		display: none;
+	}
+
 	&:not(:disabled).is-pressed[data-subscript]::after {
 		color: $white;
 	}
