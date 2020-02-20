@@ -46,14 +46,21 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 			webpack( options, ( err, stats ) => {
 				expect( err ).toBeNull();
 
-				const assetFiles = glob(
-					`${ outputDirectory }/*.asset.@(json|php)`
+				let assetFiles = glob(
+					`${ outputDirectory }/assets.@(json|php)`
 				);
-				const expectedLength =
-					typeof options.entry === 'object'
-						? Object.keys( options.entry ).length
-						: 1;
-				expect( assetFiles ).toHaveLength( expectedLength );
+				if ( assetFiles.length > 0 ) {
+					expect( assetFiles ).toHaveLength( 1 );
+				} else {
+					assetFiles = glob(
+						`${ outputDirectory }/*.asset.@(json|php)`
+					);
+					const expectedLength =
+						typeof options.entry === 'object'
+							? Object.keys( options.entry ).length
+							: 1;
+					expect( assetFiles ).toHaveLength( expectedLength );
+				}
 
 				// Asset files should match.
 				assetFiles.forEach( ( assetFile ) => {
