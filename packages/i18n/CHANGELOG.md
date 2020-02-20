@@ -1,3 +1,9 @@
+## Master
+
+### New Feature
+
+- Add `I18nLocale` class to allow creation of multiple i18n instances. (#20332)
+
 ## 3.1.0 (2018-11-15)
 
 ### Enhancements
