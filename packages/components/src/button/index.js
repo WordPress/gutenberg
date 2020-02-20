@@ -10,13 +10,14 @@ import styled from '@emotion/styled';
  */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
+import { additionalStylesHelper } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
-import { additionalStylesHelper } from '@wordpress/primitives';
+import { getTheme } from '../theme-provider';
 
 import styles from './styles';
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
@@ -121,7 +122,7 @@ export function Button(
 
 	const element = (
 		<Tag
-			css={ ( theme ) => [
+			css={ ( theme = getTheme() ) => [
 				styles.base( theme ),
 				( isDefault || isSecondary ) && styles.secondary( theme ),
 				isPrimary && styles.primary( theme ),
