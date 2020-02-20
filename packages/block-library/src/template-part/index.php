@@ -32,7 +32,7 @@ function render_block_core_template_part( $attributes ) {
 	if ( is_null( $content ) ) {
 		return 'Template Part Not Found';
 	}
-	return apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
+	return str_replace( ']]>', ']]&gt;', $content );
 }
 
 /**
