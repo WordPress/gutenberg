@@ -61,6 +61,7 @@ module.exports = {
 		const configDirectoryPath = path.dirname( configPath );
 
 		let config = null;
+		let overrideConfig = {};
 
 		try {
 			config = JSON.parse( await fs.readFile( configPath, 'utf8' ) );
@@ -74,6 +75,30 @@ module.exports = {
 			} else {
 				throw new ValidationError(
 					`Could not read .wp-env.json: ${ error.message }`
+				);
+			}
+		}
+
+		try {
+			overrideConfig = JSON.parse(
+				await fs.readFile(
+					configPath.replace(
+						/\.wp-env\.json$/,
+						'.wp-env.override.json'
+					),
+					'utf8'
+				)
+			);
+		} catch ( error ) {
+			if ( error.code === 'ENOENT' ) {
+				// Config override file does not exist. Do nothing - it's optional.
+			} else if ( error instanceof SyntaxError ) {
+				throw new ValidationError(
+					`Invalid .wp-env.override.json: ${ error.message }`
+				);
+			} else {
+				throw new ValidationError(
+					`Could not read .wp-env.override.json: ${ error.message }`
 				);
 			}
 		}
@@ -101,7 +126,8 @@ module.exports = {
 				port: 8888,
 				testsPort: 8889,
 			},
-			config
+			config,
+			overrideConfig
 		);
 
 		config.port = getNumberFromEnvVariable( 'WP_ENV_PORT' ) || config.port;
