@@ -1,10 +1,3 @@
-export const DEFAULT_ORDER = 'desc';
-export const DEFAULT_ORDER_BY = 'date';
-export const DEFAULT_SHOW_POST_CONTENT = false;
-export const DEFAULT_POST_CONTENT_RADIO = 'excerpt';
-export const DEFAULT_DISPLAY_POST_DATE = false;
-export const DEFAULT_POSTS_TO_SHOW = 5;
-export const DEFAULT_EXCERPT_LENGTH = 55;
 export const MIN_EXCERPT_LENGTH = 10;
 export const MAX_EXCERPT_LENGTH = 100;
 export const MAX_POSTS_COLUMNS = 6;

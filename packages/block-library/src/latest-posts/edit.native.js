@@ -17,7 +17,6 @@ import { fetchRequest } from 'react-native-gutenberg-bridge';
 import {
 	Icon,
 	PanelBody,
-	PanelActions,
 	ToggleControl,
 	SelectControl,
 	RangeControl,
@@ -28,17 +27,7 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
-import {
-	DEFAULT_POSTS_TO_SHOW,
-	DEFAULT_ORDER,
-	DEFAULT_ORDER_BY,
-	DEFAULT_SHOW_POST_CONTENT,
-	DEFAULT_POST_CONTENT_RADIO,
-	DEFAULT_DISPLAY_POST_DATE,
-	DEFAULT_EXCERPT_LENGTH,
-	MIN_EXCERPT_LENGTH,
-	MAX_EXCERPT_LENGTH,
-} from './constants';
+import { MIN_EXCERPT_LENGTH, MAX_EXCERPT_LENGTH } from './constants';
 
 class LatestPostsEdit extends Component {
 	constructor() {
@@ -122,25 +111,6 @@ class LatestPostsEdit extends Component {
 			styles.latestPostBlockSubtitle,
 			styles.latestPostBlockSubtitleDark
 		);
-
-		const onClearSettings = () => {
-			setAttributes( {
-				excerptLength: DEFAULT_EXCERPT_LENGTH,
-				displayPostContent: DEFAULT_SHOW_POST_CONTENT,
-				displayPostContentRadio: DEFAULT_POST_CONTENT_RADIO,
-				displayPostDate: DEFAULT_DISPLAY_POST_DATE,
-				order: DEFAULT_ORDER,
-				orderBy: DEFAULT_ORDER_BY,
-				postsToShow: DEFAULT_POSTS_TO_SHOW,
-			} );
-		};
-
-		const actions = [
-			{
-				label: __( 'Clear All Settings' ),
-				onPress: onClearSettings,
-			},
-		];
 
 		const onSetDisplayPostContent = ( value ) => {
 			setAttributes( { displayPostContent: value } );
@@ -233,7 +203,6 @@ class LatestPostsEdit extends Component {
 					/>
 				</PanelBody>
 
-				<PanelActions actions={ actions } />
 			</InspectorControls>
 		);
 
@@ -249,7 +218,7 @@ class LatestPostsEdit extends Component {
 					<Text style={ titleStyle }>
 						{ blockType.settings.title }
 					</Text>
-					<Text style={ subTitleStyle }>{ __( 'Configure' ) }</Text>
+					<Text style={ subTitleStyle }>{ __( 'Customize' ) }</Text>
 				</View>
 			</TouchableWithoutFeedback>
 		);
