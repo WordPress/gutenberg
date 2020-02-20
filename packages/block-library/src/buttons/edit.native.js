@@ -8,6 +8,7 @@ import {
 } from '@wordpress/block-editor';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -27,6 +28,7 @@ function ButtonsEdit( {
 	attributes,
 	setAttributes,
 	onDelete,
+	onAddNextButton,
 	shouldDelete,
 } ) {
 	const { align } = attributes;
@@ -37,12 +39,19 @@ function ButtonsEdit( {
 
 	function renderAppender() {
 		if ( isSelected ) {
-			return <InnerBlocks.ButtonBlockAppender flex={ false } />;
+			return (
+				<InnerBlocks.ButtonBlockAppender
+					flex={ false }
+					customOnAdd={ onAddNextButton }
+				/>
+			);
 		}
 		return null;
 	}
 
-	const buttonsStyle = { justifyContent: ALIGNMENT_MAP[ align ] };
+	const buttonsStyle = {
+		justifyContent: ALIGNMENT_MAP[ align ],
+	};
 
 	return (
 		<>
@@ -77,12 +86,21 @@ export default compose(
 			shouldDelete: getBlockCount( clientId ) === 1,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId } ) => {
-		const { removeBlock } = dispatch( 'core/block-editor' );
+	withDispatch( ( dispatch, { clientId }, registry ) => {
+		const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+		const { getBlocks } = registry.select( 'core/block-editor' );
+		const innerBlocks = getBlocks( clientId );
+
+		const extendedInnerBlocks = [
+			...innerBlocks,
+			createBlock( 'core/button' ),
+		];
+
 		return {
-			onDelete: () => {
-				removeBlock( clientId );
-			},
+			// The purpose of `onAddNextButton` is giving the ability to automatically
+			// adding `Button` inside `Buttons` block on the appender press event.
+			onAddNextButton: () =>
+				replaceInnerBlocks( clientId, extendedInnerBlocks, false ),
 		};
 	} )
 )( ButtonsEdit );

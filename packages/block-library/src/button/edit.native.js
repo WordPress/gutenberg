@@ -225,12 +225,12 @@ class ButtonEdit extends Component {
 
 	onSetMaxWidth() {
 		const { parentWidth, isSelectedButtonsBlock } = this.props;
-		const { marginRight: unSelectedSpacing } = styles.button;
+		const { marginRight: unselectedSpacing } = styles.button;
 		const { marginRight: selectedSpacing } = styles.buttonsSelected;
 
 		const buttonSpacing = isSelectedButtonsBlock
 			? selectedSpacing
-			: unSelectedSpacing;
+			: unselectedSpacing;
 
 		const maxWidth = parentWidth - 2 * buttonSpacing;
 		this.setState( {

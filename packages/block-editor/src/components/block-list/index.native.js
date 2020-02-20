@@ -117,10 +117,14 @@ export class BlockList extends Component {
 			style,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			__experimentalMoverDirection,
 		} = this.props;
 
 		const forceRefresh =
 			shouldShowInsertionPointBefore || shouldShowInsertionPointAfter;
+
+		const horizontalDirection =
+			__experimentalMoverDirection === 'horizontal';
 
 		return (
 			<View
@@ -152,11 +156,7 @@ export class BlockList extends Component {
 					}
 					ListFooterComponent={ this.renderBlockListFooter }
 					style={ [
-						this.props.__experimentalMoverDirection ===
-							'horizontal' && {
-							flexDirection: 'row',
-							flexWrap: 'wrap',
-						},
+						horizontalDirection && styles.horizontal,
 						style,
 					] }
 				/>
@@ -180,7 +180,11 @@ export class BlockList extends Component {
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			customOnDelete,
+			__experimentalMoverDirection,
 		} = this.props;
+
+		const horizontalDirection =
+			__experimentalMoverDirection === 'horizontal';
 
 		return (
 			<ReadableContentView>
@@ -198,6 +202,7 @@ export class BlockList extends Component {
 						}
 						parentWidth={ this.state.maxWidth }
 						customOnDelete={ customOnDelete }
+						horizontalDirection={ horizontalDirection }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (

@@ -21,6 +21,7 @@ function ButtonBlockAppender( {
 	getStylesFromColorScheme,
 	showSeparator,
 	flex = true,
+	customOnAdd,
 } ) {
 	const appenderStyle = {
 		...styles.appender,
@@ -40,7 +41,7 @@ function ButtonBlockAppender( {
 				rootClientId={ rootClientId }
 				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
 					<Button
-						onClick={ onToggle }
+						onClick={ customOnAdd || onToggle }
 						aria-expanded={ isOpen }
 						disabled={ disabled }
 						fixedRatio={ false }
