@@ -62,12 +62,6 @@ class LatestPostsEdit extends Component {
 		this.isStillMounted = false;
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( ! prevProps.isSelected && this.props.isSelected ) {
-			this.props.openGeneralSidebar();
-		}
-	}
-
 	render() {
 		const {
 			attributes,
@@ -202,7 +196,6 @@ class LatestPostsEdit extends Component {
 						onNumberOfItemsChange={ onSetPostsToShow }
 					/>
 				</PanelBody>
-
 			</InspectorControls>
 		);
 
