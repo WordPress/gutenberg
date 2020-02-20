@@ -77,11 +77,6 @@ Default properties include:
 
 An array of settings objects associated with a link (for example: a setting to determine whether or not the link opens in a new tab). Each object will be used to render a `ToggleControl` for that setting.
 
-### onClose
-
-- Type: `Function`
-- Required: No
-
 ### onChange
 
 - Type: `Function`
