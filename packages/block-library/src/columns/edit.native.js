@@ -83,12 +83,11 @@ function ColumnsEditContainer( {
 						label={ __( 'Number of columns' ) }
 						icon="columns"
 						value={ columnCount }
-						defaultValue={ DEFAULT_COLUMNS }
-						onChangeValue={ ( value ) =>
+						onChange={ ( value ) =>
 							updateColumns( columnCount, value )
 						}
-						minValue={ MIN_COLUMNS_NUMBER }
-						maxValue={ MAX_COLUMNS_NUMBER }
+						min={ MIN_COLUMNS_NUMBER }
+						max={ MAX_COLUMNS_NUMBER }
 					/>
 				</PanelBody>
 			</InspectorControls>
