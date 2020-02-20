@@ -18,7 +18,6 @@ import {
 	Icon,
 	PanelBody,
 	ToggleControl,
-	SelectControl,
 	RangeControl,
 	QueryControls,
 } from '@wordpress/components';
@@ -111,7 +110,9 @@ class LatestPostsEdit extends Component {
 		};
 
 		const onSetDisplayPostContentRadio = ( value ) => {
-			setAttributes( { displayPostContentRadio: value } );
+			setAttributes( {
+				displayPostContentRadio: value ? 'full_post' : 'excerpt',
+			} );
 		};
 
 		const onSetExcerptLength = ( value ) => {
@@ -142,24 +143,17 @@ class LatestPostsEdit extends Component {
 
 		const getInspectorControls = () => (
 			<InspectorControls>
-				<PanelBody title={ __( 'Post Content Settings' ) }>
+				<PanelBody title={ __( 'Post content settings' ) }>
 					<ToggleControl
-						label={ __( 'Show Post Content' ) }
+						label={ __( 'Show post content' ) }
 						checked={ displayPostContent }
 						onChange={ onSetDisplayPostContent }
 					/>
 					{ displayPostContent && (
-						<SelectControl
-							label={ __( 'Show' ) }
-							value={ displayPostContentRadio }
-							onChangeValue={ onSetDisplayPostContentRadio }
-							options={ [
-								{ label: __( 'Excerpt' ), value: 'excerpt' },
-								{
-									label: __( 'Full Post' ),
-									value: 'full_post',
-								},
-							] }
+						<ToggleControl
+							label={ __( 'Show full post content' ) }
+							checked={ displayPostContentRadio === 'full_post' }
+							onChange={ onSetDisplayPostContentRadio }
 						/>
 					) }
 					{ displayPostContent &&
