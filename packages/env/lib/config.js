@@ -151,8 +151,7 @@ module.exports = {
 		}
 
 		const workDirectoryPath = path.resolve(
-			os.homedir(),
-			'.wp-env',
+			getHomeDirectory(),
 			md5( configPath )
 		);
 
@@ -284,6 +283,32 @@ function getNumberFromEnvVariable( varName ) {
 	}
 
 	return maybeNumber;
+}
+
+/**
+ * Gets the `wp-env` home directory in which generated files are created.
+ *
+ * By default, '~/.wp-env/'. On Linux, '~/wp-env/'. Can be overriden with the
+ * WP_ENV_HOME environment variable.
+ *
+ * @return {string} The absolute path to the `wp-env` home directory.
+ */
+function getHomeDirectory() {
+	// Allow user to override download location.
+	if ( process.env.WP_ENV_HOME ) {
+		return path.resolve( process.env.WP_ENV_HOME );
+	}
+
+	/**
+	 * Installing docker with Snap Packages on Linux is common, but does not
+	 * support hidden directories. Therefore we use a public directory on Linux.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325
+	 */
+	return path.resolve(
+		os.homedir(),
+		os.platform() === 'linux' ? 'wp-env' : '.wp-env'
+	);
 }
 
 /**
