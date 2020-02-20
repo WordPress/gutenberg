@@ -213,7 +213,7 @@
 	}
 }
 
-.block-editor-block-toolbar__mover-trigger-wrapper {
+.block-editor-block-toolbar__mover-trigger-wrapper:not(:empty) {
 	@include break-medium() {
 		background-color: $white;
 		border: 1px solid $black;
