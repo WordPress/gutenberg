@@ -104,6 +104,10 @@ module.exports = {
 			config
 		);
 
+		config.port = getNumberFromEnvVariable( 'WP_ENV_PORT' ) || config.port;
+		config.testsPort =
+			getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) || config.testsPort;
+
 		if ( config.core !== null && typeof config.core !== 'string' ) {
 			throw new ValidationError(
 				'Invalid .wp-env.json: "core" must be null or a string.'
@@ -147,8 +151,7 @@ module.exports = {
 		}
 
 		const workDirectoryPath = path.resolve(
-			os.homedir(),
-			'.wp-env',
+			getHomeDirectory(),
 			md5( configPath )
 		);
 
@@ -253,6 +256,59 @@ function includeTestsPath( source ) {
 			'tests-' + path.basename( source.path )
 		),
 	};
+}
+
+/**
+ * Parses an environment variable which should be a number.
+ *
+ * Throws an error if the variable cannot be parsed to a number.
+ * Returns null if the environment variable has not been specified.
+ *
+ * @param {string} varName The environment variable to check (e.g. WP_ENV_PORT).
+ * @return {null|number} The number. Null if it does not exist.
+ */
+function getNumberFromEnvVariable( varName ) {
+	// Allow use of the default if it does not exist.
+	if ( ! process.env[ varName ] ) {
+		return null;
+	}
+
+	const maybeNumber = parseInt( process.env[ varName ] );
+
+	// Throw an error if it is not parseable as a number.
+	if ( isNaN( maybeNumber ) ) {
+		throw new ValidationError(
+			`Invalid environment variable: ${ varName } must be a number.`
+		);
+	}
+
+	return maybeNumber;
+}
+
+/**
+ * Gets the `wp-env` home directory in which generated files are created.
+ *
+ * By default, '~/.wp-env/'. On Linux, '~/wp-env/'. Can be overriden with the
+ * WP_ENV_HOME environment variable.
+ *
+ * @return {string} The absolute path to the `wp-env` home directory.
+ */
+function getHomeDirectory() {
+	// Allow user to override download location.
+	if ( process.env.WP_ENV_HOME ) {
+		return path.resolve( process.env.WP_ENV_HOME );
+	}
+
+	/**
+	 * Installing docker with Snap Packages on Linux is common, but does not
+	 * support hidden directories. Therefore we use a public directory on Linux.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325
+	 */
+	return path.resolve(
+		os.homedir(),
+		os.platform() === 'linux' ? 'wp-env' : '.wp-env'
+	);
 }
 
 /**
