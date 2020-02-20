@@ -11,7 +11,6 @@ import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { close } from '@wordpress/icons';
 
 export function ReusableBlockDeleteButton( {
 	isVisible,
@@ -23,11 +22,7 @@ export function ReusableBlockDeleteButton( {
 	}
 
 	return (
-		<MenuItem
-			icon={ close }
-			disabled={ isDisabled }
-			onClick={ () => onDelete() }
-		>
+		<MenuItem disabled={ isDisabled } onClick={ () => onDelete() }>
 			{ __( 'Remove from Reusable blocks' ) }
 		</MenuItem>
 	);

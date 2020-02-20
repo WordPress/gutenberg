@@ -11,11 +11,9 @@ import {
 	BlockNavigationDropdown,
 	ToolSelector,
 } from '@wordpress/block-editor';
-import {
-	TableOfContents,
-	EditorHistoryRedo,
-	EditorHistoryUndo,
-} from '@wordpress/editor';
+import { EditorHistoryRedo, EditorHistoryUndo } from '@wordpress/editor';
+
+const inserterToggleProps = { isPrimary: true };
 
 function HeaderToolbar() {
 	const { hasFixedToolbar, showInserter, isTextModeEnabled } = useSelect(
@@ -49,12 +47,12 @@ function HeaderToolbar() {
 				disabled={ ! showInserter }
 				position="bottom right"
 				showInserterHelpPanel
+				toggleProps={ inserterToggleProps }
 			/>
+			<ToolSelector />
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
-			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
 			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
-			<ToolSelector />
 			{ ( hasFixedToolbar || ! isLargeViewport ) && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />

@@ -5,4 +5,9 @@
 .block-library-spacer__resize-container {
 	clear: both;
 	margin-bottom: $default-block-margin;
+
+	// Don't show the horizontal indicator.
+	.components-resizable-box__handle::before {
+		content: none;
+	}
 }

@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -17,6 +21,7 @@ import { useShowMoversGestures } from './utils';
 export default function BlockToolbar( { hideDragHandle } ) {
 	const {
 		blockClientIds,
+		hasFixedToolbar,
 		isValid,
 		mode,
 		moverDirection,
@@ -39,6 +44,9 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 		return {
 			blockClientIds: selectedBlockClientIds,
+			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
+				'fixedToolbar'
+			),
 			rootClientId: blockRootClientId,
 			isValid:
 				selectedBlockClientIds.length === 1
@@ -61,7 +69,9 @@ export default function BlockToolbar( { hideDragHandle } ) {
 	} = useShowMoversGestures( { ref: nodeRef } );
 
 	const shouldShowMovers =
-		useViewportMatch( 'medium', '<' ) || ( showMovers && hasMovers );
+		useViewportMatch( 'medium', '<' ) ||
+		hasFixedToolbar ||
+		( showMovers && hasMovers );
 
 	if ( blockClientIds.length === 0 ) {
 		return null;
@@ -75,8 +85,13 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		transform: shouldShowMovers ? 'translateX(0px)' : 'translateX(100%)',
 	};
 
+	const classes = classnames(
+		'block-editor-block-toolbar',
+		! hasFixedToolbar && 'has-responsive-movers'
+	);
+
 	return (
-		<div className="block-editor-block-toolbar">
+		<div className={ classes }>
 			<div
 				className="block-editor-block-toolbar__mover-switcher-container"
 				ref={ nodeRef }

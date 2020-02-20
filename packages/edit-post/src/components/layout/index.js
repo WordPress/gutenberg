@@ -13,6 +13,7 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
+	TableOfContents,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -67,6 +68,7 @@ function Layout() {
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
+		isTextModeEnabled,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -94,9 +96,8 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-			hasBlockSelected: select(
-				'core/block-editor'
-			).getBlockSelectionStart(),
+			isTextModeEnabled:
+				select( 'core/edit-post' ).getEditorMode() === 'text',
 		};
 	}, [] );
 	const sidebarIsOpened =
@@ -167,6 +168,12 @@ function Layout() {
 						mode === 'visual' && (
 							<div className="edit-post-layout__footer">
 								<BlockBreadcrumb />
+
+								<TableOfContents
+									hasOutlineItemsDisabled={
+										isTextModeEnabled
+									}
+								/>
 							</div>
 						)
 					}
@@ -184,10 +191,10 @@ function Layout() {
 								}
 							/>
 						) : (
-							<div className="edit-post-layout__toogle-publish-panel">
+							<div className="edit-post-toggle-publish-panel">
 								<Button
 									isSecondary
-									className="edit-post-layout__toogle-publish-panel-button"
+									className="edit-post-toggle-publish-panel__button"
 									onClick={ togglePublishSidebar }
 									aria-expanded={ false }
 								>

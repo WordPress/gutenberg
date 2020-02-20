@@ -17,12 +17,23 @@ $block-inserter-search-height: 38px;
 }
 
 .block-editor-inserter__popover > .components-popover__content {
-	padding: 0;
+	padding: 0 0 $border-width 0;
 
 	@include break-medium {
 		overflow-y: visible;
 		height: $block-inserter-content-height + $block-inserter-tabs-height + $block-inserter-search-height;
 	}
+}
+
+.block-editor-inserter__toggle.components-button {
+	display: inline-flex;
+	align-items: center;
+	cursor: pointer;
+	border: none;
+	outline: none;
+	padding: 0;
+	transition: color 0.2s ease;
+	@include reduce-motion("transition");
 }
 
 .block-editor-inserter__menu {
