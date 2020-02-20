@@ -409,6 +409,15 @@ function gutenberg_register_packages_styles( &$styles ) {
 
 	gutenberg_override_style(
 		$styles,
+		'wp-plugins',
+		gutenberg_url( 'build/plugins/style.css' ),
+		array( 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'build/plugins/style.css' )
+	);
+	$styles->add_data( 'wp-plugins', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),

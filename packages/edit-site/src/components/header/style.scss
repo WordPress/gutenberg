@@ -33,5 +33,10 @@
 }
 
 .edit-site-header__actions {
+	display: flex;
 	padding: 0 20px;
+	button {
+		margin-right: $grid-size-small;
+		margin-left: $grid-size-small;
+	}
 }

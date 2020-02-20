@@ -1,0 +1,5 @@
+.plugins-sidebar-header__small {
+	@include break-medium() {
+		display: none;
+	}
+}

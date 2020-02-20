@@ -73,6 +73,10 @@ _Returns_
 
 -   `WPComponent`: The component to be rendered.
 
+<a name="PluginSidebar" href="#PluginSidebar">#</a> **PluginSidebar**
+
+Undocumented declaration.
+
 <a name="registerPlugin" href="#registerPlugin">#</a> **registerPlugin**
 
 Registers a plugin to the editor.

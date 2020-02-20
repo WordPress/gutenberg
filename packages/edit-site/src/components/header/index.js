@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { PluginSidebar } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -21,6 +22,7 @@ export default function Header() {
 			</h1>
 			<div className="edit-site-header__actions">
 				<SaveButton />
+				<PluginSidebar.PinnedItemsSlot scope="edit-site/sidebar" />
 			</div>
 		</div>
 	);
