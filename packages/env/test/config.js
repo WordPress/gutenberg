@@ -3,6 +3,7 @@
  * External dependencies
  */
 const { readFile } = require( 'fs' ).promises;
+const os = require( 'os' );
 
 /**
  * Internal dependencies
@@ -326,6 +327,71 @@ describe( 'readConfig', () => {
 			port: 8888,
 			testsPort: 8889,
 		} );
+	} );
+
+	it( 'should use the WP_ENV_HOME environment variable only if specified', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldEnvHome = process.env.WP_ENV_HOME;
+
+		expect.assertions( 2 );
+
+		process.env.WP_ENV_HOME = 'here/is/a/path';
+		const configWith = await readConfig( '.wp-env.json' );
+		expect(
+			configWith.workDirectoryPath.includes( 'here/is/a/path' )
+		).toBe( true );
+
+		process.env.WP_ENV_HOME = undefined;
+		const configWithout = await readConfig( '.wp-env.json' );
+		expect(
+			configWithout.workDirectoryPath.includes( 'here/is/a/path' )
+		).toBe( false );
+
+		process.env.WP_ENV_HOME = oldEnvHome;
+	} );
+
+	it( 'should use the WP_ENV_HOME environment variable on Linux', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldEnvHome = process.env.WP_ENV_HOME;
+		const oldOsPlatform = os.platform;
+		os.platform = () => 'linux';
+
+		expect.assertions( 2 );
+
+		process.env.WP_ENV_HOME = 'here/is/a/path';
+		const configWith = await readConfig( '.wp-env.json' );
+		expect(
+			configWith.workDirectoryPath.includes( 'here/is/a/path' )
+		).toBe( true );
+
+		process.env.WP_ENV_HOME = undefined;
+		const configWithout = await readConfig( '.wp-env.json' );
+		expect(
+			configWithout.workDirectoryPath.includes( 'here/is/a/path' )
+		).toBe( false );
+
+		process.env.WP_ENV_HOME = oldEnvHome;
+		os.platform = oldOsPlatform;
+	} );
+
+	it( 'should use a non-private folder on Linux', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldOsPlatform = os.platform;
+		os.platform = () => 'linux';
+
+		expect.assertions( 2 );
+
+		const config = await readConfig( '.wp-env.json' );
+		expect( config.workDirectoryPath.includes( '.wp-env' ) ).toBe( false );
+		expect( config.workDirectoryPath.includes( 'wp-env' ) ).toBe( true );
+
+		os.platform = oldOsPlatform;
 	} );
 } );
 

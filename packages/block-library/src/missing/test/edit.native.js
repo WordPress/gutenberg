@@ -8,7 +8,7 @@ import { Text, Platform } from 'react-native';
  * WordPress dependencies
  */
 import { BottomSheet, Icon } from '@wordpress/components';
-import { help } from '@wordpress/icons';
+import { help, plugins } from '@wordpress/icons';
 jest.mock( '@wordpress/blocks' );
 
 /**
@@ -71,7 +71,7 @@ describe( 'Missing block', () => {
 		const testInstance = component.root;
 		const icons = testInstance.findAllByType( Icon );
 		expect( icons.length ).toBe( 2 );
-		expect( icons[ 1 ].props.icon ).toBe( 'admin-plugins' );
+		expect( icons[ 1 ].props.icon ).toBe( plugins );
 	} );
 
 	it( 'renders title text without crashing', () => {
