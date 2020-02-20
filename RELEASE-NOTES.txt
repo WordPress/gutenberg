@@ -8,6 +8,7 @@
 * [Android] Fix issue preventing correct placeholder image from displaying during image upload
 * [iOS] Fix diplay of large numbers on ordered lists
 * Fix issue where adding emojis to the post title add strong HTML elements to the title of the post
+* [iOS] Fix issue where alignment of paragraph blocks were not being respected whem splitting the paragraph or reading from the original Post content.
 
 1.22.0
 ------
