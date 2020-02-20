@@ -347,6 +347,10 @@ function LinkControl( {
 	// Effects
 	const getSearchHandler = useCallback(
 		( val, args ) => {
+			if ( ! showSuggestions ) {
+				return Promise.resolve( [] );
+			}
+
 			return isURLLike( val )
 				? handleDirectEntry( val, args )
 				: handleEntitySearch( val, args );
@@ -547,7 +551,7 @@ function LinkControl( {
 						}
 					} }
 					renderSuggestions={
-						showSuggestions ? renderSearchResults : noop
+						showSuggestions ? renderSearchResults : false
 					}
 					fetchSuggestions={ getSearchHandler }
 					showInitialSuggestions={ showInitialSuggestions }
