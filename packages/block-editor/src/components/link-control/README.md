@@ -55,7 +55,7 @@ Current link value.
 
 A link `value` is composed of a union between the values of default link properties and any custom link `settings`.
 
-Default properties include:
+The resulting default properties of `value` include:
 
 - `url` (`string`): Link URL.
 - `title` (`string`, optional): Link title.
