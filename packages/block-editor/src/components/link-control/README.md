@@ -110,7 +110,7 @@ Whether to present initial suggestions immediately.
 - Type: `boolean`
 - Required: No
 
-If passed as either `true` or `false`, controls the internal editing state of the component to respectively show or not to show the URL input field.
+Controls the internal editing state of the component. If passed as either `true` or `false` will respectively show or hide the URL input field.
 
 ### createSuggestion
 
