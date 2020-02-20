@@ -141,6 +141,13 @@ class EditorProvider extends Component {
 			return;
 		}
 
+		if ( !! this.props.revisionNotice ) {
+			this.props.createNotice( 'info', this.props.revisionNotice, {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+		}
+
 		const updatedStyles = transformStyles(
 			this.props.settings.styles,
 			'.editor-styles-wrapper'
@@ -263,11 +270,14 @@ export default compose( [
 			__experimentalTearDownEditor,
 			undo,
 		} = dispatch( 'core/editor' );
-		const { createWarningNotice } = dispatch( 'core/notices' );
+		const { createNotice, createWarningNotice } = dispatch(
+			'core/notices'
+		);
 
 		return {
 			setupEditor,
 			updatePostLock,
+			createNotice,
 			createWarningNotice,
 			resetEditorBlocks,
 			updateEditorSettings,

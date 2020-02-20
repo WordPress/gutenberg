@@ -39,7 +39,8 @@ export function reinitializeEditor(
 	postId,
 	target,
 	settings,
-	initialEdits
+	initialEdits,
+	revisionNotice
 ) {
 	unmountComponentAtNode( target );
 	const reboot = reinitializeEditor.bind(
@@ -48,7 +49,8 @@ export function reinitializeEditor(
 		postId,
 		target,
 		settings,
-		initialEdits
+		initialEdits,
+		revisionNotice
 	);
 
 	render(
@@ -58,6 +60,7 @@ export function reinitializeEditor(
 			postId={ postId }
 			postType={ postType }
 			initialEdits={ initialEdits }
+			revisionNotice
 			recovery
 		/>,
 		target
@@ -83,7 +86,8 @@ export function initializeEditor(
 	postType,
 	postId,
 	settings,
-	initialEdits
+	initialEdits,
+	revisionNotice
 ) {
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind(
@@ -92,7 +96,8 @@ export function initializeEditor(
 		postId,
 		target,
 		settings,
-		initialEdits
+		initialEdits,
+		revisionNotice
 	);
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
@@ -142,6 +147,7 @@ export function initializeEditor(
 			postId={ postId }
 			postType={ postType }
 			initialEdits={ initialEdits }
+			revisionNotice={ revisionNotice }
 		/>,
 		target
 	);

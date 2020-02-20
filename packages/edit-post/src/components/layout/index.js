@@ -48,7 +48,7 @@ import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
-function Layout() {
+function Layout( { isRevision } ) {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const {
 		closePublishSidebar,
@@ -114,7 +114,7 @@ function Layout() {
 	return (
 		<>
 			<FullscreenMode />
-			<BrowserURL />
+			<BrowserURL isRevision={ isRevision } />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
