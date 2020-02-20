@@ -14,6 +14,7 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
  * @param {number} value The value to clamp
  * @param {number} min The minimum value
  * @param {number} max The maxinum value
+ *
  * @return {number} A (float) number
  */
 function floatClamp( value, min, max ) {
@@ -24,21 +25,21 @@ function floatClamp( value, min, max ) {
  * Hook to store a clamped value, derived from props.
  */
 export function useControlledRangeValue( { min, max, value: valueProp = 0 } ) {
-	const [ value, _setValue ] = useState( floatClamp( valueProp, min, max ) );
+	const [ value, setValue ] = useState( floatClamp( valueProp, min, max ) );
 	const valueRef = useRef( value );
 
-	const setValue = ( nextValue ) => {
-		_setValue( floatClamp( nextValue, min, max ) );
+	const setClampValue = ( nextValue ) => {
+		setValue( floatClamp( nextValue, min, max ) );
 	};
 
 	useEffect( () => {
 		if ( valueRef.current !== valueProp ) {
-			setValue( valueProp );
+			setClampValue( valueProp );
 			valueRef.current = valueProp;
 		}
-	}, [ valueProp, setValue ] );
+	}, [ valueProp, setClampValue ] );
 
-	return [ value, setValue ];
+	return [ value, setClampValue ];
 }
 
 /**

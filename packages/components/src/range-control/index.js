@@ -17,9 +17,7 @@ import { compose, withInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
-
 import { color } from '../utils/colors';
-
 import { useControlledRangeValue, useDebouncedHoverInteraction } from './utils';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
