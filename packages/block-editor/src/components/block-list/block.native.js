@@ -205,7 +205,10 @@ class BlockListBlock extends Component {
 				accessible={ ! isSelected }
 				accessibilityRole={ 'button' }
 			>
-				<View accessibilityLabel={ accessibilityLabel }>
+				<View
+					style={ { flex: 1 } }
+					accessibilityLabel={ accessibilityLabel }
+				>
 					{ isSelected && (
 						<FloatingToolbar>
 							<Toolbar passedStyle={ styles.toolbar }>
