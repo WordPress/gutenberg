@@ -16,7 +16,7 @@ import { compose, withInstanceId } from '@wordpress/compose';
  */
 import BaseControl from '../base-control';
 import Button from '../button';
-import Dashicon from '../dashicon';
+import Icon from '../icon';
 
 import { color } from '../utils/colors';
 
@@ -164,7 +164,7 @@ const BaseRangeControl = forwardRef(
 				>
 					{ beforeIcon && (
 						<BeforeIconWrapper>
-							<Dashicon icon={ beforeIcon } />
+							<Icon icon={ beforeIcon } />
 						</BeforeIconWrapper>
 					) }
 					<Wrapper
@@ -225,7 +225,7 @@ const BaseRangeControl = forwardRef(
 					</Wrapper>
 					{ afterIcon && (
 						<AfterIconWrapper>
-							<Dashicon icon={ afterIcon } />
+							<Icon icon={ afterIcon } />
 						</AfterIconWrapper>
 					) }
 					{ withInputField && (

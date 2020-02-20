@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { controlsRepeat } from '@wordpress/icons';
 
 export function ReusableBlockConvertButton( {
 	isVisible,
@@ -26,14 +27,14 @@ export function ReusableBlockConvertButton( {
 		<>
 			{ ! isReusable && (
 				<MenuItem
-					icon="controls-repeat"
+					icon={ controlsRepeat }
 					onClick={ onConvertToReusable }
 				>
 					{ __( 'Add to Reusable blocks' ) }
 				</MenuItem>
 			) }
 			{ isReusable && (
-				<MenuItem icon="controls-repeat" onClick={ onConvertToStatic }>
+				<MenuItem icon={ controlsRepeat } onClick={ onConvertToStatic }>
 					{ __( 'Convert to Regular Block' ) }
 				</MenuItem>
 			) }

@@ -15,7 +15,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
-import { rss, pencil } from '@wordpress/icons';
+import { rss, pencil, grid, list } from '@wordpress/icons';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
@@ -90,13 +90,13 @@ class RSSEdit extends Component {
 				onClick: () => this.setState( { editing: true } ),
 			},
 			{
-				icon: 'list-view',
+				icon: list,
 				title: __( 'List view' ),
 				onClick: () => setAttributes( { blockLayout: 'list' } ),
 				isActive: blockLayout === 'list',
 			},
 			{
-				icon: 'grid-view',
+				icon: grid,
 				title: __( 'Grid view' ),
 				onClick: () => setAttributes( { blockLayout: 'grid' } ),
 				isActive: blockLayout === 'grid',

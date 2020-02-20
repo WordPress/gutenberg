@@ -17,7 +17,7 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Social Icons' ),
 	description: __(
-		'Create a block of links to your social media or external sites.'
+		'Display icons linking to your social media profiles or websites.'
 	),
 	keywords: [ _x( 'links', 'block keywords' ) ],
 	supports: {

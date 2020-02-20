@@ -21,6 +21,7 @@ import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
+import { formatLtr } from '@wordpress/icons';
 
 /**
  * Browser dependencies
@@ -41,7 +42,7 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 			<ToolbarGroup
 				controls={ [
 					{
-						icon: 'editor-ltr',
+						icon: formatLtr,
 						title: _x( 'Left to right', 'editor button' ),
 						isActive: direction === 'ltr',
 						onClick() {

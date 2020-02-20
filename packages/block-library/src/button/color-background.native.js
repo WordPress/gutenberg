@@ -44,22 +44,28 @@ function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
 		};
 	}
 
-	if ( gradientValue ) {
-		const { colors, locations, angle } = transformGradient();
-		return (
-			<LinearGradient
-				colors={ colors }
-				useAngle={ true }
-				angle={ angle }
-				locations={ locations }
-				angleCenter={ { x: 0.5, y: 0.5 } }
-				style={ wrapperStyles }
-			>
-				{ children }
-			</LinearGradient>
-		);
-	}
-	return <View style={ wrapperStyles }>{ children }</View>;
+	const { colors, locations, angle } = gradientValue
+		? transformGradient()
+		: {};
+
+	return (
+		<View style={ wrapperStyles }>
+			{ gradientValue && (
+				<LinearGradient
+					colors={ colors }
+					useAngle={ true }
+					angle={ angle }
+					locations={ locations }
+					angleCenter={ { x: 0.5, y: 0.5 } }
+					style={ [
+						styles.linearGradient,
+						{ borderRadius: borderRadiusValue },
+					] }
+				/>
+			) }
+			{ children }
+		</View>
+	);
 }
 
 export default ColorBackground;

@@ -67,7 +67,7 @@ describe( 'Links', () => {
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
-		// Navigate to and toggle the "Open in New Tab" checkbox.
+		// Navigate to and toggle the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
@@ -371,7 +371,7 @@ describe( 'Links', () => {
 			)
 		).not.toBeNull();
 
-		// Tab to the "Open in New Tab" toggle.
+		// Tab to the "Open in new tab" toggle.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 
@@ -467,7 +467,7 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'k' );
 		await waitForAutoFocus();
 
-		// Navigate to and toggle the "Open in New Tab" checkbox.
+		// Navigate to and toggle the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
@@ -476,7 +476,7 @@ describe( 'Links', () => {
 		// a changing value of the setting.
 		await page.waitForSelector( ':focus.components-form-toggle__input' );
 
-		// Close dialog. Expect that "Open in New Tab" would have been applied
+		// Close dialog. Expect that "Open in new tab" would have been applied
 		// immediately.
 		await page.keyboard.press( 'Escape' );
 
@@ -505,7 +505,7 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'primary', 'k' );
 		await waitForAutoFocus();
 
-		// Navigate to the "Open in New Tab" checkbox.
+		// Navigate to the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		// Uncheck the checkbox.
