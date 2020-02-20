@@ -84,6 +84,7 @@ class LatestPostsEdit extends Component {
 
 		const { categoriesList } = this.state;
 		const blockType = coreBlocks[ name ];
+		const displayFullPostContent = displayPostContentRadio === 'full_post';
 
 		const blockStyle = getStylesFromColorScheme(
 			styles.latestPostBlock,
@@ -148,24 +149,30 @@ class LatestPostsEdit extends Component {
 						label={ __( 'Show post content' ) }
 						checked={ displayPostContent }
 						onChange={ onSetDisplayPostContent }
+						separatorType={
+							displayPostContent ? 'fullWidth' : 'none'
+						}
 					/>
 					{ displayPostContent && (
 						<ToggleControl
 							label={ __( 'Show full post content' ) }
-							checked={ displayPostContentRadio === 'full_post' }
+							checked={ displayFullPostContent }
 							onChange={ onSetDisplayPostContentRadio }
+							separatorType={
+								displayFullPostContent ? 'none' : 'fullWidth'
+							}
 						/>
 					) }
-					{ displayPostContent &&
-						displayPostContentRadio === 'excerpt' && (
-							<RangeControl
-								label={ __( 'Max number of words in excerpt' ) }
-								value={ excerptLength }
-								onChange={ onSetExcerptLength }
-								min={ MIN_EXCERPT_LENGTH }
-								max={ MAX_EXCERPT_LENGTH }
-							/>
-						) }
+					{ displayPostContent && ! displayFullPostContent && (
+						<RangeControl
+							label={ __( 'Max number of words in excerpt' ) }
+							value={ excerptLength }
+							onChange={ onSetExcerptLength }
+							min={ MIN_EXCERPT_LENGTH }
+							max={ MAX_EXCERPT_LENGTH }
+							separatorType="none"
+						/>
+					) }
 				</PanelBody>
 
 				<PanelBody title={ __( 'Post meta settings' ) }>
@@ -173,6 +180,7 @@ class LatestPostsEdit extends Component {
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
 						onChange={ onSetDisplayPostDate }
+						separatorType="none"
 					/>
 				</PanelBody>
 
