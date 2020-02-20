@@ -13,7 +13,7 @@ import {
 	shadow,
 } from 'styled-system';
 
-export const Button = styled.TouchableOpacity`
+export const PrimitiveButton = styled.TouchableOpacity`
 ${ color }
 ${ space }
 ${ layout }

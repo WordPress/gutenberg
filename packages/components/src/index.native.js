@@ -7,6 +7,7 @@ export {
 	G,
 	HorizontalRule,
 	BlockQuotation,
+	PrimitiveButton,
 } from '@wordpress/primitives';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
@@ -56,6 +57,3 @@ export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as StepperControl } from './mobile/stepper-control';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
-
-// Styled Primitives
-export { default as StyledPrimitives, styled, css } from './styled-primitives';

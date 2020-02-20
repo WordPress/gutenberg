@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Icon, StyledPrimitives } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
+import { PrimitiveButton } from '@wordpress/primitives';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
@@ -27,7 +28,7 @@ const BlockBreadcrumb = ( {
 } ) => {
 	return (
 		<View style={ styles.breadcrumbContainer }>
-			<StyledPrimitives.Button
+			<PrimitiveButton
 				flexDirection="row"
 				alignItems="center"
 				onPress={ () => {
@@ -62,7 +63,7 @@ const BlockBreadcrumb = ( {
 				>
 					<BlockTitle clientId={ clientId } />
 				</Text>
-			</StyledPrimitives.Button>
+			</PrimitiveButton>
 		</View>
 	);
 };

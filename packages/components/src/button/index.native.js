@@ -9,11 +9,11 @@ import { isArray } from 'lodash';
  */
 import { Children, cloneElement } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { PrimitiveButton } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
-import { Button as PrimitiveButton } from '../styled-primitives/button';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 
