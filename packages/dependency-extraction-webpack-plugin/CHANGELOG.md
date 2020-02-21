@@ -1,5 +1,7 @@
 ## Master
 
+## 2.3.0 (2020-02-21)
+
 ### New Features
 
 - The plugin now supports optional `combineAssets` options. When this flag is set to `true`, all information about assets is combined into a single `assets.(json|php)` file generated in the output directory ([#20330](https://github.com/WordPress/gutenberg/pull/20330)).
