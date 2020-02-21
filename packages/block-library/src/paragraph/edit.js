@@ -131,7 +131,7 @@ function ParagraphBlock( {
 						onChange={ setFontSize }
 					/>
 					<ToggleControl
-						label={ __( 'Drop Cap' ) }
+						label={ __( 'Drop cap' ) }
 						checked={ !! dropCap }
 						onChange={ () =>
 							setAttributes( { dropCap: ! dropCap } )
