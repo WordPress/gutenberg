@@ -47,18 +47,20 @@ function Editor( { settings: _settings } ) {
 	return template ? (
 		<SlotFillProvider>
 			<DropZoneProvider>
-				<EntityProvider
-					kind="postType"
-					type={ settings.templateType }
-					id={ settings.templateId }
-				>
-					<Context.Provider value={ context }>
-						<Notices />
-						<Header />
-						<Sidebar />
-						<BlockEditor />
-						<Popover.Slot />
-					</Context.Provider>
+				<EntityProvider kind="root" type="site">
+					<EntityProvider
+						kind="postType"
+						type={ settings.templateType }
+						id={ settings.templateId }
+					>
+						<Context.Provider value={ context }>
+							<Notices />
+							<Header />
+							<Sidebar />
+							<BlockEditor />
+							<Popover.Slot />
+						</Context.Provider>
+					</EntityProvider>
 				</EntityProvider>
 			</DropZoneProvider>
 		</SlotFillProvider>
