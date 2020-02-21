@@ -372,6 +372,15 @@ async function configureWordPress( environment, config ) {
 		options
 	);
 
+	// Set wp-config.php values.
+	for ( const [ key, value ] of Object.entries( config.config ) ) {
+		await dockerCompose.run(
+			environment === 'development' ? 'cli' : 'tests-cli',
+			[ 'wp', 'config', 'set', key, value, '--raw' ],
+			options
+		);
+	}
+
 	// Activate all plugins.
 	for ( const pluginSource of config.pluginSources ) {
 		await dockerCompose.run(
@@ -387,14 +396,6 @@ async function configureWordPress( environment, config ) {
 		await dockerCompose.run(
 			environment === 'development' ? 'cli' : 'tests-cli',
 			`wp theme activate ${ themeSource.basename }`,
-			options
-		);
-	}
-
-	for ( const [ key, value ] of Object.entries( config.config ) ) {
-		await dockerCompose.run(
-			'cli',
-			`wp config set ${ key } ${ value } --raw`,
 			options
 		);
 	}
