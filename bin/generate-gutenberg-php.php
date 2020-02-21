@@ -2,7 +2,7 @@
 <?php
 /**
  * Generates the production (plugin build) version of `gutenberg.php`,
- * containing alternate `define` statements from the development version.
+ * containing alternate `define` statements from the development version..
  *
  * @package gutenberg-build
  */
