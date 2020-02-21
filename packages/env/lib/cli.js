@@ -32,6 +32,7 @@ const withSpinner = ( command ) => ( ...args ) => {
 					time[ 1 ] / 1e6
 				).toFixed( 0 ) }ms)`
 			);
+			process.exit( 0 );
 		},
 		( error ) => {
 			if ( error instanceof env.ValidationError ) {

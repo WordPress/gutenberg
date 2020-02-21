@@ -7,12 +7,14 @@ const path = require( 'path' );
 const fs = require( 'fs' ).promises;
 const dockerCompose = require( 'docker-compose' );
 const yaml = require( 'js-yaml' );
+const inquirer = require( 'inquirer' );
 
 /**
  * Promisified dependencies
  */
 const copyDir = util.promisify( require( 'copy-dir' ) );
 const sleep = util.promisify( setTimeout );
+const rimraf = util.promisify( require( 'rimraf' ) );
 
 /**
  * Internal dependencies
@@ -47,6 +49,7 @@ module.exports = {
 		 */
 		await module.exports.stop( { spinner } );
 
+		await checkForLegacyInstall( spinner );
 		const config = await initConfig( { spinner, debug } );
 
 		spinner.text = 'Downloading WordPress.';
@@ -237,6 +240,52 @@ module.exports = {
 
 	ValidationError,
 };
+
+/**
+ * Checks for legacy installs and provides
+ * the user the option to delete them.
+ *
+ * @param {Object} spinner A CLI spinner which indicates progress.
+ */
+async function checkForLegacyInstall( spinner ) {
+	const basename = path.basename( process.cwd() );
+	const installs = [
+		`../${ basename }-wordpress`,
+		`../${ basename }-tests-wordpress`,
+	];
+	await Promise.all(
+		installs.map( ( install ) =>
+			fs
+				.access( install )
+				.catch( () =>
+					installs.splice( installs.indexOf( install ), 1 )
+				)
+		)
+	);
+	if ( ! installs.length ) {
+		return;
+	}
+
+	spinner.info(
+		`It appears that you have used a previous version of this tool where installs were kept in ${ installs.join(
+			' and '
+		) }. Installs are now in your home folder.\n`
+	);
+	const { yesDelete } = await inquirer.prompt( [
+		{
+			type: 'confirm',
+			name: 'yesDelete',
+			message:
+				'Do you wish to delete these old installs to reclaim disk space?',
+			default: true,
+		},
+	] );
+	if ( yesDelete ) {
+		await Promise.all( installs.map( ( install ) => rimraf( install ) ) );
+		spinner.info( 'Old installs deleted successfully.' );
+	}
+	spinner.start();
+}
 
 /**
  * Initializes the local environment so that Docker commands can be run. Reads
