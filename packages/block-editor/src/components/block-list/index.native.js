@@ -158,6 +158,7 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 			containerStyle,
 			disallowRemoveInnerBlocks,
+			customOnDelete,
 		} = this.props;
 
 		return (
@@ -178,6 +179,7 @@ export class BlockList extends Component {
 							this.onCaretVerticalPositionChange
 						}
 						disallowRemoveInnerBlocks={ disallowRemoveInnerBlocks }
+						customOnDelete={ customOnDelete }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (
