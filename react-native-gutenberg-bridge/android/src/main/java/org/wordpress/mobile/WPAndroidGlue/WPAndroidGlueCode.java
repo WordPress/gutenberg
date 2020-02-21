@@ -75,6 +75,7 @@ public class WPAndroidGlueCode {
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private OnMediaEditorListener mOnMediaEditorListener;
+    private OnLogGutenbergUserEventListener mOnLogGutenbergUserEventListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -152,6 +153,10 @@ public class WPAndroidGlueCode {
 
     public interface OnMediaEditorListener {
         void onMediaEditorClicked(String mediaUrl);
+    }
+
+    public interface OnLogGutenbergUserEventListener {
+        void onGutenbergDidLogSessionTemplateEvent(String properties);
     }
 
     public void mediaSelectionCancelled() {
@@ -392,7 +397,8 @@ public class WPAndroidGlueCode {
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
                                   RequestExecutor fetchExecutor,
                                   OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
-                                  OnMediaEditorListener onMediaEditorListener) {
+                                  OnMediaEditorListener onMediaEditorListener,
+                                  OnLogGutenbergUserEventListener onLogGutenbergUserEventListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
@@ -403,6 +409,7 @@ public class WPAndroidGlueCode {
         mRequestExecutor = fetchExecutor;
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
         mOnMediaEditorListener = onMediaEditorListener;
+        mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
