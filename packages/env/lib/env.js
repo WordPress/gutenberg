@@ -47,7 +47,7 @@ module.exports = {
 		 */
 		await module.exports.stop( { spinner } );
 
-		const config = await initConfig( debug );
+		const config = await initConfig( { spinner, debug } );
 
 		spinner.text = 'Downloading WordPress.';
 
@@ -77,6 +77,7 @@ module.exports = {
 				if ( config.coreSource ) {
 					await downloadSource( config.coreSource, {
 						onProgress: getProgressSetter( 'core' ),
+						spinner,
 						debug: config.debug,
 					} );
 					await copyCoreFiles(
@@ -89,6 +90,7 @@ module.exports = {
 			...config.pluginSources.map( ( source ) =>
 				downloadSource( source, {
 					onProgress: getProgressSetter( source.basename ),
+					spinner,
 					debug: config.debug,
 				} )
 			),
@@ -96,6 +98,7 @@ module.exports = {
 			...config.themeSources.map( ( source ) =>
 				downloadSource( source, {
 					onProgress: getProgressSetter( source.basename ),
+					spinner,
 					debug: config.debug,
 				} )
 			),
@@ -140,7 +143,10 @@ module.exports = {
 	 * @param {boolean} options.debug   True if debug mode is enabled.
 	 */
 	async stop( { spinner, debug } ) {
-		const { dockerComposeConfigPath } = await initConfig( debug );
+		const { dockerComposeConfigPath } = await initConfig( {
+			spinner,
+			debug,
+		} );
 
 		spinner.text = 'Stopping WordPress.';
 
@@ -161,7 +167,7 @@ module.exports = {
 	 * @param {boolean} options.debug       True if debug mode is enabled.
 	 */
 	async clean( { environment, spinner, debug } ) {
-		const config = await initConfig( debug );
+		const config = await initConfig( { spinner, debug } );
 
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
@@ -201,7 +207,7 @@ module.exports = {
 	 * @param {boolean} options.debug     True if debug mode is enabled.
 	 */
 	async run( { container, command, spinner, debug } ) {
-		const config = await initConfig( debug );
+		const config = await initConfig( { spinner, debug } );
 
 		command = command.join( ' ' );
 
@@ -236,21 +242,39 @@ module.exports = {
  * Initializes the local environment so that Docker commands can be run. Reads
  * ./.wp-env.json, creates ~/.wp-env, and creates ~/.wp-env/docker-compose.yml.
  *
- * @param {boolean} debug True if debug mode is enabled.
+ * @param {Object}  options
+ * @param {Object}  options.spinner A CLI spinner which indicates progress.
+ * @param {boolean} options.debug   True if debug mode is enabled.
  *
  * @return {Config} The-env config object.
  */
-async function initConfig( debug ) {
+async function initConfig( { spinner, debug } ) {
 	const configPath = path.resolve( '.wp-env.json' );
 	const config = await readConfig( configPath );
 	config.debug = debug;
 
 	await fs.mkdir( config.workDirectoryPath, { recursive: true } );
 
+	const dockerComposeConfig = buildDockerComposeConfig( config );
 	await fs.writeFile(
 		config.dockerComposeConfigPath,
-		yaml.dump( buildDockerComposeConfig( config ) )
+		yaml.dump( dockerComposeConfig )
 	);
+
+	if ( config.debug ) {
+		spinner.info(
+			`Config:\n${ JSON.stringify(
+				config,
+				null,
+				4
+			) }\n\nDocker Compose Config:\n${ JSON.stringify(
+				dockerComposeConfig,
+				null,
+				4
+			) }`
+		);
+		spinner.start();
+	}
 
 	return config;
 }

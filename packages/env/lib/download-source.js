@@ -15,6 +15,7 @@ const NodeGit = require( 'nodegit' );
  * @param {Source}   source             The source to download.
  * @param {Object}   options
  * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
+ * @param {Object}   options.spinner    A CLI spinner which indicates progress.
  * @param {boolean}  options.debug      True if debug mode is enabled.
  */
 module.exports = async function downloadSource( source, options ) {
@@ -30,12 +31,16 @@ module.exports = async function downloadSource( source, options ) {
  * @param {Source}   source             The source to download.
  * @param {Object}   options
  * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
+ * @param {Object}   options.spinner    A CLI spinner which indicates progress.
  * @param {boolean}  options.debug      True if debug mode is enabled.
  */
-async function downloadGitSource( source, { onProgress, debug } ) {
-	debug = debug
+async function downloadGitSource( source, { onProgress, spinner, debug } ) {
+	const log = debug
 		? // eslint-disable-next-line no-console
-		  ( message ) => console.log( `NodeGit: ${ message }` )
+		  ( message ) => {
+				spinner.info( `NodeGit: ${ message }` );
+				spinner.start();
+		  }
 		: () => {};
 	onProgress( 0 );
 
@@ -56,22 +61,22 @@ async function downloadGitSource( source, { onProgress, debug } ) {
 		},
 	};
 
-	debug( 'Cloning or getting the repo.' );
+	log( 'Cloning or getting the repo.' );
 	const repository = await NodeGit.Clone(
 		source.url,
 		source.path,
 		gitFetchOptions
 	).catch( () => {
-		debug( 'Repo already exists, get it.' );
+		log( 'Repo already exists, get it.' );
 		return NodeGit.Repository.open( source.path );
 	} );
 
-	debug( 'Fetching the specified ref.' );
+	log( 'Fetching the specified ref.' );
 	const remote = await repository.getRemote( 'origin' );
 	await remote.fetch( source.ref, gitFetchOptions.fetchOpts );
 	await remote.disconnect();
 	try {
-		debug( 'Checking out the specified ref.' );
+		log( 'Checking out the specified ref.' );
 		await repository.checkoutRef(
 			await repository
 				.getReference( 'FETCH_HEAD' )
@@ -85,7 +90,7 @@ async function downloadGitSource( source, { onProgress, debug } ) {
 			}
 		);
 	} catch ( error ) {
-		debug( 'Ref needs to be set as detached.' );
+		log( 'Ref needs to be set as detached.' );
 		await repository.setHeadDetached( source.ref );
 	}
 
