@@ -8,7 +8,8 @@
 * [Android] Fix issue preventing correct placeholder image from displaying during image upload
 * [iOS] Fix diplay of large numbers on ordered lists
 * Fix issue where adding emojis to the post title add strong HTML elements to the title of the post
-* [iOS] Fix issue where alignment of paragraph blocks were not being respected whem splitting the paragraph or reading from the original Post content.
+* [iOS] Fix issue where alignment of paragraph blocks was not always being respected when splitting the paragraph or reading the post's html content.
+* We’ve introduced a new toolbar that floats above the block you’re editing, which makes navigating your blocks easier — especially complex ones.
 
 1.22.0
 ------
