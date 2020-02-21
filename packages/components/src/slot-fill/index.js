@@ -16,6 +16,9 @@ export function Slot( { bubblesVirtually, ...props } ) {
 }
 
 export function Fill( props ) {
+	// We're adding both Fills here so they can register themselves before
+	// their respective slot has been registered. Only the Fill that has a slot
+	// will render. The other one will return null.
 	return (
 		<>
 			<BaseFill { ...props } />
