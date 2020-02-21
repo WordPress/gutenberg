@@ -16,7 +16,12 @@ import { EditorHistoryRedo, EditorHistoryUndo } from '@wordpress/editor';
 const inserterToggleProps = { isPrimary: true };
 
 function HeaderToolbar() {
-	const { hasFixedToolbar, showInserter, isTextModeEnabled, previewDeviceType } = useSelect(
+	const {
+		hasFixedToolbar,
+		showInserter,
+		isTextModeEnabled,
+		previewDeviceType,
+	} = useSelect(
 		( select ) => ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
 				'fixedToolbar'
@@ -27,16 +32,16 @@ function HeaderToolbar() {
 				select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
-			previewDeviceType: select('core/block-editor').getPreviewDeviceType(),
+			previewDeviceType: select(
+				'core/block-editor'
+			).getPreviewDeviceType(),
 		} ),
 		[]
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const displayBlockToolbar = 
-		! isLargeViewport || 
-		previewDeviceType !== 'Desktop' ||
-		hasFixedToolbar;
+	const displayBlockToolbar =
+		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
 
 	const toolbarAriaLabel = displayBlockToolbar
 		? /* translators: accessibility text for the editor toolbar when Top Toolbar is on */
