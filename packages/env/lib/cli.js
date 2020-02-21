@@ -67,6 +67,11 @@ const withSpinner = ( command ) => ( ...args ) => {
 
 module.exports = function cli() {
 	yargs.usage( wpPrimary( '$0 <command>' ) );
+	yargs.option( 'debug', {
+		type: 'boolean',
+		describe: 'Enable debug output.',
+		default: false,
+	} );
 
 	yargs.command(
 		'start',
