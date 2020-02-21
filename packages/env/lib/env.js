@@ -77,6 +77,7 @@ module.exports = {
 				if ( config.coreSource ) {
 					await downloadSource( config.coreSource, {
 						onProgress: getProgressSetter( 'core' ),
+						debug: config.debug,
 					} );
 					await copyCoreFiles(
 						config.coreSource.path,
@@ -88,12 +89,14 @@ module.exports = {
 			...config.pluginSources.map( ( source ) =>
 				downloadSource( source, {
 					onProgress: getProgressSetter( source.basename ),
+					debug: config.debug,
 				} )
 			),
 
 			...config.themeSources.map( ( source ) =>
 				downloadSource( source, {
 					onProgress: getProgressSetter( source.basename ),
+					debug: config.debug,
 				} )
 			),
 		] );
