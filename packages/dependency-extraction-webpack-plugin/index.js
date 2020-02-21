@@ -138,13 +138,13 @@ class DependencyExtractionWebpackPlugin {
 				const runtimeChunk = entrypoint.getRuntimeChunk();
 
 				const assetData = {
+					// Get a sorted array so we can produce a stable, stringified representation.
 					dependencies: Array.from(
 						entrypointExternalizedWpDeps
 					).sort(),
 					version: runtimeChunk.hash,
 				};
 
-				// Get a stable, stringified representation of the WordPress script asset.
 				const assetString = this.stringify( assetData );
 
 				// Determine a filename for the asset file.
