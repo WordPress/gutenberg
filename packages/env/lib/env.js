@@ -421,6 +421,19 @@ async function configureWordPress( environment, config ) {
 		options
 	);
 
+	// Set wp-config.php values.
+	for ( const [ key, value ] of Object.entries( config.config ) ) {
+		const command = [ 'wp', 'config', 'set', key, value ];
+		if ( typeof value !== 'string' ) {
+			command.push( '--raw' );
+		}
+		await dockerCompose.run(
+			environment === 'development' ? 'cli' : 'tests-cli',
+			command,
+			options
+		);
+	}
+
 	// Activate all plugins.
 	for ( const pluginSource of config.pluginSources ) {
 		await dockerCompose.run(

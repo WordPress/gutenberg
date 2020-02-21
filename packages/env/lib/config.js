@@ -37,6 +37,7 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @property {Source[]}    themeSources            Themes to load in the environment.
  * @property {number}      port                    The port on which to start the development WordPress environment.
  * @property {number}      testsPort               The port on which to start the testing WordPress environment.
+ * @property {Object}      config                  Mapping of wp-config.php constants to their desired values.
  * @property {boolean}     debug                   True if debug mode is enabled.
  */
 
@@ -126,6 +127,7 @@ module.exports = {
 				themes: [],
 				port: 8888,
 				testsPort: 8889,
+				config: { WP_DEBUG: true, SCRIPT_DEBUG: true },
 			},
 			config,
 			overrideConfig
@@ -177,6 +179,12 @@ module.exports = {
 			);
 		}
 
+		if ( typeof config.config !== 'object' ) {
+			throw new ValidationError(
+				'Invalid .wp-env.json: "config" must be an object.'
+			);
+		}
+
 		const workDirectoryPath = path.resolve(
 			getHomeDirectory(),
 			md5( configPath )
@@ -207,6 +215,7 @@ module.exports = {
 					workDirectoryPath,
 				} )
 			),
+			config: config.config,
 		};
 	},
 };
