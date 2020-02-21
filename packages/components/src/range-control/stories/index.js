@@ -153,6 +153,17 @@ export const customMarks = () => {
 	);
 };
 
+export const multiple = () => {
+	return (
+		<Wrapper>
+			<RangeControlWithState />
+			<RangeControlWithState />
+			<RangeControlWithState />
+			<RangeControlWithState />
+		</Wrapper>
+	);
+};
+
 const Wrapper = styled.div`
 	padding: 60px 40px;
 `;

@@ -86,6 +86,26 @@ function gutenberg_grant_template_caps( array $allcaps ) {
 add_filter( 'user_has_cap', 'gutenberg_grant_template_caps' );
 
 /**
+ * Filters `wp_template` posts slug resolution to bypass deduplication logic as
+ * template slugs should be unique.
+ *
+ * @param string $slug          The resolved slug (post_name).
+ * @param int    $post_ID       Post ID.
+ * @param string $post_status   No uniqueness checks are made if the post is still draft or pending.
+ * @param string $post_type     Post type.
+ * @param int    $post_parent   Post parent ID.
+ * @param int    $original_slug The desired slug (post_name).
+ * @return string The original, desired slug.
+ */
+function gutenberg_filter_wp_template_wp_unique_post_slug( $slug, $post_ID, $post_status, $post_type, $post_parent, $original_slug ) {
+	if ( 'wp_template' === $post_type ) {
+		return $original_slug;
+	}
+	return $slug;
+}
+add_filter( 'wp_unique_post_slug', 'gutenberg_filter_wp_template_wp_unique_post_slug', 10, 6 );
+
+/**
  * Fixes the label of the 'wp_template' admin menu entry.
  */
 function gutenberg_fix_template_admin_menu_entry() {
