@@ -8,6 +8,7 @@ import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 import org.wordpress.mobile.WPAndroidGlue.RequestExecutor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public interface GutenbergBridgeJS2Parent extends RequestExecutor {
@@ -78,6 +79,28 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
             }
 
             return OTHER;
+        }
+    }
+
+    enum GutenbergUserEvent {
+        PAGE_TEMPLATE_APPLIED("page_template_applied");
+
+        private static final Map<String, GutenbergUserEvent> MAP = new HashMap<>();
+
+        static {
+            for (GutenbergUserEvent event : values()) {
+                MAP.put(event.name, event);
+            }
+        }
+
+        String name;
+
+        GutenbergUserEvent(String name) {
+            this.name = name;
+        }
+
+        public static GutenbergUserEvent getEnum(String eventName) {
+            return MAP.get(eventName);
         }
     }
 
