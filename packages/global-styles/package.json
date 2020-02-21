@@ -22,10 +22,11 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.8.3",
-		"@wordpress/block-editor": "../block-editor",
 		"@wordpress/components": "../components",
+		"@wordpress/data": "4.14.0",
 		"@wordpress/element": "../element",
-		"@wordpress/i18n": "../i18n"
+		"@wordpress/i18n": "../i18n",
+		"lodash": "4.17.15"
 	},
 	"publishConfig": {
 		"access": "public"

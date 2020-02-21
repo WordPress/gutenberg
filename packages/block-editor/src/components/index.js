@@ -10,11 +10,7 @@ export { default as Autocomplete } from './autocomplete';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { default as BlockControls } from './block-controls';
-export {
-	default as BlockEdit,
-	useBlockEditContext,
-	ifBlockEditSelected,
-} from './block-edit';
+export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';

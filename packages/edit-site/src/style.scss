@@ -24,6 +24,10 @@ body.toplevel_page_gutenberg-edit-site {
 	@include reset;
 }
 
+.components-modal__frame h1 {
+	background-color: inherit;
+}
+
 .edit-site {
 	// On mobile the main content area has to scroll, otherwise you can invoke
 	// the over-scroll bounce on the non-scrolling container, for a bad experience.

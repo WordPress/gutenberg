@@ -15,4 +15,20 @@
 	.block-editor-block-inspector__card {
 		margin: 0;
 	}
+
+	p {
+		background-color: inherit;
+		color: $dark-gray-500;
+		font-size: $default-font-size;
+		line-height: $default-line-height;
+		font-weight: 400;
+	}
+
+	h2 {
+		background-color: inherit;
+		font-size: $default-font-size;
+		line-height: $default-line-height;
+		font-weight: 500;
+	}
+
 }

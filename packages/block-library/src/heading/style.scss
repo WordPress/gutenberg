@@ -7,7 +7,8 @@
 	h6 {
 		background-color: var(--wp--color--background);
 		color: var(--wp--color--text);
-		line-height: var(--wp--typography--line-height);
+		line-height: var(--wp--typography--line-height, var(--wp--typography--line-height-heading));
+		font-weight: var(--wp--typography--font-weight-heading);
 	}
 }
 
@@ -21,34 +22,27 @@ h6 {
 		padding: $block-bg-padding--v $block-bg-padding--h;
 	}
 }
-.wp-gs {
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		line-height: var(--wp-typography-titleLineHeight);
-		color: var(--wp-color--text);
-		font-weight: var(--wp-heading--fontWeight);
-	}
+
+:root h1 {
+	font-size: calc(1px * var(--wp--typography--font-base) * var(--wp--typography--font-scale) * var(--wp--typography--font-scale) * var(--wp--typography--font-scale) * var(--wp--typography--font-scale) * var(--wp--typography--font-scale));
 }
 
-.wp-gs h1 {
-	font-size: var(--wp-typography--fontSizeH1);
+:root h2 {
+	font-size: calc(1px * var(--wp--typography--font-base) * var(--wp--typography--font-scale) * var(--wp--typography--font-scale) * var(--wp--typography--font-scale) * var(--wp--typography--font-scale));
 }
-.wp-gs h2 {
-	font-size: var(--wp-typography--fontSizeH2);
+
+:root h3 {
+	font-size: calc(1px * var(--wp--typography--font-base) * var(--wp--typography--font-scale) * var(--wp--typography--font-scale) * var(--wp--typography--font-scale));
 }
-.wp-gs h3 {
-	font-size: var(--wp-typography--fontSizeH3);
+
+:root h4 {
+	font-size: calc(1px * var(--wp--typography--font-base) * var(--wp--typography--font-scale) * var(--wp--typography--font-scale));
 }
-.wp-gs h4 {
-	font-size: var(--wp-typography--fontSizeH4);
+
+:root h5 {
+	font-size: calc(1px * var(--wp--typography--font-base) * var(--wp--typography--font-scale));
 }
-.wp-gs h5 {
-	font-size: var(--wp-typography--fontSizeH5);
-}
-.wp-gs h6 {
-	font-size: var(--wp-typography--fontSizeH6);
+
+:root h6 {
+	font-size: calc(0.5px * var(--wp--typography--font-base) * var(--wp--typography--font-scale));
 }

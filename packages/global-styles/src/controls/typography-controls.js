@@ -2,35 +2,28 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RangeControl } from '@wordpress/components';
+import { PanelBody, RangeControl } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-import { GlobalStylesPanelBody } from '../global-styles-panel-body';
-import { useGlobalStylesState } from '../store';
-
-export default function TypographyControls() {
-	const {
-		fontSize,
+export default function TypographyControls( {
+	typography: {
+		fontBase,
 		fontScale,
-		lineHeight,
-		fontWeight,
-		setStyles,
-	} = useGlobalStylesState();
-
+		lineHeightBase,
+		lineHeightHeading,
+		fontWeightBase,
+		fontWeightHeading,
+	},
+	setTypography,
+} ) {
 	return (
-		<GlobalStylesPanelBody
-			title={ __( 'Typography' ) }
-			initialOpen={ false }
-		>
+		<PanelBody title={ __( 'Typography' ) } initialOpen={ false }>
 			<RangeControl
-				label={ __( 'Font Size' ) }
-				value={ fontSize }
+				label={ __( 'Font Base' ) }
+				value={ fontBase }
 				min={ 10 }
 				max={ 30 }
 				step={ 1 }
-				onChange={ ( value ) => setStyles( { fontSize: value } ) }
+				onChange={ ( value ) => setTypography( { fontBase: value } ) }
 			/>
 			<RangeControl
 				label={ __( 'Font Scale' ) }
@@ -38,24 +31,50 @@ export default function TypographyControls() {
 				min={ 1.1 }
 				max={ 1.4 }
 				step={ 0.025 }
-				onChange={ ( value ) => setStyles( { fontScale: value } ) }
+				onChange={ ( value ) => setTypography( { fontScale: value } ) }
 			/>
+			<h2>Heading</h2>
 			<RangeControl
 				label={ __( 'Line Height' ) }
-				value={ lineHeight }
+				value={ lineHeightHeading }
 				min={ 1 }
 				max={ 2 }
 				step={ 0.1 }
-				onChange={ ( value ) => setStyles( { lineHeight: value } ) }
+				onChange={ ( value ) =>
+					setTypography( { lineHeightHeading: value } )
+				}
 			/>
 			<RangeControl
 				label={ __( 'Font Weight' ) }
-				value={ fontWeight }
+				value={ fontWeightHeading }
 				min={ 100 }
 				max={ 900 }
 				step={ 100 }
-				onChange={ ( value ) => setStyles( { fontWeight: value } ) }
+				onChange={ ( value ) =>
+					setTypography( { fontWeightHeading: value } )
+				}
 			/>
-		</GlobalStylesPanelBody>
+			<h2>Base</h2>
+			<RangeControl
+				label={ __( 'Line Height' ) }
+				value={ lineHeightBase }
+				min={ 1 }
+				max={ 2 }
+				step={ 0.1 }
+				onChange={ ( value ) =>
+					setTypography( { lineHeightBase: value } )
+				}
+			/>
+			<RangeControl
+				label={ __( 'Font Weight' ) }
+				value={ fontWeightBase }
+				min={ 100 }
+				max={ 900 }
+				step={ 100 }
+				onChange={ ( value ) =>
+					setTypography( { fontWeightBase: value } )
+				}
+			/>
+		</PanelBody>
 	);
 }

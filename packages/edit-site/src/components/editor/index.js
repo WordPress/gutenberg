@@ -21,7 +21,7 @@ import {
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { GlobalStylesStateProvider } from '@wordpress/global-styles';
+import { GlobalStylesProvider } from '@wordpress/global-styles';
 
 /**
  * Internal dependencies
@@ -65,7 +65,10 @@ function Editor( { settings: _settings } ) {
 		<>
 			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
-			<GlobalStylesStateProvider>
+			<GlobalStylesProvider
+				userEntityId={ settings.__experimentalGlobalStylesUserEntityId }
+				baseStyles={ settings.__experimentalGlobalStylesBase }
+			>
 				<SlotFillProvider>
 					<DropZoneProvider>
 						<EntityProvider kind="root" type="site">
@@ -96,7 +99,7 @@ function Editor( { settings: _settings } ) {
 						</EntityProvider>
 					</DropZoneProvider>
 				</SlotFillProvider>
-			</GlobalStylesStateProvider>
+			</GlobalStylesProvider>
 		</>
 	) : null;
 }

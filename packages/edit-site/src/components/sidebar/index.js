@@ -4,15 +4,15 @@
 import { createSlotFill } from '@wordpress/components';
 import { ComplementaryArea } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
-import { cog, pencil } from '@wordpress/icons';
-import { GlobalStylesPanel } from '@wordpress/global-styles';
+import { cog, typography } from '@wordpress/icons';
+import { GlobalStylesControls } from '@wordpress/global-styles';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
 function Sidebar() {
 	return (
-		<>
+		<div className="edit-site-sidebar">
 			<ComplementaryArea.Slot scope="core/edit-site" />
 			<ComplementaryArea
 				scope="core/edit-site"
@@ -26,11 +26,11 @@ function Sidebar() {
 				scope="core/edit-site"
 				complementaryAreaIdentifier="edit-site/global-styles"
 				title={ __( 'Global Styles' ) }
-				icon={ pencil }
+				icon={ typography }
 			>
-				<p>Global Styles area</p>
+				<GlobalStylesControls bubblesVirtually />
 			</ComplementaryArea>
-		</>
+		</div>
 	);
 }
 

@@ -1,7 +1,9 @@
 :root p {
 	background-color: var(--wp--color--background);
 	color: var(--wp--color--text);
-	line-height: var(--wp--typography--line-height);
+	line-height: var(--wp--typography--line-height, var(--wp--typography--line-height-base));
+	font-size: calc(1px * var(--wp--typography--font-base));
+	font-weight: var(--wp--typography--font-weight-base);
 }
 
 .is-small-text {
@@ -40,12 +42,4 @@ p.has-background {
 
 p.has-text-color a {
 	color: inherit;
-}
-
-.wp-gs p {
-	color: var(--wp-paragraph--color, var(--wp-color--text));
-	font-size: var(--wp-typography--fontSize);
-	font-weight: var(--wp-typography--fontWeight);
-	line-height: var(--wp-paragraph--lineHeight, var(--wp-typography--lineHeight));
-
 }

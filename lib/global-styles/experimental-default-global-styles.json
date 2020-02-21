@@ -1,0 +1,14 @@
+{
+	"color": {
+		"background": "white",
+		"text": "black"
+	},
+	"typography": {
+		"font-base": 16,
+		"font-scale": 1.2,
+		"font-weight-base": 400,
+		"font-weight-heading": 400,
+		"line-height-base": 1.5,
+		"line-height-heading": 1.5
+	}
+}
