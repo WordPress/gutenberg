@@ -127,7 +127,7 @@ module.exports = {
 				themes: [],
 				port: 8888,
 				testsPort: 8889,
-				config: {},
+				config: { WP_DEBUG: true, SCRIPT_DEBUG: true },
 			},
 			config,
 			overrideConfig
