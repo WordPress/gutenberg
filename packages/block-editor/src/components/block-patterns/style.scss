@@ -1,0 +1,44 @@
+.block-editor-patterns {
+	padding: 10px;
+}
+
+.block-editor-patterns__item {
+	box-shadow: $shadow-popover;
+	transition: all 0.15s ease-in-out;
+	border-radius: 2px;
+	cursor: pointer;
+	border: 1px solid $light-gray-500;
+
+	&:hover {
+		transform: scale(1.05);
+		&::after {
+			opacity: 1;
+		}
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 1px $dark-gray-300, 0 0 0 2px $white;
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
+}
+
+.block-editor-patterns__item + .block-editor-patterns__item {
+	margin-top: 15px;
+}
+
+.block-editor-patterns__item-preview {
+	overflow: hidden;
+	height: 200px;
+
+	.block-editor-block-preview__container {
+		height: 100%;
+	}
+}
+
+
+.block-editor-patterns__item-title {
+	text-align: center;
+	padding: 10px 0;
+}
