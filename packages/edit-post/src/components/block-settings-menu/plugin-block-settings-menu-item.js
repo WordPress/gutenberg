@@ -6,7 +6,8 @@ import { difference } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { BlockSettingsMenuControls, MenuItem } from '@wordpress/components';
+import { BlockSettingsMenuControls } from '@wordpress/block-editor';
+import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { plugins } from '@wordpress/icons';
 
