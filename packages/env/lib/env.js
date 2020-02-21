@@ -390,6 +390,16 @@ async function configureWordPress( environment, config ) {
 			options
 		);
 	}
+
+	if ( environment === 'development' ) {
+		for ( const [ key, value ] of Object.entries( config.config ) ) {
+			await dockerCompose.run(
+				'cli',
+				`wp config set ${ key } ${ value } --raw`,
+				options
+			);
+		}
+	}
 }
 
 /**

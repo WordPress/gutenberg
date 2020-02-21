@@ -188,6 +188,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"themes"`    | `string[]`    | `[]`     | A list of themes to install in the environment. The first theme in the list will be activated.                            |
 | `"port"`      | `string`      | `"8888"` | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
 | `"testsPort"` | `string`      | `"8889"` | The port number to use for the tests instance.                                                                            |
+| `"config"`    | `Object`      | `"{}"`   | Mapping of wp-config.php constants to their desired values.                                                               |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
