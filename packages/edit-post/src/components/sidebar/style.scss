@@ -6,7 +6,7 @@
 	@include break-small() {
 		z-index: auto;
 		height: 100%;
-		overflow: visible;
+		overflow: auto;
 		-webkit-overflow-scrolling: touch;
 	}
 
