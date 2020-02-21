@@ -20,18 +20,20 @@ function PostDateEditor( { format, setAttributes } ) {
 	const [ date, setDate ] = useEntityProp( 'postType', 'post', 'date' );
 	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
 	const settings = __experimentalGetSettings();
+	// To know if the current time format is a 12 hour time, look for "a".
+	// Also make sure this "a" is not escaped by a "/".
 	const is12Hour = /a(?!\\)/i.test(
 		settings.formats.time
-			.toLowerCase()
-			.replace( /\\\\/g, '' )
+			.toLowerCase() // Test only for the lower case "a".
+			.replace( /\\\\/g, '' ) // Replace "//" with empty strings.
 			.split( '' )
 			.reverse()
-			.join( '' )
+			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
 	);
-	const formatOptions = Object.keys( settings.formats ).map(
-		( formatKey ) => ( {
-			key: settings.formats[ formatKey ],
-			name: dateI18n( settings.formats[ formatKey ], date ),
+	const formatOptions = Object.values( settings.formats ).map(
+		( formatOption ) => ( {
+			key: formatOption,
+			name: dateI18n( formatOption, date ),
 		} )
 	);
 	const resolvedFormat = format || siteFormat || settings.formats.date;
