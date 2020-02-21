@@ -18,6 +18,9 @@
     <string name="gutenberg_native_alt_text" tools:ignore="UnusedResources">Alt Text</string>
     <string name="gutenberg_native_an_unknown_error_occurred_please_try_again" tools:ignore="UnusedResources">An unknown error occurred. Please try again.</string>
     <string name="gutenberg_native_annotations_sidebar" tools:ignore="UnusedResources">Annotations Sidebar</string>
+    <string name="gutenberg_native_border_settings" tools:ignore="UnusedResources">Border Settings</string>
+    <string name="gutenberg_native_button_color_settings_are_coming_soon" tools:ignore="UnusedResources">Button color settings are coming soon.</string>
+    <string name="gutenberg_native_button_link_url" tools:ignore="UnusedResources">Button Link URL</string>
     <string name="gutenberg_native_choose_from_device" tools:ignore="UnusedResources">Choose from device</string>
     <string name="gutenberg_native_clear_all_settings" tools:ignore="UnusedResources">Clear All Settings</string>
     <string name="gutenberg_native_content" tools:ignore="UnusedResources">Content…</string>
@@ -50,6 +53,7 @@
     <!-- translators: accessibility text. %s: image caption. -->
     <string name="gutenberg_native_image_caption_s" tools:ignore="UnusedResources">Image caption. %s</string>
     <string name="gutenberg_native_link_inserted" tools:ignore="UnusedResources">Link inserted</string>
+    <string name="gutenberg_native_link_settings" tools:ignore="UnusedResources">Link Settings</string>
     <string name="gutenberg_native_link_text" tools:ignore="UnusedResources">Link text</string>
     <string name="gutenberg_native_move_block_down" tools:ignore="UnusedResources">Move block down</string>
     <!-- translators: accessibility text. %1: current block position (number). %2: next block position (number) -->
