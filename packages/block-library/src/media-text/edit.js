@@ -228,7 +228,7 @@ class MediaTextEdit extends Component {
 			{
 				value: backgroundColor.color,
 				onChange: setBackgroundColor,
-				label: __( 'Background Color' ),
+				label: __( 'Background color' ),
 			},
 		];
 		const toolbarControls = [
@@ -275,7 +275,7 @@ class MediaTextEdit extends Component {
 				) }
 				{ imageFill && (
 					<FocalPointPicker
-						label={ __( 'Focal Point Picker' ) }
+						label={ __( 'Focal point picker' ) }
 						url={ mediaUrl }
 						value={ focalPoint }
 						onChange={ ( value ) =>
@@ -285,7 +285,7 @@ class MediaTextEdit extends Component {
 				) }
 				{ mediaType === 'image' && (
 					<TextareaControl
-						label={ __( 'Alt Text (Alternative Text)' ) }
+						label={ __( 'Alt text (alternative text)' ) }
 						value={ mediaAlt }
 						onChange={ onMediaAltChange }
 						help={

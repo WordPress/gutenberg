@@ -94,7 +94,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
   onClick={[MockFunction]}
   type="button"
 >
-  Custom Color
+  Custom color
 </button>
 `;
 
@@ -121,7 +121,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
         onClick={[Function]}
         type="button"
       >
-        Custom Color
+        Custom color
       </button>
     </ForwardRef(Button)>
   </div>
@@ -215,7 +215,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               "renderContent": [Function],
             }
           }
-          linkText="Custom Color"
+          linkText="Custom color"
         />
         <ButtonAction
           onClick={[Function]}
@@ -482,7 +482,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               "renderContent": [Function],
             }
           }
-          linkText="Custom Color"
+          linkText="Custom color"
         >
           <Dropdown
             className="components-circular-option-picker__dropdown-link-action"
@@ -506,7 +506,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   onClick={[Function]}
                   type="button"
                 >
-                  Custom Color
+                  Custom color
                 </button>
               </ForwardRef(Button)>
             </div>

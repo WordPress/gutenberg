@@ -100,7 +100,7 @@ class LatestPostsEdit extends Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Post content settings' ) }>
 					<ToggleControl
-						label={ __( 'Post Content' ) }
+						label={ __( 'Post content' ) }
 						checked={ displayPostContent }
 						onChange={ ( value ) =>
 							setAttributes( { displayPostContent: value } )
@@ -113,7 +113,7 @@ class LatestPostsEdit extends Component {
 							options={ [
 								{ label: __( 'Excerpt' ), value: 'excerpt' },
 								{
-									label: __( 'Full Post' ),
+									label: __( 'Full post' ),
 									value: 'full_post',
 								},
 							] }
@@ -148,7 +148,7 @@ class LatestPostsEdit extends Component {
 					/>
 				</PanelBody>
 
-				<PanelBody title={ __( 'Featured Image Settings' ) }>
+				<PanelBody title={ __( 'Featured image settings' ) }>
 					<ToggleControl
 						label={ __( 'Display featured image' ) }
 						checked={ displayFeaturedImage }
@@ -187,7 +187,7 @@ class LatestPostsEdit extends Component {
 							/>
 							<BaseControl>
 								<BaseControl.VisualLabel>
-									{ __( 'Image Alignment' ) }
+									{ __( 'Image alignment' ) }
 								</BaseControl.VisualLabel>
 								<BlockAlignmentToolbar
 									value={ featuredImageAlign }
