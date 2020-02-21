@@ -28,15 +28,16 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * A wp-env config object.
  *
  * @typedef Config
- * @property {string} name Name of the environment.
- * @property {string} configDirectoryPath Path to the .wp-env.json file.
- * @property {string} workDirectoryPath Path to the work directory located in ~/.wp-env.
- * @property {string} dockerComposeConfigPath Path to the docker-compose.yml file.
- * @property {Source|null} coreSource The WordPress installation to load in the environment.
- * @property {Source[]} pluginSources Plugins to load in the environment.
- * @property {Source[]} themeSources Themes to load in the environment.
- * @property {number} port The port on which to start the development WordPress environment.
- * @property {number} testsPort The port on which to start the testing WordPress environment.
+ * @property {string}      name                    Name of the environment.
+ * @property {string}      configDirectoryPath     Path to the .wp-env.json file.
+ * @property {string}      workDirectoryPath       Path to the work directory located in ~/.wp-env.
+ * @property {string}      dockerComposeConfigPath Path to the docker-compose.yml file.
+ * @property {Source|null} coreSource              The WordPress installation to load in the environment.
+ * @property {Source[]}    pluginSources           Plugins to load in the environment.
+ * @property {Source[]}    themeSources            Themes to load in the environment.
+ * @property {number}      port                    The port on which to start the development WordPress environment.
+ * @property {number}      testsPort               The port on which to start the testing WordPress environment.
+ * @property {boolean}     debug                   True if debug mode is enabled.
  */
 
 /**

@@ -29,10 +29,11 @@ module.exports = {
 	/**
 	 * Starts the development server.
 	 *
-	 * @param {Object} options
-	 * @param {Object} options.spinner A CLI spinner which indicates progress.
+	 * @param {Object}  options
+	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean} options.debug   True if debug mode is enabled.
 	 */
-	async start( { spinner } ) {
+	async start( { spinner, debug } ) {
 		/**
 		 * If the Docker image is already running and the `wp-env` files have been
 		 * deleted, the start command will not complete successfully. Stopping
@@ -46,7 +47,7 @@ module.exports = {
 		 */
 		await module.exports.stop( { spinner } );
 
-		const config = await initConfig();
+		const config = await initConfig( { spinner, debug } );
 
 		spinner.text = 'Downloading WordPress.';
 
@@ -69,12 +70,15 @@ module.exports = {
 			// Preemptively start the database while we wait for sources to download.
 			dockerCompose.upOne( 'mysql', {
 				config: config.dockerComposeConfigPath,
+				log: config.debug,
 			} ),
 
 			( async () => {
 				if ( config.coreSource ) {
 					await downloadSource( config.coreSource, {
 						onProgress: getProgressSetter( 'core' ),
+						spinner,
+						debug: config.debug,
 					} );
 					await copyCoreFiles(
 						config.coreSource.path,
@@ -86,12 +90,16 @@ module.exports = {
 			...config.pluginSources.map( ( source ) =>
 				downloadSource( source, {
 					onProgress: getProgressSetter( source.basename ),
+					spinner,
+					debug: config.debug,
 				} )
 			),
 
 			...config.themeSources.map( ( source ) =>
 				downloadSource( source, {
 					onProgress: getProgressSetter( source.basename ),
+					spinner,
+					debug: config.debug,
 				} )
 			),
 		] );
@@ -100,6 +108,7 @@ module.exports = {
 
 		await dockerCompose.upMany( [ 'wordpress', 'tests-wordpress' ], {
 			config: config.dockerComposeConfigPath,
+			log: config.debug,
 		} );
 
 		try {
@@ -129,15 +138,22 @@ module.exports = {
 	/**
 	 * Stops the development server.
 	 *
-	 * @param {Object} options
-	 * @param {Object} options.spinner A CLI spinner which indicates progress.
+	 * @param {Object}  options
+	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean} options.debug   True if debug mode is enabled.
 	 */
-	async stop( { spinner } ) {
-		const { dockerComposeConfigPath } = await initConfig();
+	async stop( { spinner, debug } ) {
+		const { dockerComposeConfigPath } = await initConfig( {
+			spinner,
+			debug,
+		} );
 
 		spinner.text = 'Stopping WordPress.';
 
-		await dockerCompose.down( { config: dockerComposeConfigPath } );
+		await dockerCompose.down( {
+			config: dockerComposeConfigPath,
+			log: debug,
+		} );
 
 		spinner.text = 'Stopped WordPress.';
 	},
@@ -145,12 +161,13 @@ module.exports = {
 	/**
 	 * Wipes the development server's database, the tests server's database, or both.
 	 *
-	 * @param {Object} options
-	 * @param {string} options.environment The environment to clean. Either 'development', 'tests', or 'all'.
-	 * @param {Object} options.spinner A CLI spinner which indicates progress.
+	 * @param {Object}  options
+	 * @param {string}  options.environment The environment to clean. Either 'development', 'tests', or 'all'.
+	 * @param {Object}  options.spinner     A CLI spinner which indicates progress.
+	 * @param {boolean} options.debug       True if debug mode is enabled.
 	 */
-	async clean( { environment, spinner } ) {
-		const config = await initConfig();
+	async clean( { environment, spinner, debug } ) {
+		const config = await initConfig( { spinner, debug } );
 
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
@@ -183,13 +200,14 @@ module.exports = {
 	/**
 	 * Runs an arbitrary command on the given Docker container.
 	 *
-	 * @param {Object} options
-	 * @param {Object} options.container The Docker container to run the command on.
-	 * @param {Object} options.command The command to run.
-	 * @param {Object} options.spinner A CLI spinner which indicates progress.
+	 * @param {Object}  options
+	 * @param {Object}  options.container The Docker container to run the command on.
+	 * @param {Object}  options.command   The command to run.
+	 * @param {Object}  options.spinner   A CLI spinner which indicates progress.
+	 * @param {boolean} options.debug     True if debug mode is enabled.
 	 */
-	async run( { container, command, spinner } ) {
-		const config = await initConfig();
+	async run( { container, command, spinner, debug } ) {
+		const config = await initConfig( { spinner, debug } );
 
 		command = command.join( ' ' );
 
@@ -198,6 +216,7 @@ module.exports = {
 		const result = await dockerCompose.run( container, command, {
 			config: config.dockerComposeConfigPath,
 			commandOptions: [ '--rm' ],
+			log: config.debug,
 		} );
 
 		if ( result.out ) {
@@ -223,18 +242,39 @@ module.exports = {
  * Initializes the local environment so that Docker commands can be run. Reads
  * ./.wp-env.json, creates ~/.wp-env, and creates ~/.wp-env/docker-compose.yml.
  *
+ * @param {Object}  options
+ * @param {Object}  options.spinner A CLI spinner which indicates progress.
+ * @param {boolean} options.debug   True if debug mode is enabled.
+ *
  * @return {Config} The-env config object.
  */
-async function initConfig() {
+async function initConfig( { spinner, debug } ) {
 	const configPath = path.resolve( '.wp-env.json' );
 	const config = await readConfig( configPath );
+	config.debug = debug;
 
 	await fs.mkdir( config.workDirectoryPath, { recursive: true } );
 
+	const dockerComposeConfig = buildDockerComposeConfig( config );
 	await fs.writeFile(
 		config.dockerComposeConfigPath,
-		yaml.dump( buildDockerComposeConfig( config ) )
+		yaml.dump( dockerComposeConfig )
 	);
+
+	if ( config.debug ) {
+		spinner.info(
+			`Config:\n${ JSON.stringify(
+				config,
+				null,
+				4
+			) }\n\nDocker Compose Config:\n${ JSON.stringify(
+				dockerComposeConfig,
+				null,
+				4
+			) }`
+		);
+		spinner.start();
+	}
 
 	return config;
 }
@@ -294,10 +334,11 @@ async function retry( action, { times, delay = 5000 } ) {
  *
  * @param {Config} config The wp-env config object.
  */
-async function checkDatabaseConnection( { dockerComposeConfigPath } ) {
+async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
 	await dockerCompose.run( 'cli', 'wp db check', {
 		config: dockerComposeConfigPath,
 		commandOptions: [ '--rm' ],
+		log: debug,
 	} );
 }
 
@@ -313,6 +354,7 @@ async function configureWordPress( environment, config ) {
 	const options = {
 		config: config.dockerComposeConfigPath,
 		commandOptions: [ '--rm' ],
+		log: config.debug,
 	};
 
 	const port = environment === 'development' ? config.port : config.testsPort;
@@ -356,10 +398,14 @@ async function configureWordPress( environment, config ) {
  * @param {string} environment The environment to clean. Either 'development', 'tests', or 'all'.
  * @param {Config} config The wp-env config object.
  */
-async function resetDatabase( environment, { dockerComposeConfigPath } ) {
+async function resetDatabase(
+	environment,
+	{ dockerComposeConfigPath, debug }
+) {
 	const options = {
 		config: dockerComposeConfigPath,
 		commandOptions: [ '--rm' ],
+		log: debug,
 	};
 
 	const tasks = [];
