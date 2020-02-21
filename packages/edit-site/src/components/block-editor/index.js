@@ -8,7 +8,7 @@ import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
-	URLPopover,
+	__experimentalLinkControl,
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
@@ -69,7 +69,7 @@ export default function BlockEditor() {
 			useSubRegistry={ false }
 		>
 			<BlockEditorKeyboardShortcuts />
-			<URLPopover.LinkViewer.Fill>
+			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
 					( fillProps ) => (
 						<NavigateToLink
@@ -85,7 +85,7 @@ export default function BlockEditor() {
 						setActiveTemplateId,
 					]
 				) }
-			</URLPopover.LinkViewer.Fill>
+			</__experimentalLinkControl.ViewerFill>
 			<Sidebar.InspectorFill>
 				<BlockInspector />
 			</Sidebar.InspectorFill>
