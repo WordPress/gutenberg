@@ -14,6 +14,7 @@ import {
 	RangeControl,
 	ToolbarButton,
 	ToolbarGroup,
+	LinearGradient,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -23,6 +24,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	withColors,
+	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -66,15 +68,10 @@ const Cover = ( {
 	overlayColor,
 	setAttributes,
 } ) => {
-	const {
-		backgroundType,
-		dimRatio,
-		focalPoint,
-		gradientValue,
-		minHeight,
-		url,
-	} = attributes;
+	const { backgroundType, dimRatio, focalPoint, minHeight, url } = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	const { gradientValue } = __experimentalUseGradient();
 
 	const hasBackground = !! (
 		url ||
@@ -239,17 +236,23 @@ const Cover = ( {
 				>
 					<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 				</View>
-
 				<View pointerEvents="none" style={ getOverlayStyles() } />
-
-				<MediaUpload
-					__experimentalOnlyMediaLibrary
-					allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
-					onSelect={ onSelectMedia }
-					render={ ( { open, getMediaOptions } ) => {
-						return background( open, getMediaOptions );
-					} }
-				/>
+				{ gradientValue ? (
+					<LinearGradient
+						gradientValue={ gradientValue }
+						pointerEvents="none"
+						style={ getOverlayStyles() }
+					/>
+				) : (
+					<MediaUpload
+						__experimentalOnlyMediaLibrary
+						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+						onSelect={ onSelectMedia }
+						render={ ( { open, getMediaOptions } ) => {
+							return background( open, getMediaOptions );
+						} }
+					/>
+				) }
 			</View>
 		</View>
 	);
