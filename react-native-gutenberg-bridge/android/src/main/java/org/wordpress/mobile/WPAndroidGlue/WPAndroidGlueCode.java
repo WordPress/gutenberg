@@ -26,6 +26,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -95,6 +96,7 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_POST_TYPE = "postType";
     private static final String PROP_NAME_LOCALE = "locale";
     private static final String PROP_NAME_TRANSLATIONS = "translations";
+    private static final String MAP_KEY_TEMPLATE = "template";
 
     private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
     private static OkHttpClient sOkHttpClient = new OkHttpClient.Builder().addInterceptor(sAddCookiesInterceptor).build();
@@ -321,6 +323,16 @@ public class WPAndroidGlueCode {
                 mMediaPickedByUserOnBlock = true;
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 mOnMediaEditorListener.onMediaEditorClicked(mediaUrl);
+            }
+
+            @Override
+            public void logUserEvent(GutenbergUserEvent event, ReadableMap eventProperties) {
+                switch (event) {
+                    case PAGE_TEMPLATE_APPLIED:
+                        mOnLogGutenbergUserEventListener.onGutenbergDidLogSessionTemplateEvent(eventProperties.getString(
+                                MAP_KEY_TEMPLATE));
+                        break;
+                }
             }
         });
 
