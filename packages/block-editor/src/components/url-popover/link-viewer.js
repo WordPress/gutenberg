@@ -8,11 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
-import {
-	createSlotFill,
-	ExternalLink,
-	Button,
-} from '@wordpress/components';
+import { createSlotFill, ExternalLink, Button } from '@wordpress/components';
 import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import { useMemo } from '@wordpress/element';
 

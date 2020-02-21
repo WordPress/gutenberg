@@ -53,7 +53,9 @@ export default function Header() {
 					ids={ settings.templateIds }
 					templatePartIds={ settings.templatePartIds }
 					activeId={ settings.templateId }
-					isTemplatePart={ settings.templateType === 'wp_template_part' }
+					isTemplatePart={
+						settings.templateType === 'wp_template_part'
+					}
 					onActiveIdChange={ setActiveTemplateId }
 					onActiveTemplatePartIdChange={ setActiveTemplatePartId }
 					onAddTemplateId={ addTemplateId }

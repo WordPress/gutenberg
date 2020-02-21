@@ -79,7 +79,11 @@ export default function BlockEditor() {
 							onActiveIdChange={ setActiveTemplateId }
 						/>
 					),
-					[ settings.templateIds, settings.templateId, setActiveTemplateId ]
+					[
+						settings.templateIds,
+						settings.templateId,
+						setActiveTemplateId,
+					]
 				) }
 			</URLPopover.LinkViewer.Fill>
 			<Sidebar.InspectorFill>

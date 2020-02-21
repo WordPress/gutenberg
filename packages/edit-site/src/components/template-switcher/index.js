@@ -50,7 +50,11 @@ export default function TemplateSwitcher( {
 			const { getEntityRecord } = select( 'core' );
 			return {
 				templates: ids.map( ( id ) => {
-					const template = getEntityRecord( 'postType', 'wp_template', id );
+					const template = getEntityRecord(
+						'postType',
+						'wp_template',
+						id
+					);
 					return {
 						label: template ? (
 							<TemplateLabel template={ template } />
@@ -62,7 +66,11 @@ export default function TemplateSwitcher( {
 					};
 				} ),
 				templateParts: templatePartIds.map( ( id ) => {
-					const template = getEntityRecord( 'postType', 'wp_template_part', id );
+					const template = getEntityRecord(
+						'postType',
+						'wp_template_part',
+						id
+					);
 					return {
 						label: template ? (
 							<TemplateLabel template={ template } />
@@ -84,9 +92,10 @@ export default function TemplateSwitcher( {
 				icon="layout"
 				label={ __( 'Switch Template' ) }
 				toggleProps={ {
-					children: ( isTemplatePart ? templateParts : templates ).find(
-						( choice ) => choice.value === activeId
-					).slug,
+					children: ( isTemplatePart
+						? templateParts
+						: templates
+					).find( ( choice ) => choice.value === activeId ).slug,
 				} }
 			>
 				{ ( { onClose } ) => (
@@ -94,7 +103,9 @@ export default function TemplateSwitcher( {
 						<MenuGroup label={ __( 'Templates' ) }>
 							<MenuItemsChoice
 								choices={ templates }
-								value={ ! isTemplatePart ? activeId : undefined }
+								value={
+									! isTemplatePart ? activeId : undefined
+								}
 								onSelect={ onActiveIdChange }
 							/>
 							<MenuItem
@@ -120,7 +131,10 @@ export default function TemplateSwitcher( {
 			<AddTemplate
 				ids={ ids }
 				onAddTemplateId={ onAddTemplateId }
-				onRequestClose={ useCallback( () => setIsAddTemplateOpen( false ), [] ) }
+				onRequestClose={ useCallback(
+					() => setIsAddTemplateOpen( false ),
+					[]
+				) }
 				isOpen={ isAddTemplateOpen }
 			/>
 		</>

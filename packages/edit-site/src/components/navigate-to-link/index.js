@@ -29,8 +29,12 @@ export default function NavigateToLink( {
 					if ( newTemplateId === null ) {
 						const { getEntityRecord } = select( 'core' );
 						newTemplateId = templateIds
-							.map( ( id ) => getEntityRecord( 'postType', 'wp_template', id ) )
-							.find( ( template ) => template.slug === data.post_name ).id;
+							.map( ( id ) =>
+								getEntityRecord( 'postType', 'wp_template', id )
+							)
+							.find(
+								( template ) => template.slug === data.post_name
+							).id;
 					}
 					setTemplateId( newTemplateId );
 				} else {

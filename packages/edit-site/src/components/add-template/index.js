@@ -17,7 +17,11 @@ export default function AddTemplate( {
 		( select ) => {
 			const { getEntityRecord } = select( 'core' );
 			return ids.reduce( ( acc, id ) => {
-				const template = getEntityRecord( 'postType', 'wp_template', id );
+				const template = getEntityRecord(
+					'postType',
+					'wp_template',
+					id
+				);
 				acc[ template ? template.slug : 'loading' ] = true;
 				return acc;
 			}, {} );
@@ -33,9 +37,9 @@ export default function AddTemplate( {
 			_setSlug( nextSlug );
 			const cleanSlug = cleanForSlug( nextSlug );
 			setHelp(
-				slugs[ cleanSlug ] ?
-					__( 'Template already exists, edit it instead.' ) :
-					cleanSlug
+				slugs[ cleanSlug ]
+					? __( 'Template already exists, edit it instead.' )
+					: cleanSlug
 			);
 		},
 		[ slugs ]
@@ -45,11 +49,15 @@ export default function AddTemplate( {
 		const cleanSlug = cleanForSlug( slug );
 
 		try {
-			const template = await saveEntityRecord( 'postType', 'wp_template', {
-				title: cleanSlug,
-				status: 'publish',
-				slug: cleanSlug,
-			} );
+			const template = await saveEntityRecord(
+				'postType',
+				'wp_template',
+				{
+					title: cleanSlug,
+					status: 'publish',
+					slug: cleanSlug,
+				}
+			);
 			onAddTemplateId( template.id );
 			onRequestClose();
 		} catch ( err ) {
@@ -59,7 +67,10 @@ export default function AddTemplate( {
 	return (
 		! slugs.loading &&
 		isOpen && (
-			<Modal title={ __( 'Add Template' ) } onRequestClose={ onRequestClose }>
+			<Modal
+				title={ __( 'Add Template' ) }
+				onRequestClose={ onRequestClose }
+			>
 				<TextControl
 					label={ __( 'Add Template' ) }
 					placeholder={ __( 'template-slug' ) }
