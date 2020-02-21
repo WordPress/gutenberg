@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, createPortal } from '@wordpress/element';
+import { useRef, useEffect, createPortal, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,5 +27,10 @@ export default function Fill( { name, children } ) {
 		children = children( slot.fillProps );
 	}
 
-	return createPortal( children, slot.ref.current );
+	const { length } = Object.keys( slot.fills );
+
+	return createPortal(
+		<Fragment key={ length }>{ children }</Fragment>,
+		slot.ref.current
+	);
 }

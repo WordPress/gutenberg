@@ -3,6 +3,7 @@
  */
 import { isEmpty } from 'lodash';
 import ReactTestRenderer from 'react-test-renderer';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -167,47 +168,6 @@ describe( 'Slot', () => {
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
 
-	it( 'should render in expected order', () => {
-		const testRenderer = ReactTestRenderer.create(
-			<Provider>
-				<div key="slot">
-					<Slot name="egg" />
-				</div>
-			</Provider>
-		);
-
-		testRenderer.update(
-			<Provider>
-				<div key="slot">
-					<Slot name="egg" />
-				</div>
-				<Filler name="egg" key="first" text="first" />
-				<Filler name="egg" key="second" text="second" />
-			</Provider>
-		);
-
-		testRenderer.update(
-			<Provider>
-				<div key="slot">
-					<Slot name="egg" />
-				</div>
-				<Filler name="egg" key="second" text="second" />
-			</Provider>
-		);
-
-		testRenderer.update(
-			<Provider>
-				<div key="slot">
-					<Slot name="egg" />
-				</div>
-				<Filler name="egg" key="first" text="first" />
-				<Filler name="egg" key="second" text="second" />
-			</Provider>
-		);
-
-		expect( testRenderer.toJSON() ).toMatchSnapshot();
-	} );
-
 	describe.each( [ false, true ] )(
 		'bubblesVirtually %p',
 		( bubblesVirtually ) => {
@@ -259,6 +219,59 @@ describe( 'Slot', () => {
 				);
 
 				expect( testRenderer.toJSON() ).toMatchSnapshot();
+			} );
+
+			it( 'should render in expected order', () => {
+				const { rerender, container } = render(
+					<Provider>
+						<div key="slot">
+							<Slot
+								name="egg"
+								bubblesVirtually={ bubblesVirtually }
+							/>
+						</div>
+					</Provider>
+				);
+
+				rerender(
+					<Provider>
+						<div key="slot">
+							<Slot
+								name="egg"
+								bubblesVirtually={ bubblesVirtually }
+							/>
+						</div>
+						<Filler name="egg" key="first" text="first" />
+						<Filler name="egg" key="second" text="second" />
+					</Provider>
+				);
+
+				rerender(
+					<Provider>
+						<div key="slot">
+							<Slot
+								name="egg"
+								bubblesVirtually={ bubblesVirtually }
+							/>
+						</div>
+						<Filler name="egg" key="second" text="second" />
+					</Provider>
+				);
+
+				rerender(
+					<Provider>
+						<div key="slot">
+							<Slot
+								name="egg"
+								bubblesVirtually={ bubblesVirtually }
+							/>
+						</div>
+						<Filler name="egg" key="first" text="first" />
+						<Filler name="egg" key="second" text="second" />
+					</Provider>
+				);
+
+				expect( container ).toMatchSnapshot();
 			} );
 		}
 	);
