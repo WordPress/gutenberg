@@ -109,7 +109,9 @@ function ColumnEdit( {
 					},
 				] }
 			>
-				{ isParentSelected && <InnerBlocks.ButtonBlockAppender /> }
+				{ isParentSelected && (
+					<InnerBlocks.ButtonBlockAppender showSeparator />
+				) }
 			</View>
 		);
 	}
