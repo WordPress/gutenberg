@@ -177,17 +177,17 @@ class CategoriesEdit extends Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Categories settings' ) }>
 					<ToggleControl
-						label={ __( 'Display as Dropdown' ) }
+						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ this.toggleDisplayAsDropdown }
 					/>
 					<ToggleControl
-						label={ __( 'Show Hierarchy' ) }
+						label={ __( 'Show hierarchy' ) }
 						checked={ showHierarchy }
 						onChange={ this.toggleShowHierarchy }
 					/>
 					<ToggleControl
-						label={ __( 'Show Post Counts' ) }
+						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
 						onChange={ this.toggleShowPostCounts }
 					/>

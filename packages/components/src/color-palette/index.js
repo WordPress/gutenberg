@@ -85,7 +85,7 @@ export default function ColorPalette( {
 							buttonProps={ {
 								'aria-label': __( 'Custom color picker' ),
 							} }
-							linkText={ __( 'Custom Color' ) }
+							linkText={ __( 'Custom color' ) }
 						/>
 					) }
 					{ !! clearable && (

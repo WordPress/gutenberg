@@ -47,7 +47,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				checked={ muted }
 			/>
 			<ToggleControl
-				label={ __( 'Playback Controls' ) }
+				label={ __( 'Playback controls' ) }
 				onChange={ toggleAttribute( 'controls' ) }
 				checked={ controls }
 			/>
