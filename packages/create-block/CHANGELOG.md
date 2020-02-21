@@ -1,5 +1,9 @@
 ## Master
 
+### New Features
+
+- Added support for `format:js` script to the block scaffolded with ESNext template ([#20335](https://github.com/WordPress/gutenberg/pull/20335)).
+
 ## 0.6.0 (2020-02-04)
 
 ### Enhancements
