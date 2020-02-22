@@ -40,7 +40,7 @@ We can extract a few key principles from this:
 
 One thing that sets WordPress apart from other systems is that it allows users to create as rich a post layout as they can imagine — as long as they know HTML and CSS and build a custom theme.
 
-Gutenberg reshapes the editor into a tool that allows users write rich posts and build beautiful layouts in a few clicks — no technical knowledge needed. WordPress will become a powerful and flexible content tool that’s accessible to all.
+Gutenberg reshapes the editor into a tool that allows users to write rich posts and build beautiful layouts in a few clicks — no technical knowledge needed. WordPress will become a powerful and flexible content tool that’s accessible to all.
 
 ### Vision
 
