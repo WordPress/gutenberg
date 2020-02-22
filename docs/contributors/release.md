@@ -60,7 +60,7 @@ Releasing the first release candidate for this milestone (`x.x`) involves:
 
 ##### Creating the Release Branch
 
-For each milestone (let's assume it's `x.x` here), a release branch is used to release all RCs and minor releases. For the first RC of the milestone, a release branch is created from master.
+For each milestone (let's assume it's `x.x` here), a release branch is used to release all RCs and minor releases. For the first RC of the milestone, a release branch is created from the master.
 
 ```
 git checkout master
