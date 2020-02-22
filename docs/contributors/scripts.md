@@ -1,6 +1,6 @@
 # Scripts
 
-The editor provides several vendor and internal scripts to plugin developers. Script names, handles, and descriptions are documented in the table below.
+The editor provides several vendors and internal scripts to plugin developers. Script names, handles, and descriptions are documented in the table below.
 
 ## WP Scripts
 
