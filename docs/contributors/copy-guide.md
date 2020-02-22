@@ -267,7 +267,7 @@ Okay, fine. Why does that matter? What do I do about it? How does this message h
 
 Maybe we’re getting somewhere here: now I know there’s something I can do about things, which is good.
 
-Then again, maybe we’re not: I still don’t know what my role is, or why it matters. Also, now I’m also not sure what a site administrator is, who mine is, or how to contact them.
+Then again, maybe we’re not: I still don’t know what my role is, or why it matters. Also, now I’m not sure what a site administrator is, who mine is, or how to contact them.
 
 All the information in this error message is technically entirely correct, but that doesn’t mean it communicates anything useful. If the goal is understanding and resolution, technical accuracy doesn’t always get us there.
 
