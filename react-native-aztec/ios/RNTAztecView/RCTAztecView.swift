@@ -37,10 +37,14 @@ class RCTAztecView: Aztec.TextView {
     }
 
     override var textAlignment: NSTextAlignment {
-        didSet {
-            super.textAlignment = textAlignment
-            defaultParagraphStyle.alignment = textAlignment
-            placeholderLabel.textAlignment = textAlignment
+        set {
+            super.textAlignment = newValue
+            defaultParagraphStyle.alignment = newValue
+            placeholderLabel.textAlignment = newValue
+        }
+
+        get {
+            return super.textAlignment
         }
     }
 
