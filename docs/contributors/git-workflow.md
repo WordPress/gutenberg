@@ -6,7 +6,7 @@ A good workflow for new contributors to follow is listed below:
 - Create a new branch
 - Make code changes
 - Commit code changes within the newly created branch
-- Push branch to forked repository
+- Push branch to the forked repository
 - Submit Pull Request to Gutenberg repository
 
 Ideally name your branches with prefixes and descriptions, like this: `[type]/[change]`. A good prefix would be:
