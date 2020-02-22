@@ -87,7 +87,7 @@ git push origin release/x.x
 
 1. [Create a new release on GitHub](https://github.com/WordPress/gutenberg/releases/new).
 2. If you were releasing the `x.x.0-rc.1` release candidate, label it `x.x.0-rc.1` and use the `vx.x.x-rc.1` as a tag.
-3. Upload the a `gutenberg.zip` file into the release.
+3. Upload the `gutenberg.zip` file into the release.
 4. Use the changelog as a description of the release.
 5. Publish the release.
 
