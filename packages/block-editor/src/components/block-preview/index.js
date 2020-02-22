@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray, noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -24,7 +24,7 @@ import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
-function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
+function ScaledBlockPreview( { blocks, viewportWidth, onReady, padding = 0 } ) {
 	const previewRef = useRef( null );
 
 	const [ isReady, setIsReady ] = useState( false );
@@ -79,9 +79,17 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
 
 				// Hack: we need  to reset the scaled elements margins
 				previewElement.style.marginTop = '0';
+
+				onReady( {
+					scale,
+					position: { x: offsetX * scale, y: offsetY },
+					ref: previewRef,
+				} );
 			} else {
 				const containerElementRect = containerElement.getBoundingClientRect();
-				setPreviewScale( containerElementRect.width / viewportWidth );
+				const scale = containerElementRect.width / viewportWidth;
+				setPreviewScale( scale );
+				onReady( { scale, ref: previewRef } );
 			}
 
 			setIsReady( true );
@@ -133,6 +141,7 @@ export function BlockPreview( {
 	viewportWidth = 700,
 	padding,
 	settings,
+	onReady = noop,
 } ) {
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	const [ recompute, triggerRecompute ] = useReducer(
@@ -152,6 +161,7 @@ export function BlockPreview( {
 				blocks={ renderedBlocks }
 				viewportWidth={ viewportWidth }
 				padding={ padding }
+				onReady={ onReady }
 			/>
 		</BlockEditorProvider>
 	);
