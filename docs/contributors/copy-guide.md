@@ -6,7 +6,7 @@ Guidelines for writing multi-line/step instructions or narrative introductions/o
 This will obviously vary quite a lot depending on the context, but here are some general tips:
 
 #### ONE: Contractions are your friends!
-They’re more conversational, and a simple way to make text sound friendlier and less formal. (And they save a bit of space as well: a win-win.)
+They’re more conversational, and a simple way to make the text sound friendlier and less formal. (And they save a bit of space as well: a win-win.)
 
 #### TWO: Cut phrases that inflate your word count without actually adding meaning.
 This happens frequently in two specific instances. First, when writing in the passive voice:
