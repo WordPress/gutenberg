@@ -29,6 +29,7 @@ import {
 	appendNewBlocks,
 	resizeOverflowingBlocks,
 	cropAndFillEmptyCells,
+	convertEmptyCellToBlockAppender,
 	hashGrid,
 	createGridStyleRules,
 } from './grid-utils';
@@ -106,14 +107,46 @@ function BlockGrid( {
 					setLayout( nextLayout );
 					updateBlockAttributes( rootClientId, {
 						grid: nextLayout.filter(
-							( item ) => ! item.i.startsWith( 'block-appender' )
+							( item ) =>
+								! item.i.startsWith( 'empty-cell' ) &&
+								! item.i.startsWith( 'block-appender' )
 						),
 					} );
 				} }
 				rowHeight={ 200 }
 				verticalCompact={ false }
+				onResizeStop={ ( nextLayout, _oldItem, newItem ) => {
+					if ( ! newItem.i.startsWith( 'empty-cell' ) ) {
+						return;
+					}
+
+					// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+					setTimeout(
+						() =>
+							setLayout(
+								cropAndFillEmptyCells(
+									convertEmptyCellToBlockAppender(
+										nextLayout,
+										newItem
+									),
+									cols,
+									rows
+								)
+							),
+						0
+					);
+				} }
 			>
 				{ [
+					...layout
+						.filter( ( item ) => item.i.startsWith( 'empty-cell' ) )
+						.map( ( item ) => (
+							<div
+								key={ item.i }
+								id={ item.i }
+								isDraggable={ false }
+							/>
+						) ),
 					...layout
 						.filter( ( item ) =>
 							item.i.startsWith( 'block-appender' )

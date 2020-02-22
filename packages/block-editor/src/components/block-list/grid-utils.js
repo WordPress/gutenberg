@@ -5,12 +5,12 @@ import uuid from 'uuid/v4';
 
 export function createInitialLayouts( grid, blockClientIds ) {
 	// Hydrate grid layout, if any, with new block client IDs.
-	return grid ?
-		grid.map( ( item, i ) => ( {
-			...item,
-			i: `block-${ blockClientIds[ i ] }`,
-		} ) ) :
-		[];
+	return grid
+		? grid.map( ( item, i ) => ( {
+				...item,
+				i: `block-${ blockClientIds[ i ] }`,
+		  } ) )
+		: [];
 }
 
 export function appendNewBlocks(
@@ -21,7 +21,9 @@ export function appendNewBlocks(
 ) {
 	if (
 		blockClientIds.length &&
-		! prevBlockClientIds.includes( blockClientIds[ blockClientIds.length - 1 ] )
+		! prevBlockClientIds.includes(
+			blockClientIds[ blockClientIds.length - 1 ]
+		)
 	) {
 		// If a block client ID has been added, make its block's position and dimensions
 		// that of the last clicked block appender, since it must be the one that added it.
@@ -34,7 +36,9 @@ export function appendNewBlocks(
 					case lastClickedBlockAppenderId:
 						return {
 							...appenderItem,
-							i: `block-${ blockClientIds[ blockClientIds.length - 1 ] }`,
+							i: `block-${
+								blockClientIds[ blockClientIds.length - 1 ]
+							}`,
 						};
 					case blockClientIds[ blockClientIds.length - 1 ]:
 						return null;
@@ -64,9 +68,13 @@ export function resizeOverflowingBlocks( nextLayout, nodes ) {
 			node.offsetWidth / ( clientWidth / itemsMap[ node.id ].w )
 		);
 		const minRows = Math.ceil(
-			( node.offsetHeight - 20 ) / ( clientHeight / itemsMap[ node.id ].h )
+			( node.offsetHeight - 20 ) /
+				( clientHeight / itemsMap[ node.id ].h )
 		);
-		if ( itemsMap[ node.id ].w < minCols || itemsMap[ node.id ].h < minRows ) {
+		if (
+			itemsMap[ node.id ].w < minCols ||
+			itemsMap[ node.id ].h < minRows
+		) {
 			cellChanges[ node.id ] = {
 				w: Math.max( itemsMap[ node.id ].w, minCols ),
 				h: Math.max( itemsMap[ node.id ].h, minRows ),
@@ -87,7 +95,7 @@ export function cropAndFillEmptyCells( nextLayout, cols, rows ) {
 		Math.max(
 			rows,
 			...nextLayout
-				.filter( ( item ) => ! item.i.startsWith( 'block-appender' ) )
+				.filter( ( item ) => ! item.i.startsWith( 'empty-cell' ) )
 				.map( ( item ) => item.y + item.h )
 		) - 1;
 	if ( nextLayout.some( ( item ) => item.y > maxRow ) ) {
@@ -98,7 +106,8 @@ export function cropAndFillEmptyCells( nextLayout, cols, rows ) {
 	const emptyCells = {};
 	for (
 		let col = 0;
-		col <= Math.max( cols, ...nextLayout.map( ( item ) => item.x + item.w ) ) - 1;
+		col <=
+		Math.max( cols, ...nextLayout.map( ( item ) => item.x + item.w ) ) - 1;
 		col++
 	) {
 		for ( let row = 0; row <= maxRow; row++ ) {
@@ -119,7 +128,7 @@ export function cropAndFillEmptyCells( nextLayout, cols, rows ) {
 			...Object.keys( emptyCells ).map( ( emptyCell ) => {
 				const [ col, row ] = emptyCell.split( ' | ' );
 				return {
-					i: `block-appender-${ uuid() }`,
+					i: `empty-cell-${ uuid() }`,
 					x: Number( col ),
 					y: Number( row ),
 					w: 1,
@@ -129,6 +138,20 @@ export function cropAndFillEmptyCells( nextLayout, cols, rows ) {
 		];
 	}
 
+	return nextLayout;
+}
+
+export function convertEmptyCellToBlockAppender( nextLayout, newItem ) {
+	if ( ! newItem.i.startsWith( 'empty-cell' ) ) {
+		return nextLayout;
+	}
+
+	nextLayout = [ ...nextLayout ];
+	nextLayout.splice(
+		nextLayout.findIndex( ( item ) => item.i === newItem.i ),
+		1,
+		{ ...newItem, i: `block-appender-${ uuid() }` }
+	);
 	return nextLayout;
 }
 
@@ -144,17 +167,22 @@ export function hashGrid( grid ) {
 function createGridItemsStyleRules( gridId, items ) {
 	return items
 		.map(
-			( item, i ) => `#${ gridId } > #editor-block-list__grid-content-item-${ i } {
-		grid-area: ${ item.y + 1 } / ${ item.x + 1 } / ${ item.y + 1 + item.h } / ${ item.x +
+			(
+				item,
+				i
+			) => `#${ gridId } > #editor-block-list__grid-content-item-${ i } {
+		grid-area: ${ item.y + 1 } / ${ item.x + 1 } / ${ item.y +
 				1 +
-				item.w }
+				item.h } / ${ item.x + 1 + item.w }
 	}`
 		)
 		.join( '\n\n	' );
 }
 export function createGridStyleRules( gridId, grid, breakpoint, cols, rows ) {
-	const maxCol = Math.max( cols, ...grid.map( ( item ) => item.x + item.w ) ) - 1;
-	const maxRow = Math.max( rows, ...grid.map( ( item ) => item.y + item.h ) ) - 1;
+	const maxCol =
+		Math.max( cols, ...grid.map( ( item ) => item.x + item.w ) ) - 1;
+	const maxRow =
+		Math.max( rows, ...grid.map( ( item ) => item.y + item.h ) ) - 1;
 	return `@media (min-width: ${ breakpoint }px) {
 			#${ gridId } {
 				grid-template-columns: repeat(${ maxCol + 1 }, 1fr);

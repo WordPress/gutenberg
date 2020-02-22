@@ -587,6 +587,18 @@
 		width: 40px;
 	}
 
+	[id^="empty-cell"].react-grid-item {
+		background: $dark-gray-500;
+		border: 5px solid $white;
+		opacity: 0.25;
+		padding: 10px;
+
+		& > .react-resizable-handle {
+			height: 100%;
+			width: 100%;
+		}
+	}
+
 	.block-list-appender {
 		&.block-list-appender {
 			margin: 0;
