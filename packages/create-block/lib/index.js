@@ -1,9 +1,11 @@
 /**
  * External dependencies
  */
+const { command } = require( 'execa' );
 const program = require( 'commander' );
 const inquirer = require( 'inquirer' );
 const { startCase } = require( 'lodash' );
+const { join } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -13,6 +15,19 @@ const log = require( './log' );
 const { version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
 const { getDefaultValues, getPrompts } = require( './templates' );
+
+async function checkSystemRequirements() {
+	try {
+		await command( 'check-node-version --package', {
+			cwd: join( __dirname, '..' ),
+		} );
+	} catch ( error ) {
+		log.error( 'Minimum system requirements not met!' );
+		log.error( error.stderr );
+		log.info( error.stdout );
+		process.exit( error.exitCode );
+	}
+}
 
 const commandName = `wp-create-block`;
 program
@@ -31,6 +46,7 @@ program
 		'esnext'
 	)
 	.action( async ( slug, { template } ) => {
+		await checkSystemRequirements();
 		try {
 			const defaultValues = getDefaultValues( template );
 			if ( slug ) {
@@ -50,21 +66,18 @@ program
 			}
 		} catch ( error ) {
 			if ( error instanceof CLIError ) {
-				log.info( '' );
 				log.error( error.message );
 				process.exit( 1 );
 			} else {
 				throw error;
 			}
 		}
-	} );
-
-program.on( '--help', function() {
-	log.info( '' );
-	log.info( 'Examples:' );
-	log.info( `  $ ${ commandName }` );
-	log.info( `  $ ${ commandName } todo-list` );
-	log.info( `  $ ${ commandName } --template es5 todo-list` );
-} );
-
-program.parse( process.argv );
+	} )
+	.on( '--help', function() {
+		log.info( '' );
+		log.info( 'Examples:' );
+		log.info( `  $ ${ commandName }` );
+		log.info( `  $ ${ commandName } todo-list` );
+		log.info( `  $ ${ commandName } --template es5 todo-list` );
+	} )
+	.parse( process.argv );
