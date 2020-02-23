@@ -362,7 +362,7 @@ Now that the packages have been published the _"chore(release): publish"_ and _"
 7. `git cherry-pick fe6ae0d`
 8. `git push`
 
-Confirm the packages dependancies do not contain `file://` links in the `dependencies` or `devdependencies` section of the packages released, e.g:
+Confirm the packages dependencies do not contain `file://` links in the `dependencies` or `devdependencies` section of the packages released, e.g:
 > https://unpkg.com/browse/@wordpress/jest-preset-default@5.3.1/package.json
 > https://unpkg.com/browse/@wordpress/scripts@6.1.1/package.json
 > https://unpkg.com/browse/@wordpress/jest-preset-default@5.3.1/package.json
