@@ -30,10 +30,5 @@ export default function Fill( { name, children } ) {
 		children = children( slot.fillProps );
 	}
 
-	return (
-		<>
-			<span ref={ ref } />
-			{ createPortal( children, slot.ref.current, slot.key ) }
-		</>
-	);
+	return createPortal( children, slot.ref.current );
 }
