@@ -44,7 +44,7 @@ const DEFAULT_QUERY = {
 
 const MIN_TERMS_COUNT_FOR_FILTER = 8;
 
-class HierarchicalTermSelector extends Component {
+export class HierarchicalTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
 		this.findTerm = this.findTerm.bind( this );
@@ -216,6 +216,29 @@ class HierarchicalTermSelector extends Component {
 		if ( this.props.taxonomy !== prevProps.taxonomy ) {
 			this.fetchTerms();
 		}
+
+		// Rebuild the available terms tree when the selected terms have changed.
+		if ( prevProps.terms.length !== this.props.terms.length ) {
+			this.setState( ( { availableTerms, filterValue } ) => {
+				const newAvailableTermsTree = this.sortBySelected(
+					buildTermsTree( availableTerms )
+				);
+
+				const newState = {
+					availableTermsTree: newAvailableTermsTree,
+				};
+
+				// If searching, rebuild the filtered terms tree also.
+				if ( 0 < filterValue.length ) {
+					newState.filteredTermsTree = this.getFilteredTermsTree(
+						filterValue,
+						newAvailableTermsTree
+					);
+				}
+
+				return newState;
+			} );
+		}
 	}
 
 	fetchTerms() {
@@ -293,15 +316,13 @@ class HierarchicalTermSelector extends Component {
 			return 0;
 		};
 		termsTree.sort( termOrChildIsSelected );
+
 		return termsTree;
 	}
 
 	setFilterValue( event ) {
-		const { availableTermsTree } = this.state;
 		const filterValue = event.target.value;
-		const filteredTermsTree = availableTermsTree
-			.map( this.getFilterMatcher( filterValue ) )
-			.filter( ( term ) => term );
+
 		const getResultCount = ( terms ) => {
 			let count = 0;
 			for ( let i = 0; i < terms.length; i++ ) {
@@ -312,6 +333,12 @@ class HierarchicalTermSelector extends Component {
 			}
 			return count;
 		};
+
+		const filteredTermsTree = this.getFilteredTermsTree(
+			filterValue,
+			this.state.availableTermsTree
+		);
+
 		this.setState( {
 			filterValue,
 			filteredTermsTree,
@@ -323,6 +350,12 @@ class HierarchicalTermSelector extends Component {
 			resultCount
 		);
 		this.props.debouncedSpeak( resultsFoundMessage, 'assertive' );
+	}
+
+	getFilteredTermsTree( filterValue, availableTermsTree ) {
+		return availableTermsTree
+			.map( this.getFilterMatcher( filterValue ) )
+			.filter( ( term ) => term );
 	}
 
 	getFilterMatcher( filterValue ) {
@@ -364,6 +397,7 @@ class HierarchicalTermSelector extends Component {
 
 	renderTerms( renderedTerms ) {
 		const { terms = [] } = this.props;
+
 		return renderedTerms.map( ( term ) => {
 			return (
 				<div
