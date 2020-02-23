@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, createPortal, Fragment } from '@wordpress/element';
+import { useRef, useEffect, createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,18 +30,10 @@ export default function Fill( { name, children } ) {
 		children = children( slot.fillProps );
 	}
 
-	// We re-mount the portal children whenever the number of fills change
-	// See https://github.com/WordPress/gutenberg/pull/19242#discussion_r381152030
-	// We also check if the current fill has been already registered, because
-	// the useEffect above will be called only after the first render, which
-	// could trigger a re-mount here unnecessarily in the second render.
-	const key =
-		slot.fills.indexOf( ref ) !== -1
-			? slot.fills.length
-			: slot.fills.length + 1;
-
-	return createPortal(
-		<Fragment key={ key }>{ children }</Fragment>,
-		slot.ref.current
+	return (
+		<>
+			<span ref={ ref } />
+			{ createPortal( children, slot.ref.current, slot.key ) }
+		</>
 	);
 }

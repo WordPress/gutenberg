@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useContext } from '@wordpress/element';
+import { useCallback, useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,8 +11,9 @@ import SlotFillContext from './slot-fill-context';
 export default function useSlot( name ) {
 	const registry = useContext( SlotFillContext );
 
-	const { ref, fillProps } = registry.slots[ name ] || {};
-	const fills = registry.fills[ name ] || [];
+	const slot = registry.slots[ name ] || {};
+	const slotFills = registry.fills[ name ];
+	const fills = useMemo( () => slotFills || [], [ slotFills ] );
 
 	const updateSlot = useCallback(
 		( slotRef, slotFillProps ) => {
@@ -40,8 +41,7 @@ export default function useSlot( name ) {
 	);
 
 	return {
-		ref,
-		fillProps,
+		...slot,
 		updateSlot,
 		unregisterSlot,
 		fills,

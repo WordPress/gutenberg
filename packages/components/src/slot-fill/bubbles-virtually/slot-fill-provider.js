@@ -8,6 +8,24 @@ import { useMemo, useCallback, useState } from '@wordpress/element';
  */
 import SlotFillContext from './slot-fill-context';
 
+function getIndexBasedOnDOMPosition( newRef, existingRefs ) {
+	return existingRefs.findIndex( ( existingRef ) => {
+		if (
+			typeof window === 'undefined' ||
+			! existingRef.current ||
+			! newRef.current
+		) {
+			return false;
+		}
+		// Return true if newRef is located earlier in the DOM than the existingRef
+		return Boolean(
+			// eslint-disable-next-line no-bitwise
+			existingRef.current.compareDocumentPosition( newRef.current ) &
+				window.Node.DOCUMENT_POSITION_PRECEDING
+		);
+	} );
+}
+
 function useSlotRegistry() {
 	const [ slots, setSlots ] = useState( {} );
 	const [ fills, setFills ] = useState( {} );
@@ -16,6 +34,7 @@ function useSlotRegistry() {
 		setSlots( ( prevSlots ) => ( {
 			...prevSlots,
 			[ name ]: {
+				...prevSlots[ name ],
 				ref: ref || prevSlots[ name ].ref,
 				fillProps: fillProps || prevSlots[ name ].fillProps || {},
 			},
@@ -31,10 +50,32 @@ function useSlotRegistry() {
 	}, [] );
 
 	const registerFill = useCallback( ( name, ref ) => {
-		setFills( ( prevFills ) => ( {
-			...prevFills,
-			[ name ]: [ ...( prevFills[ name ] || [] ), ref ],
-		} ) );
+		setFills( ( prevFills ) => {
+			const prevSlotFills = prevFills[ name ] || [];
+			const nextIndex = getIndexBasedOnDOMPosition( ref, prevSlotFills );
+			if ( nextIndex === -1 ) {
+				// Should be added as the last element
+				return { ...prevFills, [ name ]: [ ...prevSlotFills, ref ] };
+			}
+			setSlots( ( prevSlots ) => ( {
+				...prevSlots,
+				[ name ]: {
+					...prevSlots[ name ],
+					key:
+						prevSlots[ name ] && prevSlots[ name ].key
+							? -prevSlots[ name ].key
+							: 1,
+				},
+			} ) );
+			return {
+				...prevFills,
+				[ name ]: [
+					...prevSlotFills.slice( 0, nextIndex ),
+					ref,
+					...prevSlotFills.slice( nextIndex ),
+				],
+			};
+		} );
 	}, [] );
 
 	const unregisterFill = useCallback( ( name, ref ) => {
