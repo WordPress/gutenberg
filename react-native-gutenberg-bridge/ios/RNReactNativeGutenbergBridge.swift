@@ -227,8 +227,8 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     
     @objc
     func logUserEvent(_ event: String, properties:[AnyHashable: Any]?) {
-        guard let event = GutenbergUserEvent(event: event, properties: properties) else { return }
-        self.delegate?.gutenbergDidLogUserEvent(event)
+        guard let logEvent = GutenbergUserEvent(event: event, properties: properties) else { return }
+        self.delegate?.gutenbergDidLogUserEvent(logEvent)
     }
 }
 

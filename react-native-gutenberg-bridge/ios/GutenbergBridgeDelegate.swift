@@ -66,17 +66,17 @@ extension RCTLogLevel {
 
 public enum GutenbergUserEvent {
     
-    case pageTemplateApply(_ template: String)
     case editorSessionTemplateApply(_ template: String)
+    case editorSessionTemplatePreview(_ template: String)
     
     init?(event: String, properties:[AnyHashable: Any]?) {
         switch event {
-        case "page_template_apply":
-            guard let template = properties?["template"] as? String else { return nil }
-            self = .pageTemplateApply(template)
-        case "editor_session_template_preview":
+        case "editor_session_template_apply":
             guard let template = properties?["template"] as? String else { return nil }
             self = .editorSessionTemplateApply(template)
+        case "editor_session_template_preview":
+            guard let template = properties?["template"] as? String else { return nil }
+            self = .editorSessionTemplatePreview(template)
         default:
             return nil
         }

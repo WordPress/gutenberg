@@ -17,8 +17,8 @@ export const mediaSources = {
 };
 
 export const userEvents = {
-	pageTemplateApply: 'page_template_apply',
-	editorSessionTemplateApply: 'editor_session_template_preview',
+	editorSessionTemplateApply: 'editor_session_template_apply',
+	editorSessionTemplatePreview: 'editor_session_template_preview',
 };
 
 export const showMediaEditorButton = isIOS;
