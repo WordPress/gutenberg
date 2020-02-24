@@ -290,6 +290,8 @@ export function isSavingMetaBoxes( state ) {
 
 /**
  * Returns the current editing canvas device type.
+ * It's marked as experimental because, potentially, we'll need this
+ * in several pages including edit-site.
  *
  * @param {Object} state Global application state.
  *
