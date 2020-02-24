@@ -1,5 +1,9 @@
 == Changelog ==
 
+= 7.6.0-rc.1 =
+
+Changelog creation in progress.
+
 = 7.5.0 =
 
 ## Features
