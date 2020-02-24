@@ -33,6 +33,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			isBlockValid,
 			getBlockRootClientId,
 			getBlockListSettings,
+			getSettings,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const blockRootClientId = getBlockRootClientId(
@@ -44,9 +45,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 		return {
 			blockClientIds: selectedBlockClientIds,
-			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
-				'fixedToolbar'
-			),
+			hasFixedToolbar: getSettings().hasFixedToolbar,
 			rootClientId: blockRootClientId,
 			isValid:
 				selectedBlockClientIds.length === 1
