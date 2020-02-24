@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useMemo, useCallback } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
+import { parse, cloneBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -44,14 +49,19 @@ function BlockPatterns( { patterns } ) {
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
 		const { index, rootClientId } = getBlockInsertionPoint();
-		insertBlocks( blocks, index, rootClientId, false );
+		insertBlocks(
+			map( blocks, ( block ) => cloneBlock( block ) ),
+			index,
+			rootClientId,
+			false
+		);
 		createSuccessNotice(
 			sprintf( __( 'Pattern "%s" inserted' ), pattern.title ),
 			{
 				type: 'snackbar',
 			}
 		);
-	} );
+	}, [] );
 
 	return (
 		<div className="block-editor-patterns">
