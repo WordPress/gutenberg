@@ -101,11 +101,6 @@ class LatestPostsEdit extends Component {
 			styles.latestPostBlockMessageDark
 		);
 
-		const subTitleStyle = getStylesFromColorScheme(
-			styles.latestPostBlockSubtitle,
-			styles.latestPostBlockSubtitleDark
-		);
-
 		const onSetDisplayPostContent = ( value ) => {
 			setAttributes( { displayPostContent: value } );
 		};
@@ -213,7 +208,7 @@ class LatestPostsEdit extends Component {
 					<Text style={ titleStyle }>
 						{ blockType.settings.title }
 					</Text>
-					<Text style={ subTitleStyle }>{ __( 'CUSTOMIZE' ) }</Text>
+					<Text style={ styles.latestPostBlockSubtitle }>{ __( 'CUSTOMIZE' ) }</Text>
 				</View>
 			</TouchableWithoutFeedback>
 		);
