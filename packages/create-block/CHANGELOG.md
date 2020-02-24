@@ -1,5 +1,10 @@
 ## Master
 
+### Bug Fixes
+
+- Added error message when minimum system requirements not met ([#20398](https://github.com/WordPress/gutenberg/pull/20398/)).
+- Corrected the minimum `npm` version required to align with `@wordpress/scripts` package used internally ([#20398](https://github.com/WordPress/gutenberg/pull/20398/)).
+
 ## 0.8.0 (2020-02-21)
 
 ### New Features
