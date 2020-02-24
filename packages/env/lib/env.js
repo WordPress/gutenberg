@@ -47,7 +47,7 @@ module.exports = {
 		 *
 		 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
 		 */
-		await module.exports.stop( { spinner } );
+		await module.exports.stop( { spinner, debug } );
 
 		await checkForLegacyInstall( spinner );
 		const config = await initConfig( { spinner, debug } );
