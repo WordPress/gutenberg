@@ -203,7 +203,8 @@ module.exports = {
 			coreSource: includeTestsPath(
 				parseSourceString( config.core, {
 					workDirectoryPath,
-				} )
+				} ),
+				{ workDirectoryPath }
 			),
 			pluginSources: config.plugins.map( ( sourceString ) =>
 				parseSourceString( sourceString, {
@@ -277,9 +278,11 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
  * property set correctly. Only the 'core' source requires a testsPath.
  *
  * @param {Source|null} source A source object.
+ * @param {Object} options
+ * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  * @return {Source|null} A source object.
  */
-function includeTestsPath( source ) {
+function includeTestsPath( source, { workDirectoryPath } ) {
 	if ( source === null ) {
 		return null;
 	}
@@ -287,8 +290,7 @@ function includeTestsPath( source ) {
 	return {
 		...source,
 		testsPath: path.resolve(
-			source.path,
-			'..',
+			workDirectoryPath,
 			'tests-' + path.basename( source.path )
 		),
 	};
