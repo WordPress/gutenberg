@@ -33,8 +33,8 @@ function HeaderToolbar() {
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
 			previewDeviceType: select(
-				'core/block-editor'
-			).getPreviewDeviceType(),
+				'core/edit-post'
+			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]
 	);

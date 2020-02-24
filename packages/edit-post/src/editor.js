@@ -145,16 +145,19 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select, { postId, postType } ) => {
-		const { isFeatureActive, getPreference } = select( 'core/edit-post' );
+		const {
+			isFeatureActive,
+			getPreference,
+			__experimentalGetPreviewDeviceType,
+		} = select( 'core/edit-post' );
 		const { getEntityRecord } = select( 'core' );
 		const { getBlockTypes } = select( 'core/blocks' );
-		const { getPreviewDeviceType } = select( 'core/block-editor' );
 
 		return {
 			showInserterHelpPanel: isFeatureActive( 'showInserterHelpPanel' ),
 			hasFixedToolbar:
 				isFeatureActive( 'fixedToolbar' ) ||
-				getPreviewDeviceType() !== 'Desktop',
+				__experimentalGetPreviewDeviceType() !== 'Desktop',
 			focusMode: isFeatureActive( 'focusMode' ),
 			post: getEntityRecord( 'postType', postType, postId ),
 			preferredStyleVariations: getPreference(
