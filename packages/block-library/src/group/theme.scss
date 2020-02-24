@@ -6,6 +6,17 @@
 		margin-top: 0;
 		margin-bottom: 0;
 	}
+}
+
+.wp-block-group {
+
+	.editor-styles-wrapper & {
+		// Adds animation to improve abilty for users to perceive
+		// the change occuring within the Editor
+		@include reduce-motion("transition");
+		transition: 0.2s ease-out;
+		transition-property: margin, padding;
+	}
 
 	&.padding-none {
 		padding: 0;
