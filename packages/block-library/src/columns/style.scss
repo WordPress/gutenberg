@@ -99,4 +99,10 @@
 	&.is-vertically-aligned-bottom {
 		align-self: flex-end;
 	}
+
+	&.is-vertically-aligned-top,
+	&.is-vertically-aligned-center,
+	&.is-vertically-aligned-bottom {
+		width: 100%;
+	}
 }
