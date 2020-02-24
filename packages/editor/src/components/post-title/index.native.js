@@ -101,7 +101,7 @@ class PostTitle extends Component {
 			>
 				<RichText
 					tagName={ 'p' }
-					rootTagsToEliminate={ [ 'strong' ] }
+					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }

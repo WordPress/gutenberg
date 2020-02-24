@@ -100,13 +100,13 @@ export default function FontSizePicker( {
 	return (
 		<fieldset className="components-font-size-picker">
 			<legend className="screen-reader-text">
-				{ __( 'Font Size' ) }
+				{ __( 'Font size' ) }
 			</legend>
 			<div className="components-font-size-picker__controls">
 				{ fontSizes.length > 0 && (
 					<CustomSelectControl
 						className={ 'components-font-size-picker__select' }
-						label={ __( 'Preset Size' ) }
+						label={ __( 'Preset size' ) }
 						options={ options }
 						value={
 							options.find(

@@ -188,6 +188,83 @@ example: {
 
 If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
 
+#### variations (optional)
+
+- **Type:** `Object[]`
+
+Similarly to how the block's style variations can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted.
+
+By default, all variations will show up in the Inserter in addition to the regular block type item. However, setting the `isDefault` flag for any of the variations listed will override the regular block type in the Inserter.
+
+{% codetabs %}
+{% ES5 %}
+
+```js
+variations: [
+    {
+		name: 'wordpress',
+		isDefault: true,
+		title: __( 'WordPress' ),
+		description: __( 'Code is poetry!' ),
+		icon: WordPressIcon,
+		attributes: { service: 'wordpress' },
+	},
+	{
+		name: 'google',
+		title: __( 'Google' ),
+		icon: GoogleIcon,
+		attributes: { service: 'google' },
+	},
+	{
+		name: 'twitter',
+		title: __( 'Twitter' ),
+		icon: TwitterIcon,
+		attributes: { service: 'twitter' },
+	},
+],
+```
+
+{% ESNext %}
+
+```js
+variations: [
+    {
+		name: 'wordpress',
+		isDefault: true,
+		title: __( 'WordPress' ),
+		description: __( 'Code is poetry!' ),
+		icon: WordPressIcon,
+		attributes: { service: 'wordpress' },
+	},
+	{
+		name: 'google',
+		title: __( 'Google' ),
+		icon: GoogleIcon,
+		attributes: { service: 'google' },
+	},
+	{
+		name: 'twitter',
+		title: __( 'Twitter' ),
+		icon: TwitterIcon,
+		attributes: { service: 'twitter' },
+	},
+],
+```
+
+{% end %}
+
+An object describing a variation defined for the block type can contain the following fields:
+
+- `name` (type `string`) – The unique and machine-readable name.
+- `title` (type `string`) – A human-readable variation title.
+- `description` (optional, type `string`) – A detailed variation description.
+- `icon` (optional, type `String` | `Object`) – An icon helping to visualize the variation. It can have the same shape as the block type.
+- `isDefault` (optional, type `boolean`) – Indicates whether the current variation is the default one. Defaults to `false`.
+- `attributes` (optional, type `Object`) – Values that override block attributes.
+- `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
+- `example` (optional, type `Object`) – Example provides structured data for the block preview. You can set to `undefined` to disable the preview shown for the block type.
+- `scope` (optional, type `String[]`) - the list of scopes where the variation is applicable. When not provided, it assumes all available scopes. Available options: `block`, `inserter`.
+
 #### transforms (optional)
 
 -   **Type:** `Array`

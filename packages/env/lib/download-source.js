@@ -12,9 +12,11 @@ const NodeGit = require( 'nodegit' );
  * Downloads the given source if necessary. The specific action taken depends
  * on the source type.
  *
- * @param {Source} source The source to download.
- * @param {Object} options
+ * @param {Source}   source             The source to download.
+ * @param {Object}   options
  * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
+ * @param {Object}   options.spinner    A CLI spinner which indicates progress.
+ * @param {boolean}  options.debug      True if debug mode is enabled.
  */
 module.exports = async function downloadSource( source, options ) {
 	if ( source.type === 'git' ) {
@@ -26,11 +28,20 @@ module.exports = async function downloadSource( source, options ) {
  * Clones the git repository at `source.url` into `source.path`. If the
  * repository already exists, it is updated instead.
  *
- * @param {Source} source The source to download.
- * @param {Object} options
+ * @param {Source}   source             The source to download.
+ * @param {Object}   options
  * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
+ * @param {Object}   options.spinner    A CLI spinner which indicates progress.
+ * @param {boolean}  options.debug      True if debug mode is enabled.
  */
-async function downloadGitSource( source, { onProgress } ) {
+async function downloadGitSource( source, { onProgress, spinner, debug } ) {
+	const log = debug
+		? // eslint-disable-next-line no-console
+		  ( message ) => {
+				spinner.info( `NodeGit: ${ message }` );
+				spinner.start();
+		  }
+		: () => {};
 	onProgress( 0 );
 
 	const gitFetchOptions = {
@@ -50,20 +61,22 @@ async function downloadGitSource( source, { onProgress } ) {
 		},
 	};
 
-	// Clone or get the repo.
+	log( 'Cloning or getting the repo.' );
 	const repository = await NodeGit.Clone(
 		source.url,
 		source.path,
 		gitFetchOptions
-	)
-		// Repo already exists, get it.
-		.catch( () => NodeGit.Repository.open( source.path ) );
+	).catch( () => {
+		log( 'Repo already exists, get it.' );
+		return NodeGit.Repository.open( source.path );
+	} );
 
-	// Checkout the specified ref.
+	log( 'Fetching the specified ref.' );
 	const remote = await repository.getRemote( 'origin' );
 	await remote.fetch( source.ref, gitFetchOptions.fetchOpts );
 	await remote.disconnect();
 	try {
+		log( 'Checking out the specified ref.' );
 		await repository.checkoutRef(
 			await repository
 				.getReference( 'FETCH_HEAD' )
@@ -77,7 +90,7 @@ async function downloadGitSource( source, { onProgress } ) {
 			}
 		);
 	} catch ( error ) {
-		// Some commit refs need to be set as detached.
+		log( 'Ref needs to be set as detached.' );
 		await repository.setHeadDetached( source.ref );
 	}
 

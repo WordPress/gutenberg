@@ -304,7 +304,7 @@ export default function __experimentalUseColors(
 
 				panelLabel = colorConfig.label ||
 					COMMON_COLOR_LABELS[ name ] ||
-					startCase( name ), // E.g. 'Background Color'.
+					startCase( name ), // E.g. 'Background color'.
 				componentName = startCase( name ).replace( /\s/g, '' ), // E.g. 'BackgroundColor'.
 
 				color = colorConfig.color,
