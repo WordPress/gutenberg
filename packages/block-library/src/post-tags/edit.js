@@ -28,9 +28,9 @@ function PostTagsDisplay() {
 	);
 	return (
 		tagLinks &&
-		( tagLinks.length === 0 ?
-			__( 'No tags.' ) :
-			tagLinks.reduce( ( prev, curr ) => [ prev, ' | ', curr ] ) )
+		( tagLinks.length === 0
+			? __( 'No tags.' )
+			: tagLinks.reduce( ( prev, curr ) => [ prev, ' | ', curr ] ) )
 	);
 }
 
