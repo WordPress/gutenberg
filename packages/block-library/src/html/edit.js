@@ -76,10 +76,13 @@ class HTMLEdit extends Component {
 				<Disabled.Consumer>
 					{ ( isDisabled ) =>
 						isPreview || isDisabled ? (
-							<SandBox
-								html={ attributes.content }
-								styles={ styles }
-							/>
+							<>
+								<SandBox
+									html={ attributes.content }
+									styles={ styles }
+								/>
+								<div className="wp-block-html__preview-overlay"></div>
+							</>
 						) : (
 							<PlainText
 								value={ attributes.content }
