@@ -81,7 +81,7 @@ export function useShowMoversGestures( { ref, debounceTimeout = 500 } ) {
 	const registerRef = useRef( false );
 
 	const isFocusedWithin = () => {
-		return ref && ref.current.contains( document.activeElement );
+		return ref?.current && ref.current.contains( document.activeElement );
 	};
 
 	useEffect( () => {
