@@ -14,13 +14,16 @@ const DEFAULT_MAX_ITEMS = 100;
 
 export default function QueryControls( {
 	categoriesList,
+	authorsList,
 	selectedCategoryId,
+	selectedAuthorId,
 	numberOfItems,
 	order,
 	orderBy,
 	maxItems = DEFAULT_MAX_ITEMS,
 	minItems = DEFAULT_MIN_ITEMS,
 	onCategoryChange,
+	onAuthorChange,
 	onNumberOfItemsChange,
 	onOrderChange,
 	onOrderByChange,
@@ -70,6 +73,16 @@ export default function QueryControls( {
 				noOptionLabel={ __( 'All' ) }
 				selectedCategoryId={ selectedCategoryId }
 				onChange={ onCategoryChange }
+			/>
+		),
+		onAuthorChange && (
+			<SelectControl
+				key="query-controls-author-select"
+				options={ authorsList }
+				label={ __( 'Author' ) }
+				noOptionLabel={ __( 'All' ) }
+				value={ selectedAuthorId }
+				onChange={ onAuthorChange }
 			/>
 		),
 		onNumberOfItemsChange && (

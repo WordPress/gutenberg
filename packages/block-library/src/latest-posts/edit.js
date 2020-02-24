@@ -74,6 +74,7 @@ class LatestPostsEdit extends Component {
 			attributes,
 			setAttributes,
 			imageSizeOptions,
+			authorsList,
 			latestPosts,
 			defaultImageWidth,
 			defaultImageHeight,
@@ -89,6 +90,7 @@ class LatestPostsEdit extends Component {
 			order,
 			orderBy,
 			categories,
+			author,
 			postsToShow,
 			excerptLength,
 			featuredImageAlign,
@@ -210,7 +212,9 @@ class LatestPostsEdit extends Component {
 						{ ...{ order, orderBy } }
 						numberOfItems={ postsToShow }
 						categoriesList={ categoriesList }
+						authorsList={ authorsList }
 						selectedCategoryId={ categories }
+						selectedAuthorId={ author }
 						onOrderChange={ ( value ) =>
 							setAttributes( { order: value } )
 						}
@@ -220,6 +224,11 @@ class LatestPostsEdit extends Component {
 						onCategoryChange={ ( value ) =>
 							setAttributes( {
 								categories: '' !== value ? value : undefined,
+							} )
+						}
+						onAuthorChange={ ( value ) =>
+							setAttributes( {
+								author: '' !== value ? value : undefined,
 							} )
 						}
 						onNumberOfItemsChange={ ( value ) =>
@@ -420,7 +429,7 @@ export default withSelect( ( select, props ) => {
 		orderBy,
 		categories,
 	} = props.attributes;
-	const { getEntityRecords, getMedia } = select( 'core' );
+	const { getEntityRecords, getMedia, getAuthors } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
 	const { imageSizes, imageDimensions } = getSettings();
 	const latestPostsQuery = pickBy(
@@ -464,5 +473,11 @@ export default withSelect( ( select, props ) => {
 					}
 					return post;
 			  } ),
+		authorsList: getAuthors().map( ( author ) => {
+			return {
+				value: author.id,
+				label: author.name,
+			};
+		} ),
 	};
 } )( LatestPostsEdit );
