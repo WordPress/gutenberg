@@ -208,7 +208,9 @@ class LatestPostsEdit extends Component {
 					<Text style={ titleStyle }>
 						{ blockType.settings.title }
 					</Text>
-					<Text style={ styles.latestPostBlockSubtitle }>{ __( 'CUSTOMIZE' ) }</Text>
+					<Text style={ styles.latestPostBlockSubtitle }>
+						{ __( 'CUSTOMIZE' ) }
+					</Text>
 				</View>
 			</TouchableWithoutFeedback>
 		);
