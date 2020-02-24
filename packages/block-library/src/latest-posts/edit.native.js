@@ -165,7 +165,7 @@ class LatestPostsEdit extends Component {
 					) }
 					{ displayPostContent && displayExcerptPostContent && (
 						<RangeControl
-							label={ __( 'Excerpt length' ) }
+							label={ __( 'Excerpt length (words)' ) }
 							value={ excerptLength }
 							onChange={ onSetExcerptLength }
 							min={ MIN_EXCERPT_LENGTH }
