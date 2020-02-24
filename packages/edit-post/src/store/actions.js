@@ -269,7 +269,7 @@ export function metaBoxUpdatesSuccess() {
  *
  * @return {Object} Action object.
  */
-export function setPreviewDeviceType( deviceType ) {
+export function __experimentalSetPreviewDeviceType( deviceType ) {
 	return {
 		type: 'SET_PREVIEW_DEVICE_TYPE',
 		deviceType,
