@@ -74,11 +74,10 @@ export default function BlockToolbar( { hideDragHandle } ) {
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) ||
 		hasFixedToolbar ||
-		previewDeviceType !== 'Desktop'
-	
+		previewDeviceType !== 'Desktop';
+
 	const shouldShowMovers =
-		displayHeaderToolbar ||
-		( showMovers && hasMovers );
+		displayHeaderToolbar || ( showMovers && hasMovers );
 
 	if ( blockClientIds.length === 0 ) {
 		return null;
