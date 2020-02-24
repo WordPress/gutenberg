@@ -14,22 +14,6 @@ export default {
 };
 
 export const _default = () => {
-	const tooltipText = text( 'Text', 'More information' );
-	return (
-		<Tooltip text={ tooltipText }>
-			<div
-				style={ {
-					margin: '100px',
-					textAlign: 'center',
-					border: '1px solid #ccc',
-				} }
-			>
-				Hover for more information
-			</div>
-		</Tooltip>
-	);
-};
-export const withPosition = () => {
 	const positionOptions = {
 		'top left': 'top left',
 		'top center ': 'top center',
@@ -44,7 +28,9 @@ export const withPosition = () => {
 		<Tooltip text={ tooltipText } position={ position }>
 			<div
 				style={ {
-					margin: '100px',
+					margin: '50px auto',
+					width: '200px',
+					padding: '20px',
 					textAlign: 'center',
 					border: '1px solid #ccc',
 				} }
