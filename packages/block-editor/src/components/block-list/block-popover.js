@@ -31,7 +31,6 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-		getPreviewDeviceType,
 	} = select( 'core/block-editor' );
 	return {
 		isNavigationMode: isNavigationMode(),
@@ -41,7 +40,6 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		lastClientId: getLastMultiSelectedBlockClientId(),
-		previewDeviceType: getPreviewDeviceType(),
 	};
 }
 
@@ -63,7 +61,6 @@ function BlockPopover( {
 		hasMultiSelection,
 		hasFixedToolbar,
 		lastClientId,
-		previewDeviceType,
 	} = useSelect( selector, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
@@ -77,7 +74,6 @@ function BlockPopover( {
 		! isNavigationMode &&
 		! hasFixedToolbar &&
 		isLargeViewport &&
-		previewDeviceType === 'Desktop' &&
 		! showEmptyBlockSideInserter &&
 		! isMultiSelecting &&
 		( ! isTyping || isCaretWithinFormattedText );
