@@ -55,6 +55,12 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.port }}:80`;
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.testsPort }}:80`;
 
+	// The www-data user in wordpress:cli has a different UID (82) to the
+	// www-data user in wordpress (33). Ensure we use the wordpress www-data
+	// user for CLI commands.
+	// https://github.com/docker-library/wordpress/issues/256
+	const cliUser = '33:33';
+
 	return {
 		version: '3.7',
 		services: {
@@ -86,11 +92,13 @@ module.exports = function buildDockerComposeConfig( config ) {
 				depends_on: [ 'wordpress' ],
 				image: 'wordpress:cli',
 				volumes: developmentMounts,
+				user: cliUser,
 			},
 			'tests-cli': {
 				depends_on: [ 'wordpress' ],
 				image: 'wordpress:cli',
 				volumes: testsMounts,
+				user: cliUser,
 			},
 			composer: {
 				image: 'composer',
