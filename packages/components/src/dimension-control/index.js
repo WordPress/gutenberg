@@ -28,6 +28,7 @@ export function DimensionControl( props ) {
 		icon,
 		onChange,
 		className = '',
+		help = '',
 	} = props;
 
 	const onChangeSpacingSize = ( val ) => {
@@ -72,6 +73,7 @@ export function DimensionControl( props ) {
 			value={ value }
 			onChange={ onChangeSpacingSize }
 			options={ formatSizesAsOptions( sizes ) }
+			help={ help }
 		/>
 	);
 }

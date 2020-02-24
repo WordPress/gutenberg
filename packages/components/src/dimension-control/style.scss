@@ -19,6 +19,11 @@
 	}
 
 	.components-base-control__help {
+		display: flex;
+		align-items: center;
 		margin-top: -4px;
+		margin-left: auto;
+		margin-bottom: 0;
+		padding-left: 7em;
 	}
 }

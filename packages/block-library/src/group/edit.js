@@ -76,12 +76,18 @@ function GroupEdit( { hasInnerBlocks, className, attributes, setAttributes } ) {
 							updateSpacing,
 							'paddingSize'
 						) }
+						help={ __(
+							'Adjust spacing around content within the block.'
+						) }
 					/>
 
 					<DimensionControl
 						label={ __( 'Margin' ) }
 						value={ attributes.marginSize }
 						onChange={ partialRight( updateSpacing, 'marginSize' ) }
+						help={ __(
+							'Adjust spacing on the sides of the block.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
