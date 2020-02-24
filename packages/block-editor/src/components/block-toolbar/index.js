@@ -71,10 +71,13 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		gestures: showMoversGestures,
 	} = useShowMoversGestures( { ref: nodeRef } );
 
-	const shouldShowMovers =
+	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) ||
 		hasFixedToolbar ||
-		previewDeviceType !== 'Desktop' ||
+		previewDeviceType !== 'Desktop'
+	
+	const shouldShowMovers =
+		displayHeaderToolbar ||
 		( showMovers && hasMovers );
 
 	if ( blockClientIds.length === 0 ) {
@@ -91,7 +94,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 	const classes = classnames(
 		'block-editor-block-toolbar',
-		! hasFixedToolbar && 'has-responsive-movers'
+		! displayHeaderToolbar && 'has-responsive-movers'
 	);
 
 	return (
