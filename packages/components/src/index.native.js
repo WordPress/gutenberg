@@ -5,6 +5,9 @@ export {
 	Polygon,
 	Rect,
 	G,
+	LinearGradient,
+	Stop,
+	Defs,
 	HorizontalRule,
 	BlockQuotation,
 } from '@wordpress/primitives';
