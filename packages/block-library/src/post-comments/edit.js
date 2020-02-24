@@ -7,12 +7,18 @@ import { useEntityId } from '@wordpress/core-data';
 function PostCommentsDisplay( { postId } ) {
 	return useSelect(
 		( select ) => {
-			const comments = select( 'core' ).getEntityRecords( 'root', 'comment', {
-				post: postId,
-			} );
+			const comments = select( 'core' ).getEntityRecords(
+				'root',
+				'comment',
+				{
+					post: postId,
+				}
+			);
 			return (
 				comments &&
-				comments.map( ( comment ) => <p key={ comment.id }>{ comment.content.raw }</p> )
+				comments.map( ( comment ) => (
+					<p key={ comment.id }>{ comment.content.raw }</p>
+				) )
 			);
 		},
 		[ postId ]
