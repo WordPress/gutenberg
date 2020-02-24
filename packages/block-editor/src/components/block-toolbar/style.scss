@@ -33,26 +33,12 @@
 		border: 0;
 
 		// Add a border after item groups to show as separator in the block toolbar.
-		// Also, on Mobile the toolbar is docked to the top of the screen.
 		border-right: $border-width solid $light-gray-500;
-		@include break-medium() {
-			border-right: $border-width solid $dark-gray-primary;
-		}
 	}
 
 	> :last-child,
 	> :last-child .components-toolbar {
 		border-right: none;
-	}
-
-	// Add a border and adjust the color for Top Toolbar mode.
-	.has-fixed-toolbar & {
-		.block-editor-block-mover .components-toolbar {
-			border-left: $border-width solid $light-gray-500;
-		}
-		.components-toolbar {
-			border-color: $light-gray-500;
-		}
 	}
 }
 
