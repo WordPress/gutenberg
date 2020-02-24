@@ -203,13 +203,7 @@ class PullQuoteEdit extends Component {
 	}
 }
 
-const PullQuoteEditWeb = withColors( {
+export default withColors( {
 	mainColor: 'background-color',
 	textColor: 'color',
 } )( PullQuoteEdit );
-
-const PullQuoteEditNative = ( props ) => {
-	return <PullQuoteEdit mainColor={ {} } textColor={ {} } { ...props } />;
-};
-
-export default Platform.OS === 'web' ? PullQuoteEditWeb : PullQuoteEditNative;
