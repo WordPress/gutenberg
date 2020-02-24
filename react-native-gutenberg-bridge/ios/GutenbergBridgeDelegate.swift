@@ -64,8 +64,23 @@ extension RCTLogLevel {
     }
 }
 
-public enum GutenbergUserEvent: String {
-    case pageTemplateApplied = "page_template_applied"
+public enum GutenbergUserEvent {
+    
+    case pageTemplateApply(_ template: String)
+    case editorSessionTemplateApply(_ template: String)
+    
+    init?(event: String, properties:[AnyHashable: Any]?) {
+        switch event {
+        case "page_template_apply":
+            guard let template = properties?["template"] as? String else { return nil }
+            self = .pageTemplateApply(template)
+        case "editor_session_template_preview":
+            guard let template = properties?["template"] as? String else { return nil }
+            self = .editorSessionTemplateApply(template)
+        default:
+            return nil
+        }
+    }
 }
 
 public protocol GutenbergBridgeDelegate: class {
@@ -146,8 +161,7 @@ public protocol GutenbergBridgeDelegate: class {
     
     /// Tells the delegate that the editor needs to log a custom event
     /// - Parameter event: The event key to be logged
-    /// - Parameter properties: Any relevant properties related to the event
-    func gutenbergLogUserEvent(_ event: GutenbergUserEvent, properties: [AnyHashable: Any])
+    func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
