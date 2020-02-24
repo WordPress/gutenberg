@@ -5,6 +5,13 @@
  * @package WordPress
  */
 
+$block_core_latest_posts_excerpt = 0;
+
+function get_block_core_latest_posts_excerpt() {
+	global $block_core_latest_posts_excerpt;
+	return $block_core_latest_posts_excerpt;
+}
+
 /**
  * Renders the `core/latest-posts` block on server.
  *
@@ -13,6 +20,8 @@
  * @return string Returns the post content with latest posts added.
  */
 function render_block_core_latest_posts( $attributes ) {
+	global $block_core_latest_posts_excerpt;
+
 	$args = array(
 		'posts_per_page'   => $attributes['postsToShow'],
 		'post_status'      => 'publish',
@@ -21,11 +30,8 @@ function render_block_core_latest_posts( $attributes ) {
 		'suppress_filters' => false,
 	);
 
-	$excerpt_length        = $attributes['excerptLength'];
-	$excerpt_length_filter = function ( $length ) use ( $excerpt_length ) {
-		return $excerpt_length;
-	};
-	add_filter( 'excerpt_length', $excerpt_length_filter, 999 );
+	$block_core_latest_posts_excerpt = $attributes['excerptLength'];
+	add_filter( 'excerpt_length', 'get_block_core_latest_posts_excerpt', 999 );
 
 	if ( isset( $attributes['categories'] ) ) {
 		$args['category'] = $attributes['categories'];
@@ -116,6 +122,8 @@ function render_block_core_latest_posts( $attributes ) {
 
 		$list_items_markup .= "</li>\n";
 	}
+
+	remove_filter( 'excerpt_length', 'get_block_core_latest_posts_excerpt', 999 );
 
 	$class = 'wp-block-latest-posts wp-block-latest-posts__list';
 	if ( isset( $attributes['align'] ) ) {
