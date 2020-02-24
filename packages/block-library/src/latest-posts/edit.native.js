@@ -84,7 +84,7 @@ class LatestPostsEdit extends Component {
 
 		const { categoriesList } = this.state;
 		const blockType = coreBlocks[ name ];
-		const displayFullPostContent = displayPostContentRadio === 'full_post';
+		const displayExcerptPostContent = displayPostContentRadio === 'excerpt';
 
 		const blockStyle = getStylesFromColorScheme(
 			styles.latestPostBlock,
@@ -112,7 +112,7 @@ class LatestPostsEdit extends Component {
 
 		const onSetDisplayPostContentRadio = ( value ) => {
 			setAttributes( {
-				displayPostContentRadio: value ? 'full_post' : 'excerpt',
+				displayPostContentRadio: value ? 'excerpt' : 'full_post',
 			} );
 		};
 
@@ -155,17 +155,17 @@ class LatestPostsEdit extends Component {
 					/>
 					{ displayPostContent && (
 						<ToggleControl
-							label={ __( 'Show full post content' ) }
-							checked={ displayFullPostContent }
+							label={ __( 'Only show excerpt' ) }
+							checked={ displayExcerptPostContent }
 							onChange={ onSetDisplayPostContentRadio }
 							separatorType={
-								displayFullPostContent ? 'none' : 'fullWidth'
+								displayExcerptPostContent ? 'fullWidth' : 'none'
 							}
 						/>
 					) }
-					{ displayPostContent && ! displayFullPostContent && (
+					{ displayPostContent && displayExcerptPostContent && (
 						<RangeControl
-							label={ __( 'Max number of words in excerpt' ) }
+							label={ __( 'Excerpt length' ) }
 							value={ excerptLength }
 							onChange={ onSetExcerptLength }
 							min={ MIN_EXCERPT_LENGTH }
