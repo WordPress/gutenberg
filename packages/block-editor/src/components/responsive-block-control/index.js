@@ -33,15 +33,15 @@ function ResponsiveBlockControl( props ) {
 		viewports = [
 			{
 				id: 'small',
-				label: __( 'Small' ),
+				label: __( 'Small screens' ),
 			},
 			{
 				id: 'medium',
-				label: __( 'Medium' ),
+				label: __( 'Medium screens' ),
 			},
 			{
 				id: 'large',
-				label: __( 'Large' ),
+				label: __( 'Large screens' ),
 			},
 		],
 	} = props;
