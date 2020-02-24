@@ -1,6 +1,6 @@
 # Building a custom block editor
 
-The purpose of this tutorial is to step through the fundamentals of creating a custom instance of a "block editor".
+The purpose of [this tutorial](tutorial.md) is to step through the fundamentals of creating a custom instance of a "block editor".
 
 ![alt text](screenshots/editor.png "The Standalone Editor instance populated with example Blocks within a custom WP Admin page.")
 
