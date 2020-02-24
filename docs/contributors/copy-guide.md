@@ -36,7 +36,7 @@ Features don’t allow anyone to do anything; they’re just tools that do speci
 The more direct sentences are almost always clearer. Scan your copy for the words “can,” “be,” “might,” “allows you to,” and “helps”—they’re the most common culprits, and looking for those words specifically is a way to locate phrasing you can tighten up.
 
 #### THREE: Beware of “simple,” “easy,” and “just.”
-It is not for us to decide what is simple: it’s for the user to decide. If we say something is easy and the user doesn’t have an easy experience, it undermines their trust in us and what we’re building. Same goes for “just”—many of us know to avoid “simple,” but still use “just” all the time. “Just click here.” “Just enter your username.” It’s the same thing: it implies that something will be no big deal, but we can’t know what the user will find to be a big deal.
+It is not for us to decide what is simple: it’s for the user to decide. If we say something is easy and the user doesn’t have an easy experience, it undermines their trust in us and what we’re building. The same goes for “just”—many of us know to avoid “simple,” but still use “just” all the time. “Just click here.” “Just enter your username.” It’s the same thing: it implies that something will be no big deal, but we can’t know what the user will find to be a big deal.
 
 It’s also safer and more helpful to be specific. “Easy” and “simple” are shorthand for explanations that we haven’t written; whenever you see them, take a minute to think about what they’re standing in for. Maybe “It’s easy to add a block by hitting ‘enter’” really means “You can add more content to the page without taking your hands off the keyboard.” Great! Say the specific thing instead of relying on “easy.”
 
