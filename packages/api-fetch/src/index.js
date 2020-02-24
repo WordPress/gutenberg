@@ -132,24 +132,19 @@ function apiFetch( options ) {
 		return step( workingOptions, next );
 	};
 
-	return new Promise( ( resolve, reject ) => {
-		createRunStep( 0 )( options )
-			.then( resolve )
-			.catch( ( error ) => {
-				if ( error.code !== 'rest_cookie_invalid_nonce' ) {
-					return reject( error );
-				}
+	return createRunStep( 0 )( options ).catch( ( error ) => {
+		if ( error.code !== 'rest_cookie_invalid_nonce' ) {
+			return Promise.reject( error );
+		}
 
-				// If the nonce is invalid, refresh it and try again.
-				window
-					.fetch( apiFetch.nonceEndpoint )
-					.then( checkStatus )
-					.then( ( data ) => data.text() )
-					.then( ( text ) => {
-						apiFetch.nonceMiddleware.nonce = text;
-						apiFetch( options ).then( resolve ).catch( reject );
-					} )
-					.catch( reject );
+		// If the nonce is invalid, refresh it and try again.
+		return window
+			.fetch( apiFetch.nonceEndpoint )
+			.then( checkStatus )
+			.then( ( data ) => data.text() )
+			.then( ( text ) => {
+				apiFetch.nonceMiddleware.nonce = text;
+				return apiFetch( options );
 			} );
 	} );
 }
