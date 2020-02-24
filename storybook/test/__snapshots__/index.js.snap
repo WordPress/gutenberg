@@ -8120,6 +8120,28 @@ exports[`Storyshots Components/ToggleControl With Help Text 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/ToolTip Default 1`] = `
+<div
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onMouseDown={[Function]}
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
+  style={
+    Object {
+      "border": "1px solid #ccc",
+      "margin": "50px auto",
+      "padding": "20px",
+      "textAlign": "center",
+      "width": "200px",
+    }
+  }
+>
+  Hover for more information
+</div>
+`;
+
 exports[`Storyshots Components/Toolbar Default 1`] = `
 <div
   aria-label="Options"
