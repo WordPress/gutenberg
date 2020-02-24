@@ -1,12 +1,29 @@
 /**
+ * External dependencies
+ */
+import { partialRight } from 'lodash';
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { InnerBlocks, __experimentalUseColors } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	__experimentalUseColors,
+	InspectorControls,
+} from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
-function GroupEdit( { hasInnerBlocks, className } ) {
+import {
+	PanelBody,
+	__experimentalDimensionControl as DimensionControl,
+} from '@wordpress/components';
+
+import { __ } from '@wordpress/i18n';
+
+function GroupEdit( { hasInnerBlocks, className, attributes, setAttributes } ) {
 	const ref = useRef();
 	const {
 		TextColor,
@@ -23,12 +40,54 @@ function GroupEdit( { hasInnerBlocks, className } ) {
 		}
 	);
 
+	/**
+	 * Updates the spacing attribute for a given dimension
+	 * (and optionally a given viewport)
+	 *
+	 * @param  {string} size      a slug representing a dimension size (eg: `medium`)
+	 * @param  {string} dimensionAttr the dimension attribute for a property (eg: `paddingSize`)
+	 * @return {void}
+	 */
+	const updateSpacing = ( size, dimensionAttr ) => {
+		setAttributes( {
+			[ dimensionAttr ]: size,
+		} );
+	};
+
+	const hasPadding = !! attributes.paddingSize;
+	const hasMargin = !! attributes.marginSize;
+
+	const classes = classnames( className, {
+		'has-padding': hasPadding,
+		'has-margin': hasMargin,
+		[ `padding-${ attributes.paddingSize }` ]: hasPadding,
+		[ `margin-${ attributes.marginSize }` ]: hasMargin,
+	} );
+
 	return (
 		<>
 			{ InspectorControlsColorPanel }
+			<InspectorControls>
+				<PanelBody title={ __( 'Spacing' ) }>
+					<DimensionControl
+						label={ __( 'Padding' ) }
+						value={ attributes.paddingSize }
+						onChange={ partialRight(
+							updateSpacing,
+							'paddingSize'
+						) }
+					/>
+
+					<DimensionControl
+						label={ __( 'Margin' ) }
+						value={ attributes.marginSize }
+						onChange={ partialRight( updateSpacing, 'marginSize' ) }
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<BackgroundColor>
 				<TextColor>
-					<div className={ className } ref={ ref }>
+					<div className={ classes } ref={ ref }>
 						<div className="wp-block-group__inner-container">
 							<InnerBlocks
 								renderAppender={
