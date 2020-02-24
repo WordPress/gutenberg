@@ -30,7 +30,7 @@ const __experimentalPageTemplatePicker = ( {
 			blocks: parse( templatePreview.content ),
 		} );
 		setTemplatePreview( undefined );
-		logUserEvent( userEvents.pageTemplateApplied, {
+		logUserEvent( userEvents.editorSessionTemplateApply, {
 			template: templatePreview.name,
 		} );
 	};
