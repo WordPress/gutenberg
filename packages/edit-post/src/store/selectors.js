@@ -287,3 +287,14 @@ export function hasMetaBoxes( state ) {
 export function isSavingMetaBoxes( state ) {
 	return state.metaBoxes.isSaving;
 }
+
+/**
+ * Returns the current editing canvas device type.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Device type.
+ */
+export function getPreviewDeviceType( state ) {
+	return state.deviceType;
+}
