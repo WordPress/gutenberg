@@ -5,6 +5,7 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -19,7 +20,7 @@ function BlockPattern( { pattern, onClick } ) {
 		<div
 			className="block-editor-patterns__item"
 			role="button"
-			onClick={ () => onClick( blocks ) }
+			onClick={ () => onClick( pattern, blocks ) }
 			onKeyDown={ ( event ) => {
 				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
 					onClick( blocks );
@@ -40,9 +41,16 @@ function BlockPatterns( { patterns } ) {
 		return select( 'core/block-editor' ).getBlockInsertionPoint;
 	} );
 	const { insertBlocks } = useDispatch( 'core/block-editor' );
-	const onClickPattern = useCallback( ( blocks ) => {
+	const { createSuccessNotice } = useDispatch( 'core/notices' );
+	const onClickPattern = useCallback( ( pattern, blocks ) => {
 		const { index, rootClientId } = getBlockInsertionPoint();
-		insertBlocks( blocks, index, rootClientId );
+		insertBlocks( blocks, index, rootClientId, false );
+		createSuccessNotice(
+			sprintf( __( 'Pattern "%s" inserted' ), pattern.title ),
+			{
+				type: 'snackbar',
+			}
+		);
 	} );
 
 	return (
