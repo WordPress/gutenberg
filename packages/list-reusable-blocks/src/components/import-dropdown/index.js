@@ -24,7 +24,6 @@ function ImportDropdown( { onUpload } ) {
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
 					isPrimary
-					isSmall
 				>
 					{ __( 'Import from JSON' ) }
 				</Button>
