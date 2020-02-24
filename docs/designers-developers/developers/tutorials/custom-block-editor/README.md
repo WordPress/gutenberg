@@ -2,7 +2,7 @@
 
 The purpose of this tutorial is to step through the fundamentals of creating a custom instance of a "block editor".
 
-![alt text](custom-block-editor.png "The Standalone Editor instance populated with example Blocks within a custom WP Admin page.")
+![alt text](screenshots/editor.png "The Standalone Editor instance populated with example Blocks within a custom WP Admin page.")
 
 The editor you will see in this tutorial (as above) is **__not__ be the same Block Editor you are familiar with when creating Posts** in with WordPress. Rather it is an entirely **custom block editor instance** built using the lower-level [`@wordpress/block-editor`](https://developer.wordpress.org/block-editor/packages/packages-block-editor/) package (and friends).
 
