@@ -208,7 +208,7 @@ describe( 'InserterMenu', () => {
 		assertOpenedPanels( element, 3 );
 
 		const matchingCategories = element.querySelectorAll(
-			'.components-panel__body-toggle'
+			'.components-panel__body-toggle, .components-panel__body-text-title'
 		);
 
 		expect( matchingCategories ).toHaveLength( 3 );
@@ -234,7 +234,7 @@ describe( 'InserterMenu', () => {
 		assertOpenedPanels( element, 3 );
 
 		const matchingCategories = element.querySelectorAll(
-			'.components-panel__body-toggle'
+			'.components-panel__body-toggle, .components-panel__body-text-title'
 		);
 
 		expect( matchingCategories ).toHaveLength( 3 );

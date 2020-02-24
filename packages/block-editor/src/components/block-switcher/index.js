@@ -177,7 +177,7 @@ export class BlockSwitcher extends Component {
 								{ possibleBlockTransformations.length !== 0 && (
 									<PanelBody
 										title={ __( 'Transform To:' ) }
-										initialOpen
+										alwaysOpen={ ! hasBlockStyles }
 									>
 										<BlockTypesList
 											items={ possibleBlockTransformations.map(

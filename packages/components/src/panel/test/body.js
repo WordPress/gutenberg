@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { shallow, mount } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
 
 /**
  * Internal dependencies
@@ -97,6 +98,44 @@ describe( 'PanelBody', () => {
 			const panelBody = mount( <PanelBody initialOpen={ false } /> );
 			panelBody.instance().toggle( fakeEvent );
 			expect( panelBody.state( 'opened' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'button inclusion', () => {
+		const buttonSelector = '.components-panel__body-toggle';
+
+		it( 'should have a button if opened prop is not set', () => {
+			const wrapper = TestUtils.renderIntoDocument( <PanelBody /> );
+			expect(
+				TestUtils.scryRenderedDOMComponentsWithClass(
+					wrapper,
+					buttonSelector
+				)
+			).toHaveLength( 0 );
+		} );
+
+		it( 'should not have a button if opened prop is true', () => {
+			const wrapper = TestUtils.renderIntoDocument(
+				<PanelBody alwaysOpen={ true } />
+			);
+			expect(
+				TestUtils.scryRenderedDOMComponentsWithClass(
+					wrapper,
+					buttonSelector
+				)
+			).toHaveLength( 0 );
+		} );
+
+		it( 'should have a button if alwaysOpen is false', () => {
+			const wrapper = TestUtils.renderIntoDocument(
+				<PanelBody alwaysOpen={ false } />
+			);
+			expect(
+				TestUtils.scryRenderedDOMComponentsWithClass(
+					wrapper,
+					buttonSelector
+				)
+			).toHaveLength( 0 );
 		} );
 	} );
 } );
