@@ -1,5 +1,9 @@
 ## Master
 
+### Bug Fixes
+
+- Ensure `packages-update` work when `dependencies` or `devDependencies` are missing in the `package.json` file.
+
 ## 7.1.0 (2020-02-10)
 
 ### Bug Fixes
