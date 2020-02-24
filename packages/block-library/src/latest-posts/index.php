@@ -157,6 +157,9 @@ function register_block_core_latest_posts() {
 				'categories'              => array(
 					'type' => 'string',
 				),
+				'author'                  => array(
+					'type' => 'string',
+				),
 				'postsToShow'             => array(
 					'type'    => 'number',
 					'default' => 5,

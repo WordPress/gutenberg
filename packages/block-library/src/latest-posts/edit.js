@@ -428,6 +428,7 @@ export default withSelect( ( select, props ) => {
 		order,
 		orderBy,
 		categories,
+		author,
 	} = props.attributes;
 	const { getEntityRecords, getMedia, getAuthors } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
@@ -438,6 +439,7 @@ export default withSelect( ( select, props ) => {
 			order,
 			orderby: orderBy,
 			per_page: postsToShow,
+			author,
 		},
 		( value ) => ! isUndefined( value )
 	);
@@ -473,10 +475,10 @@ export default withSelect( ( select, props ) => {
 					}
 					return post;
 			  } ),
-		authorsList: getAuthors().map( ( author ) => {
+		authorsList: getAuthors().map( ( currentAuthor ) => {
 			return {
-				value: author.id,
-				label: author.name,
+				value: currentAuthor.id,
+				label: currentAuthor.name,
 			};
 		} ),
 	};

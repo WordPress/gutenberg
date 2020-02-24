@@ -78,10 +78,10 @@ export default function QueryControls( {
 		onAuthorChange && (
 			<SelectControl
 				key="query-controls-author-select"
-				options={ authorsList }
 				label={ __( 'Author' ) }
 				noOptionLabel={ __( 'All' ) }
 				value={ selectedAuthorId }
+				options={ authorsList }
 				onChange={ onAuthorChange }
 			/>
 		),
