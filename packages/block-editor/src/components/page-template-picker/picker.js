@@ -43,7 +43,15 @@ const __experimentalPageTemplatePicker = ( {
 						key={ template.name }
 						icon={ template.icon }
 						label={ template.name }
-						onPress={ () => setTemplatePreview( template ) }
+						onPress={ () => {
+							logUserEvent(
+								userEvents.editorSessionTemplatePreview,
+								{
+									template: template.name,
+								}
+							);
+							setTemplatePreview( template );
+						} }
 					/>
 				) ) }
 			</Container>
