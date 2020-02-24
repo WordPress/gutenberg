@@ -15,7 +15,7 @@ import path from 'path';
  * Internal dependencies
  */
 import serverConfigs from './serverConfigs';
-import { ios, android8 } from './caps';
+import { iosServer, iosLocal, android8 } from './caps';
 import AppiumLocal from './appium-local';
 import _ from 'underscore';
 
@@ -92,13 +92,11 @@ const setupDriver = async () => {
 			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	} else {
-		desiredCaps = _.clone( ios );
+		desiredCaps = _.clone( iosServer );
+		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		if ( isLocalEnvironment() ) {
+			desiredCaps = _.clone( iosLocal );
 			desiredCaps.app = path.resolve( localIOSAppPath );
-			delete desiredCaps.platformVersion;
-			desiredCaps.deviceName = 'iPhone 11';
-		} else {
-			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	}
 

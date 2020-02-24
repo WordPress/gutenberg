@@ -37,10 +37,14 @@ class RCTAztecView: Aztec.TextView {
     }
 
     override var textAlignment: NSTextAlignment {
-        didSet {
-            super.textAlignment = textAlignment
-            defaultParagraphStyle.alignment = textAlignment
-            placeholderLabel.textAlignment = textAlignment
+        set {
+            super.textAlignment = newValue
+            defaultParagraphStyle.alignment = newValue
+            placeholderLabel.textAlignment = newValue
+        }
+
+        get {
+            return super.textAlignment
         }
     }
 
@@ -141,8 +145,7 @@ class RCTAztecView: Aztec.TextView {
         delegate = self
         textContainerInset = .zero
         contentInset = .zero
-        textContainer.lineFragmentPadding = 0
-        Aztec.Metrics.listTextIndentation = 24
+        textContainer.lineFragmentPadding = 0        
         addPlaceholder()
         textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)

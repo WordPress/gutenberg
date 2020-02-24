@@ -1,13 +1,25 @@
-exports.ios = {
+const ios = {
 	browserName: '',
 	platformName: 'iOS',
-	platformVersion: '13.0',
-	deviceName: 'iPhone 11 Simulator',
+	platformVersion: '13.3',
+	deviceName: 'iPhone 11',
 	os: 'iOS',
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
 	appiumVersion: '1.15.0', // SauceLabs requires appiumVersion to be specified.
 	app: undefined, // will be set later, locally this is relative to root of project
+};
+
+exports.iosLocal = {
+	...ios,
+	platformVersion: '13.3',
+	deviceName: 'iPhone 11',
+};
+
+exports.iosServer = {
+	...ios,
+	platformVersion: '13.0',
+	deviceName: 'iPhone 11 Simulator',
 };
 
 exports.android8 = {
