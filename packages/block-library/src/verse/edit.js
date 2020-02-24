@@ -25,6 +25,7 @@ export default function VerseEdit( {
 		<>
 			<BlockControls>
 				<AlignmentToolbar
+					isCollapsed={ false }
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );
@@ -45,6 +46,7 @@ export default function VerseEdit( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 				onMerge={ mergeBlocks }
+				textAlign={ textAlign }
 			/>
 		</>
 	);
