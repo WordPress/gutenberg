@@ -20,7 +20,6 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Group' ),
 	icon,
-
 	description: __( 'A block that groups other blocks.' ),
 	keywords: [
 		__( 'container' ),
