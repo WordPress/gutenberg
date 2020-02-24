@@ -36,7 +36,7 @@ To release a stable version, run:
 ./bin/commander.js stable
 ```
 
-It is possible to run the "stable" release CLI in a consecutive way to release patch releases following the first stable release.
+It is possible to run the "stable" release CLI consecutively to release patch releases following the first stable release.
 
 ### Manual Release Process
 
@@ -60,7 +60,7 @@ Releasing the first release candidate for this milestone (`x.x`) involves:
 
 ##### Creating the Release Branch
 
-For each milestone (let's assume it's `x.x` here), a release branch is used to release all RCs and minor releases. For the first RC of the milestone, a release branch is created from master.
+For each milestone (let's assume it's `x.x` here), a release branch is used to release all RCs and minor releases. For the first RC of the milestone, a release branch is created from the master.
 
 ```
 git checkout master
@@ -106,7 +106,7 @@ If a bug is found in a release candidate and a fix is committed to `master`, we 
 7. Merge the version bump pull request and avoid removing the release branch.
 8. Follow the steps in [build the plugin](#build-the-plugin) and [publish the release on GitHub](#publish-the-release-on-github).
 
-You can copy the existing changelog from the previous release candidate. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7) and the call for testing post.
+You can copy the existing changelog from the previous release candidate. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7) and the call for the testing post.
 
 ### Official Gutenberg Releases™
 
@@ -135,7 +135,7 @@ Creating a release involves:
 
 2. Create [a commit like this](https://github.com/WordPress/gutenberg/commit/00d01049685f11f9bb721ad3437cb928814ab2a2#diff-b9cfc7f2cdf78a7f4b91a753d10865a2), removing the `-rc.X` from the version number in `gutenberg.php`, `package.json`, and `package-lock.json`.
 3. Create a new branch called `bump/x.x` from `release/x.x` and switch to it: `git checkout -b bump/x.x`.
-4. Create a pull request from `bump/x.x` to `master`. Verify the continuous integrations tests pass, before continuing to the next step even if conflicts exist.
+4. Create a pull request from `bump/x.x` to `master`. Verify the continuous integration tests pass, before continuing to the next step even if conflicts exist.
 5. Rebase `bump/x.x` against `origin/master` using `git fetch origin && git rebase origin/master`.
 6. Force push the branch `bump/x.x` using `git push --force-with-lease`.
 7. Switch to the `release/x.x` branch. Tag the version from the release branch `git tag vx.x.0`.
@@ -191,7 +191,7 @@ svn ci -m "Releasing Gutenberg version X.X.X"
 
 This will cause the new version to be available to users of WordPress all over the globe! 💃
 
-You should check that folks are able to install the new version from their Dashboard.
+You should check that folks can install the new version from their Dashboard.
 
 ### Publish the Release Blog Post
 
@@ -209,7 +209,7 @@ The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wor
 
 ### Synchronizing WordPress Trunk
 
-For each Gutenberg plugin release, WordPress trunk should be synchronized with this release. This involves the following steps that are automated with `./bin/commander npm-stable` command:
+For each Gutenberg plugin release, the WordPress trunk should be synchronized with this release. This involves the following steps that are automated with `./bin/commander npm-stable` command:
 
 **Note:** The WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, this happens between the first `beta` and the first `RC` of the WordPress release cycle. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
 
@@ -220,7 +220,7 @@ For each Gutenberg plugin release, WordPress trunk should be synchronized with t
 4. Check out all the files from the release branch: `git checkout release/x.x -- .`.
 5. Commit all changes to the `wp/trunk` branch with `git commit -m "Merge changes published in the Gutenberg plugin vX.X release"` and push to the repository.
 6. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch.
-Aassuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version.
+Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version.
 
 Now, the branch is ready to be used to publish the npm packages.
 
@@ -293,7 +293,7 @@ Whilst waiting for the Travis CI build for  `wp/trunk` [branch to pass](https://
 
 Check the versions listed in the current `CHANGELOG.md` file, looking through the commit history of a package e.g [@wordpress/scripts](https://github.com/WordPress/gutenberg/commits/master/packages/scripts) and look out for _"chore(release): publish"_ and _"Update changelogs"_ commits to determine recent version bumps, then looking at the commits since the most recent release should aid with discovering what changes have occurred since the last release.
 
-Note: You may discover the current version of each package is not up to date, if so updating the previous released versions would be appreciated.
+Note: You may discover the current version of each package is not up to date, if so updating the previously released versions would be appreciated.
 
 Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/master/packages/README.md#maintaining-changelogs) documentation and commit the changes:
 
@@ -357,7 +357,7 @@ Now that the packages have been published the _"chore(release): publish"_ and _"
 2. `git pull`
 3. Cherry-pick the `278f524`hash you noted above from the _"Update changelogs"_ commit made to `wp/trunk`
 4. `git cherry-pick 278f524`
-5. Get the commit hash from the the lerna publish commit either from the terminal or [wp/trunk commits](https://github.com/WordPress/gutenberg/commits/wp/trunk)
+5. Get the commit hash from the Lerna publish commit either from the terminal or [wp/trunk commits](https://github.com/WordPress/gutenberg/commits/wp/trunk)
 6. Cherry-pick the `fe6ae0d` "chore(release): publish"_ commit made to `wp/trunk`
 7. `git cherry-pick fe6ae0d`
 8. `git push`
