@@ -16,6 +16,9 @@ export default function save( { attributes } ) {
 		customTextColor,
 	} = attributes;
 
+	const hasPadding = !! attributes.paddingSize;
+	const hasMargin = !! attributes.marginSize;
+
 	const backgroundClass = getColorClassName(
 		'background-color',
 		backgroundColor
@@ -24,6 +27,10 @@ export default function save( { attributes } ) {
 	const className = classnames( backgroundClass, textClass, {
 		'has-text-color': textColor || customTextColor,
 		'has-background': backgroundColor || customBackgroundColor,
+		'has-padding': hasPadding,
+		'has-margin': hasMargin,
+		[ `padding-${ attributes.paddingSize }` ]: hasPadding,
+		[ `margin-${ attributes.marginSize }` ]: hasMargin,
 	} );
 
 	const styles = {
