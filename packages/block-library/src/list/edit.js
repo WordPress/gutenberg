@@ -18,6 +18,12 @@ import {
 	__unstableIsListRootSelected as isListRootSelected,
 	__unstableIsActiveListType as isActiveListType,
 } from '@wordpress/rich-text';
+import {
+	formatListBullets,
+	formatListNumbered,
+	formatIndent,
+	formatOutdent,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -78,7 +84,7 @@ export default function ListEdit( {
 				<ToolbarGroup
 					controls={ [
 						{
-							icon: 'editor-ul',
+							icon: formatListBullets,
 							title: __( 'Convert to unordered list' ),
 							isActive: isActiveListType( value, 'ul', tagName ),
 							onClick() {
@@ -93,7 +99,7 @@ export default function ListEdit( {
 							},
 						},
 						{
-							icon: 'editor-ol',
+							icon: formatListNumbered,
 							title: __( 'Convert to ordered list' ),
 							isActive: isActiveListType( value, 'ol', tagName ),
 							onClick() {
@@ -108,7 +114,7 @@ export default function ListEdit( {
 							},
 						},
 						{
-							icon: 'editor-outdent',
+							icon: formatOutdent,
 							title: __( 'Outdent list item' ),
 							shortcut: _x( 'Backspace', 'keyboard key' ),
 							isDisabled: ! canOutdentListItems( value ),
@@ -118,7 +124,7 @@ export default function ListEdit( {
 							},
 						},
 						{
-							icon: 'editor-indent',
+							icon: formatIndent,
 							title: __( 'Indent list item' ),
 							shortcut: _x( 'Space', 'keyboard key' ),
 							isDisabled: ! canIndentListItems( value ),

@@ -329,7 +329,7 @@ function CoverEdit( {
 					<PanelBody title={ __( 'Media settings' ) }>
 						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 							<ToggleControl
-								label={ __( 'Fixed Background' ) }
+								label={ __( 'Fixed background' ) }
 								checked={ hasParallax }
 								onChange={ toggleParallax }
 							/>
@@ -337,7 +337,7 @@ function CoverEdit( {
 						{ IMAGE_BACKGROUND_TYPE === backgroundType &&
 							! hasParallax && (
 								<FocalPointPicker
-									label={ __( 'Focal Point Picker' ) }
+									label={ __( 'Focal point picker' ) }
 									url={ url }
 									value={ focalPoint }
 									onChange={ ( newFocalPoint ) =>
@@ -396,7 +396,7 @@ function CoverEdit( {
 						>
 							{ !! url && (
 								<RangeControl
-									label={ __( 'Background Opacity' ) }
+									label={ __( 'Background opacity' ) }
 									value={ dimRatio }
 									onChange={ ( newDimRation ) =>
 										setAttributes( {

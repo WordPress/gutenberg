@@ -3,6 +3,12 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control {
 	position: relative;
 	min-width: $modal-min-width;
+
+	.components-popover__content & {
+		min-width: auto;
+		width: 90vw;
+		max-width: $modal-min-width;
+	}
 }
 
 // Provides positioning context for reset button. Without this then when an
@@ -158,7 +164,6 @@ $block-editor-link-control-number-of-actions: 1;
 		text-overflow: ellipsis;
 		max-width: 230px;
 		overflow: hidden;
-		white-space: nowrap;
 	}
 
 	.block-editor-link-control__search-item-title mark {
