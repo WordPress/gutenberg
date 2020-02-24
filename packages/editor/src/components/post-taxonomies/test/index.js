@@ -129,9 +129,29 @@ describe( 'HierarchicalTermSelector', () => {
 
 	const getStateWrapperAndWrapperWithDefaultTerms = (
 		defaultTerms = [
-			{ id: 1, name: 'Atlanta' },
-			{ id: 2, name: 'Miami' },
-			{ id: 3, name: 'Zurich' },
+			{ id: 3, name: 'Zurich', children: [] },
+			{ id: 1, name: 'Atlanta', children: [] },
+			{
+				id: 2,
+				name: 'Chicago',
+				children: [
+					{
+						id: 6,
+						name: 'Skokie',
+						children: [],
+					},
+					{
+						id: 5,
+						name: 'Naperville',
+						children: [],
+					},
+					{
+						id: 4,
+						name: 'Aurora',
+						children: [],
+					},
+				],
+			},
 		]
 	) => {
 		const app = TestUtils.renderIntoDocument( <App /> );
@@ -158,7 +178,7 @@ describe( 'HierarchicalTermSelector', () => {
 				wrapper,
 				'components-checkbox-control__input'
 			)
-		).toHaveLength( 3 );
+		).toHaveLength( 6 );
 	} );
 
 	it( 'handles changes to selected terms', () => {
@@ -180,7 +200,7 @@ describe( 'HierarchicalTermSelector', () => {
 			)
 		).toHaveLength( 1 );
 
-		app.setState( { selectedTerms: [ 1, 2 ] } );
+		app.setState( { selectedTerms: [ 1, 5 ] } );
 
 		expect(
 			TestUtils.scryRenderedDOMComponentsWithClass(
@@ -251,7 +271,7 @@ describe( 'HierarchicalTermSelector', () => {
 				wrapper,
 				'components-checkbox-control__input'
 			)
-		).toHaveLength( 2 );
+		).toHaveLength( 4 );
 	} );
 
 	it( 'shows selected matching search terms first', () => {
@@ -265,7 +285,7 @@ describe( 'HierarchicalTermSelector', () => {
 				wrapper,
 				'components-checkbox-control__label'
 			)[ 0 ].innerHTML
-		).toEqual( expect.stringContaining( 'Miami' ) );
+		).toEqual( expect.stringContaining( 'Chicago' ) );
 
 		// Select Zurich.
 		app.setState( { selectedTerms: [ 3 ] } );
@@ -278,7 +298,26 @@ describe( 'HierarchicalTermSelector', () => {
 			)[ 0 ].innerHTML
 		).toEqual( expect.stringContaining( 'Zurich' ) );
 
-		// Unselect Zurich.
+		// Add a child of Chicago.
+		app.setState( { selectedTerms: [ 3, 6 ] } );
+
+		// Chicago will now be first even though it's not selected.
+		expect(
+			TestUtils.scryRenderedDOMComponentsWithClass(
+				wrapper,
+				'components-checkbox-control__label'
+			)[ 0 ].innerHTML
+		).toEqual( expect.stringContaining( 'Chicago' ) );
+
+		// And the child will be next.
+		expect(
+			TestUtils.scryRenderedDOMComponentsWithClass(
+				wrapper,
+				'components-checkbox-control__label'
+			)[ 1 ].innerHTML
+		).toEqual( expect.stringContaining( 'Skokie' ) );
+
+		// Unselect all.
 		app.setState( { selectedTerms: [] } );
 
 		expect(
@@ -286,7 +325,7 @@ describe( 'HierarchicalTermSelector', () => {
 				wrapper,
 				'components-checkbox-control__label'
 			)[ 0 ].innerHTML
-		).toEqual( expect.stringContaining( 'Miami' ) );
+		).toEqual( expect.stringContaining( 'Chicago' ) );
 
 		wrapper.setFilterValue( { target: { value: '' } } );
 

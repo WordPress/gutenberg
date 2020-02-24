@@ -297,14 +297,12 @@ export class HierarchicalTermSelector extends Component {
 			}
 			return false;
 		};
-		const termOrChildIsSelected = ( termA, termB ) => {
+
+		const sortTerms = ( termA, termB ) => {
 			const termASelected = treeHasSelection( termA );
 			const termBSelected = treeHasSelection( termB );
 
-			if ( termASelected === termBSelected ) {
-				return 0;
-			}
-
+			// Selected terms come first.
 			if ( termASelected && ! termBSelected ) {
 				return -1;
 			}
@@ -313,11 +311,30 @@ export class HierarchicalTermSelector extends Component {
 				return 1;
 			}
 
-			return 0;
-		};
-		termsTree.sort( termOrChildIsSelected );
+			// Neither is selected. Now sort by name.
+			if ( termA.name === termB.name ) {
+				return 0;
+			}
 
-		return termsTree;
+			return termA.name < termB.name ? -1 : 1;
+		};
+
+		termsTree.sort( sortTerms );
+
+		// Apply sorting recursively to all children.
+		return termsTree.map( ( termTree ) => {
+			if (
+				undefined === termTree.children ||
+				termTree.children.length === 0
+			) {
+				return termTree;
+			}
+
+			return {
+				...termTree,
+				children: this.sortBySelected( termTree.children ),
+			};
+		} );
 	}
 
 	setFilterValue( event ) {
