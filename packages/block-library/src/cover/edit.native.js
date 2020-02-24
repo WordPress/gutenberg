@@ -94,6 +94,8 @@ const Cover = ( {
 
 	const onSelectMedia = ( media ) => {
 		const onSelect = attributesFromMedia( setAttributes );
+		// Remove gradient attribute since the image URL is set
+		setAttributes( { gradient: undefined } );
 		onSelect( media );
 	};
 
@@ -236,7 +238,6 @@ const Cover = ( {
 				>
 					<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 				</View>
-				<View pointerEvents="none" style={ getOverlayStyles() } />
 				{ gradientValue ? (
 					<LinearGradient
 						gradientValue={ gradientValue }
@@ -244,15 +245,16 @@ const Cover = ( {
 						style={ getOverlayStyles() }
 					/>
 				) : (
-					<MediaUpload
-						__experimentalOnlyMediaLibrary
-						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
-						onSelect={ onSelectMedia }
-						render={ ( { open, getMediaOptions } ) => {
-							return background( open, getMediaOptions );
-						} }
-					/>
+					<View pointerEvents="none" style={ getOverlayStyles() } />
 				) }
+				<MediaUpload
+					__experimentalOnlyMediaLibrary
+					allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+					onSelect={ onSelectMedia }
+					render={ ( { open, getMediaOptions } ) => {
+						return background( open, getMediaOptions );
+					} }
+				/>
 			</View>
 		</View>
 	);
