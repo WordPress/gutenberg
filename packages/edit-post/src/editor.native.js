@@ -147,9 +147,12 @@ export default compose( [
 			'core/edit-post'
 		);
 		const { getBlockTypes } = select( 'core/blocks' );
+		const { getPreviewDeviceType } = select( 'core/block-editor' );
 
 		return {
-			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			hasFixedToolbar:
+				isFeatureActive( 'fixedToolbar' ) ||
+				getPreviewDeviceType() !== 'Desktop',
 			focusMode: isFeatureActive( 'focusMode' ),
 			mode: getEditorMode(),
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),

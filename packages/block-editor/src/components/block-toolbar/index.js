@@ -33,6 +33,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			isBlockValid,
 			getBlockRootClientId,
 			getBlockListSettings,
+			getSettings,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const blockRootClientId = getBlockRootClientId(
@@ -44,9 +45,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 		return {
 			blockClientIds: selectedBlockClientIds,
-			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
-				'fixedToolbar'
-			),
+			hasFixedToolbar: getSettings().hasFixedToolbar,
 			rootClientId: blockRootClientId,
 			isValid:
 				selectedBlockClientIds.length === 1
@@ -68,10 +67,11 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		gestures: showMoversGestures,
 	} = useShowMoversGestures( { ref: nodeRef } );
 
+	const displayHeaderToolbar =
+		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
+
 	const shouldShowMovers =
-		useViewportMatch( 'medium', '<' ) ||
-		hasFixedToolbar ||
-		( showMovers && hasMovers );
+		displayHeaderToolbar || ( showMovers && hasMovers );
 
 	if ( blockClientIds.length === 0 ) {
 		return null;
@@ -87,7 +87,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 	const classes = classnames(
 		'block-editor-block-toolbar',
-		! hasFixedToolbar && 'has-responsive-movers'
+		! displayHeaderToolbar && 'has-responsive-movers'
 	);
 
 	return (
