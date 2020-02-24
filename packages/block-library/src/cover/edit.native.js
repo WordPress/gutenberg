@@ -110,31 +110,27 @@ const Cover = ( {
 		setAttributes( { dimRatio: value } );
 	};
 
-	const getOverlayStyles = () => {
-		// Set opacity to 1 while video / theme color support is not available
-		const opacity =
-			url && VIDEO_BACKGROUND_TYPE !== backgroundType
-				? dimRatio / 100
-				: 1;
-
-		return [
-			styles.overlay,
-			{
-				backgroundColor:
-					overlayColor && overlayColor.color
-						? overlayColor.color
-						: styles.overlay.color,
-				opacity,
-			},
-			// While we don't support theme colors we add a default bg color
-			! overlayColor.color && ! url
-				? getStylesFromColorScheme(
-						styles.backgroundSolid,
-						styles.backgroundSolidDark
-				  )
-				: {},
-		];
-	};
+	const overlayStyles = [
+		styles.overlay,
+		{
+			backgroundColor:
+				overlayColor && overlayColor.color
+					? overlayColor.color
+					: styles.overlay.color,
+			// Set opacity to 1 while video / theme color support is not available
+			opacity:
+				url && VIDEO_BACKGROUND_TYPE !== backgroundType
+					? dimRatio / 100
+					: 1,
+		},
+		// While we don't support theme colors we add a default bg color
+		! overlayColor.color && ! url
+			? getStylesFromColorScheme(
+					styles.backgroundSolid,
+					styles.backgroundSolidDark
+			  )
+			: {},
+	];
 
 	const placeholderIconStyle = getStylesFromColorScheme(
 		styles.icon,
@@ -240,7 +236,7 @@ const Cover = ( {
 					<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 				</View>
 
-				<View pointerEvents="none" style={ getOverlayStyles() } />
+				<View pointerEvents="none" style={ overlayStyles } />
 
 				<MediaUpload
 					__experimentalOnlyMediaLibrary
