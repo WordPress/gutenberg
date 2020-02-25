@@ -203,7 +203,6 @@ const Cover = ( {
 					( gradientValue ? (
 						<LinearGradient
 							gradientValue={ gradientValue }
-							pointerEvents="none"
 							style={ styles.background }
 						/>
 					) : (
