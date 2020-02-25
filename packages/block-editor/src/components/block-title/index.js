@@ -29,6 +29,19 @@ export function BlockTitle( { name } ) {
 		return null;
 	}
 
+	// TODO: Infer this from `block.json` when we have block context.
+	// See https://github.com/WordPress/gutenberg/issues/19685.
+	if ( name === 'core/template-part' ) {
+		return (
+			<>
+				<span className="block-editor-block-title__global">
+					Global{ ' ' }
+				</span>
+				{ blockType.title }
+			</>
+		);
+	}
+
 	return blockType.title;
 }
 
