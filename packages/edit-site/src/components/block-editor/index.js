@@ -13,10 +13,13 @@ import {
 	ObserveTyping,
 	BlockList,
 } from '@wordpress/block-editor';
+import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import { useEditorContext } from '../editor';
+import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 
@@ -48,7 +51,9 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
+			<Popover.Slot name="block-toolbar" />
 			<BlockEditorKeyboardShortcuts />
+			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
 					( fillProps ) => (
