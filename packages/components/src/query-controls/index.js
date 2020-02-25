@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+
+import { union } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -79,9 +85,11 @@ export default function QueryControls( {
 			<SelectControl
 				key="query-controls-author-select"
 				label={ __( 'Author' ) }
-				noOptionLabel={ __( 'All' ) }
 				value={ selectedAuthorId }
-				options={ authorsList }
+				options={ union(
+					[ { value: '', label: __( 'All' ) } ],
+					authorsList
+				) }
 				onChange={ onAuthorChange }
 			/>
 		),
