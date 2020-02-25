@@ -512,9 +512,9 @@ describe( 'Writing Flow', () => {
 		const y = paragraphRect.y + paragraphRect.height + 1;
 
 		await page.mouse.move( x, y );
-		// await page.waitForSelector(
-		// 	'.block-editor-block-list__insertion-point-inserter'
-		// );
+		await page.waitForSelector(
+			'.block-editor-block-list__insertion-point-inserter'
+		);
 
 		const inserter = await page.$(
 			'.block-editor-block-list__insertion-point-inserter'
