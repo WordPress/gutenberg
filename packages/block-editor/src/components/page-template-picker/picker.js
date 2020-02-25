@@ -47,7 +47,7 @@ const __experimentalPageTemplatePicker = ( {
 							logUserEvent(
 								userEvents.editorSessionTemplatePreview,
 								{
-									template: template.name,
+									template: template.key,
 								}
 							);
 							setTemplatePreview( template );
