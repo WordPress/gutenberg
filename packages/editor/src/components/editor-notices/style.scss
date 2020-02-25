@@ -28,7 +28,7 @@
 		padding: 6px 12px;
 
 		// Min-height matches the height of a single-line notice with an action button.
-		min-height: $header-height + $grid-size-small;
+		min-height: $header-height + $grid-unit-05;
 
 		// Margins ensure that the dismiss button aligns to the center of the first line of text.
 		.components-notice__dismiss {

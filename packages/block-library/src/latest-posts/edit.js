@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isUndefined, pickBy } from 'lodash';
+import { get, invoke, isUndefined, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -30,7 +30,7 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
-import { pin } from '@wordpress/icons';
+import { pin, list, grid } from '@wordpress/icons';
 
 /**
  * Module Constants
@@ -101,7 +101,7 @@ class LatestPostsEdit extends Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Post content settings' ) }>
 					<ToggleControl
-						label={ __( 'Post Content' ) }
+						label={ __( 'Post content' ) }
 						checked={ displayPostContent }
 						onChange={ ( value ) =>
 							setAttributes( { displayPostContent: value } )
@@ -114,7 +114,7 @@ class LatestPostsEdit extends Component {
 							options={ [
 								{ label: __( 'Excerpt' ), value: 'excerpt' },
 								{
-									label: __( 'Full Post' ),
+									label: __( 'Full post' ),
 									value: 'full_post',
 								},
 							] }
@@ -149,7 +149,7 @@ class LatestPostsEdit extends Component {
 					/>
 				</PanelBody>
 
-				<PanelBody title={ __( 'Featured Image Settings' ) }>
+				<PanelBody title={ __( 'Featured image settings' ) }>
 					<ToggleControl
 						label={ __( 'Display featured image' ) }
 						checked={ displayFeaturedImage }
@@ -188,7 +188,7 @@ class LatestPostsEdit extends Component {
 							/>
 							<BaseControl>
 								<BaseControl.VisualLabel>
-									{ __( 'Image Alignment' ) }
+									{ __( 'Image alignment' ) }
 								</BaseControl.VisualLabel>
 								<BlockAlignmentToolbar
 									value={ featuredImageAlign }
@@ -273,13 +273,13 @@ class LatestPostsEdit extends Component {
 
 		const layoutControls = [
 			{
-				icon: 'list-view',
+				icon: list,
 				title: __( 'List view' ),
 				onClick: () => setAttributes( { postLayout: 'list' } ),
 				isActive: postLayout === 'list',
 			},
 			{
-				icon: 'grid-view',
+				icon: grid,
 				title: __( 'Grid view' ),
 				onClick: () => setAttributes( { postLayout: 'grid' } ),
 				isActive: postLayout === 'grid',
@@ -303,7 +303,11 @@ class LatestPostsEdit extends Component {
 					} ) }
 				>
 					{ displayPosts.map( ( post, i ) => {
-						const titleTrimmed = post.title.rendered.trim();
+						const titleTrimmed = invoke( post, [
+							'title',
+							'rendered',
+							'trim',
+						] );
 						let excerpt = post.excerpt.rendered;
 
 						const excerptElement = document.createElement( 'div' );

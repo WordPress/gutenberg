@@ -13,6 +13,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
+import { camera, wordpress } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
@@ -26,7 +27,7 @@ const cameraImageSource = {
 	value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
 	label: __( 'Take a Photo' ),
 	types: [ MEDIA_TYPE_IMAGE ],
-	icon: 'camera',
+	icon: camera,
 };
 
 const cameraVideoSource = {
@@ -34,7 +35,7 @@ const cameraVideoSource = {
 	value: mediaSources.deviceCamera,
 	label: __( 'Take a Video' ),
 	types: [ MEDIA_TYPE_VIDEO ],
-	icon: 'camera',
+	icon: camera,
 };
 
 const deviceLibrarySource = {
@@ -49,7 +50,7 @@ const siteLibrarySource = {
 	value: mediaSources.siteMediaLibrary,
 	label: __( 'WordPress Media Library' ),
 	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
-	icon: 'wordpress-alt',
+	icon: wordpress,
 };
 
 const internalSources = [
