@@ -242,7 +242,10 @@ const Cover = ( {
 					<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 				</View>
 
-				<View pointerEvents="none" style={ overlayStyles } />
+				{ /* We don't render overlay on top of gradient */ }
+				{ ! gradientValue && (
+					<View pointerEvents="none" style={ overlayStyles } />
+				) }
 
 				<MediaUpload
 					__experimentalOnlyMediaLibrary
