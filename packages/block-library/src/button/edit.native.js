@@ -66,8 +66,15 @@ class ButtonEdit extends Component {
 		this.state = {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
-			isButtonFocused: Platform.OS !== 'ios',
+			isButtonFocused: true,
 		};
+	}
+
+	componentDidMount() {
+		if (this.richTextRef) {
+			this.richTextRef.blur()
+		}
+		this.onSetMaxWidth();
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -259,6 +266,7 @@ class ButtonEdit extends Component {
 					onChange={ this.onChangeURL }
 					autoCapitalize="none"
 					autoCorrect={ false }
+					autoFocus={ !isCompatibleWithSettings && Platform.OS === 'ios' }
 					separatorType={
 						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
 					}
@@ -384,6 +392,7 @@ class ButtonEdit extends Component {
 							this.onToggleButtonFocus( true )
 						}
 						__unstableMobileNoFocusOnMount={ ! isSelected }
+						onBlur={this.onSetMaxWidth}
 						selectionColor={ textColor.color || '#fff' }
 						onReplace={ onReplace }
 						onRemove={ this.onRemove }
