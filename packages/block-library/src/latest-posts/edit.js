@@ -309,6 +309,9 @@ class LatestPostsEdit extends Component {
 							'trim',
 						] );
 						let excerpt = post.excerpt.rendered;
+						if ( post.excerpt.raw !== '' ) {
+							excerpt = post.excerpt.raw;
+						}
 
 						const excerptElement = document.createElement( 'div' );
 						excerptElement.innerHTML = excerpt;
@@ -324,6 +327,21 @@ class LatestPostsEdit extends Component {
 							'wp-block-latest-posts__featured-image': true,
 							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
 						} );
+
+						const postExcerpt =
+							excerptLength <
+								excerpt.trim().split( ' ' ).length &&
+							post.excerpt.raw === ''
+								? excerpt
+										.trim()
+										.split( ' ', excerptLength )
+										.join( ' ' ) +
+								  ' ... <a href=' +
+								  post.link +
+								  'target="_blank" rel="noopener noreferrer">' +
+								  __( 'Read more' ) +
+								  '</a>'
+								: excerpt;
 
 						return (
 							<li key={ i }>
@@ -370,28 +388,7 @@ class LatestPostsEdit extends Component {
 									displayPostContentRadio === 'excerpt' && (
 										<div className="wp-block-latest-posts__post-excerpt">
 											<RawHTML key="html">
-												{ excerptLength <
-												excerpt.trim().split( ' ' )
-													.length
-													? excerpt
-															.trim()
-															.split(
-																' ',
-																excerptLength
-															)
-															.join( ' ' ) +
-													  ' ... <a href=' +
-													  post.link +
-													  'target="_blank" rel="noopener noreferrer">' +
-													  __( 'Read more' ) +
-													  '</a>'
-													: excerpt
-															.trim()
-															.split(
-																' ',
-																excerptLength
-															)
-															.join( ' ' ) }
+												{ postExcerpt }
 											</RawHTML>
 										</div>
 									) }
