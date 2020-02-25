@@ -74,10 +74,7 @@ describe( 'Block variations', () => {
 		);
 		expect( successMessageBlock ).toBeDefined();
 		expect(
-			await successMessageBlock.$eval(
-				'p.has-vivid-green-cyan-background-color',
-				( node ) => node.innerText
-			)
+			await successMessageBlock.evaluate( ( node ) => node.innerText )
 		).toBe( 'This is a success message!' );
 	} );
 	test( 'Pick the additional variation in the inserted Columns block', async () => {
