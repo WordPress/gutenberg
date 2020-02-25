@@ -28,7 +28,7 @@ export default function Slot( {
 	useEffect( () => {
 		registry.registerSlot( name, ref, fillProps );
 		return () => {
-			registry.unregisterSlot( name );
+			registry.unregisterSlot( name, ref );
 		};
 		// We are not including fillProps in the deps because we don't want to
 		// unregister and register the slot whenever fillProps change, which would

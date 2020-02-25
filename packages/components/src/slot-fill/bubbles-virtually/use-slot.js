@@ -22,9 +22,12 @@ export default function useSlot( name ) {
 		[ name, registry.updateSlot ]
 	);
 
-	const unregisterSlot = useCallback( () => {
-		registry.unregisterSlot( name );
-	}, [ name, registry.unregisterSlot ] );
+	const unregisterSlot = useCallback(
+		( slotRef ) => {
+			registry.unregisterSlot( name, slotRef );
+		},
+		[ name, registry.unregisterSlot ]
+	);
 
 	const registerFill = useCallback(
 		( fillRef ) => {
