@@ -86,10 +86,6 @@ html.block-editor-editor-skeleton__html-container {
 	background: $white;
 	color: $dark-gray-primary;
 
-	&:empty {
-		display: none;
-	}
-
 	// On Mobile the header is fixed to keep HTML as scrollable.
 	@include break-medium() {
 		overflow: auto;

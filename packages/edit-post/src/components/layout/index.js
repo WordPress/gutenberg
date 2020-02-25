@@ -191,10 +191,10 @@ function Layout() {
 								}
 							/>
 						) : (
-							<div className="edit-post-toggle-publish-panel">
+							<div className="edit-post-layout__toggle-publish-panel">
 								<Button
 									isSecondary
-									className="edit-post-toggle-publish-panel__button"
+									className="edit-post-layout__toggle-publish-panel-button"
 									onClick={ togglePublishSidebar }
 									aria-expanded={ false }
 								>
