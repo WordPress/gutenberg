@@ -5,8 +5,21 @@
  * @package WordPress
  */
 
+/**
+ * The excerpt length set by the Latest Posts core block
+ * set at render time and used by the block itself.
+ *
+ * @var int
+ */
 $block_core_latest_posts_excerpt = 0;
 
+/**
+ * Callback for the excerpt_length filter used by
+ * the Latest Posts block at render time.
+ *
+ * @return int Returns the global $block_core_latest_posts_excerpt variable
+ *             to allow the excerpt_length filter respect the Latest Block setting.
+ */
 function get_block_core_latest_posts_excerpt() {
 	global $block_core_latest_posts_excerpt;
 	return $block_core_latest_posts_excerpt;
