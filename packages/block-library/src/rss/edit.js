@@ -75,7 +75,7 @@ class RSSEdit extends Component {
 							}
 							className={ 'components-placeholder__input' }
 						/>
-						<Button isSecondary type="submit">
+						<Button isPrimary type="submit">
 							{ __( 'Use URL' ) }
 						</Button>
 					</form>
