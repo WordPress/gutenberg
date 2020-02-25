@@ -12,6 +12,7 @@ import {
 	BlockControls,
 	AlignmentToolbar,
 } from '@wordpress/block-editor';
+import { Platform } from '@wordpress/element';
 
 export default function VerseEdit( {
 	attributes,
@@ -20,12 +21,16 @@ export default function VerseEdit( {
 	mergeBlocks,
 } ) {
 	const { textAlign, content } = attributes;
+	const isAlignmentToolbarCollapsed = Platform.select( {
+		web: true,
+		native: false,
+	} );
 
 	return (
 		<>
 			<BlockControls>
 				<AlignmentToolbar
-					isCollapsed={ false }
+					isCollapsed={ isAlignmentToolbarCollapsed }
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );
