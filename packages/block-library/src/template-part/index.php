@@ -37,10 +37,7 @@ function render_block_core_template_part( $attributes ) {
 	$content = do_blocks( $content );
 	$content = wptexturize( $content );
 	$content = convert_smilies( $content );
-	$content = wpautop( $content );
-	$content = shortcode_unautop( $content );
 	$content = wp_make_content_images_responsive( $content );
-	$content = do_shortcode( $content );
 
 	return str_replace( ']]>', ']]&gt;', $content );
 }
