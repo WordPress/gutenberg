@@ -516,9 +516,10 @@ function LinkControl( {
 		);
 	};
 
-	const viewerSlotFillProps = useMemo( () => ( { url: value.url } ), [
-		value.url,
-	] );
+	const viewerSlotFillProps = useMemo(
+		() => ( { url: value && value.url } ),
+		[ value && value.url ]
+	);
 	return (
 		<div
 			tabIndex={ -1 }
