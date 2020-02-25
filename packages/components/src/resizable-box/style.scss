@@ -52,6 +52,11 @@
 	}
 }
 
+// Elevate the resize handle above the focus style.
+.components-resizable-box__handle {
+	z-index: z-index(".components-resizable-box__handle");
+}
+
 // Show corner handles on top of side handles so they can be used
 .components-resizable-box__side-handle {
 	z-index: z-index(".components-resizable-box__side-handle");

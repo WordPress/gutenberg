@@ -16,7 +16,7 @@
 	// On mobile the main content area has to scroll, otherwise you can invoke the overscroll bounce on the non-scrolling container.
 	@include break-small {
 		position: fixed;
-		padding: $grid-size;
+		padding: $grid-unit-10;
 		top: $admin-bar-height-big;
 	}
 

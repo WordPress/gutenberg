@@ -53,7 +53,6 @@ function BlockListBlock( {
 	isFirstMultiSelected,
 	isLastMultiSelected,
 	isTypingWithinBlock,
-	isEmptyDefaultBlock,
 	isAncestorOfSelectedBlock,
 	isSelectionEnabled,
 	className,
@@ -215,17 +214,6 @@ function BlockListBlock( {
 	};
 
 	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
-
-	// If the block is selected and we're typing the block should not appear.
-	// Empty paragraph blocks should always show up as unselected.
-	const showEmptyBlockSideInserter =
-		! isNavigationMode && isSelected && isEmptyDefaultBlock && isValid;
-	const shouldAppearSelected =
-		! isFocusMode &&
-		! showEmptyBlockSideInserter &&
-		isSelected &&
-		! isTypingWithinBlock;
-
 	const isDragging =
 		isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
@@ -246,7 +234,7 @@ function BlockListBlock( {
 		{
 			'has-selected-ui': hasSelectedUI,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-			'is-selected': shouldAppearSelected && hasSelectedUI,
+			'is-selected': isSelected,
 			'is-multi-selected': isMultiSelected,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
@@ -354,7 +342,6 @@ const applyWithSelect = withSelect(
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
 		} = select( 'core/block-editor' );
-
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
 		const { focusMode, isRTL } = getSettings();
@@ -391,8 +378,6 @@ const applyWithSelect = withSelect(
 			initialPosition: isSelected
 				? getSelectedBlocksInitialCaretPosition()
 				: null,
-			isEmptyDefaultBlock:
-				name && isUnmodifiedDefaultBlock( { name, attributes } ),
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			isNavigationMode: isNavigationMode(),

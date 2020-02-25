@@ -2338,8 +2338,8 @@ exports[`Storyshots Components/ColorPicker Alpha Enabled 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+            <polygon
+              points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
             />
           </svg>
         </button>
@@ -2512,8 +2512,8 @@ exports[`Storyshots Components/ColorPicker Default 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+            <polygon
+              points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
             />
           </svg>
         </button>
@@ -2554,8 +2554,8 @@ exports[`Storyshots Components/CustomSelectControl Default 1`] = `
       width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+      <polygon
+        points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
       />
     </svg>
   </button>
@@ -3090,8 +3090,8 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
           width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path
-            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+          <polygon
+            points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
           />
         </svg>
       </button>
@@ -3380,8 +3380,8 @@ input[type='number'].emotion-18 {
           width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path
-            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+          <polygon
+            points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
           />
         </svg>
       </button>
@@ -3578,8 +3578,8 @@ exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
           width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path
-            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+          <polygon
+            points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
           />
         </svg>
       </button>
@@ -4138,8 +4138,8 @@ exports[`Storyshots Components/Panel Default 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            <polygon
+              points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
             />
           </svg>
         </span>
@@ -4191,8 +4191,8 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            <polygon
+              points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
             />
           </svg>
         </span>
@@ -4230,8 +4230,8 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+            <polygon
+              points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
             />
           </svg>
         </span>
@@ -4278,8 +4278,8 @@ exports[`Storyshots Components/Panel With Icon 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            <polygon
+              points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
             />
           </svg>
         </span>
@@ -8170,7 +8170,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
         aria-expanded={false}
         aria-haspopup="true"
         aria-label="Change text alignment"
-        className="components-button components-dropdown-menu__toggle has-text has-icon"
+        className="components-button components-dropdown-menu__toggle has-icon"
         id="options-toolbar-2"
         onBlur={[Function]}
         onClick={[Function]}
@@ -8195,9 +8195,6 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
             d="M12 5V3H3v2h9zm5 4V7H3v2h14zm-5 4v-2H3v2h9zm5 4v-2H3v2h14z"
           />
         </svg>
-        <span
-          className="components-dropdown-menu__indicator"
-        />
       </button>
     </div>
   </div>
@@ -8319,11 +8316,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
         onMouseLeave={[Function]}
         tabIndex={-1}
         type="button"
-      >
-        <span
-          className="components-dropdown-menu__indicator"
-        />
-      </button>
+      />
     </div>
   </div>
   <div
@@ -10004,8 +9997,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+      <polygon
+        points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
       />
     </svg>
     <svg
@@ -10017,8 +10010,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={36}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+      <polygon
+        points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
       />
     </svg>
     <svg
@@ -10030,8 +10023,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={48}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+      <polygon
+        points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
       />
     </svg>
   </div>
@@ -10175,8 +10168,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+      <polygon
+        points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
       />
     </svg>
     <svg
@@ -10188,8 +10181,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={36}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+      <polygon
+        points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
       />
     </svg>
     <svg
@@ -10201,8 +10194,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={48}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+      <polygon
+        points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
       />
     </svg>
   </div>
