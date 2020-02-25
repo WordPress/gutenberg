@@ -29,10 +29,10 @@ const __experimentalPageTemplatePicker = ( {
 			title: templatePreview.name,
 			blocks: parse( templatePreview.content ),
 		} );
-		setTemplatePreview( undefined );
 		logUserEvent( userEvents.editorSessionTemplateApply, {
-			template: templatePreview.name,
+			template: templatePreview.key,
 		} );
+		setTemplatePreview( undefined );
 	};
 
 	return (
@@ -40,7 +40,7 @@ const __experimentalPageTemplatePicker = ( {
 			<Container>
 				{ templates.map( ( template ) => (
 					<Button
-						key={ template.name }
+						key={ template.key }
 						icon={ template.icon }
 						label={ template.name }
 						onPress={ () => {

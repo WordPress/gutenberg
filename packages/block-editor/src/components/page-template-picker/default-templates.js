@@ -11,6 +11,7 @@ import memoize from 'memize';
 const defaultTemplates = [
 	{
 		name: 'About',
+		key: 'about',
 		icon: '👋',
 		content: `
 			<!-- wp:paragraph {"align":"left"} -->
@@ -56,6 +57,7 @@ const defaultTemplates = [
 	},
 	{
 		name: 'Contact',
+		key: 'contact',
 		icon: '✉️',
 		content: `
 			<!-- wp:paragraph {"align":"left"} -->
