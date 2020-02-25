@@ -551,7 +551,7 @@ function LinkControl( {
 						}
 					} }
 					renderSuggestions={
-						showSuggestions ? renderSearchResults : false
+						showSuggestions ? renderSearchResults : null
 					}
 					fetchSuggestions={ getSearchHandler }
 					showInitialSuggestions={ showInitialSuggestions }
