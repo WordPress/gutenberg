@@ -85,7 +85,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     }
 
     enum GutenbergUserEvent {
-        PAGE_TEMPLATE_APPLIED("page_template_applied");
+        EDITOR_SESSION_TEMPLATE_APPLY("editor_session_template_apply"),
+        EDITOR_SESSION_TEMPLATE_PREVIEW("editor_session_template_preview");
 
         private static final Map<String, GutenbergUserEvent> MAP = new HashMap<>();
 

@@ -158,7 +158,8 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnLogGutenbergUserEventListener {
-        void onGutenbergDidLogSessionTemplateEvent(String properties);
+        void onEditorSessionTemplateApply(String template);
+        void onEditorSessionTemplatePreview(String template);
     }
 
     public void mediaSelectionCancelled() {
@@ -328,8 +329,12 @@ public class WPAndroidGlueCode {
             @Override
             public void logUserEvent(GutenbergUserEvent event, ReadableMap eventProperties) {
                 switch (event) {
-                    case PAGE_TEMPLATE_APPLIED:
-                        mOnLogGutenbergUserEventListener.onGutenbergDidLogSessionTemplateEvent(eventProperties.getString(
+                    case EDITOR_SESSION_TEMPLATE_APPLY:
+                        mOnLogGutenbergUserEventListener.onEditorSessionTemplateApply(eventProperties.getString(
+                                MAP_KEY_TEMPLATE));
+                        break;
+                    case EDITOR_SESSION_TEMPLATE_PREVIEW:
+                        mOnLogGutenbergUserEventListener.onEditorSessionTemplatePreview(eventProperties.getString(
                                 MAP_KEY_TEMPLATE));
                         break;
                 }
