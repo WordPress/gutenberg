@@ -12,7 +12,7 @@ import { ToggleControl } from '@wordpress/components';
 const defaultSettings = [
 	{
 		id: 'opensInNewTab',
-		title: __( 'Open in New Tab' ),
+		title: __( 'Open in new tab' ),
 	},
 ];
 

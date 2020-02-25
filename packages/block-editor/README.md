@@ -158,6 +158,12 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="BlockSettingsMenuControls" href="#BlockSettingsMenuControls">#</a> **BlockSettingsMenuControls**
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-settings-menu-controls/README.md>
+
 <a name="BlockTitle" href="#BlockTitle">#</a> **BlockTitle**
 
 Undocumented declaration.

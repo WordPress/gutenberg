@@ -15,7 +15,11 @@ function render_block_core_post_comments_form() {
 	if ( ! $post ) {
 		return '';
 	}
-	return comment_form( array(), $post->ID );
+	ob_start();
+	comment_form( array(), $post->ID );
+	$form = ob_get_clean();
+
+	return $form;
 }
 
 /**

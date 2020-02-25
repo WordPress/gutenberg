@@ -12,7 +12,7 @@ import Paragraph from '../edit';
  * WordPress dependencies
  */
 jest.mock( '@wordpress/blocks' );
-jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
+jest.mock( '../../../../data/src/components/use-select', () => () => ( {
 	attributes: () => {},
 	settingsColors: [],
 } ) );
