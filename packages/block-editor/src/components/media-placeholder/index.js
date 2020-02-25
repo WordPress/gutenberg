@@ -267,14 +267,21 @@ export class MediaPlaceholder extends Component {
 	}
 
 	renderUrlSelectionUI() {
-		const { onSelectURL } = this.props;
+		const {
+			onSelectURL,
+			disableURLButton = false
+		} = this.props;
+
 		if ( ! onSelectURL ) {
 			return null;
 		}
+
 		const { isURLInputVisible, src } = this.state;
+
 		return (
 			<div className="block-editor-media-placeholder__url-input-container">
 				<Button
+					disabled={ disableURLButton }
 					className="block-editor-media-placeholder__button"
 					onClick={ this.openURLInput }
 					isPressed={ isURLInputVisible }
@@ -303,6 +310,8 @@ export class MediaPlaceholder extends Component {
 			mediaUpload,
 			multiple = false,
 			onSelect,
+			disableUploadButton = false,
+			disableMediaLibraryButton = false,
 			value = {},
 		} = this.props;
 
@@ -320,6 +329,7 @@ export class MediaPlaceholder extends Component {
 					return (
 						<Button
 							isSecondary
+							disabled={ disableMediaLibraryButton }
 							onClick={ ( event ) => {
 								event.stopPropagation();
 								open();
@@ -345,6 +355,7 @@ export class MediaPlaceholder extends Component {
 								<>
 									<Button
 										isSecondary
+										disabled={ disableUploadButton }
 										className={ classnames(
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
@@ -380,6 +391,7 @@ export class MediaPlaceholder extends Component {
 						onChange={ this.onUpload }
 						accept={ accept }
 						multiple={ multiple }
+						disabled={ disableUploadButton }
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>
