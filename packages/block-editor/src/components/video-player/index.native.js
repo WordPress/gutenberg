@@ -24,6 +24,7 @@ class Video extends Component {
 	constructor() {
 		super( ...arguments );
 		this.isIOS = Platform.OS === 'ios';
+		this.forceFullscreen = ! this.isIOS;
 		this.state = {
 			isFullScreen: false,
 			videoContainerHeight: 0,
@@ -84,7 +85,10 @@ class Video extends Component {
 	}
 
 	render() {
-		const { isSelected, style } = this.props;
+		const { isSelected, style, forceFullscreen } = this.props;
+		if ( forceFullscreen !== undefined ) {
+			this.forceFullscreen = forceFullscreen;
+		}
 		const { isFullScreen, videoContainerHeight } = this.state;
 		const showPlayButton = videoContainerHeight > 0;
 
@@ -95,10 +99,7 @@ class Video extends Component {
 					ref={ ( ref ) => {
 						this.player = ref;
 					} }
-					// Using built-in player controls is messing up the layout on iOS.
-					// So we are setting controls=false and adding a play button that
-					// will trigger presentFullscreenPlayer()
-					controls={ false }
+					controls={ ! this.forceFullscreen }
 					ignoreSilentSwitch={ 'ignore' }
 					paused={ ! isFullScreen }
 					onLayout={ this.onVideoLayout }
@@ -109,7 +110,7 @@ class Video extends Component {
 						this.setState( { isFullScreen: false } );
 					} }
 				/>
-				{ showPlayButton && (
+				{ showPlayButton && this.forceFullscreen && (
 					// If we add the play icon as a subview to VideoPlayer then react-native-video decides to show control buttons
 					// even if we set controls={ false }, so we are adding our play button as a sibling overlay view.
 					<TouchableOpacity
