@@ -15,8 +15,8 @@ import {
 	getUnregisteredTypeHandlerName,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
+import { InnerBlocks } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-
 /**
  * Internal dependencies
  */
@@ -53,6 +53,8 @@ class BlockListBlock extends Component {
 	}
 
 	getBlockForType() {
+		const { parentWidth } = this.props;
+
 		return (
 			<BlockEdit
 				name={ this.props.name }
@@ -67,7 +69,7 @@ class BlockListBlock extends Component {
 					this.props.onCaretVerticalPositionChange
 				}
 				clientId={ this.props.clientId }
-				parentWidth={ this.props.parentWidth }
+				parentWidth={ parentWidth }
 			/>
 		);
 	}
@@ -181,6 +183,28 @@ class BlockListBlock extends Component {
 		}
 	}
 
+	renderButtonsAppender() {
+		const { name, isSelected, clientId, customOnAdd } = this.props;
+		if ( name === 'core/button' && isSelected ) {
+			return (
+				<>
+					<View>
+						<InnerBlocks.ButtonBlockAppender
+							flex={ false }
+							customOnAdd={ () => customOnAdd( clientId ) }
+						/>
+					</View>
+					{ /* It looks like there is a problem with RN and `flexWrap: 'wrap'` existing only on iOS and occuring while 
+							setting a `maxWidth` for `Buttons` block - `appender` is wrapped too early and is moved into next line.
+							Probably some native calculations related to rounding return incorrect value. 
+					*/ }
+					<View style={ styles.buttonsAppenderSpacer } />
+				</>
+			);
+		}
+		return null;
+	}
+
 	render() {
 		const {
 			attributes,
@@ -194,6 +218,7 @@ class BlockListBlock extends Component {
 			parentId,
 			isTouchable,
 			customOnDelete,
+			horizontalDirection,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -225,26 +250,39 @@ class BlockListBlock extends Component {
 						</FloatingToolbar>
 					) }
 					<View
-						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
-						accessibilityLabel={ accessibilityLabel }
-						style={ this.applyBlockStyle() }
+						style={
+							horizontalDirection && [
+								styles.horizontal,
+								{ maxWidth: this.props.parentWidth },
+							]
+						}
 					>
-						{ isValid ? (
-							this.getBlockForType()
-						) : (
-							<BlockInvalidWarning
-								blockTitle={ title }
-								icon={ icon }
-							/>
-						) }
-						<View style={ this.applyToolbarStyle() }>
-							{ isSelected && (
-								<BlockMobileToolbar
-									clientId={ clientId }
-									customOnDelete={ customOnDelete }
+						<View
+							pointerEvents={ isTouchable ? 'auto' : 'box-only' }
+							accessibilityLabel={ accessibilityLabel }
+							style={ this.applyBlockStyle() }
+						>
+							{ isValid ? (
+								this.getBlockForType()
+							) : (
+								<BlockInvalidWarning
+									blockTitle={ title }
+									icon={ icon }
 								/>
 							) }
+							<View style={ this.applyToolbarStyle() }>
+								{ isSelected && (
+									<BlockMobileToolbar
+										clientId={ clientId }
+										customOnDelete={ customOnDelete }
+										horizontalDirection={
+											horizontalDirection
+										}
+									/>
+								) }
+							</View>
 						</View>
+						{ this.renderButtonsAppender() }
 					</View>
 				</View>
 			</TouchableWithoutFeedback>

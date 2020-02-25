@@ -137,3 +137,12 @@
 	margin-left: -$block-edge-to-content;
 	margin-right: -$block-edge-to-content;
 }
+
+.horizontal {
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.buttonsAppenderSpacer {
+	width: $block-selected-margin;
+}

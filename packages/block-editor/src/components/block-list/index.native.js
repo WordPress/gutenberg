@@ -43,7 +43,6 @@ export class BlockList extends Component {
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind(
 			this
 		);
-		this.onLayout = this.onLayout.bind( this );
 		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind(
 			this
 		);
@@ -72,12 +71,6 @@ export class BlockList extends Component {
 
 	shouldFlatListPreventAutomaticScroll() {
 		return this.props.isBlockInsertionPointVisible;
-	}
-
-	onLayout( { nativeEvent } ) {
-		const { width } = nativeEvent.layout;
-
-		this.setState( { maxWidth: width } );
 	}
 
 	renderDefaultBlockAppender() {
@@ -130,7 +123,6 @@ export class BlockList extends Component {
 			<View
 				style={ { flex: isRootList ? 1 : 0 } }
 				onAccessibilityEscape={ clearSelectedBlock }
-				onLayout={ this.onLayout }
 			>
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android'
@@ -180,6 +172,7 @@ export class BlockList extends Component {
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			customOnDelete,
+			customOnAdd,
 			__experimentalMoverDirection,
 		} = this.props;
 
@@ -200,9 +193,10 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
-						parentWidth={ this.state.maxWidth }
+						parentWidth={ this.props.parentWidth }
 						customOnDelete={ customOnDelete }
 						horizontalDirection={ horizontalDirection }
+						customOnAdd={ customOnAdd }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (
