@@ -94,8 +94,8 @@ const Cover = ( {
 
 	const onSelectMedia = ( media ) => {
 		const onSelect = attributesFromMedia( setAttributes );
-		// Remove gradient attribute since the image URL is set
-		setAttributes( { gradient: undefined } );
+		// Remove gradient attribute
+		setAttributes( { gradient: undefined, customGradient: undefined } );
 		onSelect( media );
 	};
 
@@ -198,12 +198,20 @@ const Cover = ( {
 				{ getMediaOptions() }
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
 
-				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-					<ImageWithFocalPoint
-						focalPoint={ focalPoint }
-						url={ url }
-					/>
-				) }
+				{ /* When the gradient is set as a background the backgroundType is equal to IMAGE_BACKGROUND_TYPE */ }
+				{ IMAGE_BACKGROUND_TYPE === backgroundType &&
+					( gradientValue ? (
+						<LinearGradient
+							gradientValue={ gradientValue }
+							pointerEvents="none"
+							style={ styles.background }
+						/>
+					) : (
+						<ImageWithFocalPoint
+							focalPoint={ focalPoint }
+							url={ url }
+						/>
+					) ) }
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -238,15 +246,8 @@ const Cover = ( {
 				>
 					<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 				</View>
-				{ gradientValue ? (
-					<LinearGradient
-						gradientValue={ gradientValue }
-						pointerEvents="none"
-						style={ getOverlayStyles() }
-					/>
-				) : (
-					<View pointerEvents="none" style={ getOverlayStyles() } />
-				) }
+
+				<View pointerEvents="none" style={ getOverlayStyles() } />
 				<MediaUpload
 					__experimentalOnlyMediaLibrary
 					allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
