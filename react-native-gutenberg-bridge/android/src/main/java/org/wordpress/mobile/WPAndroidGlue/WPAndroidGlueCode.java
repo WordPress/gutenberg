@@ -39,6 +39,7 @@ import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -96,7 +97,6 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_POST_TYPE = "postType";
     private static final String PROP_NAME_LOCALE = "locale";
     private static final String PROP_NAME_TRANSLATIONS = "translations";
-    private static final String MAP_KEY_TEMPLATE = "template";
 
     private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
     private static OkHttpClient sOkHttpClient = new OkHttpClient.Builder().addInterceptor(sAddCookiesInterceptor).build();
@@ -158,8 +158,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnLogGutenbergUserEventListener {
-        void onEditorSessionTemplateApply(String template);
-        void onEditorSessionTemplatePreview(String template);
+        void onGutenbergUserEvent(GutenbergUserEvent event, Map<String, Object> properties);
     }
 
     public void mediaSelectionCancelled() {
@@ -328,16 +327,7 @@ public class WPAndroidGlueCode {
 
             @Override
             public void logUserEvent(GutenbergUserEvent event, ReadableMap eventProperties) {
-                switch (event) {
-                    case EDITOR_SESSION_TEMPLATE_APPLY:
-                        mOnLogGutenbergUserEventListener.onEditorSessionTemplateApply(eventProperties.getString(
-                                MAP_KEY_TEMPLATE));
-                        break;
-                    case EDITOR_SESSION_TEMPLATE_PREVIEW:
-                        mOnLogGutenbergUserEventListener.onEditorSessionTemplatePreview(eventProperties.getString(
-                                MAP_KEY_TEMPLATE));
-                        break;
-                }
+                mOnLogGutenbergUserEventListener.onGutenbergUserEvent(event, eventProperties.toHashMap());
             }
         });
 
