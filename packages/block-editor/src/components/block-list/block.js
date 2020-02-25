@@ -437,8 +437,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 				// The default save outputs null.
 				// We can have more nuanced heuristics in the future.
 				isLocalChange =
-					select( 'core/blocks' ).getBlockType( getBlockName( rootClientId ) )
-						.save === DEFAULT_BLOCK_TYPE_SETTINGS.save;
+					select( 'core/blocks' ).getBlockType(
+						getBlockName( rootClientId )
+					).save === DEFAULT_BLOCK_TYPE_SETTINGS.save;
 			}
 			updateBlockAttributes(
 				clientId,
@@ -492,7 +493,22 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			) {
 				__unstableMarkLastChangeAsPersistent();
 			}
-			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
+
+			const { clientId } = ownProps;
+			const { getBlockRootClientId, getBlockName } = select(
+				'core/block-editor'
+			);
+			let isLocalChange = false;
+			const rootClientId = getBlockRootClientId( clientId );
+			if ( rootClientId ) {
+				// The default save outputs null.
+				// We can have more nuanced heuristics in the future.
+				isLocalChange =
+					select( 'core/blocks' ).getBlockType(
+						getBlockName( rootClientId )
+					).save === DEFAULT_BLOCK_TYPE_SETTINGS.save;
+			}
+			replaceBlocks( [ clientId ], blocks, indexToSelect, isLocalChange );
 		},
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );

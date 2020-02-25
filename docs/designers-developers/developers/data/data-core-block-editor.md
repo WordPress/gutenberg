@@ -1120,11 +1120,17 @@ _Returns_
 Returns an action object signalling that a blocks should be replaced with
 one or more replacement blocks.
 
+You may set `isLocalChange` to true to scope change detection to a section of
+the block tree. I.e. so the edit doesn't dirty the entire block tree. This
+is used for edits made to blocks that are saved somewhere other than the main
+post by their root.
+
 _Parameters_
 
 -   _clientIds_ `(string|Array<string>)`: Block client ID(s) to replace.
 -   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
 -   _indexToSelect_ `number`: Index of replacement block to select.
+-   _isLocalChange_ `[string]`: Whether to scope change detection.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
 

@@ -375,8 +375,7 @@ function withPersistentBlockChange( reducer ) {
 
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
-		nextState.persistentChangeRootClientId =
-			action.type === 'UPDATE_BLOCK_ATTRIBUTES' && action.rootClientId;
+		nextState.persistentChangeRootClientId = action.rootClientId;
 
 		const isExplicitPersistentChange =
 			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
@@ -409,10 +408,7 @@ function withPersistentBlockChange( reducer ) {
 				? ! markNextChangeAsNotPersistent
 				: ! isUpdatingSameBlockAttribute( action, lastAction ),
 		};
-		if (
-			action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
-			action.rootClientId
-		) {
+		if ( action.rootClientId ) {
 			nextState.persistentChangeRootClientId = action.rootClientId;
 		}
 
