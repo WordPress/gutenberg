@@ -27,6 +27,11 @@
 	.block-editor-block-preview__container {
 		height: 100%;
 	}
+
+	.block-editor-block-preview__content {
+		display: flex;
+		justify-content: center;
+	}
 }
 
 .block-editor-patterns__item-title {
