@@ -304,12 +304,16 @@ function gutenberg_strip_php_suffix( $template_file ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
+	global $_wp_current_template_id;
 	if ( ! post_type_exists( 'wp_template' ) || ! post_type_exists( 'wp_template_part' ) ) {
 		return $settings;
 	}
 
 	// Create template part auto-drafts for the edited post.
-	foreach ( parse_blocks( get_post()->post_content ) as $block ) {
+	$post = isset( $_wp_current_template_id )
+		? get_post( $_wp_current_template_id ) // It's a template.
+		: get_post(); // It's a post.
+	foreach ( parse_blocks( $post->post_content ) as $block ) {
 		create_auto_draft_for_template_part_block( $block );
 	}
 
