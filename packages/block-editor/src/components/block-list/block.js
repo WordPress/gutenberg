@@ -432,14 +432,17 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 				'core/block-editor'
 			);
 			let isLocalChange = false;
-			const rootClientId = getBlockRootClientId( clientId );
-			if ( rootClientId ) {
+			let rootClientId = clientId;
+			while ( ( rootClientId = getBlockRootClientId( rootClientId ) ) ) {
 				// The default save outputs null.
 				// We can have more nuanced heuristics in the future.
 				isLocalChange =
 					select( 'core/blocks' ).getBlockType(
 						getBlockName( rootClientId )
 					).save === DEFAULT_BLOCK_TYPE_SETTINGS.save;
+				if ( isLocalChange ) {
+					break;
+				}
 			}
 			updateBlockAttributes(
 				clientId,
@@ -499,14 +502,17 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 				'core/block-editor'
 			);
 			let isLocalChange = false;
-			const rootClientId = getBlockRootClientId( clientId );
-			if ( rootClientId ) {
+			let rootClientId = clientId;
+			while ( ( rootClientId = getBlockRootClientId( rootClientId ) ) ) {
 				// The default save outputs null.
 				// We can have more nuanced heuristics in the future.
 				isLocalChange =
 					select( 'core/blocks' ).getBlockType(
 						getBlockName( rootClientId )
 					).save === DEFAULT_BLOCK_TYPE_SETTINGS.save;
+				if ( isLocalChange ) {
+					break;
+				}
 			}
 			replaceBlocks( [ clientId ], blocks, indexToSelect, isLocalChange );
 		},
