@@ -45,9 +45,6 @@
 		// Formatting buttons
 		> svg {
 			border-radius: $radius-round-rectangle;
-
-			// This assumes 20x20px dashicons.
-			padding: 2px;
 			width: $button-size-small;
 			height: $button-size-small;
 			margin: -1px $grid-unit-10 -1px 0;
