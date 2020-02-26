@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 const About = {
 	// translators: title for "About" page template
 	name: __( 'About' ),
+	key: 'about',
 	icon: '👋',
 	content: [
 		{
