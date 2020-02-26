@@ -1,9 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
-	navigateRegions,
 	DropZoneProvider,
 	Popover,
 	SlotFillProvider,
@@ -14,6 +12,7 @@ import {
 	BlockEditorKeyboardShortcuts,
 	__experimentalEditorSkeleton as EditorSkeleton,
 } from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,6 +24,8 @@ import Notices from '../notices';
 
 function Layout( { blockEditorSettings } ) {
 	const [ selectedArea, setSelectedArea ] = useState( null );
+	const isMobile = useViewportMatch( 'medium', '<' );
+
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
@@ -33,16 +34,12 @@ function Layout( { blockEditorSettings } ) {
 					<FocusReturnProvider>
 						<EditorSkeleton
 							header={ <Header /> }
-							sidebar={ <Sidebar /> }
+							sidebar={ ! isMobile && <Sidebar /> }
 							content={
 								<>
 									<Notices />
 									<div
 										className="edit-widgets-layout__content"
-										role="region"
-										aria-label={ __(
-											'Widgets screen content'
-										) }
 										tabIndex="-1"
 										onFocus={ () => {
 											setSelectedArea( null );
@@ -68,4 +65,4 @@ function Layout( { blockEditorSettings } ) {
 	);
 }
 
-export default navigateRegions( Layout );
+export default Layout;
