@@ -47,7 +47,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.URLInputButton, {
+		return wp.element.createElement( wp.blockEditor.URLInputButton, {
 			className: props.className,
 			url: props.attributes.url,
 			onChange: function( url, post ) {
@@ -66,7 +66,7 @@ wp.blocks.registerBlockType( /* ... */, {
 {% ESNext %}
 ```js
 import { registerBlockType } from '@wordpress/blocks';
-import { URLInputButton } from @wordpress/editor';
+import { URLInputButton } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...
@@ -165,7 +165,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.URLInput, {
+		return wp.element.createElement( wp.blockEditor.URLInput, {
 			className: props.className,
 			value: props.attributes.url,
 			onChange: function( url, post ) {
@@ -184,7 +184,7 @@ wp.blocks.registerBlockType( /* ... */, {
 {% ESNext %}
 ```js
 import { registerBlockType } from '@wordpress/blocks';
-import { URLInput } from '@wordpress/editor';
+import { URLInput } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...
