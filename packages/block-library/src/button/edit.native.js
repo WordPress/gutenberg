@@ -92,11 +92,11 @@ class ButtonEdit extends Component {
 		}
 
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
-		// to avoid flashing caret after closing one of them	
+		// to avoid flashing caret after closing one of them
 		if (
 			( ! prevProps.editorSidebarOpened && editorSidebarOpened ) ||
 			( ! prevState.isLinkSheetVisible && isLinkSheetVisible )
-		) {		
+		) {
 			if ( Platform.OS === 'android' && this.richTextRef ) {
 				this.richTextRef.blur();
 				this.onToggleButtonFocus( false );
