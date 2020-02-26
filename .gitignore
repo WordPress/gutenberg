@@ -2,6 +2,7 @@
 build
 build-module
 build-style
+build-types
 node_modules
 gutenberg.zip
 
