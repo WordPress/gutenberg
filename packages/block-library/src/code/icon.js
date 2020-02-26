@@ -5,7 +5,6 @@ import { Path, SVG } from '@wordpress/components';
 
 export default (
 	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-		<Path d="M0,0h24v24H0V0z" fill="none" />
-		<Path d="M9.4,16.6L4.8,12l4.6-4.6L8,6l-6,6l6,6L9.4,16.6z M14.6,16.6l4.6-4.6l-4.6-4.6L16,6l6,6l-6,6L14.6,16.6z" />
+		<Path d="M14.5 6.4l-1 1.1 5.4 4.9-5.4 5 1 1.1 6.6-6.1-6.6-6zm-5 0l-6.6 6.1 6.6 6 1-1.1-5.4-4.9 5.4-5-1-1.1z" />
 	</SVG>
 );

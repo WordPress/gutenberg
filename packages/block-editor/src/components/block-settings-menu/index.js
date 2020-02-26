@@ -14,7 +14,7 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { moreVertical } from '@wordpress/icons';
+import { moreHorizontal } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -68,7 +68,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 			} ) => (
 				<Toolbar>
 					<DropdownMenu
-						icon={ moreVertical }
+						icon={ moreHorizontal }
 						label={ __( 'More options' ) }
 						className="block-editor-block-settings-menu"
 						popoverProps={ POPOVER_PROPS }
