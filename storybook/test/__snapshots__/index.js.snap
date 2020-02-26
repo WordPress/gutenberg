@@ -7887,6 +7887,56 @@ exports[`Storyshots Components/ScrollLock Default 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/SlotFill Default 1`] = `
+Array [
+  <h2>
+    Profile
+  </h2>,
+  <p>
+    Name: 
+    <span />
+  </p>,
+  <p>
+    Age: 
+    <span />
+  </p>,
+]
+`;
+
+exports[`Storyshots Components/SlotFill With Context 1`] = `
+Array [
+  <h2>
+    Profile
+  </h2>,
+  <p>
+    Name: 
+    <span />
+  </p>,
+  <p>
+    Age: 
+    <span />
+  </p>,
+]
+`;
+
+exports[`Storyshots Components/SlotFill With Fill Props 1`] = `
+Array [
+  <h2>
+    Profile
+  </h2>,
+  <p>
+    Name:
+     
+    <span />
+  </p>,
+  <p>
+    Age:
+     
+    <span />
+  </p>,
+]
+`;
+
 exports[`Storyshots Components/Snackbar Default 1`] = `
 <div
   className="components-snackbar"
@@ -8117,6 +8167,28 @@ exports[`Storyshots Components/ToggleControl With Help Text 1`] = `
   >
     Has fixed background.
   </p>
+</div>
+`;
+
+exports[`Storyshots Components/ToolTip Default 1`] = `
+<div
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onMouseDown={[Function]}
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
+  style={
+    Object {
+      "border": "1px solid #ccc",
+      "margin": "50px auto",
+      "padding": "20px",
+      "textAlign": "center",
+      "width": "200px",
+    }
+  }
+>
+  Hover for more information
 </div>
 `;
 

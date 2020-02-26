@@ -1,26 +1,28 @@
 /**
  * External dependencies
  */
-const { command } = require( 'execa' );
+const execa = require( 'execa' );
 const program = require( 'commander' );
 const inquirer = require( 'inquirer' );
 const { startCase } = require( 'lodash' );
-const { join } = require( 'path' );
 
 /**
  * Internal dependencies
  */
 const CLIError = require( './cli-error' );
 const log = require( './log' );
-const { version } = require( '../package.json' );
+const { engines, version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
 const { getDefaultValues, getPrompts } = require( './templates' );
 
 async function checkSystemRequirements() {
 	try {
-		await command( 'check-node-version --package', {
-			cwd: join( __dirname, '..' ),
-		} );
+		await execa( 'check-node-version', [
+			'--node',
+			engines.node,
+			'--npm',
+			engines.npm,
+		] );
 	} catch ( error ) {
 		log.error( 'Minimum system requirements not met!' );
 		log.error( error.stderr );

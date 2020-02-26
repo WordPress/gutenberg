@@ -76,7 +76,7 @@ describe( 'cpt locking', () => {
 
 		it( 'should not error when deleting the cotents of a paragraph', async () => {
 			await page.click(
-				'.block-editor-block-list__block[data-type="core/paragraph"] p'
+				'.block-editor-block-list__block[data-type="core/paragraph"]'
 			);
 			const textToType = 'Paragraph';
 			await page.keyboard.type( 'Paragraph' );
