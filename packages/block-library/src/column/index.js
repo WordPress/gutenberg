@@ -24,6 +24,7 @@ export const settings = {
 		inserter: false,
 		reusable: false,
 		html: false,
+		lightBlockWrapper: true,
 	},
 	getEditWrapperProps( attributes ) {
 		const { width } = attributes;

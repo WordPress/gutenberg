@@ -18,6 +18,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
 	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -103,12 +104,13 @@ function ColumnsEditContainer( {
 			{ InspectorControlsColorPanel }
 			<BackgroundColor>
 				<TextColor>
-					<div className={ classes } ref={ ref }>
-						<InnerBlocks
-							allowedBlocks={ ALLOWED_BLOCKS }
-							__experimentalMoverDirection="horizontal"
-						/>
-					</div>
+					<InnerBlocks
+						allowedBlocks={ ALLOWED_BLOCKS }
+						__experimentalMoverDirection="horizontal"
+						tagName={ Block.div }
+						className={ classes }
+						ref={ ref }
+					/>
 				</TextColor>
 			</BackgroundColor>
 		</>
@@ -255,25 +257,27 @@ const ColumnsEdit = ( props ) => {
 	}
 
 	return (
-		<__experimentalBlockVariationPicker
-			icon={ get( blockType, [ 'icon', 'src' ] ) }
-			label={ get( blockType, [ 'title' ] ) }
-			variations={ variations }
-			onSelect={ ( nextVariation = defaultVariation ) => {
-				if ( nextVariation.attributes ) {
-					props.setAttributes( nextVariation.attributes );
-				}
-				if ( nextVariation.innerBlocks ) {
-					replaceInnerBlocks(
-						props.clientId,
-						createBlocksFromInnerBlocksTemplate(
-							nextVariation.innerBlocks
-						)
-					);
-				}
-			} }
-			allowSkip
-		/>
+		<Block.div>
+			<__experimentalBlockVariationPicker
+				icon={ get( blockType, [ 'icon', 'src' ] ) }
+				label={ get( blockType, [ 'title' ] ) }
+				variations={ variations }
+				onSelect={ ( nextVariation = defaultVariation ) => {
+					if ( nextVariation.attributes ) {
+						props.setAttributes( nextVariation.attributes );
+					}
+					if ( nextVariation.innerBlocks ) {
+						replaceInnerBlocks(
+							props.clientId,
+							createBlocksFromInnerBlocksTemplate(
+								nextVariation.innerBlocks
+							)
+						);
+					}
+				} }
+				allowSkip
+			/>
+		</Block.div>
 	);
 };
 

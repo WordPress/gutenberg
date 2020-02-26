@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { withViewportMatch } from '@wordpress/viewport';
-import { Component } from '@wordpress/element';
+import { Component, forwardRef, useRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	synchronizeBlocksWithTemplate,
@@ -149,9 +149,25 @@ class InnerBlocks extends Component {
 			clientId,
 			hasOverlay,
 			__experimentalCaptureToolbars: captureToolbars,
+			forwardedRef,
 			...props
 		} = this.props;
 		const { templateInProcess } = this.state;
+
+		if ( templateInProcess ) {
+			return null;
+		}
+
+		const blockList = (
+			<BlockList
+				rootClientId={ clientId }
+				forwardedRef={ forwardedRef }
+				{ ...props }
+			/>
+		);
+		if ( props.tagName ) {
+			return blockList;
+		}
 
 		const classes = classnames( 'block-editor-inner-blocks', {
 			'has-overlay': enableClickThrough && hasOverlay,
@@ -159,16 +175,14 @@ class InnerBlocks extends Component {
 		} );
 
 		return (
-			<div className={ classes }>
-				{ ! templateInProcess && (
-					<BlockList rootClientId={ clientId } { ...props } />
-				) }
+			<div className={ classes } ref={ forwardedRef }>
+				{ blockList }
 			</div>
 		);
 	}
 }
 
-InnerBlocks = compose( [
+const ComposedInnerBlocks = compose( [
 	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
 	withSelect( ( select, ownProps ) => {
@@ -228,15 +242,22 @@ InnerBlocks = compose( [
 	} ),
 ] )( InnerBlocks );
 
-// Expose default appender placeholders as components.
-InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
-InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
+const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
+	const fallbackRef = useRef();
+	return (
+		<ComposedInnerBlocks { ...props } forwardedRef={ ref || fallbackRef } />
+	);
+} );
 
-InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
-	<BlockContent />
-) );
+// Expose default appender placeholders as components.
+ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
+ForwardedInnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
+
+ForwardedInnerBlocks.Content = withBlockContentContext(
+	( { BlockContent } ) => <BlockContent />
+);
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
  */
-export default InnerBlocks;
+export default ForwardedInnerBlocks;

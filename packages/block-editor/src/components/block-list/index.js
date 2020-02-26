@@ -37,6 +37,8 @@ function BlockList( {
 	isDraggable,
 	renderAppender,
 	__experimentalUIParts = {},
+	tagName = 'div',
+	forwardedRef,
 } ) {
 	function selector( select ) {
 		const {
@@ -70,7 +72,7 @@ function BlockList( {
 		enableAnimation,
 	} = useSelect( selector, [ rootClientId ] );
 
-	const Container = rootClientId ? 'div' : RootContainer;
+	const Container = rootClientId ? tagName : RootContainer;
 	const ref = useRef();
 	const targetClientId = useBlockDropZone( {
 		element: ref,
@@ -82,7 +84,7 @@ function BlockList( {
 
 	return (
 		<Container
-			ref={ ref }
+			ref={ forwardedRef || ref }
 			className={ classnames(
 				'block-editor-block-list__layout',
 				className

@@ -11,6 +11,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -31,7 +32,7 @@ function ColumnEdit( {
 	} );
 
 	return (
-		<div className={ classes }>
+		<>
 			<BlockControls>
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
@@ -61,11 +62,13 @@ function ColumnEdit( {
 				templateLock={ false }
 				renderAppender={
 					hasChildBlocks
-						? undefined
+						? false
 						: () => <InnerBlocks.ButtonBlockAppender />
 				}
+				tagName={ Block.div }
+				className={ classes }
 			/>
-		</div>
+		</>
 	);
 }
 
