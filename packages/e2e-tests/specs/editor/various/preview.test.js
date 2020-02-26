@@ -14,7 +14,6 @@ import {
 	publishPost,
 	saveDraft,
 	clickOnMoreMenuItem,
-	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').Page} Page */
@@ -278,13 +277,13 @@ describe( 'Preview with Custom Fields enabled', () => {
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
 		await editorPage.click( '.editor-post-title__input' );
-		await pressKeyWithModifier( 'primary', 'a' );
-		await editorPage.keyboard.press( 'Delete' );
-		await editorPage.keyboard.type( 'title 2' );
+		await editorPage.keyboard.press( 'End' );
+		await editorPage.keyboard.press( 'Backspace' );
+		await editorPage.keyboard.type( '2' );
 		await editorPage.keyboard.press( 'Tab' );
-		await pressKeyWithModifier( 'primary', 'a' );
-		await editorPage.keyboard.press( 'Delete' );
-		await editorPage.keyboard.type( 'content 2' );
+		await editorPage.keyboard.press( 'End' );
+		await editorPage.keyboard.press( 'Backspace' );
+		await editorPage.keyboard.type( '2' );
 
 		// Open the preview page.
 		await waitForPreviewNavigation( previewPage );

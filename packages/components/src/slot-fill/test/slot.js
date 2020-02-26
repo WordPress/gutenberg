@@ -7,9 +7,7 @@ import { render, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import Slot from '../slot';
-import Fill from '../fill';
-import Provider from '../context';
+import { Slot, Fill, Provider } from '../';
 
 /**
  * WordPress dependencies
