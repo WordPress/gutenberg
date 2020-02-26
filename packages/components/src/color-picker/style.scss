@@ -41,7 +41,7 @@
 }
 
 .components-color-picker__body {
-	padding: $grid-size-large $grid-size-large #{ $grid-size-small * 3 };
+	padding: $grid-unit-20 $grid-unit-20 #{ $grid-unit-05 * 3 };
 }
 
 .components-color-picker__controls {

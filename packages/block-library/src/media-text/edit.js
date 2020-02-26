@@ -161,7 +161,7 @@ class MediaTextEdit extends Component {
 		} = attributes;
 		return (
 			<MediaContainer
-				className="block-library-media-text__media-container"
+				className="wp-block-media-text__media-container"
 				onSelectMedia={ this.onSelectMedia }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }

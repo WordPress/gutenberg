@@ -1,3 +1,9 @@
+## Master
+
+### New Feature
+
+- Add `isRTL` function (#20298)
+
 ## 3.1.0 (2018-11-15)
 
 ### Enhancements
