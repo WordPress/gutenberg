@@ -81,7 +81,9 @@ class HTMLEdit extends Component {
 									html={ attributes.content }
 									styles={ styles }
 								/>
-								{ ! this.props.isSelected && <div className="block-library-html__preview-overlay"></div> }
+								{ ! this.props.isSelected && (
+									<div className="block-library-html__preview-overlay"></div>
+								) }
 							</>
 						) : (
 							<PlainText
