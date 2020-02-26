@@ -81,20 +81,22 @@ class ButtonEdit extends Component {
 		} = this.props;
 		const { isLinkSheetVisible, isButtonFocused } = this.state;
 
-		// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
 		if (
 			( prevProps.editorSidebarOpened && ! editorSidebarOpened ) ||
 			( prevState.isLinkSheetVisible && ! isLinkSheetVisible )
 		) {
+			// Prepends "http://" to an url when closing link settings sheet and button settings sheet
+			setAttributes( { url: prependHTTP( url ) } );
+			// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
 			this.isEditingURL = false;
 		}
 
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
-		// to avoid flashing caret after closing one of them
+		// to avoid flashing caret after closing one of them	
 		if (
 			( ! prevProps.editorSidebarOpened && editorSidebarOpened ) ||
 			( ! prevState.isLinkSheetVisible && isLinkSheetVisible )
-		) {
+		) {		
 			if ( Platform.OS === 'android' && this.richTextRef ) {
 				this.richTextRef.blur();
 				this.onToggleButtonFocus( false );
@@ -102,13 +104,8 @@ class ButtonEdit extends Component {
 		}
 
 		// Paste a URL from clipboard
-		if ( isLinkSheetVisible && ! url && ! this.isEditingURL ) {
+		if ( (isLinkSheetVisible || editorSidebarOpened) && ! url && ! this.isEditingURL ) {
 			this.getURLFromClipboard();
-		}
-
-		// Prepends "http://" to a url when closing link settings sheet and button settings sheet
-		if ( ! isLinkSheetVisible && ! editorSidebarOpened ) {
-			setAttributes( { url: prependHTTP( url ) } );
 		}
 
 		if ( this.richTextRef ) {
@@ -238,6 +235,7 @@ class ButtonEdit extends Component {
 					onChange={ this.onChangeURL }
 					autoCapitalize="none"
 					autoCorrect={ false }
+					autoFocus={ !isCompatibleWithSettings && Platform.OS === 'ios' }
 					separatorType={
 						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
 					}
