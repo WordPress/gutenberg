@@ -28,7 +28,12 @@ const setInitialState = async ( {
 } ) => {
 	let availableBlocks = {};
 	if ( isJetpackActive ) {
-		availableBlocks = supportedJetpackBlocks; //await apiFetch( { path: `/wp/v2/gutenberg/available-extensions` } );
+		console.log( 'Fetching /wpcom/v2/gutenberg/available-extensions' );
+		try {
+			availableBlocks = await apiFetch( { path: `/wpcom/v2/gutenberg/available-extensions` } );
+		} catch ( error ) {
+			console.error( 'Error while fetching available extensions', error );
+		}
 	}
 	const jetpackEditorInitialState = {
 		available_blocks: availableBlocks,
