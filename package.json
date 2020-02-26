@@ -86,6 +86,8 @@
 		"@storybook/addon-viewport": "5.3.2",
 		"@storybook/react": "5.3.2",
 		"@types/jest": "24.0.25",
+		"@types/lodash": "4.14.149",
+		"@types/qs": "6.9.1",
 		"@types/requestidlecallback": "0.3.1",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
