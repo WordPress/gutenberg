@@ -7,7 +7,7 @@ import {
 	Icon,
 	MenuGroup,
 	MenuItem,
-	Polygon,
+	Path,
 	SVG,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -17,12 +17,12 @@ import { external } from '@wordpress/icons';
 
 const downArrow = (
 	<SVG
-		width="18"
-		height="18"
+		width="24"
+		height="24"
 		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 18 18"
+		viewBox="0 0 24 24"
 	>
-		<Polygon points="9,13.5 14.7,7.9 13.2,6.5 9,10.7 4.8,6.5 3.3,7.9 " />
+		<Path d="M12.3 16.1l-5.8-5.6 1-1 4.7 4.4 4.3-4.4 1 1z" />
 	</SVG>
 );
 

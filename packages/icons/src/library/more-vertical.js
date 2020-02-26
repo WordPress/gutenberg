@@ -3,10 +3,10 @@
  */
 import { SVG, Path } from '@wordpress/primitives';
 
-const moreHorizontal = (
+const moreVertical = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M11 13h2v-2h-2v2zm-6 0h2v-2H5v2zm12-2v2h2v-2h-2z" />
+		<Path d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z" />
 	</SVG>
 );
 
-export default moreHorizontal;
+export default moreVertical;
