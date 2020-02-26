@@ -14,14 +14,7 @@ class RCTAztecView: Aztec.TextView {
     @objc var onSelectionChange: RCTBubblingEventBlock? = nil
     @objc var minWidth: CGFloat = 0
     @objc var maxWidth: CGFloat = 0
-    @objc var blockType: NSDictionary? = nil {
-        didSet {
-            guard let block = blockType, let tag = block["tag"] as? String else {
-                return
-            }
-            blockModel = BlockModel(tag: tag)
-        }
-    }
+
     @objc var activeFormats: NSSet? = nil {
         didSet {
             let currentTypingAttributes = formattingIdentifiersForTypingAttributes()
@@ -46,13 +39,7 @@ class RCTAztecView: Aztec.TextView {
         get {
             return super.textAlignment
         }
-    }
-
-    var blockModel = BlockModel(tag: "") {
-        didSet {
-            forceTypingAttributesIfNeeded()
-        }
-    }
+    }    
 
     private var previousContentSize: CGSize = .zero
 
@@ -618,12 +605,6 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
-    func forceTypingAttributesIfNeeded() {
-        if let formatHandler = HeadingBlockFormatHandler(block: blockModel) {
-            formatHandler.forceTypingFormat(on: self)
-        }
-    }
-
     // MARK: - Event Propagation
 
     func propagateContentChanges() {
@@ -672,8 +653,7 @@ extension RCTAztecView: UITextViewDelegate {
         guard isInsertingDictationResult == false else {
             return
         }
-
-        forceTypingAttributesIfNeeded()
+        
         propagateContentChanges()
         updatePlaceholderVisibility()
         //Necessary to send height information to JS after pasting text.
