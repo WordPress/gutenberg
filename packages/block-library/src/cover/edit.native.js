@@ -14,6 +14,7 @@ import {
 	RangeControl,
 	ToolbarButton,
 	ToolbarGroup,
+	LinearGradient,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -23,6 +24,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	withColors,
+	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -66,15 +68,10 @@ const Cover = ( {
 	overlayColor,
 	setAttributes,
 } ) => {
-	const {
-		backgroundType,
-		dimRatio,
-		focalPoint,
-		gradientValue,
-		minHeight,
-		url,
-	} = attributes;
+	const { backgroundType, dimRatio, focalPoint, minHeight, url } = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	const { gradientValue } = __experimentalUseGradient();
 
 	const hasBackground = !! (
 		url ||
@@ -97,6 +94,8 @@ const Cover = ( {
 
 	const onSelectMedia = ( media ) => {
 		const onSelect = attributesFromMedia( setAttributes );
+		// Remove gradient attribute
+		setAttributes( { gradient: undefined, customGradient: undefined } );
 		onSelect( media );
 	};
 
@@ -195,12 +194,19 @@ const Cover = ( {
 				{ getMediaOptions() }
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
 
-				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-					<ImageWithFocalPoint
-						focalPoint={ focalPoint }
-						url={ url }
-					/>
-				) }
+				{ /* When the gradient is set as a background the backgroundType is equal to IMAGE_BACKGROUND_TYPE */ }
+				{ IMAGE_BACKGROUND_TYPE === backgroundType &&
+					( gradientValue ? (
+						<LinearGradient
+							gradientValue={ gradientValue }
+							style={ styles.background }
+						/>
+					) : (
+						<ImageWithFocalPoint
+							focalPoint={ focalPoint }
+							url={ url }
+						/>
+					) ) }
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -236,7 +242,10 @@ const Cover = ( {
 					<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 				</View>
 
-				<View pointerEvents="none" style={ overlayStyles } />
+				{ /* We don't render overlay on top of gradient */ }
+				{ ! gradientValue && (
+					<View pointerEvents="none" style={ overlayStyles } />
+				) }
 
 				<MediaUpload
 					__experimentalOnlyMediaLibrary
