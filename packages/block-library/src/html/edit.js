@@ -82,8 +82,8 @@ class HTMLEdit extends Component {
 									styles={ styles }
 								/>
 								{ /*	
-									An overlay is added when the block is not selected in order to register click events as 
-									some browsers do not bubble up the clicks from the sandboxed iframe, which makes it 
+									An overlay is added when the block is not selected in order to register click events. 
+									Some browsers do not bubble up the clicks from the sandboxed iframe, which makes it 
 									difficult to reselect the block. 
 								*/ }
 								{ ! this.props.isSelected && (
