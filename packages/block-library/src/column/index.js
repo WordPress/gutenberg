@@ -26,17 +26,6 @@ export const settings = {
 		html: false,
 		lightBlockWrapper: true,
 	},
-	getEditWrapperProps( attributes ) {
-		const { width } = attributes;
-		if ( Number.isFinite( width ) ) {
-			return {
-				style: {
-					flexBasis: width + '%',
-				},
-				'data-has-explicit-width': true,
-			};
-		}
-	},
 	edit,
 	save,
 };

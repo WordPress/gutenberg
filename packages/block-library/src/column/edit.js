@@ -31,6 +31,8 @@ function ColumnEdit( {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
+	const hasWidth = Number.isFinite( width );
+
 	return (
 		<>
 			<BlockControls>
@@ -67,6 +69,8 @@ function ColumnEdit( {
 				}
 				tagName={ Block.div }
 				className={ classes }
+				style={ hasWidth ? { flexBasis: width + '%' } : undefined }
+				data-has-explicit-width={ hasWidth }
 			/>
 		</>
 	);
