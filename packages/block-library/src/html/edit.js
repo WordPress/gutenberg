@@ -81,7 +81,7 @@ class HTMLEdit extends Component {
 									html={ attributes.content }
 									styles={ styles }
 								/>
-								<div className="wp-block-html__preview-overlay"></div>
+								<div className="block-library-html__preview-overlay"></div>
 							</>
 						) : (
 							<PlainText
