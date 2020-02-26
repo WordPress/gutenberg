@@ -87,6 +87,10 @@ class ButtonEdit extends Component {
 		} = this.props;
 		const { isLinkSheetVisible, isButtonFocused } = this.state;
 
+		if ( prevProps.selectedId !== selectedId ) {
+			this.onToggleButtonFocus( true );
+		}
+
 		if ( prevProps.parentWidth !== parentWidth ) {
 			this.onSetMaxWidth();
 		}
@@ -309,6 +313,7 @@ class ButtonEdit extends Component {
 			isSelected,
 			clientId,
 			onReplace,
+			mergeBlocks
 		} = this.props;
 		const {
 			placeholder,
@@ -396,6 +401,7 @@ class ButtonEdit extends Component {
 						selectionColor={ textColor.color || '#fff' }
 						onReplace={ onReplace }
 						onRemove={ this.onRemove }
+						onMerge={ mergeBlocks }
 					/>
 				</ColorBackground>
 

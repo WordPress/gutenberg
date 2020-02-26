@@ -92,8 +92,9 @@ export class BlockList extends Component {
 			blockClientIds,
 			renderAppender,
 			isSelectedButtonsBlock,
+			isSelectedButtonBlock
 		} = this.props;
-		if ( ! isSelectedButtonsBlock ) {
+		if ( ! isSelectedButtonsBlock && ! isSelectedButtonBlock ) {
 			return renderAppender && blockClientIds.length > 0;
 		}
 		return false;
@@ -214,6 +215,7 @@ export class BlockList extends Component {
 			withFooter = true,
 			isSelectedButtonsBlock,
 			renderAppender,
+			isSelectedButtonBlock
 		} = this.props;
 
 		if ( ! isReadOnly && withFooter ) {
@@ -228,7 +230,7 @@ export class BlockList extends Component {
 					</TouchableWithoutFeedback>
 				</>
 			);
-		} else if ( isSelectedButtonsBlock && renderAppender ) {
+		} else if ( (isSelectedButtonsBlock || isSelectedButtonBlock) && renderAppender ) {
 			return renderAppender();
 		}
 		return null;
@@ -280,6 +282,8 @@ export default compose( [
 
 		const isSelectedButtonsBlock =
 			selectedBlock && selectedBlock.name === 'core/buttons';
+		const isSelectedButtonBlock =
+			selectedBlock && selectedBlock.name === 'core/button';
 		const isReadOnly = getSettings().readOnly;
 
 		return {
@@ -292,6 +296,7 @@ export default compose( [
 			isReadOnly,
 			isRootList: rootClientId === undefined,
 			isSelectedButtonsBlock,
+			isSelectedButtonBlock
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

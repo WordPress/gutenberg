@@ -37,6 +37,7 @@ function ButtonsEdit( {
 	onAddNextButton,
 	shouldDelete,
 	isParentSelected,
+	isSelectedButton
 } ) {
 	const { align } = attributes;
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
@@ -46,7 +47,7 @@ function ButtonsEdit( {
 	}
 
 	function renderAppender() {
-		if ( isSelected ) {
+		if ( isSelected || isSelectedButton ) {
 			return (
 				<InnerBlocks.ButtonBlockAppender
 					flex={ false }
@@ -105,6 +106,8 @@ export default compose(
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const buttonsParents = getBlockParents( clientId, true );
 		const parentId = buttonsParents[ 0 ] || '';
+		const selectedButtonParents = getBlockParents( selectedBlockClientId, true )
+		const selectedButtonParentId = selectedButtonParents[ 0 ] || '';
 
 		return {
 			// The purpose of `shouldDelete` check is giving the ability to pass to
@@ -114,6 +117,7 @@ export default compose(
 			shouldDelete: getBlockCount( clientId ) === 1,
 			isParentSelected:
 				selectedBlockClientId && selectedBlockClientId === parentId,
+			isSelectedButton: selectedButtonParentId === clientId
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId }, registry ) => {

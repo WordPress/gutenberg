@@ -184,28 +184,6 @@ class BlockListBlock extends Component {
 		}
 	}
 
-	renderButtonsAppender() {
-		const { name, isSelected, clientId, customOnAdd } = this.props;
-		if ( name === 'core/button' && isSelected ) {
-			return (
-				<>
-					<View>
-						<InnerBlocks.ButtonBlockAppender
-							flex={ false }
-							customOnAdd={ () => customOnAdd( clientId ) }
-						/>
-					</View>
-					{ /* It looks like there is a problem with RN and `flexWrap: 'wrap'` existing only on iOS and occuring while 
-							setting a `maxWidth` for `Buttons` block - `appender` is wrapped too early and is moved into next line.
-							Probably some native calculations related to rounding return incorrect value. 
-					*/ }
-					<View style={ styles.buttonsAppenderSpacer } />
-				</>
-			);
-		}
-		return null;
-	}
-
 	render() {
 		const {
 			attributes,
@@ -250,14 +228,6 @@ class BlockListBlock extends Component {
 							<Breadcrumbs clientId={ clientId } />
 						</FloatingToolbar>
 					) }
-					<View
-						style={
-							horizontalDirection && [
-								styles.horizontal,
-								{ maxWidth: this.props.parentWidth },
-							]
-						}
-					>
 						<View
 							pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 							accessibilityLabel={ accessibilityLabel }
@@ -283,8 +253,6 @@ class BlockListBlock extends Component {
 								) }
 							</View>
 						</View>
-						{ this.renderButtonsAppender() }
-					</View>
 				</View>
 			</TouchableWithoutFeedback>
 		);
