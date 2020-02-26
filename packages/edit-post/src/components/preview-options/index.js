@@ -30,10 +30,12 @@ export default function PreviewOptions( {
 	forceIsAutosaveable,
 	forcePreviewLink,
 } ) {
-	const { setPreviewDeviceType } = useDispatch( 'core/block-editor' );
+	const {
+		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
+	} = useDispatch( 'core/edit-post' );
 
 	const deviceType = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getPreviewDeviceType();
+		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
 
 	const translateDropdownButtonText = () => {

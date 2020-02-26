@@ -8,7 +8,7 @@
 
 .table-of-contents__popover {
 	.components-popover__content {
-		padding: $grid-size-large;
+		padding: $grid-unit-20;
 
 		@include break-small {
 			max-height: calc(100vh - 120px);
@@ -23,7 +23,7 @@
 
 .table-of-contents__wrapper:focus {
 	@include square-style__focus();
-	outline-offset: $grid-size;
+	outline-offset: $grid-unit-10;
 }
 
 .table-of-contents__counts {
@@ -38,7 +38,7 @@
 	flex-direction: column;
 	font-size: $default-font-size;
 	color: $dark-gray-300;
-	padding-right: $grid-size;
+	padding-right: $grid-unit-10;
 	margin-bottom: 0;
 
 	&:last-child {

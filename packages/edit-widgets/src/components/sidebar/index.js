@@ -3,6 +3,7 @@
  */
 import { createSlotFill, Panel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useViewportMatch } from '@wordpress/compose';
 
 export const {
 	Fill: BlockSidebarFill,
@@ -10,6 +11,13 @@ export const {
 } = createSlotFill( 'EditWidgetsBlockSidebar' );
 
 function Sidebar() {
+	const isMobile = useViewportMatch( 'medium', '<' );
+
+	// Disable on mobile temporarily
+	if ( isMobile ) {
+		return null;
+	}
+
 	return (
 		<div
 			className="edit-widgets-sidebar"

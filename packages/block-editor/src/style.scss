@@ -19,7 +19,6 @@
 @import "./components/block-settings-menu/style.scss";
 @import "./components/block-styles/style.scss";
 @import "./components/block-switcher/style.scss";
-@import "./components/block-toolbar/style.scss";
 @import "./components/block-types-list/style.scss";
 @import "./components/block-variation-picker/style.scss";
 @import "./components/button-block-appender/style.scss";
@@ -52,5 +51,7 @@
 
 // Styles for components that are used outside of the editing canvas go here:
 
+@import "./components/block-toolbar/style.scss";
 @import "./components/editor-skeleton/style.scss";
 @import "./components/inserter/style.scss";
+

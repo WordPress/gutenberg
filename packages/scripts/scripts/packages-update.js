@@ -15,9 +15,9 @@ function readJSONFile( fileName ) {
 	return JSON.parse( data );
 }
 
-function getWordPressPackages( packageJSON ) {
-	return Object.keys( packageJSON.dependencies )
-		.concat( Object.keys( packageJSON.devDependencies ) )
+function getWordPressPackages( { dependencies = {}, devDependencies = {} } ) {
+	return Object.keys( dependencies )
+		.concat( Object.keys( devDependencies ) )
 		.filter( ( packageName ) =>
 			packageName.startsWith( WORDPRESS_PACKAGES_PREFIX )
 		);
@@ -26,19 +26,17 @@ function getWordPressPackages( packageJSON ) {
 function getPackageVersionDiff( initialPackageJSON, finalPackageJSON ) {
 	const diff = [ 'dependencies', 'devDependencies' ].reduce(
 		( result, keyPackageJSON ) => {
-			return Object.keys( finalPackageJSON[ keyPackageJSON ] ).reduce(
-				( _result, dependency ) => {
-					const initial =
-						initialPackageJSON[ keyPackageJSON ][ dependency ];
-					const final =
-						finalPackageJSON[ keyPackageJSON ][ dependency ];
-					if ( initial !== final ) {
-						_result.push( { dependency, initial, final } );
-					}
-					return _result;
-				},
-				result
-			);
+			return Object.keys(
+				finalPackageJSON[ keyPackageJSON ] || {}
+			).reduce( ( _result, dependency ) => {
+				const initial =
+					initialPackageJSON[ keyPackageJSON ][ dependency ];
+				const final = finalPackageJSON[ keyPackageJSON ][ dependency ];
+				if ( initial !== final ) {
+					_result.push( { dependency, initial, final } );
+				}
+				return _result;
+			}, result );
 		},
 		[]
 	);

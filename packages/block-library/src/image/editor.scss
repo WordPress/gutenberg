@@ -37,7 +37,6 @@
 // Ensure the resize handles are visible when the image is focused.
 .wp-block-image.is-focused .components-resizable-box__handle {
 	display: block;
-	z-index: z-index(".block-library-image__resize-handlers");
 }
 
 .block-editor-block-list__block[data-type="core/image"][data-align="center"] {
