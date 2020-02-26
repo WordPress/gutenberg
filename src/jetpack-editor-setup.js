@@ -13,7 +13,6 @@ import { JETPACK_DATA_PATH } from '../jetpack/extensions/shared/get-jetpack-data
  */
 import apiFetch from '@wordpress/api-fetch';
 
-const contactInfo = '../jetpack/extensions/blocks/contact-info/editor.js';
 const supportedJetpackBlocks = {
 	'contact-info': {
 		available: true,
@@ -32,7 +31,9 @@ const setInitialState = async ( {
 		try {
 			availableBlocks = await apiFetch( { path: `/wpcom/v2/gutenberg/available-extensions` } );
 		} catch ( error ) {
-			console.error( 'Error while fetching available extensions', error );
+			console.warn( 'Error while fetching available extensions', error );
+			// manually set availableBlocks while WP REST API auth is being worked on
+			availableBlocks = supportedJetpackBlocks;
 		}
 	}
 	const jetpackEditorInitialState = {
@@ -55,9 +56,5 @@ export default async ( jetpackState ) => {
 
 	require( '../jetpack/extensions/editor' );
 
-	const jetpackEditorInitialState = await setInitialState( jetpackState );
-
-	//jetpackEditorInitialState.available_blocks
-	console.log( 'requiring jetpack/contact-info' );
-	require( contactInfo );
+	return setInitialState( jetpackState );
 };
