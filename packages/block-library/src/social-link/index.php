@@ -23,7 +23,7 @@ function render_block_core_social_link( $attributes ) {
 	}
 
 	$icon = block_core_social_link_get_icon( $service );
-	return '<li class="wp-social-link wp-social-link-' . $service . '"><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '"> ' . $icon . '</a></li>';
+	return '<li class="wp-social-link wp-social-link-' . esc_attr( $service ) . '"><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '"> ' . $icon . '</a></li>';
 }
 
 /**
