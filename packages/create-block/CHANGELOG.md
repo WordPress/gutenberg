@@ -1,8 +1,10 @@
 ## Master
 
-## 0.8.2 (2020-02-26)
+## 0.8.3 (2020-02-26)
 
-- Fixed buggy check for minimum system requirements when run with `npx` and `npm init` ([#20456](https://github.com/WordPress/gutenberg/pull/20456)).
+### Bug Fixes
+
+- Fixed buggy check for minimum system requirements when run with `npx` and `npm init` ([#20461](https://github.com/WordPress/gutenberg/pull/20461)).
 
 ## 0.8.1 (2020-02-25)
 

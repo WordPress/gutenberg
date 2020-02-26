@@ -1,35 +1,19 @@
 /**
  * External dependencies
  */
-const execa = require( 'execa' );
-const program = require( 'commander' );
 const inquirer = require( 'inquirer' );
+const program = require( 'commander' );
 const { startCase } = require( 'lodash' );
 
 /**
  * Internal dependencies
  */
+const checkSystemRequirements = require( './check-system-requirements' );
 const CLIError = require( './cli-error' );
 const log = require( './log' );
 const { engines, version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
 const { getDefaultValues, getPrompts } = require( './templates' );
-
-async function checkSystemRequirements() {
-	try {
-		await execa( 'check-node-version', [
-			'--node',
-			engines.node,
-			'--npm',
-			engines.npm,
-		] );
-	} catch ( error ) {
-		log.error( 'Minimum system requirements not met!' );
-		log.error( error.stderr );
-		log.info( error.stdout );
-		process.exit( error.exitCode );
-	}
-}
 
 const commandName = `wp-create-block`;
 program
@@ -48,7 +32,7 @@ program
 		'esnext'
 	)
 	.action( async ( slug, { template } ) => {
-		await checkSystemRequirements();
+		await checkSystemRequirements( engines );
 		try {
 			const defaultValues = getDefaultValues( template );
 			if ( slug ) {
