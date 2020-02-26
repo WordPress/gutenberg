@@ -25,6 +25,7 @@
 		"objects.js"
 	],
 	"main": "index.js",
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.8.3"

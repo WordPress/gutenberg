@@ -1,0 +1,34 @@
+{
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"allowSyntheticDefaultImports": true,
+		"jsx": "preserve",
+		"target": "esnext",
+		"module": "esnext",
+		"lib": [ "dom", "esnext" ],
+		"declaration": true,
+		"declarationMap": true,
+		"composite": true,
+		"emitDeclarationOnly": true,
+		// "isolatedModules": true,
+
+		/* Strict Type-Checking Options */
+		"strict": true /* Enable all strict type-checking options. */,
+		"strictNullChecks": true,
+		"noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
+
+		/* Additional Checks */
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+
+		/* Module Resolution Options */
+		"moduleResolution": "node",
+		/* This needs to be false so our types are possible to consume without setting this */
+		"esModuleInterop": false,
+		"resolveJsonModule": true
+	},
+	"exclude": [ "**/benchmark", "**/test/**", "**/build/**", "**/build-*/**" ]
+}
