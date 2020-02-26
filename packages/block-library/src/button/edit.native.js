@@ -104,7 +104,11 @@ class ButtonEdit extends Component {
 		}
 
 		// Paste a URL from clipboard
-		if ( (isLinkSheetVisible || editorSidebarOpened) && ! url && ! this.isEditingURL ) {
+		if (
+			( isLinkSheetVisible || editorSidebarOpened ) &&
+			! url &&
+			! this.isEditingURL
+		) {
 			this.getURLFromClipboard();
 		}
 
@@ -235,7 +239,10 @@ class ButtonEdit extends Component {
 					onChange={ this.onChangeURL }
 					autoCapitalize="none"
 					autoCorrect={ false }
-					autoFocus={ !isCompatibleWithSettings && Platform.OS === 'ios' }
+					// eslint-disable-next-line jsx-a11y/no-autofocus
+					autoFocus={
+						! isCompatibleWithSettings && Platform.OS === 'ios'
+					}
 					separatorType={
 						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
 					}
