@@ -123,7 +123,7 @@ export const BLUE = {
 		200: '#bfe7f3',
 		100: '#e5f5fa',
 		highlight: '#b3e7fe',
-		focus: '#007cba',
+		focus: '#3858e9',
 	},
 };
 
