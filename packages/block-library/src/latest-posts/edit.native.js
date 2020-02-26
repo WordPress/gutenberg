@@ -61,10 +61,53 @@ class LatestPostsEdit extends Component {
 		this.isStillMounted = false;
 	}
 
+	onSetDisplayPostContent = ( value ) => {
+		const { setAttributes } = this.props;
+		setAttributes( { displayPostContent: value } );
+	};
+
+	onSetDisplayPostContentRadio = ( value ) => {
+		const { setAttributes } = this.props;
+		setAttributes( {
+			displayPostContentRadio: value ? 'excerpt' : 'full_post',
+		} );
+	};
+
+	onSetExcerptLength = ( value ) => {
+		const { setAttributes } = this.props;
+		setAttributes( { excerptLength: value } );
+	};
+
+	onSetDisplayPostDate = ( value ) => {
+		const { setAttributes } = this.props;
+		setAttributes( { displayPostDate: value } );
+	};
+
+	onSetOrder = ( value ) => {
+		const { setAttributes } = this.props;
+		setAttributes( { order: value } );
+	};
+
+	onSetOrderBy = ( value ) => {
+		const { setAttributes } = this.props;
+		setAttributes( { orderBy: value } );
+	};
+
+	onSetPostsToShow = ( value ) => {
+		const { setAttributes } = this.props;
+		setAttributes( { postsToShow: value } );
+	};
+
+	onSetCategories = ( value ) => {
+		const { setAttributes } = this.props;
+		setAttributes( {
+			categories: '' !== value ? value.toString() : undefined,
+		} );
+	};
+
 	render() {
 		const {
 			attributes,
-			setAttributes,
 			getStylesFromColorScheme,
 			name,
 			openGeneralSidebar,
@@ -101,49 +144,13 @@ class LatestPostsEdit extends Component {
 			styles.latestPostBlockMessageDark
 		);
 
-		const onSetDisplayPostContent = ( value ) => {
-			setAttributes( { displayPostContent: value } );
-		};
-
-		const onSetDisplayPostContentRadio = ( value ) => {
-			setAttributes( {
-				displayPostContentRadio: value ? 'excerpt' : 'full_post',
-			} );
-		};
-
-		const onSetExcerptLength = ( value ) => {
-			setAttributes( { excerptLength: value } );
-		};
-
-		const onSetDisplayPostDate = ( value ) => {
-			setAttributes( { displayPostDate: value } );
-		};
-
-		const onSetOrder = ( value ) => {
-			setAttributes( { order: value } );
-		};
-
-		const onSetOrderBy = ( value ) => {
-			setAttributes( { orderBy: value } );
-		};
-
-		const onSetPostsToShow = ( value ) => {
-			setAttributes( { postsToShow: value } );
-		};
-
-		const onSetCategories = ( value ) => {
-			setAttributes( {
-				categories: '' !== value ? value.toString() : undefined,
-			} );
-		};
-
 		const getInspectorControls = () => (
 			<InspectorControls>
 				<PanelBody title={ __( 'Post content settings' ) }>
 					<ToggleControl
 						label={ __( 'Show post content' ) }
 						checked={ displayPostContent }
-						onChange={ onSetDisplayPostContent }
+						onChange={ this.onSetDisplayPostContent }
 						separatorType={
 							displayPostContent ? 'fullWidth' : 'none'
 						}
@@ -152,7 +159,7 @@ class LatestPostsEdit extends Component {
 						<ToggleControl
 							label={ __( 'Only show excerpt' ) }
 							checked={ displayExcerptPostContent }
-							onChange={ onSetDisplayPostContentRadio }
+							onChange={ this.onSetDisplayPostContentRadio }
 							separatorType={
 								displayExcerptPostContent ? 'fullWidth' : 'none'
 							}
@@ -162,7 +169,7 @@ class LatestPostsEdit extends Component {
 						<RangeControl
 							label={ __( 'Excerpt length (words)' ) }
 							value={ excerptLength }
-							onChange={ onSetExcerptLength }
+							onChange={ this.onSetExcerptLength }
 							min={ MIN_EXCERPT_LENGTH }
 							max={ MAX_EXCERPT_LENGTH }
 							separatorType="none"
@@ -174,7 +181,7 @@ class LatestPostsEdit extends Component {
 					<ToggleControl
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
-						onChange={ onSetDisplayPostDate }
+						onChange={ this.onSetDisplayPostDate }
 						separatorType="none"
 					/>
 				</PanelBody>
@@ -187,10 +194,10 @@ class LatestPostsEdit extends Component {
 						selectedCategoryId={
 							undefined !== categories ? Number( categories ) : ''
 						}
-						onOrderChange={ onSetOrder }
-						onOrderByChange={ onSetOrderBy }
-						onCategoryChange={ onSetCategories }
-						onNumberOfItemsChange={ onSetPostsToShow }
+						onOrderChange={ this.onSetOrder }
+						onOrderByChange={ this.onSetOrderBy }
+						onCategoryChange={ this.onSetCategories }
+						onNumberOfItemsChange={ this.onSetPostsToShow }
 					/>
 				</PanelBody>
 			</InspectorControls>
