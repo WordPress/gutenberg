@@ -81,6 +81,11 @@ class HTMLEdit extends Component {
 									html={ attributes.content }
 									styles={ styles }
 								/>
+								{/*	
+									An overlay is added when the block is not selected in order to register click events as 
+									some browsers do not bubble up the clicks from the sandboxed iframe, which makes it 
+									difficult to reselect the block. 
+								*/}
 								{ ! this.props.isSelected && (
 									<div className="block-library-html__preview-overlay"></div>
 								) }
