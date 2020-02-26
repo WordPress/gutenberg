@@ -4,8 +4,6 @@
 import initStoryshots, {
 	snapshotWithOptions,
 } from '@storybook/addon-storyshots';
-import React from 'react';
-import ReactDOM from 'react-dom';
 import path from 'path';
 
 initStoryshots( {
@@ -26,11 +24,6 @@ initStoryshots( {
 			if ( story.kind === 'Components/Popover' ) {
 				const parentElement = document.createElement( 'div' );
 				parentElement.appendChild( currentElement );
-			}
-			if ( story.kind === 'Components/SlotFill' ) {
-				ReactDOM.createPortal = ( children ) => {
-					return React.createElement( 'div', null, children );
-				};
 			}
 
 			return currentElement;
