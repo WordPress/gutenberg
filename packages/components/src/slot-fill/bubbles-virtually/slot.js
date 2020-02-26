@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useEffect,
-	useRef,
-	useLayoutEffect,
-	useContext,
-} from '@wordpress/element';
+import { useRef, useLayoutEffect, useContext } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -25,7 +20,7 @@ export default function Slot( {
 	const ref = useRef();
 	const slot = useSlot( name );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		registry.registerSlot( name, ref, fillProps );
 		return () => {
 			registry.unregisterSlot( name, ref );

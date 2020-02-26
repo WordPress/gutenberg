@@ -84,7 +84,6 @@ describe( 'RichText', () => {
 		await page.keyboard.type( 'Some ' );
 		await page.mouse.move( 0, 0 );
 		await page.mouse.move( 10, 10 );
-		await page.waitForSelector( '[aria-label="Bold"]' );
 		await page.click( '[aria-label="Bold"]' );
 		await page.keyboard.type( 'bold' );
 		await page.mouse.move( 0, 0 );
