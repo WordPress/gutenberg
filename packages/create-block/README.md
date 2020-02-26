@@ -19,7 +19,7 @@ You just need to provide the `slug` which is the target location for scaffolded 
   $ npm start
   ```
 
-  _(requires `node` version `10.0.0` or above, and `npm` version `6.1.0` or above)_
+  _(requires `node` version `10.0.0` or above, and `npm` version `6.9.0` or above)_
 
 You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on the code.
 

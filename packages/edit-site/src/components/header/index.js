@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import { BlockNavigationDropdown, ToolSelector } from '@wordpress/block-editor';
 
 /**
@@ -42,12 +41,7 @@ export default function Header() {
 		[]
 	);
 	return (
-		<div
-			className="edit-site-header"
-			role="region"
-			aria-label={ __( 'Site editor top bar.' ) }
-			tabIndex="-1"
-		>
+		<div className="edit-site-header">
 			<div className="edit-site-header__toolbar">
 				<TemplateSwitcher
 					ids={ settings.templateIds }

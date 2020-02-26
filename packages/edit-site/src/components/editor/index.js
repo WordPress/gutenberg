@@ -12,9 +12,11 @@ import {
 	SlotFillProvider,
 	DropZoneProvider,
 	Popover,
-	navigateRegions,
+	FocusReturnProvider,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
+import { __experimentalEditorSkeleton as EditorSkeleton } from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,6 +32,7 @@ export function useEditorContext() {
 }
 
 function Editor( { settings: _settings } ) {
+	const isMobile = useViewportMatch( 'medium', '<' );
 	const [ settings, setSettings ] = useState( _settings );
 	const template = useSelect(
 		( select ) =>
@@ -47,21 +50,31 @@ function Editor( { settings: _settings } ) {
 	return template ? (
 		<SlotFillProvider>
 			<DropZoneProvider>
-				<EntityProvider
-					kind="postType"
-					type={ settings.templateType }
-					id={ settings.templateId }
-				>
-					<Context.Provider value={ context }>
-						<Notices />
-						<Header />
-						<Sidebar />
-						<BlockEditor />
-						<Popover.Slot />
-					</Context.Provider>
+				<EntityProvider kind="root" type="site">
+					<EntityProvider
+						kind="postType"
+						type={ settings.templateType }
+						id={ settings.templateId }
+					>
+						<Context.Provider value={ context }>
+							<FocusReturnProvider>
+								<EditorSkeleton
+									sidebar={ ! isMobile && <Sidebar /> }
+									header={ <Header /> }
+									content={
+										<>
+											<Notices />
+											<BlockEditor />
+										</>
+									}
+								/>
+								<Popover.Slot />
+							</FocusReturnProvider>
+						</Context.Provider>
+					</EntityProvider>
 				</EntityProvider>
 			</DropZoneProvider>
 		</SlotFillProvider>
 	) : null;
 }
-export default navigateRegions( Editor );
+export default Editor;

@@ -153,6 +153,7 @@ export const registerCoreBlocks = () => {
 		spacer,
 		shortcode,
 		devOnly( verse ),
+		cover,
 		devOnly( pullquote ),
 	].forEach( registerBlock );
 

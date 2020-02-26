@@ -5,7 +5,7 @@
 
 		.components-button {
 			align-self: flex-start;
-			margin-top: $grid-size-xlarge;
+			margin-top: $grid-unit-30;
 			position: static;
 		}
 	}
@@ -22,12 +22,12 @@
 		display: flex;
 		height: 30px;
 		justify-content: center;
-		margin: auto 0 $grid-size-xlarge 0;
+		margin: auto 0 $grid-unit-30 0;
 		position: relative;
 		width: 100%;
 
 		@include break-small() {
-			margin: $grid-size-xlarge 0 0;
+			margin: $grid-unit-30 0 0;
 		}
 	}
 
@@ -48,8 +48,8 @@
 .components-modal__frame.components-guide {
 	@media (max-width: $break-small) {
 		bottom: 15%;
-		left: $grid-size-xlarge;
-		right: $grid-size-xlarge;
+		left: $grid-unit-30;
+		right: $grid-unit-30;
 		top: 15%;
 	}
 }

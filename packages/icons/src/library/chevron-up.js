@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { SVG, Path } from '@wordpress/primitives';
+import { SVG, Polygon } from '@wordpress/primitives';
 
 const chevronUp = (
 	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-		<Path d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z" />
+		<Polygon points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 " />
 	</SVG>
 );
 
