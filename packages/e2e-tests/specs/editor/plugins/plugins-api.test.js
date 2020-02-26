@@ -4,6 +4,7 @@
 import {
 	activatePlugin,
 	clickBlockAppender,
+	clickBlockToolbarButton,
 	clickOnMoreMenuItem,
 	createNewPost,
 	deactivatePlugin,
@@ -154,6 +155,14 @@ describe( 'Using Plugins API', () => {
 				( el ) => el.innerText
 			);
 			expect( pluginDocumentSettingsText ).toMatchSnapshot();
+		} );
+	} );
+
+	describe( 'Block Settings Menu Item', () => {
+		it( 'Should render a new item', async () => {
+			clickBlockToolbarButton( 'My new plugin' );
+
+			expect( console ).toHaveLoggedWith( 'Block clicked' );
 		} );
 	} );
 } );
