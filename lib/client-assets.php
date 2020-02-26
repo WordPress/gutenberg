@@ -721,9 +721,9 @@ function gutenberg_load_block_pattern( $name ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_settings_block_patterns( $settings ) {
-	$block_patterns = [
+	$block_patterns                          = [
 		gutenberg_load_block_pattern( 'teams' ),
-		gutenberg_load_block_pattern( 'testimonial' )
+		gutenberg_load_block_pattern( 'testimonial' ),
 	];
 	$settings['__experimentalBlockPatterns'] = $block_patterns;
 	return $settings;
