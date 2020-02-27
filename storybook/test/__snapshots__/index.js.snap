@@ -8023,6 +8023,36 @@ Array [
 ]
 `;
 
+exports[`Storyshots Components/TextareaControl Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-textarea-control-0"
+    >
+      Label Text
+    </label>
+    <textarea
+      aria-describedby="inspector-textarea-control-0__help"
+      className="components-textarea-control__input"
+      id="inspector-textarea-control-0"
+      onChange={[Function]}
+      rows={4}
+    />
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-textarea-control-0__help"
+  >
+    Help text to explain the textarea.
+  </p>
+</div>
+`;
+
 exports[`Storyshots Components/Tip Default 1`] = `
 <div
   className="components-tip"
