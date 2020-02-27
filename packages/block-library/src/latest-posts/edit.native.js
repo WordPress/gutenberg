@@ -41,6 +41,8 @@ class LatestPostsEdit extends Component {
 		this.fetchRequest = fetchRequest( '/wp/v2/categories' )
 			.then( ( categoriesList ) => {
 				if ( this.isStillMounted ) {
+					// TODO: remove this check after `fetchRequest` types are made consist across platforms
+					// (see: https://github.com/wordpress-mobile/gutenberg-mobile/issues/1961)
 					if ( typeof categoriesList === 'string' ) {
 						this.setState( {
 							categoriesList: JSON.parse( categoriesList ),
