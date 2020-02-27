@@ -107,6 +107,7 @@ function ColumnsEditContainer( {
 						<InnerBlocks
 							allowedBlocks={ ALLOWED_BLOCKS }
 							__experimentalMoverDirection="horizontal"
+							renderAppender={ false }
 						/>
 					</div>
 				</TextColor>
