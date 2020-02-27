@@ -32,17 +32,18 @@ const BlockMobileToolbar = ( {
 
 		<BlockSettingsButton.Slot />
 
-		<ToolbarButton
-			title={ sprintf(
-				/* translators: accessibility text. %s: current block position (number). */
-				__( 'Remove block at row %s' ),
-				order + 1
-			) }
-			onClick={ onDelete }
-			isDisabled={ disallowRemoveBlock }
-			icon={ trash }
-			extraProps={ { hint: __( 'Double tap to remove the block' ) } }
-		/>
+		{ ! disallowRemoveBlock && (
+			<ToolbarButton
+				title={ sprintf(
+					/* translators: accessibility text. %s: current block position (number). */
+					__( 'Remove block at row %s' ),
+					order + 1
+				) }
+				onClick={ onDelete }
+				icon={ trash }
+				extraProps={ { hint: __( 'Double tap to remove the block' ) } }
+			/>
+		) }
 	</View>
 );
 

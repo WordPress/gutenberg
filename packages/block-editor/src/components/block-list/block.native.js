@@ -193,7 +193,6 @@ class BlockListBlock extends Component {
 			parentId,
 			isTouchable,
 			disallowRemoveInnerBlocks,
-			hasChildren,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -245,8 +244,7 @@ class BlockListBlock extends Component {
 								<BlockMobileToolbar
 									clientId={ clientId }
 									disallowRemoveBlock={
-										disallowRemoveInnerBlocks &&
-										! hasChildren
+										disallowRemoveInnerBlocks
 									}
 								/>
 							) }
