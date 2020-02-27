@@ -67,6 +67,7 @@ class BlockListBlock extends Component {
 					this.props.onCaretVerticalPositionChange
 				}
 				clientId={ this.props.clientId }
+				columnsSettings={ this.props.columnsSettings }
 			/>
 		);
 	}

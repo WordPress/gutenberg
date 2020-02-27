@@ -27,21 +27,17 @@ function ColumnEdit( {
 	getStylesFromColorScheme,
 	isParentSelected,
 	isDescendantOfParentSelected,
-	columnsContainerSettings,
 	isMobile,
+	columnsSettings,
 } ) {
 	const { verticalAlignment } = attributes;
-	const {
-		columnsInRow = 1,
-		width: columnsContainerWidth,
-	} = columnsContainerSettings;
+	const { columnsInRow, width: columnsContainerWidth } = columnsSettings;
 
-	const columnContainerBaseWidth = styles[ 'column-container-base' ].maxWidth;
 	const containerMaxWidth = styles[ 'columns-container' ].maxWidth;
 
 	const containerWidth = columnsContainerWidth || containerMaxWidth;
 
-	const minWidth = Math.min( containerWidth, columnContainerBaseWidth );
+	const minWidth = Math.min( containerWidth, containerMaxWidth );
 	const columnBaseWidth = minWidth / columnsInRow;
 
 	const applyBlockStyle = ( placeholder = false ) => {
@@ -164,7 +160,6 @@ export default compose( [
 			getBlockCount,
 			getBlockRootClientId,
 			getSelectedBlockClientId,
-			getBlockListSettings,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -172,8 +167,6 @@ export default compose( [
 
 		const parentId = getBlockRootClientId( clientId );
 		const hasChildren = !! getBlockCount( clientId );
-
-		const columnsContainerSettings = getBlockListSettings( parentId );
 
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
@@ -185,12 +178,17 @@ export default compose( [
 			parentId
 		);
 
+		const parents = getBlockParents( clientId, true );
+
+		const isAncestorSelected =
+			selectedBlockClientId && parents.includes( selectedBlockClientId );
+
 		return {
 			hasChildren,
 			isParentSelected,
 			isSelected,
-			columnsContainerSettings,
 			isDescendantOfParentSelected,
+			isAncestorSelected,
 		};
 	} ),
 	withViewportMatch( { isMobile: '< mobile' } ),

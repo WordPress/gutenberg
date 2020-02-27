@@ -159,6 +159,7 @@ export class BlockList extends Component {
 			containerStyle,
 			disallowRemoveInnerBlocks,
 			customOnDelete,
+			columnsSettings,
 		} = this.props;
 
 		return (
@@ -180,6 +181,7 @@ export class BlockList extends Component {
 						}
 						disallowRemoveInnerBlocks={ disallowRemoveInnerBlocks }
 						customOnDelete={ customOnDelete }
+						columnsSettings={ columnsSettings }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (

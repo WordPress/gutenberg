@@ -16,7 +16,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -48,8 +48,6 @@ const MAX_COLUMNS_NUMBER = 6;
 
 function ColumnsEditContainer( {
 	attributes,
-	updateBlockSettings,
-	blockListSettings,
 	updateAlignment,
 	updateColumns,
 	isMobile,
@@ -57,7 +55,10 @@ function ColumnsEditContainer( {
 	onDeleteColumn,
 } ) {
 	const { verticalAlignment } = attributes;
-	const { width } = blockListSettings;
+	const [ columnsSettings, setColumnsSettings ] = useState( {
+		columnsInRow: 2,
+	} );
+	const { width } = columnsSettings;
 
 	useEffect( () => {
 		updateColumns(
@@ -103,8 +104,7 @@ function ColumnsEditContainer( {
 				onLayout={ ( event ) => {
 					const { width: newWidth } = event.nativeEvent.layout;
 					if ( newWidth !== width ) {
-						updateBlockSettings( {
-							...blockListSettings,
+						setColumnsSettings( {
 							columnsInRow: getColumnsInRow(
 								newWidth,
 								columnCount
@@ -117,7 +117,10 @@ function ColumnsEditContainer( {
 				<InnerBlocks
 					flatListProps={ {
 						...( ! isMobile && {
-							contentContainerStyle: styles.columnsContainer,
+							contentContainerStyle: {
+								...styles.columnsContainer,
+								maxWidth: width,
+							},
 						} ),
 						horizontal: ! isMobile,
 						scrollEnabled: false,
@@ -126,6 +129,7 @@ function ColumnsEditContainer( {
 					allowedBlocks={ ALLOWED_BLOCKS }
 					disallowRemoveInnerBlocks
 					customOnDelete={ onDeleteColumn }
+					columnsSettings={ columnsSettings }
 				/>
 			</View>
 		</>
@@ -156,11 +160,6 @@ const ColumnsEditContainerWrapper = withDispatch(
 					verticalAlignment,
 				} );
 			} );
-		},
-		updateBlockSettings( settings ) {
-			const { clientId } = ownProps;
-			const { updateBlockListSettings } = dispatch( 'core/block-editor' );
-			updateBlockListSettings( clientId, settings );
 		},
 		onDeleteColumn: () => {
 			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
@@ -209,15 +208,12 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, isSelected, getStylesFromColorScheme } = props;
-	const { hasChildren, blockListSettings, columnCount } = useSelect(
+	const { hasChildren, columnCount } = useSelect(
 		( select ) => {
-			const { getBlocks, getBlockListSettings, getBlockCount } = select(
-				'core/block-editor'
-			);
+			const { getBlocks, getBlockCount } = select( 'core/block-editor' );
 
 			return {
 				hasChildren: getBlocks( clientId ).length > 0,
-				blockListSettings: getBlockListSettings( clientId ) || {},
 				columnCount: getBlockCount( clientId ),
 			};
 		},
@@ -242,11 +238,7 @@ const ColumnsEdit = ( props ) => {
 	}
 
 	return (
-		<ColumnsEditContainerWrapper
-			blockListSettings={ blockListSettings }
-			columnCount={ columnCount }
-			{ ...props }
-		/>
+		<ColumnsEditContainerWrapper columnCount={ columnCount } { ...props } />
 	);
 };
 
