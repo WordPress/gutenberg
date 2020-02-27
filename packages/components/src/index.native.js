@@ -26,12 +26,6 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 } from './slot-fill';
-export {
-	createSlotFill as __experimentalCreateSlotFill,
-	Slot as __experimentalSlot,
-	Fill as __experimentalFill,
-	SlotFillProvider as __experimentalSlotFillProvider,
-} from './slot-fill2';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';

@@ -3,7 +3,7 @@
  */
 import { useContext } from '@wordpress/element';
 import {
-	__experimentalCreateSlotFill as createSlotFill,
+	createSlotFill,
 	__experimentalToolbarContext as ToolbarContext,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -17,7 +17,13 @@ const { Fill, Slot } = createSlotFill( 'BlockControls' );
 
 function BlockControlsSlot( props ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
-	return <Slot { ...props } fillProps={ accessibleToolbarState || null } />;
+	return (
+		<Slot
+			{ ...props }
+			bubblesVirtually
+			fillProps={ accessibleToolbarState || null }
+		/>
+	);
 }
 
 function BlockControlsFill( { controls, children } ) {
