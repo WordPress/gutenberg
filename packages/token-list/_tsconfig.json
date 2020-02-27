@@ -1,4 +1,5 @@
 {
+	// Currently disabled, package does not typecheck
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
