@@ -46,6 +46,7 @@ class LatestPostsEdit extends Component {
 		this.onSetOrderBy = this.onSetOrderBy.bind( this );
 		this.onSetPostsToShow = this.onSetPostsToShow.bind( this );
 		this.onSetCategories = this.onSetCategories.bind( this );
+		this.getInspectorControls = this.getInspectorControls.bind( this );
 	}
 
 	componentDidMount() {
@@ -119,15 +120,8 @@ class LatestPostsEdit extends Component {
 		} );
 	}
 
-	render() {
-		const {
-			attributes,
-			getStylesFromColorScheme,
-			name,
-			openGeneralSidebar,
-			isSelected,
-		} = this.props;
-
+	getInspectorControls() {
+		const { attributes } = this.props;
 		const {
 			displayPostContent,
 			displayPostContentRadio,
@@ -140,25 +134,9 @@ class LatestPostsEdit extends Component {
 		} = attributes;
 
 		const { categoriesList } = this.state;
-		const blockType = coreBlocks[ name ];
 		const displayExcerptPostContent = displayPostContentRadio === 'excerpt';
 
-		const blockStyle = getStylesFromColorScheme(
-			styles.latestPostBlock,
-			styles.latestPostBlockDark
-		);
-
-		const iconStyle = getStylesFromColorScheme(
-			styles.latestPostBlockIcon,
-			styles.latestPostBlockIconDark
-		);
-
-		const titleStyle = getStylesFromColorScheme(
-			styles.latestPostBlockMessage,
-			styles.latestPostBlockMessageDark
-		);
-
-		const getInspectorControls = () => (
+		return (
 			<InspectorControls>
 				<PanelBody title={ __( 'Post content settings' ) }>
 					<ToggleControl
@@ -216,6 +194,32 @@ class LatestPostsEdit extends Component {
 				</PanelBody>
 			</InspectorControls>
 		);
+	}
+
+	render() {
+		const {
+			getStylesFromColorScheme,
+			name,
+			openGeneralSidebar,
+			isSelected,
+		} = this.props;
+
+		const blockType = coreBlocks[ name ];
+
+		const blockStyle = getStylesFromColorScheme(
+			styles.latestPostBlock,
+			styles.latestPostBlockDark
+		);
+
+		const iconStyle = getStylesFromColorScheme(
+			styles.latestPostBlockIcon,
+			styles.latestPostBlockIconDark
+		);
+
+		const titleStyle = getStylesFromColorScheme(
+			styles.latestPostBlockMessage,
+			styles.latestPostBlockMessageDark
+		);
 
 		return (
 			<TouchableWithoutFeedback
@@ -224,7 +228,7 @@ class LatestPostsEdit extends Component {
 				onPress={ openGeneralSidebar }
 			>
 				<View style={ blockStyle }>
-					{ getInspectorControls() }
+					{ this.getInspectorControls() }
 					<Icon icon={ icon } { ...iconStyle } />
 					<Text style={ titleStyle }>
 						{ blockType.settings.title }
