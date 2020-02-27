@@ -41,6 +41,7 @@ describe( 'isURL', () => {
 		[ 'mailto:example@example.com' ],
 		[ 'ssh://user:password@127.0.0.1:8080' ],
 		[ 'file:///localfolder/file.mov' ],
+		[ 'file:/localfolder/file.mov' ],
 	] )( 'valid (true): %s', ( url ) => {
 		expect( isURL( url ) ).toBe( true );
 	} );
