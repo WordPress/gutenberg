@@ -70,7 +70,6 @@ function ColumnEdit( {
 				tagName={ Block.div }
 				className={ classes }
 				style={ hasWidth ? { flexBasis: width + '%' } : undefined }
-				data-has-explicit-width={ hasWidth }
 			/>
 		</>
 	);

@@ -56,7 +56,7 @@
 
 		// Columns with an explicitly-assigned width should maintain their
 		// `flex-basis` width and not grow.
-		&[style] {
+		&[style*="flex-basis"] {
 			flex-grow: 0;
 		}
 
