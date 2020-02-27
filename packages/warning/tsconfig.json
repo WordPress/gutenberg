@@ -2,7 +2,8 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"outDir": "build-types"
+		"outDir": "build-types",
+		"tsBuildInfoFile": "../../.cache/warning.tsbuildinfo"
 	},
 	"include": [ "src/**/*.js" ]
 }
