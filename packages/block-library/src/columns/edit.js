@@ -89,6 +89,7 @@ function ColumnsEditContainer( {
 				__experimentalPassedProps={ {
 					className: classes,
 				} }
+				renderAppender={ false }
 			/>
 		</>
 	);
