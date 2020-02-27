@@ -1,10 +1,11 @@
-.components-menu-group {
-	width: 100%;
-	padding: ($grid-size - $border-width) 0;
+.components-menu-group + .components-menu-group {
+	margin-top: $grid-unit-10;
+	padding-top: $grid-unit-10;
+	border-top: $border-width solid $dark-gray-primary;
 }
 
 .components-menu-group__label {
-	margin-bottom: $grid-size;
-	color: $dark-gray-300;
-	padding: 0 ($grid-size - $border-width);
+	margin-bottom: $grid-unit-10;
+	color: $medium-gray-text;
+	padding: 0;
 }

@@ -11,9 +11,7 @@ import {
 	Dropdown,
 	ToolbarButton,
 	ToolbarGroup,
-	PanelBody,
-	Path,
-	SVG,
+	MenuGroup,
 } from '@wordpress/components';
 import {
 	getBlockType,
@@ -26,6 +24,7 @@ import { Component } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -87,7 +86,7 @@ export class BlockSwitcher extends Component {
 			const blockType = getBlockType( sourceBlockName );
 			icon = blockType.icon;
 		} else {
-			icon = 'layout';
+			icon = layout;
 		}
 
 		if ( ! hasBlockStyles && ! possibleBlockTransformations.length ) {
@@ -120,9 +119,13 @@ export class BlockSwitcher extends Component {
 						1 === blocks.length
 							? __( 'Change block type or style' )
 							: sprintf(
-								_n( 'Change type of %d block', 'Change type of %d blocks', blocks.length ),
-								blocks.length
-							);
+									_n(
+										'Change type of %d block',
+										'Change type of %d blocks',
+										blocks.length
+									),
+									blocks.length
+							  );
 
 					return (
 						<ToolbarGroup>
@@ -134,49 +137,52 @@ export class BlockSwitcher extends Component {
 								label={ label }
 								onKeyDown={ openOnArrowDown }
 								showTooltip
-								icon={
-									<>
-										<BlockIcon icon={ icon } showColors />
-										<SVG
-											className="block-editor-block-switcher__transform"
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 24 24"
-										>
-											<Path d="M6.5 8.9c.6-.6 1.4-.9 2.2-.9h6.9l-1.3 1.3 1.4 1.4L19.4 7l-3.7-3.7-1.4 1.4L15.6 6H8.7c-1.4 0-2.6.5-3.6 1.5l-2.8 2.8 1.4 1.4 2.8-2.8zm13.8 2.4l-2.8 2.8c-.6.6-1.3.9-2.1.9h-7l1.3-1.3-1.4-1.4L4.6 16l3.7 3.7 1.4-1.4L8.4 17h6.9c1.3 0 2.6-.5 3.5-1.5l2.8-2.8-1.3-1.4z" />
-										</SVG>
-									</>
-								}
+								icon={ <BlockIcon icon={ icon } showColors /> }
 							/>
 						</ToolbarGroup>
 					);
 				} }
 				renderContent={ ( { onClose } ) => (
 					<>
-						{ ( hasBlockStyles || possibleBlockTransformations.length !== 0 ) && (
+						{ ( hasBlockStyles ||
+							possibleBlockTransformations.length !== 0 ) && (
 							<div className="block-editor-block-switcher__container">
 								{ hasBlockStyles && (
-									<PanelBody title={ __( 'Block Styles' ) } initialOpen>
+									<MenuGroup>
+										<div className="block-editor-block-switcher__label">
+											{ __( 'Styles' ) }
+										</div>
 										<BlockStyles
 											clientId={ blocks[ 0 ].clientId }
 											onSwitch={ onClose }
-											onHoverClassName={ this.onHoverClassName }
+											onHoverClassName={
+												this.onHoverClassName
+											}
 										/>
-									</PanelBody>
+									</MenuGroup>
 								) }
 								{ possibleBlockTransformations.length !== 0 && (
-									<PanelBody title={ __( 'Transform To:' ) } initialOpen>
+									<MenuGroup>
+										<div className="block-editor-block-switcher__label">
+											{ __( 'Transform to' ) }
+										</div>
 										<BlockTypesList
-											items={ possibleBlockTransformations.map( ( destinationBlockType ) => ( {
-												id: destinationBlockType.name,
-												icon: destinationBlockType.icon,
-												title: destinationBlockType.title,
-											} ) ) }
+											items={ possibleBlockTransformations.map(
+												( destinationBlockType ) => ( {
+													id:
+														destinationBlockType.name,
+													icon:
+														destinationBlockType.icon,
+													title:
+														destinationBlockType.title,
+												} )
+											) }
 											onSelect={ ( item ) => {
 												onTransform( blocks, item.id );
 												onClose();
 											} }
 										/>
-									</PanelBody>
+									</MenuGroup>
 								) }
 							</div>
 						) }
@@ -189,16 +195,24 @@ export class BlockSwitcher extends Component {
 									viewportWidth={ 500 }
 									blocks={
 										hoveredBlockType.example
-											? getBlockFromExample( hoveredBlock.name, {
-												attributes: {
-													...hoveredBlockType.example.attributes,
-													className: hoveredClassName,
-												},
-												innerBlocks: hoveredBlockType.example.innerBlocks,
-											} )
+											? getBlockFromExample(
+													hoveredBlock.name,
+													{
+														attributes: {
+															...hoveredBlockType
+																.example
+																.attributes,
+															className: hoveredClassName,
+														},
+														innerBlocks:
+															hoveredBlockType
+																.example
+																.innerBlocks,
+													}
+											  )
 											: cloneBlock( hoveredBlock, {
-												className: hoveredClassName,
-											} )
+													className: hoveredClassName,
+											  } )
 									}
 								/>
 							</div>

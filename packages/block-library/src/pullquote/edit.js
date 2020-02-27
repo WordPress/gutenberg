@@ -166,12 +166,12 @@ class PullQuoteEdit extends Component {
 							{
 								value: mainColor.color,
 								onChange: this.pullQuoteMainColorSetter,
-								label: __( 'Main Color' ),
+								label: __( 'Main color' ),
 							},
 							{
 								value: textColor.color,
 								onChange: this.pullQuoteTextColorSetter,
-								label: __( 'Text Color' ),
+								label: __( 'Text color' ),
 							},
 						] }
 					>

@@ -5,6 +5,11 @@ import { shallow } from 'enzyme';
 import { noop } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { more } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import { MenuItem } from '../';
@@ -20,7 +25,7 @@ describe( 'MenuItem', () => {
 		const wrapper = shallow(
 			<MenuItem
 				className="my-class"
-				icon="wordpress"
+				icon={ more }
 				isSelected={ true }
 				role="menuitemcheckbox"
 				onClick={ noop }
@@ -37,7 +42,7 @@ describe( 'MenuItem', () => {
 		const wrapper = shallow(
 			<MenuItem
 				className="my-class"
-				icon="wordpress"
+				icon={ more }
 				onClick={ noop }
 				shortcut="mod+shift+alt+w"
 			>

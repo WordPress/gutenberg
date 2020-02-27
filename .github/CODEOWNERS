@@ -18,12 +18,12 @@
 # Editor
 /packages/annotations                           @atimmer @ellatrix
 /packages/autop                                 @aduth
-/packages/block-editor                          @youknowriad @talldan @ellatrix
+/packages/block-editor                          @youknowriad @ellatrix
 /packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
 /packages/blocks                                @youknowriad @ellatrix
-/packages/edit-post                             @talldan
-/packages/editor                                @talldan
+/packages/edit-post
+/packages/editor
 /packages/list-reusable-blocks                  @youknowriad @noisysocks
 /packages/shortcode                             @aduth
 
@@ -53,12 +53,12 @@
 /packages/scripts                               @youknowriad @gziolo @ntwb @nerrad @ajitbohra
 
 # UI Components
-/packages/components                            @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @chrisvanpatten
-/packages/compose                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
-/packages/element                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
-/packages/notices                               @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
-/packages/nux                                   @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
-/packages/viewport                              @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
+/packages/components                            @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @chrisvanpatten
+/packages/compose                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta
+/packages/element                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta
+/packages/notices                               @ajitbohra @jaymanpandya @jorgefilipecosta
+/packages/nux                                   @ajitbohra @jaymanpandya @jorgefilipecosta @noisysocks
+/packages/viewport                              @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta
 
 # Utilities
 /packages/a11y                                  @youknowriad @aduth

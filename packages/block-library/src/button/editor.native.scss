@@ -1,0 +1,41 @@
+.richTextWrapper {
+	overflow: visible;
+	align-self: flex-start;
+}
+
+.outline {
+	position: absolute;
+	left: -($block-spacing + $border-width);
+	right: -($block-spacing + $border-width);
+	top: -($block-spacing + $border-width);
+	bottom: -($block-spacing + $border-width);
+}
+
+.linearGradient {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+}
+
+.button {
+	border-width: $border-width;
+	border-radius: $border-width * 4;
+	padding: $block-spacing;
+	max-width: 580px;
+	min-width: 108px;
+	margin: $panel-padding;
+}
+
+.fallbackButton {
+	background-color: $button-fallback-bg;
+}
+
+.clearLinkButton {
+	color: $alert-red;
+}
+
+.placeholderTextColor {
+	color: rgba($color: $white, $alpha: 0.43);
+}

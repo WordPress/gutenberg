@@ -178,15 +178,18 @@ export class ImageEdit extends Component {
 
 		let mediaAttributes = pickRelevantMediaFiles( media );
 
-		// If the current image is temporary but an alt or caption text was meanwhile written by the user,
+		// If the current image is temporary but an alt text was meanwhile written by the user,
 		// make sure the text is not overwritten.
 		if ( isTemporaryImage( id, url ) ) {
 			if ( alt ) {
 				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
 			}
-			if ( caption ) {
-				mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
-			}
+		}
+
+		// If a caption text was meanwhile written by the user,
+		// make sure the text is not overwritten by empty captions
+		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
+			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
 		}
 
 		let additionalAttributes;
@@ -357,6 +360,7 @@ export class ImageEdit extends Component {
 				/>
 				{ url && (
 					<MediaReplaceFlow
+						mediaId={ id }
 						mediaURL={ url }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						accept="image/*"
@@ -442,7 +446,7 @@ export class ImageEdit extends Component {
 				<InspectorControls>
 					<PanelBody title={ __( 'Image settings' ) }>
 						<TextareaControl
-							label={ __( 'Alt Text (Alternative Text)' ) }
+							label={ __( 'Alt text (alternative text)' ) }
 							value={ alt }
 							onChange={ this.updateAlt }
 							help={
@@ -473,7 +477,7 @@ export class ImageEdit extends Component {
 				</InspectorControls>
 				<InspectorAdvancedControls>
 					<TextControl
-						label={ __( 'Title Attribute' ) }
+						label={ __( 'Title attribute' ) }
 						value={ title || '' }
 						onChange={ this.onSetTitle }
 						help={

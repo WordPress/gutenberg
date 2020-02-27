@@ -12,7 +12,7 @@ export {
 
 // Components
 export { default as Animate } from './animate';
-export { default as __experimentalAnglePicker } from './angle-picker';
+export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
@@ -99,7 +99,7 @@ export {
 	Slot,
 	Fill,
 	Provider as SlotFillProvider,
-	Consumer as __experimentalSlotFillConsumer,
+	useSlot as __experimentalUseSlot,
 } from './slot-fill';
 
 export {

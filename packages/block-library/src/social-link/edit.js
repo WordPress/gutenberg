@@ -19,6 +19,7 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -26,15 +27,15 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getIconBySite, getNameBySite } from './social-list';
 
 const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
-	const { url, site, label } = attributes;
+	const { url, service, label } = attributes;
 	const [ showURLPopover, setPopover ] = useState( false );
-	const classes = classNames( 'wp-social-link', 'wp-social-link-' + site, {
+	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
 	} );
 
 	// Import icon.
-	const IconComponent = getIconBySite( site );
-	const socialLinkName = getNameBySite( site );
+	const IconComponent = getIconBySite( service );
+	const socialLinkName = getNameBySite( service );
 
 	return (
 		<Fragment>
@@ -45,7 +46,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 				>
 					<PanelRow>
 						<TextControl
-							label={ __( 'Link Label' ) }
+							label={ __( 'Link label' ) }
 							help={ __(
 								'Briefly describe the link to help screen reader users.'
 							) }
@@ -74,12 +75,12 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 									onChange={ ( nextURL ) =>
 										setAttributes( { url: nextURL } )
 									}
-									placeholder={ __( 'Enter Address' ) }
+									placeholder={ __( 'Enter address' ) }
 									disableSuggestions={ true }
 								/>
 							</div>
 							<Button
-								icon="editor-break"
+								icon={ keyboardReturn }
 								label={ __( 'Apply' ) }
 								type="submit"
 							/>

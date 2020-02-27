@@ -30,28 +30,30 @@ import {
 } from '../';
 
 describe( 'isURL', () => {
-	it( 'returns true when given things that look like a URL', () => {
-		const urls = [
-			'http://wordpress.org',
-			'https://wordpress.org',
-			'HTTPS://WORDPRESS.ORG',
-			'https://wordpress.org/foo#bar',
-			'https://localhost/foo#bar',
-		];
-
-		expect( every( urls, isURL ) ).toBe( true );
+	it.each( [
+		[ 'http://wordpress.org' ],
+		[ 'https://wordpress.org' ],
+		[ 'HTTPS://WORDPRESS.ORG' ],
+		[ 'https://wordpress.org/./foo' ],
+		[ 'https://wordpress.org/path?query#fragment' ],
+		[ 'https://localhost/foo#bar' ],
+		[ 'mailto:example@example.com' ],
+		[ 'ssh://user:password@127.0.0.1:8080' ],
+	] )( 'valid (true): %s', ( url ) => {
+		expect( isURL( url ) ).toBe( true );
 	} );
 
-	it( "returns false when given things that don't look like a URL", () => {
-		const urls = [
-			'HTTP: HyperText Transfer Protocol',
-			'URLs begin with a http:// prefix',
-			'Go here: http://wordpress.org',
-			'http://',
-			'',
-		];
-
-		expect( every( urls, isURL ) ).toBe( false );
+	it.each( [
+		[ 'http://word press.org' ],
+		[ 'http://wordpress.org:port' ],
+		[ 'http://[wordpress.org]/' ],
+		[ 'HTTP: HyperText Transfer Protocol' ],
+		[ 'URLs begin with a http:// prefix' ],
+		[ 'Go here: http://wordpress.org' ],
+		[ 'http://' ],
+		[ '' ],
+	] )( 'invalid (false): %s', ( url ) => {
+		expect( isURL( url ) ).toBe( false );
 	} );
 } );
 

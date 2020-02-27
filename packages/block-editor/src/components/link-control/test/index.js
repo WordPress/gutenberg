@@ -50,6 +50,28 @@ afterEach( () => {
 	mockFetchSearchSuggestions.mockReset();
 } );
 
+function getURLInput() {
+	return container.querySelector( 'input[aria-label="URL"]' );
+}
+
+function getSearchResults() {
+	const input = getURLInput();
+	// The input has `aria-owns` to indicate that it owns (and is related to)
+	// the search results with `role="listbox"`.
+	const relatedSelector = input.getAttribute( 'aria-owns' );
+
+	// Select by relationship as well as role
+	return container.querySelectorAll(
+		`#${ relatedSelector }[role="listbox"] [role="option"]`
+	);
+}
+
+function getCurrentLink() {
+	return container.querySelector(
+		'.block-editor-link-control__search-item.is-current'
+	);
+}
+
 describe( 'Basic rendering', () => {
 	it( 'should render', () => {
 		act( () => {
@@ -57,12 +79,73 @@ describe( 'Basic rendering', () => {
 		} );
 
 		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchInput = getURLInput();
 
 		expect( searchInput ).not.toBeNull();
 		expect( container.innerHTML ).toMatchSnapshot();
+	} );
+
+	describe( 'forceIsEditingLink', () => {
+		const isEditing = () => !! getURLInput();
+
+		it( 'undefined', () => {
+			act( () => {
+				render(
+					<LinkControl value={ { url: 'https://example.com' } } />,
+					container
+				);
+			} );
+
+			expect( isEditing() ).toBe( false );
+		} );
+
+		it( 'true', () => {
+			act( () => {
+				render(
+					<LinkControl
+						value={ { url: 'https://example.com' } }
+						forceIsEditingLink
+					/>,
+					container
+				);
+			} );
+
+			expect( isEditing() ).toBe( true );
+		} );
+
+		it( 'false', () => {
+			act( () => {
+				render(
+					<LinkControl value={ { url: 'https://example.com' } } />,
+					container
+				);
+			} );
+
+			// Click the "Edit" button to trigger into the editing mode.
+			const editButton = Array.from(
+				container.querySelectorAll( 'button' )
+			).find( ( button ) => button.innerHTML.includes( 'Edit' ) );
+
+			act( () => {
+				Simulate.click( editButton );
+			} );
+
+			expect( isEditing() ).toBe( true );
+
+			// If passed `forceIsEditingLink` of `false` while editing, should
+			// forcefully reset to the preview state.
+			act( () => {
+				render(
+					<LinkControl
+						value={ { url: 'https://example.com' } }
+						forceIsEditingLink={ false }
+					/>,
+					container
+				);
+			} );
+
+			expect( isEditing() ).toBe( false );
+		} );
 	} );
 } );
 
@@ -84,9 +167,7 @@ describe( 'Searching for a link', () => {
 		} );
 
 		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchInput = getURLInput();
 
 		// Simulate searching for a term
 		act( () => {
@@ -96,10 +177,7 @@ describe( 'Searching for a link', () => {
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 		await eventLoopTick();
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="menu"] button[role="menuitem"]'
-		);
+		const searchResultElements = getSearchResults();
 
 		let loadingUI = container.querySelector( '.components-spinner' );
 
@@ -127,9 +205,7 @@ describe( 'Searching for a link', () => {
 		} );
 
 		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchInput = getURLInput();
 
 		// Simulate searching for a term
 		act( () => {
@@ -138,11 +214,10 @@ describe( 'Searching for a link', () => {
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 		await eventLoopTick();
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		const searchResultElements = getSearchResults();
+
 		const firstSearchResultItemHTML = first( searchResultElements )
 			.innerHTML;
 		const lastSearchResultItemHTML = last( searchResultElements ).innerHTML;
@@ -176,9 +251,7 @@ describe( 'Searching for a link', () => {
 			} );
 
 			// Search Input UI
-			const searchInput = container.querySelector(
-				'input[aria-label="URL"]'
-			);
+			const searchInput = getURLInput();
 
 			// Simulate searching for a term
 			act( () => {
@@ -189,11 +262,10 @@ describe( 'Searching for a link', () => {
 
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 			await eventLoopTick();
+			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-			const searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
+			const searchResultElements = getSearchResults();
+
 			const lastSearchResultItemHTML = last( searchResultElements )
 				.innerHTML;
 			const additionalDefaultFallbackURLSuggestionLength = 1;
@@ -217,56 +289,6 @@ describe( 'Searching for a link', () => {
 			);
 		}
 	);
-
-	it( 'should reset the input field and the search results when search term is cleared or reset', async () => {
-		const searchTerm = 'Hello world';
-
-		act( () => {
-			render( <LinkControl />, container );
-		} );
-
-		let searchResultElements;
-		let searchInput;
-
-		// Search Input UI
-		searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
-
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
-
-		// Check we have definitely rendered some suggestions
-		expect( searchResultElements ).toHaveLength(
-			fauxEntitySuggestions.length
-		);
-
-		// Grab the reset button now it's available
-		const resetUI = container.querySelector( '[aria-label="Reset"]' );
-
-		act( () => {
-			Simulate.click( resetUI );
-		} );
-
-		await eventLoopTick();
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
-		searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		expect( searchInput.value ).toBe( '' );
-		expect( searchResultElements ).toHaveLength( 0 );
-	} );
 } );
 
 describe( 'Manual link entry', () => {
@@ -282,9 +304,7 @@ describe( 'Manual link entry', () => {
 			} );
 
 			// Search Input UI
-			const searchInput = container.querySelector(
-				'input[aria-label="URL"]'
-			);
+			const searchInput = getURLInput();
 
 			// Simulate searching for a term
 			act( () => {
@@ -296,10 +316,8 @@ describe( 'Manual link entry', () => {
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 			await eventLoopTick();
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-			const searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
+			const searchResultElements = getSearchResults();
+
 			const firstSearchResultItemHTML =
 				searchResultElements[ 0 ].innerHTML;
 			const expectedResultsLength = 1;
@@ -332,9 +350,7 @@ describe( 'Manual link entry', () => {
 				} );
 
 				// Search Input UI
-				const searchInput = container.querySelector(
-					'input[aria-label="URL"]'
-				);
+				const searchInput = getURLInput();
 
 				// Simulate searching for a term
 				act( () => {
@@ -346,10 +362,8 @@ describe( 'Manual link entry', () => {
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 				await eventLoopTick();
 
-				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
+				const searchResultElements = getSearchResults();
+
 				const firstSearchResultItemHTML =
 					searchResultElements[ 0 ].innerHTML;
 				const expectedResultsLength = 1;
@@ -382,11 +396,8 @@ describe( 'Default search suggestions', () => {
 		await eventLoopTick();
 
 		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchInput = getURLInput();
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		const searchResultsWrapper = container.querySelector(
 			'[role="listbox"]'
 		);
@@ -416,8 +427,6 @@ describe( 'Default search suggestions', () => {
 	} );
 
 	it( 'should not display initial suggestions when input value is present', async () => {
-		let searchResultElements;
-		//
 		// Render with an initial value an ensure that no initial suggestions
 		// are shown.
 		//
@@ -439,9 +448,7 @@ describe( 'Default search suggestions', () => {
 		// Click the "Edit/Change" button and check initial suggestions are not
 		// shown.
 		//
-		const currentLinkUI = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		const currentLinkUI = getCurrentLink();
 		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
 		act( () => {
@@ -450,35 +457,533 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
-		searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		const searchResultElements = getSearchResults();
 
-		expect( searchResultElements ).toHaveLength( 0 );
+		const searchInput = getURLInput();
 
-		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
+		// search input is set to the URL value
+		expect( searchInput.value ).toEqual( fauxEntitySuggestions[ 0 ].url );
 
-		//
-		// Reset the search to empty and check the initial suggestions are now shown.
-		//
-		const resetUI = container.querySelector( '[aria-label="Reset"]' );
+		// it should match any url that's like ?p= and also include a URL option
+		expect( searchResultElements ).toHaveLength( 5 );
+
+		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should display initial suggestions when input value is manually deleted', async () => {
+		const searchTerm = 'Hello world';
 
 		act( () => {
-			Simulate.click( resetUI );
+			render( <LinkControl showInitialSuggestions />, container );
+		} );
+
+		let searchResultElements;
+		let searchInput;
+
+		// Search Input UI
+		searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		expect( searchInput.value ).toBe( searchTerm );
+
+		searchResultElements = getSearchResults();
+
+		// delete the text
+		act( () => {
+			Simulate.change( searchInput, { target: { value: '' } } );
 		} );
 
 		await eventLoopTick();
 
-		searchResultElements = container.querySelectorAll(
+		searchResultElements = getSearchResults();
+
+		searchInput = getURLInput();
+
+		// check the input is empty now
+		expect( searchInput.value ).toBe( '' );
+
+		const searchResultLabel = container.querySelector(
+			'.block-editor-link-control__search-results-label'
+		);
+
+		expect( searchResultLabel.innerHTML ).toBe( 'Recently updated' );
+
+		expect( searchResultElements ).toHaveLength( 3 );
+	} );
+} );
+
+describe( 'Creating Entities (eg: Posts, Pages)', () => {
+	const noResults = [];
+	beforeEach( () => {
+		// Force returning empty results for existing Pages. Doing this means that the only item
+		// shown should be "Create Page" suggestion because there will be no search suggestions
+		// and our input does not conform to a direct entry schema (eg: a URL).
+		mockFetchSearchSuggestions.mockImplementation( () =>
+			Promise.resolve( noResults )
+		);
+	} );
+	it.each( [
+		[ 'HelloWorld', 'without spaces' ],
+		[ 'Hello World', 'with spaces' ],
+	] )(
+		'should allow creating a link for a valid Entity title "%s" (%s)',
+		async ( entityNameText ) => {
+			let resolver;
+			let resolvedEntity;
+
+			const createSuggestion = ( title ) =>
+				new Promise( ( resolve ) => {
+					resolver = resolve;
+					resolvedEntity = {
+						title,
+						id: 123,
+						url: '/?p=123',
+						type: 'page',
+					};
+				} );
+
+			const LinkControlConsumer = () => {
+				const [ link, setLink ] = useState( null );
+
+				return (
+					<LinkControl
+						value={ link }
+						onChange={ ( suggestion ) => {
+							setLink( suggestion );
+						} }
+						createSuggestion={ createSuggestion }
+					/>
+				);
+			};
+
+			act( () => {
+				render( <LinkControlConsumer />, container );
+			} );
+
+			// Search Input UI
+			const searchInput = container.querySelector(
+				'input[aria-label="URL"]'
+			);
+
+			// Simulate searching for a term
+			act( () => {
+				Simulate.change( searchInput, {
+					target: { value: entityNameText },
+				} );
+			} );
+
+			await eventLoopTick();
+
+			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+			const searchResultElements = container.querySelectorAll(
+				'[role="listbox"] [role="option"]'
+			);
+
+			const createButton = first(
+				Array.from( searchResultElements ).filter( ( result ) =>
+					result.innerHTML.includes( 'New page' )
+				)
+			);
+
+			expect( createButton ).not.toBeNull();
+			expect( createButton.innerHTML ).toEqual(
+				expect.stringContaining( entityNameText )
+			);
+
+			// No need to wait in this test because we control the Promise
+			// resolution manually via the `resolver` reference
+			act( () => {
+				Simulate.click( createButton );
+			} );
+
+			await eventLoopTick();
+
+			// Check for loading indicator
+			const loadingIndicator = container.querySelector(
+				'.block-editor-link-control__loading'
+			);
+			const currentLinkLabel = container.querySelector(
+				'[aria-label="Currently selected"]'
+			);
+
+			expect( currentLinkLabel ).toBeNull();
+			expect( loadingIndicator.innerHTML ).toEqual(
+				expect.stringContaining( 'Creating' )
+			);
+
+			// Resolve the `createSuggestion` promise
+			await act( async () => {
+				resolver( resolvedEntity );
+			} );
+
+			await eventLoopTick();
+
+			const currentLink = container.querySelector(
+				'[aria-label="Currently selected"]'
+			);
+
+			const currentLinkHTML = currentLink.innerHTML;
+
+			expect( currentLinkHTML ).toEqual(
+				expect.stringContaining( entityNameText )
+			);
+			expect( currentLinkHTML ).toEqual(
+				expect.stringContaining( '/?p=123' )
+			);
+		}
+	);
+
+	it( 'should allow createSuggestion prop to return a non-Promise value', async () => {
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( null );
+
+			return (
+				<LinkControl
+					value={ link }
+					onChange={ ( suggestion ) => {
+						setLink( suggestion );
+					} }
+					createSuggestion={ ( title ) => ( {
+						title,
+						id: 123,
+						url: '/?p=123',
+						type: 'page',
+					} ) }
+				/>
+			);
+		};
+
+		act( () => {
+			render( <LinkControlConsumer />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: 'Some new page to create' },
+			} );
+		} );
+
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		const searchResultElements = container.querySelectorAll(
 			'[role="listbox"] [role="option"]'
 		);
 
-		expect( searchResultElements ).toHaveLength( 3 );
+		const createButton = first(
+			Array.from( searchResultElements ).filter( ( result ) =>
+				result.innerHTML.includes( 'New page' )
+			)
+		);
 
-		// Ensure only called once as a guard against potential infinite
-		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
-		// which has calls to `setState` within it.
-		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+		await act( async () => {
+			Simulate.click( createButton );
+		} );
+
+		await eventLoopTick();
+
+		const currentLink = container.querySelector(
+			'[aria-label="Currently selected"]'
+		);
+
+		const currentLinkHTML = currentLink.innerHTML;
+
+		expect( currentLinkHTML ).toEqual(
+			expect.stringContaining( 'Some new page to create' )
+		);
+		expect( currentLinkHTML ).toEqual(
+			expect.stringContaining( '/?p=123' )
+		);
+	} );
+
+	it( 'should allow creation of entities via the keyboard', async () => {
+		const entityNameText = 'A new page to be created';
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( null );
+
+			return (
+				<LinkControl
+					value={ link }
+					onChange={ ( suggestion ) => {
+						setLink( suggestion );
+					} }
+					createSuggestion={ ( title ) =>
+						Promise.resolve( {
+							title,
+							id: 123,
+							url: '/?p=123',
+							type: 'page',
+						} )
+					}
+				/>
+			);
+		};
+
+		act( () => {
+			render( <LinkControlConsumer />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: entityNameText },
+			} );
+		} );
+
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		const searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
+		const form = container.querySelector( 'form' );
+		const createButton = first(
+			Array.from( searchResultElements ).filter( ( result ) =>
+				result.innerHTML.includes( 'New page' )
+			)
+		);
+
+		// Step down into the search results, highlighting the first result item
+		act( () => {
+			Simulate.keyDown( searchInput, { keyCode: DOWN } );
+		} );
+
+		act( () => {
+			Simulate.keyDown( createButton, { keyCode: ENTER } );
+		} );
+
+		await act( async () => {
+			Simulate.submit( form );
+		} );
+
+		await eventLoopTick();
+
+		const currentLink = container.querySelector(
+			'[aria-label="Currently selected"]'
+		);
+
+		const currentLinkHTML = currentLink.innerHTML;
+
+		expect( currentLinkHTML ).toEqual(
+			expect.stringContaining( entityNameText )
+		);
+	} );
+
+	describe( 'Do not show create option', () => {
+		it.each( [ [ undefined ], [ null ], [ false ] ] )(
+			'should not show not show an option to create an entity when "createSuggestion" handler is %s',
+			async ( handler ) => {
+				act( () => {
+					render(
+						<LinkControl createSuggestion={ handler } />,
+						container
+					);
+				} );
+				// Await the initial suggestions to be fetched
+				await eventLoopTick();
+
+				// Search Input UI
+				const searchInput = container.querySelector(
+					'input[aria-label="URL"]'
+				);
+
+				// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+				const searchResultElements = container.querySelectorAll(
+					'[role="listbox"] [role="option"]'
+				);
+				const createButton = first(
+					Array.from( searchResultElements ).filter( ( result ) =>
+						result.innerHTML.includes( 'New page' )
+					)
+				);
+
+				// Verify input has no value
+				expect( searchInput.value ).toBe( '' );
+				expect( createButton ).toBeFalsy(); // shouldn't exist!
+			}
+		);
+
+		it( 'should not show not show an option to create an entity when input is empty', async () => {
+			act( () => {
+				render(
+					<LinkControl
+						showInitialSuggestions={ true } // should show even if we're not showing initial suggestions
+						createSuggestion={ jest.fn() }
+					/>,
+					container
+				);
+			} );
+			// Await the initial suggestions to be fetched
+			await eventLoopTick();
+
+			// Search Input UI
+			const searchInput = container.querySelector(
+				'input[aria-label="URL"]'
+			);
+
+			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+			const searchResultElements = container.querySelectorAll(
+				'[role="listbox"] [role="option"]'
+			);
+			const createButton = first(
+				Array.from( searchResultElements ).filter( ( result ) =>
+					result.innerHTML.includes( 'New page' )
+				)
+			);
+
+			// Verify input has no value
+			expect( searchInput.value ).toBe( '' );
+			expect( createButton ).toBeFalsy(); // shouldn't exist!
+		} );
+
+		it.each( [
+			'https://wordpress.org',
+			'www.wordpress.org',
+			'mailto:example123456@wordpress.org',
+			'tel:example123456@wordpress.org',
+			'#internal-anchor',
+		] )(
+			'should not show option to "Create Page" when text is a form of direct entry (eg: %s)',
+			async ( inputText ) => {
+				act( () => {
+					render(
+						<LinkControl createSuggestion={ jest.fn() } />,
+						container
+					);
+				} );
+
+				// Search Input UI
+				const searchInput = container.querySelector(
+					'input[aria-label="URL"]'
+				);
+
+				// Simulate searching for a term
+				act( () => {
+					Simulate.change( searchInput, {
+						target: { value: inputText },
+					} );
+				} );
+
+				await eventLoopTick();
+
+				// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+				const searchResultElements = container.querySelectorAll(
+					'[role="listbox"] [role="option"]'
+				);
+
+				const createButton = first(
+					Array.from( searchResultElements ).filter( ( result ) =>
+						result.innerHTML.includes( 'New page' )
+					)
+				);
+
+				expect( createButton ).toBeFalsy(); // shouldn't exist!
+			}
+		);
+	} );
+
+	describe( 'Error handling', () => {
+		it( 'should display human-friendly, perceivable error notice and re-show create button and search input if page creation request fails', async () => {
+			const searchText = 'This page to be created';
+			let searchInput;
+
+			const throwsError = () => {
+				throw new Error( 'API response returned invalid entity.' ); // this can be any error and msg
+			};
+
+			const createSuggestion = () => Promise.reject( throwsError() );
+
+			act( () => {
+				render(
+					<LinkControl createSuggestion={ createSuggestion } />,
+					container
+				);
+			} );
+
+			// Search Input UI
+			searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+			// Simulate searching for a term
+			act( () => {
+				Simulate.change( searchInput, {
+					target: { value: searchText },
+				} );
+			} );
+
+			await eventLoopTick();
+
+			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+			let searchResultElements = container.querySelectorAll(
+				'[role="listbox"] [role="option"]'
+			);
+			let createButton = first(
+				Array.from( searchResultElements ).filter( ( result ) =>
+					result.innerHTML.includes( 'New page' )
+				)
+			);
+
+			await act( async () => {
+				Simulate.click( createButton );
+			} );
+
+			await eventLoopTick();
+
+			searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+			// This is a Notice component
+			// we allow selecting by className here as an edge case because the
+			// a11y is handled via `speak`.
+			// See: https://github.com/WordPress/gutenberg/tree/master/packages/a11y#speak.
+			const errorNotice = container.querySelector(
+				'.block-editor-link-control__search-error'
+			);
+
+			// Catch the error in the test to avoid test failures
+			expect( throwsError ).toThrow( Error );
+
+			// Check human readable error notice is perceivable
+			expect( errorNotice ).not.toBeFalsy();
+			expect( errorNotice.innerHTML ).toEqual(
+				expect.stringContaining(
+					'API response returned invalid entity'
+				)
+			);
+
+			// Verify input is repopulated with original search text
+			expect( searchInput ).not.toBeFalsy();
+			expect( searchInput.value ).toBe( searchText );
+
+			// Verify search results are re-shown and create button is available.
+			searchResultElements = container.querySelectorAll(
+				'[role="listbox"] [role="option"]'
+			);
+			createButton = first(
+				Array.from( searchResultElements ).filter( ( result ) =>
+					result.innerHTML.includes( 'New page' )
+				)
+			);
+
+			expect( createButton ).not.toBeFalsy(); // shouldn't exist!
+		} );
 	} );
 } );
 
@@ -497,9 +1002,7 @@ describe( 'Selecting links', () => {
 		} );
 
 		// TODO: select by aria role or visible text
-		const currentLink = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		const currentLink = getCurrentLink();
 		const currentLinkHTML = currentLink.innerHTML;
 		const currentLinkAnchor = currentLink.querySelector(
 			`[href="${ selectedLink.url }"]`
@@ -534,9 +1037,7 @@ describe( 'Selecting links', () => {
 		} );
 
 		// Required in order to select the button below
-		let currentLinkUI = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		let currentLinkUI = getCurrentLink();
 		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
 		// Simulate searching for a term
@@ -544,12 +1045,8 @@ describe( 'Selecting links', () => {
 			Simulate.click( currentLinkBtn );
 		} );
 
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
-		currentLinkUI = container.querySelector(
-			'.block-editor-link-control__search-item.is-current'
-		);
+		const searchInput = getURLInput();
+		currentLinkUI = getCurrentLink();
 
 		// We should be back to showing the search input
 		expect( searchInput ).not.toBeNull();
@@ -589,9 +1086,7 @@ describe( 'Selecting links', () => {
 				} );
 
 				// Search Input UI
-				const searchInput = container.querySelector(
-					'input[aria-label="URL"]'
-				);
+				const searchInput = getURLInput();
 
 				// Simulate searching for a term
 				act( () => {
@@ -603,10 +1098,7 @@ describe( 'Selecting links', () => {
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 				await eventLoopTick();
 
-				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
+				const searchResultElements = getSearchResults();
 
 				const firstSearchSuggestion = first( searchResultElements );
 
@@ -667,9 +1159,7 @@ describe( 'Selecting links', () => {
 				} );
 
 				// Search Input UI
-				const searchInput = container.querySelector(
-					'input[aria-label="URL"]'
-				);
+				const searchInput = getURLInput();
 				const form = container.querySelector( 'form' );
 
 				// Simulate searching for a term
@@ -687,10 +1177,8 @@ describe( 'Selecting links', () => {
 					Simulate.keyDown( searchInput, { keyCode: DOWN } );
 				} );
 
-				// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
+				const searchResultElements = getSearchResults();
+
 				const firstSearchSuggestion = first( searchResultElements );
 				const secondSearchSuggestion = nth( searchResultElements, 1 );
 
@@ -765,6 +1253,80 @@ describe( 'Selecting links', () => {
 				expect( currentLinkAnchor ).not.toBeNull();
 			}
 		);
+
+		it( 'should allow selection of initial search results via the keyboard', async () => {
+			act( () => {
+				render( <LinkControl showInitialSuggestions />, container );
+			} );
+
+			await eventLoopTick();
+
+			const searchResultsWrapper = container.querySelector(
+				'[role="listbox"]'
+			);
+
+			const searchResultsLabel = container.querySelector(
+				`#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }`
+			);
+
+			expect( searchResultsLabel.innerHTML ).toEqual(
+				'Recently updated'
+			);
+
+			// Search Input UI
+			const searchInput = getURLInput();
+
+			// Step down into the search results, highlighting the first result item
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: DOWN } );
+			} );
+
+			await eventLoopTick();
+
+			const searchResultElements = getSearchResults();
+
+			const firstSearchSuggestion = first( searchResultElements );
+			const secondSearchSuggestion = nth( searchResultElements, 1 );
+
+			let selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should have highlighted the first item using the keyboard
+			expect( selectedSearchResultElement ).toEqual(
+				firstSearchSuggestion
+			);
+
+			// Check we can go down again using the down arrow
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: DOWN } );
+			} );
+
+			selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should have highlighted the first item using the keyboard
+			expect( selectedSearchResultElement ).toEqual(
+				secondSearchSuggestion
+			);
+
+			// Check we can go back up via up arrow
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: UP } );
+			} );
+
+			selectedSearchResultElement = container.querySelector(
+				'[role="option"][aria-selected="true"]'
+			);
+
+			// We should be back to highlighting the first search result again
+			expect( selectedSearchResultElement ).toEqual(
+				firstSearchSuggestion
+			);
+
+			expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 
 	it( 'does not forcefully regain focus if onChange handler had shifted it', () => {
@@ -794,9 +1356,7 @@ describe( 'Selecting links', () => {
 
 		// Change value.
 		const form = container.querySelector( 'form' );
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchInput = getURLInput();
 
 		// Simulate searching for a term
 		act( () => {
@@ -821,7 +1381,7 @@ describe( 'Selecting links', () => {
 describe( 'Addition Settings UI', () => {
 	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
 		const selectedLink = first( fauxEntitySuggestions );
-		const expectedSettingText = 'Open in New Tab';
+		const expectedSettingText = 'Open in new tab';
 
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
@@ -858,7 +1418,7 @@ describe( 'Addition Settings UI', () => {
 		const customSettings = [
 			{
 				id: 'newTab',
-				title: 'Open in New Tab',
+				title: 'Open in new tab',
 			},
 			{
 				id: 'noFollow',

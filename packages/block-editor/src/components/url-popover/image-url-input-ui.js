@@ -18,6 +18,7 @@ import {
 	Path,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { link as linkIcon, close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -227,7 +228,7 @@ const ImageURLInputUI = ( {
 	const advancedOptions = (
 		<>
 			<ToggleControl
-				label={ __( 'Open in New Tab' ) }
+				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }
 			/>
@@ -258,7 +259,7 @@ const ImageURLInputUI = ( {
 	return (
 		<>
 			<Button
-				icon="admin-links"
+				icon={ linkIcon }
 				className="components-toolbar__control"
 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
 				aria-expanded={ isOpen }
@@ -310,7 +311,7 @@ const ImageURLInputUI = ( {
 								urlLabel={ urlLabel }
 							/>
 							<Button
-								icon="no"
+								icon={ close }
 								label={ __( 'Remove link' ) }
 								onClick={ onLinkRemove }
 							/>

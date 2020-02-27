@@ -1,6 +1,8 @@
 .edit-post-visual-editor {
 	position: relative;
 	padding-top: 50px;
+	// Default background color so that grey .edit-post-editor-regions__content color doesn't show through.
+	background-color: $white;
 
 	& .components-button {
 		font-family: $default-font;
@@ -25,7 +27,7 @@
 
 .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
 	// Allow the page to be scrolled with the last block in the middle.
-	min-height: 50vh;
+	min-height: 40vh;
 	width: 100%;
 }
 

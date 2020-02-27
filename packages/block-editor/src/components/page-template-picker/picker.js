@@ -2,8 +2,12 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
+
+/**
+ * External dependencies
+ */
+import { logUserEvent, userEvents } from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
@@ -22,7 +26,10 @@ const __experimentalPageTemplatePicker = ( {
 	const onApply = () => {
 		editPost( {
 			title: templatePreview.name,
-			blocks: parse( templatePreview.content ),
+			blocks: templatePreview.blocks,
+		} );
+		logUserEvent( userEvents.editorSessionTemplateApply, {
+			template: templatePreview.key,
 		} );
 		setTemplatePreview( undefined );
 	};
@@ -32,10 +39,18 @@ const __experimentalPageTemplatePicker = ( {
 			<Container>
 				{ templates.map( ( template ) => (
 					<Button
-						key={ template.name }
+						key={ template.key }
 						icon={ template.icon }
 						label={ template.name }
-						onPress={ () => setTemplatePreview( template ) }
+						onPress={ () => {
+							logUserEvent(
+								userEvents.editorSessionTemplatePreview,
+								{
+									template: template.key,
+								}
+							);
+							setTemplatePreview( template );
+						} }
 					/>
 				) ) }
 			</Container>

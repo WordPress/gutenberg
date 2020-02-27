@@ -6,18 +6,11 @@ import { uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSpokenMessages, Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
-import {
-	create,
-	insert,
-	isCollapsed,
-	applyFormat,
-	getTextContent,
-	slice,
-} from '@wordpress/rich-text';
+import { create, insert, isCollapsed, applyFormat } from '@wordpress/rich-text';
 import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
 
 /**
@@ -31,7 +24,6 @@ function InlineLinkUI( {
 	addingLink,
 	value,
 	onChange,
-	onFocus,
 	speak,
 	stopAddingLink,
 } ) {
@@ -50,6 +42,16 @@ function InlineLinkUI( {
 	 * @type {string}
 	 */
 	const mountingKey = useMemo( uniqueId, [ addingLink ] );
+
+	/**
+	 * Pending settings to be applied to the next link. When inserting a new
+	 * link, toggle values cannot be applied immediately, because there is not
+	 * yet a link for them to apply to. Thus, they are maintained in a state
+	 * value until the time that the link can be inserted or edited.
+	 *
+	 * @type {[Object|undefined,Function]}
+	 */
+	const [ nextLinkValue, setNextLinkValue ] = useState();
 
 	const anchorRef = useMemo( () => {
 		const selection = window.getSelection();
@@ -79,15 +81,41 @@ function InlineLinkUI( {
 	const linkValue = {
 		url: activeAttributes.url,
 		opensInNewTab: activeAttributes.target === '_blank',
+		...nextLinkValue,
 	};
 
 	function onChangeLink( nextValue ) {
+		// Merge with values from state, both for the purpose of assigning the
+		// next state value, and for use in constructing the new link format if
+		// the link is ready to be applied.
+		nextValue = {
+			...nextLinkValue,
+			...nextValue,
+		};
+
+		// LinkControl calls `onChange` immediately upon the toggling a setting.
+		const didToggleSetting =
+			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
+			linkValue.url === nextValue.url;
+
+		// If change handler was called as a result of a settings change during
+		// link insertion, it must be held in state until the link is ready to
+		// be applied.
+		const didToggleSettingForNewLink =
+			didToggleSetting && nextValue.url === undefined;
+
+		// If link will be assigned, the state value can be considered flushed.
+		// Otherwise, persist the pending changes.
+		setNextLinkValue( didToggleSettingForNewLink ? nextValue : undefined );
+
+		if ( didToggleSettingForNewLink ) {
+			return;
+		}
+
 		const newUrl = prependHTTP( nextValue.url );
-		const selectedText = getTextContent( slice( value ) );
 		const format = createLinkFormat( {
 			url: newUrl,
 			opensInNewWindow: nextValue.opensInNewTab,
-			text: selectedText,
 		} );
 
 		if ( isCollapsed( value ) && ! isActive ) {
@@ -102,8 +130,11 @@ function InlineLinkUI( {
 			onChange( applyFormat( value, format ) );
 		}
 
-		onFocus();
-		stopAddingLink();
+		// Focus should only be shifted back to the formatted segment when the
+		// URL is submitted.
+		if ( ! didToggleSetting ) {
+			stopAddingLink();
+		}
 
 		if ( ! isValidHref( newUrl ) ) {
 			speak(
@@ -127,7 +158,11 @@ function InlineLinkUI( {
 			onClose={ stopAddingLink }
 			position="bottom center"
 		>
-			<LinkControl value={ linkValue } onChange={ onChangeLink } />
+			<LinkControl
+				value={ linkValue }
+				onChange={ onChangeLink }
+				forceIsEditingLink={ addingLink }
+			/>
 		</Popover>
 	);
 }

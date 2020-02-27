@@ -19,6 +19,7 @@ import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -43,7 +44,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 			/>
 			<Button
 				className="block-editor-media-placeholder__url-input-submit-button"
-				icon="editor-break"
+				icon={ keyboardReturn }
 				label={ __( 'Apply' ) }
 				type="submit"
 			/>
@@ -277,7 +278,7 @@ export class MediaPlaceholder extends Component {
 					className="block-editor-media-placeholder__button"
 					onClick={ this.openURLInput }
 					isPressed={ isURLInputVisible }
-					isSecondary
+					isTertiary
 				>
 					{ __( 'Insert from URL' ) }
 				</Button>
@@ -318,7 +319,7 @@ export class MediaPlaceholder extends Component {
 				render={ ( { open } ) => {
 					return (
 						<Button
-							isSecondary
+							isTertiary
 							onClick={ ( event ) => {
 								event.stopPropagation();
 								open();
@@ -343,7 +344,7 @@ export class MediaPlaceholder extends Component {
 							const content = (
 								<>
 									<Button
-										isSecondary
+										isPrimary
 										className={ classnames(
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
@@ -371,7 +372,7 @@ export class MediaPlaceholder extends Component {
 				<>
 					{ this.renderDropZone() }
 					<FormFileUpload
-						isSecondary
+						isPrimary
 						className={ classnames(
 							'block-editor-media-placeholder__button',
 							'block-editor-media-placeholder__upload-button'
