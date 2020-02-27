@@ -21,7 +21,7 @@ function BlockControlsSlot( props ) {
 		<Slot
 			{ ...props }
 			bubblesVirtually
-			fillProps={ accessibleToolbarState || null }
+			fillProps={ accessibleToolbarState }
 		/>
 	);
 }
@@ -30,7 +30,9 @@ function BlockControlsFill( { controls, children } ) {
 	return (
 		<Fill>
 			{ ( fillProps ) => (
-				<ToolbarContext.Provider value={ fillProps }>
+				<ToolbarContext.Provider
+					value={ Object.keys( fillProps ).length ? fillProps : null }
+				>
 					<ToolbarGroup controls={ controls } />
 					{ children }
 				</ToolbarContext.Provider>

@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import { ToolbarGroup, Button } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -114,7 +114,7 @@ export class BlockMover extends Component {
 						onDragEnd={ onDraggableEnd }
 					>
 						<ToolbarGroup>
-							<ToolbarButton
+							<Button
 								className="block-editor-block-mover__control block-editor-block-mover__control-up"
 								onClick={ isFirst ? null : onMoveUp }
 								icon={ getArrowIcon( 'up' ) }
@@ -129,7 +129,7 @@ export class BlockMover extends Component {
 								onBlur={ this.onBlur }
 							/>
 
-							<ToolbarButton
+							<Button
 								className="block-editor-block-mover__control block-editor-block-mover__control-down"
 								onClick={ isLast ? null : onMoveDown }
 								icon={ getArrowIcon( 'down' ) }

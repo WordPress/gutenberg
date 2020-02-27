@@ -9,7 +9,7 @@ import { castArray, flow } from 'lodash';
 import { __, _n } from '@wordpress/i18n';
 import {
 	ToolbarGroup,
-	ToolbarItem,
+	__experimentalToolbarItem as ToolbarItem,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,

@@ -20,7 +20,7 @@ function BlockFormatControlsSlot( props ) {
 		<Slot
 			{ ...props }
 			bubblesVirtually
-			fillProps={ accessibleToolbarState || null }
+			fillProps={ accessibleToolbarState }
 		/>
 	);
 }
@@ -29,7 +29,9 @@ function BlockFormatControlsFill( props ) {
 	return (
 		<Fill { ...props }>
 			{ ( fillProps ) => (
-				<ToolbarContext.Provider value={ fillProps }>
+				<ToolbarContext.Provider
+					value={ Object.keys( fillProps ).length ? fillProps : null }
+				>
 					{ props.children }
 				</ToolbarContext.Provider>
 			) }

@@ -158,14 +158,14 @@
 		}
 	}
 
-	.components-toolbar-group {
-		border-color: $light-gray-800;
-		border-left: 0;
-		margin: 0;
-	}
+	// .components-toolbar-group {
+	// 	border-color: $light-gray-800;
+	// 	border-left: 0;
+	// 	margin: 0;
+	// }
 
 	// Single buttons should remain 48px.
-	.components-toolbar-group div:first-child:last-child > .components-button,
+	// .components-toolbar-group div:first-child:last-child > .components-button,
 	.components-toolbar div:first-child:last-child > .components-button {
 		min-width: $block-toolbar-height;
 		padding-left: $grid-unit-15;

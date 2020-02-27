@@ -7,13 +7,17 @@ import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 function useShouldDisplayAccessibleToolbar( ref ) {
-	const [ shouldDisplayAccessibleToolbar, setShouldDisplayAccessibleToolbar ] = useState( false );
+	const [
+		shouldDisplayAccessibleToolbar,
+		setShouldDisplayAccessibleToolbar,
+	] = useState( false );
 	useEffect( () => {
 		const wrapper = ref.current;
 		window.requestAnimationFrame( () => {
 			const focusables = focus.focusable.find( wrapper );
 			const notToolbarItem = focusables.find(
-				( focusable ) => ! ( 'experimentalToolbarItem' in focusable.dataset )
+				( focusable ) =>
+					! ( 'experimentalToolbarItem' in focusable.dataset )
 			);
 			if ( ! notToolbarItem ) {
 				setShouldDisplayAccessibleToolbar( true );
@@ -25,7 +29,9 @@ function useShouldDisplayAccessibleToolbar( ref ) {
 
 function NavigableToolbar( { children, focusOnMount, ...props } ) {
 	const wrapper = useRef();
-	const shouldDisplayAccessibleToolbar = useShouldDisplayAccessibleToolbar( wrapper );
+	const shouldDisplayAccessibleToolbar = useShouldDisplayAccessibleToolbar(
+		wrapper
+	);
 
 	const focusToolbar = useCallback( () => {
 		const tabbables = focus.tabbable.find( wrapper.current );
