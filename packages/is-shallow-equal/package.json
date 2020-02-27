@@ -22,7 +22,8 @@
 	"files": [
 		"arrays.js",
 		"index.js",
-		"objects.js"
+		"objects.js",
+		"build-types"
 	],
 	"main": "index.js",
 	"types": "build-types",
