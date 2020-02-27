@@ -8,7 +8,6 @@ export {
 	G,
 	HorizontalRule,
 	BlockQuotation,
-	PrimitiveButton,
 } from '@wordpress/primitives';
 
 // Components
@@ -115,4 +114,7 @@ export {
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 export * from './text';
-export { useTheme, default as ThemeProvider } from './theme-provider';
+export {
+	__experimentalUseTheme,
+	default as __experimentalThemeProvider,
+} from './theme-provider';

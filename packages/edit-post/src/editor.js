@@ -18,7 +18,7 @@ import {
 	KeyboardShortcuts,
 	SlotFillProvider,
 	DropZoneProvider,
-	ThemeProvider,
+	__experimentalThemeProvider as ThemeProvider,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 

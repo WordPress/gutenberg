@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { PrimitiveButton, useTheme } from '@wordpress/components';
+import { PrimitiveButton } from '@wordpress/primitives';
+import { __experimentalUseTheme } from '@wordpress/components';
 
 export default function BlockBreadcrumbButton( { children, ...props } ) {
-	const theme = useTheme();
+	const theme = __experimentalUseTheme();
 	const additionalStyles = [
 		{
 			states: 'hover',
