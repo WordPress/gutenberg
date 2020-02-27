@@ -3275,6 +3275,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -3452,8 +3453,8 @@ input[type='number'].emotion-18 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -3488,8 +3489,6 @@ input[type='number'].emotion-18 {
           <span
             aria-hidden={false}
             className="components-simple-tooltip components-range-control__tooltip emotion-12 emotion-13"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
             role="tooltip"
             style={
               Object {
@@ -4932,8 +4931,8 @@ input[type='number'].emotion-34 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -5269,8 +5268,8 @@ input[type='number'].emotion-12 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -5456,6 +5455,7 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -5544,8 +5544,8 @@ input[type='number'].emotion-14 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -5580,8 +5580,6 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {
@@ -5743,6 +5741,7 @@ exports[`Storyshots Components/RangeControl Multiple 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -5831,8 +5830,8 @@ input[type='number'].emotion-14 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -5867,8 +5866,6 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={false}
             className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
             role="tooltip"
             style={
               Object {
@@ -5916,8 +5913,8 @@ input[type='number'].emotion-14 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -5952,8 +5949,6 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={false}
             className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
             role="tooltip"
             style={
               Object {
@@ -6001,8 +5996,8 @@ input[type='number'].emotion-14 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -6037,8 +6032,6 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={false}
             className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
             role="tooltip"
             style={
               Object {
@@ -6086,8 +6079,8 @@ input[type='number'].emotion-14 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -6122,8 +6115,6 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={false}
             className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
             role="tooltip"
             style={
               Object {
@@ -6286,6 +6277,7 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -6375,8 +6367,8 @@ input[type='number'].emotion-14 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -6411,8 +6403,6 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {
@@ -6581,6 +6571,7 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -6674,8 +6665,8 @@ input[type='number'].emotion-16 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -6710,8 +6701,6 @@ input[type='number'].emotion-16 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {
@@ -6897,6 +6886,7 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -7003,8 +6993,8 @@ input[type='number'].emotion-16 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -7039,8 +7029,6 @@ input[type='number'].emotion-16 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-12 emotion-13"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {
@@ -7203,6 +7191,7 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -7291,8 +7280,8 @@ input[type='number'].emotion-14 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -7327,8 +7316,6 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {
@@ -7491,6 +7478,7 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -7593,8 +7581,8 @@ input[type='number'].emotion-14 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -7629,8 +7617,6 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {

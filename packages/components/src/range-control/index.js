@@ -59,7 +59,7 @@ const BaseRangeControl = forwardRef(
 			onBlur = noop,
 			onChange = noop,
 			onFocus = noop,
-			onMouseEnter = noop,
+			onMouseMove = noop,
 			onMouseLeave = noop,
 			renderTooltipContent = ( v ) => v,
 			showTooltip: showTooltipProp,
@@ -152,7 +152,7 @@ const BaseRangeControl = forwardRef(
 		const hoverInteractions = useDebouncedHoverInteraction( {
 			onShow: handleShowTooltip,
 			onHide: handleHideTooltip,
-			onMouseEnter,
+			onMouseMove,
 			onMouseLeave,
 		} );
 
@@ -222,7 +222,6 @@ const BaseRangeControl = forwardRef(
 						</ThumbWrapper>
 						{ enableTooltip && (
 							<SimpleTooltip
-								{ ...hoverInteractions }
 								className="components-range-control__tooltip"
 								inputRef={ inputRef }
 								renderTooltipContent={ renderTooltipContent }

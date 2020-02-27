@@ -56,7 +56,7 @@ export function useControlledRangeValue( { min, max, value: valueProp } ) {
 export function useDebouncedHoverInteraction( {
 	onShow = noop,
 	onHide = noop,
-	onMouseEnter = noop,
+	onMouseMove = noop,
 	onMouseLeave = noop,
 	timeout = 300,
 } ) {
@@ -72,8 +72,8 @@ export function useDebouncedHoverInteraction( {
 		[ timeout ]
 	);
 
-	const handleOnMouseEnter = useCallback( ( event ) => {
-		onMouseEnter( event );
+	const handleOnMouseMove = useCallback( ( event ) => {
+		onMouseMove( event );
 
 		setDebouncedTimeout( () => {
 			if ( ! show ) {
@@ -99,7 +99,7 @@ export function useDebouncedHoverInteraction( {
 	} );
 
 	return {
-		onMouseEnter: handleOnMouseEnter,
+		onMouseMove: handleOnMouseMove,
 		onMouseLeave: handleOnMouseLeave,
 	};
 }
