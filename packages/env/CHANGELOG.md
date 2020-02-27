@@ -2,6 +2,7 @@
 
 ### New Feature
 
+-   You can now use `wp-env wp` as a convenient shortcut for running WP-CLI commands.
 -   URLs for ZIP files are now supported as core, plugin, and theme sources.
 -   The `.wp-env.json` coniguration file now accepts a `config` object for setting `wp-config.php` values.
 -   A `.wp-env.override.json` configuration file can now be used to override fields from `.wp-env.json`.

@@ -175,6 +175,33 @@ Positionals:
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 ```
 
+### `wp-env run <container> [command..]`
+
+```sh
+wp-env run <container> [command..]
+
+Runs a shell command in one of the underlying Docker containers.
+
+Positionals:
+  container  The container to run the command on.            [string] [required]
+  command    The command to run.                           [array] [default: []]
+```
+
+### `wp-env wp [command..]`
+
+```sh
+wp-env wp [command..]
+
+Runs a WP-CLI command (https://wp-cli.org) against one of the environments.
+
+Positionals:
+  command  The command to run.                             [array] [default: []]
+
+Options:
+  --environment  Which environment to run the WP-CLI command against.
+             [string] [choices: "development", "tests"] [default: "development"]
+```
+
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.

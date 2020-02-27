@@ -111,7 +111,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'run <container> [command..]',
-		'Runs an arbitrary command in one of the underlying Docker containers.',
+		'Runs a shell command in one of the underlying Docker containers.',
 		( args ) => {
 			args.positional( 'container', {
 				type: 'string',
@@ -123,6 +123,24 @@ module.exports = function cli() {
 			} );
 		},
 		withSpinner( env.run )
+	);
+	yargs.command(
+		'wp [command..]',
+		'Runs a WP-CLI command (https://wp-cli.org) against one of the environments.',
+		( args ) => {
+			args.option( 'environment', {
+				type: 'string',
+				describe:
+					'Which environment to run the WP-CLI command against.',
+				choices: [ 'development', 'tests' ],
+				default: 'development',
+			} );
+			args.positional( 'command', {
+				type: 'string',
+				describe: 'The command to run.',
+			} );
+		},
+		withSpinner( env.wpCLI )
 	);
 
 	return yargs;

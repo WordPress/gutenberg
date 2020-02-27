@@ -203,18 +203,18 @@ module.exports = {
 	/**
 	 * Runs an arbitrary command on the given Docker container.
 	 *
-	 * @param {Object}  options
-	 * @param {Object}  options.container The Docker container to run the command on.
-	 * @param {Object}  options.command   The command to run.
-	 * @param {Object}  options.spinner   A CLI spinner which indicates progress.
-	 * @param {boolean} options.debug     True if debug mode is enabled.
+	 * @param {Object}   options
+	 * @param {string}   options.container The Docker container to run the command on.
+	 * @param {string[]} options.command   The command to run.
+	 * @param {Object}   options.spinner   A CLI spinner which indicates progress.
+	 * @param {boolean}  options.debug     True if debug mode is enabled.
 	 */
 	async run( { container, command, spinner, debug } ) {
 		const config = await initConfig( { spinner, debug } );
 
-		command = command.join( ' ' );
+		const commandDescription = command.join( ' ' );
 
-		spinner.text = `Running \`${ command }\` in '${ container }'.`;
+		spinner.text = `Running \`${ commandDescription }\` in '${ container }'.`;
 
 		const result = await dockerCompose.run( container, command, {
 			config: config.dockerComposeConfigPath,
@@ -235,7 +235,24 @@ module.exports = {
 			throw result.err;
 		}
 
-		spinner.text = `Ran \`${ command }\` in '${ container }'.`;
+		spinner.text = `Ran \`${ commandDescription }\` in '${ container }'.`;
+	},
+
+	/**
+	 * Runs an WP-CLI against the specified environment.
+	 *
+	 * @param {Object}   options
+	 * @param {string}   options.environment The environment to run against. Either 'development' or 'tests'.
+	 * @param {string[]} options.command     The command to run.
+	 * @param {Object}   options.spinner     A CLI spinner which indicates progress.
+	 * @param {boolean}  options.debug       True if debug mode is enabled.
+	 */
+	async wpCLI( { environment, command, ...options } ) {
+		await module.exports.run( {
+			container: environment === 'development' ? 'cli' : 'tests-cli',
+			command: [ 'wp', ...command ],
+			...options,
+		} );
 	},
 
 	ValidationError,
