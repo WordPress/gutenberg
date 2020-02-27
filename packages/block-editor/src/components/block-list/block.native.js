@@ -194,7 +194,6 @@ class BlockListBlock extends Component {
 			isTouchable,
 			disallowRemoveInnerBlocks,
 			hasChildren,
-			customOnDelete,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -249,7 +248,6 @@ class BlockListBlock extends Component {
 										disallowRemoveInnerBlocks &&
 										! hasChildren
 									}
-									customOnDelete={ customOnDelete }
 								/>
 							) }
 						</View>

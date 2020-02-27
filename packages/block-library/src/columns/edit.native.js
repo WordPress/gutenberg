@@ -52,7 +52,6 @@ function ColumnsEditContainer( {
 	updateColumns,
 	isMobile,
 	columnCount,
-	onDeleteColumn,
 } ) {
 	const { verticalAlignment } = attributes;
 	const [ columnsSettings, setColumnsSettings ] = useState( {
@@ -128,7 +127,6 @@ function ColumnsEditContainer( {
 					containerStyle={ { flex: 1 } }
 					allowedBlocks={ ALLOWED_BLOCKS }
 					disallowRemoveInnerBlocks
-					customOnDelete={ onDeleteColumn }
 					columnsSettings={ columnsSettings }
 				/>
 			</View>
@@ -161,13 +159,10 @@ const ColumnsEditContainerWrapper = withDispatch(
 				} );
 			} );
 		},
-		onDeleteColumn: () => {
-			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
-			const { getSelectedBlockClientId } = registry.select(
-				'core/block-editor'
-			);
-
-			replaceInnerBlocks( getSelectedBlockClientId(), [], false );
+		updateBlockSettings( settings ) {
+			const { clientId } = ownProps;
+			const { updateBlockListSettings } = dispatch( 'core/block-editor' );
+			updateBlockListSettings( clientId, settings );
 		},
 		/**
 		 * Updates the column columnCount, including necessary revisions to child Column
@@ -178,7 +173,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+			const { replaceInnerBlocks, selectBlock } = dispatch(
+				'core/block-editor'
+			);
 			const { getBlocks } = registry.select( 'core/block-editor' );
 
 			let innerBlocks = getBlocks( clientId );
@@ -199,6 +196,16 @@ const ColumnsEditContainerWrapper = withDispatch(
 					innerBlocks,
 					previousColumns - newColumns
 				);
+			}
+
+			if ( innerBlocks.length < MIN_COLUMNS_NUMBER ) {
+				innerBlocks = [
+					...innerBlocks,
+					...times( MIN_COLUMNS_NUMBER - innerBlocks.length, () => {
+						return createBlock( 'core/column' );
+					} ),
+				];
+				selectBlock( clientId );
 			}
 
 			replaceInnerBlocks( clientId, innerBlocks, false );
