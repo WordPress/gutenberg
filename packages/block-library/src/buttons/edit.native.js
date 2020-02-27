@@ -41,13 +41,14 @@ function ButtonsEdit( {
 } ) {
 	const { align } = attributes;
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
+	const shouldRenderFooterAppender = isSelected || isSelectedButton;
 
 	function updateAlignment( nextAlign ) {
 		setAttributes( { align: nextAlign } );
 	}
 
 	function renderAppender() {
-		if ( isSelected || isSelectedButton ) {
+		if ( shouldRenderFooterAppender ) {
 			return (
 				<InnerBlocks.ButtonBlockAppender
 					flex={ false }
@@ -90,6 +91,7 @@ function ButtonsEdit( {
 					customOnDelete={ shouldDelete && onDelete }
 					customOnAdd={ onAddNextButton }
 					parentWidth={ maxWidth }
+					shouldRenderFooterAppender={ shouldRenderFooterAppender }
 				/>
 			</View>
 		</>
