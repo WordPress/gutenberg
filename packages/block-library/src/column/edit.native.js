@@ -27,8 +27,12 @@ function ColumnEdit( {
 	getStylesFromColorScheme,
 	isParentSelected,
 	isDescendantOfParentSelected,
+	isDescendantSelected,
+	isAncestorSelected,
 	isMobile,
 	columnsSettings,
+	isColumnsInRootList,
+	isDeepNested,
 } ) {
 	const { verticalAlignment } = attributes;
 	const { columnsInRow, width: columnsContainerWidth } = columnsSettings;
@@ -57,29 +61,56 @@ function ColumnEdit( {
 			'parent-selected',
 			'descendant-selected',
 			'placeholder-selected',
+			'dashed-border',
 		];
 		const widths = pullWidths( names );
-		const [ , parentSelected, , placeholderSelected ] = widths;
+		const [
+			emptyColumnSelected,
+			parentSelected,
+			columnSelected,
+			placeholderParentSelected,
+			dashedBorderWidth,
+		] = widths;
 
-		if ( isParentSelected ) {
-			width -= placeholder ? placeholderSelected : parentSelected;
-			return { width };
-		}
+		switch ( true ) {
+			case isSelected:
+				width = columnBaseWidth;
+				width -= ! hasChildren
+					? emptyColumnSelected
+					: columnSelected + dashedBorderWidth;
+				break;
 
-		const [ selected, , descendantSelected ] = widths;
+			case isParentSelected:
+				width -= placeholder
+					? placeholderParentSelected
+					: parentSelected;
+				break;
 
-		if ( placeholder ) {
-			if ( isDescendantOfParentSelected ) {
-				width -= selected;
-			} else {
+			case isDescendantSelected:
+				width = columnBaseWidth;
+				break;
+
+			case isDescendantOfParentSelected:
+				width = columnBaseWidth;
+				if ( ! hasChildren ) width -= emptyColumnSelected;
+				break;
+
+			case isAncestorSelected:
+				width = columnBaseWidth;
+				if ( ! hasChildren ) width -= parentSelected;
+				break;
+
+			case placeholder:
 				width -=
-					columnsInRow === 1 ? parentSelected : placeholderSelected;
-				if ( ! hasChildren ) width -= 4;
-			}
-		} else if ( isSelected ) {
-			width -= ! hasChildren ? selected : descendantSelected;
-		} else if ( isDescendantOfParentSelected ) {
-			width += descendantSelected;
+					columnsInRow === 1
+						? parentSelected
+						: placeholderParentSelected;
+				width -= columnSelected;
+				if ( ! isDeepNested ) width -= dashedBorderWidth;
+				if ( isColumnsInRootList ) width -= parentSelected;
+				break;
+
+			default:
 		}
 
 		return { width };
@@ -179,9 +210,13 @@ export default compose( [
 		);
 
 		const parents = getBlockParents( clientId, true );
+		const isColumnsInRootList = !! parents[ 2 ];
 
 		const isAncestorSelected =
 			selectedBlockClientId && parents.includes( selectedBlockClientId );
+		const isDescendantSelected = selectedParents.includes( clientId );
+
+		const isDeepNested = parents.length > 2;
 
 		return {
 			hasChildren,
@@ -189,6 +224,9 @@ export default compose( [
 			isSelected,
 			isDescendantOfParentSelected,
 			isAncestorSelected,
+			isDescendantSelected,
+			isColumnsInRootList,
+			isDeepNested,
 		};
 	} ),
 	withViewportMatch( { isMobile: '< mobile' } ),

@@ -37,11 +37,15 @@
 }
 
 .column-selected-margin {
-	width: 2 * $block-padding;
+	width: 2 * $block-edge-to-content;
 }
 
 .column-descendant-selected-margin {
-	width: $block-selected-margin + $block-selected-border-width;
+	width: 2 * $block-selected-margin;
+}
+
+.column-dashed-border-margin {
+	width: 2 * $block-selected-border-width;
 }
 
 .is-vertically-aligned-top {
