@@ -64,6 +64,7 @@ function Editor( { settings: _settings } ) {
 									content={
 										<>
 											<Notices />
+											<Popover.Slot name="block-toolbar" />
 											<BlockEditor />
 										</>
 									}
