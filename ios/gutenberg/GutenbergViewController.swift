@@ -190,6 +190,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("Gutenberg requested media editor for " + mediaUrl.absoluteString)
         callback([MediaInfo(id: 1, url: "https://cldup.com/Fz-ASbo2s3.jpg", type: "image")])
     }
+    
+    func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent) {
+        print("Gutenberg loged user event")
+    }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
