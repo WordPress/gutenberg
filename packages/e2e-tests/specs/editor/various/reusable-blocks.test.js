@@ -117,7 +117,9 @@ describe( 'Reusable blocks', () => {
 		await insertBlock( 'Greeting block' );
 
 		// Put the reusable block in edit mode
-		const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+		const editButton = await page.waitForXPath(
+			'//button[text()="Edit" and not(@disabled)]'
+		);
 		await editButton.click();
 
 		// Change the block's title

@@ -53,7 +53,8 @@ export default compose( [
 		return {
 			isVisible:
 				!! reusableBlock &&
-				!! canUser( 'delete', 'blocks', reusableBlock.id ),
+				( reusableBlock.isTemporary ||
+					!! canUser( 'delete', 'blocks', reusableBlock.id ) ),
 			isDisabled: reusableBlock && reusableBlock.isTemporary,
 		};
 	} ),
