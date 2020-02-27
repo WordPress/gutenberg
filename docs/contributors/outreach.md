@@ -4,7 +4,7 @@ This includes articles, talks, demos and anything the community is doing to disc
 
 ## Articles
 
-A short list of useful articles around defining, extending, and contributing to Gutenberg.
+A short-list of useful articles around defining, extending, and contributing to Gutenberg.
 
 ### Overviews of Gutenberg
 
@@ -35,7 +35,7 @@ A short list of useful articles around defining, extending, and contributing to 
 
 ## Talks
 
-Talks given about Gutenberg, including slides and videos as they are available.
+Talks were given about Gutenberg, including slides and videos as they are available.
 
 ### Slides
 - [The new core WordPress editor](http://kimb.me/talk-bigwp-london-new-core-wordpress-editor/) at BigWP London (18. May 2017)
