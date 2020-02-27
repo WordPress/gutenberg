@@ -71,8 +71,6 @@ export const createQueue = () => {
 	/**
 	 * Callback to process as much queue as time permits.
 	 *
-	 * @type {IdleRequestCallback & FrameRequestCallback}
-	 *
 	 * @param {IdleDeadline|number} deadline Idle callback deadline object, or
 	 *                                       animation frame timestamp.
 	 */
