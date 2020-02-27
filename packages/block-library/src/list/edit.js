@@ -7,6 +7,7 @@ import {
 	RichText,
 	BlockControls,
 	RichTextShortcut,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 import {
@@ -146,7 +147,7 @@ export default function ListEdit( {
 			<RichText
 				identifier="values"
 				multiline="li"
-				tagName={ tagName }
+				tagName={ Block[ tagName ] }
 				onChange={ ( nextValues ) =>
 					setAttributes( { values: nextValues } )
 				}
