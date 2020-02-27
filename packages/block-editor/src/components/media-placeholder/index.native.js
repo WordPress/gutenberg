@@ -37,6 +37,7 @@ function MediaPlaceholder( props ) {
 		labels = {},
 		icon,
 		onSelect,
+		__experimentalOnlyMediaLibrary,
 		isAppender,
 		disableMediaButtons,
 		getStylesFromColorScheme,
@@ -141,6 +142,9 @@ function MediaPlaceholder( props ) {
 			<MediaUpload
 				allowedTypes={ allowedTypes }
 				onSelect={ setMedia }
+				__experimentalOnlyMediaLibrary={
+					__experimentalOnlyMediaLibrary
+				}
 				multiple={ multiple }
 				render={ ( { open, getMediaOptions } ) => {
 					return (

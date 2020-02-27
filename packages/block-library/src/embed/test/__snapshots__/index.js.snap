@@ -52,7 +52,7 @@ exports[`core/embed block edit matches snapshot 1`] = `
         value=""
       />
       <button
-        class="components-button is-secondary"
+        class="components-button is-primary"
         type="submit"
       >
         Embed

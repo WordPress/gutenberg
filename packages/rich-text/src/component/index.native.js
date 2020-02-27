@@ -5,7 +5,7 @@
  */
 import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
-import { pickBy } from 'lodash';
+import { get, pickBy } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -698,6 +698,7 @@ export class RichText extends Component {
 			minWidth,
 			maxWidth,
 			formatTypes,
+			parentBlockStyles,
 			withoutInteractiveFormatting,
 		} = this.props;
 
@@ -806,6 +807,7 @@ export class RichText extends Component {
 						}
 					} }
 					style={ {
+						backgroundColor: styles.richText.backgroundColor,
 						...style,
 						...( this.isIOS && minWidth && maxWidth
 							? { width }
@@ -836,7 +838,11 @@ export class RichText extends Component {
 					}
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
-					color={ ( style && style.color ) || defaultColor }
+					color={
+						( style && style.color ) ||
+						( parentBlockStyles && parentBlockStyles.color ) ||
+						defaultColor
+					}
 					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
@@ -876,8 +882,17 @@ RichText.defaultProps = {
 };
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
-	} ) ),
+	withSelect( ( select, { clientId } ) => {
+		const { getBlockParents, getBlock } = select( 'core/block-editor' );
+		const parents = getBlockParents( clientId, true );
+		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
+		const parentBlockStyles =
+			get( parentBlock, [ 'attributes', 'childrenStyles' ] ) || {};
+
+		return {
+			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
+			...{ parentBlockStyles },
+		};
+	} ),
 	withPreferredColorScheme,
 ] )( RichText );

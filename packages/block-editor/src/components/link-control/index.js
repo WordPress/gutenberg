@@ -12,6 +12,7 @@ import {
 	ExternalLink,
 	Spinner,
 	VisuallyHidden,
+	createSlotFill,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -21,6 +22,7 @@ import {
 	Fragment,
 	useEffect,
 	createElement,
+	useMemo,
 } from '@wordpress/element';
 import {
 	safeDecodeURI,
@@ -40,6 +42,10 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 import LinkControlSearchCreate from './search-create-button';
+
+const { Slot: ViewerSlot, Fill: ViewerFill } = createSlotFill(
+	'BlockEditorLinkControlViewer'
+);
 
 // Used as a unique identifier for the "Create" option within search results.
 // Used to help distinguish the "Create" suggestion within the search results in
@@ -510,6 +516,10 @@ function LinkControl( {
 		);
 	};
 
+	const viewerSlotFillProps = useMemo(
+		() => ( { url: value && value.url } ),
+		[ value && value.url ]
+	);
 	return (
 		<div
 			tabIndex={ -1 }
@@ -574,6 +584,7 @@ function LinkControl( {
 						>
 							{ __( 'Edit' ) }
 						</Button>
+						<ViewerSlot fillProps={ viewerSlotFillProps } />
 					</div>
 				</Fragment>
 			) }
@@ -585,5 +596,7 @@ function LinkControl( {
 		</div>
 	);
 }
+
+LinkControl.ViewerFill = ViewerFill;
 
 export default LinkControl;

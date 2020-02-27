@@ -12,12 +12,7 @@ import SaveButton from '../save-button';
 
 function Header() {
 	return (
-		<div
-			className="edit-widgets-header"
-			role="region"
-			aria-label={ __( 'Widgets screen top bar' ) }
-			tabIndex="-1"
-		>
+		<div className="edit-widgets-header">
 			<NavigableMenu>
 				<Inserter.Slot />
 			</NavigableMenu>

@@ -59,7 +59,6 @@ html.block-editor-editor-skeleton__html-container {
 
 .block-editor-editor-skeleton__content {
 	flex-grow: 1;
-	background-color: $light-gray-700;
 
 	// Treat as flex container to allow children to grow to occupy full
 	// available height of the content area.
@@ -75,26 +74,6 @@ html.block-editor-editor-skeleton__html-container {
 }
 
 .block-editor-editor-skeleton__sidebar {
-	display: none;
-
-	@include break-medium() {
-		display: block;
-		z-index: z-index(".block-editor-editor-skeleton__sidebar");
-		position: fixed !important; // Need to override the default relative positionning
-		top: -9999em;
-		bottom: auto;
-		left: auto;
-		right: 0;
-		width: $sidebar-width;
-
-		&:focus {
-			top: auto;
-			bottom: 0;
-		}
-	}
-}
-
-.is-sidebar-opened .block-editor-editor-skeleton__sidebar {
 	display: block;
 	width: auto; // Keep the sidebar width flexible.
 	flex-shrink: 0;

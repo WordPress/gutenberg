@@ -76,6 +76,7 @@ async function mockCreatePageResponse( title, slug ) {
 
 /**
  * Interacts with the LinkControl to perform a search and select a returned suggestion
+ *
  * @param {string} url What will be typed in the search input
  * @param {string} label What the resulting label will be in the creating Navigation Link Block after the block is created.
  * @param {string} type What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
