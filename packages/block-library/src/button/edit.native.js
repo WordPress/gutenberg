@@ -236,16 +236,11 @@ class ButtonEdit extends Component {
 	}
 
 	onLayout( { nativeEvent } ) {
-		const { parentWidth } = this.props;
 		const { width } = nativeEvent.layout;
-		const { marginRight: spacing } = styles.button;
-
-		if ( ! parentWidth ) {
-			this.setState( { maxWidth: width - spacing } );
-		}
+		this.onSetMaxWidth( width );
 	}
 
-	onSetMaxWidth() {
+	onSetMaxWidth( width ) {
 		const { parentWidth, isSelectedButtonsBlock } = this.props;
 		const { marginRight: unselectedSpacing } = styles.button;
 		const { marginRight: selectedSpacing } = styles.buttonsSelected;
@@ -254,12 +249,12 @@ class ButtonEdit extends Component {
 			? selectedSpacing
 			: unselectedSpacing;
 
-		const maxWidth = parentWidth - 2 * buttonSpacing;
-
 		if ( parentWidth ) {
 			this.setState( {
-				maxWidth,
+				maxWidth: parentWidth - 2 * buttonSpacing,
 			} );
+		} else if ( ! parentWidth && width ) {
+			this.setState( { maxWidth: width - unselectedSpacing } );
 		}
 	}
 
@@ -410,7 +405,9 @@ class ButtonEdit extends Component {
 							this.onToggleButtonFocus( true )
 						}
 						__unstableMobileNoFocusOnMount={ ! isSelected }
-						onBlur={ this.onSetMaxWidth }
+						onBlur={ () => {
+							this.onSetMaxWidth();
+						} }
 						selectionColor={ textColor.color || '#fff' }
 						onReplace={ onReplace }
 						onRemove={ this.onRemove }
