@@ -160,7 +160,7 @@ describe( 'Using Plugins API', () => {
 
 	describe( 'Block Settings Menu Item', () => {
 		it( 'Should render a new item', async () => {
-			clickBlockToolbarButton( 'My new plugin' );
+			await clickBlockToolbarButton( 'My new plugin' );
 
 			expect( console ).toHaveLoggedWith( 'Block clicked' );
 		} );

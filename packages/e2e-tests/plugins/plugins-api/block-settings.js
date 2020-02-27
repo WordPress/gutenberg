@@ -7,7 +7,7 @@
 				label: 'My new plugin',
 				allowedBlocks: [ 'core/paragraph' ],
 				onClick: function() {
-					console.log( 'Block clicked ' );
+					console.log( 'Block clicked' );
 				},
 			},
 			null
