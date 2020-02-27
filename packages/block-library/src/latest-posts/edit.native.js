@@ -34,6 +34,18 @@ class LatestPostsEdit extends Component {
 		this.state = {
 			categoriesList: [],
 		};
+		this.onSetDisplayPostContent = this.onSetDisplayPostContent.bind(
+			this
+		);
+		this.onSetDisplayPostContentRadio = this.onSetDisplayPostContentRadio.bind(
+			this
+		);
+		this.onSetExcerptLength = this.onSetExcerptLength.bind( this );
+		this.onSetDisplayPostDate = this.onSetDisplayPostDate.bind( this );
+		this.onSetOrder = this.onSetOrder.bind( this );
+		this.onSetOrderBy = this.onSetOrderBy.bind( this );
+		this.onSetPostsToShow = this.onSetPostsToShow.bind( this );
+		this.onSetCategories = this.onSetCategories.bind( this );
 	}
 
 	componentDidMount() {
@@ -63,49 +75,49 @@ class LatestPostsEdit extends Component {
 		this.isStillMounted = false;
 	}
 
-	onSetDisplayPostContent = ( value ) => {
+	onSetDisplayPostContent( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { displayPostContent: value } );
-	};
+	}
 
-	onSetDisplayPostContentRadio = ( value ) => {
+	onSetDisplayPostContentRadio( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( {
 			displayPostContentRadio: value ? 'excerpt' : 'full_post',
 		} );
-	};
+	}
 
-	onSetExcerptLength = ( value ) => {
+	onSetExcerptLength( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { excerptLength: value } );
-	};
+	}
 
-	onSetDisplayPostDate = ( value ) => {
+	onSetDisplayPostDate( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { displayPostDate: value } );
-	};
+	}
 
-	onSetOrder = ( value ) => {
+	onSetOrder( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { order: value } );
-	};
+	}
 
-	onSetOrderBy = ( value ) => {
+	onSetOrderBy( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { orderBy: value } );
-	};
+	}
 
-	onSetPostsToShow = ( value ) => {
+	onSetPostsToShow( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { postsToShow: value } );
-	};
+	}
 
-	onSetCategories = ( value ) => {
+	onSetCategories( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( {
 			categories: '' !== value ? value.toString() : undefined,
 		} );
-	};
+	}
 
 	render() {
 		const {
