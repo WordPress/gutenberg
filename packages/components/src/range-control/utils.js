@@ -44,7 +44,7 @@ export function useControlledRangeValue( { min, max, value: valueProp } ) {
 			setClampValue( valueProp );
 			valueRef.current = valueProp;
 		}
-	}, [ valueRef, valueProp, setValue ] );
+	}, [ valueProp, setValue ] );
 
 	return [ value, setValue ];
 }
