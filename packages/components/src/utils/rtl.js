@@ -20,17 +20,17 @@ export function useRtl() {
  * @param {Object} ltrStyles
  * @return {Object} Converted ltr -> rtl styles
  */
-const convertLtrToRtl = ( ltrStyles = {} ) => {
+export const convertLtrToRtl = ( ltrStyles = {} ) => {
 	const nextStyles = {};
 
 	for ( const key in ltrStyles ) {
 		const value = ltrStyles[ key ];
 		let nextKey = key;
-		if ( /left/gi.test( key ) ) {
-			nextKey = [ key.replace( 'left', 'right' ) ];
+		if ( /left/gi.test( nextKey ) ) {
+			nextKey = key.replace( 'left', 'right' );
 		}
-		if ( /Left/gi.test( key ) ) {
-			nextKey = [ key.replace( 'Left', 'Right' ) ];
+		if ( /Left/gi.test( nextKey ) ) {
+			nextKey = key.replace( 'Left', 'Right' );
 		}
 		nextStyles[ nextKey ] = value;
 	}
