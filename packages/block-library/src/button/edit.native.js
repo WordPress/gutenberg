@@ -249,7 +249,7 @@ class ButtonEdit extends Component {
 			? selectedSpacing
 			: unselectedSpacing;
 
-		if ( parentWidth ) {
+		if ( parentWidth && ! width ) {
 			this.setState( {
 				maxWidth: parentWidth - 2 * buttonSpacing,
 			} );
