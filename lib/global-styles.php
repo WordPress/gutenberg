@@ -221,8 +221,8 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 	// (3rd party blocks, custom selectors, etc).
 	$selectors = array(
 		'core'                      => ':root',
-		'core/paragraph'            => '.entry-content p',
-		'custom/paragraph-in-quote' => '.wp-block-quote p',
+		'core/paragraph'            => '.wp-site-blocks p',
+		'custom/paragraph-in-quote' => '.wp-site-blocks .wp-block-quote p',
 	);
 	foreach ( $global_styles as $blockname => $subtree ) {
 		$token    = '--';
