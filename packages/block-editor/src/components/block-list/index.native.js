@@ -91,10 +91,9 @@ export class BlockList extends Component {
 		const {
 			blockClientIds,
 			renderAppender,
-			isSelectedButtonsBlock,
-			isSelectedButtonBlock
+			shouldRenderFooterAppender = false,
 		} = this.props;
-		if ( ! isSelectedButtonsBlock && ! isSelectedButtonBlock ) {
+		if ( ! shouldRenderFooterAppender ) {
 			return renderAppender && blockClientIds.length > 0;
 		}
 		return false;
@@ -213,9 +212,8 @@ export class BlockList extends Component {
 		const {
 			isReadOnly,
 			withFooter = true,
-			isSelectedButtonsBlock,
 			renderAppender,
-			isSelectedButtonBlock
+			shouldRenderFooterAppender,
 		} = this.props;
 
 		if ( ! isReadOnly && withFooter ) {
@@ -230,7 +228,7 @@ export class BlockList extends Component {
 					</TouchableWithoutFeedback>
 				</>
 			);
-		} else if ( (isSelectedButtonsBlock || isSelectedButtonBlock) && renderAppender ) {
+		} else if ( shouldRenderFooterAppender && renderAppender ) {
 			return renderAppender();
 		}
 		return null;
@@ -246,14 +244,12 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSettings,
-			getBlock,
 		} = select( 'core/block-editor' );
 
 		const horizontalDirection =
 			__experimentalMoverDirection === 'horizontal';
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const selectedBlock = getBlock( selectedBlockClientId );
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
@@ -280,10 +276,6 @@ export default compose( [
 			);
 		};
 
-		const isSelectedButtonsBlock =
-			selectedBlock && selectedBlock.name === 'core/buttons';
-		const isSelectedButtonBlock =
-			selectedBlock && selectedBlock.name === 'core/button';
 		const isReadOnly = getSettings().readOnly;
 
 		return {
@@ -295,8 +287,6 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
-			isSelectedButtonsBlock,
-			isSelectedButtonBlock
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

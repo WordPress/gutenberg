@@ -51,6 +51,7 @@ class ButtonEdit extends Component {
 		this.onChangeOpenInNewTab = this.onChangeOpenInNewTab.bind( this );
 		this.onChangeURL = this.onChangeURL.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
+		this.onLayout = this.onLayout.bind( this );
 		this.onSetMaxWidth = this.onSetMaxWidth.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
@@ -71,8 +72,8 @@ class ButtonEdit extends Component {
 	}
 
 	componentDidMount() {
-		if (this.richTextRef) {
-			this.richTextRef.blur()
+		if ( this.richTextRef ) {
+			this.richTextRef.blur();
 		}
 		this.onSetMaxWidth();
 	}
@@ -234,6 +235,16 @@ class ButtonEdit extends Component {
 		this.setState( { isLinkSheetVisible: false } );
 	}
 
+	onLayout( { nativeEvent } ) {
+		const { parentWidth } = this.props;
+		const { width } = nativeEvent.layout;
+		const { marginRight: spacing } = styles.button;
+
+		if ( ! parentWidth ) {
+			this.setState( { maxWidth: width - spacing } );
+		}
+	}
+
 	onSetMaxWidth() {
 		const { parentWidth, isSelectedButtonsBlock } = this.props;
 		const { marginRight: unselectedSpacing } = styles.button;
@@ -244,9 +255,12 @@ class ButtonEdit extends Component {
 			: unselectedSpacing;
 
 		const maxWidth = parentWidth - 2 * buttonSpacing;
-		this.setState( {
-			maxWidth,
-		} );
+
+		if ( parentWidth ) {
+			this.setState( {
+				maxWidth,
+			} );
+		}
 	}
 
 	onRemove() {
@@ -270,7 +284,6 @@ class ButtonEdit extends Component {
 					onChange={ this.onChangeURL }
 					autoCapitalize="none"
 					autoCorrect={ false }
-					autoFocus={ !isCompatibleWithSettings && Platform.OS === 'ios' }
 					separatorType={
 						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
 					}
@@ -313,7 +326,7 @@ class ButtonEdit extends Component {
 			isSelected,
 			clientId,
 			onReplace,
-			mergeBlocks
+			mergeBlocks,
 		} = this.props;
 		const {
 			placeholder,
@@ -354,7 +367,7 @@ class ButtonEdit extends Component {
 		const backgroundColor = this.getBackgroundColor();
 
 		return (
-			<View style={ { flex: 1 } }>
+			<View style={ { flex: 1 } } onLayout={ this.onLayout }>
 				<ColorBackground
 					borderRadiusValue={ borderRadiusValue }
 					backgroundColor={ backgroundColor }
@@ -397,7 +410,7 @@ class ButtonEdit extends Component {
 							this.onToggleButtonFocus( true )
 						}
 						__unstableMobileNoFocusOnMount={ ! isSelected }
-						onBlur={this.onSetMaxWidth}
+						onBlur={ this.onSetMaxWidth }
 						selectionColor={ textColor.color || '#fff' }
 						onReplace={ onReplace }
 						onRemove={ this.onRemove }

@@ -37,7 +37,7 @@ function ButtonsEdit( {
 	onAddNextButton,
 	shouldDelete,
 	isParentSelected,
-	isSelectedButton
+	isSelectedButton,
 } ) {
 	const { align } = attributes;
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
@@ -106,7 +106,10 @@ export default compose(
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const buttonsParents = getBlockParents( clientId, true );
 		const parentId = buttonsParents[ 0 ] || '';
-		const selectedButtonParents = getBlockParents( selectedBlockClientId, true )
+		const selectedButtonParents = getBlockParents(
+			selectedBlockClientId,
+			true
+		);
 		const selectedButtonParentId = selectedButtonParents[ 0 ] || '';
 
 		return {
@@ -117,7 +120,7 @@ export default compose(
 			shouldDelete: getBlockCount( clientId ) === 1,
 			isParentSelected:
 				selectedBlockClientId && selectedBlockClientId === parentId,
-			isSelectedButton: selectedButtonParentId === clientId
+			isSelectedButton: selectedButtonParentId === clientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId }, registry ) => {
