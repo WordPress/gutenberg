@@ -26,7 +26,7 @@ The block editor first became available in December 2018, and we're still hard a
 
 The development hub for the Gutenberg project is on Github at: <a href="https://github.com/wordpress/gutenberg/"> https://github.com/wordpress/gutenberg</a>
 
-Discussion for the project is on <a href="https://make.wordpress.com/core/">Make Blog</a> and the `#core-editor` channel in Slack, <a href="https://make.wordpress.org/chat/">signup information</a>.
+Discussion for the project is on <a href="https://make.wordpress.org/core/">Make Blog</a> and the `#core-editor` channel in Slack, <a href="https://make.wordpress.org/chat/">signup information</a>.
 
 == Frequently Asked Questions ==
 
