@@ -101,9 +101,9 @@ Keep in mind that not all states are available on mobile, so these ones that are
 import { PrimitiveButton } from "@wordpress/primitives";
 
 const MyButton = () => (
-	<Button>
-		Click me!
-	</Button>
+  <Button>
+    Click me!
+  </Button>
 );
 
 ```
@@ -120,8 +120,8 @@ const MyButton = () => (
     margin={4}
     padding={8}
   >
-		Click me!
-	</Button>
+    Click me!
+  </Button>
 );
 
 ```
@@ -172,8 +172,8 @@ const MyButton = () => (
     padding={8}
     additionalStyles={additionalStyles}
   >
-		Click me!
-	</Button>
+    Click me!
+  </Button>
 );
 
 ```
