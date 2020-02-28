@@ -1,3 +1,9 @@
+// This max-width is used to constrain the main editor column, it should not
+// cascade into columns.
+.wp-block-columns .wp-block {
+	max-width: none;
+}
+
 // It needs to be investigated which of these removed styles remain applicable
 // in the editor, but the removal of all the wrapper containers should
 // significantly reduce the amount of corrections needed. The front-end styles
