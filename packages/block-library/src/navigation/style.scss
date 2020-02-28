@@ -1,6 +1,6 @@
-$navigation-menu-height: $grid-unit * 7;
-$navigation-sub-menu-height: $grid-unit * 5;
-$navigation-sub-menu-width: $grid-unit * 25;
+$navigation-menu-height: $grid-unit-10 * 7;
+$navigation-sub-menu-height: $grid-unit-10 * 5;
+$navigation-sub-menu-width: $grid-unit-10 * 25;
 
 /*
 * Frontend: reset the default list styles
@@ -158,30 +158,30 @@ $navigation-sub-menu-width: $grid-unit * 25;
 			display: flex;
 			align-items: center;
 			width: max-content;
-			padding: $grid-unit * 0.75 $grid-unit * 2;
+			padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
 		}
 
 		// Submenu links only
 		.wp-block-navigation-link {
 
 			&:first-child:not(:only-child) .wp-block-navigation-link__content {
-				padding-top: $grid-unit;
+				padding-top: $grid-unit-10;
 			}
 
 			&:last-child .wp-block-navigation-link__content {
-				padding-bottom: $grid-unit;
+				padding-bottom: $grid-unit-10;
 			}
 		}
 
 		&.has-child .wp-block-navigation-link__content {
 			min-width: 100%;
-			padding-right: $grid-unit * 4;
+			padding-right: $grid-unit-10 * 4;
 			position: relative;
 		}
 
 		.wp-block-navigation-link__submenu-icon {
 			position: absolute;
-			right: $grid-unit * 2;
+			right: $grid-unit-10 * 2;
 
 			svg {
 				fill: currentColor;
