@@ -61,7 +61,7 @@
 
 			// Between mobile and large viewports, allow 2 columns.
 			@include break-small() {
-				flex-basis: calc(50% - (#{$grid-size-large}));
+				flex-basis: calc(50% - (#{$grid-unit-20}));
 				flex-grow: 0;
 				margin-left: 0;
 				margin-right: 0;
