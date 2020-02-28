@@ -6,14 +6,15 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 
 /**
- * @typedef {import('./config').Config} Config
+ * @typedef {import('./config').WPConfig} WPConfig
  */
 
 /**
  * Creates a docker-compose config object which, when serialized into a
  * docker-compose.yml file, tells docker-compose how to run the environment.
  *
- * @param {Config} config A wp-env config object.
+ * @param {WPConfig} config A wp-env config object.
+ *
  * @return {Object} A docker-compose config object, ready to serialize into YAML.
  */
 module.exports = function buildDockerComposeConfig( config ) {
