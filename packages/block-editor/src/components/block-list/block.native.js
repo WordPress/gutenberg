@@ -206,16 +206,18 @@ class BlockListBlock extends Component {
 				<View accessibilityLabel={ accessibilityLabel }>
 					{ isSelected && (
 						<FloatingToolbar>
-							<Toolbar passedStyle={ styles.toolbar }>
-								<ToolbarButton
-									title={ __( 'Navigate Up' ) }
-									onClick={ () =>
-										this.props.onSelect( parentId )
-									}
-									icon={ NavigateUpSVG }
-								/>
-								<View style={ styles.pipe } />
-							</Toolbar>
+							{ this.props.hasParent && (
+								<Toolbar passedStyle={ styles.toolbar }>
+									<ToolbarButton
+										title={ __( 'Navigate Up' ) }
+										onClick={ () =>
+											this.props.onSelect( parentId )
+										}
+										icon={ NavigateUpSVG }
+									/>
+									<View style={ styles.pipe } />
+								</Toolbar>
+							) }
 							<Breadcrumbs clientId={ clientId } />
 						</FloatingToolbar>
 					) }
