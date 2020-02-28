@@ -13,7 +13,6 @@ import {
 	includes,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -312,9 +311,7 @@ export class InserterMenu extends Component {
 		/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 		return (
 			<div
-				className={ classnames( 'block-editor-inserter__menu', {
-					'has-help-panel': hasHelpPanel,
-				} ) }
+				className="block-editor-inserter__menu"
 				onKeyPress={ stopKeyPropagation }
 				onKeyDown={ this.onKeyDown }
 			>
@@ -465,8 +462,12 @@ export class InserterMenu extends Component {
 							} }
 						</__experimentalInserterMenuExtension.Slot>
 					</div>
+					{ showInserterHelpPanel && (
+						<div className="block-editor-inserter__tips">
+							<Tips />
+						</div>
+					) }
 				</div>
-
 				{ hasHelpPanel && (
 					<div className="block-editor-inserter__menu-help-panel">
 						{ hoveredItem && (
@@ -535,7 +536,6 @@ export class InserterMenu extends Component {
 										) }
 									</p>
 								</div>
-								<Tips />
 							</div>
 						) }
 					</div>
