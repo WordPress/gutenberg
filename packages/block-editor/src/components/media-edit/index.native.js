@@ -1,18 +1,14 @@
 /**
- * External dependencies
- */
-import React from 'react';
-import {
-	requestMediaEditor,
-	mediaSources,
-} from 'react-native-gutenberg-bridge';
-
-/**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
 import { update } from '@wordpress/icons';
+import {
+	requestMediaEditor,
+	mediaSources,
+} from '@wordpress/react-native-bridge';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 
@@ -36,7 +32,7 @@ const replaceOption = {
 
 const options = [ editOption, replaceOption ];
 
-export class MediaEdit extends React.Component {
+export class MediaEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );

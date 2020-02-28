@@ -17,13 +17,13 @@ import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 
 import com.brentvatne.react.ReactVideoPackage;
+import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.LifecycleState;
@@ -31,8 +31,8 @@ import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
 import com.horcrux.svg.SvgPackage;
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 
 import org.wordpress.android.util.AppLog;
@@ -74,6 +74,7 @@ public class WPAndroidGlueCode {
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
+    private OnMediaEditorListener mOnMediaEditorListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -147,6 +148,10 @@ public class WPAndroidGlueCode {
 
     public interface OnEditorAutosaveListener {
         void onEditorAutosave();
+    }
+
+    public interface OnMediaEditorListener {
+        void onMediaEditorClicked(String mediaUrl);
     }
 
     public void mediaSelectionCancelled() {
@@ -297,7 +302,7 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<String> onError) {
+            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<Bundle> onError) {
                 mRequestExecutor.performRequest(pathFromJS, onSuccess, onError);
             }
 
@@ -305,13 +310,20 @@ public class WPAndroidGlueCode {
             public void requestImageFullscreenPreview(String mediaUrl) {
                 mOnImageFullscreenPreviewListener.onImageFullscreenPreviewClicked(mediaUrl);
             }
+
+            @Override
+            public void requestMediaEditor(MediaUploadCallback mediaUploadCallback, String mediaUrl) {
+                mMediaPickedByUserOnBlock = true;
+                mPendingMediaUploadCallback = mediaUploadCallback;
+                mOnMediaEditorListener.onMediaEditorClicked(mediaUrl);
+            }
         });
 
         return Arrays.asList(
                 new MainReactPackage(getMainPackageConfig(getImagePipelineConfig(sOkHttpClient))),
                 new SvgPackage(),
+                new LinearGradientPackage(),
                 new ReactAztecPackage(),
-                new RNRecyclerviewListPackage(),
                 new ReactVideoPackage(),
                 new ReactSliderPackage(),
                 mRnReactNativeGutenbergBridgePackage);
@@ -345,6 +357,7 @@ public class WPAndroidGlueCode {
                                     .setJSMainModulePath("index")
                                     .addPackages(getPackages())
                                     .setUseDeveloperSupport(isDebug)
+                                    .setJavaScriptExecutorFactory(new HermesExecutorFactory())
                                     .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
         if (!buildGutenbergFromSource) {
             builder.setBundleAssetName("index.android.bundle");
@@ -378,7 +391,8 @@ public class WPAndroidGlueCode {
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
                                   RequestExecutor fetchExecutor,
-                                  OnImageFullscreenPreviewListener onImageFullscreenPreviewListener) {
+                                  OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
+                                  OnMediaEditorListener onMediaEditorListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
@@ -388,6 +402,7 @@ public class WPAndroidGlueCode {
         mOnEditorAutosaveListener = onEditorAutosaveListener;
         mRequestExecutor = fetchExecutor;
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
+        mOnMediaEditorListener = onMediaEditorListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -628,6 +643,12 @@ public class WPAndroidGlueCode {
             } else {
                 rnMediaList.addAll(mediaList);
                 mPendingMediaUploadCallback.onUploadMediaFileSelected(rnMediaList);
+            }
+        } else {
+            // This case is for media that is shared from the device
+            for (Media mediaToAppend : mediaList) {
+                sendOrDeferAppendMediaSignal(mediaToAppend.getId(), mediaToAppend.getUrl(),
+                        mediaToAppend.getType());
             }
         }
 

@@ -23,7 +23,7 @@ module.exports = {
 	settings: {
 		react: {
 			pragma: "React",
-			version: "16.8.3",
+			version: "detect",
 			flowVersion: "0.92.0",
 		},
 	},

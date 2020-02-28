@@ -9,9 +9,7 @@ import { View } from 'react-native';
  */
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	subscribeMediaUpload,
-} from '@wordpress/react-native-bridge';
+import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies

@@ -34,40 +34,16 @@
 const fs = require( 'fs' );
 
 const sass = require( 'node-sass' );
-const semver = require( 'semver' );
 const css2rn = require( 'css-to-react-native-transform' ).default;
 const path = require( 'path' );
 
-let upstreamTransformer = null;
-
-const reactNativeVersionString = require( 'react-native/package.json' ).version;
-const reactNativeMinorVersion = semver( reactNativeVersionString ).minor;
-
-if ( reactNativeMinorVersion >= 59 ) {
-	upstreamTransformer = require( 'metro-react-native-babel-transformer' );
-} else if ( reactNativeMinorVersion >= 56 ) {
-	upstreamTransformer = require( 'metro/src/reactNativeTransformer' );
-} else if ( reactNativeMinorVersion >= 52 ) {
-	upstreamTransformer = require( 'metro/src/transformer' );
-} else if ( reactNativeMinorVersion >= 47 ) {
-	upstreamTransformer = require( 'metro-bundler/src/transformer' );
-} else if ( reactNativeMinorVersion === 46 ) {
-	upstreamTransformer = require( 'metro-bundler/build/transformer' );
-} else {
-	// handle RN <= 0.45
-	const oldUpstreamTransformer = require( 'react-native/packager/transformer' );
-	upstreamTransformer = {
-		transform( { src, filename, options } ) {
-			return oldUpstreamTransformer.transform( src, filename, options );
-		},
-	};
-}
+const upstreamTransformer = require( 'metro-react-native-babel-transformer' );
 
 // TODO: need to find a way to pass the include paths and the default asset files via some config
 const autoImportIncludePaths = [
 	path.join( path.dirname( __filename ), 'src' ),
-	path.join( path.dirname( __filename ), 'gutenberg/assets/stylesheets' ),
-	path.join( path.dirname( __filename ), 'gutenberg/packages/base-styles' ),
+	path.join( path.dirname( __filename ), '../../assets/stylesheets' ),
+	path.join( path.dirname( __filename ), '../base-styles' ),
 ];
 const autoImportAssets = [
 	'_colors.scss',

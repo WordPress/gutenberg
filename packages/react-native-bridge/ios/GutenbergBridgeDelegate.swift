@@ -133,7 +133,11 @@ public protocol GutenbergBridgeDelegate: class {
 
     /// Tells the delegate to display a fullscreen image from a given URL
     ///
-    func gutenbergDidRequestFullscreenImage(with mediaUrl: URL)
+    func gutenbergDidRequestImagePreview(with mediaUrl: URL, thumbUrl: URL?)
+
+    /// Tells the delegate to display the media editor from a given URL
+    ///
+    func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

@@ -51,9 +51,7 @@ module.exports = {
 			'|'
 		) })$` ]: '<rootDir>/packages/$1/src',
 	},
-	modulePathIgnorePatterns: [
-		'<rootDir>/packages/react-native',
-	],
+	modulePathIgnorePatterns: [ '<rootDir>/packages/react-native' ],
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [ 'android', 'ios', 'native' ],
