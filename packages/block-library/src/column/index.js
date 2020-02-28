@@ -26,6 +26,7 @@ export const settings = {
 		html: false,
 	},
 	getEditWrapperProps( attributes ) {
+		console.log( 'test' );
 		const { width } = attributes;
 		if ( Number.isFinite( width ) ) {
 			return {
