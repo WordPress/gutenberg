@@ -40,6 +40,7 @@ function gutenberg_reregister_core_block_types() {
 		'post-date.php'           => 'core/post-date',
 		'post-excerpt.php'        => 'core/post-excerpt',
 		'post-featured-image.php' => 'core/post-featured-image',
+		'post-tags.php'           => 'core/post-tags',
 	);
 
 	$registry = WP_Block_Type_Registry::get_instance();

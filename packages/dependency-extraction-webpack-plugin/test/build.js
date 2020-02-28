@@ -47,12 +47,16 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 				expect( err ).toBeNull();
 
 				const assetFiles = glob(
-					`${ outputDirectory }/*.asset.@(json|php)`
+					`${ outputDirectory }/+(*.asset|assets).@(json|php)`
 				);
-				const expectedLength =
+				const hasCombinedAssets = ( options.plugins || [] ).some(
+					( plugin ) => !! ( plugin.options || {} ).combineAssets
+				);
+				const entrypointCount =
 					typeof options.entry === 'object'
 						? Object.keys( options.entry ).length
 						: 1;
+				const expectedLength = hasCombinedAssets ? 1 : entrypointCount;
 				expect( assetFiles ).toHaveLength( expectedLength );
 
 				// Asset files should match.

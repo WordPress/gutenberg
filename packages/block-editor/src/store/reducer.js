@@ -1448,23 +1448,6 @@ export function automaticChangeStatus( state, action ) {
 	// Reset the state by default (for any action not handled).
 }
 
-/**
- * Reducer returning the editing canvas device type.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function deviceType( state = 'Desktop', action ) {
-	switch ( action.type ) {
-		case 'SET_PREVIEW_DEVICE_TYPE':
-			return action.deviceType;
-	}
-
-	return state;
-}
-
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1484,5 +1467,4 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	isNavigationMode,
 	automaticChangeStatus,
-	deviceType,
 } );

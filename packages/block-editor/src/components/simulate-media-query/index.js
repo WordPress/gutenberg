@@ -15,9 +15,10 @@ const DISABLED_MEDIA_QUERY = '(min-width:999999px)';
 const VALID_MEDIA_QUERY_REGEX = /\((min|max)-width:[^\(]*?\)/g;
 
 function getStyleSheetsThatMatchHostname() {
-	if ( ! window ) {
-		return;
+	if ( typeof window === 'undefined' ) {
+		return [];
 	}
+
 	return filter(
 		get( window, [ 'document', 'styleSheets' ], [] ),
 		( styleSheet ) => {
@@ -74,6 +75,13 @@ export default function useSimulatedMediaQuery( marker, width ) {
 				++ruleIndex
 			) {
 				const rule = styleSheet.cssRules[ ruleIndex ];
+				if (
+					rule.type !== window.CSSRule.STYLE_RULE &&
+					rule.type !== window.CSSRule.MEDIA_RULE
+				) {
+					continue;
+				}
+
 				if (
 					! relevantSection &&
 					!! rule.cssText.match( new RegExp( `#start-${ marker }` ) )

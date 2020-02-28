@@ -2027,7 +2027,7 @@ exports[`Storyshots Components/ColorPalette Default 1`] = `
         onClick={[Function]}
         type="button"
       >
-        Custom Color
+        Custom color
       </button>
     </div>
     <button
@@ -2124,7 +2124,7 @@ exports[`Storyshots Components/ColorPalette With Knobs 1`] = `
         onClick={[Function]}
         type="button"
       >
-        Custom Color
+        Custom color
       </button>
     </div>
     <button
@@ -2338,8 +2338,8 @@ exports[`Storyshots Components/ColorPicker Alpha Enabled 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+            <polygon
+              points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
             />
           </svg>
         </button>
@@ -2512,8 +2512,8 @@ exports[`Storyshots Components/ColorPicker Default 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+            <polygon
+              points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
             />
           </svg>
         </button>
@@ -2532,12 +2532,12 @@ exports[`Storyshots Components/CustomSelectControl Default 1`] = `
     htmlFor="downshift-null-toggle-button"
     id="downshift-null-label"
   >
-    Font Size
+    Font size
   </label>
   <button
     aria-expanded={false}
     aria-haspopup="listbox"
-    aria-label="Font Size"
+    aria-label="Font size"
     className="components-button components-custom-select-control__button is-small"
     id="downshift-null-toggle-button"
     onClick={[Function]}
@@ -2554,8 +2554,8 @@ exports[`Storyshots Components/CustomSelectControl Default 1`] = `
       width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+      <polygon
+        points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
       />
     </svg>
   </button>
@@ -3054,7 +3054,7 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
   <legend
     className="screen-reader-text"
   >
-    Font Size
+    Font size
   </legend>
   <div
     className="components-font-size-picker__controls"
@@ -3067,12 +3067,12 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
         htmlFor="downshift-null-toggle-button"
         id="downshift-null-label"
       >
-        Preset Size
+        Preset size
       </label>
       <button
         aria-expanded={false}
         aria-haspopup="listbox"
-        aria-label="Preset Size"
+        aria-label="Preset size"
         className="components-button components-custom-select-control__button is-small"
         id="downshift-null-toggle-button"
         onClick={[Function]}
@@ -3090,8 +3090,8 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
           width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path
-            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+          <polygon
+            points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
           />
         </svg>
       </button>
@@ -3344,7 +3344,7 @@ input[type='number'].emotion-18 {
   <legend
     className="screen-reader-text"
   >
-    Font Size
+    Font size
   </legend>
   <div
     className="components-font-size-picker__controls"
@@ -3357,12 +3357,12 @@ input[type='number'].emotion-18 {
         htmlFor="downshift-null-toggle-button"
         id="downshift-null-label"
       >
-        Preset Size
+        Preset size
       </label>
       <button
         aria-expanded={false}
         aria-haspopup="listbox"
-        aria-label="Preset Size"
+        aria-label="Preset size"
         className="components-button components-custom-select-control__button is-small"
         id="downshift-null-toggle-button"
         onClick={[Function]}
@@ -3380,8 +3380,8 @@ input[type='number'].emotion-18 {
           width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path
-            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+          <polygon
+            points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
           />
         </svg>
       </button>
@@ -3542,7 +3542,7 @@ exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
   <legend
     className="screen-reader-text"
   >
-    Font Size
+    Font size
   </legend>
   <div
     className="components-font-size-picker__controls"
@@ -3555,12 +3555,12 @@ exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
         htmlFor="downshift-null-toggle-button"
         id="downshift-null-label"
       >
-        Preset Size
+        Preset size
       </label>
       <button
         aria-expanded={false}
         aria-haspopup="listbox"
-        aria-label="Preset Size"
+        aria-label="Preset size"
         className="components-button components-custom-select-control__button is-small"
         id="downshift-null-toggle-button"
         onClick={[Function]}
@@ -3578,8 +3578,8 @@ exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
           width={24}
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path
-            d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+          <polygon
+            points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
           />
         </svg>
       </button>
@@ -4138,8 +4138,8 @@ exports[`Storyshots Components/Panel Default 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            <polygon
+              points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
             />
           </svg>
         </span>
@@ -4191,8 +4191,8 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            <polygon
+              points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
             />
           </svg>
         </span>
@@ -4230,8 +4230,8 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+            <polygon
+              points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
             />
           </svg>
         </span>
@@ -4278,8 +4278,8 @@ exports[`Storyshots Components/Panel With Icon 1`] = `
             width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+            <polygon
+              points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
             />
           </svg>
         </span>
@@ -5674,6 +5674,549 @@ input[type='number'].emotion-14 {
         value={0}
       />
     </span>
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components/RangeControl Multiple 1`] = `
+.emotion-16 {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+}
+
+.emotion-12 {
+  box-sizing: border-box;
+  color: #007cba;
+  display: block;
+  padding-top: 15px;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  margin-left: 10px;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-2 {
+  background-color: #d7dade;
+  box-sizing: border-box;
+  left: 0;
+  pointer-events: none;
+  right: 0;
+  display: block;
+  height: 3px;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-4 {
+  background-color: currentColor;
+  border-radius: 1px;
+  box-sizing: border-box;
+  height: 3px;
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  margin-top: 14px;
+  top: 0;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-top: 5px;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 20px;
+  margin-left: -10px;
+}
+
+.emotion-6 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid #7e8993;
+  box-sizing: border-box;
+  height: 100%;
+  outline: 0;
+  pointer-events: none;
+  position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  border-color: #7e8993;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.emotion-10 {
+  background: #23282d;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: white;
+  display: inline-block;
+  font-size: 11px;
+  min-width: 32px;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  text-align: center;
+  -webkit-transition: opacity 120ms ease;
+  transition: opacity 120ms ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0;
+  margin-top: -4px;
+  top: -100%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-10::after {
+  border: 6px solid #23282d;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  bottom: -6px;
+  box-sizing: border-box;
+  content: '';
+  height: 0;
+  left: 50%;
+  line-height: 0;
+  margin-left: -6px;
+  position: absolute;
+  width: 0;
+}
+
+.emotion-10::after {
+  border-bottom: none;
+  border-top-style: solid;
+  bottom: -6px;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-10 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-14 {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-top: 0;
+  min-width: 54px;
+  max-width: 120px;
+  margin-left: 16px;
+}
+
+input[type='number'].emotion-14 {
+  height: 30px;
+  min-height: 30px;
+}
+
+.emotion-72 {
+  padding: 60px 40px;
+}
+
+<div
+  className="emotion-72 emotion-73"
+>
+  <div
+    className="components-base-control components-range-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <span
+        className="components-range-control__root emotion-16 emotion-17"
+      >
+        <span
+          className="components-range-control__wrapper emotion-12 emotion-13"
+          color="#00669b"
+        >
+          <input
+            aria-hidden={false}
+            className="components-range-control__slider emotion-0 emotion-1"
+            disabled={false}
+            id="inspector-range-control-9"
+            max={100}
+            min={0}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            step={1}
+            tabIndex={0}
+            type="range"
+            value={5}
+          />
+          <span
+            aria-hidden={true}
+            className="emotion-2 emotion-3"
+          />
+          <span
+            aria-hidden={true}
+            className="components-range-control__track emotion-4 emotion-5"
+            style={
+              Object {
+                "width": "5%",
+              }
+            }
+          />
+          <span
+            className="emotion-8 emotion-9"
+            style={
+              Object {
+                "left": "5%",
+              }
+            }
+          >
+            <span
+              aria-hidden={true}
+              className="emotion-6 emotion-7"
+            />
+          </span>
+          <span
+            aria-hidden={false}
+            className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            role="tooltip"
+            style={
+              Object {
+                "left": "5%",
+                "zIndex": 100,
+              }
+            }
+          >
+            5
+          </span>
+        </span>
+        <input
+          className="components-range-control__number emotion-14 emotion-133"
+          inputMode="decimal"
+          max={100}
+          min={0}
+          onChange={[Function]}
+          step={1}
+          type="number"
+          value={5}
+        />
+      </span>
+    </div>
+  </div>
+  <div
+    className="components-base-control components-range-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <span
+        className="components-range-control__root emotion-16 emotion-17"
+      >
+        <span
+          className="components-range-control__wrapper emotion-12 emotion-13"
+          color="#00669b"
+        >
+          <input
+            aria-hidden={false}
+            className="components-range-control__slider emotion-0 emotion-1"
+            disabled={false}
+            id="inspector-range-control-10"
+            max={100}
+            min={0}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            step={1}
+            tabIndex={0}
+            type="range"
+            value={5}
+          />
+          <span
+            aria-hidden={true}
+            className="emotion-2 emotion-3"
+          />
+          <span
+            aria-hidden={true}
+            className="components-range-control__track emotion-4 emotion-5"
+            style={
+              Object {
+                "width": "5%",
+              }
+            }
+          />
+          <span
+            className="emotion-8 emotion-9"
+            style={
+              Object {
+                "left": "5%",
+              }
+            }
+          >
+            <span
+              aria-hidden={true}
+              className="emotion-6 emotion-7"
+            />
+          </span>
+          <span
+            aria-hidden={false}
+            className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            role="tooltip"
+            style={
+              Object {
+                "left": "5%",
+                "zIndex": 100,
+              }
+            }
+          >
+            5
+          </span>
+        </span>
+        <input
+          className="components-range-control__number emotion-14 emotion-133"
+          inputMode="decimal"
+          max={100}
+          min={0}
+          onChange={[Function]}
+          step={1}
+          type="number"
+          value={5}
+        />
+      </span>
+    </div>
+  </div>
+  <div
+    className="components-base-control components-range-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <span
+        className="components-range-control__root emotion-16 emotion-17"
+      >
+        <span
+          className="components-range-control__wrapper emotion-12 emotion-13"
+          color="#00669b"
+        >
+          <input
+            aria-hidden={false}
+            className="components-range-control__slider emotion-0 emotion-1"
+            disabled={false}
+            id="inspector-range-control-11"
+            max={100}
+            min={0}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            step={1}
+            tabIndex={0}
+            type="range"
+            value={5}
+          />
+          <span
+            aria-hidden={true}
+            className="emotion-2 emotion-3"
+          />
+          <span
+            aria-hidden={true}
+            className="components-range-control__track emotion-4 emotion-5"
+            style={
+              Object {
+                "width": "5%",
+              }
+            }
+          />
+          <span
+            className="emotion-8 emotion-9"
+            style={
+              Object {
+                "left": "5%",
+              }
+            }
+          >
+            <span
+              aria-hidden={true}
+              className="emotion-6 emotion-7"
+            />
+          </span>
+          <span
+            aria-hidden={false}
+            className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            role="tooltip"
+            style={
+              Object {
+                "left": "5%",
+                "zIndex": 100,
+              }
+            }
+          >
+            5
+          </span>
+        </span>
+        <input
+          className="components-range-control__number emotion-14 emotion-133"
+          inputMode="decimal"
+          max={100}
+          min={0}
+          onChange={[Function]}
+          step={1}
+          type="number"
+          value={5}
+        />
+      </span>
+    </div>
+  </div>
+  <div
+    className="components-base-control components-range-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <span
+        className="components-range-control__root emotion-16 emotion-17"
+      >
+        <span
+          className="components-range-control__wrapper emotion-12 emotion-13"
+          color="#00669b"
+        >
+          <input
+            aria-hidden={false}
+            className="components-range-control__slider emotion-0 emotion-1"
+            disabled={false}
+            id="inspector-range-control-12"
+            max={100}
+            min={0}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            step={1}
+            tabIndex={0}
+            type="range"
+            value={5}
+          />
+          <span
+            aria-hidden={true}
+            className="emotion-2 emotion-3"
+          />
+          <span
+            aria-hidden={true}
+            className="components-range-control__track emotion-4 emotion-5"
+            style={
+              Object {
+                "width": "5%",
+              }
+            }
+          />
+          <span
+            className="emotion-8 emotion-9"
+            style={
+              Object {
+                "left": "5%",
+              }
+            }
+          >
+            <span
+              aria-hidden={true}
+              className="emotion-6 emotion-7"
+            />
+          </span>
+          <span
+            aria-hidden={false}
+            className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            role="tooltip"
+            style={
+              Object {
+                "left": "5%",
+                "zIndex": 100,
+              }
+            }
+          >
+            5
+          </span>
+        </span>
+        <input
+          className="components-range-control__number emotion-14 emotion-133"
+          inputMode="decimal"
+          max={100}
+          min={0}
+          onChange={[Function]}
+          step={1}
+          type="number"
+          value={5}
+        />
+      </span>
+    </div>
   </div>
 </div>
 `;
@@ -7344,6 +7887,58 @@ exports[`Storyshots Components/ScrollLock Default 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/SelectControl Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-select-control-0"
+    >
+      Label Text
+    </label>
+    <select
+      aria-describedby="inspector-select-control-0__help"
+      className="components-select-control__input"
+      id="inspector-select-control-0"
+      multiple={false}
+      onChange={[Function]}
+    >
+      <option
+        disabled={true}
+        value={null}
+      >
+        Select an Option
+      </option>
+      <option
+        value="a"
+      >
+        Option A
+      </option>
+      <option
+        value="b"
+      >
+        Option B
+      </option>
+      <option
+        value="c"
+      >
+        Option C
+      </option>
+    </select>
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-select-control-0__help"
+  >
+    Help text to explain the select control.
+  </p>
+</div>
+`;
+
 exports[`Storyshots Components/Snackbar Default 1`] = `
 <div
   className="components-snackbar"
@@ -7440,6 +8035,36 @@ exports[`Storyshots Components/TabPanel Default 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/TextControl Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-text-control-3"
+    >
+      Label Text
+    </label>
+    <input
+      aria-describedby="inspector-text-control-3__help"
+      className="components-text-control__input"
+      id="inspector-text-control-3"
+      onChange={[Function]}
+      type="text"
+    />
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-text-control-3__help"
+  >
+    Help text to explain the input.
+  </p>
+</div>
+`;
+
 exports[`Storyshots Components/TextHighlight Default 1`] = `
 Array [
   "We call the new editor ",
@@ -7448,6 +8073,36 @@ Array [
   </mark>,
   ". The entire editing experience has been rebuilt for media rich pages and posts.",
 ]
+`;
+
+exports[`Storyshots Components/TextareaControl Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-textarea-control-0"
+    >
+      Label Text
+    </label>
+    <textarea
+      aria-describedby="inspector-textarea-control-0__help"
+      className="components-textarea-control__input"
+      id="inspector-textarea-control-0"
+      onChange={[Function]}
+      rows={4}
+    />
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-textarea-control-0__help"
+  >
+    Help text to explain the textarea.
+  </p>
+</div>
 `;
 
 exports[`Storyshots Components/Tip Default 1`] = `
@@ -7577,6 +8232,28 @@ exports[`Storyshots Components/ToggleControl With Help Text 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/ToolTip Default 1`] = `
+<div
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onMouseDown={[Function]}
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
+  style={
+    Object {
+      "border": "1px solid #ccc",
+      "margin": "50px auto",
+      "padding": "20px",
+      "textAlign": "center",
+      "width": "200px",
+    }
+  }
+>
+  Hover for more information
+</div>
+`;
+
 exports[`Storyshots Components/Toolbar Default 1`] = `
 <div
   aria-label="Options"
@@ -7627,7 +8304,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
         aria-expanded={false}
         aria-haspopup="true"
         aria-label="Change text alignment"
-        className="components-button components-dropdown-menu__toggle has-text has-icon"
+        className="components-button components-dropdown-menu__toggle has-icon"
         id="options-toolbar-2"
         onBlur={[Function]}
         onClick={[Function]}
@@ -7652,9 +8329,6 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
             d="M12 5V3H3v2h9zm5 4V7H3v2h14zm-5 4v-2H3v2h9zm5 4v-2H3v2h14z"
           />
         </svg>
-        <span
-          className="components-dropdown-menu__indicator"
-        />
       </button>
     </div>
   </div>
@@ -7776,11 +8450,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
         onMouseLeave={[Function]}
         tabIndex={-1}
         type="button"
-      >
-        <span
-          className="components-dropdown-menu__indicator"
-        />
-      </button>
+      />
     </div>
   </div>
   <div
@@ -9461,8 +10131,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+      <polygon
+        points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
       />
     </svg>
     <svg
@@ -9474,8 +10144,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={36}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+      <polygon
+        points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
       />
     </svg>
     <svg
@@ -9487,8 +10157,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={48}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+      <polygon
+        points="8,9.5 12,13.4 16,9.5 17,10.5 12,15.6 7,10.5 "
       />
     </svg>
   </div>
@@ -9632,8 +10302,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+      <polygon
+        points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
       />
     </svg>
     <svg
@@ -9645,8 +10315,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={36}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+      <polygon
+        points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
       />
     </svg>
     <svg
@@ -9658,8 +10328,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       width={48}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+      <polygon
+        points="16,14.5 12,10.6 8,14.5 7,13.5 12,8.4 17,13.5 "
       />
     </svg>
   </div>

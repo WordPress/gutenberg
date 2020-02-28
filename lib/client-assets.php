@@ -698,3 +698,34 @@ function gutenberg_extend_settings_image_dimensions( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_image_dimensions' );
+
+/**
+ * Load a block pattern by name.
+ *
+ * @param string $name Block Pattern File name.
+ *
+ * @return array Block Pattern Array.
+ */
+function gutenberg_load_block_pattern( $name ) {
+	return json_decode(
+		file_get_contents( __DIR__ . '/patterns/' . $name . '.json' ),
+		true
+	);
+}
+
+/**
+ * Extends block editor settings to include a list of default block patterns.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_block_patterns( $settings ) {
+	$block_patterns                          = [
+		gutenberg_load_block_pattern( 'teams' ),
+		gutenberg_load_block_pattern( 'testimonial' ),
+	];
+	$settings['__experimentalBlockPatterns'] = $block_patterns;
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns' );

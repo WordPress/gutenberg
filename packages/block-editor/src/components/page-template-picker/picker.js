@@ -5,6 +5,11 @@ import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 
 /**
+ * External dependencies
+ */
+import { logUserEvent, userEvents } from 'react-native-gutenberg-bridge';
+
+/**
  * Internal dependencies
  */
 import Button from './button';
@@ -23,6 +28,9 @@ const __experimentalPageTemplatePicker = ( {
 			title: templatePreview.name,
 			blocks: templatePreview.blocks,
 		} );
+		logUserEvent( userEvents.editorSessionTemplateApply, {
+			template: templatePreview.key,
+		} );
 		setTemplatePreview( undefined );
 	};
 
@@ -31,10 +39,18 @@ const __experimentalPageTemplatePicker = ( {
 			<Container>
 				{ templates.map( ( template ) => (
 					<Button
-						key={ template.name }
+						key={ template.key }
 						icon={ template.icon }
 						label={ template.name }
-						onPress={ () => setTemplatePreview( template ) }
+						onPress={ () => {
+							logUserEvent(
+								userEvents.editorSessionTemplatePreview,
+								{
+									template: template.key,
+								}
+							);
+							setTemplatePreview( template );
+						} }
 					/>
 				) ) }
 			</Container>

@@ -9,7 +9,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Heading', () => {
-	const CUSTOM_COLOR_TEXT = 'Custom Color';
+	const CUSTOM_COLOR_TEXT = 'Custom color';
 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `//button[contains(text(),'${ CUSTOM_COLOR_TEXT }')]`;
 	const COLOR_INPUT_FIELD_SELECTOR =
 		'.components-color-palette__picker .components-text-control__input';

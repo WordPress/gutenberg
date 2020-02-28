@@ -50,7 +50,7 @@ class ImageSizeControl extends Component {
 			<>
 				{ ! isEmpty( imageSizeOptions ) && (
 					<SelectControl
-						label={ __( 'Image Size' ) }
+						label={ __( 'Image size' ) }
 						value={ slug }
 						options={ imageSizeOptions }
 						onChange={ onChangeImage }
@@ -59,7 +59,7 @@ class ImageSizeControl extends Component {
 				{ isResizable && (
 					<div className="block-editor-image-size-control">
 						<p className="block-editor-image-size-control__row">
-							{ __( 'Image Dimensions' ) }
+							{ __( 'Image dimensions' ) }
 						</p>
 						<div className="block-editor-image-size-control__row">
 							<TextControl

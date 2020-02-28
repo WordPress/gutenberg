@@ -162,7 +162,7 @@ function Navigation( {
 						className="wp-block-navigation-placeholder__buttons"
 					>
 						<Button
-							isSecondary
+							isPrimary
 							className="wp-block-navigation-placeholder__button"
 							onClick={ handleCreateFromExistingPages }
 							disabled={ ! hasPages }

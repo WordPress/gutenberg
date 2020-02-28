@@ -105,8 +105,8 @@ function ColumnsEditContainer( {
 				<TextColor>
 					<div className={ classes } ref={ ref }>
 						<InnerBlocks
-							templateLock="all"
 							allowedBlocks={ ALLOWED_BLOCKS }
+							__experimentalMoverDirection="horizontal"
 						/>
 					</div>
 				</TextColor>

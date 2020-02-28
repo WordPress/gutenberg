@@ -576,7 +576,7 @@ export class TableEdit extends Component {
 						/>
 						<Button
 							className="wp-block-table__placeholder-button"
-							isSecondary
+							isPrimary
 							type="submit"
 						>
 							{ __( 'Create Table' ) }
@@ -640,7 +640,7 @@ export class TableEdit extends Component {
 							{
 								value: backgroundColor.color,
 								onChange: setBackgroundColor,
-								label: __( 'Background Color' ),
+								label: __( 'Background color' ),
 								disableCustomColors: true,
 								colors: BACKGROUND_COLORS,
 							},

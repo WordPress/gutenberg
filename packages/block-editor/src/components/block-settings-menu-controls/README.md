@@ -5,7 +5,7 @@ Block Settings Menu Controls appear in the block settings dropdown menu when the
 ## Usage
 
 ```jsx
-import { BlockSettingsMenuControls } from '@wordress/components';
+import { BlockSettingsMenuControls } from '@wordress/block-editor';
 import MyButton from './my-toggle-button';
 
 function ReusableBlocksButtons() {
