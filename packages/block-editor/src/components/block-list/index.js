@@ -39,7 +39,7 @@ function BlockList( {
 	__experimentalUIParts = {},
 	tagName = 'div',
 	forwardedRef,
-	style,
+	...props
 } ) {
 	function selector( select ) {
 		const {
@@ -91,7 +91,7 @@ function BlockList( {
 				className
 			) }
 			{ ...__experimentalContainerProps }
-			style={ style }
+			{ ...props }
 		>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection

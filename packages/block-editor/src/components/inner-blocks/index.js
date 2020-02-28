@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, isEqual } from 'lodash';
+import { pick, isEqual, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -162,7 +162,20 @@ class InnerBlocks extends Component {
 			<BlockList
 				rootClientId={ clientId }
 				forwardedRef={ forwardedRef }
-				{ ...props }
+				{ ...omit( props, [
+					'templateLock',
+					'isSmallScreen',
+					'block',
+					'blockListSettings',
+					'parentLock',
+					'isLastBlockChangePersistent',
+					'replaceInnerBlocks',
+					'__unstableMarkNextChangeAsNotPersistent',
+					'updateNestedSettings',
+					'__experimentalMoverDirection',
+					'allowedBlocks',
+					'template',
+				] ) }
 			/>
 		);
 		if ( props.tagName ) {
