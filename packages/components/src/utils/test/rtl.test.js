@@ -22,6 +22,8 @@ describe( 'convertLtrToRtl', () => {
 			borderTopRightRadius: 20,
 			marginRight: 20,
 			paddingRight: 20,
+			// edge cases
+			textCombineUpright: 'none',
 		};
 		const nextStyle = convertLtrToRtl( style );
 
@@ -46,6 +48,9 @@ describe( 'convertLtrToRtl', () => {
 		expect( nextStyle.borderTopLeftRadius ).toBe( 20 );
 		expect( nextStyle.marginLeft ).toBe( 20 );
 		expect( nextStyle.paddingLeft ).toBe( 20 );
+
+		// Edge cases
+		expect( nextStyle.textCombineUpright ).toBe( 'none' );
 	} );
 
 	it( 'converts (*)left <-> (*)right', () => {
@@ -68,6 +73,8 @@ describe( 'convertLtrToRtl', () => {
 			'margin-right': 20,
 			'padding-right': 20,
 			right: 20,
+			// edge cases
+			'text-combine-upright': 'none',
 		};
 		const nextStyle = convertLtrToRtl( style );
 
@@ -94,5 +101,8 @@ describe( 'convertLtrToRtl', () => {
 		expect( nextStyle[ 'margin-left' ] ).toBe( 20 );
 		expect( nextStyle[ 'padding-left' ] ).toBe( 20 );
 		expect( nextStyle.left ).toBe( 20 );
+
+		// Edge cases
+		expect( nextStyle[ 'text-combine-upright' ] ).toBe( 'none' );
 	} );
 } );
