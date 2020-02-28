@@ -12,7 +12,7 @@ buildscript {
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
 
-        aztecVersion = 'v1.3.37'
+        aztecVersion = 'v1.3.38'
     }
 
     repositories {
@@ -85,11 +85,11 @@ repositories {
     maven { url "https://jitpack.io" }
 
     if (!rootProject.ext.buildGutenbergFromSource) {
-         // if not building from source (where the node_modules dir is used), use a remote RN maven repo
-         def reactNativeRepo = 'https://dl.bintray.com/wordpress-mobile/react-native-mirror/'
-         println "Will use the RN maven repo at ${reactNativeRepo}"
-         maven { url reactNativeRepo }
-     }
+        // if not building from source (where the node_modules dir is used), use a remote RN maven repo
+        def reactNativeRepo = 'https://dl.bintray.com/wordpress-mobile/react-native-mirror/'
+        println "Will use the RN maven repo at ${reactNativeRepo}"
+        maven { url reactNativeRepo }
+    }
 }
 
 dependencies {
