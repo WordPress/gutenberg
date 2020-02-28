@@ -58,7 +58,7 @@ Name | Type | Default | Description
 --- | --- | --- | ---
 `disabled` | `bool` | `false` | Whether the button is disabled.
 `focus` | `bool` | `false` | Whether the button is focused.
-`additionalStyles` | `Object` | `{}` | Additional styles for different states
+`additionalStyles` | `Array` | `[]` | Additional styles for different states
 
 In addition, the PrimitiveButton uses the [`styled-system`](https://styled-system.com/) that allows styling the component by props. Please check https://styled-system.com/api to see list of all supported props.
 
@@ -69,12 +69,12 @@ The `additionalStyles` prop:
 - Allows style customizations for each state
 - Allows combining the states
 
-It has to be an `Object` that contains records with styles for particular or mixed states. Every record needs the `states` key, where the value is a string with the state or mixed states concatenated by "`:`" i.e `hover`, `hover:focus:enabled` and the `styles` key with an `Object` value that includes styles that should be aplied.
+It has to be an `Array` that contains records with styles for particular or mixed states. Every record needs the `states` key, where the value is a string with the state or mixed states concatenated by "`:`" i.e `hover`, `hover:focus:enabled` and the `styles` key with an `Object` value that includes styles that should be aplied.
 
 example:
 
 ```js
-{
+[
   {
     states: 'hover',
     styles: {
@@ -87,7 +87,7 @@ example:
       color: 'red',
     },
   },
-}
+]
 ```
 
 Keep in mind that not all states are available on mobile, so these ones that are not supported for current platform will be omitted. For example `hover` is invalid for mobile as there’s no cursor so it will have no impact on mobile app.
@@ -131,7 +131,7 @@ const MyButton = () => (
 ```jsx
 import { PrimitiveButton } from "@wordpress/primitives";
 
-const additionalStyles = {
+const additionalStyles = [
   {
     states: 'hover',
     styles: {
@@ -162,7 +162,7 @@ const additionalStyles = {
       background: '#AAAAAA'
     }
   }
-}
+]
 
 const MyButton = () => (
   <Button
