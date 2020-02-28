@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { convertLtrToRtl } from '../rtl';
+import { convertLTRToRTL } from '../rtl';
 
-describe( 'convertLtrToRtl', () => {
+describe( 'convertLTRToRTL', () => {
 	it( 'converts (*)Left <-> (*)Right', () => {
 		const style = {
 			// left values
@@ -29,7 +29,7 @@ describe( 'convertLtrToRtl', () => {
 			// edge cases
 			textCombineUpright: 'none',
 		};
-		const nextStyle = convertLtrToRtl( style );
+		const nextStyle = convertLTRToRTL( style );
 
 		expect( Object.keys( style ).length ).toBe(
 			Object.keys( nextStyle ).length
@@ -88,7 +88,7 @@ describe( 'convertLtrToRtl', () => {
 			// edge cases
 			'text-combine-upright': 'none',
 		};
-		const nextStyle = convertLtrToRtl( style );
+		const nextStyle = convertLTRToRTL( style );
 
 		expect( Object.keys( style ).length ).toBe(
 			Object.keys( nextStyle ).length

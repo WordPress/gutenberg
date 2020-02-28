@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { css } from '@emotion/core';
+import { mapKeys } from 'lodash';
 
 const LOWER_LEFT_REGEXP = new RegExp( /-left/g );
 const LOWER_RIGHT_REGEXP = new RegExp( /-right/g );
@@ -68,16 +69,8 @@ function getConvertedKey( key ) {
  *
  * @return {Object} Converted ltr -> rtl styles
  */
-export const convertLtrToRtl = ( ltrStyles = {} ) => {
-	const nextStyles = {};
-
-	for ( const key in ltrStyles ) {
-		const value = ltrStyles[ key ];
-		const nextKey = getConvertedKey( key );
-		nextStyles[ nextKey ] = value;
-	}
-
-	return nextStyles;
+export const convertLTRToRTL = ( ltrStyles = {} ) => {
+	return mapKeys( ltrStyles, ( _value, key ) => getConvertedKey( key ) );
 };
 
 /**
@@ -96,6 +89,6 @@ export function rtl( ltrStyles = {}, rtlStyles ) {
 			return isRtl ? css( rtlStyles ) : css( ltrStyles );
 		}
 
-		return isRtl ? css( convertLtrToRtl( ltrStyles ) ) : css( ltrStyles );
+		return isRtl ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
 	};
 }
