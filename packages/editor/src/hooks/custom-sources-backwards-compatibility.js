@@ -6,7 +6,7 @@ import { pickBy, mapValues, isEmpty, mapKeys } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { select as globalSelect, useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -116,3 +116,19 @@ addFilter(
 	'core/editor/custom-sources-backwards-compatibility/shim-attribute-source',
 	shimAttributeSource
 );
+
+// The above filter will only capture blocks registered after the filter was
+// applied. There may already be registered by this point, and those must be
+// updated to apply the shim.
+//
+// The following implementation achieves this, albeit with a couple caveats:
+// - Only blocks registered on the global store will be modified.
+// - The block settings are directly mutated, since there is currently no
+//   mechanism to update an existing block registration. This is the reason for
+//   `getBlockType` separate from `getBlockTypes`, since the latter returns a
+//   _copy_ of the block registration (i.e. the mutation would not affect the
+//   actual registered block settings).
+globalSelect( 'core/blocks' )
+	.getBlockTypes()
+	.map( ( { name } ) => globalSelect( 'core/blocks' ).getBlockType( name ) )
+	.forEach( shimAttributeSource );
