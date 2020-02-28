@@ -26,12 +26,22 @@ export const convertLtrToRtl = ( ltrStyles = {} ) => {
 	for ( const key in ltrStyles ) {
 		const value = ltrStyles[ key ];
 		let nextKey = key;
-		if ( /left/gi.test( nextKey ) ) {
-			nextKey = key.replace( 'left', 'right' );
+
+		// Lowercase flip
+		if ( /left/g.test( key ) ) {
+			nextKey = key.replace( /left/g, 'right' );
 		}
-		if ( /Left/gi.test( nextKey ) ) {
-			nextKey = key.replace( 'Left', 'Right' );
+		if ( /right/g.test( key ) ) {
+			nextKey = key.replace( /right/g, 'left' );
 		}
+		// Capitalized case flip
+		if ( /Left/g.test( key ) ) {
+			nextKey = key.replace( /Left/g, 'Right' );
+		}
+		if ( /Right/g.test( key ) ) {
+			nextKey = key.replace( /Right/g, 'Left' );
+		}
+
 		nextStyles[ nextKey ] = value;
 	}
 
