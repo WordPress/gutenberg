@@ -51,24 +51,18 @@ const BlockMobileToolbar = ( {
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockIndex, getBlockRootClientId } = select(
-			'core/block-editor'
-		);
+		const { getBlockIndex } = select( 'core/block-editor' );
 
 		return {
 			order: getBlockIndex( clientId ),
-			rootClientId: getBlockRootClientId( clientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
-		const { removeBlock, selectBlock } = dispatch( 'core/block-editor' );
+		const { removeBlock } = dispatch( 'core/block-editor' );
 		return {
 			onDelete: () => {
 				Keyboard.dismiss();
 				removeBlock( clientId, rootClientId );
-				if ( !! rootClientId ) {
-					selectBlock( rootClientId );
-				}
 			},
 		};
 	} )
