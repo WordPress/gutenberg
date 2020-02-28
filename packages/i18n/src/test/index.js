@@ -1,3 +1,5 @@
+/* eslint-disable @wordpress/valid-text-domain */
+
 // Mock memoization as identity function. Inline since Jest errors on out-of-
 // scope references in a mock callback.
 jest.mock( 'memize', () => ( fn ) => fn );
@@ -185,3 +187,5 @@ describe( 'i18n', () => {
 function setDefaultLocalData() {
 	setLocaleData( localeData, 'test_domain' );
 }
+
+/* eslint-enable @wordpress/valid-text-domain */

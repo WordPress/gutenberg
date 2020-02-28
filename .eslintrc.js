@@ -42,6 +42,12 @@ module.exports = {
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/gutenberg-phase': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
+		'@wordpress/valid-text-domain': [
+			'error',
+			{
+				allowDefault: true,
+			},
+		],
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or
