@@ -4,11 +4,6 @@
 	max-width: none;
 }
 
-// It needs to be investigated which of these removed styles remain applicable
-// in the editor, but the removal of all the wrapper containers should
-// significantly reduce the amount of corrections needed. The front-end styles
-// should ideally be enough.
-
 // Ideally this shouldn't be necessary. There should be no default margins in
 // the editor.
 .editor-styles-wrapper .block-editor-block-list__block.wp-block-column,
