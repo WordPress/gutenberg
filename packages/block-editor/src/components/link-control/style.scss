@@ -151,6 +151,8 @@ $block-editor-link-control-number-of-actions: 1;
 	.block-editor-link-control__search-item-header {
 		display: block;
 		margin-right: $grid-unit-30;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
 	.block-editor-link-control__search-item-icon {
@@ -160,9 +162,9 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.block-editor-link-control__search-item-info,
 	.block-editor-link-control__search-item-title {
-		text-overflow: ellipsis;
 		max-width: 230px;
 		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.block-editor-link-control__search-item-title mark {
