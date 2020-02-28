@@ -55,9 +55,22 @@ export default class ClassicEdit extends Component {
 		const {
 			clientId,
 			attributes: { content },
+			isSelected,
+			setAttributes,
 		} = this.props;
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
+		if ( ! isSelected && editor && editor.getContent().length === 0 ) {
+			// Reset the content.
+			setAttributes( {
+				content: '',
+			} );
+			wp.oldEditor.remove( `editor-${ clientId }` );
+			return;
+		} else if ( ! editor ) {
+			this.initialize();
+			return;
+		}
 
 		if ( prevProps.attributes.content !== content ) {
 			editor.setContent( content || '' );
