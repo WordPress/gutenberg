@@ -58,7 +58,7 @@ Name | Type | Default | Description
 --- | --- | --- | ---
 `disabled` | `bool` | `false` | Whether the button is disabled.
 `focus` | `bool` | `false` | Whether the button is focused.
-`additionalStyles` | `Object` | `{}` | Additional styles for different states - see here TODO
+`additionalStyles` | `Object` | `{}` | Additional styles for different states
 
 In addition, the PrimitiveButton uses the [`styled-system`](https://styled-system.com/) that allows styling the component by props. Please check https://styled-system.com/api to see list of all supported props.
 
