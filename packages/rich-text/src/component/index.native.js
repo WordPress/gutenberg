@@ -811,7 +811,7 @@ export class RichText extends Component {
 						...style,
 						...( this.isIOS && minWidth && maxWidth
 							? { width }
-							: {} ),
+							: { maxWidth } ),
 						minHeight: this.state.height,
 					} }
 					text={ {
