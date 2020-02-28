@@ -60,6 +60,12 @@ export default class ClassicEdit extends Component {
 		} = this.props;
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
+
+		/**
+		 * Removes the `editor` if there's no content.
+		 * Doing so will make the <div key="toolbar"/> empty which will result
+		 * to showing the 'Classic' banner.
+		 */
 		if ( ! isSelected && editor && editor.getContent().length === 0 ) {
 			// Reset the content.
 			setAttributes( {
@@ -68,6 +74,7 @@ export default class ClassicEdit extends Component {
 			wp.oldEditor.remove( `editor-${ clientId }` );
 			return;
 		} else if ( ! editor ) {
+			// Reinitialize the `editor`.
 			this.initialize();
 			return;
 		}
