@@ -15,7 +15,6 @@ import {
 	getUnregisteredTypeHandlerName,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
-import { InnerBlocks } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -228,31 +227,29 @@ class BlockListBlock extends Component {
 							<Breadcrumbs clientId={ clientId } />
 						</FloatingToolbar>
 					) }
-						<View
-							pointerEvents={ isTouchable ? 'auto' : 'box-only' }
-							accessibilityLabel={ accessibilityLabel }
-							style={ this.applyBlockStyle() }
-						>
-							{ isValid ? (
-								this.getBlockForType()
-							) : (
-								<BlockInvalidWarning
-									blockTitle={ title }
-									icon={ icon }
+					<View
+						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
+						accessibilityLabel={ accessibilityLabel }
+						style={ this.applyBlockStyle() }
+					>
+						{ isValid ? (
+							this.getBlockForType()
+						) : (
+							<BlockInvalidWarning
+								blockTitle={ title }
+								icon={ icon }
+							/>
+						) }
+						<View style={ this.applyToolbarStyle() }>
+							{ isSelected && (
+								<BlockMobileToolbar
+									clientId={ clientId }
+									customOnDelete={ customOnDelete }
+									horizontalDirection={ horizontalDirection }
 								/>
 							) }
-							<View style={ this.applyToolbarStyle() }>
-								{ isSelected && (
-									<BlockMobileToolbar
-										clientId={ clientId }
-										customOnDelete={ customOnDelete }
-										horizontalDirection={
-											horizontalDirection
-										}
-									/>
-								) }
-							</View>
 						</View>
+					</View>
 				</View>
 			</TouchableWithoutFeedback>
 		);

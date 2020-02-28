@@ -20,22 +20,29 @@ const BlockMover = ( {
 	onMoveUp,
 	firstIndex,
 	rootClientId,
-	horizontalDirection
+	horizontalDirection,
 } ) => {
-
 	const firstButtonIcon = horizontalDirection ? arrowLeft : arrowUp;
 	const secondButtonIcon = horizontalDirection ? arrowRight : arrowDown;
 
-	const firstButtonHint = horizontalDirection ? __( 'Double tap to move the block to the left' ) : __( 'Double tap to move the block up' )
-	const secondButtonHint = horizontalDirection ? __( 'Double tap to move the block to the right' ) : __( 'Double tap to move the block down' )
+	const firstButtonHint = horizontalDirection
+		? __( 'Double tap to move the block to the left' )
+		: __( 'Double tap to move the block up' );
+	const secondButtonHint = horizontalDirection
+		? __( 'Double tap to move the block to the right' )
+		: __( 'Double tap to move the block down' );
 
-	const firstBlockTitle = horizontalDirection ? __( 'Move block left' ) : __( 'Move block up' );
-	const lastBlockTitle = horizontalDirection ? __( 'Move block right' ) : __( 'Move block down' )
+	const firstBlockTitle = horizontalDirection
+		? __( 'Move block left' )
+		: __( 'Move block up' );
+	const lastBlockTitle = horizontalDirection
+		? __( 'Move block right' )
+		: __( 'Move block down' );
 
 	const firstButtonDirection = horizontalDirection ? 'left' : 'up';
 	const secondButtonDirection = horizontalDirection ? 'right' : 'down';
 
-	const location = horizontalDirection ? 'position' : 'row'
+	const location = horizontalDirection ? 'position' : 'row';
 
 	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
@@ -48,7 +55,9 @@ const BlockMover = ( {
 					! isFirst
 						? sprintf(
 								/* translators: accessibility text. %1: block moving direction (string). %2: location of block - row or order number (string). %3: current block position (number). %4: next block position (number) */
-								__( 'Move block %2$s from %1$s %3$s to %1$s %4$s' ),
+								__(
+									'Move block %2$s from %1$s %3$s to %1$s %4$s'
+								),
 								location,
 								firstButtonDirection,
 								firstIndex + 1,

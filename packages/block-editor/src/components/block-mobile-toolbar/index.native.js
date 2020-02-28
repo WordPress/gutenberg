@@ -24,10 +24,13 @@ const BlockMobileToolbar = ( {
 	onDelete,
 	order,
 	customOnDelete,
-	horizontalDirection
+	horizontalDirection,
 } ) => (
 	<View style={ styles.toolbar }>
-		<BlockMover clientIds={ [ clientId ] } horizontalDirection={horizontalDirection} />
+		<BlockMover
+			clientIds={ [ clientId ] }
+			horizontalDirection={ horizontalDirection }
+		/>
 
 		<View style={ styles.spacer } />
 
