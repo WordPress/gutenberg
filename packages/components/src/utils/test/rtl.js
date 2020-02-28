@@ -13,6 +13,8 @@ describe( 'convertLtrToRtl', () => {
 			borderLeftWidth: 10,
 			borderTopLeftRadius: 10,
 			marginLeft: 10,
+			scrollMarginLeft: 10,
+			scrollPaddingLeft: 10,
 			// right values
 			paddingLeft: 10,
 			borderRight: '20px solid blue',
@@ -22,6 +24,8 @@ describe( 'convertLtrToRtl', () => {
 			borderTopRightRadius: 20,
 			marginRight: 20,
 			paddingRight: 20,
+			scrollMarginRight: 20,
+			scrollPaddingRight: 20,
 			// edge cases
 			textCombineUpright: 'none',
 		};
@@ -39,6 +43,8 @@ describe( 'convertLtrToRtl', () => {
 		expect( nextStyle.borderTopRightRadius ).toBe( 10 );
 		expect( nextStyle.marginRight ).toBe( 10 );
 		expect( nextStyle.paddingRight ).toBe( 10 );
+		expect( nextStyle.scrollMarginRight ).toBe( 10 );
+		expect( nextStyle.scrollPaddingRight ).toBe( 10 );
 
 		// Right -> Left
 		expect( nextStyle.borderLeft ).toBe( '20px solid blue' );
@@ -48,6 +54,8 @@ describe( 'convertLtrToRtl', () => {
 		expect( nextStyle.borderTopLeftRadius ).toBe( 20 );
 		expect( nextStyle.marginLeft ).toBe( 20 );
 		expect( nextStyle.paddingLeft ).toBe( 20 );
+		expect( nextStyle.scrollMarginLeft ).toBe( 20 );
+		expect( nextStyle.scrollPaddingLeft ).toBe( 20 );
 
 		// Edge cases
 		expect( nextStyle.textCombineUpright ).toBe( 'none' );
@@ -63,6 +71,8 @@ describe( 'convertLtrToRtl', () => {
 			'border-top-left-radius': 10,
 			'margin-left': 10,
 			'padding-left': 10,
+			'scroll-margin-left': 10,
+			'scroll-padding-left': 10,
 			left: 10,
 			// right values
 			'border-right': '20px solid blue',
@@ -72,6 +82,8 @@ describe( 'convertLtrToRtl', () => {
 			'border-top-right-radius': 20,
 			'margin-right': 20,
 			'padding-right': 20,
+			'scroll-margin-right': 20,
+			'scroll-padding-right': 20,
 			right: 20,
 			// edge cases
 			'text-combine-upright': 'none',
@@ -90,6 +102,8 @@ describe( 'convertLtrToRtl', () => {
 		expect( nextStyle[ 'border-top-right-radius' ] ).toBe( 10 );
 		expect( nextStyle[ 'margin-right' ] ).toBe( 10 );
 		expect( nextStyle[ 'padding-right' ] ).toBe( 10 );
+		expect( nextStyle[ 'scroll-margin-right' ] ).toBe( 10 );
+		expect( nextStyle[ 'scroll-padding-right' ] ).toBe( 10 );
 		expect( nextStyle.right ).toBe( 10 );
 
 		// right -> left
@@ -100,6 +114,8 @@ describe( 'convertLtrToRtl', () => {
 		expect( nextStyle[ 'border-top-left-radius' ] ).toBe( 20 );
 		expect( nextStyle[ 'margin-left' ] ).toBe( 20 );
 		expect( nextStyle[ 'padding-left' ] ).toBe( 20 );
+		expect( nextStyle[ 'scroll-margin-left' ] ).toBe( 20 );
+		expect( nextStyle[ 'scroll-padding-left' ] ).toBe( 20 );
 		expect( nextStyle.left ).toBe( 20 );
 
 		// Edge cases

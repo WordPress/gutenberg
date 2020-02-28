@@ -3,6 +3,11 @@
  */
 import { css } from '@emotion/core';
 
+const lowerLeftRegExp = new RegExp( /-left/g );
+const lowerRightRegExp = new RegExp( /-right/g );
+const upperLeftRegExp = new RegExp( /Left/g );
+const upperRightRegExp = new RegExp( /Right/g );
+
 function getRtl() {
 	return !! ( document && document.documentElement.dir === 'rtl' );
 }
@@ -27,19 +32,26 @@ export const convertLtrToRtl = ( ltrStyles = {} ) => {
 		const value = ltrStyles[ key ];
 		let nextKey = key;
 
-		// Lowercase flip
-		if ( /left/g.test( key ) ) {
-			nextKey = key.replace( /left/g, 'right' );
+		// Direct flip
+		if ( key === 'left' ) {
+			nextKey = 'right';
 		}
-		if ( /right/g.test( key ) ) {
-			nextKey = key.replace( /right/g, 'left' );
+		if ( key === 'right' ) {
+			nextKey = 'left';
+		}
+		// Lowercase flip
+		if ( lowerLeftRegExp.test( key ) ) {
+			nextKey = key.replace( lowerLeftRegExp, '-right' );
+		}
+		if ( lowerRightRegExp.test( key ) ) {
+			nextKey = key.replace( lowerRightRegExp, '-left' );
 		}
 		// Capitalized case flip
-		if ( /Left/g.test( key ) ) {
-			nextKey = key.replace( /Left/g, 'Right' );
+		if ( upperLeftRegExp.test( key ) ) {
+			nextKey = key.replace( upperLeftRegExp, 'Right' );
 		}
-		if ( /Right/g.test( key ) ) {
-			nextKey = key.replace( /Right/g, 'Left' );
+		if ( upperRightRegExp.test( key ) ) {
+			nextKey = key.replace( upperRightRegExp, 'Left' );
 		}
 
 		nextStyles[ nextKey ] = value;
