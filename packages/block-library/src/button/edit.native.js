@@ -327,6 +327,7 @@ class ButtonEdit extends Component {
 			clientId,
 			onReplace,
 			mergeBlocks,
+			parentWidth,
 		} = this.props;
 		const {
 			placeholder,
@@ -337,6 +338,10 @@ class ButtonEdit extends Component {
 			rel,
 		} = attributes;
 		const { maxWidth, isLinkSheetVisible, isButtonFocused } = this.state;
+
+		if ( parentWidth === 0 ) {
+			return null;
+		}
 
 		const borderRadiusValue =
 			borderRadius !== undefined
