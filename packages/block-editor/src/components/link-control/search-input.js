@@ -4,7 +4,7 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Notice } from '@wordpress/components';
-import { ENTER } from '@wordpress/keycodes';
+import { ENTER, ESCAPE } from '@wordpress/keycodes';
 import { keyboardReturn } from '@wordpress/icons';
 
 /**
@@ -56,7 +56,9 @@ const LinkControlSearchInput = ( {
 				if ( keycode === ENTER ) {
 					selectSuggestionOrCurrentInputValue();
 				}
-				event.stopPropagation();
+				if ( keycode !== ESCAPE ) {
+					event.stopPropagation();
+				}
 			} }
 		>
 			<div className="block-editor-link-control__search-input-wrapper">
