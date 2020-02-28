@@ -46,6 +46,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
+	showMediaEditorButton,
 } from '@wordpress/react-native-bridge';
 import { link, image as icon } from '@wordpress/icons';
 
