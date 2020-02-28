@@ -118,8 +118,8 @@ addFilter(
 );
 
 // The above filter will only capture blocks registered after the filter was
-// applied. There may already be registered by this point, and those must be
-// updated to apply the shim.
+// added. There may already be blocks registered by this point, and those must
+// be updated to apply the shim.
 //
 // The following implementation achieves this, albeit with a couple caveats:
 // - Only blocks registered on the global store will be modified.
@@ -128,6 +128,13 @@ addFilter(
 //   `getBlockType` separate from `getBlockTypes`, since the latter returns a
 //   _copy_ of the block registration (i.e. the mutation would not affect the
 //   actual registered block settings).
+//
+// `getBlockTypes` or `getBlockType` implementation could change in the future
+// in regards to creating settings clones, but the corresponding end-to-end
+// tests for meta blocks should cover against any potential regressions.
+//
+// In the future, we could support updating block settings, at which point this
+// implementation could use that mechanism instead.
 globalSelect( 'core/blocks' )
 	.getBlockTypes()
 	.map( ( { name } ) => globalSelect( 'core/blocks' ).getBlockType( name ) )
