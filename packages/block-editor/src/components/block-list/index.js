@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useRef, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,24 +23,18 @@ import useBlockDropZone from '../block-drop-zone';
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
-	return (
-		<AsyncModeProvider value={ false }>
-			<WrappedComponent { ...props } />
-		</AsyncModeProvider>
-	);
-};
-
-function BlockList( {
-	className,
-	rootClientId,
-	isDraggable,
-	renderAppender,
-	__experimentalUIParts = {},
-	tagName = 'div',
-	forwardedRef,
-	...props
-} ) {
+function BlockList(
+	{
+		className,
+		rootClientId,
+		isDraggable,
+		renderAppender,
+		__experimentalUIParts = {},
+		tagName = 'div',
+		...props
+	},
+	ref
+) {
 	function selector( select ) {
 		const {
 			getBlockOrder,
@@ -74,7 +68,6 @@ function BlockList( {
 	} = useSelect( selector, [ rootClientId ] );
 
 	const Container = rootClientId ? tagName : RootContainer;
-	const ref = useRef();
 	const targetClientId = useBlockDropZone( {
 		element: ref,
 		rootClientId,
@@ -85,7 +78,7 @@ function BlockList( {
 
 	return (
 		<Container
-			ref={ forwardedRef || ref }
+			ref={ ref }
 			className={ classnames(
 				'block-editor-block-list__layout',
 				className
@@ -136,7 +129,16 @@ function BlockList( {
 	);
 }
 
+const ForwardedBlockList = forwardRef( BlockList );
+
 // This component needs to always be synchronous
 // as it's the one changing the async mode
 // depending on the block selection.
-export default forceSyncUpdates( BlockList );
+export default forwardRef( ( props, ref ) => {
+	const fallbackRef = useRef();
+	return (
+		<AsyncModeProvider value={ false }>
+			<ForwardedBlockList ref={ ref || fallbackRef } { ...props } />
+		</AsyncModeProvider>
+	);
+} );

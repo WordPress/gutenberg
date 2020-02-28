@@ -160,8 +160,8 @@ class InnerBlocks extends Component {
 
 		const blockList = (
 			<BlockList
+				ref={ forwardedRef }
 				rootClientId={ clientId }
-				forwardedRef={ forwardedRef }
 				{ ...omit( props, [
 					'templateLock',
 					'isSmallScreen',
