@@ -41,7 +41,7 @@ const fetchJSON = ( url ) =>
 	new Promise( ( resolve, reject ) => {
 		get( url, async ( response ) => {
 			if ( response.statusCode !== 200 ) {
-				reject();
+				return reject();
 			}
 
 			let string = '';
