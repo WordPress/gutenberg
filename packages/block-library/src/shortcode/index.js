@@ -18,6 +18,8 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Shortcode' ),
+	areas: [ 'the_content' ],
+	parent: [ 'core/group' ],
 	description: __(
 		'Insert additional custom elements with a WordPress shortcode.'
 	),
