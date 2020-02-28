@@ -37,7 +37,7 @@ const INPUT_EXCEPTIONS = [ '#x' ];
  *
  * @return {Promise<string>} Promise resolving to downloaded content string.
  */
-const fetchAsString = ( url ) =>
+const fetchJSON = ( url ) =>
 	new Promise( ( resolve, reject ) => {
 		get( url, async ( response ) => {
 			if ( response.statusCode !== 200 ) {
@@ -50,7 +50,7 @@ const fetchAsString = ( url ) =>
 				string += chunk.toString();
 			}
 
-			resolve( string );
+			resolve( JSON.parse( string ) );
 		} );
 	} );
 
@@ -88,9 +88,9 @@ const isException = ( item ) => INPUT_EXCEPTIONS.includes( item.input );
  * @param {string} [outFile] Optional output file.
  */
 async function download( outFile = DEFAULT_OUT_FILE ) {
-	const data = await fetchAsString( DATA_URL );
+	const data = await fetchJSON( DATA_URL );
 
-	const transformedData = JSON.parse( data )
+	const transformedData = data
 		.filter(
 			( item ) =>
 				isDataItem( item ) && ! hasBase( item ) && ! isException( item )
