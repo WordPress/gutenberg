@@ -30,12 +30,12 @@ const DATA_URL =
 const INPUT_EXCEPTIONS = [ '#x' ];
 
 /**
- * Given a URL, returns promise resolving to the downloaded URL contents as
- * string.
+ * Given a URL, returns promise resolving to the downloaded URL contents parsed
+ * as JSON.
  *
  * @param {string} url URL to download.
  *
- * @return {Promise<string>} Promise resolving to downloaded content string.
+ * @return {Promise<*>} Promise resolving to result of parsed JSON.
  */
 const fetchJSON = ( url ) =>
 	new Promise( ( resolve, reject ) => {
