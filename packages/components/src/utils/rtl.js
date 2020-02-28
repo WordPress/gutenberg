@@ -3,26 +3,69 @@
  */
 import { css } from '@emotion/core';
 
-const lowerLeftRegExp = new RegExp( /-left/g );
-const lowerRightRegExp = new RegExp( /-right/g );
-const upperLeftRegExp = new RegExp( /Left/g );
-const upperRightRegExp = new RegExp( /Right/g );
+const LOWER_LEFT_REGEXP = new RegExp( /-left/g );
+const LOWER_RIGHT_REGEXP = new RegExp( /-right/g );
+const UPPER_LEFT_REGEXP = new RegExp( /Left/g );
+const UPPER_RIGHT_REGEXP = new RegExp( /Right/g );
 
+/**
+ * Checks to see whether the document is set to rtl.
+ *
+ * @return {boolean} Whether document is RTL.
+ */
 function getRtl() {
 	return !! ( document && document.documentElement.dir === 'rtl' );
 }
 
 /**
  * Simple hook to retrieve RTL direction value
+ *
+ * @return {boolean} Whether document is RTL.
  */
 export function useRtl() {
 	return getRtl();
 }
 
 /**
+ * Flips a CSS property from left <-> right.
+ *
+ * @param {string} key The CSS property name.
+ *
+ * @return {string} The flipped CSS property name, if applicable.
+ */
+function getConvertedKey( key ) {
+	if ( key === 'left' ) {
+		return 'right';
+	}
+
+	if ( key === 'right' ) {
+		return 'left';
+	}
+
+	if ( LOWER_LEFT_REGEXP.test( key ) ) {
+		return key.replace( LOWER_LEFT_REGEXP, '-right' );
+	}
+
+	if ( LOWER_RIGHT_REGEXP.test( key ) ) {
+		return key.replace( LOWER_RIGHT_REGEXP, '-left' );
+	}
+
+	if ( UPPER_LEFT_REGEXP.test( key ) ) {
+		return key.replace( UPPER_LEFT_REGEXP, 'Right' );
+	}
+
+	if ( UPPER_RIGHT_REGEXP.test( key ) ) {
+		return key.replace( UPPER_RIGHT_REGEXP, 'Left' );
+	}
+
+	return key;
+}
+
+/**
  * An incredibly basic ltr -> rtl converter for style properties
  *
  * @param {Object} ltrStyles
+ *
  * @return {Object} Converted ltr -> rtl styles
  */
 export const convertLtrToRtl = ( ltrStyles = {} ) => {
@@ -30,30 +73,7 @@ export const convertLtrToRtl = ( ltrStyles = {} ) => {
 
 	for ( const key in ltrStyles ) {
 		const value = ltrStyles[ key ];
-		let nextKey = key;
-
-		// Direct flip
-		if ( key === 'left' ) {
-			nextKey = 'right';
-		}
-		if ( key === 'right' ) {
-			nextKey = 'left';
-		}
-		// Lowercase flip
-		if ( lowerLeftRegExp.test( key ) ) {
-			nextKey = key.replace( lowerLeftRegExp, '-right' );
-		}
-		if ( lowerRightRegExp.test( key ) ) {
-			nextKey = key.replace( lowerRightRegExp, '-left' );
-		}
-		// Capitalized case flip
-		if ( upperLeftRegExp.test( key ) ) {
-			nextKey = key.replace( upperLeftRegExp, 'Right' );
-		}
-		if ( upperRightRegExp.test( key ) ) {
-			nextKey = key.replace( upperRightRegExp, 'Left' );
-		}
-
+		const nextKey = getConvertedKey( key );
 		nextStyles[ nextKey ] = value;
 	}
 
