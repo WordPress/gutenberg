@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback, View, Text } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -54,15 +55,21 @@ class LatestPostsEdit extends Component {
 		this.fetchRequest = fetchRequest( '/wp/v2/categories' )
 			.then( ( categoriesList ) => {
 				if ( this.isStillMounted ) {
+					let parsedCategoriesList = categoriesList;
+
 					// TODO: remove this check after `fetchRequest` types are made consist across platforms
 					// (see: https://github.com/wordpress-mobile/gutenberg-mobile/issues/1961)
 					if ( typeof categoriesList === 'string' ) {
-						this.setState( {
-							categoriesList: JSON.parse( categoriesList ),
-						} );
-					} else {
-						this.setState( { categoriesList } );
+						parsedCategoriesList = JSON.parse( categoriesList );
 					}
+
+					if ( isEmpty( parsedCategoriesList ) ) {
+						parsedCategoriesList = [];
+					}
+
+					this.setState( {
+						categoriesList: parsedCategoriesList,
+					} );
 				}
 			} )
 			.catch( () => {
