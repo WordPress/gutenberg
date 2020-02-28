@@ -304,8 +304,9 @@ function gutenberg_strip_php_suffix( $template_file ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
-	global $_wp_current_template_id;
-	if ( ! post_type_exists( 'wp_template' ) || ! post_type_exists( 'wp_template_part' ) ) {
+	global $post, $_wp_current_template_id;
+
+	if ( ! $post || ! post_type_exists( 'wp_template' ) || ! post_type_exists( 'wp_template_part' ) ) {
 		return $settings;
 	}
 
