@@ -201,7 +201,11 @@ export default class ClassicEdit extends Component {
 	}
 
 	render() {
-		const { clientId } = this.props;
+		const {
+			clientId,
+			attributes: { content },
+			isSelected,
+		} = this.props;
 
 		// Disable reasons:
 		//
@@ -219,7 +223,13 @@ export default class ClassicEdit extends Component {
 				onClick={ this.focus }
 				data-placeholder={ __( 'Classic' ) }
 				onKeyDown={ this.onToolbarKeyDown }
-			/>,
+			>
+				{ ! isSelected &&
+					! this.editor &&
+					content &&
+					content.length > 0 &&
+					' ' }
+			</div>,
 			<div
 				key="editor"
 				id={ `editor-${ clientId }` }
