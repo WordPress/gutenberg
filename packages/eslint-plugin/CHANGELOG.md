@@ -1,5 +1,9 @@
 ## Master
 
+### New Features
+
+- New Rule: [`@wordpress/valid-text-domain`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/valid-text-domain.md)
+
 ## 4.0.0 (2020-02-10)
 
 ### Breaking Changes
