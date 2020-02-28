@@ -20,7 +20,7 @@ const BlockCaption = ( {
 	shouldDisplay,
 	text,
 } ) => (
-	<View style={ { flex: 1, padding: 12 } }>
+	<View style={ { flex: 1, padding: shouldDisplay ? 12 : 0 } }>
 		<Caption
 			accessibilityLabelCreator={ accessibilityLabelCreator }
 			accessible={ accessible }
