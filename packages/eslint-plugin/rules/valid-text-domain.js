@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+const { TRANSLATION_FUNCTIONS } = require( '../util' );
+
 const STATUS = {
 	MISSING: 'missing',
 	INVALID_VALUE: 'invalid-domain',
@@ -67,8 +72,6 @@ function getTextDomain( functionName, args ) {
 			return {};
 	}
 }
-
-const TRANSLATION_FUNCTIONS = [ '__', '_x', '_n', '_nx' ];
 
 module.exports = {
 	meta: {
