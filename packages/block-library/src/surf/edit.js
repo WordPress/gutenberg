@@ -17,6 +17,11 @@ import Text from './text';
 const SurfEdit = ( { attributes, setAttributes } ) => {
 	const { waveHeight } = attributes;
 
+	// this function will set the waveHeight attribute for our block
+	const changeWaveHeight = ( height ) => {
+		setAttributes( { waveHeight: height } );
+	};
+
 	return (
 		<>
 			<Text>Wave height: { waveHeight } ft</Text>
@@ -28,8 +33,7 @@ const SurfEdit = ( { attributes, setAttributes } ) => {
 						max={ 25 }
 						separatorType={ 'none' }
 						value={ waveHeight }
-						// we pass a function here to listen for changes
-						onChange={ () => undefined }
+						onChange={ changeWaveHeight }
 					/>
 				</PanelBody>
 			</InspectorControls>
