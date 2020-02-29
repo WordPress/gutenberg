@@ -9,13 +9,21 @@ import { Text } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Dashicon } from '@wordpress/components';
 
-export const name = 'core/surf';
+/**
+ * Internal dependencies
+ */
+import metadata from './block.json';
+
+// we can use information from block.json in our block configuration
+// (the metadata object is merged with settings in registerBlock)
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Surf' ),
-	category: 'common',
 	description: __( 'Add surf conditions.' ),
 	edit: () => <Text>Hello world!</Text>,
 	save: () => <span>Hello world!</span>,
-	icon: <Dashicon icon="palmtree" />, // let's give our block a nice icon :)
+	icon: <Dashicon icon="palmtree" />,
 };
