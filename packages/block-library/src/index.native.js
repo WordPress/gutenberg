@@ -171,6 +171,7 @@ export const registerCoreBlocks = () => {
 		shortcode,
 		devOnly( verse ),
 		cover,
+		devOnly( myBlock ), // add our block here to register it (with a dev flag)
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
