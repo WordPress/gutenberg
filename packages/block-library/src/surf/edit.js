@@ -24,7 +24,7 @@ const SurfEdit = ( { attributes, setAttributes } ) => {
 	// let's add a wave emoji that changes size
 	const styles = {
 		waveHeightText: { color: 'darkblue' },
-		waveEmoji: { fontSize: 20 + waveHeight },
+		waveEmoji: { fontSize: 20 + 3 * waveHeight },
 	};
 
 	return (
