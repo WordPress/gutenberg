@@ -86,11 +86,21 @@ module.exports = {
 						items: {
 							type: 'string',
 						},
+						uniqueItems: true,
 					},
 				},
 				additionalProperties: false,
 			},
 		],
+		messages: {
+			invalidValue: "Invalid text domain '{{ textDomain }}'",
+			invalidType: 'Text domain is not a string literal',
+			unnecessaryDefault: 'Unnecessary default text domain',
+			missing: 'Missing text domain',
+			useAllowedValue:
+				'Use one of the whitelisted text domains: {{ textDomains }}',
+		},
+		fixable: 'code',
 	},
 	create( context ) {
 		const options = context.options[ 0 ] || {};
@@ -112,27 +122,71 @@ module.exports = {
 				switch ( status ) {
 					case STATUS.MISSING:
 						if ( ! allowDefault ) {
-							context.report( node, 'Missing text domain' );
+							const lastArg = args[ args.length - 1 ];
+
+							context.report( {
+								node,
+								messageId: 'missing',
+								fix:
+									allowedTextDomains.length === 1
+										? ( fixer ) => {
+												return fixer.insertTextAfter(
+													lastArg,
+													`, '${ allowedTextDomains[ 0 ] }'`
+												);
+										  }
+										: null,
+							} );
 						}
 						break;
 					case STATUS.INVALID_TYPE:
-						context.report(
+						context.report( {
 							node,
-							'Text domain is not a string literal'
-						);
+							messageId: 'invalidType',
+						} );
 						break;
 					case STATUS.INVALID_VALUE:
-						const { value } = getTextDomain( callee.name, args );
+						const textDomain = getTextDomain( callee.name, args );
+						const { value, range, parent } = textDomain;
+
+						const previousArg = [ ...parent.arguments ] // avoids reverse() modifying the AST.
+							.reverse()
+							.find( ( arg ) => arg.range[ 1 ] < range[ 0 ] );
 
 						if ( 'default' === value && allowDefault ) {
-							context.report(
+							context.report( {
 								node,
-								'Unnecessary default text domain'
-							);
+								messageId: 'unnecessaryDefault',
+								fix: ( fixer ) => {
+									return fixer.removeRange( [
+										previousArg.range[ 1 ],
+										range[ 1 ],
+									] );
+								},
+							} );
 							break;
 						}
 
-						context.report( node, 'Invalid text domain: ' + value );
+						context.report( {
+							node,
+							messageId: 'invalidValue',
+							data: {
+								textDomain: value,
+							},
+							fix:
+								allowedTextDomains.length === 1
+									? ( fixer ) => {
+											return fixer.replaceTextRange(
+												// account for quotes.
+												[
+													range[ 0 ] + 1,
+													range[ 1 ] - 1,
+												],
+												allowedTextDomains[ 0 ]
+											);
+									  }
+									: null,
+						} );
 						break;
 					default:
 						break;
