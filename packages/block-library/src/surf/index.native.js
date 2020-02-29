@@ -14,8 +14,6 @@ import { Dashicon } from '@wordpress/components';
  */
 import metadata from './block.json';
 
-// we can use information from block.json in our block configuration
-// (the metadata object is merged with settings in registerBlock)
 const { name } = metadata;
 
 export { metadata, name };
@@ -23,7 +21,7 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Surf' ),
 	description: __( 'Add surf conditions.' ),
-	edit: () => <Text>Hello world!</Text>,
-	save: () => <span>Hello world!</span>,
+	edit: () => <Text>Hello world!</Text>, // we can extract these functions to
+	save: () => <span>Hello world!</span>, // their own files
 	icon: <Dashicon icon="palmtree" />,
 };
