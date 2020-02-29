@@ -12,19 +12,23 @@ import Text from './text';
 
 // Let's make some waves!
 //
-// We can use some components to make our attribute adjustable
+// We can add some style
 
 const SurfEdit = ( { attributes, setAttributes } ) => {
 	const { waveHeight } = attributes;
 
-	// this function will set the waveHeight attribute for our block
 	const changeWaveHeight = ( height ) => {
 		setAttributes( { waveHeight: height } );
 	};
 
+	// we can use a style object to pass inline styles
+	const style = {
+		color: 'darkblue',
+	};
+
 	return (
 		<>
-			<Text>Wave height: { waveHeight } ft</Text>
+			<Text style={ style }>Wave height: { waveHeight } ft</Text>
 			<InspectorControls>
 				<PanelBody title={ __( 'Surf settings' ) }>
 					<RangeControl
