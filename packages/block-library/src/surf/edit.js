@@ -3,4 +3,8 @@
  */
 import Text from './text';
 
-export default () => <Text>Hello world!</Text>;
+// Usually, we name our edit function
+
+const SurfEdit = () => <Text>Hello world!</Text>;
+
+export default SurfEdit;
