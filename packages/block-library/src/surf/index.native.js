@@ -11,7 +11,8 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 
-// Note: Since we don't have save.native.js, save is imported from save.js
+// Up until now, our implementation has been mobile only.
+// We can implement this block for web, and share this index file as index.js
 
 const { name } = metadata;
 
