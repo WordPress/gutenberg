@@ -9,6 +9,9 @@ import { Dashicon } from '@wordpress/components';
  */
 import edit from './edit';
 import metadata from './block.json';
+import save from './save';
+
+// Note: Since we don't have save.native.js, save is imported from save.js
 
 const { name } = metadata;
 
@@ -18,6 +21,6 @@ export const settings = {
 	title: __( 'Surf' ),
 	description: __( 'Add surf conditions.' ),
 	edit,
-	save: () => <span>Hello world!</span>,
+	save,
 	icon: <Dashicon icon="palmtree" />,
 };
