@@ -3,14 +3,17 @@
  */
 import { Text } from 'react-native';
 
-// The block name and configuration object are typically defined in a directory
-// for that block:
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 export const name = 'core/surf';
 
 export const settings = {
-	title: 'Surf',
+	title: __( 'Surf' ), // let's make sure our user facing strings are translated
 	category: 'common',
-	description: 'Add surf conditions.',
+	description: __( 'Add surf conditions.' ),
 	edit: () => <Text>Hello world!</Text>,
 	save: () => <span>Hello world!</span>,
 };
