@@ -21,14 +21,18 @@ const SurfEdit = ( { attributes, setAttributes } ) => {
 		setAttributes( { waveHeight: height } );
 	};
 
-	// we can use a style object to pass inline styles
-	const style = {
-		color: 'darkblue',
+	// let's add a wave emoji that changes size
+	const styles = {
+		waveHeightText: { color: 'darkblue' },
+		waveEmoji: { fontSize: 20 + waveHeight },
 	};
 
 	return (
 		<>
-			<Text style={ style }>Wave height: { waveHeight } ft</Text>
+			<Text style={ styles.waveEmoji }>🌊</Text>
+			<Text style={ styles.waveHeightText }>
+				Wave height: { waveHeight } ft
+			</Text>
 			<InspectorControls>
 				<PanelBody title={ __( 'Surf settings' ) }>
 					<RangeControl
