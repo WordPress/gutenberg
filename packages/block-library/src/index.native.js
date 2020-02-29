@@ -8,8 +8,6 @@ import {
 	setGroupingBlockName,
 } from '@wordpress/blocks';
 
-import { Text } from 'react-native'; // all text must be wrapped in React Native
-
 /**
  * Internal dependencies
  */
@@ -52,20 +50,7 @@ import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
 import * as group from './group';
-
-// A very basic block
-// Note: blocks belong in their own directories and this is added here only for
-// demonstration purposes
-const myBlock = {
-	name: "core/my-block", // lowercase hyphenated string with a namespace prefix
-	settings: {
-		title: 'My Block', // the name displayed to the user
-		category: 'common', // common | formatting | layout | widgets | embed
-		description: 'My cool new block.', // an optional short description
-		edit: () => <Text>Hello world!</Text>, // how a block renders in the editor
-		save: () => <span>Hello world!</span>, // how a block renders as saved html
-	},
-};
+import * as surf from './surf';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -112,7 +97,7 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
-	myBlock, // add our block here to prioritize its display
+	surf, // add our block here to prioritize its display
 ].reduce( ( accumulator, block ) => {
 	accumulator[ block.name ] = block;
 	return accumulator;
@@ -171,7 +156,7 @@ export const registerCoreBlocks = () => {
 		shortcode,
 		devOnly( verse ),
 		cover,
-		devOnly( myBlock ), // add our block here to register it (with a dev flag)
+		devOnly( surf ), // add our block here to register it (with a dev flag)
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
