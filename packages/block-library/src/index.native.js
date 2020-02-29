@@ -112,6 +112,7 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
+	myBlock, // add our block here to prioritize its display
 ].reduce( ( accumulator, block ) => {
 	accumulator[ block.name ] = block;
 	return accumulator;
