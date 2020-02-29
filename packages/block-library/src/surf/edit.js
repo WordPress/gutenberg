@@ -17,7 +17,24 @@ import Text from './text';
 const SurfEdit = ( { attributes, setAttributes } ) => {
 	const { waveHeight } = attributes;
 
-	return <Text>Wave height: { waveHeight } ft</Text>;
+	return (
+		<>
+			<Text>Wave height: { waveHeight } ft</Text>
+			<InspectorControls>
+				<PanelBody title={ __( 'Surf settings' ) }>
+					<RangeControl
+						label={ __( 'Wave height in feet' ) }
+						min={ 0 }
+						max={ 25 }
+						separatorType={ 'none' }
+						value={ waveHeight }
+						// we pass a function here to listen for changes
+						onChange={ () => undefined }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		</>
+	);
 };
 
 export default SurfEdit;
