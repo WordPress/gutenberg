@@ -118,8 +118,8 @@ export class BlockMover extends Component {
 								className="block-editor-block-mover__control block-editor-block-mover__control-up"
 								onClick={ isFirst ? null : onMoveUp }
 								icon={ getArrowIcon( 'up' ) }
-								// translators: %s: Horizontal direction of block movement ( left, right )
 								label={ sprintf(
+									// translators: %s: Horizontal direction of block movement ( left, right )
 									__( 'Move %s' ),
 									getMovementDirection( 'up' )
 								) }
@@ -133,8 +133,8 @@ export class BlockMover extends Component {
 								className="block-editor-block-mover__control block-editor-block-mover__control-down"
 								onClick={ isLast ? null : onMoveDown }
 								icon={ getArrowIcon( 'down' ) }
-								// translators: %s: Horizontal direction of block movement ( left, right )
 								label={ sprintf(
+									// translators: %s: Horizontal direction of block movement ( left, right )
 									__( 'Move %s' ),
 									getMovementDirection( 'down' )
 								) }

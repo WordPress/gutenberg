@@ -29,8 +29,8 @@ const defaultRenderToggle = ( {
 } ) => {
 	let label;
 	if ( hasSingleBlockType ) {
-		// translators: %s: the name of the block when there is only one
 		label = sprintf(
+			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
 			blockTitle
 		);
@@ -236,8 +236,8 @@ export default compose( [
 				);
 
 				if ( ! selectBlockOnInsert ) {
-					// translators: %s: the name of the block that has been added
 					const message = sprintf(
+						// translators: %s: the name of the block that has been added
 						__( '%s block added' ),
 						allowedBlockType.title
 					);

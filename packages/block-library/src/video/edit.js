@@ -200,6 +200,7 @@ class VideoEdit extends Component {
 								<p id={ videoPosterDescription } hidden>
 									{ this.props.attributes.poster
 										? sprintf(
+												/* translators: %s: poster image URL. */
 												__(
 													'The current poster image url is %s'
 												),

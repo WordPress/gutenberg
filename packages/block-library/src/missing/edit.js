@@ -17,6 +17,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	let messageHTML;
 	if ( hasContent && hasHTMLBlock ) {
 		messageHTML = sprintf(
+			/* translators: %s: block name */
 			__(
 				'Your site doesn’t include support for the "%s" block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.'
 			),
@@ -29,6 +30,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 		);
 	} else {
 		messageHTML = sprintf(
+			/* translators: %s: block name */
 			__(
 				'Your site doesn’t include support for the "%s" block. You can leave this block intact or remove it entirely.'
 			),

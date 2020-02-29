@@ -48,6 +48,7 @@ module.exports = {
 				allowDefault: true,
 			},
 		],
+		'@wordpress/no-missing-translator-comments': 'error',
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or

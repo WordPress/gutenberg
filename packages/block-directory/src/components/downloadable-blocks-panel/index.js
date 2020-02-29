@@ -55,6 +55,7 @@ function DownloadableBlocksPanel( {
 	}
 
 	const resultsFoundMessage = sprintf(
+		/* translators: %s: number of available blocks. */
 		_n(
 			'No blocks found in your library. We did find %d block available for download.',
 			'No blocks found in your library. We did find %d blocks available for download.',

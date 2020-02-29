@@ -17,7 +17,13 @@ function Stars( { rating } ) {
 	const emptyStarCount = 5 - ( fullStarCount + halfStarCount );
 
 	return (
-		<div aria-label={ sprintf( __( '%s out of 5 stars' ), stars ) }>
+		<div
+			aria-label={ sprintf(
+				/* translators: %s: number of stars. */
+				__( '%s out of 5 stars' ),
+				stars
+			) }
+		>
 			{ times( fullStarCount, ( i ) => (
 				<Icon
 					key={ `full_stars_${ i }` }

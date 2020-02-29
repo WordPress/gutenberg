@@ -1,4 +1,5 @@
 /* eslint-disable @wordpress/valid-text-domain */
+/* eslint-disable @wordpress/no-missing-translator-comments */
 
 // Mock memoization as identity function. Inline since Jest errors on out-of-
 // scope references in a mock callback.
@@ -188,4 +189,5 @@ function setDefaultLocalData() {
 	setLocaleData( localeData, 'test_domain' );
 }
 
+/* eslint-enable @wordpress/no-missing-translator-comments */
 /* eslint-enable @wordpress/valid-text-domain */

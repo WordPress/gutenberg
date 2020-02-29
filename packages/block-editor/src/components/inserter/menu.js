@@ -256,6 +256,7 @@ export class InserterMenu extends Component {
 		);
 
 		const resultsFoundMessage = sprintf(
+			/* translators: %d: number of results. */
 			_n( '%d result found.', '%d results found.', resultCount ),
 			resultCount
 		);
@@ -666,8 +667,8 @@ export default compose(
 					);
 
 					if ( ! selectBlockOnInsert ) {
-						// translators: %s: the name of the block that has been added
 						const message = sprintf(
+							// translators: %s: the name of the block that has been added
 							__( '%s block added' ),
 							title
 						);
