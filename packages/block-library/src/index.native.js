@@ -8,6 +8,8 @@ import {
 	setGroupingBlockName,
 } from '@wordpress/blocks';
 
+import { Text } from 'react-native'; // all text must be wrapped in React Native
+
 /**
  * Internal dependencies
  */
@@ -50,6 +52,20 @@ import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
 import * as group from './group';
+
+// A very basic block
+// Note: blocks belong in their own directories and this is added here only for
+// demonstration purposes
+const myBlock = {
+	name: "core/my-block", // lowercase hyphenated string with a namespace prefix
+	settings: {
+		title: 'My Block', // the name displayed to the user
+		category: 'common', // common | formatting | layout | widgets | embed
+		description: 'My cool new block.', // an optional short description
+		edit: () => <Text>Hello world!</Text>, // how a block renders in the editor
+		save: () => <span>Hello world!</span>, // how a block renders as saved html
+	},
+};
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
