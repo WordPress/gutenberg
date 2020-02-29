@@ -1,0 +1,18 @@
+.block-library-separator__resize-container.is-selected {
+	background: $light-gray-200;
+
+	.is-dark-theme & {
+		background: $light-opacity-light-200;
+	}
+}
+
+.block-library-separator__resize-container {
+	clear: both;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin-bottom: $default-block-margin;
+	hr {
+		min-width: 2.5em;
+	}
+}
