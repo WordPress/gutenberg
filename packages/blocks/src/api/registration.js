@@ -10,6 +10,7 @@ import { get, omit, pick, isFunction, isPlainObject, some } from 'lodash';
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import { blockDefault } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -70,7 +71,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @property {string}   name                   The unique and machine-readable name.
  * @property {string}   title                  A human-readable variation title.
- * @property {string}   description            A detailed variation description.
+ * @property {string}   [description]          A detailed variation description.
  * @property {WPIcon}   [icon]                 An icon helping to visualize the variation.
  * @property {boolean}  [isDefault]            Indicates whether the current variation is
  *                                             the default one. Defaults to `false`.
@@ -118,7 +119,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  * @type {Object}
  */
 export const DEFAULT_BLOCK_TYPE_SETTINGS = {
-	icon: 'block-default',
+	icon: blockDefault,
 	attributes: {},
 	keywords: [],
 	save: () => null,
@@ -491,33 +492,21 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
 };
 
 /**
- * Registers a new block variation for the given block.
+ * Registers a new block variation for the given block type.
  *
  * @param {string}           blockName Name of the block (example: “core/columns”).
  * @param {WPBlockVariation} variation Object describing a block variation.
  */
-export const __experimentalRegisterBlockVariation = (
-	blockName,
-	variation
-) => {
-	dispatch( 'core/blocks' ).__experimentalAddBlockVariations(
-		blockName,
-		variation
-	);
+export const registerBlockVariation = ( blockName, variation ) => {
+	dispatch( 'core/blocks' ).addBlockVariations( blockName, variation );
 };
 
 /**
- * Unregisters a block variation defined for the given block.
+ * Unregisters a block variation defined for the given block type.
  *
  * @param {string} blockName     Name of the block (example: “core/columns”).
  * @param {string} variationName Name of the variation defined for the block.
  */
-export const __experimentalUnregisterBlockVariation = (
-	blockName,
-	variationName
-) => {
-	dispatch( 'core/blocks' ).__experimentalRemoveBlockVariations(
-		blockName,
-		variationName
-	);
+export const unregisterBlockVariation = ( blockName, variationName ) => {
+	dispatch( 'core/blocks' ).removeBlockVariations( blockName, variationName );
 };

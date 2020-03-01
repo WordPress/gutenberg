@@ -50,17 +50,22 @@ $navigation-item-height: 46px;
 		height: 28px;
 
 		.block-editor-button-block-appender {
-			padding: $grid-size;
-			padding-bottom: $grid-size-small;
-			padding-top: $grid-size-small;
+			padding: $grid-unit-10;
+			padding-bottom: $grid-unit-05;
+			padding-top: $grid-unit-05;
 			outline: none;
 			background: none;
 		}
 	}
+
+	// Set a min width when the item is focused and empty in order to show the caret.
+	.wp-block-navigation .wp-block-navigation-link.is-selected .block-editor-rich-text__editable:focus {
+		min-width: 20px;
+	}
 }
 
 .wp-block-navigation__inserter-content {
-	padding: $grid-size-large;
+	padding: $grid-unit-20;
 }
 
 /**

@@ -42,6 +42,10 @@ describe( 'cpt locking', () => {
 		await page.click(
 			'.block-editor-rich-text__editable.wp-block-paragraph'
 		);
+		// Hover the block switcher to show the movers
+		await page.hover(
+			'.block-editor-block-toolbar .block-editor-block-toolbar__block-switcher-wrapper'
+		);
 		expect( await page.$( 'button[aria-label="Move up"]' ) ).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
 		await page.type(
@@ -72,7 +76,7 @@ describe( 'cpt locking', () => {
 
 		it( 'should not error when deleting the cotents of a paragraph', async () => {
 			await page.click(
-				'.block-editor-block-list__block[data-type="core/paragraph"] p'
+				'.block-editor-block-list__block[data-type="core/paragraph"]'
 			);
 			const textToType = 'Paragraph';
 			await page.keyboard.type( 'Paragraph' );
@@ -86,13 +90,13 @@ describe( 'cpt locking', () => {
 				'<!-- /wp:image -->'
 			);
 			await setPostContent( contentWithoutImage );
-			const VALIDATION_PARAGRAPH_SELECTOR =
-				'.editor-template-validation-notice .components-notice__content p';
-			await page.waitForSelector( VALIDATION_PARAGRAPH_SELECTOR );
+			const noticeContent = await page.waitForSelector(
+				'.editor-template-validation-notice .components-notice__content'
+			);
 			expect(
 				await page.evaluate(
-					( element ) => element.textContent,
-					await page.$( VALIDATION_PARAGRAPH_SELECTOR )
+					( _noticeContent ) => _noticeContent.firstChild.nodeValue,
+					noticeContent
 				)
 			).toEqual(
 				'The content of your post doesn’t match the template assigned to your post type.'

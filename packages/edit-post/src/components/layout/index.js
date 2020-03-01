@@ -13,12 +13,12 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
+	TableOfContents,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
-	__experimentalPageTemplatePicker,
-	__experimentalUsePageTemplatePickerVisible,
+	__experimentalEditorSkeleton as EditorSkeleton,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -39,7 +39,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import EditorRegions from '../editor-regions';
 import FullscreenMode from '../fullscreen-mode';
 import BrowserURL from '../browser-url';
 import Header from '../header';
@@ -51,7 +50,7 @@ import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
 function Layout() {
-	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const {
 		closePublishSidebar,
 		openGeneralSidebar,
@@ -69,6 +68,7 @@ function Layout() {
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
+		isTextModeEnabled,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -96,12 +96,10 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-			hasBlockSelected: select(
-				'core/block-editor'
-			).getBlockSelectionStart(),
+			isTextModeEnabled:
+				select( 'core/edit-post' ).getEditorMode() === 'text',
 		};
 	}, [] );
-	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened =
 		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -124,13 +122,13 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
-				<EditorRegions
+				<EditorSkeleton
 					className={ className }
 					header={ <Header /> }
 					sidebar={
-						! publishSidebarOpened && (
+						( ! isMobileViewport || sidebarIsOpened ) && (
 							<>
-								{ ! sidebarIsOpened && (
+								{ ! isMobileViewport && ! sidebarIsOpened && (
 									<div className="edit-post-layout__toogle-sidebar-panel">
 										<Button
 											isSecondary
@@ -170,10 +168,17 @@ function Layout() {
 						</>
 					}
 					footer={
+						! isMobileViewport &&
 						isRichEditingEnabled &&
 						mode === 'visual' && (
 							<div className="edit-post-layout__footer">
 								<BlockBreadcrumb />
+
+								<TableOfContents
+									hasOutlineItemsDisabled={
+										isTextModeEnabled
+									}
+								/>
 							</div>
 						)
 					}
@@ -191,10 +196,10 @@ function Layout() {
 								}
 							/>
 						) : (
-							<div className="edit-post-layout__toogle-publish-panel">
+							<div className="edit-post-layout__toggle-publish-panel">
 								<Button
 									isSecondary
-									className="edit-post-layout__toogle-publish-panel-button"
+									className="edit-post-layout__toggle-publish-panel-button"
 									onClick={ togglePublishSidebar }
 									aria-expanded={ false }
 								>
@@ -214,9 +219,6 @@ function Layout() {
 				<WelcomeGuide />
 				<Popover.Slot />
 				<PluginArea />
-				{ showPageTemplatePicker && (
-					<__experimentalPageTemplatePicker />
-				) }
 			</FocusReturnProvider>
 		</>
 	);

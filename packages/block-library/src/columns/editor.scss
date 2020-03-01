@@ -9,13 +9,6 @@
 	}
 }
 
-// Ideally all block toolbars should be positioned the same.
-.components-popover.block-editor-block-list__block-popover
-.components-popover__content
-.block-editor-block-contextual-toolbar[data-type="core/column"] {
-	margin-left: 0;
-}
-
 .wp-block-columns {
 	display: block;
 
@@ -66,7 +59,7 @@
 			// Responsiveness: Show at most one columns on mobile.
 			flex-basis: 100%;
 
-			// Beyond mobile, allow 2 columns.
+			// Between mobile and large viewports, allow 2 columns.
 			@include break-small() {
 				flex-basis: calc(50% - (#{$grid-size-large}));
 				flex-grow: 0;
@@ -74,19 +67,39 @@
 				margin-right: 0;
 			}
 
+			// At large viewports, show all columns horizontally.
+			@include break-medium() {
+				// Available space should be divided equally amongst columns
+				// without an assigned width. This is achieved by assigning a
+				// flex basis that is consistent (equal), would not cause the
+				// sum total of column widths to exceed 100%, and which would
+				// cede to a column with an assigned width. The `flex-grow`
+				// allows columns to maximally and equally occupy space
+				// remaining after subtracting the space occupied by columns
+				// with explicit widths (if any exist).
+				flex-basis: 0;
+				flex-grow: 1;
+
+				// Columns with an explicitly-assigned width should maintain
+				// their `flex-basis` width and not grow.
+				&[data-has-explicit-width] {
+					flex-grow: 0;
+				}
+			}
+
 			// Add space between columns. Themes can customize this if they wish to work differently.
 			// This has to match the same padding applied in style.scss.
 			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 			@include break-small() {
 				&:nth-child(even) {
-					margin-left: calc(#{$grid-size-large * 2});
+					margin-left: calc(#{$grid-unit-20 * 2});
 				}
 			}
 
 			// When columns are in a single row, add space before all except the first.
 			@include break-medium() {
 				&:not(:first-child) {
-					margin-left: calc(#{$grid-size-large * 2});
+					margin-left: calc(#{$grid-unit-20 * 2});
 				}
 			}
 
@@ -141,13 +154,6 @@ div.block-core-columns.is-vertically-aligned-center {
 .are-vertically-aligned-bottom .block-core-columns,
 div.block-core-columns.is-vertically-aligned-bottom {
 	justify-content: flex-end;
-}
-
-/**
- * Fixes single Column breadcrumb position.
- */
-[data-type="core/column"] > .editor-block-list__breadcrumb {
-	left: -$block-left-border-width;
 }
 
 /**

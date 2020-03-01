@@ -25,8 +25,7 @@ const automations = [
 		task: ifNotFork( addFirstTimeContributorLabel ),
 	},
 	{
-		event: 'pull_request',
-		action: 'closed',
+		event: 'push',
 		task: addMilestone,
 	},
 ];
@@ -47,7 +46,7 @@ const automations = [
 	for ( const { event, action, task } of automations ) {
 		if (
 			event === context.eventName &&
-			action === context.payload.action
+			( action === undefined || action === context.payload.action )
 		) {
 			try {
 				debug( `main: Starting task ${ task.name }` );

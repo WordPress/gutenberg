@@ -4,6 +4,7 @@
  * WordPress dependencies
  */
 import { applyFilters, doAction } from '@wordpress/hooks';
+import { plugins as pluginsIcon } from '@wordpress/icons';
 
 /**
  * External dependencies
@@ -48,6 +49,7 @@ const plugins = {};
  * var PluginSidebar = wp.editPost.PluginSidebar;
  * var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
  * var registerPlugin = wp.plugins.registerPlugin;
+ * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
  *
  * function Component() {
  * 	return el(
@@ -71,7 +73,7 @@ const plugins = {};
  * 	);
  * }
  * registerPlugin( 'plugin-name', {
- * 	icon: 'smiley',
+ * 	icon: moreIcon,
  * 	render: Component,
  * } );
  * ```
@@ -79,8 +81,9 @@ const plugins = {};
  * @example <caption>ESNext</caption>
  * ```js
  * // Using ESNext syntax
- * const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
- * const { registerPlugin } = wp.plugins;
+ * import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+ * import { registerPlugin } from '@wordpress/plugins';
+ * import { more } from '@wordpress/icons';
  *
  * const Component = () => (
  * 	<>
@@ -99,7 +102,7 @@ const plugins = {};
  * );
  *
  * registerPlugin( 'plugin-name', {
- * 	icon: 'smiley',
+ * 	icon: more,
  * 	render: Component,
  * } );
  * ```
@@ -136,7 +139,7 @@ export function registerPlugin( name, settings ) {
 
 	plugins[ name ] = {
 		name,
-		icon: 'admin-plugins',
+		icon: pluginsIcon,
 		...settings,
 	};
 

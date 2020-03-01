@@ -1,3 +1,17 @@
+## Master
+
+## 9.2.0 (2020-02-10)
+
+### Enhancements
+
+- The `Notice` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
+- The `Snackbar` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
+- A `Notice` `actions` member can now assign `isPrimary` to render a primary button action associated with a notice message.
+
+### Bug Fixes
+
+- Notice will assume a default status of 'info' if none is provided. This resolves an issue where the notice would be assigned a class name `is-undefined`. This was previously the effective default by styled appearance and should not be considered a breaking change in that regard.
+
 ## 9.0.0 (2020-01-13)
 
 ### New Features

@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { ExternalLink, Button } from '@wordpress/components';
 import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
+import { pencil } from '@wordpress/icons';
 
 function LinkViewerUrl( { url, urlLabel, className } ) {
 	const linkClassName = classnames(
@@ -50,7 +51,7 @@ export default function LinkViewer( {
 			/>
 			{ onEditLinkClick && (
 				<Button
-					icon="edit"
+					icon={ pencil }
 					label={ __( 'Edit' ) }
 					onClick={ onEditLinkClick }
 				/>

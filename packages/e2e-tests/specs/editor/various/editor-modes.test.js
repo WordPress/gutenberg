@@ -18,7 +18,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 	it( 'should switch between visual and HTML modes', async () => {
 		// This block should be in "visual" mode by default.
 		let visualBlock = await page.$$(
-			'.block-editor-block-list__layout .block-editor-block-list__block .rich-text'
+			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
 		);
 		expect( visualBlock ).toHaveLength( 1 );
 
@@ -52,7 +52,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// This block should be in "visual" mode by default.
 		visualBlock = await page.$$(
-			'.block-editor-block-list__layout .block-editor-block-list__block .rich-text'
+			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
 		);
 		expect( visualBlock ).toHaveLength( 1 );
 	} );
@@ -100,6 +100,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await page.click( '.components-font-size-picker__select' );
 		await page.click(
 			'.components-custom-select-control__item:nth-child(5)'
+		);
+		await page.waitForXPath(
+			`//button[contains(@class, "components-custom-select-control__button") and contains(text(), 'Large')]`
 		);
 
 		// Make sure the HTML content updated.

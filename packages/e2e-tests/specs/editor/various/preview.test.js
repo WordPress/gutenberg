@@ -14,7 +14,6 @@ import {
 	publishPost,
 	saveDraft,
 	clickOnMoreMenuItem,
-	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').Page} Page */
@@ -22,7 +21,9 @@ import {
 async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();
 	const expectedTabsCount = openTabs.length + 1;
-	await editorPage.click( '.editor-post-preview' );
+	await editorPage.click( '.editor-post-preview__button-toggle' );
+	await editorPage.waitFor( '.editor-post-preview__button-external' );
+	await editorPage.click( '.editor-post-preview__button-external' );
 
 	// Wait for the new tab to open.
 	while ( openTabs.length < expectedTabsCount ) {
@@ -47,7 +48,7 @@ async function openPreviewPage( editorPage ) {
  * @return {Promise} Promise resolving once navigation completes.
  */
 async function waitForPreviewNavigation( previewPage ) {
-	await page.click( '.editor-post-preview' );
+	await page.click( '.editor-post-preview__button-external' );
 	return previewPage.waitForNavigation();
 }
 
@@ -98,7 +99,7 @@ describe( 'Preview', () => {
 
 		// Disabled until content present.
 		const isPreviewDisabled = await editorPage.$$eval(
-			'.editor-post-preview:not( :disabled ):not( [aria-disabled="true"] )',
+			'.editor-post-preview__button-toggle:not( :disabled ):not( [aria-disabled="true"] )',
 			( enabledButtons ) => ! enabledButtons.length
 		);
 		expect( isPreviewDisabled ).toBe( true );
@@ -276,13 +277,13 @@ describe( 'Preview with Custom Fields enabled', () => {
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
 		await editorPage.click( '.editor-post-title__input' );
-		await pressKeyWithModifier( 'primary', 'a' );
-		await editorPage.keyboard.press( 'Delete' );
-		await editorPage.keyboard.type( 'title 2' );
+		await editorPage.keyboard.press( 'End' );
+		await editorPage.keyboard.press( 'Backspace' );
+		await editorPage.keyboard.type( '2' );
 		await editorPage.keyboard.press( 'Tab' );
-		await pressKeyWithModifier( 'primary', 'a' );
-		await editorPage.keyboard.press( 'Delete' );
-		await editorPage.keyboard.type( 'content 2' );
+		await editorPage.keyboard.press( 'End' );
+		await editorPage.keyboard.press( 'Backspace' );
+		await editorPage.keyboard.type( '2' );
 
 		// Open the preview page.
 		await waitForPreviewNavigation( previewPage );

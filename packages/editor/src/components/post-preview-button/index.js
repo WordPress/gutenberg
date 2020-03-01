@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -182,16 +183,25 @@ export class PostPreviewButton extends Component {
 		// just link to the post's URL.
 		const href = previewLink || currentPostLink;
 
+		const classNames = classnames(
+			{
+				'editor-post-preview': ! this.props.className,
+			},
+			this.props.className
+		);
+
 		return (
 			<Button
-				isSecondary
-				className="editor-post-preview"
+				isTertiary={ ! this.props.className }
+				className={ classNames }
 				href={ href }
 				target={ this.getWindowTarget() }
 				disabled={ ! isSaveable }
 				onClick={ this.openPreviewWindow }
 			>
-				{ _x( 'Preview', 'imperative verb' ) }
+				{ this.props.textContent
+					? this.props.textContent
+					: _x( 'Preview', 'imperative verb' ) }
 				<span className="screen-reader-text">
 					{ /* translators: accessibility text */
 					__( '(opens in a new tab)' ) }

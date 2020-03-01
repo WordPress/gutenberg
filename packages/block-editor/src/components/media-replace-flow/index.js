@@ -16,6 +16,7 @@ import {
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { link, upload, media as mediaIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -27,6 +28,7 @@ import LinkViewer from '../url-popover/link-viewer';
 
 const MediaReplaceFlow = ( {
 	mediaURL,
+	mediaId,
 	allowedTypes,
 	accept,
 	onSelect,
@@ -132,7 +134,6 @@ const MediaReplaceFlow = ( {
 						onKeyDown={ openOnArrowDown }
 					>
 						{ name }
-						<span className="block-editor-media-replace-flow__indicator" />
 					</Button>
 				</ToolbarGroup>
 			) }
@@ -140,10 +141,11 @@ const MediaReplaceFlow = ( {
 				<>
 					<NavigableMenu>
 						<MediaUpload
+							value={ mediaId }
 							onSelect={ ( media ) => selectMedia( media ) }
 							allowedTypes={ allowedTypes }
 							render={ ( { open } ) => (
-								<MenuItem icon="admin-media" onClick={ open }>
+								<MenuItem icon={ mediaIcon } onClick={ open }>
 									{ __( 'Open Media Library' ) }
 								</MenuItem>
 							) }
@@ -157,7 +159,7 @@ const MediaReplaceFlow = ( {
 								render={ ( { openFileDialog } ) => {
 									return (
 										<MenuItem
-											icon="upload"
+											icon={ upload }
 											onClick={ () => {
 												openFileDialog();
 											} }
@@ -170,7 +172,7 @@ const MediaReplaceFlow = ( {
 						</MediaUploadCheck>
 						{ onSelectURL && (
 							<MenuItem
-								icon="admin-links"
+								icon={ link }
 								onClick={ () =>
 									setShowURLInput( ! showURLInput )
 								}

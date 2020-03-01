@@ -6,6 +6,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { withPluginContext } from '@wordpress/plugins';
 import { compose } from '@wordpress/compose';
+import { starEmpty, starFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -48,7 +49,7 @@ function PluginSidebar( props ) {
 					<strong>{ title }</strong>
 					{ isPinnable && (
 						<Button
-							icon={ isPinned ? 'star-filled' : 'star-empty' }
+							icon={ isPinned ? starFilled : starEmpty }
 							label={
 								isPinned
 									? __( 'Unpin from toolbar' )
@@ -90,6 +91,7 @@ function PluginSidebar( props ) {
  * var el = wp.element.createElement;
  * var PanelBody = wp.components.PanelBody;
  * var PluginSidebar = wp.editPost.PluginSidebar;
+ * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
  *
  * function MyPluginSidebar() {
  * 	return el(
@@ -97,7 +99,7 @@ function PluginSidebar( props ) {
  * 			{
  * 				name: 'my-sidebar',
  * 				title: 'My sidebar title',
- * 				icon: 'smiley',
+ * 				icon: moreIcon,
  * 			},
  * 			el(
  * 				PanelBody,
@@ -111,15 +113,16 @@ function PluginSidebar( props ) {
  * @example <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PanelBody } = wp.components;
- * const { PluginSidebar } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PanelBody } from '@wordpress/components';
+ * import { PluginSidebar } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * const MyPluginSidebar = () => (
  * 	<PluginSidebar
  * 		name="my-sidebar"
  * 		title="My sidebar title"
- * 		icon="smiley"
+ * 		icon={ more }
  * 	>
  * 		<PanelBody>
  * 			{ __( 'My sidebar content' ) }
