@@ -33,20 +33,23 @@ const useResizeObserver = () => {
 
 	const onLayout = useCallback( ( { nativeEvent } ) => {
 		const { width, height } = nativeEvent.layout;
-
-		setMeasurements( { width, height } );
+		setMeasurements( ( prevState ) => {
+			if (
+				! prevState ||
+				prevState.width !== width ||
+				prevState.height !== height
+			) {
+				return { width, height };
+			}
+			return prevState;
+		} );
 	}, [] );
 
-	const resizeObserver = () => {
-		return (
-			<View
-				style={ { ...StyleSheet.absoluteFill } }
-				onLayout={ onLayout }
-			/>
-		);
-	};
-
-	return [ resizeObserver(), measurements ];
+	return [
+		// eslint-disable-next-line react/jsx-key
+		<View style={ StyleSheet.absoluteFill } onLayout={ onLayout } />,
+		measurements,
+	];
 };
 
 export default useResizeObserver;

@@ -160,6 +160,7 @@ _Returns_
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 
 Hook which allows to listen the resize event of any target element when it changes sizes.
+_Note: `useResizeObserver` will report `null` until after first render_
 
 _Usage_
 
