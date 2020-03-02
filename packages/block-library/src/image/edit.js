@@ -411,7 +411,6 @@ export class ImageEdit extends Component {
 		const mediaPlaceholder = (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
-				className={ className }
 				labels={ labels }
 				onSelect={ this.onSelectImage }
 				onSelectURL={ this.onSelectURL }
@@ -429,7 +428,12 @@ export class ImageEdit extends Component {
 			return (
 				<>
 					{ controls }
-					<Block.div className={ classes } data-align={ align }>
+					<Block.div
+						className={ classnames( className, {
+							[ `align${ align }` ]:
+								! needsAlignmentWrapper && align,
+						} ) }
+					>
 						{ needsAlignmentWrapper ? (
 							<div className={ `align${ align }` }>
 								{ mediaPlaceholder }
