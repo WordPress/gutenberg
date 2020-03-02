@@ -45,7 +45,21 @@ Undocumented declaration.
 
 <a name="sprintf" href="#sprintf">#</a> **sprintf**
 
-Internal dependencies
+Returns a formatted string. If an error occurs in applying the format, the
+original format string is returned.
+
+_Related_
+
+-   <http://www.diveintojavascript.com/projects/javascript-sprintf>
+
+_Parameters_
+
+-   _format_ `string`: The format of the string to generate.
+-   _args_ `...string`: Arguments to apply to the format.
+
+_Returns_
+
+-   `string`: The formatted string.
 
 <a name="_n" href="#_n">#</a> **\_n**
 
