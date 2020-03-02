@@ -59,7 +59,7 @@ export function useDebouncedShowMovers( {
 		[ isFocused ]
 	);
 
-	useEffect( () => () => clearTimeout( timeoutRef.current ) );
+	useEffect( () => () => clearTimeout( timeoutRef.current ), [] );
 
 	return {
 		showMovers,
