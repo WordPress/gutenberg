@@ -176,13 +176,6 @@ function gutenberg_edit_site_init( $hook ) {
 	);
 
 	/**
-	 * Scripts
-	 */
-	wp_enqueue_media();
-	wp_tinymce_inline_scripts();
-	wp_enqueue_editor();
-
-	/**
 	 * Fires after block assets have been enqueued for the editing interface.
 	 *
 	 * Call `add_action` on any hook before 'admin_enqueue_scripts'.
