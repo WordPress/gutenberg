@@ -157,6 +157,29 @@ _Returns_
 
 -   `boolean`: Reduced motion preference value.
 
+<a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
+
+Hook which allows to listen the resize event of any target element when it changes sizes.
+
+_Usage_
+
+```js
+const App = () => {
+	const [ resizeListener, sizes ] = useResizeObserver();
+
+	return (
+		<div>
+			{ resizeListener }
+			Your content here
+		</div>
+	);
+};
+```
+
+_Returns_
+
+-   `Object`: Measurements object with properties `width` and `height`.
+
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
 Returns true if the viewport matches the given query, or false otherwise.
