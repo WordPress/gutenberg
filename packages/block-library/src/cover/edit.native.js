@@ -257,7 +257,7 @@ const Cover = ( {
 
 				<MediaUpload
 					__experimentalOnlyMediaLibrary
-					allowedTypes={ [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ] }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onSelect={ onSelectMedia }
 					render={ ( { open, getMediaOptions } ) => {
 						return background( open, getMediaOptions );
