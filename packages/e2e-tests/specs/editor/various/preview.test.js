@@ -48,6 +48,8 @@ async function openPreviewPage( editorPage ) {
  * @return {Promise} Promise resolving once navigation completes.
  */
 async function waitForPreviewNavigation( previewPage ) {
+	await page.click( '.editor-post-preview__button-toggle' );
+	await page.waitForSelector( '.editor-post-preview__button-external' );
 	await page.click( '.editor-post-preview__button-external' );
 	return previewPage.waitForNavigation();
 }
@@ -144,6 +146,7 @@ describe( 'Preview', () => {
 		// Pressing preview without changes should bring same preview window to
 		// front and reload, but should not show interstitial.
 		await editorPage.bringToFront();
+		await editorPage.click( '.editor-post-preview__button-toggle' );
 		await waitForPreviewNavigation( previewPage );
 		previewTitle = await previewPage.$eval(
 			'.entry-title',
@@ -179,6 +182,7 @@ describe( 'Preview', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/7561
 		await editorPage.bringToFront();
+		await editorPage.click( '.editor-post-preview__button-toggle' );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
