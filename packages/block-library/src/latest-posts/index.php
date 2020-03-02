@@ -5,25 +5,6 @@
  * @package WordPress
  */
 
-/**
- * The excerpt length set by the Latest Posts core block
- * set at render time and used by the block itself.
- *
- * @var int
- */
-$block_core_latest_posts_excerpt = 0;
-
-/**
- * Callback for the excerpt_length filter used by
- * the Latest Posts block at render time.
- *
- * @return int Returns the global $block_core_latest_posts_excerpt variable
- *             to allow the excerpt_length filter respect the Latest Block setting.
- */
-function get_block_core_latest_posts_excerpt() {
-	global $block_core_latest_posts_excerpt;
-	return $block_core_latest_posts_excerpt;
-}
 
 /**
  * Renders the `core/latest-posts` block on server.
@@ -33,7 +14,6 @@ function get_block_core_latest_posts_excerpt() {
  * @return string Returns the post content with latest posts added.
  */
 function render_block_core_latest_posts( $attributes ) {
-	global $block_core_latest_posts_excerpt;
 
 	$args = array(
 		'posts_per_page'   => $attributes['postsToShow'],
@@ -43,8 +23,21 @@ function render_block_core_latest_posts( $attributes ) {
 		'suppress_filters' => false,
 	);
 
-	$block_core_latest_posts_excerpt = $attributes['excerptLength'];
-	add_filter( 'excerpt_length', 'get_block_core_latest_posts_excerpt', 999 );
+	/**
+	* Callback for the excerpt_length filter used by
+	* the Latest Posts block at render time.
+	*
+	* @return int Returns the $length variable
+	*             to allow the excerpt_length filter respect the Latest Block setting.
+	*/
+	$block_core_latest_posts_excerpt_length = function( $length ) use ( $attributes ) {
+		if ( ! empty( $attributes['excerptLength'] ) ) {
+			return $attributes['excerptLength'];
+		}
+		return $length;
+	};
+
+	add_filter( 'excerpt_length', $block_core_latest_posts_excerpt_length, 999 );
 
 	if ( isset( $attributes['categories'] ) ) {
 		$args['category'] = $attributes['categories'];
@@ -136,7 +129,7 @@ function render_block_core_latest_posts( $attributes ) {
 		$list_items_markup .= "</li>\n";
 	}
 
-	remove_filter( 'excerpt_length', 'get_block_core_latest_posts_excerpt', 999 );
+	remove_filter( 'excerpt_length', $block_core_latest_posts_excerpt_length );
 
 	$class = 'wp-block-latest-posts wp-block-latest-posts__list';
 	if ( isset( $attributes['align'] ) ) {
