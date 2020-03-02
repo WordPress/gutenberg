@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import { I18n } from './i18n';
+import { createI18n } from './create-i18n';
 
-export const i18n = new I18n();
+export const i18n = createI18n();
 
 /*
  * Comments in this file are duplicated from ./i18n due to
