@@ -83,23 +83,27 @@
 	// Navigate mode & Focused wrapper.
 	// We're using a pseudo element to overflow placeholder borders
 	// and any border inside the block itself.
-	&:not([contenteditable]):focus::after {
-		position: absolute;
-		z-index: 1;
-		pointer-events: none;
-		content: "";
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
+	&:not([contenteditable]):focus {
+		outline: none;
 
-		// 2px outside.
-		box-shadow: 0 0 0 2px $blue-medium-focus;
-		border-radius: $radius-block-ui;
+		&::after {
+			position: absolute;
+			z-index: 1;
+			pointer-events: none;
+			content: "";
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
 
-		// Show a light color for dark themes.
-		.is-dark-theme & {
-			box-shadow: 0 0 0 2px $blue-medium-focus-dark;
+			// 2px outside.
+			box-shadow: 0 0 0 2px $blue-medium-focus;
+			border-radius: $radius-block-ui;
+
+			// Show a light color for dark themes.
+			.is-dark-theme & {
+				box-shadow: 0 0 0 2px $blue-medium-focus-dark;
+			}
 		}
 	}
 
@@ -278,12 +282,15 @@
 
 	// Wide and full-wide.
 	&[data-align="full"],
-	&[data-align="wide"] {
+	&[data-align="wide"],
+	&.alignfull,
+	&.alignwide {
 		clear: both;
 	}
 
 	// Full-wide.
-	&[data-align="full"] {
+	&[data-align="full"],
+	&.alignfull {
 		margin-left: -$block-padding;
 		margin-right: -$block-padding;
 
@@ -387,11 +394,6 @@
 		// Match width of actual content.
 		left: $block-padding;
 		right: $block-padding;
-	}
-
-	&[data-align="full"] > .block-editor-block-list__insertion-point {
-		left: 0;
-		right: 0;
 	}
 }
 
@@ -554,10 +556,6 @@
 			margin-left: - $block-toolbar-height - $border-width;
 		}
 
-		.block-editor-block-contextual-toolbar[data-align="full"],
-		.block-editor-block-list__breadcrumb[data-align="full"] {
-			margin-left: 0;
-		}
 	}
 
 	.is-dragging-components-draggable & {

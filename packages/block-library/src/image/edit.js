@@ -29,10 +29,11 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	RichText,
+	__experimentalBlock as Block,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -404,6 +405,9 @@ export class ImageEdit extends Component {
 				src={ url }
 			/>
 		);
+		const needsAlignmentWrapper =
+			[ 'center', 'left', 'right' ].indexOf( align ) !== -1;
+
 		const mediaPlaceholder = (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
@@ -420,11 +424,20 @@ export class ImageEdit extends Component {
 				disableMediaButtons={ url }
 			/>
 		);
+
 		if ( ! url ) {
 			return (
 				<>
 					{ controls }
-					{ mediaPlaceholder }
+					<Block.div className={ classes } data-align={ align }>
+						{ needsAlignmentWrapper ? (
+							<div className={ `align${ align }` }>
+								{ mediaPlaceholder }
+							</div>
+						) : (
+							mediaPlaceholder
+						) }
+					</Block.div>
 				</>
 			);
 		}
@@ -434,6 +447,7 @@ export class ImageEdit extends Component {
 			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
 			[ `size-${ sizeSlug }` ]: sizeSlug,
+			[ `align${ align }` ]: align,
 		} );
 
 		const isResizable =
@@ -497,188 +511,196 @@ export class ImageEdit extends Component {
 			</>
 		);
 
+		const AlignmentWrapper = needsAlignmentWrapper ? Block.div : Fragment;
+		const BlockContentWrapper = needsAlignmentWrapper
+			? 'figure'
+			: Block.figure;
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/click-events-have-key-events */
 		return (
 			<>
 				{ controls }
-				<figure className={ classes }>
-					<ImageSize src={ url } dirtynessTrigger={ align }>
-						{ ( sizes ) => {
-							const {
-								imageWidthWithinContainer,
-								imageHeightWithinContainer,
-								imageWidth,
-								imageHeight,
-							} = sizes;
+				<AlignmentWrapper>
+					<BlockContentWrapper className={ classes }>
+						<ImageSize src={ url } dirtynessTrigger={ align }>
+							{ ( sizes ) => {
+								const {
+									imageWidthWithinContainer,
+									imageHeightWithinContainer,
+									imageWidth,
+									imageHeight,
+								} = sizes;
 
-							const filename = this.getFilename( url );
-							let defaultedAlt;
-							if ( alt ) {
-								defaultedAlt = alt;
-							} else if ( filename ) {
-								defaultedAlt = sprintf(
-									__(
-										'This image has an empty alt attribute; its file name is %s'
-									),
-									filename
+								const filename = this.getFilename( url );
+								let defaultedAlt;
+								if ( alt ) {
+									defaultedAlt = alt;
+								} else if ( filename ) {
+									defaultedAlt = sprintf(
+										__(
+											'This image has an empty alt attribute; its file name is %s'
+										),
+										filename
+									);
+								} else {
+									defaultedAlt = __(
+										'This image has an empty alt attribute'
+									);
+								}
+
+								const img = (
+									// Disable reason: Image itself is not meant to be interactive, but
+									// should direct focus to block.
+									/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+									<>
+										<img
+											src={ url }
+											alt={ defaultedAlt }
+											onClick={ this.onImageClick }
+											onError={ () =>
+												this.onImageError( url )
+											}
+										/>
+										{ isBlobURL( url ) && <Spinner /> }
+									</>
+									/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 								);
-							} else {
-								defaultedAlt = __(
-									'This image has an empty alt attribute'
-								);
-							}
 
-							const img = (
-								// Disable reason: Image itself is not meant to be interactive, but
-								// should direct focus to block.
-								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-								<>
-									<img
-										src={ url }
-										alt={ defaultedAlt }
-										onClick={ this.onImageClick }
-										onError={ () =>
-											this.onImageError( url )
-										}
-									/>
-									{ isBlobURL( url ) && <Spinner /> }
-								</>
-								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-							);
+								if (
+									! isResizable ||
+									! imageWidthWithinContainer
+								) {
+									return (
+										<>
+											{ getInspectorControls(
+												imageWidth,
+												imageHeight
+											) }
+											<div style={ { width, height } }>
+												{ img }
+											</div>
+										</>
+									);
+								}
 
-							if (
-								! isResizable ||
-								! imageWidthWithinContainer
-							) {
+								const currentWidth =
+									width || imageWidthWithinContainer;
+								const currentHeight =
+									height || imageHeightWithinContainer;
+
+								const ratio = imageWidth / imageHeight;
+								const minWidth =
+									imageWidth < imageHeight
+										? MIN_SIZE
+										: MIN_SIZE * ratio;
+								const minHeight =
+									imageHeight < imageWidth
+										? MIN_SIZE
+										: MIN_SIZE / ratio;
+
+								// With the current implementation of ResizableBox, an image needs an explicit pixel value for the max-width.
+								// In absence of being able to set the content-width, this max-width is currently dictated by the vanilla editor style.
+								// The following variable adds a buffer to this vanilla style, so 3rd party themes have some wiggleroom.
+								// This does, in most cases, allow you to scale the image beyond the width of the main column, though not infinitely.
+								// @todo It would be good to revisit this once a content-width variable becomes available.
+								const maxWidthBuffer = maxWidth * 2.5;
+
+								let showRightHandle = false;
+								let showLeftHandle = false;
+
+								/* eslint-disable no-lonely-if */
+								// See https://github.com/WordPress/gutenberg/issues/7584.
+								if ( align === 'center' ) {
+									// When the image is centered, show both handles.
+									showRightHandle = true;
+									showLeftHandle = true;
+								} else if ( isRTL ) {
+									// In RTL mode the image is on the right by default.
+									// Show the right handle and hide the left handle only when it is aligned left.
+									// Otherwise always show the left handle.
+									if ( align === 'left' ) {
+										showRightHandle = true;
+									} else {
+										showLeftHandle = true;
+									}
+								} else {
+									// Show the left handle and hide the right handle only when the image is aligned right.
+									// Otherwise always show the right handle.
+									if ( align === 'right' ) {
+										showLeftHandle = true;
+									} else {
+										showRightHandle = true;
+									}
+								}
+								/* eslint-enable no-lonely-if */
+
 								return (
 									<>
 										{ getInspectorControls(
 											imageWidth,
 											imageHeight
 										) }
-										<div style={ { width, height } }>
+										<ResizableBox
+											size={ {
+												width,
+												height,
+											} }
+											minWidth={ minWidth }
+											maxWidth={ maxWidthBuffer }
+											minHeight={ minHeight }
+											maxHeight={ maxWidthBuffer / ratio }
+											lockAspectRatio
+											enable={ {
+												top: false,
+												right: showRightHandle,
+												bottom: true,
+												left: showLeftHandle,
+											} }
+											onResizeStart={ onResizeStart }
+											onResizeStop={ (
+												event,
+												direction,
+												elt,
+												delta
+											) => {
+												onResizeStop();
+												setAttributes( {
+													width: parseInt(
+														currentWidth +
+															delta.width,
+														10
+													),
+													height: parseInt(
+														currentHeight +
+															delta.height,
+														10
+													),
+												} );
+											} }
+										>
 											{ img }
-										</div>
+										</ResizableBox>
 									</>
 								);
-							}
-
-							const currentWidth =
-								width || imageWidthWithinContainer;
-							const currentHeight =
-								height || imageHeightWithinContainer;
-
-							const ratio = imageWidth / imageHeight;
-							const minWidth =
-								imageWidth < imageHeight
-									? MIN_SIZE
-									: MIN_SIZE * ratio;
-							const minHeight =
-								imageHeight < imageWidth
-									? MIN_SIZE
-									: MIN_SIZE / ratio;
-
-							// With the current implementation of ResizableBox, an image needs an explicit pixel value for the max-width.
-							// In absence of being able to set the content-width, this max-width is currently dictated by the vanilla editor style.
-							// The following variable adds a buffer to this vanilla style, so 3rd party themes have some wiggleroom.
-							// This does, in most cases, allow you to scale the image beyond the width of the main column, though not infinitely.
-							// @todo It would be good to revisit this once a content-width variable becomes available.
-							const maxWidthBuffer = maxWidth * 2.5;
-
-							let showRightHandle = false;
-							let showLeftHandle = false;
-
-							/* eslint-disable no-lonely-if */
-							// See https://github.com/WordPress/gutenberg/issues/7584.
-							if ( align === 'center' ) {
-								// When the image is centered, show both handles.
-								showRightHandle = true;
-								showLeftHandle = true;
-							} else if ( isRTL ) {
-								// In RTL mode the image is on the right by default.
-								// Show the right handle and hide the left handle only when it is aligned left.
-								// Otherwise always show the left handle.
-								if ( align === 'left' ) {
-									showRightHandle = true;
-								} else {
-									showLeftHandle = true;
+							} }
+						</ImageSize>
+						{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
+							<RichText
+								tagName="figcaption"
+								placeholder={ __( 'Write caption…' ) }
+								value={ caption }
+								unstableOnFocus={ this.onFocusCaption }
+								onChange={ ( value ) =>
+									setAttributes( { caption: value } )
 								}
-							} else {
-								// Show the left handle and hide the right handle only when the image is aligned right.
-								// Otherwise always show the right handle.
-								if ( align === 'right' ) {
-									showLeftHandle = true;
-								} else {
-									showRightHandle = true;
-								}
-							}
-							/* eslint-enable no-lonely-if */
+								isSelected={ this.state.captionFocused }
+								inlineToolbar
+							/>
+						) }
 
-							return (
-								<>
-									{ getInspectorControls(
-										imageWidth,
-										imageHeight
-									) }
-									<ResizableBox
-										size={ {
-											width,
-											height,
-										} }
-										minWidth={ minWidth }
-										maxWidth={ maxWidthBuffer }
-										minHeight={ minHeight }
-										maxHeight={ maxWidthBuffer / ratio }
-										lockAspectRatio
-										enable={ {
-											top: false,
-											right: showRightHandle,
-											bottom: true,
-											left: showLeftHandle,
-										} }
-										onResizeStart={ onResizeStart }
-										onResizeStop={ (
-											event,
-											direction,
-											elt,
-											delta
-										) => {
-											onResizeStop();
-											setAttributes( {
-												width: parseInt(
-													currentWidth + delta.width,
-													10
-												),
-												height: parseInt(
-													currentHeight +
-														delta.height,
-													10
-												),
-											} );
-										} }
-									>
-										{ img }
-									</ResizableBox>
-								</>
-							);
-						} }
-					</ImageSize>
-					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-						<RichText
-							tagName="figcaption"
-							placeholder={ __( 'Write caption…' ) }
-							value={ caption }
-							unstableOnFocus={ this.onFocusCaption }
-							onChange={ ( value ) =>
-								setAttributes( { caption: value } )
-							}
-							isSelected={ this.state.captionFocused }
-							inlineToolbar
-						/>
-					) }
-				</figure>
-				{ mediaPlaceholder }
+						{ mediaPlaceholder }
+					</BlockContentWrapper>
+				</AlignmentWrapper>
 			</>
 		);
 		/* eslint-enable jsx-a11y/click-events-have-key-events */
