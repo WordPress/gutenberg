@@ -7,6 +7,17 @@ module.exports = {
 	meta: {
 		type: 'problem',
 		schema: [],
+		messages: {
+			noFormatString: 'sprintf must be called with a format string',
+			invalidFormatString:
+				'sprintf must be called with a valid format string',
+			noPlaceholderArgs:
+				'sprintf must be called with placeholder value argument(s)',
+			noPlaceholders:
+				'sprintf format string must contain at least one placeholder',
+			placeholderMismatch:
+				'sprintf format string options must have the same number of placeholders',
+		},
 	},
 	create( context ) {
 		return {
@@ -17,18 +28,18 @@ module.exports = {
 				}
 
 				if ( ! args.length ) {
-					context.report(
+					context.report( {
 						node,
-						'sprintf must be called with a format string'
-					);
+						messageId: 'noFormatString',
+					} );
 					return;
 				}
 
 				if ( args.length < 2 ) {
-					context.report(
+					context.report( {
 						node,
-						'sprintf must be called with placeholder value argument(s)'
-					);
+						messageId: 'noPlaceholderArgs',
+					} );
 					return;
 				}
 
@@ -70,10 +81,10 @@ module.exports = {
 				}
 
 				if ( ! candidates.length ) {
-					context.report(
+					context.report( {
 						node,
-						'sprintf must be called with a valid format string'
-					);
+						messageId: 'invalidFormatString',
+					} );
 					return;
 				}
 
@@ -88,18 +99,18 @@ module.exports = {
 						numPlaceholders !== undefined &&
 						( ! match || numPlaceholders !== match.length )
 					) {
-						context.report(
+						context.report( {
 							node,
-							'sprintf format string options must have the same number of placeholders'
-						);
+							messageId: 'placeholderMismatch',
+						} );
 						return;
 					}
 
 					if ( ! match ) {
-						context.report(
+						context.report( {
 							node,
-							'sprintf format string must contain at least one placeholder'
-						);
+							messageId: 'noPlaceholders',
+						} );
 						return;
 					}
 
