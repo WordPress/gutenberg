@@ -53,6 +53,7 @@ class LatestPostsEdit extends Component {
 		super( ...arguments );
 		this.state = {
 			categoriesList: [],
+			usersList: [],
 		};
 	}
 
@@ -71,6 +72,20 @@ class LatestPostsEdit extends Component {
 					this.setState( { categoriesList: [] } );
 				}
 			} );
+
+		this.fetchRequest = apiFetch( {
+			path: addQueryArgs( `/wp/v2/users` ),
+		} )
+			.then( ( usersList ) => {
+				if ( this.isStillMounted ) {
+					this.setState( { usersList } );
+				}
+			} )
+			.catch( () => {
+				if ( this.isStillMounted ) {
+					this.setState( { usersList: [] } );
+				}
+			} );
 	}
 
 	componentWillUnmount() {
@@ -86,12 +101,13 @@ class LatestPostsEdit extends Component {
 			defaultImageWidth,
 			defaultImageHeight,
 		} = this.props;
-		const { categoriesList } = this.state;
+		const { categoriesList, usersList } = this.state;
 		const {
 			displayFeaturedImage,
 			displayPostContentRadio,
 			displayPostContent,
 			displayPostDate,
+			displayPostAuthor,
 			postLayout,
 			columns,
 			order,
@@ -186,6 +202,13 @@ class LatestPostsEdit extends Component {
 						checked={ displayPostDate }
 						onChange={ ( value ) =>
 							setAttributes( { displayPostDate: value } )
+						}
+					/>
+					<ToggleControl
+						label={ __( 'Display post author' ) }
+						checked={ displayPostAuthor }
+						onChange={ ( value ) =>
+							setAttributes( { displayPostAuthor: value } )
 						}
 					/>
 				</PanelBody>
@@ -337,6 +360,7 @@ class LatestPostsEdit extends Component {
 						'wp-block-latest-posts__list': true,
 						'is-grid': postLayout === 'grid',
 						'has-dates': displayPostDate,
+						'has-author': displayPostAuthor,
 						[ `columns-${ columns }` ]: postLayout === 'grid',
 					} ) }
 				>
@@ -418,6 +442,11 @@ class LatestPostsEdit extends Component {
 											post.date_gmt
 										) }
 									</time>
+								) }
+								{ displayPostAuthor && usersList[ i ].name && (
+									<span className="wp-block-latest-posts__post-author">
+										by { usersList[ i ].name }
+									</span>
 								) }
 								{ displayPostContent &&
 									displayPostContentRadio === 'excerpt' && (
