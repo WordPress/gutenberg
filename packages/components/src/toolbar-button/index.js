@@ -28,36 +28,31 @@ function ToolbarButton( {
 	if ( ! accessibleToolbarState ) {
 		// This should be deprecated when <Toolbar __experimentalAccessibilityLabel="label">
 		// becomes stable.
-		const button = (
-			<Button
-				icon={ props.icon }
-				label={ props.title }
-				shortcut={ props.shortcut }
-				data-subscript={ props.subscript }
-				onClick={ ( event ) => {
-					event.stopPropagation();
-					if ( props.onClick ) {
-						props.onClick( event );
-					}
-				} }
-				className={ classnames(
-					'components-toolbar__control',
-					className
-				) }
-				isPressed={ props.isActive }
-				disabled={ props.isDisabled }
-				data-experimental-toolbar-item
-				{ ...extraProps }
-			/>
+		return (
+			<ToolbarButtonContainer className={ containerClassName }>
+				<Button
+					icon={ props.icon }
+					label={ props.title }
+					shortcut={ props.shortcut }
+					data-subscript={ props.subscript }
+					onClick={ ( event ) => {
+						event.stopPropagation();
+						if ( props.onClick ) {
+							props.onClick( event );
+						}
+					} }
+					className={ classnames(
+						'components-toolbar__control',
+						className
+					) }
+					isPressed={ props.isActive }
+					disabled={ props.isDisabled }
+					data-experimental-toolbar-item
+					{ ...extraProps }
+				/>
+				{ children }
+			</ToolbarButtonContainer>
 		);
-		if ( containerClassName ) {
-			return (
-				<ToolbarButtonContainer className={ containerClassName }>
-					{ button }
-					{ children }
-				</ToolbarButtonContainer>
-			);
-		}
 	}
 
 	// ToobarItem will pass all props to the render prop child, which will pass
