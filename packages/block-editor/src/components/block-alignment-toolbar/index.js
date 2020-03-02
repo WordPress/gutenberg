@@ -58,7 +58,9 @@ export function BlockAlignmentToolbar( {
 
 	const enabledControls = wideControlsEnabled
 		? controls
-		: controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
+		: controls.filter(
+				( control ) => WIDE_CONTROLS.indexOf( control ) === -1
+		  );
 
 	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value ];
 	const defaultAlignmentControl =

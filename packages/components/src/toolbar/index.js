@@ -23,7 +23,10 @@ import ToolbarContainer from './toolbar-container';
  * @param {string} [props.className] Class to set on the container div.
  * @param {Object} ref               React Element ref.
  */
-function Toolbar( { className, __experimentalAccessibilityLabel, ...props }, ref ) {
+function Toolbar(
+	{ className, __experimentalAccessibilityLabel, ...props },
+	ref
+) {
 	if ( __experimentalAccessibilityLabel ) {
 		return (
 			<ToolbarContainer
