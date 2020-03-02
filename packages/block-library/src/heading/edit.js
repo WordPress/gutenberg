@@ -20,6 +20,7 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
@@ -80,7 +81,7 @@ function HeadingEdit( {
 				<RichText
 					ref={ ref }
 					identifier="content"
-					tagName={ tagName }
+					tagName={ Block[ tagName ] }
 					value={ content }
 					onChange={ ( value ) =>
 						setAttributes( { content: value } )
