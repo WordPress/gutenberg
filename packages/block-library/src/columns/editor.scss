@@ -175,3 +175,16 @@ div.block-core-columns.is-vertically-aligned-bottom {
 		padding-right: $block-container-side-padding;
 	}
 }
+
+// Stop Columns butting up against edge of viewport on smaller viewports. Remove
+// on larger viewports where width handles this. Specificity overide required to
+// overide generic `.entry-content *` rule
+.wp-block-columns > .block-editor-inner-blocks > .block-editor-block-list__layout {
+	padding-left: $block-padding;
+	padding-right: $block-padding;
+
+	@include break-small() {
+		padding-left: 0;
+		padding-right: 0;
+	}
+}
