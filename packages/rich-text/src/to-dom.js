@@ -309,9 +309,16 @@ export function applySelection( { startPath, endPath }, current ) {
 	// there is no focus, which is accounted for here in the explicit `blur` to
 	// restore to a state of non-focus.
 	if ( activeElement !== document.activeElement ) {
+		// The `instanceof` checks protect against edge cases where the focused
+		// element is not of the interface HTMLElement (does not have a `focus`
+		// or `blur` property).
+		//
+		// See: https://github.com/Microsoft/TypeScript/issues/5901#issuecomment-431649653
 		if ( activeElement ) {
-			activeElement.focus();
-		} else {
+			if ( activeElement instanceof window.HTMLElement ) {
+				activeElement.focus();
+			}
+		} else if ( document.activeElement instanceof window.HTMLElement ) {
 			document.activeElement.blur();
 		}
 	}
