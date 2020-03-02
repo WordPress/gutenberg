@@ -51,7 +51,7 @@ $z-layers: (
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
-	".block-editor-inner-blocks.has-overlay::after": 60,
+	".block-editor-block-list__layout.has-overlay::after": 60,
 
 	// The toolbar, when contextual, should be above any adjacent nested block click overlays.
 	".block-editor-block-contextual-toolbar": 61,

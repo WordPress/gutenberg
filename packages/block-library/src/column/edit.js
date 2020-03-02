@@ -11,6 +11,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -30,8 +31,10 @@ function ColumnEdit( {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
+	const hasWidth = Number.isFinite( width );
+
 	return (
-		<div className={ classes }>
+		<>
 			<BlockControls>
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
@@ -61,11 +64,16 @@ function ColumnEdit( {
 				templateLock={ false }
 				renderAppender={
 					hasChildBlocks
-						? undefined
+						? false
 						: () => <InnerBlocks.ButtonBlockAppender />
 				}
+				__experimentalTagName={ Block.div }
+				__experimentalPassedProps={ {
+					className: classes,
+					style: hasWidth ? { flexBasis: width + '%' } : undefined,
+				} }
 			/>
-		</div>
+		</>
 	);
 }
 

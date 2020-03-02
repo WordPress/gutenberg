@@ -48,6 +48,7 @@ const BlockComponent = forwardRef(
 			name,
 			mode,
 			blockTitle,
+			wrapperProps,
 		} = useContext( BlockContext );
 		const { initialPosition } = useSelect(
 			( select ) => {
@@ -194,6 +195,7 @@ const BlockComponent = forwardRef(
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
+				{ ...wrapperProps }
 				{ ...props }
 				id={ blockElementId }
 				ref={ wrapper }
