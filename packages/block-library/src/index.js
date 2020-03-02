@@ -76,7 +76,6 @@ import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
 import * as postTags from './post-tags';
 import * as query from './query';
-import { registerQueryStore, registerDeduplicatedBlock } from './query/store';
 
 /**
  * Function to register an individual block.
@@ -213,10 +212,5 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 						  ]
 						: [] ),
 				].forEach( registerBlock );
-
-				if ( __experimentalEnableFullSiteEditing ) {
-					registerQueryStore();
-					registerDeduplicatedBlock( `core/${ query.name }` );
-				}
 		  }
 		: undefined;

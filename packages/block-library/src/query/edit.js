@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import QueryPanel from './query-panel';
-import { STORE_NAMESPACE } from './store';
 
 /**
  * External dependencies
@@ -25,7 +24,7 @@ import { cloneBlock, createBlock } from '@wordpress/blocks';
 import { PanelBody, Placeholder, Spinner } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { EntityProvider } from '@wordpress/core-data';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 const defaultFields = [
 	'core/post-title',
@@ -109,11 +108,9 @@ class Edit extends Component {
 		const {
 			attributes,
 			className,
+			postList,
 			query,
 			setAttributes,
-			clientId,
-			postList,
-			markPostsAsDisplayed,
 		} = this.props;
 
 		const { criteria } = attributes;
@@ -124,7 +121,6 @@ class Edit extends Component {
 			className,
 			editingPost ? 'is-editing' : ''
 		);
-		markPostsAsDisplayed( clientId, query );
 
 		return (
 			<div className={ classes }>
@@ -229,16 +225,9 @@ const queryCriteriaFromAttributes = ( criteria ) => {
 
 export default compose(
 	withSelect( ( select, props ) => {
-		const { attributes, clientId } = props;
+		const { attributes } = props;
 		const { criteria } = attributes;
 		const queryCriteria = queryCriteriaFromAttributes( criteria );
-
-		if ( ! isSpecificPostModeActive( criteria ) ) {
-			const postIdsToExclude = select( STORE_NAMESPACE ).previousPostIds(
-				clientId
-			);
-			queryCriteria.exclude = postIdsToExclude.join( ',' );
-		}
 
 		return {
 			query: select( 'core' ).getEntityRecords(
@@ -246,17 +235,6 @@ export default compose(
 				'post',
 				queryCriteria
 			),
-		};
-	} ),
-	withDispatch( ( dispatch, props ) => {
-		const { attributes } = props;
-		const { criteria } = attributes;
-		const markPostsAsDisplayed = isSpecificPostModeActive( criteria )
-			? dispatch( STORE_NAMESPACE ).markSpecificPostsAsDisplayed
-			: dispatch( STORE_NAMESPACE ).markPostsAsDisplayed;
-
-		return {
-			markPostsAsDisplayed,
 		};
 	} )
 )( Edit );
