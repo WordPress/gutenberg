@@ -19,6 +19,7 @@
 	}
 
 	// Borders around toolbar segments.
+	.components-toolbar-group,
 	.components-toolbar {
 		background: none;
 		// IE11 has thick paddings without this.
@@ -37,6 +38,7 @@
 	}
 
 	> :last-child,
+	> :last-child .components-toolbar-group,
 	> :last-child .components-toolbar {
 		border-right: none;
 	}
@@ -119,7 +121,8 @@
 
 	// Size multiple sequential buttons to be optically balanced.
 	// Icons are 36px, as set by a 24px icon and 12px padding.
-	.components-toolbar div > .components-button.has-icon {
+	.components-toolbar-group > .components-button.has-icon:not(.block-editor-block-mover__control),
+	.components-toolbar > .components-button.has-icon:not(.block-editor-block-mover__control) {
 		min-width: $block-toolbar-height - $grid-unit-15;
 		padding-left: $grid-unit-15 / 2; // 6px.
 		padding-right: $grid-unit-15 / 2;
@@ -135,7 +138,10 @@
 	}
 
 	// First button in a group.
-	.components-toolbar div:first-child .components-button {
+	.components-toolbar-group > .components-button:first-child:not(.block-editor-block-mover__control),
+	.components-toolbar-group > div:first-child .components-button:not(.block-editor-block-mover__control),
+	.components-toolbar > .components-button:first-child:not(.block-editor-block-mover__control),
+	.components-toolbar > div:first-child .components-button:not(.block-editor-block-mover__control) {
 		min-width: $block-toolbar-height - $grid-unit-15 / 2;
 		padding-left: $grid-unit-15 - $border-width;
 		padding-right: $grid-unit-15 / 2;
@@ -147,7 +153,10 @@
 	}
 
 	// Last button in a group.
-	.components-toolbar div:last-child .components-button {
+	.components-toolbar-group > .components-button:last-child:not(.block-editor-block-mover__control),
+	.components-toolbar-group > div:last-child .components-button:not(.block-editor-block-mover__control),
+	.components-toolbar > .components-button:last-child:not(.block-editor-block-mover__control),
+	.components-toolbar > div:last-child .components-button:not(.block-editor-block-mover__control) {
 		min-width: $block-toolbar-height - $grid-unit-15 / 2;
 		padding-left: $grid-unit-15 / 2;
 		padding-right: $grid-unit-15 - $border-width;
@@ -158,15 +167,11 @@
 		}
 	}
 
-	// .components-toolbar-group {
-	// 	border-color: $light-gray-800;
-	// 	border-left: 0;
-	// 	margin: 0;
-	// }
-
 	// Single buttons should remain 48px.
-	// .components-toolbar-group div:first-child:last-child > .components-button,
-	.components-toolbar div:first-child:last-child > .components-button {
+	.components-toolbar-group > .components-button:first-child:last-child:not(.block-editor-block-mover__control),
+	.components-toolbar-group > div:first-child:last-child .components-button:not(.block-editor-block-mover__control),
+	.components-toolbar > .components-button:first-child:last-child:not(.block-editor-block-mover__control),
+	.components-toolbar > div:first-child:last-child .components-button:not(.block-editor-block-mover__control) {
 		min-width: $block-toolbar-height;
 		padding-left: $grid-unit-15;
 		padding-right: $grid-unit-15;

@@ -13,15 +13,18 @@
 
 // Show the mover in a single button under the contextual toolbar.
 .block-editor-block-mover {
+	.components-toolbar-group,
 	.components-toolbar {
 		flex-direction: column;
 	}
 
+	&.is-horizontal .components-toolbar-group,
 	&.is-horizontal .components-toolbar {
 		flex-direction: row;
 	}
 
 	// Position the icons correctly.
+	.components-toolbar-group .block-editor-block-mover__control-up,
 	.components-toolbar .block-editor-block-mover__control-up {
 		svg {
 			margin-bottom: -$grid-unit-10;
@@ -34,6 +37,7 @@
 		}
 	}
 
+	.components-toolbar-group .block-editor-block-mover__control-down,
 	.components-toolbar .block-editor-block-mover__control-down {
 		svg {
 			margin-top: -$grid-unit-10;
