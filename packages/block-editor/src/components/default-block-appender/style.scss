@@ -31,7 +31,7 @@
 		// Emulate the dimensions of a paragraph block.
 		// On mobile and in nested contexts, the plus to add blocks shows up on the right.
 		// The rightmost padding makes sure it doesn't overlap text.
-		padding: 0 #{ $block-padding + $icon-button-size } 0 $block-padding;
+		padding: 0 #{ $block-padding + $button-size } 0 $block-padding;
 
 		// Use opacity to work in various editor styles.
 		color: $dark-opacity-300;
@@ -48,7 +48,6 @@
 
 // Ensure that the height of the first appender, and the one between blocks, is the same as text.
 .block-editor-default-block-appender__content {
-	min-height: $empty-paragraph-height / 2;
 	line-height: $editor-line-height;
 }
 
