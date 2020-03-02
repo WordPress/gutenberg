@@ -131,7 +131,7 @@ const BlockComponent = forwardRef(
 
 		useEffect( () => {
 			if ( ! isMultiSelecting && ! isNavigationMode && isSelected ) {
-				focusTabbable( ! isMounting.current );
+				focusTabbable( true );
 			}
 
 			isMounting.current = false;
