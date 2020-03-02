@@ -72,9 +72,6 @@ class ButtonEdit extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.richTextRef ) {
-			this.richTextRef.blur();
-		}
 		this.onSetMaxWidth();
 	}
 
