@@ -130,7 +130,9 @@ export class PostPreviewButton extends Component {
 
 		if ( previewWindow && ! previewWindow.closed ) {
 			previewWindow.location = url;
-			this.buttonRef.current.focus();
+			if ( this.buttonRef.current ) {
+				this.buttonRef.current.focus();
+			}
 		}
 	}
 
