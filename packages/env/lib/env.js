@@ -449,13 +449,17 @@ async function configureWordPress( environment, config ) {
 	// Install WordPress.
 	await dockerCompose.run(
 		environment === 'development' ? 'cli' : 'tests-cli',
-		`wp core install
-			--url=localhost:${ port }
-			--title='${ config.name }'
-			--admin_user=admin
-			--admin_password=password
-			--admin_email=wordpress@example.com
-			--skip-email`,
+		[
+			'wp',
+			'core',
+			'install',
+			`--url=localhost:${ port }`,
+			`--title=${ config.name }`,
+			'--admin_user=admin',
+			'--admin_password=password',
+			'--admin_email=wordpress@example.com',
+			'--skip-email',
+		],
 		options
 	);
 
