@@ -5,18 +5,12 @@ import classnames from 'classnames';
 import useResizeAware from 'react-resize-aware';
 
 /**
- * Internal dependencies
- */
-import Icon from '../icon';
-
-/**
  * Renders a placeholder. Normally used by blocks to render their empty state.
  *
  * @param  {Object} props The component props.
  * @return {Object}       The rendered placeholder.
  */
 function Placeholder( {
-	icon,
 	children,
 	label,
 	instructions,
@@ -56,10 +50,7 @@ function Placeholder( {
 					{ preview }
 				</div>
 			) }
-			<div className="components-placeholder__label">
-				<Icon icon={ icon } />
-				{ label }
-			</div>
+			<div className="components-placeholder__label">{ label }</div>
 			{ !! instructions && (
 				<div className="components-placeholder__instructions">
 					{ instructions }
