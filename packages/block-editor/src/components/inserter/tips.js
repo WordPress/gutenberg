@@ -23,7 +23,7 @@ const globalTips = [
 	),
 	__experimentalCreateInterpolateElement(
 		__(
-			'Outdent a list by pressing <kbd>backspace</kbd> at the beginning of a line'
+			'Outdent a list by pressing <kbd>backspace</kbd> at the beginning of a line.'
 		),
 		{ kbd: <kbd /> }
 	),
