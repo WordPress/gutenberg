@@ -3,7 +3,15 @@
 /**
  * External dependencies
  */
-import { get, omit, pick, isFunction, isPlainObject, some } from 'lodash';
+import {
+	cloneDeep,
+	get,
+	isFunction,
+	isPlainObject,
+	omit,
+	pick,
+	some,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -154,7 +162,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
-		...DEFAULT_BLOCK_TYPE_SETTINGS,
+		...cloneDeep( DEFAULT_BLOCK_TYPE_SETTINGS ),
 		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};
