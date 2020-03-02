@@ -27,7 +27,7 @@ function render_block_core_search( $attributes ) {
 		);
 	} else {
 		$label_markup = sprintf(
-			'<label for="%s" class="wp-block-search__label screen-reader-text">%s</label>',
+			'<label for="%s" class="wp-block-search__label components-visually-hidden">%s</label>',
 			$input_id,
 			__( 'Search' )
 		);

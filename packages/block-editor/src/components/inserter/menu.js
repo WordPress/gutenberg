@@ -20,7 +20,11 @@ import scrollIntoView from 'dom-scroll-into-view';
 import { speak } from '@wordpress/a11y';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
-import { PanelBody, withSpokenMessages } from '@wordpress/components';
+import {
+	PanelBody,
+	withSpokenMessages,
+	VisuallyHidden,
+} from '@wordpress/components';
 import {
 	isReusableBlock,
 	createBlock,
@@ -316,12 +320,12 @@ export class InserterMenu extends Component {
 				onKeyDown={ this.onKeyDown }
 			>
 				<div className="block-editor-inserter__main-area">
-					<label
+					<VisuallyHidden
+						as="label"
 						htmlFor={ `block-editor-inserter__search-${ instanceId }` }
-						className="screen-reader-text"
 					>
 						{ __( 'Search for a block' ) }
-					</label>
+					</VisuallyHidden>
 					<input
 						id={ `block-editor-inserter__search-${ instanceId }` }
 						type="search"

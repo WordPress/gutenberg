@@ -11,7 +11,7 @@ import { Icon, check, chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { Button } from '../';
+import { Button, VisuallyHidden } from '../';
 
 const itemToString = ( item ) => item && item.name;
 // This is needed so that in Windows, where
@@ -91,6 +91,9 @@ export default function CustomSelectControl( {
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
+
+	const LabelComponent = hideLabelFromVision ? VisuallyHidden : 'label';
+	const labelProps = hideLabelFromVision ? { as: 'label' } : {};
 	return (
 		<div
 			className={ classnames(
@@ -99,7 +102,9 @@ export default function CustomSelectControl( {
 			) }
 		>
 			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */ }
-			<label
+			<VisuallyHidden
+				as="label"
+				shouldBeHidden={ hideLabelFromVision }
 				{ ...getLabelProps( {
 					className: classnames(
 						'components-custom-select-control__label',
@@ -110,7 +115,21 @@ export default function CustomSelectControl( {
 				} ) }
 			>
 				{ label }
-			</label>
+			</VisuallyHidden>
+
+			<LabelComponent
+				{ ...getLabelProps( {
+					className: classnames(
+						'components-custom-select-control__label',
+						{
+							'screen-reader-text': hideLabelFromVision,
+						}
+					),
+				} ) }
+				{ ...labelProps }
+			>
+				{ label }
+			</LabelComponent>
 			<Button
 				{ ...getToggleButtonProps( {
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
