@@ -147,6 +147,7 @@ export default function ListEdit( {
 			<RichText
 				identifier="values"
 				multiline="li"
+				__unstableMultilineRootTag={ tagName }
 				tagName={ Block[ tagName ] }
 				onChange={ ( nextValues ) =>
 					setAttributes( { values: nextValues } )

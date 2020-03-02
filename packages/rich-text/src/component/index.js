@@ -769,7 +769,10 @@ class RichText extends Component {
 	 */
 	handleSpace( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-		const { tagName, __unstableMultilineTag: multilineTag } = this.props;
+		const {
+			__unstableMultilineRootTag: multilineRootTag,
+			__unstableMultilineTag: multilineTag,
+		} = this.props;
 
 		if (
 			// Only override when no modifiers are pressed.
@@ -797,7 +800,7 @@ class RichText extends Component {
 			return;
 		}
 
-		this.onChange( indentListItems( value, { type: tagName } ) );
+		this.onChange( indentListItems( value, { type: multilineRootTag } ) );
 		event.preventDefault();
 	}
 
