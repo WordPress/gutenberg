@@ -30,8 +30,8 @@ function BlockList(
 		isDraggable,
 		renderAppender,
 		__experimentalUIParts = {},
-		tagName = 'div',
-		...props
+		__experimentalTagName = 'div',
+		__experimentalPassedProps = {},
 	},
 	ref
 ) {
@@ -67,7 +67,7 @@ function BlockList(
 		enableAnimation,
 	} = useSelect( selector, [ rootClientId ] );
 
-	const Container = rootClientId ? tagName : RootContainer;
+	const Container = rootClientId ? __experimentalTagName : RootContainer;
 	const targetClientId = useBlockDropZone( {
 		element: ref,
 		rootClientId,
@@ -84,7 +84,7 @@ function BlockList(
 				className
 			) }
 			{ ...__experimentalContainerProps }
-			{ ...props }
+			{ ...__experimentalPassedProps }
 		>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection

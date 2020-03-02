@@ -67,9 +67,11 @@ function ColumnEdit( {
 						? false
 						: () => <InnerBlocks.ButtonBlockAppender />
 				}
-				tagName={ Block.div }
-				className={ classes }
-				style={ hasWidth ? { flexBasis: width + '%' } : undefined }
+				__experimentalTagName={ Block.div }
+				__experimentalPassedProps={ {
+					className: classes,
+					style: hasWidth ? { flexBasis: width + '%' } : undefined,
+				} }
 			/>
 		</>
 	);

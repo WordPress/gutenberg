@@ -107,9 +107,11 @@ function ColumnsEditContainer( {
 					<InnerBlocks
 						allowedBlocks={ ALLOWED_BLOCKS }
 						__experimentalMoverDirection="horizontal"
-						tagName={ Block.div }
-						className={ classes }
 						ref={ ref }
+						__experimentalTagName={ Block.div }
+						__experimentalPassedProps={ {
+							className: classes,
+						} }
 					/>
 				</TextColor>
 			</BackgroundColor>

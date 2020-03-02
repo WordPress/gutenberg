@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, isEqual, omit } from 'lodash';
+import { pick, isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -150,7 +150,6 @@ class InnerBlocks extends Component {
 			hasOverlay,
 			__experimentalCaptureToolbars: captureToolbars,
 			forwardedRef,
-			className,
 			...props
 		} = this.props;
 		const { templateInProcess } = this.state;
@@ -159,34 +158,21 @@ class InnerBlocks extends Component {
 			return null;
 		}
 
-		const classes = classnames( className, {
+		const classes = classnames( {
 			'has-overlay': enableClickThrough && hasOverlay,
 			'is-capturing-toolbar': captureToolbars,
 		} );
 
 		const blockList = (
 			<BlockList
+				{ ...props }
 				ref={ forwardedRef }
 				rootClientId={ clientId }
 				className={ classes }
-				{ ...omit( props, [
-					'templateLock',
-					'isSmallScreen',
-					'block',
-					'blockListSettings',
-					'parentLock',
-					'isLastBlockChangePersistent',
-					'replaceInnerBlocks',
-					'__unstableMarkNextChangeAsNotPersistent',
-					'updateNestedSettings',
-					'__experimentalMoverDirection',
-					'allowedBlocks',
-					'template',
-				] ) }
 			/>
 		);
 
-		if ( props.tagName ) {
+		if ( props.__experimentalTagName ) {
 			return blockList;
 		}
 
