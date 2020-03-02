@@ -78,13 +78,14 @@ function BlockList(
 
 	return (
 		<Container
+			{ ...__experimentalPassedProps }
 			ref={ ref }
 			className={ classnames(
 				'block-editor-block-list__layout',
-				className
+				className,
+				__experimentalPassedProps.className
 			) }
 			{ ...__experimentalContainerProps }
-			{ ...__experimentalPassedProps }
 		>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
