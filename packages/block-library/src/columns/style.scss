@@ -14,6 +14,21 @@
 	}
 }
 
+// Stop Columns butting up against edge of viewport on smaller viewports. Remove
+// on larger viewports where width handles this. Specificity overide required to
+// overide generic `.entry-content *` rule
+.wp-block-columns {
+	&.wp-block-columns:not(.has-background) {
+		padding-left: $block-padding;
+		padding-right: $block-padding;
+
+		@include break-xlarge() {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
+}
+
 .wp-block-column {
 	flex-grow: 1;
 
