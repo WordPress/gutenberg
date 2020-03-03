@@ -7,7 +7,8 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { Button, Path, SVG } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { Path, SVG } from '@wordpress/primitives';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
