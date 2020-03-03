@@ -21,7 +21,7 @@ async function main() {
 		cwd: path.resolve( __dirname, '..', '..' ),
 	} );
 	const projectPaths = packagesWithTs.map( ( tsconfigPath ) =>
-		path.resolve( path.dirname( tsconfigPath ) )
+		path.dirname( tsconfigPath )
 	);
 
 	const args = [ '--build', ...projectPaths, ...process.argv.slice( 2 ) ];
