@@ -92,8 +92,17 @@ export default function CustomSelectControl( {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
 
-	const LabelComponent = hideLabelFromVision ? VisuallyHidden : 'label';
-	const labelProps = hideLabelFromVision ? { as: 'label' } : {};
+	const labelElem = (
+		/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
+		<label
+			{ ...getLabelProps( {
+				className: 'components-custom-select-control__label',
+			} ) }
+		>
+			{ label }
+		</label>
+	);
+
 	return (
 		<div
 			className={ classnames(
@@ -101,35 +110,11 @@ export default function CustomSelectControl( {
 				className
 			) }
 		>
-			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */ }
-			<VisuallyHidden
-				as="label"
-				shouldBeHidden={ hideLabelFromVision }
-				{ ...getLabelProps( {
-					className: classnames(
-						'components-custom-select-control__label',
-						{
-							'screen-reader-text': hideLabelFromVision,
-						}
-					),
-				} ) }
-			>
-				{ label }
-			</VisuallyHidden>
-
-			<LabelComponent
-				{ ...getLabelProps( {
-					className: classnames(
-						'components-custom-select-control__label',
-						{
-							'screen-reader-text': hideLabelFromVision,
-						}
-					),
-				} ) }
-				{ ...labelProps }
-			>
-				{ label }
-			</LabelComponent>
+			{ hideLabelFromVision ? (
+				<VisuallyHidden> { labelElem } </VisuallyHidden>
+			) : (
+				labelElem
+			) }
 			<Button
 				{ ...getToggleButtonProps( {
 					// This is needed because some speech recognition software don't support `aria-labelledby`.

@@ -3025,11 +3025,11 @@ exports[`Storyshots Components/ExternalLink Default 1`] = `
   target="_blank"
 >
   WordPress
-  <span
+  <div
     className="components-visually-hidden"
   >
     (opens in a new tab)
-  </span>
+  </div>
   <svg
     aria-hidden="true"
     className="components-external-link__icon"
@@ -3051,11 +3051,13 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
 <fieldset
   className="components-font-size-picker"
 >
-  <legend
-    className="screen-reader-text"
+  <div
+    className="components-visually-hidden"
   >
-    Font size
-  </legend>
+    <legend>
+      Font size
+    </legend>
+  </div>
   <div
     className="components-font-size-picker__controls"
   >
@@ -3342,11 +3344,13 @@ input[type='number'].emotion-18 {
 <fieldset
   className="components-font-size-picker"
 >
-  <legend
-    className="screen-reader-text"
+  <div
+    className="components-visually-hidden"
   >
-    Font size
-  </legend>
+    <legend>
+      Font size
+    </legend>
+  </div>
   <div
     className="components-font-size-picker__controls"
   >
@@ -3538,11 +3542,13 @@ exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
 <fieldset
   className="components-font-size-picker"
 >
-  <legend
-    className="screen-reader-text"
+  <div
+    className="components-visually-hidden"
   >
-    Font size
-  </legend>
+    <legend>
+      Font size
+    </legend>
+  </div>
   <div
     className="components-font-size-picker__controls"
   >

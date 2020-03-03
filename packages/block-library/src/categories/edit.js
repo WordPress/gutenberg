@@ -137,8 +137,8 @@ class CategoriesEdit extends Component {
 		const selectId = `blocks-category-select-${ instanceId }`;
 		return (
 			<>
-				<VisuallyHidden as="label" htmlFor={ selectId }>
-					{ __( 'Categories' ) }
+				<VisuallyHidden>
+					<label htmlFor={ selectId }>{ __( 'Categories' ) }</label>
 				</VisuallyHidden>
 				<select
 					id={ selectId }

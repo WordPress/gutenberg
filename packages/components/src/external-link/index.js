@@ -35,7 +35,7 @@ export function ExternalLink(
 			ref={ ref }
 		>
 			{ children }
-			<VisuallyHidden as="span">
+			<VisuallyHidden>
 				{ /* translators: accessibility text */
 				__( '(opens in a new tab)' ) }
 			</VisuallyHidden>

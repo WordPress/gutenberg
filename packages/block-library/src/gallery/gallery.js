@@ -41,9 +41,17 @@ export const Gallery = ( props ) => {
 		images,
 	} = attributes;
 
-	const shouldHideCaption = ! isSelected && RichText.isEmpty( caption );
-	const CaptionComponent = shouldHideCaption ? VisuallyHidden : RichText;
-	const captionProps = shouldHideCaption ? { as: RichText } : {};
+	const richTextElem = (
+		<RichText
+			tagName="figcaption"
+			className="blocks-gallery-caption"
+			placeholder={ __( 'Write gallery caption…' ) }
+			value={ caption }
+			unstableOnFocus={ onFocusGalleryCaption }
+			onChange={ ( value ) => setAttributes( { caption: value } ) }
+			inlineToolbar
+		/>
+	);
 
 	return (
 		<figure
@@ -92,16 +100,11 @@ export const Gallery = ( props ) => {
 				} ) }
 			</ul>
 			{ mediaPlaceholder }
-			<CaptionComponent
-				tagName="figcaption"
-				className="blocks-gallery-caption"
-				placeholder={ __( 'Write gallery caption…' ) }
-				value={ caption }
-				unstableOnFocus={ onFocusGalleryCaption }
-				onChange={ ( value ) => setAttributes( { caption: value } ) }
-				inlineToolbar
-				{ ...captionProps }
-			/>
+			{ ! isSelected && RichText.isEmpty( caption ) ? (
+				<VisuallyHidden>{ richTextElem }</VisuallyHidden>
+			) : (
+				richTextElem
+			) }
 		</figure>
 	);
 };

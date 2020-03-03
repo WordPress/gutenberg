@@ -117,7 +117,7 @@ function ControlPointButton( {
 				} }
 				{ ...additionalProps }
 			/>
-			<VisuallyHidden as="div" id={ descriptionId }>
+			<VisuallyHidden id={ descriptionId }>
 				{ __(
 					'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
 				) }

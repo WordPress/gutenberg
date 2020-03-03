@@ -58,7 +58,7 @@ export default function BlockNavigationList( {
 								<BlockIcon icon={ blockType.icon } showColors />
 								{ getBlockLabel( blockType, block.attributes ) }
 								{ isSelected && (
-									<VisuallyHidden as="span">
+									<VisuallyHidden>
 										{ __( '(selected block)' ) }
 									</VisuallyHidden>
 								) }

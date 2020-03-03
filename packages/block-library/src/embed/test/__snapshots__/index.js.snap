@@ -60,11 +60,11 @@ exports[`core/embed block edit matches snapshot 1`] = `
         target="_blank"
       >
         Learn more about embeds
-        <span
+        <div
           class="components-visually-hidden"
         >
           (opens in a new tab)
-        </span>
+        </div>
         <svg
           aria-hidden="true"
           class="components-external-link__icon"
