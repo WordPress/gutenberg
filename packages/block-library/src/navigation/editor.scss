@@ -85,7 +85,6 @@ $colors-selector-size: 22px;
 
 	// Button container.
 	.block-library-colors-selector__icon-container {
-		width: 42px;
 		height: 30px;
 		position: relative;
 		margin: 0 auto;
@@ -93,11 +92,11 @@ $colors-selector-size: 22px;
 		display: flex;
 		align-items: center;
 		border-radius: 4px;
+	}
 
-		// Add the button arrow.
-		&::after {
-			@include dropdown-arrow();
-		}
+	.block-library-colors-selector__state-selection {
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	// colors-selector - selection status.

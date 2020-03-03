@@ -302,22 +302,6 @@
 	text-align: center;
 }
 
-@mixin dropdown-arrow() {
-	content: "";
-	pointer-events: none;
-	display: block;
-	width: 0;
-	height: 0;
-	border-left: 3px solid transparent;
-	border-right: 3px solid transparent;
-	border-top: 5px solid;
-	margin-left: $grid-unit-05;
-
-	// This gives the icon space on the right side consistent with the material
-	// icon standards.
-	margin-right: 2px;
-}
-
 
 /**
  * Allows users to opt-out of animations via OS-level preferences.
