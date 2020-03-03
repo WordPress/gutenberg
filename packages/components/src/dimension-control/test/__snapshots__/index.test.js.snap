@@ -83,11 +83,11 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
       <Icon
         icon={
           <SVG
-            viewBox="-2 -2 24 24"
+            viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
           >
             <Path
-              d="M17 7v3h-5v5H9v-5H4V7h5V2h3v5h5z"
+              d="M13.2 17.2h-1.4v-5h-5v-1.4h5V6.2h1.4v4.6h4.6v1.4h-4.6z"
             />
           </SVG>
         }
@@ -136,11 +136,11 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
       <Icon
         icon={
           <SVG
-            viewBox="-2 -2 24 24"
+            viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
           >
             <Path
-              d="M17 7v3h-5v5H9v-5H4V7h5V2h3v5h5z"
+              d="M13.2 17.2h-1.4v-5h-5v-1.4h5V6.2h1.4v4.6h4.6v1.4h-4.6z"
             />
           </SVG>
         }
