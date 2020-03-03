@@ -365,14 +365,43 @@
 }
 
 // Sibling inserter / "inbetweenserter".
+// Fade it in after a delay.
 .block-editor-block-list__insertion-point-inserter,
 .block-editor-block-list__block-popover-inserter {
 	.block-editor-inserter__toggle.components-button {
-		// Special dimensions for this button.
-		min-width: 32px;
-		height: 32px;
+		animation: block-editor-inserter__toggle__fade-in-animation-delayed 1.2s ease;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
+
+		&:hover {
+			animation: block-editor-inserter__toggle__fade-in-animation 0.2s ease;
+			animation-fill-mode: forwards;
+			@include reduce-motion("animation");
+		}
 	}
 }
+
+@keyframes block-editor-inserter__toggle__fade-in-animation-delayed {
+	0% {
+		opacity: 0;
+	}
+	80% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes block-editor-inserter__toggle__fade-in-animation {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
 
 // This is the edge-to-edge hover area that contains the plus.
 .block-editor-block-list__block {

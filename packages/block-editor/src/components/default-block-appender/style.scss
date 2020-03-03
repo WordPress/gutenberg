@@ -51,32 +51,29 @@
 	line-height: $editor-line-height;
 }
 
+// Basic look for sibling inserter, and side-inserter.
+.block-editor-inserter__toggle.components-button {
+	background: $dark-gray-primary;
+	border-radius: $radius-block-ui;
+	color: $white;
+
+	// Special dimensions for this button.
+	min-width: 24px;
+	height: 24px;
+
+	&:hover {
+		color: $white;
+	}
+}
+
 // Empty / default block side inserter.
 .block-editor-block-list__empty-block-inserter, // Empty paragraph
 .block-editor-default-block-appender .block-editor-inserter { // Empty appender
 	position: absolute;
-	top: 0;
-
-	// Change the size of the buttons to match that of the default paragraph height.
-	.components-button.has-icon {
-		width: $block-side-ui-width;
-		height: $block-side-ui-width;
-		padding: 0;
-	}
-
-	.components-button svg {
-		display: block;
-		margin: auto;
-	}
+	top: 2px; // Centers it in the default paragraph height.
 
 	.block-editor-inserter__toggle {
 		margin-right: 0;
-
-		// Hide the box shadow that appears on hover.
-		// All the :not() rules are needed to override default Button styles.
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
-			box-shadow: none;
-		}
 	}
 }
 
