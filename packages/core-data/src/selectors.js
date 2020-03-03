@@ -193,56 +193,52 @@ export function getEntityRecords( state, kind, name, query ) {
 }
 
 /**
- * Returns a map of objects with each edited
- * raw entity record and its corresponding edits.
- *
- * The map is keyed by entity `kind => name => key => { rawRecord, edits }`.
+ * Returns the  list of dirty entity records.
  *
  * @param {Object} state State tree.
  *
- * @return {{ [kind: string]: { [name: string]: { [key: string]: { rawRecord: Object<string,*>, edits: Object<string,*> } } } }} The map of edited records with their edits.
+ * @return {[{ title: string, key: string, name: string, kind: string }]} The list of updated records
  */
-export const getEntityRecordChangesByRecord = createSelector(
+export const __experimentalGetDirtyEntityRecords = createSelector(
 	( state ) => {
 		const {
 			entities: { data },
 		} = state;
-		return Object.keys( data ).reduce( ( acc, kind ) => {
+		const dirtyRecords = [];
+		Object.keys( data ).forEach( ( kind ) => {
 			Object.keys( data[ kind ] ).forEach( ( name ) => {
-				const editsKeys = Object.keys(
+				const primaryKeys = Object.keys(
 					data[ kind ][ name ].edits
-				).filter( ( editsKey ) =>
-					hasEditsForEntityRecord( state, kind, name, editsKey )
+				).filter( ( pks ) =>
+					hasEditsForEntityRecord( state, kind, name, pks )
 				);
-				if ( editsKeys.length ) {
-					if ( ! acc[ kind ] ) {
-						acc[ kind ] = {};
-					}
-					if ( ! acc[ kind ][ name ] ) {
-						acc[ kind ][ name ] = {};
-					}
-					editsKeys.forEach(
-						( editsKey ) =>
-							( acc[ kind ][ name ][ editsKey ] = {
-								rawRecord: getRawEntityRecord(
-									state,
-									kind,
-									name,
-									editsKey
-								),
-								edits: getEntityRecordNonTransientEdits(
-									state,
-									kind,
-									name,
-									editsKey
-								),
-							} )
-					);
+
+				if ( primaryKeys.length ) {
+					const entity = getEntity( state, kind, name );
+					primaryKeys.forEach( ( primaryKey ) => {
+						const entityRecord = getEntityRecord(
+							state,
+							kind,
+							name,
+							primaryKey
+						);
+						dirtyRecords.push( {
+							// We avoid using primrayKey because it's transformed to a string
+							// when it's used as an object key.
+							key: entityRecord[ entity.key || 'id' ],
+							title: ! entity.getTitle
+								? ''
+								: entity.getTitle( entityRecord ),
+							name,
+							kind,
+							entity,
+						} );
+					} );
 				}
 			} );
+		} );
 
-			return acc;
-		}, {} );
+		return dirtyRecords;
 	},
 	( state ) => [ state.entities.data ]
 );

@@ -36,7 +36,8 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/url": "file:../url",
 		"file-saver": "^2.0.2",
-		"jszip": "^3.2.2"
+		"jszip": "^3.2.2",
+		"lodash": "^4.17.15"
 	},
 	"publishConfig": {
 		"access": "public"

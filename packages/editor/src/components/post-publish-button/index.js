@@ -1,10 +1,9 @@
 /**
  * External dependencies
  */
-import { noop, get } from 'lodash';
+import { noop, get, some } from 'lodash';
 import classnames from 'classnames';
 import memoize from 'memize';
-import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
@@ -35,10 +34,9 @@ export class PostPublishButton extends Component {
 			entitiesSavedStatesCallback: false,
 		};
 		this.createIgnoredForSave = memoize(
-			( postType, postId ) =>
-				new EquivalentKeyMap( [
-					[ [ 'postType', postType, String( postId ) ], true ],
-				] ),
+			( postType, postId ) => [
+				{ kind: 'postType', name: postType, key: postId },
+			],
 			{ maxSize: 1 }
 		);
 	}
@@ -65,13 +63,19 @@ export class PostPublishButton extends Component {
 		};
 	}
 
-	closeEntitiesSavedStates( savedById ) {
+	closeEntitiesSavedStates( savedEntities ) {
 		const { postType, postId } = this.props;
 		const { entitiesSavedStatesCallback } = this.state;
 		this.setState( { entitiesSavedStatesCallback: false }, () => {
 			if (
-				savedById &&
-				savedById.has( [ 'postType', postType, String( postId ) ] )
+				savedEntities &&
+				some(
+					savedEntities,
+					( elt ) =>
+						elt.kind === 'postType' &&
+						elt.name === postType &&
+						elt.key === postId
+				)
 			) {
 				// The post entity was checked, call the held callback from `createOnClick`.
 				entitiesSavedStatesCallback();
