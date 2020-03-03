@@ -7,10 +7,10 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { Button, Toolbar } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
-import { chevronLeft } from '@wordpress/icons';
+import { wordpress } from '@wordpress/icons';
 
 function FullscreenModeClose( { isActive, postType } ) {
 	if ( ! isActive || ! postType ) {
@@ -18,19 +18,15 @@ function FullscreenModeClose( { isActive, postType } ) {
 	}
 
 	return (
-		<Toolbar className="edit-post-fullscreen-mode-close__toolbar">
-			<Button
-				icon={ chevronLeft }
-				href={ addQueryArgs( 'edit.php', {
-					post_type: postType.slug,
-				} ) }
-				label={ get(
-					postType,
-					[ 'labels', 'view_items' ],
-					__( 'Back' )
-				) }
-			/>
-		</Toolbar>
+		<Button
+			className="edit-post-fullscreen-mode-close"
+			icon={ wordpress }
+			iconSize={ 36 }
+			href={ addQueryArgs( 'edit.php', {
+				post_type: postType.slug,
+			} ) }
+			label={ get( postType, [ 'labels', 'view_items' ], __( 'Back' ) ) }
+		/>
 	);
 }
 
