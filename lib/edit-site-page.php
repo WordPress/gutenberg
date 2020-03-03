@@ -171,7 +171,7 @@ function gutenberg_edit_site_init( $hook ) {
 
 	wp_add_inline_script(
 		'wp-blocks',
-		sprintf( 'wp.blocks.unstable__bootstrapServerSideBlockDefinitions( %s );', wp_json_encode( array_merge( get_block_categories( $post ), get_block_editor_server_block_settings() ) ) ),
+		sprintf( 'wp.blocks.unstable__bootstrapServerSideBlockDefinitions( %s );', wp_json_encode( get_block_editor_server_block_settings() ) ),
 		'after'
 	);
 
