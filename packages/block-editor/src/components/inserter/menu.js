@@ -321,7 +321,9 @@ export class InserterMenu extends Component {
 			>
 				<div className="block-editor-inserter__main-area">
 					<VisuallyHidden>
-						<label htmlFor={ `block-editor-inserter__search-${ instanceId }` }>
+						<label
+							htmlFor={ `block-editor-inserter__search-${ instanceId }` }
+						>
 							{ __( 'Search for a block' ) }
 						</label>
 					</VisuallyHidden>
