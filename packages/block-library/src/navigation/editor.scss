@@ -44,20 +44,6 @@ $navigation-item-height: 46px;
 		display: none;
 	}
 
-	// Polish the Appender.
-	.wp-block-navigation .block-list-appender {
-		width: 28px;
-		height: 28px;
-
-		.block-editor-button-block-appender {
-			padding: $grid-unit-10;
-			padding-bottom: $grid-unit-05;
-			padding-top: $grid-unit-05;
-			outline: none;
-			background: none;
-		}
-	}
-
 	// Set a min width when the item is focused and empty in order to show the caret.
 	.wp-block-navigation .wp-block-navigation-link.is-selected .block-editor-rich-text__editable:focus {
 		min-width: 20px;

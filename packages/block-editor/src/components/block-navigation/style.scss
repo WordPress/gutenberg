@@ -16,24 +16,6 @@ $tree-item-height: 36px;
 	margin: 0;
 }
 
-.block-editor-block-navigation__list .block-editor-button-block-appender {
-	outline: none;
-	background: none;
-	padding: $grid-unit-10;
-	margin-left: 0.8em;
-	width: $button-size;
-	border-radius: 4px;
-
-	&:hover:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__hover;
-		outline: none;
-	}
-
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__focus;
-	}
-}
-
 .block-editor-block-navigation__list .block-editor-block-navigation__list {
 	margin-top: 2px;
 	border-left: $tree-border-width solid $light-gray-900;
