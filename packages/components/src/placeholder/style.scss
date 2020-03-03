@@ -42,6 +42,14 @@
 	display: flex;
 	font-weight: 600;
 	margin-bottom: $grid-unit-20;
+	align-items: center;
+
+	> svg,
+	.dashicon,
+	.block-editor-block-icon {
+		fill: currentColor;
+		margin-right: 1ch;
+	}
 }
 
 .components-placeholder__fieldset,
