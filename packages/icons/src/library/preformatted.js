@@ -1,15 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { Path, Rect, SVG } from '@wordpress/primitives';
+import { Path, SVG } from '@wordpress/primitives';
 
 const preformatted = (
 	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-		<Path d="M20,4H4C2.9,4,2,4.9,2,6v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V6C22,4.9,21.1,4,20,4z M20,18H4V6h16V18z" />
-		<Rect x="6" y="10" width="2" height="2" />
-		<Rect x="6" y="14" width="8" height="2" />
-		<Rect x="16" y="14" width="2" height="2" />
-		<Rect x="10" y="10" width="8" height="2" />
+		<Path d="M18 4H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 14c0 .3-.2.5-.5.5H6c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h12c.3 0 .5.2.5.5v12zM7 16.5h6V15H7v1.5zm4-4h6V11h-6v1.5zM9 11H7v1.5h2V11zm6 5.5h2V15h-2v1.5z" />
 	</SVG>
 );
 
