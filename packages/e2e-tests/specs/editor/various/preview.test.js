@@ -8,12 +8,14 @@ import { parse } from 'url';
  * WordPress dependencies
  */
 import {
+	activatePlugin,
 	clickOnCloseModalButton,
+	clickOnMoreMenuItem,
 	createNewPost,
 	createURL,
+	deactivatePlugin,
 	publishPost,
 	saveDraft,
-	clickOnMoreMenuItem,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').Page} Page */
@@ -321,5 +323,38 @@ describe( 'Preview with Custom Fields enabled', () => {
 
 		// Make sure the editor is active for the afterEach function.
 		await editorPage.bringToFront();
+	} );
+} );
+
+describe( 'Preview with private custom post type', () => {
+	beforeAll( async () => {
+		await activatePlugin( 'gutenberg-test-custom-post-types' );
+	} );
+
+	afterAll( async () => {
+		await deactivatePlugin( 'gutenberg-test-custom-post-types' );
+	} );
+
+	it( 'should not show the Preview Externally button', async () => {
+		await createNewPost( { postType: 'not_public' } );
+
+		// Type in the title filed.
+		await page.type( '.editor-post-title__input', 'aaaaa' );
+		await page.keyboard.press( 'Tab' );
+
+		// Open the preview menu.
+		await page.click( '.editor-post-preview__button-toggle' );
+
+		// Expect there to be three preview buttons.
+		const previewButtons = await page.$$(
+			'.editor-post-preview__button-resize'
+		);
+		expect( previewButtons.length ).toBe( 3 );
+
+		// Expect the Preview Externally button not to be present.
+		const previewExternallyButton = await page.$x(
+			'//a[contains(text(), "Preview externally")]'
+		);
+		expect( previewExternallyButton.length ).toBe( 0 );
 	} );
 } );
