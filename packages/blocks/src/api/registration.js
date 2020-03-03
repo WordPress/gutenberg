@@ -3,15 +3,7 @@
 /**
  * External dependencies
  */
-import {
-	cloneDeep,
-	get,
-	isFunction,
-	isPlainObject,
-	omit,
-	pick,
-	some,
-} from 'lodash';
+import { get, isFunction, isPlainObject, omit, pick, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -121,18 +113,6 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *                                             then no preview is shown.
  */
 
-/**
- * Default values to assign for omitted optional block type settings.
- *
- * @type {Object}
- */
-export const DEFAULT_BLOCK_TYPE_SETTINGS = {
-	icon: blockDefault,
-	attributes: {},
-	keywords: [],
-	save: () => null,
-};
-
 export let serverSideBlockDefinitions = {};
 
 /**
@@ -162,7 +142,10 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
-		...cloneDeep( DEFAULT_BLOCK_TYPE_SETTINGS ),
+		icon: blockDefault,
+		attributes: {},
+		keywords: [],
+		save: () => null,
 		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};

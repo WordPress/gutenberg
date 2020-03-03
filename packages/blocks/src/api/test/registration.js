@@ -35,7 +35,6 @@ import {
 	isReusableBlock,
 	serverSideBlockDefinitions,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
-	DEFAULT_BLOCK_TYPE_SETTINGS,
 } from '../registration';
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
 
@@ -588,7 +587,10 @@ describe( 'blocks', () => {
 								...omit(
 									{
 										name,
-										...DEFAULT_BLOCK_TYPE_SETTINGS,
+										icon: blockIcon,
+										attributes: {},
+										keywords: [],
+										save: () => null,
 										...get(
 											serverSideBlockDefinitions,
 											name
