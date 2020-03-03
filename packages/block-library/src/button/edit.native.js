@@ -239,6 +239,7 @@ class ButtonEdit extends Component {
 	}
 
 	onSetMaxWidth( width ) {
+		const { maxWidth } = this.state;
 		const { parentWidth, isSelectedButtonsBlock } = this.props;
 		const { marginRight: unselectedSpacing } = styles.button;
 		const { marginRight: selectedSpacing } = styles.buttonsSelected;
@@ -247,11 +248,15 @@ class ButtonEdit extends Component {
 			? selectedSpacing
 			: unselectedSpacing;
 
-		if ( parentWidth && ! width ) {
+		const isParentWidthChanged =
+			maxWidth !== parentWidth - 2 * buttonSpacing;
+		const isWidthChanged = maxWidth !== width - unselectedSpacing;
+
+		if ( parentWidth && ! width && isParentWidthChanged ) {
 			this.setState( {
 				maxWidth: parentWidth - 2 * buttonSpacing,
 			} );
-		} else if ( ! parentWidth && width ) {
+		} else if ( ! parentWidth && width && isWidthChanged ) {
 			this.setState( { maxWidth: width - unselectedSpacing } );
 		}
 	}
@@ -369,7 +374,7 @@ class ButtonEdit extends Component {
 		const backgroundColor = this.getBackgroundColor();
 
 		return (
-			<View style={ { flex: 1 } } onLayout={ this.onLayout }>
+			<View onLayout={ this.onLayout }>
 				<ColorBackground
 					borderRadiusValue={ borderRadiusValue }
 					backgroundColor={ backgroundColor }
