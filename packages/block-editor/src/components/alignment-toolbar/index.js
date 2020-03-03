@@ -28,6 +28,10 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 	},
 ];
 
+const POPOVER_PROPS = {
+	position: 'bottom right',
+};
+
 export function AlignmentToolbar( props ) {
 	const {
 		value,
@@ -45,11 +49,6 @@ export function AlignmentToolbar( props ) {
 		alignmentControls,
 		( control ) => control.align === value
 	);
-
-	const POPOVER_PROPS = {
-		position: 'bottom right',
-		noArrow: true,
-	};
 
 	return (
 		<Toolbar
