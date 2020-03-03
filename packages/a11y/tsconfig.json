@@ -2,8 +2,9 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"outDir": "build-types",
+		"declarationDir": "build-types",
 		"tsBuildInfoFile": "../../.cache/a11y.tsbuildinfo"
 	},
-	"references": [ { "path": "../dom-ready" } ]
+	"references": [ { "path": "../dom-ready" } ],
+	"include": [ "src/**/*" ]
 }
