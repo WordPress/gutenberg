@@ -48,6 +48,11 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
   }
   isCollapsed={true}
   label="Change text alignment"
+  popoverProps={
+    Object {
+      "position": "bottom right",
+    }
+  }
 />
 `;
 
@@ -114,5 +119,10 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
   }
   isCollapsed={true}
   label="Change text alignment"
+  popoverProps={
+    Object {
+      "position": "bottom right",
+    }
+  }
 />
 `;
