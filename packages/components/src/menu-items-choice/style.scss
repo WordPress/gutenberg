@@ -2,6 +2,10 @@
 .components-menu-items-choice.components-button {
 	padding-left: 2rem;
 
+	svg {
+		margin-right: $grid-unit-10;
+	}
+
 	&.has-icon {
 		padding-left: 0.5rem;
 	}
