@@ -320,11 +320,12 @@ export class InserterMenu extends Component {
 				onKeyDown={ this.onKeyDown }
 			>
 				<div className="block-editor-inserter__main-area">
-					<VisuallyHidden
-						as="label"
-						htmlFor={ `block-editor-inserter__search-${ instanceId }` }
-					>
-						{ __( 'Search for a block' ) }
+					<VisuallyHidden>
+						<label
+							htmlFor={ `block-editor-inserter__search-${ instanceId }` }
+						>
+							{ __( 'Search for a block' ) }
+						</label>
 					</VisuallyHidden>
 					<input
 						id={ `block-editor-inserter__search-${ instanceId }` }
