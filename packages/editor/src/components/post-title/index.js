@@ -132,7 +132,7 @@ class PostTitle extends Component {
 	}
 }
 
-const applyWithSelect = withSelect( ( select ) => {
+const applyWithSelect = withSelect( ( select, { title: ownTitle } ) => {
 	const { getEditedPostAttribute, isCleanNewPost } = select( 'core/editor' );
 	const { getSettings } = select( 'core/block-editor' );
 	const { getPostType } = select( 'core' );
@@ -141,7 +141,7 @@ const applyWithSelect = withSelect( ( select ) => {
 
 	return {
 		isCleanNewPost: isCleanNewPost(),
-		title: getEditedPostAttribute( 'title' ),
+		title: getEditedPostAttribute( 'title' ) || ownTitle,
 		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 		placeholder: titlePlaceholder,
 		isFocusMode: focusMode,
