@@ -50,6 +50,13 @@ $navigation-item-height: 46px;
 	}
 }
 
+// Polish the Appender.
+.wp-block-navigation .block-list-appender {
+	margin: 0;
+	display: flex;
+	align-items: center;
+}
+
 .wp-block-navigation__inserter-content {
 	padding: $grid-unit-20;
 }
