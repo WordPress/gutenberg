@@ -29,14 +29,16 @@ For a complete example, see the [Internationalization section of the Block Edito
 
 <a name="createI18n" href="#createI18n">#</a> **createI18n**
 
+Create an i18n instance
+
 _Parameters_
 
 -   _initialData_ `[LocaleData]`: Locale data configuration.
 -   _initialDomain_ `[string]`: Domain for which configuration applies.
 
-<a name="i18n" href="#i18n">#</a> **i18n**
+_Returns_
 
-Undocumented declaration.
+-   `I18n`: I18n instance
 
 <a name="isRTL" href="#isRTL">#</a> **isRTL**
 
