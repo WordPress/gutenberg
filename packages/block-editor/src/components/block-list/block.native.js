@@ -189,6 +189,8 @@ class BlockListBlock extends Component {
 			title,
 			parentId,
 			isTouchable,
+			hasParent,
+			onSelect,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -206,13 +208,11 @@ class BlockListBlock extends Component {
 				<View accessibilityLabel={ accessibilityLabel }>
 					{ isSelected && (
 						<FloatingToolbar>
-							{ this.props.hasParent && (
+							{ hasParent && (
 								<Toolbar passedStyle={ styles.toolbar }>
 									<ToolbarButton
 										title={ __( 'Navigate Up' ) }
-										onClick={ () =>
-											this.props.onSelect( parentId )
-										}
+										onClick={ () => onSelect( parentId ) }
 										icon={ NavigateUpSVG }
 									/>
 									<View style={ styles.pipe } />
