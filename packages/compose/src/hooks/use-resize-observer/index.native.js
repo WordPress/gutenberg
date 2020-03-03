@@ -46,6 +46,7 @@ const useResizeObserver = () => {
 	}, [] );
 
 	return [
+		// `key` is needless in that place since we are not rendering an array of elements
 		// eslint-disable-next-line react/jsx-key
 		<View style={ StyleSheet.absoluteFill } onLayout={ onLayout } />,
 		measurements,

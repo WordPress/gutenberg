@@ -179,7 +179,7 @@ const App = () => {
 
 _Returns_
 
--   `Object`: Measurements object with properties `width` and `height`.
+-   `?Object`: Measurements object with properties `width` and `height`.
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
