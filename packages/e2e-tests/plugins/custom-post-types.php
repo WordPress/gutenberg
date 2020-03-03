@@ -16,12 +16,12 @@ function public_queryable_false_public_false_cpt() {
 	register_post_type(
 		$public_queryable_false_public_false,
 		array(
-			'label'              => 'NotPublicQNotPublic',
-			'show_in_rest'       => true,
-			'public'             => false,
-			'supports'           => array( 'title', 'editor', 'revisions' ),
-			'show_ui'            => true,
-			'show_in_menu'       => true,
+			'label'        => 'NotPublicQNotPublic',
+			'show_in_rest' => true,
+			'public'       => false,
+			'supports'     => array( 'title', 'editor', 'revisions' ),
+			'show_ui'      => true,
+			'show_in_menu' => true,
 		)
 	);
 }
