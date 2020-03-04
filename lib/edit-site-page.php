@@ -34,7 +34,9 @@ function gutenberg_edit_site_init( $hook ) {
 		$_wp_current_template_content,
 		$_wp_current_template_hierarchy,
 		$_wp_current_template_part_ids;
-	if ( 'gutenberg_page_gutenberg-edit-site' !== $hook ) {
+	if ( 'gutenberg_page_gutenberg-edit-site' !== $hook
+		&& 'toplevel_page_gutenberg-edit-site' !== $hook
+	) {
 		return;
 	}
 
