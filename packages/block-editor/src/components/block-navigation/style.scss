@@ -16,6 +16,15 @@ $tree-item-height: 36px;
 	margin: 0;
 }
 
+.block-editor-block-navigation__list .block-editor-button-block-appender {
+	outline: none;
+	background: none;
+	padding: $grid-unit-10;
+	padding: 6px;
+	margin-left: 0.8em;
+	width: calc(100% - 0.8em);
+}
+
 .block-editor-block-navigation__list .block-editor-block-navigation__list {
 	margin-top: 2px;
 	border-left: $tree-border-width solid $light-gray-900;
