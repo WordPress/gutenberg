@@ -123,6 +123,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: blockIcon,
 				},
+				allowDefaultStyle: true,
 				attributes: {},
 				keywords: [],
 				save: noop,
@@ -268,6 +269,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: blockIcon,
 				},
+				allowDefaultStyle: true,
 				attributes: {},
 				keywords: [],
 				save: expect.any( Function ),
@@ -297,6 +299,7 @@ describe( 'blocks', () => {
 					icon: {
 						src: blockIcon,
 					},
+					allowDefaultStyle: true,
 					attributes: {
 						ok: {
 							type: 'boolean',
@@ -365,6 +368,7 @@ describe( 'blocks', () => {
 						</svg>
 					),
 				},
+				allowDefaultStyle: true,
 				attributes: {},
 				keywords: [],
 			} );
@@ -391,6 +395,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'foo',
 				},
+				allowDefaultStyle: true,
 				attributes: {},
 				keywords: [],
 			} );
@@ -431,6 +436,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: MyTestIcon,
 				},
+				allowDefaultStyle: true,
 				attributes: {},
 				keywords: [],
 			} );
@@ -485,6 +491,7 @@ describe( 'blocks', () => {
 						</svg>
 					),
 				},
+				allowDefaultStyle: true,
 				attributes: {},
 				keywords: [],
 			} );
@@ -508,6 +515,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: blockIcon,
 				},
+				allowDefaultStyle: true,
 				attributes: {},
 				keywords: [],
 			} );
@@ -704,6 +712,7 @@ describe( 'blocks', () => {
 					icon: {
 						src: blockIcon,
 					},
+					allowDefaultStyle: true,
 					attributes: {},
 					keywords: [],
 					variations: [],
@@ -719,6 +728,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: blockIcon,
 				},
+				allowDefaultStyle: true,
 				attributes: {},
 				keywords: [],
 			} );
@@ -795,6 +805,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: blockIcon,
 				},
+				allowDefaultStyle: true,
 				attributes: {},
 				keywords: [],
 			} );
@@ -817,6 +828,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: blockIcon,
 				},
+				allowDefaultStyle: true,
 				attributes: {},
 				keywords: [],
 			} );
@@ -846,6 +858,7 @@ describe( 'blocks', () => {
 					icon: {
 						src: blockIcon,
 					},
+					allowDefaultStyle: true,
 					attributes: {},
 					keywords: [],
 					variations: [],
@@ -859,6 +872,7 @@ describe( 'blocks', () => {
 					icon: {
 						src: blockIcon,
 					},
+					allowDefaultStyle: true,
 					attributes: {},
 					keywords: [],
 					variations: [],
