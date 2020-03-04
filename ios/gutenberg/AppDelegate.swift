@@ -28,7 +28,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     static func isUITesting() -> Bool {
-//        return ProcessInfo.processInfo.arguments.contains("uitesting")
-        return true
+        return ProcessInfo.processInfo.arguments.contains("uitesting")
     }
 }
