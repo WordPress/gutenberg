@@ -406,7 +406,7 @@ export class ImageEdit extends Component {
 			/>
 		);
 		const needsAlignmentWrapper =
-			[ 'center', 'left', 'right' ].indexOf( align ) !== -1;
+			[ 'center', 'left', 'right' ].includes( align );
 
 		const mediaPlaceholder = (
 			<MediaPlaceholder
