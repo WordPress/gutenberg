@@ -189,6 +189,7 @@ class BlockListBlock extends Component {
 			title,
 			parentId,
 			isTouchable,
+			showFloatingToolbar,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -204,7 +205,7 @@ class BlockListBlock extends Component {
 				accessibilityRole={ 'button' }
 			>
 				<View accessibilityLabel={ accessibilityLabel }>
-					{ isSelected && (
+					{ showFloatingToolbar && (
 						<FloatingToolbar>
 							<Toolbar passedStyle={ styles.toolbar }>
 								<ToolbarButton
@@ -252,6 +253,7 @@ export default compose( [
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
+			getBlock,
 			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
@@ -273,6 +275,10 @@ export default compose( [
 		const parentId = parents[ 0 ] || '';
 
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
+		const rootBlock = getBlock( rootBlockId );
+		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
+
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -333,6 +339,7 @@ export default compose( [
 			isTouchable,
 			isDimmed,
 			isUnregisteredBlock,
+			showFloatingToolbar,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
