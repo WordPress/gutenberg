@@ -140,6 +140,16 @@ styles: [
 
 Plugins and Themes can also register [custom block style](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) for existing blocks.
 
+#### allowDefaultStyle (optional)
+
+-   **Type:** `Boolean`
+
+When the style picker is shown, it may also show a selector to allow the user to select a default style to use for this block type. If you prefer not to show the selector, set this property to `false`.
+
+```js
+allowDefaultStyle: false,
+```
+
 #### attributes (optional)
 
 -   **Type:** `Object`
