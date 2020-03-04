@@ -57,13 +57,7 @@
 	margin-right: auto;
 	width: 100%;
 	display: flex;
-}
-
-.editor-post-preview__icon-external {
-	position: absolute;
-	right: $grid-unit-10;
-	top: 6px;
-	z-index: 1;
+	justify-content: space-between;
 }
 
 @include break-small() {

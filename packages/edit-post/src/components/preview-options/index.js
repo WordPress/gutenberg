@@ -120,10 +120,7 @@ export default function PreviewOptions( {
 									textContent={
 										<>
 											{ __( 'Preview externally' ) }
-											<Icon
-												icon={ external }
-												className="editor-post-preview__icon-external"
-											/>
+											<Icon icon={ external } />
 										</>
 									}
 								/>
