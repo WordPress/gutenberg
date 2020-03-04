@@ -21,24 +21,25 @@ const DEFAULT_LOCALE_DATA = {
 
 /**
  * An i18n instance
+ *
  * @typedef {Object} I18n
  * @property {Function} setLocaleData Merges locale data into the Tannin instance by domain. Accepts data in a
- *																		Jed-formatted JSON object shape.
- * @property {Function} __ 						Retrieve the translation of text.
- * @property {Function} _x 						Retrieve translated string with gettext context.
- * @property {Function} _n 						Translates and retrieves the singular or plural form based on the supplied
- * 																		number.
- * @property {Function} _nx 					Translates and retrieves the singular or plural form based on the supplied
- *																		number, with gettext context.
- * @property {Function} isRTL 				Check if current locale is RTL.
+ *                                    Jed-formatted JSON object shape.
+ * @property {Function} __            Retrieve the translation of text.
+ * @property {Function} _x            Retrieve translated string with gettext context.
+ * @property {Function} _n            Translates and retrieves the singular or plural form based on the supplied
+ *                                    number.
+ * @property {Function} _nx           Translates and retrieves the singular or plural form based on the supplied
+ *                                    number, with gettext context.
+ * @property {Function} isRTL         Check if current locale is RTL.
  */
 
 /**
  * Create an i18n instance
  *
- * @param {LocaleData} [initialData]   	Locale data configuration.
- * @param {string}     [initialDomain] 	Domain for which configuration applies.
- * @return {I18n} 											I18n instance
+ * @param {LocaleData} [initialData]    Locale data configuration.
+ * @param {string}     [initialDomain]  Domain for which configuration applies.
+ * @return {I18n}                       I18n instance
  */
 export const createI18n = ( initialData, initialDomain ) => {
 	/**
