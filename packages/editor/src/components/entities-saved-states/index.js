@@ -42,7 +42,7 @@ export default function EntitiesSavedStates( {
 	};
 	const saveCheckedEntities = () => {
 		const entitiesToSave = dirtyEntityRecords.filter(
-			( { key, kind, name } ) => {
+			( { kind, name, key } ) => {
 				return ! some(
 					ignoredForSave.concat( unsavedEntityRecords ),
 					( elt ) =>
@@ -53,7 +53,7 @@ export default function EntitiesSavedStates( {
 			}
 		);
 
-		entitiesToSave.forEach( ( { key, kind, name } ) => {
+		entitiesToSave.forEach( ( { kind, name, key } ) => {
 			saveEditedEntityRecord( kind, name, key );
 		} );
 

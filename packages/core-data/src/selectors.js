@@ -15,6 +15,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { REDUCER_KEY } from './name';
 import { getQueriedItems } from './queried-data';
+import { DEFAULT_ENTITY_KEY } from './entities';
 
 /**
  * Returns true if a request is in progress for embed preview data, or false
@@ -209,8 +210,8 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 			Object.keys( data[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = Object.keys(
 					data[ kind ][ name ].edits
-				).filter( ( pks ) =>
-					hasEditsForEntityRecord( state, kind, name, pks )
+				).filter( ( primaryKey ) =>
+					hasEditsForEntityRecord( state, kind, name, primaryKey )
 				);
 
 				if ( primaryKeys.length ) {
@@ -223,9 +224,12 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 							primaryKey
 						);
 						dirtyRecords.push( {
-							// We avoid using primrayKey because it's transformed to a string
+							// We avoid using primaryKey because it's transformed into a string
 							// when it's used as an object key.
-							key: entityRecord[ entity.key || 'id' ],
+							key:
+								entityRecord[
+									entity.key || DEFAULT_ENTITY_KEY
+								],
 							title: ! entity.getTitle
 								? ''
 								: entity.getTitle( entityRecord ),
