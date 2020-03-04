@@ -802,6 +802,21 @@ export function updateSettings( settings ) {
 	};
 }
 
+/*
+ * Returns an action object used in signalling that the block editor features
+ * have been updated.
+ *
+ * @param {Object} features Updated features.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalUpdateFeatures( features ) {
+	return {
+		type: 'UPDATE_FEATURES',
+		features,
+	};
+}
+
 /**
  * Returns an action object used in signalling that a temporary reusable blocks have been saved
  * in order to switch its temporary id with the real id.

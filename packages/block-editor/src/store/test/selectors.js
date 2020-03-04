@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import deepFreeze from 'deep-freeze';
 import { filter } from 'lodash';
 
 /**
@@ -66,6 +67,7 @@ const {
 	INSERTER_UTILITY_MEDIUM,
 	INSERTER_UTILITY_LOW,
 	getLowestCommonAncestorWithSelectedBlock,
+	__experimentalGetFeature,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2795,6 +2797,31 @@ describe( 'selectors', () => {
 			expect(
 				getLowestCommonAncestorWithSelectedBlock( state, 'c' )
 			).toBe( 'a' );
+		} );
+	} );
+
+	describe( '__experimentalGetFeature', () => {
+		it( 'returns undefined when feature not found', () => {
+			const state = deepFreeze( {} );
+
+			const result = __experimentalGetFeature( state, 'unknown' );
+
+			expect( result ).toBeUndefined();
+		} );
+
+		it( 'returns the feature object when found', () => {
+			const testFeature = {
+				enabled: true,
+			};
+			const state = deepFreeze( {
+				features: {
+					testFeature,
+				},
+			} );
+
+			const result = __experimentalGetFeature( state, 'testFeature' );
+
+			expect( result ).toEqual( testFeature );
 		} );
 	} );
 } );

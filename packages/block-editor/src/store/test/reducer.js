@@ -26,6 +26,7 @@ import {
 	selectionEnd,
 	initialPosition,
 	isMultiSelecting,
+	features,
 	preferences,
 	blocksMode,
 	insertionPoint,
@@ -33,6 +34,7 @@ import {
 	blockListSettings,
 	lastBlockAttributesChange,
 } from '../reducer';
+import { FEATURES_DEFAULTS } from '../defaults';
 
 describe( 'state', () => {
 	describe( 'hasSameKeys()', () => {
@@ -2305,6 +2307,53 @@ describe( 'state', () => {
 
 			expect( state1 ).toEqual( original );
 			expect( state2 ).toEqual( original );
+		} );
+	} );
+
+	describe( 'features', () => {
+		it( 'should apply all defaults', () => {
+			const state = features( undefined, {} );
+
+			expect( state ).toEqual( FEATURES_DEFAULTS );
+		} );
+
+		it( 'should add new feature when not found', () => {
+			const intialState = deepFreeze( {} );
+			const newFeature = {
+				enabled: true,
+			};
+			const state = features( intialState, {
+				type: 'UPDATE_FEATURES',
+				features: {
+					newFeature,
+				},
+			} );
+
+			expect( state ).toEqual( {
+				newFeature,
+			} );
+		} );
+
+		it( 'should replace an existing feature when found', () => {
+			const initialState = deepFreeze( {
+				existingFeature: {
+					enabled: false,
+					foo: 'bar',
+				},
+			} );
+			const updatedExistingFeature = {
+				enabled: true,
+			};
+			const state = features( initialState, {
+				type: 'UPDATE_FEATURES',
+				features: {
+					existingFeature: updatedExistingFeature,
+				},
+			} );
+
+			expect( state ).toEqual( {
+				existingFeature: updatedExistingFeature,
+			} );
 		} );
 	} );
 

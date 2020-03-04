@@ -29,6 +29,7 @@ import {
 	updateBlock,
 	updateBlockAttributes,
 	updateBlockListSettings,
+	__experimentalUpdateFeatures,
 } from '../actions';
 import { select } from '../controls';
 
@@ -904,6 +905,20 @@ describe( 'actions', () => {
 				rootClientId: 'root',
 				time: expect.any( Number ),
 				updateSelection: false,
+			} );
+		} );
+	} );
+
+	describe( 'updateFeatures', () => {
+		it( 'should return the UPDATE_FEATURES action', () => {
+			const features = {
+				foo: {
+					enabled: true,
+				},
+			};
+			expect( __experimentalUpdateFeatures( features ) ).toEqual( {
+				type: 'UPDATE_FEATURES',
+				features,
 			} );
 		} );
 	} );

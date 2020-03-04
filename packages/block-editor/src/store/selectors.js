@@ -1502,6 +1502,18 @@ export function getSettings( state ) {
 }
 
 /**
+ * Returns the block editor feature by name.
+ *
+ * @param {Object} state       Editor state.
+ * @param {string} featureName Feature name.
+ *
+ * @return {Object} The block editor feature object.
+ */
+export function __experimentalGetFeature( state, featureName ) {
+	return state.features?.[ featureName ];
+}
+
+/**
  * Returns true if the most recent block change is be considered persistent, or
  * false otherwise. A persistent change is one committed by BlockEditorProvider
  * via its `onChange` callback, in addition to `onInput`.

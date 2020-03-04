@@ -26,7 +26,11 @@ import { isReusableBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
+import {
+	FEATURES_DEFAULTS,
+	PREFERENCES_DEFAULTS,
+	SETTINGS_DEFAULTS,
+} from './defaults';
 import { insertAt, moveTo } from './array';
 
 /**
@@ -1287,6 +1291,26 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 }
 
 /**
+ * Reducer returning the editor features.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function features( state = FEATURES_DEFAULTS, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_FEATURES':
+			return {
+				...state,
+				...action.features,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the user preferences.
  *
  * @param {Object}  state                 Current state.
@@ -1485,6 +1509,7 @@ export default combineReducers( {
 	insertionPoint,
 	template,
 	settings,
+	features,
 	preferences,
 	lastBlockAttributesChange,
 	isNavigationMode,
