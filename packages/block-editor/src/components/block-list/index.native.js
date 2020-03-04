@@ -23,6 +23,7 @@ import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import BlockInsertionPoint from './insertion-point';
+import { __ } from '@wordpress/i18n';
 
 const innerToolbarHeight = 44;
 
@@ -185,7 +186,7 @@ export class BlockList extends Component {
 		return (
 			<>
 				<TouchableWithoutFeedback
-					accessible={false}
+					accessibilityLabel={__( 'Add block' )}
 					onPress={ () => {
 						this.addBlockToEndOfPost( paragraphBlock );
 					} }
