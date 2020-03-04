@@ -1,0 +1,5 @@
+{
+  "__file": "wp_block",
+  "title": "Testimonial",
+  "content": "<!-- wp:columns -->\n<div class=\"wp-block-columns\"><!-- wp:column {\"width\":25} -->\n<div class=\"wp-block-column\" style=\"flex-basis:25%\"><!-- wp:image {\"sizeSlug\":\"large\",\"className\":\"is-style-rounded is-style-circle-mask\"} -->\n<figure class=\"wp-block-image size-large is-style-rounded is-style-circle-mask\"><img src=\"https://wpdesignhub.com/designs/basic/055854/team-member-1.png\" alt=\"CC0 by Coffee Bean https://pixabay.com/en/users/coffeebeanworks-558718/?tab=about\"/></figure>\n<!-- /wp:image --></div>\n<!-- /wp:column -->\n\n<!-- wp:column {\"width\":75} -->\n<div class=\"wp-block-column\" style=\"flex-basis:75%\"><!-- wp:paragraph {\"fontSize\":\"medium\"} -->\n<p class=\"has-medium-font-size\">“These guys are amazing! A very professional team that delivers excellent results every time we come for help. I highly recommend this company for your projects!”</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p><em>— Jane Doe</em></p>\n<!-- /wp:paragraph --></div>\n<!-- /wp:column --></div>\n<!-- /wp:columns -->"
+}
