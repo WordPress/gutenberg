@@ -25,8 +25,8 @@ import BlockListAppender from '../block-list-appender';
 import BlockInsertionPoint from './insertion-point';
 
 const innerToolbarHeight = 44;
-const globalToolBarHeight = 44;
-const extraBlockBorderMargin = 4;
+const headerToolBarHeight = 44;
+const blockBorderWidth = 1;
 
 export class BlockList extends Component {
 	constructor() {
@@ -120,9 +120,9 @@ export class BlockList extends Component {
 					innerRef={ this.scrollViewInnerRef }
 					extraScrollHeight={
 						innerToolbarHeight +
-						globalToolBarHeight +
-						extraBlockBorderMargin
+						blockBorderWidth
 					}
+					inputAccessoryViewHeight={ headerToolBarHeight }
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					data={ blockClientIds }
