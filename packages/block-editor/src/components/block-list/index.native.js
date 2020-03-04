@@ -185,6 +185,7 @@ export class BlockList extends Component {
 		return (
 			<>
 				<TouchableWithoutFeedback
+					accessible={false}
 					onPress={ () => {
 						this.addBlockToEndOfPost( paragraphBlock );
 					} }
