@@ -76,7 +76,10 @@ export function isInsideRootBlock( blockElement, element ) {
  * @return {boolean} Whether element contains inner blocks.
  */
 export function hasInnerBlocksContext( element ) {
-	return !! element.querySelector( '.block-editor-block-list__layout' );
+	return (
+		element.classList.contains( 'block-editor-block-list__layout' ) ||
+		!! element.querySelector( '.block-editor-block-list__layout' )
+	);
 }
 
 /**

@@ -21,7 +21,7 @@ $tree-item-height: 36px;
 	background: none;
 	padding: $grid-unit-10;
 	margin-left: 0.8em;
-	width: $icon-button-size;
+	width: $button-size;
 	border-radius: 4px;
 
 	&:hover:not(:disabled):not([aria-disabled="true"]) {

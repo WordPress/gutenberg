@@ -33,6 +33,7 @@ export const settings = {
 		className: false,
 		anchor: true,
 		__unstablePasteTextInline: true,
+		lightBlockWrapper: true,
 	},
 	example: {
 		attributes: {
