@@ -48,16 +48,13 @@ import { Component } from '@wordpress/element';
 import edit from './edit';`,
 			errors: [
 				{
-					message:
-						'Expected preceding "External dependencies" comment block',
+					messageId: 'expectExternal',
 				},
 				{
-					message:
-						'Expected preceding "WordPress dependencies" comment block',
+					messageId: 'expectWordPress',
 				},
 				{
-					message:
-						'Expected preceding "Internal dependencies" comment block',
+					messageId: 'expectInternal',
 				},
 			],
 			output: `

@@ -8,6 +8,14 @@ module.exports = {
 		},
 		schema: [],
 		fixable: true,
+		messages: {
+			expectExternal:
+				'Expected preceding "External dependencies" comment block',
+			expectWordPress:
+				'Expected preceding "WordPress dependencies" comment block',
+			expectInternal:
+				'Expected preceding "Internal dependencies" comment block',
+		},
 	},
 	create( context ) {
 		const comments = context.getSourceCode().getAllComments();
@@ -204,7 +212,7 @@ module.exports = {
 
 					context.report( {
 						node: child,
-						message: `Expected preceding "${ locality } dependencies" comment block`,
+						messageId: `expect${ locality }`,
 						fix( fixer ) {
 							const { comment, value } = correction;
 							const text = `/*${ value }*/`;
