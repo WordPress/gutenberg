@@ -247,6 +247,12 @@
 		cursor: default;
 	}
 
+	.alignleft,
+	.alignright {
+		// Without z-index, won't be clickable as "above" adjacent content.
+		z-index: z-index(".block-editor-block-list__block {core/image aligned left or right}");
+	}
+
 	// Alignments.
 	&[data-align="left"],
 	&[data-align="right"] {
