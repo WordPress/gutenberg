@@ -10,6 +10,11 @@ import { Caption, RichText } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
+
 const BlockCaption = ( {
 	accessible,
 	accessibilityLabelCreator,
@@ -20,7 +25,7 @@ const BlockCaption = ( {
 	shouldDisplay,
 	text,
 } ) => (
-	<View style={ { flex: 1, padding: 12 } }>
+	<View style={ [ styles.container, shouldDisplay && styles.padding ] }>
 		<Caption
 			accessibilityLabelCreator={ accessibilityLabelCreator }
 			accessible={ accessible }
