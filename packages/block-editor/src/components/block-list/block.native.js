@@ -189,6 +189,8 @@ class BlockListBlock extends Component {
 			title,
 			parentId,
 			isTouchable,
+			hasParent,
+			onSelect,
 			showFloatingToolbar,
 		} = this.props;
 
@@ -207,16 +209,16 @@ class BlockListBlock extends Component {
 				<View accessibilityLabel={ accessibilityLabel }>
 					{ showFloatingToolbar && (
 						<FloatingToolbar>
-							<Toolbar passedStyle={ styles.toolbar }>
-								<ToolbarButton
-									title={ __( 'Navigate Up' ) }
-									onClick={ () =>
-										this.props.onSelect( parentId )
-									}
-									icon={ NavigateUpSVG }
-								/>
-								<View style={ styles.pipe } />
-							</Toolbar>
+							{ hasParent && (
+								<Toolbar passedStyle={ styles.toolbar }>
+									<ToolbarButton
+										title={ __( 'Navigate Up' ) }
+										onClick={ () => onSelect( parentId ) }
+										icon={ NavigateUpSVG }
+									/>
+									<View style={ styles.pipe } />
+								</Toolbar>
+							) }
 							<Breadcrumbs clientId={ clientId } />
 						</FloatingToolbar>
 					) }
