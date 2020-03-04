@@ -186,7 +186,7 @@ export class BlockList extends Component {
 		return (
 			<>
 				<TouchableWithoutFeedback
-					accessibilityLabel={__( 'Add block' )}
+					accessibilityLabel={ __( 'Add block' ) }
 					onPress={ () => {
 						this.addBlockToEndOfPost( paragraphBlock );
 					} }
