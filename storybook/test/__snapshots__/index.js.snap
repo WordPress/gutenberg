@@ -13720,7 +13720,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M13.2 17.2h-1.4v-5h-5v-1.4h5V6.2h1.4v4.6h4.6v1.4h-4.6z"
+        d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"
       />
     </svg>
     <svg
@@ -13733,7 +13733,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M13.2 17.2h-1.4v-5h-5v-1.4h5V6.2h1.4v4.6h4.6v1.4h-4.6z"
+        d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"
       />
     </svg>
     <svg
@@ -13746,7 +13746,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M13.2 17.2h-1.4v-5h-5v-1.4h5V6.2h1.4v4.6h4.6v1.4h-4.6z"
+        d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"
       />
     </svg>
   </div>
