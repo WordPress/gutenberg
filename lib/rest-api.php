@@ -93,3 +93,13 @@ function gutenberg_register_rest_block_directory() {
 	$block_directory_controller->register_routes();
 }
 add_filter( 'rest_api_init', 'gutenberg_register_rest_block_directory' );
+
+/**
+ * Registers the image editor.
+ *
+ * @since 7.x.0
+ */
+function gutenberg_register_image_editor_api() {
+	WP_REST_Image_Editor_API::init();
+}
+add_filter( 'rest_api_init', 'gutenberg_register_image_editor_api' );

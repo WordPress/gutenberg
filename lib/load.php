@@ -39,6 +39,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Block_Directory_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-block-directory-controller.php';
 	}
+
+	if ( ! class_exists( 'WP_REST_Image_Editor_API' ) ) {
+		error_log("YO!!!");
+		require dirname( __FILE__ ) . '/class-wp-rest-image-editor.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/
