@@ -144,7 +144,7 @@ Plugins and Themes can also register [custom block style](/docs/designers-develo
 
 -   **Type:** `Boolean`
 
-When the style picker is shown, it may also show a selector to allow the user to select a default style to use for this block type. If you prefer not to show the selector, set this property to `false`.
+When the style picker is shown, a selector is displayed so the user can select a default style for this block type. If you prefer not to show the selector, set this property to `false`, the default value is `true`.
 
 ```js
 allowDefaultStyle: false,
