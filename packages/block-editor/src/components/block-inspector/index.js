@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import {
 	PanelBody,
@@ -66,7 +67,11 @@ const BlockInspector = ( {
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
 						<BlockStyles clientId={ selectedBlockClientId } />
-						{ blockType.allowDefaultStyle && (
+						{ hasBlockSupport(
+							blockType.name,
+							'defaultStyle',
+							true
+						) && (
 							<DefaultStylePicker blockName={ blockType.name } />
 						) }
 					</PanelBody>

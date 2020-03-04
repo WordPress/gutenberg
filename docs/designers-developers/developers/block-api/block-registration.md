@@ -140,16 +140,6 @@ styles: [
 
 Plugins and Themes can also register [custom block style](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) for existing blocks.
 
-#### allowDefaultStyle (optional)
-
--   **Type:** `Boolean`
-
-When the style picker is shown, a selector is displayed so the user can select a default style for this block type. If you prefer not to show the selector, set this property to `false`, the default value is `true`.
-
-```js
-allowDefaultStyle: false,
-```
-
 #### attributes (optional)
 
 -   **Type:** `Object`
@@ -725,6 +715,14 @@ attributes: {
 // Remove the support for wide alignment.
 alignWide: false,
 ```
+
+-   `defaultStyle` (default `true`): When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to `false`.
+
+```js
+// Remove the Default Style dropdown.
+defaultStyle: false,
+```
+
 
 -   `anchor` (default `false`): Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 

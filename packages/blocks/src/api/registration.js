@@ -146,7 +146,6 @@ export function registerBlockType( name, settings ) {
 		attributes: {},
 		keywords: [],
 		save: () => null,
-		allowDefaultStyle: true,
 		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};
