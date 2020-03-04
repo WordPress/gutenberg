@@ -345,6 +345,12 @@ describe( 'Preview with private custom post type', () => {
 		// Open the preview menu.
 		await page.click( '.editor-post-preview__button-toggle' );
 
+		// Expect there to be a single menu group in the dropdown.
+		const menuGroups = await page.$$(
+			'.editor-post-preview__dropdown-content .components-menu-group'
+		);
+		expect( menuGroups.length ).toBe( 1 );
+
 		// Expect there to be three preview buttons.
 		const previewButtons = await page.$$(
 			'.editor-post-preview__button-resize'
