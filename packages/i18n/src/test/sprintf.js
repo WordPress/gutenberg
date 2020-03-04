@@ -1,5 +1,5 @@
-// Mock memoization as identity function. Inline since Jest errors on out-of-
-// scope references in a mock callback.
+// Mock memoization as identity function. Inline since Jest errors on
+// out-of-scope references in a mock callback.
 jest.mock( 'memize', () => ( fn ) => fn );
 
 /**
