@@ -118,10 +118,7 @@ export class BlockList extends Component {
 					accessibilityLabel="block-list"
 					autoScroll={ this.props.autoScroll }
 					innerRef={ this.scrollViewInnerRef }
-					extraScrollHeight={
-						innerToolbarHeight +
-						blockBorderWidth
-					}
+					extraScrollHeight={ innerToolbarHeight + blockBorderWidth }
 					inputAccessoryViewHeight={ headerToolBarHeight }
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
