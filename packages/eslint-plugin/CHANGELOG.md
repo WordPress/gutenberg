@@ -1,5 +1,9 @@
 ## Master
 
+### Enhancements
+
+- Added new `isInternalDependencyPatterns` option to `@wordpress/dependency-group` that allows marking aliased dependencies as internal ones.
+
 ## 4.0.0 (2020-02-10)
 
 ### Breaking Changes

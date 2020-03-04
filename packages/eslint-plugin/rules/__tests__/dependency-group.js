@@ -35,6 +35,28 @@ import { Component } from '@wordpress/element';
  */
 import edit from './edit';`,
 		},
+		{
+			code: `
+/**
+ * External dependencies
+ */
+import { get } from 'lodash';
+import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import CoolComponent from 'my-awesome-alias';
+import edit from './edit';`,
+			options: [
+				{ isInternalDependencyPatterns: [ '^my-awesome-alias$' ] },
+			],
+		},
 	],
 	invalid: [
 		{
