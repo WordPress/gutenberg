@@ -33,6 +33,7 @@ export const settings = {
 	supports: {
 		align: true,
 		alignWide: false,
+		lightBlockWrapper: true,
 	},
 	parent: [ 'core/buttons' ],
 	styles: [

@@ -26,6 +26,7 @@ export const settings = {
 	supports: {
 		align: true,
 		alignWide: false,
+		lightBlockWrapper: true,
 	},
 	transforms,
 	edit,

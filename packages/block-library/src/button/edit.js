@@ -29,6 +29,7 @@ import {
 	RichText,
 	withColors,
 	__experimentalLinkControl as LinkControl,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { link } from '@wordpress/icons';
@@ -193,13 +194,14 @@ function ButtonEdit( {
 	} = __experimentalUseGradient();
 
 	return (
-		<div className={ className }>
+		<>
 			<RichText
+				tagName={ Block.div }
 				placeholder={ placeholder || __( 'Add text…' ) }
 				value={ text }
 				onChange={ ( value ) => setAttributes( { text: value } ) }
 				withoutInteractiveFormatting
-				className={ classnames( 'wp-block-button__link', {
+				className={ classnames( className, 'wp-block-button__link', {
 					'has-background': backgroundColor.color || gradientValue,
 					[ backgroundColor.class ]:
 						! gradientValue && backgroundColor.class,
@@ -272,7 +274,7 @@ function ButtonEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-		</div>
+		</>
 	);
 }
 
