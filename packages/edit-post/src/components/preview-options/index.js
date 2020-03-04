@@ -13,7 +13,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PostPreviewButton } from '@wordpress/editor';
 import { __, _x } from '@wordpress/i18n';
-import { external } from '@wordpress/icons';
+import { external, check } from '@wordpress/icons';
 
 const downArrow = (
 	<SVG
@@ -77,21 +77,21 @@ export default function PreviewOptions( {
 						<MenuItem
 							className="editor-post-preview__button-resize"
 							onClick={ () => setPreviewDeviceType( 'Desktop' ) }
-							icon={ deviceType === 'Desktop' && 'yes' }
+							icon={ deviceType === 'Desktop' && check }
 						>
 							{ __( 'Desktop' ) }
 						</MenuItem>
 						<MenuItem
 							className="editor-post-preview__button-resize"
 							onClick={ () => setPreviewDeviceType( 'Tablet' ) }
-							icon={ deviceType === 'Tablet' && 'yes' }
+							icon={ deviceType === 'Tablet' && check }
 						>
 							{ __( 'Tablet' ) }
 						</MenuItem>
 						<MenuItem
 							className="editor-post-preview__button-resize"
 							onClick={ () => setPreviewDeviceType( 'Mobile' ) }
-							icon={ deviceType === 'Mobile' && 'yes' }
+							icon={ deviceType === 'Mobile' && check }
 						>
 							{ __( 'Mobile' ) }
 						</MenuItem>

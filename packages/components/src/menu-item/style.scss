@@ -8,7 +8,7 @@
 	.components-menu-items__item-icon,
 	svg.components-menu-items__item-icon,
 	> span > svg {
-		margin-right: 4px;
+		margin-right: $grid-unit-10;
 	}
 
 	.components-menu-items__item-icon {
