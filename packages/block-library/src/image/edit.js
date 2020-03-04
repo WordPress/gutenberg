@@ -405,8 +405,9 @@ export class ImageEdit extends Component {
 				src={ url }
 			/>
 		);
-		const needsAlignmentWrapper =
-			[ 'center', 'left', 'right' ].includes( align );
+		const needsAlignmentWrapper = [ 'center', 'left', 'right' ].includes(
+			align
+		);
 
 		const mediaPlaceholder = (
 			<MediaPlaceholder
