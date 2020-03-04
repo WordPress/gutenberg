@@ -40,6 +40,21 @@ async function openPreviewPage( editorPage ) {
 }
 
 /**
+ * Given the Page instance for the editor, opens preview drodpdown, and
+ * awaits the presence of the external preview selector.
+ *
+ * @param {Page} editorPage current editor page.
+ *
+ * @return {Promise} Promise resolving once selector is visible on page.
+ */
+async function waitForPreviewDropdownOpen( editorPage ) {
+	await editorPage.click( '.editor-post-preview__button-toggle' );
+	return editorPage.waitForSelector(
+		'.editor-post-preview__button-external'
+	);
+}
+
+/**
  * Given a Puppeteer Page instance for a preview window, clicks Preview, and
  * awaits the window navigation.
  *
@@ -48,8 +63,6 @@ async function openPreviewPage( editorPage ) {
  * @return {Promise} Promise resolving once navigation completes.
  */
 async function waitForPreviewNavigation( previewPage ) {
-	await page.click( '.editor-post-preview__button-toggle' );
-	await page.waitForSelector( '.editor-post-preview__button-external' );
 	await page.click( '.editor-post-preview__button-external' );
 	return previewPage.waitForNavigation();
 }
@@ -134,6 +147,7 @@ describe( 'Preview', () => {
 		// Return to editor to change title.
 		await editorPage.bringToFront();
 		await editorPage.type( '.editor-post-title__input', '!' );
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -146,7 +160,6 @@ describe( 'Preview', () => {
 		// Pressing preview without changes should bring same preview window to
 		// front and reload, but should not show interstitial.
 		await editorPage.bringToFront();
-		await editorPage.click( '.editor-post-preview__button-toggle' );
 		await waitForPreviewNavigation( previewPage );
 		previewTitle = await previewPage.$eval(
 			'.entry-title',
@@ -161,6 +174,7 @@ describe( 'Preview', () => {
 		// Return to editor to change title.
 		await editorPage.bringToFront();
 		await editorPage.type( '.editor-post-title__input', ' And more.' );
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -182,7 +196,6 @@ describe( 'Preview', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/7561
 		await editorPage.bringToFront();
-		await editorPage.click( '.editor-post-preview__button-toggle' );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -226,6 +239,7 @@ describe( 'Preview', () => {
 		// Save draft and open the preview page right after.
 		await editorPage.waitForSelector( '.editor-post-save-draft' );
 		await saveDraft();
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -290,6 +304,7 @@ describe( 'Preview with Custom Fields enabled', () => {
 		await editorPage.keyboard.type( '2' );
 
 		// Open the preview page.
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match input.
