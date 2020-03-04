@@ -11,6 +11,33 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
+function EntityRecordState( { record, checked, onChange } ) {
+	const entity = useSelect(
+		( select ) => select( 'core' ).getEntity( record.kind, record.name ),
+		[ record.kind, record.name ]
+	);
+
+	return (
+		<CheckboxControl
+			label={
+				<>
+					{ entity.label }
+					{ !! record.title && (
+						<>
+							{ ': ' }
+							<strong>
+								{ record.title || __( 'Untitled' ) }
+							</strong>
+						</>
+					) }
+				</>
+			}
+			checked={ ! checked }
+			onChange={ onChange }
+		/>
+	);
+}
+
 export default function EntitiesSavedStates( {
 	isOpen,
 	onRequestClose,
@@ -68,22 +95,9 @@ export default function EntitiesSavedStates( {
 			>
 				{ dirtyEntityRecords.map( ( record ) => {
 					return (
-						<CheckboxControl
+						<EntityRecordState
 							key={ record.key }
-							label={
-								<>
-									{ record.entity.label }
-									{ !! record.title && (
-										<>
-											{ ': ' }
-											<strong>
-												{ record.title ||
-													__( 'Untitled' ) }
-											</strong>
-										</>
-									) }
-								</>
-							}
+							record={ record }
 							checked={
 								! some(
 									unsavedEntityRecords,
