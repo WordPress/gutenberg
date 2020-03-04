@@ -132,7 +132,7 @@ class PostTitle extends Component {
 	}
 }
 
-const applyWithSelect = withSelect( ( select, { title: ownTitle } ) => {
+const applyWithSelect = withSelect( ( select, { fallbackTitle: ownTitle } ) => {
 	const { getEditedPostAttribute, isCleanNewPost } = select( 'core/editor' );
 	const { getSettings } = select( 'core/block-editor' );
 	const { getPostType } = select( 'core' );
