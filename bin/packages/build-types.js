@@ -1,11 +1,11 @@
-/* eslint-disable eslint-comments/disable-enable-pair, no-console */
-
 /**
  * External dependencies
  */
 const execa = require( 'execa' );
 const glob = require( 'fast-glob' );
 const path = require( 'path' );
+
+/* eslint-disable no-console */
 
 const tscPath = path.resolve(
 	__dirname,
@@ -30,3 +30,5 @@ function main() {
 }
 
 main();
+
+/* eslint-enable no-console */
