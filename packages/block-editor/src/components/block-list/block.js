@@ -99,12 +99,14 @@ function BlockListBlock( {
 		lightBlockWrapper && hasBlockSupport( blockType, 'className', true )
 			? getBlockDefaultClassName( name )
 			: null;
+	const customClassName = lightBlockWrapper ? attributes.className : null;
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the
 	// block.
 	const wrapperClassName = classnames(
 		generatedClassName,
+		customClassName,
 		'wp-block block-editor-block-list__block',
 		{
 			'has-selected-ui': hasSelectedUI,
