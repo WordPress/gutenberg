@@ -16,8 +16,8 @@ const tscPath = path.resolve(
 	'tsc'
 );
 
-async function main() {
-	const packagesWithTs = await glob( 'packages/*/tsconfig.json', {
+function main() {
+	const packagesWithTs = glob.sync( 'packages/*/tsconfig.json', {
 		cwd: path.resolve( __dirname, '..', '..' ),
 	} );
 	const projectPaths = packagesWithTs.map( ( tsconfigPath ) =>
@@ -26,13 +26,7 @@ async function main() {
 
 	const args = [ '--build', ...projectPaths, ...process.argv.slice( 2 ) ];
 
-	try {
-		await execa( tscPath, args, { stdio: 'inherit' } );
-	} catch {
-		process.exitCode = 1;
-	}
+	execa.sync( tscPath, args, { stdio: 'inherit' } );
 }
 
-main().catch( ( err ) => {
-	throw err;
-} );
+main();
