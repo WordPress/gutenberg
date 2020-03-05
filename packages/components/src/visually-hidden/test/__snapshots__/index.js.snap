@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VisuallyHidden allows additional classnames to be specified, but retains the \`components-visually-hidden\` classname 1`] = `
+<span
+  className="components-visually-hidden test-component"
+>
+  Test
+</span>
+`;
+
+exports[`VisuallyHidden by default renders as a div with the visually hidden class name 1`] = `
+<div
+  className="components-visually-hidden"
+>
+  Test
+</div>
+`;
+
+exports[`VisuallyHidden can be rendered as a different element using the \`as\` prop 1`] = `
+<span
+  className="components-visually-hidden"
+>
+  Test
+</span>
+`;
+
+exports[`VisuallyHidden forwards any additional props passed to the component to the rendered element 1`] = `
+<span
+  className="components-visually-hidden"
+  data-test="test"
+>
+  Test
+</span>
+`;
