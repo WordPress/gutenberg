@@ -401,13 +401,13 @@
 
 	input[type="checkbox"],
 	input[type="radio"] {
-		border: $border-width + 1 solid $dark-gray-300;
-		margin-right: 12px;
+		border: $border-width + 1 solid $medium-gray-text;
+		margin-right: $grid-unit-15;
 		transition: none;
 
 		&:focus {
-			border-color: $dark-gray-300;
-			box-shadow: 0 0 0 1px $dark-gray-300;
+			border-color: $medium-gray-text;
+			box-shadow: 0 0 0 1px $medium-gray-text;
 		}
 
 		&:checked {
@@ -416,12 +416,12 @@
 		}
 
 		&:checked:focus {
-			box-shadow: 0 0 0 2px $dark-gray-500;
+			box-shadow: 0 0 0 2px $medium-gray-text;
 		}
 	}
 
 	input[type="checkbox"] {
-		border-radius: $radius-round-rectangle / 2;
+		border-radius: $radius-block-ui;
 
 		&:checked::before,
 		&[aria-checked="mixed"]::before {
