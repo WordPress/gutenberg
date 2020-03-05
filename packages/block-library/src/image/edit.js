@@ -33,7 +33,7 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -405,9 +405,6 @@ export class ImageEdit extends Component {
 				src={ url }
 			/>
 		);
-		const needsAlignmentWrapper = [ 'center', 'left', 'right' ].includes(
-			align
-		);
 
 		const mediaPlaceholder = (
 			<MediaPlaceholder
@@ -430,29 +427,19 @@ export class ImageEdit extends Component {
 				<>
 					{ controls }
 					<Block.div
-						className={ classnames( className, {
-							[ `align${ align }` ]:
-								! needsAlignmentWrapper && align,
-						} ) }
+						className={ classnames( className, `align${ align }` ) }
 					>
-						{ needsAlignmentWrapper ? (
-							<div className={ `align${ align }` }>
-								{ mediaPlaceholder }
-							</div>
-						) : (
-							mediaPlaceholder
-						) }
+						{ mediaPlaceholder }
 					</Block.div>
 				</>
 			);
 		}
 
-		const classes = classnames( className, {
+		const classes = classnames( className, `align${ align }`, {
 			'is-transient': isBlobURL( url ),
 			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
 			[ `size-${ sizeSlug }` ]: sizeSlug,
-			[ `align${ align }` ]: align,
 		} );
 
 		const isResizable =
@@ -516,17 +503,13 @@ export class ImageEdit extends Component {
 			</>
 		);
 
-		const AlignmentWrapper = needsAlignmentWrapper ? Block.div : Fragment;
-		const BlockContentWrapper = needsAlignmentWrapper
-			? 'figure'
-			: Block.figure;
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/click-events-have-key-events */
 		return (
 			<>
 				{ controls }
-				<AlignmentWrapper>
-					<BlockContentWrapper className={ classes }>
+				<div className="wp-align-wrapper">
+					<Block.figure className={ classes }>
 						<ImageSize src={ url } dirtynessTrigger={ align }>
 							{ ( sizes ) => {
 								const {
@@ -702,10 +685,9 @@ export class ImageEdit extends Component {
 								inlineToolbar
 							/>
 						) }
-
 						{ mediaPlaceholder }
-					</BlockContentWrapper>
-				</AlignmentWrapper>
+					</Block.figure>
+				</div>
 			</>
 		);
 		/* eslint-enable jsx-a11y/click-events-have-key-events */
