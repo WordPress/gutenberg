@@ -426,16 +426,16 @@ export class ImageEdit extends Component {
 			return (
 				<>
 					{ controls }
-					<Block.div
-						className={ classnames( className, `align${ align }` ) }
-					>
-						{ mediaPlaceholder }
-					</Block.div>
+					<div className={ `wp-align-wrapper wp-align-${ align }` }>
+						<Block.div className={ className }>
+							{ mediaPlaceholder }
+						</Block.div>
+					</div>
 				</>
 			);
 		}
 
-		const classes = classnames( className, `align${ align }`, {
+		const classes = classnames( className, {
 			'is-transient': isBlobURL( url ),
 			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
@@ -508,7 +508,7 @@ export class ImageEdit extends Component {
 		return (
 			<>
 				{ controls }
-				<div className="wp-align-wrapper">
+				<div className={ `wp-align-wrapper wp-align-${ align }` }>
 					<Block.figure className={ classes }>
 						<ImageSize src={ url } dirtynessTrigger={ align }>
 							{ ( sizes ) => {

@@ -247,12 +247,6 @@
 		cursor: default;
 	}
 
-	.alignleft,
-	.alignright {
-		// Without z-index, won't be clickable as "above" adjacent content.
-		z-index: z-index(".block-editor-block-list__block {core/image aligned left or right}");
-	}
-
 	// Alignments.
 	&[data-align="left"],
 	&[data-align="right"] {
@@ -288,15 +282,12 @@
 
 	// Wide and full-wide.
 	&[data-align="full"],
-	&[data-align="wide"],
-	&.alignfull,
-	&.alignwide {
+	&[data-align="wide"] {
 		clear: both;
 	}
 
 	// Full-wide.
-	&[data-align="full"],
-	&.alignfull {
+	&[data-align="full"] {
 		margin-left: -$block-padding;
 		margin-right: -$block-padding;
 
