@@ -205,14 +205,17 @@ function gutenberg_override_style( &$styles, $handle, $src, $deps = array(), $ve
  *
  * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
  */
-function gutenberg_register_vendor_scripts( &$scripts ) {
+function gutenberg_register_vendor_scripts( &$scripts ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	// This function is intentionally left empty.
 	//
 	// Scripts such as react and react-dom are expected to be overridden soon,
 	// and it is preferred to keep this function in place so as not to disturb
 	// tooling related to the plugin build process.
 	//
-	// See https://github.com/WordPress/gutenberg/pull/20628
+	// TODO: Remove phpcs exception in function signature once this function
+	// regains its use.
+	//
+	// See https://github.com/WordPress/gutenberg/pull/20628.
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
