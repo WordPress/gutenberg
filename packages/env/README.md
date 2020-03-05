@@ -11,7 +11,7 @@ $ cd /path/to/a/wordpress/plugin
 $ npx wp-env start
 ```
 
-The local environment will be available at http://localhost:8888.
+The local environment will be available at http://localhost:8888. You can login to the admin with: username `admin`, password `password`.
 
 ## Instructions
 
