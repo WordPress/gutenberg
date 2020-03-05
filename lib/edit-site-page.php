@@ -34,7 +34,7 @@ function gutenberg_edit_site_init( $hook ) {
 		$_wp_current_template_content,
 		$_wp_current_template_hierarchy,
 		$_wp_current_template_part_ids;
-	if ( apply_filters('is-ineligable-site-editor-hook', $hook) ) {
+	if ( apply_filters('is-ineligible-site-editor-hook', $hook) ) {
 		return;
 	}
 
@@ -161,12 +161,12 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
  * 
  * Usage: apply_filters( 'add-site-editor-hook-path', $new_hook_string )
  * 
- * The inner filter for 'is-ineligable-site-editor-hook' is only intended to be applied within
+ * The inner filter for 'is-ineligible-site-editor-hook' is only intended to be applied within
  * the init function itself.  This will filter through all hooks added by the outer filter and
  * return 'false' if there is any match.  It will return the original hook if no match is found.
  */
 add_filter( 'add-site-editor-hook-path', function( $new_hook ){
-	add_filter('is-ineligable-site-editor-hook', function( $hook ) use ( $new_hook ){
+	add_filter('is-ineligible-site-editor-hook', function( $hook ) use ( $new_hook ){
 		if ( $hook === false || $new_hook === $hook ){
 			return false;
 		}
