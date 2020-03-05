@@ -39,6 +39,7 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 
 	const changeAngleToPosition = ( event ) => {
 		const { x: centerX, y: centerY } = angleCircleCenter.current;
+		event.preventDefault();
 		onChange( getAngle( centerX, centerY, event.clientX, event.clientY ) );
 	};
 
