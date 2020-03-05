@@ -2,6 +2,7 @@
 	"references": [
 		{ "path": "bin" },
 		{ "path": "packages/a11y" },
+		{ "path": "packages/autop" },
 		{ "path": "packages/blob" },
 		{ "path": "packages/dom-ready" },
 		{ "path": "packages/i18n" },
