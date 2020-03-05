@@ -15,6 +15,7 @@ yarn.lock
 
 playground/dist
 .cache
+*.tsbuildinfo
 
 # Report generated from jest-junit
 test/native/junit.xml

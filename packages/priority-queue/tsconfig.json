@@ -2,8 +2,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"declarationDir": "build-types",
-		"tsBuildInfoFile": "../../.cache/priority-queue.tsbuildinfo"
+		"declarationDir": "build-types"
 	},
 	"include": [ "src/**/*" ]
 }

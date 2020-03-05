@@ -3,8 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"outDir": "build-types",
-		"tsBuildInfoFile": "../../.cache/token-list.tsbuildinfo"
+		"outDir": "build-types"
 	},
 	"include": [ "src/**/*" ]
 }

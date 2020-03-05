@@ -177,7 +177,7 @@
 	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
-		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-* ./packages/*/node_modules .cache/*.tsbuildinfo",
+		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-* ./packages/*/node_modules ./packages/*/tsconfig.tsbuildinfo",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
 		"build:packages": "node ./bin/packages/build.js",
 		"build:package-types": "node ./bin/packages/build-types.js",

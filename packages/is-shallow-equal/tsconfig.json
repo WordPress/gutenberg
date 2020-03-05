@@ -2,8 +2,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": ".",
-		"declarationDir": "build-types",
-		"tsBuildInfoFile": "../../.cache/is-shallow-equal.tsbuildinfo"
+		"declarationDir": "build-types"
 	},
 	"files": [ "arrays.js", "index.js", "objects.js" ]
 }
