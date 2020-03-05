@@ -21,13 +21,12 @@ import { __ } from '@wordpress/i18n';
 function ColumnEdit( {
 	attributes,
 	setAttributes,
-	className,
 	updateAlignment,
 	hasChildBlocks,
 } ) {
 	const { verticalAlignment, width } = attributes;
 
-	const classes = classnames( className, 'block-core-columns', {
+	const classes = classnames( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
