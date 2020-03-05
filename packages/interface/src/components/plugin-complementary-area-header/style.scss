@@ -1,9 +1,8 @@
-/* Text Editor specific */
-.components-panel__header.edit-post-sidebar-header__small {
+.components-panel__header.interface-plugin-complementary-area-header__small {
 	background: $white;
 	padding-right: $grid-unit-05;
 
-	.edit-post-sidebar__title {
+	.interface-plugin-complementary-area-header__small-title {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -15,7 +14,7 @@
 	}
 }
 
-.components-panel__header.edit-post-sidebar-header {
+.interface-plugin-complementary-area-header {
 	padding-right: $grid-unit-05;
 	background: $light-gray-200;
 
