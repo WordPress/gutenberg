@@ -519,53 +519,43 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withSelect(
-		(
-			select,
-			{ clientId, isAppender, rootClientId, showInserterHelpPanel }
-		) => {
-			const {
-				getInserterItems,
-				getBlockName,
-				getBlockRootClientId,
-				getBlockSelectionEnd,
-				getSettings,
-			} = select( 'core/block-editor' );
-			const {
-				getCategories,
-				getCollections,
-				getChildBlockNames,
-			} = select( 'core/blocks' );
+	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
+		const {
+			getInserterItems,
+			getBlockName,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+			getSettings,
+		} = select( 'core/block-editor' );
+		const { getCategories, getCollections, getChildBlockNames } = select(
+			'core/blocks'
+		);
 
-			let destinationRootClientId = rootClientId;
-			if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
-				const end = getBlockSelectionEnd();
-				if ( end ) {
-					destinationRootClientId =
-						getBlockRootClientId( end ) || undefined;
-				}
+		let destinationRootClientId = rootClientId;
+		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
+			const end = getBlockSelectionEnd();
+			if ( end ) {
+				destinationRootClientId =
+					getBlockRootClientId( end ) || undefined;
 			}
-			const destinationRootBlockName = getBlockName(
-				destinationRootClientId
-			);
-
-			const {
-				showInserterHelpPanel: showInserterHelpPanelSetting,
-				__experimentalFetchReusableBlocks: fetchReusableBlocks,
-			} = getSettings();
-
-			return {
-				categories: getCategories(),
-				collections: getCollections(),
-				rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-				items: getInserterItems( destinationRootClientId ),
-				showInserterHelpPanel:
-					showInserterHelpPanel && showInserterHelpPanelSetting,
-				destinationRootClientId,
-				fetchReusableBlocks,
-			};
 		}
-	),
+		const destinationRootBlockName = getBlockName(
+			destinationRootClientId
+		);
+
+		const {
+			__experimentalFetchReusableBlocks: fetchReusableBlocks,
+		} = getSettings();
+
+		return {
+			categories: getCategories(),
+			collections: getCollections(),
+			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
+			items: getInserterItems( destinationRootClientId ),
+			destinationRootClientId,
+			fetchReusableBlocks,
+		};
+	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const { showInsertionPoint, hideInsertionPoint } = dispatch(
 			'core/block-editor'
