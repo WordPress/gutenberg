@@ -683,8 +683,13 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_heig
  *
  * @return array Filtered editor settings.
  */
-function gutenberg_extend_settings_custom_units( $settings ) {
-	$settings['__experimentalDisableCustomUnits'] = get_theme_support( 'experimental-custom-units' );
+function gutenberg_extend_settings_block_patterns( $settings ) {
+	$block_patterns                          = [
+		gutenberg_load_block_pattern( 'teams' ),
+		gutenberg_load_block_pattern( 'testimonial' ),
+		gutenberg_load_block_pattern( 'pricing-table01' ),
+	];
+	$settings['__experimentalBlockPatterns'] = $block_patterns;
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
