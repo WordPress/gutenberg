@@ -1,14 +1,31 @@
-.edit-post-fullscreen-mode-close__toolbar {
+.edit-post-fullscreen-mode-close.has-icon {
 	// Do not show the toolbar icon on small screens,
 	// when Fullscreen Mode is not an option in the "More" menu.
 	display: none;
 
 	@include break-medium() {
 		display: flex;
-		border-top: 0;
-		border-bottom: 0;
-		border-left: 0;
-		margin: -9px 10px -8px -10px;
-		padding: 9px 10px;
+		align-items: center;
+		align-self: stretch;
+		border: none;
+		background: #23282e; // WP-admin gray.
+		color: $white;
+		border-radius: 0;
+		height: auto;
+		width: $header-height;
+
+		&:hover {
+			background: #32373d !important; // WP-admin light-gray.
+			color: $white !important;
+			box-shadow: none !important;
+		}
+
+		&:active {
+			color: $white;
+		}
+	}
+	svg {
+		margin-left: auto;
+		margin-right: auto;
 	}
 }
