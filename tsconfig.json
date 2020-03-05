@@ -5,6 +5,7 @@
 		{ "path": "packages/autop" },
 		{ "path": "packages/blob" },
 		{ "path": "packages/dom-ready" },
+		{ "path": "packages/escape-html" },
 		{ "path": "packages/i18n" },
 		{ "path": "packages/is-shallow-equal" },
 		{ "path": "packages/priority-queue" },
