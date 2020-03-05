@@ -34,7 +34,11 @@ function gutenberg_edit_site_init( $hook ) {
 		$_wp_current_template_content,
 		$_wp_current_template_hierarchy,
 		$_wp_current_template_part_ids;
-	if ( apply_filters( 'is-ineligible-site-editor-hook', $hook ) ) {
+
+	$allowed_hooks = [ 'gutenberg_page_gutenberg-edit-site', 'toplevel_page_gutenberg-edit-site' ];
+	$allowed_hooks = apply_filters( 'site-editor-hook-paths', $allowed_hooks );
+
+	if ( ! in_array( $hook, $allowed_hooks, true ) ) {
 		return;
 	}
 
@@ -156,23 +160,3 @@ function gutenberg_edit_site_init( $hook ) {
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
 
-/**
- * Adds a filter to allow defining more hooks to be accepted by gutenberg_edit_site_init function.
- * 
- * Usage: apply_filters( 'add-site-editor-hook-path', $new_hook_string )
- * 
- * The inner filter for 'is-ineligible-site-editor-hook' is only intended to be applied within
- * the init function itself.  This will filter through all hooks added by the outer filter and
- * return 'false' if there is any match.  It will return the original hook if no match is found.
- */
-add_filter( 'add-site-editor-hook-path', function( $new_hook ) {
-	add_filter( 'is-ineligible-site-editor-hook', function( $hook ) use ( $new_hook ) {
-		if ( $hook === false || $new_hook === $hook ){
-			return false;
-		}
-		return $hook;
-	});
-});
-
-// Define our default allowed hook for gutenberg_edit_site_init function.
-apply_filters( 'add-site-editor-hook-path', 'gutenberg_page_gutenberg-edit-site' );
