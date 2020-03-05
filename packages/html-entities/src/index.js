@@ -1,3 +1,4 @@
+/** @type {HTMLTextAreaElement} */
 let _decodeTextArea;
 
 /**
@@ -36,5 +37,6 @@ export function decodeEntities( html ) {
 	_decodeTextArea.innerHTML = html;
 	const decoded = _decodeTextArea.textContent;
 	_decodeTextArea.innerHTML = '';
-	return decoded;
+	// Cast to string, HTMLTextElement should always have `string` textContent
+	return /** @type {string} */ ( decoded );
 }
