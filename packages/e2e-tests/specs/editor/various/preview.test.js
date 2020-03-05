@@ -335,7 +335,7 @@ describe( 'Preview with private custom post type', () => {
 		await deactivatePlugin( 'gutenberg-test-custom-post-types' );
 	} );
 
-	it( 'should not show the Preview Externally button', async () => {
+	it( 'should not show the Preview Externally link', async () => {
 		await createNewPost( { postType: 'not_public' } );
 
 		// Type in the title filed.
@@ -349,10 +349,10 @@ describe( 'Preview with private custom post type', () => {
 			'.editor-post-preview__dropdown-content'
 		);
 
-		// Expect the Preview Externally button not to be present.
-		const previewExternallyButton = await previewDropdownContents.$x(
+		// Expect the Preview Externally link not to be present.
+		const previewExternallyLink = await previewDropdownContents.$x(
 			'//a[contains(text(), "Preview externally")]'
 		);
-		expect( previewExternallyButton.length ).toBe( 0 );
+		expect( previewExternallyLink.length ).toBe( 0 );
 	} );
 } );
