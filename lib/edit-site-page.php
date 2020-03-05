@@ -156,13 +156,13 @@ function gutenberg_edit_site_init( $hook ) {
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
 
-add_filter( 'add-site-editor-hook-path', function( $slug ){
-	add_filter('is-ineligable-site-editor-hook', function( $hook ){
-		if ( $hook === false || $slug === $hook ){
+add_filter( 'add-site-editor-hook-path', function( $new_hook ){
+	add_filter('is-ineligable-site-editor-hook', function( $hook ) use ( $new_hook ){
+		if ( $hook === false || $new_hook === $hook ){
 			return false;
 		}
 		return $hook;
 	});
 });
 
-applyFilter( 'add-site-editor-hook-path', 'gutenberg_page_gutenberg-edit-site');
+apply_filters( 'add-site-editor-hook-path', 'gutenberg_page_gutenberg-edit-site');
