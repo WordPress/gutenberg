@@ -11,12 +11,12 @@
 		"declarationMap": true,
 		"composite": true,
 		"emitDeclarationOnly": true,
-		// "isolatedModules": true,
+		"isolatedModules": true,
 
 		/* Strict Type-Checking Options */
-		"strict": true /* Enable all strict type-checking options. */,
+		"strict": true,
 		"strictNullChecks": true,
-		"noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
+		"noImplicitAny": true,
 
 		/* Additional Checks */
 		"noUnusedLocals": true,
