@@ -345,8 +345,12 @@ describe( 'Preview with private custom post type', () => {
 		// Open the preview menu.
 		await page.click( '.editor-post-preview__button-toggle' );
 
+		const previewDropdownContents = await page.$(
+			'.editor-post-preview__dropdown-content'
+		);
+
 		// Expect the Preview Externally button not to be present.
-		const previewExternallyButton = await page.$x(
+		const previewExternallyButton = await previewDropdownContents.$x(
 			'//a[contains(text(), "Preview externally")]'
 		);
 		expect( previewExternallyButton.length ).toBe( 0 );
