@@ -1,9 +1,10 @@
 {
-	// Currently disabled, package does not typecheck
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"outDir": "build-types"
+		"outDir": "build-types",
+		"strictNullChecks": false,
+		"noImplicitAny": false
 	},
 	"include": [ "src/**/*" ]
 }
