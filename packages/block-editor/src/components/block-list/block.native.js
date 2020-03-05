@@ -192,7 +192,6 @@ class BlockListBlock extends Component {
 			title,
 			parentId,
 			isTouchable,
-			disallowRemoveInnerBlocks,
 			hasParent,
 			onSelect,
 			showFloatingToolbar,
@@ -244,12 +243,7 @@ class BlockListBlock extends Component {
 						) }
 						<View style={ this.applyToolbarStyle() }>
 							{ isSelected && (
-								<BlockMobileToolbar
-									clientId={ clientId }
-									disallowRemoveBlock={
-										disallowRemoveInnerBlocks
-									}
-								/>
+								<BlockMobileToolbar clientId={ clientId } />
 							) }
 						</View>
 					</View>

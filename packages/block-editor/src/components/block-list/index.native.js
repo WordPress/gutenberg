@@ -157,7 +157,6 @@ export class BlockList extends Component {
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			containerStyle,
-			disallowRemoveInnerBlocks,
 			columnsSettings,
 		} = this.props;
 
@@ -178,7 +177,6 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
-						disallowRemoveInnerBlocks={ disallowRemoveInnerBlocks }
 						columnsSettings={ columnsSettings }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
