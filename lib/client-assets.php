@@ -206,29 +206,6 @@ function gutenberg_override_style( &$styles, $handle, $src, $deps = array(), $ve
  * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
  */
 function gutenberg_register_vendor_scripts( &$scripts ) {
-	$suffix = SCRIPT_DEBUG ? '' : '.min';
-
-	// Vendor Scripts.
-	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
-
-	// TODO: Overrides for react, react-dom and lodash are necessary
-	// until WordPress 5.3 is released.
-	gutenberg_register_vendor_script(
-		$scripts,
-		'react',
-		'https://unpkg.com/react@16.9.0/umd/react' . $react_suffix . '.js',
-		array( 'wp-polyfill' ),
-		'16.9.0',
-		true
-	);
-	gutenberg_register_vendor_script(
-		$scripts,
-		'react-dom',
-		'https://unpkg.com/react-dom@16.9.0/umd/react-dom' . $react_suffix . '.js',
-		array( 'react' ),
-		'16.9.0',
-		true
-	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
