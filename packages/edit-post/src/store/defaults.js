@@ -10,6 +10,7 @@ export const PREFERENCES_DEFAULTS = {
 		fixedToolbar: false,
 		showInserterHelpPanel: true,
 		welcomeGuide: true,
+		fullscreenMode: true,
 	},
 	pinnedPluginItems: {},
 	hiddenBlockTypes: [],

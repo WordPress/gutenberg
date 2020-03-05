@@ -51,6 +51,7 @@ const siteLibrarySource = {
 	label: __( 'WordPress Media Library' ),
 	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
 	icon: wordpress,
+	mediaLibrary: true,
 };
 
 const internalSources = [
@@ -94,15 +95,18 @@ export class MediaUpload extends React.Component {
 	}
 
 	getMediaOptionsItems() {
-		const { allowedTypes = [] } = this.props;
+		const {
+			allowedTypes = [],
+			__experimentalOnlyMediaLibrary,
+		} = this.props;
 
 		return this.getAllSources()
 			.filter( ( source ) => {
-				return (
-					allowedTypes.filter( ( allowedType ) =>
-						source.types.includes( allowedType )
-					).length > 0
-				);
+				return __experimentalOnlyMediaLibrary
+					? source.mediaLibrary
+					: allowedTypes.filter( ( allowedType ) =>
+							source.types.includes( allowedType )
+					  ).length > 0;
 			} )
 			.map( ( source ) => {
 				return {
@@ -140,6 +144,7 @@ export class MediaUpload extends React.Component {
 		const types = allowedTypes.filter( ( type ) =>
 			mediaSource.types.includes( type )
 		);
+
 		requestMediaPicker( mediaSource.id, types, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
 				onSelect( media );

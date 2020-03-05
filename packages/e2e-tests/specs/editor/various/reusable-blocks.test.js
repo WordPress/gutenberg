@@ -117,7 +117,9 @@ describe( 'Reusable blocks', () => {
 		await insertBlock( 'Greeting block' );
 
 		// Put the reusable block in edit mode
-		const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+		const editButton = await page.waitForXPath(
+			'//button[text()="Edit" and not(@disabled)]'
+		);
 		await editButton.click();
 
 		// Change the block's title
@@ -181,7 +183,7 @@ describe( 'Reusable blocks', () => {
 
 		// Check that its content is up to date
 		const text = await page.$eval(
-			'.block-editor-block-list__block[data-type="core/paragraph"] p',
+			'.block-editor-block-list__block[data-type="core/paragraph"]',
 			( element ) => element.innerText
 		);
 		expect( text ).toMatch( 'Oh! Hello there!' );

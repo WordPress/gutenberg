@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, every } from 'lodash';
+import { every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { controlsRepeat } from '@wordpress/icons';
+import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 
 export function ReusableBlockConvertButton( {
 	isVisible,
@@ -24,21 +24,32 @@ export function ReusableBlockConvertButton( {
 	}
 
 	return (
-		<>
-			{ ! isReusable && (
-				<MenuItem
-					icon={ controlsRepeat }
-					onClick={ onConvertToReusable }
-				>
-					{ __( 'Add to Reusable blocks' ) }
-				</MenuItem>
+		<BlockSettingsMenuControls>
+			{ ( { onClose } ) => (
+				<>
+					{ ! isReusable && (
+						<MenuItem
+							onClick={ () => {
+								onConvertToReusable();
+								onClose();
+							} }
+						>
+							{ __( 'Add to Reusable blocks' ) }
+						</MenuItem>
+					) }
+					{ isReusable && (
+						<MenuItem
+							onClick={ () => {
+								onConvertToStatic();
+								onClose();
+							} }
+						>
+							{ __( 'Convert to Regular Block' ) }
+						</MenuItem>
+					) }
+				</>
 			) }
-			{ isReusable && (
-				<MenuItem icon={ controlsRepeat } onClick={ onConvertToStatic }>
-					{ __( 'Convert to Regular Block' ) }
-				</MenuItem>
-			) }
-		</>
+		</BlockSettingsMenuControls>
 	);
 }
 
@@ -83,7 +94,7 @@ export default compose( [
 			isVisible,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientIds, onToggle = noop } ) => {
+	withDispatch( ( dispatch, { clientIds } ) => {
 		const {
 			__experimentalConvertBlockToReusable: convertBlockToReusable,
 			__experimentalConvertBlockToStatic: convertBlockToStatic,
@@ -91,15 +102,10 @@ export default compose( [
 
 		return {
 			onConvertToStatic() {
-				if ( clientIds.length !== 1 ) {
-					return;
-				}
 				convertBlockToStatic( clientIds[ 0 ] );
-				onToggle();
 			},
 			onConvertToReusable() {
 				convertBlockToReusable( clientIds );
-				onToggle();
 			},
 		};
 	} ),

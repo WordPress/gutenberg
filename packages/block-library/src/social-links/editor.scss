@@ -2,7 +2,7 @@
 .wp-block-social-links {
 	div.block-editor-url-input {
 		display: inline-block;
-		margin-left: $grid-size;
+		margin-left: $grid-unit-10;
 	}
 
 	.block-editor-block-list__layout {
@@ -57,7 +57,7 @@
 	margin: 0;
 
 	.block-editor-button-block-appender {
-		padding: $grid-size;
+		padding: $grid-unit-10;
 		outline: none;
 		background: none;
 	}

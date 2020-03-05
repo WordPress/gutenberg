@@ -32,6 +32,7 @@ const withSpinner = ( command ) => ( ...args ) => {
 					time[ 1 ] / 1e6
 				).toFixed( 0 ) }ms)`
 			);
+			process.exit( 0 );
 		},
 		( error ) => {
 			if ( error instanceof env.ValidationError ) {
@@ -67,6 +68,11 @@ const withSpinner = ( command ) => ( ...args ) => {
 
 module.exports = function cli() {
 	yargs.usage( wpPrimary( '$0 <command>' ) );
+	yargs.option( 'debug', {
+		type: 'boolean',
+		describe: 'Enable debug output.',
+		default: false,
+	} );
 
 	yargs.command(
 		'start',

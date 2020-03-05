@@ -1,5 +1,72 @@
 == Changelog ==
 
+= 7.6.0 =
+
+## Features
+- Add a rotating list of tips to the inserter help panel [20163](https://github.com/WordPress/gutenberg/pull/20163) 
+
+## Enhancements
+- Improve find-ability for social/video embeds [20224](https://github.com/WordPress/gutenberg/pull/20224)
+
+## New APIs
+- Ensure packages-update wp-scripts command works with missing dependencies [20408](https://github.com/WordPress/gutenberg/pull/20408)
+- Add new option in dependencies webpack plugin to combine assets files into one file [20330](https://github.com/WordPress/gutenberg/pull/20330)
+- Environment:
+    - Add custom port numbers to .wp-env.json [20158](https://github.com/WordPress/gutenberg/pull/20158) 
+    - Add support for local override files. [20341](https://github.com/WordPress/gutenberg/pull/20341)
+    - Add debug mode. [20348](https://github.com/WordPress/gutenberg/pull/20348)
+
+## Experimental
+- New blocks:
+    - Post Featured Image. [19875](https://github.com/WordPress/gutenberg/pull/19875)
+    - Comments Count block. [19953](https://github.com/WordPress/gutenberg/pull/19953)
+    - Comments Form block. [19954](https://github.com/WordPress/gutenberg/pull/19954)
+    - Post Tags block. [19580](https://github.com/WordPress/gutenberg/pull/19580)
+- Add new features to the Post Excerpt block. [19715](https://github.com/WordPress/gutenberg/pull/19715)
+- Allow changing Site Title block heading level. [20361](https://github.com/WordPress/gutenberg/pull/20361)
+- Render the post comments form properly [20279](https://github.com/WordPress/gutenberg/pull/20279)
+- Add new features to the Post Date block. [19857](https://github.com/WordPress/gutenberg/pull/19857)
+- Add multiple template loading [19141](https://github.com/WordPress/gutenberg/pull/19141)
+- Show error when resolved block template is empty [20239](https://github.com/WordPress/gutenberg/pull/20239)
+
+## Bug Fixes
+- Overflowing `LinkControl` block editor component. [20154](https://github.com/WordPress/gutenberg/pull/20154) 
+- Broken gallery to image transform and inconsistent types used in the gallery block [20084](https://github.com/WordPress/gutenberg/pull/20084) 
+- Missing label on heading toolbar. [20248](https://github.com/WordPress/gutenberg/pull/20248) 
+- Sidebar jumpiness. [20355](https://github.com/WordPress/gutenberg/pull/20355) 
+- Fix wrong imports in PluginBlockSettingsMenuItem [20356](https://github.com/WordPress/gutenberg/pull/20356) 
+- Color formatter appears when color choosing is not possible [20222](https://github.com/WordPress/gutenberg/pull/20222) 
+- Crash when updating a post with the latest post block [20289](https://github.com/WordPress/gutenberg/pull/20289) 
+- Inconsistency on Import from JSON button look [20416](https://github.com/WordPress/gutenberg/pull/20416) 
+- Inline image width pop-up 'wanders' down page [20232](https://github.com/WordPress/gutenberg/pull/20232) 
+- Styling problem on vertically aligned blocks [20368](https://github.com/WordPress/gutenberg/pull/20368) 
+- Remove unnecessary aria-label from link formatter [18742](https://github.com/WordPress/gutenberg/pull/18742) 
+- Make navigation button expand to fit longer nav link text [20230](https://github.com/WordPress/gutenberg/pull/20230) 
+- Flow for gallery creation and editing [20287](https://github.com/WordPress/gutenberg/pull/20287)
+- Fix background color for dark themes on the spacer block [20296](https://github.com/WordPress/gutenberg/pull/20296) 
+- Show metaboxes peeking in even on tiny screens. [20262](https://github.com/WordPress/gutenberg/pull/20262) 
+- Add an edit state to media frames to fix an issue when opening a new tab. [17642](https://github.com/WordPress/gutenberg/pull/17642)
+
+## Documentation
+- Add a basic storybook story listing all the @wordpress/icons [20266](https://github.com/WordPress/gutenberg/pull/20266) 
+- Add docs for variations in the block registration section [20145](https://github.com/WordPress/gutenberg/pull/20145) 
+- Improve README for `<LinkControl />` component. [19677](https://github.com/WordPress/gutenberg/pull/19677) 
+- Remove the devhub manifest file [20175](https://github.com/WordPress/gutenberg/pull/20175) 
+- Several documentation improvements and typo fixes: [20385](https://github.com/WordPress/gutenberg/pull/20385), [20378](https://github.com/WordPress/gutenberg/pull/20378), [20392](https://github.com/WordPress/gutenberg/pull/20392), [20381](https://github.com/WordPress/gutenberg/pull/20381), [20388](https://github.com/WordPress/gutenberg/pull/20388), [20371](https://github.com/WordPress/gutenberg/pull/20371), [20380](https://github.com/WordPress/gutenberg/pull/20380), [20384](https://github.com/WordPress/gutenberg/pull/20384), [20379](https://github.com/WordPress/gutenberg/pull/20379), [20391](https://github.com/WordPress/gutenberg/pull/20391), [20251](https://github.com/WordPress/gutenberg/pull/20251)
+
+## Various
+- Create block: Add support for `format:js` to ESNext template [20335](https://github.com/WordPress/gutenberg/pull/20335)
+- Add check for minimum system requirements on create block [20398](https://github.com/WordPress/gutenberg/pull/20398)
+- Conditionally apply Editor Skeleton html element styles [20245](https://github.com/WordPress/gutenberg/pull/20245) 
+- Environment:
+    - Check for legacy installs and provide the option to delete them. [20340](https://github.com/WordPress/gutenberg/pull/20340)
+    - Fix testsPath on local sources [20353](https://github.com/WordPress/gutenberg/pull/20353)
+    - Use user with UID=33 to run WP CLI commands [20403](https://github.com/WordPress/gutenberg/pull/20403)
+    - Fix issue where docker & wp had different URLs [20228](https://github.com/WordPress/gutenberg/pull/20228) 
+    - No longer show error message twice [20157](https://github.com/WordPress/gutenberg/pull/20157)
+    - Support wp-config.php overrides. [20352](https://github.com/WordPress/gutenberg/pull/20352) 
+    - Support overwriting generated file directory with an environment variable [20253](https://github.com/WordPress/gutenberg/pull/20253) 
+
 = 7.5.0 =
 
 ## Features

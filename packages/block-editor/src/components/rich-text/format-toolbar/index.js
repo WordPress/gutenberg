@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
 
 const POPOVER_PROPS = {
-	position: 'bottom left',
+	position: 'bottom right',
 };
 
 const FormatToolbar = () => {

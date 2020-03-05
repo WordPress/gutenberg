@@ -11,7 +11,6 @@ import { MenuItem } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { html } from '@wordpress/icons';
 
 export function BlockModeToggle( {
 	blockType,
@@ -30,11 +29,7 @@ export function BlockModeToggle( {
 	const label =
 		mode === 'visual' ? __( 'Edit as HTML' ) : __( 'Edit visually' );
 
-	return (
-		<MenuItem onClick={ onToggleMode } icon={ html }>
-			{ ! small && label }
-		</MenuItem>
-	);
+	return <MenuItem onClick={ onToggleMode }>{ ! small && label }</MenuItem>;
 }
 
 export default compose( [

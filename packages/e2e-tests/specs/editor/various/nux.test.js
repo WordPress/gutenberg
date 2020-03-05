@@ -15,7 +15,7 @@ describe( 'New User Experience (NUX)', () => {
 			'.edit-post-welcome-guide',
 			( element ) => element.innerText
 		);
-		expect( welcomeGuideText ).toContain( 'Welcome to the Block Editor' );
+		expect( welcomeGuideText ).toContain( 'Welcome to the block editor' );
 
 		// Click on the 'Next' button
 		const [ nextButton ] = await page.$x(
@@ -41,7 +41,7 @@ describe( 'New User Experience (NUX)', () => {
 			'.edit-post-welcome-guide',
 			( element ) => element.innerText
 		);
-		expect( welcomeGuideText ).toContain( 'Welcome to the Block Editor' );
+		expect( welcomeGuideText ).toContain( 'Welcome to the block editor' );
 
 		// Press the button for Page 2
 		await page.click( 'button[aria-label="Page 2 of 4"]' );
@@ -55,13 +55,13 @@ describe( 'New User Experience (NUX)', () => {
 		// Press the right arrow key for Page 3
 		await page.keyboard.press( 'ArrowRight' );
 		await page.waitForXPath(
-			'//h1[contains(text(), "Get to know the Block Library")]'
+			'//h1[contains(text(), "Get to know the block library")]'
 		);
 
 		// Press the right arrow key for Page 4
 		await page.keyboard.press( 'ArrowRight' );
 		await page.waitForXPath(
-			'//h1[contains(text(), "Learn how to use the Block Editor")]'
+			'//h1[contains(text(), "Learn how to use the block editor")]'
 		);
 
 		// Click on the *visible* 'Get started' button. There are two in the DOM

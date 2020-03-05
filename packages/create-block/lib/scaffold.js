@@ -85,6 +85,9 @@ module.exports = async function(
 		code( '  $ npm run build' );
 		info( '    Builds the code for production.' );
 		info( '' );
+		code( '  $ npm run format:js' );
+		info( '    Formats JavaScript files.' );
+		info( '' );
 		code( '  $ npm run lint:css' );
 		info( '    Lints CSS files.' );
 		info( '' );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray, noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -24,7 +24,21 @@ import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
-function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
+const getInlineStyles = ( scale, x, y, isReady, width ) => ( {
+	transform: `scale(${ scale })`,
+	visibility: isReady ? 'visible' : 'hidden',
+	left: x,
+	top: y,
+	width,
+} );
+
+function ScaledBlockPreview( {
+	blocks,
+	viewportWidth,
+	padding = 0,
+	onReady,
+	scalingDelay,
+} ) {
 	const previewRef = useRef( null );
 
 	const [ isReady, setIsReady ] = useState( false );
@@ -39,6 +53,11 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
 			if ( ! containerElement ) {
 				return;
 			}
+
+			// Auxiliary vars used for onReady() callback.
+			let scale,
+				offsetX = 0,
+				offsetY = 0;
 
 			// If we're previewing a single block, scale the preview to fit it.
 			if ( blocks.length === 1 ) {
@@ -59,13 +78,13 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
 				};
 				const scaledElementRect = previewElement.getBoundingClientRect();
 
-				const scale =
+				scale =
 					containerElementRect.width / scaledElementRect.width || 1;
-				const offsetX =
+				offsetX =
 					-( scaledElementRect.left - containerElementRect.left ) *
 						scale +
 					padding;
-				const offsetY =
+				offsetY =
 					containerElementRect.height >
 					scaledElementRect.height * scale
 						? ( containerElementRect.height -
@@ -81,11 +100,25 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
 				previewElement.style.marginTop = '0';
 			} else {
 				const containerElementRect = containerElement.getBoundingClientRect();
-				setPreviewScale( containerElementRect.width / viewportWidth );
+				scale = containerElementRect.width / viewportWidth;
+				setPreviewScale( scale );
 			}
 
 			setIsReady( true );
-		}, 100 );
+			onReady( {
+				scale,
+				position: { x: offsetX, y: offsetY },
+				previewContainerRef: previewRef,
+
+				inlineStyles: getInlineStyles(
+					scale,
+					offsetX,
+					offsetY,
+					true,
+					viewportWidth
+				),
+			} );
+		}, scalingDelay );
 
 		// Cleanup
 		return () => {
@@ -99,13 +132,13 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
 		return null;
 	}
 
-	const previewStyles = {
-		transform: `scale(${ previewScale })`,
-		visibility: isReady ? 'visible' : 'hidden',
-		left: x,
-		top: y,
-		width: viewportWidth,
-	};
+	const previewStyles = getInlineStyles(
+		previewScale,
+		x,
+		y,
+		isReady,
+		viewportWidth
+	);
 
 	return (
 		<div
@@ -133,6 +166,8 @@ export function BlockPreview( {
 	viewportWidth = 700,
 	padding,
 	settings,
+	__experimentalOnReady = noop,
+	__experimentalScalingDelay = 100,
 } ) {
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	const [ recompute, triggerRecompute ] = useReducer(
@@ -152,6 +187,8 @@ export function BlockPreview( {
 				blocks={ renderedBlocks }
 				viewportWidth={ viewportWidth }
 				padding={ padding }
+				onReady={ __experimentalOnReady }
+				scalingDelay={ __experimentalScalingDelay }
 			/>
 		</BlockEditorProvider>
 	);
