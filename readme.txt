@@ -1,6 +1,6 @@
 === Gutenberg ===
 Contributors: matveb, joen, karmatosed
-Requires at least: 5.2.0
+Requires at least: 5.3.0
 Tested up to: 5.3
 Stable tag: V.V.V
 License: GPLv2 or later
