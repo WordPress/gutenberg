@@ -1,4 +1,4 @@
-# Tutorial
+# Tutorial: building a custom block editor
 
 This tutorial will step through the fundamentals of creating a custom instance
 of a "block editor" using the `@wordpress/block-editor` package.
