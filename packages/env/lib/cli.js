@@ -124,7 +124,7 @@ module.exports = function cli() {
 		},
 		withSpinner( env.run )
 	);
-	yargs.example('$0 run cli wp users list', 'Runs `wp users list` wp-cli command which lists WordPress users.');
+	yargs.example('$0 run cli wp user list', 'Runs `wp user list` wp-cli command which lists WordPress users.');
 
 	return yargs;
 };
