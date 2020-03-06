@@ -63,6 +63,7 @@ function BlockNavigationDropdown( { isDisabled } ) {
 	return (
 		<Dropdown
 			contentClassName="block-editor-block-navigation__popover"
+			position="bottom right"
 			renderToggle={ ( toggleProps ) => (
 				<BlockNavigationDropdownToggle
 					{ ...toggleProps }
