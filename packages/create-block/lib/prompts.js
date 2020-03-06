@@ -73,6 +73,31 @@ const category = {
 	choices: [ 'common', 'embed', 'formatting', 'layout', 'widgets' ],
 };
 
+const author = {
+	type: 'input',
+	name: 'author',
+	message:
+		"The author name — this should be a list of wordpress.org userid's:",
+};
+
+const license = {
+	type: 'input',
+	name: 'license',
+	message: 'The plugin license:',
+	filter( input ) {
+		return input || 'GPLv2 or later';
+	},
+};
+
+const version = {
+	type: 'input',
+	name: 'author',
+	message: 'The plugin version:',
+	filter( input ) {
+		return input || '0.1.0';
+	},
+};
+
 module.exports = {
 	slug,
 	namespace,
@@ -80,4 +105,7 @@ module.exports = {
 	description,
 	dashicon,
 	category,
+	author,
+	license,
+	version,
 };
