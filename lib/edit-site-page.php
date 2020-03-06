@@ -35,7 +35,7 @@ function gutenberg_edit_site_init( $hook ) {
 		$_wp_current_template_hierarchy,
 		$_wp_current_template_part_ids;
 
-	$allowed_hooks = [ 'gutenberg_page_gutenberg-edit-site', 'toplevel_page_gutenberg-edit-site' ];
+	$allowed_hooks = array( 'gutenberg_page_gutenberg-edit-site' );
 	$allowed_hooks = apply_filters( 'site-editor-hook-paths', $allowed_hooks );
 
 	if ( ! in_array( $hook, $allowed_hooks, true ) ) {
@@ -159,4 +159,3 @@ function gutenberg_edit_site_init( $hook ) {
 	wp_enqueue_style( 'wp-format-library' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
-
