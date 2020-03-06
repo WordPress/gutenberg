@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -53,6 +58,13 @@ export default function PreviewOptions( {
 		return select( 'core/editor' ).isEditedPostSaveable();
 	}, [] );
 
+	const isViewable = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+		return get( postType, [ 'viewable' ], false );
+	}, [] );
+
 	return (
 		<Dropdown
 			className="editor-post-preview__dropdown"
@@ -96,22 +108,25 @@ export default function PreviewOptions( {
 							{ __( 'Mobile' ) }
 						</MenuItem>
 					</MenuGroup>
-					<MenuGroup>
-						<div className="editor-post-preview__grouping-external">
-							<PostPreviewButton
-								className={
-									'editor-post-preview__button-external'
-								}
-								forceIsAutosaveable={ forceIsAutosaveable }
-								forcePreviewLink={ forcePreviewLink }
-								textContent={ __( 'Preview externally' ) }
-							/>
-							<Icon
-								icon={ external }
-								className="editor-post-preview__icon-external"
-							/>
-						</div>
-					</MenuGroup>
+					{ isViewable && (
+						<MenuGroup>
+							<div className="editor-post-preview__grouping-external">
+								<PostPreviewButton
+									className={
+										'editor-post-preview__button-external'
+									}
+									forceIsAutosaveable={ forceIsAutosaveable }
+									forcePreviewLink={ forcePreviewLink }
+									textContent={
+										<>
+											{ __( 'Preview externally' ) }
+											<Icon icon={ external } />
+										</>
+									}
+								/>
+							</div>
+						</MenuGroup>
+					) }
 				</>
 			) }
 		/>
