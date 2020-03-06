@@ -67,10 +67,11 @@
 }
 
 // Empty / default block side inserter.
-.block-editor-block-list__empty-block-inserter, // Empty paragraph
-.block-editor-default-block-appender .block-editor-inserter { // Empty appender
+.block-editor-block-list__empty-block-inserter.block-editor-block-list__empty-block-inserter, // Empty paragraph, needs specificity to override inherited popover styles.
+.block-editor-default-block-appender .block-editor-inserter { // Empty appender.
 	position: absolute;
 	top: 2px; // Centers it in the default paragraph height.
+	height: $button-size-small + $grid-unit-10;
 
 	.block-editor-inserter__toggle {
 		margin-right: 0;
