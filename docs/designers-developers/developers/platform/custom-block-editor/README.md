@@ -15,4 +15,4 @@ Code snippets are provided in "ESNext". ESNext refers to the next versions of th
 
 Note that it is not required to use ESNext to create blocks or extend the editor, you can use classic JavaScript. However, once familiar with ESNext, developers find it is easier to read and write, thus most code examples you'll find use the ESNext syntax.
 
-* [Start custom block editor tutorial](/docs/designers-developers/developers/platform/tutorial.md)
+* [Start custom block editor tutorial](/docs/designers-developers/developers/platform/custom-block-editor/tutorial.md)
