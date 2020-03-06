@@ -4,6 +4,10 @@
 	// Default background color so that grey .edit-post-editor-regions__content color doesn't show through.
 	background-color: $white;
 
+	// This helps to create the canvas "surface" when changing the viewport
+	// size (Desktop, Tablet, Mobile) using the preview-options button.
+	box-shadow: 0 2px 4px $light-gray-900;
+
 	& .components-button {
 		font-family: $default-font;
 	}
