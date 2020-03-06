@@ -46,7 +46,6 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 
 function ColumnsEditContainer( {
 	attributes,
-	className,
 	updateAlignment,
 	updateColumns,
 	clientId,
@@ -78,7 +77,7 @@ function ColumnsEditContainer( {
 		}
 	);
 
-	const classes = classnames( className, {
+	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 

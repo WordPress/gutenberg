@@ -33,10 +33,10 @@ selectorNames.forEach( ( name ) => {
 				return state.currentPost;
 			},
 
-			getEntityRecordChangesByRecord() {
+			__experimentalGetDirtyEntityRecords() {
 				return (
-					state.getEntityRecordChangesByRecord &&
-					state.getEntityRecordChangesByRecord()
+					state.__experimentalGetDirtyEntityRecords &&
+					state.__experimentalGetDirtyEntityRecords()
 				);
 			},
 
@@ -461,8 +461,10 @@ describe( 'selectors', () => {
 				editorSettings: {
 					__experimentalEnableFullSiteEditing: false,
 				},
-				getEntityRecordChangesByRecord() {
-					return { someKind: { someName: { someKey: {} } } };
+				__experimentalGetDirtyEntityRecords() {
+					return [
+						{ kind: 'someKind', name: 'someName', key: 'someKey' },
+					];
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( false );
@@ -473,8 +475,10 @@ describe( 'selectors', () => {
 				editorSettings: {
 					__experimentalEnableFullSiteEditing: true,
 				},
-				getEntityRecordChangesByRecord() {
-					return { someKind: { someName: { someKey: {} } } };
+				__experimentalGetDirtyEntityRecords() {
+					return [
+						{ kind: 'someKind', name: 'someName', key: 'someKey' },
+					];
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( true );
@@ -485,8 +489,8 @@ describe( 'selectors', () => {
 				editorSettings: {
 					__experimentalEnableFullSiteEditing: true,
 				},
-				getEntityRecordChangesByRecord() {
-					return { postType: { post: { 1: {} } } };
+				__experimentalGetDirtyEntityRecords() {
+					return [ { kind: 'postType', name: 'post', key: 1 } ];
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( false );
@@ -497,8 +501,11 @@ describe( 'selectors', () => {
 				editorSettings: {
 					__experimentalEnableFullSiteEditing: true,
 				},
-				getEntityRecordChangesByRecord() {
-					return { postType: { post: { 1: {}, 2: {} } } };
+				__experimentalGetDirtyEntityRecords() {
+					return [
+						{ kind: 'postType', name: 'post', key: 1 },
+						{ kind: 'postType', name: 'post', key: 2 },
+					];
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( true );
@@ -509,10 +516,11 @@ describe( 'selectors', () => {
 				editorSettings: {
 					__experimentalEnableFullSiteEditing: true,
 				},
-				getEntityRecordChangesByRecord() {
-					return {
-						postType: { post: { 1: {} }, wp_template: { 1: {} } },
-					};
+				__experimentalGetDirtyEntityRecords() {
+					return [
+						{ kind: 'postType', name: 'post', key: 1 },
+						{ kind: 'postType', name: 'wp_template', key: 1 },
+					];
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( true );
