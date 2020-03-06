@@ -5,7 +5,7 @@ import { Path, SVG } from '@wordpress/primitives';
 
 const mediaAndText = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M13 17h8v-2h-8v2zM3 19h8V5H3v14zM13 9h8V7h-8v2zm0 4h8v-2h-8v2z" />
+		<Path d="M4 17h7V6H4v11zm9-10v1.5h7V7h-7zm0 5.5h7V11h-7v1.5zm0 4h7V15h-7v1.5z" />
 	</SVG>
 );
 

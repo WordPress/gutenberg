@@ -234,6 +234,12 @@
 		"parent": "backward-compatibility"
 	},
 	{
+		"title": "Gutenberg as a Development Platform",
+		"slug": "platform",
+		"markdown_source": "../docs/designers-developers/developers/platform/README.md",
+		"parent": "developers"
+	},
+	{
 		"title": "Designer Documentation",
 		"slug": "designers",
 		"markdown_source": "../docs/designers-developers/designers/README.md",

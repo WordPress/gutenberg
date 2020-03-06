@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, has, map, pick, mapValues, includes } from 'lodash';
+import { find, get, has, map, pick, mapValues, includes, some } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -149,51 +149,17 @@ export const hasNonPostEntityChanges = createRegistrySelector(
 			return false;
 		}
 
-		const entityRecordChangesByRecord = select(
+		const dirtyEntityRecords = select(
 			'core'
-		).getEntityRecordChangesByRecord();
-		const changedKinds = Object.keys( entityRecordChangesByRecord );
-		if (
-			changedKinds.length > 1 ||
-			( changedKinds.length === 1 &&
-				! entityRecordChangesByRecord.postType )
-		) {
-			// Return true if there is more than one edited entity kind
-			// or the edited entity kind is not the editor's post's kind.
-			return true;
-		} else if ( ! entityRecordChangesByRecord.postType ) {
-			// Don't continue if there are no edited entity kinds.
-			return false;
-		}
-
+		).__experimentalGetDirtyEntityRecords();
 		const { type, id } = getCurrentPost( state );
-		const changedPostTypes = Object.keys(
-			entityRecordChangesByRecord.postType
+		return some(
+			dirtyEntityRecords,
+			( entityRecord ) =>
+				entityRecord.kind !== 'postType' ||
+				entityRecord.name !== type ||
+				entityRecord.key !== id
 		);
-		if (
-			changedPostTypes.length > 1 ||
-			( changedPostTypes.length === 1 &&
-				! entityRecordChangesByRecord.postType[ type ] )
-		) {
-			// Return true if there is more than one edited post type
-			// or the edited entity's post type is not the editor's post's post type.
-			return true;
-		}
-
-		const changedPosts = Object.keys(
-			entityRecordChangesByRecord.postType[ type ]
-		);
-		if (
-			changedPosts.length > 1 ||
-			( changedPosts.length === 1 &&
-				! entityRecordChangesByRecord.postType[ type ][ id ] )
-		) {
-			// Return true if there is more than one edited post
-			// or the edited post is not the editor's post.
-			return true;
-		}
-
-		return false;
 	}
 );
 

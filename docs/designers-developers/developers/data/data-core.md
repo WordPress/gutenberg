@@ -153,21 +153,6 @@ _Returns_
 
 -   `?Object`: Record.
 
-<a name="getEntityRecordChangesByRecord" href="#getEntityRecordChangesByRecord">#</a> **getEntityRecordChangesByRecord**
-
-Returns a map of objects with each edited
-raw entity record and its corresponding edits.
-
-The map is keyed by entity `kind => name => key => { rawRecord, edits }`.
-
-_Parameters_
-
--   _state_ `Object`: State tree.
-
-_Returns_
-
--   (unknown type): The map of edited records with their edits.
-
 <a name="getEntityRecordEdits" href="#getEntityRecordEdits">#</a> **getEntityRecordEdits**
 
 Returns the specified entity record's edits.

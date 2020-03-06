@@ -83,23 +83,27 @@
 	// Navigate mode & Focused wrapper.
 	// We're using a pseudo element to overflow placeholder borders
 	// and any border inside the block itself.
-	&:not([contenteditable]):focus::after {
-		position: absolute;
-		z-index: 1;
-		pointer-events: none;
-		content: "";
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
+	&:not([contenteditable]):focus {
+		outline: none;
 
-		// 2px outside.
-		box-shadow: 0 0 0 2px $blue-medium-focus;
-		border-radius: $radius-block-ui;
+		&::after {
+			position: absolute;
+			z-index: 1;
+			pointer-events: none;
+			content: "";
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
 
-		// Show a light color for dark themes.
-		.is-dark-theme & {
-			box-shadow: 0 0 0 2px $blue-medium-focus-dark;
+			// 2px outside.
+			box-shadow: 0 0 0 2px $blue-medium-focus;
+			border-radius: $radius-block-ui;
+
+			// Show a light color for dark themes.
+			.is-dark-theme & {
+				box-shadow: 0 0 0 2px $blue-medium-focus-dark;
+			}
 		}
 	}
 
@@ -243,6 +247,12 @@
 		cursor: default;
 	}
 
+	.alignleft,
+	.alignright {
+		// Without z-index, won't be clickable as "above" adjacent content.
+		z-index: z-index(".block-editor-block-list__block {core/image aligned left or right}");
+	}
+
 	// Alignments.
 	&[data-align="left"],
 	&[data-align="right"] {
@@ -278,12 +288,15 @@
 
 	// Wide and full-wide.
 	&[data-align="full"],
-	&[data-align="wide"] {
+	&[data-align="wide"],
+	&.alignfull,
+	&.alignwide {
 		clear: both;
 	}
 
 	// Full-wide.
-	&[data-align="full"] {
+	&[data-align="full"],
+	&.alignfull {
 		margin-left: -$block-padding;
 		margin-right: -$block-padding;
 
@@ -365,14 +378,64 @@
 }
 
 // Sibling inserter / "inbetweenserter".
+.block-editor-block-list__empty-block-inserter,
+.block-editor-default-block-appender,
 .block-editor-block-list__insertion-point-inserter,
 .block-editor-block-list__block-popover-inserter {
 	.block-editor-inserter__toggle.components-button {
+		// Basic look
+		background: $dark-gray-primary;
+		border-radius: $radius-block-ui;
+		color: $white;
+
 		// Special dimensions for this button.
-		min-width: 32px;
-		height: 32px;
+		min-width: 24px;
+		height: 24px;
+
+		&:hover {
+			color: $white;
+		}
 	}
 }
+
+
+.block-editor-block-list__insertion-point-inserter,
+.block-editor-block-list__block-popover-inserter {
+	.block-editor-inserter__toggle.components-button {
+		// Fade it in after a delay.
+		animation: block-editor-inserter__toggle__fade-in-animation-delayed 1.2s ease;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
+
+		&:hover {
+			animation: block-editor-inserter__toggle__fade-in-animation 0.2s ease;
+			animation-fill-mode: forwards;
+			@include reduce-motion("animation");
+		}
+	}
+}
+
+@keyframes block-editor-inserter__toggle__fade-in-animation-delayed {
+	0% {
+		opacity: 0;
+	}
+	80% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes block-editor-inserter__toggle__fade-in-animation {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
 
 // This is the edge-to-edge hover area that contains the plus.
 .block-editor-block-list__block {
@@ -387,11 +450,6 @@
 		// Match width of actual content.
 		left: $block-padding;
 		right: $block-padding;
-	}
-
-	&[data-align="full"] > .block-editor-block-list__insertion-point {
-		left: 0;
-		right: 0;
 	}
 }
 

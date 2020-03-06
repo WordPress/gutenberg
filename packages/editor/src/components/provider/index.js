@@ -121,7 +121,6 @@ class EditorProvider extends Component {
 				'__mobileEnablePageTemplates',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBase',
-				'showInserterHelpPanel',
 				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
