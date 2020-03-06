@@ -1,19 +1,23 @@
 .editor-post-preview__dropdown {
 	display: none;
 	margin-right: $grid-unit-15;
-	box-shadow: inset 0 0 0 $border-width $light-gray-secondary;
-	border-radius: $radius-block-ui;
+	//box-shadow: inset 0 0 0 $border-width $light-gray-secondary;
+	//border-radius: $radius-block-ui;
 	padding: 0;
 }
 
 .editor-post-preview__button-toggle {
 	display: flex;
 	justify-content: space-between;
-	padding: 0 0 0 $grid-unit-15;
+	padding: 0 $grid-unit-15;
 
 	&:focus:not(:disabled) {
 		box-shadow: inset 0 0 0 1px $white, 0 0 0 2px color($theme-color);
 	}
+}
+
+.editor-post-preview__button-icon {
+	height: 16px;
 }
 
 .editor-post-preview__button-resize.editor-post-preview__button-resize {
@@ -22,15 +26,6 @@
 	&.has-icon {
 		padding-left: $grid-unit-10;
 	}
-}
-
-.editor-post-preview__button-separator {
-	border-left: $border-width solid $light-gray-secondary;
-	padding: 6px;
-	margin-left: $grid-unit-15;
-	display: flex;
-	align-items: center;
-	justify-content: center;
 }
 
 .editor-post-preview__dropdown-content {

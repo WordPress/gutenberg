@@ -22,6 +22,7 @@ import { external, check } from '@wordpress/icons';
 
 const downArrow = (
 	<SVG
+		className="editor-post-preview__button-icon"
 		width="24"
 		height="24"
 		xmlns="http://www.w3.org/2000/svg"
@@ -78,9 +79,7 @@ export default function PreviewOptions( {
 					disabled={ ! isSaveable }
 				>
 					{ translateDropdownButtonText() }
-					<div className="editor-post-preview__button-separator">
-						{ downArrow }
-					</div>
+					{ downArrow }
 				</Button>
 			) }
 			renderContent={ () => (
