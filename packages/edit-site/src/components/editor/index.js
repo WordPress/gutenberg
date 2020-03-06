@@ -17,6 +17,7 @@ import {
 import { EntityProvider } from '@wordpress/core-data';
 import { __experimentalEditorSkeleton as EditorSkeleton } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { FullscreenMode } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -48,34 +49,37 @@ function Editor( { settings: _settings } ) {
 		setSettings,
 	] );
 	return template ? (
-		<SlotFillProvider>
-			<DropZoneProvider>
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ settings.templateType }
-						id={ settings.templateId }
-					>
-						<Context.Provider value={ context }>
-							<FocusReturnProvider>
-								<EditorSkeleton
-									sidebar={ ! isMobile && <Sidebar /> }
-									header={ <Header /> }
-									content={
-										<>
-											<Notices />
-											<Popover.Slot name="block-toolbar" />
-											<BlockEditor />
-										</>
-									}
-								/>
-								<Popover.Slot />
-							</FocusReturnProvider>
-						</Context.Provider>
+		<>
+			<FullscreenMode />
+			<SlotFillProvider>
+				<DropZoneProvider>
+					<EntityProvider kind="root" type="site">
+						<EntityProvider
+							kind="postType"
+							type={ settings.templateType }
+							id={ settings.templateId }
+						>
+							<Context.Provider value={ context }>
+								<FocusReturnProvider>
+									<EditorSkeleton
+										sidebar={ ! isMobile && <Sidebar /> }
+										header={ <Header /> }
+										content={
+											<>
+												<Notices />
+												<Popover.Slot name="block-toolbar" />
+												<BlockEditor />
+											</>
+										}
+									/>
+									<Popover.Slot />
+								</FocusReturnProvider>
+							</Context.Provider>
+						</EntityProvider>
 					</EntityProvider>
-				</EntityProvider>
-			</DropZoneProvider>
-		</SlotFillProvider>
+				</DropZoneProvider>
+			</SlotFillProvider>
+		</>
 	) : null;
 }
 export default Editor;
