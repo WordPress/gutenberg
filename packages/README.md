@@ -190,5 +190,61 @@ npm run publish:legacy
 
 This is usually necessary when adding bug fixes or security patches to the earlier versions of WordPress.
 
+## TypeScript
+
+The [TypeScript](http://www.typescriptlang.org/) language is a typed superset of JavaScript that compiles to plain JavaScript.
+Gutenberg does not use the TypeScript language, however TypeScript has powerful tooling that can be applied to JavaScript projects.
+
+Gutenberg uses TypeScript for several reasons, including:
+
+-   Powerful editor integrations improve developer experience.
+-   Type system can detect some issues and lead to more robust software.
+-   Type declarations can be produced to allow other projects to benefit from these advantages as well.
+
+### Using TypeScript
+
+Gutenberg uses TypeScript by running the TypeScript compiler (`tsc`) on select packages.
+These packages benefit from type checking and produced type declarations in the published packages.
+
+To opt-in to TypeScript tooling, packages should include a `tsconfig.json` file in the package root.
+The presence of the `tsconfig.json` file indicates to our build system that the package has opted-in and will be included in the TypeScript build process.
+
+A `tsconfig.json` file should look like the following (comments are not necessary):
+
+```jsonc
+{
+	// Extends a base configuration common to most packages
+	"extends": "../../tsconfig.base.json",
+
+	// Options for the TypeScript compiler
+	// We'll usually set our `rootDir` and `declarationDir` as follows, which is specific
+	// to each project.
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types"
+	},
+
+	// Which source files should be included
+	"include": [ "src/**/*" ],
+
+	// Other WordPress package dependencies that have opted-in to TypeScript should be listed
+	// here. In this case, our package depends on `@wordpress/dom-ready`.
+	"references": [ { "path": "../dom-ready" } ]
+}
+```
+
+Type declarations will be produced in the `build-types` which should be included in the published package.
+For consumers to use the published type declarations, we'll set the `types` field in `package.json`:
+
+```json
+{
+	"main": "build/index.js",
+	"main-module": "build-module/index.js",
+	"types": "build-types"
+}
+```
+
+Ensure that the `build-types` directory will be included in the published package, for example if a `files` field is declared.
+
 [lerna]: https://lerna.js.org/
 [npm]: https://www.npmjs.com/
