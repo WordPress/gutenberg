@@ -3,7 +3,6 @@
  */
 import { Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -68,5 +67,4 @@ export const settings = {
 		align: false,
 	},
 	edit,
-	save: () => <InnerBlocks.Content />,
 };

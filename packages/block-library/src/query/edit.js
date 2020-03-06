@@ -146,10 +146,7 @@ class Edit extends Component {
 					) }
 					{ query && ! query.length && (
 						<Placeholder>
-							{ __(
-								'Sorry, no posts were found.',
-								'newspack-blocks'
-							) }
+							{ __( 'Sorry, no posts were found.' ) }
 						</Placeholder>
 					) }
 					{ query &&
