@@ -2339,7 +2339,7 @@ exports[`Storyshots Components/ColorPicker Alpha Enabled 1`] = `
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5.5 10.6l1-1.2 5.2 4.8 4.8-4.7 1 1-5.7 5.8-6.3-5.7z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -2513,7 +2513,7 @@ exports[`Storyshots Components/ColorPicker Default 1`] = `
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5.5 10.6l1-1.2 5.2 4.8 4.8-4.7 1 1-5.7 5.8-6.3-5.7z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -2555,7 +2555,7 @@ exports[`Storyshots Components/CustomSelectControl Default 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M5.5 10.6l1-1.2 5.2 4.8 4.8-4.7 1 1-5.7 5.8-6.3-5.7z"
+        d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
       />
     </svg>
   </button>
@@ -3091,7 +3091,7 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5.5 10.6l1-1.2 5.2 4.8 4.8-4.7 1 1-5.7 5.8-6.3-5.7z"
+            d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
           />
         </svg>
       </button>
@@ -3381,7 +3381,7 @@ input[type='number'].emotion-18 {
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5.5 10.6l1-1.2 5.2 4.8 4.8-4.7 1 1-5.7 5.8-6.3-5.7z"
+            d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
           />
         </svg>
       </button>
@@ -3579,7 +3579,7 @@ exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5.5 10.6l1-1.2 5.2 4.8 4.8-4.7 1 1-5.7 5.8-6.3-5.7z"
+            d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
           />
         </svg>
       </button>
@@ -4139,7 +4139,7 @@ exports[`Storyshots Components/Panel Default 1`] = `
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M18.5 13.4l-1 1.2-5.2-4.8-4.8 4.7-1-1 5.7-5.8 6.3 5.7z"
+              d="M12 8l-6 5.4 1 1.2 5-4.6 5 4.6 1-1.2z"
             />
           </svg>
         </span>
@@ -4192,7 +4192,7 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M18.5 13.4l-1 1.2-5.2-4.8-4.8 4.7-1-1 5.7-5.8 6.3 5.7z"
+              d="M12 8l-6 5.4 1 1.2 5-4.6 5 4.6 1-1.2z"
             />
           </svg>
         </span>
@@ -4231,7 +4231,7 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5.5 10.6l1-1.2 5.2 4.8 4.8-4.7 1 1-5.7 5.8-6.3-5.7z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </span>
@@ -4279,7 +4279,7 @@ exports[`Storyshots Components/Panel With Icon 1`] = `
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M18.5 13.4l-1 1.2-5.2-4.8-4.8 4.7-1-1 5.7-5.8 6.3 5.7z"
+              d="M12 8l-6 5.4 1 1.2 5-4.6 5 4.6 1-1.2z"
             />
           </svg>
         </span>
@@ -10114,7 +10114,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M5.5 10.6l1-1.2 5.2 4.8 4.8-4.7 1 1-5.7 5.8-6.3-5.7z"
+        d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
       />
     </svg>
     <svg
@@ -10127,7 +10127,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M5.5 10.6l1-1.2 5.2 4.8 4.8-4.7 1 1-5.7 5.8-6.3-5.7z"
+        d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
       />
     </svg>
     <svg
@@ -10140,7 +10140,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M5.5 10.6l1-1.2 5.2 4.8 4.8-4.7 1 1-5.7 5.8-6.3-5.7z"
+        d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
       />
     </svg>
   </div>
@@ -10171,7 +10171,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M13.4 18.5l-5.7-6.3 5.8-5.7 1 1-4.7 4.8 4.8 5.2z"
+        d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"
       />
     </svg>
     <svg
@@ -10184,7 +10184,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M13.4 18.5l-5.7-6.3 5.8-5.7 1 1-4.7 4.8 4.8 5.2z"
+        d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"
       />
     </svg>
     <svg
@@ -10197,7 +10197,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M13.4 18.5l-5.7-6.3 5.8-5.7 1 1-4.7 4.8 4.8 5.2z"
+        d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"
       />
     </svg>
   </div>
@@ -10228,7 +10228,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M10.6 18.5l-1.2-1 4.8-5.2-4.7-4.8 1-1 5.8 5.7z"
+        d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
       />
     </svg>
     <svg
@@ -10241,7 +10241,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M10.6 18.5l-1.2-1 4.8-5.2-4.7-4.8 1-1 5.8 5.7z"
+        d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
       />
     </svg>
     <svg
@@ -10254,7 +10254,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M10.6 18.5l-1.2-1 4.8-5.2-4.7-4.8 1-1 5.8 5.7z"
+        d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
       />
     </svg>
   </div>
@@ -10285,7 +10285,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M18.5 13.4l-1 1.2-5.2-4.8-4.8 4.7-1-1 5.7-5.8 6.3 5.7z"
+        d="M12 8l-6 5.4 1 1.2 5-4.6 5 4.6 1-1.2z"
       />
     </svg>
     <svg
@@ -10298,7 +10298,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M18.5 13.4l-1 1.2-5.2-4.8-4.8 4.7-1-1 5.7-5.8 6.3 5.7z"
+        d="M12 8l-6 5.4 1 1.2 5-4.6 5 4.6 1-1.2z"
       />
     </svg>
     <svg
@@ -10311,7 +10311,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M18.5 13.4l-1 1.2-5.2-4.8-4.8 4.7-1-1 5.7-5.8 6.3 5.7z"
+        d="M12 8l-6 5.4 1 1.2 5-4.6 5 4.6 1-1.2z"
       />
     </svg>
   </div>
