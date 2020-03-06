@@ -1,7 +1,5 @@
 .wp-block-image {
-	// The image block is in a `figure` element, and many themes zero this out.
-	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
-	margin-bottom: 1em;
+	margin: 0;
 
 	img {
 		max-width: 100%;
@@ -22,11 +20,6 @@
 	.aligncenter,
 	&.is-resized {
 		display: table;
-
-		// The figure is born with left and right margin.
-		// We remove this by default, and then customize it for left, right, and center.
-		margin-left: 0;
-		margin-right: 0;
 
 		> figcaption {
 			display: table-caption;

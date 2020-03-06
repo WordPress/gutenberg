@@ -27,6 +27,7 @@ export const settings = {
 	],
 	supports: {
 		lightBlockWrapper: true,
+		align: true,
 	},
 	example: {
 		attributes: {

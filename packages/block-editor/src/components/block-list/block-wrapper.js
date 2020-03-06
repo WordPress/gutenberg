@@ -19,6 +19,7 @@ import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -49,7 +50,9 @@ const BlockComponent = forwardRef(
 			mode,
 			blockTitle,
 			wrapperProps,
+			attributes,
 		} = useContext( BlockContext );
+		const supportAlignments = hasBlockSupport( name, 'align', false );
 		const { initialPosition } = useSelect(
 			( select ) => {
 				if ( ! isSelected ) {
@@ -190,7 +193,7 @@ const BlockComponent = forwardRef(
 		const blockElementId = `block-${ clientId }${ htmlSuffix }`;
 		const Animated = animated[ tagName ];
 
-		return (
+		const blockContentElement = (
 			<Animated
 				// Overrideable props.
 				aria-label={ blockLabel }
@@ -199,7 +202,9 @@ const BlockComponent = forwardRef(
 				{ ...props }
 				id={ blockElementId }
 				ref={ wrapper }
-				className={ classnames( className, props.className ) }
+				className={ classnames( className, props.className, {
+					'wp-block': ! supportAlignments,
+				} ) }
 				data-block={ clientId }
 				data-type={ name }
 				data-title={ blockTitle }
@@ -216,6 +221,21 @@ const BlockComponent = forwardRef(
 				{ children }
 			</Animated>
 		);
+
+		if ( supportAlignments ) {
+			return (
+				<div
+					className={ classnames( 'wp-block wp-align-wrapper', {
+						[ `wp-align-${ attributes.align }` ]: !! attributes.align,
+					} ) }
+					data-align={ attributes.align }
+				>
+					{ blockContentElement }
+				</div>
+			);
+		}
+
+		return blockContentElement;
 	}
 );
 

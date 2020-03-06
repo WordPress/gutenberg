@@ -1,10 +1,6 @@
 .wp-block-image {
 	position: relative;
 
-	// This resets the intrinsic margin on the figure in non-floated, wide, and full-wide alignments.
-	margin-left: 0;
-	margin-right: 0;
-
 	&.is-transient img {
 		opacity: 0.3;
 	}
@@ -39,18 +35,6 @@
 	display: block;
 }
 
-.block-editor-block-list__block[data-type="core/image"][data-align="center"] {
-	.wp-block-image {
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	&[data-resized="false"] .wp-block-image > div {
-		margin-left: auto;
-		margin-right: auto;
-	}
-}
-
 .block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
 	position: absolute;
 	left: 0;
@@ -62,26 +46,9 @@
 	}
 }
 
-// Although the float markup is different in the editor compared to the frontend,
-// this CSS uses the same technique to allow floats in a wide images context.
-// That is, the block retains its centering and max-width, and a child inside
-// is floated instead of the block itself.
-[data-type="core/image"][data-align="center"],
-[data-type="core/image"][data-align="left"],
-[data-type="core/image"][data-align="right"] {
-	figure {
-		margin: 0;
-	}
-}
-
-[data-type="core/image"][data-align="wide"],
-[data-type="core/image"][data-align="full"] {
-	figure img {
+.wp-block[data-align="wide"],
+.wp-block[data-align="full"] {
+	.wp-block-image img {
 		width: 100%;
 	}
-}
-
-// This is similar to above but for resized unfloated images only, where the markup is different.
-[data-type="core/image"] figure.is-resized {
-	margin: 0;
 }

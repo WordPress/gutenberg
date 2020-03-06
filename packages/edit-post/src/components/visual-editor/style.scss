@@ -36,13 +36,6 @@
 	height: 0;
 }
 
-// The base width of blocks
-.edit-post-visual-editor .block-editor-block-list__block {
-	margin-left: auto;
-	margin-right: auto;
-}
-
-
 // The base width of the title should match that of blocks even if it isn't a block.
 // @todo: This duplicates CSS from line 49 in block-list/style.scss, and should be
 // removed when the Title field becomes an actual block.

@@ -99,7 +99,7 @@ function BlockListBlock( {
 	// Generate the wrapper class names handling the different states of the
 	// block.
 	const wrapperClassName = classnames(
-		'wp-block block-editor-block-list__block',
+		'block-editor-block-list__block',
 		{
 			'has-selected-ui': hasSelectedUI,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
@@ -164,6 +164,7 @@ function BlockListBlock( {
 		mode,
 		blockTitle: blockType.title,
 		wrapperProps,
+		attributes,
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 

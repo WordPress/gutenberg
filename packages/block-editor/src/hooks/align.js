@@ -88,7 +88,10 @@ export function addAttribute( settings ) {
 	if ( has( settings.attributes, [ 'align', 'type' ] ) ) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, 'align' ) ) {
+	if (
+		hasBlockSupport( settings, 'align' ) &&
+		! hasBlockSupport( settings, 'lightBlockWrapper' )
+	) {
 		// Use Lodash's assign to gracefully handle if attributes are undefined
 		settings.attributes = assign( settings.attributes, {
 			align: {
@@ -124,7 +127,8 @@ export const withToolbarControls = createHigherOrderComponent(
 		const validAlignments = isEmbedButton
 			? []
 			: getValidAlignments(
-					getBlockSupport( blockName, 'align' ),
+					getBlockSupport( blockName, 'align' ) &&
+						! hasBlockSupport( blockName, 'lightBlockWrapper' ),
 					hasBlockSupport( blockName, 'alignWide', true )
 			  );
 
@@ -182,7 +186,8 @@ export const withDataAlign = createHigherOrderComponent(
 		}
 
 		const validAlignments = getValidAlignments(
-			getBlockSupport( name, 'align' ),
+			getBlockSupport( name, 'align' ) &&
+				! hasBlockSupport( name, 'lightBlockWrapper' ),
 			hasBlockSupport( name, 'alignWide', true ),
 			hasWideEnabled
 		);
@@ -207,7 +212,9 @@ export const withDataAlign = createHigherOrderComponent(
  */
 export function addAssignedAlign( props, blockType, attributes ) {
 	const { align } = attributes;
-	const blockAlign = getBlockSupport( blockType, 'align' );
+	const blockAlign =
+		getBlockSupport( blockType, 'align' ) &&
+		! hasBlockSupport( blockType, 'lightBlockWrapper' );
 	const hasWideBlockSupport = hasBlockSupport( blockType, 'alignWide', true );
 	const isAlignValid = includes(
 		// Compute valid alignments without taking into account,

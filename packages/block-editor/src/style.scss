@@ -56,3 +56,65 @@
 @import "./components/editor-skeleton/style.scss";
 @import "./components/inserter/style.scss";
 
+
+// Default styles for alignments in case the theme doesn't provide them.
+.wp-block {
+	max-width: $content-width;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: $default-block-margin;
+	margin-bottom: $default-block-margin;
+
+	// Floated blocks shouldn't have margins
+	&[data-align="left"],
+	&[data-align="right"] {
+		margin-top: 0;
+		margin-bottom: 0;
+
+		& > * {
+			// z-index should be higher than regular blocks to allow selection on click
+			z-index: z-index(".wp-block {aligned left or right}");
+		}
+	}
+
+	// Left.
+	&[data-align="left"] > * {
+		// This is in the editor only; the image should be floated on the frontend.
+		/*!rtl:begin:ignore*/
+		float: left;
+		margin-right: 2em;
+		/*!rtl:end:ignore*/
+	}
+
+	// Right.
+	&[data-align="right"] > * {
+		// Right: This is in the editor only; the image should be floated on the frontend.
+		/*!rtl:begin:ignore*/
+		float: right;
+		margin-left: 2em;
+		/*!rtl:end:ignore*/
+	}
+
+	&[data-align="full"] {
+		max-width: none;
+		clear: both;
+
+		// Leave room for the UI
+		margin-left: -$block-padding;
+		margin-right: -$block-padding;
+		@include break-small() {
+			margin-left: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
+			margin-right: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
+		}
+	}
+
+	&[data-align="wide"] {
+		max-width: 1100px;
+		clear: both;
+	}
+
+	&[data-align="center"] {
+		display: flex;
+		justify-content: center;
+	}
+}

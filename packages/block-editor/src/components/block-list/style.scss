@@ -247,56 +247,6 @@
 		cursor: default;
 	}
 
-	// Alignments.
-	&[data-align="left"],
-	&[data-align="right"] {
-		// Without z-index, won't be clickable as "above" adjacent content.
-		z-index: z-index(".block-editor-block-list__block {core/image aligned left or right}");
-		width: 100%;
-
-		// When images are floated, the block itself should collapse to zero height.
-		height: 0;
-
-		&::before {
-			content: none;
-		}
-	}
-
-	// Left.
-	&[data-align="left"] > .is-block-content {
-		// This is in the editor only; the image should be floated on the frontend.
-		/*!rtl:begin:ignore*/
-		float: left;
-		margin-right: 2em;
-		/*!rtl:end:ignore*/
-	}
-
-	// Right.
-	&[data-align="right"] > .is-block-content {
-		// Right: This is in the editor only; the image should be floated on the frontend.
-		/*!rtl:begin:ignore*/
-		float: right;
-		margin-left: 2em;
-		/*!rtl:end:ignore*/
-	}
-
-	// Wide and full-wide.
-	&[data-align="full"],
-	&[data-align="wide"] {
-		clear: both;
-	}
-
-	// Full-wide.
-	&[data-align="full"] {
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
-
-		@include break-small() {
-			margin-left: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
-			margin-right: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
-		}
-	}
-
 	// Clear floats.
 	&[data-clear="true"] {
 		float: none;
