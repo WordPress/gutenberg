@@ -111,7 +111,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'run <container> [command..]',
-		'Runs an arbitrary command in one of the underlying Docker containers.',
+		'Runs an arbitrary command in one of the underlying Docker containers, for example running wp cli commands.',
 		( args ) => {
 			args.positional( 'container', {
 				type: 'string',
@@ -124,6 +124,7 @@ module.exports = function cli() {
 		},
 		withSpinner( env.run )
 	);
+	yargs.example('$0 run cli wp users list', 'Runs `wp users list` wp-cli command which lists WordPress users.');
 
 	return yargs;
 };
