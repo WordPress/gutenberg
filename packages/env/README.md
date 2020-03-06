@@ -180,7 +180,9 @@ Positionals:
 ```sh
 wp-env run <container> [command..]
 
-Runs an arbitrary command in one of the underlying Docker containers.
+Runs an arbitrary command in one of the underlying Docker containers, for
+example it's useful for running wp cli commands.
+
 
 Positionals:
   container  The container to run the command on.            [string] [required]
