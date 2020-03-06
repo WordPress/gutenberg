@@ -29,7 +29,7 @@ By the end of this article, you should have gained a good understanding of how t
 
 We're going to be creating an (almost) fully functioning Block Editor instance.
 
-![alt text](screenshots/editor.png "The Standalone Editor instance populated with example Blocks within a custom WP Admin page.")
+![alt text](https://wordpress.org/gutenberg/files/2020/03/editor.png "The Standalone Editor instance populated with example Blocks within a custom WP Admin page.")
 
 This block editor will not be the same _Block Editor_ you are familiar with when creating `Post`s in WP Admin. Rather it will be an entirely custom instance which will live within a custom WP Admin page called (imaginatively) "Block Editor".
 
@@ -49,7 +49,7 @@ Our custom editor is going to be built as a WordPress Plugin. To keep things sim
 
 Let's take a look at our Plugin file structure:
 
-![alt text](screenshots/repo-files.png "Screenshot showing file structure of the Plugin at https://github.com/getdave/standalone-block-editor.")
+![alt text](https://wordpress.org/gutenberg/files/2020/03/repo-files.png "Screenshot showing file structure of the Plugin at https://github.com/getdave/standalone-block-editor.")
 
 Here's a brief summary of what's going on:
 
@@ -513,7 +513,7 @@ We've come a long way on our journey to create a custom block editor. But there 
 one major area left to touch upon - Block persistance; that is the act of having our
 Blocks saved and **available _between_ page refreshes**.
 
-![alt text](screenshots/block-persistance.gif "Screencapture showing added Blocks being restored between page refreshes.")
+![alt text](https://wordpress.org/gutenberg/files/2020/03/block-persistance.gif "Screencapture showing added Blocks being restored between page refreshes.")
 
 As this is only an _experiment_ we've opted to utilise the browser's
 `localStorage` API to handle saving Block data. In a real-world scenario however
