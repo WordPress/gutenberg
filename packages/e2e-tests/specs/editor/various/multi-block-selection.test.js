@@ -259,7 +259,7 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.down( 'Shift' );
-		await page.click( '.wp-block-paragraph' );
+		await page.click( '[data-type="core/paragraph"]' );
 		await page.keyboard.up( 'Shift' );
 
 		await testNativeSelection();
@@ -275,7 +275,7 @@ describe( 'Multi-block selection', () => {
 
 		const [ coord1, coord2 ] = await page.evaluate( () => {
 			const elements = Array.from(
-				document.querySelectorAll( '.wp-block-paragraph' )
+				document.querySelectorAll( '[data-type="core/paragraph"]' )
 			);
 			const rect1 = elements[ 0 ].getBoundingClientRect();
 			const rect2 = elements[ 1 ].getBoundingClientRect();
@@ -311,7 +311,7 @@ describe( 'Multi-block selection', () => {
 
 		const [ coord1, coord2 ] = await page.evaluate( () => {
 			const elements = Array.from(
-				document.querySelectorAll( '.wp-block-paragraph' )
+				document.querySelectorAll( '[data-type="core/paragraph"]' )
 			);
 			const rect1 = elements[ 0 ].getBoundingClientRect();
 			const rect2 = elements[ 1 ].getBoundingClientRect();
@@ -387,7 +387,9 @@ describe( 'Multi-block selection', () => {
 
 			const range = selection.getRangeAt( 0 );
 			const rect1 = range.getClientRects()[ 0 ];
-			const element = document.querySelector( '.wp-block-paragraph' );
+			const element = document.querySelector(
+				'[data-type="core/paragraph"]'
+			);
 			const rect2 = element.getBoundingClientRect();
 
 			return [
@@ -429,7 +431,7 @@ describe( 'Multi-block selection', () => {
 
 		const [ coord1, coord2 ] = await page.evaluate( () => {
 			const elements = Array.from(
-				document.querySelectorAll( '.wp-block-paragraph' )
+				document.querySelectorAll( '[data-type="core/paragraph"]' )
 			);
 			const rect1 = elements[ 2 ].getBoundingClientRect();
 			const rect2 = elements[ 1 ].getBoundingClientRect();
@@ -472,7 +474,9 @@ describe( 'Multi-block selection', () => {
 		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
 
 		const coord = await page.evaluate( () => {
-			const element = document.querySelector( '.wp-block-paragraph' );
+			const element = document.querySelector(
+				'[data-type="core/paragraph"]'
+			);
 			const rect = element.getBoundingClientRect();
 			return {
 				x: rect.x - 1,

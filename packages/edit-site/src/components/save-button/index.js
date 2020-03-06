@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { some } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
@@ -33,29 +38,15 @@ export default function SaveButton() {
 	}, [ slug ] );
 
 	const { isDirty, isSaving } = useSelect( ( select ) => {
-		const { getEntityRecordChangesByRecord, isSavingEntityRecord } = select(
-			'core'
-		);
-		const entityRecordChangesByRecord = getEntityRecordChangesByRecord();
-		const changedKinds = Object.keys( entityRecordChangesByRecord );
+		const {
+			__experimentalGetDirtyEntityRecords,
+			isSavingEntityRecord,
+		} = select( 'core' );
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 		return {
-			isDirty: changedKinds.length > 0,
-			isSaving: changedKinds.some( ( changedKind ) =>
-				Object.keys(
-					entityRecordChangesByRecord[ changedKind ]
-				).some( ( changedName ) =>
-					Object.keys(
-						entityRecordChangesByRecord[ changedKind ][
-							changedName
-						]
-					).some( ( changedKey ) =>
-						isSavingEntityRecord(
-							changedKind,
-							changedName,
-							changedKey
-						)
-					)
-				)
+			isDirty: dirtyEntityRecords.length > 0,
+			isSaving: some( dirtyEntityRecords, ( record ) =>
+				isSavingEntityRecord( record.kind, record.name, record.key )
 			),
 		};
 	} );
