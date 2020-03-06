@@ -32,7 +32,7 @@ export const withForwardedProps = () => (
 
 export const withAdditionalClassNames = () => (
 	<>
-		Additional class names passed to VisuallyHidden and extend the component
+		Additional class names passed to VisuallyHidden extend the component
 		class name.{ ' ' }
 		<VisuallyHidden as="label" className="test-input">
 			Check out my class!{ ' ' }
