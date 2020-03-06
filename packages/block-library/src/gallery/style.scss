@@ -102,7 +102,7 @@
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .blocks-gallery-image,
 			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc(#{ 100% / $i } - #{ $grid-unit-20 * ( $i - 1 ) });
+				width: calc(#{ 100% / $i } - #{ $grid-unit-20 * ( $i - 1 ) / $i });
 				margin-right: $grid-unit-20;
 			}
 		}
