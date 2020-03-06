@@ -29,7 +29,7 @@ function MyApp() {
 
 ## Development Scripts
 
-The wp-scripts package is a collection of reusable scripts for JavaScript development — includes scripts for building, linting, and testing — all with no additional configuration files.
+The [wp-scripts package](https://developer.wordpress.org/block-editor/packages/packages-scripts/) is a collection of reusable scripts for JavaScript development — includes scripts for building, linting, and testing — all with no additional configuration files.
 
 Here is a quick example, on how to use wp-scripts in your project.
 
