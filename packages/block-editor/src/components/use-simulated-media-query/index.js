@@ -13,6 +13,7 @@ const ENABLED_MEDIA_QUERY = '(min-width:0px)';
 const DISABLED_MEDIA_QUERY = '(min-width:999999px)';
 
 const VALID_MEDIA_QUERY_REGEX = /\((min|max)-width:[^\(]*?\)/g;
+const URL_REGEX = /(http:|https:)?\/\/([\w.:-]+)?\/?/;
 
 function getStyleSheetsThatMatchHostname() {
 	if ( typeof window === 'undefined' ) {
@@ -22,9 +23,15 @@ function getStyleSheetsThatMatchHostname() {
 	return filter(
 		get( window, [ 'document', 'styleSheets' ], [] ),
 		( styleSheet ) => {
+			if ( ! styleSheet.href ) {
+				return false;
+			}
+			const matcheableUrl = styleSheet.href.match( URL_REGEX );
 			return (
-				styleSheet.href &&
-				styleSheet.href.includes( window.location.hostname )
+				matcheableUrl &&
+				matcheableUrl.length > 2 &&
+				matcheableUrl[ 1 ] === window.location.protocol &&
+				matcheableUrl[ 2 ] === window.location.host
 			);
 		}
 	);
