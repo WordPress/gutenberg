@@ -12,7 +12,6 @@ const repoRoot = path.join( __dirname, '..', '..' );
 const tscPath = path.join( repoRoot, 'node_modules', '.bin', 'tsc' );
 
 // lint-staged passes full paths to staged changes
-/** @type {string[]} */
 const changedFiles = process.argv.slice( 2 );
 
 // Transform changed files to package directories containing tsconfig.json
