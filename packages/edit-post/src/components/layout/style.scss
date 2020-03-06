@@ -123,7 +123,8 @@
 	}
 }
 
+// Creates the background "surface" when changing the viewport
+// size (Desktop, Tablet, Mobile) using the preview-options button.
 .edit-post-layout .block-editor-editor-skeleton__content {
-	background-color: $light-gray-700;
+	background-color: $light-gray-500;
 }
-
