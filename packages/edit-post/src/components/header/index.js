@@ -58,8 +58,8 @@ function Header() {
 
 	return (
 		<div className="edit-post-header">
+			<FullscreenModeClose />
 			<div className="edit-post-header__toolbar">
-				<FullscreenModeClose />
 				<HeaderToolbar />
 			</div>
 			<div className="edit-post-header__settings">

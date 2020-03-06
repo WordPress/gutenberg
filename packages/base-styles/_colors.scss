@@ -27,7 +27,8 @@ $white: #fff;
 
 // G2 colors.
 $dark-gray-primary: #1e1e1e;
-$medium-gray-text: #757575;
+$medium-gray-text: #757575;		// Meets 4.6:1 text contrast.
+$light-gray-ui: #949494;		// Meets 3:1 UI contrast.
 $light-gray-secondary: #ccc;
 $light-gray-tertiary: #e7e8e9;
 $theme-color: theme(button);

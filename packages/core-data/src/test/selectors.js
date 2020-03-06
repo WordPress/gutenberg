@@ -10,7 +10,7 @@ import {
 	getEntityRecord,
 	__experimentalGetEntityRecordNoResolver,
 	getEntityRecords,
-	getEntityRecordChangesByRecord,
+	__experimentalGetDirtyEntityRecords,
 	getEntityRecordNonTransientEdits,
 	getEmbedPreview,
 	isPreviewEmbedFallback,
@@ -115,7 +115,7 @@ describe( 'getEntityRecords', () => {
 	} );
 } );
 
-describe( 'getEntityRecordChangesByRecord', () => {
+describe( '__experimentalGetDirtyEntityRecords', () => {
 	it( 'should return a map of objects with each raw edited entity record and its corresponding edits', () => {
 		const state = deepFreeze( {
 			entities: {
@@ -136,6 +136,7 @@ describe( 'getEntityRecordChangesByRecord', () => {
 										someRawProperty: {
 											raw: 'somePersistedRawValue',
 										},
+										id: 'someKey',
 									},
 								},
 							},
@@ -152,22 +153,9 @@ describe( 'getEntityRecordChangesByRecord', () => {
 				},
 			},
 		} );
-		expect( getEntityRecordChangesByRecord( state ) ).toEqual( {
-			someKind: {
-				someName: {
-					someKey: {
-						rawRecord: {
-							someProperty: 'somePersistedValue',
-							someRawProperty: 'somePersistedRawValue',
-						},
-						edits: {
-							someProperty: 'someEditedValue',
-							someRawProperty: 'someEditedRawValue',
-						},
-					},
-				},
-			},
-		} );
+		expect( __experimentalGetDirtyEntityRecords( state ) ).toEqual( [
+			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
+		] );
 	} );
 } );
 
