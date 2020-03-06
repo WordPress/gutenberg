@@ -7,3 +7,22 @@
 .wp-block-rss li a > div {
 	display: inline;
 }
+
+.blocks-rss__placeholder-form {
+	display: flex;
+	align-items: stretch;
+}
+
+.blocks-rss__placeholder-input {
+	display: flex;
+	align-items: stretch;
+	flex-grow: 1;
+
+	.components-base-control__field {
+		margin: 0;
+		display: flex;
+		align-items: stretch;
+		flex-grow: 1;
+		margin-right: $grid-unit-10;
+	}
+}
