@@ -42,7 +42,7 @@ function ColumnEdit( {
 	const containerWidth = columnsContainerWidth || containerMaxWidth;
 
 	const minWidth = Math.min( containerWidth, containerMaxWidth );
-	const columnBaseWidth = minWidth / columnsInRow;
+	const columnBaseWidth = minWidth / Math.max( columnsInRow, 1 );
 
 	const applyBlockStyle = ( placeholder = false ) => {
 		if ( isMobile ) {
