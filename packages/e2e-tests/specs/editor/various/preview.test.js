@@ -8,12 +8,14 @@ import { parse } from 'url';
  * WordPress dependencies
  */
 import {
+	activatePlugin,
 	clickOnCloseModalButton,
+	clickOnMoreMenuItem,
 	createNewPost,
 	createURL,
+	deactivatePlugin,
 	publishPost,
 	saveDraft,
-	clickOnMoreMenuItem,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').Page} Page */
@@ -37,6 +39,21 @@ async function openPreviewPage( editorPage ) {
 	// the preview to load by waiting for the title to appear.
 	await previewPage.waitForSelector( '.entry-title' );
 	return previewPage;
+}
+
+/**
+ * Given the Page instance for the editor, opens preview drodpdown, and
+ * awaits the presence of the external preview selector.
+ *
+ * @param {Page} editorPage current editor page.
+ *
+ * @return {Promise} Promise resolving once selector is visible on page.
+ */
+async function waitForPreviewDropdownOpen( editorPage ) {
+	await editorPage.click( '.editor-post-preview__button-toggle' );
+	return editorPage.waitForSelector(
+		'.editor-post-preview__button-external'
+	);
 }
 
 /**
@@ -132,6 +149,7 @@ describe( 'Preview', () => {
 		// Return to editor to change title.
 		await editorPage.bringToFront();
 		await editorPage.type( '.editor-post-title__input', '!' );
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -158,6 +176,7 @@ describe( 'Preview', () => {
 		// Return to editor to change title.
 		await editorPage.bringToFront();
 		await editorPage.type( '.editor-post-title__input', ' And more.' );
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -222,6 +241,7 @@ describe( 'Preview', () => {
 		// Save draft and open the preview page right after.
 		await editorPage.waitForSelector( '.editor-post-save-draft' );
 		await saveDraft();
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -286,6 +306,7 @@ describe( 'Preview with Custom Fields enabled', () => {
 		await editorPage.keyboard.type( '2' );
 
 		// Open the preview page.
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match input.
@@ -302,5 +323,36 @@ describe( 'Preview with Custom Fields enabled', () => {
 
 		// Make sure the editor is active for the afterEach function.
 		await editorPage.bringToFront();
+	} );
+} );
+
+describe( 'Preview with private custom post type', () => {
+	beforeAll( async () => {
+		await activatePlugin( 'gutenberg-test-custom-post-types' );
+	} );
+
+	afterAll( async () => {
+		await deactivatePlugin( 'gutenberg-test-custom-post-types' );
+	} );
+
+	it( 'should not show the Preview Externally link', async () => {
+		await createNewPost( { postType: 'not_public' } );
+
+		// Type in the title filed.
+		await page.type( '.editor-post-title__input', 'aaaaa' );
+		await page.keyboard.press( 'Tab' );
+
+		// Open the preview menu.
+		await page.click( '.editor-post-preview__button-toggle' );
+
+		const previewDropdownContents = await page.$(
+			'.editor-post-preview__dropdown-content'
+		);
+
+		// Expect the Preview Externally link not to be present.
+		const previewExternallyLink = await previewDropdownContents.$x(
+			'//a[contains(text(), "Preview externally")]'
+		);
+		expect( previewExternallyLink.length ).toBe( 0 );
 	} );
 } );

@@ -45,9 +45,6 @@
 		// Formatting buttons
 		> svg {
 			border-radius: $radius-round-rectangle;
-
-			// This assumes 20x20px dashicons.
-			padding: 2px;
 			width: $button-size-small;
 			height: $button-size-small;
 			margin: -1px $grid-unit-10 -1px 0;
@@ -58,15 +55,11 @@
 	.components-menu-item__button.components-button {
 		min-height: $button-size;
 		height: auto;
-		padding-left: 2rem;
+		padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
 		text-align: left;
 
 		&.has-icon {
-			padding-left: 0.5rem;
-		}
-
-		.dashicon {
-			margin-right: 4px;
+			padding-left: $grid-unit-10;
 		}
 	}
 
