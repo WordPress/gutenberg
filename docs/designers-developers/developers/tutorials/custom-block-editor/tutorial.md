@@ -1,5 +1,18 @@
 # Tutorial
 
+## Table of Contents
+
+* [What we're going to be building](#what-were-going-to-be-building).
+* [Plugin setup and organization](#plugin-setup-and-organization).
+* [The "Core" of the Editor](#the-core-of-the-editor).
+* [Creating the custom "Block Editor" page in WP Admin](#creating-the-custom-block-editor-page-in-wp-admin).
+* [Registering and Rendering our custom block editor](#registering-and-rendering-our-custom-block-editor).
+* [Reviewing the `<Editor>` component](#reviewing-the-editor-component).
+* [The custom `<BlockEditor>`](#the-custom-blockeditor).
+* [Reviewing the Sidebar](#reviewing-the-sidebar).
+* [Block Persistence](#block-persistence).
+* [Wrapping up](#wrapping-up).
+
 The Gutenberg codebase is complex, with many packages and components, but at its core it is a tool for managing and editing blocks. Therefore, when working on the editor it is important to gain a better understanding of how block editing works at a _fundamental_ level.
 
 To do this, this tutorial will walk you through building a **fully functioning, __custom__ block editor "instance"** within WordPress, introducing you to the key packages and components along the way.
@@ -21,6 +34,8 @@ Our editor will have the following features:
 * _Basic_ block persistance between page reloads.
 
 With that in mind, let's start taking our first steps towards building this.
+
+
 
 ## Plugin setup and organization
 
@@ -208,7 +223,7 @@ domReady( function() {
 
 **Note**: it is possible to render the editor from PHP without creating an unnecessary JS global. Check out [the Edit Site package in Gutenberg Core for an example of this](https://href.li/?https://github.com/WordPress/gutenberg/blob/c6821d7e64a54eb322583a35daedc6c192ece850/lib/edit-site-page.php#L135).
 
-## The `<Editor>` component
+## Reviewing the `<Editor>` component
 
 Let's take a closer look at the `<Editor>` component we saw being used above.
 
@@ -419,7 +434,7 @@ These provide other important elements of functionality for our editor instance.
 3. [`<ObserveTyping>`](https://github.com/WordPress/gutenberg/tree/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/observe-typing)- used to manage the editor's internal `isTyping` flag. This is used in various places, most commonly to show/hide the Block toolbar in response to typing.
 
 
-### The Sidebar
+## Reviewing the Sidebar
 
 Also within the render of our `<BlockEditor>`, is our `<Sidebar>` component.
 
