@@ -555,7 +555,7 @@ export class TableEdit extends Component {
 					instructions={ __( 'Insert a table for sharing data.' ) }
 				>
 					<form
-						className="wp-block-table__placeholder-form"
+						className="blocks-table__placeholder-form"
 						onSubmit={ this.onCreateTable }
 					>
 						<TextControl
@@ -564,7 +564,7 @@ export class TableEdit extends Component {
 							value={ initialColumnCount }
 							onChange={ this.onChangeInitialColumnCount }
 							min="1"
-							className="wp-block-table__placeholder-input"
+							className="blocks-table__placeholder-input"
 						/>
 						<TextControl
 							type="number"
@@ -572,10 +572,10 @@ export class TableEdit extends Component {
 							value={ initialRowCount }
 							onChange={ this.onChangeInitialRowCount }
 							min="1"
-							className="wp-block-table__placeholder-input"
+							className="blocks-table__placeholder-input"
 						/>
 						<Button
-							className="wp-block-table__placeholder-button"
+							className="blocks-table__placeholder-button"
 							isPrimary
 							type="submit"
 						>
