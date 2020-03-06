@@ -1,7 +1,11 @@
 # Tutorial
 
+This tutorial will step through the fundamentals of creating a custom instance
+of a "block editor" using the `@wordpress/block-editor` package.
+
 ## Table of Contents
 
+* [Introduction](#introduction).
 * [What we're going to be building](#what-were-going-to-be-building).
 * [Plugin setup and organization](#plugin-setup-and-organization).
 * [The "Core" of the Editor](#the-core-of-the-editor).
@@ -12,6 +16,8 @@
 * [Reviewing the Sidebar](#reviewing-the-sidebar).
 * [Block Persistence](#block-persistence).
 * [Wrapping up](#wrapping-up).
+
+## Introduction
 
 The Gutenberg codebase is complex, with many packages and components, but at its core it is a tool for managing and editing blocks. Therefore, when working on the editor it is important to gain a better understanding of how block editing works at a _fundamental_ level.
 
