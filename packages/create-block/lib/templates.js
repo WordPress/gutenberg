@@ -31,6 +31,7 @@ const templates = {
 			'index.js',
 			'$slug.php',
 			'style.css',
+			'readme.txt',
 		],
 	},
 	esnext: {
@@ -53,6 +54,7 @@ const templates = {
 			'src/index.js',
 			'$slug.php',
 			'style.css',
+			'readme.txt',
 		],
 		wpScriptsEnabled: true,
 	},
