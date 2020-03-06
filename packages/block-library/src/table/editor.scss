@@ -53,7 +53,21 @@
 
 .blocks-table__placeholder-form.blocks-table__placeholder-form {
 	display: flex;
-	align-items: flex-end;
+	flex-direction: column;
+	align-items: flex-start;
+
+	> * {
+		margin-bottom: $grid-unit-10;
+	}
+
+	@include break-medium() {
+		flex-direction: row;
+		align-items: flex-end;
+
+		> * {
+			margin-bottom: 0;
+		}
+	}
 
 	.components-base-control + .components-base-control {
 		margin-top: 0;

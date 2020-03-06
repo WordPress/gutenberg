@@ -11,6 +11,16 @@
 .blocks-rss__placeholder-form {
 	display: flex;
 	align-items: stretch;
+
+	> * {
+		margin-bottom: $grid-unit-10;
+	}
+
+	@include break-medium() {
+		> * {
+			margin-bottom: 0;
+		}
+	}
 }
 
 .blocks-rss__placeholder-input {
