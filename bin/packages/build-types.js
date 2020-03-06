@@ -24,7 +24,7 @@ function main() {
 		path.dirname( tsconfigPath )
 	);
 
-	const args = [ '--build', ...projectPaths, ...process.argv.slice( 2 ) ];
+	const args = [ '--build', ...projectPaths ];
 
 	execa.sync( tscPath, args, { stdio: 'inherit' } );
 }
