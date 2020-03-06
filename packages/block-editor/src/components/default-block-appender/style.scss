@@ -53,11 +53,12 @@
 }
 
 // Empty / default block side inserter.
-.block-editor-block-list__empty-block-inserter, // Empty paragraph
+.block-editor-block-list__empty-block-inserter.block-editor-block-list__empty-block-inserter, // Empty paragraph, needs specificity to override inherited popover styles.
 .block-editor-default-block-appender .block-editor-inserter { // Empty appender
 	position: absolute;
 	top: 0;
 
+	height: $block-side-ui-width;
 	// Change the size of the buttons to match that of the default paragraph height.
 	.components-button.has-icon {
 		width: $block-side-ui-width;
