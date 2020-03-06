@@ -35,6 +35,7 @@ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handle
 		height: 18px;
 		position: absolute;
 		width: 18px;
+		padding: 0;
 		top: $components-custom-gradient-picker__padding;
 
 		&.is-active {
