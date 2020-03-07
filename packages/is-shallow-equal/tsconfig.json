@@ -1,8 +1,8 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": ".",
+		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"files": [ "arrays.js", "index.js", "objects.js" ]
+	"include": [ "src/**/*" ]
 }

@@ -19,13 +19,7 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"files": [
-		"arrays.js",
-		"index.js",
-		"objects.js",
-		"build-types"
-	],
-	"main": "index.js",
+	"main": "src/index.js",
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
