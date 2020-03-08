@@ -11,6 +11,7 @@ import {
 	createBlock,
 	hasBlockSupport,
 	cloneBlock,
+	doBlocksMatchTemplate,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
@@ -38,19 +39,35 @@ function* ensureDefaultBlock() {
 }
 
 /**
- * Returns an action object used in signalling that blocks state should be
+ * Returns an action generator used in signalling that blocks state should be
  * reset to the specified array of blocks, taking precedence over any other
  * content reflected as an edit in state.
  *
  * @param {Array} blocks Array of blocks.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function resetBlocks( blocks ) {
-	return {
+export function* resetBlocks( blocks ) {
+	yield {
 		type: 'RESET_BLOCKS',
 		blocks,
 	};
+	const template = yield select( STORE_KEY, 'getTemplate' );
+	const templateLock = yield select( STORE_KEY, 'getTemplateLock' );
+
+	// Unlocked templates are considered always valid because they act
+	// as default values only.
+	const isBlocksValidToTemplate =
+		! template ||
+		templateLock !== 'all' ||
+		doBlocksMatchTemplate( blocks, template );
+
+	const isValidTemplate = yield select( STORE_KEY, 'isValidTemplate' );
+
+	// Update if validity has changed.
+	if ( isBlocksValidToTemplate !== isValidTemplate ) {
+		yield setTemplateValidity( isBlocksValidToTemplate );
+	}
 }
 
 /**

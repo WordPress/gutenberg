@@ -9,7 +9,6 @@ import { findKey } from 'lodash';
 import { speak } from '@wordpress/a11y';
 import {
 	getBlockType,
-	doBlocksMatchTemplate,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
 	cloneBlock,
@@ -21,50 +20,18 @@ import { create, toHTMLString, insert, remove } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import {
+	resetBlocks,
 	replaceBlocks,
 	selectBlock,
-	setTemplateValidity,
-	resetBlocks,
 	selectionChange,
 } from './actions';
 import {
 	getBlock,
 	getBlocks,
 	getSelectedBlockCount,
-	getTemplateLock,
 	getTemplate,
-	isValidTemplate,
 	getSelectionStart,
 } from './selectors';
-
-/**
- * Block validity is a function of blocks state (at the point of a
- * reset) and the template setting. As a compromise to its placement
- * across distinct parts of state, it is implemented here as a side-
- * effect of the block reset action.
- *
- * @param {Object} action RESET_BLOCKS action.
- * @param {Object} store  Store instance.
- *
- * @return {?Object} New validity set action if validity has changed.
- */
-export function validateBlocksToTemplate( action, store ) {
-	const state = store.getState();
-	const template = getTemplate( state );
-	const templateLock = getTemplateLock( state );
-
-	// Unlocked templates are considered always valid because they act
-	// as default values only.
-	const isBlocksValidToTemplate =
-		! template ||
-		templateLock !== 'all' ||
-		doBlocksMatchTemplate( action.blocks, template );
-
-	// Update if validity has changed.
-	if ( isBlocksValidToTemplate !== isValidTemplate( state ) ) {
-		return setTemplateValidity( isBlocksValidToTemplate );
-	}
-}
 
 export default {
 	MERGE_BLOCKS( action, store ) {
@@ -219,7 +186,6 @@ export default {
 			)
 		);
 	},
-	RESET_BLOCKS: [ validateBlocksToTemplate ],
 	MULTI_SELECT: ( action, { getState } ) => {
 		const blockCount = getSelectedBlockCount( getState() );
 

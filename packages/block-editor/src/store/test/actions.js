@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { doBlocksMatchTemplate } from '@wordpress/blocks';
+import { select } from '@wordpress/data-controls';
+
+/**
  * Internal dependencies
  */
 import {
@@ -29,18 +35,114 @@ import {
 	updateBlock,
 	updateBlockAttributes,
 	updateBlockListSettings,
+	setTemplateValidity,
 } from '../actions';
-import { select } from '../controls';
+import { STORE_KEY } from '../constants';
+
+jest.mock( '@wordpress/blocks' );
+
+const {
+	registerBlockType,
+	unregisterBlockType,
+	getBlockTypes,
+	createBlock,
+} = jest.requireActual( '@wordpress/blocks' );
+
+/**
+ * Needed because we're mocking '@wordpress/blocks' and the implementation is
+ * in the imported actions module.
+ */
+doBlocksMatchTemplate.mockImplementation( ( ...args ) => {
+	const { doBlocksMatchTemplate: matcher } = jest.requireActual(
+		'@wordpress/blocks'
+	);
+	return matcher( ...args );
+} );
 
 describe( 'actions', () => {
 	describe( 'resetBlocks', () => {
-		it( 'should return the RESET_BLOCKS actions', () => {
+		let fulfillment;
+		const reset = ( blocks ) => ( fulfillment = resetBlocks( blocks ) );
+		it( 'should yield the RESET_BLOCKS action', () => {
 			const blocks = [];
-			const result = resetBlocks( blocks );
-			expect( result ).toEqual( {
+			reset( blocks );
+			const { value } = fulfillment.next();
+			expect( value ).toEqual( {
 				type: 'RESET_BLOCKS',
 				blocks,
 			} );
+		} );
+		it( 'should yield select control for getTemplate', () => {
+			const { value } = fulfillment.next();
+			expect( value ).toEqual( select( STORE_KEY, 'getTemplate' ) );
+		} );
+		it( 'should yield select control for getTemplateLock', () => {
+			const { value } = fulfillment.next();
+			expect( value ).toEqual( select( STORE_KEY, 'getTemplateLock' ) );
+		} );
+		it( 'should yield select control for isValidTemplate', () => {
+			const { value } = fulfillment.next();
+			expect( value ).toEqual( select( STORE_KEY, 'isValidTemplate' ) );
+		} );
+		describe( 'testing variations of template and template lock', () => {
+			const defaultBlockSettings = {
+				save: () => 'Saved',
+				category: 'common',
+				title: 'block title',
+			};
+			beforeEach( () => {
+				registerBlockType( 'core/test-block', defaultBlockSettings );
+			} );
+
+			afterEach( () => {
+				getBlockTypes().forEach( ( block ) => {
+					unregisterBlockType( block.name );
+				} );
+			} );
+			const rewind = ( template, templateLock, isValidTemplate ) => {
+				reset( [] );
+				fulfillment.next();
+				fulfillment.next();
+				fulfillment.next( template );
+				fulfillment.next( templateLock );
+				return fulfillment.next( isValidTemplate );
+			};
+
+			it(
+				'yields action for setTemplateValidity when there is a template ' +
+					'and the blocks do not match the template and template is currently ' +
+					'not valid in the state and there is no template lock',
+				() => {
+					const { value } = rewind(
+						[ createBlock( 'core/test-block' ) ],
+						false,
+						false
+					);
+					expect( value ).toEqual( setTemplateValidity( true ) );
+				}
+			);
+			it(
+				'yields action for setTemplateValidity when there is a template ' +
+					'and the blocks do not match the template and the template is ' +
+					'currently valid in the state and there is a template lock',
+				() => {
+					const { value } = rewind(
+						[ createBlock( 'core/test-block' ) ],
+						'all',
+						true
+					);
+					expect( value ).toEqual( setTemplateValidity( false ) );
+				}
+			);
+			it(
+				'does not yield setTemplateValidity when the validation matches the ' +
+					'state',
+				() => {
+					const { value, done } = rewind( [], false, true );
+					expect( value ).toBeUndefined();
+					expect( done ).toBe( true );
+				}
+			);
 		} );
 	} );
 
@@ -132,14 +234,14 @@ describe( 'actions', () => {
 			expect( replaceBlockGenerator.next().value ).toEqual( {
 				args: [ 'chicken' ],
 				selectorName: 'getBlockRootClientId',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( replaceBlockGenerator.next().value ).toEqual( {
 				args: [ 'core/test-block', undefined ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -153,7 +255,7 @@ describe( 'actions', () => {
 			expect( replaceBlockGenerator.next().value ).toEqual( {
 				args: [],
 				selectorName: 'getBlockCount',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -185,28 +287,28 @@ describe( 'actions', () => {
 			expect( replaceBlockGenerator.next().value ).toEqual( {
 				args: [],
 				selectorName: 'getSettings',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( replaceBlockGenerator.next().value ).toEqual( {
 				args: [ 'chicken' ],
 				selectorName: 'getBlockRootClientId',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( replaceBlockGenerator.next().value ).toEqual( {
 				args: [ 'core/test-ribs', undefined ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
 				args: [ 'core/test-chicken', undefined ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -239,21 +341,21 @@ describe( 'actions', () => {
 			expect( replaceBlockGenerator.next().value ).toEqual( {
 				args: [ 'chicken' ],
 				selectorName: 'getBlockRootClientId',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( replaceBlockGenerator.next().value ).toEqual( {
 				args: [ 'core/test-ribs', undefined ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
 				args: [ 'core/test-chicken', undefined ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -267,7 +369,7 @@ describe( 'actions', () => {
 			expect( replaceBlockGenerator.next().value ).toEqual( {
 				args: [],
 				selectorName: 'getBlockCount',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -299,7 +401,7 @@ describe( 'actions', () => {
 			expect( insertBlockGenerator.next().value ).toEqual( {
 				args: [ 'core/test-block', 'testclientid' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -343,7 +445,7 @@ describe( 'actions', () => {
 			expect( insertBlocksGenerator.next().value ).toEqual( {
 				args: [],
 				selectorName: 'getSettings',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -359,21 +461,21 @@ describe( 'actions', () => {
 			).toEqual( {
 				args: [ 'core/test-ribs', 'testrootid' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( insertBlocksGenerator.next( true ).value ).toEqual( {
 				args: [ 'core/test-chicken', 'testrootid' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( insertBlocksGenerator.next( true ).value ).toEqual( {
 				args: [ 'core/test-chicken-ribs', 'testrootid' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -420,7 +522,7 @@ describe( 'actions', () => {
 			expect( insertBlocksGenerator.next().value ).toEqual( {
 				args: [],
 				selectorName: 'getSettings',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -435,7 +537,7 @@ describe( 'actions', () => {
 			).toEqual( {
 				args: [ 'core/test-ribs', 'testrootid' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -484,21 +586,21 @@ describe( 'actions', () => {
 			expect( insertBlocksGenerator.next().value ).toEqual( {
 				args: [ 'core/test-ribs', 'testrootid' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( insertBlocksGenerator.next( true ).value ).toEqual( {
 				args: [ 'core/test-chicken', 'testrootid' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( insertBlocksGenerator.next( false ).value ).toEqual( {
 				args: [ 'core/test-chicken-ribs', 'testrootid' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -539,14 +641,14 @@ describe( 'actions', () => {
 			expect( insertBlocksGenerator.next().value ).toEqual( {
 				args: [ 'core/test-ribs', 'testrootid' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( insertBlocksGenerator.next( false ).value ).toEqual( {
 				args: [ 'core/test-chicken', 'testrootid' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -594,14 +696,14 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlocks( clientIds ) );
 
 			expect( actions ).toEqual( [
-				select( 'core/block-editor', 'getBlockRootClientId', clientId ),
-				select( 'core/block-editor', 'getTemplateLock', undefined ),
+				select( STORE_KEY, 'getBlockRootClientId', clientId ),
+				select( STORE_KEY, 'getTemplateLock', undefined ),
 				selectPreviousBlock( clientId ),
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds,
 				},
-				select( 'core/block-editor', 'getBlockCount' ),
+				select( STORE_KEY, 'getBlockCount' ),
 			] );
 		} );
 	} );
@@ -618,7 +720,7 @@ describe( 'actions', () => {
 			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
 				args: [ 'ribs' ],
 				selectorName: 'getTemplateLock',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -646,7 +748,7 @@ describe( 'actions', () => {
 			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
 				args: [ 'ribs' ],
 				selectorName: 'getTemplateLock',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -667,7 +769,7 @@ describe( 'actions', () => {
 			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
 				args: [ 'ribs' ],
 				selectorName: 'getTemplateLock',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -688,14 +790,14 @@ describe( 'actions', () => {
 			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
 				args: [ 'ribs' ],
 				selectorName: 'getTemplateLock',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
 				args: [ 'chicken' ],
 				selectorName: 'getBlockName',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -705,7 +807,7 @@ describe( 'actions', () => {
 			).toEqual( {
 				args: [ 'myblock/chicken-block', 'chicken-ribs' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -734,14 +836,14 @@ describe( 'actions', () => {
 			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
 				args: [ 'ribs' ],
 				selectorName: 'getTemplateLock',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
 				args: [ 'chicken' ],
 				selectorName: 'getBlockName',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -751,7 +853,7 @@ describe( 'actions', () => {
 			).toEqual( {
 				args: [ 'myblock/chicken-block', 'chicken-ribs' ],
 				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
+				storeKey: STORE_KEY,
 				type: 'SELECT',
 			} );
 
@@ -769,14 +871,14 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlock( clientId ) );
 
 			expect( actions ).toEqual( [
-				select( 'core/block-editor', 'getBlockRootClientId', clientId ),
-				select( 'core/block-editor', 'getTemplateLock', undefined ),
+				select( STORE_KEY, 'getBlockRootClientId', clientId ),
+				select( STORE_KEY, 'getTemplateLock', undefined ),
 				selectPreviousBlock( clientId ),
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				},
-				select( 'core/block-editor', 'getBlockCount' ),
+				select( STORE_KEY, 'getBlockCount' ),
 			] );
 		} );
 
@@ -786,13 +888,13 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlock( clientId, false ) );
 
 			expect( actions ).toEqual( [
-				select( 'core/block-editor', 'getBlockRootClientId', clientId ),
-				select( 'core/block-editor', 'getTemplateLock', undefined ),
+				select( STORE_KEY, 'getBlockRootClientId', clientId ),
+				select( STORE_KEY, 'getTemplateLock', undefined ),
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				},
-				select( 'core/block-editor', 'getBlockCount' ),
+				select( STORE_KEY, 'getBlockCount' ),
 			] );
 		} );
 	} );
