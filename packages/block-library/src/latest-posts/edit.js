@@ -309,9 +309,6 @@ class LatestPostsEdit extends Component {
 							'trim',
 						] );
 						let excerpt = post.excerpt.rendered;
-						if ( post.excerpt.raw !== '' ) {
-							excerpt = post.excerpt.raw;
-						}
 
 						const excerptElement = document.createElement( 'div' );
 						excerptElement.innerHTML = excerpt;
