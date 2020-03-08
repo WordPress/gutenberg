@@ -33,11 +33,7 @@ function block_core_latest_posts_get_excerpt_length() {
  * @return string Returns the post content with latest posts added.
  */
 function render_block_core_latest_posts( $attributes ) {
-<<<<<<< HEAD
-	global $block_core_latest_posts_excerpt_length;
-=======
-	global $post;
->>>>>>> fixes the read more added by themes in latest posts block rendering
+	global $post, $block_core_latest_posts_excerpt_length;
 
 	$args = array(
 		'posts_per_page'   => $attributes['postsToShow'],
