@@ -11,11 +11,7 @@ import applyMiddlewares from './middlewares';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import controls from './controls';
-
-/**
- * Module Constants
- */
-const MODULE_KEY = 'core/block-editor';
+import { STORE_KEY } from './constants';
 
 /**
  * Block editor data store configuration.
@@ -31,10 +27,12 @@ export const storeConfig = {
 	controls,
 };
 
-const store = registerStore( MODULE_KEY, {
+const store = registerStore( STORE_KEY, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );
 applyMiddlewares( store );
+
+export { STORE_KEY as BLOCK_EDITOR_STORE_KEY };
 
 export default store;

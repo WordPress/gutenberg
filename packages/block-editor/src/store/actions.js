@@ -19,6 +19,7 @@ import { select } from '@wordpress/data-controls';
 /**
  * Internal dependencies
  */
+import { STORE_KEY } from './constants';
 
 /**
  * Generator which will yield a default block insert action if there
@@ -27,7 +28,7 @@ import { select } from '@wordpress/data-controls';
  * replacement, etc).
  */
 function* ensureDefaultBlock() {
-	const count = yield select( 'core/block-editor', 'getBlockCount' );
+	const count = yield select( STORE_KEY, 'getBlockCount' );
 
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
@@ -158,7 +159,7 @@ export function selectBlock( clientId, initialPosition = null ) {
  */
 export function* selectPreviousBlock( clientId ) {
 	const previousBlockClientId = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'getPreviousBlockClientId',
 		clientId
 	);
@@ -176,7 +177,7 @@ export function* selectPreviousBlock( clientId ) {
  */
 export function* selectNextBlock( clientId ) {
 	const nextBlockClientId = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'getNextBlockClientId',
 		clientId
 	);
@@ -293,10 +294,10 @@ export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield select( 'core/block-editor', 'getSettings' )
+		yield select( STORE_KEY, 'getSettings' )
 	);
 	const rootClientId = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'getBlockRootClientId',
 		first( clientIds )
 	);
@@ -304,7 +305,7 @@ export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 	for ( let index = 0; index < blocks.length; index++ ) {
 		const block = blocks[ index ];
 		const canInsertBlock = yield select(
-			'core/block-editor',
+			STORE_KEY,
 			'canInsertBlockType',
 			block.name,
 			rootClientId
@@ -375,7 +376,7 @@ export function* moveBlockToPosition(
 	index
 ) {
 	const templateLock = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'getTemplateLock',
 		fromRootClientId
 	);
@@ -405,14 +406,10 @@ export function* moveBlockToPosition(
 		return;
 	}
 
-	const blockName = yield select(
-		'core/block-editor',
-		'getBlockName',
-		clientId
-	);
+	const blockName = yield select( STORE_KEY, 'getBlockName', clientId );
 
 	const canInsertBlock = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'canInsertBlockType',
 		blockName,
 		toRootClientId
@@ -463,12 +460,12 @@ export function* insertBlocks(
 ) {
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield select( 'core/block-editor', 'getSettings' )
+		yield select( STORE_KEY, 'getSettings' )
 	);
 	const allowedBlocks = [];
 	for ( const block of blocks ) {
 		const isValid = yield select(
-			'core/block-editor',
+			STORE_KEY,
 			'canInsertBlockType',
 			block.name,
 			rootClientId
@@ -573,15 +570,11 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 
 	clientIds = castArray( clientIds );
 	const rootClientId = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'getBlockRootClientId',
 		clientIds[ 0 ]
 	);
-	const isLocked = yield select(
-		'core/block-editor',
-		'getTemplateLock',
-		rootClientId
-	);
+	const isLocked = yield select( STORE_KEY, 'getTemplateLock', rootClientId );
 	if ( isLocked ) {
 		return;
 	}
@@ -883,13 +876,9 @@ export function* duplicateBlocks( clientIds ) {
 	if ( ! clientIds && ! clientIds.length ) {
 		return;
 	}
-	const blocks = yield select(
-		'core/block-editor',
-		'getBlocksByClientId',
-		clientIds
-	);
+	const blocks = yield select( STORE_KEY, 'getBlocksByClientId', clientIds );
 	const rootClientId = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'getBlockRootClientId',
 		clientIds[ 0 ]
 	);
@@ -909,7 +898,7 @@ export function* duplicateBlocks( clientIds ) {
 	}
 
 	const lastSelectedIndex = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'getBlockIndex',
 		last( castArray( clientIds ) ),
 		rootClientId
@@ -934,21 +923,17 @@ export function* insertBeforeBlock( clientId ) {
 		return;
 	}
 	const rootClientId = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'getBlockRootClientId',
 		clientId
 	);
-	const isLocked = yield select(
-		'core/block-editor',
-		'getTemplateLock',
-		rootClientId
-	);
+	const isLocked = yield select( STORE_KEY, 'getTemplateLock', rootClientId );
 	if ( isLocked ) {
 		return;
 	}
 
 	const firstSelectedIndex = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'getBlockIndex',
 		clientId,
 		rootClientId
@@ -966,21 +951,17 @@ export function* insertAfterBlock( clientId ) {
 		return;
 	}
 	const rootClientId = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'getBlockRootClientId',
 		clientId
 	);
-	const isLocked = yield select(
-		'core/block-editor',
-		'getTemplateLock',
-		rootClientId
-	);
+	const isLocked = yield select( STORE_KEY, 'getTemplateLock', rootClientId );
 	if ( isLocked ) {
 		return;
 	}
 
 	const firstSelectedIndex = yield select(
-		'core/block-editor',
+		STORE_KEY,
 		'getBlockIndex',
 		clientId,
 		rootClientId
