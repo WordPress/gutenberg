@@ -23,6 +23,13 @@ export const settings = {
 	),
 	icon,
 	keywords: [ __( 'movie' ) ],
+	example: {
+		attributes: {
+			autoplay: true,
+			controls: true,
+			src: 'https://upload.wikimedia.org/wikipedia/commons/c/ca/Wood_thrush_in_Central_Park_switch_sides_%2816510%29.webm',
+		},
+	},
 	transforms,
 	edit,
 	save,
