@@ -13,24 +13,18 @@ import {
 	registerBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-import { createRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import actions, {
-	updateSettings,
+import {
 	mergeBlocks,
 	replaceBlocks,
-	resetBlocks,
 	selectBlock,
 	selectionChange,
-	setTemplateValidity,
 } from '../actions';
-import effects, { validateBlocksToTemplate } from '../effects';
+import effects from '../effects';
 import * as selectors from '../selectors';
-import reducer from '../reducer';
-import applyMiddlewares from '../middlewares';
 import '../../';
 
 describe( 'effects', () => {
@@ -295,82 +289,6 @@ describe( 'effects', () => {
 			expect( Array.from( lastCallArgument ) ).toEqual(
 				Array.from( expectedGenerator )
 			);
-		} );
-	} );
-
-	describe( 'validateBlocksToTemplate', () => {
-		let store;
-		beforeEach( () => {
-			store = createRegistry().registerStore( 'test', {
-				actions,
-				selectors,
-				reducer,
-			} );
-			applyMiddlewares( store );
-
-			registerBlockType( 'core/test-block', defaultBlockSettings );
-		} );
-
-		afterEach( () => {
-			getBlockTypes().forEach( ( block ) => {
-				unregisterBlockType( block.name );
-			} );
-		} );
-
-		it( 'should return undefined if no template assigned', () => {
-			const result = validateBlocksToTemplate(
-				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-				store
-			);
-
-			expect( result ).toBe( undefined );
-		} );
-
-		it( 'should return undefined if invalid but unlocked', () => {
-			store.dispatch(
-				updateSettings( {
-					template: [ [ 'core/foo', {} ] ],
-				} )
-			);
-
-			const result = validateBlocksToTemplate(
-				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-				store
-			);
-
-			expect( result ).toBe( undefined );
-		} );
-
-		it( 'should return undefined if locked and valid', () => {
-			store.dispatch(
-				updateSettings( {
-					template: [ [ 'core/test-block' ] ],
-					templateLock: 'all',
-				} )
-			);
-
-			const result = validateBlocksToTemplate(
-				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-				store
-			);
-
-			expect( result ).toBe( undefined );
-		} );
-
-		it( 'should return validity set action if invalid on default state', () => {
-			store.dispatch(
-				updateSettings( {
-					template: [ [ 'core/foo' ] ],
-					templateLock: 'all',
-				} )
-			);
-
-			const result = validateBlocksToTemplate(
-				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-				store
-			);
-
-			expect( result ).toEqual( setTemplateValidity( false ) );
 		} );
 	} );
 } );
