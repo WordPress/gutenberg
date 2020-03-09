@@ -41,7 +41,7 @@
 		"stylelint-scss": "^3.14.2"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^8.2.0",
+		"@commitlint/cli": "^8.3.5",
 		"@commitlint/config-conventional": "^8.2.0",
 		"@wordpress/scripts": "^7.1.2",
 		"husky": "^4.2.3",
