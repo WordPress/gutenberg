@@ -17,18 +17,16 @@ In order to access the SlotFills, we need to do four things:
 
 
 Here is an example using the `PluginPostStatusInfo` slotFill:
+
 ```js
 const { registerPlugin } = wp.plugins;
 const { PluginPostStatusInfo } = wp.editPost;
 
-
-const PluginPostStatusInfoTest = () => {
-	return(
-		<PluginPostStatusInfo>
-			<p>Post Status Info SlotFill</p>
-		</PluginPostStatusInfo>
-	)
-}
+const PluginPostStatusInfoTest = () => (
+	<PluginPostStatusInfo>
+		<p>Post Status Info SlotFill</p>
+	</PluginPostStatusInfo>
+);
 
 registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 ```
@@ -62,7 +60,6 @@ const PluginPostStatusInfo = ( { children, className } ) => (
 PluginPostStatusInfo.Slot = Slot;
 
 export default PluginPostStatusInfo;
-
 ```
 
 This new Slot is then exposed in the editor. The example below is from core and represents the Status & visibility panel.
@@ -73,31 +70,34 @@ Any items that have been added via the SlotFill ( see the example above ), will 
 See [core code](https://github.com/WordPress/gutenberg/tree/master/packages/edit-post/src/components/sidebar/post-status/index.js#L26).
 
 ```js
-function PostStatus( { isOpened, onTogglePanel } ) {
-	return (
-		<PanelBody className="edit-post-post-status" title={ __( 'Status & visibility' ) } opened={ isOpened } onToggle={ onTogglePanel }>
-			<PluginPostStatusInfo.Slot>
-				{ ( fills ) => (
-					<Fragment>
-						<PostVisibility />
-						<PostSchedule />
-						<PostFormat />
-						<PostSticky />
-						<PostPendingStatus />
-						<PostAuthor />
-						{ fills }
-						<PostTrash />
-					</Fragment>
-				) }
-			</PluginPostStatusInfo.Slot>
-		</PanelBody>
-	);
-}
+const PostStatus = ( { isOpened, onTogglePanel } ) => (
+	<PanelBody
+		className="edit-post-post-status"
+		title={ __( 'Status & visibility' ) }
+		opened={ isOpened }
+		onToggle={ onTogglePanel }
+	>
+		<PluginPostStatusInfo.Slot>
+			{ ( fills ) => (
+				<Fragment>
+					<PostVisibility />
+					<PostSchedule />
+					<PostFormat />
+					<PostSticky />
+					<PostPendingStatus />
+					<PostAuthor />
+					{ fills }
+					<PostTrash />
+				</Fragment>
+			) }
+		</PluginPostStatusInfo.Slot>
+	</PanelBody>
+);
 ```
 
 ## Currently available SlotFills and examples
 
-There are currently seven available SlotFills in the `edit-post` package. Please refer to the individual items below for usage and example details:
+There are currently eight available SlotFills in the `edit-post` package. Please refer to the individual items below for usage and example details:
 
 * [PluginBlockSettingsMenuItem](/docs/designers-developers/developers/slotfills/plugin-block-settings-menu-item.md)
 * [PluginDocumentSettingPanel](/docs/designers-developers/developers/slotfills/plugin-document-setting-panel.md)
@@ -107,7 +107,3 @@ There are currently seven available SlotFills in the `edit-post` package. Please
 * [PluginPrePublishPanel](/docs/designers-developers/developers/slotfills/plugin-pre-publish-panel.md)
 * [PluginSidebar](/docs/designers-developers/developers/slotfills/plugin-sidebar.md)
 * [PluginSidebarMoreMenuItem](/docs/designers-developers/developers/slotfills/plugin-sidebar-more-menu-item.md)
-
-
-
-
