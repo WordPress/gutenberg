@@ -1,53 +1,57 @@
 /**
  * External dependencies
  */
-import { isUndefined, isNaN } from 'lodash';
+import { isUndefined } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { DOWN, UP } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
+import { __experimentalUseBlockEditProps as useBlockEditProps } from '../../index';
 import { LineHeightControlWrapper } from './styles';
 
 const BASE_DEFAULT_VALUE = 1.5;
+const INITIAL_VALUE = '';
 const STEP = 0.1;
 
 export default function LineHeightControl( props ) {
 	const [ lineHeight, setLineHeight ] = useLineHeightState();
 
-	// Handles cases when there is no lineHeight defined.
-	// Improves interaction by starting with a base of 1.5, rather than 0.
-	const handleOnKeyDown = ( event ) => {
-		if ( ! isUndefined( lineHeight ) ) return;
-
-		switch ( event.keyCode ) {
-			case UP:
-				event.preventDefault();
-				return setLineHeight( BASE_DEFAULT_VALUE + STEP );
-			case DOWN:
-				event.preventDefault();
-				return setLineHeight( BASE_DEFAULT_VALUE - STEP );
+	const handleOnChange = ( nextValue ) => {
+		// Set the next value as normal if lineHeight has been defined
+		if ( isLineHeightDefined( lineHeight ) ) {
+			return setLineHeight( nextValue );
 		}
+
+		// Otherwise...
+		let adjustedNextValue;
+
+		if ( nextValue === `${ STEP }` ) {
+			// Increment by step value
+			adjustedNextValue = BASE_DEFAULT_VALUE + STEP;
+		} else {
+			// Decrement by step value
+			adjustedNextValue = BASE_DEFAULT_VALUE - STEP;
+		}
+
+		setLineHeight( adjustedNextValue );
 	};
 
 	return (
 		<LineHeightControlWrapper>
 			<TextControl
 				autoComplete="off"
-				onChange={ setLineHeight }
-				onKeyDown={ handleOnKeyDown }
+				onChange={ handleOnChange }
 				label={ __( 'Line height' ) }
 				placeholder={ BASE_DEFAULT_VALUE }
 				step={ STEP }
 				type="number"
-				value={ lineHeight }
+				value={ lineHeight || INITIAL_VALUE }
 				{ ...props }
 				min={ 0 }
 			/>
@@ -55,65 +59,64 @@ export default function LineHeightControl( props ) {
 	);
 }
 
-export function getLineHeightControlStyles( attributes ) {
-	const { lineHeight } = attributes;
-
-	return {
-		'--wp--core-paragraph--line-height': `${ lineHeight * 100 }%`,
-	};
-}
-
-export function getLineHeightControlClassName( attributes ) {
-	const { lineHeight } = attributes;
-
-	return ! isUndefined( lineHeight ) ? 'has-line-height' : '';
-}
-
+/**
+ * Retrieves the attributes/setter for the block, but adjusted to target just the lineHeight attribute
+ *
+ * @return {Array<string|undefined, Function>} [lineHeight, setLineHeight] from the block's edit props.
+ */
 function useLineHeightState() {
-	const attributes = useBlockAttributes();
-	const setAttributes = useSetAttributes();
+	const [ attributes, setAttributes ] = useBlockEditProps();
 
 	const { lineHeight } = attributes;
-	const setLineHeight = ( value ) =>
-		setAttributes( { lineHeight: parseFloat( value ) } );
 
-	let value = parseFloat( lineHeight );
+	const setLineHeight = ( value ) => {
+		setAttributes( { lineHeight: value } );
+	};
 
-	if ( isNaN( value ) ) {
-		value = undefined;
+	return [ lineHeight, setLineHeight ];
+}
+
+/**
+ * Determines if the lineHeight attribute has been properly defined.
+ *
+ * @param {any} lineHeight The value to check.
+ *
+ * @return {boolean} Whether the lineHeight attribute is valid.
+ */
+function isLineHeightDefined( lineHeight ) {
+	return ! isUndefined( lineHeight ) && lineHeight !== INITIAL_VALUE;
+}
+
+/**
+ * Generates the "inline" lineHeight attribute styles, if defined.
+ *
+ * @param {Object} attributes Attributes from a block.
+ *
+ * @return {Object} Style properties with the lineHeight attribute, if defined.
+ */
+export function getLineHeightControlStyles( { lineHeight } = {} ) {
+	if ( ! isLineHeightDefined( lineHeight ) ) {
+		return {};
 	}
 
-	return [ value, setLineHeight ];
-}
+	const value = parseFloat( lineHeight ) * 100;
 
-function useBlockAttributes() {
-	const clientId = useSelectedBlockClientId();
-	const { attributes } = useSelect( ( select ) => {
-		const { __unstableGetBlockWithoutInnerBlocks } = select(
-			'core/block-editor'
-		);
-		return __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
-	}, [] );
-
-	return attributes;
-}
-
-function useSelectedBlockClientId() {
-	const clientId = useSelect( ( select ) => {
-		const { getSelectedBlockClientId } = select( 'core/block-editor' );
-		return getSelectedBlockClientId();
-	}, [] );
-
-	return clientId;
-}
-
-function useSetAttributes() {
-	const clientId = useSelectedBlockClientId();
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
-
-	const setAttributes = ( newAttributes ) => {
-		updateBlockAttributes( clientId, newAttributes );
+	return {
+		'--wp--core-paragraph--line-height': `${ value }%`,
 	};
+}
 
-	return setAttributes;
+/**
+ * Generates the CSS className representing the  lineHeight attribute styles, if defined.
+ *
+ * @param {Object} attributes Attributes from a block.
+ *
+ * @return {string} CSS className of the lineHeight attribute, if defined.
+ */
+export function getLineHeightControlClassName( { lineHeight } = {} ) {
+	if ( ! isLineHeightDefined( lineHeight ) ) {
+		return '';
+	}
+
+	return 'has-line-height';
 }
