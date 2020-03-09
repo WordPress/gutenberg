@@ -29,6 +29,11 @@
 			order: initial;
 		}
 	}
+
+	// Adjust icon sizes for dropdowns
+	.components-dropdown svg {
+		height: 16px;
+	}
 }
 
 .edit-post-header__toolbar {

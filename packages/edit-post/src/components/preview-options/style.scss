@@ -14,10 +14,6 @@
 	&:focus:not(:disabled) {
 		box-shadow: inset 0 0 0 1px $white, 0 0 0 2px color($theme-color);
 	}
-
-	svg {
-		height: 16px;
-	}
 }
 
 .editor-post-preview__button-resize.editor-post-preview__button-resize {
@@ -48,11 +44,16 @@
 }
 
 .editor-post-preview__button-external {
-	padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
+	padding-left: 8px;
 	margin-right: auto;
 	width: 100%;
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-start;
+
+	svg {
+		margin-right: 8px;
+		height: 20px;
+	}
 }
 
 @include break-small() {
