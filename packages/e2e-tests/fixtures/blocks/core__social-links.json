@@ -11,7 +11,8 @@
                 "isValid": true,
                 "attributes": {
                     "url": "https://mastodon.social/@marcuskaz",
-                    "service": "mastodon"
+                    "service": "mastodon",
+					"opensInNewTab": false
                 },
                 "innerBlocks": [],
                 "originalContent": ""
