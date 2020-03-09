@@ -39,6 +39,10 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
 
 	const changeAngleToPosition = ( event ) => {
 		const { x: centerX, y: centerY } = angleCircleCenter.current;
+		// Prevent (drag) mouse events from selecting and accidentally
+		// triggering actions from other elements.
+		event.preventDefault();
+
 		onChange( getAngle( centerX, centerY, event.clientX, event.clientY ) );
 	};
 
