@@ -50,6 +50,7 @@ import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
 import * as group from './group';
+import * as surf from './surf';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -96,6 +97,7 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
+	surf, // add our block here to prioritize its display
 ].reduce( ( accumulator, block ) => {
 	accumulator[ block.name ] = block;
 	return accumulator;
@@ -154,6 +156,7 @@ export const registerCoreBlocks = () => {
 		shortcode,
 		devOnly( verse ),
 		cover,
+		devOnly( surf ), // add our block here to register it (with a dev flag)
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

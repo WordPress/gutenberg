@@ -1,0 +1,10 @@
+{
+	"name": "core/surf",
+	"category": "common",
+	"attributes": {
+		"waveHeight": {
+			"type": "number",
+			"default": 1
+		}
+	}
+}
