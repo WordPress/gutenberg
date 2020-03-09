@@ -9,6 +9,10 @@
 		"service": {
 			"type": "string"
 		},
+		"opensInNewTab": {
+			"type": "boolean",
+			"default": false
+		},
 		"label": {
 			"type": "string"
 		}

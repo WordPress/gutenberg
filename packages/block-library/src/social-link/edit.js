@@ -7,9 +7,9 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import {
+	__experimentalLinkControl as LinkControl,
 	InspectorControls,
 	URLPopover,
-	URLInput,
 } from '@wordpress/block-editor';
 import { Fragment, useState } from '@wordpress/element';
 import {
@@ -27,11 +27,16 @@ import { keyboardReturn } from '@wordpress/icons';
 import { getIconBySite, getNameBySite } from './social-list';
 
 const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
-	const { url, service, label } = attributes;
+	const { url, label, opensInNewTab, service } = attributes;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
 	} );
+
+	const link = {
+		url,
+		opensInNewTab,
+	};
 
 	// Import icon.
 	const IconComponent = getIconBySite( service );
@@ -70,13 +75,18 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 							} }
 						>
 							<div className="block-editor-url-input">
-								<URLInput
-									value={ url }
-									onChange={ ( nextURL ) =>
-										setAttributes( { url: nextURL } )
+								<LinkControl
+									value={ link }
+									onChange={ ( {
+										url: newURL = '',
+										opensInNewTab: newOpensInNewTab,
+									} = {} ) =>
+										setAttributes( {
+											url: encodeURI( newURL ),
+											opensInNewTab: newOpensInNewTab,
+										} )
 									}
-									placeholder={ __( 'Enter address' ) }
-									disableSuggestions={ true }
+									showInitialSuggestions={ false }
 								/>
 							</div>
 							<Button

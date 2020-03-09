@@ -15,6 +15,8 @@
 function render_block_core_social_link( $attributes ) {
 	$service = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
 	$url     = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
+	$opensInNewTab = ( isset( $attributes['opensInNewTab'] ) ) ? $attributes['opensInNewTab'] : false;
+
 	$label   = ( isset( $attributes['label'] ) ) ?
 		$attributes['label'] :
 		/* translators: %s: Social Link service name */
@@ -24,9 +26,9 @@ function render_block_core_social_link( $attributes ) {
 	if ( ! $url ) {
 		return '';
 	}
-
+	$target = ( $opensInNewTab ) ? 'target="_new"' : '';
 	$icon = block_core_social_link_get_icon( $service );
-	return '<li class="wp-social-link wp-social-link-' . esc_attr( $service ) . '"><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '"> ' . $icon . '</a></li>';
+	return '<li class="wp-social-link wp-social-link-' . esc_attr( $service ) . '"><a href="' . esc_url( $url ) . '" ' . $target . ' aria-label="' . esc_attr( $label ) . '"> ' . $icon . '</a></li>';
 }
 
 /**
