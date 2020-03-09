@@ -20,7 +20,7 @@
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
 		height: auto;
-		max-height: calc(100vh - #{ $admin-bar-height-big + $panel-header-height });
+		max-height: calc(100vh - #{ $admin-bar-height-big + $panel-header-height + $panel-header-height });
 		margin-top: -1px;
 		margin-bottom: -1px;
 		position: relative;
