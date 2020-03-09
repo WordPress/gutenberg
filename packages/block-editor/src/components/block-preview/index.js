@@ -53,7 +53,10 @@ export function BlockPreview( {
 			 * be rerendered.
 			 */ }
 			{ autoHeight ? (
-				<AutoHeightBlockPreview viewportWidth={ viewportWidth } />
+				<AutoHeightBlockPreview
+					key={ recompute }
+					viewportWidth={ viewportWidth }
+				/>
 			) : (
 				<ScaledBlockPreview
 					key={ recompute }
