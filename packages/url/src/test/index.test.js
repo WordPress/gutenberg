@@ -300,12 +300,12 @@ describe( 'getQueryString', () => {
 				'https://andalouses.example/beach?foo[]=bar&foo[]=baz'
 			)
 		).toBe( 'foo[]=bar&foo[]=baz' );
-		expect( getQueryString( 'test.com?foo[]=bar&foo[]=baz' ) ).toBe(
+		expect( getQueryString( 'https://test.com?foo[]=bar&foo[]=baz' ) ).toBe(
 			'foo[]=bar&foo[]=baz'
 		);
-		expect( getQueryString( 'test.com?foo=bar&foo=baz?test' ) ).toBe(
-			'foo=bar&foo=baz?test'
-		);
+		expect(
+			getQueryString( 'https://test.com?foo=bar&foo=baz?test' )
+		).toBe( 'foo=bar&foo=baz?test' );
 	} );
 
 	it( 'returns undefined when the provided does not contain a url query string', () => {
