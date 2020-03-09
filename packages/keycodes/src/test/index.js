@@ -296,6 +296,21 @@ describe( 'isKeyboardEvent', () => {
 		return attachNode;
 	}
 
+	it( 'returns false for a superset of modifiers', () => {
+		expect.assertions( 3 );
+		const attachNode = attachEventListeners( ( event ) => {
+			expect(
+				isKeyboardEvent.primary( event, 'm', isAppleOSFalse )
+			).toBe( false );
+		} );
+
+		keyPress( attachNode, {
+			ctrlKey: true,
+			shiftKey: true,
+			key: 'm',
+		} );
+	} );
+
 	describe( 'primary', () => {
 		it( 'should identify modifier key when Ctrl is pressed', () => {
 			expect.assertions( 3 );
