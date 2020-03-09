@@ -17,7 +17,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PostPreviewButton } from '@wordpress/editor';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { external, check } from '@wordpress/icons';
 
 const downArrow = (
@@ -72,7 +72,7 @@ export default function PreviewOptions( {
 			) }
 			renderContent={ () => (
 				<>
-					<MenuGroup label={ _x( 'View', 'noun' ) }>
+					<MenuGroup>
 						<MenuItem
 							className="editor-post-preview__button-resize"
 							onClick={ () => setPreviewDeviceType( 'Desktop' ) }
@@ -106,8 +106,8 @@ export default function PreviewOptions( {
 									forcePreviewLink={ forcePreviewLink }
 									textContent={
 										<>
-											{ __( 'Preview externally' ) }
 											<Icon icon={ external } />
+											{ __( 'Preview in new tab' ) }
 										</>
 									}
 								/>
