@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getFontSizeClass, RichText } from '@wordpress/block-editor';
+import {
+	getFontSizeClass,
+	RichText,
+	__experimentalGetLineHeightControlStyles as getLineHeightStyles,
+	__experimentalGetLineHeightControlClassName as getLineHeightClassName,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -18,15 +23,21 @@ export default function save( { attributes } ) {
 		direction,
 	} = attributes;
 
+	const lineHeightStyles = getLineHeightStyles( attributes );
+	const lineHeightClassName = getLineHeightClassName( attributes );
 	const fontSizeClass = getFontSizeClass( fontSize );
 
-	const className = classnames( {
-		'has-drop-cap': dropCap,
-		[ `has-text-align-${ align }` ]: align,
-		[ fontSizeClass ]: fontSizeClass,
-	} );
+	const className = classnames(
+		{
+			'has-drop-cap': dropCap,
+			[ `has-text-align-${ align }` ]: align,
+			[ fontSizeClass ]: fontSizeClass,
+		},
+		lineHeightClassName
+	);
 
 	const styles = {
+		...lineHeightStyles,
 		fontSize: fontSizeClass ? undefined : customFontSize,
 	};
 
