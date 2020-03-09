@@ -47,23 +47,16 @@ function render_block_core_post_excerpt( $attributes ) {
  * Registers the `core/post-excerpt` block on the server.
  */
 function register_block_core_post_excerpt() {
+	$path     = __DIR__ . '/post-excerpt/block.json';
+	$metadata = json_decode( file_get_contents( $path ), true );
+
 	register_block_type(
-		'core/post-excerpt',
-		array(
-			'attributes'      => array(
-				'wordCount'         => array(
-					'type'    => 'number',
-					'default' => 55,
-				),
-				'moreText'          => array(
-					'type' => 'string',
-				),
-				'showMoreOnNewLine' => array(
-					'type'    => 'boolean',
-					'default' => true,
-				),
-			),
-			'render_callback' => 'render_block_core_post_excerpt',
+		$metadata['name'],
+		array_merge(
+			$metadata,
+			array(
+				'render_callback' => 'render_block_core_post_excerpt',
+			)
 		)
 	);
 }
