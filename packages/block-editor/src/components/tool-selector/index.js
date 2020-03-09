@@ -59,6 +59,7 @@ function ToolSelector() {
 					label={ __( 'Tools' ) }
 				/>
 			) }
+			position="bottom right"
 			renderContent={ () => (
 				<>
 					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>

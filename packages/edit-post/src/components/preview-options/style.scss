@@ -56,13 +56,8 @@
 	padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
 	margin-right: auto;
 	width: 100%;
-}
-
-.editor-post-preview__icon-external {
-	position: absolute;
-	right: $grid-unit-10;
-	top: 6px;
-	z-index: 1;
+	display: flex;
+	justify-content: space-between;
 }
 
 @include break-small() {

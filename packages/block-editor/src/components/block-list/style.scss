@@ -378,10 +378,31 @@
 }
 
 // Sibling inserter / "inbetweenserter".
-// Fade it in after a delay.
+.block-editor-block-list__empty-block-inserter,
+.block-editor-default-block-appender,
 .block-editor-block-list__insertion-point-inserter,
 .block-editor-block-list__block-popover-inserter {
 	.block-editor-inserter__toggle.components-button {
+		// Basic look
+		background: $dark-gray-primary;
+		border-radius: $radius-block-ui;
+		color: $white;
+
+		// Special dimensions for this button.
+		min-width: 24px;
+		height: 24px;
+
+		&:hover {
+			color: $white;
+		}
+	}
+}
+
+
+.block-editor-block-list__insertion-point-inserter,
+.block-editor-block-list__block-popover-inserter {
+	.block-editor-inserter__toggle.components-button {
+		// Fade it in after a delay.
 		animation: block-editor-inserter__toggle__fade-in-animation-delayed 1.2s ease;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");

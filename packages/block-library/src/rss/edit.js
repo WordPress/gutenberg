@@ -66,14 +66,17 @@ class RSSEdit extends Component {
 		if ( this.state.editing ) {
 			return (
 				<Placeholder icon={ rss } label="RSS">
-					<form onSubmit={ this.onSubmitURL }>
+					<form
+						onSubmit={ this.onSubmitURL }
+						className="blocks-rss__placeholder-form"
+					>
 						<TextControl
 							placeholder={ __( 'Enter URL here…' ) }
 							value={ feedURL }
 							onChange={ ( value ) =>
 								setAttributes( { feedURL: value } )
 							}
-							className={ 'components-placeholder__input' }
+							className="blocks-rss__placeholder-input"
 						/>
 						<Button isPrimary type="submit">
 							{ __( 'Use URL' ) }
