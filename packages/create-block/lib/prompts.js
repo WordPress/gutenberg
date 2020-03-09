@@ -77,7 +77,7 @@ const author = {
 	type: 'input',
 	name: 'author',
 	message:
-		"The author name — this should be a list of wordpress.org userid's:",
+		"The author name — this should be a list of wordpress.org user id's:",
 };
 
 const license = {
