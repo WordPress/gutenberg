@@ -6,7 +6,12 @@ import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, cloneElement, renderToString } from '@wordpress/element';
+import {
+	Component,
+	cloneElement,
+	renderToString,
+	createContext,
+} from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -17,6 +22,7 @@ import {
 	getBlockType,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 } from './registration';
 import { normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
@@ -68,6 +74,8 @@ export function getBlockMenuDefaultClassName( blockName ) {
 	);
 }
 
+export const BlockPropsFilterContext = createContext();
+
 /**
  * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
@@ -95,27 +103,42 @@ export function getSaveElement(
 	}
 
 	let element = save( { attributes, innerBlocks } );
+	let blockPropsFilter = ( props ) => props;
 
-	if (
-		isObject( element ) &&
-		hasFilter( 'blocks.getSaveContent.extraProps' )
-	) {
-		/**
-		 * Filters the props applied to the block save result element.
-		 *
-		 * @param {Object}  props      Props applied to save element.
-		 * @param {WPBlock} blockType  Block type definition.
-		 * @param {Object}  attributes Block attributes.
-		 */
-		const props = applyFilters(
-			'blocks.getSaveContent.extraProps',
-			{ ...element.props },
-			blockType,
-			attributes
-		);
+	if ( hasFilter( 'blocks.getSaveContent.extraProps' ) ) {
+		if ( hasBlockSupport( blockType, 'lightBlockWrapper', false ) ) {
+			blockPropsFilter = ( props ) =>
+				/**
+				 * Filters the props applied to the block save result element.
+				 *
+				 * @param {Object}  props      Props applied to save element.
+				 * @param {WPBlock} blockType  Block type definition.
+				 * @param {Object}  attributes Block attributes.
+				 */
+				applyFilters(
+					'blocks.getSaveContent.extraProps',
+					{ ...props },
+					blockType,
+					attributes
+				);
+		} else if ( isObject( element ) ) {
+			/**
+			 * Filters the props applied to the block save result element.
+			 *
+			 * @param {Object}  props      Props applied to save element.
+			 * @param {WPBlock} blockType  Block type definition.
+			 * @param {Object}  attributes Block attributes.
+			 */
+			const props = applyFilters(
+				'blocks.getSaveContent.extraProps',
+				{ ...element.props },
+				blockType,
+				attributes
+			);
 
-		if ( ! isShallowEqual( props, element.props ) ) {
-			element = cloneElement( element, props );
+			if ( ! isShallowEqual( props, element.props ) ) {
+				element = cloneElement( element, props );
+			}
 		}
 	}
 
@@ -135,7 +158,9 @@ export function getSaveElement(
 
 	return (
 		<BlockContentProvider innerBlocks={ innerBlocks }>
-			{ element }
+			<BlockPropsFilterContext.Provider value={ blockPropsFilter }>
+				{ element }
+			</BlockPropsFilterContext.Provider>
 		</BlockContentProvider>
 	);
 }

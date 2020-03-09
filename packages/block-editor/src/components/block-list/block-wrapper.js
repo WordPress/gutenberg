@@ -19,6 +19,7 @@ import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { BlockPropsFilterContext } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -238,9 +239,13 @@ const elements = [
 const BlockSaveComponent = forwardRef(
 	( { children, tagName: TagName = 'div', ...props }, wrapper ) => {
 		return (
-			<TagName { ...props } ref={ wrapper }>
-				{ children }
-			</TagName>
+			<BlockPropsFilterContext>
+				{ ( filter ) => (
+					<TagName ref={ wrapper } { ...filter( props ) }>
+						{ children }
+					</TagName>
+				) }
+			</BlockPropsFilterContext>
 		);
 	}
 );

@@ -7,7 +7,10 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import {
+	RichText,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -67,11 +70,13 @@ export default function save( { attributes } ) {
 
 	if ( 'left' === align || 'right' === align || 'center' === align ) {
 		return (
-			<div>
+			<Block.Save.div>
 				<figure className={ classes }>{ figure }</figure>
-			</div>
+			</Block.Save.div>
 		);
 	}
 
-	return <figure className={ classes }>{ figure }</figure>;
+	return (
+		<Block.Save.figure className={ classes }>{ figure }</Block.Save.figure>
+	);
 }
