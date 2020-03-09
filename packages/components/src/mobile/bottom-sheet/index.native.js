@@ -322,4 +322,5 @@ ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
 
+export { Consumer as BottomSheetConsumer };
 export default ThemedBottomSheet;
