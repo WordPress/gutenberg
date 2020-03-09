@@ -137,7 +137,7 @@ function Navigation( {
 	const hasPages = hasResolvedPages && pages && pages.length;
 
 	const blockClassNames = classnames( className, {
-		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 		[ fontSize.class ]: fontSize.class,
 	} );
 	const blockInlineStyles = {

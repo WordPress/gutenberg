@@ -12,18 +12,6 @@ $navigation-item-height: 46px;
 	margin: 0;
 }
 
-.wp-block-navigation.items-justification-left > ul {
-	justify-content: flex-start;
-}
-
-.wp-block-navigation.items-justification-center > ul {
-	justify-content: center;
-}
-
-.wp-block-navigation.items-justification-right > ul {
-	justify-content: flex-end;
-}
-
 // Polish the Appender.
 .wp-block-navigation .block-list-appender {
 	margin: 0;
