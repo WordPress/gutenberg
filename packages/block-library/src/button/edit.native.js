@@ -22,7 +22,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 	BottomSheet,
-	Consumer,
+	BottomSheetConsumer,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
@@ -442,9 +442,9 @@ class ButtonEdit extends Component {
 						{ this.getLinkSettings( url, rel, linkTarget, true ) }
 					</PanelBody>
 					<PanelBody title={ __( 'Color Settings' ) }>
-						<Consumer>
+						<BottomSheetConsumer>
 							{ ( {
-								isBottomSheetScrolling,
+								isBottomSheetScrolling = false,
 								shouldEnableBottomSheetScroll,
 							} ) => {
 								return (
@@ -492,7 +492,7 @@ class ButtonEdit extends Component {
 									/>
 								);
 							} }
-						</Consumer>
+						</BottomSheetConsumer>
 					</PanelBody>
 				</InspectorControls>
 			</View>

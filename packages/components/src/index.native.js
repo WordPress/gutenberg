@@ -48,8 +48,7 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
 // Mobile Components
 export {
 	default as BottomSheet,
-	Provider,
-	Consumer,
+	BottomSheetConsumer,
 } from './mobile/bottom-sheet';
 export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';

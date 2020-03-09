@@ -32,7 +32,7 @@ import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
-export const { Provider, Consumer } = createContext();
+export const { Provider: BottomSheetProvider, Consumer } = createContext();
 
 class BottomSheet extends Component {
 	constructor() {
@@ -277,6 +277,8 @@ class BottomSheet extends Component {
 						disableScrollViewPanResponder
 						bounces={ bounces }
 						onScroll={ this.onScroll }
+						onScrollBeginDrag={ () => this.isScrolling( true ) }
+						onScrollEndDrag={ () => this.isScrolling( false ) }
 						scrollEventThrottle={ 16 }
 						style={ { maxHeight } }
 						contentContainerStyle={ [
@@ -286,7 +288,7 @@ class BottomSheet extends Component {
 						] }
 						scrollEnabled={ scrollEnabled }
 					>
-						<Provider
+						<BottomSheetProvider
 							value={ {
 								shouldEnableBottomSheetScroll: this
 									.onShouldEnableScroll,
@@ -294,7 +296,7 @@ class BottomSheet extends Component {
 							} }
 						>
 							{ children }
-						</Provider>
+						</BottomSheetProvider>
 						<View style={ { height: safeAreaBottomInset } } />
 					</ScrollView>
 				</KeyboardAvoidingView>
