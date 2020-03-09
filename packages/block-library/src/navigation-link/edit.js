@@ -209,7 +209,8 @@ function NavigationLinkEdit( {
 					backgroundColor: rgbBackgroundColor,
 				} }
 			>
-				<div className="wp-block-navigation-link__content">
+				{ /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
+				<a className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }
 						tagName="span"
@@ -219,6 +220,7 @@ function NavigationLinkEdit( {
 							setAttributes( { label: labelValue } )
 						}
 						placeholder={ itemLabelPlaceholder }
+						keepPlaceholderOnFocus
 						withoutInteractiveFormatting
 						allowedFormats={ [
 							'core/bold',
@@ -283,7 +285,7 @@ function NavigationLinkEdit( {
 							/>
 						</Popover>
 					) }
-				</div>
+				</a>
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
 					renderAppender={
@@ -292,6 +294,10 @@ function NavigationLinkEdit( {
 							? InnerBlocks.DefaultAppender
 							: false
 					}
+					__experimentalTagName="ul"
+					__experimentalPassedProps={ {
+						className: 'wp-block-navigation__container',
+					} }
 				/>
 			</Block.li>
 		</Fragment>
