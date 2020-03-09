@@ -3,6 +3,7 @@ let offset;
 let output;
 let stack;
 
+/* eslint-disable jsdoc/check-values */
 /**
  * Matches block comment delimiters
  *
@@ -39,12 +40,13 @@ let stack;
  *    once browsers reliably support atomic grouping or possessive
  *    quantifiers natively we should remove this trick and simplify
  *
- * @type RegExp
+ * @type {RegExp}
  *
  * @since 3.8.0
  * @since 4.6.1 added optimization to prevent backtracking on attribute parsing
  */
 const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/g;
+/*eslint-enable*/
 
 function Block( blockName, attrs, innerBlocks, innerHTML, innerContent ) {
 	return {
