@@ -274,11 +274,6 @@ describe( 'getQueryString', () => {
 	it( 'returns the query string of a URL', () => {
 		expect(
 			getQueryString(
-				'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
-			)
-		).toBe( 'query=params&more' );
-		expect(
-			getQueryString(
 				'http://user:password@www.test-this.com:1020/test-path/file.extension?query=params&more#anchor'
 			)
 		).toBe( 'query=params&more' );
@@ -315,6 +310,11 @@ describe( 'getQueryString', () => {
 
 	it( 'returns undefined when the provided does not contain a url query string', () => {
 		expect( getQueryString( '' ) ).toBeUndefined();
+		expect(
+			getQueryString(
+				'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+			)
+		).toBeUndefined();
 		expect(
 			getQueryString( 'https://wordpress.org/test-path#anchor' )
 		).toBeUndefined();
