@@ -115,8 +115,7 @@ build_files=$(ls build/*/*.{js,css,asset.php} build/block-library/blocks/*.php b
 status "Creating archive... 🎁"
 zip -r gutenberg.zip \
 	gutenberg.php \
-	lib/*.php \
-	lib/demo-block-templates/*.html \
+	lib \
 	packages/block-serialization-default-parser/*.php \
 	post-content.php \
 	$vendor_scripts \
