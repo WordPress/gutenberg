@@ -235,11 +235,30 @@ const elements = [
 	'nav',
 ];
 
+const BlockSaveComponent = forwardRef(
+	( { children, tagName: TagName = 'div', ...props }, wrapper ) => {
+		return (
+			<TagName { ...props } ref={ wrapper }>
+				{ children }
+			</TagName>
+		);
+	}
+);
+
 const ExtendedBlockComponent = elements.reduce( ( acc, element ) => {
 	acc[ element ] = forwardRef( ( props, ref ) => {
 		return <BlockComponent { ...props } ref={ ref } tagName={ element } />;
 	} );
 	return acc;
 }, BlockComponent );
+
+ExtendedBlockComponent.Save = elements.reduce( ( acc, element ) => {
+	acc[ element ] = forwardRef( ( props, ref ) => {
+		return (
+			<BlockSaveComponent { ...props } ref={ ref } tagName={ element } />
+		);
+	} );
+	return acc;
+}, BlockSaveComponent );
 
 export const Block = ExtendedBlockComponent;

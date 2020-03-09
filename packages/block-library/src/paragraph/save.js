@@ -10,6 +10,7 @@ import {
 	getColorClassName,
 	getFontSizeClass,
 	RichText,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -51,7 +52,7 @@ export default function save( { attributes } ) {
 
 	return (
 		<RichText.Content
-			tagName="p"
+			tagName={ Block.Save.p }
 			style={ styles }
 			className={ className ? className : undefined }
 			value={ content }
