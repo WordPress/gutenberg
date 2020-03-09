@@ -84,9 +84,12 @@ const license = {
 	type: 'input',
 	name: 'license',
 	message: 'The plugin license:',
-	filter( input ) {
-		return input || 'GPLv2 or later';
-	},
+};
+
+const licenseURI = {
+	type: 'input',
+	name: 'licenseURI',
+	message: 'The plugin license URI:',
 };
 
 const version = {
@@ -107,5 +110,6 @@ module.exports = {
 	category,
 	author,
 	license,
+	licenseURI,
 	version,
 };

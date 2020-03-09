@@ -9,6 +9,7 @@ const dashicon = 'smiley';
 const category = 'widgets';
 const author = 'The WordPress Contributors';
 const license = 'GPL-2.0-or-later';
+const licenseURI = 'https://www.gnu.org/licenses/gpl-2.0.html';
 const version = '0.1.0';
 
 const templates = {
@@ -23,6 +24,7 @@ const templates = {
 			category,
 			author,
 			license,
+			licenseURI,
 			version,
 		},
 		outputFiles: [
@@ -45,6 +47,7 @@ const templates = {
 			category,
 			author,
 			license,
+			licenseURI,
 			version,
 		},
 		outputFiles: [
