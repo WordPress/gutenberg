@@ -10,11 +10,11 @@ import {
 	getColorClassName,
 	getFontSizeClass,
 	RichText,
-	__experimentalGetLineHeightControlStyles as getLineHeightStyles,
-	__experimentalGetLineHeightControlClassName as getLineHeightClassName,
+	__experimentalWithLineHeight as withLineHeight,
 } from '@wordpress/block-editor';
+import { compose } from '@wordpress/compose';
 
-export default function save( { attributes } ) {
+function ParagraphSaveBlock( { attributes, className, style = {} } ) {
 	const {
 		align,
 		content,
@@ -28,9 +28,6 @@ export default function save( { attributes } ) {
 		direction,
 	} = attributes;
 
-	const lineHeightStyles = getLineHeightStyles( attributes );
-	const lineHeightClassName = getLineHeightClassName( attributes );
-
 	const textClass = getColorClassName( 'color', textColor );
 	const backgroundClass = getColorClassName(
 		'background-color',
@@ -38,7 +35,7 @@ export default function save( { attributes } ) {
 	);
 	const fontSizeClass = getFontSizeClass( fontSize );
 
-	const className = classnames(
+	const classes = classnames(
 		{
 			'has-text-color': textColor || customTextColor,
 			'has-background': backgroundColor || customBackgroundColor,
@@ -48,11 +45,11 @@ export default function save( { attributes } ) {
 			[ textClass ]: textClass,
 			[ backgroundClass ]: backgroundClass,
 		},
-		lineHeightClassName
+		className
 	);
 
 	const styles = {
-		...lineHeightStyles,
+		...style,
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 		color: textClass ? undefined : customTextColor,
 		fontSize: fontSizeClass ? undefined : customFontSize,
@@ -62,9 +59,13 @@ export default function save( { attributes } ) {
 		<RichText.Content
 			tagName="p"
 			style={ styles }
-			className={ className ? className : undefined }
+			className={ classes ? classes : undefined }
 			value={ content }
 			dir={ direction }
 		/>
 	);
 }
+
+const ParagraphSave = compose( [ withLineHeight() ] )( ParagraphSaveBlock );
+
+export default ParagraphSave;

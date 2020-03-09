@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
@@ -17,9 +12,8 @@ import {
 	withFontSizes,
 	__experimentalUseColors,
 	__experimentalBlock as Block,
+	__experimentalWithLineHeight as withLineHeight,
 	__experimentalLineHeightControl as LineHeightControl,
-	__experimentalGetLineHeightControlStyles as getLineHeightStyles,
-	__experimentalGetLineHeightControlClassName as getLineHeightClassName,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
@@ -83,11 +77,10 @@ function ParagraphBlock( {
 	onReplace,
 	setAttributes,
 	setFontSize,
+	className,
+	style,
 } ) {
 	const { align, content, dropCap, placeholder, direction } = attributes;
-
-	const lineHeightStyles = getLineHeightStyles( attributes );
-	const lineHeightClassName = getLineHeightClassName( attributes );
 
 	const ref = useRef();
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
@@ -115,14 +108,12 @@ function ParagraphBlock( {
 		[ fontSize.size ]
 	);
 
-	const className = classnames(
-		{
-			'has-drop-cap': dropCap,
-			[ `has-text-align-${ align }` ]: align,
-			[ fontSize.class ]: fontSize.class,
-		},
-		lineHeightClassName
-	);
+	const styles = {
+		...style,
+		fontSize: fontSize.size ? `${ fontSize.size }px` : undefined,
+		direction,
+		minHeight: dropCapMinimumHeight,
+	};
 
 	return (
 		<>
@@ -169,14 +160,7 @@ function ParagraphBlock( {
 						identifier="content"
 						tagName={ Block.p }
 						className={ className }
-						style={ {
-							...lineHeightStyles,
-							fontSize: fontSize.size
-								? fontSize.size + 'px'
-								: undefined,
-							direction,
-							minHeight: dropCapMinimumHeight,
-						} }
+						style={ styles }
 						value={ content }
 						onChange={ ( newContent ) =>
 							setAttributes( { content: newContent } )
@@ -216,8 +200,9 @@ function ParagraphBlock( {
 	);
 }
 
-const ParagraphEdit = compose( [ withFontSizes( 'fontSize' ) ] )(
-	ParagraphBlock
-);
+const ParagraphEdit = compose( [
+	withFontSizes( 'fontSize' ),
+	withLineHeight(),
+] )( ParagraphBlock );
 
 export default ParagraphEdit;

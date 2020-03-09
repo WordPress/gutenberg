@@ -36,8 +36,7 @@ export { default as InspectorControls } from './inspector-controls';
 export { default as __experimentalLinkControl } from './link-control';
 export {
 	default as __experimentalLineHeightControl,
-	getLineHeightControlStyles as __experimentalGetLineHeightControlStyles,
-	getLineHeightControlClassName as __experimentalGetLineHeightControlClassName,
+	withLineHeight as __experimentalWithLineHeight,
 } from './line-height-control';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
