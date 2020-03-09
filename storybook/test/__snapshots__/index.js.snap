@@ -3463,10 +3463,12 @@ input[type='number'].emotion-18 {
           <span
             aria-hidden={true}
             className="emotion-4 emotion-5"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-6 emotion-7"
+            disabled={false}
             style={
               Object {
                 "width": "4.545454545454546%",
@@ -3520,6 +3522,7 @@ input[type='number'].emotion-18 {
         <input
           aria-label="Custom Size"
           className="components-range-control__number emotion-18 emotion-153"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={12}
@@ -4920,6 +4923,7 @@ input[type='number'].emotion-34 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden="true"
@@ -4928,6 +4932,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark is-filled emotion-4 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "0%",
@@ -4949,6 +4954,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark is-filled emotion-4 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "10%",
@@ -4970,6 +4976,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark is-filled emotion-4 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "20%",
@@ -4991,6 +4998,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark emotion-16 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "80%",
@@ -5012,6 +5020,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark emotion-16 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "100%",
@@ -5034,6 +5043,7 @@ input[type='number'].emotion-34 {
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-26 emotion-27"
+            disabled={false}
             style={
               Object {
                 "width": "50%",
@@ -5056,6 +5066,7 @@ input[type='number'].emotion-34 {
         </span>
         <input
           className="components-range-control__number emotion-34 emotion-333"
+          disabled={false}
           inputMode="decimal"
           max={10}
           min={0}
@@ -5257,10 +5268,12 @@ input[type='number'].emotion-12 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "50%",
@@ -5285,6 +5298,7 @@ input[type='number'].emotion-12 {
         <input
           aria-label="Range Label"
           className="components-range-control__number emotion-12 emotion-113"
+          disabled={false}
           inputMode="decimal"
           max={10}
           min={0}
@@ -5533,10 +5547,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "0%",
@@ -5573,6 +5589,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={20}
         min={0}
@@ -5819,10 +5836,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -5858,6 +5877,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -5902,10 +5922,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -5941,6 +5963,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -5985,10 +6008,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -6024,6 +6049,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -6068,10 +6094,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -6107,6 +6135,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -6356,10 +6385,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -6396,6 +6427,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
@@ -6654,10 +6686,12 @@ input[type='number'].emotion-16 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -6712,6 +6746,7 @@ input[type='number'].emotion-16 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-16 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
@@ -6982,10 +7017,12 @@ input[type='number'].emotion-16 {
         <span
           aria-hidden={true}
           className="emotion-4 emotion-5"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-6 emotion-7"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -7022,6 +7059,7 @@ input[type='number'].emotion-16 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-16 emotion-153"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
@@ -7269,10 +7307,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "37.5%",
@@ -7309,6 +7349,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={10}
         min={2}
@@ -7570,10 +7611,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -7610,6 +7653,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
