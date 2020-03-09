@@ -34,7 +34,7 @@
 .edit-post-header__toolbar {
 	display: flex;
 	flex-grow: 1;
-	padding-left: $grid-unit-20;
+	padding-left: $grid-unit-30;
 }
 
 .edit-post-header__settings {
@@ -54,6 +54,7 @@
 		// Special dimensions for this button.
 		min-width: 32px;
 		height: 32px;
+		margin-right: $grid-unit-10;
 	}
 }
 
