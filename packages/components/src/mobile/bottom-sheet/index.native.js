@@ -17,7 +17,7 @@ import SafeArea from 'react-native-safe-area';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createContext } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
@@ -32,11 +32,15 @@ import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
+export const { Provider, Consumer } = createContext();
+
 class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
 		this.onScroll = this.onScroll.bind( this );
+		this.isScrolling = this.isScrolling.bind( this );
+		this.onShouldEnableScroll = this.onShouldEnableScroll.bind( this );
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
@@ -46,6 +50,8 @@ class BottomSheet extends Component {
 			bounces: false,
 			maxHeight: 0,
 			keyboardHeight: 0,
+			scrollEnabled: true,
+			isScrolling: false,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -163,6 +169,14 @@ class BottomSheet extends Component {
 		}
 	}
 
+	onShouldEnableScroll( value ) {
+		this.setState( { scrollEnabled: value } );
+	}
+
+	isScrolling( value ) {
+		this.setState( { isScrolling: value } );
+	}
+
 	render() {
 		const {
 			title = '',
@@ -178,7 +192,13 @@ class BottomSheet extends Component {
 			children,
 			...rest
 		} = this.props;
-		const { maxHeight, bounces, safeAreaBottomInset } = this.state;
+		const {
+			maxHeight,
+			bounces,
+			safeAreaBottomInset,
+			isScrolling,
+			scrollEnabled,
+		} = this.state;
 
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
@@ -232,9 +252,11 @@ class BottomSheet extends Component {
 				}
 				swipeDirection="down"
 				onMoveShouldSetResponder={
+					scrollEnabled &&
 					panResponder.panHandlers.onMoveShouldSetResponder
 				}
 				onMoveShouldSetResponderCapture={
+					scrollEnabled &&
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
 				onAccessibilityEscape={ onClose }
@@ -262,8 +284,17 @@ class BottomSheet extends Component {
 							hideHeader && styles.emptyHeader,
 							contentStyle,
 						] }
+						scrollEnabled={ scrollEnabled }
 					>
-						{ children }
+						<Provider
+							value={ {
+								shouldEnableBottomSheetScroll: this
+									.onShouldEnableScroll,
+								isBottomSheetScrolling: isScrolling,
+							} }
+						>
+							{ children }
+						</Provider>
 						<View style={ { height: safeAreaBottomInset } } />
 					</ScrollView>
 				</KeyboardAvoidingView>

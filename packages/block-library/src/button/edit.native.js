@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View, AccessibilityInfo, Platform, Clipboard } from 'react-native';
+import HsvColorPicker from 'react-native-hsv-color-picker';
 /**
  * WordPress dependencies
  */
@@ -18,10 +19,10 @@ import {
 	ToggleControl,
 	PanelBody,
 	RangeControl,
-	UnsupportedFooterControl,
 	ToolbarGroup,
 	ToolbarButton,
 	BottomSheet,
+	Consumer,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
@@ -56,6 +57,8 @@ class ButtonEdit extends Component {
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
+		this.onSatValPickerChange = this.onSatValPickerChange.bind( this );
+		this.onHuePickerChange = this.onHuePickerChange.bind( this );
 
 		// `isEditingURL` property is used to prevent from automatically pasting
 		// URL from clipboard while trying to clear `Button URL` field and then
@@ -69,6 +72,9 @@ class ButtonEdit extends Component {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
 			isButtonFocused,
+			hue: 0,
+			sat: 0.5,
+			val: 0.5,
 		};
 	}
 
@@ -278,6 +284,19 @@ class ButtonEdit extends Component {
 		this.richTextRef = richText;
 	}
 
+	onSatValPickerChange( { saturation, value } ) {
+		this.setState( {
+			sat: saturation,
+			val: value,
+		} );
+	}
+
+	onHuePickerChange( { hue } ) {
+		this.setState( {
+			hue,
+		} );
+	}
+
 	render() {
 		const {
 			attributes,
@@ -294,7 +313,14 @@ class ButtonEdit extends Component {
 			linkTarget,
 			rel,
 		} = attributes;
-		const { maxWidth, isLinkSheetVisible, isButtonFocused } = this.state;
+		const {
+			maxWidth,
+			isLinkSheetVisible,
+			isButtonFocused,
+			hue,
+			sat,
+			val,
+		} = this.state;
 
 		const borderRadiusValue =
 			borderRadius !== undefined
@@ -415,13 +441,58 @@ class ButtonEdit extends Component {
 					<PanelBody title={ __( 'Link Settings' ) }>
 						{ this.getLinkSettings( url, rel, linkTarget, true ) }
 					</PanelBody>
-					<PanelBody>
-						<UnsupportedFooterControl
-							label={ __(
-								'Button color settings are coming soon.'
-							) }
-							separatorType="none"
-						/>
+					<PanelBody title={ __( 'Color Settings' ) }>
+						<Consumer>
+							{ ( {
+								isBottomSheetScrolling,
+								shouldEnableBottomSheetScroll,
+							} ) => {
+								return (
+									<HsvColorPicker
+										huePickerHue={ hue }
+										onHuePickerDragMove={
+											this.onHuePickerChange
+										}
+										onHuePickerPress={
+											! isBottomSheetScrolling &&
+											this.onHuePickerChange
+										}
+										satValPickerHue={ hue }
+										satValPickerSaturation={ sat }
+										satValPickerValue={ val }
+										onSatValPickerDragMove={
+											this.onSatValPickerChange
+										}
+										onSatValPickerPress={
+											! isBottomSheetScrolling &&
+											this.onSatValPickerChange
+										}
+										onSatValPickerDragStart={ () =>
+											shouldEnableBottomSheetScroll(
+												false
+											)
+										}
+										onSatValPickerDragEnd={ () =>
+											shouldEnableBottomSheetScroll(
+												true
+											)
+										}
+										onHuePickerDragStart={ () =>
+											shouldEnableBottomSheetScroll(
+												false
+											)
+										}
+										onHuePickerDragEnd={ () =>
+											shouldEnableBottomSheetScroll(
+												true
+											)
+										}
+										ref={ this.colorPicker }
+										containerStyle={ { marginBottom: 20 } }
+									/>
+								);
+							} }
+						</Consumer>
 					</PanelBody>
 				</InspectorControls>
 			</View>
