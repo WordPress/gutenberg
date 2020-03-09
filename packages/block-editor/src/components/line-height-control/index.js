@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isUndefined } from 'lodash';
+import { isUndefined, isNaN } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -77,9 +77,11 @@ function useLineHeightState() {
 	const setLineHeight = ( value ) =>
 		setAttributes( { lineHeight: parseFloat( value ) } );
 
-	const value = isUndefined( lineHeight )
-		? undefined
-		: parseFloat( lineHeight );
+	let value = parseFloat( lineHeight );
+
+	if ( isNaN( value ) ) {
+		value = undefined;
+	}
 
 	return [ value, setLineHeight ];
 }
