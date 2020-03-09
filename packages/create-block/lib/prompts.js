@@ -96,9 +96,6 @@ const version = {
 	type: 'input',
 	name: 'author',
 	message: 'The plugin version:',
-	filter( input ) {
-		return input || '0.1.0';
-	},
 };
 
 module.exports = {
