@@ -19,7 +19,7 @@ const templates = {
 			slug: 'es5-example',
 			title: 'ES5 Example',
 			description:
-				'Example block written with ES5 standard and no JSX – no build step required.',
+				'Example block written with ES5 standard and no JSX – no build step required. This should be no more than 150 characters. No markup here.',
 			dashicon,
 			category,
 			author,
@@ -42,7 +42,7 @@ const templates = {
 			slug: 'esnext-example',
 			title: 'ESNext Example',
 			description:
-				'Example block written with ESNext standard and JSX support – build step required.',
+				'Example block written with ESNext standard and JSX support – build step required. This should be no more than 150 characters. No markup here.',
 			dashicon,
 			category,
 			author,
