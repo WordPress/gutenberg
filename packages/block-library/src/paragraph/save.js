@@ -9,11 +9,11 @@ import classnames from 'classnames';
 import {
 	getFontSizeClass,
 	RichText,
-	__experimentalGetLineHeightControlStyles as getLineHeightStyles,
-	__experimentalGetLineHeightControlClassName as getLineHeightClassName,
+	__experimentalWithLineHeight as withLineHeight,
 } from '@wordpress/block-editor';
+import { compose } from '@wordpress/compose';
 
-export default function save( { attributes } ) {
+function ParagraphSaveBlock( { attributes, className, style = {} } ) {
 	const {
 		align,
 		content,
@@ -23,21 +23,19 @@ export default function save( { attributes } ) {
 		direction,
 	} = attributes;
 
-	const lineHeightStyles = getLineHeightStyles( attributes );
-	const lineHeightClassName = getLineHeightClassName( attributes );
 	const fontSizeClass = getFontSizeClass( fontSize );
 
-	const className = classnames(
+	const classes = classnames(
 		{
 			'has-drop-cap': dropCap,
 			[ `has-text-align-${ align }` ]: align,
 			[ fontSizeClass ]: fontSizeClass,
 		},
-		lineHeightClassName
+		className
 	);
 
 	const styles = {
-		...lineHeightStyles,
+		...style,
 		fontSize: fontSizeClass ? undefined : customFontSize,
 	};
 
@@ -45,9 +43,13 @@ export default function save( { attributes } ) {
 		<RichText.Content
 			tagName="p"
 			style={ styles }
-			className={ className ? className : undefined }
+			className={ classes ? classes : undefined }
 			value={ content }
 			dir={ direction }
 		/>
 	);
 }
+
+const ParagraphSave = compose( [ withLineHeight() ] )( ParagraphSaveBlock );
+
+export default ParagraphSave;
