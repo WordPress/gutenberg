@@ -46,7 +46,9 @@
 			{ "docs/designers-developers/developers/backward-compatibility/meta-box.md": [] }
 		] },
 		{ "docs/designers-developers/developers/platform/README.md": [
-			{ "docs/designers-developers/developers/platform/custom-block-editor/README.md": [] }
+			{ "docs/designers-developers/developers/platform/custom-block-editor/README.md": [
+				{ "docs/designers-developers/developers/platform/custom-block-editor/tutorial.md": [] }
+			] }
 		] }
 	] },
 	{ "docs/designers-developers/designers/README.md": [
