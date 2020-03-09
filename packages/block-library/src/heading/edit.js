@@ -12,7 +12,7 @@ import HeadingToolbar from './heading-toolbar';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
+import { PanelBody, __experimentalText as Text } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentToolbar,
@@ -22,7 +22,7 @@ import {
 	__experimentalUseColors,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { useRef } from '@wordpress/element';
+import { useRef, Platform } from '@wordpress/element';
 
 function HeadingEdit( {
 	attributes,
@@ -54,17 +54,19 @@ function HeadingEdit( {
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
+					isCollapsed={ Platform.OS === 'web' }
 				/>
 				<AlignmentToolbar
 					value={ align }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { align: nextAlign } );
 					} }
+					isCollapsed={ Platform.OS === 'web' }
 				/>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading settings' ) }>
-					<p>{ __( 'Level' ) }</p>
+					<Text variant="label">{ __( 'Level' ) }</Text>
 					<HeadingToolbar
 						isCollapsed={ false }
 						minLevel={ 1 }
@@ -81,7 +83,9 @@ function HeadingEdit( {
 				<RichText
 					ref={ ref }
 					identifier="content"
-					tagName={ Block[ tagName ] }
+					tagName={
+						Platform.OS === 'web' ? Block[ tagName ] : tagName
+					}
 					value={ content }
 					onChange={ ( value ) =>
 						setAttributes( { content: value } )
@@ -103,6 +107,7 @@ function HeadingEdit( {
 						[ `has-text-align-${ align }` ]: align,
 					} ) }
 					placeholder={ placeholder || __( 'Write heading…' ) }
+					textAlign={ align }
 				/>
 			</TextColor>
 		</>
