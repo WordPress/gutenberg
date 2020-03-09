@@ -22,7 +22,6 @@ import { external, check } from '@wordpress/icons';
 
 const downArrow = (
 	<SVG
-		className="editor-post-preview__button-icon"
 		width="24"
 		height="24"
 		xmlns="http://www.w3.org/2000/svg"
@@ -43,17 +42,6 @@ export default function PreviewOptions( {
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
-
-	const translateDropdownButtonText = () => {
-		switch ( deviceType ) {
-			case 'Tablet':
-				return __( 'Tablet' );
-			case 'Mobile':
-				return __( 'Mobile' );
-			default:
-				return __( 'Desktop' );
-		}
-	};
 
 	const isSaveable = useSelect( ( select ) => {
 		return select( 'core/editor' ).isEditedPostSaveable();
@@ -78,7 +66,7 @@ export default function PreviewOptions( {
 					aria-expanded={ isOpen }
 					disabled={ ! isSaveable }
 				>
-					{ translateDropdownButtonText() }
+					{ __( 'Preview' ) }
 					{ downArrow }
 				</Button>
 			) }
