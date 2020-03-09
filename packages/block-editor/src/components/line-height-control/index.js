@@ -28,7 +28,8 @@ export default function LineHeightControl( props ) {
 	const handleOnChange = ( nextValue ) => {
 		// Set the next value as normal if lineHeight has been defined
 		if ( isLineHeightDefined( lineHeight ) ) {
-			return setLineHeight( parseFloat( nextValue ) );
+			setLineHeight( nextValue );
+			return;
 		}
 
 		// Otherwise...

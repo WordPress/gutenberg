@@ -23,7 +23,11 @@ export function useLineHeightState() {
 	const { lineHeight } = attributes;
 
 	const setLineHeight = ( value ) => {
-		setAttributes( { lineHeight: value } );
+		const nextValue = isLineHeightDefined( value )
+			? parseFloat( value )
+			: INITIAL_VALUE;
+
+		setAttributes( { lineHeight: nextValue } );
 	};
 
 	return [ lineHeight, setLineHeight ];
@@ -52,12 +56,10 @@ export function getLineHeightControlStyles( { lineHeight } = {} ) {
 		return {};
 	}
 
-	const value = parseFloat( lineHeight ) * 100;
-
 	// Using CSS variable to set the style. This reduces specifity, allowing for
 	// easier overrides, if needed.
 	return {
-		'--wp--core-paragraph--line-height': `${ value }%`,
+		'--wp--core-paragraph--line-height': `${ lineHeight }`,
 	};
 }
 
