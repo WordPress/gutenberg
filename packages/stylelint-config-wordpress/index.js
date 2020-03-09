@@ -3,10 +3,13 @@
 module.exports = {
 	extends: 'stylelint-config-recommended',
 	rules: {
-		'at-rule-empty-line-before': [ 'always', {
-			except: [ 'blockless-after-blockless' ],
-			ignore: [ 'after-comment' ],
-		} ],
+		'at-rule-empty-line-before': [
+			'always',
+			{
+				except: [ 'blockless-after-blockless' ],
+				ignore: [ 'after-comment' ],
+			},
+		],
 		'at-rule-name-case': 'lower',
 		'at-rule-name-space-after': 'always-single-line',
 		'at-rule-no-unknown': true,
@@ -18,14 +21,20 @@ module.exports = {
 		'color-hex-case': 'lower',
 		'color-hex-length': 'short',
 		'color-named': 'never',
-		'comment-empty-line-before': [ 'always', {
-			ignore: [ 'stylelint-commands' ],
-		} ],
+		'comment-empty-line-before': [
+			'always',
+			{
+				ignore: [ 'stylelint-commands' ],
+			},
+		],
 		'declaration-bang-space-after': 'never',
 		'declaration-bang-space-before': 'always',
-		'declaration-block-no-duplicate-properties': [ true, {
-			ignore: [ 'consecutive-duplicates' ],
-		} ],
+		'declaration-block-no-duplicate-properties': [
+			true,
+			{
+				ignore: [ 'consecutive-duplicates' ],
+			},
+		],
 		'declaration-block-semicolon-newline-after': 'always',
 		'declaration-block-semicolon-space-before': 'never',
 		'declaration-block-trailing-semicolon': 'always',
@@ -36,25 +45,36 @@ module.exports = {
 			'line-height': [ 'px' ],
 		},
 		'font-family-name-quotes': 'always-where-recommended',
-		'font-weight-notation': [ 'numeric', {
-			ignore: [ 'relative' ],
-		} ],
+		'font-weight-notation': [
+			'numeric',
+			{
+				ignore: [ 'relative' ],
+			},
+		],
 		'function-comma-space-after': 'always',
 		'function-comma-space-before': 'never',
 		'function-max-empty-lines': 1,
-		'function-name-case': [ 'lower', {
-			ignoreFunctions: [ '/^DXImageTransform.Microsoft.*$/' ],
-		} ],
+		'function-name-case': [
+			'lower',
+			{
+				ignoreFunctions: [ '/^DXImageTransform.Microsoft.*$/' ],
+			},
+		],
 		'function-parentheses-space-inside': 'never',
 		'function-url-quotes': 'never',
 		'function-whitespace-after': 'always',
 		indentation: 'tab',
 		'length-zero-no-unit': true,
 		'max-empty-lines': 2,
-		'max-line-length': [ 80, {
-			ignore: 'non-comments',
-			ignorePattern: [ '/(https?://[0-9,a-z]*.*)|(^description\\:.+)|(^tags\\:.+)/i' ],
-		} ],
+		'max-line-length': [
+			80,
+			{
+				ignore: 'non-comments',
+				ignorePattern: [
+					'/(https?://[0-9,a-z]*.*)|(^description\\:.+)|(^tags\\:.+)/i',
+				],
+			},
+		],
 		'media-feature-colon-space-after': 'always',
 		'media-feature-colon-space-before': 'never',
 		'media-feature-range-operator-space-after': 'always',
@@ -67,9 +87,12 @@ module.exports = {
 		'number-leading-zero': 'always',
 		'number-no-trailing-zeros': true,
 		'property-case': 'lower',
-		'rule-empty-line-before': [ 'always', {
-			ignore: [ 'after-comment' ],
-		} ],
+		'rule-empty-line-before': [
+			'always',
+			{
+				ignore: [ 'after-comment' ],
+			},
+		],
 		'selector-attribute-brackets-space-inside': 'never',
 		'selector-attribute-operator-space-after': 'never',
 		'selector-attribute-operator-space-before': 'never',
@@ -77,13 +100,15 @@ module.exports = {
 		'selector-class-pattern': [
 			'^([a-z][a-z0-9]*)(-[a-z0-9]+)*$',
 			{
-				message: 'Selector should use lowercase and separate words with hyphens (selector-class-pattern)',
+				message:
+					'Selector should use lowercase and separate words with hyphens (selector-class-pattern)',
 			},
 		],
 		'selector-id-pattern': [
 			'^([a-z][a-z0-9]*)(-[a-z0-9]+)*$',
 			{
-				message: 'Selector should use lowercase and separate words with hyphens (selector-id-pattern)',
+				message:
+					'Selector should use lowercase and separate words with hyphens (selector-id-pattern)',
 			},
 		],
 		'selector-combinator-space-after': 'always',

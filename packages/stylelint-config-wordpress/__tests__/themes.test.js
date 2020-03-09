@@ -16,14 +16,12 @@ describe( 'flags no warnings with valid css', () => {
 	} );
 
 	it( 'did not error', () => {
-		return result.then( ( data ) => (
-			expect( data.errored ).toBeFalsy()
-		) );
+		return result.then( ( data ) => expect( data.errored ).toBeFalsy() );
 	} );
 
 	it( 'flags no warnings', () => {
-		return result.then( ( data ) => (
+		return result.then( ( data ) =>
 			expect( data.results[ 0 ].warnings ).toHaveLength( 0 )
-		) );
+		);
 	} );
 } );

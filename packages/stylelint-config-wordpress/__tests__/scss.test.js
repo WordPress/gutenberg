@@ -17,15 +17,13 @@ describe( 'flags no warnings with valid scss', () => {
 	} );
 
 	it( 'did not error', () => {
-		return result.then( ( data ) => (
-			expect( data.errored ).toBeFalsy()
-		) );
+		return result.then( ( data ) => expect( data.errored ).toBeFalsy() );
 	} );
 
 	it( 'flags no warnings', () => {
-		return result.then( ( data ) => (
+		return result.then( ( data ) =>
 			expect( data.results[ 0 ].warnings ).toHaveLength( 0 )
-		) );
+		);
 	} );
 } );
 
@@ -40,15 +38,13 @@ describe( 'flags warnings with invalid scss', () => {
 	} );
 
 	it( 'did error', () => {
-		return result.then( ( data ) => (
-			expect( data.errored ).toBeTruthy()
-		) );
+		return result.then( ( data ) => expect( data.errored ).toBeTruthy() );
 	} );
 
 	it( 'flags correct number of warnings', () => {
-		return result.then( ( data ) => (
+		return result.then( ( data ) =>
 			expect( data.results[ 0 ].warnings ).toHaveLength( 8 )
-		) );
+		);
 	} );
 
 	// ToDo: Fix snapshot, as results differ between Node.js v10 & v12

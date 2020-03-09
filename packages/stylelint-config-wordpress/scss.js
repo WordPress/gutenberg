@@ -1,27 +1,27 @@
 'use strict';
 
 module.exports = {
-	extends: [
-		'./',
-		'stylelint-config-recommended-scss',
-	].map( require.resolve ),
+	extends: [ './', 'stylelint-config-recommended-scss' ].map(
+		require.resolve
+	),
 
-	plugins: [
-		'stylelint-scss',
-	],
+	plugins: [ 'stylelint-scss' ],
 
 	rules: {
-
 		// stylelint-config-wordpress css overrides
-		'at-rule-empty-line-before': [ 'always', {
-			except: [ 'blockless-after-blockless' ],
-			ignore: [ 'after-comment' ],
-			ignoreAtRules: [ 'else' ],
-		} ],
+		'at-rule-empty-line-before': [
+			'always',
+			{
+				except: [ 'blockless-after-blockless' ],
+				ignore: [ 'after-comment' ],
+				ignoreAtRules: [ 'else' ],
+			},
+		],
 
 		'block-opening-brace-space-before': 'always',
 		'block-closing-brace-newline-after': [
-			'always', {
+			'always',
+			{
 				ignoreAtRules: [ 'if', 'else' ],
 			},
 		],

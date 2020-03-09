@@ -3,7 +3,10 @@
 const fs = require( 'fs' ),
 	config = require( '../' ),
 	stylelint = require( 'stylelint' ),
-	validCss = fs.readFileSync( './__tests__/vendor-prefixes-valid.css', 'utf-8' );
+	validCss = fs.readFileSync(
+		'./__tests__/vendor-prefixes-valid.css',
+		'utf-8'
+	);
 
 describe( 'flags no warnings with valid vendor prefixes css', () => {
 	let result;
@@ -16,14 +19,12 @@ describe( 'flags no warnings with valid vendor prefixes css', () => {
 	} );
 
 	it( 'did not error', () => {
-		return result.then( ( data ) => (
-			expect( data.errored ).toBeFalsy()
-		) );
+		return result.then( ( data ) => expect( data.errored ).toBeFalsy() );
 	} );
 
 	it( 'flags no warnings', () => {
-		return result.then( ( data ) => (
+		return result.then( ( data ) =>
 			expect( data.results[ 0 ].warnings ).toHaveLength( 0 )
-		) );
+		);
 	} );
 } );
