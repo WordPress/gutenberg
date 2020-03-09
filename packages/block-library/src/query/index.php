@@ -16,21 +16,15 @@ class Blocks_Query {
  * Registers the `core/query` block on server.
 */
 function register_block_core_query() {
+	$path = __DIR__ . '/query/block.json';
+	$metadata = json_decode( file_get_contents( $path), true);
 	register_block_type(
-		'core/query',
-		array(
-			'attributes'      => array(
-				'className' => array(
-					'type' => 'string',
-				),
-				'criteria'  => array(
-					'type'    => 'object',
-					'default' => array(
-						'perPage' => 3,
-					),
-				),
-			),
-			'render_callback' => 'render_block_core_query',
+		$metadata['name'],
+		array_merge(
+			$metadata,
+			array(
+				'render_callback' => 'render_block_core_query',
+			)
 		)
 	);
 }

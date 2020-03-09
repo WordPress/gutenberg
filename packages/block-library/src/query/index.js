@@ -31,37 +31,8 @@ export const icon = (
 export const settings = {
 	title,
 	icon,
-	category: 'layout',
 	keywords: [],
 	description: __( 'A collection of posts.' ),
-	attributes: {
-		className: {
-			type: 'string',
-		},
-		criteria: {
-			type: 'object',
-			default: {
-				per_page: 3,
-				offset: 0,
-				tags: [],
-				categories: [],
-				author: [],
-				specificPosts: [],
-			},
-		},
-		blocks: {
-			type: 'array',
-			default: [
-				{
-					isValid: true,
-					clientId: null,
-					name: 'post-title',
-					attributes: {},
-					innerBlocks: [],
-				},
-			],
-		},
-	},
 	supports: {
 		html: false,
 		align: false,

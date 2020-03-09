@@ -1,4 +1,32 @@
 {
 	"name": "core/query",
-	"category": "layout"
+	"category": "layout",
+	"attributes": {
+		"className": {
+			"type": "string"
+		},
+		"criteria": {
+			"type": "object",
+			"default": {
+				"per_page": 3,
+				"offset": 0,
+				"tags": [],
+				"categories": [],
+				"author": [],
+				"specificPosts": []
+			}
+		},
+		"blocks": {
+			"type": "array",
+			"default": [
+				{
+					"isValid": true,
+					"clientId": null,
+					"name": "post-title",
+					"attributes": {},
+					"innerBlocks": []
+				}
+			]
+		}
+	}
 }

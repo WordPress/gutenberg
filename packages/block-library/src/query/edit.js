@@ -111,12 +111,12 @@ class Edit extends Component {
 			postList,
 			query,
 			setAttributes,
+			settings,
 		} = this.props;
 
 		const { criteria } = attributes;
 
 		const { editingPost, blocksTree } = this.state;
-		const settings = {};
 		const classes = classNames(
 			className,
 			editingPost ? 'is-editing' : ''
@@ -232,6 +232,7 @@ export default compose(
 				'post',
 				queryCriteria
 			),
+			settings: select( 'core/block-editor' ).getSettings(),
 		};
 	} )
 )( Edit );
