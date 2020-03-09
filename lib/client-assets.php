@@ -649,9 +649,11 @@ function gutenberg_load_block_pattern( $name ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_settings_block_patterns( $settings ) {
-	$block_patterns = [
-		gutenberg_load_block_pattern( 'text-two-columns' ),
-		gutenberg_load_block_pattern( 'cover-abc' ),
+	$block_patterns                          = [
+		gutenberg_load_block_pattern( 'teams' ),
+		gutenberg_load_block_pattern( 'testimonial' ),
+		gutenberg_load_block_pattern( 'columns4-footer' ),
+		gutenberg_load_block_pattern( 'natural-columns' ),
 	];
 	$settings['__experimentalBlockPatterns'] = $block_patterns;
 	return $settings;
