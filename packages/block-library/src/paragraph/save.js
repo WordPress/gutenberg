@@ -10,6 +10,8 @@ import {
 	getColorClassName,
 	getFontSizeClass,
 	RichText,
+	__experimentalGetLineHeightControlStyles as getLineHeightStyles,
+	__experimentalGetLineHeightControlClassName as getLineHeightClassName,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -26,6 +28,9 @@ export default function save( { attributes } ) {
 		direction,
 	} = attributes;
 
+	const lineHeightStyles = getLineHeightStyles( attributes );
+	const lineHeightClassName = getLineHeightClassName( attributes );
+
 	const textClass = getColorClassName( 'color', textColor );
 	const backgroundClass = getColorClassName(
 		'background-color',
@@ -33,17 +38,21 @@ export default function save( { attributes } ) {
 	);
 	const fontSizeClass = getFontSizeClass( fontSize );
 
-	const className = classnames( {
-		'has-text-color': textColor || customTextColor,
-		'has-background': backgroundColor || customBackgroundColor,
-		'has-drop-cap': dropCap,
-		[ `has-text-align-${ align }` ]: align,
-		[ fontSizeClass ]: fontSizeClass,
-		[ textClass ]: textClass,
-		[ backgroundClass ]: backgroundClass,
-	} );
+	const className = classnames(
+		{
+			'has-text-color': textColor || customTextColor,
+			'has-background': backgroundColor || customBackgroundColor,
+			'has-drop-cap': dropCap,
+			[ `has-text-align-${ align }` ]: align,
+			[ fontSizeClass ]: fontSizeClass,
+			[ textClass ]: textClass,
+			[ backgroundClass ]: backgroundClass,
+		},
+		lineHeightClassName
+	);
 
 	const styles = {
+		...lineHeightStyles,
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 		color: textClass ? undefined : customTextColor,
 		fontSize: fontSizeClass ? undefined : customFontSize,

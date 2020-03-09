@@ -28,6 +28,10 @@
 	font-style: normal;
 }
 
+p.has-line-height {
+	line-height: var(--wp--core-paragraph--line-height, inherit);
+}
+
 p.has-background {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }

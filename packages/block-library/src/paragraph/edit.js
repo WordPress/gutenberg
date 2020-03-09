@@ -17,6 +17,9 @@ import {
 	withFontSizes,
 	__experimentalUseColors,
 	__experimentalBlock as Block,
+	__experimentalLineHeightControl as LineHeightControl,
+	__experimentalGetLineHeightControlStyles as getLineHeightStyles,
+	__experimentalGetLineHeightControlClassName as getLineHeightClassName,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
@@ -83,6 +86,9 @@ function ParagraphBlock( {
 } ) {
 	const { align, content, dropCap, placeholder, direction } = attributes;
 
+	const lineHeightStyles = getLineHeightStyles( attributes );
+	const lineHeightClassName = getLineHeightClassName( attributes );
+
 	const ref = useRef();
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
 		fontSize.size,
@@ -109,6 +115,15 @@ function ParagraphBlock( {
 		[ fontSize.size ]
 	);
 
+	const className = classnames(
+		{
+			'has-drop-cap': dropCap,
+			[ `has-text-align-${ align }` ]: align,
+			[ fontSize.class ]: fontSize.class,
+		},
+		lineHeightClassName
+	);
+
 	return (
 		<>
 			<BlockControls>
@@ -131,6 +146,7 @@ function ParagraphBlock( {
 						value={ fontSize.size }
 						onChange={ setFontSize }
 					/>
+					<LineHeightControl />
 					<ToggleControl
 						label={ __( 'Drop cap' ) }
 						checked={ !! dropCap }
@@ -152,12 +168,9 @@ function ParagraphBlock( {
 						ref={ ref }
 						identifier="content"
 						tagName={ Block.p }
-						className={ classnames( {
-							'has-drop-cap': dropCap,
-							[ `has-text-align-${ align }` ]: align,
-							[ fontSize.class ]: fontSize.class,
-						} ) }
+						className={ className }
 						style={ {
+							...lineHeightStyles,
 							fontSize: fontSize.size
 								? fontSize.size + 'px'
 								: undefined,

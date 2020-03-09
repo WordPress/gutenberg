@@ -33,12 +33,18 @@
 		"fontSize": {
 			"type": "string"
 		},
+		"lineHeight": {
+			"type": "number"
+		},
 		"customFontSize": {
 			"type": "number"
 		},
 		"direction": {
 			"type": "string",
-			"enum": [ "ltr", "rtl" ]
+			"enum": [
+				"ltr",
+				"rtl"
+			]
 		}
 	}
 }
