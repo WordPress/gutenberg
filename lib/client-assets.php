@@ -651,6 +651,7 @@ function gutenberg_load_block_pattern( $name ) {
 function gutenberg_extend_settings_block_patterns( $settings ) {
 	$block_patterns                          = [
 		gutenberg_load_block_pattern( 'text-two-columns' ),
+		gutenberg_load_block_pattern( 'two-buttons' ),
 		gutenberg_load_block_pattern( 'cover-abc' ),
 	];
 	$settings['__experimentalBlockPatterns'] = $block_patterns;
