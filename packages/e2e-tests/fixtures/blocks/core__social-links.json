@@ -12,7 +12,7 @@
                 "attributes": {
                     "url": "https://mastodon.social/@marcuskaz",
                     "service": "mastodon",
-					"opensInNewTab": false
+                    "opensInNewTab": false
                 },
                 "innerBlocks": [],
                 "originalContent": ""

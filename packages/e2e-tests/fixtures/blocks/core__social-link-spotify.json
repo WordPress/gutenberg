@@ -4,7 +4,7 @@
         "name": "core/social-link",
         "isValid": true,
         "attributes": {
-			"opensInNewTab": false,
+            "opensInNewTab": false,
             "url": "https://example.com/",
             "service": "spotify"
         },
