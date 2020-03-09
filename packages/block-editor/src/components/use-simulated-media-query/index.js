@@ -8,12 +8,12 @@ import { match } from 'css-mediaquery';
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
+import { getProtocol, getAuthority } from '@wordpress/url';
 
 const ENABLED_MEDIA_QUERY = '(min-width:0px)';
 const DISABLED_MEDIA_QUERY = '(min-width:999999px)';
 
 const VALID_MEDIA_QUERY_REGEX = /\((min|max)-width:[^\(]*?\)/g;
-const URL_REGEX = /(http:|https:)?\/\/([\w.:-]+)?\/?/;
 
 function getStyleSheetsThatMatchHostname() {
 	if ( typeof window === 'undefined' ) {
@@ -26,12 +26,9 @@ function getStyleSheetsThatMatchHostname() {
 			if ( ! styleSheet.href ) {
 				return false;
 			}
-			const matcheableUrl = styleSheet.href.match( URL_REGEX );
 			return (
-				matcheableUrl &&
-				matcheableUrl.length > 2 &&
-				matcheableUrl[ 1 ] === window.location.protocol &&
-				matcheableUrl[ 2 ] === window.location.host
+				getProtocol( styleSheet.href ) === window.location.protocol &&
+				getAuthority( styleSheet.href ) === window.location.host
 			);
 		}
 	);
