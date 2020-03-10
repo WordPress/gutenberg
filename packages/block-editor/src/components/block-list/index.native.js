@@ -46,6 +46,7 @@ export class BlockList extends Component {
 		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind(
 			this
 		);
+		this.cellRenderer = this.cellRenderer.bind( this );
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -137,6 +138,7 @@ export class BlockList extends Component {
 					getItemLayout={(data, index) => {
 						return { length: 0, offset: 0, index };
 					}}
+					CellRendererComponent={ this.cellRenderer }
 				/>
 
 				{ this.shouldShowInnerBlockAppender() && (
@@ -148,6 +150,28 @@ export class BlockList extends Component {
 						/>
 					</View>
 				) }
+			</View>
+		);
+	}
+
+	cellRenderer( { children, index, item } ) {
+		const { isBlockSelected, getBlockHierarchyRootClientId, getBlock } = this.props;
+
+		const isSelected = isBlockSelected( item );
+		const rootBlockId = getBlockHierarchyRootClientId( item );
+		const rootBlock = getBlock( rootBlockId );
+		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
+
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
+		const firstChildAdjustsForFloatingToolbar = hasRootInnerBlocks && isBlockSelected( rootBlock.innerBlocks[0].clientId );
+		const adjustsForFloatingToolbar = showFloatingToolbar || firstChildAdjustsForFloatingToolbar;
+
+		return (
+			<View
+				zIndex={ index }
+				hitSlop={{top: (adjustsForFloatingToolbar?44:0)}} 
+			>
+				{ children }
 			</View>
 		);
 	}
@@ -208,6 +232,9 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSettings,
+			isBlockSelected, 
+			getBlockHierarchyRootClientId, 
+			getBlock,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -246,6 +273,9 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
+			isBlockSelected, 
+			getBlockHierarchyRootClientId, 
+			getBlock,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
