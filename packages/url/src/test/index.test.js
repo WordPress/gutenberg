@@ -28,7 +28,7 @@ import {
 	filterURLForDisplay,
 	cleanForSlug,
 } from '../';
-import wptData from './fixtures/wpt-data.json';
+import wptData from './fixtures/wpt-data';
 
 describe( 'isURL', () => {
 	it.each( wptData.map( ( { input, failure } ) => [ input, !! failure ] ) )(
