@@ -182,7 +182,7 @@ function register_block_core_latest_posts() {
 					'type' => 'string',
 				),
 				'categories'              => array(
-					'type' => 'string',
+					'type' => 'array',
 				),
 				'postsToShow'             => array(
 					'type'    => 'number',

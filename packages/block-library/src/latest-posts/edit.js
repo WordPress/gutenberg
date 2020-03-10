@@ -18,6 +18,7 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarGroup,
+	FormTokenField,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -96,6 +97,23 @@ class LatestPostsEdit extends Component {
 			featuredImageSizeWidth,
 			featuredImageSizeHeight,
 		} = attributes;
+		var suggestions = categoriesList.reduce(
+			( accumulator, category ) => ( {
+				...accumulator,
+				[ category.name ]: category,
+			} ),
+			{}
+		);
+
+		const handleOnChange = ( tokens ) => {
+			// Categories that are already will be objects, while new additions will be strings (the name).
+			// allValues nomalizes the array so that they are all objects.
+			const allValues = tokens.map( ( token ) =>
+				typeof token === 'string' ? suggestions[ token ] : token
+			);
+
+			setAttributes( { categories: allValues } );
+		};
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -225,6 +243,17 @@ class LatestPostsEdit extends Component {
 						onNumberOfItemsChange={ ( value ) =>
 							setAttributes( { postsToShow: value } )
 						}
+					/>
+					<FormTokenField
+						value={
+							categories &&
+							categories.map( ( item ) => ( {
+								id: item.id,
+								value: item.name,
+							} ) )
+						}
+						suggestions={ Object.keys( suggestions ) }
+						onChange={ handleOnChange }
 					/>
 					{ postLayout === 'grid' && (
 						<RangeControl
