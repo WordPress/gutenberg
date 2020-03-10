@@ -272,6 +272,7 @@ function Navigation( {
 							templateInsertUpdatesSelection={ false }
 							__experimentalMoverDirection={ 'horizontal' }
 							__experimentalTagName="ul"
+							__experimentalAppenderTagName="li"
 							__experimentalPassedProps={ {
 								className: 'wp-block-navigation__container',
 							} }
