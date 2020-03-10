@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import {
 	getLineHeightControlStyles,
 	getLineHeightControlClassName,
-} from './index';
+} from './utils';
 
 /**
  * Higher-order component that provides a Block's Edit/Save component with
@@ -24,12 +24,10 @@ export default function withLineHeight() {
 			...props
 		} ) {
 			const { lineHeight } = attributes;
-			const lineHeightStyles = getLineHeightControlStyles( {
-				lineHeight,
-			} );
-			const lineHeightClassName = getLineHeightControlClassName( {
-				lineHeight,
-			} );
+			const lineHeightStyles = getLineHeightControlStyles( lineHeight );
+			const lineHeightClassName = getLineHeightControlClassName(
+				lineHeight
+			);
 
 			const classes = classnames( lineHeightClassName, className );
 			const styles = { ...style, ...lineHeightStyles };

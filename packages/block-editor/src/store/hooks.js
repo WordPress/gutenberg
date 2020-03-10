@@ -57,7 +57,7 @@ export function useBlockAttributes() {
 /**
  * Retrieves the attributes and setAttributes callback from the selected block.
  *
- * @return {Array<Object, Function>} [attributes, setAttributes]
+ * @return {Array<Object, Function>} [attributes, setAttributes] for a block.
  */
 export function useBlockEditProps() {
 	const attributes = useBlockAttributes();
