@@ -14,13 +14,11 @@ In order to access the SlotFills, we need to do four things:
 3. Define a method to render our changes. Our changes/additions will be wrapped in the SlotFill component we imported.
 4. Register the plugin.
 
-
-
 Here is an example using the `PluginPostStatusInfo` slotFill:
 
 ```js
-const { registerPlugin } = wp.plugins;
-const { PluginPostStatusInfo } = wp.editPost;
+import { registerPlugin } from '@wordpress/plugins';
+import { PluginPostStatusInfo } from '@wordpress/edit-post';
 
 const PluginPostStatusInfoTest = () => (
 	<PluginPostStatusInfo>
