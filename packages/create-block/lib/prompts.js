@@ -77,25 +77,25 @@ const author = {
 	type: 'input',
 	name: 'author',
 	message:
-		"The author name — this should be a list of wordpress.org user id's:",
+		'The list of contributors containing only WordPress.org usernames (optional):',
 };
 
 const license = {
 	type: 'input',
 	name: 'license',
-	message: 'The plugin license:',
+	message: 'The plugin license (optional):',
 };
 
 const licenseURI = {
 	type: 'input',
 	name: 'licenseURI',
-	message: 'The plugin license URI:',
+	message: 'The plugin license URI (optional):',
 };
 
 const version = {
 	type: 'input',
 	name: 'version',
-	message: 'The plugin version:',
+	message: 'The plugin version (optional):',
 };
 
 module.exports = {
