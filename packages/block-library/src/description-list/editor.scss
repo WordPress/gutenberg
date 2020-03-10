@@ -1,0 +1,13 @@
+// Undo default editor styles.
+.editor-styles-wrapper .block-editor-block-list__block {
+	&[data-type="core/description-list"],
+	&[data-type="core/description-term"],
+	&[data-type="core/description-details"] {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
+	&[data-type="core/description-details"] {
+		margin-inline-start: 40px;
+	}
+}

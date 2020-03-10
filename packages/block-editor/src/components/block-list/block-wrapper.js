@@ -231,6 +231,9 @@ const elements = [
 	'ol',
 	'ul',
 	'figure',
+	'dl',
+	'dt',
+	'dd',
 ];
 
 const ExtendedBlockComponent = elements.reduce( ( acc, element ) => {

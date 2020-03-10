@@ -30,6 +30,9 @@ import * as code from './code';
 import * as columns from './columns';
 import * as column from './column';
 import * as cover from './cover';
+import * as descriptionList from './description-list';
+import * as descriptionTerm from './description-term';
+import * as descriptionDetails from './description-details';
 import * as embed from './embed';
 import * as file from './file';
 import * as html from './html';
@@ -125,6 +128,9 @@ export const registerCoreBlocks = () => {
 		columns,
 		column,
 		cover,
+		descriptionList,
+		descriptionTerm,
+		descriptionDetails,
 		embed,
 		...embed.common,
 		...embed.others,
