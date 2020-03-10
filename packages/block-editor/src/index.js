@@ -15,5 +15,3 @@ export * from './components';
 export * from './utils';
 export { storeConfig } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';
-
-export { useBlockEditProps as __experimentalUseBlockEditProps } from './store/hooks';
