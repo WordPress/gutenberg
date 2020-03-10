@@ -134,6 +134,9 @@ export class BlockList extends Component {
 					ListFooterComponent={
 						! isReadOnly && withFooter && this.renderBlockListFooter
 					}
+					getItemLayout={(data, index) => {
+						return { length: 0, offset: 0, index };
+					}}
 				/>
 
 				{ this.shouldShowInnerBlockAppender() && (
