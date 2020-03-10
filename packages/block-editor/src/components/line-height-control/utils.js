@@ -6,7 +6,7 @@ import { isUndefined } from 'lodash';
 /**
  * Internal dependencies
  */
-import { __experimentalUseBlockEditProps as useBlockEditProps } from '../../index';
+import { __experimentalUseBlockEditProps as useBlockEditProps } from '../../store';
 
 export const BASE_DEFAULT_VALUE = 1.5;
 export const INITIAL_VALUE = '';
