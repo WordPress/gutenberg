@@ -94,7 +94,7 @@ const licenseURI = {
 
 const version = {
 	type: 'input',
-	name: 'author',
+	name: 'version',
 	message: 'The plugin version:',
 };
 
