@@ -26,6 +26,7 @@ export const settings = {
 	supports: {
 		reusable: false,
 		html: false,
+		lightBlockWrapper: true,
 	},
 
 	__experimentalLabel: ( { label } ) => label,
