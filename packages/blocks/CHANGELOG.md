@@ -2,7 +2,7 @@
 
 ### New Feature
 
-- Blocks can now be registered with an `allowDefaultStyle` setting, allowing the default style picker to be removed.
+- Blocks can now be registered with an `defaultStyle` flag in the `supports` setting, allowing the default style picker to be removed.
 
 ## 6.4.0 (2019-08-05)
 
