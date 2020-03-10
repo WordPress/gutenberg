@@ -39,3 +39,21 @@
 .placeholderTextColor {
 	color: rgba($color: $white, $alpha: 0.43);
 }
+
+.bottomSheetColorsHeader {
+	flex-direction: row;
+	align-items: center;
+}
+
+.bottomSheetBackButton {
+	flex-direction: row;
+	align-items: center;
+	z-index: 2;
+}
+
+.bottomSheetHeaderTitle {
+	position: absolute;
+	left: 0;
+	right: 0;
+	text-align: center;
+}

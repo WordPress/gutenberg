@@ -169,3 +169,13 @@
 	font-size: $text-editor-font-size;
 	color: $gray;
 }
+
+// Color Cell
+
+.colorCircle {
+	width: 30px;
+	height: 30px;
+	border-radius: 15px;
+	border-color: $gray;
+	border-width: $border-width;
+}

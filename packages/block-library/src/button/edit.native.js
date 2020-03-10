@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import { View, AccessibilityInfo, Platform, Clipboard } from 'react-native';
+import {
+	View,
+	AccessibilityInfo,
+	Platform,
+	Clipboard,
+	TouchableWithoutFeedback,
+	Text,
+} from 'react-native';
 import HsvColorPicker from 'react-native-hsv-color-picker';
 /**
  * WordPress dependencies
@@ -23,11 +30,12 @@ import {
 	ToolbarButton,
 	BottomSheet,
 	BottomSheetConsumer,
+	ColorControl,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { link, external } from '@wordpress/icons';
+import { link, external, Icon, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -59,6 +67,9 @@ class ButtonEdit extends Component {
 		this.setRef = this.setRef.bind( this );
 		this.onSatValPickerChange = this.onSatValPickerChange.bind( this );
 		this.onHuePickerChange = this.onHuePickerChange.bind( this );
+		this.changeBottomSheetContent = this.changeBottomSheetContent.bind(
+			this
+		);
 
 		// `isEditingURL` property is used to prevent from automatically pasting
 		// URL from clipboard while trying to clear `Button URL` field and then
@@ -75,6 +86,8 @@ class ButtonEdit extends Component {
 			hue: 0,
 			sat: 0.5,
 			val: 0.5,
+			screen: 'Settings',
+			segment: 'Presets',
 		};
 	}
 
@@ -297,6 +310,12 @@ class ButtonEdit extends Component {
 		} );
 	}
 
+	changeBottomSheetContent( onChangeContentWithOpacity, destination ) {
+		onChangeContentWithOpacity( () =>
+			this.setState( { screen: destination } )
+		);
+	}
+
 	render() {
 		const {
 			attributes,
@@ -320,6 +339,7 @@ class ButtonEdit extends Component {
 			hue,
 			sat,
 			val,
+			screen,
 		} = this.state;
 
 		const borderRadiusValue =
@@ -428,26 +448,105 @@ class ButtonEdit extends Component {
 				</BottomSheet>
 
 				<InspectorControls>
-					<PanelBody title={ __( 'Border Settings' ) }>
-						<RangeControl
-							label={ __( 'Border Radius' ) }
-							minimumValue={ MIN_BORDER_RADIUS_VALUE }
-							maximumValue={ MAX_BORDER_RADIUS_VALUE }
-							value={ borderRadiusValue }
-							onChange={ this.onChangeBorderRadius }
-							separatorType="none"
-						/>
-					</PanelBody>
-					<PanelBody title={ __( 'Link Settings' ) }>
-						{ this.getLinkSettings( url, rel, linkTarget, true ) }
-					</PanelBody>
-					<PanelBody title={ __( 'Color Settings' ) }>
-						<BottomSheetConsumer>
-							{ ( {
-								isBottomSheetScrolling = false,
-								shouldEnableBottomSheetScroll,
-							} ) => {
+					<BottomSheetConsumer>
+						{ ( {
+							isBottomSheetScrolling,
+							shouldEnableBottomSheetScroll,
+							onChangeContentWithOpacity,
+						} ) => {
+							if ( screen === 'Settings' ) {
 								return (
+									<View>
+										<PanelBody
+											title={ __( 'Border Settings' ) }
+										>
+											<RangeControl
+												label={ __( 'Border Radius' ) }
+												minimumValue={
+													MIN_BORDER_RADIUS_VALUE
+												}
+												maximumValue={
+													MAX_BORDER_RADIUS_VALUE
+												}
+												value={ borderRadiusValue }
+												onChange={
+													this.onChangeBorderRadius
+												}
+												separatorType="none"
+											/>
+										</PanelBody>
+										<PanelBody
+											title={ __( 'Link Settings' ) }
+										>
+											{ this.getLinkSettings(
+												url,
+												rel,
+												linkTarget,
+												true
+											) }
+										</PanelBody>
+										<PanelBody
+											title={ __( 'Color Settings' ) }
+										>
+											<ColorControl
+												onPress={ () => {
+													this.changeBottomSheetContent(
+														onChangeContentWithOpacity,
+														'Background'
+													);
+												} }
+												label={ __( 'Background' ) }
+												color={ backgroundColor }
+												separatorType="fullWidth"
+											/>
+											<ColorControl
+												onPress={ () => {
+													this.changeBottomSheetContent(
+														onChangeContentWithOpacity,
+														'Text'
+													);
+												} }
+												label={ __( 'Text' ) }
+												color={
+													textColor.color || '#fff'
+												}
+												separatorType="none"
+											/>
+										</PanelBody>
+									</View>
+								);
+							}
+							return (
+								<View>
+									<View
+										style={ styles.bottomSheetColorsHeader }
+									>
+										<TouchableWithoutFeedback
+											onPress={ () => {
+												this.changeBottomSheetContent(
+													onChangeContentWithOpacity,
+													'Settings'
+												);
+											} }
+											label={ __( 'Background' ) }
+										>
+											<View
+												style={
+													styles.bottomSheetBackButton
+												}
+											>
+												<Icon icon={ chevronLeft } />
+												<Text>Back</Text>
+											</View>
+										</TouchableWithoutFeedback>
+										<Text
+											style={
+												styles.bottomSheetHeaderTitle
+											}
+										>
+											{ screen }
+										</Text>
+									</View>
 									<HsvColorPicker
 										huePickerHue={ hue }
 										onHuePickerDragMove={
@@ -490,10 +589,10 @@ class ButtonEdit extends Component {
 										ref={ this.colorPicker }
 										containerStyle={ { marginBottom: 20 } }
 									/>
-								);
-							} }
-						</BottomSheetConsumer>
-					</PanelBody>
+								</View>
+							);
+						} }
+					</BottomSheetConsumer>
 				</InspectorControls>
 			</View>
 		);
