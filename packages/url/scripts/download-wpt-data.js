@@ -20,14 +20,14 @@ const DATA_URL =
 	'https://raw.githubusercontent.com/web-platform-tests/wpt/master/url/resources/urltestdata.json';
 
 /**
- * Items to exclude by input. Ideally this should be empty, but are necessary
- * by non-spec-conformance of various platform implementations. For example,
- * "#x" parse result is different in Node.js implementation of URL constructor
- * than it is in the browser.
+ * Items to exclude from the default test data, where the test case relies on
+ * an explicit `'about:blank'` base parameter provided to the constructor. The
+ * test data as given does not otherwise allow for distinction between a null
+ * base and base of `'about:blank'`.
  *
  * @type {string[]}
  */
-const INPUT_EXCEPTIONS = [ '#x' ];
+const INPUT_EXCEPTIONS_ACTUAL_ABOUT_BLANK_BASE = [ '#x' ];
 
 /**
  * Given a URL, returns promise resolving to the downloaded URL contents parsed
@@ -80,7 +80,8 @@ const hasBase = ( item ) => item.base !== 'about:blank';
  *
  * @return {boolean} Whether data item is exception.
  */
-const isException = ( item ) => INPUT_EXCEPTIONS.includes( item.input );
+const isException = ( item ) =>
+	INPUT_EXCEPTIONS_ACTUAL_ABOUT_BLANK_BASE.includes( item.input );
 
 /**
  * Downloads data and writes output file.
