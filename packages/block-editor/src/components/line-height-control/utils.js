@@ -17,12 +17,13 @@ export const STEP = 0.1;
  *
  * @return {Array<string|undefined, Function>} [lineHeight, setLineHeight] from the block's edit props.
  */
-export function useLineHeightState() {
+export function useLineHeightControlState() {
 	const [ attributes, setAttributes ] = useBlockEditProps();
 
 	const { lineHeight } = attributes;
 
 	const setLineHeight = ( value ) => {
+		// Value needs to be either a (float) number or empty string
 		const nextValue = isLineHeightDefined( value )
 			? parseFloat( value )
 			: INITIAL_VALUE;
@@ -47,11 +48,11 @@ export function isLineHeightDefined( lineHeight ) {
 /**
  * Generates the "inline" lineHeight attribute styles, if defined.
  *
- * @param {Object} attributes Attributes from a block.
+ * @param {number|string} lineHeight The line-height value to stylize.
  *
  * @return {Object} Style properties with the lineHeight attribute, if defined.
  */
-export function getLineHeightControlStyles( { lineHeight } = {} ) {
+export function getLineHeightControlStyles( lineHeight ) {
 	if ( ! isLineHeightDefined( lineHeight ) ) {
 		return {};
 	}
@@ -66,11 +67,11 @@ export function getLineHeightControlStyles( { lineHeight } = {} ) {
 /**
  * Generates the CSS className representing the  lineHeight attribute styles, if defined.
  *
- * @param {Object} attributes Attributes from a block.
+ * @param {number|string} lineHeight The line-height value render to className.
  *
  * @return {string} CSS className of the lineHeight attribute, if defined.
  */
-export function getLineHeightControlClassName( { lineHeight } = {} ) {
+export function getLineHeightControlClassName( lineHeight ) {
 	if ( ! isLineHeightDefined( lineHeight ) ) {
 		return '';
 	}

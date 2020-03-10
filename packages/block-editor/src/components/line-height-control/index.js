@@ -11,22 +11,18 @@ import {
 	BASE_DEFAULT_VALUE,
 	INITIAL_VALUE,
 	STEP,
-	useLineHeightState,
+	useLineHeightControlState,
 	isLineHeightDefined,
 } from './utils';
 import { LineHeightControlWrapper } from './styles';
 
-export {
-	getLineHeightControlStyles,
-	getLineHeightControlClassName,
-} from './utils';
 export { default as withLineHeight } from './with-line-height';
 
 export default function LineHeightControl( props ) {
-	const [ lineHeight, setLineHeight ] = useLineHeightState();
+	const [ lineHeight, setLineHeight ] = useLineHeightControlState();
 
 	const handleOnChange = ( nextValue ) => {
-		// Set the next value as normal if lineHeight has been defined
+		// Set the next value without modification if lineHeight has been defined
 		if ( isLineHeightDefined( lineHeight ) ) {
 			setLineHeight( nextValue );
 			return;
@@ -49,6 +45,8 @@ export default function LineHeightControl( props ) {
 		setLineHeight( adjustedNextValue );
 	};
 
+	const value = lineHeight || INITIAL_VALUE;
+
 	return (
 		<LineHeightControlWrapper>
 			<TextControl
@@ -58,7 +56,7 @@ export default function LineHeightControl( props ) {
 				placeholder={ BASE_DEFAULT_VALUE }
 				step={ STEP }
 				type="number"
-				value={ lineHeight || INITIAL_VALUE }
+				value={ value }
 				{ ...props }
 				min={ 0 }
 			/>
