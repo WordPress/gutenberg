@@ -35,8 +35,6 @@ div.components-toolbar {
 	}
 
 	& > div + div {
-		margin-left: -3px;
-
 		&.has-left-divider {
 			margin-left: 6px;
 			position: relative;
@@ -52,7 +50,7 @@ div.components-toolbar {
 			top: 8px;
 			left: -3px;
 			width: 1px;
-			height: $icon-button-size - 16px;
+			height: $button-size - 16px;
 		}
 	}
 }

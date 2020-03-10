@@ -27,6 +27,7 @@ function BlockListAppender( {
 	isLocked,
 	renderAppender: CustomAppender,
 	className,
+	tagName: TagName = 'div',
 } ) {
 	if ( isLocked || CustomAppender === false ) {
 		return null;
@@ -57,7 +58,7 @@ function BlockListAppender( {
 	}
 
 	return (
-		<div
+		<TagName
 			// A `tabIndex` is used on the wrapping `div` element in order to
 			// force a focus event to occur when an appender `button` element
 			// is clicked. In some browsers (Firefox, Safari), button clicks do
@@ -73,7 +74,7 @@ function BlockListAppender( {
 			className={ classnames( 'block-list-appender', className ) }
 		>
 			{ appender }
-		</div>
+		</TagName>
 	);
 }
 

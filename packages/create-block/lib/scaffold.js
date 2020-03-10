@@ -25,6 +25,7 @@ module.exports = async function(
 		category,
 		author,
 		license,
+		licenseURI,
 		version,
 	}
 ) {
@@ -46,6 +47,7 @@ module.exports = async function(
 		version,
 		author,
 		license,
+		licenseURI,
 		textdomain: namespace,
 	};
 	await Promise.all(
@@ -84,6 +86,9 @@ module.exports = async function(
 		info( '' );
 		code( '  $ npm run build' );
 		info( '    Builds the code for production.' );
+		info( '' );
+		code( '  $ npm run format:js' );
+		info( '    Formats JavaScript files.' );
 		info( '' );
 		code( '  $ npm run lint:css' );
 		info( '    Lints CSS files.' );

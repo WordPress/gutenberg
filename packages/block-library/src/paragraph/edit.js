@@ -16,6 +16,7 @@ import {
 	RichText,
 	withFontSizes,
 	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
@@ -74,7 +75,6 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 
 function ParagraphBlock( {
 	attributes,
-	className,
 	fontSize,
 	mergeBlocks,
 	onReplace,
@@ -132,7 +132,7 @@ function ParagraphBlock( {
 						onChange={ setFontSize }
 					/>
 					<ToggleControl
-						label={ __( 'Drop Cap' ) }
+						label={ __( 'Drop cap' ) }
 						checked={ !! dropCap }
 						onChange={ () =>
 							setAttributes( { dropCap: ! dropCap } )
@@ -151,16 +151,12 @@ function ParagraphBlock( {
 					<RichText
 						ref={ ref }
 						identifier="content"
-						tagName="p"
-						className={ classnames(
-							'wp-block-paragraph',
-							className,
-							{
-								'has-drop-cap': dropCap,
-								[ `has-text-align-${ align }` ]: align,
-								[ fontSize.class ]: fontSize.class,
-							}
-						) }
+						tagName={ Block.p }
+						className={ classnames( {
+							'has-drop-cap': dropCap,
+							[ `has-text-align-${ align }` ]: align,
+							[ fontSize.class ]: fontSize.class,
+						} ) }
 						style={ {
 							fontSize: fontSize.size
 								? fontSize.size + 'px'

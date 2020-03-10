@@ -49,7 +49,7 @@ import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
 function Layout() {
-	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const {
 		closePublishSidebar,
 		openGeneralSidebar,
@@ -94,9 +94,6 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-			hasBlockSelected: select(
-				'core/block-editor'
-			).getBlockSelectionStart(),
 		};
 	}, [] );
 	const sidebarIsOpened =
@@ -125,24 +122,28 @@ function Layout() {
 					className={ className }
 					header={ <Header /> }
 					sidebar={
-						<>
-							{ ! sidebarIsOpened && (
-								<div className="edit-post-layout__toogle-sidebar-panel">
-									<Button
-										isSecondary
-										className="edit-post-layout__toogle-sidebar-panel-button"
-										onClick={ openSidebarPanel }
-										aria-expanded={ false }
-									>
-										{ hasBlockSelected
-											? __( 'Open block settings' )
-											: __( 'Open document settings' ) }
-									</Button>
-								</div>
-							) }
-							<SettingsSidebar />
-							<Sidebar.Slot />
-						</>
+						( ! isMobileViewport || sidebarIsOpened ) && (
+							<>
+								{ ! isMobileViewport && ! sidebarIsOpened && (
+									<div className="edit-post-layout__toogle-sidebar-panel">
+										<Button
+											isSecondary
+											className="edit-post-layout__toogle-sidebar-panel-button"
+											onClick={ openSidebarPanel }
+											aria-expanded={ false }
+										>
+											{ hasBlockSelected
+												? __( 'Open block settings' )
+												: __(
+														'Open document settings'
+												  ) }
+										</Button>
+									</div>
+								) }
+								<SettingsSidebar />
+								<Sidebar.Slot />
+							</>
+						)
 					}
 					content={
 						<>
@@ -163,6 +164,7 @@ function Layout() {
 						</>
 					}
 					footer={
+						! isMobileViewport &&
 						isRichEditingEnabled &&
 						mode === 'visual' && (
 							<div className="edit-post-layout__footer">
@@ -184,10 +186,10 @@ function Layout() {
 								}
 							/>
 						) : (
-							<div className="edit-post-layout__toogle-publish-panel">
+							<div className="edit-post-layout__toggle-publish-panel">
 								<Button
 									isSecondary
-									className="edit-post-layout__toogle-publish-panel-button"
+									className="edit-post-layout__toggle-publish-panel-button"
 									onClick={ togglePublishSidebar }
 									aria-expanded={ false }
 								>

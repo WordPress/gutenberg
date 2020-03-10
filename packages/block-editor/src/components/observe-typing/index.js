@@ -17,6 +17,7 @@ import {
 	ENTER,
 	BACKSPACE,
 	ESCAPE,
+	TAB,
 } from '@wordpress/keycodes';
 import { withSafeTimeout } from '@wordpress/compose';
 
@@ -111,7 +112,10 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	 * @param {KeyboardEvent} event Keypress or keydown event to interpret.
 	 */
 	function stopTypingOnEscapeKey( event ) {
-		if ( isTyping && event.keyCode === ESCAPE ) {
+		if (
+			isTyping &&
+			( event.keyCode === ESCAPE || event.keyCode === TAB )
+		) {
 			stopTyping();
 		}
 	}

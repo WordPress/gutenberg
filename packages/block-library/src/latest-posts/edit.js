@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isUndefined, pickBy } from 'lodash';
+import { get, invoke, isUndefined, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -101,7 +101,7 @@ class LatestPostsEdit extends Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Post content settings' ) }>
 					<ToggleControl
-						label={ __( 'Post Content' ) }
+						label={ __( 'Post content' ) }
 						checked={ displayPostContent }
 						onChange={ ( value ) =>
 							setAttributes( { displayPostContent: value } )
@@ -114,7 +114,7 @@ class LatestPostsEdit extends Component {
 							options={ [
 								{ label: __( 'Excerpt' ), value: 'excerpt' },
 								{
-									label: __( 'Full Post' ),
+									label: __( 'Full post' ),
 									value: 'full_post',
 								},
 							] }
@@ -149,7 +149,7 @@ class LatestPostsEdit extends Component {
 					/>
 				</PanelBody>
 
-				<PanelBody title={ __( 'Featured Image Settings' ) }>
+				<PanelBody title={ __( 'Featured image settings' ) }>
 					<ToggleControl
 						label={ __( 'Display featured image' ) }
 						checked={ displayFeaturedImage }
@@ -188,7 +188,7 @@ class LatestPostsEdit extends Component {
 							/>
 							<BaseControl>
 								<BaseControl.VisualLabel>
-									{ __( 'Image Alignment' ) }
+									{ __( 'Image alignment' ) }
 								</BaseControl.VisualLabel>
 								<BlockAlignmentToolbar
 									value={ featuredImageAlign }
@@ -303,7 +303,11 @@ class LatestPostsEdit extends Component {
 					} ) }
 				>
 					{ displayPosts.map( ( post, i ) => {
-						const titleTrimmed = post.title.rendered.trim();
+						const titleTrimmed = invoke( post, [
+							'title',
+							'rendered',
+							'trim',
+						] );
 						let excerpt = post.excerpt.rendered;
 
 						const excerptElement = document.createElement( 'div' );
@@ -320,6 +324,21 @@ class LatestPostsEdit extends Component {
 							'wp-block-latest-posts__featured-image': true,
 							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
 						} );
+
+						const postExcerpt =
+							excerptLength <
+								excerpt.trim().split( ' ' ).length &&
+							post.excerpt.raw === ''
+								? excerpt
+										.trim()
+										.split( ' ', excerptLength )
+										.join( ' ' ) +
+								  ' ... <a href=' +
+								  post.link +
+								  'target="_blank" rel="noopener noreferrer">' +
+								  __( 'Read more' ) +
+								  '</a>'
+								: excerpt;
 
 						return (
 							<li key={ i }>
@@ -366,28 +385,7 @@ class LatestPostsEdit extends Component {
 									displayPostContentRadio === 'excerpt' && (
 										<div className="wp-block-latest-posts__post-excerpt">
 											<RawHTML key="html">
-												{ excerptLength <
-												excerpt.trim().split( ' ' )
-													.length
-													? excerpt
-															.trim()
-															.split(
-																' ',
-																excerptLength
-															)
-															.join( ' ' ) +
-													  ' ... <a href=' +
-													  post.link +
-													  'target="_blank" rel="noopener noreferrer">' +
-													  __( 'Read more' ) +
-													  '</a>'
-													: excerpt
-															.trim()
-															.split(
-																' ',
-																excerptLength
-															)
-															.join( ' ' ) }
+												{ postExcerpt }
 											</RawHTML>
 										</div>
 									) }
