@@ -17,7 +17,11 @@ import {
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import {
+	compose,
+	withPreferredColorScheme,
+	useResizeObserver,
+} from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { withViewportMatch } from '@wordpress/viewport';
 /**
@@ -53,11 +57,13 @@ function ColumnsEditContainer( {
 	isMobile,
 	columnCount,
 } ) {
-	const { verticalAlignment } = attributes;
+	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsSettings, setColumnsSettings ] = useState( {
 		columnsInRow: 2,
 	} );
-	const { width } = columnsSettings;
+
+	const { verticalAlignment } = attributes;
+	const { width } = sizes || {};
 
 	useEffect( () => {
 		updateColumns(
@@ -65,6 +71,13 @@ function ColumnsEditContainer( {
 			Math.min( MAX_COLUMNS_NUMBER, columnCount || DEFAULT_COLUMNS )
 		);
 	}, [ columnCount ] );
+
+	useEffect( () => {
+		setColumnsSettings( {
+			columnsInRow: getColumnsInRow( width, columnCount ),
+			width,
+		} );
+	}, [ width ] );
 
 	const getColumnsInRow = ( containerWidth, columnsNumber ) => {
 		if ( containerWidth < 480 ) {
@@ -99,20 +112,8 @@ function ColumnsEditContainer( {
 					isCollapsed={ false }
 				/>
 			</BlockControls>
-			<View
-				onLayout={ ( event ) => {
-					const { width: newWidth } = event.nativeEvent.layout;
-					if ( newWidth !== width ) {
-						setColumnsSettings( {
-							columnsInRow: getColumnsInRow(
-								newWidth,
-								columnCount
-							),
-							width: newWidth,
-						} );
-					}
-				} }
-			>
+			<View>
+				{ resizeListener }
 				<InnerBlocks
 					flatListProps={ {
 						...( ! isMobile && {
