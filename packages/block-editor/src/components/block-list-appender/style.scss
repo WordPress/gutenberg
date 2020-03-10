@@ -8,6 +8,12 @@
 	.has-background & {
 		margin: ($grid-unit-20 + $block-spacing) $grid-unit-10;
 	}
+
+	// Animate appearance.
+	opacity: 1;
+	transform: scale(1);
+	transition: all 0.1s ease;
+	@include reduce-motion("transition");
 }
 
 .block-list-appender.is-drop-target > div::before {
@@ -23,4 +29,11 @@
 
 .block-list-appender > .block-editor-inserter {
 	display: block;
+}
+
+
+// Hide the nested appender unless parent or child is selected.
+.block-editor-block-list__block:not(.is-selected):not(.has-child-selected) .block-editor-inner-blocks > .block-editor-block-list__layout > .block-list-appender {
+	opacity: 0;
+	transform: scale(0);
 }
