@@ -14,8 +14,7 @@ For a developer experience closer to the one the project maintainers current hav
 * yarn (`npm install -g yarn`)
 * [AndroidStudio](https://developer.android.com/studio/) to be able to compile the Android version of the app
 * [Xcode](https://developer.apple.com/xcode/) to be able to compile the iOS app
-* [Carthage](https://github.com/Carthage/Carthage#installing-carthage) needed for fetching the Aztec dependency.
-
+* CocoaPods(`sudo gem install cocoapods`) needed to fetch React and third-party dependencies.
 
 Note that the OS platform used by the maintainers is macOS but the tools and setup should be usable in other platforms too.
 
@@ -81,7 +80,7 @@ yarn ios --simulator="iPhone Xs Max"
 
 To see a list of all of your available iOS devices, use `xcrun simctl list devices`.
 
-### When things seem crazy
+### Troubleshooting
 
 Some times, and especially when tweaking anything in the `package.json`, Babel configuration (`.babelrc`) or the Jest configuration (`jest.config.js`), your changes might seem to not take effect as expected. On those times, you might need to clean various caches before starting the packager. To do that, run the script: `yarn start:reset`. Other times, you might want to reinstall the NPM packages from scratch and the `yarn clean:install` script can be handy.
 
@@ -111,7 +110,7 @@ To run the tests with debugger support, start it with the following CLI command:
 yarn test:debug
 ```
 
-Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to springle `debugger` statements anywhere in the code that you'd like the debugger to break.
+Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to sprinkle `debugger` statements anywhere in the code that you'd like the debugger to break.
 
 ## Writing and Running Unit Tests
 
@@ -121,21 +120,25 @@ This project is set up to use [jest](https://facebook.github.io/jest/) for tests
 
 This repository uses Appium to run UI tests. The tests live in `__device-tests__` and are written using Appium to run tests against simulators and real devices. To run these you'll need to check off a few things: 
 
-* For now when running the tests you'll need to ensure the metro bundler is not running. 
-* [Appium cli](https://github.com/appium/appium/blob/master/docs/en/about-appium/getting-started.md) installed and available globally, I'd also recommend using [appium doctor](https://github.com/appium/appium-doctor) to ensure all of Appium's dependencies are good to go. You don't have to worry about starting the server yourself, the tests handle starting the server on port 4723, just be sure that the port is free or feel free to change the port number in the test file. 
+* When running the tests, you'll need to ensure the Metro bundler (`yarn start`) is not running. 
+* [Appium CLI](https://github.com/appium/appium/blob/master/docs/en/about-appium/getting-started.md) installed and available globally. We also recommend using [appium-doctor](https://github.com/appium/appium-doctor) to ensure all of Appium's dependencies are good to go. You don't have to worry about starting the server yourself, the tests handle starting the server on port 4723, just be sure that the port is free or feel free to change the port number in the test file. 
 * For iOS a simulator should automatically launch but for Android you'll need to have an emulator *with at least platform version 8.0* fired up and running.
 
-After those are checked off to run the UI tests on iOS run 
+Then, to run the UI tests on iOS: 
 
 `yarn test:e2e:ios:local`
 
-and for android run, 
+and for Android:
 
 `yarn test:e2e:android:local`
 
-Note, you might experience problems that seem to be related to the tests starting the Appium server, for example errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. Sorry about that this is still a WIP, you can manually start the Appium server via [appium desktop](https://github.com/appium/appium-desktop) or the cli, then change the port number in the tests while optionally commenting out related code in the `beforeAll` and `afterAll` block. 
+To run a single test instead of the entire suite, use `yarn device-tests:local`. Here's an example that runs only `gutenberg-editor-paragraph.test`:
 
-For a more detailed outline of the UI tests and how to get started writing one please visit the [UI Test documentation](https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/__device-tests__/README.md) and our [contributing guide](https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/__device-tests__/CONTRIBUTING.md).
+`TEST_RN_PLATFORM=ios yarn device-tests:local gutenberg-editor-paragraph.test`
+
+Note: You might experience problems that seem to be related to the tests starting the Appium server, e.g. errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. For now, you can manually start the Appium server via [appium desktop](https://github.com/appium/appium-desktop) or the CLI, then change the port number in the tests while (optionally) commenting out related code in the `beforeAll` and `afterAll` block. 
+
+For a more detailed outline of the UI tests and how to get started writing one, please visit the [UI Test documentation](https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/__device-tests__/README.md) and our [contributing guide](https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/__device-tests__/CONTRIBUTING.md).
 
 ## Static analysis and code style
 
@@ -147,7 +150,7 @@ yarn lint
 
 To have the linter also _fix_ the violations run: `yarn lint:fix`.
 
-In parallel to `eslint` the project uses `Prettier` for codestyling. Run:
+In parallel to `eslint`, the project uses `Prettier` for codestyling. Run:
 
 ```
 yarn prettier
@@ -160,7 +163,7 @@ to enforce the style. This will modify the source files to make them conform to 
 yarn flow
 ```
 
-You might want to use Visual Studio Code as an editor. The project includes the configuration needed to use the above codestyle and lint tools automatically.
+You might want to use Visual Studio Code as an editor. The project includes the configuration needed to use the above codestyle and linting tools automatically.
 
 ## License
 
