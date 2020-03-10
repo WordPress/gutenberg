@@ -4310,29 +4310,8 @@ exports[`Storyshots Components/Panel With Icon 1`] = `
 
 exports[`Storyshots Components/Placeholder Default 1`] = `
 <div
-  className="components-placeholder"
+  className="components-placeholder is-large"
 >
-  <iframe
-    aria-hidden={true}
-    aria-label="resize-listener"
-    frameBorder={0}
-    src="about:blank"
-    style={
-      Object {
-        "display": "block",
-        "height": "100%",
-        "left": 0,
-        "opacity": 0,
-        "overflow": "hidden",
-        "pointerEvents": "none",
-        "position": "absolute",
-        "top": 0,
-        "width": "100%",
-        "zIndex": -1,
-      }
-    }
-    tabIndex={-1}
-  />
   <div
     className="components-placeholder__label"
   >
