@@ -146,8 +146,8 @@ $block-inserter-search-height: 38px;
 
 	@include break-medium {
 		position: absolute;
-		top: 0;
-		left: calc(100% + 20px);
+		top: -1px;
+		left: calc(100% + 12px);
 		display: flex;
 		flex-direction: column;
 	}
