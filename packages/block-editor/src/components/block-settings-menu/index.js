@@ -14,7 +14,7 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { trash, moreHorizontal } from '@wordpress/icons';
+import { moreHorizontal } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,11 +24,12 @@ import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
-import __experimentalBlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
+import BlockSettingsMenuControls from '../block-settings-menu-controls';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
+	noArrow: true,
 };
 
 export function BlockSettingsMenu( { clientIds } ) {
@@ -71,6 +72,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 						label={ __( 'More options' ) }
 						className="block-editor-block-settings-menu"
 						popoverProps={ POPOVER_PROPS }
+						noIcons
 					>
 						{ ( { onClose } ) => (
 							<>
@@ -94,7 +96,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 												onClose,
 												onDuplicate
 											) }
-											icon="admin-page"
 											shortcut={ shortcuts.duplicate }
 										>
 											{ __( 'Duplicate' ) }
@@ -107,7 +108,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 													onClose,
 													onInsertBefore
 												) }
-												icon="insert-before"
 												shortcut={
 													shortcuts.insertBefore
 												}
@@ -119,7 +119,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 													onClose,
 													onInsertAfter
 												) }
-												icon="insert-after"
 												shortcut={
 													shortcuts.insertAfter
 												}
@@ -134,10 +133,10 @@ export function BlockSettingsMenu( { clientIds } ) {
 											onToggle={ onClose }
 										/>
 									) }
-									<__experimentalBlockSettingsMenuPluginsExtension.Slot
-										fillProps={ { clientIds, onClose } }
-									/>
 								</MenuGroup>
+								<BlockSettingsMenuControls.Slot
+									fillProps={ { onClose } }
+								/>
 								<MenuGroup>
 									{ ! isLocked && (
 										<MenuItem
@@ -145,7 +144,6 @@ export function BlockSettingsMenu( { clientIds } ) {
 												onClose,
 												onRemove
 											) }
-											icon={ trash }
 											shortcut={ shortcuts.remove }
 										>
 											{ _n(

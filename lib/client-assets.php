@@ -205,38 +205,17 @@ function gutenberg_override_style( &$styles, $handle, $src, $deps = array(), $ve
  *
  * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
  */
-function gutenberg_register_vendor_scripts( &$scripts ) {
-	$suffix = SCRIPT_DEBUG ? '' : '.min';
-
-	// Vendor Scripts.
-	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
-
-	// TODO: Overrides for react, react-dom and lodash are necessary
-	// until WordPress 5.3 is released.
-	gutenberg_register_vendor_script(
-		$scripts,
-		'react',
-		'https://unpkg.com/react@16.9.0/umd/react' . $react_suffix . '.js',
-		array( 'wp-polyfill' ),
-		'16.9.0',
-		true
-	);
-	gutenberg_register_vendor_script(
-		$scripts,
-		'react-dom',
-		'https://unpkg.com/react-dom@16.9.0/umd/react-dom' . $react_suffix . '.js',
-		array( 'react' ),
-		'16.9.0',
-		true
-	);
-	gutenberg_register_vendor_script(
-		$scripts,
-		'lodash',
-		'https://unpkg.com/lodash@4.17.15/lodash' . $suffix . '.js',
-		array(),
-		'4.17.15',
-		true
-	);
+function gutenberg_register_vendor_scripts( &$scripts ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+	// This function is intentionally left empty.
+	//
+	// Scripts such as react and react-dom are expected to be overridden soon,
+	// and it is preferred to keep this function in place so as not to disturb
+	// tooling related to the plugin build process.
+	//
+	// TODO: Remove phpcs exception in function signature once this function
+	// regains its use.
+	//
+	// See https://github.com/WordPress/gutenberg/pull/20628.
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
@@ -628,57 +607,6 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
 
 /**
- * Extends block editor preload paths to preload additional data. Note that any
- * additions here should be complemented with a corresponding core ticket to
- * reconcile the change upstream for future removal from Gutenberg.
- *
- * @param array   $preload_paths Array of paths to preload.
- * @param WP_Post $post          Post being edited.
- *
- * @return array Filtered array of paths to preload.
- */
-function gutenberg_extend_block_editor_preload_paths( $preload_paths, $post ) {
-	/*
-	 * Preload any autosaves for the post. (see https://github.com/WordPress/gutenberg/pull/7945)
-	 *
-	 * Trac ticket: https://core.trac.wordpress.org/ticket/46974
-	 *
-	 * At the time of writing, the change is not committed or released
-	 * in core. This path should be removed from Gutenberg when the code is
-	 * released in core, and the corresponding release version becomes
-	 * the minimum supported version.
-	 */
-	$post_type_object = get_post_type_object( $post->post_type );
-
-	if ( isset( $post_type_object ) ) {
-		$rest_base      = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
-		$autosaves_path = sprintf( '/wp/v2/%s/%d/autosaves?context=edit', $rest_base, $post->ID );
-
-		if ( ! in_array( $autosaves_path, $preload_paths, true ) ) {
-			$preload_paths[] = $autosaves_path;
-		}
-	}
-
-	/*
-	 * Used in considering user permissions for creating and updating blocks,
-	 * as condition for displaying relevant actions in the interface.
-	 *
-	 * Trac ticket: https://core.trac.wordpress.org/ticket/46429
-	 *
-	 * This is present in WordPress 5.2 and should be removed from Gutenberg
-	 * once WordPress 5.2 is the minimum supported version.
-	 */
-	$blocks_path = array( '/wp/v2/blocks', 'OPTIONS' );
-
-	if ( ! in_array( $blocks_path, $preload_paths, true ) ) {
-		$preload_paths[] = $blocks_path;
-	}
-
-	return $preload_paths;
-}
-add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload_paths', 10, 2 );
-
-/**
  * Extends block editor settings to include a list of image dimensions per size.
  *
  * @param array $settings Default editor settings.
@@ -698,3 +626,36 @@ function gutenberg_extend_settings_image_dimensions( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_image_dimensions' );
+
+/**
+ * Load a block pattern by name.
+ *
+ * @param string $name Block Pattern File name.
+ *
+ * @return array Block Pattern Array.
+ */
+function gutenberg_load_block_pattern( $name ) {
+	return json_decode(
+		file_get_contents( __DIR__ . '/patterns/' . $name . '.json' ),
+		true
+	);
+}
+
+/**
+ * Extends block editor settings to include a list of default block patterns.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_block_patterns( $settings ) {
+	$block_patterns                          = [
+		gutenberg_load_block_pattern( 'text-two-columns' ),
+		gutenberg_load_block_pattern( 'two-buttons' ),
+		gutenberg_load_block_pattern( 'cover-abc' ),
+		gutenberg_load_block_pattern( 'two-images' ),
+	];
+	$settings['__experimentalBlockPatterns'] = $block_patterns;
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns' );

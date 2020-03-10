@@ -158,6 +158,12 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="BlockSettingsMenuControls" href="#BlockSettingsMenuControls">#</a> **BlockSettingsMenuControls**
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-settings-menu-controls/README.md>
+
 <a name="BlockTitle" href="#BlockTitle">#</a> **BlockTitle**
 
 Undocumented declaration.
@@ -339,10 +345,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md>
 
-<a name="MultiBlocksSwitcher" href="#MultiBlocksSwitcher">#</a> **MultiBlocksSwitcher**
-
-Undocumented declaration.
-
 <a name="MultiSelectScrollIntoView" href="#MultiSelectScrollIntoView">#</a> **MultiSelectScrollIntoView**
 
 Scrolls the multi block selection end into view if not in view already. This
@@ -413,7 +415,6 @@ _Properties_
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
--   _showInserterHelpPanel_ `boolean`: Whether or not the inserter help panel is shown
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 -   _\_\_experimentalEnableLegacyWidgetBlock_ `boolean`: Whether the user has enabled the Legacy Widget Block
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory

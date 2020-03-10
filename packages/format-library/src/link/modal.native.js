@@ -19,7 +19,7 @@ import {
 	getTextContent,
 	slice,
 } from '@wordpress/rich-text';
-import { link } from '@wordpress/icons';
+import { external, link, textColor } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -174,14 +174,14 @@ class ModalLinkUI extends Component {
 					/* eslint-enable jsx-a11y/no-autofocus */
 				}
 				<BottomSheet.Cell
-					icon={ 'editor-textcolor' }
+					icon={ textColor }
 					label={ __( 'Link text' ) }
 					value={ text }
 					placeholder={ __( 'Add link text' ) }
 					onChangeValue={ this.onChangeText }
 				/>
 				<BottomSheet.SwitchCell
-					icon={ 'external' }
+					icon={ external }
 					label={ __( 'Open in new tab' ) }
 					value={ this.state.opensInNewWindow }
 					onValueChange={ this.onChangeOpensInNewWindow }

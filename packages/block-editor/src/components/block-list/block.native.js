@@ -189,6 +189,9 @@ class BlockListBlock extends Component {
 			title,
 			parentId,
 			isTouchable,
+			hasParent,
+			onSelect,
+			showFloatingToolbar,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -198,27 +201,27 @@ class BlockListBlock extends Component {
 		);
 
 		return (
-			<>
-				{ isSelected && (
-					<FloatingToolbar>
-						<Toolbar passedStyle={ styles.toolbar }>
-							<ToolbarButton
-								title={ __( 'Navigate Up' ) }
-								onClick={ () =>
-									this.props.onSelect( parentId )
-								}
-								icon={ NavigateUpSVG }
-							/>
-							<View style={ styles.pipe } />
-						</Toolbar>
-						<Breadcrumbs clientId={ clientId } />
-					</FloatingToolbar>
-				) }
-				<TouchableWithoutFeedback
-					onPress={ this.onFocus }
-					accessible={ ! isSelected }
-					accessibilityRole={ 'button' }
-				>
+			<TouchableWithoutFeedback
+				onPress={ this.onFocus }
+				accessible={ ! isSelected }
+				accessibilityRole={ 'button' }
+			>
+				<View accessibilityLabel={ accessibilityLabel }>
+					{ showFloatingToolbar && (
+						<FloatingToolbar>
+							{ hasParent && (
+								<Toolbar passedStyle={ styles.toolbar }>
+									<ToolbarButton
+										title={ __( 'Navigate Up' ) }
+										onClick={ () => onSelect( parentId ) }
+										icon={ NavigateUpSVG }
+									/>
+									<View style={ styles.pipe } />
+								</Toolbar>
+							) }
+							<Breadcrumbs clientId={ clientId } />
+						</FloatingToolbar>
+					) }
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
@@ -238,8 +241,8 @@ class BlockListBlock extends Component {
 							) }
 						</View>
 					</View>
-				</TouchableWithoutFeedback>
-			</>
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
@@ -252,6 +255,7 @@ export default compose( [
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
+			getBlock,
 			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
@@ -273,6 +277,10 @@ export default compose( [
 		const parentId = parents[ 0 ] || '';
 
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
+		const rootBlock = getBlock( rootBlockId );
+		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
+
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -333,6 +341,7 @@ export default compose( [
 			isTouchable,
 			isDimmed,
 			isUnregisteredBlock,
+			showFloatingToolbar,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

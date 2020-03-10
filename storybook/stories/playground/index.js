@@ -43,6 +43,7 @@ function App() {
 							<BlockInspector />
 						</div>
 						<div className="editor-styles-wrapper">
+							<Popover.Slot name="block-toolbar" />
 							<BlockEditorKeyboardShortcuts />
 							<WritingFlow>
 								<ObserveTyping>

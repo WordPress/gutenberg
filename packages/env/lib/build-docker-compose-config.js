@@ -55,6 +55,12 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.port }}:80`;
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.testsPort }}:80`;
 
+	// The www-data user in wordpress:cli has a different UID (82) to the
+	// www-data user in wordpress (33). Ensure we use the wordpress www-data
+	// user for CLI commands.
+	// https://github.com/docker-library/wordpress/issues/256
+	const cliUser = '33:33';
+
 	return {
 		version: '3.7',
 		services: {
@@ -63,13 +69,13 @@ module.exports = function buildDockerComposeConfig( config ) {
 				environment: {
 					MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
 				},
+				volumes: [ 'mysql:/var/lib/mysql' ],
 			},
 			wordpress: {
 				depends_on: [ 'mysql' ],
 				image: 'wordpress',
 				ports: [ developmentPorts ],
 				environment: {
-					WORDPRESS_DEBUG: '1',
 					WORDPRESS_DB_NAME: 'wordpress',
 				},
 				volumes: developmentMounts,
@@ -79,7 +85,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'wordpress',
 				ports: [ testsPorts ],
 				environment: {
-					WORDPRESS_DEBUG: '1',
 					WORDPRESS_DB_NAME: 'tests-wordpress',
 				},
 				volumes: testsMounts,
@@ -88,11 +93,13 @@ module.exports = function buildDockerComposeConfig( config ) {
 				depends_on: [ 'wordpress' ],
 				image: 'wordpress:cli',
 				volumes: developmentMounts,
+				user: cliUser,
 			},
 			'tests-cli': {
 				depends_on: [ 'wordpress' ],
 				image: 'wordpress:cli',
 				volumes: testsMounts,
+				user: cliUser,
 			},
 			composer: {
 				image: 'composer',
@@ -102,6 +109,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 		volumes: {
 			...( ! config.coreSource && { wordpress: {} } ),
 			...( ! config.coreSource && { 'tests-wordpress': {} } ),
+			mysql: {},
 		},
 	};
 };

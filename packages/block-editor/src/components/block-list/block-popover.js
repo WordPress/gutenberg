@@ -46,7 +46,6 @@ function selector( select ) {
 function BlockPopover( {
 	clientId,
 	rootClientId,
-	name,
 	align,
 	isValid,
 	moverDirection,
@@ -160,6 +159,7 @@ function BlockPopover( {
 			className="block-editor-block-list__block-popover"
 			__unstableSticky={ ! showEmptyBlockSideInserter }
 			__unstableSlotName="block-toolbar"
+			__unstableBoundaryParent
 			// Allow subpixel positioning for the block movement animation.
 			__unstableAllowVerticalSubpixelPosition={
 				moverDirection !== 'horizontal' && node
@@ -169,6 +169,9 @@ function BlockPopover( {
 			}
 			onBlur={ () => setIsToolbarForced( false ) }
 			shouldAnchorIncludePadding
+			// Popover calculates the width once. Trigger a reset by remounting
+			// the component.
+			key={ shouldShowContextualToolbar }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
@@ -199,7 +202,6 @@ function BlockPopover( {
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
-					data-type={ name }
 					data-align={ align }
 				/>
 			) }
@@ -309,7 +311,6 @@ export default function WrappedBlockPopover() {
 		<BlockPopover
 			clientId={ clientId }
 			rootClientId={ rootClientId }
-			name={ name }
 			align={ align }
 			isValid={ isValid }
 			moverDirection={ moverDirection }

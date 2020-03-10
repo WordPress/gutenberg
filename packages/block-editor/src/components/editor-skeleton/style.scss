@@ -1,6 +1,6 @@
 // On Mobile devices, swiping the HTML element should not scroll.
 // By making it fixed, we prevent that.
-html {
+html.block-editor-editor-skeleton__html-container {
 	position: fixed;
 	width: 100%;
 
@@ -59,7 +59,6 @@ html {
 
 .block-editor-editor-skeleton__content {
 	flex-grow: 1;
-	background-color: $light-gray-700;
 
 	// Treat as flex container to allow children to grow to occupy full
 	// available height of the content area.
@@ -75,26 +74,6 @@ html {
 }
 
 .block-editor-editor-skeleton__sidebar {
-	display: none;
-
-	@include break-medium() {
-		display: block;
-		z-index: z-index(".block-editor-editor-skeleton__sidebar");
-		position: fixed !important; // Need to override the default relative positionning
-		top: -9999em;
-		bottom: auto;
-		left: auto;
-		right: 0;
-		width: $sidebar-width;
-
-		&:focus {
-			top: auto;
-			bottom: 0;
-		}
-	}
-}
-
-.is-sidebar-opened .block-editor-editor-skeleton__sidebar {
 	display: block;
 	width: auto; // Keep the sidebar width flexible.
 	flex-shrink: 0;
@@ -105,6 +84,7 @@ html {
 	bottom: 0;
 	left: 0;
 	background: $white;
+	color: $dark-gray-primary;
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
 	@include break-medium() {
@@ -120,6 +100,7 @@ html {
 	height: auto;  // Keep the height flexible.
 	border-bottom: $border-width solid $light-gray-500;
 	z-index: z-index(".block-editor-editor-skeleton__header");
+	color: $dark-gray-primary;
 
 	// On Mobile the header is sticky.
 	position: sticky;
@@ -135,8 +116,8 @@ html {
 .block-editor-editor-skeleton__footer {
 	height: auto;  // Keep the height flexible.
 	flex-shrink: 0;
-	overflow: auto;
 	border-top: $border-width solid $light-gray-500;
+	color: $dark-gray-primary;
 
 	// On Mobile the footer is hidden
 	display: none;
@@ -153,6 +134,7 @@ html {
 	left: auto;
 	right: 0;
 	width: $sidebar-width;
+	color: $dark-gray-primary;
 
 	&:focus {
 		top: auto;

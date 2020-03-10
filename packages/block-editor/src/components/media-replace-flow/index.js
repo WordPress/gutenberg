@@ -16,7 +16,7 @@ import {
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { link, upload } from '@wordpress/icons';
+import { link, upload, media as mediaIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -134,7 +134,6 @@ const MediaReplaceFlow = ( {
 						onKeyDown={ openOnArrowDown }
 					>
 						{ name }
-						<span className="block-editor-media-replace-flow__indicator" />
 					</Button>
 				</ToolbarGroup>
 			) }
@@ -146,7 +145,7 @@ const MediaReplaceFlow = ( {
 							onSelect={ ( media ) => selectMedia( media ) }
 							allowedTypes={ allowedTypes }
 							render={ ( { open } ) => (
-								<MenuItem icon="admin-media" onClick={ open }>
+								<MenuItem icon={ mediaIcon } onClick={ open }>
 									{ __( 'Open Media Library' ) }
 								</MenuItem>
 							) }

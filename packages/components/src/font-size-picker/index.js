@@ -4,6 +4,7 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
+import { textColor } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -99,13 +100,13 @@ export default function FontSizePicker( {
 	return (
 		<fieldset className="components-font-size-picker">
 			<legend className="screen-reader-text">
-				{ __( 'Font Size' ) }
+				{ __( 'Font size' ) }
 			</legend>
 			<div className="components-font-size-picker__controls">
 				{ fontSizes.length > 0 && (
 					<CustomSelectControl
 						className={ 'components-font-size-picker__select' }
-						label={ __( 'Preset Size' ) }
+						label={ __( 'Preset size' ) }
 						options={ options }
 						value={
 							options.find(
@@ -149,8 +150,8 @@ export default function FontSizePicker( {
 					onChange={ onSliderChangeValue }
 					min={ 12 }
 					max={ 100 }
-					beforeIcon="editor-textcolor"
-					afterIcon="editor-textcolor"
+					beforeIcon={ textColor }
+					afterIcon={ textColor }
 				/>
 			) }
 		</fieldset>

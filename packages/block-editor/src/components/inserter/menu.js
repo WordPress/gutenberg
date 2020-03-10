@@ -13,7 +13,6 @@ import {
 	includes,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -33,6 +32,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { addQueryArgs } from '@wordpress/url';
+import { controlsRepeat } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -311,9 +311,7 @@ export class InserterMenu extends Component {
 		/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 		return (
 			<div
-				className={ classnames( 'block-editor-inserter__menu', {
-					'has-help-panel': hasHelpPanel,
-				} ) }
+				className="block-editor-inserter__menu"
 				onKeyPress={ stopKeyPropagation }
 				onKeyDown={ this.onKeyDown }
 			>
@@ -422,7 +420,7 @@ export class InserterMenu extends Component {
 								title={ __( 'Reusable' ) }
 								opened={ isPanelOpen( 'reusable' ) }
 								onToggle={ this.onTogglePanel( 'reusable' ) }
-								icon="controls-repeat"
+								icon={ controlsRepeat }
 								ref={ this.bindPanel( 'reusable' ) }
 							>
 								<BlockTypesList
@@ -464,79 +462,54 @@ export class InserterMenu extends Component {
 							} }
 						</__experimentalInserterMenuExtension.Slot>
 					</div>
+					{ showInserterHelpPanel && (
+						<div className="block-editor-inserter__tips">
+							<Tips />
+						</div>
+					) }
 				</div>
-
-				{ hasHelpPanel && (
+				{ hasHelpPanel && hoveredItem && (
 					<div className="block-editor-inserter__menu-help-panel">
-						{ hoveredItem && (
-							<>
-								{ ! isReusableBlock( hoveredItem ) && (
-									<BlockCard blockType={ hoveredItem } />
-								) }
-								<div className="block-editor-inserter__preview">
-									{ isReusableBlock( hoveredItem ) ||
-									hoveredItemBlockType.example ? (
-										<div className="block-editor-inserter__preview-content">
-											<BlockPreview
-												padding={ 10 }
-												viewportWidth={ 500 }
-												blocks={
-													hoveredItemBlockType.example
-														? getBlockFromExample(
-																hoveredItem.name,
-																{
-																	attributes: {
-																		...hoveredItemBlockType
-																			.example
-																			.attributes,
-																		...hoveredItem.initialAttributes,
-																	},
-																	innerBlocks:
-																		hoveredItemBlockType
-																			.example
-																			.innerBlocks,
-																}
-														  )
-														: createBlock(
-																hoveredItem.name,
-																hoveredItem.initialAttributes
-														  )
-												}
-											/>
-										</div>
-									) : (
-										<div className="block-editor-inserter__preview-content-missing">
-											{ __( 'No Preview Available.' ) }
-										</div>
-									) }
-								</div>
-							</>
+						{ ! isReusableBlock( hoveredItem ) && (
+							<BlockCard blockType={ hoveredItem } />
 						) }
-						{ ! hoveredItem && (
-							<div className="block-editor-inserter__menu-help-panel-no-block">
-								<div className="block-editor-inserter__menu-help-panel-no-block-text">
-									<div className="block-editor-inserter__menu-help-panel-title">
-										{ __( 'Content blocks' ) }
-									</div>
-									<p>
-										{ __(
-											'Welcome to the wonderful world of blocks! Blocks are the basis of all content within the editor.'
-										) }
-									</p>
-									<p>
-										{ __(
-											'There are blocks available for all kinds of content: insert text, headings, images, lists, videos, tables, and lots more.'
-										) }
-									</p>
-									<p>
-										{ __(
-											'Browse through the library to learn more about what each block does.'
-										) }
-									</p>
+						<div className="block-editor-inserter__preview">
+							{ isReusableBlock( hoveredItem ) ||
+							hoveredItemBlockType.example ? (
+								<div className="block-editor-inserter__preview-content">
+									<BlockPreview
+										padding={ 10 }
+										viewportWidth={ 500 }
+										blocks={
+											hoveredItemBlockType.example
+												? getBlockFromExample(
+														hoveredItem.name,
+														{
+															attributes: {
+																...hoveredItemBlockType
+																	.example
+																	.attributes,
+																...hoveredItem.initialAttributes,
+															},
+															innerBlocks:
+																hoveredItemBlockType
+																	.example
+																	.innerBlocks,
+														}
+												  )
+												: createBlock(
+														hoveredItem.name,
+														hoveredItem.initialAttributes
+												  )
+										}
+									/>
 								</div>
-								<Tips />
-							</div>
-						) }
+							) : (
+								<div className="block-editor-inserter__preview-content-missing">
+									{ __( 'No Preview Available.' ) }
+								</div>
+							) }
+						</div>
 					</div>
 				) }
 			</div>
@@ -546,53 +519,43 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withSelect(
-		(
-			select,
-			{ clientId, isAppender, rootClientId, showInserterHelpPanel }
-		) => {
-			const {
-				getInserterItems,
-				getBlockName,
-				getBlockRootClientId,
-				getBlockSelectionEnd,
-				getSettings,
-			} = select( 'core/block-editor' );
-			const {
-				getCategories,
-				getCollections,
-				getChildBlockNames,
-			} = select( 'core/blocks' );
+	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
+		const {
+			getInserterItems,
+			getBlockName,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+			getSettings,
+		} = select( 'core/block-editor' );
+		const { getCategories, getCollections, getChildBlockNames } = select(
+			'core/blocks'
+		);
 
-			let destinationRootClientId = rootClientId;
-			if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
-				const end = getBlockSelectionEnd();
-				if ( end ) {
-					destinationRootClientId =
-						getBlockRootClientId( end ) || undefined;
-				}
+		let destinationRootClientId = rootClientId;
+		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
+			const end = getBlockSelectionEnd();
+			if ( end ) {
+				destinationRootClientId =
+					getBlockRootClientId( end ) || undefined;
 			}
-			const destinationRootBlockName = getBlockName(
-				destinationRootClientId
-			);
-
-			const {
-				showInserterHelpPanel: showInserterHelpPanelSetting,
-				__experimentalFetchReusableBlocks: fetchReusableBlocks,
-			} = getSettings();
-
-			return {
-				categories: getCategories(),
-				collections: getCollections(),
-				rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-				items: getInserterItems( destinationRootClientId ),
-				showInserterHelpPanel:
-					showInserterHelpPanel && showInserterHelpPanelSetting,
-				destinationRootClientId,
-				fetchReusableBlocks,
-			};
 		}
-	),
+		const destinationRootBlockName = getBlockName(
+			destinationRootClientId
+		);
+
+		const {
+			__experimentalFetchReusableBlocks: fetchReusableBlocks,
+		} = getSettings();
+
+		return {
+			categories: getCategories(),
+			collections: getCollections(),
+			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
+			items: getInserterItems( destinationRootClientId ),
+			destinationRootClientId,
+			fetchReusableBlocks,
+		};
+	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const { showInsertionPoint, hideInsertionPoint } = dispatch(
 			'core/block-editor'

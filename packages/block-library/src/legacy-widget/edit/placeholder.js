@@ -10,6 +10,7 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SelectControl, Placeholder } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
+import { brush } from '@wordpress/icons';
 
 export default function LegacyWidgetPlaceholder( {
 	availableLegacyWidgets,
@@ -47,7 +48,7 @@ export default function LegacyWidgetPlaceholder( {
 	}
 	return (
 		<Placeholder
-			icon={ <BlockIcon icon="admin-customizer" /> }
+			icon={ <BlockIcon icon={ brush } /> }
 			label={ __( 'Legacy Widget' ) }
 		>
 			{ placeholderContent }

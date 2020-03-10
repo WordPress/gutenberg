@@ -72,6 +72,8 @@ import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
+import * as postFeaturedImage from './post-featured-image';
+import * as postTags from './post-tags';
 
 /**
  * Function to register an individual block.
@@ -201,6 +203,8 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postCommentsForm,
 								postDate,
 								postExcerpt,
+								postFeaturedImage,
+								postTags,
 						  ]
 						: [] ),
 				].forEach( registerBlock );
