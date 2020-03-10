@@ -209,8 +209,7 @@ function NavigationLinkEdit( {
 					backgroundColor: rgbBackgroundColor,
 				} }
 			>
-				{ /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
-				<a className="wp-block-navigation-link__content">
+				<div className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }
 						tagName="span"
@@ -285,7 +284,7 @@ function NavigationLinkEdit( {
 							/>
 						</Popover>
 					) }
-				</a>
+				</div>
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
 					renderAppender={
