@@ -105,14 +105,13 @@ class LatestPostsEdit extends Component {
 			{}
 		);
 
-		const handleOnChange = ( tokens ) => {
+		const selectCategories = ( tokens ) => {
 			// Categories that are already will be objects, while new additions will be strings (the name).
-			// allValues nomalizes the array so that they are all objects.
-			const allValues = tokens.map( ( token ) =>
+			// allCategories nomalizes the array so that they are all objects.
+			const allCategories = tokens.map( ( token ) =>
 				typeof token === 'string' ? suggestions[ token ] : token
 			);
-
-			setAttributes( { categories: allValues } );
+			setAttributes( { categories: allCategories } );
 		};
 
 		const inspectorControls = (
@@ -227,33 +226,27 @@ class LatestPostsEdit extends Component {
 					<QueryControls
 						{ ...{ order, orderBy } }
 						numberOfItems={ postsToShow }
-						categoriesList={ categoriesList }
-						selectedCategoryId={ categories }
 						onOrderChange={ ( value ) =>
 							setAttributes( { order: value } )
 						}
 						onOrderByChange={ ( value ) =>
 							setAttributes( { orderBy: value } )
 						}
-						onCategoryChange={ ( value ) =>
-							setAttributes( {
-								categories: '' !== value ? value : undefined,
-							} )
-						}
 						onNumberOfItemsChange={ ( value ) =>
 							setAttributes( { postsToShow: value } )
 						}
 					/>
 					<FormTokenField
+						label={ __( 'Categories' ) }
 						value={
 							categories &&
 							categories.map( ( item ) => ( {
 								id: item.id,
-								value: item.name,
+								value: item.name || item.value,
 							} ) )
 						}
 						suggestions={ Object.keys( suggestions ) }
-						onChange={ handleOnChange }
+						onChange={ selectCategories }
 					/>
 					{ postLayout === 'grid' && (
 						<RangeControl
@@ -446,9 +439,10 @@ export default withSelect( ( select, props ) => {
 	const { getEntityRecords, getMedia } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
 	const { imageSizes, imageDimensions } = getSettings();
+	const catIds = categories.map( ( cat ) => cat.id );
 	const latestPostsQuery = pickBy(
 		{
-			categories,
+			categories: catIds,
 			order,
 			orderby: orderBy,
 			per_page: postsToShow,
