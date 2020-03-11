@@ -47,7 +47,7 @@ function render_block_core_latest_posts( $attributes ) {
 	add_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
 
 	if ( isset( $attributes['categories'] ) ) {
-		$args['category'] = $attributes['categories'];
+		$args['category__in'] = array_column( $attributes['categories'], 'id' );
 	}
 
 	$recent_posts = get_posts( $args );
@@ -182,7 +182,7 @@ function register_block_core_latest_posts() {
 					'type' => 'string',
 				),
 				'categories'              => array(
-					'type' => 'string',
+					'type' => 'array',
 				),
 				'postsToShow'             => array(
 					'type'    => 'number',
