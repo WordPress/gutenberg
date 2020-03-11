@@ -110,7 +110,6 @@ export class MediaPlaceholder extends Component {
 
 	onFilesUpload( files ) {
 		const {
-			addToGallery,
 			allowedTypes,
 			mediaUpload,
 			multiple,
@@ -119,48 +118,46 @@ export class MediaPlaceholder extends Component {
 		} = this.props;
 		let setMedia;
 		if ( multiple ) {
-			if ( addToGallery ) {
-				// To allow changes to a gallery to be made while uploads are in progress
-				// (including trigging multiple upload groups and removing already in place images),
-				// we must be able to add newMedia based on the current value of the Gallery
-				// whenever the setMedia function runs. Since the setMedia function runs multiple
-				// times per upload group and is passed newMedia containing every item in its
-				// group each time, we must also filter out whatever this upload group had
-				// previously returned to the gallery before adding and returning the image
-				// array with replacement newMedia values.
+			// To allow changes to a gallery to be made while uploads are in progress
+			// (including trigging multiple upload groups and removing already in place images),
+			// we must be able to add newMedia based on the current value of the Gallery
+			// whenever the setMedia function runs. Since the setMedia function runs multiple
+			// times per upload group and is passed newMedia containing every item in its
+			// group each time, we must also filter out whatever this upload group had
+			// previously returned to the gallery before adding and returning the image
+			// array with replacement newMedia values.
 
-				// Define an array to store urls from newMedia between subsequent function calls.
-				let lastMediaPassed = [];
-				setMedia = ( newMedia ) => {
-					// Get the current array of images on the Gallery.
-					const currentMedia = this.props.value || [];
-					// Remove any images this upload group is responsible for (lastMediaPassed).
-					// Their replacements are contained in newMedia.
-					const filteredMedia = currentMedia.filter( ( item ) => {
-						// If Item has id, only remove it if lastMediaPassed has an item with that id.
-						if ( item.id ) {
-							return ! lastMediaPassed.some(
-								( { id } ) => id === item.id
-							);
-						}
-						// Compare transient images via .includes since gallery may append extra info onto the url.
-						return ! lastMediaPassed.some( ( { urlSlug } ) =>
-							item.url.includes( urlSlug )
+			// Get a reference to the image array on the Gallery.
+			const currentMedia = this.props.value;
+
+			// Define an array to store urls from newMedia between subsequent function calls.
+			let lastMediaPassed = [];
+			setMedia = ( newMedia ) => {
+				// Remove any images this upload group is responsible for (lastMediaPassed).
+				// Their replacements are contained in newMedia.
+				const filteredMedia = currentMedia.filter( ( item ) => {
+					// If Item has id, only remove it if lastMediaPassed has an item with that id.
+					if ( item.id ) {
+						return ! lastMediaPassed.some(
+							// Soft equal since int can get turned to string in gallery.
+							( { id } ) => id == item.id
 						);
-					} );
-					// Return the filtered media array along with newMedia.
-					onSelect( filteredMedia.concat( newMedia ) );
-					// Reset lastMediaPassed and set it with ids and urls from newMedia.
-					lastMediaPassed = newMedia.map( ( media ) => {
-						// Add everything up to '.fileType' to compare via .includes.
-						const cutOffIndex = media.url.lastIndexOf( '.' );
-						const urlSlug = media.url.slice( 0, cutOffIndex );
-						return { id: media.id, urlSlug };
-					} );
-				};
-			} else {
-				setMedia = onSelect;
-			}
+					}
+					// Compare transient images via .includes since gallery may append extra info onto the url.
+					return ! lastMediaPassed.some( ( { urlSlug } ) =>
+						item.url.includes( urlSlug )
+					);
+				} );
+				// Return the filtered media array along with newMedia.
+				onSelect( filteredMedia.concat( newMedia ) );
+				// Reset lastMediaPassed and set it with ids and urls from newMedia.
+				lastMediaPassed = newMedia.map( ( media ) => {
+					// Add everything up to '.fileType' to compare via .includes.
+					const cutOffIndex = media.url.lastIndexOf( '.' );
+					const urlSlug = media.url.slice( 0, cutOffIndex );
+					return { id: media.id, urlSlug };
+				} );
+			};
 		} else {
 			setMedia = ( [ media ] ) => onSelect( media );
 		}
