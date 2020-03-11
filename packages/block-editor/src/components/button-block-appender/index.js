@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { Button, Tooltip } from '@wordpress/components';
 import { _x, sprintf } from '@wordpress/i18n';
-import { Icon, plusCircle } from '@wordpress/icons';
+import { Icon, plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -65,7 +65,7 @@ function ButtonBlockAppender( {
 							<span className="screen-reader-text">
 								{ label }
 							</span>
-							<Icon icon={ plusCircle } />
+							<Icon icon={ plus } />
 						</Button>
 					</Tooltip>
 				);

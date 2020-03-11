@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { clamp, noop } from 'lodash';
+import { clamp, isFinite, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,11 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
 import { color } from '../utils/colors';
-import { useControlledRangeValue, useDebouncedHoverInteraction } from './utils';
+import {
+	floatClamp,
+	useControlledRangeValue,
+	useDebouncedHoverInteraction,
+} from './utils';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
 import {
@@ -42,6 +46,7 @@ const BaseRangeControl = forwardRef(
 			allowReset = false,
 			beforeIcon,
 			className,
+			currentInput,
 			color: colorProp = color( 'blue.wordpress.700' ),
 			disabled = false,
 			help,
@@ -54,7 +59,7 @@ const BaseRangeControl = forwardRef(
 			onBlur = noop,
 			onChange = noop,
 			onFocus = noop,
-			onMouseEnter = noop,
+			onMouseMove = noop,
 			onMouseLeave = noop,
 			renderTooltipContent = ( v ) => v,
 			showTooltip: showTooltipProp,
@@ -67,7 +72,7 @@ const BaseRangeControl = forwardRef(
 	) => {
 		const isRTL = useRtl();
 
-		const sliderValue = initialPosition || valueProp;
+		const sliderValue = valueProp || initialPosition;
 		const [ value, setValue ] = useControlledRangeValue( {
 			min,
 			max,
@@ -75,7 +80,6 @@ const BaseRangeControl = forwardRef(
 		} );
 		const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 		const [ isFocused, setIsFocused ] = useState( false );
-		const originalValueRef = useRef( value );
 
 		const inputRef = useRef();
 
@@ -90,7 +94,16 @@ const BaseRangeControl = forwardRef(
 		const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
 		const isThumbFocused = ! disabled && isFocused;
 
-		const fillValue = ( ( value - min ) / ( max - min ) ) * 100;
+		const isValueReset = value === null;
+		const inputSliderValue = isValueReset ? '' : value;
+		const currentInputValue = isValueReset ? '' : value || currentInput;
+
+		const rangeFillValue = isValueReset
+			? floatClamp( max / 2, min, max )
+			: value;
+
+		const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
+		const fillValue = isValueReset ? 50 : calculatedFillValue;
 		const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
 
 		const classes = classnames( 'components-range-control', className );
@@ -103,7 +116,7 @@ const BaseRangeControl = forwardRef(
 		const id = `inspector-range-control-${ instanceId }`;
 
 		const describedBy = !! help ? `${ id }__help` : undefined;
-		const enableTooltip = showTooltipProp !== false;
+		const enableTooltip = showTooltipProp !== false && isFinite( value );
 
 		const handleOnChange = ( event ) => {
 			if ( ! event.target.checkValidity() ) {
@@ -117,10 +130,8 @@ const BaseRangeControl = forwardRef(
 		};
 
 		const handleOnReset = () => {
-			const nextValue = originalValueRef.current;
-
-			setValue( nextValue );
-			onChange( nextValue );
+			setValue( null );
+			onChange( undefined );
 		};
 
 		const handleShowTooltip = () => setShowTooltip( true );
@@ -141,7 +152,7 @@ const BaseRangeControl = forwardRef(
 		const hoverInteractions = useDebouncedHoverInteraction( {
 			onShow: handleShowTooltip,
 			onHide: handleHideTooltip,
-			onMouseEnter,
+			onMouseMove,
 			onMouseLeave,
 		} );
 
@@ -188,7 +199,7 @@ const BaseRangeControl = forwardRef(
 							step={ step }
 							tabIndex={ 0 }
 							type="range"
-							value={ value }
+							value={ inputSliderValue }
 						/>
 						<RangeRail
 							aria-hidden={ true }
@@ -196,7 +207,7 @@ const BaseRangeControl = forwardRef(
 							max={ max }
 							min={ min }
 							step={ step }
-							value={ value }
+							value={ rangeFillValue }
 						/>
 						<Track
 							aria-hidden={ true }
@@ -211,7 +222,6 @@ const BaseRangeControl = forwardRef(
 						</ThumbWrapper>
 						{ enableTooltip && (
 							<SimpleTooltip
-								{ ...hoverInteractions }
 								className="components-range-control__tooltip"
 								inputRef={ inputRef }
 								renderTooltipContent={ renderTooltipContent }
@@ -236,7 +246,7 @@ const BaseRangeControl = forwardRef(
 							onChange={ handleOnChange }
 							step={ step }
 							type="number"
-							value={ value }
+							value={ currentInputValue }
 						/>
 					) }
 					{ allowReset && (

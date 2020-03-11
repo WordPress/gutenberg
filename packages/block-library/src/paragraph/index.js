@@ -56,12 +56,6 @@ export const settings = {
 				( attributesToMerge.content || '' ),
 		};
 	},
-	getEditWrapperProps( attributes ) {
-		const { width } = attributes;
-		if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
-			return { 'data-align': width };
-		}
-	},
 	edit,
 	save,
 };

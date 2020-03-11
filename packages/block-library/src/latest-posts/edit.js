@@ -325,6 +325,21 @@ class LatestPostsEdit extends Component {
 							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
 						} );
 
+						const postExcerpt =
+							excerptLength <
+								excerpt.trim().split( ' ' ).length &&
+							post.excerpt.raw === ''
+								? excerpt
+										.trim()
+										.split( ' ', excerptLength )
+										.join( ' ' ) +
+								  ' ... <a href=' +
+								  post.link +
+								  'target="_blank" rel="noopener noreferrer">' +
+								  __( 'Read more' ) +
+								  '</a>'
+								: excerpt;
+
 						return (
 							<li key={ i }>
 								{ displayFeaturedImage && (
@@ -370,28 +385,7 @@ class LatestPostsEdit extends Component {
 									displayPostContentRadio === 'excerpt' && (
 										<div className="wp-block-latest-posts__post-excerpt">
 											<RawHTML key="html">
-												{ excerptLength <
-												excerpt.trim().split( ' ' )
-													.length
-													? excerpt
-															.trim()
-															.split(
-																' ',
-																excerptLength
-															)
-															.join( ' ' ) +
-													  ' ... <a href=' +
-													  post.link +
-													  'target="_blank" rel="noopener noreferrer">' +
-													  __( 'Read more' ) +
-													  '</a>'
-													: excerpt
-															.trim()
-															.split(
-																' ',
-																excerptLength
-															)
-															.join( ' ' ) }
+												{ postExcerpt }
 											</RawHTML>
 										</div>
 									) }

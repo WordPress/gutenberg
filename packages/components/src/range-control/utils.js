@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { clamp, noop } from 'lodash';
+import { clamp, isFinite, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,35 +11,42 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
 /**
  * A float supported clamp function for a specific value.
  *
- * @param {number} value The value to clamp
+ * @param {number|null} value The value to clamp
  * @param {number} min The minimum value
  * @param {number} max The maxinum value
  *
  * @return {number} A (float) number
  */
-function floatClamp( value, min, max ) {
+export function floatClamp( value, min, max ) {
+	if ( ! isFinite( value ) ) {
+		return null;
+	}
+
 	return parseFloat( clamp( value, min, max ) );
 }
 
 /**
  * Hook to store a clamped value, derived from props.
  */
-export function useControlledRangeValue( { min, max, value: valueProp = 0 } ) {
+export function useControlledRangeValue( { min, max, value: valueProp } ) {
 	const [ value, setValue ] = useState( floatClamp( valueProp, min, max ) );
 	const valueRef = useRef( value );
 
-	const setClampValue = ( nextValue ) => {
-		setValue( floatClamp( nextValue, min, max ) );
-	};
+	const setClampValue = useCallback(
+		( nextValue ) => {
+			setValue( floatClamp( nextValue, min, max ) );
+		},
+		[ setValue, min, max ]
+	);
 
 	useEffect( () => {
 		if ( valueRef.current !== valueProp ) {
 			setClampValue( valueProp );
 			valueRef.current = valueProp;
 		}
-	}, [ valueProp, setClampValue ] );
+	}, [ valueProp, setValue ] );
 
-	return [ value, setClampValue ];
+	return [ value, setValue ];
 }
 
 /**
@@ -49,7 +56,7 @@ export function useControlledRangeValue( { min, max, value: valueProp = 0 } ) {
 export function useDebouncedHoverInteraction( {
 	onShow = noop,
 	onHide = noop,
-	onMouseEnter = noop,
+	onMouseMove = noop,
 	onMouseLeave = noop,
 	timeout = 300,
 } ) {
@@ -65,8 +72,8 @@ export function useDebouncedHoverInteraction( {
 		[ timeout ]
 	);
 
-	const handleOnMouseEnter = useCallback( ( event ) => {
-		onMouseEnter( event );
+	const handleOnMouseMove = useCallback( ( event ) => {
+		onMouseMove( event );
 
 		setDebouncedTimeout( () => {
 			if ( ! show ) {
@@ -92,7 +99,7 @@ export function useDebouncedHoverInteraction( {
 	} );
 
 	return {
-		onMouseEnter: handleOnMouseEnter,
+		onMouseMove: handleOnMouseMove,
 		onMouseLeave: handleOnMouseLeave,
 	};
 }

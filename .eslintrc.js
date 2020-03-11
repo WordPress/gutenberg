@@ -42,13 +42,13 @@ module.exports = {
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/gutenberg-phase': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
-		'@wordpress/valid-text-domain': [
+		'@wordpress/i18n-text-domain': [
 			'error',
 			{
 				allowDefault: true,
 			},
 		],
-		'@wordpress/no-missing-translator-comments': 'error',
+		'@wordpress/i18n-translator-comments': 'error',
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or

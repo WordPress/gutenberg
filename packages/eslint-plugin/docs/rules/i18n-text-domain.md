@@ -1,4 +1,4 @@
-# Enforce passing valid text domains (valid-text-domain)
+# Enforce passing valid text domains (i18n-text-domain)
 
 [Translation functions](https://github.com/WordPress/gutenberg/blob/master/packages/i18n/README.md#api) must be called with a valid string literal as the text domain.
 

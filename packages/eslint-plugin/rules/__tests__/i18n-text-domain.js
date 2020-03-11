@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../valid-text-domain';
+import rule from '../i18n-text-domain';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -14,7 +14,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'valid-text-domain', rule, {
+ruleTester.run( 'i18n-text-domain', rule, {
 	valid: [
 		{
 			code: `__('Hello World')`,

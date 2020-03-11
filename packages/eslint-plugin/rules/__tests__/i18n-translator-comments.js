@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../no-missing-translator-comments';
+import rule from '../i18n-translator-comments';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -14,7 +14,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'no-missing-translator-comments', rule, {
+ruleTester.run( 'i18n-translator-comments', rule, {
 	valid: [
 		{
 			code: `

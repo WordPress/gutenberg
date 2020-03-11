@@ -5,8 +5,8 @@ module.exports = {
 		'@wordpress/valid-sprintf': 'error',
 		'@wordpress/no-base-control-with-label-without-id': 'error',
 		'@wordpress/no-unguarded-get-range-at': 'error',
-		'@wordpress/no-missing-translator-comments': 'error',
-		'@wordpress/valid-text-domain': 'error',
+		'@wordpress/i18n-translator-comments': 'error',
+		'@wordpress/i18n-text-domain': 'error',
 		'no-restricted-syntax': [
 			'error',
 			{
