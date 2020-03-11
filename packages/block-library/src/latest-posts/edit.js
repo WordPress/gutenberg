@@ -97,7 +97,7 @@ class LatestPostsEdit extends Component {
 			featuredImageSizeWidth,
 			featuredImageSizeHeight,
 		} = attributes;
-		var suggestions = categoriesList.reduce(
+		const suggestions = categoriesList.reduce(
 			( accumulator, category ) => ( {
 				...accumulator,
 				[ category.name ]: category,
@@ -236,18 +236,20 @@ class LatestPostsEdit extends Component {
 							setAttributes( { postsToShow: value } )
 						}
 					/>
-					<FormTokenField
-						label={ __( 'Categories' ) }
-						value={
-							categories &&
-							categories.map( ( item ) => ( {
-								id: item.id,
-								value: item.name || item.value,
-							} ) )
-						}
-						suggestions={ Object.keys( suggestions ) }
-						onChange={ selectCategories }
-					/>
+					{ categoriesList.length > 0 && (
+						<FormTokenField
+							label={ __( 'Categories' ) }
+							value={
+								categories &&
+								categories.map( ( item ) => ( {
+									id: item.id,
+									value: item.name || item.value,
+								} ) )
+							}
+							suggestions={ Object.keys( suggestions ) }
+							onChange={ selectCategories }
+						/>
+					) }
 					{ postLayout === 'grid' && (
 						<RangeControl
 							label={ __( 'Columns' ) }
@@ -439,7 +441,10 @@ export default withSelect( ( select, props ) => {
 	const { getEntityRecords, getMedia } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
 	const { imageSizes, imageDimensions } = getSettings();
-	const catIds = categories.map( ( cat ) => cat.id );
+	const catIds =
+		categories && categories.length > 0
+			? categories.map( ( cat ) => cat.id )
+			: [];
 	const latestPostsQuery = pickBy(
 		{
 			categories: catIds,
