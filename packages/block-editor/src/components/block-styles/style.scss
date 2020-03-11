@@ -27,7 +27,13 @@
 	}
 
 	&.is-active {
-		@include block-style__is-active();
+		.block-editor-block-styles__item-label {
+			font-weight: bold;
+		}
+
+		.block-editor-block-styles__item-preview {
+			border: 2px solid $dark-gray-primary;
+		}
 	}
 }
 
