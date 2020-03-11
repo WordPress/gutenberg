@@ -25,7 +25,6 @@ function ButtonGroup( {
 		<div className={ classes } role={ role } { ...props }>
 			{ mode === 'radio'
 				? children.map( ( child, index ) => {
-						// TODO: Handle children witout value props
 						const { value } = child.props;
 						const isChecked = checked === value;
 						return cloneElement( child, {
