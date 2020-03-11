@@ -1,20 +1,15 @@
 .components-button-group {
 	display: inline-block;
+	border-radius: $radius-block-ui;
+	border: $border-width solid $theme-color;
 
 	.components-button {
 		border-radius: 0;
 		display: inline-flex;
+		color: $theme-color;
 
 		& + .components-button {
 			margin-left: -1px;
-		}
-
-		&:first-child {
-			border-radius: 3px 0 0 3px;
-		}
-
-		&:last-child {
-			border-radius: 0 3px 3px 0;
 		}
 
 		// The focused button should be elevated so the focus ring isn't cropped,

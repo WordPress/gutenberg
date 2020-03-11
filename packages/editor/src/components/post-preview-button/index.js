@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, renderToString } from '@wordpress/element';
+import { Component, createRef, renderToString } from '@wordpress/element';
 import { Button, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -104,12 +104,13 @@ export class PostPreviewButton extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.buttonRef = createRef();
+
 		this.openPreviewWindow = this.openPreviewWindow.bind( this );
 	}
 
 	componentDidUpdate( prevProps ) {
 		const { previewLink } = this.props;
-
 		// This relies on the window being responsible to unset itself when
 		// navigation occurs or a new preview window is opened, to avoid
 		// unintentional forceful redirects.
@@ -129,6 +130,9 @@ export class PostPreviewButton extends Component {
 
 		if ( previewWindow && ! previewWindow.closed ) {
 			previewWindow.location = url;
+			if ( this.buttonRef.current ) {
+				this.buttonRef.current.focus();
+			}
 		}
 	}
 
@@ -198,6 +202,7 @@ export class PostPreviewButton extends Component {
 				target={ this.getWindowTarget() }
 				disabled={ ! isSaveable }
 				onClick={ this.openPreviewWindow }
+				ref={ this.buttonRef }
 			>
 				{ this.props.textContent
 					? this.props.textContent

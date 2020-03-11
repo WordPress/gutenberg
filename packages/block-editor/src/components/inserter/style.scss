@@ -1,4 +1,4 @@
-$block-inserter-content-height: 350px;
+$block-inserter-preview-height: 350px;
 $block-inserter-tabs-height: 44px;
 $block-inserter-search-height: 38px;
 
@@ -17,11 +17,10 @@ $block-inserter-search-height: 38px;
 }
 
 .block-editor-inserter__popover > .components-popover__content {
-	padding: 0 0 $border-width 0;
-
 	@include break-medium {
 		overflow-y: visible;
-		height: $block-inserter-content-height + $block-inserter-tabs-height + $block-inserter-search-height;
+		height: 100vh;
+		padding: 0;
 	}
 }
 
@@ -38,17 +37,6 @@ $block-inserter-search-height: 38px;
 
 .block-editor-inserter__menu {
 	height: 100%;
-	display: flex;
-	width: auto;
-	position: relative;
-
-	@include break-medium {
-		width: 400px;
-
-		&.has-help-panel {
-			width: 700px;
-		}
-	}
 }
 
 .block-editor-inserter__main-area {
@@ -81,6 +69,7 @@ $block-inserter-search-height: 38px;
 	position: relative;
 	z-index: 1;
 	border-radius: $radius-round-rectangle;
+	flex-shrink: 0;
 
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
 	font-size: $mobile-text-min-font-size;
@@ -102,10 +91,6 @@ $block-inserter-search-height: 38px;
 
 	&:focus {
 		outline: $border-width dotted $dark-gray-500;
-	}
-
-	@include break-medium {
-		height: $block-inserter-content-height + $block-inserter-tabs-height;
 	}
 
 	// Don't show the top border on the first panel, let the Search border be the border.
@@ -152,13 +137,17 @@ $block-inserter-search-height: 38px;
 
 .block-editor-inserter__menu-help-panel {
 	display: none;
-	border-left: $border-width solid $light-gray-500;
+	border: $border-width solid $light-gray-secondary;
 	width: 300px;
-	height: 100%;
+	min-height: $block-inserter-preview-height;
+	margin-right: 20px;
 	padding: 20px;
-	overflow-y: auto;
+	background: $white;
 
 	@include break-medium {
+		position: absolute;
+		top: 0;
+		left: calc(100% + 20px);
 		display: flex;
 		flex-direction: column;
 	}
@@ -172,7 +161,8 @@ $block-inserter-search-height: 38px;
 
 	.block-editor-inserter__preview {
 		display: flex;
-		flex-grow: 2;
+		flex-grow: 1;
+		overflow-y: auto;
 	}
 }
 
@@ -220,7 +210,7 @@ $block-inserter-search-height: 38px;
 	border-radius: $radius-round-rectangle;
 	min-height: 150px;
 	display: grid;
-	flex-grow: 2;
+	flex-grow: 1;
 
 	.block-editor-block-preview__container {
 		margin-right: 0;
@@ -237,4 +227,9 @@ $block-inserter-search-height: 38px;
 	border: $border-width solid $light-gray-500;
 	border-radius: $radius-round-rectangle;
 	align-items: center;
+}
+
+.block-editor-inserter__tips {
+	padding: $grid-unit-20;
+	flex-shrink: 0;
 }
