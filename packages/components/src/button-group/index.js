@@ -22,7 +22,7 @@ function ButtonGroup( {
 	return (
 		<div className={ classes } role={ role } { ...props }>
 			{ mode === 'radio'
-				? Children.map( children, ( child ) => {
+				? Children.map( children, ( child, index ) => {
 						// TODO: Handle children witout value props
 						const { value } = child.props;
 						const isChecked = checked === value;
@@ -31,6 +31,10 @@ function ButtonGroup( {
 							'aria-checked': isChecked,
 							isPrimary: isChecked,
 							isSecondary: ! isChecked,
+							tabIndex:
+								isChecked || ( ! checked && index === 0 )
+									? 0
+									: -1,
 							onClick() {
 								onChange( value );
 							},
