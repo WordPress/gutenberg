@@ -77,9 +77,7 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 				<RichText
 					ref={ ref }
 					identifier="content"
-					tagName={
-						Platform.OS === 'web' ? Block[ tagName ] : tagName
-					}
+					tagName={ Block[ tagName ] }
 					value={ content }
 					onChange={ ( value ) =>
 						setAttributes( { content: value } )
