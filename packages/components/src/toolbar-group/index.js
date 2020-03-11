@@ -79,7 +79,7 @@ function ToolbarGroup( {
 		controlSets = [ controlSets ];
 	}
 
-	if ( isCollapsed && Platform.OS === 'web') {
+	if ( isCollapsed && Platform.OS === 'web' ) {
 		return (
 			<ToolbarGroupCollapsed
 				label={ title }

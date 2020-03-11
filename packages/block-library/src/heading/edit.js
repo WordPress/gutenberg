@@ -47,13 +47,13 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 					selectedLevel={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
-					}					
+					}
 				/>
 				<AlignmentToolbar
 					value={ align }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { align: nextAlign } );
-					} }					
+					} }
 				/>
 			</BlockControls>
 			<InspectorControls>
