@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,6 +12,17 @@ import CategorySelect from './category-select';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
+
+// currently this is needed for consistent controls UI on mobile
+// this can be removed after control components settle on consistent defaults
+const MOBILE_CONTROL_PROPS = Platform.select( {
+	web: {},
+	native: { separatorType: 'fullWidth' },
+} );
+const MOBILE_CONTROL_PROPS_SEPARATOR_NONE = Platform.select( {
+	web: {},
+	native: { separatorType: 'none' },
+} );
 
 export default function QueryControls( {
 	categoriesList,
@@ -60,6 +72,7 @@ export default function QueryControls( {
 						onOrderByChange( newOrderBy );
 					}
 				} }
+				{ ...MOBILE_CONTROL_PROPS }
 			/>
 		),
 		onCategoryChange && (
@@ -70,6 +83,7 @@ export default function QueryControls( {
 				noOptionLabel={ __( 'All' ) }
 				selectedCategoryId={ selectedCategoryId }
 				onChange={ onCategoryChange }
+				{ ...MOBILE_CONTROL_PROPS }
 			/>
 		),
 		onNumberOfItemsChange && (
@@ -81,6 +95,7 @@ export default function QueryControls( {
 				min={ minItems }
 				max={ maxItems }
 				required
+				{ ...MOBILE_CONTROL_PROPS_SEPARATOR_NONE }
 			/>
 		),
 	];
