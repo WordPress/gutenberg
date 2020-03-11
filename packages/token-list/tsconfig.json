@@ -2,9 +2,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"outDir": "build-types",
-		"strictNullChecks": false,
-		"noImplicitAny": false
+		"outDir": "build-types"
 	},
 	"include": [ "src/**/*" ]
 }
