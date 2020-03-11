@@ -1,0 +1,43 @@
+.default {
+	border-radius: 15px;
+	padding: 7px 12px;
+	align-items: center;
+	justify-content: center;
+}
+
+.selected {
+	background-color: #fff;
+}
+
+.container {
+	height: 38px;
+	background-color: rgba(0, 0, 0, 0.04);
+	border-radius: 19px;
+	align-items: center;
+	flex-direction: row;
+	align-self: center;
+	padding: 4px;
+}
+
+.outline {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	border-width: 1px;
+	border-radius: 15px;
+	border-color: rgba(0, 0, 0, 0.1);
+}
+
+.buttonTextDefault {
+	font-size: 12px;
+	height: 16px;
+	font-weight: 500;
+	text-align: center;
+	color: rgba(0, 0, 0, 0.6);
+}
+
+.buttonTextSelected {
+	color: rgba(0, 0, 0, 0.87);
+}

@@ -32,6 +32,7 @@ import {
 	BottomSheet,
 	BottomSheetConsumer,
 	ColorControl,
+	SegmentedControls,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
@@ -311,6 +312,11 @@ class ButtonEdit extends Component {
 		} );
 	}
 
+	// eslint-disable-next-line no-unused-vars
+	onSegmentHandler( index, item ) {
+		//TODO
+	}
+
 	changeBottomSheetContent( destination ) {
 		LayoutAnimation.configureNext(
 			LayoutAnimation.create(
@@ -548,6 +554,10 @@ class ButtonEdit extends Component {
 											{ screen }
 										</Text>
 									</View>
+									<SegmentedControls
+										segments={ [ 'Solid', 'Gradient' ] }
+										segmentHandler={ this.onSegmentHandler }
+									/>
 									<HsvColorPicker
 										huePickerHue={ hue }
 										onHuePickerDragMove={
