@@ -50,28 +50,3 @@
 		}
 	}
 }
-
-.block-editor-media-replace-flow__link-viewer {
-	align-items: center;
-
-	.block-editor-url-popover__link-viewer-url {
-		margin: 0;
-		margin-right: 4px;
-	}
-
-	// Overflow is not working properly if we show the icon.
-	.components-external-link__icon {
-		display: none;
-	}
-	.components-visually-hidden {
-		position: initial;
-	}
-	.components-button {
-		flex-shrink: 0;
-	}
-
-	button {
-		position: relative;
-		top: -8px;
-	}
-}
