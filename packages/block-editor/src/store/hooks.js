@@ -44,14 +44,12 @@ export function useSetAttributes() {
  */
 export function useBlockAttributes() {
 	const clientId = useSelectedBlockClientId();
-	const { attributes } = useSelect( ( select ) => {
-		const { __unstableGetBlockWithoutInnerBlocks } = select(
-			'core/block-editor'
-		);
-		return __unstableGetBlockWithoutInnerBlocks( clientId ) || {};
+	const attributes = useSelect( ( select ) => {
+		const { getBlockAttributes } = select( 'core/block-editor' );
+		return getBlockAttributes( clientId ) || {};
 	}, [] );
 
-	return attributes || {};
+	return attributes;
 }
 
 /**
