@@ -15,7 +15,6 @@ import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
 } from '@wordpress/components';
-import OverflowView from '../../../../../../react-native-overflow-view/src/OverflowView'
 
 /**
  * Internal dependencies
@@ -136,6 +135,9 @@ export class BlockList extends Component {
 					ListFooterComponent={
 						! isReadOnly && withFooter && this.renderBlockListFooter
 					}
+					getItemLayout={(data, index) => {
+						return { length: 0, offset: 0, index };
+					}}
 					CellRendererComponent={ this.cellRenderer }
 				/>
 
