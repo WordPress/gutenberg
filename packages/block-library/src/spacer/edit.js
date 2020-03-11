@@ -12,8 +12,8 @@ import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 
-const minSpacerHeight = 20;
-const maxSpacerHeight = 500;
+const MIN_SPACER_HEIGHT = 20;
+const MAX_SPACER_HEIGHT = 500;
 
 const SpacerEdit = ( {
 	attributes,
@@ -41,7 +41,7 @@ const SpacerEdit = ( {
 				size={ {
 					height,
 				} }
-				minHeight={ minSpacerHeight }
+				minHeight={ MIN_SPACER_HEIGHT }
 				enable={ {
 					top: false,
 					right: false,
@@ -58,7 +58,7 @@ const SpacerEdit = ( {
 					onResizeStop();
 					const spacerHeight = Math.min(
 						parseInt( height + delta.height, 10 ),
-						maxSpacerHeight
+						MAX_SPACER_HEIGHT
 					);
 					updateHeight( spacerHeight );
 				} }
@@ -67,8 +67,8 @@ const SpacerEdit = ( {
 				<PanelBody title={ __( 'Spacer settings' ) }>
 					<RangeControl
 						label={ __( 'Height in pixels' ) }
-						min={ minSpacerHeight }
-						max={ maxSpacerHeight }
+						min={ MIN_SPACER_HEIGHT }
+						max={ MAX_SPACER_HEIGHT }
 						separatorType={ 'none' }
 						value={ height }
 						onChange={ updateHeight }
