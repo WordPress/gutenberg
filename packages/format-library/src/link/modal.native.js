@@ -169,6 +169,7 @@ class ModalLinkUI extends Component {
 						autoCorrect={ false }
 						keyboardType="url"
 						onChangeValue={ this.onChangeInputValue }
+						onSubmit={ this.onDismiss }
 						autoFocus={ Platform.OS === 'ios' }
 					/>
 					/* eslint-enable jsx-a11y/no-autofocus */
@@ -179,6 +180,7 @@ class ModalLinkUI extends Component {
 					value={ text }
 					placeholder={ __( 'Add link text' ) }
 					onChangeValue={ this.onChangeText }
+					onSubmit={ this.onDismiss }
 				/>
 				<BottomSheet.SwitchCell
 					icon={ external }

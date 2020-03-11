@@ -98,6 +98,7 @@ class BottomSheetCell extends Component {
 			cellContainerStyle = {},
 			cellRowContainerStyle = {},
 			onChangeValue,
+			onSubmit,
 			children,
 			editable = true,
 			separatorType,
@@ -226,6 +227,7 @@ class BottomSheetCell extends Component {
 					}
 					onFocus={ startEditing }
 					onBlur={ finishEditing }
+					onSubmitEditing={ onSubmit }
 					keyboardType={ this.typeToKeyboardType( type, step ) }
 					{ ...valueProps }
 				/>
