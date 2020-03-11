@@ -11,6 +11,10 @@ export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorControls } from './inspector-controls';
+export {
+	default as __experimentalLineHeightControl,
+	withLineHeight as __experimentalWithLineHeight,
+} from './line-height-control';
 export { default as PlainText } from './plain-text';
 export {
 	default as RichText,
