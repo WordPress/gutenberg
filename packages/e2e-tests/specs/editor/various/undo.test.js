@@ -173,7 +173,7 @@ describe( 'undo', () => {
 		await page.keyboard.type( 'test' );
 		await saveDraft();
 		await page.reload();
-		await page.click( '.wp-block-paragraph' );
+		await page.click( '[data-type="core/paragraph"]' );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'b' );
 		await pressKeyWithModifier( 'primary', 'z' );
@@ -397,7 +397,7 @@ describe( 'undo', () => {
 			await page.$( '.editor-history__undo[aria-disabled="true"]' )
 		).not.toBeNull();
 
-		await page.click( '.wp-block-paragraph' );
+		await page.click( '[data-type="core/paragraph"]' );
 
 		await page.keyboard.type( '2' );
 

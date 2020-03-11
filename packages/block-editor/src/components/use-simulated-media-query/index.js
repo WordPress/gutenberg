@@ -8,6 +8,7 @@ import { match } from 'css-mediaquery';
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
+import { getProtocol, getAuthority } from '@wordpress/url';
 
 const ENABLED_MEDIA_QUERY = '(min-width:0px)';
 const DISABLED_MEDIA_QUERY = '(min-width:999999px)';
@@ -22,9 +23,12 @@ function getStyleSheetsThatMatchHostname() {
 	return filter(
 		get( window, [ 'document', 'styleSheets' ], [] ),
 		( styleSheet ) => {
+			if ( ! styleSheet.href ) {
+				return false;
+			}
 			return (
-				styleSheet.href &&
-				styleSheet.href.includes( window.location.hostname )
+				getProtocol( styleSheet.href ) === window.location.protocol &&
+				getAuthority( styleSheet.href ) === window.location.host
 			);
 		}
 	);
