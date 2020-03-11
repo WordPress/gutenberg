@@ -16,6 +16,7 @@ import {
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import OverflowView from '../../../../../../react-native-overflow-view/src/OverflowView'
 
 /**
  * Internal dependencies
@@ -208,7 +209,8 @@ class BlockListBlock extends Component {
 				accessible={ ! isSelected }
 				accessibilityRole={ 'button' }
 			>
-				<View accessibilityLabel={ accessibilityLabel }>
+				<OverflowView accessibilityLabel={ accessibilityLabel } 
+				pointerEvents={adjustsForFloatingToolbar ? 'box-none' : 'auto'}>
 					{ showFloatingToolbar && (
 						<FloatingToolbar>
 							{ hasParent && (
@@ -243,7 +245,7 @@ class BlockListBlock extends Component {
 							) }
 						</View>
 					</View>
-				</View>
+				</OverflowView>
 			</TouchableWithoutFeedback>
 		);
 	}
