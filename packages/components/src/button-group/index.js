@@ -24,14 +24,15 @@ function ButtonGroup( {
 			{ mode === 'radio'
 				? Children.map( children, ( child ) => {
 						// TODO: Handle children witout value props
-						const isChecked = checked === child.props.value;
+						const { value } = child.props;
+						const isChecked = checked === value;
 						return cloneElement( child, {
 							role: mode,
 							'aria-checked': isChecked,
 							isPrimary: isChecked,
 							isSecondary: ! isChecked,
 							onClick() {
-								onChange( child.props.value );
+								onChange( value );
 							},
 						} );
 				  } )
