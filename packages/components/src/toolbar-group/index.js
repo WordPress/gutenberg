@@ -7,7 +7,7 @@ import { flatMap } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
+import { useContext, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -79,7 +79,7 @@ function ToolbarGroup( {
 		controlSets = [ controlSets ];
 	}
 
-	if ( isCollapsed ) {
+	if ( isCollapsed && Platform.OS === 'web') {
 		return (
 			<ToolbarGroupCollapsed
 				label={ title }

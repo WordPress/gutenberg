@@ -22,7 +22,7 @@ import {
 	__experimentalUseColors,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { useRef, Platform } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 
 function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 	const ref = useRef();
@@ -47,15 +47,13 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 					selectedLevel={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
-					}
-					isCollapsed={ Platform.OS === 'web' }
+					}					
 				/>
 				<AlignmentToolbar
 					value={ align }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { align: nextAlign } );
-					} }
-					isCollapsed={ Platform.OS === 'web' }
+					} }					
 				/>
 			</BlockControls>
 			<InspectorControls>
