@@ -45,7 +45,7 @@ module.exports = {
 		'@wordpress/i18n-text-domain': [
 			'error',
 			{
-				allowDefault: true,
+				allowedTextDomains: [ 'default' ],
 			},
 		],
 		'@wordpress/i18n-translator-comments': 'error',

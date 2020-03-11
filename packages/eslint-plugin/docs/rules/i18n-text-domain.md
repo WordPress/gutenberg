@@ -7,21 +7,20 @@
 Examples of **incorrect** code for this rule:
 
 ```js
-__( 'Hello World' ); // unless allowDefault is set.
-__( 'Hello World', 'default' ); // with allowDefault set.
+__( 'Hello World' ); // unless allowedTextDomains contains 'default'
+__( 'Hello World', 'default' ); // with allowedTextDomains = [ 'default' ]
 __( 'Hello World', foo );
 ```
 
 Examples of **correct** code for this rule:
 
 ```js
-__( 'Hello World' ); // with allowDefault set.
-__( 'Hello World', 'foo-bar' ); // with allowedTextDomains set
+__( 'Hello World' ); // with allowedTextDomains = [ 'default' ]
+__( 'Hello World', 'foo-bar' ); // with allowedTextDomains = [ 'foo-bar' ]
 ```
 
 ## Options
 
-This rule accepts two options:
+This rule accepts a single options argument:
 
-- Set the `allowDefault` boolean to allow omitting the text domain and using its default value (`'default'`).
-- Set `allowedTextDomains` to specify the list of allowed text domains, e.g. `'foo-bar'`.
+- Set `allowedTextDomains` to specify the list of allowed text domains, e.g. `[ 'foo', 'bar' ]`. The default is `[ 'default' ]`.

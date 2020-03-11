@@ -18,19 +18,19 @@ ruleTester.run( 'i18n-text-domain', rule, {
 	valid: [
 		{
 			code: `__('Hello World')`,
-			options: [ { allowDefault: true } ],
+			options: [ { allowedTextDomains: [ 'default' ] } ],
 		},
 		{
 			code: `_x('Hello World', 'context')`,
-			options: [ { allowDefault: true } ],
+			options: [ { allowedTextDomains: [ 'default' ] } ],
 		},
 		{
 			code: `var number = ''; _n('Singular', 'Plural', number)`,
-			options: [ { allowDefault: true } ],
+			options: [ { allowedTextDomains: [ 'default' ] } ],
 		},
 		{
 			code: `var number = ''; _nx('Singular', 'Plural', number, 'context')`,
-			options: [ { allowDefault: true } ],
+			options: [ { allowedTextDomains: [ 'default' ] } ],
 		},
 		{
 			code: `__('Hello World', 'foo')`,
@@ -117,31 +117,31 @@ ruleTester.run( 'i18n-text-domain', rule, {
 		{
 			code: `__('Hello World', 'default')`,
 			output: `__('Hello World')`,
-			options: [ { allowDefault: true } ],
+			options: [ { allowedTextDomains: [ 'default' ] } ],
 			errors: [ { messageId: 'unnecessaryDefault' } ],
 		},
 		{
 			code: `__('default', 'default')`,
 			output: `__('default')`,
-			options: [ { allowDefault: true } ],
+			options: [ { allowedTextDomains: [ 'default' ] } ],
 			errors: [ { messageId: 'unnecessaryDefault' } ],
 		},
 		{
 			code: `_x('Hello World', 'context', 'default')`,
 			output: `_x('Hello World', 'context')`,
-			options: [ { allowDefault: true } ],
+			options: [ { allowedTextDomains: [ 'default' ] } ],
 			errors: [ { messageId: 'unnecessaryDefault' } ],
 		},
 		{
 			code: `var number = ''; _n('Singular', 'Plural', number, 'default')`,
 			output: `var number = ''; _n('Singular', 'Plural', number)`,
-			options: [ { allowDefault: true } ],
+			options: [ { allowedTextDomains: [ 'default' ] } ],
 			errors: [ { messageId: 'unnecessaryDefault' } ],
 		},
 		{
 			code: `var number = ''; _nx('Singular', 'Plural', number, 'context', 'default')`,
 			output: `var number = ''; _nx('Singular', 'Plural', number, 'context')`,
-			options: [ { allowDefault: true } ],
+			options: [ { allowedTextDomains: [ 'default' ] } ],
 			errors: [ { messageId: 'unnecessaryDefault' } ],
 		},
 	],

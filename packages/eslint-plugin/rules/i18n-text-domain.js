@@ -32,10 +32,6 @@ module.exports = {
 			{
 				type: 'object',
 				properties: {
-					allowDefault: {
-						type: 'boolean',
-						default: false,
-					},
 					allowedTextDomains: {
 						type: 'array',
 						items: {
@@ -59,8 +55,9 @@ module.exports = {
 	},
 	create( context ) {
 		const options = context.options[ 0 ] || {};
-		const { allowDefault, allowedTextDomains = [] } = options;
+		const { allowedTextDomains = [ 'default' ] } = options;
 		const canFixTextDomain = allowedTextDomains.length === 1;
+		const allowDefault = allowedTextDomains.includes( 'default' );
 
 		return {
 			CallExpression( node ) {
@@ -73,8 +70,8 @@ module.exports = {
 
 				if ( textDomain === undefined ) {
 					if ( ! allowDefault ) {
-						const lastArg = args[ args.length - 1 ];
 						const addMissingTextDomain = ( fixer ) => {
+							const lastArg = args[ args.length - 1 ];
 							return fixer.insertTextAfter(
 								lastArg,
 								`, '${ allowedTextDomains[ 0 ] }'`
@@ -100,26 +97,25 @@ module.exports = {
 					return;
 				}
 
+				if ( 'default' === value && allowDefault ) {
+					const removeDefaultTextDomain = ( fixer ) => {
+						const previousArgIndex = args.indexOf( textDomain ) - 1;
+						const previousArg = args[ previousArgIndex ];
+						return fixer.removeRange( [
+							previousArg.range[ 1 ],
+							range[ 1 ],
+						] );
+					};
+
+					context.report( {
+						node,
+						messageId: 'unnecessaryDefault',
+						fix: removeDefaultTextDomain,
+					} );
+					return;
+				}
+
 				if ( ! allowedTextDomains.includes( value ) ) {
-					const previousArgIndex = args.indexOf( textDomain ) - 1;
-					const previousArg = args[ previousArgIndex ];
-
-					if ( 'default' === value && allowDefault ) {
-						const removeDefaultTextDomain = ( fixer ) => {
-							return fixer.removeRange( [
-								previousArg.range[ 1 ],
-								range[ 1 ],
-							] );
-						};
-
-						context.report( {
-							node,
-							messageId: 'unnecessaryDefault',
-							fix: removeDefaultTextDomain,
-						} );
-						return;
-					}
-
 					const replaceTextDomain = ( fixer ) => {
 						return fixer.replaceTextRange(
 							// account for quotes.
