@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { join } from 'path';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,12 @@ function readFile( filePath ) {
 	return existsSync( filePath )
 		? readFileSync( filePath, 'utf8' ).trim()
 		: '';
+}
+
+function deleteFile( filePath ) {
+	if ( existsSync( filePath ) ) {
+		unlinkSync( filePath );
+	}
 }
 
 describe( 'Performance', () => {
@@ -49,7 +55,6 @@ describe( 'Performance', () => {
 		};
 
 		let i = 1;
-		let startTime;
 
 		while ( i-- ) {
 			await page.reload( { waitUntil: [ 'domcontentloaded', 'load' ] } );
@@ -72,17 +77,39 @@ describe( 'Performance', () => {
 		await insertBlock( 'Paragraph' );
 
 		i = 200;
+		const traceFile = __dirname + '/trace.json';
+
+		await page.tracing.start( {
+			path: traceFile,
+			screenshots: false,
+			categories: [ 'devtools.timeline' ],
+		} );
 
 		while ( i-- ) {
-			startTime = new Date();
 			await page.keyboard.type( 'x' );
-			results.type.push( new Date() - startTime );
 		}
+
+		await page.tracing.stop();
+
+		const traceResults = JSON.parse( readFile( traceFile ) );
+		const isKeypressEvent = ( item ) =>
+			item.cat === 'devtools.timeline' &&
+			item.name === 'EventDispatch' &&
+			item.dur &&
+			item.args &&
+			item.args.data &&
+			item.args.data.type === 'keypress';
+
+		results.type = traceResults.traceEvents
+			.filter( isKeypressEvent )
+			.map( ( item ) => item.dur / 1000 );
 
 		writeFileSync(
 			__dirname + '/results.json',
 			JSON.stringify( results, null, 2 )
 		);
+
+		deleteFile( traceFile );
 
 		expect( true ).toBe( true );
 	} );
