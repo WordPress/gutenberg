@@ -4,7 +4,6 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Notice } from '@wordpress/components';
-import { ENTER, ESCAPE } from '@wordpress/keycodes';
 import { keyboardReturn } from '@wordpress/icons';
 
 /**
@@ -45,22 +44,7 @@ const LinkControlSearchInput = ( {
 	}
 
 	return (
-		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-		<form
-			onSubmit={ selectSuggestionOrCurrentInputValue }
-			onKeyDown={ ( event ) => {
-				event.stopPropagation();
-			} }
-			onKeyPress={ ( event ) => {
-				const { keycode } = event;
-				if ( keycode === ENTER ) {
-					selectSuggestionOrCurrentInputValue();
-				}
-				if ( keycode !== ESCAPE ) {
-					event.stopPropagation();
-				}
-			} }
-		>
+		<form onSubmit={ selectSuggestionOrCurrentInputValue }>
 			<div className="block-editor-link-control__search-input-wrapper">
 				<URLInput
 					className="block-editor-link-control__search-input"

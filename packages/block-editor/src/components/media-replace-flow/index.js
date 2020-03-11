@@ -123,7 +123,16 @@ const MediaReplaceFlow = ( {
 						</MediaUploadCheck>
 					</NavigableMenu>
 					{ onSelectURL && (
-						<div className="block-editor-media-flow__url-input">
+						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+						<form
+							className="block-editor-media-flow__url-input"
+							onKeyDown={ ( event ) => {
+								event.stopPropagation();
+							} }
+							onKeyPress={ ( event ) => {
+								event.stopPropagation();
+							} }
+						>
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }
 							</span>
@@ -137,7 +146,7 @@ const MediaReplaceFlow = ( {
 									editMediaButtonRef.current.focus();
 								} }
 							/>
-						</div>
+						</form>
 					) }
 				</>
 			) }
