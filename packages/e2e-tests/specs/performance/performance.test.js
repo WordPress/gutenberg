@@ -51,16 +51,22 @@ describe( 'Performance', () => {
 		let i = 1;
 		let startTime;
 
-		await page.on( 'load', () =>
-			results.load.push( new Date() - startTime )
-		);
-		await page.on( 'domcontentloaded', () =>
-			results.domcontentloaded.push( new Date() - startTime )
-		);
-
 		while ( i-- ) {
-			startTime = new Date();
 			await page.reload( { waitUntil: [ 'domcontentloaded', 'load' ] } );
+			const timings = JSON.parse(
+				await page.evaluate( () =>
+					JSON.stringify( window.performance.timing )
+				)
+			);
+			const {
+				navigationStart,
+				domContentLoadedEventEnd,
+				loadEventEnd,
+			} = timings;
+			results.load.push( loadEventEnd - navigationStart );
+			results.domcontentloaded.push(
+				domContentLoadedEventEnd - navigationStart
+			);
 		}
 
 		await insertBlock( 'Paragraph' );
