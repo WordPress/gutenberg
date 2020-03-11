@@ -8,7 +8,7 @@
 // Forcing some space above the list of options in
 // the dropdown to visually balance them.
 .block-editor-media-replace-flow__options .components-popover__content {
-	padding-top: 8px;
+	padding-top: $grid-unit-20;
 }
 
 .block-editor-media-replace-flow__indicator {
@@ -16,29 +16,24 @@
 }
 
 .block-editor-media-flow__url-input {
-
-	border-top: 1px solid $light-gray-800;
-	margin-top: 8px;
+	margin-top: $grid-unit-20;
 
 	.block-editor-media-replace-flow__image-url-label {
-		color: $dark-gray-300;
-		font-size: $default-font-size;
-		display: block;
-		position: relative;
 		top: $grid-unit-20;
-		padding-left: $grid-unit-20;
 	}
 
 	.block-editor-link-control {
-		min-width: auto;
 		margin-top: -16px;
+		width: auto;
+
 		.block-editor-link-control__search-item-title {
 			max-width: 180px;
 			margin-top: $grid-unit-20;
 		}
+
 		.block-editor-link-control__search-item.is-current {
 			width: auto;
-			padding: $grid-unit-20;
+			padding: 0;
 		}
 	}
 }
