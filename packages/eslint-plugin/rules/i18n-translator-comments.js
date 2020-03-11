@@ -5,14 +5,14 @@ const {
 	TRANSLATION_FUNCTIONS,
 	REGEXP_PLACEHOLDER,
 	getTranslateStrings,
-} = require( '../util' );
+} = require( '../utils' );
 
 module.exports = {
 	meta: {
 		type: 'problem',
 		messages: {
 			missing:
-				'Translation function is missing preceding translator comment',
+				'Translation function with placeholders is missing preceding translator comment',
 		},
 	},
 	create( context ) {
@@ -36,34 +36,35 @@ module.exports = {
 					return;
 				}
 
-				let hasPlaceholders = false;
-
-				for ( const candidate of candidates ) {
-					if ( candidate.match( REGEXP_PLACEHOLDER ) ) {
-						hasPlaceholders = true;
-						break;
-					}
-				}
+				const hasPlaceholders = candidates.some( ( candidate ) =>
+					candidate.match( REGEXP_PLACEHOLDER )
+				);
 
 				if ( ! hasPlaceholders ) {
 					return;
 				}
 
-				const comments = [];
-
-				comments.push( ...context.getCommentsBefore( node ) );
+				const comments = context.getCommentsBefore( node ).slice();
 
 				let parentNode = parent;
 
+				/**
+				 * Loop through all parent nodes and get their preceding comments as well.
+				 *
+				 * This way we can gather comments that are not directly preceding the translation
+				 * function call, but are just on the line above it. This case is commonly supported
+				 * by string extraction tools like WP-CLI's i18n command.
+				 */
 				while (
 					parentNode &&
+					parentNode.type !== 'Program' &&
 					Math.abs( parentNode.loc.start.line - currentLine ) <= 1
 				) {
 					comments.push( ...context.getCommentsBefore( parentNode ) );
 					parentNode = parentNode.parent;
 				}
 
-				for ( const comment of comments.filter( Boolean ) ) {
+				for ( const comment of comments ) {
 					const {
 						value: commentText,
 						loc: {
@@ -71,11 +72,22 @@ module.exports = {
 						},
 					} = comment;
 
+					/*
+					Skip cases like this:
+
+					// translators: %s: Preference
+					console.log(
+						sprintf(
+							__( 'Preference: %s' ),
+							preference
+						)
+					);
+					 */
 					if ( Math.abs( commentLine - currentLine ) > 1 ) {
 						continue;
 					}
 
-					if ( commentText.trim().match( /translators: /i ) ) {
+					if ( /translators:\s*\S+/i.test( commentText ) ) {
 						return;
 					}
 				}

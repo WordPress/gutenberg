@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const { REGEXP_PLACEHOLDER, getTranslateStrings } = require( '../util' );
+const { REGEXP_PLACEHOLDER, getTranslateStrings } = require( '../utils' );
 
 module.exports = {
 	meta: {

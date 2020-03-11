@@ -18,13 +18,11 @@ ruleTester.run( 'i18n-translator-comments', rule, {
 	valid: [
 		{
 			code: `
-var color = '';
 // translators: %s: Color
 sprintf( __( 'Color: %s' ), color );`,
 		},
 		{
 			code: `
-var address = '';
 sprintf(
 	// translators: %s: Address.
 	__( 'Address: %s' ),
@@ -35,13 +33,11 @@ sprintf(
 	invalid: [
 		{
 			code: `
-var color = '';
 sprintf( __( 'Color: %s' ), color );`,
 			errors: [ { messageId: 'missing' } ],
 		},
 		{
 			code: `
-var address = '';
 sprintf(
 	__( 'Address: %s' ),
 	address
@@ -53,6 +49,25 @@ sprintf(
 // translators: %s: Name
 var name = '';
 sprintf( __( 'Name: %s' ), name );`,
+			errors: [ { messageId: 'missing' } ],
+		},
+		{
+			code: `
+// translators: %s: Surname
+console.log(
+	sprintf( __( 'Surname: %s' ), name )
+);`,
+			errors: [ { messageId: 'missing' } ],
+		},
+		{
+			code: `
+// translators: %s: Preference
+console.log(
+	sprintf(
+		__( 'Preference: %s' ),
+		preference
+	)
+);`,
 			errors: [ { messageId: 'missing' } ],
 		},
 	],

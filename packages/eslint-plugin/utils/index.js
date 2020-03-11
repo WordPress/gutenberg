@@ -16,7 +16,7 @@ const REGEXP_PLACEHOLDER = /%[^%]/g;
  * @param {string}        functionName Function name.
  * @param {espree.Node[]} args         Espree argument Node objects.
  *
- * @return {?Array<string>} All possible translate function string results.
+ * @return {Array<string>|void} All possible translate function string results.
  */
 function getTranslateStrings( functionName, args ) {
 	switch ( functionName ) {
