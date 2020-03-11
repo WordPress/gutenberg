@@ -170,7 +170,7 @@
 		"sprintf-js": "1.1.1",
 		"style-loader": "1.0.0",
 		"stylelint-config-wordpress": "13.1.0",
-		"typescript": "3.8.2",
+		"typescript": "3.8.3",
 		"uuid": "3.3.2",
 		"webpack": "4.42.0",
 		"worker-farm": "1.7.0"
