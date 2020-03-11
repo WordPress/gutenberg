@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { uniqueId, debounce } from 'lodash';
+import { uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -48,17 +48,17 @@ const MediaReplaceFlow = ( {
 	const errorNoticeID = uniqueId();
 
 	const onError = ( message ) => {
-		const renderMsg = renderToString( message );
-		const speakMsg = debounce(
-			() => speak( renderToString( message ) ),
-			5000
-		);
-		speakMsg();
-		createNotice( 'error', renderMsg, {
-			id: errorNoticeID,
-			isDismissible: true,
-			__unstableHTML: true,
-		} );
+		const errorElement = document.createElement( 'div' );
+		errorElement.innerHTML = renderToString( message );
+		const renderMsg =
+			errorElement.textContent || errorElement.innerText || '';
+		setTimeout( () => {
+			createNotice( 'error', renderMsg, {
+				speak: true,
+				id: errorNoticeID,
+				isDismissible: true,
+			} );
+		}, 1000 );
 	};
 
 	const selectMedia = ( media ) => {
@@ -72,11 +72,10 @@ const MediaReplaceFlow = ( {
 		onSelectURL( newURL );
 	};
 
-	const uploadFiles = ( event, closeDropdown ) => {
+	const uploadFiles = ( event ) => {
 		const files = event.target.files;
 		const setMedia = ( [ media ] ) => {
 			selectMedia( media );
-			closeDropdown();
 		};
 		mediaUpload( {
 			allowedTypes,
