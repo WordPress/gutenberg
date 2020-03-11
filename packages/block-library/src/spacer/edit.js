@@ -23,7 +23,7 @@ const SpacerEdit = ( {
 	onResizeStop,
 } ) => {
 	const { height } = attributes;
-	const changeAttribute = ( value ) => {
+	const updateHeight = ( value ) => {
 		setAttributes( {
 			height: value,
 		} );
@@ -56,10 +56,11 @@ const SpacerEdit = ( {
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					onResizeStop();
-					const spacerHeight = parseInt( height + delta.height, 10 );
-					setAttributes( {
-						height: spacerHeight,
-					} );
+					const spacerHeight = Math.min(
+						parseInt( height + delta.height, 10 ),
+						maxSpacerHeight
+					);
+					updateHeight( spacerHeight );
 				} }
 			/>
 			<InspectorControls>
@@ -70,7 +71,7 @@ const SpacerEdit = ( {
 						max={ maxSpacerHeight }
 						separatorType={ 'none' }
 						value={ height }
-						onChange={ changeAttribute }
+						onChange={ updateHeight }
 						step={ 10 }
 					/>
 				</PanelBody>
