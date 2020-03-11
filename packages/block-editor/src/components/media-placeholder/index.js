@@ -139,10 +139,14 @@ export class MediaPlaceholder extends Component {
 					const filteredMedia = currentMedia.filter( ( item ) => {
 						// If Item has id, only remove it if lastMediaPassed has an item with that id.
 						if ( item.id ) {
-							return ! lastMediaPassed.some( ( { id } ) => id === item.id );
+							return ! lastMediaPassed.some(
+								( { id } ) => id === item.id
+							);
 						}
 						// Compare transient images via .includes since gallery may append extra info onto the url.
-						return ! lastMediaPassed.some( ( { urlSlug } ) => item.url.includes( urlSlug ) );
+						return ! lastMediaPassed.some( ( { urlSlug } ) =>
+							item.url.includes( urlSlug )
+						);
 					} );
 					// Return the filtered media array along with newMedia.
 					onSelect( filteredMedia.concat( newMedia ) );
