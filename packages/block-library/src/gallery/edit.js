@@ -73,6 +73,7 @@ class GalleryEdit extends Component {
 
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectImages = this.onSelectImages.bind( this );
+		this.onDeselectImage = this.onDeselectImage.bind( this );
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
@@ -117,6 +118,16 @@ class GalleryEdit extends Component {
 			if ( this.state.selectedImage !== index ) {
 				this.setState( {
 					selectedImage: index,
+				} );
+			}
+		};
+	}
+
+	onDeselectImage( index ) {
+		return () => {
+			if ( this.state.selectedImage === index ) {
+				this.setState( {
+					selectedImage: null,
 				} );
 			}
 		};
@@ -427,6 +438,7 @@ class GalleryEdit extends Component {
 					onMoveForward={ this.onMoveForward }
 					onRemoveImage={ this.onRemoveImage }
 					onSelectImage={ this.onSelectImage }
+					onDeselectImage={ this.onDeselectImage }
 					onSetImageAttributes={ this.setImageAttributes }
 					onFocusGalleryCaption={ this.onFocusGalleryCaption }
 				/>
