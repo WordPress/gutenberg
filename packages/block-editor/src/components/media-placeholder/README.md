@@ -161,6 +161,14 @@ An object or an array of objects that contain media ID (`id` property) to be sel
 - Required: No
 - Platform: Web
 
+### onSelectURL
+
+Callback called when urls can be configured. No media insertion from url will be available if not set.
+
+- Type: `Function`
+- Required: No
+- Platform: Web
+
 
 ## Extend
 
