@@ -23,16 +23,10 @@ function render_block_core_post_author() {
  * Registers the `core/post-author` block on the server.
  */
 function register_block_core_post_author() {
-	$path     = __DIR__ . '/post-author/block.json';
-	$metadata = json_decode( file_get_contents( $path ), true );
-
-	register_block_type(
-		$metadata['name'],
-		array_merge(
-			$metadata,
-			array(
-				'render_callback' => 'render_block_core_post_author',
-			)
+	register_block_type_from_metadata(
+		__DIR__ . '/post-author',
+		array(
+			'render_callback' => 'render_block_core_post_author',
 		)
 	);
 }

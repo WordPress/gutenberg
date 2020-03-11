@@ -8,6 +8,45 @@
  * @package gutenberg
  */
 
+ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
+	/**
+	 * Registers a block type from metadata stored in the `block.json` file.
+	 *
+	 * @since 7.8.0
+	 *
+	 * @param string $path Path to the folder where the `block.json` file is located.
+	 *                     Alternatively it's possible to provide only the name of the
+	 *                     last folder for blocks located in the WordPress core.
+	 * @param array  $args {
+	 *     Optional. Array of block type arguments. Any arguments may be defined, however the
+	 *     ones described below are supported by default. Default empty array.
+	 *
+	 *     @type callable $render_callback Callback used to render blocks of this block type.
+	 * }
+	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
+	 */
+	function register_block_type_from_metadata( $path, $args = array() ) {
+		$path = is_dir( $path ) ? $path : ABSPATH . WPINC . '/blocks/' . $path;
+		$file = trailingslashit( $path ) . 'block.json';
+		if ( ! file_exists( $file ) ) {
+			return false;
+		}
+
+		$metadata = json_decode( file_get_contents( $path ), true );
+		if ( ! is_array( $metadata ) ) {
+			return false;
+		}
+
+		return register_block_type(
+			$metadata['name'],
+			array_merge(
+				$metadata,
+				$args
+			)
+		);
+	}
+ }
+
 /**
  * Adds a polyfill for the WHATWG URL in environments which do not support it.
  * The intention in how this action is handled is under the assumption that this

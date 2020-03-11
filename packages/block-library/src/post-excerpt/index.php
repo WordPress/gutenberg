@@ -47,16 +47,10 @@ function render_block_core_post_excerpt( $attributes ) {
  * Registers the `core/post-excerpt` block on the server.
  */
 function register_block_core_post_excerpt() {
-	$path     = __DIR__ . '/post-excerpt/block.json';
-	$metadata = json_decode( file_get_contents( $path ), true );
-
-	register_block_type(
-		$metadata['name'],
-		array_merge(
-			$metadata,
-			array(
-				'render_callback' => 'render_block_core_post_excerpt',
-			)
+	register_block_type_from_metadata(
+		__DIR__ . '/post-excerpt',
+		array(
+			'render_callback' => 'render_block_core_post_excerpt',
 		)
 	);
 }
