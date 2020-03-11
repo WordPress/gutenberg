@@ -3,11 +3,12 @@
 }
 
 // Show an indicator triangle.
+.block-editor-block-switcher__no-switcher-icon,
 .block-editor-block-switcher__toggle {
 	position: relative;
 
 	&::after {
-		display: none;
+		display: block;
 		content: "";
 		position: absolute;
 		bottom: 1px;
@@ -41,14 +42,12 @@
 	}
 }
 
-// When the block switcher does not have any transformations, we show it but as disabled.
-// The background and opacity change helps make the icon legible, despite being disabled.
+// Even when the block switcher does not have any transformations, it still serves as a block indicator.
 .components-button.block-editor-block-switcher__no-switcher-icon:disabled {
-	opacity: 0.84;
+	opacity: 1;
 
-	// Also make the icon monochrome to further imply disabled state.
-	// We use !important here because icon colors are set as inline styles,
-	// and should be overridden when disabled.
+	// Since it's not clickable, though, don't show a hover state.
+	&,
 	.block-editor-block-icon.has-colors {
 		color: $dark-gray-primary !important;
 	}
@@ -164,10 +163,6 @@
 	}
 
 	.components-button.block-editor-block-switcher__toggle {
-		&::after {
-			display: block;
-		}
-
 		.block-editor-block-icon,
 		.block-editor-block-switcher__transform {
 			width: $block-toolbar-height;
