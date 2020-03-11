@@ -121,6 +121,12 @@ ruleTester.run( 'i18n-text-domain', rule, {
 			errors: [ { messageId: 'unnecessaryDefault' } ],
 		},
 		{
+			code: `__('default', 'default')`,
+			output: `__('default')`,
+			options: [ { allowDefault: true } ],
+			errors: [ { messageId: 'unnecessaryDefault' } ],
+		},
+		{
 			code: `_x('Hello World', 'context', 'default')`,
 			output: `_x('Hello World', 'context')`,
 			options: [ { allowDefault: true } ],

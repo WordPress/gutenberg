@@ -90,7 +90,7 @@ module.exports = {
 					return;
 				}
 
-				const { type, value, range, parent } = textDomain;
+				const { type, value, range } = textDomain;
 
 				if ( type !== 'Literal' ) {
 					context.report( {
@@ -101,10 +101,8 @@ module.exports = {
 				}
 
 				if ( ! allowedTextDomains.includes( value ) ) {
-					// avoids reverse() modifying the AST.
-					const previousArg = [ ...parent.arguments ]
-						.reverse()
-						.find( ( arg ) => arg.range[ 1 ] < range[ 0 ] );
+					const previousArgIndex = args.indexOf( textDomain ) - 1;
+					const previousArg = args[ previousArgIndex ];
 
 					if ( 'default' === value && allowDefault ) {
 						const removeDefaultTextDomain = ( fixer ) => {
