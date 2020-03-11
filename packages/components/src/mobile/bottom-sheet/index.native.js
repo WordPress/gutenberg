@@ -45,9 +45,6 @@ class BottomSheet extends Component {
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
-		this.onChangeContentWithOpacity = this.onChangeContentWithOpacity.bind(
-			this
-		);
 
 		this.state = {
 			safeAreaBottomInset: 0,
@@ -190,14 +187,6 @@ class BottomSheet extends Component {
 		} ).start( callback );
 	}
 
-	onChangeContentWithOpacity( replaceBottomSheetContent ) {
-		const callback = () => {
-			this.onHandleOpacityAnimation( 1 );
-			replaceBottomSheetContent();
-		};
-		this.onHandleOpacityAnimation( 0, callback );
-	}
-
 	render() {
 		const {
 			title = '',
@@ -316,8 +305,6 @@ class BottomSheet extends Component {
 								shouldEnableBottomSheetScroll: this
 									.onShouldEnableScroll,
 								isBottomSheetScrolling: isScrolling,
-								onChangeContentWithOpacity: this
-									.onChangeContentWithOpacity,
 							} }
 						>
 							{ children }

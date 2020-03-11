@@ -8,6 +8,7 @@ import {
 	Clipboard,
 	TouchableWithoutFeedback,
 	Text,
+	LayoutAnimation,
 } from 'react-native';
 import HsvColorPicker from 'react-native-hsv-color-picker';
 /**
@@ -310,10 +311,15 @@ class ButtonEdit extends Component {
 		} );
 	}
 
-	changeBottomSheetContent( onChangeContentWithOpacity, destination ) {
-		onChangeContentWithOpacity( () =>
-			this.setState( { screen: destination } )
+	changeBottomSheetContent( destination ) {
+		LayoutAnimation.configureNext(
+			LayoutAnimation.create(
+				200,
+				LayoutAnimation.Types.easeInEaseOut,
+				LayoutAnimation.Properties.opacity
+			)
 		);
+		this.setState( { screen: destination } );
 	}
 
 	render() {
@@ -452,7 +458,6 @@ class ButtonEdit extends Component {
 						{ ( {
 							isBottomSheetScrolling,
 							shouldEnableBottomSheetScroll,
-							onChangeContentWithOpacity,
 						} ) => {
 							if ( screen === 'Settings' ) {
 								return (
@@ -491,7 +496,6 @@ class ButtonEdit extends Component {
 											<ColorControl
 												onPress={ () => {
 													this.changeBottomSheetContent(
-														onChangeContentWithOpacity,
 														'Background'
 													);
 												} }
@@ -502,7 +506,6 @@ class ButtonEdit extends Component {
 											<ColorControl
 												onPress={ () => {
 													this.changeBottomSheetContent(
-														onChangeContentWithOpacity,
 														'Text'
 													);
 												} }
@@ -524,7 +527,6 @@ class ButtonEdit extends Component {
 										<TouchableWithoutFeedback
 											onPress={ () => {
 												this.changeBottomSheetContent(
-													onChangeContentWithOpacity,
 													'Settings'
 												);
 											} }
@@ -536,7 +538,6 @@ class ButtonEdit extends Component {
 												}
 											>
 												<Icon icon={ chevronLeft } />
-												<Text>Back</Text>
 											</View>
 										</TouchableWithoutFeedback>
 										<Text
