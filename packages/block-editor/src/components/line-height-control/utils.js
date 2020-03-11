@@ -4,6 +4,11 @@
 import { isUndefined } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import { __experimentalUseBlockEditProps as useBlockEditProps } from '../../store';
@@ -11,6 +16,20 @@ import { __experimentalUseBlockEditProps as useBlockEditProps } from '../../stor
 export const BASE_DEFAULT_VALUE = 1.5;
 export const INITIAL_VALUE = '';
 export const STEP = 0.1;
+
+/**
+ * Retrieves whether custom lineHeight controls should be disabled from editor settings.
+ *
+ * @return {boolean} Whether lineHeight controls should be disabled.
+ */
+export function useIsLineHeightControlsDisabled() {
+	const isDisabled = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return !! getSettings().disableCustomLineHeight;
+	}, [] );
+
+	return isDisabled;
+}
 
 /**
  * Retrieves the attributes/setter for the block, but adjusted to target just the lineHeight attribute

@@ -11,6 +11,7 @@ import {
 	BASE_DEFAULT_VALUE,
 	INITIAL_VALUE,
 	STEP,
+	useIsLineHeightControlsDisabled,
 	useLineHeightControlState,
 	isLineHeightDefined,
 } from './utils';
@@ -20,6 +21,12 @@ export { default as withLineHeight } from './with-line-height';
 
 export default function LineHeightControl( props ) {
 	const [ lineHeight, setLineHeight ] = useLineHeightControlState();
+	const isDisabled = useIsLineHeightControlsDisabled();
+
+	// Don't render the controls if disabled by editor settings
+	if ( isDisabled ) {
+		return null;
+	}
 
 	const handleOnChange = ( nextValue ) => {
 		// Set the next value without modification if lineHeight has been defined

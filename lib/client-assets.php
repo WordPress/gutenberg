@@ -647,6 +647,18 @@ function gutenberg_extend_settings_block_patterns( $settings ) {
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns', 0 );
 
+/**
+ * Extends block editor settings to determine whether to use custom line height controls.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_custom_line_height( $settings ) {
+	$settings['disableCustomLineHeight'] = get_theme_support( 'disable-custom-line-height' );
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_height' );
 
 /*
  * Register default patterns if not registered in Core already.
