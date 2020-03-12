@@ -25,6 +25,42 @@ function deleteFile( filePath ) {
 	}
 }
 
+function isKeyEvent( item ) {
+	return (
+		item.cat === 'devtools.timeline' &&
+		item.name === 'EventDispatch' &&
+		item.dur &&
+		item.args &&
+		item.args.data
+	);
+}
+
+function isKeyDownEvent( item ) {
+	return isKeyEvent( item ) && item.args.data.type === 'keydown';
+}
+
+function isKeyPressEvent( item ) {
+	return isKeyEvent( item ) && item.args.data.type === 'keypress';
+}
+
+function isKeyUpEvent( item ) {
+	return isKeyEvent( item ) && item.args.data.type === 'keyup';
+}
+
+function getEventDurationsForType( trace, filterFunction ) {
+	return trace.traceEvents
+		.filter( filterFunction )
+		.map( ( item ) => item.dur / 1000 );
+}
+
+function getEventDurations( trace ) {
+	return [
+		getEventDurationsForType( trace, isKeyDownEvent ),
+		getEventDurationsForType( trace, isKeyPressEvent ),
+		getEventDurationsForType( trace, isKeyUpEvent ),
+	];
+}
+
 describe( 'Performance', () => {
 	it( '1000 paragraphs', async () => {
 		const html = readFile(
@@ -92,17 +128,22 @@ describe( 'Performance', () => {
 		await page.tracing.stop();
 
 		const traceResults = JSON.parse( readFile( traceFile ) );
-		const isKeypressEvent = ( item ) =>
-			item.cat === 'devtools.timeline' &&
-			item.name === 'EventDispatch' &&
-			item.dur &&
-			item.args &&
-			item.args.data &&
-			item.args.data.type === 'keypress';
+		const [
+			keyDownEvents,
+			keyPressEvents,
+			keyUpEvents,
+		] = getEventDurations( traceResults );
 
-		results.type = traceResults.traceEvents
-			.filter( isKeypressEvent )
-			.map( ( item ) => item.dur / 1000 );
+		if (
+			keyDownEvents.length === keyPressEvents.length &&
+			keyPressEvents.length === keyUpEvents.length
+		) {
+			for ( let j = 0; j < keyDownEvents.length; j++ ) {
+				results.type.push(
+					keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
+				);
+			}
+		}
 
 		writeFileSync(
 			__dirname + '/results.json',
