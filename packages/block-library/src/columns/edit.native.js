@@ -50,6 +50,7 @@ function ColumnsEditContainer( {
 	updateColumns,
 	columnCount,
 	isSelected,
+	onAddNextColumn,
 } ) {
 	const { verticalAlignment } = attributes;
 	const [ columnsSettings, setColumnsSettings ] = useState( {
@@ -73,6 +74,17 @@ function ColumnsEditContainer( {
 			return Math.min( columnCount, 2 );
 		}
 		return columnsNumber;
+	};
+
+	const renderAppender = () => {
+		if ( isSelected ) {
+			return (
+				<InnerBlocks.ButtonBlockAppender
+					customOnAdd={ onAddNextColumn }
+				/>
+			);
+		}
+		return null;
 	};
 
 	return (
@@ -113,9 +125,7 @@ function ColumnsEditContainer( {
 				} }
 			>
 				<InnerBlocks
-					renderAppender={
-						isSelected && InnerBlocks.ButtonBlockAppender
-					}
+					renderAppender={ renderAppender }
 					__experimentalMoverDirection={
 						getColumnsInRow( width, columnCount ) > 1
 							? 'horizontal'
@@ -132,6 +142,7 @@ function ColumnsEditContainer( {
 					containerStyle={ { flex: 1 } }
 					allowedBlocks={ ALLOWED_BLOCKS }
 					columnsSettings={ columnsSettings }
+					customOnAdd={ onAddNextColumn }
 				/>
 			</View>
 		</>
@@ -201,6 +212,22 @@ const ColumnsEditContainerWrapper = withDispatch(
 			}
 
 			replaceInnerBlocks( clientId, innerBlocks, false );
+		},
+		onAddNextColumn: () => {
+			const { clientId } = ownProps;
+			const { replaceInnerBlocks, selectBlock } = dispatch(
+				'core/block-editor'
+			);
+			const { getBlocks } = registry.select( 'core/block-editor' );
+
+			const innerBlocks = getBlocks( clientId );
+
+			const insertedBlock = createBlock( 'core/column' );
+
+			innerBlocks.push( insertedBlock );
+
+			replaceInnerBlocks( clientId, innerBlocks, true );
+			selectBlock( insertedBlock.clientId );
 		},
 	} )
 )( ColumnsEditContainer );
