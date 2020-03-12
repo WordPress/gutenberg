@@ -5,11 +5,7 @@
 /*rtl:end:ignore*/
 
 .components-datetime {
-	padding: $grid-unit-20;
-
-	.components-popover__content & {
-		padding: 0;
-	}
+	padding: 0;
 
 	.components-datetime__calendar-help {
 		padding: $grid-unit-20;
