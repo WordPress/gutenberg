@@ -144,7 +144,7 @@ class PostPermalink extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const {
-			isCleanNewPost,
+			isEditedPostNew,
 			isPermalinkEditable,
 			getCurrentPost,
 			getPermalinkParts,
@@ -160,7 +160,7 @@ export default compose( [
 		const postType = getPostType( postTypeName );
 
 		return {
-			isNew: isCleanNewPost(),
+			isNew: isEditedPostNew(),
 			postLink: link,
 			permalinkParts: getPermalinkParts(),
 			postSlug: safeDecodeURIComponent( getEditedPostSlug() ),
