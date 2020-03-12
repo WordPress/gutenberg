@@ -170,78 +170,16 @@ function render_block_core_latest_posts( $attributes ) {
  * Registers the `core/latest-posts` block on server.
  */
 function register_block_core_latest_posts() {
+	$path     = __DIR__ . '/latest-posts/block.json';
+	$metadata = json_decode( file_get_contents( $path ), true );
+
 	register_block_type(
-		'core/latest-posts',
-		array(
-			'attributes'      => array(
-				'align'                   => array(
-					'type' => 'string',
-					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
-				),
-				'className'               => array(
-					'type' => 'string',
-				),
-				'categories'              => array(
-					'type' => 'array',
-				),
-				'postsToShow'             => array(
-					'type'    => 'number',
-					'default' => 5,
-				),
-				'displayPostContent'      => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'displayPostContentRadio' => array(
-					'type'    => 'string',
-					'default' => 'excerpt',
-				),
-				'excerptLength'           => array(
-					'type'    => 'number',
-					'default' => 55,
-				),
-				'displayPostDate'         => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'postLayout'              => array(
-					'type'    => 'string',
-					'default' => 'list',
-				),
-				'columns'                 => array(
-					'type'    => 'number',
-					'default' => 3,
-				),
-				'order'                   => array(
-					'type'    => 'string',
-					'default' => 'desc',
-				),
-				'orderBy'                 => array(
-					'type'    => 'string',
-					'default' => 'date',
-				),
-				'displayFeaturedImage'    => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'featuredImageAlign'      => array(
-					'type' => 'string',
-					'enum' => array( 'left', 'center', 'right' ),
-				),
-				'featuredImageSizeSlug'   => array(
-					'type'    => 'string',
-					'default' => 'thumbnail',
-				),
-				'featuredImageSizeWidth'  => array(
-					'type'    => 'number',
-					'default' => null,
-				),
-				'featuredImageSizeHeight' => array(
-					'type'    => 'number',
-					'default' => null,
-				),
-			),
-			'render_callback' => 'render_block_core_latest_posts',
+		$metadata['name'],
+		array_merge(
+			$metadata,
+			array(
+				'render_callback' => 'render_block_core_latest_posts',
+			)
 		)
 	);
 }
