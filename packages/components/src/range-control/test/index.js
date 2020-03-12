@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import TestUtils from 'react-dom/test-utils';
+import TestUtils, { act } from 'react-dom/test-utils';
 
 /**
  * Internal dependencies
@@ -291,6 +291,121 @@ describe( 'RangeControl', () => {
 			} );
 
 			expect( onChange ).toHaveBeenCalledWith( 0.225 );
+		} );
+	} );
+
+	describe( 'initialPosition / value', () => {
+		const getInputElement = ( wrapper ) =>
+			TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__slider'
+			);
+
+		it( 'renders initial rendered value of 50% of min/max, if no initialPosition or value is defined', () => {
+			const wrapper = getWrapper( { min: 0, max: 10 } );
+			const inputElement = getInputElement( wrapper );
+
+			expect( inputElement.value ).toBe( '5' );
+		} );
+
+		it( 'renders initialPosition if no value is provided', () => {
+			const wrapper = getWrapper( {
+				initialPosition: 50,
+				value: undefined,
+			} );
+			const inputElement = getInputElement( wrapper );
+
+			expect( inputElement.value ).toBe( '50' );
+		} );
+
+		it( 'renders value instead of initialPosition is provided', () => {
+			const wrapper = getWrapper( { initialPosition: 50, value: 10 } );
+			const inputElement = getInputElement( wrapper );
+
+			expect( inputElement.value ).toBe( '10' );
+		} );
+	} );
+
+	describe( 'reset', () => {
+		class StatefulTestWrapper extends Component {
+			constructor( props ) {
+				super( props );
+				this.state = {
+					value: undefined,
+				};
+				this.handleOnChange = this.handleOnChange.bind( this );
+			}
+
+			handleOnChange( nextValue = this.props.resetFallbackValue ) {
+				this.setState( { value: nextValue } );
+			}
+
+			render() {
+				return (
+					<RangeControl
+						{ ...this.props }
+						value={ this.state.value }
+						onChange={ this.handleOnChange }
+					/>
+				);
+			}
+		}
+
+		const getStatefulWrapper = ( props = {} ) =>
+			TestUtils.renderIntoDocument(
+				<StatefulTestWrapper { ...props } />
+			);
+
+		const getInputElement = ( wrapper ) =>
+			TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__slider'
+			);
+
+		it( 'resets to a custom fallback value, defined by a parent component', () => {
+			const wrapper = getStatefulWrapper( {
+				initialPosition: 50,
+				value: 10,
+				allowReset: true,
+				resetFallbackValue: 33,
+			} );
+
+			const resetButton = TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__reset'
+			);
+
+			act( () => {
+				TestUtils.Simulate.click( resetButton );
+			} );
+
+			const inputElement = getInputElement( wrapper );
+
+			expect( inputElement.value ).toBe( '33' );
+		} );
+
+		it( 'resets to a 50% of min/max value, of no initialPosition or value is defined', () => {
+			const wrapper = getStatefulWrapper( {
+				initialPosition: undefined,
+				value: 10,
+				min: 0,
+				max: 100,
+				allowReset: true,
+				resetFallbackValue: undefined,
+			} );
+
+			const resetButton = TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__reset'
+			);
+
+			act( () => {
+				TestUtils.Simulate.click( resetButton );
+			} );
+
+			const inputElement = getInputElement( wrapper );
+
+			expect( inputElement.value ).toBe( '50' );
 		} );
 	} );
 } );

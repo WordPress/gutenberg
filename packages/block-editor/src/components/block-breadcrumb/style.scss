@@ -18,8 +18,9 @@
 	line-height: $button-size-small;
 	padding: 0;
 
-	&:hover {
+	&:hover:not(:disabled) {
 		text-decoration: underline;
+		box-shadow: none;
 	}
 
 	&:focus {

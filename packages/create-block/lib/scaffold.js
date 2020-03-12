@@ -25,6 +25,7 @@ module.exports = async function(
 		category,
 		author,
 		license,
+		licenseURI,
 		version,
 	}
 ) {
@@ -46,6 +47,7 @@ module.exports = async function(
 		version,
 		author,
 		license,
+		licenseURI,
 		textdomain: namespace,
 	};
 	await Promise.all(
