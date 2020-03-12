@@ -24,9 +24,7 @@ class Video extends Component {
 	constructor() {
 		super( ...arguments );
 		this.isIOS = Platform.OS === 'ios';
-		this.forceFullscreen = ! this.isIOS;
 		this.state = {
-			isFullScreen: false,
 			videoContainerHeight: 0,
 		};
 		this.onPressPlay = this.onPressPlay.bind( this );
@@ -85,11 +83,12 @@ class Video extends Component {
 	}
 
 	render() {
-		const { isSelected, style, forceFullscreen } = this.props;
-		if ( forceFullscreen !== undefined ) {
-			this.forceFullscreen = forceFullscreen;
-		}
-		const { isFullScreen, videoContainerHeight } = this.state;
+		const {
+			isSelected,
+			style,
+			forceFullscreen = ! this.isIOS,
+		} = this.props;
+		const { videoContainerHeight } = this.state;
 		const showPlayButton = videoContainerHeight > 0;
 
 		return (
@@ -99,18 +98,11 @@ class Video extends Component {
 					ref={ ( ref ) => {
 						this.player = ref;
 					} }
-					controls={ ! this.forceFullscreen }
+					controls={ ! forceFullscreen }
 					ignoreSilentSwitch={ 'ignore' }
-					paused={ ! isFullScreen }
 					onLayout={ this.onVideoLayout }
-					onFullscreenPlayerWillPresent={ () => {
-						this.setState( { isFullScreen: true } );
-					} }
-					onFullscreenPlayerDidDismiss={ () => {
-						this.setState( { isFullScreen: false } );
-					} }
 				/>
-				{ showPlayButton && this.forceFullscreen && (
+				{ showPlayButton && forceFullscreen && (
 					// If we add the play icon as a subview to VideoPlayer then react-native-video decides to show control buttons
 					// even if we set controls={ false }, so we are adding our play button as a sibling overlay view.
 					<TouchableOpacity
