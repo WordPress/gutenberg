@@ -135,11 +135,7 @@ function ColumnEdit( {
 						...styles.marginHorizontalNone,
 					},
 				] }
-			>
-				{ isParentSelected && (
-					<InnerBlocks.ButtonBlockAppender showSeparator />
-				) }
-			</View>
+			></View>
 		);
 	}
 
