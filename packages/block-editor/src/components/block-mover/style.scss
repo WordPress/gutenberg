@@ -8,6 +8,7 @@
 }
 
 .block-editor-block-mover__control.has-icon {
+	height: auto;
 	padding: 0;
 }
 
@@ -16,6 +17,10 @@
 	.components-toolbar-group,
 	.components-toolbar {
 		flex-direction: column;
+	}
+
+	.components-toolbar > div {
+		flex: 1;
 	}
 
 	&.is-horizontal .components-toolbar-group,
@@ -48,6 +53,13 @@
 			top: 0;
 			height: calc(100% - #{ $grid-unit-10 });
 		}
+	}
+
+	.components-toolbar-group .block-editor-block-mover__control.has-icon.has-icon,
+	.components-toolbar .block-editor-block-mover__control.has-icon.has-icon {
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
+		min-width: $block-toolbar-height;
 	}
 
 	// Mover is horizontal.
