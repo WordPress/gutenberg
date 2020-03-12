@@ -156,9 +156,13 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			__experimentalMoverDirection,
 			containerStyle,
 			columnsSettings,
 		} = this.props;
+
+		const horizontalDirection =
+			__experimentalMoverDirection === 'horizontal';
 
 		return (
 			<ReadableContentView style={ containerStyle }>
@@ -177,6 +181,7 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
+						horizontalDirection={ horizontalDirection }
 						columnsSettings={ columnsSettings }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&

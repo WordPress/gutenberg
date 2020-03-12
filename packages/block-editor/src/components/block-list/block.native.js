@@ -192,6 +192,7 @@ class BlockListBlock extends Component {
 			title,
 			parentId,
 			isTouchable,
+			horizontalDirection,
 			hasParent,
 			onSelect,
 			showFloatingToolbar,
@@ -243,7 +244,10 @@ class BlockListBlock extends Component {
 						) }
 						<View style={ this.applyToolbarStyle() }>
 							{ isSelected && (
-								<BlockMobileToolbar clientId={ clientId } />
+								<BlockMobileToolbar
+									clientId={ clientId }
+									horizontalDirection={ horizontalDirection }
+								/>
 							) }
 						</View>
 					</View>

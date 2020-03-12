@@ -19,9 +19,17 @@ import styles from './style.scss';
 import BlockMover from '../block-mover';
 import { BlockSettingsButton } from '../block-settings';
 
-const BlockMobileToolbar = ( { clientId, onDelete, order } ) => (
+const BlockMobileToolbar = ( {
+	clientId,
+	onDelete,
+	order,
+	horizontalDirection,
+} ) => (
 	<View style={ styles.toolbar }>
-		<BlockMover clientIds={ [ clientId ] } />
+		<BlockMover
+			clientIds={ [ clientId ] }
+			horizontalDirection={ horizontalDirection }
+		/>
 
 		<View style={ styles.spacer } />
 
