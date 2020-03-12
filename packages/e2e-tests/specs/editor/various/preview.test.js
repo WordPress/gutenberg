@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { last } from 'lodash';
-import { parse } from 'url';
 
 /**
  * WordPress dependencies
@@ -187,9 +186,9 @@ describe( 'Preview', () => {
 		expect( previewTitle ).toBe( 'Hello World! And more.' );
 
 		// Published preview URL should include ID and nonce parameters.
-		const { query } = parse( previewPage.url(), true );
-		expect( query ).toHaveProperty( 'preview_id' );
-		expect( query ).toHaveProperty( 'preview_nonce' );
+		const { searchParams } = new URL( previewPage.url() );
+		expect( searchParams.has( 'preview_id' ) ).toBe( true );
+		expect( searchParams.has( 'preview_nonce' ) ).toBe( true );
 
 		// Return to editor. Previewing already-autosaved preview tab should
 		// reuse the opened tab, skipping interstitial. This resolves an edge
