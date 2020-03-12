@@ -31,7 +31,7 @@ import {
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
-import { cover as icon } from '@wordpress/icons';
+import { cover as icon, replace } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -43,7 +43,6 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 } from './shared';
-import { EditMediaIcon } from './edit-media-icon';
 
 /**
  * Constants
@@ -141,7 +140,7 @@ const Cover = ( {
 			<ToolbarGroup>
 				<ToolbarButton
 					title={ __( 'Edit cover media' ) }
-					icon={ EditMediaIcon }
+					icon={ replace }
 					onClick={ open }
 				/>
 			</ToolbarGroup>
