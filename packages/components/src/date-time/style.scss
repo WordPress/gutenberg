@@ -7,6 +7,10 @@
 .components-datetime {
 	padding: $grid-unit-20;
 
+	.components-popover__content & {
+		padding: 0;
+	}
+
 	.components-datetime__calendar-help {
 		padding: $grid-unit-20;
 
@@ -126,7 +130,7 @@
 			}
 
 			select {
-				margin-right: 4px;
+				margin-right: $grid-unit-05;
 
 				&:focus {
 					position: relative;
@@ -136,7 +140,7 @@
 
 			input[type="number"] {
 				padding: 2px;
-				margin-right: 4px;
+				margin-right: $grid-unit-05;
 				text-align: center;
 				-moz-appearance: textfield;
 
@@ -157,7 +161,7 @@
 	// We are assuming MM-DD-YYY correlates with AM/PM
 	&.is-12-hour {
 		.components-datetime__time-field-day input {
-			margin: 0 -4px 0 0 !important;
+			margin: 0 -$grid-unit-05 0 0 !important;
 			border-radius: $radius-round-rectangle 0 0 $radius-round-rectangle !important;
 		}
 		.components-datetime__time-field-year input {
@@ -194,5 +198,5 @@
 // Hack to center the datepicker component within the popover.
 // It sets its own styles so centering is tricky.
 .components-popover .components-datetime__date {
-	padding-left: 4px;
+	padding-left: $grid-unit-05;
 }
