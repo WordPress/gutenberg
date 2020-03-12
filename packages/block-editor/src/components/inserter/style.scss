@@ -143,11 +143,13 @@ $block-inserter-search-height: 38px;
 	margin-right: 20px;
 	padding: 20px;
 	background: $white;
+	box-shadow: $shadow-popover;
+	border-radius: $radius-block-ui;
 
 	@include break-medium {
 		position: absolute;
-		top: 0;
-		left: calc(100% + 20px);
+		top: -$border-width;
+		left: calc(100% + #{$grid-unit-15});
 		display: flex;
 		flex-direction: column;
 	}
