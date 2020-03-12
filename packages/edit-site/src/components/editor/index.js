@@ -50,9 +50,18 @@ function Editor( { settings: _settings } ) {
 		settings,
 		setSettings,
 	] );
+
+	const { isFullscreenActive } = useSelect( ( select ) => {
+		return {
+			isFullscreenActive: select( 'core/edit-site' ).isFeatureActive(
+				'fullscreenMode'
+			),
+		};
+	}, [] );
+
 	return template ? (
 		<>
-			<FullscreenMode />
+			<FullscreenMode isActive={ isFullscreenActive } />
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<EntityProvider kind="root" type="site">
