@@ -1,5 +1,15 @@
 == Changelog ==
 
+= 7.7.1 =
+
+### Bug Fixes
+
+- Fix Drag and Drop into the columns block.
+- Fix the columns block selection.
+- Fix applying colors and backgrounds to the columns block.
+- Fix the RangeControl controlled behavior.
+
+
 = 7.7.0 =
 
 ### Features
