@@ -49,6 +49,11 @@ function render_block_core_latest_posts( $attributes ) {
 	if ( isset( $attributes['categories'] ) ) {
 		$args['category__in'] = array_column( $attributes['categories'], 'id' );
 	}
+	if ( isset( $attributes['postType'] ) ) {
+		$args['post_type'] = $attributes['postType'];
+	}
+
+
 
 	$recent_posts = get_posts( $args );
 

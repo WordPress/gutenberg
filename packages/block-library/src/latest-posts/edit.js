@@ -19,6 +19,7 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 	FormTokenField,
+	SelectControl,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -54,6 +55,7 @@ class LatestPostsEdit extends Component {
 		super( ...arguments );
 		this.state = {
 			categoriesList: [],
+			postTypeList: [],
 		};
 	}
 
@@ -72,6 +74,19 @@ class LatestPostsEdit extends Component {
 					this.setState( { categoriesList: [] } );
 				}
 			} );
+		this.fetchRequest = apiFetch( {
+			path: addQueryArgs( `/wp/v2/types` ),
+		} )
+			.then( ( postTypeList ) => {
+				if ( this.isStillMounted ) {
+					this.setState( { postTypeList } );
+				}
+			} )
+			.catch( () => {
+				if ( this.isStillMounted ) {
+					this.setState( { postTypeList: [] } );
+				}
+			} );
 	}
 
 	componentWillUnmount() {
@@ -87,7 +102,7 @@ class LatestPostsEdit extends Component {
 			defaultImageWidth,
 			defaultImageHeight,
 		} = this.props;
-		const { categoriesList } = this.state;
+		const { categoriesList, postTypeList } = this.state;
 		const {
 			displayFeaturedImage,
 			displayPostContentRadio,
@@ -104,22 +119,28 @@ class LatestPostsEdit extends Component {
 			featuredImageSizeSlug,
 			featuredImageSizeWidth,
 			featuredImageSizeHeight,
+			postType,
 		} = attributes;
-		const suggestions = categoriesList.reduce(
+		const categorySuggestions = categoriesList.reduce(
 			( accumulator, category ) => ( {
 				...accumulator,
 				[ category.name ]: category,
 			} ),
 			{}
 		);
+		const postTypeSuggestions = postTypeList;
 
 		const selectCategories = ( tokens ) => {
 			// Categories that are already will be objects, while new additions will be strings (the name).
 			// allCategories nomalizes the array so that they are all objects.
 			const allCategories = tokens.map( ( token ) =>
-				typeof token === 'string' ? suggestions[ token ] : token
+				typeof token === 'string' ? categorySuggestions[ token ] : token
 			);
 			setAttributes( { categories: allCategories } );
+		};
+
+		const selectPostTypes = ( val ) => {
+			setAttributes( { postType: val } );
 		};
 
 		const inspectorControls = (
@@ -254,8 +275,23 @@ class LatestPostsEdit extends Component {
 									value: item.name || item.value,
 								} ) )
 							}
-							suggestions={ Object.keys( suggestions ) }
+							suggestions={ Object.keys( categorySuggestions ) }
 							onChange={ selectCategories }
+						/>
+					) }
+					{ postTypeList && (
+						<SelectControl
+							label={ __( 'Post types' ) }
+							value={ postType }
+							onChange={ selectPostTypes }
+							options={ Object.values( postTypeList ).map(
+								( item ) => {
+									return {
+										label: item.name,
+										value: item.slug,
+									};
+								}
+							) }
 						/>
 					) }
 					{ postLayout === 'grid' && (
@@ -445,14 +481,16 @@ export default withSelect( ( select, props ) => {
 		order,
 		orderBy,
 		categories,
+		postType,
 	} = props.attributes;
-	const { getEntityRecords, getMedia } = select( 'core' );
+	const { getEntityRecords, getMedia, getPostTypes } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
 	const { imageSizes, imageDimensions } = getSettings();
 	const catIds =
 		categories && categories.length > 0
 			? categories.map( ( cat ) => cat.id )
 			: [];
+
 	const latestPostsQuery = pickBy(
 		{
 			categories: catIds,
@@ -463,7 +501,12 @@ export default withSelect( ( select, props ) => {
 		( value ) => ! isUndefined( value )
 	);
 
-	const posts = getEntityRecords( 'postType', 'post', latestPostsQuery );
+	const posts = getEntityRecords(
+		'postType',
+		postType || 'post',
+		latestPostsQuery
+	);
+
 	const imageSizeOptions = imageSizes
 		.filter( ( { slug } ) => slug !== 'full' )
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
