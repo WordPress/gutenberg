@@ -40,6 +40,7 @@ export default function UnitControl( {
 		<Root>
 			<ValueInput
 				aria-label={ label }
+				inputmode="numeric"
 				{ ...props }
 				value={ value }
 				onChange={ handleOnChange }
