@@ -30,8 +30,6 @@ function ColumnEdit( {
 	isDescendantSelected,
 	isAncestorSelected,
 	columnsSettings,
-	isColumnsInRootList,
-	isDeepNested,
 } ) {
 	const { verticalAlignment } = attributes;
 	const { columnsInRow, width: columnsContainerWidth } = columnsSettings;
@@ -100,9 +98,9 @@ function ColumnEdit( {
 					columnsInRow === 1
 						? parentSelected
 						: placeholderParentSelected;
-				width -= columnSelected;
-				if ( ! isDeepNested ) width -= dashedBorderWidth;
-				if ( isColumnsInRootList ) width -= parentSelected;
+				width -=
+					columnSelected +
+					( columnsInRow === 1 ? parentSelected : dashedBorderWidth );
 				break;
 
 			default:
@@ -130,11 +128,7 @@ function ColumnEdit( {
 						...styles.marginHorizontalNone,
 					},
 				] }
-			>
-				{ isParentSelected && (
-					<InnerBlocks.ButtonBlockAppender showSeparator />
-				) }
-			</View>
+			></View>
 		);
 	}
 
@@ -205,13 +199,10 @@ export default compose( [
 		);
 
 		const parents = getBlockParents( clientId, true );
-		const isColumnsInRootList = !! parents[ 2 ];
 
 		const isAncestorSelected =
 			selectedBlockClientId && parents.includes( selectedBlockClientId );
 		const isDescendantSelected = selectedParents.includes( clientId );
-
-		const isDeepNested = parents.length > 2;
 
 		return {
 			hasChildren,
@@ -220,8 +211,6 @@ export default compose( [
 			isDescendantOfParentSelected,
 			isAncestorSelected,
 			isDescendantSelected,
-			isColumnsInRootList,
-			isDeepNested,
 		};
 	} ),
 	withViewportMatch( { isMobile: '< mobile' } ),

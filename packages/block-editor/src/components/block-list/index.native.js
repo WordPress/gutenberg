@@ -69,10 +69,13 @@ export class BlockList extends Component {
 	}
 
 	renderDefaultBlockAppender() {
-		const { shouldShowInsertionPointBefore } = this.props;
+		const { shouldShowInsertionPointBefore, columnsSettings } = this.props;
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
+		const parentWidth = columnsSettings && columnsSettings.width;
 		return (
-			<ReadableContentView>
+			<ReadableContentView
+				style={ parentWidth && { maxWidth: parentWidth } }
+			>
 				<BlockListAppender // show the default appender, anormal, when not inserting a block
 					rootClientId={ this.props.rootClientId }
 					renderAppender={ this.props.renderAppender }
@@ -160,10 +163,15 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			__experimentalMoverDirection,
+			customOnDelete,
 			containerStyle,
 			disallowRemoveInnerBlocks,
 			columnsSettings,
 		} = this.props;
+
+		const horizontalDirection =
+			__experimentalMoverDirection === 'horizontal';
 
 		return (
 			<ReadableContentView style={ containerStyle }>
@@ -183,6 +191,8 @@ export class BlockList extends Component {
 							this.onCaretVerticalPositionChange
 						}
 						disallowRemoveInnerBlocks={ disallowRemoveInnerBlocks }
+						customOnDelete={ customOnDelete }
+						horizontalDirection={ horizontalDirection }
 						columnsSettings={ columnsSettings }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
@@ -212,7 +222,7 @@ export class BlockList extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select, { rootClientId, __experimentalMoverDirection } ) => {
 		const {
 			getBlockCount,
 			getBlockOrder,
@@ -222,12 +232,16 @@ export default compose( [
 			getSettings,
 		} = select( 'core/block-editor' );
 
+		const horizontalDirection =
+			__experimentalMoverDirection === 'horizontal';
+
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
+				! horizontalDirection &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				// if list is empty, show the insertion point (via the default appender)
@@ -238,6 +252,7 @@ export default compose( [
 		};
 		const shouldShowInsertionPointAfter = ( clientId ) => {
 			return (
+				! horizontalDirection &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				// if the insertion point is at the end of the list

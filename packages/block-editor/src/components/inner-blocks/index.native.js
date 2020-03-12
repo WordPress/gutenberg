@@ -112,6 +112,8 @@ class InnerBlocks extends Component {
 		const {
 			clientId,
 			renderAppender,
+			__experimentalMoverDirection,
+			customOnDelete,
 			containerStyle,
 			flatListProps,
 			disallowRemoveInnerBlocks,
@@ -126,6 +128,10 @@ class InnerBlocks extends Component {
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
 						withFooter={ false }
+						__experimentalMoverDirection={
+							__experimentalMoverDirection
+						}
+						customOnDelete={ customOnDelete }
 						containerStyle={ containerStyle }
 						flatListProps={ flatListProps }
 						disallowRemoveInnerBlocks={ disallowRemoveInnerBlocks }

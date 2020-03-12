@@ -193,6 +193,8 @@ class BlockListBlock extends Component {
 			parentId,
 			isTouchable,
 			disallowRemoveInnerBlocks,
+			customOnDelete,
+			horizontalDirection,
 			hasParent,
 			onSelect,
 			showFloatingToolbar,
@@ -249,6 +251,8 @@ class BlockListBlock extends Component {
 									disallowRemoveBlock={
 										disallowRemoveInnerBlocks
 									}
+									customOnDelete={ customOnDelete }
+									horizontalDirection={ horizontalDirection }
 								/>
 							) }
 						</View>
