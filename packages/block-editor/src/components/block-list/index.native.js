@@ -70,10 +70,13 @@ export class BlockList extends Component {
 	}
 
 	renderDefaultBlockAppender() {
-		const { shouldShowInsertionPointBefore } = this.props;
+		const { shouldShowInsertionPointBefore, columnsSettings } = this.props;
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
+		const parentWidth = columnsSettings && columnsSettings.width;
 		return (
-			<ReadableContentView>
+			<ReadableContentView
+				style={ parentWidth && { maxWidth: parentWidth } }
+			>
 				<BlockListAppender // show the default appender, anormal, when not inserting a block
 					rootClientId={ this.props.rootClientId }
 					renderAppender={ this.props.renderAppender }
