@@ -124,7 +124,7 @@ function ColumnsEditContainer( {
 					flatListProps={ {
 						contentContainerStyle: {
 							...styles.columnsContainer,
-							// maxWidth: width,
+							maxWidth: width,
 						},
 						horizontal: true,
 						scrollEnabled: false,
