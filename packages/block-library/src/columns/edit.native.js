@@ -118,6 +118,7 @@ function ColumnsEditContainer( {
 					renderAppender={
 						isSelected && InnerBlocks.ButtonBlockAppender
 					}
+					__experimentalMoverDirection="horizontal"
 					flatListProps={ {
 						...( ! isMobile && {
 							contentContainerStyle: {

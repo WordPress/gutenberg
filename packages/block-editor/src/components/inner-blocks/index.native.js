@@ -112,6 +112,7 @@ class InnerBlocks extends Component {
 		const {
 			clientId,
 			renderAppender,
+			__experimentalMoverDirection,
 			containerStyle,
 			flatListProps,
 			columnsSettings,
@@ -125,6 +126,9 @@ class InnerBlocks extends Component {
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
 						withFooter={ false }
+						__experimentalMoverDirection={
+							__experimentalMoverDirection
+						}
 						containerStyle={ containerStyle }
 						flatListProps={ flatListProps }
 						columnsSettings={ columnsSettings }
