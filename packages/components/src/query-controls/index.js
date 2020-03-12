@@ -36,6 +36,9 @@ export default function QueryControls( {
 	onNumberOfItemsChange,
 	onOrderChange,
 	onOrderByChange,
+	onPostTypeChange,
+	postTypeList,
+	selectedPostType,
 } ) {
 	return [
 		onOrderChange && onOrderByChange && (
@@ -83,6 +86,18 @@ export default function QueryControls( {
 				noOptionLabel={ __( 'All' ) }
 				selectedCategoryId={ selectedCategoryId }
 				onChange={ onCategoryChange }
+				{ ...MOBILE_CONTROL_PROPS }
+			/>
+		),
+		onPostTypeChange && (
+			<SelectControl
+				label={ __( 'Post types' ) }
+				value={ selectedPostType }
+				options={ Object.values( postTypeList ).map( ( item ) => ( {
+					label: item.name,
+					value: item.slug,
+				} ) ) }
+				onChange={ onPostTypeChange }
 				{ ...MOBILE_CONTROL_PROPS }
 			/>
 		),

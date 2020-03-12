@@ -53,8 +53,6 @@ function render_block_core_latest_posts( $attributes ) {
 		$args['post_type'] = $attributes['postType'];
 	}
 
-
-
 	$recent_posts = get_posts( $args );
 
 	$list_items_markup = '';

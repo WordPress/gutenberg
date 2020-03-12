@@ -19,7 +19,6 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 	FormTokenField,
-	SelectControl,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -128,7 +127,6 @@ class LatestPostsEdit extends Component {
 			} ),
 			{}
 		);
-		const postTypeSuggestions = postTypeList;
 
 		const selectCategories = ( tokens ) => {
 			// Categories that are already will be objects, while new additions will be strings (the name).
@@ -137,10 +135,6 @@ class LatestPostsEdit extends Component {
 				typeof token === 'string' ? categorySuggestions[ token ] : token
 			);
 			setAttributes( { categories: allCategories } );
-		};
-
-		const selectPostTypes = ( val ) => {
-			setAttributes( { postType: val } );
 		};
 
 		const inspectorControls = (
@@ -264,6 +258,11 @@ class LatestPostsEdit extends Component {
 						onNumberOfItemsChange={ ( value ) =>
 							setAttributes( { postsToShow: value } )
 						}
+						onPostTypeChange={ ( value ) =>
+							setAttributes( { postType: value } )
+						}
+						postTypeList={ postTypeList }
+						selectedPostType={ postType }
 					/>
 					{ categoriesList.length > 0 && (
 						<FormTokenField
@@ -279,21 +278,7 @@ class LatestPostsEdit extends Component {
 							onChange={ selectCategories }
 						/>
 					) }
-					{ postTypeList && (
-						<SelectControl
-							label={ __( 'Post types' ) }
-							value={ postType }
-							onChange={ selectPostTypes }
-							options={ Object.values( postTypeList ).map(
-								( item ) => {
-									return {
-										label: item.name,
-										value: item.slug,
-									};
-								}
-							) }
-						/>
-					) }
+
 					{ postLayout === 'grid' && (
 						<RangeControl
 							label={ __( 'Columns' ) }
