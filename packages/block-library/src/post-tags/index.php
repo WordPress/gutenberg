@@ -29,10 +29,16 @@ function render_block_core_post_tags() {
  * Registers the `core/post-tags` block on the server.
  */
 function register_block_core_post_tags() {
+	$path     = __DIR__ . '/post-tags/block.json';
+	$metadata = json_decode( file_get_contents( $path ), true );
+
 	register_block_type(
-		'core/post-tags',
-		array(
-			'render_callback' => 'render_block_core_post_tags',
+		$metadata['name'],
+		array_merge(
+			$metadata,
+			array(
+				'render_callback' => 'render_block_core_post_tags',
+			)
 		)
 	);
 }

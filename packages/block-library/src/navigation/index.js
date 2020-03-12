@@ -29,6 +29,7 @@ export const settings = {
 		anchor: true,
 		html: false,
 		inserter: true,
+		lightBlockWrapper: true,
 	},
 
 	styles: [

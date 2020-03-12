@@ -240,6 +240,18 @@
 		"parent": "developers"
 	},
 	{
+		"title": "Building a custom block editor",
+		"slug": "custom-block-editor",
+		"markdown_source": "../docs/designers-developers/developers/platform/custom-block-editor/README.md",
+		"parent": "platform"
+	},
+	{
+		"title": "Tutorial: building a custom block editor",
+		"slug": "tutorial",
+		"markdown_source": "../docs/designers-developers/developers/platform/custom-block-editor/tutorial.md",
+		"parent": "custom-block-editor"
+	},
+	{
 		"title": "Designer Documentation",
 		"slug": "designers",
 		"markdown_source": "../docs/designers-developers/designers/README.md",

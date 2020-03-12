@@ -35,6 +35,9 @@ function GroupEdit( { hasInnerBlocks, isSelected, getStylesFromColorScheme } ) {
 	return (
 		<InnerBlocks
 			renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
+			flatListProps={ {
+				scrollEnabled: false,
+			} }
 		/>
 	);
 }

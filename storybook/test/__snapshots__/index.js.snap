@@ -3275,6 +3275,7 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -3452,8 +3453,8 @@ input[type='number'].emotion-18 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -3488,8 +3489,6 @@ input[type='number'].emotion-18 {
           <span
             aria-hidden={false}
             className="components-simple-tooltip components-range-control__tooltip emotion-12 emotion-13"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
             role="tooltip"
             style={
               Object {
@@ -4704,7 +4703,7 @@ exports[`Storyshots Components/RadioControl With Help 1`] = `
 `;
 
 exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
-.emotion-38 {
+.emotion-36 {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
   cursor: pointer;
@@ -4816,61 +4815,7 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   box-shadow: 0 0 0 rgba(0,0,0,0);
 }
 
-.emotion-32 {
-  background: #23282d;
-  border-radius: 3px;
-  box-sizing: border-box;
-  color: white;
-  display: inline-block;
-  font-size: 11px;
-  min-width: 32px;
-  opacity: 0;
-  padding: 8px;
-  position: absolute;
-  text-align: center;
-  -webkit-transition: opacity 120ms ease;
-  transition: opacity 120ms ease;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  opacity: 0;
-  margin-top: -4px;
-  top: -100%;
-  -webkit-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
-}
-
-.emotion-32::after {
-  border: 6px solid #23282d;
-  border-left-color: transparent;
-  border-right-color: transparent;
-  bottom: -6px;
-  box-sizing: border-box;
-  content: '';
-  height: 0;
-  left: 50%;
-  line-height: 0;
-  margin-left: -6px;
-  position: absolute;
-  width: 0;
-}
-
-.emotion-32::after {
-  border-bottom: none;
-  border-top-style: solid;
-  bottom: -6px;
-}
-
-@media ( prefers-reduced-motion:reduce ) {
-  .emotion-32 {
-    -webkit-transition-duration: 0ms;
-    transition-duration: 0ms;
-  }
-}
-
-.emotion-36 {
+.emotion-34 {
   box-sizing: border-box;
   display: inline-block;
   margin-top: 0;
@@ -4879,16 +4824,16 @@ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
   margin-left: 16px;
 }
 
-input[type='number'].emotion-36 {
+input[type='number'].emotion-34 {
   height: 30px;
   min-height: 30px;
 }
 
-.emotion-40 {
+.emotion-38 {
   padding: 60px 40px;
 }
 
-.emotion-34 {
+.emotion-32 {
   box-sizing: border-box;
   color: #007cba;
   display: block;
@@ -4936,7 +4881,7 @@ input[type='number'].emotion-36 {
   color: #6c7781;
 }
 
-.emotion-8 {
+.emotion-16 {
   box-sizing: border-box;
   height: 9px;
   left: 0;
@@ -4946,7 +4891,7 @@ input[type='number'].emotion-36 {
   background-color: #d7dade;
 }
 
-.emotion-10 {
+.emotion-18 {
   box-sizing: border-box;
   color: #d7dade;
   left: 0;
@@ -4961,7 +4906,7 @@ input[type='number'].emotion-36 {
 }
 
 <div
-  className="emotion-40 emotion-41"
+  className="emotion-38 emotion-39"
 >
   <div
     className="components-base-control components-range-control"
@@ -4970,10 +4915,10 @@ input[type='number'].emotion-36 {
       className="components-base-control__field"
     >
       <span
-        className="components-range-control__root emotion-38 emotion-39"
+        className="components-range-control__root emotion-36 emotion-37"
       >
         <span
-          className="components-range-control__wrapper is-marked emotion-34 emotion-35"
+          className="components-range-control__wrapper is-marked emotion-32 emotion-33"
           color="#00669b"
         >
           <input
@@ -4986,12 +4931,12 @@ input[type='number'].emotion-36 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
-            value={0}
+            value=""
           />
           <span
             aria-hidden={true}
@@ -5024,7 +4969,7 @@ input[type='number'].emotion-36 {
             </span>
             <span
               aria-hidden="true"
-              className="components-range-control__mark emotion-8 emotion-5"
+              className="components-range-control__mark is-filled emotion-4 emotion-5"
               style={
                 Object {
                   "left": "10%",
@@ -5034,7 +4979,7 @@ input[type='number'].emotion-36 {
             />
             <span
               aria-hidden="true"
-              className="components-range-control__mark-label emotion-10 emotion-7"
+              className="components-range-control__mark-label is-filled emotion-6 emotion-7"
               style={
                 Object {
                   "left": "10%",
@@ -5045,7 +4990,7 @@ input[type='number'].emotion-36 {
             </span>
             <span
               aria-hidden="true"
-              className="components-range-control__mark emotion-8 emotion-5"
+              className="components-range-control__mark is-filled emotion-4 emotion-5"
               style={
                 Object {
                   "left": "20%",
@@ -5055,7 +5000,7 @@ input[type='number'].emotion-36 {
             />
             <span
               aria-hidden="true"
-              className="components-range-control__mark-label emotion-10 emotion-7"
+              className="components-range-control__mark-label is-filled emotion-6 emotion-7"
               style={
                 Object {
                   "left": "20%",
@@ -5066,7 +5011,7 @@ input[type='number'].emotion-36 {
             </span>
             <span
               aria-hidden="true"
-              className="components-range-control__mark emotion-8 emotion-5"
+              className="components-range-control__mark emotion-16 emotion-5"
               style={
                 Object {
                   "left": "80%",
@@ -5076,7 +5021,7 @@ input[type='number'].emotion-36 {
             />
             <span
               aria-hidden="true"
-              className="components-range-control__mark-label emotion-10 emotion-7"
+              className="components-range-control__mark-label emotion-18 emotion-7"
               style={
                 Object {
                   "left": "80%",
@@ -5087,7 +5032,7 @@ input[type='number'].emotion-36 {
             </span>
             <span
               aria-hidden="true"
-              className="components-range-control__mark emotion-8 emotion-5"
+              className="components-range-control__mark emotion-16 emotion-5"
               style={
                 Object {
                   "left": "100%",
@@ -5097,7 +5042,7 @@ input[type='number'].emotion-36 {
             />
             <span
               aria-hidden="true"
-              className="components-range-control__mark-label emotion-10 emotion-7"
+              className="components-range-control__mark-label emotion-18 emotion-7"
               style={
                 Object {
                   "left": "100%",
@@ -5112,7 +5057,7 @@ input[type='number'].emotion-36 {
             className="components-range-control__track emotion-26 emotion-27"
             style={
               Object {
-                "width": "0%",
+                "width": "50%",
               }
             }
           />
@@ -5120,7 +5065,7 @@ input[type='number'].emotion-36 {
             className="emotion-30 emotion-31"
             style={
               Object {
-                "left": "0%",
+                "left": "50%",
               }
             }
           >
@@ -5129,31 +5074,16 @@ input[type='number'].emotion-36 {
               className="emotion-28 emotion-29"
             />
           </span>
-          <span
-            aria-hidden={false}
-            className="components-simple-tooltip components-range-control__tooltip emotion-32 emotion-33"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            role="tooltip"
-            style={
-              Object {
-                "left": "0%",
-                "zIndex": 100,
-              }
-            }
-          >
-            0
-          </span>
         </span>
         <input
-          className="components-range-control__number emotion-36 emotion-353"
+          className="components-range-control__number emotion-34 emotion-333"
           inputMode="decimal"
           max={10}
           min={0}
           onChange={[Function]}
           step={1}
           type="number"
-          value={0}
+          value=""
         />
       </span>
     </div>
@@ -5338,12 +5268,12 @@ input[type='number'].emotion-12 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
-            value={0}
+            value=""
           />
           <span
             aria-hidden={true}
@@ -5354,7 +5284,7 @@ input[type='number'].emotion-12 {
             className="components-range-control__track emotion-4 emotion-5"
             style={
               Object {
-                "width": "0%",
+                "width": "50%",
               }
             }
           />
@@ -5362,7 +5292,7 @@ input[type='number'].emotion-12 {
             className="emotion-8 emotion-9"
             style={
               Object {
-                "left": "0%",
+                "left": "50%",
               }
             }
           >
@@ -5382,7 +5312,7 @@ input[type='number'].emotion-12 {
           onChange={[Function]}
           step={1}
           type="number"
-          value={0}
+          value=""
         />
       </span>
     </div>
@@ -5525,6 +5455,7 @@ exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -5613,8 +5544,8 @@ input[type='number'].emotion-14 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -5649,8 +5580,6 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {
@@ -5671,7 +5600,6 @@ input[type='number'].emotion-14 {
         onChange={[Function]}
         step={1}
         type="number"
-        value={0}
       />
     </span>
   </div>
@@ -5813,6 +5741,7 @@ exports[`Storyshots Components/RangeControl Multiple 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -5901,8 +5830,8 @@ input[type='number'].emotion-14 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -5937,8 +5866,6 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={false}
             className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
             role="tooltip"
             style={
               Object {
@@ -5986,8 +5913,8 @@ input[type='number'].emotion-14 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -6022,8 +5949,6 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={false}
             className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
             role="tooltip"
             style={
               Object {
@@ -6071,8 +5996,8 @@ input[type='number'].emotion-14 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -6107,8 +6032,6 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={false}
             className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
             role="tooltip"
             style={
               Object {
@@ -6156,8 +6079,8 @@ input[type='number'].emotion-14 {
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
-            onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseMove={[Function]}
             step={1}
             tabIndex={0}
             type="range"
@@ -6192,8 +6115,6 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={false}
             className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
             role="tooltip"
             style={
               Object {
@@ -6356,6 +6277,7 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -6445,8 +6367,8 @@ input[type='number'].emotion-14 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -6481,8 +6403,6 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {
@@ -6651,6 +6571,7 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -6744,8 +6665,8 @@ input[type='number'].emotion-16 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -6780,8 +6701,6 @@ input[type='number'].emotion-16 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {
@@ -6967,6 +6886,7 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -7073,8 +6993,8 @@ input[type='number'].emotion-16 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -7109,8 +7029,6 @@ input[type='number'].emotion-16 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-12 emotion-13"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {
@@ -7273,6 +7191,7 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] 
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -7361,8 +7280,8 @@ input[type='number'].emotion-14 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -7397,8 +7316,6 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {
@@ -7561,6 +7478,7 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
   min-width: 32px;
   opacity: 0;
   padding: 8px;
+  pointer-events: none;
   position: absolute;
   text-align: center;
   -webkit-transition: opacity 120ms ease;
@@ -7663,8 +7581,8 @@ input[type='number'].emotion-14 {
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          onMouseEnter={[Function]}
           onMouseLeave={[Function]}
+          onMouseMove={[Function]}
           step={1}
           tabIndex={0}
           type="range"
@@ -7699,8 +7617,6 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={false}
           className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
           role="tooltip"
           style={
             Object {
@@ -12047,12 +11963,12 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       focusable="false"
       height={24}
       role="img"
-      viewBox="-2 -2 24 24"
+      viewBox="0 0 24 24"
       width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M9 15h2V9H9v6zm1-10c-.5 0-1 .5-1 1s.5 1 1 1 1-.5 1-1-.5-1-1-1zm0-4c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7z"
+        d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-5h-2v5zm0-7h2V8h-2v2z"
       />
     </svg>
     <svg
@@ -12060,12 +11976,12 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       focusable="false"
       height={36}
       role="img"
-      viewBox="-2 -2 24 24"
+      viewBox="0 0 24 24"
       width={36}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M9 15h2V9H9v6zm1-10c-.5 0-1 .5-1 1s.5 1 1 1 1-.5 1-1-.5-1-1-1zm0-4c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7z"
+        d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-5h-2v5zm0-7h2V8h-2v2z"
       />
     </svg>
     <svg
@@ -12073,12 +11989,12 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       focusable="false"
       height={48}
       role="img"
-      viewBox="-2 -2 24 24"
+      viewBox="0 0 24 24"
       width={48}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M9 15h2V9H9v6zm1-10c-.5 0-1 .5-1 1s.5 1 1 1 1-.5 1-1-.5-1-1-1zm0-4c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7z"
+        d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-5h-2v5zm0-7h2V8h-2v2z"
       />
     </svg>
   </div>
@@ -12565,12 +12481,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="https://www.w3.org/2000/svg"
     >
       <path
-        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zM7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 2.88-2.88 7.19-5 9.88C9.92 16.21 7 11.85 7 9z"
-      />
-      <circle
-        cx="12"
-        cy="9"
-        r="2.5"
+        d="M12.5 4C8.9 4 6 6.8 6 10.2c0 .8.3 1.8.9 3.1.5 1.1 1.2 2.3 2 3.6.7 1 3 3.8 3.2 3.9l.4.5.4-.5c.2-.2 2.6-2.9 3.2-3.9.8-1.2 1.5-2.5 2-3.6.6-1.3.9-2.3.9-3.1C19 6.8 16.1 4 12.5 4zm4.3 8.7c-.5 1-1.1 2.2-1.9 3.4-.5.7-1.7 2.2-2.4 3-.7-.8-1.9-2.3-2.4-3-.8-1.2-1.4-2.3-1.9-3.3-.6-1.4-.7-2.2-.7-2.5 0-2.6 2.2-4.7 5-4.7s5 2.1 5 4.7c0 .2-.1 1-.7 2.4zM12.5 9c-.8 0-1.5.7-1.5 1.5s.7 1.5 1.5 1.5 1.5-.7 1.5-1.5S13.3 9 12.5 9z"
       />
     </svg>
     <svg
@@ -12583,12 +12494,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="https://www.w3.org/2000/svg"
     >
       <path
-        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zM7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 2.88-2.88 7.19-5 9.88C9.92 16.21 7 11.85 7 9z"
-      />
-      <circle
-        cx="12"
-        cy="9"
-        r="2.5"
+        d="M12.5 4C8.9 4 6 6.8 6 10.2c0 .8.3 1.8.9 3.1.5 1.1 1.2 2.3 2 3.6.7 1 3 3.8 3.2 3.9l.4.5.4-.5c.2-.2 2.6-2.9 3.2-3.9.8-1.2 1.5-2.5 2-3.6.6-1.3.9-2.3.9-3.1C19 6.8 16.1 4 12.5 4zm4.3 8.7c-.5 1-1.1 2.2-1.9 3.4-.5.7-1.7 2.2-2.4 3-.7-.8-1.9-2.3-2.4-3-.8-1.2-1.4-2.3-1.9-3.3-.6-1.4-.7-2.2-.7-2.5 0-2.6 2.2-4.7 5-4.7s5 2.1 5 4.7c0 .2-.1 1-.7 2.4zM12.5 9c-.8 0-1.5.7-1.5 1.5s.7 1.5 1.5 1.5 1.5-.7 1.5-1.5S13.3 9 12.5 9z"
       />
     </svg>
     <svg
@@ -12601,12 +12507,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="https://www.w3.org/2000/svg"
     >
       <path
-        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zM7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 2.88-2.88 7.19-5 9.88C9.92 16.21 7 11.85 7 9z"
-      />
-      <circle
-        cx="12"
-        cy="9"
-        r="2.5"
+        d="M12.5 4C8.9 4 6 6.8 6 10.2c0 .8.3 1.8.9 3.1.5 1.1 1.2 2.3 2 3.6.7 1 3 3.8 3.2 3.9l.4.5.4-.5c.2-.2 2.6-2.9 3.2-3.9.8-1.2 1.5-2.5 2-3.6.6-1.3.9-2.3.9-3.1C19 6.8 16.1 4 12.5 4zm4.3 8.7c-.5 1-1.1 2.2-1.9 3.4-.5.7-1.7 2.2-2.4 3-.7-.8-1.9-2.3-2.4-3-.8-1.2-1.4-2.3-1.9-3.3-.6-1.4-.7-2.2-.7-2.5 0-2.6 2.2-4.7 5-4.7s5 2.1 5 4.7c0 .2-.1 1-.7 2.4zM12.5 9c-.8 0-1.5.7-1.5 1.5s.7 1.5 1.5 1.5 1.5-.7 1.5-1.5S13.3 9 12.5 9z"
       />
     </svg>
   </div>
