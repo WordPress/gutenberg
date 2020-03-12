@@ -139,17 +139,17 @@ $block-inserter-search-height: 38px;
 	display: none;
 	border: $border-width solid $light-gray-secondary;
 	width: 300px;
-	min-height: $block-inserter-preview-height;
 	margin-right: 20px;
 	padding: 20px;
 	background: $white;
+	box-shadow: $shadow-popover;
+	border-radius: $radius-block-ui;
 
 	@include break-medium {
 		position: absolute;
-		top: 0;
-		left: calc(100% + 20px);
-		display: flex;
-		flex-direction: column;
+		top: -$border-width;
+		left: calc(100% + #{$grid-unit-15});
+		display: block;
 	}
 
 	.block-editor-block-card {
@@ -157,12 +157,6 @@ $block-inserter-search-height: 38px;
 		margin-bottom: 20px;
 		border-bottom: $border-width solid $light-gray-500;
 		@include edit-post__fade-in-animation();
-	}
-
-	.block-editor-inserter__preview {
-		display: flex;
-		flex-grow: 1;
-		overflow-y: auto;
 	}
 }
 
@@ -208,13 +202,12 @@ $block-inserter-search-height: 38px;
 .block-editor-inserter__preview-content {
 	border: $border-width solid $light-gray-500;
 	border-radius: $radius-round-rectangle;
-	min-height: 150px;
+	min-height: $grid-unit-60 * 3;
 	display: grid;
 	flex-grow: 1;
+	align-items: center;
 
 	.block-editor-block-preview__container {
-		margin-right: 0;
-		margin-left: 0;
 		padding: 10px;
 	}
 }
@@ -227,6 +220,7 @@ $block-inserter-search-height: 38px;
 	border: $border-width solid $light-gray-500;
 	border-radius: $radius-round-rectangle;
 	align-items: center;
+	min-height: $grid-unit-60 * 3;
 }
 
 .block-editor-inserter__tips {

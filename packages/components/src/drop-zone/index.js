@@ -22,6 +22,7 @@ export function useDropZone( {
 	onDrop,
 	isDisabled,
 	withPosition,
+	__unstableIsRelative = false,
 } ) {
 	const { addDropZone, removeDropZone } = useContext( Context );
 	const [ state, setState ] = useState( {
@@ -39,6 +40,7 @@ export function useDropZone( {
 				onHTMLDrop,
 				setState,
 				withPosition,
+				isRelative: __unstableIsRelative,
 			};
 			addDropZone( dropZone );
 			return () => {
@@ -76,6 +78,7 @@ function DropZoneComponent( {
 			onFilesDrop,
 			onHTMLDrop,
 			onDrop,
+			__unstableIsRelative: true,
 		}
 	);
 
