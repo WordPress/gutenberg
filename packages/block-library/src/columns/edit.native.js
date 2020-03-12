@@ -17,9 +17,8 @@ import {
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
  */
@@ -49,7 +48,6 @@ function ColumnsEditContainer( {
 	attributes,
 	updateAlignment,
 	updateColumns,
-	isMobile,
 	columnCount,
 	isSelected,
 } ) {
@@ -124,13 +122,11 @@ function ColumnsEditContainer( {
 							: ''
 					}
 					flatListProps={ {
-						...( ! isMobile && {
-							contentContainerStyle: {
-								...styles.columnsContainer,
-								maxWidth: width,
-							},
-						} ),
-						horizontal: ! isMobile && columnCount !== 0,
+						contentContainerStyle: {
+							...styles.columnsContainer,
+							// maxWidth: width,
+						},
+						horizontal: true,
 						scrollEnabled: false,
 					} }
 					containerStyle={ { flex: 1 } }
@@ -245,7 +241,4 @@ const ColumnsEdit = ( props ) => {
 	);
 };
 
-export default compose( [
-	withViewportMatch( { isMobile: '< mobile' } ),
-	withPreferredColorScheme,
-] )( ColumnsEdit );
+export default withPreferredColorScheme( ColumnsEdit );
