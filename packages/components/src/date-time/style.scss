@@ -118,47 +118,11 @@
 			color: $dark-gray-500;
 		}
 
-		.components-datetime__time-am-button {
-			margin-left: 8px;
-			margin-right: -1px;
-			border-radius: 3px 0 0 3px;
-		}
-
-		.components-datetime__time-pm-button {
-			margin-left: -1px;
-			border-radius: 0 3px 3px 0;
-		}
-
-		.components-datetime__time-am-button:focus,
-		.components-datetime__time-pm-button:focus {
-			position: relative;
-			z-index: 1;
-		}
-
-		.components-datetime__time-am-button.is-pressed,
-		.components-datetime__time-pm-button.is-pressed {
-			background: $light-gray-300;
-			border-color: $dark-gray-100;
-			box-shadow: inset 0 2px 5px -3px $dark-gray-500;
-			&:focus {
-				box-shadow:
-					inset 0 2px 5px -3px $dark-gray-500,
-					0 0 0 1px $white,
-					0 0 0 3px $blue-medium-focus;
-			}
-		}
-
 		.components-datetime__time-field {
 
 			&-time {
 				/*rtl:ignore*/
 				direction: ltr;
-			}
-
-
-			&.am-pm button {
-				font-size: 11px;
-				font-weight: 600;
 			}
 
 			select {
