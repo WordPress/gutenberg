@@ -15,9 +15,11 @@ import {
 	FocusReturnProvider,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
-import { __experimentalEditorSkeleton as EditorSkeleton } from '@wordpress/block-editor';
+import {
+	__experimentalEditorSkeleton as EditorSkeleton,
+	__experimentalFullscreenMode as FullscreenMode,
+} from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { FullscreenMode } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
