@@ -14173,6 +14173,114 @@ exports[`Storyshots Icons/Icon Library 1`] = `
         }
       }
     >
+      replace
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 20 20"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        height="5"
+        rx="1"
+        width="7"
+        x="11"
+        y="3"
+      />
+      <rect
+        height="5"
+        rx="1"
+        width="7"
+        x="2"
+        y="12"
+      />
+      <path
+        d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z"
+      />
+      <path
+        d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 20 20"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        height="5"
+        rx="1"
+        width="7"
+        x="11"
+        y="3"
+      />
+      <rect
+        height="5"
+        rx="1"
+        width="7"
+        x="2"
+        y="12"
+      />
+      <path
+        d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z"
+      />
+      <path
+        d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 20 20"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        height="5"
+        rx="1"
+        width="7"
+        x="11"
+        y="3"
+      />
+      <rect
+        height="5"
+        rx="1"
+        width="7"
+        x="2"
+        y="12"
+      />
+      <path
+        d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z"
+      />
+      <path
+        d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
       resizeCornerNE
     </strong>
     <svg
