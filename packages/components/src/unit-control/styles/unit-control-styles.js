@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { rtl } from '../../utils/style-mixins';
+import { color, rtl } from '../../utils/style-mixins';
 
 export const Root = styled.div`
 	box-sizing: border-box;
@@ -36,7 +36,7 @@ export const ValueInput = styled.input`
 	&&& {
 		appearance: none;
 		box-sizing: border-box;
-		border: 1px solid black;
+		border: 1px solid ${color( 'ui.border' )};
 		border-radius: 2px;
 		padding: 3px 8px;
 		display: block;
@@ -65,11 +65,11 @@ const unitHeightStyles = ( { size } ) => {
 const unitLabelStyles = ( props ) => {
 	return css`
 		appearance: none;
-		background: white;
+		background: ${color( 'ui.background' )};
 		border-radius: 2px;
 		border: none;
 		box-sizing: border-box;
-		color: #333;
+		color: ${color( 'darkGray.500' )};
 		display: block;
 		font-size: 8px;
 		height: 20px;
@@ -82,7 +82,7 @@ const unitLabelStyles = ( props ) => {
 		width: 22px;
 		z-index: 1;
 
-		${rtl( { right: 4 } )}
+		${rtl( { right: 4 } )()}
 		${unitHeightStyles( props )}
 	`;
 };
@@ -101,7 +101,7 @@ export const UnitSelect = styled.select`
 
 		&:hover,
 		&:focus {
-			box-shadow: 0 0 0 1px black inset;
+			box-shadow: 0 0 0 1px ${color( 'ui.border' )} inset;
 		}
 	}
 `;
