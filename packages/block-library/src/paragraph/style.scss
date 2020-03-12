@@ -28,7 +28,7 @@
 	font-style: normal;
 }
 
-p.has-line-height {
+:root p.has-line-height {
 	line-height: var(--wp--core-paragraph--line-height, inherit);
 }
 

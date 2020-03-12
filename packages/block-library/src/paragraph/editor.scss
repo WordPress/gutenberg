@@ -1,7 +1,3 @@
-.block-editor-block-list__block[data-type="core/paragraph"].has-line-height {
-	line-height: var(--wp--core-paragraph--line-height, inherit);
-}
-
 // Overwrite the inline style to make the height collapse when the paragraph editable gets focus.
 .block-editor-block-list__block[data-type="core/paragraph"].has-drop-cap:focus {
 	min-height: auto !important;
