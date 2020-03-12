@@ -19,7 +19,7 @@ export default {
 };
 
 function Example() {
-	const [ value, setValue ] = useState( 0 );
+	const [ value, setValue ] = useState( '' );
 	const [ unit, setUnit ] = useState( 'px' );
 
 	return (
@@ -35,8 +35,16 @@ function Example() {
 }
 
 export const _default = () => {
-	return <Example />;
+	return (
+		<Wrapper>
+			<Example />
+		</Wrapper>
+	);
 };
+
+const Wrapper = styled.div`
+	padding: 40px;
+`;
 
 const ControlWrapperView = styled.div`
 	max-width: 80px;

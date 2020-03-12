@@ -32,20 +32,13 @@ export default function UnitControl( {
 	value,
 	...props
 } ) {
-	const handleOnChange = ( event ) => {
-		onChange( event.target.value );
-	};
-
-	// TODO: Create NumberControl primitive
-
 	return (
 		<Root>
 			<ValueInput
 				aria-label={ label }
-				inputmode="numeric"
 				{ ...props }
 				value={ value }
-				onChange={ handleOnChange }
+				onChange={ onChange }
 				size={ size }
 				type="number"
 			/>

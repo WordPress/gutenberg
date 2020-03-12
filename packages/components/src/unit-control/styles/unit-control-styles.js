@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { color, rtl } from '../../utils/style-mixins';
+import NumberControl from '../../number-control';
 
 export const Root = styled.div`
 	box-sizing: border-box;
@@ -32,7 +33,7 @@ const sizeStyles = ( { size } ) => {
 	return css( style );
 };
 
-export const ValueInput = styled.input`
+export const ValueInput = styled( NumberControl )`
 	&&& {
 		appearance: none;
 		box-sizing: border-box;
@@ -48,7 +49,7 @@ export const ValueInput = styled.input`
 			margin: 0;
 		}
 
-		${rtl( { paddingRight: 18 } )}
+		${rtl( { paddingRight: 20 } )}
 		${sizeStyles};
 	}
 `;
