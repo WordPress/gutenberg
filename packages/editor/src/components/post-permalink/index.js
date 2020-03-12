@@ -81,7 +81,9 @@ class PostPermalink extends Component {
 			: __( 'Copy the permalink' );
 
 		const { prefix, suffix } = permalinkParts;
-		const samplePermalink = isEditable ? prefix + postSlug + suffix : prefix;
+		const samplePermalink = isEditable
+			? prefix + postSlug + suffix
+			: prefix;
 
 		return (
 			<div className="editor-post-permalink">

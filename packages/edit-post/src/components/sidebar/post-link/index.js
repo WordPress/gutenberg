@@ -150,13 +150,9 @@ export default compose( [
 			postTypeLabel: get( postType, [ 'labels', 'view_item' ] ),
 		};
 	} ),
-	ifCondition(
-		( { isEnabled, postLink, isViewable, permalinkParts } ) => {
-			return (
-				isEnabled && postLink && isViewable && permalinkParts
-			);
-		}
-	),
+	ifCondition( ( { isEnabled, postLink, isViewable, permalinkParts } ) => {
+		return isEnabled && postLink && isViewable && permalinkParts;
+	} ),
 	withDispatch( ( dispatch ) => {
 		const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );
 		const { editPost } = dispatch( 'core/editor' );
