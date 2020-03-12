@@ -29,7 +29,6 @@ function ColumnEdit( {
 	isDescendantOfParentSelected,
 	isDescendantSelected,
 	isAncestorSelected,
-	isMobile,
 	columnsSettings,
 	isColumnsInRootList,
 	isDeepNested,
@@ -45,10 +44,6 @@ function ColumnEdit( {
 	const columnBaseWidth = minWidth / columnsInRow;
 
 	const applyBlockStyle = ( placeholder = false ) => {
-		if ( isMobile ) {
-			return;
-		}
-
 		const pullWidths = ( names ) =>
 			names.map(
 				( name ) =>
