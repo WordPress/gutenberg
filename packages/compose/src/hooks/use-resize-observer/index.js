@@ -7,7 +7,7 @@ import useResizeAware from 'react-resize-aware';
  * Hook which allows to listen the resize event of any target element when it changes sizes.
  * _Note: `useResizeObserver` will report `null` until after first render_
  *
- * @return {Array} An array of {Element} `resizeListener` and g{?Object} `measurements` with properties `width` and `height`
+ * @return {Array} An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
  *
  * @example
  *
@@ -25,10 +25,4 @@ import useResizeAware from 'react-resize-aware';
  * ```
  *
  */
-const useResizeObserver = () => {
-	const [ resizeListener, sizes ] = useResizeAware();
-
-	return [ resizeListener, sizes ];
-};
-
-export default useResizeObserver;
+export default useResizeAware;

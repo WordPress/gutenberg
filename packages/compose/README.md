@@ -179,7 +179,7 @@ const App = () => {
 
 _Returns_
 
--   `Array`: An array of {Element} `resizeListener` and g{?Object} `measurements` with properties `width` and `height`
+-   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
