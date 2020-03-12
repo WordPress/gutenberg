@@ -15,12 +15,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { RichText } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
-import { close } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import { leftArrow, rightArrow } from './icons';
+import { close, chevronLeft, chevronRight } from '@wordpress/icons';
 
 class GalleryImage extends Component {
 	constructor() {
@@ -199,7 +194,7 @@ class GalleryImage extends Component {
 				{ href ? <a href={ href }>{ img }</a> : img }
 				<div className="block-library-gallery-item__move-menu">
 					<Button
-						icon={ leftArrow }
+						icon={ chevronLeft }
 						onClick={ isFirstItem ? undefined : onMoveBackward }
 						className="blocks-gallery-item__move-backward"
 						label={ __( 'Move image backward' ) }
@@ -207,7 +202,7 @@ class GalleryImage extends Component {
 						disabled={ ! isSelected }
 					/>
 					<Button
-						icon={ rightArrow }
+						icon={ chevronRight }
 						onClick={ isLastItem ? undefined : onMoveForward }
 						className="blocks-gallery-item__move-forward"
 						label={ __( 'Move image forward' ) }

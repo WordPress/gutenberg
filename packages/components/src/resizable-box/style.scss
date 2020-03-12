@@ -1,3 +1,6 @@
+$resize-handler-size: 15px;
+$resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // Make the resize handle container larger so there's a larger grabbable area.
+
 // This is a wrapper of the actual visible handle (pseudo element). It is styled
 // to be much bigger than the visual part so it's easier to click and use.
 .components-resizable-box__handle {

@@ -37,7 +37,7 @@ export function PublishButtonLabel( {
 		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
 	}
 
-	return hasNonPostEntityChanges ? __( 'Publish…' ) : __( 'Publish' );
+	return __( 'Publish' );
 }
 
 export default compose( [

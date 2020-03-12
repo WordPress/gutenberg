@@ -14,6 +14,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
+	getBlockDefaultClassName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, withSelect, useSelect } from '@wordpress/data';
@@ -94,11 +95,18 @@ function BlockListBlock( {
 	}
 
 	const isAligned = wrapperProps && wrapperProps[ 'data-align' ];
+	const generatedClassName =
+		lightBlockWrapper && hasBlockSupport( blockType, 'className', true )
+			? getBlockDefaultClassName( name )
+			: null;
+	const customClassName = lightBlockWrapper ? attributes.className : null;
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the
 	// block.
 	const wrapperClassName = classnames(
+		generatedClassName,
+		customClassName,
 		'wp-block block-editor-block-list__block',
 		{
 			'has-selected-ui': hasSelectedUI,
@@ -139,7 +147,7 @@ function BlockListBlock( {
 	// For aligned blocks, provide a wrapper element so the block can be
 	// positioned relative to the block column. This is enabled with the
 	// .is-block-content className.
-	if ( isAligned ) {
+	if ( ! lightBlockWrapper && isAligned ) {
 		blockEdit = <div className="is-block-content">{ blockEdit }</div>;
 	}
 
@@ -163,6 +171,7 @@ function BlockListBlock( {
 		name,
 		mode,
 		blockTitle: blockType.title,
+		wrapperProps,
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 

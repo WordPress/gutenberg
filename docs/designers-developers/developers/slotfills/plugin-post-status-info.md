@@ -5,17 +5,14 @@ This slots allows for the insertion of items in the Status & visibility panel of
 ## Example
 
 ```js
-const { registerPlugin } = wp.plugins;
-const { PluginPostStatusInfo } = wp.editPost;
+import { registerPlugin } from '@wordpress/plugins';
+import { PluginPostStatusInfo } from '@wordpress/edit-post';
 
-
-const PluginPostStatusInfoTest = () => {
-	return(
-		<PluginPostStatusInfo>
-			<p>Post Status Info SlotFill</p>
-		</PluginPostStatusInfo>
-	)
-}
+const PluginPostStatusInfoTest = () => (
+	<PluginPostStatusInfo>
+		<p>Post Status Info SlotFill</p>
+	</PluginPostStatusInfo>
+);
 
 registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 ```

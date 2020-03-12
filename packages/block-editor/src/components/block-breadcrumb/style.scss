@@ -14,12 +14,13 @@
 }
 
 .block-editor-block-breadcrumb__button.components-button {
-	height: $icon-button-size-small;
-	line-height: $icon-button-size-small;
+	height: $button-size-small;
+	line-height: $button-size-small;
 	padding: 0;
 
-	&:hover {
+	&:hover:not(:disabled) {
 		text-decoration: underline;
+		box-shadow: none;
 	}
 
 	&:focus {

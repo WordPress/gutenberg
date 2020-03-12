@@ -58,13 +58,8 @@ export function isInSameBlock( a, b ) {
  * @return {boolean} Whether element is in the block Element but not its children.
  */
 export function isInsideRootBlock( blockElement, element ) {
-	const innerBlocksContainer = blockElement.querySelector(
-		'.block-editor-block-list__layout'
-	);
-	return (
-		blockElement.contains( element ) &&
-		( ! innerBlocksContainer || ! innerBlocksContainer.contains( element ) )
-	);
+	const parentBlock = element.closest( '.block-editor-block-list__block' );
+	return parentBlock === blockElement;
 }
 
 /**
@@ -76,7 +71,10 @@ export function isInsideRootBlock( blockElement, element ) {
  * @return {boolean} Whether element contains inner blocks.
  */
 export function hasInnerBlocksContext( element ) {
-	return !! element.querySelector( '.block-editor-block-list__layout' );
+	return (
+		element.classList.contains( 'block-editor-block-list__layout' ) ||
+		!! element.querySelector( '.block-editor-block-list__layout' )
+	);
 }
 
 /**

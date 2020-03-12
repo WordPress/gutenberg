@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
+import { default as Video } from 'react-native-video';
 
 /**
  * WordPress dependencies
@@ -21,6 +22,7 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	MEDIA_TYPE_IMAGE,
+	MEDIA_TYPE_VIDEO,
 	MediaPlaceholder,
 	MediaUpload,
 	withColors,
@@ -46,7 +48,7 @@ import { EditMediaIcon } from './edit-media-icon';
 /**
  * Constants
  */
-const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE ];
+const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
 const INNER_BLOCKS_TEMPLATE = [
 	[
 		'core/paragraph',
@@ -116,11 +118,7 @@ const Cover = ( {
 				overlayColor && overlayColor.color
 					? overlayColor.color
 					: styles.overlay.color,
-			// Set opacity to 1 while video / theme color support is not available
-			opacity:
-				url && VIDEO_BACKGROUND_TYPE !== backgroundType
-					? dimRatio / 100
-					: 1,
+			opacity: dimRatio / 100,
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url
@@ -207,6 +205,16 @@ const Cover = ( {
 							url={ url }
 						/>
 					) ) }
+				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+					<Video
+						muted
+						disableFocus
+						repeat
+						resizeMode={ 'cover' }
+						source={ { uri: url } }
+						style={ styles.background }
+					/>
+				) }
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -249,7 +257,7 @@ const Cover = ( {
 
 				<MediaUpload
 					__experimentalOnlyMediaLibrary
-					allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onSelect={ onSelectMedia }
 					render={ ( { open, getMediaOptions } ) => {
 						return background( open, getMediaOptions );

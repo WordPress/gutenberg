@@ -3,11 +3,11 @@
 .wp-block-navigation-link__container {
 	border-radius: 0;
 	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
-	line-height: $icon-button-size;
-	min-height: $icon-button-size;
+	line-height: $button-size;
+	min-height: $button-size;
 }
 
-/*
+/**
  * Adjust Navigation Item.
  */
 .wp-block-navigation-link {
@@ -29,9 +29,9 @@
 	}
 
 	.block-list-appender {
-		margin: $grid-size * 2;
-		margin-left: $grid-size * 1.25;
-		margin-top: $grid-size * 1.25;
+		margin: $grid-unit-10 * 2;
+		margin-left: $grid-unit-10 * 1.25;
+		margin-top: $grid-unit-10 * 1.25;
 	}
 }
 
