@@ -324,6 +324,7 @@ class TimePicker extends Component {
 									isPrimary={ am === 'AM' }
 									isSecondary={ am !== 'AM' }
 									onClick={ this.updateAmPm( 'AM' ) }
+									className="components-datetime__time-am-button"
 								>
 									{ __( 'AM' ) }
 								</Button>
@@ -331,6 +332,7 @@ class TimePicker extends Component {
 									isPrimary={ am === 'PM' }
 									isSecondary={ am !== 'PM' }
 									onClick={ this.updateAmPm( 'PM' ) }
+									className="components-datetime__time-pm-button"
 								>
 									{ __( 'PM' ) }
 								</Button>
