@@ -51,6 +51,7 @@ function ColumnsEditContainer( {
 	updateColumns,
 	isMobile,
 	columnCount,
+	isSelected,
 } ) {
 	const { verticalAlignment } = attributes;
 	const [ columnsSettings, setColumnsSettings ] = useState( {
@@ -114,6 +115,9 @@ function ColumnsEditContainer( {
 				} }
 			>
 				<InnerBlocks
+					renderAppender={
+						isSelected && InnerBlocks.ButtonBlockAppender
+					}
 					flatListProps={ {
 						...( ! isMobile && {
 							contentContainerStyle: {
@@ -121,7 +125,7 @@ function ColumnsEditContainer( {
 								maxWidth: width,
 							},
 						} ),
-						horizontal: ! isMobile,
+						horizontal: ! isMobile && columnCount !== 0,
 						scrollEnabled: false,
 					} }
 					containerStyle={ { flex: 1 } }
