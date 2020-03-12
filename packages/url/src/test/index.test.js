@@ -288,6 +288,14 @@ describe( 'getQueryString', () => {
 		).toBe( 'foo=bar&foo=baz?test' );
 	} );
 
+	it( 'returns the query string of a path', () => {
+		expect( getQueryString( '/wp-json/wp/v2/posts?type=page' ) ).toBe(
+			'type=page'
+		);
+
+		expect( getQueryString( '/wp-json/wp/v2/posts' ) ).toBeUndefined();
+	} );
+
 	it( 'returns undefined when the provided does not contain a url query string', () => {
 		expect( getQueryString( '' ) ).toBeUndefined();
 		expect(
