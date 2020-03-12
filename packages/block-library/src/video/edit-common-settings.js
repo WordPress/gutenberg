@@ -65,6 +65,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 					{ value: 'metadata', label: __( 'Metadata' ) },
 					{ value: 'none', label: __( 'None' ) },
 				] }
+				separatorType={ 'none' }
 			/>
 		</>
 	);
