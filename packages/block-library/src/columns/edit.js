@@ -102,17 +102,29 @@ function ColumnsEditContainer( {
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
 			<BackgroundColor>
-				<TextColor>
-					<InnerBlocks
-						allowedBlocks={ ALLOWED_BLOCKS }
-						__experimentalMoverDirection="horizontal"
-						ref={ ref }
-						__experimentalTagName={ Block.div }
-						__experimentalPassedProps={ {
-							className: classes,
-						} }
-					/>
-				</TextColor>
+				{ ( backgroundProps ) => (
+					<TextColor>
+						{ ( textColorProps ) => (
+							<InnerBlocks
+								allowedBlocks={ ALLOWED_BLOCKS }
+								__experimentalMoverDirection="horizontal"
+								ref={ ref }
+								__experimentalTagName={ Block.div }
+								__experimentalPassedProps={ {
+									className: classnames(
+										classes,
+										backgroundProps.className,
+										textColorProps.className
+									),
+									style: {
+										...backgroundProps.style,
+										...textColorProps.style,
+									},
+								} }
+							/>
+						) }
+					</TextColor>
+				) }
 			</BackgroundColor>
 		</>
 	);
