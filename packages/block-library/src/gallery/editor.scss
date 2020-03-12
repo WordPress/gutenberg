@@ -60,7 +60,7 @@ figure.wp-block-gallery {
 	.is-selected .block-library-gallery-item__inline-menu {
 		background: $white;
 		border: 1px solid $dark-gray-primary;
-		border-radius: $radius-round-rectangle;
+		border-radius: $radius-block-ui;
 		transition: box-shadow 0.2s ease-out;
 		@include reduce-motion("transition");
 

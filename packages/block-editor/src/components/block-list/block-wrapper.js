@@ -230,7 +230,9 @@ const elements = [
 	'h6',
 	'ol',
 	'ul',
+	'li',
 	'figure',
+	'nav',
 ];
 
 const ExtendedBlockComponent = elements.reduce( ( acc, element ) => {
