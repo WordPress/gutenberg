@@ -28,9 +28,7 @@ function parameterEquals( parameterName, value ) {
 function isRESTRoute( path ) {
 	return ( request ) =>
 		parameterEquals( 'rest_route', path )( request ) ||
-		new URL( request.url() ).pathname
-			.replace( /\/$/, '' )
-			.endsWith( join( '/wp-json', path ).replace( /\/$/, '' ) );
+		new URL( request.url() ).pathname.endsWith( join( '/wp-json', path ) );
 }
 
 /**
