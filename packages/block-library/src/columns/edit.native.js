@@ -42,7 +42,6 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
  * @type {number}
  */
 const MIN_COLUMNS_NUMBER = 0;
-const MAX_COLUMNS_NUMBER = 6;
 
 function ColumnsEditContainer( {
 	attributes,
@@ -99,7 +98,7 @@ function ColumnsEditContainer( {
 							updateColumns( columnCount, value )
 						}
 						min={ MIN_COLUMNS_NUMBER }
-						max={ MAX_COLUMNS_NUMBER }
+						max={ columnCount + 1 }
 					/>
 				</PanelBody>
 			</InspectorControls>
