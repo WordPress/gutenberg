@@ -259,11 +259,12 @@ export default compose( [
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
-			getBlock,
 			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 			getBlockCount,
+			shouldShowFloatingToolbar,
+			shouldAllowSpaceForFloatingToolbar,
 		} = select( 'core/block-editor' );
 
 		const order = getBlockIndex( clientId, rootClientId );
@@ -281,12 +282,9 @@ export default compose( [
 		const parentId = parents[ 0 ] || '';
 
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
-		const rootBlock = getBlock( rootBlockId );
-		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
-		const firstChildAdjustsForFloatingToolbar = hasRootInnerBlocks && isBlockSelected( rootBlock.innerBlocks[0].clientId );
-		const adjustsForFloatingToolbar = showFloatingToolbar || firstChildAdjustsForFloatingToolbar;
+		const showFloatingToolbar = shouldShowFloatingToolbar( clientId );
+		const adjustsForFloatingToolbar = shouldAllowSpaceForFloatingToolbar( clientId );
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		const commonAncestor = getLowestCommonAncestorWithSelectedBlock(

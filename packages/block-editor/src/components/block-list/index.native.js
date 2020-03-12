@@ -155,16 +155,8 @@ export class BlockList extends Component {
 	}
 
 	cellRenderer( { children, index, item } ) {
-		const { isBlockSelected, getBlockHierarchyRootClientId, getBlock } = this.props;
-
-		const isSelected = isBlockSelected( item );
-		const rootBlockId = getBlockHierarchyRootClientId( item );
-		const rootBlock = getBlock( rootBlockId );
-		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
-
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
-		const firstChildAdjustsForFloatingToolbar = hasRootInnerBlocks && isBlockSelected( rootBlock.innerBlocks[0].clientId );
-		const adjustsForFloatingToolbar = showFloatingToolbar || firstChildAdjustsForFloatingToolbar;
+		const { shouldAllowSpaceForFloatingToolbar } = this.props;
+		const adjustsForFloatingToolbar = shouldAllowSpaceForFloatingToolbar( item );
 
 		return (
 			<View
@@ -233,9 +225,7 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSettings,
-			isBlockSelected, 
-			getBlockHierarchyRootClientId, 
-			getBlock,
+			shouldAllowSpaceForFloatingToolbar,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -274,9 +264,7 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
-			isBlockSelected, 
-			getBlockHierarchyRootClientId, 
-			getBlock,
+			shouldAllowSpaceForFloatingToolbar,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
