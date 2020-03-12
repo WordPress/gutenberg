@@ -14,8 +14,18 @@ import { useSelect } from '@wordpress/data';
 import { __experimentalUseBlockEditProps as useBlockEditProps } from '../../store';
 
 export const BASE_DEFAULT_VALUE = 1.5;
-export const INITIAL_VALUE = '';
 export const STEP = 0.1;
+/**
+ * There are varying value types within LineHeightControl:
+ *
+ * {undefined} Initial value. No changes from the user.
+ * {string} Input value. Value consumed/outputted by the input. Empty would be ''.
+ * {number} Block attribute type. Input value needs to be converted for attribute setting.
+ *
+ * Note: If the value is undefined, the input requires it to be an empty string ('')
+ * in order to be considered "controlled" by props (rather than internal state).
+ */
+export const RESET_VALUE = '';
 
 /**
  * Retrieves whether custom lineHeight controls should be disabled from editor settings.
@@ -42,10 +52,11 @@ export function useLineHeightControlState() {
 	const { lineHeight } = attributes;
 
 	const setLineHeight = ( value ) => {
-		// Value needs to be either a (float) number or empty string
 		const nextValue = isLineHeightDefined( value )
-			? parseFloat( value )
-			: INITIAL_VALUE;
+			? // Convert to a number for the block attribute
+			  parseFloat( value )
+			: // Unset for the block attribute
+			  undefined;
 
 		setAttributes( { lineHeight: nextValue } );
 	};
@@ -61,7 +72,7 @@ export function useLineHeightControlState() {
  * @return {boolean} Whether the lineHeight attribute is valid.
  */
 export function isLineHeightDefined( lineHeight ) {
-	return ! isUndefined( lineHeight ) && lineHeight !== INITIAL_VALUE;
+	return ! isUndefined( lineHeight ) && lineHeight !== RESET_VALUE;
 }
 
 /**

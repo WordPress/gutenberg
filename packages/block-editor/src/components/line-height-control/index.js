@@ -9,7 +9,7 @@ import { TextControl } from '@wordpress/components';
  */
 import {
 	BASE_DEFAULT_VALUE,
-	INITIAL_VALUE,
+	RESET_VALUE,
 	STEP,
 	useIsLineHeightControlsDisabled,
 	useLineHeightControlState,
@@ -22,6 +22,7 @@ export { default as withLineHeight } from './with-line-height';
 export default function LineHeightControl( props ) {
 	const [ lineHeight, setLineHeight ] = useLineHeightControlState();
 	const isDisabled = useIsLineHeightControlsDisabled();
+	const isDefined = isLineHeightDefined( lineHeight );
 
 	// Don't render the controls if disabled by editor settings
 	if ( isDisabled ) {
@@ -30,7 +31,7 @@ export default function LineHeightControl( props ) {
 
 	const handleOnChange = ( nextValue ) => {
 		// Set the next value without modification if lineHeight has been defined
-		if ( isLineHeightDefined( lineHeight ) ) {
+		if ( isDefined ) {
 			setLineHeight( nextValue );
 			return;
 		}
@@ -52,7 +53,7 @@ export default function LineHeightControl( props ) {
 		setLineHeight( adjustedNextValue );
 	};
 
-	const value = lineHeight || INITIAL_VALUE;
+	const value = isDefined ? lineHeight : RESET_VALUE;
 
 	return (
 		<LineHeightControlWrapper>
