@@ -326,11 +326,10 @@ describe( 'getQueryString', () => {
 		).toBeUndefined();
 		expect( getQueryString( 'https://wordpress.org/' ) ).toBeUndefined();
 		expect( getQueryString( 'https://localhost:8080' ) ).toBeUndefined();
-		expect( getQueryString( 'https://' ) ).toBeUndefined();
-		expect( getQueryString( 'https:///test' ) ).toBeUndefined();
-		expect( getQueryString( 'https://#' ) ).toBeUndefined();
-		expect( getQueryString( 'https://?' ) ).toBeUndefined();
-		expect( getQueryString( 'test.com' ) ).toBeUndefined();
+		expect( getQueryString( 'invalid' ) ).toBeUndefined();
+		expect(
+			getQueryString( 'https://example.com/empty?' )
+		).toBeUndefined();
 	} );
 } );
 
