@@ -27,24 +27,18 @@ function PostLink( {
 	editPermalink,
 	forceEmptyField,
 	setState,
-	postTitle,
 	postSlug,
-	postID,
 	postTypeLabel,
 } ) {
 	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
-	const currentSlug =
-		safeDecodeURIComponent( postSlug ) ||
-		cleanForSlug( postTitle ) ||
-		postID;
 	if ( isEditable ) {
 		prefixElement = prefix && (
 			<span className="edit-post-post-link__link-prefix">{ prefix }</span>
 		);
-		postNameElement = currentSlug && (
+		postNameElement = postSlug && (
 			<span className="edit-post-post-link__link-post-name">
-				{ currentSlug }
+				{ postSlug }
 			</span>
 		);
 		suffixElement = suffix && (
@@ -62,7 +56,7 @@ function PostLink( {
 				<div className="editor-post-link">
 					<TextControl
 						label={ __( 'URL Slug' ) }
-						value={ forceEmptyField ? '' : currentSlug }
+						value={ forceEmptyField ? '' : postSlug }
 						onChange={ ( newValue ) => {
 							editPermalink( newValue );
 							// When we delete the field the permalink gets
@@ -127,25 +121,24 @@ function PostLink( {
 export default compose( [
 	withSelect( ( select ) => {
 		const {
-			isEditedPostNew,
 			isPermalinkEditable,
 			getCurrentPost,
 			isCurrentPostPublished,
 			getPermalinkParts,
 			getEditedPostAttribute,
+			getEditedPostSlug,
 		} = select( 'core/editor' );
 		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
 			'core/edit-post'
 		);
 		const { getPostType } = select( 'core' );
 
-		const { link, id } = getCurrentPost();
+		const { link } = getCurrentPost();
 
 		const postTypeName = getEditedPostAttribute( 'type' );
 		const postType = getPostType( postTypeName );
 
 		return {
-			isNew: isEditedPostNew(),
 			postLink: link,
 			isEditable: isPermalinkEditable(),
 			isPublished: isCurrentPostPublished(),
@@ -153,16 +146,14 @@ export default compose( [
 			permalinkParts: getPermalinkParts(),
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isViewable: get( postType, [ 'viewable' ], false ),
-			postTitle: getEditedPostAttribute( 'title' ),
-			postSlug: getEditedPostAttribute( 'slug' ),
-			postID: id,
+			postSlug: safeDecodeURIComponent( getEditedPostSlug() ),
 			postTypeLabel: get( postType, [ 'labels', 'view_item' ] ),
 		};
 	} ),
 	ifCondition(
-		( { isEnabled, isNew, postLink, isViewable, permalinkParts } ) => {
+		( { isEnabled, postLink, isViewable, permalinkParts } ) => {
 			return (
-				isEnabled && ! isNew && postLink && isViewable && permalinkParts
+				isEnabled && postLink && isViewable && permalinkParts
 			);
 		}
 	),
