@@ -14,6 +14,7 @@ function parameterEquals( parameterName, value ) {
 	return ( request ) =>
 		new URL( request.url() ).searchParams.get( parameterName ) === value;
 }
+
 /**
  * Creates a function to determine if a request is a REST request of a given
  * path, accounting for variance in site permalink configuration.
