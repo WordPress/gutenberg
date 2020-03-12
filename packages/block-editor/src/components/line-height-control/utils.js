@@ -35,7 +35,8 @@ export const RESET_VALUE = '';
 export function useIsLineHeightControlsDisabled() {
 	const isDisabled = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		return !! getSettings().disableCustomLineHeight;
+
+		return !! getSettings().__experimentalDisableCustomLineHeight;
 	}, [] );
 
 	return isDisabled;
