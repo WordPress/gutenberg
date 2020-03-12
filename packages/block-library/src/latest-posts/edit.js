@@ -18,7 +18,6 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarGroup,
-	FormTokenField,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -243,21 +242,11 @@ class LatestPostsEdit extends Component {
 						onNumberOfItemsChange={ ( value ) =>
 							setAttributes( { postsToShow: value } )
 						}
+						categoriesList={ categoriesList }
+						onCategoryChange={ selectCategories }
+						selectedCategories={ categories }
 					/>
-					{ categoriesList.length > 0 && (
-						<FormTokenField
-							label={ __( 'Categories' ) }
-							value={
-								categories &&
-								categories.map( ( item ) => ( {
-									id: item.id,
-									value: item.name || item.value,
-								} ) )
-							}
-							suggestions={ Object.keys( suggestions ) }
-							onChange={ selectCategories }
-						/>
-					) }
+
 					{ postLayout === 'grid' && (
 						<RangeControl
 							label={ __( 'Columns' ) }

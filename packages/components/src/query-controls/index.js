@@ -7,7 +7,7 @@ import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { RangeControl, SelectControl } from '../';
+import { RangeControl, SelectControl, FormTokenField } from '../';
 import CategorySelect from './category-select';
 
 const DEFAULT_MIN_ITEMS = 1;
@@ -26,7 +26,7 @@ const MOBILE_CONTROL_PROPS_SEPARATOR_NONE = Platform.select( {
 
 export default function QueryControls( {
 	categoriesList,
-	selectedCategoryId,
+	selectedCategories,
 	numberOfItems,
 	order,
 	orderBy,
@@ -37,6 +37,14 @@ export default function QueryControls( {
 	onOrderChange,
 	onOrderByChange,
 } ) {
+	const suggestions = categoriesList.reduce(
+		( accumulator, category ) => ( {
+			...accumulator,
+			[ category.name ]: category,
+		} ),
+		{}
+	);
+
 	return [
 		onOrderChange && onOrderByChange && (
 			<SelectControl
@@ -76,16 +84,20 @@ export default function QueryControls( {
 			/>
 		),
 		onCategoryChange && (
-			<CategorySelect
-				key="query-controls-category-select"
-				categoriesList={ categoriesList }
-				label={ __( 'Category' ) }
-				noOptionLabel={ __( 'All' ) }
-				selectedCategoryId={ selectedCategoryId }
+			<FormTokenField
+				label={ __( 'Categories' ) }
+				value={
+					selectedCategories &&
+					selectedCategories.map( ( item ) => ( {
+						id: item.id,
+						value: item.name || item.value,
+					} ) )
+				}
+				suggestions={ Object.keys( suggestions ) }
 				onChange={ onCategoryChange }
-				{ ...MOBILE_CONTROL_PROPS }
 			/>
 		),
+
 		onNumberOfItemsChange && (
 			<RangeControl
 				key="query-controls-range-control"
