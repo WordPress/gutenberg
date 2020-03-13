@@ -8,9 +8,7 @@ const __experimentalUsePageTemplatePickerVisible = () => {
 	return useSelect( ( select ) => {
 		const { getCurrentPostType } = select( 'core/editor' );
 
-		const { getBlockOrder, getBlock, getSettings } = select(
-			'core/block-editor'
-		);
+		const { getBlockOrder, getBlock } = select( 'core/block-editor' );
 
 		const blocks = getBlockOrder();
 		const isEmptyBlockList = blocks.length === 0;
