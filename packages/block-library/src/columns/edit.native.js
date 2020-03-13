@@ -41,7 +41,7 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
  *
  * @type {number}
  */
-const MIN_COLUMNS_NUMBER = 0;
+const MIN_COLUMNS_NUMBER = 1;
 
 function ColumnsEditContainer( {
 	attributes,
@@ -50,6 +50,7 @@ function ColumnsEditContainer( {
 	columnCount,
 	isSelected,
 	onAddNextColumn,
+	onDelete,
 } ) {
 	const { verticalAlignment } = attributes;
 	const [ columnsSettings, setColumnsSettings ] = useState( {
@@ -142,6 +143,7 @@ function ColumnsEditContainer( {
 					allowedBlocks={ ALLOWED_BLOCKS }
 					columnsSettings={ columnsSettings }
 					customOnAdd={ onAddNextColumn }
+					customOnDelete={ columnCount === 1 && onDelete }
 				/>
 			</View>
 		</>
@@ -227,6 +229,11 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 			replaceInnerBlocks( clientId, innerBlocks, true );
 			selectBlock( insertedBlock.clientId );
+		},
+		onDelete: () => {
+			const { clientId } = ownProps;
+			const { removeBlock } = dispatch( 'core/block-editor' );
+			removeBlock( clientId );
 		},
 	} )
 )( ColumnsEditContainer );

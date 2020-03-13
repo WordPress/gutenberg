@@ -192,6 +192,7 @@ class BlockListBlock extends Component {
 			title,
 			parentId,
 			isTouchable,
+			customOnDelete,
 			horizontalDirection,
 			hasParent,
 			onSelect,
@@ -246,6 +247,7 @@ class BlockListBlock extends Component {
 							{ isSelected && (
 								<BlockMobileToolbar
 									clientId={ clientId }
+									customOnDelete={ customOnDelete }
 									horizontalDirection={ horizontalDirection }
 								/>
 							) }

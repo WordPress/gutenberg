@@ -23,6 +23,7 @@ const BlockMobileToolbar = ( {
 	clientId,
 	onDelete,
 	order,
+	customOnDelete,
 	horizontalDirection,
 } ) => (
 	<View style={ styles.toolbar }>
@@ -41,7 +42,7 @@ const BlockMobileToolbar = ( {
 				__( 'Remove block at row %s' ),
 				order + 1
 			) }
-			onClick={ onDelete }
+			onClick={ customOnDelete || onDelete }
 			icon={ trash }
 			extraProps={ { hint: __( 'Double tap to remove the block' ) } }
 		/>

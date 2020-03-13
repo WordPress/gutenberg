@@ -160,6 +160,7 @@ export class BlockList extends Component {
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			__experimentalMoverDirection,
+			customOnDelete,
 			containerStyle,
 			columnsSettings,
 		} = this.props;
@@ -184,6 +185,7 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
+						customOnDelete={ customOnDelete }
 						horizontalDirection={ horizontalDirection }
 						columnsSettings={ columnsSettings }
 					/>
