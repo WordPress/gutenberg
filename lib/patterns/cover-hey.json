@@ -1,0 +1,5 @@
+{
+	"__file": "wp_block",
+	"title": "Cover Hey!",
+	"content": "<!-- wp:group {\"align\":\"wide\"} -->\n<div class=\"wp-block-group alignwide\"><div class=\"wp-block-group__inner-container\"><!-- wp:cover {\"url\":\"https://nrqsnchztest.blog/wp-content/uploads/2020/03/IMG_8372.jpg\",\"id\":535,\"dimRatio\":20,\"focalPoint\":{\"x\":\"0.46\",\"y\":\"0.06\"},\"minHeight\":500,\"align\":\"full\"} -->\n<div class=\"wp-block-cover alignfull has-background-dim-20 has-background-dim\" style=\"background-image:url(https://nrqsnchztest.blog/wp-content/uploads/2020/03/IMG_8372.jpg);background-position:46% 6%;min-height:500px\"><div class=\"wp-block-cover__inner-container\"><!-- wp:paragraph {\"align\":\"center\",\"placeholder\":\"Write title…\",\"customFontSize\":244} -->\n<p style=\"font-size:244px\" class=\"has-text-align-center\"><strong>hey</strong></p>\n<!-- /wp:paragraph --></div></div>\n<!-- /wp:cover --></div></div>\n<!-- /wp:group -->"
+  }
