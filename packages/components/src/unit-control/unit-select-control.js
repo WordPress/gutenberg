@@ -9,6 +9,10 @@ import { noop, isEmpty } from 'lodash';
 import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
 import { CSS_UNITS } from './utils';
 
+/**
+ * Renders a `select` if there are multiple units.
+ * Otherwise, renders a non-selectable label.
+ */
 export default function UnitSelectControl( {
 	isTabbable = true,
 	options = CSS_UNITS,
@@ -16,7 +20,7 @@ export default function UnitSelectControl( {
 	size = 'default',
 	value = 'px',
 } ) {
-	if ( isEmpty( options ) ) {
+	if ( isEmpty( options ) || options.length === 1 ) {
 		return <UnitLabel size={ size }>{ value }</UnitLabel>;
 	}
 
