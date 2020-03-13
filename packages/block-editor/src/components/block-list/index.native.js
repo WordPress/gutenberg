@@ -127,7 +127,7 @@ export class BlockList extends Component {
 						this.shouldFlatListPreventAutomaticScroll
 					}
 					title={ title }
-					ListHeaderComponent={ ! isReadOnly && header }
+					ListHeaderComponent={ header }
 					ListEmptyComponent={
 						! isReadOnly && this.renderDefaultBlockAppender
 					}
