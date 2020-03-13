@@ -33,7 +33,7 @@ const __experimentalPageTemplatePicker = ( {
 
 	const onApply = () => {
 		editPost( {
-			title: title ? title : templatePreview.name,
+			title: title || templatePreview.name,
 			blocks: templatePreview.blocks,
 		} );
 		logUserEvent( userEvents.editorSessionTemplateApply, {
