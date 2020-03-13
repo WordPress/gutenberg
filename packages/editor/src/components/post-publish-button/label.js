@@ -35,7 +35,7 @@ export function PublishButtonLabel( {
 	} else if ( isBeingScheduled && 'private' !== visibility ) {
 		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
 	} else if ( isPublished ) {
-		return hasNonPostEntityChanges ? __( 'Update…' ) : __( 'Update' ) ;
+		return hasNonPostEntityChanges ? __( 'Update…' ) : __( 'Update' );
 	}
 
 	return __( 'Publish' );
