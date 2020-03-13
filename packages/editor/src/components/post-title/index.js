@@ -8,7 +8,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useRef, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
@@ -23,9 +23,18 @@ import PostPermalink from '../post-permalink';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 /**
- * Constants
+ * Global regular expression matching one or more newline characters.
+ *
+ * @type {RegExp}
  */
 const REGEXP_NEWLINES = /[\r\n]+/g;
+
+/**
+ * Global regular expression matching ampersands.
+ *
+ * @type {RegExp}
+ */
+const REGEXP_AMPERSAND = /&/g;
 
 function PostTitle() {
 	const {
@@ -58,6 +67,8 @@ function PostTitle() {
 	const { editPost } = useDispatch( 'core/editor' );
 	const instanceId = useInstanceId( PostTitle );
 	const [ isSelected, setIsSelected ] = useState( false );
+	const hasReceivedChangeInteraction = useRef( false );
+	const decodedTitle = useMemo( () => decodeEntities( title ), [ title ] );
 
 	function onSelect() {
 		setIsSelected( true );
@@ -69,7 +80,18 @@ function PostTitle() {
 	}
 
 	function onChange( event ) {
-		const nextTitle = event.target.value.replace( REGEXP_NEWLINES, ' ' );
+		hasReceivedChangeInteraction.current = true;
+
+		const nextTitle = event.target.value
+			// `onKeyDown` interprets Enter press as inserting a default block,
+			// so this logic would never be reached. But for content which is
+			// pated and includes newlines, convert each newline to a space.
+			.replace( REGEXP_NEWLINES, ' ' )
+			// The title field renders with decoded entities. If user explicitly
+			// enters an ampersand, anticipate the decoding by preemptively
+			// _encoding_ it.
+			.replace( REGEXP_AMPERSAND, '&amp;' );
+
 		editPost( { title: nextTitle } );
 	}
 
@@ -101,7 +123,7 @@ function PostTitle() {
 							<Textarea
 								id={ `post-title-${ instanceId }` }
 								className="editor-post-title__input"
-								value={ title }
+								value={ decodedTitle }
 								onChange={ onChange }
 								placeholder={
 									decodedPlaceholder || __( 'Add title' )
