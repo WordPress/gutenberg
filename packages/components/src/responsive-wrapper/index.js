@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import useResizeAware from 'react-resize-aware';
 
 /**
  * WordPress dependencies
@@ -14,15 +15,23 @@ function ResponsiveWrapper( {
 	children,
 	isInline = false,
 } ) {
+	const [
+		containerResizeListener,
+		{ width: containerWidth },
+	] = useResizeAware();
 	if ( Children.count( children ) !== 1 ) {
 		return null;
 	}
 	const imageStyle = {
-		paddingBottom: ( naturalHeight / naturalWidth ) * 100 + '%',
+		paddingBottom:
+			naturalWidth < containerWidth
+				? naturalHeight
+				: ( naturalHeight / naturalWidth ) * 100 + '%',
 	};
 	const TagName = isInline ? 'span' : 'div';
 	return (
 		<TagName className="components-responsive-wrapper">
+			{ containerResizeListener }
 			<TagName style={ imageStyle } />
 			{ cloneElement( children, {
 				className: classnames(
