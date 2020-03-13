@@ -34,7 +34,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks.
-		await page.click( '[aria-label="Block navigation"]' );
+		await page.click( '[aria-label="Content structure"]' );
 		const columnsBlockMenuItem = (
 			await page.$x(
 				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]"
@@ -52,7 +52,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( '3' );
 
 		// Navigate to the last column block.
-		await page.click( '[aria-label="Block navigation"]' );
+		await page.click( '[aria-label="Content structure"]' );
 		const lastColumnsBlockMenuItem = (
 			await page.$x(
 				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
@@ -85,6 +85,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the columns blocks using the keyboard.
 		await openBlockNavigator();
+		await pressKeyTimes( 'Tab', 2 );
 		await page.keyboard.press( 'Enter' );
 
 		// Move focus to the sidebar area.
@@ -98,7 +99,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the last column in the columns block.
 		await openBlockNavigator();
-		await pressKeyTimes( 'Tab', 4 );
+		await pressKeyTimes( 'Tab', 6 );
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
 
@@ -127,6 +128,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Return to first block.
 		await openBlockNavigator();
+		await pressKeyTimes( 'Tab', 2 );
 		await page.keyboard.press( 'Space' );
 
 		// Replace its content.
