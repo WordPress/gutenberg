@@ -5,6 +5,14 @@ export function backgroundImageStyles( url ) {
 	return url ? { backgroundImage: `url(${ url })` } : {};
 }
 
+export const CSS_UNITS = [
+	{ value: 'px', label: 'px', default: COVER_MIN_HEIGHT },
+	{ value: 'em', label: 'em', default: 10 },
+	{ value: 'rem', label: 'rem', default: 10 },
+	{ value: 'vw', label: 'vw', default: 10 },
+	{ value: 'vh', label: 'vh', default: 10 },
+];
+
 export function dimRatioToClass( ratio ) {
 	return ratio === 0 || ratio === 50 || ! ratio
 		? null

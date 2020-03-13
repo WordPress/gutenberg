@@ -18,9 +18,10 @@ import {
 	RangeControl,
 	ResizableBox,
 	ToggleControl,
+	__experimentalUnitControl as UnitControl,
 	withNotices,
 } from '@wordpress/components';
-import { compose, withInstanceId } from '@wordpress/compose';
+import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
@@ -45,6 +46,7 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
+	CSS_UNITS,
 	backgroundImageStyles,
 	dimRatioToClass,
 } from './shared';
@@ -71,47 +73,54 @@ function retrieveFastAverageColor() {
 	return retrieveFastAverageColor.fastAverageColor;
 }
 
-const CoverHeightInput = withInstanceId( function( {
-	value = '',
-	instanceId,
-	onChange,
-} ) {
+const { __getComputedSize: getComputedUnitSize } = UnitControl;
+
+function CoverHeightInput( { onChange, onUnitChange, unit, value = '' } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
+	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
+	const isPx = unit === 'px';
+
+	const handleOnChange = ( unprocessedValue ) => {
+		const inputValue =
+			unprocessedValue !== ''
+				? parseInt( unprocessedValue, 10 )
+				: undefined;
+
+		if ( isNaN( inputValue ) && inputValue !== undefined ) {
+			setTemporaryInput( unprocessedValue );
+			return;
+		}
+		setTemporaryInput( null );
+		onChange( inputValue );
+	};
+
+	const handleOnBlur = () => {
+		if ( temporaryInput !== null ) {
+			setTemporaryInput( null );
+		}
+	};
+
+	const inputValue = temporaryInput !== null ? temporaryInput : value;
+	const min = isPx ? COVER_MIN_HEIGHT : 0;
+
 	return (
 		<BaseControl label={ __( 'Minimum height in pixels' ) } id={ inputId }>
-			<input
-				type="number"
+			<UnitControl
 				id={ inputId }
-				onChange={ ( event ) => {
-					const unprocessedValue = event.target.value;
-					const inputValue =
-						unprocessedValue !== ''
-							? parseInt( event.target.value, 10 )
-							: undefined;
-					if (
-						( isNaN( inputValue ) ||
-							inputValue < COVER_MIN_HEIGHT ) &&
-						inputValue !== undefined
-					) {
-						setTemporaryInput( event.target.value );
-						return;
-					}
-					setTemporaryInput( null );
-					onChange( inputValue );
-				} }
-				onBlur={ () => {
-					if ( temporaryInput !== null ) {
-						setTemporaryInput( null );
-					}
-				} }
-				value={ temporaryInput !== null ? temporaryInput : value }
-				min={ COVER_MIN_HEIGHT }
+				min={ min }
+				onBlur={ handleOnBlur }
+				onChange={ handleOnChange }
+				onUnitChange={ onUnitChange }
 				step="1"
+				style={ { maxWidth: 80 } }
+				unit={ unit }
+				units={ CSS_UNITS }
+				value={ inputValue }
 			/>
 		</BaseControl>
 	);
-} );
+}
 
 const RESIZABLE_BOX_ENABLE_OPTION = {
 	top: false,
@@ -227,6 +236,7 @@ function CoverEdit( {
 		focalPoint,
 		hasParallax,
 		minHeight,
+		minHeightUnit,
 		url,
 	} = attributes;
 	const {
@@ -255,12 +265,16 @@ function CoverEdit( {
 
 	const { removeAllNotices, createErrorNotice } = noticeOperations;
 
+	const computedMinHeight =
+		temporaryMinHeight ||
+		getComputedUnitSize( { value: minHeight, unit: minHeightUnit } );
+
 	const style = {
 		...( backgroundType === IMAGE_BACKGROUND_TYPE
 			? backgroundImageStyles( url )
 			: {} ),
 		backgroundColor: overlayColor.color,
-		minHeight: temporaryMinHeight || minHeight,
+		minHeight: computedMinHeight,
 	};
 
 	if ( gradientValue && ! url ) {
@@ -339,9 +353,15 @@ function CoverEdit( {
 						<PanelBody title={ __( 'Dimensions' ) }>
 							<CoverHeightInput
 								value={ temporaryMinHeight || minHeight }
+								unit={ minHeightUnit }
 								onChange={ ( newMinHeight ) =>
 									setAttributes( { minHeight: newMinHeight } )
 								}
+								onUnitChange={ ( nextUnit ) => {
+									setAttributes( {
+										minHeightUnit: nextUnit,
+									} );
+								} }
 							/>
 						</PanelBody>
 						<PanelColorGradientSettings
@@ -436,7 +456,10 @@ function CoverEdit( {
 						'is-selected': isSelected,
 					}
 				) }
-				onResizeStart={ () => toggleSelection( false ) }
+				onResizeStart={ () => {
+					setAttributes( { minHeightUnit: 'px' } );
+					toggleSelection( false );
+				} }
 				onResize={ setTemporaryMinHeight }
 				onResizeStop={ ( newMinHeight ) => {
 					toggleSelection( true );

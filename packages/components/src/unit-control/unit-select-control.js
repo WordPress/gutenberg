@@ -25,7 +25,10 @@ export default function UnitSelectControl( {
 	}
 
 	const handleOnChange = ( event ) => {
-		onChange( event.target.value );
+		const { value: unitValue } = event.target;
+		const data = options.find( ( option ) => option.value === unitValue );
+
+		onChange( unitValue, { event, data } );
 	};
 
 	return (

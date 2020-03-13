@@ -74,10 +74,12 @@ const unitSizeStyles = ( { size } ) => {
 		default: {
 			top: 5,
 			height: 20,
+			minHeight: 20,
 		},
 		small: {
 			top: 4,
 			height: 16,
+			minHeight: 16,
 		},
 	};
 
@@ -94,7 +96,7 @@ const unitLabelStyles = ( props ) => {
 		color: ${color( 'darkGray.500' )};
 		display: block;
 		font-size: 8px;
-		height: 20px;
+		line-height: 1;
 		letter-spacing: -0.5px;
 		outline: none;
 		padding: 2px 2px;

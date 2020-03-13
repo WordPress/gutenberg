@@ -34,6 +34,7 @@ export default function save( { attributes } ) {
 		overlayColor,
 		url,
 		minHeight,
+		minHeightUnit,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -56,7 +57,9 @@ export default function save( { attributes } ) {
 	if ( customGradient && ! url ) {
 		style.background = customGradient;
 	}
-	style.minHeight = minHeight || undefined;
+	style.minHeight = minHeightUnit
+		? `${ minHeight }${ minHeightUnit }`
+		: minHeight || undefined;
 
 	const classes = classnames(
 		dimRatioToClass( dimRatio ),
