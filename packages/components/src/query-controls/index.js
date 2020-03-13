@@ -37,13 +37,15 @@ export default function QueryControls( {
 	onOrderChange,
 	onOrderByChange,
 } ) {
-	const suggestions = categoriesList.reduce(
+	const categorySuggestions = categoriesList.reduce(
 		( accumulator, category ) => ( {
 			...accumulator,
 			[ category.name ]: category,
 		} ),
 		{}
 	);
+
+	const MAX_CATEGORIES_SUGGESTIONS = 20;
 
 	return [
 		onOrderChange && onOrderByChange && (
@@ -93,8 +95,9 @@ export default function QueryControls( {
 						value: item.name || item.value,
 					} ) )
 				}
-				suggestions={ Object.keys( suggestions ) }
+				suggestions={ Object.keys( categorySuggestions ) }
 				onChange={ onCategoryChange }
+				maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
 			/>
 		),
 
