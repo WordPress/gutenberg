@@ -20,7 +20,7 @@ export default function UnitSelectControl( {
 	size = 'default',
 	value = 'px',
 } ) {
-	if ( isEmpty( options ) || options.length === 1 ) {
+	if ( isEmpty( options ) || options.length === 1 || options === false ) {
 		return <UnitLabel size={ size }>{ value }</UnitLabel>;
 	}
 

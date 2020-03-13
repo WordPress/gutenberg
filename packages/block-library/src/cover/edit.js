@@ -35,7 +35,7 @@ import {
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { withDispatch } from '@wordpress/data';
+import { useSelect, withDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 
 /**
@@ -73,6 +73,15 @@ function retrieveFastAverageColor() {
 	return retrieveFastAverageColor.fastAverageColor;
 }
 
+export function useIsCustomUnitsDisabled() {
+	const isDisabled = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return !! getSettings().__experimentalDisableCustomUnits;
+	}, [] );
+
+	return isDisabled;
+}
+
 const { __getComputedSize: getComputedUnitSize } = UnitControl;
 
 function CoverHeightInput( {
@@ -85,6 +94,7 @@ function CoverHeightInput( {
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
+	const isCustomUnitsDisabled = useIsCustomUnitsDisabled();
 
 	const handleOnChange = ( unprocessedValue ) => {
 		const inputValue =
@@ -108,6 +118,7 @@ function CoverHeightInput( {
 
 	const inputValue = temporaryInput !== null ? temporaryInput : value;
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
+	const units = isCustomUnitsDisabled ? false : CSS_UNITS;
 
 	return (
 		<BaseControl label={ __( 'Minimum height in pixels' ) } id={ inputId }>
@@ -120,7 +131,7 @@ function CoverHeightInput( {
 				step="1"
 				style={ { maxWidth: 80 } }
 				unit={ unit }
-				units={ CSS_UNITS }
+				units={ units }
 				value={ inputValue }
 			/>
 		</BaseControl>
