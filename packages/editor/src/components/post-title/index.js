@@ -82,7 +82,6 @@ function PostTitle() {
 
 	// The wp-block className is important for editor styles.
 	const className = classnames( 'wp-block editor-post-title__block', {
-		'is-selected': isSelected,
 		'is-focus-mode': isFocusMode,
 	} );
 	const decodedPlaceholder = decodeEntities( placeholder );
