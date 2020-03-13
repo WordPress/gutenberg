@@ -269,7 +269,7 @@ If you use a [TypeScript integration](https://github.com/Microsoft/TypeScript/wi
 
 For packages which do not distribute their own TypeScript types, you are welcomed to install and use the [DefinitelyTyped](http://definitelytyped.org/) community-maintained types definitions, if one exists.
 
-### Record Types
+### Generic Types
 
 When documenting a generic type such as `Object`, `Function`, `Promise`, etc., always include details about the expected record types.
 
@@ -282,10 +282,12 @@ When documenting a generic type such as `Object`, `Function`, `Promise`, etc., a
 
 // Correct:
 
-/** @type {Object<string,number>} */
+/** @type {Record<string,number>} */ /* or */ /** @type {{[setting:string]:any}} */
 /** @type {(key:string)=>boolean} */
 /** @type {Promise<string>} */
 ```
+
+When the name of the key for an object provides hints for developers what to do, use indexable interface like `{[setting:string]:any}`. If not, use `Record`.
 
 The function expression here uses TypeScript's syntax for function types, which can be useful in providing more detailed information about the names and types of the expected parameters. For more information, consult the [TypeScript `@type` tag function recommendations](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#type).
 
@@ -312,7 +314,7 @@ Similar to the "Custom Types" advice concerning type unions and with literal val
 /**
  * Hash of breakpoint names with pixel width at which it becomes effective.
  *
- * @type {Object<WPBreakpoint,number>}
+ * @type {Record<WPBreakpoint,number>}
  */
 const BREAKPOINTS = { huge: 1440 /* , ... */ };
 ```
