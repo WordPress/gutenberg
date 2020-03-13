@@ -8,13 +8,13 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { withFocusOutside } from '@wordpress/components';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { DetectFocusOutside } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -27,66 +27,75 @@ import PostTypeSupportCheck from '../post-type-support-check';
  */
 const REGEXP_NEWLINES = /[\r\n]+/g;
 
-class PostTitle extends Component {
-	constructor() {
-		super( ...arguments );
+function PostTitle() {
+	const {
+		isCleanNewPost,
+		title,
+		isPostTypeViewable,
+		placeholder,
+		isFocusMode,
+		hasFixedToolbar,
+	} = useSelect( ( select ) => {
+		const {
+			getEditedPostAttribute,
+			isCleanNewPost: getIsCleanNewPost,
+		} = select( 'core/editor' );
+		const { getSettings } = select( 'core/block-editor' );
+		const { getPostType } = select( 'core' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+		const {
+			titlePlaceholder,
+			focusMode,
+			hasFixedToolbar: _hasFixedToolbar,
+		} = getSettings();
 
-		this.onChange = this.onChange.bind( this );
-		this.onSelect = this.onSelect.bind( this );
-		this.onUnselect = this.onUnselect.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
-
-		this.state = {
-			isSelected: false,
+		return {
+			isCleanNewPost: getIsCleanNewPost(),
+			title: getEditedPostAttribute( 'title' ),
+			isPostTypeViewable: get( postType, [ 'viewable' ], false ),
+			placeholder: titlePlaceholder,
+			isFocusMode: focusMode,
+			hasFixedToolbar: _hasFixedToolbar,
 		};
+	} );
+	const { insertDefaultBlock, clearSelectedBlock } = useDispatch(
+		'core/block-editor'
+	);
+	const { editPost } = useDispatch( 'core/editor' );
+	const instanceId = useInstanceId( PostTitle );
+	const [ isSelected, setIsSelected ] = useState( false );
+
+	function onSelect() {
+		setIsSelected( true );
+		clearSelectedBlock();
 	}
 
-	handleFocusOutside() {
-		this.onUnselect();
+	function onUnselect() {
+		setIsSelected( false );
 	}
 
-	onSelect() {
-		this.setState( { isSelected: true } );
-		this.props.clearSelectedBlock();
+	function onChange( event ) {
+		const nextTitle = event.target.value.replace( REGEXP_NEWLINES, ' ' );
+		editPost( { title: nextTitle } );
 	}
 
-	onUnselect() {
-		this.setState( { isSelected: false } );
-	}
-
-	onChange( event ) {
-		const newTitle = event.target.value.replace( REGEXP_NEWLINES, ' ' );
-		this.props.onUpdate( newTitle );
-	}
-
-	onKeyDown( event ) {
+	function onKeyDown( event ) {
 		if ( event.keyCode === ENTER ) {
 			event.preventDefault();
-			this.props.onEnterPress();
+			insertDefaultBlock( undefined, undefined, 0 );
 		}
 	}
 
-	render() {
-		const {
-			hasFixedToolbar,
-			isCleanNewPost,
-			isFocusMode,
-			isPostTypeViewable,
-			instanceId,
-			placeholder,
-			title,
-		} = this.props;
-		const { isSelected } = this.state;
+	// The wp-block className is important for editor styles.
+	const className = classnames( 'wp-block editor-post-title__block', {
+		'is-selected': isSelected,
+		'is-focus-mode': isFocusMode,
+		'has-fixed-toolbar': hasFixedToolbar,
+	} );
+	const decodedPlaceholder = decodeEntities( placeholder );
 
-		// The wp-block className is important for editor styles.
-		const className = classnames( 'wp-block editor-post-title__block', {
-			'is-selected': isSelected,
-			'is-focus-mode': isFocusMode,
-			'has-fixed-toolbar': hasFixedToolbar,
-		} );
-		const decodedPlaceholder = decodeEntities( placeholder );
-
-		return (
+	return (
+		<DetectFocusOutside onFocusOutside={ onUnselect }>
 			<PostTypeSupportCheck supportKeys="title">
 				<div className="editor-post-title">
 					<div className={ className }>
@@ -101,18 +110,18 @@ class PostTitle extends Component {
 								id={ `post-title-${ instanceId }` }
 								className="editor-post-title__input"
 								value={ title }
-								onChange={ this.onChange }
+								onChange={ onChange }
 								placeholder={
 									decodedPlaceholder || __( 'Add title' )
 								}
-								onFocus={ this.onSelect }
-								onKeyDown={ this.onKeyDown }
-								onKeyPress={ this.onUnselect }
+								onFocus={ onSelect }
+								onKeyDown={ onKeyDown }
+								onKeyPress={ onUnselect }
 								/*
-									Only autofocus the title when the post is entirely empty.
-									This should only happen for a new post, which means we
-									focus the title on new post so the author can start typing
-									right away, without needing to click anything.
+								Only autofocus the title when the post is entirely empty.
+								This should only happen for a new post, which means we
+								focus the title on new post so the author can start typing
+								right away, without needing to click anything.
 								*/
 								/* eslint-disable jsx-a11y/no-autofocus */
 								autoFocus={
@@ -128,47 +137,8 @@ class PostTitle extends Component {
 					</div>
 				</div>
 			</PostTypeSupportCheck>
-		);
-	}
+		</DetectFocusOutside>
+	);
 }
 
-const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute, isCleanNewPost } = select( 'core/editor' );
-	const { getSettings } = select( 'core/block-editor' );
-	const { getPostType } = select( 'core' );
-	const postType = getPostType( getEditedPostAttribute( 'type' ) );
-	const { titlePlaceholder, focusMode, hasFixedToolbar } = getSettings();
-
-	return {
-		isCleanNewPost: isCleanNewPost(),
-		title: getEditedPostAttribute( 'title' ),
-		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
-		placeholder: titlePlaceholder,
-		isFocusMode: focusMode,
-		hasFixedToolbar,
-	};
-} );
-
-const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { insertDefaultBlock, clearSelectedBlock } = dispatch(
-		'core/block-editor'
-	);
-	const { editPost } = dispatch( 'core/editor' );
-
-	return {
-		onEnterPress() {
-			insertDefaultBlock( undefined, undefined, 0 );
-		},
-		onUpdate( title ) {
-			editPost( { title } );
-		},
-		clearSelectedBlock,
-	};
-} );
-
-export default compose(
-	applyWithSelect,
-	applyWithDispatch,
-	withInstanceId,
-	withFocusOutside
-)( PostTitle );
+export default PostTitle;
