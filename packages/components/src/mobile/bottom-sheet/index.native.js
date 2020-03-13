@@ -68,9 +68,13 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
-		this.subscribeAndroidModalClosed = subscribeAndroidModalClosed( () => {
-			this.props.onClose();
-		} );
+		if ( Platform.OS === 'android' ) {
+			this.subscribeAndroidModalClosed = subscribeAndroidModalClosed(
+				() => {
+					this.props.onClose();
+				}
+			);
+		}
 
 		this.keyboardWillShowListener = Keyboard.addListener(
 			'keyboardWillShow',
@@ -90,7 +94,9 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
-		this.subscribeAndroidModalClosed.remove();
+		if ( Platform.OS === 'android' ) {
+			this.subscribeAndroidModalClosed.remove();
+		}
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
