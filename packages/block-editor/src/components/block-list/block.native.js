@@ -80,18 +80,12 @@ class BlockListBlock extends Component {
 	}
 
 	applyBlockStyle() {
-		const {
-			isDimmed,
-			hasParent,
-			isParentSelected,
-			isLastBlock,
-			isFirstBlock,
-		} = this.props;
+		const { isDimmed, hasParent, isLastBlock, isFirstBlock } = this.props;
 		return [
 			// Do not add horizontal margin in nested blocks
 			! hasParent && styles.withMarginHorizontal,
-			// remove margin bottom for the last block if parent is not selected (the margin is added to the parent)
-			( ! isLastBlock || isParentSelected ) && styles.withMarginBottom,
+			// remove margin bottom for the last block (the margin is added to the parent)
+			! isLastBlock && styles.withMarginBottom,
 			// remove margin top for the first block that is not on the root level (the margin is added to the parent)
 			! ( isFirstBlock && hasParent ) && styles.withMarginTop,
 			isDimmed && styles.dimmed,

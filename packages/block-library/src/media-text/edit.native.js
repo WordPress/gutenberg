@@ -200,8 +200,15 @@ class MediaTextEdit extends Component {
 			: this.state.mediaWidth || mediaWidth;
 		const widthString = `${ temporaryMediaWidth }%`;
 
-		const innerBlockContainerStyle =
-			! shouldStack && styles.innerPaddingNoStuck;
+		const innerBlockContainerStyle = ! shouldStack
+			? styles.innerBlock
+			: {
+					...( mediaPosition === 'left' &&
+						styles.innerBlockStackMediaLeft ),
+					...( mediaPosition === 'right' &&
+						styles.innerBlockStackMediaRight ),
+			  };
+
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
 			...styles[
@@ -210,23 +217,21 @@ class MediaTextEdit extends Component {
 			...( mediaPosition === 'right'
 				? styles[ 'has-media-on-the-right' ]
 				: {} ),
-			...( shouldStack
-				? styles[ 'is-stacked-on-mobile' ]
-				: { marginBottom: isSelected ? 16 : 0 } ),
+			...( shouldStack && styles[ 'is-stacked-on-mobile' ] ),
 			...( shouldStack && mediaPosition === 'right'
 				? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ]
 				: {} ),
+			...( isSelected && styles[ 'is-selected' ] ),
 			backgroundColor: backgroundColor.color,
 		};
+
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
+
 		const mediaContainerStyle = shouldStack
 			? {
-					...( mediaPosition === 'left' && styles.mediaStuckLeft ),
-					...( mediaPosition === 'right' && styles.mediaStuckRight ),
-					...( mediaPosition === 'right' &&
-						isSelected &&
-						styles.mediaStuckRightSelected ),
+					...( mediaPosition === 'left' && styles.mediaStackLeft ),
+					...( mediaPosition === 'right' && styles.mediaStackRight ),
 			  }
 			: {
 					...( mediaPosition === 'left' && styles.mediaLeft ),
