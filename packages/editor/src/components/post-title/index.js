@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { DetectFocusOutside } from '@wordpress/components';
+import { DetectFocusOutside, VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -92,12 +92,12 @@ function PostTitle() {
 				<div className="editor-post-title">
 					<div className={ className }>
 						<div>
-							<label
+							<VisuallyHidden
+								as="label"
 								htmlFor={ `post-title-${ instanceId }` }
-								className="screen-reader-text"
 							>
 								{ decodedPlaceholder || __( 'Add title' ) }
-							</label>
+							</VisuallyHidden>
 							<Textarea
 								id={ `post-title-${ instanceId }` }
 								className="editor-post-title__input"
