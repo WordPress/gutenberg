@@ -70,6 +70,10 @@ export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
 }
 
+export function subscribeAndroidModalClosed( callback ) {
+	return gutenbergBridgeEvents.addListener( 'notifyModalClosed', callback );
+}
+
 /**
  * Request media picker for the given media source.
  *

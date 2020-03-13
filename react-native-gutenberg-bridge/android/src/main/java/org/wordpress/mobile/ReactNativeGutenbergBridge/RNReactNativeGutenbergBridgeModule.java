@@ -35,6 +35,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_FOCUS_TITLE = "setFocusOnTitle";
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
     private static final String EVENT_NAME_MEDIA_APPEND = "mediaAppend";
+    private static final String EVENT_NAME_TOGGLE_HTML_MODE = "toggleHTMLMode";
+    private static final String EVENT_NAME_NOTIFY_MODAL_CLOSED = "notifyModalClosed";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
@@ -285,6 +287,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     public void toggleEditorMode() {
-        emitToJS("toggleHTMLMode", null);
+        emitToJS(EVENT_NAME_TOGGLE_HTML_MODE, null);
+    }
+
+    public void notifyModalClosed() {
+        emitToJS(EVENT_NAME_NOTIFY_MODAL_CLOSED, null);
     }
 }
