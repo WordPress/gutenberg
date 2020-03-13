@@ -184,8 +184,6 @@ class MediaTextEdit extends Component {
 			backgroundColor,
 			setAttributes,
 			isSelected,
-			isParentSelected,
-			isAncestorSelected,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -202,11 +200,8 @@ class MediaTextEdit extends Component {
 			: this.state.mediaWidth || mediaWidth;
 		const widthString = `${ temporaryMediaWidth }%`;
 
-		const innerBlockContainerStyle = ! shouldStack && {
-			...styles.paddingHorizontalNone,
-			...( mediaPosition === 'right' && styles.innerPaddingMediaOnRight ),
-			...( mediaPosition === 'left' && styles.innerPaddingMediaOnLeft ),
-		};
+		const innerBlockContainerStyle =
+			! shouldStack && styles.innerPaddingNoStuck;
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
 			...styles[
@@ -215,7 +210,9 @@ class MediaTextEdit extends Component {
 			...( mediaPosition === 'right'
 				? styles[ 'has-media-on-the-right' ]
 				: {} ),
-			...( shouldStack ? styles[ 'is-stacked-on-mobile' ] : {} ),
+			...( shouldStack
+				? styles[ 'is-stacked-on-mobile' ]
+				: { marginBottom: isSelected ? 16 : 0 } ),
 			...( shouldStack && mediaPosition === 'right'
 				? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ]
 				: {} ),
@@ -223,12 +220,18 @@ class MediaTextEdit extends Component {
 		};
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
-		const mediaContainerStyle = {
-			...( isParentSelected || isAncestorSelected
-				? styles.denseMediaPadding
-				: styles.regularMediaPadding ),
-			...( isSelected && styles.innerPadding ),
-		};
+		const mediaContainerStyle = shouldStack
+			? {
+					...( mediaPosition === 'left' && { marginBottom: 16 } ),
+					...( mediaPosition === 'right' && {
+						marginTop: 16,
+						marginBottom: isSelected ? 8 : 0,
+					} ),
+			  }
+			: {
+					...( mediaPosition === 'left' && { paddingRight: 16 } ),
+					...( mediaPosition === 'right' && { paddingLeft: 16 } ),
+			  };
 
 		const toolbarControls = [
 			{
