@@ -10,6 +10,7 @@ export default function CategorySelect( {
 	categoriesList,
 	selectedCategoryId,
 	onChange,
+	...props
 } ) {
 	const termsTree = buildTermsTree( categoriesList );
 	return (
@@ -17,6 +18,7 @@ export default function CategorySelect( {
 			{ ...{ label, noOptionLabel, onChange } }
 			tree={ termsTree }
 			selectedId={ selectedCategoryId }
+			{ ...props }
 		/>
 	);
 }

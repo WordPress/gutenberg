@@ -1,25 +1,15 @@
 .block-editor-warning {
+	align-items: center;
 	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	flex-wrap: nowrap;
+	flex-wrap: wrap;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	padding: ($grid-unit-10 - $border-width - $border-width) $grid-unit-15;
+
+	// Block UI appearance.
+	border: $border-width solid $dark-gray-primary;
+	border-radius: $radius-block-ui;
 	background-color: $white;
-	border: $border-width solid $light-gray-500;
-	text-align: left;
-	padding: 10px $block-padding $block-padding;
-
-	.is-selected & {
-		// Use opacity to work in various editor styles.
-		border-color: $dark-opacity-light-800;
-
-		@include break-small {
-			border-left-color: transparent;
-		}
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-800;
-		}
-	}
 
 	.block-editor-warning__message {
 		line-height: $default-line-height;
@@ -28,6 +18,7 @@
 		margin: 1em 0;
 
 	}
+
 	// Required extra-specifity to override paragraph block styles.
 	p.block-editor-warning__message.block-editor-warning__message {
 		min-height: auto;
@@ -47,29 +38,10 @@
 	}
 
 	.block-editor-warning__action {
-		margin: 0 6px 0 0;
+		margin: 0 0 0 $grid-unit-10;
 	}
 }
 
 .block-editor-warning__secondary {
-	margin: 5px 0 0 -4px;
-	height: $block-controls-height;
-
-	// the padding and margin of the more menu is intentionally non-standard
-	.components-button.has-icon {
-		width: auto;
-		padding: 0 2px;
-	}
-
-	@include break-small() {
-		margin-left: 4px;
-
-		.components-button.has-icon {
-			padding: 0 4px;
-		}
-	}
-
-	.components-button svg {
-		transform: rotate(90deg);
-	}
+	margin: auto 0 auto $grid-unit-10;
 }

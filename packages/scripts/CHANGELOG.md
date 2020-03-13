@@ -1,5 +1,11 @@
 ## Master
 
+## 7.1.2 (2020-02-25)
+
+### Bug Fixes
+
+- Ensure `packages-update` work when `dependencies` or `devDependencies` are missing in the `package.json` file ([#20408](https://github.com/WordPress/gutenberg/pull/20408)).
+
 ## 7.1.0 (2020-02-10)
 
 ### Bug Fixes

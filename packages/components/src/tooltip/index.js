@@ -173,6 +173,7 @@ class Tooltip extends Component {
 						className="components-tooltip"
 						aria-hidden="true"
 						animate={ false }
+						noArrow={ true }
 					>
 						{ text }
 						<Shortcut

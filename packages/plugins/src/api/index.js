@@ -4,6 +4,7 @@
  * WordPress dependencies
  */
 import { applyFilters, doAction } from '@wordpress/hooks';
+import { plugins as pluginsIcon } from '@wordpress/icons';
 
 /**
  * External dependencies
@@ -138,7 +139,7 @@ export function registerPlugin( name, settings ) {
 
 	plugins[ name ] = {
 		name,
-		icon: 'admin-plugins',
+		icon: pluginsIcon,
 		...settings,
 	};
 

@@ -15,7 +15,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
-import { rss, pencil } from '@wordpress/icons';
+import { rss, pencil, grid, list } from '@wordpress/icons';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
@@ -66,16 +66,19 @@ class RSSEdit extends Component {
 		if ( this.state.editing ) {
 			return (
 				<Placeholder icon={ rss } label="RSS">
-					<form onSubmit={ this.onSubmitURL }>
+					<form
+						onSubmit={ this.onSubmitURL }
+						className="blocks-rss__placeholder-form"
+					>
 						<TextControl
 							placeholder={ __( 'Enter URL here…' ) }
 							value={ feedURL }
 							onChange={ ( value ) =>
 								setAttributes( { feedURL: value } )
 							}
-							className={ 'components-placeholder__input' }
+							className="blocks-rss__placeholder-input"
 						/>
-						<Button isSecondary type="submit">
+						<Button isPrimary type="submit">
 							{ __( 'Use URL' ) }
 						</Button>
 					</form>
@@ -90,13 +93,13 @@ class RSSEdit extends Component {
 				onClick: () => this.setState( { editing: true } ),
 			},
 			{
-				icon: 'list-view',
+				icon: list,
 				title: __( 'List view' ),
 				onClick: () => setAttributes( { blockLayout: 'list' } ),
 				isActive: blockLayout === 'list',
 			},
 			{
-				icon: 'grid-view',
+				icon: grid,
 				title: __( 'Grid view' ),
 				onClick: () => setAttributes( { blockLayout: 'grid' } ),
 				isActive: blockLayout === 'grid',

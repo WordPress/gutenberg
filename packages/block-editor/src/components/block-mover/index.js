@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { first, last, partial, castArray } from 'lodash';
+import { first, last, partial } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Button, ToolbarGroup } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
@@ -18,7 +18,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { getBlockMoverDescription } from './mover-description';
-import { leftArrow, rightArrow, dragHandle } from './icons';
+import { leftArrow, rightArrow } from './icons';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 import BlockDraggable from '../block-draggable';
 
@@ -62,7 +62,7 @@ export class BlockMover extends Component {
 			hideDragHandle,
 		} = this.props;
 		const { isFocused } = this.state;
-		const blocksCount = castArray( clientIds ).length;
+		const blocksCount = clientIds.length;
 		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 			return null;
 		}
@@ -82,110 +82,93 @@ export class BlockMover extends Component {
 			return null;
 		};
 
-		const getMovementDirection = ( moveDirection ) => {
+		const getMovementDirectionLabel = ( moveDirection ) => {
 			if ( moveDirection === 'up' ) {
 				if ( orientation === 'horizontal' ) {
-					return isRTL ? 'right' : 'left';
+					return isRTL ? __( 'Move right' ) : __( 'Move left' );
 				}
-				return 'up';
+				return __( 'Move up' );
 			} else if ( moveDirection === 'down' ) {
 				if ( orientation === 'horizontal' ) {
-					return isRTL ? 'left' : 'right';
+					return isRTL ? __( 'Move left' ) : __( 'Move right' );
 				}
-				return 'down';
+				return __( 'Move down' );
 			}
 			return null;
 		};
 
 		// We emulate a disabled state because forcefully applying the `disabled`
-		// attribute on the button while it has focus causes the screen to change
+		// attribute on the buttons while it has focus causes the screen to change
 		// to an unfocused state (body as active element) without firing blur on,
 		// the rendering parent, leaving it unable to react to focus out.
 		return (
-			<ToolbarGroup
-				className={ classnames( 'block-editor-block-mover', {
-					'is-visible': isFocused || ! isHidden,
-					'is-horizontal': orientation === 'horizontal',
-				} ) }
-			>
-				<Button
-					className="block-editor-block-mover__control"
-					onClick={ isFirst ? null : onMoveUp }
-					icon={ getArrowIcon( 'up' ) }
-					// translators: %s: Horizontal direction of block movement ( left, right )
-					label={ sprintf(
-						__( 'Move %s' ),
-						getMovementDirection( 'up' )
-					) }
-					aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
-					aria-disabled={ isFirst }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
-				/>
-
-				{ ! hideDragHandle && (
-					<BlockDraggable clientIds={ clientIds }>
-						{ ( { onDraggableStart, onDraggableEnd } ) => (
+			<BlockDraggable clientIds={ clientIds }>
+				{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
+					<div
+						className={ classnames( 'block-editor-block-mover', {
+							'is-visible': isFocused || ! isHidden,
+							'is-horizontal': orientation === 'horizontal',
+						} ) }
+						draggable={ isDraggable && ! hideDragHandle }
+						onDragStart={ onDraggableStart }
+						onDragEnd={ onDraggableEnd }
+					>
+						<ToolbarGroup>
 							<Button
-								icon={ dragHandle }
-								className="block-editor-block-mover__control-drag-handle block-editor-block-mover__control"
-								aria-hidden="true"
-								// Should not be able to tab to drag handle as this
-								// button can only be used with a pointer device.
-								tabIndex="-1"
-								onDragStart={ onDraggableStart }
-								onDragEnd={ onDraggableEnd }
-								draggable
+								className="block-editor-block-mover__control block-editor-block-mover__control-up"
+								onClick={ isFirst ? null : onMoveUp }
+								icon={ getArrowIcon( 'up' ) }
+								label={ getMovementDirectionLabel( 'up' ) }
+								aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
+								aria-disabled={ isFirst }
+								onFocus={ this.onFocus }
+								onBlur={ this.onBlur }
 							/>
-						) }
-					</BlockDraggable>
-				) }
 
-				<Button
-					className="block-editor-block-mover__control"
-					onClick={ isLast ? null : onMoveDown }
-					icon={ getArrowIcon( 'down' ) }
-					// translators: %s: Horizontal direction of block movement ( left, right )
-					label={ sprintf(
-						__( 'Move %s' ),
-						getMovementDirection( 'down' )
-					) }
-					aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
-					aria-disabled={ isLast }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
-				/>
-				<span
-					id={ `block-editor-block-mover__up-description-${ instanceId }` }
-					className="block-editor-block-mover__description"
-				>
-					{ getBlockMoverDescription(
-						blocksCount,
-						blockType && blockType.title,
-						firstIndex,
-						isFirst,
-						isLast,
-						-1,
-						orientation,
-						isRTL
-					) }
-				</span>
-				<span
-					id={ `block-editor-block-mover__down-description-${ instanceId }` }
-					className="block-editor-block-mover__description"
-				>
-					{ getBlockMoverDescription(
-						blocksCount,
-						blockType && blockType.title,
-						firstIndex,
-						isFirst,
-						isLast,
-						1,
-						orientation,
-						isRTL
-					) }
-				</span>
-			</ToolbarGroup>
+							<Button
+								className="block-editor-block-mover__control block-editor-block-mover__control-down"
+								onClick={ isLast ? null : onMoveDown }
+								icon={ getArrowIcon( 'down' ) }
+								label={ getMovementDirectionLabel( 'down' ) }
+								aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
+								aria-disabled={ isLast }
+								onFocus={ this.onFocus }
+								onBlur={ this.onBlur }
+							/>
+							<span
+								id={ `block-editor-block-mover__up-description-${ instanceId }` }
+								className="block-editor-block-mover__description"
+							>
+								{ getBlockMoverDescription(
+									blocksCount,
+									blockType && blockType.title,
+									firstIndex,
+									isFirst,
+									isLast,
+									-1,
+									orientation,
+									isRTL
+								) }
+							</span>
+							<span
+								id={ `block-editor-block-mover__down-description-${ instanceId }` }
+								className="block-editor-block-mover__description"
+							>
+								{ getBlockMoverDescription(
+									blocksCount,
+									blockType && blockType.title,
+									firstIndex,
+									isFirst,
+									isLast,
+									1,
+									orientation,
+									isRTL
+								) }
+							</span>
+						</ToolbarGroup>
+					</div>
+				) }
+			</BlockDraggable>
 		);
 	}
 }
@@ -199,18 +182,12 @@ export default compose(
 			getBlockRootClientId,
 			getBlockOrder,
 		} = select( 'core/block-editor' );
-		const normalizedClientIds = castArray( clientIds );
-		const firstClientId = first( normalizedClientIds );
+		const firstClientId = first( clientIds );
 		const block = getBlock( firstClientId );
-		const rootClientId = getBlockRootClientId(
-			first( normalizedClientIds )
-		);
+		const rootClientId = getBlockRootClientId( first( clientIds ) );
 		const blockOrder = getBlockOrder( rootClientId );
 		const firstIndex = getBlockIndex( firstClientId, rootClientId );
-		const lastIndex = getBlockIndex(
-			last( normalizedClientIds ),
-			rootClientId
-		);
+		const lastIndex = getBlockIndex( last( clientIds ), rootClientId );
 		const { getSettings } = select( 'core/block-editor' );
 		const { isRTL } = getSettings();
 

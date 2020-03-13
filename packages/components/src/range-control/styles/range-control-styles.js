@@ -229,6 +229,7 @@ export const Tooltip = styled.span`
 	min-width: 32px;
 	opacity: 0;
 	padding: 8px;
+	pointer-events: none;
 	position: absolute;
 	text-align: center;
 	transition: opacity 120ms ease;

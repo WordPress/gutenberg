@@ -12,6 +12,7 @@ import {
 	ExternalLink,
 	Spinner,
 	VisuallyHidden,
+	createSlotFill,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -21,6 +22,7 @@ import {
 	Fragment,
 	useEffect,
 	createElement,
+	useMemo,
 } from '@wordpress/element';
 import {
 	safeDecodeURI,
@@ -40,6 +42,10 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 import LinkControlSearchCreate from './search-create-button';
+
+const { Slot: ViewerSlot, Fill: ViewerFill } = createSlotFill(
+	'BlockEditorLinkControlViewer'
+);
 
 // Used as a unique identifier for the "Create" option within search results.
 // Used to help distinguish the "Create" suggestion within the search results in
@@ -133,6 +139,7 @@ const makeCancelable = ( promise ) => {
  * @property {WPLinkControlValue=}                  value                  Current link value.
  * @property {WPLinkControlOnChangeProp=}           onChange               Value change handler, called with the updated value if
  *                                                                         the user selects a new link or updates settings.
+ * @property {boolean=}                             showSuggestions        Whether to present suggestions when typing the URL.
  * @property {boolean=}                             showInitialSuggestions Whether to present initial suggestions immediately.
  * @property {WPLinkControlCreateSuggestionProp=}   createSuggestion       Handler to manage creation of link value from suggestion.
  */
@@ -148,6 +155,7 @@ function LinkControl( {
 	value,
 	settings,
 	onChange = noop,
+	showSuggestions = true,
 	showInitialSuggestions,
 	forceIsEditingLink,
 	createSuggestion,
@@ -339,6 +347,10 @@ function LinkControl( {
 	// Effects
 	const getSearchHandler = useCallback(
 		( val, args ) => {
+			if ( ! showSuggestions ) {
+				return Promise.resolve( [] );
+			}
+
 			return isURLLike( val )
 				? handleDirectEntry( val, args )
 				: handleEntitySearch( val, args );
@@ -510,6 +522,10 @@ function LinkControl( {
 		);
 	};
 
+	const viewerSlotFillProps = useMemo(
+		() => ( { url: value && value.url } ),
+		[ value && value.url ]
+	);
 	return (
 		<div
 			tabIndex={ -1 }
@@ -534,7 +550,9 @@ function LinkControl( {
 							stopEditing();
 						}
 					} }
-					renderSuggestions={ renderSearchResults }
+					renderSuggestions={
+						showSuggestions ? renderSearchResults : null
+					}
 					fetchSuggestions={ getSearchHandler }
 					showInitialSuggestions={ showInitialSuggestions }
 					errorMessage={ errorMessage }
@@ -574,6 +592,7 @@ function LinkControl( {
 						>
 							{ __( 'Edit' ) }
 						</Button>
+						<ViewerSlot fillProps={ viewerSlotFillProps } />
 					</div>
 				</Fragment>
 			) }
@@ -585,5 +604,7 @@ function LinkControl( {
 		</div>
 	);
 }
+
+LinkControl.ViewerFill = ViewerFill;
 
 export default LinkControl;

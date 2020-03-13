@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -11,7 +6,7 @@ import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { close } from '@wordpress/icons';
+import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 
 export function ReusableBlockDeleteButton( {
 	isVisible,
@@ -23,13 +18,21 @@ export function ReusableBlockDeleteButton( {
 	}
 
 	return (
-		<MenuItem
-			icon={ close }
-			disabled={ isDisabled }
-			onClick={ () => onDelete() }
-		>
-			{ __( 'Remove from Reusable blocks' ) }
-		</MenuItem>
+		<BlockSettingsMenuControls>
+			{ ( { onClose } ) => (
+				<MenuItem
+					disabled={ isDisabled }
+					onClick={ () => {
+						const hasConfirmed = onDelete();
+						if ( hasConfirmed ) {
+							onClose();
+						}
+					} }
+				>
+					{ __( 'Remove from Reusable blocks' ) }
+				</MenuItem>
+			) }
+		</BlockSettingsMenuControls>
 	);
 }
 
@@ -50,11 +53,12 @@ export default compose( [
 		return {
 			isVisible:
 				!! reusableBlock &&
-				!! canUser( 'delete', 'blocks', reusableBlock.id ),
+				( reusableBlock.isTemporary ||
+					!! canUser( 'delete', 'blocks', reusableBlock.id ) ),
 			isDisabled: reusableBlock && reusableBlock.isTemporary,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, onToggle = noop }, { select } ) => {
+	withDispatch( ( dispatch, { clientId }, { select } ) => {
 		const {
 			__experimentalDeleteReusableBlock: deleteReusableBlock,
 		} = dispatch( 'core/editor' );
@@ -74,8 +78,9 @@ export default compose( [
 				if ( hasConfirmed ) {
 					const block = getBlock( clientId );
 					deleteReusableBlock( block.attributes.ref );
-					onToggle();
 				}
+
+				return hasConfirmed;
 			},
 		};
 	} ),
