@@ -32,10 +32,16 @@ const BlockPreview = ( { blocks } ) => {
 		readOnly: true,
 	};
 
+	const spaceView = () => {
+		return (
+			<View style={ { flex: 0, height: 12}} />
+		);
+	}
+
 	return (
 		<BlockEditorProvider value={ blocks } settings={ settings }>
 			<View style={ { flex: 1 } }>
-				<BlockList />
+				<BlockList header={ spaceView() }/>
 			</View>
 		</BlockEditorProvider>
 	);
