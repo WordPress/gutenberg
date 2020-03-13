@@ -116,7 +116,7 @@ const Services = {
 		{
 			name: 'core/spacer',
 			attributes: {
-				height: 40,
+				height: 24,
 			},
 		},
 		{

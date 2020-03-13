@@ -55,8 +55,7 @@
 		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",
-		"tinycolor2": "^1.4.1",
-		"url": "^0.11.0"
+		"tinycolor2": "^1.4.1"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -7,7 +7,7 @@ const Contact = {
 	// translators: title for "Contact" page template
 	name: __( 'Contact' ),
 	key: 'contact',
-	icon: '✉',
+	icon: '✉️',
 	content: [
 		{
 			name: 'core/paragraph',

@@ -4310,29 +4310,8 @@ exports[`Storyshots Components/Panel With Icon 1`] = `
 
 exports[`Storyshots Components/Placeholder Default 1`] = `
 <div
-  className="components-placeholder"
+  className="components-placeholder is-large"
 >
-  <iframe
-    aria-hidden={true}
-    aria-label="resize-listener"
-    frameBorder={0}
-    src="about:blank"
-    style={
-      Object {
-        "display": "block",
-        "height": "100%",
-        "left": 0,
-        "opacity": 0,
-        "overflow": "hidden",
-        "pointerEvents": "none",
-        "position": "absolute",
-        "top": 0,
-        "width": "100%",
-        "zIndex": -1,
-      }
-    }
-    tabIndex={-1}
-  />
   <div
     className="components-placeholder__label"
   >
@@ -8703,6 +8682,35 @@ Array [
     </span>
      always show.
   </div>,
+]
+`;
+
+exports[`Storyshots Components/VisuallyHidden With Additional Class Names 1`] = `
+Array [
+  "Additional class names passed to VisuallyHidden extend the component class name.",
+  " ",
+  <label
+    className="components-visually-hidden test-input"
+  >
+    Check out my class!
+     
+  </label>,
+  "Inspect the HTML to see!",
+]
+`;
+
+exports[`Storyshots Components/VisuallyHidden With Forwarded Props 1`] = `
+Array [
+  "Additional props can be passed to VisuallyHidden and are forwarded to the rendered element.",
+  " ",
+  <span
+    className="components-visually-hidden"
+    data-id="test"
+  >
+    Check out my data attribute!
+     
+  </span>,
+  "Inspect the HTML to see!",
 ]
 `;
 
@@ -14155,6 +14163,63 @@ exports[`Storyshots Icons/Icon Library 1`] = `
     >
       <path
         d="M15.6 6.5l-1.1 1 2.9 3.3H8c-.9 0-1.7.3-2.3.9-1.4 1.5-1.4 4.2-1.4 5.6v.2h1.5v-.3c0-1.1 0-3.5 1-4.5.3-.3.7-.5 1.3-.5h9.2L14.5 15l1.1 1.1 4.6-4.6-4.6-5z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
+      replace
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M16 10h4c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-4c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1zm-8 4H4c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h4c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1zm10-2.6L14.5 15l1.1 1.1 1.7-1.7c-.1 1.1-.3 2.3-.9 2.9-.3.3-.7.5-1.3.5h-4.5v1.5H15c.9 0 1.7-.3 2.3-.9 1-1 1.3-2.7 1.4-4l1.8 1.8 1.1-1.1-3.6-3.7zM6.8 9.7c.1-1.1.3-2.3.9-2.9.4-.4.8-.6 1.3-.6h4.5V4.8H9c-.9 0-1.7.3-2.3.9-1 1-1.3 2.7-1.4 4L3.5 8l-1 1L6 12.6 9.5 9l-1-1-1.7 1.7z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M16 10h4c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-4c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1zm-8 4H4c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h4c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1zm10-2.6L14.5 15l1.1 1.1 1.7-1.7c-.1 1.1-.3 2.3-.9 2.9-.3.3-.7.5-1.3.5h-4.5v1.5H15c.9 0 1.7-.3 2.3-.9 1-1 1.3-2.7 1.4-4l1.8 1.8 1.1-1.1-3.6-3.7zM6.8 9.7c.1-1.1.3-2.3.9-2.9.4-.4.8-.6 1.3-.6h4.5V4.8H9c-.9 0-1.7.3-2.3.9-1 1-1.3 2.7-1.4 4L3.5 8l-1 1L6 12.6 9.5 9l-1-1-1.7 1.7z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M16 10h4c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-4c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1zm-8 4H4c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h4c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1zm10-2.6L14.5 15l1.1 1.1 1.7-1.7c-.1 1.1-.3 2.3-.9 2.9-.3.3-.7.5-1.3.5h-4.5v1.5H15c.9 0 1.7-.3 2.3-.9 1-1 1.3-2.7 1.4-4l1.8 1.8 1.1-1.1-3.6-3.7zM6.8 9.7c.1-1.1.3-2.3.9-2.9.4-.4.8-.6 1.3-.6h4.5V4.8H9c-.9 0-1.7.3-2.3.9-1 1-1.3 2.7-1.4 4L3.5 8l-1 1L6 12.6 9.5 9l-1-1-1.7 1.7z"
       />
     </svg>
   </div>

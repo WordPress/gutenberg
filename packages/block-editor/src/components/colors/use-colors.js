@@ -3,7 +3,14 @@
  */
 import memoize from 'memize';
 import classnames from 'classnames';
-import { map, kebabCase, camelCase, castArray, startCase } from 'lodash';
+import {
+	map,
+	kebabCase,
+	camelCase,
+	castArray,
+	startCase,
+	isFunction,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -172,37 +179,48 @@ export default function __experimentalUseColors(
 					children,
 					className: componentClassName = '',
 					style: componentStyle = {},
-				} ) =>
-					// Clone children, setting the style property from the color configuration,
-					// if not already set explicitly through props.
-					Children.map( children, ( child ) => {
-						let colorStyle = {};
-						if ( color ) {
-							colorStyle = { [ property ]: colorValue };
-						} else if ( customColor ) {
-							colorStyle = { [ property ]: customColor };
-						}
+				} ) => {
+					let colorStyle = {};
+					if ( color ) {
+						colorStyle = { [ property ]: colorValue };
+					} else if ( customColor ) {
+						colorStyle = { [ property ]: customColor };
+					}
+					const extraProps = {
+						className: classnames( componentClassName, {
+							[ `has-${ kebabCase( color ) }-${ kebabCase(
+								property
+							) }` ]: color,
+							[ className || `has-${ kebabCase( name ) }` ]:
+								color || customColor,
+						} ),
+						style: {
+							...colorStyle,
+							...componentStyle,
+						},
+					};
 
-						return cloneElement( child, {
-							className: classnames(
-								componentClassName,
-								child.props.className,
-								{
-									[ `has-${ kebabCase( color ) }-${ kebabCase(
-										property
-									) }` ]: color,
-									[ className ||
-									`has-${ kebabCase( name ) }` ]:
-										color || customColor,
-								}
-							),
-							style: {
-								...colorStyle,
-								...componentStyle,
-								...( child.props.style || {} ),
-							},
-						} );
-					} ),
+					if ( isFunction( children ) ) {
+						return children( extraProps );
+					}
+
+					return (
+						// Clone children, setting the style property from the color configuration,
+						// if not already set explicitly through props.
+						Children.map( children, ( child ) => {
+							return cloneElement( child, {
+								className: classnames(
+									child.props.className,
+									extraProps.className
+								),
+								style: {
+									...extraProps.style,
+									...( child.props.style || {} ),
+								},
+							} );
+						} )
+					);
+				},
 				{ maxSize: colorConfigs.length }
 			),
 		[ colorConfigs.length ]
