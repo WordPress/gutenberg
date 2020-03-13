@@ -75,7 +75,12 @@ function retrieveFastAverageColor() {
 
 const { __getComputedSize: getComputedUnitSize } = UnitControl;
 
-function CoverHeightInput( { onChange, onUnitChange, unit, value = '' } ) {
+function CoverHeightInput( {
+	onChange,
+	onUnitChange,
+	unit = 'px',
+	value = '',
+} ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;

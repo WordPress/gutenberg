@@ -33,8 +33,7 @@
 			"type": "number"
 		},
 		"minHeightUnit": {
-			"type": "string",
-			"default": "px"
+			"type": "string"
 		},
 		"gradient": {
 			"type": "string"

@@ -3929,6 +3929,17 @@ exports[`Storyshots Components/Modal Default 1`] = `
 </button>
 `;
 
+exports[`Storyshots Components/NumberControl Default 1`] = `
+<input
+  className="component-number-control"
+  inputMode="numeric"
+  onChange={[Function]}
+  onKeyDown={[Function]}
+  type="number"
+  value=""
+/>
+`;
+
 exports[`Storyshots Components/Panel Default 1`] = `
 <div
   className="components-panel"
@@ -8745,6 +8756,135 @@ exports[`Storyshots Components/TreeSelect Default 1`] = `
   >
     Help text to explain the select control.
   </p>
+</div>
+`;
+
+exports[`Storyshots Components/UnitControl Default 1`] = `
+.emotion-6 {
+  max-width: 80px;
+}
+
+.emotion-4 {
+  box-sizing: border-box;
+  position: relative;
+}
+
+.emotion-0.emotion-0.emotion-0 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  border: 1px solid #000;
+  border-radius: 2px;
+  padding: 3px 8px;
+  display: block;
+  width: 100%;
+  padding-right: 20px;
+  height: 30px;
+  line-height: 30;
+}
+
+.emotion-0.emotion-0.emotion-0::-webkit-outer-spin-button,
+.emotion-0.emotion-0.emotion-0::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.emotion-2.emotion-2.emotion-2 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: #fff;
+  border-radius: 2px;
+  border: none;
+  box-sizing: border-box;
+  color: #555d66;
+  display: block;
+  font-size: 8px;
+  line-height: 1;
+  -webkit-letter-spacing: -0.5px;
+  -moz-letter-spacing: -0.5px;
+  -ms-letter-spacing: -0.5px;
+  letter-spacing: -0.5px;
+  outline: none;
+  padding: 2px 2px;
+  position: absolute;
+  text-align-last: center;
+  text-transform: uppercase;
+  width: 22px;
+  z-index: 1;
+  right: 4px;
+  top: 5px;
+  height: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.emotion-2.emotion-2.emotion-2:hover {
+  background-color: #edeff0;
+}
+
+.emotion-2.emotion-2.emotion-2:focus {
+  border-color: #007cba;
+  outline: 2px solid transparent;
+  outline-offset: 0;
+}
+
+<div
+  className="emotion-6 emotion-7"
+>
+  <div
+    className="component-unit-control emotion-4 emotion-5"
+  >
+    <input
+      className="component-number-control component-unit-control__input emotion-0 emotion-1"
+      inputMode="numeric"
+      onChange={[Function]}
+      onKeyDown={[Function]}
+      size="default"
+      type="number"
+      value=""
+    />
+    <select
+      className="emotion-2 emotion-3"
+      onChange={[Function]}
+      size="default"
+      tabIndex={null}
+      value="px"
+    >
+      <option
+        value="px"
+      >
+        px
+      </option>
+      <option
+        value="%"
+      >
+        %
+      </option>
+      <option
+        value="em"
+      >
+        em
+      </option>
+      <option
+        value="rem"
+      >
+        rem
+      </option>
+      <option
+        value="vw"
+      >
+        vw
+      </option>
+      <option
+        value="vh"
+      >
+        vh
+      </option>
+    </select>
+  </div>
 </div>
 `;
 
