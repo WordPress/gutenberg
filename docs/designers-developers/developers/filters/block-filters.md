@@ -324,12 +324,25 @@ wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-nam
 
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
+{% codetabs %}
+{% ES5 %}
 ```js
 // my-plugin.js
 wp.domReady( function() {
 	wp.blocks.unregisterBlockType( 'core/verse' );
 } );
 ```
+{% ESNext %}
+```js
+// my-plugin.js
+import { unregisterBlockType } from '@wordpress/blocks';
+import domReady from '@wordpress/dom-ready'
+
+domReady( function() {
+	unregisterBlockType( 'core/verse' );
+} );
+```
+{% end %}
 
 and load this script in the Editor
 
@@ -346,6 +359,8 @@ function my_plugin_blacklist_blocks() {
 }
 add_action( 'enqueue_block_editor_assets', 'my_plugin_blacklist_blocks' );
 ```
+
+**Important:** When unregistering a block, there can be a [race condition](https://en.wikipedia.org/wiki/Race_condition) on which code runs first: registering the block, or unregistering the block. You want your unregister code to run last. The way to do that is specify the component that is registering the block as a dependency, in this case `wp-edit-post`. Additionally, using `wp.domReady()` ensures the unregister code runs once the dom is loaded.
 
 ### Using a whitelist
 

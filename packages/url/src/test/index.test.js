@@ -253,11 +253,6 @@ describe( 'getQueryString', () => {
 	it( 'returns the query string of a URL', () => {
 		expect(
 			getQueryString(
-				'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
-			)
-		).toBe( 'query=params&more' );
-		expect(
-			getQueryString(
 				'http://user:password@www.test-this.com:1020/test-path/file.extension?query=params&more#anchor'
 			)
 		).toBe( 'query=params&more' );
@@ -284,16 +279,21 @@ describe( 'getQueryString', () => {
 				'https://andalouses.example/beach?foo[]=bar&foo[]=baz'
 			)
 		).toBe( 'foo[]=bar&foo[]=baz' );
-		expect( getQueryString( 'test.com?foo[]=bar&foo[]=baz' ) ).toBe(
+		expect( getQueryString( 'https://test.com?foo[]=bar&foo[]=baz' ) ).toBe(
 			'foo[]=bar&foo[]=baz'
 		);
-		expect( getQueryString( 'test.com?foo=bar&foo=baz?test' ) ).toBe(
-			'foo=bar&foo=baz?test'
-		);
+		expect(
+			getQueryString( 'https://test.com?foo=bar&foo=baz?test' )
+		).toBe( 'foo=bar&foo=baz?test' );
 	} );
 
 	it( 'returns undefined when the provided does not contain a url query string', () => {
 		expect( getQueryString( '' ) ).toBeUndefined();
+		expect(
+			getQueryString(
+				'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+			)
+		).toBeUndefined();
 		expect(
 			getQueryString( 'https://wordpress.org/test-path#anchor' )
 		).toBeUndefined();
@@ -305,11 +305,10 @@ describe( 'getQueryString', () => {
 		).toBeUndefined();
 		expect( getQueryString( 'https://wordpress.org/' ) ).toBeUndefined();
 		expect( getQueryString( 'https://localhost:8080' ) ).toBeUndefined();
-		expect( getQueryString( 'https://' ) ).toBeUndefined();
-		expect( getQueryString( 'https:///test' ) ).toBeUndefined();
-		expect( getQueryString( 'https://#' ) ).toBeUndefined();
-		expect( getQueryString( 'https://?' ) ).toBeUndefined();
-		expect( getQueryString( 'test.com' ) ).toBeUndefined();
+		expect( getQueryString( 'invalid' ) ).toBeUndefined();
+		expect(
+			getQueryString( 'https://example.com/empty?' )
+		).toBeUndefined();
 	} );
 } );
 
