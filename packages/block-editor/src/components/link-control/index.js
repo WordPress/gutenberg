@@ -90,11 +90,13 @@ const makeCancelable = ( promise ) => {
  *                                    providing a custom `settings` prop.
  */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Custom settings values associated with a link.
  *
- * @typedef {Record<string, any>} WPLinkControlSettingsValue
+ * @typedef {{[setting:string]:any}} WPLinkControlSettingsValue
  */
+/* eslint-enable */
 
 /**
  * Custom settings values associated with a link.
