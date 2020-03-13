@@ -279,7 +279,7 @@ function CoverEdit( {
 			? backgroundImageStyles( url )
 			: {} ),
 		backgroundColor: overlayColor.color,
-		minHeight: computedMinHeight,
+		minHeight: computedMinHeight || undefined,
 	};
 
 	if ( gradientValue && ! url ) {
