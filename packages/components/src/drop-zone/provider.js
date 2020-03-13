@@ -150,18 +150,18 @@ class DropZoneProvider extends Component {
 		);
 
 		// Find the leaf dropzone not containing another dropzone
-		const hoveredDropZone = find(
-			hoveredDropZones,
-			( zone ) =>
-				! some(
-					hoveredDropZones,
-					( subZone ) =>
-						subZone !== zone &&
-						zone.element.current.parentElement.contains(
-							subZone.element.current
-						)
-				)
-		);
+		const hoveredDropZone = find( hoveredDropZones, ( zone ) => {
+			const container = zone.isRelative
+				? zone.element.current.parentElement
+				: zone.element.current;
+
+			return ! some(
+				hoveredDropZones,
+				( subZone ) =>
+					subZone !== zone &&
+					container.contains( subZone.element.current )
+			);
+		} );
 
 		const hoveredDropZoneIndex = this.dropZones.indexOf( hoveredDropZone );
 

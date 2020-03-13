@@ -37,7 +37,6 @@ export default function ListEdit( {
 	setAttributes,
 	mergeBlocks,
 	onReplace,
-	className,
 	isSelected,
 } ) {
 	const { ordered, values, type, reversed, start } = attributes;
@@ -153,7 +152,6 @@ export default function ListEdit( {
 					setAttributes( { values: nextValues } )
 				}
 				value={ values }
-				className={ className }
 				placeholder={ __( 'Write list…' ) }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value ) =>

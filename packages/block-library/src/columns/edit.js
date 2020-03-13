@@ -46,7 +46,6 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 
 function ColumnsEditContainer( {
 	attributes,
-	className,
 	updateAlignment,
 	updateColumns,
 	clientId,
@@ -78,7 +77,7 @@ function ColumnsEditContainer( {
 		}
 	);
 
-	const classes = classnames( className, {
+	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
@@ -103,17 +102,29 @@ function ColumnsEditContainer( {
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
 			<BackgroundColor>
-				<TextColor>
-					<InnerBlocks
-						allowedBlocks={ ALLOWED_BLOCKS }
-						__experimentalMoverDirection="horizontal"
-						ref={ ref }
-						__experimentalTagName={ Block.div }
-						__experimentalPassedProps={ {
-							className: classes,
-						} }
-					/>
-				</TextColor>
+				{ ( backgroundProps ) => (
+					<TextColor>
+						{ ( textColorProps ) => (
+							<InnerBlocks
+								allowedBlocks={ ALLOWED_BLOCKS }
+								__experimentalMoverDirection="horizontal"
+								ref={ ref }
+								__experimentalTagName={ Block.div }
+								__experimentalPassedProps={ {
+									className: classnames(
+										classes,
+										backgroundProps.className,
+										textColorProps.className
+									),
+									style: {
+										...backgroundProps.style,
+										...textColorProps.style,
+									},
+								} }
+							/>
+						) }
+					</TextColor>
+				) }
 			</BackgroundColor>
 		</>
 	);

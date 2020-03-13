@@ -120,7 +120,6 @@ class EditorProvider extends Component {
 				'__experimentalEnableFullSiteEditingDemo',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBase',
-				'showInserterHelpPanel',
 				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,

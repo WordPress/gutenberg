@@ -21,16 +21,26 @@ export const Edit = ( props ) => {
 		return null;
 	}
 
+	// `edit` and `save` are functions or components describing the markup
+	// with which a block is displayed. If `blockType` is valid, assign
+	// them preferentially as the render value for the block.
+	const Component = blockType.edit || blockType.save;
+	const lightBlockWrapper = hasBlockSupport(
+		blockType,
+		'lightBlockWrapper',
+		false
+	);
+
+	if ( lightBlockWrapper ) {
+		return <Component { ...props } />;
+	}
+
 	// Generate a class name for the block's editable form
 	const generatedClassName = hasBlockSupport( blockType, 'className', true )
 		? getBlockDefaultClassName( name )
 		: null;
 	const className = classnames( generatedClassName, attributes.className );
 
-	// `edit` and `save` are functions or components describing the markup
-	// with which a block is displayed. If `blockType` is valid, assign
-	// them preferentially as the render value for the block.
-	const Component = blockType.edit || blockType.save;
 	return <Component { ...props } className={ className } />;
 };
 

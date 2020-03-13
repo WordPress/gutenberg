@@ -1,6 +1,6 @@
 === Gutenberg ===
 Contributors: matveb, joen, karmatosed
-Requires at least: 5.2.0
+Requires at least: 5.3.0
 Tested up to: 5.3
 Stable tag: V.V.V
 License: GPLv2 or later
@@ -52,4 +52,4 @@ The four phases of the project are Editing, Customization, Collaboration, and Mu
 
 == Changelog ==
 
-To read the changelog for Gutenberg 7.6.0, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v7.6.0">release page</a>.
+To read the changelog for Gutenberg 7.7.1, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v7.7.1">release page</a>.

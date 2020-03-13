@@ -17,7 +17,7 @@
 }
 
 .editor-post-preview__button-resize.editor-post-preview__button-resize {
-	padding-left: 36px;
+	padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
 
 	&.has-icon {
 		padding-left: $grid-unit-10;
@@ -25,8 +25,8 @@
 }
 
 .editor-post-preview__button-separator {
-	border-left: 1px solid $light-gray-secondary;
-	padding: $grid-unit-10 + $border-width;
+	border-left: $border-width solid $light-gray-secondary;
+	padding: 6px;
 	margin-left: $grid-unit-15;
 	display: flex;
 	align-items: center;
@@ -36,36 +36,35 @@
 .editor-post-preview__dropdown-content {
 	.components-popover__content {
 		overflow-y: visible;
+		padding-bottom: 0;
 	}
-	.components-menu-group__label {
-		padding-left: 15px;
-	}
+
 	.components-menu-group + .components-menu-group {
-		border-top: 1px solid $light-gray-500;
-		padding: 0;
+		border-top: $border-width solid $light-gray-secondary;
+		padding: $grid-unit-10 $grid-unit-15;
+		margin-left: -$grid-unit-15;
+		margin-right: -$grid-unit-15;
 	}
 }
 
 .editor-post-preview__grouping-external {
+	display: flex;
 	position: relative;
-	padding-top: $grid-unit-10;
 }
 
 .editor-post-preview__button-external {
-	height: $button-size;
-	display: block;
-}
-
-.editor-post-preview__icon-external {
-	position: absolute;
-	right: $grid-unit-20 - $border-width;
-	top: $grid-unit-20 - $border-width - $border-width;
+	padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
+	margin-right: auto;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
 }
 
 @include break-small() {
 	.editor-post-preview {
 		display: none;
 	}
+
 	.editor-post-preview__dropdown {
 		display: flex;
 	}
