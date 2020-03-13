@@ -63,15 +63,11 @@ function Layout() {
 		publishSidebarOpened,
 		hasActiveMetaboxes,
 		isSaving,
-		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
 	} = useSelect( ( select ) => {
 		return {
-			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
-				'fixedToolbar'
-			),
 			editorSidebarOpened: select(
 				'core/edit-post'
 			).isEditorSidebarOpened(),
@@ -100,7 +96,6 @@ function Layout() {
 		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
-		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 	} );
 	const openSidebarPanel = () =>
