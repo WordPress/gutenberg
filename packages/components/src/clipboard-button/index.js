@@ -81,6 +81,7 @@ class ClipboardButton extends Component {
 			onFinishCopy,
 			// eslint-disable-next-line no-unused-vars
 			text,
+			containerClassName,
 			...buttonProps
 		} = this.props;
 		const classes = classnames( 'components-clipboard-button', className );
@@ -95,7 +96,11 @@ class ClipboardButton extends Component {
 		};
 
 		return (
-			<span ref={ this.containerRef } onCopy={ focusOnCopyEventTarget }>
+			<span
+				ref={ this.containerRef }
+				onCopy={ focusOnCopyEventTarget }
+				className={ containerClassName }
+			>
 				<Button { ...buttonProps } className={ classes }>
 					{ children }
 				</Button>
