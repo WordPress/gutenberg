@@ -45,13 +45,25 @@ const MediaReplaceFlow = ( {
 		return select( 'core/block-editor' ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = createRef();
-	const errorNoticeID = uniqueId();
+	const errorNoticeID = uniqueId(
+		'block-editor/media-replace-flow/error-notice/'
+	);
 
 	const onError = ( message ) => {
 		const errorElement = document.createElement( 'div' );
 		errorElement.innerHTML = renderToString( message );
+		// The default error contains some HTML that,
+		// for example, makes the filename bold.
+		// The notice, by default, accepts strings only and so
+		// I am removing the html from the error.
 		const renderMsg =
 			errorElement.textContent || errorElement.innerText || '';
+		// We need to set a timeout for showing the notice
+		// so that VoiceOver and possibly other screen readers
+		// can announce the error afer the toolbar button
+		// regains focus once the upload dialog closes.
+		// Otherwise VO simply skips over the notice and announces
+		// the focused element and the open menu.
 		setTimeout( () => {
 			createNotice( 'error', renderMsg, {
 				speak: true,
