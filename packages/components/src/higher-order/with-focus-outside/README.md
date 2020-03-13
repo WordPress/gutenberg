@@ -1,3 +1,5 @@
+>⚠️ **Note:** While this higher-order component is not officially deprecated, you should consider using the [`DetectFocusOutside` component](../../detect-focus-outside) instead. This higher-order component _does not_ and will never support being used by function components.
+
 # withFocusOutside
 
 `withFocusOutside` is a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html) to enable behavior to occur when focus leaves an element. Since a `blur` event will fire in React even when focus transitions to another element in the same context, this higher-order component encapsulates the logic necessary to determine if focus has truly left the element.
