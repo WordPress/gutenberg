@@ -8,7 +8,6 @@ import { Platform } from '@wordpress/element';
  * Internal dependencies
  */
 import { RangeControl, SelectControl, FormTokenField } from '../';
-import CategorySelect from './category-select';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
