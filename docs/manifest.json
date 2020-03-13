@@ -696,6 +696,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "DetectFocusOutside",
+		"slug": "detect-focus-outside",
+		"markdown_source": "../packages/components/src/detect-focus-outside/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "DimensionControl",
 		"slug": "dimension-control",
 		"markdown_source": "../packages/components/src/dimension-control/README.md",
