@@ -56,7 +56,7 @@ function HeaderToolbar( {
 				alwaysBounceHorizontal={ false }
 				contentContainerStyle={ styles.scrollableContent }
 			>
-				<Toolbar accessible={ false }>
+				<Toolbar accessible={ false } noLeftSeparator >
 					<Inserter disabled={ ! showInserter } />
 					{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
 					<ToolbarButton
