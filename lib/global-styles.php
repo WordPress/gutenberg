@@ -266,8 +266,7 @@ function gutenberg_experimental_global_styles_is_site_editor() {
 	}
 
 	$screen = get_current_screen();
-	return ! empty( $screen ) &&
-		( 'gutenberg_page_gutenberg-edit-site' === $screen->id );
+	return ! empty( $screen ) && gutenberg_is_edit_site_page( $screen->id );
 }
 
 /**
