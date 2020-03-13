@@ -56,28 +56,26 @@ function HeaderToolbar( {
 				alwaysBounceHorizontal={ false }
 				contentContainerStyle={ styles.scrollableContent }
 			>
-				<Toolbar accessible={ false }>
-					<Inserter disabled={ ! showInserter } />
-					{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
-					<ToolbarButton
-						title={ __( 'Undo' ) }
-						icon={ undoIcon }
-						isDisabled={ ! hasUndo }
-						onClick={ undo }
-						extraProps={ {
-							hint: __( 'Double tap to undo last change' ),
-						} }
-					/>
-					<ToolbarButton
-						title={ __( 'Redo' ) }
-						icon={ redoIcon }
-						isDisabled={ ! hasRedo }
-						onClick={ redo }
-						extraProps={ {
-							hint: __( 'Double tap to redo last change' ),
-						} }
-					/>
-				</Toolbar>
+				<Inserter disabled={ ! showInserter } />
+				{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
+				<ToolbarButton
+					title={ __( 'Undo' ) }
+					icon={ undoIcon }
+					isDisabled={ ! hasUndo }
+					onClick={ undo }
+					extraProps={ {
+						hint: __( 'Double tap to undo last change' ),
+					} }
+				/>
+				<ToolbarButton
+					title={ __( 'Redo' ) }
+					icon={ redoIcon }
+					isDisabled={ ! hasRedo }
+					onClick={ redo }
+					extraProps={ {
+						hint: __( 'Double tap to redo last change' ),
+					} }
+				/>
 				{ hasFixedToolbar && <BlockToolbar /> }
 			</ScrollView>
 			{ showKeyboardHideButton && (
