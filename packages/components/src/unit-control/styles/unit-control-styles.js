@@ -14,15 +14,26 @@ export const Root = styled.div`
 	position: relative;
 `;
 
+const fontSizeStyles = ( { size } ) => {
+	const sizes = {
+		default: null,
+		small: 11,
+	};
+
+	return css`
+		@media ( min-width: 600px ) {
+			font-size: ${sizes[ size ]};
+		}
+	`;
+};
+
 const sizeStyles = ( { size } ) => {
 	const sizes = {
 		default: {
-			fontSize: null,
 			height: 30,
 			lineHeight: 30,
 		},
 		small: {
-			fontSize: 11,
 			height: 24,
 			lineHeight: 24,
 		},
@@ -32,6 +43,9 @@ const sizeStyles = ( { size } ) => {
 
 	return css( style );
 };
+
+// TODO: Resolve need to use &&& to increase specificity
+// https://github.com/WordPress/gutenberg/issues/18483
 
 export const ValueInput = styled( NumberControl )`
 	&&& {
@@ -50,17 +64,24 @@ export const ValueInput = styled( NumberControl )`
 		}
 
 		${rtl( { paddingRight: 20 } )}
+		${fontSizeStyles};
 		${sizeStyles};
 	}
 `;
 
-const unitHeightStyles = ( { size } ) => {
-	const tops = {
-		default: 5,
-		small: 2,
+const unitSizeStyles = ( { size } ) => {
+	const sizes = {
+		default: {
+			top: 5,
+			height: 20,
+		},
+		small: {
+			top: 4,
+			height: 16,
+		},
 	};
 
-	return css( { top: tops[ size ] } );
+	return css( sizes[ size ] );
 };
 
 const unitLabelStyles = ( props ) => {
@@ -84,7 +105,7 @@ const unitLabelStyles = ( props ) => {
 		z-index: 1;
 
 		${rtl( { right: 4 } )()}
-		${unitHeightStyles( props )}
+		${unitSizeStyles( props )}
 	`;
 };
 
@@ -99,10 +120,16 @@ export const UnitSelect = styled.select`
 	&&& {
 		${unitLabelStyles};
 		cursor: pointer;
+		border: 1px solid transparent;
 
-		&:hover,
+		&:hover {
+			background-color: ${color( 'lightGray.300' )};
+		}
+
 		&:focus {
-			box-shadow: 0 0 0 1px ${color( 'ui.border' )} inset;
+			border-color: ${color( 'ui.borderFocus' )};
+			outline: 2px solid transparent;
+			outline-offset: 0;
 		}
 	}
 `;

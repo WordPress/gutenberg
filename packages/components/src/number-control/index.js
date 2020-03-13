@@ -9,12 +9,12 @@ import { clamp, noop } from 'lodash';
 import { UP, DOWN } from '@wordpress/keycodes';
 
 export default function NumberControl( {
-	enableShiftIncrement = true,
+	isShiftStepEnabled = true,
 	max = Infinity,
 	min = -Infinity,
 	onChange = noop,
 	onKeyDown = noop,
-	shiftIncrement = 10,
+	shiftStep = 10,
 	step = 1,
 	...props
 } ) {
@@ -25,9 +25,11 @@ export default function NumberControl( {
 		const { value } = event.target;
 
 		const isEmpty = value === '';
-		const shiftAmount = step * shiftIncrement;
+		const enableShift = event.shiftKey && isShiftStepEnabled;
 
+		const incrementalValue = enableShift ? shiftStep : step;
 		let nextValue = isEmpty ? baseValue : value;
+
 		// Convert to a number to use math
 		nextValue = parseFloat( nextValue );
 
@@ -35,12 +37,7 @@ export default function NumberControl( {
 			case UP:
 				event.preventDefault();
 
-				if ( event.shiftKey && enableShiftIncrement ) {
-					nextValue = nextValue + shiftAmount;
-				} else {
-					nextValue = nextValue + step;
-				}
-
+				nextValue = nextValue + incrementalValue;
 				nextValue = clamp( nextValue, min, max );
 
 				onChange( nextValue.toString() );
@@ -50,12 +47,7 @@ export default function NumberControl( {
 			case DOWN:
 				event.preventDefault();
 
-				if ( event.shiftKey && enableShiftIncrement ) {
-					nextValue = nextValue - shiftAmount;
-				} else {
-					nextValue = nextValue - step;
-				}
-
+				nextValue = nextValue - incrementalValue;
 				nextValue = clamp( nextValue, min, max );
 
 				onChange( nextValue.toString() );
@@ -70,8 +62,8 @@ export default function NumberControl( {
 
 	return (
 		<input
-			{ ...props }
 			inputMode="numeric"
+			{ ...props }
 			type="number"
 			onChange={ handleOnChange }
 			onKeyDown={ handleOnKeyDown }

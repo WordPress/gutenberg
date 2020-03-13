@@ -131,6 +131,7 @@ export const ALERT = {
 export const UI = {
 	background: BASE.white,
 	border: BASE.black,
+	borderFocus: BLUE.medium.focus,
 };
 
 export const COLORS = {

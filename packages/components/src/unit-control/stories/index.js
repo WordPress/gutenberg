@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { boolean, number, select } from '@storybook/addon-knobs';
 import styled from '@emotion/styled';
 
 /**
@@ -22,9 +23,25 @@ function Example() {
 	const [ value, setValue ] = useState( '' );
 	const [ unit, setUnit ] = useState( 'px' );
 
+	const props = {
+		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
+		isUnitSelectTabbable: boolean( 'isUnitSelectTabbable', true ),
+		shiftStep: number( 'shiftStep', 10 ),
+		size: select(
+			'size',
+			{
+				default: 'default',
+				small: 'small',
+			},
+			'default'
+		),
+		step: number( 'step', 1 ),
+	};
+
 	return (
 		<ControlWrapperView>
 			<UnitControl
+				{ ...props }
 				value={ value }
 				onChange={ setValue }
 				unit={ unit }
@@ -35,16 +52,8 @@ function Example() {
 }
 
 export const _default = () => {
-	return (
-		<Wrapper>
-			<Example />
-		</Wrapper>
-	);
+	return <Example />;
 };
-
-const Wrapper = styled.div`
-	padding: 40px;
-`;
 
 const ControlWrapperView = styled.div`
 	max-width: 80px;

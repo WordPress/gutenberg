@@ -1,25 +1,13 @@
 /**
  * External dependencies
  */
-import { noop, isEmpty } from 'lodash';
+import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import {
-	Root,
-	UnitSelect,
-	UnitLabel,
-	ValueInput,
-} from './styles/unit-control-styles';
-
-const CSS_UNITS = [
-	{ value: 'px', label: 'px' },
-	{ value: '%', label: '%' },
-	{ value: 'em', label: 'em' },
-	{ value: 'rem', label: 'rem' },
-	{ value: 'vw', label: 'vw' },
-	{ value: 'vh', label: 'vh' },
-];
+import { Root, ValueInput } from './styles/unit-control-styles';
+import UnitSelectControl from './unit-select-control';
+import { CSS_UNITS } from './utils';
 
 export default function UnitControl( {
 	isUnitSelectTabbable = true,
@@ -27,7 +15,7 @@ export default function UnitControl( {
 	onChange = noop,
 	onUnitChange = noop,
 	size = 'default',
-	unit,
+	unit = 'px',
 	units = CSS_UNITS,
 	value,
 	...props
@@ -50,36 +38,5 @@ export default function UnitControl( {
 				value={ unit }
 			/>
 		</Root>
-	);
-}
-
-function UnitSelectControl( {
-	isTabbable = true,
-	options = CSS_UNITS,
-	onChange = noop,
-	size = 'default',
-	value = 'px',
-} ) {
-	if ( isEmpty( options ) ) {
-		return <UnitLabel size={ size }>{ value }</UnitLabel>;
-	}
-
-	const handleOnChange = ( event ) => {
-		onChange( event.target.value );
-	};
-
-	return (
-		<UnitSelect
-			value={ value }
-			onChange={ handleOnChange }
-			size={ size }
-			tabIndex={ isTabbable ? null : '-1' }
-		>
-			{ options.map( ( option ) => (
-				<option value={ option.value } key={ option.value }>
-					{ option.label }
-				</option>
-			) ) }
-		</UnitSelect>
 	);
 }
