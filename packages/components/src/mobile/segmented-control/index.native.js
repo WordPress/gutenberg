@@ -33,21 +33,21 @@ const Segment = ( { isSelected, title, onPress } ) => {
 };
 
 const SegmentedControls = ( { segments, segmentHandler } ) => {
-	const [ activeSegment, setActiveSegment ] = useState( 0 );
+	const [ activeSegment, setActiveSegment ] = useState( segments[ 0 ] );
 
-	function onHandlePress( index, item ) {
-		setActiveSegment( index );
-		segmentHandler( index, item );
+	function onHandlePress( item ) {
+		setActiveSegment( item );
+		segmentHandler( item );
 	}
 
 	return (
 		<View style={ styles.container }>
-			{ segments.map( ( segment, index ) => (
+			{ segments.map( ( segment ) => (
 				<Segment
 					title={ segment }
-					onPress={ () => onHandlePress( index, segment ) }
-					isSelected={ activeSegment === index }
-					key={ index }
+					onPress={ () => onHandlePress( segment ) }
+					isSelected={ activeSegment === segment }
+					key={ segment }
 				/>
 			) ) }
 		</View>

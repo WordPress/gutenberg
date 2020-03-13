@@ -15,14 +15,13 @@ import {
 	SETTINGS_DEFAULTS,
 	__experimentalUseGradient,
 } from '@wordpress/block-editor';
-import { Icon, check } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { LinearGradient } from '@wordpress/components';
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
+import ColorIndicator from '../color-indicator';
 
 function ColorPalette( {
 	setBackgroundColor,
@@ -67,16 +66,13 @@ function ColorPalette( {
 							onPress={ () => onColorPress( color.gradient ) }
 							key={ color.gradient }
 						>
-							<LinearGradient
-								style={ styles.circleOption }
-								gradientValue={ color.gradient }
-							>
-								{ isSelected && (
-									<View style={ styles.selected }>
-										<Icon icon={ check } />
-									</View>
-								) }
-							</LinearGradient>
+							<View>
+								<ColorIndicator
+									color={ color.gradient }
+									gradient
+									isSelected={ isSelected }
+								/>
+							</View>
 						</TouchableWithoutFeedback>
 					);
 				} ) }
@@ -94,17 +90,11 @@ function ColorPalette( {
 							onPress={ () => onColorPress( color.color ) }
 							key={ color.color }
 						>
-							<View
-								style={ [
-									styles.circleOption,
-									{ backgroundColor: color.color },
-								] }
-							>
-								{ isSelected && (
-									<View style={ styles.selected }>
-										<Icon icon={ check } />
-									</View>
-								) }
+							<View>
+								<ColorIndicator
+									color={ color.color }
+									isSelected={ isSelected }
+								/>
 							</View>
 						</TouchableWithoutFeedback>
 					);

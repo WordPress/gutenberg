@@ -317,8 +317,7 @@ class ButtonEdit extends Component {
 		} );
 	}
 
-	// eslint-disable-next-line no-unused-vars
-	onSegmentHandler( index, item ) {
+	onSegmentHandler( item ) {
 		this.setState( { segment: item } );
 	}
 
@@ -330,7 +329,7 @@ class ButtonEdit extends Component {
 				LayoutAnimation.Properties.opacity
 			)
 		);
-		this.setState( { screen: destination } );
+		this.setState( { screen: destination, segment: 'Solid' } );
 	}
 
 	getColorPalette() {

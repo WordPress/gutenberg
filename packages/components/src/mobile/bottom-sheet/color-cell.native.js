@@ -1,20 +1,13 @@
 /**
- * External dependencies
- */
-import { View } from 'react-native';
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Icon, chevronRight } from '@wordpress/icons';
+import { ColorIndicator } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import LinearGradient from '../linear-gradient';
 import { __experimentalUseGradient } from '@wordpress/block-editor';
-/**
- * Internal dependencies
- */
 import Cell from './cell';
 import styles from './styles.scss';
 
@@ -22,22 +15,7 @@ export default function BottomSheetColorCell( props ) {
 	const { onPress, color, clientId, ...cellProps } = props;
 
 	const { gradientValue } = __experimentalUseGradient( {}, clientId );
-
-	function getCircleSwatch() {
-		if ( gradientValue && ! color ) {
-			return (
-				<LinearGradient
-					gradientValue={ gradientValue }
-					style={ styles.colorCircle }
-				/>
-			);
-		}
-		return (
-			<View
-				style={ [ styles.colorCircle, { backgroundColor: color } ] }
-			/>
-		);
-	}
+	const isGradient = gradientValue && ! color;
 
 	return (
 		<Cell
@@ -51,7 +29,11 @@ export default function BottomSheetColorCell( props ) {
 			editable={ false }
 			value={ '' }
 		>
-			{ getCircleSwatch() }
+			<ColorIndicator
+				color={ isGradient ? gradientValue : color }
+				style={ styles.colorCircle }
+				gradient={ isGradient }
+			/>
 			<Icon icon={ chevronRight }></Icon>
 		</Cell>
 	);
