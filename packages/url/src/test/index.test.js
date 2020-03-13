@@ -738,6 +738,12 @@ describe( 'hasQueryArg', () => {
 } );
 
 describe( 'removeQueryArgs', () => {
+	it( 'should not change URL without a querystring', () => {
+		const url = 'https://andalouses.example/beach';
+
+		expect( removeQueryArgs( url, 'baz', 'test' ) ).toEqual( url );
+	} );
+
 	it( 'should not change URL not containing query args', () => {
 		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
 

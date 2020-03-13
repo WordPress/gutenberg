@@ -19,11 +19,12 @@ import { buildQueryString } from './build-query-string';
  */
 export function removeQueryArgs( url, ...args ) {
 	const queryStringIndex = url.indexOf( '?' );
+	if ( queryStringIndex === -1 ) {
+		return url;
+	}
+
 	const query = getQueryArgs( url );
-	const baseUrl =
-		queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
-
+	const baseURL = url.substr( 0, queryStringIndex );
 	args.forEach( ( arg ) => delete query[ arg ] );
-
-	return baseUrl + '?' + buildQueryString( query );
+	return baseURL + '?' + buildQueryString( query );
 }
