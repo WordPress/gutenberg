@@ -55,7 +55,7 @@ const MediaReplaceFlow = ( {
 		// The default error contains some HTML that,
 		// for example, makes the filename bold.
 		// The notice, by default, accepts strings only and so
-		// I am removing the html from the error.
+		// we need to remove the html from the error.
 		const renderMsg =
 			errorElement.textContent || errorElement.innerText || '';
 		// We need to set a timeout for showing the notice
