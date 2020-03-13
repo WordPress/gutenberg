@@ -100,7 +100,7 @@ module.exports = {
 		'jsdoc/check-property-names': 'error',
 		'jsdoc/check-tag-names': 'error',
 		'jsdoc/check-types': 'error',
-		'jsdoc/check-values': 'error',
+		'jsdoc/check-values': 'off',
 		'jsdoc/empty-tags': 'error',
 		'jsdoc/implements-on-classes': 'error',
 		'jsdoc/newline-after-description': 'error',
