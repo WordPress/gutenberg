@@ -20,6 +20,7 @@ class DependencyExtractionWebpackPlugin {
 		this.options = Object.assign(
 			{
 				combineAssets: false,
+				combinedOutputFile: null,
 				injectPolyfill: false,
 				outputFormat: 'php',
 				useDefaults: true,
@@ -106,6 +107,7 @@ class DependencyExtractionWebpackPlugin {
 		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
 			const {
 				combineAssets,
+				combinedOutputFile,
 				injectPolyfill,
 				outputFormat,
 			} = this.options;
@@ -180,7 +182,8 @@ class DependencyExtractionWebpackPlugin {
 				const outputFolder = compiler.options.output.path;
 				const assetsFilePath = path.resolve(
 					outputFolder,
-					'assets.' + ( outputFormat === 'php' ? 'php' : 'json' )
+					combinedOutputFile ||
+						'assets.' + ( outputFormat === 'php' ? 'php' : 'json' )
 				);
 				const assetsFilename = path.relative(
 					outputFolder,
