@@ -7893,7 +7893,7 @@ exports[`Storyshots Components/TabPanel Default 1`] = `
     <button
       aria-controls="0-tab1-view"
       aria-selected={true}
-      className="components-button tab-one active-tab"
+      className="components-button components-tab-panel__tabs-item tab-one is-active"
       id="0-tab1"
       onClick={[Function]}
       role="tab"
@@ -7905,7 +7905,7 @@ exports[`Storyshots Components/TabPanel Default 1`] = `
     <button
       aria-controls="0-tab2-view"
       aria-selected={false}
-      className="components-button tab-two"
+      className="components-button components-tab-panel__tabs-item tab-two"
       id="0-tab2"
       onClick={[Function]}
       role="tab"
