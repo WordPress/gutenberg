@@ -15,7 +15,7 @@ import HsvColorPicker from 'react-native-hsv-color-picker';
  * WordPress dependencies
  */
 import { withInstanceId, compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	RichText,
 	withColors,
@@ -33,6 +33,7 @@ import {
 	BottomSheetConsumer,
 	ColorControl,
 	SegmentedControls,
+	ColorPalette,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
@@ -62,6 +63,7 @@ class ButtonEdit extends Component {
 		this.onChangeOpenInNewTab = this.onChangeOpenInNewTab.bind( this );
 		this.onChangeURL = this.onChangeURL.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
+		this.onSegmentHandler = this.onSegmentHandler.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
@@ -89,7 +91,7 @@ class ButtonEdit extends Component {
 			sat: 0.5,
 			val: 0.5,
 			screen: 'Settings',
-			segment: 'Presets',
+			segment: 'Solid',
 		};
 	}
 
@@ -110,6 +112,7 @@ class ButtonEdit extends Component {
 			setAttributes( { url: prependHTTP( url ) } );
 			// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
 			this.isEditingURL = false;
+			this.setState( { segment: 'Solid', screen: 'Settings' } );
 		}
 
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
@@ -171,8 +174,10 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor } = this.props;
-		if ( backgroundColor.color ) {
+		const { backgroundColor, attributes } = this.props;
+		if ( attributes.gradient ) {
+			return null;
+		} else if ( backgroundColor.color ) {
 			// `backgroundColor` which should be set when we are able to resolve it
 			return backgroundColor.color;
 		}
@@ -314,7 +319,7 @@ class ButtonEdit extends Component {
 
 	// eslint-disable-next-line no-unused-vars
 	onSegmentHandler( index, item ) {
-		//TODO
+		this.setState( { segment: item } );
 	}
 
 	changeBottomSheetContent( destination ) {
@@ -326,6 +331,22 @@ class ButtonEdit extends Component {
 			)
 		);
 		this.setState( { screen: destination } );
+	}
+
+	getColorPalette() {
+		const { segment } = this.state;
+		const { setBackgroundColor, clientId } = this.props;
+		return (
+			<ColorPalette
+				setBackgroundColor={ setBackgroundColor }
+				backgroundColor={ this.getBackgroundColor() }
+				clientId={ clientId }
+				currentSegment={ segment }
+				onCustomPress={ () => {
+					this.changeBottomSheetContent( 'Custom' );
+				} }
+			/>
+		);
 	}
 
 	render() {
@@ -508,6 +529,7 @@ class ButtonEdit extends Component {
 												label={ __( 'Background' ) }
 												color={ backgroundColor }
 												separatorType="fullWidth"
+												clientId={ clientId }
 											/>
 											<ColorControl
 												onPress={ () => {
@@ -520,88 +542,113 @@ class ButtonEdit extends Component {
 													textColor.color || '#fff'
 												}
 												separatorType="none"
+												clientId={ clientId }
 											/>
 										</PanelBody>
 									</View>
 								);
-							}
-							return (
-								<View>
-									<View
-										style={ styles.bottomSheetColorsHeader }
-									>
-										<TouchableWithoutFeedback
-											onPress={ () => {
-												this.changeBottomSheetContent(
-													'Settings'
-												);
-											} }
-											label={ __( 'Background' ) }
-										>
-											<View
-												style={
-													styles.bottomSheetBackButton
-												}
-											>
-												<Icon icon={ chevronLeft } />
-											</View>
-										</TouchableWithoutFeedback>
-										<Text
+							} else if (
+								screen === 'Background' ||
+								screen === 'Text'
+							) {
+								return (
+									<View>
+										<View
 											style={
-												styles.bottomSheetHeaderTitle
+												styles.bottomSheetColorsHeader
 											}
 										>
-											{ screen }
-										</Text>
+											<TouchableWithoutFeedback
+												onPress={ () => {
+													this.changeBottomSheetContent(
+														'Settings'
+													);
+												} }
+												label={ __( 'Background' ) }
+											>
+												<View
+													style={
+														styles.bottomSheetBackButton
+													}
+												>
+													<Icon
+														icon={ chevronLeft }
+													/>
+												</View>
+											</TouchableWithoutFeedback>
+											<Text
+												style={
+													styles.bottomSheetHeaderTitle
+												}
+											>
+												{ sprintf(
+													__( '%s' ),
+													screen
+												) }
+											</Text>
+										</View>
+										{ this.getColorPalette() }
+										<SegmentedControls
+											segments={ [ 'Solid', 'Gradient' ] }
+											segmentHandler={
+												this.onSegmentHandler
+											}
+										/>
 									</View>
-									<SegmentedControls
-										segments={ [ 'Solid', 'Gradient' ] }
-										segmentHandler={ this.onSegmentHandler }
-									/>
-									<HsvColorPicker
-										huePickerHue={ hue }
-										onHuePickerDragMove={
-											this.onHuePickerChange
-										}
-										onHuePickerPress={
-											! isBottomSheetScrolling &&
-											this.onHuePickerChange
-										}
-										satValPickerHue={ hue }
-										satValPickerSaturation={ sat }
-										satValPickerValue={ val }
-										onSatValPickerDragMove={
-											this.onSatValPickerChange
-										}
-										onSatValPickerPress={
-											! isBottomSheetScrolling &&
-											this.onSatValPickerChange
-										}
-										onSatValPickerDragStart={ () =>
-											shouldEnableBottomSheetScroll(
-												false
-											)
-										}
-										onSatValPickerDragEnd={ () =>
-											shouldEnableBottomSheetScroll(
-												true
-											)
-										}
-										onHuePickerDragStart={ () =>
-											shouldEnableBottomSheetScroll(
-												false
-											)
-										}
-										onHuePickerDragEnd={ () =>
-											shouldEnableBottomSheetScroll(
-												true
-											)
-										}
-										ref={ this.colorPicker }
-										containerStyle={ { marginBottom: 20 } }
-									/>
-								</View>
-							);
+								);
+							} else if ( screen === 'Custom' ) {
+								return (
+									<>
+										<HsvColorPicker
+											huePickerHue={ hue }
+											onHuePickerDragMove={
+												this.onHuePickerChange
+											}
+											onHuePickerPress={
+												! isBottomSheetScrolling &&
+												this.onHuePickerChange
+											}
+											satValPickerHue={ hue }
+											satValPickerSaturation={ sat }
+											satValPickerValue={ val }
+											onSatValPickerDragMove={
+												this.onSatValPickerChange
+											}
+											onSatValPickerPress={
+												! isBottomSheetScrolling &&
+												this.onSatValPickerChange
+											}
+											onSatValPickerDragStart={ () =>
+												shouldEnableBottomSheetScroll(
+													false
+												)
+											}
+											onSatValPickerDragEnd={ () =>
+												shouldEnableBottomSheetScroll(
+													true
+												)
+											}
+											onHuePickerDragStart={ () =>
+												shouldEnableBottomSheetScroll(
+													false
+												)
+											}
+											onHuePickerDragEnd={ () =>
+												shouldEnableBottomSheetScroll(
+													true
+												)
+											}
+											ref={ this.colorPicker }
+											containerStyle={ {
+												marginBottom: 20,
+											} }
+										/>
+										<View
+											style={ styles.horizontalSeparator }
+										/>
+									</>
+								);
+							}
 						} }
 					</BottomSheetConsumer>
 				</InspectorControls>

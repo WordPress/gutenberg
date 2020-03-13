@@ -56,4 +56,10 @@
 	left: 0;
 	right: 0;
 	text-align: center;
+	font-weight: 500;
+}
+
+.horizontalSeparator {
+	border-bottom-width: $border-width;
+	border-color: $light-gray-400;
 }

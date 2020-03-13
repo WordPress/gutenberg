@@ -17,14 +17,15 @@
 	flex-direction: row;
 	align-self: center;
 	padding: 4px;
+	margin: 8px;
 }
 
 .outline {
 	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
+	top: -1;
+	bottom: -1;
+	left: -1;
+	right: -1;
 	border-width: 1px;
 	border-radius: 15px;
 	border-color: rgba(0, 0, 0, 0.1);

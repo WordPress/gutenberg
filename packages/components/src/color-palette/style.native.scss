@@ -1,0 +1,35 @@
+.selected {
+	height: 28px;
+	width: 28px;
+	border-radius: 14px;
+	background-color: #fff;
+	justify-content: center;
+	align-items: center;
+}
+
+.circleOption {
+	height: 48px;
+	width: 48px;
+	border-radius: 24px;
+	margin-right: 8px;
+	justify-content: center;
+	align-items: center;
+}
+
+.container {
+	flex-direction: row;
+	padding: 16px;
+}
+
+.verticalSeparator {
+	border-width: $border-width / 2;
+	border-color: $light-gray-400;
+	height: 38px;
+	margin-right: 8px;
+	align-self: center;
+}
+
+.customButton {
+	color: $blue-wordpress;
+	align-self: center;
+}

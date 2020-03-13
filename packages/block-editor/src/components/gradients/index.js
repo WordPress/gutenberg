@@ -42,25 +42,29 @@ function getGradientSlugByValue( gradients, value ) {
 	return gradient && gradient.slug;
 }
 
-export function __experimentalUseGradient( {
-	gradientAttribute = 'gradient',
-	customGradientAttribute = 'customGradient',
-} = {} ) {
+export function __experimentalUseGradient(
+	{
+		gradientAttribute = 'gradient',
+		customGradientAttribute = 'customGradient',
+	} = {},
+	customClientId
+) {
 	const { clientId } = useBlockEditContext();
+	const id = clientId || customClientId;
 
 	const { gradients, gradient, customGradient } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } = select(
 				'core/block-editor'
 			);
-			const attributes = getBlockAttributes( clientId );
+			const attributes = getBlockAttributes( id );
 			return {
 				gradient: attributes[ gradientAttribute ],
 				customGradient: attributes[ customGradientAttribute ],
 				gradients: getSettings().gradients,
 			};
 		},
-		[ clientId, gradientAttribute, customGradientAttribute ]
+		[ id, gradientAttribute, customGradientAttribute ]
 	);
 
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
@@ -68,18 +72,18 @@ export function __experimentalUseGradient( {
 		( newGradientValue ) => {
 			const slug = getGradientSlugByValue( gradients, newGradientValue );
 			if ( slug ) {
-				updateBlockAttributes( clientId, {
+				updateBlockAttributes( id, {
 					[ gradientAttribute ]: slug,
 					[ customGradientAttribute ]: undefined,
 				} );
 				return;
 			}
-			updateBlockAttributes( clientId, {
+			updateBlockAttributes( id, {
 				[ gradientAttribute ]: undefined,
 				[ customGradientAttribute ]: newGradientValue,
 			} );
 		},
-		[ gradients, clientId, updateBlockAttributes ]
+		[ gradients, id, updateBlockAttributes ]
 	);
 
 	const gradientClass = __experimentalGetGradientClass( gradient );
