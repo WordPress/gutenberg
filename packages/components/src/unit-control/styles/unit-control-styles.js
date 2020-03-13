@@ -17,12 +17,16 @@ export const Root = styled.div`
 const fontSizeStyles = ( { size } ) => {
 	const sizes = {
 		default: null,
-		small: 11,
+		small: '11px',
 	};
+
+	const fontSize = sizes[ size ];
+
+	if ( ! fontSize ) return '';
 
 	return css`
 		@media ( min-width: 600px ) {
-			font-size: ${sizes[ size ]};
+			font-size: ${fontSize};
 		}
 	`;
 };
@@ -32,10 +36,12 @@ const sizeStyles = ( { size } ) => {
 		default: {
 			height: 30,
 			lineHeight: 30,
+			minHeight: 30,
 		},
 		small: {
 			height: 24,
 			lineHeight: 24,
+			minHeight: 24,
 		},
 	};
 
@@ -86,7 +92,7 @@ const unitSizeStyles = ( { size } ) => {
 	return css( sizes[ size ] );
 };
 
-const unitLabelStyles = ( props ) => {
+const baseUnitLabelStyles = ( props ) => {
 	return css`
 		appearance: none;
 		background: ${color( 'ui.background' )};
@@ -111,16 +117,25 @@ const unitLabelStyles = ( props ) => {
 	`;
 };
 
+const unitLabelPaddingStyles = ( { size } ) => {
+	const sizes = {
+		default: '6px 2px',
+		small: '4px 2px',
+	};
+
+	return css( { padding: sizes[ size ] } );
+};
+
 export const UnitLabel = styled.div`
 	&&& {
-		${unitLabelStyles};
-		padding: 5px 2px;
+		${baseUnitLabelStyles};
+		${unitLabelPaddingStyles};
 	}
 `;
 
 export const UnitSelect = styled.select`
 	&&& {
-		${unitLabelStyles};
+		${baseUnitLabelStyles};
 		cursor: pointer;
 		border: 1px solid transparent;
 
