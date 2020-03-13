@@ -17,11 +17,13 @@ const ToolbarGroupContainer = ( {
 	getStylesFromColorScheme,
 	passedStyle,
 	children,
+	...props
 } ) => (
 	<View
 		style={ [
 			getStylesFromColorScheme( styles.container, styles.containerDark ),
 			passedStyle,
+			! props.noLeftSeparator && styles.leftSeparator,
 		] }
 	>
 		{ children }
