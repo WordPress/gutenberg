@@ -34,7 +34,6 @@ function PostTitle() {
 		isPostTypeViewable,
 		placeholder,
 		isFocusMode,
-		hasFixedToolbar,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
@@ -43,11 +42,7 @@ function PostTitle() {
 		const { getSettings } = select( 'core/block-editor' );
 		const { getPostType } = select( 'core' );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
-		const {
-			titlePlaceholder,
-			focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
-		} = getSettings();
+		const { titlePlaceholder, focusMode } = getSettings();
 
 		return {
 			isCleanNewPost: getIsCleanNewPost(),
@@ -55,7 +50,6 @@ function PostTitle() {
 			isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 			placeholder: titlePlaceholder,
 			isFocusMode: focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
 		};
 	} );
 	const { insertDefaultBlock, clearSelectedBlock } = useDispatch(
@@ -90,7 +84,6 @@ function PostTitle() {
 	const className = classnames( 'wp-block editor-post-title__block', {
 		'is-selected': isSelected,
 		'is-focus-mode': isFocusMode,
-		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 	const decodedPlaceholder = decodeEntities( placeholder );
 
