@@ -53,8 +53,8 @@ function setPath( object, path, value ) {
 }
 
 /**
- * Returns an object of query arguments of the given URL. Returns undefined if
- * the given URL is not a valid URL or URL does not have non-empty querystring.
+ * Returns an object of query arguments of the given URL. If the given URL is
+ * invalid or has no querystring, an empty object is returned.
  *
  * @param {string} url URL.
  *
@@ -64,18 +64,11 @@ function setPath( object, path, value ) {
  * // { "foo": "bar", "bar": "baz" }
  * ```
  *
- * @return {QueryArgs|undefined} Query arg value, or undefined if given URL is
- *                               not a valid URL or URL does not have non-empty
- *                               querystring.
+ * @return {QueryArgs} Query args object.
  */
 export function getQueryArgs( url ) {
-	const query = getQueryString( url );
-	if ( query === undefined ) {
-		return;
-	}
-
 	return (
-		query
+		( getQueryString( url ) || '' )
 			// Normalize space encoding, accounting for PHP URL encoding
 			// corresponding to `application/x-www-form-urlencoded`.
 			//

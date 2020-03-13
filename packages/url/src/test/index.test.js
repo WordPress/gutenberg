@@ -632,18 +632,14 @@ describe( 'getQueryArgs', () => {
 		} );
 	} );
 
-	it( 'should gracefully handle invalid URLs', () => {
-		const url = 'example';
-
-		expect( getQueryArgs( url ) ).toBeUndefined();
-	} );
-
-	it( 'should return undefined for URL without querystring', () => {
+	it( 'should return empty object for URL without querystring', () => {
 		const urlWithoutQuerystring = 'https://andalouses.example/beach';
 		const urlWithEmptyQuerystring = 'https://andalouses.example/beach?';
+		const invalidURL = 'example';
 
-		expect( getQueryArgs( urlWithoutQuerystring ) ).toBeUndefined();
-		expect( getQueryArgs( urlWithEmptyQuerystring ) ).toBeUndefined();
+		expect( getQueryArgs( invalidURL ) ).toEqual( {} );
+		expect( getQueryArgs( urlWithoutQuerystring ) ).toEqual( {} );
+		expect( getQueryArgs( urlWithEmptyQuerystring ) ).toEqual( {} );
 	} );
 
 	it( 'should gracefully handle empty keys and values', () => {

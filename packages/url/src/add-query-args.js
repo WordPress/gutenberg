@@ -32,7 +32,7 @@ export function addQueryArgs( url = '', args ) {
 	const queryStringIndex = url.indexOf( '?' );
 	if ( queryStringIndex !== -1 ) {
 		// Merge into existing query arguments.
-		args = Object.assign( {}, getQueryArgs( url ), args );
+		args = Object.assign( getQueryArgs( url ), args );
 
 		// Change working base URL to omit previous query arguments.
 		baseUrl = baseUrl.substr( 0, queryStringIndex );

@@ -222,8 +222,8 @@ _Returns_
 
 <a name="getQueryArgs" href="#getQueryArgs">#</a> **getQueryArgs**
 
-Returns an object of query arguments of the given URL. Returns undefined if
-the given URL is not a valid URL or URL does not have non-empty querystring.
+Returns an object of query arguments of the given URL. If the given URL is
+invalid or has no querystring, an empty object is returned.
 
 _Usage_
 
@@ -238,7 +238,7 @@ _Parameters_
 
 _Returns_
 
--   `(QueryArgs|undefined)`: Query arg value, or undefined if given URL is not a valid URL or URL does not have non-empty querystring.
+-   `QueryArgs`: Query args object.
 
 <a name="getQueryString" href="#getQueryString">#</a> **getQueryString**
 
