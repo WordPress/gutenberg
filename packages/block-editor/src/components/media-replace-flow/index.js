@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import { uniqueId } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { useState, createRef } from '@wordpress/element';
+import { useState, createRef, renderToString } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -11,10 +16,9 @@ import {
 	ToolbarGroup,
 	Button,
 	Dropdown,
-	withNotices,
 } from '@wordpress/components';
+import { withDispatch, useSelect } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
-import { useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { upload, media as mediaIcon } from '@wordpress/icons';
 
@@ -32,30 +36,58 @@ const MediaReplaceFlow = ( {
 	accept,
 	onSelect,
 	onSelectURL,
-	onError,
 	name = __( 'Replace' ),
+	createNotice,
+	removeNotice,
 } ) => {
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = createRef();
+	const errorNoticeID = uniqueId(
+		'block-editor/media-replace-flow/error-notice/'
+	);
+
+	const onError = ( message ) => {
+		const errorElement = document.createElement( 'div' );
+		errorElement.innerHTML = renderToString( message );
+		// The default error contains some HTML that,
+		// for example, makes the filename bold.
+		// The notice, by default, accepts strings only and so
+		// we need to remove the html from the error.
+		const renderMsg =
+			errorElement.textContent || errorElement.innerText || '';
+		// We need to set a timeout for showing the notice
+		// so that VoiceOver and possibly other screen readers
+		// can announce the error afer the toolbar button
+		// regains focus once the upload dialog closes.
+		// Otherwise VO simply skips over the notice and announces
+		// the focused element and the open menu.
+		setTimeout( () => {
+			createNotice( 'error', renderMsg, {
+				speak: true,
+				id: errorNoticeID,
+				isDismissible: true,
+			} );
+		}, 1000 );
+	};
 
 	const selectMedia = ( media ) => {
 		onSelect( media );
 		setMediaURLValue( media.url );
 		speak( __( 'The media file has been replaced' ) );
+		removeNotice( errorNoticeID );
 	};
 
 	const selectURL = ( newURL ) => {
 		onSelectURL( newURL );
 	};
 
-	const uploadFiles = ( event, closeDropdown ) => {
+	const uploadFiles = ( event ) => {
 		const files = event.target.files;
 		const setMedia = ( [ media ] ) => {
 			selectMedia( media );
-			closeDropdown();
 		};
 		mediaUpload( {
 			allowedTypes,
@@ -154,4 +186,12 @@ const MediaReplaceFlow = ( {
 	);
 };
 
-export default compose( withNotices )( MediaReplaceFlow );
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { createNotice, removeNotice } = dispatch( 'core/notices' );
+		return {
+			createNotice,
+			removeNotice,
+		};
+	} ),
+] )( MediaReplaceFlow );

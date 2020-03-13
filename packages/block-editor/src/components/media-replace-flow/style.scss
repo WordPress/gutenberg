@@ -50,3 +50,21 @@
 		}
 	}
 }
+
+.block-editor-media-flow__error {
+	padding: 0 20px 20px 20px;
+	max-width: 255px;
+
+	.components-with-notices-ui {
+		max-width: 255px;
+
+		.components-notice__content {
+			overflow: hidden;
+			word-wrap: break-word;
+		}
+		.components-notice__dismiss {
+			position: absolute;
+			right: 10px;
+		}
+	}
+}
