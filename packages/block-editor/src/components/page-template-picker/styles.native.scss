@@ -34,3 +34,12 @@
 .buttonTextDark {
 	color: $light-opacity-700;
 }
+
+.previewContainer {
+	flex: 1;
+	background-color: $white;
+}
+
+.previewContainerDark {
+	background-color: $black;
+}

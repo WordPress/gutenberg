@@ -3,7 +3,7 @@
  */
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
 import { ModalHeaderBar } from '@wordpress/components';
-import { usePreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -11,6 +11,11 @@ import { __ } from '@wordpress/i18n';
  * External dependencies
  */
 import { Modal, View, SafeAreaView } from 'react-native';
+
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
 
 // We are replicating this here because the one in @wordpress/block-editor always
 // tries to scale the preview and we would need a lot of cross platform code to handle
@@ -39,9 +44,10 @@ BlockPreview.displayName = 'BlockPreview';
 
 const Preview = ( props ) => {
 	const { template, onDismiss, onApply } = props;
-	const preferredColorScheme = usePreferredColorScheme();
-	const containerBackgroundColor =
-		preferredColorScheme === 'dark' ? 'black' : 'white';
+	const previewContainerStyle = usePreferredColorSchemeStyle(
+		styles.previewContainer,
+		styles.previewContainerDark
+	);
 
 	if ( template === undefined ) {
 		return null;
@@ -64,9 +70,7 @@ const Preview = ( props ) => {
 			onRequestClose={ onDismiss }
 			supportedOrientations={ [ 'portrait', 'landscape' ] }
 		>
-			<SafeAreaView
-				style={ { flex: 1, backgroundColor: containerBackgroundColor } }
-			>
+			<SafeAreaView style={ previewContainerStyle }>
 				<ModalHeaderBar
 					leftButton={ leftButton }
 					rightButton={ rightButton }
