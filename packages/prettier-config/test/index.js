@@ -6,7 +6,7 @@ import { isPlainObject } from 'lodash';
 /**
  * Internal dependencies
  */
-import config from '../lib/prettier-config.js';
+import config from '../lib/';
 
 describe( 'prettier config tests', () => {
 	it( 'should be an object', () => {

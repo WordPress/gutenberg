@@ -1446,6 +1446,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/prettier-config",
+		"slug": "packages-prettier-config",
+		"markdown_source": "../packages/prettier-config/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/primitives",
 		"slug": "packages-primitives",
 		"markdown_source": "../packages/primitives/README.md",

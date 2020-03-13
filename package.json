@@ -105,6 +105,7 @@
 		"@wordpress/library-export-default-webpack-plugin": "file:packages/library-export-default-webpack-plugin",
 		"@wordpress/npm-package-json-lint-config": "file:packages/npm-package-json-lint-config",
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
+		"@wordpress/prettier-config": "file:packages/prettier-config",
 		"@wordpress/scripts": "file:packages/scripts",
 		"babel-loader": "8.0.6",
 		"babel-plugin-emotion": "10.0.27",

@@ -22,9 +22,9 @@
 		"node": ">=10"
 	},
 	"files": [
-		"lib/prettier-config.js"
+		"lib/index.js"
 	],
-	"main": "lib/prettier-config.js",
+	"main": "lib/index.js",
 	"publishConfig": {
 		"access": "public"
 	}
