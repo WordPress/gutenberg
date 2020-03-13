@@ -222,15 +222,15 @@ class MediaTextEdit extends Component {
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
 		const mediaContainerStyle = shouldStack
 			? {
-					...( mediaPosition === 'left' && { marginBottom: 16 } ),
-					...( mediaPosition === 'right' && {
-						marginTop: 16,
-						marginBottom: isSelected ? 8 : 0,
-					} ),
+					...( mediaPosition === 'left' && styles.mediaStuckLeft ),
+					...( mediaPosition === 'right' && styles.mediaStuckRight ),
+					...( mediaPosition === 'right' &&
+						isSelected &&
+						styles.mediaStuckRightSelected ),
 			  }
 			: {
-					...( mediaPosition === 'left' && { paddingRight: 16 } ),
-					...( mediaPosition === 'right' && { paddingLeft: 16 } ),
+					...( mediaPosition === 'left' && styles.mediaLeft ),
+					...( mediaPosition === 'right' && styles.mediaRight ),
 			  };
 
 		const toolbarControls = [

@@ -108,18 +108,32 @@
 	padding: $block-selected-to-content;
 }
 
-.innerPaddingMediaOnLeft {
+.innerPaddingNoStuck {
 	padding-right: $block-selected-to-content;
-}
-
-.innerPaddingMediaOnRight {
 	padding-left: $block-selected-to-content;
 }
 
-.paddingHorizontalNone {
-	padding-left: 0;
-	padding-right: 0;
+.mediaStuckLeft {
+	margin-bottom: 16;
 }
+
+.mediaLeft {
+	padding-right: 16;
+}
+
+.mediaRight {
+	padding-left: 16;
+}
+
+.mediaStuckRight {
+	margin-top: 16;
+	margin-bottom: 0;
+}
+
+.mediaStuckRightSelected {
+	margin-bottom: 8;
+}
+
 
 .regularMediaPadding {
 	padding: $block-edge-to-content;
