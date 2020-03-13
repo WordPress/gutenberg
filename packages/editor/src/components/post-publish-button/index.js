@@ -167,7 +167,7 @@ export class PostPublishButton extends Component {
 
 		const toggleChildren = isBeingScheduled
 			? __( 'Schedule…' )
-			: __( 'Publish…' );
+			: __( 'Publish' );
 		const buttonChildren = (
 			<PublishButtonLabel
 				forceIsSaving={ forceIsSaving }

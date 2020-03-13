@@ -29,25 +29,13 @@ export function PublishButtonLabel( {
 	}
 
 	if ( ! hasPublishAction ) {
-<<<<<<< HEAD
 		return hasNonPostEntityChanges
 			? __( 'Submit for Review…' )
 			: __( 'Submit for Review' );
-	} else if ( isPublished ) {
-		return hasNonPostEntityChanges ? __( 'Update…' ) : __( 'Update' );
-	} else if ( isBeingScheduled ) {
-		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
-	}
-
-	if ( 'private' === visibility ) {
-		return __( 'Publish Privately' );
-=======
-		return __( 'Submit for Review' );
 	} else if ( isBeingScheduled && 'private' !== visibility ) {
-		return __( 'Schedule' );
+		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
 	} else if ( isPublished ) {
-		return __( 'Update' );
->>>>>>> Handle proper labeling for scheduled private posts
+		return hasNonPostEntityChanges ? __( 'Update…' ) : __( 'Update' ) ;
 	}
 
 	return __( 'Publish' );

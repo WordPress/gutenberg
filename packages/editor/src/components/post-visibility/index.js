@@ -151,12 +151,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { editPost } = dispatch( 'core/editor' );
 		return {
-<<<<<<< HEAD
-			onSave: savePost,
 			onUpdateVisibility( status, password = '' ) {
-=======
-			onUpdateVisibility( status, password = null ) {
->>>>>>> Prevent publishing on visibility change to private
 				editPost( { status, password } );
 			},
 		};
