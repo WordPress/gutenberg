@@ -60,7 +60,12 @@ describe( 'Post visibility', () => {
 		const [ privateLabel ] = await page.$x( '//label[text()="Private"]' );
 		await privateLabel.click();
 
-		// Enter a title for this post.
+		// Publish private post
+		await page.click( '.editor-post-publish-panel__toggle' );
+
+		await page.click( '.editor-post-publish-button' );
+
+		// Enter a new title for this post.
 		await page.type( '.editor-post-title__input', ' Changed' );
 
 		await page.click( '.editor-post-publish-button' );
