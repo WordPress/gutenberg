@@ -18,7 +18,6 @@ import {
 	RangeControl,
 	ResizableBox,
 	ToggleControl,
-	__experimentalUnitControl as UnitControl,
 	withNotices,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
@@ -33,9 +32,10 @@ import {
 	ColorPalette,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { useSelect, withDispatch } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 
 /**
@@ -73,15 +73,6 @@ function retrieveFastAverageColor() {
 	return retrieveFastAverageColor.fastAverageColor;
 }
 
-export function useIsCustomUnitsDisabled() {
-	const isDisabled = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return !! getSettings().__experimentalDisableCustomUnits;
-	}, [] );
-
-	return isDisabled;
-}
-
 const { __getComputedSize: getComputedUnitSize } = UnitControl;
 
 function CoverHeightInput( {
@@ -94,7 +85,6 @@ function CoverHeightInput( {
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
-	const isCustomUnitsDisabled = useIsCustomUnitsDisabled();
 
 	const handleOnChange = ( unprocessedValue ) => {
 		const inputValue =
@@ -118,7 +108,6 @@ function CoverHeightInput( {
 
 	const inputValue = temporaryInput !== null ? temporaryInput : value;
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
-	const units = isCustomUnitsDisabled ? false : CSS_UNITS;
 
 	return (
 		<BaseControl label={ __( 'Minimum height in pixels' ) } id={ inputId }>
@@ -131,7 +120,7 @@ function CoverHeightInput( {
 				step="1"
 				style={ { maxWidth: 80 } }
 				unit={ unit }
-				units={ units }
+				units={ CSS_UNITS }
 				value={ inputValue }
 			/>
 		</BaseControl>
