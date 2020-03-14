@@ -8782,6 +8782,7 @@ exports[`Storyshots Components/UnitControl Default 1`] = `
   padding-right: 20px;
   height: 30px;
   line-height: 30;
+  min-height: 30px;
 }
 
 .emotion-0.emotion-0.emotion-0::-webkit-outer-spin-button,
