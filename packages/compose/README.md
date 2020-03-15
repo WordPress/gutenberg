@@ -188,7 +188,7 @@ Returns true if the viewport matches the given query, or false otherwise.
 _Usage_
 
 ```js
-useViewportMatch( 'huge', <' );
+useViewportMatch( 'huge', '<' );
 useViewportMatch( 'medium' );
 ```
 
