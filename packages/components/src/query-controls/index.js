@@ -11,6 +11,7 @@ import { RangeControl, SelectControl, FormTokenField } from '../';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
+const MAX_CATEGORIES_SUGGESTIONS = 20;
 
 // currently this is needed for consistent controls UI on mobile
 // this can be removed after control components settle on consistent defaults
@@ -24,7 +25,7 @@ const MOBILE_CONTROL_PROPS_SEPARATOR_NONE = Platform.select( {
 } );
 
 export default function QueryControls( {
-	categoriesList,
+	categorySuggestions,
 	selectedCategories,
 	numberOfItems,
 	order,
@@ -36,16 +37,6 @@ export default function QueryControls( {
 	onOrderChange,
 	onOrderByChange,
 } ) {
-	const categorySuggestions = categoriesList.reduce(
-		( accumulator, category ) => ( {
-			...accumulator,
-			[ category.name ]: category,
-		} ),
-		{}
-	);
-
-	const MAX_CATEGORIES_SUGGESTIONS = 20;
-
 	return [
 		onOrderChange && onOrderByChange && (
 			<SelectControl

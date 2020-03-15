@@ -111,7 +111,13 @@ class LatestPostsEdit extends Component {
 			} ),
 			{}
 		);
-
+		const categorySuggestions = categoriesList.reduce(
+			( accumulator, category ) => ( {
+				...accumulator,
+				[ category.name ]: category,
+			} ),
+			{}
+		);
 		const selectCategories = ( tokens ) => {
 			// Categories that are already will be objects, while new additions will be strings (the name).
 			// allCategories nomalizes the array so that they are all objects.
@@ -242,7 +248,7 @@ class LatestPostsEdit extends Component {
 						onNumberOfItemsChange={ ( value ) =>
 							setAttributes( { postsToShow: value } )
 						}
-						categoriesList={ categoriesList }
+						categorySuggestions={ categorySuggestions }
 						onCategoryChange={ selectCategories }
 						selectedCategories={ categories }
 					/>
