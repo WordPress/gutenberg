@@ -6,20 +6,3 @@ export const CSS_UNITS = [
 	{ value: 'vw', label: 'vw', default: 10 },
 	{ value: 'vh', label: 'vh', default: 10 },
 ];
-
-export function getComputedSize( { value = 0, unit = 'px' } ) {
-	if ( unit === 'px' ) {
-		return value;
-	}
-
-	if ( unit === 'em' || unit === 'rem' ) {
-		const { fontSize } = window.getComputedStyle(
-			document.documentElement
-		);
-		return parseFloat( fontSize ) * value;
-	}
-
-	const windowValue = unit === 'vw' ? window.innerWidth : window.innerHeight;
-
-	return Math.round( windowValue * ( value / 100 ) );
-}

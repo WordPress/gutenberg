@@ -8,7 +8,7 @@ import classNames from 'classnames';
  */
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
-import { CSS_UNITS, getComputedSize } from './utils';
+import { CSS_UNITS } from './utils';
 
 export default function UnitControl( {
 	className,
@@ -59,4 +59,3 @@ export default function UnitControl( {
 }
 
 UnitControl.__defaultUnits = CSS_UNITS;
-UnitControl.__getComputedSize = getComputedSize;

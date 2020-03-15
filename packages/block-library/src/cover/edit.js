@@ -73,8 +73,6 @@ function retrieveFastAverageColor() {
 	return retrieveFastAverageColor.fastAverageColor;
 }
 
-const { __getComputedSize: getComputedUnitSize } = UnitControl;
-
 function CoverHeightInput( {
 	onChange,
 	onUnitChange,
@@ -267,19 +265,18 @@ function CoverEdit( {
 	);
 
 	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
-
 	const { removeAllNotices, createErrorNotice } = noticeOperations;
 
-	const computedMinHeight =
-		temporaryMinHeight ||
-		getComputedUnitSize( { value: minHeight, unit: minHeightUnit } );
+	const minHeightWithUnit = minHeightUnit
+		? `${ minHeight }${ minHeightUnit }`
+		: minHeight;
 
 	const style = {
 		...( backgroundType === IMAGE_BACKGROUND_TYPE
 			? backgroundImageStyles( url )
 			: {} ),
 		backgroundColor: overlayColor.color,
-		minHeight: computedMinHeight || undefined,
+		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
 	if ( gradientValue && ! url ) {
