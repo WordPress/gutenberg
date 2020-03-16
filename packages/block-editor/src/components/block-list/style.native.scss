@@ -51,3 +51,15 @@
 	padding-left: $block-custom-appender-to-content;
 	padding-right: $block-custom-appender-to-content;
 }
+
+.blockBorder {
+	width: $block-selected-border-width;
+}
+
+.headerToolbar {
+	height: $mobile-header-toolbar-height;
+}
+
+.blockToolbar {
+	height: $mobile-block-toolbar-height;
+}
