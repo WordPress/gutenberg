@@ -93,7 +93,7 @@ class PostTitle extends Component {
 						<div>
 							<VisuallyHidden
 								as="label"
-								htmlFor={`post-title-${instanceId}`}
+								htmlFor={ `post-title-${ instanceId }` }
 							>
 								{ decodedPlaceholder || __( 'Add title' ) }
 							</VisuallyHidden>
