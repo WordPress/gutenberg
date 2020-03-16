@@ -29,6 +29,7 @@
 			background: rgba($white, 0.1);
 		}
 
+		// Disable the flashing on navigation mode.
 		.is-navigate-mode & {
 			background: transparent;
 		}

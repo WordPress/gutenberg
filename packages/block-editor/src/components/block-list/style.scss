@@ -164,6 +164,7 @@
 			box-shadow: 0 0 0 2px $blue-medium-focus;
 			border-radius: $radius-block-ui;
 			transition: box-shadow 0.2s ease-out;
+			@include reduce-motion("transition");
 
 			// Windows High Contrast mode will show this outline.
 			outline: 2px solid transparent;
@@ -207,8 +208,9 @@
 		bottom: 0;
 		left: 0;
 		border-radius: $radius-block-ui;
-		transition: box-shadow 0.1s ease-in;
 		box-shadow: 0 0 0 2px transparent;
+		transition: box-shadow 0.1s ease-in;
+		@include reduce-motion("transition");
 	}
 
 	// Warnings
