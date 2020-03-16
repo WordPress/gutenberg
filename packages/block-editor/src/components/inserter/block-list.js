@@ -127,7 +127,9 @@ function InserterBlockList( {
 
 	// Fetch resuable blocks on mount
 	useEffect( () => {
-		fetchReusableBlocks();
+		if ( fetchReusableBlocks ) {
+			fetchReusableBlocks();
+		}
 	}, [] );
 
 	// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
@@ -342,7 +344,7 @@ function InserterBlockList( {
 				onHover={ onHoverItem }
 			/>
 
-			{ !! suggestedItems.length && (
+			{ !! suggestedItems.length && ! filterValue && (
 				<PanelBody
 					title={ _x( 'Most used', 'blocks' ) }
 					opened={ isPanelOpen( 'suggested' ) }

@@ -19,7 +19,7 @@ import InserterBlockList from './block-list';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
-export function InserterMenu( {
+function InserterMenu( {
 	rootClientId,
 	clientId,
 	isAppender,
