@@ -45,7 +45,7 @@ describe( 'addMilestone', () => {
 				get: jest.fn( () =>
 					Promise.resolve( {
 						data: {
-							milestone: 'Gutenberg 6.4',
+							milestone: 'Gutenberg 7.5',
 						},
 					} )
 				),
@@ -95,9 +95,9 @@ describe( 'addMilestone', () => {
 				listMilestonesForRepo: jest.fn( () =>
 					Promise.resolve( {
 						data: [
-							{ title: 'Gutenberg 6.2', number: 10 },
-							{ title: 'Gutenberg 6.3', number: 11 },
-							{ title: 'Gutenberg 6.4', number: 12 },
+							{ title: 'Gutenberg 7.4', number: 10 },
+							{ title: 'Gutenberg 7.5', number: 11 },
+							{ title: 'Gutenberg 7.6', number: 12 },
 						],
 					} )
 				),
@@ -109,7 +109,7 @@ describe( 'addMilestone', () => {
 						data: {
 							content: Buffer.from(
 								JSON.stringify( {
-									version: '6.3.0',
+									version: '7.5.0',
 								} )
 							).toString( 'base64' ),
 							encoding: 'base64',
@@ -134,8 +134,8 @@ describe( 'addMilestone', () => {
 		expect( octokit.issues.createMilestone ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			title: 'Gutenberg 6.4',
-			due_on: '2019-08-26T00:00:00.000Z',
+			title: 'Gutenberg 7.6',
+			due_on: '2020-02-24T00:00:00.000Z',
 		} );
 		expect( octokit.issues.listMilestonesForRepo ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -173,9 +173,9 @@ describe( 'addMilestone', () => {
 				listMilestonesForRepo: jest.fn( () =>
 					Promise.resolve( {
 						data: [
-							{ title: 'Gutenberg 6.8', number: 10 },
-							{ title: 'Gutenberg 6.9', number: 11 },
-							{ title: 'Gutenberg 7.0', number: 12 },
+							{ title: 'Gutenberg 7.8', number: 10 },
+							{ title: 'Gutenberg 7.9', number: 11 },
+							{ title: 'Gutenberg 8.0', number: 12 },
 						],
 					} )
 				),
@@ -187,7 +187,7 @@ describe( 'addMilestone', () => {
 						data: {
 							content: Buffer.from(
 								JSON.stringify( {
-									version: '6.9.0',
+									version: '7.9.0',
 								} )
 							).toString( 'base64' ),
 							encoding: 'base64',
@@ -212,8 +212,8 @@ describe( 'addMilestone', () => {
 		expect( octokit.issues.createMilestone ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			title: 'Gutenberg 7.0',
-			due_on: '2019-11-18T00:00:00.000Z',
+			title: 'Gutenberg 8.0',
+			due_on: '2020-04-20T00:00:00.000Z',
 		} );
 		expect( octokit.issues.listMilestonesForRepo ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
