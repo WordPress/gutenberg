@@ -6,7 +6,6 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { LinearGradient } from '@wordpress/components';
-import { __experimentalUseGradient } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
@@ -21,13 +20,13 @@ function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
 		},
 	];
 
-	const { gradientValue } = __experimentalUseGradient();
+	const isGradient = backgroundColor.includes( 'linear-gradient' );
 
 	return (
 		<View style={ wrapperStyles }>
-			{ gradientValue && (
+			{ isGradient && (
 				<LinearGradient
-					gradientValue={ gradientValue }
+					gradientValue={ backgroundColor }
 					angleCenter={ { x: 0.5, y: 0.5 } }
 					style={ [
 						styles.linearGradient,

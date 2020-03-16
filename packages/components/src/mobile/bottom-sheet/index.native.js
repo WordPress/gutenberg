@@ -31,9 +31,12 @@ import CyclePickerCell from './cycle-picker-cell';
 import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
+import ColorCell from './color-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
-export const { Provider: BottomSheetProvider, Consumer } = createContext();
+export const { Provider: BottomSheetProvider, Consumer } = createContext( {
+	isBottomSheetScrolling: false,
+} );
 
 class BottomSheet extends Component {
 	constructor() {
@@ -333,6 +336,7 @@ ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
+ThemedBottomSheet.ColorCell = ColorCell;
 
 export { Consumer as BottomSheetConsumer };
 export default ThemedBottomSheet;

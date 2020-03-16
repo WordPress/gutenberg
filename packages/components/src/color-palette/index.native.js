@@ -33,14 +33,9 @@ function ColorPalette( {
 	const isGradient = currentSegment === 'Gradient';
 	const isIOS = Platform.OS === 'ios';
 
-	const { setGradient, gradientValue } = __experimentalUseGradient(
-		{},
-		clientId
-	);
+	const { setGradient } = __experimentalUseGradient( {}, clientId );
 
-	const [ activeColor, setActiveColor ] = useState(
-		gradientValue || backgroundColor
-	);
+	const [ activeColor, setActiveColor ] = useState( backgroundColor );
 
 	const defaultColors = SETTINGS_DEFAULTS.colors;
 	const defaultGradientColors = SETTINGS_DEFAULTS.gradients;
@@ -56,19 +51,23 @@ function ColorPalette( {
 		}
 	}
 
-	const GradientSwatch = () => {
+	function Swatch( { gradient } ) {
+		const palette = gradient ? defaultGradientColors : defaultColors;
 		return (
 			<>
-				{ defaultGradientColors.map( ( color ) => {
-					const isSelected = color.gradient === activeColor;
+				{ palette.map( ( color ) => {
+					const paletteColor = gradient
+						? color.gradient
+						: color.color;
+					const isSelected = paletteColor === activeColor;
 					return (
 						<TouchableWithoutFeedback
-							onPress={ () => onColorPress( color.gradient ) }
-							key={ color.gradient }
+							onPress={ () => onColorPress( paletteColor ) }
+							key={ paletteColor }
 						>
 							<View>
 								<ColorIndicator
-									color={ color.gradient }
+									color={ paletteColor }
 									gradient
 									isSelected={ isSelected }
 								/>
@@ -78,27 +77,12 @@ function ColorPalette( {
 				} ) }
 			</>
 		);
-	};
+	}
 
 	const ColorSwatch = () => {
 		return (
-			<View style={ { flexDirection: 'row' } }>
-				{ defaultColors.map( ( color ) => {
-					const isSelected = color.color === activeColor;
-					return (
-						<TouchableWithoutFeedback
-							onPress={ () => onColorPress( color.color ) }
-							key={ color.color }
-						>
-							<View>
-								<ColorIndicator
-									color={ color.color }
-									isSelected={ isSelected }
-								/>
-							</View>
-						</TouchableWithoutFeedback>
-					);
-				} ) }
+			<View style={ styles.row }>
+				<Swatch gradient={ false } />
 				<View style={ styles.verticalSeparator } />
 				<TouchableWithoutFeedback onPress={ onCustomPress }>
 					<Text style={ styles.customButton }>
@@ -116,7 +100,7 @@ function ColorPalette( {
 			showsHorizontalScrollIndicator={ false }
 			keyboardShouldPersistTaps={ true }
 		>
-			{ isGradient ? <GradientSwatch /> : <ColorSwatch /> }
+			{ isGradient ? <Swatch gradient /> : <ColorSwatch /> }
 		</ScrollView>
 	);
 }

@@ -62,3 +62,4 @@ export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
 export { default as LinearGradient } from './mobile/linear-gradient';
 export { default as SegmentedControls } from './mobile/segmented-control';
+export { default as NavigationHeader } from './mobile/bottom-sheet/navigation-header';

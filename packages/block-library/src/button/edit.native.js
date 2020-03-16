@@ -6,8 +6,6 @@ import {
 	AccessibilityInfo,
 	Platform,
 	Clipboard,
-	TouchableWithoutFeedback,
-	Text,
 	LayoutAnimation,
 } from 'react-native';
 import HsvColorPicker from 'react-native-hsv-color-picker';
@@ -15,12 +13,13 @@ import HsvColorPicker from 'react-native-hsv-color-picker';
  * WordPress dependencies
  */
 import { withInstanceId, compose } from '@wordpress/compose';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	RichText,
 	withColors,
 	InspectorControls,
 	BlockControls,
+	SETTINGS_DEFAULTS,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -34,11 +33,13 @@ import {
 	ColorControl,
 	SegmentedControls,
 	ColorPalette,
+	ColorIndicator,
+	NavigationHeader,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { link, external, Icon, chevronLeft } from '@wordpress/icons';
+import { link, external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -174,14 +175,20 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor, attributes } = this.props;
-		if ( attributes.gradient ) {
-			return null;
-		} else if ( backgroundColor.color ) {
-			// `backgroundColor` which should be set when we are able to resolve it
-			return backgroundColor.color;
+		const { attributes, backgroundColor } = this.props;
+		const { gradient, customGradient } = attributes;
+		const fallbackBackgroundColor = styles.fallbackButton.backgroundColor;
+		const defaultGradients = SETTINGS_DEFAULTS.gradients;
+
+		if ( gradient ) {
+			const gradientColor = defaultGradients.find(
+				( defaultGradient ) => defaultGradient.slug === gradient
+			).gradient;
+			return gradientColor;
+		} else if ( customGradient ) {
+			return customGradient;
 		}
-		return styles.fallbackButton.backgroundColor;
+		return backgroundColor.color || fallbackBackgroundColor;
 	}
 
 	onChangeText( value ) {
@@ -528,7 +535,6 @@ class ButtonEdit extends Component {
 												label={ __( 'Background' ) }
 												color={ backgroundColor }
 												separatorType="fullWidth"
-												clientId={ clientId }
 											/>
 											<ColorControl
 												onPress={ () => {
@@ -541,7 +547,6 @@ class ButtonEdit extends Component {
 													textColor.color || '#fff'
 												}
 												separatorType="none"
-												clientId={ clientId }
 											/>
 										</PanelBody>
 									</View>
@@ -552,45 +557,31 @@ class ButtonEdit extends Component {
 							) {
 								return (
 									<View>
-										<View
-											style={
-												styles.bottomSheetColorsHeader
+										<NavigationHeader
+											screen={ screen }
+											leftButtonOnPress={ () =>
+												this.changeBottomSheetContent(
+													'Settings'
+												)
 											}
-										>
-											<TouchableWithoutFeedback
-												onPress={ () => {
-													this.changeBottomSheetContent(
-														'Settings'
-													);
-												} }
-												label={ __( 'Background' ) }
-											>
-												<View
-													style={
-														styles.bottomSheetBackButton
-													}
-												>
-													<Icon
-														icon={ chevronLeft }
-													/>
-												</View>
-											</TouchableWithoutFeedback>
-											<Text
-												style={
-													styles.bottomSheetHeaderTitle
-												}
-											>
-												{ sprintf(
-													__( '%s' ),
-													screen
-												) }
-											</Text>
-										</View>
+										/>
 										{ this.getColorPalette() }
+										<View
+											style={ styles.horizontalSeparator }
+										/>
 										<SegmentedControls
 											segments={ [ 'Solid', 'Gradient' ] }
 											segmentHandler={
 												this.onSegmentHandler
+											}
+											addonLeft={
+												<ColorIndicator
+													color={ backgroundColor }
+													style={ {
+														width: 24,
+														height: 24,
+													} }
+												/>
 											}
 										/>
 									</View>

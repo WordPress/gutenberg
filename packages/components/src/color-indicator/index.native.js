@@ -12,14 +12,16 @@ import { LinearGradient } from '@wordpress/components';
  */
 import styles from './style.scss';
 
-function ColorIndicator( { color, isSelected, gradient, style } ) {
+function ColorIndicator( { color, isSelected, style } ) {
 	const SelectedIcon = () => (
 		<View style={ styles.selected }>
 			<Icon icon={ check } />
 		</View>
 	);
 
-	if ( gradient ) {
+	const isGradient = color.includes( 'linear-gradient' );
+
+	if ( isGradient ) {
 		return (
 			<LinearGradient
 				style={ [ styles.circleOption, style ] }

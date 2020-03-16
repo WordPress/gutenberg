@@ -7,15 +7,11 @@ import { ColorIndicator } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { __experimentalUseGradient } from '@wordpress/block-editor';
 import Cell from './cell';
 import styles from './styles.scss';
 
 export default function BottomSheetColorCell( props ) {
-	const { onPress, color, clientId, ...cellProps } = props;
-
-	const { gradientValue } = __experimentalUseGradient( {}, clientId );
-	const isGradient = gradientValue && ! color;
+	const { onPress, color, ...cellProps } = props;
 
 	return (
 		<Cell
@@ -29,11 +25,7 @@ export default function BottomSheetColorCell( props ) {
 			editable={ false }
 			value={ '' }
 		>
-			<ColorIndicator
-				color={ isGradient ? gradientValue : color }
-				style={ styles.colorCircle }
-				gradient={ isGradient }
-			/>
+			<ColorIndicator color={ color } style={ styles.colorCircle } />
 			<Icon icon={ chevronRight }></Icon>
 		</Cell>
 	);

@@ -17,7 +17,6 @@
 	flex-direction: row;
 	align-self: center;
 	padding: 4px;
-	margin: 8px;
 }
 
 .outline {
@@ -41,4 +40,10 @@
 
 .buttonTextSelected {
 	color: rgba(0, 0, 0, 0.87);
+}
+
+.row {
+	flex-direction: row;
+	align-items: center;
+	padding: $panel-padding / 2 $panel-padding;
 }

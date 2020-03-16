@@ -173,9 +173,43 @@
 // Color Cell
 
 .colorCircle {
-	width: 30px;
-	height: 30px;
-	border-radius: 15px;
+	width: 32px;
+	height: 32px;
+	border-radius: 16px;
 	border-color: $gray;
 	border-width: $border-width;
+}
+
+// Navigation Header
+
+.bottomSheetHeader {
+	flex-direction: row;
+	align-items: center;
+}
+
+.bottomSheetBackButton {
+	flex-direction: row;
+	align-items: center;
+	flex: 1;
+}
+
+.bottomSheetBackButtonIcon {
+	color: $blue-wordpress;
+	width: 36px;
+}
+
+.bottomSheetHeaderTitle {
+	text-align: center;
+	font-weight: 500;
+	font-size: 16px;
+	flex: 2;
+}
+
+.bottomSheetBackButtonText {
+	font-size: 16px;
+	color: $blue-wordpress;
+}
+
+.bottomSheetRightSpace {
+	flex: 1;
 }
