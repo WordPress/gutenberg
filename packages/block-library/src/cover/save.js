@@ -64,7 +64,7 @@ export default function save( { attributes } ) {
 		{
 			'has-background-dim': dimRatio !== 0,
 			'has-parallax': hasParallax,
-			'has-background-gradient': customGradient,
+			'has-background-gradient': gradient || customGradient,
 			[ gradientClass ]: ! url && gradientClass,
 		}
 	);
