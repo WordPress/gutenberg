@@ -92,9 +92,14 @@ class BlockListBlock extends Component {
 			// Do not add horizontal margin in nested blocks
 			! hasParent && styles.withMarginHorizontal,
 			// remove margin bottom for the last block (the margin is added to the parent)
-			! isLastBlock && styles.withMarginBottom,
+			! isLastBlock && name !== 'core/column' && styles.withMarginBottom,
+			// TODO1: handle bottom margin in horizontal block (keep in note that in Column there will be also appender before mobile toolbar)
+			// TODO2: handle proper FloatingToolbar position when Column block is selected
+			name === 'core/column' && { marginBottom: 32 },
 			// remove margin top for the first block that is not on the root level (the margin is added to the parent)
-			! ( isFirstBlock && hasParent ) && styles.withMarginTop,
+			! ( isFirstBlock && hasParent ) &&
+				name !== 'core/column' &&
+				styles.withMarginTop,
 			isDimmed && styles.dimmed,
 			name === 'core/column' && { flex: 1 },
 		];

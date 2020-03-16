@@ -119,6 +119,7 @@ function ColumnsEditContainer( {
 						},
 						horizontal: true,
 						scrollEnabled: false,
+						style: { overflow: 'visible' },
 					} }
 					containerStyle={ { flex: 1 } }
 					allowedBlocks={ ALLOWED_BLOCKS }

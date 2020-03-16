@@ -13,7 +13,6 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
-import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
  */
@@ -26,12 +25,7 @@ function ColumnEdit( {
 	isSelected,
 	getStylesFromColorScheme,
 	isParentSelected,
-	isDescendantOfParentSelected,
-	isDescendantSelected,
-	isAncestorSelected,
 	columnsSettings,
-	isColumnsInRootList,
-	isDeepNested,
 } ) {
 	const { verticalAlignment } = attributes;
 	const { columnsInRow, width: columnsContainerWidth } = columnsSettings;
@@ -43,70 +37,13 @@ function ColumnEdit( {
 	const minWidth = Math.min( containerWidth, containerMaxWidth );
 	const columnBaseWidth = minWidth / Math.max( 1, columnsInRow );
 
-	const applyBlockStyle = ( placeholder = false ) => {
-		const pullWidths = ( names ) =>
-			names.map(
-				( name ) =>
-					( styles[ `column-${ name }-margin` ] || {} ).width || 0
-			);
-
+	const applyBlockStyle = () => {
 		let width = columnBaseWidth;
-		const names = [
-			'selected',
-			'parent-selected',
-			'descendant-selected',
-			'placeholder-selected',
-			'dashed-border',
-		];
-		const widths = pullWidths( names );
-		const [
-			emptyColumnSelected,
-			parentSelected,
-			columnSelected,
-			placeholderParentSelected,
-			dashedBorderWidth,
-		] = widths;
-
-		switch ( true ) {
-			case isSelected:
-				width = columnBaseWidth;
-				width -= ! hasChildren
-					? emptyColumnSelected
-					: columnSelected + dashedBorderWidth;
-				break;
-
-			case isParentSelected:
-				width -= placeholder
-					? placeholderParentSelected
-					: parentSelected;
-				break;
-
-			case isDescendantSelected:
-				width = columnBaseWidth;
-				break;
-
-			case isDescendantOfParentSelected:
-				width = columnBaseWidth;
-				if ( ! hasChildren ) width -= emptyColumnSelected;
-				break;
-
-			case isAncestorSelected:
-				width = columnBaseWidth;
-				if ( ! hasChildren ) width -= parentSelected;
-				break;
-
-			case placeholder:
-				width -=
-					columnsInRow === 1
-						? parentSelected
-						: placeholderParentSelected;
-				width -= columnSelected;
-				if ( ! isDeepNested ) width -= dashedBorderWidth;
-				if ( isColumnsInRootList ) width -= parentSelected;
-				break;
-
-			default:
-		}
+		//TODO: 6 is spacing between Column, find a way to pass it better and verify if 6 is proper value
+		if ( columnsInRow > 1 )
+			width =
+				( minWidth - ( columnsInRow + 1 ) * 6 ) /
+				Math.max( 1, columnsInRow );
 
 		return { width };
 	};
@@ -151,6 +88,7 @@ function ColumnEdit( {
 				<InnerBlocks
 					flatListProps={ {
 						scrollEnabled: false,
+						style: { overflow: 'visible' },
 					} }
 					renderAppender={
 						isSelected && InnerBlocks.ButtonBlockAppender
@@ -182,7 +120,6 @@ function ColumnEditWrapper( props ) {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const {
-			getBlockParents,
 			getBlockCount,
 			getBlockRootClientId,
 			getSelectedBlockClientId,
@@ -197,33 +134,11 @@ export default compose( [
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
 
-		const selectedParents = selectedBlockClientId
-			? getBlockParents( selectedBlockClientId )
-			: [];
-		const isDescendantOfParentSelected = selectedParents.includes(
-			parentId
-		);
-
-		const parents = getBlockParents( clientId, true );
-		const isColumnsInRootList = !! parents[ 2 ];
-
-		const isAncestorSelected =
-			selectedBlockClientId && parents.includes( selectedBlockClientId );
-		const isDescendantSelected = selectedParents.includes( clientId );
-
-		const isDeepNested = parents.length > 2;
-
 		return {
 			hasChildren,
 			isParentSelected,
 			isSelected,
-			isDescendantOfParentSelected,
-			isAncestorSelected,
-			isDescendantSelected,
-			isColumnsInRootList,
-			isDeepNested,
 		};
 	} ),
-	withViewportMatch( { isMobile: '< mobile' } ),
 	withPreferredColorScheme,
 ] )( ColumnEditWrapper );
