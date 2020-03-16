@@ -6,7 +6,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { DateTimePicker } from '@wordpress/components';
 
-export function PostSchedule( { date, onUpdateDate } ) {
+export function PostSchedule( { date, modified, onUpdateDate } ) {
 	const settings = __experimentalGetSettings();
 	// To know if the current timezone is a 12 hour time with look for "a" in the time format
 	// We also make sure this a is not escaped by a "/"
@@ -22,7 +22,7 @@ export function PostSchedule( { date, onUpdateDate } ) {
 	return (
 		<DateTimePicker
 			key="date-time-picker"
-			currentDate={ date }
+			currentDate={ date || modified }
 			onChange={ onUpdateDate }
 			is12Hour={ is12HourTime }
 		/>
@@ -33,6 +33,9 @@ export default compose( [
 	withSelect( ( select ) => {
 		return {
 			date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
+			modified: select( 'core/editor' ).getEditedPostAttribute(
+				'modified'
+			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
