@@ -360,9 +360,9 @@ class LatestPostsEdit extends Component {
 										.trim()
 										.split( ' ', excerptLength )
 										.join( ' ' ) +
-								  ' ... <a href=' +
+								  ' ... <a href="' +
 								  post.link +
-								  'target="_blank" rel="noopener noreferrer">' +
+								  '" target="_blank" rel="noopener noreferrer">' +
 								  __( 'Read more' ) +
 								  '</a>'
 								: excerpt;
