@@ -5,7 +5,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 /**
@@ -26,6 +26,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		mode,
 		moverDirection,
 		hasMovers = true,
+		rootClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockMode,
@@ -60,12 +61,19 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		};
 	}, [] );
 
+	const { toggleBlockFocus } = useDispatch( 'core/block-editor' );
 	const nodeRef = useRef();
 
-	const {
-		showMovers,
-		gestures: showMoversGestures,
-	} = useShowMoversGestures( { ref: nodeRef } );
+	const handleOnFocusChange = ( isFocused ) => {
+		toggleBlockFocus( rootClientId, isFocused );
+	};
+
+	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
+		{
+			ref: nodeRef,
+			onChange: handleOnFocusChange,
+		}
+	);
 
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;

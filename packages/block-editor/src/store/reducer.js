@@ -1448,6 +1448,18 @@ export function automaticChangeStatus( state, action ) {
 	// Reset the state by default (for any action not handled).
 }
 
+export function blockFocused( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'FOCUS_BLOCK':
+			return action.clientId;
+
+		case 'UNFOCUS_BLOCK':
+			return undefined;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1467,4 +1479,5 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	isNavigationMode,
 	automaticChangeStatus,
+	blockFocused,
 } );

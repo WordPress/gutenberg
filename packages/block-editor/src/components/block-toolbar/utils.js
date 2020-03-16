@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+/**
  * WordPress dependencies
  */
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
@@ -12,9 +16,17 @@ export function useDebouncedShowMovers( {
 	ref,
 	isFocused,
 	debounceTimeout = 500,
+	onChange = noop,
 } ) {
 	const [ showMovers, setShowMovers ] = useState( false );
 	const timeoutRef = useRef();
+
+	const handleOnChange = ( nextIsFocused ) => {
+		if ( nextIsFocused !== showMovers ) {
+			setShowMovers( nextIsFocused );
+			onChange( nextIsFocused );
+		}
+	};
 
 	const getIsHovered = () => {
 		return ref?.current && ref.current.matches( ':hover' );
@@ -38,7 +50,7 @@ export function useDebouncedShowMovers( {
 				clearTimeout( timeout );
 			}
 			if ( ! showMovers ) {
-				setShowMovers( true );
+				handleOnChange( true );
 			}
 		},
 		[ showMovers ]
@@ -52,7 +64,7 @@ export function useDebouncedShowMovers( {
 
 			timeoutRef.current = setTimeout( () => {
 				if ( shouldHideMovers() ) {
-					setShowMovers( false );
+					handleOnChange( false );
 				}
 			}, debounceTimeout );
 		},
@@ -72,13 +84,17 @@ export function useDebouncedShowMovers( {
  * Hook that provides a showMovers state and gesture events for DOM elements
  * that interact with the showMovers state.
  */
-export function useShowMoversGestures( { ref, debounceTimeout = 500 } ) {
+export function useShowMoversGestures( {
+	ref,
+	debounceTimeout = 500,
+	onChange = noop,
+} ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const {
 		showMovers,
 		debouncedShowMovers,
 		debouncedHideMovers,
-	} = useDebouncedShowMovers( { ref, debounceTimeout, isFocused } );
+	} = useDebouncedShowMovers( { ref, debounceTimeout, isFocused, onChange } );
 
 	const registerRef = useRef( false );
 

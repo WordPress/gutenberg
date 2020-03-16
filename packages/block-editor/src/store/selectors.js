@@ -1621,3 +1621,9 @@ export function isNavigationMode( state ) {
 export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
 }
+
+export function getIsBlockFocused( state ) {
+	const clientId = getSelectedBlockClientId( state );
+
+	return state.blockFocused === clientId;
+}
