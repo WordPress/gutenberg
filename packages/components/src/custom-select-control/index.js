@@ -99,7 +99,7 @@ export default function CustomSelectControl( {
 			) }
 		>
 			{ hideLabelFromVision ? (
-				<VisuallyHidden as="label"> { label } </VisuallyHidden>
+				<VisuallyHidden as="label" {...getLabelProps()}> { label } </VisuallyHidden>
 			) : (
 				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
 				<label
