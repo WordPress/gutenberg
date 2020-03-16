@@ -15,6 +15,7 @@ import {
 	IconButton,
 	Icon,
 	Button,
+	Snackbar,
 	withNotices,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -121,11 +122,9 @@ class RichImage extends Component {
 
 				<div className={ classes }>
 					{ inProgress && (
-						<Fragment>
-							<div className="richimage__working-notice">
-								{ __( 'Processing…' ) }
-							</div>
-						</Fragment>
+						<Snackbar className="richimage__working-notice">
+							{ __( 'Processing…' ) }
+						</Snackbar>
 					) }
 
 					<CroppedImage
