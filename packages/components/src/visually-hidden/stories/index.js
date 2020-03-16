@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import VisuallyHidden from '../';
+import VisuallyHidden, { VisibilityHelper } from '../';
 
 export default {
 	title: 'Components/VisuallyHidden',
@@ -37,6 +37,22 @@ export const withAdditionalClassNames = () => (
 		<VisuallyHidden as="label" className="test-input">
 			Check out my class!{ ' ' }
 		</VisuallyHidden>
+		Inspect the HTML to see!
+	</>
+);
+
+export const withVisibilityHelper = () => (
+	<>
+		You can use { '<VisibilityHelper/>' } to conditionally apply
+		VisuallyHidden component.
+		<br />
+		<VisibilityHelper isHidden={ true } as="label">
+			I am hidden!{ ' ' }
+		</VisibilityHelper>
+		<VisibilityHelper isHidden={ false } as="label">
+			I am visible!{ ' ' }
+		</VisibilityHelper>
+		<br />
 		Inspect the HTML to see!
 	</>
 );

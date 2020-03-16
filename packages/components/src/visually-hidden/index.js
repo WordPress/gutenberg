@@ -19,4 +19,26 @@ function VisuallyHidden( { as = 'div', className, ...props } ) {
 		...props,
 	} );
 }
+
+/**
+ * VisibilityHelper component to simplify common use-case of
+ * conditionally hiding components.
+ */
+export function VisibilityHelper( {
+	className,
+	isHidden = false,
+	as,
+	...props
+} ) {
+	if ( isHidden ) {
+		return <VisuallyHidden as={ as } { ...props } />;
+	}
+
+	return renderAsRenderProps( {
+		as,
+		className,
+		...props,
+	} );
+}
+
 export default VisuallyHidden;
