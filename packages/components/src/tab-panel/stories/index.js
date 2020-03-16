@@ -14,7 +14,6 @@ export const _default = () => {
 	return (
 		<TabPanel
 			className="my-tab-panel"
-			activeClass="active-tab"
 			tabs={ [
 				{
 					name: 'tab1',

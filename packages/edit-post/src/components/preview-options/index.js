@@ -17,7 +17,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PostPreviewButton } from '@wordpress/editor';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { external, check } from '@wordpress/icons';
 
 const downArrow = (
@@ -43,17 +43,6 @@ export default function PreviewOptions( {
 		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
 
-	const translateDropdownButtonText = () => {
-		switch ( deviceType ) {
-			case 'Tablet':
-				return __( 'Tablet' );
-			case 'Mobile':
-				return __( 'Mobile' );
-			default:
-				return __( 'Desktop' );
-		}
-	};
-
 	const isSaveable = useSelect( ( select ) => {
 		return select( 'core/editor' ).isEditedPostSaveable();
 	}, [] );
@@ -77,15 +66,13 @@ export default function PreviewOptions( {
 					aria-expanded={ isOpen }
 					disabled={ ! isSaveable }
 				>
-					{ translateDropdownButtonText() }
-					<div className="editor-post-preview__button-separator">
-						{ downArrow }
-					</div>
+					{ __( 'Preview' ) }
+					{ downArrow }
 				</Button>
 			) }
 			renderContent={ () => (
 				<>
-					<MenuGroup label={ _x( 'View', 'noun' ) }>
+					<MenuGroup>
 						<MenuItem
 							className="editor-post-preview__button-resize"
 							onClick={ () => setPreviewDeviceType( 'Desktop' ) }
@@ -119,8 +106,8 @@ export default function PreviewOptions( {
 									forcePreviewLink={ forcePreviewLink }
 									textContent={
 										<>
-											{ __( 'Preview externally' ) }
 											<Icon icon={ external } />
+											{ __( 'Preview in new tab' ) }
 										</>
 									}
 								/>

@@ -39,7 +39,7 @@ function ColumnEdit( {
 	const containerWidth = columnsContainerWidth || containerMaxWidth;
 
 	const minWidth = Math.min( containerWidth, containerMaxWidth );
-	const columnBaseWidth = minWidth / Math.max( columnsInRow, 1 );
+	const columnBaseWidth = minWidth / Math.max( 1, columnsInRow );
 
 	const applyBlockStyle = ( placeholder = false ) => {
 		const pullWidths = ( names ) =>

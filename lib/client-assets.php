@@ -668,13 +668,20 @@ function gutenberg_load_block_pattern( $name ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_settings_block_patterns( $settings ) {
-	$block_patterns                          = [
-		gutenberg_load_block_pattern( 'text-two-columns' ),
-		gutenberg_load_block_pattern( 'two-buttons' ),
-		gutenberg_load_block_pattern( 'cover-abc' ),
-		gutenberg_load_block_pattern( 'two-images' ),
-	];
-	$settings['__experimentalBlockPatterns'] = $block_patterns;
+	if ( empty( $settings['__experimentalBlockPatterns'] ) ) {
+		$settings['__experimentalBlockPatterns'] = [];
+	}
+
+	$settings['__experimentalBlockPatterns'] = array_merge(
+		[
+			gutenberg_load_block_pattern( 'text-two-columns' ),
+			gutenberg_load_block_pattern( 'two-buttons' ),
+			gutenberg_load_block_pattern( 'cover-abc' ),
+			gutenberg_load_block_pattern( 'two-images' ),
+		],
+		$settings['__experimentalBlockPatterns']
+	);
+
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns' );
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns', 0 );

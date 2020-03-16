@@ -21,6 +21,22 @@ function gutenberg_edit_site_page() {
 }
 
 /**
+ * Checks whether the provided page is one of allowed Site Editor pages.
+ *
+ * @param string $page Page to check.
+ *
+ * @return bool True for Site Editor pages, false otherwise.
+ */
+function gutenberg_is_edit_site_page( $page ) {
+	$allowed_pages = array(
+		'gutenberg_page_gutenberg-edit-site',
+		'toplevel_page_gutenberg-edit-site',
+	);
+
+	return in_array( $page, $allowed_pages, true );
+}
+
+/**
  * Initialize the Gutenberg Edit Site Page.
  *
  * @since 7.2.0
@@ -35,10 +51,7 @@ function gutenberg_edit_site_init( $hook ) {
 		$_wp_current_template_hierarchy,
 		$_wp_current_template_part_ids;
 
-	$allowed_hooks = array( 'gutenberg_page_gutenberg-edit-site' );
-	$allowed_hooks = apply_filters( 'site_editor_allowed_hooks', $allowed_hooks );
-
-	if ( ! in_array( $hook, $allowed_hooks, true ) ) {
+	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
 	}
 
