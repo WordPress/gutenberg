@@ -1,7 +1,18 @@
 /**
  * External dependencies
  */
-import { get, invoke, isUndefined, pickBy } from 'lodash';
+import {
+	compact,
+	concat,
+	find,
+	get,
+	invoke,
+	isUndefined,
+	pickBy,
+	throttle,
+	map,
+	unescape as unescapeString,
+} from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -47,16 +58,147 @@ import {
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
 };
+const TAG_LIST_QUERY = {
+	per_page: -1,
+	orderby: 'count',
+	order: 'desc',
+	_fields: 'id,name',
+};
+
+const isSameTermName = ( termA, termB ) =>
+	termA.toLowerCase() === termB.toLowerCase();
+
+/**
+ * Returns a term object with name unescaped.
+ * The unescape of the name property is done using lodash unescape function.
+ *
+ * @param {Object} term The term object to unescape.
+ *
+ * @return {Object} Term object with name property unescaped.
+ */
+const unescapeTerm = ( term ) => {
+	return {
+		...term,
+		name: unescapeString( term.name ),
+	};
+};
+
+/**
+ * Returns an array of term objects with names unescaped.
+ * The unescape of each term is performed using the unescapeTerm function.
+ *
+ * @param {Object[]} terms Array of term objects to unescape.
+ *
+ * @return {Object[]} Array of term objects unescaped.
+ */
+const unescapeTerms = ( terms ) => {
+	return map( terms, unescapeTerm );
+};
 
 class LatestPostsEdit extends Component {
 	constructor() {
 		super( ...arguments );
+		this.searchTerms = throttle( this.searchTerms.bind( this ), 500 );
+		this.updateTags = this.updateTags.bind( this );
+		this.tokenizeTags = this.tokenizeTags.bind( this );
+		this.getTagsDetails = this.getTagsDetails.bind( this );
+		this.getCategoriesDetails = this.getCategoriesDetails.bind( this );
 		this.state = {
 			categoriesList: [],
+			tagsList: [],
+			tokenizedTags: [],
+			suggestedTags: [],
 		};
 	}
 
-	componentDidMount() {
+	tokenizeTags( tagsList ) {
+		let tokenizedTags = [];
+		if ( tagsList.length > 0 ) {
+			tokenizedTags = tagsList.reduce( ( accumulator, tag ) => {
+				accumulator.push( tag.name );
+				return accumulator;
+			}, [] );
+		}
+		this.setState( { tokenizedTags } );
+	}
+
+	updateTags( termNames ) {
+		const { setAttributes } = this.props;
+		const newTags = compact(
+			concat(
+				termNames.map( ( termName ) => {
+					return find( this.state.suggestedTags, ( result ) => {
+						return isSameTermName( result.name, termName );
+					} );
+				} ),
+				termNames.map( ( termName ) => {
+					return find( this.state.tagsList, ( result ) => {
+						return isSameTermName( result.name, termName );
+					} );
+				} )
+			)
+		);
+		const tagsIds = newTags.map( ( { id } ) => id );
+		setAttributes( { tags: tagsIds } );
+		this.getTagsDetails( tagsIds );
+		this.tokenizeTags( newTags );
+	}
+
+	searchTerms( search = '' ) {
+		invoke( this.searchRequest, [ 'abort' ] );
+		this.searchRequest = this.fetchTerms( { search } );
+	}
+
+	fetchTerms( params = {} ) {
+		const query = { ...TAG_LIST_QUERY, ...params };
+		const request = apiFetch( {
+			path: addQueryArgs( `/wp/v2/tags`, query ),
+		} );
+		request.then( unescapeTerms ).then( ( terms ) => {
+			this.setState( ( state ) => ( {
+				suggestedTags: state.tagsList.concat(
+					terms.filter(
+						( term ) =>
+							! find(
+								state.tagsList,
+								( tag ) => tag.id === term.id
+							)
+					)
+				),
+			} ) );
+		} );
+
+		return request;
+	}
+
+	getTagsDetails( newTags = false ) {
+		this.isStillMounted = true;
+		let { tags } = this.props.attributes;
+		if ( newTags ) {
+			tags = newTags;
+		}
+		if ( tags && tags.length > 0 ) {
+			this.fetchRequest = apiFetch( {
+				path: addQueryArgs( `/wp/v2/tags`, {
+					include: tags.join( ',' ),
+				} ),
+			} )
+				.then( ( tagsList ) => {
+					if ( this.isStillMounted ) {
+						this.setState( { tagsList } );
+						this.tokenizeTags( tagsList );
+					}
+				} )
+				.catch( () => {
+					if ( this.isStillMounted ) {
+						this.setState( { tagsList: [] } );
+						this.tokenizeTags( [] );
+					}
+				} );
+		}
+	}
+
+	getCategoriesDetails() {
 		this.isStillMounted = true;
 		this.fetchRequest = apiFetch( {
 			path: addQueryArgs( `/wp/v2/categories`, CATEGORIES_LIST_QUERY ),
@@ -73,6 +215,11 @@ class LatestPostsEdit extends Component {
 			} );
 	}
 
+	componentDidMount() {
+		this.getCategoriesDetails();
+		this.getTagsDetails();
+	}
+
 	componentWillUnmount() {
 		this.isStillMounted = false;
 	}
@@ -86,7 +233,7 @@ class LatestPostsEdit extends Component {
 			defaultImageWidth,
 			defaultImageHeight,
 		} = this.props;
-		const { categoriesList } = this.state;
+		const { categoriesList, tokenizedTags, suggestedTags } = this.state;
 		const {
 			displayFeaturedImage,
 			displayPostContentRadio,
@@ -251,6 +398,12 @@ class LatestPostsEdit extends Component {
 						categorySuggestions={ categorySuggestions }
 						onCategoryChange={ selectCategories }
 						selectedCategories={ categories }
+						selectedTags={ tokenizedTags }
+						onTagsChange={ this.updateTags }
+						onTagInputChage={ this.searchTerms }
+						suggestedTags={ suggestedTags.map(
+							( tag ) => tag.name
+						) }
 					/>
 
 					{ postLayout === 'grid' && (
@@ -440,6 +593,7 @@ export default withSelect( ( select, props ) => {
 		order,
 		orderBy,
 		categories,
+		tags,
 	} = props.attributes;
 	const { getEntityRecords, getMedia } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
@@ -451,6 +605,7 @@ export default withSelect( ( select, props ) => {
 	const latestPostsQuery = pickBy(
 		{
 			categories: catIds,
+			tags,
 			order,
 			orderby: orderBy,
 			per_page: postsToShow,

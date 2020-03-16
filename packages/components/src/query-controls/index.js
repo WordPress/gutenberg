@@ -11,16 +11,22 @@ import { RangeControl, SelectControl, FormTokenField } from '../';
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
 const MAX_CATEGORIES_SUGGESTIONS = 20;
+const MAX_TERMS_SUGGESTIONS = 20;
 
 export default function QueryControls( {
 	categorySuggestions,
 	selectedCategories,
+	onCategoryChange,
+	selectedTags,
+	suggestedTags,
+	onTagInputChage,
+	tagsLoading,
+	onTagsChange,
 	numberOfItems,
 	order,
 	orderBy,
 	maxItems = DEFAULT_MAX_ITEMS,
 	minItems = DEFAULT_MIN_ITEMS,
-	onCategoryChange,
 	onNumberOfItemsChange,
 	onOrderChange,
 	onOrderByChange,
@@ -77,7 +83,17 @@ export default function QueryControls( {
 				maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
 			/>
 		),
-
+		onTagsChange && (
+			<FormTokenField
+				value={ selectedTags }
+				suggestions={ suggestedTags }
+				onChange={ onTagsChange }
+				onInputChange={ onTagInputChage }
+				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
+				disabled={ tagsLoading }
+				label={ __( 'Filter by tags' ) }
+			/>
+		),
 		onNumberOfItemsChange && (
 			<RangeControl
 				key="query-controls-range-control"
