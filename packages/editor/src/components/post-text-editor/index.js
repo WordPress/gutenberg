@@ -68,10 +68,11 @@ export class PostTextEditor extends Component {
 		const { instanceId } = this.props;
 		return (
 			<>
-				<VisuallyHidden>
-					<label htmlFor={ `post-content-${ instanceId }` }>
-						{ __( 'Type text or HTML' ) }
-					</label>
+				<VisuallyHidden
+					as="label"
+					htmlFor={ `post-content-${ instanceId }` }
+				>
+					{ __( 'Type text or HTML' ) }
 				</VisuallyHidden>
 				<Textarea
 					autoComplete="off"

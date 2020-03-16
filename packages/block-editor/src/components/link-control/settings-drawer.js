@@ -44,8 +44,8 @@ const LinkControlSettingsDrawer = ( {
 
 	return (
 		<fieldset className="block-editor-link-control__settings">
-			<VisuallyHidden>
-				<legend>{ __( 'Currently selected link settings' ) }</legend>
+			<VisuallyHidden as="legend">
+				{ __( 'Currently selected link settings' ) }
 			</VisuallyHidden>
 			{ theSettings }
 		</fieldset>

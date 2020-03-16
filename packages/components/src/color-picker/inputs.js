@@ -177,8 +177,8 @@ export class Inputs extends Component {
 		} else if ( this.state.view === 'rgb' ) {
 			return (
 				<fieldset>
-					<VisuallyHidden>
-						<legend>{ __( 'Color value in RGB' ) }</legend>
+					<VisuallyHidden as="legend">
+						{ __( 'Color value in RGB' ) }
 					</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input

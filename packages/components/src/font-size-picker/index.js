@@ -100,9 +100,7 @@ export default function FontSizePicker( {
 	const fontSizePickerNumberId = `components-font-size-picker__number#${ instanceId }`;
 	return (
 		<fieldset className="components-font-size-picker">
-			<VisuallyHidden>
-				<legend>{ __( 'Font size' ) }</legend>
-			</VisuallyHidden>
+			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
 			<div className="components-font-size-picker__controls">
 				{ fontSizes.length > 0 && (
 					<CustomSelectControl

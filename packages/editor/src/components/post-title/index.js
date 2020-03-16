@@ -91,10 +91,11 @@ class PostTitle extends Component {
 				<div className="editor-post-title">
 					<div className={ className }>
 						<div>
-							<VisuallyHidden>
-								<label htmlFor={ `post-title-${ instanceId }` }>
-									{ decodedPlaceholder || __( 'Add title' ) }
-								</label>
+							<VisuallyHidden
+								as="label"
+								htmlFor={`post-title-${instanceId}`}
+							>
+								{ decodedPlaceholder || __( 'Add title' ) }
 							</VisuallyHidden>
 							<Textarea
 								id={ `post-title-${ instanceId }` }
