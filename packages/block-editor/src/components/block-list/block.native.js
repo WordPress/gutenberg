@@ -98,14 +98,6 @@ class BlockListBlock extends Component {
 		];
 	}
 
-	applyToolbarStyle() {
-		const { hasChildren, isUnregisteredBlock } = this.props;
-
-		if ( ! hasChildren || isUnregisteredBlock ) {
-			return styles.neutralToolbar;
-		}
-	}
-
 	render() {
 		const {
 			attributes,
@@ -191,7 +183,7 @@ class BlockListBlock extends Component {
 								icon={ icon }
 							/>
 						) }
-						<View style={ this.applyToolbarStyle() }>
+						<View style={ styles.neutralToolbar }>
 							{ isSelected && (
 								<BlockMobileToolbar clientId={ clientId } />
 							) }
