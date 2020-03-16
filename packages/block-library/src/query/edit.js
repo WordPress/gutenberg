@@ -68,20 +68,10 @@ class Edit extends Component {
 		this.setState( { blocksTree: newBlocksTree } );
 	}
 
-	cleanBlock( block ) {
-		const { name, isValid, attributes, innerBlocks } = block;
-		return {
-			name,
-			attributes: { ...attributes, post: {} },
-			innerBlocks: innerBlocks.map( ( b ) => this.cleanBlock( b ) ),
-			isValid,
-		};
-	}
-
 	updateBlocks( blocks, postId ) {
 		const { setAttributes } = this.props;
 		const { blocksTree } = this.state;
-		const cleanBlocks = blocks.map( this.cleanBlock );
+		const cleanBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 		this.setState(
 			{
 				blocksTree: { ...( blocksTree || [] ), [ postId ]: blocks },
