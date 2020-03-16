@@ -8,8 +8,17 @@ import {
 	PostScheduleLabel,
 	PostScheduleCheck,
 } from '@wordpress/editor';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 export function PostSchedule() {
+	const allowUnschedule = useSelect(
+		( select ) =>
+			! select( 'core/editor' ).isEditedPostDateFloating() &&
+			! select( 'core/editor' ).isCurrentPostScheduled() &&
+			! select( 'core/editor' ).isCurrentPostPublished(),
+		[]
+	);
+	const { editPost } = useDispatch( 'core/editor' );
 	return (
 		<PostScheduleCheck>
 			<PanelRow className="edit-post-post-schedule">
@@ -32,6 +41,17 @@ export function PostSchedule() {
 					renderContent={ () => <PostScheduleForm /> }
 				/>
 			</PanelRow>
+			{ allowUnschedule && (
+				<PanelRow className="edit-post-post-unschedule">
+					<Button
+						isSmall
+						isSecondary
+						onClick={ () => editPost( { date: null } ) }
+					>
+						{ __( 'Unschedule' ) }
+					</Button>
+				</PanelRow>
+			) }
 		</PostScheduleCheck>
 	);
 }
