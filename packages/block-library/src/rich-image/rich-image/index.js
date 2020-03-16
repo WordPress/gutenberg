@@ -15,7 +15,6 @@ import {
 	IconButton,
 	Icon,
 	Button,
-	Modal,
 	withNotices,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -24,8 +23,6 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getFilterClass } from './filter-class';
-import FilterMenu from './filter-menu';
 import CroppedImage from './cropped-image';
 import richImageRequest from './api';
 import {
@@ -34,7 +31,6 @@ import {
 	FlipHorizontalIcon,
 	FlipVerticalIcon,
 	CropIcon,
-	FilterIcon,
 } from './icon';
 
 const ROTATE_STEP = 90;
@@ -54,11 +50,9 @@ class RichImage extends Component {
 			isCrop: false,
 			inProgress: null,
 			crop: DEFAULT_CROP,
-			isFilter: false,
 		};
 
 		this.adjustImage = this.adjustImage.bind( this );
-		this.applyFilter = this.applyFilter.bind( this );
 		this.cropImage = this.cropImage.bind( this );
 	}
 
@@ -90,17 +84,6 @@ class RichImage extends Component {
 			} );
 	}
 
-	applyFilter( imageFilter ) {
-		const { setAttributes, className } = this.props;
-		const adjustedAttrs = {
-			imageFilter,
-			...getFilterClass( imageFilter, className ),
-		};
-
-		setAttributes( adjustedAttrs );
-		this.setState( { isFilter: false } );
-	}
-
 	cropImage() {
 		const { crop } = this.state;
 
@@ -119,8 +102,8 @@ class RichImage extends Component {
 			originalBlock: OriginalBlock,
 			noticeUI,
 		} = this.props;
-		const { isCrop, inProgress, crop, isFilter } = this.state;
-		const { url, imageFilter } = attributes;
+		const { isCrop, inProgress, crop } = this.state;
+		const { url } = attributes;
 		const isEditing = ! isCrop && isSelected && url;
 
 		if ( ! isSelected ) {
@@ -263,15 +246,6 @@ class RichImage extends Component {
 									} )
 								}
 							/>
-							<IconButton
-								className="components-toolbar__control richimage-toolbar__control"
-								disabled={ inProgress }
-								icon={ <FilterIcon /> }
-								label={ __( 'Filter' ) }
-								onClick={ () =>
-									this.setState( { isFilter: true } )
-								}
-							/>
 						</Toolbar>
 					</BlockControls>
 				) }
@@ -294,22 +268,6 @@ class RichImage extends Component {
 							</Button>
 						</Toolbar>
 					</BlockControls>
-				) }
-
-				{ isFilter && (
-					<Modal
-						className="richimage__filter-modal"
-						title={ __( 'Photo Filters' ) }
-						onRequestClose={ () =>
-							this.setState( { isFilter: false } )
-						}
-					>
-						<FilterMenu
-							onSelect={ this.applyFilter }
-							url={ url }
-							currentFilter={ imageFilter }
-						/>
-					</Modal>
 				) }
 			</Fragment>
 		);

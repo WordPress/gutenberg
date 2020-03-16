@@ -396,9 +396,3 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
 .richimage-toolbar__control {
 	padding: 6px;
 }
-
-// Make the filter dialog bigger.
-.richimage__filter-modal {
-	width: 100%;
-	max-width: calc(100% - 32px - 32px);
-}
