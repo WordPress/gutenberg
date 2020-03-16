@@ -105,7 +105,7 @@ function InserterBlockList( {
 				categories: getCategories(),
 				collections: getCollections(),
 				rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-				items: getInserterItems( destinationRootClientId ),
+				items: getInserterItems( destRootClientId ),
 				destinationRootClientId: destRootClientId,
 				fetchReusableBlocks: __experimentalFetchReusableBlocks,
 				...pick( select( 'core/block-editor' ), [
