@@ -53,7 +53,7 @@ export function useDebouncedShowMovers( {
 				handleOnChange( true );
 			}
 		},
-		[ showMovers ]
+		[ handleOnChange, showMovers ]
 	);
 
 	const debouncedHideMovers = useCallback(
@@ -68,10 +68,16 @@ export function useDebouncedShowMovers( {
 				}
 			}, debounceTimeout );
 		},
-		[ isFocused ]
+		[ handleOnChange, isFocused ]
 	);
 
-	useEffect( () => () => clearTimeout( timeoutRef.current ), [] );
+	useEffect(
+		() => () => {
+			clearTimeout( timeoutRef.current );
+			handleOnChange( false );
+		},
+		[ handleOnChange ]
+	);
 
 	return {
 		showMovers,

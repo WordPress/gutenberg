@@ -991,14 +991,20 @@ export function* insertAfterBlock( clientId ) {
 	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
 }
 
-export function toggleBlockFocus( clientId, isFocused ) {
-	if ( isFocused ) {
+/**
+ * Generator that toggles the highlighted block state.
+ *
+ * @param {string} clientId The block's clientId.
+ * @param {boolean} isHighlighted The highlight state.
+ */
+export function toggleBlockHighlight( clientId, isHighlighted ) {
+	if ( isHighlighted ) {
 		return {
-			type: 'FOCUS_BLOCK',
+			type: 'HIGHLIGHT_BLOCK',
 			clientId,
 		};
 	}
 	return {
-		type: 'UNFOCUS_BLOCK',
+		type: 'UNHIGHLIGHT_BLOCK',
 	};
 }

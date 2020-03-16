@@ -1622,8 +1622,14 @@ export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
 }
 
-export function getIsBlockFocused( state ) {
-	const clientId = getSelectedBlockClientId( state );
-
-	return state.blockFocused === clientId;
+/**
+ * Returns true if the current highlighted block matches the block clientId.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} clientId The block to check.
+ *
+ * @return {boolean} Whether the block is currently highlighted.
+ */
+export function getIsBlockHighlighted( state, clientId ) {
+	return state.blockHighlighted === clientId;
 }

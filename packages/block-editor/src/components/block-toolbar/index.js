@@ -21,12 +21,12 @@ import { useShowMoversGestures } from './utils';
 export default function BlockToolbar( { hideDragHandle } ) {
 	const {
 		blockClientIds,
+		blockClientId,
 		hasFixedToolbar,
 		isValid,
 		mode,
 		moverDirection,
 		hasMovers = true,
-		rootClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockMode,
@@ -37,15 +37,15 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			getSettings,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
-		const blockRootClientId = getBlockRootClientId(
-			selectedBlockClientIds[ 0 ]
-		);
+		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
 
 		const { __experimentalMoverDirection, __experimentalUIParts = {} } =
 			getBlockListSettings( blockRootClientId ) || {};
 
 		return {
 			blockClientIds: selectedBlockClientIds,
+			blockClientId: selectedBlockClientId,
 			hasFixedToolbar: getSettings().hasFixedToolbar,
 			rootClientId: blockRootClientId,
 			isValid:
@@ -61,11 +61,11 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		};
 	}, [] );
 
-	const { toggleBlockFocus } = useDispatch( 'core/block-editor' );
+	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
 	const nodeRef = useRef();
 
 	const handleOnFocusChange = ( isFocused ) => {
-		toggleBlockFocus( rootClientId, isFocused );
+		toggleBlockHighlight( blockClientId, isFocused );
 	};
 
 	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(

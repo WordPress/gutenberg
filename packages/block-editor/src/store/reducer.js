@@ -1448,13 +1448,21 @@ export function automaticChangeStatus( state, action ) {
 	// Reset the state by default (for any action not handled).
 }
 
-export function blockFocused( state = undefined, action ) {
+/**
+ * Reducer returning current highlighted block.
+ *
+ * @param {boolean} state  Current highlighted block.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function blockHighlighted( state = '', action ) {
 	switch ( action.type ) {
-		case 'FOCUS_BLOCK':
+		case 'HIGHLIGHT_BLOCK':
 			return action.clientId;
 
-		case 'UNFOCUS_BLOCK':
-			return undefined;
+		case 'UNHIGHLIGHT_BLOCK':
+			return '';
 	}
 
 	return state;
@@ -1479,5 +1487,5 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	isNavigationMode,
 	automaticChangeStatus,
-	blockFocused,
+	blockHighlighted,
 } );
