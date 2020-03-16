@@ -27,7 +27,7 @@ export default function ResponsiveBlockControlLabel( {
 			<span aria-describedby={ `rbc-desc-${ instanceId }` }>
 				{ viewport.label }
 			</span>
-			<VisuallyHidden id={ `rbc-desc-${ instanceId }` }>
+			<VisuallyHidden as="span" id={ `rbc-desc-${ instanceId }` }>
 				{ accessibleLabel }
 			</VisuallyHidden>
 		</Fragment>

@@ -10,7 +10,9 @@ exports[`PostPreviewButton render() should render currentPostLink otherwise 1`] 
   target="wp-preview-1"
 >
   Preview
-  <VisuallyHidden>
+  <VisuallyHidden
+    as="span"
+  >
     (opens in a new tab)
   </VisuallyHidden>
 </ForwardRef(Button)>
@@ -26,7 +28,9 @@ exports[`PostPreviewButton render() should render previewLink if provided 1`] = 
   target="wp-preview-1"
 >
   Preview
-  <VisuallyHidden>
+  <VisuallyHidden
+    as="span"
+  >
     (opens in a new tab)
   </VisuallyHidden>
 </ForwardRef(Button)>

@@ -230,8 +230,8 @@ export class Inputs extends Component {
 		} else if ( this.state.view === 'hsl' ) {
 			return (
 				<fieldset>
-					<VisuallyHidden>
-						<legend>{ __( 'Color value in HSL' ) }</legend>
+					<VisuallyHidden as="legend">
+						{ __( 'Color value in HSL' ) }
 					</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input

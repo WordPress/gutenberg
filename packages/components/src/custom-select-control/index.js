@@ -91,18 +91,6 @@ export default function CustomSelectControl( {
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
-
-	const labelElem = (
-		/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
-		<label
-			{ ...getLabelProps( {
-				className: 'components-custom-select-control__label',
-			} ) }
-		>
-			{ label }
-		</label>
-	);
-
 	return (
 		<div
 			className={ classnames(
@@ -111,9 +99,16 @@ export default function CustomSelectControl( {
 			) }
 		>
 			{ hideLabelFromVision ? (
-				<VisuallyHidden> { labelElem } </VisuallyHidden>
+				<VisuallyHidden as="label"> { label } </VisuallyHidden>
 			) : (
-				labelElem
+				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
+				<label
+					{ ...getLabelProps( {
+						className: 'components-custom-select-control__label',
+					} ) }
+				>
+					{ label }
+				</label>
 			) }
 			<Button
 				{ ...getToggleButtonProps( {
