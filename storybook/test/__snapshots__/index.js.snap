@@ -8714,6 +8714,28 @@ Array [
 ]
 `;
 
+exports[`Storyshots Components/VisuallyHidden With Visibility Helper 1`] = `
+Array [
+  "You can use ",
+  "<VisibilityHelper/>",
+  " to conditionally apply VisuallyHidden component.",
+  <br />,
+  <label
+    className="components-visually-hidden"
+  >
+    I am hidden!
+     
+  </label>,
+  <label>
+    I am visible!
+     
+  </label>,
+  <br />,
+  "Inspect the HTML to see!",
+]
+`;
+
+
 exports[`Storyshots Components|AnglePickerControl Default 1`] = `
 <div
   className="components-base-control components-angle-picker-control"

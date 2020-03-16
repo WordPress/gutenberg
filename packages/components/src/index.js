@@ -91,7 +91,7 @@ export { default as ToolbarGroup } from './toolbar-group';
 export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
-export { default as VisuallyHidden } from './visually-hidden';
+export { default as VisuallyHidden, VisibilityHelper } from './visually-hidden';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {
 	createSlotFill,
