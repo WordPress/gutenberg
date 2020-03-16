@@ -97,9 +97,7 @@ function InserterBlockList( {
 					destRootClientId = getBlockRootClientId( end ) || undefined;
 				}
 			}
-			const destinationRootBlockName = getBlockName(
-				destinationRootClientId
-			);
+			const destinationRootBlockName = getBlockName( destRootClientId );
 
 			const { __experimentalFetchReusableBlocks } = getSettings();
 
@@ -281,6 +279,7 @@ function InserterBlockList( {
 	useEffect( () => {
 		if ( ! filterValue ) {
 			setOpenPanels( [ 'suggested' ] );
+			return;
 		}
 		let newOpenPanels = [];
 		if ( reusableItems.length > 0 ) {
