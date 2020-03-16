@@ -1,6 +1,11 @@
 ## Master
 
-## Internal
+### Enhancements
+
+- Incompatibility between `@svgr/webpack` in version `4.3.3` and `url-loader` in version `3.0.0` was fixed by bumping `@svgr/webpack` to `^5.2.0`.
+- All webpack dependencies got minor version update if applicable.
+
+### Internal
 
 - Package depends now on the shared Prettier config exposed in `@wordpress/prettier-config` dependency ([#20026](https://github.com/WordPress/gutenberg/pull/20026)).
 
@@ -26,7 +31,6 @@
 ### New Features
 
 - Add SVGR support to compile SVG files to React components using the `@svgr/webpack` plugin ([#18243](https://github.com/WordPress/gutenberg/pull/18243)).
-
 - Add `format-js` script to format JavaScript source code, it uses the [`wp-prettier`](https://github.com/Automattic/wp-prettier) – Prettier fork adjusted to WordPress coding style guidelines ([#18048](https://github.com/WordPress/gutenberg/pull/18048)).
 - Add `lint-md-js` script to lint JavaScript source code in markdown files, uses the `eslint-plugin-markdown` plugin ([#19518](https://github.com/WordPress/gutenberg/pull/19518)).
 - Add `lint-md-docs` script to lint the markup of markdown files, uses the `markdownlint` module ([#19855](https://github.com/WordPress/gutenberg/pull/19855)).
