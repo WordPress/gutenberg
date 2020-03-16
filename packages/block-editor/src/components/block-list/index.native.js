@@ -15,6 +15,7 @@ import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -188,6 +189,7 @@ export class BlockList extends Component {
 		return (
 			<>
 				<TouchableWithoutFeedback
+					accessibilityLabel={ __( 'Add paragraph block' ) }
 					onPress={ () => {
 						this.addBlockToEndOfPost( paragraphBlock );
 					} }
