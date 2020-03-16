@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -15,11 +20,14 @@ import {
 	useLineHeightControlState,
 	isLineHeightDefined,
 } from './utils';
-import { LineHeightControlWrapper } from './styles';
 
 export { default as withLineHeight } from './with-line-height';
 
-export default function LineHeightControl( props ) {
+export default function LineHeightControl( {
+	className,
+	style = {},
+	...props
+} ) {
 	const [ lineHeight, setLineHeight ] = useLineHeightControlState();
 	const isDisabled = useIsLineHeightControlsDisabled();
 	const isDefined = isLineHeightDefined( lineHeight );
@@ -53,10 +61,12 @@ export default function LineHeightControl( props ) {
 		setLineHeight( adjustedNextValue );
 	};
 
+	const classes = classnames( 'block-editor-line-height-control', className );
+
 	const value = isDefined ? lineHeight : RESET_VALUE;
 
 	return (
-		<LineHeightControlWrapper>
+		<div className={ classes } style={ style }>
 			<TextControl
 				autoComplete="off"
 				onChange={ handleOnChange }
@@ -68,6 +78,6 @@ export default function LineHeightControl( props ) {
 				{ ...props }
 				min={ 0 }
 			/>
-		</LineHeightControlWrapper>
+		</div>
 	);
 }
