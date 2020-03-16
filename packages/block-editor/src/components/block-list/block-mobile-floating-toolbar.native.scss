@@ -24,6 +24,6 @@ $floating-toolbar-height: 44;
 }
 
 .withMargin {
-	margin-top: -16;
+	margin-top: -$block-edge-to-content;
 	margin-bottom: 24;
 }
