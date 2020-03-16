@@ -13,6 +13,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 export function PostSchedule() {
 	const allowUnschedule = useSelect(
 		( select ) =>
+			select( 'core/editor' ).getEditedPostAttribute( 'date' ) &&
 			! select( 'core/editor' ).isEditedPostDateFloating() &&
 			! select( 'core/editor' ).isCurrentPostScheduled() &&
 			! select( 'core/editor' ).isCurrentPostPublished(),
