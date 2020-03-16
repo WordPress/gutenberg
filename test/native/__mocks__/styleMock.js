@@ -81,4 +81,13 @@ module.exports = {
 	infoSheetIcon: {
 		color: 'gray',
 	},
+	blockToolbar: {
+		height: 44,
+	},
+	headerToolbar: {
+		height: 44,
+	},
+	blockBorder: {
+		width: 1,
+	},
 };

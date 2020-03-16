@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * External dependencies
@@ -21,11 +21,19 @@ const __experimentalPageTemplatePicker = ( {
 	templates = getDefaultTemplates(),
 } ) => {
 	const { editPost } = useDispatch( 'core/editor' );
+	const { title } = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
+
+		return {
+			title: getEditedPostAttribute( 'title' ),
+		};
+	} );
+
 	const [ templatePreview, setTemplatePreview ] = useState();
 
 	const onApply = () => {
 		editPost( {
-			title: templatePreview.name,
+			title: title || templatePreview.name,
 			blocks: templatePreview.blocks,
 		} );
 		logUserEvent( userEvents.editorSessionTemplateApply, {
