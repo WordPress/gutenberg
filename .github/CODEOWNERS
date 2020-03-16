@@ -21,11 +21,11 @@
 /packages/block-editor                          @youknowriad @ellatrix
 /packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
-/packages/blocks                                @youknowriad @ellatrix
+/packages/blocks                                @youknowriad @ellatrix @aduth
 /packages/edit-post
 /packages/editor
 /packages/list-reusable-blocks                  @youknowriad @noisysocks
-/packages/shortcode                             @aduth
+/packages/shortcode
 
 # Widgets
 /packages/edit-widgets                          @youknowriad
@@ -63,18 +63,18 @@
 # Utilities
 /packages/a11y                                  @youknowriad @aduth
 /packages/blob                                  @aduth
-/packages/date                                  @aduth
+/packages/date
 /packages/deprecated                            @aduth
 /packages/dom                                   @ellatrix
 /packages/dom-ready                             @aduth
-/packages/escape-html                           @aduth
-/packages/html-entities                         @aduth
+/packages/escape-html
+/packages/html-entities
 /packages/i18n                                  @swissspidy
 /packages/is-shallow-equal                      @aduth
 /packages/keycodes                              @talldan @ellatrix
 /packages/priority-queue                        @youknowriad @aduth
 /packages/token-list                            @aduth
-/packages/url                                   @talldan
+/packages/url                                   @talldan @aduth
 /packages/wordcount                             @aduth
 
 # Extensibility
