@@ -119,5 +119,6 @@ export { default as update } from './library/update';
 export { default as upload } from './library/upload';
 export { default as verse } from './library/verse';
 export { default as video } from './library/video';
+export { default as videoAlt2 } from './library/video-alt2';
 export { default as widget } from './library/widget';
 export { default as wordpress } from './library/wordpress';
