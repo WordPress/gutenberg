@@ -20,18 +20,11 @@ import {
 	InspectorControls,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { cloneBlock, createBlock } from '@wordpress/blocks';
+import { cloneBlock } from '@wordpress/blocks';
 import { PanelBody, Placeholder, Spinner } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { EntityProvider } from '@wordpress/core-data';
 import { withSelect } from '@wordpress/data';
-
-const defaultFields = [
-	'core/post-title',
-	'core/post-date',
-	'core/post-author',
-	'core/post-excerpt',
-];
 
 class Edit extends Component {
 	constructor( props ) {
@@ -49,7 +42,6 @@ class Edit extends Component {
 
 	componentDidMount() {
 		this.createBlockTree();
-		this.updateBlocks( defaultFields.map( ( f ) => createBlock( f ) ) );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -69,9 +61,7 @@ class Edit extends Component {
 				[ post.id ]:
 					post.id === editingPost
 						? blocksTree[ post.id ]
-						: blocks.map( ( block ) =>
-								cloneBlock( block, { post } )
-						  ),
+						: blocks.map( ( block ) => cloneBlock( block ) ),
 			} ),
 			{}
 		);

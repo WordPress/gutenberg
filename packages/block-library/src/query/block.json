@@ -20,11 +20,24 @@
 			"type": "array",
 			"default": [
 				{
-					"isValid": true,
-					"clientId": null,
-					"name": "post-title",
-					"attributes": {},
-					"innerBlocks": []
+					"name": "core/post-title",
+					"innerBlocks": [],
+					"isValid": true
+				},
+				{
+					"name": "core/post-date",
+					"innerBlocks": [],
+					"isValid": true
+				},
+				{
+					"name": "core/post-author",
+					"innerBlocks": [],
+					"isValid": true
+				},
+				{
+					"name": "core/post-excerpt",
+					"innerBlocks": [],
+					"isValid": true
 				}
 			]
 		}
