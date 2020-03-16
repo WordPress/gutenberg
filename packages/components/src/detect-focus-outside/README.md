@@ -1,8 +1,8 @@
 # DetectFocusOutside
 
-`DetectFocusOutside` is a component used to help detect when focus leaves an element.
+`DetectFocusOutside` is a component used to help detect when focus leaves a component tree.
 
-This can be useful to disambiguate focus transitions within the same element. A React `blur` event will fire even when focus transitions to another element in the same context. `DetectFocusOutside` will only invoke its callback prop when focus has truly left the element.
+This is useful to detect whether focus has transitioned to another element outside a particular component tree, in which case DetectFocusOutside will invoke the onFocusOutside callback. This is unlike React's `onBlur`, which will be invoked even when focus transitions to another element in the same component tree.
 
 ## Usage
 
