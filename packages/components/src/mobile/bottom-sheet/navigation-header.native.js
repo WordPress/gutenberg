@@ -24,17 +24,14 @@ function BottomSheetNavigationHeader( { leftButtonOnPress, screen } ) {
 							<Icon
 								icon={ chevronLeft }
 								size={ styles.bottomSheetBackButtonIcon.width }
-								style={ styles.bottomSheetBackButtonIcon }
+								style={ 36 }
 							/>
 							<Text style={ styles.bottomSheetBackButtonText }>
 								{ __( 'Back' ) }
 							</Text>
 						</>
 					) : (
-						<Icon
-							icon={ arrowLeft }
-							size={ styles.bottomSheetBackButtonIcon.width }
-						/>
+						<Icon icon={ arrowLeft } size={ 24 } />
 					) }
 				</View>
 			</TouchableWithoutFeedback>

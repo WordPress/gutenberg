@@ -176,8 +176,6 @@
 	width: 32px;
 	height: 32px;
 	border-radius: 16px;
-	border-color: $gray;
-	border-width: $border-width;
 }
 
 // Navigation Header
@@ -185,6 +183,8 @@
 .bottomSheetHeader {
 	flex-direction: row;
 	align-items: center;
+	padding-right: $panel-padding;
+	padding-left: $panel-padding;
 }
 
 .bottomSheetBackButton {
@@ -195,7 +195,6 @@
 
 .bottomSheetBackButtonIcon {
 	color: $blue-wordpress;
-	width: 36px;
 }
 
 .bottomSheetHeaderTitle {

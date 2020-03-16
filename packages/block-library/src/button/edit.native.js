@@ -7,6 +7,7 @@ import {
 	Platform,
 	Clipboard,
 	LayoutAnimation,
+	UIManager,
 } from 'react-native';
 import HsvColorPicker from 'react-native-hsv-color-picker';
 /**
@@ -54,6 +55,15 @@ const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
 const PREPEND_HTTP = 'http://';
+
+// It's needed set the following flags via UIManager
+// to have `LayoutAnimation` working on Android
+if (
+	Platform.OS === 'android' &&
+	UIManager.setLayoutAnimationEnabledExperimental
+) {
+	UIManager.setLayoutAnimationEnabledExperimental( true );
+}
 
 class ButtonEdit extends Component {
 	constructor( props ) {
@@ -492,153 +502,165 @@ class ButtonEdit extends Component {
 							isBottomSheetScrolling,
 							shouldEnableBottomSheetScroll,
 						} ) => {
-							if ( screen === 'Settings' ) {
-								return (
-									<View>
-										<PanelBody
-											title={ __( 'Border Settings' ) }
-										>
-											<RangeControl
-												label={ __( 'Border Radius' ) }
-												minimumValue={
-													MIN_BORDER_RADIUS_VALUE
-												}
-												maximumValue={
-													MAX_BORDER_RADIUS_VALUE
-												}
-												value={ borderRadiusValue }
-												onChange={
-													this.onChangeBorderRadius
-												}
-												separatorType="none"
-											/>
-										</PanelBody>
-										<PanelBody
-											title={ __( 'Link Settings' ) }
-										>
-											{ this.getLinkSettings(
-												url,
-												rel,
-												linkTarget,
-												true
-											) }
-										</PanelBody>
-										<PanelBody
-											title={ __( 'Color Settings' ) }
-										>
-											<ColorControl
-												onPress={ () => {
-													this.changeBottomSheetContent(
-														'Background'
-													);
-												} }
-												label={ __( 'Background' ) }
-												color={ backgroundColor }
-												separatorType="fullWidth"
-											/>
-											<ColorControl
-												onPress={ () => {
-													this.changeBottomSheetContent(
-														'Text'
-													);
-												} }
-												label={ __( 'Text' ) }
-												color={
-													textColor.color || '#fff'
-												}
-												separatorType="none"
-											/>
-										</PanelBody>
-									</View>
-								);
-							} else if (
-								screen === 'Background' ||
-								screen === 'Text'
-							) {
-								return (
-									<View>
-										<NavigationHeader
-											screen={ screen }
-											leftButtonOnPress={ () =>
-												this.changeBottomSheetContent(
-													'Settings'
-												)
-											}
-										/>
-										{ this.getColorPalette() }
-										<View
-											style={ styles.horizontalSeparator }
-										/>
-										<SegmentedControls
-											segments={ [ 'Solid', 'Gradient' ] }
-											segmentHandler={
-												this.onSegmentHandler
-											}
-											addonLeft={
-												<ColorIndicator
-													color={ backgroundColor }
-													style={ {
-														width: 24,
-														height: 24,
-													} }
+							return (
+								<>
+									{ screen === 'Settings' && (
+										<View>
+											<PanelBody
+												title={ __(
+													'Border Settings'
+												) }
+											>
+												<RangeControl
+													label={ __(
+														'Border Radius'
+													) }
+													minimumValue={
+														MIN_BORDER_RADIUS_VALUE
+													}
+													maximumValue={
+														MAX_BORDER_RADIUS_VALUE
+													}
+													value={ borderRadiusValue }
+													onChange={
+														this
+															.onChangeBorderRadius
+													}
+													separatorType="none"
 												/>
-											}
-										/>
-									</View>
-								);
-							} else if ( screen === 'Custom' ) {
-								return (
-									<>
-										<HsvColorPicker
-											huePickerHue={ hue }
-											onHuePickerDragMove={
-												this.onHuePickerChange
-											}
-											onHuePickerPress={
-												! isBottomSheetScrolling &&
-												this.onHuePickerChange
-											}
-											satValPickerHue={ hue }
-											satValPickerSaturation={ sat }
-											satValPickerValue={ val }
-											onSatValPickerDragMove={
-												this.onSatValPickerChange
-											}
-											onSatValPickerPress={
-												! isBottomSheetScrolling &&
-												this.onSatValPickerChange
-											}
-											onSatValPickerDragStart={ () =>
-												shouldEnableBottomSheetScroll(
-													false
-												)
-											}
-											onSatValPickerDragEnd={ () =>
-												shouldEnableBottomSheetScroll(
+											</PanelBody>
+											<PanelBody
+												title={ __( 'Color Settings' ) }
+											>
+												<ColorControl
+													onPress={ () => {
+														this.changeBottomSheetContent(
+															'Background'
+														);
+													} }
+													label={ __( 'Background' ) }
+													color={ backgroundColor }
+													separatorType="fullWidth"
+												/>
+												<ColorControl
+													onPress={ () => {
+														this.changeBottomSheetContent(
+															'Text'
+														);
+													} }
+													label={ __( 'Text' ) }
+													color={
+														textColor.color ||
+														'#fff'
+													}
+													separatorType="none"
+												/>
+											</PanelBody>
+											<PanelBody
+												title={ __( 'Link Settings' ) }
+											>
+												{ this.getLinkSettings(
+													url,
+													rel,
+													linkTarget,
 													true
-												)
-											}
-											onHuePickerDragStart={ () =>
-												shouldEnableBottomSheetScroll(
-													false
-												)
-											}
-											onHuePickerDragEnd={ () =>
-												shouldEnableBottomSheetScroll(
-													true
-												)
-											}
-											ref={ this.colorPicker }
-											containerStyle={ {
-												marginBottom: 20,
-											} }
-										/>
-										<View
-											style={ styles.horizontalSeparator }
-										/>
-									</>
-								);
-							}
+												) }
+											</PanelBody>
+										</View>
+									) }
+									{ ( screen === 'Background' ||
+										screen === 'Text' ) && (
+										<View>
+											<NavigationHeader
+												screen={ screen }
+												leftButtonOnPress={ () =>
+													this.changeBottomSheetContent(
+														'Settings'
+													)
+												}
+											/>
+											{ this.getColorPalette() }
+											<View
+												style={
+													styles.horizontalSeparator
+												}
+											/>
+											<SegmentedControls
+												segments={ [
+													'Solid',
+													'Gradient',
+												] }
+												segmentHandler={
+													this.onSegmentHandler
+												}
+												addonLeft={
+													<ColorIndicator
+														color={
+															backgroundColor
+														}
+														style={
+															styles.colorIndicator
+														}
+													/>
+												}
+											/>
+										</View>
+									) }
+									{ screen === 'Custom' && (
+										<>
+											<HsvColorPicker
+												huePickerHue={ hue }
+												onHuePickerDragMove={
+													this.onHuePickerChange
+												}
+												onHuePickerPress={
+													! isBottomSheetScrolling &&
+													this.onHuePickerChange
+												}
+												satValPickerHue={ hue }
+												satValPickerSaturation={ sat }
+												satValPickerValue={ val }
+												onSatValPickerDragMove={
+													this.onSatValPickerChange
+												}
+												onSatValPickerPress={
+													! isBottomSheetScrolling &&
+													this.onSatValPickerChange
+												}
+												onSatValPickerDragStart={ () =>
+													shouldEnableBottomSheetScroll(
+														false
+													)
+												}
+												onSatValPickerDragEnd={ () =>
+													shouldEnableBottomSheetScroll(
+														true
+													)
+												}
+												onHuePickerDragStart={ () =>
+													shouldEnableBottomSheetScroll(
+														false
+													)
+												}
+												onHuePickerDragEnd={ () =>
+													shouldEnableBottomSheetScroll(
+														true
+													)
+												}
+												ref={ this.colorPicker }
+												containerStyle={ {
+													marginBottom: 20,
+												} }
+											/>
+											<View
+												style={
+													styles.horizontalSeparator
+												}
+											/>
+										</>
+									) }
+								</>
+							);
 						} }
 					</BottomSheetConsumer>
 				</InspectorControls>
