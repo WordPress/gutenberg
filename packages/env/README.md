@@ -192,7 +192,7 @@ Positionals:
 For example:
 
 ```sh
-;  wp-env run cli wp user list
+wp-env run cli wp user list
 ⠏ Running `wp user list` in 'cli'.
 
 ID      user_login      display_name    user_email      user_registered roles
