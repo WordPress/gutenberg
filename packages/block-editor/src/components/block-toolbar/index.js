@@ -64,14 +64,10 @@ export default function BlockToolbar( { hideDragHandle } ) {
 	const toggleBlockHighlight = useToggleBlockHighlight( blockClientId );
 	const nodeRef = useRef();
 
-	const handleOnFocusChange = ( isFocused ) => {
-		toggleBlockHighlight( blockClientId, isFocused );
-	};
-
 	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
 		{
 			ref: nodeRef,
-			onChange: handleOnFocusChange,
+			onChange: toggleBlockHighlight,
 		}
 	);
 
