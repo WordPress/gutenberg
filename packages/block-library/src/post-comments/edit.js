@@ -3,6 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useEntityId } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 function PostCommentsDisplay( { postId } ) {
 	return useSelect(
@@ -14,12 +15,12 @@ function PostCommentsDisplay( { postId } ) {
 					post: postId,
 				}
 			);
-			return (
-				comments &&
-				comments.map( ( comment ) => (
-					<p key={ comment.id }>{ comment.content.raw }</p>
-				) )
-			);
+			// TODO: "No Comments" placeholder should be editable.
+			return comments
+				? comments.map( ( comment ) => (
+						<p key={ comment.id }>{ comment.content.raw }</p>
+				  ) )
+				: __( 'No comments.' );
 		},
 		[ postId ]
 	);
