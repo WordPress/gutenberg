@@ -149,6 +149,9 @@ class RichImage extends Component {
 									icon={ <RotateLeftIcon /> }
 									label={ __( 'Rotate' ) }
 									disabled={ inProgress }
+									popoverProps={ {
+										position: 'bottom right',
+									} }
 									controls={ [
 										{
 											icon: <RotateLeftIcon />,
@@ -174,6 +177,9 @@ class RichImage extends Component {
 									icon={ <FlipVerticalIcon /> }
 									label={ __( 'Flip' ) }
 									disabled={ inProgress }
+									popoverProps={ {
+										position: 'bottom right',
+									} }
 									controls={
 										inProgress
 											? []
