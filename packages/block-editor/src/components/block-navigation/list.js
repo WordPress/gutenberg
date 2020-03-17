@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import {
 	__experimentalGetBlockLabel as getBlockLabel,
 	getBlockType,
@@ -58,9 +58,9 @@ export default function BlockNavigationList( {
 								<BlockIcon icon={ blockType.icon } showColors />
 								{ getBlockLabel( blockType, block.attributes ) }
 								{ isSelected && (
-									<span className="screen-reader-text">
+									<VisuallyHidden as="span">
 										{ __( '(selected block)' ) }
-									</span>
+									</VisuallyHidden>
 								) }
 							</Button>
 						</div>

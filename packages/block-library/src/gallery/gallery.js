@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
+import { VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -39,10 +40,6 @@ export const Gallery = ( props ) => {
 		imageCrop,
 		images,
 	} = attributes;
-
-	const captionClassNames = classnames( 'blocks-gallery-caption', {
-		'screen-reader-text': ! isSelected && RichText.isEmpty( caption ),
-	} );
 
 	return (
 		<figure
@@ -91,9 +88,10 @@ export const Gallery = ( props ) => {
 				} ) }
 			</ul>
 			{ mediaPlaceholder }
-			<RichText
+			<RichTextVisibilityHelper
+				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 				tagName="figcaption"
-				className={ captionClassNames }
+				className="blocks-gallery-caption"
 				placeholder={ __( 'Write gallery caption…' ) }
 				value={ caption }
 				unstableOnFocus={ onFocusGalleryCaption }
@@ -103,5 +101,13 @@ export const Gallery = ( props ) => {
 		</figure>
 	);
 };
+
+function RichTextVisibilityHelper( { isHidden, ...richTextProps } ) {
+	return isHidden ? (
+		<VisuallyHidden as={ RichText } { ...richTextProps } />
+	) : (
+		<RichText { ...richTextProps } />
+	);
+}
 
 export default Gallery;
