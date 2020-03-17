@@ -5,6 +5,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 
 const { clearTimeout, setTimeout } = window;
@@ -71,13 +72,7 @@ export function useDebouncedShowMovers( {
 		[ handleOnChange, isFocused ]
 	);
 
-	useEffect(
-		() => () => {
-			clearTimeout( timeoutRef.current );
-			handleOnChange( false );
-		},
-		[ handleOnChange ]
-	);
+	useEffect( () => () => clearTimeout( timeoutRef.current ), [] );
 
 	return {
 		showMovers,
@@ -156,4 +151,30 @@ export function useShowMoversGestures( {
 			onMouseLeave: debouncedHideMovers,
 		},
 	};
+}
+
+/**
+ * Hook that toggles the highlight (outline) state of a block
+ *
+ * @param {string} clientId The block's clientId
+ *
+ * @return {Function} Callback function to toggle highlight state.
+ */
+export function useToggleBlockHighlight( clientId ) {
+	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
+
+	const updateBlockHighlight = useCallback(
+		( isFocused ) => {
+			toggleBlockHighlight( clientId, isFocused );
+		},
+		[ clientId ]
+	);
+
+	useEffect( () => {
+		return () => {
+			updateBlockHighlight( false );
+		};
+	}, [] );
+
+	return updateBlockHighlight;
 }
