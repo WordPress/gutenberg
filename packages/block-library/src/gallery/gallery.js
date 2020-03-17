@@ -102,11 +102,11 @@ export const Gallery = ( props ) => {
 	);
 };
 
-function RichTextVisibilityHelper( { isHidden, className, ...richTextProps } ) {
+function RichTextVisibilityHelper( { isHidden, ...richTextProps } ) {
 	return isHidden ? (
 		<VisuallyHidden as={ RichText } { ...richTextProps } />
 	) : (
-		<RichText className={ className } { ...richTextProps } />
+		<RichText { ...richTextProps } />
 	);
 }
 
