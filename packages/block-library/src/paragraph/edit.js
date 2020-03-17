@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { isUndefined } from 'lodash';
 
 /**
@@ -81,15 +82,14 @@ function ParagraphBlock( {
 	onReplace,
 	setAttributes,
 	setFontSize,
-	className,
 } ) {
 	const {
 		align,
 		content,
-		dropCap,
-		placeholder,
 		direction,
+		dropCap,
 		lineHeight,
+		placeholder,
 	} = attributes;
 
 	const ref = useRef();
@@ -169,7 +169,11 @@ function ParagraphBlock( {
 						ref={ ref }
 						identifier="content"
 						tagName={ Block.p }
-						className={ className }
+						className={ classnames( {
+							'has-drop-cap': dropCap,
+							[ `has-text-align-${ align }` ]: align,
+							[ fontSize.class ]: fontSize.class,
+						} ) }
 						style={ styles }
 						value={ content }
 						onChange={ ( newContent ) =>

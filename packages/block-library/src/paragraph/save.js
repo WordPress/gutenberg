@@ -35,7 +35,7 @@ export default function save( { attributes } ) {
 	);
 	const fontSizeClass = getFontSizeClass( fontSize );
 
-	const classes = classnames( {
+	const className = classnames( {
 		'has-text-color': textColor || customTextColor,
 		'has-background': backgroundColor || customBackgroundColor,
 		'has-drop-cap': dropCap,
@@ -56,7 +56,7 @@ export default function save( { attributes } ) {
 		<RichText.Content
 			tagName="p"
 			style={ styles }
-			className={ classes ? classes : undefined }
+			className={ className ? className : undefined }
 			value={ content }
 			dir={ direction }
 		/>
