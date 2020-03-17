@@ -48,8 +48,9 @@
 }
 
 .paddingToContent {
-	padding-left: $block-custom-appender-to-content;
-	padding-right: $block-custom-appender-to-content;
+	margin-left: - 9;
+	margin-right: - 9;
+	margin-top: 10;
 }
 
 .blockBorder {

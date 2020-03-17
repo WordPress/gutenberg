@@ -124,7 +124,10 @@ export class BlockList extends Component {
 					}
 					inputAccessoryViewHeight={ headerToolbar.height }
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
+					scrollViewStyle={ {
+						flex: isRootList ? 1 : 0,
+						overflow: 'visible',
+					} }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					extraData={ forceRefresh }

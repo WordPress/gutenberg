@@ -86,15 +86,7 @@ $block-selected-margin: 3px;
 $block-selected-border-width: 1px;
 $block-selected-padding: 0;
 $block-selected-child-margin: 5px;
-$block-selected-child-border-width: 1px;
-$block-selected-child-padding: 0;
 $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $block-selected-border-width;
-$block-selected-child-to-content: $block-selected-to-content - $block-selected-child-margin - $block-selected-child-border-width;
-$block-custom-appender-to-content: $block-selected-margin - $block-selected-border-width;
-$block-media-container-to-content: $block-selected-child-margin + $block-selected-border-width;
-$block-selected-vertical-margin-descendant: 2 * $block-selected-to-content;
-$block-selected-vertical-margin-child: $block-edge-to-content;
-$block-toolbar-margin: $block-selected-margin + $block-selected-border-width;
 
 
 /**

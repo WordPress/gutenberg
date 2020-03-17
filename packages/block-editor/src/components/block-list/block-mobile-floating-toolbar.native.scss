@@ -22,3 +22,8 @@ $floating-toolbar-height: 44;
 .floatingToolbarFillColorDark {
 	background-color: rgba(#3c434a, 0.85);
 }
+
+.withMargin {
+	margin-top: -$block-edge-to-content;
+	margin-bottom: 24;
+}

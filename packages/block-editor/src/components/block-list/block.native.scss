@@ -2,18 +2,6 @@
 	flex: 1 1 auto;
 }
 
-.fullSolidBordered {
-	border-width: $block-selected-border-width;
-	border-radius: 4px;
-	border-style: solid;
-}
-
-.dashedBordered {
-	border-width: $block-selected-child-border-width;
-	border-radius: 2px;
-	border-style: dashed;
-}
-
 .solidBorderColor {
 	border-color: $blue-wordpress;
 }
@@ -34,74 +22,11 @@
 	opacity: 0.2;
 }
 
-.horizontalSpaceNone {
-	padding-left: 0;
-	padding-right: 0;
-	margin-left: 0;
-	margin-right: 0;
-}
-
-.marginHorizontalNone {
-	margin-left: 0;
-	margin-right: 0;
-}
-
-.marginVerticalDescendant {
-	margin-bottom: $block-selected-vertical-margin-descendant;
-}
-
-.marginVerticalChild {
-	margin-bottom: $block-selected-vertical-margin-child;
-}
-
-.marginVerticalNone {
-	margin-top: 0;
-	margin-bottom: 0;
-}
-
 .blockTitle {
 	background-color: $gray;
 	padding-left: 8px;
 	padding-top: 4px;
 	padding-bottom: 4px;
-}
-
-.neutral {
-	margin: 0;
-	border: 0;
-	padding: 0;
-}
-
-.full {
-	margin: $block-edge-to-content;
-	border: 0;
-	padding: 0;
-}
-
-.selectedLeaf {
-	margin: $block-selected-margin;
-	padding-left: $block-selected-to-content;
-	padding-right: $block-selected-to-content;
-	padding-top: $block-selected-to-content;
-}
-
-.selectedParent {
-	margin: $block-selected-margin;
-	padding: 0;
-}
-
-.childOfSelected {
-	margin: $block-selected-child-margin;
-	padding: 0;
-}
-
-.childOfSelectedLeaf {
-	margin: $block-selected-child-margin;
-	padding: $block-selected-child-to-content;
-}
-
-.descendantOfSelectedLeaf {
-	margin: $block-selected-child-to-content;
 }
 
 .aztec_container {
@@ -134,6 +59,41 @@
 }
 
 .neutralToolbar {
-	margin-left: -$block-edge-to-content;
-	margin-right: -$block-edge-to-content;
+	margin-left: - 14;
+	margin-right: - 14;
+}
+
+.solidBorder {
+	position: absolute;
+	top: -12;
+	bottom: 0;
+	left: -12;
+	right: -12;
+	border-width: $block-selected-border-width;
+	border-radius: 4px;
+	border-style: solid;
+}
+
+.dashedBorder {
+	position: absolute;
+	top: -6;
+	bottom: -6;
+	left: -6;
+	right: -6;
+	border-width: $block-selected-border-width;
+	border-radius: 2px;
+	border-style: dashed;
+}
+
+.withMarginHorizontal {
+	margin-left: $block-edge-to-content;
+	margin-right: $block-edge-to-content;
+}
+
+.withMarginTop {
+	margin-top: $block-edge-to-content;
+}
+
+.withMarginBottom {
+	margin-bottom: $block-edge-to-content;
 }
