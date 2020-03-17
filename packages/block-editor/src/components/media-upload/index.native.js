@@ -13,7 +13,12 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
-import { captureCamera, captureVideo, image, wordpress } from '@wordpress/icons';
+import {
+	captureCamera,
+	captureVideo,
+	image,
+	wordpress,
+} from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
