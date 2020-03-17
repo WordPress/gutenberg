@@ -13,7 +13,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
-import { captureCamera, captureVideo, wordpress } from '@wordpress/icons';
+import { captureCamera, captureVideo, image, wordpress } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
@@ -43,6 +43,7 @@ const deviceLibrarySource = {
 	value: mediaSources.deviceLibrary,
 	label: __( 'Choose from device' ),
 	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
+	icon: image,
 };
 
 const siteLibrarySource = {
