@@ -1,6 +1,5 @@
 $block-inserter-preview-height: 350px;
 $block-inserter-tabs-height: 44px;
-$block-inserter-search-height: 38px;
 
 .block-editor-inserter {
 	display: inline-block;
@@ -82,9 +81,28 @@ $block-inserter-search-height: 38px;
 	}
 }
 
-.block-editor-inserter__results {
+.block-editor-inserter__tabs {
+	display: flex;
 	flex-grow: 1;
-	overflow: auto;
+	flex-direction: column;
+	margin-top: -$grid-unit-20;
+
+	.components-tab-panel__tabs {
+		padding: 0 $grid-unit-20;
+		margin-bottom: -1px;
+		border-bottom: $border-width solid $light-gray-secondary;
+	}
+
+	.components-tab-panel__tab-content {
+		display: flex;
+		flex-grow: 1;
+		flex-direction: column;
+		position: relative;
+	}
+}
+
+.block-editor-inserter__block-list {
+	flex-grow: 1;
 	position: relative;
 	z-index: 1; // Necessary for the stacked card below parent blocks to show up.
 	padding: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
@@ -97,6 +115,17 @@ $block-inserter-search-height: 38px;
 	[role="presentation"] + .components-panel__body {
 		border-top: none;
 	}
+}
+
+// This extra div is needed because
+// flex grow and overflow auto doesn't work well together.
+.block-editor-inserter__scrollable {
+	overflow: auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
 }
 
 .block-editor-inserter__popover .block-editor-block-types-list {
@@ -226,4 +255,39 @@ $block-inserter-search-height: 38px;
 .block-editor-inserter__tips {
 	padding: $grid-unit-20;
 	flex-shrink: 0;
+}
+
+.block-editor-inserter__patterns {
+	padding: $grid-unit-20;
+}
+
+.block-editor-inserter__patterns-item {
+	border-radius: $radius-block-ui;
+	cursor: pointer;
+	margin-bottom: $grid-unit-20;
+	border: 1px solid $light-gray-500;
+	transition: all 0.05s ease-in-out;
+	position: relative;
+
+	&:hover {
+		background: $white;
+		box-shadow: 0 0 0 1px $white, 0 0 0 3px $dark-gray-500;
+	}
+
+	&:focus {
+		box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
+
+	&.is-placeholder .block-editor-patterns__item-preview {
+		min-height: 100px;
+	}
+}
+
+.block-editor-inserter__patterns-item-title {
+	text-align: center;
+	padding: 10px 0;
+	padding: $grid-unit-20;
 }

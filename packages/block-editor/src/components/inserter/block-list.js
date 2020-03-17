@@ -3,7 +3,6 @@
  */
 import {
 	map,
-	pick,
 	includes,
 	filter,
 	findIndex,
@@ -23,9 +22,9 @@ import { PanelBody, withSpokenMessages } from '@wordpress/components';
 import { addQueryArgs } from '@wordpress/url';
 import { controlsRepeat } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { useMemo, useEffect, useState, useRef } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { compose, withSafeTimeout } from '@wordpress/compose';
 
 /**
@@ -54,10 +53,8 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 const MAX_SUGGESTED_ITEMS = 9;
 
 function InserterBlockList( {
-	clientId,
-	isAppender,
 	rootClientId,
-	onSelect,
+	onInsert,
 	onHover,
 	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 	filterValue,
@@ -69,61 +66,30 @@ function InserterBlockList( {
 		collections,
 		items,
 		rootChildBlocks,
-		getSelectedBlock,
-		destinationRootClientId,
-		getBlockIndex,
-		getBlockSelectionEnd,
-		getBlockOrder,
 		fetchReusableBlocks,
 	} = useSelect(
 		( select ) => {
-			const {
-				getInserterItems,
-				getBlockName,
-				getBlockRootClientId,
-				getBlockSelectionEnd: _getBlockSelectionEnd,
-				getSettings,
-			} = select( 'core/block-editor' );
+			const { getInserterItems, getBlockName, getSettings } = select(
+				'core/block-editor'
+			);
 			const {
 				getCategories,
 				getCollections,
 				getChildBlockNames,
 			} = select( 'core/blocks' );
-
-			let destRootClientId = rootClientId;
-			if ( ! destRootClientId && ! clientId && ! isAppender ) {
-				const end = _getBlockSelectionEnd();
-				if ( end ) {
-					destRootClientId = getBlockRootClientId( end ) || undefined;
-				}
-			}
-			const destinationRootBlockName = getBlockName( destRootClientId );
-
+			const rootBlockName = getBlockName( rootClientId );
 			const { __experimentalFetchReusableBlocks } = getSettings();
 
 			return {
 				categories: getCategories(),
 				collections: getCollections(),
-				rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-				items: getInserterItems( destRootClientId ),
-				destinationRootClientId: destRootClientId,
+				rootChildBlocks: getChildBlockNames( rootBlockName ),
+				items: getInserterItems( rootClientId ),
 				fetchReusableBlocks: __experimentalFetchReusableBlocks,
-				...pick( select( 'core/block-editor' ), [
-					'getSelectedBlock',
-					'getBlockIndex',
-					'getBlockSelectionEnd',
-					'getBlockOrder',
-				] ),
 			};
 		},
-		[ clientId, isAppender, rootClientId ]
+		[ rootClientId ]
 	);
-	const {
-		replaceBlocks,
-		insertBlock,
-		showInsertionPoint,
-		hideInsertionPoint,
-	} = useDispatch( 'core/block-editor' );
 
 	// Fetch resuable blocks on mount
 	useEffect( () => {
@@ -132,68 +98,21 @@ function InserterBlockList( {
 		}
 	}, [] );
 
-	// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
-	// This breaks the withDispatch not containing any logic rule.
-	// Since it's a function only called when the event handlers are called,
-	// it's fine to extract it.
-	// eslint-disable-next-line no-restricted-syntax
-	function getInsertionIndex() {
-		// If the clientId is defined, we insert at the position of the block.
-		if ( clientId ) {
-			return getBlockIndex( clientId, destinationRootClientId );
-		}
-
-		// If there a selected block, we insert after the selected block.
-		const end = getBlockSelectionEnd();
-		if ( ! isAppender && end ) {
-			return getBlockIndex( end, destinationRootClientId ) + 1;
-		}
-
-		// Otherwise, we insert at the end of the current rootClientId
-		return getBlockOrder( destinationRootClientId ).length;
-	}
-
-	const onHoverItem = ( item ) => {
-		onHover( item );
-		if ( item ) {
-			const index = getInsertionIndex();
-			showInsertionPoint( destinationRootClientId, index );
-		} else {
-			hideInsertionPoint();
-		}
-	};
-
 	const onSelectItem = ( item ) => {
 		const { name, title, initialAttributes, innerBlocks } = item;
-		const selectedBlock = getSelectedBlock();
 		const insertedBlock = createBlock(
 			name,
 			initialAttributes,
 			createBlocksFromInnerBlocksTemplate( innerBlocks )
 		);
-		if (
-			! isAppender &&
-			selectedBlock &&
-			isUnmodifiedDefaultBlock( selectedBlock )
-		) {
-			replaceBlocks( selectedBlock.clientId, insertedBlock );
-		} else {
-			insertBlock(
-				insertedBlock,
-				getInsertionIndex(),
-				destinationRootClientId,
-				selectBlockOnInsert
-			);
 
-			if ( ! selectBlockOnInsert ) {
-				// translators: %s: the name of the block that has been added
-				const message = sprintf( __( '%s block added' ), title );
-				speak( message );
-			}
+		onInsert( insertedBlock );
+
+		if ( ! selectBlockOnInsert ) {
+			// translators: %s: the name of the block that has been added
+			const message = sprintf( __( '%s block added' ), title );
+			speak( message );
 		}
-
-		onSelect();
-		return insertedBlock;
 	};
 
 	const filteredItems = useMemo( () => {
@@ -328,7 +247,6 @@ function InserterBlockList( {
 
 	return (
 		<div
-			className="block-editor-inserter__results"
 			ref={ inserterResults }
 			tabIndex="0"
 			role="region"
@@ -338,7 +256,7 @@ function InserterBlockList( {
 				rootClientId={ rootClientId }
 				items={ childItems }
 				onSelect={ onSelectItem }
-				onHover={ onHoverItem }
+				onHover={ onHover }
 			/>
 
 			{ !! suggestedItems.length && ! filterValue && (
@@ -351,7 +269,7 @@ function InserterBlockList( {
 					<BlockTypesList
 						items={ suggestedItems }
 						onSelect={ onSelectItem }
-						onHover={ onHoverItem }
+						onHover={ onHover }
 					/>
 				</PanelBody>
 			) }
@@ -373,7 +291,7 @@ function InserterBlockList( {
 						<BlockTypesList
 							items={ categoryItems }
 							onSelect={ onSelectItem }
-							onHover={ onHoverItem }
+							onHover={ onHover }
 						/>
 					</PanelBody>
 				);
@@ -397,7 +315,7 @@ function InserterBlockList( {
 						<BlockTypesList
 							items={ collectionItems }
 							onSelect={ onSelectItem }
-							onHover={ onHoverItem }
+							onHover={ onHover }
 						/>
 					</PanelBody>
 				);
@@ -415,7 +333,7 @@ function InserterBlockList( {
 					<BlockTypesList
 						items={ reusableItems }
 						onSelect={ onSelectItem }
-						onHover={ onHoverItem }
+						onHover={ onHover }
 					/>
 					<a
 						className="block-editor-inserter__manage-reusable-blocks"
@@ -431,7 +349,7 @@ function InserterBlockList( {
 			<__experimentalInserterMenuExtension.Slot
 				fillProps={ {
 					onSelect: onSelectItem,
-					onHover: onHoverItem,
+					onHover,
 					filterValue,
 					hasItems,
 				} }
