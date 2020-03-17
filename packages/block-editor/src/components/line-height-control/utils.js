@@ -75,37 +75,3 @@ export function useLineHeightControlState() {
 export function isLineHeightDefined( lineHeight ) {
 	return ! isUndefined( lineHeight ) && lineHeight !== RESET_VALUE;
 }
-
-/**
- * Generates the "inline" lineHeight attribute styles, if defined.
- *
- * @param {number|string} lineHeight The line-height value to stylize.
- *
- * @return {Object} Style properties with the lineHeight attribute, if defined.
- */
-export function getLineHeightControlStyles( lineHeight ) {
-	if ( ! isLineHeightDefined( lineHeight ) ) {
-		return {};
-	}
-
-	// Using CSS variable to set the style. This reduces specifity, allowing for
-	// easier overrides, if needed.
-	return {
-		'--wp--core-paragraph--line-height': `${ lineHeight }`,
-	};
-}
-
-/**
- * Generates the CSS className representing the  lineHeight attribute styles, if defined.
- *
- * @param {number|string} lineHeight The line-height value render to className.
- *
- * @return {string} CSS className of the lineHeight attribute, if defined.
- */
-export function getLineHeightControlClassName( lineHeight ) {
-	if ( ! isLineHeightDefined( lineHeight ) ) {
-		return '';
-	}
-
-	return 'has-line-height';
-}

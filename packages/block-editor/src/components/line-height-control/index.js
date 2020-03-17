@@ -21,8 +21,6 @@ import {
 	isLineHeightDefined,
 } from './utils';
 
-export { default as withLineHeight } from './with-line-height';
-
 export default function LineHeightControl( {
 	className,
 	style = {},

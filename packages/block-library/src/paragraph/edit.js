@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isUndefined } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
@@ -11,7 +16,6 @@ import {
 	RichText,
 	withFontSizes,
 	__experimentalBlock as Block,
-	__experimentalWithLineHeight as withLineHeight,
 	__experimentalLineHeightControl as LineHeightControl,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
@@ -77,9 +81,15 @@ function ParagraphBlock( {
 	setAttributes,
 	setFontSize,
 	className,
-	style,
 } ) {
-	const { align, content, dropCap, placeholder, direction } = attributes;
+	const {
+		align,
+		content,
+		dropCap,
+		placeholder,
+		direction,
+		lineHeight,
+	} = attributes;
 
 	const ref = useRef();
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
@@ -87,10 +97,10 @@ function ParagraphBlock( {
 	] );
 
 	const styles = {
-		...style,
 		fontSize: fontSize.size ? `${ fontSize.size }px` : undefined,
 		direction,
 		minHeight: dropCapMinimumHeight,
+		lineHeight: isUndefined( lineHeight ) ? undefined : lineHeight,
 	};
 
 	return (
@@ -171,9 +181,8 @@ function ParagraphBlock( {
 	);
 }
 
-const ParagraphEdit = compose( [
-	withFontSizes( 'fontSize' ),
-	withLineHeight(),
-] )( ParagraphBlock );
+const ParagraphEdit = compose( [ withFontSizes( 'fontSize' ) ] )(
+	ParagraphBlock
+);
 
 export default ParagraphEdit;

@@ -2,18 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isUndefined } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import {
-	getFontSizeClass,
-	RichText,
-	__experimentalWithLineHeight as withLineHeight,
-} from '@wordpress/block-editor';
-import { compose } from '@wordpress/compose';
+import { getFontSizeClass, RichText } from '@wordpress/block-editor';
 
-function ParagraphSaveBlock( { attributes, className, style = {} } ) {
+export default function save( { attributes } ) {
 	const {
 		align,
 		content,
@@ -21,22 +17,20 @@ function ParagraphSaveBlock( { attributes, className, style = {} } ) {
 		fontSize,
 		customFontSize,
 		direction,
+		lineHeight,
 	} = attributes;
 
 	const fontSizeClass = getFontSizeClass( fontSize );
 
-	const classes = classnames(
-		{
-			'has-drop-cap': dropCap,
-			[ `has-text-align-${ align }` ]: align,
-			[ fontSizeClass ]: fontSizeClass,
-		},
-		className
-	);
+	const classes = classnames( {
+		'has-drop-cap': dropCap,
+		[ `has-text-align-${ align }` ]: align,
+		[ fontSizeClass ]: fontSizeClass,
+	} );
 
 	const styles = {
-		...style,
 		fontSize: fontSizeClass ? undefined : customFontSize,
+		lineHeight: isUndefined( lineHeight ) ? undefined : lineHeight,
 	};
 
 	return (
@@ -49,7 +43,3 @@ function ParagraphSaveBlock( { attributes, className, style = {} } ) {
 		/>
 	);
 }
-
-const ParagraphSave = compose( [ withLineHeight() ] )( ParagraphSaveBlock );
-
-export default ParagraphSave;
