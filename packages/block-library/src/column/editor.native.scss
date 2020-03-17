@@ -39,3 +39,7 @@
 .flexBase {
 	flex: 1;
 }
+
+.columnMargin {
+	margin: $block-edge-to-content;
+}

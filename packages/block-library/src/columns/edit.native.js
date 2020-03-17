@@ -53,6 +53,7 @@ function ColumnsEditContainer( {
 	updateAlignment,
 	updateColumns,
 	columnCount,
+	isSelected,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsSettings, setColumnsSettings ] = useState( {
@@ -109,7 +110,7 @@ function ColumnsEditContainer( {
 					isCollapsed={ false }
 				/>
 			</BlockControls>
-			<View>
+			<View style={ isSelected ? styles.blockSelected : styles.block }>
 				{ resizeListener }
 				<InnerBlocks
 					flatListProps={ {
@@ -119,7 +120,7 @@ function ColumnsEditContainer( {
 						},
 						horizontal: true,
 						scrollEnabled: false,
-						style: { overflow: 'visible' },
+						style: styles.innerBlocks,
 					} }
 					containerStyle={ { flex: 1 } }
 					allowedBlocks={ ALLOWED_BLOCKS }
@@ -214,9 +215,12 @@ const ColumnsEdit = ( props ) => {
 	const { clientId, isSelected, getStylesFromColorScheme } = props;
 	const { hasChildren, columnCount } = useSelect(
 		( select ) => {
-			const { getBlocks, getBlockCount } = select( 'core/block-editor' );
+			const { getBlocks, getBlockCount, isBlockSelected } = select(
+				'core/block-editor'
+			);
 
 			return {
+				isSelected: isBlockSelected( clientId ),
 				hasChildren: getBlocks( clientId ).length > 0,
 				columnCount: getBlockCount( clientId ),
 			};

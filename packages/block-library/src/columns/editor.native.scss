@@ -28,4 +28,17 @@
 	align-items: stretch;
 	max-width: $content-width;
 	overflow: visible;
+	width: 100%;
+}
+
+.blockSelected {
+	margin-bottom: - 24;
+}
+
+.block {
+	margin-bottom: -$block-edge-to-content;
+}
+
+.innerBlocks {
+	overflow: visible;
 }

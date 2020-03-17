@@ -40,10 +40,12 @@ function ColumnEdit( {
 	const applyBlockStyle = () => {
 		let width = columnBaseWidth;
 		//TODO: 6 is spacing between Column, find a way to pass it better and verify if 6 is proper value
-		if ( columnsInRow > 1 )
-			width =
-				( minWidth - ( columnsInRow + 1 ) * 6 ) /
-				Math.max( 1, columnsInRow );
+		if ( columnsInRow > 1 ) {
+			// For first and last block we don't need margin on both sides, that's why we subtract 2
+			const margins =
+				( columnsInRow * 2 - 2 ) * styles.columnMargin.margin;
+			width = ( minWidth - margins ) / Math.max( 1, columnsInRow );
+		}
 
 		return { width };
 	};
