@@ -43,7 +43,7 @@ function ColumnEdit( {
 		if ( columnsInRow > 1 ) {
 			// For first and last block we don't need margin on both sides, that's why we subtract 2
 			const margins =
-				( columnsInRow * 2 - 2 ) * styles.columnMargin.margin;
+				( columnsInRow * 2 - 2 ) * styles.columnMargin.marginLeft;
 			width = ( minWidth - margins ) / Math.max( 1, columnsInRow );
 		}
 
