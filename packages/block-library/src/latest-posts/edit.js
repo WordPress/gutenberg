@@ -104,13 +104,6 @@ class LatestPostsEdit extends Component {
 			featuredImageSizeWidth,
 			featuredImageSizeHeight,
 		} = attributes;
-		const suggestions = categoriesList.reduce(
-			( accumulator, category ) => ( {
-				...accumulator,
-				[ category.name ]: category,
-			} ),
-			{}
-		);
 		const categorySuggestions = categoriesList.reduce(
 			( accumulator, category ) => ( {
 				...accumulator,
@@ -119,11 +112,14 @@ class LatestPostsEdit extends Component {
 			{}
 		);
 		const selectCategories = ( tokens ) => {
+			if ( ! categorySuggestions[ tokens[ tokens.length - 1 ] ] )
+				return false;
 			// Categories that are already will be objects, while new additions will be strings (the name).
 			// allCategories nomalizes the array so that they are all objects.
 			const allCategories = tokens.map( ( token ) =>
-				typeof token === 'string' ? suggestions[ token ] : token
+				typeof token === 'string' ? categorySuggestions[ token ] : token
 			);
+
 			setAttributes( { categories: allCategories } );
 		};
 
