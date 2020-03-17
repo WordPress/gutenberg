@@ -19,9 +19,7 @@ describe( 'AdminNotices', () => {
 					<p>My <strong>notice</strong> text</p>
 					<p>My second line of text</p>
 					<button type="button" class="notice-dismiss">
-						<span class="screen-reader-text">
-							Dismiss this notice.
-						</span>
+						<span class="screen-reader-text">Dismiss this notice.</span>
 					</button>
 				</div>
 				<div class="notice notice-warning">Warning</div>
