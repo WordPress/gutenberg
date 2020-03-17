@@ -28,12 +28,6 @@
 	font-style: normal;
 }
 
-// :root increases CSS specificity
-// This improves rendering consistency within the editor and site.
-:root p.has-line-height {
-	line-height: var(--wp--core-paragraph--line-height, inherit);
-}
-
 p.has-background {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }
