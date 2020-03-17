@@ -169,6 +169,8 @@
 			// 2px outside.
 			box-shadow: 0 0 0 2px $blue-medium-focus;
 			border-radius: $radius-block-ui;
+			transition: box-shadow 0.2s ease-out;
+			@include reduce-motion("transition");
 
 			// Windows High Contrast mode will show this outline.
 			outline: 2px solid transparent;
@@ -202,6 +204,19 @@
 .block-editor-block-list__layout .block-editor-block-list__block {
 	&.has-warning {
 		min-height: ( $block-padding + $block-spacing ) * 2;
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-radius: $radius-block-ui;
+		box-shadow: 0 0 0 2px transparent;
+		transition: box-shadow 0.1s ease-in;
+		@include reduce-motion("transition");
 	}
 
 	// Warnings
