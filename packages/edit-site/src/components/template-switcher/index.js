@@ -12,11 +12,13 @@ import {
 	MenuItemsChoice,
 	MenuItem,
 } from '@wordpress/components';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import AddTemplate from '../add-template';
+import TemplatePreview from './preview';
 
 function TemplateLabel( { template } ) {
 	return (
@@ -45,6 +47,13 @@ export default function TemplateSwitcher( {
 	onActiveTemplatePartIdChange,
 	onAddTemplateId,
 } ) {
+	const [ hoveredTemplate, setHoveredTemplate ] = useState();
+	const onHoverTemplate = ( id ) => {
+		setHoveredTemplate( { id, type: 'template' } );
+	};
+	const onHoverTemplatePart = ( id ) => {
+		setHoveredTemplate( { id, type: 'template-part' } );
+	};
 	const { templates, templateParts } = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( 'core' );
@@ -89,7 +98,11 @@ export default function TemplateSwitcher( {
 	return (
 		<>
 			<DropdownMenu
-				icon="layout"
+				popoverProps={ {
+					className: 'edit-site-template-switcher__popover',
+					position: 'bottom right',
+				} }
+				icon={ layout }
 				label={ __( 'Switch Template' ) }
 				toggleProps={ {
 					children: ( isTemplatePart
@@ -107,6 +120,7 @@ export default function TemplateSwitcher( {
 									! isTemplatePart ? activeId : undefined
 								}
 								onSelect={ onActiveIdChange }
+								onHover={ onHoverTemplate }
 							/>
 							<MenuItem
 								icon="plus"
@@ -123,8 +137,12 @@ export default function TemplateSwitcher( {
 								choices={ templateParts }
 								value={ isTemplatePart ? activeId : undefined }
 								onSelect={ onActiveTemplatePartIdChange }
+								onHover={ onHoverTemplatePart }
 							/>
 						</MenuGroup>
+						{ !! hoveredTemplate && (
+							<TemplatePreview item={ hoveredTemplate } />
+						) }
 					</>
 				) }
 			</DropdownMenu>

@@ -154,7 +154,7 @@ function InserterBlockList( {
 	}
 
 	const onHoverItem = ( item ) => {
-		onHover();
+		onHover( item );
 		if ( item ) {
 			const index = getInsertionIndex();
 			showInsertionPoint( destinationRootClientId, index );
