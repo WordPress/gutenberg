@@ -22,7 +22,7 @@ export default function save( { attributes } ) {
 
 	const fontSizeClass = getFontSizeClass( fontSize );
 
-	const classes = classnames( {
+	const className = classnames( {
 		'has-drop-cap': dropCap,
 		[ `has-text-align-${ align }` ]: align,
 		[ fontSizeClass ]: fontSizeClass,
@@ -37,7 +37,7 @@ export default function save( { attributes } ) {
 		<RichText.Content
 			tagName="p"
 			style={ styles }
-			className={ classes ? classes : undefined }
+			className={ className ? className : undefined }
 			value={ content }
 			dir={ direction }
 		/>
