@@ -94,8 +94,9 @@ class Layout extends Component {
 
 	render() {
 		const {
-			mode,
 			getStylesFromColorScheme,
+			isPage,
+			mode,
 			showPageTemplatePicker,
 		} = this.props;
 
@@ -143,8 +144,10 @@ class Layout extends Component {
 						parentHeight={ this.state.rootViewHeight }
 						style={ toolbarKeyboardAvoidingViewStyle }
 					>
-						{ showPageTemplatePicker && (
-							<__experimentalPageTemplatePicker />
+						{ isPage && (
+							<__experimentalPageTemplatePicker
+								visible={ showPageTemplatePicker }
+							/>
 						) }
 						<Header />
 						<BottomSheetSettings />
@@ -157,12 +160,14 @@ class Layout extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { __unstableIsEditorReady: isEditorReady } = select(
-			'core/editor'
-		);
+		const {
+			__unstableIsEditorReady: isEditorReady,
+			getCurrentPostType,
+		} = select( 'core/editor' );
 		const { getEditorMode } = select( 'core/edit-post' );
 
 		return {
+			isPage: getCurrentPostType(),
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
 		};
