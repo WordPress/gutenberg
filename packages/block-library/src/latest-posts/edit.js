@@ -122,12 +122,11 @@ class LatestPostsEdit extends Component {
 			// Categories that are already will be objects, while new additions will be strings (the name).
 			// allCategories nomalizes the array so that they are all objects.
 			const allCategories = tokens.map( ( token ) => {
-				if ( typeof suggestions[ token ] !== 'undefined' ) {
-					return typeof token === 'string'
+				const newToken =
+					typeof suggestions[ token ] !== 'undefined'
 						? suggestions[ token ]
-						: token;
-				}
-				return null;
+						: null;
+				return typeof token === 'string' ? newToken : token;
 			} );
 			// we do nothing if the category is not selected
 			// from suggestions
