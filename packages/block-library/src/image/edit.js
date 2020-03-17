@@ -391,12 +391,6 @@ export class ImageEdit extends Component {
 			</BlockControls>
 		);
 		const src = isExternal ? url : undefined;
-		const labels = {
-			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
-			instructions: __(
-				'Upload an image file, pick one from your media library, or add one with a URL.'
-			),
-		};
 		const mediaPreview = !! url && (
 			<img
 				alt={ __( 'Edit image' ) }
@@ -412,7 +406,6 @@ export class ImageEdit extends Component {
 		const mediaPlaceholder = (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
-				labels={ labels }
 				onSelect={ this.onSelectImage }
 				onSelectURL={ this.onSelectURL }
 				notices={ noticeUI }
