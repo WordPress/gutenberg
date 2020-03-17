@@ -13,8 +13,15 @@ export default function UnitControl( { units: unitsProp, ...props } ) {
 	// Adjust units based on add_theme_support( 'disable-custom-units' );
 	let units;
 
-	// Handle extra arguments for add_theme_support,
-	// Example: ( 'disable-custom-units', 'rem' );
+	/**
+	 * Handle extra arguments for add_theme_support
+	 *
+	 * Example: add_theme_support( 'disable-custom-units', 'rem' );
+	 * Or: add_theme_support( 'disable-custom-units', 'px, 'rem', 'em' );
+	 *
+	 * Note: If there are unit argument (e.g. 'em'), these units are enabled
+	 * within the control.
+	 */
 	if ( Array.isArray( settings ) ) {
 		units = filterUnitsWithSettings( settings, unitsProp );
 	} else {
