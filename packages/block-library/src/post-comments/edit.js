@@ -16,7 +16,7 @@ function PostCommentsDisplay( { postId } ) {
 				}
 			);
 			// TODO: "No Comments" placeholder should be editable.
-			return comments
+			return comments && comments.length
 				? comments.map( ( comment ) => (
 						<p key={ comment.id }>{ comment.content.raw }</p>
 				  ) )
