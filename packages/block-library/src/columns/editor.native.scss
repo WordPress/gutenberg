@@ -36,7 +36,8 @@
 }
 
 .block {
-	margin-bottom: -$block-edge-to-content;
+	margin-bottom: - 2 * $block-edge-to-content;
+
 }
 
 .innerBlocks {
