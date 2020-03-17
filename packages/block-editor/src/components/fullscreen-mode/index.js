@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
 
 export class FullscreenMode extends Component {
 	componentDidMount() {
@@ -45,6 +44,4 @@ export class FullscreenMode extends Component {
 	}
 }
 
-export default withSelect( ( select ) => ( {
-	isActive: select( 'core/edit-post' ).isFeatureActive( 'fullscreenMode' ),
-} ) )( FullscreenMode );
+export default FullscreenMode;

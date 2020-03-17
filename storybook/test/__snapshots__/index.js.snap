@@ -3052,7 +3052,7 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
   className="components-font-size-picker"
 >
   <legend
-    className="screen-reader-text"
+    className="components-visually-hidden"
   >
     Font size
   </legend>
@@ -3343,7 +3343,7 @@ input[type='number'].emotion-18 {
   className="components-font-size-picker"
 >
   <legend
-    className="screen-reader-text"
+    className="components-visually-hidden"
   >
     Font size
   </legend>
@@ -3539,7 +3539,7 @@ exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
   className="components-font-size-picker"
 >
   <legend
-    className="screen-reader-text"
+    className="components-visually-hidden"
   >
     Font size
   </legend>
