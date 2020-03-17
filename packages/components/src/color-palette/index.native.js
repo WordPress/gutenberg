@@ -25,24 +25,33 @@ import ColorIndicator from '../color-indicator';
 
 function ColorPalette( {
 	setBackgroundColor,
+	setTextColor,
 	backgroundColor,
+	textColor,
 	clientId,
 	currentSegment,
+	currentScreen,
 	onCustomPress,
 } ) {
-	const isGradient = currentSegment === 'Gradient';
+	const isGradientSegment = currentSegment === 'Gradient';
+	const isTextScreen = currentScreen === 'Text';
 	const isIOS = Platform.OS === 'ios';
 
 	const { setGradient } = __experimentalUseGradient( {}, clientId );
 
-	const [ activeColor, setActiveColor ] = useState( backgroundColor );
+	const [ activeBgColor, setActiveBgColor ] = useState( backgroundColor );
+	const [ activeTextColor, setActiveTextColor ] = useState( textColor );
 
 	const defaultColors = SETTINGS_DEFAULTS.colors;
 	const defaultGradientColors = SETTINGS_DEFAULTS.gradients;
 
 	function onColorPress( value ) {
-		setActiveColor( value );
-		if ( isGradient ) {
+		setActiveBgColor( value );
+		setActiveTextColor( value );
+
+		if ( isTextScreen ) {
+			setTextColor( value );
+		} else if ( ! isTextScreen && isGradientSegment ) {
 			setGradient( value );
 			setBackgroundColor();
 		} else {
@@ -59,7 +68,9 @@ function ColorPalette( {
 					const paletteColor = gradient
 						? color.gradient
 						: color.color;
-					const isSelected = paletteColor === activeColor;
+					const isSelected =
+						paletteColor === activeBgColor ||
+						paletteColor === activeTextColor;
 					return (
 						<TouchableWithoutFeedback
 							onPress={ () => onColorPress( paletteColor ) }
@@ -100,7 +111,7 @@ function ColorPalette( {
 			showsHorizontalScrollIndicator={ false }
 			keyboardShouldPersistTaps={ true }
 		>
-			{ isGradient ? <Swatch gradient /> : <ColorSwatch /> }
+			{ isGradientSegment ? <Swatch gradient /> : <ColorSwatch /> }
 		</ScrollView>
 	);
 }

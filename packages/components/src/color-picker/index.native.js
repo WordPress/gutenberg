@@ -20,36 +20,54 @@ function ColorPicker( {
 	shouldEnableBottomSheetScroll,
 	isBottomSheetScrolling,
 	setBackgroundColor,
+	setTextColor,
 	backgroundColor,
+	textColor,
 	onNavigationBack,
 	clientId,
+	previousScreen,
 } ) {
 	const [ hue, setHue ] = useState( 0 );
 	const [ sat, setSaturation ] = useState( 0.5 );
 	const [ val, setValue ] = useState( 0.5 );
-	const [ savedColor ] = useState( backgroundColor );
+	const [ savedBgColor ] = useState( backgroundColor );
+	const [ savedTextColor ] = useState( textColor );
 
 	const currentColor = tinycolor(
 		`hsv ${ hue } ${ sat } ${ val }`
 	).toHexString();
 	const isGradient = backgroundColor.includes( 'linear-gradient' );
+	const isTextScreen = previousScreen === 'Text';
 	const { setGradient } = __experimentalUseGradient( {}, clientId );
 
+	function setHSVFromHex( color ) {
+		const { h, s, v } = tinycolor( color ).toHsv();
+
+		setHue( h );
+		setSaturation( s );
+		setValue( v );
+	}
+
 	useEffect( () => {
-		setBackgroundColor( currentColor );
+		if ( isTextScreen ) {
+			setTextColor( currentColor );
+		} else {
+			setBackgroundColor( currentColor );
+		}
 	}, [ currentColor ] );
 
 	useEffect( () => {
-		if ( ! isGradient ) {
-			const { h, s, v } = tinycolor( backgroundColor ).toHsv();
+		if ( isTextScreen ) {
+			setHSVFromHex( textColor );
+			setTextColor( textColor );
+		} else {
+			if ( ! isGradient ) {
+				setHSVFromHex( backgroundColor );
+			}
 
-			setHue( h );
-			setSaturation( s );
-			setValue( v );
+			setBackgroundColor( backgroundColor );
+			setGradient();
 		}
-
-		setBackgroundColor( backgroundColor );
-		setGradient();
 	}, [] );
 
 	function onHuePickerChange( { hue: h } ) {
@@ -63,12 +81,16 @@ function ColorPicker( {
 
 	function onPressCancelButton() {
 		onNavigationBack();
-		setBackgroundColor( savedColor );
+		setBackgroundColor( savedBgColor );
+		setTextColor( savedTextColor );
 	}
 
 	function onPressApplyButton() {
 		onNavigationBack();
-		setBackgroundColor( currentColor );
+		if ( isTextScreen ) {
+			return setTextColor( currentColor );
+		}
+		return setBackgroundColor( currentColor );
 	}
 
 	return (

@@ -8,6 +8,7 @@ import {
 	Clipboard,
 	LayoutAnimation,
 	UIManager,
+	Text,
 } from 'react-native';
 /**
  * WordPress dependencies
@@ -47,7 +48,7 @@ import { link, external } from '@wordpress/icons';
  */
 import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
-import ColorBackground from './color-background.native';
+import ColorBackground from './color-background';
 import LinkRelIcon from './link-rel';
 
 const NEW_TAB_REL = 'noreferrer noopener';
@@ -96,6 +97,7 @@ class ButtonEdit extends Component {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
 			isButtonFocused,
+			previousScreen: '',
 			screen: 'Settings',
 			segment: 'Solid',
 		};
@@ -321,6 +323,7 @@ class ButtonEdit extends Component {
 	}
 
 	changeBottomSheetContent( destination ) {
+		const { screen } = this.state;
 		LayoutAnimation.configureNext(
 			LayoutAnimation.create(
 				200,
@@ -328,18 +331,30 @@ class ButtonEdit extends Component {
 				LayoutAnimation.Properties.opacity
 			)
 		);
-		this.setState( { screen: destination, segment: 'Solid' } );
+		this.setState( {
+			screen: destination,
+			segment: 'Solid',
+			previousScreen: screen,
+		} );
 	}
 
 	getColorPalette() {
-		const { segment } = this.state;
-		const { setBackgroundColor, clientId } = this.props;
+		const { segment, screen } = this.state;
+		const {
+			setBackgroundColor,
+			clientId,
+			textColor,
+			setTextColor,
+		} = this.props;
 		return (
 			<ColorPalette
 				setBackgroundColor={ setBackgroundColor }
+				setTextColor={ setTextColor }
 				backgroundColor={ this.getBackgroundColor() }
-				clientId={ clientId }
+				textColor={ textColor.color || '#fff' }
 				currentSegment={ segment }
+				currentScreen={ screen }
+				clientId={ clientId }
 				onCustomPress={ () => {
 					this.changeBottomSheetContent( 'Custom' );
 				} }
@@ -355,6 +370,7 @@ class ButtonEdit extends Component {
 			clientId,
 			onReplace,
 			setBackgroundColor,
+			setTextColor,
 		} = this.props;
 		const {
 			placeholder,
@@ -369,6 +385,7 @@ class ButtonEdit extends Component {
 			isLinkSheetVisible,
 			isButtonFocused,
 			screen,
+			previousScreen,
 		} = this.state;
 
 		const borderRadiusValue =
@@ -548,8 +565,7 @@ class ButtonEdit extends Component {
 											</PanelBody>
 										</View>
 									) }
-									{ ( screen === 'Background' ||
-										screen === 'Text' ) && (
+									{ screen === 'Background' && (
 										<View>
 											<NavigationHeader
 												screen={ screen }
@@ -586,21 +602,62 @@ class ButtonEdit extends Component {
 											/>
 										</View>
 									) }
+									{ screen === 'Text' && (
+										<View>
+											<NavigationHeader
+												screen={ screen }
+												leftButtonOnPress={ () =>
+													this.changeBottomSheetContent(
+														'Settings'
+													)
+												}
+											/>
+											{ this.getColorPalette() }
+											<View
+												style={
+													styles.horizontalSeparator
+												}
+											/>
+											<View style={ styles.textFooter }>
+												<ColorIndicator
+													color={
+														textColor.color ||
+														'#fff'
+													}
+													style={
+														styles.absoluteColorIndicator
+													}
+												/>
+												<Text
+													style={
+														styles.selectColorText
+													}
+												>
+													{ __( 'Select a color' ) }
+												</Text>
+											</View>
+										</View>
+									) }
 									{ screen === 'Custom' && (
 										<ColorPicker
+											previousScreen={ previousScreen }
 											shouldEnableBottomSheetScroll={
 												shouldEnableBottomSheetScroll
 											}
 											isBottomSheetScrolling={
 												isBottomSheetScrolling
 											}
+											setTextColor={ setTextColor }
 											setBackgroundColor={
 												setBackgroundColor
 											}
 											backgroundColor={ backgroundColor }
+											textColor={
+												textColor.color || '#fff'
+											}
 											onNavigationBack={ () =>
 												this.changeBottomSheetContent(
-													'Background'
+													previousScreen
 												)
 											}
 											clientId={ clientId }
