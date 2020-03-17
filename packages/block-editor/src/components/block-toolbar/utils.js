@@ -9,6 +9,7 @@ import { useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 
 const { clearTimeout, setTimeout } = window;
+const DEBOUNCE_TIMEOUT = 250;
 
 /**
  * Hook that creates a showMover state, as well as debounced show/hide callbacks
@@ -16,7 +17,7 @@ const { clearTimeout, setTimeout } = window;
 export function useDebouncedShowMovers( {
 	ref,
 	isFocused,
-	debounceTimeout = 500,
+	debounceTimeout = DEBOUNCE_TIMEOUT,
 	onChange = noop,
 } ) {
 	const [ showMovers, setShowMovers ] = useState( false );
@@ -87,7 +88,7 @@ export function useDebouncedShowMovers( {
  */
 export function useShowMoversGestures( {
 	ref,
-	debounceTimeout = 500,
+	debounceTimeout = DEBOUNCE_TIMEOUT,
 	onChange = noop,
 } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
