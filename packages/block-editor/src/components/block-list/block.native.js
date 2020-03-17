@@ -86,31 +86,19 @@ class BlockListBlock extends Component {
 			hasParent,
 			isLastBlock,
 			isFirstBlock,
-			name,
+			isHorizontal,
+			isSelected,
 		} = this.props;
 		return [
 			// Do not add horizontal margin in nested blocks
 			! hasParent && styles.withMarginHorizontal,
 			// remove margin bottom for the last block (the margin is added to the parent)
-			! isLastBlock && name !== 'core/column' && styles.withMarginBottom,
-			// TODO1: handle bottom margin in horizontal block (keep in note that in Column there will be also appender before mobile toolbar)
-			// TODO2: handle proper FloatingToolbar position when Column block is selected
-			name === 'core/column' && { marginBottom: 32 },
+			! isLastBlock && ! isSelected && styles.isVerticalMarginBottom,
 			// remove margin top for the first block that is not on the root level (the margin is added to the parent)
-			! ( isFirstBlock && hasParent ) &&
-				name !== 'core/column' &&
-				styles.withMarginTop,
+			! ( isFirstBlock && hasParent ) && styles.isVerticalMarginTop,
+			isHorizontal && styles.isHorizontal,
 			isDimmed && styles.dimmed,
-			name === 'core/column' && { flex: 1 },
 		];
-	}
-
-	applyToolbarStyle() {
-		const { hasChildren, isUnregisteredBlock } = this.props;
-
-		if ( ! hasChildren || isUnregisteredBlock ) {
-			return styles.neutralToolbar;
-		}
 	}
 
 	render() {
@@ -125,6 +113,7 @@ class BlockListBlock extends Component {
 			title,
 			parentId,
 			isFirstBlock,
+			isHorizontal,
 			isTouchable,
 			disallowRemoveInnerBlocks,
 			hasParent,
@@ -152,7 +141,9 @@ class BlockListBlock extends Component {
 				>
 					{ showFloatingToolbar && (
 						<FloatingToolbar
-							isFirstBlock={ hasParent && isFirstBlock }
+							isFirstBlock={
+								( hasParent && isFirstBlock ) || isHorizontal
+							}
 						>
 							{ hasParent && (
 								<Toolbar passedStyle={ styles.toolbar }>
@@ -202,7 +193,7 @@ class BlockListBlock extends Component {
 								icon={ icon }
 							/>
 						) }
-						<View style={ this.applyToolbarStyle() }>
+						<View style={ styles.neutralToolbar }>
 							{ isSelected && (
 								<BlockMobileToolbar
 									clientId={ clientId }
@@ -295,6 +286,9 @@ export default compose( [
 			! isDescendantSelected &&
 			( isDescendantOfParentSelected || rootBlockId === clientId );
 
+		// We should create a selector for that
+		const isHorizontal = name === 'core/column';
+
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -306,6 +300,7 @@ export default compose( [
 			isFirstBlock,
 			isSelected,
 			isValid,
+			isHorizontal,
 			parentId,
 			isParentSelected,
 			firstToSelectId,

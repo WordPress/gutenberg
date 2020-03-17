@@ -203,10 +203,9 @@ class MediaTextEdit extends Component {
 		const innerBlockContainerStyle = ! shouldStack
 			? styles.innerBlock
 			: {
-					...( mediaPosition === 'left' &&
-						styles.innerBlockStackMediaLeft ),
-					...( mediaPosition === 'right' &&
-						styles.innerBlockStackMediaRight ),
+					...( mediaPosition === 'left'
+						? styles.innerBlockStackMediaLeft
+						: styles.innerBlockStackMediaRight ),
 			  };
 
 		const containerStyles = {
