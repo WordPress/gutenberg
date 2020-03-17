@@ -305,8 +305,11 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
 }
 
 .richimage__crop-icon {
-	padding: 6px;
-	color: #555d66; // Be sure to update this as the UI changes.
+	padding: 0 8px;
+	min-width: 48px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	svg {
 		fill: currentColor;
