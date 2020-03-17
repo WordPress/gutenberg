@@ -21,11 +21,13 @@
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_settings_image_dimensions( $settings ) {
-	// Only filter settings if:
-	// 1. `imageDimensions` is not already assigned, in which case it can be
-	//    assumed to have been set from WordPress 5.4.0+ default settings.
-	// 2. `imageSizes` is an array. Plugins may run `block_editor_settings`
-	//    directly and not provide all properties of the settings array.
+	/*
+	 * Only filter settings if:
+	 * 1. `imageDimensions` is not already assigned, in which case it can be
+	 *    assumed to have been set from WordPress 5.4.0+ default settings.
+	 * 2. `imageSizes` is an array. Plugins may run `block_editor_settings`
+	 *    directly and not provide all properties of the settings array.
+	 */
 	if ( ! isset( $settings['imageDimensions'] ) && ! empty( $settings['imageSizes'] ) ) {
 		$image_dimensions = array();
 		$all_sizes        = wp_get_registered_image_subsizes();
