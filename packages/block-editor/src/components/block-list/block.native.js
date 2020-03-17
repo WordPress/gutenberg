@@ -210,7 +210,7 @@ class BlockListBlock extends Component {
 				accessibilityRole={ 'button' }
 			>
 				<OverflowView accessibilityLabel={ accessibilityLabel } 
-				pointerEvents={adjustsForFloatingToolbar ? 'box-none' : 'auto'}>
+				presentingOverflow={ adjustsForFloatingToolbar }>
 					{ showFloatingToolbar && (
 						<FloatingToolbar>
 							{ hasParent && (
