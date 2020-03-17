@@ -1,0 +1,32 @@
+.footer {
+	border-top-width: $border-width;
+	border-color: $light-gray-400;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: $panel-padding;
+	margin-top: $panel-padding;
+}
+
+.cancelButton {
+	color: $alert-red;
+}
+
+.applyButton {
+	color: $blue-wordpress;
+}
+
+.colorWrapper {
+	flex-direction: row;
+	align-items: center;
+}
+
+.colorText {
+	font-family: $default-monospace-font;
+	color: rgba(0, 0, 0, 0.6);
+}
+
+.colorIndicator {
+	height: 16px;
+	width: 16px;
+}

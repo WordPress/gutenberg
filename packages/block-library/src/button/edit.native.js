@@ -9,7 +9,6 @@ import {
 	LayoutAnimation,
 	UIManager,
 } from 'react-native';
-import HsvColorPicker from 'react-native-hsv-color-picker';
 /**
  * WordPress dependencies
  */
@@ -36,6 +35,7 @@ import {
 	ColorPalette,
 	ColorIndicator,
 	NavigationHeader,
+	ColorPicker,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
@@ -80,8 +80,6 @@ class ButtonEdit extends Component {
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
-		this.onSatValPickerChange = this.onSatValPickerChange.bind( this );
-		this.onHuePickerChange = this.onHuePickerChange.bind( this );
 		this.changeBottomSheetContent = this.changeBottomSheetContent.bind(
 			this
 		);
@@ -98,9 +96,6 @@ class ButtonEdit extends Component {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
 			isButtonFocused,
-			hue: 0,
-			sat: 0.5,
-			val: 0.5,
 			screen: 'Settings',
 			segment: 'Solid',
 		};
@@ -321,19 +316,6 @@ class ButtonEdit extends Component {
 		this.richTextRef = richText;
 	}
 
-	onSatValPickerChange( { saturation, value } ) {
-		this.setState( {
-			sat: saturation,
-			val: value,
-		} );
-	}
-
-	onHuePickerChange( { hue } ) {
-		this.setState( {
-			hue,
-		} );
-	}
-
 	onSegmentHandler( item ) {
 		this.setState( { segment: item } );
 	}
@@ -372,6 +354,7 @@ class ButtonEdit extends Component {
 			isSelected,
 			clientId,
 			onReplace,
+			setBackgroundColor,
 		} = this.props;
 		const {
 			placeholder,
@@ -385,9 +368,6 @@ class ButtonEdit extends Component {
 			maxWidth,
 			isLinkSheetVisible,
 			isButtonFocused,
-			hue,
-			sat,
-			val,
 			screen,
 		} = this.state;
 
@@ -607,57 +587,24 @@ class ButtonEdit extends Component {
 										</View>
 									) }
 									{ screen === 'Custom' && (
-										<>
-											<HsvColorPicker
-												huePickerHue={ hue }
-												onHuePickerDragMove={
-													this.onHuePickerChange
-												}
-												onHuePickerPress={
-													! isBottomSheetScrolling &&
-													this.onHuePickerChange
-												}
-												satValPickerHue={ hue }
-												satValPickerSaturation={ sat }
-												satValPickerValue={ val }
-												onSatValPickerDragMove={
-													this.onSatValPickerChange
-												}
-												onSatValPickerPress={
-													! isBottomSheetScrolling &&
-													this.onSatValPickerChange
-												}
-												onSatValPickerDragStart={ () =>
-													shouldEnableBottomSheetScroll(
-														false
-													)
-												}
-												onSatValPickerDragEnd={ () =>
-													shouldEnableBottomSheetScroll(
-														true
-													)
-												}
-												onHuePickerDragStart={ () =>
-													shouldEnableBottomSheetScroll(
-														false
-													)
-												}
-												onHuePickerDragEnd={ () =>
-													shouldEnableBottomSheetScroll(
-														true
-													)
-												}
-												ref={ this.colorPicker }
-												containerStyle={ {
-													marginBottom: 20,
-												} }
-											/>
-											<View
-												style={
-													styles.horizontalSeparator
-												}
-											/>
-										</>
+										<ColorPicker
+											shouldEnableBottomSheetScroll={
+												shouldEnableBottomSheetScroll
+											}
+											isBottomSheetScrolling={
+												isBottomSheetScrolling
+											}
+											setBackgroundColor={
+												setBackgroundColor
+											}
+											backgroundColor={ backgroundColor }
+											onNavigationBack={ () =>
+												this.changeBottomSheetContent(
+													'Background'
+												)
+											}
+											clientId={ clientId }
+										/>
 									) }
 								</>
 							);

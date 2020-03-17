@@ -23,8 +23,8 @@ function BottomSheetNavigationHeader( { leftButtonOnPress, screen } ) {
 						<>
 							<Icon
 								icon={ chevronLeft }
-								size={ styles.bottomSheetBackButtonIcon.width }
-								style={ 36 }
+								size={ 40 }
+								style={ styles.bottomSheetBackButtonIcon }
 							/>
 							<Text style={ styles.bottomSheetBackButtonText }>
 								{ __( 'Back' ) }
