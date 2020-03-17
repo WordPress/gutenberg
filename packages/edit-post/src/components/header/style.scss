@@ -34,14 +34,30 @@
 .edit-post-header__toolbar {
 	display: flex;
 	flex-grow: 1;
-	padding-left: $grid-unit-30;
+	padding-left: $grid-unit-10;
+
+	@include break-small() {
+		padding-left: $grid-unit-30;
+	}
+
+	.table-of-contents {
+		display: none;
+
+		@include break-small() {
+			display: block;
+		}
+	}
 }
 
 .edit-post-header__settings {
 	display: inline-flex;
 	align-items: center;
 	flex-wrap: wrap;
-	padding-right: $grid-unit-20;
+	padding-right: $grid-unit-05;
+
+	@include break-small () {
+		padding-right: $grid-unit-20;
+	}
 }
 
 
