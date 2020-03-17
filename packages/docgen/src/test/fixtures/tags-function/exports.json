@@ -1,269 +1,378 @@
 {
-	"type": "ExportNamedDeclaration",
-	"start": 521,
-	"end": 609,
-	"loc": {
-		"start": {
-			"line": 22,
-			"column": 0
-		},
-		"end": {
-			"line": 24,
-			"column": 2
-		}
-	},
-	"range": [
-		521,
-		609
-	],
-	"declaration": {
-		"type": "VariableDeclaration",
-		"start": 528,
-		"end": 609,
-		"loc": {
-			"start": {
-				"line": 22,
-				"column": 7
-			},
-			"end": {
-				"line": 24,
-				"column": 2
-			}
-		},
-		"range": [
-			528,
-			609
-		],
-		"declarations": [
-			{
-				"type": "VariableDeclarator",
-				"start": 534,
-				"end": 608,
-				"loc": {
-					"start": {
-						"line": 22,
-						"column": 13
-					},
-					"end": {
-						"line": 24,
-						"column": 1
-					}
-				},
-				"range": [
-					534,
-					608
-				],
-				"id": {
-					"type": "Identifier",
-					"start": 534,
-					"end": 537,
-					"loc": {
-						"start": {
-							"line": 22,
-							"column": 13
-						},
-						"end": {
-							"line": 22,
-							"column": 16
-						}
-					},
-					"range": [
-						534,
-						537
-					],
-					"name": "sum"
-				},
-				"init": {
-					"type": "ArrowFunctionExpression",
-					"start": 540,
-					"end": 608,
-					"loc": {
-						"start": {
-							"line": 22,
-							"column": 19
-						},
-						"end": {
-							"line": 24,
-							"column": 1
-						}
-					},
-					"range": [
-						540,
-						608
-					],
-					"id": null,
-					"generator": false,
-					"expression": false,
-					"async": false,
-					"params": [
-						{
-							"type": "Identifier",
-							"start": 542,
-							"end": 552,
-							"loc": {
-								"start": {
-									"line": 22,
-									"column": 21
-								},
-								"end": {
-									"line": 22,
-									"column": 31
-								}
-							},
-							"range": [
-								542,
-								552
-							],
-							"name": "firstParam"
-						},
-						{
-							"type": "Identifier",
-							"start": 554,
-							"end": 565,
-							"loc": {
-								"start": {
-									"line": 22,
-									"column": 33
-								},
-								"end": {
-									"line": 22,
-									"column": 44
-								}
-							},
-							"range": [
-								554,
-								565
-							],
-							"name": "secondParam"
-						}
-					],
-					"body": {
-						"type": "BlockStatement",
-						"start": 571,
-						"end": 608,
-						"loc": {
-							"start": {
-								"line": 22,
-								"column": 50
-							},
-							"end": {
-								"line": 24,
-								"column": 1
-							}
-						},
-						"range": [
-							571,
-							608
-						],
-						"body": [
-							{
-								"type": "ReturnStatement",
-								"start": 574,
-								"end": 606,
-								"loc": {
-									"start": {
-										"line": 23,
-										"column": 1
-									},
-									"end": {
-										"line": 23,
-										"column": 33
-									}
-								},
-								"range": [
-									574,
-									606
-								],
-								"argument": {
-									"type": "BinaryExpression",
-									"start": 581,
-									"end": 605,
-									"loc": {
-										"start": {
-											"line": 23,
-											"column": 8
-										},
-										"end": {
-											"line": 23,
-											"column": 32
-										}
-									},
-									"range": [
-										581,
-										605
-									],
-									"left": {
-										"type": "Identifier",
-										"start": 581,
-										"end": 591,
-										"loc": {
-											"start": {
-												"line": 23,
-												"column": 8
-											},
-											"end": {
-												"line": 23,
-												"column": 18
-											}
-										},
-										"range": [
-											581,
-											591
-										],
-										"name": "firstParam"
-									},
-									"operator": "+",
-									"right": {
-										"type": "Identifier",
-										"start": 594,
-										"end": 605,
-										"loc": {
-											"start": {
-												"line": 23,
-												"column": 21
-											},
-											"end": {
-												"line": 23,
-												"column": 32
-											}
-										},
-										"range": [
-											594,
-											605
-										],
-										"name": "secondParam"
-									}
-								}
-							}
-						]
-					}
-				}
-			}
-		],
-		"kind": "const"
-	},
-	"specifiers": [],
-	"source": null,
-	"leadingComments": [
-		{
-			"type": "Block",
-			"value": "*\n * A function that adds two parameters.\n *\n * @deprecated Use native addition instead.\n * @since v2\n *\n * @see addition\n * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators\n *\n * @param {number} firstParam The first param to add.\n * @param {number} secondParam The second param to add.\n *\n *  @example\n *\n * ```js\n * const addResult = sum( 1, 3 );\n * console.log( addResult ); // will yield 4\n * ```\n *\n * @return {number} The result of adding the two params.\n ",
-			"start": 0,
-			"end": 520,
-			"range": [
-				0,
-				520
-			],
-			"loc": {
-				"start": {
-					"line": 1,
-					"column": 0
-				},
-				"end": {
-					"line": 21,
-					"column": 3
-				}
-			}
-		}
-	]
+  "pos": 0,
+  "end": 608,
+  "flags": 131072,
+  "modifierFlagsCache": 0,
+  "transformFlags": 0,
+  "kind": 225,
+  "jsDoc": [
+    {
+      "pos": 0,
+      "end": 519,
+      "flags": 4325376,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 303,
+      "tags": [
+        {
+          "pos": 50,
+          "end": 62,
+          "flags": 4325376,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 306,
+          "tagName": {
+            "pos": 51,
+            "end": 61,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 75,
+            "escapedText": "deprecated"
+          },
+          "comment": "Use native addition instead."
+        },
+        {
+          "pos": 94,
+          "end": 101,
+          "flags": 4325376,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 306,
+          "tagName": {
+            "pos": 95,
+            "end": 100,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 75,
+            "escapedText": "since"
+          },
+          "comment": "v2"
+        },
+        {
+          "pos": 110,
+          "end": 115,
+          "flags": 4325376,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 306,
+          "tagName": {
+            "pos": 111,
+            "end": 114,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 75,
+            "escapedText": "see"
+          },
+          "comment": "addition"
+        },
+        {
+          "pos": 127,
+          "end": 132,
+          "flags": 4325376,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 306,
+          "tagName": {
+            "pos": 128,
+            "end": 131,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 75,
+            "escapedText": "see"
+          },
+          "comment": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators"
+        },
+        {
+          "pos": 235,
+          "end": 289,
+          "flags": 4325376,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 316,
+          "tagName": {
+            "pos": 236,
+            "end": 241,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 75,
+            "escapedText": "param"
+          },
+          "typeExpression": {
+            "pos": 242,
+            "end": 250,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 294,
+            "type": {
+              "pos": 243,
+              "end": 249,
+              "flags": 4325376,
+              "modifierFlagsCache": 0,
+              "transformFlags": 0,
+              "kind": 140
+            }
+          },
+          "name": {
+            "pos": 251,
+            "end": 261,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 75,
+            "escapedText": "firstParam"
+          },
+          "isNameFirst": false,
+          "isBracketed": false,
+          "comment": "The first param to add."
+        },
+        {
+          "pos": 289,
+          "end": 349,
+          "flags": 4325376,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 316,
+          "tagName": {
+            "pos": 290,
+            "end": 295,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 75,
+            "escapedText": "param"
+          },
+          "typeExpression": {
+            "pos": 296,
+            "end": 304,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 294,
+            "type": {
+              "pos": 297,
+              "end": 303,
+              "flags": 4325376,
+              "modifierFlagsCache": 0,
+              "transformFlags": 0,
+              "kind": 140
+            }
+          },
+          "name": {
+            "pos": 305,
+            "end": 316,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 75,
+            "escapedText": "secondParam"
+          },
+          "isNameFirst": false,
+          "isBracketed": false,
+          "comment": "The second param to add."
+        },
+        {
+          "pos": 349,
+          "end": 364,
+          "flags": 4325376,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 306,
+          "tagName": {
+            "pos": 350,
+            "end": 357,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 75,
+            "escapedText": "example"
+          },
+          "comment": "```js\nconst addResult = sum( 1, 3 );\nconsole.log( addResult ); // will yield 4\n```"
+        },
+        {
+          "pos": 462,
+          "end": 478,
+          "flags": 4325376,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 317,
+          "tagName": {
+            "pos": 463,
+            "end": 469,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 75,
+            "originalKeywordKind": 101,
+            "escapedText": "return"
+          },
+          "typeExpression": {
+            "pos": 470,
+            "end": 478,
+            "flags": 4325376,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 294,
+            "type": {
+              "pos": 471,
+              "end": 477,
+              "flags": 4325376,
+              "modifierFlagsCache": 0,
+              "transformFlags": 0,
+              "kind": 140
+            }
+          },
+          "comment": "The result of adding the two params."
+        }
+      ],
+      "comment": "A function that adds two parameters."
+    }
+  ],
+  "modifiers": [
+    {
+      "pos": 0,
+      "end": 526,
+      "flags": 131072,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 89
+    }
+  ],
+  "declarationList": {
+    "pos": 526,
+    "end": 607,
+    "flags": 131074,
+    "modifierFlagsCache": 0,
+    "transformFlags": 0,
+    "kind": 243,
+    "declarations": [
+      {
+        "pos": 532,
+        "end": 607,
+        "flags": 131072,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 242,
+        "name": {
+          "pos": 532,
+          "end": 536,
+          "flags": 131072,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 75,
+          "escapedText": "sum"
+        },
+        "initializer": {
+          "pos": 538,
+          "end": 607,
+          "flags": 131072,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 202,
+          "parameters": [
+            {
+              "pos": 540,
+              "end": 551,
+              "flags": 131072,
+              "modifierFlagsCache": 0,
+              "transformFlags": 0,
+              "kind": 156,
+              "name": {
+                "pos": 540,
+                "end": 551,
+                "flags": 131072,
+                "modifierFlagsCache": 0,
+                "transformFlags": 0,
+                "kind": 75,
+                "escapedText": "firstParam"
+              }
+            },
+            {
+              "pos": 552,
+              "end": 564,
+              "flags": 131072,
+              "modifierFlagsCache": 0,
+              "transformFlags": 0,
+              "kind": 156,
+              "name": {
+                "pos": 552,
+                "end": 564,
+                "flags": 131072,
+                "modifierFlagsCache": 0,
+                "transformFlags": 0,
+                "kind": 75,
+                "escapedText": "secondParam"
+              }
+            }
+          ],
+          "equalsGreaterThanToken": {
+            "pos": 566,
+            "end": 569,
+            "flags": 131072,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 38
+          },
+          "body": {
+            "pos": 569,
+            "end": 607,
+            "flags": 131072,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 223,
+            "multiLine": true,
+            "statements": [
+              {
+                "pos": 571,
+                "end": 605,
+                "flags": 131072,
+                "modifierFlagsCache": 0,
+                "transformFlags": 0,
+                "kind": 235,
+                "expression": {
+                  "pos": 579,
+                  "end": 604,
+                  "flags": 131072,
+                  "modifierFlagsCache": 0,
+                  "transformFlags": 0,
+                  "kind": 209,
+                  "left": {
+                    "pos": 579,
+                    "end": 590,
+                    "flags": 131072,
+                    "modifierFlagsCache": 0,
+                    "transformFlags": 0,
+                    "kind": 75,
+                    "escapedText": "firstParam"
+                  },
+                  "operatorToken": {
+                    "pos": 590,
+                    "end": 592,
+                    "flags": 131072,
+                    "modifierFlagsCache": 0,
+                    "transformFlags": 0,
+                    "kind": 39
+                  },
+                  "right": {
+                    "pos": 592,
+                    "end": 604,
+                    "flags": 131072,
+                    "modifierFlagsCache": 0,
+                    "transformFlags": 0,
+                    "kind": 75,
+                    "escapedText": "secondParam"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
 }

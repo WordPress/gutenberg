@@ -1,82 +1,36 @@
 {
-	"type": "ExportNamedDeclaration",
-	"start": 64,
-	"end": 89,
-	"loc": {
-		"start": {
-			"line": 6,
-			"column": 0
-		},
-		"end": {
-			"line": 6,
-			"column": 25
-		}
-	},
-	"range": [
-		64,
-		89
-	],
-	"declaration": null,
-	"specifiers": [
-		{
-			"type": "ExportSpecifier",
-			"start": 73,
-			"end": 86,
-			"loc": {
-				"start": {
-					"line": 6,
-					"column": 9
-				},
-				"end": {
-					"line": 6,
-					"column": 22
-				}
-			},
-			"range": [
-				73,
-				86
-			],
-			"local": {
-				"type": "Identifier",
-				"start": 73,
-				"end": 86,
-				"loc": {
-					"start": {
-						"line": 6,
-						"column": 9
-					},
-					"end": {
-						"line": 6,
-						"column": 22
-					}
-				},
-				"range": [
-					73,
-					86
-				],
-				"name": "myDeclaration"
-			},
-			"exported": {
-				"type": "Identifier",
-				"start": 73,
-				"end": 86,
-				"loc": {
-					"start": {
-						"line": 6,
-						"column": 9
-					},
-					"end": {
-						"line": 6,
-						"column": 22
-					}
-				},
-				"range": [
-					73,
-					86
-				],
-				"name": "myDeclaration"
-			}
-		}
-	],
-	"source": null
+  "pos": 62,
+  "end": 89,
+  "flags": 131072,
+  "modifierFlagsCache": 0,
+  "transformFlags": 0,
+  "kind": 260,
+  "isTypeOnly": false,
+  "exportClause": {
+    "pos": 70,
+    "end": 88,
+    "flags": 131072,
+    "modifierFlagsCache": 0,
+    "transformFlags": 0,
+    "kind": 261,
+    "elements": [
+      {
+        "pos": 72,
+        "end": 86,
+        "flags": 131072,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 263,
+        "name": {
+          "pos": 72,
+          "end": 86,
+          "flags": 131072,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 75,
+          "escapedText": "myDeclaration"
+        }
+      }
+    ]
+  }
 }

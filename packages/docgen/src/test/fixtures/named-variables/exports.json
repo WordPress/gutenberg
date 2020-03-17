@@ -1,185 +1,91 @@
 {
-	"type": "ExportNamedDeclaration",
-	"start": 35,
-	"end": 97,
-	"loc": {
-		"start": {
-			"line": 4,
-			"column": 0
-		},
-		"end": {
-			"line": 5,
-			"column": 24
-		}
-	},
-	"range": [
-		35,
-		97
-	],
-	"declaration": {
-		"type": "VariableDeclaration",
-		"start": 42,
-		"end": 97,
-		"loc": {
-			"start": {
-				"line": 4,
-				"column": 7
-			},
-			"end": {
-				"line": 5,
-				"column": 24
-			}
-		},
-		"range": [
-			42,
-			97
-		],
-		"declarations": [
-			{
-				"type": "VariableDeclarator",
-				"start": 48,
-				"end": 71,
-				"loc": {
-					"start": {
-						"line": 4,
-						"column": 13
-					},
-					"end": {
-						"line": 4,
-						"column": 36
-					}
-				},
-				"range": [
-					48,
-					71
-				],
-				"id": {
-					"type": "Identifier",
-					"start": 48,
-					"end": 64,
-					"loc": {
-						"start": {
-							"line": 4,
-							"column": 13
-						},
-						"end": {
-							"line": 4,
-							"column": 29
-						}
-					},
-					"range": [
-						48,
-						64
-					],
-					"name": "firstDeclaration"
-				},
-				"init": {
-					"type": "Literal",
-					"start": 67,
-					"end": 71,
-					"loc": {
-						"start": {
-							"line": 4,
-							"column": 32
-						},
-						"end": {
-							"line": 4,
-							"column": 36
-						}
-					},
-					"range": [
-						67,
-						71
-					],
-					"value": true,
-					"raw": "true"
-				}
-			},
-			{
-				"type": "VariableDeclarator",
-				"start": 74,
-				"end": 96,
-				"loc": {
-					"start": {
-						"line": 5,
-						"column": 1
-					},
-					"end": {
-						"line": 5,
-						"column": 23
-					}
-				},
-				"range": [
-					74,
-					96
-				],
-				"id": {
-					"type": "Identifier",
-					"start": 74,
-					"end": 91,
-					"loc": {
-						"start": {
-							"line": 5,
-							"column": 1
-						},
-						"end": {
-							"line": 5,
-							"column": 18
-						}
-					},
-					"range": [
-						74,
-						91
-					],
-					"name": "secondDeclaration"
-				},
-				"init": {
-					"type": "Literal",
-					"start": 94,
-					"end": 96,
-					"loc": {
-						"start": {
-							"line": 5,
-							"column": 21
-						},
-						"end": {
-							"line": 5,
-							"column": 23
-						}
-					},
-					"range": [
-						94,
-						96
-					],
-					"value": 42,
-					"raw": "42"
-				}
-			}
-		],
-		"kind": "const"
-	},
-	"specifiers": [],
-	"source": null,
-	"leadingComments": [
-		{
-			"type": "Block",
-			"value": "*\n * My declaration example.\n ",
-			"start": 0,
-			"end": 34,
-			"range": [
-				0,
-				34
-			],
-			"loc": {
-				"start": {
-					"line": 1,
-					"column": 0
-				},
-				"end": {
-					"line": 3,
-					"column": 3
-				}
-			}
-		}
-	]
+  "pos": 0,
+  "end": 97,
+  "flags": 131072,
+  "modifierFlagsCache": 0,
+  "transformFlags": 0,
+  "kind": 225,
+  "jsDoc": [
+    {
+      "pos": 0,
+      "end": 34,
+      "flags": 4325376,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 303,
+      "comment": "My declaration example."
+    }
+  ],
+  "modifiers": [
+    {
+      "pos": 0,
+      "end": 41,
+      "flags": 131072,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 89
+    }
+  ],
+  "declarationList": {
+    "pos": 41,
+    "end": 96,
+    "flags": 131074,
+    "modifierFlagsCache": 0,
+    "transformFlags": 0,
+    "kind": 243,
+    "declarations": [
+      {
+        "pos": 47,
+        "end": 71,
+        "flags": 131072,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 242,
+        "name": {
+          "pos": 47,
+          "end": 64,
+          "flags": 131072,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 75,
+          "escapedText": "firstDeclaration"
+        },
+        "initializer": {
+          "pos": 66,
+          "end": 71,
+          "flags": 131072,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 106
+        }
+      },
+      {
+        "pos": 72,
+        "end": 96,
+        "flags": 131072,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 242,
+        "name": {
+          "pos": 72,
+          "end": 91,
+          "flags": 131072,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 75,
+          "escapedText": "secondDeclaration"
+        },
+        "initializer": {
+          "pos": 93,
+          "end": 96,
+          "flags": 131072,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 8,
+          "text": "42",
+          "numericLiteralFlags": 0
+        }
+      }
+    ]
+  }
 }

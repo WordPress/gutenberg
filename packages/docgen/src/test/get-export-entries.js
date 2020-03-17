@@ -10,14 +10,14 @@ const path = require( 'path' );
 const getExportEntries = require( '../get-export-entries' );
 
 describe( 'Export entries', function() {
-	it( 'default class (anonymous)', () => {
-		const token = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/default-class-anonymous/exports.json'
-			),
+	const getToken = ( dir ) =>
+		fs.readFileSync(
+			path.join( __dirname, './fixtures', dir, 'exports.json' ),
 			'utf-8'
 		);
+
+	it( 'default class (anonymous)', () => {
+		const token = getToken( 'default-class-anonymous' );
 		const name = getExportEntries( JSON.parse( token ) );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {

@@ -1,82 +1,36 @@
 {
-	"type": "ExportNamedDeclaration",
-	"start": 63,
-	"end": 84,
-	"loc": {
-		"start": {
-			"line": 3,
-			"column": 0
-		},
-		"end": {
-			"line": 3,
-			"column": 21
-		}
-	},
-	"range": [
-		63,
-		84
-	],
-	"declaration": null,
-	"specifiers": [
-		{
-			"type": "ExportSpecifier",
-			"start": 72,
-			"end": 81,
-			"loc": {
-				"start": {
-					"line": 3,
-					"column": 9
-				},
-				"end": {
-					"line": 3,
-					"column": 18
-				}
-			},
-			"range": [
-				72,
-				81
-			],
-			"local": {
-				"type": "Identifier",
-				"start": 72,
-				"end": 81,
-				"loc": {
-					"start": {
-						"line": 3,
-						"column": 9
-					},
-					"end": {
-						"line": 3,
-						"column": 18
-					}
-				},
-				"range": [
-					72,
-					81
-				],
-				"name": "variables"
-			},
-			"exported": {
-				"type": "Identifier",
-				"start": 72,
-				"end": 81,
-				"loc": {
-					"start": {
-						"line": 3,
-						"column": 9
-					},
-					"end": {
-						"line": 3,
-						"column": 18
-					}
-				},
-				"range": [
-					72,
-					81
-				],
-				"name": "variables"
-			}
-		}
-	],
-	"source": null
+  "pos": 94,
+  "end": 117,
+  "flags": 131072,
+  "modifierFlagsCache": 0,
+  "transformFlags": 0,
+  "kind": 260,
+  "isTypeOnly": false,
+  "exportClause": {
+    "pos": 102,
+    "end": 116,
+    "flags": 131072,
+    "modifierFlagsCache": 0,
+    "transformFlags": 0,
+    "kind": 261,
+    "elements": [
+      {
+        "pos": 104,
+        "end": 114,
+        "flags": 131072,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 263,
+        "name": {
+          "pos": 104,
+          "end": 114,
+          "flags": 131072,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 75,
+          "escapedText": "variables"
+        }
+      }
+    ]
+  }
 }

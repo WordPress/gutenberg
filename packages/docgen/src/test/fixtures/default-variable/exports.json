@@ -1,62 +1,27 @@
 {
-	"type": "ExportDefaultDeclaration",
-	"start": 41,
-	"end": 61,
-	"loc": {
-		"start": {
-			"line": 4,
-			"column": 0
-		},
-		"end": {
-			"line": 4,
-			"column": 20
-		}
-	},
-	"range": [
-		41,
-		61
-	],
-	"declaration": {
-		"type": "Literal",
-		"start": 56,
-		"end": 60,
-		"loc": {
-			"start": {
-				"line": 4,
-				"column": 15
-			},
-			"end": {
-				"line": 4,
-				"column": 19
-			}
-		},
-		"range": [
-			56,
-			60
-		],
-		"value": true,
-		"raw": "true"
-	},
-	"leadingComments": [
-		{
-			"type": "Block",
-			"value": "*\n * Variable declaration example.\n ",
-			"start": 0,
-			"end": 40,
-			"range": [
-				0,
-				40
-			],
-			"loc": {
-				"start": {
-					"line": 1,
-					"column": 0
-				},
-				"end": {
-					"line": 3,
-					"column": 3
-				}
-			}
-		}
-	]
+  "pos": 0,
+  "end": 61,
+  "flags": 131072,
+  "modifierFlagsCache": 0,
+  "transformFlags": 0,
+  "kind": 259,
+  "jsDoc": [
+    {
+      "pos": 0,
+      "end": 40,
+      "flags": 4325376,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 303,
+      "comment": "Variable declaration example."
+    }
+  ],
+  "expression": {
+    "pos": 55,
+    "end": 60,
+    "flags": 131072,
+    "modifierFlagsCache": 0,
+    "transformFlags": 0,
+    "kind": 106
+  }
 }
