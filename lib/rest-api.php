@@ -93,3 +93,32 @@ function gutenberg_register_rest_block_directory() {
 	$block_directory_controller->register_routes();
 }
 add_filter( 'rest_api_init', 'gutenberg_register_rest_block_directory' );
+
+/**
+ * Registers the REST settings controller API routes.
+ *
+ * @since ?
+ */
+function gutenberg_register_rest_settings_controller() {
+	register_setting(
+		'general',
+		'blogname',
+		array(
+			'show_in_rest' => array(
+				'name' => 'title',
+				'prepare_callback' => function() {
+					return array(
+						'raw' => get_bloginfo( 'blogname', 'raw' ),
+						'display' => get_bloginfo( 'blogname', 'display' ),
+					);
+				},
+			),
+			'type'         => 'string',
+			'description'  => __( 'Site title.' ),
+		)
+	);
+
+	$rest_settings_controller = new WP_REST_Settings_Controller2();
+	$rest_settings_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_settings_controller', 98 );
