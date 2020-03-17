@@ -140,7 +140,7 @@ export default function TemplateSwitcher( {
 								onHover={ onHoverTemplatePart }
 							/>
 						</MenuGroup>
-						{ !! hoveredTemplate && (
+						{ !! hoveredTemplate?.id && (
 							<TemplatePreview item={ hoveredTemplate } />
 						) }
 					</>
