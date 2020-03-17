@@ -85,15 +85,17 @@ class BlockListBlock extends Component {
 			hasParent,
 			isLastBlock,
 			isFirstBlock,
+			isHorizontal,
 			isSelected,
 		} = this.props;
 		return [
 			// Do not add horizontal margin in nested blocks
 			! hasParent && styles.withMarginHorizontal,
 			// remove margin bottom for the last block (the margin is added to the parent)
-			! isLastBlock && ! isSelected && styles.withMarginBottom,
+			! isLastBlock && ! isSelected && styles.isVerticalMarginBottom,
 			// remove margin top for the first block that is not on the root level (the margin is added to the parent)
-			! ( isFirstBlock && hasParent ) && styles.withMarginTop,
+			! ( isFirstBlock && hasParent ) && styles.isVerticalMarginTop,
+			isHorizontal && styles.isHorizontal,
 			isDimmed && styles.dimmed,
 		];
 	}
@@ -110,6 +112,7 @@ class BlockListBlock extends Component {
 			title,
 			parentId,
 			isFirstBlock,
+			isHorizontal,
 			isTouchable,
 			hasParent,
 			isParentSelected,
@@ -133,7 +136,9 @@ class BlockListBlock extends Component {
 				<View accessibilityLabel={ accessibilityLabel }>
 					{ showFloatingToolbar && (
 						<FloatingToolbar
-							isFirstBlock={ hasParent && isFirstBlock }
+							isFirstBlock={
+								( hasParent && isFirstBlock ) || isHorizontal
+							}
 						>
 							{ hasParent && (
 								<Toolbar passedStyle={ styles.toolbar }>
@@ -271,6 +276,8 @@ export default compose( [
 			! isDescendantSelected &&
 			( isDescendantOfParentSelected || rootBlockId === clientId );
 
+		const isHorizontal = false;
+
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -282,6 +289,7 @@ export default compose( [
 			isFirstBlock,
 			isSelected,
 			isValid,
+			isHorizontal,
 			parentId,
 			isParentSelected,
 			firstToSelectId,

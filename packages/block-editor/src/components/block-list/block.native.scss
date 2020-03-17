@@ -90,10 +90,16 @@
 	margin-right: $block-edge-to-content;
 }
 
-.withMarginTop {
+.isVerticalMarginTop {
 	margin-top: $block-edge-to-content;
 }
 
-.withMarginBottom {
+.isVerticalMarginBottom {
 	margin-bottom: $block-edge-to-content;
+}
+
+.isHorizontal {
+	margin-bottom: 2 * $block-edge-to-content;
+	margin-top: 0;
+	flex: 1;
 }
