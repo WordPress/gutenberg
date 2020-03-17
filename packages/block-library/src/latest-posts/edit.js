@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, invoke, isUndefined, pickBy } from 'lodash';
+import { get, includes, invoke, isUndefined, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -121,9 +121,19 @@ class LatestPostsEdit extends Component {
 		const selectCategories = ( tokens ) => {
 			// Categories that are already will be objects, while new additions will be strings (the name).
 			// allCategories nomalizes the array so that they are all objects.
-			const allCategories = tokens.map( ( token ) =>
-				typeof token === 'string' ? suggestions[ token ] : token
-			);
+			const allCategories = tokens.map( ( token ) => {
+				if ( typeof suggestions[ token ] !== 'undefined' ) {
+					return typeof token === 'string'
+						? suggestions[ token ]
+						: token;
+				}
+				return null;
+			} );
+			// we do nothing if the category is not selected
+			// from suggestions
+			if ( includes( allCategories, null ) ) {
+				return [];
+			}
 			setAttributes( { categories: allCategories } );
 		};
 
