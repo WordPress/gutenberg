@@ -258,7 +258,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 	);
 	return blocks.map( ( block ) => {
 		const blockName = block.name;
-		if ( ! hasBlockSupport( blockName, 'defaultStyle', true ) ) {
+		if ( ! hasBlockSupport( blockName, 'defaultStylePicker', true ) ) {
 			return block;
 		}
 		if ( ! preferredStyleVariations[ blockName ] ) {

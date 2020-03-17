@@ -69,7 +69,7 @@ const BlockInspector = ( {
 						<BlockStyles clientId={ selectedBlockClientId } />
 						{ hasBlockSupport(
 							blockType.name,
-							'defaultStyle',
+							'defaultStylePicker',
 							true
 						) && (
 							<DefaultStylePicker blockName={ blockType.name } />

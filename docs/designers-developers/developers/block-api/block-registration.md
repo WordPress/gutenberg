@@ -716,11 +716,11 @@ attributes: {
 alignWide: false,
 ```
 
--   `defaultStyle` (default `true`): When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to `false`.
+-   `defaultStylePicker` (default `true`): When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to `false`.
 
 ```js
-// Remove the Default Style dropdown.
-defaultStyle: false,
+// Remove the Default Style picker.
+defaultStylePicker: false,
 ```
 
 
