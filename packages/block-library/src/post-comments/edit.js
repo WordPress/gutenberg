@@ -27,6 +27,7 @@ function PostCommentsDisplay( { postId } ) {
 }
 
 export default function PostCommentsEdit() {
+	// TODO: Update to handle multiple post types.
 	const postId = useEntityId( 'postType', 'post' );
 	if ( ! postId ) {
 		return 'Post Comments Placeholder';

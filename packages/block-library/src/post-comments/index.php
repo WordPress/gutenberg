@@ -21,6 +21,7 @@ function render_block_core_post_comments() {
 		)
 	);
 	$output   = '';
+	// TODO: Handle nested comments.
 	foreach ( $comments as $comment ) {
 		$output .= '<p>' . $comment->comment_author . '<br />' . $comment->comment_content . '</p>';
 	}
