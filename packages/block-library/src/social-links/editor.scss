@@ -86,6 +86,7 @@
 
 // To ensure a better selection footprint when editing, attach the margin to the block container.
 // @todo: This can very probably be removed entirely when this block receives a lighter DOM.
+.is-navigate-mode .block-editor-block-list__layout .block-editor-block-list__block[data-type="core/social-link"].is-selected::after,
 .block-editor-block-list__layout .block-editor-block-list__block[data-type="core/social-link"]:not([contenteditable]):focus::after {
 	right: 8px;
 }
