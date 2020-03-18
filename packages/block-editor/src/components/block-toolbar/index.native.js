@@ -21,12 +21,14 @@ export default function BlockToolbar() {
 
 		return {
 			blockClientIds: selectedBlockClientIds,
-			isValid: selectedBlockClientIds.length === 1 ?
-				isBlockValid( selectedBlockClientIds[ 0 ] ) :
-				null,
-			mode: selectedBlockClientIds.length === 1 ?
-				getBlockMode( selectedBlockClientIds[ 0 ] ) :
-				null,
+			isValid:
+				selectedBlockClientIds.length === 1
+					? isBlockValid( selectedBlockClientIds[ 0 ] )
+					: null,
+			mode:
+				selectedBlockClientIds.length === 1
+					? getBlockMode( selectedBlockClientIds[ 0 ] )
+					: null,
 		};
 	}, [] );
 

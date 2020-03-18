@@ -14,10 +14,7 @@ const INHERITED_COLUMN_ATTRIBUTES = [ 'align' ];
  *
  * @return {Object} New table state.
  */
-export function createTable( {
-	rowCount,
-	columnCount,
-} ) {
+export function createTable( { rowCount, columnCount } ) {
 	return {
 		body: times( rowCount, () => ( {
 			cells: times( columnCount, () => ( {
@@ -57,12 +54,14 @@ export function getFirstRow( state ) {
  * @return {*} The attribute value.
  */
 export function getCellAttribute( state, cellLocation, attributeName ) {
-	const {
+	const { sectionName, rowIndex, columnIndex } = cellLocation;
+	return get( state, [
 		sectionName,
 		rowIndex,
+		'cells',
 		columnIndex,
-	} = cellLocation;
-	return get( state, [ sectionName, rowIndex, 'cells', columnIndex, attributeName ] );
+		attributeName,
+	] );
 }
 
 /**
@@ -129,12 +128,17 @@ export function isCellSelected( cellLocation, selection ) {
 
 	switch ( selection.type ) {
 		case 'column':
-			return selection.type === 'column' && cellLocation.columnIndex === selection.columnIndex;
+			return (
+				selection.type === 'column' &&
+				cellLocation.columnIndex === selection.columnIndex
+			);
 		case 'cell':
-			return selection.type === 'cell' &&
+			return (
+				selection.type === 'cell' &&
 				cellLocation.sectionName === selection.sectionName &&
 				cellLocation.columnIndex === selection.columnIndex &&
-				cellLocation.rowIndex === selection.rowIndex;
+				cellLocation.rowIndex === selection.rowIndex
+			);
 	}
 }
 
@@ -148,13 +152,12 @@ export function isCellSelected( cellLocation, selection ) {
  *
  * @return {Object} New table state.
  */
-export function insertRow( state, {
-	sectionName,
-	rowIndex,
-	columnCount,
-} ) {
+export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 	const firstRow = getFirstRow( state );
-	const cellCount = columnCount === undefined ? get( firstRow, [ 'cells', 'length' ] ) : columnCount;
+	const cellCount =
+		columnCount === undefined
+			? get( firstRow, [ 'cells', 'length' ] )
+			: columnCount;
 
 	// Bail early if the function cannot determine how many cells to add.
 	if ( ! cellCount ) {
@@ -166,8 +169,15 @@ export function insertRow( state, {
 			...state[ sectionName ].slice( 0, rowIndex ),
 			{
 				cells: times( cellCount, ( index ) => {
-					const firstCellInColumn = get( firstRow, [ 'cells', index ], {} );
-					const inheritedAttributes = pick( firstCellInColumn, INHERITED_COLUMN_ATTRIBUTES );
+					const firstCellInColumn = get(
+						firstRow,
+						[ 'cells', index ],
+						{}
+					);
+					const inheritedAttributes = pick(
+						firstCellInColumn,
+						INHERITED_COLUMN_ATTRIBUTES
+					);
 
 					return {
 						...inheritedAttributes,
@@ -191,12 +201,11 @@ export function insertRow( state, {
  *
  * @return {Object} New table state.
  */
-export function deleteRow( state, {
-	sectionName,
-	rowIndex,
-} ) {
+export function deleteRow( state, { sectionName, rowIndex } ) {
 	return {
-		[ sectionName ]: state[ sectionName ].filter( ( row, index ) => index !== rowIndex ),
+		[ sectionName ]: state[ sectionName ].filter(
+			( row, index ) => index !== rowIndex
+		),
 	};
 }
 
@@ -209,9 +218,7 @@ export function deleteRow( state, {
  *
  * @return {Object} New table state.
  */
-export function insertColumn( state, {
-	columnIndex,
-} ) {
+export function insertColumn( state, { columnIndex } ) {
 	const tableSections = pick( state, [ 'head', 'body', 'foot' ] );
 
 	return mapValues( tableSections, ( section, sectionName ) => {
@@ -250,9 +257,7 @@ export function insertColumn( state, {
  *
  * @return {Object} New table state.
  */
-export function deleteColumn( state, {
-	columnIndex,
-} ) {
+export function deleteColumn( state, { columnIndex } ) {
 	const tableSections = pick( state, [ 'head', 'body', 'foot' ] );
 
 	return mapValues( tableSections, ( section ) => {
@@ -261,9 +266,16 @@ export function deleteColumn( state, {
 			return section;
 		}
 
-		return section.map( ( row ) => ( {
-			cells: row.cells.length >= columnIndex ? row.cells.filter( ( cell, index ) => index !== columnIndex ) : row.cells,
-		} ) ).filter( ( row ) => row.cells.length );
+		return section
+			.map( ( row ) => ( {
+				cells:
+					row.cells.length >= columnIndex
+						? row.cells.filter(
+								( cell, index ) => index !== columnIndex
+						  )
+						: row.cells,
+			} ) )
+			.filter( ( row ) => row.cells.length );
 	} );
 }
 

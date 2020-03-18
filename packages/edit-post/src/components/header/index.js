@@ -3,11 +3,9 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import {
-	PostPreviewButton,
-	PostSavedState,
-} from '@wordpress/editor';
+import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { cog } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,6 +15,7 @@ import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PinnedPlugins from './pinned-plugins';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
+import PreviewOptions from '../preview-options';
 
 function Header() {
 	const {
@@ -26,22 +25,43 @@ function Header() {
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
-	} = useSelect( ( select ) => ( {
-		shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
-	} ), [] );
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch( 'core/edit-post' );
+	} = useSelect(
+		( select ) => ( {
+			shortcut: select(
+				'core/keyboard-shortcuts'
+			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+			isEditorSidebarOpened: select(
+				'core/edit-post'
+			).isEditorSidebarOpened(),
+			isPublishSidebarOpened: select(
+				'core/edit-post'
+			).isPublishSidebarOpened(),
+			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			getBlockSelectionStart: select( 'core/block-editor' )
+				.getBlockSelectionStart,
+		} ),
+		[]
+	);
+	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
+		'core/edit-post'
+	);
 
-	const toggleGeneralSidebar = isEditorSidebarOpened ?
-		closeGeneralSidebar :
-		() => openGeneralSidebar( getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document' );
+	const toggleGeneralSidebar = isEditorSidebarOpened
+		? closeGeneralSidebar
+		: () =>
+				openGeneralSidebar(
+					getBlockSelectionStart()
+						? 'edit-post/block'
+						: 'edit-post/document'
+				);
 
 	return (
 		<div className="edit-post-header">
+			<FullscreenModeClose />
+			<div className="edit-post-header__toolbar">
+				<HeaderToolbar />
+			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
@@ -54,6 +74,10 @@ function Header() {
 						forceIsSaving={ isSaving }
 					/>
 				) }
+				<PreviewOptions
+					forceIsAutosaveable={ hasActiveMetaboxes }
+					forcePreviewLink={ isSaving ? null : undefined }
+				/>
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }
@@ -63,7 +87,7 @@ function Header() {
 					forceIsSaving={ isSaving }
 				/>
 				<Button
-					icon="admin-generic"
+					icon={ cog }
 					label={ __( 'Settings' ) }
 					onClick={ toggleGeneralSidebar }
 					isPressed={ isEditorSidebarOpened }
@@ -72,10 +96,6 @@ function Header() {
 				/>
 				<PinnedPlugins.Slot />
 				<MoreMenu />
-			</div>
-			<div className="edit-post-header__toolbar">
-				<FullscreenModeClose />
-				<HeaderToolbar />
 			</div>
 		</div>
 	);

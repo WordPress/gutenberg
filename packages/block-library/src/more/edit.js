@@ -6,10 +6,7 @@ import { PanelBody, ToggleControl } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/block-editor';
 import { ENTER } from '@wordpress/keycodes';
-import {
-	getDefaultBlockName,
-	createBlock,
-} from '@wordpress/blocks';
+import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
 export default class MoreEdit extends Component {
 	constructor() {
@@ -28,7 +25,8 @@ export default class MoreEdit extends Component {
 			defaultText: '',
 		} );
 
-		const value = event.target.value.length === 0 ? undefined : event.target.value;
+		const value =
+			event.target.value.length === 0 ? undefined : event.target.value;
 		this.props.setAttributes( { customText: value } );
 	}
 
@@ -41,16 +39,17 @@ export default class MoreEdit extends Component {
 	}
 
 	getHideExcerptHelp( checked ) {
-		return checked ?
-			__( 'The excerpt is hidden.' ) :
-			__( 'The excerpt is visible.' );
+		return checked
+			? __( 'The excerpt is hidden.' )
+			: __( 'The excerpt is visible.' );
 	}
 
 	render() {
 		const { customText, noTeaser } = this.props.attributes;
 		const { setAttributes } = this.props;
 
-		const toggleHideExcerpt = () => setAttributes( { noTeaser: ! noTeaser } );
+		const toggleHideExcerpt = () =>
+			setAttributes( { noTeaser: ! noTeaser } );
 		const { defaultText } = this.state;
 		const value = customText !== undefined ? customText : defaultText;
 		const inputLength = value.length + 1.2;
@@ -61,7 +60,9 @@ export default class MoreEdit extends Component {
 				<InspectorControls>
 					<PanelBody>
 						<ToggleControl
-							label={ __( 'Hide the excerpt on the full content page' ) }
+							label={ __(
+								'Hide the excerpt on the full content page'
+							) }
 							checked={ !! noTeaser }
 							onChange={ toggleHideExcerpt }
 							help={ this.getHideExcerptHelp }

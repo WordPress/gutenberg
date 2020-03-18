@@ -74,12 +74,16 @@ describe( 'templates', () => {
 		}
 
 		beforeAll( async () => {
-			await activatePlugin( 'gutenberg-test-plugin-post-formats-support' );
+			await activatePlugin(
+				'gutenberg-test-plugin-post-formats-support'
+			);
 			await setPostFormat( 'image' );
 		} );
 		afterAll( async () => {
 			await setPostFormat( STANDARD_FORMAT_VALUE );
-			await deactivatePlugin( 'gutenberg-test-plugin-post-formats-support' );
+			await deactivatePlugin(
+				'gutenberg-test-plugin-post-formats-support'
+			);
 		} );
 
 		it( 'should populate new post with default block for format', async () => {

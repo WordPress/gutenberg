@@ -16,24 +16,29 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockNavigationList from './list';
 
-function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, selectBlock } ) {
+function BlockNavigation( {
+	rootBlock,
+	rootBlocks,
+	selectedBlockClientId,
+	selectBlock,
+} ) {
 	if ( ! rootBlocks || rootBlocks.length === 0 ) {
 		return null;
 	}
 
-	const hasHierarchy = (
-		rootBlock && (
-			rootBlock.clientId !== selectedBlockClientId ||
-			( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 )
-		)
-	);
+	const hasHierarchy =
+		rootBlock &&
+		( rootBlock.clientId !== selectedBlockClientId ||
+			( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 ) );
 
 	return (
 		<NavigableMenu
 			role="presentation"
 			className="block-editor-block-navigation__container"
 		>
-			<p className="block-editor-block-navigation__label">{ __( 'Block navigation' ) }</p>
+			<p className="block-editor-block-navigation__label">
+				{ __( 'Block navigation' ) }
+			</p>
 			{ hasHierarchy && (
 				<BlockNavigationList
 					blocks={ [ rootBlock ] }
@@ -64,7 +69,11 @@ export default compose(
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			rootBlocks: getBlocks(),
-			rootBlock: selectedBlockClientId ? getBlock( getBlockHierarchyRootClientId( selectedBlockClientId ) ) : null,
+			rootBlock: selectedBlockClientId
+				? getBlock(
+						getBlockHierarchyRootClientId( selectedBlockClientId )
+				  )
+				: null,
 			selectedBlockClientId,
 		};
 	} ),

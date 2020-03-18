@@ -27,7 +27,7 @@ class ClipboardButton extends Component {
 		const { getText, onCopy } = this;
 		const container = this.containerRef.current;
 
-		this.clipboard = new Clipboard( container.firstChild,	{
+		this.clipboard = new Clipboard( container.firstChild, {
 			text: getText,
 			container,
 		} );
@@ -71,9 +71,18 @@ class ClipboardButton extends Component {
 	}
 
 	render() {
-		// Disable reason: Exclude from spread props passed to Button
-		// eslint-disable-next-line no-unused-vars
-		const { className, children, onCopy, onFinishCopy, text, ...buttonProps } = this.props;
+		const {
+			className,
+			children,
+			// Disable reason: Exclude from spread props passed to Button
+			// eslint-disable-next-line no-unused-vars
+			onCopy,
+			// eslint-disable-next-line no-unused-vars
+			onFinishCopy,
+			// eslint-disable-next-line no-unused-vars
+			text,
+			...buttonProps
+		} = this.props;
 		const classes = classnames( 'components-clipboard-button', className );
 
 		// Workaround for inconsistent behavior in Safari, where <textarea> is not

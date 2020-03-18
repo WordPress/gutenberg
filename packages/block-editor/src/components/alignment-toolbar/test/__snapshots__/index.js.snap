@@ -6,7 +6,14 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
     Array [
       Object {
         "align": "custom-left",
-        "icon": "editor-alignleft",
+        "icon": <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M4 19.8h8.9v-1.5H4v1.5zm8.9-15.6H4v1.5h8.9V4.2zm-8.9 7v1.5h16v-1.5H4z"
+          />
+        </SVG>,
         "isActive": false,
         "onClick": [Function],
         "role": "menuitemradio",
@@ -14,7 +21,14 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
       },
       Object {
         "align": "custom-right",
-        "icon": "editor-aligncenter",
+        "icon": <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M16.4 4.2H7.6v1.5h8.9V4.2zM4 11.2v1.5h16v-1.5H4zm3.6 8.6h8.9v-1.5H7.6v1.5z"
+          />
+        </SVG>,
         "isActive": true,
         "onClick": [Function],
         "role": "menuitemradio",
@@ -22,9 +36,23 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
       },
     ]
   }
-  icon="editor-aligncenter"
+  icon={
+    <SVG
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <Path
+        d="M16.4 4.2H7.6v1.5h8.9V4.2zM4 11.2v1.5h16v-1.5H4zm3.6 8.6h8.9v-1.5H7.6v1.5z"
+      />
+    </SVG>
+  }
   isCollapsed={true}
   label="Change text alignment"
+  popoverProps={
+    Object {
+      "position": "bottom right",
+    }
+  }
 />
 `;
 
@@ -34,7 +62,14 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
     Array [
       Object {
         "align": "left",
-        "icon": "editor-alignleft",
+        "icon": <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M4 19.8h8.9v-1.5H4v1.5zm8.9-15.6H4v1.5h8.9V4.2zm-8.9 7v1.5h16v-1.5H4z"
+          />
+        </SVG>,
         "isActive": true,
         "onClick": [Function],
         "role": "menuitemradio",
@@ -42,7 +77,14 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
       },
       Object {
         "align": "center",
-        "icon": "editor-aligncenter",
+        "icon": <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M16.4 4.2H7.6v1.5h8.9V4.2zM4 11.2v1.5h16v-1.5H4zm3.6 8.6h8.9v-1.5H7.6v1.5z"
+          />
+        </SVG>,
         "isActive": false,
         "onClick": [Function],
         "role": "menuitemradio",
@@ -50,7 +92,14 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
       },
       Object {
         "align": "right",
-        "icon": "editor-alignright",
+        "icon": <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M11.1 19.8H20v-1.5h-8.9v1.5zm0-15.6v1.5H20V4.2h-8.9zM4 12.8h16v-1.5H4v1.5z"
+          />
+        </SVG>,
         "isActive": false,
         "onClick": [Function],
         "role": "menuitemradio",
@@ -58,8 +107,22 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
       },
     ]
   }
-  icon="editor-alignleft"
+  icon={
+    <SVG
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <Path
+        d="M4 19.8h8.9v-1.5H4v1.5zm8.9-15.6H4v1.5h8.9V4.2zm-8.9 7v1.5h16v-1.5H4z"
+      />
+    </SVG>
+  }
   isCollapsed={true}
   label="Change text alignment"
+  popoverProps={
+    Object {
+      "position": "bottom right",
+    }
+  }
 />
 `;

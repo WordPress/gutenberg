@@ -127,9 +127,9 @@ export const controls = {
 	SELECT: createRegistryControl(
 		( registry ) => ( { storeKey, selectorName, args } ) => {
 			return registry[
-				registry.select( storeKey )[ selectorName ].hasResolver ?
-					'__experimentalResolveSelect' :
-					'select'
+				registry.select( storeKey )[ selectorName ].hasResolver
+					? '__experimentalResolveSelect'
+					: 'select'
 			]( storeKey )[ selectorName ]( ...args );
 		}
 	),

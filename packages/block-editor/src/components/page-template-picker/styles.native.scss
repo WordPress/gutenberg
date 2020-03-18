@@ -35,9 +35,16 @@
 	color: $light-opacity-700;
 }
 
-.headerRightButton {
+.previewContainer {
 	flex: 1;
-	align-items: flex-end;
-	justify-content: center;
-	padding-right: 12px;
+	background-color: $white;
+}
+
+.previewContainerDark {
+	background-color: $black;
+}
+
+.previewHeader {
+	flex: 0;
+	height: 15px;
 }

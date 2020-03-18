@@ -59,6 +59,20 @@ _Returns_
 
 -   `Array`: Block Types.
 
+<a name="getBlockVariations" href="#getBlockVariations">#</a> **getBlockVariations**
+
+Returns block variations by block name.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+-   _blockName_ `string`: Block type name.
+-   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+
+_Returns_
+
+-   `(Array<WPBlockVariation>|void)`: Block variations.
+
 <a name="getCategories" href="#getCategories">#</a> **getCategories**
 
 Returns all the available categories.
@@ -107,6 +121,23 @@ _Parameters_
 _Returns_
 
 -   `?string`: Default block name.
+
+<a name="getDefaultBlockVariation" href="#getDefaultBlockVariation">#</a> **getDefaultBlockVariation**
+
+Returns the default block variation for the given block type.
+When there are multiple variations annotated as the default one,
+the last added item is picked. This simplifies registering overrides.
+When there is no default variation set, it returns the first item.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+-   _blockName_ `string`: Block type name.
+-   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+
+_Returns_
+
+-   `?WPBlockVariation`: The default block variation.
 
 <a name="getFreeformFallbackBlockName" href="#getFreeformFallbackBlockName">#</a> **getFreeformFallbackBlockName**
 
@@ -246,6 +277,19 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="addBlockVariations" href="#addBlockVariations">#</a> **addBlockVariations**
+
+Returns an action object used in signalling that new block variations have been added.
+
+_Parameters_
+
+-   _blockName_ `string`: Block name.
+-   _variations_ `(WPBlockVariation|Array<WPBlockVariation>)`: Block variations.
+
+_Returns_
+
+-   `Object`: Action object.
+
 <a name="removeBlockCollection" href="#removeBlockCollection">#</a> **removeBlockCollection**
 
 Returns an action object used to remove block collections
@@ -278,6 +322,19 @@ Returns an action object used to remove a registered block type.
 _Parameters_
 
 -   _names_ `(string|Array)`: Block name.
+
+_Returns_
+
+-   `Object`: Action object.
+
+<a name="removeBlockVariations" href="#removeBlockVariations">#</a> **removeBlockVariations**
+
+Returns an action object used in signalling that block variations have been removed.
+
+_Parameters_
+
+-   _blockName_ `string`: Block name.
+-   _variationNames_ `(string|Array<string>)`: Block variation names.
 
 _Returns_
 

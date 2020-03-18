@@ -109,7 +109,8 @@ export const select = defaultRegistry.select;
  *
  * @return {Object} Object containing the store's promise-wrapped selectors.
  */
-export const __experimentalResolveSelect = defaultRegistry.__experimentalResolveSelect;
+export const __experimentalResolveSelect =
+	defaultRegistry.__experimentalResolveSelect;
 
 /**
  * Given the name of a registered store, returns an object of the store's action creators.

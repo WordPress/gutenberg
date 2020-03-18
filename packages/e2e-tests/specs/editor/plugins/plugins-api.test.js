@@ -30,7 +30,10 @@ describe( 'Using Plugins API', () => {
 		it( 'Should render post status info inside Document Setting sidebar', async () => {
 			await openDocumentSettingsSidebar();
 
-			const pluginPostStatusInfoText = await page.$eval( '.edit-post-post-status .my-post-status-info-plugin', ( el ) => el.innerText );
+			const pluginPostStatusInfoText = await page.$eval(
+				'.edit-post-post-status .my-post-status-info-plugin',
+				( el ) => el.innerText
+			);
 			expect( pluginPostStatusInfoText ).toBe( 'My post status info' );
 		} );
 	} );
@@ -45,14 +48,20 @@ describe( 'Using Plugins API', () => {
 		it( 'Should render publish panel inside Pre-publish sidebar', async () => {
 			await openPublishPanel();
 
-			const pluginPublishPanelText = await page.$eval( '.editor-post-publish-panel .my-publish-panel-plugin__pre', ( el ) => el.innerText );
+			const pluginPublishPanelText = await page.$eval(
+				'.editor-post-publish-panel .my-publish-panel-plugin__pre',
+				( el ) => el.innerText
+			);
 			expect( pluginPublishPanelText ).toMatch( 'My pre publish panel' );
 		} );
 
 		it( 'Should render publish panel inside Post-publish sidebar', async () => {
 			await publishPost();
 
-			const pluginPublishPanelText = await page.$eval( '.editor-post-publish-panel .my-publish-panel-plugin__post', ( el ) => el.innerText );
+			const pluginPublishPanelText = await page.$eval(
+				'.editor-post-publish-panel .my-publish-panel-plugin__post',
+				( el ) => el.innerText
+			);
 			expect( pluginPublishPanelText ).toMatch( 'My post publish panel' );
 		} );
 	} );
@@ -61,7 +70,10 @@ describe( 'Using Plugins API', () => {
 		it( 'Should open plugins sidebar using More Menu item and render content', async () => {
 			await clickOnMoreMenuItem( 'Sidebar title plugin' );
 
-			const pluginSidebarContent = await page.$eval( '.edit-post-sidebar', ( el ) => el.innerHTML );
+			const pluginSidebarContent = await page.$eval(
+				'.edit-post-sidebar',
+				( el ) => el.innerHTML
+			);
 			expect( pluginSidebarContent ).toMatchSnapshot();
 		} );
 
@@ -89,7 +101,10 @@ describe( 'Using Plugins API', () => {
 			it( 'Should open plugins sidebar using More Menu item and render content', async () => {
 				await clickOnMoreMenuItem( 'Sidebar title plugin' );
 
-				const pluginSidebarContent = await page.$eval( '.edit-post-sidebar', ( el ) => el.innerHTML );
+				const pluginSidebarContent = await page.$eval(
+					'.edit-post-sidebar',
+					( el ) => el.innerHTML
+				);
 				expect( pluginSidebarContent ).toMatchSnapshot();
 			} );
 		} );
@@ -98,7 +113,10 @@ describe( 'Using Plugins API', () => {
 	describe( 'Document Setting Custom Panel', () => {
 		it( 'Should render a custom panel inside Document Setting sidebar', async () => {
 			await openDocumentSettingsSidebar();
-			const pluginDocumentSettingsText = await page.$eval( '.edit-post-sidebar .my-document-setting-plugin', ( el ) => el.innerText );
+			const pluginDocumentSettingsText = await page.$eval(
+				'.edit-post-sidebar .my-document-setting-plugin',
+				( el ) => el.innerText
+			);
 			expect( pluginDocumentSettingsText ).toMatchSnapshot();
 		} );
 	} );

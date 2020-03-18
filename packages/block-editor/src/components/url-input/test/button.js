@@ -14,19 +14,28 @@ import URLInputButton from '../button';
 import '../../../store';
 
 describe( 'URLInputButton', () => {
-	const clickEditLink = ( wrapper ) => wrapper.find( 'ForwardRef(Button).components-toolbar__control' ).simulate( 'click' );
+	const clickEditLink = ( wrapper ) =>
+		wrapper
+			.find( 'ForwardRef(Button).components-toolbar__control' )
+			.simulate( 'click' );
 
 	it( 'should have a valid class name in the wrapper tag', () => {
 		const wrapper = shallow( <URLInputButton /> );
-		expect( wrapper.hasClass( 'block-editor-url-input__button' ) ).toBe( true );
+		expect( wrapper.hasClass( 'block-editor-url-input__button' ) ).toBe(
+			true
+		);
 	} );
 	it( 'should have isPressed props set to false when url prop not defined', () => {
 		const wrapper = shallow( <URLInputButton /> );
-		expect( wrapper.find( 'ForwardRef(Button)' ).prop( 'isPressed' ) ).toBe( false );
+		expect( wrapper.find( 'ForwardRef(Button)' ).prop( 'isPressed' ) ).toBe(
+			false
+		);
 	} );
 	it( 'should have isPressed prop set to true if url prop defined', () => {
 		const wrapper = shallow( <URLInputButton url="https://example.com" /> );
-		expect( wrapper.find( 'ForwardRef(Button)' ).prop( 'isPressed' ) ).toBe( true );
+		expect( wrapper.find( 'ForwardRef(Button)' ).prop( 'isPressed' ) ).toBe(
+			true
+		);
 	} );
 	it( 'should have hidden form by default', () => {
 		const wrapper = shallow( <URLInputButton /> );
@@ -63,19 +72,20 @@ describe( 'URLInputButton', () => {
 	} );
 	it( 'should close the form when user submits it', () => {
 		const wrapper = TestUtils.renderIntoDocument( <URLInputButton /> );
-		const buttonElement = () => TestUtils.scryRenderedDOMComponentsWithClass(
-			wrapper,
-			'components-toolbar__control'
-		);
-		const formElement = () => TestUtils.scryRenderedDOMComponentsWithTag(
-			wrapper,
-			'form'
-		);
+		const buttonElement = () =>
+			TestUtils.scryRenderedDOMComponentsWithClass(
+				wrapper,
+				'components-toolbar__control'
+			);
+		const formElement = () =>
+			TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'form' );
 		TestUtils.Simulate.click( buttonElement().shift() );
 		expect( wrapper.state.expanded ).toBe( true );
 		TestUtils.Simulate.submit( formElement().shift() );
 		expect( wrapper.state.expanded ).toBe( false );
-		// eslint-disable-next-line react/no-find-dom-node
-		ReactDOM.unmountComponentAtNode( ReactDOM.findDOMNode( wrapper ).parentNode );
+		ReactDOM.unmountComponentAtNode(
+			// eslint-disable-next-line react/no-find-dom-node
+			ReactDOM.findDOMNode( wrapper ).parentNode
+		);
 	} );
 } );

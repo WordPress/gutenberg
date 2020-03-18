@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { upperFirst, camelCase, map, find } from 'lodash';
+import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -12,12 +17,56 @@ import { apiFetch, select } from './controls';
 export const DEFAULT_ENTITY_KEY = 'id';
 
 export const defaultEntities = [
-	{ name: 'site', kind: 'root', baseURL: '/wp/v2/settings' },
-	{ name: 'postType', kind: 'root', key: 'slug', baseURL: '/wp/v2/types' },
-	{ name: 'media', kind: 'root', baseURL: '/wp/v2/media', plural: 'mediaItems' },
-	{ name: 'taxonomy', kind: 'root', key: 'slug', baseURL: '/wp/v2/taxonomies', plural: 'taxonomies' },
-	{ name: 'widgetArea', kind: 'root', baseURL: '/__experimental/widget-areas', plural: 'widgetAreas', transientEdits: { blocks: true } },
-	{ name: 'user', kind: 'root', baseURL: '/wp/v2/users', plural: 'users' },
+	{
+		label: __( 'Site' ),
+		name: 'site',
+		kind: 'root',
+		baseURL: '/wp/v2/settings',
+	},
+	{
+		label: __( 'Post Type' ),
+		name: 'postType',
+		kind: 'root',
+		key: 'slug',
+		baseURL: '/wp/v2/types',
+	},
+	{
+		name: 'media',
+		kind: 'root',
+		baseURL: '/wp/v2/media',
+		plural: 'mediaItems',
+		label: __( 'Media' ),
+	},
+	{
+		name: 'taxonomy',
+		kind: 'root',
+		key: 'slug',
+		baseURL: '/wp/v2/taxonomies',
+		plural: 'taxonomies',
+		label: __( 'Taxonomy' ),
+	},
+	{
+		name: 'widgetArea',
+		kind: 'root',
+		baseURL: '/__experimental/widget-areas',
+		plural: 'widgetAreas',
+		transientEdits: { blocks: true },
+		label: __( 'Widget area' ),
+	},
+	{
+		label: __( 'User' ),
+		name: 'user',
+		kind: 'root',
+		baseURL: '/wp/v2/users',
+		plural: 'users',
+	},
+	{
+		name: 'comment',
+		kind: 'root',
+		baseURL: '/wp/v2/comments',
+		plural: 'comments',
+		label: __( 'Comment' ),
+	},
 ];
 
 export const kinds = [
@@ -37,12 +86,19 @@ function* loadPostTypeEntities() {
 			kind: 'postType',
 			baseURL: '/wp/v2/' + postType.rest_base,
 			name,
+			label: postType.labels.singular_name,
 			transientEdits: {
 				blocks: true,
 				selectionStart: true,
 				selectionEnd: true,
 			},
 			mergedEdits: { meta: true },
+			getTitle( record ) {
+				if ( name === 'wp_template_part' || name === 'wp_template' ) {
+					return startCase( record.slug );
+				}
+				return get( record, [ 'title', 'rendered' ], record.id );
+			},
 		};
 	} );
 }
@@ -53,12 +109,15 @@ function* loadPostTypeEntities() {
  * @return {Promise} Entities promise
  */
 function* loadTaxonomyEntities() {
-	const taxonomies = yield apiFetch( { path: '/wp/v2/taxonomies?context=edit' } );
+	const taxonomies = yield apiFetch( {
+		path: '/wp/v2/taxonomies?context=edit',
+	} );
 	return map( taxonomies, ( taxonomy, name ) => {
 		return {
 			kind: 'taxonomy',
 			baseURL: '/wp/v2/' + taxonomy.rest_base,
 			name,
+			label: taxonomy.labels.singular_name,
 		};
 	} );
 }
@@ -73,11 +132,20 @@ function* loadTaxonomyEntities() {
  *
  * @return {string} Method name
  */
-export const getMethodName = ( kind, name, prefix = 'get', usePlural = false ) => {
+export const getMethodName = (
+	kind,
+	name,
+	prefix = 'get',
+	usePlural = false
+) => {
 	const entity = find( defaultEntities, { kind, name } );
 	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
-	const nameSuffix = upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
-	const suffix = usePlural && entity.plural ? upperFirst( camelCase( entity.plural ) ) : nameSuffix;
+	const nameSuffix =
+		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
+	const suffix =
+		usePlural && entity.plural
+			? upperFirst( camelCase( entity.plural ) )
+			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
 

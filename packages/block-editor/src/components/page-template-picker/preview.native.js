@@ -2,14 +2,15 @@
  * WordPress dependencies
  */
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
-import { Button, ModalHeaderBar } from '@wordpress/components';
+import { ModalHeaderBar } from '@wordpress/components';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
  * External dependencies
  */
-import { Modal, View, SafeAreaView, Text, TouchableOpacity } from 'react-native';
+import { Modal, View, SafeAreaView } from 'react-native';
 
 /**
  * Internal dependencies
@@ -31,13 +32,12 @@ const BlockPreview = ( { blocks } ) => {
 		readOnly: true,
 	};
 
+	const header = <View style={ styles.previewHeader } />;
+
 	return (
-		<BlockEditorProvider
-			value={ blocks }
-			settings={ settings }
-		>
+		<BlockEditorProvider value={ blocks } settings={ settings }>
 			<View style={ { flex: 1 } }>
-				<BlockList />
+				<BlockList header={ header } />
 			</View>
 		</BlockEditorProvider>
 	);
@@ -46,32 +46,23 @@ BlockPreview.displayName = 'BlockPreview';
 
 const Preview = ( props ) => {
 	const { template, onDismiss, onApply } = props;
+	const previewContainerStyle = usePreferredColorSchemeStyle(
+		styles.previewContainer,
+		styles.previewContainerDark
+	);
 
 	if ( template === undefined ) {
 		return null;
 	}
 
-	const leftButton = (
-		<View
-			style={ { flex: 1, width: 44 } }
-		>
-			<Button
-				icon="no-alt"
-				size={ 24 }
-				label={ __( 'Close' ) }
-				onClick={ onDismiss }
-			/>
-		</View>
-	);
+	const leftButton = <ModalHeaderBar.CloseButton onPress={ onDismiss } />;
 
 	const rightButton = (
-		<View
-			style={ styles.headerRightButton }
-		>
-			<TouchableOpacity onPress={ onApply }>
-				<Text>{ __( 'Apply' ) }</Text>
-			</TouchableOpacity>
-		</View>
+		<ModalHeaderBar.Button
+			onPress={ onApply }
+			title={ __( 'Apply' ) }
+			isPrimary={ true }
+		/>
 	);
 
 	return (
@@ -79,16 +70,16 @@ const Preview = ( props ) => {
 			visible={ !! template }
 			animationType="slide"
 			onRequestClose={ onDismiss }
+			supportedOrientations={ [ 'portrait', 'landscape' ] }
 		>
-			<SafeAreaView style={ { flex: 1 } }>
+			<SafeAreaView style={ previewContainerStyle }>
 				<ModalHeaderBar
 					leftButton={ leftButton }
 					rightButton={ rightButton }
 					title={ template.name }
+					subtitle={ __( 'Template Preview' ) }
 				/>
-				<BlockPreview
-					blocks={ template.blocks }
-				/>
+				<BlockPreview blocks={ template.blocks } />
 			</SafeAreaView>
 		</Modal>
 	);

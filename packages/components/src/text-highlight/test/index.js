@@ -24,47 +24,55 @@ afterEach( () => {
 	container = null;
 } );
 
-const defaultText = 'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.';
+const defaultText =
+	'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.';
 
 describe( 'Basic rendering', () => {
-	it.each( [
-		[ 'Gutenberg' ],
-		[ 'media' ],
-	] )( 'should highlight the singular occurance of the text "%s" in the text if it exists', ( highlight ) => {
-		act( () => {
-			render(
-				<TextHighlight
-					text={ defaultText }
-					highlight={ highlight }
-				/>, container
+	it.each( [ [ 'Gutenberg' ], [ 'media' ] ] )(
+		'should highlight the singular occurance of the text "%s" in the text if it exists',
+		( highlight ) => {
+			act( () => {
+				render(
+					<TextHighlight
+						text={ defaultText }
+						highlight={ highlight }
+					/>,
+					container
+				);
+			} );
+
+			const highlightedEls = Array.from(
+				container.querySelectorAll( 'mark' )
 			);
-		} );
 
-		const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
-
-		highlightedEls.forEach( ( el ) => {
-			expect( el.innerHTML ).toEqual( expect.stringContaining( highlight ) );
-		} );
-	} );
+			highlightedEls.forEach( ( el ) => {
+				expect( el.innerHTML ).toEqual(
+					expect.stringContaining( highlight )
+				);
+			} );
+		}
+	);
 
 	it( 'should highlight multiple occurances of the string every time it exists in the text', () => {
 		const highlight = 'edit';
 
 		act( () => {
 			render(
-				<TextHighlight
-					text={ defaultText }
-					highlight={ highlight }
-				/>, container
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				container
 			);
 		} );
 
-		const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
+		const highlightedEls = Array.from(
+			container.querySelectorAll( 'mark' )
+		);
 
 		expect( highlightedEls ).toHaveLength( 2 );
 
 		highlightedEls.forEach( ( el ) => {
-			expect( el.innerHTML ).toEqual( expect.stringContaining( highlight ) );
+			expect( el.innerHTML ).toEqual(
+				expect.stringContaining( highlight )
+			);
 		} );
 	} );
 
@@ -73,14 +81,14 @@ describe( 'Basic rendering', () => {
 
 		act( () => {
 			render(
-				<TextHighlight
-					text={ defaultText }
-					highlight={ highlight }
-				/>, container
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				container
 			);
 		} );
 
-		const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
+		const highlightedEls = Array.from(
+			container.querySelectorAll( 'mark' )
+		);
 
 		// Our component matcher is case insensitive so string.Containing will
 		// return a false failure
@@ -98,14 +106,14 @@ describe( 'Basic rendering', () => {
 
 		act( () => {
 			render(
-				<TextHighlight
-					text={ defaultText }
-					highlight={ highlight }
-				/>, container
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				container
 			);
 		} );
 
-		const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
+		const highlightedEls = Array.from(
+			container.querySelectorAll( 'mark' )
+		);
 
 		expect( highlightedEls ).toHaveLength( 0 );
 	} );

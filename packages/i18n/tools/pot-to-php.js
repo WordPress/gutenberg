@@ -7,16 +7,17 @@ const fs = require( 'fs' );
 const TAB = '\t';
 const NEWLINE = '\n';
 
-const fileHeader = [
-	'<?php',
-	'/* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */',
-	'$generated_i18n_strings = array(',
-].join( NEWLINE ) + NEWLINE;
+const fileHeader =
+	[
+		'<?php',
+		'/* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */',
+		'$generated_i18n_strings = array(',
+	].join( NEWLINE ) + NEWLINE;
 
-const fileFooter = NEWLINE + [
-	');',
-	'/* THIS IS THE END OF THE GENERATED FILE */',
-].join( NEWLINE ) + NEWLINE;
+const fileFooter =
+	NEWLINE +
+	[ ');', '/* THIS IS THE END OF THE GENERATED FILE */' ].join( NEWLINE ) +
+	NEWLINE;
 
 /**
  * Escapes single quotes.
@@ -25,7 +26,7 @@ const fileFooter = NEWLINE + [
  * @return {string} The escaped string.
  */
 function escapeSingleQuotes( input ) {
-	return input.replace( /'/g, '\\\'' );
+	return input.replace( /'/g, "\\'" );
 }
 
 /**
@@ -46,7 +47,9 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 	if ( ! isEmpty( comments ) ) {
 		if ( ! isEmpty( comments.reference ) ) {
 			// All references are split by newlines, add a // Reference prefix to make them tidy.
-			php += TAB + '// Reference: ' +
+			php +=
+				TAB +
+				'// Reference: ' +
 				comments.reference
 					.split( NEWLINE )
 					.join( NEWLINE + TAB + '// Reference: ' ) +
@@ -63,7 +66,8 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 		}
 
 		if ( ! isEmpty( comments.extracted ) ) {
-			php += TAB + `/* translators: ${ comments.extracted } */${ NEWLINE }`;
+			php +=
+				TAB + `/* translators: ${ comments.extracted } */${ NEWLINE }`;
 		}
 	}
 
@@ -74,15 +78,21 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 			if ( isEmpty( context ) ) {
 				php += TAB + `__( '${ original }', '${ textdomain }' )`;
 			} else {
-				php += TAB + `_x( '${ original }', '${ translation.msgctxt }', '${ textdomain }' )`;
+				php +=
+					TAB +
+					`_x( '${ original }', '${ translation.msgctxt }', '${ textdomain }' )`;
 			}
 		} else {
 			const plural = escapeSingleQuotes( translation.msgid_plural );
 
 			if ( isEmpty( context ) ) {
-				php += TAB + `_n_noop( '${ original }', '${ plural }', '${ textdomain }' )`;
+				php +=
+					TAB +
+					`_n_noop( '${ original }', '${ plural }', '${ textdomain }' )`;
 			} else {
-				php += TAB + `_nx_noop( '${ original }',  '${ plural }', '${ translation.msgctxt }', '${ textdomain }' )`;
+				php +=
+					TAB +
+					`_nx_noop( '${ original }',  '${ plural }', '${ translation.msgctxt }', '${ textdomain }' )`;
 			}
 		}
 	}
@@ -100,23 +110,26 @@ function convertPOTToPHP( potFile, phpFile, options ) {
 		const translations = parsedPO.translations[ context ];
 
 		const newOutput = Object.values( translations )
-			.map( ( translation ) => convertTranslationToPHP( translation, options.textdomain, context ) )
+			.map( ( translation ) =>
+				convertTranslationToPHP(
+					translation,
+					options.textdomain,
+					context
+				)
+			)
 			.filter( ( php ) => php !== '' );
 
 		output = [ ...output, ...newOutput ];
 	}
 
-	const fileOutput = fileHeader + output.join( ',' + NEWLINE + NEWLINE ) + fileFooter;
+	const fileOutput =
+		fileHeader + output.join( ',' + NEWLINE + NEWLINE ) + fileFooter;
 
 	fs.writeFileSync( phpFile, fileOutput );
 }
 
 const args = process.argv.slice( 2 );
 
-convertPOTToPHP(
-	args[ 0 ],
-	args[ 1 ],
-	{
-		textdomain: args[ 2 ],
-	}
-);
+convertPOTToPHP( args[ 0 ], args[ 1 ], {
+	textdomain: args[ 2 ],
+} );

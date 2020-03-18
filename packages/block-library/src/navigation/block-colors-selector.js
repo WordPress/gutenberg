@@ -1,8 +1,13 @@
-
 /**
  * WordPress dependencies
  */
-import { Button, Dropdown, ToolbarGroup, SVG, Path } from '@wordpress/components';
+import {
+	Button,
+	Dropdown,
+	ToolbarGroup,
+	SVG,
+	Path,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 
@@ -37,7 +42,10 @@ const ColorSelectorIcon = ( { style, className } ) => {
  * @param {Object} colorControlProps colorControl properties.
  * @return {*} React toggle button component.
  */
-const renderToggleComponent = ( { TextColor, BackgroundColor } ) => ( { onToggle, isOpen } ) => {
+const renderToggleComponent = ( { TextColor, BackgroundColor } ) => ( {
+	onToggle,
+	isOpen,
+} ) => {
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();

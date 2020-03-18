@@ -35,7 +35,7 @@
 		bottom: auto;
 		left: 50%;
 		min-width: $modal-min-width;
-		max-width: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
+		max-width: calc(100% - #{ $grid-unit-20 } - #{ $grid-unit-20 });
 		max-height: calc(100% - #{ $header-height } - #{ $header-height });
 		transform: translate(-50%, -50%);
 
@@ -48,7 +48,7 @@
 
 @keyframes components-modal__appear-animation {
 	from {
-		margin-top: $grid-size * 4;
+		margin-top: $grid-unit-40;
 	}
 	to {
 		margin-top: 0;
@@ -61,7 +61,7 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid $light-gray-500;
-	padding: 0 $grid-size-xlarge;
+	padding: 0 $grid-unit-30;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -75,7 +75,7 @@
 	position: relative;
 	position: sticky;
 	top: 0;
-	margin: 0 -#{$grid-size-xlarge} $grid-size-xlarge;
+	margin: 0 -#{$grid-unit-30} $grid-unit-30;
 
 	// Rules inside this query are only run by Microsoft Edge.
 	// Edge has bugs around position: sticky;, so it needs a separate top rule.
@@ -97,7 +97,7 @@
 
 	.components-button {
 		position: relative;
-		left: $grid-size;
+		left: $grid-unit-10;
 	}
 }
 
@@ -113,9 +113,9 @@
 	display: inline-block;
 
 	svg {
-		max-width: $icon-button-size;
-		max-height: $icon-button-size;
-		padding: $grid-size;
+		max-width: $button-size;
+		max-height: $button-size;
+		padding: $grid-unit-10;
 	}
 }
 
@@ -123,7 +123,7 @@
 .components-modal__content {
 	box-sizing: border-box;
 	height: 100%;
-	padding: 0 $grid-size-xlarge $grid-size-xlarge;
+	padding: 0 $grid-unit-30 $grid-unit-30;
 
 	// Rules inside this query are only run by Microsoft Edge.
 	// This is a companion top padding to the fixed rule in line 77.

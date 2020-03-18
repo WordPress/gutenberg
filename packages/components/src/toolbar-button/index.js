@@ -41,7 +41,10 @@ function ToolbarButton( {
 							props.onClick( event );
 						}
 					} }
-					className={ classnames( 'components-toolbar__control', className ) }
+					className={ classnames(
+						'components-toolbar__control',
+						className
+					) }
 					isPressed={ props.isActive }
 					disabled={ props.isDisabled }
 					{ ...extraProps }
@@ -59,7 +62,9 @@ function ToolbarButton( {
 			className={ classnames( 'components-toolbar-button', className ) }
 			{ ...props }
 		>
-			{ ( toolbarItemProps ) => <Button { ...toolbarItemProps }>{ children }</Button> }
+			{ ( toolbarItemProps ) => (
+				<Button { ...toolbarItemProps }>{ children }</Button>
+			) }
 		</ToolbarItem>
 	);
 }

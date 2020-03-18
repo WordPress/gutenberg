@@ -47,8 +47,14 @@ export function addAttribute( settings ) {
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
-	if ( hasBlockSupport( blockType, 'customClassName', true ) && attributes.className ) {
-		extraProps.className = classnames( extraProps.className, attributes.className );
+	if (
+		hasBlockSupport( blockType, 'customClassName', true ) &&
+		attributes.className
+	) {
+		extraProps.className = classnames(
+			extraProps.className,
+			attributes.className
+		);
 	}
 
 	return extraProps;
@@ -112,6 +118,18 @@ export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 	return blockAttributes;
 }
 
-addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
-addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
-addFilter( 'blocks.getBlockAttributes', 'core/custom-class-name/addParsedDifference', addParsedDifference );
+addFilter(
+	'blocks.registerBlockType',
+	'core/custom-class-name/attribute',
+	addAttribute
+);
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'core/custom-class-name/save-props',
+	addSaveProps
+);
+addFilter(
+	'blocks.getBlockAttributes',
+	'core/custom-class-name/addParsedDifference',
+	addParsedDifference
+);

@@ -6,11 +6,12 @@ import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
+import { undo as undoIcon } from '@wordpress/icons';
 
 function EditorHistoryUndo( { hasUndo, undo } ) {
 	return (
 		<Button
-			icon="undo"
+			icon={ undoIcon }
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }
 			// If there are no undo levels we don't want to actually disable this

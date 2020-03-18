@@ -3,16 +3,12 @@
  */
 import React from 'react';
 import { View } from 'react-native';
-import {
-	subscribeMediaUpload,
-} from 'react-native-gutenberg-bridge';
+import { subscribeMediaUpload } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
-import {
-	Spinner,
-} from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -71,7 +67,11 @@ export class MediaUploadProgress extends React.Component {
 	}
 
 	updateMediaProgress( payload ) {
-		this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
+		this.setState( {
+			progress: payload.progress,
+			isUploadInProgress: true,
+			isUploadFailed: false,
+		} );
 		if ( this.props.onUpdateMediaProgress ) {
 			this.props.onUpdateMediaProgress( payload );
 		}
@@ -103,9 +103,11 @@ export class MediaUploadProgress extends React.Component {
 		if ( this.subscriptionParentMediaUpload ) {
 			return;
 		}
-		this.subscriptionParentMediaUpload = subscribeMediaUpload( ( payload ) => {
-			this.mediaUpload( payload );
-		} );
+		this.subscriptionParentMediaUpload = subscribeMediaUpload(
+			( payload ) => {
+				this.mediaUpload( payload );
+			}
+		);
 	}
 
 	removeMediaUploadListener() {
@@ -119,17 +121,19 @@ export class MediaUploadProgress extends React.Component {
 		const { isUploadInProgress, isUploadFailed } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
-		const retryMessage = __( 'Failed to insert media.\nPlease tap for options.' );
+		const retryMessage = __(
+			'Failed to insert media.\nPlease tap for options.'
+		);
 
 		return (
 			<View style={ styles.mediaUploadProgress }>
-				{ showSpinner &&
+				{ showSpinner && (
 					<View style={ styles.progressBar }>
 						<Spinner progress={ progress } />
 					</View>
-				}
-				{ coverUrl &&
-					<ImageSize src={ coverUrl } >
+				) }
+				{ coverUrl && (
+					<ImageSize src={ coverUrl }>
 						{ ( sizes ) => {
 							const {
 								imageWidthWithinContainer,
@@ -137,30 +141,37 @@ export class MediaUploadProgress extends React.Component {
 							} = sizes;
 
 							let finalHeight = imageHeightWithinContainer;
-							if ( height > 0 && height < imageHeightWithinContainer ) {
+							if (
+								height > 0 &&
+								height < imageHeightWithinContainer
+							) {
 								finalHeight = height;
 							}
 
 							let finalWidth = imageWidthWithinContainer;
-							if ( width > 0 && width < imageWidthWithinContainer ) {
+							if (
+								width > 0 &&
+								width < imageWidthWithinContainer
+							) {
 								finalWidth = width;
 							}
-							return ( this.props.renderContent( {
+							return this.props.renderContent( {
 								isUploadInProgress,
 								isUploadFailed,
 								finalWidth,
 								finalHeight,
 								imageWidthWithinContainer,
 								retryMessage,
-							} ) );
+							} );
 						} }
 					</ImageSize>
-				}
-				{ ! coverUrl && this.props.renderContent( {
-					isUploadInProgress,
-					isUploadFailed,
-					retryMessage,
-				} ) }
+				) }
+				{ ! coverUrl &&
+					this.props.renderContent( {
+						isUploadInProgress,
+						isUploadFailed,
+						retryMessage,
+					} ) }
 			</View>
 		);
 	}

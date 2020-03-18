@@ -26,7 +26,10 @@ import { parse } from 'qs';
  */
 export function getQueryArg( url, arg ) {
 	const queryStringIndex = url.indexOf( '?' );
-	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
+	const query =
+		queryStringIndex !== -1
+			? parse( url.substr( queryStringIndex + 1 ) )
+			: {};
 
 	return query[ arg ];
 }

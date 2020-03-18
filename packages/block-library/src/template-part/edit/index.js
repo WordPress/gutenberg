@@ -25,7 +25,8 @@ export default function TemplatePartEdit( {
 	// Set the post ID, once found, so that edits persist.
 	useEffect( () => {
 		if (
-			( initialPostId.current === undefined || initialPostId.current === null ) &&
+			( initialPostId.current === undefined ||
+				initialPostId.current === null ) &&
 			postId !== undefined &&
 			postId !== null
 		) {
@@ -36,7 +37,11 @@ export default function TemplatePartEdit( {
 	if ( postId ) {
 		// Part of a template file, post ID already resolved.
 		return (
-			<EntityProvider kind="postType" type="wp_template_part" id={ postId }>
+			<EntityProvider
+				kind="postType"
+				type="wp_template_part"
+				id={ postId }
+			>
 				<TemplatePartInnerBlocks />
 			</EntityProvider>
 		);

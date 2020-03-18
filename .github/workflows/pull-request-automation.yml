@@ -1,6 +1,7 @@
 on:
   pull_request:
-    types: [opened, closed]
+    types: [opened]
+  push:
 name: Pull request automation
 
 jobs:

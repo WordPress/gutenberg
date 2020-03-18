@@ -1,8 +1,3 @@
-/**
- * Internal dependencies
- */
-import { sprintf, __, _x, _n, _nx, setLocaleData } from '../';
-
 // Mock memoization as identity function. Inline since Jest errors on out-of-
 // scope references in a mock callback.
 jest.mock( 'memize', () => ( fn ) => fn );
@@ -31,42 +26,88 @@ const additionalLocaleData = {
 	'%d cat': [ '%d chat', '%d chats' ],
 };
 
-setLocaleData( localeData, 'test_domain' );
+// Get clean locale data
+let sprintf, __, _x, _n, _nx, isRTL, setLocaleData;
+beforeEach( () => {
+	const module = require.resolve( '..' );
+	delete require.cache[ module ];
+	( { sprintf, __, _x, _n, _nx, isRTL, setLocaleData } = require( '..' ) );
+} );
 
 describe( 'i18n', () => {
 	describe( '__', () => {
+		beforeEach( setDefaultLocalData );
+
 		it( 'use the translation', () => {
 			expect( __( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
 		} );
 	} );
 
 	describe( '_x', () => {
+		beforeEach( setDefaultLocalData );
+
 		it( 'use the translation with context', () => {
 			expect( _x( 'feed', 'verb', 'test_domain' ) ).toBe( 'nourrir' );
 		} );
 	} );
 
 	describe( '_n', () => {
+		beforeEach( setDefaultLocalData );
+
 		it( 'use the plural form', () => {
-			expect( _n( '%d banana', '%d bananas', 3, 'test_domain' ) ).toBe( '%d bananes' );
+			expect( _n( '%d banana', '%d bananas', 3, 'test_domain' ) ).toBe(
+				'%d bananes'
+			);
 		} );
 
 		it( 'use the singular form', () => {
-			expect( _n( '%d banana', '%d bananas', 1, 'test_domain' ) ).toBe( '%d banane' );
+			expect( _n( '%d banana', '%d bananas', 1, 'test_domain' ) ).toBe(
+				'%d banane'
+			);
 		} );
 	} );
 
 	describe( '_nx', () => {
+		beforeEach( setDefaultLocalData );
+
 		it( 'use the plural form', () => {
-			expect( _nx( '%d apple', '%d apples', 3, 'fruit', 'test_domain' ) ).toBe( '%d pommes' );
+			expect(
+				_nx( '%d apple', '%d apples', 3, 'fruit', 'test_domain' )
+			).toBe( '%d pommes' );
 		} );
 
 		it( 'use the singular form', () => {
-			expect( _nx( '%d apple', '%d apples', 1, 'fruit', 'test_domain' ) ).toBe( '%d pomme' );
+			expect(
+				_nx( '%d apple', '%d apples', 1, 'fruit', 'test_domain' )
+			).toBe( '%d pomme' );
 		} );
 	} );
 
-	describe( 'sprintf()', () => {
+	describe( 'isRTL', () => {
+		const ARLocaleData = {
+			'': {
+				plural_forms:
+					'nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;',
+				language: 'ar',
+				localeSlug: 'ar',
+			},
+			'text direction\u0004ltr': [ 'rtl' ],
+			Back: [ 'رجوع' ],
+		};
+
+		it( 'is false for non-rtl', () => {
+			expect( isRTL() ).toBe( false );
+		} );
+
+		it( 'is true for rtl', () => {
+			setLocaleData( ARLocaleData );
+			expect( isRTL() ).toBe( true );
+		} );
+	} );
+
+	describe( 'sprintf', () => {
+		beforeEach( setDefaultLocalData );
+
 		it( 'absorbs errors', () => {
 			// Disable reason: Failing case is the purpose of the test.
 			// eslint-disable-next-line @wordpress/valid-sprintf
@@ -85,20 +126,26 @@ describe( 'i18n', () => {
 
 	describe( 'setLocaleData', () => {
 		beforeAll( () => {
+			setDefaultLocalData();
 			setLocaleData( additionalLocaleData, 'test_domain' );
 		} );
 
 		it( 'supports omitted plural forms expression', () => {
-			setLocaleData( {
-				'': {
-					domain: 'test_domain2',
-					lang: 'fr',
+			setLocaleData(
+				{
+					'': {
+						domain: 'test_domain2',
+						lang: 'fr',
+					},
+
+					'%d banana': [ '%d banane', '%d bananes' ],
 				},
+				'test_domain2'
+			);
 
-				'%d banana': [ '%d banane', '%d bananes' ],
-			}, 'test_domain2' );
-
-			expect( _n( '%d banana', '%d bananes', 2, 'test_domain2' ) ).toBe( '%d bananes' );
+			expect( _n( '%d banana', '%d bananes', 2, 'test_domain2' ) ).toBe(
+				'%d bananes'
+			);
 		} );
 
 		describe( '__', () => {
@@ -107,22 +154,34 @@ describe( 'i18n', () => {
 			} );
 
 			it( 'new translation available.', () => {
-				expect( __( 'cheeseburger', 'test_domain' ) ).toBe( 'hamburger au fromage' );
+				expect( __( 'cheeseburger', 'test_domain' ) ).toBe(
+					'hamburger au fromage'
+				);
 			} );
 		} );
 
 		describe( '_n', () => {
 			it( 'existing plural form still works', () => {
-				expect( _n( '%d banana', '%d bananas', 3, 'test_domain' ) ).toBe( '%d bananes' );
+				expect(
+					_n( '%d banana', '%d bananas', 3, 'test_domain' )
+				).toBe( '%d bananes' );
 			} );
 
 			it( 'new singular form was added', () => {
-				expect( _n( '%d cat', '%d cats', 1, 'test_domain' ) ).toBe( '%d chat' );
+				expect( _n( '%d cat', '%d cats', 1, 'test_domain' ) ).toBe(
+					'%d chat'
+				);
 			} );
 
 			it( 'new plural form was added', () => {
-				expect( _n( '%d cat', '%d cats', 3, 'test_domain' ) ).toBe( '%d chats' );
+				expect( _n( '%d cat', '%d cats', 3, 'test_domain' ) ).toBe(
+					'%d chats'
+				);
 			} );
 		} );
 	} );
 } );
+
+function setDefaultLocalData() {
+	setLocaleData( localeData, 'test_domain' );
+}

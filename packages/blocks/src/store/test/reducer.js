@@ -7,12 +7,12 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	__experimentalAddBlockPatterns,
+	addBlockVariations,
 	addBlockTypes,
-	__experimentalRemoveBlockPatterns,
+	removeBlockVariations,
 } from '../actions';
 import {
-	blockPatterns,
+	blockVariations,
 	blockStyles,
 	blockTypes,
 	categories,
@@ -76,9 +76,7 @@ describe( 'blockStyles', () => {
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [
-				{ name: 'fancy' },
-			],
+			'core/image': [ { name: 'fancy' } ],
 		} );
 
 		state = blockStyles( state, {
@@ -88,44 +86,33 @@ describe( 'blockStyles', () => {
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [
-				{ name: 'fancy' },
-				{ name: 'lightbox' },
-			],
+			'core/image': [ { name: 'fancy' }, { name: 'lightbox' } ],
 		} );
 	} );
 
 	it( 'should add block styles when adding a block', () => {
 		const original = deepFreeze( {
-			'core/image': [
-				{ name: 'fancy' },
-			],
+			'core/image': [ { name: 'fancy' } ],
 		} );
 
 		const state = blockStyles( original, {
 			type: 'ADD_BLOCK_TYPES',
-			blockTypes: [ {
-				name: 'core/image',
-				styles: [
-					{ name: 'original' },
-				],
-			} ],
+			blockTypes: [
+				{
+					name: 'core/image',
+					styles: [ { name: 'original' } ],
+				},
+			],
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [
-				{ name: 'original' },
-				{ name: 'fancy' },
-			],
+			'core/image': [ { name: 'original' }, { name: 'fancy' } ],
 		} );
 	} );
 
 	it( 'should remove block styles', () => {
 		const original = deepFreeze( {
-			'core/image': [
-				{ name: 'fancy' },
-				{ name: 'lightbox' },
-			],
+			'core/image': [ { name: 'fancy' }, { name: 'lightbox' } ],
 		} );
 
 		const state = blockStyles( original, {
@@ -135,111 +122,90 @@ describe( 'blockStyles', () => {
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [
-				{ name: 'lightbox' },
-			],
+			'core/image': [ { name: 'lightbox' } ],
 		} );
 	} );
 } );
 
-describe( 'blockPatterns', () => {
+describe( 'blockVariations', () => {
 	const blockName = 'block/name';
 
-	const blockPatternName = 'pattern-name';
-	const blockPattern = {
-		name: blockPatternName,
-		label: 'My pattern',
+	const blockVariationName = 'variation-name';
+	const blockVariation = {
+		name: blockVariationName,
+		label: 'My variation',
 	};
 
-	const secondBlockPatternName = 'second-pattern-name';
-	const secondBlockPattern = {
-		name: secondBlockPatternName,
-		label: 'My Second Pattern',
+	const secondBlockVariationName = 'second-variation-name';
+	const secondBlockVariation = {
+		name: secondBlockVariationName,
+		label: 'My Second Variation',
 	};
 
 	it( 'should return an empty object as default state', () => {
-		const state = blockPatterns( undefined, {} );
+		const state = blockVariations( undefined, {} );
 
 		expect( state ).toEqual( {} );
 	} );
 
-	it( 'should add a new block pattern when no pattern register', () => {
+	it( 'should add a new block variation when no variation register', () => {
 		const initialState = deepFreeze( {} );
 
-		const state = blockPatterns(
+		const state = blockVariations(
 			initialState,
-			__experimentalAddBlockPatterns( blockName, blockPattern )
+			addBlockVariations( blockName, blockVariation )
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [
-				blockPattern,
-			],
+			[ blockName ]: [ blockVariation ],
 		} );
 	} );
 
-	it( 'should add another pattern when a block pattern already present for the block', () => {
+	it( 'should add another variation when a block variation already present for the block', () => {
 		const initialState = deepFreeze( {
-			[ blockName ]: [
-				blockPattern,
-			],
+			[ blockName ]: [ blockVariation ],
 		} );
 
-		const state = blockPatterns(
+		const state = blockVariations(
 			initialState,
-			__experimentalAddBlockPatterns( blockName, secondBlockPattern ),
+			addBlockVariations( blockName, secondBlockVariation )
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [
-				blockPattern,
-				secondBlockPattern,
-			],
+			[ blockName ]: [ blockVariation, secondBlockVariation ],
 		} );
 	} );
 
-	it( 'should prepend block patterns added when adding a block', () => {
+	it( 'should prepend block variations added when adding a block', () => {
 		const initialState = deepFreeze( {
-			[ blockName ]: [
-				secondBlockPattern,
-			],
+			[ blockName ]: [ secondBlockVariation ],
 		} );
 
-		const state = blockPatterns(
+		const state = blockVariations(
 			initialState,
 			addBlockTypes( {
 				name: blockName,
-				patterns: [
-					blockPattern,
-				],
+				variations: [ blockVariation ],
 			} )
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [
-				blockPattern,
-				secondBlockPattern,
-			],
+			[ blockName ]: [ blockVariation, secondBlockVariation ],
 		} );
 	} );
 
-	it( 'should remove a block pattern', () => {
+	it( 'should remove a block variation', () => {
 		const initialState = deepFreeze( {
-			[ blockName ]: [
-				blockPattern,
-				secondBlockPattern,
-			],
+			[ blockName ]: [ blockVariation, secondBlockVariation ],
 		} );
 
-		const state = blockPatterns(
+		const state = blockVariations(
 			initialState,
-			__experimentalRemoveBlockPatterns( blockName, blockPatternName )
+			removeBlockVariations( blockName, blockVariationName )
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [
-				secondBlockPattern,
-			],
+			[ blockName ]: [ secondBlockVariation ],
 		} );
 	} );
 } );
@@ -355,16 +321,16 @@ describe( 'categories', () => {
 			categories: [ { slug: 'wings', title: 'Wings' } ],
 		} );
 
-		expect( state ).toEqual( [
-			{ slug: 'wings', title: 'Wings' },
-		] );
+		expect( state ).toEqual( [ { slug: 'wings', title: 'Wings' } ] );
 	} );
 
 	it( 'should add the category icon', () => {
-		const original = deepFreeze( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-		} ] );
+		const original = deepFreeze( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+			},
+		] );
 
 		const state = categories( original, {
 			type: 'UPDATE_CATEGORY',
@@ -374,23 +340,28 @@ describe( 'categories', () => {
 			},
 		} );
 
-		expect( state ).toEqual( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-			icon: 'new-icon',
-		} ] );
+		expect( state ).toEqual( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+				icon: 'new-icon',
+			},
+		] );
 	} );
 
 	it( 'should update the category icon', () => {
-		const original = deepFreeze( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-			icon: 'old-icon',
-		}, {
-			slug: 'wings',
-			title: 'Wings',
-			icon: 'old-icon',
-		} ] );
+		const original = deepFreeze( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+				icon: 'old-icon',
+			},
+			{
+				slug: 'wings',
+				title: 'Wings',
+				icon: 'old-icon',
+			},
+		] );
 
 		const state = categories( original, {
 			type: 'UPDATE_CATEGORY',
@@ -400,27 +371,33 @@ describe( 'categories', () => {
 			},
 		} );
 
-		expect( state ).toEqual( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-			icon: 'new-icon',
-		}, {
-			slug: 'wings',
-			title: 'Wings',
-			icon: 'old-icon',
-		} ] );
+		expect( state ).toEqual( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+				icon: 'new-icon',
+			},
+			{
+				slug: 'wings',
+				title: 'Wings',
+				icon: 'old-icon',
+			},
+		] );
 	} );
 
 	it( 'should update multiple category properties', () => {
-		const original = deepFreeze( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-			icon: 'old-icon',
-		}, {
-			slug: 'wings',
-			title: 'Wings',
-			icon: 'old-icon',
-		} ] );
+		const original = deepFreeze( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+				icon: 'old-icon',
+			},
+			{
+				slug: 'wings',
+				title: 'Wings',
+				icon: 'old-icon',
+			},
+		] );
 
 		const state = categories( original, {
 			type: 'UPDATE_CATEGORY',
@@ -431,15 +408,18 @@ describe( 'categories', () => {
 			},
 		} );
 
-		expect( state ).toEqual( [ {
-			slug: 'chicken',
-			title: 'Chicken',
-			icon: 'old-icon',
-		}, {
-			slug: 'wings',
-			title: 'New Wings',
-			chicken: 'ribs',
-			icon: 'old-icon',
-		} ] );
+		expect( state ).toEqual( [
+			{
+				slug: 'chicken',
+				title: 'Chicken',
+				icon: 'old-icon',
+			},
+			{
+				slug: 'wings',
+				title: 'New Wings',
+				chicken: 'ribs',
+				icon: 'old-icon',
+			},
+		] );
 	} );
 } );

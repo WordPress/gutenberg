@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-puppeteer-axe",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"description": "Axe API integration with Jest and Puppeteer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,7 +30,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.8.3",
 		"axe-puppeteer": "^1.0.0"
 	},
 	"peerDependencies": {

@@ -13,10 +13,9 @@ describe( 'AutosaveMonitor', () => {
 	let wrapper;
 	beforeEach( () => {
 		toggleTimer.mockClear();
-		wrapper = shallow(
-			<AutosaveMonitor />,
-			{ lifecycleExperimental: true }
-		);
+		wrapper = shallow( <AutosaveMonitor />, {
+			lifecycleExperimental: true,
+		} );
 
 		wrapper.instance().toggleTimer = toggleTimer;
 	} );
@@ -93,14 +92,29 @@ describe( 'AutosaveMonitor', () => {
 			const afterReference = [];
 
 			// A post is non-dirty while autosave is in-flight.
-			wrapper.setProps( { isDirty: false, isAutosaving: true, isAutosaveable: true, editsReference: beforeReference } );
+			wrapper.setProps( {
+				isDirty: false,
+				isAutosaving: true,
+				isAutosaveable: true,
+				editsReference: beforeReference,
+			} );
 			toggleTimer.mockClear();
-			wrapper.setProps( { isDirty: true, isAutosaving: false, isAutosaveable: true, editsReference: beforeReference } );
+			wrapper.setProps( {
+				isDirty: true,
+				isAutosaving: false,
+				isAutosaveable: true,
+				editsReference: beforeReference,
+			} );
 
 			expect( toggleTimer ).toHaveBeenCalledWith( false );
 
 			// Once edit occurs after autosave, resume scheduling.
-			wrapper.setProps( { isDirty: true, isAutosaving: false, isAutosaveable: true, editsReference: afterReference } );
+			wrapper.setProps( {
+				isDirty: true,
+				isAutosaving: false,
+				isAutosaveable: true,
+				editsReference: afterReference,
+			} );
 
 			expect( toggleTimer.mock.calls[ 1 ][ 0 ] ).toBe( true );
 		} );

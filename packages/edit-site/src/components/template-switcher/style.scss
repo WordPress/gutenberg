@@ -1,0 +1,37 @@
+.edit-site-template-switcher__popover .components-popover__content {
+	overflow: visible;
+}
+
+.edit-site-template-switcher__label {
+	position: relative;
+	width: 100%;
+}
+
+.edit-site-template-switcher__label-customized-icon-container {
+	position: absolute;
+	right: 5px;
+	top: 0;
+	width: 10px;
+}
+
+.edit-site-template-switcher__label-customized-icon-icon {
+	width: 100%;
+}
+
+.edit-site-template-switcher__preview {
+	display: none;
+	border: $border-width solid $light-gray-secondary;
+	width: 300px;
+	padding: $grid-unit-20;
+	background: $white;
+	box-shadow: $shadow-popover;
+	border-radius: $radius-block-ui;
+	position: absolute;
+	top: -$border-width;
+	left: calc(100% + #{$grid-unit-15});
+
+
+	@include break-medium {
+		display: block;
+	}
+}

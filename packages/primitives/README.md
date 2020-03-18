@@ -1,6 +1,6 @@
 # Primitives
 
-Primitives to be used cross-plateform.
+Primitives to be used cross-platform.
 
 ## Installation
 

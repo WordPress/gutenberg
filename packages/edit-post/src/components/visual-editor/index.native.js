@@ -22,7 +22,10 @@ class VisualEditor extends Component {
 			title,
 			getStylesFromColorScheme,
 		} = this.props;
-		const blockHolderFocusedStyle = getStylesFromColorScheme( styles.blockHolderFocused, styles.blockHolderFocusedDark );
+		const blockHolderFocusedStyle = getStylesFromColorScheme(
+			styles.blockHolderFocused,
+			styles.blockHolderFocusedDark
+		);
 		return (
 			<ReadableContentView>
 				<PostTitle
@@ -30,11 +33,7 @@ class VisualEditor extends Component {
 					title={ title }
 					onUpdate={ editTitle }
 					placeholder={ __( 'Add title' ) }
-					borderStyle={
-						this.props.isFullyBordered ?
-							styles.blockHolderFullBordered :
-							styles.blockHolderSemiBordered
-					}
+					borderStyle={ styles.blockHolderFullBordered }
 					focusedBorderColor={ blockHolderFocusedStyle.borderColor }
 					accessibilityLabel="post-title"
 				/>
@@ -43,15 +42,11 @@ class VisualEditor extends Component {
 	}
 
 	render() {
-		const {
-			isFullyBordered,
-			safeAreaBottomInset,
-		} = this.props;
+		const { safeAreaBottomInset } = this.props;
 
 		return (
 			<BlockList
 				header={ this.renderHeader() }
-				isFullyBordered={ isFullyBordered }
 				safeAreaBottomInset={ safeAreaBottomInset }
 				autoScroll={ true }
 			/>
@@ -61,18 +56,14 @@ class VisualEditor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-		} = select( 'core/editor' );
+		const { getEditedPostAttribute } = select( 'core/editor' );
 
 		return {
 			title: getEditedPostAttribute( 'title' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const {
-			editPost,
-		} = dispatch( 'core/editor' );
+		const { editPost } = dispatch( 'core/editor' );
 
 		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
 

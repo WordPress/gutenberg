@@ -76,9 +76,10 @@ export const createQueue = () => {
 	 *                                       animation frame timestamp.
 	 */
 	const runWaitingList = ( deadline ) => {
-		const hasTimeRemaining = typeof deadline === 'number' ?
-			() => false :
-			() => deadline.timeRemaining() > 0;
+		const hasTimeRemaining =
+			typeof deadline === 'number'
+				? () => false
+				: () => deadline.timeRemaining() > 0;
 
 		do {
 			if ( waitingList.length === 0 ) {
@@ -87,7 +88,9 @@ export const createQueue = () => {
 			}
 
 			const nextElement = /** @type {WPPriorityQueueContext} */ ( waitingList.shift() );
-			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get( nextElement ) );
+			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
+				nextElement
+			) );
 			callback();
 			elementsMap.delete( nextElement );
 		} while ( hasTimeRemaining() );
@@ -131,7 +134,9 @@ export const createQueue = () => {
 
 		const index = waitingList.indexOf( element );
 		waitingList.splice( index, 1 );
-		const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get( element ) );
+		const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
+			element
+		) );
 		elementsMap.delete( element );
 		callback();
 

@@ -1,8 +1,18 @@
 // Primitives
-export { SVG, Path, Circle, Polygon, Rect, G, HorizontalRule, BlockQuotation } from '@wordpress/primitives';
+export {
+	SVG,
+	Path,
+	Circle,
+	Polygon,
+	Rect,
+	G,
+	HorizontalRule,
+	BlockQuotation,
+} from '@wordpress/primitives';
 
 // Components
 export { default as Animate } from './animate';
+export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
@@ -24,7 +34,10 @@ export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { default as Draggable } from './draggable';
-export { default as DropZone, useDropZone as __unstableUseDropZone } from './drop-zone';
+export {
+	default as DropZone,
+	useDropZone as __unstableUseDropZone,
+} from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
@@ -85,17 +98,13 @@ export {
 	Slot,
 	Fill,
 	Provider as SlotFillProvider,
-	Consumer as __experimentalSlotFillConsumer,
+	useSlot as __experimentalUseSlot,
 } from './slot-fill';
 
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
-export {
-	default as withConstrainedTabbing,
-} from './higher-order/with-constrained-tabbing';
-export {
-	default as withFallbackStyles,
-} from './higher-order/with-fallback-styles';
+export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
+export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
 export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export {
@@ -103,7 +112,5 @@ export {
 	Provider as FocusReturnProvider,
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
-export {
-	default as withSpokenMessages,
-} from './higher-order/with-spoken-messages';
+export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 export * from './text';

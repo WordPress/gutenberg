@@ -8,10 +8,13 @@ import { sprintf, __ } from '@wordpress/i18n';
 function PostAuthorDisplay() {
 	const [ authorId ] = useEntityProp( 'postType', 'post', 'author' );
 	const author = useSelect(
-		( select ) => select( 'core' ).getEntityRecord( 'root', 'user', authorId ),
+		( select ) =>
+			select( 'core' ).getEntityRecord( 'root', 'user', authorId ),
 		[ authorId ]
 	);
-	return author ? <address>{ sprintf( __( 'By %s' ), author.name ) }</address> : null;
+	return author ? (
+		<address>{ sprintf( __( 'By %s' ), author.name ) }</address>
+	) : null;
 }
 
 export default function PostAuthorEdit() {

@@ -33,7 +33,10 @@ export default function RadioControl( {
 				label={ label }
 				id={ id }
 				help={ help }
-				className={ classnames( className, 'components-radio-control' ) }
+				className={ classnames(
+					className,
+					'components-radio-control'
+				) }
 			>
 				{ options.map( ( option, index ) => (
 					<div
@@ -52,7 +55,9 @@ export default function RadioControl( {
 								!! help ? `${ id }__help` : undefined
 							}
 						/>
-						<label htmlFor={ `${ id }-${ index }` }>{ option.label }</label>
+						<label htmlFor={ `${ id }-${ index }` }>
+							{ option.label }
+						</label>
 					</div>
 				) ) }
 			</BaseControl>

@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/editor'; // This shouldn't be necessary
-
 import { useEffect, useState } from '@wordpress/element';
 import {
 	BlockEditorKeyboardShortcuts,
@@ -45,6 +43,7 @@ function App() {
 							<BlockInspector />
 						</div>
 						<div className="editor-styles-wrapper">
+							<Popover.Slot name="block-toolbar" />
 							<BlockEditorKeyboardShortcuts />
 							<WritingFlow>
 								<ObserveTyping>

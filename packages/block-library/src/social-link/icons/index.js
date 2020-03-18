@@ -1,4 +1,3 @@
-
 export * from './amazon';
 export * from './bandcamp';
 export * from './behance';

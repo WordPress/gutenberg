@@ -12,11 +12,7 @@ export default forwardRef( ( { children, ...props }, ref ) => {
 	//   - onMouseDown is disabled as this can cause interactions with other DOM elements
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div
-			{ ...props }
-			ref={ ref }
-			onMouseDown={ stopPropagation }
-		>
+		<div { ...props } ref={ ref } onMouseDown={ stopPropagation }>
 			{ children }
 		</div>
 	);

@@ -10,10 +10,7 @@ import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
 export function PostStickyCheck( { hasStickyAction, postType, children } ) {
-	if (
-		postType !== 'post' ||
-		! hasStickyAction
-	) {
+	if ( postType !== 'post' || ! hasStickyAction ) {
 		return null;
 	}
 
@@ -24,7 +21,11 @@ export default compose( [
 	withSelect( ( select ) => {
 		const post = select( 'core/editor' ).getCurrentPost();
 		return {
-			hasStickyAction: get( post, [ '_links', 'wp:action-sticky' ], false ),
+			hasStickyAction: get(
+				post,
+				[ '_links', 'wp:action-sticky' ],
+				false
+			),
 			postType: select( 'core/editor' ).getCurrentPostType(),
 		};
 	} ),

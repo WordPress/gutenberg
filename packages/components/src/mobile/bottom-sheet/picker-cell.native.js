@@ -36,11 +36,12 @@ export default function BottomSheetPickerCell( props ) {
 			onPress={ onCellPress }
 			editable={ false }
 			value={ label }
-			{ ...cellProps } >
+			{ ...cellProps }
+		>
 			<Picker
 				leftAlign
 				hideCancelButton={ hideCancelButton }
-				ref={ ( instance ) => picker = instance }
+				ref={ ( instance ) => ( picker = instance ) }
 				options={ options }
 				onChange={ onChange }
 			/>

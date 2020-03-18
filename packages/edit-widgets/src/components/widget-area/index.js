@@ -29,6 +29,8 @@ import Sidebar from '../sidebar';
 import SelectionObserver from './selection-observer';
 import Inserter from '../inserter';
 
+const inserterToggleProps = { isPrimary: true };
+
 function getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ) {
 	if ( ! hasUploadPermissions ) {
 		return blockEditorSettings;
@@ -53,19 +55,30 @@ function WidgetArea( {
 	isSelectedArea,
 	onBlockSelected,
 } ) {
-	const { blocks, widgetAreaName, hasUploadPermissions, rawContent } = useSelect(
+	const {
+		blocks,
+		widgetAreaName,
+		hasUploadPermissions,
+		rawContent,
+	} = useSelect(
 		( select ) => {
-			const {
-				canUser,
-				getEditedEntityRecord,
-			} = select( 'core' );
-			const widgetArea = getEditedEntityRecord( 'root', 'widgetArea', id );
+			const { canUser, getEditedEntityRecord } = select( 'core' );
+			const widgetArea = getEditedEntityRecord(
+				'root',
+				'widgetArea',
+				id
+			);
 			const widgetAreaContent = get( widgetArea, [ 'content' ], '' );
 			return {
 				blocks: widgetArea && widgetArea.blocks,
-				rawContent: widgetAreaContent.raw ? widgetAreaContent.raw : widgetAreaContent,
+				rawContent: widgetAreaContent.raw
+					? widgetAreaContent.raw
+					: widgetAreaContent,
 				widgetAreaName: widgetArea && widgetArea.name,
-				hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
+				hasUploadPermissions: defaultTo(
+					canUser( 'create', 'media' ),
+					true
+				),
 			};
 		},
 		[ id ]
@@ -87,24 +100,19 @@ function WidgetArea( {
 		[ editEntityRecord, id ]
 	);
 	const settings = useMemo(
-		() => getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ),
+		() =>
+			getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ),
 		[ blockEditorSettings, hasUploadPermissions ]
 	);
-	useEffect(
-		() => {
-			if ( blocks ) {
-				return;
-			}
-			onChange( parse( rawContent ) );
-		},
-		[ blocks, onChange, rawContent ]
-	);
+	useEffect( () => {
+		if ( blocks ) {
+			return;
+		}
+		onChange( parse( rawContent ) );
+	}, [ blocks, onChange, rawContent ] );
 	return (
 		<Panel className="edit-widgets-widget-area">
-			<PanelBody
-				title={ widgetAreaName }
-				initialOpen={ initialOpen }
-			>
+			<PanelBody title={ widgetAreaName } initialOpen={ initialOpen }>
 				<div
 					onFocus={ ( event ) => {
 						// Stop propagation of the focus event to avoid the parent
@@ -122,7 +130,9 @@ function WidgetArea( {
 						{ isSelectedArea && (
 							<>
 								<Inserter>
-									<BlockInserter />
+									<BlockInserter
+										toggleProps={ inserterToggleProps }
+									/>
 								</Inserter>
 								<BlockEditorKeyboardShortcuts />
 							</>
@@ -132,7 +142,9 @@ function WidgetArea( {
 							onBlockSelected={ onBlockSelected }
 						/>
 						<Sidebar.Inspector>
-							<BlockInspector showNoBlockSelectedMessage={ false } />
+							<BlockInspector
+								showNoBlockSelectedMessage={ false }
+							/>
 						</Sidebar.Inspector>
 						<div className="editor-styles-wrapper">
 							<WritingFlow>

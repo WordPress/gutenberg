@@ -3,7 +3,10 @@
  */
 import CustomSelectControl from '../';
 
-export default { title: 'Components/CustomSelectControl', component: CustomSelectControl };
+export default {
+	title: 'Components/CustomSelectControl',
+	component: CustomSelectControl,
+};
 
 const options = [
 	{
@@ -28,5 +31,5 @@ const options = [
 	},
 ];
 export const _default = () => (
-	<CustomSelectControl label="Font Size" options={ options } />
+	<CustomSelectControl label="Font size" options={ options } />
 );

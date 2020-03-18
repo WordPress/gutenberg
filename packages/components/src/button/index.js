@@ -16,10 +16,7 @@ import { forwardRef } from '@wordpress/element';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 
-const disabledEventsOnDisabledButton = [
-	'onMouseDown',
-	'onClick',
-];
+const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
 export function Button( props, ref ) {
 	const {
@@ -70,9 +67,14 @@ export function Button( props, ref ) {
 
 	const trulyDisabled = disabled && ! isFocusable;
 	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
-	const tagProps = Tag === 'a' ?
-		{ href, target } :
-		{ type: 'button', disabled: trulyDisabled, 'aria-pressed': isPressed };
+	const tagProps =
+		Tag === 'a'
+			? { href, target }
+			: {
+					type: 'button',
+					disabled: trulyDisabled,
+					'aria-pressed': isPressed,
+			  };
 
 	if ( disabled && isFocusable ) {
 		// In this case, the button will be disabled, but still focusable and
@@ -88,20 +90,19 @@ export function Button( props, ref ) {
 	}
 
 	// Should show the tooltip if...
-	const shouldShowTooltip = ! trulyDisabled && (
+	const shouldShowTooltip =
+		! trulyDisabled &&
 		// an explicit tooltip is passed or...
-		( showTooltip && label ) ||
-		// there's a shortcut or...
-		shortcut ||
-		(
+		( ( showTooltip && label ) ||
+			// there's a shortcut or...
+			shortcut ||
 			// there's a label and...
-			!! label &&
-			// the children are empty and...
-			( ! children || ( isArray( children ) && ! children.length ) ) &&
-			// the tooltip is not explicitly disabled.
-			false !== showTooltip
-		)
-	);
+			( !! label &&
+				// the children are empty and...
+				( ! children ||
+					( isArray( children ) && ! children.length ) ) &&
+				// the tooltip is not explicitly disabled.
+				false !== showTooltip ) );
 
 	const element = (
 		<Tag
@@ -121,7 +122,11 @@ export function Button( props, ref ) {
 	}
 
 	return (
-		<Tooltip text={ label } shortcut={ shortcut } position={ tooltipPosition }>
+		<Tooltip
+			text={ label }
+			shortcut={ shortcut }
+			position={ tooltipPosition }
+		>
 			{ element }
 		</Tooltip>
 	);

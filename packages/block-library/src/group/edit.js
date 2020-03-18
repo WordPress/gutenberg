@@ -6,12 +6,11 @@ import { compose } from '@wordpress/compose';
 import {
 	InnerBlocks,
 	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
-function GroupEdit( {
-	hasInnerBlocks,
-} ) {
+function GroupEdit( { hasInnerBlocks, className } ) {
 	const ref = useRef();
 	const {
 		TextColor,
@@ -23,7 +22,7 @@ function GroupEdit( {
 			{ name: 'backgroundColor', className: 'has-background' },
 		],
 		{
-			contrastCheckers: { backgroundColor: true, textColor: true },
+			contrastCheckers: [ { backgroundColor: true, textColor: true } ],
 			colorDetector: { targetRef: ref },
 		}
 	);
@@ -33,13 +32,16 @@ function GroupEdit( {
 			{ InspectorControlsColorPanel }
 			<BackgroundColor>
 				<TextColor>
-					<div className="wp-block-group" ref={ ref } >
-						<div className="wp-block-group__inner-container" >
+					<Block.div className={ className } ref={ ref }>
+						<div className="wp-block-group__inner-container">
 							<InnerBlocks
-								renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
+								renderAppender={
+									! hasInnerBlocks &&
+									InnerBlocks.ButtonBlockAppender
+								}
 							/>
 						</div>
-					</div>
+					</Block.div>
 				</TextColor>
 			</BackgroundColor>
 		</>
@@ -48,9 +50,7 @@ function GroupEdit( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlock,
-		} = select( 'core/block-editor' );
+		const { getBlock } = select( 'core/block-editor' );
 
 		const block = getBlock( clientId );
 

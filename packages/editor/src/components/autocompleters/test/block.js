@@ -31,7 +31,9 @@ describe( 'block', () => {
 
 	it( 'should retrieve block options for current insertion point', async () => {
 		const expectedOptions = [ {}, {}, {} ];
-		const mockGetBlockInsertionParentClientId = jest.fn( () => 'expected-insertion-point' );
+		const mockGetBlockInsertionParentClientId = jest.fn(
+			() => 'expected-insertion-point'
+		);
 		const mockGetInserterItems = jest.fn( () => expectedOptions );
 
 		const completer = createBlockCompleter( {
@@ -42,7 +44,9 @@ describe( 'block', () => {
 
 		const actualOptions = completer.options();
 		expect( mockGetBlockInsertionParentClientId ).toHaveBeenCalled();
-		expect( mockGetInserterItems ).toHaveBeenCalledWith( 'expected-insertion-point' );
+		expect( mockGetInserterItems ).toHaveBeenCalledWith(
+			'expected-insertion-point'
+		);
 		expect( actualOptions ).toEqual( expectedOptions );
 	} );
 
@@ -53,7 +57,11 @@ describe( 'block', () => {
 
 		const completer = createBlockCompleter( {
 			getBlockInsertionParentClientId: () => 'ignored',
-			getInserterItems: () => [ option1, option2CurrentlySelected, option3 ],
+			getInserterItems: () => [
+				option1,
+				option2CurrentlySelected,
+				option3,
+			],
 			getSelectedBlockName: () => 'block-2-currently-selected',
 		} );
 
@@ -81,25 +89,36 @@ describe( 'block', () => {
 			// Intentionally omitted keyword list
 		};
 
-		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndKeywords ) )
-			.toEqual( [ 'formatting', 'foo-keyword-1', 'foo-keyword-2', 'foo' ] );
-		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndEmptyKeywords ) )
-			.toEqual( [ 'common', 'bar' ] );
-		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndUndefinedKeywords ) )
-			.toEqual( [ 'widgets', 'baz' ] );
+		expect(
+			blockCompleter.getOptionKeywords( inserterItemWithTitleAndKeywords )
+		).toEqual( [ 'formatting', 'foo-keyword-1', 'foo-keyword-2', 'foo' ] );
+		expect(
+			blockCompleter.getOptionKeywords(
+				inserterItemWithTitleAndEmptyKeywords
+			)
+		).toEqual( [ 'common', 'bar' ] );
+		expect(
+			blockCompleter.getOptionKeywords(
+				inserterItemWithTitleAndUndefinedKeywords
+			)
+		).toEqual( [ 'widgets', 'baz' ] );
 	} );
 
 	it( 'should render a block option label', () => {
-		const labelComponents = shallow( <div>
-			{ blockCompleter.getOptionLabel( {
-				icon: 'expected-icon',
-				title: 'expected-text',
-			} ) }
-		</div> ).children();
+		const labelComponents = shallow(
+			<div>
+				{ blockCompleter.getOptionLabel( {
+					icon: 'expected-icon',
+					title: 'expected-text',
+				} ) }
+			</div>
+		).children();
 
 		expect( labelComponents ).toHaveLength( 2 );
 		expect( labelComponents.at( 0 ).name() ).toBe( 'BlockIcon' );
-		expect( labelComponents.at( 0 ).prop( 'icon' ) ).toEqual( 'expected-icon' );
+		expect( labelComponents.at( 0 ).prop( 'icon' ) ).toEqual(
+			'expected-icon'
+		);
 		expect( labelComponents.at( 1 ).text() ).toBe( 'expected-text' );
 	} );
 
@@ -117,7 +136,11 @@ describe( 'block', () => {
 			isDisabled: false,
 		};
 
-		expect( blockCompleter.isOptionDisabled( disabledInserterItem ) ).toBe( true );
-		expect( blockCompleter.isOptionDisabled( enabledInserterItem ) ).toBe( false );
+		expect( blockCompleter.isOptionDisabled( disabledInserterItem ) ).toBe(
+			true
+		);
+		expect( blockCompleter.isOptionDisabled( enabledInserterItem ) ).toBe(
+			false
+		);
 	} );
 } );

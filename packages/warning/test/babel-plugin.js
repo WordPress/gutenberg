@@ -35,10 +35,7 @@ describe( 'babel-plugin', function() {
 	} );
 
 	it( 'should not replace warning calls without import declaration', () => {
-		compare(
-			'warning("a");',
-			'warning("a");'
-		);
+		compare( 'warning("a");', 'warning("a");' );
 	} );
 
 	it( 'should replace warning calls without import declaration with plugin options', () => {
@@ -55,7 +52,7 @@ describe( 'babel-plugin', function() {
 				'import warning from "@wordpress/warning";',
 				'warning("a");',
 				'warning("b");',
-				'warning("c");',
+				'warning("c");'
 			),
 			join(
 				'import warning from "@wordpress/warning";',
@@ -72,7 +69,7 @@ describe( 'babel-plugin', function() {
 				'import warn from "@wordpress/warning";',
 				'warn("a");',
 				'warn("b");',
-				'warn("c");',
+				'warn("c");'
 			),
 			join(
 				'import warn from "@wordpress/warning";',
@@ -89,7 +86,7 @@ describe( 'babel-plugin', function() {
 				'import warn from "@wordpress/warning";',
 				'warn("a");',
 				'warn("b");',
-				'warn("c");',
+				'warn("c");'
 			),
 			join(
 				'import warn from "@wordpress/warning";',

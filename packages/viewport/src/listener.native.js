@@ -21,14 +21,18 @@ const matchWidth = ( operator, breakpoint ) => {
 
 const addDimensionsEventListener = ( breakpoints, operators ) => {
 	const setIsMatching = () => {
-		const matches = reduce( breakpoints, ( result, width, name ) => {
-			forEach( operators, ( condition, operator ) => {
-				const key = [ operator, name ].join( ' ' );
-				result[ key ] = matchWidth( condition, width );
-			} );
+		const matches = reduce(
+			breakpoints,
+			( result, width, name ) => {
+				forEach( operators, ( condition, operator ) => {
+					const key = [ operator, name ].join( ' ' );
+					result[ key ] = matchWidth( condition, width );
+				} );
 
-			return result;
-		}, {} );
+				return result;
+			},
+			{}
+		);
 
 		dispatch( 'core/viewport' ).setIsMatching( matches );
 	};
