@@ -34,7 +34,7 @@ function BlockPattern( { pattern, onClick } ) {
 			tabIndex={ 0 }
 		>
 			<div className="block-editor-patterns__item-preview">
-				<BlockPreview blocks={ blocks } />
+				<BlockPreview blocks={ blocks } autoHeight />
 			</div>
 			<div className="block-editor-patterns__item-title">{ title }</div>
 		</div>

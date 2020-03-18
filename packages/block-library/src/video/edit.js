@@ -184,7 +184,7 @@ class VideoEdit extends Component {
 									}
 									render={ ( { open } ) => (
 										<Button
-											isSecondary
+											isPrimary
 											onClick={ open }
 											ref={ this.posterImageButton }
 											aria-describedby={
@@ -192,8 +192,8 @@ class VideoEdit extends Component {
 											}
 										>
 											{ ! this.props.attributes.poster
-												? __( 'Select Poster Image' )
-												: __( 'Replace image' ) }
+												? __( 'Select' )
+												: __( 'Replace' ) }
 										</Button>
 									) }
 								/>
@@ -212,10 +212,9 @@ class VideoEdit extends Component {
 								{ !! this.props.attributes.poster && (
 									<Button
 										onClick={ this.onRemovePoster }
-										isLink
-										isDestructive
+										isTertiary
 									>
-										{ __( 'Remove Poster Image' ) }
+										{ __( 'Remove' ) }
 									</Button>
 								) }
 							</BaseControl>

@@ -43,7 +43,7 @@ Then, start the local environment:
 $ wp-env start
 ```
 
-Finally, navigate to http://localhost:8888 in your web browser to see WordPress running with the local WordPress plugin or theme running and activated.
+Finally, navigate to http://localhost:8888 in your web browser to see WordPress running with the local WordPress plugin or theme running and activated. Default login credentials are username: `admin` password: `password`.
 
 ### Stopping the environment
 
@@ -175,6 +175,32 @@ Positionals:
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 ```
 
+### `wp-env run [container] [command]` 
+
+```sh
+wp-env run <container> [command..]
+
+Runs an arbitrary command in one of the underlying Docker containers, for
+example it's useful for running wp cli commands.
+
+
+Positionals:
+  container  The container to run the command on.            [string] [required]
+  command    The command to run.                           [array] [default: []]
+```
+
+For example:
+
+```sh
+wp-env run cli wp user list
+⠏ Running `wp user list` in 'cli'.
+
+ID      user_login      display_name    user_email      user_registered roles
+1       admin   admin   wordpress@example.com   2020-03-05 10:45:14     administrator
+
+✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
+```
+
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
@@ -186,8 +212,8 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"core"`      | `string|null` | `null`                                     | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
 | `"plugins"`   | `string[]`    | `[]`                                       | A list of plugins to install and activate in the environment.                                                             |
 | `"themes"`    | `string[]`    | `[]`                                       | A list of themes to install in the environment. The first theme in the list will be activated.                            |
-| `"port"`      | `string`      | `"8888"`                                   | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
-| `"testsPort"` | `string`      | `"8889"`                                   | The port number to use for the tests instance.                                                                            |
+| `"port"`      | `integer`      | `8888`                                   | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
+| `"testsPort"` | `integer`      | `8889`                                   | The port number to use for the tests instance.                                                                            |
 | `"config"`    | `Object`      | `"{ WP_DEBUG: true, SCRIPT_DEBUG: true }"` | Mapping of wp-config.php constants to their desired values.                                                               |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._

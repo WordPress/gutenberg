@@ -81,11 +81,13 @@ class ButtonEdit extends Component {
 		} = this.props;
 		const { isLinkSheetVisible, isButtonFocused } = this.state;
 
-		// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
 		if (
 			( prevProps.editorSidebarOpened && ! editorSidebarOpened ) ||
 			( prevState.isLinkSheetVisible && ! isLinkSheetVisible )
 		) {
+			// Prepends "http://" to an url when closing link settings sheet and button settings sheet
+			setAttributes( { url: prependHTTP( url ) } );
+			// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
 			this.isEditingURL = false;
 		}
 
@@ -102,13 +104,12 @@ class ButtonEdit extends Component {
 		}
 
 		// Paste a URL from clipboard
-		if ( isLinkSheetVisible && ! url && ! this.isEditingURL ) {
+		if (
+			( isLinkSheetVisible || editorSidebarOpened ) &&
+			! url &&
+			! this.isEditingURL
+		) {
 			this.getURLFromClipboard();
-		}
-
-		// Prepends "http://" to a url when closing link settings sheet and button settings sheet
-		if ( ! isLinkSheetVisible && ! editorSidebarOpened ) {
-			setAttributes( { url: prependHTTP( url ) } );
 		}
 
 		if ( this.richTextRef ) {
@@ -238,6 +239,10 @@ class ButtonEdit extends Component {
 					onChange={ this.onChangeURL }
 					autoCapitalize="none"
 					autoCorrect={ false }
+					// eslint-disable-next-line jsx-a11y/no-autofocus
+					autoFocus={
+						! isCompatibleWithSettings && Platform.OS === 'ios'
+					}
 					separatorType={
 						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
 					}

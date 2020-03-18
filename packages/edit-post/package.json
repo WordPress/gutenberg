@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "3.13.2",
+	"version": "3.13.6",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,6 +41,7 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",

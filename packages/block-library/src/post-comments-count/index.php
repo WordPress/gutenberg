@@ -32,15 +32,21 @@ function render_block_core_post_comments_count( $attributes ) {
  * Registers the `core/post-comments-count` block on the server.
  */
 function register_block_core_post_comments_count() {
+	$path     = __DIR__ . '/post-comments-count/block.json';
+	$metadata = json_decode( file_get_contents( $path ), true );
+
 	register_block_type(
-		'core/post-comments-count',
-		array(
-			'attributes'      => array(
-				'className' => array(
-					'type' => 'string',
+		$metadata['name'],
+		array_merge(
+			$metadata,
+			array(
+				'attributes'      => array(
+					'className' => array(
+						'type' => 'string',
+					),
 				),
-			),
-			'render_callback' => 'render_block_core_post_comments_count',
+				'render_callback' => 'render_block_core_post_comments_count',
+			)
 		)
 	);
 }

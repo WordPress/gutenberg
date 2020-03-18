@@ -11,7 +11,11 @@ import {
 	BlockNavigationDropdown,
 	ToolSelector,
 } from '@wordpress/block-editor';
-import { EditorHistoryRedo, EditorHistoryUndo } from '@wordpress/editor';
+import {
+	TableOfContents,
+	EditorHistoryRedo,
+	EditorHistoryUndo,
+} from '@wordpress/editor';
 
 const inserterToggleProps = { isPrimary: true };
 
@@ -63,6 +67,7 @@ function HeaderToolbar() {
 			<ToolSelector />
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
+			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
 			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">

@@ -26,6 +26,7 @@ export const settings = {
 	supports: {
 		align: [ 'wide', 'full' ],
 		html: false,
+		lightBlockWrapper: true,
 	},
 	variations,
 	example: {

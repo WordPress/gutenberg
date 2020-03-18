@@ -46,7 +46,6 @@ function selector( select ) {
 function BlockPopover( {
 	clientId,
 	rootClientId,
-	name,
 	align,
 	isValid,
 	moverDirection,
@@ -203,7 +202,6 @@ function BlockPopover( {
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
-					data-type={ name }
 					data-align={ align }
 				/>
 			) }
@@ -313,7 +311,6 @@ export default function WrappedBlockPopover() {
 		<BlockPopover
 			clientId={ clientId }
 			rootClientId={ rootClientId }
-			name={ name }
 			align={ align }
 			isValid={ isValid }
 			moverDirection={ moverDirection }

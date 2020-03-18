@@ -38,6 +38,7 @@ function Layout( { blockEditorSettings } ) {
 							content={
 								<>
 									<Notices />
+									<Popover.Slot name="block-toolbar" />
 									<div
 										className="edit-widgets-layout__content"
 										tabIndex="-1"

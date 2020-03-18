@@ -69,6 +69,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				environment: {
 					MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
 				},
+				volumes: [ 'mysql:/var/lib/mysql' ],
 			},
 			wordpress: {
 				depends_on: [ 'mysql' ],
@@ -108,6 +109,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 		volumes: {
 			...( ! config.coreSource && { wordpress: {} } ),
 			...( ! config.coreSource && { 'tests-wordpress': {} } ),
+			mysql: {},
 		},
 	};
 };

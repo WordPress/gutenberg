@@ -48,6 +48,7 @@ const BlockComponent = forwardRef(
 			name,
 			mode,
 			blockTitle,
+			wrapperProps,
 		} = useContext( BlockContext );
 		const { initialPosition } = useSelect(
 			( select ) => {
@@ -94,10 +95,8 @@ const BlockComponent = forwardRef(
 
 		/**
 		 * When a block becomes selected, transition focus to an inner tabbable.
-		 *
-		 * @param {boolean} ignoreInnerBlocks Should not focus inner blocks.
 		 */
-		const focusTabbable = ( ignoreInnerBlocks ) => {
+		const focusTabbable = () => {
 			// Focus is captured by the wrapper node, so while focus transition
 			// should only consider tabbables within editable display, since it
 			// may be the wrapper itself or a side control which triggered the
@@ -111,10 +110,8 @@ const BlockComponent = forwardRef(
 				.find( wrapper.current )
 				.filter( isTextField )
 				// Exclude inner blocks
-				.filter(
-					( node ) =>
-						! ignoreInnerBlocks ||
-						isInsideRootBlock( wrapper.current, node )
+				.filter( ( node ) =>
+					isInsideRootBlock( wrapper.current, node )
 				);
 
 			// If reversed (e.g. merge via backspace), use the last in the set of
@@ -126,15 +123,10 @@ const BlockComponent = forwardRef(
 			placeCaretAtHorizontalEdge( target, isReverse );
 		};
 
-		// Focus the selected block's wrapper or inner input on mount and update
-		const isMounting = useRef( true );
-
 		useEffect( () => {
 			if ( ! isMultiSelecting && ! isNavigationMode && isSelected ) {
-				focusTabbable( ! isMounting.current );
+				focusTabbable();
 			}
-
-			isMounting.current = false;
 		}, [ isSelected, isMultiSelecting, isNavigationMode ] );
 
 		// Block Reordering animation
@@ -203,6 +195,7 @@ const BlockComponent = forwardRef(
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
+				{ ...wrapperProps }
 				{ ...props }
 				id={ blockElementId }
 				ref={ wrapper }
@@ -226,7 +219,21 @@ const BlockComponent = forwardRef(
 	}
 );
 
-const elements = [ 'p', 'div' ];
+const elements = [
+	'p',
+	'div',
+	'h1',
+	'h2',
+	'h3',
+	'h4',
+	'h5',
+	'h6',
+	'ol',
+	'ul',
+	'li',
+	'figure',
+	'nav',
+];
 
 const ExtendedBlockComponent = elements.reduce( ( acc, element ) => {
 	acc[ element ] = forwardRef( ( props, ref ) => {

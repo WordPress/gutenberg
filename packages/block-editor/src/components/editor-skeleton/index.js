@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 function useHTMLClass( className ) {
 	useEffect( () => {
 		const element =
-			document && document.querySelector( `html:not(.${ className }` );
+			document && document.querySelector( `html:not(.${ className })` );
 		if ( ! element ) {
 			return;
 		}

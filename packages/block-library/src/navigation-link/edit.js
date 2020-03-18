@@ -28,6 +28,7 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
@@ -192,8 +193,8 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div
-				className={ classnames( 'wp-block-navigation-link', {
+			<Block.li
+				className={ classnames( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
 					'is-selected': isSelected,
 					'has-link': !! url,
@@ -218,6 +219,7 @@ function NavigationLinkEdit( {
 							setAttributes( { label: labelValue } )
 						}
 						placeholder={ itemLabelPlaceholder }
+						keepPlaceholderOnFocus
 						withoutInteractiveFormatting
 						allowedFormats={ [
 							'core/bold',
@@ -291,8 +293,13 @@ function NavigationLinkEdit( {
 							? InnerBlocks.DefaultAppender
 							: false
 					}
+					__experimentalTagName="ul"
+					__experimentalAppenderTagName="li"
+					__experimentalPassedProps={ {
+						className: 'wp-block-navigation__container',
+					} }
 				/>
-			</div>
+			</Block.li>
 		</Fragment>
 	);
 }

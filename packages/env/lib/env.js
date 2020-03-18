@@ -50,6 +50,7 @@ module.exports = {
 		await module.exports.stop( { spinner, debug } );
 
 		await checkForLegacyInstall( spinner );
+
 		const config = await initConfig( { spinner, debug } );
 
 		spinner.text = 'Downloading WordPress.';
@@ -113,6 +114,14 @@ module.exports = {
 			config: config.dockerComposeConfigPath,
 			log: config.debug,
 		} );
+
+		if ( config.coreSource === null ) {
+			// Don't chown wp-content when it exists on the user's local filesystem.
+			await Promise.all( [
+				makeContentDirectoriesWritable( 'development', config ),
+				makeContentDirectoriesWritable( 'tests', config ),
+			] );
+		}
 
 		try {
 			await checkDatabaseConnection( config );
@@ -356,6 +365,35 @@ async function copyCoreFiles( fromPath, toPath ) {
 }
 
 /**
+ * Makes the WordPress content directories (wp-content, wp-content/plugins,
+ * wp-content/themes) owned by the www-data user. This ensures that WordPress
+ * can write to these directories.
+ *
+ * This is necessary when running wp-env with `"core": null` because Docker
+ * will automatically create these directories as the root user when binding
+ * volumes during `docker-compose up`, and `docker-compose up` doesn't support
+ * the `-u` option.
+ *
+ * See https://github.com/docker-library/wordpress/issues/436.
+ *
+ * @param {string} environment The environment to check. Either 'development' or 'tests'.
+ * @param {Config} config The wp-env config object.
+ */
+async function makeContentDirectoriesWritable(
+	environment,
+	{ dockerComposeConfigPath, debug }
+) {
+	await dockerCompose.exec(
+		environment === 'development' ? 'wordpress' : 'tests-wordpress',
+		'chown www-data:www-data wp-content wp-content/plugins wp-content/themes',
+		{
+			config: dockerComposeConfigPath,
+			log: debug,
+		}
+	);
+}
+
+/**
  * Performs the given action again and again until it does not throw an error.
  *
  * @param {Function} action The action to perform.
@@ -411,13 +449,17 @@ async function configureWordPress( environment, config ) {
 	// Install WordPress.
 	await dockerCompose.run(
 		environment === 'development' ? 'cli' : 'tests-cli',
-		`wp core install
-			--url=localhost:${ port }
-			--title='${ config.name }'
-			--admin_user=admin
-			--admin_password=password
-			--admin_email=wordpress@example.com
-			--skip-email`,
+		[
+			'wp',
+			'core',
+			'install',
+			`--url=localhost:${ port }`,
+			`--title=${ config.name }`,
+			'--admin_user=admin',
+			'--admin_password=password',
+			'--admin_email=wordpress@example.com',
+			'--skip-email',
+		],
 		options
 	);
 

@@ -42,7 +42,7 @@
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
 	border-radius: $radius-round-rectangle;
-	color: $dark-gray-500;
+	color: $dark-gray-primary;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
 

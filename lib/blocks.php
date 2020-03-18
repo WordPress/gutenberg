@@ -35,6 +35,7 @@ function gutenberg_reregister_core_block_types() {
 		'post-title.php'          => 'core/post-title',
 		'post-content.php'        => 'core/post-content',
 		'post-author.php'         => 'core/post-author',
+		'post-comments.php'       => 'core/post-comments',
 		'post-comments-count.php' => 'core/post-comments-count',
 		'post-comments-form.php'  => 'core/post-comments-form',
 		'post-date.php'           => 'core/post-date',

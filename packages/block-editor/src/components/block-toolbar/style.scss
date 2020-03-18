@@ -125,7 +125,7 @@
 		padding-right: $grid-unit-15 / 2;
 
 		svg {
-			min-width: $icon-button-size-small; // This is the optimal icon size, and we size the whole button after this.
+			min-width: $button-size-small; // This is the optimal icon size, and we size the whole button after this.
 		}
 
 		&::before {

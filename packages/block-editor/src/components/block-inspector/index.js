@@ -64,7 +64,7 @@ const BlockInspector = ( {
 			<BlockCard blockType={ blockType } />
 			{ hasBlockStyles && (
 				<div>
-					<PanelBody title={ __( 'Styles' ) } initialOpen={ false }>
+					<PanelBody title={ __( 'Styles' ) }>
 						<BlockStyles clientId={ selectedBlockClientId } />
 						<DefaultStylePicker blockName={ blockType.name } />
 					</PanelBody>

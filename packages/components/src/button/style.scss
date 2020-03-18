@@ -9,13 +9,13 @@
 	background: none;
 	transition: box-shadow 0.1s linear;
 	@include reduce-motion("transition");
-	height: $icon-button-size;
+	height: $button-size;
 	align-items: center;
 	box-sizing: border-box;
 	padding: 6px 12px;
 	overflow: hidden;
 	border-radius: $radius-block-ui;
-	color: $black;
+	color: $dark-gray-primary;
 
 	&[aria-expanded="true"],
 	&:hover {
@@ -232,7 +232,7 @@
 		padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
 
 		// Icon buttons are square.
-		min-width: $icon-button-size;
+		min-width: $button-size;
 		justify-content: center;
 
 		.dashicon {
@@ -256,7 +256,7 @@
 
 	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
 	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
-	.screen-reader-text {
+	.components-visually-hidden {
 		height: auto;
 	}
 }

@@ -9,26 +9,40 @@
  */
 
 /**
- * Filters allowed CSS attributes to include `flex-basis`, included in saved
- * markup of the Column block.
+ * Extends block editor settings to include a list of image dimensions per size.
  *
- * This can be removed when plugin support requires WordPress 5.3.0+.
+ * This can be removed when plugin support requires WordPress 5.4.0+.
  *
- * @see https://core.trac.wordpress.org/ticket/47281
- * @see https://core.trac.wordpress.org/changeset/45363
+ * @see https://core.trac.wordpress.org/ticket/49389
+ * @see https://core.trac.wordpress.org/changeset/47240
  *
- * @since 5.7.0
+ * @param array $settings Default editor settings.
  *
- * @param string[] $attr Array of allowed CSS attributes.
- *
- * @return string[] Filtered array of allowed CSS attributes.
+ * @return array Filtered editor settings.
  */
-function gutenberg_safe_style_css_column_flex_basis( $attr ) {
-	$attr[] = 'flex-basis';
+function gutenberg_extend_settings_image_dimensions( $settings ) {
+	/*
+	 * Only filter settings if:
+	 * 1. `imageDimensions` is not already assigned, in which case it can be
+	 *    assumed to have been set from WordPress 5.4.0+ default settings.
+	 * 2. `imageSizes` is an array. Plugins may run `block_editor_settings`
+	 *    directly and not provide all properties of the settings array.
+	 */
+	if ( ! isset( $settings['imageDimensions'] ) && ! empty( $settings['imageSizes'] ) ) {
+		$image_dimensions = array();
+		$all_sizes        = wp_get_registered_image_subsizes();
+		foreach ( $settings['imageSizes'] as $size ) {
+			$key = $size['slug'];
+			if ( isset( $all_sizes[ $key ] ) ) {
+				$image_dimensions[ $key ] = $all_sizes[ $key ];
+			}
+		}
+		$settings['imageDimensions'] = $image_dimensions;
+	}
 
-	return $attr;
+	return $settings;
 }
-add_filter( 'safe_style_css', 'gutenberg_safe_style_css_column_flex_basis' );
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_image_dimensions' );
 
 /**
  * Adds a polyfill for the WHATWG URL in environments which do not support it.
@@ -38,6 +52,10 @@ add_filter( 'safe_style_css', 'gutenberg_safe_style_css_column_flex_basis' );
  *
  * This can be removed when plugin support requires WordPress 5.4.0+.
  *
+ * The script registration occurs in `gutenberg_register_vendor_scripts`, which
+ * should be removed in coordination with this function.
+ *
+ * @see gutenberg_register_vendor_scripts
  * @see https://core.trac.wordpress.org/ticket/49360
  * @see https://developer.mozilla.org/en-US/docs/Web/API/URL/URL
  * @see https://developer.wordpress.org/reference/functions/wp_default_packages_vendor/
@@ -47,28 +65,12 @@ add_filter( 'safe_style_css', 'gutenberg_safe_style_css_column_flex_basis' );
  * @param WP_Scripts $scripts WP_Scripts object.
  */
 function gutenberg_add_url_polyfill( $scripts ) {
-	// Only register polyfill if not already registered. This prevents handling
-	// in an environment where core has updated to manage the polyfill. This
-	// depends on the action being handled after default script registration.
-	$is_polyfill_script_registered = (bool) $scripts->query( 'wp-polyfill-url', 'registered' );
-	if ( $is_polyfill_script_registered ) {
-		return;
-	}
-
-	gutenberg_register_vendor_script(
-		$scripts,
-		'wp-polyfill-url',
-		'https://unpkg.com/polyfill-library@3.42.0/polyfills/URL/polyfill.js',
-		array(),
-		'3.42.0'
-	);
-
 	did_action( 'init' ) && $scripts->add_inline_script(
 		'wp-polyfill',
 		wp_get_script_polyfill(
 			$scripts,
 			array(
-				'\'URL\' in window' => 'wp-polyfill-url',
+				'window.URL && window.URL.prototype && window.URLSearchParams' => 'wp-polyfill-url',
 			)
 		)
 	);
@@ -80,6 +82,10 @@ add_action( 'wp_default_scripts', 'gutenberg_add_url_polyfill', 20 );
  *
  * This can be removed when plugin support requires WordPress 5.4.0+.
  *
+ * The script registration occurs in `gutenberg_register_vendor_scripts`, which
+ * should be removed in coordination with this function.
+ *
+ * @see gutenberg_register_vendor_scripts
  * @see gutenberg_add_url_polyfill
  * @see https://core.trac.wordpress.org/ticket/49360
  * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMRect
@@ -90,22 +96,6 @@ add_action( 'wp_default_scripts', 'gutenberg_add_url_polyfill', 20 );
  * @param WP_Scripts $scripts WP_Scripts object.
  */
 function gutenberg_add_dom_rect_polyfill( $scripts ) {
-	// Only register polyfill if not already registered. This prevents handling
-	// in an environment where core has updated to manage the polyfill. This
-	// depends on the action being handled after default script registration.
-	$is_polyfill_script_registered = (bool) $scripts->query( 'wp-polyfill-dom-rect', 'registered' );
-	if ( $is_polyfill_script_registered ) {
-		return;
-	}
-
-	gutenberg_register_vendor_script(
-		$scripts,
-		'wp-polyfill-dom-rect',
-		'https://unpkg.com/polyfill-library@3.42.0/polyfills/DOMRect/polyfill.js',
-		array(),
-		'3.42.0'
-	);
-
 	did_action( 'init' ) && $scripts->add_inline_script(
 		'wp-polyfill',
 		wp_get_script_polyfill(

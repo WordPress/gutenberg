@@ -13,7 +13,7 @@ import {
 
 describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 	const paragraphSelector =
-		'.block-editor-rich-text__editable.wp-block-paragraph';
+		'.block-editor-rich-text__editable[data-type="core/paragraph"]';
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-innerblocks-allowed-blocks' );
 	} );

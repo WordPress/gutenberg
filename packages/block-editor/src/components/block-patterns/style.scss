@@ -21,17 +21,7 @@
 }
 
 .block-editor-patterns__item-preview {
-	overflow: hidden;
-	height: 200px;
-
-	.block-editor-block-preview__container {
-		height: 100%;
-	}
-
-	.block-editor-block-preview__content {
-		display: flex;
-		justify-content: center;
-	}
+	padding: $grid-unit-20;
 }
 
 .block-editor-patterns__item-title {
