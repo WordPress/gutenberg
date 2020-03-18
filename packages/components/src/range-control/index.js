@@ -203,6 +203,7 @@ const BaseRangeControl = forwardRef(
 						/>
 						<RangeRail
 							aria-hidden={ true }
+							disabled={ disabled }
 							marks={ marks }
 							max={ max }
 							min={ min }
@@ -212,6 +213,7 @@ const BaseRangeControl = forwardRef(
 						<Track
 							aria-hidden={ true }
 							className="components-range-control__track"
+							disabled={ disabled }
 							style={ { width: fillValueOffset } }
 						/>
 						<ThumbWrapper style={ offsetStyle }>
@@ -240,6 +242,7 @@ const BaseRangeControl = forwardRef(
 						<InputNumber
 							aria-label={ label }
 							className="components-range-control__number"
+							disabled={ disabled }
 							inputMode="decimal"
 							max={ max }
 							min={ min }
@@ -253,7 +256,7 @@ const BaseRangeControl = forwardRef(
 						<ActionRightWrapper>
 							<Button
 								className="components-range-control__reset"
-								disabled={ value === undefined }
+								disabled={ disabled || value === undefined }
 								isSecondary
 								isSmall
 								onClick={ handleOnReset }
