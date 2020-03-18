@@ -22,6 +22,10 @@ $border-radius-ios: 7px;
 	background-color: #fff;
 }
 
+.selectedDark {
+	background-color: #545454;
+}
+
 .shadowIOS {
 	box-shadow: 0 0 8px rgba(0, 0, 0, 0.12);
 }
@@ -35,7 +39,10 @@ $border-radius-ios: 7px;
 	align-self: center;
 	padding-left: $segment-spacing + $border-width;
 	padding-right: $segment-spacing + $border-width;
+}
 
+.containerDark {
+	background-color: #a4a4a4;
 }
 
 .containerIOS {
@@ -52,7 +59,7 @@ $border-radius-ios: 7px;
 	right: -$border-width;
 	border-width: $border-width;
 	border-radius: $container-height / 2;
-	border-color: rgba(0, 0, 0, 0.1);
+	border-color: rgba(0, 0, 0, 0.04);
 }
 
 .outlineIOS {
@@ -68,13 +75,21 @@ $border-radius-ios: 7px;
 .buttonTextDefault {
 	font-size: 12px;
 	height: 16px;
-	font-weight: 500;
+	font-weight: 600;
 	text-align: center;
 	color: rgba(0, 0, 0, 0.6);
 }
 
+.buttonTextDefaultDark {
+	color: #f4f4f4;
+}
+
 .buttonTextSelected {
 	color: rgba(0, 0, 0, 0.87);
+}
+
+.buttonTextSelectedDark {
+	color: #e0e0e0;
 }
 
 .row {
