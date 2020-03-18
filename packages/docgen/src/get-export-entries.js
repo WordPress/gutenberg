@@ -1,103 +1,105 @@
 /**
  * External dependencies
  */
-const { get } = require( 'lodash' );
+const ts = require( 'typescript' );
+const { SyntaxKind } = ts;
+
+const { hasExportKeyword, hasDefaultKeyword } = require( './has-keyword' );
 
 /**
  * Returns the export entry records of the given export statement.
  * Unlike [the standard](http://www.ecma-international.org/ecma-262/9.0/#exportentry-record),
  * the `importName` and the `localName` are merged together.
  *
- * @param {Object} token Espree node representing an export.
+ * @param {Object} statement TypeScript AST node representing an export.
  *
  * @return {Array} Exported entry records. Example:
  * [ {
  *    localName: 'localName',
  *    exportName: 'exportedName',
  *    module: null,
- *    lineStart: 2,
- *    lineEnd: 3,
  * } ]
  */
-module.exports = function( token ) {
-	if ( token.type === 'ExportDefaultDeclaration' ) {
-		const getLocalName = ( t ) => {
-			let name;
-			switch ( t.declaration.type ) {
-				case 'Identifier':
-					name = t.declaration.name;
-					break;
-				case 'AssignmentExpression':
-					name = t.declaration.left.name;
-					break;
-				//case 'FunctionDeclaration'
-				//case 'ClassDeclaration'
-				default:
-					name = get( t.declaration, [ 'id', 'name' ], '*default*' );
-			}
-			return name;
-		};
+module.exports = function( statement ) {
+	if ( hasExportKeyword( statement ) ) {
+		if ( hasDefaultKeyword( statement ) ) {
+			const getLocalName = ( s ) => {
+				switch ( s.kind ) {
+					case SyntaxKind.ClassDeclaration:
+					case SyntaxKind.FunctionDeclaration:
+					default:
+						return s.name ? s.name.escapedText : '*default*';
+				}
+			};
+
+			return [
+				{
+					localName: getLocalName( statement ),
+					exportName: 'default',
+					module: null,
+				},
+			];
+		}
+
+		if ( statement.kind === SyntaxKind.VariableStatement ) {
+			return statement.declarationList.declarations.map( ( decl ) => {
+				return {
+					localName: decl.name.escapedText,
+					exportName: decl.name.escapedText,
+					module: null,
+				};
+			} );
+		}
+
 		return [
 			{
-				localName: getLocalName( token ),
+				localName: statement.name.escapedText,
+				exportName: statement.name.escapedText,
+				module: null,
+			},
+		];
+	}
+
+	if ( statement.kind === SyntaxKind.ExportAssignment ) {
+		const getLocalName = ( s ) => {
+			switch ( s.expression.kind ) {
+				case SyntaxKind.Identifier:
+					return s.expression.escapedText;
+				default:
+					return '*default*';
+			}
+		};
+
+		return [
+			{
+				localName: getLocalName( statement ),
 				exportName: 'default',
 				module: null,
-				lineStart: token.loc.start.line,
-				lineEnd: token.loc.end.line,
 			},
 		];
 	}
 
-	if ( token.type === 'ExportAllDeclaration' ) {
-		return [
-			{
-				localName: '*',
-				exportName: null,
-				module: token.source.value,
-				lineStart: token.loc.start.line,
-				lineEnd: token.loc.end.line,
-			},
-		];
-	}
+	// statement.kind === SyntaxKind.ExportDeclaration
 
-	const name = [];
-	if ( token.declaration === null ) {
-		token.specifiers.forEach( ( specifier ) =>
-			name.push( {
-				localName: specifier.local.name,
-				exportName: specifier.exported.name,
-				module: get( token.source, [ 'value' ], null ),
-				lineStart: specifier.loc.start.line,
-				lineEnd: specifier.loc.end.line,
-			} )
-		);
-		return name;
-	}
-
-	switch ( token.declaration.type ) {
-		case 'ClassDeclaration':
-		case 'FunctionDeclaration':
-			name.push( {
-				localName: token.declaration.id.name,
-				exportName: token.declaration.id.name,
-				module: null,
-				lineStart: token.declaration.loc.start.line,
-				lineEnd: token.declaration.loc.end.line,
-			} );
-			break;
-
-		case 'VariableDeclaration':
-			token.declaration.declarations.forEach( ( declaration ) => {
-				name.push( {
-					localName: declaration.id.name,
-					exportName: declaration.id.name,
-					module: null,
-					lineStart: token.declaration.loc.start.line,
-					lineEnd: token.declaration.loc.end.line,
-				} );
-			} );
-			break;
-	}
-
-	return name;
+	return statement.exportClause
+		? // export { a, b } from './module'
+		  statement.exportClause.elements.map( ( element ) => {
+				return {
+					localName: element.propertyName
+						? element.propertyName.escapedText
+						: element.name.escapedText,
+					exportName: element.name.escapedText,
+					module: statement.moduleSpecifier
+						? statement.moduleSpecifier.text
+						: null,
+				};
+		  } )
+		: // export * from './namespace-module';
+		  [
+				{
+					localName: '*',
+					exportName: null,
+					module: statement.moduleSpecifier.text,
+				},
+		  ];
 };
