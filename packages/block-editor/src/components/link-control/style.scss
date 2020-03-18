@@ -41,6 +41,10 @@ $block-editor-link-control-number-of-actions: 1;
 			@include input-style__focus();
 		}
 	}
+
+	.components-base-control__field {
+		margin-bottom: 0;
+	}
 }
 
 .block-editor-link-control__search-error {
