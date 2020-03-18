@@ -38,7 +38,7 @@
 		"./packages/is-shallow-equal/**/*.js",
 		"./packages/priority-queue/**/*.js",
 		"./packages/token-list/**/*.js",
-		"./packages/url/**/*.js",
+		"./packages/url/src/**/*.js",
 		"./packages/warning/**/*.js",
 	],
 	"exclude": [

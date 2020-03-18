@@ -502,6 +502,7 @@ export class InserterMenu extends Component {
 														hoveredItem.initialAttributes
 												  )
 										}
+										autoHeight
 									/>
 								</div>
 							) : (

@@ -31,6 +31,7 @@ function BlockList(
 		renderAppender,
 		__experimentalUIParts = {},
 		__experimentalTagName = 'div',
+		__experimentalAppenderTagName,
 		__experimentalPassedProps = {},
 	},
 	ref
@@ -120,6 +121,7 @@ function BlockList(
 				);
 			} ) }
 			<BlockListAppender
+				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
 				className={

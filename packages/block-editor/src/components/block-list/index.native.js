@@ -133,7 +133,10 @@ export class BlockList extends Component {
 					innerRef={ this.scrollViewInnerRef }
 					extraScrollHeight={ innerToolbarHeight + 10 }
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
+					scrollViewStyle={ {
+						flex: isRootList ? 1 : 0,
+						overflow: 'visible',
+					} }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					extraData={ forceRefresh }

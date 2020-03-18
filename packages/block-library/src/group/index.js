@@ -87,6 +87,7 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 		anchor: true,
 		html: false,
+		lightBlockWrapper: true,
 	},
 	transforms: {
 		from: [

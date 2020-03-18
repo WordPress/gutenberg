@@ -52,6 +52,7 @@
 		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"react-autosize-textarea": "^3.0.2",
+		"react-resize-aware": "^3.0.0",
 		"react-spring": "^8.0.19",
 		"redux-multi": "^0.1.12",
 		"refx": "^3.0.0",

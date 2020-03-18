@@ -84,12 +84,6 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 		width: $navigation-sub-menu-width;
 	}
 
-	// Remove paddings on subsequent immediate children.
-	.block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
-		margin: 0;
-		width: auto;
-	}
-
 	&,
 	> .wp-block-navigation__container {
 		align-items: center;
@@ -122,12 +116,7 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 			margin: 0;
 		}
 
-		> .block-editor-inner-blocks {
-			display: none;
-		}
-
-		&.has-child > .wp-block-navigation__container,
-		&.is-editing.has-child > .block-editor-inner-blocks {
+		&.has-child > .wp-block-navigation__container {
 			// Box model
 			display: flex;
 			border: $border-width solid rgba(0, 0, 0, 0.15);
@@ -147,7 +136,6 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 		}
 
 		// Inherit colors from menu
-		.block-editor-inner-blocks,
 		.wp-block-navigation__container {
 			background-color: inherit;
 			color: inherit;
@@ -206,13 +194,11 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 	.wp-block-navigation-link,
 	&.is-style-light .wp-block-navigation-link {
 		//  No text color
-		&:not(.has-text-color) > .block-editor-inner-blocks,
 		&:not(.has-text-color) > .wp-block-navigation__container {
 			color: $light-style-sub-menu-text-color;
 		}
 
 		// No background color
-		&:not(.has-background) > .block-editor-inner-blocks,
 		&:not(.has-background) > .wp-block-navigation__container {
 			background-color: $light-style-sub-menu-background-color;
 		}
@@ -221,13 +207,11 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 	// Dark styles.
 	&.is-style-dark .wp-block-navigation-link {
 		// No text color
-		&:not(.has-text-color) > .block-editor-inner-blocks,
 		&:not(.has-text-color) > .wp-block-navigation__container {
 			color: $dark-style-sub-menu-text-color;
 		}
 
 		// No background color
-		&:not(.has-background) > .block-editor-inner-blocks,
 		&:not(.has-background) > .wp-block-navigation__container {
 			background-color: $dark-style-sub-menu-background-color;
 		}
