@@ -121,6 +121,7 @@ function BlockListBlock( {
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
 			'is-block-collapsed': isAligned,
+			'is-focus-container': name === 'core/template-part',
 		},
 		className
 	);

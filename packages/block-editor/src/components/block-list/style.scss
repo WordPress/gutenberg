@@ -119,6 +119,19 @@
 		}
 	}
 
+	&.is-focus-container {
+		&.has-child-selected,
+		&.is-selected {
+			box-shadow: 0 0 0 1600px rgba(230, 230, 230, 0.6);
+			padding: 1px 30px;
+			z-index: 2;
+		}
+		&.has-child-selected {
+			border: 1px solid rgba(0, 0, 0, 0.1);
+			border-radius: $radius-block-ui;
+		}
+	}
+
 	// Between-blocks dropzone line indicator.
 	&.is-drop-target::before {
 		content: "";
