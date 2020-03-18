@@ -8,7 +8,6 @@ import {
 	Clipboard,
 	LayoutAnimation,
 	UIManager,
-	Text,
 } from 'react-native';
 /**
  * WordPress dependencies
@@ -32,11 +31,7 @@ import {
 	BottomSheet,
 	BottomSheetConsumer,
 	ColorControl,
-	SegmentedControls,
-	ColorPalette,
-	ColorIndicator,
-	NavigationHeader,
-	ColorPicker,
+	ColorSettings,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
@@ -57,7 +52,7 @@ const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
 const PREPEND_HTTP = 'http://';
 
-// It's needed set the following flags via UIManager
+// It's needed to set the following flags via UIManager
 // to have `LayoutAnimation` working on Android
 if (
 	Platform.OS === 'android' &&
@@ -75,7 +70,6 @@ class ButtonEdit extends Component {
 		this.onChangeOpenInNewTab = this.onChangeOpenInNewTab.bind( this );
 		this.onChangeURL = this.onChangeURL.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
-		this.onSegmentHandler = this.onSegmentHandler.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
@@ -99,7 +93,6 @@ class ButtonEdit extends Component {
 			isButtonFocused,
 			previousScreen: '',
 			screen: 'Settings',
-			segment: 'Solid',
 		};
 	}
 
@@ -120,7 +113,7 @@ class ButtonEdit extends Component {
 			setAttributes( { url: prependHTTP( url ) } );
 			// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
 			this.isEditingURL = false;
-			this.setState( { segment: 'Solid', screen: 'Settings' } );
+			this.setState( { screen: 'Settings' } );
 		}
 
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
@@ -318,10 +311,6 @@ class ButtonEdit extends Component {
 		this.richTextRef = richText;
 	}
 
-	onSegmentHandler( item ) {
-		this.setState( { segment: item } );
-	}
-
 	changeBottomSheetContent( destination ) {
 		const { screen } = this.state;
 		LayoutAnimation.configureNext(
@@ -333,33 +322,8 @@ class ButtonEdit extends Component {
 		);
 		this.setState( {
 			screen: destination,
-			segment: 'Solid',
 			previousScreen: screen,
 		} );
-	}
-
-	getColorPalette() {
-		const { segment, screen } = this.state;
-		const {
-			setBackgroundColor,
-			clientId,
-			textColor,
-			setTextColor,
-		} = this.props;
-		return (
-			<ColorPalette
-				setBackgroundColor={ setBackgroundColor }
-				setTextColor={ setTextColor }
-				backgroundColor={ this.getBackgroundColor() }
-				textColor={ textColor.color || '#fff' }
-				currentSegment={ segment }
-				currentScreen={ screen }
-				clientId={ clientId }
-				onCustomPress={ () => {
-					this.changeBottomSheetContent( 'Custom' );
-				} }
-			/>
-		);
 	}
 
 	render() {
@@ -565,104 +529,30 @@ class ButtonEdit extends Component {
 											</PanelBody>
 										</View>
 									) }
-									{ screen === 'Background' && (
-										<View>
-											<NavigationHeader
-												screen={ screen }
-												leftButtonOnPress={ () =>
-													this.changeBottomSheetContent(
-														'Settings'
-													)
-												}
-											/>
-											{ this.getColorPalette() }
-											<View
-												style={
-													styles.horizontalSeparator
-												}
-											/>
-											<SegmentedControls
-												segments={ [
-													'Solid',
-													'Gradient',
-												] }
-												segmentHandler={
-													this.onSegmentHandler
-												}
-												addonLeft={
-													<ColorIndicator
-														color={
-															backgroundColor
-														}
-														style={
-															styles.colorIndicator
-														}
-													/>
-												}
-											/>
-										</View>
-									) }
-									{ screen === 'Text' && (
-										<View>
-											<NavigationHeader
-												screen={ screen }
-												leftButtonOnPress={ () =>
-													this.changeBottomSheetContent(
-														'Settings'
-													)
-												}
-											/>
-											{ this.getColorPalette() }
-											<View
-												style={
-													styles.horizontalSeparator
-												}
-											/>
-											<View style={ styles.textFooter }>
-												<ColorIndicator
-													color={
-														textColor.color ||
-														'#fff'
-													}
-													style={
-														styles.absoluteColorIndicator
-													}
-												/>
-												<Text
-													style={
-														styles.selectColorText
-													}
-												>
-													{ __( 'Select a color' ) }
-												</Text>
-											</View>
-										</View>
-									) }
-									{ screen === 'Custom' && (
-										<ColorPicker
-											previousScreen={ previousScreen }
-											shouldEnableBottomSheetScroll={
-												shouldEnableBottomSheetScroll
-											}
-											isBottomSheetScrolling={
-												isBottomSheetScrolling
-											}
-											setTextColor={ setTextColor }
-											setBackgroundColor={
-												setBackgroundColor
-											}
-											backgroundColor={ backgroundColor }
-											textColor={
-												textColor.color || '#fff'
-											}
-											onNavigationBack={ () =>
-												this.changeBottomSheetContent(
-													previousScreen
-												)
-											}
-											clientId={ clientId }
-										/>
-									) }
+									<ColorSettings
+										screen={ screen }
+										changeBottomSheetContent={ (
+											destination
+										) =>
+											this.changeBottomSheetContent(
+												destination
+											)
+										}
+										backgroundColor={ backgroundColor }
+										textColor={ textColor.color || '#fff' }
+										setTextColor={ setTextColor }
+										setBackgroundColor={
+											setBackgroundColor
+										}
+										clientId={ clientId }
+										previousScreen={ previousScreen }
+										shouldEnableBottomSheetScroll={
+											shouldEnableBottomSheetScroll
+										}
+										isBottomSheetScrolling={
+											isBottomSheetScrolling
+										}
+									/>
 								</>
 							);
 						} }

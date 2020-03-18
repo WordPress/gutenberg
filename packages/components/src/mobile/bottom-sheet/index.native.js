@@ -10,7 +10,6 @@ import {
 	ScrollView,
 	Keyboard,
 	StatusBar,
-	Animated,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
@@ -56,7 +55,6 @@ class BottomSheet extends Component {
 			keyboardHeight: 0,
 			scrollEnabled: true,
 			isScrolling: false,
-			opacity: new Animated.Value( 1 ),
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -182,14 +180,6 @@ class BottomSheet extends Component {
 		this.setState( { isScrolling: value } );
 	}
 
-	onHandleOpacityAnimation( value, callback ) {
-		const { opacity } = this.state;
-		Animated.timing( opacity, {
-			toValue: value,
-			duration: 400,
-		} ).start( callback );
-	}
-
 	render() {
 		const {
 			title = '',
@@ -211,7 +201,6 @@ class BottomSheet extends Component {
 			safeAreaBottomInset,
 			isScrolling,
 			scrollEnabled,
-			opacity,
 		} = this.state;
 
 		const panResponder = PanResponder.create( {
@@ -251,7 +240,7 @@ class BottomSheet extends Component {
 		return (
 			<Modal
 				isVisible={ isVisible }
-				style={ [ styles.bottomModal, { opacity } ] }
+				style={ styles.bottomModal }
 				animationInTiming={ 600 }
 				animationOutTiming={ 250 }
 				backdropTransitionInTiming={ 50 }

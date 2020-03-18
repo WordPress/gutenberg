@@ -9,7 +9,7 @@ import tinycolor from 'tinycolor2';
  */
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ColorIndicator } from '@wordpress/components';
+import { ColorIndicator, BottomSheet } from '@wordpress/components';
 import { __experimentalUseGradient } from '@wordpress/block-editor';
 /**
  * Internal dependencies
@@ -32,13 +32,17 @@ function ColorPicker( {
 	const [ val, setValue ] = useState( 0.5 );
 	const [ savedBgColor ] = useState( backgroundColor );
 	const [ savedTextColor ] = useState( textColor );
+	const { setGradient } = __experimentalUseGradient( {}, clientId );
+
+	const { paddingLeft, height, borderRadius } = styles.picker;
+	const pickerWidth = BottomSheet.getWidth() - 2 * paddingLeft;
 
 	const currentColor = tinycolor(
 		`hsv ${ hue } ${ sat } ${ val }`
 	).toHexString();
+
 	const isGradient = backgroundColor.includes( 'linear-gradient' );
 	const isTextScreen = previousScreen === 'Text';
-	const { setGradient } = __experimentalUseGradient( {}, clientId );
 
 	function setHSVFromHex( color ) {
 		const { h, s, v } = tinycolor( color ).toHsv();
@@ -120,6 +124,10 @@ function ColorPicker( {
 				onHuePickerDragEnd={ () =>
 					shouldEnableBottomSheetScroll( true )
 				}
+				huePickerBarWidth={ pickerWidth }
+				satValPickerSize={ { width: pickerWidth, height } }
+				satValPickerBorderRadius={ borderRadius }
+				huePickerBorderRadius={ borderRadius }
 			/>
 			<View style={ styles.footer }>
 				<TouchableWithoutFeedback onPress={ onPressCancelButton }>

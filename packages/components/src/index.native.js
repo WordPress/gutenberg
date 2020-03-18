@@ -36,7 +36,6 @@ export { default as SelectControl } from './select-control';
 export { default as RangeControl } from './range-control';
 export { default as UnsupportedFooterControl } from './unsupported-footer-control';
 export { default as ColorControl } from './color-control';
-export { default as ColorPicker } from './color-picker';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
@@ -62,5 +61,4 @@ export { default as StepperControl } from './mobile/stepper-control';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
 export { default as LinearGradient } from './mobile/linear-gradient';
-export { default as SegmentedControls } from './mobile/segmented-control';
-export { default as NavigationHeader } from './mobile/bottom-sheet/navigation-header';
+export { default as ColorSettings } from './mobile/color-settings';
