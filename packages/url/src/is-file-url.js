@@ -14,5 +14,5 @@
  * @return {boolean} Whether or not it looks like a file URL.
  */
 export function isFileURL( url ) {
-	return url.startsWith( 'file:' );
+	return url && url.startsWith( 'file:' );
 }
