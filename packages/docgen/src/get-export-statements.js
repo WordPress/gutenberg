@@ -3,7 +3,7 @@
  */
 const { SourceFile, SyntaxKind } = require( 'typescript' );
 
-const { hasExportKeyword } = require( './has-keyword' );
+const { hasExportModifier } = require( './has-modifier' );
 
 /**
  * @param {SourceFile} sourceFile
@@ -17,7 +17,7 @@ function getExportStatements( sourceFile ) {
 			return true;
 		}
 
-		return hasExportKeyword( statement );
+		return hasExportModifier( statement );
 	} );
 }
 

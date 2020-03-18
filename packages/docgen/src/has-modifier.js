@@ -4,7 +4,7 @@ const { Statement, SyntaxKind } = require( 'typescript' );
  *
  * @param {Statement} statement
  */
-function hasExportKeyword( statement ) {
+function hasExportModifier( statement ) {
 	if ( statement.modifiers ) {
 		return (
 			statement.modifiers.filter(
@@ -20,7 +20,7 @@ function hasExportKeyword( statement ) {
  *
  * @param {Statement} statement
  */
-function hasDefaultKeyword( statement ) {
+function hasDefaultModifier( statement ) {
 	if ( statement.modifiers ) {
 		return (
 			statement.modifiers.filter(
@@ -33,6 +33,6 @@ function hasDefaultKeyword( statement ) {
 }
 
 module.exports = {
-	hasExportKeyword,
-	hasDefaultKeyword,
+	hasExportModifier,
+	hasDefaultModifier,
 };

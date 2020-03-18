@@ -4,7 +4,7 @@
 const ts = require( 'typescript' );
 const { SyntaxKind } = ts;
 
-const { hasExportKeyword, hasDefaultKeyword } = require( './has-keyword' );
+const { hasExportModifier, hasDefaultModifier } = require( './has-modifier' );
 
 /**
  * Returns the export entry records of the given export statement.
@@ -21,8 +21,8 @@ const { hasExportKeyword, hasDefaultKeyword } = require( './has-keyword' );
  * } ]
  */
 module.exports = function( statement ) {
-	if ( hasExportKeyword( statement ) ) {
-		if ( hasDefaultKeyword( statement ) ) {
+	if ( hasExportModifier( statement ) ) {
+		if ( hasDefaultModifier( statement ) ) {
 			const getLocalName = ( s ) => {
 				switch ( s.kind ) {
 					case SyntaxKind.ClassDeclaration:
