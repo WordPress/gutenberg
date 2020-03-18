@@ -482,16 +482,12 @@ class RichText extends Component {
 		clearTimeout( this.onInput.timeout );
 		this.onInput.timeout = setTimeout( this.onCreateUndoLevel, 1000 );
 
-		if ( ! allowPrefixTransformations ) {
-			return;
-		}
-
 		// Only run input rules when inserting text.
 		if ( inputType !== 'insertText' ) {
 			return;
 		}
 
-		if ( inputRule ) {
+		if ( allowPrefixTransformations && inputRule ) {
 			inputRule( change, this.valueToFormat );
 		}
 

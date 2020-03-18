@@ -10,7 +10,8 @@ html.wp-toolbar {
 	background: $white;
 }
 
-body.gutenberg_page_gutenberg-edit-site {
+body.gutenberg_page_gutenberg-edit-site,
+body.toplevel_page_gutenberg-edit-site {
 	@include wp-admin-reset(".edit-site");
 }
 

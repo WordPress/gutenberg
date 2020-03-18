@@ -48,13 +48,18 @@ import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { external, link, image as icon, textColor } from '@wordpress/icons';
+import {
+	external,
+	link,
+	image as icon,
+	textColor,
+	replace,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
-import { editImageIcon } from './icon';
 import SvgIconRetry from './icon-retry';
 import SvgIconCustomize from './icon-customize';
 import { getUpdatedLinkTargetSettings } from './utils';
@@ -373,7 +378,7 @@ export class ImageEdit extends React.Component {
 				<ToolbarGroup>
 					<ToolbarButton
 						title={ __( 'Edit image' ) }
-						icon={ editImageIcon }
+						icon={ replace }
 						onClick={ open }
 					/>
 				</ToolbarGroup>

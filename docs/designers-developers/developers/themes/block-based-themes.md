@@ -73,7 +73,7 @@ Ultimately, any WordPress user with the correct capabilities (example: `administ
 
 In the current iteration (at the time of writing this doc), you can navigate to the temporary "Templates" admin menu under "Appearance" `wp-admin/edit.php?post_type=wp_template` and use this as a playground to edit your templates.
 
-When ready, switch to the "Code editor" mode and grab the HTML of the template from there and put it in the right file in your theme directory.
+When ready, switch to the code editor mode and grab the HTML of the template from there and put it in the right file in your theme directory.
 
 ## Templates CPT
 

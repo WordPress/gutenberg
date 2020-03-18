@@ -8,12 +8,7 @@ const __experimentalUsePageTemplatePickerVisible = () => {
 	return useSelect( ( select ) => {
 		const { getCurrentPostType } = select( 'core/editor' );
 
-		const { getBlockOrder, getBlock, getSettings } = select(
-			'core/block-editor'
-		);
-
-		const isPageTemplatesEnabled = getSettings()
-			.__mobileEnablePageTemplates;
+		const { getBlockOrder, getBlock } = select( 'core/block-editor' );
 
 		const blocks = getBlockOrder();
 		const isEmptyBlockList = blocks.length === 0;
@@ -23,7 +18,7 @@ const __experimentalUsePageTemplatePickerVisible = () => {
 		const isEmptyContent = isEmptyBlockList || isOnlyUnmodifiedDefault;
 		const isPage = getCurrentPostType() === 'page';
 
-		return isPageTemplatesEnabled && isEmptyContent && isPage;
+		return isEmptyContent && isPage;
 	}, [] );
 };
 

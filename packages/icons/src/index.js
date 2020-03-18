@@ -91,6 +91,7 @@ export { default as pullRight } from './library/pull-right';
 export { default as pullquote } from './library/pullquote';
 export { default as quote } from './library/quote';
 export { default as redo } from './library/redo';
+export { default as replace } from './library/replace';
 export { default as resizeCornerNE } from './library/resize-corner-n-e';
 export { default as rss } from './library/rss';
 export { default as search } from './library/search';

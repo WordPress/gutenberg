@@ -33,12 +33,20 @@ import { withSelect } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
 
 /**
+ * Internal dependencies
+ */
+import {
+	MIN_EXCERPT_LENGTH,
+	MAX_EXCERPT_LENGTH,
+	MAX_POSTS_COLUMNS,
+} from './constants';
+
+/**
  * Module Constants
  */
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
 };
-const MAX_POSTS_COLUMNS = 6;
 
 class LatestPostsEdit extends Component {
 	constructor() {
@@ -96,6 +104,28 @@ class LatestPostsEdit extends Component {
 			featuredImageSizeWidth,
 			featuredImageSizeHeight,
 		} = attributes;
+		const suggestions = categoriesList.reduce(
+			( accumulator, category ) => ( {
+				...accumulator,
+				[ category.name ]: category,
+			} ),
+			{}
+		);
+		const categorySuggestions = categoriesList.reduce(
+			( accumulator, category ) => ( {
+				...accumulator,
+				[ category.name ]: category,
+			} ),
+			{}
+		);
+		const selectCategories = ( tokens ) => {
+			// Categories that are already will be objects, while new additions will be strings (the name).
+			// allCategories nomalizes the array so that they are all objects.
+			const allCategories = tokens.map( ( token ) =>
+				typeof token === 'string' ? suggestions[ token ] : token
+			);
+			setAttributes( { categories: allCategories } );
+		};
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -133,8 +163,8 @@ class LatestPostsEdit extends Component {
 								onChange={ ( value ) =>
 									setAttributes( { excerptLength: value } )
 								}
-								min={ 10 }
-								max={ 100 }
+								min={ MIN_EXCERPT_LENGTH }
+								max={ MAX_EXCERPT_LENGTH }
 							/>
 						) }
 				</PanelBody>
@@ -209,23 +239,20 @@ class LatestPostsEdit extends Component {
 					<QueryControls
 						{ ...{ order, orderBy } }
 						numberOfItems={ postsToShow }
-						categoriesList={ categoriesList }
-						selectedCategoryId={ categories }
 						onOrderChange={ ( value ) =>
 							setAttributes( { order: value } )
 						}
 						onOrderByChange={ ( value ) =>
 							setAttributes( { orderBy: value } )
 						}
-						onCategoryChange={ ( value ) =>
-							setAttributes( {
-								categories: '' !== value ? value : undefined,
-							} )
-						}
 						onNumberOfItemsChange={ ( value ) =>
 							setAttributes( { postsToShow: value } )
 						}
+						categorySuggestions={ categorySuggestions }
+						onCategoryChange={ selectCategories }
+						selectedCategories={ categories }
 					/>
+
 					{ postLayout === 'grid' && (
 						<RangeControl
 							label={ __( 'Columns' ) }
@@ -325,6 +352,21 @@ class LatestPostsEdit extends Component {
 							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
 						} );
 
+						const postExcerpt =
+							excerptLength <
+								excerpt.trim().split( ' ' ).length &&
+							post.excerpt.raw === ''
+								? excerpt
+										.trim()
+										.split( ' ', excerptLength )
+										.join( ' ' ) +
+								  ' ... <a href=' +
+								  post.link +
+								  'target="_blank" rel="noopener noreferrer">' +
+								  __( 'Read more' ) +
+								  '</a>'
+								: excerpt;
+
 						return (
 							<li key={ i }>
 								{ displayFeaturedImage && (
@@ -370,28 +412,7 @@ class LatestPostsEdit extends Component {
 									displayPostContentRadio === 'excerpt' && (
 										<div className="wp-block-latest-posts__post-excerpt">
 											<RawHTML key="html">
-												{ excerptLength <
-												excerpt.trim().split( ' ' )
-													.length
-													? excerpt
-															.trim()
-															.split(
-																' ',
-																excerptLength
-															)
-															.join( ' ' ) +
-													  ' ... <a href=' +
-													  post.link +
-													  'target="_blank" rel="noopener noreferrer">' +
-													  __( 'Read more' ) +
-													  '</a>'
-													: excerpt
-															.trim()
-															.split(
-																' ',
-																excerptLength
-															)
-															.join( ' ' ) }
+												{ postExcerpt }
 											</RawHTML>
 										</div>
 									) }
@@ -423,9 +444,13 @@ export default withSelect( ( select, props ) => {
 	const { getEntityRecords, getMedia } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
 	const { imageSizes, imageDimensions } = getSettings();
+	const catIds =
+		categories && categories.length > 0
+			? categories.map( ( cat ) => cat.id )
+			: [];
 	const latestPostsQuery = pickBy(
 		{
-			categories,
+			categories: catIds,
 			order,
 			orderby: orderBy,
 			per_page: postsToShow,

@@ -240,6 +240,18 @@
 		"parent": "developers"
 	},
 	{
+		"title": "Building a custom block editor",
+		"slug": "custom-block-editor",
+		"markdown_source": "../docs/designers-developers/developers/platform/custom-block-editor/README.md",
+		"parent": "platform"
+	},
+	{
+		"title": "Tutorial: building a custom block editor",
+		"slug": "tutorial",
+		"markdown_source": "../docs/designers-developers/developers/platform/custom-block-editor/tutorial.md",
+		"parent": "custom-block-editor"
+	},
+	{
 		"title": "Designer Documentation",
 		"slug": "designers",
 		"markdown_source": "../docs/designers-developers/designers/README.md",
@@ -1431,6 +1443,12 @@
 		"title": "@wordpress/postcss-themes",
 		"slug": "packages-postcss-themes",
 		"markdown_source": "../packages/postcss-themes/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/prettier-config",
+		"slug": "packages-prettier-config",
+		"markdown_source": "../packages/prettier-config/README.md",
 		"parent": "packages"
 	},
 	{

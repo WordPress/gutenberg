@@ -12,4 +12,4 @@
 
 * Learn how to add customized buttons to the toolbar with the [Format API tutorial](/docs/designers-developers/developers/tutorials/format-api/).
 
-* Build your own [custom block editor instance](/docs/designers-developers/developers/tutorials/custom-block-editor/) - this will walk you through building a standalone instance of the block editor within WP Admin.
+* Build your own [custom block editor instance](/docs/designers-developers/developers/platform/custom-block-editor/) - this will walk you through building a standalone instance of the block editor within WP Admin.

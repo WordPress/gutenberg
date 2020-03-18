@@ -16,11 +16,16 @@ import ToolsMoreMenuGroup from '../components/header/tools-more-menu-group';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import BlockPatterns from './block-patterns';
 
+registerPlugin( 'edit-post-block-patterns', {
+	render() {
+		return <BlockPatterns />;
+	},
+} );
+
 registerPlugin( 'edit-post', {
 	render() {
 		return (
 			<>
-				<BlockPatterns />
 				<ToolsMoreMenuGroup>
 					{ ( { onClose } ) => (
 						<>

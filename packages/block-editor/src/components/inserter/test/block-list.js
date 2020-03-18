@@ -1,30 +1,37 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
-import TestUtils from 'react-dom/test-utils';
+import TestUtils, { act } from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
 
 /**
  * Internal dependencies
  */
+import InserterBlockList from '../block-list';
+import useSelect from '../../../../../data/src/components/use-select';
 import items, { categories, collections } from './fixtures';
-import { InserterMenu } from '../menu';
 
-const DEFAULT_PROPS = {
-	position: 'top center',
-	categories,
-	collections,
-	items,
-	debouncedSpeak: noop,
-	fetchReusableBlocks: noop,
-	setTimeout: noop,
-};
+jest.mock( '../../../../../data/src/components/use-select', () => {
+	// This allows us to tweaak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
+
+jest.mock( '../../../../../data/src/components/use-dispatch', () => {
+	return {
+		useDispatch: () => ( {} ),
+	};
+} );
 
 const getWrapperForProps = ( propOverrides ) => {
-	return TestUtils.renderIntoDocument(
-		<InserterMenu { ...DEFAULT_PROPS } { ...propOverrides } />
-	);
+	let wrapper;
+	act( () => {
+		wrapper = TestUtils.renderIntoDocument(
+			<InserterBlockList { ...propOverrides } />
+		);
+	} );
+
+	return wrapper;
 };
 
 const initializeMenuDefaultStateAndReturnElement = ( propOverrides ) => {
@@ -75,16 +82,15 @@ const getTabButtonWithContent = ( element, content ) => {
 	return foundButton;
 };
 
-const performSearchWithText = ( element, searchText ) => {
-	const searchElement = element.querySelector(
-		'.block-editor-inserter__search'
-	);
-	TestUtils.Simulate.change( searchElement, {
-		target: { value: searchText },
-	} );
-};
-
 describe( 'InserterMenu', () => {
+	beforeEach( () => {
+		useSelect.mockImplementation( () => ( {
+			categories,
+			collections,
+			items,
+		} ) );
+	} );
+
 	it( 'should show the suggested tab by default', () => {
 		const element = initializeMenuDefaultStateAndReturnElement();
 		const activeCategory = element.querySelector(
@@ -94,9 +100,13 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should show nothing if there are no items', () => {
-		const element = initializeMenuDefaultStateAndReturnElement( {
-			items: [],
-		} );
+		const noItems = [];
+		useSelect.mockImplementation( () => ( {
+			categories,
+			collections,
+			items: noItems,
+		} ) );
+		const element = initializeMenuDefaultStateAndReturnElement();
 		const visibleBlocks = element.querySelector(
 			'.block-editor-block-types-list__item'
 		);
@@ -115,16 +125,6 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks[ 0 ].textContent ).toEqual( 'Text' );
 		expect( visibleBlocks[ 1 ].textContent ).toEqual( 'Advanced Text' );
 		expect( visibleBlocks[ 2 ].textContent ).toEqual( 'Some Other Block' );
-	} );
-
-	it( 'should limit the number of items shown in the suggested tab', () => {
-		const element = initializeMenuDefaultStateAndReturnElement( {
-			maxSuggestedItems: 2,
-		} );
-		const visibleBlocks = element.querySelectorAll(
-			'.block-editor-block-types-list__list-item'
-		);
-		expect( visibleBlocks ).toHaveLength( 2 );
 	} );
 
 	it( 'should show items from the embed category in the embed tab', () => {
@@ -202,8 +202,9 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should allow searching for items', () => {
-		const element = initializeMenuDefaultStateAndReturnElement();
-		performSearchWithText( element, 'text' );
+		const element = initializeMenuDefaultStateAndReturnElement( {
+			filterValue: 'text',
+		} );
 
 		assertOpenedPanels( element, 3 );
 
@@ -228,8 +229,9 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should trim whitespace of search terms', () => {
-		const element = initializeMenuDefaultStateAndReturnElement();
-		performSearchWithText( element, ' text' );
+		const element = initializeMenuDefaultStateAndReturnElement( {
+			filterValue: ' text',
+		} );
 
 		assertOpenedPanels( element, 3 );
 

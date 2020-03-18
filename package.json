@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "7.6.0",
+	"version": "7.7.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -105,6 +105,7 @@
 		"@wordpress/library-export-default-webpack-plugin": "file:packages/library-export-default-webpack-plugin",
 		"@wordpress/npm-package-json-lint-config": "file:packages/npm-package-json-lint-config",
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
+		"@wordpress/prettier-config": "file:packages/prettier-config",
 		"@wordpress/scripts": "file:packages/scripts",
 		"babel-loader": "8.0.6",
 		"babel-plugin-emotion": "10.0.27",
@@ -166,7 +167,7 @@
 		"stylelint-config-wordpress": "13.1.0",
 		"typescript": "3.5.3",
 		"uuid": "3.3.2",
-		"webpack": "4.41.0",
+		"webpack": "4.42.0",
 		"worker-farm": "1.7.0"
 	},
 	"scripts": {
