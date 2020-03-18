@@ -5,12 +5,6 @@ import Disabled from '../';
 import SelectControl from '../../select-control/';
 import TextControl from '../../text-control/';
 import TextareaControl from '../../textarea-control/';
-import CheckboxControl from '../../checkbox-control/';
-import RadioControl from '../../radio-control/';
-import RangeControl from '../../range-control/';
-import ToggleControl from '../../toggle-control/';
-import FormFileUpload from '../../form-file-upload/';
-import AnglePickerControl from '../../angle-picker-control/';
 
 export default {
 	title: 'Components/Disabled',
@@ -32,18 +26,6 @@ export const _default = () => {
 					{ value: 'c', label: 'Option C' },
 				] }
 			/>
-			<CheckboxControl label="Checkbox Control" />
-			<RadioControl
-				label="Radio Control"
-				options={ [
-					{ label: 'Option A', value: 'a' },
-					{ label: 'Option B', value: 'b' },
-				] }
-			/>
-			<RangeControl label="Range Control" min={ 2 } max={ 10 } />
-			<ToggleControl label="Toggle Control" />
-			<FormFileUpload accept="image/*">Upload</FormFileUpload>
-			<AnglePickerControl />
 		</Disabled>
 	);
 };
