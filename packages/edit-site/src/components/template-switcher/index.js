@@ -12,7 +12,7 @@ import {
 	MenuItemsChoice,
 	MenuItem,
 } from '@wordpress/components';
-import { layout } from '@wordpress/icons';
+import { layout, plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -123,7 +123,7 @@ export default function TemplateSwitcher( {
 								onHover={ onHoverTemplate }
 							/>
 							<MenuItem
-								icon="plus"
+								icon={ plus }
 								onClick={ () => {
 									onClose();
 									setIsAddTemplateOpen( true );
