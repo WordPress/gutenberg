@@ -19,23 +19,13 @@ const supportedJetpackBlocks = {
 	},
 };
 
-const setInitialState = async ( {
+const setJetpackData = async ( {
 	isJetpackActive = false,
 	userData = null,
 	siteFragment = null,
 	blogId,
 } ) => {
-	let availableBlocks = {};
-	if ( isJetpackActive ) {
-		console.log( 'Fetching /wpcom/v2/gutenberg/available-extensions' );
-		try {
-			availableBlocks = await apiFetch( { path: `/wpcom/v2/gutenberg/available-extensions` } );
-		} catch ( error ) {
-			console.warn( 'Error while fetching available extensions', error );
-			// manually set availableBlocks while WP REST API auth is being worked on
-			availableBlocks = supportedJetpackBlocks;
-		}
-	}
+	const availableBlocks = supportedJetpackBlocks;
 	const jetpackEditorInitialState = {
 		available_blocks: availableBlocks,
 		jetpack: {
@@ -54,7 +44,9 @@ export default async ( jetpackState ) => {
 		return;
 	}
 
+	const jetpackData = await setJetpackData( jetpackState );
+
 	require( '../jetpack/extensions/editor' );
 
-	return setInitialState( jetpackState );
+	return jetpackData;
 };
