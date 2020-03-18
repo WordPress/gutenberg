@@ -198,12 +198,12 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 	);
 
 	$classes[]       = 'wp-block-navigation-link';
-	$css_classes     = trim( implode( ' ', $classes ) );
 	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
 		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
 		: '';
 
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
+		$css_classes     = trim( implode( ' ', $classes ) );
 		$has_submenu = count( (array) $block['innerBlocks'] ) > 0;
 		$is_active   = ! empty( $block['attrs']['id'] ) && ( get_the_ID() === $block['attrs']['id'] );
 
