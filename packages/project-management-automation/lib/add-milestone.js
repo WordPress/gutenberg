@@ -6,8 +6,6 @@ const debug = require( './debug' );
 /** @typedef {import('@octokit/rest').HookError} HookError */
 /** @typedef {import('@actions/github').GitHub} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
-/** @typedef {import('@octokit/rest').Response} OctokitResponse */
-/** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponse} OctokitIssuesListMilestonesForRepoResponse */
 
 // Milestone due dates are calculated from a known due date:
 // 6.3, which was due on August 12 2019.
