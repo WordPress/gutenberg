@@ -3,6 +3,7 @@
  */
 
 import classnames from 'classnames';
+import Cropper from 'react-easy-crop';
 
 /**
  * WordPress dependencies
@@ -24,7 +25,6 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import CroppedImage from './cropped-image';
 import richImageRequest from './api';
 import {
 	RotateLeftIcon,
@@ -50,11 +50,20 @@ class RichImage extends Component {
 		this.state = {
 			isCrop: false,
 			inProgress: null,
-			crop: DEFAULT_CROP,
+			imageSrc: null,
+			imgSize: { naturalHeight: 0, naturalWidth: 0 },
+			crop: null,
+			position: { x: 0, y: 0 },
+			zoom: 1,
+			aspect: 4 / 3,
 		};
 
 		this.adjustImage = this.adjustImage.bind( this );
 		this.cropImage = this.cropImage.bind( this );
+		this.onCropChange = this.onCropChange.bind( this );
+		this.onZoomChange = this.onZoomChange.bind( this );
+		this.onCropComplete = this.onCropComplete.bind( this );
+		this.onMediaLoaded = this.onMediaLoaded.bind( this );
 	}
 
 	adjustImage( action, attrs ) {
@@ -88,12 +97,30 @@ class RichImage extends Component {
 	cropImage() {
 		const { crop } = this.state;
 
+		// Was getting occasional errors before rounding
+		// TODO: Switch to pixel offset and dimensions to avoid that
 		this.adjustImage( 'crop', {
-			cropX: crop.x,
-			cropY: crop.y,
-			cropWidth: crop.width,
-			cropHeight: crop.height,
+			cropX: Math.round( crop.x ),
+			cropY: Math.round( crop.y ),
+			cropWidth: Math.round( crop.width ),
+			cropHeight: Math.round( crop.height ),
 		} );
+	}
+
+	onCropChange( position ) {
+		this.setState( { position } );
+	}
+
+	onCropComplete( crop ) {
+		this.setState( { crop } );
+	}
+
+	onZoomChange( zoom ) {
+		this.setState( { zoom } );
+	}
+
+	onMediaLoaded( imgSize ) {
+		this.setState( { imgSize } );
 	}
 
 	render() {
@@ -103,7 +130,14 @@ class RichImage extends Component {
 			originalBlock: OriginalBlock,
 			noticeUI,
 		} = this.props;
-		const { isCrop, inProgress, crop } = this.state;
+		const {
+			isCrop,
+			inProgress,
+			position,
+			zoom,
+			aspect,
+			imgSize,
+		} = this.state;
 		const { url } = attributes;
 		const isEditing = ! isCrop && isSelected && url;
 
@@ -127,16 +161,30 @@ class RichImage extends Component {
 						</Snackbar>
 					) }
 
-					<CroppedImage
-						url={ url }
-						currentCrop={ isCrop ? crop : null }
-						setCrop={ ( newCrop ) =>
-							this.setState( { crop: newCrop } )
-						}
-						inProgress={ inProgress }
-					>
+					{ isCrop ? (
+						<div
+							style={ {
+								position: 'relative',
+								maxWidth: '100%',
+								width: imgSize.naturalWidth,
+								paddingBottom: `${ 100 / aspect }%`,
+							} }
+						>
+							<Cropper
+								image={ url }
+								disabled={ inProgress }
+								crop={ position }
+								zoom={ zoom }
+								aspect={ aspect }
+								onZoomChange={ this.onZoomChange }
+								onCropChange={ this.onCropChange }
+								onCropComplete={ this.onCropComplete }
+								onMediaLoaded={ this.onMediaLoaded }
+							/>
+						</div>
+					) : (
 						<OriginalBlock { ...this.props } />
-					</CroppedImage>
+					) }
 				</div>
 
 				{ isEditing && (
