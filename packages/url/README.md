@@ -226,6 +226,29 @@ _Returns_
 
 -   `boolean`: Whether or not it looks like an email.
 
+<a name="isFileURL" href="#isFileURL">#</a> **isFileURL**
+
+Determines whether the given string looks like a file URL.
+
+_Related_
+
+-   <https://url.spec.whatwg.org/>
+-   <https://url.spec.whatwg.org/#valid-url-string>
+
+_Usage_
+
+```js
+const isFileURL = isFileURL( 'file:///file.txt' ); // true
+```
+
+_Parameters_
+
+-   _url_ `string`: The string to scrutinise.
+
+_Returns_
+
+-   `boolean`: Whether or not it looks like a file URL.
+
 <a name="isURL" href="#isURL">#</a> **isURL**
 
 Determines whether the given string looks like a URL.
