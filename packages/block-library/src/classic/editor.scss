@@ -249,20 +249,31 @@ div[data-type="core/freeform"] {
 		outline: $border-width solid transparent;
 	}
 
-	&.is-selected::before {
-		border-color: $dark-gray-primary;
+	&.is-selected{
+		&::before {
+			border-color: $dark-gray-primary;
+		}
+
+		// Ensure aligned blocks at end are within the selected block.
+		.block-library-rich-text__tinymce{
+
+			&.mce-edit-focus{
+				padding: 10px;
+				border: $border-width solid $light-gray-500;
+				border-top: none;
+			}
+
+			&::after {
+				content: "";
+				display: table;
+				clear: both;
+			}
+		}
 	}
 
 	.block-editor-block-contextual-toolbar + div {
 		margin-top: 0;
 		padding-top: 0;
-	}
-
-	// Ensure aligned blocks at end are within the selected block.
-	&.is-selected .block-library-rich-text__tinymce::after {
-		content: "";
-		display: table;
-		clear: both;
 	}
 }
 
@@ -313,6 +324,7 @@ div[data-type="core/freeform"] {
 	div[data-type="core/freeform"].is-typing & {
 		display: block;
 		border-color: $dark-gray-primary;
+		margin-bottom: 0;
 	}
 
 	// Remove the box shadow to mimic other Gutenberg UI.
