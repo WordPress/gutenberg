@@ -34,7 +34,6 @@ export const settings = {
 		align: true,
 		alignWide: false,
 		reusable: false,
-		html: false,
 	},
 	parent: [ 'core/buttons' ],
 	styles: [
