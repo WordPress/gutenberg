@@ -141,10 +141,7 @@ function RichTextWrapper(
 
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		const {
-			__experimentalCanUserUseUnfilteredHTML,
-			__experimentalUndo: undo,
-		} = getSettings();
+		const { __experimentalUndo: undo } = getSettings();
 
 		let isSelected;
 
@@ -171,7 +168,6 @@ function RichTextWrapper(
 		}
 
 		return {
-			canUserUseUnfilteredHTML: __experimentalCanUserUseUnfilteredHTML,
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
@@ -186,7 +182,6 @@ function RichTextWrapper(
 	// retreived from the store on merge.
 	// To do: fix this somehow.
 	const {
-		canUserUseUnfilteredHTML,
 		isCaretWithinFormattedText,
 		selectionStart,
 		selectionEnd,
@@ -394,7 +389,6 @@ function RichTextWrapper(
 				plainText,
 				mode,
 				tagName,
-				canUserUseUnfilteredHTML,
 			} );
 
 			if ( typeof content === 'string' ) {
@@ -437,7 +431,6 @@ function RichTextWrapper(
 			onSplit,
 			splitValue,
 			__unstableEmbedURLOnPaste,
-			canUserUseUnfilteredHTML,
 			multiline,
 		]
 	);
