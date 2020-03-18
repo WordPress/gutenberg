@@ -44,11 +44,7 @@ export function PostSchedule() {
 			</PanelRow>
 			{ allowUnschedule && (
 				<PanelRow className="edit-post-post-unschedule">
-					<Button
-						isSmall
-						isLink
-						onClick={ () => editPost( { date: null } ) }
-					>
+					<Button isLink onClick={ () => editPost( { date: null } ) }>
 						{ __( 'Unschedule' ) }
 					</Button>
 				</PanelRow>
