@@ -112,7 +112,10 @@ class LatestPostsEdit extends Component {
 			{}
 		);
 		const selectCategories = ( tokens ) => {
-			if ( ! categorySuggestions[ tokens[ tokens.length - 1 ] ] )
+			if (
+				! categorySuggestions[ tokens[ tokens.length - 1 ] ] &&
+				! tokens[ tokens.length - 1 ].id
+			)
 				return false;
 			// Categories that are already will be objects, while new additions will be strings (the name).
 			// allCategories nomalizes the array so that they are all objects.
