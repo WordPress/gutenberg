@@ -36,6 +36,20 @@ describe( 'Heading', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should not work with the list input rule', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '## 1. H' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should work with the format input rules', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '## `code`' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should create a paragraph block above when pressing enter at the start', async () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '## a' );
