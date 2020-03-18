@@ -32,6 +32,7 @@ import {
 	FlipHorizontalIcon,
 	FlipVerticalIcon,
 	CropIcon,
+	AspectIcon,
 } from './icon';
 
 const ROTATE_STEP = 90;
@@ -56,6 +57,7 @@ class RichImage extends Component {
 			position: { x: 0, y: 0 },
 			zoom: 1,
 			aspect: 4 / 3,
+			isPortrait: false,
 		};
 
 		this.adjustImage = this.adjustImage.bind( this );
@@ -137,6 +139,7 @@ class RichImage extends Component {
 			zoom,
 			aspect,
 			imgSize,
+			isPortrait,
 		} = this.state;
 		const { url } = attributes;
 		const isEditing = ! isCrop && isSelected && url;
@@ -167,7 +170,9 @@ class RichImage extends Component {
 								position: 'relative',
 								maxWidth: '100%',
 								width: imgSize.naturalWidth,
-								paddingBottom: `${ 100 / aspect }%`,
+								paddingBottom: `${
+									isPortrait ? aspect * 100 : 100 / aspect
+								}%`,
 							} }
 						>
 							<Cropper
@@ -175,7 +180,7 @@ class RichImage extends Component {
 								disabled={ inProgress }
 								crop={ position }
 								zoom={ zoom }
-								aspect={ aspect }
+								aspect={ isPortrait ? 1 / aspect : aspect }
 								onZoomChange={ this.onZoomChange }
 								onCropChange={ this.onCropChange }
 								onCropComplete={ this.onCropComplete }
@@ -309,6 +314,72 @@ class RichImage extends Component {
 							<div className="richimage__crop-icon">
 								<Icon icon={ CropIcon } />
 							</div>
+						</Toolbar>
+						<Toolbar
+							className="richimage-toolbar__dropdown"
+							isCollapsed={ true }
+							icon={ <AspectIcon /> }
+							label={ __( 'Aspect Ratio' ) }
+							disabled={ inProgress }
+							popoverProps={ {
+								position: 'bottom right',
+							} }
+							controls={
+								inProgress
+									? []
+									: [
+											{
+												title: __( '16:10' ),
+												onClick: () =>
+													this.setState( {
+														aspect: 16 / 10,
+													} ),
+											},
+											{
+												title: __( '16:9' ),
+												onClick: () =>
+													this.setState( {
+														aspect: 16 / 9,
+													} ),
+											},
+											{
+												title: __( '4:3' ),
+												onClick: () =>
+													this.setState( {
+														aspect: 4 / 3,
+													} ),
+											},
+											{
+												title: __( '3:2' ),
+												onClick: () =>
+													this.setState( {
+														aspect: 3 / 2,
+													} ),
+											},
+											{
+												title: __( '1:1' ),
+												onClick: () =>
+													this.setState( {
+														aspect: 1,
+													} ),
+											},
+									  ]
+							}
+						/>
+						<Toolbar>
+							<IconButton
+								className="richimage-toolbar__dropdown"
+								disabled={ inProgress }
+								icon="image-rotate-right"
+								label={ __( 'Orientation' ) }
+								onClick={ () =>
+									this.setState( ( prev ) => ( {
+										isPortrait: ! prev.isPortrait,
+									} ) )
+								}
+							/>
+						</Toolbar>
+						<Toolbar>
 							<Button onClick={ this.cropImage }>
 								{ __( 'Apply' ) }
 							</Button>
