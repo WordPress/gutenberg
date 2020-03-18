@@ -8,7 +8,7 @@ import { noop } from 'lodash';
 import { useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 
-const { clearTimeout, setTimeout } = window;
+const { clearTimeout, requestAnimationFrame, setTimeout } = window;
 const DEBOUNCE_TIMEOUT = 250;
 
 /**
@@ -171,7 +171,11 @@ export function useToggleBlockHighlight( clientId ) {
 
 	useEffect( () => {
 		return () => {
-			updateBlockHighlight( false );
+			// Sequences state change to enable editor updates (e.g. cursor
+			// position) to render correctly.
+			requestAnimationFrame( () => {
+				updateBlockHighlight( false );
+			} );
 		};
 	}, [] );
 
