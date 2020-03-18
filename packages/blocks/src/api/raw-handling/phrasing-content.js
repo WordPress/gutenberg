@@ -74,17 +74,6 @@ const embeddedContentSchema = {
 	},
 	canvas: { attributes: [ 'width', 'height' ] },
 	embed: { attributes: [ 'src', 'type', 'width', 'height' ] },
-	iframe: {
-		attributes: [
-			'src',
-			'srcdoc',
-			'name',
-			'sandbox',
-			'seamless',
-			'width',
-			'height',
-		],
-	},
 	img: {
 		attributes: [
 			'alt',
