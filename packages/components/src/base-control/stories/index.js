@@ -39,13 +39,16 @@ export const fieldset = () => {
 	return (
 		<BaseControl label="Post visibility" as="fieldset" id={ id }>
 			<input type="radio" id={ radioId1 } name="post-visibility" />
-			<label htmlFor={ radioId1 }>Public</label><br />
+			<label htmlFor={ radioId1 }>Public</label>
+			<br />
 
 			<input type="radio" id={ radioId2 } name="post-visibility" />
-			<label htmlFor={ radioId2 }>Private</label><br />
+			<label htmlFor={ radioId2 }>Private</label>
+			<br />
 
 			<input type="radio" id={ radioId3 } name="post-visibility" />
-			<label htmlFor={ radioId3 }>Password Protected</label><br />
+			<label htmlFor={ radioId3 }>Password Protected</label>
+			<br />
 		</BaseControl>
 	);
 };
