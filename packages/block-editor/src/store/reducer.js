@@ -1456,7 +1456,7 @@ export function automaticChangeStatus( state, action ) {
  *
  * @return {string} Updated state.
  */
-export function blockHighlighted( state = '', action ) {
+export function highlightedBlock( state = '', action ) {
 	switch ( action.type ) {
 		case 'HIGHLIGHT_BLOCK':
 			return action.clientId;
@@ -1487,5 +1487,5 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	isNavigationMode,
 	automaticChangeStatus,
-	blockHighlighted,
+	highlightedBlock,
 } );
