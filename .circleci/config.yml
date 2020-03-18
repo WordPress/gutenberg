@@ -40,7 +40,7 @@ jobs:
         type: boolean
         default: false
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:10
     steps:
       - checkout
       - checkout-gutenberg
