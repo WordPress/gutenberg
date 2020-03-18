@@ -44,7 +44,7 @@ import {
 	MediaEdit,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { isFileURL } from '@wordpress/url';
+import { getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -128,7 +128,7 @@ export class ImageEdit extends React.Component {
 		if (
 			! attributes.id &&
 			attributes.url &&
-			isFileURL( attributes.url )
+			getProtocol( attributes.url ) === 'file:'
 		) {
 			requestMediaImport( attributes.url, ( id, url ) => {
 				if ( url ) {
@@ -139,7 +139,11 @@ export class ImageEdit extends React.Component {
 
 		// Make sure we mark any temporary images as failed if they failed while
 		// the editor wasn't open
-		if ( attributes.id && attributes.url && isFileURL( attributes.url ) ) {
+		if (
+			attributes.id &&
+			attributes.url &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
 			mediaUploadSync();
 		}
 	}
@@ -178,7 +182,10 @@ export class ImageEdit extends React.Component {
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( attributes.id );
-		} else if ( attributes.id && isFileURL( attributes.url ) ) {
+		} else if (
+			attributes.id &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
 			requestImageFailedRetryDialog( attributes.id );
 		} else if ( ! this.state.isCaptionSelected ) {
 			requestImageFullscreenPreview(
@@ -667,7 +674,8 @@ export default compose( [
 		} = props;
 		const { imageSizes } = getSettings();
 
-		const shouldGetMedia = id && isSelected && ! isFileURL( url );
+		const shouldGetMedia =
+			id && isSelected && getProtocol( url ) !== 'file:';
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,

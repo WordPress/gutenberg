@@ -27,7 +27,6 @@ import {
 	safeDecodeURI,
 	filterURLForDisplay,
 	cleanForSlug,
-	isFileURL,
 } from '../';
 import wptData from './fixtures/wpt-data';
 
@@ -90,6 +89,7 @@ describe( 'getProtocol', () => {
 		expect( getProtocol( 'https://localhost:8080' ) ).toBe( 'https:' );
 		expect( getProtocol( 'tel:1234' ) ).toBe( 'tel:' );
 		expect( getProtocol( 'blob:data' ) ).toBe( 'blob:' );
+		expect( getProtocol( 'file:///folder/file.txt' ) ).toBe( 'file:' );
 	} );
 
 	it( 'returns undefined when the provided value does not contain a URL protocol', () => {
@@ -675,29 +675,5 @@ describe( 'cleanForSlug', () => {
 
 	it( 'should return an empty string for falsy argument', () => {
 		expect( cleanForSlug( null ) ).toBe( '' );
-	} );
-} );
-
-describe( 'isFileURL', () => {
-	it( 'returns true when given things that look like an file url', () => {
-		const urls = [
-			'file:///temp.txt',
-			'file:///path/temp.txt',
-			'file:/temp.txt',
-		];
-
-		expect( every( urls, isFileURL ) ).toBe( true );
-	} );
-
-	it( "returns false when given things that don't look like an file url", () => {
-		const urls = [
-			'http://www.wordpress.org/something/',
-			'https://www.wordpress.org/something/',
-			'Abc.wordpress.org',
-			'A@b@c@wordpress.org',
-			undefined,
-		];
-
-		expect( every( urls, isFileURL ) ).toBe( false );
 	} );
 } );

@@ -36,7 +36,7 @@ import {
 	InspectorControls,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { isURL, isFileURL } from '@wordpress/url';
+import { isURL, getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { video as SvgIcon, replace } from '@wordpress/icons';
 
@@ -80,7 +80,7 @@ class VideoEdit extends React.Component {
 
 	componentDidMount() {
 		const { attributes } = this.props;
-		if ( attributes.id && isFileURL( attributes.src ) ) {
+		if ( attributes.id && getProtocol( attributes.src ) === 'file:' ) {
 			mediaUploadSync();
 		}
 	}
@@ -111,7 +111,10 @@ class VideoEdit extends React.Component {
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( attributes.id );
-		} else if ( attributes.id && isFileURL( attributes.src ) ) {
+		} else if (
+			attributes.id &&
+			getProtocol( attributes.src ) === 'file:'
+		) {
 			requestImageFailedRetryDialog( attributes.id );
 		}
 
