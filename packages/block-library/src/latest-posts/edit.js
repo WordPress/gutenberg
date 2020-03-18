@@ -131,7 +131,7 @@ class LatestPostsEdit extends Component {
 			// we do nothing if the category is not selected
 			// from suggestions
 			if ( includes( allCategories, null ) ) {
-				return [];
+				return false;
 			}
 			setAttributes( { categories: allCategories } );
 		};
