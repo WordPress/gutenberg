@@ -8,7 +8,15 @@ import classnames from 'classnames';
  */
 import VisualLabel from './visual-label';
 
-function BaseControl( { as = 'div', id, label, hideLabelFromVision, help, className, children } ) {
+function BaseControl( {
+	as = 'div',
+	id,
+	label,
+	hideLabelFromVision,
+	help,
+	className,
+	children,
+} ) {
 	const isFieldSet = as === 'fieldset';
 
 	const WrapperComponent = as;
@@ -16,7 +24,9 @@ function BaseControl( { as = 'div', id, label, hideLabelFromVision, help, classN
 	const VisualLabelComponent = isFieldSet ? 'legend' : LabelComponent;
 
 	return (
-		<WrapperComponent className={ classnames( 'components-base-control', className ) }>
+		<WrapperComponent
+			className={ classnames( 'components-base-control', className ) }
+		>
 			<div className="components-base-control__field">
 				{ label && (
 					<VisualLabel
@@ -29,7 +39,14 @@ function BaseControl( { as = 'div', id, label, hideLabelFromVision, help, classN
 				) }
 				{ children }
 			</div>
-			{ !! help && <p id={ id + '__help' } className="components-base-control__help">{ help }</p> }
+			{ !! help && (
+				<p
+					id={ id + '__help' }
+					className="components-base-control__help"
+				>
+					{ help }
+				</p>
+			) }
 		</WrapperComponent>
 	);
 }
