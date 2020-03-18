@@ -8674,14 +8674,14 @@ exports[`Storyshots Components/TreeSelect Default 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-select-control-0"
+      htmlFor="inspector-select-control-1"
     >
       Label Text
     </label>
     <select
-      aria-describedby="inspector-select-control-0__help"
+      aria-describedby="inspector-select-control-1__help"
       className="components-select-control__input"
-      id="inspector-select-control-0"
+      id="inspector-select-control-1"
       multiple={false}
       onChange={[Function]}
     >
@@ -8724,7 +8724,7 @@ exports[`Storyshots Components/TreeSelect Default 1`] = `
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-select-control-0__help"
+    id="inspector-select-control-1__help"
   >
     Help text to explain the select control.
   </p>
