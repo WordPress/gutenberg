@@ -695,6 +695,7 @@ describe( 'isFileURL', () => {
 			'https://www.wordpress.org/something/',
 			'Abc.wordpress.org',
 			'A@b@c@wordpress.org',
+			undefined,
 		];
 
 		expect( every( urls, isFileURL ) ).toBe( false );

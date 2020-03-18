@@ -230,11 +230,6 @@ _Returns_
 
 Determines whether the given string looks like a file URL.
 
-_Related_
-
--   <https://url.spec.whatwg.org/>
--   <https://url.spec.whatwg.org/#valid-url-string>
-
 _Usage_
 
 ```js
