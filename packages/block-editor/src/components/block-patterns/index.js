@@ -58,7 +58,7 @@ function BlockPatterns( { patterns } ) {
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: block pattern title. */
-				__( 'Pattern "%s" inserted' ),
+				__( 'Pattern "%s" inserted.' ),
 				pattern.title
 			),
 			{
