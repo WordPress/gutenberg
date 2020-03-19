@@ -34,10 +34,34 @@
 const fs = require( 'fs' );
 
 const sass = require( 'node-sass' );
+const semver = require( 'semver' );
 const css2rn = require( 'css-to-react-native-transform' ).default;
 const path = require( 'path' );
 
-const upstreamTransformer = require( 'metro-react-native-babel-transformer' );
+let upstreamTransformer = null;
+
+const reactNativeVersionString = require( 'react-native/package.json' ).version;
+const reactNativeMinorVersion = semver( reactNativeVersionString ).minor;
+
+if ( reactNativeMinorVersion >= 59 ) {
+	upstreamTransformer = require( 'metro-react-native-babel-transformer' );
+} else if ( reactNativeMinorVersion >= 56 ) {
+	upstreamTransformer = require( 'metro/src/reactNativeTransformer' );
+} else if ( reactNativeMinorVersion >= 52 ) {
+	upstreamTransformer = require( 'metro/src/transformer' );
+} else if ( reactNativeMinorVersion >= 47 ) {
+	upstreamTransformer = require( 'metro-bundler/src/transformer' );
+} else if ( reactNativeMinorVersion === 46 ) {
+	upstreamTransformer = require( 'metro-bundler/build/transformer' );
+} else {
+	// handle RN <= 0.45
+	const oldUpstreamTransformer = require( 'react-native/packager/transformer' );
+	upstreamTransformer = {
+		transform( { src, filename, options } ) {
+			return oldUpstreamTransformer.transform( src, filename, options );
+		},
+	};
+}
 
 // TODO: need to find a way to pass the include paths and the default asset files via some config
 const autoImportIncludePaths = [
