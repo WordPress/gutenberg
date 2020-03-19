@@ -1,10 +1,17 @@
+/**
+ * External dependencies.
+ */
 const ts = require( 'typescript' );
+
+/**
+ * Node dependencies.
+ */
 const { join } = require( 'path' );
 
 /**
  * Internal dependencies.
  */
-const getJSDocFromToken = require( '../get-jsdoc-from-token' );
+const getJSDocFromToken = require( '../get-jsdoc-from-statement' );
 
 describe( 'JSDoc', () => {
 	const prepare = ( dir ) => {

@@ -1,3 +1,6 @@
+/**
+ * External dependencies.
+ */
 const ts = require( 'typescript' );
 const { SyntaxKind } = ts;
 
