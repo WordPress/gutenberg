@@ -69,22 +69,22 @@ class WP_REST_Image_Editor_API extends WP_REST_Controller {
 				[ $this, 'crop_image' ],
 				[
 					'cropX' => [
-						'type' => 'integer',
+						'type' => 'float',
 						'minimum' => 0,
 						'required' => true,
 					],
 					'cropY' => [
-						'type' => 'integer',
+						'type' => 'float',
 						'minimum' => 0,
 						'required' => true,
 					],
 					'cropWidth' => [
-						'type' => 'integer',
+						'type' => 'float',
 						'minimum' => 1,
 						'required' => true,
 					],
 					'cropHeight' => [
-						'type' => 'integer',
+						'type' => 'float',
 						'minimum' => 1,
 						'required' => true,
 					],

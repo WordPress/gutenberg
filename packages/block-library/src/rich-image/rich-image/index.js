@@ -95,13 +95,11 @@ class RichImage extends Component {
 	cropImage() {
 		const { crop } = this.state;
 
-		// Was getting occasional errors before rounding
-		// TODO: Switch to pixel offset and dimensions to avoid that
 		this.adjustImage( 'crop', {
-			cropX: Math.round( crop.x ),
-			cropY: Math.round( crop.y ),
-			cropWidth: Math.round( crop.width ),
-			cropHeight: Math.round( crop.height ),
+			cropX: crop.x,
+			cropY: crop.y,
+			cropWidth: crop.width,
+			cropHeight: crop.height,
 		} );
 	}
 
