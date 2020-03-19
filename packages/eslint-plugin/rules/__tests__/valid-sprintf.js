@@ -50,6 +50,12 @@ sprintf(
 	authorBlockRating
 );`,
 		},
+		{
+			code: `i18n.sprintf( '%s', 'substitute' )`,
+		},
+		{
+			code: `i18n.sprintf( i18n.__( '%s' ), 'substitute' )`,
+		},
 	],
 	invalid: [
 		{
@@ -97,6 +103,14 @@ sprintf(
 	authorBlockRating
 );`,
 			errors: [ { messageId: 'noNumberedPlaceholders' } ],
+		},
+		{
+			code: `i18n.sprintf()`,
+			errors: [ { messageId: 'noFormatString' } ],
+		},
+		{
+			code: `i18n.sprintf( i18n.__( '%%' ), 'substitute' )`,
+			errors: [ { messageId: 'noPlaceholders' } ],
 		},
 	],
 } );

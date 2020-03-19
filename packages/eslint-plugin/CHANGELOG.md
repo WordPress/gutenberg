@@ -10,6 +10,10 @@
 
 - The `@wordpress/valid-sprintf` rule now recognizes mix of ordered and non-ordered placeholders.
 
+### Bug Fix
+
+- The `@wordpress/valid-sprintf` rule now detects usage of `sprintf` via `i18n.sprintf` (e.g. when using `import * as i18n from '@wordpress/i18n'`).
+
 ## 4.0.0 (2020-02-10)
 
 ### Breaking Changes

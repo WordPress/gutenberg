@@ -29,7 +29,13 @@ module.exports = {
 		return {
 			CallExpression( node ) {
 				const { callee, arguments: args } = node;
-				if ( callee.name !== 'sprintf' ) {
+
+				const functionName =
+					callee.property && callee.property.name
+						? callee.property.name
+						: callee.name;
+
+				if ( functionName !== 'sprintf' ) {
 					return;
 				}
 
@@ -60,10 +66,16 @@ module.exports = {
 						break;
 
 					case 'CallExpression':
+						const argFunctionName =
+							args[ 0 ].callee.property &&
+							args[ 0 ].callee.property.name
+								? args[ 0 ].callee.property.name
+								: args[ 0 ].callee.name;
+
 						// All possible options (arguments) from a translate
 						// function must be valid.
 						candidates = getTranslateStrings(
-							args[ 0 ].callee.name,
+							argFunctionName,
 							args[ 0 ].arguments
 						);
 
