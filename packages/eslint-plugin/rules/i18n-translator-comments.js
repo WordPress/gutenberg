@@ -84,7 +84,7 @@ module.exports = {
 					);
 					 */
 					if ( Math.abs( commentLine - currentLine ) > 1 ) {
-						continue;
+						break;
 					}
 
 					if ( /translators:\s*\S+/i.test( commentText ) ) {
