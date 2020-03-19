@@ -52,7 +52,7 @@ function useCustomUnitsSettings() {
  * @param {Array} settings Collection of preferred units.
  * @param {Array} units Collection of available units.
  *
- * @return {Array}
+ * @return {Array} Filtered units based on settings.
  */
 function filterUnitsWithSettings( settings = [], units = [] ) {
 	return units.filter( ( unit ) => {
