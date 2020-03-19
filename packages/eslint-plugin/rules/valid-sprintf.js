@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-const { REGEXP_PLACEHOLDER, getTranslateStrings } = require( '../utils' );
+const {
+	SPRINTF_PLACEHOLDER_REGEX,
+	UNORDERED_SPRINTF_PLACEHOLDER_REGEX,
+	getTranslateStrings,
+} = require( '../utils' );
 
 module.exports = {
 	meta: {
@@ -17,6 +21,8 @@ module.exports = {
 				'sprintf format string must contain at least one placeholder',
 			placeholderMismatch:
 				'sprintf format string options must have the same number of placeholders',
+			noNumberedPlaceholders:
+				'Multiple sprintf placeholders should be ordered. Mix of ordered and non-ordered placeholders found.',
 		},
 	},
 	create( context ) {
@@ -89,15 +95,21 @@ module.exports = {
 				}
 
 				let numPlaceholders;
-				for ( let i = 0; i < candidates.length; i++ ) {
-					const match = candidates[ i ].match( REGEXP_PLACEHOLDER );
+				for ( const candidate of candidates ) {
+					const allMatches = candidate.match(
+						SPRINTF_PLACEHOLDER_REGEX
+					);
+					const unorderedMatches = candidate.match(
+						UNORDERED_SPRINTF_PLACEHOLDER_REGEX
+					);
 
 					// Prioritize placeholder number consistency over matching
 					// placeholder, since it's a more common error to omit a
 					// placeholder from the singular form of pluralization.
 					if (
 						numPlaceholders !== undefined &&
-						( ! match || numPlaceholders !== match.length )
+						( ! allMatches ||
+							numPlaceholders !== allMatches.length )
 					) {
 						context.report( {
 							node,
@@ -106,7 +118,21 @@ module.exports = {
 						return;
 					}
 
-					if ( ! match ) {
+					if (
+						unorderedMatches &&
+						allMatches &&
+						unorderedMatches.length > 0 &&
+						allMatches.length > 1 &&
+						unorderedMatches.length !== allMatches.length
+					) {
+						context.report( {
+							node,
+							messageId: 'noNumberedPlaceholders',
+						} );
+						return;
+					}
+
+					if ( ! allMatches ) {
 						context.report( {
 							node,
 							messageId: 'noPlaceholders',
@@ -118,7 +144,7 @@ module.exports = {
 						// Track the number of placeholders discovered in the
 						// string to verify that all other candidate options
 						// have the same number.
-						numPlaceholders = match.length;
+						numPlaceholders = allMatches.length;
 					}
 				}
 			},

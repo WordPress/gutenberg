@@ -37,6 +37,19 @@ ruleTester.run( 'valid-sprintf', rule, {
 		{
 			code: `var value = ''; sprintf( value, 'substitute' )`,
 		},
+		{
+			code: `
+sprintf(
+	/* translators: 1: number of blocks. 2: average rating. */
+	_n(
+		'This author has %1$d block, with an average rating of %2$d.',
+		'This author has %1$d blocks, with an average rating of %2$d.',
+		authorBlockCount
+	),
+	authorBlockCount,
+	authorBlockRating
+);`,
+		},
 	],
 	invalid: [
 		{
@@ -70,6 +83,20 @@ ruleTester.run( 'valid-sprintf', rule, {
 		{
 			code: `sprintf( _n( '%s', '%s %s' ), 'substitute' )`,
 			errors: [ { messageId: 'placeholderMismatch' } ],
+		},
+		{
+			code: `
+sprintf(
+	/* translators: 1: number of blocks. 2: average rating. */
+	_n(
+		'This author has %d block, with an average rating of %d.',
+		'This author has %d blocks, with an average rating of %d.',
+		authorBlockCount
+	),
+	authorBlockCount,
+	authorBlockRating
+);`,
+			errors: [ { messageId: 'noNumberedPlaceholders' } ],
 		},
 	],
 } );
