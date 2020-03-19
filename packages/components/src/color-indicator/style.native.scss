@@ -14,6 +14,16 @@
 	margin-right: 8px;
 	justify-content: center;
 	align-items: center;
-	border-color: $gray-10;
+	border-color: rgba(0, 0, 0, 0.1);
 	border-width: $border-width;
+}
+
+.circleOptionDark {
+	border-color: rgba(255, 255, 255, 0.1);
+}
+
+.absolute {
+	position: absolute;
+	margin-right: 0;
+	border-width: 0;
 }

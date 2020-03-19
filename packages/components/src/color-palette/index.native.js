@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	ScrollView,
-	TouchableWithoutFeedback,
-	View,
-	Text,
-	Platform,
-} from 'react-native';
+import { ScrollView, TouchableWithoutFeedback, View } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -16,7 +10,6 @@ import {
 	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -33,9 +26,14 @@ function ColorPalette( {
 	currentScreen,
 	onCustomPress,
 } ) {
+	const customSwatchGradients = [
+		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,0,0,0) 70.71%)',
+		'linear-gradient(240deg, rgba(0,255,0,.8), 0%, rgba(0,255,0,0) 70.71%)',
+		'linear-gradient(360deg, rgba(0,0,255,.8), 0%, rgba(0,0,255,0) 70.71%)',
+	];
+
 	const isGradientSegment = currentSegment === 'Gradient';
 	const isTextScreen = currentScreen === 'Text';
-	const isIOS = Platform.OS === 'ios';
 
 	const { setGradient } = __experimentalUseGradient( {}, clientId );
 
@@ -60,7 +58,7 @@ function ColorPalette( {
 		}
 	}
 
-	function Swatch( { gradient } ) {
+	function Swatch( { gradient, custom } ) {
 		const palette = gradient ? defaultGradientColors : defaultColors;
 		return (
 			<>
@@ -86,23 +84,22 @@ function ColorPalette( {
 						</TouchableWithoutFeedback>
 					);
 				} ) }
+				{ custom && (
+					<>
+						<View style={ styles.verticalSeparator } />
+						<TouchableWithoutFeedback onPress={ onCustomPress }>
+							<View>
+								<ColorIndicator
+									custom
+									color={ customSwatchGradients }
+								/>
+							</View>
+						</TouchableWithoutFeedback>
+					</>
+				) }
 			</>
 		);
 	}
-
-	const ColorSwatch = () => {
-		return (
-			<View style={ styles.row }>
-				<Swatch gradient={ false } />
-				<View style={ styles.verticalSeparator } />
-				<TouchableWithoutFeedback onPress={ onCustomPress }>
-					<Text style={ styles.customButton }>
-						{ isIOS ? __( 'Custom' ) : __( 'CUSTOM' ) }
-					</Text>
-				</TouchableWithoutFeedback>
-			</View>
-		);
-	};
 
 	return (
 		<ScrollView
@@ -111,7 +108,11 @@ function ColorPalette( {
 			showsHorizontalScrollIndicator={ false }
 			keyboardShouldPersistTaps={ true }
 		>
-			{ isGradientSegment ? <Swatch gradient /> : <ColorSwatch /> }
+			{ isGradientSegment ? (
+				<Swatch gradient />
+			) : (
+				<Swatch custom onCustomPress={ onCustomPress } />
+			) }
 		</ScrollView>
 	);
 }
