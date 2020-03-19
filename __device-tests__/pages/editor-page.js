@@ -230,10 +230,6 @@ export default class EditorPage {
 	// Paragraph Block functions
 	// =========================
 
-	async addNewParagraphBlock() {
-		await this.addNewBlock( this.paragraphBlockName );
-	}
-
 	async getParagraphBlockAtPosition( position: number, options: { autoscroll: boolean } = { autoscroll: false } ) {
 		return this.getBlockAtPosition( position, this.paragraphBlockName, options );
 	}
@@ -297,10 +293,6 @@ export default class EditorPage {
 	// List Block functions
 	// =========================
 
-	async addNewListBlock() {
-		await this.addNewBlock( this.listBlockName );
-	}
-
 	async getListBlockAtPosition( position: number ) {
 		return this.getBlockAtPosition( position, this.listBlockName );
 	}
@@ -353,10 +345,6 @@ export default class EditorPage {
 	// Image Block functions
 	// =========================
 
-	async addNewImageBlock() {
-		await this.addNewBlock( this.imageBlockName );
-	}
-
 	async getImageBlockAtPosition( position: number ) {
 		return this.getBlockAtPosition( position, this.imageBlockName );
 	}
@@ -387,10 +375,6 @@ export default class EditorPage {
 	// Gallery Block functions
 	// =========================
 
-	async addNewGalleryBlock() {
-		await this.addNewBlock( this.galleryBlockName );
-	}
-
 	async getGalleryBlockAtPosition( position: number ) {
 		return this.getBlockAtPosition( position, this.galleryBlockName );
 	}
@@ -402,9 +386,6 @@ export default class EditorPage {
 	// =========================
 	// Heading Block functions
 	// =========================
-	async addNewHeadingBlock() {
-		await this.addNewBlock( this.headingBlockName );
-	}
 
 	async getHeadingBlockAtPosition( position: number ) {
 		return this.getBlockAtPosition( position, this.headingBlockName );
