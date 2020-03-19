@@ -148,7 +148,6 @@ export class Inserter extends Component {
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
 			showSeparator,
-			blockDoNotSupportInserter,
 		} = this.props;
 		if ( showSeparator && isOpen ) {
 			return <BlockInsertionPoint />;
@@ -193,7 +192,7 @@ export class Inserter extends Component {
 				{ renderToggle( {
 					onToggle: onPress,
 					isOpen,
-					disabled: disabled || blockDoNotSupportInserter,
+					disabled,
 					style,
 					onLongPress,
 				} ) }
@@ -257,10 +256,7 @@ export default compose( [
 			getBlockOrder,
 			getBlockIndex,
 			getBlock,
-			getBlockName,
 		} = select( 'core/block-editor' );
-
-		const { getBlockSupport } = select( 'core/blocks' );
 
 		const end = getBlockSelectionEnd();
 		// `end` argument (id) can refer to the component which is removed
@@ -319,10 +315,6 @@ export default compose( [
 			? selectedBlockIndex + 1
 			: endOfRootIndex;
 
-		const blockDoNotSupportInserter =
-			! isAppender &&
-			getBlockSupport( getBlockName( end ), 'inserter' ) === false;
-
 		return {
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
@@ -330,7 +322,6 @@ export default compose( [
 			insertionIndexAfter,
 			isAnyBlockSelected,
 			isSelectedBlockReplaceable: isSelectedUnmodifiedDefaultBlock,
-			blockDoNotSupportInserter,
 		};
 	} ),
 
