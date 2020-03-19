@@ -58,7 +58,7 @@ const MyNavigableContainer = () => (
 		<NavigableMenu onNavigate={ onNavigate } orientation="horizontal">
 			<Button isSecondary>Item 1</Button>
 			<Button isSecondary>Item 2</Button>
-			<Button isSecondaryisSecondary>Item 3</Button>
+			<Button isSecondary>Item 3</Button>
 		</NavigableMenu>
 		
 		<span>Tabbable Container:</span>

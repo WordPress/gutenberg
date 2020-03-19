@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dom-ready",
-	"version": "2.5.1",
+	"version": "2.7.0",
 	"description": "Execute callback after the DOM is loaded.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,7 @@
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.4.4"
+		"@babel/runtime": "^7.8.3"
 	},
 	"publishConfig": {
 		"access": "public"

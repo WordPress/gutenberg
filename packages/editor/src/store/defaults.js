@@ -28,4 +28,3 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	codeEditingEnabled: true,
 	enableCustomFields: false,
 };
-

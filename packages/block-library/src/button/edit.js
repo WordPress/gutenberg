@@ -7,29 +7,31 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useCallback, useState } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import {
-	useCallback,
-} from '@wordpress/element';
-import {
-	compose,
-	withInstanceId,
-} from '@wordpress/compose';
-import {
+	KeyboardShortcuts,
 	PanelBody,
 	RangeControl,
 	TextControl,
 	ToggleControl,
 	withFallbackStyles,
+	ToolbarButton,
+	ToolbarGroup,
+	Popover,
 } from '@wordpress/components';
 import {
+	BlockControls,
 	__experimentalUseGradient,
 	ContrastChecker,
 	InspectorControls,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	RichText,
-	URLInput,
 	withColors,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
+import { link } from '@wordpress/icons';
 
 const { getComputedStyle } = window;
 
@@ -38,10 +40,19 @@ const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	const backgroundColorValue = backgroundColor && backgroundColor.color;
 	const textColorValue = textColor && textColor.color;
 	//avoid the use of querySelector if textColor color is known and verify if node is available.
-	const textNode = ! textColorValue && node ? node.querySelector( '[contenteditable="true"]' ) : null;
+	const textNode =
+		! textColorValue && node
+			? node.querySelector( '[contenteditable="true"]' )
+			: null;
 	return {
-		fallbackBackgroundColor: backgroundColorValue || ! node ? undefined : getComputedStyle( node ).backgroundColor,
-		fallbackTextColor: textColorValue || ! textNode ? undefined : getComputedStyle( textNode ).color,
+		fallbackBackgroundColor:
+			backgroundColorValue || ! node
+				? undefined
+				: getComputedStyle( node ).backgroundColor,
+		fallbackTextColor:
+			textColorValue || ! textNode
+				? undefined
+				: getComputedStyle( textNode ).color,
 	};
 } );
 
@@ -58,10 +69,10 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 		[ setAttributes ]
 	);
 	return (
-		<PanelBody title={ __( 'Border Settings' ) }>
+		<PanelBody title={ __( 'Border settings' ) }>
 			<RangeControl
 				value={ borderRadius }
-				label={ __( 'Border Radius' ) }
+				label={ __( 'Border radius' ) }
 				min={ MIN_BORDER_RADIUS_VALUE }
 				max={ MAX_BORDER_RADIUS_VALUE }
 				initialPosition={ INITIAL_BORDER_RADIUS_POSITION }
@@ -69,6 +80,64 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 				onChange={ setBorderRadius }
 			/>
 		</PanelBody>
+	);
+}
+
+function URLPicker( {
+	isSelected,
+	url,
+	setAttributes,
+	opensInNewTab,
+	onToggleOpenInNewTab,
+} ) {
+	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
+	const openLinkControl = () => {
+		setIsURLPickerOpen( true );
+	};
+	const linkControl = isURLPickerOpen && (
+		<Popover
+			position="bottom center"
+			onClose={ () => setIsURLPickerOpen( false ) }
+		>
+			<LinkControl
+				className="wp-block-navigation-link__inline-link-input"
+				value={ { url, opensInNewTab } }
+				onChange={ ( {
+					url: newURL = '',
+					opensInNewTab: newOpensInNewTab,
+				} ) => {
+					setAttributes( { url: newURL } );
+
+					if ( opensInNewTab !== newOpensInNewTab ) {
+						onToggleOpenInNewTab( newOpensInNewTab );
+					}
+				} }
+			/>
+		</Popover>
+	);
+	return (
+		<>
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton
+						name="link"
+						icon={ link }
+						title={ __( 'Link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ openLinkControl }
+					/>
+				</ToolbarGroup>
+			</BlockControls>
+			{ isSelected && (
+				<KeyboardShortcuts
+					bindGlobal
+					shortcuts={ {
+						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+					} }
+				/>
+			) }
+			{ linkControl }
+		</>
 	);
 }
 
@@ -90,7 +159,6 @@ function ButtonEdit( {
 		placeholder,
 		rel,
 		text,
-		title,
 		url,
 	} = attributes;
 	const onSetLinkRel = useCallback(
@@ -125,43 +193,37 @@ function ButtonEdit( {
 	} = __experimentalUseGradient();
 
 	return (
-		<div className={ className } title={ title }>
+		<div className={ className }>
 			<RichText
 				placeholder={ placeholder || __( 'Add text…' ) }
 				value={ text }
 				onChange={ ( value ) => setAttributes( { text: value } ) }
 				withoutInteractiveFormatting
-				className={ classnames(
-					'wp-block-button__link', {
-						'has-background': backgroundColor.color || gradientValue,
-						[ backgroundColor.class ]: ! gradientValue && backgroundColor.class,
-						'has-text-color': textColor.color,
-						[ textColor.class ]: textColor.class,
-						[ gradientClass ]: gradientClass,
-						'no-border-radius': borderRadius === 0,
-					}
-				) }
+				className={ classnames( 'wp-block-button__link', {
+					'has-background': backgroundColor.color || gradientValue,
+					[ backgroundColor.class ]:
+						! gradientValue && backgroundColor.class,
+					'has-text-color': textColor.color,
+					[ textColor.class ]: textColor.class,
+					[ gradientClass ]: gradientClass,
+					'no-border-radius': borderRadius === 0,
+				} ) }
 				style={ {
-					...( ! backgroundColor.color && gradientValue ?
-						{ background: gradientValue } :
-						{ backgroundColor: backgroundColor.color }
-					),
+					...( ! backgroundColor.color && gradientValue
+						? { background: gradientValue }
+						: { backgroundColor: backgroundColor.color } ),
 					color: textColor.color,
-					borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+					borderRadius: borderRadius
+						? borderRadius + 'px'
+						: undefined,
 				} }
 			/>
-			<URLInput
-				label={ __( 'Link' ) }
-				className="wp-block-button__inline-link"
-				value={ url }
-				/* eslint-disable jsx-a11y/no-autofocus */
-				// Disable Reason: The rule is meant to prevent enabling auto-focus, not disabling it.
-				autoFocus={ false }
-				/* eslint-enable jsx-a11y/no-autofocus */
-				onChange={ ( value ) => setAttributes( { url: value } ) }
-				disableSuggestions={ ! isSelected }
-				isFullWidth
-				hasBorder
+			<URLPicker
+				url={ url }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+				opensInNewTab={ linkTarget === '_blank' }
+				onToggleOpenInNewTab={ onToggleOpenInNewTab }
 			/>
 			<InspectorControls>
 				<PanelColorGradientSettings
@@ -170,7 +232,7 @@ function ButtonEdit( {
 						{
 							colorValue: textColor.color,
 							onColorChange: setTextColor,
-							label: __( 'Text Color' ),
+							label: __( 'Text color' ),
 						},
 						{
 							colorValue: backgroundColor.color,
@@ -215,7 +277,6 @@ function ButtonEdit( {
 }
 
 export default compose( [
-	withInstanceId,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	applyFallbackStyles,
 ] )( ButtonEdit );

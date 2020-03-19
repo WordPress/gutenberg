@@ -14,7 +14,16 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
     </div>
     <ForwardRef(Button)
       aria-expanded={true}
-      icon="no-alt"
+      icon={
+        <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
+          />
+        </SVG>
+      }
       label="Close panel"
     />
   </div>
@@ -49,7 +58,16 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
     </div>
     <ForwardRef(Button)
       aria-expanded={true}
-      icon="no-alt"
+      icon={
+        <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
+          />
+        </SVG>
+      }
       label="Close panel"
     />
   </div>
@@ -87,7 +105,16 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
     </div>
     <ForwardRef(Button)
       aria-expanded={true}
-      icon="no-alt"
+      icon={
+        <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
+          />
+        </SVG>
+      }
       label="Close panel"
     />
   </div>
@@ -123,7 +150,16 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
     </div>
     <ForwardRef(Button)
       aria-expanded={true}
-      icon="no-alt"
+      icon={
+        <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
+          />
+        </SVG>
+      }
       label="Close panel"
     />
   </div>
@@ -159,7 +195,16 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
     </div>
     <ForwardRef(Button)
       aria-expanded={true}
-      icon="no-alt"
+      icon={
+        <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
+          />
+        </SVG>
+      }
       label="Close panel"
     />
   </div>

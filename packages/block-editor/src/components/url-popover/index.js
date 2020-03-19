@@ -3,10 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import {
-	Button,
-	Popover,
-} from '@wordpress/components';
+import { Button, Popover } from '@wordpress/components';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,7 +16,9 @@ class URLPopover extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.toggleSettingsVisibility = this.toggleSettingsVisibility.bind( this );
+		this.toggleSettingsVisibility = this.toggleSettingsVisibility.bind(
+			this
+		);
 
 		this.state = {
 			isSettingsExpanded: false,
@@ -41,9 +41,7 @@ class URLPopover extends Component {
 			...popoverProps
 		} = this.props;
 
-		const {
-			isSettingsExpanded,
-		} = this.state;
+		const { isSettingsExpanded } = this.state;
 
 		const showSettings = !! renderSettings && isSettingsExpanded;
 
@@ -60,7 +58,7 @@ class URLPopover extends Component {
 						{ !! renderSettings && (
 							<Button
 								className="block-editor-url-popover__settings-toggle"
-								icon="arrow-down-alt2"
+								icon={ chevronDown }
 								label={ __( 'Link settings' ) }
 								onClick={ this.toggleSettingsVisibility }
 								aria-expanded={ isSettingsExpanded }
@@ -74,9 +72,7 @@ class URLPopover extends Component {
 					) }
 				</div>
 				{ additionalControls && ! showSettings && (
-					<div
-						className="block-editor-url-popover__additional-controls"
-					>
+					<div className="block-editor-url-popover__additional-controls">
 						{ additionalControls }
 					</div>
 				) }

@@ -103,7 +103,7 @@ export const ALERT = {
 
 export const COLORS = {
 	...BASE,
-	darkGrey: DARK_GRAY,
+	darkGray: DARK_GRAY,
 	darkOpacity: DARK_OPACITY,
 	darkOpacityLight: DARK_OPACITY_LIGHT,
 	lightGray: LIGHT_GRAY,

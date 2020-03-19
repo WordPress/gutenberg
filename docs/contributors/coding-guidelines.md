@@ -10,8 +10,8 @@ To avoid class name collisions, class names **must** adhere to the following gui
 
 All class names assigned to an element must be prefixed with the name of the package, followed by a dash and the name of the directory in which the component resides. Any descendent of the component's root element must append a dash-delimited descriptor, separated from the base by two consecutive underscores `__`.
 
-* Root element: `package-directory`
-* Child elements: `package-directory__descriptor-foo-bar`
+-   Root element: `package-directory`
+-   Child elements: `package-directory__descriptor-foo-bar`
 
 The root element is considered to be the highest ancestor element returned by the default export in the `index.js`. Notably, if your folder contains multiple files, each with their own default exported component, only the element rendered by that of `index.js` can be considered the root. All others should be treated as descendents.
 
@@ -23,12 +23,10 @@ Consider the following component located at `packages/components/src/notice/inde
 export default function Notice( { children, onRemove } ) {
 	return (
 		<div className="components-notice">
-			<div className="components-notice__content">
-				{ children }
-			</div>
+			<div className="components-notice__content">{ children }</div>
 			<Button
 				className="components-notice__dismiss"
-				icon="no"
+				icon={ check }
 				label={ __( 'Dismiss this notice' ) }
 				onClick={ onRemove }
 			/>
@@ -51,11 +49,7 @@ export default function Notice( { children, onRemove, isDismissible } ) {
 		'is-dismissible': isDismissible,
 	} );
 
-	return (
-		<div className={ classes }>
-			{ /* ... */ }
-		</div>
-	);
+	return <div className={ classes }>{ /* ... */ }</div>;
 }
 ```
 
@@ -135,8 +129,8 @@ export { __experimentalDoExcitingExperimentalAction } from './api';
 export { __unstableDoTerribleAwfulAction } from './api';
 ```
 
-- An **experimental API** is one which is planned for eventual public availability, but is subject to further experimentation, testing, and discussion.
-- An **unstable API** is one which serves as a means to an end. It is not desired to ever be converted into a public API.
+-   An **experimental API** is one which is planned for eventual public availability, but is subject to further experimentation, testing, and discussion.
+-   An **unstable API** is one which serves as a means to an end. It is not desired to ever be converted into a public API.
 
 In both cases, the API should be made stable or removed at the earliest opportunity.
 
@@ -168,7 +162,7 @@ const object = {
 
 ### Strings
 
-String literals should be declared with single-quotes *unless* the string itself contains a single-quote that would need to be escaped–in that case: use a double-quote. If the string contains a single-quote *and* a double-quote, you can use ES6 template strings to avoid escaping the quotes.
+String literals should be declared with single-quotes _unless_ the string itself contains a single-quote that would need to be escaped–in that case: use a double-quote. If the string contains a single-quote _and_ a double-quote, you can use ES6 template strings to avoid escaping the quotes.
 
 **Note:** The single-quote character (`'`) should never be used in place of an apostrophe (`’`) for words like `it’s` or `haven’t` in user-facing strings. For test code it's still encouraged to use a real apostrophe.
 
@@ -176,12 +170,12 @@ In general, avoid backslash-escaping quotes:
 
 ```js
 // Bad:
-const name = "Matt";
+const name = 'Matt';
 // Good:
 const name = 'Matt';
 
 // Bad:
-const pet = 'Matt\'s dog';
+const pet = "Matt's dog";
 // Also bad (not using an apostrophe):
 const pet = "Matt's dog";
 // Good:
@@ -207,8 +201,8 @@ Gutenberg follows the [WordPress JavaScript Documentation Standards](https://mak
 
 For additional guidance, consult the following resources:
 
-- [JSDoc Official Documentation](https://jsdoc.app/index.html)
-- [TypeScript Supported JSDoc](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#supported-jsdoc)
+-   [JSDoc Official Documentation](https://jsdoc.app/index.html)
+-   [TypeScript Supported JSDoc](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#supported-jsdoc)
 
 ### Custom Types
 
@@ -236,7 +230,7 @@ Custom types can also be used to describe a set of predefined options. While the
 ```js
 /**
  * Named breakpoint sizes.
- * 
+ *
  * @typedef {'huge'|'wide'|'large'|'medium'|'small'|'mobile'} WPBreakpoint
  */
 ```
@@ -311,13 +305,13 @@ Similar to the "Custom Types" advice concerning type unions and with literal val
 ```js
 /**
  * Named breakpoint sizes.
- * 
+ *
  * @typedef {"huge"|"wide"|"large"|"medium"|"small"|"mobile"} WPBreakpoint
  */
 
 /**
  * Hash of breakpoint names with pixel width at which it becomes effective.
- * 
+ *
  * @type {Object<WPBreakpoint,number>}
  */
 const BREAKPOINTS = { huge: 1440 /* , ... */ };
@@ -331,9 +325,9 @@ You can express a nullable type using a leading `?`. Use the nullable form of a 
 /**
  * Returns a configuration value for a given key, if exists. Returns null if
  * there is no configured value.
- * 
+ *
  * @param {string} key Configuration key to retrieve.
- * 
+ *
  * @return {?*} Configuration value, if exists.
  */
 function getConfigurationValue( key ) {
@@ -372,9 +366,9 @@ If a function has multiple code paths where some (but not all) conditions result
 ```js
 /**
  * Returns a configuration value for a given key, if exists.
- * 
+ *
  * @param {string} key Configuration key to retrieve.
- * 
+ *
  * @return {*|void} Configuration value, if exists.
  */
 function getConfigurationValue( key ) {
@@ -401,7 +395,7 @@ Because the documentation generated using the `@wordpress/docgen` tool will incl
 
 When documenting an example, use the markdown <code>\`\`\`</code> code block to demarcate the beginning and end of the code sample. An example can span multiple lines.
 
-```js
+````js
 /**
  * Given the name of a registered store, returns an object of the store's
  * selectors. The selector functions are been pre-bound to pass the current
@@ -418,7 +412,7 @@ When documenting an example, use the markdown <code>\`\`\`</code> code block to 
  * @return {Object<string,WPDataSelector>} Object containing the store's
  *                                         selectors.
  */
-```
+````
 
 ### Documenting `@wordpress/element` (React) Components
 
@@ -426,7 +420,7 @@ When possible, all components should be implemented as [function components](htt
 
 Documenting a function component should be treated the same as any other function. The primary caveat in documenting a component is being aware that the function typically accepts only a single argument (the "props"), which may include many property members. Use the [dot syntax for parameter properties](https://jsdoc.app/tags-param.html#parameters-with-properties) to document individual prop types.
 
-```js
+````js
 /**
  * Renders the block's configured title as a string, or empty if the title
  * cannot be determined.
@@ -442,15 +436,15 @@ Documenting a function component should be treated the same as any other functio
  *
  * @return {?string} Block title.
  */
-```
+````
 
 For class components, there is no recommendation for documenting the props of the component. Gutenberg does not use or endorse the [`propTypes` static class member](https://reactjs.org/docs/typechecking-with-proptypes.html).
 
 ## PHP
 
 We use
-[`phpcs` (PHP\_CodeSniffer)](https://github.com/squizlabs/PHP_CodeSniffer) with the [WordPress Coding Standards ruleset](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) to run a lot of automated checks against all PHP code in this project.  This ensures that we are consistent with WordPress PHP coding standards.
+[`phpcs` (PHP_CodeSniffer)](https://github.com/squizlabs/PHP_CodeSniffer) with the [WordPress Coding Standards ruleset](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) to run a lot of automated checks against all PHP code in this project. This ensures that we are consistent with WordPress PHP coding standards.
 
 The easiest way to use PHPCS is [local environment](/docs/contributors/getting-started.md#local-environment). Once that's installed, you can check your PHP by running `npm run lint-php`.
 
-If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`.  This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.
+If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`. This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.

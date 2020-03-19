@@ -71,7 +71,9 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 		 */
 		removeNotice( id ) {
 			this.setState( ( state ) => ( {
-				noticeList: state.noticeList.filter( ( notice ) => notice.id !== id ),
+				noticeList: state.noticeList.filter(
+					( notice ) => notice.id !== id
+				),
 			} ) );
 		}
 
@@ -90,11 +92,13 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 					noticeList={ this.state.noticeList }
 					noticeOperations={ this.noticeOperations }
 					noticeUI={
-						this.state.noticeList.length > 0 && <NoticeList
-							className="components-with-notices-ui"
-							notices={ this.state.noticeList }
-							onRemove={ this.removeNotice }
-						/>
+						this.state.noticeList.length > 0 && (
+							<NoticeList
+								className="components-with-notices-ui"
+								notices={ this.state.noticeList }
+								onRemove={ this.removeNotice }
+							/>
+						)
 					}
 					{ ...this.props }
 				/>

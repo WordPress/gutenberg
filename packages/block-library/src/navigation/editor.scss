@@ -1,117 +1,26 @@
-// Reduce the paddings, margins, and UI of inner-blocks.
-// @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
-// When that happens, leverage that instead of the following overrides.
-[data-type="core/navigation"] {
+$navigation-height: 60px;
+$navigation-item-height: 46px;
 
-	.wp-block-navigation .block-editor-inner-blocks {
-		flex: 1; // expand to fill available space required for justification
-	}
-
-	// 1. Reset margins on immediate innerblocks container.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout {
-		margin-left: 0;
-		margin-right: 0;
-	}
-
-	.wp-block-navigation.items-justification-left .block-editor-inner-blocks > .block-editor-block-list__layout {
-		justify-content: flex-start;
-	}
-
-	.wp-block-navigation.items-justification-center .block-editor-inner-blocks > .block-editor-block-list__layout {
-		justify-content: center;
-	}
-
-	.wp-block-navigation.items-justification-right .block-editor-inner-blocks > .block-editor-block-list__layout {
-		justify-content: flex-end;
-	}
-
-	// 2. Remove paddings on subsequent immediate children.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
-		width: auto;
-		padding-left: 0;
-		padding-right: 0;
-		margin-left: 0;
-		margin-right: 0;
-		margin-bottom: 1em; // Useful for when items wrap.
-	}
-
-	// 3. Remove margins on subsequent Edit container.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit {
-		margin-left: 0;
-		margin-right: 0;
-	}
-
-	// 4. Remove vertical margins on subsequent block container.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout .wp-block > .block-editor-block-list__block-edit > [data-block] {
-		margin-top: 0;
-		margin-bottom: 0;
-	}
-
-	.wp-block-navigation .block-editor-block-list__block-edit::before {
-		left: 0;
-		right: 0;
-	}
-
-	// Remove the dashed outlines for child blocks.
-	&.is-hovered .wp-block-navigation .block-editor-block-list__block-edit::before,
-	&.is-selected .wp-block-navigation .block-editor-block-list__block-edit::before,
-	&.has-child-selected .wp-block-navigation .block-editor-block-list__block-edit::before {
-		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
-	}
-
-	// Hide the sibling inserter.
-	.wp-block-navigation .block-editor-block-list__insertion-point {
-		display: none;
-	}
-
-	// Polish the Appender.
-	.wp-block-navigation .block-list-appender {
-		margin: 0;
-
-		.block-editor-button-block-appender {
-			padding: $grid-size;
-			outline: none;
-			background: none;
-		}
-	}
+// Undo default editor styles.
+.editor-styles-wrapper .wp-block-navigation ul,
+.editor-styles-wrapper .wp-block-navigation ol {
+	margin-bottom: 0;
+	margin-left: 0;
 }
 
-.wp-block-navigation .block-editor-block-list__layout,
-.wp-block-navigation {
+.editor-styles-wrapper .wp-block-navigation .block-editor-block-list__block {
+	margin: 0;
+}
+
+// Polish the Appender.
+.wp-block-navigation .block-list-appender {
+	margin: 0;
 	display: flex;
-	flex-wrap: wrap;
+	align-items: center;
 }
 
 .wp-block-navigation__inserter-content {
-	padding: $grid-size-large;
-}
-
-/*
- * Adjust Navigation Item.
- */
-.wp-block-navigation .wp-block-navigation-link {
-	margin-right: $grid-size;
-	margin-left: $grid-size;
-
-	.block-editor-block-list__layout {
-		display: block;
-		margin: $grid-size;
-	}
-
-	// Provide a base navigation item margin.
-	// This should be the same inside the field,
-	// and the edit container should compensate.
-	// This is to make sure the edit and view are the same.
-	padding: 0 $grid-size;
-
-	// Only display inner blocks when the block is being edited.
-	.block-editor-inner-blocks {
-		display: none;
-	}
-
-	&.is-editing .block-editor-inner-blocks {
-		display: block;
-	}
+	padding: $grid-unit-20;
 }
 
 /**
@@ -131,7 +40,6 @@ $colors-selector-size: 22px;
 
 	// Button container.
 	.block-library-colors-selector__icon-container {
-		width: 42px;
 		height: 30px;
 		position: relative;
 		margin: 0 auto;
@@ -139,18 +47,11 @@ $colors-selector-size: 22px;
 		display: flex;
 		align-items: center;
 		border-radius: 4px;
+	}
 
-		// Add the button arrow.
-		&::after {
-			@include dropdown-arrow();
-		}
-
-		// Styling button states.
-		&:focus,
-		&:hover {
-			color: $dark-gray-500;
-			box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px #fff;
-		}
+	.block-library-colors-selector__state-selection {
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	// colors-selector - selection status.
@@ -191,12 +92,8 @@ $color-control-label-height: 20px;
 		float: right;
 		margin-top: 2px;
 	}
-}
 
-.block-editor-block-mover {
-	&.is-horizontal {
-		.block-editor-block-mover__control-drag-handle {
-			display: none;
-		}
+	.components-panel__body-title {
+		display: none;
 	}
 }

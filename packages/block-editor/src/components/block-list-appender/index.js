@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { last } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -12,9 +13,12 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import IgnoreNestedEvents from '../ignore-nested-events';
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
+
+function stopPropagation( event ) {
+	event.stopPropagation();
+}
 
 function BlockListAppender( {
 	blockClientIds,
@@ -22,6 +26,8 @@ function BlockListAppender( {
 	canInsertDefaultBlock,
 	isLocked,
 	renderAppender: CustomAppender,
+	className,
+	tagName: TagName = 'div',
 } ) {
 	if ( isLocked || CustomAppender === false ) {
 		return null;
@@ -51,39 +57,38 @@ function BlockListAppender( {
 		);
 	}
 
-	// IgnoreNestedEvents is used to treat interactions within the appender as
-	// subject to the same conditions as those which occur within nested blocks.
-	// Notably, this effectively prevents event bubbling to block ancestors
-	// which can otherwise interfere with the intended behavior of the appender
-	// (e.g. focus handler on the ancestor block).
-	//
-	// A `tabIndex` is used on the wrapping `div` element in order to force a
-	// focus event to occur when an appender `button` element is clicked. In
-	// some browsers (Firefox, Safari), button clicks do not emit a focus event,
-	// which could cause this event to propagate unexpectedly. The `tabIndex`
-	// ensures that the interaction is captured as a focus, without also adding
-	// an extra tab stop.
-	//
-	// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 	return (
-		<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
-			<div tabIndex={ -1 } className="block-list-appender">
-				{ appender }
-			</div>
-		</IgnoreNestedEvents>
+		<TagName
+			// A `tabIndex` is used on the wrapping `div` element in order to
+			// force a focus event to occur when an appender `button` element
+			// is clicked. In some browsers (Firefox, Safari), button clicks do
+			// not emit a focus event, which could cause this event to propagate
+			// unexpectedly. The `tabIndex` ensures that the interaction is
+			// captured as a focus, without also adding an extra tab stop.
+			//
+			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+			tabIndex={ -1 }
+			// Prevent the block from being selected when the appender is
+			// clicked.
+			onFocus={ stopPropagation }
+			className={ classnames( 'block-list-appender', className ) }
+		>
+			{ appender }
+		</TagName>
 	);
 }
 
 export default withSelect( ( select, { rootClientId } ) => {
-	const {
-		getBlockOrder,
-		canInsertBlockType,
-		getTemplateLock,
-	} = select( 'core/block-editor' );
+	const { getBlockOrder, canInsertBlockType, getTemplateLock } = select(
+		'core/block-editor'
+	);
 
 	return {
 		isLocked: !! getTemplateLock( rootClientId ),
 		blockClientIds: getBlockOrder( rootClientId ),
-		canInsertDefaultBlock: canInsertBlockType( getDefaultBlockName(), rootClientId ),
+		canInsertDefaultBlock: canInsertBlockType(
+			getDefaultBlockName(),
+			rootClientId
+		),
 	};
 } )( BlockListAppender );

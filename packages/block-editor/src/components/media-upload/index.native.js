@@ -13,6 +13,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
+import { capturePhoto, captureVideo, image, wordpress } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
@@ -26,7 +27,7 @@ const cameraImageSource = {
 	value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
 	label: __( 'Take a Photo' ),
 	types: [ MEDIA_TYPE_IMAGE ],
-	icon: 'camera',
+	icon: capturePhoto,
 };
 
 const cameraVideoSource = {
@@ -34,7 +35,7 @@ const cameraVideoSource = {
 	value: mediaSources.deviceCamera,
 	label: __( 'Take a Video' ),
 	types: [ MEDIA_TYPE_VIDEO ],
-	icon: 'camera',
+	icon: captureVideo,
 };
 
 const deviceLibrarySource = {
@@ -42,6 +43,7 @@ const deviceLibrarySource = {
 	value: mediaSources.deviceLibrary,
 	label: __( 'Choose from device' ),
 	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
+	icon: image,
 };
 
 const siteLibrarySource = {
@@ -49,10 +51,16 @@ const siteLibrarySource = {
 	value: mediaSources.siteMediaLibrary,
 	label: __( 'WordPress Media Library' ),
 	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
-	icon: 'wordpress-alt',
+	icon: wordpress,
+	mediaLibrary: true,
 };
 
-const internalSources = [ deviceLibrarySource, cameraImageSource, cameraVideoSource, siteLibrarySource ];
+const internalSources = [
+	deviceLibrarySource,
+	cameraImageSource,
+	cameraVideoSource,
+	siteLibrarySource,
+];
 
 export class MediaUpload extends React.Component {
 	constructor( props ) {
@@ -69,13 +77,15 @@ export class MediaUpload extends React.Component {
 	componentDidMount() {
 		const { allowedTypes = [] } = this.props;
 		getOtherMediaOptions( allowedTypes, ( otherMediaOptions ) => {
-			const otherMediaOptionsWithIcons = otherMediaOptions.map( ( option ) => {
-				return {
-					...option,
-					types: allowedTypes,
-					id: option.value,
-				};
-			} );
+			const otherMediaOptionsWithIcons = otherMediaOptions.map(
+				( option ) => {
+					return {
+						...option,
+						types: allowedTypes,
+						id: option.value,
+					};
+				}
+			);
 
 			this.setState( { otherMediaOptions: otherMediaOptionsWithIcons } );
 		} );
@@ -86,24 +96,25 @@ export class MediaUpload extends React.Component {
 	}
 
 	getMediaOptionsItems() {
-		const { allowedTypes = [], multiple = false } = this.props;
+		const {
+			allowedTypes = [],
+			__experimentalOnlyMediaLibrary,
+		} = this.props;
 
-		// disable upload sources for now when multiple flag is set
-		// eslint-disable-next-line no-undef
-		if ( ! __DEV__ ) {
-			if ( allowedTypes.includes( MEDIA_TYPE_IMAGE ) && multiple ) {
-				return [ siteLibrarySource ];
-			}
-		}
-
-		return this.getAllSources().filter( ( source ) => {
-			return allowedTypes.filter( ( allowedType ) => source.types.includes( allowedType ) ).length > 0;
-		} ).map( ( source ) => {
-			return {
-				...source,
-				icon: source.icon || this.getChooseFromDeviceIcon(),
-			};
-		} );
+		return this.getAllSources()
+			.filter( ( source ) => {
+				return __experimentalOnlyMediaLibrary
+					? source.mediaLibrary
+					: allowedTypes.filter( ( allowedType ) =>
+							source.types.includes( allowedType )
+					  ).length > 0;
+			} )
+			.map( ( source ) => {
+				return {
+					...source,
+					icon: source.icon || this.getChooseFromDeviceIcon(),
+				};
+			} );
 	}
 
 	getChooseFromDeviceIcon() {
@@ -128,8 +139,13 @@ export class MediaUpload extends React.Component {
 
 	onPickerSelect( value ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
-		const mediaSource = this.getAllSources().filter( ( source ) => source.value === value ).shift();
-		const types = allowedTypes.filter( ( type ) => mediaSource.types.includes( type ) );
+		const mediaSource = this.getAllSources()
+			.filter( ( source ) => source.value === value )
+			.shift();
+		const types = allowedTypes.filter( ( type ) =>
+			mediaSource.types.includes( type )
+		);
+
 		requestMediaPicker( mediaSource.id, types, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
 				onSelect( media );
@@ -141,13 +157,16 @@ export class MediaUpload extends React.Component {
 		const getMediaOptions = () => (
 			<Picker
 				hideCancelButton
-				ref={ ( instance ) => this.picker = instance }
+				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }
 				onChange={ this.onPickerSelect }
 			/>
 		);
 
-		return this.props.render( { open: this.onPickerPresent, getMediaOptions } );
+		return this.props.render( {
+			open: this.onPickerPresent,
+			getMediaOptions,
+		} );
 	}
 }
 

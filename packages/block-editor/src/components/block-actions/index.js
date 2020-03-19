@@ -70,10 +70,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, props, { select } ) => {
-		const {
-			clientIds,
-			blocks,
-		} = props;
+		const { clientIds, blocks } = props;
 
 		const {
 			removeBlocks,
@@ -101,22 +98,20 @@ export default compose( [
 					return;
 				}
 
-				const {
-					getGroupingBlockName,
-				} = select( 'core/blocks' );
+				const { getGroupingBlockName } = select( 'core/blocks' );
 
 				const groupingBlockName = getGroupingBlockName();
 
 				// Activate the `transform` on `core/group` which does the conversion
-				const newBlocks = switchToBlockType( blocks, groupingBlockName );
+				const newBlocks = switchToBlockType(
+					blocks,
+					groupingBlockName
+				);
 
 				if ( ! newBlocks ) {
 					return;
 				}
-				replaceBlocks(
-					clientIds,
-					newBlocks
-				);
+				replaceBlocks( clientIds, newBlocks );
 			},
 
 			onUngroup() {
@@ -130,10 +125,7 @@ export default compose( [
 					return;
 				}
 
-				replaceBlocks(
-					clientIds,
-					innerBlocks
-				);
+				replaceBlocks( clientIds, innerBlocks );
 			},
 		};
 	} ),

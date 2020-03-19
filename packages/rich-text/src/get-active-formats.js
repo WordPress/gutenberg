@@ -7,12 +7,10 @@
  *
  * @return {?Object} Active format objects.
  */
-export function getActiveFormats( {
-	formats,
-	start,
-	end,
-	activeFormats,
-}, EMPTY_ACTIVE_FORMATS = [] ) {
+export function getActiveFormats(
+	{ formats, start, end, activeFormats },
+	EMPTY_ACTIVE_FORMATS = []
+) {
 	if ( start === undefined ) {
 		return EMPTY_ACTIVE_FORMATS;
 	}

@@ -35,7 +35,8 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 
 		render() {
 			return (
-				<WrappedComponent { ...this.props }
+				<WrappedComponent
+					{ ...this.props }
 					speak={ this.speak }
 					debouncedSpeak={ this.debouncedSpeak }
 				/>

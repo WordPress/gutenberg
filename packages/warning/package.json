@@ -1,0 +1,27 @@
+{
+	"name": "@wordpress/warning",
+	"version": "1.0.0",
+	"description": "Warning utility for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"warning"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/warning/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/warning"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"sideEffects": false,
+	"publishConfig": {
+		"access": "public"
+	}
+}

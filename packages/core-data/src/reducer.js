@@ -57,7 +57,10 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 				},
 				queries: {
 					...state.queries,
-					[ action.queryID ]: map( action.users, ( user ) => user.id ),
+					[ action.queryID ]: map(
+						action.users,
+						( user ) => user.id
+					),
 				},
 			};
 	}
@@ -134,12 +137,13 @@ function entity( entityConfig ) {
 	return flowRight( [
 		// Limit to matching action type so we don't attempt to replace action on
 		// an unhandled action.
-		ifMatchingAction( ( action ) => (
-			action.name &&
-			action.kind &&
-			action.name === entityConfig.name &&
-			action.kind === entityConfig.kind
-		) ),
+		ifMatchingAction(
+			( action ) =>
+				action.name &&
+				action.kind &&
+				action.name === entityConfig.name &&
+				action.kind === entityConfig.kind
+		),
 
 		// Inject the entity config into the action.
 		replaceAction( ( action ) => {
@@ -164,19 +168,29 @@ function entity( entityConfig ) {
 								continue;
 							}
 
-							const nextEdits = Object.keys( edits ).reduce( ( acc, key ) => {
-								// If the edited value is still different to the persisted value,
-								// keep the edited value in edits.
-								if (
-									// Edits are the "raw" attribute values, but records may have
-									// objects with more properties, so we use `get` here for the
-									// comparison.
-									! isEqual( edits[ key ], get( record[ key ], 'raw', record[ key ] ) )
-								) {
-									acc[ key ] = edits[ key ];
-								}
-								return acc;
-							}, {} );
+							const nextEdits = Object.keys( edits ).reduce(
+								( acc, key ) => {
+									// If the edited value is still different to the persisted value,
+									// keep the edited value in edits.
+									if (
+										// Edits are the "raw" attribute values, but records may have
+										// objects with more properties, so we use `get` here for the
+										// comparison.
+										! isEqual(
+											edits[ key ],
+											get(
+												record[ key ],
+												'raw',
+												record[ key ]
+											)
+										)
+									) {
+										acc[ key ] = edits[ key ];
+									}
+									return acc;
+								},
+								{}
+							);
 
 							if ( Object.keys( nextEdits ).length ) {
 								nextState[ recordId ] = nextEdits;
@@ -215,7 +229,8 @@ function entity( entityConfig ) {
 						return {
 							...state,
 							[ action.recordId ]: {
-								pending: action.type === 'SAVE_ENTITY_RECORD_START',
+								pending:
+									action.type === 'SAVE_ENTITY_RECORD_START',
 								error: action.error,
 								isAutosave: action.isAutosave,
 							},
@@ -239,10 +254,7 @@ function entity( entityConfig ) {
 export function entitiesConfig( state = defaultEntities, action ) {
 	switch ( action.type ) {
 		case 'ADD_ENTITIES':
-			return [
-				...state,
-				...action.entities,
-			];
+			return [ ...state, ...action.entities ];
 	}
 
 	return state;
@@ -263,18 +275,25 @@ export const entities = ( state = {}, action ) => {
 	let entitiesDataReducer = state.reducer;
 	if ( ! entitiesDataReducer || newConfig !== state.config ) {
 		const entitiesByKind = groupBy( newConfig, 'kind' );
-		entitiesDataReducer = combineReducers( Object.entries( entitiesByKind ).reduce( ( memo, [ kind, subEntities ] ) => {
-			const kindReducer = combineReducers( subEntities.reduce(
-				( kindMemo, entityConfig ) => ( {
-					...kindMemo,
-					[ entityConfig.name ]: entity( entityConfig ),
-				} ),
-				{}
-			) );
+		entitiesDataReducer = combineReducers(
+			Object.entries( entitiesByKind ).reduce(
+				( memo, [ kind, subEntities ] ) => {
+					const kindReducer = combineReducers(
+						subEntities.reduce(
+							( kindMemo, entityConfig ) => ( {
+								...kindMemo,
+								[ entityConfig.name ]: entity( entityConfig ),
+							} ),
+							{}
+						)
+					);
 
-			memo[ kind ] = kindReducer;
-			return memo;
-		}, {} ) );
+					memo[ kind ] = kindReducer;
+					return memo;
+				},
+				{}
+			)
+		);
 	}
 
 	const newData = entitiesDataReducer( state.data, action );
@@ -311,19 +330,27 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 		case 'CREATE_UNDO_LEVEL':
 			let isCreateUndoLevel = action.type === 'CREATE_UNDO_LEVEL';
 			const isUndoOrRedo =
-				! isCreateUndoLevel && ( action.meta.isUndo || action.meta.isRedo );
+				! isCreateUndoLevel &&
+				( action.meta.isUndo || action.meta.isRedo );
 			if ( isCreateUndoLevel ) {
 				action = lastEditAction;
 			} else if ( ! isUndoOrRedo ) {
 				// Don't lose the last edit cache if the new one only has transient edits.
 				// Transient edits don't create new levels so updating the cache would make
 				// us skip an edit later when creating levels explicitly.
-				if ( Object.keys( action.edits ).some( ( key ) => ! action.transientEdits[ key ] ) ) {
+				if (
+					Object.keys( action.edits ).some(
+						( key ) => ! action.transientEdits[ key ]
+					)
+				) {
 					lastEditAction = action;
 				} else {
 					lastEditAction = {
 						...action,
-						edits: { ...( lastEditAction && lastEditAction.edits ), ...action.edits },
+						edits: {
+							...( lastEditAction && lastEditAction.edits ),
+							...action.edits,
+						},
 					};
 				}
 			}
@@ -331,7 +358,8 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 			let nextState;
 			if ( isUndoOrRedo ) {
 				nextState = [ ...state ];
-				nextState.offset = state.offset + ( action.meta.isUndo ? -1 : 1 );
+				nextState.offset =
+					state.offset + ( action.meta.isUndo ? -1 : 1 );
 
 				if ( state.flattenedUndo ) {
 					// The first undo in a sequence of undos might happen while we have
@@ -355,16 +383,22 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 			// are merged. They are defined in the entity's config.
 			if (
 				! isCreateUndoLevel &&
-				! Object.keys( action.edits ).some( ( key ) => ! action.transientEdits[ key ] )
+				! Object.keys( action.edits ).some(
+					( key ) => ! action.transientEdits[ key ]
+				)
 			) {
 				nextState = [ ...state ];
-				nextState.flattenedUndo = { ...state.flattenedUndo, ...action.edits };
+				nextState.flattenedUndo = {
+					...state.flattenedUndo,
+					...action.edits,
+				};
 				nextState.offset = state.offset;
 				return nextState;
 			}
 
 			// Clear potential redos, because this only supports linear history.
-			nextState = nextState || state.slice( 0, state.offset || undefined );
+			nextState =
+				nextState || state.slice( 0, state.offset || undefined );
 			nextState.offset = nextState.offset || 0;
 			nextState.pop();
 			if ( ! isCreateUndoLevel ) {
@@ -372,14 +406,17 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 					kind: action.meta.undo.kind,
 					name: action.meta.undo.name,
 					recordId: action.meta.undo.recordId,
-					edits: { ...state.flattenedUndo, ...action.meta.undo.edits },
+					edits: {
+						...state.flattenedUndo,
+						...action.meta.undo.edits,
+					},
 				} );
 			}
 			// When an edit is a function it's an optimization to avoid running some expensive operation.
 			// We can't rely on the function references being the same so we opt out of comparing them here.
-			const comparisonUndoEdits = Object.values( action.meta.undo.edits ).filter(
-				( edit ) => typeof edit !== 'function'
-			);
+			const comparisonUndoEdits = Object.values(
+				action.meta.undo.edits
+			).filter( ( edit ) => typeof edit !== 'function' );
 			const comparisonEdits = Object.values( action.edits ).filter(
 				( edit ) => typeof edit !== 'function'
 			);
@@ -388,9 +425,9 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 					kind: action.kind,
 					name: action.name,
 					recordId: action.recordId,
-					edits: isCreateUndoLevel ?
-						{ ...state.flattenedUndo, ...action.edits } :
-						action.edits,
+					edits: isCreateUndoLevel
+						? { ...state.flattenedUndo, ...action.edits }
+						: action.edits,
 				} );
 			}
 			return nextState;

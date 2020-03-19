@@ -1,15 +1,38 @@
 /**
+ * WordPress dependencies
+ */
+import {
+	alignCenter,
+	alignLeft,
+	alignRight,
+	code,
+	formatBold,
+	formatItalic,
+	formatStrikethrough,
+	link,
+	more,
+	paragraph,
+} from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import Toolbar from '../';
-import { SVG, Path, ToolbarButton, ToolbarGroup } from '../../';
+import {
+	SVG,
+	Path,
+	ToolbarButton,
+	ToolbarGroup,
+	__experimentalToolbarItem as ToolbarItem,
+	DropdownMenu,
+} from '../../';
 
-export default { title: 'Components|Toolbar', component: Toolbar };
+export default { title: 'Components/Toolbar', component: Toolbar };
 
 function InlineImageIcon() {
 	return (
 		<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-			<Path d="M4 16h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2zM4 5h10v9H4V5zm14 9v2h4v-2h-4zM2 20h20v-2H2v2zm6.4-8.8L7 9.4 5 12h8l-2.6-3.4-2 2.6z" />
+			<Path d="M4 18.5h16V17H4v1.5zM16 13v1.5h4V13h-4zM5.1 15h7.8c.6 0 1.1-.5 1.1-1.1V6.1c0-.6-.5-1.1-1.1-1.1H5.1C4.5 5 4 5.5 4 6.1v7.8c0 .6.5 1.1 1.1 1.1zm.4-8.5h7V10l-1-1c-.3-.3-.8-.3-1 0l-1.6 1.5-1.2-.7c-.3-.2-.6-.2-.9 0l-1.3 1V6.5zm0 6.1l1.8-1.3 1.3.8c.3.2.7.2.9-.1l1.5-1.4 1.5 1.4v1.5h-7v-.9z" />
 		</SVG>
 	);
 }
@@ -18,44 +41,71 @@ function InlineImageIcon() {
 export const _default = () => {
 	return (
 		// id is required for server side rendering
-		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar">
+		<Toolbar
+			__experimentalAccessibilityLabel="Options"
+			id="options-toolbar"
+		>
 			<ToolbarGroup>
-				<ToolbarButton icon="editor-paragraph" title="Paragraph" />
+				<ToolbarButton icon={ paragraph } label="Paragraph" />
 			</ToolbarGroup>
-			<ToolbarGroup
-				icon="editor-alignleft"
-				label="Change text alignment"
-				isCollapsed
-				controls={ [
-					{ icon: 'editor-alignleft', title: 'Align left', isActive: true },
-					{ icon: 'editor-aligncenter', title: 'Align center' },
-					{ icon: 'editor-alignright', title: 'Align right' },
-				] }
-			/>
 			<ToolbarGroup>
-				<ToolbarButton icon="editor-bold" title="Bold" />
-				<ToolbarButton icon="editor-italic" title="Italic" />
-				<ToolbarButton icon="admin-links" title="Link" />
+				<ToolbarItem>
+					{ ( toggleProps ) => (
+						<DropdownMenu
+							hasArrowIndicator
+							icon={ alignLeft }
+							label="Change text alignment"
+							controls={ [
+								{
+									icon: alignLeft,
+									title: 'Align left',
+									isActive: true,
+								},
+								{
+									icon: alignCenter,
+									title: 'Align center',
+								},
+								{
+									icon: alignRight,
+									title: 'Align right',
+								},
+							] }
+							toggleProps={ toggleProps }
+						/>
+					) }
+				</ToolbarItem>
+			</ToolbarGroup>
+			<ToolbarGroup>
+				<ToolbarButton>Text</ToolbarButton>
+				<ToolbarButton icon={ formatBold } label="Bold" isPressed />
+				<ToolbarButton icon={ formatItalic } label="Italic" />
+				<ToolbarButton icon={ link } label="Link" />
 				<ToolbarGroup
 					isCollapsed
 					icon={ false }
 					label="More rich text controls"
 					controls={ [
-						{ icon: 'editor-code', title: 'Inline code' },
+						{ icon: code, title: 'Inline code' },
 						{ icon: <InlineImageIcon />, title: 'Inline image' },
-						{ icon: 'editor-strikethrough', title: 'Strikethrough' },
+						{
+							icon: formatStrikethrough,
+							title: 'Strikethrough',
+						},
 					] }
 				/>
 			</ToolbarGroup>
 			<ToolbarGroup
-				hasArrowIndicator={ false }
-				icon="ellipsis"
+				icon={ more }
 				label="Change text alignment"
 				isCollapsed
 				controls={ [
-					{ icon: 'editor-alignleft', title: 'Align left', isActive: true },
-					{ icon: 'editor-aligncenter', title: 'Align center' },
-					{ icon: 'editor-alignright', title: 'Align right' },
+					{
+						icon: alignLeft,
+						title: 'Align left',
+						isActive: true,
+					},
+					{ icon: alignCenter, title: 'Align center' },
+					{ icon: alignRight, title: 'Align right' },
 				] }
 			/>
 		</Toolbar>
@@ -65,10 +115,13 @@ export const _default = () => {
 export const withoutGroup = () => {
 	return (
 		// id is required for server side rendering
-		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar-without-group">
-			<ToolbarButton icon="editor-bold" title="Bold" />
-			<ToolbarButton icon="editor-italic" title="Italic" />
-			<ToolbarButton icon="admin-links" title="Link" />
+		<Toolbar
+			__experimentalAccessibilityLabel="Options"
+			id="options-toolbar-without-group"
+		>
+			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
+			<ToolbarButton icon={ formatItalic } label="Italic" />
+			<ToolbarButton icon={ link } label="Link" />
 		</Toolbar>
 	);
 };

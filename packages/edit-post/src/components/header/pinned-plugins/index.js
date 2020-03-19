@@ -12,11 +12,11 @@ const { Fill: PinnedPlugins, Slot } = createSlotFill( 'PinnedPlugins' );
 
 PinnedPlugins.Slot = ( props ) => (
 	<Slot { ...props }>
-		{ ( fills ) => ! isEmpty( fills ) && (
-			<div className="edit-post-pinned-plugins">
-				{ fills }
-			</div>
-		) }
+		{ ( fills ) =>
+			! isEmpty( fills ) && (
+				<div className="edit-post-pinned-plugins">{ fills }</div>
+			)
+		}
 	</Slot>
 );
 

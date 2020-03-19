@@ -87,11 +87,7 @@ export class Saturation extends Component {
 
 	brighten( amount = 0.01 ) {
 		const { hsv, onChange = noop } = this.props;
-		const intValue = clamp(
-			hsv.v + Math.round( amount * 100 ),
-			0,
-			100
-		);
+		const intValue = clamp( hsv.v + Math.round( amount * 100 ), 0, 100 );
 		const change = {
 			h: hsv.h,
 			s: hsv.s,
@@ -105,7 +101,11 @@ export class Saturation extends Component {
 
 	handleChange( e ) {
 		const { onChange = noop } = this.props;
-		const change = calculateSaturationChange( e, this.props, this.container.current );
+		const change = calculateSaturationChange(
+			e,
+			this.props,
+			this.container.current
+		);
 		this.throttle( onChange, change, e );
 	}
 
@@ -134,7 +134,7 @@ export class Saturation extends Component {
 	render() {
 		const { hsv, hsl, instanceId } = this.props;
 		const pointerLocation = {
-			top: `${ -( hsv.v ) + 100 }%`,
+			top: `${ -hsv.v + 100 }%`,
 			left: `${ hsv.s }%`,
 		};
 		const shortcuts = {
@@ -174,7 +174,8 @@ export class Saturation extends Component {
 						onKeyDown={ this.preventKeyEvents }
 					/>
 					<VisuallyHidden
-						id={ `color-picker-saturation-${ instanceId }` }>
+						id={ `color-picker-saturation-${ instanceId }` }
+					>
 						{ __(
 							'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.'
 						) }
@@ -186,7 +187,4 @@ export class Saturation extends Component {
 	}
 }
 
-export default compose(
-	pure,
-	withInstanceId
-)( Saturation );
+export default compose( pure, withInstanceId )( Saturation );

@@ -7,7 +7,8 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { Button, Dashicon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { Icon, plusCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,9 +16,22 @@ import { Button, Dashicon } from '@wordpress/components';
 import Inserter from '../inserter';
 import styles from './styles.scss';
 
-function ButtonBlockAppender( { rootClientId, getStylesFromColorScheme, showSeparator } ) {
-	const appenderStyle = { ...styles.appender, ...getStylesFromColorScheme( styles.appenderLight, styles.appenderDark ) };
-	const addBlockButtonStyle = getStylesFromColorScheme( styles.addBlockButton, styles.addBlockButtonDark );
+function ButtonBlockAppender( {
+	rootClientId,
+	getStylesFromColorScheme,
+	showSeparator,
+} ) {
+	const appenderStyle = {
+		...styles.appender,
+		...getStylesFromColorScheme(
+			styles.appenderLight,
+			styles.appenderDark
+		),
+	};
+	const addBlockButtonStyle = getStylesFromColorScheme(
+		styles.addBlockButton,
+		styles.addBlockButtonDark
+	);
 
 	return (
 		<>
@@ -31,8 +45,8 @@ function ButtonBlockAppender( { rootClientId, getStylesFromColorScheme, showSepa
 						fixedRatio={ false }
 					>
 						<View style={ appenderStyle }>
-							<Dashicon
-								icon="plus-alt"
+							<Icon
+								icon={ plusCircleFilled }
 								style={ addBlockButtonStyle }
 								color={ addBlockButtonStyle.color }
 								size={ addBlockButtonStyle.size }

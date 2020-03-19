@@ -33,15 +33,13 @@ class FormFileUpload extends Component {
 			...props
 		} = this.props;
 
-		const ui = render ?
-			render( { openFileDialog: this.openFileDialog } ) : (
-				<Button
-					onClick={ this.openFileDialog }
-					{ ...props }
-				>
-					{ children }
-				</Button>
-			);
+		const ui = render ? (
+			render( { openFileDialog: this.openFileDialog } )
+		) : (
+			<Button onClick={ this.openFileDialog } { ...props }>
+				{ children }
+			</Button>
+		);
 		return (
 			<div className="components-form-file-upload">
 				{ ui }

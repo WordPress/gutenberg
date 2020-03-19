@@ -1,5 +1,13 @@
-// Components
-export * from './primitives';
+export {
+	SVG,
+	Path,
+	Circle,
+	Polygon,
+	Rect,
+	G,
+	HorizontalRule,
+	BlockQuotation,
+} from '@wordpress/primitives';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as Dashicon } from './dashicon';
@@ -7,10 +15,16 @@ export { default as Dropdown } from './dropdown';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as ToolbarGroup } from './toolbar-group';
+export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
 export { default as Spinner } from './spinner';
-export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
+export {
+	createSlotFill,
+	Slot,
+	Fill,
+	Provider as SlotFillProvider,
+} from './slot-fill';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';
@@ -20,6 +34,9 @@ export { default as TextControl } from './text-control';
 export { default as ToggleControl } from './toggle-control';
 export { default as SelectControl } from './select-control';
 export { default as RangeControl } from './range-control';
+export { default as ResizableBox } from './resizable-box';
+export { default as UnsupportedFooterControl } from './unsupported-footer-control';
+export { default as QueryControls } from './query-controls';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
@@ -35,6 +52,10 @@ export { default as BottomSheet } from './mobile/bottom-sheet';
 export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
+export { default as ModalHeaderBar } from './mobile/modal-header-bar';
 export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as StepperControl } from './mobile/stepper-control';
+export { default as CycleSelectControl } from './mobile/cycle-select-control';
+export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
+export { default as LinearGradient } from './mobile/linear-gradient';

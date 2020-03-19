@@ -8,25 +8,23 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { alt, url, id } ) => (
+			transform: ( { alt, url, id } ) =>
 				createBlock( 'core/media-text', {
 					mediaAlt: alt,
 					mediaId: id,
 					mediaUrl: url,
 					mediaType: 'image',
-				} )
-			),
+				} ),
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
-			transform: ( { src, id } ) => (
+			transform: ( { src, id } ) =>
 				createBlock( 'core/media-text', {
 					mediaId: id,
 					mediaUrl: src,
 					mediaType: 'video',
-				} )
-			),
+				} ),
 		},
 	],
 	to: [

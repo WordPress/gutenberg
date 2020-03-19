@@ -14,5 +14,8 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Template Part' ),
+	supports: {
+		html: false,
+	},
 	edit,
 };

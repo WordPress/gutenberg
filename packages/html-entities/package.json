@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/html-entities",
-	"version": "2.5.0",
+	"version": "2.6.0",
 	"description": "HTML entity utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4"
+		"@babel/runtime": "^7.8.3"
 	},
 	"publishConfig": {
 		"access": "public"

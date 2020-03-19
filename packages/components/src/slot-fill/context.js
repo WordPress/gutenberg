@@ -6,7 +6,18 @@ import { sortBy, forEach, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createContext, useContext, useState, useEffect } from '@wordpress/element';
+import {
+	Component,
+	createContext,
+	useContext,
+	useState,
+	useEffect,
+} from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import SlotFillBubblesVirtuallyProvider from './bubbles-virtually/slot-fill-provider';
 
 const SlotFillContext = createContext( {
 	registerSlot: () => {},
@@ -66,10 +77,7 @@ class SlotFillProvider extends Component {
 	}
 
 	registerFill( name, instance ) {
-		this.fills[ name ] = [
-			...( this.fills[ name ] || [] ),
-			instance,
-		];
+		this.fills[ name ] = [ ...( this.fills[ name ] || [] ), instance ];
 		this.forceUpdateSlot( name );
 	}
 
@@ -86,10 +94,7 @@ class SlotFillProvider extends Component {
 	}
 
 	unregisterFill( name, instance ) {
-		this.fills[ name ] = without(
-			this.fills[ name ],
-			instance
-		);
+		this.fills[ name ] = without( this.fills[ name ], instance );
 		this.resetFillOccurrence( name );
 		this.forceUpdateSlot( name );
 	}
@@ -140,7 +145,9 @@ class SlotFillProvider extends Component {
 	render() {
 		return (
 			<Provider value={ this.contextValue }>
-				{ this.props.children }
+				<SlotFillBubblesVirtuallyProvider>
+					{ this.props.children }
+				</SlotFillBubblesVirtuallyProvider>
 			</Provider>
 		);
 	}

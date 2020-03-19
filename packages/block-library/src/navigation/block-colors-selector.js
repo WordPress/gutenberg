@@ -1,15 +1,15 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Button, Dropdown, ToolbarGroup, SVG, Path } from '@wordpress/components';
+import {
+	Button,
+	Dropdown,
+	ToolbarGroup,
+	SVG,
+	Path,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
-import { ColorPaletteControl } from '@wordpress/block-editor';
 
 const ColorSelectorSVGIcon = () => (
 	<SVG xmlns="https://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -23,12 +23,12 @@ const ColorSelectorSVGIcon = () => (
  * @param {Object} colorControlProps colorControl properties.
  * @return {*} React Icon component.
  */
-const ColorSelectorIcon = ( { color } ) => {
+const ColorSelectorIcon = ( { style, className } ) => {
 	return (
 		<div className="block-library-colors-selector__icon-container">
 			<div
-				className="block-library-colors-selector__state-selection"
-				style={ { ...( color && { color } ) } }
+				className={ `${ className } block-library-colors-selector__state-selection` }
+				style={ style }
 			>
 				<ColorSelectorSVGIcon />
 			</div>
@@ -42,7 +42,10 @@ const ColorSelectorIcon = ( { color } ) => {
  * @param {Object} colorControlProps colorControl properties.
  * @return {*} React toggle button component.
  */
-const renderToggleComponent = ( { value } ) => ( { onToggle, isOpen } ) => {
+const renderToggleComponent = ( { TextColor, BackgroundColor } ) => ( {
+	onToggle,
+	isOpen,
+} ) => {
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();
@@ -58,32 +61,26 @@ const renderToggleComponent = ( { value } ) => ( { onToggle, isOpen } ) => {
 				label={ __( 'Open Colors Selector' ) }
 				onClick={ onToggle }
 				onKeyDown={ openOnArrowDown }
-				icon={ <ColorSelectorIcon color={ value } /> }
+				icon={
+					<BackgroundColor>
+						<TextColor>
+							<ColorSelectorIcon />
+						</TextColor>
+					</BackgroundColor>
+				}
 			/>
 		</ToolbarGroup>
 	);
 };
 
-const renderContent = ( { value, onChange = noop } ) => ( () => {
-	return (
-		<>
-			<div className="color-palette-controller-container">
-				<ColorPaletteControl
-					value={ value }
-					onChange={ onChange }
-					label={ __( 'Text Color' ) }
-				/>
-			</div>
-		</>
-	);
-} );
-
-export default ( colorControlProps ) => (
+const BlockColorsStyleSelector = ( { children, ...other } ) => (
 	<Dropdown
 		position="bottom right"
 		className="block-library-colors-selector"
 		contentClassName="block-library-colors-selector__popover"
-		renderToggle={ renderToggleComponent( colorControlProps ) }
-		renderContent={ renderContent( colorControlProps ) }
+		renderToggle={ renderToggleComponent( other ) }
+		renderContent={ () => children }
 	/>
 );
+
+export default BlockColorsStyleSelector;

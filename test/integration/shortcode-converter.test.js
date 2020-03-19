@@ -30,9 +30,9 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 							ids: {
 								type: 'array',
 								shortcode: ( { named: { ids } } ) =>
-									ids.split( ',' ).map( ( id ) => (
-										parseInt( id, 10 )
-									) ),
+									ids
+										.split( ',' )
+										.map( ( id ) => parseInt( id, 10 ) ),
 							},
 						},
 					},
@@ -56,7 +56,8 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 						attributes: {
 							id: {
 								type: 'number',
-								shortcode: ( { named: { id } } ) => parseInt( id, 10 ),
+								shortcode: ( { named: { id } } ) =>
+									parseInt( id, 10 ),
 							},
 						},
 						isMatch( { named: { id } } ) {
@@ -83,7 +84,8 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 						attributes: {
 							id: {
 								type: 'number',
-								shortcode: ( { named: { id } } ) => parseInt( id, 10 ),
+								shortcode: ( { named: { id } } ) =>
+									parseInt( id, 10 ),
 							},
 						},
 						isMatch( { named: { id } } ) {
@@ -129,9 +131,10 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 
 	it( 'should not convert a shortcode to a block type with a failing `isMatch`', () => {
 		const original = `<p>[my-broccoli id="1000"]</p>`;
-
 		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
-		const expectedBlock = createBlock( 'core/shortcode' );
+		const expectedBlock = createBlock( 'core/shortcode', {
+			text: '[my-broccoli id="1000"]',
+		} );
 		expectedBlock.clientId = transformed[ 1 ].clientId;
 		expect( transformed[ 1 ] ).toEqual( expectedBlock );
 	} );
@@ -142,11 +145,15 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		<p>[my-broccoli id="1000"]</p>`;
 
 		const transformed = segmentHTMLToShortcodeBlock( original );
-		const firstExpectedBlock = createBlock( 'test/fallback-broccoli', { id: 1001 } );
+		const firstExpectedBlock = createBlock( 'test/fallback-broccoli', {
+			id: 1001,
+		} );
 		firstExpectedBlock.clientId = transformed[ 1 ].clientId;
 		const secondExpectedBlock = createBlock( 'test/broccoli', { id: 42 } );
 		secondExpectedBlock.clientId = transformed[ 3 ].clientId;
-		const thirdExpectedBlock = createBlock( 'core/shortcode' );
+		const thirdExpectedBlock = createBlock( 'core/shortcode', {
+			text: '[my-broccoli id="1000"]',
+		} );
 		thirdExpectedBlock.clientId = transformed[ 5 ].clientId;
 		expect( transformed[ 1 ] ).toEqual( firstExpectedBlock );
 		expect( transformed[ 3 ] ).toEqual( secondExpectedBlock );
@@ -221,12 +228,14 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 
 	it( 'should not convert inline shortcodes', () => {
 		const originalInASentence = `<p>Here is a nice [foo shortcode].</p>`;
-		expect( segmentHTMLToShortcodeBlock( originalInASentence, 0 ) )
-			.toEqual( [ originalInASentence ] );
+		expect(
+			segmentHTMLToShortcodeBlock( originalInASentence, 0 )
+		).toEqual( [ originalInASentence ] );
 
 		const originalMultipleShortcodes = `<p>[foo bar] [baz quux]</p>`;
-		expect( segmentHTMLToShortcodeBlock( originalMultipleShortcodes, 0 ) )
-			.toEqual( [ originalMultipleShortcodes ] );
+		expect(
+			segmentHTMLToShortcodeBlock( originalMultipleShortcodes, 0 )
+		).toEqual( [ originalMultipleShortcodes ] );
 	} );
 
 	it( 'should convert regardless of shortcode alias', () => {

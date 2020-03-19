@@ -1,0 +1,16 @@
+{
+	"name": "core/social-link",
+	"category": "widgets",
+	"icon": "share",
+	"attributes": {
+		"url": {
+			"type": "string"
+		},
+		"service": {
+			"type": "string"
+		},
+		"label": {
+			"type": "string"
+		}
+	}
+}

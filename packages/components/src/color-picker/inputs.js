@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { DOWN, ENTER, UP } from '@wordpress/keycodes';
 import { pure } from '@wordpress/compose';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -286,9 +287,10 @@ export class Inputs extends Component {
 		return (
 			<div className="components-color-picker__inputs-wrapper">
 				{ this.renderFields() }
-				<div className="components-color-picker__inputs-toggle">
+				<div className="components-color-picker__inputs-toggle-wrapper">
 					<PureButton
-						icon="arrow-down-alt2"
+						className="components-color-picker__inputs-toggle"
+						icon={ chevronDown }
 						label={ __( 'Change color format' ) }
 						onClick={ this.toggleViews }
 					/>

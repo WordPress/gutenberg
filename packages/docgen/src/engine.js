@@ -9,36 +9,40 @@ const { flatten } = require( 'lodash' );
  */
 const getIntermediateRepresentation = require( './get-intermediate-representation' );
 
-const getAST = ( source ) => espree.parse( source, {
-	attachComment: true,
-	loc: true,
-	ecmaVersion: 2018,
-	ecmaFeatures: {
-		jsx: true,
-	},
-	sourceType: 'module',
-} );
+const getAST = ( source ) =>
+	espree.parse( source, {
+		attachComment: true,
+		loc: true,
+		ecmaVersion: 2018,
+		ecmaFeatures: {
+			jsx: true,
+		},
+		sourceType: 'module',
+	} );
 
-const getExportTokens = ( ast ) => ast.body.filter(
-	( node ) => [
-		'ExportNamedDeclaration',
-		'ExportDefaultDeclaration',
-		'ExportAllDeclaration',
-	].some( ( declaration ) => declaration === node.type )
-);
+const getExportTokens = ( ast ) =>
+	ast.body.filter( ( node ) =>
+		[
+			'ExportNamedDeclaration',
+			'ExportDefaultDeclaration',
+			'ExportAllDeclaration',
+		].some( ( declaration ) => declaration === node.type )
+	);
 
 const engine = ( path, code, getIRFromPath = () => {} ) => {
 	const result = {};
 	result.ast = getAST( code );
 	result.tokens = getExportTokens( result.ast );
-	result.ir = flatten( result.tokens.map(
-		( token ) => getIntermediateRepresentation(
-			path,
-			token,
-			result.ast,
-			getIRFromPath
+	result.ir = flatten(
+		result.tokens.map( ( token ) =>
+			getIntermediateRepresentation(
+				path,
+				token,
+				result.ast,
+				getIRFromPath
+			)
 		)
-	) );
+	);
 
 	return result;
 };

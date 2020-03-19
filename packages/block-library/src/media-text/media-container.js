@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Button, ResizableBox, ToolbarGroup, withNotices } from '@wordpress/components';
+import { ResizableBox, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	MediaUpload,
+	MediaReplaceFlow,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -24,12 +24,14 @@ import icon from './media-container-icon';
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 
 export function imageFillStyles( url, focalPoint ) {
-	return url ?
-		{
-			backgroundImage: `url(${ url })`,
-			backgroundPosition: focalPoint ? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%` : `50% 50%`,
-		} :
-		{};
+	return url
+		? {
+				backgroundImage: `url(${ url })`,
+				backgroundPosition: focalPoint
+					? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
+					: `50% 50%`,
+		  }
+		: {};
 }
 
 class MediaContainer extends Component {
@@ -45,31 +47,31 @@ class MediaContainer extends Component {
 	}
 
 	renderToolbarEditButton() {
-		const { mediaId, onSelectMedia } = this.props;
+		const { onSelectMedia, mediaUrl, mediaId } = this.props;
 		return (
 			<BlockControls>
-				<ToolbarGroup>
-					<MediaUpload
-						onSelect={ onSelectMedia }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ mediaId }
-						render={ ( { open } ) => (
-							<Button
-								className="components-toolbar__control"
-								label={ __( 'Edit media' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
-					/>
-				</ToolbarGroup>
+				<MediaReplaceFlow
+					mediaId={ mediaId }
+					mediaURL={ mediaUrl }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*,video/*"
+					onSelect={ onSelectMedia }
+				/>
 			</BlockControls>
 		);
 	}
 
 	renderImage() {
-		const { mediaAlt, mediaUrl, className, imageFill, focalPoint } = this.props;
-		const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
+		const {
+			mediaAlt,
+			mediaUrl,
+			className,
+			imageFill,
+			focalPoint,
+		} = this.props;
+		const backgroundStyles = imageFill
+			? imageFillStyles( mediaUrl, focalPoint )
+			: {};
 		return (
 			<>
 				{ this.renderToolbarEditButton() }
@@ -111,7 +113,15 @@ class MediaContainer extends Component {
 	}
 
 	render() {
-		const { mediaPosition, mediaUrl, mediaType, mediaWidth, commitWidthChange, onWidthChange, toggleSelection } = this.props;
+		const {
+			mediaPosition,
+			mediaUrl,
+			mediaType,
+			mediaWidth,
+			commitWidthChange,
+			onWidthChange,
+			toggleSelection,
+		} = this.props;
 		if ( mediaType && mediaUrl ) {
 			const onResizeStart = () => {
 				toggleSelection( false );

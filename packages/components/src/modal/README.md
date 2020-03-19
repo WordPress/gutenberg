@@ -244,4 +244,4 @@ If this property is added, it will an additional class name to the modal overlay
 
 ## Related components
 
-- To notify a user with a mesage of medium importance, use `Notice`.
+- To notify a user with a message of medium importance, use `Notice`.

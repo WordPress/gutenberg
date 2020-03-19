@@ -110,7 +110,7 @@ register_block_style(
 
 The function's first argument is the registered name of the block, and the name of the style as the second argument.
 
-The following code sample unregisteres the style named 'fancy-quote'  from the quote block:
+The following code sample unregisters the style named 'fancy-quote'  from the quote block:
 
 ```php
 unregister_block_style( 'core/quote', 'fancy-quote' );
@@ -324,12 +324,25 @@ wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-nam
 
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
+{% codetabs %}
+{% ES5 %}
 ```js
 // my-plugin.js
 wp.domReady( function() {
 	wp.blocks.unregisterBlockType( 'core/verse' );
 } );
 ```
+{% ESNext %}
+```js
+// my-plugin.js
+import { unregisterBlockType } from '@wordpress/blocks';
+import domReady from '@wordpress/dom-ready'
+
+domReady( function() {
+	unregisterBlockType( 'core/verse' );
+} );
+```
+{% end %}
 
 and load this script in the Editor
 
@@ -346,6 +359,8 @@ function my_plugin_blacklist_blocks() {
 }
 add_action( 'enqueue_block_editor_assets', 'my_plugin_blacklist_blocks' );
 ```
+
+**Important:** When unregistering a block, there can be a [race condition](https://en.wikipedia.org/wiki/Race_condition) on which code runs first: registering the block, or unregistering the block. You want your unregister code to run last. The way to do that is specify the component that is registering the block as a dependency, in this case `wp-edit-post`. Additionally, using `wp.domReady()` ensures the unregister code runs once the dom is loaded.
 
 ### Using a whitelist
 
@@ -414,16 +429,15 @@ add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 
 You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/).
 
-It is possible to set an SVG as the icon of the category if a custom icon is needed. To do so, the icon should be rendered and set on the frontend, so it can make use of WordPress SVG, allowing mobile compatibility and making the icon more accessible.
+You can also set a custom icon in SVG format. To do so, the icon should be rendered and set on the frontend, so it can make use of WordPress SVG, allowing mobile compatibility and making the icon more accessible.
 
 To set an SVG icon for the category shown in the previous example, add the following example JavaScript code to the editor calling `wp.blocks.updateCategory` e.g:
 ```js
 ( function() {
 	var el = wp.element.createElement;
-	var SVG = wp.components.SVG;
+	var SVG = wp.primitives.SVG;
 	var circle = el( 'circle', { cx: 10, cy: 10, r: 10, fill: 'red', stroke: 'blue', strokeWidth: '10' } );
 	var svgIcon = el( SVG, { width: 20, height: 20, viewBox: '0 0 20 20'}, circle);
 	wp.blocks.updateCategory( 'my-category', { icon: svgIcon } );
 } )();
 ```
-

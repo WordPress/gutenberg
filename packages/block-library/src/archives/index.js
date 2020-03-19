@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { archive as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import icon from './icon';
 
 export const name = 'core/archives';
 

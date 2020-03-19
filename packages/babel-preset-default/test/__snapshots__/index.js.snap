@@ -65,5 +65,16 @@ describe('Babel preset default', function () {
       }
     }, _callee2);
   })));
+  test('support for optional chaining', function () {
+    var _obj$foo, _obj$foo2;
+
+    var obj = {
+      foo: {
+        bar: 42
+      }
+    };
+    expect(obj === null || obj === void 0 ? void 0 : (_obj$foo = obj.foo) === null || _obj$foo === void 0 ? void 0 : _obj$foo.bar).toEqual(42);
+    expect(obj === null || obj === void 0 ? void 0 : (_obj$foo2 = obj.foo) === null || _obj$foo2 === void 0 ? void 0 : _obj$foo2.baz).toEqual(undefined);
+  });
 });"
 `;

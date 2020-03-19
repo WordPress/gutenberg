@@ -101,18 +101,22 @@ export function getNotificationArgumentsForSaveFail( data ) {
 		private: __( 'Publishing failed.' ),
 		future: __( 'Scheduling failed.' ),
 	};
-	let noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1 ?
-		messages[ edits.status ] :
-		__( 'Updating failed.' );
+	let noticeMessage =
+		! isPublished && publishStatus.indexOf( edits.status ) !== -1
+			? messages[ edits.status ]
+			: __( 'Updating failed.' );
 
 	// Check if message string contains HTML. Notice text is currently only
 	// supported as plaintext, and stripping the tags may muddle the meaning.
-	if ( error.message && ! ( /<\/?[^>]*>/.test( error.message ) ) ) {
+	if ( error.message && ! /<\/?[^>]*>/.test( error.message ) ) {
 		noticeMessage = [ noticeMessage, error.message ].join( ' ' );
 	}
-	return [ noticeMessage, {
-		id: SAVE_POST_NOTICE_ID,
-	} ];
+	return [
+		noticeMessage,
+		{
+			id: SAVE_POST_NOTICE_ID,
+		},
+	];
 }
 
 /**
@@ -124,9 +128,9 @@ export function getNotificationArgumentsForSaveFail( data ) {
  */
 export function getNotificationArgumentsForTrashFail( data ) {
 	return [
-		data.error.message && data.error.code !== 'unknown_error' ?
-			data.error.message :
-			__( 'Trashing failed' ),
+		data.error.message && data.error.code !== 'unknown_error'
+			? data.error.message
+			: __( 'Trashing failed' ),
 		{
 			id: TRASH_POST_NOTICE_ID,
 		},

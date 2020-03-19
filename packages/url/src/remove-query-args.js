@@ -18,8 +18,12 @@ import { parse, stringify } from 'qs';
  */
 export function removeQueryArgs( url, ...args ) {
 	const queryStringIndex = url.indexOf( '?' );
-	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
-	const baseUrl = queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
+	const query =
+		queryStringIndex !== -1
+			? parse( url.substr( queryStringIndex + 1 ) )
+			: {};
+	const baseUrl =
+		queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
 
 	args.forEach( ( arg ) => delete query[ arg ] );
 

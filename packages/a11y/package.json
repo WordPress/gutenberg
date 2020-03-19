@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/a11y",
-	"version": "2.5.1",
+	"version": "2.7.0",
 	"description": "Accessibility (a11y) utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.8.3",
 		"@wordpress/dom-ready": "file:../dom-ready"
 	},
 	"publishConfig": {

@@ -10,7 +10,7 @@ There are a few new concepts to consider when building themes:
 - **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.
 - **Dark Mode** - If a Theme is a Dark Theme with a dark background containing light text, the theme author can opt-in to the Dark Mode.
 
-By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the blocks provide.
+By default, blocks provide their styles to enable basic support for blocks in themes without any change. They also [provide opt-in opinonated styles](#default-block-styles). Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the blocks provide.
 
 Some advanced block features require opt-in support in the theme itself as it's difficult for the block to provide these styles, they may require some architecting of the theme itself, in order to work well.
 
@@ -46,6 +46,14 @@ add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
 ```
 
 ## Opt-in features
+
+## Default block styles
+
+Core blocks include default styles. The styles are enqueued for editing but are not enqueued for viewing unless the theme opts-in to the core styles. If you'd like to use default styles in your theme, add theme support for `wp-block-styles`:
+
+```php
+add_theme_support( 'wp-block-styles' );
+```
 
 ### Wide Alignment:
 
@@ -140,7 +148,7 @@ Different blocks have the possibility of selecting from a list of predefined gra
 
 ```php
 add_theme_support(
-	'__experimental-editor-gradient-presets',
+	'editor-gradient-presets',
 	array(
 		array(
 			'name'     => __( 'Vivid cyan blue to vivid purple', 'themeLangDomain' ),
@@ -172,6 +180,14 @@ add_theme_support(
 ```
 
 `name` is a human-readable label (demonstrated above) that appears in the tooltip and provides a meaningful description of the gradient to users. It is especially important for those who rely on screen readers or would otherwise have difficulty perceiving the color. `gradient` is a CSS value of a gradient applied to a background-image of the block. Details of valid gradient types can be found in the [mozilla documentation](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Images/Using_CSS_gradients). `slug` is a unique identifier for the gradient and is used to generate the CSS classes used by the block editor.
+
+Themes are responsible for creating the classes that apply the gradients. So to correctly apply "Vivid cyan blue to vivid purple" a theme should implement the following class:
+
+```css
+.has-vivid-cyan-blue-to-vivid-purple-gradient-background {
+	background: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);
+}
+```
 
 
 ### Block Font Sizes:
@@ -239,6 +255,16 @@ add_theme_support( 'disable-custom-colors' );
 ```
 
 This flag will make sure users are only able to choose colors from the `editor-color-palette` the theme provided or from the editor default colors if the theme did not provide one.
+
+### Disabling custom gradients
+
+Themes can disable the ability to set a custom gradient with the following code:
+
+```php
+add_theme_support( 'disable-custom-gradients' );
+```
+
+When set, users will be restricted to the default gradients provided in the block editor or the gradients provided via the `editor-gradient-presets` theme support setting.
 
 ## Editor styles
 
@@ -313,14 +339,6 @@ To change the main column width of the editor, add the following CSS to `style-e
 You can use those editor widths to match those in your theme. You can use any CSS width unit, including `%` or `px`.
 
 Further reading: [Applying Styles with Stylesheets](/docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md).
-
-## Default block styles
-
-Core blocks include default styles. The styles are enqueued for editing but are not enqueued for viewing unless the theme opts-in to the core styles. If you'd like to use default styles in your theme, add theme support for `wp-block-styles`:
-
-```php
-add_theme_support( 'wp-block-styles' );
-```
 
 ## Responsive embedded content
 

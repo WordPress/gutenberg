@@ -28,8 +28,10 @@ class Sandbox extends Component {
 		this.trySandbox();
 	}
 
-	componentDidUpdate() {
-		this.trySandbox();
+	componentDidUpdate( prevProps ) {
+		const forceRerender = prevProps.html !== this.props.html;
+
+		this.trySandbox( forceRerender );
 	}
 
 	isFrameAccessible() {
@@ -61,18 +63,24 @@ class Sandbox extends Component {
 		const { action, width, height } = data;
 		const { width: oldWidth, height: oldHeight } = this.state;
 
-		if ( 'resize' === action && ( oldWidth !== width || oldHeight !== height ) ) {
+		if (
+			'resize' === action &&
+			( oldWidth !== width || oldHeight !== height )
+		) {
 			this.setState( { width, height } );
 		}
 	}
 
-	trySandbox() {
+	trySandbox( forceRerender = false ) {
 		if ( ! this.isFrameAccessible() ) {
 			return;
 		}
 
 		const body = this.iframe.current.contentDocument.body;
-		if ( null !== body.getAttribute( 'data-resizable-iframe-connected' ) ) {
+		if (
+			! forceRerender &&
+			null !== body.getAttribute( 'data-resizable-iframe-connected' )
+		) {
 			return;
 		}
 
@@ -163,20 +171,38 @@ class Sandbox extends Component {
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
 		// that expect the scripts to be part of the body.
 		const htmlDoc = (
-			<html lang={ document.documentElement.lang } className={ this.props.type }>
+			<html
+				lang={ document.documentElement.lang }
+				className={ this.props.type }
+			>
 				<head>
 					<title>{ this.props.title }</title>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
-					{ ( this.props.styles && this.props.styles.map(
-						( rules, i ) => <style key={ i } dangerouslySetInnerHTML={ { __html: rules } } />
-					) ) }
+					{ this.props.styles &&
+						this.props.styles.map( ( rules, i ) => (
+							<style
+								key={ i }
+								dangerouslySetInnerHTML={ { __html: rules } }
+							/>
+						) ) }
 				</head>
-				<body data-resizable-iframe-connected="data-resizable-iframe-connected" className={ this.props.type }>
-					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />
-					<script type="text/javascript" dangerouslySetInnerHTML={ { __html: observeAndResizeJS } } />
-					{ ( this.props.scripts && this.props.scripts.map(
-						( src ) => <script key={ src } src={ src } />
-					) ) }
+				<body
+					data-resizable-iframe-connected="data-resizable-iframe-connected"
+					className={ this.props.type }
+				>
+					<div
+						dangerouslySetInnerHTML={ { __html: this.props.html } }
+					/>
+					<script
+						type="text/javascript"
+						dangerouslySetInnerHTML={ {
+							__html: observeAndResizeJS,
+						} }
+					/>
+					{ this.props.scripts &&
+						this.props.scripts.map( ( src ) => (
+							<script key={ src } src={ src } />
+						) ) }
 				</body>
 			</html>
 		);
@@ -209,7 +235,8 @@ class Sandbox extends Component {
 				onLoad={ this.trySandbox }
 				onFocus={ onFocus }
 				width={ Math.ceil( this.state.width ) }
-				height={ Math.ceil( this.state.height ) } />
+				height={ Math.ceil( this.state.height ) }
+			/>
 		);
 	}
 }

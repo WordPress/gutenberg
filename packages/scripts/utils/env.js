@@ -48,7 +48,11 @@ function mergeYAMLConfigs( originalConfig, newConfig, baseDir ) {
 			originalConfig[ key ] = [ ...cleanOriginal, ...newConfig[ key ] ];
 		} else if ( isPlainObject( newConfig[ key ] ) ) {
 			// If the newConfig element is an object, we need to recursively merge it.
-			originalConfig[ key ] = mergeYAMLConfigs( originalConfig[ key ], newConfig[ key ], baseDir );
+			originalConfig[ key ] = mergeYAMLConfigs(
+				originalConfig[ key ],
+				newConfig[ key ],
+				baseDir
+			);
 		} else {
 			// Any other data types are overwritten by the newConfig.
 			originalConfig[ key ] = newConfig[ key ];
@@ -92,7 +96,9 @@ function downloadWordPressZip() {
 		stdout.write( 'Downloading...\n' );
 		// Download the archive.
 		request
-			.get( 'https://github.com/WordPress/wordpress-develop/archive/master.zip' )
+			.get(
+				'https://github.com/WordPress/wordpress-develop/archive/master.zip'
+			)
 			.on( 'error', ( error ) => {
 				stdout.write( "ERROR: The zip file couldn't be downloaded.\n" );
 				stdout.write( error.toString() );
@@ -110,30 +116,62 @@ function downloadWordPressZip() {
  */
 function buildWordPress( newInstall, fastInstall ) {
 	if ( ! fastInstall ) {
-		execSync( 'npm install', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
-		execSync( 'npm run env:start', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+		execSync( 'npm install', {
+			cwd: env.WP_DEVELOP_DIR,
+			stdio: 'inherit',
+		} );
+		execSync( 'npm run env:start', {
+			cwd: env.WP_DEVELOP_DIR,
+			stdio: 'inherit',
+		} );
 		if ( env.LOCAL_DIR === 'build' ) {
-			execSync( 'npm run build', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+			execSync( 'npm run build', {
+				cwd: env.WP_DEVELOP_DIR,
+				stdio: 'inherit',
+			} );
 		} else {
-			execSync( 'npm run build:dev', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+			execSync( 'npm run build:dev', {
+				cwd: env.WP_DEVELOP_DIR,
+				stdio: 'inherit',
+			} );
 		}
 	}
 
 	if ( newInstall ) {
-		execSync( 'npm run env:install', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+		execSync( 'npm run env:install', {
+			cwd: env.WP_DEVELOP_DIR,
+			stdio: 'inherit',
+		} );
 	}
 
 	// Mount the plugin into the WordPress install.
 	execSync( 'npm run env connect', { stdio: 'inherit' } );
 
 	if ( newInstall ) {
-		execSync( `npm run env cli plugin activate ${ env.npm_package_wp_env_plugin_dir }`, { stdio: 'inherit' } );
+		execSync(
+			`npm run env cli plugin activate ${ env.npm_package_wp_env_plugin_dir }`,
+			{
+				stdio: 'inherit',
+			}
+		);
 
-		const currentUrl = execSync( 'npm run --silent env cli option get siteurl' ).toString().trim();
+		const currentUrl = execSync(
+			'npm run --silent env cli option get siteurl'
+		)
+			.toString()
+			.trim();
 
 		stdout.write( chalk.white( '\nWelcome to...\n' ) );
-		for ( let ii = 0; env[ `npm_package_wp_env_welcome_logo_${ ii }` ]; ii++ ) {
-			stdout.write( chalk.green( env[ `npm_package_wp_env_welcome_logo_${ ii }` ] ) + '\n' );
+		for (
+			let ii = 0;
+			env[ `npm_package_wp_env_welcome_logo_${ ii }` ];
+			ii++
+		) {
+			stdout.write(
+				chalk.green(
+					env[ `npm_package_wp_env_welcome_logo_${ ii }` ]
+				) + '\n'
+			);
 		}
 
 		if ( env.npm_package_wp_env_welcome_build_command ) {
@@ -146,7 +184,11 @@ function buildWordPress( newInstall, fastInstall ) {
 			stdout.write( chalk.white( nextStep ) );
 		}
 
-		stdout.write( chalk.white( '\nAccess the above install using the following credentials:\n' ) );
+		stdout.write(
+			chalk.white(
+				'\nAccess the above install using the following credentials:\n'
+			)
+		);
 
 		const access = sprintf(
 			'Default username: %s, password: %s\n',

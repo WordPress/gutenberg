@@ -135,7 +135,7 @@ _Parameters_
 
 -   _shortcuts_ `(Array<string>|string)`: Keyboard Shortcuts.
 -   _callback_ `Function`: Shortcut callback.
--   _options_ `Object`: Shortcut options.
+-   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
 
@@ -157,6 +157,30 @@ _Returns_
 
 -   `boolean`: Reduced motion preference value.
 
+<a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
+
+Hook which allows to listen the resize event of any target element when it changes sizes.
+_Note: `useResizeObserver` will report `null` until after first render_
+
+_Usage_
+
+```js
+const App = () => {
+	const [ resizeListener, sizes ] = useResizeObserver();
+
+	return (
+		<div>
+			{ resizeListener }
+			Your content here
+		</div>
+	);
+};
+```
+
+_Returns_
+
+-   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
+
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
 Returns true if the viewport matches the given query, or false otherwise.
@@ -164,7 +188,7 @@ Returns true if the viewport matches the given query, or false otherwise.
 _Usage_
 
 ```js
-useViewportMatch( 'huge', <' );
+useViewportMatch( 'huge', '<' );
 useViewportMatch( 'medium' );
 ```
 

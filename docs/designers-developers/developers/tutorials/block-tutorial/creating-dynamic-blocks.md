@@ -30,10 +30,9 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 
 	edit: withSelect( ( select ) => {
 		return {
-			posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
+			posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
 		};
 	} )( ( { posts, className } ) => {
-
 		if ( ! posts ) {
 			return 'Loading...';
 		}
@@ -42,7 +41,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 			return 'No posts';
 		}
 
-		let post = posts[ 0 ];
+		const post = posts[ 0 ];
 
 		return <a className={ className } href={ post.link }>
 			{ post.title.rendered }
@@ -53,28 +52,25 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 {% ES5 %}
 ```js
 ( function( blocks, element, data ) {
-
 	var el = element.createElement,
-	registerBlockType = blocks.registerBlockType,
-	withSelect = data.withSelect;
+		registerBlockType = blocks.registerBlockType,
+		withSelect = data.withSelect;
 
 	registerBlockType( 'gutenberg-examples/example-dynamic', {
 		title: 'Example: last post',
 		icon: 'megaphone',
 		category: 'widgets',
-		
 		edit: withSelect( function( select ) {
 			return {
-				posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
+				posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
 			};
 		} )( function( props ) {
-
 			if ( ! props.posts ) {
-				return "Loading...";
+				return 'Loading...';
 			}
 
 			if ( props.posts.length === 0 ) {
-				return "No posts";
+				return 'No posts';
 			}
 			var className = props.className;
 			var post = props.posts[ 0 ];
@@ -177,10 +173,9 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 {% ES5 %}
 ```js
 ( function( blocks, element, serverSideRender ) {
-
 	var el = element.createElement,
-	registerBlockType = blocks.registerBlockType,
-	ServerSideRender = serverSideRender;
+		registerBlockType = blocks.registerBlockType,
+		ServerSideRender = serverSideRender;
 
 	registerBlockType( 'gutenberg-examples/example-dynamic', {
 		title: 'Example: last post',
@@ -188,11 +183,10 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 		category: 'widgets',
 
 		edit: function( props ) {
-
 			return (
-				el(ServerSideRender, {
-					block: "gutenberg-examples/example-dynamic",
-					attributes: props.attributes
+				el( ServerSideRender, {
+					block: 'gutenberg-examples/example-dynamic',
+					attributes: props.attributes,
 				} )
 			);
 		},

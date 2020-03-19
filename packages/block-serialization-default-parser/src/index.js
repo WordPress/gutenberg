@@ -167,7 +167,7 @@ function proceed() {
 	const stackDepth = stack.length;
 
 	// we may have some HTML soup before the next block
-	const leadingHtmlStart = ( startOffset > offset ) ? offset : null;
+	const leadingHtmlStart = startOffset > offset ? offset : null;
 
 	switch ( tokenType ) {
 		case 'no-more-tokens':
@@ -202,7 +202,14 @@ function proceed() {
 			// in the top-level of the document
 			if ( 0 === stackDepth ) {
 				if ( null !== leadingHtmlStart ) {
-					output.push( Freeform( document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ) ) );
+					output.push(
+						Freeform(
+							document.substr(
+								leadingHtmlStart,
+								startOffset - leadingHtmlStart
+							)
+						)
+					);
 				}
 				output.push( Block( blockName, attrs, [], '', [] ) );
 				offset = startOffset + tokenLength;
@@ -213,7 +220,7 @@ function proceed() {
 			addInnerBlock(
 				Block( blockName, attrs, [], '', [] ),
 				startOffset,
-				tokenLength,
+				tokenLength
 			);
 			offset = startOffset + tokenLength;
 			return true;
@@ -226,8 +233,8 @@ function proceed() {
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
-					leadingHtmlStart,
-				),
+					leadingHtmlStart
+				)
 			);
 			offset = startOffset + tokenLength;
 			return true;
@@ -254,7 +261,10 @@ function proceed() {
 			// otherwise we're nested and we have to close out the current
 			// block and add it as a innerBlock to the parent
 			const stackTop = stack.pop();
-			const html = document.substr( stackTop.prevOffset, startOffset - stackTop.prevOffset );
+			const html = document.substr(
+				stackTop.prevOffset,
+				startOffset - stackTop.prevOffset
+			);
 			stackTop.block.innerHTML += html;
 			stackTop.block.innerContent.push( html );
 			stackTop.prevOffset = startOffset + tokenLength;
@@ -263,7 +273,7 @@ function proceed() {
 				stackTop.block,
 				stackTop.tokenStart,
 				stackTop.tokenLength,
-				startOffset + tokenLength,
+				startOffset + tokenLength
 			);
 			offset = startOffset + tokenLength;
 			return true;
@@ -308,7 +318,15 @@ function nextToken() {
 	}
 
 	const startedAt = matches.index;
-	const [ match, closerMatch, namespaceMatch, nameMatch, attrsMatch, /* internal/unused */, voidMatch ] = matches;
+	const [
+		match,
+		closerMatch,
+		namespaceMatch,
+		nameMatch,
+		attrsMatch /* internal/unused */,
+		,
+		voidMatch,
+	] = matches;
 
 	const length = match.length;
 	const isCloser = !! closerMatch;
@@ -349,7 +367,10 @@ function addFreeform( rawLength ) {
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	parent.block.innerBlocks.push( block );
-	const html = document.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+	const html = document.substr(
+		parent.prevOffset,
+		tokenStart - parent.prevOffset
+	);
 
 	if ( html ) {
 		parent.block.innerHTML += html;
@@ -363,7 +384,9 @@ function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 function addBlockFromStack( endOffset ) {
 	const { block, leadingHtmlStart, prevOffset, tokenStart } = stack.pop();
 
-	const html = endOffset ? document.substr( prevOffset, endOffset - prevOffset ) : document.substr( prevOffset );
+	const html = endOffset
+		? document.substr( prevOffset, endOffset - prevOffset )
+		: document.substr( prevOffset );
 
 	if ( html ) {
 		block.innerHTML += html;
@@ -371,7 +394,14 @@ function addBlockFromStack( endOffset ) {
 	}
 
 	if ( null !== leadingHtmlStart ) {
-		output.push( Freeform( document.substr( leadingHtmlStart, tokenStart - leadingHtmlStart ) ) );
+		output.push(
+			Freeform(
+				document.substr(
+					leadingHtmlStart,
+					tokenStart - leadingHtmlStart
+				)
+			)
+		);
 	}
 
 	output.push( block );

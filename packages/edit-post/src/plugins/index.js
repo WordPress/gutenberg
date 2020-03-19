@@ -14,6 +14,13 @@ import ManageBlocksMenuItem from './manage-blocks-menu-item';
 import KeyboardShortcutsHelpMenuItem from './keyboard-shortcuts-help-menu-item';
 import ToolsMoreMenuGroup from '../components/header/tools-more-menu-group';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
+import BlockPatterns from './block-patterns';
+
+registerPlugin( 'edit-post-block-patterns', {
+	render() {
+		return <BlockPatterns />;
+	},
+} );
 
 registerPlugin( 'edit-post', {
 	render() {
@@ -25,13 +32,26 @@ registerPlugin( 'edit-post', {
 							<ManageBlocksMenuItem onSelect={ onClose } />
 							<MenuItem
 								role="menuitem"
-								href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_block',
+								} ) }
 							>
 								{ __( 'Manage all reusable blocks' ) }
 							</MenuItem>
-							<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
+							<KeyboardShortcutsHelpMenuItem
+								onSelect={ onClose }
+							/>
 							<WelcomeGuideMenuItem />
 							<CopyContentMenuItem />
+							<MenuItem
+								role="menuitem"
+								href={ __(
+									'https://wordpress.org/support/article/wordpress-editor/'
+								) }
+								target="_new"
+							>
+								{ __( 'Help' ) }
+							</MenuItem>
 						</>
 					) }
 				</ToolsMoreMenuGroup>

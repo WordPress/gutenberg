@@ -1,0 +1,26 @@
+.block-editor-image-size-control {
+	margin-bottom: 1em;
+
+	.block-editor-image-size-control__row {
+		display: flex;
+		justify-content: space-between;
+
+		.block-editor-image-size-control__width,
+		.block-editor-image-size-control__height {
+			margin-bottom: 0.5em;
+
+			// Fix the text and placeholder text being misaligned in Safari
+			input {
+				line-height: 1.25;
+			}
+		}
+
+		.block-editor-image-size-control__width {
+			margin-right: 5px;
+		}
+
+		.block-editor-image-size-control__height {
+			margin-left: 5px;
+		}
+	}
+}

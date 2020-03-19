@@ -26,7 +26,11 @@ export function fetchDownloadableBlocks() {
  * @return {Object} Action object.
  */
 export function receiveDownloadableBlocks( downloadableBlocks, filterValue ) {
-	return { type: 'RECEIVE_DOWNLOADABLE_BLOCKS', downloadableBlocks, filterValue };
+	return {
+		type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
+		downloadableBlocks,
+		filterValue,
+	};
 }
 
 /**

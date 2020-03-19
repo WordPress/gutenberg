@@ -27,9 +27,7 @@ import {
 	__experimentalReceiveReusableBlocks as receiveReusableBlocksAction,
 	__experimentalSaveReusableBlock as saveReusableBlock,
 } from '../actions';
-import {
-	__experimentalGetReusableBlock as getReusableBlock,
-} from '../selectors';
+import { __experimentalGetReusableBlock as getReusableBlock } from '../selectors';
 
 /**
  * Module Constants
@@ -57,22 +55,30 @@ export const fetchReusableBlocks = async ( action, store ) => {
 		let posts;
 
 		if ( id ) {
-			posts = [ await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }` } ) ];
+			posts = [
+				await apiFetch( {
+					path: `/wp/v2/${ postType.rest_base }/${ id }`,
+				} ),
+			];
 		} else {
-			posts = await apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
+			posts = await apiFetch( {
+				path: `/wp/v2/${ postType.rest_base }?per_page=-1`,
+			} );
 		}
 
-		const results = compact( map( posts, ( post ) => {
-			if ( post.status !== 'publish' || post.content.protected ) {
-				return null;
-			}
+		const results = compact(
+			map( posts, ( post ) => {
+				if ( post.status !== 'publish' || post.content.protected ) {
+					return null;
+				}
 
-			return {
-				...post,
-				content: post.content.raw,
-				title: post.title.raw,
-			};
-		} ) );
+				return {
+					...post,
+					content: post.content.raw,
+					title: post.title.raw,
+				};
+			} )
+		);
 
 		if ( results.length ) {
 			dispatch( receiveReusableBlocksAction( results ) );
@@ -110,8 +116,12 @@ export const saveReusableBlocks = async ( action, store ) => {
 	const state = store.getState();
 	const { title, content, isTemporary } = getReusableBlock( state, id );
 
-	const data = isTemporary ? { title, content, status: 'publish' } : { id, title, content, status: 'publish' };
-	const path = isTemporary ? `/wp/v2/${ postType.rest_base }` : `/wp/v2/${ postType.rest_base }/${ id }`;
+	const data = isTemporary
+		? { title, content, status: 'publish' }
+		: { id, title, content, status: 'publish' };
+	const path = isTemporary
+		? `/wp/v2/${ postType.rest_base }`
+		: `/wp/v2/${ postType.rest_base }/${ id }`;
 	const method = isTemporary ? 'POST' : 'PUT';
 
 	try {
@@ -121,13 +131,18 @@ export const saveReusableBlocks = async ( action, store ) => {
 			updatedId: updatedReusableBlock.id,
 			id,
 		} );
-		const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
+		const message = isTemporary
+			? __( 'Block created.' )
+			: __( 'Block updated.' );
 		dataDispatch( 'core/notices' ).createSuccessNotice( message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
 			type: 'snackbar',
 		} );
 
-		dataDispatch( 'core/block-editor' ).__unstableSaveReusableBlock( id, updatedReusableBlock.id );
+		dataDispatch( 'core/block-editor' ).__unstableSaveReusableBlock(
+			id,
+			updatedReusableBlock.id
+		);
 	} catch ( error ) {
 		dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
 		dataDispatch( 'core/notices' ).createErrorNotice( error.message, {
@@ -160,8 +175,12 @@ export const deleteReusableBlocks = async ( action, store ) => {
 	}
 	// Remove any other blocks that reference this reusable block
 	const allBlocks = select( 'core/block-editor' ).getBlocks();
-	const associatedBlocks = allBlocks.filter( ( block ) => isReusableBlock( block ) && block.attributes.ref === id );
-	const associatedBlockClientIds = associatedBlocks.map( ( block ) => block.clientId );
+	const associatedBlocks = allBlocks.filter(
+		( block ) => isReusableBlock( block ) && block.attributes.ref === id
+	);
+	const associatedBlockClientIds = associatedBlocks.map(
+		( block ) => block.clientId
+	);
 
 	const transactionId = uniqueId();
 
@@ -173,7 +192,9 @@ export const deleteReusableBlocks = async ( action, store ) => {
 
 	// Remove the parsed block.
 	if ( associatedBlockClientIds.length ) {
-		dataDispatch( 'core/block-editor' ).removeBlocks( associatedBlockClientIds );
+		dataDispatch( 'core/block-editor' ).removeBlocks(
+			associatedBlockClientIds
+		);
 	}
 
 	try {
@@ -214,7 +235,10 @@ export const convertBlockToStatic = ( action, store ) => {
 	const oldBlock = select( 'core/block-editor' ).getBlock( action.clientId );
 	const reusableBlock = getReusableBlock( state, oldBlock.attributes.ref );
 	const newBlocks = parse( reusableBlock.content );
-	dataDispatch( 'core/block-editor' ).replaceBlocks( oldBlock.clientId, newBlocks );
+	dataDispatch( 'core/block-editor' ).replaceBlocks(
+		oldBlock.clientId,
+		newBlocks
+	);
 };
 
 /**
@@ -228,12 +252,14 @@ export const convertBlockToReusable = ( action, store ) => {
 	const reusableBlock = {
 		id: uniqueId( 'reusable' ),
 		title: __( 'Untitled Reusable Block' ),
-		content: serialize( select( 'core/block-editor' ).getBlocksByClientId( action.clientIds ) ),
+		content: serialize(
+			select( 'core/block-editor' ).getBlocksByClientId(
+				action.clientIds
+			)
+		),
 	};
 
-	dispatch( receiveReusableBlocksAction( [
-		reusableBlock,
-	] ) );
+	dispatch( receiveReusableBlocksAction( [ reusableBlock ] ) );
 	dispatch( saveReusableBlock( reusableBlock.id ) );
 
 	dataDispatch( 'core/block-editor' ).replaceBlocks(

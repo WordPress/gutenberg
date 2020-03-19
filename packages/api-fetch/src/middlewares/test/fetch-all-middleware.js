@@ -29,9 +29,9 @@ describe( 'Fetch All Middleware', () => {
 				status: 200,
 				headers: {
 					get() {
-						return options.url === '/posts?per_page=100' ?
-							'</posts?per_page=100&page=2>; rel="next"' :
-							'';
+						return options.url === '/posts?per_page=100'
+							? '</posts?per_page=100&page=2>; rel="next"'
+							: '';
 					},
 				},
 				json() {

@@ -17,9 +17,7 @@ import { loginUser } from './login-user';
  * @param {string} query String to be serialized as query portion of URL.
  */
 export async function visitAdminPage( adminPath, query ) {
-	await page.goto(
-		createURL( join( 'wp-admin', adminPath ), query )
-	);
+	await page.goto( createURL( join( 'wp-admin', adminPath ), query ) );
 
 	if ( isCurrentURL( 'wp-login.php' ) ) {
 		await loginUser();

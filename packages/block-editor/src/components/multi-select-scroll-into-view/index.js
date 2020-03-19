@@ -21,10 +21,9 @@ import { getBlockDOMNode } from '../../utils/dom';
  */
 export default function MultiSelectScrollIntoView() {
 	const selector = ( select ) => {
-		const {
-			getBlockSelectionEnd,
-			isMultiSelecting,
-		} = select( 'core/block-editor' );
+		const { getBlockSelectionEnd, isMultiSelecting } = select(
+			'core/block-editor'
+		);
 
 		return {
 			selectionEnd: getBlockSelectionEnd(),

@@ -23,7 +23,17 @@ import { EnablePluginDocumentSettingPanelOption } from '../../options-modal/opti
 
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
-const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, className, title, icon, children, currentPostType } ) => {
+const PluginDocumentSettingFill = ( {
+	isEnabled,
+	panelName,
+	opened,
+	onToggle,
+	className,
+	title,
+	icon,
+	children,
+	currentPostType
+} ) => {
 	return (
 		<>
 			<EnablePluginDocumentSettingPanelOption
@@ -115,9 +125,11 @@ const PluginDocumentSettingPanel = compose(
 	} ),
 	withDispatch( ( dispatch, { panelName } ) => ( {
 		onToggle() {
-			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened( panelName );
+			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened(
+				panelName
+			);
 		},
-	} ) ),
+	} ) )
 )( PluginDocumentSettingFill );
 
 PluginDocumentSettingPanel.Slot = Slot;

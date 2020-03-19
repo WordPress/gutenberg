@@ -6,17 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import { useRef, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import __experimentalBlockListFooter from '../block-list-footer';
-import useMultiSelection from './use-multi-selection';
+import RootContainer from './root-container';
+import useBlockDropZone from '../block-drop-zone';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -24,22 +23,19 @@ import useMultiSelection from './use-multi-selection';
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
-	return (
-		<AsyncModeProvider value={ false }>
-			<WrappedComponent { ...props } />
-		</AsyncModeProvider>
-	);
-};
-
-function BlockList( {
-	className,
-	rootClientId,
-	__experimentalMoverDirection: moverDirection = 'vertical',
-	isDraggable,
-	renderAppender,
-	__experimentalUIParts = {},
-} ) {
+function BlockList(
+	{
+		className,
+		rootClientId,
+		isDraggable,
+		renderAppender,
+		__experimentalUIParts = {},
+		__experimentalTagName = 'div',
+		__experimentalAppenderTagName,
+		__experimentalPassedProps = {},
+	},
+	ref
+) {
 	function selector( select ) {
 		const {
 			getBlockOrder,
@@ -57,10 +53,9 @@ function BlockList( {
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
-			enableAnimation: (
+			enableAnimation:
 				! isTyping() &&
-				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD
-			),
+				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 		};
 	}
 
@@ -72,62 +67,81 @@ function BlockList( {
 		hasMultiSelection,
 		enableAnimation,
 	} = useSelect( selector, [ rootClientId ] );
-	const ref = useRef();
-	const onSelectionStart = useMultiSelection( { ref, rootClientId } );
 
-	const uiParts = {
-		hasMovers: true,
-		hasSelectedUI: true,
-		...__experimentalUIParts,
-	};
+	const Container = rootClientId ? __experimentalTagName : RootContainer;
+	const targetClientId = useBlockDropZone( {
+		element: ref,
+		rootClientId,
+	} );
+	const __experimentalContainerProps = rootClientId
+		? {}
+		: { hasPopover: __experimentalUIParts.hasPopover };
 
 	return (
-		<div
+		<Container
+			{ ...__experimentalPassedProps }
 			ref={ ref }
 			className={ classnames(
 				'block-editor-block-list__layout',
-				className
+				className,
+				__experimentalPassedProps.className
 			) }
+			{ ...__experimentalContainerProps }
 		>
 			{ blockClientIds.map( ( clientId, index ) => {
-				const isBlockInSelection = hasMultiSelection ?
-					multiSelectedBlockClientIds.includes( clientId ) :
-					selectedBlockClientId === clientId;
+				const isBlockInSelection = hasMultiSelection
+					? multiSelectedBlockClientIds.includes( clientId )
+					: selectedBlockClientId === clientId;
 
 				return (
-					<BlockAsyncModeProvider
-						key={ 'block-' + clientId }
-						clientId={ clientId }
-						isBlockInSelection={ isBlockInSelection }
+					<AsyncModeProvider
+						key={ clientId }
+						value={ ! isBlockInSelection }
 					>
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
-							onSelectionStart={ onSelectionStart }
 							isDraggable={ isDraggable }
-							moverDirection={ moverDirection }
 							isMultiSelecting={ isMultiSelecting }
 							// This prop is explicitely computed and passed down
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
-							animateOnChange={ index }
+							index={ index }
 							enableAnimation={ enableAnimation }
-							hasSelectedUI={ uiParts.hasSelectedUI }
-							hasMovers={ uiParts.hasMovers }
+							hasSelectedUI={
+								__experimentalUIParts.hasSelectedUI
+							}
+							className={
+								clientId === targetClientId
+									? 'is-drop-target'
+									: undefined
+							}
 						/>
-					</BlockAsyncModeProvider>
+					</AsyncModeProvider>
 				);
 			} ) }
 			<BlockListAppender
+				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
+				className={
+					targetClientId === null ? 'is-drop-target' : undefined
+				}
 			/>
-			<__experimentalBlockListFooter.Slot />
-		</div>
+		</Container>
 	);
 }
+
+const ForwardedBlockList = forwardRef( BlockList );
 
 // This component needs to always be synchronous
 // as it's the one changing the async mode
 // depending on the block selection.
-export default forceSyncUpdates( BlockList );
+export default forwardRef( ( props, ref ) => {
+	const fallbackRef = useRef();
+	return (
+		<AsyncModeProvider value={ false }>
+			<ForwardedBlockList ref={ ref || fallbackRef } { ...props } />
+		</AsyncModeProvider>
+	);
+} );

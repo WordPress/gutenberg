@@ -173,7 +173,7 @@ Setting `parent` lets a block require that it is only available when nested with
 
 An icon property should be specified to make it easier to identify a block. These can be any of WordPress' Dashicons (slug serving also as a fallback in non-js contexts).
 
-**Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. This colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.components.SVG](/packages/components/src/primitives/svg/README.md) component to add accessibility attributes (aria-hidden, role, and focusable).
+**Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. This colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/primitives/src/svg/README.md) component to add accessibility attributes (aria-hidden, role, and focusable).
 
 ### Description
 

@@ -1,14 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	flow,
-	get,
-	includes,
-	omit,
-	union,
-	without,
-} from 'lodash';
+import { flow, get, includes, omit, union, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -86,7 +79,9 @@ export const preferences = flow( [
 
 			case 'TOGGLE_PANEL_OPENED': {
 				const { panelName } = action;
-				const isOpen = state[ panelName ] === true || get( state, [ panelName, 'opened' ], false );
+				const isOpen =
+					state[ panelName ] === true ||
+					get( state, [ panelName, 'opened' ], false );
 				return {
 					...state,
 					[ panelName ]: {
@@ -120,7 +115,11 @@ export const preferences = flow( [
 		if ( action.type === 'TOGGLE_PINNED_PLUGIN_ITEM' ) {
 			return {
 				...state,
-				[ action.pluginName ]: ! get( state, [ action.pluginName ], true ),
+				[ action.pluginName ]: ! get(
+					state,
+					[ action.pluginName ],
+					true
+				),
 			};
 		}
 		return state;
@@ -175,10 +174,7 @@ export function removedPanels( state = [], action ) {
 	switch ( action.type ) {
 		case 'REMOVE_PANEL':
 			if ( ! includes( state, action.panelName ) ) {
-				return [
-					...state,
-					action.panelName,
-				];
+				return [ ...state, action.panelName ];
 			}
 	}
 
@@ -194,7 +190,10 @@ export function removedPanels( state = [], action ) {
  *
  * @return {?string} Updated state.
  */
-export function activeGeneralSidebar( state = DEFAULT_ACTIVE_GENERAL_SIDEBAR, action ) {
+export function activeGeneralSidebar(
+	state = DEFAULT_ACTIVE_GENERAL_SIDEBAR,
+	action
+) {
 	switch ( action.type ) {
 		case 'OPEN_GENERAL_SIDEBAR':
 			return action.name;
@@ -272,6 +271,23 @@ export function metaBoxLocations( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the editing canvas device type.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function deviceType( state = 'Desktop', action ) {
+	switch ( action.type ) {
+		case 'SET_PREVIEW_DEVICE_TYPE':
+			return action.deviceType;
+	}
+
+	return state;
+}
+
 const metaBoxes = combineReducers( {
 	isSaving: isSavingMetaBoxes,
 	locations: metaBoxLocations,
@@ -284,4 +300,5 @@ export default combineReducers( {
 	preferences,
 	publishSidebarActive,
 	removedPanels,
+	deviceType,
 } );

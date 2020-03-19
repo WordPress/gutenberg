@@ -51,7 +51,7 @@ describe( 'BlockSwitcher', () => {
 		registerBlockType( 'core/heading', {
 			category: 'common',
 			title: 'Heading',
-			edit: () => { },
+			edit: () => {},
 			save: () => {},
 			transforms: {
 				to: [
@@ -73,14 +73,16 @@ describe( 'BlockSwitcher', () => {
 		registerBlockType( 'core/paragraph', {
 			category: 'common',
 			title: 'Paragraph',
-			edit: () => { },
+			edit: () => {},
 			save: () => {},
 			transforms: {
-				to: [ {
-					type: 'block',
-					blocks: [ 'core/heading' ],
-					transform: () => {},
-				} ],
+				to: [
+					{
+						type: 'block',
+						blocks: [ 'core/heading' ],
+						transform: () => {},
+					},
+				],
 			},
 		} );
 	} );
@@ -97,15 +99,15 @@ describe( 'BlockSwitcher', () => {
 	} );
 
 	test( 'should render switcher with blocks', () => {
-		const blocks = [
-			headingBlock1,
-		];
+		const blocks = [ headingBlock1 ];
 		const inserterItems = [
 			{ name: 'core/heading', frecency: 1 },
 			{ name: 'core/paragraph', frecency: 1 },
 		];
 
-		const wrapper = shallow( <BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } /> );
+		const wrapper = shallow(
+			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+		);
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
@@ -117,7 +119,9 @@ describe( 'BlockSwitcher', () => {
 			{ name: 'core/paragraph', frecency: 1 },
 		];
 
-		const wrapper = shallow( <BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } /> );
+		const wrapper = shallow(
+			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+		);
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
@@ -129,15 +133,15 @@ describe( 'BlockSwitcher', () => {
 			{ name: 'core/paragraph', frecency: 1 },
 		];
 
-		const wrapper = shallow( <BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } /> );
+		const wrapper = shallow(
+			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+		);
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	describe( 'Dropdown', () => {
-		const blocks = [
-			headingBlock1,
-		];
+		const blocks = [ headingBlock1 ];
 
 		const inserterItems = [
 			{ name: 'core/quote', frecency: 1 },
@@ -149,7 +153,13 @@ describe( 'BlockSwitcher', () => {
 
 		const onTransformStub = jest.fn();
 		const getDropdown = () => {
-			const blockSwitcher = shallow( <BlockSwitcher blocks={ blocks } onTransform={ onTransformStub } inserterItems={ inserterItems } /> );
+			const blockSwitcher = shallow(
+				<BlockSwitcher
+					blocks={ blocks }
+					onTransform={ onTransformStub }
+					inserterItems={ inserterItems }
+				/>
+			);
 			return blockSwitcher.find( 'Dropdown' );
 		};
 
@@ -170,8 +180,17 @@ describe( 'BlockSwitcher', () => {
 			} );
 
 			test( 'should simulate a keydown event, which should call onToggle and open transform toggle.', () => {
-				const toggleClosed = shallow( getDropdown().props().renderToggle( { onToggle: onToggleStub, isOpen: false } ) );
-				const iconButtonClosed = toggleClosed.find( 'ForwardRef(Button)' );
+				const toggleClosed = shallow(
+					getDropdown()
+						.props()
+						.renderToggle( {
+							onToggle: onToggleStub,
+							isOpen: false,
+						} )
+				);
+				const iconButtonClosed = toggleClosed.find(
+					'ForwardRef(Button)'
+				);
 
 				iconButtonClosed.simulate( 'keydown', mockKeyDown );
 
@@ -179,7 +198,14 @@ describe( 'BlockSwitcher', () => {
 			} );
 
 			test( 'should simulate a click event, which should call onToggle.', () => {
-				const toggleOpen = shallow( getDropdown().props().renderToggle( { onToggle: onToggleStub, isOpen: true } ) );
+				const toggleOpen = shallow(
+					getDropdown()
+						.props()
+						.renderToggle( {
+							onToggle: onToggleStub,
+							isOpen: true,
+						} )
+				);
 				const iconButtonOpen = toggleOpen.find( 'ForwardRef(Button)' );
 
 				iconButtonOpen.simulate( 'keydown', mockKeyDown );
@@ -191,7 +217,13 @@ describe( 'BlockSwitcher', () => {
 		describe( '.renderContent', () => {
 			test( 'should create the transform items for the chosen block. A heading block will have 3 items', () => {
 				const onCloseStub = jest.fn();
-				const content = shallow( <div>{ getDropdown().props().renderContent( { onClose: onCloseStub } ) }</div> );
+				const content = shallow(
+					<div>
+						{ getDropdown()
+							.props()
+							.renderContent( { onClose: onCloseStub } ) }
+					</div>
+				);
 				const blockList = content.find( 'BlockTypesList' );
 				expect( blockList.prop( 'items' ) ).toHaveLength( 1 );
 			} );

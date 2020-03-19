@@ -4,7 +4,12 @@
 import { Fill, ToolbarButton } from '@wordpress/components';
 import { displayShortcut } from '@wordpress/keycodes';
 
-export function RichTextToolbarButton( { name, shortcutType, shortcutCharacter, ...props } ) {
+export function RichTextToolbarButton( {
+	name,
+	shortcutType,
+	shortcutCharacter,
+	...props
+} ) {
 	let shortcut;
 	let fillName = 'RichText.ToolbarControls';
 
@@ -18,10 +23,7 @@ export function RichTextToolbarButton( { name, shortcutType, shortcutCharacter, 
 
 	return (
 		<Fill name={ fillName }>
-			<ToolbarButton
-				{ ...props }
-				shortcut={ shortcut }
-			/>
+			<ToolbarButton { ...props } shortcut={ shortcut } />
 		</Fill>
 	);
 }

@@ -27,7 +27,7 @@ class Picker extends Component {
 				}
 				const selected = options[ buttonIndex - 1 ];
 				onChange( selected.value );
-			},
+			}
 		);
 	}
 

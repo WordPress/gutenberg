@@ -123,12 +123,6 @@
 	cursor: default;
 }
 
-@mixin button-style__hover {
-	background-color: $white;
-	color: $dark-gray-900;
-	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
-}
-
 @mixin button-style__active() {
 	outline: none;
 	background-color: $white;
@@ -137,12 +131,10 @@
 }
 
 @mixin button-style__focus-active() {
-	background-color: $white;
-	color: $dark-gray-900;
-	box-shadow: inset 0 0 0 1px $dark-gray-300, inset 0 0 0 2px $white;
+	box-shadow: 0 0 0 1px color($theme-color);
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
+	outline: 1px solid transparent;
 }
 
 // Switch.
@@ -154,25 +146,16 @@
 	outline-offset: 2px;
 }
 
-// Formatting Buttons.
-@mixin formatting-button-style__hover {
-	color: $dark-gray-500;
-	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
+
+/**
+ * Block Toolbar/Formatting Buttons
+ */
+
+@mixin block-toolbar-button-style__focus() {
+	box-shadow: inset 0 0 0 2px color($theme-color), inset 0 0 0 4px $white; // Inner halo makes this work on top of a toggled button.
+	outline: 2px solid transparent; // Shown to Windows 10 High Contrast Mode.
 }
 
-@mixin formatting-button-style__active() {
-	outline: none;
-	color: $white;
-	box-shadow: none;
-	background: $dark-gray-500;
-}
-
-@mixin formatting-button-style__focus() {
-	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-}
 
 // Tabs, Inputs, Square buttons.
 @mixin input-style__neutral() {
@@ -231,35 +214,26 @@
 }
 
 @mixin block-style__hover {
-	background: $light-gray-200;
-	color: $dark-gray-900;
+	border-color: $theme-color;
+	color: $theme-color !important;
 }
 
 @mixin block-style__focus() {
-	color: $dark-gray-900;
-	box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
+	box-shadow: inset 0 0 0 1px $white, 0 0 0 2px $theme-color;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
 }
 
 @mixin block-style__is-active() {
-	color: $dark-gray-900;
-	box-shadow: inset 0 0 0 2px $dark-gray-500;
+	color: $white;
+	background: $dark-gray-primary;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
 	outline-offset: -2px;
 }
 
-@mixin block-style__is-active-focus() {
-	color: $dark-gray-900;
-	box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500, inset 0 0 0 2px $dark-gray-500;
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 4px solid transparent;
-	outline-offset: -4px;
-}
 
 /**
  * Applies editor left position to the selector passed as argument
@@ -279,7 +253,7 @@
 			left: $admin-sidebar-width-collapsed;
 		}
 
-		@include break-large() {
+		@media (min-width: #{ ($break-large + 1) }) {
 			left: $admin-sidebar-width;
 		}
 	}
@@ -328,21 +302,6 @@
 	text-align: center;
 }
 
-@mixin dropdown-arrow() {
-	content: "";
-	pointer-events: none;
-	display: block;
-	width: 0;
-	height: 0;
-	border-left: 3px solid transparent;
-	border-right: 3px solid transparent;
-	border-top: 5px solid;
-	margin-left: $grid-size-small;
-
-	// This gives the icon space on the right side consistent with the material
-	// icon standards.
-	margin-right: 2px;
-}
 
 /**
  * Allows users to opt-out of animations via OS-level preferences.
@@ -428,7 +387,7 @@
 	}
 
 	select {
-		padding: 2px;
+		padding: 3px 24px 3px 8px;
 		font-size: $default-font-size;
 		color: $dark-gray-500;
 
@@ -442,13 +401,13 @@
 
 	input[type="checkbox"],
 	input[type="radio"] {
-		border: $border-width + 1 solid $dark-gray-300;
-		margin-right: 12px;
+		border: $border-width + 1 solid $medium-gray-text;
+		margin-right: $grid-unit-15;
 		transition: none;
 
 		&:focus {
-			border-color: $dark-gray-300;
-			box-shadow: 0 0 0 1px $dark-gray-300;
+			border-color: $medium-gray-text;
+			box-shadow: 0 0 0 1px $medium-gray-text;
 		}
 
 		&:checked {
@@ -457,12 +416,12 @@
 		}
 
 		&:checked:focus {
-			box-shadow: 0 0 0 2px $dark-gray-500;
+			box-shadow: 0 0 0 2px $medium-gray-text;
 		}
 	}
 
 	input[type="checkbox"] {
-		border-radius: $radius-round-rectangle / 2;
+		border-radius: $radius-block-ui;
 
 		&:checked::before,
 		&[aria-checked="mixed"]::before {

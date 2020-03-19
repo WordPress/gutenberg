@@ -13,7 +13,12 @@ import {
 	AlignmentToolbar,
 } from '@wordpress/block-editor';
 
-export default function VerseEdit( { attributes, setAttributes, className, mergeBlocks } ) {
+export default function VerseEdit( {
+	attributes,
+	setAttributes,
+	className,
+	mergeBlocks,
+} ) {
 	const { textAlign, content } = attributes;
 
 	return (

@@ -15,25 +15,39 @@ export function BlockInspectorButton( {
 	small = false,
 	speak,
 } ) {
-	const { shortcut, areAdvancedSettingsOpened } = useSelect( ( select ) => ( {
-		shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-		areAdvancedSettingsOpened: select( 'core/edit-post' ).getActiveGeneralSidebarName() === 'edit-post/block',
-	} ), [] );
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch( 'core/edit-post' );
+	const { shortcut, areAdvancedSettingsOpened } = useSelect(
+		( select ) => ( {
+			shortcut: select(
+				'core/keyboard-shortcuts'
+			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			areAdvancedSettingsOpened:
+				select( 'core/edit-post' ).getActiveGeneralSidebarName() ===
+				'edit-post/block',
+		} ),
+		[]
+	);
+	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
+		'core/edit-post'
+	);
 
 	const speakMessage = () => {
 		if ( areAdvancedSettingsOpened ) {
 			speak( __( 'Block settings closed' ) );
 		} else {
-			speak( __( 'Additional settings are now available in the Editor block settings sidebar' ) );
+			speak(
+				__(
+					'Additional settings are now available in the Editor block settings sidebar'
+				)
+			);
 		}
 	};
 
-	const label = areAdvancedSettingsOpened ? __( 'Hide Block Settings' ) : __( 'Show Block Settings' );
+	const label = areAdvancedSettingsOpened
+		? __( 'Hide Block Settings' )
+		: __( 'Show Block Settings' );
 
 	return (
 		<MenuItem
-			className="block-editor-block-settings-menu__control"
 			onClick={ () => {
 				if ( areAdvancedSettingsOpened ) {
 					closeGeneralSidebar();
@@ -43,7 +57,6 @@ export function BlockInspectorButton( {
 					onClick();
 				}
 			} }
-			icon="admin-generic"
 			shortcut={ shortcut }
 		>
 			{ ! small && label }

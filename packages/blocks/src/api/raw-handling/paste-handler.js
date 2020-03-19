@@ -49,8 +49,14 @@ const { console } = window;
  * @return {string} HTML only containing phrasing content.
  */
 function filterInlineHTML( HTML ) {
-	HTML = deepFilterHTML( HTML, [ googleDocsUIDRemover, phrasingContentReducer, commentRemover ] );
-	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), { inline: true } );
+	HTML = deepFilterHTML( HTML, [
+		googleDocsUIDRemover,
+		phrasingContentReducer,
+		commentRemover,
+	] );
+	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
+		inline: true,
+	} );
 	HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
 
 	// Allows us to ask for this information when we get a report.
@@ -60,13 +66,18 @@ function filterInlineHTML( HTML ) {
 }
 
 function getRawTransformations() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } )
-		.map( ( transform ) => {
-			return transform.isMatch ? transform : {
-				...transform,
-				isMatch: ( node ) => transform.selector && node.matches( transform.selector ),
-			};
-		} );
+	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map(
+		( transform ) => {
+			return transform.isMatch
+				? transform
+				: {
+						...transform,
+						isMatch: ( node ) =>
+							transform.selector &&
+							node.matches( transform.selector ),
+				  };
+		}
+	);
 }
 
 /**
@@ -86,16 +97,15 @@ function htmlToBlocks( { html, rawTransforms } ) {
 	doc.body.innerHTML = html;
 
 	return Array.from( doc.body.children ).map( ( node ) => {
-		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) => isMatch( node ) );
+		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) =>
+			isMatch( node )
+		);
 
 		if ( ! rawTransform ) {
 			return createBlock(
 				// Should not be hardcoded.
 				'core/html',
-				getBlockAttributes(
-					'core/html',
-					node.outerHTML
-				)
+				getBlockAttributes( 'core/html', node.outerHTML )
 			);
 		}
 
@@ -107,10 +117,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
 
 		return createBlock(
 			blockName,
-			getBlockAttributes(
-				blockName,
-				node.outerHTML
-			)
+			getBlockAttributes( blockName, node.outerHTML )
 		);
 	} );
 }
@@ -119,23 +126,33 @@ function htmlToBlocks( { html, rawTransforms } ) {
  * Converts an HTML string to known blocks. Strips everything else.
  *
  * @param {Object}  options
- * @param {string}  [options.HTML]                     The HTML to convert.
- * @param {string}  [options.plainText]                Plain text version.
- * @param {string}  [options.mode]                     Handle content as blocks or inline content.
- *                                                     * 'AUTO': Decide based on the content passed.
- *                                                     * 'INLINE': Always handle as inline content, and return string.
- *                                                     * 'BLOCKS': Always handle as blocks, and return array of blocks.
- * @param {Array}   [options.tagName]                  The tag into which content will be inserted.
- * @param {boolean} [options.canUserUseUnfilteredHTML] Whether or not the user can use unfiltered HTML.
+ * @param {string}  [options.HTML]      The HTML to convert.
+ * @param {string}  [options.plainText] Plain text version.
+ * @param {string}  [options.mode]      Handle content as blocks or inline content.
+ *                                      * 'AUTO': Decide based on the content passed.
+ *                                      * 'INLINE': Always handle as inline content, and return string.
+ *                                      * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param {Array}   [options.tagName]   The tag into which content will be inserted.
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
+export function pasteHandler( {
+	HTML = '',
+	plainText = '',
+	mode = 'AUTO',
+	tagName,
+} ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/g, '' );
 	// Strip Windows markers.
-	HTML = HTML.replace( /^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i, '' );
-	HTML = HTML.replace( /(?:<!--\s*EndFragment\s*-->\s*)?<\/body>\s*<\/html>\s*$/i, '' );
+	HTML = HTML.replace(
+		/^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i,
+		''
+	);
+	HTML = HTML.replace(
+		/(?:<!--\s*EndFragment\s*-->\s*)?<\/body>\s*<\/html>\s*$/i,
+		''
+	);
 
 	// If we detect block delimiters in HTML, parse entirely as blocks.
 	if ( mode !== 'INLINE' ) {
@@ -192,58 +209,64 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 	// empty HTML strings are included.
 	const hasShortcodes = pieces.length > 1;
 
-	if ( mode === 'AUTO' && ! hasShortcodes && isInlineContent( HTML, tagName ) ) {
+	if (
+		mode === 'AUTO' &&
+		! hasShortcodes &&
+		isInlineContent( HTML, tagName )
+	) {
 		return filterInlineHTML( HTML );
 	}
 
 	const rawTransforms = getRawTransformations();
 	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
-	const blockContentSchema = getBlockContentSchema( rawTransforms, phrasingContentSchema, true );
+	const blockContentSchema = getBlockContentSchema(
+		rawTransforms,
+		phrasingContentSchema,
+		true
+	);
 
-	const blocks = compact( flatMap( pieces, ( piece ) => {
-		// Already a block from shortcode.
-		if ( typeof piece !== 'string' ) {
-			return piece;
-		}
+	const blocks = compact(
+		flatMap( pieces, ( piece ) => {
+			// Already a block from shortcode.
+			if ( typeof piece !== 'string' ) {
+				return piece;
+			}
 
-		const filters = [
-			googleDocsUIDRemover,
-			msListConverter,
-			headRemover,
-			listReducer,
-			imageCorrector,
-			phrasingContentReducer,
-			specialCommentConverter,
-			commentRemover,
-			figureContentReducer,
-			blockquoteNormaliser,
-		];
+			const filters = [
+				googleDocsUIDRemover,
+				msListConverter,
+				headRemover,
+				listReducer,
+				imageCorrector,
+				phrasingContentReducer,
+				specialCommentConverter,
+				commentRemover,
+				iframeRemover,
+				figureContentReducer,
+				blockquoteNormaliser,
+			];
 
-		if ( ! canUserUseUnfilteredHTML ) {
-			// Should run before `figureContentReducer`.
-			filters.unshift( iframeRemover );
-		}
+			const schema = {
+				...blockContentSchema,
+				// Keep top-level phrasing content, normalised by `normaliseBlocks`.
+				...phrasingContentSchema,
+			};
 
-		const schema = {
-			...blockContentSchema,
-			// Keep top-level phrasing content, normalised by `normaliseBlocks`.
-			...phrasingContentSchema,
-		};
+			piece = deepFilterHTML( piece, filters, blockContentSchema );
+			piece = removeInvalidHTML( piece, schema );
+			piece = normaliseBlocks( piece );
+			piece = deepFilterHTML(
+				piece,
+				[ htmlFormattingRemover, brRemover, emptyParagraphRemover ],
+				blockContentSchema
+			);
 
-		piece = deepFilterHTML( piece, filters, blockContentSchema );
-		piece = removeInvalidHTML( piece, schema );
-		piece = normaliseBlocks( piece );
-		piece = deepFilterHTML( piece, [
-			htmlFormattingRemover,
-			brRemover,
-			emptyParagraphRemover,
-		], blockContentSchema );
+			// Allows us to ask for this information when we get a report.
+			console.log( 'Processed HTML piece:\n\n', piece );
 
-		// Allows us to ask for this information when we get a report.
-		console.log( 'Processed HTML piece:\n\n', piece );
-
-		return htmlToBlocks( { html: piece, rawTransforms } );
-	} ) );
+			return htmlToBlocks( { html: piece, rawTransforms } );
+		} )
+	);
 
 	// If we're allowed to return inline content, and there is only one inlineable block,
 	// and the original plain text content does not have any line breaks, then
@@ -255,7 +278,10 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 	) {
 		const trimmedPlainText = plainText.trim();
 
-		if ( trimmedPlainText !== '' && trimmedPlainText.indexOf( '\n' ) === -1 ) {
+		if (
+			trimmedPlainText !== '' &&
+			trimmedPlainText.indexOf( '\n' ) === -1
+		) {
 			return removeInvalidHTML(
 				getBlockContent( blocks[ 0 ] ),
 				phrasingContentSchema

@@ -33,7 +33,9 @@ describe( 'Datepicker', () => {
 			( dateLabel ) => dateLabel.textContent
 		);
 
-		expect( publishingDate ).toMatch( /[A-Za-z]{3} \d{1,2}, \d{4} \d{1,2}:\d{2} [ap]m/ );
+		expect( publishingDate ).toMatch(
+			/[A-Za-z]{3} \d{1,2}, \d{4} \d{1,2}:\d{2} [ap]m/
+		);
 	} );
 
 	it( 'should show the publishing date if the date is in the future', async () => {
@@ -54,6 +56,8 @@ describe( 'Datepicker', () => {
 
 		expect( publishingDate ).not.toEqual( 'Immediately' );
 		// The expected date format will be "Sep 26, 2018 11:52 pm".
-		expect( publishingDate ).toMatch( /[A-Za-z]{3} \d{1,2}, \d{4} \d{1,2}:\d{2} [ap]m/ );
+		expect( publishingDate ).toMatch(
+			/[A-Za-z]{3} \d{1,2}, \d{4} \d{1,2}:\d{2} [ap]m/
+		);
 	} );
 } );

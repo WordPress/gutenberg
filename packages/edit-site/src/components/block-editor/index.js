@@ -2,11 +2,13 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { uploadMedia } from '@wordpress/media-utils';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
+	__experimentalLinkControl,
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
@@ -17,11 +19,17 @@ import {
 /**
  * Internal dependencies
  */
+import { useEditorContext } from '../editor';
+import NavigateToLink from '../navigate-to-link';
 import Sidebar from '../sidebar';
 
-export default function BlockEditor( { settings: _settings } ) {
+export default function BlockEditor() {
+	const { settings: _settings, setSettings } = useEditorContext();
 	const canUserCreateMedia = useSelect( ( select ) => {
-		const _canUserCreateMedia = select( 'core' ).canUser( 'create', 'media' );
+		const _canUserCreateMedia = select( 'core' ).canUser(
+			'create',
+			'media'
+		);
 		return _canUserCreateMedia || _canUserCreateMedia !== false;
 	}, [] );
 	const settings = useMemo( () => {
@@ -39,19 +47,49 @@ export default function BlockEditor( { settings: _settings } ) {
 			},
 		};
 	}, [ canUserCreateMedia, _settings ] );
-	const [ blocks, setBlocks ] = useState( [] );
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		settings.templateType
+	);
+	const setActiveTemplateId = useCallback(
+		( newTemplateId ) =>
+			setSettings( ( prevSettings ) => ( {
+				...prevSettings,
+				templateId: newTemplateId,
+				templateType: 'wp_template',
+			} ) ),
+		[]
+	);
 	return (
 		<BlockEditorProvider
 			settings={ settings }
 			value={ blocks }
-			onInput={ setBlocks }
-			onChange={ setBlocks }
+			onInput={ onInput }
+			onChange={ onChange }
+			useSubRegistry={ false }
 		>
 			<BlockEditorKeyboardShortcuts />
+			<__experimentalLinkControl.ViewerFill>
+				{ useCallback(
+					( fillProps ) => (
+						<NavigateToLink
+							{ ...fillProps }
+							templateIds={ settings.templateIds }
+							activeId={ settings.templateId }
+							onActiveIdChange={ setActiveTemplateId }
+						/>
+					),
+					[
+						settings.templateIds,
+						settings.templateId,
+						setActiveTemplateId,
+					]
+				) }
+			</__experimentalLinkControl.ViewerFill>
 			<Sidebar.InspectorFill>
 				<BlockInspector />
 			</Sidebar.InspectorFill>
-			<div className="editor-styles-wrapper">
+			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
 				<WritingFlow>
 					<ObserveTyping>
 						<BlockList

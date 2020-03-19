@@ -32,13 +32,16 @@ describe( 'MediaUpload component', () => {
 
 	it( 'opens media options picker', () => {
 		const wrapper = shallow(
-			<MediaUpload allowedTypes={ [] } render={ ( { open, getMediaOptions } ) => {
-				return (
-					<TouchableWithoutFeedback onPress={ open }>
-						{ getMediaOptions() }
-					</TouchableWithoutFeedback>
-				);
-			} } />
+			<MediaUpload
+				allowedTypes={ [] }
+				render={ ( { open, getMediaOptions } ) => {
+					return (
+						<TouchableWithoutFeedback onPress={ open }>
+							{ getMediaOptions() }
+						</TouchableWithoutFeedback>
+					);
+				} }
+			/>
 		);
 		expect( wrapper.find( 'Picker' ) ).toHaveLength( 1 );
 	} );
@@ -54,23 +57,35 @@ describe( 'MediaUpload component', () => {
 								{ getMediaOptions() }
 							</TouchableWithoutFeedback>
 						);
-					} } />
+					} }
+				/>
 			);
-			expect( wrapper.find( 'Picker' ).props().options.filter( ( item ) => item.label === expectedOption ) ).toHaveLength( 1 );
+			expect(
+				wrapper
+					.find( 'Picker' )
+					.props()
+					.options.filter( ( item ) => item.label === expectedOption )
+			).toHaveLength( 1 );
 		};
 		expectOptionForMediaType( MEDIA_TYPE_IMAGE, OPTION_TAKE_PHOTO );
 		expectOptionForMediaType( MEDIA_TYPE_VIDEO, OPTION_TAKE_VIDEO );
 	} );
 
-	const expectMediaPickerForOption = ( option, allowMultiple, requestFunction ) => {
-		requestFunction.mockImplementation( ( source, mediaTypes, multiple, callback ) => {
-			expect( mediaTypes[ 0 ] ).toEqual( MEDIA_TYPE_VIDEO );
-			if ( multiple ) {
-				callback( [ { id: MEDIA_ID, url: MEDIA_URL } ] );
-			} else {
-				callback( { id: MEDIA_ID, url: MEDIA_URL } );
+	const expectMediaPickerForOption = (
+		option,
+		allowMultiple,
+		requestFunction
+	) => {
+		requestFunction.mockImplementation(
+			( source, mediaTypes, multiple, callback ) => {
+				expect( mediaTypes[ 0 ] ).toEqual( MEDIA_TYPE_VIDEO );
+				if ( multiple ) {
+					callback( [ { id: MEDIA_ID, url: MEDIA_URL } ] );
+				} else {
+					callback( { id: MEDIA_ID, url: MEDIA_URL } );
+				}
 			}
-		} );
+		);
 
 		const onSelect = jest.fn();
 
@@ -85,7 +100,8 @@ describe( 'MediaUpload component', () => {
 							{ getMediaOptions() }
 						</TouchableWithoutFeedback>
 					);
-				} } />
+				} }
+			/>
 		);
 		wrapper.find( 'Picker' ).simulate( 'change', option );
 		const media = { id: MEDIA_ID, url: MEDIA_URL };
@@ -93,26 +109,48 @@ describe( 'MediaUpload component', () => {
 		expect( requestFunction ).toHaveBeenCalledTimes( 1 );
 
 		expect( onSelect ).toHaveBeenCalledTimes( 1 );
-		expect( onSelect ).toHaveBeenCalledWith( allowMultiple ? [ media ] : media );
+		expect( onSelect ).toHaveBeenCalledWith(
+			allowMultiple ? [ media ] : media
+		);
 	};
 
 	it( 'can select media from device library', () => {
-		expectMediaPickerForOption( mediaSources.deviceLibrary, false, requestMediaPicker );
+		expectMediaPickerForOption(
+			mediaSources.deviceLibrary,
+			false,
+			requestMediaPicker
+		);
 	} );
 
 	it( 'can select media from WP media library', () => {
-		expectMediaPickerForOption( mediaSources.siteMediaLibrary, false, requestMediaPicker );
+		expectMediaPickerForOption(
+			mediaSources.siteMediaLibrary,
+			false,
+			requestMediaPicker
+		);
 	} );
 
 	it( 'can select media by capturig', () => {
-		expectMediaPickerForOption( mediaSources.deviceCamera, false, requestMediaPicker );
+		expectMediaPickerForOption(
+			mediaSources.deviceCamera,
+			false,
+			requestMediaPicker
+		);
 	} );
 
 	it( 'can select multiple media from device library', () => {
-		expectMediaPickerForOption( mediaSources.deviceLibrary, true, requestMediaPicker );
+		expectMediaPickerForOption(
+			mediaSources.deviceLibrary,
+			true,
+			requestMediaPicker
+		);
 	} );
 
 	it( 'can select multiple media from WP media library', () => {
-		expectMediaPickerForOption( mediaSources.siteMediaLibrary, true, requestMediaPicker );
+		expectMediaPickerForOption(
+			mediaSources.siteMediaLibrary,
+			true,
+			requestMediaPicker
+		);
 	} );
 } );

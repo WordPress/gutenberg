@@ -1,4 +1,3 @@
-
 /**
  * External dependencies
  */
@@ -9,26 +8,27 @@ import { View } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import {
-	InnerBlocks,
-	withColors,
-} from '@wordpress/block-editor';
+import { InnerBlocks, withColors } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
 
-function GroupEdit( {
-	hasInnerBlocks,
-	isSelected,
-	getStylesFromColorScheme,
-} ) {
+function GroupEdit( { hasInnerBlocks, isSelected, getStylesFromColorScheme } ) {
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
-			<View style={ [
-				getStylesFromColorScheme( styles.groupPlaceholder, styles.groupPlaceholderDark ),
-				! hasInnerBlocks && { ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
-			] } />
+			<View
+				style={ [
+					getStylesFromColorScheme(
+						styles.groupPlaceholder,
+						styles.groupPlaceholderDark
+					),
+					! hasInnerBlocks && {
+						...styles.marginVerticalDense,
+						...styles.marginHorizontalNone,
+					},
+				] }
+			/>
 		);
 	}
 
@@ -42,9 +42,7 @@ function GroupEdit( {
 export default compose( [
 	withColors( 'backgroundColor' ),
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlock,
-		} = select( 'core/block-editor' );
+		const { getBlock } = select( 'core/block-editor' );
 
 		const block = getBlock( clientId );
 

@@ -107,10 +107,7 @@ class ModalFrame extends Component {
 		const {
 			overlayClassName,
 			contentLabel,
-			aria: {
-				describedby,
-				labelledby,
-			},
+			aria: { describedby, labelledby },
 			children,
 			className,
 			role,
@@ -119,7 +116,10 @@ class ModalFrame extends Component {
 
 		return (
 			<IsolatedEventContainer
-				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
+				className={ classnames(
+					'components-modal__screen-overlay',
+					overlayClassName
+				) }
 				onKeyDown={ this.handleKeyDown }
 			>
 				<div
