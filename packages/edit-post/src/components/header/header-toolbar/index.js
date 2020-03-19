@@ -27,14 +27,17 @@ const inserterToggleProps = { isPrimary: true };
 function HeaderToolbar() {
 	const {
 		hasFixedToolbar,
-		showInserter,
 		isTextModeEnabled,
 		previewDeviceType,
 		showIconLabels,
+		showInserter,
 	} = useSelect(
 		( select ) => ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
 				'fixedToolbar'
+			),
+			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
 			),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			showInserter:
