@@ -17,6 +17,8 @@ export { default as brush } from './library/brush';
 export { default as button } from './library/button';
 export { default as calendar } from './library/calendar';
 export { default as camera } from './library/camera';
+export { default as capturePhoto } from './library/capture-photo';
+export { default as captureVideo } from './library/capture-video';
 export { default as category } from './library/category';
 export { default as chartLine } from './library/chart-line';
 export { default as check } from './library/check';

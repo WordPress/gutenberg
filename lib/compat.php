@@ -9,6 +9,42 @@
  */
 
 /**
+ * Extends block editor settings to include a list of image dimensions per size.
+ *
+ * This can be removed when plugin support requires WordPress 5.4.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/49389
+ * @see https://core.trac.wordpress.org/changeset/47240
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_image_dimensions( $settings ) {
+	/*
+	 * Only filter settings if:
+	 * 1. `imageDimensions` is not already assigned, in which case it can be
+	 *    assumed to have been set from WordPress 5.4.0+ default settings.
+	 * 2. `imageSizes` is an array. Plugins may run `block_editor_settings`
+	 *    directly and not provide all properties of the settings array.
+	 */
+	if ( ! isset( $settings['imageDimensions'] ) && ! empty( $settings['imageSizes'] ) ) {
+		$image_dimensions = array();
+		$all_sizes        = wp_get_registered_image_subsizes();
+		foreach ( $settings['imageSizes'] as $size ) {
+			$key = $size['slug'];
+			if ( isset( $all_sizes[ $key ] ) ) {
+				$image_dimensions[ $key ] = $all_sizes[ $key ];
+			}
+		}
+		$settings['imageDimensions'] = $image_dimensions;
+	}
+
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_image_dimensions' );
+
+/**
  * Adds a polyfill for the WHATWG URL in environments which do not support it.
  * The intention in how this action is handled is under the assumption that this
  * code would eventually be placed at `wp_default_packages_vendor`, which is

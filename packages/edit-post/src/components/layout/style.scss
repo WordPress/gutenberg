@@ -104,23 +104,6 @@
 		font-size: $default-font-size;
 		padding: 0 ($grid-unit-15 + 6px);
 	}
-
-	.table-of-contents {
-		margin: auto 0 0 auto;
-	}
-
-	.table-of-contents .components-button {
-		height: $button-size-small;
-		padding: 0;
-
-		&:focus {
-			box-shadow: inset 0 0 0 2px color($theme-color);
-
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 1px solid transparent;
-
-		}
-	}
 }
 
 .edit-post-layout .block-editor-editor-skeleton__content {

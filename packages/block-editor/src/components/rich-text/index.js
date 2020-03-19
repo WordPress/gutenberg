@@ -67,7 +67,15 @@ function getMultilineTag( multiline ) {
 	return multiline === true ? 'p' : multiline;
 }
 
-function getAllowedFormats( { allowedFormats, formattingControls } ) {
+function getAllowedFormats( {
+	allowedFormats,
+	formattingControls,
+	disableFormats,
+} ) {
+	if ( disableFormats ) {
+		return getAllowedFormats.EMPTY_ARRAY;
+	}
+
 	if ( ! allowedFormats && ! formattingControls ) {
 		return;
 	}
@@ -82,6 +90,8 @@ function getAllowedFormats( { allowedFormats, formattingControls } ) {
 
 	return formattingControls.map( ( name ) => `core/${ name }` );
 }
+
+getAllowedFormats.EMPTY_ARRAY = [];
 
 function RichTextWrapper(
 	{
@@ -112,6 +122,8 @@ function RichTextWrapper(
 		style,
 		preserveWhiteSpace,
 		__unstableEmbedURLOnPaste,
+		__unstableDisableFormats: disableFormats,
+		disableLineBreaks,
 		...props
 	},
 	forwardedRef
@@ -141,10 +153,7 @@ function RichTextWrapper(
 
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		const {
-			__experimentalCanUserUseUnfilteredHTML,
-			__experimentalUndo: undo,
-		} = getSettings();
+		const { __experimentalUndo: undo } = getSettings();
 
 		let isSelected;
 
@@ -171,7 +180,6 @@ function RichTextWrapper(
 		}
 
 		return {
-			canUserUseUnfilteredHTML: __experimentalCanUserUseUnfilteredHTML,
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
@@ -186,7 +194,6 @@ function RichTextWrapper(
 	// retreived from the store on merge.
 	// To do: fix this somehow.
 	const {
-		canUserUseUnfilteredHTML,
 		isCaretWithinFormattedText,
 		selectionStart,
 		selectionEnd,
@@ -207,6 +214,7 @@ function RichTextWrapper(
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		formattingControls,
+		disableFormats,
 	} );
 	const hasFormats =
 		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
@@ -334,14 +342,18 @@ function RichTextWrapper(
 
 			if ( multiline ) {
 				if ( shiftKey ) {
-					onChange( insert( value, '\n' ) );
+					if ( ! disableLineBreaks ) {
+						onChange( insert( value, '\n' ) );
+					}
 				} else if ( canSplit && isEmptyLine( value ) ) {
 					splitValue( value );
 				} else {
 					onChange( insertLineSeparator( value ) );
 				}
 			} else if ( shiftKey || ! canSplit ) {
-				onChange( insert( value, '\n' ) );
+				if ( ! disableLineBreaks ) {
+					onChange( insert( value, '\n' ) );
+				}
 			} else {
 				splitValue( value );
 			}
@@ -394,7 +406,6 @@ function RichTextWrapper(
 				plainText,
 				mode,
 				tagName,
-				canUserUseUnfilteredHTML,
 			} );
 
 			if ( typeof content === 'string' ) {
@@ -437,7 +448,6 @@ function RichTextWrapper(
 			onSplit,
 			splitValue,
 			__unstableEmbedURLOnPaste,
-			canUserUseUnfilteredHTML,
 			multiline,
 		]
 	);
@@ -511,6 +521,7 @@ function RichTextWrapper(
 			__unstableMarkAutomaticChange={ __unstableMarkAutomaticChange }
 			__unstableDidAutomaticChange={ didAutomaticChange }
 			__unstableUndo={ undo }
+			__unstableDisableFormats={ disableFormats }
 			style={ style }
 			preserveWhiteSpace={ preserveWhiteSpace }
 			disabled={ disabled }

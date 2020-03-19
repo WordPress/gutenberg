@@ -32,10 +32,22 @@
 		margin: $grid-unit-10 $grid-unit-10 0 0;
 		flex-shrink: 1;
 		max-width: 100px;
+
+		button {
+			display: flex;
+		}
 	}
 
 	.block-editor-block-variation-picker__variation {
 		padding: $grid-unit-10;
+	}
+
+	.block-editor-block-variation-picker__variation-label {
+		font-family: $default-font;
+		font-size: 12px;
+		display: block;
+		margin-right: $grid-unit-15;
+		text-align: center;
 	}
 }
 
