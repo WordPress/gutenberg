@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
@@ -25,6 +30,7 @@ function HeaderToolbar() {
 		showInserter,
 		isTextModeEnabled,
 		previewDeviceType,
+		showIconLabels,
 	} = useSelect(
 		( select ) => ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -55,7 +61,9 @@ function HeaderToolbar() {
 
 	return (
 		<NavigableToolbar
-			className="edit-post-header-toolbar"
+			className={ classnames( 'edit-post-header-toolbar', {
+				'show-icon-labels': showIconLabels,
+			} ) }
 			aria-label={ toolbarAriaLabel }
 		>
 			<Inserter
