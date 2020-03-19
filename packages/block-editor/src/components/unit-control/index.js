@@ -10,14 +10,14 @@ export default function UnitControl( { units: unitsProp, ...props } ) {
 	const settings = useCustomUnitsSettings();
 	const isDisabled = !! settings;
 
-	// Adjust units based on add_theme_support( 'disable-custom-units' );
+	// Adjust units based on add_theme_support( 'experimental-custom-units' );
 	let units;
 
 	/**
 	 * Handle extra arguments for add_theme_support
 	 *
-	 * Example: add_theme_support( 'disable-custom-units', 'rem' );
-	 * Or: add_theme_support( 'disable-custom-units', 'px, 'rem', 'em' );
+	 * Example: add_theme_support( 'experimental-custom-units', 'rem' );
+	 * Or: add_theme_support( 'experimental-custom-units', 'px, 'rem', 'em' );
 	 *
 	 * Note: If there are unit argument (e.g. 'em'), these units are enabled
 	 * within the control.
@@ -35,7 +35,7 @@ export default function UnitControl( { units: unitsProp, ...props } ) {
 UnitControl.__defaultUnits = __defaultUnits;
 
 /**
- * Hook that retrieves the 'disable-custom-units' setting from add_theme_support()
+ * Hook that retrieves the 'experimental-custom-units' setting from add_theme_support()
  */
 function useCustomUnitsSettings() {
 	const settings = useSelect( ( select ) => {

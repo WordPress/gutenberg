@@ -665,7 +665,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_heig
 * @return array Filtered editor settings.
 */
 function gutenberg_extend_settings_custom_units( $settings ) {
-	$settings['__experimentalDisableCustomUnits'] = get_theme_support( 'disable-custom-units' );
+	$settings['__experimentalDisableCustomUnits'] = get_theme_support( 'experimental-custom-units' );
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
