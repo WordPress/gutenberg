@@ -8758,6 +8758,45 @@ Array [
 ]
 `;
 
+exports[`Storyshots Components|AnglePicker Default 1`] = `
+<div
+  className="components-base-control components-angle-picker"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="components-angle-picker__input-0"
+    >
+      Angle
+    </label>
+    <div
+      aria-hidden="true"
+      className="components-angle-picker__angle-circle"
+      onMouseDown={[Function]}
+    >
+      <div
+        className="components-angle-picker__angle-circle-indicator-wrapper"
+      >
+        <span
+          className="components-angle-picker__angle-circle-indicator"
+        />
+      </div>
+    </div>
+    <input
+      className="components-angle-picker__input-field"
+      id="components-angle-picker__input-0"
+      max={360}
+      min={0}
+      onChange={[Function]}
+      step="1"
+      type="number"
+    />
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components|AnglePickerControl Default 1`] = `
 <div
   className="components-base-control components-angle-picker-control"

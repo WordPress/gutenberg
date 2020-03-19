@@ -79,7 +79,7 @@ group='com.github.wordpress-mobile.gutenberg-mobile'
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
 project.ext.buildGutenbergFromSource = false
 
-def hermesOriginalPath = "../../node_modules/hermes-engine/android/";
+def hermesOriginalPath = "../../../node_modules/hermes-engine/android/";
 def hermesPath = hermesOriginalPath;
 
 android {
@@ -136,7 +136,7 @@ dependencies {
 
         implementation 'com.facebook.react:react-native:+'
     } else {
-        hermesPath = "../../bundle/";
+        hermesPath = "../../react-native-editor/bundle/";
 
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../package.json', 'react-native-video', 'dependencies')))
@@ -161,7 +161,7 @@ if (isJitPack) {
         args = ['bundle:android']
     }
 
-    task ensureAssetsDirectory { 
+    task ensureAssetsDirectory {
         doLast {
             mkdir assetsFolder
         }
@@ -189,7 +189,7 @@ if (isJitPack) {
 
     task copyJSBundle(type: Copy) {
         def origFileName = 'App.js'
-        def origWithPath = "../../bundle/android/${origFileName}"
+        def origWithPath = "../../react-native-editor/bundle/android/${origFileName}"
         def target = 'index.android.bundle'
         from origWithPath
         into assetsFolder
@@ -200,7 +200,7 @@ if (isJitPack) {
     }
 
     task cleanupNodeModulesFolder(type: Delete) {
-        delete '../../node_modules'
+        delete '../../react-native-editor/node_modules'
     }
 
     if (isJitPack) {
