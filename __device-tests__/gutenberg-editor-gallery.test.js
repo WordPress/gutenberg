@@ -18,6 +18,7 @@ describe( 'Gutenberg Editor Gallery Block tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	let galleryBlockName = 'Gallery';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -40,7 +41,7 @@ describe( 'Gutenberg Editor Gallery Block tests', () => {
 	} );
 
 	it( 'should be able to add a gallery block', async () => {
-		await editorPage.addNewGalleryBlock();
+		await editorPage.addNewBlock( galleryBlockName );
 		const galleryBlock = await editorPage.getGalleryBlockAtPosition( 1 );
 
 		expect( galleryBlock ).toBeTruthy();

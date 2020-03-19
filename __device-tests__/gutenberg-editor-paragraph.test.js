@@ -23,6 +23,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	let paragraphBlockName = 'Paragraph';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -45,7 +46,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	} );
 
 	it( 'should be able to add a new Paragraph block', async () => {
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -55,7 +56,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	} );
 
 	it( 'should be able to split one paragraph block into two', async () => {
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -78,7 +79,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	} );
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -108,7 +109,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	} );
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();

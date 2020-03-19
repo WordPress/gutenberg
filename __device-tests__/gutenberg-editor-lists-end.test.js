@@ -20,6 +20,7 @@ describe( 'Gutenberg Editor tests for List block (end)', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	let listBlockName = 'List';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -42,7 +43,7 @@ describe( 'Gutenberg Editor tests for List block (end)', () => {
 	} );
 
 	it( 'should be able to end a List block', async () => {
-		await editorPage.addNewListBlock();
+		await editorPage.addNewBlock( listBlockName );
 		const listBlockElement = await editorPage.getListBlockAtPosition( 1 );
 
 		// Click List block on Android to force EditText focus

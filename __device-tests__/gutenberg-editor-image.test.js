@@ -22,6 +22,9 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	let imageBlockName = 'Image';
+	let paragraphBlockName = 'Paragraph';
+
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -44,7 +47,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 	} );
 
 	it( 'should be able to add an image block', async () => {
-		await editorPage.addNewImageBlock();
+		await editorPage.addNewBlock( imageBlockName );
 		let imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 
 		// Can only add image from media library on iOS
@@ -70,7 +73,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 	} );
 
 	it( 'should be able to add an image block with multiple paragraph blocks', async () => {
-		await editorPage.addNewImageBlock();
+		await editorPage.addNewBlock( imageBlockName );
 		let imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 
 		// Can only add image from media library on iOS
@@ -85,7 +88,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await editorPage.dismissKeyboard();
 		}
 
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();

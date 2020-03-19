@@ -22,6 +22,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	let paragraphBlockName = 'Paragraph';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -45,7 +46,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 	} );
 
 	it( 'should be able to insert block into post', async () => {
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -56,7 +57,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
 		await paragraphBlockElement.click();
 
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3 );
 		await paragraphBlockElement.click();
 		await editorPage.sendTextToParagraphBlockAtPosition( 3, testData.mediumText );
@@ -90,7 +91,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 	} );
 
 	it( 'should be able to insert block at the beginning of post from the title', async () => {
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -107,7 +108,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await titleElement.click();
 		await titleElement.click();
 
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		await clickMiddleOfElement( driver, paragraphBlockElement );
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.mediumText );

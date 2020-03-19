@@ -21,6 +21,7 @@ describe( 'Gutenberg Editor tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	let paragraphBlockName = 'Paragraph';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -43,7 +44,7 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	it( 'should be able to add blocks , rotate device and continue adding blocks', async () => {
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -57,7 +58,7 @@ describe( 'Gutenberg Editor tests', () => {
 			await driver.hideDeviceKeyboard();
 		}
 
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 
 		if ( isAndroid() ) {
 			await driver.hideDeviceKeyboard();

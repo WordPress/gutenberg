@@ -20,6 +20,8 @@ describe( 'Gutenberg Editor tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	let paragraphBlockName = 'Paragraph';
+	let headingBlockName = 'Heading';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -42,7 +44,7 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	it( 'should be able to create a post with heading and paragraph blocks', async () => {
-		await editorPage.addNewHeadingBlock();
+		await editorPage.addNewBlock( headingBlockName );
 		let headingBlockElement = await editorPage.getHeadingBlockAtPosition( 1 );
 
 		if ( isAndroid() ) {
@@ -50,19 +52,19 @@ describe( 'Gutenberg Editor tests', () => {
 		}
 		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading );
 
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
-		await editorPage.addNewHeadingBlock();
+		await editorPage.addNewBlock( headingBlockName );
 		headingBlockElement = await editorPage.getHeadingBlockAtPosition( 4 );
 		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading );
 
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 5 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 	} );

@@ -31,6 +31,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	let paragraphBlockName = 'Paragraph';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -50,7 +51,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 	} );
 
 	it( 'copies plain text from one paragraph block and pastes in another', async () => {
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 
 		if ( isAndroid() ) {
@@ -66,7 +67,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 		await tapCopyAboveElement( driver, textViewElement );
 
 		// create another paragraph block
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement2 = await editorPage.getParagraphBlockAtPosition( 2 );
 
 		if ( isAndroid() ) {
@@ -100,7 +101,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 		await tapCopyAboveElement( driver, textViewElement );
 
 		// create another paragraph block
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement2 = await editorPage.getParagraphBlockAtPosition( 2 );
 
 		if ( isAndroid() ) {
