@@ -77,7 +77,7 @@ export const Gallery = ( props ) => {
 	};
 
 	return (
-		<View>
+		<View style={ { flex: 1 } }>
 			<Tiles
 				columns={ displayedColumns }
 				spacing={ TILE_SPACING }
