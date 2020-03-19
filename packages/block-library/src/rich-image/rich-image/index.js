@@ -148,7 +148,6 @@ class RichImage extends Component {
 							<div
 								className="richimage__crop-area"
 								style={ {
-									width: imageSize.naturalWidth,
 									paddingBottom: `${ ( 100 *
 										imageSize.naturalHeight ) /
 										imageSize.naturalWidth }%`,
