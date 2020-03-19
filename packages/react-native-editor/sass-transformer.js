@@ -65,6 +65,7 @@ if ( reactNativeMinorVersion >= 59 ) {
 
 // TODO: need to find a way to pass the include paths and the default asset files via some config
 const autoImportIncludePaths = [
+	path.join( path.dirname( __filename ), 'src' ),
 	path.join( path.dirname( __filename ), '../base-styles' ),
 ];
 const autoImportAssets = [
