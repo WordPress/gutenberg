@@ -15,6 +15,8 @@ npm run build
 
 This will build Gutenberg, ready to be used as a WordPress plugin!
 
+`npm run build` is intended for one-off compilations of the project. If you're planning to do continued development in the source files, using `npm run dev` will most often be the better option. This will configure the build to avoid minifying the generated output, rebuild files automatically as they are changed in your working directory, and configure dependencies as running in a development environment so that useful warnings and errors are logged to your browser's developer console.
+
 If you don't have a local WordPress environment to load Gutenberg in, we can help get that up and running, too.
 
 ## Local Environment
