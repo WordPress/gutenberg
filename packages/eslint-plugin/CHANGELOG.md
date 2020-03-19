@@ -6,7 +6,7 @@
 - New Rule: [`@wordpress/i18n-translator-comments`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)
 - The `prefer-const` rule included in the `recommended` and `esnext` rulesets has been relaxed to allow a `let` assignment if any of a [destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) are reassigned.
 
-### Enhancements
+### Breaking Changes
 
 - The `@wordpress/valid-sprintf` rule now recognizes mix of ordered and non-ordered placeholders.
 
